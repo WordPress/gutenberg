@@ -56,6 +56,17 @@ const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
 const EMPTY_ARRAY = [];
 
 /**
+ * Shared reference to an empty Set for cases where it is important to avoid
+ * returning a new Set reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ *
+ * @type {Set}
+ */
+const EMPTY_SET = new Set();
+
+/**
  * Returns a block's name given its client ID, or null if no block exists with
  * the client ID.
  *
@@ -1277,17 +1288,6 @@ export function getBlockMode( state, clientId ) {
  */
 export function isTyping( state ) {
 	return state.isTyping;
-}
-
-/**
- * Returns true if the the block interface should be hidden, or false otherwise.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether the block toolbar is hidden.
- */
-export function __experimentalIsBlockInterfaceHidden( state ) {
-	return state.isBlockInterfaceHidden;
 }
 
 /**
@@ -2715,16 +2715,6 @@ export function wasBlockJustInserted( state, clientId, source ) {
 }
 
 /**
- * Gets the client ids of the last inserted blocks.
- *
- * @param {Object} state Global application state.
- * @return {Array|undefined} Client Ids of the last inserted block(s).
- */
-export function getLastInsertedBlocksClientIds( state ) {
-	return state?.lastBlockInserted?.clientIds;
-}
-
-/**
  * Tells if the block is visible on the canvas or not.
  *
  * @param {Object} state    Global application state.
@@ -2743,11 +2733,15 @@ export function isBlockVisible( state, clientId ) {
  */
 export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => {
-		return new Set(
+		const visibleBlocks = new Set(
 			Object.keys( state.blockVisibility ).filter(
 				( key ) => state.blockVisibility[ key ]
 			)
 		);
+		if ( visibleBlocks.size === 0 ) {
+			return EMPTY_SET;
+		}
+		return visibleBlocks;
 	},
 	( state ) => [ state.blockVisibility ]
 );

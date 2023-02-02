@@ -17,7 +17,7 @@ import Interface from './interface';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import WelcomeGuide from '../welcome-guide';
 
-function Layout( { blockEditorSettings, onError } ) {
+function Layout( { blockEditorSettings } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	function onPluginAreaError( name ) {
@@ -33,7 +33,7 @@ function Layout( { blockEditorSettings, onError } ) {
 	}
 
 	return (
-		<ErrorBoundary onError={ onError }>
+		<ErrorBoundary>
 			<WidgetAreasBlockEditorProvider
 				blockEditorSettings={ blockEditorSettings }
 			>

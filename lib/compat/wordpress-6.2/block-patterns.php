@@ -141,51 +141,6 @@ function gutenberg_register_core_block_patterns_categories() {
 add_action( 'init', 'gutenberg_register_core_block_patterns_categories' );
 
 /**
- * Registers Gutenberg-bundled patterns, with a focus on headers and footers
- * for site editing.
- *
- * @since 6.2.0
- * @access private
- */
-function gutenberg_register_core_block_patterns() {
-	if ( ! get_theme_support( 'core-block-patterns' ) ) {
-		return;
-	}
-
-	$core_block_patterns = array(
-		'centered-footer',
-		'centered-footer-with-social-links',
-		'centered-header',
-		'centered-logo-in-navigation',
-		'footer-with-background-color-and-three-columns',
-		'footer-with-credit-line-and-navigation',
-		'footer-with-large-font-size',
-		'footer-with-navigation-and-credit-line',
-		'footer-with-search-site-title-and-credit-line',
-		'footer-with-site-title-and-credit-line',
-		'header-with-large-font-size',
-		'left-aligned-footer',
-		'right-aligned-footer',
-		'simple-header',
-		'simple-header-inside-image',
-		'simple-header-with-background-color',
-		'simple-header-with-image',
-		'simple-header-with-tagline',
-		'simple-header-with-tagline-2',
-		'site-title-and-menu-button',
-		'site-title-and-vertical-navigation',
-	);
-
-	foreach ( $core_block_patterns as $core_block_pattern ) {
-		register_block_pattern(
-			'core/' . $core_block_pattern,
-			require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
-		);
-	}
-}
-add_action( 'init', 'gutenberg_register_core_block_patterns' );
-
-/**
  * Register any patterns that the active theme may provide under its
  * `./patterns/` directory. Each pattern is defined as a PHP file and defines
  * its metadata using plugin-style headers. The minimum required definition is:
@@ -355,3 +310,149 @@ function gutenberg_register_theme_block_patterns() {
 }
 remove_action( 'init', '_register_theme_block_patterns' );
 add_action( 'init', 'gutenberg_register_theme_block_patterns' );
+
+/**
+ * Normalize the pattern from the API (snake_case) to the format expected by `register_block_pattern` (camelCase).
+ *
+ * @since 6.2.0
+ *
+ * @param array $pattern Pattern as returned from the Pattern Directory API.
+ */
+function gutenberg_normalize_remote_pattern( $pattern ) {
+	if ( isset( $pattern['block_types'] ) ) {
+		$pattern['blockTypes'] = $pattern['block_types'];
+		unset( $pattern['block_types'] );
+	}
+
+	if ( isset( $pattern['viewport_width'] ) ) {
+		$pattern['viewportWidth'] = $pattern['viewport_width'];
+		unset( $pattern['viewport_width'] );
+	}
+
+	return (array) $pattern;
+}
+
+/**
+ * Register Core's official patterns from wordpress.org/patterns.
+ *
+ * @since 5.8.0
+ * @since 5.9.0 The $current_screen argument was removed.
+ * @since 6.2.0 Normalize the pattern from the API (snake_case) to the format expected by `register_block_pattern` (camelCase).
+ *
+ * @param WP_Screen $deprecated Unused. Formerly the screen that the current request was triggered from.
+ */
+function gutenberg_load_remote_block_patterns( $deprecated = null ) {
+	if ( ! empty( $deprecated ) ) {
+		_deprecated_argument( __FUNCTION__, '5.9.0' );
+		$current_screen = $deprecated;
+		if ( ! $current_screen->is_block_editor ) {
+			return;
+		}
+	}
+
+	$supports_core_patterns = get_theme_support( 'core-block-patterns' );
+
+	/**
+	 * Filter to disable remote block patterns.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param bool $should_load_remote
+	 */
+	$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
+
+	if ( $supports_core_patterns && $should_load_remote ) {
+		$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+		$core_keyword_id = 11; // 11 is the ID for "core".
+		$request->set_param( 'keyword', $core_keyword_id );
+		$response = rest_do_request( $request );
+		if ( $response->is_error() ) {
+			return;
+		}
+		$patterns = $response->get_data();
+
+		foreach ( $patterns as $pattern ) {
+			$normalized_pattern = gutenberg_normalize_remote_pattern( $pattern );
+			$pattern_name       = 'core/' . sanitize_title( $normalized_pattern['title'] );
+			register_block_pattern( $pattern_name, (array) $normalized_pattern );
+		}
+	}
+}
+
+/**
+ * Register `Featured` (category) patterns from wordpress.org/patterns.
+ *
+ * @since 5.9.0
+ * @since 6.2.0 Normalize the pattern from the API (snake_case) to the format expected by `register_block_pattern` (camelCase).
+ */
+function gutenberg_load_remote_featured_patterns() {
+	$supports_core_patterns = get_theme_support( 'core-block-patterns' );
+
+	/** This filter is documented in wp-includes/block-patterns.php */
+	$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
+
+	if ( ! $should_load_remote || ! $supports_core_patterns ) {
+		return;
+	}
+
+	$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+	$featured_cat_id = 26; // This is the `Featured` category id from pattern directory.
+	$request->set_param( 'category', $featured_cat_id );
+	$response = rest_do_request( $request );
+	if ( $response->is_error() ) {
+		return;
+	}
+	$patterns = $response->get_data();
+	$registry = WP_Block_Patterns_Registry::get_instance();
+	foreach ( $patterns as $pattern ) {
+		$normalized_pattern = gutenberg_normalize_remote_pattern( $pattern );
+		$pattern_name       = sanitize_title( $normalized_pattern['title'] );
+		// Some patterns might be already registered as core patterns with the `core` prefix.
+		$is_registered = $registry->is_registered( $pattern_name ) || $registry->is_registered( "core/$pattern_name" );
+		if ( ! $is_registered ) {
+			register_block_pattern( $pattern_name, (array) $normalized_pattern );
+		}
+	}
+}
+
+/**
+ * Registers patterns from Pattern Directory provided by a theme's
+ * `theme.json` file.
+ *
+ * @since 6.0.0
+ * @since 6.2.0 Normalize the pattern from the API (snake_case) to the format expected by `register_block_pattern` (camelCase).
+ * @access private
+ */
+function gutenberg_register_remote_theme_patterns() {
+	/** This filter is documented in wp-includes/block-patterns.php */
+	if ( ! apply_filters( 'should_load_remote_block_patterns', true ) ) {
+		return;
+	}
+
+	if ( ! wp_theme_has_theme_json() ) {
+		return;
+	}
+
+	$pattern_settings = WP_Theme_JSON_Resolver::get_theme_data()->get_patterns();
+	if ( empty( $pattern_settings ) ) {
+		return;
+	}
+
+	$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+	$request['slug'] = $pattern_settings;
+	$response        = rest_do_request( $request );
+	if ( $response->is_error() ) {
+		return;
+	}
+	$patterns          = $response->get_data();
+	$patterns_registry = WP_Block_Patterns_Registry::get_instance();
+	foreach ( $patterns as $pattern ) {
+		$normalized_pattern = gutenberg_normalize_remote_pattern( $pattern );
+		$pattern_name       = sanitize_title( $normalized_pattern['title'] );
+		// Some patterns might be already registered as core patterns with the `core` prefix.
+		$is_registered = $patterns_registry->is_registered( $pattern_name ) || $patterns_registry->is_registered( "core/$pattern_name" );
+		if ( ! $is_registered ) {
+			register_block_pattern( $pattern_name, (array) $normalized_pattern );
+		}
+	}
+}

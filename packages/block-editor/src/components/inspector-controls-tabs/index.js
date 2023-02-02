@@ -20,7 +20,7 @@ export default function InspectorControlsTabs( {
 } ) {
 	// The tabs panel will mount before fills are rendered to the list view
 	// slot. This means the list view tab isn't initially included in the
-	// available tabs so the panel defaults selection to the styles tab
+	// available tabs so the panel defaults selection to the settings tab
 	// which at the time is the first tab. This check allows blocks known to
 	// include the list view tab to set it as the tab selected by default.
 	const initialTabName = ! useIsListViewTabDisabled( blockName )

@@ -28,7 +28,6 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
 				__( 'Name and create your new %s' ),
 				areaLabel.toLowerCase()
 			) }
-			closeLabel={ __( 'Cancel' ) }
 			overlayClassName="wp-block-template-part__placeholder-create-new__title-form"
 			onRequestClose={ onClose }
 		>

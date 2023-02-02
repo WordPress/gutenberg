@@ -101,7 +101,7 @@ class NativeEditorProvider extends Component {
 		} = this.props;
 
 		updateEditorSettings( {
-			...capabilities,
+			capabilities,
 			...this.getThemeColors( this.props ),
 			locale,
 			hostAppNamespace,
@@ -325,7 +325,7 @@ class NativeEditorProvider extends Component {
 	}
 
 	updateCapabilitiesAction( capabilities ) {
-		this.props.updateEditorSettings( capabilities );
+		this.props.updateEditorSettings( { capabilities } );
 	}
 
 	render() {

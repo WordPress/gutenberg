@@ -14,6 +14,7 @@ $z-layers: (
 
 	// These next three share a stacking context
 	".block-library-template-part__selection-search": 2, // higher sticky element
+	".block-library-query-pattern__selection-search": 2, // higher sticky element
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
