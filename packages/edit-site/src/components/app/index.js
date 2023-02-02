@@ -3,7 +3,6 @@
  */
 import { SlotFillProvider, Popover } from '@wordpress/components';
 import { UnsavedChangesWarning } from '@wordpress/editor';
-import { StrictMode } from '@wordpress/element';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
@@ -32,17 +31,15 @@ export default function App() {
 	}
 
 	return (
-		<StrictMode>
-			<ShortcutProvider style={ { height: '100%' } }>
-				<SlotFillProvider>
-					<Popover.Slot />
-					<UnsavedChangesWarning />
-					<Routes>
-						<Layout />
-						<PluginArea onError={ onPluginAreaError } />
-					</Routes>
-				</SlotFillProvider>
-			</ShortcutProvider>
-		</StrictMode>
+		<ShortcutProvider style={ { height: '100%' } }>
+			<SlotFillProvider>
+				<Popover.Slot />
+				<UnsavedChangesWarning />
+				<Routes>
+					<Layout />
+					<PluginArea onError={ onPluginAreaError } />
+				</Routes>
+			</SlotFillProvider>
+		</ShortcutProvider>
 	);
 }

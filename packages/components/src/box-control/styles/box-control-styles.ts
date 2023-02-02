@@ -9,6 +9,7 @@ import styled from '@emotion/styled';
 import { Flex } from '../../flex';
 import BaseUnitControl from '../../unit-control';
 import { rtl } from '../../utils';
+import type { BoxUnitControlProps } from '../types';
 
 export const Root = styled.div`
 	box-sizing: border-box;
@@ -43,7 +44,11 @@ export const Layout = styled( Flex )`
 	justify-content: flex-start;
 `;
 
-const unitControlBorderRadiusStyles = ( { isFirst, isLast, isOnly } ) => {
+const unitControlBorderRadiusStyles = ( {
+	isFirst,
+	isLast,
+	isOnly,
+}: Pick< BoxUnitControlProps, 'isFirst' | 'isLast' | 'isOnly' > ) => {
 	if ( isFirst ) {
 		return rtl( { borderTopRightRadius: 0, borderBottomRightRadius: 0 } )();
 	}
@@ -59,7 +64,10 @@ const unitControlBorderRadiusStyles = ( { isFirst, isLast, isOnly } ) => {
 	} );
 };
 
-const unitControlMarginStyles = ( { isFirst, isOnly } ) => {
+const unitControlMarginStyles = ( {
+	isFirst,
+	isOnly,
+}: Pick< BoxUnitControlProps, 'isFirst' | 'isOnly' > ) => {
 	const marginLeft = isFirst || isOnly ? 0 : -1;
 
 	return rtl( { marginLeft } )();

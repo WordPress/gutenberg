@@ -8,6 +8,7 @@ import { useHover } from '@use-gesture/react';
  */
 import BaseTooltip from '../tooltip';
 import { UnitControlWrapper, UnitControl } from './styles/box-control-styles';
+import type { BoxUnitControlProps } from './types';
 
 const noop = () => {};
 
@@ -20,7 +21,7 @@ export default function BoxUnitControl( {
 	label,
 	value,
 	...props
-} ) {
+}: BoxUnitControlProps ) {
 	const bindHoverGesture = useHover( ( { event, ...state } ) => {
 		if ( state.hovering ) {
 			onHoverOn( event, state );
@@ -48,7 +49,13 @@ export default function BoxUnitControl( {
 	);
 }
 
-function Tooltip( { children, text } ) {
+function Tooltip( {
+	children,
+	text,
+}: {
+	children: JSX.Element;
+	text?: string;
+} ) {
 	if ( ! text ) return children;
 
 	/**

@@ -43,7 +43,6 @@
 		"src/index.js",
 		"src/angle-picker-control",
 		"src/autocomplete",
-		"src/box-control",
 		"src/combobox-control",
 		"src/custom-gradient-picker",
 		"src/dimension-control",
@@ -58,7 +57,7 @@
 		"src/menu-items-choice",
 		"src/navigation",
 		"src/palette-edit",
-		"src/panel",
+		"src/panel/body.js",
 		"src/toolbar"
 	]
 }
