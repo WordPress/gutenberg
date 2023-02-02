@@ -310,3 +310,60 @@ function gutenberg_register_theme_block_patterns() {
 }
 remove_action( 'init', '_register_theme_block_patterns' );
 add_action( 'init', 'gutenberg_register_theme_block_patterns' );
+
+
+/**
+ * Register Core's official patterns from wordpress.org/patterns.
+ *
+ * @since 5.8.0
+ * @since 5.9.0 The $current_screen argument was removed.
+ * @since 6.2.0 Normalize the settings from the API (snake_case) to the format expected by `register_block_pattern` (camelCase).
+ *
+ * @param WP_Screen $deprecated Unused. Formerly the screen that the current request was triggered from.
+ */
+function gutenberg_load_remote_block_patterns( $deprecated = null ) {
+	if ( ! empty( $deprecated ) ) {
+		_deprecated_argument( __FUNCTION__, '5.9.0' );
+		$current_screen = $deprecated;
+		if ( ! $current_screen->is_block_editor ) {
+			return;
+		}
+	}
+
+	$supports_core_patterns = get_theme_support( 'core-block-patterns' );
+
+	/**
+	 * Filter to disable remote block patterns.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param bool $should_load_remote
+	 */
+	$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
+
+	if ( $supports_core_patterns && $should_load_remote ) {
+		$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+		$core_keyword_id = 11; // 11 is the ID for "core".
+		$request->set_param( 'keyword', $core_keyword_id );
+		$response = rest_do_request( $request );
+		if ( $response->is_error() ) {
+			return;
+		}
+		$patterns = $response->get_data();
+
+		foreach ( $patterns as $settings ) {
+			if ( isset( $settings['block_types'] ) ) {
+				$settings['blockTypes'] = $settings['block_types'];
+				unset( $settings['block_types'] );
+			}
+
+			if ( isset( $settings['viewport_width'] ) ) {
+				$settings['viewportWidth'] = $settings['viewport_width'];
+				unset( $settings['viewport_width'] );
+			}
+
+			$pattern_name = 'core/' . sanitize_title( $settings['title'] );
+			register_block_pattern( $pattern_name, (array) $settings );
+		}
+	}
+}
