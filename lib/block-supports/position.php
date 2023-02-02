@@ -68,7 +68,7 @@ function gutenberg_render_position_support( $block_content, $block ) {
 	) {
 		$wrapper_classes[] = $class_name;
 		$wrapper_classes[] = 'is-position-' . $position_type;
-		$sides = array( 'top', 'right', 'bottom', 'left' );
+		$sides             = array( 'top', 'right', 'bottom', 'left' );
 
 		foreach ( $sides as $side ) {
 			$side_value = _wp_array_get( $style_attribute, array( 'position', $side ) );
