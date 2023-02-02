@@ -84,3 +84,15 @@ export type PanelBodyProps = {
 	 */
 	scrollAfterOpen?: boolean;
 };
+
+export type PanelBodyTitleProps = {
+	/**
+	 * Whether or not the panel body is currently opened or not.
+	 */
+	isOpened?: boolean | '';
+	/**
+	 * A callback invoked when 'PanelBodyTitle' is clicked. It is used to
+	 * toggle the body opened or closed.
+	 */
+	onClick: ( event: MouseEvent ) => void;
+};

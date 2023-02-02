@@ -14,7 +14,8 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import type { PanelBodyProps } from './types';
+import type { PanelBodyProps, PanelBodyTitleProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 import Button from '../button';
 import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
@@ -96,7 +97,16 @@ export function UnforwardedPanelBody(
 }
 
 const PanelBodyTitle = forwardRef(
-	( { isOpened, icon, title, ...props }, ref ) => {
+	(
+		{
+			isOpened,
+			icon,
+			title,
+			...props
+		}: WordPressComponentProps< PanelBodyTitleProps, 'h2' > &
+			PanelBodyProps,
+		ref: ForwardedRef< any >
+	) => {
 		if ( ! title ) return null;
 
 		return (
