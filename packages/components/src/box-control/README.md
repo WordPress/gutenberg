@@ -56,7 +56,7 @@ Props for the internal [UnitControl](../unit-control) components.
 Heading label for the control.
 
 -   Required: No
--   Default: `Box Control`
+-   Default: `__( 'Box Control' )`
 
 ### `onChange`: `(next: BoxControlValue) => void`
 
