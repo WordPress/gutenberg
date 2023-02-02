@@ -9,7 +9,11 @@ import styled from '@emotion/styled';
  */
 import { COLORS, rtl } from '../../utils';
 
-const containerPositionStyles = ( { isPositionAbsolute } ) => {
+const containerPositionStyles = ( {
+	isPositionAbsolute,
+}: {
+	isPositionAbsolute: boolean;
+} ) => {
 	if ( ! isPositionAbsolute ) return '';
 
 	return css`
@@ -39,7 +43,7 @@ export const Side = styled.div`
 	transition: opacity 120ms linear;
 	z-index: 1;
 
-	${ ( { isActive } ) =>
+	${ ( { isActive }: { isActive: boolean } ) =>
 		isActive &&
 		`
 		opacity: 0.3;

@@ -1,6 +1,8 @@
 /**
  * Internal dependencies
  */
+import type { UnitControlProps } from '../unit-control/types';
+import type { BoxControlInputControlProps } from './types';
 import UnitControl from './unit-control';
 import {
 	LABELS,
@@ -22,18 +24,20 @@ export default function AllInputControl( {
 	selectedUnits,
 	setSelectedUnits,
 	...props
-} ) {
+}: BoxControlInputControlProps ) {
 	const allValue = getAllValue( values, selectedUnits, sides );
 	const hasValues = isValuesDefined( values );
 	const isMixed = hasValues && isValuesMixed( values, selectedUnits, sides );
-	const allPlaceholder = isMixed ? LABELS.mixed : null;
+	const allPlaceholder = isMixed ? LABELS.mixed : undefined;
 
-	const handleOnFocus = ( event ) => {
+	const handleOnFocus: React.FocusEventHandler< HTMLInputElement > = (
+		event
+	) => {
 		onFocus( event, { side: 'all' } );
 	};
 
-	const handleOnChange = ( next ) => {
-		const isNumeric = ! isNaN( parseFloat( next ) );
+	const handleOnChange: UnitControlProps[ 'onChange' ] = ( next ) => {
+		const isNumeric = next !== undefined && ! isNaN( parseFloat( next ) );
 		const nextValue = isNumeric ? next : undefined;
 		const nextValues = applyValueToSides( values, nextValue, sides );
 
@@ -42,7 +46,7 @@ export default function AllInputControl( {
 
 	// Set selected unit so it can be used as fallback by unlinked controls
 	// when individual sides do not have a value containing a unit.
-	const handleOnUnitChange = ( unit ) => {
+	const handleOnUnitChange: UnitControlProps[ 'onUnitChange' ] = ( unit ) => {
 		const newUnits = applyValueToSides( selectedUnits, unit, sides );
 		setSelectedUnits( newUnits );
 	};
