@@ -105,18 +105,6 @@ Messages to display.
 -   Required: No
 -   Default: `{ selected: __( 'Item selected.' ) }`
 
-#### `onChange`: `( selectedValue: string ) => void`
-
-Function called with the selected value changes.
-
--   Required: No
-
-#### `onFilterValueChange`: `( nextInput: string ) => void`
-
-Function called with the control's search input value changes. The argument contains the next input value.
-
--   Required: No
-
 `onChange`: `( selectedValue: string ) => void`
 
 Function called with the selected value changes.
