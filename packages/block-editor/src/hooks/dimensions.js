@@ -347,5 +347,17 @@ export function useIsDimensionsSupportValid( blockName, feature ) {
 		return false;
 	}
 
+	if (
+		sides?.length &&
+		feature === 'blockGap' &&
+		! AXIAL_SIDES.every( ( side ) => sides.includes( side ) )
+	) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`The ${ feature } support for the "${ blockName }" block can not be configured to support arbitrary sides.`
+		);
+		return false;
+	}
+
 	return true;
 }
