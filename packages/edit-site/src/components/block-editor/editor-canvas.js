@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -8,7 +13,7 @@ import {
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -16,16 +21,18 @@ import { useSelect } from '@wordpress/data';
 import { store as editSiteStore } from '../../store';
 
 function EditorCanvas( { enableResizing, settings, children, ...props } ) {
-	const { deviceType, isZoomOutMode } = useSelect(
+	const { canvasMode, deviceType, isZoomOutMode } = useSelect(
 		( select ) => ( {
 			deviceType:
 				select( editSiteStore ).__experimentalGetPreviewDeviceType(),
 			isZoomOutMode:
 				select( blockEditorStore ).__unstableGetEditorMode() ===
 				'zoom-out',
+			canvasMode: select( editSiteStore ).__unstableGetCanvasMode(),
 		} ),
 		[]
 	);
+	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
 	const deviceStyles = useResizeCanvas( deviceType );
 	const mouseMoveTypingRef = useMouseMoveTypingReset();
 	return (
@@ -55,8 +62,20 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			}
 			ref={ mouseMoveTypingRef }
 			name="editor-canvas"
-			className="edit-site-visual-editor__editor-canvas"
+			className={ classnames(
+				'edit-site-visual-editor__editor-canvas',
+				`is-canvas-${ canvasMode }`
+			) }
 			{ ...props }
+			role={ canvasMode === 'view' ? 'button' : undefined }
+			onClick={
+				canvasMode === 'view'
+					? () => {
+							__unstableSetCanvasMode( 'edit' );
+					  }
+					: undefined
+			}
+			readonly={ canvasMode === 'view' }
 		>
 			{ /* Filters need to be rendered before children to avoid Safari rendering issues. */ }
 			{ settings.svgFilters }
