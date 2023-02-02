@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as viewportStore } from '@wordpress/viewport';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -97,27 +98,34 @@ function ComplementaryArea( {
 	isActiveByDefault,
 	showIconLabels = false,
 } ) {
-	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
-		( select ) => {
-			const { getActiveComplementaryArea, isItemPinned } =
-				select( interfaceStore );
-			const _activeArea = getActiveComplementaryArea( scope );
-			const _isSmall =
-				select( viewportStore ).isViewportMatch( '< medium' );
+	const { isLoading, isActive, isPinned, activeArea, isSmall, isLarge } =
+		useSelect(
+			( select ) => {
+				const { getActiveComplementaryArea, isItemPinned } =
+					select( interfaceStore );
 
-			return {
-				isActive:
-					_activeArea === undefined && ! _isSmall
-						? undefined
-						: _activeArea === identifier,
-				isPinned: isItemPinned( scope, identifier ),
-				activeArea: _activeArea,
-				isSmall: _isSmall,
-				isLarge: select( viewportStore ).isViewportMatch( 'large' ),
-			};
-		},
-		[ identifier, scope ]
-	);
+				const isComplementaryAreaVisible = select(
+					preferencesStore
+				).get( scope, 'isComplementaryAreaVisible' );
+				const _activeArea = getActiveComplementaryArea( scope );
+				const _isSmall =
+					select( viewportStore ).isViewportMatch( '< medium' );
+
+				return {
+					isLoading:
+						isComplementaryAreaVisible &&
+						_activeArea === undefined &&
+						! _isSmall,
+					isActive: _activeArea === identifier,
+					isPinned: isItemPinned( scope, identifier ),
+					activeArea: _activeArea,
+					isSmall:
+						select( viewportStore ).isViewportMatch( '< medium' ),
+					isLarge: select( viewportStore ).isViewportMatch( 'large' ),
+				};
+			},
+			[ identifier, scope ]
+		);
 	useAdjustComplementaryListener(
 		scope,
 		identifier,
@@ -150,7 +158,7 @@ function ComplementaryArea( {
 								isActive && ( ! showIconLabels || isLarge )
 							}
 							aria-expanded={ isActive }
-							aria-disabled={ isActive === undefined }
+							aria-disabled={ isLoading }
 							label={ title }
 							icon={ showIconLabels ? check : icon }
 							showTooltip={ ! showIconLabels }
