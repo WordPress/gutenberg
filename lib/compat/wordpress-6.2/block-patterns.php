@@ -457,9 +457,15 @@ function gutenberg_register_remote_theme_patterns() {
 	}
 }
 
+/**
+ * Registers new patterns for the query loop block.
+ *
+ * @since 6.2.0
+ * @access private
+ */
 function gutenberg_register_new_query_block_patterns() {
 	$patterns = array(
-		'query-post-feed' => array(
+		'query-post-feed'                    => array(
 			'title'      => _x( 'Post feed', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -489,7 +495,7 @@ function gutenberg_register_new_query_block_patterns() {
 				<!-- /wp:post-template --></div>
 				<!-- /wp:query -->',
 		),
-		'query-post-table' => array(
+		'query-post-table'                   => array(
 			'title'      => _x( 'Post table', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -531,7 +537,7 @@ function gutenberg_register_new_query_block_patterns() {
 				<!-- /wp:query --></div>
 				<!-- /wp:group -->',
 		),
-		'query-post-list-cards' => array(
+		'query-post-list-cards'              => array(
 			'title'      => _x( 'Post list cards', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -557,7 +563,7 @@ function gutenberg_register_new_query_block_patterns() {
 				<!-- /wp:post-template --></div>
 				<!-- /wp:query -->',
 		),
-		'query-two-column-text-list' => array(
+		'query-two-column-text-list'         => array(
 			'title'      => _x( 'Two column text list', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -585,7 +591,7 @@ function gutenberg_register_new_query_block_patterns() {
 				<!-- /wp:group --></div>
 				<!-- /wp:query -->',
 		),
-		'query-two-column-with-tags' => array(
+		'query-two-column-with-tags'         => array(
 			'title'      => _x( 'Two column with tags', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -609,7 +615,7 @@ function gutenberg_register_new_query_block_patterns() {
 				<!-- /wp:group --></div>
 				<!-- /wp:query -->',
 		),
-		'query-colorful-full-width-posts' => array(
+		'query-colorful-full-width-posts'    => array(
 			'title'      => _x( 'Colorful full width posts', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -677,7 +683,7 @@ function gutenberg_register_new_query_block_patterns() {
 				<!-- /wp:column --></div>
 				<!-- /wp:columns -->',
 		),
-		'query-more-posts' => array(
+		'query-more-posts'                   => array(
 			'title'      => _x( 'Featured post with more posts', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -715,7 +721,7 @@ function gutenberg_register_new_query_block_patterns() {
 				<!-- /wp:query --></div>
 				<!-- /wp:group -->',
 		),
-		'query-post-and-date-list' => array(
+		'query-post-and-date-list'           => array(
 			'title'      => _x( 'Post and date list', 'Block pattern title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -739,7 +745,7 @@ function gutenberg_register_new_query_block_patterns() {
 				<!-- /wp:separator --></div>
 				<!-- /wp:group --></div>
 				<!-- /wp:group -->',
-		)
+		),
 	);
 
 	foreach ( $patterns as $name => $pattern ) {
