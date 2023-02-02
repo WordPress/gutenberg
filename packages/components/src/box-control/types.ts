@@ -64,6 +64,8 @@ export type BoxControlProps = Pick<
 	/**
 	 * If this property is true, when the box control is unlinked, vertical and horizontal controls
 	 * can be used instead of updating individual sides.
+	 *
+	 * @default false
 	 */
 	splitOnAxis?: boolean;
 	/**
