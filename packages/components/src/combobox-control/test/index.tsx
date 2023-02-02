@@ -64,7 +64,7 @@ const ControlledComboboxControl = ( {
 	...props
 }: ComboboxControlProps ) => {
 	const [ value, setValue ] = useState( valueProp );
-	const handleOnChange = ( newValue: string ) => {
+	const handleOnChange: ComboboxControlProps[ 'onChange' ] = ( newValue ) => {
 		setValue( newValue );
 		onChange?.( newValue );
 	};
