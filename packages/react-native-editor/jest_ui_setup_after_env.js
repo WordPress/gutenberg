@@ -4,6 +4,7 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const childProcess = require( 'child_process' );
+const { toMatchImageSnapshot } = require( 'jest-image-snapshot' );
 
 /**
  * Internal dependencies
@@ -14,6 +15,8 @@ const {
 } = require( './__device-tests__/helpers/utils' );
 
 jest.setTimeout( 1000000 ); // In milliseconds.
+
+expect.extend( { toMatchImageSnapshot } );
 
 let iOSScreenRecordingProcess;
 let androidScreenRecordingProcess;
