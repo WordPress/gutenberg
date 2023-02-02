@@ -54,7 +54,7 @@ export type BoxControlProps = Pick<
 	/**
 	 * The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
 	 *
-	 * @default `{ top: undefined, right: undefined, bottom: undefined, left: undefined}`
+	 * @default `{ top: undefined, right: undefined, bottom: undefined, left: undefined }`
 	 */
 	resetValues?: BoxControlValue;
 	/**

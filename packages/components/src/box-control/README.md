@@ -69,6 +69,7 @@ A callback function when an input value changes.
 The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
 
 -   Required: No
+-   Default: `{ top: undefined, right: undefined, bottom: undefined, left: undefined }`
 
 ### `sides`: `string[]`
 
