@@ -485,7 +485,7 @@ supports: {
 -   Type: `boolean`
 -   Default value: `true`
 
-By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
+By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programatically, set `inserter` to `false`.
 
 ```js
 supports: {
