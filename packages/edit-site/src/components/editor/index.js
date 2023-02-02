@@ -38,6 +38,7 @@ import { GlobalStylesRenderer } from '../global-styles-renderer';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
+import { unlock } from '../../experiments';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -71,11 +72,11 @@ export default function Editor() {
 			getEditedPostId,
 			getEditedPostContext,
 			getEditorMode,
-			__unstableGetCanvasMode,
+			getCanvasMode,
 			isInserterOpened,
 			isListViewOpened,
 			isSaveViewOpened,
-		} = select( editSiteStore );
+		} = unlock( select( editSiteStore ) );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
@@ -99,7 +100,7 @@ export default function Editor() {
 				  ] )
 				: false,
 			editorMode: getEditorMode(),
-			canvasMode: __unstableGetCanvasMode(),
+			canvasMode: getCanvasMode(),
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),

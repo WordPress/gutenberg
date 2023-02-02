@@ -27,6 +27,7 @@ import { useLocation } from '../routes';
 import getIsListPage from '../../utils/get-is-list-page';
 import SiteIcon from '../site-icon';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import { unlock } from '../../experiments';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
@@ -38,13 +39,10 @@ const SiteHub = forwardRef(
 		const { canvasMode, dashboardLink, entityConfig } = useSelect(
 			( select ) => {
 				select( editSiteStore ).getEditedPostType();
-				const {
-					__unstableGetCanvasMode,
-					getSettings,
-					getEditedPostType,
-				} = select( editSiteStore );
+				const { getCanvasMode, getSettings, getEditedPostType } =
+					unlock( select( editSiteStore ) );
 				return {
-					canvasMode: __unstableGetCanvasMode(),
+					canvasMode: getCanvasMode(),
 					dashboardLink: getSettings().__experimentalDashboardLink,
 					entityConfig: select( coreStore ).getEntityConfig(
 						'postType',
@@ -56,7 +54,7 @@ const SiteHub = forwardRef(
 		);
 		const disableMotion = useReducedMotion();
 		const isMobileViewport = useViewportMatch( 'medium', '<' );
-		const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
+		const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 		const { clearSelectedBlock } = useDispatch( blockEditorStore );
 		const showEditButton =
 			( isEditorPage && canvasMode === 'view' && ! isMobileViewport ) ||
@@ -77,7 +75,7 @@ const SiteHub = forwardRef(
 					onClick: () => {
 						clearSelectedBlock();
 						setIsMobileCanvasVisible( false );
-						__unstableSetCanvasMode( 'view' );
+						setCanvasMode( 'view' );
 					},
 			  };
 		const { getTitle } = useEditedEntityRecord();
@@ -137,7 +135,7 @@ const SiteHub = forwardRef(
 					<Button
 						className="edit-site-site-hub__edit-button"
 						onClick={ () => {
-							__unstableSetCanvasMode( 'edit' );
+							setCanvasMode( 'edit' );
 						} }
 						variant="primary"
 					>
