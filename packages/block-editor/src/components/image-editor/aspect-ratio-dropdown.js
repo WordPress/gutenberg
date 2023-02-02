@@ -15,18 +15,18 @@ import { useImageEditingContext } from './context';
 function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
 	return (
 		<MenuGroup label={ label }>
-			{ aspectRatios.map( ( { title, aspect } ) => (
+			{ aspectRatios.map( ( { name, slug, ratio } ) => (
 				<MenuItem
-					key={ aspect }
+					key={ slug }
 					disabled={ isDisabled }
 					onClick={ () => {
-						onClick( aspect );
+						onClick( ratio );
 					} }
 					role="menuitemradio"
-					isSelected={ aspect === value }
-					icon={ aspect === value ? check : undefined }
+					isSelected={ ratio === value }
+					icon={ ratio === value ? check : undefined }
 				>
-					{ title }
+					{ name }
 				</MenuItem>
 			) ) }
 		</MenuGroup>
@@ -49,12 +49,23 @@ function ratioToNumber( str ) {
 	return b ? a / b : a;
 }
 
+function presetRatioAsNumber( { ratio, ...rest } ) {
+	return {
+		ratio: ratioToNumber( ratio ),
+		...rest,
+	};
+}
+
 export default function AspectRatioDropdown( { toggleProps } ) {
 	const { isInProgress, aspect, setAspect, defaultAspect } =
 		useImageEditingContext();
 
-	const [ themeRatios ] =
-		useSettings( [ 'dimensions.aspectRatios.theme' ] ) || [];
+	const [ defaultRatios ] = (
+		useSettings( [ 'dimensions.aspectRatios.default' ] ) || [ [] ]
+	).map( presetRatioAsNumber );
+	const [ themeRatios ] = (
+		useSettings( [ 'dimensions.aspectRatios.theme' ] ) || [ [] ]
+	).map( presetRatioAsNumber );
 	const [ showDefaultRatios ] = useSettings( [
 		'dimensions.defaultAspectRatios',
 	] );
@@ -83,12 +94,9 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 								aspect: defaultAspect,
 							},
 							...( showDefaultRatios
-								? [
-										{
-											title: __( 'Square' ),
-											aspect: 1,
-										},
-								  ]
+								? defaultRatios.filter(
+										( { ratio } ) => ratio === 1
+								  )
 								: [] ),
 						] }
 					/>
@@ -101,12 +109,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 								onClose();
 							} }
 							value={ aspect }
-							aspectRatios={ themeRatios.map(
-								( { name, ratio } ) => ( {
-									title: name,
-									aspect: ratioToNumber( ratio ),
-								} )
-							) }
+							aspectRatios={ themeRatios }
 						/>
 					) }
 					{ showDefaultRatios && (
@@ -118,20 +121,9 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 								onClose();
 							} }
 							value={ aspect }
-							aspectRatios={ [
-								{
-									title: __( '16:9' ),
-									aspect: 16 / 9,
-								},
-								{
-									title: __( '4:3' ),
-									aspect: 4 / 3,
-								},
-								{
-									title: __( '3:2' ),
-									aspect: 3 / 2,
-								},
-							] }
+							aspectRatios={ defaultRatios.filter(
+								( { ratio } ) => ratio > 1
+							) }
 						/>
 					) }
 					{ showDefaultRatios && (
@@ -143,20 +135,9 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 								onClose();
 							} }
 							value={ aspect }
-							aspectRatios={ [
-								{
-									title: __( '9:16' ),
-									aspect: 9 / 16,
-								},
-								{
-									title: __( '3:4' ),
-									aspect: 3 / 4,
-								},
-								{
-									title: __( '2:3' ),
-									aspect: 2 / 3,
-								},
-							] }
+							aspectRatios={ defaultRatios.filter(
+								( { ratio } ) => ratio < 1
+							) }
 						/>
 					) }
 				</>
