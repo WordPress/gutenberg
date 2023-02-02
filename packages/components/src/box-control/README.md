@@ -73,7 +73,7 @@ The `top`, `right`, `bottom`, and `left` box dimension values to use when the co
 
 ### `sides`: `string[]`
 
-Collection of sides to allow control of. If omitted or empty, all sides will be available.
+Collection of sides to allow control of. If omitted or empty, all sides will be available. Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
 
 -   Required: No
 
