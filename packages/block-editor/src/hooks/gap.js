@@ -210,13 +210,6 @@ export function GapEdit( props ) {
 				top: gapValue?.top,
 		  };
 
-	// Remove undefined properties from the box control value.
-	const cleanedBoxControlGapValue = Object.fromEntries(
-		Object.entries( boxControlGapValue ).filter(
-			( [ , value ] ) => value !== undefined
-		)
-	);
-
 	return Platform.select( {
 		web: (
 			<>
@@ -228,7 +221,7 @@ export function GapEdit( props ) {
 							onChange={ onChange }
 							units={ units }
 							sides={ sides }
-							values={ cleanedBoxControlGapValue }
+							values={ boxControlGapValue }
 							allowReset={ false }
 							splitOnAxis={ splitOnAxis }
 						/>
@@ -240,12 +233,12 @@ export function GapEdit( props ) {
 							onChange={ onChange }
 							units={ units }
 							// Default to `row` for combined values.
-							value={ cleanedBoxControlGapValue }
+							value={ boxControlGapValue }
 						/>
 					) ) }
 				{ spacingSizes?.length > 0 && (
 					<SpacingSizesControl
-						values={ cleanedBoxControlGapValue }
+						values={ boxControlGapValue }
 						onChange={ onChange }
 						label={ __( 'Block spacing' ) }
 						sides={ splitOnAxis ? sides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
