@@ -195,6 +195,7 @@ function BlockPatternsTabs( {
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 	const categories = usePatternsCategories( rootClientId );
+	const initialCategory = categories.length && categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
 		<>
@@ -261,7 +262,7 @@ function BlockPatternsTabs( {
 			) }
 			{ showPatternsExplorer && (
 				<PatternsExplorerModal
-					initialCategory={ selectedCategory }
+					initialCategory={ initialCategory }
 					patternCategories={ categories }
 					onModalClose={ () => setShowPatternsExplorer( false ) }
 				/>
