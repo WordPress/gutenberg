@@ -189,8 +189,8 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2 extends Gutenberg_REST_Block_
 		if ( ! $this->remote_patterns_loaded ) {
 			// Load block patterns from w.org.
 			gutenberg_load_remote_block_patterns(); // Patterns with the `core` keyword.
-			_load_remote_featured_patterns(); // Patterns in the `featured` category.
-			_register_remote_theme_patterns(); // Patterns requested by current theme.
+			gutenberg_load_remote_featured_patterns(); // Patterns in the `featured` category.
+			gutenberg_register_remote_theme_patterns(); // Patterns requested by current theme.
 
 			$this->remote_patterns_loaded = true;
 		}
