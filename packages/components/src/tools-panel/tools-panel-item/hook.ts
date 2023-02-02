@@ -109,7 +109,7 @@ export function useToolsPanelItem(
 				'Do something here to make non-default items with values updated show'
 			);
 		}
-	} );
+	}, [ isShownByDefault, isValueSet, wasValueSet ] );
 
 	// Note: `label` is used as a key when building menu item state in
 	// `ToolsPanel`.
