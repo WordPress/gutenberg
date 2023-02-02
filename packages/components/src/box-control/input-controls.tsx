@@ -55,8 +55,9 @@ export default function BoxInputControls( {
 			 * Supports changing pair sides. For example, holding the ALT key
 			 * when changing the TOP will also update BOTTOM.
 			 */
-			// @ts-expect-error - event.altKey is only present when the change event was
-			// triggered by a keyboard event.
+			// @ts-expect-error - TODO: event.altKey is only present when the change event was
+			// triggered by a keyboard event. Should this feature be implemented differently so
+			// it also works with drag events?
 			if ( event.altKey ) {
 				switch ( side ) {
 					case 'top':
