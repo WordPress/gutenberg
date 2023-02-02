@@ -48,6 +48,7 @@ import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../experiments';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
@@ -98,8 +99,9 @@ export default function NewTemplate( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const { setTemplate, __unstableSetCanvasMode } =
-		useDispatch( editSiteStore );
+	const { setTemplate, setCanvasMode } = unlock(
+		useDispatch( editSiteStore )
+	);
 
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isCreatingTemplate ) {
@@ -140,7 +142,7 @@ export default function NewTemplate( {
 			setTemplate( newTemplate.id, newTemplate.slug );
 
 			// Switch to edit mode.
-			__unstableSetCanvasMode( 'edit' );
+			setCanvasMode( 'edit' );
 
 			// Navigate to the created template editor.
 			history.push( {
