@@ -404,7 +404,14 @@ function TableEdit( {
 				<tr key={ rowIndex }>
 					{ cells.map(
 						(
-							{ content, tag: CellTag, scope, align, colspan },
+							{
+								content,
+								tag: CellTag,
+								scope,
+								align,
+								colspan,
+								rowspan,
+							},
 							columnIndex
 						) => (
 							<RichText
@@ -418,6 +425,7 @@ function TableEdit( {
 								) }
 								scope={ CellTag === 'th' ? scope : undefined }
 								colSpan={ colspan }
+								rowSpan={ rowspan }
 								value={ content }
 								onChange={ onChange }
 								unstableOnFocus={ () => {
@@ -464,30 +472,32 @@ function TableEdit( {
 					</BlockControls>
 				</>
 			) }
-			{ ! isEmpty && (
-				<InspectorControls>
-					<PanelBody
-						title={ __( 'Settings' ) }
-						className="blocks-table-settings"
-					>
-						<ToggleControl
-							label={ __( 'Fixed width table cells' ) }
-							checked={ !! hasFixedLayout }
-							onChange={ onChangeFixedLayout }
-						/>
-						<ToggleControl
-							label={ __( 'Header section' ) }
-							checked={ !! ( head && head.length ) }
-							onChange={ onToggleHeaderSection }
-						/>
-						<ToggleControl
-							label={ __( 'Footer section' ) }
-							checked={ !! ( foot && foot.length ) }
-							onChange={ onToggleFooterSection }
-						/>
-					</PanelBody>
-				</InspectorControls>
-			) }
+			<InspectorControls>
+				<PanelBody
+					title={ __( 'Settings' ) }
+					className="blocks-table-settings"
+				>
+					<ToggleControl
+						label={ __( 'Fixed width table cells' ) }
+						checked={ !! hasFixedLayout }
+						onChange={ onChangeFixedLayout }
+					/>
+					{ ! isEmpty && (
+						<>
+							<ToggleControl
+								label={ __( 'Header section' ) }
+								checked={ !! ( head && head.length ) }
+								onChange={ onToggleHeaderSection }
+							/>
+							<ToggleControl
+								label={ __( 'Footer section' ) }
+								checked={ !! ( foot && foot.length ) }
+								onChange={ onToggleFooterSection }
+							/>
+						</>
+					) }
+				</PanelBody>
+			</InspectorControls>
 			{ ! isEmpty && (
 				<table
 					className={ classnames(

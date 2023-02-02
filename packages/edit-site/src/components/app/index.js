@@ -3,6 +3,7 @@
  */
 import { SlotFillProvider, Popover } from '@wordpress/components';
 import { UnsavedChangesWarning } from '@wordpress/editor';
+import { StrictMode } from '@wordpress/element';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
@@ -15,7 +16,7 @@ import { PluginArea } from '@wordpress/plugins';
 import { Routes } from '../routes';
 import Layout from '../layout';
 
-export default function App( { reboot } ) {
+export default function App() {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	function onPluginAreaError( name ) {
@@ -31,16 +32,17 @@ export default function App( { reboot } ) {
 	}
 
 	return (
-		<ShortcutProvider style={ { height: '100%' } }>
-			<SlotFillProvider>
-				<Popover.Slot />
-				<UnsavedChangesWarning />
-
-				<Routes>
-					<Layout onError={ reboot } />
-					<PluginArea onError={ onPluginAreaError } />
-				</Routes>
-			</SlotFillProvider>
-		</ShortcutProvider>
+		<StrictMode>
+			<ShortcutProvider style={ { height: '100%' } }>
+				<SlotFillProvider>
+					<Popover.Slot />
+					<UnsavedChangesWarning />
+					<Routes>
+						<Layout />
+						<PluginArea onError={ onPluginAreaError } />
+					</Routes>
+				</SlotFillProvider>
+			</ShortcutProvider>
+		</StrictMode>
 	);
 }

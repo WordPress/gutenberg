@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { render } from '@wordpress/element';
+import { StrictMode, createRoot } from '@wordpress/element';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -91,13 +91,14 @@ export function initialize( editorName, blockEditorSettings ) {
 			}
 		} );
 
-		render(
-			<CustomizeWidgets
-				api={ wp.customize }
-				sidebarControls={ sidebarControls }
-				blockEditorSettings={ blockEditorSettings }
-			/>,
-			container
+		createRoot( container ).render(
+			<StrictMode>
+				<CustomizeWidgets
+					api={ wp.customize }
+					sidebarControls={ sidebarControls }
+					blockEditorSettings={ blockEditorSettings }
+				/>
+			</StrictMode>
 		);
 	} );
 }

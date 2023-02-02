@@ -73,7 +73,6 @@ const linkOptions = [
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const allowedBlocks = [ 'core/image' ];
-const LAYOUT = { type: 'default', alignments: [] };
 
 const PLACEHOLDER_TEXT = Platform.isNative
 	? __( 'ADD MEDIA' )
@@ -531,7 +530,6 @@ function GalleryEdit( props ) {
 		allowedBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
-		__experimentalLayout: LAYOUT,
 		...nativeInnerBlockProps,
 	} );
 

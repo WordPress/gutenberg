@@ -25,14 +25,7 @@ import { unlock } from './experiments';
 
 const { ExperimentalEditorProvider } = unlock( editorExperiments );
 
-function Editor( {
-	postId,
-	postType,
-	settings,
-	initialEdits,
-	onError,
-	...props
-} ) {
+function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	const {
 		hasFixedToolbar,
 		focusMode,
@@ -193,7 +186,7 @@ function Editor( {
 						}
 						{ ...props }
 					>
-						<ErrorBoundary onError={ onError }>
+						<ErrorBoundary>
 							<EditorInitialization postId={ postId } />
 							<Layout styles={ styles } />
 						</ErrorBoundary>

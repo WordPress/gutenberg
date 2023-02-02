@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.3.0 (2023-02-01)
+
 ### Bug Fix
 
 -   Force visual editor in browse mode ([#47329](https://github.com/WordPress/gutenberg/pull/47329)).
