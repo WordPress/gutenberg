@@ -81,8 +81,8 @@ function register_block_core_post_terms() {
 		$variation = array(
 			'name'        => $taxonomy->name,
 			'title'       => $taxonomy->label,
-			/* translators: %s: taxonomy's label */
 			'description' => sprintf(
+				/* translators: %s: taxonomy's label */
 				__( 'Display a list of assigned terms from the taxonomy: %s' ),
 				$taxonomy->label
 			),
