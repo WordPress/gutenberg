@@ -16,11 +16,11 @@ import type { WordPressComponentProps } from '../ui/context';
  * Return focusables in a row element, excluding those from other branches
  * nested within the row.
  *
- * @param  rowElement The DOM element representing the row.
+ * @param rowElement The DOM element representing the row.
  *
  * @return The array of focusables in the row.
  */
-function getRowFocusables( rowElement: Element ) {
+function getRowFocusables( rowElement: HTMLElement ) {
 	const focusablesInRow = focus.focusable.find( rowElement, {
 		sequential: true,
 	} );
@@ -77,7 +77,8 @@ function UnforwardedTreeGrid(
 			}
 
 			// Calculate the columnIndex of the active element.
-			const activeRow = activeElement.closest( '[role="row"]' );
+			const activeRow =
+				activeElement.closest< HTMLElement >( '[role="row"]' );
 
 			if ( ! activeRow ) {
 				return;
@@ -126,7 +127,9 @@ function UnforwardedTreeGrid(
 							1
 						);
 						const rows = Array.from(
-							treeGridElement.querySelectorAll( '[role="row"]' )
+							treeGridElement.querySelectorAll< HTMLElement >(
+								'[role="row"]'
+							)
 						);
 						let parentRow = activeRow;
 						const currentRowIndex = rows.indexOf( activeRow );
@@ -180,7 +183,9 @@ function UnforwardedTreeGrid(
 			} else if ( ( [ UP, DOWN ] as number[] ).includes( keyCode ) ) {
 				// Calculate the rowIndex of the next row.
 				const rows = Array.from(
-					treeGridElement.querySelectorAll( '[role="row"]' )
+					treeGridElement.querySelectorAll< HTMLElement >(
+						'[role="row"]'
+					)
 				);
 				const currentRowIndex = rows.indexOf( activeRow );
 				let nextRowIndex;
@@ -234,7 +239,9 @@ function UnforwardedTreeGrid(
 			} else if ( ( [ HOME, END ] as number[] ).includes( keyCode ) ) {
 				// Calculate the rowIndex of the next row.
 				const rows = Array.from(
-					treeGridElement.querySelectorAll( '[role="row"]' )
+					treeGridElement.querySelectorAll< HTMLElement >(
+						'[role="row"]'
+					)
 				);
 				const currentRowIndex = rows.indexOf( activeRow );
 				let nextRowIndex;

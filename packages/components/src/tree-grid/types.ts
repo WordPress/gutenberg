@@ -91,13 +91,13 @@ export type TreeGridProps = {
 	 *
 	 * @default noop
 	 */
-	onExpandRow?: ( row: Element ) => void;
+	onExpandRow?: ( row: HTMLElement ) => void;
 	/**
 	 * Callback to fire when row is collapsed.
 	 *
 	 * @default noop
 	 */
-	onCollapseRow?: ( row: Element ) => void;
+	onCollapseRow?: ( row: HTMLElement ) => void;
 	/**
 	 * Callback that fires when focus is shifted from one row to another via
 	 * the Up and Down keys. Callback is also fired on Home and End keys which
@@ -110,7 +110,7 @@ export type TreeGridProps = {
 	 */
 	onFocusRow?: (
 		event: React.KeyboardEvent< HTMLTableElement >,
-		startRow: Element,
-		destinationRow: Element
+		startRow: HTMLElement,
+		destinationRow: HTMLElement
 	) => void;
 };

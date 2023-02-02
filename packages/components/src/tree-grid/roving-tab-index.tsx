@@ -18,7 +18,8 @@ export default function RovingTabIndex( {
 }: {
 	children: React.ReactNode;
 } ) {
-	const [ lastFocusedElement, setLastFocusedElement ] = useState< Element >();
+	const [ lastFocusedElement, setLastFocusedElement ] =
+		useState< HTMLElement >();
 
 	// Use `useMemo` to avoid creation of a new object for the providerValue
 	// on every render. Only create a new object when the `lastFocusedElement`

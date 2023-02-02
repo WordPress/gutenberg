@@ -33,7 +33,7 @@ export const RovingTabIndexItem = forwardRef(
 					: -1;
 		}
 
-		const onFocus: React.FocusEventHandler< Element > = ( event ) =>
+		const onFocus: React.FocusEventHandler< HTMLElement > = ( event ) =>
 			setLastFocusedElement?.( event.target );
 		const allProps = { ref, tabIndex, onFocus, ...props };
 

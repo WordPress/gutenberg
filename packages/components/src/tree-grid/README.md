@@ -79,7 +79,7 @@ Aside from the documented callback functions, any props specified will be passed
 
 `TreeGrid` should always have children.
 
-###### `onFocusRow`: `( event: KeyboardEvent, startRow: Element, destinationRow: Element ) => void`
+###### `onFocusRow`: `( event: KeyboardEvent, startRow: HTMLElement, destinationRow: HTMLElement ) => void`
 
 Callback that fires when focus is shifted from one row to another via the Up and Down keys. Callback is also fired on Home and End keys which move focus from the beginning row to the end row.
 The callback is passed the event, the start row element that the focus was on originally, and
@@ -87,13 +87,13 @@ the destination row element after the focus has moved.
 
 -   Required: No
 
-###### `onCollapseRow`: `( row: Element ) => void`
+###### `onCollapseRow`: `( row: HTMLElement ) => void`
 
 A callback that passes in the row element to be collapsed.
 
 -   Required: No
 
-###### `onExpandRow`: `( row: Element ) => void`
+###### `onExpandRow`: `( row: HTMLElement ) => void`
 
 A callback that passes in the row element to be expanded.
 
