@@ -211,6 +211,7 @@ function LinkControl( {
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
+		setSettingsOpen( false );
 		setIsEditingLink( false );
 	};
 
