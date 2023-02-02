@@ -1924,7 +1924,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$custom_css = 'body {color:purple;}p{color:red;}';
+		$custom_css = 'body {color:purple;}.wp-block-paragraph{color:red;}';
 		$this->assertEquals( $custom_css, $theme_json->get_custom_css() );
 	}
 
