@@ -9,7 +9,7 @@ import {
 	store as coreStore,
 	useResourcePermissions,
 } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { StrictMode, useMemo } from '@wordpress/element';
 import {
 	BlockEditorKeyboardShortcuts,
 	CopyHandler,
@@ -99,22 +99,26 @@ export default function WidgetAreasBlockEditorProvider( {
 	);
 
 	return (
-		<ShortcutProvider>
-			<BlockEditorKeyboardShortcuts.Register />
-			<KeyboardShortcuts.Register />
-			<SlotFillProvider>
-				<ExperimentalBlockEditorProvider
-					value={ blocks }
-					onInput={ onInput }
-					onChange={ onChange }
-					settings={ settings }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<CopyHandler>{ children }</CopyHandler>
-					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
-				</ExperimentalBlockEditorProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+		<StrictMode>
+			<ShortcutProvider>
+				<BlockEditorKeyboardShortcuts.Register />
+				<KeyboardShortcuts.Register />
+				<SlotFillProvider>
+					<ExperimentalBlockEditorProvider
+						value={ blocks }
+						onInput={ onInput }
+						onChange={ onChange }
+						settings={ settings }
+						useSubRegistry={ false }
+						{ ...props }
+					>
+						<CopyHandler>{ children }</CopyHandler>
+						<ReusableBlocksMenuItems
+							rootClientId={ widgetAreaId }
+						/>
+					</ExperimentalBlockEditorProvider>
+				</SlotFillProvider>
+			</ShortcutProvider>
+		</StrictMode>
 	);
 }

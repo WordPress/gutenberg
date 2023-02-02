@@ -132,6 +132,7 @@ const DimensionControls = ( {
 					panelId={ clientId }
 				>
 					<ToggleGroupControl
+						__nextHasNoMarginBottom
 						label={ scaleLabel }
 						value={ scale }
 						help={ scaleHelp[ scale ] }

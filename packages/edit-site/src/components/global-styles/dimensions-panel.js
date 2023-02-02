@@ -18,7 +18,7 @@ import {
 } from '@wordpress/components';
 import {
 	__experimentalUseCustomSides as useCustomSides,
-	__experimentalHeightControl as HeightControl,
+	HeightControl,
 	__experimentalSpacingSizesControl as SpacingSizesControl,
 	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';

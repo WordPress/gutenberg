@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { act, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -76,9 +77,14 @@ describe( 'Button', () => {
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-pressed' );
 		} );
 
-		it( 'should render a button element with has-text when children are passed', () => {
+		it( 'should render a button element with has-text when children are passed', async () => {
+			const user = userEvent.setup();
+
 			render( <Button icon={ plusCircle }>Children</Button> );
-			act( () => screen.getByRole( 'button' ).focus() );
+
+			// Move focus to the button
+			await user.tab();
+
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
 		} );
 
@@ -183,16 +189,14 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should add an aria-label when the label property is used, with Tooltip wrapper', async () => {
+			const user = userEvent.setup();
+
 			render( <Button icon={ plusCircle } label="WordPress" /> );
-			// Wait for the `floating-ui` effects in `Tooltip`/`Popover` to finish running
-			// See also: https://floating-ui.com/docs/react-dom#testing
-			await act( () => Promise.resolve() );
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
-			await act( () => {
-				screen.getByRole( 'button', { name: 'WordPress' } ).focus();
-			} );
+			// Move focus to the button
+			await user.tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 		} );
@@ -216,6 +220,8 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should populate tooltip with label content for buttons without visible labels (no children)', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<Button
 					describedBy="Description text"
@@ -223,13 +229,11 @@ describe( 'Button', () => {
 					icon={ plusCircle }
 				/>
 			);
-			await act( () => Promise.resolve() );
 
 			expect( screen.queryByText( 'Label' ) ).not.toBeInTheDocument();
 
-			await act( async () => {
-				screen.getByRole( 'button', { name: 'Label' } ).focus();
-			} );
+			// Move focus to the button
+			await user.tab();
 
 			expect( screen.getByText( 'Label' ) ).toBeVisible();
 		} );
@@ -245,7 +249,6 @@ describe( 'Button', () => {
 					Children
 				</Button>
 			);
-			await act( () => Promise.resolve() );
 
 			expect(
 				screen.getByRole( 'button', {
@@ -254,7 +257,9 @@ describe( 'Button', () => {
 			).toBeVisible();
 		} );
 
-		it( 'should allow tooltip disable', () => {
+		it( 'should allow tooltip disable', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<Button
 					icon={ plusCircle }
@@ -262,33 +267,37 @@ describe( 'Button', () => {
 					showTooltip={ false }
 				/>
 			);
-			const button = screen.getByRole( 'button', { name: 'WordPress' } );
 
-			expect( button ).toHaveAttribute( 'aria-label', 'WordPress' );
+			expect(
+				screen.getByRole( 'button', { name: 'WordPress' } )
+			).toHaveAttribute( 'aria-label', 'WordPress' );
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
-			act( () => button.focus() );
+			// Move focus to the button
+			await user.tab();
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should show the tooltip for empty children', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<Button icon={ plusCircle } label="WordPress" children={ [] } />
 			);
-			await act( () => Promise.resolve() );
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
-			await act( async () => {
-				screen.getByRole( 'button', { name: 'WordPress' } ).focus();
-			} );
+			// Move focus to the button
+			await user.tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 		} );
 
-		it( 'should not show the tooltip when icon and children defined', () => {
+		it( 'should not show the tooltip when icon and children defined', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<Button icon={ plusCircle } label="WordPress">
 					Children
@@ -297,26 +306,25 @@ describe( 'Button', () => {
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
-			act( () => {
-				screen.getByRole( 'button', { name: 'WordPress' } ).focus();
-			} );
+			// Move focus to the button
+			await user.tab();
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should force showing the tooltip even if icon and children defined', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<Button icon={ plusCircle } label="WordPress" showTooltip>
 					Children
 				</Button>
 			);
-			await act( () => Promise.resolve() );
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
-			await act( async () => {
-				screen.getByRole( 'button', { name: 'WordPress' } ).focus();
-			} );
+			// Move focus to the button
+			await user.tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 		} );
