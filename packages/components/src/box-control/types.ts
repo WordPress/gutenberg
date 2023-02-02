@@ -50,7 +50,7 @@ export type BoxControlProps = Pick<
 	/**
 	 * A callback function when an input value changes.
 	 */
-	onChange?: ( next: BoxControlValue ) => void;
+	onChange: ( next: BoxControlValue ) => void;
 	/**
 	 * The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
 	 *

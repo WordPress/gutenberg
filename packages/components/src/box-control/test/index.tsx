@@ -15,7 +15,7 @@ import { useState } from '@wordpress/element';
 import BoxControl from '..';
 import type { BoxControlProps, BoxControlValue } from '../types';
 
-const Example = ( extraProps: BoxControlProps ) => {
+const Example = ( extraProps: Omit< BoxControlProps, 'onChange' > ) => {
 	const [ state, setState ] = useState< BoxControlValue >();
 
 	return (
@@ -30,7 +30,7 @@ const Example = ( extraProps: BoxControlProps ) => {
 describe( 'BoxControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render a box control input', () => {
-			render( <BoxControl /> );
+			render( <BoxControl onChange={ () => {} } /> );
 
 			expect(
 				screen.getByRole( 'textbox', { name: 'Box Control' } )
@@ -40,7 +40,7 @@ describe( 'BoxControl', () => {
 		it( 'should update values when interacting with input', async () => {
 			const user = userEvent.setup();
 
-			render( <BoxControl /> );
+			render( <BoxControl onChange={ () => {} } /> );
 
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
@@ -62,7 +62,7 @@ describe( 'BoxControl', () => {
 		it( 'should reset values when clicking Reset', async () => {
 			const user = userEvent.setup();
 
-			render( <BoxControl /> );
+			render( <BoxControl onChange={ () => {} } /> );
 
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
@@ -239,7 +239,7 @@ describe( 'BoxControl', () => {
 			const user = userEvent.setup();
 
 			// Render control.
-			render( <BoxControl /> );
+			render( <BoxControl onChange={ () => {} } /> );
 
 			// Make unit selection on all input control.
 			await user.selectOptions(
@@ -271,7 +271,7 @@ describe( 'BoxControl', () => {
 			const user = userEvent.setup();
 
 			// Render control.
-			const { rerender } = render( <BoxControl /> );
+			const { rerender } = render( <BoxControl onChange={ () => {} } /> );
 
 			// Make unit selection on all input control.
 			await user.selectOptions(
@@ -299,7 +299,9 @@ describe( 'BoxControl', () => {
 			} );
 
 			// Rerender with individual side value & confirm unit is selected.
-			rerender( <BoxControl values={ { top: '2.5em' } } /> );
+			rerender(
+				<BoxControl values={ { top: '2.5em' } } onChange={ () => {} } />
+			);
 
 			const rerenderedControls = screen.getAllByRole( 'combobox', {
 				name: 'Select unit',
