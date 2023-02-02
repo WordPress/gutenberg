@@ -170,7 +170,7 @@ export function updateControlPointColorByPosition(
  * @param {number}  mouseXCoordinate Horizontal coordinate of the mouse position.
  * @param {Element} containerElement Container for the gradient picker.
  *
- * @return {number} Whole number percentage from the left.
+ * @return {number | undefined} Whole number percentage from the left.
  */
 export function getHorizontalRelativeGradientPosition(
 	mouseXCoordinate,

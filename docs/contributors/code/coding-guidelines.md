@@ -136,7 +136,7 @@ export { __unstableDoTerribleAwfulAction } from './api';
 -   An **experimental API** is one which is planned for eventual public availability, but is subject to further experimentation, testing, and discussion.
 -   An **unstable API** is one which serves as a means to an end. It is not desired to ever be converted into a public API.
 
-In both cases, the API should be made stable or removed at the earliest opportunity. 
+In both cases, the API should be made stable or removed at the earliest opportunity.
 
 While an experimental API may often stabilize into a publicly-available API, there is no guarantee that it will. The conversion to a stable API will inherently be considered a breaking change by the mere fact that the function name must be changed to remove the `__experimental` prefix.
 
@@ -147,23 +147,23 @@ While an experimental API may often stabilize into a publicly-available API, the
 As of June 2022, WordPress Core contains 280 publicly exported experimental APIs. They got merged from the Gutenberg
 plugin during the major WordPress releases. Many plugins and themes rely on these experimental APIs for essential
 features that can't be accessed in any other way. Naturally, these APIs can't be removed without a warning anymore.
-They are a part of the WordPress public API and fall under the 
-[WordPress Backwards Compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/). 
+They are a part of the WordPress public API and fall under the
+[WordPress Backwards Compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/).
 Removing them involves a deprecation process. It may be relatively easy for some APIs, but it may require effort and
 span multiple WordPress releases for others.
 
 **Use private experimental APIs instead.**
 
-Make your experimental APIs private and don't expose them to WordPress extenders. 
+Make your experimental APIs private and don't expose them to WordPress extenders.
 
 This way they'll remain internal implementation details that can be changed or removed
- without a warning and without breaking WordPress plugins.
+without a warning and without breaking WordPress plugins.
 
 The tactical guidelines below will help you write code without introducing new experimental APIs.
 
 #### General guidelines
 
-Some `__experimental` functions are exported in *package A* and only used in a single *package B* and nowhere else. Consider removing such functions from *package A* and making them private and non-exported members of *package B*.
+Some `__experimental` functions are exported in _package A_ and only used in a single _package B_ and nowhere else. Consider removing such functions from _package A_ and making them private and non-exported members of _package B_.
 
 If your experimental API is only meant for the Gutenberg Plugin but not for the next WordPress major release, consider limiting the export to the plugin environment. For example, `@wordpress/components` could do that to receive early feedback about a new Component, but avoid bringing that component to WordPress core:
 
@@ -179,45 +179,49 @@ Sometimes a non-exported React hook suffices as a substitute for introducing a n
 
 ```js
 // Instead of this:
-	// selectors.js:
-	export function __unstableHasActiveBlockOverlayActive( state, parent ) { /* ... */ }
-	export function __unstableIsWithinBlockOverlay( state, clientId ) {
-		let parent = state.blocks.parents[ clientId ];
-		while ( !! parent ) {
-			if ( __unstableHasActiveBlockOverlayActive( state, parent ) ) {
-				return true;
-			}
-			parent = state.blocks.parents[ parent ];
+// selectors.js:
+export function __unstableHasActiveBlockOverlayActive( state, parent ) {
+	/* ... */
+}
+export function __unstableIsWithinBlockOverlay( state, clientId ) {
+	let parent = state.blocks.parents[ clientId ];
+	while ( !! parent ) {
+		if ( __unstableHasActiveBlockOverlayActive( state, parent ) ) {
+			return true;
 		}
-		return false;
+		parent = state.blocks.parents[ parent ];
 	}
-	// MyComponent.js:
-	function MyComponent({ clientId }) {
-		const { __unstableIsWithinBlockOverlay } = useSelect( myStore );
-		const isWithinBlockOverlay = __unstableIsWithinBlockOverlay( clientId );
-		// ...
-	}
+	return false;
+}
+// MyComponent.js:
+function MyComponent( { clientId } ) {
+	const { __unstableIsWithinBlockOverlay } = useSelect( myStore );
+	const isWithinBlockOverlay = __unstableIsWithinBlockOverlay( clientId );
+	// ...
+}
 
 // Consider this:
-	// MyComponent.js:
-	function hasActiveBlockOverlayActive ( selectors, parent ) { /* ... */ }
-	function useIsWithinBlockOverlay( clientId ) {
-		return useSelect( ( select ) => {
-			const selectors = select( blockEditorStore ); 
-			let parent = selectors.getBlockRootClientId( clientId );
-			while ( !!parent ) {
-				if ( hasActiveBlockOverlayActive( selectors, parent ) ) {
-					return true;
-				}
-				parent = selectors.getBlockRootClientId( parent );
+// MyComponent.js:
+function hasActiveBlockOverlayActive( selectors, parent ) {
+	/* ... */
+}
+function useIsWithinBlockOverlay( clientId ) {
+	return useSelect( ( select ) => {
+		const selectors = select( blockEditorStore );
+		let parent = selectors.getBlockRootClientId( clientId );
+		while ( !! parent ) {
+			if ( hasActiveBlockOverlayActive( selectors, parent ) ) {
+				return true;
 			}
-			return false;
-		});
-	}
-	function MyComponent({ clientId }) {
-		const isWithinBlockOverlay = useIsWithinBlockOverlay( clientId );
-		// ...
-	}
+			parent = selectors.getBlockRootClientId( parent );
+		}
+		return false;
+	} );
+}
+function MyComponent( { clientId } ) {
+	const isWithinBlockOverlay = useIsWithinBlockOverlay( clientId );
+	// ...
+}
 ```
 
 #### Dispatch experimental actions in thunks
@@ -227,10 +231,10 @@ enables dispatching private actions inline:
 
 ```js
 export function toggleFeature( scope, featureName ) {
-    return function ( { dispatch } ) {
-		dispatch({ type: '__experimental_BEFORE_TOGGLE' })
+	return function ( { dispatch } ) {
+		dispatch( { type: '__experimental_BEFORE_TOGGLE' } );
 		// ...
-    };
+	};
 }
 ```
 
@@ -246,7 +250,7 @@ export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
 		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
 		'@wordpress/block-editor' // Name of the package calling __dangerousOptInToUnstableAPIsOnlyForCoreModules,
-								  // (not the name of the package whose APIs you want to access)
+		// (not the name of the package whose APIs you want to access)
 	);
 ```
 
@@ -338,13 +342,14 @@ import { lock } from './experiments';
 
 export const experiments = {};
 /* Attach private data to the exported object */
-lock(experiments, {
-	__experimentalCallback: function() {},
-	__experimentalReactComponent: function ExperimentalComponent() { return <div/>; },
-	__experimentalClass: class Experiment{},
+lock( experiments, {
+	__experimentalCallback: function () {},
+	__experimentalReactComponent: function ExperimentalComponent() {
+		return <div />;
+	},
+	__experimentalClass: class Experiment {},
 	__experimentalVariable: 5,
-});
-
+} );
 
 // In packages/package2/index.js:
 import { experiments } from '@wordpress/package1';
@@ -354,8 +359,36 @@ const {
 	__experimentalCallback,
 	__experimentalReactComponent,
 	__experimentalClass,
-	__experimentalVariable
+	__experimentalVariable,
 } = unlock( experiments );
+```
+
+Remember to always register the private actions and selectors on the **registered** store.
+
+Sometimes that's easy:
+```js
+export const store = createReduxStore( STORE_NAME, storeConfig() );
+// `register` uses the same `store` object created from `createReduxStore`.
+register( store );
+unlock( store ).registerPrivateActions( {
+	// ...
+} );
+```
+
+However some package might call both `createReduxStore` **and** `registerStore`. In this case, always choose the store that gets registered:
+
+```js
+export const store = createReduxStore( STORE_NAME, {
+	...storeConfig,
+	persist: [ 'preferences' ],
+} );
+const registeredStore = registerStore( STORE_NAME, {
+	...storeConfig,
+	persist: [ 'preferences' ],
+} );
+unlock( registeredStore ).registerPrivateActions( {
+	// ...
+} );
 ```
 
 #### Experimental function arguments
@@ -370,7 +403,7 @@ inside it:
 import { lock } from './experiments';
 
 // The experimental function contains all the logic
-function __experimentalValidateBlocks(formula, __experimentalIsStrict) {
+function __experimentalValidateBlocks( formula, __experimentalIsStrict ) {
 	let isValid = false;
 	// ...complex logic we don't want to duplicate...
 	if ( __experimentalIsStrict ) {
@@ -383,19 +416,18 @@ function __experimentalValidateBlocks(formula, __experimentalIsStrict) {
 
 // The stable public function is a thin wrapper that calls the
 // experimental function with the experimental features disabled
-export function validateBlocks(blocks) {
-	__experimentalValidateBlocks(blocks, false);
+export function validateBlocks( blocks ) {
+	__experimentalValidateBlocks( blocks, false );
 }
 lock( validateBlocks, __experimentalValidateBlocks );
-
 
 // In @wordpress/package2/index.js:
 import { validateBlocks } from '@wordpress/package1';
 import { unlock } from './experiments';
 
 // The experimental function may be "unlocked" given the stable function:
-const __experimentalValidateBlocks = unlock(validateBlocks);
-__experimentalValidateBlocks(blocks, true);
+const __experimentalValidateBlocks = unlock( validateBlocks );
+__experimentalValidateBlocks( blocks, true );
 ```
 
 #### Experimental React Component properties
@@ -412,17 +444,17 @@ import { lock } from './experiments';
 // The experimental component contains all the logic
 const ExperimentalMyButton = ( { title, __experimentalShowIcon = true } ) => {
 	// ...complex logic we don't want to duplicate...
-  
+
 	return (
 		<button>
-			{ __experimentalShowIcon  && <Icon src={some icon} /> } { title }  
+			{ __experimentalShowIcon  && <Icon src={some icon} /> } { title }
 		</button>
 	);
 }
 
 // The stable public component is a thin wrapper that calls the
 // experimental component with the experimental features disabled
-export const MyButton = ( { title } ) => 
+export const MyButton = ( { title } ) =>
     <ExperimentalMyButton title={ title } __experimentalShowIcon={ false } />
 
 lock(MyButton, ExperimentalMyButton);
@@ -439,6 +471,19 @@ export function MyComponent() {
 		<ExperimentalMyButton data={data} __experimentalShowIcon={ true } />
 	)
 }
+```
+
+#### Experimental editor settings
+
+WordPress extenders cannot update the experimental block settings on their own. The `updateSettings()` actions of the `@wordpress/block-editor` store will filter out all the settings that are **not** a part of the public API. The only way to actually store them is via private action. `__experimentalUpdateSettings()`.
+
+To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/actions.js](/packages/block-editor/src/store/actions.js):
+
+```js
+const privateSettings = [
+	'inserterMediaCategories',
+	// List a block editor setting here to make it private
+];
 ```
 
 #### Experimental block.json and theme.json APIs

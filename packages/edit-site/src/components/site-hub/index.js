@@ -136,7 +136,6 @@ const SiteHub = forwardRef(
 				{ showEditButton && (
 					<Button
 						className="edit-site-site-hub__edit-button"
-						label={ __( 'Open the editor' ) }
 						onClick={ () => {
 							__unstableSetCanvasMode( 'edit' );
 						} }

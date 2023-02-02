@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__experimentalOffCanvasEditor as OffCanvasEditor,
+	experiments as blockEditorExperiments,
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -18,19 +18,22 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
 import { LeafMoreMenu } from '../leaf-more-menu';
+import { unlock } from '../../experiments';
+import DeletedNavigationWarning from './deleted-navigation-warning';
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );
 
-const ExperimentMainContent = ( {
+const MainContent = ( {
 	clientId,
 	currentMenuId,
 	isLoading,
 	isNavigationMenuMissing,
+	onCreateNew,
 } ) => {
+	const { OffCanvasEditor } = unlock( blockEditorExperiments );
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(
@@ -45,6 +48,10 @@ const ExperimentMainContent = ( {
 		return <p>{ __( 'Select or create a menu' ) }</p>;
 	}
 
+	if ( isNavigationMenuMissing ) {
+		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
+	}
+
 	if ( isLoading ) {
 		return <Spinner />;
 	}
@@ -53,97 +60,52 @@ const ExperimentMainContent = ( {
 		<OffCanvasEditor
 			blocks={ clientIdsTree }
 			isExpanded={ true }
-			selectBlockInCanvas={ false }
 			LeafMoreMenu={ LeafMoreMenu }
 		/>
 	);
 };
 
-const ExperimentControls = ( props ) => {
-	const {
-		createNavigationMenuIsSuccess,
-		createNavigationMenuIsError,
-		currentMenuId = null,
-		onCreateNew,
-		onSelectClassicMenu,
-		onSelectNavigationMenu,
-		isManageMenusButtonDisabled,
-	} = props;
-
-	return (
-		<>
-			<HStack className="wp-block-navigation-off-canvas-editor__header">
-				<Heading
-					className="wp-block-navigation-off-canvas-editor__title"
-					level={ 2 }
-				>
-					{ __( 'Menu' ) }
-				</Heading>
-				<NavigationMenuSelector
-					currentMenuId={ currentMenuId }
-					onSelectClassicMenu={ onSelectClassicMenu }
-					onSelectNavigationMenu={ onSelectNavigationMenu }
-					onCreateNew={ onCreateNew }
-					createNavigationMenuIsSuccess={
-						createNavigationMenuIsSuccess
-					}
-					createNavigationMenuIsError={ createNavigationMenuIsError }
-					actionLabel={ actionLabel }
-					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
-				/>
-			</HStack>
-			<ExperimentMainContent { ...props } />
-		</>
-	);
-};
-
-const DefaultControls = ( props ) => {
-	const {
-		createNavigationMenuIsSuccess,
-		createNavigationMenuIsError,
-		currentMenuId = null,
-		isManageMenusButtonDisabled,
-		onCreateNew,
-		onSelectClassicMenu,
-		onSelectNavigationMenu,
-	} = props;
-
-	return (
-		<>
-			<NavigationMenuSelector
-				currentMenuId={ currentMenuId }
-				onSelectClassicMenu={ onSelectClassicMenu }
-				onSelectNavigationMenu={ onSelectNavigationMenu }
-				onCreateNew={ onCreateNew }
-				createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
-				createNavigationMenuIsError={ createNavigationMenuIsError }
-				actionLabel={ actionLabel }
-				isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
-			/>
-			<ManageMenusButton disabled={ isManageMenusButtonDisabled } />
-		</>
-	);
-};
-
 const MenuInspectorControls = ( props ) => {
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-	const menuControlsSlot = isOffCanvasNavigationEditorEnabled
-		? 'list'
-		: undefined;
+	const {
+		createNavigationMenuIsSuccess,
+		createNavigationMenuIsError,
+		currentMenuId = null,
+		onCreateNew,
+		onSelectClassicMenu,
+		onSelectNavigationMenu,
+		isManageMenusButtonDisabled,
+	} = props;
 
 	return (
-		<InspectorControls __experimentalGroup={ menuControlsSlot }>
+		<InspectorControls group="list">
 			<PanelBody
-				title={
-					isOffCanvasNavigationEditorEnabled ? null : __( 'Menu' )
-				}
+				title={ process.env.IS_GUTENBERG_PLUGIN ? null : __( 'Menu' ) }
 			>
-				{ isOffCanvasNavigationEditorEnabled ? (
-					<ExperimentControls { ...props } />
-				) : (
-					<DefaultControls { ...props } />
-				) }
+				<HStack className="wp-block-navigation-off-canvas-editor__header">
+					<Heading
+						className="wp-block-navigation-off-canvas-editor__title"
+						level={ 2 }
+					>
+						{ __( 'Menu' ) }
+					</Heading>
+					<NavigationMenuSelector
+						currentMenuId={ currentMenuId }
+						onSelectClassicMenu={ onSelectClassicMenu }
+						onSelectNavigationMenu={ onSelectNavigationMenu }
+						onCreateNew={ onCreateNew }
+						createNavigationMenuIsSuccess={
+							createNavigationMenuIsSuccess
+						}
+						createNavigationMenuIsError={
+							createNavigationMenuIsError
+						}
+						actionLabel={ actionLabel }
+						isManageMenusButtonDisabled={
+							isManageMenusButtonDisabled
+						}
+					/>
+				</HStack>
+				<MainContent { ...props } />
 			</PanelBody>
 		</InspectorControls>
 	);

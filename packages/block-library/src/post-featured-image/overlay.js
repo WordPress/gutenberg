@@ -64,7 +64,7 @@ const Overlay = ( {
 					style={ overlayStyles }
 				/>
 			) }
-			<InspectorControls __experimentalGroup="color">
+			<InspectorControls group="color">
 				<ColorGradientSettingsDropdown
 					__experimentalIsRenderedInSidebar
 					settings={ [

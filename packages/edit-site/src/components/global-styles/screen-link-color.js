@@ -17,33 +17,31 @@ import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
-function ScreenLinkColor( { name, variationPath = '' } ) {
+function ScreenLinkColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useGlobalSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
-
 	const colorsPerOrigin = useColorsPerOrigin( name );
-
 	const [ isLinkEnabled ] = useGlobalSetting( 'color.link', name );
 
 	const hasLinkColor =
 		supports.includes( 'linkColor' ) &&
 		isLinkEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
 	const pseudoStates = {
 		default: {
 			label: __( 'Default' ),
 			value: useGlobalStyle(
-				variationPath + 'elements.link.color.text',
+				prefix + 'elements.link.color.text',
 				name
 			)[ 0 ],
 			handler: useGlobalStyle(
-				variationPath + 'elements.link.color.text',
+				prefix + 'elements.link.color.text',
 				name
 			)[ 1 ],
 			userValue: useGlobalStyle(
-				variationPath + 'elements.link.color.text',
+				prefix + 'elements.link.color.text',
 				name,
 				'user'
 			)[ 0 ],
@@ -51,15 +49,15 @@ function ScreenLinkColor( { name, variationPath = '' } ) {
 		hover: {
 			label: __( 'Hover' ),
 			value: useGlobalStyle(
-				variationPath + 'elements.link.:hover.color.text',
+				prefix + 'elements.link.:hover.color.text',
 				name
 			)[ 0 ],
 			handler: useGlobalStyle(
-				variationPath + 'elements.link.:hover.color.text',
+				prefix + 'elements.link.:hover.color.text',
 				name
 			)[ 1 ],
 			userValue: useGlobalStyle(
-				variationPath + 'elements.link.:hover.color.text',
+				prefix + 'elements.link.:hover.color.text',
 				name,
 				'user'
 			)[ 0 ],
