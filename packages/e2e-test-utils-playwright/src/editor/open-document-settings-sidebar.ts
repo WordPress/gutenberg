@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import type { Editor } from './index';
-import { expect } from '../test';
 
 /**
  * Clicks on the button in the header which opens Document Settings sidebar when
@@ -23,11 +22,9 @@ export async function openDocumentSettingsSidebar( this: Editor ) {
 
 	if ( isClosed ) {
 		await toggleButton.click();
-
-		await expect(
-			this.page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Close settings' } )
-		).toBeVisible();
+		await this.page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Close settings' } )
+			.waitFor();
 	}
 }
