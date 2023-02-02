@@ -2722,11 +2722,13 @@ export function isBlockVisible( state, clientId ) {
  */
 export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => {
-		return new Set(
-			Object.keys( state.blockVisibility ).filter(
-				( key ) => state.blockVisibility[ key ]
-			)
+		const visibleBlocks = Object.keys( state.blockVisibility ).filter(
+			( key ) => state.blockVisibility[ key ]
 		);
+		if ( visibleBlocks.length === 0 ) {
+			return EMPTY_ARRAY;
+		}
+		return visibleBlocks;
 	},
 	( state ) => [ state.blockVisibility ]
 );

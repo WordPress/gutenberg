@@ -168,7 +168,7 @@ function Items( {
 					value={
 						// Only provide data asynchronously if the block is
 						// not visible and not selected.
-						! visibleBlocks.has( clientId ) &&
+						! visibleBlocks.includes( clientId ) &&
 						! selectedBlocks.includes( clientId )
 					}
 				>
