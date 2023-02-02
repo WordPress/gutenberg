@@ -174,7 +174,7 @@ html :where(.is-position-sticky) {
 // within the scope of the position classname. This is required because the admin bar
 // is not fixed to the top on mobile devices, but is fixed on viewports larger than 600px.
 @media screen and (max-width: 600px) {
-	.is-position-sticky {
+	html :where(.is-position-sticky) {
 		/* stylelint-disable length-zero-no-unit */
 		--wp-admin--admin-bar--position-offset: 0px; // 0px is set explicitly so that it can be used in a calc value.
 		/* stylelint-enable length-zero-no-unit */
