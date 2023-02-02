@@ -16,7 +16,7 @@ function ScreenEffects( { name, variation = '' } ) {
 	const hasShadowPanel = useHasShadowControl( name );
 	return (
 		<>
-			<ScreenHeader title={ __( 'Effects' ) } />
+			<ScreenHeader title={ __( 'Shadow' ) } />
 			<BlockPreviewPanel name={ name } variation={ variationClassName } />
 			{ hasShadowPanel && (
 				<ShadowPanel name={ name } variation={ variation } />

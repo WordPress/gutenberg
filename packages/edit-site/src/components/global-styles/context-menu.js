@@ -12,6 +12,7 @@ import {
 import {
 	typography,
 	border,
+	shadow,
 	color,
 	layout,
 	chevronLeft,
@@ -94,11 +95,11 @@ function ContextMenu( { name, parentMenu = '' } ) {
 				) }
 				{ hasEffectsPanel && (
 					<NavigationButtonAsItem
-						icon={ border }
+						icon={ shadow }
 						path={ parentMenu + '/effects' }
-						aria-label={ __( 'Effects' ) }
+						aria-label={ __( 'Shadow' ) }
 					>
-						{ __( 'Effects' ) }
+						{ __( 'Shadow' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasLayoutPanel && (
