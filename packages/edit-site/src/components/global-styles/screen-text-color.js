@@ -16,7 +16,8 @@ import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
-function ScreenTextColor( { name, variationPath = '' } ) {
+function ScreenTextColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ isTextEnabled ] = useGlobalSetting( 'color.text', name );
@@ -27,15 +28,8 @@ function ScreenTextColor( { name, variationPath = '' } ) {
 		isTextEnabled &&
 		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
-	const [ color, setColor ] = useGlobalStyle(
-		variationPath + 'color.text',
-		name
-	);
-	const [ userColor ] = useGlobalStyle(
-		variationPath + 'color.text',
-		name,
-		'user'
-	);
+	const [ color, setColor ] = useGlobalStyle( prefix + 'color.text', name );
+	const [ userColor ] = useGlobalStyle( prefix + 'color.text', name, 'user' );
 
 	if ( ! hasTextColor ) {
 		return null;

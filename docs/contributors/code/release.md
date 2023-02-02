@@ -36,7 +36,9 @@ This will trigger a GitHub Actions (GHA) workflow that bumps the plugin version,
 
 #### Publishing the @wordpress packages to NPM
 
-As part of the release candidate (RC) process, all of the `@wordpress` packages are published to NPM. You may see messaging after the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml) action has created the draft release that the ["Publish npm packages"](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) action requires someone with appropriate permissions to trigger the action. This is not the case as this process is automated and it will automatically run after the release notes are published.
+As part of the release candidate (RC) process, all of the `@wordpress` packages are published to NPM. You may see messaging after the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml) action has created the draft release that the ["Publish npm packages"](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) action requires someone with appropriate permissions to trigger the action.
+
+This message is misleading and no action is required by the release coordinator. The process is automated and it will automatically run after the release notes are published.
 
 #### View the release draft
 

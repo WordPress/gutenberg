@@ -6,7 +6,7 @@
  * @subpackage HTML
  */
 
-require_once __DIR__ . '/../../lib/experimental/html/index.php';
+require_once __DIR__ . '/../../lib/experimental/html/wp-html.php';
 
 /**
  * @group html

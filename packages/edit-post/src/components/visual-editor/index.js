@@ -82,7 +82,7 @@ function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
  *
  * @param {Array} blocks A list of blocks.
  *
- * @return {Object} The Post Content block.
+ * @return {Object | undefined} The Post Content block.
  */
 function findPostContent( blocks ) {
 	for ( let i = 0; i < blocks.length; i++ ) {

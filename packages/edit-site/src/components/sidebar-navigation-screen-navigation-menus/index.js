@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import NavigationInspector from '../sidebar-edit-mode/navigation-menu-sidebar/navigation-inspector';
+import NavigationInspector from '../navigation-inspector';
 
 export default function SidebarNavigationScreenNavigationMenus() {
 	return (

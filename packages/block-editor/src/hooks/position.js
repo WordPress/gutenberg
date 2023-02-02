@@ -274,7 +274,7 @@ export function PositionPanel( props ) {
 	return Platform.select( {
 		web:
 			options.length > 1 ? (
-				<InspectorControls __experimentalGroup="position">
+				<InspectorControls group="position">
 					<BaseControl className="block-editor-hooks__position-selection">
 						<CustomSelectControl
 							__nextUnconstrainedWidth

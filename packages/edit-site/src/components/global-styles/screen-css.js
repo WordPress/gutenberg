@@ -2,14 +2,13 @@
  * WordPress dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { ExternalLink } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import Subtitle from './subtitle';
 import CustomCSSControl from './custom-css';
 
 function ScreenCSS( { name } ) {
@@ -34,11 +33,14 @@ function ScreenCSS( { name } ) {
 	return (
 		<>
 			<ScreenHeader title={ __( 'CSS' ) } description={ description } />
+			<ExternalLink
+				href="https://wordpress.org/support/article/css/"
+				className="edit-site-global-styles-screen-css-help-link"
+			>
+				{ __( 'Learn more about CSS' ) }
+			</ExternalLink>
 			<div className="edit-site-global-styles-screen-css">
-				<VStack spacing={ 3 }>
-					<Subtitle>{ __( 'ADDITIONAL CSS' ) }</Subtitle>
-					<CustomCSSControl blockName={ name } />
-				</VStack>
+				<CustomCSSControl blockName={ name } />
 			</div>
 		</>
 	);

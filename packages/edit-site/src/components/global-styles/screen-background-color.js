@@ -25,7 +25,8 @@ import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
-function ScreenBackgroundColor( { name, variationPath = '' } ) {
+function ScreenBackgroundColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ areCustomGradientsEnabled ] = useGlobalSetting(
@@ -48,20 +49,20 @@ function ScreenBackgroundColor( { name, variationPath = '' } ) {
 		supports.includes( 'background' ) &&
 		( gradientsPerOrigin.length > 0 || areCustomGradientsEnabled );
 	const [ backgroundColor, setBackgroundColor ] = useGlobalStyle(
-		variationPath + 'color.background',
+		prefix + 'color.background',
 		name
 	);
 	const [ userBackgroundColor ] = useGlobalStyle(
-		variationPath + 'color.background',
+		prefix + 'color.background',
 		name,
 		'user'
 	);
 	const [ gradient, setGradient ] = useGlobalStyle(
-		variationPath + 'color.gradient',
+		prefix + 'color.gradient',
 		name
 	);
 	const [ userGradient ] = useGlobalStyle(
-		variationPath + 'color.gradient',
+		prefix + 'color.gradient',
 		name,
 		'user'
 	);

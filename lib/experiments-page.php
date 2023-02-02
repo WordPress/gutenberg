@@ -65,18 +65,6 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
-	add_settings_field(
-		'gutenberg-site-editor-navigation-menu-sidebar',
-		__( 'Global navigation menu sidebar ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test a new global navigation menu sidebar in the site editor.', 'gutenberg' ),
-			'id'    => 'gutenberg-site-editor-navigation-menu-sidebar',
-		)
-	);
-
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

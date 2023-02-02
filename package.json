@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "15.0.1",
+	"version": "15.1.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -232,7 +232,7 @@
 		"snapshot-diff": "0.8.1",
 		"source-map-loader": "3.0.0",
 		"sprintf-js": "1.1.1",
-		"storybook-source-link": "2.0.3",
+		"storybook-source-link": "2.0.4",
 		"style-loader": "3.2.1",
 		"terser-webpack-plugin": "5.1.4",
 		"typescript": "4.4.2",

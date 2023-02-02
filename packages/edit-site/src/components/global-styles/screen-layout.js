@@ -9,20 +9,17 @@ import { __ } from '@wordpress/i18n';
 import DimensionsPanel, { useHasDimensionsPanel } from './dimensions-panel';
 import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
-import { getVariationClassNameFromPath } from './utils';
+import { getVariationClassName } from './utils';
 
-function ScreenLayout( { name, variationPath = '' } ) {
+function ScreenLayout( { name, variation = '' } ) {
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
-	const variationClassName = getVariationClassNameFromPath( variationPath );
+	const variationClassName = getVariationClassName( variation );
 	return (
 		<>
 			<ScreenHeader title={ __( 'Layout' ) } />
 			<BlockPreviewPanel name={ name } variation={ variationClassName } />
 			{ hasDimensionsPanel && (
-				<DimensionsPanel
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<DimensionsPanel name={ name } variation={ variation } />
 			) }
 		</>
 	);

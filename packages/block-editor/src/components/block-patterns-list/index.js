@@ -51,7 +51,7 @@ function BlockPattern( {
 					onDragStart={ ( event ) => {
 						setIsDragging( true );
 						if ( onDragStart ) {
-							onHover( null );
+							onHover?.( null );
 							onDragStart( event );
 						}
 					} }
@@ -73,15 +73,15 @@ function BlockPattern( {
 							className="block-editor-block-patterns-list__item"
 							onClick={ () => {
 								onClick( pattern, blocks );
-								onHover( null );
+								onHover?.( null );
 							} }
 							onMouseEnter={ () => {
 								if ( isDragging ) {
 									return;
 								}
-								onHover( pattern );
+								onHover?.( pattern );
 							} }
-							onMouseLeave={ () => onHover( null ) }
+							onMouseLeave={ () => onHover?.( null ) }
 							aria-label={ pattern.title }
 							aria-describedby={
 								pattern.description ? descriptionId : undefined

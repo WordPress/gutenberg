@@ -186,7 +186,7 @@ export default function TypographyPanel( {
 	name,
 	element,
 	headingLevel,
-	variationPath = '',
+	variation = '',
 } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	let prefix = '';
@@ -194,6 +194,11 @@ export default function TypographyPanel( {
 		prefix = `elements.${ headingLevel }.`;
 	} else if ( element && element !== 'text' ) {
 		prefix = `elements.${ element }.`;
+	}
+	if ( variation ) {
+		prefix = prefix
+			? `variations.${ variation }.${ prefix }`
+			: `variations.${ variation }`;
 	}
 	const [ fontSizesPerOrigin ] = useGlobalSetting(
 		'typography.fontSizes',
@@ -240,15 +245,9 @@ export default function TypographyPanel( {
 	}
 
 	const [ fontFamily, setFontFamily, hasFontFamily, resetFontFamily ] =
-		useStyleWithReset(
-			variationPath + prefix + 'typography.fontFamily',
-			name
-		);
+		useStyleWithReset( prefix + 'typography.fontFamily', name );
 	const { fontSize, setFontSize, hasFontSize, resetFontSize } =
-		useFontSizeWithReset(
-			variationPath + prefix + 'typography.fontSize',
-			name
-		);
+		useFontSizeWithReset( prefix + 'typography.fontSize', name );
 	const {
 		fontStyle,
 		setFontStyle,
@@ -256,39 +255,27 @@ export default function TypographyPanel( {
 		setFontWeight,
 		hasFontAppearance,
 		resetFontAppearance,
-	} = useFontAppearance( variationPath + prefix, name );
+	} = useFontAppearance( prefix, name );
 	const [ lineHeight, setLineHeight, hasLineHeight, resetLineHeight ] =
-		useStyleWithReset(
-			variationPath + prefix + 'typography.lineHeight',
-			name
-		);
+		useStyleWithReset( prefix + 'typography.lineHeight', name );
 	const [
 		letterSpacing,
 		setLetterSpacing,
 		hasLetterSpacing,
 		resetLetterSpacing,
-	] = useStyleWithReset(
-		variationPath + prefix + 'typography.letterSpacing',
-		name
-	);
+	] = useStyleWithReset( prefix + 'typography.letterSpacing', name );
 	const [
 		textTransform,
 		setTextTransform,
 		hasTextTransform,
 		resetTextTransform,
-	] = useStyleWithReset(
-		variationPath + prefix + 'typography.textTransform',
-		name
-	);
+	] = useStyleWithReset( prefix + 'typography.textTransform', name );
 	const [
 		textDecoration,
 		setTextDecoration,
 		hasTextDecoration,
 		resetTextDecoration,
-	] = useStyleWithReset(
-		variationPath + prefix + 'typography.textDecoration',
-		name
-	);
+	] = useStyleWithReset( prefix + 'typography.textDecoration', name );
 
 	const resetAll = () => {
 		resetFontFamily();

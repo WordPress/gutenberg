@@ -53,7 +53,7 @@ function render_block_core_calendar( $attributes ) {
 	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 
 	// Generate color styles and classes.
-	$styles        = gutenberg_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
+	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 	$inline_styles = empty( $styles['css'] ) ? '' : sprintf( ' style="%s"', esc_attr( $styles['css'] ) );
 	$classnames    = empty( $styles['classnames'] ) ? '' : ' ' . esc_attr( $styles['classnames'] );
 	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {

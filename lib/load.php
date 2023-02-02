@@ -48,6 +48,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.2/block-patterns.php';
 	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-global-styles-controller-6-2.php';
 
+	// WordPress 6.3 compat.
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-pattern-directory-controller-6-3.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/rest-api.php';
+
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
@@ -91,7 +95,7 @@ require __DIR__ . '/compat/wordpress-6.2/widgets.php';
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
-	require __DIR__ . '/experimental/html/index.php';
+	require __DIR__ . '/experimental/html/wp-html.php';
 }
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
@@ -137,4 +141,5 @@ require __DIR__ . '/block-supports/position.php';
 require __DIR__ . '/block-supports/spacing.php';
 require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
+require __DIR__ . '/block-supports/anchor.php';
 require __DIR__ . '/block-supports/shadow.php';
