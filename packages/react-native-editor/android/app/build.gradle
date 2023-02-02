@@ -275,6 +275,18 @@ dependencies {
     implementation("com.facebook.react:hermes-engine:${extractPackageVersion(packageJson, 'react-native', 'dependencies')}") {
         exclude group:'com.facebook.fbjni'
     }
+
+    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
+        exclude group:'com.facebook.fbjni'
+    }
+
+    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
+        exclude group:'com.facebook.flipper'
+    }
+
+    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}") {
+        exclude group:'com.facebook.flipper'
+    }
 }
 
 if (isNewArchitectureEnabled()) {
