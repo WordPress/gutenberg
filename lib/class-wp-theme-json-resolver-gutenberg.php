@@ -335,7 +335,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					'6.2.0'
 				);
 			}
-			
+
 			// Allow themes to enable all border settings via theme_support.
 			if ( current_theme_supports( 'border' ) ) {
 				$theme_support_data['settings']['border']['color']  = true;
