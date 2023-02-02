@@ -323,6 +323,26 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			if ( current_theme_supports( 'appearance-tools' ) ) {
 				$theme_support_data['settings']['appearanceTools'] = true;
 			}
+
+			// Allow themes to enable link colors via theme_support.
+			if ( current_theme_supports( 'link-color' ) ) {
+				$theme_support_data['settings']['color']['link'] = true;
+			}
+			if ( current_theme_supports( 'experimental-link-color' ) ) {
+				_doing_it_wrong(
+					current_theme_supports( 'experimental-link-color' ),
+					__( '`experimental-link-color` is no longer supported. Use `link-color` instead.', 'gutenberg' ),
+					'6.2.0'
+				);
+			}
+			
+			// Allow themes to enable all border settings via theme_support.
+			if ( current_theme_supports( 'border' ) ) {
+				$theme_support_data['settings']['border']['color']  = true;
+				$theme_support_data['settings']['border']['radius'] = true;
+				$theme_support_data['settings']['border']['style']  = true;
+				$theme_support_data['settings']['border']['width']  = true;
+			}
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
