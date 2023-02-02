@@ -110,7 +110,6 @@ function RichTextWrapper(
 		__unstableEmbedURLOnPaste,
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
-		unstableOnFocus,
 		__unstableAllowPrefixTransformations,
 		...props
 	},
@@ -449,7 +448,6 @@ function RichTextWrapper(
 					props.className,
 					'rich-text'
 				) }
-				onFocus={ unstableOnFocus }
 				onKeyDown={ onKeyDown }
 			/>
 		</>
