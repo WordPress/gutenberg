@@ -14,6 +14,7 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -45,6 +46,20 @@ const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 
 function GlobalStylesActionMenu() {
 	const { toggle } = useDispatch( preferencesStore );
+	const { canEditCSS } = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+
+		return {
+			canEditCSS:
+				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+		};
+	}, [] );
 	const { useGlobalStylesReset } = unlock( blockEditorExperiments );
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { goTo } = useNavigator();
@@ -65,10 +80,14 @@ function GlobalStylesActionMenu() {
 						onClick: () =>
 							toggle( 'core/edit-site', 'welcomeGuideStyles' ),
 					},
-					{
-						title: __( 'Additional CSS' ),
-						onClick: loadCustomCSS,
-					},
+					...( canEditCSS
+						? [
+								{
+									title: __( 'Additional CSS' ),
+									onClick: loadCustomCSS,
+								},
+						  ]
+						: [] ),
 				] }
 			/>
 		</GlobalStylesMenuFill>
