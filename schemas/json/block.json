@@ -389,7 +389,8 @@
 									"items": {
 										"type": "string",
 										"enum": [ "vertical", "horizontal" ]
-									}
+									},
+									"default": [ "vertical", "horizontal" ]
 								}
 							]
 						}
