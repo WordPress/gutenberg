@@ -352,6 +352,7 @@ function LinkControl( {
 				{ ( showSettings || showTextControl ) && (
 					<>
 						<Button
+							className="block-editor-link-control__drawer-toggle"
 							aria-expanded={ settingsOpen }
 							onClick={ () => setSettingsOpen( ! settingsOpen ) }
 							icon={ settingsIcon }
@@ -375,26 +376,30 @@ function LinkControl( {
 										duration: 0.2,
 									} }
 								>
-									{ showTextControl && (
-										<TextControl
-											__nextHasNoMarginBottom
-											ref={ textInputRef }
-											className="block-editor-link-control__setting block-editor-link-control__text-content"
-											label="Text"
-											value={ internalTextInputValue }
-											onChange={
-												setInternalTextInputValue
-											}
-											onKeyDown={ handleSubmitWithEnter }
-										/>
-									) }
-									{ showSettings && (
-										<LinkControlSettingsDrawer
-											value={ value }
-											settings={ settings }
-											onChange={ onChange }
-										/>
-									) }
+									<div className="block-editor-link-control__drawer-inner">
+										{ showTextControl && (
+											<TextControl
+												__nextHasNoMarginBottom
+												ref={ textInputRef }
+												className="block-editor-link-control__setting block-editor-link-control__text-content"
+												label="Text"
+												value={ internalTextInputValue }
+												onChange={
+													setInternalTextInputValue
+												}
+												onKeyDown={
+													handleSubmitWithEnter
+												}
+											/>
+										) }
+										{ showSettings && (
+											<LinkControlSettingsDrawer
+												value={ value }
+												settings={ settings }
+												onChange={ onChange }
+											/>
+										) }
+									</div>
 								</motion.div>
 							) }
 						</AnimatePresence>

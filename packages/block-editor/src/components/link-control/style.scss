@@ -432,6 +432,15 @@ $preview-image-height: 140px;
 	order: 30;
 	flex-direction: column;
 	flex-basis: 100%; // occupy full width.
+	overflow: hidden;
+}
+
+// Inner div required to avoid padding/margin
+// causing janky animation.
+.block-editor-link-control__drawer-inner {
+	display: flex; // allow for ordering.
+	flex-direction: column;
+	flex-basis: 100%; // occupy full width.
 	margin-top: $grid-unit-20;
 	padding-top: $grid-unit-20;
 	position: relative;
@@ -475,7 +484,7 @@ $preview-image-height: 140px;
 .block-editor-link-control__setting {
 	margin-bottom: $grid-unit-20;
 
-	:last-child {
+	&.block-editor-link-control__setting:last-child {
 		margin-bottom: 0;
 	}
 }
