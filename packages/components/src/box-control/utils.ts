@@ -212,7 +212,7 @@ export function normalizeSides( sides: BoxControlProps[ 'sides' ] ) {
  */
 export function applyValueToSides(
 	currentValues: BoxControlValue,
-	newValue: string | undefined,
+	newValue?: string,
 	sides?: BoxControlProps[ 'sides' ]
 ): BoxControlValue {
 	const newValues = { ...currentValues };
