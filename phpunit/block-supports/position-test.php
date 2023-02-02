@@ -58,7 +58,7 @@ class WP_Block_Supports_Position_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that minimum height block support works as expected.
+	 * Tests that position block support works as expected.
 	 *
 	 * @covers ::gutenberg_render_position_support
 	 *
