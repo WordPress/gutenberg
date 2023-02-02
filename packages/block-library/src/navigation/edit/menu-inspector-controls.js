@@ -48,7 +48,7 @@ const MainContent = ( {
 		return <p>{ __( 'Select or create a menu' ) }</p>;
 	}
 
-	if ( isNavigationMenuMissing ) {
+	if ( currentMenuId && isNavigationMenuMissing ) {
 		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
 	}
 
