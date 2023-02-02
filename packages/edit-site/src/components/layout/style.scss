@@ -85,9 +85,9 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	}
 
 	> div {
-		overflow-y: auto;
-		min-height: 100%;
-		@include custom-scrollbars-on-hover;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
 	}
 
 	.resizable-editor__drag-handle {
