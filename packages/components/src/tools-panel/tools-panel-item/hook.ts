@@ -103,6 +103,14 @@ export function useToolsPanelItem(
 		flagItemCustomization,
 	] );
 
+	useEffect( () => {
+		if ( ! isShownByDefault && isValueSet && ! wasValueSet ) {
+			console.log(
+				'Do something here to make non-default items with values updated show'
+			);
+		}
+	} );
+
 	// Note: `label` is used as a key when building menu item state in
 	// `ToolsPanel`.
 	const menuGroup = isShownByDefault ? 'default' : 'optional';

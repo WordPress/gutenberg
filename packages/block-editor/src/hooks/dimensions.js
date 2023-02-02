@@ -148,10 +148,7 @@ export function DimensionsPanel( props ) {
 							'padding',
 							'spacing'
 						) }
-						isShownByDefault={
-							defaultSpacingControls?.padding ||
-							hasPaddingValue( props )
-						}
+						isShownByDefault={ defaultSpacingControls?.padding }
 						panelId={ props.clientId }
 					>
 						<PaddingEdit
@@ -171,10 +168,7 @@ export function DimensionsPanel( props ) {
 							'margin',
 							'spacing'
 						) }
-						isShownByDefault={
-							defaultSpacingControls?.margin ||
-							hasMarginValue( props )
-						}
+						isShownByDefault={ defaultSpacingControls?.margin }
 						panelId={ props.clientId }
 					>
 						<MarginEdit
@@ -194,10 +188,7 @@ export function DimensionsPanel( props ) {
 							'blockGap',
 							'spacing'
 						) }
-						isShownByDefault={
-							defaultSpacingControls?.blockGap ||
-							hasGapValue( props )
-						}
+						isShownByDefault={ defaultSpacingControls?.blockGap }
 						panelId={ props.clientId }
 					>
 						<GapEdit { ...props } />
@@ -213,8 +204,7 @@ export function DimensionsPanel( props ) {
 							'dimensions'
 						) }
 						isShownByDefault={
-							defaultDimensionsControls?.minHeight ||
-							hasMinHeightValue( props )
+							defaultDimensionsControls?.minHeight
 						}
 						panelId={ props.clientId }
 					>
