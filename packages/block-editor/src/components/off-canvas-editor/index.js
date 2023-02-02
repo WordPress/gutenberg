@@ -60,10 +60,18 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {boolean} props.showBlockMovers Flag to enable block movers
  * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
  * @param {Object}  props.LeafMoreMenu    Optional more menu substitution.
+ * @param {string}  props.description         Optional accessible description for the tree grid component.
  * @param {Object}  ref                   Forwarded ref
  */
 function OffCanvasEditor(
-	{ id, blocks, showBlockMovers = false, isExpanded = false, LeafMoreMenu },
+	{
+		id,
+		blocks,
+		showBlockMovers = false,
+		isExpanded = false,
+		LeafMoreMenu,
+		description = __( 'Block navigation structure' ),
+	},
 	ref
 ) {
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
@@ -208,7 +216,8 @@ function OffCanvasEditor(
 					onCollapseRow={ collapseRow }
 					onExpandRow={ expandRow }
 					onFocusRow={ focusRow }
-					applicationAriaLabel={ __( 'Block navigation structure' ) }
+					// eslint-disable-next-line jsx-a11y/aria-props
+					aria-description={ description }
 				>
 					<ListViewContext.Provider value={ contextValue }>
 						<ListViewBranch
