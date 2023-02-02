@@ -140,12 +140,11 @@ function ComplementaryArea( {
 	} = useDispatch( interfaceStore );
 
 	useEffect( () => {
+		// Set initial visibility: For large screens, enable if it's active by
+		// default. For small screens, always initially disable.
 		if ( isActiveByDefault && activeArea === undefined && ! isSmall ) {
 			enableComplementaryArea( scope, identifier );
 		} else if ( activeArea === undefined && isSmall ) {
-			// The isComplementaryAreaVisible state is preserved, so in case it
-			// was previously true, we need to adjust and initially disable for
-			// small screens.
 			disableComplementaryArea( scope, identifier );
 		}
 	}, [
