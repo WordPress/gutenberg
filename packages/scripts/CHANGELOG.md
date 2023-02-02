@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   The `WP_DEVTOOL` environment variable can now be used to set the Webpack devtool option for sourcemaps in production builds ([#46812](https://github.com/WordPress/gutenberg/pull/46812)). Previously, this only worked for development builds.
+
 ## 25.3.0 (2023-02-01)
 
 ## 25.2.0 (2023-01-11)
