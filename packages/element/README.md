@@ -41,8 +41,7 @@ Let's render a customized greeting into an empty element:
 	wp.element.createRoot(document.getElementById( 'greeting' ))
 		.render(
 			wp.element.createElement( Greeting, { toWhom: 'World' } )
-		)
-	);
+		);
 </script>
 ```
 
