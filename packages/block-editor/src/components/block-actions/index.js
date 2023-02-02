@@ -58,6 +58,8 @@ export default function BlockActions( {
 		setBlockMovingClientId,
 		setNavigationMode,
 		selectBlock,
+		clearSelectedBlock,
+		multiSelect,
 	} = useDispatch( blockEditorStore );
 
 	const notifyCopy = useNotifyCopy();
@@ -132,6 +134,13 @@ export default function BlockActions( {
 		},
 		async onPasteStyles() {
 			await pasteStyles( blocks );
+
+			// Need to reselect the block(s) in order for optional tool panel control changes to register.
+			clearSelectedBlock();
+			multiSelect(
+				blocks[ 0 ].clientId,
+				blocks[ blocks.length - 1 ].clientId
+			);
 		},
 	} );
 }
