@@ -296,16 +296,15 @@ const config = {
 	},
 };
 
+// WP_DEVTOOL global variable controls how source maps are generated.
+// See: https://webpack.js.org/configuration/devtool/#devtool.
+if ( process.env.WP_DEVTOOL ) {
+	config.devtool = process.env.WP_DEVTOOL;
+}
+
 if ( ! isProduction ) {
-	// WP_DEVTOOL global variable controls how source maps are generated.
-	// See: https://webpack.js.org/configuration/devtool/#devtool.
-	config.devtool = process.env.WP_DEVTOOL || 'source-map';
-	config.module.rules.unshift( {
-		test: /\.(j|t)sx?$/,
-		exclude: [ /node_modules/ ],
-		use: require.resolve( 'source-map-loader' ),
-		enforce: 'pre',
-	} );
+	// Set default sourcemap mode if it wasn't set by WP_DEVTOOL.
+	config.devtool = config.devtool || 'source-map';
 	config.devServer = {
 		devMiddleware: {
 			writeToDisk: true,
@@ -321,6 +320,16 @@ if ( ! isProduction ) {
 			},
 		},
 	};
+}
+
+// Add source-map-loader if devtool is set, whether in dev mode or not.
+if ( config.devtool ) {
+	config.module.rules.unshift( {
+		test: /\.(j|t)sx?$/,
+		exclude: [ /node_modules/ ],
+		use: require.resolve( 'source-map-loader' ),
+		enforce: 'pre',
+	} );
 }
 
 module.exports = config;

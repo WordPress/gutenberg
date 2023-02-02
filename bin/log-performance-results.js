@@ -47,7 +47,7 @@ const data = new TextEncoder().encode(
 					] )
 				),
 			};
-		} ),
+		}, {} ),
 		baseMetrics: resultsFiles.reduce(
 			( result, { metricsPrefix }, index ) => {
 				return {
