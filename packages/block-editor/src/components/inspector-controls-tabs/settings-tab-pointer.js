@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -33,9 +34,10 @@ export default function InspectorControlsTabsPointer() {
 				icon={ close }
 				iconSize="16"
 				label={ __( 'Dismiss' ) }
-				onClick={ () =>
-					setPreference( 'core', PREFERENCE_NAME, false )
-				}
+				onClick={ () => {
+					setPreference( 'core', PREFERENCE_NAME, false );
+					speak( __( 'Notice dismissed.' ) );
+				} }
 				showTooltip={ false }
 			/>
 		</div>
