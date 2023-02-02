@@ -26,6 +26,8 @@ import {
 	insert,
 	isCollapsed,
 	getTextContent,
+	// Error expected because `@wordpress/rich-text` is not yet fully typed.
+	// @ts-expect-error
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
 
