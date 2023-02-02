@@ -52,22 +52,21 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		)
 	);
 
+	$anchor = '<a href="' . esc_url( $url ) . '" class="wp-block-social-link-anchor">';
+	if ( $open_in_new_tab ) {
+		$anchor = '<a href="' . esc_url( $url ) . '" rel="' . esc_attr( $rel ) . ' noopener nofollow" target="_blank" class="wp-block-social-link">';
+	} elseif ( '' !== $rel ) {
+		$anchor = '<a href="' . esc_url( $url ) . '" rel="' . esc_attr( $rel ) . '" class="wp-block-social-link">';
+	}
+
 	$link  = '<li ' . $wrapper_attributes . '>';
-	$link .= '<a href="' . esc_url( $url ) . '" class="wp-block-social-link-anchor">';
+	$link .= $anchor;
 	$link .= $icon;
 	$link .= '<span class="wp-block-social-link-label' . ( $show_labels ? '' : ' screen-reader-text' ) . '">';
 	$link .= esc_html( $label );
 	$link .= '</span></a></li>';
 
-	$w = new WP_HTML_Tag_Processor( $link );
-	$w->next_tag( 'a' );
-	if ( $open_in_new_tab ) {
-		$w->set_attribute( 'rel', esc_attr( $rel ) . ' noopener nofollow' );
-		$w->set_attribute( 'target', '_blank' );
-	} elseif ( '' !== $rel ) {
-		$w->set_attribute( 'rel', esc_attr( $rel ) );
-	}
-	return $w;
+	return $link;
 }
 
 /**
