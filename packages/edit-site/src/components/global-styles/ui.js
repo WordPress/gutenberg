@@ -37,6 +37,7 @@ import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
 import { unlock } from '../../experiments';
+import ScreenEffects from './screen-effects';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
 const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
@@ -207,6 +208,10 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>
 				<ScreenBorder name={ name } variation={ variation } />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path={ parentMenu + '/effects' }>
+				<ScreenEffects name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
