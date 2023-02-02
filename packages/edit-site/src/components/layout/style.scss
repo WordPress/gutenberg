@@ -215,10 +215,15 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	right: 0;
 	width: $sidebar-width;
 	color: $gray-900;
+	background: $white;
 
 	&:focus,
 	&:focus-within {
-		top: auto;
+		top: 0;
 		bottom: 0;
+	}
+
+	@include break-medium {
+		border-left: $border-width solid $gray-300;
 	}
 }

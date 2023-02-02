@@ -268,12 +268,7 @@ export default function Layout() {
 						) }
 					</AnimatePresence>
 
-					<NavigableRegion
-						className="edit-site-layout__actions"
-						ariaLabel={ __( 'Save sidebar' ) }
-					>
-						<SavePanel />
-					</NavigableRegion>
+					<SavePanel />
 
 					{ showCanvas && (
 						<div
