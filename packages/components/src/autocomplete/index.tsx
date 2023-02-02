@@ -369,8 +369,8 @@ export function useAutocomplete( {
 	};
 }
 
-function useLastDifferentValue( value ) {
-	const history = useRef( new Set() );
+function useLastDifferentValue( value: UseAutocompleteProps[ 'record' ] ) {
+	const history = useRef< Set< typeof value > >( new Set() );
 
 	history.current.add( value );
 
@@ -382,9 +382,9 @@ function useLastDifferentValue( value ) {
 	return Array.from( history.current )[ 0 ];
 }
 
-export function useAutocompleteProps( options ) {
-	const ref = useRef();
-	const onKeyDownRef = useRef();
+export function useAutocompleteProps( options: UseAutocompleteProps ) {
+	const ref = useRef< HTMLElement | undefined >();
+	const onKeyDownRef = useRef< ( event: KeyboardEvent ) => void >();
 	const { record } = options;
 	const previousRecord = useLastDifferentValue( record );
 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
@@ -395,9 +395,11 @@ export function useAutocompleteProps( options ) {
 
 	const mergedRefs = useMergeRefs( [
 		ref,
-		useRefEffect( ( element ) => {
-			function _onKeyDown( event ) {
-				onKeyDownRef.current( event );
+		useRefEffect( ( element: HTMLElement ) => {
+			function _onKeyDown( event: KeyboardEvent ) {
+				if ( typeof onKeyDownRef.current !== 'undefined' ) {
+					onKeyDownRef.current( event );
+				}
 			}
 			element.addEventListener( 'keydown', _onKeyDown );
 			return () => {
