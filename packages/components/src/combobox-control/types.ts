@@ -3,14 +3,19 @@
  */
 import type { ReactNode } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { SuggestionsListProps } from '../form-token-field/types';
+
 export type DetectOutsideProps = {
 	onFocusOutside: ( event: Event ) => void;
 	children: ReactNode;
 };
 
 export type Option = {
-	value: string;
 	label: string;
+	value: string;
 };
 
 export type ComboboxControlProps = {
@@ -68,9 +73,9 @@ export type ComboboxControlProps = {
 	 * under the `item` key, the single option's data (directly from
 	 * the array of data passed to the `options` prop).
 	 */
-	__experimentalRenderItem?: (
-		item: Record< 'item', Record< string, unknown > >
-	) => ReactNode;
+	__experimentalRenderItem?: SuggestionsListProps<
+		Record< string, string >
+	>[ '__experimentalRenderItem' ];
 	/**
 	 * Starts opting into 36px default size styling.
 	 */

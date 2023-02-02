@@ -142,7 +142,7 @@ The current value of the input.
 
 -   Required: No
 
-#### `__experimentalRenderItem`: `( item: Record< 'item', Record< string, unknown > >	) => ReactNode`
+#### `__experimentalRenderItem`: `( args: { item: Record< string, string > ) => ReactNode )`
 
 Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
 

@@ -339,10 +339,10 @@ WithCustomRenderItem.args = {
 		const { label, age, country } = item;
 		return (
 			<div>
-				<div style={ { marginBottom: '0.2rem' } }>
-					{ label as string }
-				</div>
-				<small>{ `Age: ${ age }, Country: ${ country }` }</small>
+				<div style={ { marginBottom: '0.2rem' } }>{ label }</div>
+				<small>
+					Age: { age }, Country: { country }
+				</small>
 			</div>
 		);
 	},
