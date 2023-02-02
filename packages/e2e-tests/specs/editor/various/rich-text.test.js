@@ -412,7 +412,8 @@ describe( 'RichText', () => {
 		await page.waitForXPath(
 			'//button[@role="tab"][@aria-selected="true"][text()="Text"]'
 		);
-		// Tab to the "Text" tab.
+		// Initial focus is on the "Text" tab.
+		// Tab to the "Custom color picker".
 		await page.keyboard.press( 'Tab' );
 		// Tab to black.
 		await page.keyboard.press( 'Tab' );
