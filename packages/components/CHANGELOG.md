@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `ComboboxControl`: Convert to TypeScript ([#47468](https://github.com/WordPress/gutenberg/pull/47468)).
+
 ## 23.3.0 (2023-02-01)
 
 ### Deprecations
