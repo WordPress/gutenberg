@@ -5,7 +5,7 @@
 ### Bug Fix
 
 -   Force visual editor in browse mode ([#47329](https://github.com/WordPress/gutenberg/pull/47329)).
--   Style Book: Exclude blocks that are not allowed to insert or have parent ([#47461](https://github.com/WordPress/gutenberg/pull/47461)).
+-   Style Book: Exclude blocks that are not allowed to insert ([#47461](https://github.com/WordPress/gutenberg/pull/47461)).
 
 ## 5.2.0 (2023-01-11)
 
