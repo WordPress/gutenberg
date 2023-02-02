@@ -365,6 +365,10 @@ export const withPositionStyles = createHigherOrderComponent(
 		// Attach a `wp-container-` id-based class name.
 		const className = classnames( props?.className, {
 			[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+			[ `is-position-${ attributes?.style?.position?.type }` ]:
+				allowPositionStyles &&
+				!! css &&
+				!! attributes?.style?.position?.type,
 		} );
 
 		return (
