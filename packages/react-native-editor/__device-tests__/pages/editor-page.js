@@ -799,10 +799,12 @@ class EditorPage {
 
 		const base64Image = Buffer.from( screenshot, 'base64' );
 		const image = await jimp.read( base64Image );
-		const croppedHeight = isAndroid()
-			? image.getHeight() - statusBarHeight
-			: image.getHeight();
-		image.crop( 0, statusBarHeight, image.getWidth(), croppedHeight );
+		image.crop(
+			0,
+			statusBarHeight,
+			image.getWidth(),
+			image.getHeight() - statusBarHeight
+		);
 		const resizedImage = await image.resize( 320, jimp.AUTO );
 		const croppedImage = await resizedImage.getBase64Async( jimp.MIME_PNG );
 
