@@ -35,6 +35,7 @@ import { speak } from '@wordpress/a11y';
 import { getAutoCompleterUI } from './autocompleter-ui';
 import { escapeRegExp } from '../utils/strings';
 import type {
+	AutocompleteProps,
 	AutocompleterUIProps,
 	KeyedOption,
 	OptionCompletion,
@@ -424,7 +425,11 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 	};
 }
 
-export default function Autocomplete( { children, isSelected, ...options } ) {
+export default function Autocomplete( {
+	children,
+	isSelected,
+	...options
+}: AutocompleteProps ) {
 	const { popover, ...props } = useAutocomplete( options );
 	return (
 		<>

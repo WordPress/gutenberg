@@ -5,7 +5,11 @@ import type { WPElement } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { MutableRefObject } from 'react';
+import type { MutableRefObject, ReactNode } from 'react';
+/**
+ * Internal dependencies
+ */
+import type { useAutocomplete } from '.';
 
 type GetOptions< TCompleterOption = any > = (
 	filterValue: AutocompleterUIProps[ 'filterValue' ]
@@ -193,4 +197,18 @@ export type UseAutocompleteProps = {
 	 * A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
 	 */
 	contentRef: ContentRef;
+};
+
+export type AutocompleteProps = UseAutocompleteProps & {
+	/**
+	 * A function that returns nodes to be rendered within the Autocomplete.
+	 */
+	children: (
+		props: Omit< ReturnType< typeof useAutocomplete >, 'popover' >
+	) => ReactNode;
+	/**
+	 * Whether or not the Autocomplte componenet is selected, and if its `Popover`
+	 * should be displayed.
+	 */
+	isSelected: boolean;
 };
