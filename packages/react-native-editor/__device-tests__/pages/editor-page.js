@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import jimp from 'jimp';
+
+/**
  * Internal dependencies
  */
 const {
@@ -786,6 +791,26 @@ class EditorPage {
 			: `//XCUIElementTypeButton[contains(@name, "Shortcode Block. Row ${ position }")]//XCUIElementTypeTextView`;
 
 		return await waitForVisible( this.driver, blockLocator );
+	}
+
+	async takeScreenshot() {
+		const statusBarHeight = isAndroid() ? 100 : 94;
+		const screenshot = await this.driver.takeScreenshot();
+
+		const base64Image = Buffer.from( screenshot, 'base64' );
+		const image = await jimp.read( base64Image );
+		const croppedHeight = isAndroid()
+			? image.getHeight() - statusBarHeight
+			: image.getHeight();
+		image.crop( 0, statusBarHeight, image.getWidth(), croppedHeight );
+		const resizedImage = await image.resize( 320, jimp.AUTO );
+		const croppedImage = await resizedImage.getBase64Async( jimp.MIME_PNG );
+
+		return croppedImage.replace( 'data:image/png;base64,', '' );
+	}
+
+	getPlatform() {
+		return isAndroid() ? 'Android' : 'iOS';
 	}
 }
 
