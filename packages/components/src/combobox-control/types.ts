@@ -25,7 +25,8 @@ export type ComboboxControlProps = {
 	 */
 	className?: string;
 	/**
-	 * If this property is added, a help text will be generated using help property as the content.
+	 * If this property is added, a help text will be generated using
+	 * help property as the content.
 	 */
 	help?: string;
 	/**
@@ -47,7 +48,8 @@ export type ComboboxControlProps = {
 	 */
 	onChange?: ( selectedValue: string ) => void;
 	/**
-	 * Function called with the control's search input value changes. The argument contains the next input value.
+	 * Function called with the control's search input value changes.
+	 * The argument contains the next input value.
 	 *
 	 * @default () => void
 	 */
@@ -61,7 +63,10 @@ export type ComboboxControlProps = {
 	 */
 	value?: string;
 	/**
-	 * Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
+	 * Custom renderer invoked for each option in the suggestion list.
+	 * The render prop receives as its argument an object containing,
+	 * under the `item` key, the single option's data (directly from
+	 * the array of data passed to the `options` prop).
 	 */
 	__experimentalRenderItem?: (
 		item: Record< 'item', Record< string, unknown > >
@@ -71,7 +76,8 @@ export type ComboboxControlProps = {
 	 */
 	__next36pxDefaultSize?: boolean;
 	/**
-	 * Starts opting into the new margin-free styles that will become the default in a future version
+	 * Starts opting into the new margin-free styles
+	 * that will become the default in a future version.
 	 *
 	 * @default false
 	 */
