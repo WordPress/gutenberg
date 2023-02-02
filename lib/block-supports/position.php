@@ -87,7 +87,7 @@ function gutenberg_render_position_support( $block_content, $block ) {
 					}
 
 					// Ensure current side value also factors in the height of the logged in admin bar.
-					$side_value = "calc($side_value + var(--wp-admin--admin-bar--height, 0px))";
+					$side_value = "calc($side_value + var(--wp-admin--admin-bar--position-offset, 0px))";
 				}
 
 				$position_styles[] =
