@@ -463,9 +463,9 @@ test.describe( 'Widgets Customizer', () => {
 		await page.keyboard.press( 'Escape' );
 		await expect(
 			page.locator(
-				'*[aria-live="polite"][aria-relevant="additions text"] >> text=/^You are currently in navigation mode./'
+				'css=.block-editor-block-list__layout.is-navigate-mode'
 			)
-		).toHaveCount( 1 );
+		).toBeVisible();
 		await expect( paragraphBlock ).toBeVisible();
 	} );
 
