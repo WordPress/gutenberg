@@ -82,7 +82,10 @@ function register_block_core_post_terms() {
 			'name'        => $taxonomy->name,
 			'title'       => $taxonomy->label,
 			/* translators: %s: taxonomy's label */
-			'description' => sprintf( __( 'Display the assigned taxonomy: %s' ), $taxonomy->label ),
+			'description' => sprintf(
+				__( 'Display a list of assigned terms from the taxonomy: %s' ),
+				$taxonomy->label
+			),
 			'attributes'  => array(
 				'term' => $taxonomy->name,
 			),
