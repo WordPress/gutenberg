@@ -32,6 +32,7 @@ import {
 	blockListSettings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
+	draggedBlocksOrigin,
 } from '../reducer';
 
 const noop = () => {};
@@ -2461,6 +2462,30 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( [] );
+		} );
+	} );
+
+	describe( 'draggedBlocksOrigin', () => {
+		it.each( [ '', 'inner-blocks' ] )(
+			`should store the dragged blocks' origin as "%s" when a user starts dragging blocks`,
+			( theOrigin ) => {
+				const clientIds = [ 'block-1', 'block-2', 'block-3' ];
+				const state = draggedBlocksOrigin( [], {
+					type: 'START_DRAGGING_BLOCKS',
+					clientIds,
+					origin: theOrigin,
+				} );
+
+				expect( state ).toBe( theOrigin );
+			}
+		);
+
+		it( `should set the state to an empty string when a user stops dragging blocks`, () => {
+			const state = draggedBlocksOrigin( [], {
+				type: 'STOP_DRAGGING_BLOCKS',
+			} );
+
+			expect( state ).toBe( '' );
 		} );
 	} );
 

@@ -799,6 +799,17 @@ describe( 'actions', () => {
 				clientIds,
 			} );
 		} );
+
+		it( 'should optionally return a drag origin with START_DRAGGING_BLOCKS action', () => {
+			const clientIds = [ 'block-1', 'block-2', 'block-3' ];
+			expect( startDraggingBlocks( clientIds, 'inner-blocks' ) ).toEqual(
+				{
+					type: 'START_DRAGGING_BLOCKS',
+					clientIds,
+					origin: 'inner-blocks',
+				}
+			);
+		} );
 	} );
 
 	describe( 'stopDraggingBlocks', () => {
