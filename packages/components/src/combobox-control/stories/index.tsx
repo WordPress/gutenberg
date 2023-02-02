@@ -330,8 +330,7 @@ const authorOptions = [
  * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
  * and is subject to change.)
  */
-export const WithCustomRenderItem: ComponentStory< typeof ComboboxControl > =
-	Template.bind( {} );
+export const WithCustomRenderItem = Template.bind( {} );
 WithCustomRenderItem.args = {
 	...Default.args,
 	label: 'Select an author',
