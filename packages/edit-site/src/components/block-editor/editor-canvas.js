@@ -13,6 +13,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../experiments';
 import { store as editSiteStore } from '../../store';
 
 function EditorCanvas( { enableResizing, settings, children, ...props } ) {
@@ -23,11 +24,11 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			isZoomOutMode:
 				select( blockEditorStore ).__unstableGetEditorMode() ===
 				'zoom-out',
-			canvasMode: select( editSiteStore ).__unstableGetCanvasMode(),
+			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 		} ),
 		[]
 	);
-	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const deviceStyles = useResizeCanvas( deviceType );
 	const mouseMoveTypingRef = useMouseMoveTypingReset();
 	return (
@@ -62,9 +63,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			role={ canvasMode === 'view' ? 'button' : undefined }
 			onClick={
 				canvasMode === 'view'
-					? () => {
-							__unstableSetCanvasMode( 'edit' );
-					  }
+					? () => setCanvasMode( 'edit' )
 					: undefined
 			}
 			readonly={ canvasMode === 'view' }
