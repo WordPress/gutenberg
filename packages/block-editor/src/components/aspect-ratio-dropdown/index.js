@@ -12,7 +12,13 @@ import { useSettings } from '../use-settings';
 import { POPOVER_PROPS } from '../image-editor/constants';
 import { useImageEditingContext } from '../image-editor/context';
 
-function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
+function AspectRatioGroup( {
+	aspectRatios,
+	isDisabled,
+	label,
+	onClick,
+	value,
+} ) {
 	return (
 		<MenuGroup label={ label }>
 			{ aspectRatios.map( ( { name, slug, ratio } ) => (
@@ -80,7 +86,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 		>
 			{ ( { onClose } ) => (
 				<>
-					<AspectGroup
+					<AspectRatioGroup
 						isDisabled={ isInProgress }
 						onClick={ ( newAspect ) => {
 							setAspect( newAspect );
@@ -101,7 +107,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						] }
 					/>
 					{ themeRatios.length > 0 && (
-						<AspectGroup
+						<AspectRatioGroup
 							label={ __( 'Theme' ) }
 							isDisabled={ isInProgress }
 							onClick={ ( newAspect ) => {
@@ -113,7 +119,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						/>
 					) }
 					{ showDefaultRatios && (
-						<AspectGroup
+						<AspectRatioGroup
 							label={ __( 'Landscape' ) }
 							isDisabled={ isInProgress }
 							onClick={ ( newAspect ) => {
@@ -127,7 +133,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						/>
 					) }
 					{ showDefaultRatios && (
-						<AspectGroup
+						<AspectRatioGroup
 							label={ __( 'Portrait' ) }
 							isDisabled={ isInProgress }
 							onClick={ ( newAspect ) => {
