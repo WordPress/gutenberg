@@ -167,8 +167,13 @@ export default function useBlockDropZone( {
 		[ targetRootClientId ]
 	);
 
-	const { getBlockListSettings, getBlocks, getBlockIndex } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockListSettings,
+		getBlocks,
+		getBlockIndex,
+		getDraggedBlocksOrigin,
+	} = useSelect( blockEditorStore );
+
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
@@ -179,6 +184,17 @@ export default function useBlockDropZone( {
 	const throttled = useThrottle(
 		useCallback(
 			( event, ownerDocument ) => {
+				const draggedBlocksOrigin = getDraggedBlocksOrigin();
+
+				if (
+					dropZoneName &&
+					draggedBlocksOrigin &&
+					dropZoneName !== draggedBlocksOrigin
+				) {
+					// If drag and drop names are available and they don't match, don't allow dropping.
+					return;
+				}
+
 				const blocks = getBlocks( targetRootClientId );
 
 				// The block list is empty, don't show the insertion point but still allow dropping.

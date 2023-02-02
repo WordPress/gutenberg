@@ -69,7 +69,7 @@ const BlockDraggable = ( {
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
-				startDraggingBlocks( clientIds );
+				startDraggingBlocks( clientIds, dragOrigin );
 				isDragging.current = true;
 
 				startScrolling( event );
