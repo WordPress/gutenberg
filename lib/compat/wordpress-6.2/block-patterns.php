@@ -403,11 +403,10 @@ function gutenberg_load_remote_featured_patterns() {
 		return;
 	}
 	$patterns = $response->get_data();
-
+	$registry = WP_Block_Patterns_Registry::get_instance();
 	foreach ( $patterns as $pattern ) {
 		$normalized_pattern = gutenberg_normalize_remote_pattern( $pattern );
 		$pattern_name       = sanitize_title( $normalized_pattern['title'] );
-		$registry           = WP_Block_Patterns_Registry::get_instance();
 		// Some patterns might be already registered as core patterns with the `core` prefix.
 		$is_registered = $registry->is_registered( $pattern_name ) || $registry->is_registered( "core/$pattern_name" );
 		if ( ! $is_registered ) {
