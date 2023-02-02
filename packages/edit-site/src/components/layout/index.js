@@ -39,6 +39,7 @@ import SiteHub from '../site-hub';
 import ResizeHandle from '../block-editor/resize-handle';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 import { unlock } from '../../experiments';
+import SavePanel from '../save-panel';
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
@@ -266,6 +267,8 @@ export default function Layout() {
 							</ResizableBox>
 						) }
 					</AnimatePresence>
+
+					<SavePanel />
 
 					{ showCanvas && (
 						<div
