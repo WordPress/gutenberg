@@ -64,7 +64,9 @@ const MainContent = ( {
 				__( 'Structure for navigation menu: %s' ),
 				navigationMenu?.title || __( 'Untitled menu' )
 		  )
-		: __( 'You have not yet created any menus. Displaying a list of your Pages' );
+		: __(
+				'You have not yet created any menus. Displaying a list of your Pages'
+		  );
 	return (
 		<OffCanvasEditor
 			blocks={ clientIdsTree }
