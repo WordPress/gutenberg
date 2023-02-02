@@ -6,10 +6,7 @@ import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
-import {
-	PreferenceToggleMenuItem,
-	store as preferencesStore,
-} from '@wordpress/preferences';
+import { PreferenceToggleMenuItem } from '@wordpress/preferences';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -32,13 +29,11 @@ function WritingMenu() {
 
 	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
 		useDispatch( postEditorStore );
-	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
-			setPreference( 'core/edit-post', 'fixedToolbar', false );
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();

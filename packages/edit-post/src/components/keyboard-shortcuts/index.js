@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -45,10 +44,7 @@ function KeyboardShortcuts() {
 	} = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
-	const { set: setPreference } = useDispatch( preferencesStore );
-
 	const toggleDistractionFree = () => {
-		setPreference( 'core/edit-post', 'fixedToolbar', false );
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );
 		closeGeneralSidebar();

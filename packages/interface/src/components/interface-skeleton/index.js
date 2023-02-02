@@ -10,7 +10,6 @@ import { forwardRef, useEffect } from '@wordpress/element';
 import {
 	__unstableUseNavigateRegions as useNavigateRegions,
 	__unstableMotion as motion,
-	SlotFillProvider,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
@@ -97,73 +96,71 @@ function InterfaceSkeleton(
 				!! footer && 'has-footer'
 			) }
 		>
-			<SlotFillProvider>
-				<div className="interface-interface-skeleton__editor">
-					{ !! header && isDistractionFree && (
+			<div className="interface-interface-skeleton__editor">
+				{ !! header && isDistractionFree && (
+					<NavigableRegion
+						as={ motion.div }
+						className="interface-interface-skeleton__header"
+						aria-label={ mergedLabels.header }
+						initial={ isDistractionFree ? 'hidden' : 'hover' }
+						whileHover="hover"
+						variants={ headerVariants }
+						transition={ { type: 'tween', delay: 0.8 } }
+					>
+						{ header }
+					</NavigableRegion>
+				) }
+				{ !! header && ! isDistractionFree && (
+					<NavigableRegion
+						className="interface-interface-skeleton__header"
+						ariaLabel={ mergedLabels.header }
+					>
+						{ header }
+					</NavigableRegion>
+				) }
+				{ isDistractionFree && (
+					<div className="interface-interface-skeleton__header">
+						{ editorNotices }
+					</div>
+				) }
+				<div className="interface-interface-skeleton__body">
+					{ !! secondarySidebar && (
 						<NavigableRegion
-							as={ motion.div }
-							className="interface-interface-skeleton__header"
-							aria-label={ mergedLabels.header }
-							initial={ isDistractionFree ? 'hidden' : 'hover' }
-							whileHover="hover"
-							variants={ headerVariants }
-							transition={ { type: 'tween', delay: 0.8 } }
+							className="interface-interface-skeleton__secondary-sidebar"
+							ariaLabel={ mergedLabels.secondarySidebar }
 						>
-							{ header }
+							{ secondarySidebar }
 						</NavigableRegion>
 					) }
-					{ !! header && ! isDistractionFree && (
-						<NavigableRegion
-							className="interface-interface-skeleton__header"
-							ariaLabel={ mergedLabels.header }
-						>
-							{ header }
-						</NavigableRegion>
-					) }
-					{ isDistractionFree && (
-						<div className="interface-interface-skeleton__header">
-							{ editorNotices }
+					{ !! notices && (
+						<div className="interface-interface-skeleton__notices">
+							{ notices }
 						</div>
 					) }
-					<div className="interface-interface-skeleton__body">
-						{ !! secondarySidebar && (
-							<NavigableRegion
-								className="interface-interface-skeleton__secondary-sidebar"
-								ariaLabel={ mergedLabels.secondarySidebar }
-							>
-								{ secondarySidebar }
-							</NavigableRegion>
-						) }
-						{ !! notices && (
-							<div className="interface-interface-skeleton__notices">
-								{ notices }
-							</div>
-						) }
+					<NavigableRegion
+						className="interface-interface-skeleton__content"
+						ariaLabel={ mergedLabels.body }
+					>
+						{ content }
+					</NavigableRegion>
+					{ !! sidebar && (
 						<NavigableRegion
-							className="interface-interface-skeleton__content"
-							ariaLabel={ mergedLabels.body }
+							className="interface-interface-skeleton__sidebar"
+							ariaLabel={ mergedLabels.sidebar }
 						>
-							{ content }
+							{ sidebar }
 						</NavigableRegion>
-						{ !! sidebar && (
-							<NavigableRegion
-								className="interface-interface-skeleton__sidebar"
-								ariaLabel={ mergedLabels.sidebar }
-							>
-								{ sidebar }
-							</NavigableRegion>
-						) }
-						{ !! actions && (
-							<NavigableRegion
-								className="interface-interface-skeleton__actions"
-								ariaLabel={ mergedLabels.actions }
-							>
-								{ actions }
-							</NavigableRegion>
-						) }
-					</div>
+					) }
+					{ !! actions && (
+						<NavigableRegion
+							className="interface-interface-skeleton__actions"
+							ariaLabel={ mergedLabels.actions }
+						>
+							{ actions }
+						</NavigableRegion>
+					) }
 				</div>
-			</SlotFillProvider>
+			</div>
 			{ !! footer && (
 				<NavigableRegion
 					className="interface-interface-skeleton__footer"
