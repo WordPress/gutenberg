@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -62,10 +57,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			}
 			ref={ mouseMoveTypingRef }
 			name="editor-canvas"
-			className={ classnames(
-				'edit-site-visual-editor__editor-canvas',
-				`is-canvas-${ canvasMode }`
-			) }
+			className="edit-site-visual-editor__editor-canvas"
 			{ ...props }
 			role={ canvasMode === 'view' ? 'button' : undefined }
 			onClick={
