@@ -113,6 +113,13 @@ function InserterMenu(
 		[ onToggleInsertionPoint, setHoveredItem ]
 	);
 
+	const onHoverPattern = useCallback(
+		( item ) => {
+			onToggleInsertionPoint( !! item );
+		},
+		[ onToggleInsertionPoint ]
+	);
+
 	const onClickPatternCategory = useCallback(
 		( patternCategory ) => {
 			setSelectedPatternCategory( patternCategory );
@@ -296,7 +303,7 @@ function InserterMenu(
 				<BlockPatternsCategoryDialog
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsertPattern }
-					onHover={ onHover }
+					onHover={ onHoverPattern }
 					category={ selectedPatternCategory }
 					showTitlesAsTooltip
 				/>
