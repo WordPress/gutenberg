@@ -1247,6 +1247,18 @@ export function draggedBlocks( state = [], action ) {
 	return state;
 }
 
+export function draggedBlocksOrigin( state = '', action ) {
+	switch ( action.type ) {
+		case 'START_DRAGGING_BLOCKS':
+			return action.origin;
+
+		case 'STOP_DRAGGING_BLOCKS':
+			return '';
+	}
+
+	return state;
+}
+
 /**
  * Reducer tracking the visible blocks.
  *
@@ -1886,4 +1898,5 @@ export default combineReducers( {
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
 	blockVisibility,
+	draggedBlocksOrigin,
 } );
