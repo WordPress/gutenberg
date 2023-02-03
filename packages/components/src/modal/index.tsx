@@ -202,8 +202,7 @@ function UnforwardedModal(
 										onClick={ onRequestClose }
 										icon={ close }
 										label={
-											closeButtonLabel ||
-											__( 'Close dialog' )
+											closeButtonLabel || __( 'Close' )
 										}
 									/>
 								) }

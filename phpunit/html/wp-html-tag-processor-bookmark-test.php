@@ -6,7 +6,7 @@
  * @subpackage HTML
  */
 
-require_once __DIR__ . '/../../lib/experimental/html/index.php';
+require_once __DIR__ . '/../../lib/experimental/html/wp-html.php';
 
 /**
  * @group html
@@ -341,13 +341,12 @@ HTML;
 		$p = new WP_HTML_Tag_Processor( '<ul><li>One</li><li>Two</li><li>Three</li></ul>' );
 		$p->next_tag( 'li' );
 
-		$this->expectException( Exception::class );
-
-		for ( $i = 0;$i < WP_HTML_Tag_Processor::MAX_BOOKMARKS;$i++ ) {
+		for ( $i = 0; $i < WP_HTML_Tag_Processor::MAX_BOOKMARKS; $i++ ) {
 			$this->assertTrue( $p->set_bookmark( "bookmark $i" ), "Could not allocate the bookmark #$i" );
 		}
 
-		$this->assertFalse( $p->set_bookmark( 'final bookmark' ), "Allocated $i bookmarks, which is one above the limit." );
+		$this->setExpectedIncorrectUsage( 'WP_HTML_Tag_Processor::set_bookmark' );
+		$this->assertFalse( $p->set_bookmark( 'final bookmark' ), "Allocated $i bookmarks, which is one above the limit" );
 	}
 
 	/**
@@ -360,11 +359,11 @@ HTML;
 		$p->next_tag( 'li' );
 		$p->set_bookmark( 'bookmark' );
 
-		$this->expectException( Exception::class );
-
 		for ( $i = 0; $i < WP_HTML_Tag_Processor::MAX_SEEK_OPS; $i++ ) {
 			$this->assertTrue( $p->seek( 'bookmark' ), 'Could not seek to the "bookmark"' );
 		}
-		$this->assertFalse( $p->seek( 'bookmark' ), "$i-th seek() to the bookmark succeeded, even though it should exceed the allowed limit." );
+
+		$this->setExpectedIncorrectUsage( 'WP_HTML_Tag_Processor::seek' );
+		$this->assertFalse( $p->seek( 'bookmark' ), "$i-th seek() to the bookmark succeeded, even though it should exceed the allowed limit" );
 	}
 }

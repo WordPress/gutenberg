@@ -12,13 +12,14 @@ import { TabPanel } from '@wordpress/components';
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
+import { useSupportedStyles, useColorsPerOrigin } from './hooks';
 import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
-function ScreenLinkColor( { name, variationPath = '' } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+function ScreenLinkColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const supports = useSupportedStyles( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const [ isLinkEnabled ] = useGlobalSetting( 'color.link', name );
@@ -32,15 +33,15 @@ function ScreenLinkColor( { name, variationPath = '' } ) {
 		default: {
 			label: __( 'Default' ),
 			value: useGlobalStyle(
-				variationPath + 'elements.link.color.text',
+				prefix + 'elements.link.color.text',
 				name
 			)[ 0 ],
 			handler: useGlobalStyle(
-				variationPath + 'elements.link.color.text',
+				prefix + 'elements.link.color.text',
 				name
 			)[ 1 ],
 			userValue: useGlobalStyle(
-				variationPath + 'elements.link.color.text',
+				prefix + 'elements.link.color.text',
 				name,
 				'user'
 			)[ 0 ],
@@ -48,15 +49,15 @@ function ScreenLinkColor( { name, variationPath = '' } ) {
 		hover: {
 			label: __( 'Hover' ),
 			value: useGlobalStyle(
-				variationPath + 'elements.link.:hover.color.text',
+				prefix + 'elements.link.:hover.color.text',
 				name
 			)[ 0 ],
 			handler: useGlobalStyle(
-				variationPath + 'elements.link.:hover.color.text',
+				prefix + 'elements.link.:hover.color.text',
 				name
 			)[ 1 ],
 			userValue: useGlobalStyle(
-				variationPath + 'elements.link.:hover.color.text',
+				prefix + 'elements.link.:hover.color.text',
 				name,
 				'user'
 			)[ 0 ],

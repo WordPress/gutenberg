@@ -27,8 +27,8 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean}       codeEditingEnabled                     Whether or not the user can switch to the code editor
  * @property {boolean}       generateAnchors                        Enable/Disable auto anchor generation for Heading blocks
  * @property {boolean}       enableOpenverseMediaCategory           Enable/Disable the Openverse media category in the inserter.
+ * @property {boolean}       clearBlockSelection                    Whether the block editor should clear selection on mousedown when a block is not clicked.
  * @property {boolean}       __experimentalCanUserUseUnfilteredHTML Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
- * @property {boolean}       __experimentalClearBlockSelection      Whether the block editor should clear selection on mousedown when a block is not clicked.
  * @property {boolean}       __experimentalBlockDirectory           Whether the user has enabled the Block Directory
  * @property {Array}         __experimentalBlockPatterns            Array of objects representing the block patterns
  * @property {Array}         __experimentalBlockPatternCategories   Array of objects representing the block pattern categories
@@ -160,8 +160,9 @@ export const SETTINGS_DEFAULTS = {
 	// Allows to disable Openverse media category in the inserter.
 	enableOpenverseMediaCategory: true,
 
+	clearBlockSelection: true,
+
 	__experimentalCanUserUseUnfilteredHTML: false,
-	__experimentalClearBlockSelection: true,
 	__experimentalBlockDirectory: false,
 	__mobileEnablePageTemplates: false,
 	__experimentalBlockPatterns: [],
