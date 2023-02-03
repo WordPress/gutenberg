@@ -6,20 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	Spinner,
-	Notice,
-	TextControl,
-	__unstableMotion as motion,
-	__unstableAnimatePresence as AnimatePresence,
-} from '@wordpress/components';
-import { useReducedMotion } from '@wordpress/compose';
+import { Button, Spinner, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
-import { settings as settingsIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -144,10 +135,6 @@ function LinkControl( {
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
-
-	const prefersReducedMotion = useReducedMotion();
-	const MaybeAnimatePresence = prefersReducedMotion ? 'div' : AnimatePresence;
-	const MaybeMotionDiv = prefersReducedMotion ? 'div' : motion.div;
 
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
@@ -291,6 +278,7 @@ function LinkControl( {
 	const showTextControl = hasLinkValue && hasTextControl;
 
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
+
 	return (
 		<div
 			tabIndex={ -1 }
@@ -356,60 +344,19 @@ function LinkControl( {
 
 			<div className="block-editor-link-control__tools">
 				{ ( showSettings || showTextControl ) && (
-					<>
-						<Button
-							className="block-editor-link-control__drawer-toggle"
-							aria-expanded={ settingsOpen }
-							onClick={ () => setSettingsOpen( ! settingsOpen ) }
-							icon={ settingsIcon }
-							label={ __( 'Toggle link settings' ) }
-							aria-controls="link-1" // todo - this should be dynamic
-						/>
-						<MaybeAnimatePresence>
-							{ settingsOpen && (
-								<MaybeMotionDiv
-									className="block-editor-link-control__drawer"
-									hidden={ ! settingsOpen }
-									id={ 'link-1' } // todo - this should be dynamic
-									initial="collapsed"
-									animate="open"
-									exit="collapsed"
-									variants={ {
-										open: { opacity: 1, height: 'auto' },
-										collapsed: { opacity: 0, height: 0 },
-									} }
-									transition={ {
-										duration: 0.1,
-									} }
-								>
-									<div className="block-editor-link-control__drawer-inner">
-										{ showTextControl && (
-											<TextControl
-												__nextHasNoMarginBottom
-												ref={ textInputRef }
-												className="block-editor-link-control__setting block-editor-link-control__text-content"
-												label="Text"
-												value={ internalTextInputValue }
-												onChange={
-													setInternalTextInputValue
-												}
-												onKeyDown={
-													handleSubmitWithEnter
-												}
-											/>
-										) }
-										{ showSettings && (
-											<LinkControlSettingsDrawer
-												value={ value }
-												settings={ settings }
-												onChange={ onChange }
-											/>
-										) }
-									</div>
-								</MaybeMotionDiv>
-							) }
-						</MaybeAnimatePresence>
-					</>
+					<LinkControlSettingsDrawer
+						settingsOpen={ settingsOpen }
+						setSettingsOpen={ setSettingsOpen }
+						showTextControl={ showTextControl }
+						showSettings={ showSettings }
+						textInputRef={ textInputRef }
+						internalTextInputValue={ internalTextInputValue }
+						setInternalTextInputValue={ setInternalTextInputValue }
+						handleSubmitWithEnter={ handleSubmitWithEnter }
+						value={ value }
+						settings={ settings }
+						onChange={ onChange }
+					/>
 				) }
 
 				{ isEditing && (
