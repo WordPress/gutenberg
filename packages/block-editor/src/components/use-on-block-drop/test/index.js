@@ -26,7 +26,7 @@ describe( 'parseDropEvent', () => {
 			srcClientIds: [ 'abc' ],
 			srcIndex: 1,
 			type: 'block',
-			dragOrigin: 'canvas',
+			targets: [ 'canvas' ],
 		};
 		const event = {
 			dataTransfer: {
@@ -56,7 +56,7 @@ describe( 'parseDropEvent', () => {
 			srcRootClientId: null,
 			srcIndex: null,
 			blocks: null,
-			dragOrigin: null,
+			targets: null,
 			...rawDataTransfer,
 		} );
 	} );
@@ -68,7 +68,7 @@ describe( 'parseDropEvent', () => {
 			srcClientIds: null,
 			srcIndex: null,
 			type: null,
-			dragOrigin: null,
+			targets: null,
 		};
 		const event = {
 			dataTransfer: {
@@ -88,7 +88,7 @@ describe( 'parseDropEvent', () => {
 			srcClientIds: null,
 			srcIndex: null,
 			type: null,
-			dragOrigin: null,
+			targets: null,
 		};
 		const event = {};
 
@@ -303,12 +303,12 @@ describe( 'onBlockDrop', () => {
 		);
 	} );
 
-	it( 'does nothing if the block is dropped into a drop target that does not match origin of the drag', () => {
+	it( 'does nothing if the block is dropped into a drop zone that is not included in a list of valid targets', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
 
 		const dropZoneName = 'canvas';
-		const dragOrigin = 'list-view';
+		const targets = [ 'list-view' ];
 
 		const getBlockIndex = jest.fn( () => 1 );
 		// Dragged block is being dropped as a descendant of itself.
@@ -326,7 +326,51 @@ describe( 'onBlockDrop', () => {
 						type: 'block',
 						srcRootClientId: '0',
 						srcClientIds: [ '5' ],
-						dragOrigin,
+						targets,
+					} );
+				},
+			},
+		};
+
+		const eventHandler = onBlockDrop(
+			targetRootClientId,
+			targetBlockIndex,
+			getBlockIndex,
+			getClientIdsOfDescendants,
+			moveBlocks,
+			insertOrReplaceBlocks,
+			clearSelectedBlock,
+			dropZoneName
+		);
+		eventHandler( event );
+
+		expect( moveBlocks ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing if the block with targets is dropped into an unnamed dropzone', () => {
+		const targetRootClientId = '1';
+		const targetBlockIndex = 0;
+
+		const dropZoneName = '';
+		const targets = [ 'list-view' ];
+
+		const getBlockIndex = jest.fn( () => 1 );
+		// Dragged block is being dropped as a descendant of itself.
+		const getClientIdsOfDescendants = jest.fn( () => [
+			targetRootClientId,
+		] );
+		const moveBlocks = jest.fn();
+		const insertOrReplaceBlocks = jest.fn();
+		const clearSelectedBlock = jest.fn();
+
+		const event = {
+			dataTransfer: {
+				getData() {
+					return JSON.stringify( {
+						type: 'block',
+						srcRootClientId: '0',
+						srcClientIds: [ '5' ],
+						targets,
 					} );
 				},
 			},
