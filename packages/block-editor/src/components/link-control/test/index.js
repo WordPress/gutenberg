@@ -1676,9 +1676,13 @@ describe( 'Addition Settings UI', () => {
 			ariaControls: 'link-settings-1',
 		} );
 
+		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'false' );
+
 		expect( settingsToggle ).toBeVisible();
 
 		await user.click( settingsToggle );
+
+		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'true' );
 
 		const newTabSettingInput = screen.getByRole( 'checkbox', {
 			name: 'Open in new tab',
@@ -1688,6 +1692,7 @@ describe( 'Addition Settings UI', () => {
 
 		await user.click( settingsToggle );
 
+		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'false' );
 		expect( newTabSettingInput ).not.toBeVisible();
 	} );
 
