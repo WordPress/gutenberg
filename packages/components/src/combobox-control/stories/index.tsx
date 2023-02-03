@@ -71,27 +71,6 @@ Default.args = {
 	options: countryOptions,
 };
 
-const authorOptions = [
-	{
-		value: 'parsley',
-		label: 'Parsley Montana',
-		age: 48,
-		country: 'Germany',
-	},
-	{
-		value: 'cabbage',
-		label: 'Cabbage New York',
-		age: 44,
-		country: 'France',
-	},
-	{
-		value: 'jake',
-		label: 'Jake Weary',
-		age: 41,
-		country: 'United Kingdom',
-	},
-];
-
 /**
  * The rendered output of each suggestion can be customized by passing a
  * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
@@ -101,10 +80,26 @@ export const WithCustomRenderItem = Template.bind( {} );
 WithCustomRenderItem.args = {
 	...Default.args,
 	label: 'Select an author',
-	options: authorOptions.map( ( item ) => ( {
-		label: item.label,
-		value: item.value,
-	} ) ),
+	options: [
+		{
+			value: 'parsley',
+			label: 'Parsley Montana',
+			age: 48,
+			country: 'Germany',
+		},
+		{
+			value: 'cabbage',
+			label: 'Cabbage New York',
+			age: 44,
+			country: 'France',
+		},
+		{
+			value: 'jake',
+			label: 'Jake Weary',
+			age: 41,
+			country: 'United Kingdom',
+		},
+	],
 	__experimentalRenderItem: ( { item } ) => {
 		const { label, age, country } = item;
 		return (
