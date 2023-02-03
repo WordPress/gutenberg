@@ -71,12 +71,14 @@ export default function useCreateNavigationMenu( clientId ) {
 
 					// Set the status to publish so that the Navigation block
 					// shows up in the multi entity save flow.
-					editEntityRecord(
-						'postType',
-						'wp_navigation',
-						response.id,
-						{ status: 'publish' }
-					);
+					if ( postStatus !== 'publish' ) {
+						editEntityRecord(
+							'postType',
+							'wp_navigation',
+							response.id,
+							{ status: 'publish' }
+						);
+					}
 
 					return response;
 				} )
