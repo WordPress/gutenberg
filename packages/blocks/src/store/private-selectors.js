@@ -30,8 +30,17 @@ const ROOT_BLOCK_SUPPORTS = [
 	'letterSpacing',
 ];
 
-function filterElementBlockSupports( blockSuppots, name, element ) {
-	return blockSuppots.filter( ( support ) => {
+/**
+ * Filters the list of supported styles for a given element.
+ *
+ * @param {string[]}         blockSupports list of supported styles.
+ * @param {string|undefined} name          block name.
+ * @param {string|undefined} element       element name.
+ *
+ * @return {string[]} filtered list of supported styles.
+ */
+function filterElementBlockSupports( blockSupports, name, element ) {
+	return blockSupports.filter( ( support ) => {
 		if ( support === 'fontSize' && element === 'heading' ) {
 			return false;
 		}
@@ -67,6 +76,9 @@ function filterElementBlockSupports( blockSuppots, name, element ) {
 	} );
 }
 
+/**
+ * Returns the list of supported styles for a given block name and element.
+ */
 export const getSupportedStyles = createSelector(
 	( state, name, element ) => {
 		if ( ! name ) {
@@ -121,7 +133,8 @@ export const getSupportedStyles = createSelector(
 						STYLE_PROPERTY[ styleName ].support
 					) !== false
 				) {
-					return supportKeys.push( styleName );
+					supportKeys.push( styleName );
+					return;
 				}
 			}
 
@@ -132,7 +145,7 @@ export const getSupportedStyles = createSelector(
 					false
 				)
 			) {
-				return supportKeys.push( styleName );
+				supportKeys.push( styleName );
 			}
 		} );
 
