@@ -347,6 +347,9 @@ function ComboboxControl( {
 					{ isExpanded && (
 						<SuggestionsList
 							instanceId={ instanceId }
+							// The empty string for `value` here is not actually used, but is
+							// just a quick way to satisfy the TypeScript requirements of SuggestionsList.
+							// See: https://github.com/WordPress/gutenberg/pull/47581/files#r1091089330
 							match={ { label: inputValue, value: '' } }
 							displayTransform={ ( suggestion ) =>
 								suggestion.label
