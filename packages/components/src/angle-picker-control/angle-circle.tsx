@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { MouseEvent as ReactMouseEvent } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
@@ -20,6 +15,12 @@ import {
 
 import type { WordPressComponentProps } from '../ui/context';
 import type { AngleCircleProps } from './types';
+
+type UseDraggingArgumentType = Parameters< typeof useDragging >[ 0 ];
+type UseDraggingCallbackEvent =
+	| Parameters< UseDraggingArgumentType[ 'onDragStart' ] >[ 0 ]
+	| Parameters< UseDraggingArgumentType[ 'onDragMove' ] >[ 0 ]
+	| Parameters< UseDraggingArgumentType[ 'onDragEnd' ] >[ 0 ];
 
 function AngleCircle( {
 	value,
@@ -42,9 +43,7 @@ function AngleCircle( {
 		};
 	};
 
-	const changeAngleToPosition = (
-		event: ReactMouseEvent | MouseEvent | undefined
-	) => {
+	const changeAngleToPosition = ( event: UseDraggingCallbackEvent ) => {
 		if ( event === undefined ) {
 			return;
 		}
