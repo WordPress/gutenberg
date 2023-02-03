@@ -12,12 +12,14 @@ import { RovingTabIndexProvider } from './roving-tab-index-context';
  * Provider for adding roving tab index behaviors to tree grid structures.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/components/src/tree-grid/README.md
- *
- * @param {Object}    props          Component props.
- * @param {WPElement} props.children Children to be rendered
  */
-export default function RovingTabIndex( { children } ) {
-	const [ lastFocusedElement, setLastFocusedElement ] = useState();
+export default function RovingTabIndex( {
+	children,
+}: {
+	children: React.ReactNode;
+} ) {
+	const [ lastFocusedElement, setLastFocusedElement ] =
+		useState< HTMLElement >();
 
 	// Use `useMemo` to avoid creation of a new object for the providerValue
 	// on every render. Only create a new object when the `lastFocusedElement`

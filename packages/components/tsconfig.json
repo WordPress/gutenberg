@@ -61,7 +61,6 @@
 		"src/navigation",
 		"src/palette-edit",
 		"src/panel/body.js",
-		"src/toolbar",
-		"src/tree-grid"
+		"src/toolbar"
 	]
 }

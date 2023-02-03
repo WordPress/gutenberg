@@ -9,23 +9,21 @@ import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import RovingTabIndexContainer from './roving-tab-index';
+import type { TreeGridProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
 /**
  * Return focusables in a row element, excluding those from other branches
  * nested within the row.
  *
- * @param {Element} rowElement The DOM element representing the row.
+ * @param rowElement The DOM element representing the row.
  *
- * @return {Array | undefined} The array of focusables in the row.
+ * @return The array of focusables in the row.
  */
-function getRowFocusables( rowElement ) {
+function getRowFocusables( rowElement: HTMLElement ) {
 	const focusablesInRow = focus.focusable.find( rowElement, {
 		sequential: true,
 	} );
-
-	if ( ! focusablesInRow || ! focusablesInRow.length ) {
-		return;
-	}
 
 	return focusablesInRow.filter( ( focusable ) => {
 		return focusable.closest( '[role="row"]' ) === rowElement;
@@ -35,16 +33,8 @@ function getRowFocusables( rowElement ) {
 /**
  * Renders both a table and tbody element, used to create a tree hierarchy.
  *
- * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/components/src/tree-grid/README.md
- * @param {Object}    props                      Component props.
- * @param {WPElement} props.children             Children to be rendered.
- * @param {Function}  props.onExpandRow          Callback to fire when row is expanded.
- * @param {Function}  props.onCollapseRow        Callback to fire when row is collapsed.
- * @param {Function}  props.onFocusRow           Callback to fire when moving focus to a different row.
- * @param {string}    props.applicationAriaLabel Label to use for the application role.
- * @param {Object}    ref                        A ref to the underlying DOM table element.
  */
-function TreeGrid(
+function UnforwardedTreeGrid(
 	{
 		children,
 		onExpandRow = () => {},
@@ -52,11 +42,12 @@ function TreeGrid(
 		onFocusRow = () => {},
 		applicationAriaLabel,
 		...props
-	},
-	ref
+	}: WordPressComponentProps< TreeGridProps, 'table', false >,
+	/** A ref to the underlying DOM table element. */
+	ref: React.ForwardedRef< HTMLTableElement >
 ) {
 	const onKeyDown = useCallback(
-		( event ) => {
+		( event: React.KeyboardEvent< HTMLTableElement > ) => {
 			const { keyCode, metaKey, ctrlKey, altKey } = event;
 
 			// The shift key is intentionally absent from the following list,
@@ -65,7 +56,9 @@ function TreeGrid(
 
 			if (
 				hasModifierKeyPressed ||
-				! [ UP, DOWN, LEFT, RIGHT, HOME, END ].includes( keyCode )
+				! ( [ UP, DOWN, LEFT, RIGHT, HOME, END ] as number[] ).includes(
+					keyCode
+				)
 			) {
 				return;
 			}
@@ -75,21 +68,33 @@ function TreeGrid(
 
 			const { activeElement } = document;
 			const { currentTarget: treeGridElement } = event;
-			if ( ! treeGridElement.contains( activeElement ) ) {
+
+			if (
+				! activeElement ||
+				! treeGridElement.contains( activeElement )
+			) {
 				return;
 			}
 
 			// Calculate the columnIndex of the active element.
-			const activeRow = activeElement.closest( '[role="row"]' );
+			const activeRow =
+				activeElement.closest< HTMLElement >( '[role="row"]' );
+
+			if ( ! activeRow ) {
+				return;
+			}
+
 			const focusablesInRow = getRowFocusables( activeRow );
-			const currentColumnIndex = focusablesInRow.indexOf( activeElement );
+			const currentColumnIndex = focusablesInRow.indexOf(
+				activeElement as HTMLElement
+			);
 			const canExpandCollapse = 0 === currentColumnIndex;
 			const cannotFocusNextColumn =
 				canExpandCollapse &&
 				activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
 				keyCode === RIGHT;
 
-			if ( [ LEFT, RIGHT ].includes( keyCode ) ) {
+			if ( ( [ LEFT, RIGHT ] as number[] ).includes( keyCode ) ) {
 				// Calculate to the next element.
 				let nextIndex;
 				if ( keyCode === LEFT ) {
@@ -116,22 +121,25 @@ function TreeGrid(
 						// If a row is focused, and it is collapsed, moves to the parent row (if there is one).
 						const level = Math.max(
 							parseInt(
-								activeRow?.getAttribute( 'aria-level' ) ?? 1,
+								activeRow?.getAttribute( 'aria-level' ) ?? '1',
 								10
 							) - 1,
 							1
 						);
 						const rows = Array.from(
-							treeGridElement.querySelectorAll( '[role="row"]' )
+							treeGridElement.querySelectorAll< HTMLElement >(
+								'[role="row"]'
+							)
 						);
 						let parentRow = activeRow;
 						const currentRowIndex = rows.indexOf( activeRow );
 						for ( let i = currentRowIndex; i >= 0; i-- ) {
+							const ariaLevel =
+								rows[ i ].getAttribute( 'aria-level' );
+
 							if (
-								parseInt(
-									rows[ i ].getAttribute( 'aria-level' ),
-									10
-								) === level
+								ariaLevel !== null &&
+								parseInt( ariaLevel, 10 ) === level
 							) {
 								parentRow = rows[ i ];
 								break;
@@ -172,10 +180,12 @@ function TreeGrid(
 				// Prevent key use for anything else. This ensures Voiceover
 				// doesn't try to handle key navigation.
 				event.preventDefault();
-			} else if ( [ UP, DOWN ].includes( keyCode ) ) {
+			} else if ( ( [ UP, DOWN ] as number[] ).includes( keyCode ) ) {
 				// Calculate the rowIndex of the next row.
 				const rows = Array.from(
-					treeGridElement.querySelectorAll( '[role="row"]' )
+					treeGridElement.querySelectorAll< HTMLElement >(
+						'[role="row"]'
+					)
 				);
 				const currentRowIndex = rows.indexOf( activeRow );
 				let nextRowIndex;
@@ -226,10 +236,12 @@ function TreeGrid(
 				// Prevent key use for anything else. This ensures Voiceover
 				// doesn't try to handle key navigation.
 				event.preventDefault();
-			} else if ( [ HOME, END ].includes( keyCode ) ) {
+			} else if ( ( [ HOME, END ] as number[] ).includes( keyCode ) ) {
 				// Calculate the rowIndex of the next row.
 				const rows = Array.from(
-					treeGridElement.querySelectorAll( '[role="row"]' )
+					treeGridElement.querySelectorAll< HTMLElement >(
+						'[role="row"]'
+					)
 				);
 				const currentRowIndex = rows.indexOf( activeRow );
 				let nextRowIndex;
@@ -306,7 +318,71 @@ function TreeGrid(
 	/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */
 }
 
-export default forwardRef( TreeGrid );
+/**
+ * `TreeGrid` is used to create a tree hierarchy.
+ * It is not a visually styled component, but instead helps with adding
+ * keyboard navigation and roving tab index behaviors to tree grid structures.
+ *
+ * A tree grid is a hierarchical 2 dimensional UI component, for example it could be
+ * used to implement a file system browser.
+ *
+ * A tree grid allows the user to navigate using arrow keys.
+ * Up/down to navigate vertically across rows, and left/right to navigate horizontally
+ * between focusables in a row.
+ *
+ * The `TreeGrid` renders both a `table` and `tbody` element, and is intended to be used
+ * with `TreeGridRow` (`tr`) and `TreeGridCell` (`td`) to build out a grid.
+ *
+ * ```jsx
+ * function TreeMenu() {
+ * 	return (
+ * 		<TreeGrid>
+ * 			<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 2 }>
+ * 				<TreeGridCell>
+ * 					{ ( props ) => (
+ * 						<Button onClick={ onSelect } { ...props }>Select</Button>
+ * 					) }
+ * 				</TreeGridCell>
+ * 				<TreeGridCell>
+ * 					{ ( props ) => (
+ * 						<Button onClick={ onMove } { ...props }>Move</Button>
+ * 					) }
+ * 				</TreeGridCell>
+ * 			</TreeGridRow>
+ * 			<TreeGridRow level={ 1 } positionInSet={ 2 } setSize={ 2 }>
+ * 				<TreeGridCell>
+ * 					{ ( props ) => (
+ * 						<Button onClick={ onSelect } { ...props }>Select</Button>
+ * 					) }
+ * 				</TreeGridCell>
+ * 				<TreeGridCell>
+ * 					{ ( props ) => (
+ * 						<Button onClick={ onMove } { ...props }>Move</Button>
+ * 					) }
+ * 				</TreeGridCell>
+ * 			</TreeGridRow>
+ * 			<TreeGridRow level={ 2 } positionInSet={ 1 } setSize={ 1 }>
+ * 				<TreeGridCell>
+ * 					{ ( props ) => (
+ * 						<Button onClick={ onSelect } { ...props }>Select</Button>
+ * 					) }
+ * 				</TreeGridCell>
+ * 				<TreeGridCell>
+ * 					{ ( props ) => (
+ * 						<Button onClick={ onMove } { ...props }>Move</Button>
+ * 					) }
+ * 				</TreeGridCell>
+ * 			</TreeGridRow>
+ * 		</TreeGrid>
+ * 	);
+ * }
+ * ```
+ *
+ * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
+ */
+export const TreeGrid = forwardRef( UnforwardedTreeGrid );
+
+export default TreeGrid;
 export { default as TreeGridRow } from './row';
 export { default as TreeGridCell } from './cell';
 export { default as TreeGridItem } from './item';
