@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { createBlock } from '@wordpress/blocks';
 import {
 	InspectorControls,
-	BlockControls,
 	useBlockProps,
 	useInnerBlocksProps,
 	getColorClassName,
@@ -18,15 +17,13 @@ import {
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
-	ToolbarButton,
 	Spinner,
 	Notice,
 	ComboboxControl,
 	Button,
-	Modal,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useEffect } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
@@ -34,16 +31,15 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
+import {
+	convertDescription,
+	ConvertToLinksModal,
+} from './convert-to-links-modal';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
-
-const convertDescription = __(
-	'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking "Edit" below.'
-);
-
 function BlockContent( {
 	blockProps,
 	innerBlocksProps,
@@ -111,48 +107,6 @@ function BlockContent( {
 	if ( pages.length > 0 ) {
 		return <ul { ...innerBlocksProps }></ul>;
 	}
-}
-
-function ConvertToLinksModal( { onClick, disabled } ) {
-	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
-	const closeModal = () => setOpen( false );
-
-	return (
-		<>
-			<BlockControls group="other">
-				<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
-					{ __( 'Edit' ) }
-				</ToolbarButton>
-			</BlockControls>
-			{ isOpen && (
-				<Modal
-					onRequestClose={ closeModal }
-					title={ __( 'Edit this menu' ) }
-					className={ 'wp-block-page-list-modal' }
-					aria={ {
-						describedby: 'wp-block-page-list-modal__description',
-					} }
-				>
-					<p id={ 'wp-block-page-list-modal__description' }>
-						{ convertDescription }
-					</p>
-					<div className="wp-block-page-list-modal-buttons">
-						<Button variant="tertiary" onClick={ closeModal }>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							disabled={ disabled }
-							onClick={ onClick }
-						>
-							{ __( 'Edit' ) }
-						</Button>
-					</div>
-				</Modal>
-			) }
-		</>
-	);
 }
 
 export default function PageListEdit( {
