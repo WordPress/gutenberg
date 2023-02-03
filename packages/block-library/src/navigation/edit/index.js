@@ -246,8 +246,7 @@ function Navigation( {
 		if (
 			! hasResolvedNavigationMenus ||
 			isConvertingClassicMenu ||
-			fallbackNavigationMenus?.length > 0 ||
-			! classicMenus?.length
+			fallbackNavigationMenus?.length > 0
 		) {
 			return;
 		}
@@ -256,28 +255,38 @@ function Navigation( {
 		// a classic menu with a `primary` location or slug,
 		// then create a new navigation menu based on it.
 		// Otherwise, use the most recently created classic menu.
-		const primaryMenus = classicMenus.filter(
-			( classicMenu ) =>
-				classicMenu.locations.includes( 'primary' ) ||
-				classicMenu.slug === 'primary'
-		);
+		if ( classicMenus?.length ) {
+			const primaryMenus = classicMenus.filter(
+				( classicMenu ) =>
+					classicMenu.locations.includes( 'primary' ) ||
+					classicMenu.slug === 'primary'
+			);
 
-		if ( primaryMenus.length ) {
-			convertClassicMenu(
-				primaryMenus[ 0 ].id,
-				primaryMenus[ 0 ].name,
-				'publish'
-			);
-		} else {
-			classicMenus.sort( ( a, b ) => {
-				return b.id - a.id;
-			} );
-			convertClassicMenu(
-				classicMenus[ 0 ].id,
-				classicMenus[ 0 ].name,
-				'publish'
-			);
+			if ( primaryMenus.length ) {
+				convertClassicMenu(
+					primaryMenus[ 0 ].id,
+					primaryMenus[ 0 ].name,
+					'publish'
+				);
+			} else {
+				classicMenus.sort( ( a, b ) => {
+					return b.id - a.id;
+				} );
+				convertClassicMenu(
+					classicMenus[ 0 ].id,
+					classicMenus[ 0 ].name,
+					'publish'
+				);
+			}
 		}
+
+		// If there are no fallback navigation menus and no classic menus,
+		// then create a new navigation menu.
+		createNavigationMenu(
+			'navigation',
+			[ createBlock( 'core/page-list' ) ],
+			'publish'
+		);
 	}, [ hasResolvedNavigationMenus ] );
 
 	const navRef = useRef();
