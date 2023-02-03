@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import CustomSelectControl from '../';
+import CustomSelectControl from '..';
 
 export default {
 	title: 'Components/CustomSelectControl',

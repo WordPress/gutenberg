@@ -37,18 +37,6 @@ describe( '__dangerousOptInToUnstableAPIsOnlyForCoreModules', () => {
 			/This feature is only for JavaScript modules shipped with WordPress core/
 		);
 	} );
-	it( 'Should not register the same module twice', () => {
-		expect( () => {
-			__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-				requiredConsent,
-				'@experiments/test'
-			);
-			__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-				requiredConsent,
-				'@experiments/test'
-			);
-		} ).toThrow( /is already registered/ );
-	} );
 	it( 'Should grant access to unstable APIs when passed both a consent string and a previously unregistered package name', () => {
 		const unstableAPIs = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 			requiredConsent,

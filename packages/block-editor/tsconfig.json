@@ -16,6 +16,7 @@
 		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../escape-html" },
+		{ "path": "../experiments" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
