@@ -13,6 +13,7 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { getAutoCompleterUI } from '../autocompleter-ui';
+import type { WPCompleter } from '../types';
 
 describe( 'AutocompleterUI', () => {
 	describe( 'click outside behavior', () => {
@@ -21,27 +22,45 @@ describe( 'AutocompleterUI', () => {
 
 			const resetSpy = jest.fn();
 
-			const autocompleter = {
+			const autocompleter: WPCompleter = {
 				name: 'fruit',
+				options: [
+					{ visual: '🍎', name: 'Apple', id: 1 },
+					{ visual: '🍊', name: 'Orange', id: 2 },
+					{ visual: '🍇', name: 'Grapes', id: 3 },
+				],
 				// The prefix that triggers this completer
 				triggerPrefix: '~',
+				getOptionLabel: ( option ) => (
+					<span>
+						<span className="icon">{ option.visual }</span>
+						{ option.name }
+					</span>
+				),
 				// Mock useItems function to return a autocomplete item.
-				useItems: () => {
-					return [
-						[
-							{
-								isDisabled: false,
-								key: 'Apple',
-								value: 'Apple',
-								label: (
-									<span>
-										<span className="icon">🍎</span>
-										{ 'Apple' }
-									</span>
-								),
-							},
-						],
-					];
+				useItems: ( filterValue ) => {
+					const options = autocompleter.options as Array< {
+						visual: 'string';
+						name: 'string';
+						id: number;
+					} >;
+					const keyedOptions = options.map(
+						( optionData, optionIndex ) => ( {
+							key: `${ autocompleter.name }-${ optionIndex }`,
+							value: optionData,
+							label: autocompleter.getOptionLabel( optionData ),
+							keywords: autocompleter.getOptionKeywords
+								? autocompleter.getOptionKeywords( optionData )
+								: [],
+							isDisabled: autocompleter.isOptionDisabled
+								? autocompleter.isOptionDisabled( optionData )
+								: false,
+						} )
+					);
+					const filteredOptions = keyedOptions.filter( ( option ) =>
+						option.value.name.includes( filterValue )
+					);
+					return [ filteredOptions ];
 				},
 			};
 
@@ -56,13 +75,17 @@ describe( 'AutocompleterUI', () => {
 					<div>
 						<AutocompleterUI
 							className={ 'test' }
-							filterValue={ '~' }
-							instanceId={ '1' }
+							filterValue={ 'Apple' }
+							instanceId={ 1 }
 							listBoxId={ '1' }
 							selectedIndex={ 0 }
 							onChangeOptions={ () => {} }
 							onSelect={ () => {} }
-							value={ { visual: '🍎', name: 'Apple', id: 1 } }
+							value={ {
+								text: 'This is the text that is being edited.',
+								start: 0,
+								end: 0,
+							} }
 							contentRef={ contentRef }
 							reset={ resetSpy }
 						/>
