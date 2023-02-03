@@ -53,6 +53,11 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 
 jest.useRealTimers();
 
+jest.mock( '@wordpress/compose', () => ( {
+	...jest.requireActual( '@wordpress/compose' ),
+	useReducedMotion: jest.fn( () => true ),
+} ) );
+
 beforeEach( () => {
 	// Setup a DOM element as a render target.
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
@@ -789,6 +794,8 @@ describe( 'Manual link entry', () => {
 
 			await user.click( editButton );
 
+			await toggleSettingsDrawer( user );
+
 			let searchInput = screen.getByRole( 'combobox', {
 				name: 'URL',
 			} );
@@ -820,6 +827,8 @@ describe( 'Manual link entry', () => {
 			} );
 
 			await user.click( editButton );
+
+			await toggleSettingsDrawer( user );
 
 			// Re-query the inputs as they have been replaced.
 			searchInput = screen.getByRole( 'combobox', {
@@ -2152,3 +2161,11 @@ describe( 'Controlling link title text', () => {
 		).not.toBeInTheDocument();
 	} );
 } );
+
+async function toggleSettingsDrawer( user ) {
+	const settingsToggle = screen.queryByRole( 'button', {
+		name: 'Toggle link settings',
+	} );
+
+	await user.click( settingsToggle );
+}
