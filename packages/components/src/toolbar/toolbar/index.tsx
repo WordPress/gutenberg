@@ -16,9 +16,14 @@ import deprecated from '@wordpress/deprecated';
 import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
 import type { ToolbarProps } from './types';
+import type { WordPressComponentProps } from '../../ui/context';
 
 function UnforwardedToolbar(
-	{ className, label, ...props }: ToolbarProps,
+	{
+		className,
+		label,
+		...props
+	}: WordPressComponentProps< ToolbarProps, 'div', false >,
 	ref: ForwardedRef< any >
 ) {
 	if ( ! label ) {

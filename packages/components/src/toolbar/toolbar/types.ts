@@ -1,15 +1,15 @@
 /**
  * External dependencies
  */
-import type { ToolbarProps as ReakitToolbarContainerProps } from 'reakit/Toolbar';
+import type { ReactNode } from 'react';
 
 export type ToolbarProps = {
 	/**
-	 * Class to set on the container div.
+	 * Children to be rendered inside the toolbar.
 	 */
-	className?: string;
+	children?: ReactNode;
 	/**
 	 * An accessible label for the toolbar.
 	 */
 	label: string;
-} & Partial< ReakitToolbarContainerProps >;
+};
