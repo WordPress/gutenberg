@@ -2056,6 +2056,10 @@ describe( 'Controlling link title text', () => {
 			/>
 		);
 
+		const user = userEvent.setup();
+
+		await toggleSettingsDrawer( user );
+
 		expect(
 			screen.queryByRole( 'textbox', { name: 'Text' } )
 		).toBeVisible();
@@ -2082,6 +2086,10 @@ describe( 'Controlling link title text', () => {
 				/>
 			);
 
+			const user = userEvent.setup();
+
+			await toggleSettingsDrawer( user );
+
 			const textInput = screen.queryByRole( 'textbox', {
 				name: 'Text',
 			} );
@@ -2103,6 +2111,8 @@ describe( 'Controlling link title text', () => {
 				onChange={ mockOnChange }
 			/>
 		);
+
+		await toggleSettingsDrawer( user );
 
 		const textInput = screen.queryByRole( 'textbox', { name: 'Text' } );
 
@@ -2137,6 +2147,8 @@ describe( 'Controlling link title text', () => {
 				onChange={ mockOnChange }
 			/>
 		);
+
+		await toggleSettingsDrawer( user );
 
 		const textInput = screen.queryByRole( 'textbox', { name: 'Text' } );
 
