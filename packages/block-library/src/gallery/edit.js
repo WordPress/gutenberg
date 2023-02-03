@@ -522,8 +522,8 @@ function GalleryEdit( props ) {
 	} );
 
 	const nativeInnerBlockProps = Platform.isNative && {
-		marginHorizontal: 0,
-		marginVertical: 0,
+		marginHorizontal: 20,
+		marginVertical: 20,
 	};
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
