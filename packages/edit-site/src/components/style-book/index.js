@@ -70,10 +70,14 @@ function getExamples() {
 	};
 
 	const otherExamples = getBlockTypes()
-		.filter(
-			( blockType ) =>
-				blockType.name !== 'core/heading' && !! blockType.example
-		)
+		.filter( ( blockType ) => {
+			const { name, example, supports } = blockType;
+			return (
+				name !== 'core/heading' &&
+				!! example &&
+				supports.inserter !== false
+			);
+		} )
 		.map( ( blockType ) => ( {
 			name: blockType.name,
 			title: blockType.title,
