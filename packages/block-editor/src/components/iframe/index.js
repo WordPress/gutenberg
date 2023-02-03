@@ -19,6 +19,7 @@ import {
 	useResizeObserver,
 	useMergeRefs,
 	useRefEffect,
+	useDisabled,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -207,7 +208,13 @@ function Iframe( {
 				forceRender();
 			} );
 	}, [] );
-	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
+	const disabledRef = useDisabled( { isDisabled: ! readonly } );
+	const bodyRef = useMergeRefs( [
+		contentRef,
+		clearerRef,
+		writingFlowRef,
+		disabledRef,
+	] );
 
 	const styleAssets = (
 		<>
@@ -284,7 +291,6 @@ function Iframe( {
 									marginTop: frameSize,
 									transform: `scale( ${ scale } )`,
 								} }
-								inert={ readonly ? 'true' : undefined }
 							>
 								{ contentResizeListener }
 								<StyleProvider document={ iframeDocument }>

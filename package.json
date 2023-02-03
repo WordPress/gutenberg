@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "15.0.1",
+	"version": "15.1.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -233,6 +233,7 @@
 		"source-map-loader": "3.0.0",
 		"sprintf-js": "1.1.1",
 		"storybook-source-link": "2.0.4",
+		"strip-json-comments": "5.0.0",
 		"style-loader": "3.2.1",
 		"terser-webpack-plugin": "5.1.4",
 		"typescript": "4.4.2",
@@ -266,12 +267,13 @@
 		"fixtures:regenerate": "npm-run-all fixtures:clean fixtures:generate",
 		"format": "wp-scripts format",
 		"format:php": "wp-env run composer run-script format",
-		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
+		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:tsconfig\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
 		"lint:css": "wp-scripts lint-style \"**/*.scss\"",
 		"lint:css:fix": "npm run lint:css -- --fix",
 		"lint:js": "wp-scripts lint-js",
 		"lint:js:fix": "npm run lint:js -- --fix",
 		"lint:lockfile": "node ./bin/validate-package-lock.js",
+		"lint:tsconfig": "node ./bin/validate-tsconfig.mjs",
 		"lint:md:docs": "wp-scripts lint-md-docs",
 		"prelint:php": "wp-env run composer \"update --no-interaction\"",
 		"lint:php": "wp-env run composer run-script lint",
@@ -342,6 +344,9 @@
 			"npm run docs:theme-ref",
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
 			"node ./bin/packages/lint-staged-typecheck.js"
+		],
+		"**/tsconfig.json": [
+			"npm run lint:tsconfig"
 		]
 	},
 	"wp-env": {

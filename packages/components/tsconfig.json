@@ -24,9 +24,13 @@
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },
 		{ "path": "../element" },
+		{ "path": "../escape-html" },
 		{ "path": "../hooks" },
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../is-shallow-equal" },
+		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../react-i18n" },
 		{ "path": "../warning" }
@@ -42,7 +46,6 @@
 		"src/index.js",
 		"src/angle-picker-control",
 		"src/autocomplete",
-		"src/box-control",
 		"src/custom-gradient-picker",
 		"src/dimension-control",
 		"src/duotone-picker",
@@ -56,8 +59,7 @@
 		"src/menu-items-choice",
 		"src/navigation",
 		"src/palette-edit",
-		"src/panel",
-		"src/toolbar",
-		"src/tree-grid"
+		"src/panel/body.js",
+		"src/toolbar"
 	]
 }

@@ -17,7 +17,7 @@ import { useState } from '@wordpress/element';
  */
 import ScreenHeader from './header';
 import {
-	getSupportedGlobalStylesPanels,
+	useSupportedStyles,
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
@@ -28,7 +28,7 @@ const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 function ScreenHeadingColor( { name, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
 	const [ selectedLevel, setCurrentTab ] = useState( 'heading' );
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ areCustomGradientsEnabled ] = useGlobalSetting(
 		'color.customGradient',
@@ -128,6 +128,7 @@ function ScreenHeadingColor( { name, variation = '' } ) {
 				<h4>{ __( 'Select heading level' ) }</h4>
 
 				<ToggleGroupControl
+					__nextHasNoMarginBottom
 					label={ __( 'Select heading level' ) }
 					hideLabelFromVision={ true }
 					value={ selectedLevel }

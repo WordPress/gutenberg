@@ -20,7 +20,7 @@ import NavigationMenu from './navigation-menu';
 
 const NAVIGATION_MENUS_QUERY = [ { per_page: -1, status: 'publish' } ];
 
-export default function NavigationInspector() {
+export default function NavigationInspector( { onSelect } ) {
 	const {
 		selectedNavigationBlockId,
 		clientIdToRef,
@@ -206,7 +206,10 @@ export default function NavigationInspector() {
 					onChange={ onChange }
 					onInput={ onInput }
 				>
-					<NavigationMenu innerBlocks={ publishedInnerBlocks } />
+					<NavigationMenu
+						innerBlocks={ publishedInnerBlocks }
+						onSelect={ onSelect }
+					/>
 				</BlockEditorProvider>
 			) }
 
