@@ -18,7 +18,7 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 import ScreenHeader from './header';
 import Palette from './palette';
 import { NavigationButtonAsItem } from './navigation-button';
-import { getSupportedGlobalStylesPanels } from './hooks';
+import { useSupportedStyles } from './hooks';
 import Subtitle from './subtitle';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 import BlockPreviewPanel from './block-preview-panel';
@@ -30,7 +30,7 @@ const { useGlobalStyle } = unlock( blockEditorExperiments );
 function BackgroundColorItem( { name, parentMenu, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
 	const urlPrefix = variation ? `/variations/${ variation }` : '';
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const hasSupport =
 		supports.includes( 'backgroundColor' ) ||
 		supports.includes( 'background' );
@@ -67,7 +67,7 @@ function BackgroundColorItem( { name, parentMenu, variation = '' } ) {
 function TextColorItem( { name, parentMenu, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
 	const urlPrefix = variation ? `/variations/${ variation }` : '';
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const hasSupport = supports.includes( 'color' );
 	const [ color ] = useGlobalStyle( prefix + 'color.text', name );
 
@@ -98,7 +98,7 @@ function TextColorItem( { name, parentMenu, variation = '' } ) {
 function LinkColorItem( { name, parentMenu, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
 	const urlPrefix = variation ? `/variations/${ variation }` : '';
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const hasSupport = supports.includes( 'linkColor' );
 	const [ color ] = useGlobalStyle(
 		prefix + 'elements.link.color.text',
@@ -138,7 +138,7 @@ function LinkColorItem( { name, parentMenu, variation = '' } ) {
 function HeadingColorItem( { name, parentMenu, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
 	const urlPrefix = variation ? `/variations/${ variation }` : '';
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const hasSupport = supports.includes( 'color' );
 	const [ color ] = useGlobalStyle(
 		prefix + 'elements.heading.color.text',
@@ -176,7 +176,7 @@ function HeadingColorItem( { name, parentMenu, variation = '' } ) {
 function ButtonColorItem( { name, parentMenu, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
 	const urlPrefix = variation ? `/variations/${ variation }` : '';
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const hasSupport = supports.includes( 'buttonColor' );
 	const [ color ] = useGlobalStyle(
 		prefix + 'elements.button.color.text',
