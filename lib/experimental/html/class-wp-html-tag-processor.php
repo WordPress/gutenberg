@@ -598,9 +598,10 @@ class WP_HTML_Tag_Processor {
 		}
 
 		if ( ! array_key_exists( $name, $this->bookmarks ) && count( $this->bookmarks ) >= self::MAX_BOOKMARKS ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				throw new Exception( "Tried to jump to a non-existent HTML bookmark {$name}." );
-			}
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Too many bookmarks: cannot create any more.', 'gutenberg' )
+			);
 			return false;
 		}
 
