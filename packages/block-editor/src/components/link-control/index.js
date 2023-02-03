@@ -14,6 +14,7 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
+import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -143,6 +144,10 @@ function LinkControl( {
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
+
+	const prefersReducedMotion = useReducedMotion();
+	const MaybeAnimatePresence = prefersReducedMotion ? 'div' : AnimatePresence;
+	const MaybeMotionDiv = prefersReducedMotion ? 'div' : motion.div;
 
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
@@ -360,9 +365,9 @@ function LinkControl( {
 							label={ __( 'Toggle link settings' ) }
 							aria-controls="link-1" // todo - this should be dynamic
 						/>
-						<AnimatePresence>
+						<MaybeAnimatePresence>
 							{ settingsOpen && (
-								<motion.div
+								<MaybeMotionDiv
 									className="block-editor-link-control__drawer"
 									hidden={ ! settingsOpen }
 									id={ 'link-1' } // todo - this should be dynamic
@@ -401,9 +406,9 @@ function LinkControl( {
 											/>
 										) }
 									</div>
-								</motion.div>
+								</MaybeMotionDiv>
 							) }
-						</AnimatePresence>
+						</MaybeAnimatePresence>
 					</>
 				) }
 
