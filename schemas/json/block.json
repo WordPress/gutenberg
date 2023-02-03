@@ -311,7 +311,7 @@
 				},
 				"inserter": {
 					"type": "boolean",
-					"description": "By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set inserter to false.",
+					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programatically, set inserter to false.",
 					"default": true
 				},
 				"multiple": {
