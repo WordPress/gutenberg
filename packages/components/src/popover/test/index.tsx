@@ -148,7 +148,8 @@ describe( 'Popover', () => {
 				const popover = screen.getByTestId( 'popover-element' );
 
 				await waitFor( () => expect( popover ).toBeVisible() );
-				await waitFor( () => expect( popover ).toHaveFocus() );
+
+				expect( popover ).toHaveFocus();
 			} );
 
 			it( 'should allow focus-on-open behavior to be disabled', async () => {
