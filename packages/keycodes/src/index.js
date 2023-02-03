@@ -13,7 +13,7 @@
  * External dependencies
  */
 import { capitalCase } from 'change-case';
-import { get, mapValues } from 'lodash';
+import { mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -222,7 +222,7 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 
 		const modifierKeys = modifier( _isApple ).reduce(
 			( accumulator, key ) => {
-				const replacementKey = get( replacementKeyMap, key, key );
+				const replacementKey = replacementKeyMap[ key ] ?? key;
 				// If on the Mac, adhere to platform convention and don't show plus between keys.
 				if ( isApple ) {
 					return [ ...accumulator, replacementKey ];
@@ -287,6 +287,7 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 		_isApple = isAppleOS
 	) => {
 		const isApple = _isApple();
+		/** @type {Record<string,string>} */
 		const replacementKeyMap = {
 			[ SHIFT ]: 'Shift',
 			[ COMMAND ]: isApple ? 'Command' : 'Control',
@@ -303,7 +304,7 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 		};
 
 		return [ ...modifier( _isApple ), character ]
-			.map( ( key ) => capitalCase( get( replacementKeyMap, key, key ) ) )
+			.map( ( key ) => capitalCase( replacementKeyMap[ key ] ?? key ) )
 			.join( isApple ? ' ' : ' + ' );
 	};
 } );
