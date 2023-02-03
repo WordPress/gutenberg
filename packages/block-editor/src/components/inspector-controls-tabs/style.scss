@@ -17,6 +17,7 @@
 .block-editor-inspector-controls-tabs__pointer {
 	align-items: top;
 	background: $gray-100;
+	border-radius: $radius-block-ui;
 	color: $gray-900;
 	display: flex;
 	flex-direction: row;
@@ -24,11 +25,11 @@
 }
 
 .block-editor-inspector-controls-tabs__pointer-content {
-	margin: $grid-unit-20 0 $grid-unit-20 $grid-unit-20;
+	margin: $grid-unit-15 0 $grid-unit-15 $grid-unit-15;
 }
 
 .block-editor-inspector-controls-tabs__pointer-dismiss {
 	// The dismiss button has a lot of empty space through its padding.
 	// Apply margin to visually align the icon with the top of the text to its left.
-	margin: $grid-unit-10 $grid-unit-10 $grid-unit-10 0;
+	margin: $grid-unit-05 $grid-unit-05 $grid-unit-05 0;
 }
