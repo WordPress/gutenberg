@@ -28,7 +28,12 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-function HeaderToolbar() {
+function HeaderToolbar( {
+	showInserter = true,
+	showTools = true,
+	showListView = true,
+	showUndoRedo = true,
+} ) {
 	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editPostStore );
@@ -116,22 +121,24 @@ function HeaderToolbar() {
 			aria-label={ toolbarAriaLabel }
 		>
 			<div className="edit-post-header-toolbar__left">
-				<ToolbarItem
-					ref={ inserterButton }
-					as={ Button }
-					className="edit-post-header-toolbar__inserter-toggle"
-					variant="primary"
-					isPressed={ isInserterOpened }
-					onMouseDown={ preventDefault }
-					onClick={ toggleInserter }
-					disabled={ ! isInserterEnabled }
-					icon={ plus }
-					label={ showIconLabels ? shortLabel : longLabel }
-					showTooltip={ ! showIconLabels }
-				/>
+				{ showInserter && (
+					<ToolbarItem
+						ref={ inserterButton }
+						as={ Button }
+						className="edit-post-header-toolbar__inserter-toggle"
+						variant="primary"
+						isPressed={ isInserterOpened }
+						onMouseDown={ preventDefault }
+						onClick={ toggleInserter }
+						disabled={ ! isInserterEnabled }
+						icon={ plus }
+						label={ showIconLabels ? shortLabel : longLabel }
+						showTooltip={ ! showIconLabels }
+					/>
+				) }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						{ isLargeViewport && (
+						{ showTools && isLargeViewport && (
 							<ToolbarItem
 								as={ ToolSelector }
 								showTooltip={ ! showIconLabels }
@@ -141,17 +148,25 @@ function HeaderToolbar() {
 								disabled={ isTextModeEnabled }
 							/>
 						) }
-						<ToolbarItem
-							as={ EditorHistoryUndo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-						/>
-						<ToolbarItem
-							as={ EditorHistoryRedo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-						/>
-						{ overflowItems }
+						{ showUndoRedo && (
+							<>
+								<ToolbarItem
+									as={ EditorHistoryUndo }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+								/>
+								<ToolbarItem
+									as={ EditorHistoryRedo }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+								/>
+							</>
+						) }
+						{ showListView && overflowItems }
 					</>
 				) }
 			</div>
