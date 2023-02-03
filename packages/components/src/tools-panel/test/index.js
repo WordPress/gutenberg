@@ -169,7 +169,6 @@ const getMenuButton = () => {
 /**
  * Helper to find the menu button and simulate a user click.
  *
- * @return {HTMLElement} The menuButton.
  */
 const openDropdownMenu = async () => {
 	const user = userEvent.setup();
