@@ -12,7 +12,6 @@ import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as viewportStore } from '@wordpress/viewport';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -104,17 +103,16 @@ function ComplementaryArea( {
 	const { isLoading, isActive, isPinned, activeArea, isSmall, isLarge } =
 		useSelect(
 			( select ) => {
-				const { getActiveComplementaryArea, isItemPinned } =
-					select( interfaceStore );
+				const {
+					getActiveComplementaryArea,
+					isComplementaryAreaLoading,
+					isItemPinned,
+				} = select( interfaceStore );
 
-				const isVisible = select( preferencesStore ).get(
-					scope,
-					'isComplementaryAreaVisible'
-				);
 				const _activeArea = getActiveComplementaryArea( scope );
 
 				return {
-					isLoading: isVisible && _activeArea === undefined,
+					isLoading: isComplementaryAreaLoading( scope ),
 					isActive: _activeArea === identifier,
 					isPinned: isItemPinned( scope, identifier ),
 					activeArea: _activeArea,
@@ -147,14 +145,7 @@ function ComplementaryArea( {
 		} else if ( activeArea === undefined && isSmall ) {
 			disableComplementaryArea( scope, identifier );
 		}
-	}, [
-		activeArea,
-		isActiveByDefault,
-		scope,
-		identifier,
-		isSmall,
-		isLoading,
-	] );
+	}, [ activeArea, isActiveByDefault, scope, identifier, isSmall ] );
 
 	return (
 		<>
