@@ -106,7 +106,7 @@ const getIndexOfMatchingSuggestion = (
  */
 function ComboboxControl( {
 	__nextHasNoMarginBottom = false,
-	__next36pxDefaultSize,
+	__next36pxDefaultSize = false,
 	value: valueProp,
 	label,
 	options,
