@@ -31,18 +31,21 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isSaving,
 		hasFixedToolbar,
 		firstParentClientId,
-		selectedBlockClientId,
+		hasSelectedBlocks,
 		showIconLabels,
 		isDistractionFreeMode,
 	} = useSelect( ( select ) => {
-		const { getSettings, getBlockParents, getSelectedBlockClientId } =
+		const { getSettings, getBlockParents, getSelectedBlockClientIds } =
 			select( blockEditorStore );
 		const settings = getSettings();
-		const _selectedBlockClientId = getSelectedBlockClientId();
-		const parents = getBlockParents( _selectedBlockClientId );
+		const _selectedBlockClientIds = getSelectedBlockClientIds();
+		const parents =
+			_selectedBlockClientIds?.length === 1
+				? getBlockParents( _selectedBlockClientIds )
+				: [];
 		const _firstParentClientId = parents[ parents.length - 1 ];
 		return {
-			selectedBlockClientId: _selectedBlockClientId,
+			hasSelectedBlocks: !! _selectedBlockClientIds.length,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
@@ -84,9 +87,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				className="edit-post-header__toolbar"
 			>
 				{ ! hasFixedToolbar && <HeaderToolbar /> }
-				{ ! selectedBlockClientId && hasFixedToolbar && (
-					<HeaderToolbar />
-				) }
+				{ ! hasSelectedBlocks && hasFixedToolbar && <HeaderToolbar /> }
 				{ hasFixedToolbar && (
 					<div
 						style={
