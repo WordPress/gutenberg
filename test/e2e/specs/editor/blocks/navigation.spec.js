@@ -66,14 +66,21 @@ test.describe(
 			editor,
 			navBlockUtils,
 		} ) => {
-			//Create a menu
-			await navBlockUtils.createNavigationMenu( {
+			const createdMenu = await navBlockUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
 					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
 			} );
-			//insert navigation block
-			//check the markup of the block
+
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			// Check the markup of the block is correct.
+			await editor.publishPost();
+			const content = await editor.getEditedPostContent();
+			expect( content ).toBe(
+				`<!-- wp:navigation {"ref":${ createdMenu.id }} /-->`
+			);
+
 			//check the block in the list view?
 			//check the block in the frontend?
 			await editor.page.pause();
@@ -110,11 +117,13 @@ class NavigationBlockUtils {
 	 *
 	 */
 	async deleteAllNavigationMenus() {
-		const menus = await this.rest( { path: `/wp/v2/navigation/` } );
+		const menus = await this.requestUtils.rest( {
+			path: `/wp/v2/navigation/`,
+		} );
 
 		if ( ! menus?.length ) return;
 
-		await this.batchRest(
+		await this.requestUtils.batchRest(
 			menus.map( ( menu ) => ( {
 				method: 'DELETE',
 				path: `/wp/v2/navigation/${ menu.id }?force=true`,
