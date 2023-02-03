@@ -135,9 +135,13 @@ export function hasChildLayoutSupport( {
 } ) {
 	const {
 		type: parentLayoutType = 'default',
+		default: { type: defaultParentLayoutType = 'default' } = {},
 		allowSizingOnChildren = false,
 	} = parentLayout;
-	const support = parentLayoutType === 'flex' && allowSizingOnChildren;
+
+	const support =
+		( defaultParentLayoutType === 'flex' || parentLayoutType === 'flex' ) &&
+		allowSizingOnChildren;
 
 	return support;
 }

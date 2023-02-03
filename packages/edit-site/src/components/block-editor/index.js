@@ -51,13 +51,14 @@ export default function BlockEditor() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
 	const { storedSettings, templateType, canvasMode } = useSelect(
 		( select ) => {
-			const { getSettings, getEditedPostType, __unstableGetCanvasMode } =
-				select( editSiteStore );
+			const { getSettings, getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
 			return {
 				storedSettings: getSettings( setIsInserterOpened ),
 				templateType: getEditedPostType(),
-				canvasMode: __unstableGetCanvasMode(),
+				canvasMode: getCanvasMode(),
 			};
 		},
 		[ setIsInserterOpened ]

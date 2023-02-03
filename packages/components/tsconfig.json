@@ -26,6 +26,7 @@
 		{ "path": "../element" },
 		{ "path": "../escape-html" },
 		{ "path": "../hooks" },
+		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../is-shallow-equal" },
@@ -45,7 +46,6 @@
 		"src/index.js",
 		"src/angle-picker-control",
 		"src/autocomplete",
-		"src/box-control",
 		"src/combobox-control",
 		"src/custom-gradient-picker",
 		"src/dimension-control",
@@ -60,7 +60,7 @@
 		"src/menu-items-choice",
 		"src/navigation",
 		"src/palette-edit",
-		"src/panel",
+		"src/panel/body.js",
 		"src/toolbar",
 		"src/tree-grid"
 	]

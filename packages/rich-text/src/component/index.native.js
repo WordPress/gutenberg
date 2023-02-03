@@ -1310,10 +1310,9 @@ export default compose( [
 			: settings?.colors;
 
 		return {
-			areMentionsSupported:
-				getSettings( 'capabilities' ).mentions === true,
-			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
-			...{ parentBlockStyles },
+			areMentionsSupported: settings?.capabilities?.mentions === true,
+			areXPostsSupported: settings?.capabilities?.xposts === true,
+			parentBlockStyles,
 			baseGlobalStyles,
 			colorPalette,
 		};
