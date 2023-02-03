@@ -21,6 +21,7 @@ const toMatchImageSnapshot = configureToMatchImageSnapshot( {
 	failureThreshold: 0.01, // 1% threshold.
 	failureThresholdType: 'percent',
 	dumpInlineDiffToConsole: true,
+	runInProcess: true,
 } );
 expect.extend( { toMatchImageSnapshot } );
 
