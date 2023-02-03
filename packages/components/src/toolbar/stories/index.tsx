@@ -82,29 +82,32 @@ Default.args = {
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
-					{ ( toggleProps: unknown ) => (
-						<DropdownMenu
-							hasArrowIndicator
-							icon={ alignLeft }
-							label="Align"
-							controls={ [
-								{
-									icon: alignLeft,
-									title: 'Align left',
-									isActive: true,
-								},
-								{
-									icon: alignCenter,
-									title: 'Align center',
-								},
-								{
-									icon: alignRight,
-									title: 'Align right',
-								},
-							] }
-							toggleProps={ toggleProps }
-						/>
-					) }
+					{
+						// @ts-expect-error TODO: Remove when ToolbarItem/DropdownMenu is typed
+						( toggleProps ) => (
+							<DropdownMenu
+								hasArrowIndicator
+								icon={ alignLeft }
+								label="Align"
+								controls={ [
+									{
+										icon: alignLeft,
+										title: 'Align left',
+										isActive: true,
+									},
+									{
+										icon: alignCenter,
+										title: 'Align center',
+									},
+									{
+										icon: alignRight,
+										title: 'Align right',
+									},
+								] }
+								toggleProps={ toggleProps }
+							/>
+						)
+					}
 				</ToolbarItem>
 			</ToolbarGroup>
 			<ToolbarGroup>
@@ -128,7 +131,7 @@ Default.args = {
 				/>
 			</ToolbarGroup>
 			<ToolbarGroup
-				// @ts-ignore TODO: Remove when ToolbarGroup is typed
+				// @ts-expect-error TODO: Remove when ToolbarGroup is typed
 				icon={ more }
 				label="Align"
 				isCollapsed
