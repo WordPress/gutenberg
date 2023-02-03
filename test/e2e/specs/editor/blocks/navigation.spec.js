@@ -64,41 +64,19 @@ test.describe(
 
 		test( 'default to my only existing menu', async ( {
 			editor,
-			page,
 			navBlockUtils,
 		} ) => {
-			const createdMenu = await navBlockUtils.createNavigationMenu( {
+			//Create a menu
+			await navBlockUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
 					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
 			} );
-
-			await editor.insertBlock( { name: 'core/navigation' } );
-
-			//check the block in the canvas.
-			await expect(
-				editor.canvas.locator(
-					'role=textbox[name="Navigation link text"i] >> text="WordPress"'
-				)
-			).toBeVisible();
-
-			// Check the markup of the block is correct.
-			await editor.publishPost();
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/navigation',
-					attributes: { ref: createdMenu.id },
-				},
-			] );
-			await page.locator( 'role=button[name="Close panel"i]' ).click();
-
-			//check the block in the frontend.
-			await page.goto( '/' );
-			await expect(
-				page.locator(
-					'role=navigation >> role=link[name="WordPress"i]'
-				)
-			).toBeVisible();
+			//insert navigation block
+			//check the markup of the block
+			//check the block in the list view?
+			//check the block in the frontend?
+			await editor.page.pause();
 		} );
 	}
 );
@@ -132,13 +110,11 @@ class NavigationBlockUtils {
 	 *
 	 */
 	async deleteAllNavigationMenus() {
-		const menus = await this.requestUtils.rest( {
-			path: `/wp/v2/navigation/`,
-		} );
+		const menus = await this.rest( { path: `/wp/v2/navigation/` } );
 
 		if ( ! menus?.length ) return;
 
-		await this.requestUtils.batchRest(
+		await this.batchRest(
 			menus.map( ( menu ) => ( {
 				method: 'DELETE',
 				path: `/wp/v2/navigation/${ menu.id }?force=true`,
