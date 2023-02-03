@@ -518,18 +518,6 @@ _Returns_
 
 -   `string[]`: Array of dragged block client ids.
 
-### getDraggedBlocksOrigin
-
-Returns the origin of the dragged blocks (if any).
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `string`: The origin of the dragged blocks.
-
 ### getFirstMultiSelectedBlockClientId
 
 Returns the client ID of the first block in the multi-selection set, or null

@@ -19,6 +19,7 @@ import {
 	isPointContainedByRect,
 } from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../experiments';
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 /** @typedef {import('../use-on-block-drop/types').WPDropOperation} WPDropOperation */
@@ -172,7 +173,7 @@ export default function useBlockDropZone( {
 		getBlocks,
 		getBlockIndex,
 		getDraggedBlocksOrigin,
-	} = useSelect( blockEditorStore );
+	} = unlock( useSelect( blockEditorStore ) );
 
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );

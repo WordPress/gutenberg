@@ -72,7 +72,6 @@ const {
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
-	getDraggedBlocksOrigin,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2299,16 +2298,6 @@ describe( 'selectors', () => {
 				draggedBlocks,
 			};
 			expect( getDraggedBlockClientIds( state ) ).toBe( draggedBlocks );
-		} );
-	} );
-
-	describe( 'getDraggedBlocksOrigin', () => {
-		it( 'returns the draggedBlocks origin', () => {
-			const theOrigin = 'inner-blocks';
-			const state = {
-				draggedBlocksOrigin: theOrigin,
-			};
-			expect( getDraggedBlocksOrigin( state ) ).toBe( theOrigin );
 		} );
 	} );
 

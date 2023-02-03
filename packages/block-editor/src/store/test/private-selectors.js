@@ -4,6 +4,7 @@
 import {
 	isBlockInterfaceHidden,
 	getLastInsertedBlocksClientIds,
+	getDraggedBlocksOrigin,
 } from '../private-selectors';
 
 describe( 'private selectors', () => {
@@ -47,6 +48,16 @@ describe( 'private selectors', () => {
 				'123456',
 				'78910',
 			] );
+		} );
+	} );
+
+	describe( 'getDraggedBlocksOrigin', () => {
+		it( 'returns the draggedBlocks origin', () => {
+			const theOrigin = 'inner-blocks';
+			const state = {
+				draggedBlocksOrigin: theOrigin,
+			};
+			expect( getDraggedBlocksOrigin( state ) ).toBe( theOrigin );
 		} );
 	} );
 } );

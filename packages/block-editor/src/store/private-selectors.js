@@ -18,3 +18,13 @@ export function isBlockInterfaceHidden( state ) {
 export function getLastInsertedBlocksClientIds( state ) {
 	return state?.lastBlockInserted?.clientIds;
 }
+
+/**
+ * Returns the origin of the dragged blocks (if any).
+ *
+ * @param {Object} state Global application state.
+ * @return {string} The origin of the dragged blocks.
+ */
+export function getDraggedBlocksOrigin( state ) {
+	return state.draggedBlocksOrigin;
+}

@@ -1304,16 +1304,6 @@ export function getDraggedBlockClientIds( state ) {
 }
 
 /**
- * Returns the origin of the dragged blocks (if any).
- *
- * @param {Object} state Global application state.
- * @return {string} The origin of the dragged blocks.
- */
-export function getDraggedBlocksOrigin( state ) {
-	return state.draggedBlocksOrigin;
-}
-
-/**
  * Returns whether the block is being dragged.
  *
  * Only returns true if the block is being directly dragged,
