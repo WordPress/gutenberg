@@ -114,10 +114,16 @@ function OffCanvasEditor(
 	} );
 	const selectEditorBlock = useCallback(
 		( event, blockClientId ) => {
-			updateBlockSelection( event, blockClientId );
-			setSelectedTreeId( blockClientId );
+			let blockSelectionResult;
 			if ( onSelect ) {
-				onSelect( getBlock( blockClientId ) );
+				blockSelectionResult = onSelect(
+					getBlock( blockClientId ),
+					event
+				);
+			}
+			if ( blockSelectionResult !== false ) {
+				updateBlockSelection( event, blockClientId );
+				setSelectedTreeId( blockClientId );
 			}
 		},
 		[ setSelectedTreeId, updateBlockSelection, onSelect, getBlock ]

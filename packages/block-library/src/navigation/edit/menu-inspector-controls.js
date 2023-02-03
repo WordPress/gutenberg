@@ -73,6 +73,13 @@ const MainContent = ( {
 			isExpanded={ true }
 			LeafMoreMenu={ LeafMoreMenu }
 			description={ description }
+			onSelect={ ( block ) => {
+				const onSelect = block.attributes?.onSelect;
+				if ( onSelect ) {
+					// If this returns fasle, then the block won't be selected.
+					return onSelect( block );
+				}
+			} }
 		/>
 	);
 };

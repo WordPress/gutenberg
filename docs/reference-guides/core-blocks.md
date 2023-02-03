@@ -438,7 +438,7 @@ Displays a page inside a list of all pages. ([Source](https://github.com/WordPre
 -	**Name:** core/page-list-item
 -	**Category:** widgets
 -	**Supports:** ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
--	**Attributes:** hasChildren, id, label, link, title
+-	**Attributes:** hasChildren, id, label, link, onSelect, title
 
 ## Paragraph
 
