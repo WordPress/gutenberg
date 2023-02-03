@@ -22,6 +22,11 @@ const toMatchImageSnapshot = configureToMatchImageSnapshot( {
 	failureThresholdType: 'percent',
 	dumpInlineDiffToConsole: true,
 	runInProcess: true,
+	customSnapshotIdentifier( data ) {
+		return `${ data.defaultIdentifier }-${
+			isAndroid() ? 'android' : 'ios'
+		}`;
+	},
 } );
 expect.extend( { toMatchImageSnapshot } );
 
