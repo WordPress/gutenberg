@@ -18,6 +18,28 @@ import { __ } from '@wordpress/i18n';
  */
 import { createTemplatePartId } from './create-template-part-id';
 
+function createTemplatePartRecordFromBlocks( area, blocks, title ) {
+	// Currently template parts only allow latin chars.
+	// Fallback slug will receive suffix by default.
+	const cleanSlug =
+		kebabCase( title ).replace( /[^\w-]+/g, '' ) || 'wp-custom-part';
+
+	// If we have `area` set from block attributes, means an exposed
+	// block variation was inserted. So add this prop to the template
+	// part entity on creation. Afterwards remove `area` value from
+	// block attributes.
+	const record = {
+		title,
+		slug: cleanSlug,
+		content: serialize( blocks ),
+		// `area` is filterable on the server and defaults to `UNCATEGORIZED`
+		// if provided value is not allowed.
+		area,
+	};
+
+	return record;
+}
+
 /**
  * Retrieves the available template parts for the given area.
  *
@@ -61,7 +83,7 @@ export function useAlternativeTemplateParts( area, excludedId ) {
 						templatePart.area === area )
 			) || []
 		);
-	}, [ templateParts, area ] );
+	}, [ templateParts, area, excludedId ] );
 
 	return {
 		templateParts: filteredTemplateParts,
@@ -96,23 +118,12 @@ export function useCreateTemplatePartFromBlocks( area, setAttributes ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	return async ( blocks = [], title = __( 'Untitled Template Part' ) ) => {
-		// Currently template parts only allow latin chars.
-		// Fallback slug will receive suffix by default.
-		const cleanSlug =
-			kebabCase( title ).replace( /[^\w-]+/g, '' ) || 'wp-custom-part';
-
-		// If we have `area` set from block attributes, means an exposed
-		// block variation was inserted. So add this prop to the template
-		// part entity on creation. Afterwards remove `area` value from
-		// block attributes.
-		const record = {
-			title,
-			slug: cleanSlug,
-			content: serialize( blocks ),
-			// `area` is filterable on the server and defaults to `UNCATEGORIZED`
-			// if provided value is not allowed.
+		const record = createTemplatePartRecordFromBlocks(
 			area,
-		};
+			blocks,
+			title
+		);
+
 		const templatePart = await saveEntityRecord(
 			'postType',
 			'wp_template_part',
@@ -160,4 +171,49 @@ export function useTemplatePartArea( area ) {
 		},
 		[ area ]
 	);
+}
+
+export function useShuffleTemplatePart(
+	area,
+	clientId,
+	templatePartId,
+	setAttributes
+) {
+	const { templateParts } = useAlternativeTemplateParts(
+		area,
+		templatePartId
+	);
+	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+	const createTemplatePartFromBlocks = useCreateTemplatePartFromBlocks(
+		area,
+		setAttributes
+	);
+
+	return async function shuffleTemplatePart() {
+		const list = [
+			...templateParts,
+			...blockPatterns.filter( ( pattern ) =>
+				templateParts.every(
+					( templatePart ) =>
+						templatePart.content.raw !== serialize( pattern.blocks )
+				)
+			),
+		];
+		// We explicitly want the randomness here.
+		// eslint-disable-next-line no-restricted-syntax
+		const randomIndex = Math.floor( Math.random() * list.length );
+		const randomItem = list[ randomIndex ];
+
+		if ( randomIndex < templateParts.length ) {
+			const templatePart = randomItem;
+			setAttributes( {
+				slug: templatePart.slug,
+				theme: templatePart.theme,
+				area: undefined,
+			} );
+		} else {
+			const pattern = randomItem;
+			await createTemplatePartFromBlocks( pattern.blocks, pattern.title );
+		}
+	};
 }

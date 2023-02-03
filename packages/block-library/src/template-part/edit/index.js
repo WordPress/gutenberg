@@ -15,8 +15,9 @@ import {
 	store as blockEditorStore,
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
+	BlockControls,
 } from '@wordpress/block-editor';
-import { Spinner, Modal, MenuItem } from '@wordpress/components';
+import { Spinner, Modal, MenuItem, ToolbarButton } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, createInterpolateElement } from '@wordpress/element';
@@ -33,6 +34,7 @@ import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,
 	useTemplatePartArea,
+	useShuffleTemplatePart,
 } from './utils/hooks';
 
 export default function TemplatePartEdit( {
@@ -92,6 +94,12 @@ export default function TemplatePartEdit( {
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
+	const shuffleTemplatePart = useShuffleTemplatePart(
+		area,
+		clientId,
+		templatePartId,
+		setAttributes
+	);
 
 	// The `isSelected` check ensures the `BlockSettingsMenuControls` fill
 	// doesn't render multiple times. The block controls has similar internal check.
@@ -157,27 +165,34 @@ export default function TemplatePartEdit( {
 					</TagName>
 				) }
 				{ canReplace && (
-					<BlockSettingsMenuControls>
-						{ () => (
-							<MenuItem
-								onClick={ () => {
-									setIsTemplatePartSelectionOpen( true );
-								} }
-							>
-								{ createInterpolateElement(
-									__( 'Replace <BlockTitle />' ),
-									{
-										BlockTitle: (
-											<BlockTitle
-												clientId={ clientId }
-												maximumLength={ 25 }
-											/>
-										),
-									}
-								) }
-							</MenuItem>
-						) }
-					</BlockSettingsMenuControls>
+					<>
+						<BlockSettingsMenuControls>
+							{ () => (
+								<MenuItem
+									onClick={ () => {
+										setIsTemplatePartSelectionOpen( true );
+									} }
+								>
+									{ createInterpolateElement(
+										__( 'Replace <BlockTitle />' ),
+										{
+											BlockTitle: (
+												<BlockTitle
+													clientId={ clientId }
+													maximumLength={ 25 }
+												/>
+											),
+										}
+									) }
+								</MenuItem>
+							) }
+						</BlockSettingsMenuControls>
+						<BlockControls group="other">
+							<ToolbarButton onClick={ shuffleTemplatePart }>
+								{ __( 'Shuffle' ) }
+							</ToolbarButton>
+						</BlockControls>
+					</>
 				) }
 				{ isEntityAvailable && (
 					<TemplatePartInnerBlocks
