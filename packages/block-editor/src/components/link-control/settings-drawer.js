@@ -33,7 +33,9 @@ function LinkSettingsDrawer( {
 	const MaybeAnimatePresence = prefersReducedMotion ? 'div' : AnimatePresence;
 	const MaybeMotionDiv = prefersReducedMotion ? 'div' : motion.div;
 
-	const settingsDrawerId = useInstanceId( LinkSettingsDrawer );
+	const id = useInstanceId( LinkSettingsDrawer );
+
+	const settingsDrawerId = `link-control-settings-drawer-${ id }`;
 
 	return (
 		<>
