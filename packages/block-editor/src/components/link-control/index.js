@@ -342,24 +342,26 @@ function LinkControl( {
 				/>
 			) }
 
-			<div className="block-editor-link-control__tools">
-				{ ( showSettings || showTextControl ) && (
-					<LinkControlSettingsDrawer
-						settingsOpen={ settingsOpen }
-						setSettingsOpen={ setSettingsOpen }
-						showTextControl={ showTextControl }
-						showSettings={ showSettings }
-						textInputRef={ textInputRef }
-						internalTextInputValue={ internalTextInputValue }
-						setInternalTextInputValue={ setInternalTextInputValue }
-						handleSubmitWithEnter={ handleSubmitWithEnter }
-						value={ value }
-						settings={ settings }
-						onChange={ onChange }
-					/>
-				) }
+			{ isEditing && (
+				<div className="block-editor-link-control__tools">
+					{ ( showSettings || showTextControl ) && (
+						<LinkControlSettingsDrawer
+							settingsOpen={ settingsOpen }
+							setSettingsOpen={ setSettingsOpen }
+							showTextControl={ showTextControl }
+							showSettings={ showSettings }
+							textInputRef={ textInputRef }
+							internalTextInputValue={ internalTextInputValue }
+							setInternalTextInputValue={
+								setInternalTextInputValue
+							}
+							handleSubmitWithEnter={ handleSubmitWithEnter }
+							value={ value }
+							settings={ settings }
+							onChange={ onChange }
+						/>
+					) }
 
-				{ isEditing && (
 					<div className="block-editor-link-control__search-actions">
 						<Button
 							variant="primary"
@@ -373,8 +375,8 @@ function LinkControl( {
 							{ __( 'Cancel' ) }
 						</Button>
 					</div>
-				) }
-			</div>
+				</div>
+			) }
 
 			{ renderControlBottom && renderControlBottom() }
 		</div>
