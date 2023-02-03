@@ -41,9 +41,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		const _selectedBlockClientIds = getSelectedBlockClientIds();
 		const parents =
 			_selectedBlockClientIds?.length === 1
-				? getBlockParents( _selectedBlockClientIds )
+				? getBlockParents( _selectedBlockClientIds[ 0 ] )
 				: [];
-		const _firstParentClientId = parents[ parents.length - 1 ];
+		const hasParent = parents.length > 0;
 		return {
 			hasSelectedBlocks: !! _selectedBlockClientIds.length,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -55,9 +55,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			isDistractionFreeMode:
 				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 			hasFixedToolbar: settings.hasFixedToolbar,
-			firstParentClientId: _firstParentClientId,
+			firstParentClientId: hasParent,
 		};
-	}, [] );
+	} );
 
 	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
 
@@ -88,19 +88,25 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			>
 				{ ! hasFixedToolbar && <HeaderToolbar /> }
 				{ ! hasSelectedBlocks && hasFixedToolbar && <HeaderToolbar /> }
-				{ hasFixedToolbar && (
-					<div
-						style={
-							firstParentClientId
-								? {
-										position: 'relative',
-										left: '70px',
-								  }
-								: {}
-						}
-					>
-						<BlockToolbar hideDragHandle={ hasFixedToolbar } />
-					</div>
+				{ hasSelectedBlocks && hasFixedToolbar && (
+					<>
+						<HeaderToolbar
+							showInserter={ true }
+							showTools={ false }
+							showListView={ false }
+							showUndoRedo={ false }
+						/>
+						<div
+							style={ {
+								display: 'flex',
+								width: '100%',
+								position: 'relative',
+								left: firstParentClientId ? '60px' : '0',
+							} }
+						>
+							<BlockToolbar hideDragHandle={ hasFixedToolbar } />
+						</div>
+					</>
 				) }
 				<TemplateTitle />
 			</motion.div>
