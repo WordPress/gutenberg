@@ -171,10 +171,7 @@ Default.args = {
 	),
 };
 
-export const WithoutGroup: ComponentStory< typeof Toolbar > = Template.bind(
-	{}
-);
-
+export const WithoutGroup = Template.bind( {} );
 WithoutGroup.args = {
 	label: 'Options',
 	id: 'options-toolbar-without-group',
