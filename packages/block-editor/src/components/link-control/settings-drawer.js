@@ -10,7 +10,7 @@ import {
 import { settings as settingsIcon } from '@wordpress/icons';
 import { useReducedMotion, useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-
+import { Fragment } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -30,7 +30,9 @@ function LinkSettingsDrawer( {
 	onChange,
 } ) {
 	const prefersReducedMotion = useReducedMotion();
-	const MaybeAnimatePresence = prefersReducedMotion ? 'div' : AnimatePresence;
+	const MaybeAnimatePresence = prefersReducedMotion
+		? Fragment
+		: AnimatePresence;
 	const MaybeMotionDiv = prefersReducedMotion ? 'div' : motion.div;
 
 	const id = useInstanceId( LinkSettingsDrawer );
