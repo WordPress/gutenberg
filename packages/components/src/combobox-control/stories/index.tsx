@@ -31,6 +31,7 @@ const meta: ComponentMeta< typeof ComboboxControl > = {
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
 	},
 };
 export default meta;
