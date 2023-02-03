@@ -14,7 +14,7 @@
 	}
 }
 
-.block-editor-inspector-controls-tabs__pointer {
+.block-editor-inspector-controls-tabs__hint {
 	align-items: top;
 	background: $gray-100;
 	border-radius: $radius-block-ui;
@@ -24,11 +24,11 @@
 	margin: $grid-unit-20;
 }
 
-.block-editor-inspector-controls-tabs__pointer-content {
+.block-editor-inspector-controls-tabs__hint-content {
 	margin: $grid-unit-15 0 $grid-unit-15 $grid-unit-15;
 }
 
-.block-editor-inspector-controls-tabs__pointer-dismiss {
+.block-editor-inspector-controls-tabs__hint-dismiss {
 	// The dismiss button has a lot of empty space through its padding.
 	// Apply margin to visually align the icon with the top of the text to its left.
 	margin: $grid-unit-05 $grid-unit-05 $grid-unit-05 0;
