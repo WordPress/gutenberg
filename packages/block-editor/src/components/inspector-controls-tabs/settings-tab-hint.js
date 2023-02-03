@@ -36,7 +36,7 @@ export default function InspectorControlsTabsHint() {
 				className="block-editor-inspector-controls-tabs__hint-dismiss"
 				icon={ close }
 				iconSize="16"
-				label={ __( 'Dismiss' ) }
+				label={ __( 'Dismiss hint' ) }
 				onClick={ () => {
 					// Retain focus when dismissing the element.
 					const previousElement = focus.tabbable.findPrevious(
