@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { createBlock } from '@wordpress/blocks';
 import {
+	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
@@ -21,9 +22,10 @@ import {
 	Notice,
 	ComboboxControl,
 	Button,
+	ToolbarButton,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
@@ -135,6 +137,10 @@ export default function PageListEdit( {
 		'showSubmenuIcon' in context &&
 		pages?.length > 0 &&
 		pages?.length <= MAX_PAGE_COUNT;
+
+	const [ isModalOpen, setModalOpen ] = useState( false );
+	const openModal = () => setModalOpen( true );
+	const closeModal = () => setModalOpen( false );
 
 	const convertToNavigationLinks = useConvertToNavigationLinks( {
 		clientId,
@@ -266,6 +272,11 @@ export default function PageListEdit( {
 
 	return (
 		<>
+			<BlockControls group="other">
+				<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
+					{ __( 'Edit' ) }
+				</ToolbarButton>
+			</BlockControls>
 			<InspectorControls>
 				{ pagesTree.length > 0 && (
 					<PanelBody>
@@ -296,10 +307,11 @@ export default function PageListEdit( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			{ allowConvertToLinks && (
+			{ allowConvertToLinks && isModalOpen && (
 				<ConvertToLinksModal
 					disabled={ ! hasResolvedPages }
 					onClick={ convertToNavigationLinks }
+					closeModal={ closeModal }
 				/>
 			) }
 			<BlockContent
