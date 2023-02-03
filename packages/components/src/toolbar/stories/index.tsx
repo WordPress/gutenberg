@@ -71,7 +71,7 @@ const Template: ComponentStory< typeof Toolbar > = ( props ) => (
 	</div>
 );
 
-export const Default: ComponentStory< typeof Toolbar > = Template.bind( {} );
+export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Options',
 	id: 'options-toolbar',
@@ -82,29 +82,32 @@ Default.args = {
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
-					{ ( toggleProps: unknown ) => (
-						<DropdownMenu
-							hasArrowIndicator
-							icon={ alignLeft }
-							label="Align"
-							controls={ [
-								{
-									icon: alignLeft,
-									title: 'Align left',
-									isActive: true,
-								},
-								{
-									icon: alignCenter,
-									title: 'Align center',
-								},
-								{
-									icon: alignRight,
-									title: 'Align right',
-								},
-							] }
-							toggleProps={ toggleProps }
-						/>
-					) }
+					{
+						// @ts-expect-error TODO: Remove when ToolbarItem/DropdownMenu is typed
+						( toggleProps ) => (
+							<DropdownMenu
+								hasArrowIndicator
+								icon={ alignLeft }
+								label="Align"
+								controls={ [
+									{
+										icon: alignLeft,
+										title: 'Align left',
+										isActive: true,
+									},
+									{
+										icon: alignCenter,
+										title: 'Align center',
+									},
+									{
+										icon: alignRight,
+										title: 'Align right',
+									},
+								] }
+								toggleProps={ toggleProps }
+							/>
+						)
+					}
 				</ToolbarItem>
 			</ToolbarGroup>
 			<ToolbarGroup>
@@ -114,7 +117,7 @@ Default.args = {
 				<ToolbarButton icon={ link } label="Link" />
 				<ToolbarGroup
 					isCollapsed
-					// @ts-ignore TODO: Remove when ToolbarGroup is typed
+					// @ts-expect-error TODO: Remove when ToolbarGroup is typed
 					icon={ false }
 					label="More rich text controls"
 					controls={ [
@@ -128,7 +131,7 @@ Default.args = {
 				/>
 			</ToolbarGroup>
 			<ToolbarGroup
-				// @ts-ignore TODO: Remove when ToolbarGroup is typed
+				// @ts-expect-error TODO: Remove when ToolbarGroup is typed
 				icon={ more }
 				label="Align"
 				isCollapsed
@@ -168,10 +171,7 @@ Default.args = {
 	),
 };
 
-export const WithoutGroup: ComponentStory< typeof Toolbar > = Template.bind(
-	{}
-);
-
+export const WithoutGroup = Template.bind( {} );
 WithoutGroup.args = {
 	label: 'Options',
 	id: 'options-toolbar-without-group',

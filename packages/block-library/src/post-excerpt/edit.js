@@ -58,18 +58,28 @@ export default function PostExcerptEditor( {
 	}, [ renderedExcerpt ] );
 	if ( ! postType || ! postId ) {
 		return (
-			<div { ...blockProps }>
-				<p>
-					{ __(
-						'This is the Post Excerpt block, it will display the excerpt from single posts.'
-					) }
-				</p>
-				<p>
-					{ __(
-						'If there are any Custom Post Types with support for excerpts, the Post Excerpt block can display the excerpts of those entries as well.'
-					) }
-				</p>
-			</div>
+			<>
+				<BlockControls>
+					<AlignmentToolbar
+						value={ textAlign }
+						onChange={ ( newAlign ) =>
+							setAttributes( { textAlign: newAlign } )
+						}
+					/>
+				</BlockControls>
+				<div { ...blockProps }>
+					<p>
+						{ __(
+							'This is the Post Excerpt block, it will display the excerpt from single posts.'
+						) }
+					</p>
+					<p>
+						{ __(
+							'If there are any Custom Post Types with support for excerpts, the Post Excerpt block can display the excerpts of those entries as well.'
+						) }
+					</p>
+				</div>
+			</>
 		);
 	}
 	if ( isProtected && ! userCanEdit ) {

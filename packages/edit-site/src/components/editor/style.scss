@@ -7,8 +7,8 @@
 	display: flex;
 	justify-content: center;
 
-	.interface-interface-skeleton__actions:focus &,
-	.interface-interface-skeleton__actions:focus-within & {
+	.edit-site-layout__actions:focus &,
+	.edit-site-layout__actions:focus-within & {
 		top: auto;
 		bottom: 0;
 	}

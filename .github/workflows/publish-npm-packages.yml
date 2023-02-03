@@ -30,13 +30,13 @@ jobs:
         environment: WordPress packages
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   path: main
                   ref: trunk
 
             - name: Checkout (for publishing)
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.

@@ -435,7 +435,7 @@ export default function Image( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
 					__nextHasNoMarginBottom
 					label={ __( 'Title attribute' ) }
