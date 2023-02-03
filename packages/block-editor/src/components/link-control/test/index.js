@@ -1670,6 +1670,10 @@ describe( 'Addition Settings UI', () => {
 
 		render( <LinkControlConsumer /> );
 
+		const user = userEvent.setup();
+
+		await toggleSettingsDrawer( user );
+
 		const newTabSettingLabel = screen.getByText( expectedSettingText );
 		expect( newTabSettingLabel ).toBeVisible();
 
@@ -1707,6 +1711,10 @@ describe( 'Addition Settings UI', () => {
 		};
 
 		render( <LinkControlConsumer /> );
+
+		const user = userEvent.setup();
+
+		await toggleSettingsDrawer( user );
 
 		expect( screen.queryAllByRole( 'checkbox' ) ).toHaveLength( 2 );
 
