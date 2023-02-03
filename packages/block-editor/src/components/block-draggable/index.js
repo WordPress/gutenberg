@@ -19,7 +19,7 @@ const BlockDraggable = ( {
 	cloneClassname,
 	onDragStart,
 	onDragEnd,
-	dragOrigin,
+	targets = [],
 } ) => {
 	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
@@ -60,7 +60,7 @@ const BlockDraggable = ( {
 		type: 'block',
 		srcClientIds: clientIds,
 		srcRootClientId,
-		dragOrigin,
+		targets,
 	};
 
 	return (
@@ -69,7 +69,7 @@ const BlockDraggable = ( {
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
-				startDraggingBlocks( clientIds, dragOrigin );
+				startDraggingBlocks( clientIds, targets );
 				isDragging.current = true;
 
 				startScrolling( event );

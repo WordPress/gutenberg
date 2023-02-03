@@ -32,7 +32,7 @@ import {
 	blockListSettings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
-	draggedBlocksOrigin,
+	draggedBlocksTargets,
 } from '../reducer';
 
 const noop = () => {};
@@ -2465,27 +2465,30 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'draggedBlocksOrigin', () => {
-		it.each( [ '', 'inner-blocks' ] )(
-			`should store the dragged blocks' origin as "%s" when a user starts dragging blocks`,
-			( theOrigin ) => {
+	describe( 'draggedBlocksTargets', () => {
+		it.each( [ [ '' ], [ 'inner-blocks', 'list-view' ] ] )(
+			`should store the dragged blocks' targets as "%s" when a user starts dragging blocks`,
+			( targets ) => {
 				const clientIds = [ 'block-1', 'block-2', 'block-3' ];
-				const state = draggedBlocksOrigin( [], {
+				const state = draggedBlocksTargets( [], {
 					type: 'START_DRAGGING_BLOCKS',
 					clientIds,
-					origin: theOrigin,
+					targets,
 				} );
 
-				expect( state ).toBe( theOrigin );
+				expect( state ).toEqual( targets );
 			}
 		);
 
-		it( `should set the state to an empty string when a user stops dragging blocks`, () => {
-			const state = draggedBlocksOrigin( [], {
-				type: 'STOP_DRAGGING_BLOCKS',
-			} );
+		it( `should reset the state to an empty string when a user stops dragging blocks`, () => {
+			const state = draggedBlocksTargets(
+				[ 'inner-blocks', 'list-view' ],
+				{
+					type: 'STOP_DRAGGING_BLOCKS',
+				}
+			);
 
-			expect( state ).toBe( '' );
+			expect( state ).toEqual( [] );
 		} );
 	} );
 

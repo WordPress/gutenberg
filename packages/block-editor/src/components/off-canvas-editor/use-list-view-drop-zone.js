@@ -17,6 +17,7 @@ import {
 } from '../../utils/math';
 import useOnBlockDrop from '../use-on-block-drop';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../experiments';
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 
@@ -179,26 +180,39 @@ function getListViewDropTarget( blocksData, position ) {
 /**
  * A react hook for implementing a drop zone in list view.
  *
+ * @param {string} dropZoneName The name of the drop zone.
  * @return {WPListViewDropZoneTarget} The drop target.
  */
-export default function useListViewDropZone() {
+export default function useListViewDropZone( dropZoneName ) {
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
 		getBlockCount,
 		getDraggedBlockClientIds,
 		canInsertBlocks,
-	} = useSelect( blockEditorStore );
+		getDraggedBlocksTargets,
+	} = unlock( useSelect( blockEditorStore ) );
 	const [ target, setTarget ] = useState();
 	const { rootClientId: targetRootClientId, blockIndex: targetBlockIndex } =
 		target || {};
 
-	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
+	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex, {
+		dropZoneName,
+	} );
 
 	const draggedBlockClientIds = getDraggedBlockClientIds();
 	const throttled = useThrottle(
 		useCallback(
 			( event, currentTarget ) => {
+				const draggedBlocksTargets = getDraggedBlocksTargets();
+
+				if (
+					draggedBlocksTargets?.length &&
+					! draggedBlocksTargets.includes( dropZoneName )
+				) {
+					// If drag targets are defined and the drop zone doesn't match, don't allow dropping.
+					return;
+				}
 				const position = { x: event.clientX, y: event.clientY };
 				const isBlockDrag = !! draggedBlockClientIds?.length;
 

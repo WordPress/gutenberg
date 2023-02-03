@@ -1247,13 +1247,12 @@ export function draggedBlocks( state = [], action ) {
 	return state;
 }
 
-export function draggedBlocksOrigin( state = '', action ) {
+export function draggedBlocksTargets( state = [], action ) {
 	switch ( action.type ) {
 		case 'START_DRAGGING_BLOCKS':
-			return action.origin;
-
+			return action.targets;
 		case 'STOP_DRAGGING_BLOCKS':
-			return '';
+			return [];
 	}
 
 	return state;
@@ -1898,5 +1897,5 @@ export default combineReducers( {
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
 	blockVisibility,
-	draggedBlocksOrigin,
+	draggedBlocksTargets,
 } );

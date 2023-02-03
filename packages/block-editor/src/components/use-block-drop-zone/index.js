@@ -172,7 +172,7 @@ export default function useBlockDropZone( {
 		getBlockListSettings,
 		getBlocks,
 		getBlockIndex,
-		getDraggedBlocksOrigin,
+		getDraggedBlocksTargets,
 	} = unlock( useSelect( blockEditorStore ) );
 
 	const { showInsertionPoint, hideInsertionPoint } =
@@ -185,14 +185,13 @@ export default function useBlockDropZone( {
 	const throttled = useThrottle(
 		useCallback(
 			( event, ownerDocument ) => {
-				const draggedBlocksOrigin = getDraggedBlocksOrigin();
+				const draggedBlocksTargets = getDraggedBlocksTargets();
 
 				if (
-					dropZoneName &&
-					draggedBlocksOrigin &&
-					dropZoneName !== draggedBlocksOrigin
+					draggedBlocksTargets?.length &&
+					! draggedBlocksTargets.includes( dropZoneName )
 				) {
-					// If drag and drop names are available and they don't match, don't allow dropping.
+					// If drag targets are defined and the drop zone doesn't match, don't allow dropping.
 					return;
 				}
 

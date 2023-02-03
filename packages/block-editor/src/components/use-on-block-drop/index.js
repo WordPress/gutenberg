@@ -33,7 +33,7 @@ export function parseDropEvent( event ) {
 		srcIndex: null,
 		type: null,
 		blocks: null,
-		dragOrigin: null,
+		targets: null,
 	};
 
 	if ( ! event.dataTransfer ) {
@@ -81,7 +81,7 @@ export function onBlockDrop(
 			srcClientIds: sourceClientIds,
 			type: dropType,
 			blocks,
-			dragOrigin,
+			targets: draggableTargets,
 		} = parseDropEvent( event );
 
 		// If the user is inserting a block.
@@ -95,7 +95,10 @@ export function onBlockDrop(
 
 		// If the user is moving a block.
 		if ( dropType === 'block' ) {
-			if ( dropZoneName && dragOrigin && dropZoneName !== dragOrigin ) {
+			if (
+				draggableTargets?.length &&
+				! draggableTargets.includes( dropZoneName )
+			) {
 				return;
 			}
 			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );

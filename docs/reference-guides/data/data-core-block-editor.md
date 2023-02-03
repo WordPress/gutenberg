@@ -1573,7 +1573,7 @@ Returns an action object used in signalling that the user has begun to drag bloc
 _Parameters_
 
 -   _clientIds_ `string[]`: An array of client ids being dragged
--   _origin_ `string`: the name of the origin of the drag blocks.
+-   _targets_ `Array`: the names of target dropzones into which this draggable can be dropped.
 
 _Returns_
 

@@ -1291,14 +1291,14 @@ export function stopTyping() {
  *
  * @param {string[]} clientIds An array of client ids being dragged
  *
- * @param {string}   origin    the name of the origin of the drag blocks.
+ * @param {Array}    targets   the names of target dropzones into which this draggable can be dropped.
  * @return {Object} Action object.
  */
-export function startDraggingBlocks( clientIds = [], origin ) {
+export function startDraggingBlocks( clientIds = [], targets ) {
 	return {
 		type: 'START_DRAGGING_BLOCKS',
 		clientIds,
-		origin,
+		targets,
 	};
 }
 

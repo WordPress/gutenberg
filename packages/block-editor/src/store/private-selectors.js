@@ -25,6 +25,6 @@ export function getLastInsertedBlocksClientIds( state ) {
  * @param {Object} state Global application state.
  * @return {string} The origin of the dragged blocks.
  */
-export function getDraggedBlocksOrigin( state ) {
-	return state.draggedBlocksOrigin;
+export function getDraggedBlocksTargets( state ) {
+	return state.draggedBlocksTargets;
 }

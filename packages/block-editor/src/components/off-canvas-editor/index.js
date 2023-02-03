@@ -92,7 +92,8 @@ function OffCanvasEditor(
 
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
-	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone();
+	const { ref: dropZoneRef, target: blockDropTarget } =
+		useListViewDropZone( 'offcanvas' );
 	const elementRef = useRef();
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
 
