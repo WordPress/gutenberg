@@ -195,6 +195,7 @@
 		"husky": "7.0.0",
 		"inquirer": "7.1.0",
 		"jest": "27.4.5",
+		"jest-image-snapshot": "6.1.0",
 		"jest-junit": "13.0.0",
 		"jest-message-util": "27.4.2",
 		"jest-watch-typeahead": "1.0.0",
