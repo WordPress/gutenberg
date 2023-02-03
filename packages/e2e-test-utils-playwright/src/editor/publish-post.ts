@@ -20,9 +20,7 @@ export async function publishPost( this: Editor ) {
 	// Save any entities.
 	if ( isEntitiesSavePanelVisible ) {
 		// Handle saving entities.
-		await this.page.click(
-			'role=region[name="Editor publish"i] >> role=button[name="Save"i]'
-		);
+		await entitiesSaveButton.click();
 	}
 
 	// Handle saving just the post.
