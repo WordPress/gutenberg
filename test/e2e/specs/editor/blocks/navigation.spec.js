@@ -80,9 +80,25 @@ test.describe(
 			expect( content ).toBe(
 				`<!-- wp:navigation {"ref":${ createdMenu.id }} /-->`
 			);
+			await editor.page
+				.locator( 'role=button[name="Close panel"i]' )
+				.click();
 
-			//check the block in the list view?
-			//check the block in the frontend?
+			//check the block in the canvas.
+			await expect(
+				editor.page.locator(
+					'role=gridcell[name="Custom Link link"] >> a:has-text("WordPress")'
+				)
+			).toBeVisible();
+
+			//check the block in the frontend.
+			await editor.page.goto( '/' );
+			await expect(
+				editor.page.locator(
+					'nav:has-text("WordPress") >> role=link[name="WordPress"]'
+				)
+			).toBeVisible();
+
 			await editor.page.pause();
 		} );
 	}
