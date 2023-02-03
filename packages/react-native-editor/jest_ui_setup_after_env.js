@@ -4,6 +4,7 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const childProcess = require( 'child_process' );
+// eslint-disable-next-line import/no-extraneous-dependencies
 const { configureToMatchImageSnapshot } = require( 'jest-image-snapshot' );
 
 /**
