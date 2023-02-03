@@ -76,7 +76,7 @@ const MainContent = ( {
 			onSelect={ ( block ) => {
 				const onSelect = block.attributes?.onSelect;
 				if ( onSelect ) {
-					// If this returns fasle, then the block won't be selected.
+					// If this returns false, then the block won't be selected.
 					return onSelect( block );
 				}
 			} }
