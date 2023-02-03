@@ -15,12 +15,12 @@ export type AnglePickerControlProps = {
 	/**
 	 * A function that receives the new value of the input.
 	 */
-	onChange?: ( value: number ) => void;
+	onChange: ( value: number ) => void;
 	/**
 	 * The current value of the input. The value represents an angle in degrees
 	 * and should be a value between 0 and 360.
 	 */
-	value?: number | string;
+	value: number | string;
 };
 
 export type AngleCircleProps = Pick<

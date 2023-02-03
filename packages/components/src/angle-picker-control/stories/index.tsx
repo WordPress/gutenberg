@@ -39,7 +39,7 @@ const AnglePickerWithState: ComponentStory< typeof AnglePickerControl > = ( {
 
 	const handleChange = ( newValue: number ) => {
 		setAngle( newValue );
-		onChange?.( newValue );
+		onChange( newValue );
 	};
 
 	return (
