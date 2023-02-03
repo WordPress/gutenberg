@@ -154,19 +154,15 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * returns. Optionally, you can also pass any other props through this hook, and
  * they will be merged and returned.
  *
- * @param {Object} props                Optional. Props to pass to the element. Must contain
- *                                      the ref if one is defined.
- * @param {Object} options              Optional. Inner blocks options.
+ * @param {Object} props   Optional. Props to pass to the element. Must contain
+ *                         the ref if one is defined.
+ * @param {Object} options Optional. Inner blocks options.
  *
- * @param {string} options.dropZoneName Optional. The name of the drop zone.
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const {
-		__unstableDisableLayoutClassNames,
-		__unstableDisableDropZone,
-		__unstableDropZoneName = 'inner-blocks',
-	} = options;
+	const { __unstableDisableLayoutClassNames, __unstableDisableDropZone } =
+		options;
 	const {
 		clientId,
 		layout = null,
@@ -208,7 +204,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 	const blockDropZoneRef = useBlockDropZone( {
 		rootClientId: clientId,
-		dropZoneName: __unstableDropZoneName,
 	} );
 
 	const ref = useMergeRefs( [

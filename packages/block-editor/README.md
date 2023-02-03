@@ -830,7 +830,6 @@ _Parameters_
 
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Optional. Inner blocks options.
--   _options.dropZoneName_ `string`: Optional. The name of the drop zone.
 
 ### useSetting
 
