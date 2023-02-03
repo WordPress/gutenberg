@@ -315,7 +315,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'marginSelector' => ' > ',
+						'marginSelector' => ' > * + ',
 					),
 					'flex'    => array(
 						'name'          => 'flex',

@@ -680,7 +680,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'.is-layout-flow > * + .wp-block-cover { margin-top: 25px; margin-bottom: 50px; }.wp-site-blocks > .wp-block-cover { margin-top: 25px; margin-bottom: 50px; }'
+				'.is-layout-flow > * + .wp-block-cover { margin-top: 25px; margin-bottom: 50px; }.wp-site-blocks > * + .wp-block-cover { margin-top: 25px; margin-bottom: 50px; }'
 			);
 		} );
 	} );
