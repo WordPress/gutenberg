@@ -10,7 +10,7 @@ import { useState } from '@wordpress/element';
 import { AnglePickerControl } from '@wordpress/components';
 
 function Example() {
-	const [ angle, setAngle ] = useState();
+	const [ angle, setAngle ] = useState( 0 );
 	return (
 		<AnglePickerControl
 			value={ angle }
