@@ -431,13 +431,12 @@ function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
 	return false;
 }
 
+/**
+ * Create and returns a navigation menu containing a page-list as a fallback.
+ *
+ * @return array the newly created navigation menu.
+ */
 function block_core_navigation_get_default_pages_fallback() {
-	$page_list_fallback = array(
-		array(
-			'blockName' => 'core/page-list',
-		),
-	);
-
 	$registry = WP_Block_Type_Registry::get_instance();
 
 	// If `core/page-list` is not registered then use empty blocks.
@@ -447,8 +446,8 @@ function block_core_navigation_get_default_pages_fallback() {
 	$wp_insert_post_result = wp_insert_post(
 		array(
 			'post_content' => $default_blocks,
-			'post_title'   => 'navigation', // TODO - use the template slug in future
-			'post_name'    => 'navigation', // TODO - use the template slug in future
+			'post_title'   => 'Navigation', // TODO - use the template slug in future
+			'post_name'    => 'Navigation', // TODO - use the template slug in future
 			'post_status'  => 'publish',
 			'post_type'    => 'wp_navigation',
 		),
@@ -556,7 +555,6 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
-	error_log( 'render_block_core_navigation' );
 	static $seen_menu_names = array();
 
 	// Flag used to indicate whether the rendered output is considered to be

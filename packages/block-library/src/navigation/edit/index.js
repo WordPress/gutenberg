@@ -278,15 +278,15 @@ function Navigation( {
 					'publish'
 				);
 			}
+		} else {
+			// If there are no fallback navigation menus and no classic menus,
+			// then create a new navigation menu.
+			createNavigationMenu(
+				'Navigation', // TODO - use the template slug in future
+				[ createBlock( 'core/page-list' ) ],
+				'publish'
+			);
 		}
-
-		// If there are no fallback navigation menus and no classic menus,
-		// then create a new navigation menu.
-		createNavigationMenu(
-			'navigation',
-			[ createBlock( 'core/page-list' ) ],
-			'publish'
-		);
 	}, [ hasResolvedNavigationMenus ] );
 
 	const navRef = useRef();
