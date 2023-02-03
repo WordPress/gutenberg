@@ -71,7 +71,7 @@ const Template: ComponentStory< typeof Toolbar > = ( props ) => (
 	</div>
 );
 
-export const Default: ComponentStory< typeof Toolbar > = Template.bind( {} );
+export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Options',
 	id: 'options-toolbar',
@@ -114,7 +114,7 @@ Default.args = {
 				<ToolbarButton icon={ link } label="Link" />
 				<ToolbarGroup
 					isCollapsed
-					// @ts-ignore TODO: Remove when ToolbarGroup is typed
+					// @ts-expect-error TODO: Remove when ToolbarGroup is typed
 					icon={ false }
 					label="More rich text controls"
 					controls={ [
