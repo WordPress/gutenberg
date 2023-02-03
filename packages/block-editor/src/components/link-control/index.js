@@ -379,7 +379,7 @@ function LinkControl( {
 										collapsed: { opacity: 0, height: 0 },
 									} }
 									transition={ {
-										duration: 0.2,
+										duration: 0.1,
 									} }
 								>
 									<div className="block-editor-link-control__drawer-inner">
