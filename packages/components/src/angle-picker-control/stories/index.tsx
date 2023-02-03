@@ -17,6 +17,7 @@ const meta: ComponentMeta< typeof AnglePickerControl > = {
 	title: 'Components/AnglePickerControl',
 	component: AnglePickerControl,
 	argTypes: {
+		as: { control: { type: null } },
 		value: { control: { type: null } },
 	},
 	parameters: {
