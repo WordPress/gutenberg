@@ -32,7 +32,7 @@ Label to use for the angle picker.
 -   Required: No
 -   Default: `__( 'Angle' )`
 
-### `value`: `number`
+### `value`: `number | string`
 
 The current value of the input. The value represents an angle in degrees and should be a value between 0 and 360.
 

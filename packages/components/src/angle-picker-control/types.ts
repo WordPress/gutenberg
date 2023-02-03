@@ -20,7 +20,7 @@ export type AnglePickerControlProps = {
 	/**
 	 * A function that receives the new value of the input.
 	 */
-	value?: number;
+	value?: number | string;
 };
 
 export type AngleCircleProps = Pick<
