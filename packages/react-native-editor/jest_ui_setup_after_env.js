@@ -20,6 +20,7 @@ jest.setTimeout( 1000000 ); // In milliseconds.
 const toMatchImageSnapshot = configureToMatchImageSnapshot( {
 	failureThreshold: 0.01, // 1% threshold.
 	failureThresholdType: 'percent',
+	dumpInlineDiffToConsole: true,
 } );
 expect.extend( { toMatchImageSnapshot } );
 
