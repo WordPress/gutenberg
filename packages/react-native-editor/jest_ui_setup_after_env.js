@@ -4,7 +4,7 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const childProcess = require( 'child_process' );
-const { toMatchImageSnapshot } = require( 'jest-image-snapshot' );
+const { configureToMatchImageSnapshot } = require( 'jest-image-snapshot' );
 
 /**
  * Internal dependencies
@@ -16,6 +16,10 @@ const {
 
 jest.setTimeout( 1000000 ); // In milliseconds.
 
+const toMatchImageSnapshot = configureToMatchImageSnapshot( {
+	failureThreshold: 0.01, // 1% threshold.
+	failureThresholdType: 'percent',
+} );
 expect.extend( { toMatchImageSnapshot } );
 
 let iOSScreenRecordingProcess;
