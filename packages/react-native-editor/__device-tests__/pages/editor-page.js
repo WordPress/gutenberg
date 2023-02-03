@@ -806,13 +806,7 @@ class EditorPage {
 			image.getHeight() - statusBarHeight
 		);
 		const resizedImage = await image.resize( 320, jimp.AUTO );
-		const croppedImage = await resizedImage.getBase64Async( jimp.MIME_PNG );
-
-		return croppedImage.replace( 'data:image/png;base64,', '' );
-	}
-
-	getPlatform() {
-		return isAndroid() ? 'Android' : 'iOS';
+		return resizedImage.getBufferAsync( jimp.MIME_PNG );
 	}
 }
 

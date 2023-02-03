@@ -5,7 +5,7 @@ import { blockNames } from './pages/editor-page';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor Visual test for Gallery Block', () => {
-	it( `should be able to render the placeholder correctly for ${ editorPage.getPlatform() }`, async () => {
+	it( 'should be able to render the placeholder correctly', async () => {
 		await editorPage.addNewBlock( blockNames.gallery );
 
 		await editorPage.closePicker();
@@ -21,7 +21,7 @@ describe( 'Gutenberg Editor Visual test for Gallery Block', () => {
 		await editorPage.removeBlockAtPosition( blockNames.gallery );
 	} );
 
-	it( `should be able to render a gallery correctly for ${ editorPage.getPlatform() }`, async () => {
+	it( 'should be able to render a gallery correctly', async () => {
 		await editorPage.setHtmlContent(
 			[ testData.galleryBlock ].join( '\n\n' )
 		);
