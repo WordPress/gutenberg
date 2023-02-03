@@ -53,7 +53,7 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		<AnglePickerControl
 			__nextHasNoMarginBottom
 			onChange={ onAngleChange }
-			value={ hasGradient ? angle : undefined }
+			value={ hasGradient ? angle : '' }
 		/>
 	);
 };
