@@ -98,7 +98,7 @@ describe( 'BorderBoxControl', () => {
 
 			const widthInput = screen.getByRole( 'spinbutton', {
 				name: 'Border width',
-			} );
+			} ) as HTMLInputElement;
 
 			expect( widthInput.value ).toBe( '1' );
 		} );
@@ -110,7 +110,7 @@ describe( 'BorderBoxControl', () => {
 
 			const widthInput = screen.getByRole( 'spinbutton', {
 				name: 'Border width',
-			} );
+			} ) as HTMLInputElement;
 
 			expect( widthInput.value ).toBe( '1' );
 		} );
@@ -171,7 +171,7 @@ describe( 'BorderBoxControl', () => {
 
 			const linkedInput = screen.getByRole( 'spinbutton', {
 				name: 'Border width',
-			} );
+			} ) as HTMLInputElement;
 			const unitSelect = screen.getByRole( 'combobox', {
 				name: 'Select unit',
 			} );
@@ -237,7 +237,7 @@ describe( 'BorderBoxControl', () => {
 
 			const widthInputs = screen.getAllByRole( 'spinbutton', {
 				name: 'Border width',
-			} );
+			} ) as HTMLInputElement[];
 
 			expect( widthInputs[ 0 ].value ).toBe( '1' ); // Top.
 			expect( widthInputs[ 1 ].value ).toBe( '0.75' ); // Left.
@@ -260,7 +260,7 @@ describe( 'BorderBoxControl', () => {
 
 			const widthInputs = screen.getAllByRole( 'spinbutton', {
 				name: 'Border width',
-			} );
+			} ) as HTMLInputElement[];
 			expect( widthInputs[ 0 ].value ).toBe( '1' ); // Top.
 			expect( widthInputs[ 1 ].value ).toBe( '1' ); // Left.
 			expect( widthInputs[ 2 ].value ).toBe( '1' ); // Right.
