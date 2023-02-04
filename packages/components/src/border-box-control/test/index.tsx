@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { act } from 'react-test-renderer';
 
 /**
  * Internal dependencies
@@ -189,7 +188,14 @@ describe( 'BorderBoxControl', () => {
 
 			const colorButton = screen.getByLabelText( colorPickerRegex );
 			await user.click( colorButton );
-			await act( () => Promise.resolve() );
+
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Custom color picker.',
+					} )
+				).toBeVisible()
+			);
 
 			const styleLabel = screen.queryByText( 'Style' );
 			const solidButton = screen.queryByRole( 'button', {
