@@ -3,6 +3,7 @@
  */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ComponentProps } from 'react';
 
 /**
  * Internal dependencies
@@ -118,7 +119,10 @@ const renderGroupedItemsInPanel = () => {
 
 // Custom component rendering a panel item within a wrapping element. Also used
 // to test panel item registration and rendering.
-const WrappedItem = ( { text, ...props } ) => {
+const WrappedItem = ( {
+	text,
+	...props
+}: ComponentProps< typeof ToolsPanelItem > & { text: string } ) => {
 	return (
 		<div>
 			<span>Wrapper</span>
@@ -920,7 +924,9 @@ describe( 'ToolsPanel', () => {
 			// test that no orphaned items appear registered in the panel menu.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/34085
-			const TestSlotFillPanel = ( { panelId } ) => (
+			const TestSlotFillPanel = ( {
+				panelId,
+			}: Pick< ComponentProps< typeof ToolsPanelItem >, 'panelId' > ) => (
 				<SlotFillProvider>
 					<ToolsPanelItems>
 						<ToolsPanelItem { ...altControlProps } panelId="1234">
