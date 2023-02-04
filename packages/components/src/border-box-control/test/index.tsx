@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import { BorderBoxControl } from '..';
 
-jest.useFakeTimers();
-
 const colors = [
 	{ name: 'Gray', color: '#f6f7f7' },
 	{ name: 'Blue', color: '#72aee6' },
@@ -115,15 +113,29 @@ describe( 'BorderBoxControl', () => {
 		} );
 
 		it( 'should render placeholder and omit unit select when border values are mixed', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <BorderBoxControl { ...props } value={ mixedBorders } /> );
+
+			// There are 4 inputs when in unlinked mode (top/right/bottom/left)
+			expect(
+				screen.getAllByRole( 'spinbutton', {
+					name: 'Border width',
+				} )
+			).toHaveLength( 4 );
 
 			// First render of control with mixed values should show split view.
 			await user.click(
 				screen.getByRole( 'button', { name: 'Link sides' } )
+			);
+
+			// In linked mode, there is only one input
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'spinbutton', {
+						name: 'Border width',
+					} )
+				).toBeVisible()
 			);
 
 			const widthInput = screen.getByRole( 'spinbutton', {
@@ -138,9 +150,7 @@ describe( 'BorderBoxControl', () => {
 		} );
 
 		it( 'should render shared border width and unit select when switching to linked view', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			// Render control with mixed border values but consistent widths.
 			render(
@@ -180,15 +190,14 @@ describe( 'BorderBoxControl', () => {
 		} );
 
 		it( 'should omit style options when requested', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <BorderBoxControl { ...props } enableStyle={ false } /> );
 
 			const colorButton = screen.getByLabelText( colorPickerRegex );
 			await user.click( colorButton );
 
+			// Wait for the custom color picker in the dropdown to appear
 			await waitFor( () =>
 				expect(
 					screen.getByRole( 'button', {
@@ -252,9 +261,7 @@ describe( 'BorderBoxControl', () => {
 		} );
 
 		it( 'should render split view correctly when starting with flat border', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<BorderBoxControl { ...props } value={ defaultBorders } />
@@ -274,9 +281,7 @@ describe( 'BorderBoxControl', () => {
 		} );
 
 		it( 'should omit style options when requested', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <BorderBoxControl { ...props } enableStyle={ false } /> );
 
@@ -330,9 +335,7 @@ describe( 'BorderBoxControl', () => {
 
 		describe( 'Linked value change handling', () => {
 			it( 'should set undefined when new border is empty', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl { ...props } value={ { width: '1px' } } />
@@ -346,9 +349,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should update with complete flat border', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl { ...props } value={ defaultBorder } />
@@ -367,9 +368,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should maintain mixed values if not explicitly set via linked control', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl
@@ -402,9 +401,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should update with consistent split borders', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl { ...props } value={ defaultBorders } />
@@ -423,9 +420,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should set undefined borders when change results in empty borders', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl
@@ -447,9 +442,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should set flat border when change results in consistent split borders', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl
@@ -482,9 +475,7 @@ describe( 'BorderBoxControl', () => {
 
 		describe( 'Split value change handling', () => {
 			it( 'should set split borders when the updated borders are mixed', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				const borders = {
 					top: { ...defaultBorder, width: '1px' },
@@ -508,9 +499,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should set flat border when updated borders are consistent', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				const borders = {
 					top: { ...defaultBorder, width: '4px' },
