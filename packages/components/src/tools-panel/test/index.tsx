@@ -234,10 +234,20 @@ describe( 'ToolsPanel', () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					{ false && (
-						<ToolsPanelItem>Should not show</ToolsPanelItem>
+						<ToolsPanelItem
+							label="Not rendered 1"
+							hasValue={ () => false }
+						>
+							Should not show
+						</ToolsPanelItem>
 					) }
 					{ false && (
-						<ToolsPanelItem>Not shown either</ToolsPanelItem>
+						<ToolsPanelItem
+							label="Not rendered 2"
+							hasValue={ () => false }
+						>
+							Not shown either
+						</ToolsPanelItem>
 					) }
 					<span>Visible but insignificant</span>
 				</ToolsPanel>
