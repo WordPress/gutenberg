@@ -500,8 +500,9 @@ describe( 'ToolsPanel', () => {
 			expect( menuGroups.length ).toEqual( 3 );
 
 			// The linked control should be in the second group, of optional controls.
-			let optionalItem = within( menuGroups[ 1 ] ).getByText( 'Linked' );
-			expect( optionalItem ).toBeInTheDocument();
+			expect(
+				within( menuGroups[ 1 ] ).getByText( 'Linked' )
+			).toBeInTheDocument();
 
 			// Simulate the main control having a value set which should
 			// trigger the linked control becoming a default control via the
@@ -531,10 +532,11 @@ describe( 'ToolsPanel', () => {
 			// Optional controls have an additional aria-label. This can be used
 			// to confirm the conditional default control has been removed from
 			// the optional menu item group.
-			optionalItem = screen.queryByRole( 'menuitemcheckbox', {
-				name: 'Show Linked',
-			} );
-			expect( optionalItem ).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'menuitemcheckbox', {
+					name: 'Show Linked',
+				} )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'should handle conditionally rendered default control', async () => {
@@ -1014,29 +1016,30 @@ describe( 'ToolsPanel', () => {
 
 			// Only the item matching the panelId should have been registered
 			// and appear in the panel menu.
-			let altMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Show Alt',
-			} );
-			let exampleMenuItem = screen.queryByRole( 'menuitemcheckbox', {
-				name: 'Hide and reset Example',
-			} );
-
-			expect( altMenuItem ).toBeInTheDocument();
-			expect( exampleMenuItem ).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemcheckbox', {
+					name: 'Show Alt',
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'menuitemcheckbox', {
+					name: 'Hide and reset Example',
+				} )
+			).not.toBeInTheDocument();
 
 			// Re-render the panel with different panelID simulating a block
 			// selection change.
 			rerender( <TestSlotFillPanel panelId="9999" /> );
-
-			altMenuItem = screen.queryByRole( 'menuitemcheckbox', {
-				name: 'Show Alt',
-			} );
-			exampleMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Hide and reset Example',
-			} );
-
-			expect( altMenuItem ).not.toBeInTheDocument();
-			expect( exampleMenuItem ).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'menuitemcheckbox', {
+					name: 'Show Alt',
+				} )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemcheckbox', {
+					name: 'Hide and reset Example',
+				} )
+			).toBeInTheDocument();
 		} );
 	} );
 
