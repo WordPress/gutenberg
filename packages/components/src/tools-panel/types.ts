@@ -19,8 +19,10 @@ export type ToolsPanelProps = {
 	/**
 	 * Flags that the items in this ToolsPanel will be contained within an inner
 	 * wrapper element allowing the panel to lay them out accordingly.
+	 *
+	 * @default false
 	 */
-	hasInnerWrapper: boolean;
+	hasInnerWrapper?: boolean;
 	/**
 	 * The heading level of the panel's header.
 	 *
@@ -47,8 +49,10 @@ export type ToolsPanelProps = {
 	/**
 	 * Advises the `ToolsPanel` that its child `ToolsPanelItem`s should render
 	 * placeholder content instead of null when they are toggled off and hidden.
+	 *
+	 * @default false
 	 */
-	shouldRenderPlaceholderItems: boolean;
+	shouldRenderPlaceholderItems?: boolean;
 	/**
 	 * Experimental prop allowing for a custom CSS class to be applied to the
 	 * first visible `ToolsPanelItem` within the `ToolsPanel`.
