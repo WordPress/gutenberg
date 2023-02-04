@@ -5,6 +5,7 @@
 ### Internal
 
 -   `ResizableBox`: refactor styles to TypeScript ([47756](https://github.com/WordPress/gutenberg/pull/47756)).
+-   `BorderBoxControl`: migrate tests to TypeScript, remove act() call ([47755](https://github.com/WordPress/gutenberg/pull/47755)).
 
 ## 23.3.0 (2023-02-01)
 
