@@ -187,6 +187,8 @@ export const WithOptionalItemsPlusIcon = ( {
 				<ToolsPanel
 					label="Tools Panel (optional items only)"
 					resetAll={ resetAll }
+					// Why is `key` used here?
+					// @ts-ignore
 					key={ isShownByDefault }
 				>
 					<SingleColumnItem
@@ -253,6 +255,9 @@ export const WithSlotFillItems = () => {
 		resetFilters.forEach( ( resetFilter ) => {
 			newAttributes = {
 				...newAttributes,
+				// TODO: the `ResetFilter` type doesn't specify any attributes
+				// and doesn't return any objects
+				// @ts-ignore
 				...resetFilter( newAttributes ),
 			};
 		} );
@@ -343,6 +348,9 @@ export const WithConditionalDefaultControl = () => {
 		resetFilters.forEach( ( resetFilter ) => {
 			newAttributes = {
 				...newAttributes,
+				// TODO: the `ResetFilter` type doesn't specify any attributes
+				// and doesn't return any objects
+				// @ts-ignore
 				...resetFilter( newAttributes ),
 			};
 		} );
@@ -432,6 +440,9 @@ export const WithConditionallyRenderedControl = () => {
 		resetFilters.forEach( ( resetFilter ) => {
 			newAttributes = {
 				...newAttributes,
+				// TODO: the `ResetFilter` type doesn't specify any attributes
+				// and doesn't return any objects
+				// @ts-ignore
 				...resetFilter( newAttributes ),
 			};
 		} );
