@@ -10,13 +10,7 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	useCallback,
-	useMemo,
-	useState,
-	useRef,
-	forwardRef,
-} from '@wordpress/element';
+import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -180,7 +174,6 @@ function UnforwardedColorPalette(
 	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const customColorPaletteRef = useRef< HTMLElement | null >( null );
 	const {
 		clearable = true,
 		colors = [],
@@ -195,13 +188,8 @@ function UnforwardedColorPalette(
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 
 	const customColorPaletteCallbackRef = useCallback(
-		( ref: HTMLElement | null ) => {
-			if ( ref ) {
-				customColorPaletteRef.current = ref;
-				setNormalizedColorValue(
-					normalizeColorValue( value, customColorPaletteRef )
-				);
-			}
+		( node: HTMLElement | null ) => {
+			setNormalizedColorValue( normalizeColorValue( value, node ) );
 		},
 		[ value ]
 	);

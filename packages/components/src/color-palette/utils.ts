@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import type { RefObject } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -78,19 +77,18 @@ export const isMultiplePaletteArray = (
 
 export const normalizeColorValue = (
 	value: string | undefined,
-	ref: RefObject< HTMLElement > | null
+	element: HTMLElement | null
 ) => {
 	const currentValueIsCssVariable = /^var\(/.test( value ?? '' );
 
-	if ( ! currentValueIsCssVariable || ! ref?.current ) {
+	if ( ! currentValueIsCssVariable || element === null ) {
 		return value;
 	}
 
-	const { ownerDocument } = ref.current;
+	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
-	const computedBackgroundColor = defaultView?.getComputedStyle(
-		ref.current
-	).backgroundColor;
+	const computedBackgroundColor =
+		defaultView?.getComputedStyle( element ).backgroundColor;
 
 	return computedBackgroundColor
 		? colord( computedBackgroundColor ).toHex()
