@@ -9,6 +9,7 @@ import userEvent from '@testing-library/user-event';
  */
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+import type { ToolsPanelContext as ToolsPanelContextType } from '../types';
 
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const resetAll = jest.fn();
@@ -90,7 +91,7 @@ const GroupedItems = ( {
 
 // This context object is used to help simulate different scenarios in which
 // `ToolsPanelItem` registration or deregistration requires testing.
-const panelContext = {
+const panelContext: ToolsPanelContextType = {
 	panelId: '1234',
 	menuItems: {
 		default: {},
@@ -614,7 +615,7 @@ describe( 'ToolsPanel', () => {
 			// themselves, while those for the old panelId deregister.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/36588
-			const context = { ...panelContext };
+			const context: ToolsPanelContextType = { ...panelContext };
 			const TestPanel = () => (
 				<ToolsPanelContext.Provider value={ context }>
 					<ToolsPanelItem { ...altControlProps } panelId="1234">
@@ -678,7 +679,10 @@ describe( 'ToolsPanel', () => {
 			// individual items should still render themselves in this case.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/37216
-			const context = { ...panelContext, panelId: null };
+			const context: ToolsPanelContextType = {
+				...panelContext,
+				panelId: null,
+			};
 			const TestPanel = () => (
 				<ToolsPanelContext.Provider value={ context }>
 					<ToolsPanelItem { ...altControlProps } panelId="1234">
