@@ -413,15 +413,15 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 /**
  * Returns true if the navigation block contains a nested navigation block.
  *
- * @param array $parsed_blocks the parsed blocks to be normalized.
+ * @param WP_Block_List $inner_blocks Inner block instance to be normalized.
  * @return bool true if the navigation block contains a nested navigation block.
  */
-function block_core_navigation_block_contains_core_navigation( $parsed_blocks ) {
-	foreach ( $parsed_blocks as $block ) {
-		if ( 'core/navigation' === $block['blockName'] ) {
+function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
+	foreach ( $inner_blocks as $block ) {
+		if ( 'core/navigation' === $block->name ) {
 			return true;
 		}
-		if ( block_core_navigation_block_contains_core_navigation( $block['innerBlocks'] ) ) {
+		if ( $block->inner_blocks && block_core_navigation_block_contains_core_navigation( $block->inner_blocks ) ) {
 			return true;
 		}
 	}
@@ -643,8 +643,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
 	}
 
-	$parsed_blocks = parse_blocks( $navigation_post->post_content );
-	if ( block_core_navigation_block_contains_core_navigation( $parsed_blocks ) ) {
+	if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
 		return '';
 	}
 
@@ -886,7 +885,7 @@ add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_back
  * @param array $settings Default editor settings.
  * @return array Filtered editor settings.
  */
-function gutenberg_enable_animation_for_navigation_inspector( $settings ) {
+function block_core_navigation_enable_inspector_animation( $settings ) {
 	$current_animation_settings = _wp_array_get(
 		$settings,
 		array( '__experimentalBlockInspectorAnimation' ),
@@ -906,4 +905,4 @@ function gutenberg_enable_animation_for_navigation_inspector( $settings ) {
 	return $settings;
 }
 
-add_filter( 'block_editor_settings_all', 'gutenberg_enable_animation_for_navigation_inspector' );
+add_filter( 'block_editor_settings_all', 'block_core_navigation_enable_inspector_animation' );

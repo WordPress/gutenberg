@@ -11,13 +11,14 @@ import {
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
+import { useSupportedStyles, useColorsPerOrigin } from './hooks';
 import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
-function ScreenButtonColor( { name, variationPath = '' } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+function ScreenButtonColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const supports = useSupportedStyles( name );
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ isBackgroundEnabled ] = useGlobalSetting(
@@ -31,7 +32,7 @@ function ScreenButtonColor( { name, variationPath = '' } ) {
 		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
 	const [ buttonTextColor, setButtonTextColor ] = useGlobalStyle(
-		variationPath + 'elements.button.color.text',
+		prefix + 'elements.button.color.text',
 		name
 	);
 	const [ userButtonTextColor ] = useGlobalStyle(

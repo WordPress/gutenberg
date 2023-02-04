@@ -90,6 +90,7 @@ GEM
 PLATFORMS
   arm64-darwin-21
   arm64-darwin-22
+  ruby
 
 DEPENDENCIES
   cocoapods (~> 1.11, >= 1.11.2)

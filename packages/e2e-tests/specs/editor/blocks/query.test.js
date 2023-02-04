@@ -31,7 +31,7 @@ describe( 'Query block', () => {
 		await trashAllPosts( 'page' );
 	} );
 	describe( 'Query block insertion', () => {
-		it( 'Carousel', async () => {
+		it( 'List', async () => {
 			await insertBlock( 'Query' );
 			// Wait for the choose pattern button
 			const choosePatternButton = await page.waitForSelector(
@@ -40,64 +40,20 @@ describe( 'Query block', () => {
 			await choosePatternButton.click();
 			// Wait for pattern blocks to be loaded.
 			await page.waitForSelector(
-				'.block-editor-block-pattern-setup__container iframe[title="Editor canvas"]'
+				'.block-library-query-pattern__selection-content iframe[title="Editor canvas"]'
 			);
-			/**
-			 * Ensure that carousel is working by checking slider css classes
-			 * and navigating to the next pattern.
-			 */
-			await page.waitForSelector(
-				'li.pattern-slide.active-slide[aria-label="Query Test 1"]'
+			// Choose the standard pattern.
+			const chosenPattern = await page.waitForSelector(
+				'.block-editor-block-patterns-list__item[aria-label="Standard"]'
 			);
-			const nextPatternButton = await page.waitForSelector(
-				'.block-editor-block-pattern-setup__navigation button[aria-label="Next pattern"]'
-			);
-			await nextPatternButton.click();
-			await page.waitForSelector(
-				'li.pattern-slide.active-slide[aria-label="Query Test 2"]'
-			);
-			// Choose the selected pattern.
-			const chooseButton = await page.waitForXPath(
-				'//div[contains(@class, "block-editor-block-pattern-setup__actions")]//button[text()="Choose"]'
-			);
-			chooseButton.click();
+			chosenPattern.click();
 			// Wait for pattern setup to go away.
-			await page.waitForSelector( '.block-editor-block-pattern-setup', {
-				hidden: true,
-			} );
-			/**
-			 * We can't use `getEditedPostContent` easily for now because
-			 * `query` makes used of `instanceId` so it's not very reliable.
-			 * This should be revisited.
-			 */
-			await page.waitForSelector( '.wp-block-post-date' );
-			await page.waitForSelector( '.wp-block-post-title' );
-		} );
-		it( 'Grid view', async () => {
-			await insertBlock( 'Query' );
-			// Wait for the choose pattern button
-			const choosePatternButton = await page.waitForSelector(
-				'div[data-type="core/query"] button.is-primary'
-			);
-			await choosePatternButton.click();
-			// Wait for patterns setup to be loaded.
 			await page.waitForSelector(
-				'.block-editor-block-pattern-setup__display-controls'
+				'.block-library-query-pattern__selection-content',
+				{
+					hidden: true,
+				}
 			);
-			// Click the Grid view button.
-			const gridViewButton = await page.waitForSelector(
-				'.block-editor-block-pattern-setup__display-controls button[aria-label="Grid view"]'
-			);
-			await gridViewButton.click();
-			// Wait for patterns to be loaded and click the wanted pattern.
-			const gridPattern = await page.waitForSelector(
-				'.block-editor-block-pattern-setup-list__list-item[aria-label="Query Test 2"]'
-			);
-			await gridPattern.click();
-			// Wait for pattern setup to go away.
-			await page.waitForSelector( '.block-editor-block-pattern-setup', {
-				hidden: true,
-			} );
 			/**
 			 * We can't use `getEditedPostContent` easily for now because
 			 * `query` makes used of `instanceId` so it's not very reliable.

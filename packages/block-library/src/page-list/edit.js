@@ -41,7 +41,7 @@ const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
 
 const convertDescription = __(
-	'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking customize below.'
+	'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking "Edit" below.'
 );
 
 function BlockContent( {
@@ -84,15 +84,26 @@ function BlockContent( {
 		const parentPageDetails = pages.find(
 			( page ) => page.id === parentPageID
 		);
+
+		if ( parentPageDetails?.title?.rendered ) {
+			return (
+				<div { ...blockProps }>
+					<Warning>
+						{ sprintf(
+							// translators: %s: Page title.
+							__( 'Page List: "%s" page has no children.' ),
+							parentPageDetails.title.rendered
+						) }
+					</Warning>
+				</div>
+			);
+		}
+
 		return (
 			<div { ...blockProps }>
-				<Warning>
-					{ sprintf(
-						// translators: %s: Page title.
-						__( '"%s" page has no children.' ),
-						parentPageDetails.title.rendered
-					) }
-				</Warning>
+				<Notice status={ 'warning' } isDismissible={ false }>
+					{ __( 'Page List: Cannot retrieve Pages.' ) }
+				</Notice>
 			</div>
 		);
 	}
@@ -116,9 +127,8 @@ function ConvertToLinksModal( { onClick, disabled } ) {
 			</BlockControls>
 			{ isOpen && (
 				<Modal
-					closeLabel={ __( 'Close' ) }
 					onRequestClose={ closeModal }
-					title={ __( 'Customize this menu' ) }
+					title={ __( 'Edit this menu' ) }
 					className={ 'wp-block-page-list-modal' }
 					aria={ {
 						describedby: 'wp-block-page-list-modal__description',
@@ -136,7 +146,7 @@ function ConvertToLinksModal( { onClick, disabled } ) {
 							disabled={ disabled }
 							onClick={ onClick }
 						>
-							{ __( 'Customize' ) }
+							{ __( 'Edit' ) }
 						</Button>
 					</div>
 				</Modal>
@@ -303,18 +313,6 @@ export default function PageListEdit( {
 	return (
 		<>
 			<InspectorControls>
-				{ allowConvertToLinks && (
-					<PanelBody title={ __( 'Customize this menu' ) }>
-						<p>{ convertDescription }</p>
-						<Button
-							variant="primary"
-							disabled={ ! hasResolvedPages }
-							onClick={ convertToNavigationLinks }
-						>
-							{ __( 'Customize' ) }
-						</Button>
-					</PanelBody>
-				) }
 				{ pagesTree.length > 0 && (
 					<PanelBody>
 						<ComboboxControl
@@ -329,6 +327,18 @@ export default function PageListEdit( {
 								'Choose a page to show only its subpages.'
 							) }
 						/>
+					</PanelBody>
+				) }
+				{ allowConvertToLinks && (
+					<PanelBody title={ __( 'Edit this menu' ) }>
+						<p>{ convertDescription }</p>
+						<Button
+							variant="primary"
+							disabled={ ! hasResolvedPages }
+							onClick={ convertToNavigationLinks }
+						>
+							{ __( 'Edit' ) }
+						</Button>
 					</PanelBody>
 				) }
 			</InspectorControls>
