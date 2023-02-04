@@ -75,6 +75,13 @@ export const isMultiplePaletteArray = (
 	);
 };
 
+/**
+ * Transform a CSS variable used as background color into the color value itself.
+ *
+ * @param value   The color value that may be a CSS variable.
+ * @param element The element for which to get the computed style.
+ * @return The background color value computed from a element.
+ */
 export const normalizeColorValue = (
 	value: string | undefined,
 	element: HTMLElement | null
