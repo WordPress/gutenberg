@@ -155,6 +155,7 @@ Flags that the items in this ToolsPanel will be contained within an inner
 wrapper element allowing the panel to lay them out accordingly.
 
 - Required: No
+- Default: `false`
 
 ### `label`: `string`
 
@@ -185,3 +186,4 @@ Advises the `ToolsPanel` that all of its `ToolsPanelItem` children should render
 placeholder content (instead of `null`) when they are toggled off and hidden.
 
 - Required: No
+- Default: `false`

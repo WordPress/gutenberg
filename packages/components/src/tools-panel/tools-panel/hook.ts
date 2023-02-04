@@ -59,8 +59,8 @@ export function useToolsPanel(
 		className,
 		resetAll,
 		panelId,
-		hasInnerWrapper,
-		shouldRenderPlaceholderItems,
+		hasInnerWrapper = false,
+		shouldRenderPlaceholderItems = false,
 		__experimentalFirstVisibleItemClass,
 		__experimentalLastVisibleItemClass,
 		...otherProps
