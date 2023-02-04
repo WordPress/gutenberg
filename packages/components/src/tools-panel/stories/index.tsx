@@ -7,10 +7,14 @@ import styled from '@emotion/styled';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-} from '@wordpress/components';
+	ToggleGroupControl,
+	ToggleGroupControlOption,
+} from '../../toggle-group-control';
 
 /**
  * Internal dependencies
