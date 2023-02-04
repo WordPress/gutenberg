@@ -21,7 +21,7 @@ export function useToolsPanelItem(
 	const {
 		className,
 		hasValue,
-		isShownByDefault,
+		isShownByDefault = false,
 		label,
 		panelId,
 		resetAllFilter = noop,
