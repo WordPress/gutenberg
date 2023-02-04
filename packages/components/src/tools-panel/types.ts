@@ -101,8 +101,10 @@ export type ToolsPanelItem = {
 	 * This prop identifies the current item as being displayed by default. This
 	 * means it will show regardless of whether it has a value set or is toggled
 	 * on in the panel's menu.
+	 *
+	 * @default false
 	 */
-	isShownByDefault: boolean;
+	isShownByDefault?: boolean;
 	/**
 	 * The supplied label is dual purpose. It is used as:
 	 * 1. the human-readable label for the panel's dropdown menu

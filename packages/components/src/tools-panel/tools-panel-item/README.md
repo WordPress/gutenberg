@@ -31,7 +31,8 @@ This prop identifies the current item as being displayed by default. This means
 it will show regardless of whether it has a value set or is toggled on in the
 panel's menu.
 
--   Required: Yes
+-   Required: No
+-   Default: `false`
 
 ### `label`: `string`
 
