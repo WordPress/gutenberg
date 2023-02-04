@@ -23,10 +23,11 @@ export type ToolsPanelProps = {
 	label: string;
 	/**
 	 * If a `panelId` is set, it is passed through the `ToolsPanelContext` and
-	 * used to restrict panel items. Only items with a matching `panelId` will
-	 * be able to register themselves with this panel.
+	 * used to restrict panel items. When a `panelId` is set, items can only
+	 * register themselves if the `panelId` is explicitly `null` or the item's
+	 * `panelId` matches exactly.
 	 */
-	panelId: string;
+	panelId?: string | null;
 	/**
 	 * A function to call when the `Reset all` menu option is selected. This is
 	 * passed through to the panel's header component.
@@ -91,11 +92,12 @@ export type ToolsPanelItem = {
 	 */
 	label: string;
 	/**
-	 * Panel items will ensure they are only registering with their intended
-	 * panel by comparing the `panelId` props set on both the item and the panel
-	 * itself. This allows items to be injected from a shared source.
+	 * Panel items will ensure they are only registering with their intended panel
+	 * by comparing the `panelId` props set on both the item and the panel itself,
+	 * or if the `panelId` is explicitly `null`. This allows items to be injected
+	 * from a shared source.
 	 */
-	panelId: string;
+	panelId?: string | null;
 	/**
 	 * A `ToolsPanel` will collect each item's `resetAllFilter` and pass an
 	 * array of these functions through to the panel's `resetAll` callback. They
@@ -128,7 +130,7 @@ export type ToolsPanelMenuItems = {
 };
 
 export type ToolsPanelContext = {
-	panelId?: string;
+	panelId?: string | null;
 	menuItems: ToolsPanelMenuItems;
 	hasMenuItems: boolean;
 	registerPanelItem: ( item: ToolsPanelItem ) => void;

@@ -58,10 +58,10 @@ A callback to take action when this item is selected in the `ToolsPanel` menu.
 
 -   Required: No
 
-### `panelId`: `string`
+### `panelId`: `string | null`
 
 Panel items will ensure they are only registering with their intended panel by
-comparing the `panelId` props set on both the item and the panel itself. This
+comparing the `panelId` props set on both the item and the panel itself, or if the `panelId` is explicitly `null`. This
 allows items to be injected from a shared source.
 
 -   Required: No

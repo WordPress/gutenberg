@@ -163,7 +163,7 @@ panel's dropdown menu.
 
 - Required: Yes
 
-### `panelId`: `string`
+### `panelId`: `string | null`
 
 If a `panelId` is set, it is passed through the `ToolsPanelContext` and used
 to restrict panel items. When a `panelId` is set, items can only register
