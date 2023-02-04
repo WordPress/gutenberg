@@ -8,7 +8,7 @@ import { act } from 'react-test-renderer';
 /**
  * Internal dependencies
  */
-import { BorderBoxControl } from '../';
+import { BorderBoxControl } from '..';
 
 jest.useFakeTimers();
 
