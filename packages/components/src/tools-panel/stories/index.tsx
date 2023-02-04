@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { ComponentProps, ReactText } from 'react';
 import styled from '@emotion/styled';
 
 /**
@@ -30,10 +31,10 @@ export default {
 };
 
 export const _default = () => {
-	const [ height, setHeight ] = useState();
-	const [ minHeight, setMinHeight ] = useState();
-	const [ width, setWidth ] = useState();
-	const [ scale, setScale ] = useState();
+	const [ height, setHeight ] = useState< string | undefined >();
+	const [ minHeight, setMinHeight ] = useState< string | undefined >();
+	const [ width, setWidth ] = useState< string | undefined >();
+	const [ scale, setScale ] = useState< ReactText | undefined >();
 
 	const resetAll = () => {
 		setHeight( undefined );
@@ -118,8 +119,8 @@ export const _default = () => {
 };
 
 export const WithNonToolsPanelItems = () => {
-	const [ height, setHeight ] = useState();
-	const [ width, setWidth ] = useState();
+	const [ height, setHeight ] = useState< string | undefined >();
+	const [ width, setWidth ] = useState< string | undefined >();
 
 	const resetAll = () => {
 		setHeight( undefined );
@@ -167,10 +168,12 @@ export const WithNonToolsPanelItems = () => {
 	);
 };
 
-export const WithOptionalItemsPlusIcon = ( { isShownByDefault } ) => {
-	const [ height, setHeight ] = useState();
-	const [ width, setWidth ] = useState();
-	const [ minWidth, setMinWidth ] = useState();
+export const WithOptionalItemsPlusIcon = ( {
+	isShownByDefault,
+}: Pick< ComponentProps< typeof ToolsPanelItem >, 'isShownByDefault' > ) => {
+	const [ height, setHeight ] = useState< string | undefined >();
+	const [ width, setWidth ] = useState< string | undefined >();
+	const [ minWidth, setMinWidth ] = useState< string | undefined >();
 
 	const resetAll = () => {
 		setHeight( undefined );
@@ -236,10 +239,15 @@ const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const panelId = 'unique-tools-panel-id';
 
 export const WithSlotFillItems = () => {
-	const [ attributes, setAttributes ] = useState( {} );
+	const [ attributes, setAttributes ] = useState< {
+		width?: string;
+		height?: string;
+	} >( {} );
 	const { width, height } = attributes;
 
-	const resetAll = ( resetFilters = [] ) => {
+	const resetAll: ComponentProps< typeof ToolsPanel >[ 'resetAll' ] = (
+		resetFilters = []
+	) => {
 		let newAttributes = {};
 
 		resetFilters.forEach( ( resetFilter ) => {
@@ -252,7 +260,7 @@ export const WithSlotFillItems = () => {
 		setAttributes( newAttributes );
 	};
 
-	const updateAttribute = ( name, value ) => {
+	const updateAttribute = ( name: string, value?: any ) => {
 		setAttributes( {
 			...attributes,
 			[ name ]: value,
@@ -321,10 +329,15 @@ export const WithSlotFillItems = () => {
 };
 
 export const WithConditionalDefaultControl = () => {
-	const [ attributes, setAttributes ] = useState( {} );
+	const [ attributes, setAttributes ] = useState< {
+		height?: string;
+		scale?: ReactText;
+	} >( {} );
 	const { height, scale } = attributes;
 
-	const resetAll = ( resetFilters = [] ) => {
+	const resetAll: ComponentProps< typeof ToolsPanel >[ 'resetAll' ] = (
+		resetFilters = []
+	) => {
 		let newAttributes = {};
 
 		resetFilters.forEach( ( resetFilter ) => {
@@ -337,7 +350,7 @@ export const WithConditionalDefaultControl = () => {
 		setAttributes( newAttributes );
 	};
 
-	const updateAttribute = ( name, value ) => {
+	const updateAttribute = ( name: string, value?: any ) => {
 		setAttributes( {
 			...attributes,
 			[ name ]: value,
@@ -405,10 +418,15 @@ export const WithConditionalDefaultControl = () => {
 };
 
 export const WithConditionallyRenderedControl = () => {
-	const [ attributes, setAttributes ] = useState( {} );
+	const [ attributes, setAttributes ] = useState< {
+		height?: string;
+		scale?: ReactText;
+	} >( {} );
 	const { height, scale } = attributes;
 
-	const resetAll = ( resetFilters = [] ) => {
+	const resetAll: ComponentProps< typeof ToolsPanel >[ 'resetAll' ] = (
+		resetFilters = []
+	) => {
 		let newAttributes = {};
 
 		resetFilters.forEach( ( resetFilter ) => {
@@ -421,7 +439,7 @@ export const WithConditionallyRenderedControl = () => {
 		setAttributes( newAttributes );
 	};
 
-	const updateAttribute = ( name, value ) => {
+	const updateAttribute = ( name: string, value?: any ) => {
 		setAttributes( {
 			...attributes,
 			[ name ]: value,
