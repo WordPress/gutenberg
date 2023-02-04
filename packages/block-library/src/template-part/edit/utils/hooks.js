@@ -9,7 +9,7 @@ import { kebabCase } from 'lodash';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
@@ -17,28 +17,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { createTemplatePartId } from './create-template-part-id';
-
-function createTemplatePartRecordFromBlocks( area, blocks, title ) {
-	// Currently template parts only allow latin chars.
-	// Fallback slug will receive suffix by default.
-	const cleanSlug =
-		kebabCase( title ).replace( /[^\w-]+/g, '' ) || 'wp-custom-part';
-
-	// If we have `area` set from block attributes, means an exposed
-	// block variation was inserted. So add this prop to the template
-	// part entity on creation. Afterwards remove `area` value from
-	// block attributes.
-	const record = {
-		title,
-		slug: cleanSlug,
-		content: serialize( blocks ),
-		// `area` is filterable on the server and defaults to `UNCATEGORIZED`
-		// if provided value is not allowed.
-		area,
-	};
-
-	return record;
-}
 
 /**
  * Retrieves the available template parts for the given area.
@@ -118,11 +96,23 @@ export function useCreateTemplatePartFromBlocks( area, setAttributes ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	return async ( blocks = [], title = __( 'Untitled Template Part' ) ) => {
-		const record = createTemplatePartRecordFromBlocks(
+		// Currently template parts only allow latin chars.
+		// Fallback slug will receive suffix by default.
+		const cleanSlug =
+			kebabCase( title ).replace( /[^\w-]+/g, '' ) || 'wp-custom-part';
+
+		// If we have `area` set from block attributes, means an exposed
+		// block variation was inserted. So add this prop to the template
+		// part entity on creation. Afterwards remove `area` value from
+		// block attributes.
+		const record = {
+			title,
+			slug: cleanSlug,
+			content: serialize( blocks ),
+			// `area` is filterable on the server and defaults to `UNCATEGORIZED`
+			// if provided value is not allowed.
 			area,
-			blocks,
-			title
-		);
+		};
 
 		const templatePart = await saveEntityRecord(
 			'postType',
@@ -179,25 +169,27 @@ export function useShuffleTemplatePart(
 	templatePartId,
 	setAttributes
 ) {
+	const currentPatternRef = useRef( null );
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
 	);
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
-	const createTemplatePartFromBlocks = useCreateTemplatePartFromBlocks(
-		area,
-		setAttributes
-	);
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
 	return async function shuffleTemplatePart() {
 		const list = [
 			...templateParts,
-			...blockPatterns.filter( ( pattern ) =>
-				templateParts.every(
-					( templatePart ) =>
-						templatePart.content.raw !== serialize( pattern.blocks )
-				)
-			),
+			...blockPatterns.filter( ( pattern ) => {
+				const serializedPatternBlocks = serialize( pattern.blocks );
+				return (
+					pattern.name !== currentPatternRef.current &&
+					templateParts.every(
+						( templatePart ) =>
+							templatePart.content.raw !== serializedPatternBlocks
+					)
+				);
+			} ),
 		];
 		// We explicitly want the randomness here.
 		// eslint-disable-next-line no-restricted-syntax
@@ -213,7 +205,9 @@ export function useShuffleTemplatePart(
 			} );
 		} else {
 			const pattern = randomItem;
-			await createTemplatePartFromBlocks( pattern.blocks, pattern.title );
+			currentPatternRef.current = pattern.name;
+
+			replaceInnerBlocks( clientId, pattern.blocks );
 		}
 	};
 }
