@@ -15,7 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import { ToolsPanel, ToolsPanelItem } from '../';
+import { ToolsPanel, ToolsPanelItem } from '..';
 import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';

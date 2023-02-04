@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
+import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '..';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
