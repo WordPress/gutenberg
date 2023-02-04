@@ -13,6 +13,8 @@ import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
 
+const noop = () => {};
+
 export function useToolsPanelItem(
 	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
 ) {
@@ -22,7 +24,7 @@ export function useToolsPanelItem(
 		isShownByDefault,
 		label,
 		panelId,
-		resetAllFilter,
+		resetAllFilter = noop,
 		onDeselect,
 		onSelect,
 		...otherProps
