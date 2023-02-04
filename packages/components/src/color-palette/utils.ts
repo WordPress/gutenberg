@@ -2,11 +2,9 @@
  * External dependencies
  */
 import type { RefObject } from 'react';
-import type { Colord } from 'colord';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-import mixPlugin from 'colord/plugins/mix';
 
 /**
  * WordPress dependencies
@@ -18,7 +16,7 @@ import { __ } from '@wordpress/i18n';
  */
 import type { ColorObject, ColorPaletteProps, PaletteObject } from './types';
 
-extend( [ namesPlugin, a11yPlugin, mixPlugin ] );
+extend( [ namesPlugin, a11yPlugin ] );
 
 export const extractColorNameFromCurrentValue = (
 	currentValue?: ColorPaletteProps[ 'value' ],
@@ -97,15 +95,4 @@ export const normalizeColorValue = (
 	return computedBackgroundColor
 		? colord( computedBackgroundColor ).toHex()
 		: value;
-};
-
-// Composite with background color behind when the front background color is transparent
-// to get the actual background color.
-export const getCompositeBackgroundColor = (
-	behindColor: Colord,
-	frontColor: Colord
-) => {
-	return frontColor.alpha() < 1
-		? behindColor.mix( frontColor.alpha( 1 ), frontColor.alpha() )
-		: frontColor;
 };

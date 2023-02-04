@@ -5,7 +5,6 @@ import type { ForwardedRef } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-import mixPlugin from 'colord/plugins/mix';
 
 /**
  * WordPress dependencies
@@ -42,13 +41,12 @@ import type { WordPressComponentProps } from '../ui/context';
 import type { DropdownProps } from '../dropdown/types';
 import {
 	extractColorNameFromCurrentValue,
-	getCompositeBackgroundColor,
 	isMultiplePaletteArray,
 	normalizeColorValue,
 	showTransparentBackground,
 } from './utils';
 
-extend( [ namesPlugin, a11yPlugin, mixPlugin ] );
+extend( [ namesPlugin, a11yPlugin ] );
 
 function SinglePalette( {
 	className,
@@ -230,10 +228,7 @@ function UnforwardedColorPalette(
 	);
 
 	const colordColor = colord( normalizedColorValue ?? '' );
-	const compositeColor = getCompositeBackgroundColor(
-		colord( '#fff' ),
-		colordColor
-	);
+
 	const valueWithoutLeadingHash = value?.startsWith( '#' )
 		? value.substring( 1 )
 		: value ?? '';
@@ -284,10 +279,8 @@ function UnforwardedColorPalette(
 									: {
 											background: value,
 											color:
-												compositeColor.contrast() >
-												compositeColor.contrast(
-													'#000'
-												)
+												colordColor.contrast() >
+												colordColor.contrast( '#000' )
 													? '#fff'
 													: '#000',
 									  }
