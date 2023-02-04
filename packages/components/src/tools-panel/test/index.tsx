@@ -21,24 +21,24 @@ const defaultProps = {
 };
 
 // Default props for an enabled control to be rendered within panel.
+let controlValue: boolean | undefined = true;
 const controlProps = {
-	attributes: { value: true },
 	hasValue: jest.fn().mockImplementation( () => {
-		return !! controlProps.attributes.value;
+		return !! controlValue;
 	} ),
 	label: 'Example',
 	onDeselect: jest.fn().mockImplementation( () => {
-		controlProps.attributes.value = undefined;
+		controlValue = undefined;
 	} ),
 	onSelect: jest.fn(),
 };
 
 // Default props without a value for an alternate control to be rendered within
 // the panel.
+let altControlValue: boolean | undefined = false;
 const altControlProps = {
-	attributes: { value: false },
 	hasValue: jest.fn().mockImplementation( () => {
-		return !! altControlProps.attributes.value;
+		return !! altControlValue;
 	} ),
 	label: 'Alt',
 	onDeselect: jest.fn(),
@@ -46,24 +46,24 @@ const altControlProps = {
 };
 
 // Default props for wrapped or grouped panel items.
+let nestedControlValue: boolean | undefined = true;
 const nestedControlProps = {
-	attributes: { value: true },
 	hasValue: jest.fn().mockImplementation( () => {
-		return !! nestedControlProps.attributes.value;
+		return !! nestedControlValue;
 	} ),
 	label: 'Nested Control 1',
 	onDeselect: jest.fn().mockImplementation( () => {
-		nestedControlProps.attributes.value = undefined;
+		nestedControlValue = undefined;
 	} ),
 	onSelect: jest.fn(),
 	isShownByDefault: true,
 };
 
 // Alternative props for wrapped or grouped panel items.
+const altNestedControlValue: boolean | undefined = false;
 const altNestedControlProps = {
-	attributes: { value: false },
 	hasValue: jest.fn().mockImplementation( () => {
-		return !! altNestedControlProps.attributes.value;
+		return !! altNestedControlValue;
 	} ),
 	label: 'Nested Control 2',
 	onDeselect: jest.fn(),
@@ -186,8 +186,8 @@ const selectMenuItem = async ( label ) => {
 
 describe( 'ToolsPanel', () => {
 	afterEach( () => {
-		controlProps.attributes.value = true;
-		altControlProps.attributes.value = false;
+		controlValue = true;
+		altControlValue = false;
 	} );
 
 	describe( 'basic rendering', () => {
@@ -452,10 +452,10 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should render default controls with conditional isShownByDefault', async () => {
+			const linkedControlValue = false;
 			const linkedControlProps = {
-				attributes: { value: false },
 				hasValue: jest.fn().mockImplementation( () => {
-					return !! linkedControlProps.attributes.value;
+					return !! linkedControlValue;
 				} ),
 				label: 'Linked',
 				onDeselect: jest.fn(),
@@ -472,7 +472,7 @@ describe( 'ToolsPanel', () => {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						{ ...linkedControlProps }
-						isShownByDefault={ !! altControlProps.attributes.value }
+						isShownByDefault={ !! altControlValue }
 					>
 						<div>Linked control</div>
 					</ToolsPanelItem>
@@ -501,7 +501,7 @@ describe( 'ToolsPanel', () => {
 			// Simulate the main control having a value set which should
 			// trigger the linked control becoming a default control via the
 			// conditional `isShownByDefault` prop.
-			altControlProps.attributes.value = true;
+			altControlValue = true;
 
 			rerender( <TestPanel /> );
 
@@ -533,10 +533,10 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should handle conditionally rendered default control', async () => {
+			const conditionalControlValue = false;
 			const conditionalControlProps = {
-				attributes: { value: false },
 				hasValue: jest.fn().mockImplementation( () => {
-					return !! conditionalControlProps.attributes.value;
+					return !! conditionalControlValue;
 				} ),
 				label: 'Conditional',
 				onDeselect: jest.fn(),
@@ -551,7 +551,7 @@ describe( 'ToolsPanel', () => {
 					>
 						<div>Default control</div>
 					</ToolsPanelItem>
-					{ !! altControlProps.attributes.value && (
+					{ !! altControlValue && (
 						<ToolsPanelItem
 							{ ...conditionalControlProps }
 							isShownByDefault={ true }
@@ -579,7 +579,7 @@ describe( 'ToolsPanel', () => {
 
 			// Simulate the main control having a value set which will now
 			// render the new default control into the ToolsPanel.
-			altControlProps.attributes.value = true;
+			altControlValue = true;
 
 			rerender( <TestPanel /> );
 
@@ -1031,10 +1031,10 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'panel header icon toggle', () => {
+		const defaultControlsValue = false;
 		const defaultControls = {
-			attributes: { value: false },
 			hasValue: jest.fn().mockImplementation( () => {
-				return !! defaultControls.attributes.value;
+				return !! defaultControlsValue;
 			} ),
 			label: 'Default',
 			onDeselect: jest.fn(),
@@ -1042,10 +1042,10 @@ describe( 'ToolsPanel', () => {
 			isShownByDefault: true,
 		};
 
+		const optionalControlsValue = false;
 		const optionalControls = {
-			attributes: { value: false },
 			hasValue: jest.fn().mockImplementation( () => {
-				return !! optionalControls.attributes.value;
+				return !! optionalControlsValue;
 			} ),
 			label: 'Optional',
 			onDeselect: jest.fn(),
