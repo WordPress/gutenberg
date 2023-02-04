@@ -183,7 +183,7 @@ const openDropdownMenu = async () => {
 };
 
 // Opens dropdown then selects the menu item by label before simulating a click.
-const selectMenuItem = async ( label ) => {
+const selectMenuItem = async ( label: string ) => {
 	const user = userEvent.setup();
 	const menuItem = await screen.findByText( label );
 	await user.click( menuItem );
