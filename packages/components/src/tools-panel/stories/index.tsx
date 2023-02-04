@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { ComponentProps, ReactText } from 'react';
+import type { ComponentMeta } from '@storybook/react';
 import styled from '@emotion/styled';
 
 /**
@@ -25,10 +26,24 @@ import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
-export default {
+const meta: ComponentMeta< typeof ToolsPanel > = {
 	title: 'Components (Experimental)/ToolsPanel',
 	component: ToolsPanel,
+	subcomponents: {
+		ToolsPanelItem,
+	},
+	argTypes: {
+		// TODO
+	},
+	parameters: {
+		actions: { argTypesRegex: '^on.*' },
+		controls: {
+			expanded: true,
+		},
+		docs: { source: { state: 'open' } },
+	},
 };
+export default meta;
 
 export const _default = () => {
 	const [ height, setHeight ] = useState< string | undefined >();
