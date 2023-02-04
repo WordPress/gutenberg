@@ -73,3 +73,4 @@ these functions through to the panel's `resetAll` callback. They can then be
 iterated over to perform additional tasks.
 
 -   Required: No
+-   Default: `() => {}`

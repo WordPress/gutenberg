@@ -123,8 +123,10 @@ export type ToolsPanelItem = {
 	 * A `ToolsPanel` will collect each item's `resetAllFilter` and pass an
 	 * array of these functions through to the panel's `resetAll` callback. They
 	 * can then be iterated over to perform additional tasks.
+	 *
+	 * @default noop
 	 */
-	resetAllFilter: ResetAllFilter;
+	resetAllFilter?: ResetAllFilter;
 };
 
 export type ToolsPanelItemProps = ToolsPanelItem & {
