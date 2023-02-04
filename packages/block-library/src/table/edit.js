@@ -398,7 +398,7 @@ function TableEdit( {
 		},
 	];
 
-	const renderedSections = [ 'head', 'body', 'foot' ].map( ( name ) => (
+	const renderedSections = sections.map( ( name ) => (
 		<TSection name={ name } key={ name }>
 			{ attributes[ name ].map( ( { cells }, rowIndex ) => (
 				<tr key={ rowIndex }>
