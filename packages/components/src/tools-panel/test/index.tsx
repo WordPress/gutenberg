@@ -1119,9 +1119,10 @@ describe( 'ToolsPanel', () => {
 			await openDropdownMenu();
 
 			const resetAllItem = await screen.findByRole( 'menuitem', {
-				disabled: false,
+				name: 'Reset all',
 			} );
 			expect( resetAllItem ).toBeInTheDocument();
+			expect( resetAllItem ).toHaveAttribute( 'aria-disabled', 'false' );
 
 			await selectMenuItem( 'Reset all' );
 
@@ -1130,9 +1131,13 @@ describe( 'ToolsPanel', () => {
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 
 			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
-				disabled: true,
+				name: 'Reset all',
 			} );
 			expect( disabledResetAllItem ).toBeInTheDocument();
+			expect( disabledResetAllItem ).toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
 		} );
 	} );
 
