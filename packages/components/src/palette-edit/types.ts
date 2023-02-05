@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentProps } from 'react';
-
-/**
- * Internal dependencies
- */
-import type Button from '../button';
+import type { MouseEventHandler } from 'react';
 
 export type Color = {
 	color: string;
@@ -28,11 +23,11 @@ export type PaletteEditProps = {
 	 *
 	 * @default []
 	 */
-	colors: Color[];
+	colors?: Color[];
 	/**
 	 * The gradients in the palette.
 	 */
-	gradients: Gradient[];
+	gradients?: Gradient[];
 	/**
 	 * Runs on changing the value.
 	 */
@@ -45,11 +40,19 @@ export type PaletteEditProps = {
 	 * A message to show if there's nothing to edit.
 	 */
 	emptyMessage?: string;
+	/**
+	 * Whether the user can only change the color or gradient values.
+	 * If false, they can change the names and delete values.
+	 */
 	canOnlyChangeValues?: boolean;
+	/**
+	 * Whether you can reset the editor.
+	 */
 	canReset?: boolean;
 	/**
+	 * The prefix for the element slug.
 	 *
-	 * @default '''
+	 * @default ''
 	 */
 	slugPrefix?: SlugPrefix;
 };
@@ -58,35 +61,35 @@ type EditingElement = number | null;
 export type SlugPrefix = string;
 
 export type ColorPickerPopoverProps = {
-	isGradient: boolean;
 	element: PaletteElement;
+	isGradient?: boolean;
 	onChange: ( newElement: PaletteElement ) => void;
-	onClose: () => void;
+	onClose?: () => void;
 };
 
 export type NameInputProps = {
-	value: PaletteElement[ 'name' ];
 	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;
 	label: string;
+	value: PaletteElement[ 'name' ];
 };
 
 export type OptionProps = {
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	element: PaletteElement;
-	onChange: ( newElement: PaletteElement ) => void;
 	isEditing: boolean;
+	isGradient?: boolean;
+	onChange: ( newElement: PaletteElement ) => void;
+	onRemove: MouseEventHandler< HTMLButtonElement >;
 	onStartEditing: () => void;
-	onRemove: ComponentProps< typeof Button >[ 'onClick' ];
 	onStopEditing: () => void;
 	slugPrefix: SlugPrefix;
-	isGradient: boolean;
 };
 
 export type PaletteEditListViewProps = {
-	canOnlyChangeValues: boolean;
-	editingElement: EditingElement;
+	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
+	editingElement?: EditingElement;
 	elements: PaletteElement[];
-	isGradient: boolean;
+	isGradient?: boolean;
 	onChange: ( newElements?: PaletteElement[] ) => void;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
 	slugPrefix: SlugPrefix;

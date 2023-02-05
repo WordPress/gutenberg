@@ -134,7 +134,7 @@ function ColorPickerPopover( {
 						__nextHasNoMargin
 						__experimentalIsRenderedInSidebar
 						value={ element.gradient }
-						onChange={ ( newGradient ) =>
+						onChange={ ( newGradient: Gradient[ 'gradient' ] ) =>
 							onChange( {
 								...element,
 								gradient: newGradient,
@@ -155,7 +155,7 @@ function getIsGradient( element: PaletteElement ): element is Gradient {
 	return 'gradient' in element;
 }
 
-function getValue( element: PaletteElement, isGradient: boolean ) {
+function getValue( element: PaletteElement, isGradient?: boolean ) {
 	if ( isGradient && getIsGradient( element ) ) {
 		return element.gradient;
 	}
@@ -247,7 +247,7 @@ function isTemporaryElement( slugPrefix: string, element: PaletteElement ) {
 	return (
 		regex.test( element.slug ) &&
 		( ( getIsColor( element ) && element.color === DEFAULT_COLOR ) ||
-			( ! getIsColor( element ) &&
+			( getIsGradient( element ) &&
 				!! element.gradient &&
 				element.gradient === DEFAULT_GRADIENT ) )
 	);
@@ -341,11 +341,9 @@ function PaletteEditListView( {
 	);
 }
 
-const EMPTY_ARRAY = [];
-
 export default function PaletteEdit( {
 	gradients,
-	colors = EMPTY_ARRAY,
+	colors = [],
 	onChange,
 	paletteLabel,
 	emptyMessage,
@@ -356,9 +354,9 @@ export default function PaletteEdit( {
 	const isGradient = !! gradients;
 	const elements = isGradient ? gradients : colors;
 	const [ isEditing, setIsEditing ] = useState( false );
-	const [ editingElement, setEditingElement ] = useState< number | null >(
-		null
-	);
+	const [ editingElement, setEditingElement ] = useState<
+		number | null | undefined
+	>( null );
 	const isAdding =
 		isEditing &&
 		!! editingElement &&
@@ -368,11 +366,28 @@ export default function PaletteEdit( {
 	const hasElements = elementsLength > 0;
 	const debounceOnChange = useDebounce( onChange, 100 );
 	const onSelectPaletteItem = useCallback(
-		( value: PaletteElement, newEditingElementIndex: number ) => {
+		(
+			value?: PaletteElement[ keyof PaletteElement ],
+			newEditingElementIndex?: number
+		) => {
+			if ( ! newEditingElementIndex ) {
+				return;
+			}
+
 			const selectedElement = elements[ newEditingElementIndex ];
-			const key = isGradient ? 'gradient' : 'color';
 			// Ensures that the index returned matches a known element value.
-			if ( !! selectedElement && selectedElement[ key ] === value ) {
+			if (
+				!! selectedElement &&
+				isGradient &&
+				getIsGradient( selectedElement ) &&
+				selectedElement.gradient === value
+			) {
+				setEditingElement( newEditingElementIndex );
+			} else if (
+				!! selectedElement &&
+				getIsColor( selectedElement ) &&
+				selectedElement.color === value
+			) {
 				setEditingElement( newEditingElementIndex );
 			} else {
 				setIsEditing( true );
@@ -446,7 +461,7 @@ export default function PaletteEdit( {
 									isSmall: true,
 								} }
 							>
-								{ ( { onClose } ) => (
+								{ ( { onClose }: { onClose: () => void } ) => (
 									<>
 										<NavigableMenu role="menu">
 											{ ! isEditing && (
@@ -537,11 +552,12 @@ export default function PaletteEdit( {
 									)
 								);
 							} }
-							element={ elements[ editingElement ] }
+							element={ elements[ editingElement ?? -1 ] }
 						/>
 					) }
 					{ ! isEditing &&
 						( isGradient ? (
+							// @ts-expect-error TODO: Remove when GradientPicker is refactored to TS.
 							<GradientPicker
 								__nextHasNoMargin
 								gradients={ gradients }
