@@ -3,6 +3,7 @@
  */
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import type { ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -21,6 +22,7 @@ import { FlexItem } from '../../../flex';
 import { HStack } from '../../../h-stack';
 import { Item, ItemGroup } from '../../../item-group';
 import { ToolsPanel, ToolsPanelItem, ToolsPanelContext } from '../..';
+import type { ToolsPanelContext as ToolsPanelContextType } from '../../types';
 import {
 	createSlotFill,
 	Provider as SlotFillProvider,
@@ -45,7 +47,6 @@ const colors = [
 	{ name: 'Yellow 10', color: '#f2d675' },
 	{ name: 'Yellow 40', color: '#bd8600' },
 ];
-const panelId = 'unique-tools-panel-id';
 
 const { Fill, Slot } = createSlotFill( 'ToolsPanelSlot' );
 
@@ -62,10 +63,10 @@ const { Fill, Slot } = createSlotFill( 'ToolsPanelSlot' );
 // This custom fill is required to re-establish the ToolsPanelContext for
 // injected ToolsPanelItem components as they will not have access to the React
 // Context as the Provider is part of the ToolsPanelItems.Slot tree.
-const ToolsPanelItems = ( { children } ) => {
+const ToolsPanelItems = ( { children }: { children: React.ReactNode } ) => {
 	return (
 		<Fill>
-			{ ( fillProps ) => (
+			{ ( fillProps: ToolsPanelContextType ) => (
 				<ToolsPanelContext.Provider value={ fillProps }>
 					{ children }
 				</ToolsPanelContext.Provider>
@@ -76,7 +77,13 @@ const ToolsPanelItems = ( { children } ) => {
 
 // This fetches the ToolsPanelContext and passes it through `fillProps` so that
 // rendered fills can re-establish the `ToolsPanelContext.Provider`.
-const SlotContainer = ( { Slot: ToolsPanelSlot, ...props } ) => {
+const SlotContainer = ( {
+	Slot: ToolsPanelSlot,
+	...props
+}: {
+	Slot: React.ElementType;
+	[ key: string ]: any;
+} ) => {
 	const toolsPanelContext = useContext( ToolsPanelContext );
 
 	return (
@@ -90,49 +97,83 @@ const SlotContainer = ( { Slot: ToolsPanelSlot, ...props } ) => {
 
 // This wraps the slot with a `ToolsPanel` mimicking a real-world use case from
 // the block editor.
-ToolsPanelItems.Slot = ( { resetAll, ...props } ) => (
+ToolsPanelItems.Slot = ( {
+	resetAll,
+	panelId,
+	label,
+	hasInnerWrapper,
+	shouldRenderPlaceholderItems,
+	__experimentalFirstVisibleItemClass,
+	__experimentalLastVisibleItemClass,
+	...props
+}: React.ComponentProps< typeof ToolsPanel > & {
+	[ key: string ]: any;
+} ) => (
 	<ToolsPanel
-		label="Tools Panel with Item Group"
+		label={ label }
 		resetAll={ resetAll }
 		panelId={ panelId }
-		hasInnerWrapper={ true }
-		shouldRenderPlaceholderItems={ true }
-		__experimentalFirstVisibleItemClass="first"
-		__experimentalLastVisibleItemClass="last"
+		hasInnerWrapper={ hasInnerWrapper }
+		shouldRenderPlaceholderItems={ shouldRenderPlaceholderItems }
+		__experimentalFirstVisibleItemClass={
+			__experimentalFirstVisibleItemClass
+		}
+		__experimentalLastVisibleItemClass={
+			__experimentalLastVisibleItemClass
+		}
 	>
 		<SlotContainer { ...props } Slot={ Slot } />
 	</ToolsPanel>
 );
 
-export const ToolsPanelWithItemGroupSlot = () => {
-	const [ attributes, setAttributes ] = useState( {} );
+export const ToolsPanelWithItemGroupSlot: ComponentStory<
+	typeof ToolsPanel
+> = ( { resetAll: resetAllProp, panelId, ...props } ) => {
+	const [ attributes, setAttributes ] = useState< {
+		text?: string;
+		background?: string;
+		link?: string;
+	} >( {} );
 	const { text, background, link } = attributes;
 
 	const cx = useCx();
 	const slotWrapperClassName = cx( SlotWrapper );
 	const itemClassName = cx( ToolsPanelItemClass );
 
-	const resetAll = ( resetFilters = [] ) => {
+	const resetAll: typeof resetAllProp = ( resetFilters = [] ) => {
 		let newAttributes = {};
 
 		resetFilters.forEach( ( resetFilter ) => {
 			newAttributes = {
 				...newAttributes,
+				// TODO: the `ResetFilter` type doesn't specify any attributes
+				// and doesn't return any objects
+				// @ts-ignore
 				...resetFilter( newAttributes ),
 			};
 		} );
 
 		setAttributes( newAttributes );
+
+		resetAllProp( resetFilters );
 	};
 
-	const updateAttribute = ( name, value ) => {
+	const updateAttribute = ( name: string, value?: any ) => {
 		setAttributes( {
 			...attributes,
 			[ name ]: value,
 		} );
 	};
 
-	const ToolsPanelColorDropdown = ( { attribute, label, value } ) => {
+	const ToolsPanelColorDropdown = ( {
+		attribute,
+		label,
+		value,
+	}: {
+		attribute: string;
+		label: string;
+		value?: string;
+	} ) => {
 		return (
 			<ToolsPanelItem
 				className={ itemClassName }
@@ -173,12 +214,16 @@ export const ToolsPanelWithItemGroupSlot = () => {
 			<PanelWrapperView>
 				<Panel>
 					<ToolsPanelItems.Slot
+						{ ...props }
+						// Not sure how to type this
+						// @ts-expect-error
 						as={ ItemGroup }
 						isBordered
 						isSeparated
 						isRounded={ false }
 						className={ slotWrapperClassName }
 						resetAll={ resetAll }
+						panelId={ panelId }
 					/>
 				</Panel>
 			</PanelWrapperView>
@@ -203,6 +248,14 @@ export const ToolsPanelWithItemGroupSlot = () => {
 			</ToolsPanelItems>
 		</SlotFillProvider>
 	);
+};
+ToolsPanelWithItemGroupSlot.args = {
+	label: 'Tools Panel with Item Group',
+	panelId: 'unique-tools-panel-id',
+	hasInnerWrapper: true,
+	shouldRenderPlaceholderItems: true,
+	__experimentalFirstVisibleItemClass: 'first',
+	__experimentalLastVisibleItemClass: 'last',
 };
 
 const PanelWrapperView = styled.div`
