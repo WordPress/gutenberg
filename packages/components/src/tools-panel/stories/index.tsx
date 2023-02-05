@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentProps, ReactText } from 'react';
-import type { ComponentMeta } from '@storybook/react';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import styled from '@emotion/styled';
 
 /**
@@ -33,7 +32,10 @@ const meta: ComponentMeta< typeof ToolsPanel > = {
 		ToolsPanelItem,
 	},
 	argTypes: {
-		// TODO
+		as: { control: { type: null } },
+		children: { control: { type: null } },
+		panelId: { control: { type: null } },
+		resetAll: { action: 'resetAll' },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
@@ -45,26 +47,27 @@ const meta: ComponentMeta< typeof ToolsPanel > = {
 };
 export default meta;
 
-export const _default = () => {
+export const Default: ComponentStory< typeof ToolsPanel > = ( {
+	resetAll: resetAllProp,
+	...props
+} ) => {
 	const [ height, setHeight ] = useState< string | undefined >();
 	const [ minHeight, setMinHeight ] = useState< string | undefined >();
 	const [ width, setWidth ] = useState< string | undefined >();
-	const [ scale, setScale ] = useState< ReactText | undefined >();
+	const [ scale, setScale ] = useState< React.ReactText | undefined >();
 
-	const resetAll = () => {
+	const resetAll: typeof resetAllProp = ( filters ) => {
 		setHeight( undefined );
 		setWidth( undefined );
 		setMinHeight( undefined );
 		setScale( undefined );
+		resetAllProp( filters );
 	};
 
 	return (
 		<PanelWrapperView>
 			<Panel>
-				<ToolsPanel
-					label="Tools Panel (default example)"
-					resetAll={ resetAll }
-				>
+				<ToolsPanel { ...props } resetAll={ resetAll }>
 					<SingleColumnItem
 						hasValue={ () => !! width }
 						label="Width"
@@ -132,23 +135,27 @@ export const _default = () => {
 		</PanelWrapperView>
 	);
 };
+Default.args = {
+	label: 'Tools Panel (default example)',
+};
 
-export const WithNonToolsPanelItems = () => {
+export const WithNonToolsPanelItems: ComponentStory< typeof ToolsPanel > = ( {
+	resetAll: resetAllProp,
+	...props
+} ) => {
 	const [ height, setHeight ] = useState< string | undefined >();
 	const [ width, setWidth ] = useState< string | undefined >();
 
-	const resetAll = () => {
+	const resetAll: typeof resetAllProp = ( filters ) => {
 		setHeight( undefined );
 		setWidth( undefined );
+		resetAll( filters );
 	};
 
 	return (
 		<PanelWrapperView>
 			<Panel>
-				<ToolsPanel
-					label="ToolsPanel (with non-menu items)"
-					resetAll={ resetAll }
-				>
+				<ToolsPanel { ...props } resetAll={ resetAll }>
 					<IntroText>
 						This text illustrates not all items must be wrapped in a
 						ToolsPanelItem and represented in the panel menu.
@@ -182,35 +189,47 @@ export const WithNonToolsPanelItems = () => {
 		</PanelWrapperView>
 	);
 };
+WithNonToolsPanelItems.args = {
+	...Default.args,
+	label: 'ToolsPanel (with non-menu items)',
+};
 
-export const WithOptionalItemsPlusIcon = ( {
-	isShownByDefault,
-}: Pick< ComponentProps< typeof ToolsPanelItem >, 'isShownByDefault' > ) => {
+export const WithOptionalItemsPlusIcon: ComponentStory<
+	typeof ToolsPanel
+> = ( {
+	// This is an extra prop that is passed to one underlying `ToolsPanelItem` to
+	// showcase the differences in `ToolsPanel` when all items are optional or not
+	// @ts-expect-error
+	isFirstToolsPanelItemShownByDefault,
+	resetAll: resetAllProp,
+	...props
+} ) => {
 	const [ height, setHeight ] = useState< string | undefined >();
 	const [ width, setWidth ] = useState< string | undefined >();
 	const [ minWidth, setMinWidth ] = useState< string | undefined >();
 
-	const resetAll = () => {
+	const resetAll: typeof resetAllProp = ( filters ) => {
 		setHeight( undefined );
 		setWidth( undefined );
 		setMinWidth( undefined );
+		resetAll( filters );
 	};
 
 	return (
 		<PanelWrapperView>
 			<Panel>
 				<ToolsPanel
-					label="Tools Panel (optional items only)"
+					{ ...props }
 					resetAll={ resetAll }
-					// Why is `key` used here?
-					// @ts-ignore
-					key={ isShownByDefault }
+					// `key` property here is used as a hack to force `ToolsPanel` to re-render
+					// See https://github.com/WordPress/gutenberg/pull/38262/files#r793422991
+					key={ isFirstToolsPanelItemShownByDefault }
 				>
 					<SingleColumnItem
 						hasValue={ () => !! minWidth }
 						label="Minimum width"
 						onDeselect={ () => setMinWidth( undefined ) }
-						isShownByDefault={ isShownByDefault }
+						isShownByDefault={ isFirstToolsPanelItemShownByDefault }
 					>
 						<UnitControl
 							label="Minimum width"
@@ -249,22 +268,28 @@ export const WithOptionalItemsPlusIcon = ( {
 };
 
 WithOptionalItemsPlusIcon.args = {
-	isShownByDefault: false,
+	...Default.args,
+	label: 'Tools Panel (optional items only)',
+	// This is an extra prop that is passed to one underlying `ToolsPanelItem` to
+	// showcase the differences in `ToolsPanel` when all items are optional or not
+	// @ts-expect-error
+	isFirstToolsPanelItemShownByDefault: false,
 };
 
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
-const panelId = 'unique-tools-panel-id';
 
-export const WithSlotFillItems = () => {
+export const WithSlotFillItems: ComponentStory< typeof ToolsPanel > = ( {
+	resetAll: resetAllProp,
+	panelId,
+	...props
+} ) => {
 	const [ attributes, setAttributes ] = useState< {
 		width?: string;
 		height?: string;
 	} >( {} );
 	const { width, height } = attributes;
 
-	const resetAll: ComponentProps< typeof ToolsPanel >[ 'resetAll' ] = (
-		resetFilters = []
-	) => {
+	const resetAll: typeof resetAllProp = ( resetFilters = [] ) => {
 		let newAttributes = {};
 
 		resetFilters.forEach( ( resetFilter ) => {
@@ -278,6 +303,7 @@ export const WithSlotFillItems = () => {
 		} );
 
 		setAttributes( newAttributes );
+		resetAllProp( resetFilters );
 	};
 
 	const updateAttribute = ( name: string, value?: any ) => {
@@ -336,7 +362,7 @@ export const WithSlotFillItems = () => {
 			<PanelWrapperView>
 				<Panel>
 					<ToolsPanel
-						label="Tools Panel With SlotFill Items"
+						{ ...props }
 						resetAll={ resetAll }
 						panelId={ panelId }
 					>
@@ -347,17 +373,22 @@ export const WithSlotFillItems = () => {
 		</SlotFillProvider>
 	);
 };
+WithSlotFillItems.args = {
+	...Default.args,
+	label: 'Tools Panel With SlotFill Items',
+	panelId: 'unique-tools-panel-id',
+};
 
-export const WithConditionalDefaultControl = () => {
+export const WithConditionalDefaultControl: ComponentStory<
+	typeof ToolsPanel
+> = ( { resetAll: resetAllProp, panelId, ...props } ) => {
 	const [ attributes, setAttributes ] = useState< {
 		height?: string;
-		scale?: ReactText;
+		scale?: React.ReactText;
 	} >( {} );
 	const { height, scale } = attributes;
 
-	const resetAll: ComponentProps< typeof ToolsPanel >[ 'resetAll' ] = (
-		resetFilters = []
-	) => {
+	const resetAll: typeof resetAllProp = ( resetFilters = [] ) => {
 		let newAttributes = {};
 
 		resetFilters.forEach( ( resetFilter ) => {
@@ -371,6 +402,8 @@ export const WithConditionalDefaultControl = () => {
 		} );
 
 		setAttributes( newAttributes );
+
+		resetAllProp( resetFilters );
 	};
 
 	const updateAttribute = ( name: string, value?: any ) => {
@@ -428,7 +461,7 @@ export const WithConditionalDefaultControl = () => {
 			<PanelWrapperView>
 				<Panel>
 					<ToolsPanel
-						label="Tools Panel With Conditional Default via SlotFill"
+						{ ...props }
 						resetAll={ resetAll }
 						panelId={ panelId }
 					>
@@ -439,17 +472,22 @@ export const WithConditionalDefaultControl = () => {
 		</SlotFillProvider>
 	);
 };
+WithConditionalDefaultControl.args = {
+	...Default.args,
+	label: 'Tools Panel With Conditional Default via SlotFill',
+	panelId: 'unique-tools-panel-id',
+};
 
-export const WithConditionallyRenderedControl = () => {
+export const WithConditionallyRenderedControl: ComponentStory<
+	typeof ToolsPanel
+> = ( { resetAll: resetAllProp, panelId, ...props } ) => {
 	const [ attributes, setAttributes ] = useState< {
 		height?: string;
-		scale?: ReactText;
+		scale?: React.ReactText;
 	} >( {} );
 	const { height, scale } = attributes;
 
-	const resetAll: ComponentProps< typeof ToolsPanel >[ 'resetAll' ] = (
-		resetFilters = []
-	) => {
+	const resetAll: typeof resetAllProp = ( resetFilters = [] ) => {
 		let newAttributes = {};
 
 		resetFilters.forEach( ( resetFilter ) => {
@@ -463,6 +501,8 @@ export const WithConditionallyRenderedControl = () => {
 		} );
 
 		setAttributes( newAttributes );
+
+		resetAllProp( resetFilters );
 	};
 
 	const updateAttribute = ( name: string, value?: any ) => {
@@ -533,7 +573,7 @@ export const WithConditionallyRenderedControl = () => {
 			<PanelWrapperView>
 				<Panel>
 					<ToolsPanel
-						label="Tools Panel With Conditionally Rendered Item via SlotFill"
+						{ ...props }
 						resetAll={ resetAll }
 						panelId={ panelId }
 					>
@@ -543,6 +583,11 @@ export const WithConditionallyRenderedControl = () => {
 			</PanelWrapperView>
 		</SlotFillProvider>
 	);
+};
+WithConditionallyRenderedControl.args = {
+	...Default.args,
+	label: 'Tools Panel With Conditionally Rendered Item via SlotFill',
+	panelId: 'unique-tools-panel-id',
 };
 
 export { ToolsPanelWithItemGroupSlot } from './utils/tools-panel-with-item-group-slot';
