@@ -248,7 +248,6 @@ function isTemporaryElement( slugPrefix: string, element: PaletteElement ) {
 		regex.test( element.slug ) &&
 		( ( getIsColor( element ) && element.color === DEFAULT_COLOR ) ||
 			( getIsGradient( element ) &&
-				!! element.gradient &&
 				element.gradient === DEFAULT_GRADIENT ) )
 	);
 }
@@ -375,18 +374,17 @@ export default function PaletteEdit( {
 			}
 
 			const selectedElement = elements[ newEditingElementIndex ];
+			if ( ! selectedElement ) {
+				return;
+			}
+
 			// Ensures that the index returned matches a known element value.
 			if (
-				!! selectedElement &&
-				isGradient &&
-				getIsGradient( selectedElement ) &&
-				selectedElement.gradient === value
-			) {
-				setEditingElement( newEditingElementIndex );
-			} else if (
-				!! selectedElement &&
-				getIsColor( selectedElement ) &&
-				selectedElement.color === value
+				( isGradient &&
+					getIsGradient( selectedElement ) &&
+					selectedElement.gradient === value ) ||
+				( getIsColor( selectedElement ) &&
+					selectedElement.color === value )
 			) {
 				setEditingElement( newEditingElementIndex );
 			} else {
