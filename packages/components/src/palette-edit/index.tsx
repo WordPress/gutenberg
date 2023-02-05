@@ -147,14 +147,12 @@ function ColorPickerPopover( {
 	);
 }
 
-function getIsColor( paletteElement: PaletteElement ): paletteElement is Color {
-	return 'color' in paletteElement;
+function getIsColor( element: PaletteElement ): element is Color {
+	return 'color' in element;
 }
 
-function getIsGradient(
-	paletteElement: PaletteElement
-): paletteElement is Gradient {
-	return 'gradient' in paletteElement;
+function getIsGradient( element: PaletteElement ): element is Gradient {
+	return 'gradient' in element;
 }
 
 function getValue( element: PaletteElement, isGradient: boolean ) {
@@ -244,18 +242,14 @@ function Option( {
 	);
 }
 
-function isTemporaryElement(
-	slugPrefix: string,
-	paletteElement: PaletteElement
-) {
+function isTemporaryElement( slugPrefix: string, element: PaletteElement ) {
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	return (
-		regex.test( paletteElement.slug ) &&
-		( ( getIsColor( paletteElement ) &&
-			paletteElement.color === DEFAULT_COLOR ) ||
-			( ! getIsColor( paletteElement ) &&
-				!! paletteElement.gradient &&
-				paletteElement.gradient === DEFAULT_GRADIENT ) )
+		regex.test( element.slug ) &&
+		( ( getIsColor( element ) && element.color === DEFAULT_COLOR ) ||
+			( ! getIsColor( element ) &&
+				!! element.gradient &&
+				element.gradient === DEFAULT_GRADIENT ) )
 	);
 }
 
