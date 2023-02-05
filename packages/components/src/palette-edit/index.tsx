@@ -369,7 +369,7 @@ export default function PaletteEdit( {
 			value?: PaletteElement[ keyof PaletteElement ],
 			newEditingElementIndex?: number
 		) => {
-			if ( ! newEditingElementIndex ) {
+			if ( undefined === newEditingElementIndex ) {
 				return;
 			}
 
@@ -380,8 +380,8 @@ export default function PaletteEdit( {
 
 			// Ensures that the index returned matches a known element value.
 			if (
-				( isGradient &&
-					getIsGradient( selectedElement ) &&
+				( getIsGradient( selectedElement ) &&
+					isGradient &&
 					selectedElement.gradient === value ) ||
 				( getIsColor( selectedElement ) &&
 					selectedElement.color === value )
