@@ -42,6 +42,7 @@ import {
 import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
+import { PaletteEditProps } from './types';
 
 const DEFAULT_COLOR = '#000';
 
@@ -317,14 +318,16 @@ export default function PaletteEdit( {
 	canOnlyChangeValues,
 	canReset,
 	slugPrefix = '',
-} ) {
+}: PaletteEditProps ) {
 	const isGradient = !! gradients;
 	const elements = isGradient ? gradients : colors;
 	const [ isEditing, setIsEditing ] = useState( false );
-	const [ editingElement, setEditingElement ] = useState( null );
+	const [ editingElement, setEditingElement ] = useState< number | null >(
+		null
+	);
 	const isAdding =
 		isEditing &&
-		editingElement &&
+		!! editingElement &&
 		elements[ editingElement ] &&
 		! elements[ editingElement ].slug;
 	const elementsLength = elements.length;

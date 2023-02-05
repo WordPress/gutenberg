@@ -6,7 +6,7 @@ import { render, fireEvent, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import PaletteEdit, { getNameForPosition } from '../';
+import PaletteEdit, { getNameForPosition } from '..';
 
 describe( 'getNameForPosition', () => {
 	test( 'should return 1 by default', () => {
