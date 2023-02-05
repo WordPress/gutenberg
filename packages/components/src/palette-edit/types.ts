@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { MouseEventHandler } from 'react';
+import type { Key, MouseEventHandler } from 'react';
 
 export type Color = {
 	color: string;
@@ -31,7 +31,7 @@ export type PaletteEditProps = {
 	/**
 	 * Runs on changing the value.
 	 */
-	onChange: ( newColors?: Array< PaletteElement > ) => void;
+	onChange: ( newElements?: PaletteElement[] ) => void;
 	/**
 	 * A heading label for the palette.
 	 */
@@ -42,11 +42,11 @@ export type PaletteEditProps = {
 	emptyMessage?: string;
 	/**
 	 * Whether the user can only change the color or gradient values.
-	 * If false, they can change the names and delete values.
+	 * If true, they cannot change names or delete values.
 	 */
 	canOnlyChangeValues?: boolean;
 	/**
-	 * Whether you can reset the editor.
+	 * Whether the user can reset the editor.
 	 */
 	canReset?: boolean;
 	/**
@@ -78,6 +78,7 @@ export type OptionProps = {
 	element: PaletteElement;
 	isEditing: boolean;
 	isGradient?: boolean;
+	key: Key;
 	onChange: ( newElement: PaletteElement ) => void;
 	onRemove: MouseEventHandler< HTMLButtonElement >;
 	onStartEditing: () => void;
