@@ -42,7 +42,12 @@ import {
 import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
-import { PaletteEditProps } from './types';
+import {
+	Color,
+	PaletteEditListViewProps,
+	PaletteEditProps,
+	PaletteElement,
+} from './types';
 
 const DEFAULT_COLOR = '#000';
 
@@ -210,12 +215,22 @@ function Option( {
 	);
 }
 
-function isTemporaryElement( slugPrefix, { slug, color, gradient } ) {
+function isColor( paletteEntity: PaletteElement ): paletteEntity is Color {
+	return 'color' in paletteEntity;
+}
+
+function isTemporaryElement(
+	slugPrefix: string,
+	paletteEntity: PaletteElement
+) {
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	return (
-		regex.test( slug ) &&
-		( ( !! color && color === DEFAULT_COLOR ) ||
-			( !! gradient && gradient === DEFAULT_GRADIENT ) )
+		regex.test( paletteEntity.slug ) &&
+		( ( isColor( paletteEntity ) &&
+			paletteEntity.color === DEFAULT_COLOR ) ||
+			( ! isColor( paletteEntity ) &&
+				!! paletteEntity.gradient &&
+				paletteEntity.gradient === DEFAULT_GRADIENT ) )
 	);
 }
 
@@ -227,17 +242,17 @@ function PaletteEditListView( {
 	canOnlyChangeValues,
 	slugPrefix,
 	isGradient,
-} ) {
+}: PaletteEditListViewProps ) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
-	const elementsReference = useRef();
+	const elementsReference = useRef< PaletteElement[] >();
 	useEffect( () => {
 		elementsReference.current = elements;
 	}, [ elements ] );
 	useEffect( () => {
 		return () => {
 			if (
-				elementsReference.current.some( ( element, index ) =>
-					isTemporaryElement( slugPrefix, element, index )
+				elementsReference.current?.some( ( element ) =>
+					isTemporaryElement( slugPrefix, element )
 				)
 			) {
 				const newElements = elementsReference.current.filter(
