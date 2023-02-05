@@ -57,14 +57,17 @@ export type PaletteEditProps = {
 type EditingElement = number | null;
 export type SlugPrefix = string;
 
-export type PaletteEditListViewProps = {
-	canOnlyChangeValues: boolean;
-	editingElement: EditingElement;
-	elements: PaletteElement[];
+export type ColorPickerPopoverProps = {
 	isGradient: boolean;
-	onChange: ( newElements?: PaletteElement[] ) => void;
-	setEditingElement: ( newEditingElement?: EditingElement ) => void;
-	slugPrefix: SlugPrefix;
+	element: PaletteElement;
+	onChange: ( newElement: PaletteElement ) => void;
+	onClose: () => void;
+};
+
+export type NameInputProps = {
+	value: PaletteElement[ 'name' ];
+	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;
+	label: string;
 };
 
 export type OptionProps = {
@@ -79,8 +82,12 @@ export type OptionProps = {
 	isGradient: boolean;
 };
 
-export type NameInputProps = {
-	value: PaletteElement[ 'name' ];
-	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;
-	label: string;
+export type PaletteEditListViewProps = {
+	canOnlyChangeValues: boolean;
+	editingElement: EditingElement;
+	elements: PaletteElement[];
+	isGradient: boolean;
+	onChange: ( newElements?: PaletteElement[] ) => void;
+	setEditingElement: ( newEditingElement?: EditingElement ) => void;
+	slugPrefix: SlugPrefix;
 };

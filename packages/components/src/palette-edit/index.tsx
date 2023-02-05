@@ -44,6 +44,7 @@ import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
 import type {
 	Color,
+	ColorPickerPopoverProps,
 	Gradient,
 	NameInputProps,
 	OptionProps,
@@ -107,7 +108,7 @@ function ColorPickerPopover( {
 	element,
 	onChange,
 	onClose = () => {},
-} ) {
+}: ColorPickerPopoverProps ) {
 	return (
 		<Popover
 			placement="left-start"
@@ -115,7 +116,7 @@ function ColorPickerPopover( {
 			className="components-palette-edit__popover"
 			onClose={ onClose }
 		>
-			{ ! isGradient && (
+			{ ! isGradient && getIsColor( element ) && (
 				<ColorPicker
 					color={ element.color }
 					enableAlpha
@@ -127,7 +128,7 @@ function ColorPickerPopover( {
 					}
 				/>
 			) }
-			{ isGradient && (
+			{ isGradient && getIsGradient( element ) && (
 				<div className="components-palette-edit__popover-gradient-picker">
 					<CustomGradientPicker
 						__nextHasNoMargin
