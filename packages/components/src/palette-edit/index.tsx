@@ -42,16 +42,20 @@ import {
 import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
-import {
+import type {
 	Color,
+	Gradient,
+	NameInputProps,
+	OptionProps,
 	PaletteEditListViewProps,
 	PaletteEditProps,
 	PaletteElement,
+	SlugPrefix,
 } from './types';
 
 const DEFAULT_COLOR = '#000';
 
-function NameInput( { value, onChange, label } ) {
+function NameInput( { value, onChange, label }: NameInputProps ) {
 	return (
 		<NameInputControl
 			label={ label }
@@ -68,12 +72,15 @@ function NameInput( { value, onChange, label } ) {
  * It expects slugs to be in the format: slugPrefix + color- + number.
  * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
  *
- * @param {string} elements   An array of color palette items.
- * @param {string} slugPrefix The slug prefix used to match the element slug.
+ * @param elements An array of color palette items.
+ * @param slugPrefix The slug prefix used to match the element slug.
  *
- * @return {string} A unique name for a palette item.
+ * @return A unique name for a palette item.
  */
-export function getNameForPosition( elements, slugPrefix ) {
+export function getNameForPosition(
+	elements: PaletteElement[],
+	slugPrefix: SlugPrefix
+) {
 	const temporaryNameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	const position = elements.reduce( ( previousValue, currentValue ) => {
 		if ( typeof currentValue?.slug === 'string' ) {
@@ -149,9 +156,15 @@ function Option( {
 	onStopEditing,
 	slugPrefix,
 	isGradient,
-} ) {
+}: OptionProps ) {
 	const focusOutsideProps = useFocusOutside( onStopEditing );
-	const value = isGradient ? element.gradient : element.color;
+	let value: Color[ 'color' ] | Gradient[ 'gradient' ];
+
+	if ( isGradient && getIsGradient( element ) ) {
+		value = element.gradient;
+	} else if ( getIsColor( element ) ) {
+		value = element.color;
+	}
 
 	return (
 		<PaletteItem
@@ -181,10 +194,10 @@ function Option( {
 									: __( 'Color name' )
 							}
 							value={ element.name }
-							onChange={ ( nextName ) =>
+							onChange={ ( nextName?: string ) =>
 								onChange( {
 									...element,
-									name: nextName,
+									name: nextName ?? '',
 									slug: slugPrefix + kebabCase( nextName ),
 								} )
 							}
@@ -215,22 +228,28 @@ function Option( {
 	);
 }
 
-function isColor( paletteEntity: PaletteElement ): paletteEntity is Color {
-	return 'color' in paletteEntity;
+function getIsColor( paletteElement: PaletteElement ): paletteElement is Color {
+	return 'color' in paletteElement;
+}
+
+function getIsGradient(
+	paletteElement: PaletteElement
+): paletteElement is Gradient {
+	return 'gradient' in paletteElement;
 }
 
 function isTemporaryElement(
 	slugPrefix: string,
-	paletteEntity: PaletteElement
+	paletteElement: PaletteElement
 ) {
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	return (
-		regex.test( paletteEntity.slug ) &&
-		( ( isColor( paletteEntity ) &&
-			paletteEntity.color === DEFAULT_COLOR ) ||
-			( ! isColor( paletteEntity ) &&
-				!! paletteEntity.gradient &&
-				paletteEntity.gradient === DEFAULT_GRADIENT ) )
+		regex.test( paletteElement.slug ) &&
+		( ( getIsColor( paletteElement ) &&
+			paletteElement.color === DEFAULT_COLOR ) ||
+			( ! getIsColor( paletteElement ) &&
+				!! paletteElement.gradient &&
+				paletteElement.gradient === DEFAULT_GRADIENT ) )
 	);
 }
 
@@ -349,7 +368,7 @@ export default function PaletteEdit( {
 	const hasElements = elementsLength > 0;
 	const debounceOnChange = useDebounce( onChange, 100 );
 	const onSelectPaletteItem = useCallback(
-		( value, newEditingElementIndex ) => {
+		( value: PaletteElement, newEditingElementIndex: number ) => {
 			const selectedElement = elements[ newEditingElementIndex ];
 			const key = isGradient ? 'gradient' : 'color';
 			// Ensures that the index returned matches a known element value.
@@ -504,7 +523,7 @@ export default function PaletteEdit( {
 						<ColorPickerPopover
 							isGradient={ isGradient }
 							onClose={ () => setEditingElement( null ) }
-							onChange={ ( newElement ) => {
+							onChange={ ( newElement: PaletteElement ) => {
 								debounceOnChange(
 									elements.map(
 										( currentElement, currentIndex ) => {

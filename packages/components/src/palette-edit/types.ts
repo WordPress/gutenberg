@@ -1,3 +1,13 @@
+/**
+ * External dependencies
+ */
+import type { ComponentProps } from 'react';
+
+/**
+ * Internal dependencies
+ */
+import type Button from '../button';
+
 export type Color = {
 	color: string;
 	name: string;
@@ -35,16 +45,17 @@ export type PaletteEditProps = {
 	 * A message to show if there's nothing to edit.
 	 */
 	emptyMessage?: string;
-	canOnlyChangeValues: boolean;
-	canReset: boolean;
+	canOnlyChangeValues?: boolean;
+	canReset?: boolean;
 	/**
 	 *
 	 * @default '''
 	 */
-	slugPrefix?: string;
+	slugPrefix?: SlugPrefix;
 };
 
 type EditingElement = number | null;
+export type SlugPrefix = string;
 
 export type PaletteEditListViewProps = {
 	canOnlyChangeValues: boolean;
@@ -53,5 +64,23 @@ export type PaletteEditListViewProps = {
 	isGradient: boolean;
 	onChange: ( newElements?: PaletteElement[] ) => void;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
-	slugPrefix: string;
+	slugPrefix: SlugPrefix;
+};
+
+export type OptionProps = {
+	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
+	element: PaletteElement;
+	onChange: ( newElement: PaletteElement ) => void;
+	isEditing: boolean;
+	onStartEditing: () => void;
+	onRemove: ComponentProps< typeof Button >[ 'onClick' ];
+	onStopEditing: () => void;
+	slugPrefix: SlugPrefix;
+	isGradient: boolean;
+};
+
+export type NameInputProps = {
+	value: PaletteElement[ 'name' ];
+	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;
+	label: string;
 };
