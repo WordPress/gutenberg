@@ -1,0 +1,24 @@
+a.wp-block-link-preview.wp-block-link-preview {
+	display: block;
+	border: 1px solid #d3d3d3;
+	height: 100px;
+	font-size: smaller;
+	text-decoration: none !important;
+	color: inherit !important;
+
+	> div {
+		padding: 10px;
+		overflow: hidden;
+	}
+
+	.link-preview__icon {
+		height: 1em;
+		width: 1em;
+	}
+
+	> img {
+		float: right;
+		max-width: 50%;
+		height: 100%;
+	}
+}

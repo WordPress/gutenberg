@@ -1,0 +1,29 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "core/link-preview",
+	"title": "Link preview",
+	"category": "embed",
+	"description": "A link with a preview of the destination site.",
+	"textdomain": "default",
+	"attributes": {
+		"url": {
+			"type": "string",
+			"__experimentalRole": "content"
+		},
+		"title": {
+			"type": "string"
+		},
+		"description": {
+			"type": "string"
+		},
+		"icon": {
+			"type": "string"
+		},
+		"image": {
+			"type": "string"
+		}
+	},
+	"editorStyle": "wp-block-link-preview-editor",
+	"style": "wp-block-link-preview"
+}
