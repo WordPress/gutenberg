@@ -147,6 +147,27 @@ function ColorPickerPopover( {
 	);
 }
 
+function getIsColor( paletteElement: PaletteElement ): paletteElement is Color {
+	return 'color' in paletteElement;
+}
+
+function getIsGradient(
+	paletteElement: PaletteElement
+): paletteElement is Gradient {
+	return 'gradient' in paletteElement;
+}
+
+function getValue( element: PaletteElement, isGradient: boolean ) {
+	if ( isGradient && getIsGradient( element ) ) {
+		return element.gradient;
+	}
+	if ( getIsColor( element ) ) {
+		return element.color;
+	}
+
+	return '';
+}
+
 function Option( {
 	canOnlyChangeValues,
 	element,
@@ -159,15 +180,7 @@ function Option( {
 	isGradient,
 }: OptionProps ) {
 	const focusOutsideProps = useFocusOutside( onStopEditing );
-	let value: Color[ 'color' ] | Gradient[ 'gradient' ];
-
-	if ( isGradient && getIsGradient( element ) ) {
-		value = element.gradient;
-	} else if ( getIsColor( element ) ) {
-		value = element.color;
-	} else {
-		value = '';
-	}
+	const value = getValue( element, isGradient );
 
 	return (
 		<PaletteItem
@@ -229,16 +242,6 @@ function Option( {
 			) }
 		</PaletteItem>
 	);
-}
-
-function getIsColor( paletteElement: PaletteElement ): paletteElement is Color {
-	return 'color' in paletteElement;
-}
-
-function getIsGradient(
-	paletteElement: PaletteElement
-): paletteElement is Gradient {
-	return 'gradient' in paletteElement;
 }
 
 function isTemporaryElement(
