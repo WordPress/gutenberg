@@ -165,6 +165,8 @@ function Option( {
 		value = element.gradient;
 	} else if ( getIsColor( element ) ) {
 		value = element.color;
+	} else {
+		value = '';
 	}
 
 	return (
