@@ -233,7 +233,7 @@ function ScreenColors( { name, variation = '' } ) {
 					<Palette name={ name } />
 
 					<VStack spacing={ 3 }>
-						<Subtitle>{ __( 'Elements' ) }</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Elements' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							<BackgroundColorItem
 								name={ name }

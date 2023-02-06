@@ -3,6 +3,11 @@
  */
 import type { ReactNode } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { HeadingSize } from '../heading/types';
+
 type ResetAllFilter = () => void;
 type ResetAll = ( filters?: ResetAllFilter[] ) => void;
 
@@ -47,6 +52,10 @@ export type ToolsPanelProps = {
 	 * last visible `ToolsPanelItem` within the `ToolsPanel`.
 	 */
 	__experimentalLastVisibleItemClass?: string;
+	/**
+	 * The heading level of the panel's header.
+	 */
+	headingLevel: HeadingSize;
 };
 
 export type ToolsPanelHeaderProps = {
@@ -67,6 +76,10 @@ export type ToolsPanelHeaderProps = {
 	 * `onSelect` or `onDeselect` callbacks as appropriate.
 	 */
 	toggleItem: ( label: string ) => void;
+	/**
+	 * The heading level of the panel's header.
+	 */
+	headingLevel: HeadingSize;
 };
 
 export type ToolsPanelItem = {
