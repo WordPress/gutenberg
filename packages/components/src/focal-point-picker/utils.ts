@@ -35,7 +35,10 @@ export function getExtension( filename = '' ): string {
  */
 export function isVideoType( filename: string = '' ): boolean {
 	if ( ! filename ) return false;
-	return VIDEO_EXTENSIONS.includes( getExtension( filename ) );
+	return (
+		filename.startsWith( 'data:video/' ) ||
+		VIDEO_EXTENSIONS.includes( getExtension( filename ) )
+	);
 }
 
 /**

@@ -9,13 +9,9 @@ import userEvent from '@testing-library/user-event';
  */
 import IsolatedEventContainer from '../';
 
-jest.useFakeTimers();
-
 describe( 'IsolatedEventContainer', () => {
 	it( 'should pass props to container', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const clickHandler = jest.fn();
 		render(
 			<IsolatedEventContainer
@@ -47,9 +43,7 @@ describe( 'IsolatedEventContainer', () => {
 	} );
 
 	it( 'should stop event propagation only for mousedown, but not for keydown', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const mousedownHandler = jest.fn();
 		const keydownHandler = jest.fn();

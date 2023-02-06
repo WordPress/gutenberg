@@ -6,7 +6,7 @@
  * @subpackage HTML
  */
 
-require_once __DIR__ . '/../../lib/experimental/html/index.php';
+require_once __DIR__ . '/../../lib/experimental/html/wp-html.php';
 
 /**
  * @group html
@@ -72,6 +72,19 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
 		$this->assertFalse( $p->next_tag( 'p' ), 'Querying a non-existing tag did not return false' );
 		$this->assertNull( $p->get_attribute( 'class' ), 'Accessing an attribute of a non-existing tag did not return null' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_attribute
+	 */
+	public function test_get_attribute_returns_null_when_in_closing_tag() {
+		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
+		$this->assertTrue( $p->next_tag( 'div' ), 'Querying an existing tag did not return true' );
+		$this->assertTrue( $p->next_tag( array( 'tag_closers' => 'visit' ) ), 'Querying an existing closing tag did not return true' );
+		$this->assertNull( $p->get_attribute( 'class' ), 'Accessing an attribute of a closing tag did not return null' );
 	}
 
 	/**
@@ -193,6 +206,87 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->next_tag();
 		$p->set_attribute( 'data-enabled', 'abc' );
 		$this->assertEquals( '<div data-enabled="abc">Test</div>', $p->get_updated_html(), 'A case-insensitive set_attribute call did not update the existing attribute.' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_null_before_finding_tags() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
+		$this->assertNull( $p->get_attribute_names_with_prefix( 'data-' ) );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_null_when_not_in_open_tag() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
+		$p->next_tag( 'p' );
+		$this->assertNull( $p->get_attribute_names_with_prefix( 'data-' ), 'Accessing attributes of a non-existing tag did not return null' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_null_when_in_closing_tag() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
+		$p->next_tag( 'div' );
+		$p->next_tag( array( 'tag_closers' => 'visit' ) );
+		$this->assertNull( $p->get_attribute_names_with_prefix( 'data-' ), 'Accessing attributes of a closing tag did not return null' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_empty_array_when_no_attributes_present() {
+		$p = new WP_HTML_Tag_Processor( '<div>Test</div>' );
+		$p->next_tag( 'div' );
+		$this->assertSame( array(), $p->get_attribute_names_with_prefix( 'data-' ), 'Accessing the attributes on a tag without any did not return an empty array' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_matching_attribute_names_in_lowercase() {
+		$p = new WP_HTML_Tag_Processor( '<div DATA-enabled class="test" data-test-ID="14">Test</div>' );
+		$p->next_tag();
+		$this->assertSame(
+			array( 'data-enabled', 'data-test-id' ),
+			$p->get_attribute_names_with_prefix( 'data-' )
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers get_updated_html
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_attribute_added_by_set_attribute() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
+		$p->next_tag();
+		$p->set_attribute( 'data-test-id', '14' );
+		$this->assertSame(
+			'<div data-test-id="14" data-foo="bar">Test</div>',
+			$p->get_updated_html(),
+			"Updated HTML doesn't include attribute added via set_attribute"
+		);
+		$this->assertSame(
+			array( 'data-test-id', 'data-foo' ),
+			$p->get_attribute_names_with_prefix( 'data-' ),
+			"Accessing attribute names doesn't find attribute added via set_attribute"
+		);
 	}
 
 	/**
@@ -422,12 +516,256 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers set_attribute
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_set_attribute_with_a_non_existing_attribute_adds_a_new_attribute_to_the_markup() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
 		$p->next_tag();
 		$p->set_attribute( 'test-attribute', 'test-value' );
-		$this->assertSame( '<div test-attribute="test-value" id="first"><span id="second">Text</span></div>', $p->get_updated_html() );
+		$this->assertSame(
+			'<div test-attribute="test-value" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML does not include attribute added via set_attribute()'
+		);
+		$this->assertSame(
+			'test-value',
+			$p->get_attribute( 'test-attribute' ),
+			'get_attribute() (called after get_updated_html()) did not return attribute added via set_attribute()'
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers get_updated_html
+	 * @covers get_attribute
+	 */
+	public function test_get_attribute_returns_updated_values_before_they_are_updated() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
+		$p->next_tag();
+		$p->set_attribute( 'test-attribute', 'test-value' );
+		$this->assertSame(
+			'test-value',
+			$p->get_attribute( 'test-attribute' ),
+			'get_attribute() (called before get_updated_html()) did not return attribute added via set_attribute()'
+		);
+		$this->assertSame(
+			'<div test-attribute="test-value" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML does not include attribute added via set_attribute()'
+		);
+	}
+
+	public function test_get_attribute_returns_updated_values_before_they_are_updated_with_different_name_casing() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
+		$p->next_tag();
+		$p->set_attribute( 'test-ATTribute', 'test-value' );
+		$this->assertSame(
+			'test-value',
+			$p->get_attribute( 'test-attribute' ),
+			'get_attribute() (called before get_updated_html()) did not return attribute added via set_attribute()'
+		);
+		$this->assertSame(
+			'<div test-ATTribute="test-value" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML does not include attribute added via set_attribute()'
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers get_updated_html
+	 * @covers get_attribute
+	 */
+	public function test_get_attribute_reflects_added_class_names_before_they_are_updated() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
+		$p->next_tag();
+		$p->add_class( 'my-class' );
+		$this->assertSame(
+			'my-class',
+			$p->get_attribute( 'class' ),
+			'get_attribute() (called before get_updated_html()) did not return class name added via add_class()'
+		);
+		$this->assertSame(
+			'<div class="my-class" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML does not include class name added via add_class()'
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers get_updated_html
+	 * @covers get_attribute
+	 */
+	public function test_get_attribute_reflects_added_class_names_before_they_are_updated_and_retains_classes_from_previous_add_class_calls() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
+		$p->next_tag();
+		$p->add_class( 'my-class' );
+		$this->assertSame(
+			'my-class',
+			$p->get_attribute( 'class' ),
+			'get_attribute() (called before get_updated_html()) did not return class name added via add_class()'
+		);
+		$p->add_class( 'my-other-class' );
+		$this->assertSame(
+			'my-class my-other-class',
+			$p->get_attribute( 'class' ),
+			'get_attribute() (called before get_updated_html()) did not return class names added via subsequent add_class() calls'
+		);
+		$this->assertSame(
+			'<div class="my-class my-other-class" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML does not include class names added via subsequent add_class() calls'
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers remove_attribute
+	 * @covers get_attribute
+	 * @covers get_updated_html
+	 */
+	public function test_get_attribute_reflects_removed_attribute_before_it_is_updated() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
+		$p->next_tag();
+		$p->remove_attribute( 'id' );
+		$this->assertNull(
+			$p->get_attribute( 'id' ),
+			'get_attribute() (called before get_updated_html()) returned attribute that was removed by remove_attribute()'
+		);
+		$this->assertSame(
+			'<div ><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML includes attribute that was removed by remove_attribute()'
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers remove_attribute
+	 * @covers get_attribute
+	 * @covers get_updated_html
+	 */
+	public function test_get_attribute_reflects_adding_and_then_removing_an_attribute_before_it_is_updated() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
+		$p->next_tag();
+		$p->set_attribute( 'test-attribute', 'test-value' );
+		$p->remove_attribute( 'test-attribute' );
+		$this->assertNull(
+			$p->get_attribute( 'test-attribute' ),
+			'get_attribute() (called before get_updated_html()) returned attribute that was added via set_attribute() and then removed by remove_attribute()'
+		);
+		$this->assertSame(
+			self::HTML_SIMPLE,
+			$p->get_updated_html(),
+			'Updated HTML includes attribute that was added via set_attribute() and then removed by remove_attribute()'
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers remove_attribute
+	 * @covers get_attribute
+	 * @covers get_updated_html
+	 */
+	public function test_get_attribute_reflects_setting_and_then_removing_an_existing_attribute_before_it_is_updated() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
+		$p->next_tag();
+		$p->set_attribute( 'id', 'test-value' );
+		$p->remove_attribute( 'id' );
+		$this->assertNull(
+			$p->get_attribute( 'id' ),
+			'get_attribute() (called before get_updated_html()) returned attribute that was overwritten by set_attribute() and then removed by remove_attribute()'
+		);
+		$this->assertSame(
+			'<div ><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML includes attribute that was overwritten by set_attribute() and then removed by remove_attribute()'
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers remove_class
+	 * @covers get_updated_html
+	 * @covers get_attribute
+	 */
+	public function test_get_attribute_reflects_removed_class_names_before_they_are_updated() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
+		$p->next_tag();
+		$p->remove_class( 'with-border' );
+		$this->assertSame(
+			'main',
+			$p->get_attribute( 'class' ),
+			'get_attribute() (called before get_updated_html()) returned the wrong attribute after calling remove_attribute()'
+		);
+		$this->assertSame(
+			'<div class="main" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML includes wrong attribute after calling remove_attribute()'
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers remove_class
+	 * @covers get_attribute
+	 * @covers get_updated_html
+	 */
+	public function test_get_attribute_reflects_setting_and_then_removing_a_class_name_before_it_is_updated() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
+		$p->next_tag();
+		$p->add_class( 'foo-class' );
+		$p->remove_class( 'foo-class' );
+		$this->assertSame(
+			'main with-border',
+			$p->get_attribute( 'class' ),
+			'get_attribute() (called before get_updated_html()) returned class name that was added via add_class() and then removed by remove_class()'
+		);
+		$this->assertSame(
+			self::HTML_WITH_CLASSES,
+			$p->get_updated_html(),
+			'Updated HTML includes class that was added via add_class() and then removed by remove_class()'
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers remove_class
+	 * @covers get_attribute
+	 * @covers get_updated_html
+	 */
+	public function test_get_attribute_reflects_duplicating_and_then_removing_an_existing_class_name_before_it_is_updated() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
+		$p->next_tag();
+		$p->add_class( 'with-border' );
+		$p->remove_class( 'with-border' );
+		$this->assertSame(
+			'main',
+			$p->get_attribute( 'class' ),
+			'get_attribute() (called before get_updated_html()) returned class name that was duplicated via add_class() and then removed by remove_class()'
+		);
+		$this->assertSame(
+			'<div class="main" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML includes class that was duplicated via add_class() and then removed by remove_class()'
+		);
 	}
 
 	/**
@@ -527,12 +865,22 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers add_class
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_add_class_creates_a_class_attribute_when_there_is_none() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
 		$p->next_tag();
 		$p->add_class( 'foo-class' );
-		$this->assertSame( '<div class="foo-class" id="first"><span id="second">Text</span></div>', $p->get_updated_html() );
+		$this->assertSame(
+			'<div class="foo-class" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML does not include class name added via add_class()'
+		);
+		$this->assertSame(
+			'foo-class',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) did not return class name added via add_class()"
+		);
 	}
 
 	/**
@@ -540,13 +888,23 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers add_class
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_calling_add_class_twice_creates_a_class_attribute_with_both_class_names_when_there_is_no_class_attribute() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
 		$p->next_tag();
 		$p->add_class( 'foo-class' );
 		$p->add_class( 'bar-class' );
-		$this->assertSame( '<div class="foo-class bar-class" id="first"><span id="second">Text</span></div>', $p->get_updated_html() );
+		$this->assertSame(
+			'<div class="foo-class bar-class" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML does not include class names added via subsequent add_class() calls'
+		);
+		$this->assertSame(
+			'foo-class bar-class',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) did not return class names added via subsequent add_class() calls"
+		);
 	}
 
 	/**
@@ -554,12 +912,21 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers remove_class
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_remove_class_does_not_change_the_markup_when_there_is_no_class_attribute() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
 		$p->next_tag();
 		$p->remove_class( 'foo-class' );
-		$this->assertSame( self::HTML_SIMPLE, $p->get_updated_html() );
+		$this->assertSame(
+			self::HTML_SIMPLE,
+			$p->get_updated_html(),
+			'Updated HTML includes class name that was removed by remove_class()'
+		);
+		$this->assertNull(
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) did not return null for class name that was removed by remove_class()"
+		);
 	}
 
 	/**
@@ -567,6 +934,7 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers add_class
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_add_class_appends_class_names_to_the_existing_class_attribute_when_one_already_exists() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
@@ -575,7 +943,13 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->add_class( 'bar-class' );
 		$this->assertSame(
 			'<div class="main with-border foo-class bar-class" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect class names added to existing class attribute via subsequent add_class() calls'
+		);
+		$this->assertSame(
+			'main with-border foo-class bar-class',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect class names added to existing class attribute via subsequent add_class() calls"
 		);
 	}
 
@@ -584,6 +958,7 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers remove_class
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_remove_class_removes_a_single_class_from_the_class_attribute_when_one_exists() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
@@ -591,7 +966,13 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->remove_class( 'main' );
 		$this->assertSame(
 			'<div class=" with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect class name removed from existing class attribute via remove_class()'
+		);
+		$this->assertSame(
+			' with-border',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect class name removed from existing class attribute via remove_class()"
 		);
 	}
 
@@ -600,6 +981,7 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers remove_class
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_calling_remove_class_with_all_listed_class_names_removes_the_existing_class_attribute_from_the_markup() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
@@ -608,7 +990,12 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->remove_class( 'with-border' );
 		$this->assertSame(
 			'<div  id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect class attribute removed via subesequent remove_class() calls'
+		);
+		$this->assertNull(
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) did not return null for class attribute removed via subesequent remove_class() calls"
 		);
 	}
 
@@ -617,6 +1004,7 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers add_class
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_add_class_does_not_add_duplicate_class_names() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
@@ -624,7 +1012,13 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->add_class( 'with-border' );
 		$this->assertSame(
 			'<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect deduplicated class name added via add_class()'
+		);
+		$this->assertSame(
+			'main with-border',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect deduplicated class name added via add_class()"
 		);
 	}
 
@@ -633,6 +1027,7 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers add_class
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_add_class_preserves_class_name_order_when_a_duplicate_class_name_is_added() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
@@ -640,7 +1035,13 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->add_class( 'main' );
 		$this->assertSame(
 			'<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect class name order after adding duplicated class name via add_class()'
+		);
+		$this->assertSame(
+			'main with-border',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect class name order after adding duplicated class name added via add_class()"
 		);
 	}
 
@@ -649,6 +1050,7 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers add_class
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_add_class_when_there_is_a_class_attribute_with_excessive_whitespaces() {
 		$p = new WP_HTML_Tag_Processor(
@@ -658,7 +1060,13 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->add_class( 'foo-class' );
 		$this->assertSame(
 			'<div class="   main   with-border foo-class" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect existing excessive whitespace after adding class name via add_class()'
+		);
+		$this->assertSame(
+			'   main   with-border foo-class',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect existing excessive whitespace after adding class name via add_class()"
 		);
 	}
 
@@ -667,6 +1075,7 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers remove_class
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_remove_class_preserves_whitespaces_when_there_is_a_class_attribute_with_excessive_whitespaces() {
 		$p = new WP_HTML_Tag_Processor(
@@ -676,7 +1085,13 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->remove_class( 'with-border' );
 		$this->assertSame(
 			'<div class="   main" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect existing excessive whitespace after removing class name via remove_class()'
+		);
+		$this->assertSame(
+			'   main',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect existing excessive whitespace after removing class name via removing_class()"
 		);
 	}
 
@@ -685,6 +1100,7 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers remove_class
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_removing_all_classes_removes_the_existing_class_attribute_from_the_markup_even_when_excessive_whitespaces_are_present() {
 		$p = new WP_HTML_Tag_Processor(
@@ -695,21 +1111,29 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->remove_class( 'with-border' );
 		$this->assertSame(
 			'<div  id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect removed class attribute after removing all class names via remove_class()'
+		);
+		$this->assertNull(
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) did not return null after removing all class names via remove_class()"
 		);
 	}
 
 	/**
-	 * When both set_attribute('class', $value) and add_class( $different_value ) are called,
-	 * the final class name should be $value. In other words, the `add_class` call should be ignored,
-	 * and the `set_attribute` call should win. This holds regardless of the order in which these methods
-	 * are called.
+	 * When add_class( $different_value ) is called _after_ set_attribute( 'class', $value ), the
+	 * final class name should be "$value $different_value". In other words, the `add_class` call
+	 * should append its class to the one(s) set by `set_attribute`. When `add_class( $different_value )`
+	 * is called _before_ `set_attribute( 'class', $value )`, however, the final class name should be
+	 * "$value" instead, as any direct updates to the `class` attribute supersede any changes enqueued
+	 * via the class builder methods.
 	 *
 	 * @ticket 56299
 	 *
 	 * @covers add_class
 	 * @covers set_attribute
 	 * @covers get_updated_html
+	 * @covers get_attribute
 	 */
 	public function test_set_attribute_takes_priority_over_add_class() {
 		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
@@ -719,7 +1143,12 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			'<div class="set_attribute" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			$p->get_updated_html(),
-			'Calling get_updated_html after updating first tag\'s attributes did not return the expected HTML'
+			"Calling get_updated_html after updating first tag's attributes did not return the expected HTML"
+		);
+		$this->assertSame(
+			'set_attribute',
+			$p->get_attribute( 'class' ),
+			"Calling get_attribute after updating first tag's attributes did not return the expected class name"
 		);
 
 		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
@@ -727,9 +1156,113 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->set_attribute( 'class', 'set_attribute' );
 		$p->add_class( 'add_class' );
 		$this->assertSame(
+			'<div class="set_attribute add_class" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
+			$p->get_updated_html(),
+			"Calling get_updated_html after updating first tag's attributes did not return the expected HTML"
+		);
+		$this->assertSame(
+			'set_attribute add_class',
+			$p->get_attribute( 'class' ),
+			"Calling get_attribute after updating first tag's attributes did not return the expected class name"
+		);
+	}
+
+	/**
+	 * When add_class( $different_value ) is called _after_ set_attribute( 'class', $value ), the
+	 * final class name should be "$value $different_value". In other words, the `add_class` call
+	 * should append its class to the one(s) set by `set_attribute`. When `add_class( $different_value )`
+	 * is called _before_ `set_attribute( 'class', $value )`, however, the final class name should be
+	 * "$value" instead, as any direct updates to the `class` attribute supersede any changes enqueued
+	 * via the class builder methods.
+	 *
+	 * This is still true if we read enqueued updates before calling `get_updated_html()`.
+	 *
+	 * @ticket 56299
+	 *
+	 * @covers add_class
+	 * @covers set_attribute
+	 * @covers get_attribute
+	 * @covers get_updated_html
+	 */
+	public function test_set_attribute_takes_priority_over_add_class_even_before_updating() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
+		$p->next_tag();
+		$p->add_class( 'add_class' );
+		$p->set_attribute( 'class', 'set_attribute' );
+		$this->assertSame(
+			'set_attribute',
+			$p->get_attribute( 'class' ),
+			"Calling get_attribute after updating first tag's attributes did not return the expected class name"
+		);
+		$this->assertSame(
 			'<div class="set_attribute" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			$p->get_updated_html(),
-			'Calling get_updated_html after updating second tag\'s attributes did not return the expected HTML'
+			"Calling get_updated_html after updating first tag's attributes did not return the expected HTML"
+		);
+
+		$p = new WP_HTML_Tag_Processor( self::HTML_WITH_CLASSES );
+		$p->next_tag();
+		$p->set_attribute( 'class', 'set_attribute' );
+		$p->add_class( 'add_class' );
+		$this->assertSame(
+			'set_attribute add_class',
+			$p->get_attribute( 'class' ),
+			"Calling get_attribute after updating first tag's attributes did not return the expected class name"
+		);
+		$this->assertSame(
+			'<div class="set_attribute add_class" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
+			$p->get_updated_html(),
+			"Calling get_updated_html after updating first tag's attributes did not return the expected HTML"
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers add_class
+	 * @covers get_attribute
+	 * @covers get_updated_html
+	 */
+	public function test_add_class_overrides_boolean_class_attribute() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
+		$p->next_tag();
+		$p->set_attribute( 'class', true );
+		$p->add_class( 'add_class' );
+		$this->assertSame(
+			'<div class="add_class" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			"Updated HTML doesn't reflect class added via add_class that was originally set as boolean attribute"
+		);
+		$this->assertSame(
+			'add_class',
+			$p->get_attribute( 'class' ),
+			"get_attribute (called after get_updated_html()) doesn't reflect class added via add_class that was originally set as boolean attribute"
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers add_class
+	 * @covers get_attribute
+	 * @covers get_updated_html
+	 */
+	public function test_add_class_overrides_boolean_class_attribute_even_before_updating() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
+		$p->next_tag();
+		$p->set_attribute( 'class', true );
+		$p->add_class( 'add_class' );
+		$this->assertSame(
+			'add_class',
+			$p->get_attribute( 'class' ),
+			"get_attribute (called before get_updated_html()) doesn't reflect class added via add_class that was originally set as boolean attribute"
+		);
+		$this->assertSame(
+			'<div class="add_class" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			"Updated HTML doesn't reflect class added via add_class that was originally set as boolean attribute"
 		);
 	}
 

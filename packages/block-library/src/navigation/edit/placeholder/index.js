@@ -70,12 +70,6 @@ export default function NavigationPlaceholder( {
 							clientId={ clientId }
 							onSelectNavigationMenu={ onSelectNavigationMenu }
 							onSelectClassicMenu={ onSelectClassicMenu }
-							toggleProps={ {
-								variant: 'tertiary',
-								iconPosition: 'right',
-								className:
-									'wp-block-navigation-placeholder__actions__dropdown',
-							} }
 						/>
 
 						<hr />

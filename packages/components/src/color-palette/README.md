@@ -43,7 +43,7 @@ Whether the palette should have a clearing button.
 -   Required: No
 -   Default: `true`
 
-### `colors`: `( PaletteObject | ColorObject )[]`
+### `colors`: `PaletteObject[] | ColorObject[]`
 
 Array with the colors to be shown. When displaying multiple color palettes to choose from, the format of the array changes from an array of colors objects, to an array of color palettes.
 

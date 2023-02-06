@@ -132,6 +132,9 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
+		await page.click(
 			'role=group[name="Button width"i] >> role=button[name="25%"i]'
 		);
 
@@ -151,6 +154,10 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
+		// Switch to the Styles tab.
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
+		);
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
@@ -176,6 +183,10 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
+		// Switch to the Styles tab.
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
+		);
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
@@ -207,6 +218,10 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
+		// Switch to the Styles tab.
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
+		);
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
@@ -232,6 +247,10 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
+		// Switch to the Styles tab.
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
+		);
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);

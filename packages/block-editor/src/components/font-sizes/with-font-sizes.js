@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { pickBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createHigherOrderComponent, compose } from '@wordpress/compose';
@@ -160,35 +155,40 @@ export default ( ...fontSizeNames ) => {
 						}
 
 						const newState = Object.entries(
-							pickBy(
-								fontSizeAttributeNames,
-								didAttributesChange
+							fontSizeAttributeNames
+						)
+							.filter( ( [ key, value ] ) =>
+								didAttributesChange( value, key )
 							)
-						).reduce(
-							(
-								newStateAccumulator,
-								[
-									fontSizeAttributeName,
-									customFontSizeAttributeName,
-								]
-							) => {
-								const fontSizeAttributeValue =
-									attributes[ fontSizeAttributeName ];
-								const fontSizeObject = getFontSize(
-									fontSizes,
-									fontSizeAttributeValue,
-									attributes[ customFontSizeAttributeName ]
-								);
-								newStateAccumulator[ fontSizeAttributeName ] = {
-									...fontSizeObject,
-									class: getFontSizeClass(
-										fontSizeAttributeValue
-									),
-								};
-								return newStateAccumulator;
-							},
-							{}
-						);
+							.reduce(
+								(
+									newStateAccumulator,
+									[
+										fontSizeAttributeName,
+										customFontSizeAttributeName,
+									]
+								) => {
+									const fontSizeAttributeValue =
+										attributes[ fontSizeAttributeName ];
+									const fontSizeObject = getFontSize(
+										fontSizes,
+										fontSizeAttributeValue,
+										attributes[
+											customFontSizeAttributeName
+										]
+									);
+									newStateAccumulator[
+										fontSizeAttributeName
+									] = {
+										...fontSizeObject,
+										class: getFontSizeClass(
+											fontSizeAttributeValue
+										),
+									};
+									return newStateAccumulator;
+								},
+								{}
+							);
 
 						return {
 							...previousState,

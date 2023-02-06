@@ -1,17 +1,7 @@
 /**
  * WordPress dependencies
  */
-const {
-	test,
-	expect,
-	Editor,
-} = require( '@wordpress/e2e-test-utils-playwright' );
-
-test.use( {
-	editor: async ( { page }, use ) => {
-		await use( new Editor( { page, hasIframe: true } ) );
-	},
-} );
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Template Part', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -308,5 +298,71 @@ test.describe( 'Template Part', () => {
 		await paragraphLink.click( 'p[data-type="core/paragraph"] a' );
 
 		await expect( paragraph ).toBeVisible();
+	} );
+
+	test( 'can import a widget area into an empty template part', async ( {
+		admin,
+		siteEditor,
+		editor,
+		page,
+	} ) => {
+		await admin.visitSiteEditor();
+		await siteEditor.enterEditMode();
+
+		// Add a block and select it.
+		await editor.insertBlock( {
+			name: 'core/template-part',
+		} );
+
+		// Open Block Inspector -> Advanced.
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+
+		// Import the widget area.
+		await page
+			.getByRole( 'combobox', { name: 'Import widget area' } )
+			.selectOption( 'sidebar-1' );
+		await page.getByRole( 'button', { name: 'Import' } ).click();
+
+		// Verify that the widget area was imported.
+		await expect(
+			editor.canvas.locator( '[data-type="core/search"]' )
+		).toBeVisible();
+		await expect(
+			editor.canvas.locator( '[data-type="core/latest-posts"]' )
+		).toBeVisible();
+		await expect(
+			editor.canvas.locator( '[data-type="core/latest-comments"]' )
+		).toBeVisible();
+		await expect(
+			editor.canvas.locator( '[data-type="core/archives"]' )
+		).toBeVisible();
+		await expect(
+			editor.canvas.locator( '[data-type="core/categories"]' )
+		).toBeVisible();
+	} );
+
+	test( 'can not import a widget area into a non-empty template part', async ( {
+		admin,
+		siteEditor,
+		editor,
+		page,
+	} ) => {
+		await admin.visitSiteEditor();
+		await siteEditor.enterEditMode();
+
+		// Select existing header template part.
+		await editor.selectBlocks(
+			editor.canvas.locator( '[data-type="core/template-part"]' )
+		);
+
+		// Go to Block Inspector -> Advanced.
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+
+		// Verify that the widget area import button is not there.
+		await expect(
+			page.getByRole( 'combobox', { name: 'Import widget area' } )
+		).not.toBeVisible();
 	} );
 } );

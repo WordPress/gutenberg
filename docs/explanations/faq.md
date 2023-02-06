@@ -270,7 +270,7 @@ This is the canonical list of keyboard shortcuts:
 		</tr>
 		<tr>
 			<td>Remove multiple selected blocks.</td>
-			<td></td>
+			<td><kbd>del</kbd><kbd>backspace</kbd></td>
 			<td><kbd>del</kbd><kbd>backspace</kbd></td>
 		</tr>
 	</tbody>

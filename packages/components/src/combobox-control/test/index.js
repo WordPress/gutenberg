@@ -14,8 +14,6 @@ import { useState } from '@wordpress/element';
  */
 import ComboboxControl from '../';
 
-jest.useFakeTimers();
-
 const timezones = [
 	{ label: 'Greenwich Mean Time', value: 'GMT' },
 	{ label: 'Universal Coordinated Time', value: 'UTC' },
@@ -56,10 +54,7 @@ const getInput = ( name ) => screen.getByRole( 'combobox', { name } );
 const getOption = ( name ) => screen.getByRole( 'option', { name } );
 const getAllOptions = () => screen.getAllByRole( 'option' );
 const getOptionSearchString = ( option ) => option.label.substring( 0, 11 );
-const setupUser = () =>
-	userEvent.setup( {
-		advanceTimers: jest.advanceTimersByTime,
-	} );
+const setupUser = () => userEvent.setup();
 
 const ControlledComboboxControl = ( {
 	value: valueProp,

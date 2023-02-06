@@ -55,7 +55,7 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 *
 	 * @default []
 	 */
-	colors?: ( PaletteObject | ColorObject )[];
+	colors?: PaletteObject[] | ColorObject[];
 	/**
 	 * Whether to allow the user to pick a custom color on top of the predefined
 	 * choices (defined via the `colors` prop).

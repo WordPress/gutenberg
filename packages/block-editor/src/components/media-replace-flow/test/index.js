@@ -14,8 +14,6 @@ import { useState } from '@wordpress/element';
  */
 import MediaReplaceFlow from '../';
 
-jest.useFakeTimers();
-
 const noop = () => {};
 
 function TestWrapper() {
@@ -57,9 +55,7 @@ describe( 'General media replace flow', () => {
 	} );
 
 	it( 'renders replace menu', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -81,9 +77,7 @@ describe( 'General media replace flow', () => {
 	} );
 
 	it( 'displays media URL', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -106,9 +100,7 @@ describe( 'General media replace flow', () => {
 	} );
 
 	it( 'edits media URL', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -145,7 +137,7 @@ describe( 'General media replace flow', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Submit',
+				name: 'Apply',
 			} )
 		);
 

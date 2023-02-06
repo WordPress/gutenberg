@@ -1,0 +1,12 @@
+.edit-site-sidebar-navigation-screen-navigation-menus {
+	.block-editor-list-view-block__menu-edit,
+	.edit-site-navigation-inspector__select-menu {
+		display: none;
+	}
+	.offcanvas-editor-list-view-leaf {
+		max-width: calc(100% - #{ $grid-unit-05 });
+	}
+	.block-editor-list-view-leaf .block-editor-list-view-block__contents-cell {
+		width: 100%;
+	}
+}

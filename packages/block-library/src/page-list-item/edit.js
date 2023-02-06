@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -67,7 +68,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 						className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
 						aria-expanded="false"
 					>
-						{ label }
+						{ decodeEntities( label ) }
 					</button>
 					<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
 						<ItemSubmenuIcon />
@@ -80,7 +81,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 					} ) }
 					href={ link }
 				>
-					{ label }
+					{ decodeEntities( label ) }
 				</a>
 			) }
 			{ hasChildren && (

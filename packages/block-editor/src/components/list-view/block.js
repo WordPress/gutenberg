@@ -209,7 +209,7 @@ function ListViewBlock( {
 		'is-synced-branch': isSyncedBranch,
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
-		'is-synced': blockInformation.isSynced,
+		'is-synced': blockInformation?.isSynced,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block

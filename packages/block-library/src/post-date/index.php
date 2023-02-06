@@ -18,11 +18,18 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$post_ID            = $block->context['postId'];
-	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
-	$formatted_date     = get_the_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
-	$unformatted_date   = esc_attr( get_the_date( 'c', $post_ID ) );
+	$post_ID          = $block->context['postId'];
+	$formatted_date   = get_the_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
+	$unformatted_date = esc_attr( get_the_date( 'c', $post_ID ) );
+	$classes          = array();
+
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes[] = 'has-text-align-' . $attributes['textAlign'];
+	}
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	/*
 	 * If the "Display last modified date" setting is enabled,

@@ -422,7 +422,7 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 * @var WP_HTML_Text_Replacement[]
 	 */
-	private $attribute_updates = array();
+	private $lexical_updates = array();
 
 	/**
 	 * Tracks how many times we've performed a `seek()`
@@ -598,9 +598,10 @@ class WP_HTML_Tag_Processor {
 		}
 
 		if ( ! array_key_exists( $name, $this->bookmarks ) && count( $this->bookmarks ) >= self::MAX_BOOKMARKS ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				throw new Exception( "Tried to jump to a non-existent HTML bookmark {$name}." );
-			}
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Too many bookmarks: cannot create any more.', 'gutenberg' )
+			);
 			return false;
 		}
 
@@ -1059,7 +1060,7 @@ class WP_HTML_Tag_Processor {
 			return true;
 		}
 
-		/**
+		/*
 		 * > There must never be two or more attributes on
 		 * > the same start tag whose names are an ASCII
 		 * > case-insensitive match for each other.
@@ -1116,24 +1117,33 @@ class WP_HTML_Tag_Processor {
 	 * Converts class name updates into tag attributes updates
 	 * (they are accumulated in different data formats for performance).
 	 *
-	 * This method is only meant to run right before the attribute updates are applied.
-	 * The behavior in all other cases is undefined.
-	 *
 	 * @return void
 	 * @since 6.2.0
 	 *
 	 * @see $classname_updates
-	 * @see $attribute_updates
+	 * @see $lexical_updates
 	 */
 	private function class_name_updates_to_attributes_updates() {
-		if ( count( $this->classname_updates ) === 0 || isset( $this->attribute_updates['class'] ) ) {
-			$this->classname_updates = array();
+		if ( count( $this->classname_updates ) === 0 ) {
 			return;
 		}
 
-		$existing_class = isset( $this->attributes['class'] )
-			? substr( $this->html, $this->attributes['class']->value_starts_at, $this->attributes['class']->value_length )
-			: '';
+		$existing_class = $this->get_enqueued_attribute_value( 'class' );
+		if ( null === $existing_class || true === $existing_class ) {
+			$existing_class = '';
+		}
+
+		if ( false === $existing_class && isset( $this->attributes['class'] ) ) {
+			$existing_class = substr(
+				$this->html,
+				$this->attributes['class']->value_starts_at,
+				$this->attributes['class']->value_length
+			);
+		}
+
+		if ( false === $existing_class ) {
+			$existing_class = '';
+		}
 
 		/**
 		 * Updated "class" attribute value.
@@ -1247,11 +1257,11 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 */
 	private function apply_attributes_updates() {
-		if ( ! count( $this->attribute_updates ) ) {
+		if ( ! count( $this->lexical_updates ) ) {
 			return;
 		}
 
-		/**
+		/*
 		 * Attribute updates can be enqueued in any order but as we
 		 * progress through the document to replace them we have to
 		 * make our replacements in the order in which they are found
@@ -1261,17 +1271,17 @@ class WP_HTML_Tag_Processor {
 		 * out of order, which could otherwise lead to mangled output,
 		 * partially-duplicate attributes, and overwritten attributes.
 		 */
-		usort( $this->attribute_updates, array( self::class, 'sort_start_ascending' ) );
+		usort( $this->lexical_updates, array( self::class, 'sort_start_ascending' ) );
 
-		foreach ( $this->attribute_updates as $diff ) {
+		foreach ( $this->lexical_updates as $diff ) {
 			$this->updated_html .= substr( $this->html, $this->updated_bytes, $diff->start - $this->updated_bytes );
 			$this->updated_html .= $diff->text;
 			$this->updated_bytes = $diff->end;
 		}
 
 		foreach ( $this->bookmarks as $bookmark ) {
-			/**
-			 * As we loop through $this->attribute_updates, we keep comparing
+			/*
+			 * As we loop through $this->lexical_updates, we keep comparing
 			 * $bookmark->start and $bookmark->end to $diff->start. We can't
 			 * change it and still expect the correct result, so let's accumulate
 			 * the deltas separately and apply them all at once after the loop.
@@ -1279,7 +1289,7 @@ class WP_HTML_Tag_Processor {
 			$head_delta = 0;
 			$tail_delta = 0;
 
-			foreach ( $this->attribute_updates as $diff ) {
+			foreach ( $this->lexical_updates as $diff ) {
 				$update_head = $bookmark->start >= $diff->start;
 				$update_tail = $bookmark->end >= $diff->start;
 
@@ -1302,7 +1312,7 @@ class WP_HTML_Tag_Processor {
 			$bookmark->end   += $tail_delta;
 		}
 
-		$this->attribute_updates = array();
+		$this->lexical_updates = array();
 	}
 
 	/**
@@ -1371,6 +1381,69 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Return the enqueued value for a given attribute, if one exists.
+	 *
+	 * Enqueued updates can take different data types:
+	 *  - If an update is enqueued and is boolean, the return will be `true`
+	 *  - If an update is otherwise enqueued, the return will be the string value of that update.
+	 *  - If an attribute is enqueued to be removed, the return will be `null` to indicate that.
+	 *  - If no updates are enqueued, the return will be `false` to differentiate from "removed."
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $comparable_name The attribute name in its comparable form.
+	 * @return string|boolean|null Value of enqueued update if present, otherwise false.
+	 */
+	private function get_enqueued_attribute_value( $comparable_name ) {
+		if ( ! isset( $this->lexical_updates[ $comparable_name ] ) ) {
+			return false;
+		}
+
+		$enqueued_text = $this->lexical_updates[ $comparable_name ]->text;
+
+		// Removed attributes erase the entire span.
+		if ( '' === $enqueued_text ) {
+			return null;
+		}
+
+		/*
+		 * Boolean attribute updates are just the attribute name without a corresponding value.
+		 *
+		 * This value might differ from the given comparable name in that there could be leading
+		 * or trailing whitespace, and that the casing follows the name given in `set_attribute`.
+		 *
+		 * Example:
+		 * ```
+		 *     $p->set_attribute( 'data-TEST-id', 'update' );
+		 *     'update' === $p->get_enqueued_attribute_value( 'data-test-id' );
+		 * ```
+		 *
+		 * Here we detect this based on the absence of the `=`, which _must_ exist in any
+		 * attribute containing a value, e.g. `<input type="text" enabled />`.
+		 *                                            ¹           ²
+		 *                                       1. Attribute with a string value.
+		 *                                       2. Boolean attribute whose value is `true`.
+		 */
+		$equals_at = strpos( $enqueued_text, '=' );
+		if ( false === $equals_at ) {
+			return true;
+		}
+
+		/*
+		 * Finally, a normal update's value will appear after the `=` and
+		 * be double-quoted, as performed incidentally by `set_attribute`.
+		 *
+		 * e.g. `type="text"`
+		 *           ¹²    ³
+		 *        1. Equals is here.
+		 *        2. Double-quoting starts one after the equals sign.
+		 *        3. Double-quoting ends at the last character in the update.
+		 */
+		$enqueued_value = substr( $enqueued_text, $equals_at + 2, -1 );
+		return html_entity_decode( $enqueued_value );
+	}
+
+	/**
 	 * Returns the value of the parsed attribute in the currently-opened tag.
 	 *
 	 * Example:
@@ -1397,12 +1470,43 @@ class WP_HTML_Tag_Processor {
 		}
 
 		$comparable = strtolower( $name );
+
+		/*
+		 * For every attribute other than `class` we can perform a quick check if there's an
+		 * enqueued lexical update whose value we should prefer over what's in the input HTML.
+		 *
+		 * The `class` attribute is special though because we expose the helpers `add_class`
+		 * and `remove_class` which form a builder for the `class` attribute, so we have to
+		 * additionally check if there are any enqueued class changes. If there are, we need
+		 * to first flush them out so can report the full string value of the attribute.
+		 */
+		if ( 'class' === $name ) {
+			$this->class_name_updates_to_attributes_updates();
+		}
+
+		// If we have an update for this attribute, return the updated value.
+		$enqueued_value = $this->get_enqueued_attribute_value( $comparable );
+		if ( false !== $enqueued_value ) {
+			return $enqueued_value;
+		}
+
 		if ( ! isset( $this->attributes[ $comparable ] ) ) {
 			return null;
 		}
 
 		$attribute = $this->attributes[ $comparable ];
 
+		/*
+		 * This flag distinguishes an attribute with no value
+		 * from an attribute with an empty string value. For
+		 * unquoted attributes this could look very similar.
+		 * It refers to whether an `=` follows the name.
+		 *
+		 * e.g. <div boolean-attribute empty-attribute=></div>
+		 *           ¹                 ²
+		 *        1. Attribute `boolean-attribute` is `true`.
+		 *        2. Attribute `empty-attribute` is `""`.
+		 */
 		if ( true === $attribute->is_true ) {
 			return true;
 		}
@@ -1410,6 +1514,49 @@ class WP_HTML_Tag_Processor {
 		$raw_value = substr( $this->html, $attribute->value_starts_at, $attribute->value_length );
 
 		return html_entity_decode( $raw_value );
+	}
+
+	/**
+	 * Returns the lowercase names of all attributes matching a given prefix in the currently-opened tag.
+	 *
+	 * Note that matching is case-insensitive. This is in accordance with the spec:
+	 *
+	 * > There must never be two or more attributes on
+	 * > the same start tag whose names are an ASCII
+	 * > case-insensitive match for each other.
+	 *     - HTML 5 spec
+	 *
+	 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+	 *
+	 * Example:
+	 * <code>
+	 *     $p = new WP_HTML_Tag_Processor( '<div data-ENABLED class="test" DATA-test-id="14">Test</div>' );
+	 *     $p->next_tag( [ 'class_name' => 'test' ] ) === true;
+	 *     $p->get_attribute_names_with_prefix( 'data-' ) === array( 'data-enabled', 'data-test-id' );
+	 *
+	 *     $p->next_tag( [] ) === false;
+	 *     $p->get_attribute_names_with_prefix( 'data-' ) === null;
+	 * </code>
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $prefix Prefix of requested attribute names.
+	 * @return array|null List of attribute names, or `null` if not at a tag.
+	 */
+	function get_attribute_names_with_prefix( $prefix ) {
+		if ( $this->is_closing_tag || null === $this->tag_name_starts_at ) {
+			return null;
+		}
+
+		$comparable = strtolower( $prefix );
+
+		$matches = array();
+		foreach ( array_keys( $this->attributes ) as $attr_name ) {
+			if ( str_starts_with( $attr_name, $comparable ) ) {
+				$matches[] = $attr_name;
+			}
+		}
+		return $matches;
 	}
 
 	/**
@@ -1539,7 +1686,7 @@ class WP_HTML_Tag_Processor {
 			$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
 		}
 
-		/**
+		/*
 		 * > There must never be two or more attributes on
 		 * > the same start tag whose names are an ASCII
 		 * > case-insensitive match for each other.
@@ -1561,8 +1708,8 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$existing_attribute               = $this->attributes[ $comparable_name ];
-			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
+			$existing_attribute             = $this->attributes[ $comparable_name ];
+			$this->lexical_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$existing_attribute->start,
 				$existing_attribute->end,
 				$updated_attribute
@@ -1579,11 +1726,19 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$this->attribute_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
+			$this->lexical_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
 				$this->tag_name_starts_at + $this->tag_name_length,
 				$this->tag_name_starts_at + $this->tag_name_length,
 				' ' . $updated_attribute
 			);
+		}
+
+		/*
+		 * Any calls to update the `class` attribute directly should wipe out any
+		 * enqueued class changes from `add_class` and `remove_class`.
+		 */
+		if ( 'class' === $comparable_name && ! empty( $this->classname_updates ) ) {
+			$this->classname_updates = array();
 		}
 	}
 
@@ -1595,7 +1750,11 @@ class WP_HTML_Tag_Processor {
 	 * @param string $name The attribute name to remove.
 	 */
 	public function remove_attribute( $name ) {
-		/**
+		if ( $this->is_closing_tag ) {
+			return false;
+		}
+
+		/*
 		 * > There must never be two or more attributes on
 		 * > the same start tag whose names are an ASCII
 		 * > case-insensitive match for each other.
@@ -1604,7 +1763,20 @@ class WP_HTML_Tag_Processor {
 		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
 		 */
 		$name = strtolower( $name );
-		if ( $this->is_closing_tag || ! isset( $this->attributes[ $name ] ) ) {
+
+		/*
+		 * Any calls to update the `class` attribute directly should wipe out any
+		 * enqueued class changes from `add_class` and `remove_class`.
+		 */
+		if ( 'class' === $name && count( $this->classname_updates ) !== 0 ) {
+			$this->classname_updates = array();
+		}
+
+		// If we updated an attribute we didn't originally have, remove the enqueued update and move on.
+		if ( ! isset( $this->attributes[ $name ] ) ) {
+			if ( isset( $this->lexical_updates[ $name ] ) ) {
+				unset( $this->lexical_updates[ $name ] );
+			}
 			return false;
 		}
 
@@ -1619,7 +1791,7 @@ class WP_HTML_Tag_Processor {
 		 *
 		 *    Result: <div />
 		 */
-		$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
+		$this->lexical_updates[ $name ] = new WP_HTML_Text_Replacement(
 			$this->attributes[ $name ]->start,
 			$this->attributes[ $name ]->end,
 			''
@@ -1681,7 +1853,7 @@ class WP_HTML_Tag_Processor {
 	 */
 	public function get_updated_html() {
 		// Short-circuit if there are no new updates to apply.
-		if ( ! count( $this->classname_updates ) && ! count( $this->attribute_updates ) ) {
+		if ( ! count( $this->classname_updates ) && ! count( $this->lexical_updates ) ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );
 		}
 

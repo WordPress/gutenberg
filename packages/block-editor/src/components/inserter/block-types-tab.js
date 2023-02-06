@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, groupBy } from 'lodash';
+import { groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -113,7 +113,7 @@ export function BlockTypesTab( {
 					</InserterPanel>
 				) }
 
-				{ map( currentlyRenderedCategories, ( category ) => {
+				{ currentlyRenderedCategories.map( ( category ) => {
 					const categoryItems = itemsPerCategory[ category.slug ];
 					if ( ! categoryItems || ! categoryItems.length ) {
 						return null;
@@ -148,8 +148,7 @@ export function BlockTypesTab( {
 					</InserterPanel>
 				) }
 
-				{ map(
-					currentlyRenderedCollections,
+				{ currentlyRenderedCollections.map(
 					( [ namespace, collection ] ) => {
 						const collectionItems = itemsPerCollection[ namespace ];
 						if ( ! collectionItems || ! collectionItems.length ) {

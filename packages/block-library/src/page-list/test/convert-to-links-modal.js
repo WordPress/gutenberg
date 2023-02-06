@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 
-import { convertToNavigationLinks } from '../convert-to-navigation-links';
+import { convertToNavigationLinks } from '../use-convert-to-navigation-links';
 
 // Mock createBlock to avoid creating the blocks in test environment
 // as convertToNavigationLinks calls this method internally.

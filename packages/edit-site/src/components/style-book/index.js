@@ -19,7 +19,10 @@ import {
 	getBlockFromExample,
 	createBlock,
 } from '@wordpress/blocks';
-import { BlockPreview } from '@wordpress/block-editor';
+import {
+	BlockPreview,
+	experiments as blockEditorExperiments,
+} from '@wordpress/block-editor';
 import { closeSmall } from '@wordpress/icons';
 import { useResizeObserver } from '@wordpress/compose';
 import { useMemo, memo } from '@wordpress/element';
@@ -27,7 +30,9 @@ import { useMemo, memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useStyle } from '../global-styles';
+import { unlock } from '../../experiments';
+
+const { useGlobalStyle } = unlock( blockEditorExperiments );
 
 const SLOT_FILL_NAME = 'EditSiteStyleBook';
 const { Slot: StyleBookSlot, Fill: StyleBookFill } =
@@ -65,10 +70,14 @@ function getExamples() {
 	};
 
 	const otherExamples = getBlockTypes()
-		.filter(
-			( blockType ) =>
-				blockType.name !== 'core/heading' && !! blockType.example
-		)
+		.filter( ( blockType ) => {
+			const { name, example, supports } = blockType;
+			return (
+				name !== 'core/heading' &&
+				!! example &&
+				supports.inserter !== false
+			);
+		} )
 		.map( ( blockType ) => ( {
 			name: blockType.name,
 			title: blockType.title,
@@ -81,8 +90,8 @@ function getExamples() {
 
 function StyleBook( { isSelected, onSelect, onClose } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
-	const [ textColor ] = useStyle( 'color.text' );
-	const [ backgroundColor ] = useStyle( 'color.background' );
+	const [ textColor ] = useGlobalStyle( 'color.text' );
+	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const examples = useMemo( getExamples, [] );
 	const tabs = useMemo(
 		() =>
@@ -171,7 +180,7 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => (
 			<BlockPreview
 				blocks={ blocks }
 				viewportWidth={ 0 }
-				__experimentalStyles={ [
+				additionalStyles={ [
 					{
 						css:
 							'.wp-block:first-child { margin-top: 0; }' +

@@ -94,6 +94,7 @@ function CoverEdit( {
 		alt,
 		allowedBlocks,
 		templateLock,
+		tagName: TagName = 'div',
 	} = attributes;
 
 	const [ featuredImage ] = useEntityProp(
@@ -247,7 +248,7 @@ function CoverEdit( {
 			<>
 				{ blockControls }
 				{ inspectorControls }
-				<div
+				<TagName
 					{ ...blockProps }
 					className={ classnames(
 						'is-placeholder',
@@ -286,7 +287,7 @@ function CoverEdit( {
 						} }
 						showHandle={ isSelected }
 					/>
-				</div>
+				</TagName>
 			</>
 		);
 	}
@@ -308,7 +309,7 @@ function CoverEdit( {
 		<>
 			{ blockControls }
 			{ inspectorControls }
-			<div
+			<TagName
 				{ ...blockProps }
 				className={ classnames( classes, blockProps.className ) }
 				style={ { ...style, ...blockProps.style } }
@@ -399,7 +400,7 @@ function CoverEdit( {
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 				/>
 				<div { ...innerBlocksProps } />
-			</div>
+			</TagName>
 		</>
 	);
 }

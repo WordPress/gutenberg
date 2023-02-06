@@ -174,12 +174,26 @@ html.interface-interface-skeleton__html-container {
 	bottom: auto;
 	left: auto;
 	right: 0;
-	width: $sidebar-width;
 	color: $gray-900;
+	background: $white;
+	width: 100vw;
+
+	@include break-medium() {
+		width: $sidebar-width;
+	}
 
 	&:focus,
 	&:focus-within {
-		top: auto;
+		top: $admin-bar-height-big;
+
+		@include break-medium() {
+			border-left: $border-width solid $gray-300;
+			top: $admin-bar-height;
+
+			.is-fullscreen-mode & {
+				top: 0;
+			}
+		}
 		bottom: 0;
 	}
 }

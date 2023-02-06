@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 5.3.0 (2023-02-01)
+
+### Bug Fix
+
+-   Force visual editor in browse mode ([#47329](https://github.com/WordPress/gutenberg/pull/47329)).
+-   Style Book: Exclude blocks that are not allowed to insert ([#47461](https://github.com/WordPress/gutenberg/pull/47461)).
+
+## 5.2.0 (2023-01-11)
+
+## 5.1.0 (2023-01-02)
+
 ## 5.0.0 (2022-12-14)
 
 ### Breaking Changes

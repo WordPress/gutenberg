@@ -87,6 +87,7 @@ export const _default = () => {
 						onDeselect={ () => setScale( undefined ) }
 					>
 						<ToggleGroupControl
+							__nextHasNoMarginBottom
 							label="Scale"
 							value={ scale }
 							onChange={ ( next ) => setScale( next ) }
@@ -367,6 +368,7 @@ export const WithConditionalDefaultControl = () => {
 					isShownByDefault={ !! height }
 				>
 					<ToggleGroupControl
+						__nextHasNoMarginBottom
 						label="Scale"
 						value={ scale }
 						onChange={ ( next ) =>
@@ -456,6 +458,7 @@ export const WithConditionallyRenderedControl = () => {
 						isShownByDefault={ true }
 					>
 						<ToggleGroupControl
+							__nextHasNoMarginBottom
 							label="Scale"
 							value={ scale }
 							onChange={ ( next ) =>
