@@ -21,7 +21,9 @@ export type Page = {
 
 export type GuideProps = {
 	/**
-	 * @deprecated since 5.5 – use `pages` prop instead
+	 * Deprecated. Use `pages` prop instead.
+	 *
+	 * @deprecated since 5.5
 	 */
 	children?: ReactNode;
 	/**
