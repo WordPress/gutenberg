@@ -18,7 +18,7 @@ This component is generated automatically by its parent
 
 ## Props
 
-### `headingLevel`: `boolean`
+### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
 
 The heading level of the panel's header.
 
