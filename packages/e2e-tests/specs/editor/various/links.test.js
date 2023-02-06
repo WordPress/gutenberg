@@ -999,8 +999,14 @@ describe( 'Links', () => {
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Enter' );
 
+			await waitForURLFieldAutoFocus();
+
+			// Toggle link settings open
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Space' );
+
 			// Move to Link Text field.
-			await pressKeyWithModifier( 'shift', 'Tab' );
+			await page.keyboard.press( 'Tab' );
 
 			// Change text to "z"
 			await page.keyboard.type( 'z' );
