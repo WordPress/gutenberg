@@ -280,18 +280,27 @@ describe( 'BorderBoxControl', () => {
 			expect( widthInputs[ 3 ].value ).toBe( '1' ); // Bottom.
 		} );
 
-		it( 'should omit style options when requested', async () => {
-			const user = userEvent.setup();
+		// We're expecting to have 4 color buttons by default.
+		const colorButtonIndexes = [ ...Array( 4 ).keys() ];
 
-			render( <BorderBoxControl { ...props } enableStyle={ false } /> );
+		it.each( colorButtonIndexes )(
+			'should omit style options when color button %s is pressed',
+			async ( colorButtonIndex ) => {
+				const user = userEvent.setup();
 
-			await user.click(
-				screen.getByRole( 'button', { name: 'Unlink sides' } )
-			);
+				render(
+					<BorderBoxControl { ...props } enableStyle={ false } />
+				);
 
-			const colorButtons = screen.getAllByLabelText( colorPickerRegex );
+				await user.click(
+					screen.getByRole( 'button', { name: 'Unlink sides' } )
+				);
 
-			function assertStyleOptionsMissing() {
+				const colorButtons =
+					screen.getAllByLabelText( colorPickerRegex );
+
+				await user.click( colorButtons[ colorButtonIndex ] );
+
 				const styleLabel = screen.queryByText( 'Style' );
 				const solidButton = screen.queryByRole( 'button', {
 					name: 'Solid',
@@ -308,23 +317,7 @@ describe( 'BorderBoxControl', () => {
 				expect( dashedButton ).not.toBeInTheDocument();
 				expect( dottedButton ).not.toBeInTheDocument();
 			}
-
-			await user.click( colorButtons[ 0 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 0 ] );
-
-			await user.click( colorButtons[ 1 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 1 ] );
-
-			await user.click( colorButtons[ 2 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 2 ] );
-
-			await user.click( colorButtons[ 3 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 3 ] );
-		} );
+		);
 	} );
 
 	describe( 'onChange handling', () => {
