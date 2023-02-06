@@ -10,6 +10,8 @@ import {
 	clickBlockToolbarButton,
 	clickButton,
 	clickMenuItem,
+	insertBlock,
+	openListView,
 	saveDraft,
 	transformBlockTo,
 } from '@wordpress/e2e-test-utils';
@@ -68,7 +70,7 @@ async function testNativeSelection() {
 			return;
 		}
 
-		if ( ! selection.rangeCount === 1 ) {
+		if ( selection.rangeCount !== 1 ) {
 			throw 'expected one range';
 		}
 
@@ -78,14 +80,13 @@ async function testNativeSelection() {
 
 		const firstElement = elements[ 0 ];
 		const lastElement = elements[ elements.length - 1 ];
-		const { startContainer, endContainer } = selection.getRangeAt( 0 );
 
-		if ( ! firstElement.contains( startContainer ) ) {
-			throw 'expected selection to start in the first selected block';
+		if ( ! selection.containsNode( firstElement, true ) ) {
+			throw 'expected selection to include in the first selected block';
 		}
 
-		if ( ! lastElement.contains( endContainer ) ) {
-			throw 'expected selection to end in the last selected block';
+		if ( ! selection.containsNode( lastElement, true ) ) {
+			throw 'expected selection to include in the last selected block';
 		}
 	} );
 }
@@ -107,7 +108,6 @@ describe( 'Multi-block selection', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
 
-		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2, 3 ] );
 
 		// TODO: It would be great to do this test by spying on `wp.a11y.speak`,
@@ -171,10 +171,10 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pressKeyWithModifier( 'shift', 'ArrowRight' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
 		await testNativeSelection();
-		// This delete all blocks.
+		// This deletes all blocks.
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -330,7 +330,9 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.up( 'Shift' );
 		await transformBlockTo( 'Group' );
-		await page.keyboard.press( 'ArrowDown' );
+
+		// Confirm setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Click the first paragraph in the first Group block while pressing `shift` key.
 		const firstParagraph = await page.waitForXPath( "//p[text()='first']" );
@@ -354,9 +356,10 @@ describe( 'Multi-block selection', () => {
 		await page.mouse.move( x + 20, y );
 		await page.mouse.down();
 		await page.keyboard.up( 'Shift' );
+		await page.mouse.up();
 		await page.keyboard.type( 'hi' );
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
-		"<!-- wp:group -->
+		"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
 		<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
 		<p>hih text in group</p>
 		<!-- /wp:paragraph --></div>
@@ -392,9 +395,14 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/group' );
 		await page.waitForXPath(
-			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Group')]`
+			'//button[@aria-selected="true"][text()="Group"]'
 		);
 		await page.keyboard.press( 'Enter' );
+
+		// Select the default, selected Group layout from the variation picker.
+		await page.click(
+			'button[aria-label="Group: Gather blocks in a container."]'
+		);
 
 		const groupAppender = await page.waitForSelector(
 			'.block-editor-button-block-appender'
@@ -419,7 +427,6 @@ describe( 'Multi-block selection', () => {
 		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
 		await page.mouse.up();
 
-		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
 	} );
 
@@ -617,7 +624,7 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '2' );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
-		await clickBlockToolbarButton( 'Align' );
+		await clickBlockToolbarButton( 'Align text' );
 		await clickButton( 'Align text center' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -651,17 +658,23 @@ describe( 'Multi-block selection', () => {
 	it( 'should gradually multi-select', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '/columns' );
+		await page.waitForXPath(
+			'//button[@aria-selected="true"][text()="Columns"]'
+		);
 		await page.keyboard.press( 'Enter' );
 		// Select two columns.
-		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 		// Navigate to appender.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
-		// Select a paragraph.
+		// Wait for inserter results to appear and then select a paragraph.
+		await page.waitForSelector(
+			'.block-editor-inserter__quick-inserter-results .block-editor-block-types-list__item'
+		);
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
+		// Type two paragraphs
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -675,6 +688,10 @@ describe( 'Multi-block selection', () => {
 		await page.waitForSelector(
 			'[data-type="core/paragraph"].is-multi-selected'
 		);
+
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		await page.waitForSelector( '[data-type="core/column"].is-selected' );
 
 		await pressKeyWithModifier( 'primary', 'a' );
 
@@ -693,14 +710,18 @@ describe( 'Multi-block selection', () => {
 		// Select a paragraph.
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		// Add a list
+		// Add a list.
 		await page.keyboard.type( '/list' );
+		await page.waitForXPath(
+			'//button[@aria-selected="true"][text()="List"]'
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 
-		// Confirm correct setup: a paragraph and a list
+		// Confirm correct setup: a paragraph and a list.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
+		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
 
@@ -720,9 +741,8 @@ describe( 'Multi-block selection', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Clear the selected block.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
-		const box = await paragraph.boundingBox();
-		await page.mouse.click( box.x - 1, box.y );
+		await page.keyboard.press( 'Escape' );
+		await page.keyboard.press( 'Escape' );
 
 		await pressKeyWithModifier( 'primary', 'a' );
 
@@ -746,5 +766,283 @@ describe( 'Multi-block selection', () => {
 			return window.getSelection().toString();
 		} );
 		expect( selectedText ).toEqual( 'Post title' );
+	} );
+
+	it( 'should multi-select in the ListView component with shift + click', async () => {
+		// Create four blocks.
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '4' );
+
+		// Open up the list view, and get a reference to each of the list items.
+		await openListView();
+		const navButtons = await page.$$(
+			'.block-editor-list-view-block-select-button'
+		);
+
+		// Clicking on the second list item should result in the second block being selected.
+		await navButtons[ 1 ].click();
+		expect( await getSelectedFlatIndices() ).toEqual( 2 );
+
+		// Shift clicking the fourth list item should result in blocks 2 through 4 being selected.
+		await page.keyboard.down( 'Shift' );
+		await navButtons[ 3 ].click();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3, 4 ] );
+
+		// With the shift key still held down, clicking the first block should result in
+		// the first two blocks being selected.
+		await navButtons[ 0 ].click();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
+
+		// With the shift key up, clicking the fourth block should result in only that block
+		// being selected.
+		await page.keyboard.up( 'Shift' );
+		await navButtons[ 3 ].click();
+		expect( await getSelectedFlatIndices() ).toEqual( 4 );
+	} );
+
+	it( 'should multi-select in the ListView component with shift + up and down keys', async () => {
+		// Create four blocks.
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '4' );
+
+		// Open up the list view. The fourth block button will be focused.
+		await openListView();
+
+		// Press Up twice to focus over the second block.
+		await pressKeyTimes( 'ArrowUp', 2 );
+
+		// Shift + press Down to select the 2nd and 3rd blocks.
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowDown' );
+		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3 ] );
+
+		// Press Down once more to also select the 4th block.
+		await page.keyboard.press( 'ArrowDown' );
+		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3, 4 ] );
+
+		// Press Up three times to adjust the selection to only include the first two blocks.
+		await pressKeyTimes( 'ArrowUp', 3 );
+		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
+
+		// Raise the shift key
+		await page.keyboard.up( 'Shift' );
+
+		// Navigate to the bottom of the list of blocks.
+		await pressKeyTimes( 'ArrowDown', 3 );
+
+		// Shift + press UP to select the 3rd and 4th blocks.
+		// This tests that shift selecting blocks by keyboard that are not adjacent
+		// to an existing selection resets the selection.
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.up( 'Shift' );
+		expect( await getSelectedFlatIndices() ).toEqual( [ 3, 4 ] );
+	} );
+
+	it( 'should forward delete across blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1[' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '.' );
+		await page.keyboard.press( 'Enter' );
+		// "## " creates h2.
+		await page.keyboard.type( '## ]2' );
+		await page.keyboard.press( 'ArrowLeft' );
+		// Select everything between [].
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+
+		// Test setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Delete' );
+
+		// Ensure selection is in the correct place.
+		await page.keyboard.type( '&' );
+
+		// Expect a heading with "1&2" as its content.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should write over selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1[' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ']2' );
+		await page.keyboard.press( 'ArrowLeft' );
+		// Select everything between [].
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+
+		// Test setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Ensure selection is in the correct place.
+		await page.keyboard.type( '...' );
+
+		// Expect a heading with "1&2" as its content.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should handle Enter across blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1[' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '.' );
+		await page.keyboard.press( 'Enter' );
+		// "## " creates h2.
+		await page.keyboard.type( '## ]2' );
+		await page.keyboard.press( 'ArrowLeft' );
+		// Select everything between [].
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+
+		// Test setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Enter' );
+
+		// Ensure selection is in the correct place.
+		await page.keyboard.type( '&' );
+
+		// Expect two blocks with "&" in between.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should select separator (single element block)', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/hr' );
+		await page.waitForXPath(
+			'//button[@aria-selected="true"][text()="Separator"]'
+		);
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowRight' );
+		await pressKeyWithModifier( 'shift', 'ArrowDown' );
+		await pressKeyWithModifier( 'shift', 'ArrowDown' );
+
+		// Test setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' );
+
+		// Ensure selection is in the correct place.
+		await page.keyboard.type( '&' );
+
+		// Expect a paragraph with "&".
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should partially select with shift + click', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '[' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ']2' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.down( 'Shift' );
+		await page.click( 'strong' );
+		await page.keyboard.up( 'Shift' );
+
+		// Test setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'Backspace' );
+
+		// Ensure selection is in the correct place.
+		await page.keyboard.type( '&' );
+
+		// Expect two blocks with "&" in between.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+	describe( 'shift+click multi-selection', () => {
+		it( 'should multi-select block with text selection and a block without text selection', async () => {
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'hi' );
+			await page.keyboard.press( 'Enter' );
+			await insertBlock( 'Spacer' );
+			await page.keyboard.press( 'ArrowUp' );
+
+			const spacerBlock = await page.waitForSelector(
+				'.wp-block.wp-block-spacer'
+			);
+			const boundingBox = await spacerBlock.boundingBox();
+			const mousePosition = {
+				x: boundingBox.x + boundingBox.width / 2,
+				y: boundingBox.y + boundingBox.height / 2,
+			};
+			await page.keyboard.down( 'Shift' );
+			await page.mouse.click( mousePosition.x, mousePosition.y );
+			await page.keyboard.up( 'Shift' );
+
+			const selectedBlocks = await page.$$(
+				'.wp-block.is-multi-selected'
+			);
+			expect( selectedBlocks.length ).toBe( 2 );
+		} );
+		it( 'should multi-select blocks without text selection', async () => {
+			await insertBlock( 'Spacer' );
+			// Get the first spacer block element.
+			const spacerBlock = await page.waitForSelector(
+				'.wp-block.wp-block-spacer'
+			);
+			const boundingBox = await spacerBlock.boundingBox();
+			await page.keyboard.press( 'Enter' );
+			await insertBlock( 'Spacer' );
+			const mousePosition = {
+				x: boundingBox.x + boundingBox.width / 2,
+				y: boundingBox.y + boundingBox.height / 2,
+			};
+			await page.keyboard.down( 'Shift' );
+			await page.mouse.click( mousePosition.x, mousePosition.y );
+			await page.keyboard.up( 'Shift' );
+			const selectedBlocks = await page.$$(
+				'.wp-block.is-multi-selected'
+			);
+			expect( selectedBlocks.length ).toBe( 2 );
+		} );
+	} );
+
+	it( 'should select by dragging into separator', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await insertBlock( 'Separator' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		const [ paragraph, hr ] = await page.$$( '[data-type]' );
+		const coord1 = await paragraph.clickablePoint();
+		const coord2 = await hr.clickablePoint();
+
+		await page.mouse.move( coord1.x, coord1.y );
+		await page.mouse.down();
+		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
+		await page.mouse.up();
+
+		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
 	} );
 } );

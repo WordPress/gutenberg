@@ -31,7 +31,7 @@ describe( 'TypeWriter', () => {
 
 		expect( await getCaretPosition() ).toBeGreaterThan( initialPosition );
 
-		// Create blocks until the the typewriter effect kicks in.
+		// Create blocks until the typewriter effect kicks in.
 		while (
 			await page.evaluate(
 				() =>
@@ -173,7 +173,7 @@ describe( 'TypeWriter', () => {
 
 		let count = 0;
 
-		// Create blocks until the the typewriter effect kicks in, create at
+		// Create blocks until the typewriter effect kicks in, create at
 		// least 10 blocks to properly test the .
 		while (
 			( await page.evaluate(

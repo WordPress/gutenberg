@@ -10,6 +10,7 @@ import {
 	RichText,
 	useBlockProps,
 	useInnerBlocksProps,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 
 /**
@@ -39,7 +40,10 @@ export default function saveWithInnerBlocks( { attributes } ) {
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"
-					className="blocks-gallery-caption"
+					className={ classnames(
+						'blocks-gallery-caption',
+						__experimentalGetElementClassName( 'caption' )
+					) }
 					value={ caption }
 				/>
 			) }

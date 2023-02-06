@@ -14,7 +14,8 @@ data class Media(
     override val url: String,
     override val type: String,
     override val caption: String = "",
-    override val title: String = ""
+    override val title: String = "",
+    override val alt: String = ""
 ) : RNMedia {
     override fun toMap(): WritableMap = WritableNativeMap().apply {
         putInt("id", id)
@@ -22,17 +23,11 @@ data class Media(
         putString("type", type)
         putString("caption", caption)
         putString("title", title)
+        putString("alt", alt)
     }
 
     companion object {
-        @JvmStatic
-        fun createRNMediaUsingMimeType(
-            id: Int,
-            url: String,
-            mimeType: String?,
-            caption: String?,
-            title: String?
-        ): Media {
+        private fun convertToType(mimeType: String?): String {
             val isMediaType = { mediaType: MediaType ->
                 mimeType?.startsWith(mediaType.name.toLowerCase(Locale.ROOT)) == true
             }
@@ -41,6 +36,30 @@ data class Media(
                 isMediaType(VIDEO) -> VIDEO
                 else -> OTHER
             }.name.toLowerCase(Locale.ROOT)
+            return type;
+        }
+
+        @JvmStatic
+        fun createRNMediaUsingMimeType(
+            id: Int,
+            url: String,
+            mimeType: String?,
+            caption: String?,
+            title: String?,
+            alt: String?,
+        ): Media {
+            val type = convertToType(mimeType)
+            return Media(id, url, type, caption ?: "", title ?: "", alt ?: "")
+        }
+        @JvmStatic
+        fun createRNMediaUsingMimeType(
+            id: Int,
+            url: String,
+            mimeType: String?,
+            caption: String?,
+            title: String?,
+        ): Media {
+            val type = convertToType(mimeType)
             return Media(id, url, type, caption ?: "", title ?: "")
         }
     }

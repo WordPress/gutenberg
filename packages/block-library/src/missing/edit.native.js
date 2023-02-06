@@ -151,7 +151,8 @@ export class UnsupportedBlockEdit extends Component {
 		const infoTitle = sprintf( titleFormat, blockTitle );
 		const missingBlockDetail = applyFilters(
 			'native.missing_block_detail',
-			__( 'We are working hard to add more blocks with each release.' )
+			__( 'We are working hard to add more blocks with each release.' ),
+			blockName
 		);
 		const missingBlockActionButton = applyFilters(
 			'native.missing_block_action_button',
@@ -173,7 +174,7 @@ export class UnsupportedBlockEdit extends Component {
 						// On iOS, onModalHide is called when the controller is still part of the hierarchy.
 						// A small delay will ensure that the controller has already been removed.
 						this.timeout = setTimeout( () => {
-							// for the Classic block, the content is kept in the `content` attribute
+							// For the Classic block, the content is kept in the `content` attribute.
 							const content =
 								blockName === 'core/freeform'
 									? attributes.content
@@ -205,11 +206,17 @@ export class UnsupportedBlockEdit extends Component {
 					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
 						{ infoTitle }
 					</Text>
-					{ isEditableInUnsupportedBlockEditor && (
-						<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-							{ missingBlockDetail }
-						</Text>
-					) }
+					{ isEditableInUnsupportedBlockEditor &&
+						missingBlockDetail && (
+							<Text
+								style={ [
+									infoTextStyle,
+									infoDescriptionStyle,
+								] }
+							>
+								{ missingBlockDetail }
+							</Text>
+						) }
 				</View>
 				{ ( isUnsupportedBlockEditorSupported ||
 					canEnableUnsupportedBlockEditor ) &&
@@ -291,16 +298,14 @@ export class UnsupportedBlockEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, { attributes } ) => {
-		const { getSettings } = select( blockEditorStore );
+		const { capabilities } = select( blockEditorStore ).getSettings();
 		return {
 			isUnsupportedBlockEditorSupported:
-				getSettings( 'capabilities' ).unsupportedBlockEditor === true,
+				capabilities?.unsupportedBlockEditor === true,
 			canEnableUnsupportedBlockEditor:
-				getSettings( 'capabilities' )
-					.canEnableUnsupportedBlockEditor === true,
-			isEditableInUnsupportedBlockEditor: ! UBE_INCOMPATIBLE_BLOCKS.includes(
-				attributes.originalName
-			),
+				capabilities?.canEnableUnsupportedBlockEditor === true,
+			isEditableInUnsupportedBlockEditor:
+				! UBE_INCOMPATIBLE_BLOCKS.includes( attributes.originalName ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

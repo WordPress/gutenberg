@@ -1,14 +1,14 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/tag-cloud",
 		"isValid": true,
 		"attributes": {
 			"numberOfTags": 45,
 			"taxonomy": "category",
-			"showTagCounts": false
+			"showTagCounts": false,
+			"smallestFontSize": "8pt",
+			"largestFontSize": "22pt"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

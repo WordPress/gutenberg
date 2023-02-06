@@ -11,7 +11,7 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Login/out settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Display login as form' ) }
 						checked={ displayLoginAsForm }

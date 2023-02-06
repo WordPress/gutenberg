@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { difference } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
@@ -11,7 +6,7 @@ import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) =>
-	difference( selected, allowed ).length === 0;
+	selected.filter( ( id ) => ! allowed.includes( id ) ).length === 0;
 
 /**
  * Plugins may want to add an item to the menu either for every block

@@ -1,0 +1,60 @@
+.block-editor-button-block-appender {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: auto;
+	color: $gray-900;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
+
+	// Needs specificity to override button styles.
+	&.components-button.components-button {
+		padding: $grid-unit-15;
+	}
+
+	.is-dark-theme & {
+		color: $light-gray-placeholder;
+		box-shadow: inset 0 0 0 $border-width $light-gray-placeholder;
+	}
+
+	&:hover {
+		color: var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
+	}
+
+	&:focus {
+		box-shadow: inset 0 0 0 2px var(--wp-admin-theme-color);
+	}
+
+	&:active {
+		color: $black;
+	}
+}
+
+// When the appender shows up in empty container blocks, such as Group and Columns, add an extra click state.
+.block-list-appender:only-child {
+	.is-layout-constrained.block-editor-block-list__block:not(.is-selected) > &,
+	.is-layout-flow.block-editor-block-list__block:not(.is-selected) > &,
+	// Legacy groups have an inner container so need to be targeted separately
+	.is-layout-constrained.block-editor-block-list__block:not(.is-selected) > .wp-block-group__inner-container > &,
+	.is-layout-flow.block-editor-block-list__block:not(.is-selected) > .wp-block-group__inner-container > & {
+		pointer-events: none;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			pointer-events: none;
+			border: $border-width dashed currentColor;
+			@include placeholder-style();
+		}
+
+		.block-editor-inserter {
+			visibility: hidden;
+		}
+	}
+}

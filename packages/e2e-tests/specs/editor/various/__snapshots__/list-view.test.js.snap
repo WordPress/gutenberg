@@ -6,7 +6,7 @@ exports[`List view allows a user to drag a block to a new sibling position 1`] =
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2></h2>
+<h2 class=\\"wp-block-heading\\"></h2>
 <!-- /wp:heading -->
 
 <!-- wp:image -->

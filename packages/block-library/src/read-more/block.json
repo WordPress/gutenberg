@@ -17,10 +17,11 @@
 	},
 	"usesContext": [ "postId" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,
-			"text": false
+			"text": true
 		},
 		"typography": {
 			"fontSize": true,

@@ -111,7 +111,7 @@ export function TypographyPanel( props ) {
 	} );
 
 	return (
-		<InspectorControls __experimentalGroup="typography">
+		<InspectorControls group="typography">
 			{ ! isFontFamilyDisabled && (
 				<ToolsPanelItem
 					hasValue={ () => hasFontFamilyValue( props ) }
@@ -130,6 +130,7 @@ export function TypographyPanel( props ) {
 			{ ! isFontSizeDisabled && (
 				<ToolsPanelItem
 					hasValue={ () => hasFontSizeValue( props ) }
+					/* translators: Ensure translation is distinct from "Letter case" */
 					label={ __( 'Font size' ) }
 					onDeselect={ () => resetFontSize( props ) }
 					isShownByDefault={ defaultControls?.fontSize }
@@ -188,6 +189,19 @@ export function TypographyPanel( props ) {
 					<LineHeightEdit { ...props } />
 				</ToolsPanelItem>
 			) }
+			{ ! isLetterSpacingDisabled && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => hasLetterSpacingValue( props ) }
+					label={ __( 'Letter spacing' ) }
+					onDeselect={ () => resetLetterSpacing( props ) }
+					isShownByDefault={ defaultControls?.letterSpacing }
+					resetAllFilter={ createResetAllFilter( 'letterSpacing' ) }
+					panelId={ clientId }
+				>
+					<LetterSpacingEdit { ...props } />
+				</ToolsPanelItem>
+			) }
 			{ ! isTextDecorationDisabled && (
 				<ToolsPanelItem
 					className="single-column"
@@ -203,8 +217,8 @@ export function TypographyPanel( props ) {
 			) }
 			{ ! isTextTransformDisabled && (
 				<ToolsPanelItem
-					className="single-column"
 					hasValue={ () => hasTextTransformValue( props ) }
+					/* translators: Ensure translation is distinct from "Font size" */
 					label={ __( 'Letter case' ) }
 					onDeselect={ () => resetTextTransform( props ) }
 					isShownByDefault={ defaultControls?.textTransform }
@@ -212,19 +226,6 @@ export function TypographyPanel( props ) {
 					panelId={ clientId }
 				>
 					<TextTransformEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ ! isLetterSpacingDisabled && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ () => hasLetterSpacingValue( props ) }
-					label={ __( 'Letter spacing' ) }
-					onDeselect={ () => resetLetterSpacing( props ) }
-					isShownByDefault={ defaultControls?.letterSpacing }
-					resetAllFilter={ createResetAllFilter( 'letterSpacing' ) }
-					panelId={ clientId }
-				>
-					<LetterSpacingEdit { ...props } />
 				</ToolsPanelItem>
 			) }
 		</InspectorControls>

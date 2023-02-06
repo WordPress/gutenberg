@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/prettier-config",
-	"version": "1.1.1",
+	"version": "2.9.0",
 	"description": "WordPress Prettier shared configuration.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,13 +20,16 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=14"
 	},
 	"files": [
 		"lib/index.js"
 	],
 	"main": "lib/index.js",
 	"types": "build-types",
+	"peerDependencies": {
+		"prettier": ">=2"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

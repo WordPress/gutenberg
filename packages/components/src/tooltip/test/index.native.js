@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { act } from 'react-test-renderer';
-import { fireEvent, render } from 'test/helpers';
+import { fireEvent, render, act } from 'test/helpers';
 import { Keyboard, Text } from 'react-native';
 
 /**
@@ -15,7 +14,7 @@ import { SlotFillProvider } from '@wordpress/components';
  */
 import Tooltip from '../index';
 
-// Minimal tree to render tooltip
+// Minimal tree to render tooltip.
 const TooltipSlot = ( { children } ) => (
 	<SlotFillProvider>
 		<Tooltip.Slot>{ children }</Tooltip.Slot>
@@ -55,7 +54,7 @@ it( 'displays the message', () => {
 } );
 
 // Skipped until `pointerEvents: 'box-none'` no longer erroneously prevents
-// triggering `onTouch*` on the element: https://git.io/JSHZt
+// triggering `onTouch*` on the element: https://github.com/callstack/react-native-testing-library/issues/897
 it.skip( 'dismisses when the screen is tapped', () => {
 	const screen = render(
 		<TooltipSlot>
@@ -81,7 +80,7 @@ it( 'dismisses when the keyboard closes', () => {
 		</TooltipSlot>
 	);
 
-	// Show keyboard
+	// Show keyboard.
 	act( () => {
 		keyboardHandlers.forEach( ( [ event, handler ] ) => {
 			if ( event === 'keyboardDidShow' ) {

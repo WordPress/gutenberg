@@ -21,9 +21,8 @@ export default function useTemplatePartAreaLabel( clientId ) {
 				return;
 			}
 
-			const { getBlock, getBlockParentsByBlockName } = select(
-				blockEditorStore
-			);
+			const { getBlock, getBlockParentsByBlockName } =
+				select( blockEditorStore );
 
 			const withAscendingResults = true;
 			const parentTemplatePartClientIds = getBlockParentsByBlockName(
@@ -40,10 +39,12 @@ export default function useTemplatePartAreaLabel( clientId ) {
 			// Blocks can be loaded into a *non-post* block editor.
 			// This code is lifted from this file:
 			// packages/block-library/src/template-part/edit/advanced-controls.js
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			const definedAreas = select(
-				'core/editor'
-			).__experimentalGetDefaultTemplatePartAreas();
+			/* eslint-disable @wordpress/data-no-store-string-literals */
+			const definedAreas =
+				select(
+					'core/editor'
+				).__experimentalGetDefaultTemplatePartAreas();
+			/* eslint-enable @wordpress/data-no-store-string-literals */
 			const { getEditedEntityRecord } = select( coreStore );
 
 			for ( const templatePartClientId of parentTemplatePartClientIds ) {

@@ -56,6 +56,7 @@ export default function FileBlockInspector( {
 						/>
 						{ displayPreview && (
 							<RangeControl
+								__nextHasNoMarginBottom
 								label={ __( 'Height in pixels' ) }
 								min={ MIN_PREVIEW_HEIGHT }
 								max={ Math.max(
@@ -68,8 +69,9 @@ export default function FileBlockInspector( {
 						) }
 					</PanelBody>
 				) }
-				<PanelBody title={ __( 'Text link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ textLinkHref }
 						options={ linkDestinationOptions }
@@ -80,8 +82,6 @@ export default function FileBlockInspector( {
 						checked={ openInNewWindow }
 						onChange={ changeOpenInNewWindow }
 					/>
-				</PanelBody>
-				<PanelBody title={ __( 'Download button settings' ) }>
 					<ToggleControl
 						label={ __( 'Show download button' ) }
 						checked={ showDownloadButton }

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,7 +24,10 @@ export const LinkControlSearchCreate = ( {
 
 	let text;
 	if ( buttonText ) {
-		text = isFunction( buttonText ) ? buttonText( searchTerm ) : buttonText;
+		text =
+			typeof buttonText === 'function'
+				? buttonText( searchTerm )
+				: buttonText;
 	} else {
 		text = createInterpolateElement(
 			sprintf(

@@ -28,7 +28,6 @@ export const storeConfig = {
 	selectors,
 	actions,
 	resolvers,
-	__experimentalUseThunks: true,
 };
 
 /**

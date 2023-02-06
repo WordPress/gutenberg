@@ -17,7 +17,6 @@ import {
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
-	useSetting,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -29,8 +28,10 @@ import {
 	BottomSheetSelectControl,
 	CSS_UNITS,
 	filterUnitsWithSettings,
+	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import { link } from '@wordpress/icons';
+// eslint-disable-next-line no-restricted-imports
 import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
@@ -59,7 +60,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 		if ( newWidth === 'auto' ) {
 			width = undefined;
 		}
-		// Update attributes
+		// Update attributes.
 		setAttributes( { width } );
 	}
 
@@ -95,9 +96,8 @@ function ButtonEdit( props ) {
 	const { editorSidebarOpened, numOfButtons } = useSelect(
 		( select ) => {
 			const { isEditorSidebarOpened } = select( editPostStore );
-			const { getBlockCount, getBlockRootClientId } = select(
-				blockEditorStore
-			);
+			const { getBlockCount, getBlockRootClientId } =
+				select( blockEditorStore );
 			const parentId = getBlockRootClientId( clientId );
 			const blockCount = getBlockCount( parentId );
 			const currentIsEditorSidebarOpened = isEditorSidebarOpened();
@@ -118,8 +118,8 @@ function ButtonEdit( props ) {
 	const [ borderRadiusUnit, setBorderRadiusUnit ] = useState( valueUnit );
 
 	const richTextRef = useRef();
-	const colors = useSetting( 'color.palette' ) || [];
-	const gradients = useSetting( 'color.gradients' ) || [];
+	const colors = useMobileGlobalStylesColors();
+	const gradients = useMobileGlobalStylesColors( 'gradients' );
 
 	useEffect( () => {
 		if ( isSelected ) {
@@ -134,10 +134,13 @@ function ButtonEdit( props ) {
 	useEffect( () => {
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
 		// to avoid flashing caret after closing one of them
-		if ( editorSidebarOpened || isLinkSheetVisible ) {
-			if ( Platform.OS === 'android' && richTextRef?.current ) {
-				richTextRef.current.blur();
+		const richText = richTextRef?.current;
+		if ( Platform.OS === 'android' && richText ) {
+			if ( editorSidebarOpened || isLinkSheetVisible ) {
+				richText.blur();
 				onToggleButtonFocus( false );
+			} else {
+				onToggleButtonFocus( true );
 			}
 		}
 	}, [ editorSidebarOpened, isLinkSheetVisible ] );
@@ -435,7 +438,7 @@ function ButtonEdit( props ) {
 	const buttonBorderRadiusValue =
 		borderRadiusUnit === 'px' || borderRadiusUnit === '%'
 			? borderRadiusValue
-			: Math.floor( 14 * borderRadiusValue ); // lets assume that the font size is set to 14px; TO get a nicer preview.
+			: Math.floor( 14 * borderRadiusValue ); // Lets assume that the font size is set to 14px; TO get a nicer preview.
 	const outlineBorderRadius =
 		buttonBorderRadiusValue > 0
 			? buttonBorderRadiusValue + spacing + borderWidth

@@ -112,17 +112,23 @@ class Layout extends Component {
 
 		const isHtmlView = mode === 'text';
 
-		// add a margin view at the bottom for the header
+		// Add a margin view at the bottom for the header.
 		const marginBottom =
 			Platform.OS === 'android' && ! isHtmlView
-				? headerToolbarStyles.container.height
+				? headerToolbarStyles[ 'header-toolbar__container' ].height
 				: 0;
+
+		const containerStyles = getStylesFromColorScheme(
+			styles.container,
+			styles.containerDark
+		);
 
 		const toolbarKeyboardAvoidingViewStyle = {
 			...styles.toolbarKeyboardAvoidingView,
 			left: this.state.safeAreaInsets.left,
 			right: this.state.safeAreaInsets.right,
 			bottom: this.state.safeAreaInsets.bottom,
+			backgroundColor: containerStyles.backgroundColor,
 		};
 
 		const editorStyles = [
@@ -138,10 +144,7 @@ class Layout extends Component {
 		return (
 			<Tooltip.Slot>
 				<SafeAreaView
-					style={ getStylesFromColorScheme(
-						styles.container,
-						styles.containerDark
-					) }
+					style={ containerStyles }
 					onLayout={ this.onRootViewLayout }
 				>
 					<AutosaveMonitor disableIntervalChecks />
@@ -184,13 +187,12 @@ class Layout extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { __unstableIsEditorReady: isEditorReady } = select(
-			editorStore
-		);
+		const { __unstableIsEditorReady: isEditorReady } =
+			select( editorStore );
 		const { getEditorMode } = select( editPostStore );
 		const { getSettings } = select( blockEditorStore );
-		const globalStyles = getSettings()?.__experimentalGlobalStylesBaseStyles
-			?.color;
+		const globalStyles =
+			getSettings()?.__experimentalGlobalStylesBaseStyles?.color;
 
 		return {
 			isReady: isEditorReady(),

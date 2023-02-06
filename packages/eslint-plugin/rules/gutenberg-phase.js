@@ -5,7 +5,7 @@
  * @param {Object}   sourceNode The AST node to search from.
  * @param {Function} predicate  A predicate invoked for each parent.
  *
- * @return {?Object } The first encountered parent node where the predicate
+ * @return {Object | undefined} The first encountered parent node where the predicate
  *                    returns a truthy value.
  */
 function findParent( sourceNode, predicate ) {
@@ -80,7 +80,7 @@ function testIsUsedInStrictBinaryExpression( node, context ) {
 		const comparisonNode =
 			node.parent.type === 'MemberExpression' ? node.parent : node;
 
-		// Test for process.env.GUTENBERG_PHASE === <number> or <number> === process.env.GUTENBERG_PHASE
+		// Test for process.env.GUTENBERG_PHASE === <number> or <number> === process.env.GUTENBERG_PHASE.
 		const hasCorrectOperator = [ '===', '!==' ].includes( parent.operator );
 		const hasCorrectOperands =
 			( parent.left === comparisonNode &&

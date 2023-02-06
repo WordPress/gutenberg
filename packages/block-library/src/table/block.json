@@ -47,6 +47,16 @@
 							"type": "string",
 							"source": "attribute",
 							"attribute": "data-align"
+						},
+						"colspan": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "colspan"
+						},
+						"rowspan": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "rowspan"
 						}
 					}
 				}
@@ -82,6 +92,16 @@
 							"type": "string",
 							"source": "attribute",
 							"attribute": "data-align"
+						},
+						"colspan": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "colspan"
+						},
+						"rowspan": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "rowspan"
 						}
 					}
 				}
@@ -117,6 +137,16 @@
 							"type": "string",
 							"source": "attribute",
 							"attribute": "data-align"
+						},
+						"colspan": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "colspan"
+						},
+						"rowspan": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "rowspan"
 						}
 					}
 				}
@@ -134,13 +164,19 @@
 				"text": true
 			}
 		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

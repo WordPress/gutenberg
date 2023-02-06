@@ -41,7 +41,7 @@ function FocalPointSettingsButton( {
 		>
 			{ /*
 			 * Wrapper View element used around Icon as workaround for SVG opacity
-			 * issue: https://git.io/JtuXD
+			 * issue: https://github.com/react-native-svg/react-native-svg/issues/1345
 			 */ }
 			<View style={ disabled && styles.dimmedActionButton }>
 				<Icon icon={ chevronRight } />

@@ -2,6 +2,73 @@
 
 ## Unreleased
 
+## 13.10.0 (2023-02-01)
+
+- The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^37.0.3` to requiring `^39.6.9`
+
+### Enhancement
+
+-   Bump `eslint-plugin-jest` version to 27.2.1.
+
+## 13.9.0 (2023-01-11)
+
+## 13.8.0 (2023-01-02)
+
+## 13.7.0 (2022-12-14)
+
+## 13.6.0 (2022-11-16)
+
+## 13.5.0 (2022-11-02)
+
+## 13.4.0 (2022-10-19)
+
+## 13.3.0 (2022-10-05)
+
+## 13.2.0 (2022-09-21)
+
+## 13.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+-   Remove all rules targeting test files from the `recommended` and `recommended-with-formatting` presets when Jest package is installed ([#43272](https://github.com/WordPress/gutenberg/pull/43272)).
+
+## 12.8.0 (2022-07-27)
+
+### Code Quality
+
+-   Remove deprecated rules `no-negated-in-lhs` replaced with `no-unsafe-negation`, and `jsx-a11y/label-has-for` replaced with `jsx-a11/label-has-associated-control` ([#42654](https://github.com/WordPress/gutenberg/pull/42654)).
+
+## 12.6.0 (2022-06-29)
+
+-   Enable `no-unused-vars`'s setting `ignoreRestSiblings` to allow unused variables when destructuring with rest properties ([#41897](https://github.com/WordPress/gutenberg/pull/41897)).
+
+## 12.2.0 (2022-05-04)
+
+### Bug Fix
+
+-   Fix the `recommended` preset when Prettier is not installed ([#40634](https://github.com/WordPress/gutenberg/pull/40634)).
+
+## 12.0.0 (2022-04-08)
+
+### Breaking Changes
+
+-   Revert the removal of the automatic environment detection of `test-unit` and `test-e2e` for the `recommended` preset. However, They will still be disabled if `@playwright/test` is installed in the project.
+
+## 11.0.0 (2022-03-11)
+
+### Breaking Changes
+
+-   The integration with [Prettier](https://prettier.io) is now optional and gets activated when the `prettier` package is installed in the project ([#39244](https://github.com/WordPress/gutenberg/pull/39244)).
+
+### Bug Fix
+
+-   Replaced no-shadow eslint rule with @typescript-eslint/no-shadow ([#38665](https://github.com/WordPress/gutenberg/pull/38665)).
+
+### Breaking Changes
+
+-   Remove automatic environment detection of `test-unit` and `test-e2e` for the `recommended` preset. It's now recommended to opt-in to specific preset explicitly.
+
 ## 10.0.0 (2022-01-27)
 
 ### Breaking Changes

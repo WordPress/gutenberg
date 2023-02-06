@@ -8,6 +8,11 @@ import {
 
 /** @typedef {import('./create').RichTextValue} RichTextValue */
 
+const pattern = new RegExp(
+	`[${ OBJECT_REPLACEMENT_CHARACTER }${ LINE_SEPARATOR }]`,
+	'g'
+);
+
 /**
  * Get the textual content of a Rich Text value. This is similar to
  * `Element.textContent`.
@@ -17,7 +22,7 @@ import {
  * @return {string} The text content.
  */
 export function getTextContent( { text } ) {
-	return text
-		.replace( new RegExp( OBJECT_REPLACEMENT_CHARACTER, 'g' ), '' )
-		.replace( new RegExp( LINE_SEPARATOR, 'g' ), '\n' );
+	return text.replace( pattern, ( c ) =>
+		c === OBJECT_REPLACEMENT_CHARACTER ? '' : '\n'
+	);
 }

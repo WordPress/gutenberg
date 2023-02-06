@@ -262,7 +262,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		number
 	) => {
 		if ( ! tannin.data[ domain ] ) {
-			// use `doSetLocaleData` to set silently, without notifying listeners
+			// Use `doSetLocaleData` to set silently, without notifying listeners.
 			doSetLocaleData( undefined, domain );
 		}
 

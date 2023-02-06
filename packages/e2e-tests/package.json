@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/e2e-tests",
-	"version": "3.0.2",
+	"version": "6.3.0",
 	"description": "End-To-End (E2E) tests for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=14"
 	},
 	"dependencies": {
 		"@wordpress/e2e-test-utils": "file:../e2e-test-utils",
@@ -39,7 +39,9 @@
 	},
 	"peerDependencies": {
 		"jest": ">=27",
-		"puppeteer-core": ">=11"
+		"puppeteer-core": ">=11",
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

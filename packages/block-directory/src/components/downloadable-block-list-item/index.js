@@ -69,10 +69,8 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 
 	const { hasNotice, isInstalling, isInstallable } = useSelect(
 		( select ) => {
-			const {
-				getErrorNoticeForBlock,
-				isInstalling: isBlockInstalling,
-			} = select( blockDirectoryStore );
+			const { getErrorNoticeForBlock, isInstalling: isBlockInstalling } =
+				select( blockDirectoryStore );
 			const notice = getErrorNoticeForBlock( item.id );
 			const hasFatal = notice && notice.isFatal;
 			return {
@@ -93,6 +91,7 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 
 	return (
 		<CompositeItem
+			__experimentalIsFocusable
 			role="option"
 			as={ Button }
 			{ ...composite }

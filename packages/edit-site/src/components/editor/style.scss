@@ -1,43 +1,16 @@
-html #wpadminbar {
-	display: none;
-}
-
-html.wp-toolbar {
-	padding-top: 0;
-}
-
 .edit-site-editor__toggle-save-panel {
-	z-index: z-index(".edit-site-editor__toggle-save-panel");
-	position: fixed !important; // Need to override the default relative positioning
-	top: -9999em;
-	bottom: auto;
-	left: auto;
-	right: 0;
+	box-sizing: border-box;
 	width: $sidebar-width;
 	background-color: $white;
 	border: 1px dotted $gray-300;
-	height: auto !important; // Need to override the default sidebar positioning
 	padding: $grid-unit-30;
 	display: flex;
 	justify-content: center;
 
-	.interface-interface-skeleton__actions:focus &,
-	.interface-interface-skeleton__actions:focus-within & {
+	.edit-site-layout__actions:focus &,
+	.edit-site-layout__actions:focus-within & {
 		top: auto;
 		bottom: 0;
-	}
-}
-
-.edit-site-visual-editor {
-	position: relative;
-	height: 100%;
-	display: block;
-
-	iframe {
-		display: block;
-		width: 100%;
-		height: 100%;
-		background-color: $white;
 	}
 }
 

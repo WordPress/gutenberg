@@ -25,12 +25,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
 function ColumnEdit( {
-	attributes: {
-		verticalAlignment,
-		width,
-		templateLock = false,
-		allowedBlocks,
-	},
+	attributes: { verticalAlignment, width, templateLock, allowedBlocks },
 	setAttributes,
 	clientId,
 } ) {
@@ -50,9 +45,8 @@ function ColumnEdit( {
 
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
 		( select ) => {
-			const { getBlockOrder, getBlockRootClientId } = select(
-				blockEditorStore
-			);
+			const { getBlockOrder, getBlockRootClientId } =
+				select( blockEditorStore );
 
 			const rootId = getBlockRootClientId( clientId );
 

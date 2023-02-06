@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+## 1.35.0 (2023-02-01)
+
+## 1.34.0 (2023-01-11)
+
+## 1.33.0 (2023-01-02)
+
+## 1.32.0 (2022-12-14)
+
+## 1.31.0 (2022-11-16)
+
+## 1.30.0 (2022-11-02)
+
+## 1.29.0 (2022-10-19)
+
+## 1.28.0 (2022-10-05)
+
+## 1.27.0 (2022-09-21)
+
 ## 1.18.0 (2021-07-21)
 
 ### Bug Fixes
@@ -41,7 +59,7 @@
 
 ### Internal
 
--   Remove unneccessary argument from an instance of `Array#pop`.
+-   Remove unnecessary argument from an instance of `Array#pop`.
 
 ## 1.0.0 (2019-03-06)
 

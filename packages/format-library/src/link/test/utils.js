@@ -118,7 +118,7 @@ describe( 'getFormatBoundary', () => {
 	describe( 'Invalid values', () => {
 		it( 'should return empty bounds if value contains no formats', () => {
 			const record = {
-				formats: [], // no formats here!
+				formats: [], // No formats here!
 				text: 'Lorem ipsum dolor.',
 				start: 8,
 				end: 8,
@@ -145,14 +145,14 @@ describe( 'getFormatBoundary', () => {
 						[ italicFormat ],
 						[ italicFormat ],
 						null,
-						null, // 5
-						[ linkFormat, italicFormat ], // 6
+						null, // 5.
+						[ linkFormat, italicFormat ], // 6.
 						[ linkFormat ],
 						[ linkFormat, boldFormat ],
 						[ linkFormat, boldFormat ],
-						[ linkFormat, italicFormat ], // 10
-						null, // 11
-						[ boldFormat ], // 12
+						[ linkFormat, italicFormat ], // 10.
+						null, // 11.
+						[ boldFormat ], // 12.
 						[ boldFormat ],
 						[ boldFormat ],
 						[ boldFormat ],
@@ -161,8 +161,8 @@ describe( 'getFormatBoundary', () => {
 					],
 
 					text: 'Lorem ipsum dolor.',
-					start: 5, // no format here
-					end: 12, // format here but it doesn't match the target format
+					start: 5, // No format here.
+					end: 12, // Format here but it doesn't match the target format.
 				};
 
 				expect(
@@ -190,19 +190,19 @@ describe( 'getFormatBoundary', () => {
 						[ italicFormat ],
 						[ italicFormat ],
 						null,
-						null, // 5
-						[ linkFormat, italicFormat ], // 6
+						null, // 5.
+						[ linkFormat, italicFormat ], // 6.
 						[ linkFormat ],
 						[ linkFormat, boldFormat ],
 						[ linkFormat, boldFormat ],
-						[ linkFormat, italicFormat ], // 10
-						null, // 11
-						[ boldFormat ], // 12
+						[ linkFormat, italicFormat ], // 10.
+						null, // 11.
+						[ boldFormat ], // 12.
 						[ boldFormat ],
 						[ boldFormat ],
 						[ boldFormat ],
 						null,
-						null, // 17
+						null, // 17.
 					],
 
 					text: 'Lorem ipsum dolor.',
@@ -238,11 +238,11 @@ describe( 'getFormatBoundary', () => {
 						[ italicFormat ],
 						null,
 						null,
-						[ linkFormat, italicFormat ], // 6
+						[ linkFormat, italicFormat ], // 6.
 						[ linkFormat ],
 						[ linkFormat, boldFormat ],
 						[ linkFormat, boldFormat ],
-						[ linkFormat, italicFormat ], // 10
+						[ linkFormat, italicFormat ], // 10.
 					],
 
 					text: 'Lorem ipsum dolor.',
@@ -273,16 +273,16 @@ describe( 'getFormatBoundary', () => {
 					[ italicFormat ],
 					null,
 					null,
-					[ linkFormat, italicFormat ], // 6
+					[ linkFormat, italicFormat ], // 6.
 					[ linkFormat ],
 					[ linkFormat, boldFormat ],
 					[ linkFormat, boldFormat ],
-					[ linkFormat, italicFormat ], // 10
+					[ linkFormat, italicFormat ], // 10.
 				],
 
 				text: 'Lorem ipsum dolor.',
-				start: 11, // +1 beyond the end of the formats
-				end: 11, // +1 beyond the end of the formats
+				start: 11, // +1 beyond the end of the formats.
+				end: 11, // +1 beyond the end of the formats.
 			};
 
 			expect(
@@ -309,11 +309,11 @@ describe( 'getFormatBoundary', () => {
 						[ italicFormat ],
 						null,
 						null,
-						[ linkFormat, italicFormat ], // 6
+						[ linkFormat, italicFormat ], // 6.
 						[ linkFormat ],
 						[ linkFormat, boldFormat ],
 						[ linkFormat, boldFormat ],
-						[ linkFormat, italicFormat ], // 10
+						[ linkFormat, italicFormat ], // 10.
 						null,
 						null,
 						[ boldFormat ],
@@ -346,7 +346,7 @@ describe( 'getFormatBoundary', () => {
 				[ linkFormat ],
 				[ linkFormat ],
 				[ linkFormat ],
-				[ linkFormat ], // 5
+				[ linkFormat ], // 5.
 				[ boldFormat ],
 				[ boldFormat ],
 				null,
@@ -402,9 +402,9 @@ describe( 'getFormatBoundary', () => {
 					[],
 					[],
 					[],
-					[ boldFormat ], // 4
+					[ boldFormat ], // 4.
 					[ boldFormat ],
-					[ boldFormat ], // 6
+					[ boldFormat ], // 6.
 					[],
 					[],
 				],

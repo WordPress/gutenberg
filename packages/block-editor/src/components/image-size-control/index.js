@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty, noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -20,8 +15,10 @@ import { __ } from '@wordpress/i18n';
 import useDimensionHandler from './use-dimension-handler';
 
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
+const noop = () => {};
 
 export default function ImageSizeControl( {
+	imageSizeHelp,
 	imageWidth,
 	imageHeight,
 	imageSizeOptions = [],
@@ -32,21 +29,19 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage = noop,
 } ) {
-	const {
-		currentHeight,
-		currentWidth,
-		updateDimension,
-		updateDimensions,
-	} = useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
+	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
+		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
 
 	return (
 		<>
-			{ ! isEmpty( imageSizeOptions ) && (
+			{ imageSizeOptions && imageSizeOptions.length > 0 && (
 				<SelectControl
+					__nextHasNoMarginBottom
 					label={ __( 'Image size' ) }
 					value={ slug }
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
+					help={ imageSizeHelp }
 				/>
 			) }
 			{ isResizable && (

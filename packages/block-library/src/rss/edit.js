@@ -12,17 +12,19 @@ import {
 	PanelBody,
 	Placeholder,
 	RangeControl,
-	TextControl,
 	ToggleControl,
 	ToolbarGroup,
+	__experimentalHStack as HStack,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { grid, list, edit, rss } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { prependHTTP } from '@wordpress/url';
 import ServerSideRender from '@wordpress/server-side-render';
 
 const DEFAULT_MIN_ITEMS = 1;
-const DEFAULT_MAX_ITEMS = 10;
+const DEFAULT_MAX_ITEMS = 20;
 
 export default function RSSEdit( { attributes, setAttributes } ) {
 	const [ isEditing, setIsEditing ] = useState( ! attributes.feedURL );
@@ -50,6 +52,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 		event.preventDefault();
 
 		if ( feedURL ) {
+			setAttributes( { feedURL: prependHTTP( feedURL ) } );
 			setIsEditing( false );
 		}
 	}
@@ -64,17 +67,20 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						onSubmit={ onSubmitURL }
 						className="wp-block-rss__placeholder-form"
 					>
-						<TextControl
-							placeholder={ __( 'Enter URL here…' ) }
-							value={ feedURL }
-							onChange={ ( value ) =>
-								setAttributes( { feedURL: value } )
-							}
-							className="wp-block-rss__placeholder-input"
-						/>
-						<Button variant="primary" type="submit">
-							{ __( 'Use URL' ) }
-						</Button>
+						<HStack wrap>
+							<InputControl
+								__next36pxDefaultSize
+								placeholder={ __( 'Enter URL here…' ) }
+								value={ feedURL }
+								onChange={ ( value ) =>
+									setAttributes( { feedURL: value } )
+								}
+								className="wp-block-rss__placeholder-input"
+							/>
+							<Button variant="primary" type="submit">
+								{ __( 'Use URL' ) }
+							</Button>
+						</HStack>
 					</form>
 				</Placeholder>
 			</div>
@@ -107,8 +113,9 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 				<ToolbarGroup controls={ toolbarControls } />
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'RSS settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Number of items' ) }
 						value={ itemsToShow }
 						onChange={ ( value ) =>
@@ -135,6 +142,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					/>
 					{ displayExcerpt && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Max number of words in excerpt' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
@@ -147,6 +155,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					) }
 					{ blockLayout === 'grid' && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Columns' ) }
 							value={ columns }
 							onChange={ ( value ) =>

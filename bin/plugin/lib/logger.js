@@ -3,7 +3,7 @@
  */
 const chalk = require( 'chalk' );
 
-// Formats
+// Formats.
 const title = chalk.bold;
 const error = chalk.bold.red;
 const warning = chalk.bold.keyword( 'orange' );

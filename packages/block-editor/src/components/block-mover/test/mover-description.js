@@ -183,9 +183,7 @@ describe( 'block mover', () => {
 					true,
 					negativeDirection
 				)
-			).toBe(
-				'Blocks cannot be moved up as they are already at the top'
-			);
+			).toBe( 'All blocks are selected, and cannot be moved' );
 		} );
 
 		it( 'generates a title for a selection of blocks at the bottom', () => {
@@ -199,6 +197,60 @@ describe( 'block mover', () => {
 				)
 			).toBe(
 				'Blocks cannot be moved down as they are already at the bottom'
+			);
+		} );
+
+		it( 'indicates that blocks can be moved left when the orientation is horizontal and the direction is negative', () => {
+			expect(
+				getMultiBlockMoverDescription(
+					4,
+					1,
+					false,
+					true,
+					negativeDirection,
+					'horizontal'
+				)
+			).toBe( 'Move 4 blocks from position 2 left by one place' );
+		} );
+
+		it( 'indicates that blocks can be moved right when the orientation is horizontal and the direction is positive', () => {
+			expect(
+				getMultiBlockMoverDescription(
+					4,
+					0,
+					true,
+					false,
+					positiveDirection,
+					'horizontal'
+				)
+			).toBe( 'Move 4 blocks from position 1 right by one place' );
+		} );
+
+		it( 'indicates that blocks cannot be moved left when the orientation is horizontal and a selection of blocks at the left', () => {
+			expect(
+				getMultiBlockMoverDescription(
+					4,
+					1,
+					true,
+					true,
+					negativeDirection,
+					'horizontal'
+				)
+			).toBe( 'All blocks are selected, and cannot be moved' );
+		} );
+
+		it( 'indicates that blocks cannot be moved right when the orientation is horizontal and the block is the last block', () => {
+			expect(
+				getMultiBlockMoverDescription(
+					4,
+					2,
+					false,
+					true,
+					positiveDirection,
+					'horizontal'
+				)
+			).toBe(
+				'Blocks cannot be moved right as they are already are at the rightmost position'
 			);
 		} );
 	} );

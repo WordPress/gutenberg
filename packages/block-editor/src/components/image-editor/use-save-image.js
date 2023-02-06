@@ -1,11 +1,14 @@
 /**
  * WordPress dependencies
  */
+// Disable Reason: Needs to be refactored.
+// eslint-disable-next-line no-restricted-imports
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 export default function useSaveImage( {
 	crop,
@@ -60,7 +63,7 @@ export default function useSaveImage( {
 					sprintf(
 						/* translators: 1. Error message */
 						__( 'Could not edit image. %s' ),
-						error.message
+						stripHTML( error.message )
 					),
 					{
 						id: 'image-editing-error',

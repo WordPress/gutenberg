@@ -1,10 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
-		"name": "core/post-comments",
+		"name": "core/comments",
 		"isValid": true,
-		"attributes": {},
-		"innerBlocks": [],
-		"originalContent": ""
+		"attributes": {
+			"tagName": "div",
+			"legacy": true
+		},
+		"innerBlocks": []
 	}
 ]

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, deburr } from 'lodash';
+
 /**
  * WordPress dependencies
  */
@@ -15,19 +15,23 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-import { ENTER, UP, DOWN, ESCAPE } from '@wordpress/keycodes';
 import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import { InputWrapperFlex } from './styles';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
 import Button from '../button';
-import { Flex, FlexBlock, FlexItem } from '../flex';
+import { FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
+import { useControlledValue } from '../utils/hooks';
+import { normalizeTextString } from '../utils/strings';
+
+const noop = () => {};
 
 const DetectOutside = withFocusOutside(
 	class extends Component {
@@ -42,10 +46,13 @@ const DetectOutside = withFocusOutside(
 );
 
 function ComboboxControl( {
-	value,
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
+	__nextHasNoMarginBottom = false,
+	__next36pxDefaultSize,
+	value: valueProp,
 	label,
 	options,
-	onChange,
+	onChange: onChangeProp,
 	onFilterValueChange = noop,
 	hideLabelFromVision,
 	help,
@@ -54,10 +61,19 @@ function ComboboxControl( {
 	messages = {
 		selected: __( 'Item selected.' ),
 	},
+	__experimentalRenderItem,
 } ) {
+	const [ value, setValue ] = useControlledValue( {
+		value: valueProp,
+		onChange: onChangeProp,
+	} );
+
 	const currentOption = options.find( ( option ) => option.value === value );
 	const currentLabel = currentOption?.label ?? '';
-	const instanceId = useInstanceId( ComboboxControl );
+	// Use a custom prefix when generating the `instanceId` to avoid having
+	// duplicate input IDs when rendering this component and `FormTokenField`
+	// in the same page (see https://github.com/WordPress/gutenberg/issues/42112).
+	const instanceId = useInstanceId( ComboboxControl, 'combobox-control' );
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState(
 		currentOption || null
 	);
@@ -69,11 +85,9 @@ function ComboboxControl( {
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch = [];
 		const containsMatch = [];
-		const match = deburr( inputValue.toLocaleLowerCase() );
+		const match = normalizeTextString( inputValue );
 		options.forEach( ( option ) => {
-			const index = deburr( option.label )
-				.toLocaleLowerCase()
-				.indexOf( match );
+			const index = normalizeTextString( option.label ).indexOf( match );
 			if ( index === 0 ) {
 				startsWithMatch.push( option );
 			} else if ( index > 0 ) {
@@ -82,10 +96,10 @@ function ComboboxControl( {
 		} );
 
 		return startsWithMatch.concat( containsMatch );
-	}, [ inputValue, options, value ] );
+	}, [ inputValue, options ] );
 
 	const onSuggestionSelected = ( newSelectedSuggestion ) => {
-		onChange( newSelectedSuggestion.value );
+		setValue( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );
 		setInputValue( '' );
@@ -107,26 +121,34 @@ function ComboboxControl( {
 	const onKeyDown = ( event ) => {
 		let preventDefault = false;
 
-		if ( event.defaultPrevented ) {
+		if (
+			event.defaultPrevented ||
+			// Ignore keydowns from IMEs
+			event.nativeEvent.isComposing ||
+			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+			// is `isComposing=false`, even though it's technically still part of the composition.
+			// These can only be detected by keyCode.
+			event.keyCode === 229
+		) {
 			return;
 		}
 
-		switch ( event.keyCode ) {
-			case ENTER:
+		switch ( event.code ) {
+			case 'Enter':
 				if ( selectedSuggestion ) {
 					onSuggestionSelected( selectedSuggestion );
 					preventDefault = true;
 				}
 				break;
-			case UP:
+			case 'ArrowUp':
 				handleArrowNavigation( -1 );
 				preventDefault = true;
 				break;
-			case DOWN:
+			case 'ArrowDown':
 				handleArrowNavigation( 1 );
 				preventDefault = true;
 				break;
-			case ESCAPE:
+			case 'Escape':
 				setIsExpanded( false );
 				setSelectedSuggestion( null );
 				preventDefault = true;
@@ -165,8 +187,8 @@ function ComboboxControl( {
 	};
 
 	const handleOnReset = () => {
-		onChange( null );
-		inputContainer.current.input.focus();
+		setValue( null );
+		inputContainer.current.focus();
 	};
 
 	// Update current selections when the filter input changes.
@@ -181,7 +203,7 @@ function ComboboxControl( {
 		}
 	}, [ matchingSuggestions, selectedSuggestion ] );
 
-	// Announcements
+	// Announcements.
 	useEffect( () => {
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 		if ( isExpanded ) {
@@ -208,6 +230,7 @@ function ComboboxControl( {
 	return (
 		<DetectOutside onFocusOutside={ onFocusOutside }>
 			<BaseControl
+				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				className={ classnames(
 					className,
 					'components-combobox-control'
@@ -223,18 +246,15 @@ function ComboboxControl( {
 					tabIndex="-1"
 					onKeyDown={ onKeyDown }
 				>
-					<Flex>
+					<InputWrapperFlex
+						__next36pxDefaultSize={ __next36pxDefaultSize }
+					>
 						<FlexBlock>
 							<TokenInput
 								className="components-combobox-control__input"
 								instanceId={ instanceId }
 								ref={ inputContainer }
 								value={ isExpanded ? inputValue : currentLabel }
-								aria-label={
-									currentLabel
-										? `${ currentLabel }, ${ label }`
-										: null
-								}
 								onFocus={ onFocus }
 								onBlur={ onBlur }
 								isExpanded={ isExpanded }
@@ -255,7 +275,7 @@ function ComboboxControl( {
 								/>
 							</FlexItem>
 						) }
-					</Flex>
+					</InputWrapperFlex>
 					{ isExpanded && (
 						<SuggestionsList
 							instanceId={ instanceId }
@@ -270,6 +290,9 @@ function ComboboxControl( {
 							onHover={ setSelectedSuggestion }
 							onSelect={ onSuggestionSelected }
 							scrollIntoView
+							__experimentalRenderItem={
+								__experimentalRenderItem
+							}
 						/>
 					) }
 				</div>

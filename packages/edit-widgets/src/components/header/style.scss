@@ -25,18 +25,12 @@
 
 .edit-widgets-header__actions {
 	display: flex;
+	align-items: center;
 
-	.components-button {
-		margin-right: $grid-unit-05;
+	gap: $grid-unit-05;
 
-		@include break-small() {
-			margin-right: $grid-unit-15;
-		}
-	}
-
-	.edit-widgets-more-menu .components-button,
-	.interface-pinned-items .components-button {
-		margin-right: 0;
+	@include break-small() {
+		gap: $grid-unit-10;
 	}
 }
 

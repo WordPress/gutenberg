@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * Returns an action object used in signalling that format types have been
  * added.
  *
@@ -14,7 +9,9 @@ import { castArray } from 'lodash';
 export function addFormatTypes( formatTypes ) {
 	return {
 		type: 'ADD_FORMAT_TYPES',
-		formatTypes: castArray( formatTypes ),
+		formatTypes: Array.isArray( formatTypes )
+			? formatTypes
+			: [ formatTypes ],
 	};
 }
 
@@ -28,6 +25,6 @@ export function addFormatTypes( formatTypes ) {
 export function removeFormatTypes( names ) {
 	return {
 		type: 'REMOVE_FORMAT_TYPES',
-		names: castArray( names ),
+		names: Array.isArray( names ) ? names : [ names ],
 	};
 }

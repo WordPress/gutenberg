@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-import { without } from 'lodash';
-import type { ComponentType } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -12,7 +6,11 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../../utils/create-higher-order-component';
+import {
+	createHigherOrderComponent,
+	WithInjectedProps,
+	WithoutInjectedProps,
+} from '../../utils/create-higher-order-component';
 
 /**
  * We cannot use the `Window['setTimeout']` and `Window['clearTimeout']`
@@ -22,25 +20,24 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  * In the case of this component, we only handle the simplest case where
  * `setTimeout` only accepts a function (not a string) and an optional delay.
  */
-type TimeoutProps = {
+interface TimeoutProps {
 	setTimeout: ( fn: () => void, delay: number ) => number;
 	clearTimeout: ( id: number ) => void;
-};
+}
 
 /**
  * A higher-order component used to provide and manage delayed function calls
  * that ought to be bound to a component's lifecycle.
  */
-const withSafeTimeout = createHigherOrderComponent< TimeoutProps >(
-	< TProps extends TimeoutProps >(
-		OriginalComponent: ComponentType< TProps >
+const withSafeTimeout = createHigherOrderComponent(
+	< C extends WithInjectedProps< C, TimeoutProps > >(
+		OriginalComponent: C
 	) => {
-		return class WrappedComponent extends Component<
-			Omit< TProps, keyof TimeoutProps >
-		> {
+		type WrappedProps = WithoutInjectedProps< C, TimeoutProps >;
+		return class WrappedComponent extends Component< WrappedProps > {
 			timeouts: number[];
 
-			constructor( props: Omit< TProps, keyof TimeoutProps > ) {
+			constructor( props: WrappedProps ) {
 				super( props );
 				this.timeouts = [];
 				this.setTimeout = this.setTimeout.bind( this );
@@ -51,7 +48,7 @@ const withSafeTimeout = createHigherOrderComponent< TimeoutProps >(
 				this.timeouts.forEach( clearTimeout );
 			}
 
-			setTimeout( fn: ( ...args: any[] ) => void, delay: number ) {
+			setTimeout( fn: () => void, delay: number ) {
 				const id = setTimeout( () => {
 					fn();
 					this.clearTimeout( id );
@@ -62,17 +59,20 @@ const withSafeTimeout = createHigherOrderComponent< TimeoutProps >(
 
 			clearTimeout( id: number ) {
 				clearTimeout( id );
-				this.timeouts = without( this.timeouts, id );
+				this.timeouts = this.timeouts.filter(
+					( timeoutId ) => timeoutId !== id
+				);
 			}
 
 			render() {
-				const props = {
-					...this.props,
-					setTimeout: this.setTimeout,
-					clearTimeout: this.clearTimeout,
-				} as TProps;
-
-				return <OriginalComponent { ...props } />;
+				return (
+					// @ts-ignore
+					<OriginalComponent
+						{ ...this.props }
+						setTimeout={ this.setTimeout }
+						clearTimeout={ this.clearTimeout }
+					/>
+				);
 			}
 		};
 	},

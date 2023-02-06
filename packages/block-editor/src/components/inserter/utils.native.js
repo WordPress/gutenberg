@@ -33,3 +33,14 @@ export function filterInserterItems(
 		blockAllowed( block, { onlyReusable, allowReusable } )
 	);
 }
+
+export function createInserterSection( { key, metadata = {}, items } ) {
+	if ( ! key ) {
+		throw new Error( 'A unique key for the section must be provided.' );
+	}
+
+	return {
+		metadata,
+		data: [ { key, list: items } ],
+	};
+}

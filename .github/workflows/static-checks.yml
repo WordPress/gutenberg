@@ -22,19 +22,21 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
-                  node-version: 14
+                  node-version-file: '.nvmrc'
                   cache: npm
 
             - name: Npm install
               # A "full" install is executed, since `npm ci` does not always exit
-              # with an error status code if the lock file is inaccurate.
+              # with an error status code if the lock file is inaccurate. This also
+              # helps to catch dependencies not being installed with exact version.
               #
               # See: https://github.com/WordPress/gutenberg/issues/16157
+              # See: https://github.com/WordPress/gutenberg/pull/39865
               run: npm install
 
             - name: Lint JavaScript and Styles
@@ -44,7 +46,7 @@ jobs:
               run: npm run build:package-types
 
             - name: Check local changes
-              run: npm run check-local-changes
+              run: npm run other:check-local-changes
 
             - name: License compatibility
-              run: npm run check-licenses
+              run: npm run other:check-licenses

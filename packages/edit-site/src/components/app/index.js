@@ -1,47 +1,45 @@
 /**
  * WordPress dependencies
  */
-import { SlotFillProvider } from '@wordpress/components';
+import { SlotFillProvider, Popover } from '@wordpress/components';
 import { UnsavedChangesWarning } from '@wordpress/editor';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { store as noticesStore } from '@wordpress/notices';
+import { useDispatch } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
  */
 import { Routes } from '../routes';
-import Editor from '../editor';
-import List from '../list';
-import NavigationSidebar from '../navigation-sidebar';
-import getIsListPage from '../../utils/get-is-list-page';
+import Layout from '../layout';
 
-export default function EditSiteApp( { reboot } ) {
+export default function App() {
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	function onPluginAreaError( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
+			)
+		);
+	}
+
 	return (
-		<SlotFillProvider>
-			<UnsavedChangesWarning />
-
-			<Routes>
-				{ ( { params } ) => {
-					const isListPage = getIsListPage( params );
-
-					return (
-						<>
-							{ isListPage ? (
-								<List />
-							) : (
-								<Editor onError={ reboot } />
-							) }
-							{ /* Keep the instance of the sidebar to ensure focus will not be lost
-							 * when navigating to other pages. */ }
-							<NavigationSidebar
-								// Open the navigation sidebar by default when in the list page.
-								isDefaultOpen={ !! isListPage }
-								activeTemplateType={
-									isListPage ? params.postType : undefined
-								}
-							/>
-						</>
-					);
-				} }
-			</Routes>
-		</SlotFillProvider>
+		<ShortcutProvider style={ { height: '100%' } }>
+			<SlotFillProvider>
+				<Popover.Slot />
+				<UnsavedChangesWarning />
+				<Routes>
+					<Layout />
+					<PluginArea onError={ onPluginAreaError } />
+				</Routes>
+			</SlotFillProvider>
+		</ShortcutProvider>
 	);
 }

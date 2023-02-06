@@ -1,319 +1,505 @@
 /**
  * Internal dependencies
  */
+const engine = require( '../lib/engine' );
 const getExportEntries = require( '../lib/get-export-entries' );
 
+/**
+ * Parses sample code into testable structure.
+ *
+ * @param {string} code           Sourcecode to analyze in test.
+ * @param {string} [importedCode] Sourcecode for module imported in `code`.
+ */
+const parse = ( code, importedCode ) =>
+	engine(
+		'test-code.ts',
+		code.trim(),
+		importedCode
+			? () => engine( 'module-code.ts', importedCode.trim() ).ir
+			: undefined
+	).tokens;
+
+/**
+ * Useful for tests asserting properties on the first (or only) export.
+ *
+ * @param {string} code           Sourcecode to analyze in test.
+ * @param {string} [importedCode] Sourcecode for module imported in `code`.
+ */
+const firstExport = ( code, importedCode ) =>
+	getExportEntries( parse( code, importedCode )[ 0 ] );
+
 describe( 'Export entries', () => {
-	it( 'default class (anonymous)', () => {
-		const token = require( './fixtures/default-class-anonymous/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: '*default*',
-			exportName: 'default',
-			module: null,
-			lineStart: 4,
-			lineEnd: 4,
-		} );
-	} );
+	it( 'default class (anonymous)', () =>
+		expect(
+			firstExport( `
+				/**
+				 * Class declaration example.
+				 */
+				export default class {}
+		` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: '*default*',
+				exportName: 'default',
+				module: null,
+			} ),
+		] ) );
 
-	it( 'default class (named)', () => {
-		const token = require( './fixtures/default-class-named/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'ClassDeclaration',
-			exportName: 'default',
-			module: null,
-			lineStart: 4,
-			lineEnd: 4,
-		} );
-	} );
+	it( 'default class (named)', () =>
+		expect(
+			firstExport( `
+				/**
+				 * Class declaration example.
+				 */
+				export default class ClassDeclaration {}
+		` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'ClassDeclaration',
+				exportName: 'default',
+				module: null,
+			} ),
+		] ) );
 
-	it( 'default function (anonymous)', () => {
-		const token = require( './fixtures/default-function-anonymous/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: '*default*',
-			exportName: 'default',
-			module: null,
-			lineStart: 4,
-			lineEnd: 4,
-		} );
-	} );
+	it( 'default function (anonymous)', () =>
+		expect(
+			firstExport( `
+				/**
+				 * Function declaration example.
+				 */
+				export default () => {}
+		` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: '*default*',
+				exportName: 'default',
+				module: null,
+			} ),
+		] ) );
 
-	it( 'default function (named)', () => {
-		const token = require( './fixtures/default-function-named/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'myDeclaration',
-			exportName: 'default',
-			module: null,
-			lineStart: 4,
-			lineEnd: 4,
-		} );
-	} );
+	it( 'default function (named)', () =>
+		expect(
+			firstExport( `
+				/**
+				 * Function declaration example.
+				 */
+				export default function myDeclaration() {}
+		` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'myDeclaration',
+				exportName: 'default',
+				module: null,
+			} ),
+		] ) );
 
-	it( 'default identifier', () => {
-		const token = require( './fixtures/default-identifier/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'ClassDeclaration',
-			exportName: 'default',
-			module: null,
-			lineStart: 6,
-			lineEnd: 6,
-		} );
-	} );
+	it( 'default identifier', () =>
+		expect(
+			firstExport( `
+				/**
+				 * Class declaration example.
+				 */
+				class ClassDeclaration {}
+
+				export default ClassDeclaration;
+		` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'ClassDeclaration',
+				exportName: 'default',
+				module: null,
+			} ),
+		] ) );
 
 	it( 'default import (named)', () => {
-		const token = require( './fixtures/default-import-named/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'fnDeclaration',
-			exportName: 'default',
-			module: null,
-			lineStart: 3,
-			lineEnd: 3,
-		} );
+		const testCode = firstExport(
+			`
+			/**
+			 * Internal dependencies
+			 */
+			import { functionDeclaration as fnDeclaration } from './module-code';
+
+			export default fnDeclaration;
+		`,
+			`
+			/**
+			 * Function declaration.
+			 */
+			function functionDeclaration() {}
+
+			export default functionDeclaration;
+		`
+		);
+		expect( testCode ).toEqual( [
+			expect.objectContaining( {
+				localName: 'fnDeclaration',
+				exportName: 'default',
+				module: null,
+			} ),
+		] );
 	} );
 
-	it( 'default import (default)', () => {
-		const token = require( './fixtures/default-import-default/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'fnDeclaration',
-			exportName: 'default',
-			module: null,
-			lineStart: 3,
-			lineEnd: 3,
-		} );
-	} );
+	it( 'default import (default)', () =>
+		expect(
+			firstExport(
+				`
+				/**
+				 * Internal dependencies
+				 */
+				import fnDeclaration from './module-code';
+
+				export default fnDeclaration;
+			`,
+				`
+				/**
+				 * Function declaration.
+				 */
+				function functionDeclaration() {}
+
+				export default functionDeclaration;
+			`
+			)
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'fnDeclaration',
+				exportName: 'default',
+				module: null,
+			} ),
+		] ) );
 
 	it( 'default named export', () => {
-		const tokens = require( './fixtures/default-named-export/exports.json' );
-		const namedExport = getExportEntries( tokens[ 0 ] );
-		expect( namedExport ).toHaveLength( 1 );
-		expect( namedExport[ 0 ] ).toEqual( {
-			localName: 'functionDeclaration',
-			exportName: 'functionDeclaration',
-			module: null,
-			lineStart: 4,
-			lineEnd: 4,
-		} );
-		const defaultExport = getExportEntries( tokens[ 1 ] );
-		expect( defaultExport ).toHaveLength( 1 );
-		expect( defaultExport[ 0 ] ).toEqual( {
-			localName: 'functionDeclaration',
-			exportName: 'default',
-			module: null,
-			lineStart: 6,
-			lineEnd: 6,
-		} );
+		const [ namedExport, defaultExport ] = parse(
+			`
+			/**
+			 * Function declaration example.
+			 */
+			export function functionDeclaration() {}
+
+			export default functionDeclaration;
+		`
+		).map( ( token ) => getExportEntries( token ) );
+		expect( namedExport ).toEqual( [
+			expect.objectContaining( {
+				localName: 'functionDeclaration',
+				exportName: 'functionDeclaration',
+				module: null,
+			} ),
+		] );
+		expect( defaultExport ).toEqual( [
+			expect.objectContaining( {
+				localName: 'functionDeclaration',
+				exportName: 'default',
+				module: null,
+			} ),
+		] );
 	} );
 
-	it( 'default variable', () => {
-		const token = require( './fixtures/default-variable/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: '*default*',
-			exportName: 'default',
-			module: null,
-			lineStart: 4,
-			lineEnd: 4,
-		} );
-	} );
+	it( 'default variable', () =>
+		expect(
+			firstExport( `
+				/**
+				 * Variable declaration example.
+				 */
+				export default true;
+		` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: '*default*',
+				exportName: 'default',
+				module: null,
+			} ),
+		] ) );
 
-	it( 'named class', () => {
-		const token = require( './fixtures/named-class/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'MyDeclaration',
-			exportName: 'MyDeclaration',
-			module: null,
-			lineStart: 4,
-			lineEnd: 4,
-		} );
-	} );
+	it( 'named class', () =>
+		expect(
+			firstExport( `
+				/**
+				 * My declaration example.
+				 */
+				export class MyDeclaration {}
+		` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'MyDeclaration',
+				exportName: 'MyDeclaration',
+				module: null,
+				lineStart: 4,
+				lineEnd: 4,
+			} ),
+		] ) );
 
-	it( 'named default', () => {
-		const token = require( './fixtures/named-default/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'default',
-			exportName: 'default',
-			module: './named-default-module',
-			lineStart: 1,
-			lineEnd: 1,
-		} );
-	} );
+	it( 'named default', () =>
+		expect(
+			firstExport(
+				`
+				export { default } from './module-code';
+			`,
+				`
+				/**
+				 * Module declaration.
+				 */
+				export default function () {}
+			`
+			)
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'default',
+				exportName: 'default',
+				module: './module-code',
+			} ),
+		] ) );
 
-	it( 'named default (exported)', () => {
-		const token = require( './fixtures/named-default-exported/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'default',
-			exportName: 'moduleName',
-			module: './named-default-module',
-			lineStart: 1,
-			lineEnd: 1,
-		} );
-	} );
+	it( 'named default (exported)', () =>
+		expect(
+			firstExport(
+				`
+				export { default as moduleName } from './module-code';
+			`,
+				`
+				/**
+				 * Module declaration.
+				 */
+				export default function () {}
+			`
+			)
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'default',
+				exportName: 'moduleName',
+				module: './module-code',
+			} ),
+		] ) );
 
-	it( 'named function', () => {
-		const token = require( './fixtures/named-function/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'myDeclaration',
-			exportName: 'myDeclaration',
-			module: null,
-			lineStart: 4,
-			lineEnd: 4,
-		} );
-	} );
+	it( 'named function', () =>
+		expect(
+			firstExport( `
+				/**
+				 * My declaration example.
+				 */
+				export function myDeclaration() {}
+			` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'myDeclaration',
+				exportName: 'myDeclaration',
+				module: null,
+			} ),
+		] ) );
 
 	it( 'named identifier', () => {
-		const token = require( './fixtures/named-identifier/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'myDeclaration',
-			exportName: 'myDeclaration',
-			module: null,
-			lineStart: 6,
-			lineEnd: 6,
-		} );
-		const tokenObject = require( './fixtures/named-identifier-destructuring/exports.json' );
-		const nameObject = getExportEntries( tokenObject );
-		expect( nameObject ).toHaveLength( 1 );
-		expect( nameObject[ 0 ] ).toEqual( {
-			localName: 'someDeclaration',
-			exportName: 'myDeclaration',
-			module: null,
-			lineStart: 6,
-			lineEnd: 6,
-		} );
+		expect(
+			firstExport( `
+				/**
+				 * My declaration example.
+				 */
+				function myDeclaration() {}
+
+				export { myDeclaration };
+			` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'myDeclaration',
+				exportName: 'myDeclaration',
+				module: null,
+			} ),
+		] );
+
+		expect(
+			firstExport( `
+				/**
+				 * My declaration example.
+				 */
+				const { someDeclaration } = { someDeclaration: () => {} };
+
+				export { someDeclaration as myDeclaration };
+			` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'someDeclaration',
+				exportName: 'myDeclaration',
+				module: null,
+			} ),
+		] );
 	} );
 
 	it( 'named identifiers', () => {
-		const token = require( './fixtures/named-identifiers/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 3 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'functionDeclaration',
-			exportName: 'functionDeclaration',
-			module: null,
-			lineStart: 16,
-			lineEnd: 16,
-		} );
-		expect( name[ 1 ] ).toEqual( {
-			localName: 'variableDeclaration',
-			exportName: 'variableDeclaration',
-			module: null,
-			lineStart: 16,
-			lineEnd: 16,
-		} );
-		expect( name[ 2 ] ).toEqual( {
-			localName: 'ClassDeclaration',
-			exportName: 'ClassDeclaration',
-			module: null,
-			lineStart: 16,
-			lineEnd: 16,
-		} );
-		const tokenIdentifiersAndInline = require( './fixtures/named-identifiers-and-inline/exports.json' );
-		const nameInline0 = getExportEntries( tokenIdentifiersAndInline[ 0 ] );
-		expect( nameInline0 ).toHaveLength( 2 );
-		expect( nameInline0[ 0 ] ).toEqual( {
-			localName: 'functionDeclaration',
-			exportName: 'functionDeclaration',
-			module: null,
-			lineStart: 11,
-			lineEnd: 11,
-		} );
-		expect( nameInline0[ 1 ] ).toEqual( {
-			localName: 'ClassDeclaration',
-			exportName: 'ClassDeclaration',
-			module: null,
-			lineStart: 11,
-			lineEnd: 11,
-		} );
-		const nameInline1 = getExportEntries( tokenIdentifiersAndInline[ 1 ] );
-		expect( nameInline1 ).toHaveLength( 1 );
-		expect( nameInline1[ 0 ] ).toEqual( {
-			localName: 'variableDeclaration',
-			exportName: 'variableDeclaration',
-			module: null,
-			lineStart: 16,
-			lineEnd: 16,
-		} );
+		expect(
+			firstExport( `
+				/**
+				 * Function declaration example.
+				 */
+				function functionDeclaration() {}
+
+				/**
+				 * Class declaration example.
+				 */
+				class ClassDeclaration {}
+
+				/**
+				 * Variable declaration example.
+				 */
+				const variableDeclaration = true;
+
+				export { functionDeclaration, variableDeclaration, ClassDeclaration };
+			` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'functionDeclaration',
+				exportName: 'functionDeclaration',
+				module: null,
+			} ),
+			expect.objectContaining( {
+				localName: 'variableDeclaration',
+				exportName: 'variableDeclaration',
+				module: null,
+			} ),
+			expect.objectContaining( {
+				localName: 'ClassDeclaration',
+				exportName: 'ClassDeclaration',
+				module: null,
+			} ),
+		] );
+
+		expect(
+			parse( `
+				/**
+				 * Function declaration example.
+				 */
+				function functionDeclaration() {}
+
+				/**
+				 * Class declaration example.
+				 */
+				class ClassDeclaration {}
+
+				export { functionDeclaration, ClassDeclaration };
+
+				/**
+				 * Variable declaration example.
+				 */
+				export const variableDeclaration = true;
+			` ).map( ( token ) => getExportEntries( token ) )
+		).toEqual( [
+			[
+				expect.objectContaining( {
+					localName: 'functionDeclaration',
+					exportName: 'functionDeclaration',
+					module: null,
+				} ),
+				expect.objectContaining( {
+					localName: 'ClassDeclaration',
+					exportName: 'ClassDeclaration',
+					module: null,
+				} ),
+			],
+			[
+				expect.objectContaining( {
+					localName: 'variableDeclaration',
+					exportName: 'variableDeclaration',
+					module: null,
+				} ),
+			],
+		] );
 	} );
 
-	it( 'named import namespace', () => {
-		const token = require( './fixtures/named-import-namespace/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'variables',
-			exportName: 'variables',
-			module: null,
-			lineStart: 3,
-			lineEnd: 3,
-		} );
-	} );
+	it( 'named import namespace', () =>
+		expect(
+			firstExport(
+				`
+				/**
+				 * Internal dependencies
+				 */
+				import * as variables from './module-code';
 
-	it( 'named variable', () => {
-		const token = require( './fixtures/named-variable/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'myDeclaration',
-			exportName: 'myDeclaration',
-			module: null,
-			lineStart: 4,
-			lineEnd: 4,
-		} );
-	} );
+				export { variables };
+			`,
+				`
+				/**
+				 * Function declaration example.
+				 */
+				export default function myDeclaration() {}
+			`
+			)
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'variables',
+				exportName: 'variables',
+				module: null,
+			} ),
+		] ) );
 
-	it( 'named variables', () => {
-		const token = require( './fixtures/named-variables/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 2 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: 'firstDeclaration',
-			exportName: 'firstDeclaration',
-			module: null,
-			lineStart: 4,
-			lineEnd: 5,
-		} );
-		expect( name[ 1 ] ).toEqual( {
-			localName: 'secondDeclaration',
-			exportName: 'secondDeclaration',
-			module: null,
-			lineStart: 4,
-			lineEnd: 5,
-		} );
-	} );
+	it( 'named variable', () =>
+		expect(
+			firstExport( `
+				/**
+				 * My declaration example.
+				 */
+				export const myDeclaration = true;
+		` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'myDeclaration',
+				exportName: 'myDeclaration',
+				module: null,
+			} ),
+		] ) );
+
+	it( 'named variables', () =>
+		expect(
+			firstExport( `
+				/**
+				 * My declaration example.
+				 */
+				export const firstDeclaration = true,
+					secondDeclaration = 42;
+		` )
+		).toEqual( [
+			expect.objectContaining( {
+				localName: 'firstDeclaration',
+				exportName: 'firstDeclaration',
+				module: null,
+			} ),
+			expect.objectContaining( {
+				localName: 'secondDeclaration',
+				exportName: 'secondDeclaration',
+				module: null,
+			} ),
+		] ) );
 
 	it( 'namespace (*)', () => {
-		const token = require( './fixtures/namespace/exports.json' );
-		const name = getExportEntries( token );
-		expect( name ).toHaveLength( 1 );
-		expect( name[ 0 ] ).toEqual( {
-			localName: '*',
-			exportName: null,
-			module: './namespace-module',
-			lineStart: 1,
-			lineEnd: 1,
-		} );
+		expect(
+			firstExport(
+				`
+				export * from './module-code';
+			`,
+				`
+				/**
+				 * Named variable.
+				 */
+				export const myVariable = true;
+
+				/**
+				 * Named function.
+				 */
+				export const myFunction = () => {};
+
+				/**
+				 * Named class.
+				 */
+				export class MyClass {}
+
+				/**
+				 * Default variable declaration.
+				 */
+				export default 42;
+			`
+			)
+		).toEqual( [
+			expect.objectContaining( {
+				localName: '*',
+				exportName: null,
+				module: './module-code',
+			} ),
+		] );
 	} );
 } );

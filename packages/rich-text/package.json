@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "5.1.0",
+	"version": "6.3.0",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -33,13 +33,16 @@
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
-		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
-		"rememo": "^3.0.0"
+		"rememo": "^4.0.0"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

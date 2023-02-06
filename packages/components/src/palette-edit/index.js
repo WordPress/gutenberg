@@ -6,10 +6,13 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
-import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
+import {
+	__experimentalUseFocusOutside as useFocusOutside,
+	useDebounce,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -53,11 +56,80 @@ function NameInput( { value, onChange, label } ) {
 	);
 }
 
-function getNameForPosition( position ) {
+/**
+ * Returns a temporary name for a palette item in the format "Color + id".
+ * To ensure there are no duplicate ids, this function checks all slugs for temporary names.
+ * It expects slugs to be in the format: slugPrefix + color- + number.
+ * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
+ *
+ * @param {string} elements   An array of color palette items.
+ * @param {string} slugPrefix The slug prefix used to match the element slug.
+ *
+ * @return {string} A unique name for a palette item.
+ */
+export function getNameForPosition( elements, slugPrefix ) {
+	const temporaryNameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+	const position = elements.reduce( ( previousValue, currentValue ) => {
+		if ( typeof currentValue?.slug === 'string' ) {
+			const matches = currentValue?.slug.match( temporaryNameRegex );
+			if ( matches ) {
+				const id = parseInt( matches[ 1 ], 10 );
+				if ( id >= previousValue ) {
+					return id + 1;
+				}
+			}
+		}
+		return previousValue;
+	}, 1 );
+
 	return sprintf(
 		/* translators: %s: is a temporary id for a custom color */
-		__( 'Color %s ' ),
-		position + 1
+		__( 'Color %s' ),
+		position
+	);
+}
+
+function ColorPickerPopover( {
+	isGradient,
+	element,
+	onChange,
+	onClose = () => {},
+} ) {
+	return (
+		<Popover
+			placement="left-start"
+			offset={ 20 }
+			className="components-palette-edit__popover"
+			onClose={ onClose }
+		>
+			{ ! isGradient && (
+				<ColorPicker
+					color={ element.color }
+					enableAlpha
+					onChange={ ( newColor ) =>
+						onChange( {
+							...element,
+							color: newColor,
+						} )
+					}
+				/>
+			) }
+			{ isGradient && (
+				<div className="components-palette-edit__popover-gradient-picker">
+					<CustomGradientPicker
+						__nextHasNoMargin
+						__experimentalIsRenderedInSidebar
+						value={ element.gradient }
+						onChange={ ( newGradient ) =>
+							onChange( {
+								...element,
+								gradient: newGradient,
+							} )
+						}
+					/>
+				</div>
+			) }
+		</Popover>
 	);
 }
 
@@ -127,42 +199,20 @@ function Option( {
 				) }
 			</HStack>
 			{ isEditing && (
-				<Popover
-					position="bottom left"
-					className="components-palette-edit__popover"
-				>
-					{ ! isGradient && (
-						<ColorPicker
-							color={ value }
-							onChange={ ( newColor ) =>
-								onChange( {
-									...element,
-									color: newColor,
-								} )
-							}
-						/>
-					) }
-					{ isGradient && (
-						<CustomGradientPicker
-							__experimentalIsRenderedInSidebar
-							value={ value }
-							onChange={ ( newGradient ) =>
-								onChange( {
-									...element,
-									gradient: newGradient,
-								} )
-							}
-						/>
-					) }
-				</Popover>
+				<ColorPickerPopover
+					isGradient={ isGradient }
+					onChange={ onChange }
+					element={ element }
+				/>
 			) }
 		</PaletteItem>
 	);
 }
 
-function isTemporaryElement( slugPrefix, { slug, color, gradient }, index ) {
+function isTemporaryElement( slugPrefix, { slug, color, gradient } ) {
+	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	return (
-		slug === slugPrefix + kebabCase( getNameForPosition( index ) ) &&
+		regex.test( slug ) &&
 		( ( !! color && color === DEFAULT_COLOR ) ||
 			( !! gradient && gradient === DEFAULT_GRADIENT ) )
 	);
@@ -190,13 +240,18 @@ function PaletteEditListView( {
 				)
 			) {
 				const newElements = elementsReference.current.filter(
-					( element, index ) =>
-						! isTemporaryElement( slugPrefix, element, index )
+					( element ) => ! isTemporaryElement( slugPrefix, element )
 				);
 				onChange( newElements.length ? newElements : undefined );
 			}
 		};
+		// Disable reason: adding the missing dependency here would cause breaking changes that will require
+		// a heavier refactor to avoid. See https://github.com/WordPress/gutenberg/pull/43911
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
+
+	const debounceOnChange = useDebounce( onChange, 100 );
+
 	return (
 		<VStack spacing={ 3 }>
 			<ItemGroup isRounded>
@@ -212,7 +267,7 @@ function PaletteEditListView( {
 							}
 						} }
 						onChange={ ( newElement ) => {
-							onChange(
+							debounceOnChange(
 								elements.map(
 									( currentElement, currentIndex ) => {
 										if ( currentIndex === index ) {
@@ -274,13 +329,27 @@ export default function PaletteEdit( {
 		! elements[ editingElement ].slug;
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
+	const debounceOnChange = useDebounce( onChange, 100 );
+	const onSelectPaletteItem = useCallback(
+		( value, newEditingElementIndex ) => {
+			const selectedElement = elements[ newEditingElementIndex ];
+			const key = isGradient ? 'gradient' : 'color';
+			// Ensures that the index returned matches a known element value.
+			if ( !! selectedElement && selectedElement[ key ] === value ) {
+				setEditingElement( newEditingElementIndex );
+			} else {
+				setIsEditing( true );
+			}
+		},
+		[ isGradient, elements ]
+	);
 
 	return (
 		<PaletteEditStyles>
 			<PaletteHStackHeader>
 				<PaletteHeading>{ paletteLabel }</PaletteHeading>
 				<PaletteActionsContainer>
-					{ isEditing && (
+					{ hasElements && isEditing && (
 						<DoneButton
 							isSmall
 							onClick={ () => {
@@ -303,8 +372,10 @@ export default function PaletteEdit( {
 							}
 							onClick={ () => {
 								const tempOptionName = getNameForPosition(
-									elementsLength
+									elements,
+									slugPrefix
 								);
+
 								onChange( [
 									...elements,
 									{
@@ -350,9 +421,7 @@ export default function PaletteEdit( {
 													} }
 													className="components-palette-edit__menu-button"
 												>
-													{ isGradient
-														? __( 'Edit gradients' )
-														: __( 'Edit colors' ) }
+													{ __( 'Show details' ) }
 												</Button>
 											) }
 											{ ! canOnlyChangeValues && (
@@ -413,18 +482,40 @@ export default function PaletteEdit( {
 							isGradient={ isGradient }
 						/>
 					) }
+					{ ! isEditing && editingElement !== null && (
+						<ColorPickerPopover
+							isGradient={ isGradient }
+							onClose={ () => setEditingElement( null ) }
+							onChange={ ( newElement ) => {
+								debounceOnChange(
+									elements.map(
+										( currentElement, currentIndex ) => {
+											if (
+												currentIndex === editingElement
+											) {
+												return newElement;
+											}
+											return currentElement;
+										}
+									)
+								);
+							} }
+							element={ elements[ editingElement ] }
+						/>
+					) }
 					{ ! isEditing &&
 						( isGradient ? (
 							<GradientPicker
+								__nextHasNoMargin
 								gradients={ gradients }
-								onChange={ () => {} }
+								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomGradients={ true }
 							/>
 						) : (
 							<ColorPalette
 								colors={ colors }
-								onChange={ () => {} }
+								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomColors={ true }
 							/>

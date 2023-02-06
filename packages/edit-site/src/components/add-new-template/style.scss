@@ -1,11 +1,171 @@
 .edit-site-new-template-dropdown {
-	.components-dropdown-menu__toggle {
-		padding: 6px 12px;
-	}
-
 	.edit-site-new-template-dropdown__popover {
 		@include break-small() {
 			min-width: 300px;
 		}
+	}
+}
+
+.edit-site-custom-template-modal {
+	&__contents {
+		> .components-button {
+			padding: $grid-unit-30;
+			box-shadow: inset 0 0 0 $border-width $gray-600;
+			border-radius: $radius-block-ui;
+			width: 256px;
+			height: auto;
+			display: flex;
+			flex-direction: column;
+			gap: $grid-unit;
+
+			// Show the boundary of the button, in High Contrast Mode.
+			outline: 1px solid transparent;
+
+			span:first-child {
+				color: $gray-900;
+			}
+
+			span {
+				color: $gray-700;
+			}
+
+			&:hover {
+				color: var(--wp-admin-theme-color-darker-10);
+				box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color-darker-10);
+
+				span:first-child {
+					color: var(--wp-admin-theme-color);
+				}
+			}
+
+			&:focus {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 3px solid transparent;
+
+				span:first-child {
+					color: var(--wp-admin-theme-color);
+				}
+			}
+		}
+	}
+
+	.components-search-control {
+		input[type="search"].components-search-control__input {
+			background: $white;
+			border: 1px solid $gray-300;
+
+			&:focus {
+				border-color: var(--wp-admin-theme-color);
+				box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+			}
+		}
+	}
+
+	@include break-medium() {
+		width: 456px;
+	}
+}
+
+.edit-site-custom-template-modal__suggestions_list {
+	margin-top: $grid-unit-20;
+
+	@include break-small() {
+		height: 232px;
+		overflow: scroll;
+	}
+
+	&__list-item {
+		display: block;
+		width: 100%;
+		text-align: left;
+		white-space: pre-wrap;
+		overflow-wrap: break-word;
+		height: auto;
+
+		mark {
+			font-weight: 700;
+			background: none;
+		}
+
+		&:hover {
+			background-color: $gray-100;
+
+			mark {
+				color: var(--wp-admin-theme-color);
+			}
+		}
+
+		&:focus {
+			background-color: $gray-100;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
+		}
+
+		&__title,
+		&__info {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			display: block;
+		}
+
+		&__title {
+			font-weight: 500;
+			margin-bottom: 0.2em;
+		}
+
+		&__info {
+			color: $gray-700;
+			font-size: 0.9em;
+			line-height: 1.3;
+			word-break: break-all;
+		}
+	}
+}
+
+.edit-site-custom-template-modal__no-results {
+	border: 1px solid $gray-400;
+	border-radius: $radius-block-ui;
+	padding: $grid-unit-20;
+	margin-bottom: 0;
+	margin-top: $grid-unit-20;
+}
+
+
+.edit-site-custom-generic-template__modal {
+	.components-base-control {
+		@include break-medium() {
+			width: $grid-unit * 40;
+		}
+	}
+
+	.components-modal__header {
+		border-bottom: none;
+	}
+
+	.components-modal__content::before {
+		margin-bottom: $grid-unit-05;
+	}
+}
+
+.edit-site-template-actions-loading-screen-modal {
+	backdrop-filter: none;
+	background-color: transparent;
+
+	&.is-full-screen {
+		background-color: $white;
+		box-shadow: 0 0 0 transparent;
+		min-width: 100%;
+		min-height: 100%;
+	}
+
+	&__content {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
 	}
 }

@@ -4,8 +4,8 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
 import { Button } from '@wordpress/components';
-import { getBlockType, createBlock } from '@wordpress/blocks';
-import { withDispatch } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
+import { withDispatch, useSelect } from '@wordpress/data';
 import {
 	Warning,
 	useBlockProps,
@@ -13,10 +13,21 @@ import {
 } from '@wordpress/block-editor';
 import { safeHTML } from '@wordpress/dom';
 
-function MissingBlockWarning( { attributes, convertToHTML } ) {
+function MissingBlockWarning( { attributes, convertToHTML, clientId } ) {
 	const { originalName, originalUndelimitedContent } = attributes;
 	const hasContent = !! originalUndelimitedContent;
-	const hasHTMLBlock = getBlockType( 'core/html' );
+	const hasHTMLBlock = useSelect(
+		( select ) => {
+			const { canInsertBlockType, getBlockRootClientId } =
+				select( blockEditorStore );
+
+			return canInsertBlockType(
+				'core/html',
+				getBlockRootClientId( clientId )
+			);
+		},
+		[ clientId ]
+	);
 
 	const actions = [];
 	let messageHTML;

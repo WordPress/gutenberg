@@ -4,6 +4,8 @@
 import { createHigherOrderComponent, useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 
+/** @typedef {import('@wordpress/element').WPComponent} WPComponent */
+
 /**
  * A Higher Order Component used to be provide speak and debounced speak
  * functions.
@@ -15,12 +17,13 @@ import { speak } from '@wordpress/a11y';
  * @return {WPComponent} The wrapped component.
  */
 export default createHigherOrderComponent(
-	( Component ) => ( props ) => (
-		<Component
-			{ ...props }
-			speak={ speak }
-			debouncedSpeak={ useDebounce( speak, 500 ) }
-		/>
-	),
+	( Component ) => ( props ) =>
+		(
+			<Component
+				{ ...props }
+				speak={ speak }
+				debouncedSpeak={ useDebounce( speak, 500 ) }
+			/>
+		),
 	'withSpokenMessages'
 );

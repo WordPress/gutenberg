@@ -161,7 +161,7 @@ Props that are passed to the `Button` component in the `PanelBodyTitle` within t
 
 #### PanelRow
 
-The is a generic container for panel content. Default styles add a top margin and arrange items in a flex row.
+`PanelRow` is a generic container for rows within a `PanelBody`. It is a flex container with a top margin for spacing.
 
 ##### Props
 
@@ -176,13 +176,13 @@ The class that will be added with `components-panel__row`. to the classes of the
 
 PanelRow accepts a forwarded ref that will be added to the wrapper div. Usage:
 
-`<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>`
+`<PanelRow className="edit-post-post-schedule" ref={ panelRowRef }>`
 
 ---
 
 #### PanelHeader
 
-This is a simple container for a header component. This is used by the `Panel` component under the hood, so it does not typically need to be used.
+`PanelHeader` renders the header for the `Panel`. This is used by the `Panel` component under the hood, so it does not typically need to be used.
 
 ##### Props
 

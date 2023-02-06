@@ -71,6 +71,9 @@
 					},
 					{
 						"docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md": []
 					}
 				]
 			},
@@ -88,13 +91,23 @@
 			{
 				"docs/how-to-guides/data-basics/README.md": [
 					{
-					  "docs/how-to-guides/data-basics/1-data-basics-setup.md": []
+						"docs/how-to-guides/data-basics/1-data-basics-setup.md": []
 					},
 					{
-					  "docs/how-to-guides/data-basics/2-building-a-list-of-pages.md": []
+						"docs/how-to-guides/data-basics/2-building-a-list-of-pages.md": []
+					},
+					{
+						"docs/how-to-guides/data-basics/3-building-an-edit-form.md": []
+					},
+					{
+						"docs/how-to-guides/data-basics/4-building-a-create-page-form.md": []
+					},
+					{
+						"docs/how-to-guides/data-basics/5-adding-a-delete-button.md": []
 					}
 				]
 			},
+			{ "docs/how-to-guides/curating-the-editor-experience.md": [] },
 			{ "docs/how-to-guides/feature-flags.md": [] },
 			{ "docs/how-to-guides/format-api.md": [] },
 			{
@@ -123,10 +136,10 @@
 			},
 			{ "docs/how-to-guides/notices/README.md": [] },
 			{ "docs/how-to-guides/plugin-sidebar-0.md": [] },
+			{ "docs/how-to-guides/propagating-updates.md": [] },
 			{
 				"docs/how-to-guides/themes/README.md": [
 					{ "docs/how-to-guides/themes/block-theme-overview.md": [] },
-					{ "docs/how-to-guides/themes/create-block-theme.md": [] },
 					{ "docs/how-to-guides/themes/theme-json.md": [] },
 					{ "docs/how-to-guides/themes/theme-support.md": [] }
 				]
@@ -188,6 +201,9 @@
 					{ "docs/reference-guides/filters/parser-filters.md": [] },
 					{
 						"docs/reference-guides/filters/autocomplete-filters.md": []
+					},
+					{
+						"docs/reference-guides/filters/global-styles-filters.md": []
 					}
 				]
 			},
@@ -242,14 +258,33 @@
 					{
 						"docs/reference-guides/data/data-core-annotations.md": []
 					},
-					{ "docs/reference-guides/data/data-core-blocks.md": [] },
+					{
+						"docs/reference-guides/data/data-core-block-directory.md": []
+					},
 					{
 						"docs/reference-guides/data/data-core-block-editor.md": []
 					},
-					{ "docs/reference-guides/data/data-core-editor.md": [] },
+					{ "docs/reference-guides/data/data-core-blocks.md": [] },
+					{
+						"docs/reference-guides/data/data-core-customize-widgets.md": []
+					},
 					{ "docs/reference-guides/data/data-core-edit-post.md": [] },
+					{ "docs/reference-guides/data/data-core-edit-site.md": [] },
+					{
+						"docs/reference-guides/data/data-core-edit-widgets.md": []
+					},
+					{ "docs/reference-guides/data/data-core-editor.md": [] },
+					{
+						"docs/reference-guides/data/data-core-keyboard-shortcuts.md": []
+					},
 					{ "docs/reference-guides/data/data-core-notices.md": [] },
-					{ "docs/reference-guides/data/data-core-nux.md": [] },
+					{
+						"docs/reference-guides/data/data-core-preferences.md": []
+					},
+					{
+						"docs/reference-guides/data/data-core-reusable-blocks.md": []
+					},
+					{ "docs/reference-guides/data/data-core-rich-text.md": [] },
 					{ "docs/reference-guides/data/data-core-viewport.md": [] }
 				]
 			}
@@ -276,7 +311,9 @@
 				"docs/explanations/user-interface/README.md": [
 					{ "docs/explanations/user-interface/block-design.md": [] },
 					{ "docs/explanations/user-interface/animation.md": [] },
-					{ "docs/explanations/user-interface/design-resources.md": [] }
+					{
+						"docs/explanations/user-interface/design-resources.md": []
+					}
 				]
 			},
 			{ "docs/explanations/faq.md": [] },
@@ -297,7 +334,13 @@
 					{ "docs/contributors/code/grammar.md": [] },
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
-					{ "docs/contributors/code/release.md": [] },
+					{
+						"docs/contributors/code/release.md": [
+							{
+								"docs/contributors/code/auto-cherry-picking.md": []
+							}
+						]
+					},
 					{
 						"docs/contributors/code/react-native/README.md": [
 							{
@@ -315,7 +358,10 @@
 						]
 					},
 					{ "docs/contributors/code/backward-compatibility.md": [] },
-					{ "docs/contributors/code/deprecations.md": [] }
+					{ "docs/contributors/code/deprecations.md": [] },
+					{
+						"docs/contributors/code/how-to-get-your-pull-request-reviewed.md": []
+					}
 				]
 			},
 			{

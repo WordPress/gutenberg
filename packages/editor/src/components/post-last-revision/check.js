@@ -26,10 +26,8 @@ export function PostLastRevisionCheck( {
 }
 
 export default withSelect( ( select ) => {
-	const {
-		getCurrentPostLastRevisionId,
-		getCurrentPostRevisionsCount,
-	} = select( editorStore );
+	const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } =
+		select( editorStore );
 	return {
 		lastRevisionId: getCurrentPostLastRevisionId(),
 		revisionsCount: getCurrentPostRevisionsCount(),

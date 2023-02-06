@@ -98,7 +98,14 @@ function block_core_navigation_submenu_build_css_font_sizes( $context ) {
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
+		$font_sizes['inline_styles'] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $context['style']['typography']['fontSize'],
+				)
+			)
+		);
 	}
 
 	return $font_sizes;
@@ -148,7 +155,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 	$css_classes = trim( implode( ' ', $classes ) );
 	$has_submenu = count( $block->inner_blocks ) > 0;
-	$is_active   = ! empty( $attributes['id'] ) && ( get_the_ID() === $attributes['id'] );
+	$is_active   = ! empty( $attributes['id'] ) && ( get_queried_object_id() === (int) $attributes['id'] );
 
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
 	$open_on_click           = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];
@@ -167,25 +174,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$label = '';
 
 	if ( isset( $attributes['label'] ) ) {
-		$label .= wp_kses(
-			$attributes['label'],
-			array(
-				'code'   => array(),
-				'em'     => array(),
-				'img'    => array(
-					'scale' => array(),
-					'class' => array(),
-					'style' => array(),
-					'src'   => array(),
-					'alt'   => array(),
-				),
-				's'      => array(),
-				'span'   => array(
-					'style' => array(),
-				),
-				'strong' => array(),
-			)
-		);
+		$label .= wp_kses_post( $attributes['label'] );
 	}
 
 	$aria_label = sprintf(
@@ -201,7 +190,16 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	if ( ! $open_on_click ) {
 		$item_url = isset( $attributes['url'] ) ? $attributes['url'] : '';
 		// Start appending HTML attributes to anchor tag.
-		$html .= '<a class="wp-block-navigation-item__content" href="' . esc_url( $item_url ) . '"';
+		$html .= '<a class="wp-block-navigation-item__content"';
+
+		// The href attribute on a and area elements is not required;
+		// when those elements do not have href attributes they do not create hyperlinks.
+		// But also The href attribute must have a value that is a valid URL potentially
+		// surrounded by spaces.
+		// see: https://html.spec.whatwg.org/multipage/links.html#links-created-by-a-and-area-elements.
+		if ( ! empty( $item_url ) ) {
+			$html .= ' href="' . esc_url( $item_url ) . '"';
+		}
 
 		if ( $is_active ) {
 			$html .= ' aria-current="page"';
@@ -245,9 +243,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 		$html .= '</span>';
 
-		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
-
 		$html .= '</button>';
+
+		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
 
 	}
 
@@ -255,6 +253,14 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$inner_blocks_html = '';
 		foreach ( $block->inner_blocks as $inner_block ) {
 			$inner_blocks_html .= $inner_block->render();
+		}
+
+		if ( strpos( $inner_blocks_html, 'current-menu-item' ) ) {
+			$tag_processor = new WP_HTML_Tag_Processor( $html );
+			while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-navigation-item__content' ) ) ) {
+				$tag_processor->add_class( 'current-menu-ancestor' );
+			}
+			$html = $tag_processor->get_updated_html();
 		}
 
 		$html .= sprintf(
@@ -283,3 +289,35 @@ function register_block_core_navigation_submenu() {
 	);
 }
 add_action( 'init', 'register_block_core_navigation_submenu' );
+
+/**
+ * Enables animation of the block inspector for the Navigation Submenu block.
+ *
+ * See:
+ * - https://github.com/WordPress/gutenberg/pull/46342
+ * - https://github.com/WordPress/gutenberg/issues/45884
+ *
+ * @param array $settings Default editor settings.
+ * @return array Filtered editor settings.
+ */
+function block_core_navigation_submenu_enable_inspector_animation( $settings ) {
+	$current_animation_settings = _wp_array_get(
+		$settings,
+		array( '__experimentalBlockInspectorAnimation' ),
+		array()
+	);
+
+	$settings['__experimentalBlockInspectorAnimation'] = array_merge(
+		$current_animation_settings,
+		array(
+			'core/navigation-submenu' =>
+				array(
+					'enterDirection' => 'rightToLeft',
+				),
+		)
+	);
+
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'block_core_navigation_submenu_enable_inspector_animation' );

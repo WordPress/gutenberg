@@ -9,7 +9,7 @@ import {
 jest.useRealTimers();
 
 describe( 'getPxFromCssUnit', () => {
-	// Absolute units
+	// Absolute units.
 	describe( 'absolute unites should return px values', () => {
 		const testData = [
 			[ '25px', '25px' ],
@@ -19,23 +19,20 @@ describe( 'getPxFromCssUnit', () => {
 			[ '1in', '96px' ],
 			[ '12pt', '16px' ],
 			[ '1pc', '16px' ],
-			[ '40Q', '38px' ], // 40 Q should be 1 cm
+			[ '40Q', '38px' ], // 40 Q should be 1 cm.
 		];
 
+		test.each( testData )( 'getPxFromCssUnit( %s )', ( unit, expected ) => {
+			expect( getPxFromCssUnit( unit ) ).toBe( expected );
+		} );
 		test.each( testData )(
-			'test getPxFromCssUnit( %s )',
-			( unit, expected ) => {
-				expect( getPxFromCssUnit( unit ) ).toBe( expected );
-			}
-		);
-		test.each( testData )(
-			'test memoizedGetPxFromCssUnit( %s )',
+			'memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit ) ).toBe( expected );
 			}
 		);
 		test.each( testData )(
-			'test cached memoizedGetPxFromCssUnit( %s )',
+			'cached memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit ) ).toBe( expected );
 			}
@@ -63,14 +60,11 @@ describe( 'getPxFromCssUnit', () => {
 			[ '120%', '12px' ],
 		];
 
+		test.each( testData )( 'getPxFromCssUnit( %s )', ( unit, expected ) => {
+			expect( getPxFromCssUnit( unit, settings ) ).toBe( expected );
+		} );
 		test.each( testData )(
-			'test getPxFromCssUnit( %s )',
-			( unit, expected ) => {
-				expect( getPxFromCssUnit( unit, settings ) ).toBe( expected );
-			}
-		);
-		test.each( testData )(
-			'test memoizedGetPxFromCssUnit( %s )',
+			'memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
 					expected
@@ -78,7 +72,7 @@ describe( 'getPxFromCssUnit', () => {
 			}
 		);
 		test.each( testData )(
-			'test cached memoizedGetPxFromCssUnit( %s )',
+			'cached memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
 					expected
@@ -87,7 +81,7 @@ describe( 'getPxFromCssUnit', () => {
 		);
 	} );
 
-	// Function units
+	// Function units.
 
 	describe( 'function unites should return px values', () => {
 		const settings = {
@@ -120,17 +114,15 @@ describe( 'getPxFromCssUnit', () => {
 			[ 123.456, '123px' ],
 			[ 'abc', null ],
 			[ 'console.log("howdy"); + 10px', null ],
-			[ 'calc(12vw * 10px', null ], // missing closing bracket
+			[ 'calc(12vw * 10px', null ], // Missing closing bracket.
+			[ 'calc( 1em + 0.875rem )', '30px' ], // Decimals
 		];
 
+		test.each( testData )( 'getPxFromCssUnit( %s )', ( unit, expected ) => {
+			expect( getPxFromCssUnit( unit, settings ) ).toBe( expected );
+		} );
 		test.each( testData )(
-			'test getPxFromCssUnit( %s )',
-			( unit, expected ) => {
-				expect( getPxFromCssUnit( unit, settings ) ).toBe( expected );
-			}
-		);
-		test.each( testData )(
-			'test memoizedGetPxFromCssUnit( %s )',
+			'memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
 					expected
@@ -138,7 +130,7 @@ describe( 'getPxFromCssUnit', () => {
 			}
 		);
 		test.each( testData )(
-			'test cached memoizedGetPxFromCssUnit( %s )',
+			'cached memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
 					expected
@@ -159,7 +151,7 @@ describe( 'getPxFromCssUnit', () => {
 
 		const startM = Date.now();
 		i = 0;
-		// the memoized Version should be at 10X better then the non default one.
+		// The memoized Version should be at 10X better then the non default one.
 		while ( i < intervals * 10 ) {
 			memoizedGetPxFromCssUnit( 'max(25px, 35px)', { width: 201 } );
 			i++;

@@ -6,48 +6,44 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, VisuallyHidden } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import {
+	Button,
+	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
+} from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { Icon, lockSmall as lock } from '@wordpress/icons';
+import { SPACE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
-import { getBlockPositionDescription } from './utils';
-import BlockTitle from '../block-title';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
-import { SPACE, ENTER } from '@wordpress/keycodes';
+import { useBlockLock } from '../block-lock';
 
 function ListViewBlockSelectButton(
 	{
 		className,
 		block: { clientId },
-		isSelected,
 		onClick,
 		onToggleExpanded,
-		position,
-		siblingBlockCount,
-		level,
 		tabIndex,
 		onFocus,
 		onDragStart,
 		onDragEnd,
 		draggable,
-		isExpanded,
 	},
 	ref
 ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const instanceId = useInstanceId( ListViewBlockSelectButton );
-	const descriptionId = `list-view-block-select-button__${ instanceId }`;
-	const blockPositionDescription = getBlockPositionDescription(
-		position,
-		siblingBlockCount,
-		level
-	);
+	const blockTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
+	const { isLocked } = useBlockLock( clientId );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -55,12 +51,11 @@ function ListViewBlockSelectButton(
 	// inside the `useOnBlockDrop` hook.
 	const onDragStartHandler = ( event ) => {
 		event.dataTransfer.clearData();
-		onDragStart( event );
+		onDragStart?.( event );
 	};
 
 	function onKeyDownHandler( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
-			event.preventDefault();
 			onClick( event );
 		}
 	}
@@ -74,7 +69,6 @@ function ListViewBlockSelectButton(
 				) }
 				onClick={ onClick }
 				onKeyDown={ onKeyDownHandler }
-				aria-describedby={ descriptionId }
 				ref={ ref }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
@@ -82,28 +76,36 @@ function ListViewBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
-				aria-expanded={ isExpanded }
+				aria-hidden={ true }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
-				<BlockTitle clientId={ clientId } />
-				{ blockInformation?.anchor && (
-					<span className="block-editor-list-view-block-select-button__anchor">
-						{ blockInformation.anchor }
+				<HStack
+					alignment="center"
+					className="block-editor-list-view-block-select-button__label-wrapper"
+					justify="flex-start"
+					spacing={ 1 }
+				>
+					<span className="block-editor-list-view-block-select-button__title">
+						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 					</span>
-				) }
-				{ isSelected && (
-					<VisuallyHidden>
-						{ __( '(selected block)' ) }
-					</VisuallyHidden>
-				) }
+					{ blockInformation?.anchor && (
+						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
+							<Truncate
+								className="block-editor-list-view-block-select-button__anchor"
+								ellipsizeMode="auto"
+							>
+								{ blockInformation.anchor }
+							</Truncate>
+						</span>
+					) }
+					{ isLocked && (
+						<span className="block-editor-list-view-block-select-button__lock">
+							<Icon icon={ lock } />
+						</span>
+					) }
+				</HStack>
 			</Button>
-			<div
-				className="block-editor-list-view-block-select-button__description"
-				id={ descriptionId }
-			>
-				{ blockPositionDescription }
-			</div>
 		</>
 	);
 }

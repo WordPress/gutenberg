@@ -15,7 +15,7 @@ import { createElement, Fragment } from '@wordpress/element';
  */
 import LinkControlSearchCreate from './search-create-button';
 import LinkControlSearchItem from './search-item';
-import { CREATE_TYPE } from './constants';
+import { CREATE_TYPE, LINK_ENTRY_TYPES } from './constants';
 
 export default function LinkControlSearchResults( {
 	instanceId,
@@ -38,10 +38,9 @@ export default function LinkControlSearchResults( {
 		}
 	);
 
-	const directLinkEntryTypes = [ 'url', 'mailto', 'tel', 'internal' ];
 	const isSingleDirectEntryResult =
 		suggestions.length === 1 &&
-		directLinkEntryTypes.includes( suggestions[ 0 ].type.toLowerCase() );
+		LINK_ENTRY_TYPES.includes( suggestions[ 0 ].type );
 	const shouldShowCreateSuggestion =
 		withCreateSuggestion &&
 		! isSingleDirectEntryResult &&
@@ -66,7 +65,7 @@ export default function LinkControlSearchResults( {
 	// when that is required.
 	const searchResultsLabel = createElement(
 		isInitialSuggestions ? Fragment : VisuallyHidden,
-		{}, // empty props
+		{}, // Empty props.
 		<span
 			className="block-editor-link-control__search-results-label"
 			id={ searchResultsLabelId }
@@ -109,7 +108,7 @@ export default function LinkControlSearchResults( {
 					}
 
 					// If we're not handling "Create" suggestions above then
-					// we don't want them in the main results so exit early
+					// we don't want them in the main results so exit early.
 					if ( CREATE_TYPE === suggestion.type ) {
 						return null;
 					}
@@ -127,8 +126,8 @@ export default function LinkControlSearchResults( {
 								handleSuggestionClick( suggestion );
 							} }
 							isSelected={ index === selectedSuggestion }
-							isURL={ directLinkEntryTypes.includes(
-								suggestion.type.toLowerCase()
+							isURL={ LINK_ENTRY_TYPES.includes(
+								suggestion.type
 							) }
 							searchTerm={ currentInputValue }
 							shouldShowType={ shouldShowSuggestionsTypes }

@@ -1,6 +1,6 @@
-# Templates
+# Block Templates
 
-A block template is defined as a list of block items. Such blocks can have predefined attributes, placeholder content, and be static or dynamic. Block templates allow specifying a default initial state for an editor session.
+A block template is defined as a list of block items. Such blocks can have predefined attributes, placeholder content, and be static or dynamic. Block templates allow specifying a default initial state for an editor session. 
 
 The scope of templates include:
 
@@ -115,6 +115,7 @@ add_action( 'init', 'myplugin_register_template' );
 
 _Options:_
 
+-   `contentOnly` — prevents all operations. Additionally, the block types that don't have content are hidden from the list view and can't gain focus within the block list. Unlike the other lock types, this is not overrideable by children.
 -   `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
 -   `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
 
@@ -124,7 +125,6 @@ Lock settings can be inherited by InnerBlocks. If `templateLock` is not set in a
 
 Alongside template level locking, you can lock individual blocks; you can do this using a `lock` attribute on the attributes level. Block-level lock takes priority over the `templateLock` feature. Currently, you can lock moving and removing blocks.
 
-**Block-level locking is an experimental feature that may be removed or change anytime.**
 ```js
 attributes: {
   // Prevent a block from being moved or removed.
@@ -139,6 +139,25 @@ _Options:_
 -   `move` — Locks the ability of a block from being moved.
 
 You can use this with `templateLock` to lock all blocks except a single block by using `false` in `remove` or `move`.
+
+```php
+$template = array(
+	array( 'core/image', array(
+		'align' => 'left',
+	) ),
+	array( 'core/heading', array(
+		'placeholder' => 'Add Author...',
+	) ),
+	// Allow a Paragraph block to be moved or removed.
+	array( 'core/paragraph', array(
+		'placeholder' => 'Add Description...',
+		'lock' => array(
+			'move'   => false,
+			'remove' => false,
+		),
+	) ),
+);
+```
 
 ## Nested Templates
 

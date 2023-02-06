@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import {
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
 	PanelBody,
 	Placeholder,
@@ -22,122 +22,208 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { renderToString, useEffect, useState } from '@wordpress/element';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { renderToString, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
+import icon from './icon';
 import TableOfContentsList from './list';
-import { getHeadingsFromContent, linearToNestedHeadingList } from './utils';
+import { linearToNestedHeadingList } from './utils';
+
+/** @typedef {import('./utils').HeadingData} HeadingData */
 
 /**
  * Table of Contents block edit component.
  *
  * @param {Object}                       props                                   The props.
  * @param {Object}                       props.attributes                        The block attributes.
- * @param {boolean}                      props.attributes.onlyIncludeCurrentPage
- *                                                                               Whether to only include headings from the current page (if the post is
- *                                                                               paginated).
+ * @param {HeadingData[]}                props.attributes.headings               A list of data for each heading in the post.
+ * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
  * @param {string}                       props.clientId
  * @param {(attributes: Object) => void} props.setAttributes
  *
  * @return {WPComponent} The component.
  */
 export default function TableOfContentsEdit( {
-	attributes: { onlyIncludeCurrentPage },
+	attributes: { headings = [], onlyIncludeCurrentPage },
 	clientId,
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps();
 
-	// Local state; not saved to block attributes. The saved block is dynamic and uses PHP to generate its content.
-	const [ headings, setHeadings ] = useState( [] );
-	const [ headingTree, setHeadingTree ] = useState( [] );
+	const canInsertList = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
 
-	const { listBlockExists, postContent } = useSelect(
-		( select ) => ( {
-			listBlockExists: !! select( blocksStore ).getBlockType(
-				'core/list'
-			),
-			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
-			// Blocks can be loaded into a *non-post* block editor.
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			postContent: select( 'core/editor' ).getEditedPostContent(),
-		} ),
-		[]
+			return canInsertBlockType( 'core/list', rootClientId );
+		},
+		[ clientId ]
 	);
 
-	// The page this block would be part of on the front-end. For performance
-	// reasons, this is only calculated when onlyIncludeCurrentPage is true.
-	const pageIndex = useSelect(
-		( select ) => {
-			if ( ! onlyIncludeCurrentPage ) {
-				return null;
-			}
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlocks } =
+		useDispatch( blockEditorStore );
 
+	/**
+	 * The latest heading data, or null if the new data deeply equals the saved
+	 * headings attribute.
+	 *
+	 * Since useSelect forces a re-render when its return value is shallowly
+	 * inequal to its prior call, we would be re-rendering this block every time
+	 * the stores change, even if the latest headings were deeply equal to the
+	 * ones saved in the block attributes.
+	 *
+	 * By returning null when they're equal, we reduce that to 2 renders: one
+	 * when there are new latest headings (and so it returns them), and one when
+	 * they haven't changed (so it returns null). As long as the latest heading
+	 * data remains the same, further calls of the useSelect callback will
+	 * continue to return null, thus preventing any forced re-renders.
+	 */
+	const latestHeadings = useSelect(
+		( select ) => {
 			const {
 				getBlockAttributes,
-				getBlockIndex,
 				getBlockName,
-				getBlockOrder,
+				getClientIdsWithDescendants,
+				__experimentalGetGlobalBlocksByName: getGlobalBlocksByName,
 			} = select( blockEditorStore );
 
-			const blockIndex = getBlockIndex( clientId );
-			const blockOrder = getBlockOrder();
+			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+			// Blocks can be loaded into a *non-post* block editor, so to avoid
+			// declaring @wordpress/editor as a dependency, we must access its
+			// store by string. When the store is not available, editorSelectors
+			// will be null, and the block's saved markup will lack permalinks.
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			const editorSelectors = select( 'core/editor' );
 
-			// Calculate which page the block will appear in on the front-end by
-			// counting how many <!--nextpage--> tags precede it.
-			// Unfortunately, this implementation only accounts for Page Break and
-			// Classic blocks, so if there are any <!--nextpage--> tags in any
-			// other block, they won't be counted. This will result in the table
-			// of contents showing headings from the wrong page if
-			// onlyIncludeCurrentPage === true. Thankfully, this issue only
-			// affects the editor implementation.
-			let page = 1;
-			for ( let i = 0; i < blockIndex; i++ ) {
-				const blockName = getBlockName( blockOrder[ i ] );
-				if ( blockName === 'core/nextpage' ) {
-					page++;
-				} else if ( blockName === 'core/freeform' ) {
-					// Count the page breaks inside the Classic block.
-					const pageBreaks = getBlockAttributes(
-						blockOrder[ i ]
-					).content?.match( /<!--nextpage-->/g );
+			const pageBreakClientIds = getGlobalBlocksByName( 'core/nextpage' );
 
-					if ( pageBreaks !== null && pageBreaks !== undefined ) {
-						page += pageBreaks.length;
+			const isPaginated = pageBreakClientIds.length !== 0;
+
+			// Get the client ids of all blocks in the editor.
+			const allBlockClientIds = getClientIdsWithDescendants();
+
+			// If onlyIncludeCurrentPage is true, calculate the page (of a paginated post) this block is part of, so we know which headings to include; otherwise, skip the calculation.
+			let tocPage = 1;
+
+			if ( isPaginated && onlyIncludeCurrentPage ) {
+				// We can't use getBlockIndex because it only returns the index
+				// relative to sibling blocks.
+				const tocIndex = allBlockClientIds.indexOf( clientId );
+
+				for ( const [
+					blockIndex,
+					blockClientId,
+				] of allBlockClientIds.entries() ) {
+					// If we've reached blocks after the Table of Contents, we've
+					// finished calculating which page the block is on.
+					if ( blockIndex >= tocIndex ) {
+						break;
+					}
+					if ( getBlockName( blockClientId ) === 'core/nextpage' ) {
+						tocPage++;
 					}
 				}
 			}
 
-			return page;
+			const _latestHeadings = [];
+
+			/** The page (of a paginated post) a heading will be part of. */
+			let headingPage = 1;
+
+			/**
+			 * A permalink to the current post. If the core/editor store is
+			 * unavailable, this variable will be null.
+			 */
+			const permalink = editorSelectors?.getPermalink() ?? null;
+
+			let headingPageLink = null;
+
+			// If the core/editor store is available, we can add permalinks to the
+			// generated table of contents.
+			if ( typeof permalink === 'string' ) {
+				headingPageLink = isPaginated
+					? addQueryArgs( permalink, { page: headingPage } )
+					: permalink;
+			}
+
+			for ( const blockClientId of allBlockClientIds ) {
+				const blockName = getBlockName( blockClientId );
+				if ( blockName === 'core/nextpage' ) {
+					headingPage++;
+
+					// If we're only including headings from the current page (of
+					// a paginated post), then exit the loop if we've reached the
+					// pages after the one with the Table of Contents block.
+					if ( onlyIncludeCurrentPage && headingPage > tocPage ) {
+						break;
+					}
+
+					if ( typeof permalink === 'string' ) {
+						headingPageLink = addQueryArgs(
+							removeQueryArgs( permalink, [ 'page' ] ),
+							{ page: headingPage }
+						);
+					}
+				}
+				// If we're including all headings or we've reached headings on
+				// the same page as the Table of Contents block, add them to the
+				// list.
+				else if (
+					! onlyIncludeCurrentPage ||
+					headingPage === tocPage
+				) {
+					if ( blockName === 'core/heading' ) {
+						const headingAttributes =
+							getBlockAttributes( blockClientId );
+
+						const canBeLinked =
+							typeof headingPageLink === 'string' &&
+							typeof headingAttributes.anchor === 'string' &&
+							headingAttributes.anchor !== '';
+
+						_latestHeadings.push( {
+							// Convert line breaks to spaces, and get rid of HTML tags in the headings.
+							content: stripHTML(
+								headingAttributes.content.replace(
+									/(<br *\/?>)+/g,
+									' '
+								)
+							),
+							level: headingAttributes.level,
+							link: canBeLinked
+								? `${ headingPageLink }#${ headingAttributes.anchor }`
+								: null,
+						} );
+					}
+				}
+			}
+
+			if ( fastDeepEqual( headings, _latestHeadings ) ) {
+				return null;
+			}
+			return _latestHeadings;
 		},
-		[ clientId, onlyIncludeCurrentPage ]
+		[ clientId, onlyIncludeCurrentPage, headings ]
 	);
 
 	useEffect( () => {
-		let latestHeadings;
-
-		if ( onlyIncludeCurrentPage ) {
-			const pagesOfContent = postContent.split( '<!--nextpage-->' );
-
-			latestHeadings = getHeadingsFromContent(
-				pagesOfContent[ pageIndex - 1 ]
-			);
-		} else {
-			latestHeadings = getHeadingsFromContent( postContent );
+		if ( latestHeadings !== null ) {
+			// This is required to keep undo working and not create 2 undo steps
+			// for each heading change.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { headings: latestHeadings } );
 		}
+	}, [ latestHeadings ] );
 
-		if ( ! isEqual( headings, latestHeadings ) ) {
-			setHeadings( latestHeadings );
-			setHeadingTree( linearToNestedHeadingList( latestHeadings ) );
-		}
-	}, [ pageIndex, postContent, onlyIncludeCurrentPage ] );
+	const headingTree = linearToNestedHeadingList( headings );
 
-	const { replaceBlocks } = useDispatch( blockEditorStore );
-
-	const toolbarControls = listBlockExists && (
+	const toolbarControls = canInsertList && (
 		<BlockControls>
 			<ToolbarGroup>
 				<ToolbarButton
@@ -145,6 +231,7 @@ export default function TableOfContentsEdit( {
 						replaceBlocks(
 							clientId,
 							createBlock( 'core/list', {
+								ordered: true,
 								values: renderToString(
 									<TableOfContentsList
 										nestedHeadingList={ headingTree }
@@ -162,7 +249,7 @@ export default function TableOfContentsEdit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Table of Contents settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
 					label={ __( 'Only include current page' ) }
 					checked={ onlyIncludeCurrentPage }
@@ -191,8 +278,8 @@ export default function TableOfContentsEdit( {
 			<>
 				<div { ...blockProps }>
 					<Placeholder
-						icon={ <BlockIcon icon="list-view" /> }
-						label="Table of Contents"
+						icon={ <BlockIcon icon={ icon } /> }
+						label={ __( 'Table of Contents' ) }
 						instructions={ __(
 							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
 						) }
@@ -206,9 +293,9 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ul>
+				<ol inert="true">
 					<TableOfContentsList nestedHeadingList={ headingTree } />
-				</ul>
+				</ol>
 			</nav>
 			{ toolbarControls }
 			{ inspectorControls }

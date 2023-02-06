@@ -12,9 +12,11 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
-	__experimentalUnitControl as UnitControl,
 	__experimentalUseColorProps as useColorProps,
+	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
+	__experimentalGetElementClassName,
+	useSetting,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -28,10 +30,12 @@ import {
 	PanelBody,
 	BaseControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -78,9 +82,8 @@ export default function SearchEdit( {
 
 	const insertedInNavigationBlock = useSelect(
 		( select ) => {
-			const { getBlockParentsByBlockName, wasBlockJustInserted } = select(
-				blockEditorStore
-			);
+			const { getBlockParentsByBlockName, wasBlockJustInserted } =
+				select( blockEditorStore );
 			return (
 				!! getBlockParentsByBlockName( clientId, 'core/navigation' )
 					?.length && wasBlockJustInserted( clientId )
@@ -88,9 +91,8 @@ export default function SearchEdit( {
 		},
 		[ clientId ]
 	);
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	useEffect( () => {
 		if ( ! insertedInNavigationBlock ) return;
 		// This side-effect should not create an undo level.
@@ -102,8 +104,6 @@ export default function SearchEdit( {
 		} );
 	}, [ insertedInNavigationBlock ] );
 	const borderRadius = style?.border?.radius;
-	const borderColor = style?.border?.color;
-	const borderWidth = style?.border?.width;
 	const borderProps = useBorderProps( attributes );
 
 	// Check for old deprecated numerical border radius. Done as a separate
@@ -114,6 +114,11 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
+	const fluidTypographySettings = useSetting( 'typography.fluid' );
+	const typographyProps = useTypographyProps(
+		attributes,
+		fluidTypographySettings
+	);
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const isButtonPositionInside = 'button-inside' === buttonPosition;
@@ -210,14 +215,20 @@ export default function SearchEdit( {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = classnames(
 			'wp-block-search__input',
-			isButtonPositionInside ? undefined : borderProps.className
+			isButtonPositionInside ? undefined : borderProps.className,
+			typographyProps.className
 		);
-		const textFieldStyles = isButtonPositionInside
-			? { borderRadius }
-			: borderProps.style;
+		const textFieldStyles = {
+			...( isButtonPositionInside
+				? { borderRadius }
+				: borderProps.style ),
+			...typographyProps.style,
+			textDecoration: undefined,
+		};
 
 		return (
 			<input
+				type="search"
 				className={ textFieldClasses }
 				style={ textFieldStyles }
 				aria-label={ __( 'Optional placeholder text' ) }
@@ -240,11 +251,14 @@ export default function SearchEdit( {
 		const buttonClasses = classnames(
 			'wp-block-search__button',
 			colorProps.className,
+			typographyProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
-			buttonUseIcon ? 'has-icon' : undefined
+			buttonUseIcon ? 'has-icon' : undefined,
+			__experimentalGetElementClassName( 'button' )
 		);
 		const buttonStyles = {
 			...colorProps.style,
+			...typographyProps.style,
 			...( isButtonPositionInside
 				? { borderRadius }
 				: borderProps.style ),
@@ -257,6 +271,11 @@ export default function SearchEdit( {
 						type="button"
 						className={ buttonClasses }
 						style={ buttonStyles }
+						aria-label={
+							buttonText
+								? stripHTML( buttonText )
+								: __( 'Search' )
+						}
 					>
 						<Icon icon={ search } />
 					</button>
@@ -344,9 +363,8 @@ export default function SearchEdit( {
 									widthUnit: newUnit,
 								} );
 							} }
-							style={ { maxWidth: 80 } }
+							__unstableInputWidth={ '80px' }
 							value={ `${ width }${ widthUnit }` }
-							unit={ widthUnit }
 							units={ units }
 						/>
 
@@ -387,10 +405,18 @@ export default function SearchEdit( {
 		radius ? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })` : undefined;
 
 	const getWrapperStyles = () => {
-		const styles = {
-			borderColor,
-			borderWidth: isButtonPositionInside ? borderWidth : undefined,
-		};
+		const styles = isButtonPositionInside
+			? borderProps.style
+			: {
+					borderRadius: borderProps.style?.borderRadius,
+					borderTopLeftRadius: borderProps.style?.borderTopLeftRadius,
+					borderTopRightRadius:
+						borderProps.style?.borderTopRightRadius,
+					borderBottomLeftRadius:
+						borderProps.style?.borderBottomLeftRadius,
+					borderBottomRightRadius:
+						borderProps.style?.borderBottomRightRadius,
+			  };
 
 		const isNonZeroBorderRadius =
 			borderRadius !== undefined && parseInt( borderRadius, 10 ) !== 0;
@@ -404,19 +430,15 @@ export default function SearchEdit( {
 
 			if ( typeof borderRadius === 'object' ) {
 				// Individual corner border radii present.
-				const {
-					topLeft,
-					topRight,
-					bottomLeft,
-					bottomRight,
-				} = borderRadius;
+				const { topLeft, topRight, bottomLeft, bottomRight } =
+					borderRadius;
 
 				return {
+					...styles,
 					borderTopLeftRadius: padBorderRadius( topLeft ),
 					borderTopRightRadius: padBorderRadius( topRight ),
 					borderBottomLeftRadius: padBorderRadius( bottomLeft ),
 					borderBottomRightRadius: padBorderRadius( bottomRight ),
-					...styles,
 				};
 			}
 
@@ -435,7 +457,17 @@ export default function SearchEdit( {
 
 	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
+		style: {
+			...typographyProps.style,
+			// Input opts out of text decoration.
+			textDecoration: undefined,
+		},
 	} );
+
+	const labelClassnames = classnames(
+		'wp-block-search__label',
+		typographyProps.className
+	);
 
 	return (
 		<div { ...blockProps }>
@@ -443,12 +475,13 @@ export default function SearchEdit( {
 
 			{ showLabel && (
 				<RichText
-					className="wp-block-search__label"
+					className={ labelClassnames }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
 					withoutInteractiveFormatting
 					value={ label }
 					onChange={ ( html ) => setAttributes( { label: html } ) }
+					style={ typographyProps.style }
 				/>
 			) }
 

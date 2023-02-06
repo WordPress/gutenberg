@@ -4,7 +4,7 @@
 	"name": "core/comment-content",
 	"title": "Comment Content",
 	"category": "theme",
-	"parent": [ "core/comment-template" ],
+	"ancestor": [ "core/comment-template" ],
 	"description": "Displays the contents of a comment.",
 	"textdomain": "default",
 	"usesContext": [ "commentId" ],
@@ -14,6 +14,7 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -29,7 +30,11 @@
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
-			"__experimentalLetterSpacing": true
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		},
 		"spacing": {
 			"padding": [ "horizontal", "vertical" ],

@@ -2,6 +2,62 @@
 
 ## Unreleased
 
+## 7.3.0 (2023-02-01)
+
+## 7.2.0 (2023-01-11)
+
+## 7.1.0 (2023-01-02)
+
+## 7.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 6.19.0 (2022-11-16)
+
+### Enhancement
+
+-   ` BlockTypesChecklist`: Move BlockIcon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
+
+## 6.18.0 (2022-11-02)
+
+## 6.17.0 (2022-10-19)
+
+## 6.16.0 (2022-10-05)
+
+## 6.15.0 (2022-09-21)
+
+## 6.14.0 (2022-09-13)
+
+## 6.13.0 (2022-08-24)
+
+## 6.12.0 (2022-08-10)
+
+## 6.11.0 (2022-07-27)
+
+## 6.10.0 (2022-07-13)
+
+## 6.9.0 (2022-06-29)
+
+## 6.8.0 (2022-06-15)
+
+## 6.7.0 (2022-06-01)
+
+## 6.6.0 (2022-05-18)
+
+## 6.5.0 (2022-05-04)
+
+## 6.4.0 (2022-04-21)
+
+## 6.3.0 (2022-04-08)
+
+## 6.2.0 (2022-03-23)
+
+## 6.1.0 (2022-03-11)
+
+## 6.0.0 (2022-02-10)
+
 ### Breaking Change
 
 -   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).

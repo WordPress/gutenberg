@@ -46,6 +46,7 @@ export function LetterSpacingEdit( props ) {
 			value={ style?.typography?.letterSpacing }
 			onChange={ onChange }
 			__unstableInputWidth={ '100%' }
+			size="__unstable-large"
 		/>
 	);
 }

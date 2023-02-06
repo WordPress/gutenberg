@@ -1,23 +1,19 @@
 /**
- * External dependencies
- */
-import { size, map, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	EditorProvider,
 	ErrorBoundary,
 	PostLockedModal,
 	store as editorStore,
+	experiments as editorExperiments,
 } from '@wordpress/editor';
-import { StrictMode, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -25,25 +21,21 @@ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
+import { unlock } from './experiments';
 
-function Editor( {
-	postId,
-	postType,
-	settings,
-	initialEdits,
-	onError,
-	...props
-} ) {
+const { ExperimentalEditorProvider } = unlock( editorExperiments );
+
+function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	const {
 		hasFixedToolbar,
 		focusMode,
-		hasReducedUI,
+		isDistractionFree,
+		hasInlineToolbar,
 		hasThemeStyles,
 		post,
 		preferredStyleVariations,
 		hiddenBlockTypes,
 		blockTypes,
-		__experimentalLocalAutosaveInterval,
 		keepCaretInsideBlock,
 		isTemplateMode,
 		template,
@@ -51,14 +43,13 @@ function Editor( {
 		( select ) => {
 			const {
 				isFeatureActive,
-				getPreference,
 				__experimentalGetPreviewDeviceType,
 				isEditingTemplate,
 				getEditedPostTemplate,
+				getHiddenBlockTypes,
 			} = select( editPostStore );
-			const { getEntityRecord, getPostType, getEntityRecords } = select(
-				coreStore
-			);
+			const { getEntityRecord, getPostType, getEntityRecords, canUser } =
+				select( coreStore );
 			const { getEditorSettings } = select( editorStore );
 			const { getBlockTypes } = select( blocksStore );
 			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
@@ -75,29 +66,29 @@ function Editor( {
 			} else {
 				postObject = getEntityRecord( 'postType', postType, postId );
 			}
-			const supportsTemplateMode = getEditorSettings()
-				.supportsTemplateMode;
+			const supportsTemplateMode =
+				getEditorSettings().supportsTemplateMode;
 			const isViewable = getPostType( postType )?.viewable ?? false;
+			const canEditTemplate = canUser( 'create', 'templates' );
 
 			return {
 				hasFixedToolbar:
 					isFeatureActive( 'fixedToolbar' ) ||
 					__experimentalGetPreviewDeviceType() !== 'Desktop',
 				focusMode: isFeatureActive( 'focusMode' ),
-				hasReducedUI: isFeatureActive( 'reducedUI' ),
+				isDistractionFree: isFeatureActive( 'distractionFree' ),
+				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
 				hasThemeStyles: isFeatureActive( 'themeStyles' ),
-				preferredStyleVariations: getPreference(
+				preferredStyleVariations: select( preferencesStore ).get(
+					'core/edit-post',
 					'preferredStyleVariations'
 				),
-				hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
-				__experimentalLocalAutosaveInterval: getPreference(
-					'localAutosaveInterval'
-				),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 				isTemplateMode: isEditingTemplate(),
 				template:
-					supportsTemplateMode && isViewable
+					supportsTemplateMode && isViewable && canEditTemplate
 						? getEditedPostTemplate()
 						: null,
 				post: postObject,
@@ -106,9 +97,8 @@ function Editor( {
 		[ postType, postId ]
 	);
 
-	const { updatePreferredStyleVariations, setIsInserterOpened } = useDispatch(
-		editPostStore
-	);
+	const { updatePreferredStyleVariations, setIsInserterOpened } =
+		useDispatch( editPostStore );
 
 	const editorSettings = useMemo( () => {
 		const result = {
@@ -119,8 +109,8 @@ function Editor( {
 			},
 			hasFixedToolbar,
 			focusMode,
-			hasReducedUI,
-			__experimentalLocalAutosaveInterval,
+			isDistractionFree,
+			hasInlineToolbar,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
@@ -131,18 +121,17 @@ function Editor( {
 		};
 
 		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
+		if ( hiddenBlockTypes.length > 0 ) {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
 			const defaultAllowedBlockTypes =
 				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
+					? blockTypes.map( ( { name } ) => name )
 					: settings.allowedBlockTypes || [];
 
-			result.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes
+			result.allowedBlockTypes = defaultAllowedBlockTypes.filter(
+				( type ) => ! hiddenBlockTypes.includes( type )
 			);
 		}
 
@@ -151,11 +140,10 @@ function Editor( {
 		settings,
 		hasFixedToolbar,
 		focusMode,
-		hasReducedUI,
+		isDistractionFree,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
-		__experimentalLocalAutosaveInterval,
 		setIsInserterOpened,
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
@@ -164,7 +152,7 @@ function Editor( {
 	const styles = useMemo( () => {
 		const themeStyles = [];
 		const presetStyles = [];
-		settings.styles.forEach( ( style ) => {
+		settings.styles?.forEach( ( style ) => {
 			if ( ! style.__unstableType || style.__unstableType === 'theme' ) {
 				themeStyles.push( style );
 			} else {
@@ -185,28 +173,24 @@ function Editor( {
 	}
 
 	return (
-		<StrictMode>
-			<ShortcutProvider>
-				<SlotFillProvider>
-					<EditorProvider
-						settings={ editorSettings }
-						post={ post }
-						initialEdits={ initialEdits }
-						useSubRegistry={ false }
-						__unstableTemplate={
-							isTemplateMode ? template : undefined
-						}
-						{ ...props }
-					>
-						<ErrorBoundary onError={ onError }>
-							<EditorInitialization postId={ postId } />
-							<Layout styles={ styles } />
-						</ErrorBoundary>
-						<PostLockedModal />
-					</EditorProvider>
-				</SlotFillProvider>
-			</ShortcutProvider>
-		</StrictMode>
+		<ShortcutProvider>
+			<SlotFillProvider>
+				<ExperimentalEditorProvider
+					settings={ editorSettings }
+					post={ post }
+					initialEdits={ initialEdits }
+					useSubRegistry={ false }
+					__unstableTemplate={ isTemplateMode ? template : undefined }
+					{ ...props }
+				>
+					<ErrorBoundary>
+						<EditorInitialization postId={ postId } />
+						<Layout styles={ styles } />
+					</ErrorBoundary>
+					<PostLockedModal />
+				</ExperimentalEditorProvider>
+			</SlotFillProvider>
+		</ShortcutProvider>
 	);
 }
 

@@ -13,7 +13,7 @@ body:
               Feature '...' is not working properly. I expect '...' to happen, but '...' happens instead
       validations:
           required: true
-          
+
     - type: textarea
       attributes:
           label: Step-by-step reproduction instructions
@@ -42,12 +42,12 @@ body:
           description: |
               Please list what Gutenberg version you are using. If you aren't using Gutenberg, please note that it's not installed.
           placeholder: |
-            - WordPress version, Gutenberg version, and active Theme you are using.
-            - Browser(s) are you seeing the problem on.
-            - Device you are using and operating system (e.g. "Desktop with Windows 10", "iPhone with iOS 14", etc.).
+              - WordPress version, Gutenberg version, and active Theme you are using.
+              - Browser(s) are you seeing the problem on.
+              - Device you are using and operating system (e.g. "Desktop with Windows 10", "iPhone with iOS 14", etc.).
       validations:
           required: false
-          
+
     - type: dropdown
       id: existing
       attributes:
@@ -55,18 +55,18 @@ body:
           description: You can do this by searching https://github.com/WordPress/gutenberg/issues and making sure the bug is not related to another plugin.
           multiple: true
           options:
-             - 'Yes'
-             - 'No'
+              - 'Yes'
+              - 'No'
       validations:
           required: true
-   
+
     - type: dropdown
       id: plugins
       attributes:
           label: Please confirm that you have tested with all plugins deactivated except Gutenberg.
           multiple: true
           options:
-             - 'Yes'
-             - 'No'
+              - 'Yes'
+              - 'No'
       validations:
           required: true

@@ -51,7 +51,7 @@ function makeListener( { allowedImports, context } ) {
 
 		const sourceModule = node.source.value.trim();
 
-		// Ignore non-WordPress packages
+		// Ignore non-WordPress packages.
 		if ( ! sourceModule.startsWith( '@wordpress/' ) ) {
 			return;
 		}

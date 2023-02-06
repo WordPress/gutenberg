@@ -64,12 +64,7 @@ export default function useConvertToGroupButtonProps() {
 		// Do we have
 		// 1. Grouping block available to be inserted?
 		// 2. One or more blocks selected
-		// (we allow single Blocks to become groups unless
-		// they are a soltiary group block themselves)
-		const _isGroupable =
-			groupingBlockAvailable &&
-			_blocksSelection.length &&
-			! isSingleGroupingBlock;
+		const _isGroupable = groupingBlockAvailable && _blocksSelection.length;
 
 		// Do we have a single Group Block selected and does that group have inner blocks?
 		const _isUngroupable =

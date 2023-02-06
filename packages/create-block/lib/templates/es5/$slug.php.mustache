@@ -1,10 +1,13 @@
 <?php
 /**
  * Plugin Name:       {{title}}
+{{#pluginURI}}
+ * Plugin URI:        {{{pluginURI}}}
+{{/pluginURI}}
 {{#description}}
  * Description:       {{description}}
 {{/description}}
- * Requires at least: 5.7
+ * Requires at least: 6.1
  * Requires PHP:      7.0
  * Version:           {{version}}
 {{#author}}
@@ -17,6 +20,12 @@
  * License URI:       {{{licenseURI}}}
 {{/licenseURI}}
  * Text Domain:       {{textdomain}}
+{{#domainPath}}
+ * Domain Path:       {{{domainPath}}}
+{{/domainPath}}
+{{#updateURI}}
+ * Update URI:        {{{updateURI}}}
+{{/updateURI}}
  *
  * @package           {{namespace}}
  */
@@ -61,7 +70,7 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	);
 
 	register_block_type(
-		'{{namespace}}/{{slug}}',
+		$dir,
 		array(
 			'editor_script' => '{{namespace}}-{{slug}}-block-editor',
 			'editor_style'  => '{{namespace}}-{{slug}}-block-editor',

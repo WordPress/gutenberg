@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/comments-title",
+		"attrs": {
+			"textAlign": "center",
+			"singleCommentLabel": "One reply to ",
+			"multipleCommentsLabel": " replies to ",
+			"level": 4
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

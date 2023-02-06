@@ -31,18 +31,20 @@ function isComponentLike( object ) {
  * @return {Function} Higher Order Component with the focus restauration behaviour.
  */
 export default createHigherOrderComponent( ( options ) => {
-	const HoC = ( { onFocusReturn } = {} ) => ( WrappedComponent ) => {
-		const WithFocusReturn = ( props ) => {
-			const ref = useFocusReturn( onFocusReturn );
-			return (
-				<div ref={ ref }>
-					<WrappedComponent { ...props } />
-				</div>
-			);
-		};
+	const HoC =
+		( { onFocusReturn } = {} ) =>
+		( WrappedComponent ) => {
+			const WithFocusReturn = ( props ) => {
+				const ref = useFocusReturn( onFocusReturn );
+				return (
+					<div ref={ ref }>
+						<WrappedComponent { ...props } />
+					</div>
+				);
+			};
 
-		return WithFocusReturn;
-	};
+			return WithFocusReturn;
+		};
 
 	if ( isComponentLike( options ) ) {
 		const WrappedComponent = options;
@@ -55,8 +57,7 @@ export default createHigherOrderComponent( ( options ) => {
 export const Provider = ( { children } ) => {
 	deprecated( 'wp.components.FocusReturnProvider component', {
 		since: '5.7',
-		hint:
-			'This provider is not used anymore. You can just remove it from your codebase',
+		hint: 'This provider is not used anymore. You can just remove it from your codebase',
 	} );
 
 	return children;

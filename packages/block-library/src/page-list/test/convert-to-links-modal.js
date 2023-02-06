@@ -1,10 +1,28 @@
 /**
  * Internal dependencies
  */
-import { convertSelectedBlockToNavigationLinks } from '../convert-to-links-modal';
+
+import { convertToNavigationLinks } from '../use-convert-to-navigation-links';
+
+// Mock createBlock to avoid creating the blocks in test environment
+// as convertToNavigationLinks calls this method internally.
+jest.mock( '@wordpress/blocks', () => {
+	const blocks = jest.requireActual( '@wordpress/blocks' );
+
+	return {
+		...blocks,
+		createBlock( name, attributes, innerBlocks ) {
+			return {
+				name,
+				attributes,
+				innerBlocks,
+			};
+		},
+	};
+} );
 
 describe( 'page list convert to links', () => {
-	describe( 'convertSelectedBlockToNavigationLinks', () => {
+	describe( 'convertToNavigationLinks', () => {
 		it( 'Can create submenus', () => {
 			const pages = [
 				{
@@ -88,22 +106,10 @@ describe( 'page list convert to links', () => {
 					type: 'page',
 				},
 			];
-			const replaceBlock = jest.fn();
-			const createBlock = jest.fn(
-				( name, attributes, innerBlocks ) => ( {
-					name,
-					attributes,
-					innerBlocks,
-				} )
-			);
-			const convertLinks = convertSelectedBlockToNavigationLinks( {
-				pages,
-				clientId: 'testId',
-				replaceBlock,
-				createBlock,
-			} );
-			convertLinks();
-			expect( replaceBlock.mock.calls?.[ 0 ]?.[ 1 ] ).toEqual( [
+
+			const convertLinks = convertToNavigationLinks( pages );
+
+			expect( convertLinks ).toEqual( [
 				{
 					attributes: {
 						id: 2,
@@ -130,8 +136,7 @@ describe( 'page list convert to links', () => {
 								kind: 'post-type',
 								label: 'About Sub 1',
 								type: 'page',
-								url:
-									'http://wordpress.local/about/about-sub-1/',
+								url: 'http://wordpress.local/about/about-sub-1/',
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
@@ -142,8 +147,7 @@ describe( 'page list convert to links', () => {
 								kind: 'post-type',
 								label: 'About Sub 2',
 								type: 'page',
-								url:
-									'http://wordpress.local/about/about-sub-2/',
+								url: 'http://wordpress.local/about/about-sub-2/',
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
@@ -186,8 +190,7 @@ describe( 'page list convert to links', () => {
 										kind: 'post-type',
 										label: 'Test Sub Sub',
 										type: 'page',
-										url:
-											'http://wordpress.local/test/test-sub/test-sub-sub/',
+										url: 'http://wordpress.local/test/test-sub/test-sub-sub/',
 									},
 									innerBlocks: [],
 									name: 'core/navigation-link',
@@ -283,22 +286,10 @@ describe( 'page list convert to links', () => {
 					type: 'page',
 				},
 			];
-			const replaceBlock = jest.fn();
-			const createBlock = jest.fn(
-				( name, attributes, innerBlocks ) => ( {
-					name,
-					attributes,
-					innerBlocks,
-				} )
-			);
-			const convertLinks = convertSelectedBlockToNavigationLinks( {
-				pages,
-				clientId: 'testId',
-				replaceBlock,
-				createBlock,
-			} );
-			convertLinks();
-			expect( replaceBlock.mock.calls?.[ 0 ]?.[ 1 ] ).toEqual( [
+
+			const convertLinks = convertToNavigationLinks( pages );
+
+			expect( convertLinks ).toEqual( [
 				{
 					attributes: {
 						id: 2,
@@ -325,8 +316,7 @@ describe( 'page list convert to links', () => {
 								kind: 'post-type',
 								label: 'About Sub 1',
 								type: 'page',
-								url:
-									'http://wordpress.local/about/about-sub-1/',
+								url: 'http://wordpress.local/about/about-sub-1/',
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
@@ -337,8 +327,7 @@ describe( 'page list convert to links', () => {
 								kind: 'post-type',
 								label: 'About Sub 2',
 								type: 'page',
-								url:
-									'http://wordpress.local/about/about-sub-2/',
+								url: 'http://wordpress.local/about/about-sub-2/',
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
@@ -381,8 +370,7 @@ describe( 'page list convert to links', () => {
 										kind: 'post-type',
 										label: 'Test Sub Sub',
 										type: 'page',
-										url:
-											'http://wordpress.local/test/test-sub/test-sub-sub/',
+										url: 'http://wordpress.local/test/test-sub/test-sub-sub/',
 									},
 									innerBlocks: [],
 									name: 'core/navigation-link',

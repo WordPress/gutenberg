@@ -71,8 +71,13 @@ export function useContextSystem( props, namespace ) {
 		finalComponentProps[ key ] = overrideProps[ key ];
 	}
 
-	// @ts-ignore
-	finalComponentProps.children = rendered;
+	// Setting an `undefined` explicitly can cause unintended overwrites
+	// when a `cloneElement()` is involved.
+	if ( rendered !== undefined ) {
+		// @ts-ignore
+		finalComponentProps.children = rendered;
+	}
+
 	finalComponentProps.className = classes;
 
 	return finalComponentProps;

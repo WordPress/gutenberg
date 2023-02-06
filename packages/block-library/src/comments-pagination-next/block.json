@@ -2,18 +2,19 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/comments-pagination-next",
-	"title": "Next Page",
+	"title": "Comments Next Page",
 	"category": "theme",
 	"parent": [ "core/comments-pagination" ],
-	"description": "Displays the next comments page link.",
+	"description": "Displays the next comment's page link.",
 	"textdomain": "default",
 	"attributes": {
 		"label": {
 			"type": "string"
 		}
 	},
-	"usesContext": [ "postId", "comments/perPage", "comments/paginationArrow" ],
+	"usesContext": [ "postId", "comments/paginationArrow" ],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"color": {
@@ -26,10 +27,12 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

@@ -13,8 +13,10 @@ import {
 	ColorControl,
 	PanelBody,
 	BottomSheetContext,
+	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import { useRoute, useNavigation } from '@react-navigation/native';
+
 /**
  * Internal dependencies
  */
@@ -27,6 +29,7 @@ import { colorsUtils } from './utils';
 import styles from './style.scss';
 
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
+const THEME_PALETTE_NAME = 'Theme';
 
 const PaletteScreen = () => {
 	const route = useRoute();
@@ -45,10 +48,15 @@ const PaletteScreen = () => {
 	const [ currentValue, setCurrentValue ] = useState( colorValue );
 	const isGradientColor = isGradient( currentValue );
 	const selectedSegmentIndex = isGradientColor ? 1 : 0;
+	const allAvailableColors = useMobileGlobalStylesColors();
 
 	const [ currentSegment, setCurrentSegment ] = useState(
 		segments[ selectedSegmentIndex ]
 	);
+	const isGradientSegment = currentSegment === colorsUtils.segments[ 1 ];
+	const currentSegmentColors = ! isGradientSegment
+		? defaultSettings.colors
+		: defaultSettings.gradients;
 
 	const horizontalSeparatorStyle = usePreferredColorSchemeStyle(
 		styles.horizontalSeparator,
@@ -176,15 +184,37 @@ const PaletteScreen = () => {
 					<NavBar.Heading>{ label } </NavBar.Heading>
 				</NavBar>
 			) }
-			<ColorPalette
-				setColor={ setColor }
-				activeColor={ currentValue }
-				isGradientColor={ isGradientColor }
-				currentSegment={ currentSegment }
-				onCustomPress={ onCustomPress }
-				shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
-				defaultSettings={ defaultSettings }
-			/>
+
+			<View style={ styles.colorPalettes }>
+				{ currentSegmentColors.map( ( palette, paletteKey ) => {
+					const paletteSettings = {
+						colors: palette.colors,
+						gradients: palette.gradients,
+						allColors: allAvailableColors,
+					};
+					const enableCustomColor =
+						! isGradientSegment &&
+						palette.name === THEME_PALETTE_NAME;
+
+					return (
+						<ColorPalette
+							enableCustomColor={ enableCustomColor }
+							label={ palette.name }
+							key={ paletteKey }
+							setColor={ setColor }
+							activeColor={ currentValue }
+							isGradientColor={ isGradientColor }
+							currentSegment={ currentSegment }
+							onCustomPress={ onCustomPress }
+							shouldEnableBottomSheetScroll={
+								shouldEnableBottomSheetScroll
+							}
+							defaultSettings={ paletteSettings }
+						/>
+					);
+				} ) }
+			</View>
+
 			{ isCustomGadientShown && (
 				<>
 					<View style={ horizontalSeparatorStyle } />

@@ -88,12 +88,10 @@ html.interface-interface-skeleton__html-container {
 	// to "bleed" through the header.
 	// See https://github.com/WordPress/gutenberg/issues/32631
 	z-index: z-index(".interface-interface-skeleton__content");
-
 }
 
 .interface-interface-skeleton__secondary-sidebar,
 .interface-interface-skeleton__sidebar {
-	display: block;
 	flex-shrink: 0;
 	position: absolute;
 	z-index: z-index(".interface-interface-skeleton__sidebar");
@@ -107,8 +105,14 @@ html.interface-interface-skeleton__html-container {
 	// On Mobile the header is fixed to keep HTML as scrollable.
 	@include break-medium() {
 		position: relative !important;
-		z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
 		width: auto; // Keep the sidebar width flexible.
+
+		// Set this z-index only when the sidebar is opened. When it's closed, the
+		// button to open the sidebar that is shown when navigating regions needs to
+		// be above the footer. See `edit-post-layout__toggle-sidebar-panel`.
+		.is-sidebar-opened & {
+			z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
+		}
 	}
 }
 
@@ -170,11 +174,26 @@ html.interface-interface-skeleton__html-container {
 	bottom: auto;
 	left: auto;
 	right: 0;
-	width: $sidebar-width;
 	color: $gray-900;
+	background: $white;
+	width: 100vw;
 
-	&:focus {
-		top: auto;
+	@include break-medium() {
+		width: $sidebar-width;
+	}
+
+	&:focus,
+	&:focus-within {
+		top: $admin-bar-height-big;
+
+		@include break-medium() {
+			border-left: $border-width solid $gray-300;
+			top: $admin-bar-height;
+
+			.is-fullscreen-mode & {
+				top: 0;
+			}
+		}
 		bottom: 0;
 	}
 }

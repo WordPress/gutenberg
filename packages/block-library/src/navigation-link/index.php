@@ -98,7 +98,14 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
+		$font_sizes['inline_styles'] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $context['style']['typography']['fontSize'],
+				)
+			)
+		);
 	}
 
 	return $font_sizes;
@@ -112,6 +119,33 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 function block_core_navigation_link_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
+
+/**
+ * Decodes a url if it's encoded, returning the same url if not.
+ *
+ * @param string $url The url to decode.
+ *
+ * @return string $url Returns the decoded url.
+ */
+function block_core_navigation_link_maybe_urldecode( $url ) {
+	$is_url_encoded = false;
+	$query          = parse_url( $url, PHP_URL_QUERY );
+	$query_params   = wp_parse_args( $query );
+
+	foreach ( $query_params as $query_param ) {
+		if ( rawurldecode( $query_param ) !== $query_param ) {
+			$is_url_encoded = true;
+			break;
+		}
+	}
+
+	if ( $is_url_encoded ) {
+		return rawurldecode( $url );
+	}
+
+	return $url;
+}
+
 
 /**
  * Renders the `core/navigation-link` block.
@@ -150,7 +184,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	$css_classes = trim( implode( ' ', $classes ) );
 	$has_submenu = count( $block->inner_blocks ) > 0;
-	$is_active   = ! empty( $attributes['id'] ) && ( get_the_ID() === $attributes['id'] );
+	$is_active   = ! empty( $attributes['id'] ) && ( get_queried_object_id() === (int) $attributes['id'] );
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
@@ -164,7 +198,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['url'] ) ) {
-		$html .= ' href="' . esc_url( $attributes['url'] ) . '"';
+		$html .= ' href="' . esc_url( block_core_navigation_link_maybe_urldecode( $attributes['url'] ) ) . '"';
 	}
 
 	if ( $is_active ) {
@@ -193,36 +227,25 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		'<span class="wp-block-navigation-item__label">';
 
 	if ( isset( $attributes['label'] ) ) {
-		$html .= wp_kses(
-			$attributes['label'],
-			array(
-				'code'   => array(),
-				'em'     => array(),
-				'img'    => array(
-					'scale' => array(),
-					'class' => array(),
-					'style' => array(),
-					'src'   => array(),
-					'alt'   => array(),
-				),
-				's'      => array(),
-				'span'   => array(
-					'style' => array(),
-				),
-				'strong' => array(),
-			)
-		);
+		$html .= wp_kses_post( $attributes['label'] );
 	}
 
 	$html .= '</span>';
+
+	// Add description if available.
+	if ( ! empty( $attributes['description'] ) ) {
+		$html .= '<span class="wp-block-navigation-item__description">';
+		$html .= wp_kses_post( $attributes['description'] );
+		$html .= '</span>';
+	}
+
+	$html .= '</a>';
+	// End anchor tag content.
 
 	if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] && $has_submenu ) {
 		// The submenu icon can be hidden by a CSS rule on the Navigation Block.
 		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_link_render_submenu_icon() . '</span>';
 	}
-
-	$html .= '</a>';
-	// End anchor tag content.
 
 	if ( $has_submenu ) {
 		$inner_blocks_html = '';
@@ -348,3 +371,35 @@ function register_block_core_navigation_link() {
 	);
 }
 add_action( 'init', 'register_block_core_navigation_link' );
+
+/**
+ * Enables animation of the block inspector for the Navigation Link block.
+ *
+ * See:
+ * - https://github.com/WordPress/gutenberg/pull/46342
+ * - https://github.com/WordPress/gutenberg/issues/45884
+ *
+ * @param array $settings Default editor settings.
+ * @return array Filtered editor settings.
+ */
+function block_core_navigation_link_enable_inspector_animation( $settings ) {
+	$current_animation_settings = _wp_array_get(
+		$settings,
+		array( '__experimentalBlockInspectorAnimation' ),
+		array()
+	);
+
+	$settings['__experimentalBlockInspectorAnimation'] = array_merge(
+		$current_animation_settings,
+		array(
+			'core/navigation-link' =>
+				array(
+					'enterDirection' => 'rightToLeft',
+				),
+		)
+	);
+
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'block_core_navigation_link_enable_inspector_animation' );

@@ -14,24 +14,22 @@ import { store as blockEditorStore } from '../../store';
 import { getDefaultStyle } from '../block-styles/utils';
 
 export default function DefaultStylePicker( { blockName } ) {
-	const {
-		preferredStyle,
-		onUpdatePreferredStyleVariations,
-		styles,
-	} = useSelect(
-		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
-			const preferredStyleVariations =
-				settings.__experimentalPreferredStyleVariations;
-			return {
-				preferredStyle: preferredStyleVariations?.value?.[ blockName ],
-				onUpdatePreferredStyleVariations:
-					preferredStyleVariations?.onChange ?? null,
-				styles: select( blocksStore ).getBlockStyles( blockName ),
-			};
-		},
-		[ blockName ]
-	);
+	const { preferredStyle, onUpdatePreferredStyleVariations, styles } =
+		useSelect(
+			( select ) => {
+				const settings = select( blockEditorStore ).getSettings();
+				const preferredStyleVariations =
+					settings.__experimentalPreferredStyleVariations;
+				return {
+					preferredStyle:
+						preferredStyleVariations?.value?.[ blockName ],
+					onUpdatePreferredStyleVariations:
+						preferredStyleVariations?.onChange ?? null,
+					styles: select( blocksStore ).getBlockStyles( blockName ),
+				};
+			},
+			[ blockName ]
+		);
 	const selectOptions = useMemo(
 		() => [
 			{ label: __( 'Not set' ), value: '' },
@@ -39,9 +37,10 @@ export default function DefaultStylePicker( { blockName } ) {
 		],
 		[ styles ]
 	);
-	const defaultStyleName = useMemo( () => getDefaultStyle( styles )?.name, [
-		styles,
-	] );
+	const defaultStyleName = useMemo(
+		() => getDefaultStyle( styles )?.name,
+		[ styles ]
+	);
 	const selectOnChange = useCallback(
 		( blockStyle ) => {
 			onUpdatePreferredStyleVariations( blockName, blockStyle );
@@ -59,6 +58,7 @@ export default function DefaultStylePicker( { blockName } ) {
 		onUpdatePreferredStyleVariations && (
 			<div className="default-style-picker__default-switcher">
 				<SelectControl
+					__nextHasNoMarginBottom
 					options={ selectOptions }
 					value={ preferredStyle || '' }
 					label={ __( 'Default Style' ) }

@@ -2,6 +2,50 @@
 
 ## Unreleased
 
+## 10.7.0 (2023-02-01)
+
+## 10.6.0 (2023-01-11)
+
+## 10.5.0 (2023-01-02)
+
+## 10.4.0 (2022-12-14)
+
+## 10.3.0 (2022-11-16)
+
+## 10.2.0 (2022-11-02)
+
+## 10.1.0 (2022-10-19)
+
+## 10.0.0 (2022-10-05)
+
+### Breaking Change
+
+-   Testing: Remove enzyme completely ([#44494](https://github.com/WordPress/gutenberg/pull/44494)). See the [example in the README](./README.md#using-enzyme) for instructions on how to continue using `enzyme` in your project.
+
+## 9.1.0 (2022-09-21)
+
+## 9.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 8.5.2 (2022-08-17)
+
+### Bug Fix
+
+-   Jest Preset: Improve `is-plain-obj` transformation ignore ([#43271](https://github.com/WordPress/gutenberg/pull/43271)).
+
+## 8.5.1 (2022-08-12)
+
+### Bug Fix
+
+-   Jest Preset: Ignore `is-plain-obj` transformation ([#43179](https://github.com/WordPress/gutenberg/pull/43179)).
+
 ## 8.0.0 (2022-01-27)
 
 ### Breaking Changes

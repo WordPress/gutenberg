@@ -21,7 +21,7 @@ Blocks are added to WordPress using plugins, so you will need:
 
 ### Step 1: Configure block.json
 
-The functions of a static block is defined in JavaScript, however the settings and other metadata should be defined in a block.json file.
+The functions of a static block are defined in JavaScript, however the settings and other metadata should be defined in a block.json file.
 
 Here are the basic settings:
 
@@ -42,10 +42,10 @@ Create a basic `block.json` file there:
 ```json
 {
 	"apiVersion": 2,
-	"name": "gutenberg-examples/example-01-basic-esnext",
 	"title": "Example: Basic (ESNext)",
-	"icon": "universal-access-alt",
+	"name": "gutenberg-examples/example-01-basic-esnext",
 	"category": "layout",
+	"icon": "universal-access-alt",
 	"editorScript": "file:./build/index.js"
 }
 ```
@@ -133,9 +133,37 @@ Add the following to `block.js`
 
 {% end %}
 
-NOTE: If using the JSX version, you need to run `npm run build` and it will create the JavaScript file that is loaded in the editor at `build/index.js`
+### Step 4: Build or add dependency
 
-### Step 4: Confirm
+In order to register the block, an asset php file is required in the same directory as the directory used in `register_block_type()` and must begin with the script's filename.
+
+{% codetabs %}
+{% JSX %}
+
+Build the scripts and asset file which is used to keep track of dependencies and the build version.
+```bash
+npm run build
+```
+
+{% Plain %}
+
+Create the asset file to load the dependencies for the scripts. The name of this file should be the name of the js file then .asset.php. For this example, create `block.asset.php` with the following:
+
+```php
+<?php return
+	array( 'dependencies' =>
+		array(
+			'wp-blocks',
+			'wp-element',
+			'wp-polyfill'
+		),
+		'version' => '0.1'
+	);
+```
+
+{% end %}
+
+### Step 5: Confirm
 
 Open your editor and try adding your new block. It will show in the inserter using the `title`.
 When inserted you will see the `Hello World (from the editor)` message.
@@ -152,9 +180,9 @@ When you save the post and view it published, you will see the `Hola mundo (from
 
 This shows the most basic static block. The [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository has complete examples for both.
 
--   [Basic example with JSX build](https://github.com/WordPress/gutenberg-examples/tree/trunk/01-basic-esnext)
+-   [Basic Example with JSX build](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-jsx/01-basic-esnext)
 
--   [Basic example plain JavaScript](https://github.com/WordPress/gutenberg-examples/tree/trunk/01-basic),
+-   [Basic Example Plain JavaScript](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-non-jsx/01-basic),
 
 **NOTE:** The examples include a more complete block setup with translation features included, it is recommended to follow those examples for a production block. The internationalization features were left out of this guide for simplicity and focusing on the very basics of a block.
 

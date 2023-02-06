@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
@@ -30,14 +25,14 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
-	isAlternate: true,
+	variant: 'toolbar',
 };
 
 function AlignmentUI( {
 	value,
 	onChange,
 	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
-	label = __( 'Align' ),
+	label = __( 'Align text' ),
 	describedBy = __( 'Change text alignment' ),
 	isCollapsed = true,
 	isToolbar,
@@ -46,8 +41,7 @@ function AlignmentUI( {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const activeAlignment = find(
-		alignmentControls,
+	const activeAlignment = alignmentControls.find(
 		( control ) => control.align === value
 	);
 
@@ -57,14 +51,19 @@ function AlignmentUI( {
 	}
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
-	const extraProps = isToolbar ? { isCollapsed } : {};
+	const extraProps = isToolbar
+		? { isCollapsed }
+		: {
+				toggleProps: {
+					describedBy,
+				},
+				popoverProps: POPOVER_PROPS,
+		  };
 
 	return (
 		<UIComponent
 			icon={ setIcon() }
 			label={ label }
-			toggleProps={ { describedBy } }
-			popoverProps={ POPOVER_PROPS }
 			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;
 				const isActive = value === align;

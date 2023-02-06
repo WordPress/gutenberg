@@ -6,10 +6,22 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Radio from '../../radio';
+import Radio from '../radio';
 import RadioGroup from '../';
 
-export default { title: 'Components/RadioGroup', component: RadioGroup };
+export default {
+	title: 'Components (Deprecated)/RadioGroup',
+	subcomponents: { Radio },
+	component: RadioGroup,
+	parameters: {
+		docs: {
+			description: {
+				component:
+					'This component is deprecated. Use `RadioControl` or `ToggleGroupControl` instead.',
+			},
+		},
+	},
+};
 
 export const _default = () => {
 	/* eslint-disable no-restricted-syntax */

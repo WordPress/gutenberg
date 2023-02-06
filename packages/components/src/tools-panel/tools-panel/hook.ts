@@ -139,7 +139,7 @@ export function useToolsPanel(
 			} );
 			return items;
 		} );
-	}, [ generateMenuItems, panelItems, setMenuItems ] );
+	}, [ panelItems, setMenuItems ] );
 
 	// Force a menu item to be checked.
 	// This is intended for use with default panel items. They are displayed
@@ -165,10 +165,8 @@ export function useToolsPanel(
 	// in order to later determine if the panel display is empty and handle
 	// conditional display of a plus icon to indicate the presence of further
 	// menu items.
-	const [
-		areAllOptionalControlsHidden,
-		setAreAllOptionalControlsHidden,
-	] = useState( false );
+	const [ areAllOptionalControlsHidden, setAreAllOptionalControlsHidden ] =
+		useState( false );
 
 	useEffect( () => {
 		if (
@@ -192,7 +190,12 @@ export function useToolsPanel(
 			areAllOptionalControlsHidden &&
 			styles.ToolsPanelHiddenInnerWrapper;
 
-		return cx( styles.ToolsPanel, wrapperStyle, emptyStyle, className );
+		return cx(
+			styles.ToolsPanel( DEFAULT_COLUMNS ),
+			wrapperStyle,
+			emptyStyle,
+			className
+		);
 	}, [
 		areAllOptionalControlsHidden,
 		className,
@@ -252,13 +255,7 @@ export function useToolsPanel(
 			shouldReset: true,
 		} );
 		setMenuItems( resetMenuItems );
-	}, [
-		generateMenuItems,
-		isResetting.current,
-		panelItems,
-		resetAll,
-		setMenuItems,
-	] );
+	}, [ panelItems, resetAll, setMenuItems ] );
 
 	// Assist ItemGroup styling when there are potentially hidden placeholder
 	// items by identifying first & last items that are toggled on for display.
@@ -297,7 +294,6 @@ export function useToolsPanel(
 			deregisterPanelItem,
 			firstDisplayedItem,
 			flagItemCustomization,
-			isResetting.current,
 			lastDisplayedItem,
 			menuItems,
 			panelId,

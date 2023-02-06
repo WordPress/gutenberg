@@ -2,12 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
+import {
+	Platform,
+	useState,
+	useRef,
+	useEffect,
+	useMemo,
+} from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -20,7 +27,9 @@ import {
 	useIsDimensionsSupportValid,
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
-
+import BlockPopover from '../components/block-popover';
+import SpacingSizesControl from '../components/spacing-sizes-control';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 /**
  * Determines if there is padding support.
  *
@@ -91,7 +100,11 @@ export function PaddingEdit( props ) {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
+		onMouseOver,
+		onMouseOut,
 	} = props;
+
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [
@@ -124,34 +137,99 @@ export function PaddingEdit( props ) {
 		} );
 	};
 
-	const onChangeShowVisualizer = ( next ) => {
-		const newStyle = {
-			...style,
-			visualizers: {
-				padding: next,
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
 	return Platform.select( {
 		web: (
 			<>
-				<BoxControl
-					values={ style?.spacing?.padding }
-					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
-					label={ __( 'Padding' ) }
-					sides={ sides }
-					units={ units }
-					allowReset={ false }
-					splitOnAxis={ splitOnAxis }
-				/>
+				{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
+					<BoxControl
+						values={ style?.spacing?.padding }
+						onChange={ onChange }
+						label={ __( 'Padding' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
+					/>
+				) }
+				{ spacingSizes?.length > 0 && (
+					<SpacingSizesControl
+						values={ style?.spacing?.padding }
+						onChange={ onChange }
+						label={ __( 'Padding' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
+					/>
+				) }
 			</>
 		),
 		native: null,
 	} );
+}
+
+export function PaddingVisualizer( { clientId, attributes, forceShow } ) {
+	const padding = attributes?.style?.spacing?.padding;
+	const style = useMemo( () => {
+		return {
+			borderTopWidth: padding?.top
+				? getSpacingPresetCssVar( padding?.top )
+				: 0,
+			borderRightWidth: padding?.right
+				? getSpacingPresetCssVar( padding?.right )
+				: 0,
+			borderBottomWidth: padding?.bottom
+				? getSpacingPresetCssVar( padding?.bottom )
+				: 0,
+			borderLeftWidth: padding?.left
+				? getSpacingPresetCssVar( padding?.left )
+				: 0,
+		};
+	}, [ padding ] );
+
+	const [ isActive, setIsActive ] = useState( false );
+	const valueRef = useRef( padding );
+	const timeoutRef = useRef();
+
+	const clearTimer = () => {
+		if ( timeoutRef.current ) {
+			window.clearTimeout( timeoutRef.current );
+		}
+	};
+
+	useEffect( () => {
+		if ( ! isShallowEqual( padding, valueRef.current ) && ! forceShow ) {
+			setIsActive( true );
+			valueRef.current = padding;
+
+			timeoutRef.current = setTimeout( () => {
+				setIsActive( false );
+			}, 400 );
+		}
+
+		return () => {
+			setIsActive( false );
+			clearTimer();
+		};
+	}, [ padding, forceShow ] );
+
+	if ( ! isActive && ! forceShow ) {
+		return null;
+	}
+
+	return (
+		<BlockPopover
+			clientId={ clientId }
+			__unstableCoverTarget
+			__unstableRefreshSize={ padding }
+			__unstablePopoverSlot="block-toolbar"
+			shift={ false }
+		>
+			<div className="block-editor__padding-visualizer" style={ style } />
+		</BlockPopover>
+	);
 }

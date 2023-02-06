@@ -1,4 +1,12 @@
 /**
+ * Appender
+ */
+
+.wp-block-navigation .block-list-appender {
+	position: relative;
+}
+
+/**
  * Submenus.
  */
 
@@ -55,7 +63,18 @@
 	}
 }
 
+.wp-block-navigation-link__invalid-item {
+	color: #000;
+}
 
+.wp-block-navigation-link__missing_text-tooltip {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+}
 /**
  * Menu item setup state. Is shown when a menu item has no URL configured.
  */

@@ -1,20 +1,9 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { get } from 'lodash';
-
-/**
- * Returns the item that is enabled in a given scope.
- *
- * @param {Object} state    Global application state.
- * @param {string} itemType Type of item.
- * @param {string} scope    Item scope.
- *
- * @return {?string|null} The item that is enabled in the passed scope and type.
- */
-function getSingleEnableItem( state, itemType, scope ) {
-	return get( state.enableItems.singleEnableItems, [ itemType, scope ] );
-}
+import { createRegistrySelector } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Returns the complementary area that is active in a given scope.
@@ -22,29 +11,30 @@ function getSingleEnableItem( state, itemType, scope ) {
  * @param {Object} state Global application state.
  * @param {string} scope Item scope.
  *
- * @return {string} The complementary area that is active in the given scope.
+ * @return {string | null | undefined} The complementary area that is active in the given scope.
  */
-export function getActiveComplementaryArea( state, scope ) {
-	return getSingleEnableItem( state, 'complementaryArea', scope );
-}
+export const getActiveComplementaryArea = createRegistrySelector(
+	( select ) => ( state, scope ) => {
+		const isComplementaryAreaVisible = select( preferencesStore ).get(
+			scope,
+			'isComplementaryAreaVisible'
+		);
 
-/**
- * Returns a boolean indicating if an item is enabled or not in a given scope.
- *
- * @param {Object} state    Global application state.
- * @param {string} itemType Type of item.
- * @param {string} scope    Scope.
- * @param {string} item     Item to check.
- *
- * @return {boolean|undefined} True if the item is enabled, false otherwise if the item is explicitly disabled, and undefined if there is no information for that item.
- */
-function isMultipleEnabledItemEnabled( state, itemType, scope, item ) {
-	return get( state.enableItems.multipleEnableItems, [
-		itemType,
-		scope,
-		item,
-	] );
-}
+		// Return `undefined` to indicate that the user has never toggled
+		// visibility, this is the vanilla default. Other code relies on this
+		// nuance in the return value.
+		if ( isComplementaryAreaVisible === undefined ) {
+			return undefined;
+		}
+
+		// Return `null` to indicate the user hid the complementary area.
+		if ( ! isComplementaryAreaVisible ) {
+			return null;
+		}
+
+		return state?.complementaryAreas?.[ scope ];
+	}
+);
 
 /**
  * Returns a boolean indicating if an item is pinned or not.
@@ -55,12 +45,15 @@ function isMultipleEnabledItemEnabled( state, itemType, scope, item ) {
  *
  * @return {boolean} True if the item is pinned and false otherwise.
  */
-export function isItemPinned( state, scope, item ) {
-	return (
-		isMultipleEnabledItemEnabled( state, 'pinnedItems', scope, item ) !==
-		false
-	);
-}
+export const isItemPinned = createRegistrySelector(
+	( select ) => ( state, scope, item ) => {
+		const pinnedItems = select( preferencesStore ).get(
+			scope,
+			'pinnedItems'
+		);
+		return pinnedItems?.[ item ] ?? true;
+	}
+);
 
 /**
  * Returns a boolean indicating whether a feature is active for a particular
@@ -72,12 +65,16 @@ export function isItemPinned( state, scope, item ) {
  *
  * @return {boolean} Is the feature enabled?
  */
-export function isFeatureActive( state, scope, featureName ) {
-	const featureValue = state.preferences.features[ scope ]?.[ featureName ];
-	const defaultedFeatureValue =
-		featureValue !== undefined
-			? featureValue
-			: state.preferenceDefaults.features[ scope ]?.[ featureName ];
+export const isFeatureActive = createRegistrySelector(
+	( select ) => ( state, scope, featureName ) => {
+		deprecated(
+			`select( 'core/interface' ).isFeatureActive( scope, featureName )`,
+			{
+				since: '6.0',
+				alternative: `select( 'core/preferences' ).get( scope, featureName )`,
+			}
+		);
 
-	return !! defaultedFeatureValue;
-}
+		return !! select( preferencesStore ).get( scope, featureName );
+	}
+);

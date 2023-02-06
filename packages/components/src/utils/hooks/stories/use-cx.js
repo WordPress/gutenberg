@@ -32,20 +32,21 @@ const Example = ( { serializedStyles, children } ) => {
 const ExampleWithUseMemoWrong = ( { serializedStyles, children } ) => {
 	const cx = useCx();
 	// Wrong: using 'useMemo' without adding 'cx' to the dependency list.
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const classes = useMemo( () => cx( serializedStyles ), [
-		serializedStyles,
-	] );
+	const classes = useMemo(
+		() => cx( serializedStyles ),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[ serializedStyles ]
+	);
 	return <span className={ classes }>{ children }</span>;
 };
 
 const ExampleWithUseMemoRight = ( { serializedStyles, children } ) => {
 	const cx = useCx();
 	// Right: using 'useMemo' with 'cx' listed as a dependency.
-	const classes = useMemo( () => cx( serializedStyles ), [
-		cx,
-		serializedStyles,
-	] );
+	const classes = useMemo(
+		() => cx( serializedStyles ),
+		[ cx, serializedStyles ]
+	);
 	return <span className={ classes }>{ children }</span>;
 };
 

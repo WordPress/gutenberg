@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, omit } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import {
 	RichText,
 	MediaPlaceholder,
 	store as blockEditorStore,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
@@ -47,9 +48,8 @@ class GalleryImage extends Component {
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 		this.onEdit = this.onEdit.bind( this );
-		this.onSelectImageFromLibrary = this.onSelectImageFromLibrary.bind(
-			this
-		);
+		this.onSelectImageFromLibrary =
+			this.onSelectImageFromLibrary.bind( this );
 		this.onSelectCustomURL = this.onSelectCustomURL.bind( this );
 		this.state = {
 			isEditing: false,
@@ -84,11 +84,8 @@ class GalleryImage extends Component {
 	}
 
 	componentDidUpdate() {
-		const {
-			image,
-			url,
-			__unstableMarkNextChangeAsNotPersistent,
-		} = this.props;
+		const { image, url, __unstableMarkNextChangeAsNotPersistent } =
+			this.props;
 		if ( image && ! url ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			this.props.setAttributes( {
@@ -114,14 +111,18 @@ class GalleryImage extends Component {
 		// written by the user, make sure the text is not overwritten.
 		if ( isTemporaryImage( id, url ) ) {
 			if ( alt ) {
-				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
+				const { alt: omittedAlt, ...restMediaAttributes } =
+					mediaAttributes;
+				mediaAttributes = restMediaAttributes;
 			}
 		}
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
 		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
-			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
 		}
 
 		setAttributes( mediaAttributes );
@@ -249,6 +250,9 @@ class GalleryImage extends Component {
 				{ ! isEditing && ( isSelected || caption ) && (
 					<RichText
 						tagName="figcaption"
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
 						aria-label={ __( 'Image caption text' ) }
 						placeholder={ isSelected ? __( 'Add caption' ) : null }
 						value={ caption }
@@ -273,9 +277,8 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { __unstableMarkNextChangeAsNotPersistent } = dispatch(
-			blockEditorStore
-		);
+		const { __unstableMarkNextChangeAsNotPersistent } =
+			dispatch( blockEditorStore );
 		return {
 			__unstableMarkNextChangeAsNotPersistent,
 		};

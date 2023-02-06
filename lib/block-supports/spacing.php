@@ -15,7 +15,7 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_spacing_support( $block_type ) {
-	$has_spacing_support = gutenberg_block_has_support( $block_type, array( 'spacing' ), false );
+	$has_spacing_support = block_has_support( $block_type, array( 'spacing' ), false );
 
 	// Setup attributes and styles within that if needed.
 	if ( ! $block_type->attributes ) {
@@ -39,55 +39,31 @@ function gutenberg_register_spacing_support( $block_type ) {
  * @return array Block spacing CSS classes and inline styles.
  */
 function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
-	if ( gutenberg_skip_spacing_serialization( $block_type ) ) {
+	if ( wp_should_skip_block_supports_serialization( $block_type, 'spacing' ) ) {
 		return array();
 	}
 
-	$has_padding_support = gutenberg_block_has_support( $block_type, array( 'spacing', 'padding' ), false );
-	$has_margin_support  = gutenberg_block_has_support( $block_type, array( 'spacing', 'margin' ), false );
-	$styles              = array();
+	$attributes          = array();
+	$has_padding_support = block_has_support( $block_type, array( 'spacing', 'padding' ), false );
+	$has_margin_support  = block_has_support( $block_type, array( 'spacing', 'margin' ), false );
+	$block_styles        = isset( $block_attributes['style'] ) ? $block_attributes['style'] : null;
 
-	if ( $has_padding_support ) {
-		$padding_value = _wp_array_get( $block_attributes, array( 'style', 'spacing', 'padding' ), null );
-
-		if ( is_array( $padding_value ) ) {
-			foreach ( $padding_value as $key => $value ) {
-				$styles[] = sprintf( 'padding-%s: %s;', $key, $value );
-			}
-		} elseif ( null !== $padding_value ) {
-			$styles[] = sprintf( 'padding: %s;', $padding_value );
-		}
+	if ( ! $block_styles ) {
+		return $attributes;
 	}
 
-	if ( $has_margin_support ) {
-		$margin_value = _wp_array_get( $block_attributes, array( 'style', 'spacing', 'margin' ), null );
+	$skip_padding                    = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'padding' );
+	$skip_margin                     = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' );
+	$spacing_block_styles            = array();
+	$spacing_block_styles['padding'] = $has_padding_support && ! $skip_padding ? _wp_array_get( $block_styles, array( 'spacing', 'padding' ), null ) : null;
+	$spacing_block_styles['margin']  = $has_margin_support && ! $skip_margin ? _wp_array_get( $block_styles, array( 'spacing', 'margin' ), null ) : null;
+	$styles                          = gutenberg_style_engine_get_styles( array( 'spacing' => $spacing_block_styles ) );
 
-		if ( is_array( $margin_value ) ) {
-			foreach ( $margin_value as $key => $value ) {
-				$styles[] = sprintf( 'margin-%s: %s;', $key, $value );
-			}
-		} elseif ( null !== $margin_value ) {
-			$styles[] = sprintf( 'margin: %s;', $margin_value );
-		}
+	if ( ! empty( $styles['css'] ) ) {
+		$attributes['style'] = $styles['css'];
 	}
 
-	return empty( $styles ) ? array() : array( 'style' => implode( ' ', $styles ) );
-}
-
-/**
- * Checks whether serialization of the current block's spacing properties should
- * occur.
- *
- * @param WP_Block_type $block_type Block type.
- *
- * @return boolean Whether to serialize spacing support styles & classes.
- */
-function gutenberg_skip_spacing_serialization( $block_type ) {
-	$spacing_support = _wp_array_get( $block_type->supports, array( 'spacing' ), false );
-
-	return is_array( $spacing_support ) &&
-		array_key_exists( '__experimentalSkipSerialization', $spacing_support ) &&
-		$spacing_support['__experimentalSkipSerialization'];
+	return $attributes;
 }
 
 // Register the block support.

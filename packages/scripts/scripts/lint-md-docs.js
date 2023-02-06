@@ -20,7 +20,7 @@ const args = getArgsFromCLI();
 const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '**/*.md' ];
 
 // See: https://github.com/igorshubovych/markdownlint-cli#configuration
-// Check if specified on command-line or project file for config
+// Check if specified on command-line or project file for config.
 const hasLintConfig =
 	hasArgInCLI( '-c' ) ||
 	hasArgInCLI( '--config' ) ||
@@ -36,13 +36,13 @@ const defaultConfigArgs = ! hasLintConfig
 	: [];
 
 // See: https://github.com/igorshubovych/markdownlint-cli#ignoring-files
-// Check if ignore specified on command-line or project file
+// Check if ignore specified on command-line or project file.
 const hasIgnoredFiles =
 	hasArgInCLI( '--ignore' ) ||
 	hasArgInCLI( '-i' ) ||
 	hasProjectFile( '.markdownlintignore' );
 
-// Default ignore [ build, node_modules ] directories
+// Default ignore [ build, node_modules ] directories.
 const defaultIgnoreArgs = ! hasIgnoredFiles
 	? [ '--ignore-path', fromConfigRoot( '.markdownlintignore' ) ]
 	: [];

@@ -1,13 +1,18 @@
 /**
  * External dependencies
  */
-import { find, startsWith, get, camelCase, has } from 'lodash';
+import { camelCase } from 'change-case';
+import { get } from 'lodash';
 import { Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { getPxFromCssUnit } from '@wordpress/block-editor';
+import {
+	getPxFromCssUnit,
+	useSetting,
+	useMultipleOriginColorsAndGradients,
+} from '@wordpress/block-editor';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
@@ -17,7 +22,7 @@ export const BLOCK_STYLE_ATTRIBUTES = [
 	'fontSize',
 ];
 
-// Mapping style properties name to native
+// Mapping style properties name to native.
 const BLOCK_STYLE_ATTRIBUTES_MAPPING = {
 	textColor: 'color',
 	text: 'color',
@@ -28,6 +33,7 @@ const BLOCK_STYLE_ATTRIBUTES_MAPPING = {
 
 const PADDING = 12; // $solid-border-space
 const UNKNOWN_VALUE = 'undefined';
+const DEFAULT_FONT_SIZE = 16;
 
 export function getBlockPaddings(
 	mergedStyle,
@@ -47,7 +53,7 @@ export function getBlockPaddings(
 		return blockPaddings;
 	}
 
-	// Prevent adding extra paddings to inner blocks without background colors
+	// Prevent adding extra paddings to inner blocks without background colors.
 	if (
 		mergedStyle?.padding &&
 		! wrapperPropsStyle?.backgroundColor &&
@@ -70,7 +76,7 @@ export function getBlockColors(
 	const customBlockStyles = blockStyleAttributes?.style?.color || {};
 	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ blockName ];
 
-	// Global styles colors
+	// Global styles colors.
 	if ( blockGlobalStyles?.color ) {
 		Object.entries( blockGlobalStyles.color ).forEach(
 			( [ key, value ] ) => {
@@ -87,7 +93,7 @@ export function getBlockColors(
 			baseGlobalStyles?.styles?.color?.text;
 	}
 
-	// Global styles elements
+	// Global styles elements.
 	if ( blockGlobalStyles?.elements ) {
 		const linkColor = blockGlobalStyles.elements?.link?.color?.text;
 		const styleKey = BLOCK_STYLE_ATTRIBUTES_MAPPING.link;
@@ -97,9 +103,9 @@ export function getBlockColors(
 		}
 	}
 
-	// Custom colors
+	// Custom colors.
 	Object.entries( blockStyleAttributes ).forEach( ( [ key, value ] ) => {
-		const isCustomColor = startsWith( value, '#' );
+		const isCustomColor = value?.startsWith?.( '#' );
 		let styleKey = key;
 
 		if ( BLOCK_STYLE_ATTRIBUTES_MAPPING[ styleKey ] ) {
@@ -107,9 +113,9 @@ export function getBlockColors(
 		}
 
 		if ( ! isCustomColor ) {
-			const mappedColor = find( defaultColors, {
-				slug: value,
-			} );
+			const mappedColor = Object.values( defaultColors ?? {} ).find(
+				( { slug } ) => slug === value
+			);
 
 			if ( mappedColor ) {
 				blockStyles[ styleKey ] = mappedColor.color;
@@ -119,7 +125,7 @@ export function getBlockColors(
 		}
 	} );
 
-	// Color placeholder
+	// Color placeholder.
 	if ( blockStyles?.color ) {
 		blockStyles[ BLOCK_STYLE_ATTRIBUTES_MAPPING.placeholder ] =
 			blockStyles.color;
@@ -137,8 +143,9 @@ export function getBlockTypography(
 	const typographyStyles = {};
 	const customBlockStyles = blockStyleAttributes?.style?.typography || {};
 	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ blockName ];
+	const parsedFontSizes = Object.values( fontSizes ?? {} );
 
-	// Global styles
+	// Global styles.
 	if ( blockGlobalStyles?.typography ) {
 		const fontSize = blockGlobalStyles?.typography?.fontSize;
 		const lineHeight = blockGlobalStyles?.typography?.lineHeight;
@@ -147,9 +154,9 @@ export function getBlockTypography(
 			if ( parseInt( fontSize, 10 ) ) {
 				typographyStyles.fontSize = fontSize;
 			} else {
-				const mappedFontSize = find( fontSizes, {
-					slug: fontSize,
-				} );
+				const mappedFontSize = parsedFontSizes.find(
+					( { slug } ) => slug === fontSize
+				);
 
 				if ( mappedFontSize ) {
 					typographyStyles.fontSize = mappedFontSize?.size;
@@ -163,16 +170,16 @@ export function getBlockTypography(
 	}
 
 	if ( blockStyleAttributes?.fontSize && baseGlobalStyles ) {
-		const mappedFontSize = find( fontSizes, {
-			slug: blockStyleAttributes?.fontSize,
-		} );
+		const mappedFontSize = parsedFontSizes.find(
+			( { slug } ) => slug === blockStyleAttributes?.fontSize
+		);
 
 		if ( mappedFontSize ) {
 			typographyStyles.fontSize = mappedFontSize?.size;
 		}
 	}
 
-	// Custom styles
+	// Custom styles.
 	if ( customBlockStyles?.fontSize ) {
 		typographyStyles.fontSize = customBlockStyles?.fontSize;
 	}
@@ -186,7 +193,7 @@ export function getBlockTypography(
 
 export function parseStylesVariables( styles, mappedValues, customValues ) {
 	let stylesBase = styles;
-	const variables = [ 'preset', 'custom' ];
+	const variables = [ 'preset', 'custom', 'var', 'fontSize' ];
 
 	if ( ! stylesBase ) {
 		return styles;
@@ -196,16 +203,19 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 		// Examples
 		// var(--wp--preset--color--gray)
 		// var(--wp--custom--body--typography--font-family)
+		// var:preset|color|custom-color-2
 		const regex = new RegExp( `var\\(--wp--${ variable }--(.*?)\\)`, 'g' );
+		const varRegex = /\"var:preset\|color\|(.*?)\"/gm;
+		const fontSizeRegex = /"fontSize":"(.*?)"/gm;
 
 		if ( variable === 'preset' ) {
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
 				const path = $2.split( '--' );
 				const mappedPresetValue = mappedValues[ path[ 0 ] ];
 				if ( mappedPresetValue && mappedPresetValue.slug ) {
-					const matchedValue = find( mappedPresetValue.values, {
-						slug: path[ 1 ],
-					} );
+					const matchedValue = Object.values(
+						mappedPresetValue.values ?? {}
+					).find( ( { slug } ) => slug === path[ 1 ] );
 					return matchedValue?.[ mappedPresetValue.slug ];
 				}
 				return UNKNOWN_VALUE;
@@ -215,15 +225,47 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 			const customValuesData = customValues ?? JSON.parse( stylesBase );
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
 				const path = $2.split( '--' );
-				if ( has( customValuesData, path ) ) {
+				if (
+					path.reduce(
+						( prev, curr ) => prev && prev[ curr ],
+						customValuesData
+					)
+				) {
 					return get( customValuesData, path );
 				}
 
-				// Check for camelcase properties
+				// Check for camelcase properties.
 				return get( customValuesData, [
 					...path.slice( 0, path.length - 1 ),
 					camelCase( path[ path.length - 1 ] ),
 				] );
+			} );
+		}
+
+		if ( variable === 'var' ) {
+			stylesBase = stylesBase.replace( varRegex, ( _$1, $2 ) => {
+				if ( mappedValues?.color ) {
+					const matchedValue = mappedValues.color?.values?.find(
+						( { slug } ) => slug === $2
+					);
+					return `"${ matchedValue?.color }"`;
+				}
+				return UNKNOWN_VALUE;
+			} );
+		}
+
+		if ( variable === 'fontSize' ) {
+			const { width, height } = Dimensions.get( 'window' );
+
+			stylesBase = stylesBase.replace( fontSizeRegex, ( _$1, $2 ) => {
+				const parsedFontSize =
+					getPxFromCssUnit( $2, {
+						width,
+						height,
+						fontSize: DEFAULT_FONT_SIZE,
+					} ) || `${ DEFAULT_FONT_SIZE }px`;
+
+				return `"fontSize":"${ parsedFontSize }"`;
 			} );
 		}
 	} );
@@ -233,7 +275,12 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 
 export function getMappedValues( features, palette ) {
 	const typography = features?.typography;
-	const colors = { ...palette?.theme, ...palette?.custom };
+	const colors = [
+		...( palette?.theme || [] ),
+		...( palette?.custom || [] ),
+		...( palette?.default || [] ),
+	];
+
 	const fontSizes = {
 		...typography?.fontSizes?.theme,
 		...typography?.fontSizes?.custom,
@@ -258,14 +305,14 @@ export function getMappedValues( features, palette ) {
  * @return {Object} normalized sizes.
  */
 function normalizeFontSizes( fontSizes ) {
-	// Adds normalized PX values for each of the different keys
+	// Adds normalized PX values for each of the different keys.
 	if ( ! fontSizes ) {
 		return fontSizes;
 	}
 	const normalizedFontSizes = {};
 	const dimensions = Dimensions.get( 'window' );
 
-	[ 'default', 'theme', 'user' ].forEach( ( key ) => {
+	[ 'default', 'theme', 'custom' ].forEach( ( key ) => {
 		if ( fontSizes[ key ] ) {
 			normalizedFontSizes[ key ] = fontSizes[ key ]?.map(
 				( fontSizeObject ) => {
@@ -274,7 +321,7 @@ function normalizeFontSizes( fontSizes ) {
 						{
 							width: dimensions.width,
 							height: dimensions.height,
-							fontSize: 16,
+							fontSize: DEFAULT_FONT_SIZE,
 						}
 					);
 					return fontSizeObject;
@@ -284,6 +331,52 @@ function normalizeFontSizes( fontSizes ) {
 	} );
 
 	return normalizedFontSizes;
+}
+
+export function useMobileGlobalStylesColors( type = 'colors' ) {
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const availableThemeColors = colorGradientSettings?.[ type ]?.reduce(
+		( colors, origin ) => colors.concat( origin?.[ type ] ),
+		[]
+	);
+	// Default editor colors/gradients if it's not a block-based theme.
+	const colorPalette =
+		type === 'colors' ? 'color.palette' : 'color.gradients';
+	const editorDefaultPalette = useSetting( colorPalette );
+
+	return availableThemeColors.length >= 1
+		? availableThemeColors
+		: editorDefaultPalette;
+}
+
+export function getColorsAndGradients(
+	defaultEditorColors = [],
+	defaultEditorGradients = [],
+	rawFeatures
+) {
+	const features = rawFeatures ? JSON.parse( rawFeatures ) : {};
+
+	return {
+		__experimentalGlobalStylesBaseStyles: null,
+		__experimentalFeatures: {
+			color: {
+				...( ! features?.color
+					? {
+							text: true,
+							background: true,
+							palette: {
+								default: defaultEditorColors,
+							},
+							gradients: {
+								default: defaultEditorGradients,
+							},
+					  }
+					: features?.color ),
+				defaultPalette: defaultEditorColors?.length > 0,
+				defaultGradients: defaultEditorGradients?.length > 0,
+			},
+		},
+	};
 }
 
 export function getGlobalStyles( rawStyles, rawFeatures ) {
@@ -310,14 +403,14 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 	const fontSizes = normalizeFontSizes( features?.typography?.fontSizes );
 
 	return {
-		colors,
-		gradients,
 		__experimentalFeatures: {
 			color: {
 				palette: colors?.palette,
 				gradients,
 				text: features?.color?.text ?? true,
 				background: features?.color?.background ?? true,
+				defaultPalette: features?.color?.defaultPalette ?? true,
+				defaultGradients: features?.color?.defaultGradients ?? true,
 			},
 			typography: {
 				fontSizes,

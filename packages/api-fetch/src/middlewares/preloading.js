@@ -1,28 +1,34 @@
 /**
  * WordPress dependencies
  */
-import { getQueryArg, normalizePath } from '@wordpress/url';
+import { addQueryArgs, getQueryArgs, normalizePath } from '@wordpress/url';
 
 /**
  * @param {Record<string, any>} preloadedData
  * @return {import('../types').APIFetchMiddleware} Preloading middleware.
  */
 function createPreloadingMiddleware( preloadedData ) {
-	const cache = Object.keys( preloadedData ).reduce( ( result, path ) => {
-		result[ normalizePath( path ) ] = preloadedData[ path ];
-		return result;
-	}, /** @type {Record<string, any>} */ ( {} ) );
+	const cache = Object.fromEntries(
+		Object.entries( preloadedData ).map( ( [ path, data ] ) => [
+			normalizePath( path ),
+			data,
+		] )
+	);
 
 	return ( options, next ) => {
 		const { parse = true } = options;
 		/** @type {string | void} */
 		let rawPath = options.path;
 		if ( ! rawPath && options.url ) {
-			const pathFromQuery = getQueryArg( options.url, 'rest_route' );
+			const { rest_route: pathFromQuery, ...queryArgs } = getQueryArgs(
+				options.url
+			);
+
 			if ( typeof pathFromQuery === 'string' ) {
-				rawPath = pathFromQuery;
+				rawPath = addQueryArgs( pathFromQuery, queryArgs );
 			}
 		}
+
 		if ( typeof rawPath !== 'string' ) {
 			return next( options );
 		}
@@ -33,7 +39,7 @@ function createPreloadingMiddleware( preloadedData ) {
 		if ( 'GET' === method && cache[ path ] ) {
 			const cacheData = cache[ path ];
 
-			// Unsetting the cache key ensures that the data is only used a single time
+			// Unsetting the cache key ensures that the data is only used a single time.
 			delete cache[ path ];
 
 			return prepareResponse( cacheData, !! parse );
@@ -44,7 +50,7 @@ function createPreloadingMiddleware( preloadedData ) {
 		) {
 			const cacheData = cache[ method ][ path ];
 
-			// Unsetting the cache key ensures that the data is only used a single time
+			// Unsetting the cache key ensures that the data is only used a single time.
 			delete cache[ method ][ path ];
 
 			return prepareResponse( cacheData, !! parse );

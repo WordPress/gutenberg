@@ -70,6 +70,18 @@ jest.mock( '@wordpress/api-fetch', () =>
 						subtype: 'page',
 					},
 				] );
+			case '/wp/v2/media?search=&per_page=20':
+				return Promise.resolve( [
+					{
+						id: 54,
+						title: {
+							rendered: 'Some Test Media Title',
+						},
+						type: 'attachment',
+						source_url:
+							'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					},
+				] );
 			default:
 				return Promise.resolve( [
 					{
@@ -154,7 +166,24 @@ describe( 'fetchLinkSuggestions', () => {
 			{ disablePostFormats: true }
 		).then( ( suggestions ) => expect( suggestions ).toEqual( [] ) );
 	} );
-	it( 'returns suggestions from post, term, and post-format', () => {
+
+	it( 'filters suggestions by attachment', () => {
+		return fetchLinkSuggestions( '', {
+			type: 'attachment',
+		} ).then( ( suggestions ) =>
+			expect( suggestions ).toEqual( [
+				{
+					id: 54,
+					title: 'Some Test Media Title',
+					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					type: 'attachment',
+					kind: 'media',
+				},
+			] )
+		);
+	} );
+
+	it( 'returns suggestions from post, term, post-format and media', () => {
 		return fetchLinkSuggestions( '', {} ).then( ( suggestions ) =>
 			expect( suggestions ).toEqual( [
 				{
@@ -191,6 +220,13 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/type/quote/',
 					type: 'post-format',
 					kind: 'taxonomy',
+				},
+				{
+					id: 54,
+					title: 'Some Test Media Title',
+					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					type: 'attachment',
+					kind: 'media',
 				},
 			] )
 		);

@@ -16,9 +16,8 @@ describe( 'Preloading Middleware', () => {
 							body,
 						},
 					};
-					const preloadingMiddleware = createPreloadingMiddleware(
-						preloadedData
-					);
+					const preloadingMiddleware =
+						createPreloadingMiddleware( preloadedData );
 					const requestOptions = {
 						method: 'GET',
 						path: 'wp/v2/posts',
@@ -41,9 +40,8 @@ describe( 'Preloading Middleware', () => {
 							body,
 						},
 					};
-					const preloadingMiddleware = createPreloadingMiddleware(
-						preloadedData
-					);
+					const preloadingMiddleware =
+						createPreloadingMiddleware( preloadedData );
 					const requestOptions = {
 						method: 'GET',
 						path: 'wp/v2/posts',
@@ -85,9 +83,8 @@ describe( 'Preloading Middleware', () => {
 						},
 					};
 
-					const preloadingMiddleware = createPreloadingMiddleware(
-						preloadedData
-					);
+					const preloadingMiddleware =
+						createPreloadingMiddleware( preloadedData );
 
 					const requestOptions = {
 						method: 'OPTIONS',
@@ -120,9 +117,8 @@ describe( 'Preloading Middleware', () => {
 						},
 					};
 
-					const preloadingMiddleware = createPreloadingMiddleware(
-						preloadedData
-					);
+					const preloadingMiddleware =
+						createPreloadingMiddleware( preloadedData );
 
 					const requestOptions = {
 						method: 'OPTIONS',
@@ -148,9 +144,8 @@ describe( 'Preloading Middleware', () => {
 						body,
 					},
 				};
-				const preloadingMiddleware = createPreloadingMiddleware(
-					preloadedData
-				);
+				const preloadingMiddleware =
+					createPreloadingMiddleware( preloadedData );
 				const requestOptions = {
 					method: 'GET',
 					path: 'wp/v2/fake_resource',
@@ -169,9 +164,8 @@ describe( 'Preloading Middleware', () => {
 			'wp/v2/demo-reverse-alphabetical?foo=bar&baz=quux': { body },
 			'wp/v2/demo-alphabetical?baz=quux&foo=bar': { body },
 		};
-		const preloadingMiddleware = createPreloadingMiddleware(
-			preloadedData
-		);
+		const preloadingMiddleware =
+			createPreloadingMiddleware( preloadedData );
 
 		let requestOptions = {
 			method: 'GET',
@@ -190,6 +184,60 @@ describe( 'Preloading Middleware', () => {
 		expect( value ).toEqual( body );
 	} );
 
+	it( 'should recognize an urlencoded query param', async () => {
+		const body = { foo: 'foo', bar: 'bar' };
+
+		const preloadingMiddleware = createPreloadingMiddleware( {
+			'/?_fields=foo,bar': { body },
+		} );
+
+		const response = await preloadingMiddleware(
+			{
+				method: 'GET',
+				path: '/?_fields=foo%2Cbar',
+			},
+			() => {}
+		);
+
+		expect( response ).toEqual( body );
+	} );
+
+	it( 'should recognize rest_route query param as path', async () => {
+		const body = { foo: 'foo' };
+
+		const preloadingMiddleware = createPreloadingMiddleware( {
+			'/': { body },
+		} );
+
+		const response = await preloadingMiddleware(
+			{
+				method: 'GET',
+				url: '/index.php?rest_route=%2F',
+			},
+			() => {}
+		);
+
+		expect( response ).toEqual( body );
+	} );
+
+	it( 'should recognize additional query params after rest_route', async () => {
+		const body = { foo: 'foo', bar: 'bar' };
+
+		const preloadingMiddleware = createPreloadingMiddleware( {
+			'/?_fields=foo,bar': { body },
+		} );
+
+		const response = await preloadingMiddleware(
+			{
+				method: 'GET',
+				url: '/index.php?rest_route=%2F&_fields=foo%2Cbar',
+			},
+			() => {}
+		);
+
+		expect( response ).toEqual( body );
+	} );
+
 	it( 'should remove OPTIONS type requests from the cache after the first hit', async () => {
 		const body = { content: 'example' };
 		const preloadedData = {
@@ -198,9 +246,8 @@ describe( 'Preloading Middleware', () => {
 			},
 		};
 
-		const preloadingMiddleware = createPreloadingMiddleware(
-			preloadedData
-		);
+		const preloadingMiddleware =
+			createPreloadingMiddleware( preloadedData );
 
 		const requestOptions = {
 			method: 'OPTIONS',
@@ -224,9 +271,8 @@ describe( 'Preloading Middleware', () => {
 			[ 'method empty', { [ method ]: {} } ],
 		] )( '%s', ( label, preloadedData ) => {
 			it( 'should move to the next middleware if no preloaded data', () => {
-				const preloadingMiddleware = createPreloadingMiddleware(
-					preloadedData
-				);
+				const preloadingMiddleware =
+					createPreloadingMiddleware( preloadedData );
 				const requestOptions = {
 					method,
 					path: 'wp/v2/posts',

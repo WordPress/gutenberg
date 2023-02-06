@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { escapeRegExp, find, deburr } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -11,16 +11,8 @@ import {
 	useEffect,
 	useState,
 	useRef,
+	useMemo,
 } from '@wordpress/element';
-import {
-	ENTER,
-	ESCAPE,
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	BACKSPACE,
-} from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	useInstanceId,
@@ -41,6 +33,7 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import { getAutoCompleterUI } from './autocompleter-ui';
+import { escapeRegExp } from '../utils/strings';
 
 /**
  * A raw completer option.
@@ -132,7 +125,7 @@ function useAutocomplete( {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
-	const [ backspacing, setBackspacing ] = useState( false );
+	const backspacing = useRef( false );
 
 	function insertCompletion( replacement ) {
 		const end = record.start;
@@ -218,7 +211,7 @@ function useAutocomplete( {
 	}
 
 	function handleKeyDown( event ) {
-		setBackspacing( event.keyCode === BACKSPACE );
+		backspacing.current = event.key === 'Backspace';
 
 		if ( ! autocompleter ) {
 			return;
@@ -226,11 +219,20 @@ function useAutocomplete( {
 		if ( filteredOptions.length === 0 ) {
 			return;
 		}
-		if ( event.defaultPrevented ) {
+
+		if (
+			event.defaultPrevented ||
+			// Ignore keydowns from IMEs
+			event.isComposing ||
+			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+			// is `isComposing=false`, even though it's technically still part of the composition.
+			// These can only be detected by keyCode.
+			event.keyCode === 229
+		) {
 			return;
 		}
-		switch ( event.keyCode ) {
-			case UP:
+		switch ( event.key ) {
+			case 'ArrowUp':
 				setSelectedIndex(
 					( selectedIndex === 0
 						? filteredOptions.length
@@ -238,24 +240,24 @@ function useAutocomplete( {
 				);
 				break;
 
-			case DOWN:
+			case 'ArrowDown':
 				setSelectedIndex(
 					( selectedIndex + 1 ) % filteredOptions.length
 				);
 				break;
 
-			case ESCAPE:
+			case 'Escape':
 				setAutocompleter( null );
 				setAutocompleterUI( null );
 				event.preventDefault();
 				break;
 
-			case ENTER:
+			case 'Enter':
 				select( filteredOptions[ selectedIndex ] );
 				break;
 
-			case LEFT:
-			case RIGHT:
+			case 'ArrowLeft':
+			case 'ArrowRight':
 				reset();
 				return;
 
@@ -263,16 +265,19 @@ function useAutocomplete( {
 				return;
 		}
 
-		// Any handled keycode should prevent original behavior. This relies on
+		// Any handled key should prevent original behavior. This relies on
 		// the early return in the default case.
 		event.preventDefault();
 	}
 
-	let textContent;
-
-	if ( isCollapsed( record ) ) {
-		textContent = getTextContent( slice( record, 0 ) );
-	}
+	// textContent is a primitive (string), memoizing is not strictly necessary
+	// but this is a preemptive performance improvement, since the autocompleter
+	// is a potential bottleneck for the editor type metric.
+	const textContent = useMemo( () => {
+		if ( isCollapsed( record ) ) {
+			return getTextContent( slice( record, 0 ) );
+		}
+	}, [ record ] );
 
 	useEffect( () => {
 		if ( ! textContent ) {
@@ -280,12 +285,11 @@ function useAutocomplete( {
 			return;
 		}
 
-		const text = deburr( textContent );
+		const text = removeAccents( textContent );
 		const textAfterSelection = getTextContent(
 			slice( record, undefined, getTextContent( record ).length )
 		);
-		const completer = find(
-			completers,
+		const completer = completers?.find(
 			( { triggerPrefix, allowContext } ) => {
 				const index = text.lastIndexOf( triggerPrefix );
 
@@ -325,7 +329,8 @@ function useAutocomplete( {
 				// Ex: "Some text @marcelo sekkkk" <--- "kkkk" caused a mismatch, but
 				// if the user presses backspace here, it will show the completion popup again.
 				const matchingWhileBackspacing =
-					backspacing && textWithoutTrigger.split( /\s/ ).length <= 3;
+					backspacing.current &&
+					textWithoutTrigger.split( /\s/ ).length <= 3;
 
 				if (
 					mismatch &&
@@ -370,6 +375,9 @@ function useAutocomplete( {
 				: AutocompleterUI
 		);
 		setFilterValue( query );
+		// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+		// See https://github.com/WordPress/gutenberg/pull/41820
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ textContent ] );
 
 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
@@ -405,26 +413,57 @@ function useAutocomplete( {
 }
 
 export function useAutocompleteProps( options ) {
+	const [ isVisible, setIsVisible ] = useState( false );
 	const ref = useRef();
+	const recordAfterInput = useRef();
 	const onKeyDownRef = useRef();
 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
 		...options,
 		contentRef: ref,
 	} );
 	onKeyDownRef.current = onKeyDown;
+
+	useEffect( () => {
+		if ( isVisible ) {
+			if ( ! recordAfterInput.current ) {
+				recordAfterInput.current = options.record;
+			} else if (
+				recordAfterInput.current.start !== options.record.start ||
+				recordAfterInput.current.end !== options.record.end
+			) {
+				setIsVisible( false );
+				recordAfterInput.current = null;
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ options.record ] );
+
+	const mergedRefs = useMergeRefs( [
+		ref,
+		useRefEffect( ( element ) => {
+			function _onKeyDown( event ) {
+				onKeyDownRef.current( event );
+			}
+			function _onInput() {
+				// Only show auto complete UI if the user is inputting text.
+				setIsVisible( true );
+				recordAfterInput.current = null;
+			}
+			element.addEventListener( 'keydown', _onKeyDown );
+			element.addEventListener( 'input', _onInput );
+			return () => {
+				element.removeEventListener( 'keydown', _onKeyDown );
+				element.removeEventListener( 'input', _onInput );
+			};
+		}, [] ),
+	] );
+
+	if ( ! isVisible ) {
+		return { ref: mergedRefs };
+	}
+
 	return {
-		ref: useMergeRefs( [
-			ref,
-			useRefEffect( ( element ) => {
-				function _onKeyDown( event ) {
-					onKeyDownRef.current( event );
-				}
-				element.addEventListener( 'keydown', _onKeyDown );
-				return () => {
-					element.removeEventListener( 'keydown', _onKeyDown );
-				};
-			}, [] ),
-		] ),
+		ref: mergedRefs,
 		children: popover,
 		'aria-autocomplete': listBoxId ? 'list' : undefined,
 		'aria-owns': listBoxId,

@@ -33,16 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const {
-	pick,
-	reduce,
-	uniq,
-	forEach,
-	sortBy,
-	isEqual,
-	merge,
-	isEmpty,
-} = require( 'lodash' );
+const { merge, isEmpty } = require( 'lodash' );
 const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -119,19 +110,19 @@ function getNodeAsString( node ) {
  * @param {number} _originalNodeLine Private: In recursion, line number of
  *                                   the original node passed.
  *
- * @return {?string} Extracted comment.
+ * @return {string | undefined} Extracted comment.
  */
 function getExtractedComment( path, _originalNodeLine ) {
 	const { node, parent, parentPath } = path;
 
 	// Assign original node line so we can keep track in recursion whether a
-	// matched comment or parent occurs on the same or previous line
+	// matched comment or parent occurs on the same or previous line.
 	if ( ! _originalNodeLine ) {
 		_originalNodeLine = node.loc.start.line;
 	}
 
 	let comment;
-	forEach( node.leadingComments, ( commentNode ) => {
+	Object.values( node.leadingComments ?? {} ).forEach( ( commentNode ) => {
 		let line = 0;
 		if ( commentNode && commentNode.loc && commentNode.loc.end ) {
 			line = commentNode.loc.end.line;
@@ -143,13 +134,13 @@ function getExtractedComment( path, _originalNodeLine ) {
 
 		const match = commentNode.value.match( REGEXP_TRANSLATOR_COMMENT );
 		if ( match ) {
-			// Extract text from matched translator prefix
+			// Extract text from matched translator prefix.
 			comment = match[ 1 ]
 				.split( '\n' )
 				.map( ( text ) => text.trim() )
 				.join( ' ' );
 
-			// False return indicates to Lodash to break iteration
+			// False return indicates to Lodash to break iteration.
 			return false;
 		}
 	} );
@@ -162,7 +153,7 @@ function getExtractedComment( path, _originalNodeLine ) {
 		return;
 	}
 
-	// Only recurse as long as parent node is on the same or previous line
+	// Only recurse as long as parent node is on the same or previous line.
 	const { line } = parent.loc.start;
 	if ( line >= _originalNodeLine - 1 && line <= _originalNodeLine ) {
 		return getExtractedComment( parentPath, _originalNodeLine );
@@ -191,9 +182,20 @@ function isValidTranslationKey( key ) {
  * @return {boolean} Whether valid translation keys match.
  */
 function isSameTranslation( a, b ) {
-	return isEqual(
-		pick( a, VALID_TRANSLATION_KEYS ),
-		pick( b, VALID_TRANSLATION_KEYS )
+	return VALID_TRANSLATION_KEYS.every( ( key ) => a[ key ] === b[ key ] );
+}
+
+/**
+ * Sorts multiple translation objects by their reference.
+ * The reference is where they occur, in the format `file:line`.
+ *
+ * @param {Array} translations Array of translations to sort.
+ *
+ * @return {Array} Sorted translations.
+ */
+function sortByReference( translations = [] ) {
+	return [ ...translations ].sort( ( a, b ) =>
+		a.comments.reference.localeCompare( b.comments.reference )
 	);
 }
 
@@ -207,7 +209,7 @@ module.exports = () => {
 			CallExpression( path, state ) {
 				const { callee } = path.node;
 
-				// Determine function name by direct invocation or property name
+				// Determine function name by direct invocation or property name.
 				let name;
 				if ( 'MemberExpression' === callee.type ) {
 					name = callee.property.name;
@@ -215,14 +217,14 @@ module.exports = () => {
 					name = callee.name;
 				}
 
-				// Skip unhandled functions
+				// Skip unhandled functions.
 				const functionKeys = ( state.opts.functions ||
 					DEFAULT_FUNCTIONS )[ name ];
 				if ( ! functionKeys ) {
 					return;
 				}
 
-				// Assign translation keys by argument position
+				// Assign translation keys by argument position.
 				const translation = path.node.arguments.reduce(
 					( memo, arg, i ) => {
 						const key = functionKeys[ i ];
@@ -241,7 +243,7 @@ module.exports = () => {
 				}
 
 				// At this point we assume we'll save data, so initialize if
-				// we haven't already
+				// we haven't already.
 				if ( ! baseData ) {
 					baseData = {
 						charset: 'utf-8',
@@ -262,7 +264,7 @@ module.exports = () => {
 						);
 					}
 
-					// Attempt to exract nplurals from header
+					// Attempt to exract nplurals from header.
 					const pluralsMatch = (
 						baseData.headers[ 'plural-forms' ] || ''
 					).match( /nplurals\s*=\s*(\d+);/ );
@@ -271,7 +273,7 @@ module.exports = () => {
 					}
 				}
 
-				// Create empty msgstr or array of empty msgstr by nplurals
+				// Create empty msgstr or array of empty msgstr by nplurals.
 				if ( translation.msgid_plural ) {
 					translation.msgstr = Array.from( Array( nplurals ) ).map(
 						() => ''
@@ -281,7 +283,7 @@ module.exports = () => {
 				}
 
 				// Assign file reference comment, ensuring consistent pathname
-				// reference between Win32 and POSIX
+				// reference between Win32 and POSIX.
 				const { filename } = this.file.opts;
 				const pathname = relative( '.', filename )
 					.split( sep )
@@ -290,13 +292,13 @@ module.exports = () => {
 					reference: pathname + ':' + path.node.loc.start.line,
 				};
 
-				// If exists, also assign translator comment
+				// If exists, also assign translator comment.
 				const translator = getExtractedComment( path );
 				if ( translator ) {
 					translation.comments.extracted = translator;
 				}
 
-				// Create context grouping for translation if not yet exists
+				// Create context grouping for translation if not yet exists.
 				const { msgctxt = '', msgid } = translation;
 				if ( ! strings[ filename ].hasOwnProperty( msgctxt ) ) {
 					strings[ filename ][ msgctxt ] = {};
@@ -315,61 +317,49 @@ module.exports = () => {
 						return;
 					}
 
-					// Sort translations by filename for deterministic output
+					// Sort translations by filename for deterministic output.
 					const files = Object.keys( strings ).sort();
 
-					// Combine translations from each file grouped by context
-					const translations = reduce(
-						files,
-						( memo, file ) => {
-							for ( const context in strings[ file ] ) {
-								// Within the same file, sort translations by line
-								const sortedTranslations = sortBy(
-									strings[ file ][ context ],
-									'comments.reference'
-								);
+					// Combine translations from each file grouped by context.
+					const translations = files.reduce( ( memo, file ) => {
+						for ( const context in strings[ file ] ) {
+							// Within the same file, sort translations by line.
+							const sortedTranslations = sortByReference(
+								Object.values( strings[ file ][ context ] )
+							);
 
-								forEach(
-									sortedTranslations,
-									( translation ) => {
-										const {
-											msgctxt = '',
-											msgid,
-										} = translation;
-										if (
-											! memo.hasOwnProperty( msgctxt )
-										) {
-											memo[ msgctxt ] = {};
-										}
+							sortedTranslations.forEach( ( translation ) => {
+								const { msgctxt = '', msgid } = translation;
+								if ( ! memo.hasOwnProperty( msgctxt ) ) {
+									memo[ msgctxt ] = {};
+								}
 
-										// Merge references if translation already exists
-										if (
-											isSameTranslation(
-												translation,
+								// Merge references if translation already exists.
+								if (
+									isSameTranslation(
+										translation,
+										memo[ msgctxt ][ msgid ]
+									)
+								) {
+									translation.comments.reference = [
+										...new Set(
+											[
 												memo[ msgctxt ][ msgid ]
-											)
-										) {
-											translation.comments.reference = uniq(
-												[
-													memo[ msgctxt ][ msgid ]
-														.comments.reference,
-													translation.comments
-														.reference,
-												]
-													.join( '\n' )
-													.split( '\n' )
-											).join( '\n' );
-										}
+													.comments.reference,
+												translation.comments.reference,
+											]
+												.join( '\n' )
+												.split( '\n' )
+										),
+									].join( '\n' );
+								}
 
-										memo[ msgctxt ][ msgid ] = translation;
-									}
-								);
-							}
+								memo[ msgctxt ][ msgid ] = translation;
+							} );
+						}
 
-							return memo;
-						},
-						{}
-					);
+						return memo;
+					}, {} );
 
 					// Merge translations from individual files into headers
 					const data = merge( {}, baseData, { translations } );

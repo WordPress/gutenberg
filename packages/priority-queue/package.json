@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/priority-queue",
-	"version": "2.3.0",
+	"version": "2.26.0",
 	"description": "Generic browser priority queue.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,7 +28,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.16.0"
+		"@babel/runtime": "^7.16.0",
+		"requestidlecallback": "^0.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -19,9 +19,8 @@ import RenameMenuItem from './rename-menu-item';
 export default function Actions( { template } ) {
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
@@ -80,7 +79,9 @@ export default function Actions( { template } ) {
 					) }
 					{ isRevertable && (
 						<MenuItem
-							info={ __( 'Restore to default state' ) }
+							info={ __(
+								'Use the template as supplied by the theme.'
+							) }
 							onClick={ () => {
 								revertAndSaveTemplate();
 								onClose();

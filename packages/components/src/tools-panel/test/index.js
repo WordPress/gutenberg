@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -161,26 +162,26 @@ const renderPanel = () => {
  */
 const getMenuButton = () => {
 	return screen.getByRole( 'button', {
-		name: /view([\w\s]+)options/i,
+		name: /Panel([\w\s]+)header([\w\s]+)options/i,
 	} );
 };
 
 /**
  * Helper to find the menu button and simulate a user click.
  *
- * @return {HTMLElement} The menuButton.
  */
-const openDropdownMenu = () => {
+const openDropdownMenu = async () => {
+	const user = userEvent.setup();
 	const menuButton = getMenuButton();
-	fireEvent.click( menuButton );
+	await user.click( menuButton );
 	return menuButton;
 };
 
 // Opens dropdown then selects the menu item by label before simulating a click.
 const selectMenuItem = async ( label ) => {
-	openDropdownMenu();
+	const user = userEvent.setup();
 	const menuItem = await screen.findByText( label );
-	fireEvent.click( menuItem );
+	await user.click( menuItem );
 };
 
 describe( 'ToolsPanel', () => {
@@ -241,16 +242,16 @@ describe( 'ToolsPanel', () => {
 			expect( menu ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render panel menu when at least one panel item', () => {
+		it( 'should render panel menu when at least one panel item', async () => {
 			renderPanel();
 
-			const menuButton = openDropdownMenu();
+			const menuButton = await openDropdownMenu();
 			expect( menuButton ).toBeInTheDocument();
 		} );
 
 		it( 'should render reset all item in menu', async () => {
 			renderPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const resetAllItem = await screen.findByRole( 'menuitem' );
 
@@ -259,7 +260,7 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render panel menu items correctly', async () => {
 			renderPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const menuItems = await screen.findAllByRole( 'menuitemcheckbox' );
 
@@ -289,18 +290,30 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render panel item when corresponding menu item is selected', async () => {
 			renderPanel();
+			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 			const control = await screen.findByText( 'Alt control' );
 
 			expect( control ).toBeInTheDocument();
+
+			// Test the aria live announcement.
+			const announcement = screen.getByText( 'Alt is now visible' );
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should prevent optional panel item rendering when toggled off via menu item', async () => {
 			renderPanel();
+			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
 			const control = screen.queryByText( 'Example control' );
 
 			expect( control ).not.toBeInTheDocument();
+
+			// Test the aria live announcement.
+			const announcement = screen.getByText(
+				'Example hidden and reset to default'
+			);
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
@@ -319,10 +332,15 @@ describe( 'ToolsPanel', () => {
 
 			expect( control ).toBeInTheDocument();
 
+			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
 			const resetControl = screen.getByText( 'Default control' );
 
 			expect( resetControl ).toBeInTheDocument();
+
+			// Test the aria live announcement.
+			const announcement = screen.getByText( 'Example reset to default' );
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should render appropriate menu groups', async () => {
@@ -339,7 +357,7 @@ describe( 'ToolsPanel', () => {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			);
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const menuGroups = screen.getAllByRole( 'group' );
 
@@ -403,7 +421,7 @@ describe( 'ToolsPanel', () => {
 			let linkedItem = screen.queryByText( 'Linked control' );
 			expect( linkedItem ).not.toBeInTheDocument();
 
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			// The linked control should initially appear in the optional controls
 			// menu group. There should be three menu groups: default controls,
@@ -487,7 +505,7 @@ describe( 'ToolsPanel', () => {
 
 			// The conditional control should not yet appear in the default controls
 			// menu group.
-			openDropdownMenu();
+			await openDropdownMenu();
 			let menuGroups = screen.getAllByRole( 'group' );
 			let defaultItem = within( menuGroups[ 0 ] ).queryByText(
 				'Conditional'
@@ -564,7 +582,7 @@ describe( 'ToolsPanel', () => {
 			// registerPanelItem has still only been called once.
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
 			// deregisterPanelItem is called, given that we have switched panels.
-			expect( context.deregisterPanelItem ).toBeCalledWith(
+			expect( context.deregisterPanelItem ).toHaveBeenCalledWith(
 				altControlProps.label
 			);
 
@@ -657,6 +675,8 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should call onDeselect callback when menu item is toggled off', async () => {
 			renderPanel();
+
+			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
 
 			expect( controlProps.onSelect ).not.toHaveBeenCalled();
@@ -665,6 +685,8 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should call onSelect callback when menu item is toggled on', async () => {
 			renderPanel();
+
+			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 
 			expect( altControlProps.onSelect ).toHaveBeenCalledTimes( 1 );
@@ -673,6 +695,8 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should call resetAll callback when its menu item is selected', async () => {
 			renderPanel();
+
+			await openDropdownMenu();
 			await selectMenuItem( 'Reset all' );
 
 			expect( resetAll ).toHaveBeenCalledTimes( 1 );
@@ -688,6 +712,7 @@ describe( 'ToolsPanel', () => {
 		it( 'should call onDeselect after previous reset all', async () => {
 			renderPanel();
 
+			await openDropdownMenu();
 			await selectMenuItem( 'Reset all' ); // Initial control is displayed by default.
 			await selectMenuItem( controlProps.label ); // Re-display control.
 
@@ -712,12 +737,11 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render grouped items within the menu', async () => {
 			renderGroupedItemsInPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
-			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+			const defaultMenuItem = screen.getByRole( 'menuitem', {
 				name: 'Reset Nested Control 1',
-				checked: true,
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
@@ -749,14 +773,13 @@ describe( 'ToolsPanel', () => {
 			expect( altItem ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render wrapped items within the menu', () => {
+		it( 'should render wrapped items within the menu', async () => {
 			renderWrappedItemInPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
-			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+			const defaultMenuItem = screen.getByRole( 'menuitem', {
 				name: 'Reset Nested Control 1',
-				checked: true,
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
@@ -807,6 +830,7 @@ describe( 'ToolsPanel', () => {
 			expect( secondItem ).toBeInTheDocument();
 
 			// Toggle on the first item.
+			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 
 			// The order of items should be as per their original source order.
@@ -964,7 +988,7 @@ describe( 'ToolsPanel', () => {
 			isShownByDefault: false,
 		};
 
-		it( 'should render appropriate icon for the dropdown menu where there are default controls', async () => {
+		it( 'should render appropriate labels and descriptions for the dropdown menu where there are default controls', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...defaultControls }>
@@ -977,13 +1001,18 @@ describe( 'ToolsPanel', () => {
 			);
 
 			const optionsDisplayedIcon = screen.getByRole( 'button', {
-				name: 'View options',
+				name: 'Panel header options',
 			} );
 
 			expect( optionsDisplayedIcon ).toBeInTheDocument();
+
+			// The dropdown toggle doesn't have a description when an option is displayed.
+			// In this case the default control is displayed.
+			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
 		} );
 
-		it( 'should render appropriate icons for the dropdown menu where there are no default controls', async () => {
+		it( 'should render appropriate labels and descriptions for the dropdown menu where there are no default controls', async () => {
+			// All options are inactive.
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...optionalControls }>
@@ -992,37 +1021,64 @@ describe( 'ToolsPanel', () => {
 				</ToolsPanel>
 			);
 
-			// There are unactivated, optional menu items in the Tools Panel dropdown.
 			const optionsHiddenIcon = screen.getByRole( 'button', {
-				name: 'View and add options',
+				name: 'Panel header options',
 			} );
 
+			// The dropdown toggle has a description indicating that all options are hidden.
 			expect( optionsHiddenIcon ).toBeInTheDocument();
+			expect( optionsHiddenIcon ).toHaveAccessibleDescription(
+				'All options are currently hidden'
+			);
 
+			// Activate one of the options.
+			await openDropdownMenu();
 			await selectMenuItem( optionalControls.label );
 
-			// There are now NO unactivated, optional menu items in the Tools Panel dropdown.
-			expect(
-				screen.queryByRole( 'button', { name: 'View and add options' } )
-			).not.toBeInTheDocument();
-
 			const optionsDisplayedIcon = screen.getByRole( 'button', {
-				name: 'View options',
+				name: 'Panel header options',
 			} );
 
-			expect( optionsDisplayedIcon ).toBeInTheDocument();
+			// The dropdown toggle no longer has a description.
+			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
+		} );
+	} );
+
+	describe( 'reset all button', () => {
+		it( "should disable the reset all button when there's nothing to reset", async () => {
+			await renderPanel();
+			await openDropdownMenu();
+
+			const resetAllItem = await screen.findByRole( 'menuitem', {
+				disabled: false,
+			} );
+			expect( resetAllItem ).toBeInTheDocument();
+
+			await selectMenuItem( 'Reset all' );
+
+			// Test the aria live announcement.
+			const announcement = screen.getByText( 'All options reset' );
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
+
+			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
+				disabled: true,
+			} );
+			expect( disabledResetAllItem ).toBeInTheDocument();
 		} );
 	} );
 
 	describe( 'first and last panel items', () => {
 		it( 'should apply first/last classes to appropriate items', () => {
-			const { container } = render(
+			render(
 				<SlotFillProvider>
 					<ToolsPanelItems>
 						<ToolsPanelItem { ...altControlProps }>
 							<div>Item 1</div>
 						</ToolsPanelItem>
-						<ToolsPanelItem { ...controlProps }>
+						<ToolsPanelItem
+							{ ...controlProps }
+							data-testid="item-2"
+						>
 							<div>Item 2</div>
 						</ToolsPanelItem>
 					</ToolsPanelItems>
@@ -1030,6 +1086,7 @@ describe( 'ToolsPanel', () => {
 						<ToolsPanelItem
 							{ ...altControlProps }
 							label="Item 3"
+							data-testid="item-3"
 							isShownByDefault={ true }
 						>
 							<div>Item 3</div>
@@ -1060,7 +1117,8 @@ describe( 'ToolsPanel', () => {
 			expect( item3 ).toBeInTheDocument();
 			expect( screen.queryByText( 'Item 4' ) ).not.toBeInTheDocument();
 
-			expect( container ).toMatchSnapshot();
+			expect( screen.getByTestId( 'item-2' ) ).toHaveClass( 'first' );
+			expect( screen.getByTestId( 'item-3' ) ).toHaveClass( 'last' );
 		} );
 	} );
 } );

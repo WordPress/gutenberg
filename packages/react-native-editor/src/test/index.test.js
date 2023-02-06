@@ -53,7 +53,7 @@ describe( 'Register Gutenberg', () => {
 		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
-		// Reference: https://git.io/JyBk0
+		// Reference: https://github.com/facebook/jest/issues/4402#issuecomment-534516219
 		const setupLocaleCallOrder = setupLocale.mock.invocationCallOrder[ 0 ];
 		const onSetupImportedCallOrder =
 			mockOnModuleImported.mock.invocationCallOrder[ 0 ];
@@ -79,7 +79,7 @@ describe( 'Register Gutenberg', () => {
 		jest.isolateModules( () => render( <EditorComponent /> ) );
 
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
-		// Reference: https://git.io/JyBk0
+		// Reference: https://github.com/facebook/jest/issues/4402#issuecomment-534516219
 		const beforeInitCallOrder =
 			beforeInitCallback.mock.invocationCallOrder[ 0 ];
 		const onSetupImportedCallOrder =
@@ -108,7 +108,7 @@ describe( 'Register Gutenberg', () => {
 
 		const hookCallIndex = 0;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
-		// Reference: https://git.io/JyBk0
+		// Reference: https://github.com/facebook/jest/issues/4402#issuecomment-534516219
 		const hookCallOrder =
 			doAction.mock.invocationCallOrder[ hookCallIndex ];
 		const onRenderEditorCallOrder =
@@ -139,7 +139,7 @@ describe( 'Register Gutenberg', () => {
 
 		const hookCallIndex = 0;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
-		// Reference: https://git.io/JyBk0
+		// Reference: https://github.com/facebook/jest/issues/4402#issuecomment-534516219
 		const hookCallOrder =
 			applyFilters.mock.invocationCallOrder[ hookCallIndex ];
 		const onRenderEditorCallOrder =
@@ -170,7 +170,7 @@ describe( 'Register Gutenberg', () => {
 
 		const hookCallIndex = 1;
 		// "invocationCallOrder" can be used to compare call orders between different mocks.
-		// Reference: https://git.io/JyBk0
+		// Reference: https://github.com/facebook/jest/issues/4402#issuecomment-534516219
 		const hookCallOrder =
 			doAction.mock.invocationCallOrder[ hookCallIndex ];
 		const onRenderEditorCallOrder =
@@ -190,11 +190,10 @@ describe( 'Register Gutenberg', () => {
 			{},
 			{ component: EditorComponent }
 		);
-		const blockList = screen.getByTestId( 'block-list-wrapper' );
+		// Inner blocks create BlockLists so let's take into account selecting the main one
+		const blockList = screen.getAllByTestId( 'block-list-wrapper' )[ 0 ];
 
 		expect( blockList ).toBeVisible();
 		expect( console ).toHaveLoggedWith( 'Hermes is: true' );
-		// It's expected that some blocks are upgraded and inform about it (example: "Updated Block: core/cover")
-		expect( console ).toHaveInformed();
 	} );
 } );

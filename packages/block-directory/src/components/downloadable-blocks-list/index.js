@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -19,6 +14,8 @@ import { useDispatch } from '@wordpress/data';
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
 import { store as blockDirectoryStore } from '../../store';
+
+const noop = () => {};
 
 function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 	const composite = useCompositeState();

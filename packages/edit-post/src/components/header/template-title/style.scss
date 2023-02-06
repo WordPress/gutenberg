@@ -49,7 +49,15 @@
 .edit-post-template-top-area__popover {
 	.components-popover__content {
 		min-width: 280px;
-		padding: $grid-unit-10;
+		padding: 0;
+	}
+
+	.edit-site-template-details__group {
+		padding: $grid-unit-20;
+
+		.components-base-control__help {
+			margin-bottom: 0;
+		}
 	}
 
 	.edit-post-template-details__description {
@@ -58,19 +66,29 @@
 }
 
 .edit-post-template-top-area__second-menu-group {
-	margin-left: -$grid-unit-20;
-	margin-right: -$grid-unit-20;
-	padding: $grid-unit-20;
-	padding-bottom: 0;
 	border-top: $border-width solid $gray-300;
+	padding: $grid-unit-20 $grid-unit-10;
 
 	.edit-post-template-top-area__delete-template-button {
 		display: flex;
 		justify-content: center;
+		padding: $grid-unit-05 $grid-unit;
+
+		&.is-destructive {
+			padding: inherit;
+			margin-left: $grid-unit-10;
+			margin-right: $grid-unit-10;
+			width: calc(100% - #{($grid-unit * 2)});
+
+			.components-menu-item__item {
+				width: auto;
+			}
+		}
 
 		.components-menu-item__item {
 			margin-right: 0;
 			min-width: 0;
+			width: 100%;
 		}
 	}
 }

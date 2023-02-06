@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls, useSetting } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useMultipleOriginColorsAndGradients,
+} from '@wordpress/block-editor';
 import {
 	BottomSheet,
 	ColorSettings,
@@ -9,13 +12,12 @@ import {
 	ImageLinkDestinationsScreen,
 	LinkPickerScreen,
 } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
 import styles from './container.native.scss';
-import { store as blockEditorStore } from '../../store';
 
 export const blockSettingsScreens = {
 	settings: 'Settings',
@@ -25,16 +27,12 @@ export const blockSettingsScreens = {
 	imageLinkDestinations: 'imageLinkDestinations',
 };
 
-function BottomSheetSettings( {
-	editorSidebarOpened,
-	closeGeneralSidebar,
-	settings,
-	...props
-} ) {
-	const colorSettings = {
-		colors: useSetting( 'color.palette' ) || settings.colors,
-		gradients: useSetting( 'color.gradients' ) || settings.gradients,
-	};
+export default function BottomSheetSettings( props ) {
+	const colorSettings = useMultipleOriginColorsAndGradients();
+	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
+	const editorSidebarOpened = useSelect( ( select ) =>
+		select( 'core/edit-post' ).isEditorSidebarOpened()
+	);
 
 	return (
 		<BottomSheet
@@ -87,21 +85,3 @@ function BottomSheetSettings( {
 		</BottomSheet>
 	);
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getSettings } = select( blockEditorStore );
-		return {
-			settings: getSettings(),
-			editorSidebarOpened: isEditorSidebarOpened(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { closeGeneralSidebar } = dispatch( 'core/edit-post' );
-
-		return {
-			closeGeneralSidebar,
-		};
-	} ),
-] )( BottomSheetSettings );

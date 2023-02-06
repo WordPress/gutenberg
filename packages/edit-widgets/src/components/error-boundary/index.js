@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { Warning } from '@wordpress/block-editor';
 import { useCopyToClipboard } from '@wordpress/compose';
+import { doAction } from '@wordpress/hooks';
 
 function CopyButton( { text, children } ) {
 	const ref = useCopyToClipboard( text );
@@ -16,11 +17,23 @@ function CopyButton( { text, children } ) {
 	);
 }
 
+function ErrorBoundaryWarning( { message, error } ) {
+	const actions = [
+		<CopyButton key="copy-error" text={ error.stack }>
+			{ __( 'Copy Error' ) }
+		</CopyButton>,
+	];
+
+	return (
+		<Warning className="edit-widgets-error-boundary" actions={ actions }>
+			{ message }
+		</Warning>
+	);
+}
+
 export default class ErrorBoundary extends Component {
 	constructor() {
 		super( ...arguments );
-
-		this.reboot = this.reboot.bind( this );
 
 		this.state = {
 			error: null,
@@ -28,37 +41,25 @@ export default class ErrorBoundary extends Component {
 	}
 
 	componentDidCatch( error ) {
-		this.setState( { error } );
+		doAction( 'editor.ErrorBoundary.errorLogged', error );
 	}
 
-	reboot() {
-		this.props.onError();
+	static getDerivedStateFromError( error ) {
+		return { error };
 	}
 
 	render() {
-		const { error } = this.state;
-		if ( ! error ) {
+		if ( ! this.state.error ) {
 			return this.props.children;
 		}
 
 		return (
-			<Warning
-				className="edit-widgets-error-boundary"
-				actions={ [
-					<Button
-						key="recovery"
-						onClick={ this.reboot }
-						variant="secondary"
-					>
-						{ __( 'Attempt Recovery' ) }
-					</Button>,
-					<CopyButton key="copy-error" text={ error.stack }>
-						{ __( 'Copy Error' ) }
-					</CopyButton>,
-				] }
-			>
-				{ __( 'The editor has encountered an unexpected error.' ) }
-			</Warning>
+			<ErrorBoundaryWarning
+				message={ __(
+					'The editor has encountered an unexpected error.'
+				) }
+				error={ this.state.error }
+			/>
 		);
 	}
 }

@@ -2,23 +2,24 @@
  * WordPress dependencies
  */
 import {
-	trashAllPosts,
+	deleteAllTemplates,
 	activateTheme,
 	getAllBlocks,
 	selectBlockByClientId,
 	insertBlock,
 	visitSiteEditor,
+	enterEditMode,
 } from '@wordpress/e2e-test-utils';
 
 async function toggleSidebar() {
 	await page.click(
-		'.edit-site-header__actions button[aria-label="Settings"]'
+		'.edit-site-header-edit-mode__actions button[aria-label="Settings"]'
 	);
 }
 
 async function getActiveTabLabel() {
 	return await page.$eval(
-		'.edit-site-sidebar__panel-tab.is-active',
+		'.edit-site-sidebar-edit-mode__panel-tab.is-active',
 		( element ) => element.getAttribute( 'aria-label' )
 	);
 }
@@ -39,16 +40,17 @@ async function getTemplateCard() {
 describe( 'Settings sidebar', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 	} );
 	beforeEach( async () => {
 		await visitSiteEditor();
+		await enterEditMode();
 	} );
 
 	describe( 'Template tab', () => {
@@ -68,6 +70,7 @@ describe( 'Settings sidebar', () => {
 				postId: 'emptytheme//singular',
 				postType: 'wp_template',
 			} );
+			await enterEditMode();
 			const templateCardAfterNavigation = await getTemplateCard();
 
 			expect( templateCardBeforeNavigation ).toMatchObject( {

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last, noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
@@ -14,6 +9,8 @@ import { cloneBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+
+const noop = () => {};
 
 /**
  * A function to call when the block value has been updated in the block-editor
@@ -150,7 +147,9 @@ export default function useBlockSync( {
 			// to allow that the consumer may apply modifications to reflect
 			// back on the editor.
 			if (
-				last( pendingChanges.current.outgoing ) === controlledBlocks
+				pendingChanges.current.outgoing[
+					pendingChanges.current.outgoing.length - 1
+				] === controlledBlocks
 			) {
 				pendingChanges.current.outgoing = [];
 			}
@@ -258,7 +257,8 @@ export default function useBlockSync( {
 					selection: {
 						selectionStart: getSelectionStart(),
 						selectionEnd: getSelectionEnd(),
-						initialPosition: getSelectedBlocksInitialCaretPosition(),
+						initialPosition:
+							getSelectedBlocksInitialCaretPosition(),
 					},
 				} );
 			}

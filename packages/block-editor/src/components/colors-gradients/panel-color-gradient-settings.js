@@ -2,33 +2,23 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import {
 	__experimentalSpacer as Spacer,
-	ColorIndicator,
-	PanelBody,
+	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
-import { sprintf, __ } from '@wordpress/i18n';
+import { useRegistry } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import ColorGradientSettingsDropdown from './dropdown';
-import { getColorObjectByColorValue } from '../colors';
-import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
-import useSetting from '../use-setting';
-import useCommonSingleMultipleSelects from './use-common-single-multiple-selects';
-import useMultipleOriginColorsAndGradients from './use-multiple-origin-colors-and-gradients';
-
-// translators: first %s: The type of color or gradient (e.g. background, overlay...), second %s: the color name or value (e.g. red or #ff0000)
-const colorIndicatorAriaLabel = __( '(%s: color %s)' );
-
-// translators: first %s: The type of color or gradient (e.g. background, overlay...), second %s: the color name or value (e.g. red or #ff0000)
-const gradientIndicatorAriaLabel = __( '(%s: gradient %s)' );
+import useColorsAndGradientsPalettes from './use-multiple-origin-colors-and-gradients';
 
 const colorsAndGradientKeys = [
 	'colors',
@@ -36,55 +26,6 @@ const colorsAndGradientKeys = [
 	'gradients',
 	'disableCustomGradients',
 ];
-
-const Indicators = ( { colors, gradients, settings } ) => {
-	return settings.map(
-		(
-			{
-				colorValue,
-				gradientValue,
-				label,
-				colors: availableColors,
-				gradients: availableGradients,
-			},
-			index
-		) => {
-			if ( ! colorValue && ! gradientValue ) {
-				return null;
-			}
-			let ariaLabel;
-			if ( colorValue ) {
-				const colorObject = getColorObjectByColorValue(
-					availableColors || colors,
-					colorValue
-				);
-				ariaLabel = sprintf(
-					colorIndicatorAriaLabel,
-					label.toLowerCase(),
-					( colorObject && colorObject.name ) || colorValue
-				);
-			} else {
-				const gradientObject = __experimentalGetGradientObjectByGradientValue(
-					availableGradients || gradients,
-					colorValue
-				);
-				ariaLabel = sprintf(
-					gradientIndicatorAriaLabel,
-					label.toLowerCase(),
-					( gradientObject && gradientObject.name ) || gradientValue
-				);
-			}
-
-			return (
-				<ColorIndicator
-					key={ index }
-					colorValue={ colorValue || gradientValue }
-					aria-label={ ariaLabel }
-				/>
-			);
-		}
-	);
-};
 
 export const PanelColorGradientSettingsInner = ( {
 	className,
@@ -96,18 +37,17 @@ export const PanelColorGradientSettingsInner = ( {
 	settings,
 	title,
 	showTitle = true,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 	enableAlpha,
-	...props
 } ) => {
+	const panelId = useInstanceId( PanelColorGradientSettingsInner );
+	const { batch } = useRegistry();
 	if (
 		isEmpty( colors ) &&
 		isEmpty( gradients ) &&
 		disableCustomColors &&
 		disableCustomGradients &&
-		every(
-			settings,
+		settings?.every(
 			( setting ) =>
 				isEmpty( setting.colors ) &&
 				isEmpty( setting.gradients ) &&
@@ -120,34 +60,43 @@ export const PanelColorGradientSettingsInner = ( {
 		return null;
 	}
 
-	const titleElement = (
-		<span className="block-editor-panel-color-gradient-settings__panel-title">
-			{ title }
-			<Indicators
-				colors={ colors }
-				gradients={ gradients }
-				settings={ settings }
-			/>
-		</span>
-	);
-
 	return (
-		<PanelBody
+		<ToolsPanel
 			className={ classnames(
 				'block-editor-panel-color-gradient-settings',
 				className
 			) }
-			title={ showTitle ? titleElement : undefined }
-			{ ...props }
+			label={ showTitle ? title : undefined }
+			resetAll={ () => {
+				batch( () => {
+					settings.forEach(
+						( {
+							colorValue,
+							gradientValue,
+							onColorChange,
+							onGradientChange,
+						} ) => {
+							if ( colorValue ) {
+								onColorChange();
+							} else if ( gradientValue ) {
+								onGradientChange();
+							}
+						}
+					);
+				} );
+			} }
+			panelId={ panelId }
+			__experimentalFirstVisibleItemClass="first"
+			__experimentalLastVisibleItemClass="last"
 		>
 			<ColorGradientSettingsDropdown
 				settings={ settings }
+				panelId={ panelId }
 				{ ...{
 					colors,
 					gradients,
 					disableCustomColors,
 					disableCustomGradients,
-					__experimentalHasMultipleOrigins,
 					__experimentalIsRenderedInSidebar,
 					enableAlpha,
 				} }
@@ -157,23 +106,12 @@ export const PanelColorGradientSettingsInner = ( {
 					<Spacer marginY={ 4 } /> { children }
 				</>
 			) }
-		</PanelBody>
+		</ToolsPanel>
 	);
 };
 
-const PanelColorGradientSettingsSingleSelect = ( props ) => {
-	const colorGradientSettings = useCommonSingleMultipleSelects();
-	colorGradientSettings.colors = useSetting( 'color.palette' );
-	colorGradientSettings.gradients = useSetting( 'color.gradients' );
-	return (
-		<PanelColorGradientSettingsInner
-			{ ...{ ...colorGradientSettings, ...props } }
-		/>
-	);
-};
-
-const PanelColorGradientSettingsMultipleSelect = ( props ) => {
-	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+const PanelColorGradientSettingsSelect = ( props ) => {
+	const colorGradientSettings = useColorsAndGradientsPalettes();
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }
@@ -183,14 +121,11 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 
 const PanelColorGradientSettings = ( props ) => {
 	if (
-		every( colorsAndGradientKeys, ( key ) => props.hasOwnProperty( key ) )
+		colorsAndGradientKeys.every( ( key ) => props.hasOwnProperty( key ) )
 	) {
 		return <PanelColorGradientSettingsInner { ...props } />;
 	}
-	if ( props.__experimentalHasMultipleOrigins ) {
-		return <PanelColorGradientSettingsMultipleSelect { ...props } />;
-	}
-	return <PanelColorGradientSettingsSingleSelect { ...props } />;
+	return <PanelColorGradientSettingsSelect { ...props } />;
 };
 
 export default PanelColorGradientSettings;

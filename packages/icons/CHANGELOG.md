@@ -2,6 +2,84 @@
 
 ## Unreleased
 
+## 9.17.0 (2023-02-01)
+
+## 9.16.0 (2023-01-11)
+
+## 9.15.0 (2023-01-02)
+
+## 9.14.0 (2022-12-14)
+
+## 9.13.0 (2022-11-16)
+
+## 9.12.0 (2022-11-02)
+
+## 9.11.0 (2022-10-19)
+
+## 9.10.0 (2022-10-05)
+
+## 9.9.0 (2022-09-21)
+
+## 9.8.0 (2022-09-13)
+
+## 9.7.0 (2022-08-24)
+
+## 9.6.0 (2022-08-10)
+
+## 9.5.0 (2022-07-27)
+
+## 9.4.0 (2022-07-13)
+
+## 9.3.0 (2022-06-29)
+
+## 9.2.0 (2022-06-15)
+
+## 9.1.0 (2022-06-01)
+
+## 9.0.0 (2022-05-18)
+
+### Breaking Changes
+-   Removed icons no longer used by the UI: `commentTitle`, `postTitle`, `queryTitle`, `archiveTitle`.
+
+### Enhancement
+-   Update the `title` icon to match g2 design language. ([#40596](https://github.com/WordPress/gutenberg/pull/40596))
+
+## 8.4.0 (2022-05-04)
+
+## 8.3.0 (2022-04-21)
+### New Features
+
+-   Add new `filter` icon. ([#40435](https://github.com/WordPress/gutenberg/pull/40435))
+
+-   Add new `commentTitle` icon. ([#40419](https://github.com/WordPress/gutenberg/pull/40419))
+
+## 8.2.0 (2022-04-08)
+
+### New Features
+
+-   Add new `row` and `copy` icons. ([#39690](https://github.com/WordPress/gutenberg/pull/39690))
+-   Add new `listItem` icon. ([#39929](https://github.com/WordPress/gutenberg/pull/39929))
+
+## 8.1.0 (2022-03-23)
+
+## 8.0.0 (2022-03-11)
+
+### Breaking Changes
+
+-   Changed `dragHandle` footprint from 18x18 to 24x24 to match other icons. ([#39342](https://github.com/WordPress/gutenberg/pull/39342))
+
+## 7.0.0 (2022-02-23)
+
+### New Features
+
+-   Added new icon: `post`, and refreshed the existing `pin` icon. ([#39139](https://github.com/WordPress/gutenberg/pull/39139))
+
+### Breaking Changes
+
+-   Removed icons that were added by mistake: `alignJustifyAlt`, `cogAlt`, `sparkles`, `trashFilled`. ([#38849](https://github.com/WordPress/gutenberg/pull/38849))
+
+## 6.3.0 (2022-02-10)
+
 ### New Features
 
 -   Added new block icon: `tip` ([#38424](https://github.com/WordPress/gutenberg/pull/38424)).

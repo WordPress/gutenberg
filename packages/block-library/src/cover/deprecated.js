@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -17,6 +16,7 @@ import {
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -24,11 +24,15 @@ import { __ } from '@wordpress/i18n';
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
-	backgroundImageStyles,
 	getPositionClassName,
 	isContentPositionCenter,
 	dimRatioToClass,
+	mediaPosition,
 } from './shared';
+
+function backgroundImageStyles( url ) {
+	return url ? { backgroundImage: `url(${ url })` } : {};
+}
 
 /**
  * Original function to determine the background opacity classname
@@ -48,6 +52,18 @@ function migrateDimRatio( attributes ) {
 	return {
 		...attributes,
 		dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+	};
+}
+
+function migrateTag( attributes ) {
+	if ( ! attributes.tagName ) {
+		attributes = {
+			...attributes,
+			tagName: 'div',
+		};
+	}
+	return {
+		...attributes,
 	};
 }
 
@@ -81,91 +97,380 @@ const blockAttributes = {
 	},
 };
 
-// v8: deprecated to remove duplicated gradient classes and swap `wp-block-cover__gradient-background` for `wp-block-cover__background`.
-const v8 = {
-	attributes: {
-		url: {
-			type: 'string',
-		},
-		id: {
-			type: 'number',
-		},
-		alt: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'img',
-			attribute: 'alt',
-			default: '',
-		},
-		hasParallax: {
-			type: 'boolean',
-			default: false,
-		},
-		isRepeated: {
-			type: 'boolean',
-			default: false,
-		},
-		dimRatio: {
-			type: 'number',
-			default: 100,
-		},
-		overlayColor: {
-			type: 'string',
-		},
-		customOverlayColor: {
-			type: 'string',
-		},
-		backgroundType: {
-			type: 'string',
-			default: 'image',
-		},
-		focalPoint: {
-			type: 'object',
-		},
-		minHeight: {
-			type: 'number',
-		},
-		minHeightUnit: {
-			type: 'string',
-		},
-		gradient: {
-			type: 'string',
-		},
-		customGradient: {
-			type: 'string',
-		},
-		contentPosition: {
-			type: 'string',
-		},
-		isDark: {
-			type: 'boolean',
-			default: true,
-		},
-		allowedBlocks: {
-			type: 'array',
-		},
-		templateLock: {
-			type: [ 'string', 'boolean' ],
-			enum: [ 'all', 'insert', false ],
-		},
+const v8ToV10BlockAttributes = {
+	url: {
+		type: 'string',
 	},
-	supports: {
-		anchor: true,
-		align: true,
-		html: false,
-		spacing: {
+	id: {
+		type: 'number',
+	},
+	alt: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'alt',
+		default: '',
+	},
+	hasParallax: {
+		type: 'boolean',
+		default: false,
+	},
+	isRepeated: {
+		type: 'boolean',
+		default: false,
+	},
+	dimRatio: {
+		type: 'number',
+		default: 100,
+	},
+	overlayColor: {
+		type: 'string',
+	},
+	customOverlayColor: {
+		type: 'string',
+	},
+	backgroundType: {
+		type: 'string',
+		default: 'image',
+	},
+	focalPoint: {
+		type: 'object',
+	},
+	minHeight: {
+		type: 'number',
+	},
+	minHeightUnit: {
+		type: 'string',
+	},
+	gradient: {
+		type: 'string',
+	},
+	customGradient: {
+		type: 'string',
+	},
+	contentPosition: {
+		type: 'string',
+	},
+	isDark: {
+		type: 'boolean',
+		default: true,
+	},
+	allowedBlocks: {
+		type: 'array',
+	},
+	templateLock: {
+		type: [ 'string', 'boolean' ],
+		enum: [ 'all', 'insert', false ],
+	},
+};
+
+const v7toV10BlockSupports = {
+	anchor: true,
+	align: true,
+	html: false,
+	spacing: {
+		padding: true,
+		__experimentalDefaultControls: {
 			padding: true,
-			__experimentalDefaultControls: {
-				padding: true,
-			},
-		},
-		color: {
-			__experimentalDuotone:
-				'> .wp-block-cover__image-background, > .wp-block-cover__video-background',
-			text: false,
-			background: false,
 		},
 	},
+	color: {
+		__experimentalDuotone:
+			'> .wp-block-cover__image-background, > .wp-block-cover__video-background',
+		text: false,
+		background: false,
+	},
+};
+
+// Deprecation for blocks that does not have a HTML tag option.
+const v11 = {
+	attributes: v8ToV10BlockAttributes,
+	supports: v7toV10BlockSupports,
+	save( { attributes } ) {
+		const {
+			backgroundType,
+			gradient,
+			contentPosition,
+			customGradient,
+			customOverlayColor,
+			dimRatio,
+			focalPoint,
+			useFeaturedImage,
+			hasParallax,
+			isDark,
+			isRepeated,
+			overlayColor,
+			url,
+			alt,
+			id,
+			minHeight: minHeightProp,
+			minHeightUnit,
+		} = attributes;
+		const overlayColorClass = getColorClassName(
+			'background-color',
+			overlayColor
+		);
+		const gradientClass = __experimentalGetGradientClass( gradient );
+		const minHeight =
+			minHeightProp && minHeightUnit
+				? `${ minHeightProp }${ minHeightUnit }`
+				: minHeightProp;
+
+		const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+		const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
+		const isImgElement = ! ( hasParallax || isRepeated );
+
+		const style = {
+			minHeight: minHeight || undefined,
+		};
+
+		const bgStyle = {
+			backgroundColor: ! overlayColorClass
+				? customOverlayColor
+				: undefined,
+			background: customGradient ? customGradient : undefined,
+		};
+
+		const objectPosition =
+			// prettier-ignore
+			focalPoint && isImgElement
+				  ? mediaPosition(focalPoint)
+				  : undefined;
+
+		const backgroundImage = url ? `url(${ url })` : undefined;
+
+		const backgroundPosition = mediaPosition( focalPoint );
+
+		const classes = classnames(
+			{
+				'is-light': ! isDark,
+				'has-parallax': hasParallax,
+				'is-repeated': isRepeated,
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
+			},
+			getPositionClassName( contentPosition )
+		);
+
+		const imgClasses = classnames(
+			'wp-block-cover__image-background',
+			id ? `wp-image-${ id }` : null,
+			{
+				'has-parallax': hasParallax,
+				'is-repeated': isRepeated,
+			}
+		);
+
+		const gradientValue = gradient || customGradient;
+
+		return (
+			<div { ...useBlockProps.save( { className: classes, style } ) }>
+				<span
+					aria-hidden="true"
+					className={ classnames(
+						'wp-block-cover__background',
+						overlayColorClass,
+						dimRatioToClass( dimRatio ),
+						{
+							'has-background-dim': dimRatio !== undefined,
+							// For backwards compatibility. Former versions of the Cover Block applied
+							// `.wp-block-cover__gradient-background` in the presence of
+							// media, a gradient and a dim.
+							'wp-block-cover__gradient-background':
+								url && gradientValue && dimRatio !== 0,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: gradientClass,
+						}
+					) }
+					style={ bgStyle }
+				/>
+
+				{ ! useFeaturedImage &&
+					isImageBackground &&
+					url &&
+					( isImgElement ? (
+						<img
+							className={ imgClasses }
+							alt={ alt }
+							src={ url }
+							style={ { objectPosition } }
+							data-object-fit="cover"
+							data-object-position={ objectPosition }
+						/>
+					) : (
+						<div
+							role="img"
+							className={ imgClasses }
+							style={ { backgroundPosition, backgroundImage } }
+						/>
+					) ) }
+				{ isVideoBackground && url && (
+					<video
+						className={ classnames(
+							'wp-block-cover__video-background',
+							'intrinsic-ignore'
+						) }
+						autoPlay
+						muted
+						loop
+						playsInline
+						src={ url }
+						style={ { objectPosition } }
+						data-object-fit="cover"
+						data-object-position={ objectPosition }
+					/>
+				) }
+				<div
+					{ ...useInnerBlocksProps.save( {
+						className: 'wp-block-cover__inner-container',
+					} ) }
+				/>
+			</div>
+		);
+	},
+};
+
+// Deprecation for blocks that renders fixed background as backgroud from the main block container.
+const v10 = {
+	attributes: v8ToV10BlockAttributes,
+	supports: v7toV10BlockSupports,
+	save( { attributes } ) {
+		const {
+			backgroundType,
+			gradient,
+			contentPosition,
+			customGradient,
+			customOverlayColor,
+			dimRatio,
+			focalPoint,
+			useFeaturedImage,
+			hasParallax,
+			isDark,
+			isRepeated,
+			overlayColor,
+			url,
+			alt,
+			id,
+			minHeight: minHeightProp,
+			minHeightUnit,
+		} = attributes;
+		const overlayColorClass = getColorClassName(
+			'background-color',
+			overlayColor
+		);
+		const gradientClass = __experimentalGetGradientClass( gradient );
+		const minHeight =
+			minHeightProp && minHeightUnit
+				? `${ minHeightProp }${ minHeightUnit }`
+				: minHeightProp;
+
+		const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+		const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
+		const isImgElement = ! ( hasParallax || isRepeated );
+
+		const style = {
+			...( isImageBackground && ! isImgElement && ! useFeaturedImage
+				? backgroundImageStyles( url )
+				: {} ),
+			minHeight: minHeight || undefined,
+		};
+
+		const bgStyle = {
+			backgroundColor: ! overlayColorClass
+				? customOverlayColor
+				: undefined,
+			background: customGradient ? customGradient : undefined,
+		};
+
+		const objectPosition =
+			// prettier-ignore
+			focalPoint && isImgElement
+				 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+				 : undefined;
+
+		const classes = classnames(
+			{
+				'is-light': ! isDark,
+				'has-parallax': hasParallax,
+				'is-repeated': isRepeated,
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
+			},
+			getPositionClassName( contentPosition )
+		);
+
+		const gradientValue = gradient || customGradient;
+
+		return (
+			<div { ...useBlockProps.save( { className: classes, style } ) }>
+				<span
+					aria-hidden="true"
+					className={ classnames(
+						'wp-block-cover__background',
+						overlayColorClass,
+						dimRatioToClass( dimRatio ),
+						{
+							'has-background-dim': dimRatio !== undefined,
+							// For backwards compatibility. Former versions of the Cover Block applied
+							// `.wp-block-cover__gradient-background` in the presence of
+							// media, a gradient and a dim.
+							'wp-block-cover__gradient-background':
+								url && gradientValue && dimRatio !== 0,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: gradientClass,
+						}
+					) }
+					style={ bgStyle }
+				/>
+
+				{ ! useFeaturedImage &&
+					isImageBackground &&
+					isImgElement &&
+					url && (
+						<img
+							className={ classnames(
+								'wp-block-cover__image-background',
+								id ? `wp-image-${ id }` : null
+							) }
+							alt={ alt }
+							src={ url }
+							style={ { objectPosition } }
+							data-object-fit="cover"
+							data-object-position={ objectPosition }
+						/>
+					) }
+				{ isVideoBackground && url && (
+					<video
+						className={ classnames(
+							'wp-block-cover__video-background',
+							'intrinsic-ignore'
+						) }
+						autoPlay
+						muted
+						loop
+						playsInline
+						src={ url }
+						style={ { objectPosition } }
+						data-object-fit="cover"
+						data-object-position={ objectPosition }
+					/>
+				) }
+				<div
+					{ ...useInnerBlocksProps.save( {
+						className: 'wp-block-cover__inner-container',
+					} ) }
+				/>
+			</div>
+		);
+	},
+};
+
+// Deprecation for blocks with `minHeightUnit` set but no `minHeight`.
+const v9 = {
+	attributes: v8ToV10BlockAttributes,
+	supports: v7toV10BlockSupports,
 	save( { attributes } ) {
 		const {
 			backgroundType,
@@ -224,9 +529,140 @@ const v8 = {
 				'is-light': ! isDark,
 				'has-parallax': hasParallax,
 				'is-repeated': isRepeated,
-				'has-custom-content-position': ! isContentPositionCenter(
-					contentPosition
-				),
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
+			},
+			getPositionClassName( contentPosition )
+		);
+
+		const gradientValue = gradient || customGradient;
+
+		return (
+			<div { ...useBlockProps.save( { className: classes, style } ) }>
+				<span
+					aria-hidden="true"
+					className={ classnames(
+						'wp-block-cover__background',
+						overlayColorClass,
+						dimRatioToClass( dimRatio ),
+						{
+							'has-background-dim': dimRatio !== undefined,
+							// For backwards compatibility. Former versions of the Cover Block applied
+							// `.wp-block-cover__gradient-background` in the presence of
+							// media, a gradient and a dim.
+							'wp-block-cover__gradient-background':
+								url && gradientValue && dimRatio !== 0,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: gradientClass,
+						}
+					) }
+					style={ bgStyle }
+				/>
+
+				{ isImageBackground && isImgElement && url && (
+					<img
+						className={ classnames(
+							'wp-block-cover__image-background',
+							id ? `wp-image-${ id }` : null
+						) }
+						alt={ alt }
+						src={ url }
+						style={ { objectPosition } }
+						data-object-fit="cover"
+						data-object-position={ objectPosition }
+					/>
+				) }
+				{ isVideoBackground && url && (
+					<video
+						className={ classnames(
+							'wp-block-cover__video-background',
+							'intrinsic-ignore'
+						) }
+						autoPlay
+						muted
+						loop
+						playsInline
+						src={ url }
+						style={ { objectPosition } }
+						data-object-fit="cover"
+						data-object-position={ objectPosition }
+					/>
+				) }
+				<div
+					{ ...useInnerBlocksProps.save( {
+						className: 'wp-block-cover__inner-container',
+					} ) }
+				/>
+			</div>
+		);
+	},
+	migrate: migrateTag,
+};
+
+// v8: deprecated to remove duplicated gradient classes and swap `wp-block-cover__gradient-background` for `wp-block-cover__background`.
+const v8 = {
+	attributes: v8ToV10BlockAttributes,
+	supports: v7toV10BlockSupports,
+	save( { attributes } ) {
+		const {
+			backgroundType,
+			gradient,
+			contentPosition,
+			customGradient,
+			customOverlayColor,
+			dimRatio,
+			focalPoint,
+			hasParallax,
+			isDark,
+			isRepeated,
+			overlayColor,
+			url,
+			alt,
+			id,
+			minHeight: minHeightProp,
+			minHeightUnit,
+		} = attributes;
+		const overlayColorClass = getColorClassName(
+			'background-color',
+			overlayColor
+		);
+		const gradientClass = __experimentalGetGradientClass( gradient );
+		const minHeight = minHeightUnit
+			? `${ minHeightProp }${ minHeightUnit }`
+			: minHeightProp;
+
+		const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+		const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
+		const isImgElement = ! ( hasParallax || isRepeated );
+
+		const style = {
+			...( isImageBackground && ! isImgElement
+				? backgroundImageStyles( url )
+				: {} ),
+			minHeight: minHeight || undefined,
+		};
+
+		const bgStyle = {
+			backgroundColor: ! overlayColorClass
+				? customOverlayColor
+				: undefined,
+			background: customGradient ? customGradient : undefined,
+		};
+
+		const objectPosition =
+			// prettier-ignore
+			focalPoint && isImgElement
+				 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+				 : undefined;
+
+		const classes = classnames(
+			{
+				'is-light': ! isDark,
+				'has-parallax': hasParallax,
+				'is-repeated': isRepeated,
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
 			},
 			getPositionClassName( contentPosition )
 		);
@@ -287,6 +723,7 @@ const v8 = {
 			</div>
 		);
 	},
+	migrate: migrateTag,
 };
 
 const v7 = {
@@ -319,23 +756,7 @@ const v7 = {
 			default: '',
 		},
 	},
-	supports: {
-		anchor: true,
-		align: true,
-		html: false,
-		spacing: {
-			padding: true,
-			__experimentalDefaultControls: {
-				padding: true,
-			},
-		},
-		color: {
-			__experimentalDuotone:
-				'> .wp-block-cover__image-background, > .wp-block-cover__video-background',
-			text: false,
-			background: false,
-		},
-	},
+	supports: v7toV10BlockSupports,
 	save( { attributes } ) {
 		const {
 			backgroundType,
@@ -394,9 +815,8 @@ const v7 = {
 				'is-repeated': isRepeated,
 				'has-background-gradient': gradient || customGradient,
 				[ gradientClass ]: ! url && gradientClass,
-				'has-custom-content-position': ! isContentPositionCenter(
-					contentPosition
-				),
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
 			},
 			getPositionClassName( contentPosition )
 		);
@@ -452,7 +872,7 @@ const v7 = {
 			</div>
 		);
 	},
-	migrate: migrateDimRatio,
+	migrate: compose( migrateDimRatio, migrateTag ),
 };
 
 const v6 = {
@@ -546,9 +966,8 @@ const v6 = {
 				'is-repeated': isRepeated,
 				'has-background-gradient': gradient || customGradient,
 				[ gradientClass ]: ! url && gradientClass,
-				'has-custom-content-position': ! isContentPositionCenter(
-					contentPosition
-				),
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
 			},
 			getPositionClassName( contentPosition )
 		);
@@ -586,7 +1005,7 @@ const v6 = {
 			</div>
 		);
 	},
-	migrate: migrateDimRatio,
+	migrate: compose( migrateDimRatio, migrateTag ),
 };
 
 const v5 = {
@@ -683,7 +1102,7 @@ const v5 = {
 			</div>
 		);
 	},
-	migrate: migrateDimRatio,
+	migrate: compose( migrateDimRatio, migrateTag ),
 };
 
 const v4 = {
@@ -780,7 +1199,7 @@ const v4 = {
 			</div>
 		);
 	},
-	migrate: migrateDimRatio,
+	migrate: compose( migrateDimRatio, migrateTag ),
 };
 
 const v3 = {
@@ -863,10 +1282,13 @@ const v3 = {
 		const newAttribs = {
 			...attributes,
 			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			tagName: ! attributes.tagName ? 'div' : attributes.tagName,
 		};
 
+		const { title, contentAlign, ...restAttributes } = newAttribs;
+
 		return [
-			omit( newAttribs, [ 'title', 'contentAlign' ] ),
+			restAttributes,
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
@@ -946,9 +1368,13 @@ const v2 = {
 		const newAttribs = {
 			...attributes,
 			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			tagName: ! attributes.tagName ? 'div' : attributes.tagName,
 		};
+
+		const { title, contentAlign, align, ...restAttributes } = newAttribs;
+
 		return [
-			omit( newAttribs, [ 'title', 'contentAlign', 'align' ] ),
+			restAttributes,
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
@@ -1003,9 +1429,12 @@ const v1 = {
 		const newAttribs = {
 			...attributes,
 			dimRatio: ! attributes.url ? 100 : attributes.dimRatio,
+			tagName: ! attributes.tagName ? 'div' : attributes.tagName,
 		};
+		const { title, contentAlign, align, ...restAttributes } = newAttribs;
+
 		return [
-			omit( newAttribs, [ 'title', 'contentAlign', 'align' ] ),
+			restAttributes,
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
@@ -1018,4 +1447,4 @@ const v1 = {
 	},
 };
 
-export default [ v8, v7, v6, v5, v4, v3, v2, v1 ];
+export default [ v11, v10, v9, v8, v7, v6, v5, v4, v3, v2, v1 ];

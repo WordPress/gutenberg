@@ -1,19 +1,12 @@
 /**
  * Internal dependencies
  */
-import type { Props as TruncateProps } from '../truncate/types';
+import type { TruncateProps } from '../truncate/types';
 
 /**
  * External dependencies
  */
 import type { CSSProperties } from 'react';
-
-type TextAdjustLineHeightForInnerControls =
-	| boolean
-	| 'large'
-	| 'medium'
-	| 'small'
-	| 'xSmall';
 
 export type TextSize =
 	| 'body'
@@ -35,7 +28,12 @@ export interface Props extends TruncateProps {
 	/**
 	 * Automatically calculate the appropriate line-height value for contents that render text and Control elements (e.g. `TextInput`).
 	 */
-	adjustLineHeightForInnerControls?: TextAdjustLineHeightForInnerControls;
+	adjustLineHeightForInnerControls?:
+		| boolean
+		| 'large'
+		| 'medium'
+		| 'small'
+		| 'xSmall';
 	/**
 	 * Adjusts the text color.
 	 */

@@ -16,13 +16,13 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/button' ],
 			transform: ( buttons ) =>
-				// Creates the buttons block
+				// Creates the buttons block.
 				createBlock(
 					name,
 					{},
-					// Loop the selected buttons
+					// Loop the selected buttons.
 					buttons.map( ( attributes ) =>
-						// Create singular button in the buttons block
+						// Create singular button in the buttons block.
 						createBlock( 'core/button', attributes )
 					)
 				),
@@ -32,22 +32,22 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( buttons ) =>
-				// Creates the buttons block
+				// Creates the buttons block.
 				createBlock(
 					name,
 					{},
-					// Loop the selected buttons
+					// Loop the selected buttons.
 					buttons.map( ( attributes ) => {
 						const element = createElement(
 							document,
 							attributes.content
 						);
-						// Remove any HTML tags
+						// Remove any HTML tags.
 						const text = element.innerText || '';
-						// Get first url
+						// Get first url.
 						const link = element.querySelector( 'a' );
 						const url = link?.getAttribute( 'href' );
-						// Create singular button in the buttons block
+						// Create singular button in the buttons block.
 						return createBlock( 'core/button', {
 							text,
 							url,

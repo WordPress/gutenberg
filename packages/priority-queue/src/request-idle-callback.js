@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import 'requestidlecallback';
+
+/**
  * @typedef {( timeOrDeadline: IdleDeadline | number ) => void} Callback
  */
 
@@ -12,7 +17,7 @@ export function createRequestIdleCallback() {
 		};
 	}
 
-	return window.requestIdleCallback || window.requestAnimationFrame;
+	return window.requestIdleCallback;
 }
 
 export default createRequestIdleCallback();

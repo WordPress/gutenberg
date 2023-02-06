@@ -22,64 +22,11 @@
 	}
 
 	/**
-	 * The following styles replicate the separated border of the
-	 * `ItemGroup` component but allows for hidden items. This is because
-	 * to maintain the order of `ToolsPanel` controls, each `ToolsPanelItem`
-	 * must at least render a placeholder which would otherwise interfere
-	 * with the `:last-child` styles.
+	 * After converting PanelColorGradientSettings to render as a ToolsPanel
+	 * we need to remove the top margin when wrapping inner content due to
+	 * rendering via SlotFills.
 	 */
-	.block-editor-tools-panel-color-gradient-settings__item {
-		padding: 0;
-
-		// Border styles.
-		border-left: 1px solid rgba(0, 0, 0, 0.1);
-		border-right: 1px solid rgba(0, 0, 0, 0.1);
-		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-
-		&.first {
-			border-top-left-radius: 2px;
-			border-top-right-radius: 2px;
-			border-top: 1px solid rgba(0, 0, 0, 0.1);
-		}
-
-		&.last {
-			border-bottom-left-radius: 2px;
-			border-bottom-right-radius: 2px;
-		}
-
-		> div,
-		> div > button {
-			border-radius: inherit;
-		}
-	}
-
-	.block-editor-panel-color-gradient-settings__color-indicator {
-		// Show a diagonal line (crossed out) for empty swatches.
-		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
-	}
-
-	/**
-	 * The following few styles fix the layout and spacing for the due to the
-	 * introduced wrapper element by the `Item` component.
-	 */
-	.block-editor-tools-panel-color-dropdown {
-		display: block;
-		padding: 0;
-
-		> button {
-			height: 46px;
-
-			&.is-open {
-				background: $gray-100;
-				color: var(--wp-admin-theme-color);
-			}
-		}
-	}
-
-	.color-block-support-panel__item-group {
-		> div {
-			grid-column: span 2;
-			border-radius: inherit;
-		}
+	.block-editor-tools-panel-color-gradient-settings__item.first {
+		margin-top: 0;
 	}
 }

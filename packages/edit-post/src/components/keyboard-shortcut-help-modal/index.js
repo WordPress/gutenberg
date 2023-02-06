@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,7 +40,7 @@ const ShortcutList = ( { shortcuts } ) => (
 				className="edit-post-keyboard-shortcut-help-modal__shortcut"
 				key={ index }
 			>
-				{ isString( shortcut ) ? (
+				{ typeof shortcut === 'string' ? (
 					<DynamicShortcut name={ shortcut } />
 				) : (
 					<Shortcut { ...shortcut } />
@@ -101,7 +100,7 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 		<Modal
 			className="edit-post-keyboard-shortcut-help-modal"
 			title={ __( 'Keyboard shortcuts' ) }
-			closeLabel={ __( 'Close' ) }
+			closeButtonLabel={ __( 'Close' ) }
 			onRequestClose={ toggleModal }
 		>
 			<ShortcutSection

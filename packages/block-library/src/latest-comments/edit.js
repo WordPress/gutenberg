@@ -25,17 +25,13 @@ const MIN_COMMENTS = 1;
 const MAX_COMMENTS = 100;
 
 export default function LatestComments( { attributes, setAttributes } ) {
-	const {
-		commentsToShow,
-		displayAvatar,
-		displayDate,
-		displayExcerpt,
-	} = attributes;
+	const { commentsToShow, displayAvatar, displayDate, displayExcerpt } =
+		attributes;
 
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
-				<PanelBody title={ __( 'Latest comments settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Display avatar' ) }
 						checked={ displayAvatar }
@@ -60,6 +56,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 						}
 					/>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Number of comments' ) }
 						value={ commentsToShow }
 						onChange={ ( value ) =>
@@ -75,6 +72,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 				<ServerSideRender
 					block="core/latest-comments"
 					attributes={ attributes }
+					skipBlockSupportAttributes
 					// The preview uses the site's locale to make it more true to how
 					// the block appears on the frontend. Setting the locale
 					// explicitly prevents any middleware from setting it to 'user'.

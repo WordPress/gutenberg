@@ -19,7 +19,7 @@ function ContrastChecker( {
 	fallbackBackgroundColor,
 	fallbackTextColor,
 	fallbackLinkColor,
-	fontSize, // font size value in pixels
+	fontSize, // Font size value in pixels.
 	isLargeText,
 	textColor,
 	linkColor,
@@ -84,14 +84,14 @@ function ContrastChecker( {
 			message =
 				backgroundColorBrightness < colordTextColor.brightness()
 					? sprintf(
-							// translators: %s is a type of text color, e.g., "text color" or "link color"
+							// translators: %s is a type of text color, e.g., "text color" or "link color".
 							__(
 								'This color combination may be hard for people to read. Try using a darker background color and/or a brighter %s.'
 							),
 							item.description
 					  )
 					: sprintf(
-							// translators: %s is a type of text color, e.g., "text color" or "link color"
+							// translators: %s is a type of text color, e.g., "text color" or "link color".
 							__(
 								'This color combination may be hard for people to read. Try using a brighter background color and/or a darker %s.'
 							),
@@ -138,4 +138,7 @@ function ContrastChecker( {
 	);
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/contrast-checker/README.md
+ */
 export default ContrastChecker;

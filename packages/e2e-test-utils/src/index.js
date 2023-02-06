@@ -37,26 +37,29 @@ export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
 export { getCurrentPostContent } from './get-current-post-content';
+export { getListViewBlocks } from './get-list-view-blocks';
 export { hasBlockSwitcher } from './has-block-switcher';
 export { getPageError } from './get-page-error';
 export { getOption } from './get-option';
 export {
-	insertBlock,
-	insertPattern,
-	insertReusableBlock,
-	searchForBlock,
-	searchForPattern,
-	searchForReusableBlock,
-	insertBlockDirectoryBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
 	toggleGlobalBlockInserter,
+	searchForBlock,
+	searchForPattern,
+	searchForReusableBlock,
+	searchForBlockDirectoryBlock,
+	insertBlock,
+	insertPattern,
+	insertReusableBlock,
+	insertBlockDirectoryBlock,
 } from './inserter';
 export { installPlugin } from './install-plugin';
 export { installTheme } from './install-theme';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
 export { loginUser } from './login-user';
+export { logout } from './logout';
 export { createMenu, deleteAllMenus } from './menus';
 export {
 	enableFocusLossObservation,
@@ -66,6 +69,7 @@ export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openPublishPanel } from './open-publish-panel';
 export { openTypographyToolsPanelMenu } from './open-typography-tools-panel-menu';
 export { trashAllPosts } from './posts';
+export { resetPreferences } from './preferences';
 export { pressKeyTimes } from './press-key-times';
 export {
 	pressKeyWithModifier,
@@ -78,6 +82,7 @@ export { selectBlockByClientId } from './select-block-by-client-id';
 export { setBrowserViewport } from './set-browser-viewport';
 export { setOption } from './set-option';
 export { setPostContent } from './set-post-content';
+export { switchBlockInspectorTab } from './switch-block-inspector-tab.js';
 export { switchEditorModeTo } from './switch-editor-mode-to';
 export { switchUserToAdmin } from './switch-user-to-admin';
 export { switchUserToTest } from './switch-user-to-test';
@@ -86,6 +91,7 @@ export { toggleMoreMenu } from './toggle-more-menu';
 export { toggleOfflineMode, isOfflineMode } from './offline-mode';
 export { togglePreferencesOption } from './toggle-preferences-option';
 export { transformBlockTo } from './transform-block-to';
+export { trashAllComments } from './trash-all-comments';
 export { uninstallPlugin } from './uninstall-plugin';
 export { visitAdminPage } from './visit-admin-page';
 export { waitForWindowDimensions } from './wait-for-window-dimensions';
@@ -93,26 +99,21 @@ export { showBlockToolbar } from './show-block-toolbar';
 export { openPreviewPage } from './preview';
 export { wpDataSelect } from './wp-data-select';
 export { deleteAllWidgets } from './widgets';
+export { deleteAllTemplates } from './templates';
 export {
 	rest as __experimentalRest,
 	batch as __experimentalBatch,
 } from './rest-api';
 export { openListView, closeListView } from './list-view';
 export {
-	clickSiteEditorMenuItem,
-	closeSiteEditorNavigationPanel,
 	disableSiteEditorWelcomeGuide,
 	getCurrentSiteEditorContent,
-	getSiteEditorMenuItem,
-	isSiteEditorRoot,
-	navigateSiteEditorBack,
-	navigateSiteEditorBackToRoot,
-	openSiteEditorNavigationPanel,
-	siteEditorNavigateSequence,
 	visitSiteEditor,
 	toggleGlobalStyles,
+	enterEditMode,
 	openGlobalStylesPanel,
 	openPreviousGlobalStylesPanel,
 } from './site-editor';
+export { createNewTemplate } from './create-new-template';
 
 export * from './mocks';

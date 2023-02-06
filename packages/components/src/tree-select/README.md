@@ -80,12 +80,12 @@ A function that receives the id of the new node element that is being selected.
 
 The id of the currently selected node.
 
--   Type: `Object`
+-   Type: `string` | `string[]`
 -   Required: No
 
 ### tree
 
 An array containing the tree objects with the possible nodes the user can select.
 
--   Type: `String`
+-   Type: `Object[]`
 -   Required: No

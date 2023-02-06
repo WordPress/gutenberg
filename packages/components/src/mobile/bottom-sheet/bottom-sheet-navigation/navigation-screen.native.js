@@ -7,13 +7,12 @@ import {
 	useFocusEffect,
 } from '@react-navigation/native';
 import { View, ScrollView, TouchableHighlight } from 'react-native';
-import { debounce } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { BottomSheetContext } from '@wordpress/components';
-
+import { debounce } from '@wordpress/compose';
 import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
 
 /**
@@ -42,6 +41,9 @@ const BottomSheetNavigationScreen = ( {
 
 	const { setHeight } = useContext( BottomSheetNavigationContext );
 
+	// Disable reason: deferring this refactor to the native team.
+	// see https://github.com/WordPress/gutenberg/pull/41166
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [
 		setHeight,
 	] );
@@ -69,8 +71,10 @@ const BottomSheetNavigationScreen = ( {
 			 * Ideally, we refactor onHandleHardwareButtonPress to manage multiple
 			 * callbacks triggered based upon which screen is currently active.
 			 *
-			 * Related: https://git.io/JD2no
+			 * Related: https://github.com/WordPress/gutenberg/pull/36328#discussion_r768897546
 			 */
+			// see https://github.com/WordPress/gutenberg/pull/41166
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [] )
 	);
 
@@ -84,6 +88,9 @@ const BottomSheetNavigationScreen = ( {
 				setHeight( heightRef.current.maxHeight );
 			}
 			return () => {};
+			// Disable reason: deferring this refactor to the native team.
+			// see https://github.com/WordPress/gutenberg/pull/41166
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [ setHeight ] )
 	);
 
@@ -128,7 +135,19 @@ const BottomSheetNavigationScreen = ( {
 				</TouchableHighlight>
 			</ScrollView>
 		);
-	}, [ children, isFocused, safeAreaBottomInset, listProps ] );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [
+		children,
+		isFocused,
+		safeAreaBottomInset,
+		listProps,
+		name,
+		isScrollable,
+		isNested,
+		onLayout,
+	] );
 };
 
 export default BottomSheetNavigationScreen;

@@ -189,12 +189,14 @@ describe( 'converting menu items to blocks', () => {
 				name: 'core/navigation-submenu',
 				attributes: expect.objectContaining( {
 					label: 'Top Level',
+					isTopLevelItem: true,
 				} ),
 				innerBlocks: [
 					expect.objectContaining( {
 						name: 'core/navigation-link',
 						attributes: expect.objectContaining( {
 							label: 'Child 1',
+							isTopLevelLink: false,
 						} ),
 						innerBlocks: [],
 					} ),
@@ -202,18 +204,21 @@ describe( 'converting menu items to blocks', () => {
 						name: 'core/navigation-submenu',
 						attributes: expect.objectContaining( {
 							label: 'Child 2',
+							isTopLevelItem: false,
 						} ),
 						innerBlocks: [
 							expect.objectContaining( {
 								name: 'core/navigation-submenu',
 								attributes: expect.objectContaining( {
 									label: 'Sub Child',
+									isTopLevelItem: false,
 								} ),
 								innerBlocks: [
 									expect.objectContaining( {
 										name: 'core/navigation-link',
 										attributes: expect.objectContaining( {
 											label: 'Sub Sub Child',
+											isTopLevelLink: false,
 										} ),
 										innerBlocks: [],
 									} ),
@@ -227,6 +232,7 @@ describe( 'converting menu items to blocks', () => {
 				name: 'core/navigation-link',
 				attributes: expect.objectContaining( {
 					label: 'Top Level 2',
+					isTopLevelLink: true,
 				} ),
 				innerBlocks: [],
 			} ),
@@ -320,7 +326,7 @@ describe( 'converting menu items to blocks', () => {
 				type_label: 'Custom Link',
 				object: 'custom',
 				parent: 0,
-				menu_order: 0, // capturing 0 edge case.
+				menu_order: 0, // Capturing 0 edge case.
 				target: '',
 				classes: [ '' ],
 				xfn: [ '' ],

@@ -1,15 +1,7 @@
 /**
  * External dependencies
  */
-const {
-	countBy,
-	groupBy,
-	escapeRegExp,
-	uniq,
-	flow,
-	sortBy,
-	uniqBy,
-} = require( 'lodash' );
+const { groupBy } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -90,7 +82,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Enhancement': 'Enhancements',
 	'[Type] New API': 'New APIs',
 	'[Type] Performance': 'Performance',
-	'[Type] Documentation': 'Documentation',
+	'[Type] Developer Documentation': 'Documentation',
 	'[Type] Code Quality': 'Code Quality',
 	'[Type] Security': 'Security',
 };
@@ -144,7 +136,7 @@ const LABEL_FEATURE_MAPPING = {
 	'Automated Testing': 'Testing',
 	'CSS Styling': 'CSS & Styling',
 	'developer-docs': 'Documentation',
-	'[Type] Documentation': 'Documentation',
+	'[Type] Developer Documentation': 'Documentation',
 	'Global Styles': 'Global Styles',
 	'[Type] Build Tooling': 'Build Tooling',
 	'npm Packages': 'npm Packages',
@@ -194,6 +186,32 @@ const REWORD_TERMS = {
 };
 
 /**
+ * Creates a pipe function. Performs left-to-right function composition, where
+ * each successive invocation is supplied the return value of the previous.
+ *
+ * @param {Function[]} functions Functions to pipe.
+ */
+function pipe( functions ) {
+	return ( /** @type {unknown[]} */ ...args ) => {
+		return functions.reduce(
+			( prev, func ) => [ func( ...prev ) ],
+			args
+		)[ 0 ];
+	};
+}
+
+/**
+ * Escapes the RegExp special characters.
+ *
+ * @param {string} string Input string.
+ *
+ * @return {string} Regex-escaped string.
+ */
+function escapeRegExp( string ) {
+	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
+}
+
+/**
  * Returns candidates based on whether the given labels
  * are part of the allowed list.
  *
@@ -202,13 +220,15 @@ const REWORD_TERMS = {
  * @return {string[]} Type candidates.
  */
 function getTypesByLabels( labels ) {
-	return uniq(
-		labels
-			.filter( ( label ) =>
-				Object.keys( LABEL_TYPE_MAPPING ).includes( label )
-			)
-			.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
-	);
+	return [
+		...new Set(
+			labels
+				.filter( ( label ) =>
+					Object.keys( LABEL_TYPE_MAPPING ).includes( label )
+				)
+				.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
+		),
+	];
 }
 
 /**
@@ -309,7 +329,17 @@ function getIssueFeature( issue ) {
 	// 1. Prefer explicit mapping of label to feature.
 	if ( featureCandidates.length ) {
 		// Get occurances of the feature labels.
-		const featureCounts = countBy( featureCandidates );
+		const featureCounts = featureCandidates.reduce(
+			/**
+			 * @param {Record<string,number>} acc     Accumulator
+			 * @param {string}                feature Feature label
+			 */
+			( acc, feature ) => ( {
+				...acc,
+				[ feature ]: ( acc[ feature ] || 0 ) + 1,
+			} ),
+			{}
+		);
 
 		// Check which matching label occurs most often.
 		const rankedFeatures = Object.keys( featureCounts ).sort(
@@ -320,7 +350,7 @@ function getIssueFeature( issue ) {
 		return rankedFeatures[ 0 ];
 	}
 
-	// 2. `[Feature]` labels
+	// 2. `[Feature]` labels.
 	const featureSpecificLabel = getFeatureSpecificLabels( labels );
 
 	if ( featureSpecificLabel ) {
@@ -681,7 +711,10 @@ async function fetchAllPullRequests( octokit, settings ) {
 function getChangelog( pullRequests ) {
 	let changelog = '## Changelog\n\n';
 
-	const groupedPullRequests = groupBy( pullRequests, getIssueType );
+	const groupedPullRequests = groupBy(
+		skipCreatedByBots( pullRequests ),
+		getIssueType
+	);
 
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
 
@@ -753,7 +786,7 @@ function getChangelog( pullRequests ) {
 function sortFeatureGroups( featureGroups ) {
 	return Object.keys( featureGroups ).sort(
 		( featureAName, featureBName ) => {
-			// Sort "uncategorized" items to *always* be at the top of the section
+			// Sort "uncategorized" items to *always* be at the top of the section.
 			if ( featureAName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
 				return -1;
 			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
@@ -779,10 +812,6 @@ function sortFeatureGroups( featureGroups ) {
  */
 function getFirstTimeContributorPRs( pullRequests ) {
 	return pullRequests.filter( ( pr ) => {
-		if ( pr.user.type.toLowerCase() === 'bot' ) {
-			return false;
-		}
-
 		return pr.labels.find(
 			( { name } ) => name.toLowerCase() === 'first-time contributor'
 		);
@@ -797,7 +826,7 @@ function getFirstTimeContributorPRs( pullRequests ) {
  *
  * @return {string} The formatted markdown list of contributors and their PRs.
  */
-function getContributorMarkdownList( ftcPRs ) {
+function getContributorPropsMarkdownList( ftcPRs ) {
 	return ftcPRs.reduce( ( markdownList, pr ) => {
 		const title = getNormalizedTitle( pr.title, pr ) || '';
 
@@ -820,7 +849,9 @@ function getContributorMarkdownList( ftcPRs ) {
  * @return {IssuesListForRepoResponseItem[]} The sorted list of pull requests.
  */
 function sortByUsername( items ) {
-	return sortBy( items, ( item ) => item.user.login );
+	return [ ...items ].sort( ( a, b ) =>
+		a.user.login.toLowerCase().localeCompare( b.user.login.toLowerCase() )
+	);
 }
 
 /**
@@ -830,7 +861,69 @@ function sortByUsername( items ) {
  * @return {IssuesListForRepoResponseItem[]} The list of pull requests unique per user.
  */
 function getUniqueByUsername( items ) {
-	return uniqBy( items, ( item ) => item.user.login );
+	/**
+	 * @type {IssuesListForRepoResponseItem[]} List of pull requests.
+	 */
+	const EMPTY_PR_LIST = [];
+
+	return items.reduce( ( acc, item ) => {
+		if ( ! acc.some( ( i ) => i.user.login === item.user.login ) ) {
+			acc.push( item );
+		}
+		return acc;
+	}, EMPTY_PR_LIST );
+}
+
+/**
+ * Excludes users who should not be included in the changelog.
+ * Typically this is "bot" users.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ * @return {IssuesListForRepoResponseItem[]} The list of filtered pull requests.
+ */
+function skipCreatedByBots( pullRequests ) {
+	return pullRequests.filter(
+		( pr ) => pr.user.type.toLowerCase() !== 'bot'
+	);
+}
+
+/**
+ * Produces the formatted markdown for the contributor props seciton.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {string} The formatted props section.
+ */
+function getContributorProps( pullRequests ) {
+	const contributorsList = pipe( [
+		skipCreatedByBots,
+		getFirstTimeContributorPRs,
+		getUniqueByUsername,
+		sortByUsername,
+		getContributorPropsMarkdownList,
+	] )( pullRequests );
+
+	return (
+		'## First time contributors' +
+		'\n\n' +
+		'The following PRs were merged by first time contributors:' +
+		'\n\n' +
+		contributorsList
+	);
+}
+
+/**
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of first time contributor PRs.
+ * @return {string} The formatted markdown list of contributor usernames.
+ */
+function getContributorsMarkdownList( pullRequests ) {
+	return pullRequests
+		.reduce( ( markdownList = '', pr ) => {
+			markdownList += ` @${ pr.user.login }`;
+			return markdownList;
+		}, '' )
+		.trim();
 }
 
 /**
@@ -841,18 +934,19 @@ function getUniqueByUsername( items ) {
  *
  * @return {string} The formatted contributors section.
  */
-function getContributors( pullRequests ) {
-	const contributorsList = flow( [
-		getFirstTimeContributorPRs,
+function getContributorsList( pullRequests ) {
+	const contributorsList = pipe( [
+		skipCreatedByBots,
 		getUniqueByUsername,
 		sortByUsername,
-		getContributorMarkdownList,
+		getContributorsMarkdownList,
 	] )( pullRequests );
 
 	return (
-		'## First time contributors' +
 		'\n\n' +
-		'The following PRs were merged by first time contrbutors:' +
+		'## Contributors' +
+		'\n\n' +
+		'The following contributors merged PRs in this release:' +
 		'\n\n' +
 		contributorsList
 	);
@@ -880,9 +974,14 @@ async function createChangelog( settings ) {
 		const pullRequests = await fetchAllPullRequests( octokit, settings );
 
 		const changelog = getChangelog( pullRequests );
-		const contributors = getContributors( pullRequests );
+		const contributorProps = getContributorProps( pullRequests );
+		const contributorsList = getContributorsList( pullRequests );
 
-		releaselog = releaselog.concat( changelog, contributors );
+		releaselog = releaselog.concat(
+			changelog,
+			contributorProps,
+			contributorsList
+		);
 	} catch ( error ) {
 		if ( error instanceof Error ) {
 			releaselog = formats.error( error.stack );
@@ -933,7 +1032,9 @@ async function getReleaseChangelog( options ) {
 	getTypesByLabels,
 	getTypesByTitle,
 	getFormattedItemDescription,
-	getContributors,
+	getContributorProps,
+	getContributorsList,
 	getChangelog,
 	getUniqueByUsername,
+	skipCreatedByBots,
 };

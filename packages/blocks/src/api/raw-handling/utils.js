@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues, mergeWith, isFunction } from 'lodash';
+import { mapValues, mergeWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,7 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
 		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
 
-		schema = isFunction( schema ) ? schema( schemaArgs ) : schema;
+		schema = typeof schema === 'function' ? schema( schemaArgs ) : schema;
 
 		// If the block does not has anchor support and the transform does not
 		// provides an isMatch we can return the schema right away.

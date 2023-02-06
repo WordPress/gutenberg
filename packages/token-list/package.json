@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/token-list",
-	"version": "2.3.0",
+	"version": "2.26.0",
 	"description": "Constructable, plain JavaScript DOMTokenList implementation, supporting non-browser runtimes.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,8 +26,7 @@
 	"react-native": "src/index",
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
-		"lodash": "^4.17.21"
+		"@babel/runtime": "^7.16.0"
 	},
 	"publishConfig": {
 		"access": "public"

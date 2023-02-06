@@ -1,9 +1,15 @@
+// Import styles for rendering the static content of deprecated block versions.
+@import "./deprecated.scss";
+
 .wp-block-separator {
 	border: none;
 	border-bottom: 2px solid currentColor;
 	margin-left: auto;
 	margin-right: auto;
-	opacity: 0.4;
+
+	&.has-alpha-channel-opacity {
+		opacity: initial;
+	}
 
 	// Default, thin style
 	&:not(.is-style-wide):not(.is-style-dots) {

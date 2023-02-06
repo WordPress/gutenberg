@@ -29,8 +29,9 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"anchor": true,
-		"className": false,
+		"className": true,
 		"color": {
+			"gradients": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
@@ -38,22 +39,24 @@
 			}
 		},
 		"spacing": {
-			"margin": true
+			"margin": true,
+			"padding": true
 		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true,
 				"fontAppearance": true,
 				"textTransform": true
 			}
 		},
-		"__experimentalSelector": "h1,h2,h3,h4,h5,h6",
 		"__unstablePasteTextInline": true,
 		"__experimentalSlashInserter": true
 	},

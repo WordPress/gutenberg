@@ -80,11 +80,15 @@ registerCoreBlocks();
 
 ### AlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
 ### AlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
 ### Autocomplete
 
@@ -94,11 +98,15 @@ _Related_
 
 ### BlockAlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
 ### BlockAlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
 ### BlockBreadcrumb
 
@@ -151,11 +159,15 @@ Undocumented declaration.
 
 ### BlockIcon
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-icon/README.md>
 
 ### BlockInspector
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md>
 
 ### BlockList
 
@@ -163,7 +175,9 @@ Undocumented declaration.
 
 ### BlockMover
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-mover/README.md>
 
 ### BlockNavigationDropdown
 
@@ -221,21 +235,28 @@ cannot be determined.
 _Usage_
 
 ```jsx
-<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+<BlockTitle
+	clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1"
+	maximumLength={ 17 }
+/>
 ```
 
 _Parameters_
 
 -   _props_ `Object`:
 -   _props.clientId_ `string`: Client ID of block.
+-   _props.maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
+-   _props.context_ `string|undefined`: The context to pass to `getBlockLabel`.
 
 _Returns_
 
--   `?string`: Block title.
+-   `JSX.Element`: Block title.
 
 ### BlockToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md>
 
 ### BlockTools
 
@@ -251,11 +272,15 @@ _Parameters_
 
 ### BlockVerticalAlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
 ### BlockVerticalAlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
 ### ButtonBlockAppender
 
@@ -279,11 +304,15 @@ Undocumented declaration.
 
 ### ContrastChecker
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/contrast-checker/README.md>
 
 ### CopyHandler
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/copy-handler/README.md>
 
 ### createCustomColorsHOC
 
@@ -319,9 +348,15 @@ _Returns_
 
 Undocumented declaration.
 
+### experiments
+
+Experimental @wordpress/block-editor APIs.
+
 ### FontSizePicker
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
 
 ### getColorClassName
 
@@ -364,6 +399,45 @@ _Returns_
 
 -   `?Object`: Color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
 
+### getComputedFluidTypographyValue
+
+Computes a fluid font-size value that uses clamp(). A minimum and maximum
+font size OR a single font size can be specified.
+
+If a single font size is specified, it is scaled up and down by
+minimumFontSizeFactor and maximumFontSizeFactor to arrive at the minimum and
+maximum sizes.
+
+_Usage_
+
+```js
+// Calculate fluid font-size value from a minimum and maximum value.
+const fontSize = getComputedFluidTypographyValue( {
+	minimumFontSize: '20px',
+	maximumFontSize: '45px',
+} );
+// Calculate fluid font-size value from a single font size.
+const fontSize = getComputedFluidTypographyValue( {
+	fontSize: '30px',
+} );
+```
+
+_Parameters_
+
+-   _args_ `Object`:
+-   _args.minimumViewPortWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+-   _args.maximumViewPortWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+-   _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
+-   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
+-   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
+-   _args.scaleFactor_ `?number`: A scale factor to determine how fast a font scales within boundaries. Optional.
+-   _args.minimumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive minimumFontSize. Optional.
+-   _args.minimumFontSizeLimit_ `?string`: The smallest a calculated font size may be. Optional.
+
+_Returns_
+
+-   `string|null`: A font-size value using clamp().
+
 ### getFontSize
 
 Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
@@ -389,7 +463,7 @@ _Parameters_
 
 _Returns_
 
--   `string`: String with the class corresponding to the fontSize passed. The class is generated by appending 'has-' followed by fontSizeSlug in kebabCase and ending with '-font-size'.
+-   `string | undefined`: String with the class corresponding to the fontSize passed. The class is generated by appending 'has-' followed by fontSizeSlug in kebabCase and ending with '-font-size'.
 
 ### getFontSizeObjectByValue
 
@@ -443,6 +517,39 @@ _Returns_
 
 -   `string`: returns the cssUnit value in a simple px format.
 
+### getTypographyClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's typography support
+attributes.
+
+_Parameters_
+
+-   _attributes_ `Object`: Block attributes.
+-   _fluidTypographySettings_ `Object|boolean`: If boolean, whether the function should try to convert font sizes to fluid values, otherwise an object containing theme fluid typography settings.
+
+_Returns_
+
+-   `Object`: Typography block support derived CSS classes & styles.
+
+### HeightControl
+
+HeightControl renders a linked unit control and range control for adjusting the height of a block.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/height-control/README.md>
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.label_ `?string`: A label for the control.
+-   _props.onChange_ `( value: string ) => void`: Called when the height changes.
+-   _props.value_ `string`: The current height value.
+
+_Returns_
+
+-   `WPComponent`: The component to be rendered.
+
 ### InnerBlocks
 
 _Related_
@@ -465,15 +572,21 @@ _Related_
 
 ### JustifyContentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
 ### JustifyToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
 ### LineHeightControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md>
 
 ### MediaPlaceholder
 
@@ -483,7 +596,9 @@ _Related_
 
 ### MediaReplaceFlow
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md>
 
 ### MediaUpload
 
@@ -560,7 +675,11 @@ _Properties_
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
+-   _canLockBlocks_ `boolean`: Whether the user can manage Block Lock state
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
+-   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
+-   _enableOpenverseMediaCategory_ `boolean`: Enable/Disable the Openverse media category in the inserter.
+-   _clearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
@@ -569,7 +688,9 @@ _Properties_
 
 ### SkipToSelectedBlock
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md>
 
 ### store
 
@@ -579,10 +700,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
-_Type_
-
--   `Object`
-
 ### storeConfig
 
 Block editor data store configuration.
@@ -590,10 +707,6 @@ Block editor data store configuration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
-
-_Type_
-
--   `Object`
 
 ### ToolSelector
 
@@ -644,7 +757,7 @@ to try to find a match we need to things:
 1\. Block's client id to extract it's current attributes.
 2\. A block variation should have set `isActive` prop to a proper function.
 
-If for any reason a block variaton match cannot be found,
+If for any reason a block variation match cannot be found,
 the returned information come from the Block Type.
 If no blockType is found with the provided clientId, returns null.
 
@@ -720,8 +833,10 @@ _Parameters_
 
 ### useSetting
 
-Hook that retrieves the editor setting.
-It works with nested objects using by finding the value at path.
+Hook that retrieves the given setting for the block instance in use.
+
+It looks up the settings first in the block instance hierarchy.
+If none is found, it'll look it up in the block editor store.
 
 _Usage_
 
@@ -736,30 +851,6 @@ _Parameters_
 _Returns_
 
 -   `any`: Returns the value defined for the setting.
-
-### validateThemeColors
-
-Given an array of theme colors checks colors for validity
-
-_Parameters_
-
--   _colors_ `Array`: The array of theme colors
-
-_Returns_
-
--   `Array`: The array of valid theme colors or the default colors
-
-### validateThemeGradients
-
-Given an array of theme gradients checks gradients for validity
-
-_Parameters_
-
--   _gradients_ `Array`: The array of theme gradients
-
-_Returns_
-
--   `Array`: The array of valid theme gradients or the default gradients
 
 ### Warning
 

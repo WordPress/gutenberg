@@ -1,6 +1,6 @@
-# Block Filters
+# Block Hooks
 
-To modify the behavior of existing blocks, WordPress exposes several APIs:
+To modify the behavior of existing blocks, WordPress exposes several APIs.
 
 ## Registration
 
@@ -51,7 +51,7 @@ register_block_type( __DIR__ );
 
 ### `blocks.registerBlockType`
 
-Used to filter the block settings when registering the block on the client with JavaScript. It receives the block settings and the name of the registered block as arguments. This filter is also applied to each of a block's deprecated settings.
+Used to filter the block settings when registering the block on the client with JavaScript. It receives the block settings, the name of the registered block, and either null or the deprecated block settings (when applied to a registered deprecation) as arguments. This filter is also applied to each of a block's deprecated settings.
 
 _Example:_
 
@@ -85,7 +85,34 @@ The following filters are available to change the behavior of blocks while editi
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
-The filter's callback receives an element, a block type and the block attributes as arguments. It should return an element.
+The filter's callback receives an element, a block type definition object and the block attributes as arguments. It should return an element.
+
+_Example:_
+
+Wraps a cover block into an outer container.
+
+```js
+function wrapCoverBlockInContainer( element, blockType, attributes ) {
+	// skip if element is undefined
+	if ( ! element ) {
+		return;
+	}
+
+	// only apply to cover blocks
+	if ( blockType.name !== 'core/cover' ) {
+		return element;
+	}
+
+	// return the element wrapped in a div
+	return <div className="cover-block-wrapper">{ element }</div>;
+}
+
+wp.hooks.addFilter(
+	'blocks.getSaveElement',
+	'my-plugin/wrap-cover-block-in-container',
+	wrapCoverBlockInContainer
+);
+```
 
 #### `blocks.getSaveContent.extraProps`
 
@@ -152,19 +179,18 @@ _Example:_
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
-const { Fragment } = wp.element;
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody } = wp.components;
 
 const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		return (
-			<Fragment>
+			<>
 				<BlockEdit { ...props } />
 				<InspectorControls>
 					<PanelBody>My custom control</PanelBody>
 				</InspectorControls>
-			</Fragment>
+			</>
 		);
 	};
 }, 'withInspectorControl' );

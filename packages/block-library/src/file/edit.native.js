@@ -72,28 +72,22 @@ export class FileEdit extends Component {
 		this.onLayout = this.onLayout.bind( this );
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.onChangeFileName = this.onChangeFileName.bind( this );
-		this.onChangeDownloadButtonText = this.onChangeDownloadButtonText.bind(
-			this
-		);
+		this.onChangeDownloadButtonText =
+			this.onChangeDownloadButtonText.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind( this );
 		this.getFileComponent = this.getFileComponent.bind( this );
-		this.onChangeDownloadButtonVisibility = this.onChangeDownloadButtonVisibility.bind(
-			this
-		);
+		this.onChangeDownloadButtonVisibility =
+			this.onChangeDownloadButtonVisibility.bind( this );
 		this.onCopyURL = this.onCopyURL.bind( this );
-		this.onChangeOpenInNewWindow = this.onChangeOpenInNewWindow.bind(
-			this
-		);
+		this.onChangeOpenInNewWindow =
+			this.onChangeOpenInNewWindow.bind( this );
 
-		this.onChangeLinkDestinationOption = this.onChangeLinkDestinationOption.bind(
-			this
-		);
+		this.onChangeLinkDestinationOption =
+			this.onChangeLinkDestinationOption.bind( this );
 		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
 		this.onFilePressed = this.onFilePressed.bind( this );
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
@@ -370,7 +364,7 @@ export class FileEdit extends Component {
 	// Render `Text` with `placeholderText` styled as a placeholder
 	// to calculate its width which then is set as a `minWidth`
 	// This should be fixed on RNAztec level. In the mean time,
-	// We use the same strategy implemented in Button block
+	// We use the same strategy implemented in Button block.
 	getPlaceholderWidth( placeholderText ) {
 		const { maxWidth, placeholderTextWidth } = this.state;
 		return (
@@ -398,13 +392,8 @@ export class FileEdit extends Component {
 		const { attributes, media, isSelected } = this.props;
 		const { isButtonFocused, placeholderTextWidth } = this.state;
 
-		const {
-			fileName,
-			downloadButtonText,
-			id,
-			showDownloadButton,
-			align,
-		} = attributes;
+		const { fileName, downloadButtonText, id, showDownloadButton, align } =
+			attributes;
 
 		const minWidth =
 			isButtonFocused ||
@@ -452,7 +441,6 @@ export class FileEdit extends Component {
 						<TouchableWithoutFeedback
 							accessible={ ! isSelected }
 							onPress={ this.onFilePressed }
-							onLongPress={ openMediaOptions }
 							disabled={ ! isSelected }
 						>
 							<View

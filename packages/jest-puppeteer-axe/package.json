@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-puppeteer-axe",
-	"version": "4.0.0",
+	"version": "5.9.0",
 	"description": "Axe API integration with Jest and Puppeteer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=14"
 	},
 	"files": [
 		"build",

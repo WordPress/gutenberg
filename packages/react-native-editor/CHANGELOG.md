@@ -11,10 +11,179 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.88.0 
+-   [*] Bump Android `minSdkVersion` to 24 [#47604]
+-   [*] Update React Native Reanimated to 2.9.1-wp-3 [#47574]
+-   [*] Bump Aztec version to `1.6.3` [#47610]
+
+## 1.87.3
+-   [*] Fix insert blocks not handling raw string properly in unsupported block editor [#47472]
+
+## 1.87.2
+-   [*] Add boolean contentStyle and clientId check to Column Edit InnerBlocks [#47234]
+-   [*] Line-height and font-size regression fixes [#47284]
+
+## 1.87.1
+-   [**] Gallery block: Address styling regression, in which negative margin was added [#47086]
+-   [*] RichText - Parse CSS values and avoid setting undefined ones [#47080]
+
+## 1.87.0
+-   [*] Add capabilities to force only Core blocks and control Support section [#46215]
+
+## 1.86.1
+-   [*] Block Actions Menu - Fix block title regression and adds integration tests [#46699]
+
+## 1.86.0
+-   [**] Upgrade React Native to 0.69.4 [#43485]
+-   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
+
+## 1.85.1
+-   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
+
+## 1.85.0
+-   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
+
+## 1.84.1
+-   [**] Native inner blocks merge where appropriate [#45048]
+
+## 1.84.0
+-   [*] Upgrade compile and target sdk version to Android API 31 [#44610]
+-   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
+
+## 1.83.0
+* No User facing changes *
+
+## 1.82.1
+-   [**] List block v2: Fix issues splitting or merging paragraphs into the block [#43949]
+
+## 1.82.0
+-   [*] [iOS] Explicitly set tint color for action sheets to always be blue [#43759]
+
+## 1.81.2
+-   [**] List V2 - Prevent error when list is empty [#43861]
+
+## 1.81.1
+-   [*] List block v2: Fix text color inconsistencies with list items [#43244]
+-   [*] Use default placeholder text color for native List Item [#43353]
+-   [**] Add BlockListCompact [#43431]
+-   [*] Fix dynamic React Native version [#43058]
+-   [**] Disable FastImage on Android [#43322]
+
+## 1.81.0
+-   [***] List block V2 [#42702]
+
+## 1.80.1
+-   [*] Image - Workaround for Android and orientation changes [#42900]
+
+## 1.80.0
+-   [*] Add React Native FastImage [#42009]
+-   [*] Block inserter displays block collections [#42405]
+-   [*] Fix incorrect spacing within Image alt text footnote [#42504]
+-   [***] Gallery and Image block - Performance improvements [#42178]
+
+## 1.79.1
+-   [**] Fix a crash when scrolling posts containing Embed blocks (Android 12 only) [#42514]
+
+## 1.79.0
+-   [*] Add 'Insert from URL' option to Video block [#41493]
+-   [*] Image block copies the alt text from the media library when selecting an item [#41839]
+-   [*] Introduce "block recovery" option for invalid blocks [#41988]
+
+## 1.78.1
+
+-   [**] Re-introduce support for v1 of the Gallery block to the native version of the editor [#41533]
+-   [**] Fix missing translations for locales that include region (only on Android) [#41685]
+
+## 1.78.0
+
+-   [*] Bump react-native-gesture-handler to version 2.3.2 [#41337]
+
+## 1.77.1
+
+-   [***] Fix crash on iOS related to JSI and Reanimated [#41482]
+
+## 1.77.0
+
+-   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
+-   [*] Add 'Insert from URL' option to Image block [#40334]
+
+## 1.76.3
+
+-   [***] Fix crash on iOS related to JSI and Reanimated [#41482]
+
+## 1.76.2
+
+-   [*] Ensure post title gets focused when is notified from native side [#41371]
+
+## 1.76.1
+
+-   [*] BlockList - Add internal onLayout from CellRendererComponent to BlockListItemCell [#41105]
+-   [*] Fix Drag & Drop Chip positioning issue with RTL languages [#41053]
+-   [*] Add drag & drop help guide in Help & Support screen [#40961]
+-   [**] Fix drag mode not being enabled when long-pressing over Shortcode block [#41155]
+
+## 1.76.0
+
+-   [**] [Buttons block] Fix Android-only issue related to displaying formatting buttons after closing the block settings [#40725]
+-   [**] [Cover block] Improve color contrast between background and text [#40691]
+-   [*] [Gallery block] Fix broken "Link To" settings and add "Image Size" settings [#40947]
+-   [***] Add drag & drop blocks feature [#40424]
+
+## 1.75.0
+
+-   [*] [Latest Posts block] Add featured image settings [#39257]
+-   [*] Prevent incorrect notices displaying when switching between HTML-Visual mode quickly [#40415]
+-   [*] [Embed block] Fix inline preview cut-off when editing URL [#35326]
+-   [*] [iOS] Prevent gaps shown around floating toolbar when using external keyboard [#40266]
+
+## 1.74.1
+
+-   [**] RichText - Set a default value for selection values [#40581]
+
+## 1.74.0
+
+-   [**] [Quote block] Adds support for V2 behind a feature flag [#40133]
+-   [**] Update "add block" button's style in default editor view. [#39726]
+-   [*] Remove banner error notification on upload failure [#39694]
+
+## 1.73.1
+
+-   [*] [Spacer block] Fix crash when changing the height value using the text input [#40053]
+
+## 1.73.0
+
+-   [*] Update react-native-reanimated version to 2.4.1 [#39430]
+-   [*] Upgrade Gradle to 7.4 & AGP to 7.1.1 [#39508]
+-   [*] Add waits to fix editor test flakiness [#39668]
+
+## 1.72.1
+
+-   [*] Detect GIF badge during render [#39882]
+
+## 1.72.0
+
+-   [*] Add GIF badge for animated GIFs uploaded to Image blocks [#38996]
+-   [*] Small refinement to media upload errors, including centring and tweaking copy. [#38951]
+-   [*] Update gesture handler and reanimated libraries [#39098]
+-   [*] Fix issue with list's starting index and the order [#39354]
+
+## 1.71.3
+
+-   [*] Fix autocorrected Headings applying bold formatting on iOS [#38633]
+-   [***] Support for multiple color palettes [#38417]
+
+## 1.71.1
+
+-   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
+
 ## 1.71.0
 
 -   [*] Image block: Replacing the media for an image set as featured prompts to update the featured image [#34666]
 -   [***] Font size and line-height support for text-based blocks used in block-based themes [#38205]
+
+## 1.70.3
+
+-   [*] Highlight text: Check if style attribute value is defined during filtering [#38670]
 
 ## 1.70.2
 

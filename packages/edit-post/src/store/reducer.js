@@ -1,127 +1,7 @@
 /**
- * External dependencies
- */
-import { flow, get, includes, omit, union, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { PREFERENCES_DEFAULTS } from './defaults';
-
-/**
- * Higher-order reducer creator which provides the given initial state for the
- * original reducer.
- *
- * @param {*} initialState Initial state to provide to reducer.
- *
- * @return {Function} Higher-order reducer.
- */
-const createWithInitialState = ( initialState ) => ( reducer ) => {
-	return ( state = initialState, action ) => reducer( state, action );
-};
-
-/**
- * Reducer returning the user preferences.
- *
- * @param {Object}  state                           Current state.
- * @param {string}  state.mode                      Current editor mode, either
- *                                                  "visual" or "text".
- * @param {boolean} state.isGeneralSidebarDismissed Whether general sidebar is
- *                                                  dismissed. False by default
- *                                                  or when closing general
- *                                                  sidebar, true when opening
- *                                                  sidebar.
- * @param {boolean} state.isSidebarOpened           Whether the sidebar is
- *                                                  opened or closed.
- * @param {Object}  state.panels                    The state of the different
- *                                                  sidebar panels.
- * @param {Object}  action                          Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export const preferences = flow( [
-	combineReducers,
-	createWithInitialState( PREFERENCES_DEFAULTS ),
-] )( {
-	panels( state, action ) {
-		switch ( action.type ) {
-			case 'TOGGLE_PANEL_ENABLED': {
-				const { panelName } = action;
-				return {
-					...state,
-					[ panelName ]: {
-						...state[ panelName ],
-						enabled: ! get( state, [ panelName, 'enabled' ], true ),
-					},
-				};
-			}
-
-			case 'TOGGLE_PANEL_OPENED': {
-				const { panelName } = action;
-				const isOpen =
-					state[ panelName ] === true ||
-					get( state, [ panelName, 'opened' ], false );
-				return {
-					...state,
-					[ panelName ]: {
-						...state[ panelName ],
-						opened: ! isOpen,
-					},
-				};
-			}
-		}
-
-		return state;
-	},
-	editorMode( state, action ) {
-		if ( action.type === 'SWITCH_MODE' ) {
-			return action.mode;
-		}
-
-		return state;
-	},
-	hiddenBlockTypes( state, action ) {
-		switch ( action.type ) {
-			case 'SHOW_BLOCK_TYPES':
-				return without( state, ...action.blockNames );
-
-			case 'HIDE_BLOCK_TYPES':
-				return union( state, action.blockNames );
-		}
-
-		return state;
-	},
-	preferredStyleVariations( state, action ) {
-		switch ( action.type ) {
-			case 'UPDATE_PREFERRED_STYLE_VARIATIONS': {
-				if ( ! action.blockName ) {
-					return state;
-				}
-				if ( ! action.blockStyle ) {
-					return omit( state, [ action.blockName ] );
-				}
-				return {
-					...state,
-					[ action.blockName ]: action.blockStyle,
-				};
-			}
-		}
-		return state;
-	},
-	localAutosaveInterval( state, action ) {
-		switch ( action.type ) {
-			case 'UPDATE_LOCAL_AUTOSAVE_INTERVAL':
-				return action.interval;
-		}
-
-		return state;
-	},
-} );
 
 /**
  * Reducer storing the list of all programmatically removed panels.
@@ -134,7 +14,7 @@ export const preferences = flow( [
 export function removedPanels( state = [], action ) {
 	switch ( action.type ) {
 		case 'REMOVE_PANEL':
-			if ( ! includes( state, action.panelName ) ) {
+			if ( ! state.includes( action.panelName ) ) {
 				return [ ...state, action.panelName ];
 			}
 	}
@@ -195,6 +75,21 @@ export function isSavingMetaBoxes( state = false, action ) {
 	}
 }
 
+function mergeMetaboxes( metaboxes = [], newMetaboxes ) {
+	const mergedMetaboxes = [ ...metaboxes ];
+	for ( const metabox of newMetaboxes ) {
+		const existing = mergedMetaboxes.findIndex(
+			( box ) => box.id === metabox.id
+		);
+		if ( existing !== -1 ) {
+			mergedMetaboxes[ existing ] = metabox;
+		} else {
+			mergedMetaboxes.push( metabox );
+		}
+	}
+	return mergedMetaboxes;
+}
+
 /**
  * Reducer keeping track of the meta boxes per location.
  *
@@ -205,8 +100,18 @@ export function isSavingMetaBoxes( state = false, action ) {
  */
 export function metaBoxLocations( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SET_META_BOXES_PER_LOCATIONS':
-			return action.metaBoxesPerLocation;
+		case 'SET_META_BOXES_PER_LOCATIONS': {
+			const newState = { ...state };
+			for ( const [ location, metaboxes ] of Object.entries(
+				action.metaBoxesPerLocation
+			) ) {
+				newState[ location ] = mergeMetaboxes(
+					newState[ location ],
+					metaboxes
+				);
+			}
+			return newState;
+		}
 	}
 
 	return state;
@@ -268,7 +173,7 @@ export function listViewPanel( state = false, action ) {
 }
 
 /**
- * Reducer tracking whether the inserter is open.
+ * Reducer tracking whether template editing is on or off.
  *
  * @param {boolean} state
  * @param {Object}  action
@@ -306,7 +211,6 @@ const metaBoxes = combineReducers( {
 export default combineReducers( {
 	activeModal,
 	metaBoxes,
-	preferences,
 	publishSidebarActive,
 	removedPanels,
 	deviceType,

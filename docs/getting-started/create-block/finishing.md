@@ -10,7 +10,7 @@ You can visually browse the components and what their implementation looks like 
 
 ## Additional Tutorials
 
-The **RichText component** allows for creating a richer input besides plain text, allowing for bold, italic, links, and other inline formating. See the [RichText Reference](/docs/reference-guides/richtext.md) for documentation using this component.
+The **RichText component** allows for creating a richer input besides plain text, allowing for bold, italic, links, and other inline formatting. See the [RichText Reference](/docs/reference-guides/richtext.md) for documentation using this component.
 
 The InspectorPanel (the settings on the right for a block) and Block Controls (toolbar controls) have a standard way to be implemented. See the [Block controls tutorial](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md) for additional information.
 
@@ -23,3 +23,5 @@ Nested blocks, a block that contains additional blocks, is a common pattern used
 One of the best sources for information and reference is the Block Editor itself, all the core blocks are built the same way. A good way to learn how things are done is to find a core block code that does something close to what you are interested in and then using the same approach for your own block.
 
 All core blocks source are in the [block library package on GitHub](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src).
+
+Next Section: [Share your Block with the World](/docs/getting-started/create-block/submitting-to-block-directory.md)

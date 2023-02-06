@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, kebabCase } from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,8 @@ import TokenList from '@wordpress/token-list';
  */
 import useSetting from '../components/use-setting';
 import FontFamilyControl from '../components/font-family';
+import { shouldSkipSerialization } from './utils';
+import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 
 export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
 
@@ -56,9 +58,10 @@ function addSaveProps( props, blockType, attributes ) {
 	}
 
 	if (
-		hasBlockSupport(
+		shouldSkipSerialization(
 			blockType,
-			'typography.__experimentalSkipSerialization'
+			TYPOGRAPHY_SUPPORT_KEY,
+			'fontFamily'
 		)
 	) {
 		return props;
@@ -108,12 +111,12 @@ export function FontFamilyEdit( {
 } ) {
 	const fontFamilies = useSetting( 'typography.fontFamilies' );
 
-	const value = find( fontFamilies, ( { slug } ) => fontFamily === slug )
-		?.fontFamily;
+	const value = fontFamilies?.find(
+		( { slug } ) => fontFamily === slug
+	)?.fontFamily;
 
 	function onChange( newValue ) {
-		const predefinedFontFamily = find(
-			fontFamilies,
+		const predefinedFontFamily = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		);
 		setAttributes( {
@@ -127,6 +130,8 @@ export function FontFamilyEdit( {
 			fontFamilies={ fontFamilies }
 			value={ value }
 			onChange={ onChange }
+			size="__unstable-large"
+			__nextHasNoMarginBottom
 		/>
 	);
 }

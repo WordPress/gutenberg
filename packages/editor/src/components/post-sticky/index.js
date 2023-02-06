@@ -16,6 +16,7 @@ export function PostSticky( { onUpdateSticky, postSticky = false } ) {
 	return (
 		<PostStickyCheck>
 			<CheckboxControl
+				__nextHasNoMarginBottom
 				label={ __( 'Stick to the top of the blog' ) }
 				checked={ postSticky }
 				onChange={ () => onUpdateSticky( ! postSticky ) }
@@ -27,9 +28,8 @@ export function PostSticky( { onUpdateSticky, postSticky = false } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			postSticky: select( editorStore ).getEditedPostAttribute(
-				'sticky'
-			),
+			postSticky:
+				select( editorStore ).getEditedPostAttribute( 'sticky' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

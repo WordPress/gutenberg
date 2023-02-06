@@ -1,14 +1,14 @@
 .wp-block-image {
-	margin: 0 0 1em 0;
-
 	img {
+		height: auto;
+		max-width: 100%;
 		vertical-align: bottom;
+		box-sizing: border-box;
 	}
 
-	&:not(.is-style-rounded) {
-		> a,
+	&.has-custom-border {
 		img {
-			border-radius: inherit;
+			box-sizing: border-box;
 		}
 	}
 
@@ -22,6 +22,9 @@
 		width: 100%;
 	}
 
+	&.alignleft,
+	&.alignright,
+	&.aligncenter,
 	.alignleft,
 	.alignright,
 	.aligncenter {
@@ -53,6 +56,7 @@
 		margin-bottom: 0.5em;
 	}
 
+	// This is needed for classic themes where the align class is not on the container.
 	.aligncenter {
 		margin-left: auto;
 		margin-right: auto;
@@ -66,7 +70,8 @@
 	}
 
 	// Variations
-	&.is-style-rounded img {
+	&.is-style-rounded img,
+	.is-style-rounded img {
 		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
 		// to rectangular images. A pill-shape is better than otherwise.
 		border-radius: 9999px;
@@ -91,6 +96,42 @@
 			mask-position: center;
 			border-radius: 0;
 		}
+	}
+
+	// The following is required to overcome WP Core applying styles that clear
+	// img borders with a higher specificity than those added by the border
+	// block support to provide a default border-style of solid when a border
+	// color or width has been set.
+	:where(.has-border-color) {
+		border-style: solid;
+	}
+	:where([style*="border-top-color"]) {
+		border-top-style: solid;
+	}
+	:where([style*="border-right-color"]) {
+		border-right-style: solid;
+	}
+	:where([style*="border-bottom-color"]) {
+		border-bottom-style: solid;
+	}
+	:where([style*="border-left-color"]) {
+		border-left-style: solid;
+	}
+
+	:where([style*="border-width"]) {
+		border-style: solid;
+	}
+	:where([style*="border-top-width"]) {
+		border-top-style: solid;
+	}
+	:where([style*="border-right-width"]) {
+		border-right-style: solid;
+	}
+	:where([style*="border-bottom-width"]) {
+		border-bottom-style: solid;
+	}
+	:where([style*="border-left-width"]) {
+		border-left-style: solid;
 	}
 }
 

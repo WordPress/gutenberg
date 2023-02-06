@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { ToggleControl, PanelBody } from '@wordpress/components';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	ToggleControl,
+	PanelBody,
+} from '@wordpress/components';
 import {
 	InspectorControls,
 	RichText,
@@ -14,14 +19,22 @@ import {
 	AlignmentToolbar,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 export default function PostNavigationLinkEdit( {
-	attributes: { type, label, showTitle, textAlign, linkLabel },
+	attributes: { type, label, showTitle, textAlign, linkLabel, arrow },
 	setAttributes,
 } ) {
 	const isNext = type === 'next';
 	let placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
+
+	const arrowMap = {
+		none: '',
+		arrow: isNext ? '→' : '←',
+		chevron: isNext ? '»' : '«',
+	};
+
+	const displayArrow = arrowMap[ arrow ];
 
 	if ( showTitle ) {
 		/* translators: Label before for next and previous post. There is a space after the colon. */
@@ -63,6 +76,40 @@ export default function PostNavigationLinkEdit( {
 							}
 						/>
 					) }
+					<ToggleGroupControl
+						__nextHasNoMarginBottom
+						label={ __( 'Arrow' ) }
+						value={ arrow }
+						onChange={ ( value ) => {
+							setAttributes( { arrow: value } );
+						} }
+						help={ __(
+							'A decorative arrow for the next and previous link.'
+						) }
+						isBlock
+					>
+						<ToggleGroupControlOption
+							value="none"
+							label={ _x(
+								'None',
+								'Arrow option for Next/Previous link'
+							) }
+						/>
+						<ToggleGroupControlOption
+							value="arrow"
+							label={ _x(
+								'Arrow',
+								'Arrow option for Next/Previous link'
+							) }
+						/>
+						<ToggleGroupControlOption
+							value="chevron"
+							label={ _x(
+								'Chevron',
+								'Arrow option for Next/Previous link'
+							) }
+						/>
+					</ToggleGroupControl>
 				</PanelBody>
 			</InspectorControls>
 			<BlockControls>
@@ -74,6 +121,13 @@ export default function PostNavigationLinkEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
+				{ ! isNext && displayArrow && (
+					<span
+						className={ `wp-block-post-navigation-link__arrow-previous is-arrow-${ arrow }` }
+					>
+						{ displayArrow }
+					</span>
+				) }
 				<RichText
 					tagName="a"
 					aria-label={ ariaLabel }
@@ -91,6 +145,14 @@ export default function PostNavigationLinkEdit( {
 					>
 						{ __( 'An example title' ) }
 					</a>
+				) }
+				{ isNext && displayArrow && (
+					<span
+						className={ `wp-block-post-navigation-link__arrow-next is-arrow-${ arrow }` }
+						aria-hidden={ true }
+					>
+						{ displayArrow }
+					</span>
 				) }
 			</div>
 		</>

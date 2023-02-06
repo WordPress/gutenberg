@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
 import { COLORS, CONFIG } from '../utils';
 
 export const Text = css`
-	color: ${ COLORS.darkGray.primary };
+	color: ${ COLORS.gray[ 900 ] };
 	line-height: ${ CONFIG.fontLineHeightBase };
 	margin: 0;
 `;
@@ -27,7 +27,7 @@ export const destructive = css`
 `;
 
 export const muted = css`
-	color: ${ COLORS.mediumGray.text };
+	color: ${ COLORS.gray[ 700 ] };
 `;
 
 export const highlighterText = css`

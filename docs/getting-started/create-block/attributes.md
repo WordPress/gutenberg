@@ -15,7 +15,7 @@ For this block tutorial, we want to allow the user to type in a message that we 
 },
 ```
 
-Add this to the `block.json` file. The `attributes` are at the same level as the _name_ and _title_ fields.
+Add this to the `src/block.json` file. The `attributes` are at the same level as the _name_ and _title_ fields.
 
 When the block loads it will look at the saved content for the block, look for the div tag, take the text portion, and store the content in an `attributes.message` variable.
 
@@ -23,7 +23,7 @@ Note: The text portion is equivalent to `innerText` attribute of a DOM element. 
 
 ## Edit and Save
 
-The **attributes** are passed to the `edit` and `save` functions, along with a **setAttributes** function to set the values. Additional parameters are also passed in to these functions, see [the edit/save documentation](/docs/reference-guides/block-api/block-edit-save.md) for more details.
+The **attributes** are passed to both the `edit` and `save` functions. The **setAttributes** function is also passed, but only to the `edit` function. The **setAttributes** function is used to set the values. Additional parameters are also passed in to the `edit` and `save` functions, see [the edit/save documentation](/docs/reference-guides/block-api/block-edit-save.md) for more details.
 
 The `attributes` is a JavaScript object containing the values of each attribute, or default values if defined. The `setAttributes` is a function to update an attribute.
 
@@ -73,15 +73,15 @@ export default function Edit( { attributes, setAttributes } ) {
 **save.js** file:
 
 ```jsx
-import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	return <div { ...useBlockProps.save() }>{ attributes.message }</div>;
+	const blockProps = useBlockProps.save();
+	return <div { ...blockProps }>{ attributes.message }</div>;
 }
 ```
 
-If you have previously run `npm start`, and the script is still running, you can reload the editor now and add the block to test.
+If you have previously run `npm run start`, and the script is still running, you can reload the editor now and add the block to test.
 Otherwise rebuild the block using `npm run build`, reload the editor and add the block. Type a message in the editor, save, and view it in the post.
 
 Next Section: [Code Implementation](/docs/getting-started/create-block/block-code.md)

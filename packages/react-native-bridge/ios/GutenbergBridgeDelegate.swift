@@ -4,13 +4,15 @@ public struct MediaInfo: Encodable {
     public let type: String?
     public let title: String?
     public let caption: String?
+    public let alt: String?
 
-    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil) {
+    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil, alt: String? = nil) {
         self.id = id
         self.url = url
         self.type = type
         self.caption = caption
         self.title = title
+        self.alt = alt
     }
 }
 
@@ -30,6 +32,9 @@ public enum Capabilities: String {
     case instagramEmbed
     case loomEmbed
     case smartframeEmbed
+    case shouldUseFastImage
+    case supportSection
+    case onlyCoreBlocks
 }
 
 /// Wrapper for single block data

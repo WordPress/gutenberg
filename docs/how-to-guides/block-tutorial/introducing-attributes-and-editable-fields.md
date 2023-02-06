@@ -11,8 +11,8 @@ One challenge of maintaining the representation of a block as a JavaScript objec
 ```js
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'p',
 		},
 	},
@@ -26,11 +26,11 @@ In the code snippet above, when loading the editor, the `content` value will be 
 
 Earlier examples used the `createElement` function to create DOM nodes, but it's also possible to encapsulate this behavior into "components". This abstraction helps you share common behaviors and hide complexity in self-contained units.
 
-There are a number of [components available](/docs/reference-guides/packages/packages-editor.md#components) to use in implementing your blocks. You can see one such component in the code below: the [`RichText` component](/docs/reference-guides/packages/packages-editor.md#richtext) is part of the `wp-editor` package.
+There are a number of [components available](/docs/reference-guides/packages/packages-editor.md#components) to use in implementing your blocks. You can see one such component in the code below: the [`RichText` component](/docs/reference-guides/richtext.md) is part of the `wp-block-editor` package.
 
 The `RichText` component can be considered as a super-powered `textarea` element, enabling rich content editing including bold, italics, hyperlinks, etc.
 
-To use the `RichText` component, and using ES5 code, remember to add `wp-editor` to the dependency array of registered script handles when calling `wp_register_script`.
+To use the `RichText` component, and using ES5 code, remember to add `wp-block-editor` to the dependency array of registered script handles when calling `wp_register_script`.
 
 ```php
 // automatically load dependencies and version
@@ -66,8 +66,8 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 	category: 'design',
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'p',
 		},
 	},
@@ -124,8 +124,8 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 
 		attributes: {
 			content: {
-				type: 'array',
-				source: 'children',
+				type: 'string',
+				source: 'html',
 				selector: 'p',
 			},
 		},

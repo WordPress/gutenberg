@@ -16,6 +16,8 @@ import DownloadableBlocksInserterPanel from './inserter-panel';
 import DownloadableBlocksNoResults from './no-results';
 import { store as blockDirectoryStore } from '../../store';
 
+const EMPTY_ARRAY = [];
+
 function DownloadableBlocksPanel( {
 	downloadableItems,
 	onSelect,
@@ -71,10 +73,8 @@ function DownloadableBlocksPanel( {
 
 export default compose( [
 	withSelect( ( select, { filterValue, rootClientId = null } ) => {
-		const {
-			getDownloadableBlocks,
-			isRequestingDownloadableBlocks,
-		} = select( blockDirectoryStore );
+		const { getDownloadableBlocks, isRequestingDownloadableBlocks } =
+			select( blockDirectoryStore );
 		const { canInsertBlockType } = select( blockEditorStore );
 
 		const hasPermission = select( coreStore ).canUser(
@@ -83,14 +83,25 @@ export default compose( [
 		);
 
 		function getInstallableBlocks( term ) {
-			return getDownloadableBlocks( term ).filter( ( block ) =>
+			const downloadableBlocks = getDownloadableBlocks( term );
+			const installableBlocks = downloadableBlocks.filter( ( block ) =>
 				canInsertBlockType( block, rootClientId, true )
 			);
+
+			if ( downloadableBlocks.length === installableBlocks.length ) {
+				return downloadableBlocks;
+			}
+			return installableBlocks;
 		}
 
-		const downloadableItems = hasPermission
+		let downloadableItems = hasPermission
 			? getInstallableBlocks( filterValue )
 			: [];
+
+		if ( downloadableItems.length === 0 ) {
+			downloadableItems = EMPTY_ARRAY;
+		}
+
 		const isLoading = isRequestingDownloadableBlocks( filterValue );
 
 		return {

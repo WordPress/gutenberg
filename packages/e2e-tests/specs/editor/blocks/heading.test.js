@@ -12,8 +12,6 @@ describe( 'Heading', () => {
 	const COLOR_ITEM_SELECTOR =
 		'.block-editor-panel-color-gradient-settings__dropdown';
 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `.components-color-palette__custom-color`;
-	const CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR =
-		'.components-color-picker button[aria-label="Show detailed inputs"]';
 	const COLOR_INPUT_FIELD_SELECTOR =
 		'.components-color-picker .components-input-control__input';
 
@@ -82,14 +80,16 @@ describe( 'Heading', () => {
 		);
 
 		await customTextColorButton.click();
-		await page.click( CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR );
 		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
-		await page.keyboard.type( '0782f6' );
-		await page.click( 'h3[data-type="core/heading"]' );
-		await page.waitForXPath( '//button[text()="#0782f6"]' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		await page.keyboard.type( '4b7f4d' );
+		await page.keyboard.press( 'Enter' );
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:heading {\\"level\\":3,\\"style\\":{\\"color\\":{\\"text\\":\\"#4b7f4d\\"}}} -->
+		<h3 class=\\"wp-block-heading has-text-color\\" style=\\"color:#4b7f4d\\">Heading</h3>
+		<!-- /wp:heading -->"
+	` );
 	} );
 
 	it( 'should correctly apply named colors', async () => {

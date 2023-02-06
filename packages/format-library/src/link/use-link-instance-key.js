@@ -1,7 +1,7 @@
 // Weakly referenced map allows unused ids to be garbage collected.
 const weakMap = new WeakMap();
 
-// Incrementing zero-based ID value
+// Incrementing zero-based ID value.
 let id = -1;
 
 const prefix = 'link-control-instance';
@@ -14,7 +14,7 @@ function getKey( _id ) {
  * Builds a unique link control key for the given object reference.
  *
  * @param {Object} instance an unique object reference specific to this link control instance.
- * @return {string} the unique key to use for this link control.
+ * @return {string | undefined} the unique key to use for this link control.
  */
 function useLinkInstanceKey( instance ) {
 	if ( ! instance ) {

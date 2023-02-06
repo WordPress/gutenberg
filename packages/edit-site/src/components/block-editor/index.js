@@ -7,33 +7,39 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useRef } from '@wordpress/element';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { useMemo, useRef } from '@wordpress/element';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockList,
-	BlockEditorProvider,
-	__experimentalLinkControl,
 	BlockInspector,
 	BlockTools,
-	__unstableBlockSettingsMenuFirstItem,
+	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
+	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';
-import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useViewportMatch,
+	useResizeObserver,
+} from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
  */
+import inserterMediaCategories from './inserter-media-categories';
 import TemplatePartConverter from '../template-part-converter';
-import NavigateToLink from '../navigate-to-link';
-import { SidebarInspectorFill } from '../sidebar';
+import { SidebarInspectorFill } from '../sidebar-edit-mode';
 import { store as editSiteStore } from '../../store';
-import BlockInspectorButton from './block-inspector-button';
-import EditTemplatePartMenuButton from '../edit-template-part-menu-button';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
+import EditorCanvas from './editor-canvas';
+import StyleBook from '../style-book';
+import { unlock } from '../../experiments';
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorExperiments );
 
 const LAYOUT = {
 	type: 'default',
@@ -41,100 +47,172 @@ const LAYOUT = {
 	alignments: [],
 };
 
-export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings, templateType, templateId, page } = useSelect(
+export default function BlockEditor() {
+	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const { storedSettings, templateType, canvasMode } = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				getEditedPostType,
-				getEditedPostId,
-				getPage,
-			} = select( editSiteStore );
+			const { getSettings, getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
 			return {
-				settings: getSettings( setIsInserterOpen ),
+				storedSettings: getSettings( setIsInserterOpened ),
 				templateType: getEditedPostType(),
-				templateId: getEditedPostId(),
-				page: getPage(),
+				canvasMode: getCanvasMode(),
 			};
 		},
-		[ setIsInserterOpen ]
+		[ setIsInserterOpened ]
 	);
+
+	const settingsBlockPatterns =
+		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
+		storedSettings.__experimentalBlockPatterns; // WP 5.9
+	const settingsBlockPatternCategories =
+		storedSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
+		storedSettings.__experimentalBlockPatternCategories; // WP 5.9
+
+	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
+		( select ) => ( {
+			restBlockPatterns: select( coreStore ).getBlockPatterns(),
+			restBlockPatternCategories:
+				select( coreStore ).getBlockPatternCategories(),
+		} ),
+		[]
+	);
+
+	const blockPatterns = useMemo(
+		() =>
+			[
+				...( settingsBlockPatterns || [] ),
+				...( restBlockPatterns || [] ),
+			]
+				.filter(
+					( x, index, arr ) =>
+						index === arr.findIndex( ( y ) => x.name === y.name )
+				)
+				.filter( ( { postTypes } ) => {
+					return (
+						! postTypes ||
+						( Array.isArray( postTypes ) &&
+							postTypes.includes( templateType ) )
+					);
+				} ),
+		[ settingsBlockPatterns, restBlockPatterns, templateType ]
+	);
+
+	const blockPatternCategories = useMemo(
+		() =>
+			[
+				...( settingsBlockPatternCategories || [] ),
+				...( restBlockPatternCategories || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
+			),
+		[ settingsBlockPatternCategories, restBlockPatternCategories ]
+	);
+
+	const settings = useMemo( () => {
+		const {
+			__experimentalAdditionalBlockPatterns,
+			__experimentalAdditionalBlockPatternCategories,
+			...restStoredSettings
+		} = storedSettings;
+
+		return {
+			...restStoredSettings,
+			inserterMediaCategories,
+			__experimentalBlockPatterns: blockPatterns,
+			__experimentalBlockPatternCategories: blockPatternCategories,
+		};
+	}, [ storedSettings, blockPatterns, blockPatternCategories ] );
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		templateType
 	);
-	const { setPage } = useDispatch( editSiteStore );
+
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
+	const mergedRefs = useMergeRefs( [
+		contentRef,
+		useClipboardHandler(),
+		useTypingObserver(),
+	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const isTemplatePart = templateType === 'wp_template_part';
+	const hasBlocks = blocks.length !== 0;
+	const enableResizing =
+		isTemplatePart &&
+		canvasMode !== 'view' &&
+		// Disable resizing in mobile viewport.
+		! isMobileViewport;
+	const isViewMode = canvasMode === 'view';
+	const showBlockAppender =
+		( isTemplatePart && hasBlocks ) || isViewMode ? false : undefined;
 
 	return (
-		<BlockEditorProvider
+		<ExperimentalBlockEditorProvider
 			settings={ settings }
 			value={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
-			<EditTemplatePartMenuButton />
 			<TemplatePartConverter />
-			<__experimentalLinkControl.ViewerFill>
-				{ useCallback(
-					( fillProps ) => (
-						<NavigateToLink
-							{ ...fillProps }
-							activePage={ page }
-							onActivePageChange={ setPage }
-						/>
-					),
-					[ page ]
-				) }
-			</__experimentalLinkControl.ViewerFill>
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<BlockTools
-				className={ classnames( 'edit-site-visual-editor', {
-					'is-focus-mode': isTemplatePart,
-				} ) }
-				__unstableContentRef={ contentRef }
-				onClick={ ( event ) => {
-					// Clear selected block when clicking on the gray background.
-					if ( event.target === event.currentTarget ) {
-						clearSelectedBlock();
-					}
-				} }
-			>
-				<BlockEditorKeyboardShortcuts.Register />
-				<BackButton />
-				<ResizableEditor
-					// Reinitialize the editor and reset the states when the template changes.
-					key={ templateId }
-					enableResizing={
-						isTemplatePart &&
-						// Disable resizing in mobile viewport.
-						! isMobileViewport
-					}
-					settings={ settings }
-					contentRef={ mergedRefs }
-				>
-					<BlockList
-						className="edit-site-block-editor__block-list wp-site-blocks"
-						__experimentalLayout={ LAYOUT }
-						renderAppender={ isTemplatePart ? false : undefined }
-					/>
-				</ResizableEditor>
-				<__unstableBlockSettingsMenuFirstItem>
-					{ ( { onClose } ) => (
-						<BlockInspectorButton onClick={ onClose } />
-					) }
-				</__unstableBlockSettingsMenuFirstItem>
-			</BlockTools>
+			{ /* Potentially this could be a generic slot (e.g. EditorCanvas.Slot) if there are other uses for it. */ }
+			<StyleBook.Slot>
+				{ ( [ styleBook ] ) =>
+					styleBook ? (
+						<div className="edit-site-visual-editor is-focus-mode">
+							<ResizableEditor enableResizing>
+								{ styleBook }
+							</ResizableEditor>
+						</div>
+					) : (
+						<BlockTools
+							className={ classnames( 'edit-site-visual-editor', {
+								'is-focus-mode': isTemplatePart || !! styleBook,
+								'is-view-mode': isViewMode,
+							} ) }
+							__unstableContentRef={ contentRef }
+							onClick={ ( event ) => {
+								// Clear selected block when clicking on the gray background.
+								if ( event.target === event.currentTarget ) {
+									clearSelectedBlock();
+								}
+							} }
+						>
+							<BlockEditorKeyboardShortcuts.Register />
+							<BackButton />
+							<ResizableEditor
+								enableResizing={ enableResizing }
+								height={ sizes.height ?? '100%' }
+							>
+								<EditorCanvas
+									enableResizing={ enableResizing }
+									settings={ settings }
+									contentRef={ mergedRefs }
+									readonly={ canvasMode === 'view' }
+								>
+									{ resizeObserver }
+									<BlockList
+										className="edit-site-block-editor__block-list wp-site-blocks"
+										__experimentalLayout={ LAYOUT }
+										renderAppender={ showBlockAppender }
+									/>
+								</EditorCanvas>
+							</ResizableEditor>
+						</BlockTools>
+					)
+				}
+			</StyleBook.Slot>
 			<ReusableBlocksMenuItems />
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 }

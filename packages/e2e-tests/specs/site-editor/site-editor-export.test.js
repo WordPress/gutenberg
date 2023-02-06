@@ -9,9 +9,10 @@ import os from 'os';
  * WordPress dependencies
  */
 import {
-	trashAllPosts,
+	deleteAllTemplates,
 	activateTheme,
 	visitSiteEditor,
+	enterEditMode,
 	clickOnMoreMenuItem,
 } from '@wordpress/e2e-test-utils';
 
@@ -31,8 +32,8 @@ async function waitForFileExists( filePath, timeout = 10000 ) {
 describe( 'Site Editor Templates Export', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 
 	afterAll( async () => {
@@ -41,9 +42,10 @@ describe( 'Site Editor Templates Export', () => {
 
 	beforeEach( async () => {
 		await visitSiteEditor();
+		await enterEditMode();
 	} );
 
-	it( 'clicking export should download edit-site-export.zip file', async () => {
+	it( 'clicking export should download emptytheme.zip file', async () => {
 		const directory = fs.mkdtempSync(
 			path.join( os.tmpdir(), 'test-edit-site-export-' )
 		);
@@ -53,7 +55,7 @@ describe( 'Site Editor Templates Export', () => {
 		} );
 
 		await clickOnMoreMenuItem( 'Export', 'site-editor' );
-		const filePath = path.join( directory, 'edit-site-export.zip' );
+		const filePath = path.join( directory, 'emptytheme.zip' );
 		await waitForFileExists( filePath );
 		expect( fs.existsSync( filePath ) ).toBe( true );
 		fs.unlinkSync( filePath );

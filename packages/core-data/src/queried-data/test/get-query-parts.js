@@ -18,8 +18,12 @@ describe( 'getQueryParts', () => {
 	} );
 
 	it( 'parses out `include` ID filtering', () => {
+		const first = getQueryParts( { include: '1' } );
+		const second = getQueryParts( { include: 1 } );
 		const parts = getQueryParts( { include: [ 1 ] } );
 
+		expect( first ).toEqual( second );
+		expect( second ).toEqual( parts );
 		expect( parts ).toEqual( {
 			context: 'default',
 			page: 1,

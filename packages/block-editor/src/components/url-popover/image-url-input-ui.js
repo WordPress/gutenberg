@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find, isEmpty, each, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -17,6 +12,7 @@ import {
 	TextControl,
 	SVG,
 	Path,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { link as linkIcon, close } from '@wordpress/icons';
 
@@ -51,6 +47,9 @@ const ImageURLInputUI = ( {
 	rel,
 } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const openLinkUI = useCallback( () => {
 		setIsOpen( true );
 	} );
@@ -80,38 +79,25 @@ const ImageURLInputUI = ( {
 		setIsOpen( false );
 	} );
 
-	const removeNewTabRel = ( currentRel ) => {
-		let newRel = currentRel;
-
-		if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
-			if ( ! isEmpty( newRel ) ) {
-				each( NEW_TAB_REL, ( relVal ) => {
-					const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
-					newRel = newRel.replace( regExp, '' );
-				} );
-
-				// Only trim if NEW_TAB_REL values was replaced.
-				if ( newRel !== currentRel ) {
-					newRel = newRel.trim();
-				}
-
-				if ( isEmpty( newRel ) ) {
-					newRel = undefined;
-				}
-			}
-		}
-
-		return newRel;
-	};
-
 	const getUpdatedLinkTargetSettings = ( value ) => {
 		const newLinkTarget = value ? '_blank' : undefined;
 
 		let updatedRel;
-		if ( ! newLinkTarget && ! rel ) {
-			updatedRel = undefined;
+		if ( newLinkTarget ) {
+			const rels = ( rel ?? '' ).split( ' ' );
+			NEW_TAB_REL.forEach( ( relVal ) => {
+				if ( ! rels.includes( relVal ) ) {
+					rels.push( relVal );
+				}
+			} );
+			updatedRel = rels.join( ' ' );
 		} else {
-			updatedRel = removeNewTabRel( rel );
+			const rels = ( rel ?? '' )
+				.split( ' ' )
+				.filter(
+					( relVal ) => NEW_TAB_REL.includes( relVal ) === false
+				);
+			updatedRel = rels.length ? rels.join( ' ' ) : undefined;
 		}
 
 		return {
@@ -199,7 +185,7 @@ const ImageURLInputUI = ( {
 			linkDestinationInput = LINK_DESTINATION_NONE;
 		} else {
 			linkDestinationInput = (
-				find( linkDestinations, ( destination ) => {
+				linkDestinations.find( ( destination ) => {
 					return destination.url === value;
 				} ) || { linkDestination: LINK_DESTINATION_CUSTOM }
 			).linkDestination;
@@ -224,30 +210,34 @@ const ImageURLInputUI = ( {
 	};
 
 	const advancedOptions = (
-		<>
+		<VStack spacing="3">
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
-				label={ __( 'Link Rel' ) }
-				value={ removeNewTabRel( rel ) || '' }
+				__nextHasNoMarginBottom
+				label={ __( 'Link rel' ) }
+				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
 			/>
 			<TextControl
+				__nextHasNoMarginBottom
 				label={ __( 'Link CSS Class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }
 			/>
-		</>
+		</VStack>
 	);
 
 	const linkEditorValue = urlInput !== null ? urlInput : url;
 
 	const urlLabel = (
-		find( getLinkDestinations(), [ 'linkDestination', linkDestination ] ) ||
-		{}
+		getLinkDestinations().find(
+			( destination ) => destination.linkDestination === linkDestination
+		) || {}
 	).title;
 
 	return (
@@ -258,16 +248,18 @@ const ImageURLInputUI = ( {
 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
+				ref={ setPopoverAnchor }
 			/>
 			{ isOpen && (
 				<URLPopover
+					anchor={ popoverAnchor }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
 					renderSettings={ () => advancedOptions }
 					additionalControls={
 						! linkEditorValue && (
 							<NavigableMenu>
-								{ map( getLinkDestinations(), ( link ) => (
+								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
 										icon={ link.icon }

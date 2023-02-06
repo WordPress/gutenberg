@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/gallery",
 		"isValid": true,
 		"attributes": {
@@ -12,7 +11,6 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
@@ -27,7 +25,6 @@
 				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_1",
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
@@ -42,7 +39,6 @@
 				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_2",
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
@@ -56,7 +52,6 @@
 				},
 				"innerBlocks": []
 			}
-		],
-		"originalContent": "<figure class=\"wp-block-gallery columns-3 is-cropped\">\n\t<ul class=\"blocks-gallery-grid\">\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<a\n\t\t\t\t\thref=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-scaled.jpg\"\n\t\t\t\t>\n\t\t\t\t\t<img\n\t\t\t\t\t\tsrc=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg\"\n\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\tdata-id=\"705\"\n\t\t\t\t\t\tdata-full-url=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-scaled.jpg\"\n\t\t\t\t\t\tdata-link=\"http://wptest.local/classic/test-image-3/\"\n\t\t\t\t\t\tclass=\"wp-image-705\"\n\t\t\t\t\t/>\n\t\t\t\t</a>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<a\n\t\t\t\t\thref=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-scaled.jpg\"\n\t\t\t\t>\n\t\t\t\t\t<img\n\t\t\t\t\t\tsrc=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg\"\n\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\tdata-id=\"704\"\n\t\t\t\t\t\tdata-full-url=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-scaled.jpg\"\n\t\t\t\t\t\tdata-link=\"http://wptest.local/test-image-2/\"\n\t\t\t\t\t\tclass=\"wp-image-704\"\n\t\t\t\t\t/>\n\t\t\t\t</a>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<a\n\t\t\t\t\thref=\"http://wptest.local/wp-content/uploads/2020/04/test-image-scaled.jpg\"\n\t\t\t\t>\n\t\t\t\t\t<img\n\t\t\t\t\t\tsrc=\"http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg\"\n\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\tdata-id=\"703\"\n\t\t\t\t\t\tdata-full-url=\"http://wptest.local/wp-content/uploads/2020/04/test-image-scaled.jpg\"\n\t\t\t\t\t\tdata-link=\"http://wptest.local/test-image/\"\n\t\t\t\t\t\tclass=\"wp-image-703\"\n\t\t\t\t\t/>\n\t\t\t\t</a>\n\t\t\t</figure>\n\t\t</li>\n\t</ul>\n</figure>"
+		]
 	}
 ]

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-// See https://babeljs.io/docs/en/babel-types
+// See https://babeljs.io/docs/en/babel-types.
 const { types: babelTypes } = require( '@babel/core' );
 
 /* eslint-disable jsdoc/valid-types */
@@ -110,12 +110,10 @@ function getTypeLiteralPropertyTypeAnnotations( typeAnnotation ) {
  * @param {babelTypes.TSTypeLiteral} typeAnnotation
  */
 function getTypeLiteralTypeAnnotation( typeAnnotation ) {
-	const callProperties = getTypeLiteralCallSignatureDeclarationTypeAnnotations(
-		typeAnnotation
-	);
-	const indexers = getTypeLiteralIndexSignatureTypeAnnotations(
-		typeAnnotation
-	);
+	const callProperties =
+		getTypeLiteralCallSignatureDeclarationTypeAnnotations( typeAnnotation );
+	const indexers =
+		getTypeLiteralIndexSignatureTypeAnnotations( typeAnnotation );
 	const properties = getTypeLiteralPropertyTypeAnnotations( typeAnnotation );
 
 	return `{ ${ callProperties }${ properties }${ indexers }}`;
@@ -270,14 +268,14 @@ function getTypeAnnotation( typeAnnotation ) {
 			return 'boolean';
 		}
 		case 'TSConditionalType': {
-			// Unsure what this is
+			// Unsure what this is.
 			return '';
 		}
 		case 'TSConstructorType': {
 			return `new ${ getFunctionTypeAnnotation( typeAnnotation, ': ' ) }`;
 		}
 		case 'TSExpressionWithTypeArguments': {
-			// Unsure with this is
+			// Unsure with this is.
 			return '';
 		}
 		case 'TSFunctionType': {
@@ -349,7 +347,7 @@ function getTypeAnnotation( typeAnnotation ) {
 			) }`;
 		}
 		case 'TSTypeQuery': {
-			// unsure what this is
+			// Unsure what this is.
 			return '';
 		}
 		case 'TSTypeReference': {
@@ -374,6 +372,62 @@ function getTypeAnnotation( typeAnnotation ) {
 }
 
 /**
+ * Extract wrapped selector functions to reach inside for parameter types.
+ *
+ * This function wasn't necessary until we started introducing more TypeScript code into
+ * the project. With parameter types fully in the JSDoc comments we always have a direct
+ * match between parameter name and the type. However, when working in TypeScript where
+ * we rely on the type annotations for the types we introduce a mismatch when wrapping
+ * functions.
+ *
+ * Example:
+ *     export const getThings = createSelector( ( state ) => state.things, ( state ) => state.version );
+ *
+ * In this example we would document `state` but its type is buried inside of `createSelector`.
+ * Because this kind of scenario is tricky to properly parse without asking TypeScript directly
+ * to give us the actual type of `getThings` we're going to special-case the known instances
+ * of selector-wrapping to extract the inner function and re-connect the parameter types
+ * with their descriptions in the JSDoc comments.
+ *
+ * If we find more wrapper functions on selectors we should add them below following the
+ * example of `createSelector` and `createRegsitrySelector`.
+ *
+ * @param {ASTNode} token Contains either a function or a call to a function-wrapper.
+ *
+ *                        TODO: Remove the special-casing here once we're able to infer the types from TypeScript itself.
+ */
+function unwrapWrappedSelectors( token ) {
+	if ( babelTypes.isFunctionDeclaration( token ) ) {
+		return token;
+	}
+
+	if ( babelTypes.isArrowFunctionExpression( token ) ) {
+		return token;
+	}
+
+	if ( babelTypes.isTSAsExpression( token ) ) {
+		// ( ( state, queryId ) => state.queries[ queryId ] ) as any;
+		// \------------------------------------------------/ CallExpression.expression
+		return unwrapWrappedSelectors( token.expression );
+	}
+
+	if ( babelTypes.isCallExpression( token ) ) {
+		// createSelector( ( state, queryId ) => state.queries[ queryId ] );
+		//                 \--------------------------------------------/ CallExpression.arguments[0]
+		if ( token.callee.name === 'createSelector' ) {
+			return unwrapWrappedSelectors( token.arguments[ 0 ] );
+		}
+
+		// createRegistrySelector( ( selector ) => ( state, queryId ) => select( 'core/queries' ).get( queryId ) );
+		//                                         \-----------------------------------------------------------/ CallExpression.arguments[0].body
+		//                         \---------------------------------------------------------------------------/ CallExpression.arguments[0]
+		if ( token.callee.name === 'createRegistrySelector' ) {
+			return unwrapWrappedSelectors( token.arguments[ 0 ].body );
+		}
+	}
+}
+
+/**
  * @param {ASTNode} token
  * @return {babelTypes.ArrowFunctionExpression | babelTypes.FunctionDeclaration} The function token.
  */
@@ -388,11 +442,11 @@ function getFunctionToken( token ) {
 	}
 
 	if ( babelTypes.isVariableDeclaration( resolvedToken ) ) {
-		// ignore multiple variable declarations
+		// Ignore multiple variable declarations.
 		resolvedToken = resolvedToken.declarations[ 0 ].init;
 	}
 
-	return resolvedToken;
+	return unwrapWrappedSelectors( resolvedToken );
 }
 
 function getFunctionNameForError( declarationToken ) {
@@ -418,7 +472,7 @@ function getArrayTagNamePosition( tag ) {
 function getQualifiedArrayPatternTypeAnnotation( tag, paramType ) {
 	if ( babelTypes.isTSArrayType( paramType ) ) {
 		if ( babelTypes.isTSTypeReference( paramType.elementType ) ) {
-			// just get the element type for the array
+			// Just get the element type for the array.
 			return paramType.elementType.typeName.name;
 		}
 		return getTypeAnnotation( paramType.elementType.typeAnnotation );
@@ -428,7 +482,7 @@ function getQualifiedArrayPatternTypeAnnotation( tag, paramType ) {
 		);
 	}
 
-	// anything else, `Alias[ position ]`
+	// Anything else, `Alias[ position ]`.
 	return `( ${ getTypeAnnotation( paramType ) } )[ ${ getArrayTagNamePosition(
 		tag
 	) } ]`;
@@ -437,7 +491,7 @@ function getQualifiedArrayPatternTypeAnnotation( tag, paramType ) {
 function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 	const memberName = tag.name.split( '.' ).slice( -1 )[ 0 ];
 	if ( babelTypes.isTSTypeLiteral( paramType ) ) {
-		// if it's a type literal we can try to find the member on the type
+		// If it's a type literal we can try to find the member on the type.
 		const member = paramType.members.find(
 			( m ) => m.key.name === memberName
 		);
@@ -445,7 +499,7 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 			return getTypeAnnotation( member.typeAnnotation.typeAnnotation );
 		}
 	}
-	// If we couldn't find a specific member for the type then we'll just return something like `Type[ memberName ]` to indicate the parameter is a member of that type
+	// If we couldn't find a specific member for the type then we'll just return something like `Type[ memberName ]` to indicate the parameter is a member of that type.
 	const typeAnnotation = getTypeAnnotation( paramType );
 	return `${ typeAnnotation }[ '${ memberName }' ]`;
 }
@@ -454,12 +508,12 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
  * @param {CommentTag} tag              The documented parameter.
  * @param {ASTNode}    declarationToken The function the parameter is documented on.
  * @param {number}     paramIndex       The parameter index.
- * @return {string?} The parameter's type annotation.
+ * @return {string | undefined} The parameter's type annotation.
  */
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
 
-	// otherwise find the corresponding parameter token for the documented parameter
+	// Otherwise find the corresponding parameter token for the documented parameter.
 	let paramToken = functionToken.params[ paramIndex ];
 
 	// This shouldn't happen due to our ESLint enforcing correctly documented parameter names but just in case
@@ -503,7 +557,7 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 
 /**
  * @param {ASTNode} declarationToken A function token.
- * @return {string?} The function's return type annotation.
+ * @return {string | undefined} The function's return type annotation.
  */
 function getReturnTypeAnnotation( declarationToken ) {
 	const functionToken = getFunctionToken( declarationToken );
@@ -516,7 +570,7 @@ function getReturnTypeAnnotation( declarationToken ) {
 
 /**
  * @param {ASTNode} declarationToken
- * @return {string?} The type annotation for the variable.
+ * @return {string | undefined} The type annotation for the variable.
  */
 function getVariableTypeAnnotation( declarationToken ) {
 	let resolvedToken = declarationToken;
@@ -525,7 +579,7 @@ function getVariableTypeAnnotation( declarationToken ) {
 	}
 
 	if ( babelTypes.isClassDeclaration( resolvedToken ) ) {
-		// just use the classname if we're exporting a class
+		// Just use the classname if we're exporting a class.
 		return resolvedToken.id.name;
 	}
 
@@ -536,7 +590,7 @@ function getVariableTypeAnnotation( declarationToken ) {
 	try {
 		return getTypeAnnotation( resolvedToken.typeAnnotation.typeAnnotation );
 	} catch ( e ) {
-		// assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
+		// Assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
 	}
 }
 

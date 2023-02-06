@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isFunction, zip } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import defaultProcessor from './default-processor';
@@ -43,6 +38,7 @@ import defaultProcessor from './default-processor';
  */
 export default function createBatch( processor = defaultProcessor ) {
 	let lastId = 0;
+	/** @type {Array<{ input: any; resolve: ( value: any ) => void; reject: ( error: any ) => void }>} */
 	let queue = [];
 	const pending = new ObservableSet();
 
@@ -87,7 +83,7 @@ export default function createBatch( processor = defaultProcessor ) {
 					pending.delete( id );
 				} );
 
-			if ( isFunction( inputOrThunk ) ) {
+			if ( typeof inputOrThunk === 'function' ) {
 				return Promise.resolve( inputOrThunk( add ) ).finally( () => {
 					pending.delete( id );
 				} );
@@ -100,7 +96,7 @@ export default function createBatch( processor = defaultProcessor ) {
 		 * Runs the batch. This calls `batchProcessor` and resolves or rejects
 		 * all promises returned by `add()`.
 		 *
-		 * @return {Promise} A promise that resolves to a boolean that is true
+		 * @return {Promise<boolean>} A promise that resolves to a boolean that is true
 		 *                   if the processor returned no errors.
 		 */
 		async run() {
@@ -109,7 +105,7 @@ export default function createBatch( processor = defaultProcessor ) {
 					const unsubscribe = pending.subscribe( () => {
 						if ( ! pending.size ) {
 							unsubscribe();
-							resolve();
+							resolve( undefined );
 						}
 					} );
 				} );
@@ -137,17 +133,16 @@ export default function createBatch( processor = defaultProcessor ) {
 
 			let isSuccess = true;
 
-			for ( const [ result, { resolve, reject } ] of zip(
-				results,
-				queue
-			) ) {
+			results.forEach( ( result, key ) => {
+				const queueItem = queue[ key ];
+
 				if ( result?.error ) {
-					reject( result.error );
+					queueItem?.reject( result.error );
 					isSuccess = false;
 				} else {
-					resolve( result?.output ?? result );
+					queueItem?.resolve( result?.output ?? result );
 				}
-			}
+			} );
 
 			queue = [];
 
@@ -166,14 +161,14 @@ class ObservableSet {
 		return this.set.size;
 	}
 
-	add( ...args ) {
-		this.set.add( ...args );
+	add( value ) {
+		this.set.add( value );
 		this.subscribers.forEach( ( subscriber ) => subscriber() );
 		return this;
 	}
 
-	delete( ...args ) {
-		const isSuccess = this.set.delete( ...args );
+	delete( value ) {
+		const isSuccess = this.set.delete( value );
 		this.subscribers.forEach( ( subscriber ) => subscriber() );
 		return isSuccess;
 	}

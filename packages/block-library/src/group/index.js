@@ -2,16 +2,17 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
 import { group as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
+import transforms from './transforms';
 import variations from './variations';
 
 const { name } = metadata;
@@ -80,61 +81,11 @@ export const settings = {
 			},
 		],
 	},
-	transforms: {
-		from: [
-			{
-				type: 'block',
-				isMultiBlock: true,
-				blocks: [ '*' ],
-				__experimentalConvert( blocks ) {
-					// Avoid transforming a single `core/group` Block
-					if (
-						blocks.length === 1 &&
-						blocks[ 0 ].name === 'core/group'
-					) {
-						return;
-					}
-
-					const alignments = [ 'wide', 'full' ];
-
-					// Determine the widest setting of all the blocks to be grouped
-					const widestAlignment = blocks.reduce(
-						( accumulator, block ) => {
-							const { align } = block.attributes;
-							return alignments.indexOf( align ) >
-								alignments.indexOf( accumulator )
-								? align
-								: accumulator;
-						},
-						undefined
-					);
-
-					// Clone the Blocks to be Grouped
-					// Failing to create new block references causes the original blocks
-					// to be replaced in the switchToBlockType call thereby meaning they
-					// are removed both from their original location and within the
-					// new group block.
-					const groupInnerBlocks = blocks.map( ( block ) => {
-						return createBlock(
-							block.name,
-							block.attributes,
-							block.innerBlocks
-						);
-					} );
-
-					return createBlock(
-						'core/group',
-						{
-							align: widestAlignment,
-						},
-						groupInnerBlocks
-					);
-				},
-			},
-		],
-	},
+	transforms,
 	edit,
 	save,
 	deprecated,
 	variations,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

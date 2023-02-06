@@ -1,6 +1,6 @@
 # ColorIndicator
 
-ColorIndicator is a React component that renders a specific color in a squared box. It's often used to summarize a collection of used colors in a child component.
+ColorIndicator is a React component that renders a specific color in a circle. It's often used to summarize a collection of used colors in a child component.
 
 ### Single component
 
@@ -22,16 +22,14 @@ const MyColorIndicator = () => <ColorIndicator colorValue="#0073aa" />;
 
 The component accepts the following props:
 
-### colorValue
-
-The color of the indicator. Any value from the [`background`](https://developer.mozilla.org/en-US/docs/Web/CSS/background) property is supported.
-
--   Type: `string`
--   Required: Yes
-
-### className
+### `className`: `string`
 
 Extra classes for the used `<span>` element. By default only `component-color-indicator` is added.
 
--   Type: `string`
 -   Required: No
+
+### `colorValue`: `CSSProperties[ 'background' ]`
+
+The color of the indicator. Any value from the CSS [`background`](https://developer.mozilla.org/en-US/docs/Web/CSS/background) property is supported.
+
+-   Required: Yes

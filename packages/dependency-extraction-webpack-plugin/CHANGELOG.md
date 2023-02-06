@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+## 4.9.0 (2023-02-01)
+
+## 4.8.0 (2023-01-11)
+
+## 4.7.0 (2023-01-02)
+
+## 4.6.0 (2022-12-14)
+
+## 4.5.0 (2022-11-16)
+
+## 4.4.0 (2022-11-02)
+
+## 4.3.0 (2022-10-19)
+
+## 4.2.0 (2022-10-05)
+
+## 4.1.0 (2022-09-21)
+
+### New Features
+
+-   Include `@wordpress/style-engine` on the list of external dependencies to allow using `wp.styleEngine` global with WordPress 6.1 and beyond ([#43840](https://github.com/WordPress/gutenberg/pull/43840)).
+
+## 4.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+## 3.7.0 (2022-07-13)
+
+### New Features
+
+-   Output asset files for shared chunks, too ([#41002](https://github.com/WordPress/gutenberg/pull/41002)).
+
+## 3.5.0 (2022-05-18)
+
+### Bug Fix
+
+-   Use OpenSSL provider supported in Node 17+ when calling `crypto.createHash` ([#40503](https://github.com/WordPress/gutenberg/pull/40503)).
+-   Add new line at the end of generated `*.asset.php` files ([#40753](https://github.com/WordPress/gutenberg/pull/40753)).
+-   Calculate version hashes based on output file contents rather than input files and other Webpack internal state ([#34969](https://github.com/WordPress/gutenberg/pull/34969)).
+
 ## 3.3.0 (2022-01-27)
 
 -   Add the optional `externalizedReportFile` option ([#35106](https://github.com/WordPress/gutenberg/pull/35106)).

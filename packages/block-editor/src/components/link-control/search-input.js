@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop, omit } from 'lodash';
 import classnames from 'classnames';
 /**
  * WordPress dependencies
@@ -22,6 +21,8 @@ import useSearchHandler from './use-search-handler';
 // to the fetchLinkSuggestions passed in block editor settings
 // which will cause an unintended http request.
 const noopSearchHandler = () => Promise.resolve( [] );
+
+const noop = () => {};
 
 const LinkControlSearchInput = forwardRef(
 	(
@@ -80,7 +81,6 @@ const LinkControlSearchInput = forwardRef(
 				...props,
 				instanceId,
 				withCreateSuggestion,
-				currentInputValue: value,
 				createSuggestionButtonText,
 				suggestionsQuery,
 				handleSuggestionClick: ( suggestion ) => {
@@ -94,7 +94,7 @@ const LinkControlSearchInput = forwardRef(
 		const onSuggestionSelected = async ( selectedSuggestion ) => {
 			let suggestion = selectedSuggestion;
 			if ( CREATE_TYPE === selectedSuggestion.type ) {
-				// Create a new page and call onSelect with the output from the onCreateSuggestion callback
+				// Create a new page and call onSelect with the output from the onCreateSuggestion callback.
 				try {
 					suggestion = await onCreateSuggestion(
 						selectedSuggestion.title
@@ -110,9 +110,10 @@ const LinkControlSearchInput = forwardRef(
 				allowDirectEntry ||
 				( suggestion && Object.keys( suggestion ).length >= 1 )
 			) {
+				const { id, url, ...restLinkProps } = currentLink ?? {};
 				onSelect(
 					// Some direct entries don't have types or IDs, and we still need to clear the previous ones.
-					{ ...omit( currentLink, 'id', 'url' ), ...suggestion },
+					{ ...restLinkProps, ...suggestion },
 					suggestion
 				);
 			}
@@ -125,6 +126,7 @@ const LinkControlSearchInput = forwardRef(
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
+					__nextHasNoMarginBottom
 					label={ useLabel ? 'URL' : undefined }
 					className={ inputClasses }
 					value={ value }

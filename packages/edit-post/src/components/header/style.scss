@@ -44,6 +44,10 @@
 	}
 }
 
+/**
+ * Buttons on the right side
+ */
+
 .edit-post-header__settings {
 	display: inline-flex;
 	align-items: center;
@@ -51,31 +55,13 @@
 	padding-right: $grid-unit-05;
 
 	@include break-small () {
-		padding-right: $grid-unit-20;
+		padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
 	}
 
-	/**
-	 * Buttons in the Toolbar
- 	 */
+	gap: $grid-unit-05;
 
-	// Adjust button paddings to scale better to mobile.
-	.editor-post-saved-state,
-	.components-button.components-button {
-		margin-right: $grid-unit-05;
-
-		@include break-small() {
-			margin-right: $grid-unit-15;
-		}
-	}
-
-	.editor-post-saved-state,
-	.components-button.is-tertiary {
-		padding: 0 #{ $grid-unit-15 * 0.5 };
-	}
-
-	.edit-post-more-menu .components-button,
-	.interface-pinned-items .components-button {
-		margin-right: 0;
+	@include break-small() {
+		gap: $grid-unit-10;
 	}
 }
 
@@ -98,11 +84,13 @@
 	}
 }
 
-.edit-post-post-preview-dropdown {
-	.components-popover__content > div {
-		padding-bottom: 0;
-	}
+.edit-post-post-preview-dropdown .components-popover__content {
+	padding-bottom: 0;
 }
+
+/**
+ * Show icon labels.
+ */
 
 .show-icon-labels.interface-pinned-items,
 .show-icon-labels .edit-post-header,
@@ -157,32 +145,11 @@
 			padding-right: $grid-unit-15;
 		}
 	}
-	.components-dropdown-menu__toggle {
-		margin-left: $grid-unit;
-		padding-left: $grid-unit;
-		padding-right: $grid-unit;
 
-		@include break-small {
-			margin-left: $grid-unit-15;
-			padding-left: $grid-unit-15;
-			padding-right: $grid-unit-15;
-		}
-	}
-	// The inserter has a custom label, different from its aria-label, so we don't want to display both.
-	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle {
+	.editor-post-save-draft.editor-post-save-draft,
+	.editor-post-saved-state.editor-post-saved-state {
 		&::after {
 			content: none;
-		}
-	}
-	// The post saved state button has a custom label only on small breakpoint
-	.editor-post-save-draft.editor-post-save-draft {
-		&::after {
-			content: none;
-		}
-		@include break-small {
-			&::after {
-				content: attr(aria-label);
-			}
 		}
 	}
 }
@@ -226,5 +193,48 @@
 		svg {
 			margin-right: 8px;
 		}
+	}
+}
+
+.is-distraction-free {
+	.interface-interface-skeleton__header {
+		border-bottom: none;
+	}
+
+	.edit-post-header {
+		backdrop-filter: blur(20px) !important;
+		background-color: rgba(255, 255, 255, 0.9);
+		border-bottom: 1px solid #e0e0e0;
+		position: absolute;
+		width: 100%;
+
+
+		// hide some parts
+		& > .edit-post-header__settings > .editor-post-preview {
+			visibility: hidden;
+		}
+
+		& > .edit-post-header__toolbar .edit-post-header-toolbar__inserter-toggle,
+		& > .edit-post-header__toolbar .edit-post-header-toolbar__document-overview-toggle,
+		& > .edit-post-header__settings > .block-editor-post-preview__dropdown,
+		& > .edit-post-header__settings > .interface-pinned-items {
+			display: none;
+		}
+
+	}
+
+	// We need ! important because we override inline styles
+	// set by the motion component.
+	.interface-interface-skeleton__header:focus-within {
+		opacity: 1 !important;
+		div {
+			transform: translateX(0) translateZ(0) !important;
+		}
+
+	}
+
+	.components-editor-notices__dismissible {
+		position: absolute;
+		z-index: 35;
 	}
 }

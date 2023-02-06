@@ -22,9 +22,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 	it( 'should switch between visual and HTML modes', async () => {
 		// This block should be in "visual" mode by default.
-		let visualBlock = await page.$$(
-			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
-		);
+		let visualBlock = await page.$$( '[data-block].rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
 
 		// Change editing mode from "Visual" to "HTML".
@@ -33,7 +31,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// Wait for the block to be converted to HTML editing mode.
 		const htmlBlock = await page.$$(
-			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea'
+			'[data-block] .block-editor-block-list__block-html-textarea'
 		);
 		expect( htmlBlock ).toHaveLength( 1 );
 
@@ -42,9 +40,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await clickMenuItem( 'Edit visually' );
 
 		// This block should be in "visual" mode by default.
-		visualBlock = await page.$$(
-			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
-		);
+		visualBlock = await page.$$( '[data-block].rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
 	} );
 
@@ -97,14 +93,14 @@ describe( 'Editing modes (visual/HTML)', () => {
 	} );
 
 	it( 'the code editor should unselect blocks and disable the inserter', async () => {
-		// The paragraph block should be selected
+		// The paragraph block should be selected.
 		const title = await page.$eval(
 			'.block-editor-block-card__title',
 			( element ) => element.innerText
 		);
 		expect( title ).toBe( 'Paragraph' );
 
-		// The Block inspector should be active
+		// The Block inspector should be active.
 		let blockInspectorTab = await page.$(
 			'.edit-post-sidebar__panel-tab.is-active[data-label="Block"]'
 		);
@@ -112,20 +108,20 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		await switchEditorModeTo( 'Code' );
 
-		// The Block inspector should not be active anymore
+		// The Block inspector should not be active anymore.
 		blockInspectorTab = await page.$(
 			'.edit-post-sidebar__panel-tab.is-active[data-label="Block"]'
 		);
 		expect( blockInspectorTab ).toBeNull();
 
-		// No block is selected
+		// No block is selected.
 		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
 		const noBlocksElement = await page.$(
 			'.block-editor-block-inspector__no-blocks'
 		);
 		expect( noBlocksElement ).not.toBeNull();
 
-		// The inserter is disabled
+		// The inserter is disabled.
 		const disabledInserter = await page.$(
 			'.edit-post-header-toolbar__inserter-toggle:disabled, .edit-post-header-toolbar__inserter-toggle[aria-disabled="true"]'
 		);

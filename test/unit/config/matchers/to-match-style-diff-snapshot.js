@@ -8,7 +8,7 @@ const getStyleSheets = () =>
 
 /**
  *
- * @param {Element}            element
+ * @param {Element | null}     element
  * @param {HTMLStyleElement[]} styleSheets
  */
 const getStyleRulesForElement = ( element, styleSheets ) => {
@@ -17,7 +17,7 @@ const getStyleRulesForElement = ( element, styleSheets ) => {
 
 		try {
 			Array.from( styleSheet.sheet.cssRules ).forEach( ( rule ) => {
-				if ( element.matches( rule.selectorText ) ) {
+				if ( element?.matches( rule.selectorText ) ) {
 					found.push( rule.style );
 				}
 			} );
@@ -58,9 +58,9 @@ const cleanStyleRule = ( rule ) => {
 };
 
 /**
- * @param {Element} received
- * @param {Element} expected
- * @param {string}  testName
+ * @param {Element | null} received
+ * @param {Element | null} expected
+ * @param {string}         testName
  */
 function toMatchStyleDiffSnapshot( received, expected, testName ) {
 	const styleSheets = getStyleSheets();

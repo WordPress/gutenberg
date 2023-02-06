@@ -9,7 +9,7 @@ import Aztec
 import RNTAztecView
 
 @objc
-public class Gutenberg: NSObject {
+public class Gutenberg: UIResponder {
     public static func supportedBlocks(isDev: Bool = false) -> [String] {
         guard let json = try? SourceFile.supportedBlocks.getContent() else { return [] }
         let data = Data(json.utf8)
@@ -67,6 +67,8 @@ public class Gutenberg: NSObject {
         initialProps["featuredImageId"] = dataSource.gutenbergFeaturedImageId()
 
         initialProps["postType"] = dataSource.gutenbergPostType()
+
+        initialProps["hostAppNamespace"] = dataSource.gutenbergHostAppNamespace()
 
         if let locale = dataSource.gutenbergLocale() {
             initialProps["locale"] = locale
@@ -204,6 +206,14 @@ public class Gutenberg: NSObject {
             settingsUpdates["galleryWithImageBlocks"] = galleryWithImageBlocks
         }
 
+        if let quoteBlockV2 = editorSettings?.quoteBlockV2 {
+            settingsUpdates["quoteBlockV2"] = quoteBlockV2
+        }
+
+        if let listBlockV2 = editorSettings?.listBlockV2 {
+            settingsUpdates["listBlockV2"] = listBlockV2
+        }
+
         if let rawStyles = editorSettings?.rawStyles {
             settingsUpdates["rawStyles"] = rawStyles
         }
@@ -246,7 +256,11 @@ extension Gutenberg: RCTBridgeDelegate {
             return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
         }
         #endif
-        return RCTBundleURLProvider.sharedSettings()?.jsBundleURL(forBundleRoot: "index", fallbackResource: "")
+        
+        guard let localBundle = RCTBundleURLProvider.sharedSettings()?.jsBundleURL(forBundleRoot: "index", fallbackExtension: "") else {
+            return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+        }
+        return localBundle
     }
 
     public func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {

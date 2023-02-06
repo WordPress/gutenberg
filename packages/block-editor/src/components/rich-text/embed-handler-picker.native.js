@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -15,6 +10,8 @@ import {
 } from '@wordpress/element';
 import { Picker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+const noop = () => {};
 
 const DEFAULT_PICKER_OPTIONS = [
 	{

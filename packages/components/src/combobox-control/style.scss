@@ -6,6 +6,7 @@ input.components-combobox-control__input[type="text"] {
 	width: 100%;
 	border: none;
 	box-shadow: none;
+	font-family: inherit;
 	font-size: 16px;
 	padding: 2px;
 	margin: 0;
@@ -30,8 +31,7 @@ input.components-combobox-control__input[type="text"] {
 	flex-wrap: wrap;
 	align-items: flex-start;
 	width: 100%;
-	margin: 0 0 $grid-unit-10 0;
-	padding: $grid-unit-05;
+	padding: 0;
 
 	&:focus-within {
 		@include input-style__focus();

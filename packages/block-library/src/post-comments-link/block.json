@@ -1,6 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
+	"__experimental": "fse",
 	"name": "core/post-comments-link",
 	"title": "Post Comments Link",
 	"category": "theme",
@@ -13,6 +14,7 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"color": {
 			"link": true,
@@ -22,13 +24,19 @@
 				"link": true
 			}
 		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

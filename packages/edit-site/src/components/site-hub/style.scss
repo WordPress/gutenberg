@@ -1,0 +1,38 @@
+.edit-site-site-hub {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: $grid-unit-10;
+}
+
+.edit-site-site-hub__edit-button {
+	height: $grid-unit-40;
+	color: $white;
+}
+
+.edit-site-site-hub__post-type {
+	opacity: 0.6;
+}
+
+.edit-site-site-hub__view-mode-toggle-container {
+	height: $header-height;
+	width: $header-height + 4px;
+	flex-shrink: 0;
+}
+
+.edit-site-layout.is-edit-mode {
+	.edit-site-site-hub__view-mode-toggle-container {
+		width: $header-height;
+	}
+}
+
+.edit-site-site-hub__text-content {
+	// Necessary for the ellipsis to work.
+	overflow: hidden;
+}
+
+.edit-site-site-hub__title {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}

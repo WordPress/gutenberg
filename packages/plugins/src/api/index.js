@@ -7,11 +7,6 @@ import { applyFilters, doAction } from '@wordpress/hooks';
 import { plugins as pluginsIcon } from '@wordpress/icons';
 
 /**
- * External dependencies
- */
-import { isFunction } from 'lodash';
-
-/**
  * Defined behavior of a plugin type.
  *
  * @typedef {Object} WPPlugin
@@ -38,9 +33,9 @@ const plugins = {};
 /**
  * Registers a plugin to the editor.
  *
- * @param {string}   name     A string identifying the plugin.Must be
- *                            unique across all registered plugins.
- * @param {WPPlugin} settings The settings for this plugin.
+ * @param {string}                 name     A string identifying the plugin.Must be
+ *                                          unique across all registered plugins.
+ * @param {Omit<WPPlugin, 'name'>} settings The settings for this plugin.
  *
  * @example
  * ```js
@@ -135,7 +130,7 @@ export function registerPlugin( name, settings ) {
 
 	const { render, scope } = settings;
 
-	if ( ! isFunction( render ) ) {
+	if ( typeof render !== 'function' ) {
 		console.error(
 			'The "render" property must be specified and must be a valid function.'
 		);
@@ -188,7 +183,7 @@ export function registerPlugin( name, settings ) {
  * unregisterPlugin( 'plugin-name' );
  * ```
  *
- * @return {?WPPlugin} The previous plugin settings object, if it has been
+ * @return {WPPlugin | undefined} The previous plugin settings object, if it has been
  *                     successfully unregistered; otherwise `undefined`.
  */
 export function unregisterPlugin( name ) {

@@ -142,7 +142,7 @@ registerPlugin( 'plugin-name', {
 _Parameters_
 
 -   _name_ `string`: A string identifying the plugin.Must be unique across all registered plugins.
--   _settings_ `WPPlugin`: The settings for this plugin.
+-   _settings_ `Omit<WPPlugin, 'name'>`: The settings for this plugin.
 
 _Returns_
 
@@ -174,7 +174,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPPlugin`: The previous plugin settings object, if it has been successfully unregistered; otherwise `undefined`.
+-   `WPPlugin | undefined`: The previous plugin settings object, if it has been successfully unregistered; otherwise `undefined`.
 
 #### withPluginContext
 

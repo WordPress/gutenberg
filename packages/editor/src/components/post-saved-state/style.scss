@@ -33,3 +33,8 @@
 		}
 	}
 }
+
+// Overwrite rules from Button component packages/components/src/button/style.scss
+.editor-post-save-draft.has-text.has-icon svg {
+	margin-right: 0;
+}

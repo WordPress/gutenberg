@@ -19,6 +19,7 @@ function PostComments( { commentStatus = 'open', ...props } ) {
 
 	return (
 		<CheckboxControl
+			__nextHasNoMarginBottom
 			label={ __( 'Allow comments' ) }
 			checked={ commentStatus === 'open' }
 			onChange={ onToggleComments }
@@ -29,9 +30,10 @@ function PostComments( { commentStatus = 'open', ...props } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			commentStatus: select( editorStore ).getEditedPostAttribute(
-				'comment_status'
-			),
+			commentStatus:
+				select( editorStore ).getEditedPostAttribute(
+					'comment_status'
+				),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

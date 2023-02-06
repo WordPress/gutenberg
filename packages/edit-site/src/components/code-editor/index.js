@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { parse } from '@wordpress/blocks';
+import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useEntityBlockEditor, useEntityProp } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -32,10 +32,20 @@ export default function CodeEditor() {
 		'postType',
 		templateType
 	);
-	const content =
-		contentStructure instanceof Function
-			? contentStructure( { blocks } )
-			: contentStructure;
+
+	// Replicates the logic found in getEditedPostContent().
+	let content;
+	if ( contentStructure instanceof Function ) {
+		content = contentStructure( { blocks } );
+	} else if ( blocks ) {
+		// If we have parsed blocks already, they should be our source of truth.
+		// Parsing applies block deprecations and legacy block conversions that
+		// unparsed content will not have.
+		content = __unstableSerializeAndClean( blocks );
+	} else {
+		content = contentStructure;
+	}
+
 	const { switchEditorMode } = useDispatch( editSiteStore );
 	return (
 		<div className="edit-site-code-editor">

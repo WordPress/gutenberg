@@ -49,13 +49,14 @@ class FlakyTestsReporter {
 			}
 			case 'passed': {
 				if ( this.failingTestCaseResults.has( testTitle ) ) {
-					const failingResults = this.failingTestCaseResults.get(
-						testTitle
-					);
+					const failingResults =
+						this.failingTestCaseResults.get( testTitle );
 
 					await fs.writeFile(
 						`flaky-tests/${ filenamify( testTitle ) }.json`,
 						JSON.stringify( {
+							version: 1,
+							runner: 'jest-circus',
 							title: testTitle,
 							path: testPath,
 							results: failingResults,

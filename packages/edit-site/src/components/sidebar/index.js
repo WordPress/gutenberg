@@ -1,82 +1,59 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { cog } from '@wordpress/icons';
-import { useEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { memo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { __experimentalNavigatorProvider as NavigatorProvider } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import DefaultSidebar from './default-sidebar';
-import GlobalStylesSidebar from './global-styles-sidebar';
-import { STORE_NAME } from '../../store/constants';
-import SettingsHeader from './settings-header';
-import TemplateCard from './template-card';
-import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
+import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
+import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
+import useSyncSidebarPathWithURL from '../sync-state-with-url/use-sync-sidebar-path-with-url';
+import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
+import SaveButton from '../save-button';
 
-const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
-	'EditSiteSidebarInspector'
-);
-export const SidebarInspectorFill = InspectorFill;
+function SidebarScreens() {
+	useSyncSidebarPathWithURL();
 
-export function SidebarComplementaryAreaFills() {
-	const { sidebar, isEditorSidebarOpened, hasBlockSelection } = useSelect(
-		( select ) => {
-			const _sidebar = select(
-				interfaceStore
-			).getActiveComplementaryArea( STORE_NAME );
-			const _isEditorSidebarOpened = [
-				SIDEBAR_BLOCK,
-				SIDEBAR_TEMPLATE,
-			].includes( _sidebar );
-			return {
-				sidebar: _sidebar,
-				isEditorSidebarOpened: _isEditorSidebarOpened,
-				hasBlockSelection: !! select(
-					blockEditorStore
-				).getBlockSelectionStart(),
-			};
-		},
-		[]
-	);
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	useEffect( () => {
-		if ( ! isEditorSidebarOpened ) return;
-		if ( hasBlockSelection ) {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
-		} else {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
-		}
-	}, [ hasBlockSelection, isEditorSidebarOpened ] );
-	let sidebarName = sidebar;
-	if ( ! isEditorSidebarOpened ) {
-		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
-	}
 	return (
 		<>
-			<DefaultSidebar
-				identifier={ sidebarName }
-				title={ __( 'Settings' ) }
-				icon={ cog }
-				closeLabel={ __( 'Close settings sidebar' ) }
-				header={ <SettingsHeader sidebarName={ sidebarName } /> }
-				headerClassName="edit-site-sidebar__panel-tabs"
-			>
-				{ sidebarName === SIDEBAR_TEMPLATE && (
-					<PanelBody>
-						<TemplateCard />
-					</PanelBody>
-				) }
-				{ sidebarName === SIDEBAR_BLOCK && (
-					<InspectorSlot bubblesVirtually />
-				) }
-			</DefaultSidebar>
-			<GlobalStylesSidebar />
+			<SidebarNavigationScreenMain />
+			<SidebarNavigationScreenNavigationMenus />
+			<SidebarNavigationScreenTemplates postType="wp_template" />
+			<SidebarNavigationScreenTemplates postType="wp_template_part" />
 		</>
 	);
 }
+
+function Sidebar() {
+	const { isDirty } = useSelect( ( select ) => {
+		const { __experimentalGetDirtyEntityRecords } = select( coreStore );
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+		// The currently selected entity to display.
+		// Typically template or template part in the site editor.
+		return {
+			isDirty: dirtyEntityRecords.length > 0,
+		};
+	}, [] );
+
+	return (
+		<>
+			<NavigatorProvider
+				className="edit-site-sidebar__content"
+				initialPath="/"
+			>
+				<SidebarScreens />
+			</NavigatorProvider>
+			{ isDirty && (
+				<div className="edit-site-sidebar__footer">
+					<SaveButton />
+				</div>
+			) }
+		</>
+	);
+}
+
+export default memo( Sidebar );

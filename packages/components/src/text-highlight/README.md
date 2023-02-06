@@ -23,16 +23,16 @@ const MyTextHighlight = () => (
 
 The component accepts the following props.
 
-### text
-
-The string of text to be tested for occurrences of then given `highlight`.
-
--   Type: `String`
--   Required: Yes
-
-### highlight
+### `highlight`: `string`
 
 The string to search for and highlight within the `text`. Case insensitive. Multiple matches.
 
--   Type: `String`
 -   Required: Yes
+-   Default: `''`
+
+### `text`: `string`
+
+The string of text to be tested for occurrences of then given `highlight`.
+
+-   Required: Yes
+-   Default: `''`

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/keyboard-shortcuts",
-	"version": "3.1.0",
+	"version": "4.3.0",
 	"description": "Handling keyboard shortcuts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,8 +29,10 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/keycodes": "file:../keycodes",
-		"lodash": "^4.17.21",
-		"rememo": "^3.0.0"
+		"rememo": "^4.0.0"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { extend, flow } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { defaultSettings } from './defaultSettings';
@@ -37,7 +32,7 @@ import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCoun
  * @return {WPWordCountSettings} The combined settings object to be used.
  */
 function loadSettings( type, userSettings ) {
-	const settings = extend( {}, defaultSettings, userSettings );
+	const settings = Object.assign( {}, defaultSettings, userSettings );
 
 	settings.shortcodes = settings.l10n?.shortcodes ?? [];
 
@@ -70,15 +65,15 @@ function loadSettings( type, userSettings ) {
  * @return {number} Count of words.
  */
 function countWords( text, regex, settings ) {
-	text = flow(
+	text = [
 		stripTags.bind( null, settings ),
 		stripHTMLComments.bind( null, settings ),
 		stripShortcodes.bind( null, settings ),
 		stripSpaces.bind( null, settings ),
 		stripHTMLEntities.bind( null, settings ),
 		stripConnectors.bind( null, settings ),
-		stripRemovables.bind( null, settings )
-	)( text );
+		stripRemovables.bind( null, settings ),
+	].reduce( ( result, fn ) => fn( result ), text );
 	text = text + '\n';
 	return text.match( regex )?.length ?? 0;
 }
@@ -93,14 +88,14 @@ function countWords( text, regex, settings ) {
  * @return {number} Count of characters.
  */
 function countCharacters( text, regex, settings ) {
-	text = flow(
+	text = [
 		stripTags.bind( null, settings ),
 		stripHTMLComments.bind( null, settings ),
 		stripShortcodes.bind( null, settings ),
 		transposeAstralsToCountableChar.bind( null, settings ),
 		stripSpaces.bind( null, settings ),
-		transposeHTMLEntitiesToCountableChars.bind( null, settings )
-	)( text );
+		transposeHTMLEntitiesToCountableChars.bind( null, settings ),
+	].reduce( ( result, fn ) => fn( result ), text );
 	text = text + '\n';
 	return text.match( regex )?.length ?? 0;
 }

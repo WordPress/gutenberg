@@ -6,9 +6,10 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import ColorGradientSettingsDropdown from '../components/colors-gradients/dropdown';
 import ContrastChecker from '../components/contrast-checker';
-import ToolsPanelColorDropdown from '../components/colors-gradients/tools-panel-color-dropdown';
 import InspectorControls from '../components/inspector-controls';
+import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 
 function getComputedStyle( node ) {
@@ -25,9 +26,22 @@ export default function ColorPanel( {
 	const [ detectedColor, setDetectedColor ] = useState();
 	const [ detectedLinkColor, setDetectedLinkColor ] = useState();
 	const ref = useBlockRef( clientId );
+	const definedColors = settings.filter( ( setting ) => setting?.colorValue );
 
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
+			return;
+		}
+		if ( ! definedColors.length ) {
+			if ( detectedBackgroundColor ) {
+				setDetectedBackgroundColor();
+			}
+			if ( detectedColor ) {
+				setDetectedColor();
+			}
+			if ( detectedLinkColor ) {
+				setDetectedColor();
+			}
 			return;
 		}
 
@@ -42,8 +56,8 @@ export default function ColorPanel( {
 		}
 
 		let backgroundColorNode = ref.current;
-		let backgroundColor = getComputedStyle( backgroundColorNode )
-			.backgroundColor;
+		let backgroundColor =
+			getComputedStyle( backgroundColorNode ).backgroundColor;
 		while (
 			backgroundColor === 'rgba(0, 0, 0, 0)' &&
 			backgroundColorNode.parentNode &&
@@ -51,23 +65,25 @@ export default function ColorPanel( {
 				backgroundColorNode.parentNode.ELEMENT_NODE
 		) {
 			backgroundColorNode = backgroundColorNode.parentNode;
-			backgroundColor = getComputedStyle( backgroundColorNode )
-				.backgroundColor;
+			backgroundColor =
+				getComputedStyle( backgroundColorNode ).backgroundColor;
 		}
 
 		setDetectedBackgroundColor( backgroundColor );
 	} );
 
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
 	return (
-		<InspectorControls __experimentalGroup="color">
-			{ settings.map( ( setting, index ) => (
-				<ToolsPanelColorDropdown
-					key={ index }
-					settings={ setting }
-					panelId={ clientId }
-					enableAlpha={ enableAlpha }
-				/>
-			) ) }
+		<InspectorControls group="color">
+			<ColorGradientSettingsDropdown
+				enableAlpha={ enableAlpha }
+				panelId={ clientId }
+				settings={ settings }
+				__experimentalIsItemGroup={ false }
+				__experimentalIsRenderedInSidebar
+				{ ...colorGradientSettings }
+			/>
 			{ enableContrastChecking && (
 				<ContrastChecker
 					backgroundColor={ detectedBackgroundColor }

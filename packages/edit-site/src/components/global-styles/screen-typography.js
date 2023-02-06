@@ -1,22 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	FlexItem,
 } from '@wordpress/components';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { NavigationButton } from './navigation-button';
-import { useStyle } from './hooks';
+import { NavigationButtonAsItem } from './navigation-button';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
+import BlockPreviewPanel from './block-preview-panel';
+import { getVariationClassName } from './utils';
+import { unlock } from '../../experiments';
+
+const { useGlobalStyle } = unlock( blockEditorExperiments );
 
 function Item( { name, parentMenu, element, label } ) {
 	const hasSupport = ! name;
@@ -28,23 +33,44 @@ function Item( { name, parentMenu, element, label } ) {
 					textDecoration: 'underline',
 			  }
 			: {};
-	const [ fontFamily ] = useStyle( prefix + 'typography.fontFamily', name );
-	const [ fontStyle ] = useStyle( prefix + 'typography.fontStyle', name );
-	const [ fontWeight ] = useStyle( prefix + 'typography.fontWeight', name );
-	const [ letterSpacing ] = useStyle(
+	const [ fontFamily ] = useGlobalStyle(
+		prefix + 'typography.fontFamily',
+		name
+	);
+	const [ fontStyle ] = useGlobalStyle(
+		prefix + 'typography.fontStyle',
+		name
+	);
+	const [ fontWeight ] = useGlobalStyle(
+		prefix + 'typography.fontWeight',
+		name
+	);
+	const [ letterSpacing ] = useGlobalStyle(
 		prefix + 'typography.letterSpacing',
 		name
 	);
-	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
-	const [ gradientValue ] = useStyle( prefix + 'color.gradient', name );
-	const [ color ] = useStyle( prefix + 'color.text', name );
+	const [ backgroundColor ] = useGlobalStyle(
+		prefix + 'color.background',
+		name
+	);
+	const [ gradientValue ] = useGlobalStyle( prefix + 'color.gradient', name );
+	const [ color ] = useGlobalStyle( prefix + 'color.text', name );
 
 	if ( ! hasSupport ) {
 		return null;
 	}
 
+	const navigationButtonLabel = sprintf(
+		// translators: %s: is a subset of Typography, e.g., 'text' or 'links'.
+		__( 'Typography %s styles' ),
+		label
+	);
+
 	return (
-		<NavigationButton path={ parentMenu + '/typography/' + element }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/typography/' + element }
+			aria-label={ navigationButtonLabel }
+		>
 			<HStack justify="flex-start">
 				<FlexItem
 					className="edit-site-global-styles-screen-typography__indicator"
@@ -62,13 +88,13 @@ function Item( { name, parentMenu, element, label } ) {
 				</FlexItem>
 				<FlexItem>{ label }</FlexItem>
 			</HStack>
-		</NavigationButton>
+		</NavigationButtonAsItem>
 	);
 }
 
-function ScreenTypography( { name } ) {
+function ScreenTypography( { name, variation = '' } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
-
+	const variationClassName = getVariationClassName( variation );
 	return (
 		<>
 			<ScreenHeader
@@ -77,6 +103,8 @@ function ScreenTypography( { name } ) {
 					'Manage the typography settings for different elements.'
 				) }
 			/>
+
+			<BlockPreviewPanel name={ name } variation={ variationClassName } />
 
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">
@@ -95,13 +123,30 @@ function ScreenTypography( { name } ) {
 								element="link"
 								label={ __( 'Links' ) }
 							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="heading"
+								label={ __( 'Headings' ) }
+							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="button"
+								label={ __( 'Buttons' ) }
+							/>
 						</ItemGroup>
 					</VStack>
 				</div>
 			) }
-
-			{ /* no typography elements support yet for blocks */ }
-			{ !! name && <TypographyPanel name={ name } element="text" /> }
+			{ /* No typography elements support yet for blocks. */ }
+			{ !! name && (
+				<TypographyPanel
+					name={ name }
+					variation={ variation }
+					element="text"
+				/>
+			) }
 		</>
 	);
 }

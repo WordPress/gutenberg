@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { pick, defaultTo } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Platform, useMemo } from '@wordpress/element';
@@ -18,8 +13,68 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+
+const EMPTY_BLOCKS_LIST = [];
+
+const BLOCK_EDITOR_SETTINGS = [
+	'__experimentalBlockDirectory',
+	'__experimentalBlockInspectorAnimation',
+	'__experimentalDiscussionSettings',
+	'__experimentalFeatures',
+	'__experimentalGlobalStylesBaseStyles',
+	'__experimentalPreferredStyleVariations',
+	'__experimentalSetIsInserterOpened',
+	'__unstableGalleryWithImageBlocks',
+	'alignWide',
+	'allowedBlockTypes',
+	'blockInspectorTabs',
+	'allowedMimeTypes',
+	'bodyPlaceholder',
+	'canLockBlocks',
+	'capabilities',
+	'clearBlockSelection',
+	'codeEditingEnabled',
+	'colors',
+	'disableCustomColors',
+	'disableCustomFontSizes',
+	'disableCustomSpacingSizes',
+	'disableCustomGradients',
+	'disableLayoutStyles',
+	'enableCustomLineHeight',
+	'enableCustomSpacing',
+	'enableCustomUnits',
+	'enableOpenverseMediaCategory',
+	'focusMode',
+	'fontSizes',
+	'gradients',
+	'generateAnchors',
+	'hasFixedToolbar',
+	'hasInlineToolbar',
+	'isDistractionFree',
+	'imageDefaultSize',
+	'imageDimensions',
+	'imageEditing',
+	'imageSizes',
+	'isRTL',
+	'keepCaretInsideBlock',
+	'locale',
+	'maxWidth',
+	'onUpdateDefaultBlockStyles',
+	'postsPerPage',
+	'readOnly',
+	'styles',
+	'template',
+	'templateLock',
+	'titlePlaceholder',
+	'supportsLayout',
+	'widgetTypesToHideFromLegacyWidgetBlock',
+	'__unstableHasCustomAppender',
+	'__unstableIsPreviewMode',
+	'__unstableResolvedAssets',
+];
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -36,23 +91,16 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		canUseUnfilteredHTML,
 		userCanCreatePages,
 		pageOnFront,
+		postType,
 	} = useSelect( ( select ) => {
-		const { canUserUseUnfilteredHTML } = select( editorStore );
+		const { canUserUseUnfilteredHTML, getCurrentPostType } =
+			select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const {
-			canUser,
-			getUnstableBase,
-			hasFinishedResolution,
-			getEntityRecord,
-		} = select( coreStore );
+		const { canUser, getEntityRecord } = select( coreStore );
 
-		const siteSettings = getEntityRecord( 'root', 'site' );
-
-		const siteData = getUnstableBase();
-
-		const hasFinishedResolvingSiteData = hasFinishedResolution(
-			'getUnstableBase'
-		);
+		const siteSettings = canUser( 'read', 'settings' )
+			? getEntityRecord( 'root', 'site' )
+			: undefined;
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -62,17 +110,61 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						'wp_block',
 						{ per_page: -1 }
 				  )
-				: [], // Reusable blocks are fetched in the native version of this hook.
-			hasUploadPermissions: defaultTo(
-				canUser( 'create', 'media' ),
-				true
-			),
-			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
-			baseUrl: siteData?.url || '',
+				: EMPTY_BLOCKS_LIST, // Reusable blocks are fetched in the native version of this hook.
+			hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 			userCanCreatePages: canUser( 'create', 'pages' ),
 			pageOnFront: siteSettings?.page_on_front,
+			postType: getCurrentPostType(),
 		};
 	}, [] );
+
+	const settingsBlockPatterns =
+		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
+		settings.__experimentalBlockPatterns; // WP 5.9
+	const settingsBlockPatternCategories =
+		settings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
+		settings.__experimentalBlockPatternCategories; // WP 5.9
+
+	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
+		( select ) => ( {
+			restBlockPatterns: select( coreStore ).getBlockPatterns(),
+			restBlockPatternCategories:
+				select( coreStore ).getBlockPatternCategories(),
+		} ),
+		[]
+	);
+
+	const blockPatterns = useMemo(
+		() =>
+			[
+				...( settingsBlockPatterns || [] ),
+				...( restBlockPatterns || [] ),
+			]
+				.filter(
+					( x, index, arr ) =>
+						index === arr.findIndex( ( y ) => x.name === y.name )
+				)
+				.filter( ( { postTypes } ) => {
+					return (
+						! postTypes ||
+						( Array.isArray( postTypes ) &&
+							postTypes.includes( postType ) )
+					);
+				} ),
+		[ settingsBlockPatterns, restBlockPatterns, postType ]
+	);
+
+	const blockPatternCategories = useMemo(
+		() =>
+			[
+				...( settingsBlockPatternCategories || [] ),
+				...( restBlockPatternCategories || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
+			),
+		[ settingsBlockPatternCategories, restBlockPatternCategories ]
+	);
 
 	const { undo } = useDispatch( editorStore );
 
@@ -96,51 +188,18 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 
 	return useMemo(
 		() => ( {
-			...pick( settings, [
-				'__experimentalBlockDirectory',
-				'__experimentalBlockPatternCategories',
-				'__experimentalBlockPatterns',
-				'__experimentalDiscussionSettings',
-				'__experimentalFeatures',
-				'__experimentalPreferredStyleVariations',
-				'__experimentalSetIsInserterOpened',
-				'__unstableGalleryWithImageBlocks',
-				'alignWide',
-				'allowedBlockTypes',
-				'bodyPlaceholder',
-				'codeEditingEnabled',
-				'colors',
-				'disableCustomColors',
-				'disableCustomFontSizes',
-				'disableCustomGradients',
-				'enableCustomLineHeight',
-				'enableCustomSpacing',
-				'enableCustomUnits',
-				'focusMode',
-				'fontSizes',
-				'gradients',
-				'hasFixedToolbar',
-				'hasReducedUI',
-				'imageDefaultSize',
-				'imageDimensions',
-				'imageEditing',
-				'imageSizes',
-				'isRTL',
-				'keepCaretInsideBlock',
-				'maxWidth',
-				'onUpdateDefaultBlockStyles',
-				'styles',
-				'template',
-				'templateLock',
-				'titlePlaceholder',
-				'supportsLayout',
-				'widgetTypesToHideFromLegacyWidgetBlock',
-				'__unstableResolvedAssets',
-			] ),
+			...Object.fromEntries(
+				Object.entries( settings ).filter( ( [ key ] ) =>
+					BLOCK_EDITOR_SETTINGS.includes( key )
+				)
+			),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
+			__experimentalBlockPatterns: blockPatterns,
+			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
+			inserterMediaCategories,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
@@ -148,11 +207,14 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
 			pageOnFront,
+			__experimentalPreferPatternsOnRoot: hasTemplate,
 		} ),
 		[
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
+			blockPatterns,
+			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,

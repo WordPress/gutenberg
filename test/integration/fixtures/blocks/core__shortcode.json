@@ -1,12 +1,10 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/shortcode",
 		"isValid": true,
 		"attributes": {
 			"text": "[gallery ids=\"238,338\"]"
 		},
-		"innerBlocks": [],
-		"originalContent": "[gallery ids=\"238,338\"]"
+		"innerBlocks": []
 	}
 ]

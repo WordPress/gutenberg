@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { once, uniqueId, omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
@@ -17,30 +12,40 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import AutosaveMonitor from '../autosave-monitor';
-import { localAutosaveGet, localAutosaveClear } from '../../store/controls';
+import {
+	localAutosaveGet,
+	localAutosaveClear,
+} from '../../store/local-autosave';
 import { store as editorStore } from '../../store';
 
 const requestIdleCallback = window.requestIdleCallback
 	? window.requestIdleCallback
 	: window.requestAnimationFrame;
 
+let hasStorageSupport;
+let uniqueId = 0;
+
 /**
  * Function which returns true if the current environment supports browser
  * sessionStorage, or false otherwise. The result of this function is cached and
  * reused in subsequent invocations.
  */
-const hasSessionStorageSupport = once( () => {
-	try {
-		// Private Browsing in Safari 10 and earlier will throw an error when
-		// attempting to set into sessionStorage. The test here is intentional in
-		// causing a thrown error as condition bailing from local autosave.
-		window.sessionStorage.setItem( '__wpEditorTestSessionStorage', '' );
-		window.sessionStorage.removeItem( '__wpEditorTestSessionStorage' );
-		return true;
-	} catch ( error ) {
-		return false;
+const hasSessionStorageSupport = () => {
+	if ( typeof hasStorageSupport === 'undefined' ) {
+		try {
+			// Private Browsing in Safari 10 and earlier will throw an error when
+			// attempting to set into sessionStorage. The test here is intentional in
+			// causing a thrown error as condition bailing from local autosave.
+			window.sessionStorage.setItem( '__wpEditorTestSessionStorage', '' );
+			window.sessionStorage.removeItem( '__wpEditorTestSessionStorage' );
+			hasStorageSupport = true;
+		} catch ( error ) {
+			hasStorageSupport = false;
+		}
 	}
-} );
+
+	return hasStorageSupport;
+};
 
 /**
  * Custom hook which manages the creation of a notice prompting the user to
@@ -51,8 +56,8 @@ function useAutosaveNotice() {
 		( select ) => ( {
 			postId: select( editorStore ).getCurrentPostId(),
 			isEditedPostNew: select( editorStore ).isEditedPostNew(),
-			hasRemoteAutosave: !! select( editorStore ).getEditorSettings()
-				.autosave,
+			hasRemoteAutosave:
+				!! select( editorStore ).getEditorSettings().autosave,
 		} ),
 		[]
 	);
@@ -95,7 +100,7 @@ function useAutosaveNotice() {
 			return;
 		}
 
-		const noticeId = uniqueId( 'wpEditorAutosaveRestore' );
+		const noticeId = `wpEditorAutosaveRestore${ ++uniqueId }`;
 		createWarningNotice(
 			__(
 				'The backup of this post in your browser is different from the version below.'
@@ -106,7 +111,11 @@ function useAutosaveNotice() {
 					{
 						label: __( 'Restore the backup' ),
 						onClick() {
-							editPost( omit( edits, [ 'content' ] ) );
+							const {
+								content: editsContent,
+								...editsWithoutContent
+							} = edits;
+							editPost( editsWithoutContent );
 							resetEditorBlocks( parse( edits.content ) );
 							removeNotice( noticeId );
 						},
@@ -121,22 +130,17 @@ function useAutosaveNotice() {
  * Custom hook which ejects a local autosave after a successful save occurs.
  */
 function useAutosavePurge() {
-	const {
-		postId,
-		isEditedPostNew,
-		isDirty,
-		isAutosaving,
-		didError,
-	} = useSelect(
-		( select ) => ( {
-			postId: select( editorStore ).getCurrentPostId(),
-			isEditedPostNew: select( editorStore ).isEditedPostNew(),
-			isDirty: select( editorStore ).isEditedPostDirty(),
-			isAutosaving: select( editorStore ).isAutosavingPost(),
-			didError: select( editorStore ).didPostSaveRequestFail(),
-		} ),
-		[]
-	);
+	const { postId, isEditedPostNew, isDirty, isAutosaving, didError } =
+		useSelect(
+			( select ) => ( {
+				postId: select( editorStore ).getCurrentPostId(),
+				isEditedPostNew: select( editorStore ).isEditedPostNew(),
+				isDirty: select( editorStore ).isEditedPostDirty(),
+				isAutosaving: select( editorStore ).isAutosavingPost(),
+				didError: select( editorStore ).didPostSaveRequestFail(),
+			} ),
+			[]
+		);
 
 	const lastIsDirty = useRef( isDirty );
 	const lastIsAutosaving = useRef( isAutosaving );
@@ -174,8 +178,8 @@ function LocalAutosaveMonitor() {
 
 	const { localAutosaveInterval } = useSelect(
 		( select ) => ( {
-			localAutosaveInterval: select( editorStore ).getEditorSettings()
-				.__experimentalLocalAutosaveInterval,
+			localAutosaveInterval:
+				select( editorStore ).getEditorSettings().localAutosaveInterval,
 		} ),
 		[]
 	);

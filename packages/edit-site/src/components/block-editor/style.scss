@@ -14,15 +14,32 @@
 
 .edit-site-visual-editor {
 	position: relative;
+	height: 100%;
+	display: block;
+	overflow: hidden;
 	background-color: $gray-800;
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
 
+	iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.edit-site-visual-editor__editor-canvas {
+		height: 100%;
+		background: $white;
+	}
+
 	&.is-focus-mode {
-		padding: $grid-unit-60;
+		.edit-site-layout.is-full-canvas & {
+			padding: $grid-unit-60;
+		}
 
 		.edit-site-visual-editor__editor-canvas {
 			border-radius: $radius-block-ui;
+			max-height: 100%;
 		}
 
 		// To hide the horizontal scrollbar and show the drag handle on the
@@ -36,6 +53,19 @@
 		margin: 0 auto;
 		// Removing this will cancel the bottom margins in the iframe.
 		overflow: auto;
+	}
+
+	/*
+		Temporary to hide the contextual toolbar in view mode.
+		See: https://github.com/WordPress/gutenberg/pull/46298
+		This rule can possibly be removed once the
+		contextual toolbar has been redesigned.
+		See: https://github.com/WordPress/gutenberg/issues/40450
+	*/
+	&.is-view-mode {
+		.block-editor-block-contextual-toolbar {
+			display: none;
+		}
 	}
 }
 
@@ -53,20 +83,52 @@
 }
 
 .resizable-editor__drag-handle {
-	$height: 100px;
 	position: absolute;
 	top: 0;
 	bottom: 0;
 	padding: 0;
 	margin: auto 0;
-	width: $grid-unit-05;
-	height: $height;
+	width: $grid-unit-15;
 	appearance: none;
 	cursor: ew-resize;
 	outline: none;
-	background: $gray-600;
-	border-radius: 2px;
+	background: none;
+	border-radius: $radius-block-ui;
 	border: 0;
+
+	&.is-variation-default {
+		height: 100px;
+	}
+
+	&.is-variation-separator {
+		height: 100%;
+		width: $grid-unit-30;
+		right: 0;
+
+		&::after {
+			width: 2px;
+			border-radius: 0;
+			background: transparent;
+			left: 50%;
+			transform: translateX(-1px);
+			right: 0;
+			transition: all ease 0.2s;
+			transition-delay: 0.1s;
+			@include reduce-motion;
+		}
+	}
+
+	&::after {
+		position: absolute;
+		top: $grid-unit-30;
+		left: $grid-unit-05;
+		right: 0;
+		bottom: $grid-unit-30;
+		content: "";
+		width: $grid-unit-05;
+		background: $gray-600;
+		border-radius: $radius-block-ui;
+	}
 
 	&.is-left {
 		left: -$grid-unit-20;
@@ -78,10 +140,22 @@
 
 	&:hover,
 	&:active {
-		background: $gray-400;
+		opacity: 1;
+		&.is-variation-default::after {
+			background: $gray-400;
+		}
+		&.is-variation-separator::after {
+			background: var(--wp-admin-theme-color);
+		}
 	}
 
-	&:focus {
+	&:focus::after {
 		box-shadow: 0 0 0 1px $gray-800, 0 0 0 calc(var(--wp-admin-border-width-focus) + 1px) var(--wp-admin-theme-color);
 	}
+
+	&.is-variation-separator:focus::after {
+		border-radius: $radius-block-ui;
+		box-shadow: inset 0 0 0 2px var(--wp-admin-theme-color);
+	}
 }
+

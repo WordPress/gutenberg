@@ -9,7 +9,7 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
-import {__experimentalScrollable as Scrollable } from '@wordpress/components';
+import { __experimentalScrollable as Scrollable } from '@wordpress/components';
 
 function Example() {
 	return (
@@ -22,17 +22,23 @@ function Example() {
 
 ## Props
 
-### `scrollDirection`: `string`
+### `children`: `ReactNode`
 
-- Required: No
-- Default: `y`
-- Allowed values: `x`, `y`, `auto`
+The children elements.
+
+-   Required: Yes
+
+### `scrollDirection`: `string`
 
 Renders a scrollbar for a specific axis when content overflows.
 
+-   Required: No
+-   Default: `y`
+-   Allowed values: `x`, `y`, `auto`
+
 ### `smoothScroll`: `boolean`
 
-- Required: No
-- Default: `false`
-
 Enables (CSS) smooth scrolling.
+
+-   Required: No
+-   Default: `false`

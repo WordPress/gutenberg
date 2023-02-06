@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { useEffect, Platform } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {
 	AlignmentControl,
@@ -41,13 +41,27 @@ function HeadingEdit( {
 		style,
 	} );
 
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { canGenerateAnchors } = useSelect( ( select ) => {
+		const { getGlobalBlockCount, getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+
+		return {
+			canGenerateAnchors:
+				!! settings.generateAnchors ||
+				getGlobalBlockCount( 'core/table-of-contents' ) > 0,
+		};
+	}, [] );
+
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	// Initially set anchor for headings that have content but no anchor set.
 	// This is used when transforming a block to heading, or for legacy anchors.
 	useEffect( () => {
+		if ( ! canGenerateAnchors ) {
+			return;
+		}
+
 		if ( ! anchor && content ) {
 			// This side-effect should not create an undo level.
 			__unstableMarkNextChangeAsNotPersistent();
@@ -59,14 +73,15 @@ function HeadingEdit( {
 
 		// Remove anchor map when block unmounts.
 		return () => setAnchor( clientId, null );
-	}, [ content, anchor ] );
+	}, [ anchor, content, clientId, canGenerateAnchors ] );
 
 	const onContentChange = ( value ) => {
 		const newAttrs = { content: value };
 		if (
-			! anchor ||
-			! value ||
-			generateAnchor( clientId, content ) === anchor
+			canGenerateAnchors &&
+			( ! anchor ||
+				! value ||
+				generateAnchor( clientId, content ) === anchor )
 		) {
 			newAttrs.anchor = generateAnchor( clientId, value );
 		}

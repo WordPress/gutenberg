@@ -147,8 +147,8 @@ export type ToolsPanelContext = {
 };
 
 export type ToolsPanelControlsGroupProps = {
+	itemClassName?: string;
 	items: [ string, boolean ][];
-	onClose: () => void;
 	toggleItem: ( label: string ) => void;
 };
 

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
-import { isPlainObject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -89,7 +88,10 @@ export default function useText( props ) {
 			display,
 			fontSize: getFontSize( size ),
 			/* eslint-disable jsdoc/valid-types */
-			fontWeight: /** @type {import('react').CSSProperties['fontWeight']} */ ( weight ),
+			fontWeight:
+				/** @type {import('react').CSSProperties['fontWeight']} */ (
+					weight
+				),
 			/* eslint-enable jsdoc/valid-types */
 			lineHeight,
 			letterSpacing,
@@ -105,7 +107,7 @@ export default function useText( props ) {
 				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
 
 			sx.optimalTextColor = isOptimalTextColorDark
-				? css( { color: COLORS.black } )
+				? css( { color: COLORS.gray[ 900 ] } )
 				: css( { color: COLORS.white } );
 		}
 
@@ -164,8 +166,11 @@ export default function useText( props ) {
 	 */
 	if ( ! truncate && Array.isArray( children ) ) {
 		content = Children.map( children, ( child ) => {
-			// @ts-ignore
-			if ( ! isPlainObject( child ) || ! ( 'props' in child ) ) {
+			if (
+				typeof child !== 'object' ||
+				child === null ||
+				! ( 'props' in child )
+			) {
 				return child;
 			}
 

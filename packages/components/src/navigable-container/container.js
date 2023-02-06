@@ -1,15 +1,11 @@
 // @ts-nocheck
 /**
- * External dependencies
- */
-import { omit, noop, isFunction } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component, forwardRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
+const noop = () => {};
 const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
 
 function cycleValue( value, total, offset ) {
@@ -52,7 +48,7 @@ class NavigableContainer extends Component {
 		const { forwardedRef } = this.props;
 		this.container = ref;
 
-		if ( isFunction( forwardedRef ) ) {
+		if ( typeof forwardedRef === 'function' ) {
 			forwardedRef( ref );
 		} else if ( forwardedRef && 'current' in forwardedRef ) {
 			forwardedRef.current = ref;
@@ -93,9 +89,9 @@ class NavigableContainer extends Component {
 
 		const offset = eventToOffset( event );
 
-		// eventToOffset returns undefined if the event is not handled by the component
+		// eventToOffset returns undefined if the event is not handled by the component.
 		if ( offset !== undefined && stopNavigationEvents ) {
-			// Prevents arrow key handlers bound to the document directly interfering
+			// Prevents arrow key handlers bound to the document directly interfering.
 			event.stopImmediatePropagation();
 
 			// When navigating a collection of items, prevent scroll containers
@@ -103,7 +99,14 @@ class NavigableContainer extends Component {
 			// 'handling' the event, as voiceover will try to use arrow keys
 			// for highlighting text.
 			const targetRole = event.target.getAttribute( 'role' );
-			if ( MENU_ITEM_ROLES.includes( targetRole ) ) {
+			const targetHasMenuItemRole =
+				MENU_ITEM_ROLES.includes( targetRole );
+
+			// `preventDefault()` on tab to avoid having the browser move the focus
+			// after this component has already moved it.
+			const isTab = event.code === 'Tab';
+
+			if ( targetHasMenuItemRole || isTab ) {
 				event.preventDefault();
 			}
 		}
@@ -130,20 +133,19 @@ class NavigableContainer extends Component {
 	}
 
 	render() {
-		const { children, ...props } = this.props;
+		const {
+			children,
+			stopNavigationEvents,
+			eventToOffset,
+			onNavigate,
+			onKeyDown,
+			cycle,
+			onlyBrowserTabstops,
+			forwardedRef,
+			...restProps
+		} = this.props;
 		return (
-			<div
-				ref={ this.bindContainer }
-				{ ...omit( props, [
-					'stopNavigationEvents',
-					'eventToOffset',
-					'onNavigate',
-					'onKeyDown',
-					'cycle',
-					'onlyBrowserTabstops',
-					'forwardedRef',
-				] ) }
-			>
+			<div ref={ this.bindContainer } { ...restProps }>
 				{ children }
 			</div>
 		);

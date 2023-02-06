@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, partial } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,9 +30,8 @@ const PANEL_NAME = 'page-attributes';
 export function PageAttributes() {
 	const { isEnabled, isOpened, postType } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
-		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
-			editPostStore
-		);
+		const { isEditorPanelEnabled, isEditorPanelOpened } =
+			select( editPostStore );
 		const { getPostType } = select( coreStore );
 		return {
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
@@ -47,7 +46,8 @@ export function PageAttributes() {
 		return null;
 	}
 
-	const onTogglePanel = partial( toggleEditorPanelOpened, PANEL_NAME );
+	const onTogglePanel = ( ...args ) =>
+		toggleEditorPanelOpened( PANEL_NAME, ...args );
 
 	return (
 		<PageAttributesCheck>

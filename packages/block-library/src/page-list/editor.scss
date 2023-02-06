@@ -22,19 +22,13 @@
 	}
 }
 
+.wp-block-navigation .wp-block-navigation__submenu-container > .wp-block-page-list {
+	display: block; // This is needed to make sure the page list container is 100% wide, so that the children are correctly positioned.
+}
+
 // Make links unclickable in the editor.
 .wp-block-pages-list__item__link {
 	pointer-events: none;
-}
-
-.wp-block-page-list .components-placeholder {
-	min-height: 0;
-	padding: 0;
-	background-color: inherit;
-
-	.components-spinner {
-		margin: 0.5em;
-	}
 }
 
 // Modal that shows conversion option.

@@ -2,10 +2,97 @@
 
 ## Unreleased
 
+## 4.10.0 (2023-02-01)
+
+## 4.9.0 (2023-01-11)
+
+## 4.8.0 (2023-01-02)
+
+## 4.7.0 (2022-12-14)
+
+## 4.6.0 (2022-11-16)
+
+## 4.5.0 (2022-11-02)
+
+### Enhancement
+
+-   Update templates to use the `render` field in `block.json` introduced in WordPress 6.1 ([#44185](https://github.com/WordPress/gutenberg/pull/44185)).
+
+## 4.4.0 (2022-10-19)
+
+### New Feature
+
+-   Add new `customPackageJSON` and `customBlockJSON` keys to allow templates to define custom keys for the resulting `package.json` and `block.json` files respectively.[#44649](https://github.com/WordPress/gutenberg/pull/44649)
+
+## 4.3.0 (2022-10-05)
+
+## 4.2.0 (2022-09-21)
+
+## 4.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+### New Feature
+
+-   Add `--no-plugin` flag to allow scaffolding of a block in an existing plugin ([#41642](https://github.com/WordPress/gutenberg/pull/41642))
+-   Introduce the `--variant` flag to allow selection of a variant as defined in the template ([#41289](https://github.com/WordPress/gutenberg/pull/41289), [#43481](https://github.com/WordPress/gutenberg/pull/43481)).
+
+## 3.6.0 (2022-07-13)
+
+### Enhancement
+
+-   Added prompt to continue when minimum system requirements not met ([#42151](https://github.com/WordPress/gutenberg/pull/42151)).
+
+## 3.3.0 (2022-06-01)
+
+### Enhancement
+
+-   Read the block name from `block.json` file in JavaScript files ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
+
+## 3.2.0 (2022-05-18)
+
+### Bug Fix
+
+-   Fix the `.editorconfig` file include to work correctly with YAML files ([#40994](https://github.com/WordPress/gutenberg/pull/40994)).
+
+### Internal
+
+-   Updated `commander` dependency from requiring `^4.1.0` to `^9.2.0` ([#40927](https://github.com/WordPress/gutenberg/pull/40927)).
+
+## 3.1.0 (2022-04-08)
+
 ### New Features
 
--    Automatically add a `"env": "wp-env"` entry to scripts when the `--wp-env` is passed or when a template sets `wpEnv` to `true` ([#38530](https://github.com/WordPress/gutenberg/pull/38530)).
--    Introduce the `customScripts` property to allow templates to define additional scripts ([#38535](https://github.com/WordPress/gutenberg/pull/38535)).
+-   Add `npmDevDependencies` template variable to allow definition of `devDependencies` as part of a template ([#39723](https://github.com/WordPress/gutenberg/pull/39723)).
+
+## 3.0.0 (2022-03-03)
+
+### Breaking Changes
+
+-   It is no longer mandatory to provide the deprecated `templatesPath` option when configuring the custom project template ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
+-   Custom project templates will use default template files during scaffolding for the WordPress plugin shell and/or individual blocks. It is possible to replace them with a custom set of template files by using the `pluginTemplatesPath` and/or `blockTemplatesPath` options ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
+-   The default `esnext` project template got renamed to `static` ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
+
+### New Features
+
+-   Added CLI prompts for three additional plugin header fields: `Plugin URI`, `Domain Path`, and `Update URI` ([#39096](https://github.com/WordPress/gutenberg/pull/39096)).
+
+### Deprecations
+
+-   To remove confusion when configuring custom project templates, the `templatesPath` option got renamed to `pluginTemplatesPath`. The old name still works but is considered deprecated, and it might get removed in the future ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
+
+### Documentation
+
+-   Include a missing note on how to create a zip file for a WordPress plugin ([#39049](https://github.com/WordPress/gutenberg/pull/39049))
+
+## 2.9.0 (2022-02-10)
+
+### New Features
+
+-   Automatically add a `"env": "wp-env"` entry to scripts when the `--wp-env` is passed or when a template sets `wpEnv` to `true` ([#38530](https://github.com/WordPress/gutenberg/pull/38530)).
+-   Introduce the `customScripts` property to allow templates to define additional scripts ([#38535](https://github.com/WordPress/gutenberg/pull/38535)).
 
 ## 2.8.0 (2022-01-27)
 

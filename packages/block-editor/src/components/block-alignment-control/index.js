@@ -3,10 +3,15 @@
  */
 import BlockAlignmentUI from './ui';
 
-export function BlockAlignmentControl( props ) {
+const BlockAlignmentControl = ( props ) => {
 	return <BlockAlignmentUI { ...props } isToolbar={ false } />;
-}
+};
 
-export function BlockAlignmentToolbar( props ) {
+const BlockAlignmentToolbar = ( props ) => {
 	return <BlockAlignmentUI { ...props } isToolbar />;
-}
+};
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md
+ */
+export { BlockAlignmentControl, BlockAlignmentToolbar };

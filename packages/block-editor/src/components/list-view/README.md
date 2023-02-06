@@ -4,7 +4,7 @@ The ListView component provides an overview of the hierarchical structure of all
 
 Blocks that have child blocks (such as group or column blocks) are presented with the parent at the top and the nested children below.
 
-In addition to presenting the structure of the blocks in the editor, the ListView component lets users navigate to each block by clicking on its line in the hierarchy tree.
+In addition to presenting the structure of the blocks in the editor, the ListView component lets users navigate to each block by clicking on its line in the hierarchy tree. Multiple blocks at the same level of nesting can be selected by holding down the `SHIFT` key and clicking blocks within the list.
 
 ![List view](https://make.wordpress.org/core/files/2020/08/block-navigation.png)
 ![View of a group list view](https://make.wordpress.org/core/files/2020/08/view-of-group-block-navigation.png)
@@ -23,7 +23,7 @@ Renders a list view with default syles.
 ```jsx
 import { ListView } from '@wordpress/block-editor';
 
-const MyNavigation = () => <ListView onSelect={ onClose } />;
+const MyNavigation = () => <ListView />;
 ```
 
 ## Related components

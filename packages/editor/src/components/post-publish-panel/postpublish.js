@@ -122,6 +122,7 @@ class PostPublishPanelPostpublish extends Component {
 					</p>
 					<div className="post-publish-panel__postpublish-post-address-container">
 						<TextControl
+							__nextHasNoMarginBottom
 							className="post-publish-panel__postpublish-post-address"
 							readOnly
 							label={ sprintf(
@@ -163,11 +164,8 @@ class PostPublishPanelPostpublish extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const {
-		getEditedPostAttribute,
-		getCurrentPost,
-		isCurrentPostScheduled,
-	} = select( editorStore );
+	const { getEditedPostAttribute, getCurrentPost, isCurrentPostScheduled } =
+		select( editorStore );
 	const { getPostType } = select( coreStore );
 
 	return {

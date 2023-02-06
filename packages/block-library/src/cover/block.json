@@ -10,6 +10,10 @@
 		"url": {
 			"type": "string"
 		},
+		"useFeaturedImage": {
+			"type": "boolean",
+			"default": false
+		},
 		"id": {
 			"type": "number"
 		},
@@ -69,15 +73,21 @@
 		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
-			"enum": [ "all", "insert", false ]
+			"enum": [ "all", "insert", "contentOnly", false ]
+		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
 		}
 	},
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"anchor": true,
 		"align": true,
 		"html": false,
 		"spacing": {
 			"padding": true,
+			"margin": [ "top", "bottom" ],
 			"__experimentalDefaultControls": {
 				"padding": true
 			}
@@ -86,6 +96,19 @@
 			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
 			"text": false,
 			"background": false
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-cover-editor",

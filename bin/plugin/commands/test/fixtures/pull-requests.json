@@ -1697,7 +1697,7 @@
 				"id": 567484057,
 				"node_id": "MDU6TGFiZWw1Njc0ODQwNTc=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Type]%20Documentation",
-				"name": "[Type] Documentation",
+				"name": "[Type] Developer Documentation",
 				"color": "bfd4f2",
 				"default": false,
 				"description": ""
@@ -3822,7 +3822,7 @@
 				"id": 567484057,
 				"node_id": "MDU6TGFiZWw1Njc0ODQwNTc=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Type]%20Documentation",
-				"name": "[Type] Documentation",
+				"name": "[Type] Developer Documentation",
 				"color": "bfd4f2",
 				"default": false,
 				"description": ""
@@ -4409,7 +4409,7 @@
 				"id": 567484057,
 				"node_id": "MDU6TGFiZWw1Njc0ODQwNTc=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Type]%20Documentation",
-				"name": "[Type] Documentation",
+				"name": "[Type] Developer Documentation",
 				"color": "bfd4f2",
 				"default": false,
 				"description": ""
@@ -5099,24 +5099,6 @@
 				"color": "d93f0b",
 				"default": false,
 				"description": "An existing feature is broken."
-			},
-			{
-				"id": 2074073931,
-				"node_id": "MDU6TGFiZWwyMDc0MDczOTMx",
-				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Feature]%20Navigation%20Screen",
-				"name": "[Feature] Navigation Screen",
-				"color": "fbca04",
-				"default": false,
-				"description": "A new block-based screen intended to replace nav-menus.php."
-			},
-			{
-				"id": 2536082965,
-				"node_id": "MDU6TGFiZWwyNTM2MDgyOTY1",
-				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Package]%20Edit%20Navigation",
-				"name": "[Package] Edit Navigation",
-				"color": "ed2572",
-				"default": false,
-				"description": "/packages/edit-navigation"
 			}
 		],
 		"state": "closed",
@@ -6218,7 +6200,7 @@
 				"id": 567484057,
 				"node_id": "MDU6TGFiZWw1Njc0ODQwNTc=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Type]%20Documentation",
-				"name": "[Type] Documentation",
+				"name": "[Type] Developer Documentation",
 				"color": "bfd4f2",
 				"default": false,
 				"description": ""
@@ -6413,7 +6395,7 @@
 				"id": 567484057,
 				"node_id": "MDU6TGFiZWw1Njc0ODQwNTc=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Type]%20Documentation",
-				"name": "[Type] Documentation",
+				"name": "[Type] Developer Documentation",
 				"color": "bfd4f2",
 				"default": false,
 				"description": ""
@@ -6628,7 +6610,7 @@
 			"diff_url": "https://github.com/WordPress/gutenberg/pull/33788.diff",
 			"patch_url": "https://github.com/WordPress/gutenberg/pull/33788.patch"
 		},
-		"body": "## Description\r\nReact Native added a `PROJECT_ROOT` [configuration to better support monorepos](https://git.io/JBwVr). Prior to setting the `PROJECT_ROOT` configuration, building the Demo app in Xcode threw errors related to the inability to find the entry `index.js` file, as it was searching in the root directory.\r\n\r\n<details><summary>Error Text</summary>\r\n\r\n```\r\nerror The resource `/Users/username/Sites/a8c/gutenberg/index.js` was not found.\r\nError: The resource `/Users/username/Sites/a8c/gutenberg/index.js` was not found.\r\n    at /Users/username/Sites/a8c/gutenberg/node_modules/metro/src/IncrementalBundler.js:457:26\r\n    at gotStat (node:fs:2627:21)\r\n    at FSReqCallback.oncomplete (node:fs:195:21)\r\ninfo Run CLI with --verbose flag for more details.\r\nCommand PhaseScriptExecution failed with a nonzero exit code\r\n```\r\n\r\n</details>\r\n\r\n<details><summary>Error Screenshot</summary>\r\n\r\n<img width=\"1552\" alt=\"xcode-demo-app-error\" src=\"https://user-images.githubusercontent.com/438664/127712716-eb2fd3a3-0444-45be-a4d5-8ada20d22579.png\">\r\n\r\n</details>\r\n\r\n## How has this been tested?\r\n1. Check out `trunk` branch. \r\n2. `npm run native start:reset`\r\n3. Launch Xcode and build the Demo app to a physical device. \r\n4. ⚠️ **Unexpected:** Notice the build failure. \r\n5. Check out this PR branch. \r\n6. `npm run native start:reset`\r\n7. Launch Xcode and build the Demo app to a physical device. \r\n8. ℹ️ **Expected:** The build succeeds and runs on the device. \r\n\r\n## Screenshots <!-- if applicable -->\r\n\r\n## Types of changes\r\nBug fix\r\n\r\n## Checklist:\r\n- [x] My code is tested.\r\n- [x] My code follows the WordPress code style. <!-- Check code: `npm run lint`, Guidelines: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/ -->\r\n- [x] My code follows the accessibility standards. <!-- Guidelines: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/accessibility/ -->\r\n- [ ] I've tested my changes with keyboard and screen readers. <!-- Instructions: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/accessibility-testing.md -->\r\n- [x] My code has proper inline documentation. <!-- Guidelines: https://developer.wordpress.org/coding-standards/inline-documentation-standards/javascript/ -->\r\n- [x] I've included developer documentation if appropriate. <!-- Handbook: https://developer.wordpress.org/block-editor/ -->\r\n- [x] I've updated all React Native files affected by any refactorings/renamings in this PR (please manually search all `*.native.js` files for terms that need renaming or removal). <!-- React Native mobile Gutenberg guidelines: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/native-mobile.md -->\r\n",
+		"body": "## Description\r\nReact Native added a `PROJECT_ROOT` [configuration to better support monorepos](https://github.com/facebook/react-native/commit/9ccde378b6e6379df61f9d968be6346ca6be7ead). Prior to setting the `PROJECT_ROOT` configuration, building the Demo app in Xcode threw errors related to the inability to find the entry `index.js` file, as it was searching in the root directory.\r\n\r\n<details><summary>Error Text</summary>\r\n\r\n```\r\nerror The resource `/Users/username/Sites/a8c/gutenberg/index.js` was not found.\r\nError: The resource `/Users/username/Sites/a8c/gutenberg/index.js` was not found.\r\n    at /Users/username/Sites/a8c/gutenberg/node_modules/metro/src/IncrementalBundler.js:457:26\r\n    at gotStat (node:fs:2627:21)\r\n    at FSReqCallback.oncomplete (node:fs:195:21)\r\ninfo Run CLI with --verbose flag for more details.\r\nCommand PhaseScriptExecution failed with a nonzero exit code\r\n```\r\n\r\n</details>\r\n\r\n<details><summary>Error Screenshot</summary>\r\n\r\n<img width=\"1552\" alt=\"xcode-demo-app-error\" src=\"https://user-images.githubusercontent.com/438664/127712716-eb2fd3a3-0444-45be-a4d5-8ada20d22579.png\">\r\n\r\n</details>\r\n\r\n## How has this been tested?\r\n1. Check out `trunk` branch. \r\n2. `npm run native start:reset`\r\n3. Launch Xcode and build the Demo app to a physical device. \r\n4. ⚠️ **Unexpected:** Notice the build failure. \r\n5. Check out this PR branch. \r\n6. `npm run native start:reset`\r\n7. Launch Xcode and build the Demo app to a physical device. \r\n8. ℹ️ **Expected:** The build succeeds and runs on the device. \r\n\r\n## Screenshots <!-- if applicable -->\r\n\r\n## Types of changes\r\nBug fix\r\n\r\n## Checklist:\r\n- [x] My code is tested.\r\n- [x] My code follows the WordPress code style. <!-- Check code: `npm run lint`, Guidelines: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/ -->\r\n- [x] My code follows the accessibility standards. <!-- Guidelines: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/accessibility/ -->\r\n- [ ] I've tested my changes with keyboard and screen readers. <!-- Instructions: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/accessibility-testing.md -->\r\n- [x] My code has proper inline documentation. <!-- Guidelines: https://developer.wordpress.org/coding-standards/inline-documentation-standards/javascript/ -->\r\n- [x] I've included developer documentation if appropriate. <!-- Handbook: https://developer.wordpress.org/block-editor/ -->\r\n- [x] I've updated all React Native files affected by any refactorings/renamings in this PR (please manually search all `*.native.js` files for terms that need renaming or removal). <!-- React Native mobile Gutenberg guidelines: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/native-mobile.md -->\r\n",
 		"performed_via_github_app": null
 	},
 	{
@@ -6988,7 +6970,7 @@
 				"id": 567484057,
 				"node_id": "MDU6TGFiZWw1Njc0ODQwNTc=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Type]%20Documentation",
-				"name": "[Type] Documentation",
+				"name": "[Type] Developer Documentation",
 				"color": "bfd4f2",
 				"default": false,
 				"description": ""
@@ -7144,7 +7126,7 @@
 				"id": 567484057,
 				"node_id": "MDU6TGFiZWw1Njc0ODQwNTc=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Type]%20Documentation",
-				"name": "[Type] Documentation",
+				"name": "[Type] Developer Documentation",
 				"color": "bfd4f2",
 				"default": false,
 				"description": ""
@@ -7692,7 +7674,7 @@
 				"id": 567484057,
 				"node_id": "MDU6TGFiZWw1Njc0ODQwNTc=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Type]%20Documentation",
-				"name": "[Type] Documentation",
+				"name": "[Type] Developer Documentation",
 				"color": "bfd4f2",
 				"default": false,
 				"description": ""
@@ -8617,15 +8599,6 @@
 				"color": "fbca04",
 				"default": false,
 				"description": "A new block-based screen intended to replace nav-menus.php."
-			},
-			{
-				"id": 2536082965,
-				"node_id": "MDU6TGFiZWwyNTM2MDgyOTY1",
-				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Package]%20Edit%20Navigation",
-				"name": "[Package] Edit Navigation",
-				"color": "ed2572",
-				"default": false,
-				"description": "/packages/edit-navigation"
 			}
 		],
 		"state": "closed",
@@ -9522,7 +9495,7 @@
 				"id": 567484057,
 				"node_id": "MDU6TGFiZWw1Njc0ODQwNTc=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Type]%20Documentation",
-				"name": "[Type] Documentation",
+				"name": "[Type] Developer Documentation",
 				"color": "bfd4f2",
 				"default": false,
 				"description": ""
@@ -12900,7 +12873,7 @@
 				"id": 567484057,
 				"node_id": "MDU6TGFiZWw1Njc0ODQwNTc=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Type]%20Documentation",
-				"name": "[Type] Documentation",
+				"name": "[Type] Developer Documentation",
 				"color": "bfd4f2",
 				"default": false,
 				"description": ""
@@ -13613,7 +13586,7 @@
 				"id": 567484057,
 				"node_id": "MDU6TGFiZWw1Njc0ODQwNTc=",
 				"url": "https://api.github.com/repos/WordPress/gutenberg/labels/[Type]%20Documentation",
-				"name": "[Type] Documentation",
+				"name": "[Type] Developer Documentation",
 				"color": "bfd4f2",
 				"default": false,
 				"description": ""

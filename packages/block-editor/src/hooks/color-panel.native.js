@@ -23,8 +23,8 @@ const ColorPanel = ( { settings } ) => {
 	const { baseGlobalStyles } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
-			baseGlobalStyles: getSettings()
-				?.__experimentalGlobalStylesBaseStyles?.color,
+			baseGlobalStyles:
+				getSettings()?.__experimentalGlobalStylesBaseStyles?.color,
 		};
 	} );
 

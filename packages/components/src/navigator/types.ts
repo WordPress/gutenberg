@@ -11,6 +11,7 @@ export type NavigatorLocation = NavigateOptions & {
 	isInitial?: boolean;
 	isBack?: boolean;
 	path?: string;
+	hasRestoredFocus?: boolean;
 };
 
 export type NavigatorContext = {
@@ -19,7 +20,7 @@ export type NavigatorContext = {
 	goBack: () => void;
 };
 
-// Returned by the `useNavigator` hook
+// Returned by the `useNavigator` hook.
 export type Navigator = NavigatorContext;
 
 export type NavigatorProviderProps = {
@@ -42,4 +43,31 @@ export type NavigatorScreenProps = {
 	 * The children elements.
 	 */
 	children: ReactNode;
+};
+
+type ButtonProps = {
+	// TODO: should also extend `Button` prop types once the `Button` component
+	// is refactored to TypeScript.
+	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
+};
+export type NavigatorBackButtonProps = Omit< ButtonProps, 'href' > & {
+	/**
+	 * The children elements.
+	 */
+	children: ReactNode;
+};
+
+export type NavigatorButtonProps = NavigatorBackButtonProps & {
+	/**
+	 * The path of the screen to navigate to. The value of this prop needs to be
+	 * a valid value for an HTML attribute.
+	 */
+	path: string;
+	/**
+	 * The HTML attribute used to identify the `NavigatorButton`, which is used
+	 * by `Navigator` to restore focus.
+	 *
+	 * @default 'id'
+	 */
+	attributeName?: string;
 };

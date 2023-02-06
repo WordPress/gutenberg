@@ -8,6 +8,8 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	openDocumentSettingsSidebar,
+	getListViewBlocks,
+	switchBlockInspectorTab,
 } from '@wordpress/e2e-test-utils';
 
 async function openListViewSidebar() {
@@ -19,6 +21,20 @@ async function tabToColumnsControl() {
 	let isColumnsControl = false;
 	do {
 		await page.keyboard.press( 'Tab' );
+
+		const isBlockInspectorTab = await page.evaluate( () => {
+			const activeElement = document.activeElement;
+			return (
+				activeElement.getAttribute( 'role' ) === 'tab' &&
+				activeElement.attributes.getNamedItem( 'aria-label' ).value ===
+					'Styles'
+			);
+		} );
+
+		if ( isBlockInspectorTab ) {
+			await page.keyboard.press( 'ArrowRight' );
+		}
+
 		isColumnsControl = await page.evaluate( () => {
 			const activeElement = document.activeElement;
 			return (
@@ -48,16 +64,18 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks.
-		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
-		const columnsBlockMenuItem = (
-			await page.$x(
-				"//a[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Columns')]"
-			)
+		await page.click(
+			'.edit-post-header-toolbar__document-overview-toggle'
+		);
+
+		const firstColumnsBlockMenuItem = (
+			await getListViewBlocks( 'Columns' )
 		 )[ 0 ];
-		await columnsBlockMenuItem.click();
+		await firstColumnsBlockMenuItem.click();
 
 		// Tweak the columns count.
 		await openDocumentSettingsSidebar();
+		await switchBlockInspectorTab( 'Settings' );
 		await page.focus(
 			'.block-editor-block-inspector [aria-label="Columns"][type="number"]'
 		);
@@ -73,12 +91,10 @@ describe( 'Navigating the block hierarchy', () => {
 		);
 
 		// Navigate to the last column block.
-		const lastColumnsBlockMenuItem = (
-			await page.$x(
-				"//a[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Column')]"
-			)
-		 )[ 3 ];
-		await lastColumnsBlockMenuItem.click();
+		const lastColumnBlockMenuItem = (
+			await getListViewBlocks( 'Column' )
+		 )[ 2 ];
+		await lastColumnBlockMenuItem.click();
 
 		// Insert text in the last column block.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
@@ -111,17 +127,15 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Move focus to the sidebar area.
 		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
 		await tabToColumnsControl();
 
 		// Tweak the columns count by increasing it by one.
 		await page.keyboard.press( 'ArrowRight' );
 
 		// Navigate to the third column in the columns block.
-		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyTimes( 'Tab', 2 );
+		await pressKeyWithModifier( 'ctrlShift', '`' );
+		await pressKeyWithModifier( 'ctrlShift', '`' );
+		await pressKeyTimes( 'Tab', 4 );
 		await pressKeyTimes( 'ArrowDown', 4 );
 		await page.waitForSelector(
 			'.is-highlighted[aria-label="Block: Column (3 of 3)"]'
@@ -129,7 +143,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
 
-		// Insert text in the last column block
+		// Insert text in the last column block.
 		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
@@ -165,9 +179,12 @@ describe( 'Navigating the block hierarchy', () => {
 	} );
 
 	it( 'should select the wrapper div for a group', async () => {
-		// Insert a group block
+		// Insert a group block.
 		await insertBlock( 'Group' );
-
+		// Select the default, selected Group layout from the variation picker.
+		await page.click(
+			'button[aria-label="Group: Gather blocks in a container."]'
+		);
 		// Insert some random blocks.
 		// The last block shouldn't be a textual block.
 		await page.click( '.block-list-appender .block-editor-inserter' );
@@ -178,19 +195,17 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'just a paragraph' );
 		await insertBlock( 'Separator' );
 
-		// Check the Group block content
+		// Check the Group block content.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// Unselect the blocks
+		// Unselect the blocks.
 		await page.click( '.editor-post-title' );
 
-		// Try selecting the group block using the Outline
-		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
-		const groupMenuItem = (
-			await page.$x(
-				"//a[contains(@class,'block-editor-list-view-block-select-button') and contains(text(), 'Group')]"
-			)
-		 )[ 0 ];
+		// Try selecting the group block using the Outline.
+		await page.click(
+			'.edit-post-header-toolbar__document-overview-toggle'
+		);
+		const groupMenuItem = ( await getListViewBlocks( 'Group' ) )[ 0 ];
 		await groupMenuItem.click();
 
 		// The group block's wrapper should be selected.

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/babel-preset-default",
-	"version": "6.5.0",
+	"version": "7.10.0",
 	"description": "Default Babel preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,7 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=14"
 	},
 	"files": [
 		"build",

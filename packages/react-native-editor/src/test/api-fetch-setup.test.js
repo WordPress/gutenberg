@@ -15,7 +15,7 @@ const supportedPaths = [
 ];
 
 const unsupportedPaths = [
-	'wp/v1/media/', // made up example
+	'wp/v1/media/', // Made up example.
 ];
 
 const enabledCachingPaths = [

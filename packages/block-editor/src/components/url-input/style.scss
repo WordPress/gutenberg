@@ -45,9 +45,9 @@ $input-size: 300px;
 
 	.components-spinner {
 		position: absolute;
-		right: $input-padding;
-		bottom: $input-padding + $grid-unit-10 + 1;
 		margin: 0;
+		top: calc(50% - #{$spinner-size} / 2);
+		right: $grid-unit;
 	}
 }
 
@@ -71,12 +71,13 @@ $input-size: 300px;
 .block-editor-url-input .components-spinner {
 	display: none;
 	@include break-small() {
-		display: inherit;
+		display: grid;
 	}
 }
 
 .block-editor-url-input__suggestion {
-	padding: 4px $input-padding;
+	min-height: $button-size;
+	height: auto;
 	color: $gray-700;
 	display: block;
 	font-size: $default-font-size;

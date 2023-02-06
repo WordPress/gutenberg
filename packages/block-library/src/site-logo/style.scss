@@ -1,4 +1,6 @@
 .wp-block-site-logo {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 	line-height: 0;
 
 	a {
@@ -9,6 +11,12 @@
 	&.is-default-size img {
 		width: 120px;
 		height: auto;
+	}
+
+	// Constrain the image to its container.
+	img {
+		height: auto;
+		max-width: 100%;
 	}
 
 	// Inherit border radius from style variations.

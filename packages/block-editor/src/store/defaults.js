@@ -23,7 +23,11 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean}       keepCaretInsideBlock                   Whether caret should move between blocks in edit mode
  * @property {string}        bodyPlaceholder                        Empty post placeholder
  * @property {string}        titlePlaceholder                       Empty title placeholder
+ * @property {boolean}       canLockBlocks                          Whether the user can manage Block Lock state
  * @property {boolean}       codeEditingEnabled                     Whether or not the user can switch to the code editor
+ * @property {boolean}       generateAnchors                        Enable/Disable auto anchor generation for Heading blocks
+ * @property {boolean}       enableOpenverseMediaCategory           Enable/Disable the Openverse media category in the inserter.
+ * @property {boolean}       clearBlockSelection                    Whether the block editor should clear selection on mousedown when a block is not clicked.
  * @property {boolean}       __experimentalCanUserUseUnfilteredHTML Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
  * @property {boolean}       __experimentalBlockDirectory           Whether the user has enabled the Block Directory
  * @property {Array}         __experimentalBlockPatterns            Array of objects representing the block patterns
@@ -134,7 +138,7 @@ export const SETTINGS_DEFAULTS = {
 		{ slug: 'full', name: __( 'Full Size' ) },
 	],
 
-	// Allow plugin to disable Image Editor if need be
+	// Allow plugin to disable Image Editor if need be.
 	imageEditing: true,
 
 	// This is current max width of the block inner area
@@ -150,14 +154,23 @@ export const SETTINGS_DEFAULTS = {
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes: null,
 
+	// Allows to disable block locking interface.
+	canLockBlocks: true,
+
+	// Allows to disable Openverse media category in the inserter.
+	enableOpenverseMediaCategory: true,
+
+	clearBlockSelection: true,
+
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalBlockDirectory: false,
 	__mobileEnablePageTemplates: false,
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
-	__experimentalSpotlightEntityBlocks: [],
 	__unstableGalleryWithImageBlocks: false,
+	__unstableIsPreviewMode: false,
 
+	generateAnchors: false,
 	// gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	gradients: [

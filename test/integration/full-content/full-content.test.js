@@ -2,7 +2,7 @@
  * External dependencies
  */
 import glob from 'fast-glob';
-import { fromPairs, omit, startsWith, get } from 'lodash';
+import { get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -38,39 +38,32 @@ import {
 
 const blockBasenames = getAvailableBlockFixturesBasenames();
 
-function normalizeParsedBlocks( blocks ) {
-	return blocks.map( ( block, index ) => {
-		// Clone and remove React-instance-specific stuff; also, attribute
-		// values that equal `undefined` will be removed. Validation issues
-		// add too much noise so they get removed as well.
-		block = JSON.parse(
-			JSON.stringify( omit( block, 'validationIssues' ) )
-		);
-
-		// Change client IDs to a predictable value
-		block.clientId = '_clientId_' + index;
-
-		// Recurse to normalize inner blocks
-		block.innerBlocks = normalizeParsedBlocks( block.innerBlocks );
-
-		return block;
-	} );
-}
+/**
+ * Returns only the properties of the block that
+ * we care about comparing with the fixture data.
+ *
+ * @param {WPBlock[]} blocks loaded blocks to normalize.
+ */
+const normalizeParsedBlocks = ( blocks ) =>
+	blocks.map( ( block ) => ( {
+		name: block.name,
+		isValid: block.isValid,
+		attributes: JSON.parse( JSON.stringify( block.attributes ) ),
+		innerBlocks: normalizeParsedBlocks( block.innerBlocks ),
+	} ) );
 
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
 		const blockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
 		);
-		const blockDefinitions = fromPairs(
+		const blockDefinitions = Object.fromEntries(
 			blockMetadataFiles.map( ( file ) => {
 				const { name, ...metadata } = require( file );
 				return [ name, metadata ];
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		// Load all hooks that modify blocks
-		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		if ( process.env.IS_GUTENBERG_PLUGIN ) {
 			__experimentalRegisterExperimentalCoreBlocks( {
@@ -89,10 +82,8 @@ describe( 'full post content fixture', () => {
 	blockBasenames.forEach( ( basename ) => {
 		// eslint-disable-next-line jest/valid-title
 		it( basename, () => {
-			const {
-				filename: htmlFixtureFileName,
-				file: htmlFixtureContent,
-			} = getBlockFixtureHTML( basename );
+			const { filename: htmlFixtureFileName, file: htmlFixtureContent } =
+				getBlockFixtureHTML( basename );
 			if ( htmlFixtureContent === null ) {
 				throw new Error(
 					`Missing fixture file: ${ htmlFixtureFileName }`
@@ -149,13 +140,10 @@ describe( 'full post content fixture', () => {
 				/* eslint-enable no-console */
 			}
 
-			const blocksActualNormalized = normalizeParsedBlocks(
-				blocksActual
-			);
-			const {
-				filename: jsonFixtureFileName,
-				file: jsonFixtureContent,
-			} = getBlockFixtureJSON( basename );
+			const blocksActualNormalized =
+				normalizeParsedBlocks( blocksActual );
+			const { filename: jsonFixtureFileName, file: jsonFixtureContent } =
+				getBlockFixtureJSON( basename );
 
 			let blocksExpectedString;
 
@@ -208,90 +196,105 @@ describe( 'full post content fixture', () => {
 			try {
 				expect( serializedActual ).toEqual( serializedExpected );
 			} catch ( err ) {
-				throw new Error(
-					format(
-						"File '%s' does not match expected value:\n\n%s",
-						serializedHTMLFileName,
-						err.message
-					)
-				);
+				if (
+					serialize( blocksActual ) ===
+					serialize( parse( serializedExpected ) )
+				) {
+					throw new Error(
+						format(
+							"File '%s' does not match expected value (however, the block re-serializes identically so you may need to run 'npm run fixtures:regenerate'):\n\n%s",
+							serializedHTMLFileName,
+							err.message
+						)
+					);
+				} else {
+					throw new Error(
+						format(
+							"File '%s' does not match expected value:\n\n%s",
+							serializedHTMLFileName,
+							err.message
+						)
+					);
+				}
 			}
 		} );
 	} );
 
 	it( 'should be present for each block', () => {
-		const errors = [];
+		expect( () => {
+			const errors = [];
 
-		getBlockTypes()
-			.map( ( block ) => block.name )
-			// We don't want tests for each oembed provider, which all have the same
-			// `save` functions and attributes.
-			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
-			.filter(
-				( name ) => ! [ 'core/embed', 'core/template' ].includes( name )
-			)
-			.forEach( ( name ) => {
-				const nameToFilename = blockNameToFixtureBasename( name );
-				const foundFixtures = blockBasenames
-					.filter(
-						( basename ) =>
-							basename === nameToFilename ||
-							startsWith( basename, nameToFilename + '__' )
-					)
-					.map( ( basename ) => {
-						const {
-							filename: htmlFixtureFileName,
-						} = getBlockFixtureHTML( basename );
-						const {
-							file: jsonFixtureContent,
-						} = getBlockFixtureJSON( basename );
-						// The parser output for this test.  For missing files,
-						// JSON.parse( null ) === null.
-						const parserOutput = JSON.parse( jsonFixtureContent );
-						// The name of the first block that this fixture file
-						// contains (if any).
-						const firstBlock = get(
-							parserOutput,
-							[ '0', 'name' ],
-							null
-						);
-						return {
-							filename: htmlFixtureFileName,
-							parserOutput,
-							firstBlock,
-						};
-					} )
-					.filter( ( fixture ) => fixture.parserOutput !== null );
-
-				if ( ! foundFixtures.length ) {
-					errors.push(
-						format(
-							"Expected a fixture file called '%s.html' or '%s__*.html' in `test/integration/fixtures/blocks/` " +
-								'\n\n' +
-								'For more information on how to create test fixtures see https://github.com/WordPress/gutenberg/blob/1f75f8f6f500a20df5b9d6e317b4d72dd5af4ede/test/integration/fixtures/blocks/README.md\n\n',
-							nameToFilename,
-							nameToFilename
+			getBlockTypes()
+				.map( ( block ) => block.name )
+				// We don't want tests for each oembed provider, which all have the same
+				// `save` functions and attributes.
+				// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
+				.filter(
+					( name ) =>
+						! [ 'core/embed', 'core/template' ].includes( name )
+				)
+				.forEach( ( name ) => {
+					const nameToFilename = blockNameToFixtureBasename( name );
+					const foundFixtures = blockBasenames
+						.filter(
+							( basename ) =>
+								basename === nameToFilename ||
+								basename.startsWith( nameToFilename + '__' )
 						)
-					);
-				}
+						.map( ( basename ) => {
+							const { filename: htmlFixtureFileName } =
+								getBlockFixtureHTML( basename );
+							const { file: jsonFixtureContent } =
+								getBlockFixtureJSON( basename );
+							// The parser output for this test.  For missing files,
+							// JSON.parse( null ) === null.
+							const parserOutput =
+								JSON.parse( jsonFixtureContent );
+							// The name of the first block that this fixture file
+							// contains (if any).
+							const firstBlock = get(
+								parserOutput,
+								[ '0', 'name' ],
+								null
+							);
+							return {
+								filename: htmlFixtureFileName,
+								parserOutput,
+								firstBlock,
+							};
+						} )
+						.filter( ( fixture ) => fixture.parserOutput !== null );
 
-				foundFixtures.forEach( ( fixture ) => {
-					if ( name !== fixture.firstBlock ) {
+					if ( ! foundFixtures.length ) {
 						errors.push(
 							format(
-								"Expected fixture file '%s' to test the '%s' block.",
-								fixture.filename,
-								name
+								"Expected a fixture file called '%s.html' or '%s__*.html' in `test/integration/fixtures/blocks/` " +
+									'\n\n' +
+									'For more information on how to create test fixtures see https://github.com/WordPress/gutenberg/blob/1f75f8f6f500a20df5b9d6e317b4d72dd5af4ede/test/integration/fixtures/blocks/README.md\n\n',
+								nameToFilename,
+								nameToFilename
 							)
 						);
 					}
-				} );
-			} );
 
-		if ( errors.length ) {
-			throw new Error(
-				'Problem(s) with fixture files:\n\n' + errors.join( '\n' )
-			);
-		}
+					foundFixtures.forEach( ( fixture ) => {
+						if ( name !== fixture.firstBlock ) {
+							errors.push(
+								format(
+									"Expected fixture file '%s' to test the '%s' block.",
+									fixture.filename,
+									name
+								)
+							);
+						}
+					} );
+				} );
+
+			if ( errors.length ) {
+				throw new Error(
+					'Problem(s) with fixture files:\n\n' + errors.join( '\n' )
+				);
+			}
+		} ).not.toThrow();
 	} );
 } );

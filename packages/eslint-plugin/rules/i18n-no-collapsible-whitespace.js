@@ -46,9 +46,8 @@ module.exports = {
 						continue;
 					}
 
-					const collapsibleWhitespace = argumentString.match(
-						/(\n|\t|\r| {2})/
-					);
+					const collapsibleWhitespace =
+						argumentString.match( /(\n|\t|\r| {2})/ );
 
 					if ( ! collapsibleWhitespace ) {
 						continue;

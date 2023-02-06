@@ -7,7 +7,14 @@ exports[`<RichText/> Font Size renders component with style and font size 1`] = 
 `;
 
 exports[`<RichText/> Font Size should update the font size when style prop with font size property is provided 1`] = `
-<View>
+<View
+  style={
+    Array [
+      undefined,
+      undefined,
+    ]
+  }
+>
   <TextInput
     accessibilityLabel="Text input. Empty"
     activeFormats={Array []}
@@ -36,7 +43,14 @@ exports[`<RichText/> Font Size should update the font size when style prop with 
 `;
 
 exports[`<RichText/> Font Size should update the font size with decimals when style prop with font size property is provided 1`] = `
-<View>
+<View
+  style={
+    Array [
+      undefined,
+      undefined,
+    ]
+  }
+>
   <TextInput
     accessibilityLabel="Text input. Empty"
     activeFormats={Array []}

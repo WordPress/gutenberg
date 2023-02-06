@@ -2,6 +2,87 @@
 
 ## Unreleased
 
+## 6.3.0 (2023-02-01)
+
+## 6.2.0 (2023-01-11)
+
+## 6.1.0 (2023-01-02)
+
+## 6.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 5.20.0 (2022-11-16)
+
+## 5.19.0 (2022-11-02)
+
+### Internal
+
+-   `useDisabled`: Refactor the component to rely on the HTML `inert` attribute ([#44865](https://github.com/WordPress/gutenberg/pull/44865)).
+-   `useFocusOutside`: Refactor the hook to TypeScript, rewrite tests using modern RTL and jest features ([#45317](https://github.com/WordPress/gutenberg/pull/45317)).
+-   `useFocusableIframe`: Refactor to TypeScript ([#45428](https://github.com/WordPress/gutenberg/pull/45428)).
+
+## 5.18.0 (2022-10-19)
+
+## 5.17.0 (2022-10-05)
+
+## 5.16.0 (2022-09-21)
+
+### New Features
+
+-   Compose: Introduce an in-house `debounce()` utility, deprecate Lodash version ([#43943](https://github.com/WordPress/gutenberg/pull/43943)).
+-   Compose: Introduce in-house `compose` and `pipe` utils ([#44112](https://github.com/WordPress/gutenberg/pull/44112)).
+
+### Internal
+
+-   `useInstanceId`: refactor to TypeScript ([#43790](https://github.com/WordPress/gutenberg/pull/43790)).
+
+## 5.15.0 (2022-09-13)
+
+### Internal
+
+-   `useDialog`: refactor to TypeScript ([#43823](https://github.com/WordPress/gutenberg/pull/43823)).
+
+## 5.14.0 (2022-08-24)
+
+## 5.13.0 (2022-08-10)
+
+## 5.12.0 (2022-07-27)
+
+## 5.11.0 (2022-07-13)
+
+## 5.10.0 (2022-06-29)
+
+## 5.9.0 (2022-06-15)
+
+## 5.8.0 (2022-06-01)
+
+## 5.7.0 (2022-05-18)
+
+### Bug Fix
+
+-   `useRefEffect`: Allow `void` as a valid callback return type ([#40798](https://github.com/WordPress/gutenberg/pull/40798)).
+
+### New Features
+
+-   Add `useDisabled` hook.
+
+### Internal
+
+-   Update the implementation of useResizeObserver to rely on the ResizableObserver API.
+
+## 5.6.0 (2022-05-04)
+
+## 5.5.0 (2022-04-21)
+
+## 5.4.0 (2022-04-08)
+
+## 5.3.0 (2022-03-23)
+
+## 5.2.0 (2022-03-11)
+
 ## 5.1.0 (2022-01-27)
 
 ## 5.0.0 (2021-07-29)

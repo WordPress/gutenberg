@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data",
-	"version": "6.2.0",
+	"version": "8.3.0",
 	"description": "Data module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,16 +25,19 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
+		"@wordpress/experiments": "file:../experiments",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/redux-routine": "file:../redux-routine",
 		"equivalent-key-map": "^0.2.2",
+		"is-plain-object": "^5.0.0",
 		"is-promise": "^4.0.0",
 		"lodash": "^4.17.21",
 		"redux": "^4.1.2",
@@ -42,7 +45,7 @@
 		"use-memo-one": "^1.1.1"
 	},
 	"peerDependencies": {
-		"react": "^17.0.0"
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

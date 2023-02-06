@@ -15,20 +15,20 @@ if ( process.env.TEST_RN_PLATFORM ) {
 
 const configPath = 'test/native';
 
-const transpiledPackageNames = glob( '../../packages/*/src/index.js' ).map(
+const transpiledPackageNames = glob( '../../packages/*/src/index.{js,ts}' ).map(
 	( fileName ) => fileName.split( '/' )[ 3 ]
 );
 
 module.exports = {
 	verbose: true,
 	rootDir: '../../',
-	// Automatically clear mock calls and instances between every test
+	// Automatically clear mock calls and instances between every test.
 	clearMocks: true,
 	preset: 'react-native',
 	setupFiles: [ '<rootDir>/' + configPath + '/setup.js' ],
 	setupFilesAfterEnv: [ '<rootDir>/' + configPath + '/setup-after-env.js' ],
 	testMatch: [
-		'**/test/*.native.[jt]s?(x)',
+		'**/test/!(helper)*.native.[jt]s?(x)',
 		'<rootDir>/packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
 	],
 	testPathIgnorePatterns: [
@@ -49,9 +49,8 @@ module.exports = {
 		'\\.(scss)$': '<rootDir>/' + configPath + '/__mocks__/styleMock.js',
 		'\\.(eot|otf|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
 			'<rootDir>/' + configPath + '/__mocks__/fileMock.js',
-		[ `@wordpress\\/(${ transpiledPackageNames.join(
-			'|'
-		) })$` ]: '<rootDir>/packages/$1/src',
+		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
+			'<rootDir>/packages/$1/src',
 		'test/helpers$': '<rootDir>/test/native/helpers.js',
 	},
 	modulePathIgnorePatterns: [

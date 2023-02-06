@@ -12,9 +12,8 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 export default function NavigationMenuDeleteControl( { onDelete } ) {
-	const [ isConfirmModalVisible, setIsConfirmModalVisible ] = useState(
-		false
-	);
+	const [ isConfirmModalVisible, setIsConfirmModalVisible ] =
+		useState( false );
 	const id = useEntityId( 'postType', 'wp_navigation' );
 	const [ title ] = useEntityProp( 'postType', 'wp_navigation', 'title' );
 	const { deleteEntityRecord } = useDispatch( coreStore );
@@ -38,7 +37,6 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 						__( 'Delete %s' ),
 						title
 					) }
-					closeLabel={ __( 'Cancel' ) }
 					onRequestClose={ () => setIsConfirmModalVisible( false ) }
 				>
 					<p>
@@ -67,7 +65,7 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 										id,
 										{ force: true }
 									);
-									onDelete();
+									onDelete( title );
 								} }
 							>
 								{ __( 'Confirm' ) }

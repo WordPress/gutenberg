@@ -1,27 +1,26 @@
 /**
  * External dependencies
  */
-import { isEmpty, noop } from 'lodash';
 import classNames from 'classnames';
-// eslint-disable-next-line no-restricted-imports
-import type { ChangeEvent, FocusEvent, ReactNode, Ref } from 'react';
+import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
 import { useState, forwardRef } from '@wordpress/element';
-import { Icon, chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
 import InputBase from '../input-control/input-base';
-import type { InputBaseProps, LabelPosition } from '../input-control/types';
-import { Select, DownArrowWrapper } from './styles/select-control-styles';
-import type { Size } from './types';
+import { Select } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../ui/context';
+import type { SelectControlProps } from './types';
+import SelectControlChevronDown from './chevron-down';
+
+const noop = () => {};
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -30,30 +29,7 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
-export interface SelectControlProps
-	extends Omit< InputBaseProps, 'children' | 'isFocused' > {
-	help?: string;
-	hideLabelFromVision?: boolean;
-	multiple?: boolean;
-	onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
-	onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
-	onChange?: (
-		value: string | string[],
-		extra?: { event?: ChangeEvent< HTMLSelectElement > }
-	) => void;
-	options?: {
-		label: string;
-		value: string;
-		id?: string;
-		disabled?: boolean;
-	}[];
-	size?: Size;
-	value?: string | string[];
-	labelPosition?: LabelPosition;
-	children?: ReactNode;
-}
-
-function SelectControl(
+function UnforwardedSelectControl(
 	{
 		className,
 		disabled = false,
@@ -72,16 +48,18 @@ function SelectControl(
 		children,
 		prefix,
 		suffix,
+		__next36pxDefaultSize = false,
+		__nextHasNoMarginBottom = false,
 		...props
 	}: WordPressComponentProps< SelectControlProps, 'select', false >,
-	ref: Ref< HTMLSelectElement >
+	ref: ForwardedRef< HTMLSelectElement >
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;
 
-	// Disable reason: A select with an onchange throws a warning
-	if ( isEmpty( options ) && ! children ) return null;
+	// Disable reason: A select with an onchange throws a warning.
+	if ( ! options?.length && ! children ) return null;
 
 	const handleOnBlur = ( event: FocusEvent< HTMLSelectElement > ) => {
 		onBlur( event );
@@ -110,7 +88,11 @@ function SelectControl(
 
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
-		<BaseControl help={ help } id={ id }>
+		<BaseControl
+			help={ help }
+			id={ id }
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+		>
 			<InputBase
 				className={ classes }
 				disabled={ disabled }
@@ -119,18 +101,14 @@ function SelectControl(
 				isFocused={ isFocused }
 				label={ label }
 				size={ size }
-				suffix={
-					suffix || (
-						<DownArrowWrapper>
-							<Icon icon={ chevronDown } size={ 18 } />
-						</DownArrowWrapper>
-					)
-				}
+				suffix={ suffix || <SelectControlChevronDown /> }
 				prefix={ prefix }
 				labelPosition={ labelPosition }
+				__next36pxDefaultSize={ __next36pxDefaultSize }
 			>
 				<Select
 					{ ...props }
+					__next36pxDefaultSize={ __next36pxDefaultSize }
 					aria-describedby={ helpId }
 					className="components-select-control__input"
 					disabled={ disabled }
@@ -166,6 +144,31 @@ function SelectControl(
 	/* eslint-enable jsx-a11y/no-onchange */
 }
 
-const ForwardedComponent = forwardRef( SelectControl );
+/**
+ * `SelectControl` allows users to select from a single or multiple option menu.
+ * It functions as a wrapper around the browser's native `<select>` element.
+ *
+ * @example
+ * import { SelectControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MySelectControl = () => {
+ *   const [ size, setSize ] = useState( '50%' );
+ *
+ *   return (
+ *     <SelectControl
+ *       label="Size"
+ *       value={ size }
+ *       options={ [
+ *         { label: 'Big', value: '100%' },
+ *         { label: 'Medium', value: '50%' },
+ *         { label: 'Small', value: '25%' },
+ *       ] }
+ *       onChange={ setSize }
+ *     />
+ *   );
+ * };
+ */
+export const SelectControl = forwardRef( UnforwardedSelectControl );
 
-export default ForwardedComponent;
+export default SelectControl;

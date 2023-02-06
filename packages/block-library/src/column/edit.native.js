@@ -152,6 +152,11 @@ function ColumnEdit( {
 		);
 	}
 
+	const parentWidth =
+		contentStyle &&
+		contentStyle[ clientId ] &&
+		contentStyle[ clientId ].width;
+
 	return (
 		<>
 			{ isSelected && (
@@ -211,7 +216,7 @@ function ColumnEdit( {
 			>
 				<InnerBlocks
 					renderAppender={ renderAppender }
-					parentWidth={ contentStyle[ clientId ].width }
+					parentWidth={ parentWidth }
 					blockWidth={ blockWidth }
 				/>
 			</View>
@@ -261,8 +266,8 @@ export default compose( [
 		const selectedColumnIndex = blockOrder.indexOf( clientId );
 		const columns = getBlocks( parentId );
 
-		const parentAlignment = getBlockAttributes( parentId )
-			?.verticalAlignment;
+		const parentAlignment =
+			getBlockAttributes( parentId )?.verticalAlignment;
 
 		return {
 			hasChildren,

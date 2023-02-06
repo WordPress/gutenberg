@@ -27,9 +27,9 @@ describe( 'getEntityRecord', () => {
 			baseURLParams: { context: 'edit' },
 		},
 	];
+
 	beforeEach( async () => {
 		triggerFetch.mockReset();
-		jest.useFakeTimers();
 	} );
 
 	it( 'yields with requested post type', async () => {
@@ -46,12 +46,12 @@ describe( 'getEntityRecord', () => {
 
 		await getEntityRecord( 'root', 'postType', 'post' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types/post?context=edit',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
@@ -59,7 +59,7 @@ describe( 'getEntityRecord', () => {
 			undefined
 		);
 
-		// Locks should have been acquired and released
+		// Locks should have been acquired and released.
 		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
 			1
 		);
@@ -94,19 +94,19 @@ describe( 'getEntityRecord', () => {
 			query
 		)( { dispatch, select } );
 
-		// Check resolution cache for an existing entity that fulfills the request with query
+		// Check resolution cache for an existing entity that fulfills the request with query.
 		expect( select.hasEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			queryObj
 		);
 
-		// Trigger apiFetch, test that the query is present in the url
+		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types/post?context=view&_envelope=1',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
@@ -114,7 +114,7 @@ describe( 'getEntityRecord', () => {
 			queryObj
 		);
 
-		// Locks should have been acquired and released
+		// Locks should have been acquired and released.
 		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
 			1
 		);
@@ -146,7 +146,6 @@ describe( 'getEntityRecords', () => {
 
 	beforeEach( async () => {
 		triggerFetch.mockReset();
-		jest.useFakeTimers();
 	} );
 
 	it( 'dispatches the requested post type', async () => {
@@ -163,12 +162,12 @@ describe( 'getEntityRecords', () => {
 
 		await getEntityRecords( 'root', 'postType' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types?context=edit',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
@@ -191,17 +190,15 @@ describe( 'getEntityRecords', () => {
 
 		await getEntityRecords( 'root', 'postType' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types?context=edit',
 		} );
 
-		// The record should have been received
-		expect(
-			dispatch.__unstableAcquireStoreLock
-		).toHaveBeenCalledWith(
+		// The record should have been received.
+		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledWith(
 			'core',
-			[ 'entities', 'data', 'root', 'postType' ],
+			[ 'entities', 'records', 'root', 'postType' ],
 			{ exclusive: false }
 		);
 		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
@@ -223,12 +220,12 @@ describe( 'getEntityRecords', () => {
 
 		await getEntityRecords( 'root', 'postType' )( { dispatch } );
 
-		// Fetch request should have been issued
+		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types?context=edit',
 		} );
 
-		// The record should have been received
+		// The record should have been received.
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'START_RESOLUTIONS',
 			selectorName: 'getEntityRecord',
@@ -282,7 +279,13 @@ describe( 'getEmbedPreview', () => {
 } );
 
 describe( 'canUser', () => {
+	let registry;
 	beforeEach( async () => {
+		registry = {
+			select: jest.fn( () => ( {
+				hasStartedResolution: () => false,
+			} ) ),
+		};
 		triggerFetch.mockReset();
 	} );
 
@@ -295,7 +298,7 @@ describe( 'canUser', () => {
 			Promise.reject( { status: 404 } )
 		);
 
-		await canUser( 'create', 'media' )( { dispatch } );
+		await canUser( 'create', 'media' )( { dispatch, registry } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -312,12 +315,10 @@ describe( 'canUser', () => {
 		} );
 
 		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				Allow: 'GET',
-			},
+			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
-		await canUser( 'create', 'media' )( { dispatch } );
+		await canUser( 'create', 'media' )( { dispatch, registry } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -337,12 +338,10 @@ describe( 'canUser', () => {
 		} );
 
 		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				Allow: 'POST, GET, PUT, DELETE',
-			},
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'create', 'media' )( { dispatch } );
+		await canUser( 'create', 'media' )( { dispatch, registry } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -362,21 +361,127 @@ describe( 'canUser', () => {
 		} );
 
 		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				Allow: 'POST, GET, PUT, DELETE',
-			},
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'create', 'blocks', 123 )( { dispatch } );
+		await canUser( 'create', 'blocks', 123 )( { dispatch, registry } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/blocks/123',
-			method: 'GET',
+			method: 'OPTIONS',
 			parse: false,
 		} );
 
 		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
 			'create/blocks/123',
+			true
+		);
+	} );
+
+	it( 'runs apiFetch only once per resource', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveUserPermission: jest.fn(),
+		} );
+
+		registry = {
+			select: () => ( {
+				hasStartedResolution: ( _, [ action ] ) => action === 'read',
+			} ),
+		};
+
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
+		} ) );
+
+		await canUser( 'create', 'blocks' )( { dispatch, registry } );
+		await canUser( 'read', 'blocks' )( { dispatch, registry } );
+
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/blocks',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'read/blocks',
+			true
+		);
+	} );
+
+	it( 'retrieves all permissions even when ID is not given', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveUserPermission: jest.fn(),
+		} );
+
+		registry = {
+			select: () => ( {
+				hasStartedResolution: ( _, [ action ] ) => action === 'read',
+			} ),
+		};
+
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
+		} ) );
+
+		await canUser( 'create', 'blocks' )( { dispatch, registry } );
+		await canUser( 'read', 'blocks' )( { dispatch, registry } );
+		await canUser( 'update', 'blocks' )( { dispatch, registry } );
+		await canUser( 'delete', 'blocks' )( { dispatch, registry } );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/blocks',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'read/blocks',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'update/blocks',
+			false
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'delete/blocks',
+			false
+		);
+	} );
+
+	it( 'runs apiFetch only once per resource ID', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveUserPermission: jest.fn(),
+		} );
+
+		registry = {
+			select: () => ( {
+				hasStartedResolution: ( _, [ action ] ) => action === 'create',
+			} ),
+		};
+
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
+		} ) );
+
+		await canUser( 'create', 'blocks', 123 )( { dispatch, registry } );
+		await canUser( 'read', 'blocks', 123 )( { dispatch, registry } );
+		await canUser( 'update', 'blocks', 123 )( { dispatch, registry } );
+		await canUser( 'delete', 'blocks', 123 )( { dispatch, registry } );
+
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/blocks/123',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'read/blocks/123',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'update/blocks/123',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'delete/blocks/123',
 			true
 		);
 	} );
@@ -399,14 +504,14 @@ describe( 'getAutosaves', () => {
 		const postType = 'post';
 		const postId = 1;
 		const restBase = 'posts';
-		const postEntity = { rest_base: restBase };
+		const postEntityConfig = { rest_base: restBase };
 
 		triggerFetch.mockImplementation( () => SUCCESSFUL_RESPONSE );
 		const dispatch = Object.assign( jest.fn(), {
 			receiveAutosaves: jest.fn(),
 		} );
 		const resolveSelect = Object.assign( jest.fn(), {
-			getPostType: jest.fn( () => postEntity ),
+			getPostType: jest.fn( () => postEntityConfig ),
 		} );
 		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 
@@ -423,14 +528,14 @@ describe( 'getAutosaves', () => {
 		const postType = 'post';
 		const postId = 1;
 		const restBase = 'posts';
-		const postEntity = { rest_base: restBase };
+		const postEntityConfig = { rest_base: restBase };
 
 		triggerFetch.mockImplementation( () => [] );
 		const dispatch = Object.assign( jest.fn(), {
 			receiveAutosaves: jest.fn(),
 		} );
 		const resolveSelect = Object.assign( jest.fn(), {
-			getPostType: jest.fn( () => postEntity ),
+			getPostType: jest.fn( () => postEntityConfig ),
 		} );
 		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 

@@ -5,145 +5,104 @@ import { blockNames } from './pages/editor-page';
 import { isAndroid } from './helpers/utils';
 import { slashInserter, shortText } from './helpers/test-data';
 
-const ANIMATION_TIME = 200;
-
-// helper function for asserting slash inserter presence
-async function assertSlashInserterPresent( checkIsVisible ) {
-	let areResultsDisplayed;
-	try {
-		const foundElements = await editorPage.driver.elementsByAccessibilityId(
-			'Slash inserter results'
-		);
-		areResultsDisplayed = !! foundElements.length;
-	} catch ( e ) {
-		areResultsDisplayed = false;
-	}
-	if ( checkIsVisible ) {
-		expect( areResultsDisplayed ).toBeTruthy();
-	} else {
-		expect( areResultsDisplayed ).toBeFalsy();
-	}
-}
-
-// Due to flakiness, disabling until its more stable
-// https://github.com/wordpress-mobile/gutenberg-mobile/issues/3699
-// eslint-disable-next-line jest/no-disabled-tests
-describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
+describe( 'Gutenberg Editor Slash Inserter tests', () => {
 	it( 'should show the menu after typing /', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			slashInserter
 		);
-		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		assertSlashInserterPresent( true );
-
+		expect( await editorPage.assertSlashInserterPresent() ).toBe( true );
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
 	it( 'should hide the menu after deleting the / character', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			slashInserter
 		);
-		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		assertSlashInserterPresent( true );
+		expect( await editorPage.assertSlashInserterPresent() ).toBe( true );
 
-		// Remove / character
+		// Remove / character.
 		if ( isAndroid() ) {
-			await editorPage.typeTextToParagraphBlock(
+			await editorPage.typeTextToTextBlock(
 				paragraphBlockElement,
 				`${ shortText }`,
 				true
 			);
 		} else {
-			await editorPage.typeTextToParagraphBlock(
+			await editorPage.typeTextToTextBlock(
 				paragraphBlockElement,
 				`\b ${ shortText }`,
 				false
 			);
 		}
-		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		// Check if the slash inserter UI no longer exists
-		assertSlashInserterPresent( false );
+		// Check if the slash inserter UI no longer exists.
+		expect( await editorPage.assertSlashInserterPresent() ).toBe( false );
 
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
 	it( 'should add an Image block after tying /image and tapping on the Image block button', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			`${ slashInserter }image`
 		);
-		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		assertSlashInserterPresent( true );
+		expect( await editorPage.assertSlashInserterPresent() ).toBe( true );
 
-		// Find Image block button
-		const imageButtonElement = await editorPage.driver.elementByAccessibilityId(
-			'Image block'
-		);
+		// Find Image block button.
+		const imageButtonElement =
+			await editorPage.driver.elementByAccessibilityId( 'Image block' );
 		expect( imageButtonElement ).toBeTruthy();
 
-		// Add image block
+		// Add image block.
 		await imageButtonElement.click();
 
-		// Check image exists in the editor
+		// Check image exists in the editor.
 		expect(
 			await editorPage.hasBlockAtPosition( 1, blockNames.image )
 		).toBe( true );
 
-		// Slash inserter UI should not be present after adding a block
-		assertSlashInserterPresent( false );
+		// Slash inserter UI should not be present after adding a block.
+		expect( await editorPage.assertSlashInserterPresent() ).toBe( false );
 
-		// Remove image block
+		// Remove image block.
 		await editorPage.removeBlockAtPosition( blockNames.image );
 	} );
 
-	it( 'should insert an image block with "/img" + enter', async () => {
+	it( 'should insert an embed image block with "/img" + enter', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			'/img\n',
 			false
 		);
 		expect(
-			await editorPage.hasBlockAtPosition( 1, blockNames.image )
+			await editorPage.hasBlockAtPosition( 1, blockNames.embed )
 		).toBe( true );
 
-		await editorPage.removeBlockAtPosition( blockNames.image );
+		await editorPage.removeBlockAtPosition( blockNames.embed );
 	} );
 } );

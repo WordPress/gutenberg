@@ -59,8 +59,12 @@ function ImageLinkDestinationsScreen( props ) {
 	const navigation = useNavigation();
 	const route = useRoute();
 	const { url = '' } = props;
-	const { inputValue = url, imageUrl, attachmentPageUrl, linkDestination } =
-		route.params || {};
+	const {
+		inputValue = url,
+		imageUrl,
+		attachmentPageUrl,
+		linkDestination,
+	} = route.params || {};
 
 	function goToLinkPicker() {
 		navigation.navigate( blockSettingsScreens.linkPicker, {
@@ -86,9 +90,9 @@ function ImageLinkDestinationsScreen( props ) {
 		navigation.navigate( blockSettingsScreens.settings, {
 			// The `inputValue` name is reused from LinkPicker, as it helps avoid
 			// bugs from stale values remaining in the React Navigation route
-			// parameters
+			// parameters.
 			inputValue: newUrl,
-			// Clear link text value that may be set from LinkPicker
+			// Clear link text value that may be set from LinkPicker.
 			text: '',
 		} );
 	};

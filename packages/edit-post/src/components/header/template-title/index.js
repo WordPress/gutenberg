@@ -22,9 +22,8 @@ import TemplateDescription from './template-description';
 
 function TemplateTitle() {
 	const { template, isEditing, title } = useSelect( ( select ) => {
-		const { isEditingTemplate, getEditedPostTemplate } = select(
-			editPostStore
-		);
+		const { isEditingTemplate, getEditedPostTemplate } =
+			select( editPostStore );
 		const { getEditedPostAttribute } = select( editorStore );
 
 		const _isEditing = isEditingTemplate();
@@ -78,7 +77,7 @@ function TemplateTitle() {
 			</Button>
 			{ hasOptions ? (
 				<Dropdown
-					position="bottom center"
+					popoverProps={ { placement: 'bottom' } }
 					contentClassName="edit-post-template-top-area__popover"
 					renderToggle={ ( { onToggle } ) => (
 						<Button

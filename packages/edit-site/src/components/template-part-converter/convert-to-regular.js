@@ -13,6 +13,15 @@ export default function ConvertToRegularBlocks( { clientId } ) {
 	const { getBlocks } = useSelect( blockEditorStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
+	const canRemove = useSelect(
+		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+		[ clientId ]
+	);
+
+	if ( ! canRemove ) {
+		return null;
+	}
+
 	return (
 		<BlockSettingsMenuControls>
 			{ ( { onClose } ) => (

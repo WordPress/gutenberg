@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -11,9 +11,9 @@ import { useItem } from './hook';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { View } from '../../view';
 
-function Item(
+function UnconnectedItem(
 	props: WordPressComponentProps< ItemProps, 'div' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const { role, wrapperClassName, ...otherProps } = useItem( props );
 
@@ -24,4 +24,28 @@ function Item(
 	);
 }
 
-export default contextConnect( Item, 'Item' );
+/**
+ * `Item` is used in combination with `ItemGroup` to display a list of items
+ * grouped and styled together.
+ *
+ * @example
+ * ```jsx
+ * import {
+ *   __experimentalItemGroup as ItemGroup,
+ *   __experimentalItem as Item,
+ * } from '@wordpress/components';
+ *
+ * function Example() {
+ *   return (
+ *     <ItemGroup>
+ *       <Item>Code</Item>
+ *       <Item>is</Item>
+ *       <Item>Poetry</Item>
+ *     </ItemGroup>
+ *   );
+ * }
+ * ```
+ */
+export const Item = contextConnect( UnconnectedItem, 'Item' );
+
+export default Item;

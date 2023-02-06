@@ -37,9 +37,8 @@ class BottomSheetCell extends Component {
 			isScreenReaderEnabled: false,
 		};
 
-		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
-			this
-		);
+		this.handleScreenReaderToggled =
+			this.handleScreenReaderToggled.bind( this );
 
 		this.isCurrent = false;
 	}
@@ -59,7 +58,7 @@ class BottomSheetCell extends Component {
 
 		AccessibilityInfo.isScreenReaderEnabled().then(
 			( isScreenReaderEnabled ) => {
-				if ( this.isCurrent ) {
+				if ( this.isCurrent && isScreenReaderEnabled ) {
 					this.setState( { isScreenReaderEnabled } );
 				}
 			}
@@ -190,7 +189,7 @@ class BottomSheetCell extends Component {
 		};
 
 		const separatorStyle = () => {
-			//eslint-disable-next-line @wordpress/no-unused-vars-before-return
+			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 			const defaultSeparatorStyle = this.props.getStylesFromColorScheme(
 				styles.separator,
 				styles.separatorDark

@@ -9,7 +9,6 @@ import { combineReducers } from '@wordpress/data';
 import {
 	postId,
 	postType,
-	preferences,
 	saving,
 	postLock,
 	postSavingLock,
@@ -84,7 +83,6 @@ export default combineReducers( {
 	postId,
 	postType,
 	postTitle,
-	preferences,
 	saving,
 	postLock,
 	postSavingLock,

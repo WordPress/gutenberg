@@ -26,10 +26,10 @@ function FormGroupContent( {
 	truncate,
 	...props
 } ) {
-	const contextProps = useMemo( () => ( { id, horizontal } ), [
-		id,
-		horizontal,
-	] );
+	const contextProps = useMemo(
+		() => ( { id, horizontal } ),
+		[ id, horizontal ]
+	);
 
 	const content = help ? (
 		<VStack expanded={ false } spacing={ spacing }>

@@ -12,11 +12,20 @@ import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { settings, list, grid } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { usePatterns } from '../utils';
+
 export default function QueryToolbar( {
 	attributes: { query, displayLayout },
 	setQuery,
 	setDisplayLayout,
+	openPatternSelectionModal,
+	name,
+	clientId,
 } ) {
+	const hasPatterns = !! usePatterns( clientId, name ).length;
 	const maxPageInputId = useInstanceId(
 		QueryToolbar,
 		'blocks-query-pagination-max-page-input'
@@ -126,6 +135,13 @@ export default function QueryToolbar( {
 							</>
 						) }
 					/>
+				</ToolbarGroup>
+			) }
+			{ hasPatterns && (
+				<ToolbarGroup className="wp-block-template-part__block-control-group">
+					<ToolbarButton onClick={ openPatternSelectionModal }>
+						{ __( 'Replace' ) }
+					</ToolbarButton>
 				</ToolbarGroup>
 			) }
 			<ToolbarGroup controls={ displayLayoutControls } />

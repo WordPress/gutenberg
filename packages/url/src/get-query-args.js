@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { safeDecodeURIComponent } from './safe-decode-uri-component';
 import { getQueryString } from './get-query-string';
 
 /** @typedef {import('./get-query-arg').QueryArgParsed} QueryArgParsed */
@@ -28,6 +29,10 @@ function setPath( object, path, value ) {
 			// the current length of the array.
 			key = object.length.toString();
 		}
+
+		key = [ '__proto__', 'constructor', 'prototype' ].includes( key )
+			? key.toUpperCase()
+			: key;
 
 		// If the next key in the path is numeric (or empty string), it will be
 		// created as an array. Otherwise, it will be created as an object.
@@ -81,7 +86,7 @@ export function getQueryArgs( url ) {
 					// Filtering avoids decoding as `undefined` for value, where
 					// default is restored in destructuring assignment.
 					.filter( Boolean )
-					.map( decodeURIComponent );
+					.map( safeDecodeURIComponent );
 
 				if ( key ) {
 					const segments = key.replace( /\]/g, '' ).split( '[' );
@@ -89,6 +94,6 @@ export function getQueryArgs( url ) {
 				}
 
 				return accumulator;
-			}, {} )
+			}, Object.create( null ) )
 	);
 }

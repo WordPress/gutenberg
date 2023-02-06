@@ -13,6 +13,7 @@ const detectDirectoryType = require( './detect-directory-type' );
 const { validateConfig, ValidationError } = require( './validate-config' );
 const readRawConfigFile = require( './read-raw-config-file' );
 const parseConfig = require( './parse-config' );
+const { includeTestsPath, parseSourceString } = parseConfig;
 const md5 = require( '../md5' );
 
 /**
@@ -32,7 +33,7 @@ const md5 = require( '../md5' );
  * Base-level config for any particular environment. (development/tests/etc)
  *
  * @typedef WPServiceConfig
- * @property {?WPSource}                 coreSource    The WordPress installation to load in the environment.
+ * @property {WPSource}                  coreSource    The WordPress installation to load in the environment.
  * @property {WPSource[]}                pluginSources Plugins to load in the environment.
  * @property {WPSource[]}                themeSources  Themes to load in the environment.
  * @property {number}                    port          The port to use.
@@ -67,34 +68,6 @@ module.exports = async function readConfig( configPath ) {
 		md5( configPath )
 	);
 
-	// Default configuration which is overridden by .wp-env.json files.
-	const defaultConfiguration = {
-		core: null,
-		phpVersion: null,
-		plugins: [],
-		themes: [],
-		port: 8888,
-		mappings: {},
-		config: {
-			WP_DEBUG: true,
-			SCRIPT_DEBUG: true,
-			WP_ENVIRONMENT_TYPE: 'local',
-			WP_PHP_BINARY: 'php',
-			WP_TESTS_EMAIL: 'admin@example.org',
-			WP_TESTS_TITLE: 'Test Blog',
-			WP_TESTS_DOMAIN: 'http://localhost',
-			WP_SITEURL: 'http://localhost',
-			WP_HOME: 'http://localhost',
-		},
-		env: {
-			development: {}, // No overrides needed, but it should exist.
-			tests: {
-				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
-				port: 8889,
-			},
-		},
-	};
-
 	// The specified base configuration from .wp-env.json or from the local
 	// source type which was automatically detected.
 	const baseConfig =
@@ -110,6 +83,34 @@ module.exports = async function readConfig( configPath ) {
 
 	const detectedLocalConfig =
 		Object.keys( { ...baseConfig, ...overrideConfig } ).length > 0;
+
+	// Default configuration which is overridden by .wp-env.json files.
+	const defaultConfiguration = {
+		core: null, // Indicates that the latest stable version should ultimately be used.
+		phpVersion: null,
+		plugins: [],
+		themes: [],
+		port: 8888,
+		mappings: {},
+		config: {
+			WP_DEBUG: true,
+			SCRIPT_DEBUG: true,
+			WP_ENVIRONMENT_TYPE: 'local',
+			WP_PHP_BINARY: 'php',
+			WP_TESTS_EMAIL: 'admin@example.org',
+			WP_TESTS_TITLE: 'Test Blog',
+			WP_TESTS_DOMAIN: 'localhost',
+			WP_SITEURL: 'http://localhost',
+			WP_HOME: 'http://localhost',
+		},
+		env: {
+			development: {}, // No overrides needed, but it should exist.
+			tests: {
+				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
+				port: 8889,
+			},
+		},
+	};
 
 	// A quick validation before merging on a service by service level allows us
 	// to check the root configuration options and provide more helpful errors.
@@ -141,23 +142,21 @@ module.exports = async function readConfig( configPath ) {
 
 	// Merge each of the specified environment-level overrides.
 	const allPorts = new Set(); // Keep track of unique ports for validation.
-	const env = allEnvs.reduce( ( result, environment ) => {
-		result[ environment ] = parseConfig(
+	const env = {};
+	for ( const envName of allEnvs ) {
+		env[ envName ] = await parseConfig(
 			validateConfig(
 				mergeWpServiceConfigs( [
-					...getEnvConfig( defaultConfiguration, environment ),
-					...getEnvConfig( baseConfig, environment ),
-					...getEnvConfig( overrideConfig, environment ),
+					...getEnvConfig( defaultConfiguration, envName ),
+					...getEnvConfig( baseConfig, envName ),
+					...getEnvConfig( overrideConfig, envName ),
 				] ),
-				environment
+				envName
 			),
-			{
-				workDirectoryPath,
-			}
+			{ workDirectoryPath }
 		);
-		allPorts.add( result[ environment ].port );
-		return result;
-	}, {} );
+		allPorts.add( env[ envName ].port );
+	}
 
 	if ( allPorts.size !== allEnvs.length ) {
 		throw new ValidationError(
@@ -248,6 +247,7 @@ async function getDefaultBaseConfig( configPath ) {
  * @return {WPConfig} configuration object with overrides applied.
  */
 function withOverrides( config ) {
+	const workDirectoryPath = config.workDirectoryPath;
 	// Override port numbers with environment variables.
 	config.env.development.port =
 		getNumberFromEnvVariable( 'WP_ENV_PORT' ) ||
@@ -255,6 +255,16 @@ function withOverrides( config ) {
 	config.env.tests.port =
 		getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) ||
 		config.env.tests.port;
+
+	// Override WordPress core with environment variable.
+	if ( process.env.WP_ENV_CORE ) {
+		const coreSource = includeTestsPath(
+			parseSourceString( process.env.WP_ENV_CORE, { workDirectoryPath } ),
+			{ workDirectoryPath }
+		);
+		config.env.development.coreSource = coreSource;
+		config.env.tests.coreSource = coreSource;
+	}
 
 	// Override PHP version with environment variable.
 	config.env.development.phpVersion =
@@ -284,7 +294,6 @@ function withOverrides( config ) {
 	};
 
 	// Update wp config options to include the correct port number in the URL.
-	updateEnvUrl( 'WP_TESTS_DOMAIN' );
 	updateEnvUrl( 'WP_SITEURL' );
 	updateEnvUrl( 'WP_HOME' );
 

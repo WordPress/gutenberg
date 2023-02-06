@@ -1,20 +1,32 @@
 .edit-post-post-schedule {
 	width: 100%;
 	position: relative;
-	justify-content: left;
+	justify-content: flex-start;
 
 	span {
 		display: block;
 		width: 45%;
+		flex-shrink: 0;
+		// Match padding on tertiary buttons for alignment.
+		padding: $grid-unit-15 * 0.5 0;
 	}
 }
 
 .components-button.edit-post-post-schedule__toggle {
-	text-align: right;
+	text-align: left;
+	white-space: normal;
+
+	// This span is added by the Popover in Tooltip when no anchor is
+	// provided. We set its width to 0 so that it does not cause the button text
+	// to wrap to a new line when displaying the tooltip. A better fix would be
+	// to pass anchorRef and avoid the need for a span alltogether, which is
+	// what this PR allows us to do:
+	// https://github.com/WordPress/gutenberg/pull/41268.
+	span {
+		width: 0;
+	}
 }
 
-// Zero out a blanket padding that is set on the popover component.
-// The datetime component has its own padding.
-.edit-post-post-schedule__dialog .components-popover__content > div {
-	padding: 0;
+.edit-post-post-schedule__dialog .block-editor-publish-date-time-picker {
+	margin: $grid-unit-10;
 }

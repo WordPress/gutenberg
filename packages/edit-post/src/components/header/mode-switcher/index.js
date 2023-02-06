@@ -40,10 +40,10 @@ function ModeSwitcher() {
 			shortcut: select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
-			isRichEditingEnabled: select( editorStore ).getEditorSettings()
-				.richEditingEnabled,
-			isCodeEditingEnabled: select( editorStore ).getEditorSettings()
-				.codeEditingEnabled,
+			isRichEditingEnabled:
+				select( editorStore ).getEditorSettings().richEditingEnabled,
+			isCodeEditingEnabled:
+				select( editorStore ).getEditorSettings().codeEditingEnabled,
 			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
 			mode: select( editPostStore ).getEditorMode(),
 		} ),

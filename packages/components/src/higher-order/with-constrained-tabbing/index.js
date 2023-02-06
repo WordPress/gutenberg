@@ -11,7 +11,7 @@ const withConstrainedTabbing = createHigherOrderComponent(
 		function ComponentWithConstrainedTabbing( props ) {
 			const ref = useConstrainedTabbing();
 			return (
-				<div ref={ ref } tabIndex="-1">
+				<div ref={ ref } tabIndex={ -1 }>
 					<WrappedComponent { ...props } />
 				</div>
 			);

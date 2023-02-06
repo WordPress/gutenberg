@@ -27,6 +27,7 @@ import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -43,12 +44,12 @@ import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
-import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
-import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.gesturehandler.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.android.util.AppLog.T;
@@ -570,10 +571,19 @@ public class WPAndroidGlueCode {
                 new RNScreensPackage(),
                 new SafeAreaContextPackage(),
                 new RNCMaskedViewPackage(),
-                new ReanimatedPackage(),
+                new ReanimatedPackage() {
+                    // Reanimated assumes that the app implements "ReactApplication" in order to get the React instance
+                    // manager. Since this is not the case, as Gutenberg is integrated as a library, we have to override
+                    // "getReactInstanceManager" in order to provide the proper instance.
+                    @Override
+                    public ReactInstanceManager getReactInstanceManager(ReactApplicationContext reactContext) {
+                        return mReactInstanceManager;
+                    }
+                },
                 new RNPromptPackage(),
                 new RNCWebViewPackage(),
                 new ClipboardPackage(),
+                new FastImageViewPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 
@@ -596,7 +606,7 @@ public class WPAndroidGlueCode {
         mIsDarkMode = gutenbergProps.isDarkMode();
         mExceptionLogger = exceptionLogger;
         mBreadcrumbLogger = breadcrumbLogger;
-        mReactRootView = new RNGestureHandlerEnabledRootView(new MutableContextWrapper(initContext));
+        mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
 
         ReactInstanceManagerBuilder builder =

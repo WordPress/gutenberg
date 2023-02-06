@@ -16,13 +16,25 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__content {
+.block-editor-inserter__main-area {
 	position: relative;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	gap: $grid-unit-20;
+	&.show-as-tabs {
+		gap: 0;
+	}
+
+	@include break-medium {
+		width: $block-inserter-width;
+	}
 }
 
 .block-editor-inserter__popover.is-quick {
 	.components-popover__content {
 		border: none;
+		outline: none;
 
 		.block-editor-inserter__quick-inserter > * {
 			border-left: $border-width solid $gray-400;
@@ -77,15 +89,6 @@ $block-inserter-tabs-height: 44px;
 	overflow: visible;
 }
 
-.block-editor-inserter__main-area {
-	width: auto;
-	overflow-y: auto;
-	height: 100%;
-	@include break-medium {
-		width: $block-inserter-width;
-	}
-}
-
 .block-editor-inserter__inline-elements {
 	margin-top: -1px;
 }
@@ -99,36 +102,31 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__search {
-	background: $white;
 	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
-	position: sticky;
-	top: 0;
-	z-index: z-index(".block-editor-inserter__search");
 
 	.components-search-control__icon {
 		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
 	}
-
-	.components-base-control__field {
-		margin-bottom: 0;
-	}
 }
 
 .block-editor-inserter__tabs {
+	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
+	overflow: hidden;
 
 	.components-tab-panel__tabs {
-		position: sticky;
-		// Computed based off the search input height and paddings
-		top: $grid-unit-20 + $grid-unit-60;
-		background: $white;
-		z-index: z-index(".block-editor-inserter__tabs .components-tab-panel__tabs");
 		border-bottom: $border-width solid $gray-300;
 
 		.components-tab-panel__tabs-item {
 			flex-grow: 1;
 			margin-bottom: -$border-width;
+			&[id$="reusable"] {
+				flex-grow: inherit;
+				// These are to align the `reusable` icon with the search icon.
+				padding-left: $grid-unit-20;
+				padding-right: $grid-unit-20;
+			}
 		}
 	}
 
@@ -136,19 +134,18 @@ $block-inserter-tabs-height: 44px;
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
-		// Make a stacking context that keeps all descendents behind the sticky tabs
-		position: relative;
-		z-index: z-index(".block-editor-inserter__tabs .components-tab-panel__tab-content");
+		overflow-y: auto;
 	}
+}
+
+.block-editor-inserter__no-tab-container {
+	overflow-y: auto;
+	flex-grow: 1;
 }
 
 .block-editor-inserter__panel-header {
 	display: inline-flex;
 	align-items: center;
-	padding: $grid-unit-20 $grid-unit-20 0;
-}
-
-.block-editor-inserter__panel-header-patterns {
 	padding: $grid-unit-20 $grid-unit-20 0;
 }
 
@@ -174,19 +171,18 @@ $block-inserter-tabs-height: 44px;
 	border: none;
 }
 
-.block-editor-inserter__block-list {
-	flex-grow: 1;
-	position: relative;
-}
-
 .block-editor-inserter__reusable-blocks-panel {
 	position: relative;
 	text-align: right;
 }
 
+.block-editor-inserter__manage-reusable-blocks-container {
+	margin: auto $grid-unit-20 $grid-unit-20;
+}
+
 .block-editor-inserter__manage-reusable-blocks {
-	display: inline-block;
-	margin: $grid-unit-20;
+	justify-content: center;
+	width: 100%;
 }
 
 .block-editor-inserter__no-results {
@@ -240,6 +236,96 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__patterns-explore-button.components-button {
+	padding: $grid-unit-20;
+	justify-content: center;
+	margin-top: $grid-unit-20;
+	width: 100%;
+}
+
+.block-editor-inserter__patterns-selected-category.block-editor-inserter__patterns-selected-category {
+	color: var(--wp-admin-theme-color);
+	position: relative;
+
+	.components-flex-item {
+		filter: brightness(0.95);
+	}
+
+	svg {
+		fill: var(--wp-admin-theme-color);
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		border-radius: $radius-block-ui;
+		opacity: 0.04;
+		background: var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-inserter__block-patterns-tabs-container {
+	height: 100%;
+	nav {
+		height: 100%;
+	}
+}
+
+.block-editor-inserter__block-patterns-tabs {
+	display: flex;
+	flex-direction: column;
+	padding: $grid-unit-20;
+	overflow-y: auto;
+	height: 100%;
+	// Push the listitem wrapping the "explore" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
+}
+
+.block-editor-inserter__patterns-category-dialog {
+	background: $gray-100;
+	border-left: $border-width solid $gray-200;
+	border-right: $border-width solid $gray-200;
+	position: absolute;
+	padding: $grid-unit-40 $grid-unit-30;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	overflow-y: auto;
+	scrollbar-gutter: stable both-edges;
+
+	@include break-medium {
+		left: 100%;
+		display: block;
+		width: 300px;
+	}
+
+	.block-editor-block-patterns-list {
+		margin-top: $grid-unit-30;
+	}
+
+	.block-editor-block-preview__container {
+		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
+		&:hover {
+			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+		}
+	}
+}
+
+.block-editor-inserter__patterns-category-panel {
+	padding: 0 $grid-unit-20;
+
+	@include break-medium {
+		padding: 0;
+	}
+}
+
 .block-editor-inserter__preview-content {
 	min-height: $grid-unit-60 * 3;
 	background: $gray-100;
@@ -263,10 +349,6 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	flex-shrink: 0;
 	position: relative; // prevents overscroll when block library is open
-}
-
-.block-editor-inserter__manage-reusable-blocks-container {
-	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__quick-inserter {
@@ -310,7 +392,7 @@ $block-inserter-tabs-height: 44px;
 	border-top: $border-width solid $gray-300;
 }
 
-.block-editor-inserter__popover.is-quick > .components-popover__content > div {
+.block-editor-inserter__popover.is-quick > .components-popover__content {
 	padding: 0;
 }
 
@@ -341,7 +423,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-block-patterns-explorer {
 	&__sidebar {
 		position: absolute;
-		top: $header-height;
+		top: $header-height + $grid-unit-20;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;
@@ -366,7 +448,8 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	&__list {
-		margin-left: $sidebar-width - $grid-unit-40;
+		margin-left: $sidebar-width;
+		padding: $grid-unit-30 0 $grid-unit-40;
 	}
 
 	.block-editor-block-patterns-list {
@@ -391,5 +474,215 @@ $block-inserter-tabs-height: 44px;
 			min-height: 100px;
 			max-height: 800px;
 		}
+	}
+}
+
+.block-editor-inserter__patterns-category-panel-title {
+	font-size: calc(1.25 * 13px);
+}
+
+.block-editor-inserter__media-tabs-container {
+	height: 100%;
+
+	nav {
+		height: 100%;
+	}
+
+	.block-editor-inserter__media-library-button {
+		padding: $grid-unit-20;
+		justify-content: center;
+		margin-top: $grid-unit-20;
+		width: 100%;
+	}
+}
+
+.block-editor-inserter__media-tabs {
+	display: flex;
+	flex-direction: column;
+	padding: $grid-unit-20;
+	overflow-y: auto;
+	height: 100%;
+
+	// Push the listitem wrapping the "open media library" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
+
+	&__media-category {
+		&.is-selected {
+			color: var(--wp-admin-theme-color);
+			position: relative;
+
+			.components-flex-item {
+				filter: brightness(0.95);
+			}
+
+			svg {
+				fill: var(--wp-admin-theme-color);
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				border-radius: $radius-block-ui;
+				opacity: 0.04;
+				background: var(--wp-admin-theme-color);
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-dialog {
+	background: $gray-100;
+	border-left: $border-width solid $gray-200;
+	border-right: $border-width solid $gray-200;
+	position: absolute;
+	padding: $grid-unit-20 $grid-unit-30;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	overflow-y: auto;
+	scrollbar-gutter: stable both-edges;
+
+	@include break-medium {
+		left: 100%;
+		display: block;
+		width: 300px;
+	}
+
+	.block-editor-block-preview__container {
+		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
+		&:hover {
+			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+		}
+	}
+}
+
+.block-editor-inserter__media-panel {
+	min-height: 100%;
+	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
+
+	@include break-medium {
+		padding: 0;
+	}
+
+	.block-editor-inserter__media-panel-spinner {
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 1;
+	}
+
+	.block-editor-inserter__media-panel-search {
+		&.components-search-control {
+			input[type="search"].components-search-control__input {
+				background: $white;
+			}
+			button.components-button {
+				min-width: auto;
+				padding-left: $grid-unit-05 * 0.5;
+				padding-right: $grid-unit-05 * 0.5;
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-list {
+	margin-top: $grid-unit-20;
+	.block-editor-inserter__media-list__list-item {
+		position: relative;
+		cursor: pointer;
+		margin-bottom: $grid-unit-30;
+
+		&.is-placeholder {
+			min-height: 100px;
+		}
+
+		&[draggable="true"] .block-editor-block-preview__container {
+			cursor: grab;
+		}
+
+		&.is-hovered {
+			.block-editor-inserter__media-list__item-preview {
+				box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+			}
+
+			.block-editor-inserter__media-list__item-preview-options > button {
+				display: block;
+			}
+		}
+
+		.block-editor-inserter__media-list__item-preview-options {
+			position: absolute;
+			right: $grid-unit-10;
+			top: $grid-unit-10;
+
+			> button {
+				background: $white;
+				border-radius: $radius-block-ui;
+				display: none;
+
+				// These styles are important so as focus isn't lost
+				// when the button is focused and we hover away.
+				&.is-opened,
+				&:focus {
+					display: block;
+				}
+
+				&:hover {
+					box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+					// Windows High Contrast mode will show this outline, but not the box-shadow.
+					outline: 2px solid transparent;
+				}
+			}
+		}
+	}
+
+	.block-editor-inserter__media-list__item {
+		height: 100%;
+
+		.block-editor-inserter__media-list__item-preview {
+			display: flex;
+			align-items: center;
+			overflow: hidden;
+			border-radius: 2px;
+
+			> * {
+				margin: 0 auto;
+				max-width: 100%;
+			}
+		}
+
+		&:focus .block-editor-inserter__media-list__item-preview {
+			box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+		}
+	}
+}
+
+.block-editor-inserter__media-list__item-preview-options__popover {
+	.components-menu-item__button .components-menu-item__item {
+		min-width: auto;
+	}
+}
+
+
+.block-editor-inserter__mobile-tab-navigation {
+	padding: $grid-unit-20;
+	height: 100%;
+
+	> * {
+		height: 100%;
 	}
 }

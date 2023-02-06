@@ -2,7 +2,7 @@
 	{
 		"blockName": "core/cover",
 		"attrs": {
-			"gradient": "luminous-dusk",
+			"gradient": "electric-grass",
 			"isDark": false
 		},
 		"innerBlocks": [
@@ -14,17 +14,17 @@
 					"fontSize": "large"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t\t<p class=\"has-text-align-center has-large-font-size\">Cover!</p>\n\t\t",
+				"innerHTML": "\n        <p class=\"has-text-align-center has-large-font-size\">Cover!</p>\n        ",
 				"innerContent": [
-					"\n\t\t<p class=\"has-text-align-center has-large-font-size\">Cover!</p>\n\t\t"
+					"\n        <p class=\"has-text-align-center has-large-font-size\">Cover!</p>\n        "
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-cover\">\n    <span aria-hidden=\"true\" class=\"has-background-dim-100 wp-block-cover__gradient-background has-luminous-dusk-gradient-background has-background-dim has-background-gradient has-luminous-dusk-gradient-background\"></span>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
+		"innerHTML": "\n<div class=\"wp-block-cover is-light\">\n    <span aria-hidden=\"true\" class=\"has-background-dim-100 wp-block-cover__gradient-background has-electric-grass-gradient-background has-background-dim has-background-gradient has-electric-grass-gradient-background\"></span>\n    <div class=\"wp-block-cover__inner-container\">\n        \n    </div>\n</div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-cover\">\n    <span aria-hidden=\"true\" class=\"has-background-dim-100 wp-block-cover__gradient-background has-luminous-dusk-gradient-background has-background-dim has-background-gradient has-luminous-dusk-gradient-background\"></span>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t",
+			"\n<div class=\"wp-block-cover is-light\">\n    <span aria-hidden=\"true\" class=\"has-background-dim-100 wp-block-cover__gradient-background has-electric-grass-gradient-background has-background-dim has-background-gradient has-electric-grass-gradient-background\"></span>\n    <div class=\"wp-block-cover__inner-container\">\n        ",
 			null,
-			"\n\t</div>\n</div>\n"
+			"\n    </div>\n</div>\n"
 		]
 	}
 ]

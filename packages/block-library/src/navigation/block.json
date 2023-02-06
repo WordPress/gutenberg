@@ -41,6 +41,10 @@
 			"type": "string",
 			"default": "mobile"
 		},
+		"icon": {
+			"type": "string",
+			"default": "handle"
+		},
 		"hasIcon": {
 			"type": "boolean",
 			"default": true
@@ -59,9 +63,16 @@
 		},
 		"customOverlayTextColor": {
 			"type": "string"
+		},
+		"maxNestingLevel": {
+			"type": "number",
+			"default": 5
+		},
+		"templateLock": {
+			"type": [ "string", "boolean" ],
+			"enum": [ "all", "insert", "contentOnly", false ]
 		}
 	},
-	"usesContext": [ "navigationArea" ],
 	"providesContext": {
 		"textColor": "textColor",
 		"customTextColor": "customTextColor",
@@ -76,7 +87,8 @@
 		"showSubmenuIcon": "showSubmenuIcon",
 		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
-		"orientation": "orientation"
+		"orientation": "orientation",
+		"maxNestingLevel": "maxNestingLevel"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
@@ -90,6 +102,9 @@
 			"__experimentalFontWeight": true,
 			"__experimentalTextTransform": true,
 			"__experimentalFontFamily": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalSkipSerialization": [ "textDecoration" ],
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -104,12 +119,23 @@
 		"__experimentalLayout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
+			"allowVerticalAlignment": false,
+			"allowSizingOnChildren": true,
 			"default": {
 				"type": "flex"
 			}
+		},
+		"__experimentalStyle": {
+			"elements": {
+				"link": {
+					"color": {
+						"text": "inherit"
+					}
+				}
+			}
 		}
 	},
-	"viewScript": "file:./view.min.js",
+	"viewScript": [ "file:./view.min.js", "file:./view-modal.min.js" ],
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
 }

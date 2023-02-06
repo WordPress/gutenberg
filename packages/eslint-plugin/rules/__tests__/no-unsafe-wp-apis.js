@@ -21,15 +21,15 @@ const options = [
 
 ruleTester.run( 'no-unsafe-wp-apis', rule, {
 	valid: [
-		{ code: "import _ from 'lodash';", options },
-		{ code: "import { map } from 'lodash';", options },
-		{ code: "import { __experimentalFoo } from 'lodash';", options },
-		{ code: "import { __unstableFoo } from 'lodash';", options },
-		{ code: "import _, { __unstableFoo } from 'lodash';", options },
-		{ code: "import * as _ from 'lodash';", options },
+		{ code: "import _ from 'change-case';", options },
+		{ code: "import { camelCase } from 'change-case';", options },
+		{ code: "import { __experimentalFoo } from 'change-case';", options },
+		{ code: "import { __unstableFoo } from 'change-case';", options },
+		{ code: "import _, { __unstableFoo } from 'change-case';", options },
+		{ code: "import * as _ from 'change-case';", options },
 
 		{ code: "import _ from './x';", options },
-		{ code: "import { map } from './x';", options },
+		{ code: "import { camelCase } from './x';", options },
 		{ code: "import { __experimentalFoo } from './x';", options },
 		{ code: "import { __unstableFoo } from './x';", options },
 		{ code: "import _, { __unstableFoo } from './x';", options },
@@ -46,8 +46,7 @@ ruleTester.run( 'no-unsafe-wp-apis', rule, {
 			options,
 		},
 		{
-			code:
-				"import { feature, __experimentalSafe } from '@wordpress/package';",
+			code: "import { feature, __experimentalSafe } from '@wordpress/package';",
 			options,
 		},
 		{
@@ -81,8 +80,7 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 			],
 		},
 		{
-			code:
-				"import { feature, __experimentalSafe } from '@wordpress/unsafe';",
+			code: "import { feature, __experimentalSafe } from '@wordpress/unsafe';",
 			options,
 			errors: [
 				{
@@ -93,8 +91,7 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 			],
 		},
 		{
-			code:
-				"import s, { __experimentalUnsafe } from '@wordpress/package';",
+			code: "import s, { __experimentalUnsafe } from '@wordpress/package';",
 			options,
 			errors: [
 				{

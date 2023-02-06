@@ -1,10 +1,6 @@
 .contentContainer {
-	flex-direction: row-reverse;
+	flex-direction: row;
 	padding: 0 $grid-unit-20;
-}
-
-.container {
-	padding-bottom: $grid-unit-20;
 }
 
 .verticalSeparator {
@@ -41,4 +37,13 @@
 .customTextAndroid {
 	letter-spacing: 1.25;
 	font-weight: 500;
+}
+
+.headerText {
+	color: $gray;
+	padding-top: 8;
+	font-size: 14;
+	font-weight: 500;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
 }

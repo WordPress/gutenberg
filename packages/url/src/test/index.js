@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { every } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import {
@@ -44,35 +39,37 @@ describe( 'isURL', () => {
 } );
 
 describe( 'isEmail', () => {
-	it( 'returns true when given things that look like an email', () => {
-		const emails = [
-			'simple@wordpress.org',
-			'very.common@wordpress.org',
-			'disposable.style.email.with+symbol@wordpress.org',
-			'other.email-with-hyphen@wordpress.org',
-			'fully-qualified-domain@wordpress.org',
-			'user.name+tag+sorting@wordpress.org',
-			'x@wordpress.org',
-			'wordpress-indeed@strange-wordpress.org',
-			'wordpress@s.wordpress',
-		];
+	it.each( [
+		'simple@wordpress.org',
+		'very.common@wordpress.org',
+		'disposable.style.email.with+symbol@wordpress.org',
+		'other.email-with-hyphen@wordpress.org',
+		'fully-qualified-domain@wordpress.org',
+		'user.name+tag+sorting@wordpress.org',
+		'x@wordpress.org',
+		'wordpress-indeed@strange-wordpress.org',
+		'wordpress@s.wordpress',
+		'1234567890123456789012345678901234567890123456789012345678901234+x@wordpress.org',
+	] )(
+		'returns true when given things that look like an email: %s',
+		( email ) => {
+			expect( isEmail( email ) ).toBe( true );
+		}
+	);
 
-		expect( every( emails, isEmail ) ).toBe( true );
-	} );
-
-	it( "returns false when given things that don't look like an email", () => {
-		const emails = [
-			'Abc.wordpress.org',
-			'A@b@c@wordpress.org',
-			'a"b(c)d,e:f;g<h>i[jk]l@wordpress.org',
-			'just"not"right@wordpress.org',
-			'this is"notallowed@wordpress.org',
-			'this still"not\\allowed@wordpress.org',
-			'1234567890123456789012345678901234567890123456789012345678901234+x@wordpress.org',
-		];
-
-		expect( every( emails, isEmail ) ).toBe( false );
-	} );
+	it.each( [
+		'Abc.wordpress.org',
+		'A@b@c@wordpress.org',
+		'a"b(c)d,e:f;g<h>i[jk]l@wordpress.org',
+		'just"not"right@wordpress.org',
+		'this is"notallowed@wordpress.org',
+		'this still"not\\allowed@wordpress.org',
+	] )(
+		"returns false when given things that don't look like an email: %s",
+		( email ) => {
+			expect( isEmail( email ) ).toBe( false );
+		}
+	);
 } );
 
 describe( 'getProtocol', () => {
@@ -726,6 +723,16 @@ describe( 'getQueryArgs', () => {
 				)
 			).toEqual( data );
 		} );
+
+		it( 'should not blow up on malformed params', () => {
+			const url = 'https://andalouses.example/beach?foo=bar&baz=%E0%A4%A';
+
+			expect( () => getQueryArgs( url ) ).not.toThrow();
+			expect( getQueryArgs( url ) ).toEqual( {
+				baz: '%E0%A4%A',
+				foo: 'bar',
+			} );
+		} );
 	} );
 } );
 
@@ -974,16 +981,43 @@ describe( 'filterURLForDisplay', () => {
 } );
 
 describe( 'cleanForSlug', () => {
-	it( 'should return string prepared for use as url slug', () => {
+	it( 'Should return string prepared for use as url slug', () => {
 		expect( cleanForSlug( '/Is th@t Déjà_vu? ' ) ).toBe( 'is-tht-deja_vu' );
 	} );
 
-	it( 'should return an empty string for missing argument', () => {
+	it( 'Should return an empty string for missing argument', () => {
 		expect( cleanForSlug() ).toBe( '' );
 	} );
 
-	it( 'should return an empty string for falsy argument', () => {
+	it( 'Should return an empty string for falsy argument', () => {
 		expect( cleanForSlug( null ) ).toBe( '' );
+	} );
+
+	it( 'Should not allow characters used internally in rich-text', () => {
+		//The last space is an object replacement character
+		expect( cleanForSlug( 'the long cat￼' ) ).toBe( 'the-long-cat' );
+	} );
+
+	it( 'Creates a slug for languages that use multibyte encodings', () => {
+		expect( cleanForSlug( '新荣记 ' ) ).toBe( '新荣记' );
+		expect( cleanForSlug( '私のテンプレートパーツのテスト ' ) ).toBe(
+			'私のテンプレートパーツのテスト'
+		);
+		expect( cleanForSlug( 'ქართული ნაწილი' ) ).toBe( 'ქართული-ნაწილი' );
+		expect( cleanForSlug( 'Καλημέρα Κόσμε' ) ).toBe( 'καλημέρα-κόσμε' );
+		expect( cleanForSlug( '안녕하세요 ' ) ).toBe( '안녕하세요' );
+		expect( cleanForSlug( '繁体字 ' ) ).toBe( '繁体字' );
+	} );
+
+	it( 'Should trim multiple leading and trailing dashes', () => {
+		expect( cleanForSlug( '  -Is th@t Déjà_vu- 	' ) ).toBe(
+			'is-tht-deja_vu'
+		);
+	} );
+
+	it( 'Should replace multiple hyphens with a single one', () => {
+		expect( cleanForSlug( 'the long - cat' ) ).toBe( 'the-long-cat' );
+		expect( cleanForSlug( 'the----long---cat' ) ).toBe( 'the-long-cat' );
 	} );
 } );
 
@@ -1007,5 +1041,10 @@ describe( 'normalizePath', () => {
 		expect( bac ).toBe( acb );
 		expect( acb ).toBe( cba );
 		expect( cba ).toBe( cab );
+	} );
+
+	it( 'sorts urldecoded values and returns property urlencoded query string', () => {
+		const ab = normalizePath( '/foo/bar?a%2Ca=5,5&a,b=1,1' );
+		expect( ab ).toBe( '/foo/bar?a%2Ca=5%2C5&a%2Cb=1%2C1' );
 	} );
 } );

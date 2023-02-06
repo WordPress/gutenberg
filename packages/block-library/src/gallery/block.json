@@ -106,7 +106,31 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true
+		"align": true,
+		"html": false,
+		"units": [ "px", "em", "rem", "vh", "vw" ],
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"blockGap": [ "horizontal", "vertical" ],
+			"__experimentalSkipSerialization": [ "blockGap" ],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		},
+		"color": {
+			"text": false,
+			"background": true,
+			"gradients": true
+		},
+		"__experimentalLayout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"allowEditing": false,
+			"default": {
+				"type": "flex"
+			}
+		}
 	},
 	"editorStyle": "wp-block-gallery-editor",
 	"style": "wp-block-gallery"

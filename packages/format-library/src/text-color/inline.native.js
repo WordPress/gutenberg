@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-
-import { reject } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
@@ -14,16 +8,19 @@ import {
 	getActiveFormat,
 } from '@wordpress/rich-text';
 import {
-	useSetting,
 	getColorClassName,
 	getColorObjectByColorValue,
+	useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
-import { BottomSheet, ColorSettings } from '@wordpress/components';
+import {
+	BottomSheet,
+	ColorSettings,
+	useMobileGlobalStylesColors,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { textColor as settings } from './index';
 import { transparentValue } from './index.js';
 import { parseClassName } from './inline.js';
 
@@ -107,7 +104,9 @@ function setColors( value, name, colorSettings, colors ) {
 		const newFormat = applyFormat( value, format );
 		const { activeFormats } = newFormat;
 		newFormat.formats[ value.start ] = [
-			...reject( activeFormats, { type: format.type } ),
+			...( activeFormats?.filter(
+				( { type } ) => type !== format.type
+			) || [] ),
 			format,
 		];
 		return newFormat;
@@ -120,10 +119,8 @@ function setColors( value, name, colorSettings, colors ) {
 
 function ColorPicker( { name, value, onChange } ) {
 	const property = 'color';
-	const colors = useSetting( 'color.palette' ) || settings.colors;
-	const colorSettings = {
-		colors,
-	};
+	const colors = useMobileGlobalStylesColors();
+	const colorSettings = useMultipleOriginColorsAndGradients();
 
 	const onColorChange = useCallback(
 		( color ) => {

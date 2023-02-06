@@ -6,73 +6,25 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { dispatch, select } from '@wordpress/data';
-import { render, unmountComponentAtNode } from '@wordpress/element';
+import { dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
+import { createRoot } from '@wordpress/element';
 import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-import { store as viewportStore } from '@wordpress/viewport';
-import { getQueryArgs } from '@wordpress/url';
+import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { addFilter } from '@wordpress/hooks';
+import { registerLegacyWidgetBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
  */
 import './hooks';
 import { store as editSiteStore } from './store';
-import EditSiteApp from './components/app';
-import getIsListPage from './utils/get-is-list-page';
-import redirectToHomepage from './components/routes/redirect-to-homepage';
-
-/**
- * Reinitializes the editor after the user chooses to reboot the editor after
- * an unhandled error occurs, replacing previously mounted editor element using
- * an initial state from prior to the crash.
- *
- * @param {Element} target   DOM node in which editor is rendered.
- * @param {?Object} settings Editor settings object.
- */
-export async function reinitializeEditor( target, settings ) {
-	// The site editor relies on `postType` and `postId` params in the URL to
-	// define what's being edited. When visiting via the dashboard link, these
-	// won't be present. Do a client side redirect to the 'homepage' if that's
-	// the case.
-	await redirectToHomepage( settings.siteUrl );
-
-	// This will be a no-op if the target doesn't have any React nodes.
-	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind( null, target, settings );
-
-	// We dispatch actions and update the store synchronously before rendering
-	// so that we won't trigger unnecessary re-renders with useEffect.
-	{
-		dispatch( editSiteStore ).updateSettings( settings );
-
-		// Keep the defaultTemplateTypes in the core/editor settings too,
-		// so that they can be selected with core/editor selectors in any editor.
-		// This is needed because edit-site doesn't initialize with EditorProvider,
-		// which internally uses updateEditorSettings as well.
-		dispatch( editorStore ).updateEditorSettings( {
-			defaultTemplateTypes: settings.defaultTemplateTypes,
-			defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
-		} );
-
-		const isLandingOnListPage = getIsListPage(
-			getQueryArgs( window.location.href )
-		);
-
-		if ( isLandingOnListPage ) {
-			// Default the navigation panel to be opened when we're in a bigger
-			// screen and land in the list screen.
-			dispatch( editSiteStore ).setIsNavigationPanelOpened(
-				select( viewportStore ).isViewportMatch( 'medium' )
-			);
-		}
-	}
-
-	render( <EditSiteApp reboot={ reboot } />, target );
-}
+import App from './components/app';
 
 /**
  * Initializes the site editor screen.
@@ -81,26 +33,85 @@ export async function reinitializeEditor( target, settings ) {
  * @param {Object} settings Editor settings.
  */
 export function initializeEditor( id, settings ) {
+	const target = document.getElementById( id );
+	const root = createRoot( target );
+
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 	settings.__experimentalFetchRichUrlData = fetchUrlData;
-	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
-
-	const target = document.getElementById( id );
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
+	registerLegacyWidgetBlock( { inserter: false } );
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: true,
 		} );
 	}
+	/*
+	 * Prevent adding the Clasic block in the site editor.
+	 * Only add the filter when the site editor is initialized, not imported.
+	 * Also only add the filter(s) after registerCoreBlocks()
+	 * so that common filters in the block library are not overwritten.
+	 *
+	 * This usage here is inspired by previous usage of the filter in the post editor:
+	 * https://github.com/WordPress/gutenberg/pull/37157
+	 */
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removeClassicBlockFromInserter',
+		( canInsert, blockType ) => {
+			if ( blockType.name === 'core/freeform' ) {
+				return false;
+			}
+			return canInsert;
+		}
+	);
 
-	reinitializeEditor( target, settings );
+	// We dispatch actions and update the store synchronously before rendering
+	// so that we won't trigger unnecessary re-renders with useEffect.
+	dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
+		editorMode: 'visual',
+		fixedToolbar: false,
+		focusMode: false,
+		keepCaretInsideBlock: false,
+		welcomeGuide: true,
+		welcomeGuideStyles: true,
+		showListViewByDefault: false,
+	} );
+
+	dispatch( interfaceStore ).setDefaultComplementaryArea(
+		'core/edit-site',
+		'edit-site/template'
+	);
+
+	dispatch( editSiteStore ).updateSettings( settings );
+
+	// Keep the defaultTemplateTypes in the core/editor settings too,
+	// so that they can be selected with core/editor selectors in any editor.
+	// This is needed because edit-site doesn't initialize with EditorProvider,
+	// which internally uses updateEditorSettings as well.
+	dispatch( editorStore ).updateEditorSettings( {
+		defaultTemplateTypes: settings.defaultTemplateTypes,
+		defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
+	} );
+
+	// Prevent the default browser action for files dropped outside of dropzones.
+	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
+	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
+
+	root.render( <App /> );
+
+	return root;
 }
 
-export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
-export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';
-export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
-export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
-export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
+export function reinitializeEditor() {
+	deprecated( 'wp.editSite.reinitializeEditor', {
+		since: '6.2',
+		version: '6.3',
+	} );
+}
+
+export { default as PluginSidebar } from './components/sidebar-edit-mode/plugin-sidebar';
+export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';
+export { default as PluginMoreMenuItem } from './components/header-edit-mode/plugin-more-menu-item';

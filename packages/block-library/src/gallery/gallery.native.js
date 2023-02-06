@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * Internal dependencies
@@ -49,10 +48,8 @@ export const Gallery = ( props ) => {
 		}
 	}, [ sizes ] );
 
-	const {
-		align,
-		columns = defaultColumnsNumber( images.length ),
-	} = attributes;
+	const { align, columns = defaultColumnsNumber( images.length ) } =
+		attributes;
 
 	const displayedColumns = Math.min(
 		columns,
@@ -102,7 +99,7 @@ export const Gallery = ( props ) => {
 				isSelected={ isCaptionSelected }
 				accessible={ true }
 				accessibilityLabelCreator={ ( caption ) =>
-					isEmpty( caption )
+					! caption
 						? /* translators: accessibility text. Empty gallery caption. */
 
 						  'Gallery caption. Empty'
@@ -113,7 +110,7 @@ export const Gallery = ( props ) => {
 						  )
 				}
 				onFocus={ focusGalleryCaption }
-				onBlur={ onBlur } // always assign onBlur as props
+				onBlur={ onBlur } // Always assign onBlur as props.
 				insertBlocksAfter={ insertBlocksAfter }
 			/>
 		</View>

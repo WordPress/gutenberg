@@ -1,3 +1,5 @@
+/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expect*"] }] */
+
 /**
  * External dependencies
  */
@@ -20,6 +22,7 @@ import {
 	OPTION_TAKE_VIDEO,
 	OPTION_TAKE_PHOTO,
 	OPTION_INSERT_FROM_URL,
+	OPTION_WORDPRESS_MEDIA_LIBRARY,
 } from '../index';
 
 const MEDIA_URL = 'http://host.media.type';
@@ -33,8 +36,11 @@ describe( 'MediaUpload component', () => {
 		expect( wrapper ).toBeTruthy();
 	} );
 
-	it( 'shows right media capture option for media type', () => {
-		const expectOptionForMediaType = ( mediaType, expectedOption ) => {
+	describe( 'Media capture options for different media block types', () => {
+		const expectOptionForMediaType = async (
+			mediaType,
+			expectedOptions
+		) => {
 			const wrapper = render(
 				<MediaUpload
 					allowedTypes={ [ mediaType ] }
@@ -52,11 +58,32 @@ describe( 'MediaUpload component', () => {
 			);
 			fireEvent.press( wrapper.getByText( 'Open Picker' ) );
 
-			wrapper.getByText( expectedOption );
+			expectedOptions.forEach( ( item ) => {
+				const option = wrapper.getByText( item );
+				expect( option ).toBeVisible();
+			} );
 		};
-		expectOptionForMediaType( MEDIA_TYPE_IMAGE, OPTION_TAKE_PHOTO );
-		expectOptionForMediaType( MEDIA_TYPE_VIDEO, OPTION_TAKE_VIDEO );
-		expectOptionForMediaType( MEDIA_TYPE_AUDIO, OPTION_INSERT_FROM_URL );
+
+		it( 'shows the correct media capture options for the Image block', () => {
+			expectOptionForMediaType( MEDIA_TYPE_IMAGE, [
+				OPTION_TAKE_PHOTO,
+				OPTION_WORDPRESS_MEDIA_LIBRARY,
+				OPTION_INSERT_FROM_URL,
+			] );
+		} );
+
+		it( 'shows the correct media capture options for the Video block', () => {
+			expectOptionForMediaType( MEDIA_TYPE_VIDEO, [
+				OPTION_TAKE_VIDEO,
+				OPTION_WORDPRESS_MEDIA_LIBRARY,
+			] );
+		} );
+
+		it( 'shows the correct media capture options for the Audio block', () => {
+			expectOptionForMediaType( MEDIA_TYPE_AUDIO, [
+				OPTION_INSERT_FROM_URL,
+			] );
+		} );
 	} );
 
 	const expectMediaPickerForOption = (

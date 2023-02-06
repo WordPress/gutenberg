@@ -2,13 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
-	useSetting,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
-	store as blockEditorStore,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	Warning,
 } from '@wordpress/block-editor';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
@@ -38,14 +36,9 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 	);
 }
 
-function EditableContent( { layout, context = {} } ) {
+function EditableContent( { context = {} } ) {
 	const { postType, postId } = context;
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings()?.supportsLayout;
-	}, [] );
-	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
@@ -58,7 +51,6 @@ function EditableContent( { layout, context = {} } ) {
 			value: blocks,
 			onInput,
 			onChange,
-			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 		}
 	);
 	return <div { ...props } />;
@@ -81,11 +73,25 @@ function Content( props ) {
 	);
 }
 
-function Placeholder() {
-	const blockProps = useBlockProps();
+function Placeholder( { layoutClassNames } ) {
+	const blockProps = useBlockProps( { className: layoutClassNames } );
 	return (
 		<div { ...blockProps }>
-			<p>{ __( 'Post Content' ) }</p>
+			<p>
+				{ __(
+					'This is the Post Content block, it will display all the blocks in any single post or page.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'That might be a simple arrangement like consecutive paragraphs in a blog post, or a more elaborate composition that includes image galleries, videos, tables, columns, and any other block types.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'If there are any Custom Post Types registered at your site, the Post Content block can display the contents of those entries as well.'
+				) }
+			</p>
 		</div>
 	);
 }
@@ -101,23 +107,25 @@ function RecursionError() {
 	);
 }
 
-export default function PostContentEdit( { context, attributes } ) {
+export default function PostContentEdit( {
+	context,
+	attributes,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
 	const { layout = {} } = attributes;
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		contextPostId
-	);
+	const hasAlreadyRendered = useHasRecursion( contextPostId );
 
 	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
 		return <RecursionError />;
 	}
 
 	return (
-		<RecursionProvider>
+		<RecursionProvider uniqueId={ contextPostId }>
 			{ contextPostId && contextPostType ? (
 				<Content context={ context } layout={ layout } />
 			) : (
-				<Placeholder />
+				<Placeholder layoutClassNames={ layoutClassNames } />
 			) }
 		</RecursionProvider>
 	);

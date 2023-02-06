@@ -11,11 +11,35 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><li>A</li><li>Bulleted<ul><li>Indented</li></ul></li><li>List</li></ul>
+<ul><!-- wp:list-item -->
+<li>A</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Bulleted<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>Indented</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>List</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
 <!-- wp:list {"ordered":true} -->
-<ol><li>One</li><li>Two</li><li>Three</li></ol>
+<ol><!-- wp:list-item -->
+<li>One</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Two</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Three</li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->
 
 <!-- wp:table -->

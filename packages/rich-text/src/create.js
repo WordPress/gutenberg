@@ -43,7 +43,7 @@ function createEmptyValue() {
 	};
 }
 
-function toFormat( { type, attributes } ) {
+function toFormat( { tagName, attributes } ) {
 	let formatType;
 
 	if ( attributes && attributes.class ) {
@@ -64,13 +64,12 @@ function toFormat( { type, attributes } ) {
 	}
 
 	if ( ! formatType ) {
-		formatType = select( richTextStore ).getFormatTypeForBareElement(
-			type
-		);
+		formatType =
+			select( richTextStore ).getFormatTypeForBareElement( tagName );
 	}
 
 	if ( ! formatType ) {
-		return attributes ? { type, attributes } : { type };
+		return attributes ? { type: tagName, attributes } : { type: tagName };
 	}
 
 	if (
@@ -81,7 +80,7 @@ function toFormat( { type, attributes } ) {
 	}
 
 	if ( ! attributes ) {
-		return { type: formatType.name };
+		return { type: formatType.name, tagName };
 	}
 
 	const registeredAttributes = {};
@@ -94,12 +93,11 @@ function toFormat( { type, attributes } ) {
 		registeredAttributes[ key ] = _attributes[ name ];
 
 		if ( formatType.__unstableFilterAttributeValue ) {
-			registeredAttributes[
-				key
-			] = formatType.__unstableFilterAttributeValue(
-				key,
-				registeredAttributes[ key ]
-			);
+			registeredAttributes[ key ] =
+				formatType.__unstableFilterAttributeValue(
+					key,
+					registeredAttributes[ key ]
+				);
 		}
 
 		// delete the attribute and what's left is considered
@@ -117,6 +115,7 @@ function toFormat( { type, attributes } ) {
 
 	return {
 		type: formatType.name,
+		tagName,
 		attributes: registeredAttributes,
 		unregisteredAttributes,
 	};
@@ -321,7 +320,7 @@ function collapseWhiteSpace( string ) {
  * @param {string} string
  */
 export function removeReservedCharacters( string ) {
-	//with the global flag, note that we should create a new regex each time OR reset lastIndex state.
+	// with the global flag, note that we should create a new regex each time OR reset lastIndex state.
 	return string.replace(
 		new RegExp( `[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }]`, 'gu' ),
 		''
@@ -370,7 +369,7 @@ function createFromElement( {
 	// Optimise for speed.
 	for ( let index = 0; index < length; index++ ) {
 		const node = element.childNodes[ index ];
-		const type = node.nodeName.toLowerCase();
+		const tagName = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === node.TEXT_NODE ) {
 			let filter = removeReservedCharacters;
@@ -400,19 +399,19 @@ function createFromElement( {
 			// Ignore any placeholders.
 			( node.getAttribute( 'data-rich-text-placeholder' ) ||
 				// Ignore any line breaks that are not inserted by us.
-				( type === 'br' &&
+				( tagName === 'br' &&
 					! node.getAttribute( 'data-rich-text-line-break' ) ) )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
 		}
 
-		if ( type === 'script' ) {
+		if ( tagName === 'script' ) {
 			const value = {
 				formats: [ , ],
 				replacements: [
 					{
-						type,
+						type: tagName,
 						attributes: {
 							'data-rich-text-script':
 								node.getAttribute( 'data-rich-text-script' ) ||
@@ -427,20 +426,20 @@ function createFromElement( {
 			continue;
 		}
 
-		if ( type === 'br' ) {
+		if ( tagName === 'br' ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			mergePair( accumulator, create( { text: '\n' } ) );
 			continue;
 		}
 
 		const format = toFormat( {
-			type,
+			tagName,
 			attributes: getAttributes( { element: node } ),
 		} );
 
 		if (
 			multilineWrapperTags &&
-			multilineWrapperTags.indexOf( type ) !== -1
+			multilineWrapperTags.indexOf( tagName ) !== -1
 		) {
 			const value = createFromMultilineElement( {
 				element: node,
