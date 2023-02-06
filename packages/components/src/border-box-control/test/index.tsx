@@ -1,16 +1,13 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { act } from 'react-test-renderer';
 
 /**
  * Internal dependencies
  */
-import { BorderBoxControl } from '../';
-
-jest.useFakeTimers();
+import { BorderBoxControl } from '..';
 
 const colors = [
 	{ name: 'Gray', color: '#f6f7f7' },
@@ -98,7 +95,7 @@ describe( 'BorderBoxControl', () => {
 
 			const widthInput = screen.getByRole( 'spinbutton', {
 				name: 'Border width',
-			} );
+			} ) as HTMLInputElement;
 
 			expect( widthInput.value ).toBe( '1' );
 		} );
@@ -110,21 +107,35 @@ describe( 'BorderBoxControl', () => {
 
 			const widthInput = screen.getByRole( 'spinbutton', {
 				name: 'Border width',
-			} );
+			} ) as HTMLInputElement;
 
 			expect( widthInput.value ).toBe( '1' );
 		} );
 
 		it( 'should render placeholder and omit unit select when border values are mixed', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <BorderBoxControl { ...props } value={ mixedBorders } /> );
+
+			// There are 4 inputs when in unlinked mode (top/right/bottom/left)
+			expect(
+				screen.getAllByRole( 'spinbutton', {
+					name: 'Border width',
+				} )
+			).toHaveLength( 4 );
 
 			// First render of control with mixed values should show split view.
 			await user.click(
 				screen.getByRole( 'button', { name: 'Link sides' } )
+			);
+
+			// In linked mode, there is only one input
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'spinbutton', {
+						name: 'Border width',
+					} )
+				).toBeVisible()
 			);
 
 			const widthInput = screen.getByRole( 'spinbutton', {
@@ -139,9 +150,7 @@ describe( 'BorderBoxControl', () => {
 		} );
 
 		it( 'should render shared border width and unit select when switching to linked view', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			// Render control with mixed border values but consistent widths.
 			render(
@@ -171,7 +180,7 @@ describe( 'BorderBoxControl', () => {
 
 			const linkedInput = screen.getByRole( 'spinbutton', {
 				name: 'Border width',
-			} );
+			} ) as HTMLInputElement;
 			const unitSelect = screen.getByRole( 'combobox', {
 				name: 'Select unit',
 			} );
@@ -181,31 +190,30 @@ describe( 'BorderBoxControl', () => {
 		} );
 
 		it( 'should omit style options when requested', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <BorderBoxControl { ...props } enableStyle={ false } /> );
 
 			const colorButton = screen.getByLabelText( colorPickerRegex );
 			await user.click( colorButton );
-			await act( () => Promise.resolve() );
 
-			const styleLabel = screen.queryByText( 'Style' );
-			const solidButton = screen.queryByRole( 'button', {
-				name: 'Solid',
-			} );
-			const dashedButton = screen.queryByRole( 'button', {
-				name: 'Dashed',
-			} );
-			const dottedButton = screen.queryByRole( 'button', {
-				name: 'Dotted',
-			} );
+			// Wait for the custom color picker in the dropdown to appear
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Custom color picker.',
+					} )
+				).toBeVisible()
+			);
 
-			expect( styleLabel ).not.toBeInTheDocument();
-			expect( solidButton ).not.toBeInTheDocument();
-			expect( dashedButton ).not.toBeInTheDocument();
-			expect( dottedButton ).not.toBeInTheDocument();
+			// Make sure that none of the border style buttons (and the section
+			// title) are rendered to screen.
+			expect( screen.queryByText( 'Style' ) ).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: /(Solid)|(Dashed)|(Dotted)/,
+				} )
+			).not.toBeInTheDocument();
 		} );
 	} );
 
@@ -237,7 +245,7 @@ describe( 'BorderBoxControl', () => {
 
 			const widthInputs = screen.getAllByRole( 'spinbutton', {
 				name: 'Border width',
-			} );
+			} ) as HTMLInputElement[];
 
 			expect( widthInputs[ 0 ].value ).toBe( '1' ); // Top.
 			expect( widthInputs[ 1 ].value ).toBe( '0.75' ); // Left.
@@ -246,9 +254,7 @@ describe( 'BorderBoxControl', () => {
 		} );
 
 		it( 'should render split view correctly when starting with flat border', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<BorderBoxControl { ...props } value={ defaultBorders } />
@@ -260,60 +266,44 @@ describe( 'BorderBoxControl', () => {
 
 			const widthInputs = screen.getAllByRole( 'spinbutton', {
 				name: 'Border width',
-			} );
+			} ) as HTMLInputElement[];
 			expect( widthInputs[ 0 ].value ).toBe( '1' ); // Top.
 			expect( widthInputs[ 1 ].value ).toBe( '1' ); // Left.
 			expect( widthInputs[ 2 ].value ).toBe( '1' ); // Right.
 			expect( widthInputs[ 3 ].value ).toBe( '1' ); // Bottom.
 		} );
 
-		it( 'should omit style options when requested', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+		// We're expecting to have 4 color buttons by default.
+		const colorButtonIndexes = [ ...Array( 4 ).keys() ];
 
-			render( <BorderBoxControl { ...props } enableStyle={ false } /> );
+		it.each( colorButtonIndexes )(
+			'should omit style options when color button %s is pressed',
+			async ( colorButtonIndex ) => {
+				const user = userEvent.setup();
 
-			await user.click(
-				screen.getByRole( 'button', { name: 'Unlink sides' } )
-			);
+				render(
+					<BorderBoxControl { ...props } enableStyle={ false } />
+				);
 
-			const colorButtons = screen.getAllByLabelText( colorPickerRegex );
+				await user.click(
+					screen.getByRole( 'button', { name: 'Unlink sides' } )
+				);
 
-			function assertStyleOptionsMissing() {
-				const styleLabel = screen.queryByText( 'Style' );
-				const solidButton = screen.queryByRole( 'button', {
-					name: 'Solid',
-				} );
-				const dashedButton = screen.queryByRole( 'button', {
-					name: 'Dashed',
-				} );
-				const dottedButton = screen.queryByRole( 'button', {
-					name: 'Dotted',
-				} );
+				const colorButtons =
+					screen.getAllByLabelText( colorPickerRegex );
 
-				expect( styleLabel ).not.toBeInTheDocument();
-				expect( solidButton ).not.toBeInTheDocument();
-				expect( dashedButton ).not.toBeInTheDocument();
-				expect( dottedButton ).not.toBeInTheDocument();
+				await user.click( colorButtons[ colorButtonIndex ] );
+
+				// Make sure that none of the border style buttons (and the section
+				// title) are rendered to screen.
+				expect( screen.queryByText( 'Style' ) ).not.toBeInTheDocument();
+				expect(
+					screen.queryByRole( 'button', {
+						name: /(Solid)|(Dashed)|(Dotted)/,
+					} )
+				).not.toBeInTheDocument();
 			}
-
-			await user.click( colorButtons[ 0 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 0 ] );
-
-			await user.click( colorButtons[ 1 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 1 ] );
-
-			await user.click( colorButtons[ 2 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 2 ] );
-
-			await user.click( colorButtons[ 3 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 3 ] );
-		} );
+		);
 	} );
 
 	describe( 'onChange handling', () => {
@@ -324,9 +314,7 @@ describe( 'BorderBoxControl', () => {
 
 		describe( 'Linked value change handling', () => {
 			it( 'should set undefined when new border is empty', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl { ...props } value={ { width: '1px' } } />
@@ -340,9 +328,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should update with complete flat border', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl { ...props } value={ defaultBorder } />
@@ -361,9 +347,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should maintain mixed values if not explicitly set via linked control', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl
@@ -396,9 +380,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should update with consistent split borders', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl { ...props } value={ defaultBorders } />
@@ -417,9 +399,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should set undefined borders when change results in empty borders', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl
@@ -441,9 +421,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should set flat border when change results in consistent split borders', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<BorderBoxControl
@@ -476,9 +454,7 @@ describe( 'BorderBoxControl', () => {
 
 		describe( 'Split value change handling', () => {
 			it( 'should set split borders when the updated borders are mixed', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				const borders = {
 					top: { ...defaultBorder, width: '1px' },
@@ -502,9 +478,7 @@ describe( 'BorderBoxControl', () => {
 			} );
 
 			it( 'should set flat border when updated borders are consistent', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				const borders = {
 					top: { ...defaultBorder, width: '4px' },
