@@ -122,6 +122,7 @@ function ScreenBackgroundColor( { name, variation = '' } ) {
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar
+				headingLevel={ 3 }
 				{ ...controlProps }
 			/>
 		</>
