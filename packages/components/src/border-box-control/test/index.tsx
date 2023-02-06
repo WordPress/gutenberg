@@ -301,21 +301,13 @@ describe( 'BorderBoxControl', () => {
 
 				await user.click( colorButtons[ colorButtonIndex ] );
 
-				const styleLabel = screen.queryByText( 'Style' );
-				const solidButton = screen.queryByRole( 'button', {
-					name: 'Solid',
-				} );
-				const dashedButton = screen.queryByRole( 'button', {
-					name: 'Dashed',
-				} );
-				const dottedButton = screen.queryByRole( 'button', {
-					name: 'Dotted',
+				// Make sure that none of the border style buttons are
+				// rendered to screen.
+				const styleButton = screen.queryByRole( 'button', {
+					name: /(Solid)|(Dashed)|(Dotted)/,
 				} );
 
-				expect( styleLabel ).not.toBeInTheDocument();
-				expect( solidButton ).not.toBeInTheDocument();
-				expect( dashedButton ).not.toBeInTheDocument();
-				expect( dottedButton ).not.toBeInTheDocument();
+				expect( styleButton ).not.toBeInTheDocument();
 			}
 		);
 	} );
