@@ -30,17 +30,19 @@ let hasStorageSupport;
  * reused in subsequent invocations.
  */
 const hasSessionStorageSupport = () => {
-	if ( typeof hasStorageSupport === 'undefined' ) {
-		try {
-			// Private Browsing in Safari 10 and earlier will throw an error when
-			// attempting to set into sessionStorage. The test here is intentional in
-			// causing a thrown error as condition bailing from local autosave.
-			window.sessionStorage.setItem( '__wpEditorTestSessionStorage', '' );
-			window.sessionStorage.removeItem( '__wpEditorTestSessionStorage' );
-			hasStorageSupport = true;
-		} catch ( error ) {
-			hasStorageSupport = false;
-		}
+	if ( hasStorageSupport !== undefined ) {
+		return hasStorageSupport;
+	}
+
+	try {
+		// Private Browsing in Safari 10 and earlier will throw an error when
+		// attempting to set into sessionStorage. The test here is intentional in
+		// causing a thrown error as condition bailing from local autosave.
+		window.sessionStorage.setItem( '__wpEditorTestSessionStorage', '' );
+		window.sessionStorage.removeItem( '__wpEditorTestSessionStorage' );
+		hasStorageSupport = true;
+	} catch {
+		hasStorageSupport = false;
 	}
 
 	return hasStorageSupport;
@@ -73,7 +75,7 @@ function useAutosaveNotice() {
 
 		try {
 			localAutosave = JSON.parse( localAutosave );
-		} catch ( error ) {
+		} catch {
 			// Not usable if it can't be parsed.
 			return;
 		}
@@ -176,11 +178,9 @@ function LocalAutosaveMonitor() {
 	useAutosaveNotice();
 	useAutosavePurge();
 
-	const { localAutosaveInterval } = useSelect(
-		( select ) => ( {
-			localAutosaveInterval:
-				select( editorStore ).getEditorSettings().localAutosaveInterval,
-		} ),
+	const localAutosaveInterval = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().localAutosaveInterval,
 		[]
 	);
 
