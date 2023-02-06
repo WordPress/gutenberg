@@ -101,7 +101,7 @@ function CustomCSSControl( { blockName } ) {
 				</Panel>
 			) }
 			<VStack spacing={ 3 }>
-				<Subtitle>{ __( 'ADDITIONAL CSS' ) }</Subtitle>
+				<Subtitle>{ __( 'Additional CSS' ) }</Subtitle>
 				<TextareaControl
 					__nextHasNoMarginBottom
 					value={

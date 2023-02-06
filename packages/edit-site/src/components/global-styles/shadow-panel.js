@@ -27,14 +27,14 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels } from './hooks';
+import { useSupportedStyles } from './hooks';
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 export function useHasShadowControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	return supports.includes( 'shadow' );
 }
 
@@ -129,7 +129,7 @@ function ShadowPopoverContainer( { shadow, onShadowChange } ) {
 	return (
 		<div className="edit-site-global-styles__shadow-panel">
 			<VStack spacing={ 4 }>
-				<Heading level={ 5 }>{ __( 'Shadows' ) }</Heading>
+				<Heading level={ 5 }>{ __( 'Shadow' ) }</Heading>
 				<ShadowPresets
 					presets={ shadows }
 					activeShadow={ shadow }

@@ -12,6 +12,7 @@ import {
 import {
 	typography,
 	border,
+	shadow,
 	color,
 	layout,
 	chevronLeft,
@@ -32,11 +33,13 @@ import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { ScreenVariations } from './screen-variations';
+import { useHasShadowControl } from './shadow-panel';
 
 function ContextMenu( { name, parentMenu = '' } ) {
 	const hasTypographyPanel = useHasTypographyPanel( name );
 	const hasColorPanel = useHasColorPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
+	const hasEffectsPanel = useHasShadowControl( name );
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
 	const hasLayoutPanel = hasDimensionsPanel;
 	const hasVariationsPanel = useHasVariationsPanel( name, parentMenu );
@@ -85,9 +88,18 @@ function ContextMenu( { name, parentMenu = '' } ) {
 					<NavigationButtonAsItem
 						icon={ border }
 						path={ parentMenu + '/border' }
-						aria-label={ __( 'Border & shadow styles' ) }
+						aria-label={ __( 'Border' ) }
 					>
-						{ __( 'Border & Shadow' ) }
+						{ __( 'Border' ) }
+					</NavigationButtonAsItem>
+				) }
+				{ hasEffectsPanel && (
+					<NavigationButtonAsItem
+						icon={ shadow }
+						path={ parentMenu + '/effects' }
+						aria-label={ __( 'Shadow' ) }
+					>
+						{ __( 'Shadow' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasLayoutPanel && (

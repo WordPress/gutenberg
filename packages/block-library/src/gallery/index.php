@@ -108,7 +108,7 @@ function block_core_gallery_render( $attributes, $content ) {
 		),
 	);
 
-	gutenberg_style_engine_get_stylesheet_from_css_rules(
+	wp_style_engine_get_stylesheet_from_css_rules(
 		$gallery_styles,
 		array(
 			'context' => 'block-supports',

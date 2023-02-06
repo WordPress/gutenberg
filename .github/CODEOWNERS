@@ -44,6 +44,7 @@
 /packages/interface
 /packages/media-utils
 /packages/server-side-render
+/packages/block-editor/src/components/link-control  @getdave
 
 # Widgets
 /packages/edit-widgets                          @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
