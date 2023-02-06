@@ -398,7 +398,7 @@ function TableEdit( {
 		},
 	];
 
-	const renderedSections = [ 'head', 'body', 'foot' ].map( ( name ) => (
+	const renderedSections = sections.map( ( name ) => (
 		<TSection name={ name } key={ name }>
 			{ attributes[ name ].map( ( { cells }, rowIndex ) => (
 				<tr key={ rowIndex }>
@@ -428,7 +428,7 @@ function TableEdit( {
 								rowSpan={ rowspan }
 								value={ content }
 								onChange={ onChange }
-								unstableOnFocus={ () => {
+								onFocus={ () => {
 									setSelectedCell( {
 										sectionName: name,
 										rowIndex,
@@ -530,7 +530,7 @@ function TableEdit( {
 						setAttributes( { caption: value } )
 					}
 					// Deselect the selected table cell when the caption is focused.
-					unstableOnFocus={ () => setSelectedCell() }
+					onFocus={ () => setSelectedCell() }
 					__unstableOnSplitAtEnd={ () =>
 						insertBlocksAfter(
 							createBlock( getDefaultBlockName() )

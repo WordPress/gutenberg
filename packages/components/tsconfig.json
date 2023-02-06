@@ -25,6 +25,7 @@
 		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../escape-html" },
+		{ "path": "../experiments" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
@@ -44,7 +45,6 @@
 		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
 		"src/index.js",
-		"src/angle-picker-control",
 		"src/autocomplete",
 		"src/custom-gradient-picker",
 		"src/dimension-control",

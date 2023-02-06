@@ -261,6 +261,9 @@ export default function NavigationLinkEdit( {
 	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
 		if ( hasChildren ) {
+			// This side-effect should not create an undo level as those should
+			// only be created via user interactions.
+			__unstableMarkNextChangeAsNotPersistent();
 			transformToSubmenu();
 		}
 	}, [ hasChildren ] );

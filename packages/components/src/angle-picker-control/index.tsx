@@ -1,12 +1,14 @@
 /**
  * External dependencies
  */
+import type { ForwardedRef } from 'react';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -21,14 +23,22 @@ import { Text } from '../text';
 import { Spacer } from '../spacer';
 import { COLORS } from '../utils/colors-values';
 
-export default function AnglePickerControl( {
-	/** Start opting into the new margin-free styles that will become the default in a future version. */
-	__nextHasNoMarginBottom = false,
-	className,
-	label = __( 'Angle' ),
-	onChange,
-	value,
-} ) {
+import type { WordPressComponentProps } from '../ui/context';
+import type { AnglePickerControlProps } from './types';
+
+function UnforwardedAnglePickerControl(
+	props: WordPressComponentProps< AnglePickerControlProps, 'div' >,
+	ref: ForwardedRef< any >
+) {
+	const {
+		__nextHasNoMarginBottom = false,
+		className,
+		label = __( 'Angle' ),
+		onChange,
+		value,
+		...restProps
+	} = props;
+
 	if ( ! __nextHasNoMarginBottom ) {
 		deprecated(
 			'Bottom margin styles for wp.components.AnglePickerControl',
@@ -40,9 +50,15 @@ export default function AnglePickerControl( {
 		);
 	}
 
-	const handleOnNumberChange = ( unprocessedValue ) => {
+	const handleOnNumberChange = ( unprocessedValue: string | undefined ) => {
+		if ( onChange === undefined ) {
+			return;
+		}
+
 		const inputValue =
-			unprocessedValue !== '' ? parseInt( unprocessedValue, 10 ) : 0;
+			unprocessedValue !== undefined && unprocessedValue !== ''
+				? parseInt( unprocessedValue, 10 )
+				: 0;
 		onChange( inputValue );
 	};
 
@@ -50,6 +66,8 @@ export default function AnglePickerControl( {
 
 	return (
 		<Root
+			{ ...restProps }
+			ref={ ref }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			className={ classes }
 			gap={ 4 }
@@ -94,3 +112,29 @@ export default function AnglePickerControl( {
 		</Root>
 	);
 }
+
+/**
+ * `AnglePickerControl` is a React component to render a UI that allows users to
+ * pick an angle. Users can choose an angle in a visual UI with the mouse by
+ * dragging an angle indicator inside a circle or by directly inserting the
+ * desired angle in a text field.
+ *
+ * ```jsx
+ * import { useState } from '@wordpress/element';
+ * import { AnglePickerControl } from '@wordpress/components';
+ *
+ * function Example() {
+ *   const [ angle, setAngle ] = useState( 0 );
+ *   return (
+ *     <AnglePickerControl
+ *       value={ angle }
+ *       onChange={ setAngle }
+ *       __nextHasNoMarginBottom
+ *     </>
+ *   );
+ * }
+ * ```
+ */
+export const AnglePickerControl = forwardRef( UnforwardedAnglePickerControl );
+
+export default AnglePickerControl;

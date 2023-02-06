@@ -12,10 +12,14 @@ import { COLORS } from '../../utils';
 import { space } from '../../ui/utils/space';
 import CONFIG from '../../utils/config-values';
 
+import type { AnglePickerControlProps } from '../types';
+
 const CIRCLE_SIZE = 32;
 const INNER_CIRCLE_SIZE = 3;
 
-const deprecatedBottomMargin = ( { __nextHasNoMarginBottom } ) => {
+const deprecatedBottomMargin = ( {
+	__nextHasNoMarginBottom,
+}: Pick< AnglePickerControlProps, '__nextHasNoMarginBottom' > ) => {
 	return ! __nextHasNoMarginBottom
 		? css`
 				margin-bottom: ${ space( 2 ) };
