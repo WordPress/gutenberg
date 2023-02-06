@@ -42,11 +42,21 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		}
 	}
 
+	$extra_styles = '';
+
 	if ( ! empty( $attributes['height'] ) ) {
-		$extra_styles = "height:{$attributes['height']};";
-		if ( ! empty( $attributes['scale'] ) ) {
-			$extra_styles .= "object-fit:{$attributes['scale']};";
-		}
+		$extra_styles .= "height:{$attributes['height']};";
+	}
+
+	if ( ! empty( $attributes['aspectRatio'] ) ) {
+		$extra_styles .= "aspect-ratio:{$attributes['aspectRatio']};";
+	}
+
+	if ( ! empty( $attributes['scale'] ) ) {
+		$extra_styles .= "object-fit:{$attributes['scale']};";
+	}
+
+	if ( ! empty( $extra_styles ) ) {
 		$attr['style'] = empty( $attr['style'] ) ? $extra_styles : $attr['style'] . $extra_styles;
 	}
 

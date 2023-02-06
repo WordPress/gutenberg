@@ -50,8 +50,16 @@ export default function PostFeaturedImageEdit( {
 	context: { postId, postType: postTypeSlug, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const { isLink, height, width, scale, sizeSlug, rel, linkTarget } =
-		attributes;
+	const {
+		isLink,
+		aspectRatio,
+		height,
+		width,
+		scale,
+		sizeSlug,
+		rel,
+		linkTarget,
+	} = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
@@ -219,7 +227,8 @@ export default function PostFeaturedImageEdit( {
 	const imageStyles = {
 		...borderProps.style,
 		height,
-		objectFit: height && scale,
+		aspectRatio,
+		objectFit: ( height || aspectRatio ) && scale,
 	};
 
 	/**
