@@ -129,7 +129,7 @@ function ShadowPopoverContainer( { shadow, onShadowChange } ) {
 	return (
 		<div className="edit-site-global-styles__shadow-panel">
 			<VStack spacing={ 4 }>
-				<Heading level={ 5 }>{ __( 'Shadows' ) }</Heading>
+				<Heading level={ 5 }>{ __( 'Shadow' ) }</Heading>
 				<ShadowPresets
 					presets={ shadows }
 					activeShadow={ shadow }

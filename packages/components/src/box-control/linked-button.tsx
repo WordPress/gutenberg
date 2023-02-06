@@ -10,7 +10,10 @@ import { __ } from '@wordpress/i18n';
 import Button from '../button';
 import Tooltip from '../tooltip';
 
-export default function LinkedButton( { isLinked, ...props } ) {
+export default function LinkedButton( {
+	isLinked,
+	...props
+}: { isLinked?: boolean } & React.ComponentProps< typeof Button > ) {
 	const label = isLinked ? __( 'Unlink sides' ) : __( 'Link sides' );
 
 	return (

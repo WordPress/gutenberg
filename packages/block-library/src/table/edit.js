@@ -404,7 +404,14 @@ function TableEdit( {
 				<tr key={ rowIndex }>
 					{ cells.map(
 						(
-							{ content, tag: CellTag, scope, align, colspan },
+							{
+								content,
+								tag: CellTag,
+								scope,
+								align,
+								colspan,
+								rowspan,
+							},
 							columnIndex
 						) => (
 							<RichText
@@ -418,6 +425,7 @@ function TableEdit( {
 								) }
 								scope={ CellTag === 'th' ? scope : undefined }
 								colSpan={ colspan }
+								rowSpan={ rowspan }
 								value={ content }
 								onChange={ onChange }
 								unstableOnFocus={ () => {

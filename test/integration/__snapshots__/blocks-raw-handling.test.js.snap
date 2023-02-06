@@ -12,6 +12,10 @@ exports[`Blocks raw handling pasteHandler google-docs-list-only 1`] = `"My first
 
 exports[`Blocks raw handling pasteHandler google-docs-table 1`] = `"<br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III"`;
 
+exports[`Blocks raw handling pasteHandler google-docs-table-with-colspan 1`] = `"<br><br>Test colspan<br><br>"`;
+
+exports[`Blocks raw handling pasteHandler google-docs-table-with-rowspan 1`] = `"<br><br>Test rowspan<br><br>"`;
+
 exports[`Blocks raw handling pasteHandler google-docs-table-with-comments 1`] = `"<br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III"`;
 
 exports[`Blocks raw handling pasteHandler google-docs-with-comments 1`] = `"This is a <strong>title</strong><br><br>This is a <em>heading</em><br><br>Formatting test: <strong>bold</strong>, <em>italic</em>, <a href=\\"https://w.org/\\">link</a>, <s>strikethrough</s>, <sup>superscript</sup>, <sub>subscript</sub>, <strong><em>nested</em></strong>.<br><br>A<br>Bulleted<br>Indented<br>List<br><br>One<br>Two<br>Three<br><br><br><br><br>One<br>Two<br>Three<br>1<br>2<br>3<br>I<br>II<br>III<br><br><br><br><br><br>An image:<br><br><img src=\\"https://lh4.googleusercontent.com/ID\\" width=\\"544\\" height=\\"184\\"><br><br>"`;

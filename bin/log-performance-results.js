@@ -39,19 +39,22 @@ const data = new TextEncoder().encode(
 			return {
 				...result,
 				...Object.fromEntries(
-					Object.entries( performanceResults[ index ][ hash ] ).map(
-						( [ key, value ] ) => [ metricsPrefix + key, value ]
-					)
+					Object.entries(
+						performanceResults[ index ][ hash ] ?? {}
+					).map( ( [ key, value ] ) => [
+						metricsPrefix + key,
+						value,
+					] )
 				),
 			};
-		} ),
+		}, {} ),
 		baseMetrics: resultsFiles.reduce(
 			( result, { metricsPrefix }, index ) => {
 				return {
 					...result,
 					...Object.fromEntries(
 						Object.entries(
-							performanceResults[ index ][ baseHash ]
+							performanceResults[ index ][ baseHash ] ?? {}
 						).map( ( [ key, value ] ) => [
 							metricsPrefix + key,
 							value,

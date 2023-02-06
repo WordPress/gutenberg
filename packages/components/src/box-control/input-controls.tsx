@@ -5,6 +5,8 @@ import UnitControl from './unit-control';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import { ALL_SIDES, LABELS } from './utils';
 import { LayoutContainer, Layout } from './styles/box-control-styles';
+import type { BoxControlInputControlProps, BoxControlValue } from './types';
+import type { UnitControlProps } from '../unit-control/types';
 
 const noop = () => {};
 
@@ -18,29 +20,33 @@ export default function BoxInputControls( {
 	setSelectedUnits,
 	sides,
 	...props
-} ) {
-	const createHandleOnFocus = ( side ) => ( event ) => {
-		onFocus( event, { side } );
-	};
+}: BoxControlInputControlProps ) {
+	const createHandleOnFocus =
+		( side: keyof BoxControlValue ) =>
+		( event: React.FocusEvent< HTMLInputElement > ) => {
+			onFocus( event, { side } );
+		};
 
-	const createHandleOnHoverOn = ( side ) => () => {
+	const createHandleOnHoverOn = ( side: keyof BoxControlValue ) => () => {
 		onHoverOn( { [ side ]: true } );
 	};
 
-	const createHandleOnHoverOff = ( side ) => () => {
+	const createHandleOnHoverOff = ( side: keyof BoxControlValue ) => () => {
 		onHoverOff( { [ side ]: false } );
 	};
 
-	const handleOnChange = ( nextValues ) => {
+	const handleOnChange = ( nextValues: BoxControlValue ) => {
 		onChange( nextValues );
 	};
 
-	const createHandleOnChange =
+	const createHandleOnChange: (
+		side: keyof BoxControlValue
+	) => UnitControlProps[ 'onChange' ] =
 		( side ) =>
 		( next, { event } ) => {
-			const { altKey } = event;
 			const nextValues = { ...values };
-			const isNumeric = ! isNaN( parseFloat( next ) );
+			const isNumeric =
+				next !== undefined && ! isNaN( parseFloat( next ) );
 			const nextValue = isNumeric ? next : undefined;
 
 			nextValues[ side ] = nextValue;
@@ -49,7 +55,10 @@ export default function BoxInputControls( {
 			 * Supports changing pair sides. For example, holding the ALT key
 			 * when changing the TOP will also update BOTTOM.
 			 */
-			if ( altKey ) {
+			// @ts-expect-error - TODO: event.altKey is only present when the change event was
+			// triggered by a keyboard event. Should this feature be implemented differently so
+			// it also works with drag events?
+			if ( event.altKey ) {
 				switch ( side ) {
 					case 'top':
 						nextValues.bottom = nextValue;
@@ -69,11 +78,12 @@ export default function BoxInputControls( {
 			handleOnChange( nextValues );
 		};
 
-	const createHandleOnUnitChange = ( side ) => ( next ) => {
-		const newUnits = { ...selectedUnits };
-		newUnits[ side ] = next;
-		setSelectedUnits( newUnits );
-	};
+	const createHandleOnUnitChange =
+		( side: keyof BoxControlValue ) => ( next?: string ) => {
+			const newUnits = { ...selectedUnits };
+			newUnits[ side ] = next;
+			setSelectedUnits( newUnits );
+		};
 
 	// Filter sides if custom configuration provided, maintaining default order.
 	const filteredSides = sides?.length
