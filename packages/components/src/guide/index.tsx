@@ -19,7 +19,7 @@ import Button from '../button';
 import PageControl from './page-control';
 import type { GuideProps } from './types';
 
-export default function Guide( {
+function Guide( {
 	children,
 	className,
 	contentLabel,
@@ -138,3 +138,5 @@ export default function Guide( {
 		</Modal>
 	);
 }
+
+export default Guide;
