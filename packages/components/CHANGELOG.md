@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `Toolbar`: Convert to TypeScript ([#47087](https://github.com/WordPress/gutenberg/pull/47087)).
+
 ## 23.3.0 (2023-02-01)
 
 ### Deprecations
@@ -27,7 +31,6 @@
 -   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
 -   `BoxControl`: Convert to TypeScript ([#47622](https://github.com/WordPress/gutenberg/pull/47622)).
 -   `QueryControls`: Convert to TypeScript ([#46721](https://github.com/WordPress/gutenberg/pull/46721)).
--   `Toolbar`: Convert to TypeScript ([#47087](https://github.com/WordPress/gutenberg/pull/47087)).
 -   `TreeGrid`: Convert to TypeScript ([#47516](https://github.com/WordPress/gutenberg/pull/47516)).
 -   `Notice`: refactor to TypeScript ([47118](https://github.com/WordPress/gutenberg/pull/47118)).
 
