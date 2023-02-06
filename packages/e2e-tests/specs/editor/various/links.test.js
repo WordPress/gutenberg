@@ -120,8 +120,13 @@ describe( 'Links', () => {
 		// Type a URL.
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
+		const [ settingsToggle ] = await page.$x(
+			'//button[contains(@aria-label, "Toggle link settings")]'
+		);
+		await settingsToggle.click();
+
 		// Navigate to and toggle the "Open in new tab" checkbox.
-		await page.keyboard.press( 'Tab' );
+		await pressKeyTimes( 'Tab', 2 );
 		await page.keyboard.press( 'Space' );
 
 		// Toggle should still have focus and be checked.
@@ -525,6 +530,10 @@ describe( 'Links', () => {
 		await waitForURLFieldAutoFocus();
 		await page.keyboard.type( 'w.org' );
 
+		// Toggle link settings open
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
 		// Navigate to and toggle the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
@@ -533,10 +542,9 @@ describe( 'Links', () => {
 		// a changing value of the setting.
 		await page.waitForSelector( ':focus.components-form-toggle__input' );
 
-		// Close dialog. Expect that "Open in new tab" would have been applied
+		// Submit link. Expect that "Open in new tab" would have been applied
 		// immediately.
-
-		await pressKeyWithModifier( 'shift', 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		// Wait for Gutenberg to finish the job.
