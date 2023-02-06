@@ -8,7 +8,10 @@ import classnames from 'classnames';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { BaseControl, CustomSelectControl } from '@wordpress/components';
+import {
+	BaseControl,
+	experiments as componentsExperiments,
+} from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import {
@@ -26,7 +29,10 @@ import BlockList from '../components/block-list';
 import useSetting from '../components/use-setting';
 import InspectorControls from '../components/inspector-controls';
 import { cleanEmptyObject } from './utils';
+import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
+
+const { CustomSelectControl } = unlock( componentsExperiments );
 
 const POSITION_SUPPORT_KEY = 'position';
 
