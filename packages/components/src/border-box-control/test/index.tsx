@@ -206,21 +206,14 @@ describe( 'BorderBoxControl', () => {
 				).toBeVisible()
 			);
 
-			const styleLabel = screen.queryByText( 'Style' );
-			const solidButton = screen.queryByRole( 'button', {
-				name: 'Solid',
-			} );
-			const dashedButton = screen.queryByRole( 'button', {
-				name: 'Dashed',
-			} );
-			const dottedButton = screen.queryByRole( 'button', {
-				name: 'Dotted',
-			} );
-
-			expect( styleLabel ).not.toBeInTheDocument();
-			expect( solidButton ).not.toBeInTheDocument();
-			expect( dashedButton ).not.toBeInTheDocument();
-			expect( dottedButton ).not.toBeInTheDocument();
+			// Make sure that none of the border style buttons (and the section
+			// title) are rendered to screen.
+			expect( screen.queryByText( 'Style' ) ).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: /(Solid)|(Dashed)|(Dotted)/,
+				} )
+			).not.toBeInTheDocument();
 		} );
 	} );
 
@@ -301,13 +294,14 @@ describe( 'BorderBoxControl', () => {
 
 				await user.click( colorButtons[ colorButtonIndex ] );
 
-				// Make sure that none of the border style buttons are
-				// rendered to screen.
-				const styleButton = screen.queryByRole( 'button', {
-					name: /(Solid)|(Dashed)|(Dotted)/,
-				} );
-
-				expect( styleButton ).not.toBeInTheDocument();
+				// Make sure that none of the border style buttons (and the section
+				// title) are rendered to screen.
+				expect( screen.queryByText( 'Style' ) ).not.toBeInTheDocument();
+				expect(
+					screen.queryByRole( 'button', {
+						name: /(Solid)|(Dashed)|(Dotted)/,
+					} )
+				).not.toBeInTheDocument();
 			}
 		);
 	} );
