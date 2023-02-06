@@ -56,8 +56,10 @@ function useSecondaryText() {
 	const blockInformation = useBlockDisplayInformation( activeEntityBlockId );
 
 	if ( activeEntityBlockId ) {
+		const block = getBlock( activeEntityBlockId );
 		return {
-			label: getBlockDisplayText( getBlock( activeEntityBlockId ) ),
+			label: getBlockDisplayText( block ),
+			typeLabel: blockInformation?.title,
 			isActive: true,
 			icon: blockInformation?.icon,
 		};
@@ -76,7 +78,7 @@ export default function DocumentActions() {
 		[]
 	);
 	const { isLoaded, record, getTitle } = useEditedEntityRecord();
-	const { label, icon } = useSecondaryText();
+	const { label, typeLabel, icon } = useSecondaryText();
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -113,8 +115,8 @@ export default function DocumentActions() {
 
 	const entityLabel =
 		record.type === 'wp_template_part'
-			? __( 'template part' )
-			: __( 'template' );
+			? __( 'Template part' )
+			: __( 'Template' );
 
 	return (
 		<div
@@ -132,17 +134,18 @@ export default function DocumentActions() {
 					as="h1"
 				>
 					<VisuallyHidden as="span">
-						{ sprintf(
-							/* translators: %s: the entity being edited, like "template"*/
-							__( 'Editing %s: ' ),
-							entityLabel
-						) }
+						{
+							/* translators: Label for the entity being edited, like "Index template"*/
+							__( 'Editing: ' )
+						}
 					</VisuallyHidden>
-					{ getTitle() }
+					{ getTitle() + '  ' + entityLabel }
 				</Text>
 				<div className="edit-site-document-actions__secondary-item">
 					<BlockIcon icon={ icon } showColors />
-					<Text size="body">{ label ?? '' }</Text>
+					<Text size="body">
+						{ label ?? '' } { typeLabel ?? '' }
+					</Text>
 				</div>
 
 				<Dropdown
