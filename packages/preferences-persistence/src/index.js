@@ -16,9 +16,9 @@ export { create };
  * This function is used internally by WordPress in an inline script, so
  * prefixed with `__unstable`.
  *
- * @param {Object} serverData Preferences data preloaded from the server.
- * @param {string} userId     The user id.
- * @param {string} blogPrefix The site prefix.
+ * @param {Object}  serverData Preferences data preloaded from the server.
+ * @param {string}  userId     The user id.
+ * @param {?string} blogPrefix The site prefix.
  *
  * @return {Object} The persistence layer initialized with the preloaded data.
  */
