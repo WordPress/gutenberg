@@ -60,7 +60,6 @@
 		"src/menu-items-choice",
 		"src/navigation",
 		"src/palette-edit",
-		"src/panel/body.js",
-		"src/toolbar"
+		"src/panel/body.js"
 	]
 }
