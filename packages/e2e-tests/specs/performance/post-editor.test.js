@@ -31,6 +31,7 @@ import {
 	getLoadingDurations,
 } from './utils';
 
+const performance = require( 'perf_hooks' ).performance;
 jest.setTimeout( 1000000 );
 
 async function loadHtmlIntoTheBlockEditor( html ) {
