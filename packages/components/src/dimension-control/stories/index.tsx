@@ -1,7 +1,4 @@
 /**
- * WordPress dependencies
- */
-/**
  * External dependencies
  */
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
@@ -29,24 +26,4 @@ export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Please select a size',
 	sizes,
-};
-
-export const CustomSizes = Template.bind( {} );
-
-CustomSizes.args = {
-	label: 'How tall are you?',
-	sizes: [
-		{
-			name: 'Tall',
-			slug: 'tall',
-		},
-		{
-			name: 'Very Tall',
-			slug: 'very-tall',
-		},
-		{
-			name: 'Very Very Tall',
-			slug: 'very-very-tall',
-		},
-	],
 };
