@@ -30,9 +30,8 @@ module.exports = {
 	},
 	env: ( config ) => ( {
 		...config,
-		// Pretend we're in the Gutenberg plugin.
-		// Disable reason: We're defining IS_GUTENBERG_PLUGIN, not using it.
-		// eslint-disable-next-line @wordpress/is-gutenberg-plugin
-		IS_GUTENBERG_PLUGIN: true,
+		// Inject the `ALLOW_EXPERIMENT_REREGISTRATION` global, used by
+		// @wordpress/experiments.
+		ALLOW_EXPERIMENT_REREGISTRATION: true,
 	} ),
 };
