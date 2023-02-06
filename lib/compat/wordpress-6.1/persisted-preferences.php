@@ -54,7 +54,7 @@ function gutenberg_configure_persisted_preferences() {
 
 	global $wpdb;
 	$blog_prefix = $wpdb->get_blog_prefix();
-	$meta_key = $blog_prefix . 'persisted_preferences';
+	$meta_key    = $blog_prefix . 'persisted_preferences';
 
 	$preload_data = get_user_meta( $user_id, $meta_key, true );
 
