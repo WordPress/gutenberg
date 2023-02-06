@@ -2010,8 +2010,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'  => array(),
 			)
 		);
+		$reflection = new ReflectionMethod( $theme_json, 'process_blocks_custom_css' );
+		$reflection->setAccessible( true );
 
-		$this->assertEquals( $expected, $theme_json->process_blocks_custom_css( $input['css'], $input['selector'] ) );
+		$this->assertEquals( $expected, $reflection->invoke( $theme_json, $input['css'], $input['selector'] ) );
 	}
 
 	/**

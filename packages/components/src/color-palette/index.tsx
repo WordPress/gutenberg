@@ -107,6 +107,7 @@ function MultiplePalettes( {
 	onChange,
 	value,
 	actions,
+	headingLevel,
 }: MultiplePalettesProps ) {
 	if ( colors.length === 0 ) {
 		return null;
@@ -117,7 +118,9 @@ function MultiplePalettes( {
 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading>{ name }</ColorHeading>
+						<ColorHeading level={ headingLevel }>
+							{ name }
+						</ColorHeading>
 						<SinglePalette
 							clearColor={ clearColor }
 							colors={ colorPalette }
@@ -183,8 +186,10 @@ function UnforwardedColorPalette(
 		onChange,
 		value,
 		__experimentalIsRenderedInSidebar = false,
+		headingLevel = 2,
 		...otherProps
 	} = props;
+
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 
 	const hasMultipleColorOrigins = isMultiplePaletteArray( colors );
@@ -235,6 +240,7 @@ function UnforwardedColorPalette(
 				{ __( 'Clear' ) }
 			</CircularOptionPicker.ButtonAction>
 		),
+		headingLevel,
 	};
 
 	return (

@@ -22,4 +22,11 @@ global.process.env = {
 	// eslint-disable-next-line @wordpress/is-gutenberg-plugin
 	IS_GUTENBERG_PLUGIN:
 		String( process.env.npm_package_config_IS_GUTENBERG_PLUGIN ) === 'true',
+	/**
+	 * Whether to allow the same experiment to be registered multiple times.
+	 * This is useful for development purposes, but should be set to false
+	 * during the unit tests to ensure the Gutenberg plugin can be cleanly
+	 * merged into WordPress core where this is false.
+	 */
+	ALLOW_EXPERIMENT_REREGISTRATION: false,
 };
