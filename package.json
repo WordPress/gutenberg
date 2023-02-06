@@ -19,7 +19,8 @@
 		"npm": ">=6.9.0 <7"
 	},
 	"config": {
-		"IS_GUTENBERG_PLUGIN": true
+		"IS_GUTENBERG_PLUGIN": true,
+		"ALLOW_EXPERIMENT_REREGISTRATION": true
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
