@@ -28,8 +28,8 @@ export default function SidebarNavigationScreenTemplate( {
 	postType = 'wp_template',
 } ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { getTitle } = useEditedEntityRecord();
-
+	const { getDescription, getTitle } = useEditedEntityRecord();
+	const description = getDescription();
 	return (
 		<SidebarNavigationScreen
 			path={ config[ postType ].path }
@@ -43,6 +43,7 @@ export default function SidebarNavigationScreenTemplate( {
 					{ __( 'Edit' ) }
 				</Button>
 			}
+			content={ description ? <p>{ description }</p> : undefined }
 		/>
 	);
 }
