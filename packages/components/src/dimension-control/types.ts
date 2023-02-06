@@ -37,6 +37,8 @@ export type DimensionControlProps< IconProps = unknown > = {
 	onChange?: ( value?: string ) => void;
 	/**
 	 * CSS class applied to `SelectControl`.
+	 *
+	 * @default ''
 	 */
 	className?: string;
 };
