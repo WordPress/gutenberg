@@ -62,7 +62,6 @@ _Note:_ by default, if you do not provide an initial `value` prop for the curren
 ### `label`
 
 -   **Type:** `String`
--   **Default:** `undefined`
 -   **Required:** Yes
 
 The human readable label for the control.
@@ -70,7 +69,6 @@ The human readable label for the control.
 ### `value`
 
 -   **Type:** `String`
--   **Default:** `''`
 -   **Required:** No
 
 The current value of the dimension UI control. If provided the UI with automatically select the value.
@@ -78,7 +76,7 @@ The current value of the dimension UI control. If provided the UI with automatic
 ### `sizes`
 
 -   **Type:** `Array`
--   **Default:** See `packages/block-editor/src/components/dimension-control/sizes.js`
+-   **Default:** See `packages/block-editor/src/components/dimension-control/sizes.ts`
 -   **Required:** No
 
 An optional array of size objects in the following shape:
@@ -102,7 +100,6 @@ By default a set of relative sizes (`small`, `medium`...etc) are provided. See `
 ### `icon`
 
 -   **Type:** `String`
--   **Default:** `undefined`
 -   **Required:** No
 
 An optional dashicon to display before to the control label.
@@ -110,7 +107,6 @@ An optional dashicon to display before to the control label.
 ### `onChange`
 
 -   **Type:** `Function`
--   **Default:** `undefined`
 -   **Required:** No
 -   **Arguments:**:
     -   `size` - a string representing the selected size (eg: `medium`)
