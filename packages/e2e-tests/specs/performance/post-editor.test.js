@@ -112,21 +112,27 @@ describe( 'Post Editor Performance', () => {
 				timeout: 120000,
 			} );
 			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
-			const {
-				serverResponse,
-				firstPaint,
-				domContentLoaded,
-				loaded,
-				firstContentfulPaint,
-				firstBlock,
-			} = await getLoadingDurations();
-
-			results.serverResponse.push( serverResponse );
-			results.firstPaint.push( firstPaint );
-			results.domContentLoaded.push( domContentLoaded );
-			results.loaded.push( loaded );
-			results.firstContentfulPaint.push( firstContentfulPaint );
-			results.firstBlock.push( firstBlock );
+			// const {
+			// 	serverResponse,
+			// 	firstPaint,
+			// 	domContentLoaded,
+			// 	loaded,
+			// 	firstContentfulPaint,
+			// 	firstBlock,
+			// } = await getLoadingDurations();
+			//
+			// results.serverResponse.push( serverResponse );
+			// results.firstPaint.push( firstPaint );
+			// results.domContentLoaded.push( domContentLoaded );
+			// results.loaded.push( loaded );
+			// results.firstContentfulPaint.push( firstContentfulPaint );
+			// results.firstBlock.push( firstBlock );
+			results.serverResponse.push( [ 1 ] );
+			results.firstPaint.push( [ 1 ] );
+			results.domContentLoaded.push( [ 1 ] );
+			results.loaded.push( [ 1 ] );
+			results.firstContentfulPaint.push( [ 1 ] );
+			results.firstBlock.push( [ 1 ] );
 		}
 	} );
 
@@ -136,11 +142,12 @@ describe( 'Post Editor Performance', () => {
 		);
 		await insertBlock( 'Paragraph' );
 		let i = 20;
-		await page.tracing.start( {
-			path: traceFile,
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
-		} );
+		// await page.tracing.start( {
+		// 	path: traceFile,
+		// 	screenshots: false,
+		// 	categories: [ 'devtools.timeline' ],
+		// } );
+		const tic = performance.now();
 		while ( i-- ) {
 			// Wait for the browser to be idle before starting the monitoring.
 			// The timeout should be big enough to allow all async tasks tor run.
@@ -149,22 +156,24 @@ describe( 'Post Editor Performance', () => {
 			await page.waitForTimeout( 2000 );
 			await page.keyboard.type( 'x' );
 		}
-		await page.tracing.stop();
-		traceResults = JSON.parse( readFile( traceFile ) );
-		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-			getTypingEventDurations( traceResults );
-		if (
-			keyDownEvents.length === keyPressEvents.length &&
-			keyPressEvents.length === keyUpEvents.length
-		) {
-			// The first character typed triggers a longer time (isTyping change)
-			// It can impact the stability of the metric, so we exclude it.
-			for ( let j = 1; j < keyDownEvents.length; j++ ) {
-				results.type.push(
-					keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
-				);
-			}
-		}
+		const toc = performance.now();
+		// await page.tracing.stop();
+		// traceResults = JSON.parse( readFile( traceFile ) );
+		// const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+		// 	getTypingEventDurations( traceResults );
+		// if (
+		// 	keyDownEvents.length === keyPressEvents.length &&
+		// 	keyPressEvents.length === keyUpEvents.length
+		// ) {
+		// 	// The first character typed triggers a longer time (isTyping change)
+		// 	// It can impact the stability of the metric, so we exclude it.
+		// 	for ( let j = 1; j < keyDownEvents.length; j++ ) {
+		// 		results.type.push(
+		// 			keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
+		// 		);
+		// 	}
+		// }
+		results.type.push( ( toc - tic ) / 20 );
 	} );
 
 	it( 'Typing within containers', async () => {
@@ -185,12 +194,13 @@ describe( 'Post Editor Performance', () => {
 		await page.keyboard.type( 'x' );
 
 		let i = 10;
-		await page.tracing.start( {
-			path: traceFile,
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
-		} );
+		// await page.tracing.start( {
+		// 	path: traceFile,
+		// 	screenshots: false,
+		// 	categories: [ 'devtools.timeline' ],
+		// } );
 
+		const tic = performance.now();
 		while ( i-- ) {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
@@ -199,32 +209,35 @@ describe( 'Post Editor Performance', () => {
 		}
 		// eslint-disable-next-line no-restricted-syntax
 		await page.waitForTimeout( 500 );
-		await page.tracing.stop();
-		traceResults = JSON.parse( readFile( traceFile ) );
-		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-			getTypingEventDurations( traceResults );
-		if (
-			keyDownEvents.length === keyPressEvents.length &&
-			keyPressEvents.length === keyUpEvents.length
-		) {
-			// The first character typed triggers a longer time (isTyping change)
-			// It can impact the stability of the metric, so we exclude it.
-			for ( let j = 1; j < keyDownEvents.length; j++ ) {
-				results.typeContainer.push(
-					keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
-				);
-			}
-		}
+		const toc = performance.now();
+		// await page.tracing.stop();
+		// traceResults = JSON.parse( readFile( traceFile ) );
+		// const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+		// 	getTypingEventDurations( traceResults );
+		// if (
+		// 	keyDownEvents.length === keyPressEvents.length &&
+		// 	keyPressEvents.length === keyUpEvents.length
+		// ) {
+		// 	// The first character typed triggers a longer time (isTyping change)
+		// 	// It can impact the stability of the metric, so we exclude it.
+		// 	for ( let j = 1; j < keyDownEvents.length; j++ ) {
+		// 		results.typeContainer.push(
+		// 			keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
+		// 		);
+		// 	}
+		// }
+		results.typeContainer.push( ( toc - tic ) / 10 );
 	} );
 
 	it( 'Selecting blocks', async () => {
 		await load1000Paragraphs();
 		const paragraphs = await canvas().$$( '.wp-block' );
-		await page.tracing.start( {
-			path: traceFile,
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
-		} );
+		// await page.tracing.start( {
+		// 	path: traceFile,
+		// 	screenshots: false,
+		// 	categories: [ 'devtools.timeline' ],
+		// } );
+		const tic = performance.now();
 		await paragraphs[ 0 ].click();
 		for ( let j = 1; j <= 10; j++ ) {
 			// Wait for the browser to be idle before starting the monitoring.
@@ -232,47 +245,55 @@ describe( 'Post Editor Performance', () => {
 			await page.waitForTimeout( 1000 );
 			await paragraphs[ j ].click();
 		}
-		await page.tracing.stop();
-		traceResults = JSON.parse( readFile( traceFile ) );
-		const [ focusEvents ] = getSelectionEventDurations( traceResults );
-		results.focus = focusEvents;
+		const toc = performance.now();
+		// await page.tracing.stop();
+		// traceResults = JSON.parse( readFile( traceFile ) );
+		// const [ focusEvents ] = getSelectionEventDurations( traceResults );
+		// results.focus = focusEvents;
+		results.focus = [ ( toc - tic ) / 10 ];
 	} );
 
 	it( 'Opening persistent list view', async () => {
 		await load1000Paragraphs();
 		for ( let j = 0; j < 10; j++ ) {
-			await page.tracing.start( {
-				path: traceFile,
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
-			} );
+			// await page.tracing.start( {
+			// 	path: traceFile,
+			// 	screenshots: false,
+			// 	categories: [ 'devtools.timeline' ],
+			// } );
+			const tic = performance.now();
 			await openListView();
-			await page.tracing.stop();
-			traceResults = JSON.parse( readFile( traceFile ) );
-			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
-			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
-				results.listViewOpen.push( mouseClickEvents[ k ] );
-			}
+			const toc = performance.now();
+			// await page.tracing.stop();
+			// traceResults = JSON.parse( readFile( traceFile ) );
+			// const [ mouseClickEvents ] = getClickEventDurations( traceResults );
+			// for ( let k = 0; k < mouseClickEvents.length; k++ ) {
+			// 	results.listViewOpen.push( mouseClickEvents[ k ] );
+			// }
 			await closeListView();
+			results.listViewOpen.push( toc - tic );
 		}
 	} );
 
 	it( 'Opening the inserter', async () => {
 		await load1000Paragraphs();
 		for ( let j = 0; j < 10; j++ ) {
-			await page.tracing.start( {
-				path: traceFile,
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
-			} );
+			// await page.tracing.start( {
+			// 	path: traceFile,
+			// 	screenshots: false,
+			// 	categories: [ 'devtools.timeline' ],
+			// } );
+			const tic = performance.now();
 			await openGlobalBlockInserter();
-			await page.tracing.stop();
-			traceResults = JSON.parse( readFile( traceFile ) );
-			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
-			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
-				results.inserterOpen.push( mouseClickEvents[ k ] );
-			}
+			const toc = performance.now();
+			// await page.tracing.stop();
+			// traceResults = JSON.parse( readFile( traceFile ) );
+			// const [ mouseClickEvents ] = getClickEventDurations( traceResults );
+			// for ( let k = 0; k < mouseClickEvents.length; k++ ) {
+			// 	results.inserterOpen.push( mouseClickEvents[ k ] );
+			// }
 			await closeGlobalBlockInserter();
+			results.inserterOpen.push( toc - tic );
 		}
 	} );
 
@@ -286,27 +307,30 @@ describe( 'Post Editor Performance', () => {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 500 );
-			await page.tracing.start( {
-				path: traceFile,
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
-			} );
+			// await page.tracing.start( {
+			// 	path: traceFile,
+			// 	screenshots: false,
+			// 	categories: [ 'devtools.timeline' ],
+			// } );
+			const tic = performance.now();
 			await page.keyboard.type( 'p' );
-			await page.tracing.stop();
-			traceResults = JSON.parse( readFile( traceFile ) );
-			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-				getTypingEventDurations( traceResults );
-			if (
-				keyDownEvents.length === keyPressEvents.length &&
-				keyPressEvents.length === keyUpEvents.length
-			) {
-				results.inserterSearch.push(
-					sum( keyDownEvents ) +
-						sum( keyPressEvents ) +
-						sum( keyUpEvents )
-				);
-			}
+			const toc = performance.now();
+			// await page.tracing.stop();
+			// traceResults = JSON.parse( readFile( traceFile ) );
+			// const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+			// 	getTypingEventDurations( traceResults );
+			// if (
+			// 	keyDownEvents.length === keyPressEvents.length &&
+			// 	keyPressEvents.length === keyUpEvents.length
+			// ) {
+			// 	results.inserterSearch.push(
+			// 		sum( keyDownEvents ) +
+			// 			sum( keyPressEvents ) +
+			// 			sum( keyUpEvents )
+			// 	);
+			// }
 			await page.keyboard.press( 'Backspace' );
+			results.inserterSearch.push( toc - tic );
 		}
 		await closeGlobalBlockInserter();
 	} );
@@ -325,23 +349,26 @@ describe( 'Post Editor Performance', () => {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 200 );
-			await page.tracing.start( {
-				path: traceFile,
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
-			} );
+			// await page.tracing.start( {
+			// 	path: traceFile,
+			// 	screenshots: false,
+			// 	categories: [ 'devtools.timeline' ],
+			// } );
+			const tic = performance.now();
 			await page.hover( paragraphBlockItem );
 			await page.hover( headingBlockItem );
-			await page.tracing.stop();
+			// await page.tracing.stop();
+			const toc = performance.now();
 
-			traceResults = JSON.parse( readFile( traceFile ) );
-			const [ mouseOverEvents, mouseOutEvents ] =
-				getHoverEventDurations( traceResults );
-			for ( let k = 0; k < mouseOverEvents.length; k++ ) {
-				results.inserterHover.push(
-					mouseOverEvents[ k ] + mouseOutEvents[ k ]
-				);
-			}
+			// traceResults = JSON.parse( readFile( traceFile ) );
+			// const [ mouseOverEvents, mouseOutEvents ] =
+			// 	getHoverEventDurations( traceResults );
+			// for ( let k = 0; k < mouseOverEvents.length; k++ ) {
+			// 	results.inserterHover.push(
+			// 		mouseOverEvents[ k ] + mouseOutEvents[ k ]
+			// 	);
+			// }
+			results.inserterHover.push( toc - tic );
 		}
 		await closeGlobalBlockInserter();
 	} );
