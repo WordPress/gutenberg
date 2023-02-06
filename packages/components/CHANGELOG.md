@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `ResizableBox`: refactor styles to TypeScript ([47756](https://github.com/WordPress/gutenberg/pull/47756)).
+
 ## 23.3.0 (2023-02-01)
 
 ### Deprecations
