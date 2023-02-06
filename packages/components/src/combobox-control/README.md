@@ -99,7 +99,7 @@ Function called when the control's search input value changes. The argument cont
 
 Function called with the selected value changes.
 
--   Type: `( value: string | null ) => void`
+-   Type: `( value: string | null | undefined ) => void`
 -   Required: No
 
 #### value
