@@ -50,6 +50,11 @@
 				padding: $grid-unit * 9;
 			}
 		}
+
+		.edit-site-list__table-label {
+			align-self: flex-start;
+			margin-bottom: $grid-unit-20;
+		}
 	}
 }
 
@@ -57,7 +62,7 @@
 	min-width: 100%;
 	border: $border-width solid $gray-300;
 	border-radius: 2px;
-	margin: 0 auto;
+	margin: 0 auto $grid-unit-40;
 	overflow: hidden;
 	border-spacing: 0;
 	max-width: 960px;

@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { InterfaceSkeleton } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { EditorSnackbars } from '@wordpress/editor';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -60,13 +61,59 @@ export default function List() {
 		  }
 		: undefined;
 
+	const { records: templates, isResolving: isLoading } = useEntityRecords(
+		'postType',
+		templateType,
+		{
+			per_page: -1,
+		}
+	);
+
+	const { customizedTemplates, nonCustomizedTemplates } = useMemo( () => {
+		let mappedTemplates = {
+			customizedTemplates: [],
+			nonCustomizedTemplates: [],
+		};
+
+		if ( templates.length ) {
+			mappedTemplates = templates.reduce(
+				( accumulator, template ) => {
+					if ( template.source === 'custom' ) {
+						accumulator.customizedTemplates.push( template );
+					} else {
+						accumulator.nonCustomizedTemplates.push( template );
+					}
+					return accumulator;
+				},
+				{ customizedTemplates: [], nonCustomizedTemplates: [] }
+			);
+		}
+		return mappedTemplates;
+	}, [ templates ] );
+
 	return (
 		<InterfaceSkeleton
 			className="edit-site-list"
 			labels={ detailedRegionLabels }
 			header={ <Header templateType={ templateType } /> }
 			notices={ <EditorSnackbars /> }
-			content={ <Table templateType={ templateType } /> }
+			content={
+				<>
+					<Table
+						templateType={ templateType }
+						templates={ customizedTemplates }
+						isLoading={ isLoading }
+						label={ __( 'Customized templates' ) }
+						showActionsColumn
+					/>
+					<Table
+						templateType={ templateType }
+						templates={ nonCustomizedTemplates }
+						isLoading={ isLoading }
+						label={ __( 'Other templates' ) }
+					/>
+				</>
+			}
 			shortcuts={ {
 				previous: previousShortcut,
 				next: nextShortcut,
