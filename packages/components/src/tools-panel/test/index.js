@@ -342,9 +342,9 @@ describe( 'ToolsPanel', () => {
 
 			rerender( <ToolsPanelOptional toolsPanelItemValue={ 100 } /> );
 
-			const control2 = screen.queryByText( 'Optional control' );
+			const controlRerendered = screen.queryByText( 'Optional control' );
 
-			expect( control2 ).toBeInTheDocument();
+			expect( controlRerendered ).toBeInTheDocument();
 		} );
 
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
