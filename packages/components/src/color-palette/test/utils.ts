@@ -4,6 +4,7 @@
 import {
 	extractColorNameFromCurrentValue,
 	showTransparentBackground,
+	normalizeColorValue,
 } from '../utils';
 
 describe( 'ColorPalette: Utils', () => {
@@ -36,6 +37,27 @@ describe( 'ColorPalette: Utils', () => {
 			expect( showTransparentBackground( '#FFF' ) ).toBe( false );
 			expect( showTransparentBackground( '#757575' ) ).toBe( false );
 			expect( showTransparentBackground( '#f5f5f524' ) ).toBe( false ); // 0.14 alpha.
+		} );
+	} );
+
+	describe( 'normalizeColorValue', () => {
+		test( 'should return the value as is if the color value is not a CSS variable', () => {
+			const element = document.createElement( 'div' );
+			expect( normalizeColorValue( '#ff0000', element ) ).toBe(
+				'#ff0000'
+			);
+		} );
+		test( 'should return the background color computed from a element if the color value is a CSS variable', () => {
+			const element = document.createElement( 'div' );
+			const { ownerDocument } = element;
+			const { defaultView } = ownerDocument;
+			// @ts-ignore
+			defaultView.getComputedStyle = () => ( {
+				backgroundColor: '#ff0000',
+			} );
+			expect( normalizeColorValue( 'var(--red)', element ) ).toBe(
+				'#ff0000'
+			);
 		} );
 	} );
 } );

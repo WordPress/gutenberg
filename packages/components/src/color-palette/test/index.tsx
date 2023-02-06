@@ -16,16 +16,6 @@ const EXAMPLE_COLORS = [
 ];
 const INITIAL_COLOR = EXAMPLE_COLORS[ 0 ].color;
 
-const CSS_VARIABLE_COLORS = [
-	{ name: 'red', color: 'var(--red)' },
-	{ name: 'blue', color: 'var(--blue)' },
-];
-
-const CSS_VARS_STYLE_PROPS = {
-	'--red': '#f00',
-	'--blue': '#00f',
-} as React.CSSProperties;
-
 function getWrappingPopoverElement( element: HTMLElement ) {
 	return element.closest( '.components-popover' );
 }
@@ -210,53 +200,5 @@ describe( 'ColorPalette', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Clear' } )
 		).toBeInTheDocument();
-	} );
-
-	it( 'should show the readable text label even when the background color has a CSS variable.', async () => {
-		// const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		render(
-			<div style={ CSS_VARS_STYLE_PROPS }>
-				<ColorPalette
-					colors={ CSS_VARIABLE_COLORS }
-					value={ CSS_VARIABLE_COLORS[ 0 ].color }
-					onChange={ onChange }
-				/>
-			</div>
-		);
-
-		const dropdownButton = screen.getByRole( 'button', {
-			name: /^Custom color picker/,
-			expanded: false,
-		} );
-
-		const dropdownButtonStyles = window.getComputedStyle( dropdownButton );
-		expect( dropdownButtonStyles.color ).toBe( 'rgb(0, 0, 0)' );
-	} );
-
-	it( 'should render dropdown with Hex value transformed from CSS a variable to actual color', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-
-		render(
-			<div style={ CSS_VARS_STYLE_PROPS }>
-				<ColorPalette
-					colors={ CSS_VARIABLE_COLORS }
-					value={ CSS_VARIABLE_COLORS[ 0 ].color }
-					onChange={ onChange }
-				/>
-			</div>
-		);
-
-		const dropdownButton = screen.getByRole( 'button', {
-			name: /^Custom color picker/,
-			expanded: false,
-		} );
-
-		await user.click( dropdownButton );
-
-		const dropdownColorInput = screen.getByLabelText( 'Hex color' );
-		expect( dropdownColorInput ).toHaveValue( 'FF0000' );
 	} );
 } );
