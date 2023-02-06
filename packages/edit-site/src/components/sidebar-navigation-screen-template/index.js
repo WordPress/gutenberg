@@ -9,6 +9,7 @@ import { Button } from '@wordpress/components';
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../experiments';
 import { store as editSiteStore } from '../../store';
 
@@ -16,26 +17,24 @@ const config = {
 	wp_template: {
 		path: '/templates/single',
 		parentTitle: __( 'Templates' ),
-		title: __( 'Template' ),
 	},
 	wp_template_part: {
 		path: '/template-parts/single',
 		parentTitle: __( 'Template parts' ),
-		title: __( 'Template part' ),
 	},
 };
 
 export default function SidebarNavigationScreenTemplate( {
 	postType = 'wp_template',
-	postId,
 } ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { getTitle } = useEditedEntityRecord();
 
 	return (
 		<SidebarNavigationScreen
 			path={ config[ postType ].path }
 			parentTitle={ config[ postType ].parentTitle }
-			title={ config[ postType ].title }
+			title={ getTitle() }
 			actions={
 				<Button
 					variant="primary"
