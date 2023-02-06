@@ -13,12 +13,29 @@ import {
 	CircleIndicator,
 } from './styles/angle-picker-control-styles';
 
-function AngleCircle( { value, onChange, ...props } ) {
-	const angleCircleRef = useRef();
-	const angleCircleCenter = useRef();
-	const previousCursorValue = useRef();
+import type { WordPressComponentProps } from '../ui/context';
+import type { AngleCircleProps } from './types';
+
+type UseDraggingArgumentType = Parameters< typeof useDragging >[ 0 ];
+type UseDraggingCallbackEvent =
+	| Parameters< UseDraggingArgumentType[ 'onDragStart' ] >[ 0 ]
+	| Parameters< UseDraggingArgumentType[ 'onDragMove' ] >[ 0 ]
+	| Parameters< UseDraggingArgumentType[ 'onDragEnd' ] >[ 0 ];
+
+function AngleCircle( {
+	value,
+	onChange,
+	...props
+}: WordPressComponentProps< AngleCircleProps, 'div' > ) {
+	const angleCircleRef = useRef< HTMLDivElement | null >( null );
+	const angleCircleCenter = useRef< { x: number; y: number } | undefined >();
+	const previousCursorValue = useRef< CSSStyleDeclaration[ 'cursor' ] >();
 
 	const setAngleCircleCenter = () => {
+		if ( angleCircleRef.current === null ) {
+			return;
+		}
+
 		const rect = angleCircleRef.current.getBoundingClientRect();
 		angleCircleCenter.current = {
 			x: rect.x + rect.width / 2,
@@ -26,14 +43,26 @@ function AngleCircle( { value, onChange, ...props } ) {
 		};
 	};
 
-	const changeAngleToPosition = ( event ) => {
-		const { x: centerX, y: centerY } = angleCircleCenter.current;
+	const changeAngleToPosition = ( event: UseDraggingCallbackEvent ) => {
+		if ( event === undefined ) {
+			return;
+		}
+
 		// Prevent (drag) mouse events from selecting and accidentally
 		// triggering actions from other elements.
 		event.preventDefault();
 		// Input control needs to lose focus and by preventDefault above, it doesn't.
-		event.target.focus();
-		onChange( getAngle( centerX, centerY, event.clientX, event.clientY ) );
+		( event.target as HTMLDivElement | null )?.focus();
+
+		if (
+			angleCircleCenter.current !== undefined &&
+			onChange !== undefined
+		) {
+			const { x: centerX, y: centerY } = angleCircleCenter.current;
+			onChange(
+				getAngle( centerX, centerY, event.clientX, event.clientY )
+			);
+		}
 	};
 
 	const { startDrag, isDragging } = useDragging( {
@@ -52,13 +81,12 @@ function AngleCircle( { value, onChange, ...props } ) {
 			}
 			document.body.style.cursor = 'grabbing';
 		} else {
-			document.body.style.cursor = previousCursorValue.current || null;
+			document.body.style.cursor = previousCursorValue.current || '';
 			previousCursorValue.current = undefined;
 		}
 	}, [ isDragging ] );
 
 	return (
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		<CircleRoot
 			ref={ angleCircleRef }
 			onMouseDown={ startDrag }
@@ -76,11 +104,15 @@ function AngleCircle( { value, onChange, ...props } ) {
 				<CircleIndicator className="components-angle-picker-control__angle-circle-indicator" />
 			</CircleIndicatorWrapper>
 		</CircleRoot>
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	);
 }
 
-function getAngle( centerX, centerY, pointX, pointY ) {
+function getAngle(
+	centerX: number,
+	centerY: number,
+	pointX: number,
+	pointY: number
+) {
 	const y = pointY - centerY;
 	const x = pointX - centerX;
 
