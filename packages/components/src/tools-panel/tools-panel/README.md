@@ -156,6 +156,13 @@ wrapper element allowing the panel to lay them out accordingly.
 
 - Required: No
 
+### `headingLevel`: `boolean`
+
+The heading level of the panel's header.
+
+-   Required: No
+-   Default: `2`
+
 ### `label`: `string`
 
 Text to be displayed within the panel's header and as the `aria-label` for the

@@ -54,8 +54,10 @@ export type ToolsPanelProps = {
 	__experimentalLastVisibleItemClass?: string;
 	/**
 	 * The heading level of the panel's header.
+	 *
+	 * @default 2
 	 */
-	headingLevel: HeadingSize;
+	headingLevel?: HeadingSize;
 };
 
 export type ToolsPanelHeaderProps = {
@@ -78,8 +80,10 @@ export type ToolsPanelHeaderProps = {
 	toggleItem: ( label: string ) => void;
 	/**
 	 * The heading level of the panel's header.
+	 *
+	 * @default 2
 	 */
-	headingLevel: HeadingSize;
+	headingLevel?: HeadingSize;
 };
 
 export type ToolsPanelItem = {
