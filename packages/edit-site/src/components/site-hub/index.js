@@ -23,8 +23,6 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { useLocation } from '../routes';
-import getIsListPage from '../../utils/get-is-list-page';
 import SiteIcon from '../site-icon';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../private-apis';
@@ -33,9 +31,6 @@ const HUB_ANIMATION_DURATION = 0.3;
 
 const SiteHub = forwardRef(
 	( { isMobileCanvasVisible, setIsMobileCanvasVisible, ...props }, ref ) => {
-		const { params } = useLocation();
-		const isListPage = getIsListPage( params );
-		const isEditorPage = ! isListPage;
 		const { canvasMode, dashboardLink, entityConfig } = useSelect(
 			( select ) => {
 				select( editSiteStore ).getEditedPostType();
@@ -56,11 +51,6 @@ const SiteHub = forwardRef(
 		const isMobileViewport = useViewportMatch( 'medium', '<' );
 		const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 		const { clearSelectedBlock } = useDispatch( blockEditorStore );
-		const showEditButton =
-			( isEditorPage && canvasMode === 'view' && ! isMobileViewport ) ||
-			( isMobileViewport &&
-				canvasMode === 'view' &&
-				isMobileCanvasVisible );
 		const isBackToDashboardButton =
 			( ! isMobileViewport && canvasMode === 'view' ) ||
 			( isMobileViewport && ! isMobileCanvasVisible );
@@ -130,18 +120,6 @@ const SiteHub = forwardRef(
 						</VStack>
 					) }
 				</HStack>
-
-				{ showEditButton && (
-					<Button
-						className="edit-site-site-hub__edit-button"
-						onClick={ () => {
-							setCanvasMode( 'edit' );
-						} }
-						variant="primary"
-					>
-						{ __( 'Edit' ) }
-					</Button>
-				) }
 
 				{ isMobileViewport && ! isMobileCanvasVisible && (
 					<Button
