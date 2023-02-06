@@ -53,7 +53,8 @@ function gutenberg_configure_persisted_preferences() {
 	}
 
 	global $wpdb;
-	$meta_key = $wpdb->get_blog_prefix() . 'persisted_preferences';
+	$blog_prefix = $wpdb->get_blog_prefix();
+	$meta_key = $blog_prefix . 'persisted_preferences';
 
 	$preload_data = get_user_meta( $user_id, $meta_key, true );
 
@@ -63,12 +64,14 @@ function gutenberg_configure_persisted_preferences() {
 			'( function() {
 				var serverData = %s;
 				var userId = "%s";
-				var persistenceLayer = wp.preferencesPersistence.__unstableCreatePersistenceLayer( serverData, userId );
+				var blogPrefix = "%s";
+				var persistenceLayer = wp.preferencesPersistence.__unstableCreatePersistenceLayer( serverData, userId, blogPrefix );
 				var preferencesStore = wp.preferences.store;
 				wp.data.dispatch( preferencesStore ).setPersistenceLayer( persistenceLayer );
 			} ) ();',
 			wp_json_encode( $preload_data ),
-			$user_id
+			$user_id,
+			$blog_prefix
 		),
 		'after'
 	);

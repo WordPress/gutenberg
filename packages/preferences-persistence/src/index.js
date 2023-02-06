@@ -18,11 +18,18 @@ export { create };
  *
  * @param {Object} serverData Preferences data preloaded from the server.
  * @param {string} userId     The user id.
+ * @param {string} blogPrefix The site prefix.
  *
  * @return {Object} The persistence layer initialized with the preloaded data.
  */
-export function __unstableCreatePersistenceLayer( serverData, userId ) {
-	const localStorageRestoreKey = `WP_PREFERENCES_USER_${ userId }`;
+export function __unstableCreatePersistenceLayer(
+	serverData,
+	userId,
+	blogPrefix
+) {
+	const localStorageRestoreKey = blogPrefix
+		? `WP_PREFERENCES_USER_${ blogPrefix }_${ userId }`
+		: `WP_PREFERENCES_USER_${ userId }`;
 	const localData = JSON.parse(
 		window.localStorage.getItem( localStorageRestoreKey )
 	);
