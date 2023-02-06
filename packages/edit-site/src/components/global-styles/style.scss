@@ -190,7 +190,8 @@ $block-preview-height: 150px;
 }
 
 .edit-site-global-styles-screen-css-help-link {
-	padding-left: $grid-unit-20;
+	display: block;
+	margin-top: $grid-unit-10;
 }
 .edit-site-global-styles-screen-variations {
 	margin-top: $grid-unit-20;
