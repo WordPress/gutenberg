@@ -11,12 +11,14 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
-import useSyncSidebarPathWithURL from '../sync-state-with-url/use-sync-sidebar-path-with-url';
+import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
+import useSyncPathWithURL from '../sync-state-with-url/use-sync-path-with-url';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
+import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveButton from '../save-button';
 
 function SidebarScreens() {
-	useSyncSidebarPathWithURL();
+	useSyncPathWithURL();
 
 	return (
 		<>
@@ -24,6 +26,11 @@ function SidebarScreens() {
 			<SidebarNavigationScreenNavigationMenus />
 			<SidebarNavigationScreenTemplates postType="wp_template" />
 			<SidebarNavigationScreenTemplates postType="wp_template_part" />
+			<SidebarNavigationScreenTemplate postType="wp_template" />
+			<SidebarNavigationScreenTemplate postType="wp_template_part" />
+			<SidebarNavigationScreenTemplatesBrowse postType="wp_template" />
+			<SidebarNavigationScreenTemplatesBrowse postType="wp_template_part" />
+
 		</>
 	);
 }

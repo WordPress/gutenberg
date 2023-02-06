@@ -9,28 +9,28 @@ import { useEffect, useRef } from '@wordpress/element';
  */
 import { useLocation, useHistory } from '../routes';
 
-export default function useSyncSidebarPathWithURL() {
+export default function useSyncPathWithURL() {
 	const history = useHistory();
 	const { params } = useLocation();
-	const { sidebar = '/' } = params;
+	const { path = '/' } = params;
 	const { location, goTo } = useNavigator();
-	const currentSidebar = useRef( sidebar );
+	const currentPath = useRef( path );
 	const currentNavigatorLocation = useRef( location.path );
 	useEffect( () => {
-		currentSidebar.current = sidebar;
-		if ( sidebar !== currentNavigatorLocation.current ) {
-			goTo( sidebar );
+		currentPath.current = path;
+		if ( path !== currentNavigatorLocation.current ) {
+			goTo( path );
 		}
-	}, [ sidebar ] );
+	}, [ path ] );
 	useEffect( () => {
 		currentNavigatorLocation.current = location.path;
-		if ( location.path !== currentSidebar.current ) {
+		if ( location.path !== currentPath.current ) {
 			history.push( {
 				...params,
-				sidebar: location.path,
+				path: location.path,
 			} );
 		}
 	}, [ location.path, history ] );
 
-	return sidebar;
+	return path;
 }
