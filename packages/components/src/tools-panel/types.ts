@@ -22,6 +22,12 @@ export type ToolsPanelProps = {
 	 */
 	hasInnerWrapper: boolean;
 	/**
+	 * The heading level of the panel's header.
+	 *
+	 * @default 2
+	 */
+	headingLevel?: HeadingSize;
+	/**
 	 * Text to be displayed within the panel's header and as the `aria-label`
 	 * for the panel's dropdown menu.
 	 */
@@ -52,15 +58,15 @@ export type ToolsPanelProps = {
 	 * last visible `ToolsPanelItem` within the `ToolsPanel`.
 	 */
 	__experimentalLastVisibleItemClass?: string;
+};
+
+export type ToolsPanelHeaderProps = {
 	/**
 	 * The heading level of the panel's header.
 	 *
 	 * @default 2
 	 */
 	headingLevel?: HeadingSize;
-};
-
-export type ToolsPanelHeaderProps = {
 	/**
 	 * Text to be displayed within the panel header. It is also passed along as
 	 * the `label` for the panel header's `DropdownMenu`.
@@ -78,12 +84,6 @@ export type ToolsPanelHeaderProps = {
 	 * `onSelect` or `onDeselect` callbacks as appropriate.
 	 */
 	toggleItem: ( label: string ) => void;
-	/**
-	 * The heading level of the panel's header.
-	 *
-	 * @default 2
-	 */
-	headingLevel?: HeadingSize;
 };
 
 export type ToolsPanelItem = {
