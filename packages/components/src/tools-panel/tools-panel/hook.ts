@@ -57,6 +57,7 @@ export function useToolsPanel(
 ) {
 	const {
 		className,
+		headingLevel = 2,
 		resetAll,
 		panelId,
 		hasInnerWrapper,
@@ -307,6 +308,7 @@ export function useToolsPanel(
 
 	return {
 		...otherProps,
+		headingLevel,
 		panelContext,
 		resetAllItems,
 		toggleItem,
