@@ -77,10 +77,12 @@ test.describe(
 
 			// Check the markup of the block is correct.
 			await editor.publishPost();
-			await expect.poll( editor.getBlocks ).toEqual( [ {
-				name: 'core/navigation',
-				ref: createdMenu.id,
-			} ] );
+			await expect.poll( editor.getBlocks ).toEqual( [
+				{
+					name: 'core/navigation',
+					ref: createdMenu.id,
+				},
+			] );
 			await page.locator( 'role=button[name="Close panel"i]' ).click();
 
 			//check the block in the canvas.
