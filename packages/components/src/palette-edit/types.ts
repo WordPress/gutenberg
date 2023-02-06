@@ -17,21 +17,7 @@ export type Gradient = {
 
 export type PaletteElement = Color | Gradient;
 
-export type PaletteEditProps = {
-	/**
-	 * The colors in the palette.
-	 *
-	 * @default []
-	 */
-	colors?: Color[];
-	/**
-	 * The gradients in the palette.
-	 */
-	gradients?: Gradient[];
-	/**
-	 * Runs on changing the value.
-	 */
-	onChange: ( newElements?: PaletteElement[] ) => void;
+export type BasePaletteEdit = {
 	/**
 	 * A heading label for the palette.
 	 */
@@ -56,6 +42,39 @@ export type PaletteEditProps = {
 	 */
 	slugPrefix?: SlugPrefix;
 };
+
+type PaletteEditColors = {
+	gradients: never;
+	/**
+	 * The colors in the palette.
+	 *
+	 * @default []
+	 */
+	colors: Color[];
+	/**
+	 * Runs on changing the value.
+	 */
+	onChange: ( newColors: Color[] ) => void;
+}
+
+type PaletteEditGradients = {
+	colors: never;
+	/**
+	 * The gradients in the palette.
+	 */
+	gradients: Gradient[];
+	/**
+	 * Runs on changing the value.
+	 */
+	onChange: ( newGradients?: Gradient[] ) => void;
+}
+
+type PaletteEditColorsProps = BasePaletteEdit & PaletteEditColors;
+export type PaletteEditGradientsProps = BasePaletteEdit & PaletteEditGradients;
+
+export type PaletteEditProps =
+	| PaletteEditColorsProps
+	| PaletteEditGradientsProps;
 
 type EditingElement = number | null;
 export type SlugPrefix = string;
@@ -89,9 +108,9 @@ export type OptionProps = {
 export type PaletteEditListViewProps = {
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
-	elements: PaletteElement[];
+	elements: Color[] | Gradient[];
 	isGradient?: boolean;
-	onChange: ( newElements?: PaletteElement[] ) => void;
+	onChange: PaletteEditProps[ 'onChange' ];
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
 	slugPrefix: SlugPrefix;
 };

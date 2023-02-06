@@ -48,6 +48,7 @@ import type {
 	Gradient,
 	NameInputProps,
 	OptionProps,
+	PaletteEditGradientsProps,
 	PaletteEditListViewProps,
 	PaletteEditProps,
 	PaletteElement,
@@ -242,7 +243,7 @@ function Option( {
 	);
 }
 
-function isTemporaryElement( slugPrefix: string, element: PaletteElement ) {
+function isTemporaryElement( slugPrefix: string, element: Color | Gradient ) {
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	return (
 		regex.test( element.slug ) &&
@@ -262,7 +263,7 @@ function PaletteEditListView( {
 	isGradient,
 }: PaletteEditListViewProps ) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
-	const elementsReference = useRef< PaletteElement[] >();
+	const elementsReference = useRef< Color[] | Gradient[] >();
 	useEffect( () => {
 		elementsReference.current = elements;
 	}, [ elements ] );
@@ -340,18 +341,28 @@ function PaletteEditListView( {
 	);
 }
 
-export default function PaletteEdit( {
-	gradients,
-	colors = [],
-	onChange,
-	paletteLabel,
-	emptyMessage,
-	canOnlyChangeValues,
-	canReset,
-	slugPrefix = '',
-}: PaletteEditProps ) {
-	const isGradient = !! gradients;
-	const elements = isGradient ? gradients : colors;
+function getElements(props: PaletteEditProps) {
+	return isGradientPalette( props )
+		? props.gradients
+		: props.colors;
+}
+
+function isGradientPalette( props: PaletteEditProps ): props is PaletteEditGradientsProps {
+	return 'gradients' in props;
+}
+
+export default function PaletteEdit( props: PaletteEditProps ) {
+	const {
+		onChange,
+		paletteLabel,
+		emptyMessage,
+		canOnlyChangeValues,
+		canReset,
+		slugPrefix = '',
+	} = props;
+
+	const isGradient = isGradientPalette( props );
+	const elements = getElements( props );
 	const [ isEditing, setIsEditing ] = useState( false );
 	const [ editingElement, setEditingElement ] = useState<
 		number | null | undefined
@@ -359,6 +370,7 @@ export default function PaletteEdit( {
 	const isAdding =
 		isEditing &&
 		!! editingElement &&
+		elements &&
 		elements[ editingElement ] &&
 		! elements[ editingElement ].slug;
 	const elementsLength = elements.length;
@@ -426,18 +438,29 @@ export default function PaletteEdit( {
 									slugPrefix
 								);
 
-								onChange( [
-									...elements,
-									{
-										...( isGradient
-											? { gradient: DEFAULT_GRADIENT }
-											: { color: DEFAULT_COLOR } ),
-										name: tempOptionName,
-										slug:
-											slugPrefix +
-											kebabCase( tempOptionName ),
-									},
-								] );
+								if ( isGradientPalette( props ) ) {
+									props.onChange( [
+										...props.gradients,
+										{
+											gradient: DEFAULT_GRADIENT,
+											name: tempOptionName,
+											slug:
+												slugPrefix +
+												kebabCase( tempOptionName ),
+										},
+									] );
+								} else {
+									props.onChange( [
+										...props.colors,
+										{
+											color: DEFAULT_COLOR,
+											name: tempOptionName,
+											slug:
+												slugPrefix +
+												kebabCase( tempOptionName ),
+										},
+									] );
+								}
 								setIsEditing( true );
 								setEditingElement( elements.length );
 							} }
@@ -558,14 +581,14 @@ export default function PaletteEdit( {
 							// @ts-expect-error TODO: Remove when GradientPicker is refactored to TS.
 							<GradientPicker
 								__nextHasNoMargin
-								gradients={ gradients }
+								gradients={ props.gradients }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomGradients={ true }
 							/>
 						) : (
 							<ColorPalette
-								colors={ colors }
+								colors={ 'colors' in props ? props.colors : [] }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomColors={ true }
