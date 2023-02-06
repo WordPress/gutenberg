@@ -316,6 +316,37 @@ describe( 'ToolsPanel', () => {
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
+		it( 'should render optional panel item when corresponding value is updated externally', async () => {
+			const ToolsPanelOptional = ( { toolsPanelItemValue } ) => {
+				const itemProps = {
+					attributes: { value: toolsPanelItemValue },
+					hasValue: () => !! toolsPanelItemValue,
+					label: 'Alt',
+					onDeselect: jest.fn(),
+					onSelect: jest.fn(),
+				};
+				altControlProps.attributes.value = toolsPanelItemValue;
+				return (
+					<ToolsPanel { ...defaultProps }>
+						<ToolsPanelItem { ...itemProps }>
+							<div>Optional control</div>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				);
+			};
+			const { rerender } = render( <ToolsPanelOptional /> );
+
+			const control = screen.queryByText( 'Optional control' );
+
+			expect( control ).not.toBeInTheDocument();
+
+			rerender( <ToolsPanelOptional toolsPanelItemValue={ 100 } /> );
+
+			const control2 = screen.queryByText( 'Optional control' );
+
+			expect( control2 ).toBeInTheDocument();
+		} );
+
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
