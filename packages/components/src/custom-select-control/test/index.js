@@ -4,9 +4,9 @@
 import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { CustomSelectControl } from '@wordpress/components';
+import CustomSelectControl from '..';
 
 describe( 'CustomSelectControl', () => {
 	it( 'Captures the keypress event and does not let it propagate', () => {

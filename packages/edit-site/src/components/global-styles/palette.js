@@ -65,7 +65,7 @@ function Palette( { name } ) {
 
 	return (
 		<VStack spacing={ 3 }>
-			<Subtitle>{ __( 'Palette' ) }</Subtitle>
+			<Subtitle level={ 3 }>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem
 					path={ screenPath }
