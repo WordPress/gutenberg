@@ -8,6 +8,7 @@ import {
 	createNewPost,
 	pressKeyWithModifier,
 	showBlockToolbar,
+	pressKeyTimes,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Links', () => {
@@ -596,8 +597,10 @@ describe( 'Links', () => {
 			// Press Cmd+K to insert a link.
 			await pressKeyWithModifier( 'primary', 'K' );
 
-			// Wait for the URL field to auto-focus.
-			await waitForURLFieldAutoFocus();
+			const [ settingsToggle ] = await page.$x(
+				'//button[contains(@aria-label, "Toggle link settings")]'
+			);
+			await settingsToggle.click();
 
 			const textInput = await page
 				.waitForXPath(
@@ -624,11 +627,17 @@ describe( 'Links', () => {
 				'//button[contains(@aria-label, "Edit")]'
 			);
 			await editButton.click();
+
 			await waitForURLFieldAutoFocus();
 
-			await pressKeyWithModifier( 'shift', 'Tab' );
+			const [ settingsToggle ] = await page.$x(
+				'//button[contains(@aria-label, "Toggle link settings")]'
+			);
+			await settingsToggle.click();
 
-			// Tabbing back should land us in the text input.
+			await page.keyboard.press( 'Tab' );
+
+			// Tabbing should land us in the text input.
 			const { isTextInput, textValue } = await page.evaluate( () => {
 				const el = document.activeElement;
 
@@ -685,7 +694,12 @@ describe( 'Links', () => {
 
 			await waitForURLFieldAutoFocus();
 
-			await pressKeyWithModifier( 'shift', 'Tab' );
+			const [ settingsToggle ] = await page.$x(
+				'//button[contains(@aria-label, "Toggle link settings")]'
+			);
+			await settingsToggle.click();
+
+			await page.keyboard.press( 'Tab' );
 
 			// Tabbing back should land us in the text input.
 			const textInputValue = await page.evaluate(
@@ -715,9 +729,14 @@ describe( 'Links', () => {
 			await editButton.click();
 			await waitForURLFieldAutoFocus();
 
-			await pressKeyWithModifier( 'shift', 'Tab' );
+			const [ settingsToggle ] = await page.$x(
+				'//button[contains(@aria-label, "Toggle link settings")]'
+			);
+			await settingsToggle.click();
 
-			// Tabbing back should land us in the text input.
+			await page.keyboard.press( 'Tab' );
+
+			// Tabbing should land us in the text input.
 			const textInputValue = await page.evaluate(
 				() => document.activeElement.value
 			);
@@ -761,11 +780,13 @@ describe( 'Links', () => {
 			await editButton.click();
 			await waitForURLFieldAutoFocus();
 
+			const [ settingsToggle ] = await page.$x(
+				'//button[contains(@aria-label, "Toggle link settings")]'
+			);
+			await settingsToggle.click();
+
 			// Move focus back to RichText for the underlying link.
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Tab' );
+			await pressKeyTimes( 'Tab', 5 );
 
 			// Make a selection within the RichText.
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
@@ -773,7 +794,7 @@ describe( 'Links', () => {
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
 
 			// Move back to the text input.
-			await page.keyboard.press( 'Tab' );
+			await pressKeyTimes( 'Tab', 3 );
 
 			// Tabbing back should land us in the text input.
 			const textInputValue = await page.evaluate(
