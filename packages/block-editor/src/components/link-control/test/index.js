@@ -1658,13 +1658,31 @@ describe( 'Selecting links', () => {
 } );
 
 describe( 'Addition Settings UI', () => {
-	it( 'should provides a means to toggle the link settings', async () => {
+	it( 'should not show a means to toggle the link settings when not editing a link', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
 
 			return <LinkControl value={ link } />;
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const settingsToggle = screen.queryByRole( 'button', {
+			name: 'Toggle link settings',
+			ariaControls: 'link-settings-1',
+		} );
+
+		expect( settingsToggle ).not.toBeInTheDocument();
+	} );
+	it( 'should provides a means to toggle the link settings', async () => {
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+
+		const LinkControlConsumer = () => {
+			const [ link ] = useState( selectedLink );
+
+			return <LinkControl value={ link } forceIsEditingLink />;
 		};
 
 		render( <LinkControlConsumer /> );
@@ -1703,7 +1721,7 @@ describe( 'Addition Settings UI', () => {
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
 
-			return <LinkControl value={ link } />;
+			return <LinkControl value={ link } forceIsEditingLink />;
 		};
 
 		render( <LinkControlConsumer /> );
@@ -1744,6 +1762,7 @@ describe( 'Addition Settings UI', () => {
 				<LinkControl
 					value={ { ...link, newTab: false, noFollow: true } }
 					settings={ customSettings }
+					forceIsEditingLink
 				/>
 			);
 		};
