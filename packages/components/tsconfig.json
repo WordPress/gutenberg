@@ -46,7 +46,6 @@
 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
 		"src/index.js",
 		"src/autocomplete",
-		"src/combobox-control",
 		"src/custom-gradient-picker",
 		"src/dimension-control",
 		"src/duotone-picker",
