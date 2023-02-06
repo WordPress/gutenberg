@@ -59,7 +59,7 @@ jobs:
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
-            fail-fast: true
+            fail-fast: false
             matrix:
                 php:
                     - '5.6'
