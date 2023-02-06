@@ -28,6 +28,9 @@ export function DimensionControl( props: DimensionControlProps ) {
 	} = props;
 
 	const onChangeSpacingSize: SelectControlProps[ 'onChange' ] = ( val ) => {
+		/* TODO: We know `val` is going to be a string (and not an array of strings) because
+		we don't pass `multiple` to `SelectControl`. Reevaluate if we can get rid of the type cast
+		after https://github.com/WordPress/gutenberg/pull/47390 is finished. */
 		const theSize = findSizeBySlug( sizes, val as string );
 
 		if ( ! theSize || value === theSize.slug ) {
