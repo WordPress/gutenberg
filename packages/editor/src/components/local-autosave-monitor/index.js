@@ -23,7 +23,6 @@ const requestIdleCallback = window.requestIdleCallback
 	: window.requestAnimationFrame;
 
 let hasStorageSupport;
-let uniqueId = 0;
 
 /**
  * Function which returns true if the current environment supports browser
@@ -100,13 +99,14 @@ function useAutosaveNotice() {
 			return;
 		}
 
-		const noticeId = `wpEditorAutosaveRestore${ ++uniqueId }`;
+		const id = 'wpEditorAutosaveRestore';
+
 		createWarningNotice(
 			__(
 				'The backup of this post in your browser is different from the version below.'
 			),
 			{
-				id: noticeId,
+				id,
 				actions: [
 					{
 						label: __( 'Restore the backup' ),
@@ -117,7 +117,7 @@ function useAutosaveNotice() {
 							} = edits;
 							editPost( editsWithoutContent );
 							resetEditorBlocks( parse( edits.content ) );
-							removeNotice( noticeId );
+							removeNotice( id );
 						},
 					},
 				],
