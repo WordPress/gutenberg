@@ -1,6 +1,3 @@
-// Variables
-$block-preview-height: 150px;
-
 .edit-site-global-styles-preview {
 	display: flex;
 	align-items: center;
@@ -130,7 +127,6 @@ $block-preview-height: 150px;
 .edit-site-global-styles__block-preview-panel {
 	position: relative;
 	width: 100%;
-	height: $block-preview-height + 2 * $border-width;
 	overflow: auto;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-block-ui;
