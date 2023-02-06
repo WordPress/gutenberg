@@ -11,7 +11,6 @@ import {
 	Button,
 	__unstableMotion as motion,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -24,29 +23,22 @@ import { forwardRef } from '@wordpress/element';
  */
 import { store as editSiteStore } from '../../store';
 import SiteIcon from '../site-icon';
-import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../private-apis';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
 const SiteHub = forwardRef(
 	( { isMobileCanvasVisible, setIsMobileCanvasVisible, ...props }, ref ) => {
-		const { canvasMode, dashboardLink, entityConfig } = useSelect(
-			( select ) => {
-				select( editSiteStore ).getEditedPostType();
-				const { getCanvasMode, getSettings, getEditedPostType } =
-					unlock( select( editSiteStore ) );
-				return {
-					canvasMode: getCanvasMode(),
-					dashboardLink: getSettings().__experimentalDashboardLink,
-					entityConfig: select( coreStore ).getEntityConfig(
-						'postType',
-						getEditedPostType()
-					),
-				};
-			},
-			[]
-		);
+		const { canvasMode, dashboardLink } = useSelect( ( select ) => {
+			select( editSiteStore ).getEditedPostType();
+			const { getCanvasMode, getSettings } = unlock(
+				select( editSiteStore )
+			);
+			return {
+				canvasMode: getCanvasMode(),
+				dashboardLink: getSettings().__experimentalDashboardLink,
+			};
+		}, [] );
 		const disableMotion = useReducedMotion();
 		const isMobileViewport = useViewportMatch( 'medium', '<' );
 		const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
@@ -68,7 +60,11 @@ const SiteHub = forwardRef(
 						setCanvasMode( 'view' );
 					},
 			  };
-		const { getTitle } = useEditedEntityRecord();
+		const siteTitle = useSelect(
+			( select ) =>
+				select( coreStore ).getEntityRecord( 'root', 'site' )?.title,
+			[]
+		);
 
 		return (
 			<motion.div
@@ -109,16 +105,7 @@ const SiteHub = forwardRef(
 						</Button>
 					</motion.div>
 
-					{ showLabels && (
-						<VStack spacing={ 0 }>
-							<div className="edit-site-site-hub__title">
-								{ getTitle() }
-							</div>
-							<div className="edit-site-site-hub__post-type">
-								{ entityConfig?.label }
-							</div>
-						</VStack>
-					) }
+					{ showLabels && <div>{ siteTitle }</div> }
 				</HStack>
 
 				{ isMobileViewport && ! isMobileCanvasVisible && (
