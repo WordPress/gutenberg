@@ -31,6 +31,7 @@ import useBlockSelection from './use-block-selection';
 import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
+import LeafMoreMenu from './leaf-more-menu';
 import { store as blockEditorStore } from '../../store';
 
 const expanded = ( state, action ) => {
@@ -59,7 +60,6 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {boolean} props.showBlockMovers Flag to enable block movers
  * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
- * @param {Object}  props.LeafMoreMenu    Optional more menu substitution.
  * @param {string}  props.description     Optional accessible description for the tree grid component.
  * @param {string}  props.onSelect        Optional callback to be invoked when a block is selected.
  * @param {Object}  ref                   Forwarded ref
@@ -70,7 +70,6 @@ function OffCanvasEditor(
 		blocks,
 		showBlockMovers = false,
 		isExpanded = false,
-		LeafMoreMenu,
 		description = __( 'Block navigation structure' ),
 		onSelect,
 	},

@@ -19,7 +19,6 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationMenuSelector from './navigation-menu-selector';
-import { LeafMoreMenu } from '../leaf-more-menu';
 import { unlock } from '../../private-apis';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
@@ -71,7 +70,6 @@ const MainContent = ( {
 		<OffCanvasEditor
 			blocks={ clientIdsTree }
 			isExpanded={ true }
-			LeafMoreMenu={ LeafMoreMenu }
 			description={ description }
 		/>
 	);
