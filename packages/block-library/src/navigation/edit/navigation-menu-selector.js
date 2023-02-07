@@ -140,6 +140,7 @@ function NavigationMenuSelector( {
 					{ canUserCreateNavigationMenu && (
 						<MenuGroup label={ __( 'Tools' ) }>
 							<MenuItem
+								disabled={ isCreatingMenu }
 								onClick={ () => {
 									onClose();
 									onCreateNew();

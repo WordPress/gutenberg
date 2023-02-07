@@ -66,7 +66,6 @@ describe( 'NavigationMenuSelector', () => {
 		it( 'should show correct dropdown toggle prompt to choose a menu when navigation menus have resolved', async () => {
 			useNavigationMenu.mockReturnValue( {
 				navigationMenus: [],
-				isResolvingNavigationMenus: false,
 				hasResolvedNavigationMenus: true,
 				canUserCreateNavigationMenu: true,
 				canSwitchNavigationMenu: true,
@@ -120,13 +119,12 @@ describe( 'NavigationMenuSelector', () => {
 			expect( toolsGroup ).not.toBeInTheDocument();
 		} );
 
-		describe( 'Create Menu Button', () => {
+		describe( 'Creating new menus', () => {
 			it( 'should show option to create a menu when no menus exist but user can create menus', async () => {
 				const user = userEvent.setup();
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
-					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenu: true,
 					canSwitchNavigationMenu: true,
@@ -178,7 +176,6 @@ describe( 'NavigationMenuSelector', () => {
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
-					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenu: false,
 					canSwitchNavigationMenu: true,
@@ -195,6 +192,87 @@ describe( 'NavigationMenuSelector', () => {
 				} );
 				expect( toolsGroup ).not.toBeInTheDocument();
 			} );
+
+			it( 'should call handler callback and close popover when create menu button is clicked', async () => {
+				const user = userEvent.setup();
+				const handler = jest.fn();
+
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: [],
+					hasResolvedNavigationMenus: true,
+					canUserCreateNavigationMenu: true,
+					canSwitchNavigationMenu: true,
+				} );
+
+				render( <NavigationMenuSelector onCreateNew={ handler } /> );
+
+				const toggleButton = screen.getByRole( 'button' );
+				await user.click( toggleButton );
+
+				const createMenuButton = screen.getByRole( 'menuitem', {
+					name: 'Create new menu',
+				} );
+
+				await user.click( createMenuButton );
+
+				expect( handler ).toHaveBeenCalled();
+
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+			} );
+
+			it( 'should disable the create menu button when the menu is loading', async () => {
+				const user = userEvent.setup();
+				const handler = jest.fn();
+
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: [],
+					hasResolvedNavigationMenus: true,
+					canUserCreateNavigationMenu: true,
+					canSwitchNavigationMenu: true,
+				} );
+
+				const { rerender } = render(
+					<NavigationMenuSelector onCreateNew={ handler } />
+				);
+
+				const toggleButton = screen.getByRole( 'button' );
+
+				await user.click( toggleButton );
+
+				await user.click(
+					screen.getByRole( 'menuitem', {
+						name: 'Create new menu',
+					} )
+				);
+
+				// Re-open the dropdown (it's closed when the "Create menu" button is clicked).
+				await user.click( toggleButton );
+
+				// Check the dropdown is open again.
+				expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
+
+				// Check the "Create menu" button is disabled.
+				expect(
+					screen.queryByRole( 'menuitem', {
+						name: 'Create new menu',
+					} )
+				).toBeDisabled();
+
+				// Simulate the menu being created and component being re-rendered.
+				rerender(
+					<NavigationMenuSelector
+						onCreateNew={ handler }
+						createNavigationMenuIsSuccess={ true }
+					/>
+				);
+
+				// Check the button is enabled again.
+				expect(
+					screen.queryByRole( 'menuitem', {
+						name: 'Create new menu',
+					} )
+				).toBeEnabled();
+			} );
 		} );
 
 		describe( 'Navigation menus', () => {
@@ -203,7 +281,6 @@ describe( 'NavigationMenuSelector', () => {
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
-					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenu: true,
 					canSwitchNavigationMenu: false,
@@ -225,7 +302,6 @@ describe( 'NavigationMenuSelector', () => {
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
-					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenu: false,
 					canSwitchNavigationMenu: true,
@@ -265,7 +341,6 @@ describe( 'NavigationMenuSelector', () => {
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: menusWithNoTitle,
-					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenu: true,
 					canSwitchNavigationMenu: true,
@@ -302,7 +377,6 @@ describe( 'NavigationMenuSelector', () => {
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
-					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenu: true,
 					canSwitchNavigationMenu: true,
@@ -333,7 +407,6 @@ describe( 'NavigationMenuSelector', () => {
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
-					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenu: true,
 					canSwitchNavigationMenu: true,
