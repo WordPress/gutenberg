@@ -872,6 +872,7 @@ const blockNames = {
 	shortcode: 'Shortcode',
 	buttons: 'Buttons',
 	button: 'Button',
+	group: 'Group',
 };
 
 module.exports = { initializeEditorPage, blockNames };
