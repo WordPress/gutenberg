@@ -96,6 +96,8 @@ export default function List() {
 		return mappedTemplates;
 	}, [ hasResolved, templates ] );
 
+	const hasCustomizedTemplates = !! customizedTemplates?.length;
+
 	return (
 		<InterfaceSkeleton
 			className="edit-site-list"
@@ -104,18 +106,39 @@ export default function List() {
 			notices={ <EditorSnackbars /> }
 			content={
 				<>
+					{ hasCustomizedTemplates && (
+						<Table
+							templateType={ templateType }
+							postType={ postType }
+							templates={ customizedTemplates }
+							isLoading={ isResolving }
+							heading={
+								postType &&
+								sprintf(
+									// translators: %s: The template type name, either "templates" or "template parts".
+									__( 'Customized %s' ),
+									postType.labels?.name?.toLowerCase()
+								)
+							}
+							templateHeadingLevel={ 3 }
+							showActionsColumn
+						/>
+					) }
 					<Table
 						templateType={ templateType }
-						templates={ customizedTemplates }
-						isLoading={ isResolving }
-						label={ __( 'Customized templates' ) }
-						showActionsColumn
-					/>
-					<Table
-						templateType={ templateType }
+						postType={ postType }
 						templates={ nonCustomizedTemplates }
 						isLoading={ isResolving }
-						label={ __( 'Other templates' ) }
+						heading={
+							hasCustomizedTemplates &&
+							postType &&
+							sprintf(
+								// translators: %s: The template type name, either "templates" or "template parts".
+								__( 'Default %s' ),
+								postType.labels?.name?.toLowerCase()
+							)
+						}
+						templateHeadingLevel={ hasCustomizedTemplates ? 3 : 2 }
 					/>
 				</>
 			}

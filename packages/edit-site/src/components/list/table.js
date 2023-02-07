@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { __experimentalHeading as Heading } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -16,16 +14,13 @@ import AddedBy from './added-by';
 
 export default function Table( {
 	templateType,
+	postType,
 	templates,
 	isLoading,
-	label,
+	heading,
+	templateHeadingLevel,
 	showActionsColumn = false,
 } ) {
-	const postType = useSelect(
-		( select ) => select( coreStore ).getPostType( templateType ),
-		[ templateType ]
-	);
-
 	if ( ! templates || isLoading ) {
 		return null;
 	}
@@ -44,13 +39,13 @@ export default function Table( {
 
 	return (
 		<>
-			{ label && (
+			{ heading && (
 				<Heading
 					level={ 2 }
 					size={ 18 }
 					className="edit-site-list__table-label"
 				>
-					{ label }
+					{ heading }
 				</Heading>
 			) }
 			{
@@ -94,7 +89,10 @@ export default function Table( {
 								className="edit-site-list-table-column"
 								role="cell"
 							>
-								<Heading level={ 3 } size={ 16 }>
+								<Heading
+									level={ templateHeadingLevel }
+									size={ 16 }
+								>
 									<Link
 										params={ {
 											postId: template.id,
