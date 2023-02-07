@@ -124,7 +124,7 @@ require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
-require __DIR__ . 'wordpress/private-apis-page.php';
+require __DIR__ . '/experiments-page.php';
 
 // Copied package PHP files.
 if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {
