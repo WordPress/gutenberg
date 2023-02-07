@@ -283,6 +283,14 @@ class EditorPage {
 		return await swipeDown( this.driver );
 	}
 
+	// Selects the parent block using the arrow button from the floating toolbar. [Only available on iOS]
+	async selectParentBlock() {
+		const navigateUpButton = await this.driver.elementByAccessibilityId(
+			'Navigate Up'
+		);
+		await navigateUpButton.click();
+	}
+
 	// =========================
 	// Block toolbar functions
 	// =========================
