@@ -94,39 +94,39 @@ const DimensionControls = ( {
 						},
 						{
 							label: __( 'Square' ),
-							value: '1 / 1',
+							value: '1',
 						},
 						{
 							label: __( '16:10' ),
-							value: '16 / 10',
+							value: '16/10',
 						},
 						{
 							label: __( '16:9' ),
-							value: '16 / 9',
+							value: '16/9',
 						},
 						{
 							label: __( '4:3' ),
-							value: '4 / 3',
+							value: '4/3',
 						},
 						{
 							label: __( '3:2' ),
-							value: '3 / 2',
+							value: '3/2',
 						},
 						{
 							label: __( '10:16' ),
-							value: '10 / 16',
+							value: '10/16',
 						},
 						{
 							label: __( '9:16' ),
-							value: '9 / 16',
+							value: '9/16',
 						},
 						{
 							label: __( '3:4' ),
-							value: '3 / 4',
+							value: '3/4',
 						},
 						{
 							label: __( '2:3' ),
-							value: '2 / 3',
+							value: '2/3',
 						},
 					] }
 					onChange={ ( nextAspectRatio ) =>
