@@ -228,7 +228,7 @@ export default function PostFeaturedImageEdit( {
 		...borderProps.style,
 		height,
 		aspectRatio,
-		objectFit: ( height || aspectRatio ) && scale,
+		objectFit: !! ( height || aspectRatio ) && scale,
 	};
 
 	/**
