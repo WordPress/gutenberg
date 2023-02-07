@@ -61,19 +61,23 @@ export default function List() {
 		  }
 		: undefined;
 
-	const { records: templates, isResolving: isLoading } = useEntityRecords(
-		'postType',
-		templateType,
-		{
-			per_page: -1,
-		}
-	);
+	const {
+		records: templates,
+		isResolving,
+		hasResolved,
+	} = useEntityRecords( 'postType', templateType, {
+		per_page: -1,
+	} );
 
 	const { customizedTemplates, nonCustomizedTemplates } = useMemo( () => {
 		let mappedTemplates = {
 			customizedTemplates: [],
 			nonCustomizedTemplates: [],
 		};
+
+		if ( ! hasResolved || ! templates ) {
+			return [];
+		}
 
 		if ( templates.length ) {
 			mappedTemplates = templates.reduce(
@@ -88,6 +92,7 @@ export default function List() {
 				{ customizedTemplates: [], nonCustomizedTemplates: [] }
 			);
 		}
+
 		return mappedTemplates;
 	}, [ templates ] );
 
@@ -102,14 +107,14 @@ export default function List() {
 					<Table
 						templateType={ templateType }
 						templates={ customizedTemplates }
-						isLoading={ isLoading }
+						isLoading={ isResolving }
 						label={ __( 'Customized templates' ) }
 						showActionsColumn
 					/>
 					<Table
 						templateType={ templateType }
 						templates={ nonCustomizedTemplates }
-						isLoading={ isLoading }
+						isLoading={ isResolving }
 						label={ __( 'Other templates' ) }
 					/>
 				</>
