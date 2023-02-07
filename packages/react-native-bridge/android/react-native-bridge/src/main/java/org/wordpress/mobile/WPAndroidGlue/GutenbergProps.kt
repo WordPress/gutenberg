@@ -8,6 +8,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableContactInfoBlock: Boolean,
     val enableLayoutGridBlock: Boolean,
     val enableTiledGalleryBlock: Boolean,
+    val enableVideoPressBlock: Boolean,
     val enableFacebookEmbed: Boolean,
     val enableInstagramEmbed: Boolean,
     val enableLoomEmbed: Boolean,
