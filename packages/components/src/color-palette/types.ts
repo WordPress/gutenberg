@@ -73,6 +73,12 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 */
 	enableAlpha?: boolean;
 	/**
+	 * The heading level.
+	 *
+	 * @default 2
+	 */
+	headingLevel?: HeadingSize;
+	/**
 	 * Currently active value.
 	 */
 	value?: string;
@@ -82,10 +88,4 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 * @default false
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
-	/**
-	 * The heaeding level.
-	 *
-	 * @default 2
-	 */
-	headingLevel?: HeadingSize;
 };

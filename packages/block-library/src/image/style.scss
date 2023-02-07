@@ -6,6 +6,17 @@
 		box-sizing: border-box;
 	}
 
+	// The following style maintains border radius application for deprecated
+	// image blocks that applied border radius to the outer `figure` element.
+	//
+	// See: https://github.com/WordPress/gutenberg/issues/47422
+	&[style*="border-radius"] {
+		> a,
+		img {
+			border-radius: inherit;
+		}
+	}
+
 	&.has-custom-border {
 		img {
 			box-sizing: border-box;
