@@ -94,7 +94,7 @@ export default function List() {
 		}
 
 		return mappedTemplates;
-	}, [ templates ] );
+	}, [ hasResolved, templates ] );
 
 	return (
 		<InterfaceSkeleton
