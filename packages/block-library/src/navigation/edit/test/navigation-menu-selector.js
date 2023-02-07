@@ -29,7 +29,7 @@ describe( 'NavigationMenuSelector', () => {
 
 			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
 				'aria-label',
-				'Loading …'
+				expect.stringContaining( 'Loading' )
 			);
 		} );
 
@@ -40,16 +40,36 @@ describe( 'NavigationMenuSelector', () => {
 				hasResolvedNavigationMenus: true,
 			} );
 
-			const user = userEvent.setup();
 			render( <NavigationMenuSelector /> );
 
 			const button = screen.getByRole( 'button' );
 
-			await user.click( button );
-
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+			expect( button ).toHaveAttribute(
 				'aria-label',
 				'Choose a Navigation menu'
+			);
+		} );
+	} );
+
+	describe( 'Dropdown', () => {
+		it( 'should show dropdown with loading message when menus have not resolved', async () => {
+			const user = userEvent.setup();
+
+			useNavigationMenu.mockReturnValue( {
+				navigationMenus: [],
+				isResolvingNavigationMenus: true,
+				hasResolvedNavigationMenus: false,
+			} );
+
+			render( <NavigationMenuSelector /> );
+
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
+
+			const menuPopover = screen.getByRole( 'menu' );
+			expect( menuPopover ).toHaveAttribute(
+				'aria-label',
+				expect.stringContaining( 'Loading' )
 			);
 		} );
 	} );
