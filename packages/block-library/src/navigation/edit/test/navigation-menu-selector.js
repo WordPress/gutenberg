@@ -16,6 +16,33 @@ jest.mock( '../../use-navigation-menu', () => {
 	return mock;
 } );
 
+const navigationMenu1 = {
+	id: 1,
+	title: {
+		rendered: 'Menu 1',
+	},
+	status: 'publish',
+};
+const navigationMenu2 = {
+	id: 2,
+	title: {
+		rendered: 'Menu 2',
+	},
+	status: 'publish',
+};
+const navigationMenu3 = {
+	id: 3,
+	title: {
+		rendered: 'Menu 3',
+	},
+	status: 'publish',
+};
+const navigationMenusFixture = [
+	navigationMenu1,
+	navigationMenu2,
+	navigationMenu3,
+];
+
 describe( 'NavigationMenuSelector', () => {
 	describe( 'Toggle', () => {
 		it( 'should show dropdown toggle with loading message when menus have not resolved', async () => {
@@ -23,6 +50,7 @@ describe( 'NavigationMenuSelector', () => {
 				navigationMenus: [],
 				isResolvingNavigationMenus: true,
 				hasResolvedNavigationMenus: false,
+				canSwitchNavigationMenu: true,
 			} );
 
 			render( <NavigationMenuSelector /> );
@@ -39,6 +67,7 @@ describe( 'NavigationMenuSelector', () => {
 				isResolvingNavigationMenus: false,
 				hasResolvedNavigationMenus: true,
 				canUserCreateNavigationMenu: true,
+				canSwitchNavigationMenu: true,
 			} );
 
 			render( <NavigationMenuSelector /> );
@@ -60,6 +89,7 @@ describe( 'NavigationMenuSelector', () => {
 				navigationMenus: [],
 				isResolvingNavigationMenus: true,
 				hasResolvedNavigationMenus: false,
+				canSwitchNavigationMenu: true,
 			} );
 
 			render( <NavigationMenuSelector /> );
@@ -96,6 +126,7 @@ describe( 'NavigationMenuSelector', () => {
 				isResolvingNavigationMenus: false,
 				hasResolvedNavigationMenus: true,
 				canUserCreateNavigationMenu: true,
+				canSwitchNavigationMenu: true,
 			} );
 
 			render( <NavigationMenuSelector /> );
@@ -119,6 +150,7 @@ describe( 'NavigationMenuSelector', () => {
 			} );
 			expect( classicMenusGroup ).not.toBeInTheDocument();
 
+			// Check the Tools Group and Create Menu Button are present.
 			const toolsGroup = screen.queryByRole( 'group', {
 				name: 'Tools',
 			} );
@@ -129,6 +161,53 @@ describe( 'NavigationMenuSelector', () => {
 			} );
 
 			expect( createMenuButton ).toBeInTheDocument();
+		} );
+
+		it( 'should not show option to create a menu when user does not have permission to create menus', async () => {
+			const user = userEvent.setup();
+
+			useNavigationMenu.mockReturnValue( {
+				navigationMenus: [],
+				isResolvingNavigationMenus: false,
+				hasResolvedNavigationMenus: true,
+				canUserCreateNavigationMenu: false,
+				canSwitchNavigationMenu: true,
+			} );
+
+			render( <NavigationMenuSelector /> );
+
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
+
+			// Check the Tools Group and Create Menu Button are present.
+			const toolsGroup = screen.queryByRole( 'group', {
+				name: 'Tools',
+			} );
+			expect( toolsGroup ).not.toBeInTheDocument();
+		} );
+
+		it( 'should show a list of menus when menus exist', async () => {
+			const user = userEvent.setup();
+
+			useNavigationMenu.mockReturnValue( {
+				navigationMenus: navigationMenusFixture,
+				isResolvingNavigationMenus: false,
+				hasResolvedNavigationMenus: true,
+				canUserCreateNavigationMenu: false,
+				canSwitchNavigationMenu: true,
+			} );
+
+			render( <NavigationMenuSelector /> );
+
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
+
+			navigationMenusFixture.forEach( ( item ) => {
+				const menuItem = screen.queryByRole( 'menuitemradio', {
+					name: item?.title?.rendered,
+				} );
+				expect( menuItem ).toBeInTheDocument();
+			} );
 		} );
 	} );
 } );
