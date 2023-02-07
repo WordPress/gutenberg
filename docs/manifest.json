@@ -1614,9 +1614,9 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/experiments",
+		"title": "@wordpress/private-apis",
 		"slug": "packages-experiments",
-		"markdown_source": "../packages/experiments/README.md",
+		"markdown_source": "../packages/private-apis/README.md",
 		"parent": "packages"
 	},
 	{

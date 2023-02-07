@@ -10,7 +10,7 @@
 		"dom",
 		"utils"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/experiments/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/private-apis/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

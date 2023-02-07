@@ -38,7 +38,7 @@ const PAGES_ENDPOINT = '/wp/v2/pages';
 const DRAFT_PAGES_ENDPOINT = [ PAGES_ENDPOINT, { status: 'draft' } ];
 const NAVIGATION_MENUS_ENDPOINT = '/wp/v2/navigation';
 // todo: consolidate with logic found in navigation-editor tests
-// https://github.com/WordPress/gutenberg/blob/trunk/packages/e2e-tests/specs/experiments/navigation-editor.test.js#L71
+// https://github.com/WordPress/gutenberg/blob/trunk/packages/e2e-tests/specs/private-apis/navigation-editor.test.js#L71
 const REST_PAGES_ROUTES = [
 	'/wp/v2/pages',
 	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
