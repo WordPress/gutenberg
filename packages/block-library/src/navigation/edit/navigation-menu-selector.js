@@ -40,7 +40,6 @@ function NavigationMenuSelector( {
 	const {
 		navigationMenus,
 		hasResolvedNavigationMenus,
-		isNavigationMenuResolved,
 		canUserCreateNavigationMenu,
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
@@ -91,13 +90,7 @@ function NavigationMenuSelector( {
 		) {
 			setIsCreatingMenu( false );
 		}
-	}, [
-		currentMenuId,
-		hasNavigationMenus,
-		hasResolvedNavigationMenus,
-		createNavigationMenuIsSuccess,
-		isNavigationMenuResolved,
-	] );
+	}, [ hasResolvedNavigationMenus, createNavigationMenuIsSuccess ] );
 
 	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu
