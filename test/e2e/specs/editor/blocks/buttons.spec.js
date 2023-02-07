@@ -100,7 +100,7 @@ test.describe( 'Buttons', () => {
 		).toBeVisible();
 	} );
 
-	test.only( 'appends http protocol to links added which are missing a protocol', async ( {
+	test( 'appends http protocol to links added which are missing a protocol', async ( {
 		editor,
 		page,
 		pageUtils,
