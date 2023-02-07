@@ -91,6 +91,12 @@ export default function SidebarNavigationScreenTemplates( {
 		} ) );
 	}
 
+	const browseAllLink = useLink( {
+		postType,
+		postId: undefined,
+		path: config[ postType ].path + '/all',
+	} );
+
 	return (
 		<SidebarNavigationScreen
 			path={ config[ postType ].path }
@@ -114,15 +120,13 @@ export default function SidebarNavigationScreenTemplates( {
 							<Item item={ item } key={ index } />
 						) ) }
 
-						<SidebarNavigationItem
-							className="edit-site-sidebar-navigation-screen-templates__see-all"
-							{ ...useLink( {
-								postType,
-								postId: undefined,
-								path: config[ postType ].path + '/all',
-							} ) }
-							children={ config[ postType ].labels.manage }
-						/>
+						{ ! isMobileViewport && (
+							<SidebarNavigationItem
+								className="edit-site-sidebar-navigation-screen-templates__see-all"
+								{ ...browseAllLink }
+								children={ config[ postType ].labels.manage }
+							/>
+						) }
 					</ItemGroup>
 				</>
 			}
