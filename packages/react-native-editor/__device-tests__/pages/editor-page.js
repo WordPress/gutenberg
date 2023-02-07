@@ -193,8 +193,9 @@ class EditorPage {
 		return elements[ elements.length - 1 ];
 	}
 
-	// iOS might return the element without scrolling.
-	// It will depend on how fast the list renders, e.g on CI.
+	// For iOS, depending on the content and how fast the block list
+	// renders blocks, it won't need to scroll down as it would find
+	// the block right away.
 	async scrollAndReturnElementByAccessibilityId( id ) {
 		const elements = await this.driver.elementsByAccessibilityId( id );
 
