@@ -61,21 +61,21 @@ _Note:_ by default, if you do not provide an initial `value` prop for the curren
 
 ### `label`
 
--   **Type:** `String`
+-   **Type:** `string`
 -   **Required:** Yes
 
 The human readable label for the control.
 
 ### `value`
 
--   **Type:** `String`
+-   **Type:** `string`
 -   **Required:** No
 
 The current value of the dimension UI control. If provided the UI with automatically select the value.
 
 ### `sizes`
 
--   **Type:** `Array`
+-   **Type:** `{ name: string; slug: string }[]`
 -   **Default:** See `packages/block-editor/src/components/dimension-control/sizes.ts`
 -   **Required:** No
 
@@ -99,14 +99,14 @@ By default a set of relative sizes (`small`, `medium`...etc) are provided. See `
 
 ### `icon`
 
--   **Type:** `String`
+-   **Type:** `string`
 -   **Required:** No
 
 An optional dashicon to display before to the control label.
 
 ### `onChange`
 
--   **Type:** `Function`
+-   **Type:** `( value?: string ) => void;`
 -   **Required:** No
 -   **Arguments:**:
     -   `size` - a string representing the selected size (eg: `medium`)
@@ -115,7 +115,7 @@ A callback which is triggered when a spacing size value changes (is selected/cli
 
 ### `className`
 
--   **Type:** `String`
+-   **Type:** `string`
 -   **Default:** `''`
 -   **Required:** No
 
