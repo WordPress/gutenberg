@@ -31,6 +31,7 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 	'left',
 	'left-start',
 	'left-end',
+	'overlay',
 ];
 
 const meta: ComponentMeta< typeof Popover > = {
@@ -170,7 +171,12 @@ export const AllPlacements: ComponentStory< typeof Popover > = ( {
 		</h2>
 		<div>
 			{ AVAILABLE_PLACEMENTS.map( ( p ) => (
-				<PopoverWithAnchor key={ p } placement={ p } { ...args }>
+				<PopoverWithAnchor
+					key={ p }
+					placement={ p }
+					{ ...args }
+					resize={ p === 'overlay' ? true : args.resize }
+				>
 					{ children }
 					<div>
 						<small>(placement: { p })</small>
