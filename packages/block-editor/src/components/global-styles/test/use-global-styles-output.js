@@ -549,7 +549,29 @@ describe( 'global styles renderer', () => {
 									},
 								},
 							],
-							marginSelector: ' > * + ',
+							marginStyles: [
+								{
+									selector: ' > ',
+									rules: {
+										'margin-block-start': '0',
+										'margin-bottom': null,
+									},
+								},
+								{
+									selector: ' > * + ',
+									rules: {
+										'margin-top': null,
+										'margin-bottom': null,
+									},
+								},
+								{
+									selector: ' > *:last-child',
+									rules: {
+										'margin-top': null,
+										'margin-block-end': '0',
+									},
+								},
+							],
 						},
 						flex: {
 							name: 'flex',
@@ -680,7 +702,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'.is-layout-flow > * + .wp-block-cover { margin-top: 25px; margin-bottom: 50px; }.wp-site-blocks > * + .wp-block-cover { margin-top: 25px; margin-bottom: 50px; }'
+				'.is-layout-flow > .wp-block-cover { margin-block-start: 0; margin-bottom: 50px }.is-layout-flow > * + .wp-block-cover { margin-top: 25px; margin-bottom: 50px }.is-layout-flow > *:last-child.wp-block-cover { margin-top: 25px; margin-block-end: 0 }.wp-site-blocks > * + .wp-block-cover { margin-top: 25px; margin-bottom: 50px; }'
 			);
 		} );
 	} );

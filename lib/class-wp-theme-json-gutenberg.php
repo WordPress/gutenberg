@@ -1271,18 +1271,47 @@ class WP_Theme_JSON_Gutenberg {
 				if ( ! empty( $margin_styles['css'] ) ) {
 					// Add layout aware margin rules for each supported layout type.
 					foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) {
-						$class_name = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), '' ) );
+						$class_name   = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), '' ) );
+						$margin_rules = _wp_array_get( $layout_definition, array( 'marginStyles' ), array() );
+
 						if (
-							isset( $layout_definition['marginSelector'] ) &&
-							preg_match( $layout_selector_pattern, $layout_definition['marginSelector'] )
+							! empty( $class_name ) &&
+							! empty( $margin_rules )
 						) {
-							$block_rules .= sprintf(
-								'.%s%s%s {%s}',
-								$class_name,
-								$layout_definition['marginSelector'],
-								$selector,
-								$margin_styles['css']
-							);
+							foreach ( $margin_rules as $margin_rule ) {
+								if (
+									isset( $margin_rule['selector'] ) &&
+									preg_match( $layout_selector_pattern, $margin_rule['selector'] ) &&
+									! empty( $margin_rule['rules'] )
+								) {
+									$declarations = array();
+									foreach ( $margin_rule['rules'] as $css_property => $css_value ) {
+										if ( is_string( $css_value ) ) {
+											if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
+												$declarations[] = array(
+													'name'  => $css_property,
+													'value' => $css_value,
+												);
+											}
+										} elseif ( isset( $margin_styles['declarations'][ $css_property ] ) ) {
+											if ( static::is_safe_css_declaration( $css_property, $margin_styles['declarations'][ $css_property ] ) ) {
+												$declarations[] = array(
+													'name'  => $css_property,
+													'value' => $margin_styles['declarations'][ $css_property ],
+												);
+											}
+										}
+									}
+									$layout_selector = sprintf(
+										'.%s%s%s',
+										$class_name,
+										$margin_rule['selector'],
+										$selector
+									);
+
+									$block_rules .= static::to_ruleset( $layout_selector, $declarations );
+								}
+							}
 						}
 					}
 					// Add layout aware margin rule for children of the root site blocks class.

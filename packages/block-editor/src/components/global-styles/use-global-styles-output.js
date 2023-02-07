@@ -362,20 +362,52 @@ export function getLayoutStyles( {
 		style?.spacing?.margin &&
 		tree?.settings?.layout?.definitions
 	) {
-		const marginRules = compileCSS( {
+		const marginString = compileCSS( {
 			spacing: { margin: style.spacing.margin },
 		} );
+
+		// Get margin rules keyed by CSS class name.
+		const marginRules = getCSSRules( {
+			spacing: { margin: style.spacing.margin },
+		} ).reduce(
+			( acc, rule ) => ( {
+				...acc,
+				[ kebabCase( rule.key ) ]: rule.value,
+			} ),
+			{}
+		);
+
 		if ( marginRules ) {
 			// Add layout aware margin rules for each supported layout type.
 			Object.values( tree.settings.layout.definitions ).forEach(
-				( { className, marginSelector } ) => {
-					if ( marginSelector ) {
-						ruleset += `.${ className }${ marginSelector }${ selector } { ${ marginRules } }`;
+				( { className, marginStyles } ) => {
+					if ( marginStyles?.length ) {
+						marginStyles.forEach( ( marginStyle ) => {
+							const declarations = [];
+
+							Object.entries( marginStyle.rules ).forEach(
+								( [ cssProperty, cssValue ] ) => {
+									if ( cssValue ) {
+										declarations.push(
+											`${ cssProperty }: ${ cssValue }`
+										);
+									} else if ( marginRules[ cssProperty ] ) {
+										declarations.push(
+											`${ cssProperty }: ${ marginRules[ cssProperty ] }`
+										);
+									}
+								}
+							);
+
+							ruleset += `.${ className }${
+								marginStyle?.selector
+							}${ selector } { ${ declarations.join( '; ' ) } }`;
+						} );
 					}
 				}
 			);
 			// Add layout aware margin rule for children of the root site blocks class.
-			ruleset += `.wp-site-blocks > * + ${ selector } { ${ marginRules } }`;
+			ruleset += `.wp-site-blocks > * + ${ selector } { ${ marginString } }`;
 		}
 	}
 

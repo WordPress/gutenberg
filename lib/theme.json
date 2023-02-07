@@ -263,7 +263,29 @@
 							}
 						}
 					],
-					"marginSelector": " > * + "
+					"marginStyles": [
+						{
+							"selector": " > ",
+							"rules": {
+								"margin-block-start": "0",
+								"margin-bottom": null
+							}
+						},
+						{
+							"selector": " > * + ",
+							"rules": {
+								"margin-top": null,
+								"margin-bottom": null
+							}
+						},
+						{
+							"selector": " > *:last-child",
+							"rules": {
+								"margin-top": null,
+								"margin-block-end": "0"
+							}
+						}
+					]
 				},
 				"constrained": {
 					"name": "constrained",
@@ -324,7 +346,29 @@
 							}
 						}
 					],
-					"marginSelector": " > * + "
+					"marginStyles": [
+						{
+							"selector": " > ",
+							"rules": {
+								"margin-block-start": "0",
+								"margin-bottom": null
+							}
+						},
+						{
+							"selector": " > * + ",
+							"rules": {
+								"margin-top": null,
+								"margin-bottom": null
+							}
+						},
+						{
+							"selector": " > *:last-child",
+							"rules": {
+								"margin-top": null,
+								"margin-block-end": "0"
+							}
+						}
+					]
 				},
 				"flex": {
 					"name": "flex",
