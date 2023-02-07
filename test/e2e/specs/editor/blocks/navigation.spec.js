@@ -77,10 +77,10 @@ test.describe(
 
 			// Check the markup of the block is correct.
 			await editor.publishPost();
-			await expect.poll( editor.getBlocks ).toEqual( [
+			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/navigation',
-					ref: createdMenu.id,
+					attributes: { ref: createdMenu.id },
 				},
 			] );
 			await page.locator( 'role=button[name="Close panel"i]' ).click();
