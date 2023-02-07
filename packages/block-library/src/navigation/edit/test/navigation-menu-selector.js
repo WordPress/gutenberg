@@ -37,6 +37,7 @@ const navigationMenu3 = {
 	},
 	status: 'publish',
 };
+
 const navigationMenusFixture = [
 	navigationMenu1,
 	navigationMenu2,
@@ -119,78 +120,106 @@ describe( 'NavigationMenuSelector', () => {
 			expect( toolsGroup ).not.toBeInTheDocument();
 		} );
 
-		it( 'should show option to create a menu when no menus exist but user can create menus', async () => {
-			const user = userEvent.setup();
+		describe( 'Create Menu Button', () => {
+			it( 'should show option to create a menu when no menus exist but user can create menus', async () => {
+				const user = userEvent.setup();
 
-			useNavigationMenu.mockReturnValue( {
-				navigationMenus: [],
-				isResolvingNavigationMenus: false,
-				hasResolvedNavigationMenus: true,
-				canUserCreateNavigationMenu: true,
-				canSwitchNavigationMenu: true,
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: [],
+					isResolvingNavigationMenus: false,
+					hasResolvedNavigationMenus: true,
+					canUserCreateNavigationMenu: true,
+					canSwitchNavigationMenu: true,
+				} );
+
+				render( <NavigationMenuSelector /> );
+
+				const toggleButton = screen.getByRole( 'button', {
+					name: 'Choose or create a Navigation menu',
+				} );
+
+				await user.click( toggleButton );
+
+				const menuPopover = screen.getByRole( 'menu' );
+
+				expect( menuPopover ).toHaveAttribute(
+					'aria-label',
+					expect.stringContaining(
+						'Choose or create a Navigation menu'
+					)
+				);
+
+				// Check that all the option groups are *not* present.
+				const menusGroup = screen.queryByRole( 'group', {
+					name: 'Menus',
+				} );
+				expect( menusGroup ).not.toBeInTheDocument();
+
+				const classicMenusGroup = screen.queryByRole( 'group', {
+					name: 'Import Classic Menus',
+				} );
+				expect( classicMenusGroup ).not.toBeInTheDocument();
+
+				// Check the Tools Group and Create Menu Button are present.
+				const toolsGroup = screen.queryByRole( 'group', {
+					name: 'Tools',
+				} );
+				expect( toolsGroup ).toBeInTheDocument();
+
+				const createMenuButton = screen.getByRole( 'menuitem', {
+					name: 'Create new menu',
+				} );
+
+				expect( createMenuButton ).toBeInTheDocument();
 			} );
 
-			render( <NavigationMenuSelector /> );
+			it( 'should not show option to create a menu when user does not have permission to create menus', async () => {
+				const user = userEvent.setup();
 
-			const toggleButton = screen.getByRole( 'button', {
-				name: 'Choose or create a Navigation menu',
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: [],
+					isResolvingNavigationMenus: false,
+					hasResolvedNavigationMenus: true,
+					canUserCreateNavigationMenu: false,
+					canSwitchNavigationMenu: true,
+				} );
+
+				render( <NavigationMenuSelector /> );
+
+				const toggleButton = screen.getByRole( 'button' );
+				await user.click( toggleButton );
+
+				// Check the Tools Group and Create Menu Button are present.
+				const toolsGroup = screen.queryByRole( 'group', {
+					name: 'Tools',
+				} );
+				expect( toolsGroup ).not.toBeInTheDocument();
 			} );
-
-			await user.click( toggleButton );
-
-			const menuPopover = screen.getByRole( 'menu' );
-
-			expect( menuPopover ).toHaveAttribute(
-				'aria-label',
-				expect.stringContaining( 'Choose or create a Navigation menu' )
-			);
-
-			// Check that all the option groups are *not* present.
-			const menusGroup = screen.queryByRole( 'group', { name: 'Menus' } );
-			expect( menusGroup ).not.toBeInTheDocument();
-
-			const classicMenusGroup = screen.queryByRole( 'group', {
-				name: 'Import Classic Menus',
-			} );
-			expect( classicMenusGroup ).not.toBeInTheDocument();
-
-			// Check the Tools Group and Create Menu Button are present.
-			const toolsGroup = screen.queryByRole( 'group', {
-				name: 'Tools',
-			} );
-			expect( toolsGroup ).toBeInTheDocument();
-
-			const createMenuButton = screen.getByRole( 'menuitem', {
-				name: 'Create new menu',
-			} );
-
-			expect( createMenuButton ).toBeInTheDocument();
-		} );
-
-		it( 'should not show option to create a menu when user does not have permission to create menus', async () => {
-			const user = userEvent.setup();
-
-			useNavigationMenu.mockReturnValue( {
-				navigationMenus: [],
-				isResolvingNavigationMenus: false,
-				hasResolvedNavigationMenus: true,
-				canUserCreateNavigationMenu: false,
-				canSwitchNavigationMenu: true,
-			} );
-
-			render( <NavigationMenuSelector /> );
-
-			const toggleButton = screen.getByRole( 'button' );
-			await user.click( toggleButton );
-
-			// Check the Tools Group and Create Menu Button are present.
-			const toolsGroup = screen.queryByRole( 'group', {
-				name: 'Tools',
-			} );
-			expect( toolsGroup ).not.toBeInTheDocument();
 		} );
 
 		describe( 'Navigation menus listing', () => {
+			it( 'should not show a list of menus when menus exist but user does not have permission to switch menus', async () => {
+				const user = userEvent.setup();
+
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: navigationMenusFixture,
+					isResolvingNavigationMenus: false,
+					hasResolvedNavigationMenus: true,
+					canUserCreateNavigationMenu: true,
+					canSwitchNavigationMenu: false,
+				} );
+
+				render( <NavigationMenuSelector /> );
+
+				const toggleButton = screen.getByRole( 'button' );
+				await user.click( toggleButton );
+
+				const menusGroup = screen.queryByRole( 'group', {
+					name: 'Menus',
+				} );
+				expect( menusGroup ).not.toBeInTheDocument();
+			} );
+
 			it( 'should show a list of menus when menus exist', async () => {
 				const user = userEvent.setup();
 
@@ -220,15 +249,26 @@ describe( 'NavigationMenuSelector', () => {
 				} );
 			} );
 
-			it( 'should not show a list of menus when menus exist but user does not have permission to switch menus', async () => {
+			it( 'should render fallback title when menu has no title', async () => {
 				const user = userEvent.setup();
 
+				const menusWithNoTitle = [
+					{
+						id: 1,
+						status: 'publish',
+					},
+					{
+						id: 2,
+						status: 'publish',
+					},
+				];
+
 				useNavigationMenu.mockReturnValue( {
-					navigationMenus: navigationMenusFixture,
+					navigationMenus: menusWithNoTitle,
 					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
 					canUserCreateNavigationMenu: true,
-					canSwitchNavigationMenu: false,
+					canSwitchNavigationMenu: true,
 				} );
 
 				render( <NavigationMenuSelector /> );
@@ -239,7 +279,20 @@ describe( 'NavigationMenuSelector', () => {
 				const menusGroup = screen.queryByRole( 'group', {
 					name: 'Menus',
 				} );
-				expect( menusGroup ).not.toBeInTheDocument();
+				expect( menusGroup ).toBeInTheDocument();
+
+				// Check for sequentially named fallback titles.
+				expect(
+					screen.getByRole( 'menuitemradio', {
+						name: '(no title 1)',
+					} )
+				).toBeInTheDocument();
+
+				expect(
+					screen.getByRole( 'menuitemradio', {
+						name: '(no title 2)',
+					} )
+				).toBeInTheDocument();
 			} );
 		} );
 	} );
