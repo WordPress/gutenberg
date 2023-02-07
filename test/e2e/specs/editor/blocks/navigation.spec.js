@@ -75,6 +75,13 @@ test.describe(
 
 			await editor.insertBlock( { name: 'core/navigation' } );
 
+			//check the block in the canvas.
+			await expect(
+				editor.canvas.locator(
+					'role=textbox[name="Navigation link text"i] >> text="WordPress"'
+				)
+			).toBeVisible();
+
 			// Check the markup of the block is correct.
 			await editor.publishPost();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -85,18 +92,11 @@ test.describe(
 			] );
 			await page.locator( 'role=button[name="Close panel"i]' ).click();
 
-			//check the block in the canvas.
-			await expect(
-				page.locator(
-					'role=gridcell[name="Custom Link link"] >> a:has-text("WordPress")'
-				)
-			).toBeVisible();
-
 			//check the block in the frontend.
 			await page.goto( '/' );
 			await expect(
 				page.locator(
-					'nav:has-text("WordPress") >> role=link[name="WordPress"]'
+					'role=navigation >> nth=1 >> role=link[name="WordPress"]'
 				)
 			).toBeVisible();
 		} );
