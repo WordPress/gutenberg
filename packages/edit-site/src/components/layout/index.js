@@ -95,7 +95,9 @@ export default function Layout() {
 		( isMobileViewport && isEditorPage && canvasMode === 'edit' ) ||
 		! isMobileViewport ||
 		! isEditorPage;
-	const showFrame = ! isEditorPage || ( ! isMobileViewport && isEditorPage );
+	const showFrame =
+		( ! isEditorPage && ! isMobileViewport ) ||
+		( ! isMobileViewport && isEditorPage && canvasMode === 'view' );
 	const isFullCanvas =
 		( isMobileViewport && isListPage ) ||
 		( isEditorPage && canvasMode === 'edit' );
