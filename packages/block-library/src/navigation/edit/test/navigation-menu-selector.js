@@ -327,6 +327,33 @@ describe( 'NavigationMenuSelector', () => {
 					navigationMenusFixture[ 0 ].id
 				);
 			} );
+
+			it( 'should pre-select the correct menu in the menu list if a menu ID is passed', async () => {
+				const user = userEvent.setup();
+
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: navigationMenusFixture,
+					isResolvingNavigationMenus: false,
+					hasResolvedNavigationMenus: true,
+					canUserCreateNavigationMenu: true,
+					canSwitchNavigationMenu: true,
+				} );
+
+				render(
+					<NavigationMenuSelector
+						currentMenuId={ navigationMenusFixture[ 0 ].id }
+					/>
+				);
+
+				const toggleButton = screen.getByRole( 'button' );
+				await user.click( toggleButton );
+
+				const menuItem = screen.getByRole( 'menuitemradio', {
+					name: navigationMenusFixture[ 0 ].title.rendered,
+				} );
+
+				expect( menuItem ).toBeChecked();
+			} );
 		} );
 	} );
 } );
