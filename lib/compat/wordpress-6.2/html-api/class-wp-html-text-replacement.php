@@ -3,7 +3,7 @@
  * HTML Tag Processor: Text replacement class.
  *
  * @package WordPress
- * @subpackage HTML
+ * @subpackage HTML-API
  * @since 6.2.0
  */
 

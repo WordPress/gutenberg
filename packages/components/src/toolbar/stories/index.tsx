@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -18,6 +23,7 @@ import {
 	arrowRight,
 	chevronDown,
 } from '@wordpress/icons';
+import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -29,9 +35,9 @@ import {
 	ToolbarItem,
 	ToolbarDropdownMenu,
 } from '..';
-import { SVG, Path, DropdownMenu } from '../../';
+import DropdownMenu from '../../dropdown-menu';
 
-export default {
+const meta: ComponentMeta< typeof Toolbar > = {
 	title: 'Components/Toolbar',
 	component: Toolbar,
 	subcomponents: {
@@ -49,6 +55,8 @@ export default {
 	},
 };
 
+export default meta;
+
 function InlineImageIcon() {
 	return (
 		<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -57,7 +65,7 @@ function InlineImageIcon() {
 	);
 }
 
-const Template = ( props ) => (
+const Template: ComponentStory< typeof Toolbar > = ( props ) => (
 	<div style={ { height: 280 } }>
 		<Toolbar { ...props } />
 	</div>
@@ -74,29 +82,32 @@ Default.args = {
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
-					{ ( toggleProps ) => (
-						<DropdownMenu
-							hasArrowIndicator
-							icon={ alignLeft }
-							label="Align"
-							controls={ [
-								{
-									icon: alignLeft,
-									title: 'Align left',
-									isActive: true,
-								},
-								{
-									icon: alignCenter,
-									title: 'Align center',
-								},
-								{
-									icon: alignRight,
-									title: 'Align right',
-								},
-							] }
-							toggleProps={ toggleProps }
-						/>
-					) }
+					{
+						// @ts-expect-error TODO: Remove when ToolbarItem/DropdownMenu is typed
+						( toggleProps ) => (
+							<DropdownMenu
+								hasArrowIndicator
+								icon={ alignLeft }
+								label="Align"
+								controls={ [
+									{
+										icon: alignLeft,
+										title: 'Align left',
+										isActive: true,
+									},
+									{
+										icon: alignCenter,
+										title: 'Align center',
+									},
+									{
+										icon: alignRight,
+										title: 'Align right',
+									},
+								] }
+								toggleProps={ toggleProps }
+							/>
+						)
+					}
 				</ToolbarItem>
 			</ToolbarGroup>
 			<ToolbarGroup>
@@ -106,6 +117,7 @@ Default.args = {
 				<ToolbarButton icon={ link } label="Link" />
 				<ToolbarGroup
 					isCollapsed
+					// @ts-expect-error TODO: Remove when ToolbarGroup is typed
 					icon={ false }
 					label="More rich text controls"
 					controls={ [
@@ -119,6 +131,7 @@ Default.args = {
 				/>
 			</ToolbarGroup>
 			<ToolbarGroup
+				// @ts-expect-error TODO: Remove when ToolbarGroup is typed
 				icon={ more }
 				label="Align"
 				isCollapsed
