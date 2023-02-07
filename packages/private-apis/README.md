@@ -9,7 +9,7 @@ Every `@wordpress` package wanting to privately access or expose experimental AP
 
 ```js
 // In packages/block-editorwordpress/private-apis.js:
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from './private-apis';
+import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
 		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
