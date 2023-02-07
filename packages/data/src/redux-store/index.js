@@ -16,7 +16,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { builtinControls } from '../controls';
-import { lock } from '../experiments';
+import { lock } from '../private-apis';
 import promise from '../promise-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import createThunkMiddleware from './thunk-middleware';

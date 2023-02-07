@@ -20,7 +20,7 @@ import {
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
 } from '../../utils/template-part-create';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 export default function NewTemplatePart( {
 	postType,

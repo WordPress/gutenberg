@@ -38,7 +38,7 @@ import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-e
 import SiteHub from '../site-hub';
 import ResizeHandle from '../block-editor/resize-handle';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
 
 const ANIMATION_DURATION = 0.5;

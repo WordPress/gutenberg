@@ -21,7 +21,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import Inserter from '../inserter';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 function selector( select ) {
 	const {

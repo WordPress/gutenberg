@@ -29,7 +29,7 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
  */
 import { getSupportedGlobalStylesPanels } from './hooks';
 import { IconWithCurrentColor } from './icon-with-current-color';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 

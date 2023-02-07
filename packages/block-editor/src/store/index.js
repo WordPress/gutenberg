@@ -12,7 +12,7 @@ import * as privateActions from './private-actions';
 import * as privateSelectors from './private-selectors';
 import * as actions from './actions';
 import { STORE_NAME } from './constants';
-import { unlock } from '../experiments';
+import { unlock } from '../private-apis';
 
 /**
  * Block editor data store configuration.

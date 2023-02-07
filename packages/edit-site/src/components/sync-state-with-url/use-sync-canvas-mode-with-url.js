@@ -9,7 +9,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { store as editSiteStore } from '../../store';
 import { useLocation, useHistory } from '../routes';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 export default function useSyncCanvasModeWithURL() {
 	const history = useHistory();

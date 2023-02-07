@@ -11,7 +11,7 @@ import withRegistryProvider from './with-registry-provider';
 import useBlockSync from './use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import { BlockRefsProvider } from './block-refs-provider';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 

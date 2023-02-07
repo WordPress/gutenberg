@@ -48,7 +48,7 @@ import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',

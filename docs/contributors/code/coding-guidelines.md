@@ -169,7 +169,7 @@ If your experimental API is only meant for the Gutenberg Plugin but not for the 
 
 ```js
 if ( IS_GUTENBERG_PLUGIN ) {
-	export { __experimentalFunction } from './experiments';
+	export { __experimentalFunction } from './private-apis';
 }
 ```
 
@@ -298,7 +298,7 @@ import { __experimentalHasContentRoleAttribute, ...selectors } from './selectors
 import { __experimentalToggleFeature, ...actions } from './selectors';
 // The `lock` function is exported from the internal experiments.js file where
 // the opt-in function was called.
-import { lock, unlock } from './experiments';
+import { lock, unlock } from './private-apis';
 
 export const store = registerStore(/* ... */);
 // Attach a private action to the exported store:
@@ -317,7 +317,7 @@ import { store } from '@wordpress/package1';
 import { useSelect } from '@wordpress/data';
 // The `unlock` function is exported from the internal experiments.js file where
 // the opt-in function was called.
-import { unlock } from './experiments';
+import { unlock } from './private-apis';
 
 function MyComponent() {
     const hasRole = useSelect( ( select ) => (
@@ -338,7 +338,7 @@ function MyComponent() {
 
 ```js
 // In packages/package1/index.js:
-import { lock } from './experiments';
+import { lock } from './private-apis';
 
 export const experiments = {};
 /* Attach private data to the exported object */
@@ -353,7 +353,7 @@ lock( experiments, {
 
 // In packages/package2/index.js:
 import { experiments } from '@wordpress/package1';
-import { unlock } from './experiments';
+import { unlock } from './private-apis';
 
 const {
 	__experimentalCallback,
@@ -400,7 +400,7 @@ inside it:
 
 ```js
 // In @wordpress/package1/index.js:
-import { lock } from './experiments';
+import { lock } from './private-apis';
 
 // The experimental function contains all the logic
 function __experimentalValidateBlocks( formula, __experimentalIsStrict ) {
@@ -423,7 +423,7 @@ lock( validateBlocks, __experimentalValidateBlocks );
 
 // In @wordpress/package2/index.js:
 import { validateBlocks } from '@wordpress/package1';
-import { unlock } from './experiments';
+import { unlock } from './private-apis';
 
 // The experimental function may be "unlocked" given the stable function:
 const __experimentalValidateBlocks = unlock( validateBlocks );
@@ -439,7 +439,7 @@ inside it:
 
 ```js
 // In @wordpress/package1/index.js:
-import { lock } from './experiments';
+import { lock } from './private-apis';
 
 // The experimental component contains all the logic
 const ExperimentalMyButton = ( { title, __experimentalShowIcon = true } ) => {
@@ -462,7 +462,7 @@ lock(MyButton, ExperimentalMyButton);
 
 // In @wordpress/package2/index.js:
 import { MyButton } from '@wordpress/package1';
-import { unlock } from './experiments';
+import { unlock } from './private-apis';
 
 // The experimental component may be "unlocked" given the stable component:
 const ExperimentalMyButton = unlock(MyButton);
