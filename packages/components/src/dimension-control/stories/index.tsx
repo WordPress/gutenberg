@@ -23,7 +23,7 @@ export default {
 			control: { type: 'select' },
 			options: [ '-', 'desktop', 'tablet', 'mobile' ],
 			mapping: {
-				undefined,
+				'-': undefined,
 				desktop,
 				tablet,
 				mobile,
