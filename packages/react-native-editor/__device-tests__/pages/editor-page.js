@@ -824,6 +824,8 @@ class EditorPage {
 
 	async takeScreenshot() {
 		const statusBarHeight = isAndroid() ? 100 : 94;
+		// Wait for potential previous actions to finish
+		await this.driver.sleep( 250 );
 		const screenshot = await this.driver.takeScreenshot();
 
 		const base64Image = Buffer.from( screenshot, 'base64' );
