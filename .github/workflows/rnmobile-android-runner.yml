@@ -18,7 +18,7 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                native-test-name: [gutenberg-editor-initial-html]
+                native-test-name: [rendering]
                 api-level: [29]
 
         steps:

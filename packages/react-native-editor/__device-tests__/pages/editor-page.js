@@ -193,6 +193,18 @@ class EditorPage {
 		return elements[ elements.length - 1 ];
 	}
 
+	// iOS might return the element without scrolling.
+	// It will depend on how fast the list renders, e.g on CI.
+	async scrollAndReturnElementByAccessibilityId( id ) {
+		const elements = await this.driver.elementsByAccessibilityId( id );
+
+		if ( elements.length === 0 ) {
+			await swipeUp( this.driver, undefined, 100, 1 );
+			return this.scrollAndReturnElementByAccessibilityId( id );
+		}
+		return elements[ elements.length - 1 ];
+	}
+
 	async getLastElementByXPath( accessibilityLabel ) {
 		const elements = await this.driver.elementsByXPath(
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`

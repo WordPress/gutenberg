@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import initialHtml from '../src/initial-html';
+import { textBlocks } from '../src/initial-html';
 
-describe( 'Gutenberg Editor Blocks test', () => {
-	it( 'should be able to create a post with all blocks and scroll to the last one', async () => {
-		await editorPage.setHtmlContent( initialHtml );
+describe( 'Gutenberg Editor Rendering Blocks test', () => {
+	it( 'should be able to set content with text blocks', async () => {
+		await editorPage.setHtmlContent( textBlocks );
 
 		// Scroll to the last element
 		const addBlockPlaceholder =
