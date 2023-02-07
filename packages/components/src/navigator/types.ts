@@ -15,9 +15,14 @@ type NavigateOptions = {
 export type NavigatorLocation = NavigateOptions & {
 	isInitial?: boolean;
 	isBack?: boolean;
-	path?: string;
+	path: string;
 	hasRestoredFocus?: boolean;
 };
+
+type PublicNavigatorLocation = Pick<
+	NavigatorLocation,
+	'path' | 'focusTargetSelector'
+>;
 
 export type NavigatorContext = {
 	location: NavigatorLocation;
@@ -29,6 +34,12 @@ export type NavigatorContext = {
 export type Navigator = NavigatorContext;
 
 export type NavigatorProviderProps = {
+	/**
+	 * The initial location history array.
+	 *
+	 * @default []
+	 */
+	initialLocationHistory?: PublicNavigatorLocation[];
 	/**
 	 * The initial active path.
 	 */

@@ -30,16 +30,25 @@ function UnconnectedNavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { initialPath, children, className, ...otherProps } =
-		useContextSystem( props, 'NavigatorProvider' );
+	const {
+		initialLocationHistory = [],
+		initialPath,
+		children,
+		className,
+		...otherProps
+	} = useContextSystem( props, 'NavigatorProvider' );
 
 	const [ locationHistory, setLocationHistory ] = useState<
 		NavigatorLocation[]
-	>( [
-		{
-			path: initialPath,
-		},
-	] );
+	>(
+		initialLocationHistory.length
+			? initialLocationHistory
+			: [
+					{
+						path: initialPath,
+					},
+			  ]
+	);
 
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
 		( path, options = {} ) => {
