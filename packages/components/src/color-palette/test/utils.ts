@@ -49,12 +49,7 @@ describe( 'ColorPalette: Utils', () => {
 		} );
 		test( 'should return the background color computed from a element if the color value is a CSS variable', () => {
 			const element = document.createElement( 'div' );
-			const { ownerDocument } = element;
-			const { defaultView } = ownerDocument;
-			// @ts-ignore
-			defaultView.getComputedStyle = () => ( {
-				backgroundColor: '#ff0000',
-			} );
+			element.style.backgroundColor = '#ff0000';
 			expect( normalizeColorValue( 'var(--red)', element ) ).toBe(
 				'#ff0000'
 			);
