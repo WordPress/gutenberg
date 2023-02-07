@@ -93,7 +93,7 @@ function NavigationMenuSelector( {
 		hasResolvedNavigationMenus && currentMenuId === null;
 
 	useEffect( () => {
-		if ( ! hasResolvedNavigationMenus ) {
+		if ( ! hasResolvedNavigationMenus && ! canUserCreateNavigationMenu ) {
 			setSelectorLabel( __( 'Loading …' ) );
 		} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
 			setSelectorLabel( __( 'Choose or create a Navigation menu' ) );

@@ -82,13 +82,14 @@ describe( 'NavigationMenuSelector', () => {
 	} );
 
 	describe( 'Dropdown', () => {
-		it( 'should show in loading state with no options when menus have not resolved', async () => {
+		it( 'should show in loading state with no options when menus have not resolved and user cannot create menus', async () => {
 			const user = userEvent.setup();
 
 			useNavigationMenu.mockReturnValue( {
 				navigationMenus: [],
 				isResolvingNavigationMenus: true,
 				hasResolvedNavigationMenus: false,
+				canUserCreateNavigationMenu: false,
 				canSwitchNavigationMenu: true,
 			} );
 
@@ -118,7 +119,7 @@ describe( 'NavigationMenuSelector', () => {
 			expect( toolsGroup ).not.toBeInTheDocument();
 		} );
 
-		it( 'should only show option to create a menu when no menus exist', async () => {
+		it( 'should show option to create a menu when no menus exist but user can create menus', async () => {
 			const user = userEvent.setup();
 
 			useNavigationMenu.mockReturnValue( {
@@ -134,6 +135,7 @@ describe( 'NavigationMenuSelector', () => {
 			const toggleButton = screen.getByRole( 'button', {
 				name: 'Choose or create a Navigation menu',
 			} );
+
 			await user.click( toggleButton );
 
 			const menuPopover = screen.getByRole( 'menu' );
