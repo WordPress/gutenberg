@@ -16,6 +16,8 @@
 -   `NavigatorButton`: Reuse `Button` types ([47754](https://github.com/WordPress/gutenberg/pull/47754)).
 -   `ToolsPanel`: Allow display of optional items when values are updated externally to item controls ([47727](https://github.com/WordPress/gutenberg/pull/47727)).
 -   `ToolsPanel`: Ensure display of optional items when values are updated externally and multiple blocks selected ([47864](https://github.com/WordPress/gutenberg/pull/47864)).
+-   `CustomSelectControl`: lock the `__experimentalShowSelectedHint` prop ([#47229](https://github.com/WordPress/gutenberg/pull/47229)).
+-   Lock the `__experimentalPopoverPositionToPlacement` function and rename it to `__experimentalPopoverLegacyPositionToPlacement` ([#47505](https://github.com/WordPress/gutenberg/pull/47505)).
 
 ## 23.3.0 (2023-02-01)
 
