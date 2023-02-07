@@ -301,8 +301,8 @@ Create a block object from the example API.
 
 _Parameters_
 
--   _name_ `string`:
--   _example_ `Object`:
+-   _name_ `string`: 
+-   _example_ `Object`: 
 
 _Returns_
 
@@ -648,7 +648,7 @@ Converts an HTML string to known blocks. Strips everything else.
 
 _Parameters_
 
--   _options_ `Object`:
+-   _options_ `Object`: 
 -   _options.HTML_ `[string]`: The HTML to convert.
 -   _options.plainText_ `[string]`: Plain text version.
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
@@ -665,7 +665,7 @@ Converts an HTML string to known blocks.
 
 _Parameters_
 
--   _$1_ `Object`:
+-   _$1_ `Object`: 
 -   _$1.HTML_ `string`: The HTML to convert.
 
 _Returns_
@@ -684,14 +684,14 @@ import { registerBlockCollection, registerBlockType } from '@wordpress/blocks';
 
 // Register the collection.
 registerBlockCollection( 'my-collection', {
-	title: __( 'Custom Collection' ),
+    title: __( 'Custom Collection' ),
 } );
 
 // Register a block in the same namespace to add it to the collection.
 registerBlockType( 'my-collection/block-name', {
-	title: __( 'My First Block' ),
-	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
-	save: () => <div>'Hello from the saved content!</div>,
+    title: __( 'My First Block' ),
+    edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
+    save: () => <div>'Hello from the saved content!</div>,
 } );
 ```
 
@@ -715,19 +715,20 @@ import { __ } from '@wordpress/i18n';
 import { registerBlockStyle } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 
+
 const ExampleComponent = () => {
-	return (
-		<Button
-			onClick={ () => {
-				registerBlockStyle( 'core/quote', {
-					name: 'fancy-quote',
-					label: __( 'Fancy Quote' ),
-				} );
-			} }
-		>
-			{ __( 'Add a new block style for core/quote' ) }
-		</Button>
-	);
+    return (
+        <Button
+            onClick={ () => {
+                registerBlockStyle( 'core/quote', {
+                    name: 'fancy-quote',
+                    label: __( 'Fancy Quote' ),
+                } );
+            } }
+        >
+            { __( 'Add a new block style for core/quote' ) }
+        </Button>
+    );
 };
 ```
 
@@ -748,12 +749,12 @@ _Usage_
 
 ```js
 import { __ } from '@wordpress/i18n';
-import { registerBlockType } from '@wordpress/blocks';
+import { registerBlockType } from '@wordpress/blocks'
 
 registerBlockType( 'namespace/block-name', {
-	title: __( 'My First Block' ),
-	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
-	save: () => <div>Hello from the saved content!</div>,
+    title: __( 'My First Block' ),
+    edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
+    save: () => <div>Hello from the saved content!</div>,
 } );
 ```
 
@@ -780,19 +781,19 @@ import { registerBlockVariation } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	return (
-		<Button
-			onClick={ () => {
-				registerBlockVariation( 'core/embed', {
-					name: 'custom',
-					title: __( 'My Custom Embed' ),
-					attributes: { providerNameSlug: 'custom' },
-				} );
-			} }
-		>
-			__( 'Add a custom variation for core/embed' ) }
-		</Button>
-	);
+    return (
+        <Button
+            onClick={ () => {
+                registerBlockVariation( 'core/embed', {
+                    name: 'custom',
+                    title: __( 'My Custom Embed' ),
+                    attributes: { providerNameSlug: 'custom' },
+                } );
+            } }
+         >
+             __( 'Add a custom variation for core/embed' ) }
+        </Button>
+    );
 };
 ```
 
@@ -851,25 +852,25 @@ import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	// Retrieve the list of current categories.
-	const blockCategories = useSelect(
-		( select ) => select( blocksStore ).getCategories(),
-		[]
-	);
+    // Retrieve the list of current categories.
+    const blockCategories = useSelect(
+        ( select ) => select( blocksStore ).getCategories(),
+        []
+    );
 
-	return (
-		<Button
-			onClick={ () => {
-				// Add a custom category to the existing list.
-				setCategories( [
-					...blockCategories,
-					{ title: 'Custom Category', slug: 'custom-category' },
-				] );
-			} }
-		>
-			{ __( 'Add a new custom block category' ) }
-		</Button>
-	);
+    return (
+        <Button
+            onClick={ () => {
+                // Add a custom category to the existing list.
+                setCategories( [
+                    ...blockCategories,
+                    { title: 'Custom Category', slug: 'custom-category' },
+                ] );
+            } }
+        >
+            { __( 'Add a new custom block category' ) }
+        </Button>
+    );
 };
 ```
 
@@ -887,11 +888,12 @@ _Usage_
 import { setDefaultBlockName } from '@wordpress/blocks';
 
 const ExampleComponent = () => {
-	return (
-		<Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
-			{ __( 'Set the default block to Heading' ) }
-		</Button>
-	);
+
+    return (
+        <Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
+            { __( 'Set the default block to Heading' ) }
+        </Button>
+    );
 };
 ```
 
@@ -917,11 +919,12 @@ _Usage_
 import { setGroupingBlockName } from '@wordpress/blocks';
 
 const ExampleComponent = () => {
-	return (
-		<Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
-			{ __( 'Set the default block to Heading' ) }
-		</Button>
-	);
+
+    return (
+        <Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
+            { __( 'Set the default block to Heading' ) }
+        </Button>
+    );
 };
 ```
 
@@ -992,15 +995,15 @@ import { unregisterBlockStyle } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	return (
-		<Button
-			onClick={ () => {
-				unregisterBlockStyle( 'core/quote', 'plain' );
-			} }
-		>
-			{ __( 'Remove the "Plain" block style for core/quote' ) }
-		</Button>
-	);
+    return (
+    <Button
+        onClick={ () => {
+            unregisterBlockStyle( 'core/quote', 'plain' );
+        } }
+    >
+        { __( 'Remove the "Plain" block style for core/quote' ) }
+    </Button>
+    );
 };
 ```
 
@@ -1020,13 +1023,15 @@ import { __ } from '@wordpress/i18n';
 import { unregisterBlockType } from '@wordpress/blocks';
 
 const ExampleComponent = () => {
-	return (
-		<Button
-			onClick={ () => unregisterBlockType( 'my-collection/block-name' ) }
-		>
-			{ __( 'Unregister my custom block.' ) }
-		</Button>
-	);
+    return (
+        <Button
+            onClick={ () =>
+                unregisterBlockType( 'my-collection/block-name' )
+            }
+        >
+            { __( 'Unregister my custom block.' ) }
+        </Button>
+    );
 };
 ```
 
@@ -1050,15 +1055,15 @@ import { unregisterBlockVariation } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	return (
-		<Button
-			onClick={ () => {
-				unregisterBlockVariation( 'core/embed', 'youtube' );
-			} }
-		>
-			{ __( 'Remove the YouTube variation from core/embed' ) }
-		</Button>
-	);
+    return (
+        <Button
+            onClick={ () => {
+                unregisterBlockVariation( 'core/embed', 'youtube' );
+            } }
+        >
+            { __( 'Remove the YouTube variation from core/embed' ) }
+        </Button>
+    );
 };
 ```
 
@@ -1079,15 +1084,15 @@ import { updateCategory } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	return (
-		<Button
-			onClick={ () => {
-				updateCategory( 'text', { title: __( 'Written Word' ) } );
-			} }
-		>
-			{ __( 'Update Text category title' ) }
-		</Button>
-	);
+    return (
+        <Button
+            onClick={ () => {
+                updateCategory( 'text', { title: __( 'Written Word' ) } );
+            } }
+        >
+            { __( 'Update Text category title' ) }
+        </Button>
+)    ;
 };
 ```
 
@@ -1114,7 +1119,7 @@ _Returns_
 
 ### withBlockContentContext
 
-> **Deprecated**
+> **Deprecated** 
 
 A Higher Order Component used to inject BlockContent using context to the
 wrapped component.
@@ -1126,6 +1131,7 @@ _Parameters_
 _Returns_
 
 -   `WPComponent`: The same component.
+
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

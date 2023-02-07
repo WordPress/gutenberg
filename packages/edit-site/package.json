@@ -39,7 +39,7 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
-		"@wordpress/experiments": "file:../experiments",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",

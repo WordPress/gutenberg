@@ -32,7 +32,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
-		"@wordpress/experiments": "file:../experiments",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/redux-routine": "file:../redux-routine",

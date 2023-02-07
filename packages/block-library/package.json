@@ -46,7 +46,7 @@
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
-		"@wordpress/experiments": "file:../experiments",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
