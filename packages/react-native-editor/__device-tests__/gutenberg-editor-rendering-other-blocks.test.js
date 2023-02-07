@@ -3,8 +3,8 @@
  */
 import { otherBlocks } from '../src/initial-html';
 
-describe( 'Gutenberg Editor Rendering Blocks test', () => {
-	it( 'should be able to set content with other blocks', async () => {
+describe( 'Gutenberg Editor Rendering Other Blocks test', () => {
+	it( 'should be able to render blocks correctly', async () => {
 		await editorPage.setHtmlContent( otherBlocks );
 
 		// Scroll to the last element.
