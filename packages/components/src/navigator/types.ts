@@ -17,16 +17,27 @@ export type NavigatorLocation = NavigateOptions & {
 	isBack?: boolean;
 	path?: string;
 	hasRestoredFocus?: boolean;
+	restoreFocusTo?: string;
 };
 
 export type NavigatorContext = {
 	location: NavigatorLocation;
+	params: any;
+	match?: string;
 	goTo: ( path: string, options?: NavigateOptions ) => void;
 	goBack: () => void;
+	addScreen: ( screen: NavigatorScreen ) => void;
+	removeScreen: ( screen: NavigatorScreen ) => void;
 };
 
 // Returned by the `useNavigator` hook.
-export type Navigator = NavigatorContext;
+export type Navigator = {
+	location: NavigatorLocation;
+	params: any;
+	match?: string;
+	goTo: ( path: string, options?: NavigateOptions ) => void;
+	goBack: () => void;
+};
 
 export type NavigatorProviderProps = {
 	/**
@@ -65,4 +76,9 @@ export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	 * @default 'id'
 	 */
 	attributeName?: string;
+};
+
+export type NavigatorScreen = {
+	id: string;
+	path: string;
 };

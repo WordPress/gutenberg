@@ -7,7 +7,15 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	useCallback,
+	useReducer,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -24,7 +32,28 @@ import type {
 	NavigatorProviderProps,
 	NavigatorLocation,
 	NavigatorContext as NavigatorContextType,
+	NavigatorScreen as NavigatorScreenType,
 } from '../types';
+import { patternMatch } from '../utils/router';
+
+type MatchedPath = { params: object; id: string } | false;
+type ScreenAction = { type: string; screen: NavigatorScreenType };
+
+function screensReducer(
+	state: NavigatorScreenType[] = [],
+	action: ScreenAction
+): NavigatorScreenType[] {
+	switch ( action.type ) {
+		case 'add':
+			return [ ...state, action.screen ];
+		case 'remove':
+			return state.filter(
+				( s: NavigatorScreenType ) => s.id !== action.screen.id
+			);
+	}
+
+	return state;
+}
 
 function UnconnectedNavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
@@ -40,6 +69,49 @@ function UnconnectedNavigatorProvider(
 			path: initialPath,
 		},
 	] );
+	const [ screens, dispatch ] = useReducer( screensReducer, [] );
+	const [ matchedPath, setMatchedPath ] = useState< MatchedPath >( false );
+	const currentMatch = useRef< MatchedPath >( false );
+
+	useEffect( () => {
+		const updateMatch = ( newMatch: MatchedPath ) => {
+			setMatchedPath( newMatch );
+			currentMatch.current = newMatch;
+		};
+
+		const resolvePath = ( path: string ) => {
+			const newMatch = patternMatch( path, screens );
+			if (
+				currentMatch.current !== false &&
+				newMatch !== false &&
+				isShallowEqual( newMatch, currentMatch.current )
+			) {
+				return;
+			}
+
+			updateMatch( newMatch );
+		};
+
+		if ( locationHistory.length > 0 ) {
+			const path = locationHistory[ locationHistory.length - 1 ].path;
+			if ( path !== undefined ) {
+				resolvePath( path );
+			} else {
+				updateMatch( false );
+			}
+		}
+	}, [ screens, locationHistory ] );
+
+	const addScreen = useCallback(
+		( screen: NavigatorScreenType ) => dispatch( { type: 'add', screen } ),
+		[]
+	);
+
+	const removeScreen = useCallback(
+		( screen: NavigatorScreenType ) =>
+			dispatch( { type: 'remove', screen } ),
+		[]
+	);
 
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
 		( path, options = {} ) => {
@@ -67,6 +139,9 @@ function UnconnectedNavigatorProvider(
 					...prevLocationHistory[ prevLocationHistory.length - 2 ],
 					isBack: true,
 					hasRestoredFocus: false,
+					restoreFocusTo:
+						prevLocationHistory[ prevLocationHistory.length - 1 ]
+							.focusTargetSelector,
 				},
 			];
 		} );
@@ -78,10 +153,14 @@ function UnconnectedNavigatorProvider(
 				...locationHistory[ locationHistory.length - 1 ],
 				isInitial: locationHistory.length === 1,
 			},
+			params: matchedPath !== false ? matchedPath.params : {},
+			match: matchedPath !== false ? matchedPath.id : undefined,
 			goTo,
 			goBack,
+			addScreen,
+			removeScreen,
 		} ),
-		[ locationHistory, goTo, goBack ]
+		[ locationHistory, matchedPath, goTo, goBack, addScreen, removeScreen ]
 	);
 
 	const cx = useCx();

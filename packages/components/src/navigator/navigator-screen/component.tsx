@@ -5,17 +5,14 @@ import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { motion, MotionProps } from 'framer-motion';
 import { css } from '@emotion/react';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
 import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
-import {
-	useReducedMotion,
-	useMergeRefs,
-	usePrevious,
-} from '@wordpress/compose';
+import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
 
@@ -48,17 +45,26 @@ function UnconnectedNavigatorScreen(
 	props: Props,
 	forwardedRef: ForwardedRef< any >
 ) {
+	const screenId = useRef( uuid() );
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
 	);
 
 	const prefersReducedMotion = useReducedMotion();
-	const { location } = useContext( NavigatorContext );
-	const isMatch = location.path === escapeAttribute( path );
+	const { location, match, addScreen, removeScreen } =
+		useContext( NavigatorContext );
+	const isMatch = match === screenId.current;
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
-	const previousLocation = usePrevious( location );
+	useEffect( () => {
+		const screen = {
+			id: screenId.current,
+			path: escapeAttribute( path ),
+		};
+		addScreen( screen );
+		return () => removeScreen( screen );
+	}, [ path, addScreen, removeScreen ] );
 
 	const cx = useCx();
 	const classes = useMemo(
@@ -110,9 +116,9 @@ function UnconnectedNavigatorScreen(
 
 		// When navigating back, if a selector is provided, use it to look for the
 		// target element (assumed to be a node inside the current NavigatorScreen)
-		if ( location.isBack && previousLocation?.focusTargetSelector ) {
+		if ( location.isBack && location?.restoreFocusTo ) {
 			elementToFocus = wrapperRef.current.querySelector(
-				previousLocation.focusTargetSelector
+				location.restoreFocusTo
 			);
 		}
 
@@ -131,7 +137,7 @@ function UnconnectedNavigatorScreen(
 		isInitialLocation,
 		isMatch,
 		location.isBack,
-		previousLocation?.focusTargetSelector,
+		location.restoreFocusTo,
 	] );
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
