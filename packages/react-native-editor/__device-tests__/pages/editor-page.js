@@ -821,6 +821,7 @@ const blockNames = {
 	spacer: 'Spacer',
 	verse: 'Verse',
 	shortcode: 'Shortcode',
+	group: 'Group',
 };
 
 module.exports = { initializeEditorPage, blockNames };
