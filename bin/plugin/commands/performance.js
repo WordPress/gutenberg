@@ -88,7 +88,11 @@ const config = require( '../config' );
  * @return {number} Average.
  */
 function average( array ) {
-	return array.reduce( ( a, b ) => a + b, 0 ) / array.length;
+	// Try returning the minimum value.
+	return array.length > 3
+		? array.slice().sort().slice( 3 )[ 0 ]
+		: array.slice().sort()[ 0 ];
+	// return array.reduce( ( a, b ) => a + b, 0 ) / array.length;
 }
 
 /**
