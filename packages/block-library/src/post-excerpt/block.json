@@ -16,6 +16,9 @@
 		"showMoreOnNewLine": {
 			"type": "boolean",
 			"default": true
+		},
+		"addMoreText": {
+			"type": "boolean"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
