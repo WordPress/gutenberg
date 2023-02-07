@@ -271,10 +271,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'layout definitions' => array(
 				array(
 					'default' => array(
-						'name'           => 'default',
-						'slug'           => 'flow',
-						'className'      => 'is-layout-flow',
-						'baseStyles'     => array(
+						'name'          => 'default',
+						'slug'          => 'flow',
+						'className'     => 'is-layout-flow',
+						'baseStyles'    => array(
 							array(
 								'selector' => ' > .alignleft',
 								'rules'    => array(
@@ -299,7 +299,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'spacingStyles'  => array(
+						'spacingStyles' => array(
 							array(
 								'selector' => ' > *',
 								'rules'    => array(
@@ -315,7 +315,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'marginStyles' => array(
+						'marginStyles'  => array(
 							array(
 								'selector' => ' > ',
 								'rules'    => array(

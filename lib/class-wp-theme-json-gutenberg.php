@@ -1289,14 +1289,14 @@ class WP_Theme_JSON_Gutenberg {
 										if ( is_string( $css_value ) ) {
 											if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
 												$declarations[] = array(
-													'name'  => $css_property,
+													'name' => $css_property,
 													'value' => $css_value,
 												);
 											}
 										} elseif ( isset( $margin_styles['declarations'][ $css_property ] ) ) {
 											if ( static::is_safe_css_declaration( $css_property, $margin_styles['declarations'][ $css_property ] ) ) {
 												$declarations[] = array(
-													'name'  => $css_property,
+													'name' => $css_property,
 													'value' => $margin_styles['declarations'][ $css_property ],
 												);
 											}
