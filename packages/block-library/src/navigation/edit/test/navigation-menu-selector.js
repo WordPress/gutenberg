@@ -220,7 +220,7 @@ describe( 'NavigationMenuSelector', () => {
 				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 			} );
 
-			it( 'should disable the create menu button when the menu is loading', async () => {
+			it( 'should handle disabled state of the create menu button during the creation process', async () => {
 				const user = userEvent.setup();
 				const handler = jest.fn();
 
