@@ -96,7 +96,7 @@ function NavigationMenuSelector( {
 		if ( ! hasResolvedNavigationMenus ) {
 			setSelectorLabel( __( 'Loading …' ) );
 		} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
-			setSelectorLabel( __( 'Choose a Navigation menu' ) );
+			setSelectorLabel( __( 'Choose or create a Navigation menu' ) );
 		}
 
 		if (

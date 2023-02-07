@@ -75,7 +75,7 @@ describe( 'NavigationMenuSelector', () => {
 
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Choose a Navigation menu',
+					name: 'Choose or create a Navigation menu',
 				} )
 			).toBeInTheDocument();
 		} );
@@ -132,7 +132,7 @@ describe( 'NavigationMenuSelector', () => {
 			render( <NavigationMenuSelector /> );
 
 			const toggleButton = screen.getByRole( 'button', {
-				name: 'Choose a Navigation menu',
+				name: 'Choose or create a Navigation menu',
 			} );
 			await user.click( toggleButton );
 
@@ -140,7 +140,7 @@ describe( 'NavigationMenuSelector', () => {
 
 			expect( menuPopover ).toHaveAttribute(
 				'aria-label',
-				expect.stringContaining( 'Choose a Navigation menu' )
+				expect.stringContaining( 'Choose or create a Navigation menu' )
 			);
 
 			// Check that all the option groups are *not* present.
