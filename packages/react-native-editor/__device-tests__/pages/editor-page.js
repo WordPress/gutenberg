@@ -839,6 +839,8 @@ const blockNames = {
 	spacer: 'Spacer',
 	verse: 'Verse',
 	shortcode: 'Shortcode',
+	buttons: 'Buttons',
+	button: 'Button',
 };
 
 module.exports = { initializeEditorPage, blockNames };
