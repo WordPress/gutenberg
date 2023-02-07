@@ -82,7 +82,7 @@ div[data-type="core/button"] {
 
 .editor-styles-wrapper .wp-block-button .wp-block-button__link {
 	// The following styles smooth out the experience editing borders for individual
-	// buttons. They override the `button-width: 0;` applied by core's theme.json
+	// buttons. They override the `border-width: 0;` applied by core's theme.json
 	// via the Elements API button.
 	&:where(.has-border-color) {
 		border-width: initial;
