@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import type { ButtonProps } from '../button/types';
+
 export type PanelProps = {
 	/**
 	 * The text that will be rendered as the title of the panel.
@@ -43,7 +48,7 @@ export type PanelBodyProps = {
 	 *
 	 * @default {};
 	 */
-	buttonProps?: object;
+	buttonProps?: ButtonProps;
 	/**
 	 * The content to display within the panel body.
 	 *  If the children is a Function, it will be called with an object with the opened property and return its value.
@@ -87,9 +92,19 @@ export type PanelBodyProps = {
 
 export type PanelBodyTitleProps = {
 	/**
+	 * Props that are passed to the Button component in the PanelBodyTitle within the panel body.
+	 *
+	 * @default {};
+	 */
+	buttonProps?: ButtonProps;
+	/**
+	 * An icon to be shown next to the PanelBody title.
+	 */
+	icon?: JSX.Element;
+	/**
 	 * Whether or not the panel body is currently opened or not.
 	 */
-	isOpened?: boolean | '';
+	isOpened?: boolean;
 	/**
 	 * A callback invoked when 'PanelBodyTitle' is clicked. It is used to
 	 * toggle the body opened or closed.

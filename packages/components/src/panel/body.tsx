@@ -23,7 +23,10 @@ import { useControlledState, useUpdateEffect } from '../utils';
 const noop = () => {};
 
 export function UnforwardedPanelBody(
-	{
+	props: PanelBodyProps,
+	ref: ForwardedRef< HTMLDivElement >
+) {
+	const {
 		buttonProps = {},
 		children,
 		className,
@@ -33,13 +36,14 @@ export function UnforwardedPanelBody(
 		opened,
 		title,
 		scrollAfterOpen = true,
-	}: PanelBodyProps,
-	ref: ForwardedRef< HTMLDivElement >
-) {
-	const [ isOpened, setIsOpened ] = useControlledState( opened, {
-		initial: initialOpen === undefined ? true : initialOpen,
-		fallback: '',
-	} );
+	} = props;
+	const [ isOpened, setIsOpened ] = useControlledState< boolean | undefined >(
+		opened,
+		{
+			initial: initialOpen === undefined ? true : initialOpen,
+			fallback: false,
+		}
+	);
 	const nodeRef = useRef< HTMLElement >( null );
 
 	// Defaults to 'smooth' scrolling
@@ -84,10 +88,10 @@ export function UnforwardedPanelBody(
 		<div className={ classes } ref={ useMergeRefs( [ nodeRef, ref ] ) }>
 			<PanelBodyTitle
 				icon={ icon }
-				isOpened={ isOpened }
+				isOpened={ Boolean( isOpened ) }
 				onClick={ handleOnToggle }
 				title={ title }
-				{ ...buttonProps }
+				buttonProps={ buttonProps }
 			/>
 			{ typeof children === 'function'
 				? children( { opened: isOpened } )
@@ -102,9 +106,8 @@ const PanelBodyTitle = forwardRef(
 			isOpened,
 			icon,
 			title,
-			...props
-		}: WordPressComponentProps< PanelBodyTitleProps, 'h2' > &
-			PanelBodyProps,
+			buttonProps,
+		}: WordPressComponentProps< PanelBodyTitleProps, 'button' >,
 		ref: ForwardedRef< any >
 	) => {
 		if ( ! title ) return null;
@@ -115,7 +118,7 @@ const PanelBodyTitle = forwardRef(
 					className="components-panel__body-toggle"
 					aria-expanded={ isOpened }
 					ref={ ref }
-					{ ...props }
+					{ ...buttonProps }
 				>
 					{ /*
 					Firefox + NVDA don't announce aria-expanded because the browser
