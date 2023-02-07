@@ -197,7 +197,7 @@ describe( 'NavigationMenuSelector', () => {
 			} );
 		} );
 
-		describe( 'Navigation menus listing', () => {
+		describe( 'Navigation menus', () => {
 			it( 'should not show a list of menus when menus exist but user does not have permission to switch menus', async () => {
 				const user = userEvent.setup();
 
@@ -293,6 +293,39 @@ describe( 'NavigationMenuSelector', () => {
 						name: '(no title 2)',
 					} )
 				).toBeInTheDocument();
+			} );
+
+			it( 'should correctly call handler when navigation menu item is clicked', async () => {
+				const user = userEvent.setup();
+
+				const clickHandler = jest.fn();
+
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: navigationMenusFixture,
+					isResolvingNavigationMenus: false,
+					hasResolvedNavigationMenus: true,
+					canUserCreateNavigationMenu: true,
+					canSwitchNavigationMenu: true,
+				} );
+
+				render(
+					<NavigationMenuSelector
+						onSelectNavigationMenu={ clickHandler }
+					/>
+				);
+
+				const toggleButton = screen.getByRole( 'button' );
+				await user.click( toggleButton );
+
+				const menuItem = screen.getByRole( 'menuitemradio', {
+					name: navigationMenusFixture[ 0 ].title.rendered,
+				} );
+
+				await user.click( menuItem );
+
+				expect( clickHandler ).toHaveBeenCalledWith(
+					navigationMenusFixture[ 0 ].id
+				);
 			} );
 		} );
 	} );
