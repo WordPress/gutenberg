@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `NavigatorButton`: Reuse `Button` types ([47754](https://github.com/WordPress/gutenberg/pull/47754)).
+
 ## 23.3.0 (2023-02-01)
 
 ### Deprecations
