@@ -157,18 +157,6 @@
 	svg {
 		fill: $white;
 	}
-
-	&.is-customized::after {
-		position: absolute;
-		content: "";
-		background: var(--wp-admin-theme-color);
-		height: $grid-unit-10;
-		width: $grid-unit-10;
-		outline: 2px solid $white;
-		border-radius: 100%;
-		top: -1px;
-		right: -1px;
-	}
 }
 
 .edit-site-list-added-by__avatar {

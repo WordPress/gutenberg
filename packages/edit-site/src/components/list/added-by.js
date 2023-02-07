@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHStack as HStack,
-	Icon,
-	Tooltip,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -20,56 +16,31 @@ import {
 	plugins as pluginIcon,
 	globe as globeIcon,
 } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
 
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
 
-function CustomizedTooltip( { isCustomized, children } ) {
-	if ( ! isCustomized ) {
-		return children;
-	}
-
-	return (
-		<Tooltip text={ __( 'This template has been customized' ) }>
-			{ children }
-		</Tooltip>
-	);
-}
-
-function BaseAddedBy( { text, icon, imageUrl, isCustomized } ) {
+function BaseAddedBy( { text, icon, imageUrl } ) {
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 
 	return (
 		<HStack alignment="left">
-			<CustomizedTooltip isCustomized={ isCustomized }>
-				{ imageUrl ? (
-					<div
-						className={ classnames(
-							'edit-site-list-added-by__avatar',
-							{
-								'is-loaded': isImageLoaded,
-							}
-						) }
-					>
-						<img
-							onLoad={ () => setIsImageLoaded( true ) }
-							alt=""
-							src={ imageUrl }
-						/>
-					</div>
-				) : (
-					<div
-						className={ classnames(
-							'edit-site-list-added-by__icon',
-							{
-								'is-customized': isCustomized,
-							}
-						) }
-					>
-						<Icon icon={ icon } />
-					</div>
-				) }
-			</CustomizedTooltip>
+			{ imageUrl ? (
+				<div
+					className={ classnames( 'edit-site-list-added-by__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
+				>
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt=""
+						src={ imageUrl }
+					/>
+				</div>
+			) : (
+				<div className="edit-site-list-added-by__icon">
+					<Icon icon={ icon } />
+				</div>
+			) }
 			<span>{ text }</span>
 		</HStack>
 	);
