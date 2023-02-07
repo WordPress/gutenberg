@@ -38,6 +38,7 @@ describe( 'NavigationMenuSelector', () => {
 				navigationMenus: [],
 				isResolvingNavigationMenus: false,
 				hasResolvedNavigationMenus: true,
+				canUserCreateNavigationMenu: true,
 			} );
 
 			render( <NavigationMenuSelector /> );
@@ -52,7 +53,7 @@ describe( 'NavigationMenuSelector', () => {
 	} );
 
 	describe( 'Dropdown', () => {
-		it( 'should show dropdown with loading message when menus have not resolved', async () => {
+		it( 'should show in loading state with no options when menus have not resolved', async () => {
 			const user = userEvent.setup();
 
 			useNavigationMenu.mockReturnValue( {
@@ -71,6 +72,63 @@ describe( 'NavigationMenuSelector', () => {
 				'aria-label',
 				expect.stringContaining( 'Loading' )
 			);
+
+			// Check that all the option groups are *not* present.
+			const menusGroup = screen.queryByRole( 'group', { name: 'Menus' } );
+			expect( menusGroup ).not.toBeInTheDocument();
+
+			const classicMenusGroup = screen.queryByRole( 'group', {
+				name: 'Import Classic Menus',
+			} );
+			expect( classicMenusGroup ).not.toBeInTheDocument();
+
+			const toolsGroup = screen.queryByRole( 'group', {
+				name: 'Tools',
+			} );
+			expect( toolsGroup ).not.toBeInTheDocument();
+		} );
+
+		it( 'should only show option to create a menu when no menus exist', async () => {
+			const user = userEvent.setup();
+
+			useNavigationMenu.mockReturnValue( {
+				navigationMenus: [],
+				isResolvingNavigationMenus: false,
+				hasResolvedNavigationMenus: true,
+				canUserCreateNavigationMenu: true,
+			} );
+
+			render( <NavigationMenuSelector /> );
+
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
+
+			const menuPopover = screen.getByRole( 'menu' );
+
+			expect( menuPopover ).toHaveAttribute(
+				'aria-label',
+				expect.stringContaining( 'Choose a Navigation menu' )
+			);
+
+			// Check that all the option groups are *not* present.
+			const menusGroup = screen.queryByRole( 'group', { name: 'Menus' } );
+			expect( menusGroup ).not.toBeInTheDocument();
+
+			const classicMenusGroup = screen.queryByRole( 'group', {
+				name: 'Import Classic Menus',
+			} );
+			expect( classicMenusGroup ).not.toBeInTheDocument();
+
+			const toolsGroup = screen.queryByRole( 'group', {
+				name: 'Tools',
+			} );
+			expect( toolsGroup ).toBeInTheDocument();
+
+			const createMenuButton = screen.getByRole( 'menuitem', {
+				name: 'Create new menu',
+			} );
+
+			expect( createMenuButton ).toBeInTheDocument();
 		} );
 	} );
 } );
