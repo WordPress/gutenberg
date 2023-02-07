@@ -105,7 +105,9 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 			$rels[] = 'https://api.w.org/action-publish';
 		}
 
-		if ( current_user_can( 'edit_css' ) ) {
+		$can_user_edit_css = apply_filters( 'enable_global_styles_custom_css', current_user_can( 'edit_css' ) );
+
+		if ( $can_user_edit_css ) {
 			$rels[] = 'https://api.w.org/action-edit-css';
 		}
 

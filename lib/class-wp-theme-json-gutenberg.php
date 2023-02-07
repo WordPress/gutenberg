@@ -2867,6 +2867,8 @@ class WP_Theme_JSON_Gutenberg {
 		$blocks_metadata = static::get_blocks_metadata();
 		$style_nodes     = static::get_style_nodes( $theme_json, $blocks_metadata );
 
+		$can_user_edit_global_custom_css = apply_filters( 'enable_global_styles_custom_css', current_user_can( 'edit_css' ) );
+
 		foreach ( $style_nodes as $metadata ) {
 			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
 			if ( empty( $input ) ) {
@@ -2874,7 +2876,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			// The global styles custom CSS is not sanitized, but can only be edited by users with 'edit_css' capability.
-			if ( isset( $input['css'] ) && current_user_can( 'edit_css' ) ) {
+			if ( isset( $input['css'] ) && $can_user_edit_global_custom_css ) {
 				$output = $input;
 			} else {
 				$output = static::remove_insecure_styles( $input );
