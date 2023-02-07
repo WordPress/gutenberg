@@ -28,7 +28,7 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
  * Internal dependencies
  */
 import { useSupportedStyles } from './hooks';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 

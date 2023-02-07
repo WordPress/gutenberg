@@ -37,7 +37,7 @@ import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import StyleBook from '../style-book';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorExperiments );
 

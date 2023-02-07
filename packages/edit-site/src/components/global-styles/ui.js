@@ -37,7 +37,7 @@ import { ScreenVariation } from './screen-variations';
 import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 import ScreenEffects from './screen-effects';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
