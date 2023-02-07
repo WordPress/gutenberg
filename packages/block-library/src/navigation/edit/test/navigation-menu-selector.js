@@ -190,27 +190,56 @@ describe( 'NavigationMenuSelector', () => {
 			expect( toolsGroup ).not.toBeInTheDocument();
 		} );
 
-		it( 'should show a list of menus when menus exist', async () => {
-			const user = userEvent.setup();
+		describe( 'Navigation menus listing', () => {
+			it( 'should show a list of menus when menus exist', async () => {
+				const user = userEvent.setup();
 
-			useNavigationMenu.mockReturnValue( {
-				navigationMenus: navigationMenusFixture,
-				isResolvingNavigationMenus: false,
-				hasResolvedNavigationMenus: true,
-				canUserCreateNavigationMenu: false,
-				canSwitchNavigationMenu: true,
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: navigationMenusFixture,
+					isResolvingNavigationMenus: false,
+					hasResolvedNavigationMenus: true,
+					canUserCreateNavigationMenu: false,
+					canSwitchNavigationMenu: true,
+				} );
+
+				render( <NavigationMenuSelector /> );
+
+				const toggleButton = screen.getByRole( 'button' );
+				await user.click( toggleButton );
+
+				const menusGroup = screen.queryByRole( 'group', {
+					name: 'Menus',
+				} );
+				expect( menusGroup ).toBeInTheDocument();
+
+				navigationMenusFixture.forEach( ( item ) => {
+					const menuItem = screen.queryByRole( 'menuitemradio', {
+						name: item?.title?.rendered,
+					} );
+					expect( menuItem ).toBeInTheDocument();
+				} );
 			} );
 
-			render( <NavigationMenuSelector /> );
+			it( 'should not show a list of menus when menus exist but user does not have permission to switch menus', async () => {
+				const user = userEvent.setup();
 
-			const toggleButton = screen.getByRole( 'button' );
-			await user.click( toggleButton );
-
-			navigationMenusFixture.forEach( ( item ) => {
-				const menuItem = screen.queryByRole( 'menuitemradio', {
-					name: item?.title?.rendered,
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: navigationMenusFixture,
+					isResolvingNavigationMenus: false,
+					hasResolvedNavigationMenus: true,
+					canUserCreateNavigationMenu: true,
+					canSwitchNavigationMenu: false,
 				} );
-				expect( menuItem ).toBeInTheDocument();
+
+				render( <NavigationMenuSelector /> );
+
+				const toggleButton = screen.getByRole( 'button' );
+				await user.click( toggleButton );
+
+				const menusGroup = screen.queryByRole( 'group', {
+					name: 'Menus',
+				} );
+				expect( menusGroup ).not.toBeInTheDocument();
 			} );
 		} );
 	} );
