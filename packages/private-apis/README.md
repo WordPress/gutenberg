@@ -9,7 +9,7 @@ Every `@wordpress` package wanting to privately access or expose experimental AP
 
 ```js
 // In packages/block-editorwordpress/private-apis.js:
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from './private-apis';
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
 		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
@@ -56,7 +56,7 @@ Use `lock()` and `unlock()` to privately distribute the `__experimental` APIs ac
 
 ```js
 // In packages/package1/index.js:
-import { lock } from '@wordpress/private-apis';
+import { lock } from './private-apis';
 
 export const experiments = {};
 /* Attach private data to the exported object */
@@ -66,7 +66,7 @@ lock(experiments, {
 
 // In packages/package2/index.js:
 import { experiments } from '@wordpress/package1';
-import { unlock } from '@wordpress/private-apis';
+import { unlock } from './private-apis';
 
 const {
 	__experimentalFunction

@@ -9,7 +9,7 @@ import deprecated from '@wordpress/deprecated';
 import createReduxStore from './redux-store';
 import coreDataStore from './store';
 import { createEmitter } from './utils/emitter';
-import { lock, unlock } from '@wordpress/private-apis';
+import { lock, unlock } from './private-apis';
 
 /** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from './private-apis';
 
 /**
  * Internal dependencies

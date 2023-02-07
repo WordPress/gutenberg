@@ -21,7 +21,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
-import { unlock } from '@wordpress/private-apis';
+import { unlock } from './private-apis';
 
 const { ExperimentalEditorProvider } = unlock( editorExperiments );
 
