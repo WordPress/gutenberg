@@ -808,6 +808,16 @@ class EditorPage {
 		const resizedImage = await image.resize( 320, jimp.AUTO );
 		return resizedImage.getBufferAsync( jimp.MIME_PNG );
 	}
+
+	// Set the device's UI appearance style, i.e. light/dark mode. Only available on iOS platform.
+	// Appearance values can be 'light' or 'dark'.
+	async setDeviceAppearance( appearance = 'light' ) {
+		if ( ! isAndroid() ) {
+			await this.driver.execute( 'mobile: setAppearance', {
+				style: appearance,
+			} );
+		}
+	}
 }
 
 const blockNames = {
