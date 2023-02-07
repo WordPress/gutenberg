@@ -7,7 +7,6 @@ import {
 	MenuItemsChoice,
 	DropdownMenu,
 } from '@wordpress/components';
-import { useEntityProp } from '@wordpress/core-data';
 import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -46,12 +45,6 @@ function NavigationMenuSelector( {
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
-	const [ currentTitle ] = useEntityProp(
-		'postType',
-		'wp_navigation',
-		'title'
-	);
-
 	const menuChoices = useMemo( () => {
 		return (
 			navigationMenus?.map( ( { id, title }, index ) => {
@@ -73,14 +66,7 @@ function NavigationMenuSelector( {
 				};
 			} ) || []
 		);
-	}, [
-		currentTitle,
-		currentMenuId,
-		navigationMenus,
-		createNavigationMenuIsSuccess,
-		isNavigationMenuResolved,
-		hasResolvedNavigationMenus,
-	] );
+	}, [ currentMenuId, navigationMenus, actionLabel ] );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
