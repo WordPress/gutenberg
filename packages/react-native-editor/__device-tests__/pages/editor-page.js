@@ -291,6 +291,27 @@ class EditorPage {
 		await navigateUpButton.click();
 	}
 
+	// Adds a block by tapping on the appender button of blocks with inner blocks (e.g. Group block)
+	async addBlockUsingAppender( block, blockName ) {
+		const appenderButton = await block.elementByAccessibilityId(
+			'appender-button'
+		);
+		await appenderButton.click();
+
+		// Click on block of choice.
+		const blockButton = await this.findBlockButton( blockName );
+
+		if ( isAndroid() ) {
+			await blockButton.click();
+		} else {
+			await this.driver.execute( 'mobile: tap', {
+				element: blockButton,
+				x: 10,
+				y: 10,
+			} );
+		}
+	}
+
 	// =========================
 	// Block toolbar functions
 	// =========================
