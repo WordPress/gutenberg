@@ -34,7 +34,7 @@ function render_block_core_cover( $attributes, $content ) {
 
 		/*
 		 * Inserts the featured image between the (1st) cover 'background' `span` and 'inner_container' `div`,
-		 * and removes eventual withespace characters between the two (typically introduced at template level)
+		 * and removes eventual whitespace characters between the two (typically introduced at template level)
 		 */
 		$inner_container_start = '/<div\b[^>]+wp-block-cover__inner-container[\s|"][^>]*>/U';
 		if ( 1 === preg_match( $inner_container_start, $content, $matches, PREG_OFFSET_CAPTURE ) ) {
