@@ -55,13 +55,14 @@ describe( 'NavigationMenuSelector', () => {
 
 			render( <NavigationMenuSelector /> );
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'aria-label',
-				expect.stringContaining( 'Loading' )
-			);
+			expect(
+				screen.getByRole( 'button', {
+					name: /Loading/,
+				} )
+			).toBeInTheDocument();
 		} );
 
-		it( 'should show dropdown toggle correct prompt when navigation menus have resolved', async () => {
+		it( 'should show correct dropdown toggle prompt to choose a menu when navigation menus have resolved', async () => {
 			useNavigationMenu.mockReturnValue( {
 				navigationMenus: [],
 				isResolvingNavigationMenus: false,
@@ -72,12 +73,11 @@ describe( 'NavigationMenuSelector', () => {
 
 			render( <NavigationMenuSelector /> );
 
-			const button = screen.getByRole( 'button' );
-
-			expect( button ).toHaveAttribute(
-				'aria-label',
-				'Choose a Navigation menu'
-			);
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Choose a Navigation menu',
+				} )
+			).toBeInTheDocument();
 		} );
 	} );
 
@@ -94,14 +94,14 @@ describe( 'NavigationMenuSelector', () => {
 
 			render( <NavigationMenuSelector /> );
 
-			const button = screen.getByRole( 'button' );
-			await user.click( button );
+			const toggleButton = screen.getByRole( 'button' );
+			await user.click( toggleButton );
 
-			const menuPopover = screen.getByRole( 'menu' );
-			expect( menuPopover ).toHaveAttribute(
-				'aria-label',
-				expect.stringContaining( 'Loading' )
-			);
+			expect(
+				screen.getByRole( 'menu', {
+					name: /Loading/,
+				} )
+			).toBeInTheDocument();
 
 			// Check that all the option groups are *not* present.
 			const menusGroup = screen.queryByRole( 'group', { name: 'Menus' } );
@@ -131,8 +131,10 @@ describe( 'NavigationMenuSelector', () => {
 
 			render( <NavigationMenuSelector /> );
 
-			const button = screen.getByRole( 'button' );
-			await user.click( button );
+			const toggleButton = screen.getByRole( 'button', {
+				name: 'Choose a Navigation menu',
+			} );
+			await user.click( toggleButton );
 
 			const menuPopover = screen.getByRole( 'menu' );
 
@@ -176,8 +178,8 @@ describe( 'NavigationMenuSelector', () => {
 
 			render( <NavigationMenuSelector /> );
 
-			const button = screen.getByRole( 'button' );
-			await user.click( button );
+			const toggleButton = screen.getByRole( 'button' );
+			await user.click( toggleButton );
 
 			// Check the Tools Group and Create Menu Button are present.
 			const toolsGroup = screen.queryByRole( 'group', {
@@ -199,8 +201,8 @@ describe( 'NavigationMenuSelector', () => {
 
 			render( <NavigationMenuSelector /> );
 
-			const button = screen.getByRole( 'button' );
-			await user.click( button );
+			const toggleButton = screen.getByRole( 'button' );
+			await user.click( toggleButton );
 
 			navigationMenusFixture.forEach( ( item ) => {
 				const menuItem = screen.queryByRole( 'menuitemradio', {
