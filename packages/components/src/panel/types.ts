@@ -46,7 +46,7 @@ export type PanelBodyProps = {
 	/**
 	 * Props that are passed to the Button component in the PanelBodyTitle within the panel body.
 	 *
-	 * @default {};
+	 * @default {}
 	 */
 	buttonProps?: ButtonProps;
 	/**
@@ -69,7 +69,7 @@ export type PanelBodyProps = {
 	/**
 	 * A function that is called when the user clicks on the PanelBody title after the open state is changed.
 	 *
-	 * @default true;
+	 * @default true
 	 */
 	onToggle?: ( next: boolean ) => void;
 	/**
@@ -85,7 +85,7 @@ export type PanelBodyProps = {
 	 * This improves the UX when there are multiple stacking Panel Body components.
 	 * components in a scrollable container.
 	 *
-	 * @default true;
+	 * @default true
 	 */
 	scrollAfterOpen?: boolean;
 };
@@ -94,7 +94,7 @@ export type PanelBodyTitleProps = {
 	/**
 	 * Props that are passed to the Button component in the PanelBodyTitle within the panel body.
 	 *
-	 * @default {};
+	 * @default {}
 	 */
 	buttonProps?: ButtonProps;
 	/**
