@@ -8,7 +8,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Converts an array of pages into a nested array of navigation link blocks.
  *
- * @param {Array}  pages An array of pages.
+ * @param {Array} pages An array of pages.
  *
  * @return {Array} A nested array of navigation link blocks.
  */
@@ -53,9 +53,9 @@ function createNavigationLinks( pages = [] ) {
  * @param {Array}  navigationLinks An array of navigation link blocks.
  * @param {number} id              The id of the navigation link to find.
  *
- * @return {Object} The navigation link block with the given id.
+ * @return {Object|null} The navigation link block with the given id.
  */
-function findById( navigationLinks, id ) {
+function findNavigationLinkById( navigationLinks, id ) {
 	for ( const navigationLink of navigationLinks ) {
 		// Is this the link we're looking for?
 		if ( navigationLink.attributes.id === id ) {
@@ -64,17 +64,18 @@ function findById( navigationLinks, id ) {
 
 		// If not does it have innerBlocks?
 		if ( navigationLink.innerBlocks && navigationLink.innerBlocks.length ) {
-			const foundNavigationLink = findById(
+			const foundNavigationLink = findNavigationLinkById(
 				navigationLink.innerBlocks,
 				id
 			);
 
-			// Does the innerBlocks have the link we're looking for?
 			if ( foundNavigationLink ) {
 				return foundNavigationLink;
 			}
 		}
 	}
+
+	return null;
 }
 
 export function convertToNavigationLinks( pages = [], parentPageID = null ) {
@@ -82,7 +83,10 @@ export function convertToNavigationLinks( pages = [], parentPageID = null ) {
 
 	// If a parent page ID is provided, only return the children of that page.
 	if ( parentPageID ) {
-		const parentPage = findById( navigationLinks, parentPageID );
+		const parentPage = findNavigationLinkById(
+			navigationLinks,
+			parentPageID
+		);
 		if ( parentPage && parentPage.innerBlocks ) {
 			navigationLinks = parentPage.innerBlocks;
 		}
