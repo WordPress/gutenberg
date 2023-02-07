@@ -229,6 +229,7 @@ export default function PostFeaturedImageEdit( {
 		height,
 		aspectRatio,
 		objectFit: !! ( height || aspectRatio ) && scale,
+		width: !! ( height && aspectRatio ) && 'auto',
 	};
 
 	/**

@@ -50,6 +50,11 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 
 	if ( ! empty( $attributes['aspectRatio'] ) ) {
 		$extra_styles .= "aspect-ratio:{$attributes['aspectRatio']};";
+
+		// Aspect ratio with a height set needs to override the 100% width
+		if ( ! empty( $attributes['height'] ) ) {
+			$extra_styles .= 'width:auto;';
+		}
 	}
 
 	if ( ! empty( $attributes['scale'] ) ) {
