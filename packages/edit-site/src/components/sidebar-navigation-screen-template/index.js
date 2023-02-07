@@ -28,8 +28,14 @@ export default function SidebarNavigationScreenTemplate( {
 	postType = 'wp_template',
 } ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { getDescription, getTitle } = useEditedEntityRecord();
-	const description = getDescription();
+	const { getDescription, getTitle, record } = useEditedEntityRecord();
+	let description = getDescription();
+	if ( ! description && record.is_custom ) {
+		description = __(
+			'This is a custom template that can be applied manually to any Post or Page.'
+		);
+	}
+
 	return (
 		<SidebarNavigationScreen
 			path={ config[ postType ].path }
