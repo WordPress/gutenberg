@@ -6,6 +6,8 @@ import type { ShortcutProps } from '../shortcut/types';
 export type MenuItemsChoiceProps = {
 	/**
 	 * Array of choices.
+	 *
+	 * @default []
 	 */
 	choices: readonly MenuItemChoice[];
 	/**
@@ -21,6 +23,8 @@ export type MenuItemsChoiceProps = {
 	/**
 	 * Callback function to be called with a choice when user
 	 * hovers over a new choice (will be empty on mouse leave).
+	 *
+	 * @default noop
 	 */
 	onHover: ( value: string | null ) => void;
 };
