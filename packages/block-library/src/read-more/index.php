@@ -23,7 +23,7 @@ function render_block_core_read_more( $attributes, $content, $block ) {
 	$screen_reader_text = sprintf(
 		/* translators: %s is either the post title or post ID to describe the link for screen readers. */
 		__( ': %s' ),
-		'' !== $post_title ? $post_title : __( 'untitled post ' ) . $post_ID
+		'' !== $post_title ? $post_title : sprintf( __( 'untitled post %d' ), $post_ID )
 	);
 	$justify_class_name = empty( $attributes['justifyContent'] ) ? '' : "is-justified-{$attributes['justifyContent']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $justify_class_name ) );
