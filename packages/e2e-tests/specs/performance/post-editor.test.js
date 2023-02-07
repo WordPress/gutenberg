@@ -150,7 +150,7 @@ describe( 'Post Editor Performance', () => {
 			readFile( join( __dirname, '../../assets/large-post.html' ) )
 		);
 		await insertBlock( 'Paragraph' );
-		let i = 200;
+		let i = 800;
 		await page.tracing.start( {
 			path: traceFile,
 			screenshots: false,
