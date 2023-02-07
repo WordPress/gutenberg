@@ -292,7 +292,6 @@ function Iframe( {
 				{ head &&
 					createPortal(
 						<>
-							{ styleAssets }
 							{ headChildren }
 						</>,
 						head
