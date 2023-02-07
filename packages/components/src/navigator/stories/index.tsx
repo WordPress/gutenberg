@@ -208,3 +208,128 @@ function MetaphorIpsum( { quantity }: { quantity: number } ) {
 		</>
 	);
 }
+
+type MenuItem = {
+	path: string;
+	content: string;
+	items?: MenuItem[];
+};
+
+const MENU_STRUCTURE: MenuItem[] = [
+	{
+		path: '/',
+		content: 'Pick a category',
+		items: [
+			{
+				path: '/starters',
+				content: 'Starters',
+				items: [
+					{
+						path: '/starters/onion-soup',
+						content: 'Onion soup',
+					},
+					{
+						path: '/starters/vegetable-gyoza',
+						content: 'Vegetable Gyoza',
+					},
+					{
+						path: '/starters/caprese-salad',
+						content: 'Caprese salad',
+					},
+				],
+			},
+			{
+				path: '/mains',
+				content: 'Mains',
+				items: [
+					{
+						path: '/mains/roast-chicken',
+						content: 'Roast chicken',
+					},
+					{
+						path: '/mains/masamman-curry',
+						content: 'Masamman curry',
+					},
+					{
+						path: '/mains/spaghetti-carbonara',
+						content: 'Spaghetti alla carbonara',
+					},
+				],
+			},
+			{
+				path: '/desserts',
+				content: 'Desserts',
+				items: [
+					{
+						path: '/desserts/brownie',
+						content: 'Brownie',
+					},
+					{
+						path: '/desserts/cheese-platter',
+						content: 'Cheese platter',
+					},
+				],
+			},
+		],
+	},
+];
+
+const FLATTENED_MENU: MenuItem[] = [];
+
+const flattenRecursively = ( menuItems: MenuItem[] ) => {
+	for ( const menuItem of menuItems ) {
+		FLATTENED_MENU.push( menuItem );
+
+		if ( menuItem.items ) {
+			flattenRecursively( menuItem.items );
+		}
+	}
+};
+flattenRecursively( MENU_STRUCTURE );
+
+export const WithInitialLocationHistory: ComponentStory<
+	typeof NavigatorProvider
+> = ( { style, ...props } ) => (
+	<NavigatorProvider
+		style={ { ...style, height: '100vh', maxHeight: '450px' } }
+		{ ...props }
+	>
+		{ FLATTENED_MENU.map( ( { path, content, items } ) => (
+			<NavigatorScreen path={ path } key={ path }>
+				<h2>{ content }</h2>
+				{ items?.length ? (
+					<ul>
+						{ items.map(
+							( {
+								path: subItemPath,
+								content: subItemContent,
+							} ) => (
+								<li key={ subItemPath }>
+									<NavigatorButton
+										variant="secondary"
+										path={ subItemPath }
+									>
+										Navigate to &quot;{ subItemContent }
+										&quot; screen.
+									</NavigatorButton>
+								</li>
+							)
+						) }
+					</ul>
+				) : null }
+				{ path !== '/' ? (
+					<NavigatorBackButton variant="secondary">
+						Go back
+					</NavigatorBackButton>
+				) : null }
+			</NavigatorScreen>
+		) ) }
+	</NavigatorProvider>
+);
+WithInitialLocationHistory.args = {
+	initialLocationHistory: [
+		{ path: '/' },
+		{ path: '/mains', focusTargetSelector: '[id="/"]' },
+		{ path: '/mains/masamman-curry', focusTargetSelector: '[id="/mains"]' },
+	],
+};
