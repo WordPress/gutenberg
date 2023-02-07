@@ -3,7 +3,7 @@
  * HTML Span: Represents a textual span inside an HTML document.
  *
  * @package WordPress
- * @subpackage HTML
+ * @subpackage HTML-API
  * @since 6.2.0
  */
 

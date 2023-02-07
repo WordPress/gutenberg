@@ -3,7 +3,7 @@
  * HTML Tag Processor: Attribute token structure class.
  *
  * @package WordPress
- * @subpackage HTML
+ * @subpackage HTML-API
  * @since 6.2.0
  */
 
