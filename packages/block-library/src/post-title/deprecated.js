@@ -128,7 +128,7 @@ const v1 = {
 	save() {
 		return null;
 	},
-	migrate: migrateFontFamily,
+	migrate: compose( migrateFontFamily, migrateLevel ),
 	isEligible( { style } ) {
 		return style?.typography?.fontFamily;
 	},
