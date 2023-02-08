@@ -44,7 +44,6 @@ const {
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	getBlockMode,
-	__experimentalIsBlockInterfaceHidden: isBlockInterfaceHidden,
 	isTyping,
 	isDraggingBlocks,
 	getDraggedBlockClientIds,
@@ -67,13 +66,12 @@ const {
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 	__experimentalGetAllowedPatterns,
 	__experimentalGetParsedPattern,
-	__experimentalGetPatternsByBlockTypes,
+	getPatternsByBlockTypes,
 	__unstableGetClientIdWithClientIdsTree,
 	__unstableGetClientIdsTree,
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
-	getLastInsertedBlocksClientIds,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2259,24 +2257,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isBlockInterfaceHidden', () => {
-		it( 'should return the true if toggled true in state', () => {
-			const state = {
-				isBlockInterfaceHidden: true,
-			};
-
-			expect( isBlockInterfaceHidden( state ) ).toBe( true );
-		} );
-
-		it( 'should return false if toggled false in state', () => {
-			const state = {
-				isBlockInterfaceHidden: false,
-			};
-
-			expect( isBlockInterfaceHidden( state ) ).toBe( false );
-		} );
-	} );
-
 	describe( 'isTyping', () => {
 		it( 'should return the isTyping flag if the block is selected', () => {
 			const state = {
@@ -2491,6 +2471,44 @@ describe( 'selectors', () => {
 				rootClientId: undefined,
 				index: 1,
 			} );
+		} );
+
+		it( 'should cache and return the same object if state has not changed', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: 'clientId1' },
+					selectionEnd: { clientId: 'clientId1' },
+				},
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							clientId1: { clientId: 'clientId1' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							clientId1: {},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'clientId1' ],
+							clientId1: [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							clientId1: '',
+						} )
+					),
+				},
+				insertionPoint: null,
+			};
+
+			const insertionPoint1 = getBlockInsertionPoint( state );
+			const insertionPoint2 = getBlockInsertionPoint( state );
+
+			expect( insertionPoint1 ).toBe( insertionPoint2 );
 		} );
 
 		it( 'should return an object for the nested selected block', () => {
@@ -4223,7 +4241,7 @@ describe( 'selectors', () => {
 			);
 		} );
 	} );
-	describe( '__experimentalGetPatternsByBlockTypes', () => {
+	describe( 'getPatternsByBlockTypes', () => {
 		const state = {
 			blocks: {
 				byClientId: new Map(
@@ -4263,22 +4281,25 @@ describe( 'selectors', () => {
 			},
 		};
 		it( 'should return empty array if no block name is provided', () => {
-			expect( __experimentalGetPatternsByBlockTypes( state ) ).toEqual(
-				[]
-			);
+			expect( getPatternsByBlockTypes( state ) ).toEqual( [] );
 		} );
-		it( 'shoud return empty array if no match is found', () => {
-			const patterns = __experimentalGetPatternsByBlockTypes(
+		it( 'should return empty array if no match is found', () => {
+			const patterns = getPatternsByBlockTypes(
 				state,
 				'test/block-not-exists'
 			);
 			expect( patterns ).toEqual( [] );
 		} );
-		it( 'should return proper results when there are matched block patterns', () => {
-			const patterns = __experimentalGetPatternsByBlockTypes(
+		it( 'should return the same empty array in both empty array cases', () => {
+			const patterns1 = getPatternsByBlockTypes( state );
+			const patterns2 = getPatternsByBlockTypes(
 				state,
-				'test/block-a'
+				'test/block-not-exists'
 			);
+			expect( patterns1 ).toBe( patterns2 );
+		} );
+		it( 'should return proper results when there are matched block patterns', () => {
+			const patterns = getPatternsByBlockTypes( state, 'test/block-a' );
 			expect( patterns ).toHaveLength( 2 );
 			expect( patterns ).toEqual(
 				expect.arrayContaining( [
@@ -4288,7 +4309,7 @@ describe( 'selectors', () => {
 			);
 		} );
 		it( 'should return proper result with matched patterns and allowed blocks from rootClientId', () => {
-			const patterns = __experimentalGetPatternsByBlockTypes(
+			const patterns = getPatternsByBlockTypes(
 				state,
 				'test/block-a',
 				'block1'
@@ -4663,29 +4684,6 @@ describe( '__unstableGetClientIdsTree', () => {
 					{ clientId: 'baz', innerBlocks: [] },
 				],
 			},
-		] );
-	} );
-} );
-
-describe( 'getLastInsertedBlocksClientIds', () => {
-	it( 'should return undefined if no blocks have been inserted', () => {
-		const state = {
-			lastBlockInserted: {},
-		};
-
-		expect( getLastInsertedBlocksClientIds( state ) ).toEqual( undefined );
-	} );
-
-	it( 'should return clientIds if blocks have been inserted', () => {
-		const state = {
-			lastBlockInserted: {
-				clientIds: [ '123456', '78910' ],
-			},
-		};
-
-		expect( getLastInsertedBlocksClientIds( state ) ).toEqual( [
-			'123456',
-			'78910',
 		] );
 	} );
 } );

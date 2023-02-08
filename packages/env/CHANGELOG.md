@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 5.11.0 (2023-02-01)
+
+### Bug fix
+
+-   PHP 7.3 and 7.4 must use PHPUnit 9.
+
+### Enhancement
+
+-   It's now possible to run PHPUnit tests on PHP 8.1 and 8.2.
+
+## 5.10.0 (2023-01-11)
+
 ## 5.9.0 (2023-01-02)
 
 ## 5.8.0 (2022-12-14)

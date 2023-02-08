@@ -14,17 +14,17 @@
 		z-index: z-index(".block-editor-block-list__block.has-block-overlay");
 	}
 
-	&::after {
+	&:not(.is-multi-selected)::after {
 		content: none !important;
 	}
 
-	&:hover:not(.is-dragging-blocks)::before {
+	&:hover:not(.is-dragging-blocks):not(.is-multi-selected)::before {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
 	}
 
-	&.is-reusable:hover:not(.is-dragging-blocks)::before,
-	&.wp-block-template-part:hover:not(.is-dragging-blocks)::before {
+	&.is-reusable:hover:not(.is-dragging-blocks):not(.is-multi-selected)::before,
+	&.wp-block-template-part:hover:not(.is-dragging-blocks):not(.is-multi-selected)::before {
 		background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 		box-shadow: 0 0 0 $border-width var(--wp-block-synced-color) inset;
 	}

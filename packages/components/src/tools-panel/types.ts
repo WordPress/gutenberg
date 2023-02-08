@@ -3,6 +3,11 @@
  */
 import type { ReactNode } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { HeadingSize } from '../heading/types';
+
 type ResetAllFilter = () => void;
 type ResetAll = ( filters?: ResetAllFilter[] ) => void;
 
@@ -16,6 +21,12 @@ export type ToolsPanelProps = {
 	 * wrapper element allowing the panel to lay them out accordingly.
 	 */
 	hasInnerWrapper: boolean;
+	/**
+	 * The heading level of the panel's header.
+	 *
+	 * @default 2
+	 */
+	headingLevel?: HeadingSize;
 	/**
 	 * Text to be displayed within the panel's header and as the `aria-label`
 	 * for the panel's dropdown menu.
@@ -50,6 +61,12 @@ export type ToolsPanelProps = {
 };
 
 export type ToolsPanelHeaderProps = {
+	/**
+	 * The heading level of the panel's header.
+	 *
+	 * @default 2
+	 */
+	headingLevel?: HeadingSize;
 	/**
 	 * Text to be displayed within the panel header. It is also passed along as
 	 * the `label` for the panel header's `DropdownMenu`.

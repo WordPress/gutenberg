@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import { PanelBody } from '../body';
 
-jest.useFakeTimers();
-
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty div with the matching className', () => {
@@ -117,9 +115,7 @@ describe( 'PanelBody', () => {
 		} );
 
 		it( 'should toggle when clicking header', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<PanelBody title="Panel" initialOpen={ false }>
@@ -146,9 +142,7 @@ describe( 'PanelBody', () => {
 		} );
 
 		it( 'should pass button props to panel title', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const mock = jest.fn();
 
 			render(

@@ -34,8 +34,6 @@ test.describe( 'Block list view', () => {
 
 		await page.reload();
 
-		await siteEditor.enterEditMode();
-
 		// Should display the Preview button.
 		await expect(
 			page.locator( 'role=region[name="List View"i]' )

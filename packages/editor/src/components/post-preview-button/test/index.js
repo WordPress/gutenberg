@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import { PostPreviewButton } from '../';
 
-jest.useFakeTimers();
-
 describe( 'PostPreviewButton', () => {
 	const documentWrite = jest.fn();
 	const documentTitle = jest.fn();
@@ -175,9 +173,7 @@ describe( 'PostPreviewButton', () => {
 	} );
 
 	it( 'should save post if `isDraft` is `true`', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const url = 'https://wordpress.org';
 		const savePost = jest.fn();
 		const autosave = jest.fn();
@@ -203,9 +199,7 @@ describe( 'PostPreviewButton', () => {
 	} );
 
 	it( 'should autosave post if `isDraft` is `false`', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const url = 'https://wordpress.org';
 		const savePost = jest.fn();
 		const autosave = jest.fn();
@@ -231,9 +225,7 @@ describe( 'PostPreviewButton', () => {
 	} );
 
 	it( 'should open a window with the specified target', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const postId = 123;
 		const url = 'https://wordpress.org';
 
@@ -257,9 +249,7 @@ describe( 'PostPreviewButton', () => {
 	} );
 
 	it( 'should set the location in the window properly', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const postId = 123;
 		const url = 'https://wordpress.org';
 
@@ -290,9 +280,7 @@ describe( 'PostPreviewButton', () => {
 	} );
 
 	it( 'should display a `Generating preview` message while waiting for autosaving', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const previewText = 'Generating preview…';
 		const url = 'https://wordpress.org';
 		const savePost = jest.fn();

@@ -3,16 +3,15 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../experiments';
 
-/**
- * Internal dependencies
- */
-import { useGlobalStylesOutput } from '../global-styles/use-global-styles-output';
+const { useGlobalStylesOutput } = unlock( blockEditorExperiments );
 
 function useGlobalStylesRenderer() {
 	const [ styles, settings, svgFilters ] = useGlobalStylesOutput();

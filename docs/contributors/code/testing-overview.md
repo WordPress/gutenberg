@@ -491,9 +491,9 @@ There is an ongoing effort to add integration tests to the native mobile project
 
 ## End-to-end Testing
 
-End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
+Most existing End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
-> There's a ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. See the [README](https://github.com/WordPress/gutenberg/tree/HEAD/test/e2e/README.md) of the new E2E tests for the updated guideline and best practices.
+There's an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. **It's recommended to write new e2e tests in Playwright whenever possible**. The sections below mostly apply to the old Jest + Puppeteer framework. See the dedicated [guide](/docs/contributors/code/e2e/README.md) if you're writing tests with Playwright.**
 
 ### Using wp-env
 

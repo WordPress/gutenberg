@@ -11,8 +11,8 @@ type AsyncListConfig = {
 /**
  * Returns the first items from list that are present on state.
  *
- * @param  list  New array.
- * @param  state Current state.
+ * @param list  New array.
+ * @param state Current state.
  * @return First items present iin state.
  */
 function getFirstItemsPresentInState< T >( list: T[], state: T[] ): T[] {
@@ -34,8 +34,8 @@ function getFirstItemsPresentInState< T >( list: T[], state: T[] ): T[] {
  * React hook returns an array which items get asynchronously appended from a source array.
  * This behavior is useful if we want to render a list of items asynchronously for performance reasons.
  *
- * @param  list   Source array.
- * @param  config Configuration object.
+ * @param list   Source array.
+ * @param config Configuration object.
  *
  * @return Async array.
  */
@@ -44,7 +44,7 @@ function useAsyncList< T >(
 	config: AsyncListConfig = { step: 1 }
 ): T[] {
 	const { step = 1 } = config;
-	const [ current, setCurrent ] = useState( [] as T[] );
+	const [ current, setCurrent ] = useState< T[] >( [] );
 
 	useEffect( () => {
 		// On reset, we keep the first items that were previously rendered.
@@ -55,10 +55,9 @@ function useAsyncList< T >(
 			);
 		}
 		setCurrent( firstItems );
-		let nextIndex = firstItems.length;
 
 		const asyncQueue = createQueue();
-		const append = () => {
+		const append = ( nextIndex: number ) => () => {
 			if ( list.length <= nextIndex ) {
 				return;
 			}
@@ -66,10 +65,9 @@ function useAsyncList< T >(
 				...state,
 				...list.slice( nextIndex, nextIndex + step ),
 			] );
-			nextIndex += step;
-			asyncQueue.add( {}, append );
+			asyncQueue.add( {}, append( nextIndex + step ) );
 		};
-		asyncQueue.add( {}, append );
+		asyncQueue.add( {}, append( firstItems.length ) );
 
 		return () => asyncQueue.reset();
 	}, [ list ] );

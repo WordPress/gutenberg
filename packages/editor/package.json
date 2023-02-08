@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "13.1.0",
+	"version": "13.3.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -44,6 +44,7 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
+		"@wordpress/experiments": "file:../experiments",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",

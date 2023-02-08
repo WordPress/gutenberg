@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -14,8 +14,6 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
  */
 import DropdownMenu from '../';
 import { MenuItem } from '../../';
-
-jest.useFakeTimers();
 
 describe( 'DropdownMenu', () => {
 	it( 'should not render when neither controls nor children are assigned', () => {
@@ -33,9 +31,7 @@ describe( 'DropdownMenu', () => {
 	} );
 
 	it( 'should open menu when pressing arrow down on the toggle and the controls prop is used to define menu items', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const controls = [
 			{
@@ -67,10 +63,6 @@ describe( 'DropdownMenu', () => {
 
 		await user.keyboard( '[ArrowDown]' );
 
-		// Wait for the `floating-ui` effects in `Dropdown`/`Popover` to finish running
-		// See also: https://floating-ui.com/docs/react-dom#testing
-		await act( () => Promise.resolve() );
-
 		const menu = screen.getByRole( 'menu' );
 
 		// we need to wait because showing the dropdown is animated
@@ -82,9 +74,7 @@ describe( 'DropdownMenu', () => {
 	} );
 
 	it( 'should open menu when pressing arrow down on the toggle and the children prop is used to define menu items', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<DropdownMenu
@@ -92,14 +82,10 @@ describe( 'DropdownMenu', () => {
 			/>
 		);
 
-		const button = screen.getByRole( 'button' );
-		act( () => button.focus() );
+		// Move focus on the toggle button
+		await user.tab();
 
 		await user.keyboard( '[ArrowDown]' );
-
-		// Wait for the `floating-ui` effects in `Dropdown`/`Popover` to finish running
-		// See also: https://floating-ui.com/docs/react-dom#testing
-		await act( () => Promise.resolve() );
 
 		const menu = screen.getByRole( 'menu' );
 

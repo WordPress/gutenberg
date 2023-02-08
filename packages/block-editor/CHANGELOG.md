@@ -2,9 +2,16 @@
 
 ## Unreleased
 
+## 11.3.0 (2023-02-01)
+
+## 11.2.0 (2023-01-11)
+
 ### Bug Fix
 
 -   `BlockInspector`: Fix browser warning error when block is not selected ([#46875](https://github.com/WordPress/gutenberg/pull/46875)).
+-   Move component styles needed for iframes to content styles ([#47103](https://github.com/WordPress/gutenberg/pull/47103)).
+-   Block Inserter: Correctly apply style to the default inserter ([#47166](https://github.com/WordPress/gutenberg/pull/47166)).
+-   List View: Fix crash when the first template-parts is deleted width del key ([#47227](https://github.com/WordPress/gutenberg/pull/47227)).
 
 ## 11.1.0 (2023-01-02)
 

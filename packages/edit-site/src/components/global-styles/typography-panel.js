@@ -8,6 +8,7 @@ import {
 	__experimentalLetterSpacingControl as LetterSpacingControl,
 	__experimentalTextTransformControl as TextTransformControl,
 	__experimentalTextDecorationControl as TextDecorationControl,
+	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';
 import {
 	FontSizePicker,
@@ -19,14 +20,17 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import { useSupportedStyles } from './hooks';
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 export function useHasTypographyPanel( name ) {
 	const hasFontFamily = useHasFontFamilyControl( name );
 	const hasLineHeight = useHasLineHeightControl( name );
 	const hasFontAppearance = useHasAppearanceControl( name );
 	const hasLetterSpacing = useHasLetterSpacingControl( name );
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	return (
 		hasFontFamily ||
 		hasLineHeight ||
@@ -37,37 +41,44 @@ export function useHasTypographyPanel( name ) {
 }
 
 function useHasFontFamilyControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ fontFamilies ] = useSetting( 'typography.fontFamilies', name );
+	const supports = useSupportedStyles( name );
+	const [ fontFamiliesPerOrigin ] = useGlobalSetting(
+		'typography.fontFamilies',
+		name
+	);
+	const fontFamilies =
+		fontFamiliesPerOrigin?.custom ||
+		fontFamiliesPerOrigin?.theme ||
+		fontFamiliesPerOrigin?.default;
 	return supports.includes( 'fontFamily' ) && !! fontFamilies?.length;
 }
 
 function useHasLineHeightControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	return (
-		useSetting( 'typography.lineHeight', name )[ 0 ] &&
+		useGlobalSetting( 'typography.lineHeight', name )[ 0 ] &&
 		supports.includes( 'lineHeight' )
 	);
 }
 
 function useHasAppearanceControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const hasFontStyles =
-		useSetting( 'typography.fontStyle', name )[ 0 ] &&
+		useGlobalSetting( 'typography.fontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useSetting( 'typography.fontWeight', name )[ 0 ] &&
+		useGlobalSetting( 'typography.fontWeight', name )[ 0 ] &&
 		supports.includes( 'fontWeight' );
 	return hasFontStyles || hasFontWeights;
 }
 
 function useAppearanceControlLabel( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const hasFontStyles =
-		useSetting( 'typography.fontStyle', name )[ 0 ] &&
+		useGlobalSetting( 'typography.fontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useSetting( 'typography.fontWeight', name )[ 0 ] &&
+		useGlobalSetting( 'typography.fontWeight', name )[ 0 ] &&
 		supports.includes( 'fontWeight' );
 	if ( ! hasFontStyles ) {
 		return __( 'Font weight' );
@@ -79,27 +90,19 @@ function useAppearanceControlLabel( name ) {
 }
 
 function useHasLetterSpacingControl( name, element ) {
-	const setting = useSetting( 'typography.letterSpacing', name )[ 0 ];
-	if ( ! setting ) {
-		return false;
-	}
-	if ( ! name && element === 'heading' ) {
-		return true;
-	}
-	const supports = getSupportedGlobalStylesPanels( name );
-	return supports.includes( 'letterSpacing' );
+	const supports = useSupportedStyles( name, element );
+	return (
+		useGlobalSetting( 'typography.letterSpacing', name )[ 0 ] &&
+		supports.includes( 'letterSpacing' )
+	);
 }
 
 function useHasTextTransformControl( name, element ) {
-	const setting = useSetting( 'typography.textTransform', name )[ 0 ];
-	if ( ! setting ) {
-		return false;
-	}
-	if ( ! name && element === 'heading' ) {
-		return true;
-	}
-	const supports = getSupportedGlobalStylesPanels( name );
-	return supports.includes( 'textTransform' );
+	const supports = useSupportedStyles( name, element );
+	return (
+		useGlobalSetting( 'typography.textTransform', name )[ 0 ] &&
+		supports.includes( 'textTransform' )
+	);
 }
 
 function useHasTextDecorationControl( name, element ) {
@@ -110,16 +113,16 @@ function useHasTextDecorationControl( name, element ) {
 }
 
 function useStyleWithReset( path, blockName ) {
-	const [ style, setStyle ] = useStyle( path, blockName );
-	const [ userStyle ] = useStyle( path, blockName, 'user' );
+	const [ style, setStyle ] = useGlobalStyle( path, blockName );
+	const [ userStyle ] = useGlobalStyle( path, blockName, 'user' );
 	const hasStyle = () => !! userStyle;
 	const resetStyle = () => setStyle( undefined );
 	return [ style, setStyle, hasStyle, resetStyle ];
 }
 
 function useFontSizeWithReset( path, blockName ) {
-	const [ fontSize, setStyleCallback ] = useStyle( path, blockName );
-	const [ userStyle ] = useStyle( path, blockName, 'user' );
+	const [ fontSize, setStyleCallback ] = useGlobalStyle( path, blockName );
+	const [ userStyle ] = useGlobalStyle( path, blockName, 'user' );
 	const hasFontSize = () => !! userStyle;
 	const resetFontSize = () => setStyleCallback( undefined );
 	const setFontSize = ( newValue, metadata ) => {
@@ -138,20 +141,20 @@ function useFontSizeWithReset( path, blockName ) {
 }
 
 function useFontAppearance( prefix, name ) {
-	const [ fontStyle, setFontStyle ] = useStyle(
+	const [ fontStyle, setFontStyle ] = useGlobalStyle(
 		prefix + 'typography.fontStyle',
 		name
 	);
-	const [ userFontStyle ] = useStyle(
+	const [ userFontStyle ] = useGlobalStyle(
 		prefix + 'typography.fontStyle',
 		name,
 		'user'
 	);
-	const [ fontWeight, setFontWeight ] = useStyle(
+	const [ fontWeight, setFontWeight ] = useGlobalStyle(
 		prefix + 'typography.fontWeight',
 		name
 	);
-	const [ userFontWeight ] = useStyle(
+	const [ userFontWeight ] = useGlobalStyle(
 		prefix + 'typography.fontWeight',
 		name,
 		'user'
@@ -171,26 +174,50 @@ function useFontAppearance( prefix, name ) {
 	};
 }
 
-export default function TypographyPanel( { name, element, headingLevel } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+export default function TypographyPanel( {
+	name,
+	element,
+	headingLevel,
+	variation = '',
+} ) {
+	const supports = useSupportedStyles( name );
 	let prefix = '';
 	if ( element === 'heading' ) {
 		prefix = `elements.${ headingLevel }.`;
 	} else if ( element && element !== 'text' ) {
 		prefix = `elements.${ element }.`;
 	}
-	const [ fontSizes ] = useSetting( 'typography.fontSizes', name );
+	if ( variation ) {
+		prefix = prefix
+			? `variations.${ variation }.${ prefix }`
+			: `variations.${ variation }`;
+	}
+	const [ fontSizesPerOrigin ] = useGlobalSetting(
+		'typography.fontSizes',
+		name
+	);
+	const fontSizes =
+		fontSizesPerOrigin?.custom ||
+		fontSizesPerOrigin?.theme ||
+		fontSizesPerOrigin?.default;
 
-	const disableCustomFontSizes = ! useSetting(
+	const disableCustomFontSizes = ! useGlobalSetting(
 		'typography.customFontSize',
 		name
 	)[ 0 ];
-	const [ fontFamilies ] = useSetting( 'typography.fontFamilies', name );
+	const [ fontFamiliesPerOrigin ] = useGlobalSetting(
+		'typography.fontFamilies',
+		name
+	);
+	const fontFamilies =
+		fontFamiliesPerOrigin?.custom ||
+		fontFamiliesPerOrigin?.theme ||
+		fontFamiliesPerOrigin?.default;
 	const hasFontStyles =
-		useSetting( 'typography.fontStyle', name )[ 0 ] &&
+		useGlobalSetting( 'typography.fontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useSetting( 'typography.fontWeight', name )[ 0 ] &&
+		useGlobalSetting( 'typography.fontWeight', name )[ 0 ] &&
 		supports.includes( 'fontWeight' );
 	const hasFontFamilyEnabled = useHasFontFamilyControl( name );
 	const hasLineHeightEnabled = useHasLineHeightControl( name );

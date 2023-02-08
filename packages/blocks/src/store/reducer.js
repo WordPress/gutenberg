@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, map, mapValues } from 'lodash';
+import { get, isEmpty, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -269,7 +269,7 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 				( { slug } ) => slug === action.slug
 			);
 			if ( categoryToChange ) {
-				return map( state, ( category ) => {
+				return state.map( ( category ) => {
 					if ( category.slug === action.slug ) {
 						return {
 							...category,

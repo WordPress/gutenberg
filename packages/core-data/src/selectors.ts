@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { set, map, get } from 'lodash';
+import { set, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -86,8 +86,8 @@ const EMPTY_OBJECT = {};
  * Returns true if a request is in progress for embed preview data, or false
  * otherwise.
  *
- * @param  state Data state.
- * @param  url   URL the preview would be for.
+ * @param state Data state.
+ * @param url   URL the preview would be for.
  *
  * @return Whether a request is in progress for an embed preview.
  */
@@ -105,9 +105,9 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  *
  * @deprecated since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
  *
- * @param  state Data state.
- * @param  query Optional object of query parameters to
- *               include with request.
+ * @param      state Data state.
+ * @param      query Optional object of query parameters to
+ *                   include with request.
  * @return Authors list.
  */
 export function getAuthors(
@@ -129,7 +129,7 @@ export function getAuthors(
 /**
  * Returns the current user.
  *
- * @param  state Data state.
+ * @param state Data state.
  *
  * @return Current user object.
  */
@@ -140,16 +140,16 @@ export function getCurrentUser( state: State ): ET.User< 'edit' > {
 /**
  * Returns all the users returned by a query ID.
  *
- * @param  state   Data state.
- * @param  queryID Query ID.
+ * @param state   Data state.
+ * @param queryID Query ID.
  *
  * @return Users list.
  */
 export const getUserQueryResults = createSelector(
 	( state: State, queryID: string ): ET.User< 'edit' >[] => {
-		const queryResults = state.users.queries[ queryID ];
+		const queryResults = state.users.queries[ queryID ] ?? [];
 
-		return map( queryResults, ( id ) => state.users.byId[ id ] );
+		return queryResults.map( ( id ) => state.users.byId[ id ] );
 	},
 	( state: State, queryID: string ) => [
 		state.users.queries[ queryID ],
@@ -161,8 +161,8 @@ export const getUserQueryResults = createSelector(
  * Returns the loaded entities for the given kind.
  *
  * @deprecated since WordPress 6.0. Use getEntitiesConfig instead
- * @param  state Data state.
- * @param  kind  Entity kind.
+ * @param      state Data state.
+ * @param      kind  Entity kind.
  *
  * @return Array of entities with config matching kind.
  */
@@ -177,8 +177,8 @@ export function getEntitiesByKind( state: State, kind: string ): Array< any > {
 /**
  * Returns the loaded entities for the given kind.
  *
- * @param  state Data state.
- * @param  kind  Entity kind.
+ * @param state Data state.
+ * @param kind  Entity kind.
  *
  * @return Array of entities with config matching kind.
  */
@@ -190,9 +190,9 @@ export function getEntitiesConfig( state: State, kind: string ): Array< any > {
  * Returns the entity config given its kind and name.
  *
  * @deprecated since WordPress 6.0. Use getEntityConfig instead
- * @param  state Data state.
- * @param  kind  Entity kind.
- * @param  name  Entity name.
+ * @param      state Data state.
+ * @param      kind  Entity kind.
+ * @param      name  Entity name.
  *
  * @return Entity config
  */
@@ -207,9 +207,9 @@ export function getEntity( state: State, kind: string, name: string ): any {
 /**
  * Returns the entity config given its kind and name.
  *
- * @param  state Data state.
- * @param  kind  Entity kind.
- * @param  name  Entity name.
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
  *
  * @return Entity config
  */
@@ -277,12 +277,12 @@ export interface GetEntityRecord {
  * yet received, undefined if the value entity is known to not exist, or the
  * entity object if it exists and is received.
  *
- * @param  state State tree
- * @param  kind  Entity kind.
- * @param  name  Entity name.
- * @param  key   Record's key
- * @param  query Optional query. If requesting specific
- *               fields, fields must always include the ID.
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param key   Record's key
+ * @param query Optional query. If requesting specific
+ *              fields, fields must always include the ID.
  *
  * @return Record.
  */
@@ -357,10 +357,10 @@ export const getEntityRecord = createSelector(
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
  *
- * @param  state State tree
- * @param  kind  Entity kind.
- * @param  name  Entity name.
- * @param  key   Record's key
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param key   Record's key
  *
  * @return Record.
  */
@@ -374,10 +374,10 @@ export function __experimentalGetEntityRecordNoResolver<
  * Returns the entity's record object by key,
  * with its attributes mapped to their raw values.
  *
- * @param  state State tree.
- * @param  kind  Entity kind.
- * @param  name  Entity name.
- * @param  key   Record's key.
+ * @param state State tree.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param key   Record's key.
  *
  * @return Object with the entity's raw attributes.
  */
@@ -449,10 +449,10 @@ export const getRawEntityRecord = createSelector(
  * Returns true if records have been received for the given set of parameters,
  * or false otherwise.
  *
- * @param  state State tree
- * @param  kind  Entity kind.
- * @param  name  Entity name.
- * @param  query Optional terms query.
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param query Optional terms query.
  *
  * @return  Whether entity records have been received.
  */
@@ -499,11 +499,11 @@ export interface GetEntityRecords {
 /**
  * Returns the Entity's records.
  *
- * @param  state State tree
- * @param  kind  Entity kind.
- * @param  name  Entity name.
- * @param  query Optional terms query. If requesting specific
- *               fields, fields must always include the ID.
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param query Optional terms query. If requesting specific
+ *              fields, fields must always include the ID.
  *
  * @return Records.
  */
@@ -539,7 +539,7 @@ type DirtyEntityRecord = {
 /**
  * Returns the list of dirty entity records.
  *
- * @param  state State tree.
+ * @param state State tree.
  *
  * @return The list of updated records
  */
@@ -596,7 +596,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 /**
  * Returns the list of entities currently being saved.
  *
- * @param  state State tree.
+ * @param state State tree.
  *
  * @return The list of records being saved.
  */
@@ -648,10 +648,10 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 /**
  * Returns the specified entity record's edits.
  *
- * @param  state    State tree.
- * @param  kind     Entity kind.
- * @param  name     Entity name.
- * @param  recordId Record ID.
+ * @param state    State tree.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
  *
  * @return The entity record's edits.
  */
@@ -676,10 +676,10 @@ export function getEntityRecordEdits(
  * are not considered for change detection.
  * They are defined in the entity's config.
  *
- * @param  state    State tree.
- * @param  kind     Entity kind.
- * @param  name     Entity name.
- * @param  recordId Record ID.
+ * @param state    State tree.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
  *
  * @return The entity record's non transient edits.
  */
@@ -712,10 +712,10 @@ export const getEntityRecordNonTransientEdits = createSelector(
  * Returns true if the specified entity record has edits,
  * and false otherwise.
  *
- * @param  state    State tree.
- * @param  kind     Entity kind.
- * @param  name     Entity name.
- * @param  recordId Record ID.
+ * @param state    State tree.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
  *
  * @return Whether the entity record has edits or not.
  */
@@ -736,10 +736,10 @@ export function hasEditsForEntityRecord(
 /**
  * Returns the specified entity record, merged with its edits.
  *
- * @param  state    State tree.
- * @param  kind     Entity kind.
- * @param  name     Entity name.
- * @param  recordId Record ID.
+ * @param state    State tree.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
  *
  * @return The entity record, merged with its edits.
  */
@@ -787,10 +787,10 @@ export const getEditedEntityRecord = createSelector(
 /**
  * Returns true if the specified entity record is autosaving, and false otherwise.
  *
- * @param  state    State tree.
- * @param  kind     Entity kind.
- * @param  name     Entity name.
- * @param  recordId Record ID.
+ * @param state    State tree.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
  *
  * @return Whether the entity record is autosaving or not.
  */
@@ -811,10 +811,10 @@ export function isAutosavingEntityRecord(
 /**
  * Returns true if the specified entity record is saving, and false otherwise.
  *
- * @param  state    State tree.
- * @param  kind     Entity kind.
- * @param  name     Entity name.
- * @param  recordId Record ID.
+ * @param state    State tree.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
  *
  * @return Whether the entity record is saving or not.
  */
@@ -834,10 +834,10 @@ export function isSavingEntityRecord(
 /**
  * Returns true if the specified entity record is deleting, and false otherwise.
  *
- * @param  state    State tree.
- * @param  kind     Entity kind.
- * @param  name     Entity name.
- * @param  recordId Record ID.
+ * @param state    State tree.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
  *
  * @return Whether the entity record is deleting or not.
  */
@@ -857,10 +857,10 @@ export function isDeletingEntityRecord(
 /**
  * Returns the specified entity record's last save error.
  *
- * @param  state    State tree.
- * @param  kind     Entity kind.
- * @param  name     Entity name.
- * @param  recordId Record ID.
+ * @param state    State tree.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
  *
  * @return The entity record's save error.
  */
@@ -882,10 +882,10 @@ export function getLastEntitySaveError(
 /**
  * Returns the specified entity record's last delete error.
  *
- * @param  state    State tree.
- * @param  kind     Entity kind.
- * @param  name     Entity name.
- * @param  recordId Record ID.
+ * @param state    State tree.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
  *
  * @return The entity record's save error.
  */
@@ -911,7 +911,7 @@ export function getLastEntityDeleteError(
  * of the history stack we are at. 0 is the
  * last edit, -1 is the second last, and so on.
  *
- * @param  state State tree.
+ * @param state State tree.
  *
  * @return The current undo offset.
  */
@@ -923,7 +923,7 @@ function getCurrentUndoOffset( state: State ): number {
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param  state State tree.
+ * @param state State tree.
  *
  * @return The edit.
  */
@@ -935,7 +935,7 @@ export function getUndoEdit( state: State ): Optional< any > {
  * Returns the next edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param  state State tree.
+ * @param state State tree.
  *
  * @return The edit.
  */
@@ -947,7 +947,7 @@ export function getRedoEdit( state: State ): Optional< any > {
  * Returns true if there is a previous edit from the current undo offset
  * for the entity records edits history, and false otherwise.
  *
- * @param  state State tree.
+ * @param state State tree.
  *
  * @return Whether there is a previous edit or not.
  */
@@ -959,7 +959,7 @@ export function hasUndo( state: State ): boolean {
  * Returns true if there is a next edit from the current undo offset
  * for the entity records edits history, and false otherwise.
  *
- * @param  state State tree.
+ * @param state State tree.
  *
  * @return Whether there is a next edit or not.
  */
@@ -970,7 +970,7 @@ export function hasRedo( state: State ): boolean {
 /**
  * Return the current theme.
  *
- * @param  state Data state.
+ * @param state Data state.
  *
  * @return The current theme.
  */
@@ -981,7 +981,7 @@ export function getCurrentTheme( state: State ): any {
 /**
  * Return the ID of the current global styles object.
  *
- * @param  state Data state.
+ * @param state Data state.
  *
  * @return The current global styles ID.
  */
@@ -992,7 +992,7 @@ export function __experimentalGetCurrentGlobalStylesId( state: State ): string {
 /**
  * Return theme supports data in the index.
  *
- * @param  state Data state.
+ * @param state Data state.
  *
  * @return Index data.
  */
@@ -1003,8 +1003,8 @@ export function getThemeSupports( state: State ): any {
 /**
  * Returns the embed preview for the given URL.
  *
- * @param  state Data state.
- * @param  url   Embedded URL.
+ * @param state Data state.
+ * @param url   Embedded URL.
  *
  * @return Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
  */
@@ -1019,8 +1019,8 @@ export function getEmbedPreview( state: State, url: string ): any {
  * We need to be able to determine if a URL is embeddable or not, based on what we
  * get back from the oEmbed preview API.
  *
- * @param  state Data state.
- * @param  url   Embedded URL.
+ * @param state Data state.
+ * @param url   Embedded URL.
  *
  * @return Is the preview for the URL an oEmbed link fallback.
  */
@@ -1042,10 +1042,10 @@ export function isPreviewEmbedFallback( state: State, url: string ): boolean {
  *
  * https://developer.wordpress.org/rest-api/reference/
  *
- * @param  state    Data state.
- * @param  action   Action to check. One of: 'create', 'read', 'update', 'delete'.
- * @param  resource REST resource to check, e.g. 'media' or 'posts'.
- * @param  id       Optional ID of the rest resource to check.
+ * @param state    Data state.
+ * @param action   Action to check. One of: 'create', 'read', 'update', 'delete'.
+ * @param resource REST resource to check, e.g. 'media' or 'posts'.
+ * @param id       Optional ID of the rest resource to check.
  *
  * @return Whether or not the user can perform the action,
  *                             or `undefined` if the OPTIONS request is still being made.
@@ -1068,10 +1068,10 @@ export function canUser(
  *
  * https://developer.wordpress.org/rest-api/reference/
  *
- * @param  state    Data state.
- * @param  kind     Entity kind.
- * @param  name     Entity name.
- * @param  recordId Record's id.
+ * @param state    Data state.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record's id.
  * @return Whether or not the user can edit,
  * or `undefined` if the OPTIONS request is still being made.
  */
@@ -1096,9 +1096,9 @@ export function canUserEditEntityRecord(
  * May return multiple autosaves since the backend stores one autosave per
  * author for each post.
  *
- * @param  state    State tree.
- * @param  postType The type of the parent post.
- * @param  postId   The id of the parent post.
+ * @param state    State tree.
+ * @param postType The type of the parent post.
+ * @param postId   The id of the parent post.
  *
  * @return An array of autosaves for the post, or undefined if there is none.
  */
@@ -1113,10 +1113,10 @@ export function getAutosaves(
 /**
  * Returns the autosave for the post and author.
  *
- * @param  state    State tree.
- * @param  postType The type of the parent post.
- * @param  postId   The id of the parent post.
- * @param  authorId The id of the author.
+ * @param state    State tree.
+ * @param postType The type of the parent post.
+ * @param postId   The id of the parent post.
+ * @param authorId The id of the author.
  *
  * @return The autosave for the post and author.
  */
@@ -1140,9 +1140,9 @@ export function getAutosave< EntityRecord extends ET.EntityRecord< any > >(
 /**
  * Returns true if the REST request for autosaves has completed.
  *
- * @param  state    State tree.
- * @param  postType The type of the parent post.
- * @param  postId   The id of the parent post.
+ * @param state    State tree.
+ * @param postType The type of the parent post.
+ * @param postId   The id of the parent post.
  *
  * @return True if the REST request was completed. False otherwise.
  */
@@ -1174,7 +1174,7 @@ export const hasFetchedAutosaves = createRegistrySelector(
  * );
  * ```
  *
- * @param  state Editor state.
+ * @param state Editor state.
  *
  * @return A value whose reference will change only when an edit occurs.
  */
@@ -1191,8 +1191,8 @@ export const getReferenceByDistinctEdits = createSelector(
 /**
  * Retrieve the frontend template used for a given link.
  *
- * @param  state Editor state.
- * @param  link  Link.
+ * @param state Editor state.
+ * @param link  Link.
  *
  * @return The template record.
  */
@@ -1223,7 +1223,7 @@ export function __experimentalGetTemplateForLink(
 /**
  * Retrieve the current theme's base global styles
  *
- * @param  state Editor state.
+ * @param state Editor state.
  *
  * @return The Global Styles object.
  */
@@ -1240,7 +1240,7 @@ export function __experimentalGetCurrentThemeBaseGlobalStyles(
 /**
  * Return the ID of the current global styles object.
  *
- * @param  state Data state.
+ * @param state Data state.
  *
  * @return The current global styles ID.
  */
@@ -1257,7 +1257,7 @@ export function __experimentalGetCurrentThemeGlobalStylesVariations(
 /**
  * Retrieve the list of registered block patterns.
  *
- * @param  state Data state.
+ * @param state Data state.
  *
  * @return Block pattern list.
  */
@@ -1268,7 +1268,7 @@ export function getBlockPatterns( state: State ): Array< any > {
 /**
  * Retrieve the list of registered block pattern categories.
  *
- * @param  state Data state.
+ * @param state Data state.
  *
  * @return Block pattern category list.
  */

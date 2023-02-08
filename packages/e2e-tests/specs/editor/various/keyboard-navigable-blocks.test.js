@@ -56,7 +56,7 @@ const tabThroughBlockToolbar = async () => {
 	await expect( await getActiveLabel() ).toBe( 'Move down' );
 
 	await page.keyboard.press( 'ArrowRight' );
-	await expect( await getActiveLabel() ).toBe( 'Align' );
+	await expect( await getActiveLabel() ).toBe( 'Align text' );
 
 	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Bold' );
