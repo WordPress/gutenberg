@@ -23,6 +23,7 @@
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"ariaLabel": true,
+		"role": true,
 		"html": false,
 		"color": {
 			"gradients": true,
