@@ -1614,12 +1614,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/private-apis",
-		"slug": "packages-experiments",
-		"markdown_source": "../packages/private-apis/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",
@@ -1767,6 +1761,12 @@
 		"title": "@wordpress/primitives",
 		"slug": "packages-primitives",
 		"markdown_source": "../packages/primitives/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/private-apis",
+		"slug": "packages-private-apis",
+		"markdown_source": "../packages/private-apis/README.md",
 		"parent": "packages"
 	},
 	{
