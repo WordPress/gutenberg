@@ -29,7 +29,13 @@ function ScreenHeader( { title, description } ) {
 							aria-label={ __( 'Navigate to the previous view' ) }
 						/>
 						<Spacer>
-							<Heading level={ 5 }>{ title }</Heading>
+							<Heading
+								className="edit-site-global-styles-header"
+								level={ 2 }
+								size={ 13 }
+							>
+								{ title }
+							</Heading>
 						</Spacer>
 					</HStack>
 				</Spacer>

@@ -59,7 +59,7 @@ import {
 } from './child-layout';
 import useSetting from '../components/use-setting';
 import { store as blockEditorStore } from '../store';
-import { unlock } from '../experiments';
+import { unlock } from '../lock-unlock';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -343,6 +343,18 @@ export function useIsDimensionsSupportValid( blockName, feature ) {
 		// eslint-disable-next-line no-console
 		console.warn(
 			`The ${ feature } support for the "${ blockName }" block can not be configured to support both axial and arbitrary sides.`
+		);
+		return false;
+	}
+
+	if (
+		sides?.length &&
+		feature === 'blockGap' &&
+		! AXIAL_SIDES.every( ( side ) => sides.includes( side ) )
+	) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`The ${ feature } support for the "${ blockName }" block can not be configured to support arbitrary sides.`
 		);
 		return false;
 	}

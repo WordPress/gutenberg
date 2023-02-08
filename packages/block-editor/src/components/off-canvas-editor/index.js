@@ -60,12 +60,23 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {boolean} props.showBlockMovers Flag to enable block movers
  * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
  * @param {Object}  props.LeafMoreMenu    Optional more menu substitution.
+ * @param {string}  props.description     Optional accessible description for the tree grid component.
+ * @param {string}  props.onSelect        Optional callback to be invoked when a block is selected.
  * @param {Object}  ref                   Forwarded ref
  */
 function OffCanvasEditor(
-	{ id, blocks, showBlockMovers = false, isExpanded = false, LeafMoreMenu },
+	{
+		id,
+		blocks,
+		showBlockMovers = false,
+		isExpanded = false,
+		LeafMoreMenu,
+		description = __( 'Block navigation structure' ),
+		onSelect,
+	},
 	ref
 ) {
+	const { getBlock } = useSelect( blockEditorStore );
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
 		useListViewClientIds( blocks );
 
@@ -105,8 +116,11 @@ function OffCanvasEditor(
 		( event, blockClientId ) => {
 			updateBlockSelection( event, blockClientId );
 			setSelectedTreeId( blockClientId );
+			if ( onSelect ) {
+				onSelect( getBlock( blockClientId ) );
+			}
 		},
-		[ setSelectedTreeId, updateBlockSelection ]
+		[ setSelectedTreeId, updateBlockSelection, onSelect, getBlock ]
 	);
 	useEffect( () => {
 		isMounted.current = true;
@@ -208,7 +222,8 @@ function OffCanvasEditor(
 					onCollapseRow={ collapseRow }
 					onExpandRow={ expandRow }
 					onFocusRow={ focusRow }
-					applicationAriaLabel={ __( 'Block navigation structure' ) }
+					// eslint-disable-next-line jsx-a11y/aria-props
+					aria-description={ description }
 				>
 					<ListViewContext.Provider value={ contextValue }>
 						<ListViewBranch

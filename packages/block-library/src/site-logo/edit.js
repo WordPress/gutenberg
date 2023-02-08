@@ -78,18 +78,15 @@ const SiteLogo = ( {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
 			'root',
 			'__unstableBase'
 		);
 		return {
 			title: siteEntities?.name,
-			...Object.fromEntries(
-				Object.entries( getSettings() ).filter( ( [ key ] ) =>
-					[ 'imageEditing', 'maxWidth' ].includes( key )
-				)
-			),
+			imageEditing: settings.imageEditing,
+			maxWidth: settings.maxWidth,
 		};
 	}, [] );
 

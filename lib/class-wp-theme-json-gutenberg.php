@@ -721,7 +721,14 @@ class WP_Theme_JSON_Gutenberg {
 		$schema_settings_blocks = array();
 		foreach ( $valid_block_names as $block ) {
 			// Build the schema for each block style variation.
-			$style_variation_names    = isset( $input['styles']['blocks'][ $block ]['variations'] ) ? array_keys( $input['styles']['blocks'][ $block ]['variations'] ) : array();
+			$style_variation_names = array();
+			if (
+				! empty( $input['styles']['blocks'][ $block ]['variations'] ) &&
+				is_array( $input['styles']['blocks'][ $block ]['variations'] )
+			) {
+				$style_variation_names = array_keys( $input['styles']['blocks'][ $block ]['variations'] );
+			}
+
 			$schema_styles_variations = array();
 			if ( ! empty( $style_variation_names ) ) {
 				$schema_styles_variations = array_fill_keys( $style_variation_names, $styles_non_top_level );
@@ -964,7 +971,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @return string The processed CSS.
 	 */
-	public function process_blocks_custom_css( $css, $selector ) {
+	protected function process_blocks_custom_css( $css, $selector ) {
 		$processed_css = '';
 
 		// Split CSS nested rules.
@@ -2315,33 +2322,41 @@ class WP_Theme_JSON_Gutenberg {
 
 				// If the block has feature selectors, generate the declarations for them within the current style variation.
 				if ( ! empty( $block_metadata['features'] ) ) {
+					$clean_style_variation_selector = trim( $style_variation_selector );
 					foreach ( $block_metadata['features'] as $feature_name => $feature_selector ) {
-						if ( ! empty( $style_variation_node[ $feature_name ] ) ) {
-							// Prepend the variation selector to the feature selector.
-							$split_feature_selectors    = explode( ',', $feature_selector );
-							$feature_selectors          = array_map(
-								function( $split_feature_selector ) use ( $style_variation_selector ) {
-									return trim( $style_variation_selector ) . trim( $split_feature_selector );
-								},
-								$split_feature_selectors
-							);
-							$combined_feature_selectors = implode( ',', $feature_selectors );
-
-							// Compute declarations for the feature.
-							$new_feature_declarations = static::compute_style_properties( array( $feature_name => $style_variation_node[ $feature_name ] ), $settings, null, $this->theme_json );
-
-							// Merge new declarations with any that already exist for
-							// the feature selector. This may occur when multiple block
-							// support features use the same custom selector.
-							if ( isset( $style_variation_declarations[ $combined_feature_selectors ] ) ) {
-								$style_variation_declarations[ $combined_feature_selectors ] = array_merge( $style_variation_declarations[ $combined_feature_selectors ], $new_feature_declarations );
-							} else {
-								$style_variation_declarations[ $combined_feature_selectors ] = $new_feature_declarations;
-							}
-							// Remove the feature from the variation's node now the
-							// styles will be included under the feature level selector.
-							unset( $style_variation_node[ $feature_name ] );
+						if ( empty( $style_variation_node[ $feature_name ] ) ) {
+							continue;
 						}
+						// Prepend the variation selector to the feature selector.
+						$split_feature_selectors    = explode( ',', $feature_selector );
+						$feature_selectors          = array_map(
+							static function( $split_feature_selector ) use ( $clean_style_variation_selector ) {
+								return $clean_style_variation_selector . trim( $split_feature_selector );
+							},
+							$split_feature_selectors
+						);
+						$combined_feature_selectors = implode( ',', $feature_selectors );
+
+						// Compute declarations for the feature.
+						$new_feature_declarations = static::compute_style_properties( array( $feature_name => $style_variation_node[ $feature_name ] ), $settings, null, $this->theme_json );
+
+						/*
+						* Merge new declarations with any that already exist for
+						* the feature selector. This may occur when multiple block
+						* support features use the same custom selector.
+						*/
+						if ( isset( $style_variation_declarations[ $combined_feature_selectors ] ) ) {
+							$style_variation_declarations[ $combined_feature_selectors ] = array_merge( $style_variation_declarations[ $combined_feature_selectors ], $new_feature_declarations );
+						} else {
+							$style_variation_declarations[ $combined_feature_selectors ] = $new_feature_declarations;
+						}
+
+						/*
+						* Remove the feature from the variation's node now the
+						* styles will be included under the feature level selector.
+						*/
+						unset( $style_variation_node[ $feature_name ] );
+
 					}
 				}
 				// Compute declarations for remaining styles not covered by feature level selectors.
