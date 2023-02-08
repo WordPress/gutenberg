@@ -105,9 +105,14 @@ describe( 'Post Editor Performance', () => {
 			readFile( join( __dirname, '../../assets/large-post.html' ) )
 		);
 		await saveDraft();
+		const draftURL = await page.url();
+
 		let i = 5;
 		while ( i-- ) {
-			await page.reload();
+			await page.close();
+			page = await browser.newPage();
+
+			await page.goto( draftURL );
 			await page.waitForSelector( '.edit-post-layout', {
 				timeout: 120000,
 			} );
