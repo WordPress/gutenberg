@@ -60,7 +60,7 @@
 }
 
 .edit-site-template-revisions {
-	padding-left: -$grid-unit-10;
+	margin-left: math.div(-$grid-unit-10, 2);
 }
 
 h3.edit-site-template-card__template-areas-title {
