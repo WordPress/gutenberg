@@ -1230,13 +1230,15 @@ export function removeBlock( clientId, selectPrevious ) {
  * @param {Object[]}  blocks          Block objects to insert as new InnerBlocks
  * @param {?boolean}  updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to false.
  * @param {0|-1|null} initialPosition Initial block position.
+ * @param {string}    actor           Actor who triggered the action.
  * @return {Object} Action object.
  */
 export function replaceInnerBlocks(
 	rootClientId,
 	blocks,
 	updateSelection = false,
-	initialPosition = 0
+	initialPosition = 0,
+	actor = 'auto'
 ) {
 	/* eslint-enable jsdoc/valid-types */
 	return {
@@ -1246,6 +1248,7 @@ export function replaceInnerBlocks(
 		updateSelection,
 		initialPosition: updateSelection ? initialPosition : null,
 		time: Date.now(),
+		meta: { actor },
 	};
 }
 

@@ -46,6 +46,7 @@ const ListViewBlockContents = forwardRef(
 		const {
 			blockMovingClientId,
 			selectedBlockInBlockEditor,
+			lastInsertedBlocksActor,
 			lastInsertedBlockClientId,
 		} = useSelect(
 			( select ) => {
@@ -53,15 +54,19 @@ const ListViewBlockContents = forwardRef(
 					hasBlockMovingClientId,
 					getSelectedBlockClientId,
 					getLastInsertedBlocksClientIds,
+					getLastInsertedBlocksActor,
 				} = unlock( select( blockEditorStore ) );
 				const lastInsertedBlocksClientIds =
 					getLastInsertedBlocksClientIds();
 				return {
 					blockMovingClientId: hasBlockMovingClientId(),
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
+					lastInsertedBlocksActor: getLastInsertedBlocksActor(),
 					lastInsertedBlockClientId:
 						lastInsertedBlocksClientIds &&
-						lastInsertedBlocksClientIds[ 0 ],
+						lastInsertedBlocksClientIds[
+							lastInsertedBlocksClientIds.length - 1
+						],
 				};
 			},
 			[ clientId ]
@@ -77,6 +82,7 @@ const ListViewBlockContents = forwardRef(
 
 		useEffect( () => {
 			if (
+				lastInsertedBlocksActor !== 'auto' && // don't show the Link UI if the block was inserted by something other than the user.
 				clientId === lastInsertedBlockClientId &&
 				BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName ) &&
 				! hasExistingLinkValue // don't re-show the Link UI if the block already has a link value.
@@ -85,6 +91,7 @@ const ListViewBlockContents = forwardRef(
 			}
 		}, [
 			lastInsertedBlockClientId,
+			lastInsertedBlocksActor,
 			clientId,
 			insertedBlockName,
 			hasExistingLinkValue,

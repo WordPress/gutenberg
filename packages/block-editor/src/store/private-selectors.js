@@ -18,3 +18,13 @@ export function isBlockInterfaceHidden( state ) {
 export function getLastInsertedBlocksClientIds( state ) {
 	return state?.lastBlockInserted?.clientIds;
 }
+
+/**
+ * Gets the actor of the last inserted blocks.
+ *
+ * @param {Object} state Global application state.
+ * @return {string|undefined} Actor of the last inserted block(s).
+ */
+export function getLastInsertedBlocksActor( state ) {
+	return state?.lastBlockInserted?.actor;
+}

@@ -1424,6 +1424,7 @@ _Parameters_
 -   _blocks_ `Object[]`: Block objects to insert as new InnerBlocks
 -   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to false.
 -   _initialPosition_ `0|-1|null`: Initial block position.
+-   _actor_ `string`: Actor who triggered the action.
 
 _Returns_
 

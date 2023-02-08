@@ -1840,8 +1840,9 @@ export function lastBlockInserted( state = {}, action ) {
 			} );
 
 			const source = action.meta?.source;
+			const actor = action.meta?.actor;
 
-			return { clientIds, source };
+			return { clientIds, source, actor };
 		case 'RESET_BLOCKS':
 			return {};
 	}
