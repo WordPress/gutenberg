@@ -1764,15 +1764,15 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/private-apis",
-		"slug": "packages-private-apis",
-		"markdown_source": "../packages/private-apis/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/priority-queue",
 		"slug": "packages-priority-queue",
 		"markdown_source": "../packages/priority-queue/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/private-apis",
+		"slug": "packages-private-apis",
+		"markdown_source": "../packages/private-apis/README.md",
 		"parent": "packages"
 	},
 	{
