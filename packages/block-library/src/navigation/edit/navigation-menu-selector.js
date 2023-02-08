@@ -105,9 +105,13 @@ function NavigationMenuSelector( {
 							<MenuItemsChoice
 								value={ currentMenuId }
 								onSelect={ ( menuId ) => {
+									setSelectorLabel( __( 'Loading …' ) );
+									setIsCreatingMenu( true );
 									onSelectNavigationMenu( menuId );
+									onClose();
 								} }
 								choices={ menuChoices }
+								disabled={ isCreatingMenu }
 							/>
 						</MenuGroup>
 					) }
@@ -121,6 +125,7 @@ function NavigationMenuSelector( {
 											setSelectorLabel(
 												__( 'Loading …' )
 											);
+											setIsCreatingMenu( true );
 											onSelectClassicMenu( menu );
 											onClose();
 										} }
@@ -129,6 +134,7 @@ function NavigationMenuSelector( {
 											createActionLabel,
 											label
 										) }
+										disabled={ isCreatingMenu }
 									>
 										{ label }
 									</MenuItem>

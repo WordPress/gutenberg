@@ -396,38 +396,6 @@ describe( 'NavigationMenuSelector', () => {
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly call handler when navigation menu item is clicked', async () => {
-				const user = userEvent.setup();
-
-				const clickHandler = jest.fn();
-
-				useNavigationMenu.mockReturnValue( {
-					navigationMenus: navigationMenusFixture,
-					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
-					canSwitchNavigationMenu: true,
-				} );
-
-				render(
-					<NavigationMenuSelector
-						onSelectNavigationMenu={ clickHandler }
-					/>
-				);
-
-				const toggleButton = screen.getByRole( 'button' );
-				await user.click( toggleButton );
-
-				const menuItem = screen.getByRole( 'menuitemradio', {
-					name: navigationMenusFixture[ 0 ].title.rendered,
-				} );
-
-				await user.click( menuItem );
-
-				expect( clickHandler ).toHaveBeenCalledWith(
-					navigationMenusFixture[ 0 ].id
-				);
-			} );
-
 			it( 'should pre-select the correct menu in the menu list if a menu ID is passed', async () => {
 				const user = userEvent.setup();
 
@@ -452,6 +420,77 @@ describe( 'NavigationMenuSelector', () => {
 				} );
 
 				expect( menuItem ).toBeChecked();
+			} );
+
+			it( 'should call the handler when the navigation menu is selected and disable all options during the import/creation process', async () => {
+				const user = userEvent.setup();
+
+				const handler = jest.fn();
+
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: navigationMenusFixture,
+					hasResolvedNavigationMenus: true,
+					canUserCreateNavigationMenu: true,
+					canSwitchNavigationMenu: true,
+				} );
+
+				const { rerender } = render(
+					<NavigationMenuSelector
+						onSelectNavigationMenu={ handler }
+					/>
+				);
+				const toggleButton = screen.getByRole( 'button' );
+
+				await user.click( toggleButton );
+
+				await user.click(
+					screen.getByRole( 'menuitemradio', {
+						name: navigationMenusFixture[ 0 ].title.rendered,
+					} )
+				);
+
+				expect( handler ).toHaveBeenCalledWith(
+					navigationMenusFixture[ 0 ].id
+				);
+
+				//  Check the dropdown has been closed.
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+
+				// Re-open the dropdown
+				await user.click( screen.getByRole( 'button' ) );
+
+				// Check the dropdown is again open and is in the "loading" state.
+				expect(
+					screen.getByRole( 'menu', {
+						name: /Loading/,
+					} )
+				).toBeInTheDocument();
+
+				// // Check all menu items are present but disabled.
+				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
+					// // Check all menu items are present but disabled.
+					expect( item ).toBeDisabled();
+				} );
+
+				// // Simulate the menu being created and component being re-rendered.
+				rerender(
+					<NavigationMenuSelector
+						createNavigationMenuIsSuccess={ true } // classic menu import creates a Navigation menu.
+					/>
+				);
+
+				// Todo: fix bug where aria label is not updated.
+				// expect(
+				// 	screen.getByRole( 'menu', {
+				// 		name: `You are currently editing ${ navigationMenusFixture[ 0 ].title.rendered }`,
+				// 	} )
+				// ).toBeInTheDocument();
+
+				// Check all menu items are re-enabled.
+				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
+					// // Check all menu items are present but disabled.
+					expect( item ).toBeEnabled();
+				} );
 			} );
 		} );
 
@@ -518,18 +557,80 @@ describe( 'NavigationMenuSelector', () => {
 
 				expect( classicMenusGroup ).toBeInTheDocument();
 
-				// Check for classic menuitem roles
-				expect(
-					screen.getByRole( 'menuitem', {
-						name: `Create from '${ classicMenusFixture[ 0 ].name }'`,
-					} )
-				).toBeInTheDocument();
-
+				// Check for classic menuitems
 				classicMenusFixture.forEach( ( item ) => {
 					const menuItem = screen.getByRole( 'menuitem', {
 						name: `Create from '${ item.name }'`,
 					} );
 					expect( menuItem ).toBeInTheDocument();
+				} );
+			} );
+
+			it( 'should call the handler when the classic menu item is selected and disable all options during the import/creation process', async () => {
+				const user = userEvent.setup();
+				const handler = jest.fn();
+
+				useNavigationMenu.mockReturnValue( {
+					canUserCreateNavigationMenu: true,
+				} );
+
+				useNavigationEntities.mockReturnValue( {
+					menus: classicMenusFixture,
+				} );
+
+				const { rerender } = render(
+					<NavigationMenuSelector onSelectClassicMenu={ handler } />
+				);
+
+				const toggleButton = screen.getByRole( 'button' );
+
+				await user.click( toggleButton );
+
+				await user.click(
+					screen.getByRole( 'menuitem', {
+						name: `Create from '${ classicMenusFixture[ 0 ].name }'`,
+					} )
+				);
+
+				expect( handler ).toHaveBeenCalled();
+
+				// Check the dropdown has been closed.
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+
+				// // Re-open the dropdown (it's closed when the "Create menu" button is clicked).
+				await user.click( screen.getByRole( 'button' ) );
+
+				// Check the dropdown is open and is in the "loading" state.
+				expect(
+					screen.getByRole( 'menu', {
+						name: /Loading/,
+					} )
+				).toBeInTheDocument();
+
+				// Check all menu items are present but disabled.
+				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
+					// // Check all menu items are present but disabled.
+					expect( item ).toBeDisabled();
+				} );
+
+				// Simulate the menu being created and component being re-rendered.
+				rerender(
+					<NavigationMenuSelector
+						createNavigationMenuIsSuccess={ true } // classic menu import creates a Navigation menu.
+					/>
+				);
+
+				// Todo: fix bug where aria label is not updated.
+				// expect(
+				// 	screen.getByRole( 'menu', {
+				// 		name: `You are currently editing ${ classicMenusFixture[ 0 ].name }`,
+				// 	} )
+				// ).toBeInTheDocument();
+
+				// Check all menu items are re-enabled.
+				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
+					// // Check all menu items are present but disabled.
+					expect( item ).toBeEnabled();
 				} );
 			} );
 		} );
