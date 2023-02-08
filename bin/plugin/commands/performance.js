@@ -295,7 +295,7 @@ async function runPerformanceTests( branches, options ) {
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
-	await runShellScript( 'mkdir -p ' + rootDirectory + '/envs' );
+	await runShellScript( 'mkdir -p ' + rootDirectory + '/envs || env true' );
 
 	// 2- Preparing the environment directories per branch.
 	log( '\n>> Preparing an environment directory per branch' );
