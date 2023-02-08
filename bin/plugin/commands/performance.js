@@ -134,7 +134,7 @@ function formatTime( number ) {
 /**
  * Curate the raw performance results.
  *
- * @param {string} testSuite
+ * @param {string}                  testSuite
  * @param {WPRawPerformanceResults} results
  *
  * @return {WPPerformanceResults} Curated Performance results.
