@@ -138,18 +138,20 @@ export default function Editor() {
 	);
 	const isReady = editedPostType !== undefined && editedPostId !== undefined;
 
-	let titleBreadcrumb;
+	let title;
 	if ( isReady && editedPost ) {
 		const type =
 			editedPostType === 'wp_template'
 				? __( 'Template' )
 				: __( 'Template Part' );
-		titleBreadcrumb = `${ editedPost.title?.rendered } ‹ ${ type } ‹ `;
+		title = `${ editedPost.title?.rendered } ‹ ${ type } ‹ ${ __(
+			'Editor (beta)'
+		) }`;
 	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
 	// action in <URlQueryController> from double-announcing.
-	useTitle( isReady && `${ titleBreadcrumb }${ __( 'Editor (beta)' ) }` );
+	useTitle( isReady && title );
 
 	if ( ! isReady ) {
 		return <CanvasSpinner />;
