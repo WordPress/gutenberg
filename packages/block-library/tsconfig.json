@@ -6,6 +6,29 @@
 		"types": [ "gutenberg-env" ],
 		"strictNullChecks": true
 	},
-	"references": [ { "path": "../element" } ],
+	"references": [
+		{ "path": "../a11y" },
+		{ "path": "../api-fetch" },
+		{ "path": "../autop" },
+		{ "path": "../blob" },
+		{ "path": "../block-editor" },
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../core-data" },
+		{ "path": "../data" },
+		{ "path": "../date" },
+		{ "path": "../deprecated" },
+		{ "path": "../dom" },
+		{ "path": "../element" },
+		{ "path": "../escape-html" },
+		{ "path": "../experiments" },
+		{ "path": "../hooks" },
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../keycodes" },
+		{ "path": "../primitives" },
+		{ "path": "../url" }
+	],
 	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
 }

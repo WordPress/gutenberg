@@ -99,10 +99,10 @@ function LinkControlTransforms( { clientId } ) {
 				{ __( 'Transform' ) }
 			</h3>
 			<div className="link-control-transform__items">
-				{ transforms.map( ( item, index ) => {
+				{ transforms.map( ( item ) => {
 					return (
 						<Button
-							key={ `transform-${ index }` }
+							key={ `transform-${ item.name }` }
 							onClick={ () =>
 								replaceBlock(
 									clientId,

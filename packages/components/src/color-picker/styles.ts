@@ -9,7 +9,6 @@ import styled from '@emotion/styled';
 import NumberControl from '../number-control';
 import InnerSelectControl from '../select-control';
 import InnerRangeControl from '../range-control';
-import { StyledField } from '../base-control/styles/base-control-styles';
 import { space } from '../ui/utils/space';
 import { boxSizingReset } from '../utils';
 import Button from '../button';
@@ -111,10 +110,6 @@ export const ColorfulWrapper = styled.div`
 	}
 
 	${ interactiveHueStyles }
-
-	${ StyledField } {
-		margin-bottom: 0;
-	}
 `;
 
 export const CopyButton = styled( Button )`

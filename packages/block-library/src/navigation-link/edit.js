@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,6 +34,7 @@ import {
 	placeCaretAtHorizontalEdge,
 	__unstableStripHTML as stripHTML,
 } from '@wordpress/dom';
+import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import {
 	store as coreStore,
@@ -261,6 +261,9 @@ export default function NavigationLinkEdit( {
 	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
 		if ( hasChildren ) {
+			// This side-effect should not create an undo level as those should
+			// only be created via user interactions.
+			__unstableMarkNextChangeAsNotPersistent();
 			transformToSubmenu();
 		}
 	}, [ hasChildren ] );
@@ -312,12 +315,17 @@ export default function NavigationLinkEdit( {
 	 */
 	function removeLink() {
 		// Reset all attributes that comprise the link.
+		// It is critical that all attributes are reset
+		// to their default values otherwise this may
+		// in advertently trigger side effects because
+		// the values will have "changed".
 		setAttributes( {
-			url: '',
-			label: '',
-			id: '',
-			kind: '',
-			type: '',
+			url: undefined,
+			label: undefined,
+			id: undefined,
+			kind: undefined,
+			type: undefined,
+			opensInNewTab: false,
 		} );
 
 		// Close the link editing UI.
@@ -375,12 +383,19 @@ export default function NavigationLinkEdit( {
 	const DEFAULT_BLOCK = {
 		name: 'core/navigation-link',
 	};
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: true,
-		renderAppender: false,
-	} );
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			...blockProps,
+			className: 'remove-outline', // Remove the outline from the inner blocks container.
+		},
+		{
+			allowedBlocks: ALLOWED_BLOCKS,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: true,
+			renderAppender: false,
+		}
+	);
 
 	if ( ! url || isInvalid || isDraft ) {
 		blockProps.onClick = () => setIsLinkOpen( true );
@@ -425,6 +440,7 @@ export default function NavigationLinkEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ label ? stripHTML( label ) : '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
@@ -433,9 +449,14 @@ export default function NavigationLinkEdit( {
 						autoComplete="off"
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
-							setAttributes( { url: urlValue } );
+							updateAttributes(
+								{ url: urlValue },
+								setAttributes,
+								attributes
+							);
 						} }
 						label={ __( 'URL' ) }
 						autoComplete="off"
@@ -452,6 +473,7 @@ export default function NavigationLinkEdit( {
 						) }
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
@@ -460,6 +482,7 @@ export default function NavigationLinkEdit( {
 						autoComplete="off"
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
@@ -556,7 +579,7 @@ export default function NavigationLinkEdit( {
 													// Unescape is used here to "recover" the escaped characters
 													// so they display without encoding.
 													// See `updateAttributes` for more details.
-													`${ unescape(
+													`${ decodeEntities(
 														label
 													) } ${ placeholderText }`.trim()
 												}

@@ -83,6 +83,7 @@
 			}
 		},
 		"reusable": false,
+		"shadow": true,
 		"spacing": {
 			"__experimentalSkipSerialization": true,
 			"padding": [ "horizontal", "vertical" ],
@@ -91,10 +92,16 @@
 			}
 		},
 		"__experimentalBorder": {
+			"color": true,
 			"radius": true,
+			"style": true,
+			"width": true,
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
-				"radius": true
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
 			}
 		},
 		"__experimentalSelector": ".wp-block-button .wp-block-button__link"

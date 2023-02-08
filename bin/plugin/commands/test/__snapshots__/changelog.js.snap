@@ -43,6 +43,7 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Fix block appender position in classic themes. ([33895](https://github.com/WordPress/gutenberg/pull/33895))
 - Fix misspelling of \\"queries\\" in filter documentation. ([33799](https://github.com/WordPress/gutenberg/pull/33799))
 - Fix positioning discrepancy with draggable chip. ([33893](https://github.com/WordPress/gutenberg/pull/33893))
+- Navigation Editor: Avoid React warning when creating a new menu. ([33843](https://github.com/WordPress/gutenberg/pull/33843))
 
 #### Block Library
 - Fix justification for button block when selected. ([33739](https://github.com/WordPress/gutenberg/pull/33739))
@@ -71,10 +72,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 #### CSS & Styling
 - Fix navigation block placeholder preview markup. ([33963](https://github.com/WordPress/gutenberg/pull/33963))
 
-#### Navigation Screen
-- Fix regressed menu selection dropdown placeholder value for Nav Editor menu locations UI. ([33748](https://github.com/WordPress/gutenberg/pull/33748))
-- Navigation Editor: Avoid React warning when creating a new menu. ([33843](https://github.com/WordPress/gutenberg/pull/33843))
-
 #### Site Editor
 - Fix the site editor breaking in firefox. ([33896](https://github.com/WordPress/gutenberg/pull/33896))
 
@@ -86,6 +83,9 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 
 #### Build Tooling
 - Readable JS assets Plugin: Fix webpack 5 support. ([33785](https://github.com/WordPress/gutenberg/pull/33785))
+
+#### Navigation Screen
+- Fix regressed menu selection dropdown placeholder value for Nav Editor menu locations UI. ([33748](https://github.com/WordPress/gutenberg/pull/33748))
 
 #### Accessibility
 - Fix some JAWS bugs. ([33627](https://github.com/WordPress/gutenberg/pull/33627))

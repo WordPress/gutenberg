@@ -246,15 +246,17 @@ describe( 'renderCommitComment', () => {
 				issueUrl: 'url2',
 			},
 		];
+		const commitSHA = 'commitSHA';
 
 		const commentBody = renderCommitComment( {
 			reportedIssues,
 			runURL,
+			commitSHA,
 		} );
 
 		expect( commentBody ).toMatchInlineSnapshot( `
 		"<!-- flaky-tests-report-comment -->
-		**Flaky tests detected.**
+		**Flaky tests detected in commitSHA.**
 		Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
 
 		🔍  Workflow run URL: runURL
@@ -270,6 +272,7 @@ describe( 'isReportComment', () => {
 		const commentBody = renderCommitComment( {
 			reportedIssues: [],
 			runURL: '',
+			commitSHA: 'commitSHA',
 		} );
 
 		expect( isReportComment( commentBody ) ).toBe( true );

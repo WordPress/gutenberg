@@ -25,6 +25,7 @@ import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
+import { __experimentalUpdateSettings } from './private-actions';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -1264,28 +1265,6 @@ export function toggleBlockMode( clientId ) {
 }
 
 /**
- * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be hidden.
- *
- * @return {Object} Action object.
- */
-export function __experimentalHideBlockInterface() {
-	return {
-		type: 'HIDE_BLOCK_INTERFACE',
-	};
-}
-
-/**
- * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be shown.
- *
- * @return {Object} Action object.
- */
-export function __experimentalShowBlockInterface() {
-	return {
-		type: 'SHOW_BLOCK_INTERFACE',
-	};
-}
-
-/**
  * Returns an action object used in signalling that the user has begun to type.
  *
  * @return {Object} Action object.
@@ -1442,10 +1421,7 @@ export function updateBlockListSettings( clientId, settings ) {
  * @return {Object} Action object
  */
 export function updateSettings( settings ) {
-	return {
-		type: 'UPDATE_SETTINGS',
-		settings,
-	};
+	return __experimentalUpdateSettings( settings, true );
 }
 
 /**

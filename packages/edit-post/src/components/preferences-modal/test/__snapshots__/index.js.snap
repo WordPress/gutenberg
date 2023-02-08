@@ -84,7 +84,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </h1>
       </div>
       <button
-        aria-label="Close dialog"
+        aria-label="Close"
         class="components-button has-icon"
         type="button"
       >
@@ -597,6 +597,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   background: none;
   text-align: start;
   padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
+  box-sizing: border-box;
   width: 100%;
   display: block;
   margin: 0;
@@ -702,7 +703,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </h1>
       </div>
       <button
-        aria-label="Close dialog"
+        aria-label="Close"
         class="components-button has-icon"
         type="button"
       >

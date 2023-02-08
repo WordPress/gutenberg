@@ -2,7 +2,7 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { map, groupBy, get } from 'lodash';
+import { groupBy, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -68,10 +68,7 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 				},
 				queries: {
 					...state.queries,
-					[ action.queryID ]: map(
-						action.users,
-						( user ) => user.id
-					),
+					[ action.queryID ]: action.users.map( ( user ) => user.id ),
 				},
 			};
 	}

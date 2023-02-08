@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "14.8.4",
+	"version": "15.1.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -19,7 +19,8 @@
 		"npm": ">=6.9.0 <7"
 	},
 	"config": {
-		"IS_GUTENBERG_PLUGIN": true
+		"IS_GUTENBERG_PLUGIN": true,
+		"ALLOW_EXPERIMENT_REREGISTRATION": true
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
@@ -43,7 +44,6 @@
 		"@wordpress/deprecated": "file:packages/deprecated",
 		"@wordpress/dom": "file:packages/dom",
 		"@wordpress/dom-ready": "file:packages/dom-ready",
-		"@wordpress/edit-navigation": "file:packages/edit-navigation",
 		"@wordpress/edit-post": "file:packages/edit-post",
 		"@wordpress/edit-site": "file:packages/edit-site",
 		"@wordpress/edit-widgets": "file:packages/edit-widgets",
@@ -105,7 +105,6 @@
 		"@storybook/addon-actions": "6.5.7",
 		"@storybook/addon-controls": "6.5.7",
 		"@storybook/addon-docs": "6.5.7",
-		"@storybook/addon-knobs": "6.2.9",
 		"@storybook/addon-toolbars": "6.5.7",
 		"@storybook/addon-viewport": "6.5.7",
 		"@storybook/builder-webpack5": "6.5.7",
@@ -185,6 +184,7 @@
 		"eslint-import-resolver-node": "0.3.4",
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.25.2",
+		"eslint-plugin-jest": "27.2.1",
 		"eslint-plugin-jest-dom": "4.0.2",
 		"eslint-plugin-playwright": "0.8.0",
 		"eslint-plugin-ssr-friendly": "1.0.6",
@@ -233,7 +233,8 @@
 		"snapshot-diff": "0.8.1",
 		"source-map-loader": "3.0.0",
 		"sprintf-js": "1.1.1",
-		"storybook-source-link": "2.0.3",
+		"storybook-source-link": "2.0.4",
+		"strip-json-comments": "5.0.0",
 		"style-loader": "3.2.1",
 		"terser-webpack-plugin": "5.1.4",
 		"typescript": "4.4.2",
@@ -267,14 +268,15 @@
 		"fixtures:regenerate": "npm-run-all fixtures:clean fixtures:generate",
 		"format": "wp-scripts format",
 		"format:php": "wp-env run composer run-script format",
-		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
+		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:tsconfig\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
 		"lint:css": "wp-scripts lint-style \"**/*.scss\"",
 		"lint:css:fix": "npm run lint:css -- --fix",
 		"lint:js": "wp-scripts lint-js",
 		"lint:js:fix": "npm run lint:js -- --fix",
 		"lint:lockfile": "node ./bin/validate-package-lock.js",
+		"lint:tsconfig": "node ./bin/validate-tsconfig.mjs",
 		"lint:md:docs": "wp-scripts lint-md-docs",
-		"prelint:php": "wp-env run composer \"install --no-interaction\"",
+		"prelint:php": "wp-env run composer \"update --no-interaction\"",
 		"lint:php": "wp-env run composer run-script lint",
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
 		"native": "npm run --prefix packages/react-native-editor",
@@ -308,6 +310,7 @@
 		"test:unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
 		"test:unit:date": "bash ./bin/unit-test-date.sh",
 		"test:unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
+		"test:unit:profile": "wp-scripts --cpu-prof test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
 		"pretest:unit:php": "wp-env start",
 		"test:unit:php": "wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist --verbose",
 		"pretest:unit:php:multisite": "wp-env start",
@@ -342,6 +345,9 @@
 			"npm run docs:theme-ref",
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
 			"node ./bin/packages/lint-staged-typecheck.js"
+		],
+		"**/tsconfig.json": [
+			"npm run lint:tsconfig"
 		]
 	},
 	"wp-env": {

@@ -358,6 +358,9 @@ export default function NavigationSubmenuEdit( {
 	useEffect( () => {
 		// If block becomes empty, transform to Navigation Link.
 		if ( ! hasChildren && prevHasChildren ) {
+			// This side-effect should not create an undo level as those should
+			// only be created via user interactions.
+			__unstableMarkNextChangeAsNotPersistent();
 			transformToLink();
 		}
 	}, [ hasChildren, prevHasChildren ] );
@@ -393,6 +396,7 @@ export default function NavigationSubmenuEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ label || '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
@@ -401,6 +405,7 @@ export default function NavigationSubmenuEdit( {
 						autoComplete="off"
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
 							setAttributes( { url: urlValue } );
@@ -422,6 +427,7 @@ export default function NavigationSubmenuEdit( {
 						) }
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
@@ -430,6 +436,7 @@ export default function NavigationSubmenuEdit( {
 						autoComplete="off"
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );

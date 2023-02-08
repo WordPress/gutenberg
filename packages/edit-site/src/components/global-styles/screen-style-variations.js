@@ -23,15 +23,20 @@ import {
 	CardBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	experiments as blockEditorExperiments,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
-import { GlobalStylesContext } from './context';
 import StylesPreview from './preview';
 import ScreenHeader from './header';
+import { unlock } from '../../experiments';
+
+const { GlobalStylesContext } = unlock( blockEditorExperiments );
 
 function compareVariations( a, b ) {
 	return (

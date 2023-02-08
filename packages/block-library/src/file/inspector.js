@@ -71,6 +71,7 @@ export default function FileBlockInspector( {
 				) }
 				<PanelBody title={ __( 'Settings' ) }>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ textLinkHref }
 						options={ linkDestinationOptions }

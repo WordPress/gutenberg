@@ -136,12 +136,12 @@ test.describe( 'Gallery', () => {
 
 		await expect( gallery ).toBeVisible();
 		await editor.selectBlocks( gallery );
+		await editor.clickBlockToolbarButton( 'Add caption' );
 
 		const caption = gallery.locator(
 			'role=textbox[name="Gallery caption text"i]'
 		);
-		await expect( caption ).toBeVisible();
-		await caption.click();
+		await expect( caption ).toBeFocused();
 
 		await page.keyboard.type( galleryCaption );
 

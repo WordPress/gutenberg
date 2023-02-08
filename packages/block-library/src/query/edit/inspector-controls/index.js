@@ -144,6 +144,7 @@ export default function QueryInspectorControls( {
 						) }
 						{ showPostTypeControl && (
 							<SelectControl
+								__nextHasNoMarginBottom
 								options={ postTypesSelectOptions }
 								value={ postType }
 								label={ __( 'Post type' ) }
@@ -246,6 +247,7 @@ export default function QueryInspectorControls( {
 								onDeselect={ () => setQuerySearch( '' ) }
 							>
 								<TextControl
+									__nextHasNoMarginBottom
 									label={ __( 'Keyword' ) }
 									value={ querySearch }
 									onChange={ setQuerySearch }

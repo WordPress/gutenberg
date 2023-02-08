@@ -20,8 +20,6 @@ import {
 	NavigatorBackButton,
 } from '..';
 
-jest.useFakeTimers();
-
 jest.mock( 'framer-motion', () => {
 	const actual = jest.requireActual( 'framer-motion' );
 	return {
@@ -304,9 +302,7 @@ describe( 'Navigator', () => {
 	it( 'should navigate across screens', async () => {
 		const spy = jest.fn();
 
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
@@ -376,9 +372,7 @@ describe( 'Navigator', () => {
 	it( 'should not rended anything if the path does not match any available screen', async () => {
 		const spy = jest.fn();
 
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
@@ -402,9 +396,7 @@ describe( 'Navigator', () => {
 	} );
 
 	it( 'should escape the value of the `path` prop', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <MyNavigation /> );
 
@@ -437,9 +429,7 @@ describe( 'Navigator', () => {
 
 	describe( 'focus management', () => {
 		it( 'should restore focus correctly', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <MyNavigation /> );
 
@@ -469,9 +459,7 @@ describe( 'Navigator', () => {
 		} );
 
 		it( 'should keep focus on an active element inside navigator, while re-rendering', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <MyNavigation /> );
 
@@ -489,9 +477,7 @@ describe( 'Navigator', () => {
 		} );
 
 		it( 'should keep focus on an active element outside navigator, while re-rendering', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <MyNavigation /> );
 

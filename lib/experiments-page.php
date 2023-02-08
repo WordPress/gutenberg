@@ -54,18 +54,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-off-canvas-navigation-editor',
-		__( 'Off canvas navigation editor ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test a new "off canvas" editor for navigation block using the block inspector and a tree view of the current menu', 'gutenberg' ),
-			'id'    => 'gutenberg-off-canvas-navigation-editor',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-color-randomizer',
 		__( 'Color randomizer ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -74,34 +62,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Test the Global Styles color randomizer; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
 			'id'    => 'gutenberg-color-randomizer',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-block-inspector-tabs',
-		__( 'Block inspector tabs ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test a new block inspector view splitting settings and appearance controls into tabs', 'gutenberg' ),
-			'id'    => 'gutenberg-block-inspector-tabs',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-global-styles-custom-css',
-		__( 'Global styles custom css ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => sprintf(
-				/* translators: %s: WordPress documentation for roles and capabilities. */
-				__( 'Test the Global Styles custom CSS field in the site editor. This requires a user to have <a href="%s">unfiltered html capabilities</a>.', 'gutenberg' ),
-				'https://wordpress.org/support/article/roles-and-capabilities/#unfiltered_html'
-			),
-			'id'    => 'gutenberg-global-styles-custom-css',
 		)
 	);
 
