@@ -72,16 +72,16 @@ jobs:
             - name: Run iOS Device Tests
               run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
 
-            - name: Prepare build cache
-              run: |
-                  rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
-                  rm -rf packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/assets
-
             - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-              if: always()
+              if: failure()
               with:
                   name: ios-screen-recordings
                   path: packages/react-native-editor/ios-screen-recordings
+
+            - name: Prepare build cache
+              run: |
+                  rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
+                  rm -rf packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/asset
 
             - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               if: always()
