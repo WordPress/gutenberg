@@ -59,7 +59,7 @@ import {
 } from './child-layout';
 import useSetting from '../components/use-setting';
 import { store as blockEditorStore } from '../store';
-import { unlock } from '../experiments';
+import { unlock } from '../lock-unlock';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
