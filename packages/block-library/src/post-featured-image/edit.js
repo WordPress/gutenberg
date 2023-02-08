@@ -109,7 +109,10 @@ export default function PostFeaturedImageEdit( {
 					borderProps.className
 				) }
 				withIllustration={ true }
-				style={ borderProps.style }
+				style={ {
+					...blockProps.style,
+					...borderProps.style,
+				} }
 			>
 				{ content }
 			</Placeholder>
