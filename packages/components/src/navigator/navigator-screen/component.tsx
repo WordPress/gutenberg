@@ -5,13 +5,18 @@ import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { motion, MotionProps } from 'framer-motion';
 import { css } from '@emotion/react';
-import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useId,
+} from '@wordpress/element';
 import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
@@ -45,7 +50,7 @@ function UnconnectedNavigatorScreen(
 	props: Props,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const screenId = useRef( uuid() );
+	const screenId = useId();
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
@@ -54,17 +59,17 @@ function UnconnectedNavigatorScreen(
 	const prefersReducedMotion = useReducedMotion();
 	const { location, match, addScreen, removeScreen } =
 		useContext( NavigatorContext );
-	const isMatch = match === screenId.current;
+	const isMatch = match === screenId;
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
 	useEffect( () => {
 		const screen = {
-			id: screenId.current,
+			id: screenId,
 			path: escapeAttribute( path ),
 		};
 		addScreen( screen );
 		return () => removeScreen( screen );
-	}, [ path, addScreen, removeScreen ] );
+	}, [ screenId, path, addScreen, removeScreen ] );
 
 	const cx = useCx();
 	const classes = useMemo(
