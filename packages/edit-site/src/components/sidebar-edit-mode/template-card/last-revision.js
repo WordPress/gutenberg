@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { PanelBody, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { sprintf, _n } from '@wordpress/i18n';
 import { backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
@@ -74,9 +74,7 @@ const PostLastRevision = () => {
 export default function LastRevision() {
 	return (
 		<PostLastRevisionCheck>
-			<PanelBody className="edit-site-template-last-revision__panel">
-				<PostLastRevision />
-			</PanelBody>
+			<PostLastRevision />
 		</PostLastRevisionCheck>
 	);
 }
