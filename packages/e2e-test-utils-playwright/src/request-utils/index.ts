@@ -21,6 +21,7 @@ import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
 import { createPost, deleteAllPosts } from './posts';
+import { createNavigationMenu, deleteAllNavigationMenus } from './menus';
 import { resetPreferences } from './preferences';
 import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
@@ -125,6 +126,8 @@ class RequestUtils {
 	deleteAllBlocks = deleteAllBlocks;
 	createPost = createPost.bind( this );
 	deleteAllPosts = deleteAllPosts.bind( this );
+	createNavigationMenu = createNavigationMenu.bind( this );
+	deleteAllNavigationMenus = deleteAllNavigationMenus.bind( this );
 	createComment = createComment.bind( this );
 	deleteAllComments = deleteAllComments.bind( this );
 	deleteAllWidgets = deleteAllWidgets.bind( this );

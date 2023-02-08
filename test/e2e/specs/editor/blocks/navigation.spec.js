@@ -3,12 +3,6 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.use( {
-	navBlockUtils: async ( { page, requestUtils }, use ) => {
-		await use( new NavigationBlockUtils( { page, requestUtils } ) );
-	},
-} );
-
 test.describe(
 	'As a user I want the navigation block to fallback to the best possible default',
 	() => {
@@ -17,16 +11,16 @@ test.describe(
 			await requestUtils.activateTheme( 'twentytwentythree' );
 		} );
 
-		test.beforeEach( async ( { admin, navBlockUtils } ) => {
+		test.beforeEach( async ( { admin, requestUtils } ) => {
 			await Promise.all( [
-				navBlockUtils.deleteAllNavigationMenus(),
+				requestUtils.deleteAllNavigationMenus(),
 				admin.createNewPost(),
 			] );
 		} );
 
-		test.afterAll( async ( { requestUtils, navBlockUtils } ) => {
+		test.afterAll( async ( { requestUtils } ) => {
 			await Promise.all( [
-				navBlockUtils.deleteAllNavigationMenus(),
+				requestUtils.deleteAllNavigationMenus(),
 				requestUtils.activateTheme( 'twentytwentyone' ),
 			] );
 		} );
@@ -65,9 +59,9 @@ test.describe(
 		test( 'default to my only existing menu', async ( {
 			editor,
 			page,
-			navBlockUtils,
+			requestUtils,
 		} ) => {
-			const createdMenu = await navBlockUtils.createNavigationMenu( {
+			const createdMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
 					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
@@ -102,47 +96,3 @@ test.describe(
 		} );
 	}
 );
-
-class NavigationBlockUtils {
-	constructor( { editor, page, requestUtils } ) {
-		this.editor = editor;
-		this.page = page;
-		this.requestUtils = requestUtils;
-	}
-
-	/**
-	 * Create a navigation menu
-	 *
-	 * @param {Object} menuData navigation menu post data.
-	 * @return {string} Menu content.
-	 */
-	async createNavigationMenu( menuData ) {
-		return this.requestUtils.rest( {
-			method: 'POST',
-			path: `/wp/v2/navigation/`,
-			data: {
-				status: 'publish',
-				...menuData,
-			},
-		} );
-	}
-
-	/**
-	 * Delete all navigation menus
-	 *
-	 */
-	async deleteAllNavigationMenus() {
-		const menus = await this.requestUtils.rest( {
-			path: `/wp/v2/navigation/`,
-		} );
-
-		if ( ! menus?.length ) return;
-
-		await this.requestUtils.batchRest(
-			menus.map( ( menu ) => ( {
-				method: 'DELETE',
-				path: `/wp/v2/navigation/${ menu.id }?force=true`,
-			} ) )
-		);
-	}
-}
