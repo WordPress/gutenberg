@@ -4,6 +4,7 @@
 import {
 	isBlockInterfaceHidden,
 	getLastInsertedBlocksClientIds,
+	getLastInsertedBlocksActor,
 } from '../private-selectors';
 
 describe( 'private selectors', () => {
@@ -47,6 +48,18 @@ describe( 'private selectors', () => {
 				'123456',
 				'78910',
 			] );
+		} );
+	} );
+
+	describe( 'getLastInsertedBlocksActor', () => {
+		it( 'should return auto if the block was not inserted manually by the user', () => {
+			const state = {
+				lastBlockInserted: {
+					actor: 'auto',
+				},
+			};
+
+			expect( getLastInsertedBlocksActor( state ) ).toEqual( 'auto' );
 		} );
 	} );
 } );

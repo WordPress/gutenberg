@@ -865,6 +865,7 @@ describe( 'actions', () => {
 				time: expect.any( Number ),
 				updateSelection: false,
 				initialPosition: null,
+				meta: { actor: 'auto' },
 			} );
 		} );
 
@@ -876,6 +877,7 @@ describe( 'actions', () => {
 				time: expect.any( Number ),
 				updateSelection: true,
 				initialPosition: 0,
+				meta: { actor: 'auto' },
 			} );
 		} );
 	} );
