@@ -35,7 +35,7 @@ import type {
 } from '../types';
 import { patternMatch } from '../utils/router';
 
-type MatchedPath = { params: object; id: string } | false;
+type MatchedPath = ReturnType< typeof patternMatch >;
 type ScreenAction = { type: string; screen: NavigatorScreenType };
 
 function screensReducer(

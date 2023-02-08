@@ -20,16 +20,6 @@ export type NavigatorLocation = NavigateOptions & {
 	restoreFocusTo?: string;
 };
 
-export type NavigatorContext = {
-	location: NavigatorLocation;
-	params: any;
-	match?: string;
-	goTo: ( path: string, options?: NavigateOptions ) => void;
-	goBack: () => void;
-	addScreen: ( screen: NavigatorScreen ) => void;
-	removeScreen: ( screen: NavigatorScreen ) => void;
-};
-
 // Returned by the `useNavigator` hook.
 export type Navigator = {
 	location: NavigatorLocation;
@@ -37,6 +27,11 @@ export type Navigator = {
 	match?: string;
 	goTo: ( path: string, options?: NavigateOptions ) => void;
 	goBack: () => void;
+};
+
+export type NavigatorContext = Navigator & {
+	addScreen: ( screen: NavigatorScreen ) => void;
+	removeScreen: ( screen: NavigatorScreen ) => void;
 };
 
 export type NavigatorProviderProps = {
