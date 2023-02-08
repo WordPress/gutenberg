@@ -308,19 +308,6 @@ function Navigation( {
 		classicMenus?.length === 0 &&
 		! hasUncontrolledInnerBlocks;
 
-	useEffect( () => {
-		if ( isPlaceholder ) {
-			/**
-			 *  this fallback only displays (both in editor and on front)
-			 *  the list of pages block if no menu is available as a fallback.
-			 *  We don't want the fallback to request a save,
-			 *  nor to be undoable, hence we mark it non persistent.
-			 */
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, [ createBlock( 'core/page-list' ) ] );
-		}
-	}, [ clientId, isPlaceholder, ref ] );
-
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;
 
