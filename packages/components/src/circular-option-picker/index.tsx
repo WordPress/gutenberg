@@ -17,18 +17,18 @@ import Tooltip from '../tooltip';
 import type {
 	CircularOptionPickerProps,
 	DropdownLinkActionProps,
+	OptionProps,
 } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 import type { ButtonAsButtonProps } from '../button/types';
 
-function Option( props ) {
-	const {
-		className,
-		isSelected,
-		selectedIconProps,
-		tooltipText,
-		...additionalProps
-	} = props;
+function Option( {
+	className,
+	isSelected,
+	selectedIconProps,
+	tooltipText,
+	...additionalProps
+}: OptionProps ) {
 	const optionButton = (
 		<Button
 			isPressed={ isSelected }
