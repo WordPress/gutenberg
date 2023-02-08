@@ -121,9 +121,9 @@ function UnconnectedNavigatorScreen(
 
 		// When navigating back, if a selector is provided, use it to look for the
 		// target element (assumed to be a node inside the current NavigatorScreen)
-		if ( location.isBack && location?.restoreFocusTo ) {
+		if ( location.isBack && location?.focusTargetSelector ) {
 			elementToFocus = wrapperRef.current.querySelector(
-				location.restoreFocusTo
+				location.focusTargetSelector
 			);
 		}
 
@@ -142,7 +142,7 @@ function UnconnectedNavigatorScreen(
 		isInitialLocation,
 		isMatch,
 		location.isBack,
-		location.restoreFocusTo,
+		location.focusTargetSelector,
 	] );
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );

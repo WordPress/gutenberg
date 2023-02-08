@@ -17,7 +17,6 @@ export type NavigatorLocation = NavigateOptions & {
 	isBack?: boolean;
 	path?: string;
 	hasRestoredFocus?: boolean;
-	restoreFocusTo?: string;
 };
 
 // Returned by the `useNavigator` hook.

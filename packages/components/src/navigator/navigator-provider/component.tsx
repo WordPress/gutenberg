@@ -117,15 +117,33 @@ function UnconnectedNavigatorProvider(
 
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
 		( path, options = {} ) => {
-			setLocationHistory( ( prevLocationHistory ) => [
-				...prevLocationHistory,
-				{
-					...options,
+			setLocationHistory( ( prevLocationHistory ) => {
+				const { focusTargetSelector, ...restOptions } = options;
+
+				const newLocation = {
+					...restOptions,
 					path,
 					isBack: false,
 					hasRestoredFocus: false,
-				},
-			] );
+				};
+
+				if ( prevLocationHistory.length < 1 ) {
+					return [ newLocation ];
+				}
+
+				return [
+					...prevLocationHistory.slice( 0, -1 ),
+					// Assign `focusTargetSelector` to the previous location in history
+					// (the one we just navigated from).
+					{
+						...prevLocationHistory[
+							prevLocationHistory.length - 1
+						],
+						focusTargetSelector,
+					},
+					newLocation,
+				];
+			} );
 		},
 		[]
 	);
@@ -141,9 +159,6 @@ function UnconnectedNavigatorProvider(
 					...prevLocationHistory[ prevLocationHistory.length - 2 ],
 					isBack: true,
 					hasRestoredFocus: false,
-					restoreFocusTo:
-						prevLocationHistory[ prevLocationHistory.length - 1 ]
-							.focusTargetSelector,
 				},
 			];
 		} );
