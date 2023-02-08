@@ -27,11 +27,12 @@ import * as metadataActions from './metadata/actions';
 /** @typedef {import('../types').DataRegistry} DataRegistry */
 /**
  * @typedef {import('../types').StoreDescriptor<C>} StoreDescriptor
- * @template C
+ * @template {import('../types').AnyConfig} C
  */
 /**
  * @typedef {import('../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
- * @template State,Actions,Selectors
+ * @template State,Selectors
+ * @template {Record<string,import('../../types').ActionCreator>} Actions
  */
 
 const trimUndefinedValues = ( array ) => {
@@ -100,7 +101,8 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @template State,Actions,Selectors
+ * @template State,Selectors
+ * @template {Record<string,import('../../types').ActionCreator>} Actions
  * @param {string}                                    key     Unique namespace identifier.
  * @param {ReduxStoreConfig<State,Actions,Selectors>} options Registered store options, with properties
  *                                                            describing reducer, actions, selectors,

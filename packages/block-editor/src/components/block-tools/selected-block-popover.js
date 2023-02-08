@@ -21,6 +21,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import Inserter from '../inserter';
+import { unlock } from '../../lock-unlock';
 
 function selector( select ) {
 	const {
@@ -28,13 +29,14 @@ function selector( select ) {
 		isMultiSelecting,
 		hasMultiSelection,
 		isTyping,
-		__experimentalIsBlockInterfaceHidden: isBlockInterfaceHidden,
+		isBlockInterfaceHidden,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-	} = select( blockEditorStore );
+	} = unlock( select( blockEditorStore ) );
 
 	return {
 		editorMode: __unstableGetEditorMode(),
+		hasMultiSelection: hasMultiSelection(),
 		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
 		isBlockInterfaceHidden: isBlockInterfaceHidden(),
@@ -57,6 +59,7 @@ function SelectedBlockPopover( {
 } ) {
 	const {
 		editorMode,
+		hasMultiSelection,
 		isMultiSelecting,
 		isTyping,
 		isBlockInterfaceHidden,
@@ -89,7 +92,8 @@ function SelectedBlockPopover( {
 	const showEmptyBlockSideInserter =
 		! isTyping && editorMode === 'edit' && isEmptyDefaultBlock;
 	const shouldShowBreadcrumb =
-		editorMode === 'navigation' || editorMode === 'zoom-out';
+		! hasMultiSelection &&
+		( editorMode === 'navigation' || editorMode === 'zoom-out' );
 	const shouldShowContextualToolbar =
 		editorMode === 'edit' &&
 		! hasFixedToolbar &&
@@ -129,86 +133,79 @@ function SelectedBlockPopover( {
 		clientId,
 	} );
 
-	if (
-		! shouldShowBreadcrumb &&
-		! shouldShowContextualToolbar &&
-		! showEmptyBlockSideInserter
-	) {
-		return null;
+	if ( showEmptyBlockSideInserter ) {
+		return (
+			<BlockPopover
+				clientId={ capturingClientId || clientId }
+				__unstableCoverTarget
+				bottomClientId={ lastClientId }
+				className={ classnames(
+					'block-editor-block-list__block-side-inserter-popover',
+					{
+						'is-insertion-point-visible': isInsertionPointVisible,
+					}
+				) }
+				__unstablePopoverSlot={ __unstablePopoverSlot }
+				__unstableContentRef={ __unstableContentRef }
+				resize={ false }
+				shift={ false }
+				{ ...popoverProps }
+			>
+				<div className="block-editor-block-list__empty-block-inserter">
+					<Inserter
+						position="bottom right"
+						rootClientId={ rootClientId }
+						clientId={ clientId }
+						__experimentalIsQuick
+					/>
+				</div>
+			</BlockPopover>
+		);
 	}
 
-	return (
-		<>
-			{ showEmptyBlockSideInserter && (
-				<BlockPopover
-					clientId={ capturingClientId || clientId }
-					__unstableCoverTarget
-					bottomClientId={ lastClientId }
-					className={ classnames(
-						'block-editor-block-list__block-side-inserter-popover',
-						{
-							'is-insertion-point-visible':
-								isInsertionPointVisible,
+	if ( shouldShowBreadcrumb || shouldShowContextualToolbar ) {
+		return (
+			<BlockPopover
+				clientId={ capturingClientId || clientId }
+				bottomClientId={ lastClientId }
+				className={ classnames(
+					'block-editor-block-list__block-popover',
+					{
+						'is-insertion-point-visible': isInsertionPointVisible,
+					}
+				) }
+				__unstablePopoverSlot={ __unstablePopoverSlot }
+				__unstableContentRef={ __unstableContentRef }
+				resize={ false }
+				{ ...popoverProps }
+			>
+				{ shouldShowContextualToolbar && showContents && (
+					<BlockContextualToolbar
+						// If the toolbar is being shown because of being forced
+						// it should focus the toolbar right after the mount.
+						focusOnMount={ isToolbarForced.current }
+						__experimentalInitialIndex={
+							initialToolbarItemIndexRef.current
 						}
-					) }
-					__unstablePopoverSlot={ __unstablePopoverSlot }
-					__unstableContentRef={ __unstableContentRef }
-					resize={ false }
-					shift={ false }
-					{ ...popoverProps }
-				>
-					<div className="block-editor-block-list__empty-block-inserter">
-						<Inserter
-							position="bottom right"
-							rootClientId={ rootClientId }
-							clientId={ clientId }
-							__experimentalIsQuick
-						/>
-					</div>
-				</BlockPopover>
-			) }
-			{ ( shouldShowBreadcrumb || shouldShowContextualToolbar ) && (
-				<BlockPopover
-					clientId={ capturingClientId || clientId }
-					bottomClientId={ lastClientId }
-					className={ classnames(
-						'block-editor-block-list__block-popover',
-						{
-							'is-insertion-point-visible':
-								isInsertionPointVisible,
-						}
-					) }
-					__unstablePopoverSlot={ __unstablePopoverSlot }
-					__unstableContentRef={ __unstableContentRef }
-					resize={ false }
-					{ ...popoverProps }
-				>
-					{ shouldShowContextualToolbar && showContents && (
-						<BlockContextualToolbar
-							// If the toolbar is being shown because of being forced
-							// it should focus the toolbar right after the mount.
-							focusOnMount={ isToolbarForced.current }
-							__experimentalInitialIndex={
-								initialToolbarItemIndexRef.current
-							}
-							__experimentalOnIndexChange={ ( index ) => {
-								initialToolbarItemIndexRef.current = index;
-							} }
-							// Resets the index whenever the active block changes so
-							// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-							key={ clientId }
-						/>
-					) }
-					{ shouldShowBreadcrumb && (
-						<BlockSelectionButton
-							clientId={ clientId }
-							rootClientId={ rootClientId }
-						/>
-					) }
-				</BlockPopover>
-			) }
-		</>
-	);
+						__experimentalOnIndexChange={ ( index ) => {
+							initialToolbarItemIndexRef.current = index;
+						} }
+						// Resets the index whenever the active block changes so
+						// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+						key={ clientId }
+					/>
+				) }
+				{ shouldShowBreadcrumb && (
+					<BlockSelectionButton
+						clientId={ clientId }
+						rootClientId={ rootClientId }
+					/>
+				) }
+			</BlockPopover>
+		);
+	}
+
+	return null;
 }
 
 function wrapperSelector( select ) {

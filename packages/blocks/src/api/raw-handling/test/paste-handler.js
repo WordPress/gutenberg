@@ -10,46 +10,55 @@ import { init as initAndRegisterTableBlock } from '../../../../../block-library/
 const tableWithHeaderFooterAndBodyUsingColspan = `
 <table>
 	<thead>
-    <tr>
-        <th colspan="2">Colspan 2</th>
-        <th>Header Cell</th>
-    </tr>
-    </thead>
-    <tfoot>
-    <tr>
-        <th colspan="2">Footer Cell</th>
-        <th>Footer Cell</th>
-    </tr>
-    </tfoot>
-    <tbody>
-    <tr>
-        <td colspan="2">Colspan 2</td>
-        <td>Cell Data</td>
-    </tr>
-    </tbody>
+		<tr>
+			<th colspan="2">Colspan 2</th>
+			<th>Header Cell</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td colspan="2">Colspan 2</td>
+			<td>Cell Data</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<th colspan="2">Colspan 2</th>
+			<th>Footer Cell</th>
+		</tr>
+	</tfoot>
 </table>`;
 
-const googleDocsTableWithColspan = `
-<meta charset="utf-8"><b style="font-weight:normal;" id="docs-internal-guid-b0f68bdd-7fff-a054-94d1-43c2fdedca2a">
-    <div dir="ltr" style="margin-left:0pt;" align="left">
-        <table style="border:none;border-collapse:collapse;">
-            <colgroup>
-                <col width="185"/>
-                <col width="439"/>
-            </colgroup>
-            <tbody>
-            <tr style="height:21pt">
-                <td colspan="2"
-                    style="border-left:solid #000000 1pt;border-right:solid #000000 1pt;border-bottom:solid #000000 1pt;border-top:solid #000000 1pt;vertical-align:top;padding:5pt 5pt 5pt 5pt;overflow:hidden;overflow-wrap:break-word;">
-                    <p dir="ltr" style="line-height:1.2;margin-top:0pt;margin-bottom:0pt;"><span
-                            style="font-size:11pt;font-family:Arial;color:#000000;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;">Test colspan</span>
-                    </p></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <br/><br/></b>
-`;
+const tableWithHeaderFooterAndBodyUsingRowspan = `
+<table>
+	<thead>
+		<tr>
+			<th rowspan="2">Rowspan 2</th>
+			<th>Header Cell</th>
+		</tr>
+		<tr>
+			<th>Header Cell</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td rowspan="2">Rowspan 2</td>
+			<td>Cell Data</td>
+		</tr>
+		<tr>
+			<td>Cell Data</td>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td rowspan="2">Rowspan 2</td>
+			<td>Footer Cell</td>
+		</tr>
+		<tr>
+			<td>Footer Cell</td>
+		</tr>
+	</tfoot>
+</table>`;
 
 describe( 'pasteHandler', () => {
 	beforeAll( () => {
@@ -87,7 +96,7 @@ describe( 'pasteHandler', () => {
 			foot: [
 				{
 					cells: [
-						{ content: 'Footer Cell', tag: 'th', colspan: '2' },
+						{ content: 'Colspan 2', tag: 'th', colspan: '2' },
 						{ content: 'Footer Cell', tag: 'th' },
 					],
 				},
@@ -97,9 +106,9 @@ describe( 'pasteHandler', () => {
 		expect( result.isValid ).toBeTruthy();
 	} );
 
-	it( 'can handle a google docs table with colspan', () => {
+	it( 'can handle a table with thead, tbody and tfoot using rowspan', () => {
 		const [ result ] = pasteHandler( {
-			HTML: googleDocsTableWithColspan,
+			HTML: tableWithHeaderFooterAndBodyUsingRowspan,
 			tagName: 'p',
 			preserveWhiteSpace: false,
 		} );
@@ -107,23 +116,41 @@ describe( 'pasteHandler', () => {
 		expect( console ).toHaveLogged();
 
 		expect( result.attributes ).toEqual( {
+			hasFixedLayout: false,
+			caption: '',
+			head: [
+				{
+					cells: [
+						{ content: 'Rowspan 2', tag: 'th', rowspan: '2' },
+						{ content: 'Header Cell', tag: 'th' },
+					],
+				},
+				{
+					cells: [ { content: 'Header Cell', tag: 'th' } ],
+				},
+			],
 			body: [
 				{
 					cells: [
-						{
-							align: undefined,
-							colspan: '2',
-							content: 'Test colspan',
-							scope: undefined,
-							tag: 'td',
-						},
+						{ content: 'Rowspan 2', tag: 'td', rowspan: '2' },
+						{ content: 'Cell Data', tag: 'td' },
 					],
 				},
+				{
+					cells: [ { content: 'Cell Data', tag: 'td' } ],
+				},
 			],
-			caption: '',
-			foot: [],
-			hasFixedLayout: false,
-			head: [],
+			foot: [
+				{
+					cells: [
+						{ content: 'Rowspan 2', tag: 'td', rowspan: '2' },
+						{ content: 'Footer Cell', tag: 'td' },
+					],
+				},
+				{
+					cells: [ { content: 'Footer Cell', tag: 'td' } ],
+				},
+			],
 		} );
 		expect( result.name ).toEqual( 'core/table' );
 		expect( result.isValid ).toBeTruthy();

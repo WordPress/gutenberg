@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +17,7 @@ import {
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Spinner, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -120,7 +120,7 @@ export default function PostTermsEdit( {
 								href={ postTerm.link }
 								onClick={ ( event ) => event.preventDefault() }
 							>
-								{ unescape( postTerm.name ) }
+								{ decodeEntities( postTerm.name ) }
 							</a>
 						) )
 						.reduce( ( prev, curr ) => (

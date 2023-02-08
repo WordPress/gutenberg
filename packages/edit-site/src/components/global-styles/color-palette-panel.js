@@ -55,6 +55,7 @@ export default function ColorPalettePanel( { name } ) {
 					colors={ themeColors }
 					onChange={ setThemeColors }
 					paletteLabel={ __( 'Theme' ) }
+					paletteLabelHeadingLevel={ 3 }
 				/>
 			) }
 			{ !! defaultColors &&
@@ -66,12 +67,14 @@ export default function ColorPalettePanel( { name } ) {
 						colors={ defaultColors }
 						onChange={ setDefaultColors }
 						paletteLabel={ __( 'Default' ) }
+						paletteLabelHeadingLevel={ 3 }
 					/>
 				) }
 			<PaletteEdit
 				colors={ customColors }
 				onChange={ setCustomColors }
 				paletteLabel={ __( 'Custom' ) }
+				paletteLabelHeadingLevel={ 3 }
 				emptyMessage={ __(
 					'Custom colors are empty! Add some colors to create your own color palette.'
 				) }

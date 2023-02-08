@@ -313,3 +313,22 @@ export function useScopedBlockVariations( attributes ) {
 	}, [ activeVariationName, blockVariations ] );
 	return variations;
 }
+
+/**
+ * Hook that returns the block patterns for a specific block type.
+ *
+ * @param {string} clientId The block's client ID.
+ * @param {string} name     The block type name.
+ * @return {Object[]} An array of valid block patterns.
+ */
+export const usePatterns = ( clientId, name ) => {
+	return useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			return getPatternsByBlockTypes( name, rootClientId );
+		},
+		[ name, clientId ]
+	);
+};

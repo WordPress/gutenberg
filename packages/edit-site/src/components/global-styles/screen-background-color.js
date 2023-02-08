@@ -17,7 +17,7 @@ import {
  */
 import ScreenHeader from './header';
 import {
-	getSupportedGlobalStylesPanels,
+	useSupportedStyles,
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
@@ -27,7 +27,7 @@ const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 function ScreenBackgroundColor( { name, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ areCustomGradientsEnabled ] = useGlobalSetting(
 		'color.customGradient',
@@ -122,6 +122,7 @@ function ScreenBackgroundColor( { name, variation = '' } ) {
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar
+				headingLevel={ 3 }
 				{ ...controlProps }
 			/>
 		</>
