@@ -327,7 +327,10 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				) }
 			</PanelBody>
 
-			<PanelBody title={ __( 'Sorting and filtering' ) }>
+			<PanelBody
+				className="wp-block-latest-posts__sorting-filtering"
+				title={ __( 'Sorting and filtering' ) }
+			>
 				<QueryControls
 					{ ...{ order, orderBy } }
 					numberOfItems={ postsToShow }
