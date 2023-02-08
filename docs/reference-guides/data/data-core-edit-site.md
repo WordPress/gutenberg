@@ -32,34 +32,9 @@ _Returns_
 
 -   `Object`: Post object.
 
-### getCurrentTemplateLastRevisionId
-
-Returns the last revision ID of the template currently being edited,
-or null if the template is from the theme
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `?number`: ID of the last revision.
-
 ### getCurrentTemplateNavigationPanelSubMenu
 
 > **Deprecated**
-
-### getCurrentTemplateRevisionsCount
-
-Returns the number of revisions of the template currently being edited.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `number`: Number of revisions.
 
 ### getCurrentTemplateTemplateParts
 

@@ -314,36 +314,6 @@ export const getCurrentTemplate = createRegistrySelector(
 );
 
 /**
- * Returns the number of revisions of the template currently being edited.
- *
- * @param {Object} state Global application state.
- *
- * @return {number} Number of revisions.
- */
-export function getCurrentTemplateRevisionsCount( state ) {
-	const template = getCurrentTemplate( state );
-	if ( template.source === 'theme' ) {
-		return 0;
-	}
-	return ( template?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0 ) + 1;
-}
-
-/**
- * Returns the last revision ID of the template currently being edited,
- * or null if the template is from the theme
- *
- * @param {Object} state Global application state.
- *
- * @return {?number} ID of the last revision.
- */
-export function getCurrentTemplateLastRevisionId( state ) {
-	return (
-		getCurrentTemplate( state )?._links?.[ 'predecessor-version' ]?.[ 0 ]
-			?.id ?? null
-	);
-}
-
-/**
  * @deprecated
  */
 export function getCurrentTemplateNavigationPanelSubMenu() {

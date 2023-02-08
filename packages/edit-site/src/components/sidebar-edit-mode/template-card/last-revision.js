@@ -13,17 +13,26 @@ import { PostTypeSupportCheck } from '@wordpress/editor';
  */
 import { store as editSiteStore } from '../../../store';
 
-const useRevisionData = () =>
-	useSelect( ( select ) => {
-		const {
-			getCurrentTemplateLastRevisionId,
-			getCurrentTemplateRevisionsCount,
-		} = select( editSiteStore );
+const useRevisionData = () => {
+	const { currentTemplate } = useSelect( ( select ) => {
+		const { getCurrentTemplate } = select( editSiteStore );
 		return {
-			lastRevisionId: getCurrentTemplateLastRevisionId(),
-			revisionsCount: getCurrentTemplateRevisionsCount(),
+			currentTemplate: getCurrentTemplate(),
 		};
 	} );
+
+	const lastRevisionId =
+		currentTemplate?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ?? null;
+
+	const revisionsCount =
+		( currentTemplate?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0 ) +
+		1;
+
+	return {
+		lastRevisionId,
+		revisionsCount,
+	};
+};
 
 function PostLastRevisionCheck( { children } ) {
 	const { lastRevisionId, revisionsCount } = useRevisionData();
