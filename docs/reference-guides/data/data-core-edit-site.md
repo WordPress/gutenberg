@@ -18,20 +18,6 @@ _Returns_
 
 -   `Object`: Whether the current user can create media or not.
 
-### getCurrentTemplate
-
-Returns the post currently being edited in its last known saved state, not
-including unsaved edits. Returns an object containing relevant default post
-values if the post has not yet been saved.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `Object`: Post object.
-
 ### getCurrentTemplateNavigationPanelSubMenu
 
 > **Deprecated**

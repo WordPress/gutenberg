@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { sprintf, _n } from '@wordpress/i18n';
 import { backup } from '@wordpress/icons';
@@ -11,28 +10,24 @@ import { PostTypeSupportCheck } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
+import useEditedEntityRecord from '../../use-edited-entity-record';
 
-const useRevisionData = () =>
-	useSelect( ( select ) => {
-		const { getCurrentTemplate } = select( editSiteStore );
+const useRevisionData = () => {
+	const { record: currentTemplate } = useEditedEntityRecord();
 
-		const currentTemplate = getCurrentTemplate();
+	const lastRevisionId =
+		currentTemplate?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ?? null;
 
-		const lastRevisionId =
-			currentTemplate?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ??
-			null;
+	const revisionsCount =
+		( currentTemplate?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0 ) +
+		1;
 
-		const revisionsCount =
-			( currentTemplate?._links?.[ 'version-history' ]?.[ 0 ]?.count ??
-				0 ) + 1;
-
-		return {
-			currentTemplate: getCurrentTemplate(),
-			lastRevisionId,
-			revisionsCount,
-		};
-	} );
+	return {
+		currentTemplate,
+		lastRevisionId,
+		revisionsCount,
+	};
+};
 
 function PostLastRevisionCheck( { children } ) {
 	const { lastRevisionId, revisionsCount } = useRevisionData();
