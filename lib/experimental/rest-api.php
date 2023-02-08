@@ -30,7 +30,8 @@ add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
 
 /**
- * Hook in to the nav menu item post type and decorate the template rest endpoint.
+ * Hook in to the template and template part post types and decorate
+ * the rest endpoint with the revision count.
  *
  * When merging to core, this can be removed once Gutenberg_REST_Template_Revision_Count is
  * merged with WP_REST_Template_Controller.
