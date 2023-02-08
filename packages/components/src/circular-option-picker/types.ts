@@ -2,6 +2,12 @@
  * External dependencies
  */
 import type { ReactNode } from 'react';
+/**
+ * Internal dependencies
+ */
+import type { ButtonAsButtonProps } from '../button/types';
+import type Dropdown from '../dropdown';
+import type { WordPressComponentProps } from '../ui/context';
 
 export type CircularOptionPickerProps = {
 	/**
@@ -24,4 +30,17 @@ export type CircularOptionPickerProps = {
 	 * The child elements.
 	 */
 	children?: ReactNode;
+};
+
+export type DropdownLinkActionProps = {
+	buttonProps: Omit<
+		WordPressComponentProps< ButtonAsButtonProps, 'button', false >,
+		'children'
+	>;
+	linkText: string;
+	dropdownProps: Omit<
+		React.ComponentProps< typeof Dropdown >,
+		'className' | 'renderToggle'
+	>;
+	className?: string;
 };

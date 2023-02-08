@@ -14,7 +14,10 @@ import { Icon, check } from '@wordpress/icons';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
-import type { CircularOptionPickerProps } from './types';
+import type {
+	CircularOptionPickerProps,
+	DropdownLinkActionProps,
+} from './types';
 import type { WordPressComponentProps } from '../ui/context';
 import type { ButtonAsButtonProps } from '../button/types';
 
@@ -55,8 +58,12 @@ function Option( props ) {
 	);
 }
 
-function DropdownLinkAction( props ) {
-	const { buttonProps, className, dropdownProps, linkText } = props;
+function DropdownLinkAction( {
+	buttonProps,
+	className,
+	dropdownProps,
+	linkText,
+}: DropdownLinkActionProps ) {
 	return (
 		<Dropdown
 			className={ classnames(
