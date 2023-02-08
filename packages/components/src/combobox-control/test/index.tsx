@@ -12,7 +12,8 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ComboboxControl from '../';
+import ComboboxControl from '..';
+import type { ComboboxControlOption, ComboboxControlProps } from '../types';
 
 const timezones = [
 	{ label: 'Greenwich Mean Time', value: 'GMT' },
@@ -49,20 +50,21 @@ const timezones = [
 ];
 
 const defaultLabelText = 'Select a timezone';
-const getLabel = ( labelText ) => screen.getByText( labelText );
-const getInput = ( name ) => screen.getByRole( 'combobox', { name } );
-const getOption = ( name ) => screen.getByRole( 'option', { name } );
+const getLabel = ( labelText: string ) => screen.getByText( labelText );
+const getInput = ( name: string ) => screen.getByRole( 'combobox', { name } );
+const getOption = ( name: string ) => screen.getByRole( 'option', { name } );
 const getAllOptions = () => screen.getAllByRole( 'option' );
-const getOptionSearchString = ( option ) => option.label.substring( 0, 11 );
+const getOptionSearchString = ( option: ComboboxControlOption ) =>
+	option.label.substring( 0, 11 );
 const setupUser = () => userEvent.setup();
 
 const ControlledComboboxControl = ( {
 	value: valueProp,
 	onChange,
 	...props
-} ) => {
+}: ComboboxControlProps ) => {
 	const [ value, setValue ] = useState( valueProp );
-	const handleOnChange = ( newValue ) => {
+	const handleOnChange: ComboboxControlProps[ 'onChange' ] = ( newValue ) => {
 		setValue( newValue );
 		onChange?.( newValue );
 	};

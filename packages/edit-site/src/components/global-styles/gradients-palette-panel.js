@@ -75,7 +75,7 @@ export default function GradientPalettePanel( { name } ) {
 					gradients={ themeGradients }
 					onChange={ setThemeGradients }
 					paletteLabel={ __( 'Theme' ) }
-					paletteLabelLevel={ 3 }
+					paletteLabelHeadingLevel={ 3 }
 				/>
 			) }
 			{ !! defaultGradients &&

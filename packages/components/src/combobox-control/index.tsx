@@ -30,25 +30,83 @@ import { FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import { useControlledValue } from '../utils/hooks';
 import { normalizeTextString } from '../utils/strings';
+import type { ComboboxControlOption, ComboboxControlProps } from './types';
+import type { TokenInputProps } from '../form-token-field/types';
 
 const noop = () => {};
 
 const DetectOutside = withFocusOutside(
 	class extends Component {
+		// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
 		handleFocusOutside( event ) {
+			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
 			this.props.onFocusOutside( event );
 		}
 
 		render() {
+			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
 			return this.props.children;
 		}
 	}
 );
 
+const getIndexOfMatchingSuggestion = (
+	selectedSuggestion: ComboboxControlOption | null,
+	matchingSuggestions: ComboboxControlOption[]
+) =>
+	selectedSuggestion === null
+		? -1
+		: matchingSuggestions.indexOf( selectedSuggestion );
+
+/**
+ * `ComboboxControl` is an enhanced version of a [`SelectControl`](../select-control/README.md) with the addition of
+ * being able to search for options using a search input.
+ *
+ * ```jsx
+ * import { ComboboxControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const options = [
+ * 	{
+ * 		value: 'small',
+ * 		label: 'Small',
+ * 	},
+ * 	{
+ * 		value: 'normal',
+ * 		label: 'Normal',
+ * 	},
+ * 	{
+ * 		value: 'large',
+ * 		label: 'Large',
+ * 	},
+ * ];
+ *
+ * function MyComboboxControl() {
+ * 	const [ fontSize, setFontSize ] = useState();
+ * 	const [ filteredOptions, setFilteredOptions ] = useState( options );
+ * 	return (
+ * 		<ComboboxControl
+ * 			label="Font Size"
+ * 			value={ fontSize }
+ * 			onChange={ setFontSize }
+ * 			options={ filteredOptions }
+ * 			onFilterValueChange={ ( inputValue ) =>
+ * 				setFilteredOptions(
+ * 					options.filter( ( option ) =>
+ * 						option.label
+ * 							.toLowerCase()
+ * 							.startsWith( inputValue.toLowerCase() )
+ * 					)
+ * 				)
+ * 			}
+ * 		/>
+ * 	);
+ * }
+ * ```
+ */
 function ComboboxControl( {
-	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMarginBottom = false,
-	__next36pxDefaultSize,
+	__next36pxDefaultSize = false,
 	value: valueProp,
 	label,
 	options,
@@ -62,7 +120,7 @@ function ComboboxControl( {
 		selected: __( 'Item selected.' ),
 	},
 	__experimentalRenderItem,
-} ) {
+}: ComboboxControlProps ) {
 	const [ value, setValue ] = useControlledValue( {
 		value: valueProp,
 		onChange: onChangeProp,
@@ -80,11 +138,11 @@ function ComboboxControl( {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ inputHasFocus, setInputHasFocus ] = useState( false );
 	const [ inputValue, setInputValue ] = useState( '' );
-	const inputContainer = useRef();
+	const inputContainer = useRef< HTMLInputElement >( null );
 
 	const matchingSuggestions = useMemo( () => {
-		const startsWithMatch = [];
-		const containsMatch = [];
+		const startsWithMatch: ComboboxControlOption[] = [];
+		const containsMatch: ComboboxControlOption[] = [];
 		const match = normalizeTextString( inputValue );
 		options.forEach( ( option ) => {
 			const index = normalizeTextString( option.label ).indexOf( match );
@@ -98,7 +156,9 @@ function ComboboxControl( {
 		return startsWithMatch.concat( containsMatch );
 	}, [ inputValue, options ] );
 
-	const onSuggestionSelected = ( newSelectedSuggestion ) => {
+	const onSuggestionSelected = (
+		newSelectedSuggestion: ComboboxControlOption
+	) => {
 		setValue( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );
@@ -107,7 +167,10 @@ function ComboboxControl( {
 	};
 
 	const handleArrowNavigation = ( offset = 1 ) => {
-		const index = matchingSuggestions.indexOf( selectedSuggestion );
+		const index = getIndexOfMatchingSuggestion(
+			selectedSuggestion,
+			matchingSuggestions
+		);
 		let nextIndex = index + offset;
 		if ( nextIndex < 0 ) {
 			nextIndex = matchingSuggestions.length - 1;
@@ -118,7 +181,9 @@ function ComboboxControl( {
 		setIsExpanded( true );
 	};
 
-	const onKeyDown = ( event ) => {
+	const onKeyDown: React.KeyboardEventHandler< HTMLDivElement > = (
+		event
+	) => {
 		let preventDefault = false;
 
 		if (
@@ -177,7 +242,7 @@ function ComboboxControl( {
 		setIsExpanded( false );
 	};
 
-	const onInputChange = ( event ) => {
+	const onInputChange: TokenInputProps[ 'onChange' ] = ( event ) => {
 		const text = event.value;
 		setInputValue( text );
 		onFilterValueChange( text );
@@ -188,14 +253,17 @@ function ComboboxControl( {
 
 	const handleOnReset = () => {
 		setValue( null );
-		inputContainer.current.focus();
+		inputContainer.current?.focus();
 	};
 
 	// Update current selections when the filter input changes.
 	useEffect( () => {
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 		const hasSelectedMatchingSuggestions =
-			matchingSuggestions.indexOf( selectedSuggestion ) > 0;
+			getIndexOfMatchingSuggestion(
+				selectedSuggestion,
+				matchingSuggestions
+			) > 0;
 
 		if ( hasMatchingSuggestions && ! hasSelectedMatchingSuggestions ) {
 			// If the current selection isn't present in the list of suggestions, then automatically select the first item from the list of suggestions.
@@ -235,7 +303,6 @@ function ComboboxControl( {
 					className,
 					'components-combobox-control'
 				) }
-				tabIndex="-1"
 				label={ label }
 				id={ `components-form-token-input-${ instanceId }` }
 				hideLabelFromVision={ hideLabelFromVision }
@@ -243,7 +310,7 @@ function ComboboxControl( {
 			>
 				<div
 					className="components-combobox-control__suggestions-container"
-					tabIndex="-1"
+					tabIndex={ -1 }
 					onKeyDown={ onKeyDown }
 				>
 					<InputWrapperFlex
@@ -258,8 +325,9 @@ function ComboboxControl( {
 								onFocus={ onFocus }
 								onBlur={ onBlur }
 								isExpanded={ isExpanded }
-								selectedSuggestionIndex={ matchingSuggestions.indexOf(
-									selectedSuggestion
+								selectedSuggestionIndex={ getIndexOfMatchingSuggestion(
+									selectedSuggestion,
+									matchingSuggestions
 								) }
 								onChange={ onInputChange }
 							/>
@@ -279,13 +347,17 @@ function ComboboxControl( {
 					{ isExpanded && (
 						<SuggestionsList
 							instanceId={ instanceId }
-							match={ { label: inputValue } }
+							// The empty string for `value` here is not actually used, but is
+							// just a quick way to satisfy the TypeScript requirements of SuggestionsList.
+							// See: https://github.com/WordPress/gutenberg/pull/47581/files#r1091089330
+							match={ { label: inputValue, value: '' } }
 							displayTransform={ ( suggestion ) =>
 								suggestion.label
 							}
 							suggestions={ matchingSuggestions }
-							selectedIndex={ matchingSuggestions.indexOf(
-								selectedSuggestion
+							selectedIndex={ getIndexOfMatchingSuggestion(
+								selectedSuggestion,
+								matchingSuggestions
 							) }
 							onHover={ setSelectedSuggestion }
 							onSelect={ onSuggestionSelected }

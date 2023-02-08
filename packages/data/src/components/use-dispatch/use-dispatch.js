@@ -5,7 +5,7 @@ import useRegistry from '../registry-provider/use-registry';
 
 /**
  * @typedef {import('../../types').StoreDescriptor<StoreConfig>} StoreDescriptor
- * @template StoreConfig
+ * @template {import('../../types').AnyConfig} StoreConfig
  */
 /**
  * @typedef {import('../../types').UseDispatchReturn<StoreNameOrDescriptor>} UseDispatchReturn
