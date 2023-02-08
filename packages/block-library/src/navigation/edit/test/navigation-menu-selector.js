@@ -9,11 +9,22 @@ import userEvent from '@testing-library/user-event';
  */
 import NavigationMenuSelector from '../navigation-menu-selector';
 import useNavigationMenu from '../../use-navigation-menu';
+import useNavigationEntities from '../../use-navigation-entities';
 
 jest.mock( '../../use-navigation-menu', () => {
 	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
+} );
+
+jest.mock( '../../use-navigation-entities', () => {
+	// This allows us to tweak the returned value on each test.
+	const mock = jest.fn();
+	return mock;
+} );
+
+useNavigationEntities.mockReturnValue( {
+	menus: [],
 } );
 
 const navigationMenu1 = {
@@ -42,6 +53,21 @@ const navigationMenusFixture = [
 	navigationMenu1,
 	navigationMenu2,
 	navigationMenu3,
+];
+
+const classicMenusFixture = [
+	{
+		id: 1,
+		name: 'Classic Menu 1',
+	},
+	{
+		id: 2,
+		name: 'Classic Menu 2',
+	},
+	{
+		id: 3,
+		name: 'Classic Menu 3',
+	},
 ];
 
 describe( 'NavigationMenuSelector', () => {
@@ -426,6 +452,85 @@ describe( 'NavigationMenuSelector', () => {
 				} );
 
 				expect( menuItem ).toBeChecked();
+			} );
+		} );
+
+		describe( 'Classic menus', () => {
+			it( 'should not show classic menus if there are no classic menus', async () => {
+				const user = userEvent.setup();
+
+				useNavigationEntities.mockReturnValue( {
+					menus: [],
+				} );
+
+				render( <NavigationMenuSelector /> );
+
+				const toggleButton = screen.getByRole( 'button' );
+				await user.click( toggleButton );
+
+				const classicMenusGroup = screen.queryByRole( 'group', {
+					name: 'Import Classic Menus',
+				} );
+				expect( classicMenusGroup ).not.toBeInTheDocument();
+			} );
+
+			it( 'should not show classic menus if there are classic menus but the user does not have permission to create menus', async () => {
+				const user = userEvent.setup();
+
+				useNavigationMenu.mockReturnValue( {
+					canUserCreateNavigationMenu: false,
+				} );
+
+				useNavigationEntities.mockReturnValue( {
+					menus: classicMenusFixture,
+				} );
+
+				render( <NavigationMenuSelector /> );
+
+				const toggleButton = screen.getByRole( 'button' );
+				await user.click( toggleButton );
+
+				const classicMenusGroup = screen.queryByRole( 'group', {
+					name: 'Import Classic Menus',
+				} );
+				expect( classicMenusGroup ).not.toBeInTheDocument();
+			} );
+
+			it( 'should show classic menus if there are classic menus and the user has permission to create menus', async () => {
+				const user = userEvent.setup();
+
+				useNavigationMenu.mockReturnValue( {
+					canUserCreateNavigationMenu: true,
+				} );
+
+				useNavigationEntities.mockReturnValue( {
+					menus: classicMenusFixture,
+				} );
+
+				render( <NavigationMenuSelector /> );
+
+				const toggleButton = screen.getByRole( 'button' );
+				await user.click( toggleButton );
+
+				const classicMenusGroup = screen.queryByRole( 'group', {
+					name: 'Import Classic Menus',
+				} );
+
+				expect( classicMenusGroup ).toBeInTheDocument();
+
+				// Check for classic menuitem roles
+				expect(
+					screen.getByRole( 'menuitem', {
+						name: `Create from '${ classicMenusFixture[ 0 ].name }'`,
+					} )
+				).toBeInTheDocument();
+
+				classicMenusFixture.forEach( ( item ) => {
+					const menuItem = screen.getByRole( 'menuitem', {
+						name: `Create from '${ item.name }'`,
+					} );
+					expect( menuItem ).toBeInTheDocument();
+				} );
 			} );
 		} );
 	} );
