@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Add `TagSelectionDropdown` component for selecting a HTML tag from the block toolbar.
+
 ## 11.3.0 (2023-02-01)
 
 ## 11.2.0 (2023-01-11)
