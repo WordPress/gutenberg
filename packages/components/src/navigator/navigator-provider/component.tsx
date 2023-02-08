@@ -13,7 +13,6 @@ import {
 	useCallback,
 	useReducer,
 	useRef,
-	useEffect,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -70,36 +69,39 @@ function UnconnectedNavigatorProvider(
 		},
 	] );
 	const [ screens, dispatch ] = useReducer( screensReducer, [] );
-	const [ matchedPath, setMatchedPath ] = useState< MatchedPath >( false );
-	const currentMatch = useRef< MatchedPath >( false );
-
-	useEffect( () => {
-		const updateMatch = ( newMatch: MatchedPath ) => {
-			setMatchedPath( newMatch );
-			currentMatch.current = newMatch;
-		};
-
+	const currentMatch = useRef< MatchedPath >();
+	const matchedPath = useMemo( () => {
 		const resolvePath = ( path: string ) => {
 			const newMatch = patternMatch( path, screens );
+
+			// If the new match is the same as the current match,
+			// return the previous one for performance reasons.
 			if (
-				currentMatch.current !== false &&
-				newMatch !== false &&
-				isShallowEqual( newMatch, currentMatch.current )
+				currentMatch.current &&
+				newMatch &&
+				isShallowEqual(
+					newMatch.params,
+					currentMatch.current.params
+				) &&
+				newMatch.id === currentMatch.current.id
 			) {
-				return;
+				return currentMatch.current;
 			}
 
-			updateMatch( newMatch );
+			return newMatch;
 		};
 
 		if ( locationHistory.length > 0 ) {
 			const path = locationHistory[ locationHistory.length - 1 ].path;
 			if ( path !== undefined ) {
-				resolvePath( path );
-			} else {
-				updateMatch( false );
+				const newMatch = resolvePath( path );
+				currentMatch.current = newMatch;
+				return newMatch;
 			}
 		}
+
+		currentMatch.current = undefined;
+		return undefined;
 	}, [ screens, locationHistory ] );
 
 	const addScreen = useCallback(
@@ -153,8 +155,8 @@ function UnconnectedNavigatorProvider(
 				...locationHistory[ locationHistory.length - 1 ],
 				isInitial: locationHistory.length === 1,
 			},
-			params: matchedPath !== false ? matchedPath.params : {},
-			match: matchedPath !== false ? matchedPath.id : undefined,
+			params: matchedPath ? matchedPath.params : {},
+			match: matchedPath ? matchedPath.id : undefined,
 			goTo,
 			goBack,
 			addScreen,

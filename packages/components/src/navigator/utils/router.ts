@@ -19,5 +19,5 @@ export function patternMatch( path: string, screens: NavigatorScreen[] ) {
 		}
 	}
 
-	return false;
+	return undefined;
 }
