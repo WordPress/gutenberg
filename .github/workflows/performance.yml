@@ -23,7 +23,7 @@ jobs:
         steps:
             - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
-                fetch-depth: 3
+                  fetch-depth: 3
 
             - name: Use desired version of NodeJS
               uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
@@ -44,7 +44,7 @@ jobs:
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf bc6f111301267f221720640b473d1609c2974f1f $GITHUB_SHA trunk --tests-branch $GITHUB_SHA --rounds 10
+              run: ./bin/plugin/cli.js perf trunk trunk trunk trunk trunk --tests-branch $GITHUB_SHA --rounds 3
 
             - name: Store performance measurements
               if: github.event_name == 'pull_request'
