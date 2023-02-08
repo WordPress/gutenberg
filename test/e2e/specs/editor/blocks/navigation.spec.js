@@ -3,19 +3,32 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+test.use( {
+	navBlockUtils: async ( { page, requestUtils }, use ) => {
+		await use( new NavigationBlockUtils( { page, requestUtils } ) );
+	},
+} );
+
 test.describe(
 	'As a user I want the navigation block to fallback to the best possible default',
 	() => {
 		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.activateTheme( 'emptytheme' );
+			//TT3 is preferable to emptytheme because it already has the navigation block on its templates.
+			await requestUtils.activateTheme( 'twentytwentythree' );
 		} );
 
-		test.beforeEach( async ( { admin } ) => {
-			await admin.createNewPost();
+		test.beforeEach( async ( { admin, navBlockUtils } ) => {
+			await Promise.all( [
+				navBlockUtils.deleteAllNavigationMenus(),
+				admin.createNewPost(),
+			] );
 		} );
 
-		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.activateTheme( 'twentytwentyone' );
+		test.afterAll( async ( { requestUtils, navBlockUtils } ) => {
+			await Promise.all( [
+				navBlockUtils.deleteAllNavigationMenus(),
+				requestUtils.activateTheme( 'twentytwentyone' ),
+			] );
 		} );
 
 		test.afterEach( async ( { requestUtils } ) => {
@@ -48,5 +61,88 @@ test.describe(
 <!-- /wp:navigation -->`
 			);
 		} );
+
+		test( 'default to my only existing menu', async ( {
+			editor,
+			page,
+			navBlockUtils,
+		} ) => {
+			const createdMenu = await navBlockUtils.createNavigationMenu( {
+				title: 'Test Menu 1',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			//check the block in the canvas.
+			await expect(
+				editor.canvas.locator(
+					'role=textbox[name="Navigation link text"i] >> text="WordPress"'
+				)
+			).toBeVisible();
+
+			// Check the markup of the block is correct.
+			await editor.publishPost();
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/navigation',
+					attributes: { ref: createdMenu.id },
+				},
+			] );
+			await page.locator( 'role=button[name="Close panel"i]' ).click();
+
+			//check the block in the frontend.
+			await page.goto( '/' );
+			await expect(
+				page.locator(
+					'role=navigation >> role=link[name="WordPress"i]'
+				)
+			).toBeVisible();
+		} );
 	}
 );
+
+class NavigationBlockUtils {
+	constructor( { editor, page, requestUtils } ) {
+		this.editor = editor;
+		this.page = page;
+		this.requestUtils = requestUtils;
+	}
+
+	/**
+	 * Create a navigation menu
+	 *
+	 * @param {Object} menuData navigation menu post data.
+	 * @return {string} Menu content.
+	 */
+	async createNavigationMenu( menuData ) {
+		return this.requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/navigation/`,
+			data: {
+				status: 'publish',
+				...menuData,
+			},
+		} );
+	}
+
+	/**
+	 * Delete all navigation menus
+	 *
+	 */
+	async deleteAllNavigationMenus() {
+		const menus = await this.requestUtils.rest( {
+			path: `/wp/v2/navigation/`,
+		} );
+
+		if ( ! menus?.length ) return;
+
+		await this.requestUtils.batchRest(
+			menus.map( ( menu ) => ( {
+				method: 'DELETE',
+				path: `/wp/v2/navigation/${ menu.id }?force=true`,
+			} ) )
+		);
+	}
+}
