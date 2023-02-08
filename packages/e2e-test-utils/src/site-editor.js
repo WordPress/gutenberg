@@ -9,51 +9,8 @@ import { addQueryArgs } from '@wordpress/url';
  */
 
 const SELECTORS = {
-	navigationPanel: {
-		backToDashboard:
-			'.edit-site-navigation-panel .edit-site-navigation-panel__back-to-dashboard',
-		goBack: '.components-navigation__back-button',
-		isOpenState: '.edit-site-navigation-toggle.is-open',
-		menuItem: ( label ) =>
-			`//div[contains(@class, "edit-site-navigation-panel")]//button[.//*[text()="${ label }"]]`,
-		open: '.edit-site-navigation-toggle__button',
-		panelContainer: '.edit-site-navigation-panel',
-	},
 	visualEditor: '.edit-site-visual-editor iframe',
 };
-
-/**
- * Searches for an item in the navigation panel with the label provided and clicks it.
- *
- * @param {string} label The label to search the menu item for.
- */
-export async function clickSiteEditorMenuItem( label ) {
-	const item = await getSiteEditorMenuItem( label );
-
-	if ( item ) {
-		await item.click();
-	} else {
-		throw new Error(
-			`Navigation item with label ${ label } was not found.`
-		);
-	}
-}
-
-/**
- * Closes the site editor navigation panel if open
- */
-export async function closeSiteEditorNavigationPanel() {
-	const { navigationPanel } = SELECTORS;
-
-	const isOpen = !! ( await page.$( navigationPanel.isOpenState ) );
-
-	if ( isOpen ) {
-		await page.click( navigationPanel.open );
-		await page.waitForSelector( navigationPanel.panelContainer, {
-			hidden: true,
-		} );
-	}
-}
 
 /**
  * Skips the welcome guide popping up to first time users of the site editor
@@ -155,88 +112,6 @@ export function getCurrentSiteEditorContent() {
 }
 
 /**
- * Searches for an item in the site editor navigation menu with the provided label.
- *
- * @param {string} label The label to search the menu item for.
- *
- * @return {Promise<?ElementHandle>} The menu item handle or `null`
- */
-export async function getSiteEditorMenuItem( label ) {
-	const { navigationPanel } = SELECTORS;
-
-	const item = await page.waitForXPath( navigationPanel.menuItem( label ), {
-		visible: true,
-	} );
-
-	return item;
-}
-
-/**
- * Returns `true` if in the site editor navigation root
- *
- * Checks whether the “Back to dashboard” button is visible. If
- * not in the root, a “Back” button would be visible instead.
- *
- * @return {Promise<boolean>} Whether it currently is the navigation root or not
- */
-export async function isSiteEditorRoot() {
-	const { navigationPanel } = SELECTORS;
-
-	const isBackToDashboardButtonVisible = !! ( await page.$(
-		navigationPanel.backToDashboard
-	) );
-
-	return isBackToDashboardButtonVisible;
-}
-
-/**
- * Navigates the site editor back
- */
-export async function navigateSiteEditorBack() {
-	const { navigationPanel } = SELECTORS;
-
-	await page.click( navigationPanel.goBack );
-}
-
-/**
- * Goes back until it gets to the root
- */
-export async function navigateSiteEditorBackToRoot() {
-	while ( ! ( await isSiteEditorRoot() ) ) {
-		await navigateSiteEditorBack();
-	}
-}
-
-/**
- * Opens the site editor navigation panel if closed
- */
-export async function openSiteEditorNavigationPanel() {
-	const { navigationPanel } = SELECTORS;
-
-	const isOpen = !! ( await page.$( navigationPanel.isOpenState ) );
-
-	if ( ! isOpen ) {
-		await page.click( navigationPanel.open );
-		await page.waitForSelector( navigationPanel.panelContainer );
-	}
-}
-
-/**
- * Navigates through a sequence of links in the site editor navigation panel
- *
- * @param {string[] | string} labels Labels to navigate through
- */
-export async function siteEditorNavigateSequence( labels ) {
-	if ( ! Array.isArray( labels ) ) {
-		labels = [ labels ];
-	}
-
-	for ( const label of labels ) {
-		await clickSiteEditorMenuItem( label );
-	}
-}
-
-/**
  * Visits the Site Editor main page
  *
  * By default, it also skips the welcome guide. The option can be disabled if need be.
@@ -264,7 +139,7 @@ export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
  */
 export async function toggleGlobalStyles() {
 	await page.click(
-		'.edit-site-header__actions button[aria-label="Styles"]'
+		'.edit-site-header-edit-mode__actions button[aria-label="Styles"]'
 	);
 }
 
@@ -285,4 +160,17 @@ export async function openPreviousGlobalStylesPanel() {
 	await page.click(
 		'div[aria-label="Editor settings"] button[aria-label="Navigate to the previous view"]'
 	);
+}
+
+/**
+ * Enters edit mode.
+ */
+export async function enterEditMode() {
+	const editSiteToggle = await page.$( '.edit-site-site-hub__edit-button' );
+	// This check is necessary for the performance tests in old branches
+	// where the site editor toggle was not implemented yet.
+	if ( ! editSiteToggle ) {
+		return;
+	}
+	await page.click( '.edit-site-site-hub__edit-button' );
 }

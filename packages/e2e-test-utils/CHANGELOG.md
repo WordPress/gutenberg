@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+## 9.3.0 (2023-02-01)
+
+## 9.2.0 (2023-01-11)
+
+## 9.1.0 (2023-01-02)
+
+## 9.0.0 (2022-12-14)
+
+### Breaking changes
+
+-   Remove all the site editor navigation panel related utils: getSiteEditorMenuItem, isSiteEditorRoot, navigateSiteEditorBack, navigateSiteEditorBackToRoot, openSiteEditorNavigationPanel, siteEditorNavigateSequence, clickSiteEditorMenuItem, closeSiteEditorNavigationPanel.
+
+## 8.6.0 (2022-11-16)
+
+## 8.5.0 (2022-11-02)
+
+## 8.4.0 (2022-10-19)
+
+## 8.3.0 (2022-10-05)
+
+### Bug Fixes
+
+-   Don't use hardcoded login credentials when requesting nonce ([#44331](https://github.com/WordPress/gutenberg/pull/44331)).
+
 ## 8.2.0 (2022-09-21)
 
 ## 8.0.0 (2022-08-24)

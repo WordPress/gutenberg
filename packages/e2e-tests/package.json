@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/e2e-tests",
-	"version": "5.2.0",
+	"version": "6.3.0",
 	"description": "End-To-End (E2E) tests for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -40,8 +40,8 @@
 	"peerDependencies": {
 		"jest": ">=27",
 		"puppeteer-core": ">=11",
-		"react": "^17.0.0",
-		"react-dom": "^17.0.0"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,0 +1,9 @@
+.edit-site-sidebar-navigation-screen-templates__see-all {
+	/* Overrides the margin that comes from the Item component */
+	margin-top: $grid-unit-20 !important;
+}
+
+.edit-site-sidebar-navigation-screen-templates__add-button {
+	/* Overrides the color for all states of the button */
+	color: inherit !important;
+}

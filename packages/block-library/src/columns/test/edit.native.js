@@ -75,7 +75,7 @@ describe( 'Columns block', () => {
 			const screen = await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,
 			} );
-			const { getByA11yLabel } = screen;
+			const { getByLabelText } = screen;
 
 			// Get block
 			const columnsBlock = await getBlock( screen, 'Columns' );
@@ -85,7 +85,7 @@ describe( 'Columns block', () => {
 			await openBlockSettings( screen );
 
 			// Update the number of columns by adding one
-			const columnsControl = getByA11yLabel( /Number of columns/ );
+			const columnsControl = getByLabelText( /Number of columns/ );
 			fireEvent( columnsControl, 'accessibilityAction', {
 				nativeEvent: { actionName: 'increment' },
 			} );
@@ -97,7 +97,7 @@ describe( 'Columns block', () => {
 			const screen = await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,
 			} );
-			const { getByA11yLabel } = screen;
+			const { getByLabelText } = screen;
 
 			// Wait for the block to be created.
 			const columnsBlock = await getBlock( screen, 'Columns' );
@@ -107,7 +107,7 @@ describe( 'Columns block', () => {
 			await openBlockSettings( screen );
 
 			// Update the number of columns by removing one
-			const columnsControl = getByA11yLabel( /Number of columns/ );
+			const columnsControl = getByLabelText( /Number of columns/ );
 			fireEvent( columnsControl, 'accessibilityAction', {
 				nativeEvent: { actionName: 'decrement' },
 			} );
@@ -117,7 +117,7 @@ describe( 'Columns block', () => {
 
 		it( 'reaches the minimum limit of number of column blocks', async () => {
 			const screen = await initializeEditor();
-			const { getByA11yLabel, getByTestId } = screen;
+			const { getByLabelText, getByTestId } = screen;
 
 			// Add block
 			await addBlock( screen, 'Columns' );
@@ -131,7 +131,7 @@ describe( 'Columns block', () => {
 			const blockVariationModal = getByTestId( 'block-variation-modal' );
 			await waitFor( () => blockVariationModal.props.isVisible );
 			const threeColumnLayout =
-				within( blockVariationModal ).getByA11yLabel(
+				within( blockVariationModal ).getByLabelText(
 					/33 \/ 33 \/ 33 block/
 				);
 			fireEvent.press( threeColumnLayout );
@@ -144,7 +144,7 @@ describe( 'Columns block', () => {
 			await openBlockSettings( screen );
 
 			// Update the number of columns by adding one
-			const columnsControl = getByA11yLabel( /Number of columns/ );
+			const columnsControl = getByLabelText( /Number of columns/ );
 			fireEvent( columnsControl, 'accessibilityAction', {
 				nativeEvent: { actionName: 'increment' },
 			} );
@@ -164,7 +164,7 @@ describe( 'Columns block', () => {
 		const screen = await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
-		const { getByA11yLabel } = screen;
+		const { getByLabelText } = screen;
 
 		// Get block
 		const columnsBlock = await getBlock( screen, 'Columns' );
@@ -175,11 +175,11 @@ describe( 'Columns block', () => {
 		fireEvent.press( firstColumnBlock );
 
 		// Open block actions menu
-		const blockActionsButton = getByA11yLabel( /Open Block Actions Menu/ );
+		const blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
 		fireEvent.press( blockActionsButton );
 
 		// Delete block
-		const deleteButton = getByA11yLabel( /Remove block/ );
+		const deleteButton = getByLabelText( /Remove block/ );
 		fireEvent.press( deleteButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -189,7 +189,7 @@ describe( 'Columns block', () => {
 		const screen = await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
-		const { getByA11yLabel } = screen;
+		const { getByLabelText } = screen;
 
 		// Get block
 		const columnsBlock = await getBlock( screen, 'Columns' );
@@ -200,11 +200,11 @@ describe( 'Columns block', () => {
 		fireEvent.press( firstColumnBlock );
 
 		// Open block actions menu
-		let blockActionsButton = getByA11yLabel( /Open Block Actions Menu/ );
+		let blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
 		fireEvent.press( blockActionsButton );
 
 		// Delete block
-		let deleteButton = getByA11yLabel( /Remove block/ );
+		let deleteButton = getByLabelText( /Remove block/ );
 		fireEvent.press( deleteButton );
 
 		// Get the only left column
@@ -212,11 +212,11 @@ describe( 'Columns block', () => {
 		fireEvent.press( lastColumnBlock );
 
 		// Open block actions menu
-		blockActionsButton = getByA11yLabel( /Open Block Actions Menu/ );
+		blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
 		fireEvent.press( blockActionsButton );
 
 		// Delete block
-		deleteButton = getByA11yLabel( /Remove block/ );
+		deleteButton = getByLabelText( /Remove block/ );
 		fireEvent.press( deleteButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -226,20 +226,20 @@ describe( 'Columns block', () => {
 		const screen = await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
-		const { getByA11yLabel } = screen;
+		const { getByLabelText } = screen;
 
 		// Get block
 		const columnsBlock = await getBlock( screen, 'Columns' );
 		fireEvent.press( columnsBlock );
 
 		// Open vertical alignment menu
-		const verticalAlignmentButton = getByA11yLabel(
+		const verticalAlignmentButton = getByLabelText(
 			/Change vertical alignment/
 		);
 		fireEvent.press( verticalAlignmentButton );
 
 		// Get Align top button
-		const verticalTopAlignmentButton = getByA11yLabel( /Align top/ );
+		const verticalTopAlignmentButton = getByLabelText( /Align top/ );
 		fireEvent.press( verticalTopAlignmentButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -249,20 +249,20 @@ describe( 'Columns block', () => {
 		const screen = await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
-		const { getByA11yLabel } = screen;
+		const { getByLabelText } = screen;
 
 		// Get block
 		const columnsBlock = await getBlock( screen, 'Columns' );
 		fireEvent.press( columnsBlock );
 
 		// Open vertical alignment menu
-		const verticalAlignmentButton = getByA11yLabel(
+		const verticalAlignmentButton = getByLabelText(
 			/Change vertical alignment/
 		);
 		fireEvent.press( verticalAlignmentButton );
 
 		// Get Align top button
-		const verticalTopAlignmentButton = getByA11yLabel( /Align top/ );
+		const verticalTopAlignmentButton = getByLabelText( /Align top/ );
 		fireEvent.press( verticalTopAlignmentButton );
 
 		// Get the first column
@@ -273,7 +273,7 @@ describe( 'Columns block', () => {
 		fireEvent.press( verticalAlignmentButton );
 
 		// Get Align bottom button
-		const verticalBottomAlignmentButton = getByA11yLabel( /Align bottom/ );
+		const verticalBottomAlignmentButton = getByLabelText( /Align bottom/ );
 		fireEvent.press( verticalBottomAlignmentButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -283,20 +283,20 @@ describe( 'Columns block', () => {
 		const screen = await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
-		const { getByA11yLabel } = screen;
+		const { getByLabelText } = screen;
 
 		// Get block
 		const columnsBlock = await getBlock( screen, 'Columns' );
 		fireEvent.press( columnsBlock );
 
 		// Open vertical alignment menu
-		const verticalAlignmentButton = getByA11yLabel(
+		const verticalAlignmentButton = getByLabelText(
 			/Change vertical alignment/
 		);
 		fireEvent.press( verticalAlignmentButton );
 
 		// Get Align top button
-		const verticalTopAlignmentButton = getByA11yLabel( /Align top/ );
+		const verticalTopAlignmentButton = getByLabelText( /Align top/ );
 		fireEvent.press( verticalTopAlignmentButton );
 
 		// Add a new column
@@ -310,7 +310,7 @@ describe( 'Columns block', () => {
 	describe( 'when using columns percentage mechanism', () => {
 		it( "updates the slider's input value", async () => {
 			const screen = await initializeEditor();
-			const { getByA11yLabel, getByTestId } = screen;
+			const { getByLabelText, getByTestId } = screen;
 
 			// Add block
 			await addBlock( screen, 'Columns' );
@@ -324,7 +324,7 @@ describe( 'Columns block', () => {
 			const blockVariationModal = getByTestId( 'block-variation-modal' );
 			await waitFor( () => blockVariationModal.props.isVisible );
 			const threeColumnLayout =
-				within( blockVariationModal ).getByA11yLabel(
+				within( blockVariationModal ).getByLabelText(
 					/33 \/ 33 \/ 33 block/
 				);
 			fireEvent.press( threeColumnLayout );
@@ -337,7 +337,7 @@ describe( 'Columns block', () => {
 			await openBlockSettings( screen );
 
 			// Get width control
-			const widthControl = getByA11yLabel( /Width. Value is/ );
+			const widthControl = getByLabelText( /Width. Value is/ );
 			fireEvent.press( within( widthControl ).getByText( '33.3' ) );
 			const widthTextInput =
 				within( widthControl ).getByDisplayValue( '33.3' );
@@ -350,7 +350,7 @@ describe( 'Columns block', () => {
 			const screen = await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,
 			} );
-			const { getByA11yLabel, getByTestId } = screen;
+			const { getByLabelText, getByTestId } = screen;
 
 			// Get block
 			const columnsBlock = await getBlock( screen, 'Columns' );
@@ -364,7 +364,7 @@ describe( 'Columns block', () => {
 			await openBlockSettings( screen );
 
 			// Set custom width value for the first column
-			let widthControl = getByA11yLabel( /Width. Value is/ );
+			let widthControl = getByLabelText( /Width. Value is/ );
 			fireEvent.press( within( widthControl ).getByText( '50' ) );
 			let widthTextInput =
 				within( widthControl ).getByDisplayValue( '50' );
@@ -383,7 +383,7 @@ describe( 'Columns block', () => {
 			await openBlockSettings( screen );
 
 			// Set custom width value for the second column
-			widthControl = getByA11yLabel( /Width. Value is/ );
+			widthControl = getByLabelText( /Width. Value is/ );
 			fireEvent.press( within( widthControl ).getByText( '50' ) );
 			widthTextInput = within( widthControl ).getByDisplayValue( '50' );
 			fireEvent.changeText( widthTextInput, '55.5' );
@@ -422,7 +422,7 @@ describe( 'Columns block', () => {
 				);
 				await waitFor( () => blockVariationModal.props.isVisible );
 				const columnLayout =
-					within( blockVariationModal ).getByA11yLabel( layout );
+					within( blockVariationModal ).getByLabelText( layout );
 				fireEvent.press( columnLayout );
 
 				expect( getEditorHtml() ).toMatchSnapshot();

@@ -9,6 +9,9 @@
 	"keywords": [ "link" ],
 	"textdomain": "default",
 	"attributes": {
+		"textAlign": {
+			"type": "string"
+		},
 		"url": {
 			"type": "string",
 			"source": "attribute",
@@ -56,7 +59,7 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true,
+		"align": false,
 		"alignWide": false,
 		"color": {
 			"__experimentalSkipSerialization": true,
@@ -80,6 +83,7 @@
 			}
 		},
 		"reusable": false,
+		"shadow": true,
 		"spacing": {
 			"__experimentalSkipSerialization": true,
 			"padding": [ "horizontal", "vertical" ],
@@ -88,10 +92,16 @@
 			}
 		},
 		"__experimentalBorder": {
+			"color": true,
 			"radius": true,
+			"style": true,
+			"width": true,
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
-				"radius": true
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
 			}
 		},
 		"__experimentalSelector": ".wp-block-button .wp-block-button__link"

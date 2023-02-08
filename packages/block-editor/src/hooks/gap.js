@@ -17,7 +17,12 @@ import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/u
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import SpacingSizesControl from '../components/spacing-sizes-control';
 import useSetting from '../components/use-setting';
-import { AXIAL_SIDES, SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
+import {
+	AXIAL_SIDES,
+	SPACING_SUPPORT_KEY,
+	useCustomSides,
+	useIsDimensionsSupportValid,
+} from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -113,7 +118,9 @@ export function resetGap( { attributes = {}, setAttributes } ) {
  */
 export function useIsGapDisabled( { name: blockName } = {} ) {
 	const isDisabled = ! useSetting( 'spacing.blockGap' );
-	return ! hasGapSupport( blockName ) || isDisabled;
+	const isInvalid = ! useIsDimensionsSupportValid( blockName, 'blockGap' );
+
+	return ! hasGapSupport( blockName ) || isDisabled || isInvalid;
 }
 
 /**

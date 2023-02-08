@@ -17,11 +17,12 @@ if ( class_exists( 'WP_Style_Engine' ) ) {
  * The Style Engine aims to provide a consistent API for rendering styling for blocks across both client-side and server-side applications.
  *
  * This class is for internal Core usage and is not supposed to be used by extenders (plugins and/or themes).
+ * This class is final and should not be extended.
  * This is a low-level API that may need to do breaking changes. Please, use wp_style_engine_get_styles instead.
  *
  * @access private
  */
-class WP_Style_Engine {
+final class WP_Style_Engine {
 	/**
 	 * Style definitions that contain the instructions to
 	 * parse/output valid Gutenberg styles from a block's attributes.
@@ -107,31 +108,53 @@ class WP_Style_Engine {
 				'path'          => array( 'border', 'width' ),
 			),
 			'top'    => array(
-				'value_func' => 'static::get_individual_property_css_declarations',
+				'value_func' => array( self::class, 'get_individual_property_css_declarations' ),
 				'path'       => array( 'border', 'top' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
 				),
 			),
 			'right'  => array(
-				'value_func' => 'static::get_individual_property_css_declarations',
+				'value_func' => array( self::class, 'get_individual_property_css_declarations' ),
 				'path'       => array( 'border', 'right' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
 				),
 			),
 			'bottom' => array(
-				'value_func' => 'static::get_individual_property_css_declarations',
+				'value_func' => array( self::class, 'get_individual_property_css_declarations' ),
 				'path'       => array( 'border', 'bottom' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
 				),
 			),
 			'left'   => array(
-				'value_func' => 'static::get_individual_property_css_declarations',
+				'value_func' => array( self::class, 'get_individual_property_css_declarations' ),
 				'path'       => array( 'border', 'left' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
+				),
+			),
+		),
+		'shadow'     => array(
+			'shadow' => array(
+				'property_keys' => array(
+					'default' => 'box-shadow',
+				),
+				'path'          => array( 'shadow' ),
+				'css_vars'      => array(
+					'shadow' => '--wp--preset--shadow--$slug',
+				),
+			),
+		),
+		'dimensions' => array(
+			'minHeight' => array(
+				'property_keys' => array(
+					'default' => 'min-height',
+				),
+				'path'          => array( 'dimensions', 'minHeight' ),
+				'css_vars'      => array(
+					'spacing' => '--wp--preset--spacing--$slug',
 				),
 			),
 		),
@@ -193,6 +216,12 @@ class WP_Style_Engine {
 					'default' => 'line-height',
 				),
 				'path'          => array( 'typography', 'lineHeight' ),
+			),
+			'textColumns'    => array(
+				'property_keys' => array(
+					'default' => 'column-count',
+				),
+				'path'          => array( 'typography', 'textColumns' ),
 			),
 			'textDecoration' => array(
 				'property_keys' => array(

@@ -1,20 +1,12 @@
 /**
  * External dependencies
  */
-import {
-	flow,
-	reduce,
-	omit,
-	without,
-	mapValues,
-	isEqual,
-	isEmpty,
-	omitBy,
-} from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
  */
+import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 /**
@@ -36,16 +28,18 @@ const identity = ( x ) => x;
  * @return {Object} Block order map object.
  */
 function mapBlockOrder( blocks, rootClientId = '' ) {
-	const result = { [ rootClientId ]: [] };
-
+	const result = new Map();
+	const current = [];
+	result.set( rootClientId, current );
 	blocks.forEach( ( block ) => {
 		const { clientId, innerBlocks } = block;
-
-		result[ rootClientId ].push( clientId );
-
-		Object.assign( result, mapBlockOrder( innerBlocks, clientId ) );
+		current.push( clientId );
+		mapBlockOrder( innerBlocks, clientId ).forEach(
+			( order, subClientId ) => {
+				result.set( subClientId, order );
+			}
+		);
 	} );
-
 	return result;
 }
 
@@ -59,15 +53,18 @@ function mapBlockOrder( blocks, rootClientId = '' ) {
  * @return {Object} Block order map object.
  */
 function mapBlockParents( blocks, rootClientId = '' ) {
-	return blocks.reduce(
-		( result, block ) =>
-			Object.assign(
-				result,
-				{ [ block.clientId ]: rootClientId },
-				mapBlockParents( block.innerBlocks, block.clientId )
-			),
-		{}
-	);
+	const result = [];
+	const stack = [ [ rootClientId, blocks ] ];
+	while ( stack.length ) {
+		const [ parent, currentBlocks ] = stack.shift();
+		currentBlocks.forEach( ( { innerBlocks, ...block } ) => {
+			result.push( [ block.clientId, parent ] );
+			if ( innerBlocks?.length ) {
+				stack.push( [ block.clientId, innerBlocks ] );
+			}
+		} );
+	}
+	return result;
 }
 
 /**
@@ -78,16 +75,28 @@ function mapBlockParents( blocks, rootClientId = '' ) {
  * @param {Array}    blocks    Blocks to flatten.
  * @param {Function} transform Transforming function to be applied to each block.
  *
- * @return {Object} Flattened object.
+ * @return {Array} Flattened object.
  */
 function flattenBlocks( blocks, transform = identity ) {
-	const result = {};
+	const result = [];
 
 	const stack = [ ...blocks ];
 	while ( stack.length ) {
 		const { innerBlocks, ...block } = stack.shift();
 		stack.push( ...innerBlocks );
-		result[ block.clientId ] = transform( block );
+		result.push( [ block.clientId, transform( block ) ] );
+	}
+
+	return result;
+}
+
+function getFlattenedClientIds( blocks ) {
+	const result = {};
+	const stack = [ ...blocks ];
+	while ( stack.length ) {
+		const { innerBlocks, ...block } = stack.shift();
+		stack.push( ...innerBlocks );
+		result[ block.clientId ] = true;
 	}
 
 	return result;
@@ -100,10 +109,13 @@ function flattenBlocks( blocks, transform = identity ) {
  *
  * @param {Array} blocks Blocks to flatten.
  *
- * @return {Object} Flattened block attributes object.
+ * @return {Array} Flattened block attributes object.
  */
 function getFlattenedBlocksWithoutAttributes( blocks ) {
-	return flattenBlocks( blocks, ( block ) => omit( block, 'attributes' ) );
+	return flattenBlocks( blocks, ( block ) => {
+		const { attributes, ...restBlock } = block;
+		return restBlock;
+	} );
 }
 
 /**
@@ -113,27 +125,10 @@ function getFlattenedBlocksWithoutAttributes( blocks ) {
  *
  * @param {Array} blocks Blocks to flatten.
  *
- * @return {Object} Flattened block attributes object.
+ * @return {Array} Flattened block attributes object.
  */
 function getFlattenedBlockAttributes( blocks ) {
 	return flattenBlocks( blocks, ( block ) => block.attributes );
-}
-
-/**
- * Returns an object against which it is safe to perform mutating operations,
- * given the original object and its current working copy.
- *
- * @param {Object} original Original object.
- * @param {Object} working  Working object.
- *
- * @return {Object} Mutation-safe object.
- */
-function getMutateSafeObject( original, working ) {
-	if ( original === working ) {
-		return { ...original };
-	}
-
-	return working;
 }
 
 /**
@@ -146,7 +141,7 @@ function getMutateSafeObject( original, working ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( Object.keys( a ), Object.keys( b ) );
+	return fastDeepEqual( Object.keys( a ), Object.keys( b ) );
 }
 
 /**
@@ -164,13 +159,13 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
 		lastAction !== undefined &&
 		lastAction.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
-		isEqual( action.clientIds, lastAction.clientIds ) &&
+		fastDeepEqual( action.clientIds, lastAction.clientIds ) &&
 		hasSameKeys( action.attributes, lastAction.attributes )
 	);
 }
 
-function buildBlockTree( state, blocks ) {
-	const result = {};
+function updateBlockTreeForBlocks( state, blocks ) {
+	const treeToUpdate = state.tree;
 	const stack = [ ...blocks ];
 	const flattenedBlocks = [ ...blocks ];
 	while ( stack.length ) {
@@ -180,33 +175,34 @@ function buildBlockTree( state, blocks ) {
 	}
 	// Create objects before mutating them, that way it's always defined.
 	for ( const block of flattenedBlocks ) {
-		result[ block.clientId ] = {};
+		treeToUpdate.set( block.clientId, {} );
 	}
 	for ( const block of flattenedBlocks ) {
-		result[ block.clientId ] = Object.assign( result[ block.clientId ], {
-			...state.byClientId[ block.clientId ],
-			attributes: state.attributes[ block.clientId ],
-			innerBlocks: block.innerBlocks.map(
-				( subBlock ) => result[ subBlock.clientId ]
-			),
-		} );
+		treeToUpdate.set(
+			block.clientId,
+			Object.assign( treeToUpdate.get( block.clientId ), {
+				...state.byClientId.get( block.clientId ),
+				attributes: state.attributes.get( block.clientId ),
+				innerBlocks: block.innerBlocks.map( ( subBlock ) =>
+					treeToUpdate.get( subBlock.clientId )
+				),
+			} )
+		);
 	}
-
-	return result;
 }
 
 function updateParentInnerBlocksInTree(
 	state,
-	tree,
 	updatedClientIds,
 	updateChildrenOfUpdatedClientIds = false
 ) {
+	const treeToUpdate = state.tree;
 	const uncontrolledParents = new Set( [] );
 	const controlledParents = new Set();
 	for ( const clientId of updatedClientIds ) {
 		let current = updateChildrenOfUpdatedClientIds
 			? clientId
-			: state.parents[ clientId ];
+			: state.parents.get( clientId );
 		do {
 			if ( state.controlledInnerBlocks[ current ] ) {
 				// Should stop on controlled blocks.
@@ -216,7 +212,7 @@ function updateParentInnerBlocksInTree(
 			} else {
 				// Else continue traversing up through parents.
 				uncontrolledParents.add( current );
-				current = state.parents[ current ];
+				current = state.parents.get( current );
 			}
 		} while ( current !== undefined );
 	}
@@ -224,27 +220,23 @@ function updateParentInnerBlocksInTree(
 	// To make sure the order of assignments doesn't matter,
 	// we first create empty objects and mutates the inner blocks later.
 	for ( const clientId of uncontrolledParents ) {
-		tree[ clientId ] = {
-			...tree[ clientId ],
-		};
+		treeToUpdate.set( clientId, { ...treeToUpdate.get( clientId ) } );
 	}
 	for ( const clientId of uncontrolledParents ) {
-		tree[ clientId ].innerBlocks = ( state.order[ clientId ] || [] ).map(
-			( subClientId ) => tree[ subClientId ]
-		);
+		treeToUpdate.get( clientId ).innerBlocks = (
+			state.order.get( clientId ) || []
+		).map( ( subClientId ) => treeToUpdate.get( subClientId ) );
 	}
 
 	// Controlled parent blocks, need a dedicated key for their inner blocks
 	// to be used when doing getBlocks( controlledBlockClientId ).
 	for ( const clientId of controlledParents ) {
-		tree[ 'controlled||' + clientId ] = {
-			innerBlocks: ( state.order[ clientId ] || [] ).map(
-				( subClientId ) => tree[ subClientId ]
+		treeToUpdate.set( 'controlled||' + clientId, {
+			innerBlocks: ( state.order.get( clientId ) || [] ).map(
+				( subClientId ) => treeToUpdate.get( subClientId )
 			),
-		};
+		} );
 	}
-
-	return tree;
 }
 
 /**
@@ -265,82 +257,70 @@ const withBlockTree =
 			return state;
 		}
 
-		newState.tree = state.tree ? state.tree : {};
+		newState.tree = state.tree ? state.tree : new Map();
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS':
 			case 'INSERT_BLOCKS': {
-				const subTree = buildBlockTree( newState, action.blocks );
-				newState.tree = updateParentInnerBlocksInTree(
+				newState.tree = new Map( newState.tree );
+				updateBlockTreeForBlocks( newState, action.blocks );
+				updateParentInnerBlocksInTree(
 					newState,
-					{
-						...newState.tree,
-						...subTree,
-					},
 					action.rootClientId ? [ action.rootClientId ] : [ '' ],
 					true
 				);
 				break;
 			}
 			case 'UPDATE_BLOCK':
-				newState.tree = updateParentInnerBlocksInTree(
+				newState.tree = new Map( newState.tree );
+				newState.tree.set( action.clientId, {
+					...newState.tree.get( action.clientId ),
+					...newState.byClientId.get( action.clientId ),
+					attributes: newState.attributes.get( action.clientId ),
+				} );
+				updateParentInnerBlocksInTree(
 					newState,
-					{
-						...newState.tree,
-						[ action.clientId ]: {
-							...newState.tree[ action.clientId ],
-							...newState.byClientId[ action.clientId ],
-							attributes: newState.attributes[ action.clientId ],
-						},
-					},
 					[ action.clientId ],
 					false
 				);
 				break;
 			case 'UPDATE_BLOCK_ATTRIBUTES': {
-				const newSubTree = action.clientIds.reduce(
-					( result, clientId ) => {
-						result[ clientId ] = {
-							...newState.tree[ clientId ],
-							attributes: newState.attributes[ clientId ],
-						};
-						return result;
-					},
-					{}
-				);
-				newState.tree = updateParentInnerBlocksInTree(
+				newState.tree = new Map( newState.tree );
+				action.clientIds.forEach( ( clientId ) => {
+					newState.tree.set( clientId, {
+						...newState.tree.get( clientId ),
+						attributes: newState.attributes.get( clientId ),
+					} );
+				} );
+				updateParentInnerBlocksInTree(
 					newState,
-					{
-						...newState.tree,
-						...newSubTree,
-					},
 					action.clientIds,
 					false
 				);
 				break;
 			}
 			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
-				const subTree = buildBlockTree( newState, action.blocks );
-				newState.tree = updateParentInnerBlocksInTree(
-					newState,
-					{
-						...omit(
-							newState.tree,
-							action.replacedClientIds.concat(
-								// Controlled inner blocks are only removed
-								// if the block doesn't move to another position
-								// otherwise their content will be lost.
-								action.replacedClientIds
-									.filter(
-										( clientId ) => ! subTree[ clientId ]
-									)
-									.map(
-										( clientId ) =>
-											'controlled||' + clientId
-									)
+				const inserterClientIds = getFlattenedClientIds(
+					action.blocks
+				);
+				newState.tree = new Map( newState.tree );
+				action.replacedClientIds
+					.concat(
+						// Controlled inner blocks are only removed
+						// if the block doesn't move to another position
+						// otherwise their content will be lost.
+						action.replacedClientIds
+							.filter(
+								( clientId ) => ! inserterClientIds[ clientId ]
 							)
-						),
-						...subTree,
-					},
+							.map( ( clientId ) => 'controlled||' + clientId )
+					)
+					.forEach( ( key ) => {
+						newState.tree.delete( key );
+					} );
+
+				updateBlockTreeForBlocks( newState, action.blocks );
+				updateParentInnerBlocksInTree(
+					newState,
 					action.blocks.map( ( b ) => b.clientId ),
 					false
 				);
@@ -349,18 +329,19 @@ const withBlockTree =
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
 					if (
-						state.parents[ clientId ] !== undefined &&
-						( state.parents[ clientId ] === '' ||
-							newState.byClientId[ state.parents[ clientId ] ] )
+						state.parents.get( clientId ) !== undefined &&
+						( state.parents.get( clientId ) === '' ||
+							newState.byClientId.get(
+								state.parents.get( clientId )
+							) )
 					) {
 						parentsOfRemovedBlocks.push(
-							state.parents[ clientId ]
+							state.parents.get( clientId )
 						);
 					}
 				}
-				newState.tree = updateParentInnerBlocksInTree(
+				updateParentInnerBlocksInTree(
 					newState,
-					newState.tree,
 					parentsOfRemovedBlocks,
 					true
 				);
@@ -370,25 +351,29 @@ const withBlockTree =
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
 					if (
-						state.parents[ clientId ] !== undefined &&
-						( state.parents[ clientId ] === '' ||
-							newState.byClientId[ state.parents[ clientId ] ] )
+						state.parents.get( clientId ) !== undefined &&
+						( state.parents.get( clientId ) === '' ||
+							newState.byClientId.get(
+								state.parents.get( clientId )
+							) )
 					) {
 						parentsOfRemovedBlocks.push(
-							state.parents[ clientId ]
+							state.parents.get( clientId )
 						);
 					}
 				}
-				newState.tree = updateParentInnerBlocksInTree(
-					newState,
-					omit(
-						newState.tree,
-						action.removedClientIds.concat(
-							action.removedClientIds.map(
-								( clientId ) => 'controlled||' + clientId
-							)
+				newState.tree = new Map( newState.tree );
+				action.removedClientIds
+					.concat(
+						action.removedClientIds.map(
+							( clientId ) => 'controlled||' + clientId
 						)
-					),
+					)
+					.forEach( ( key ) => {
+						newState.tree.delete( key );
+					} );
+				updateParentInnerBlocksInTree(
+					newState,
 					parentsOfRemovedBlocks,
 					true
 				);
@@ -403,9 +388,9 @@ const withBlockTree =
 				if ( action.toRootClientId ) {
 					updatedBlockUids.push( action.toRootClientId );
 				}
-				newState.tree = updateParentInnerBlocksInTree(
+				newState.tree = new Map( newState.tree );
+				updateParentInnerBlocksInTree(
 					newState,
-					newState.tree,
 					updatedBlockUids,
 					true
 				);
@@ -416,39 +401,35 @@ const withBlockTree =
 				const updatedBlockUids = [
 					action.rootClientId ? action.rootClientId : '',
 				];
-				newState.tree = updateParentInnerBlocksInTree(
+				newState.tree = new Map( newState.tree );
+				updateParentInnerBlocksInTree(
 					newState,
-					newState.tree,
 					updatedBlockUids,
 					true
 				);
 				break;
 			}
 			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const updatedBlockUids = Object.keys(
-					omitBy( newState.attributes, ( attributes, clientId ) => {
-						return (
-							newState.byClientId[ clientId ].name !==
-								'core/block' ||
-							attributes.ref !== action.updatedId
-						);
-					} )
-				);
-
-				newState.tree = updateParentInnerBlocksInTree(
+				const updatedBlockUids = [];
+				newState.attributes.forEach( ( attributes, clientId ) => {
+					if (
+						newState.byClientId.get( clientId ).name ===
+							'core/block' &&
+						attributes.ref === action.updatedId
+					) {
+						updatedBlockUids.push( clientId );
+					}
+				} );
+				newState.tree = new Map( newState.tree );
+				updatedBlockUids.forEach( ( clientId ) => {
+					newState.tree.set( clientId, {
+						...newState.byClientId.get( clientId ),
+						attributes: newState.attributes.get( clientId ),
+						innerBlocks: newState.tree.get( clientId ).innerBlocks,
+					} );
+				} );
+				updateParentInnerBlocksInTree(
 					newState,
-					{
-						...newState.tree,
-						...updatedBlockUids.reduce( ( result, clientId ) => {
-							result[ clientId ] = {
-								...newState.byClientId[ clientId ],
-								attributes: newState.attributes[ clientId ],
-								innerBlocks:
-									newState.tree[ clientId ].innerBlocks,
-							};
-							return result;
-						}, {} ),
-					},
 					updatedBlockUids,
 					false
 				);
@@ -557,7 +538,7 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
 		let result = clientIds;
 		for ( let i = 0; i < result.length; i++ ) {
 			if (
-				! state.order[ result[ i ] ] ||
+				! state.order.get( result[ i ] ) ||
 				( action.keepControlledInnerBlocks &&
 					action.keepControlledInnerBlocks[ result[ i ] ] )
 			) {
@@ -568,7 +549,7 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
 				result = [ ...result ];
 			}
 
-			result.push( ...state.order[ result[ i ] ] );
+			result.push( ...state.order.get( result[ i ] ) );
 		}
 		return result;
 	};
@@ -609,23 +590,22 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'RESET_BLOCKS' ) {
 		const newState = {
 			...state,
-			byClientId: getFlattenedBlocksWithoutAttributes( action.blocks ),
-			attributes: getFlattenedBlockAttributes( action.blocks ),
+			byClientId: new Map(
+				getFlattenedBlocksWithoutAttributes( action.blocks )
+			),
+			attributes: new Map( getFlattenedBlockAttributes( action.blocks ) ),
 			order: mapBlockOrder( action.blocks ),
-			parents: mapBlockParents( action.blocks ),
+			parents: new Map( mapBlockParents( action.blocks ) ),
 			controlledInnerBlocks: {},
 		};
 
-		const subTree = buildBlockTree( newState, action.blocks );
-		newState.tree = {
-			...subTree,
-			// Root.
-			'': {
-				innerBlocks: action.blocks.map(
-					( subBlock ) => subTree[ subBlock.clientId ]
-				),
-			},
-		};
+		newState.tree = new Map( state?.tree );
+		updateBlockTreeForBlocks( newState, action.blocks );
+		newState.tree.set( '', {
+			innerBlocks: action.blocks.map( ( subBlock ) =>
+				newState.tree.get( subBlock.clientId )
+			),
+		} );
 
 		return newState;
 	}
@@ -671,11 +651,11 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 	// marked block in the block state so that they can be reattached to the
 	// marked block when we re-insert everything a few lines below.
 	let stateAfterBlocksRemoval = state;
-	if ( state.order[ action.rootClientId ] ) {
+	if ( state.order.get( action.rootClientId ) ) {
 		stateAfterBlocksRemoval = reducer( stateAfterBlocksRemoval, {
 			type: 'REMOVE_BLOCKS',
 			keepControlledInnerBlocks: nestedControllers,
-			clientIds: state.order[ action.rootClientId ],
+			clientIds: state.order.get( action.rootClientId ),
 		} );
 	}
 	let stateAfterInsert = stateAfterBlocksRemoval;
@@ -689,33 +669,20 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 		// We need to re-attach the controlled inner blocks to the blocks tree and
 		// preserve their block order. Otherwise, an inner block controller's blocks
 		// will be deleted entirely from its entity.
-		stateAfterInsert.order = {
-			...stateAfterInsert.order,
-			...reduce(
-				nestedControllers,
-				( result, value, key ) => {
-					if ( state.order[ key ] ) {
-						result[ key ] = state.order[ key ];
-					}
-					return result;
-				},
-				{}
-			),
-		};
-		stateAfterInsert.tree = {
-			...stateAfterInsert.tree,
-			...reduce(
-				nestedControllers,
-				( result, value, _key ) => {
-					const key = `controlled||${ _key }`;
-					if ( state.tree[ key ] ) {
-						result[ key ] = state.tree[ key ];
-					}
-					return result;
-				},
-				{}
-			),
-		};
+		const stateAfterInsertOrder = new Map( stateAfterInsert.order );
+		Object.keys( nestedControllers ).forEach( ( key ) => {
+			if ( state.order.get( key ) ) {
+				stateAfterInsertOrder.set( key, state.order.get( key ) );
+			}
+		} );
+		stateAfterInsert.order = stateAfterInsertOrder;
+		stateAfterInsert.tree = new Map( stateAfterInsert.tree );
+		Object.keys( nestedControllers ).forEach( ( _key ) => {
+			const key = `controlled||${ _key }`;
+			if ( state.tree.has( key ) ) {
+				stateAfterInsert.tree.set( key, state.tree.get( key ) );
+			}
+		} );
 	}
 	return stateAfterInsert;
 };
@@ -740,21 +707,16 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 		}
 
 		state = { ...state };
-
-		state.attributes = mapValues(
-			state.attributes,
-			( attributes, clientId ) => {
-				const { name } = state.byClientId[ clientId ];
-				if ( name === 'core/block' && attributes.ref === id ) {
-					return {
-						...attributes,
-						ref: updatedId,
-					};
-				}
-
-				return attributes;
+		state.attributes = new Map( state.attributes );
+		state.attributes.forEach( ( attributes, clientId ) => {
+			const { name } = state.byClientId.get( clientId );
+			if ( name === 'core/block' && attributes.ref === id ) {
+				state.attributes.set( clientId, {
+					...attributes,
+					ref: updatedId,
+				} );
 			}
-		);
+		} );
 	}
 
 	return reducer( state, action );
@@ -789,7 +751,7 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
  *
  * @return {Object} Updated state.
  */
-export const blocks = flow(
+export const blocks = pipe(
 	combineReducers,
 	withSaveReusableBlock, // Needs to be before withBlockCache.
 	withBlockTree, // Needs to be before withInnerBlocksRemoveCascade.
@@ -800,165 +762,211 @@ export const blocks = flow(
 	withIgnoredBlockChange,
 	withResetControlledBlocks
 )( {
-	byClientId( state = {}, action ) {
+	// The state is using a Map instead of a plain object for performance reasons.
+	// You can run the "./test/performance.js" unit test to check the impact
+	// code changes can have on this reducer.
+	byClientId( state = new Map(), action ) {
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS':
-			case 'INSERT_BLOCKS':
-				return {
-					...state,
-					...getFlattenedBlocksWithoutAttributes( action.blocks ),
-				};
-
-			case 'UPDATE_BLOCK':
+			case 'INSERT_BLOCKS': {
+				const newState = new Map( state );
+				getFlattenedBlocksWithoutAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
+				return newState;
+			}
+			case 'UPDATE_BLOCK': {
 				// Ignore updates if block isn't known.
-				if ( ! state[ action.clientId ] ) {
+				if ( ! state.has( action.clientId ) ) {
 					return state;
 				}
 
 				// Do nothing if only attributes change.
-				const changes = omit( action.updates, 'attributes' );
-				if ( isEmpty( changes ) ) {
+				const { attributes, ...changes } = action.updates;
+				if ( Object.values( changes ).length === 0 ) {
 					return state;
 				}
 
-				return {
-					...state,
-					[ action.clientId ]: {
-						...state[ action.clientId ],
-						...changes,
-					},
-				};
+				const newState = new Map( state );
+				newState.set( action.clientId, {
+					...state.get( action.clientId ),
+					...changes,
+				} );
+				return newState;
+			}
 
-			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
+			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
 				if ( ! action.blocks ) {
 					return state;
 				}
 
-				return {
-					...omit( state, action.replacedClientIds ),
-					...getFlattenedBlocksWithoutAttributes( action.blocks ),
-				};
+				const newState = new Map( state );
+				action.replacedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
 
-			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-				return omit( state, action.removedClientIds );
+				getFlattenedBlocksWithoutAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
+				return newState;
+			}
+
+			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
+				const newState = new Map( state );
+				action.removedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
+				return newState;
+			}
 		}
 
 		return state;
 	},
 
-	attributes( state = {}, action ) {
+	// The state is using a Map instead of a plain object for performance reasons.
+	// You can run the "./test/performance.js" unit test to check the impact
+	// code changes can have on this reducer.
+	attributes( state = new Map(), action ) {
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS':
-			case 'INSERT_BLOCKS':
-				return {
-					...state,
-					...getFlattenedBlockAttributes( action.blocks ),
-				};
+			case 'INSERT_BLOCKS': {
+				const newState = new Map( state );
+				getFlattenedBlockAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
+				return newState;
+			}
 
-			case 'UPDATE_BLOCK':
+			case 'UPDATE_BLOCK': {
 				// Ignore updates if block isn't known or there are no attribute changes.
 				if (
-					! state[ action.clientId ] ||
+					! state.get( action.clientId ) ||
 					! action.updates.attributes
 				) {
 					return state;
 				}
 
-				return {
-					...state,
-					[ action.clientId ]: {
-						...state[ action.clientId ],
-						...action.updates.attributes,
-					},
-				};
+				const newState = new Map( state );
+				newState.set( action.clientId, {
+					...state.get( action.clientId ),
+					...action.updates.attributes,
+				} );
+				return newState;
+			}
 
 			case 'UPDATE_BLOCK_ATTRIBUTES': {
 				// Avoid a state change if none of the block IDs are known.
-				if ( action.clientIds.every( ( id ) => ! state[ id ] ) ) {
+				if ( action.clientIds.every( ( id ) => ! state.get( id ) ) ) {
 					return state;
 				}
 
-				const next = action.clientIds.reduce(
-					( accumulator, id ) => ( {
-						...accumulator,
-						[ id ]: reduce(
-							action.uniqueByBlock
-								? action.attributes[ id ]
-								: action.attributes,
-							( result, value, key ) => {
-								// Consider as updates only changed values.
-								if ( value !== result[ key ] ) {
-									result = getMutateSafeObject(
-										state[ id ],
-										result
-									);
-									result[ key ] = value;
-								}
-
-								return result;
-							},
-							state[ id ]
-						),
-					} ),
-					{}
-				);
-
-				if (
-					action.clientIds.every(
-						( id ) => next[ id ] === state[ id ]
-					)
-				) {
-					return state;
+				let hasChange = false;
+				const newState = new Map( state );
+				for ( const clientId of action.clientIds ) {
+					const updatedAttributeEntries = Object.entries(
+						action.uniqueByBlock
+							? action.attributes[ clientId ]
+							: action.attributes ?? {}
+					);
+					if ( updatedAttributeEntries.length === 0 ) {
+						continue;
+					}
+					let hasUpdatedAttributes = false;
+					const existingAttributes = state.get( clientId );
+					const newAttributes = {};
+					updatedAttributeEntries.forEach( ( [ key, value ] ) => {
+						if ( existingAttributes[ key ] !== value ) {
+							hasUpdatedAttributes = true;
+							newAttributes[ key ] = value;
+						}
+					} );
+					hasChange = hasChange || hasUpdatedAttributes;
+					if ( hasUpdatedAttributes ) {
+						newState.set( clientId, {
+							...existingAttributes,
+							...newAttributes,
+						} );
+					}
 				}
 
-				return { ...state, ...next };
+				return hasChange ? newState : state;
 			}
 
-			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
+			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
 				if ( ! action.blocks ) {
 					return state;
 				}
 
-				return {
-					...omit( state, action.replacedClientIds ),
-					...getFlattenedBlockAttributes( action.blocks ),
-				};
+				const newState = new Map( state );
+				action.replacedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
+				getFlattenedBlockAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
+				return newState;
+			}
 
-			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-				return omit( state, action.removedClientIds );
+			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
+				const newState = new Map( state );
+				action.removedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
+				return newState;
+			}
 		}
 
 		return state;
 	},
 
-	order( state = {}, action ) {
+	// The state is using a Map instead of a plain object for performance reasons.
+	// You can run the "./test/performance.js" unit test to check the impact
+	// code changes can have on this reducer.
+	order( state = new Map(), action ) {
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS': {
 				const blockOrder = mapBlockOrder( action.blocks );
-				return {
-					...state,
-					...omit( blockOrder, '' ),
-					'': ( state?.[ '' ] || [] ).concat( blockOrder[ '' ] ),
-				};
+				const newState = new Map( state );
+				blockOrder.forEach( ( order, clientId ) => {
+					if ( clientId !== '' ) {
+						newState.set( clientId, order );
+					}
+				} );
+				newState.set(
+					'',
+					( state.get( '' ) ?? [] ).concat( blockOrder[ '' ] )
+				);
+				return newState;
 			}
 			case 'INSERT_BLOCKS': {
 				const { rootClientId = '' } = action;
-				const subState = state[ rootClientId ] || [];
+				const subState = state.get( rootClientId ) || [];
 				const mappedBlocks = mapBlockOrder(
 					action.blocks,
 					rootClientId
 				);
 				const { index = subState.length } = action;
-
-				return {
-					...state,
-					...mappedBlocks,
-					[ rootClientId ]: insertAt(
+				const newState = new Map( state );
+				mappedBlocks.forEach( ( order, clientId ) => {
+					newState.set( clientId, order );
+				} );
+				newState.set(
+					rootClientId,
+					insertAt(
 						subState,
-						mappedBlocks[ rootClientId ],
+						mappedBlocks.get( rootClientId ),
 						index
-					),
-				};
+					)
+				);
+				return newState;
 			}
 
 			case 'MOVE_BLOCKS_TO_POSITION': {
@@ -967,65 +975,68 @@ export const blocks = flow(
 					toRootClientId = '',
 					clientIds,
 				} = action;
-				const { index = state[ toRootClientId ].length } = action;
+				const { index = state.get( toRootClientId ).length } = action;
 
 				// Moving inside the same parent block.
 				if ( fromRootClientId === toRootClientId ) {
-					const subState = state[ toRootClientId ];
+					const subState = state.get( toRootClientId );
 					const fromIndex = subState.indexOf( clientIds[ 0 ] );
-					return {
-						...state,
-						[ toRootClientId ]: moveTo(
-							state[ toRootClientId ],
+					const newState = new Map( state );
+					newState.set(
+						toRootClientId,
+						moveTo(
+							state.get( toRootClientId ),
 							fromIndex,
 							index,
 							clientIds.length
-						),
-					};
+						)
+					);
+					return newState;
 				}
 
 				// Moving from a parent block to another.
-				return {
-					...state,
-					[ fromRootClientId ]: without(
-						state[ fromRootClientId ],
-						...clientIds
-					),
-					[ toRootClientId ]: insertAt(
-						state[ toRootClientId ],
-						clientIds,
-						index
-					),
-				};
+				const newState = new Map( state );
+				newState.set(
+					fromRootClientId,
+					state
+						.get( fromRootClientId )
+						?.filter( ( id ) => ! clientIds.includes( id ) ) ?? []
+				);
+				newState.set(
+					toRootClientId,
+					insertAt( state.get( toRootClientId ), clientIds, index )
+				);
+				return newState;
 			}
 
 			case 'MOVE_BLOCKS_UP': {
 				const { clientIds, rootClientId = '' } = action;
 				const firstClientId = clientIds[ 0 ];
-				const subState = state[ rootClientId ];
+				const subState = state.get( rootClientId );
 
 				if ( ! subState.length || firstClientId === subState[ 0 ] ) {
 					return state;
 				}
 
 				const firstIndex = subState.indexOf( firstClientId );
-
-				return {
-					...state,
-					[ rootClientId ]: moveTo(
+				const newState = new Map( state );
+				newState.set(
+					rootClientId,
+					moveTo(
 						subState,
 						firstIndex,
 						firstIndex - 1,
 						clientIds.length
-					),
-				};
+					)
+				);
+				return newState;
 			}
 
 			case 'MOVE_BLOCKS_DOWN': {
 				const { clientIds, rootClientId = '' } = action;
 				const firstClientId = clientIds[ 0 ];
 				const lastClientId = clientIds[ clientIds.length - 1 ];
-				const subState = state[ rootClientId ];
+				const subState = state.get( rootClientId );
 
 				if (
 					! subState.length ||
@@ -1035,16 +1046,17 @@ export const blocks = flow(
 				}
 
 				const firstIndex = subState.indexOf( firstClientId );
-
-				return {
-					...state,
-					[ rootClientId ]: moveTo(
+				const newState = new Map( state );
+				newState.set(
+					rootClientId,
+					moveTo(
 						subState,
 						firstIndex,
 						firstIndex + 1,
 						clientIds.length
-					),
-				};
+					)
+				);
+				return newState;
 			}
 
 			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
@@ -1054,51 +1066,52 @@ export const blocks = flow(
 				}
 
 				const mappedBlocks = mapBlockOrder( action.blocks );
+				const newState = new Map( state );
+				action.replacedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
+				mappedBlocks.forEach( ( order, clientId ) => {
+					if ( clientId !== '' ) {
+						newState.set( clientId, order );
+					}
+				} );
+				newState.forEach( ( order, clientId ) => {
+					const newSubOrder = Object.values( order ).reduce(
+						( result, subClientId ) => {
+							if ( subClientId === clientIds[ 0 ] ) {
+								return [ ...result, ...mappedBlocks.get( '' ) ];
+							}
 
-				return flow( [
-					( nextState ) =>
-						omit( nextState, action.replacedClientIds ),
-					( nextState ) => ( {
-						...nextState,
-						...omit( mappedBlocks, '' ),
-					} ),
-					( nextState ) =>
-						mapValues( nextState, ( subState ) =>
-							reduce(
-								subState,
-								( result, clientId ) => {
-									if ( clientId === clientIds[ 0 ] ) {
-										return [
-											...result,
-											...mappedBlocks[ '' ],
-										];
-									}
+							if ( clientIds.indexOf( subClientId ) === -1 ) {
+								result.push( subClientId );
+							}
 
-									if (
-										clientIds.indexOf( clientId ) === -1
-									) {
-										result.push( clientId );
-									}
-
-									return result;
-								},
-								[]
-							)
-						),
-				] )( state );
+							return result;
+						},
+						[]
+					);
+					newState.set( clientId, newSubOrder );
+				} );
+				return newState;
 			}
 
-			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-				return flow( [
-					// Remove inner block ordering for removed blocks.
-					( nextState ) => omit( nextState, action.removedClientIds ),
-
-					// Remove deleted blocks from other blocks' orderings.
-					( nextState ) =>
-						mapValues( nextState, ( subState ) =>
-							without( subState, ...action.removedClientIds )
-						),
-				] )( state );
+			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
+				const newState = new Map( state );
+				// Remove inner block ordering for removed blocks.
+				action.removedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
+				newState.forEach( ( order, clientId ) => {
+					const newSubOrder =
+						order?.filter(
+							( id ) => ! action.removedClientIds.includes( id )
+						) ?? [];
+					if ( newSubOrder.length !== order.length ) {
+						newState.set( clientId, newSubOrder );
+					}
+				} );
+				return newState;
+			}
 		}
 
 		return state;
@@ -1106,44 +1119,55 @@ export const blocks = flow(
 
 	// While technically redundant data as the inverse of `order`, it serves as
 	// an optimization for the selectors which derive the ancestry of a block.
-	parents( state = {}, action ) {
+	parents( state = new Map(), action ) {
 		switch ( action.type ) {
-			case 'RECEIVE_BLOCKS':
-				return {
-					...state,
-					...mapBlockParents( action.blocks ),
-				};
-
-			case 'INSERT_BLOCKS':
-				return {
-					...state,
-					...mapBlockParents(
-						action.blocks,
-						action.rootClientId || ''
-					),
-				};
-
+			case 'RECEIVE_BLOCKS': {
+				const newState = new Map( state );
+				mapBlockParents( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
+				return newState;
+			}
+			case 'INSERT_BLOCKS': {
+				const newState = new Map( state );
+				mapBlockParents(
+					action.blocks,
+					action.rootClientId || ''
+				).forEach( ( [ key, value ] ) => {
+					newState.set( key, value );
+				} );
+				return newState;
+			}
 			case 'MOVE_BLOCKS_TO_POSITION': {
-				return {
-					...state,
-					...action.clientIds.reduce( ( accumulator, id ) => {
-						accumulator[ id ] = action.toRootClientId || '';
-						return accumulator;
-					}, {} ),
-				};
+				const newState = new Map( state );
+				action.clientIds.forEach( ( id ) => {
+					newState.set( id, action.toRootClientId || '' );
+				} );
+				return newState;
 			}
 
-			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-				return {
-					...omit( state, action.replacedClientIds ),
-					...mapBlockParents(
-						action.blocks,
-						state[ action.clientIds[ 0 ] ]
-					),
-				};
-
-			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-				return omit( state, action.removedClientIds );
+			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
+				const newState = new Map( state );
+				action.replacedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
+				mapBlockParents(
+					action.blocks,
+					state.get( action.clientIds[ 0 ] )
+				).forEach( ( [ key, value ] ) => {
+					newState.set( key, value );
+				} );
+				return newState;
+			}
+			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
+				const newState = new Map( state );
+				action.removedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
+				return newState;
+			}
 		}
 
 		return state;
@@ -1162,6 +1186,26 @@ export const blocks = flow(
 		return state;
 	},
 } );
+
+/**
+ * Reducer returning visibility status of block interface.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isBlockInterfaceHidden( state = false, action ) {
+	switch ( action.type ) {
+		case 'HIDE_BLOCK_INTERFACE':
+			return true;
+
+		case 'SHOW_BLOCK_INTERFACE':
+			return false;
+	}
+
+	return state;
+}
 
 /**
  * Reducer returning typing state.
@@ -1475,9 +1519,19 @@ export function blocksMode( state = {}, action ) {
  */
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SHOW_INSERTION_POINT':
-			const { rootClientId, index, __unstableWithInserter } = action;
-			return { rootClientId, index, __unstableWithInserter };
+		case 'SHOW_INSERTION_POINT': {
+			const { rootClientId, index, __unstableWithInserter, operation } =
+				action;
+			const nextState = {
+				rootClientId,
+				index,
+				__unstableWithInserter,
+				operation,
+			};
+
+			// Bail out updates if the states are the same.
+			return fastDeepEqual( state, nextState ) ? state : nextState;
+		}
 
 		case 'HIDE_INSERTION_POINT':
 			return null;
@@ -1589,19 +1643,24 @@ export const blockListSettings = ( state = {}, action ) => {
 		// should correct the state.
 		case 'REPLACE_BLOCKS':
 		case 'REMOVE_BLOCKS': {
-			return omit( state, action.clientIds );
+			return Object.fromEntries(
+				Object.entries( state ).filter(
+					( [ id ] ) => ! action.clientIds.includes( id )
+				)
+			);
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
 			const { clientId } = action;
 			if ( ! action.settings ) {
 				if ( state.hasOwnProperty( clientId ) ) {
-					return omit( state, clientId );
+					const { [ clientId ]: removedBlock, ...restBlocks } = state;
+					return restBlocks;
 				}
 
 				return state;
 			}
 
-			if ( isEqual( state[ clientId ], action.settings ) ) {
+			if ( fastDeepEqual( state[ clientId ], action.settings ) ) {
 				return state;
 			}
 
@@ -1697,7 +1756,7 @@ export function lastBlockAttributesChange( state = null, action ) {
  * @param {?string} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string | undefined} Updated state.
  */
 export function automaticChangeStatus( state, action ) {
 	switch ( action.type ) {
@@ -1770,14 +1829,19 @@ export function highlightedBlock( state, action ) {
 export function lastBlockInserted( state = {}, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
+		case 'REPLACE_BLOCKS':
+		case 'REPLACE_INNER_BLOCKS':
 			if ( ! action.blocks.length ) {
 				return state;
 			}
 
-			const clientId = action.blocks[ 0 ].clientId;
+			const clientIds = action.blocks.map( ( block ) => {
+				return block.clientId;
+			} );
+
 			const source = action.meta?.source;
 
-			return { clientId, source };
+			return { clientIds, source };
 		case 'RESET_BLOCKS':
 			return {};
 	}
@@ -1802,6 +1866,7 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
+	isBlockInterfaceHidden,
 	draggedBlocks,
 	selection,
 	isMultiSelecting,

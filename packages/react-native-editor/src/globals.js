@@ -44,6 +44,9 @@ doc.implementation.createHTMLDocument = function ( html ) {
 	return jsdom.html( html, null, null );
 };
 
+// Flag used to enable a patch to `react-devtools-core` to support `jsdom-jscore-rn`.
+doc.__isJsdom = true;
+
 // `hpq` depends on `document` be available globally.
 global.document = doc;
 
@@ -55,7 +58,9 @@ if ( ! global.window.matchMedia ) {
 	global.window.matchMedia = () => ( {
 		matches: false,
 		addListener: () => {},
+		addEventListener: () => {},
 		removeListener: () => {},
+		removeEventListener: () => {},
 	} );
 }
 

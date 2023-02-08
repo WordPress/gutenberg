@@ -13,6 +13,7 @@ import {
 	SelectControl,
 	Spinner,
 	ToggleControl,
+	ToolbarButton,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -25,12 +26,13 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { audio as icon } from '@wordpress/icons';
+import { audio as icon, caption as captionIcon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -48,6 +50,8 @@ function AudioEdit( {
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
+	const prevCaption = usePrevious( caption );
+	const [ showCaption, setShowCaption ] = useState( !! caption );
 	const isTemporaryAudio = ! id && isBlobURL( src );
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -68,6 +72,30 @@ function AudioEdit( {
 			}
 		}
 	}, [] );
+
+	// We need to show the caption when changes come from
+	// history navigation(undo/redo).
+	useEffect( () => {
+		if ( caption && ! prevCaption ) {
+			setShowCaption( true );
+		}
+	}, [ caption, prevCaption ] );
+
+	// Focus the caption when we click to add one.
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
+
+	useEffect( () => {
+		if ( ! isSelected && ! caption ) {
+			setShowCaption( false );
+		}
+	}, [ isSelected, caption ] );
 
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
@@ -106,12 +134,20 @@ function AudioEdit( {
 		if ( ! media || ! media.url ) {
 			// In this case there was an error and we should continue in the editing state
 			// previous attributes should be removed because they may be temporary blob urls.
-			setAttributes( { src: undefined, id: undefined } );
+			setAttributes( {
+				src: undefined,
+				id: undefined,
+				caption: undefined,
+			} );
 			return;
 		}
 		// Sets the block's attribute and updates the edit component from the
 		// selected media, then switches off the editing UI.
-		setAttributes( { src: media.url, id: media.id } );
+		setAttributes( {
+			src: media.url,
+			id: media.id,
+			caption: media.caption,
+		} );
 	}
 
 	const classes = classnames( className, {
@@ -140,6 +176,23 @@ function AudioEdit( {
 
 	return (
 		<>
+			<BlockControls group="block">
+				<ToolbarButton
+					onClick={ () => {
+						setShowCaption( ! showCaption );
+						if ( showCaption && caption ) {
+							setAttributes( { caption: undefined } );
+						}
+					} }
+					icon={ captionIcon }
+					isPressed={ showCaption }
+					label={
+						showCaption
+							? __( 'Remove caption' )
+							: __( 'Add caption' )
+					}
+				/>
+			</BlockControls>
 			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
@@ -165,6 +218,7 @@ function AudioEdit( {
 						checked={ loop }
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
 						value={ preload || '' }
 						// `undefined` is required for the preload attribute to be unset.
@@ -195,26 +249,29 @@ function AudioEdit( {
 					<audio controls="controls" src={ src } />
 				</Disabled>
 				{ isTemporaryAudio && <Spinner /> }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						tagName="figcaption"
-						className={ __experimentalGetElementClassName(
-							'caption'
-						) }
-						aria-label={ __( 'Audio caption text' ) }
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
-						onChange={ ( value ) =>
-							setAttributes( { caption: value } )
-						}
-						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
-						}
-					/>
-				) }
+				{ showCaption &&
+					( ! RichText.isEmpty( caption ) || isSelected ) && (
+						<RichText
+							identifier="caption"
+							tagName="figcaption"
+							className={ __experimentalGetElementClassName(
+								'caption'
+							) }
+							ref={ captionRef }
+							aria-label={ __( 'Audio caption text' ) }
+							placeholder={ __( 'Add caption' ) }
+							value={ caption }
+							onChange={ ( value ) =>
+								setAttributes( { caption: value } )
+							}
+							inlineToolbar
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+							}
+						/>
+					) }
 			</figure>
 		</>
 	);

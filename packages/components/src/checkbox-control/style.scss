@@ -27,7 +27,7 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 	@include reduce-motion("transition");
 
 	&:focus {
-		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) $components-color-accent;
 
 		// Only visible in Windows High Contrast mode.
 		outline: 2px solid transparent;
@@ -35,8 +35,8 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 
 	&:checked,
 	&:indeterminate {
-		background: var(--wp-admin-theme-color);
-		border-color: var(--wp-admin-theme-color);
+		background: $components-color-accent;
+		border-color: $components-color-accent;
 
 		// Hide default checkbox styles in IE.
 		&::-ms-check {

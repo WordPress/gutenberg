@@ -13,6 +13,7 @@ import { check } from '@wordpress/icons';
 
 export default function PreviewOptions( {
 	children,
+	viewLabel,
 	className,
 	isEnabled = true,
 	deviceType,
@@ -32,8 +33,7 @@ export default function PreviewOptions( {
 		variant: 'tertiary',
 		className: 'block-editor-post-preview__button-toggle',
 		disabled: ! isEnabled,
-		/* translators: button label text should, if possible, be under 16 characters. */
-		children: __( 'View' ),
+		children: viewLabel,
 	};
 	const menuProps = {
 		'aria-label': __( 'View options' ),

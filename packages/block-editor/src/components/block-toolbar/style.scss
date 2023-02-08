@@ -39,6 +39,16 @@
 		border-right: $border-width solid $gray-300;
 	}
 
+	&.is-synced .block-editor-block-switcher .components-button .block-editor-block-icon {
+		color: var(--wp-block-synced-color);
+	}
+
+	&.is-synced .components-toolbar-button.block-editor-block-switcher__no-switcher-icon {
+		&:disabled .block-editor-block-icon.has-colors {
+			color: var(--wp-block-synced-color);
+		}
+	}
+
 	> :last-child,
 	> :last-child .components-toolbar-group,
 	> :last-child .components-toolbar {
@@ -137,15 +147,6 @@
 		padding-right: 6px;
 	}
 
-	// Switcher overrides.
-	.block-editor-block-switcher {
-		border-right: 1px solid $gray-900;
-
-		.components-dropdown-menu__toggle {
-			margin-left: 0;
-		}
-	}
-
 	.block-editor-block-switcher .components-dropdown-menu__toggle,
 	.block-editor-block-switcher__no-switcher-icon {
 		.block-editor-block-icon {
@@ -162,10 +163,20 @@
 		}
 	}
 
+	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+		width: auto;
+	}
+
 	// Mover overrides.
 	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
-		margin-left: 0;
+		border-left: 1px solid $gray-900;
+		margin-left: 6px;
+		margin-right: -6px;
 		white-space: nowrap;
+	}
+
+	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-toolbar__block-controls .block-editor-block-mover {
+		border-left-color: $gray-200;
 	}
 
 	.block-editor-block-mover-button {
@@ -175,17 +186,40 @@
 	}
 
 	.block-editor-block-mover__drag-handle.has-icon {
-		padding-left: 6px !important;
-		padding-right: 6px !important;
-		border-right: 1px solid $gray-900;
+		padding-left: 12px !important;
+		padding-right: 12px !important;
+	}
+
+	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container {
+		border-width: 0;
 	}
 
 	@include break-small() {
 		// Specificity override for https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L69
 		.is-up-button.is-up-button.is-up-button {
-			border-bottom: 1px solid $gray-900;
 			margin-right: 0;
 			border-radius: 0;
+			order: 1;
+		}
+
+		.block-editor-block-mover__move-button-container {
+			border-left: 1px solid $gray-900;
+
+			&::before {
+				content: "";
+				display: block;
+				height: 1px;
+				background: $gray-900;
+				order: 2;
+			}
+		}
+
+		.is-down-button.is-down-button.is-down-button {
+			order: 3;
+		}
+
+		.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container::before {
+			background: $gray-300;
 		}
 	}
 

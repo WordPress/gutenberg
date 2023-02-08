@@ -143,7 +143,7 @@ exports.audioBlockPlaceholder = `<!-- wp:audio {"id":5} -->
 <!-- /wp:audio -->`;
 
 exports.headerBlockEmpty = `<!-- wp:heading -->
-<h2></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->`;
 
 exports.separatorBlockEmpty = `<!-- wp:separator -->

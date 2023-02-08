@@ -63,16 +63,19 @@ export const setTemplate =
 	( templateId, templateSlug ) =>
 	async ( { dispatch, registry } ) => {
 		if ( ! templateSlug ) {
-			const template = await registry
-				.resolveSelect( coreStore )
-				.getEntityRecord( 'postType', 'wp_template', templateId );
-			templateSlug = template?.slug;
+			try {
+				const template = await registry
+					.resolveSelect( coreStore )
+					.getEntityRecord( 'postType', 'wp_template', templateId );
+				templateSlug = template?.slug;
+			} catch ( error ) {}
 		}
 
 		dispatch( {
-			type: 'SET_TEMPLATE',
-			templateId,
-			page: { context: { templateSlug } },
+			type: 'SET_EDITED_POST',
+			postType: 'wp_template',
+			id: templateId,
+			context: { templateSlug },
 		} );
 	};
 
@@ -103,9 +106,10 @@ export const addTemplate =
 		}
 
 		dispatch( {
-			type: 'SET_TEMPLATE',
-			templateId: newTemplate.id,
-			page: { context: { templateSlug: newTemplate.slug } },
+			type: 'SET_EDITED_POST',
+			postType: 'wp_template',
+			id: newTemplate.id,
+			context: { templateSlug: newTemplate.slug },
 		} );
 	};
 
@@ -165,21 +169,37 @@ export const removeTemplate =
  */
 export function setTemplatePart( templatePartId ) {
 	return {
-		type: 'SET_TEMPLATE_PART',
-		templatePartId,
+		type: 'SET_EDITED_POST',
+		postType: 'wp_template_part',
+		id: templatePartId,
 	};
 }
 
 /**
- * Action that sets the home template ID to the template ID of the page resolved
- * from a given path.
- *
- * @param {number} homeTemplateId The template ID for the homepage.
+ * @deprecated
  */
-export function setHomeTemplateId( homeTemplateId ) {
+export function setHomeTemplateId() {
+	deprecated( "dispatch( 'core/edit-site' ).setHomeTemplateId", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
 	return {
-		type: 'SET_HOME_TEMPLATE',
-		homeTemplateId,
+		type: 'NOTHING',
+	};
+}
+
+/**
+ * Set's the current block editor context.
+ *
+ * @param {Object} context The context object.
+ *
+ * @return {number} The resolved template ID for the page route.
+ */
+export function setEditedPostContext( context ) {
+	return {
+		type: 'SET_EDITED_POST_CONTEXT',
+		context,
 	};
 }
 
@@ -219,17 +239,13 @@ export const setPage =
 		}
 
 		dispatch( {
-			type: 'SET_PAGE',
-			page: template.slug
-				? {
-						...page,
-						context: {
-							...page.context,
-							templateSlug: template.slug,
-						},
-				  }
-				: page,
-			templateId: template.id,
+			type: 'SET_EDITED_POST',
+			postType: 'wp_template',
+			id: template.id,
+			context: {
+				...page.context,
+				templateSlug: template.slug,
+			},
 		} );
 
 		return template.id;
@@ -238,40 +254,45 @@ export const setPage =
 /**
  * Action that sets the active navigation panel menu.
  *
- * @param {string} menu Menu prop of active menu.
+ * @deprecated
  *
  * @return {Object} Action object.
  */
-export function setNavigationPanelActiveMenu( menu ) {
-	return {
-		type: 'SET_NAVIGATION_PANEL_ACTIVE_MENU',
-		menu,
-	};
+export function setNavigationPanelActiveMenu() {
+	deprecated( "dispatch( 'core/edit-site' ).setNavigationPanelActiveMenu", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
+	return { type: 'NOTHING' };
 }
 
 /**
  * Opens the navigation panel and sets its active menu at the same time.
  *
- * @param {string} menu Identifies the menu to open.
+ * @deprecated
  */
-export function openNavigationPanelToMenu( menu ) {
-	return {
-		type: 'OPEN_NAVIGATION_PANEL_TO_MENU',
-		menu,
-	};
+export function openNavigationPanelToMenu() {
+	deprecated( "dispatch( 'core/edit-site' ).openNavigationPanelToMenu", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
+	return { type: 'NOTHING' };
 }
 
 /**
  * Sets whether the navigation panel should be open.
  *
- * @param {boolean} isOpen If true, opens the nav panel. If false, closes it. It
- *                         does not toggle the state, but sets it directly.
+ * @deprecated
  */
-export function setIsNavigationPanelOpened( isOpen ) {
-	return {
-		type: 'SET_IS_NAVIGATION_PANEL_OPENED',
-		isOpen,
-	};
+export function setIsNavigationPanelOpened() {
+	deprecated( "dispatch( 'core/edit-site' ).setIsNavigationPanelOpened", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
+	return { type: 'NOTHING' };
 }
 
 /**
@@ -316,6 +337,19 @@ export function updateSettings( settings ) {
 export function setIsListViewOpened( isOpen ) {
 	return {
 		type: 'SET_IS_LIST_VIEW_OPENED',
+		isOpen,
+	};
+}
+
+/**
+ * Sets whether the save view panel should be open.
+ *
+ * @param {boolean} isOpen If true, opens the save view. If false, closes it.
+ *                         It does not toggle the state, but sets it directly.
+ */
+export function setIsSaveViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_SAVE_VIEW_OPENED',
 		isOpen,
 	};
 }

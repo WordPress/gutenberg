@@ -44,14 +44,16 @@ If this property is added, a label will be generated using label property as the
 ### help
 
 If this property is added, a help text will be generated using help property as the content.
+For controlled components the `help` prop can also be a function which will return a help text
+dynamically depending on the boolean `checked` parameter.
 
--   Type: `String|WPElement`
+-   Type: `String|WPElement|Function`
 -   Required: No
 
 ### checked
 
 If checked is true the toggle will be checked. If checked is false the toggle will be unchecked.
-If no value is passed the toggle will be unchecked.
+If no value is passed the toggle will be an uncontrolled component with unchecked initial value.
 
 -   Type: `Boolean`
 -   Required: No
@@ -74,5 +76,5 @@ A function that receives the checked state (boolean) as input.
 
 The class that will be added with `components-base-control` and `components-toggle-control` to the classes of the wrapper div. If no className is passed only `components-base-control` and `components-toggle-control` are used.
 
-Type: String
-Required: No
+-		Type: `String`
+-		Required: No

@@ -13,7 +13,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import { store as editSiteStore } from '../../store';
 import { STORE_NAME } from '../../store/constants';
-import { SIDEBAR_BLOCK } from '../sidebar/constants';
+import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 
 export default function BlockInspectorButton( { onClick = () => {} } ) {
 	const { shortcut, isBlockInspectorOpen } = useSelect(

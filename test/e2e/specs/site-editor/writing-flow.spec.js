@@ -1,17 +1,7 @@
 /**
  * WordPress dependencies
  */
-const {
-	test,
-	expect,
-	Editor,
-} = require( '@wordpress/e2e-test-utils-playwright' );
-
-test.use( {
-	editor: async ( { page }, use ) => {
-		await use( new Editor( { page, hasIframe: true } ) );
-	},
-} );
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site editor writing flow', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -28,13 +18,14 @@ test.describe( 'Site editor writing flow', () => {
 		editor,
 		page,
 		pageUtils,
+		siteEditor,
 	} ) => {
 		// Navigate to a template part with only a couple of blocks.
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
-
+		await siteEditor.enterEditMode();
 		// Select the first site title block.
 		const siteTitleBlock = editor.canvas.locator(
 			'role=document[name="Block: Site Title"i]'
@@ -56,13 +47,14 @@ test.describe( 'Site editor writing flow', () => {
 		editor,
 		page,
 		pageUtils,
+		siteEditor,
 	} ) => {
 		// Navigate to a template part with only a couple of blocks.
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
-
+		await siteEditor.enterEditMode();
 		// Make sure the sidebar is open.
 		await editor.openDocumentSettingsSidebar();
 

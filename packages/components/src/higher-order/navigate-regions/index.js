@@ -16,6 +16,10 @@ const defaultShortcuts = {
 			character: '`',
 		},
 		{
+			modifier: 'ctrlShift',
+			character: '~',
+		},
+		{
 			modifier: 'access',
 			character: 'p',
 		},
@@ -38,14 +42,17 @@ export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 
 	function focusRegion( offset ) {
 		const regions = Array.from(
-			ref.current.querySelectorAll( '[role="region"]' )
+			ref.current.querySelectorAll( '[role="region"][tabindex="-1"]' )
 		);
 		if ( ! regions.length ) {
 			return;
 		}
 		let nextRegion = regions[ 0 ];
+		// Based off the current element, use closest to determine the wrapping region since this operates up the DOM. Also, match tabindex to avoid edge cases with regions we do not want.
 		const selectedIndex = regions.indexOf(
-			ref.current.ownerDocument.activeElement
+			ref.current.ownerDocument.activeElement.closest(
+				'[role="region"][tabindex="-1"]'
+			)
 		);
 		if ( selectedIndex !== -1 ) {
 			let nextIndex = selectedIndex + offset;

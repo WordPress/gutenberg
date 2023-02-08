@@ -57,8 +57,6 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 
 	const isColumn =
 		typeof direction === 'string' && !! direction.includes( 'column' );
-	const isReverse =
-		typeof direction === 'string' && direction.includes( 'reverse' );
 
 	const cx = useCx();
 
@@ -87,7 +85,6 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 		expanded,
 		gap,
 		isColumn,
-		isReverse,
 		justify,
 		wrap,
 	] );

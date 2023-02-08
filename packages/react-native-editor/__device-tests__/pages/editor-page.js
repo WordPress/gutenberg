@@ -13,6 +13,7 @@ const {
 	swipeDown,
 	swipeFromTo,
 	swipeUp,
+	tapPasteAboveElement,
 	toggleHtmlMode,
 	typeString,
 	waitForVisible,
@@ -192,6 +193,19 @@ class EditorPage {
 		return elements[ elements.length - 1 ];
 	}
 
+	// For iOS, depending on the content and how fast the block list
+	// renders blocks, it won't need to scroll down as it would find
+	// the block right away.
+	async scrollAndReturnElementByAccessibilityId( id ) {
+		const elements = await this.driver.elementsByAccessibilityId( id );
+
+		if ( elements.length === 0 ) {
+			await swipeUp( this.driver, undefined, 100, 1 );
+			return this.scrollAndReturnElementByAccessibilityId( id );
+		}
+		return elements[ elements.length - 1 ];
+	}
+
 	async getLastElementByXPath( accessibilityLabel ) {
 		const elements = await this.driver.elementsByXPath(
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
@@ -228,22 +242,9 @@ class EditorPage {
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 
-		if ( isAndroid() ) {
-			// Attention! On Android `.type()` replaces the content of htmlContentView instead of appending
-			// contrary to what iOS is doing. On Android tried calling `driver.pressKeycode( 279 ) // KEYCODE_PASTE`
-			// before to paste, but for some reason it didn't work on GitHub Actions but worked only on Sauce Labs
-			await htmlContentView.type( html );
-		} else {
-			await htmlContentView.click();
-			await doubleTap( this.driver, htmlContentView );
-			// Sometimes double tap is not enough for paste menu to appear, so we also long press.
-			await longPressMiddleOfElement( this.driver, htmlContentView );
-
-			await clickIfClickable(
-				this.driver,
-				'//XCUIElementTypeMenuItem[@name="Paste"]'
-			);
-		}
+		await htmlContentView.click();
+		await doubleTap( this.driver, htmlContentView );
+		await tapPasteAboveElement( this.driver, htmlContentView );
 
 		await toggleHtmlMode( this.driver, false );
 	}
@@ -305,7 +306,18 @@ class EditorPage {
 		);
 
 		if ( relativePosition === 'before' ) {
-			await longPressMiddleOfElement( this.driver, addButton );
+			// On Android it doesn't get the right size of the button
+			const customElementSize = {
+				width: 43,
+				height: 43,
+			};
+
+			await longPressMiddleOfElement(
+				this.driver,
+				addButton,
+				8000,
+				customElementSize
+			);
 			const addBlockBeforeButtonLocator = isAndroid()
 				? '//android.widget.Button[@content-desc="Add Block Before"]'
 				: '//XCUIElementTypeButton[@name="Add Block Before"]';
@@ -801,6 +813,7 @@ const blockNames = {
 	image: 'Image',
 	latestPosts: 'Latest Posts',
 	list: 'List',
+	listItem: 'List item',
 	more: 'More',
 	paragraph: 'Paragraph',
 	search: 'Search',

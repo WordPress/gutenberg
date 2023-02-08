@@ -14,9 +14,24 @@ Users have the ability to lock and unlock blocks via the editor. The locking UI 
 
 Keep in mind that each block you want to lock will need to be individually locked as desired. There is not a way to mass lock blocks currently. 
 
-**Lock patterns or templates**
+**Apply block locking to patterns or templates**
 
 When building patterns or templates, theme authors can use these same UI tools to set the default locked state of blocks. For example, a theme author could lock various pieces of a header. Keep in mind that by default, users with editing access can unlock these blocks. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways and here’s more context on [creating a template with locked blocks](https://make.wordpress.org/core/2022/02/09/core-editor-improvement-curated-experiences-with-locking-apis-theme-json/). You can build these patterns in the editor itself, including adding locking options, before following the [documentation to register them](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-patterns/).
+
+**Apply content only editing in patterns or templates**
+
+This functionality was introduced in WordPress 6.1. In contrast to block locking, which disables the ability to move or remove blocks, content only editing is both designed for use at the pattern or template level and hides all design tools, while still allowing for the ability to edit the content of the blocks. This provides a great way to simplify the interface for users and preserve a design. When this option is added, the following changes occur:  
+
+- Non-content child blocks (containers, spacers, columns, etc) are hidden from list view, un-clickable on the canvas, and entirely un-editable.
+- The Inspector will display a list of all child 'content' blocks. Clicking a block in this list reveals its settings panel. 
+- The main List View only shows content blocks, all at the same level regardless of actual nesting.
+- Children blocks within the overall content locked container are automatically move / remove locked.
+- Additional child blocks cannot be inserted, further preserving the design and layout.
+- There is a link in the block toolbar to ‘Modify’ that a user can toggle on/off to have access to the broader design tools. Currently, it's not possibly to programmatically remove this option.
+
+This option can be applied to Columns, Cover, and Group blocks as well as third-party blocks that have the templateLock attribute in its block.json. To adopt this functionality, you need to use `"templateLock":"contentOnly"`. [Here's an example of a pattern](https://gist.github.com/annezazu/d62acd2514cea558be6cea97fe28ff3c) with this functionality in place. For more information, please [review the relevant documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-templates/#locking). 
+
+Note: There is no UI in place to manage content locking and it must be managed at the code level. 
 
 **Change permissions to control locking ability**
 

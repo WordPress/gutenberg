@@ -20,7 +20,6 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
-	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableEditorStyles as EditorStyles,
 	useSetting,
@@ -38,21 +37,14 @@ import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
-function MaybeIframe( {
-	children,
-	contentRef,
-	shouldIframe,
-	styles,
-	assets,
-	style,
-} ) {
+function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
 	if ( ! shouldIframe ) {
@@ -74,7 +66,6 @@ function MaybeIframe( {
 	return (
 		<Iframe
 			head={ <EditorStyles styles={ styles } /> }
-			assets={ assets }
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
@@ -91,7 +82,7 @@ function MaybeIframe( {
  *
  * @param {Array} blocks A list of blocks.
  *
- * @return {Object} The Post Content block.
+ * @return {Object | undefined} The Post Content block.
  */
 function findPostContent( blocks ) {
 	for ( let i = 0; i < blocks.length; i++ ) {
@@ -118,6 +109,7 @@ export default function VisualEditor( { styles } ) {
 		editedPostTemplate = {},
 		wrapperBlockName,
 		wrapperUniqueId,
+		isBlockBasedTheme,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -136,7 +128,12 @@ export default function VisualEditor( { styles } ) {
 			_wrapperBlockName = 'core/post-content';
 		}
 
-		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
+		const editorSettings = getEditorSettings();
+		const supportsTemplateMode = editorSettings.supportsTemplateMode;
+		const canEditTemplate = select( coreStore ).canUser(
+			'create',
+			'templates'
+		);
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
@@ -144,11 +141,13 @@ export default function VisualEditor( { styles } ) {
 			isTemplateMode: _isTemplateMode,
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so we check it's a block theme first.
-			editedPostTemplate: supportsTemplateMode
-				? getEditedPostTemplate()
-				: {},
+			editedPostTemplate:
+				supportsTemplateMode && canEditTemplate
+					? getEditedPostTemplate()
+					: undefined,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
+			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -156,20 +155,15 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const {
-		themeHasDisabledLayoutStyles,
-		themeSupportsLayout,
-		assets,
-		isFocusMode,
-	} = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
-		return {
-			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
-			themeSupportsLayout: _settings.supportsLayout,
-			assets: _settings.__unstableResolvedAssets,
-			isFocusMode: _settings.focusMode,
-		};
-	}, [] );
+	const { themeHasDisabledLayoutStyles, themeSupportsLayout, isFocusMode } =
+		useSelect( ( select ) => {
+			const _settings = select( blockEditorStore ).getSettings();
+			return {
+				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
+				themeSupportsLayout: _settings.supportsLayout,
+				isFocusMode: _settings.focusMode,
+			};
+		}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
@@ -266,14 +260,21 @@ export default function VisualEditor( { styles } ) {
 	const layout = postContentBlock?.attributes?.layout || {};
 
 	// Update type for blocks using legacy layouts.
-	const postContentLayout =
-		layout &&
-		( layout?.type === 'constrained' ||
-			layout?.inherit ||
-			layout?.contentSize ||
-			layout?.wideSize )
+	const postContentLayout = useMemo( () => {
+		return layout &&
+			( layout?.type === 'constrained' ||
+				layout?.inherit ||
+				layout?.contentSize ||
+				layout?.wideSize )
 			? { ...globalLayoutSettings, ...layout, type: 'constrained' }
 			: { ...globalLayoutSettings, ...layout, type: 'default' };
+	}, [
+		layout?.type,
+		layout?.inherit,
+		layout?.contentSize,
+		layout?.wideSize,
+		globalLayoutSettings,
+	] );
 
 	// If there is a Post Content block we use its layout for the block list;
 	// if not, this must be a classic theme, in which case we use the fallback layout.
@@ -288,6 +289,21 @@ export default function VisualEditor( { styles } ) {
 		}
 		titleRef?.current?.focus();
 	}, [ isWelcomeGuideVisible, isCleanNewPost ] );
+
+	styles = useMemo(
+		() => [
+			...styles,
+			{
+				// We should move this in to future to the body.
+				css:
+					`.edit-post-visual-editor__post-title-wrapper{margin-top:4rem}` +
+					( paddingBottom
+						? `body{padding-bottom:${ paddingBottom }}`
+						: '' ),
+			},
+		],
+		[ styles ]
+	);
 
 	return (
 		<BlockTools
@@ -323,14 +339,13 @@ export default function VisualEditor( { styles } ) {
 				>
 					<MaybeIframe
 						shouldIframe={
+							( isBlockBasedTheme && ! hasMetaBoxes ) ||
 							isTemplateMode ||
 							deviceType === 'Tablet' ||
 							deviceType === 'Mobile'
 						}
 						contentRef={ contentRef }
 						styles={ styles }
-						assets={ assets }
-						style={ { paddingBottom } }
 					>
 						{ themeSupportsLayout &&
 							! themeHasDisabledLayoutStyles &&
@@ -357,10 +372,15 @@ export default function VisualEditor( { styles } ) {
 						{ ! isTemplateMode && (
 							<div
 								className={ classnames(
+									// This wrapper div should have the same
+									// classes as the block list beneath.
+									'is-root-container',
+									'block-editor-block-list__layout',
 									'edit-post-visual-editor__post-title-wrapper',
 									{
 										'is-focus-mode': isFocusMode,
-									}
+									},
+									blockListLayoutClass
 								) }
 								contentEditable={ false }
 							>
@@ -383,11 +403,6 @@ export default function VisualEditor( { styles } ) {
 					</MaybeIframe>
 				</motion.div>
 			</motion.div>
-			<__unstableBlockSettingsMenuFirstItem>
-				{ ( { onClose } ) => (
-					<BlockInspectorButton onClick={ onClose } />
-				) }
-			</__unstableBlockSettingsMenuFirstItem>
 		</BlockTools>
 	);
 }

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import 'react-native-gesture-handler';
-
-/**
  * WordPress dependencies
  */
 import { applyFilters, doAction } from '@wordpress/hooks';

@@ -3,30 +3,36 @@
 	position: relative;
 }
 
-.is-focusing-regions [role="region"] {
-	// For browsers that don't support outline-offset (IE11).
-	&:focus::after {
-		content: "";
+.is-focusing-regions {
+	[role="region"]:focus::after {
 		position: absolute;
 		top: 0;
-		bottom: 0;
 		left: 0;
 		right: 0;
+		bottom: 0;
+		content: "";
 		pointer-events: none;
-		outline: 4px solid transparent; // Shown in Windows High Contrast mode.
-		box-shadow: inset 0 0 0 4px var(--wp-admin-theme-color);
+		outline: 4px solid $components-color-accent;
+		outline-offset: -4px;
+		z-index: z-index(".is-focusing-regions {region} :focus::after");
 	}
 
-	@supports ( outline-offset: 1px ) {
-		&:focus::after {
-			content: none;
-		}
+	// Fixes for edge cases.
+	// Some of the regions are currently used for layout purposes as 'interface skeleton'
+	// items. When they're absolutely positioned or when they contain absolutely
+	// positioned elements, they may have no size therefore the focus style is not
+	// visible. For the future, it's important to take into consideration that
+	// the navigable regions should always have a computed size. For now, we can
+	// fix some edge cases but these CSS rules should be later removed in favor of
+	// a more abstracted approach to make the navigabel regions focus style work
+	// regardles of the CSS used on other components.
 
-		&:focus {
-			outline-style: solid;
-			outline-color: var(--wp-admin-theme-color);
-			outline-width: 4px;
-			outline-offset: -4px;
-		}
+	// Header top bar when Distraction free mode is on.
+	&.is-distraction-free .interface-interface-skeleton__header .edit-post-header,
+	.interface-interface-skeleton__sidebar .edit-post-layout__toggle-sidebar-panel,
+	.interface-interface-skeleton__actions .edit-post-layout__toggle-publish-panel,
+	.editor-post-publish-panel {
+		outline: 4px solid $components-color-accent;
+		outline-offset: -4px;
 	}
 }

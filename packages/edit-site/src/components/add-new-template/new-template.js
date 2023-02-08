@@ -21,6 +21,7 @@ import {
 	media,
 	notFound,
 	page,
+	plus,
 	post,
 	postAuthor,
 	postDate,
@@ -47,6 +48,7 @@ import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../experiments';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
@@ -79,7 +81,11 @@ const TEMPLATE_ICONS = {
 	attachment: media,
 };
 
-export default function NewTemplate( { postType } ) {
+export default function NewTemplate( {
+	postType,
+	toggleProps,
+	showIcon = true,
+} ) {
 	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
 		useState( false );
 	const [
@@ -93,7 +99,9 @@ export default function NewTemplate( { postType } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const { setTemplate } = useDispatch( editSiteStore );
+	const { setTemplate, setCanvasMode } = unlock(
+		useDispatch( editSiteStore )
+	);
 
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isCreatingTemplate ) {
@@ -132,6 +140,9 @@ export default function NewTemplate( { postType } ) {
 
 			// Set template before navigating away to avoid initial stale value.
 			setTemplate( newTemplate.id, newTemplate.slug );
+
+			// Switch to edit mode.
+			setCanvasMode( 'edit' );
 
 			// Navigate to the created template editor.
 			history.push( {
@@ -173,15 +184,13 @@ export default function NewTemplate( { postType } ) {
 		<>
 			<DropdownMenu
 				className="edit-site-new-template-dropdown"
-				icon={ null }
-				text={ postType.labels.add_new }
+				icon={ showIcon ? plus : null }
+				text={ showIcon ? null : postType.labels.add_new }
 				label={ postType.labels.add_new_item }
 				popoverProps={ {
 					noArrow: false,
 				} }
-				toggleProps={ {
-					variant: 'primary',
-				} }
+				toggleProps={ toggleProps }
 			>
 				{ () => (
 					<>

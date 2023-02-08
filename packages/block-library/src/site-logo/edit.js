@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { includes, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,7 +34,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalImageEditor as ImageEditor,
-	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -71,7 +69,7 @@ const SiteLogo = ( {
 } ) => {
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const isWideAligned = includes( [ 'wide', 'full' ], align );
+	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
@@ -80,14 +78,15 @@ const SiteLogo = ( {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const siteEntities = select( coreStore ).getEditedEntityRecord(
+		const settings = select( blockEditorStore ).getSettings();
+		const siteEntities = select( coreStore ).getEntityRecord(
 			'root',
-			'site'
+			'__unstableBase'
 		);
 		return {
-			title: siteEntities.title,
-			...pick( getSettings(), [ 'imageEditing', 'maxWidth' ] ),
+			title: siteEntities?.name,
+			imageEditing: settings.imageEditing,
+			maxWidth: settings.maxWidth,
 		};
 	}, [] );
 
@@ -120,9 +119,10 @@ const SiteLogo = ( {
 			src={ logoUrl }
 			alt={ alt }
 			onLoad={ ( event ) => {
-				setNaturalSize(
-					pick( event.target, [ 'naturalWidth', 'naturalHeight' ] )
-				);
+				setNaturalSize( {
+					naturalWidth: event.target.naturalWidth,
+					naturalHeight: event.target.naturalHeight,
+				} );
 			} }
 		/>
 	);
@@ -215,27 +215,21 @@ const SiteLogo = ( {
 
 	const imgEdit =
 		canEditImage && isEditingImage ? (
-			<ImageEditingProvider
+			<ImageEditor
 				id={ logoId }
 				url={ logoUrl }
-				naturalWidth={ naturalWidth }
-				naturalHeight={ naturalHeight }
+				width={ currentWidth }
+				height={ currentHeight }
 				clientWidth={ clientWidth }
+				naturalHeight={ naturalHeight }
+				naturalWidth={ naturalWidth }
 				onSaveImage={ ( imageAttributes ) => {
 					setLogo( imageAttributes.id );
 				} }
-				isEditing={ isEditingImage }
-				onFinishEditing={ () => setIsEditingImage( false ) }
-			>
-				<ImageEditor
-					url={ logoUrl }
-					width={ currentWidth }
-					height={ currentHeight }
-					clientWidth={ clientWidth }
-					naturalHeight={ naturalHeight }
-					naturalWidth={ naturalWidth }
-				/>
-			</ImageEditingProvider>
+				onFinishEditing={ () => {
+					setIsEditingImage( false );
+				} }
+			/>
 		) : (
 			<ResizableBox
 				size={ {
@@ -291,6 +285,7 @@ const SiteLogo = ( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
 							setAttributes( { width: newWidth } )
@@ -370,12 +365,14 @@ export default function LogoEdit( {
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const siteSettings = getEditedEntityRecord( 'root', 'site' );
-		const siteData = getEntityRecord( 'root', '__unstableBase' );
-		const _siteLogo = siteSettings?.site_logo;
-		const _readOnlyLogo = siteData?.site_logo;
 		const _canUserEdit = canUser( 'update', 'settings' );
-		const _siteLogoId = _canUserEdit ? _siteLogo : _readOnlyLogo;
+		const siteSettings = _canUserEdit
+			? getEditedEntityRecord( 'root', 'site' )
+			: undefined;
+		const siteData = getEntityRecord( 'root', '__unstableBase' );
+		const _siteLogoId = _canUserEdit
+			? siteSettings?.site_logo
+			: siteData?.site_logo;
 		const _siteIconId = siteSettings?.site_icon;
 		const mediaItem =
 			_siteLogoId &&
@@ -392,7 +389,7 @@ export default function LogoEdit( {
 		return {
 			siteLogoId: _siteLogoId,
 			canUserEdit: _canUserEdit,
-			url: siteData?.url,
+			url: siteData?.home,
 			mediaItemData: mediaItem,
 			isRequestingMediaItem: _isRequestingMediaItem,
 			siteIconId: _siteIconId,
@@ -510,6 +507,9 @@ export default function LogoEdit( {
 				className={ placeholderClassName }
 				preview={ logoImage }
 				withIllustration={ true }
+				style={ {
+					width,
+				} }
 			>
 				{ content }
 			</Placeholder>

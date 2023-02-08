@@ -6,8 +6,6 @@ import type {
 	KeyboardEvent,
 	ForwardedRef,
 	SyntheticEvent,
-	ChangeEvent,
-	PointerEvent,
 } from 'react';
 import classnames from 'classnames';
 
@@ -23,7 +21,7 @@ import { __ } from '@wordpress/i18n';
  */
 import type { WordPressComponentProps } from '../ui/context';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
-import { Root, ValueInput } from './styles/unit-control-styles';
+import { ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
 	CSS_UNITS,
@@ -58,11 +56,11 @@ function UnforwardedUnitControl(
 		onChange: onChangeProp,
 		onUnitChange,
 		size = 'default',
-		style,
 		unit: unitProp,
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		onBlur: onBlurProp,
+		onFocus: onFocusProp,
 		...props
 	} = unitControlProps;
 
@@ -105,14 +103,18 @@ function UnforwardedUnitControl(
 	// Stores parsed value for hand-off in state reducer.
 	const refParsedQuantity = useRef< number | undefined >( undefined );
 
-	const classes = classnames( 'components-unit-control', className );
+	const classes = classnames(
+		'components-unit-control',
+		// This class is added for legacy purposes to maintain it on the outer
+		// wrapper. See: https://github.com/WordPress/gutenberg/pull/45139
+		'components-unit-control-wrapper',
+		className
+	);
 
 	const handleOnQuantityChange = (
 		nextQuantityValue: number | string | undefined,
 		changeProps: {
-			event:
-				| ChangeEvent< HTMLInputElement >
-				| PointerEvent< HTMLInputElement >;
+			event: SyntheticEvent;
 		}
 	) => {
 		if (
@@ -177,7 +179,7 @@ function UnforwardedUnitControl(
 				: undefined;
 			const changeProps = { event, data };
 
-			// The `onChange` callback already gets called, no need to call it explicitely.
+			// The `onChange` callback already gets called, no need to call it explicitly.
 			onUnitChange?.( validParsedUnit, changeProps );
 
 			setUnit( validParsedUnit );
@@ -243,6 +245,7 @@ function UnforwardedUnitControl(
 			unit={ unit }
 			units={ units }
 			onBlur={ onBlurProp }
+			onFocus={ onFocusProp }
 		/>
 	) : null;
 
@@ -258,27 +261,26 @@ function UnforwardedUnitControl(
 	}
 
 	return (
-		<Root className="components-unit-control-wrapper" style={ style }>
-			<ValueInput
-				type={ isPressEnterToChange ? 'text' : 'number' }
-				{ ...props }
-				autoComplete={ autoComplete }
-				className={ classes }
-				disabled={ disabled }
-				hideHTMLArrows
-				isPressEnterToChange={ isPressEnterToChange }
-				label={ label }
-				onBlur={ handleOnBlur }
-				onKeyDown={ handleOnKeyDown }
-				onChange={ handleOnQuantityChange }
-				ref={ forwardedRef }
-				size={ size }
-				suffix={ inputSuffix }
-				value={ parsedQuantity ?? '' }
-				step={ step }
-				__unstableStateReducer={ stateReducer }
-			/>
-		</Root>
+		<ValueInput
+			type={ isPressEnterToChange ? 'text' : 'number' }
+			{ ...props }
+			autoComplete={ autoComplete }
+			className={ classes }
+			disabled={ disabled }
+			spinControls="none"
+			isPressEnterToChange={ isPressEnterToChange }
+			label={ label }
+			onBlur={ handleOnBlur }
+			onKeyDown={ handleOnKeyDown }
+			onChange={ handleOnQuantityChange }
+			ref={ forwardedRef }
+			size={ size }
+			suffix={ inputSuffix }
+			value={ parsedQuantity ?? '' }
+			step={ step }
+			__unstableStateReducer={ stateReducer }
+			onFocus={ onFocusProp }
+		/>
 	);
 }
 

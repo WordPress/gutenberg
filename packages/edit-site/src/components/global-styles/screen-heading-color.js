@@ -6,7 +6,10 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { __experimentalColorGradientControl as ColorGradientControl } from '@wordpress/block-editor';
+import {
+	__experimentalColorGradientControl as ColorGradientControl,
+	experiments as blockEditorExperiments,
+} from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 
 /**
@@ -14,68 +17,69 @@ import { useState } from '@wordpress/element';
  */
 import ScreenHeader from './header';
 import {
-	getSupportedGlobalStylesPanels,
-	useSetting,
-	useStyle,
+	useSupportedStyles,
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
+import { unlock } from '../../experiments';
 
-function ScreenHeadingColor( { name } ) {
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+
+function ScreenHeadingColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
 	const [ selectedLevel, setCurrentTab ] = useState( 'heading' );
-
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useSetting( 'color.palette', name );
-	const [ gradients ] = useSetting( 'color.gradients', name );
-	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
-	const [ areCustomGradientsEnabled ] = useSetting(
+	const supports = useSupportedStyles( name );
+	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
+	const [ areCustomGradientsEnabled ] = useGlobalSetting(
 		'color.customGradient',
 		name
 	);
-	const [ isTextEnabled ] = useSetting( 'color.text', name );
-	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
-
+	const [ isTextEnabled ] = useGlobalSetting( 'color.text', name );
+	const [ isBackgroundEnabled ] = useGlobalSetting(
+		'color.background',
+		name
+	);
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const gradientsPerOrigin = useGradientsPerOrigin( name );
 
 	const hasTextColor =
 		supports.includes( 'color' ) &&
 		isTextEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
 	const hasBackgroundColor =
 		supports.includes( 'backgroundColor' ) &&
 		isBackgroundEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 	const hasGradientColor =
 		supports.includes( 'background' ) &&
-		( gradients.length > 0 || areCustomGradientsEnabled );
+		( gradientsPerOrigin.length > 0 || areCustomGradientsEnabled );
 
-	const [ color, setColor ] = useStyle(
-		'elements.' + selectedLevel + '.color.text',
+	const [ color, setColor ] = useGlobalStyle(
+		prefix + 'elements.' + selectedLevel + '.color.text',
 		name
 	);
-	const [ userColor ] = useStyle(
-		'elements.' + selectedLevel + '.color.text',
+	const [ userColor ] = useGlobalStyle(
+		prefix + 'elements.' + selectedLevel + '.color.text',
 		name,
 		'user'
 	);
 
-	const [ backgroundColor, setBackgroundColor ] = useStyle(
-		'elements.' + selectedLevel + '.color.background',
+	const [ backgroundColor, setBackgroundColor ] = useGlobalStyle(
+		prefix + 'elements.' + selectedLevel + '.color.background',
 		name
 	);
-	const [ userBackgroundColor ] = useStyle(
-		'elements.' + selectedLevel + '.color.background',
+	const [ userBackgroundColor ] = useGlobalStyle(
+		prefix + 'elements.' + selectedLevel + '.color.background',
 		name,
 		'user'
 	);
-	const [ gradient, setGradient ] = useStyle(
-		'elements.' + selectedLevel + '.color.gradient',
+	const [ gradient, setGradient ] = useGlobalStyle(
+		prefix + 'elements.' + selectedLevel + '.color.gradient',
 		name
 	);
-	const [ userGradient ] = useStyle(
-		'elements.' + selectedLevel + '.color.gradient',
+	const [ userGradient ] = useGlobalStyle(
+		prefix + 'elements.' + selectedLevel + '.color.gradient',
 		name,
 		'user'
 	);
@@ -121,9 +125,10 @@ function ScreenHeadingColor( { name } ) {
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-heading-color">
-				<h4>{ __( 'Select heading level' ) }</h4>
+				<h3>{ __( 'Select heading level' ) }</h3>
 
 				<ToggleGroupControl
+					__nextHasNoMarginBottom
 					label={ __( 'Select heading level' ) }
 					hideLabelFromVision={ true }
 					value={ selectedLevel }
@@ -132,7 +137,7 @@ function ScreenHeadingColor( { name } ) {
 				>
 					<ToggleGroupControlOption
 						value="heading"
-						/* translators: 'All' refers to selecting all heading levels 
+						/* translators: 'All' refers to selecting all heading levels
 						and applying the same style to h1-h6. */
 						label={ __( 'All' ) }
 					/>
@@ -146,7 +151,7 @@ function ScreenHeadingColor( { name } ) {
 			</div>
 			{ hasTextColor && (
 				<div className="edit-site-global-styles-screen-heading-color">
-					<h4>
+					<h3>
 						{ selectedLevel === 'heading'
 							? __( 'Text color for all heading levels' )
 							: sprintf(
@@ -154,24 +159,24 @@ function ScreenHeadingColor( { name } ) {
 									__( 'Text color for %s' ),
 									selectedLevel.toUpperCase()
 							  ) }
-					</h4>
+					</h3>
 					<ColorGradientControl
 						className="edit-site-screen-heading-text-color__control"
 						colors={ colorsPerOrigin }
 						disableCustomColors={ ! areCustomSolidsEnabled }
-						__experimentalHasMultipleOrigins
 						showTitle={ false }
 						enableAlpha
 						__experimentalIsRenderedInSidebar
 						colorValue={ color }
 						onColorChange={ setColor }
 						clearable={ color === userColor }
+						headingLevel={ 4 }
 					/>
 				</div>
 			) }
 			{ hasBackgroundColor && (
 				<div className="edit-site-global-styles-screen-heading-color">
-					<h4>
+					<h3>
 						{ selectedLevel === 'heading'
 							? __( 'Background color for all heading levels' )
 							: sprintf(
@@ -179,17 +184,17 @@ function ScreenHeadingColor( { name } ) {
 									__( 'Background color for %s' ),
 									selectedLevel.toUpperCase()
 							  ) }
-					</h4>
+					</h3>
 					<ColorGradientControl
 						className="edit-site-screen-heading-background-color__control"
 						colors={ colorsPerOrigin }
 						gradients={ gradientsPerOrigin }
 						disableCustomColors={ ! areCustomSolidsEnabled }
 						disableCustomGradients={ ! areCustomGradientsEnabled }
-						__experimentalHasMultipleOrigins
 						showTitle={ false }
 						enableAlpha
 						__experimentalIsRenderedInSidebar
+						headingLevel={ 4 }
 						{ ...controlProps }
 					/>
 				</div>

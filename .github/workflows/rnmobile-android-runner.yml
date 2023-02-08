@@ -14,51 +14,73 @@ concurrency:
 
 jobs:
     test:
-        runs-on: macos-latest
+        runs-on: macos-12
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                native-test-name: [gutenberg-editor-initial-html]
+                native-test-name: [gutenberg-editor-rendering]
+                api-level: [29]
 
         steps:
             - name: checkout
-              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
             - name: Use desired version of Java
-              uses: actions/setup-java@v2
+              uses: actions/setup-java@1df8dbefe2a8cbc99770194893dd902763bee34b # v3.9.0
               with:
                   distribution: 'temurin'
                   java-version: '11'
-                  cache: 'gradle'
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
 
             - run: npm ci
 
-            - name: Restore Gradle cache
-              uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
-              with:
-                  path: ~/.gradle/caches
-                  key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+            - name: Gradle cache
+              uses: gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef # v2.3.3
 
-            - uses: reactivecircus/android-emulator-runner@5de26e4bd23bf523e8a4b7f077df8bfb8e52b50e # v2.19.1
+            - name: AVD cache
+              uses: actions/cache@627f0f41f6904a5b1efbaed9f96d9eb58e92e920 # v3.2.4
+              id: avd-cache
               with:
-                  api-level: 28
-                  emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160#issuecomment-868615730
-                  profile: pixel_xl
+                  path: |
+                      ~/.android/avd/*
+                      ~/.android/adb*
+                  key: avd-${{ matrix.api-level }}
+
+            - name: Create AVD and generate snapshot for caching
+              if: steps.avd-cache.outputs.cache-hit != 'true'
+              uses: reactivecircus/android-emulator-runner@50986b1464923454c95e261820bc626f38490ec0 # v2.27.0
+              with:
+                  api-level: ${{ matrix.api-level }}
+                  force-avd-creation: false
+                  emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+                  disable-animations: false
+                  arch: x86_64
+                  profile: Nexus 6
+                  script: echo "Generated AVD snapshot for caching."
+
+            - name: Run tests
+              uses: reactivecircus/android-emulator-runner@50986b1464923454c95e261820bc626f38490ec0 # v2.27.0
+              with:
+                  api-level: ${{ matrix.api-level }}
+                  force-avd-creation: false
+                  emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+                  disable-animations: true
+                  arch: x86_64
+                  profile: Nexus 6
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
-            - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+            - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               if: always()
               with:
                   name: android-screen-recordings
                   path: packages/react-native-editor/android-screen-recordings
 
-            - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+            - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               if: always()
               with:
                   name: appium-logs

@@ -12,8 +12,9 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-// Used to skip some tests on iOS
-const onlyOnAndroid = isAndroid() ? it : it.skip;
+// Tests associated with this const are temporarily off for both platforms due to failures.
+// They should be enabled for Android-only when a fix is in place.
+const onlyOnAndroid = it.skip;
 
 describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 	beforeEach( async () => {

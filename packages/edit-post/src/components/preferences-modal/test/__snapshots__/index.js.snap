@@ -42,6 +42,17 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 }
 
 .emotion-6 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-8 {
   margin-top: calc(4px * 2);
   margin-bottom: 0;
   font-size: 12px;
@@ -73,7 +84,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </h1>
       </div>
       <button
-        aria-label="Close dialog"
+        aria-label="Close"
         class="components-button has-icon"
         type="button"
       >
@@ -186,7 +197,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     />
                   </span>
                   <label
-                    class="components-toggle-control__label"
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
                     for="inspector-toggle-control-0"
                   >
                     Include pre-publish checklist
@@ -194,7 +207,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 </div>
               </div>
               <p
-                class="components-base-control__help emotion-6 emotion-7"
+                class="components-base-control__help emotion-8 emotion-9"
                 id="inspector-toggle-control-0__help"
               >
                 Review settings, such as visibility and tags.
@@ -250,18 +263,20 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     />
                   </span>
                   <label
-                    class="components-toggle-control__label"
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
                     for="inspector-toggle-control-1"
                   >
-                    Spotlight mode
+                    Distraction free
                   </label>
                 </div>
               </div>
               <p
-                class="components-base-control__help emotion-6 emotion-7"
+                class="components-base-control__help emotion-8 emotion-9"
                 id="inspector-toggle-control-1__help"
               >
-                Highlights the current block and fades other content.
+                Reduce visual distractions by hiding the toolbar and other elements to focus on writing.
               </p>
             </div>
           </div>
@@ -296,18 +311,20 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     />
                   </span>
                   <label
-                    class="components-toggle-control__label"
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
                     for="inspector-toggle-control-2"
                   >
-                    Show button text labels
+                    Spotlight mode
                   </label>
                 </div>
               </div>
               <p
-                class="components-base-control__help emotion-6 emotion-7"
+                class="components-base-control__help emotion-8 emotion-9"
                 id="inspector-toggle-control-2__help"
               >
-                Show text instead of icons on buttons.
+                Highlights the current block and fades other content.
               </p>
             </div>
           </div>
@@ -342,18 +359,20 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     />
                   </span>
                   <label
-                    class="components-toggle-control__label"
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
                     for="inspector-toggle-control-3"
                   >
-                    Always open list view
+                    Show button text labels
                   </label>
                 </div>
               </div>
               <p
-                class="components-base-control__help emotion-6 emotion-7"
+                class="components-base-control__help emotion-8 emotion-9"
                 id="inspector-toggle-control-3__help"
               >
-                Opens the block list view sidebar by default.
+                Show text instead of icons on buttons.
               </p>
             </div>
           </div>
@@ -388,18 +407,20 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     />
                   </span>
                   <label
-                    class="components-toggle-control__label"
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
                     for="inspector-toggle-control-4"
                   >
-                    Reduce the interface
+                    Always open list view
                   </label>
                 </div>
               </div>
               <p
-                class="components-base-control__help emotion-6 emotion-7"
+                class="components-base-control__help emotion-8 emotion-9"
                 id="inspector-toggle-control-4__help"
               >
-                Compacts options and outlines in the toolbar.
+                Opens the block list view sidebar by default.
               </p>
             </div>
           </div>
@@ -434,7 +455,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     />
                   </span>
                   <label
-                    class="components-toggle-control__label"
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
                     for="inspector-toggle-control-5"
                   >
                     Use theme styles
@@ -442,7 +465,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 </div>
               </div>
               <p
-                class="components-base-control__help emotion-6 emotion-7"
+                class="components-base-control__help emotion-8 emotion-9"
                 id="inspector-toggle-control-5__help"
               >
                 Make the editor look like your theme.
@@ -480,7 +503,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     />
                   </span>
                   <label
-                    class="components-toggle-control__label"
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
                     for="inspector-toggle-control-6"
                   >
                     Display block breadcrumbs
@@ -488,7 +513,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 </div>
               </div>
               <p
-                class="components-base-control__help emotion-6 emotion-7"
+                class="components-base-control__help emotion-8 emotion-9"
                 id="inspector-toggle-control-6__help"
               >
                 Shows block breadcrumbs at the bottom of the editor.
@@ -570,8 +595,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   border: 1px solid transparent;
   cursor: pointer;
   background: none;
-  text-align: left;
+  text-align: start;
   padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
+  box-sizing: border-box;
   width: 100%;
   display: block;
   margin: 0;
@@ -580,13 +606,13 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 }
 
 .emotion-13:hover {
-  color: var( --wp-admin-theme-color, #007cba);
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 }
 
 .emotion-13:focus {
   background-color: transparent;
-  color: var( --wp-admin-theme-color, #007cba);
-  border-color: var( --wp-admin-theme-color, #007cba);
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
   outline: 3px solid transparent;
 }
 
@@ -677,7 +703,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </h1>
       </div>
       <button
-        aria-label="Close dialog"
+        aria-label="Close"
         class="components-button has-icon"
         type="button"
       >

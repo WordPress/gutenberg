@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Report flaky tests should report flaky tests to issue: Created new flaky issue 1`] = `
+exports[`Report flaky tests should report flaky tests to issue on pull request: Created new flaky issue 1`] = `
 "<!-- __META_DATA__:{} -->
 **Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
 
@@ -14,7 +14,7 @@ Should insert new template part on creation
 <!-- __TEST_RESULTS_LIST__ -->
 <!-- __TEST_RESULT__ --><details>
 <summary>
-	<time datetime=\\"2020-05-10T00:00:00.000Z\\"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 2 failed attempts on <a href=\\"runURL\\"><code>headBranch</code></a>.
+	<time datetime=\\"2020-05-10T00:00:00.000Z\\"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 2 failed attempts on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/100\\"><code>headBranch</code></a>.
 </summary>
 
 \`\`\`
@@ -62,7 +62,7 @@ Should insert new template part on creation
 "
 `;
 
-exports[`Report flaky tests should report flaky tests to issue: Updated existing flaky issue 1`] = `
+exports[`Report flaky tests should report flaky tests to issue on pull request: Updated existing flaky issue 1`] = `
 "<!-- __META_DATA__:{\\"failedTimes\\":58,\\"totalCommits\\":134,\\"baseCommit\\":\\"32bb60d08b75486341d8a63b9e786152889aa02d\\"} -->
 **Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
 
@@ -148,7 +148,190 @@ should copy only partial selection of text blocks
 <br/>
 <!-- __TEST_RESULT__ --><details>
 <summary>
-	<time datetime=\\"2020-05-10T00:00:00.000Z\\"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href=\\"runURL\\"><code>headBranch</code></a>.
+	<time datetime=\\"2020-05-10T00:00:00.000Z\\"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/100\\"><code>headBranch</code></a>.
+</summary>
+
+\`\`\`
+Error: Snapshot comparison failed:
+
+  <!-- wp:paragraph -->
+  <p>block</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>B </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>A block</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p></p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>B block</p>
+  <!-- /wp:paragraph -->
+
+Expected: /home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-expected.txt
+Received: /home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-actual.txt
+    at /home/runner/work/gutenberg/gutenberg/test/e2e/specs/editor/various/copy-cut-paste.spec.js:253:52
+\`\`\`
+</details><!-- /__TEST_RESULT__ -->
+<!-- /__TEST_RESULTS_LIST__ -->
+"
+`;
+
+exports[`Report flaky tests should report flaky tests to issue on push: Created new flaky issue 1`] = `
+"<!-- __META_DATA__:{} -->
+**Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
+
+## Test title
+Should insert new template part on creation
+
+## Test path
+\`specs/site-editor/template-part.test.js\`
+
+## Errors
+<!-- __TEST_RESULTS_LIST__ -->
+<!-- __TEST_RESULT__ --><details>
+<summary>
+	<time datetime=\\"2020-05-10T00:00:00.000Z\\"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 2 failed attempts on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/100\\"><code>trunk</code></a>.
+</summary>
+
+\`\`\`
+  ● Template Part › Template part block › Template part placeholder › Should insert new template part on creation
+
+    expect(jest.fn()).not.toHaveErrored(expected)
+
+    Expected mock function not to be called but it was called with:
+    [\\"TypeError: Cannot read properties of null (reading 'frameElement')
+
+      at Vo (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/block-editor/index.min.js?ver=dfd3a79ce1dc54c31b6ed591bcb0d55a:3:21925)
+      at ft (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:43451)
+      at Wt (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:50270)
+      at ts (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:112276)
+      at Fr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77758)
+      at Dr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77686)
+      at Rr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77549)
+      at Nr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:74544)
+      at ../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:30170
+      at unstable_runWithPriority (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)\\"]
+          at runMicrotasks (<anonymous>)
+
+  ● Template Part › Template part block › Template part placeholder › Should insert new template part on creation
+
+    expect(jest.fn()).not.toHaveErrored(expected)
+
+    Expected mock function not to be called but it was called with:
+    [\\"TypeError: Cannot read properties of null (reading 'frameElement')
+
+      at Vo (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/block-editor/index.min.js?ver=dfd3a79ce1dc54c31b6ed591bcb0d55a:3:21925)
+      at ft (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:43451)
+      at Wt (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:50270)
+      at ts (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:112276)
+      at Fr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77758)
+      at Dr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77686)
+      at Rr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77549)
+      at Nr (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:74544)
+      at ../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:30170
+      at unstable_runWithPriority (../../http:/localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)\\"]
+          at runMicrotasks (<anonymous>)
+
+\`\`\`
+</details><!-- /__TEST_RESULT__ -->
+<!-- /__TEST_RESULTS_LIST__ -->
+"
+`;
+
+exports[`Report flaky tests should report flaky tests to issue on push: Updated existing flaky issue 1`] = `
+"<!-- __META_DATA__:{\\"failedTimes\\":58,\\"totalCommits\\":134,\\"baseCommit\\":\\"32bb60d08b75486341d8a63b9e786152889aa02d\\"} -->
+**Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
+
+## Test title
+should copy only partial selection of text blocks
+
+## Test path
+\`/test/e2e/specs/editor/various/copy-cut-paste.spec.js\`
+
+## Errors
+<!-- __TEST_RESULTS_LIST__ -->
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-13T10:32:59.201Z\\"><code>[2022-04-13T10:32:59.201Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2160552635\\"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T09:51:38.785Z\\"><code>[2022-04-18T09:51:38.785Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2183265588\\"><code>update/post-featured-image-component</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T10:53:30.411Z\\"><code>[2022-04-18T10:53:30.411Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2183485173\\"><code>add/wp-env/wp-env-core-env</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T12:20:51.800Z\\"><code>[2022-04-18T12:20:51.800Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2183790777\\"><code>fix/e2e-test</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T13:47:15.612Z\\"><code>[2022-04-18T13:47:15.612Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184126130\\"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T13:48:06.669Z\\"><code>[2022-04-18T13:48:06.669Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184130029\\"><code>fix/duotone-site-editor</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T14:01:10.151Z\\"><code>[2022-04-18T14:01:10.151Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184182012\\"><code>fix/playwright-snapshots</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T14:12:20.129Z\\"><code>[2022-04-18T14:12:20.129Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184226509\\"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T14:48:36.649Z\\"><code>[2022-04-18T14:48:36.649Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184377565\\"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T14:56:37.960Z\\"><code>[2022-04-18T14:56:37.960Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184418035\\"><code>rnmobile/feature/drag-and-drop</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T15:02:27.183Z\\"><code>[2022-04-18T15:02:27.183Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184449849\\"><code>rnmobile/feature/drag-and-drop-prevent-text-focus-on-long-press</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T15:34:59.990Z\\"><code>[2022-04-18T15:34:59.990Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184593633\\"><code>add/section-concept</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T15:38:30.538Z\\"><code>[2022-04-18T15:38:30.538Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184609574\\"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T15:48:40.494Z\\"><code>[2022-04-18T15:48:40.494Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184652286\\"><code>rnmobile/feature/drag-and-drop-refactor-draggable</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T15:50:50.420Z\\"><code>[2022-04-18T15:50:50.420Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184658598\\"><code>rnmobile/feature/drag-and-drop-update-chip-animation</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T15:52:48.948Z\\"><code>[2022-04-18T15:52:48.948Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184662247\\"><code>fix/comment-reply-link-alignment</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T15:55:31.386Z\\"><code>[2022-04-18T15:55:31.386Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184668485\\"><code>rnmobile/feature/drag-and-drop-haptic-feedback</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T16:09:33.323Z\\"><code>[2022-04-18T16:09:33.323Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184728812\\"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T16:17:20.282Z\\"><code>[2022-04-18T16:17:20.282Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2184756693\\"><code>fix/embed-block-preview-cut-off</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T17:30:31.287Z\\"><code>[2022-04-18T17:30:31.287Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2185065551\\"><code>trunk</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T17:51:21.537Z\\"><code>[2022-04-18T17:51:21.537Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2185158655\\"><code>fix/copy-from-non-text-inputs</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T19:54:17.115Z\\"><code>[2022-04-18T19:54:17.115Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2185732975\\"><code>remove/block-styles-remove-role</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T21:02:44.582Z\\"><code>[2022-04-18T21:02:44.582Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2186019382\\"><code>docgen/replace-fixtures-with-code</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-18T22:38:25.644Z\\"><code>[2022-04-18T22:38:25.644Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2186398254\\"><code>try/use-css-var-for-user-presets</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-04-23T16:41:35.814Z\\"><code>[2022-04-23T16:41:35.814Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2212870284\\"><code>fix/flaky-test-reporter</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-05-10T13:20:09.628Z\\"><code>[2022-05-10T13:20:09.628Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2300794825\\"><code>wp/6.0</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-05-10T13:33:14.282Z\\"><code>[2022-05-10T13:33:14.282Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2300911722\\"><code>wp/6.0</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-05-10T13:40:06.465Z\\"><code>[2022-05-10T13:40:06.465Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2300960655\\"><code>wp/6.0</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-05-10T15:45:55.917Z\\"><code>[2022-05-10T15:45:55.917Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2301711710\\"><code>wp/6.0</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-05-10T15:54:10.994Z\\"><code>[2022-05-10T15:54:10.994Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2301740850\\"><code>wp/6.0</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-05-10T18:58:47.148Z\\"><code>[2022-05-10T18:58:47.148Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2302689513\\"><code>fix/input-field-reset-behavior-moar</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-05-16T07:23:49.752Z\\"><code>[2022-05-16T07:23:49.752Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2330295878\\"><code>refactor/range-control-to-typescript</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-05-16T07:50:53.486Z\\"><code>[2022-05-16T07:50:53.486Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2330425165\\"><code>refactor/range-control-to-typescript</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-05-16T09:51:42.310Z\\"><code>[2022-05-16T09:51:42.310Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2331036710\\"><code>wp/6.0</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-05-16T10:08:17.403Z\\"><code>[2022-05-16T10:08:17.403Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2331126515\\"><code>wp/6.0</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><time datetime=\\"2022-05-17T12:57:57.490Z\\"><code>[2022-05-17T12:57:57.490Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/2338696807\\"><code>wp/6.0</code></a>.<!-- /__TEST_RESULT__ -->
+<br/>
+<!-- __TEST_RESULT__ --><details>
+<summary>
+	<time datetime=\\"2020-05-10T00:00:00.000Z\\"><code>[2020-05-10T00:00:00.000Z]</code></time> Test passed after 1 failed attempt on <a href=\\"https://github.com/WordPress/gutenberg/actions/runs/100\\"><code>trunk</code></a>.
 </summary>
 
 \`\`\`

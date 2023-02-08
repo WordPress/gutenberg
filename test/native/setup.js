@@ -8,6 +8,14 @@ import { Image, NativeModules as RNNativeModules } from 'react-native';
 // testing environment: https://github.com/facebook/react-native/blob/6c19dc3266b84f47a076b647a1c93b3c3b69d2c5/Libraries/Core/setUpNavigator.js#L17
 global.navigator = global.navigator ?? {};
 
+/**
+ * Whether to allow the same experiment to be registered multiple times.
+ * This is useful for development purposes, but should be set to false
+ * during the unit tests to ensure the Gutenberg plugin can be cleanly
+ * merged into WordPress core where this is false.
+ */
+global.process.env.ALLOW_EXPERIMENT_REREGISTRATION = true;
+
 // Set up the app runtime globals for the test environment, which includes
 // modifying the above `global.navigator`
 require( '../../packages/react-native-editor/src/globals' );
@@ -15,6 +23,9 @@ require( '../../packages/react-native-editor/src/globals' );
 // Set up Reanimated library for testing
 require( 'react-native-reanimated/lib/reanimated2/jestUtils' ).setUpTests();
 global.__reanimatedWorkletInit = jest.fn();
+global.ReanimatedDataMock = {
+	now: () => 0,
+};
 
 RNNativeModules.UIManager = RNNativeModules.UIManager || {};
 RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};

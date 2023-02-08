@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { escape as escapeString, find, get } from 'lodash';
+import { get } from 'lodash';
+import escapeHtml from 'escape-html';
 
 /**
  * WordPress dependencies
@@ -49,13 +50,13 @@ const isSameTermName = ( termA, termB ) =>
 const termNamesToIds = ( names, terms ) => {
 	return names.map(
 		( termName ) =>
-			find( terms, ( term ) => isSameTermName( term.name, termName ) ).id
+			terms.find( ( term ) => isSameTermName( term.name, termName ) ).id
 	);
 };
 
 // Tries to create a term or fetch it if it already exists.
 function findOrCreateTerm( termName, restBase, namespace ) {
-	const escapedTermName = escapeString( termName );
+	const escapedTermName = escapeHtml( termName );
 
 	return apiFetch( {
 		path: `/${ namespace }/${ restBase }`,
@@ -202,7 +203,7 @@ export function FlatTermSelector( { slug } ) {
 
 		const newTermNames = uniqueTerms.filter(
 			( termName ) =>
-				! find( availableTerms, ( term ) =>
+				! availableTerms.find( ( term ) =>
 					isSameTermName( term.name, termName )
 				)
 		);

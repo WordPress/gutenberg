@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -168,18 +169,19 @@ const getMenuButton = () => {
 /**
  * Helper to find the menu button and simulate a user click.
  *
- * @return {HTMLElement} The menuButton.
  */
-const openDropdownMenu = () => {
+const openDropdownMenu = async () => {
+	const user = userEvent.setup();
 	const menuButton = getMenuButton();
-	fireEvent.click( menuButton );
+	await user.click( menuButton );
 	return menuButton;
 };
 
 // Opens dropdown then selects the menu item by label before simulating a click.
 const selectMenuItem = async ( label ) => {
+	const user = userEvent.setup();
 	const menuItem = await screen.findByText( label );
-	fireEvent.click( menuItem );
+	await user.click( menuItem );
 };
 
 describe( 'ToolsPanel', () => {
@@ -240,16 +242,16 @@ describe( 'ToolsPanel', () => {
 			expect( menu ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render panel menu when at least one panel item', () => {
+		it( 'should render panel menu when at least one panel item', async () => {
 			renderPanel();
 
-			const menuButton = openDropdownMenu();
+			const menuButton = await openDropdownMenu();
 			expect( menuButton ).toBeInTheDocument();
 		} );
 
 		it( 'should render reset all item in menu', async () => {
 			renderPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const resetAllItem = await screen.findByRole( 'menuitem' );
 
@@ -258,7 +260,7 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render panel menu items correctly', async () => {
 			renderPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const menuItems = await screen.findAllByRole( 'menuitemcheckbox' );
 
@@ -295,7 +297,7 @@ describe( 'ToolsPanel', () => {
 			expect( control ).toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = await screen.getByText( 'Alt is now visible' );
+			const announcement = screen.getByText( 'Alt is now visible' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -308,10 +310,41 @@ describe( 'ToolsPanel', () => {
 			expect( control ).not.toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = await screen.getByText(
+			const announcement = screen.getByText(
 				'Example hidden and reset to default'
 			);
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
+		} );
+
+		it( 'should render optional panel item when corresponding value is updated externally', async () => {
+			const ToolsPanelOptional = ( { toolsPanelItemValue } ) => {
+				const itemProps = {
+					attributes: { value: toolsPanelItemValue },
+					hasValue: () => !! toolsPanelItemValue,
+					label: 'Alt',
+					onDeselect: jest.fn(),
+					onSelect: jest.fn(),
+				};
+				altControlProps.attributes.value = toolsPanelItemValue;
+				return (
+					<ToolsPanel { ...defaultProps }>
+						<ToolsPanelItem { ...itemProps }>
+							<div>Optional control</div>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				);
+			};
+			const { rerender } = render( <ToolsPanelOptional /> );
+
+			const control = screen.queryByText( 'Optional control' );
+
+			expect( control ).not.toBeInTheDocument();
+
+			rerender( <ToolsPanelOptional toolsPanelItemValue={ 100 } /> );
+
+			const controlRerendered = screen.queryByText( 'Optional control' );
+
+			expect( controlRerendered ).toBeInTheDocument();
 		} );
 
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
@@ -337,9 +370,7 @@ describe( 'ToolsPanel', () => {
 			expect( resetControl ).toBeInTheDocument();
 
 			// Test the aria live announcement.
-			const announcement = await screen.getByText(
-				'Example reset to default'
-			);
+			const announcement = screen.getByText( 'Example reset to default' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
@@ -357,7 +388,7 @@ describe( 'ToolsPanel', () => {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			);
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const menuGroups = screen.getAllByRole( 'group' );
 
@@ -421,7 +452,7 @@ describe( 'ToolsPanel', () => {
 			let linkedItem = screen.queryByText( 'Linked control' );
 			expect( linkedItem ).not.toBeInTheDocument();
 
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			// The linked control should initially appear in the optional controls
 			// menu group. There should be three menu groups: default controls,
@@ -505,7 +536,7 @@ describe( 'ToolsPanel', () => {
 
 			// The conditional control should not yet appear in the default controls
 			// menu group.
-			openDropdownMenu();
+			await openDropdownMenu();
 			let menuGroups = screen.getAllByRole( 'group' );
 			let defaultItem = within( menuGroups[ 0 ] ).queryByText(
 				'Conditional'
@@ -582,7 +613,7 @@ describe( 'ToolsPanel', () => {
 			// registerPanelItem has still only been called once.
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
 			// deregisterPanelItem is called, given that we have switched panels.
-			expect( context.deregisterPanelItem ).toBeCalledWith(
+			expect( context.deregisterPanelItem ).toHaveBeenCalledWith(
 				altControlProps.label
 			);
 
@@ -737,7 +768,7 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render grouped items within the menu', async () => {
 			renderGroupedItemsInPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
 			const defaultMenuItem = screen.getByRole( 'menuitem', {
@@ -773,9 +804,9 @@ describe( 'ToolsPanel', () => {
 			expect( altItem ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render wrapped items within the menu', () => {
+		it( 'should render wrapped items within the menu', async () => {
 			renderWrappedItemInPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
 			const defaultMenuItem = screen.getByRole( 'menuitem', {
@@ -1057,7 +1088,7 @@ describe( 'ToolsPanel', () => {
 			await selectMenuItem( 'Reset all' );
 
 			// Test the aria live announcement.
-			const announcement = await screen.getByText( 'All options reset' );
+			const announcement = screen.getByText( 'All options reset' );
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 
 			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
@@ -1075,7 +1106,10 @@ describe( 'ToolsPanel', () => {
 						<ToolsPanelItem { ...altControlProps }>
 							<div>Item 1</div>
 						</ToolsPanelItem>
-						<ToolsPanelItem { ...controlProps }>
+						<ToolsPanelItem
+							{ ...controlProps }
+							data-testid="item-2"
+						>
 							<div>Item 2</div>
 						</ToolsPanelItem>
 					</ToolsPanelItems>
@@ -1083,6 +1117,7 @@ describe( 'ToolsPanel', () => {
 						<ToolsPanelItem
 							{ ...altControlProps }
 							label="Item 3"
+							data-testid="item-3"
 							isShownByDefault={ true }
 						>
 							<div>Item 3</div>
@@ -1113,8 +1148,8 @@ describe( 'ToolsPanel', () => {
 			expect( item3 ).toBeInTheDocument();
 			expect( screen.queryByText( 'Item 4' ) ).not.toBeInTheDocument();
 
-			expect( item2.parentElement ).toHaveClass( 'first' );
-			expect( item3.parentElement ).toHaveClass( 'last' );
+			expect( screen.getByTestId( 'item-2' ) ).toHaveClass( 'first' );
+			expect( screen.getByTestId( 'item-3' ) ).toHaveClass( 'last' );
 		} );
 	} );
 } );

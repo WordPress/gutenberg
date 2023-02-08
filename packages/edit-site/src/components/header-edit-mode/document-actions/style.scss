@@ -1,0 +1,79 @@
+.edit-site-document-actions {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding: 0 $grid-unit;
+	height: 100%;
+	// Flex items will, by default, refuse to shrink below a minimum
+	// intrinsic width. In order to shrink this flexbox item, and
+	// subsequently truncate child text, we set an explicit min-width.
+	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
+	min-width: 0;
+
+	.edit-site-document-actions__title-wrapper {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+
+		// See comment above about min-width
+		min-width: 0;
+
+		.components-dropdown {
+			display: inline-flex;
+			margin-left: $grid-unit-05;
+
+			.components-button {
+				min-width: 0;
+				padding: 0;
+			}
+		}
+	}
+
+	.edit-site-document-actions__title-wrapper > h1 {
+		margin: 0;
+
+		// See comment above about min-width
+		min-width: 0;
+	}
+
+	.edit-site-document-actions__title {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		color: currentColor;
+	}
+
+	.edit-site-document-actions__secondary-item {
+		display: flex;
+		align-items: center;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 0;
+		opacity: 0;
+		padding: 0;
+		transition: all ease 0.2s;
+		background: rgba(var(--wp-block-synced-color--rgb), 0.04);
+		border-radius: 2px;
+		@include reduce-motion(transition);
+
+		.block-editor-block-icon.has-colors {
+			color: var(--wp-block-synced-color);
+		}
+	}
+
+	&.has-secondary-label {
+		.edit-site-document-actions__secondary-item {
+			opacity: 1;
+			padding: 0 4px;
+			max-width: 180px;
+			margin-left: 6px;
+		}
+	}
+}
+
+.edit-site-document-actions__info-dropdown > .components-popover__content {
+	padding: 0;
+	min-width: 240px;
+}

@@ -17,6 +17,10 @@ export const CLASSIC_MENU_CONVERSION_ERROR = 'error';
 export const CLASSIC_MENU_CONVERSION_PENDING = 'pending';
 export const CLASSIC_MENU_CONVERSION_IDLE = 'idle';
 
+// This is needed to ensure that multiple components using this hook
+// do not import the same classic menu twice.
+let classicMenuBeingConvertedId = null;
+
 function useConvertClassicToBlockMenu( clientId ) {
 	/*
 	 * The wp_navigation post is created as a draft so the changes on the frontend and
@@ -32,7 +36,11 @@ function useConvertClassicToBlockMenu( clientId ) {
 	const [ status, setStatus ] = useState( CLASSIC_MENU_CONVERSION_IDLE );
 	const [ error, setError ] = useState( null );
 
-	async function convertClassicMenuToBlockMenu( menuId, menuName ) {
+	async function convertClassicMenuToBlockMenu(
+		menuId,
+		menuName,
+		postStatus = 'publish'
+	) {
 		let navigationMenu;
 		let classicMenuItems;
 
@@ -76,7 +84,8 @@ function useConvertClassicToBlockMenu( clientId ) {
 		try {
 			navigationMenu = await createNavigationMenu(
 				menuName,
-				innerBlocks
+				innerBlocks,
+				postStatus
 			);
 
 			/**
@@ -91,7 +100,7 @@ function useConvertClassicToBlockMenu( clientId ) {
 				'wp_navigation',
 				navigationMenu.id,
 				{
-					status: 'publish',
+					status: postStatus,
 				},
 				{ throwOnError: true }
 			);
@@ -111,7 +120,15 @@ function useConvertClassicToBlockMenu( clientId ) {
 		return navigationMenu;
 	}
 
-	const convert = useCallback( async ( menuId, menuName ) => {
+	const convert = useCallback( async ( menuId, menuName, postStatus ) => {
+		// Check whether this classic menu is being imported already.
+		if ( classicMenuBeingConvertedId === menuId ) {
+			return;
+		}
+
+		// Set the ID for the currently importing classic menu.
+		classicMenuBeingConvertedId = menuId;
+
 		if ( ! menuId || ! menuName ) {
 			setError( 'Unable to convert menu. Missing menu details.' );
 			setStatus( CLASSIC_MENU_CONVERSION_ERROR );
@@ -121,14 +138,24 @@ function useConvertClassicToBlockMenu( clientId ) {
 		setStatus( CLASSIC_MENU_CONVERSION_PENDING );
 		setError( null );
 
-		return await convertClassicMenuToBlockMenu( menuId, menuName )
+		return await convertClassicMenuToBlockMenu(
+			menuId,
+			menuName,
+			postStatus
+		)
 			.then( ( navigationMenu ) => {
 				setStatus( CLASSIC_MENU_CONVERSION_SUCCESS );
+				// Reset the ID for the currently importing classic menu.
+				classicMenuBeingConvertedId = null;
 				return navigationMenu;
 			} )
 			.catch( ( err ) => {
 				setError( err?.message );
+				// Reset the ID for the currently importing classic menu.
 				setStatus( CLASSIC_MENU_CONVERSION_ERROR );
+
+				// Reset the ID for the currently importing classic menu.
+				classicMenuBeingConvertedId = null;
 
 				// Rethrow error for debugging.
 				throw new Error(

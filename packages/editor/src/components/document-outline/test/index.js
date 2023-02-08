@@ -108,11 +108,11 @@ describe( 'DocumentOutline', () => {
 			const blocks = [ headingH2 ];
 			render( <DocumentOutline blocks={ blocks } /> );
 
-			const tableOfContentItems = within(
+			const tableOfContentItem = within(
 				screen.getByRole( 'list' )
-			).getAllByRole( 'listitem' );
-			expect( tableOfContentItems ).toHaveLength( 1 );
-			expect( tableOfContentItems[ 0 ] ).toHaveTextContent( 'Heading 2' );
+			).getByRole( 'listitem' );
+			expect( tableOfContentItem ).toBeInTheDocument();
+			expect( tableOfContentItem ).toHaveTextContent( 'Heading 2' );
 		} );
 
 		it( 'should render two items when two headings and some paragraphs provided', () => {

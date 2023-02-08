@@ -18,14 +18,19 @@ import {
 } from '@wordpress/components';
 import {
 	__experimentalUseCustomSides as useCustomSides,
+	HeightControl,
 	__experimentalSpacingSizesControl as SpacingSizesControl,
+	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import { useSupportedStyles } from './hooks';
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -35,49 +40,66 @@ export function useHasDimensionsPanel( name ) {
 	const hasPadding = useHasPadding( name );
 	const hasMargin = useHasMargin( name );
 	const hasGap = useHasGap( name );
+	const hasMinHeight = useHasMinHeight( name );
 
-	return hasContentSize || hasWideSize || hasPadding || hasMargin || hasGap;
+	return (
+		hasContentSize ||
+		hasWideSize ||
+		hasPadding ||
+		hasMargin ||
+		hasGap ||
+		hasMinHeight
+	);
 }
 
 function useHasContentSize( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'layout.contentSize', name );
+	const supports = useSupportedStyles( name );
+	const [ settings ] = useGlobalSetting( 'layout.contentSize', name );
 
 	return settings && supports.includes( 'contentSize' );
 }
 
 function useHasWideSize( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'layout.wideSize', name );
+	const supports = useSupportedStyles( name );
+	const [ settings ] = useGlobalSetting( 'layout.wideSize', name );
 
 	return settings && supports.includes( 'wideSize' );
 }
 
 function useHasPadding( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.padding', name );
+	const supports = useSupportedStyles( name );
+	const [ settings ] = useGlobalSetting( 'spacing.padding', name );
 
 	return settings && supports.includes( 'padding' );
 }
 
 function useHasMargin( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.margin', name );
+	const supports = useSupportedStyles( name );
+	const [ settings ] = useGlobalSetting( 'spacing.margin', name );
 
 	return settings && supports.includes( 'margin' );
 }
 
 function useHasGap( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.blockGap', name );
+	const supports = useSupportedStyles( name );
+	const [ settings ] = useGlobalSetting( 'spacing.blockGap', name );
 
 	return settings && supports.includes( 'blockGap' );
 }
 
-function useHasSpacingPresets() {
-	const [ settings ] = useSetting( 'spacing.spacingSizes' );
+function useHasMinHeight( name ) {
+	const supports = useSupportedStyles( name );
+	const [ settings ] = useGlobalSetting( 'dimensions.minHeight', name );
 
-	return settings && settings.length > 0;
+	return settings && supports.includes( 'minHeight' );
+}
+
+function useHasSpacingPresets() {
+	const [ settings ] = useGlobalSetting( 'spacing.spacingSizes' );
+	const { custom, theme, default: defaultPresets } = settings || {};
+	const presets = custom ?? theme ?? defaultPresets ?? [];
+
+	return settings && presets.length > 0;
 }
 
 function filterValuesBySides( values, sides ) {
@@ -140,11 +162,11 @@ function splitGapValue( value ) {
 
 // Props for managing `layout.contentSize`.
 function useContentSizeProps( name ) {
-	const [ contentSizeValue, setContentSizeValue ] = useSetting(
+	const [ contentSizeValue, setContentSizeValue ] = useGlobalSetting(
 		'layout.contentSize',
 		name
 	);
-	const [ userSetContentSizeValue ] = useSetting(
+	const [ userSetContentSizeValue ] = useGlobalSetting(
 		'layout.contentSize',
 		name,
 		'user'
@@ -161,11 +183,11 @@ function useContentSizeProps( name ) {
 
 // Props for managing `layout.wideSize`.
 function useWideSizeProps( name ) {
-	const [ wideSizeValue, setWideSizeValue ] = useSetting(
+	const [ wideSizeValue, setWideSizeValue ] = useGlobalSetting(
 		'layout.wideSize',
 		name
 	);
-	const [ userSetWideSizeValue ] = useSetting(
+	const [ userSetWideSizeValue ] = useGlobalSetting(
 		'layout.wideSize',
 		name,
 		'user'
@@ -181,8 +203,12 @@ function useWideSizeProps( name ) {
 }
 
 // Props for managing `spacing.padding`.
-function usePaddingProps( name ) {
-	const [ rawPadding, setRawPadding ] = useStyle( 'spacing.padding', name );
+function usePaddingProps( name, variation = '' ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const [ rawPadding, setRawPadding ] = useGlobalStyle(
+		prefix + 'spacing.padding',
+		name
+	);
 	const paddingValues = splitStyleValue( rawPadding );
 	const paddingSides = useCustomSides( name, 'padding' );
 	const isAxialPadding =
@@ -194,7 +220,11 @@ function usePaddingProps( name ) {
 		setRawPadding( padding );
 	};
 	const resetPaddingValue = () => setPaddingValues( {} );
-	const [ userSetPaddingValue ] = useStyle( 'spacing.padding', name, 'user' );
+	const [ userSetPaddingValue ] = useGlobalStyle(
+		prefix + 'spacing.padding',
+		name,
+		'user'
+	);
 	// The `hasPaddingValue` check does not need a parsed value, as `userSetPaddingValue` will be `undefined` if not set.
 	const hasPaddingValue = () => !! userSetPaddingValue;
 
@@ -209,8 +239,12 @@ function usePaddingProps( name ) {
 }
 
 // Props for managing `spacing.margin`.
-function useMarginProps( name ) {
-	const [ rawMargin, setRawMargin ] = useStyle( 'spacing.margin', name );
+function useMarginProps( name, variation = '' ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const [ rawMargin, setRawMargin ] = useGlobalStyle(
+		prefix + 'spacing.margin',
+		name
+	);
 	const marginValues = splitStyleValue( rawMargin );
 	const marginSides = useCustomSides( name, 'margin' );
 	const isAxialMargin =
@@ -236,14 +270,22 @@ function useMarginProps( name ) {
 }
 
 // Props for managing `spacing.blockGap`.
-function useBlockGapProps( name ) {
-	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
+function useBlockGapProps( name, variation = '' ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const [ gapValue, setGapValue ] = useGlobalStyle(
+		prefix + 'spacing.blockGap',
+		name
+	);
 	const gapValues = splitGapValue( gapValue );
 	const gapSides = useCustomSides( name, 'blockGap' );
 	const isAxialGap =
 		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const resetGapValue = () => setGapValue( undefined );
-	const [ userSetGapValue ] = useStyle( 'spacing.blockGap', name, 'user' );
+	const [ userSetGapValue ] = useGlobalStyle(
+		prefix + 'spacing.blockGap',
+		name,
+		'user'
+	);
 	const hasGapValue = () => !! userSetGapValue;
 	const setGapValues = ( nextBoxGapValue ) => {
 		if ( ! nextBoxGapValue ) {
@@ -271,15 +313,33 @@ function useBlockGapProps( name ) {
 	};
 }
 
-export default function DimensionsPanel( { name } ) {
+// Props for managing `dimensions.minHeight`.
+function useMinHeightProps( name, variation = '' ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const [ minHeightValue, setMinHeightValue ] = useGlobalStyle(
+		prefix + 'dimensions.minHeight',
+		name
+	);
+	const resetMinHeightValue = () => setMinHeightValue( undefined );
+	const hasMinHeightValue = () => !! minHeightValue;
+	return {
+		minHeightValue,
+		setMinHeightValue,
+		resetMinHeightValue,
+		hasMinHeightValue,
+	};
+}
+
+export default function DimensionsPanel( { name, variation = '' } ) {
 	const showContentSizeControl = useHasContentSize( name );
 	const showWideSizeControl = useHasWideSize( name );
 	const showPaddingControl = useHasPadding( name );
 	const showMarginControl = useHasMargin( name );
 	const showGapControl = useHasGap( name );
+	const showMinHeightControl = useHasMinHeight( name );
 	const showSpacingPresetsControl = useHasSpacingPresets();
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units', name )[ 0 ] || [
+		availableUnits: useGlobalSetting( 'spacing.units', name )[ 0 ] || [
 			'%',
 			'px',
 			'em',
@@ -312,7 +372,7 @@ export default function DimensionsPanel( { name } ) {
 		setPaddingValues,
 		resetPaddingValue,
 		hasPaddingValue,
-	} = usePaddingProps( name );
+	} = usePaddingProps( name, variation );
 
 	// Props for managing `spacing.margin`.
 	const {
@@ -322,7 +382,7 @@ export default function DimensionsPanel( { name } ) {
 		setMarginValues,
 		resetMarginValue,
 		hasMarginValue,
-	} = useMarginProps( name );
+	} = useMarginProps( name, variation );
 
 	// Props for managing `spacing.blockGap`.
 	const {
@@ -334,7 +394,15 @@ export default function DimensionsPanel( { name } ) {
 		setGapValues,
 		resetGapValue,
 		hasGapValue,
-	} = useBlockGapProps( name );
+	} = useBlockGapProps( name, variation );
+
+	// Props for managing `dimensions.minHeight`.
+	const {
+		minHeightValue,
+		setMinHeightValue,
+		resetMinHeightValue,
+		hasMinHeightValue,
+	} = useMinHeightProps( name, variation );
 
 	const resetAll = () => {
 		resetPaddingValue();
@@ -345,7 +413,11 @@ export default function DimensionsPanel( { name } ) {
 	};
 
 	return (
-		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
+		<ToolsPanel
+			label={ __( 'Dimensions' ) }
+			resetAll={ resetAll }
+			headingLevel={ 3 }
+		>
 			{ ( showContentSizeControl || showWideSizeControl ) && (
 				<span className="span-columns">
 					{ __( 'Set the width of the main content area.' ) }
@@ -512,6 +584,20 @@ export default function DimensionsPanel( { name } ) {
 							splitOnAxis={ isAxialGap }
 						/>
 					) }
+				</ToolsPanelItem>
+			) }
+			{ showMinHeightControl && (
+				<ToolsPanelItem
+					hasValue={ hasMinHeightValue }
+					label={ __( 'Min. height' ) }
+					onDeselect={ resetMinHeightValue }
+					isShownByDefault={ true }
+				>
+					<HeightControl
+						label={ __( 'Min. height' ) }
+						value={ minHeightValue }
+						onChange={ setMinHeightValue }
+					/>
 				</ToolsPanelItem>
 			) }
 		</ToolsPanel>

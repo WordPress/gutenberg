@@ -71,6 +71,9 @@
 					},
 					{
 						"docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md": []
 					}
 				]
 			},
@@ -275,7 +278,6 @@
 						"docs/reference-guides/data/data-core-keyboard-shortcuts.md": []
 					},
 					{ "docs/reference-guides/data/data-core-notices.md": [] },
-					{ "docs/reference-guides/data/data-core-nux.md": [] },
 					{
 						"docs/reference-guides/data/data-core-preferences.md": []
 					},

@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { BaseControl, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -26,17 +26,20 @@ const DEFAULT_QUERY = {
 };
 
 export default function MostUsedTerms( { onSelect, taxonomy } ) {
-	const { _terms, showTerms } = useSelect( ( select ) => {
-		const mostUsedTerms = select( coreStore ).getEntityRecords(
-			'taxonomy',
-			taxonomy.slug,
-			DEFAULT_QUERY
-		);
-		return {
-			_terms: mostUsedTerms,
-			showTerms: mostUsedTerms?.length >= MIN_MOST_USED_TERMS,
-		};
-	}, [] );
+	const { _terms, showTerms } = useSelect(
+		( select ) => {
+			const mostUsedTerms = select( coreStore ).getEntityRecords(
+				'taxonomy',
+				taxonomy.slug,
+				DEFAULT_QUERY
+			);
+			return {
+				_terms: mostUsedTerms,
+				showTerms: mostUsedTerms?.length >= MIN_MOST_USED_TERMS,
+			};
+		},
+		[ taxonomy.slug ]
+	);
 
 	if ( ! showTerms ) {
 		return null;
@@ -47,9 +50,12 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
 
 	return (
 		<div className="editor-post-taxonomies__flat-term-most-used">
-			<h3 className="editor-post-taxonomies__flat-term-most-used-label">
+			<BaseControl.VisualLabel
+				as="h3"
+				className="editor-post-taxonomies__flat-term-most-used-label"
+			>
 				{ label }
-			</h3>
+			</BaseControl.VisualLabel>
 			{ /*
 			 * Disable reason: The `list` ARIA role is redundant but
 			 * Safari+VoiceOver won't announce the list otherwise.

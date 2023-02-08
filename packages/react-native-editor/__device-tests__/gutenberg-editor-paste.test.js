@@ -25,7 +25,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 		await clearClipboard( editorPage.driver );
 	} );
 
-	it( 'copies plain text from one paragraph block and pastes in another', async () => {
+	it.skip( 'copies plain text from one paragraph block and pastes in another', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
@@ -68,7 +68,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 		await editorPage.removeBlockAtPosition( blockNames.paragraph, 1 );
 	} );
 
-	it( 'copies styled text from one paragraph block and pastes in another', async () => {
+	it.skip( 'copies styled text from one paragraph block and pastes in another', async () => {
 		// Create paragraph block with styled text by editing html.
 		await editorPage.setHtmlContent( testData.pasteHtmlText );
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(

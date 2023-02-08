@@ -2,10 +2,10 @@
  * Internal dependencies
  */
 
-import { getSupportedGlobalStylesPanels } from './hooks';
+import { useSupportedStyles } from './hooks';
 
 export function useHasColorPanel( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	return (
 		supports.includes( 'color' ) ||
 		supports.includes( 'backgroundColor' ) ||

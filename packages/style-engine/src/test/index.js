@@ -54,6 +54,9 @@ describe( 'generate', () => {
 						gradient:
 							'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
 					},
+					dimensions: {
+						minHeight: '50vh',
+					},
 					spacing: {
 						padding: { top: '10px', bottom: '5px' },
 						margin: {
@@ -69,9 +72,16 @@ describe( 'generate', () => {
 						fontWeight: '800',
 						fontFamily: "'Helvetica Neue',sans-serif",
 						lineHeight: '3.3',
+						textColumns: '2',
 						textDecoration: 'line-through',
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
+					},
+					outline: {
+						offset: '2px',
+						width: '4px',
+						style: 'dashed',
+						color: 'red',
 					},
 				},
 				{
@@ -79,7 +89,7 @@ describe( 'generate', () => {
 				}
 			)
 		).toEqual(
-			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }"
+			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; min-height: 50vh; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; column-count: 2; text-decoration: line-through; text-transform: uppercase; }"
 		);
 	} );
 
@@ -220,6 +230,9 @@ describe( 'getCSSRules', () => {
 						gradient:
 							'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
 					},
+					dimensions: {
+						minHeight: '50vh',
+					},
 					spacing: {
 						padding: { top: '10px', bottom: '5px' },
 						margin: { right: '2em', left: '1vw' },
@@ -230,10 +243,18 @@ describe( 'getCSSRules', () => {
 						fontWeight: '800',
 						fontFamily: "'Helvetica Neue',sans-serif",
 						lineHeight: '3.3',
+						textColumns: '2',
 						textDecoration: 'line-through',
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
 					},
+					outline: {
+						offset: '2px',
+						width: '4px',
+						style: 'dashed',
+						color: 'red',
+					},
+					shadow: '10px 10px red',
 				},
 				{
 					selector: '.some-selector',
@@ -257,6 +278,31 @@ describe( 'getCSSRules', () => {
 			},
 			{
 				selector: '.some-selector',
+				key: 'minHeight',
+				value: '50vh',
+			},
+			{
+				selector: '.some-selector',
+				key: 'outlineColor',
+				value: 'red',
+			},
+			{
+				selector: '.some-selector',
+				key: 'outlineStyle',
+				value: 'dashed',
+			},
+			{
+				selector: '.some-selector',
+				key: 'outlineOffset',
+				value: '2px',
+			},
+			{
+				selector: '.some-selector',
+				key: 'outlineWidth',
+				value: '4px',
+			},
+			{
+				selector: '.some-selector',
 				key: 'marginRight',
 				value: '2em',
 			},
@@ -276,44 +322,54 @@ describe( 'getCSSRules', () => {
 				value: '5px',
 			},
 			{
-				key: 'fontFamily',
 				selector: '.some-selector',
+				key: 'fontFamily',
 				value: "'Helvetica Neue',sans-serif",
 			},
 			{
-				key: 'fontSize',
 				selector: '.some-selector',
+				key: 'fontSize',
 				value: '2.2rem',
 			},
 			{
-				key: 'fontStyle',
 				selector: '.some-selector',
+				key: 'fontStyle',
 				value: 'italic',
 			},
 			{
-				key: 'fontWeight',
 				selector: '.some-selector',
+				key: 'fontWeight',
 				value: '800',
 			},
 			{
-				key: 'letterSpacing',
 				selector: '.some-selector',
+				key: 'letterSpacing',
 				value: '12px',
 			},
 			{
-				key: 'lineHeight',
 				selector: '.some-selector',
+				key: 'lineHeight',
 				value: '3.3',
 			},
 			{
-				key: 'textDecoration',
 				selector: '.some-selector',
+				key: 'columnCount',
+				value: '2',
+			},
+			{
+				selector: '.some-selector',
+				key: 'textDecoration',
 				value: 'line-through',
 			},
 			{
-				key: 'textTransform',
 				selector: '.some-selector',
+				key: 'textTransform',
 				value: 'uppercase',
+			},
+			{
+				selector: '.some-selector',
+				key: 'boxShadow',
+				value: '10px 10px red',
 			},
 		] );
 	} );

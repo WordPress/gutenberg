@@ -49,12 +49,12 @@ $preview-image-height: 140px;
 	> .components-base-control__field {
 		display: flex;
 		align-items: center;
-		margin: 0;
 	}
 
 	.components-base-control__label {
 		margin-right: $grid-unit-20;
 		margin-bottom: 0;
+		min-width: 29px; // align with search results.
 	}
 
 	input[type="text"],
@@ -64,7 +64,6 @@ $preview-image-height: 140px;
 		width: calc(100% - #{$grid-unit-20 * 2});
 		display: block;
 		padding: 11px $grid-unit-20;
-		padding-right: ( $button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
 		margin: 0;
 		position: relative;
 		border: 1px solid $gray-300;
@@ -77,20 +76,11 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__search-actions {
-	position: absolute;
-	/*
-	 * Actions must be positioned on top of URLInput, since the input will grow
-	 * when suggestions are rendered.
-	 *
-	 * Compensate for:
-	 *  - Border (1px)
-	 *  - Vertically, for the difference in height between the input (40px) and
-	 *    the icon buttons.
-	 *  - Horizontally, pad to the minimum of: default input padding, or the
-	 *    equivalent of the vertical padding.
-	 */
-	top: 1px + ( ( 40px - $button-size ) * 0.5 );
-	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) * 0.5);
+	display: flex;
+	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
+	justify-content: flex-start;
+	gap: $grid-unit-10;
+	order: 20;
 }
 
 .components-button .block-editor-link-control__search-submit .has-icon {
@@ -437,12 +427,43 @@ $preview-image-height: 140px;
 	padding: 10px;
 }
 
+.block-editor-link-control__drawer {
+	display: flex; // allow for ordering.
+	order: 30;
+	flex-direction: column;
+	flex-basis: 100%; // occupy full width.
+}
+
+// Inner div required to avoid padding/margin
+// causing janky animation.
+.block-editor-link-control__drawer-inner {
+	display: flex; // allow for ordering.
+	flex-direction: column;
+	flex-basis: 100%; // occupy full width.
+	margin-top: $grid-unit-20;
+	padding-top: $grid-unit-20;
+	position: relative;
+
+	&::after {
+		content: "";
+		display: block;
+		height: 1px;
+		background-color: $gray-300;
+		position: absolute;
+		left: -$grid-unit-20;
+		right: -$grid-unit-20;
+		top: 0;
+	}
+}
+
 .block-editor-link-control__tools {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	border-top: $border-width solid $gray-300;
+	justify-content: space-between;
 	margin: 0;
 	padding: $grid-unit-20;
+	padding-top: 0;
 }
 
 .block-editor-link-control__unlink {
@@ -454,11 +475,6 @@ $preview-image-height: 140px;
 	flex: 1;
 	margin: 0;
 
-
-	:last-child {
-		margin-bottom: 0;
-	}
-
 	.is-alternate & {
 		border-top: $border-width solid $gray-900;
 	}
@@ -467,7 +483,7 @@ $preview-image-height: 140px;
 .block-editor-link-control__setting {
 	margin-bottom: $grid-unit-20;
 
-	:last-child {
+	&.block-editor-link-control__setting:last-child {
 		margin-bottom: 0;
 	}
 }
@@ -479,14 +495,8 @@ $preview-image-height: 140px;
 		position: absolute;
 		left: auto;
 		bottom: auto;
-		/*
-		 * Position spinner to the left of the actions.
-		 *
-		 * Compensate for:
-		 *  - Input padding right ($button-size)
-		 */
 		top: calc(50% - #{$spinner-size} / 2);
-		right: $button-size;
+		right: $grid-unit-20;
 	}
 }
 

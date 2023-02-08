@@ -94,7 +94,7 @@ export default function Table( { templateType } ) {
 									) }
 								</Link>
 							</Heading>
-							{ template.description }
+							{ decodeEntities( template.description ) }
 						</td>
 
 						<td className="edit-site-list-table-column" role="cell">

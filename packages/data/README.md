@@ -500,6 +500,10 @@ import { store as myCustomStore } from 'my-custom-store';
 dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 ```
 
+_Type_
+
+-   `(storeNameOrDescriptor: StoreDescriptor|string) => Object`
+
 _Parameters_
 
 -   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
@@ -647,6 +651,10 @@ import { store as myCustomStore } from 'my-custom-store';
 select( myCustomStore ).getPrice( 'hammer' );
 ```
 
+_Type_
+
+-   `(storeNameOrDescriptor: StoreDescriptor|string) => Object`
+
 _Parameters_
 
 -   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
@@ -658,8 +666,11 @@ _Returns_
 ### subscribe
 
 Given a listener function, the function will be called any time the state value
-of one of the registered stores has changed. This function returns a `unsubscribe`
-function used to stop the subscription.
+of one of the registered stores has changed. If you specify the optional
+`storeNameOrDescriptor` parameter, the listener function will be called only
+on updates on that one specific registered store.
+
+This function returns an `unsubscribe` function used to stop the subscription.
 
 _Usage_
 
@@ -678,6 +689,7 @@ unsubscribe();
 _Parameters_
 
 -   _listener_ `Function`: Callback function.
+-   _storeNameOrDescriptor_ `string|StoreDescriptor?`: Optional store name.
 
 ### suspendSelect
 

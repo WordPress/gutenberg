@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
 import removeAccents from 'remove-accents';
 
 /**
@@ -212,7 +211,7 @@ function useAutocomplete( {
 	}
 
 	function handleKeyDown( event ) {
-		backspacing.current = event.code === 'Backspace';
+		backspacing.current = event.key === 'Backspace';
 
 		if ( ! autocompleter ) {
 			return;
@@ -220,10 +219,19 @@ function useAutocomplete( {
 		if ( filteredOptions.length === 0 ) {
 			return;
 		}
-		if ( event.defaultPrevented ) {
+
+		if (
+			event.defaultPrevented ||
+			// Ignore keydowns from IMEs
+			event.isComposing ||
+			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+			// is `isComposing=false`, even though it's technically still part of the composition.
+			// These can only be detected by keyCode.
+			event.keyCode === 229
+		) {
 			return;
 		}
-		switch ( event.code ) {
+		switch ( event.key ) {
 			case 'ArrowUp':
 				setSelectedIndex(
 					( selectedIndex === 0
@@ -281,8 +289,7 @@ function useAutocomplete( {
 		const textAfterSelection = getTextContent(
 			slice( record, undefined, getTextContent( record ).length )
 		);
-		const completer = find(
-			completers,
+		const completer = completers?.find(
 			( { triggerPrefix, allowContext } ) => {
 				const index = text.lastIndexOf( triggerPrefix );
 
@@ -406,26 +413,57 @@ function useAutocomplete( {
 }
 
 export function useAutocompleteProps( options ) {
+	const [ isVisible, setIsVisible ] = useState( false );
 	const ref = useRef();
+	const recordAfterInput = useRef();
 	const onKeyDownRef = useRef();
 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
 		...options,
 		contentRef: ref,
 	} );
 	onKeyDownRef.current = onKeyDown;
+
+	useEffect( () => {
+		if ( isVisible ) {
+			if ( ! recordAfterInput.current ) {
+				recordAfterInput.current = options.record;
+			} else if (
+				recordAfterInput.current.start !== options.record.start ||
+				recordAfterInput.current.end !== options.record.end
+			) {
+				setIsVisible( false );
+				recordAfterInput.current = null;
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ options.record ] );
+
+	const mergedRefs = useMergeRefs( [
+		ref,
+		useRefEffect( ( element ) => {
+			function _onKeyDown( event ) {
+				onKeyDownRef.current( event );
+			}
+			function _onInput() {
+				// Only show auto complete UI if the user is inputting text.
+				setIsVisible( true );
+				recordAfterInput.current = null;
+			}
+			element.addEventListener( 'keydown', _onKeyDown );
+			element.addEventListener( 'input', _onInput );
+			return () => {
+				element.removeEventListener( 'keydown', _onKeyDown );
+				element.removeEventListener( 'input', _onInput );
+			};
+		}, [] ),
+	] );
+
+	if ( ! isVisible ) {
+		return { ref: mergedRefs };
+	}
+
 	return {
-		ref: useMergeRefs( [
-			ref,
-			useRefEffect( ( element ) => {
-				function _onKeyDown( event ) {
-					onKeyDownRef.current( event );
-				}
-				element.addEventListener( 'keydown', _onKeyDown );
-				return () => {
-					element.removeEventListener( 'keydown', _onKeyDown );
-				};
-			}, [] ),
-		] ),
+		ref: mergedRefs,
 		children: popover,
 		'aria-autocomplete': listBoxId ? 'list' : undefined,
 		'aria-owns': listBoxId,

@@ -1,54 +1,71 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalColorGradientControl as ColorGradientControl } from '@wordpress/block-editor';
+import {
+	__experimentalColorGradientControl as ColorGradientControl,
+	experiments as blockEditorExperiments,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
 import {
-	getSupportedGlobalStylesPanels,
+	useSupportedStyles,
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
-	useSetting,
-	useStyle,
 } from './hooks';
+import { unlock } from '../../experiments';
 
-function ScreenBackgroundColor( { name } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useSetting( 'color.palette', name );
-	const [ gradients ] = useSetting( 'color.gradients', name );
-	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
-	const [ areCustomGradientsEnabled ] = useSetting(
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+
+function ScreenBackgroundColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const supports = useSupportedStyles( name );
+	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
+	const [ areCustomGradientsEnabled ] = useGlobalSetting(
 		'color.customGradient',
 		name
 	);
-
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const gradientsPerOrigin = useGradientsPerOrigin( name );
 
-	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
+	const [ isBackgroundEnabled ] = useGlobalSetting(
+		'color.background',
+		name
+	);
 
 	const hasBackgroundColor =
 		supports.includes( 'backgroundColor' ) &&
 		isBackgroundEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 	const hasGradientColor =
 		supports.includes( 'background' ) &&
-		( gradients.length > 0 || areCustomGradientsEnabled );
-	const [ backgroundColor, setBackgroundColor ] = useStyle(
-		'color.background',
+		( gradientsPerOrigin.length > 0 || areCustomGradientsEnabled );
+	const [ backgroundColor, setBackgroundColor ] = useGlobalStyle(
+		prefix + 'color.background',
 		name
 	);
-	const [ userBackgroundColor ] = useStyle(
-		'color.background',
+	const [ userBackgroundColor ] = useGlobalStyle(
+		prefix + 'color.background',
 		name,
 		'user'
 	);
-	const [ gradient, setGradient ] = useStyle( 'color.gradient', name );
-	const [ userGradient ] = useStyle( 'color.gradient', name, 'user' );
+	const [ gradient, setGradient ] = useGlobalStyle(
+		prefix + 'color.gradient',
+		name
+	);
+	const [ userGradient ] = useGlobalStyle(
+		prefix + 'color.gradient',
+		name,
+		'user'
+	);
 
 	if ( ! hasBackgroundColor && ! hasGradientColor ) {
 		return null;
@@ -91,15 +108,21 @@ function ScreenBackgroundColor( { name } ) {
 				) }
 			/>
 			<ColorGradientControl
-				className="edit-site-screen-background-color__control"
+				className={ classnames(
+					'edit-site-screen-background-color__control',
+					{
+						'has-no-tabs':
+							! hasBackgroundColor || ! hasGradientColor,
+					}
+				) }
 				colors={ colorsPerOrigin }
 				gradients={ gradientsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
 				disableCustomGradients={ ! areCustomGradientsEnabled }
-				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar
+				headingLevel={ 3 }
 				{ ...controlProps }
 			/>
 		</>

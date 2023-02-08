@@ -234,7 +234,6 @@ E.g: a block wants to migrate a title attribute to a paragraph innerBlock.
 
 ```js
 const { registerBlockType } = wp.blocks;
-const { omit } = lodash;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	// ... block properties go here
@@ -254,8 +253,10 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 			},
 
 			migrate( attributes, innerBlocks ) {
+				const { title, ...restAttributes } = attributes;
+
 				return [
-					omit( attributes, 'title' ),
+					restAttributes,
 					[
 						createBlock( 'core/paragraph', {
 							content: attributes.title,
@@ -278,8 +279,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 
 ```js
 var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	omit = lodash.omit;
+	registerBlockType = wp.blocks.registerBlockType;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	// ... block properties go here
@@ -295,8 +295,10 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 			},
 
 			migrate: function ( attributes, innerBlocks ) {
+				const { title, ...restAttributes } = attributes;
+
 				return [
-					omit( attributes, 'title' ),
+					restAttributes,
 					[
 						createBlock( 'core/paragraph', {
 							content: attributes.title,

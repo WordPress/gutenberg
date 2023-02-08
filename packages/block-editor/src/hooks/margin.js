@@ -29,7 +29,7 @@ import {
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
 import SpacingSizesControl from '../components/spacing-sizes-control';
-import { getCustomValueFromPreset } from '../components/spacing-sizes-control/utils';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 
 /**
  * Determines if there is margin support.
@@ -101,6 +101,8 @@ export function MarginEdit( props ) {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
+		onMouseOver,
+		onMouseOut,
 	} = props;
 
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
@@ -148,6 +150,8 @@ export function MarginEdit( props ) {
 						units={ units }
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
 					/>
 				) }
 				{ spacingSizes?.length > 0 && (
@@ -159,6 +163,8 @@ export function MarginEdit( props ) {
 						units={ units }
 						allowReset={ false }
 						splitOnAxis={ false }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
 					/>
 				) }
 			</>
@@ -167,22 +173,21 @@ export function MarginEdit( props ) {
 	} );
 }
 
-export function MarginVisualizer( { clientId, attributes } ) {
+export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 	const margin = attributes?.style?.spacing?.margin;
-	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 
 	const style = useMemo( () => {
 		const marginTop = margin?.top
-			? getCustomValueFromPreset( margin?.top, spacingSizes )
+			? getSpacingPresetCssVar( margin?.top )
 			: 0;
 		const marginRight = margin?.right
-			? getCustomValueFromPreset( margin?.right, spacingSizes )
+			? getSpacingPresetCssVar( margin?.right )
 			: 0;
 		const marginBottom = margin?.bottom
-			? getCustomValueFromPreset( margin?.bottom, spacingSizes )
+			? getSpacingPresetCssVar( margin?.bottom )
 			: 0;
 		const marginLeft = margin?.left
-			? getCustomValueFromPreset( margin?.left, spacingSizes )
+			? getSpacingPresetCssVar( margin?.left )
 			: 0;
 
 		return {
@@ -190,10 +195,10 @@ export function MarginVisualizer( { clientId, attributes } ) {
 			borderRightWidth: marginRight,
 			borderBottomWidth: marginBottom,
 			borderLeftWidth: marginLeft,
-			top: marginTop !== 0 ? `-${ marginTop }` : 0,
-			right: marginRight !== 0 ? `-${ marginRight }` : 0,
-			bottom: marginBottom !== 0 ? `-${ marginBottom }` : 0,
-			left: marginLeft !== 0 ? `-${ marginLeft }` : 0,
+			top: marginTop ? `calc(${ marginTop } * -1)` : 0,
+			right: marginRight ? `calc(${ marginRight } * -1)` : 0,
+			bottom: marginBottom ? `calc(${ marginBottom } * -1)` : 0,
+			left: marginLeft ? `calc(${ marginLeft } * -1)` : 0,
 		};
 	}, [ margin ] );
 
@@ -208,21 +213,22 @@ export function MarginVisualizer( { clientId, attributes } ) {
 	};
 
 	useEffect( () => {
-		if ( ! isShallowEqual( margin, valueRef.current ) ) {
+		if ( ! isShallowEqual( margin, valueRef.current ) && ! forceShow ) {
 			setIsActive( true );
 			valueRef.current = margin;
-
-			clearTimer();
 
 			timeoutRef.current = setTimeout( () => {
 				setIsActive( false );
 			}, 400 );
 		}
 
-		return () => clearTimer();
-	}, [ margin ] );
+		return () => {
+			setIsActive( false );
+			clearTimer();
+		};
+	}, [ margin, forceShow ] );
 
-	if ( ! isActive ) {
+	if ( ! isActive && ! forceShow ) {
 		return null;
 	}
 
@@ -231,6 +237,8 @@ export function MarginVisualizer( { clientId, attributes } ) {
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstableRefreshSize={ margin }
+			__unstablePopoverSlot="block-toolbar"
+			shift={ false }
 		>
 			<div className="block-editor__padding-visualizer" style={ style } />
 		</BlockPopover>

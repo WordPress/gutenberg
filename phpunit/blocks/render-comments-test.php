@@ -43,4 +43,4 @@ class Tests_Blocks_RenderComments extends WP_UnitTestCase {
 		$rendered = gutenberg_render_block_core_comments( $attributes, '', $block );
 		$this->assertEmpty( $rendered );
 	}
-};
+}

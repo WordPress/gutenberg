@@ -41,58 +41,68 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   min-width: 0;
 }
 
-<div
-  className="interface-preferences-modal__option"
->
+.emotion-6 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+<div>
   <div
-    className="components-base-control components-toggle-control emotion-0 emotion-1"
+    class="interface-preferences-modal__option"
   >
     <div
-      className="components-base-control__field emotion-2 emotion-3"
+      class="components-base-control components-toggle-control emotion-0 emotion-1"
     >
       <div
-        className="components-flex components-h-stack emotion-4 emotion-5"
-        data-wp-c16t={true}
-        data-wp-component="HStack"
+        class="components-base-control__field emotion-2 emotion-3"
       >
-        <span
-          className="components-form-toggle is-checked"
+        <div
+          class="components-flex components-h-stack emotion-4 emotion-5"
+          data-wp-c16t="true"
+          data-wp-component="HStack"
         >
-          <input
-            checked={true}
-            className="components-form-toggle__input"
-            id="inspector-toggle-control-3"
-            onChange={[Function]}
-            type="checkbox"
-          />
           <span
-            className="components-form-toggle__track"
+            class="components-form-toggle is-checked"
+          >
+            <input
+              class="components-form-toggle__input"
+              id="inspector-toggle-control-3"
+              type="checkbox"
+            />
+            <span
+              class="components-form-toggle__track"
+            />
+            <span
+              class="components-form-toggle__thumb"
+            />
+          </span>
+          <label
+            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+            data-wp-c16t="true"
+            data-wp-component="FlexBlock"
+            for="inspector-toggle-control-3"
           />
-          <span
-            className="components-form-toggle__thumb"
-          />
-        </span>
-        <label
-          className="components-toggle-control__label"
-          htmlFor="inspector-toggle-control-3"
-        />
+        </div>
       </div>
     </div>
+    <p
+      class="edit-post-preferences-modal__custom-fields-confirmation-message"
+    >
+      A page reload is required for this change. Make sure your content is saved before reloading.
+    </p>
+    <button
+      class="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
+      type="button"
+    >
+      Enable & Reload
+    </button>
   </div>
-  <p
-    className="edit-post-preferences-modal__custom-fields-confirmation-message"
-  >
-    A page reload is required for this change. Make sure your content is saved before reloading.
-  </p>
-  <button
-    aria-describedby={null}
-    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
-    disabled={false}
-    onClick={[Function]}
-    type="button"
-  >
-    Enable & Reload
-  </button>
 </div>
 `;
 
@@ -137,41 +147,55 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
   min-width: 0;
 }
 
-<div
-  className="interface-preferences-modal__option"
->
+.emotion-6 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+<div>
   <div
-    className="components-base-control components-toggle-control emotion-0 emotion-1"
+    class="interface-preferences-modal__option"
   >
     <div
-      className="components-base-control__field emotion-2 emotion-3"
+      class="components-base-control components-toggle-control emotion-0 emotion-1"
     >
       <div
-        className="components-flex components-h-stack emotion-4 emotion-5"
-        data-wp-c16t={true}
-        data-wp-component="HStack"
+        class="components-base-control__field emotion-2 emotion-3"
       >
-        <span
-          className="components-form-toggle is-checked"
+        <div
+          class="components-flex components-h-stack emotion-4 emotion-5"
+          data-wp-c16t="true"
+          data-wp-component="HStack"
         >
-          <input
-            checked={true}
-            className="components-form-toggle__input"
-            id="inspector-toggle-control-0"
-            onChange={[Function]}
-            type="checkbox"
-          />
           <span
-            className="components-form-toggle__track"
+            class="components-form-toggle is-checked"
+          >
+            <input
+              checked=""
+              class="components-form-toggle__input"
+              id="inspector-toggle-control-0"
+              type="checkbox"
+            />
+            <span
+              class="components-form-toggle__track"
+            />
+            <span
+              class="components-form-toggle__thumb"
+            />
+          </span>
+          <label
+            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+            data-wp-c16t="true"
+            data-wp-component="FlexBlock"
+            for="inspector-toggle-control-0"
           />
-          <span
-            className="components-form-toggle__thumb"
-          />
-        </span>
-        <label
-          className="components-toggle-control__label"
-          htmlFor="inspector-toggle-control-0"
-        />
+        </div>
       </div>
     </div>
   </div>
@@ -219,58 +243,69 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   min-width: 0;
 }
 
-<div
-  className="interface-preferences-modal__option"
->
+.emotion-6 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+<div>
   <div
-    className="components-base-control components-toggle-control emotion-0 emotion-1"
+    class="interface-preferences-modal__option"
   >
     <div
-      className="components-base-control__field emotion-2 emotion-3"
+      class="components-base-control components-toggle-control emotion-0 emotion-1"
     >
       <div
-        className="components-flex components-h-stack emotion-4 emotion-5"
-        data-wp-c16t={true}
-        data-wp-component="HStack"
+        class="components-base-control__field emotion-2 emotion-3"
       >
-        <span
-          className="components-form-toggle"
+        <div
+          class="components-flex components-h-stack emotion-4 emotion-5"
+          data-wp-c16t="true"
+          data-wp-component="HStack"
         >
-          <input
-            checked={false}
-            className="components-form-toggle__input"
-            id="inspector-toggle-control-2"
-            onChange={[Function]}
-            type="checkbox"
-          />
           <span
-            className="components-form-toggle__track"
+            class="components-form-toggle"
+          >
+            <input
+              checked=""
+              class="components-form-toggle__input"
+              id="inspector-toggle-control-2"
+              type="checkbox"
+            />
+            <span
+              class="components-form-toggle__track"
+            />
+            <span
+              class="components-form-toggle__thumb"
+            />
+          </span>
+          <label
+            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+            data-wp-c16t="true"
+            data-wp-component="FlexBlock"
+            for="inspector-toggle-control-2"
           />
-          <span
-            className="components-form-toggle__thumb"
-          />
-        </span>
-        <label
-          className="components-toggle-control__label"
-          htmlFor="inspector-toggle-control-2"
-        />
+        </div>
       </div>
     </div>
+    <p
+      class="edit-post-preferences-modal__custom-fields-confirmation-message"
+    >
+      A page reload is required for this change. Make sure your content is saved before reloading.
+    </p>
+    <button
+      class="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
+      type="button"
+    >
+      Disable & Reload
+    </button>
   </div>
-  <p
-    className="edit-post-preferences-modal__custom-fields-confirmation-message"
-  >
-    A page reload is required for this change. Make sure your content is saved before reloading.
-  </p>
-  <button
-    aria-describedby={null}
-    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
-    disabled={false}
-    onClick={[Function]}
-    type="button"
-  >
-    Disable & Reload
-  </button>
 </div>
 `;
 
@@ -315,41 +350,54 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
   min-width: 0;
 }
 
-<div
-  className="interface-preferences-modal__option"
->
+.emotion-6 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+<div>
   <div
-    className="components-base-control components-toggle-control emotion-0 emotion-1"
+    class="interface-preferences-modal__option"
   >
     <div
-      className="components-base-control__field emotion-2 emotion-3"
+      class="components-base-control components-toggle-control emotion-0 emotion-1"
     >
       <div
-        className="components-flex components-h-stack emotion-4 emotion-5"
-        data-wp-c16t={true}
-        data-wp-component="HStack"
+        class="components-base-control__field emotion-2 emotion-3"
       >
-        <span
-          className="components-form-toggle"
+        <div
+          class="components-flex components-h-stack emotion-4 emotion-5"
+          data-wp-c16t="true"
+          data-wp-component="HStack"
         >
-          <input
-            checked={false}
-            className="components-form-toggle__input"
-            id="inspector-toggle-control-1"
-            onChange={[Function]}
-            type="checkbox"
-          />
           <span
-            className="components-form-toggle__track"
+            class="components-form-toggle"
+          >
+            <input
+              class="components-form-toggle__input"
+              id="inspector-toggle-control-1"
+              type="checkbox"
+            />
+            <span
+              class="components-form-toggle__track"
+            />
+            <span
+              class="components-form-toggle__thumb"
+            />
+          </span>
+          <label
+            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+            data-wp-c16t="true"
+            data-wp-component="FlexBlock"
+            for="inspector-toggle-control-1"
           />
-          <span
-            className="components-form-toggle__thumb"
-          />
-        </span>
-        <label
-          className="components-toggle-control__label"
-          htmlFor="inspector-toggle-control-1"
-        />
+        </div>
       </div>
     </div>
   </div>

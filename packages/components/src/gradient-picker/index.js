@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -19,6 +14,18 @@ import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
 import { Spacer } from '../spacer';
 
+// The Multiple Origin Gradients have a `gradients` property (an array of
+// gradient objects), while Single Origin ones have a `gradient` property.
+const isMultipleOriginObject = ( obj ) =>
+	Array.isArray( obj.gradients ) && ! ( 'gradient' in obj );
+
+const isMultipleOriginArray = ( arr ) => {
+	return (
+		arr.length > 0 &&
+		arr.every( ( gradientObj ) => isMultipleOriginObject( gradientObj ) )
+	);
+};
+
 function SingleOrigin( {
 	className,
 	clearGradient,
@@ -28,7 +35,7 @@ function SingleOrigin( {
 	actions,
 } ) {
 	const gradientOptions = useMemo( () => {
-		return map( gradients, ( { gradient, name } ) => (
+		return gradients.map( ( { gradient, name }, index ) => (
 			<CircularOptionPicker.Option
 				key={ gradient }
 				value={ gradient }
@@ -42,7 +49,7 @@ function SingleOrigin( {
 				onClick={
 					value === gradient
 						? clearGradient
-						: () => onChange( gradient )
+						: () => onChange( gradient, index )
 				}
 				aria-label={
 					name
@@ -70,17 +77,22 @@ function MultipleOrigin( {
 	onChange,
 	value,
 	actions,
+	headingLevel,
 } ) {
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading>{ name }</ColorHeading>
+						<ColorHeading level={ headingLevel }>
+							{ name }
+						</ColorHeading>
 						<SingleOrigin
 							clearGradient={ clearGradient }
 							gradients={ gradientSet }
-							onChange={ onChange }
+							onChange={ ( gradient ) =>
+								onChange( gradient, index )
+							}
 							value={ value }
 							{ ...( gradients.length === index + 1
 								? { actions }
@@ -102,17 +114,16 @@ export default function GradientPicker( {
 	value,
 	clearable = true,
 	disableCustomGradients = false,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
+	headingLevel = 2,
 } ) {
 	const clearGradient = useCallback(
 		() => onChange( undefined ),
 		[ onChange ]
 	);
-	const Component =
-		__experimentalHasMultipleOrigins && gradients?.length
-			? MultipleOrigin
-			: SingleOrigin;
+	const Component = isMultipleOriginArray( gradients )
+		? MultipleOrigin
+		: SingleOrigin;
 
 	if ( ! __nextHasNoMargin ) {
 		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
@@ -161,6 +172,7 @@ export default function GradientPicker( {
 								</CircularOptionPicker.ButtonAction>
 							)
 						}
+						headingLevel={ headingLevel }
 					/>
 				) }
 			</VStack>

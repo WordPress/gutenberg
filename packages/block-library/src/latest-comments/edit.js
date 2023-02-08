@@ -56,6 +56,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 						}
 					/>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Number of comments' ) }
 						value={ commentsToShow }
 						onChange={ ( value ) =>
@@ -71,6 +72,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 				<ServerSideRender
 					block="core/latest-comments"
 					attributes={ attributes }
+					skipBlockSupportAttributes
 					// The preview uses the site's locale to make it more true to how
 					// the block appears on the frontend. Setting the locale
 					// explicitly prevents any middleware from setting it to 'user'.

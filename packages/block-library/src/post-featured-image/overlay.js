@@ -47,23 +47,25 @@ const Overlay = ( {
 
 	return (
 		<>
-			<span
-				aria-hidden="true"
-				className={ classnames(
-					'wp-block-post-featured-image__overlay',
-					dimRatioToClass( dimRatio ),
-					{
-						[ overlayColor.class ]: overlayColor.class,
-						'has-background-dim': dimRatio !== undefined,
-						'has-background-gradient': gradientValue,
-						[ gradientClass ]: gradientClass,
-					}
-				) }
-				style={ overlayStyles }
-			/>
-			<InspectorControls __experimentalGroup="color">
+			{ !! dimRatio && (
+				<span
+					aria-hidden="true"
+					className={ classnames(
+						'wp-block-post-featured-image__overlay',
+						dimRatioToClass( dimRatio ),
+						{
+							[ overlayColor.class ]: overlayColor.class,
+							'has-background-dim': dimRatio !== undefined,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: gradientClass,
+						},
+						borderProps.className
+					) }
+					style={ overlayStyles }
+				/>
+			) }
+			<InspectorControls group="color">
 				<ColorGradientSettingsDropdown
-					__experimentalHasMultipleOrigins
 					__experimentalIsRenderedInSidebar
 					settings={ [
 						{
@@ -95,6 +97,7 @@ const Overlay = ( {
 					panelId={ clientId }
 				>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Overlay opacity' ) }
 						value={ dimRatio }
 						onChange={ ( newDimRatio ) =>

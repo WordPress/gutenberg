@@ -23,9 +23,9 @@ function gutenberg_reregister_core_block_types() {
 				'columns',
 				'comments',
 				'group',
-				'heading',
 				'html',
 				'list',
+				'list-item',
 				'media-text',
 				'missing',
 				'more',
@@ -68,6 +68,7 @@ function gutenberg_reregister_core_block_types() {
 				'home-link.php'                    => 'core/home-link',
 				'image.php'                        => 'core/image',
 				'gallery.php'                      => 'core/gallery',
+				'heading.php'                      => 'core/heading',
 				'latest-comments.php'              => 'core/latest-comments',
 				'latest-posts.php'                 => 'core/latest-posts',
 				'loginout.php'                     => 'core/loginout',
@@ -189,7 +190,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
-	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
+	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
 	$style_path      = "build/block-library/blocks/$block_name/";
 	$stylesheet_url  = gutenberg_url( $style_path . 'style.css' );

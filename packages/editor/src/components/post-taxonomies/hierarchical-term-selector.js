@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, some, unescape as unescapeString, without } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,11 +14,13 @@ import {
 	TextControl,
 	TreeSelect,
 	withFilters,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -95,7 +97,7 @@ export function sortBySelected( termsTree, terms ) {
  * @return {Object} Term object.
  */
 export function findTerm( terms, parent, name ) {
-	return find( terms, ( term ) => {
+	return terms.find( ( term ) => {
 		return (
 			( ( ! term.parent && ! parent ) ||
 				parseInt( term.parent ) === parseInt( parent ) ) &&
@@ -258,7 +260,7 @@ export function HierarchicalTermSelector( { slug } ) {
 	const onChange = ( termId ) => {
 		const hasTerm = terms.includes( termId );
 		const newTerms = hasTerm
-			? without( terms, termId )
+			? terms.filter( ( id ) => id !== termId )
 			: [ ...terms, termId ];
 		onUpdateTerms( newTerms );
 	};
@@ -290,7 +292,7 @@ export function HierarchicalTermSelector( { slug } ) {
 		const existingTerm = findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
 			// If the term we are adding exists but is not selected select it.
-			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
+			if ( ! terms.some( ( term ) => term === existingTerm.id ) ) {
 				onUpdateTerms( [ ...terms, existingTerm.id ] );
 			}
 
@@ -358,12 +360,13 @@ export function HierarchicalTermSelector( { slug } ) {
 					className="editor-post-taxonomies__hierarchical-terms-choice"
 				>
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						checked={ terms.indexOf( term.id ) !== -1 }
 						onChange={ () => {
 							const termId = parseInt( term.id, 10 );
 							onChange( termId );
 						} }
-						label={ unescapeString( term.name ) }
+						label={ decodeEntities( term.name ) }
 					/>
 					{ !! term.children.length && (
 						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
@@ -414,6 +417,7 @@ export function HierarchicalTermSelector( { slug } ) {
 		<>
 			{ showFilter && (
 				<TextControl
+					__nextHasNoMarginBottom
 					className="editor-post-taxonomies__hierarchical-terms-filter"
 					label={ filterLabel }
 					value={ filterValue }
@@ -442,22 +446,25 @@ export function HierarchicalTermSelector( { slug } ) {
 			) }
 			{ showForm && (
 				<form onSubmit={ onAddTerm }>
-					<TextControl
-						className="editor-post-taxonomies__hierarchical-terms-input"
-						label={ newTermLabel }
-						value={ formName }
-						onChange={ onChangeFormName }
-						required
-					/>
-					{ !! availableTerms.length && (
-						<TreeSelect
-							label={ parentSelectLabel }
-							noOptionLabel={ noParentOption }
-							onChange={ onChangeFormParent }
-							selectedId={ formParent }
-							tree={ availableTermsTree }
+					<VStack>
+						<TextControl
+							__nextHasNoMarginBottom
+							className="editor-post-taxonomies__hierarchical-terms-input"
+							label={ newTermLabel }
+							value={ formName }
+							onChange={ onChangeFormName }
+							required
 						/>
-					) }
+						{ !! availableTerms.length && (
+							<TreeSelect
+								label={ parentSelectLabel }
+								noOptionLabel={ noParentOption }
+								onChange={ onChangeFormParent }
+								selectedId={ formParent }
+								tree={ availableTermsTree }
+							/>
+						) }
+					</VStack>
 					<Button
 						variant="secondary"
 						type="submit"

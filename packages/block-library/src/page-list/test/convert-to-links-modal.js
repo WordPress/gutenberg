@@ -1,10 +1,28 @@
 /**
  * Internal dependencies
  */
-import { convertSelectedBlockToNavigationLinks } from '../convert-to-links-modal';
+
+import { convertToNavigationLinks } from '../use-convert-to-navigation-links';
+
+// Mock createBlock to avoid creating the blocks in test environment
+// as convertToNavigationLinks calls this method internally.
+jest.mock( '@wordpress/blocks', () => {
+	const blocks = jest.requireActual( '@wordpress/blocks' );
+
+	return {
+		...blocks,
+		createBlock( name, attributes, innerBlocks ) {
+			return {
+				name,
+				attributes,
+				innerBlocks,
+			};
+		},
+	};
+} );
 
 describe( 'page list convert to links', () => {
-	describe( 'convertSelectedBlockToNavigationLinks', () => {
+	describe( 'convertToNavigationLinks', () => {
 		it( 'Can create submenus', () => {
 			const pages = [
 				{
@@ -88,22 +106,10 @@ describe( 'page list convert to links', () => {
 					type: 'page',
 				},
 			];
-			const replaceBlock = jest.fn();
-			const createBlock = jest.fn(
-				( name, attributes, innerBlocks ) => ( {
-					name,
-					attributes,
-					innerBlocks,
-				} )
-			);
-			const convertLinks = convertSelectedBlockToNavigationLinks( {
-				pages,
-				clientId: 'testId',
-				replaceBlock,
-				createBlock,
-			} );
-			convertLinks();
-			expect( replaceBlock.mock.calls?.[ 0 ]?.[ 1 ] ).toEqual( [
+
+			const convertLinks = convertToNavigationLinks( pages );
+
+			expect( convertLinks ).toEqual( [
 				{
 					attributes: {
 						id: 2,
@@ -280,22 +286,10 @@ describe( 'page list convert to links', () => {
 					type: 'page',
 				},
 			];
-			const replaceBlock = jest.fn();
-			const createBlock = jest.fn(
-				( name, attributes, innerBlocks ) => ( {
-					name,
-					attributes,
-					innerBlocks,
-				} )
-			);
-			const convertLinks = convertSelectedBlockToNavigationLinks( {
-				pages,
-				clientId: 'testId',
-				replaceBlock,
-				createBlock,
-			} );
-			convertLinks();
-			expect( replaceBlock.mock.calls?.[ 0 ]?.[ 1 ] ).toEqual( [
+
+			const convertLinks = convertToNavigationLinks( pages );
+
+			expect( convertLinks ).toEqual( [
 				{
 					attributes: {
 						id: 2,

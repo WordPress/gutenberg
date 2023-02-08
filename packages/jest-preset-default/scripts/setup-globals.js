@@ -44,7 +44,9 @@ global.window.cancelIdleCallback = function cancelIdleCallback( handle ) {
 global.window.matchMedia = () => ( {
 	matches: false,
 	addListener: () => {},
+	addEventListener: () => {},
 	removeListener: () => {},
+	removeEventListener: () => {},
 } );
 
 // Setup fake localStorage.

@@ -9,7 +9,12 @@ import classnames from 'classnames';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockType,
+	hasBlockSupport,
+	isReusableBlock,
+	isTemplatePart,
+} from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 
 /**
@@ -34,7 +39,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		blockClientId,
 		blockType,
 		hasFixedToolbar,
-		hasReducedUI,
+		isDistractionFree,
 		isValid,
 		isVisual,
 		isContentLocked,
@@ -60,7 +65,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 			hasFixedToolbar: settings.hasFixedToolbar,
-			hasReducedUI: settings.hasReducedUI,
+			isDistractionFree: settings.isDistractionFree,
 			rootClientId: blockRootClientId,
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
@@ -82,7 +87,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		{
 			ref: nodeRef,
 			onChange( isFocused ) {
-				if ( isFocused && hasReducedUI ) {
+				if ( isFocused && isDistractionFree ) {
 					return;
 				}
 				toggleBlockHighlight( blockClientId, isFocused );
@@ -109,11 +114,13 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 	const shouldShowVisualToolbar = isValid && isVisual;
 	const isMultiToolbar = blockClientIds.length > 1;
+	const isSynced =
+		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
-	const classes = classnames(
-		'block-editor-block-toolbar',
-		shouldShowMovers && 'is-showing-movers'
-	);
+	const classes = classnames( 'block-editor-block-toolbar', {
+		'is-showing-movers': shouldShowMovers,
+		'is-synced': isSynced,
+	} );
 
 	return (
 		<div className={ classes }>
@@ -132,9 +139,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 							) }
 							<BlockMover
 								clientIds={ blockClientIds }
-								hideDragHandle={
-									hideDragHandle || hasReducedUI
-								}
+								hideDragHandle={ hideDragHandle }
 							/>
 						</ToolbarGroup>
 					) }

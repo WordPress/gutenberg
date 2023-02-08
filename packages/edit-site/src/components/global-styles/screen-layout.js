@@ -6,19 +6,21 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import BorderPanel, { useHasBorderPanel } from './border-panel';
 import DimensionsPanel, { useHasDimensionsPanel } from './dimensions-panel';
 import ScreenHeader from './header';
+import BlockPreviewPanel from './block-preview-panel';
+import { getVariationClassName } from './utils';
 
-function ScreenLayout( { name } ) {
-	const hasBorderPanel = useHasBorderPanel( name );
+function ScreenLayout( { name, variation = '' } ) {
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
-
+	const variationClassName = getVariationClassName( variation );
 	return (
 		<>
 			<ScreenHeader title={ __( 'Layout' ) } />
-			{ hasDimensionsPanel && <DimensionsPanel name={ name } /> }
-			{ hasBorderPanel && <BorderPanel name={ name } /> }
+			<BlockPreviewPanel name={ name } variation={ variationClassName } />
+			{ hasDimensionsPanel && (
+				<DimensionsPanel name={ name } variation={ variation } />
+			) }
 		</>
 	);
 }

@@ -11,12 +11,13 @@ describe( 'addContainer', () => {
 			expect( container ).not.toBeNull();
 			expect( container.className ).toBe( 'a11y-speak-region' );
 			expect( container.id ).toBe( 'a11y-speak-polite' );
-			expect( container.getAttribute( 'style' ) ).not.toBeNull();
-			expect( container.getAttribute( 'aria-live' ) ).toBe( 'polite' );
-			expect( container.getAttribute( 'aria-relevant' ) ).toBe(
+			expect( container ).toHaveAttribute( 'style' );
+			expect( container ).toHaveAttribute( 'aria-live', 'polite' );
+			expect( container ).toHaveAttribute(
+				'aria-relevant',
 				'additions text'
 			);
-			expect( container.getAttribute( 'aria-atomic' ) ).toBe( 'true' );
+			expect( container ).toHaveAttribute( 'aria-atomic', 'true' );
 		} );
 	} );
 
@@ -27,12 +28,13 @@ describe( 'addContainer', () => {
 			expect( container ).not.toBeNull();
 			expect( container.className ).toBe( 'a11y-speak-region' );
 			expect( container.id ).toBe( 'a11y-speak-assertive' );
-			expect( container.getAttribute( 'style' ) ).not.toBeNull();
-			expect( container.getAttribute( 'aria-live' ) ).toBe( 'assertive' );
-			expect( container.getAttribute( 'aria-relevant' ) ).toBe(
+			expect( container ).toHaveAttribute( 'style' );
+			expect( container ).toHaveAttribute( 'aria-live', 'assertive' );
+			expect( container ).toHaveAttribute(
+				'aria-relevant',
 				'additions text'
 			);
-			expect( container.getAttribute( 'aria-atomic' ) ).toBe( 'true' );
+			expect( container ).toHaveAttribute( 'aria-atomic', 'true' );
 		} );
 	} );
 
@@ -43,12 +45,13 @@ describe( 'addContainer', () => {
 			expect( container ).not.toBeNull();
 			expect( container.className ).toBe( 'a11y-speak-region' );
 			expect( container.id ).toBe( 'a11y-speak-polite' );
-			expect( container.getAttribute( 'style' ) ).not.toBeNull();
-			expect( container.getAttribute( 'aria-live' ) ).toBe( 'polite' );
-			expect( container.getAttribute( 'aria-relevant' ) ).toBe(
+			expect( container ).toHaveAttribute( 'style' );
+			expect( container ).toHaveAttribute( 'aria-live', 'polite' );
+			expect( container ).toHaveAttribute(
+				'aria-relevant',
 				'additions text'
 			);
-			expect( container.getAttribute( 'aria-atomic' ) ).toBe( 'true' );
+			expect( container ).toHaveAttribute( 'aria-atomic', 'true' );
 		} );
 	} );
 } );

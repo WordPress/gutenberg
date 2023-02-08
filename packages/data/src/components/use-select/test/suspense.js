@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -109,8 +109,8 @@ describe( 'useSuspenseSelect', () => {
 			</RegistryProvider>
 		);
 
-		const rendered = render( <App /> );
-		await waitFor( () => rendered.getByLabelText( 'loaded' ) );
+		render( <App /> );
+		await screen.findByLabelText( 'loaded' );
 
 		// Verify there were 3 attempts to render. Suspended twice because of
 		// `getToken` and `getData` selectors not being resolved, and then finally
@@ -139,10 +139,11 @@ describe( 'useSuspenseSelect', () => {
 			}
 
 			render() {
+				const { children } = this.props;
 				if ( this.state.error ) {
 					return <div aria-label="error">{ this.state.error }</div>;
 				}
-				return this.props.children;
+				return children;
 			}
 		}
 
@@ -156,9 +157,81 @@ describe( 'useSuspenseSelect', () => {
 			</RegistryProvider>
 		);
 
-		const rendered = render( <App /> );
-		const label = await waitFor( () => rendered.getByLabelText( 'error' ) );
-		expect( label.textContent ).toBe( 'resolution failed' );
+		render( <App /> );
+		const label = await screen.findByLabelText( 'error' );
+		expect( label ).toHaveTextContent( 'resolution failed' );
 		expect( console ).toHaveErrored();
+	} );
+
+	it( 'independent resolutions do not cause unrelated rerenders', async () => {
+		const store = createReduxStore( 'test', {
+			reducer: ( state = {}, action ) => {
+				switch ( action.type ) {
+					case 'RECEIVE':
+						return { ...state, [ action.endpoint ]: action.data };
+					default:
+						return state;
+				}
+			},
+			selectors: {
+				getData: ( state, endpoint ) => state[ endpoint ],
+			},
+			resolvers: {
+				getData:
+					( endpoint ) =>
+					async ( { dispatch } ) => {
+						const delay = endpoint === 'slow' ? 30 : 10;
+						await new Promise( ( r ) =>
+							setTimeout( () => r(), delay )
+						);
+						dispatch( {
+							type: 'RECEIVE',
+							endpoint,
+							data: endpoint,
+						} );
+					},
+			},
+		} );
+
+		const registry = createRegistry();
+		registry.register( store );
+
+		const FastUI = jest.fn( () => {
+			const data = useSuspenseSelect(
+				( select ) => select( store ).getData( 'fast' ),
+				[]
+			);
+			return <div aria-label="fast loaded">{ data }</div>;
+		} );
+
+		const SlowUI = jest.fn( () => {
+			const data = useSuspenseSelect(
+				( select ) => select( store ).getData( 'slow' ),
+				[]
+			);
+			return <div aria-label="slow loaded">{ data }</div>;
+		} );
+
+		const App = () => (
+			<RegistryProvider value={ registry }>
+				<Suspense fallback="fast loading">
+					<FastUI />
+				</Suspense>
+				<Suspense fallback="slow loading">
+					<SlowUI />
+				</Suspense>
+			</RegistryProvider>
+		);
+
+		render( <App /> );
+
+		const fastLabel = await screen.findByLabelText( 'fast loaded' );
+		expect( fastLabel ).toHaveTextContent( 'fast' );
+
+		const slowLabel = await screen.findByLabelText( 'slow loaded' );
+		expect( slowLabel ).toHaveTextContent( 'slow' );
+
+		expect( FastUI ).toHaveBeenCalledTimes( 2 );
+		expect( SlowUI ).toHaveBeenCalledTimes( 2 );
 	} );
 } );

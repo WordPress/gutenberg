@@ -289,10 +289,13 @@ In some circumstances, such as block previews, all focusable DOM elements
 (input fields, links, buttons, etc.) need to be disabled. This hook adds the
 behavior to disable nested DOM elements to the returned ref.
 
+If you can, prefer the use of the inert HTML attribute.
+
 _Usage_
 
 ```js
 import { useDisabled } from '@wordpress/compose';
+
 const DisabledExample = () => {
 	const disabledRef = useDisabled();
 	return (
@@ -323,7 +326,7 @@ Dispatches a bubbling focus event when the iframe receives focus. Use
 
 _Returns_
 
--   `Object`: Ref to pass to the iframe.
+-   `RefCallback< HTMLIFrameElement >`: Ref to pass to the iframe.
 
 ### useFocusOnMount
 

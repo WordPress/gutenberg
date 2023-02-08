@@ -1,0 +1,229 @@
+$hub-height: $grid-unit-20 * 2 + $button-size;
+
+.edit-site-layout {
+	height: 100%;
+	background: $gray-900;
+	color: $white;
+	display: flex;
+	flex-direction: column;
+}
+
+.edit-site-layout__hub {
+	position: fixed;
+	top: $canvas-padding;
+	left: $canvas-padding;
+	width: calc(100vw - #{$canvas-padding * 2});
+	height: $hub-height;
+	z-index: z-index(".edit-site-layout__hub");
+
+	background: $black;
+	padding: $grid-unit-20;
+	padding-left: 0;
+	border-radius: $radius-block-ui * 4;
+	box-shadow: $shadow-modal;
+
+	.edit-site-layout.is-full-canvas & {
+		top: 0;
+		left: 0;
+		padding: 0;
+		padding-right: $grid-unit-20;
+		height: $header-height;
+		border-radius: 0;
+		width: 100vw;
+		box-shadow: none;
+
+		@include break-medium {
+			width: auto;
+			padding-right: 0;
+		}
+	}
+
+	.edit-site-layout.is-full-canvas.is-edit-mode & {
+		width: auto;
+		padding-right: 0;
+	}
+
+	@include break-medium {
+		width: calc(#{$nav-sidebar-width} - #{$canvas-padding * 2});
+	}
+}
+
+.edit-site-layout__header {
+	height: $header-height;
+	display: flex;
+	z-index: z-index(".edit-site-layout__header");
+
+	// This is only necessary for the exit animation
+	.edit-site-layout:not(.is-full-canvas) & {
+		position: fixed;
+		width: 100vw;
+	}
+}
+
+.edit-site-layout__content {
+	flex-grow: 1;
+	display: flex;
+
+	// Hide scrollbars during the edit/view animation.
+	overflow: hidden;
+}
+
+.edit-site-layout__sidebar {
+	z-index: z-index(".edit-site-layout__sidebar");
+	width: 100vw;
+
+	@include break-medium {
+		width: $nav-sidebar-width;
+	}
+
+	// This is only necessary for the exit animation
+	.edit-site-layout.is-full-canvas & {
+		position: fixed !important;
+		height: 100vh;
+		left: 0;
+		top: 0;
+	}
+
+	> div {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.resizable-editor__drag-handle {
+		right: 0;
+	}
+}
+
+.edit-site-layout__canvas-container {
+	position: relative;
+	flex-grow: 1;
+	z-index: z-index(".edit-site-layout__canvas-container");
+
+	&.is-resizing::after {
+		// This covers the whole content which ensures mouse up triggers
+		// even if the content is "inert".
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		content: "";
+		z-index: z-index(".edit-site-layout__canvas-container.is-resizing::after");
+	}
+}
+
+.edit-site-layout__canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+
+	& > div {
+		color: $gray-900;
+		background: $white;
+		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
+	}
+
+	@include break-medium {
+		top: $canvas-padding;
+		bottom: $canvas-padding;
+		width: calc(100% - #{$canvas-padding});
+
+		& > div {
+			border-radius: $radius-block-ui * 4;
+			// Not sure why this is necessary.
+			.edit-site-layout:not(.is-full-canvas) & .edit-site-visual-editor__editor-canvas,
+			.edit-site-layout:not(.is-full-canvas) & .interface-interface-skeleton__content {
+				border-radius: $radius-block-ui * 4;
+			}
+		}
+
+	}
+
+	.edit-site-layout.is-full-canvas & {
+		top: 0;
+		bottom: 0;
+		width: 100%;
+
+		& > div {
+			border-radius: 0;
+		}
+	}
+}
+
+// This shouldn't be necessary (we should have a way to say that a skeletton is relative
+.edit-site-layout__canvas .interface-interface-skeleton {
+	position: relative !important;
+	min-height: 100% !important;
+}
+
+.edit-site-layout__view-mode-toggle.components-button {
+	position: relative;
+	color: $white;
+	height: 100%;
+	width: 100%;
+	border-radius: $radius-block-ui;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	&:hover,
+	&:active {
+		color: $white;
+	}
+
+	&:focus {
+		box-shadow: none;
+	}
+
+	&::before {
+		transition: box-shadow 0.1s ease;
+		@include reduce-motion("transition");
+		content: "";
+		display: block;
+		position: absolute;
+		top: 9px;
+		right: 9px;
+		bottom: 9px;
+		left: 9px;
+		border-radius: $radius-block-ui + $border-width + $border-width;
+		box-shadow: none;
+	}
+
+	// Lightened spot color focus.
+	&:focus::before {
+		box-shadow:
+			inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1),
+			inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	.edit-site-layout__view-mode-toggle-icon {
+		display: flex;
+		border-radius: $radius-block-ui;
+	}
+}
+
+.edit-site-layout__actions {
+	z-index: z-index(".edit-site-layout__actions");
+	position: fixed !important; // Need to override the default relative positioning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	width: $sidebar-width;
+	color: $gray-900;
+	background: $white;
+
+	&:focus,
+	&:focus-within {
+		top: 0;
+		bottom: 0;
+	}
+
+	@include break-medium {
+		border-left: $border-width solid $gray-300;
+	}
+}

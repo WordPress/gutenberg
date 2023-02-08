@@ -22,6 +22,7 @@ import { deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
 import { createPost, deleteAllPosts } from './posts';
 import { resetPreferences } from './preferences';
+import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
 interface StorageState {
@@ -136,6 +137,8 @@ class RequestUtils {
 	deleteAllMedia = deleteAllMedia.bind( this );
 	createUser = createUser.bind( this );
 	deleteAllUsers = deleteAllUsers.bind( this );
+	getSiteSettings = getSiteSettings.bind( this );
+	updateSiteSettings = updateSiteSettings.bind( this );
 }
 
 export type { StorageState };

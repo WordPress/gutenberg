@@ -44,14 +44,12 @@
 /packages/interface
 /packages/media-utils
 /packages/server-side-render
+/packages/block-editor/src/components/link-control  @getdave
 
 # Widgets
 /packages/edit-widgets                          @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
 /packages/customize-widgets                     @noisysocks
 /packages/widgets                               @noisysocks
-
-# Navigation
-/packages/edit-navigation                       @draganescu @talldan @tellthemachines @adamziel @kevin940726 @getdave
 
 # Full Site Editing
 /packages/edit-site
@@ -71,6 +69,7 @@
 /packages/docgen
 /packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @ntwb @nerrad @ajitbohra
+/packages/e2e-test-utils-playwright             @kevin940726
 /packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
@@ -81,13 +80,13 @@
 /packages/prettier-config                       @ntwb @gziolo
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
+/test/e2e                                       @kevin940726
 
 # UI Components
 /packages/components                            @ajitbohra
 /packages/compose                               @ajitbohra
 /packages/element                               @ajitbohra
 /packages/notices                               @ajitbohra
-/packages/nux                                   @ajitbohra
 /packages/viewport                              @ajitbohra
 /packages/base-styles
 /packages/icons
@@ -125,6 +124,7 @@
 # Project Management
 /.github
 /packages/project-management-automation
+/packages/report-flaky-tests                    @kevin940726
 
 # wp-env
 /packages/env                                   @noahtallen

@@ -5,8 +5,6 @@ const stories = [
 	'../packages/icons/src/**/stories/*.@(js|tsx|mdx)',
 ].filter( Boolean );
 
-const customEnvVariables = {};
-
 module.exports = {
 	core: {
 		builder: 'webpack5',
@@ -18,31 +16,22 @@ module.exports = {
 			options: { configureJSX: true },
 		},
 		'@storybook/addon-controls',
-		'@storybook/addon-knobs', // Deprecated, new stories should use addon-controls.
-		'@storybook/addon-storysource',
 		'@storybook/addon-viewport',
 		'@storybook/addon-a11y',
 		'@storybook/addon-toolbars',
 		'@storybook/addon-actions',
+		'storybook-source-link',
 	],
+	framework: '@storybook/react',
 	features: {
 		babelModeV7: true,
 		emotionAlias: false,
+		storyStoreV7: true,
 	},
-	// Workaround:
-	// https://github.com/storybookjs/storybook/issues/12270
-	webpackFinal: async ( config ) => {
-		// Find the DefinePlugin.
-		const plugin = config.plugins.find( ( p ) => {
-			return p.definitions && p.definitions[ 'process.env' ];
-		} );
-		// Add custom env variables.
-		Object.keys( customEnvVariables ).forEach( ( key ) => {
-			plugin.definitions[ 'process.env' ][ key ] = JSON.stringify(
-				customEnvVariables[ key ]
-			);
-		} );
-
-		return config;
-	},
+	env: ( config ) => ( {
+		...config,
+		// Inject the `ALLOW_EXPERIMENT_REREGISTRATION` global, used by
+		// @wordpress/experiments.
+		ALLOW_EXPERIMENT_REREGISTRATION: true,
+	} ),
 };

@@ -1,7 +1,8 @@
 .tools-panel-item-spacing {
 	display: grid;
 	grid-template-columns: auto 1fr auto;
-	grid-row-gap: $grid-unit-05;
+	align-items: center;
+	grid-template-rows: 16px auto;
 }
 
 .component-spacing-sizes-control {
@@ -17,21 +18,35 @@
 		align-self: center;
 	}
 
-	.components-spacing-sizes-control__side-labels {
-		grid-column: 1 / 1;
-		min-height: 30px;
-		justify-content: left;
+	.components-base-control__label {
+		margin-bottom: 0;
+		height: $grid-unit-20;
 	}
 
-	.components-spacing-sizes-control__hint-single {
-		margin-top: 0;
-		margin-left: 0;
+	.components-spacing-sizes-control__side-labels {
+		grid-column: 1 / 1;
+		justify-content: left;
+		height: $grid-unit-20;
+		margin-top: $grid-unit-20;
+	}
+
+	.components-spacing-sizes-control__side-label {
+		grid-column: 1 / 1;
+		justify-self: left;
+		margin-bottom: 0;
+	}
+
+	&.is-unlinked {
+		.components-range-control.components-spacing-sizes-control__range-control,
+		.components-spacing-sizes-control__custom-value-input {
+			margin-top: $grid-unit-10;
+		}
 	}
 
 	.components-spacing-sizes-control__hint-single,
 	.components-spacing-sizes-control__hint-all {
 		color: $gray-700;
-		font-size: 12px;
+		margin-bottom: 0;
 	}
 
 	.components-spacing-sizes-control__hint-all {
@@ -46,7 +61,7 @@
 		grid-column: 2 / 2;
 		grid-row: 1 / 1;
 		justify-self: end;
-		padding: 0;
+		margin-top: -4px;
 	}
 
 	.component-spacing-sizes-control__linked-button ~ .components-spacing-sizes-control__custom-toggle-all {
@@ -56,41 +71,44 @@
 	.components-spacing-sizes-control__custom-toggle-single {
 		grid-column: 3 / 3;
 		justify-self: end;
-	}
-
-	.components-spacing-sizes-control__custom-toggle-all,
-	.components-spacing-sizes-control__custom-toggle-single {
-		&.is-small.has-icon {
-			padding: 0;
-			min-width: $icon-size;
-		}
+		margin-top: $grid-unit-15;
 	}
 
 	.component-spacing-sizes-control__linked-button {
 		grid-column: 3 / 3;
 		grid-row: 1 / 1;
 		justify-self: end;
+		line-height: 0;
+		margin-top: -4px;
 	}
 
 	.components-spacing-sizes-control__custom-value-range {
 		grid-column: span 2;
-		margin-left: $grid-unit-10;
-		padding-right: $grid-unit-10;
-		height: 30px;
+		margin-left: $grid-unit-20;
+		margin-top: 8px;
 	}
 
 	.components-spacing-sizes-control__custom-value-input {
 		width: 124px;
+		margin-top: 8px;
+		grid-column: 1;
+	}
+
+	.components-range-control {
+		height: 40px;
+		/* Vertically center the RangeControl until it has true 40px height. */
+		display: flex;
+		align-items: center;
+
+		> .components-base-control__field {
+			/* Fixes RangeControl contents when the outer wrapper is flex */
+			flex: 1;
+		}
 	}
 
 	.components-spacing-sizes-control__range-control {
 		grid-column: span 3;
-		padding-right: $grid-unit-10;
-		height: 30px;
-	}
-
-	.components-range-control__wrapper {
-		margin-bottom: 0;
+		margin-top: 8px;
 	}
 
 	.components-range-control__mark {
@@ -112,14 +130,8 @@
 		z-index: 3;
 	}
 
-	.components-spacing-sizes-control__side-label {
-		margin-right: $grid-unit-05;
-		grid-column: 1 / 1;
-		justify-self: left;
-		font-size: 12px;
-	}
-
 	.components-spacing-sizes-control__custom-select-control {
 		grid-column: span 3;
+		margin-top: $grid-unit-10;
 	}
 }

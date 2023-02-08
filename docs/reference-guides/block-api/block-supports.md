@@ -48,7 +48,7 @@ function render_block() {
 -   Type: `boolean`
 -   Default value: `false`
 
-Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link. _Important: It doesn't work with dynamic blocks yet._
+Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 
 ```js
 // Declare support for anchor links.
@@ -102,6 +102,20 @@ This property allows to enable [wide alignment](/docs/how-to-guides/themes/theme
 supports: {
 	// Remove the support for wide alignment.
 	alignWide: false
+}
+```
+
+## ariaLabel
+
+- Type: `boolean`
+- Default value: `false`
+
+ARIA-labels let you define an accessible label for elements. This property allows enabling the definition of an aria-label for the block, without exposing a UI field.
+
+```js
+supports: {
+	// Add the support for aria label.
+	ariaLabel: true
 }
 ```
 
@@ -337,36 +351,25 @@ supports: {
 Link color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
 
 
-When the block declares support for `color.link`, the attributes definition is extended to include two new attributes: `linkColor` and `style`:
-
-- `linkColor`: attribute of `string` type with no default assigned.
-
-  When a user chooses from the list of preset link colors, the preset slug is stored in the `linkColor` attribute.
-
-  The block can apply a default preset text color by specifying its own attribute with a default e.g.:
-
-  ```js
-  attributes: {
-      linkColor: {
-          type: 'string',
-          default: 'some-preset-link-color-slug',
-      }
-  }
-  ```
+When the block declares support for `color.link`, the attributes definition is extended to include the `style` attribute:
 
 - `style`: attribute of `object` type with no default assigned.
 
-  When a custom link color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.link` attribute.
+  When a link color is selected, the color value is stored in the `style.elements.link.color.text` attribute.
 
-  The block can apply a default custom link color by specifying its own attribute with a default e.g.:
+  The block can apply a default link color by specifying its own attribute with a default e.g.:
 
   ```js
   attributes: {
       style: {
           type: 'object',
           default: {
-              color: {
-                  link: '#ff0000',
+              elements: {
+                  link: {
+                      color: {
+                          text: '#ff0000',
+                      }
+                  }
               }
           }
       }
@@ -482,7 +485,7 @@ supports: {
 -   Type: `boolean`
 -   Default value: `true`
 
-By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
+By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programatically, set `inserter` to `false`.
 
 ```js
 supports: {
@@ -569,7 +572,7 @@ attributes: {
 }
 ```
 
-A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed. 
+A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed.
 
 Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
 

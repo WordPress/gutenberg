@@ -6,10 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
-import { Platform } from '@wordpress/element';
+import {
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+import { Platform, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,6 +35,13 @@ import {
 	useIsMarginDisabled,
 } from './margin';
 import {
+	MinHeightEdit,
+	hasMinHeightSupport,
+	hasMinHeightValue,
+	resetMinHeight,
+	useIsMinHeightDisabled,
+} from './min-height';
+import {
 	PaddingEdit,
 	PaddingVisualizer,
 	hasPaddingSupport,
@@ -38,65 +49,113 @@ import {
 	resetPadding,
 	useIsPaddingDisabled,
 } from './padding';
+import {
+	ChildLayoutEdit,
+	hasChildLayoutSupport,
+	hasChildLayoutValue,
+	resetChildLayout,
+	useIsChildLayoutDisabled,
+	childLayoutOrientation,
+} from './child-layout';
 import useSetting from '../components/use-setting';
+import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 
+export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
+
+function useVisualizerMouseOver() {
+	const [ isMouseOver, setIsMouseOver ] = useState( false );
+	const { hideBlockInterface, showBlockInterface } = unlock(
+		useDispatch( blockEditorStore )
+	);
+	const onMouseOver = ( e ) => {
+		e.stopPropagation();
+		hideBlockInterface();
+		setIsMouseOver( true );
+	};
+	const onMouseOut = ( e ) => {
+		e.stopPropagation();
+		showBlockInterface();
+		setIsMouseOver( false );
+	};
+	return { isMouseOver, onMouseOver, onMouseOut };
+}
 
 /**
  * Inspector controls for dimensions support.
  *
  * @param {Object} props Block props.
  *
- * @return {WPElement} Inspector controls for spacing support features.
+ * @return {WPElement} Inspector controls for dimensions and spacing support features.
  */
 export function DimensionsPanel( props ) {
 	const isGapDisabled = useIsGapDisabled( props );
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
+	const isMinHeightDisabled = useIsMinHeightDisabled( props );
+	const isChildLayoutDisabled = useIsChildLayoutDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
-	const isSupported = hasDimensionsSupport( props.name );
+	const isSupported = hasDimensionsSupport( props );
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+	const paddingMouseOver = useVisualizerMouseOver();
+	const marginMouseOver = useVisualizerMouseOver();
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
 	}
+
+	const defaultDimensionsControls = getBlockSupport( props.name, [
+		DIMENSIONS_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
 
 	const defaultSpacingControls = getBlockSupport( props.name, [
 		SPACING_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
 
-	const createResetAllFilter = ( attribute ) => ( newAttributes ) => ( {
-		...newAttributes,
-		style: {
-			...newAttributes.style,
-			spacing: {
-				...newAttributes.style?.spacing,
-				[ attribute ]: undefined,
+	const createResetAllFilter =
+		( attribute, featureSet ) => ( newAttributes ) => ( {
+			...newAttributes,
+			style: {
+				...newAttributes.style,
+				[ featureSet ]: {
+					...newAttributes.style?.[ featureSet ],
+					[ attribute ]: undefined,
+				},
 			},
-		},
-	} );
+		} );
 
 	const spacingClassnames = classnames( {
 		'tools-panel-item-spacing': spacingSizes && spacingSizes.length > 0,
 	} );
 
+	const { __unstableParentLayout: parentLayout } = props;
+
 	return (
 		<>
-			<InspectorControls __experimentalGroup="dimensions">
+			<InspectorControls group="dimensions">
 				{ ! isPaddingDisabled && (
 					<ToolsPanelItem
 						className={ spacingClassnames }
 						hasValue={ () => hasPaddingValue( props ) }
 						label={ __( 'Padding' ) }
 						onDeselect={ () => resetPadding( props ) }
-						resetAllFilter={ createResetAllFilter( 'padding' ) }
+						resetAllFilter={ createResetAllFilter(
+							'padding',
+							'spacing'
+						) }
 						isShownByDefault={ defaultSpacingControls?.padding }
 						panelId={ props.clientId }
 					>
-						<PaddingEdit { ...props } />
+						<PaddingEdit
+							onMouseOver={ paddingMouseOver.onMouseOver }
+							onMouseOut={ paddingMouseOver.onMouseOut }
+							{ ...props }
+						/>
 					</ToolsPanelItem>
 				) }
 				{ ! isMarginDisabled && (
@@ -105,11 +164,18 @@ export function DimensionsPanel( props ) {
 						hasValue={ () => hasMarginValue( props ) }
 						label={ __( 'Margin' ) }
 						onDeselect={ () => resetMargin( props ) }
-						resetAllFilter={ createResetAllFilter( 'margin' ) }
+						resetAllFilter={ createResetAllFilter(
+							'margin',
+							'spacing'
+						) }
 						isShownByDefault={ defaultSpacingControls?.margin }
 						panelId={ props.clientId }
 					>
-						<MarginEdit { ...props } />
+						<MarginEdit
+							onMouseOver={ marginMouseOver.onMouseOver }
+							onMouseOut={ marginMouseOver.onMouseOut }
+							{ ...props }
+						/>
 					</ToolsPanelItem>
 				) }
 				{ ! isGapDisabled && (
@@ -118,16 +184,63 @@ export function DimensionsPanel( props ) {
 						hasValue={ () => hasGapValue( props ) }
 						label={ __( 'Block spacing' ) }
 						onDeselect={ () => resetGap( props ) }
-						resetAllFilter={ createResetAllFilter( 'blockGap' ) }
+						resetAllFilter={ createResetAllFilter(
+							'blockGap',
+							'spacing'
+						) }
 						isShownByDefault={ defaultSpacingControls?.blockGap }
 						panelId={ props.clientId }
 					>
 						<GapEdit { ...props } />
 					</ToolsPanelItem>
 				) }
+				{ ! isMinHeightDisabled && (
+					<ToolsPanelItem
+						hasValue={ () => hasMinHeightValue( props ) }
+						label={ __( 'Min. height' ) }
+						onDeselect={ () => resetMinHeight( props ) }
+						resetAllFilter={ createResetAllFilter(
+							'minHeight',
+							'dimensions'
+						) }
+						isShownByDefault={
+							defaultDimensionsControls?.minHeight
+						}
+						panelId={ props.clientId }
+					>
+						<MinHeightEdit { ...props } />
+					</ToolsPanelItem>
+				) }
+				{ ! isChildLayoutDisabled && (
+					<VStack
+						as={ ToolsPanelItem }
+						spacing={ 2 }
+						hasValue={ () => hasChildLayoutValue( props ) }
+						label={ childLayoutOrientation( parentLayout ) }
+						onDeselect={ () => resetChildLayout( props ) }
+						resetAllFilter={ createResetAllFilter(
+							'selfStretch',
+							'layout'
+						) }
+						isShownByDefault={ false }
+						panelId={ props.clientId }
+					>
+						<ChildLayoutEdit { ...props } />
+					</VStack>
+				) }
 			</InspectorControls>
-			{ ! isPaddingDisabled && <PaddingVisualizer { ...props } /> }
-			{ ! isMarginDisabled && <MarginVisualizer { ...props } /> }
+			{ ! isPaddingDisabled && (
+				<PaddingVisualizer
+					forceShow={ paddingMouseOver.isMouseOver }
+					{ ...props }
+				/>
+			) }
+			{ ! isMarginDisabled && (
+				<MarginVisualizer
+					forceShow={ marginMouseOver.isMouseOver }
+					{ ...props }
+				/>
+			) }
 		</>
 	);
 }
@@ -135,19 +248,23 @@ export function DimensionsPanel( props ) {
 /**
  * Determine whether there is dimensions related block support.
  *
- * @param {string} blockName Block name.
+ * @param {Object} props Block props.
  *
  * @return {boolean} Whether there is support.
  */
-export function hasDimensionsSupport( blockName ) {
+export function hasDimensionsSupport( props ) {
 	if ( Platform.OS !== 'web' ) {
 		return false;
 	}
 
+	const { name: blockName } = props;
+
 	return (
 		hasGapSupport( blockName ) ||
+		hasMinHeightSupport( blockName ) ||
 		hasPaddingSupport( blockName ) ||
-		hasMarginSupport( blockName )
+		hasMarginSupport( blockName ) ||
+		hasChildLayoutSupport( props )
 	);
 }
 
@@ -160,10 +277,18 @@ export function hasDimensionsSupport( blockName ) {
  */
 const useIsDimensionsDisabled = ( props = {} ) => {
 	const gapDisabled = useIsGapDisabled( props );
+	const minHeightDisabled = useIsMinHeightDisabled( props );
 	const paddingDisabled = useIsPaddingDisabled( props );
 	const marginDisabled = useIsMarginDisabled( props );
+	const childLayoutDisabled = useIsChildLayoutDisabled( props );
 
-	return gapDisabled && paddingDisabled && marginDisabled;
+	return (
+		gapDisabled &&
+		minHeightDisabled &&
+		paddingDisabled &&
+		marginDisabled &&
+		childLayoutDisabled
+	);
 };
 
 /**
@@ -176,7 +301,7 @@ const useIsDimensionsDisabled = ( props = {} ) => {
  * @param {string} blockName Block name.
  * @param {string} feature   The feature custom sides relate to e.g. padding or margins.
  *
- * @return {?string[]} Strings representing the custom sides available.
+ * @return {string[] | undefined} Strings representing the custom sides available.
  */
 export function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
@@ -218,6 +343,18 @@ export function useIsDimensionsSupportValid( blockName, feature ) {
 		// eslint-disable-next-line no-console
 		console.warn(
 			`The ${ feature } support for the "${ blockName }" block can not be configured to support both axial and arbitrary sides.`
+		);
+		return false;
+	}
+
+	if (
+		sides?.length &&
+		feature === 'blockGap' &&
+		! AXIAL_SIDES.every( ( side ) => sides.includes( side ) )
+	) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`The ${ feature } support for the "${ blockName }" block can not be configured to support arbitrary sides.`
 		);
 		return false;
 	}

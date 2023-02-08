@@ -15,7 +15,7 @@ import {
 import { lock as lockIcon, unlock as unlockIcon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { isReusableBlock, getBlockType } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -23,6 +23,9 @@ import { isReusableBlock, getBlockType } from '@wordpress/blocks';
 import useBlockLock from './use-block-lock';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
+
+// Entity based blocks which allow edit locking
+const ALLOWS_EDIT_LOCKING = [ 'core/block', 'core/navigation' ];
 
 function getTemplateLockValue( lock ) {
 	// Prevents all operations.
@@ -41,7 +44,7 @@ function getTemplateLockValue( lock ) {
 export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
 	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
-	const { isReusable, templateLock, hasTemplateLock } = useSelect(
+	const { allowsEditLocking, templateLock, hasTemplateLock } = useSelect(
 		( select ) => {
 			const { getBlockName, getBlockAttributes } =
 				select( blockEditorStore );
@@ -49,7 +52,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			const blockType = getBlockType( blockName );
 
 			return {
-				isReusable: isReusableBlock( blockType ),
+				allowsEditLocking: ALLOWS_EDIT_LOCKING.includes( blockName ),
 				templateLock: getBlockAttributes( clientId )?.templateLock,
 				hasTemplateLock: !! blockType?.attributes?.templateLock,
 			};
@@ -70,9 +73,9 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		setLock( {
 			move: ! canMove,
 			remove: ! canRemove,
-			...( isReusable ? { edit: ! canEdit } : {} ),
+			...( allowsEditLocking ? { edit: ! canEdit } : {} ),
 		} );
-	}, [ canEdit, canMove, canRemove, isReusable ] );
+	}, [ canEdit, canMove, canRemove, allowsEditLocking ] );
 
 	const isAllChecked = Object.values( lock ).every( Boolean );
 	const isMixed = Object.values( lock ).some( Boolean ) && ! isAllChecked;
@@ -85,7 +88,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
 				blockInformation.title
 			) }
 			overlayClassName="block-editor-block-lock-modal"
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
 			<p>
@@ -111,6 +113,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					className="block-editor-block-lock-modal__options"
 				>
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						className="block-editor-block-lock-modal__options-title"
 						label={
 							<span id={ instanceId }>{ __( 'Lock all' ) }</span>
@@ -121,26 +124,18 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							setLock( {
 								move: newValue,
 								remove: newValue,
-								...( isReusable ? { edit: newValue } : {} ),
+								...( allowsEditLocking
+									? { edit: newValue }
+									: {} ),
 							} )
 						}
 					/>
 					<ul className="block-editor-block-lock-modal__checklist">
-						{ isReusable && (
+						{ allowsEditLocking && (
 							<li className="block-editor-block-lock-modal__checklist-item">
 								<CheckboxControl
-									label={
-										<>
-											{ __( 'Restrict editing' ) }
-											<Icon
-												icon={
-													lock.edit
-														? lockIcon
-														: unlockIcon
-												}
-											/>
-										</>
-									}
+									__nextHasNoMarginBottom
+									label={ __( 'Restrict editing' ) }
 									checked={ !! lock.edit }
 									onChange={ ( edit ) =>
 										setLock( ( prevLock ) => ( {
@@ -149,22 +144,16 @@ export default function BlockLockModal( { clientId, onClose } ) {
 										} ) )
 									}
 								/>
+								<Icon
+									className="block-editor-block-lock-modal__lock-icon"
+									icon={ lock.edit ? lockIcon : unlockIcon }
+								/>
 							</li>
 						) }
 						<li className="block-editor-block-lock-modal__checklist-item">
 							<CheckboxControl
-								label={
-									<>
-										{ __( 'Disable movement' ) }
-										<Icon
-											icon={
-												lock.move
-													? lockIcon
-													: unlockIcon
-											}
-										/>
-									</>
-								}
+								__nextHasNoMarginBottom
+								label={ __( 'Disable movement' ) }
 								checked={ lock.move }
 								onChange={ ( move ) =>
 									setLock( ( prevLock ) => ( {
@@ -173,21 +162,15 @@ export default function BlockLockModal( { clientId, onClose } ) {
 									} ) )
 								}
 							/>
+							<Icon
+								className="block-editor-block-lock-modal__lock-icon"
+								icon={ lock.move ? lockIcon : unlockIcon }
+							/>
 						</li>
 						<li className="block-editor-block-lock-modal__checklist-item">
 							<CheckboxControl
-								label={
-									<>
-										{ __( 'Prevent removal' ) }
-										<Icon
-											icon={
-												lock.remove
-													? lockIcon
-													: unlockIcon
-											}
-										/>
-									</>
-								}
+								__nextHasNoMarginBottom
+								label={ __( 'Prevent removal' ) }
 								checked={ lock.remove }
 								onChange={ ( remove ) =>
 									setLock( ( prevLock ) => ( {
@@ -195,6 +178,10 @@ export default function BlockLockModal( { clientId, onClose } ) {
 										remove,
 									} ) )
 								}
+							/>
+							<Icon
+								className="block-editor-block-lock-modal__lock-icon"
+								icon={ lock.remove ? lockIcon : unlockIcon }
 							/>
 						</li>
 					</ul>

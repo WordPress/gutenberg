@@ -28,7 +28,7 @@ const TEMPLATE = [
 function PostTemplateInnerBlocks() {
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: 'wp-block-post' },
-		{ template: TEMPLATE }
+		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
 	return <li { ...innerBlocksProps } />;
 }
@@ -74,7 +74,7 @@ export default function PostTemplateEdit( {
 	context: {
 		query: {
 			perPage,
-			offset,
+			offset = 0,
 			postType,
 			order,
 			orderBy,
@@ -98,6 +98,7 @@ export default function PostTemplateEdit( {
 		displayLayout: { type: layoutType = 'flex', columns = 1 } = {},
 		previewPostType,
 	},
+	__unstableLayoutClassNames,
 } ) {
 	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
@@ -216,7 +217,7 @@ export default function PostTemplateEdit( {
 	);
 	const hasLayoutFlex = layoutType === 'flex' && columns > 1;
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: classnames( __unstableLayoutClassNames, {
 			'is-flex-container': hasLayoutFlex,
 			[ `columns-${ columns }` ]: hasLayoutFlex,
 		} ),

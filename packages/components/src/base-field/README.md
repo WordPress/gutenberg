@@ -12,37 +12,25 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ```js
 function useExampleField( props ) {
-	const { 
-		as = 'input',
-		...baseProps,
-	} = useBaseField( props );
+	const { as = 'input', ...baseProps } = useBaseField( props );
 
 	const inputProps = {
 		as,
 		// more cool stuff here
-	}
+	};
 
 	return { inputProps, ...baseProps };
 }
 
 function ExampleField( props, forwardRef ) {
-	const {
-		preFix,
-		affix,
-		disabled,
-		inputProps,
-		...baseProps
-	} = useExampleField( props );
+	const { preFix, affix, disabled, inputProps, ...baseProps } =
+		useExampleField( props );
 
 	return (
 		<View { ...baseProps } disabled={ disabled }>
-			{preFix}
-			<View
-				autocomplete="off"
-				{ ...inputProps }
-				disabled={ disabled }
-			/>
-			{affix}
+			{ preFix }
+			<View autocomplete="off" { ...inputProps } disabled={ disabled } />
+			{ affix }
 		</View>
 	);
 }
@@ -50,18 +38,29 @@ function ExampleField( props, forwardRef ) {
 
 ## Props
 
+### `disabled`: `boolean`
+
+Whether the field is disabled.
+
+-   Required: No
+
 ### `hasError`: `boolean`
 
 Renders an error style around the component.
 
-### `disabled`: `boolean`
-
-Whether the field is disabled.
+-   Required: No
+-   Default: `false`
 
 ### `isInline`: `boolean`
 
 Renders a component that can be inlined in some text.
 
+-   Required: No
+-   Default: `false`
+
 ### `isSubtle`: `boolean`
 
 Renders a subtle variant of the component.
+
+-   Required: No
+-   Default: `false`

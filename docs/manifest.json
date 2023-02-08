@@ -156,6 +156,12 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Extending the Query Loop block",
+		"slug": "extending-the-query-loop-block",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md",
+		"parent": "block-tutorial"
+	},
+	{
 		"title": "Development Platform",
 		"slug": "platform",
 		"markdown_source": "../docs/how-to-guides/platform/README.md",
@@ -228,7 +234,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Getting Started with JavaScript",
+		"title": "How to use JavaScript with the Block Editor",
 		"slug": "javascript",
 		"markdown_source": "../docs/how-to-guides/javascript/README.md",
 		"parent": "how-to-guides"
@@ -306,7 +312,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Propagating updates for block types ",
+		"title": "Propagating updates for block types",
 		"slug": "propagating-updates",
 		"markdown_source": "../docs/how-to-guides/propagating-updates.md",
 		"parent": "how-to-guides"
@@ -1256,31 +1262,31 @@
 	{
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
-		"markdown_source": "../packages/components/src/toolbar-button/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-button/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarDropdownMenu",
 		"slug": "toolbar-dropdown-menu",
-		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-dropdown-menu/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarGroup",
 		"slug": "toolbar-group",
-		"markdown_source": "../packages/components/src/toolbar-group/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-group/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarItem",
 		"slug": "toolbar-item",
-		"markdown_source": "../packages/components/src/toolbar-item/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-item/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "Toolbar",
 		"slug": "toolbar",
-		"markdown_source": "../packages/components/src/toolbar/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1482,7 +1488,7 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/create-block External Template",
+		"title": "External Project Templates",
 		"slug": "packages-create-block-external-template",
 		"markdown_source": "../packages/create-block/docs/external-template.md",
 		"parent": "packages-create-block"
@@ -1722,12 +1728,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/nux",
-		"slug": "packages-nux",
-		"markdown_source": "../packages/nux/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
@@ -1959,12 +1959,6 @@
 		"title": "Notices Data",
 		"slug": "data-core-notices",
 		"markdown_source": "../docs/reference-guides/data/data-core-notices.md",
-		"parent": "data"
-	},
-	{
-		"title": "The NUX (New User Experience) Data",
-		"slug": "data-core-nux",
-		"markdown_source": "../docs/reference-guides/data/data-core-nux.md",
 		"parent": "data"
 	},
 	{

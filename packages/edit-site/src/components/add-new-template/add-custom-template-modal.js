@@ -17,6 +17,7 @@ import {
 } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -50,7 +51,10 @@ function SuggestionListItem( {
 			}
 		>
 			<span className={ `${ baseCssClass }__title` }>
-				<TextHighlight text={ suggestion.name } highlight={ search } />
+				<TextHighlight
+					text={ decodeEntities( suggestion.name ) }
+					highlight={ search }
+				/>
 			</span>
 			{ suggestion.link && (
 				<span className={ `${ baseCssClass }__info` }>
@@ -127,6 +131,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 		<>
 			{ showSearchControl && (
 				<SearchControl
+					__nextHasNoMarginBottom
 					onChange={ setSearch }
 					value={ search }
 					label={ labels.search_items }
@@ -179,7 +184,6 @@ function AddCustomTemplateModal( {
 				entityForSuggestions.labels.singular_name
 			) }
 			className={ baseCssClass }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
 			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }

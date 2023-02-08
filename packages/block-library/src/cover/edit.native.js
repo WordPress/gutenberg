@@ -58,6 +58,7 @@ import {
 } from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
+// eslint-disable-next-line no-restricted-imports
 import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
@@ -86,6 +87,36 @@ const INNER_BLOCKS_TEMPLATE = [
 		},
 	],
 ];
+
+function useIsScreenReaderEnabled() {
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
+		useState( false );
+
+	useEffect( () => {
+		let mounted = true;
+
+		const changeListener = AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			( enabled ) => setIsScreenReaderEnabled( enabled )
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			( screenReaderEnabled ) => {
+				if ( mounted && screenReaderEnabled ) {
+					setIsScreenReaderEnabled( screenReaderEnabled );
+				}
+			}
+		);
+
+		return () => {
+			mounted = false;
+
+			changeListener.remove();
+		};
+	}, [] );
+
+	return isScreenReaderEnabled;
+}
 
 const Cover = ( {
 	attributes,
@@ -117,29 +148,11 @@ const Cover = ( {
 		overlayColor,
 		isDark,
 	} = attributes;
-	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
-		useState( false );
+	const isScreenReaderEnabled = useIsScreenReaderEnabled();
 
 	useEffect( () => {
-		let isCurrent = true;
-
 		// Sync with local media store.
 		mediaUploadSync();
-		const a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
-			'screenReaderChanged',
-			setIsScreenReaderEnabled
-		);
-
-		AccessibilityInfo.isScreenReaderEnabled().then( () => {
-			if ( isCurrent ) {
-				setIsScreenReaderEnabled();
-			}
-		} );
-
-		return () => {
-			isCurrent = false;
-			a11yInfoChangeSubscription.remove();
-		};
 	}, [] );
 
 	const convertedMinHeight = useConvertUnitToMobile(
@@ -623,12 +636,9 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
-		const { getSettings } = select( blockEditorStore );
-
 		const hasInnerBlocks = getBlock( clientId )?.innerBlocks.length > 0;
 
 		return {
-			settings: getSettings(),
 			isParentSelected: selectedBlockClientId === clientId,
 			hasInnerBlocks,
 		};

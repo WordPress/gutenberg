@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### New Features
+
+-   The `WP_DEVTOOL` environment variable can now be used to set the Webpack devtool option for sourcemaps in production builds ([#46812](https://github.com/WordPress/gutenberg/pull/46812)). Previously, this only worked for development builds.
+-   Update default webpack config and lint-style script to allow PostCSS (`.pcss` extension) file usage ([#45352](https://github.com/WordPress/gutenberg/pull/45352)).
+
+## 25.3.0 (2023-02-01)
+
+## 25.2.0 (2023-01-11)
+
+## 25.1.0 (2023-01-02)
+
+## 25.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 24.6.0 (2022-11-16)
+
+## 24.5.0 (2022-11-02)
+
+## 24.4.0 (2022-10-19)
+
+## 24.3.0 (2022-10-05)
+
 ## 24.2.0 (2022-09-21)
 
 ## 24.1.0 (2022-09-13)

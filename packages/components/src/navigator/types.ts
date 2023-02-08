@@ -3,6 +3,11 @@
  */
 import type { ReactNode } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { ButtonAsButtonProps } from '../button/types';
+
 type NavigateOptions = {
 	focusTargetSelector?: string;
 };
@@ -11,6 +16,7 @@ export type NavigatorLocation = NavigateOptions & {
 	isInitial?: boolean;
 	isBack?: boolean;
 	path?: string;
+	hasRestoredFocus?: boolean;
 };
 
 export type NavigatorContext = {
@@ -44,16 +50,7 @@ export type NavigatorScreenProps = {
 	children: ReactNode;
 };
 
-type ButtonProps = {
-	// TODO: should also extend `Button` prop types once the `Button` component
-	// is refactored to TypeScript.
-};
-export type NavigatorBackButtonProps = Omit< ButtonProps, 'href' > & {
-	/**
-	 * The children elements.
-	 */
-	children: ReactNode;
-};
+export type NavigatorBackButtonProps = ButtonAsButtonProps;
 
 export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	/**

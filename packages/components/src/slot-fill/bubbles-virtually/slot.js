@@ -19,19 +19,21 @@ function Slot(
 	{ name, fillProps = {}, as: Component = 'div', ...props },
 	forwardedRef
 ) {
-	const registry = useContext( SlotFillContext );
+	const { registerSlot, unregisterSlot, ...registry } =
+		useContext( SlotFillContext );
 	const ref = useRef();
 
 	useLayoutEffect( () => {
-		registry.registerSlot( name, ref, fillProps );
+		registerSlot( name, ref, fillProps );
 		return () => {
-			registry.unregisterSlot( name, ref );
+			unregisterSlot( name, ref );
 		};
-		// We are not including fillProps in the deps because we don't want to
-		// unregister and register the slot whenever fillProps change, which would
-		// cause the fill to be re-mounted. We are only considering the initial value
-		// of fillProps.
-	}, [ registry.registerSlot, registry.unregisterSlot, name ] );
+		// Ignore reason: We don't want to unregister and register the slot whenever
+		// `fillProps` change, which would cause the fill to be re-mounted. Instead,
+		// we can just update the slot (see hook below).
+		// For more context, see https://github.com/WordPress/gutenberg/pull/44403#discussion_r994415973
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ registerSlot, unregisterSlot, name ] );
 	// fillProps may be an update that interacts with the layout, so we
 	// useLayoutEffect.
 	useLayoutEffect( () => {

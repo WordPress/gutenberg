@@ -52,9 +52,7 @@ describe( 'Guide', () => {
 	} );
 
 	it( 'shows back button and shows finish button on the last page', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		render(
 			<Guide
 				pages={ [
@@ -87,9 +85,7 @@ describe( 'Guide', () => {
 	} );
 
 	it( 'calls onFinish when the finish button is clicked', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onFinish = jest.fn();
 		render(
 			<Guide
@@ -103,9 +99,7 @@ describe( 'Guide', () => {
 	} );
 
 	it( 'calls onFinish when the modal is closed', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onFinish = jest.fn();
 		render(
 			<Guide
@@ -156,9 +150,7 @@ describe( 'Guide', () => {
 		} );
 
 		it( 'sets the current page when a button is clicked', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<Guide
@@ -200,9 +192,7 @@ describe( 'Guide', () => {
 		} );
 
 		it( 'allows navigating through the pages with the left and right arrows', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<Guide

@@ -27,7 +27,7 @@
 			"description": "The name for a block is a unique string that identifies a block. Names have to be structured as `namespace/block-name`, where namespace is the name of your plugin or theme."
 		},
 		"__experimental": {
-			"description": "The name of the experiment this block is a part of, or boolean true if there there is no specific experiment name.",
+			"description": "The name of the experiment this block is a part of, or boolean true if there is no specific experiment name.",
 			"anyOf": [
 				{
 					"type": "string"
@@ -160,6 +160,7 @@
 								"attribute",
 								"text",
 								"html",
+								"raw",
 								"query",
 								"meta"
 							]
@@ -182,13 +183,20 @@
 						},
 						"meta": {
 							"type": "string",
-							"description": "Although attributes may be obtained from a post’s meta, meta attribute sources are considered deprecated; EntityProvider and related hook APIs should be used instead, as shown in the Create Meta Block how-to here:\n\nhttps://developer.wordpress.org/block-editor/how-to-guides/metabox/meta-block-3-add/"
+							"description": "Although attributes may be obtained from a post’s meta, meta attribute sources are considered deprecated; EntityProvider and related hook APIs should be used instead, as shown in the Create Meta Block how-to here:\n\nhttps://developer.wordpress.org/block-editor/how-to-guides/metabox/#step-2-add-meta-block"
 						},
 						"default": {
 							"description": "A block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
 						}
 					},
-					"required": [ "type" ]
+					"anyOf": [
+						{
+							"required": [ "type" ]
+						},
+						{
+							"required": [ "enum" ]
+						}
+					]
 				}
 			},
 			"additionalProperties": false
@@ -271,7 +279,7 @@
 						},
 						"link": {
 							"type": "boolean",
-							"description": "This property adds block controls which allow the user to set link color in a block, link color is disabled by default.\n\nLink color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.link, the attributes definition is extended to include two new attributes: linkColor and style",
+							"description": "This property adds block controls which allow the user to set link color in a block, link color is disabled by default.\n\nLink color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.link, the attributes definition is extended to include the style attribute",
 							"default": false
 						},
 						"text": {
@@ -303,7 +311,7 @@
 				},
 				"inserter": {
 					"type": "boolean",
-					"description": "By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set inserter to false.",
+					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programatically, set inserter to false.",
 					"default": true
 				},
 				"multiple": {
@@ -400,7 +408,7 @@
 		},
 		"styles": {
 			"type": "array",
-			"description": "Block styles can be used to provide alternative styles to block. It works by adding a class name to the block’s wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.\n\nPlugins and Themes can also register custom block style for existing blocks.\n\nhttps://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/#block-styles",
+			"description": "Block styles can be used to provide alternative styles to block. It works by adding a class name to the block’s wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.\n\nPlugins and Themes can also register custom block style for existing blocks.\n\nhttps://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles",
 			"items": {
 				"type": "object",
 				"properties": {
@@ -576,7 +584,7 @@
 						"items": {
 							"enum": [ "inserter", "block", "transform" ]
 						},
-						"default": [ "inseter", "block" ]
+						"default": [ "inserter", "block" ]
 					},
 					"keywords": {
 						"type": "array",

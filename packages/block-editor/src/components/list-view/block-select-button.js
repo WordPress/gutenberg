@@ -12,7 +12,7 @@ import {
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lock } from '@wordpress/icons';
+import { Icon, lockSmall as lock } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 
 /**

@@ -1,12 +1,12 @@
-# Propagating updates for block types 
+# Propagating updates for block types
 
-This resource seeks to offer direction for those needing to provide updates to content, whether in a template for a theme, pattern, or a block over an entire site. Since each content type allows or disallows certain kind of synchronization, it's important to know what's possible before creating to make maintenance easier in the future. 
+This resource seeks to offer direction for those needing to provide updates to content, whether in a template for a theme, pattern, or a block over an entire site. Since each content type allows or disallows certain kind of synchronization, it's important to know what's possible before creating to make maintenance easier in the future.
 
 ## Recommendations on managing updates
 
 ### Establish early what content you expect to require updates
 
-At a high level, it’s important to recognize that not every piece of content can be updated across the entire site and that the method of creation greatly impacts what’s possible. As a result, it’s critical to spend time ahead of creation determining what you expect to need updates and to put that content in the appropriate format. This will make a huge difference in terms of future maintenance. 
+At a high level, it’s important to recognize that not every piece of content can be updated across the entire site and that the method of creation greatly impacts what’s possible. As a result, it’s critical to spend time ahead of creation determining what you expect to need updates and to put that content in the appropriate format. This will make a huge difference in terms of future maintenance.
 
 ### Embrace theme design at the block level
 
@@ -22,7 +22,7 @@ How to manage block updates depends on the nature of the block itself. If the bl
 
 ### Patterns
 
-**For content that you want updated later on, do not use patterns and instead rely on reusable blocks or template parts.** Patterns cannot be updated after you insert one into your site. For context, you can think of Patterns as more like sample/example/starter content. While Patterns exposed in the Inserter might evolve over time, those changes won't be automatically applied to any current useage of the pattern. Once insertered, patterns become completely detached from the original pattern unlike Reusable block or Template Part block. 
+**For content that you want updated later on, do not use patterns and instead rely on reusable blocks or template parts.** Patterns cannot be updated after you insert one into your site. For context, you can think of Patterns as more like sample/example/starter content. While Patterns exposed in the Inserter might evolve over time, those changes won't be automatically applied to any current usage of the pattern. Once inserted, patterns become completely detached from the original pattern unlike Reusable block or Template Part block.
 
 If needed, one potential workaround for patterns with custom styles is to add a class name to the wrapping block for a pattern. For example, the following adds a themeslug-special class to a Group block:
 
@@ -34,7 +34,7 @@ If needed, one potential workaround for patterns with custom styles is to add a 
 <!-- /wp:group -->
 ```
 
-It is not fool-proof because users can modify the class via the editor UI.  However, because this setting is under the "Advanced" panel it is likely to stay intact in most instances. This gives theme authors some CSS control for some pattern types, allowing them to update existing uses. However, it does not prevent users from making massive alterations that cannot be updated. 
+It is not fool-proof because users can modify the class via the editor UI.  However, because this setting is under the "Advanced" panel it is likely to stay intact in most instances. This gives theme authors some CSS control for some pattern types, allowing them to update existing uses. However, it does not prevent users from making massive alterations that cannot be updated.
 
 ### Reusable blocks
 
@@ -47,7 +47,7 @@ Because block themes allow users to directly edit templates and template parts, 
 - Revert all their changes
 - Update the templates and template parts in the database
 
-Generally speaking, if a user has made changes to templates then it’s recommended to leave the templates as is, unless agreed upon with the user (ie in an agency setting). 
+Generally speaking, if a user has made changes to templates then it’s recommended to leave the templates as is, unless agreed upon with the user (ie in an agency setting).
 
 One thing to be mindful of when updating templates is inserting references to new or different template parts.  For example, the templates/page.html template could insert a parts/header.html part in version 1.0 but change that reference to parts/header-alt.html in version 2.0.  Some developers may see this as a "workaround" in instances where users modified the original header.html.  However, this is likely to break a user's customized design since the page.html template would no longer reference the correct part unless they also modified and saved the page template.
 

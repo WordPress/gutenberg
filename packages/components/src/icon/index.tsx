@@ -33,7 +33,7 @@ interface BaseProps< P > {
 	/**
 	 * The size (width and height) of the icon.
 	 *
-	 * @default 24
+	 * @default `20` when a Dashicon is rendered, `24` for all other icons.
 	 */
 	size?: number;
 }
@@ -48,13 +48,14 @@ export type Props< P > = BaseProps< P > & AdditionalProps< IconType< P > >;
 
 function Icon< P >( {
 	icon = null,
-	size = 24,
+	size = 'string' === typeof icon ? 20 : 24,
 	...additionalProps
 }: Props< P > ) {
 	if ( 'string' === typeof icon ) {
 		return (
 			<Dashicon
 				icon={ icon }
+				size={ size }
 				{ ...( additionalProps as HTMLProps< HTMLSpanElement > ) }
 			/>
 		);

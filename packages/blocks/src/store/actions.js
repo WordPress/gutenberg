@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { isPlainObject } from 'is-plain-object';
-import { castArray, pick, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -52,7 +51,7 @@ function isFunction( maybeFunc ) {
  * @param {Object}      thunkArgs        Argument object for the thunk middleware.
  * @param {Function}    thunkArgs.select Function to select from the store.
  *
- * @return {?WPBlockType} The block, if it has been successfully registered; otherwise `undefined`.
+ * @return {WPBlockType | undefined} The block, if it has been successfully registered; otherwise `undefined`.
  */
 const processBlockType = ( blockType, { select } ) => {
 	const { name } = blockType;
@@ -72,23 +71,24 @@ const processBlockType = ( blockType, { select } ) => {
 
 	if ( settings.deprecated ) {
 		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
-			pick(
-				// Only keep valid deprecation keys.
-				applyFilters(
-					'blocks.registerBlockType',
-					// Merge deprecation keys with pre-filter settings
-					// so that filters that depend on specific keys being
-					// present don't fail.
-					{
-						// Omit deprecation keys here so that deprecations
-						// can opt out of specific keys like "supports".
-						...omit( blockType, DEPRECATED_ENTRY_KEYS ),
-						...deprecation,
-					},
-					name,
-					deprecation
-				),
-				DEPRECATED_ENTRY_KEYS
+			Object.fromEntries(
+				Object.entries(
+					// Only keep valid deprecation keys.
+					applyFilters(
+						'blocks.registerBlockType',
+						// Merge deprecation keys with pre-filter settings
+						// so that filters that depend on specific keys being
+						// present don't fail.
+						{
+							// Omit deprecation keys here so that deprecations
+							// can opt out of specific keys like "supports".
+							...omit( blockType, DEPRECATED_ENTRY_KEYS ),
+							...deprecation,
+						},
+						name,
+						deprecation
+					)
+				).filter( ( [ key ] ) => DEPRECATED_ENTRY_KEYS.includes( key ) )
 			)
 		);
 	}
@@ -114,9 +114,9 @@ const processBlockType = ( blockType, { select } ) => {
 
 	if (
 		'category' in settings &&
-		! some( select.getCategories(), {
-			slug: settings.category,
-		} )
+		! select
+			.getCategories()
+			.some( ( { slug } ) => slug === settings.category )
 	) {
 		warn(
 			'The block "' +
@@ -163,7 +163,7 @@ const processBlockType = ( blockType, { select } ) => {
 export function addBlockTypes( blockTypes ) {
 	return {
 		type: 'ADD_BLOCK_TYPES',
-		blockTypes: castArray( blockTypes ),
+		blockTypes: Array.isArray( blockTypes ) ? blockTypes : [ blockTypes ],
 	};
 }
 
@@ -242,7 +242,7 @@ export const __experimentalReapplyBlockTypeFilters =
 export function removeBlockTypes( names ) {
 	return {
 		type: 'REMOVE_BLOCK_TYPES',
-		names: castArray( names ),
+		names: Array.isArray( names ) ? names : [ names ],
 	};
 }
 
@@ -260,7 +260,7 @@ export function removeBlockTypes( names ) {
 export function addBlockStyles( blockName, styles ) {
 	return {
 		type: 'ADD_BLOCK_STYLES',
-		styles: castArray( styles ),
+		styles: Array.isArray( styles ) ? styles : [ styles ],
 		blockName,
 	};
 }
@@ -279,7 +279,7 @@ export function addBlockStyles( blockName, styles ) {
 export function removeBlockStyles( blockName, styleNames ) {
 	return {
 		type: 'REMOVE_BLOCK_STYLES',
-		styleNames: castArray( styleNames ),
+		styleNames: Array.isArray( styleNames ) ? styleNames : [ styleNames ],
 		blockName,
 	};
 }
@@ -298,7 +298,7 @@ export function removeBlockStyles( blockName, styleNames ) {
 export function addBlockVariations( blockName, variations ) {
 	return {
 		type: 'ADD_BLOCK_VARIATIONS',
-		variations: castArray( variations ),
+		variations: Array.isArray( variations ) ? variations : [ variations ],
 		blockName,
 	};
 }
@@ -317,7 +317,9 @@ export function addBlockVariations( blockName, variations ) {
 export function removeBlockVariations( blockName, variationNames ) {
 	return {
 		type: 'REMOVE_BLOCK_VARIATIONS',
-		variationNames: castArray( variationNames ),
+		variationNames: Array.isArray( variationNames )
+			? variationNames
+			: [ variationNames ],
 		blockName,
 	};
 }

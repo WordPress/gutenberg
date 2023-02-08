@@ -6,37 +6,40 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useSetting } from './hooks';
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting } = unlock( blockEditorExperiments );
 
 export default function ColorPalettePanel( { name } ) {
-	const [ themeColors, setThemeColors ] = useSetting(
+	const [ themeColors, setThemeColors ] = useGlobalSetting(
 		'color.palette.theme',
 		name
 	);
-	const [ baseThemeColors ] = useSetting(
+	const [ baseThemeColors ] = useGlobalSetting(
 		'color.palette.theme',
 		name,
 		'base'
 	);
-	const [ defaultColors, setDefaultColors ] = useSetting(
+	const [ defaultColors, setDefaultColors ] = useGlobalSetting(
 		'color.palette.default',
 		name
 	);
-	const [ baseDefaultColors ] = useSetting(
+	const [ baseDefaultColors ] = useGlobalSetting(
 		'color.palette.default',
 		name,
 		'base'
 	);
-	const [ customColors, setCustomColors ] = useSetting(
+	const [ customColors, setCustomColors ] = useGlobalSetting(
 		'color.palette.custom',
 		name
 	);
 
-	const [ defaultPaletteEnabled ] = useSetting(
+	const [ defaultPaletteEnabled ] = useGlobalSetting(
 		'color.defaultPalette',
 		name
 	);
@@ -52,6 +55,7 @@ export default function ColorPalettePanel( { name } ) {
 					colors={ themeColors }
 					onChange={ setThemeColors }
 					paletteLabel={ __( 'Theme' ) }
+					paletteLabelHeadingLevel={ 3 }
 				/>
 			) }
 			{ !! defaultColors &&
@@ -63,12 +67,14 @@ export default function ColorPalettePanel( { name } ) {
 						colors={ defaultColors }
 						onChange={ setDefaultColors }
 						paletteLabel={ __( 'Default' ) }
+						paletteLabelHeadingLevel={ 3 }
 					/>
 				) }
 			<PaletteEdit
 				colors={ customColors }
 				onChange={ setCustomColors }
 				paletteLabel={ __( 'Custom' ) }
+				paletteLabelHeadingLevel={ 3 }
 				emptyMessage={ __(
 					'Custom colors are empty! Add some colors to create your own color palette.'
 				) }

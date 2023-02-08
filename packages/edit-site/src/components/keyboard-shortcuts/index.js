@@ -6,6 +6,7 @@ import {
 	useShortcut,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
+import { isAppleOS } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -15,10 +16,10 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { SIDEBAR_BLOCK } from '../sidebar/constants';
+import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 import { STORE_NAME } from '../../store/constants';
 
-function KeyboardShortcuts( { openEntitiesSavedStates } ) {
+function KeyboardShortcuts() {
 	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 		useSelect( coreStore );
 	const { getEditorMode } = useSelect( editSiteStore );
@@ -38,6 +39,7 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		useDispatch( editSiteStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
+	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 
 	useShortcut( 'core/edit-site/save', ( event ) => {
 		event.preventDefault();
@@ -49,7 +51,7 @@ function KeyboardShortcuts( { openEntitiesSavedStates } ) {
 		);
 
 		if ( ! isSaving && isDirty ) {
-			openEntitiesSavedStates();
+			setIsSaveViewOpened( true );
 		}
 	} );
 
@@ -118,6 +120,18 @@ function KeyboardShortcutsRegister() {
 				modifier: 'primaryShift',
 				character: 'z',
 			},
+			// Disable on Apple OS because it conflicts with the browser's
+			// history shortcut. It's a fine alias for both Windows and Linux.
+			// Since there's no conflict for Ctrl+Shift+Z on both Windows and
+			// Linux, we keep it as the default for consistency.
+			aliases: isAppleOS()
+				? []
+				: [
+						{
+							modifier: 'primary',
+							character: 'y',
+						},
+				  ],
 		} );
 
 		registerShortcut( {
@@ -178,6 +192,10 @@ function KeyboardShortcutsRegister() {
 				{
 					modifier: 'access',
 					character: 'p',
+				},
+				{
+					modifier: 'ctrlShift',
+					character: '~',
 				},
 			],
 		} );

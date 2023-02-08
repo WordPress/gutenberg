@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences",
-	"version": "2.10.0",
+	"version": "3.3.0",
 	"description": "Utilities for managing WordPress preferences.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -38,8 +38,8 @@
 		"classnames": "^2.3.1"
 	},
 	"peerDependencies": {
-		"react": "^17.0.0",
-		"react-dom": "^17.0.0"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

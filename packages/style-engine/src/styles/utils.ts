@@ -129,7 +129,7 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 /**
  * Capitalizes the first letter in a string.
  *
- * @param string The string whose first letter the function will capitalize.
+ * @param  string The string whose first letter the function will capitalize.
  *
  * @return String with the first letter capitalized.
  */
@@ -141,7 +141,7 @@ export function upperFirst( string: string ): string {
 /**
  * Converts an array of strings into a camelCase string.
  *
- * @param strings The strings to join into a camelCase string.
+ * @param  strings The strings to join into a camelCase string.
  *
  * @return camelCase string.
  */

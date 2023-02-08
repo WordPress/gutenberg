@@ -22,15 +22,6 @@ const fakePath = expect.objectContaining( {
 } );
 
 describe( 'FormFileUpload', () => {
-	beforeEach( () => {
-		jest.useFakeTimers();
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
-	} );
-
 	it( 'should show an Icon Button and a hidden input', () => {
 		render(
 			<FormFileUpload onChange={ () => {} }>
@@ -41,13 +32,11 @@ describe( 'FormFileUpload', () => {
 		const button = screen.getByText( 'My Upload Button' );
 		const input = screen.getByTestId( 'form-file-upload-input' );
 		expect( button ).toBeInTheDocument();
-		expect( input.style.display ).toBe( 'none' );
+		expect( input ).toHaveStyle( 'display: none' );
 	} );
 
 	it( 'should not fire a change event after selecting the same file', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChange = jest.fn();
 
@@ -72,9 +61,7 @@ describe( 'FormFileUpload', () => {
 	} );
 
 	it( 'should fire a change event after selecting the same file if the value was reset in between', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChange = jest.fn();
 

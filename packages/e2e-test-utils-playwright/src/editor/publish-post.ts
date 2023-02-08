@@ -11,18 +11,16 @@ import type { Editor } from './index';
  */
 export async function publishPost( this: Editor ) {
 	await this.page.click( 'role=button[name="Publish"i]' );
-	const publishEditorPanel = this.page.locator(
-		'role=region[name="Publish editor"i]'
+	const entitiesSaveButton = this.page.locator(
+		'role=region[name="Editor publish"i] >> role=button[name="Save"i]'
 	);
 
-	const isPublishEditorVisible = await publishEditorPanel.isVisible();
+	const isEntitiesSavePanelVisible = await entitiesSaveButton.isVisible();
 
 	// Save any entities.
-	if ( isPublishEditorVisible ) {
+	if ( isEntitiesSavePanelVisible ) {
 		// Handle saving entities.
-		await this.page.click(
-			'role=region[name="Editor publish"i] >> role=button[name="Save"i]'
-		);
+		await entitiesSaveButton.click();
 	}
 
 	// Handle saving just the post.

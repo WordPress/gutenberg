@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, some } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -57,9 +57,10 @@ export default function useImageSizes( images, isSelected, getSettings ) {
 				};
 			}, {} );
 		}
+		const resizedImageSizes = Object.values( resizedImages );
 		return imageSizes
 			.filter( ( { slug } ) =>
-				some( resizedImages, ( sizes ) => sizes[ slug ] )
+				resizedImageSizes.some( ( sizes ) => sizes[ slug ] )
 			)
 			.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 	}

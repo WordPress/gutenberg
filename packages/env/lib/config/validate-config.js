@@ -6,7 +6,7 @@
  */
 
 /**
- * Error subtype which indicates that an expected validation erorr occured
+ * Error subtype which indicates that an expected validation erorr occurred
  * while reading wp-env configuration.
  */
 class ValidationError extends Error {}
@@ -16,7 +16,7 @@ class ValidationError extends Error {}
  * do not match the required format.
  *
  * @param {Object}  config      A config object to validate.
- * @param {?string} envLocation Identifies if the error occured in a specific environment property.
+ * @param {?string} envLocation Identifies if the error occurred in a specific environment property.
  * @return {Object} The passed config object with no modifications.
  */
 function validateConfig( config, envLocation ) {

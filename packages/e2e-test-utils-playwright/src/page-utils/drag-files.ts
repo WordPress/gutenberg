@@ -9,6 +9,7 @@ import { getType } from 'mime';
  * Internal dependencies
  */
 import type { PageUtils } from './index';
+import type { Locator } from '@playwright/test';
 
 type FileObject = {
 	name: string;
@@ -99,14 +100,19 @@ async function dragFiles(
 		/**
 		 * Drag the files over an element (fires `dragenter` and `dragover` events).
 		 *
-		 * @param  selector         A selector to search for an element.
-		 * @param  options          The optional options.
-		 * @param  options.position A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+		 * @param  selectorOrLocator A selector or a locator to search for an element.
+		 * @param  options           The optional options.
+		 * @param  options.position  A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
 		 */
-		dragOver: async ( selector: string, options: Options = {} ) => {
-			const boundingBox = await this.page
-				.locator( selector )
-				.boundingBox();
+		dragOver: async (
+			selectorOrLocator: string | Locator,
+			options: Options = {}
+		) => {
+			const locator =
+				typeof selectorOrLocator === 'string'
+					? this.page.locator( selectorOrLocator )
+					: selectorOrLocator;
+			const boundingBox = await locator.boundingBox();
 
 			if ( ! boundingBox ) {
 				throw new Error(

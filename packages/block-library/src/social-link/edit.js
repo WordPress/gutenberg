@@ -12,7 +12,7 @@ import {
 	URLInput,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Fragment, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	PanelBody,
@@ -43,6 +43,7 @@ const SocialLinkURLPopover = ( {
 		>
 			<div className="block-editor-url-input">
 				<URLInput
+					__nextHasNoMarginBottom
 					value={ url }
 					onChange={ ( nextURL ) =>
 						setAttributes( { url: nextURL } )
@@ -66,7 +67,7 @@ const SocialLinkEdit = ( {
 	isSelected,
 	setAttributes,
 } ) => {
-	const { url, service, label } = attributes;
+	const { url, service, label, rel } = attributes;
 	const { showLabels, iconColorValue, iconBackgroundColorValue } = context;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
@@ -89,7 +90,7 @@ const SocialLinkEdit = ( {
 	} );
 
 	return (
-		<Fragment>
+		<>
 			<InspectorControls>
 				<PanelBody
 					title={ sprintf(
@@ -101,17 +102,26 @@ const SocialLinkEdit = ( {
 				>
 					<PanelRow>
 						<TextControl
+							__nextHasNoMarginBottom
 							label={ __( 'Link label' ) }
 							help={ __(
 								'Briefly describe the link to help screen reader users.'
 							) }
-							value={ label }
+							value={ label || '' }
 							onChange={ ( value ) =>
 								setAttributes( { label: value } )
 							}
 						/>
 					</PanelRow>
 				</PanelBody>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<TextControl
+					__nextHasNoMarginBottom
+					label={ __( 'Link rel' ) }
+					value={ rel || '' }
+					onChange={ ( value ) => setAttributes( { rel: value } ) }
+				/>
 			</InspectorControls>
 			<li { ...blockProps }>
 				<Button
@@ -137,7 +147,7 @@ const SocialLinkEdit = ( {
 					) }
 				</Button>
 			</li>
-		</Fragment>
+		</>
 	);
 };
 

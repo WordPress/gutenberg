@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -45,10 +45,16 @@ export default ( mapNodeToProps ) =>
 						this.nodeRef,
 						this.props
 					);
-					if ( ! isEqual( newFallbackStyles, fallbackStyles ) ) {
+
+					if (
+						! fastDeepEqual( newFallbackStyles, fallbackStyles )
+					) {
 						this.setState( {
 							fallbackStyles: newFallbackStyles,
-							grabStylesCompleted: !! every( newFallbackStyles ),
+							grabStylesCompleted:
+								Object.values( newFallbackStyles ).every(
+									Boolean
+								),
 						} );
 					}
 				}

@@ -98,7 +98,14 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
+		$font_sizes['inline_styles'] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $context['style']['typography']['fontSize'],
+				)
+			)
+		);
 	}
 
 	return $font_sizes;
@@ -112,6 +119,33 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 function block_core_navigation_link_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
+
+/**
+ * Decodes a url if it's encoded, returning the same url if not.
+ *
+ * @param string $url The url to decode.
+ *
+ * @return string $url Returns the decoded url.
+ */
+function block_core_navigation_link_maybe_urldecode( $url ) {
+	$is_url_encoded = false;
+	$query          = parse_url( $url, PHP_URL_QUERY );
+	$query_params   = wp_parse_args( $query );
+
+	foreach ( $query_params as $query_param ) {
+		if ( rawurldecode( $query_param ) !== $query_param ) {
+			$is_url_encoded = true;
+			break;
+		}
+	}
+
+	if ( $is_url_encoded ) {
+		return rawurldecode( $url );
+	}
+
+	return $url;
+}
+
 
 /**
  * Renders the `core/navigation-link` block.
@@ -164,7 +198,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['url'] ) ) {
-		$html .= ' href="' . esc_url( $attributes['url'] ) . '"';
+		$html .= ' href="' . esc_url( block_core_navigation_link_maybe_urldecode( $attributes['url'] ) ) . '"';
 	}
 
 	if ( $is_active ) {

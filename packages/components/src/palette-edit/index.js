@@ -6,7 +6,7 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import {
@@ -89,6 +89,50 @@ export function getNameForPosition( elements, slugPrefix ) {
 	);
 }
 
+function ColorPickerPopover( {
+	isGradient,
+	element,
+	onChange,
+	onClose = () => {},
+} ) {
+	return (
+		<Popover
+			placement="left-start"
+			offset={ 20 }
+			className="components-palette-edit__popover"
+			onClose={ onClose }
+		>
+			{ ! isGradient && (
+				<ColorPicker
+					color={ element.color }
+					enableAlpha
+					onChange={ ( newColor ) =>
+						onChange( {
+							...element,
+							color: newColor,
+						} )
+					}
+				/>
+			) }
+			{ isGradient && (
+				<div className="components-palette-edit__popover-gradient-picker">
+					<CustomGradientPicker
+						__nextHasNoMargin
+						__experimentalIsRenderedInSidebar
+						value={ element.gradient }
+						onChange={ ( newGradient ) =>
+							onChange( {
+								...element,
+								gradient: newGradient,
+							} )
+						}
+					/>
+				</div>
+			) }
+		</Popover>
+	);
+}
+
 function Option( {
 	canOnlyChangeValues,
 	element,
@@ -155,39 +199,11 @@ function Option( {
 				) }
 			</HStack>
 			{ isEditing && (
-				<Popover
-					placement="left-start"
-					offset={ 20 }
-					className="components-palette-edit__popover"
-				>
-					{ ! isGradient && (
-						<ColorPicker
-							color={ value }
-							enableAlpha
-							onChange={ ( newColor ) =>
-								onChange( {
-									...element,
-									color: newColor,
-								} )
-							}
-						/>
-					) }
-					{ isGradient && (
-						<div className="components-palette-edit__popover-gradient-picker">
-							<CustomGradientPicker
-								__nextHasNoMargin
-								__experimentalIsRenderedInSidebar
-								value={ value }
-								onChange={ ( newGradient ) =>
-									onChange( {
-										...element,
-										gradient: newGradient,
-									} )
-								}
-							/>
-						</div>
-					) }
-				</Popover>
+				<ColorPickerPopover
+					isGradient={ isGradient }
+					onChange={ onChange }
+					element={ element }
+				/>
 			) }
 		</PaletteItem>
 	);
@@ -229,6 +245,9 @@ function PaletteEditListView( {
 				onChange( newElements.length ? newElements : undefined );
 			}
 		};
+		// Disable reason: adding the missing dependency here would cause breaking changes that will require
+		// a heavier refactor to avoid. See https://github.com/WordPress/gutenberg/pull/43911
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	const debounceOnChange = useDebounce( onChange, 100 );
@@ -294,6 +313,7 @@ export default function PaletteEdit( {
 	colors = EMPTY_ARRAY,
 	onChange,
 	paletteLabel,
+	paletteLabelHeadingLevel = 2,
 	emptyMessage,
 	canOnlyChangeValues,
 	canReset,
@@ -310,11 +330,27 @@ export default function PaletteEdit( {
 		! elements[ editingElement ].slug;
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
+	const debounceOnChange = useDebounce( onChange, 100 );
+	const onSelectPaletteItem = useCallback(
+		( value, newEditingElementIndex ) => {
+			const selectedElement = elements[ newEditingElementIndex ];
+			const key = isGradient ? 'gradient' : 'color';
+			// Ensures that the index returned matches a known element value.
+			if ( !! selectedElement && selectedElement[ key ] === value ) {
+				setEditingElement( newEditingElementIndex );
+			} else {
+				setIsEditing( true );
+			}
+		},
+		[ isGradient, elements ]
+	);
 
 	return (
 		<PaletteEditStyles>
 			<PaletteHStackHeader>
-				<PaletteHeading>{ paletteLabel }</PaletteHeading>
+				<PaletteHeading level={ paletteLabelHeadingLevel }>
+					{ paletteLabel }
+				</PaletteHeading>
 				<PaletteActionsContainer>
 					{ hasElements && isEditing && (
 						<DoneButton
@@ -388,9 +424,7 @@ export default function PaletteEdit( {
 													} }
 													className="components-palette-edit__menu-button"
 												>
-													{ isGradient
-														? __( 'Edit gradients' )
-														: __( 'Edit colors' ) }
+													{ __( 'Show details' ) }
 												</Button>
 											) }
 											{ ! canOnlyChangeValues && (
@@ -451,19 +485,40 @@ export default function PaletteEdit( {
 							isGradient={ isGradient }
 						/>
 					) }
+					{ ! isEditing && editingElement !== null && (
+						<ColorPickerPopover
+							isGradient={ isGradient }
+							onClose={ () => setEditingElement( null ) }
+							onChange={ ( newElement ) => {
+								debounceOnChange(
+									elements.map(
+										( currentElement, currentIndex ) => {
+											if (
+												currentIndex === editingElement
+											) {
+												return newElement;
+											}
+											return currentElement;
+										}
+									)
+								);
+							} }
+							element={ elements[ editingElement ] }
+						/>
+					) }
 					{ ! isEditing &&
 						( isGradient ? (
 							<GradientPicker
 								__nextHasNoMargin
 								gradients={ gradients }
-								onChange={ () => {} }
+								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomGradients={ true }
 							/>
 						) : (
 							<ColorPalette
 								colors={ colors }
-								onChange={ () => {} }
+								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomColors={ true }
 							/>
