@@ -15,6 +15,8 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 import type { CircularOptionPickerProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
+import type { ButtonAsButtonProps } from '../button/types';
 
 function Option( props ) {
 	const {
@@ -77,8 +79,11 @@ function DropdownLinkAction( props ) {
 	);
 }
 
-function ButtonAction( props ) {
-	const { className, children, ...additionalProps } = props;
+function ButtonAction( {
+	className,
+	children,
+	...additionalProps
+}: WordPressComponentProps< ButtonAsButtonProps, 'button', false > ) {
 	return (
 		<Button
 			className={ classnames(
