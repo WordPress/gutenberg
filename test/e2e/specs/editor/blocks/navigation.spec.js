@@ -96,7 +96,7 @@ test.describe(
 			await page.goto( '/' );
 			await expect(
 				page.locator(
-					'role=navigation >> nth=1 >> role=link[name="WordPress"]'
+					'role=navigation >> nth=1 >> role=link[name="WordPress"i]'
 				)
 			).toBeVisible();
 		} );
