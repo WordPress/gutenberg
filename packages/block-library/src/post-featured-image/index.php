@@ -80,13 +80,13 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = $featured_image . $overlay_markup;
 	}
 
-	$aspect_ratio  = ! empty( $attributes['aspectRatio'] )
+	$aspect_ratio = ! empty( $attributes['aspectRatio'] )
 		? esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ) . ';'
 		: '';
-	$width         = ! empty( $attributes['width'] )
+	$width        = ! empty( $attributes['width'] )
 		? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';'
 		: '';
-	$height        = ! empty( $attributes['height'] )
+	$height       = ! empty( $attributes['height'] )
 		? esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . ';'
 		: '';
 	if ( ! $height && ! $width && ! $aspect_ratio ) {
