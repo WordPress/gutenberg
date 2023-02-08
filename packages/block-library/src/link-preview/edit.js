@@ -34,9 +34,12 @@ export default function LinkPreviewEdit( props ) {
 
 	const blockProps = useBlockProps( {
 		href: url,
-		onClick( event ) {
-			event.preventDefault();
-		},
+		onClick:
+			url && title
+				? ( event ) => {
+						event.preventDefault();
+				  }
+				: undefined,
 	} );
 
 	if ( ! url ) {
