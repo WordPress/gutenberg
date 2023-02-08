@@ -137,13 +137,13 @@ export default function Editor() {
 		[ context ]
 	);
 	const isReady = editedPostType !== undefined && editedPostId !== undefined;
-	const type =
-		editedPostType === 'wp_template'
-			? __( 'Template' )
-			: __( 'Template Part' );
-	let titleBreadcrumb;
 
+	let titleBreadcrumb;
 	if ( isReady && editedPost ) {
+		const type =
+			editedPostType === 'wp_template'
+				? __( 'Template' )
+				: __( 'Template Part' );
 		titleBreadcrumb = `${ editedPost.title?.rendered } ‹ ${ type } ‹ `;
 	}
 
