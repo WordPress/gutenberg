@@ -14,6 +14,7 @@ import { Icon, check } from '@wordpress/icons';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
+import type { CircularOptionPickerProps } from './types';
 
 function Option( props ) {
 	const {
@@ -92,7 +93,9 @@ function ButtonAction( props ) {
 	);
 }
 
-export default function CircularOptionPicker( props ) {
+export default function CircularOptionPicker(
+	props: CircularOptionPickerProps
+) {
 	const { actions, className, options, children } = props;
 	return (
 		<div
