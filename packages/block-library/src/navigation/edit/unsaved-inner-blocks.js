@@ -43,6 +43,7 @@ export default function UnsavedInnerBlocks( {
 	hasSelection,
 } ) {
 	const originalBlocks = useRef();
+	const isCreatingMenu = useRef( false );
 
 	useEffect( () => {
 		// Initially store the uncontrolled inner blocks for
@@ -125,6 +126,8 @@ export default function UnsavedInnerBlocks( {
 
 	// Automatically save the uncontrolled blocks.
 	useEffect( () => {
+		// Don't allow menus to be created when one is already being created.
+		//
 		// The block will be disabled when used in a BlockPreview.
 		// In this case avoid automatic creation of a wp_navigation post.
 		// Otherwise the user will be spammed with lots of menus!
@@ -138,6 +141,7 @@ export default function UnsavedInnerBlocks( {
 		// And finally only create the menu when the block is selected,
 		// which is an indication they want to start editing.
 		if (
+			isCreatingMenu.current ||
 			isDisabled ||
 			isSaving ||
 			! hasResolvedDraftNavigationMenus ||
@@ -148,7 +152,13 @@ export default function UnsavedInnerBlocks( {
 			return;
 		}
 
-		createNavigationMenu( null, blocks );
+		// Flag that a menu is being created.
+		isCreatingMenu.current = true;
+
+		createNavigationMenu( null, blocks ).finally( () => {
+			// Flag that a menu is no longer being created.
+			isCreatingMenu.current = false;
+		} );
 	}, [
 		isDisabled,
 		isSaving,
