@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useBlockProps, BlockControls } from '@wordpress/block-editor';
 import { __experimentalFetchUrlData } from '@wordpress/core-data';
 import {
@@ -32,6 +32,19 @@ export default function LinkPreviewEdit( props ) {
 					event.preventDefault();
 			  },
 	} );
+
+	useEffect( () => {
+		if ( url && ! title && ! icon && ! image ) {
+			setIsFetching( true );
+			__experimentalFetchUrlData( url )
+				.then( ( data ) => {
+					setAttributes( data );
+				} )
+				.finally( () => {
+					setIsFetching( false );
+				} );
+		}
+	}, [] );
 
 	if ( isEditingUrl ) {
 		return (

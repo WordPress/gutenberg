@@ -21,6 +21,22 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/embed' ],
+			transform: ( { url } ) => {
+				return createBlock( 'core/embed', {
+					url,
+				} );
+			},
+		},
+	],
+	from: [
+		{
+			type: 'block',
+			blocks: [ 'core/embed' ],
+			transform: ( { url } ) => {
+				return createBlock( 'core/link-preview', {
+					url,
+				} );
+			},
 		},
 	],
 };
