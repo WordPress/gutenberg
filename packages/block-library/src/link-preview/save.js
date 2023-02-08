@@ -6,24 +6,28 @@ import { useBlockProps } from '@wordpress/block-editor';
 export default function save( { attributes } ) {
 	const { url, title, image, icon } = attributes;
 
-	if ( ! url || ! title ) {
+	if ( ! url ) {
 		return null;
 	}
 
 	return (
-		<a { ...useBlockProps.save( { href: url } ) }>
-			<img src={ image } alt={ title } />
+		<a
+			{ ...useBlockProps.save( {
+				href: url,
+				className: image ? 'has-image' : undefined,
+			} ) }
+		>
+			{ image && <img src={ image } alt={ title } /> }
 			<div>
-				<strong>{ title }</strong>
-				<br />
-				<span>
+				{ title && <strong>{ title }</strong> }
+				{ icon && (
 					<img
 						className="link-preview__icon"
 						src={ icon }
 						alt={ new URL( url ).host }
-					/>{ ' ' }
-					{ new URL( url ).host }
-				</span>
+					/>
+				) }
+				{ title ? new URL( url ).host.replace( /^www\./, '' ) : url }
 			</div>
 		</a>
 	);

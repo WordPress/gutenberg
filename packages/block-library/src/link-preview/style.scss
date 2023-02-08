@@ -1,19 +1,25 @@
-a.wp-block-link-preview.wp-block-link-preview {
+a.wp-block-link-preview {
 	display: block;
 	border: 1px solid #d3d3d3;
-	height: 100px;
+	border-radius: 2px;
 	font-size: smaller;
-	text-decoration: none !important;
-	color: inherit !important;
+
+	&.has-image {
+		height: 100px;
+	}
+
+	strong {
+		display: block;
+	}
 
 	> div {
-		padding: 10px;
-		overflow: hidden;
+		padding: 1em;
 	}
 
 	.link-preview__icon {
 		height: 1em;
 		width: 1em;
+		margin-right: 0.25em;
 	}
 
 	> img {
