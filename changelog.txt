@@ -1,8 +1,6 @@
 == Changelog ==
 
-= 15.1.0-rc.1 =
-
-
+= 15.1.0 =
 
 ## Changelog
 
@@ -33,6 +31,7 @@
 - Migrate from TextControl to InputControl to remove margin overrides. ([47161](https://github.com/WordPress/gutenberg/pull/47161))
 - Multiple blocks: Add missing has-link-color class to the front. ([47357](https://github.com/WordPress/gutenberg/pull/47357))
 - [Navigation]: Update example with no mobile view. ([47508](https://github.com/WordPress/gutenberg/pull/47508))
+- Navigation Block List View: Improve the accessible Name of the Tree Grid inside the component. ([47031](https://github.com/WordPress/gutenberg/pull/47031))
 
 #### Global Styles
 - Add "Learn more about CSS" help text to Custom CSS control. ([47091](https://github.com/WordPress/gutenberg/pull/47091))
@@ -43,6 +42,8 @@
 - Move custom CSS to ellipsis menu if no custom CSS present yet. ([47371](https://github.com/WordPress/gutenberg/pull/47371))
 - Move custom css to its own inline style generation method and combine with customizer CSS. ([47396](https://github.com/WordPress/gutenberg/pull/47396))
 - ToggleGroupControl: Add new opt-in prop. ([47269](https://github.com/WordPress/gutenberg/pull/47269))
+- Add check for edit CSS capability to overflow menu. ([47714](https://github.com/WordPress/gutenberg/pull/47714))
+- Reselect blocks after pasting styles. ([47590](https://github.com/WordPress/gutenberg/pull/47590))
 
 #### Site Editor
 - Global Styles: Try per block custom CSS. ([46571](https://github.com/WordPress/gutenberg/pull/46571))
@@ -58,6 +59,11 @@
 - Add missing controls to flex layouts. ([47134](https://github.com/WordPress/gutenberg/pull/47134))
 - Always pass layout to inner blocks. ([47477](https://github.com/WordPress/gutenberg/pull/47477))
 - Site Hub: Remove the aria-label from the Edit button. ([47343](https://github.com/WordPress/gutenberg/pull/47343))
+- Add ability to open the editor on the selected post on navigation. ([47387](https://github.com/WordPress/gutenberg/pull/47387))
+- Allow clicking the site editor frame to enter edit mode. ([47676](https://github.com/WordPress/gutenberg/pull/47676))
+- Pattern Explorer Modal: Select the first category as the initial category. ([47661](https://github.com/WordPress/gutenberg/pull/47661))
+- [Patterns]: Support the `blockTypes` prop for patterns fetched from Pattern Directory. ([47677](https://github.com/WordPress/gutenberg/pull/47677))
+- Sticky Position: Fix top position while logged in on mobile. ([47665](https://github.com/WordPress/gutenberg/pull/47665))
 
 #### Testing
 - Clean up sidebar tab end-to-end test utils. ([47097](https://github.com/WordPress/gutenberg/pull/47097))
@@ -110,6 +116,10 @@
 - Add an alt attribute to the linked featured image if there is no post title. ([46830](https://github.com/WordPress/gutenberg/pull/46830))
 - Post Template: Add default value for `offset`. ([47308](https://github.com/WordPress/gutenberg/pull/47308))
 - Parse (area-specific) context in template-part block. ([47203](https://github.com/WordPress/gutenberg/pull/47203))
+- Don't use methods with the 'gutenberg_' prefix. ([47649](https://github.com/WordPress/gutenberg/pull/47649))
+- Navigation: Only show the deleted menu warning if a ref is specified. ([47699](https://github.com/WordPress/gutenberg/pull/47699))
+- [Query Loop]: Guard term addtion when the request hasn't resolved. ([47688](https://github.com/WordPress/gutenberg/pull/47688))
+
 
 #### Block Editor
 - Fix Link Control action button visuals. ([47306](https://github.com/WordPress/gutenberg/pull/47306))
@@ -136,6 +146,8 @@
 - Fix Post Visibility end-to-end tests. ([47520](https://github.com/WordPress/gutenberg/pull/47520))
 - Fix padding and margin visualizer positioning. ([47483](https://github.com/WordPress/gutenberg/pull/47483))
 - Fix padding and margin visualizer styles. ([47139](https://github.com/WordPress/gutenberg/pull/47139))
+- Pattern Inserter: Fix unintended preview panel display when hovering mouse over pattern. ([47693](https://github.com/WordPress/gutenberg/pull/47693))
+
 
 #### Site Editor
 - Allow resizing the sidebar in the site editor using keyboard. ([47176](https://github.com/WordPress/gutenberg/pull/47176))
@@ -244,6 +256,7 @@
 - Use variation as a prop instead of variationProp in the global styles UI. ([47455](https://github.com/WordPress/gutenberg/pull/47455))
 - Update theme.json. ([47620](https://github.com/WordPress/gutenberg/pull/47620))
 - Template Parts: Add unit tests for template part creation functions. ([47224](https://github.com/WordPress/gutenberg/pull/47224))
+- Lock browse mode selectors and actions. ([47678](https://github.com/WordPress/gutenberg/pull/47678))
 
 #### Block Library
 - Export off canvas editor via experiments package. ([47465](https://github.com/WordPress/gutenberg/pull/47465))
@@ -286,7 +299,7 @@
 - ESLint: Enable `jest/recommended` for tests. ([47065](https://github.com/WordPress/gutenberg/pull/47065))
 - Remove old test now migrated to Playwright. ([47247](https://github.com/WordPress/gutenberg/pull/47247))
 - RichText tests: Don't use JSDOM explicitly, it's set up by environment. ([47445](https://github.com/WordPress/gutenberg/pull/47445))
-
+- Position Block Support: Add PHP tests. ([47626](https://github.com/WordPress/gutenberg/pull/47626))
 
 ### Tools
 
@@ -302,6 +315,7 @@
 - core-data: Refactor tests to use real timers. ([47218](https://github.com/WordPress/gutenberg/pull/47218))
 - test: Add separate mobile experiments file. ([47513](https://github.com/WordPress/gutenberg/pull/47513))
 - Migrate a11y end-to-end tests to Playwright. ([46038](https://github.com/WordPress/gutenberg/pull/46038))
+- Copy failing WP_HTML_Tag_Processor_Bookmark_Test tests from Core. ([47720](https://github.com/WordPress/gutenberg/pull/47720))
 
 #### Build Tooling
 - Add test for experimental/block-editor-settings-mobile endpoint. ([46816](https://github.com/WordPress/gutenberg/pull/46816))
@@ -329,6 +343,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @adamziel @afercia @ajlende @andrewserong @annezazu @anton-vlasenko @apeatling @audrasjb @brookewp @carolinan @chad1008 @ciampo @dcalhoun @dmsnell @draganescu @ellatrix @fabiankaegy @felixarntz @flootr @fluiddot @geriux @getdave @glendaviesnz @hellofromtonya @jameskoster @jasmussen @jffng @jorgefilipecosta @jsnajdr @kevin940726 @kienstra @kozer @madhusudhand @Mamaduka @mirka @noisysocks @ntsekouras @ntwb @oandregal @ockham @pbking @renatoagds @richtabor @Rodage @scruffian @SiobhyB @Soean @t-hamano @talldan @tellthemachines @tyxla @welenofsky @WunderBart @youknowriad
+
+
 
 
 = 15.0.1 =
