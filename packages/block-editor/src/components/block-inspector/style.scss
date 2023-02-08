@@ -24,6 +24,11 @@
 		margin-bottom: 0;
 	}
 
+	// Adjust margin-bottom from being applied to the `BaseControl`
+	.wp-block-latest-posts__sorting-filtering .components-base-control {
+		margin-bottom: $grid-unit-10;
+	}
+
 	.components-panel__body {
 		border: none;
 		border-top: $border-width solid $gray-200;
