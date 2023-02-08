@@ -189,7 +189,14 @@
 							"description": "A block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
 						}
 					},
-					"required": [ "type" ]
+					"anyOf": [
+						{
+							"required": [ "type" ]
+						},
+						{
+							"required": [ "enum" ]
+						}
+					]
 				}
 			},
 			"additionalProperties": false
@@ -304,7 +311,7 @@
 				},
 				"inserter": {
 					"type": "boolean",
-					"description": "By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set inserter to false.",
+					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programatically, set inserter to false.",
 					"default": true
 				},
 				"multiple": {

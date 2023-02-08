@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent, within } from '@testing-library/react';
-import { act } from 'react-test-renderer';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -169,19 +169,19 @@ const getMenuButton = () => {
 /**
  * Helper to find the menu button and simulate a user click.
  *
- * @return {HTMLElement} The menuButton.
  */
 const openDropdownMenu = async () => {
+	const user = userEvent.setup();
 	const menuButton = getMenuButton();
-	fireEvent.click( menuButton );
-	await act( () => Promise.resolve() );
+	await user.click( menuButton );
 	return menuButton;
 };
 
 // Opens dropdown then selects the menu item by label before simulating a click.
 const selectMenuItem = async ( label ) => {
+	const user = userEvent.setup();
 	const menuItem = await screen.findByText( label );
-	fireEvent.click( menuItem );
+	await user.click( menuItem );
 };
 
 describe( 'ToolsPanel', () => {

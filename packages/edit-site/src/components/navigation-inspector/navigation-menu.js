@@ -36,7 +36,7 @@ const ALLOWED_BLOCKS = {
 	],
 };
 
-export default function NavigationMenu( { innerBlocks } ) {
+export default function NavigationMenu( { innerBlocks, onSelect } ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
 	const { OffCanvasEditor } = unlock( blockEditorExperiments );
@@ -56,7 +56,5 @@ export default function NavigationMenu( { innerBlocks } ) {
 		} );
 	}, [ updateBlockListSettings, innerBlocks ] );
 
-	return (
-		<OffCanvasEditor blocks={ innerBlocks } selectBlockInCanvas={ false } />
-	);
+	return <OffCanvasEditor blocks={ innerBlocks } onSelect={ onSelect } />;
 }

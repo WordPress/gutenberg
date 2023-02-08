@@ -1,6 +1,3 @@
-// Variables
-$block-preview-height: 150px;
-
 .edit-site-global-styles-preview {
 	display: flex;
 	align-items: center;
@@ -63,6 +60,11 @@ $block-preview-height: 150px;
 .edit-site-block-types-search {
 	margin-bottom: $grid-unit-10;
 	padding: 0 $grid-unit-20;
+}
+
+.edit-site-global-styles-header {
+	// Need to override the too specific bottom margin for complementary areas.
+	margin-bottom: 0 !important;
 }
 
 .edit-site-global-styles-subtitle {
@@ -130,7 +132,6 @@ $block-preview-height: 150px;
 .edit-site-global-styles__block-preview-panel {
 	position: relative;
 	width: 100%;
-	height: $block-preview-height + 2 * $border-width;
 	overflow: auto;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-block-ui;
@@ -166,6 +167,16 @@ $block-preview-height: 150px;
 	font-family: $editor_html_font;
 }
 
+.edit-site-global-styles__custom-css-validation-wrapper {
+	position: absolute;
+	bottom: $grid-unit-20;
+	right: $grid-unit * 3;
+}
+
+.edit-site-global-styles__custom-css-validation-icon {
+	fill: $alert-red;
+}
+
 .edit-site-global-styles__custom-css-theme-css {
 	width: 100%;
 	line-break: anywhere;
@@ -189,4 +200,43 @@ $block-preview-height: 150px;
 .edit-site-global-styles-sidebar__navigator-screen {
 	display: flex;
 	flex-direction: column;
+}
+
+.edit-site-global-styles__shadow-panel {
+	width: 230px;
+}
+
+.edit-site-global-styles__shadow-dropdown {
+	display: block;
+	padding: 0;
+
+	> button {
+		width: 100%;
+		padding: $grid-unit-10;
+
+		&.is-open {
+			background-color: $gray-100;
+		}
+	}
+}
+
+// wrapper to clip the shadow beyond 6px
+.edit-site-global-styles__shadow-indicator-wrapper {
+	padding: 6px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+// These styles are similar to the color palette.
+.edit-site-global-styles__shadow-indicator {
+	color: $gray-800;
+	border: $gray-200 $border-width solid;
+	border-radius: $radius-block-ui;
+	cursor: pointer;
+	padding: 0;
+
+	height: 24px;
+	width: 24px;
 }

@@ -5,10 +5,29 @@
 		"declarationDir": "build-types"
 	},
 	"references": [
+		{ "path": "../a11y" },
+		{ "path": "../api-fetch" },
+		{ "path": "../blob" },
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../data" },
+		{ "path": "../date" },
 		{ "path": "../deprecated" },
+		{ "path": "../dom" },
 		{ "path": "../element" },
+		{ "path": "../escape-html" },
+		{ "path": "../experiments" },
 		{ "path": "../hooks" },
-		{ "path": "../data" }
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../keycodes" },
+		{ "path": "../style-engine" },
+		{ "path": "../token-list" },
+		{ "path": "../url" },
+		{ "path": "../warning" },
+		{ "path": "../wordcount" }
 	],
 	// NOTE: This package is being progressively typed. You are encouraged to
 	// expand this array with files which can be type-checked. At some point in

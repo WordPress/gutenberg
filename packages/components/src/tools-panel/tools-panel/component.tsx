@@ -23,6 +23,7 @@ const ToolsPanel = (
 		panelContext,
 		resetAllItems,
 		toggleItem,
+		headingLevel,
 		...toolsPanelProps
 	} = useToolsPanel( props );
 
@@ -33,6 +34,7 @@ const ToolsPanel = (
 					label={ label }
 					resetAll={ resetAllItems }
 					toggleItem={ toggleItem }
+					headingLevel={ headingLevel }
 				/>
 				{ children }
 			</ToolsPanelContext.Provider>
