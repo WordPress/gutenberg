@@ -375,7 +375,7 @@ describe( 'Navigator', () => {
 		} );
 	} );
 
-	it( 'should not rended anything if the path does not match any available screen', async () => {
+	it( 'should not render anything if the path does not match any available screen', async () => {
 		const spy = jest.fn();
 
 		const user = userEvent.setup();
