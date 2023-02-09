@@ -26,7 +26,6 @@ import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
 import { createPortal } from 'react-dom';
 import type { AutocompleterUIProps, WPCompleter } from './types';
-import type { MutableRefObject } from 'react';
 
 export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 	const useItems = autocompleter.useItems
@@ -53,7 +52,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 		} );
 
 		const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );
-		const popoverRef = useRef();
+		const popoverRef = useRef< HTMLElement >( null );
 		const popoverRefs = useMergeRefs( [
 			popoverRef,
 			useRefEffect(
@@ -72,10 +71,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 			),
 		] );
 
-		useOnClickOutside(
-			popoverRef as unknown as MutableRefObject< HTMLElement >,
-			reset
-		);
+		useOnClickOutside( popoverRef, reset );
 
 		useLayoutEffect( () => {
 			onChangeOptions( items );
@@ -142,7 +138,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 }
 
 function useOnClickOutside(
-	ref: MutableRefObject< HTMLElement >,
+	ref: React.RefObject< HTMLElement >,
 	handler: AutocompleterUIProps[ 'reset' ]
 ) {
 	useEffect( () => {
