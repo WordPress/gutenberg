@@ -37,4 +37,14 @@ describe( 'patternMatch', () => {
 		] );
 		expect( result ).toEqual( { id: 'route', params: {} } );
 	} );
+
+	it( 'should return an array of matches for the same param', () => {
+		const result = patternMatch( '/some/basic/route', [
+			{ id: 'route', path: '/:test+' },
+		] );
+		expect( result ).toEqual( {
+			id: 'route',
+			params: { test: [ 'some', 'basic', 'route' ] },
+		} );
+	} );
 } );
