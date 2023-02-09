@@ -166,19 +166,18 @@ test.describe( 'Navigation block', () => {
 
 				// Check the markup of the block is correct.
 				await editor.publishPost();
+
 				const content = await editor.getEditedPostContent();
 				expect( content ).toBe( `<!-- wp:navigation {"ref":1} /-->` );
 
 				// Find the warning message
-				const warningMessage = await editor.page.locator(
-					'class=wp-navigation-block',
-					{
-						hasText:
-							'Navigation menu has been deleted or is unavailable.',
-					}
-				);
-				expect( warningMessage ).toBeTruthy();
+				const warningMessage = editor.canvas
+					.getByRole( 'document', { name: 'Block: Navigation' } )
+					.getByText(
+						'Navigation menu has been deleted or is unavailable.'
+					);
+				await expect( warningMessage ).toBeVisible();
 			} );
 		}
 	);
-} );
+) };
