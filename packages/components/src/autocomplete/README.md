@@ -32,12 +32,13 @@ An array of all of the completers to apply to the current element.
 -   Required: Yes
 -   Type: `Array< WPCompleter >`
  
- ### contentRef
+### contentRef
 
- A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
+A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
 
- -   Required: Yes
- -   `MutableRefObject< HTMLElement | undefined >
+-   Required: Yes
+-   `MutableRefObject< HTMLElement | undefined >
+
 ### children
 
 A function that returns nodes to be rendered within the Autocomplete.
