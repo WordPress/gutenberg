@@ -40,7 +40,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 import { close, Icon } from '@wordpress/icons';
 
 /**
@@ -316,9 +316,15 @@ function Navigation( {
 		} else {
 			// If there are no fallback navigation menus and no classic menus,
 			// then create a new navigation menu.
+
+			// Check that we have a page-list block type.
+			let defaultBlocks = [];
+			if ( getBlockType( 'core/page-list' ) ) {
+				defaultBlocks = [ createBlock( 'core/page-list' ) ];
+			}
 			createNavigationMenu(
 				'Navigation', // TODO - use the template slug in future
-				[ createBlock( 'core/page-list' ) ],
+				defaultBlocks,
 				'publish'
 			);
 		}
