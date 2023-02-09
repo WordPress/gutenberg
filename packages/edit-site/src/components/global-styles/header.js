@@ -27,6 +27,7 @@ function ScreenHeader( { title, description } ) {
 							icon={ isRTL() ? chevronRight : chevronLeft }
 							isSmall
 							aria-label={ __( 'Navigate to the previous view' ) }
+							goToParent
 						/>
 						<Spacer>
 							<Heading

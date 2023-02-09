@@ -232,3 +232,64 @@ function ProductDetails() {
 		</Card>
 	);
 }
+
+const NestedNavigatorTemplate: ComponentStory< typeof NavigatorProvider > = ( {
+	style,
+} ) => (
+	<NavigatorProvider
+		style={ { ...style, height: '100vh', maxHeight: '450px' } }
+		initialPath="/"
+	>
+		<NavigatorScreen path="/">
+			<Card>
+				<CardBody>
+					<NavigatorButton variant="secondary" path="/child1">
+						Go to first child.
+					</NavigatorButton>
+					<NavigatorButton variant="secondary" path="/child2">
+						Go to second child.
+					</NavigatorButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+		<NavigatorScreen path="/child1">
+			<Card>
+				<CardBody>
+					This is the first child
+					<NavigatorBackButton variant="secondary" goToParent>
+						Go back to parent
+					</NavigatorBackButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+		<NavigatorScreen path="/child2">
+			<Card>
+				<CardBody>
+					This is the second child
+					<NavigatorBackButton variant="secondary" goToParent>
+						Go back to parent
+					</NavigatorBackButton>
+					<NavigatorButton
+						variant="secondary"
+						path="/child2/grandchild"
+					>
+						Go to grand child.
+					</NavigatorButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+		<NavigatorScreen path="/child2/grandchild">
+			<Card>
+				<CardBody>
+					This is the grand child
+					<NavigatorBackButton variant="secondary" goToParent>
+						Go back to parent
+					</NavigatorBackButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+	</NavigatorProvider>
+);
+
+export const NestedNavigator: ComponentStory< typeof NavigatorProvider > =
+	NestedNavigatorTemplate.bind( {} );

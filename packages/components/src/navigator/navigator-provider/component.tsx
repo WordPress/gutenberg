@@ -13,6 +13,7 @@ import {
 	useCallback,
 	useReducer,
 	useRef,
+	useEffect,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -33,7 +34,7 @@ import type {
 	NavigatorContext as NavigatorContextType,
 	Screen,
 } from '../types';
-import { patternMatch } from '../utils/router';
+import { patternMatch, findParent } from '../utils/router';
 
 type MatchedPath = ReturnType< typeof patternMatch >;
 type ScreenAction = { type: string; screen: Screen };
@@ -66,7 +67,15 @@ function UnconnectedNavigatorProvider(
 			path: initialPath,
 		},
 	] );
+	const currentLocationHistory = useRef< NavigatorLocation[] >( [] );
 	const [ screens, dispatch ] = useReducer( screensReducer, [] );
+	const currentScreens = useRef< Screen[] >( [] );
+	useEffect( () => {
+		currentScreens.current = screens;
+	}, [ screens ] );
+	useEffect( () => {
+		currentLocationHistory.current = locationHistory;
+	}, [ locationHistory ] );
 	const currentMatch = useRef< MatchedPath >();
 	const matchedPath = useMemo( () => {
 		let currentPath: string | undefined;
@@ -118,12 +127,16 @@ function UnconnectedNavigatorProvider(
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
 		( path, options = {} ) => {
 			setLocationHistory( ( prevLocationHistory ) => {
-				const { focusTargetSelector, ...restOptions } = options;
+				const {
+					focusTargetSelector,
+					isBack = false,
+					...restOptions
+				} = options;
 
 				const newLocation = {
 					...restOptions,
 					path,
-					isBack: false,
+					isBack,
 					hasRestoredFocus: false,
 				};
 
@@ -164,6 +177,34 @@ function UnconnectedNavigatorProvider(
 		} );
 	}, [] );
 
+	const goToParent: NavigatorContextType[ 'goToParent' ] =
+		useCallback( () => {
+			const currentPath =
+				currentLocationHistory.current[
+					currentLocationHistory.current.length - 1
+				].path;
+			if ( currentPath === undefined ) {
+				return;
+			}
+			const parentPath = findParent(
+				currentPath,
+				currentScreens.current
+			);
+			if ( parentPath === undefined ) {
+				return;
+			}
+			const isBack =
+				currentLocationHistory.current.length > 1 &&
+				currentLocationHistory.current[
+					currentLocationHistory.current.length - 2
+				].path === parentPath;
+			if ( isBack ) {
+				goBack();
+			} else {
+				goTo( parentPath, { isBack: true } );
+			}
+		}, [ goBack, goTo ] );
+
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
 			location: {
@@ -174,10 +215,19 @@ function UnconnectedNavigatorProvider(
 			match: matchedPath ? matchedPath.id : undefined,
 			goTo,
 			goBack,
+			goToParent,
 			addScreen,
 			removeScreen,
 		} ),
-		[ locationHistory, matchedPath, goTo, goBack, addScreen, removeScreen ]
+		[
+			locationHistory,
+			matchedPath,
+			goTo,
+			goBack,
+			goToParent,
+			addScreen,
+			removeScreen,
+		]
 	);
 
 	const cx = useCx();

@@ -33,7 +33,13 @@ function NavigationButtonAsItem( props ) {
 }
 
 function NavigationBackButtonAsItem( props ) {
-	return <NavigatorBackButton as={ GenericNavigationButton } { ...props } />;
+	return (
+		<NavigatorBackButton
+			as={ GenericNavigationButton }
+			{ ...props }
+			goToParent
+		/>
+	);
 }
 
 export { NavigationButtonAsItem, NavigationBackButtonAsItem };

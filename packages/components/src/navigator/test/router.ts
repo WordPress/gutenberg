@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { patternMatch } from '../utils/router';
+import { patternMatch, findParent } from '../utils/router';
 
 describe( 'patternMatch', () => {
 	it( 'should return undefined if not pattern is matched', () => {
@@ -46,5 +46,53 @@ describe( 'patternMatch', () => {
 			id: 'route',
 			params: { test: [ 'some', 'basic', 'route' ] },
 		} );
+	} );
+} );
+
+describe( 'findParent', () => {
+	it( 'should return undefined if no parent is found', () => {
+		const result = findParent( '/test', [
+			{ id: 'route', path: '/test' },
+		] );
+		expect( result ).toBeUndefined();
+	} );
+
+	it( 'should return the parent path', () => {
+		const result = findParent( '/test', [
+			{ id: 'route1', path: '/test' },
+			{ id: 'route2', path: '/' },
+		] );
+		expect( result ).toEqual( '/' );
+	} );
+
+	it( 'should return to another parent path', () => {
+		const result = findParent( '/test/123', [
+			{ id: 'route1', path: '/test/:id' },
+			{ id: 'route2', path: '/test' },
+		] );
+		expect( result ).toEqual( '/test' );
+	} );
+
+	it( 'should return the parent path with params', () => {
+		const result = findParent( '/test/123/456', [
+			{ id: 'route1', path: '/test/:id/:subId' },
+			{ id: 'route2', path: '/test/:id' },
+		] );
+		expect( result ).toEqual( '/test/123' );
+	} );
+
+	it( 'should return the parent path with optional params', () => {
+		const result = findParent( '/test/123', [
+			{ id: 'route', path: '/test/:id?' },
+		] );
+		expect( result ).toEqual( '/test' );
+	} );
+
+	it( 'should return the grand parent if no parent found', () => {
+		const result = findParent( '/test/123/456', [
+			{ id: 'route1', path: '/test/:id/:subId' },
+			{ id: 'route2', path: '/test' },
+		] );
+		expect( result ).toEqual( '/test' );
 	} );
 } );

@@ -21,3 +21,28 @@ export function patternMatch( path: string, screens: Screen[] ) {
 
 	return undefined;
 }
+
+export function findParent( path: string, screens: Screen[] ) {
+	if ( path[ 0 ] !== '/' ) {
+		return undefined;
+	}
+	const pathParts = path.split( '/' );
+	let parentPath;
+	while ( pathParts.length > 1 && ! parentPath ) {
+		pathParts.pop();
+		const potentialParentPath =
+			pathParts.join( '/' ) === '' ? '/' : pathParts.join( '/' );
+		if (
+			screens.find( ( screen ) => {
+				const matchingFunction = match( screen.path, {
+					decode: decodeURIComponent,
+				} );
+				return matchingFunction( potentialParentPath ) !== false;
+			} )
+		) {
+			parentPath = potentialParentPath;
+		}
+	}
+
+	return parentPath;
+}

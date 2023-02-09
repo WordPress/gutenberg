@@ -37,6 +37,7 @@ export default function SidebarNavigationScreen( {
 								__( 'Navigate to the previous view: %s' ),
 								parentTitle
 							) }
+							goToParent
 						/>
 					) : (
 						<div className="edit-site-sidebar-navigation-screen__icon-placeholder" />
