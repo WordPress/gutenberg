@@ -214,7 +214,11 @@ function UnforwardedModal(
 						role="document"
 						onScroll={ onContentContainerScroll }
 						ref={ contentRef }
-						aria-label={ __( 'Scrollable section' ) }
+						aria-label={
+							hasScrollableContent
+								? __( 'Scrollable section' )
+								: undefined
+						}
 						tabIndex={ hasScrollableContent ? 0 : undefined }
 					>
 						{ ! __experimentalHideHeader && (
