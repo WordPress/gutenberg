@@ -1482,6 +1482,18 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	}
 
 	/**
+	 * Whether a bookmark with the given name exists.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param string $bookmark_name Name to identify a bookmark that potentially exists.
+	 * @return bool Whether that bookmark exists.
+	 */
+	public function has_bookmark( $bookmark_name ) {
+		return array_key_exists( $bookmark_name, $this->bookmarks );
+	}
+
+	/**
 	 * Move the internal cursor in the Tag Processor to a given bookmark's location.
 	 *
 	 * In order to prevent accidental infinite loops, there's a
