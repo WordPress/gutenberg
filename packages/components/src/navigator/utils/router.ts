@@ -6,9 +6,9 @@ import { match } from 'path-to-regexp';
 /**
  * Internal dependencies
  */
-import type { NavigatorScreen } from '../types';
+import type { Screen } from '../types';
 
-export function patternMatch( path: string, screens: NavigatorScreen[] ) {
+export function patternMatch( path: string, screens: Screen[] ) {
 	for ( const screen of screens ) {
 		const matchingFunction = match( screen.path, {
 			decode: decodeURIComponent,

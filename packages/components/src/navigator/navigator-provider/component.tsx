@@ -31,24 +31,22 @@ import type {
 	NavigatorProviderProps,
 	NavigatorLocation,
 	NavigatorContext as NavigatorContextType,
-	NavigatorScreen as NavigatorScreenType,
+	Screen,
 } from '../types';
 import { patternMatch } from '../utils/router';
 
 type MatchedPath = ReturnType< typeof patternMatch >;
-type ScreenAction = { type: string; screen: NavigatorScreenType };
+type ScreenAction = { type: string; screen: Screen };
 
 function screensReducer(
-	state: NavigatorScreenType[] = [],
+	state: Screen[] = [],
 	action: ScreenAction
-): NavigatorScreenType[] {
+): Screen[] {
 	switch ( action.type ) {
 		case 'add':
 			return [ ...state, action.screen ];
 		case 'remove':
-			return state.filter(
-				( s: NavigatorScreenType ) => s.id !== action.screen.id
-			);
+			return state.filter( ( s: Screen ) => s.id !== action.screen.id );
 	}
 
 	return state;
@@ -105,13 +103,12 @@ function UnconnectedNavigatorProvider(
 	}, [ screens, locationHistory ] );
 
 	const addScreen = useCallback(
-		( screen: NavigatorScreenType ) => dispatch( { type: 'add', screen } ),
+		( screen: Screen ) => dispatch( { type: 'add', screen } ),
 		[]
 	);
 
 	const removeScreen = useCallback(
-		( screen: NavigatorScreenType ) =>
-			dispatch( { type: 'remove', screen } ),
+		( screen: Screen ) => dispatch( { type: 'remove', screen } ),
 		[]
 	);
 

@@ -29,8 +29,8 @@ export type Navigator = {
 };
 
 export type NavigatorContext = Navigator & {
-	addScreen: ( screen: NavigatorScreen ) => void;
-	removeScreen: ( screen: NavigatorScreen ) => void;
+	addScreen: ( screen: Screen ) => void;
+	removeScreen: ( screen: Screen ) => void;
 };
 
 export type NavigatorProviderProps = {
@@ -72,7 +72,7 @@ export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	attributeName?: string;
 };
 
-export type NavigatorScreen = {
+export type Screen = {
 	id: string;
 	path: string;
 };
