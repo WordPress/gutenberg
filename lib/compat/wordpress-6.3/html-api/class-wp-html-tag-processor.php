@@ -247,7 +247,7 @@
  *
  * @since 6.2.0
  */
-class WP_HTML_Tag_Processor {
+class Gutenberg_HTML_Tag_Processor_6_3 extends WP_HTML_Tag_Processor {
 	/**
 	 * The maximum number of bookmarks allowed to exist at
 	 * any given time.
