@@ -16,7 +16,7 @@ import { store as blocksStore } from '@wordpress/blocks';
  */
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
 import { GlobalStylesContext } from './context';
-import { unlock } from '../../experiments';
+import { unlock } from '../../lock-unlock';
 
 const EMPTY_CONFIG = { settings: {}, styles: {} };
 
