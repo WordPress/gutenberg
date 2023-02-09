@@ -14,6 +14,8 @@ $ wp-env start
 
 The local environment will be available at http://localhost:8888 (Username: `admin`, Password: `password`).
 
+The database credentials are: user `root`, password `password`.
+
 ## Prerequisites
 
 `wp-env` requires Docker to be installed. There are instructions available for installing Docker on [Windows](https://docs.docker.com/desktop/install/windows-install/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/desktop/install/linux-install/).
