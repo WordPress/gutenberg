@@ -7,15 +7,19 @@ import styled from '@emotion/styled';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { ToolsPanel, ToolsPanelItem } from '../';
+import {
+	ToggleGroupControl,
+	ToggleGroupControlOption,
+} from '../../toggle-group-control';
+
+/**
+ * Internal dependencies
+ */
+import { ToolsPanel, ToolsPanelItem } from '..';
 import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
