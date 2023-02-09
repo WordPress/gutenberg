@@ -5,8 +5,6 @@ const stories = [
 	'../packages/icons/src/**/stories/*.@(js|tsx|mdx)',
 ].filter( Boolean );
 
-const customEnvVariables = {};
-
 module.exports = {
 	core: {
 		builder: 'webpack5',
@@ -30,20 +28,10 @@ module.exports = {
 		emotionAlias: false,
 		storyStoreV7: true,
 	},
-	// Workaround:
-	// https://github.com/storybookjs/storybook/issues/12270
-	webpackFinal: async ( config ) => {
-		// Find the DefinePlugin.
-		const plugin = config.plugins.find( ( p ) => {
-			return p.definitions && p.definitions[ 'process.env' ];
-		} );
-		// Add custom env variables.
-		Object.keys( customEnvVariables ).forEach( ( key ) => {
-			plugin.definitions[ 'process.env' ][ key ] = JSON.stringify(
-				customEnvVariables[ key ]
-			);
-		} );
-
-		return config;
-	},
+	env: ( config ) => ( {
+		...config,
+		// Inject the `ALLOW_EXPERIMENT_REREGISTRATION` global, used by
+		// @wordpress/experiments.
+		ALLOW_EXPERIMENT_REREGISTRATION: true,
+	} ),
 };

@@ -17,7 +17,7 @@ import { useState } from '@wordpress/element';
  */
 import ScreenHeader from './header';
 import {
-	getSupportedGlobalStylesPanels,
+	useSupportedStyles,
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
@@ -25,9 +25,10 @@ import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
-function ScreenHeadingColor( { name, variationPath = '' } ) {
+function ScreenHeadingColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
 	const [ selectedLevel, setCurrentTab ] = useState( 'heading' );
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ areCustomGradientsEnabled ] = useGlobalSetting(
 		'color.customGradient',
@@ -55,30 +56,30 @@ function ScreenHeadingColor( { name, variationPath = '' } ) {
 		( gradientsPerOrigin.length > 0 || areCustomGradientsEnabled );
 
 	const [ color, setColor ] = useGlobalStyle(
-		variationPath + 'elements.' + selectedLevel + '.color.text',
+		prefix + 'elements.' + selectedLevel + '.color.text',
 		name
 	);
 	const [ userColor ] = useGlobalStyle(
-		variationPath + 'elements.' + selectedLevel + '.color.text',
+		prefix + 'elements.' + selectedLevel + '.color.text',
 		name,
 		'user'
 	);
 
 	const [ backgroundColor, setBackgroundColor ] = useGlobalStyle(
-		variationPath + 'elements.' + selectedLevel + '.color.background',
+		prefix + 'elements.' + selectedLevel + '.color.background',
 		name
 	);
 	const [ userBackgroundColor ] = useGlobalStyle(
-		variationPath + 'elements.' + selectedLevel + '.color.background',
+		prefix + 'elements.' + selectedLevel + '.color.background',
 		name,
 		'user'
 	);
 	const [ gradient, setGradient ] = useGlobalStyle(
-		variationPath + 'elements.' + selectedLevel + '.color.gradient',
+		prefix + 'elements.' + selectedLevel + '.color.gradient',
 		name
 	);
 	const [ userGradient ] = useGlobalStyle(
-		variationPath + 'elements.' + selectedLevel + '.color.gradient',
+		prefix + 'elements.' + selectedLevel + '.color.gradient',
 		name,
 		'user'
 	);
@@ -124,9 +125,10 @@ function ScreenHeadingColor( { name, variationPath = '' } ) {
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-heading-color">
-				<h4>{ __( 'Select heading level' ) }</h4>
+				<h3>{ __( 'Select heading level' ) }</h3>
 
 				<ToggleGroupControl
+					__nextHasNoMarginBottom
 					label={ __( 'Select heading level' ) }
 					hideLabelFromVision={ true }
 					value={ selectedLevel }
@@ -149,7 +151,7 @@ function ScreenHeadingColor( { name, variationPath = '' } ) {
 			</div>
 			{ hasTextColor && (
 				<div className="edit-site-global-styles-screen-heading-color">
-					<h4>
+					<h3>
 						{ selectedLevel === 'heading'
 							? __( 'Text color for all heading levels' )
 							: sprintf(
@@ -157,7 +159,7 @@ function ScreenHeadingColor( { name, variationPath = '' } ) {
 									__( 'Text color for %s' ),
 									selectedLevel.toUpperCase()
 							  ) }
-					</h4>
+					</h3>
 					<ColorGradientControl
 						className="edit-site-screen-heading-text-color__control"
 						colors={ colorsPerOrigin }
@@ -168,12 +170,13 @@ function ScreenHeadingColor( { name, variationPath = '' } ) {
 						colorValue={ color }
 						onColorChange={ setColor }
 						clearable={ color === userColor }
+						headingLevel={ 4 }
 					/>
 				</div>
 			) }
 			{ hasBackgroundColor && (
 				<div className="edit-site-global-styles-screen-heading-color">
-					<h4>
+					<h3>
 						{ selectedLevel === 'heading'
 							? __( 'Background color for all heading levels' )
 							: sprintf(
@@ -181,7 +184,7 @@ function ScreenHeadingColor( { name, variationPath = '' } ) {
 									__( 'Background color for %s' ),
 									selectedLevel.toUpperCase()
 							  ) }
-					</h4>
+					</h3>
 					<ColorGradientControl
 						className="edit-site-screen-heading-background-color__control"
 						colors={ colorsPerOrigin }
@@ -191,6 +194,7 @@ function ScreenHeadingColor( { name, variationPath = '' } ) {
 						showTitle={ false }
 						enableAlpha
 						__experimentalIsRenderedInSidebar
+						headingLevel={ 4 }
 						{ ...controlProps }
 					/>
 				</div>

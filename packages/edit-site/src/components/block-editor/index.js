@@ -7,11 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useMemo, useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockList,
-	__experimentalLinkControl,
 	BlockInspector,
 	BlockTools,
 	__unstableUseClipboardHandler as useClipboardHandler,
@@ -32,7 +31,6 @@ import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
  */
 import inserterMediaCategories from './inserter-media-categories';
 import TemplatePartConverter from '../template-part-converter';
-import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar-edit-mode';
 import { store as editSiteStore } from '../../store';
 import BackButton from './back-button';
@@ -50,16 +48,17 @@ const LAYOUT = {
 };
 
 export default function BlockEditor() {
-	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
+	const { setIsInserterOpened } = useDispatch( editSiteStore );
 	const { storedSettings, templateType, canvasMode } = useSelect(
 		( select ) => {
-			const { getSettings, getEditedPostType, __unstableGetCanvasMode } =
-				select( editSiteStore );
+			const { getSettings, getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
 			return {
 				storedSettings: getSettings( setIsInserterOpened ),
 				templateType: getEditedPostType(),
-				canvasMode: __unstableGetCanvasMode(),
+				canvasMode: getCanvasMode(),
 			};
 		},
 		[ setIsInserterOpened ]
@@ -122,7 +121,7 @@ export default function BlockEditor() {
 
 		return {
 			...restStoredSettings,
-			__unstableInserterMediaCategories: inserterMediaCategories,
+			inserterMediaCategories,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 		};
@@ -163,17 +162,6 @@ export default function BlockEditor() {
 			useSubRegistry={ false }
 		>
 			<TemplatePartConverter />
-			<__experimentalLinkControl.ViewerFill>
-				{ useCallback(
-					( fillProps ) => (
-						<NavigateToLink
-							{ ...fillProps }
-							onActivePageChange={ setPage }
-						/>
-					),
-					[]
-				) }
-			</__experimentalLinkControl.ViewerFill>
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>

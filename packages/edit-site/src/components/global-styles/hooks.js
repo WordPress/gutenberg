@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import { colord, extend } from 'colord';
 import a11yPlugin from 'colord/plugins/a11y';
 
@@ -10,101 +9,19 @@ import a11yPlugin from 'colord/plugins/a11y';
  */
 import { _x } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
-import {
-	getBlockType,
-	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
-} from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../experiments';
+import { useSelect } from '@wordpress/data';
 
 const { useGlobalSetting } = unlock( blockEditorExperiments );
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );
-
-const ROOT_BLOCK_SUPPORTS = [
-	'background',
-	'backgroundColor',
-	'color',
-	'linkColor',
-	'buttonColor',
-	'fontFamily',
-	'fontSize',
-	'fontStyle',
-	'fontWeight',
-	'lineHeight',
-	'textDecoration',
-	'padding',
-	'contentSize',
-	'wideSize',
-	'blockGap',
-];
-
-export function getSupportedGlobalStylesPanels( name ) {
-	if ( ! name ) {
-		return ROOT_BLOCK_SUPPORTS;
-	}
-
-	const blockType = getBlockType( name );
-
-	if ( ! blockType ) {
-		return [];
-	}
-
-	const supportKeys = [];
-
-	// Check for blockGap support.
-	// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
-	// Also, only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
-	if (
-		blockType?.supports?.spacing?.blockGap &&
-		blockType?.supports?.spacing?.__experimentalSkipSerialization !==
-			true &&
-		! blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
-			( spacingType ) => spacingType === 'blockGap'
-		)
-	) {
-		supportKeys.push( 'blockGap' );
-	}
-
-	Object.keys( STYLE_PROPERTY ).forEach( ( styleName ) => {
-		if ( ! STYLE_PROPERTY[ styleName ].support ) {
-			return;
-		}
-
-		// Opting out means that, for certain support keys like background color,
-		// blocks have to explicitly set the support value false. If the key is
-		// unset, we still enable it.
-		if ( STYLE_PROPERTY[ styleName ].requiresOptOut ) {
-			if (
-				STYLE_PROPERTY[ styleName ].support[ 0 ] in
-					blockType.supports &&
-				get(
-					blockType.supports,
-					STYLE_PROPERTY[ styleName ].support
-				) !== false
-			) {
-				return supportKeys.push( styleName );
-			}
-		}
-
-		if (
-			get(
-				blockType.supports,
-				STYLE_PROPERTY[ styleName ].support,
-				false
-			)
-		) {
-			return supportKeys.push( styleName );
-		}
-	} );
-
-	return supportKeys;
-}
 
 export function useColorsPerOrigin( name ) {
 	const [ customColors ] = useGlobalSetting( 'color.palette.custom', name );
@@ -234,4 +151,19 @@ export function useColorRandomizer( name ) {
 	return window.__experimentalEnableColorRandomizer
 		? [ randomizeColors ]
 		: [];
+}
+
+export function useSupportedStyles( name, element ) {
+	const { supportedPanels } = useSelect(
+		( select ) => {
+			return {
+				supportedPanels: unlock(
+					select( blocksStore )
+				).getSupportedStyles( name, element ),
+			};
+		},
+		[ name, element ]
+	);
+
+	return supportedPanels;
 }

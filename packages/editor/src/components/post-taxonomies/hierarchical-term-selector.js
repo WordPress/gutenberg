@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, unescape as unescapeString } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,6 +20,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -365,7 +366,7 @@ export function HierarchicalTermSelector( { slug } ) {
 							const termId = parseInt( term.id, 10 );
 							onChange( termId );
 						} }
-						label={ unescapeString( term.name ) }
+						label={ decodeEntities( term.name ) }
 					/>
 					{ !! term.children.length && (
 						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">

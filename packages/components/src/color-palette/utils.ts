@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import type { RefObject } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -76,21 +75,27 @@ export const isMultiplePaletteArray = (
 	);
 };
 
+/**
+ * Transform a CSS variable used as background color into the color value itself.
+ *
+ * @param value   The color value that may be a CSS variable.
+ * @param element The element for which to get the computed style.
+ * @return The background color value computed from a element.
+ */
 export const normalizeColorValue = (
 	value: string | undefined,
-	ref: RefObject< HTMLElement > | null
+	element: HTMLElement | null
 ) => {
 	const currentValueIsCssVariable = /^var\(/.test( value ?? '' );
 
-	if ( ! currentValueIsCssVariable || ! ref?.current ) {
+	if ( ! currentValueIsCssVariable || element === null ) {
 		return value;
 	}
 
-	const { ownerDocument } = ref.current;
+	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
-	const computedBackgroundColor = defaultView?.getComputedStyle(
-		ref.current
-	).backgroundColor;
+	const computedBackgroundColor =
+		defaultView?.getComputedStyle( element ).backgroundColor;
 
 	return computedBackgroundColor
 		? colord( computedBackgroundColor ).toHex()

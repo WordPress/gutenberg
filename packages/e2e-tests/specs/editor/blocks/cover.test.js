@@ -13,6 +13,7 @@ import {
 	insertBlock,
 	createNewPost,
 	openDocumentSettingsSidebar,
+	switchBlockInspectorTab,
 	transformBlockTo,
 } from '@wordpress/e2e-test-utils';
 
@@ -134,6 +135,7 @@ describe( 'Cover', () => {
 			'.block-editor-list-view-block__contents-container a'
 		);
 
+		switchBlockInspectorTab( 'Styles' );
 		const heightInputHandle = await page.waitForSelector(
 			'input[id*="block-cover-height-input"]'
 		);

@@ -33,16 +33,14 @@ describe( 'BlockEditorProvider', () => {
 		render(
 			<BlockEditorProvider
 				settings={ {
-					__unstableInserterMediaCategories: true,
+					inserterMediaCategories: true,
 				} }
 			>
 				<HasEditorSetting setRegistry={ setRegistry } />
 			</BlockEditorProvider>
 		);
 		const settings = registry.select( blockEditorStore ).getSettings();
-		expect( settings ).not.toHaveProperty(
-			'__unstableInserterMediaCategories'
-		);
+		expect( settings ).not.toHaveProperty( 'inserterMediaCategories' );
 	} );
 	it( 'should preserve stable settings', async () => {
 		render(
@@ -71,16 +69,14 @@ describe( 'ExperimentalBlockEditorProvider', () => {
 		render(
 			<ExperimentalBlockEditorProvider
 				settings={ {
-					__unstableInserterMediaCategories: true,
+					inserterMediaCategories: true,
 				} }
 			>
 				<HasEditorSetting setRegistry={ setRegistry } />
 			</ExperimentalBlockEditorProvider>
 		);
 		const settings = registry.select( blockEditorStore ).getSettings();
-		expect( settings ).toHaveProperty(
-			'__unstableInserterMediaCategories'
-		);
+		expect( settings ).toHaveProperty( 'inserterMediaCategories' );
 	} );
 	it( 'should preserve stable settings', async () => {
 		render(

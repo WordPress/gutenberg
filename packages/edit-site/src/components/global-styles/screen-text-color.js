@@ -11,13 +11,14 @@ import {
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
+import { useSupportedStyles, useColorsPerOrigin } from './hooks';
 import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
-function ScreenTextColor( { name, variationPath = '' } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+function ScreenTextColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const supports = useSupportedStyles( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ isTextEnabled ] = useGlobalSetting( 'color.text', name );
 	const colorsPerOrigin = useColorsPerOrigin( name );
@@ -27,15 +28,8 @@ function ScreenTextColor( { name, variationPath = '' } ) {
 		isTextEnabled &&
 		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
-	const [ color, setColor ] = useGlobalStyle(
-		variationPath + 'color.text',
-		name
-	);
-	const [ userColor ] = useGlobalStyle(
-		variationPath + 'color.text',
-		name,
-		'user'
-	);
+	const [ color, setColor ] = useGlobalStyle( prefix + 'color.text', name );
+	const [ userColor ] = useGlobalStyle( prefix + 'color.text', name, 'user' );
 
 	if ( ! hasTextColor ) {
 		return null;
@@ -59,6 +53,7 @@ function ScreenTextColor( { name, variationPath = '' } ) {
 				colorValue={ color }
 				onColorChange={ setColor }
 				clearable={ color === userColor }
+				headingLevel={ 3 }
 			/>
 		</>
 	);

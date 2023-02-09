@@ -18,7 +18,7 @@ import { NavigationButtonAsItem } from './navigation-button';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 import BlockPreviewPanel from './block-preview-panel';
-import { getVariationClassNameFromPath } from './utils';
+import { getVariationClassName } from './utils';
 import { unlock } from '../../experiments';
 
 const { useGlobalStyle } = unlock( blockEditorExperiments );
@@ -92,9 +92,9 @@ function Item( { name, parentMenu, element, label } ) {
 	);
 }
 
-function ScreenTypography( { name, variationPath = '' } ) {
+function ScreenTypography( { name, variation = '' } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
-	const variationClassName = getVariationClassNameFromPath( variationPath );
+	const variationClassName = getVariationClassName( variation );
 	return (
 		<>
 			<ScreenHeader
@@ -109,7 +109,7 @@ function ScreenTypography( { name, variationPath = '' } ) {
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">
 					<VStack spacing={ 3 }>
-						<Subtitle>{ __( 'Elements' ) }</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Elements' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							<Item
 								name={ name }
@@ -143,7 +143,7 @@ function ScreenTypography( { name, variationPath = '' } ) {
 			{ !! name && (
 				<TypographyPanel
 					name={ name }
-					variationPath={ variationPath }
+					variation={ variation }
 					element="text"
 				/>
 			) }

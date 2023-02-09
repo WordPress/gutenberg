@@ -10,20 +10,23 @@
  * The list of core modules allowed to opt-in to the experimental APIs.
  */
 const CORE_MODULES_USING_EXPERIMENTS = [
-	'@wordpress/data',
-	'@wordpress/editor',
-	'@wordpress/blocks',
 	'@wordpress/block-editor',
+	'@wordpress/block-library',
+	'@wordpress/blocks',
+	'@wordpress/components',
 	'@wordpress/customize-widgets',
-	'@wordpress/edit-site',
+	'@wordpress/data',
 	'@wordpress/edit-post',
+	'@wordpress/edit-site',
 	'@wordpress/edit-widgets',
-	'@wordpress/edit-navigation',
+	'@wordpress/editor',
 ];
 
 /**
  * A list of core modules that already opted-in to
  * the experiments package.
+ *
+ * @type {string[]}
  */
 const registeredExperiments = [];
 
@@ -44,6 +47,24 @@ const registeredExperiments = [];
 const requiredConsent =
 	'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.';
 
+/** @type {boolean} */
+let allowReRegistration;
+// Use try/catch to force "false" if the environment variable is not explicitly
+// set to true (e.g. when building WordPress core).
+try {
+	allowReRegistration = process.env.ALLOW_EXPERIMENT_REREGISTRATION ?? false;
+} catch ( error ) {
+	allowReRegistration = false;
+}
+
+/**
+ * Called by a @wordpress package wishing to opt-in to accessing or exposing
+ * private experimental APIs.
+ *
+ * @param {string} consent    The consent string.
+ * @param {string} moduleName The name of the module that is opting in.
+ * @return {{lock: typeof lock, unlock: typeof unlock}} An object containing the lock and unlock functions.
+ */
 export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 	consent,
 	moduleName
@@ -57,7 +78,13 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 				'your product will inevitably break on one of the next WordPress releases.'
 		);
 	}
-	if ( registeredExperiments.includes( moduleName ) ) {
+	if (
+		! allowReRegistration &&
+		registeredExperiments.includes( moduleName )
+	) {
+		// This check doesn't play well with Story Books / Hot Module Reloading
+		// and isn't included in the Gutenberg plugin. It only matters in the
+		// WordPress core release.
 		throw new Error(
 			`You tried to opt-in to unstable APIs as module "${ moduleName }" which is already registered. ` +
 				'This feature is only for JavaScript modules shipped with WordPress core. ' +
@@ -104,8 +131,8 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
  * // { a: 1 }
  * ```
  *
- * @param {Object|Function} object      The object to bind the private data to.
- * @param {any}             privateData The private data to bind to the object.
+ * @param {any} object      The object to bind the private data to.
+ * @param {any} privateData The private data to bind to the object.
  */
 function lock( object, privateData ) {
 	if ( ! object ) {

@@ -27,7 +27,6 @@ const noop = () => {};
 
 const {
 	clearSelectedBlock,
-	__experimentalHideBlockInterface: hideBlockInterface,
 	insertBlock,
 	insertBlocks,
 	mergeBlocks,
@@ -40,7 +39,6 @@ const {
 	replaceInnerBlocks,
 	resetBlocks,
 	selectBlock,
-	__experimentalShowBlockInterface: showBlockInterface,
 	showInsertionPoint,
 	startMultiSelect,
 	startTyping,
@@ -773,22 +771,6 @@ describe( 'actions', () => {
 			expect( toggleBlockMode( clientId ) ).toEqual( {
 				type: 'TOGGLE_BLOCK_MODE',
 				clientId,
-			} );
-		} );
-	} );
-
-	describe( 'hideBlockInterface', () => {
-		it( 'should return the HIDE_BLOCK_INTERFACE action', () => {
-			expect( hideBlockInterface() ).toEqual( {
-				type: 'HIDE_BLOCK_INTERFACE',
-			} );
-		} );
-	} );
-
-	describe( 'showBlockInterface', () => {
-		it( 'should return the SHOW_BLOCK_INTERFACE action', () => {
-			expect( showBlockInterface() ).toEqual( {
-				type: 'SHOW_BLOCK_INTERFACE',
 			} );
 		} );
 	} );

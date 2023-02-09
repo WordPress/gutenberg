@@ -11,13 +11,14 @@ import {
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
+import { useSupportedStyles, useColorsPerOrigin } from './hooks';
 import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
-function ScreenButtonColor( { name, variationPath = '' } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+function ScreenButtonColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const supports = useSupportedStyles( name );
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ isBackgroundEnabled ] = useGlobalSetting(
@@ -31,7 +32,7 @@ function ScreenButtonColor( { name, variationPath = '' } ) {
 		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
 	const [ buttonTextColor, setButtonTextColor ] = useGlobalStyle(
-		variationPath + 'elements.button.color.text',
+		prefix + 'elements.button.color.text',
 		name
 	);
 	const [ userButtonTextColor ] = useGlobalStyle(
@@ -63,9 +64,9 @@ function ScreenButtonColor( { name, variationPath = '' } ) {
 				) }
 			/>
 
-			<h4 className="edit-site-global-styles-section-title">
+			<h3 className="edit-site-global-styles-section-title">
 				{ __( 'Text color' ) }
-			</h4>
+			</h3>
 
 			<ColorGradientControl
 				className="edit-site-screen-button-color__control"
@@ -77,11 +78,12 @@ function ScreenButtonColor( { name, variationPath = '' } ) {
 				colorValue={ buttonTextColor }
 				onColorChange={ setButtonTextColor }
 				clearable={ buttonTextColor === userButtonTextColor }
+				headingLevel={ 4 }
 			/>
 
-			<h4 className="edit-site-global-styles-section-title">
+			<h3 className="edit-site-global-styles-section-title">
 				{ __( 'Background color' ) }
-			</h4>
+			</h3>
 
 			<ColorGradientControl
 				className="edit-site-screen-button-color__control"
@@ -93,6 +95,7 @@ function ScreenButtonColor( { name, variationPath = '' } ) {
 				colorValue={ buttonBgColor }
 				onColorChange={ setButtonBgColor }
 				clearable={ buttonBgColor === userButtonBgColor }
+				headingLevel={ 4 }
 			/>
 		</>
 	);
