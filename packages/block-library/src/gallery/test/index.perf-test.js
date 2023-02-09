@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { getBlock, setupCoreBlocks } from 'test/helpers';
 import { measurePerformance } from 'reassure';
+import { getBlock, setupCoreBlocks } from 'test/helpers';
 
 /**
  * Internal dependencies
