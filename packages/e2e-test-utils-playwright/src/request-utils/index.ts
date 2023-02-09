@@ -25,6 +25,7 @@ import {
 	createClassicMenu,
 	createNavigationMenu,
 	deleteAllMenus,
+	getNavigationMenus,
 } from './menus';
 import { deleteAllPages, createPage } from './pages';
 import { resetPreferences } from './preferences';
@@ -134,6 +135,7 @@ class RequestUtils {
 	createClassicMenu = createClassicMenu.bind( this );
 	createNavigationMenu = createNavigationMenu.bind( this );
 	deleteAllMenus = deleteAllMenus.bind( this );
+	getNavigationMenus = getNavigationMenus.bind( this );
 	createComment = createComment.bind( this );
 	deleteAllComments = deleteAllComments.bind( this );
 	deleteAllWidgets = deleteAllWidgets.bind( this );
