@@ -16,12 +16,12 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import HeadingLevelDropdown from './heading-level-dropdown';
 import { generateAnchor, setAnchor } from './autogenerate-anchors';
 
 function HeadingEdit( {
