@@ -11,9 +11,25 @@
  *
  * @param  array  $attributes The block attributes.
  * @param  string $content    The block content.
- * @return string Returns the block content with the data-id attribute added.
+ * @return string Returns the block content with the data-id attribute and aria-describedby added.
  */
 function render_block_core_image( $attributes, $content ) {
+
+	// If an image block has no alternative text but has a caption,
+	// and aria-describedby is not set, add aria-describedby to the image or image link.
+	if ( empty( $attributes['alt'] ) &&
+		str_contains( $content, 'wp-element-caption' ) &&
+		! str_contains( $content, 'aria-describedby' )
+	) {
+		$unique_id = rand();
+		$content   = str_replace( '<figcaption', '<figcaption id="wp-image-caption-' . $unique_id . '"', $content );
+		if ( str_contains( $content, 'href' ) ) {
+			$content = str_replace( '<a', '<a aria-describedby="wp-image-caption-' . $unique_id . '"', $content );
+		} else {
+			$content = str_replace( '<img', '<img aria-describedby="wp-image-caption-' . $unique_id . '"', $content );
+		}
+	}
+
 	if ( isset( $attributes['data-id'] ) ) {
 		// Add the data-id="$id" attribute to the img element
 		// to provide backwards compatibility for the Gallery Block,
