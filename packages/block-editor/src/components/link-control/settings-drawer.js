@@ -11,6 +11,7 @@ import { settings as settingsIcon } from '@wordpress/icons';
 import { useReducedMotion, useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
