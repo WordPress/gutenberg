@@ -13,11 +13,6 @@ const variations = [
 		),
 		attributes: { layout: { type: 'constrained' } },
 		isDefault: true,
-		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) =>
-			! blockAttributes.layout ||
-			! blockAttributes.layout?.type ||
-			blockAttributes.layout?.type === 'constrained',
 		icon: cover,
 	},
 ];
