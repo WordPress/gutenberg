@@ -33,7 +33,7 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 } ) => {
-	const { OffCanvasEditor } = unlock( blockEditorExperiments );
+	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorExperiments );
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(
@@ -70,6 +70,7 @@ const MainContent = ( {
 		<OffCanvasEditor
 			blocks={ clientIdsTree }
 			isExpanded={ true }
+			LeafMoreMenu={ LeafMoreMenu }
 			description={ description }
 		/>
 	);
