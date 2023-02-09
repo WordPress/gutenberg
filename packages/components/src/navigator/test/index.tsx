@@ -472,6 +472,35 @@ describe( 'Navigator', () => {
 		).toHaveFocus();
 	} );
 
+	it( 'should match correctly paths with named arguments', async () => {
+		const user = userEvent.setup();
+
+		render( <MyNavigation /> );
+
+		expect( getScreen( 'home' ) ).toBeInTheDocument();
+
+		// Navigate to Product 1 screen
+		await user.click( getNavigationButton( 'toProductScreen1' ) );
+
+		expect( getScreen( 'product' ) ).toBeInTheDocument();
+
+		// Check that named parameter is extracted correctly
+		expect( screen.getByText( 'Product ID is 1' ) ).toBeInTheDocument();
+
+		// Navigate back to home screen
+		await user.click( getNavigationButton( 'back' ) );
+
+		expect( getScreen( 'home' ) ).toBeInTheDocument();
+
+		// Navigate to Product 2 screen
+		await user.click( getNavigationButton( 'toProductScreen2' ) );
+
+		expect( getScreen( 'product' ) ).toBeInTheDocument();
+
+		// Check that named parameter is extracted correctly
+		expect( screen.getByText( 'Product ID is 2' ) ).toBeInTheDocument();
+	} );
+
 	describe( 'focus management', () => {
 		it( 'should restore focus correctly', async () => {
 			const user = userEvent.setup();
@@ -507,6 +536,19 @@ describe( 'Navigator', () => {
 			// Focus is restored on the last element that had focus when the
 			// navigation away from the screen occurred.
 			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
+
+			// Navigate to product screen for product 2
+			await user.click( getNavigationButton( 'toProductScreen2' ) );
+
+			// The first tabbable element receives focus.
+			expect( getNavigationButton( 'back' ) ).toHaveFocus();
+
+			// Navigate back to home screen.
+			await user.click( getNavigationButton( 'back' ) );
+
+			// Focus is restored on the last element that had focus when the
+			// navigation away from the screen occurred.
+			expect( getNavigationButton( 'toProductScreen2' ) ).toHaveFocus();
 		} );
 
 		it( 'should keep focus on an active element inside navigator, while re-rendering', async () => {
