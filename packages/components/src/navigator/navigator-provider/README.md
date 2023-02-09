@@ -70,3 +70,7 @@ The `location` object represent the current location, and has a few properties:
 - `path`: `string`. The path associated to the location.
 - `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards in the location stack.
 - `isInitial`: `boolean`. A flag that is `true` only for the first (root) location in the location stack.
+
+### `params`: `Record< string, string | string[] >`
+
+The parsed record of parameters from the current location. For example if the current screen path is `/product/:productId` and the location is `/product/123`, then `params` will be `{ productId: '123' }`.

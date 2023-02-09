@@ -21,8 +21,6 @@ const EMPTY_BLOCKS_LIST = [];
 
 const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalBlockDirectory',
-	'__experimentalBlockInspectorAnimation',
-	'__experimentalClearBlockSelection',
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
@@ -36,6 +34,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'bodyPlaceholder',
 	'canLockBlocks',
 	'capabilities',
+	'clearBlockSelection',
 	'codeEditingEnabled',
 	'colors',
 	'disableCustomColors',

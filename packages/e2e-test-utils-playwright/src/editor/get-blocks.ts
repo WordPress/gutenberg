@@ -6,7 +6,7 @@ import type { Editor } from './index';
 /**
  * Returns the edited blocks.
  *
- * @param  this
+ * @param this
  *
  * @return  The blocks.
  */

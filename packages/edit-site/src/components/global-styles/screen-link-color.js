@@ -12,14 +12,14 @@ import { TabPanel } from '@wordpress/components';
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
-import { unlock } from '../../experiments';
+import { useSupportedStyles, useColorsPerOrigin } from './hooks';
+import { unlock } from '../../private-apis';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 function ScreenLinkColor( { name, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const [ isLinkEnabled ] = useGlobalSetting( 'color.link', name );
@@ -111,6 +111,7 @@ function ScreenLinkColor( { name, variation = '' } ) {
 									pseudoSelectorConfig.value ===
 									pseudoSelectorConfig.userValue
 								}
+								headingLevel={ 3 }
 							/>
 						</>
 					);

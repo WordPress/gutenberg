@@ -265,6 +265,9 @@ export default function useBlockSync( {
 			previousAreBlocksDifferent = areBlocksDifferent;
 		} );
 
-		return () => unsubscribe();
+		return () => {
+			subscribed.current = false;
+			unsubscribe();
+		};
 	}, [ registry, clientId ] );
 }

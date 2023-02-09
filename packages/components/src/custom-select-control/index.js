@@ -257,3 +257,12 @@ export default function CustomSelectControl( props ) {
 		</div>
 	);
 }
+
+export function StableCustomSelectControl( props ) {
+	return (
+		<CustomSelectControl
+			{ ...props }
+			__experimentalShowSelectedHint={ false }
+		/>
+	);
+}

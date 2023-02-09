@@ -37,8 +37,6 @@ const EMPTY_ARRAY = [];
 const MAX_TERMS_SUGGESTIONS = 20;
 const DEFAULT_QUERY = {
 	per_page: MAX_TERMS_SUGGESTIONS,
-	orderby: 'count',
-	order: 'desc',
 	_fields: 'id,name',
 	context: 'view',
 };

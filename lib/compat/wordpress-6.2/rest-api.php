@@ -6,6 +6,21 @@
  */
 
 /**
+ * Update `wp_template` and `wp_template-part` post types to use
+ * Gutenberg's REST controller.
+ *
+ * @param array  $args Array of arguments for registering a post type.
+ * @param string $post_type Post type key.
+ */
+function gutenberg_update_templates_template_parts_rest_controller( $args, $post_type ) {
+	if ( in_array( $post_type, array( 'wp_template', 'wp_template-part' ), true ) ) {
+		$args['rest_controller_class'] = 'Gutenberg_REST_Templates_Controller_6_2';
+	}
+	return $args;
+}
+add_filter( 'register_post_type_args', 'gutenberg_update_templates_template_parts_rest_controller', 10, 2 );
+
+/**
  * Registers the block pattern categories REST API routes.
  */
 function gutenberg_register_rest_block_pattern_categories() {
@@ -108,3 +123,43 @@ function gutenberg_modify_rest_sidebars_response( $response ) {
 	return $response;
 }
 add_filter( 'rest_prepare_sidebar', 'gutenberg_modify_rest_sidebars_response' );
+
+
+/**
+ * Add the `block_types` value to the `pattern-directory-item` schema.
+ *
+ * @since 6.2.0 Added 'block_types' property.
+ */
+function add_block_pattern_block_types_schema() {
+	register_rest_field(
+		'pattern-directory-item',
+		'block_types',
+		array(
+			'schema' => array(
+				'description' => __( 'The block types which can use this pattern.', 'gutenberg' ),
+				'type'        => 'array',
+				'uniqueItems' => true,
+				'items'       => array( 'type' => 'string' ),
+				'context'     => array( 'view', 'embed' ),
+			),
+		)
+	);
+}
+add_filter( 'rest_api_init', 'add_block_pattern_block_types_schema' );
+
+
+/**
+ * Add the `block_types` value into the API response.
+ *
+ * @since 6.2.0 Added 'block_types' property.
+ *
+ * @param WP_REST_Response $response    The response object.
+ * @param object           $raw_pattern The unprepared pattern.
+ */
+function filter_block_pattern_response( $response, $raw_pattern ) {
+	$data                = $response->get_data();
+	$data['block_types'] = array_map( 'sanitize_text_field', $raw_pattern->meta->wpop_block_types );
+	$response->set_data( $data );
+	return $response;
+}
+add_filter( 'rest_prepare_block_pattern', 'filter_block_pattern_response', 10, 2 );

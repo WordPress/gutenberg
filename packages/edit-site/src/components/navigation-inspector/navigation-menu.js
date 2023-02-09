@@ -11,7 +11,7 @@ import { useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const ALLOWED_BLOCKS = {
 	'core/navigation': [
@@ -36,7 +36,7 @@ const ALLOWED_BLOCKS = {
 	],
 };
 
-export default function NavigationMenu( { innerBlocks } ) {
+export default function NavigationMenu( { innerBlocks, onSelect } ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
 	const { OffCanvasEditor } = unlock( blockEditorExperiments );
@@ -56,5 +56,5 @@ export default function NavigationMenu( { innerBlocks } ) {
 		} );
 	}, [ updateBlockListSettings, innerBlocks ] );
 
-	return <OffCanvasEditor blocks={ innerBlocks } />;
+	return <OffCanvasEditor blocks={ innerBlocks } onSelect={ onSelect } />;
 }

@@ -26,8 +26,8 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels } from '../../components/global-styles/hooks';
-import { unlock } from '../../experiments';
+import { useSupportedStyles } from '../../components/global-styles/hooks';
+import { unlock } from '../../private-apis';
 
 const { GlobalStylesContext } = unlock( blockEditorExperiments );
 
@@ -90,22 +90,30 @@ const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontFamily': 'fontFamily',
 };
 
-function getChangesToPush( name, attributes ) {
-	return getSupportedGlobalStylesPanels( name ).flatMap( ( key ) => {
-		if ( ! STYLE_PROPERTY[ key ] ) {
-			return [];
-		}
-		const { value: path } = STYLE_PROPERTY[ key ];
-		const presetAttributeKey = path.join( '.' );
-		const presetAttributeValue =
-			attributes[
-				STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[ presetAttributeKey ]
-			];
-		const value = presetAttributeValue
-			? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
-			: get( attributes.style, path );
-		return value ? [ { path, value } ] : [];
-	} );
+function useChangesToPush( name, attributes ) {
+	const supports = useSupportedStyles( name );
+
+	return useMemo(
+		() =>
+			supports.flatMap( ( key ) => {
+				if ( ! STYLE_PROPERTY[ key ] ) {
+					return [];
+				}
+				const { value: path } = STYLE_PROPERTY[ key ];
+				const presetAttributeKey = path.join( '.' );
+				const presetAttributeValue =
+					attributes[
+						STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[
+							presetAttributeKey
+						]
+					];
+				const value = presetAttributeValue
+					? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
+					: get( attributes.style, path );
+				return value ? [ { path, value } ] : [];
+			} ),
+		[ supports, name, attributes ]
+	);
 }
 
 function cloneDeep( object ) {
@@ -117,10 +125,7 @@ function PushChangesToGlobalStylesControl( {
 	attributes,
 	setAttributes,
 } ) {
-	const changes = useMemo(
-		() => getChangesToPush( name, attributes ),
-		[ name, attributes ]
-	);
+	const changes = useChangesToPush( name, attributes );
 
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );

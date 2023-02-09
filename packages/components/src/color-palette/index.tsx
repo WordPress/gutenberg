@@ -10,7 +10,7 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useRef, useMemo, forwardRef } from '@wordpress/element';
+import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -107,6 +107,7 @@ function MultiplePalettes( {
 	onChange,
 	value,
 	actions,
+	headingLevel,
 }: MultiplePalettesProps ) {
 	if ( colors.length === 0 ) {
 		return null;
@@ -117,7 +118,9 @@ function MultiplePalettes( {
 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading>{ name }</ColorHeading>
+						<ColorHeading level={ headingLevel }>
+							{ name }
+						</ColorHeading>
 						<SinglePalette
 							clearColor={ clearColor }
 							colors={ colorPalette }
@@ -174,7 +177,6 @@ function UnforwardedColorPalette(
 	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const customColorPaletteRef = useRef< HTMLElement | null >( null );
 	const {
 		clearable = true,
 		colors = [],
@@ -183,9 +185,19 @@ function UnforwardedColorPalette(
 		onChange,
 		value,
 		__experimentalIsRenderedInSidebar = false,
+		headingLevel = 2,
 		...otherProps
 	} = props;
+	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
+
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+
+	const customColorPaletteCallbackRef = useCallback(
+		( node: HTMLElement | null ) => {
+			setNormalizedColorValue( normalizeColorValue( value, node ) );
+		},
+		[ value ]
+	);
 
 	const hasMultipleColorOrigins = isMultiplePaletteArray( colors );
 	const buttonLabelName = useMemo(
@@ -201,14 +213,14 @@ function UnforwardedColorPalette(
 	const renderCustomColorPicker = () => (
 		<DropdownContentWrapper paddingSize="none">
 			<ColorPicker
-				color={ normalizeColorValue( value, customColorPaletteRef ) }
+				color={ normalizedColorValue }
 				onChange={ ( color ) => onChange( color ) }
 				enableAlpha={ enableAlpha }
 			/>
 		</DropdownContentWrapper>
 	);
 
-	const colordColor = colord( value ?? '' );
+	const colordColor = colord( normalizedColorValue ?? '' );
 
 	const valueWithoutLeadingHash = value?.startsWith( '#' )
 		? value.substring( 1 )
@@ -235,6 +247,7 @@ function UnforwardedColorPalette(
 				{ __( 'Clear' ) }
 			</CircularOptionPicker.ButtonAction>
 		),
+		headingLevel,
 	};
 
 	return (
@@ -246,7 +259,7 @@ function UnforwardedColorPalette(
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Flex
 							as={ 'button' }
-							ref={ customColorPaletteRef }
+							ref={ customColorPaletteCallbackRef }
 							justify="space-between"
 							align="flex-start"
 							className="components-color-palette__custom-color"

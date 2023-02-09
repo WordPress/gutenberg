@@ -22,7 +22,7 @@ import Subtitle from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
 import { useColorRandomizer } from './hooks';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useGlobalSetting } = unlock( blockEditorExperiments );
 
@@ -65,7 +65,7 @@ function Palette( { name } ) {
 
 	return (
 		<VStack spacing={ 3 }>
-			<Subtitle>{ __( 'Palette' ) }</Subtitle>
+			<Subtitle level={ 3 }>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem
 					path={ screenPath }

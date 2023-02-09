@@ -3,6 +3,13 @@
  */
 import type { ReactNode } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { ButtonAsButtonProps } from '../button/types';
+
+export type MatchParams = Record< string, string | string[] >;
+
 type NavigateOptions = {
 	focusTargetSelector?: string;
 };
@@ -14,14 +21,19 @@ export type NavigatorLocation = NavigateOptions & {
 	hasRestoredFocus?: boolean;
 };
 
-export type NavigatorContext = {
+// Returned by the `useNavigator` hook.
+export type Navigator = {
 	location: NavigatorLocation;
+	params: MatchParams;
 	goTo: ( path: string, options?: NavigateOptions ) => void;
 	goBack: () => void;
 };
 
-// Returned by the `useNavigator` hook.
-export type Navigator = NavigatorContext;
+export type NavigatorContext = Navigator & {
+	addScreen: ( screen: Screen ) => void;
+	removeScreen: ( screen: Screen ) => void;
+	match?: string;
+};
 
 export type NavigatorProviderProps = {
 	/**
@@ -45,17 +57,7 @@ export type NavigatorScreenProps = {
 	children: ReactNode;
 };
 
-type ButtonProps = {
-	// TODO: should also extend `Button` prop types once the `Button` component
-	// is refactored to TypeScript.
-	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
-};
-export type NavigatorBackButtonProps = Omit< ButtonProps, 'href' > & {
-	/**
-	 * The children elements.
-	 */
-	children: ReactNode;
-};
+export type NavigatorBackButtonProps = ButtonAsButtonProps;
 
 export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	/**
@@ -70,4 +72,9 @@ export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	 * @default 'id'
 	 */
 	attributeName?: string;
+};
+
+export type Screen = {
+	id: string;
+	path: string;
 };

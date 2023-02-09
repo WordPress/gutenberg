@@ -27,8 +27,8 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels } from './hooks';
-import { unlock } from '../../experiments';
+import { useSupportedStyles } from './hooks';
+import { unlock } from '../../private-apis';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
@@ -53,42 +53,42 @@ export function useHasDimensionsPanel( name ) {
 }
 
 function useHasContentSize( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ settings ] = useGlobalSetting( 'layout.contentSize', name );
 
 	return settings && supports.includes( 'contentSize' );
 }
 
 function useHasWideSize( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ settings ] = useGlobalSetting( 'layout.wideSize', name );
 
 	return settings && supports.includes( 'wideSize' );
 }
 
 function useHasPadding( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ settings ] = useGlobalSetting( 'spacing.padding', name );
 
 	return settings && supports.includes( 'padding' );
 }
 
 function useHasMargin( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ settings ] = useGlobalSetting( 'spacing.margin', name );
 
 	return settings && supports.includes( 'margin' );
 }
 
 function useHasGap( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ settings ] = useGlobalSetting( 'spacing.blockGap', name );
 
 	return settings && supports.includes( 'blockGap' );
 }
 
 function useHasMinHeight( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ settings ] = useGlobalSetting( 'dimensions.minHeight', name );
 
 	return settings && supports.includes( 'minHeight' );
@@ -413,7 +413,11 @@ export default function DimensionsPanel( { name, variation = '' } ) {
 	};
 
 	return (
-		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
+		<ToolsPanel
+			label={ __( 'Dimensions' ) }
+			resetAll={ resetAll }
+			headingLevel={ 3 }
+		>
 			{ ( showContentSizeControl || showWideSizeControl ) && (
 				<span className="span-columns">
 					{ __( 'Set the width of the main content area.' ) }

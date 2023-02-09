@@ -9,7 +9,7 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useGlobalStylesOutput } = unlock( blockEditorExperiments );
 
