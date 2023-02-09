@@ -130,7 +130,9 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		);
 		const preferencesModalContent =
 			preferencesModal.locator( 'role=document' );
-		const closeButton = page.locator( 'role=button[name="Close dialog"i]' );
+		const closeButton = preferencesModal.locator(
+			'role=button[name="Close"i]'
+		);
 		const generalTab = preferencesModal.locator(
 			'role=tab[name="General"i]'
 		);

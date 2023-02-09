@@ -51,7 +51,7 @@ export type ModalProps = {
 	/**
 	 * Label on the close button.
 	 *
-	 * @default `__( 'Close dialog' )`
+	 * @default `__( 'Close' )`
 	 */
 	closeButtonLabel?: string;
 	/**
