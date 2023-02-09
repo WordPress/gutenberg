@@ -642,12 +642,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "BaseField",
-		"slug": "base-field",
-		"markdown_source": "../packages/components/src/base-field/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "BorderBoxControl",
 		"slug": "border-box-control",
 		"markdown_source": "../packages/components/src/border-box-control/border-box-control/README.md",
