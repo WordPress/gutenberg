@@ -52,7 +52,7 @@ function TypographyInspectorControl( { children } ) {
 	);
 }
 
-function useBLockSettings( name ) {
+function useBlockSettings( name ) {
 	const fontFamilies = useSetting( 'typography.fontFamilies' );
 	const fontSizes = useSetting( 'typography.fontSizes' );
 	const customFontSize = useSetting( 'typography.customFontSize' );
@@ -103,7 +103,7 @@ export function TypographyPanel( {
 	attributes,
 	setAttributes,
 } ) {
-	const settings = useBLockSettings( name );
+	const settings = useBlockSettings( name );
 	const isEnabled = useHasTypographyPanel( settings );
 	const value = useMemo( () => {
 		return {
