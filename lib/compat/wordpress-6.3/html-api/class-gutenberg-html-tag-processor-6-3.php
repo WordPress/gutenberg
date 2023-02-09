@@ -1401,6 +1401,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * Applies attribute updates to HTML document.
 	 *
 	 * @since 6.2.0
+	 * @since 6.3.0 Invalidate any bookmarks whose targets are overwritten.
 	 *
 	 * @return void
 	 */
