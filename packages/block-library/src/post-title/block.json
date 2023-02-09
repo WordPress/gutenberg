@@ -12,8 +12,8 @@
 			"type": "string"
 		},
 		"level": {
-			"type": "string",
-			"default": "h2"
+			"type": "number",
+			"default": "2"
 		},
 		"isLink": {
 			"type": "boolean",

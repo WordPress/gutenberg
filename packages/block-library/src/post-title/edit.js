@@ -12,7 +12,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	PlainText,
-	TagSelectionDropdown,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -28,7 +28,7 @@ export default function PostTitleEdit( {
 	setAttributes,
 	context: { postType, postId, queryId },
 } ) {
-	const TagName = level;
+	const TagName = 'h' + level;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
@@ -102,8 +102,8 @@ export default function PostTitleEdit( {
 	return (
 		<>
 			<BlockControls group="block">
-				<TagSelectionDropdown
-					selectedTag={ level }
+				<HeadingLevelDropdown
+					selectedLevel={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

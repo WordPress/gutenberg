@@ -56,7 +56,7 @@
 								"name": "core/post-title",
 								"isValid": true,
 								"attributes": {
-									"level": "h2",
+									"level": "2",
 									"isLink": false,
 									"rel": "",
 									"linkTarget": "_self"

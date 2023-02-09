@@ -1,46 +1,20 @@
-# Block Tag Selection
+# Heading Level Dropdown
 
-`<TagSelectionDropdown>` Adds a dropdown with a list of selectable HTML tags to the block toolbar.
+`<HeadingLevelDropdown>` Adds a dropdown for selecting H1-H6 and paragraph HTML tags from the block toolbar.
 Uses `<ToolbarDropdownMenu>`.
 
 ## Usage
 
 ```jsx
 
-import { BlockControls, TagSelectionDropdown } from '@wordpress/block-editor';
+import { BlockControls, HeadingLevelDropdown } from '@wordpress/block-editor';
 
-// Default HTML tags
-const DEFAULT_TAGS = [
-	{
-		tag: 'h1',
-		title: __( 'Heading 1' ),
-	},
-	{
-		tag: 'h2',
-		title: __( 'Heading 2' ),
-	},
-	{
-		tag: 'h3',
-		title: __( 'Heading 3' ),
-	},
-	{
-		tag: 'h4',
-		title: __( 'Heading 4' ),
-	},
-	{
-		tag: 'h5',
-		title: __( 'Heading 5' ),
-	},
-	{
-		tag: 'h6',
-		title: __( 'Heading 6' ),
-	},
-];
+const HEADING_LEVELS = [ 0, 1, 2, 3, 4, 5, 6 ];
 
-const MyTagSelectionToolbar = () => (
+const MyHeadingLevelToolbar = () => (
 	<BlockControls group="block">
-		<TagSelectionDropdown
-			tags={ DEFAULT_TAGS }
+		<HeadingLevelDropdown
+			tags={ HEADING_LEVELS }
 			selectedTag={ tag }
 			onChange={ ( newTag ) =>
 				setAttributes( { tag: newTag } )

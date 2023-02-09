@@ -4,7 +4,7 @@
 
 ### Enhancements
 
-- Add `TagSelectionDropdown` component for selecting a HTML tag from the block toolbar.
+- Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
 
 ## 11.3.0 (2023-02-01)
 
