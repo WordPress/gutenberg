@@ -8,10 +8,14 @@ import classnames from 'classnames';
  */
 import { __experimentalListView as ListView } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { useFocusReturn } from '@wordpress/compose';
+import {
+	useFocusOnMount,
+	useFocusReturn,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -26,6 +30,7 @@ import ListViewOutline from './list-view-outline';
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editPostStore );
 
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const headerFocusReturnRef = useFocusReturn();
 	const contentFocusReturnRef = useFocusReturn();
 
@@ -40,6 +45,12 @@ export default function ListViewSidebar() {
 
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
+	// This ref refers to the list view tab button.
+	const listViewTabRef = useRef();
+	// This ref refers to the outline tab button.
+	const outlineTabRef = useRef();
+	// This ref refers to the list view application area.
+	const listViewRef = useRef();
 
 	/*
 	 * Callback function to handle list view or outline focus.
@@ -49,25 +60,23 @@ export default function ListViewSidebar() {
 	 * @return void
 	 */
 	function handleSidebarFocus( currentTab ) {
-		// Find tabbables based on the attached sidebar ref.
-		const sidebarTabbables = focus.tabbable.find( sidebarRef.current );
 		// List view tab is selected.
 		if ( currentTab === 'list-view' ) {
-			// Either focus the list view or the list view tab. Must have a fallback because the list view does not render when there are no blocks. If list view is available, need to skip close, list view, and outline tabs. If list view is not available, need to skip close button.
-			const listViewFocusLocation =
-				sidebarTabbables[ 3 ] || sidebarTabbables[ 1 ];
-			listViewFocusLocation.focus( { preventScroll: true } );
+			// Either focus the list view or the list view tab button. Must have a fallback because the list view does not render when there are no blocks.
+			const listViewApplicationFocus = focus.tabbable.find(
+				listViewRef.current
+			)[ 0 ];
+			const listViewFocusArea = sidebarRef.current.contains(
+				listViewApplicationFocus
+			)
+				? listViewApplicationFocus
+				: listViewTabRef.current;
+			listViewFocusArea.focus();
 			// Outline tab is selected.
 		} else {
-			// Find the 3rd tabbable based on the attached sidebar ref. This is to skip over the close button, list view tab button, and landing on outline tab button since there is nothing else to focus after.
-			sidebarTabbables[ 2 ].focus();
+			outlineTabRef.current.focus();
 		}
 	}
-
-	// Handles focus for list view when sidebar mounts.
-	useEffect( () => {
-		handleSidebarFocus( 'list-view' );
-	}, [] );
 
 	// This only fires when the sidebar is open because of the conditional rendering. It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
 	useShortcut( 'core/edit-post/toggle-list-view', () => {
@@ -104,6 +113,7 @@ export default function ListViewSidebar() {
 				<ul>
 					<li>
 						<Button
+							ref={ listViewTabRef }
 							onClick={ () => {
 								setTab( 'list-view' );
 							} }
@@ -118,6 +128,7 @@ export default function ListViewSidebar() {
 					</li>
 					<li>
 						<Button
+							ref={ outlineTabRef }
 							onClick={ () => {
 								setTab( 'outline' );
 							} }
@@ -133,7 +144,11 @@ export default function ListViewSidebar() {
 				</ul>
 			</div>
 			<div
-				ref={ contentFocusReturnRef }
+				ref={ useMergeRefs( [
+					contentFocusReturnRef,
+					focusOnMountRef,
+					listViewRef,
+				] ) }
 				className="edit-post-editor__list-view-container"
 			>
 				{ tab === 'list-view' && (
