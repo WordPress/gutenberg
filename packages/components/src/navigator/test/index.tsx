@@ -105,25 +105,6 @@ function CustomNavigatorButton( {
 	);
 }
 
-function CustomNavigatorButtonWithFocusRestoration( {
-	path,
-	onClick,
-	...props
-}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
-	onClick?: CustomTestOnClickHandler;
-} ) {
-	return (
-		<NavigatorButton
-			onClick={ () => {
-				// Used to spy on the values passed to `navigator.goTo`.
-				onClick?.( { type: 'goTo', path } );
-			} }
-			path={ path }
-			{ ...props }
-		/>
-	);
-}
-
 function CustomNavigatorBackButton( {
 	onClick,
 	...props
@@ -219,12 +200,12 @@ const MyNavigation = ( {
 					 * navigating to screen as a result of a backwards navigation.
 					 */ }
 					<button>First tabbable child screen button</button>
-					<CustomNavigatorButtonWithFocusRestoration
+					<CustomNavigatorButton
 						path={ PATHS.NESTED }
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.toNestedScreen }
-					</CustomNavigatorButtonWithFocusRestoration>
+					</CustomNavigatorButton>
 					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
 					>
