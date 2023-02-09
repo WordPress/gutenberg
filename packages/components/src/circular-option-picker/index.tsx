@@ -105,9 +105,7 @@ function ButtonAction( {
 	);
 }
 
-export default function CircularOptionPicker(
-	props: CircularOptionPickerProps
-) {
+function CircularOptionPicker( props: CircularOptionPickerProps ) {
 	const { actions, className, options, children } = props;
 	return (
 		<div
@@ -132,3 +130,5 @@ export default function CircularOptionPicker(
 CircularOptionPicker.Option = Option;
 CircularOptionPicker.ButtonAction = ButtonAction;
 CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
+
+export default CircularOptionPicker;
