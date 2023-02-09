@@ -16,6 +16,7 @@ import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
 import { Fill } from '../slot-fill';
+import { VisuallyHidden } from '../visually-hidden';
 
 export function getAutoCompleterUI( autocompleter, accessibilitySlotName ) {
 	const useItems = autocompleter.useItems
@@ -56,12 +57,11 @@ export function getAutoCompleterUI( autocompleter, accessibilitySlotName ) {
 			return null;
 		}
 
-		const ListBox = ( { hide } ) => (
-			<div
+		const ListBox = ( { Component = 'div' } ) => (
+			<Component
 				id={ listBoxId }
 				role="listbox"
 				className="components-autocomplete__results"
-				style={ hide ? { display: 'none' } : {} }
 			>
 				{ items.map( ( option, index ) => (
 					<Button
@@ -82,7 +82,7 @@ export function getAutoCompleterUI( autocompleter, accessibilitySlotName ) {
 						{ option.label }
 					</Button>
 				) ) }
-			</div>
+			</Component>
 		);
 
 		return (
@@ -99,7 +99,7 @@ export function getAutoCompleterUI( autocompleter, accessibilitySlotName ) {
 				</Popover>
 				{ accessibilitySlotName && (
 					<Fill name={ accessibilitySlotName }>
-						<ListBox hide />
+						<ListBox Component={ VisuallyHidden } />
 					</Fill>
 				) }
 			</>
