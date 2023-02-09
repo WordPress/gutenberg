@@ -2,6 +2,49 @@
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+class NavigationBlockUtils {
+	constructor( { editor, page, requestUtils } ) {
+		this.editor = editor;
+		this.page = page;
+		this.requestUtils = requestUtils;
+	}
+
+	/**
+	 * Create a navigation menu
+	 *
+	 * @param {Object} menuData navigation menu post data.
+	 * @return {string} Menu content.
+	 */
+	async createNavigationMenu( menuData ) {
+		return this.requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/navigation/`,
+			data: {
+				status: 'publish',
+				...menuData,
+			},
+		} );
+	}
+
+	/**
+	 * Delete all navigation menus
+	 *
+	 */
+	async deleteAllNavigationMenus() {
+		const menus = await this.requestUtils.rest( {
+			path: `/wp/v2/navigation/`,
+		} );
+
+		if ( ! menus?.length ) return;
+
+		await this.requestUtils.batchRest(
+			menus.map( ( menu ) => ( {
+				method: 'DELETE',
+				path: `/wp/v2/navigation/${ menu.id }?force=true`,
+			} ) )
+		);
+	}
+}
 
 test.use( {
 	navBlockUtils: async ( { page, requestUtils }, use ) => {
@@ -103,46 +146,39 @@ test.describe(
 	}
 );
 
-class NavigationBlockUtils {
-	constructor( { editor, page, requestUtils } ) {
-		this.editor = editor;
-		this.page = page;
-		this.requestUtils = requestUtils;
-	}
+test.describe( 'Navigation block', () => {
+	test.describe(
+		'As a user I want to see a warning if the menu referenced by a navigation block is not available',
+		() => {
+			test.beforeEach( async ( { admin } ) => {
+				await admin.createNewPost();
+			} );
 
-	/**
-	 * Create a navigation menu
-	 *
-	 * @param {Object} menuData navigation menu post data.
-	 * @return {string} Menu content.
-	 */
-	async createNavigationMenu( menuData ) {
-		return this.requestUtils.rest( {
-			method: 'POST',
-			path: `/wp/v2/navigation/`,
-			data: {
-				status: 'publish',
-				...menuData,
-			},
-		} );
-	}
+			test( 'warning message shows when given an unknown ref', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: 1,
+					},
+				} );
 
-	/**
-	 * Delete all navigation menus
-	 *
-	 */
-	async deleteAllNavigationMenus() {
-		const menus = await this.requestUtils.rest( {
-			path: `/wp/v2/navigation/`,
-		} );
+				// Check the markup of the block is correct.
+				await editor.publishPost();
+				const content = await editor.getEditedPostContent();
+				expect( content ).toBe( `<!-- wp:navigation {"ref":1} /-->` );
 
-		if ( ! menus?.length ) return;
-
-		await this.requestUtils.batchRest(
-			menus.map( ( menu ) => ( {
-				method: 'DELETE',
-				path: `/wp/v2/navigation/${ menu.id }?force=true`,
-			} ) )
-		);
-	}
-}
+				// Find the warning message
+				const warningMessage = await editor.page.locator(
+					'class=wp-navigation-block',
+					{
+						hasText:
+							'Navigation menu has been deleted or is unavailable.',
+					}
+				);
+				expect( warningMessage ).toBeTruthy();
+			} );
+		}
+	);
+} );
