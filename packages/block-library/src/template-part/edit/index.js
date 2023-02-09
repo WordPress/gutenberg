@@ -187,7 +187,7 @@ export default function TemplatePartEdit( {
 								</MenuItem>
 							) }
 						</BlockSettingsMenuControls>
-						<BlockControls group="other">
+						<BlockControls group="block">
 							<ToolbarButton onClick={ shuffleTemplatePart }>
 								{ __( 'Shuffle' ) }
 							</ToolbarButton>
