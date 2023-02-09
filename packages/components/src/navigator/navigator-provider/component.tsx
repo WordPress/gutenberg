@@ -7,7 +7,14 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	useCallback,
+	useReducer,
+	useRef,
+} from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -24,7 +31,26 @@ import type {
 	NavigatorProviderProps,
 	NavigatorLocation,
 	NavigatorContext as NavigatorContextType,
+	Screen,
 } from '../types';
+import { patternMatch } from '../utils/router';
+
+type MatchedPath = ReturnType< typeof patternMatch >;
+type ScreenAction = { type: string; screen: Screen };
+
+function screensReducer(
+	state: Screen[] = [],
+	action: ScreenAction
+): Screen[] {
+	switch ( action.type ) {
+		case 'add':
+			return [ ...state, action.screen ];
+		case 'remove':
+			return state.filter( ( s: Screen ) => s.id !== action.screen.id );
+	}
+
+	return state;
+}
 
 function UnconnectedNavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
@@ -40,18 +66,84 @@ function UnconnectedNavigatorProvider(
 			path: initialPath,
 		},
 	] );
+	const [ screens, dispatch ] = useReducer( screensReducer, [] );
+	const currentMatch = useRef< MatchedPath >();
+	const matchedPath = useMemo( () => {
+		let currentPath: string | undefined;
+		if (
+			locationHistory.length === 0 ||
+			( currentPath =
+				locationHistory[ locationHistory.length - 1 ].path ) ===
+				undefined
+		) {
+			currentMatch.current = undefined;
+			return undefined;
+		}
+
+		const resolvePath = ( path: string ) => {
+			const newMatch = patternMatch( path, screens );
+
+			// If the new match is the same as the current match,
+			// return the previous one for performance reasons.
+			if (
+				currentMatch.current &&
+				newMatch &&
+				isShallowEqual(
+					newMatch.params,
+					currentMatch.current.params
+				) &&
+				newMatch.id === currentMatch.current.id
+			) {
+				return currentMatch.current;
+			}
+
+			return newMatch;
+		};
+
+		const newMatch = resolvePath( currentPath );
+		currentMatch.current = newMatch;
+		return newMatch;
+	}, [ screens, locationHistory ] );
+
+	const addScreen = useCallback(
+		( screen: Screen ) => dispatch( { type: 'add', screen } ),
+		[]
+	);
+
+	const removeScreen = useCallback(
+		( screen: Screen ) => dispatch( { type: 'remove', screen } ),
+		[]
+	);
 
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
 		( path, options = {} ) => {
-			setLocationHistory( ( prevLocationHistory ) => [
-				...prevLocationHistory,
-				{
-					...options,
+			setLocationHistory( ( prevLocationHistory ) => {
+				const { focusTargetSelector, ...restOptions } = options;
+
+				const newLocation = {
+					...restOptions,
 					path,
 					isBack: false,
 					hasRestoredFocus: false,
-				},
-			] );
+				};
+
+				if ( prevLocationHistory.length < 1 ) {
+					return [ newLocation ];
+				}
+
+				return [
+					...prevLocationHistory.slice( 0, -1 ),
+					// Assign `focusTargetSelector` to the previous location in history
+					// (the one we just navigated from).
+					{
+						...prevLocationHistory[
+							prevLocationHistory.length - 1
+						],
+						focusTargetSelector,
+					},
+					newLocation,
+				];
+			} );
 		},
 		[]
 	);
@@ -78,10 +170,14 @@ function UnconnectedNavigatorProvider(
 				...locationHistory[ locationHistory.length - 1 ],
 				isInitial: locationHistory.length === 1,
 			},
+			params: matchedPath ? matchedPath.params : {},
+			match: matchedPath ? matchedPath.id : undefined,
 			goTo,
 			goBack,
+			addScreen,
+			removeScreen,
 		} ),
-		[ locationHistory, goTo, goBack ]
+		[ locationHistory, matchedPath, goTo, goBack, addScreen, removeScreen ]
 	);
 
 	const cx = useCx();
