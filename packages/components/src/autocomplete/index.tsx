@@ -400,9 +400,7 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 		ref,
 		useRefEffect( ( element: HTMLElement ) => {
 			function _onKeyDown( event: KeyboardEvent ) {
-				if ( typeof onKeyDownRef.current !== 'undefined' ) {
-					onKeyDownRef.current( event );
-				}
+				onKeyDownRef.current?.( event );
 			}
 			element.addEventListener( 'keydown', _onKeyDown );
 			return () => {
