@@ -91,37 +91,27 @@ export default function UnsavedInnerBlocks( {
 		}
 	);
 
-	const { isSaving, draftNavigationMenus, hasResolvedDraftNavigationMenus } =
-		useSelect(
-			( select ) => {
-				if ( isDisabled ) {
-					return EMPTY_OBJECT;
-				}
+	const { isSaving, hasResolvedDraftNavigationMenus } = useSelect(
+		( select ) => {
+			if ( isDisabled ) {
+				return EMPTY_OBJECT;
+			}
 
-				const {
-					getEntityRecords,
-					hasFinishedResolution,
-					isSavingEntityRecord,
-				} = select( coreStore );
+			const { hasFinishedResolution, isSavingEntityRecord } =
+				select( coreStore );
 
-				return {
-					isSaving: isSavingEntityRecord(
-						'postType',
-						'wp_navigation'
-					),
-					draftNavigationMenus: getEntityRecords(
-						...DRAFT_MENU_PARAMS
-					),
-					hasResolvedDraftNavigationMenus: hasFinishedResolution(
-						'getEntityRecords',
-						DRAFT_MENU_PARAMS
-					),
-				};
-			},
-			[ isDisabled ]
-		);
+			return {
+				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
+				hasResolvedDraftNavigationMenus: hasFinishedResolution(
+					'getEntityRecords',
+					DRAFT_MENU_PARAMS
+				),
+			};
+		},
+		[ isDisabled ]
+	);
 
-	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
+	const { hasResolvedNavigationMenus } = useNavigationMenu();
 
 	// Automatically save the uncontrolled blocks.
 	useEffect( () => {
@@ -154,11 +144,8 @@ export default function UnsavedInnerBlocks( {
 		isSaving,
 		hasResolvedDraftNavigationMenus,
 		hasResolvedNavigationMenus,
-		draftNavigationMenus,
-		navigationMenus,
 		hasSelection,
-		createNavigationMenu,
-		blocks,
+		innerBlocksAreDirty,
 	] );
 
 	const Wrapper = isSaving ? Disabled : 'div';
