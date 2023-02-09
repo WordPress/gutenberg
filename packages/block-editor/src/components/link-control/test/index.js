@@ -1670,7 +1670,7 @@ describe( 'Addition Settings UI', () => {
 		render( <LinkControlConsumer /> );
 
 		const settingsToggle = screen.queryByRole( 'button', {
-			name: 'Toggle link settings',
+			name: 'Link Settings',
 			ariaControls: 'link-settings-1',
 		} );
 
@@ -1690,7 +1690,7 @@ describe( 'Addition Settings UI', () => {
 		const user = userEvent.setup();
 
 		const settingsToggle = screen.queryByRole( 'button', {
-			name: 'Toggle link settings',
+			name: 'Link Settings',
 			ariaControls: 'link-settings-1',
 		} );
 
@@ -2241,7 +2241,7 @@ describe( 'Controlling link title text', () => {
 
 async function toggleSettingsDrawer( user ) {
 	const settingsToggle = screen.queryByRole( 'button', {
-		name: 'Toggle link settings',
+		name: 'Link Settings',
 	} );
 
 	await user.click( settingsToggle );
