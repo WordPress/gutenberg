@@ -134,19 +134,13 @@ export default function Image( {
 				} = select( blockEditorStore );
 
 				const rootClientId = getBlockRootClientId( clientId );
-				const settings = Object.fromEntries(
-					Object.entries( getSettings() ).filter( ( [ key ] ) =>
-						[
-							'imageEditing',
-							'imageSizes',
-							'maxWidth',
-							'mediaUpload',
-						].includes( key )
-					)
-				);
+				const settings = getSettings();
 
 				return {
-					...settings,
+					imageEditing: settings.imageEditing,
+					imageSizes: settings.imageSizes,
+					maxWidth: settings.maxWidth,
+					mediaUpload: settings.mediaUpload,
 					canInsertCover: canInsertBlockType(
 						'core/cover',
 						rootClientId
