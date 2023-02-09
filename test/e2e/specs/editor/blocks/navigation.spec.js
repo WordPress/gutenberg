@@ -2,49 +2,6 @@
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-class NavigationBlockUtils {
-	constructor( { editor, page, requestUtils } ) {
-		this.editor = editor;
-		this.page = page;
-		this.requestUtils = requestUtils;
-	}
-
-	/**
-	 * Create a navigation menu
-	 *
-	 * @param {Object} menuData navigation menu post data.
-	 * @return {string} Menu content.
-	 */
-	async createNavigationMenu( menuData ) {
-		return this.requestUtils.rest( {
-			method: 'POST',
-			path: `/wp/v2/navigation/`,
-			data: {
-				status: 'publish',
-				...menuData,
-			},
-		} );
-	}
-
-	/**
-	 * Delete all navigation menus
-	 *
-	 */
-	async deleteAllNavigationMenus() {
-		const menus = await this.requestUtils.rest( {
-			path: `/wp/v2/navigation/`,
-		} );
-
-		if ( ! menus?.length ) return;
-
-		await this.requestUtils.batchRest(
-			menus.map( ( menu ) => ( {
-				method: 'DELETE',
-				path: `/wp/v2/navigation/${ menu.id }?force=true`,
-			} ) )
-		);
-	}
-}
 
 test.use( {
 	navBlockUtils: async ( { page, requestUtils }, use ) => {
@@ -146,6 +103,50 @@ test.describe(
 	}
 );
 
+class NavigationBlockUtils {
+	constructor( { editor, page, requestUtils } ) {
+		this.editor = editor;
+		this.page = page;
+		this.requestUtils = requestUtils;
+	}
+
+	/**
+	 * Create a navigation menu
+	 *
+	 * @param {Object} menuData navigation menu post data.
+	 * @return {string} Menu content.
+	 */
+	async createNavigationMenu( menuData ) {
+		return this.requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/navigation/`,
+			data: {
+				status: 'publish',
+				...menuData,
+			},
+		} );
+	}
+
+	/**
+	 * Delete all navigation menus
+	 *
+	 */
+	async deleteAllNavigationMenus() {
+		const menus = await this.requestUtils.rest( {
+			path: `/wp/v2/navigation/`,
+		} );
+
+		if ( ! menus?.length ) return;
+
+		await this.requestUtils.batchRest(
+			menus.map( ( menu ) => ( {
+				method: 'DELETE',
+				path: `/wp/v2/navigation/${ menu.id }?force=true`,
+			} ) )
+		);
+	}
+}
+
 test.describe( 'Navigation block', () => {
 	test.describe(
 		'As a user I want to see a warning if the menu referenced by a navigation block is not available',
@@ -180,4 +181,4 @@ test.describe( 'Navigation block', () => {
 			} );
 		}
 	);
-) };
+} );
