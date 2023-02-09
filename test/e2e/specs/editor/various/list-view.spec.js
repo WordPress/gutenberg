@@ -201,4 +201,53 @@ test.describe( 'List view', () => {
 			} )
 		).toBeFocused();
 	} );
+
+	/**
+	 * When all the blocks gets removed from the editor, it inserts a default
+	 * paragraph block; make sure that paragraph block gets selected after
+	 * removing blocks from ListView.
+	 */
+	test( 'should select default paragraph block after removing all blocks', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Insert a couple of blocks of different types.
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/heading' } );
+
+		// Open list view.
+		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		const blockList = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		// The last inserted Header block should be selected.
+		await blockList
+			.getByRole( 'gridcell', {
+				name: 'Heading link',
+				selected: true,
+			} )
+			.waitFor();
+
+		// Select the Image block as well.
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await blockList
+			.getByRole( 'gridcell', {
+				name: 'Image link',
+				selected: true,
+			} )
+			.waitFor();
+
+		// Remove both blocks.
+		await blockList
+			.getByRole( 'button', { name: 'Options for Image block' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: /Remove blocks/i } ).click();
+
+		// Newly created paragraph block should be selected.
+		await expect(
+			page.getByRole( 'document', { name: /Empty block/i } )
+		).toBeFocused();
+	} );
 } );
