@@ -170,6 +170,12 @@ const MyNavigation = ( {
 
 				<NavigatorScreen path={ PATHS.CHILD }>
 					<p>{ SCREEN_TEXT.child }</p>
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable child screen button</button>
 					<CustomNavigatorButtonWithFocusRestoration
 						path={ PATHS.NESTED }
 						onClick={ onNavigatorButtonClick }
@@ -437,7 +443,11 @@ describe( 'Navigator', () => {
 			await user.click( getNavigationButton( 'toChildScreen' ) );
 
 			// The first tabbable element receives focus.
-			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable child screen button',
+				} )
+			).toHaveFocus();
 
 			// Navigate to nested screen.
 			await user.click( getNavigationButton( 'toNestedScreen' ) );
@@ -448,13 +458,15 @@ describe( 'Navigator', () => {
 			// Navigate back to child screen.
 			await user.click( getNavigationButton( 'back' ) );
 
-			// The first tabbable element receives focus.
+			// Focus is restored on the last element that had focus when the
+			// navigation away from the screen occurred.
 			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
 
-			// Navigate back to home screen, check that focus was correctly restored.
+			// Navigate back to home screen.
 			await user.click( getNavigationButton( 'back' ) );
 
-			// The first tabbable element receives focus.
+			// Focus is restored on the last element that had focus when the
+			// navigation away from the screen occurred.
 			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
 		} );
 
@@ -467,7 +479,11 @@ describe( 'Navigator', () => {
 			await user.click( getNavigationButton( 'toChildScreen' ) );
 
 			// The first tabbable element receives focus.
-			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable child screen button',
+				} )
+			).toHaveFocus();
 
 			// Interact with the inner input.
 			// The focus should stay on the input element.
@@ -485,7 +501,11 @@ describe( 'Navigator', () => {
 			await user.click( getNavigationButton( 'toChildScreen' ) );
 
 			// The first tabbable element receives focus.
-			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable child screen button',
+				} )
+			).toHaveFocus();
 
 			// Interact with the outer input.
 			// The focus should stay on the input element.
