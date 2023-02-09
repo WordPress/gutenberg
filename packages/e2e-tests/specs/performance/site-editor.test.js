@@ -93,7 +93,14 @@ describe( 'Site Editor Performance', () => {
 	it( 'Loading', async () => {
 		const editorURL = await page.url();
 
-		let i = 3;
+		// Number of sample measurements to take.
+		const samples = 3;
+		// Number of throwaway measurements to perform before recording samples.
+		// Having at least one helps ensure that caching quirks don't manifest in
+		// the results.
+		const throwaway = 1;
+
+		let i = throwaway + samples;
 
 		// Measuring loading time.
 		while ( i-- ) {
@@ -114,16 +121,23 @@ describe( 'Site Editor Performance', () => {
 				firstBlock,
 			} = await getLoadingDurations();
 
-			results.serverResponse.push( serverResponse );
-			results.firstPaint.push( firstPaint );
-			results.domContentLoaded.push( domContentLoaded );
-			results.loaded.push( loaded );
-			results.firstContentfulPaint.push( firstContentfulPaint );
-			results.firstBlock.push( firstBlock );
+			if ( i < samples ) {
+				results.serverResponse.push( serverResponse );
+				results.firstPaint.push( firstPaint );
+				results.domContentLoaded.push( domContentLoaded );
+				results.loaded.push( loaded );
+				results.firstContentfulPaint.push( firstContentfulPaint );
+				results.firstBlock.push( firstBlock );
+			}
 		}
 	} );
 
 	it( 'Typing', async () => {
+		await page.waitForSelector( '.edit-site-visual-editor', {
+			timeout: 120000,
+		} );
+		await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
+
 		// Measuring typing performance inside the post content.
 		await canvas().waitForSelector(
 			'[data-type="core/post-content"] [data-type="core/paragraph"]'
