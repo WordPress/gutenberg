@@ -250,9 +250,11 @@ function KeyboardShortcuts() {
 		}
 	} );
 
-	useShortcut( 'core/edit-post/toggle-list-view', () =>
-		setIsListViewOpened( ! isListViewOpened() )
-	);
+	useShortcut( 'core/edit-post/toggle-list-view', () => {
+		if ( ! isListViewOpened() ) {
+			setIsListViewOpened( true );
+		}
+	} );
 
 	useShortcut(
 		'core/block-editor/transform-heading-to-paragraph',
