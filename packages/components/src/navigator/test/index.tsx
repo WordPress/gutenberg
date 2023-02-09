@@ -18,6 +18,7 @@ import {
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
+	useNavigator,
 } from '..';
 
 jest.mock( 'framer-motion', () => {
@@ -50,6 +51,9 @@ const PATHS = {
 	HOME: '/',
 	CHILD: '/child',
 	NESTED: '/child/nested',
+	PRODUCT_PATTERN: '/product/:productId',
+	PRODUCT_1: '/product/1',
+	PRODUCT_2: '/product/2',
 	INVALID_HTML_ATTRIBUTE: INVALID_HTML_ATTRIBUTE.raw,
 	NOT_FOUND: '/not-found',
 };
@@ -58,6 +62,7 @@ const SCREEN_TEXT = {
 	home: 'This is the home screen.',
 	child: 'This is the child screen.',
 	nested: 'This is the nested screen.',
+	product: 'This is the product screen.',
 	invalidHtmlPath: 'This is the screen with an invalid HTML value as a path.',
 };
 
@@ -65,6 +70,8 @@ const BUTTON_TEXT = {
 	toNonExistingScreen: 'Navigate to non-existing screen.',
 	toChildScreen: 'Navigate to child screen.',
 	toNestedScreen: 'Navigate to nested screen.',
+	toProductScreen1: 'Navigate to product 1 screen.',
+	toProductScreen2: 'Navigate to product 2 screen.',
 	toInvalidHtmlPathScreen:
 		'Navigate to screen with an invalid HTML value as a path.',
 	back: 'Go back',
@@ -134,6 +141,24 @@ function CustomNavigatorBackButton( {
 	);
 }
 
+const ProductScreen = ( {
+	onBackButtonClick,
+}: {
+	onBackButtonClick?: CustomTestOnClickHandler;
+} ) => {
+	const { params } = useNavigator();
+
+	return (
+		<NavigatorScreen path={ PATHS.PRODUCT_PATTERN }>
+			<p>{ SCREEN_TEXT.product }</p>
+			<p>Product ID is { params.productId }</p>
+			<CustomNavigatorBackButton onClick={ onBackButtonClick }>
+				{ BUTTON_TEXT.back }
+			</CustomNavigatorBackButton>
+		</NavigatorScreen>
+	);
+};
+
 const MyNavigation = ( {
 	initialPath = PATHS.HOME,
 	onNavigatorButtonClick,
@@ -159,6 +184,18 @@ const MyNavigation = ( {
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.toChildScreen }
+					</CustomNavigatorButton>
+					<CustomNavigatorButton
+						path={ PATHS.PRODUCT_1 }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toProductScreen1 }
+					</CustomNavigatorButton>
+					<CustomNavigatorButton
+						path={ PATHS.PRODUCT_2 }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toProductScreen2 }
 					</CustomNavigatorButton>
 					<CustomNavigatorButton
 						path={ PATHS.INVALID_HTML_ATTRIBUTE }
@@ -208,6 +245,8 @@ const MyNavigation = ( {
 						{ BUTTON_TEXT.back }
 					</CustomNavigatorBackButton>
 				</NavigatorScreen>
+
+				<ProductScreen onBackButtonClick={ onNavigatorButtonClick } />
 
 				<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
 					<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
