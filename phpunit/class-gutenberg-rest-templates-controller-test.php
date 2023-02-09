@@ -49,7 +49,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 'singular', $response->get_data()['slug'], 'Should fallback to `singular.html`.' );
 		// Should fallback to `index.html`.
-		$request->set_param( 'slug', 'tag' );
+		$request->set_param( 'slug', 'author' );
 		$request->set_param( 'ignore_empty', true );
 		$request->set_param( 'is_custom', false );
 		$response = rest_get_server()->dispatch( $request );
