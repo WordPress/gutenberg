@@ -6,6 +6,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -13,6 +14,10 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { store as editSiteStore } from '../../store';
 
 export default function SaveButton() {
+	// We only want to show the saving state of the button if the button itself initiated the save,
+	// otherwise, the button will show in the side bar when saving is initiated from template save models, etc.
+	const [ selfInitiatedSave, setSelfInitiatedSave ] = useState( false );
+
 	const { isDirty, isSaving, isSaveViewOpen } = useSelect( ( select ) => {
 		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 			select( coreStore );
@@ -32,29 +37,43 @@ export default function SaveButton() {
 
 	const label = __( 'Save' );
 
+	const showButton =
+		( isDirty && ! isSaving ) || ( isSaving && selfInitiatedSave );
+
 	return (
-		<Button
-			variant="primary"
-			className="edit-site-save-button__button"
-			aria-disabled={ disabled }
-			aria-expanded={ isSaveViewOpen }
-			isBusy={ isSaving }
-			onClick={ disabled ? undefined : () => setIsSaveViewOpened( true ) }
-			label={ label }
-			/*
-			 * We want the tooltip to show the keyboard shortcut only when the
-			 * button does something, i.e. when it's not disabled.
-			 */
-			shortcut={ disabled ? undefined : displayShortcut.primary( 's' ) }
-			/*
+		showButton && (
+			<Button
+				variant="primary"
+				className="edit-site-save-button__button"
+				aria-disabled={ disabled }
+				aria-expanded={ isSaveViewOpen }
+				isBusy={ isSaving }
+				onClick={
+					disabled
+						? undefined
+						: () => {
+								setIsSaveViewOpened( true );
+								setSelfInitiatedSave( true );
+						  }
+				}
+				label={ label }
+				/*
+				 * We want the tooltip to show the keyboard shortcut only when the
+				 * button does something, i.e. when it's not disabled.
+				 */
+				shortcut={
+					disabled ? undefined : displayShortcut.primary( 's' )
+				}
+				/*
 			 * Displaying the keyboard shortcut conditionally makes the tooltip
 			 * itself show conditionally. This would trigger a full-rerendering
 			 * of the button that we want to avoid. By setting `showTooltip`,
 			 & the tooltip is always rendered even when there's no keyboard shortcut.
 			 */
-			showTooltip
-		>
-			{ label }
-		</Button>
+				showTooltip
+			>
+				{ label }
+			</Button>
+		)
 	);
 }
