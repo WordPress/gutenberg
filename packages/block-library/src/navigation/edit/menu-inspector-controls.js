@@ -19,7 +19,6 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationMenuSelector from './navigation-menu-selector';
-import { LeafMoreMenu } from '../leaf-more-menu';
 import { unlock } from '../../private-apis';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
@@ -34,7 +33,7 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 } ) => {
-	const { OffCanvasEditor } = unlock( blockEditorExperiments );
+	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorExperiments );
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(
