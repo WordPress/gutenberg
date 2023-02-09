@@ -6,11 +6,11 @@ import { match } from 'path-to-regexp';
 /**
  * Internal dependencies
  */
-import type { Screen } from '../types';
+import type { Screen, MatchParams } from '../types';
 
 export function patternMatch( path: string, screens: Screen[] ) {
 	for ( const screen of screens ) {
-		const matchingFunction = match( screen.path, {
+		const matchingFunction = match< MatchParams >( screen.path, {
 			decode: decodeURIComponent,
 		} );
 		const matched = matchingFunction( path );
