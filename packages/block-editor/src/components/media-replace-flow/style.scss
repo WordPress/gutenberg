@@ -23,24 +23,22 @@
 	}
 
 	.block-editor-link-control {
-		width: 220px; // Hardcoded width avoids resizing of control when switching between preview/edit.
+		width: 328px; // Hardcoded width avoids resizing of control when switching between preview/edit.
 
 		.block-editor-url-input {
 			padding: 0; // Cancel unnecessary default 1px padding in this case.
 			margin: 0; // Reset default LinkControl margins.
 		}
 
-		.components-base-control .components-base-control__field {
-			margin-bottom: 0;
-		}
-
-		.block-editor-link-control__search-item-title {
-			max-width: 180px;
-			white-space: nowrap;
-		}
-
+		.block-editor-link-control__search-item-title,
 		.block-editor-link-control__search-item-info {
+			max-width: 220px;
 			white-space: nowrap;
+		}
+
+		.block-editor-link-control__tools {
+			justify-content: flex-end;
+			padding: $grid-unit-20 0 0;
 		}
 
 		.block-editor-link-control__search-item.is-current {
