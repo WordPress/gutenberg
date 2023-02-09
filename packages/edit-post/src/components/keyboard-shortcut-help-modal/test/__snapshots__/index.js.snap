@@ -705,7 +705,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           <div
             class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
           >
-            Insert a link to a post or page
+            Insert a link to a post or page.
           </div>
           <div
             class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
