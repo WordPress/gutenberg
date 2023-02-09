@@ -62,7 +62,7 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 
 	const classes = useMemo( () => {
 		const base = css( {
-			alignItems: isColumn ? 'normal' : align,
+			alignItems: align,
 			flexDirection: direction,
 			flexWrap: wrap ? 'wrap' : undefined,
 			gap: space( gap ),
