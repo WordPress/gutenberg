@@ -21,6 +21,7 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -28,15 +29,20 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
-import { useHasTypographyPanel } from './typography-panel';
 import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { ScreenVariations } from './screen-variations';
 import { useHasShadowControl } from './shadow-panel';
+import { unlock } from '../../experiments';
+
+const { useHasTypographyPanel, useGlobalSetting } = unlock(
+	blockEditorExperiments
+);
 
 function ContextMenu( { name, parentMenu = '' } ) {
-	const hasTypographyPanel = useHasTypographyPanel( name );
+	const [ settings ] = useGlobalSetting( '', name );
+	const hasTypographyPanel = useHasTypographyPanel( name, null, settings );
 	const hasColorPanel = useHasColorPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasEffectsPanel = useHasShadowControl( name );
