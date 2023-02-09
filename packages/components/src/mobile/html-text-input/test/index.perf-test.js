@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { measurePerformance } from 'reassure';
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent } from '@testing-library/react-native';
 
 /**
  * Internal dependencies
@@ -18,10 +18,6 @@ describe( 'HTMLTextInput Performance', () => {
 	it( 'measures performance', async () => {
 		const onChange = jest.fn();
 
-		const utils = render(
-			<HTMLTextInput onChange={ onChange } onPersist={ jest.fn() } />
-		);
-
 		const scenario = async ( screen ) => {
 			// Simulate user typing text.
 			const htmlTextInput = findContentTextInput( screen );
@@ -31,9 +27,16 @@ describe( 'HTMLTextInput Performance', () => {
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( 'text' );
 
-			expect( screen.getByDisplayValue( 'text' ) ).toBeInTheDocument();
+			expect( screen.getByDisplayValue( 'text' ) ).toBeTruthy();
 		};
 
-		await measurePerformance( utils, { scenario } );
+		await measurePerformance(
+			<HTMLTextInput
+				getStylesFromColorScheme={ jest.fn() }
+				onChange={ onChange }
+				onPersist={ jest.fn() }
+			/>,
+			{ scenario }
+		);
 	} );
 } );
