@@ -8,6 +8,8 @@ import type { ReactNode } from 'react';
  */
 import type { ButtonAsButtonProps } from '../button/types';
 
+export type MatchParams = Record< string, string | string[] >;
+
 type NavigateOptions = {
 	focusTargetSelector?: string;
 };
@@ -19,14 +21,19 @@ export type NavigatorLocation = NavigateOptions & {
 	hasRestoredFocus?: boolean;
 };
 
-export type NavigatorContext = {
+// Returned by the `useNavigator` hook.
+export type Navigator = {
 	location: NavigatorLocation;
+	params: MatchParams;
 	goTo: ( path: string, options?: NavigateOptions ) => void;
 	goBack: () => void;
 };
 
-// Returned by the `useNavigator` hook.
-export type Navigator = NavigatorContext;
+export type NavigatorContext = Navigator & {
+	addScreen: ( screen: Screen ) => void;
+	removeScreen: ( screen: Screen ) => void;
+	match?: string;
+};
 
 export type NavigatorProviderProps = {
 	/**
@@ -65,4 +72,9 @@ export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	 * @default 'id'
 	 */
 	attributeName?: string;
+};
+
+export type Screen = {
+	id: string;
+	path: string;
 };

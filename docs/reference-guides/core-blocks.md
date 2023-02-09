@@ -248,7 +248,7 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 
 -	**Name:** core/file
 -	**Category:** media
--	**Supports:** align, anchor
+-	**Supports:** align, anchor, color (background, gradients, link, ~~text~~)
 -	**Attributes:** displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
 ## Classic
@@ -546,7 +546,7 @@ Display a post's excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/
 -	**Name:** core/post-excerpt
 -	**Category:** theme
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** moreText, showMoreOnNewLine, textAlign
+-	**Attributes:** excerptLength, moreText, showMoreOnNewLine, textAlign
 
 ## Post Featured Image
 

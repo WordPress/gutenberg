@@ -26,7 +26,7 @@ const OBSERVED_CONSOLE_MESSAGE_TYPES = [ 'warn', 'error' ] as const;
  * Adds a page event handler to emit uncaught exception to process if one of
  * the observed console logging types is encountered.
  *
- * @param  message The console message.
+ * @param message The console message.
  */
 function observeConsoleLogging( message: ConsoleMessage ) {
 	const type = message.type();

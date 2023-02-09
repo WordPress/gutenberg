@@ -8,13 +8,14 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  */
 import Button from '../../button';
 import { Card, CardBody, CardFooter, CardHeader } from '../../card';
-import { HStack } from '../../h-stack';
+import { VStack } from '../../v-stack';
 import Dropdown from '../../dropdown';
 import {
 	NavigatorProvider,
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
+	useNavigator,
 } from '..';
 
 const meta: ComponentMeta< typeof NavigatorProvider > = {
@@ -46,7 +47,7 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 				<CardBody>
 					<p>This is the home screen.</p>
 
-					<HStack justify="flex-start" wrap>
+					<VStack alignment="left">
 						<NavigatorButton variant="secondary" path="/child">
 							Navigate to child screen.
 						</NavigatorButton>
@@ -60,6 +61,10 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 
 						<NavigatorButton variant="secondary" path="/stickies">
 							Navigate to screen with sticky content.
+						</NavigatorButton>
+
+						<NavigatorButton variant="secondary" path="/product/1">
+							Navigate to product screen with id 1.
 						</NavigatorButton>
 
 						<Dropdown
@@ -86,7 +91,7 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 								</Card>
 							) }
 						/>
-					</HStack>
+					</VStack>
 				</CardBody>
 			</Card>
 		</NavigatorScreen>
@@ -166,6 +171,10 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 				</CardFooter>
 			</Card>
 		</NavigatorScreen>
+
+		<NavigatorScreen path="/product/:id">
+			<ProductDetails />
+		</NavigatorScreen>
 	</NavigatorProvider>
 );
 
@@ -206,5 +215,20 @@ function MetaphorIpsum( { quantity }: { quantity: number } ) {
 				</p>
 			) ) }
 		</>
+	);
+}
+
+function ProductDetails() {
+	const { params } = useNavigator();
+
+	return (
+		<Card>
+			<CardBody>
+				<NavigatorBackButton variant="secondary">
+					Go back
+				</NavigatorBackButton>
+				<p>This is the screen for the product with id: { params.id }</p>
+			</CardBody>
+		</Card>
 	);
 }

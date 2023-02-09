@@ -2,68 +2,34 @@
  * WordPress dependencies
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import { getFontAppearanceLabel } from '../components/font-appearance-control';
+import {
+	default as StylesTypographyPanel,
+	useHasTypographyPanel,
+} from '../components/global-styles/typography-panel';
 
-import {
-	LINE_HEIGHT_SUPPORT_KEY,
-	LineHeightEdit,
-	hasLineHeightValue,
-	resetLineHeight,
-	useIsLineHeightDisabled,
-} from './line-height';
-import {
-	FONT_STYLE_SUPPORT_KEY,
-	FONT_WEIGHT_SUPPORT_KEY,
-	FontAppearanceEdit,
-	hasFontAppearanceValue,
-	resetFontAppearance,
-	useIsFontAppearanceDisabled,
-	useIsFontStyleDisabled,
-	useIsFontWeightDisabled,
-} from './font-appearance';
-import {
-	FONT_FAMILY_SUPPORT_KEY,
-	FontFamilyEdit,
-	hasFontFamilyValue,
-	resetFontFamily,
-	useIsFontFamilyDisabled,
-} from './font-family';
-import {
-	FONT_SIZE_SUPPORT_KEY,
-	FontSizeEdit,
-	hasFontSizeValue,
-	resetFontSize,
-	useIsFontSizeDisabled,
-} from './font-size';
-import {
-	TEXT_DECORATION_SUPPORT_KEY,
-	TextDecorationEdit,
-	hasTextDecorationValue,
-	resetTextDecoration,
-	useIsTextDecorationDisabled,
-} from './text-decoration';
-import {
-	TEXT_TRANSFORM_SUPPORT_KEY,
-	TextTransformEdit,
-	hasTextTransformValue,
-	resetTextTransform,
-	useIsTextTransformDisabled,
-} from './text-transform';
-import {
-	LETTER_SPACING_SUPPORT_KEY,
-	LetterSpacingEdit,
-	hasLetterSpacingValue,
-	resetLetterSpacing,
-	useIsLetterSpacingDisabled,
-} from './letter-spacing';
+import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
+import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
+import { FONT_SIZE_SUPPORT_KEY } from './font-size';
+import { useSetting } from '../components';
+import { cleanEmptyObject } from './utils';
 
+function omit( object, keys ) {
+	return Object.fromEntries(
+		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
+	);
+}
+
+const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
+const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
+const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
+const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
+const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
 export const TYPOGRAPHY_SUPPORT_KEY = 'typography';
 export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
@@ -76,159 +42,98 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LETTER_SPACING_SUPPORT_KEY,
 ];
 
-export function TypographyPanel( props ) {
-	const { clientId } = props;
-	const isFontFamilyDisabled = useIsFontFamilyDisabled( props );
-	const isFontSizeDisabled = useIsFontSizeDisabled( props );
-	const isFontAppearanceDisabled = useIsFontAppearanceDisabled( props );
-	const isLineHeightDisabled = useIsLineHeightDisabled( props );
-	const isTextDecorationDisabled = useIsTextDecorationDisabled( props );
-	const isTextTransformDisabled = useIsTextTransformDisabled( props );
-	const isLetterSpacingDisabled = useIsLetterSpacingDisabled( props );
+function TypographyInspectorControl( { children } ) {
+	return (
+		<InspectorControls group="typography">{ children }</InspectorControls>
+	);
+}
 
-	const hasFontStyles = ! useIsFontStyleDisabled( props );
-	const hasFontWeights = ! useIsFontWeightDisabled( props );
+export function TypographyPanel( {
+	clientId,
+	name,
+	attributes,
+	setAttributes,
+} ) {
+	const settings = {
+		typography: {
+			fontFamilies: {
+				custom: useSetting( 'typography.fontFamilies' ),
+			},
+			fontSizes: {
+				custom: useSetting( 'typography.fontSizes' ),
+			},
+			customFontSize: useSetting( 'typography.customFontSize' ),
+			fontStyle: useSetting( 'typography.fontStyle' ),
+			fontWeight: useSetting( 'typography.fontWeight' ),
+			lineHeight: useSetting( 'typography.lineHeight' ),
+			textDecoration: useSetting( 'typography.textDecoration' ),
+			textTransform: useSetting( 'typography.textTransform' ),
+			letterSpacing: useSetting( 'typography.letterSpacing' ),
+		},
+	};
 
-	const isDisabled = useIsTypographyDisabled( props );
-	const isSupported = hasTypographySupport( props.name );
+	const isSupported = hasTypographySupport( name );
+	const isEnabled = useHasTypographyPanel( name, null, settings );
 
-	if ( isDisabled || ! isSupported ) return null;
+	const value = useMemo( () => {
+		return {
+			...attributes.style,
+			typography: {
+				...attributes.style?.typography,
+				fontFamily: attributes.fontFamily
+					? 'var:preset|font-family|' + attributes.fontFamily
+					: undefined,
+				fontSize: attributes.fontSize
+					? 'var:preset|font-size|' + attributes.fontSize
+					: attributes.style?.typography?.fontSize,
+			},
+		};
+	}, [ attributes.style, attributes.fontSize, attributes.fontFamily ] );
 
-	const defaultControls = getBlockSupport( props.name, [
+	const onChange = ( newStyle ) => {
+		const updatedStyle = { ...omit( newStyle, [ 'fontFamily' ] ) };
+		const fontSizeValue = newStyle?.typography?.fontSize;
+		const fontFamilyValue = newStyle?.typography?.fontFamily;
+		const fontSizeSlug = fontSizeValue?.startsWith(
+			'var:preset|font-size|'
+		)
+			? fontSizeValue.substring( 'var:preset|font-size|'.length )
+			: undefined;
+		const fontFamilySlug = fontFamilyValue?.startsWith(
+			'var:preset|font-family|'
+		)
+			? fontFamilyValue.substring( 'var:preset|font-family|'.length )
+			: undefined;
+		updatedStyle.typography = {
+			...omit( updatedStyle.typography, [ 'fontFamily' ] ),
+			fontSize: fontSizeSlug ? undefined : fontSizeValue,
+		};
+		setAttributes( {
+			style: cleanEmptyObject( updatedStyle ),
+			fontFamily: fontFamilySlug,
+			fontSize: fontSizeSlug,
+		} );
+	};
+
+	if ( ! isEnabled || ! isSupported ) {
+		return null;
+	}
+
+	const defaultControls = getBlockSupport( name, [
 		TYPOGRAPHY_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
 
-	const createResetAllFilter = ( attribute ) => ( newAttributes ) => ( {
-		...newAttributes,
-		style: {
-			...newAttributes.style,
-			typography: {
-				...newAttributes.style?.typography,
-				[ attribute ]: undefined,
-			},
-		},
-	} );
-
 	return (
-		<InspectorControls group="typography">
-			{ ! isFontFamilyDisabled && (
-				<ToolsPanelItem
-					hasValue={ () => hasFontFamilyValue( props ) }
-					label={ __( 'Font family' ) }
-					onDeselect={ () => resetFontFamily( props ) }
-					isShownByDefault={ defaultControls?.fontFamily }
-					resetAllFilter={ ( newAttributes ) => ( {
-						...newAttributes,
-						fontFamily: undefined,
-					} ) }
-					panelId={ clientId }
-				>
-					<FontFamilyEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ ! isFontSizeDisabled && (
-				<ToolsPanelItem
-					hasValue={ () => hasFontSizeValue( props ) }
-					/* translators: Ensure translation is distinct from "Letter case" */
-					label={ __( 'Font size' ) }
-					onDeselect={ () => resetFontSize( props ) }
-					isShownByDefault={ defaultControls?.fontSize }
-					resetAllFilter={ ( newAttributes ) => ( {
-						...newAttributes,
-						fontSize: undefined,
-						style: {
-							...newAttributes.style,
-							typography: {
-								...newAttributes.style?.typography,
-								fontSize: undefined,
-							},
-						},
-					} ) }
-					panelId={ clientId }
-				>
-					<FontSizeEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ ! isFontAppearanceDisabled && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ () => hasFontAppearanceValue( props ) }
-					label={ getFontAppearanceLabel(
-						hasFontStyles,
-						hasFontWeights
-					) }
-					onDeselect={ () => resetFontAppearance( props ) }
-					isShownByDefault={ defaultControls?.fontAppearance }
-					resetAllFilter={ ( newAttributes ) => ( {
-						...newAttributes,
-						style: {
-							...newAttributes.style,
-							typography: {
-								...newAttributes.style?.typography,
-								fontStyle: undefined,
-								fontWeight: undefined,
-							},
-						},
-					} ) }
-					panelId={ clientId }
-				>
-					<FontAppearanceEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ ! isLineHeightDisabled && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ () => hasLineHeightValue( props ) }
-					label={ __( 'Line height' ) }
-					onDeselect={ () => resetLineHeight( props ) }
-					isShownByDefault={ defaultControls?.lineHeight }
-					resetAllFilter={ createResetAllFilter( 'lineHeight' ) }
-					panelId={ clientId }
-				>
-					<LineHeightEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ ! isLetterSpacingDisabled && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ () => hasLetterSpacingValue( props ) }
-					label={ __( 'Letter spacing' ) }
-					onDeselect={ () => resetLetterSpacing( props ) }
-					isShownByDefault={ defaultControls?.letterSpacing }
-					resetAllFilter={ createResetAllFilter( 'letterSpacing' ) }
-					panelId={ clientId }
-				>
-					<LetterSpacingEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ ! isTextDecorationDisabled && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ () => hasTextDecorationValue( props ) }
-					label={ __( 'Decoration' ) }
-					onDeselect={ () => resetTextDecoration( props ) }
-					isShownByDefault={ defaultControls?.textDecoration }
-					resetAllFilter={ createResetAllFilter( 'textDecoration' ) }
-					panelId={ clientId }
-				>
-					<TextDecorationEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ ! isTextTransformDisabled && (
-				<ToolsPanelItem
-					hasValue={ () => hasTextTransformValue( props ) }
-					/* translators: Ensure translation is distinct from "Font size" */
-					label={ __( 'Letter case' ) }
-					onDeselect={ () => resetTextTransform( props ) }
-					isShownByDefault={ defaultControls?.textTransform }
-					resetAllFilter={ createResetAllFilter( 'textTransform' ) }
-					panelId={ clientId }
-				>
-					<TextTransformEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-		</InspectorControls>
+		<StylesTypographyPanel
+			as={ TypographyInspectorControl }
+			panelId={ clientId }
+			name={ name }
+			settings={ settings }
+			value={ value }
+			onChange={ onChange }
+			defaultControls={ defaultControls }
+		/>
 	);
 }
 
@@ -237,17 +142,3 @@ export const hasTypographySupport = ( blockName ) => {
 		hasBlockSupport( blockName, key )
 	);
 };
-
-function useIsTypographyDisabled( props = {} ) {
-	const configs = [
-		useIsFontAppearanceDisabled( props ),
-		useIsFontSizeDisabled( props ),
-		useIsLineHeightDisabled( props ),
-		useIsFontFamilyDisabled( props ),
-		useIsTextDecorationDisabled( props ),
-		useIsTextTransformDisabled( props ),
-		useIsLetterSpacingDisabled( props ),
-	];
-
-	return configs.filter( Boolean ).length === configs.length;
-}
