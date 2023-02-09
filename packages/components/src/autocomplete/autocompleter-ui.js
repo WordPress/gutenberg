@@ -15,8 +15,9 @@ import { useAnchor } from '@wordpress/rich-text';
 import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
+import { Fill } from '../slot-fill';
 
-export function getAutoCompleterUI( autocompleter ) {
+export function getAutoCompleterUI( autocompleter, accessibilitySlotName ) {
 	const useItems = autocompleter.useItems
 		? autocompleter.useItems
 		: getDefaultUseItems( autocompleter );
@@ -55,41 +56,53 @@ export function getAutoCompleterUI( autocompleter ) {
 			return null;
 		}
 
-		return (
-			<Popover
-				focusOnMount={ false }
-				onClose={ onReset }
-				placement="top-start"
-				className="components-autocomplete__popover"
-				anchor={ popoverAnchor }
-				ref={ popoverRef }
+		const ListBox = ( { hide } ) => (
+			<div
+				id={ listBoxId }
+				role="listbox"
+				className="components-autocomplete__results"
+				style={ hide ? { display: 'none' } : {} }
 			>
-				<div
-					id={ listBoxId }
-					role="listbox"
-					className="components-autocomplete__results"
+				{ items.map( ( option, index ) => (
+					<Button
+						key={ option.key }
+						id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+						role="option"
+						aria-selected={ index === selectedIndex }
+						disabled={ option.isDisabled }
+						className={ classnames(
+							'components-autocomplete__result',
+							className,
+							{
+								'is-selected': index === selectedIndex,
+							}
+						) }
+						onClick={ () => onSelect( option ) }
+					>
+						{ option.label }
+					</Button>
+				) ) }
+			</div>
+		);
+
+		return (
+			<>
+				<Popover
+					focusOnMount={ false }
+					onClose={ onReset }
+					placement="top-start"
+					className="components-autocomplete__popover"
+					anchor={ popoverAnchor }
+					ref={ popoverRef }
 				>
-					{ items.map( ( option, index ) => (
-						<Button
-							key={ option.key }
-							id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
-							role="option"
-							aria-selected={ index === selectedIndex }
-							disabled={ option.isDisabled }
-							className={ classnames(
-								'components-autocomplete__result',
-								className,
-								{
-									'is-selected': index === selectedIndex,
-								}
-							) }
-							onClick={ () => onSelect( option ) }
-						>
-							{ option.label }
-						</Button>
-					) ) }
-				</div>
-			</Popover>
+					<ListBox />
+				</Popover>
+				{ accessibilitySlotName && (
+					<Fill name={ accessibilitySlotName }>
+						<ListBox hide />
+					</Fill>
+				) }
+			</>
 		);
 	}
 

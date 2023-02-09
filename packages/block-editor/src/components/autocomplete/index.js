@@ -15,6 +15,7 @@ import { getDefaultBlockName, getBlockSupport } from '@wordpress/blocks';
 import { useBlockEditContext } from '../block-edit/context';
 import blockAutocompleter from '../../autocompleters/block';
 import linkAutocompleter from '../../autocompleters/link';
+import { ACCESSIBILITY_SLOT_NAME } from '../iframe';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -59,6 +60,7 @@ export function useBlockEditorAutocompleteProps( props ) {
 	return useAutocompleteProps( {
 		...props,
 		completers: useCompleters( props ),
+		__unstableAccessibilitySlotName: ACCESSIBILITY_SLOT_NAME,
 	} );
 }
 

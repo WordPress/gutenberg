@@ -117,6 +117,7 @@ function useAutocomplete( {
 	onReplace,
 	completers,
 	contentRef,
+	__unstableAccessibilitySlotName,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const instanceId = useInstanceId( useAutocomplete );
@@ -371,7 +372,10 @@ function useAutocomplete( {
 		setAutocompleter( completer );
 		setAutocompleterUI( () =>
 			completer !== autocompleter
-				? getAutoCompleterUI( completer )
+				? getAutoCompleterUI(
+						completer,
+						__unstableAccessibilitySlotName
+				  )
 				: AutocompleterUI
 		);
 		setFilterValue( query );
