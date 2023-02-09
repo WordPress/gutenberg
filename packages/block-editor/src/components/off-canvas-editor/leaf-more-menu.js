@@ -5,8 +5,13 @@ import { createBlock } from '@wordpress/blocks';
 import { addSubmenu, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
-import { store as blockEditorStore, BlockTitle } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+import BlockTitle from '../block-title';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -14,7 +19,7 @@ const POPOVER_PROPS = {
 	variant: 'toolbar',
 };
 
-export const LeafMoreMenu = ( props ) => {
+export default function LeafMoreMenu( props ) {
 	const { clientId, block } = props;
 
 	const { insertBlock, replaceBlock, removeBlocks, replaceInnerBlocks } =
@@ -90,4 +95,4 @@ export const LeafMoreMenu = ( props ) => {
 			) }
 		</DropdownMenu>
 	);
-};
+}
