@@ -238,6 +238,7 @@ export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
 	'color.duotone': true,
 	'color.gradients': true,
 	'color.palette': true,
+	'dimensions.aspectRatios': true,
 	'typography.fontFamilies': true,
 	'typography.fontSizes': true,
 	'spacing.spacingSizes': true,

@@ -237,6 +237,32 @@
 					"description": "Settings related to dimensions.",
 					"type": "object",
 					"properties": {
+						"defaultAspectRatios": {
+							"description": "Allow users to choose aspect ratios from the default set of aspect ratios.",
+							"type": "boolean",
+							"default": true
+						},
+						"aspectRatios": {
+							"description": "Allow users to define aspect ratios for some blocks.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the aspect ratio preset.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the aspect ratio preset.",
+										"type": "string"
+									},
+									"ratio": {
+										"description": "Aspect ratio expressed as a division or decimal.",
+										"type": "string"
+									}
+								}
+							}
+						},
 						"minHeight": {
 							"description": "Allow users to set custom minimum height.",
 							"type": "boolean",
@@ -620,6 +646,7 @@
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
+				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
 				{ "$ref": "#/definitions/settingsPropertiesShadow" },
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
@@ -639,6 +666,7 @@
 						"border": {},
 						"shadow": {},
 						"color": {},
+						"dimensions": {},
 						"layout": {},
 						"spacing": {},
 						"typography": {},
@@ -1995,6 +2023,7 @@
 							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
 						},
 						"color": {},
+						"dimensions": {},
 						"layout": {},
 						"spacing": {},
 						"typography": {},
