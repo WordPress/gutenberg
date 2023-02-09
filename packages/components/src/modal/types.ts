@@ -63,13 +63,6 @@ export type ModalProps = {
 	 */
 	contentLabel?: string;
 	/**
-	 * If this property is added, it will be added to the modal scrollable section `div` as
-	 * `div` as `aria-label`.
-	 *
-	 * @default `__( 'Scrollable section' )`
-	 */
-	scrollableContentLabel?: string;
-	/**
 	 * If this property is true, it will focus the first tabbable element
 	 * rendered in the modal.
 	 *

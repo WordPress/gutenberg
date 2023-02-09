@@ -67,7 +67,6 @@ function UnforwardedModal(
 		onKeyDown,
 		isFullScreen = false,
 		__experimentalHideHeader = false,
-		scrollableContentLabel,
 	} = props;
 
 	const ref = useRef< HTMLDivElement >();
@@ -215,12 +214,7 @@ function UnforwardedModal(
 						role="document"
 						onScroll={ onContentContainerScroll }
 						ref={ contentRef }
-						aria-label={
-							hasScrollableContent
-								? scrollableContentLabel ||
-								  __( 'Scrollable section' )
-								: undefined
-						}
+						aria-label={ __( 'Scrollable section' ) }
 						tabIndex={ hasScrollableContent ? 0 : undefined }
 					>
 						{ ! __experimentalHideHeader && (
