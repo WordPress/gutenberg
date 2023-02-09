@@ -35,6 +35,9 @@ export default function SavePanel() {
 				className="edit-site-save-panel__modal"
 				onRequestClose={ onClose }
 				__experimentalHideHeader
+				contentLabel={ __(
+					'Save site, content, and template changes'
+				) }
 			>
 				<EntitiesSavedStates close={ onClose } />
 			</Modal>
