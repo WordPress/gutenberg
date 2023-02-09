@@ -69,6 +69,17 @@ function UnconnectedNavigatorProvider(
 	const [ screens, dispatch ] = useReducer( screensReducer, [] );
 	const currentMatch = useRef< MatchedPath >();
 	const matchedPath = useMemo( () => {
+		let currentPath: string | undefined;
+		if (
+			locationHistory.length === 0 ||
+			( currentPath =
+				locationHistory[ locationHistory.length - 1 ].path ) ===
+				undefined
+		) {
+			currentMatch.current = undefined;
+			return undefined;
+		}
+
 		const resolvePath = ( path: string ) => {
 			const newMatch = patternMatch( path, screens );
 
@@ -89,17 +100,9 @@ function UnconnectedNavigatorProvider(
 			return newMatch;
 		};
 
-		if ( locationHistory.length > 0 ) {
-			const path = locationHistory[ locationHistory.length - 1 ].path;
-			if ( path !== undefined ) {
-				const newMatch = resolvePath( path );
-				currentMatch.current = newMatch;
-				return newMatch;
-			}
-		}
-
-		currentMatch.current = undefined;
-		return undefined;
+		const newMatch = resolvePath( currentPath );
+		currentMatch.current = newMatch;
+		return newMatch;
 	}, [ screens, locationHistory ] );
 
 	const addScreen = useCallback(
