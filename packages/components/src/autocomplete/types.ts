@@ -20,11 +20,6 @@ export type OptionCompletion = {
 	value: string | WPElement;
 };
 
-type getOptionCompletion< TCompleterOption = any > = (
-	option: TCompleterOption,
-	query: string
-) => OptionCompletion | OptionCompletion[ 'value' ];
-
 type OptionLabel = string | WPElement | Array< string | WPElement >;
 export type KeyedOption = {
 	key: string;
@@ -79,7 +74,10 @@ export type WPCompleter< TCompleterOption = any > = {
 	 * treated by returning an object with `action` and `value` properties. The
 	 * `action` declares what should be done with the `value`.
 	 */
-	getOptionCompletion?: getOptionCompletion;
+	getOptionCompletion?: (
+		option: TCompleterOption,
+		query: string
+	) => OptionCompletion | OptionCompletion[ 'value' ];
 	/**
 	 * A function that returns an array of items to be displayed in the
 	 * Autocomplete UI. These items have uniform shape and have been filtered by
