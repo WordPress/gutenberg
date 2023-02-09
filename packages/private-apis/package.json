@@ -1,6 +1,6 @@
 {
-	"name": "@wordpress/experiments",
-	"version": "0.8.1",
+	"name": "@wordpress/private-apis",
+	"version": "0.8.0",
 	"description": "Internal experimental APIs for WordPress core.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -10,11 +10,11 @@
 		"dom",
 		"utils"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/experiments/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/private-apis/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/experiments"
+		"directory": "packages/private-apis"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"

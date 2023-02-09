@@ -19,7 +19,7 @@ import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 import BlockPreviewPanel from './block-preview-panel';
 import { getVariationClassName } from './utils';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useGlobalStyle } = unlock( blockEditorExperiments );
 

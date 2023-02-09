@@ -3,7 +3,7 @@
  */
 import { createRegistry } from '../registry';
 import createReduxStore from '../redux-store';
-import { unlock } from '../experiments';
+import { unlock } from '../private-apis';
 
 /**
  * WordPress dependencies

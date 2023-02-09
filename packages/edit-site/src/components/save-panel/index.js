@@ -11,7 +11,7 @@ import { NavigableRegion } from '@wordpress/interface';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 export default function SavePanel() {
 	const { isSaveViewOpen, canvasMode } = useSelect( ( select ) => {

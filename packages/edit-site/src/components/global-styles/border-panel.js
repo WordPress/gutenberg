@@ -19,7 +19,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 

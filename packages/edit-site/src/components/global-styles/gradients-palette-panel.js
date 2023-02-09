@@ -14,7 +14,7 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import Subtitle from './subtitle';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useGlobalSetting } = unlock( blockEditorExperiments );
 

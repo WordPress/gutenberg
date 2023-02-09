@@ -25,7 +25,6 @@
 		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../escape-html" },
-		{ "path": "../experiments" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
@@ -33,6 +32,7 @@
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
 		{ "path": "../react-i18n" },
 		{ "path": "../warning" }
 	],

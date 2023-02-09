@@ -27,7 +27,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { getSupportedGlobalStylesPanels } from '../../components/global-styles/hooks';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { GlobalStylesContext } = unlock( blockEditorExperiments );
 
