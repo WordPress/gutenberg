@@ -40,7 +40,7 @@ function useDeprecatedProps(
 
 export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 	const {
-		align = 'center',
+		align,
 		className,
 		direction: directionProp = 'row',
 		expanded = true,
@@ -62,7 +62,7 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 
 	const classes = useMemo( () => {
 		const base = css( {
-			alignItems: align,
+			alignItems: align ?? ( isColumn ? 'normal' : 'center' ),
 			flexDirection: direction,
 			flexWrap: wrap ? 'wrap' : undefined,
 			gap: space( gap ),
