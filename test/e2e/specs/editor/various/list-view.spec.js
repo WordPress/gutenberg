@@ -57,7 +57,6 @@ test.describe( 'List view', () => {
 
 		// Open list view.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
-
 		const blockList = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
@@ -110,5 +109,46 @@ test.describe( 'List view', () => {
 		// Ensure console didn't throw an error as reported in
 		// https://github.com/WordPress/gutenberg/issues/38763.
 		await expect( hasThrownConsoleError ).toBeFalsy();
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026
+	test( 'should select previous block after removing selected one', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Insert a couple of blocks of different types.
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Open list view.
+		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		const blockList = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		// The last inserted paragraph block should be selected.
+		await blockList
+			.getByRole( 'gridcell', {
+				name: 'Paragraph link',
+				selected: true,
+			} )
+			.waitFor();
+
+		// Remove the Paragraph block via its options menu in list view.
+		await blockList
+			.getByRole( 'button', { name: 'Options for Paragraph block' } )
+			.click();
+		await page
+			.getByRole( 'menuitem', { name: /Remove Paragraph/i } )
+			.click();
+
+		// Heading block should be selected as previous block.
+		await expect(
+			page.getByRole( 'document', {
+				name: 'Block: Heading',
+			} )
+		).toBeFocused();
 	} );
 } );
