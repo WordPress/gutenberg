@@ -97,11 +97,18 @@ export default function UnsavedInnerBlocks( {
 				return EMPTY_OBJECT;
 			}
 
-			const { hasFinishedResolution, isSavingEntityRecord } =
-				select( coreStore );
+			const {
+				getEntityRecords,
+				hasFinishedResolution,
+				isSavingEntityRecord,
+			} = select( coreStore );
 
 			return {
 				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
+				draftNavigationMenus: getEntityRecords(
+					// This is needed so that hasResolvedDraftNavigationMenus gives the correct status.
+					...DRAFT_MENU_PARAMS
+				),
 				hasResolvedDraftNavigationMenus: hasFinishedResolution(
 					'getEntityRecords',
 					DRAFT_MENU_PARAMS
@@ -144,8 +151,8 @@ export default function UnsavedInnerBlocks( {
 		isSaving,
 		hasResolvedDraftNavigationMenus,
 		hasResolvedNavigationMenus,
-		hasSelection,
 		innerBlocksAreDirty,
+		hasSelection,
 	] );
 
 	const Wrapper = isSaving ? Disabled : 'div';
