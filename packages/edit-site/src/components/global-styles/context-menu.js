@@ -34,7 +34,7 @@ import { NavigationButtonAsItem } from './navigation-button';
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { ScreenVariations } from './screen-variations';
 import { useHasShadowControl } from './shadow-panel';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useHasTypographyPanel, useGlobalSetting } = unlock(
 	blockEditorExperiments

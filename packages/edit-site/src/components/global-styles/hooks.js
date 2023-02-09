@@ -15,7 +15,7 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 import { useSelect } from '@wordpress/data';
 
 const { useGlobalSetting } = unlock( blockEditorExperiments );

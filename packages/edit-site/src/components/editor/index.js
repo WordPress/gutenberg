@@ -35,7 +35,7 @@ import { GlobalStylesRenderer } from '../global-styles-renderer';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */

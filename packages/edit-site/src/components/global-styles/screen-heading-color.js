@@ -21,7 +21,7 @@ import {
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 

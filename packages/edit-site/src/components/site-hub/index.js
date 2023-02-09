@@ -27,7 +27,7 @@ import { useLocation } from '../routes';
 import getIsListPage from '../../utils/get-is-list-page';
 import SiteIcon from '../site-icon';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const HUB_ANIMATION_DURATION = 0.3;
 

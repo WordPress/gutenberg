@@ -13,7 +13,7 @@ import { TabPanel } from '@wordpress/components';
  */
 import ScreenHeader from './header';
 import { useSupportedStyles, useColorsPerOrigin } from './hooks';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
