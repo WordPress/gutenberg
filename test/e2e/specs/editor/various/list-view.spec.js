@@ -250,4 +250,76 @@ test.describe( 'List view', () => {
 			page.getByRole( 'document', { name: /Empty block/i } )
 		).toBeFocused();
 	} );
+
+	test( 'should expand nested list items', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/cover' } );
+
+		// Click first color option from the block placeholder's color picker to
+		// make the inner blocks appear.
+		await page
+			.getByRole( 'button', { name: /Color: /i } )
+			.first()
+			.click();
+
+		// Open list view.
+		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		const blockList = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		// Things start off expanded.
+		await blockList
+			.getByRole( 'gridcell', {
+				name: 'Cover link',
+				expanded: true,
+			} )
+			.waitFor();
+
+		// The child paragraph block should be selected.
+		await blockList
+			.getByRole( 'gridcell', {
+				name: 'Paragraph link',
+				selected: true,
+			} )
+			.waitFor();
+
+		// Collapse the Cover block.
+		await blockList
+			.getByRole( 'gridcell', { name: 'Cover link' } )
+			.locator( '.block-editor-list-view__expander[aria-hidden="true"]' )
+			// Force the click to bypass the visibility check. The expander is
+			// intentionally aria-hidden. See the implementation for details.
+			.click( { force: true } );
+
+		// Check that we're collapsed.
+		await expect(
+			blockList.getByRole( 'gridcell', { name: /link/i } )
+		).toHaveCount( 1 );
+
+		// Click the Cover block list view item.
+		await blockList
+			.getByRole( 'gridcell', {
+				name: 'Cover link',
+				expanded: false,
+			} )
+			.click();
+
+		// Click the Cover block title placeholder.
+		await page
+			.getByRole( 'document', { name: 'Block: Cover' } )
+			.getByRole( 'document', { name: /Empty block/i } )
+			.click();
+
+		// The child paragraph block in the list view should be selected.
+		await blockList
+			.getByRole( 'gridcell', {
+				name: 'Paragraph link',
+				selected: true,
+			} )
+			.waitFor();
+	} );
 } );
