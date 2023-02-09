@@ -1264,6 +1264,13 @@ export function toggleBlockMode( clientId ) {
 	};
 }
 
+export function __unstableIframeIncompatible( clientId ) {
+	return {
+		type: 'IFRAME_INCOMPATIBLE',
+		clientId,
+	};
+}
+
 /**
  * Returns an action object used in signalling that the user has begun to type.
  *

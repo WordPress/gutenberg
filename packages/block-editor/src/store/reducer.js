@@ -1507,6 +1507,18 @@ export function blocksMode( state = {}, action ) {
 	return state;
 }
 
+export function iframeIncompatible( state = true, action ) {
+	if ( action.type === 'IFRAME_INCOMPATIBLE' ) {
+		const { clientId } = action;
+		return {
+			...state,
+			[ clientId ]: false,
+		};
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning the block insertion point visibility, either null if there
  * is not an explicit insertion point assigned, or an object of its `index` and
@@ -1873,6 +1885,7 @@ export default combineReducers( {
 	isSelectionEnabled,
 	initialPosition,
 	blocksMode,
+	iframeIncompatible,
 	blockListSettings,
 	insertionPoint,
 	template,

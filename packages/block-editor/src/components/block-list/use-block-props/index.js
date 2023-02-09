@@ -34,6 +34,7 @@ import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
+import { useNonReactObserver } from './use-non-react-observer';
 import { store as blockEditorStore } from '../../../store';
 import useBlockOverlayActive from '../../block-content-overlay';
 
@@ -137,6 +138,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			triggerAnimationOnChange: index,
 		} ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
+		useNonReactObserver( clientId ),
 	] );
 
 	const blockEditContext = useBlockEditContext();

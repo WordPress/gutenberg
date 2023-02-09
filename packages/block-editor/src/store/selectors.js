@@ -1279,6 +1279,10 @@ export function getBlockMode( state, clientId ) {
 	return state.blocksMode[ clientId ] || 'visual';
 }
 
+export function isIframeIncompatible( state, clientId ) {
+	return state.iframeIncompatible[ clientId ] || false;
+}
+
 /**
  * Returns true if the user is typing, or false otherwise.
  *
