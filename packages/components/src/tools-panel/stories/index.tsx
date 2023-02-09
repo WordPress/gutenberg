@@ -196,14 +196,11 @@ WithNonToolsPanelItems.args = {
 
 export const WithOptionalItemsPlusIcon: ComponentStory<
 	typeof ToolsPanel
-> = ( {
-	// This is an extra prop that is passed to one underlying `ToolsPanelItem` to
-	// showcase the differences in `ToolsPanel` when all items are optional or not
-	// @ts-expect-error
-	isFirstToolsPanelItemShownByDefault,
-	resetAll: resetAllProp,
-	...props
-} ) => {
+> = ( { resetAll: resetAllProp, ...props } ) => {
+	const [
+		isFirstToolsPanelItemShownByDefault,
+		setIsFirstToolsPanelItemShownByDefault,
+	] = useState( false );
 	const [ height, setHeight ] = useState< string | undefined >();
 	const [ width, setWidth ] = useState< string | undefined >();
 	const [ minWidth, setMinWidth ] = useState< string | undefined >();
@@ -216,64 +213,86 @@ export const WithOptionalItemsPlusIcon: ComponentStory<
 	};
 
 	return (
-		<PanelWrapperView>
-			<Panel>
-				<ToolsPanel
-					{ ...props }
-					resetAll={ resetAll }
-					// `key` property here is used as a hack to force `ToolsPanel` to re-render
-					// See https://github.com/WordPress/gutenberg/pull/38262/files#r793422991
-					key={ isFirstToolsPanelItemShownByDefault }
-				>
-					<SingleColumnItem
-						hasValue={ () => !! minWidth }
-						label="Minimum width"
-						onDeselect={ () => setMinWidth( undefined ) }
-						isShownByDefault={ isFirstToolsPanelItemShownByDefault }
+		<>
+			<PanelWrapperView>
+				<Panel>
+					<ToolsPanel
+						{ ...props }
+						resetAll={ resetAll }
+						// `key` property here is used as a hack to force `ToolsPanel` to re-render
+						// See https://github.com/WordPress/gutenberg/pull/38262/files#r793422991
+						key={
+							isFirstToolsPanelItemShownByDefault
+								? 'true'
+								: 'false'
+						}
 					>
-						<UnitControl
+						<SingleColumnItem
+							hasValue={ () => !! minWidth }
 							label="Minimum width"
-							value={ minWidth }
-							onChange={ ( next ) => setMinWidth( next ) }
-						/>
-					</SingleColumnItem>
-					<SingleColumnItem
-						hasValue={ () => !! width }
-						label="Width"
-						onDeselect={ () => setWidth( undefined ) }
-						isShownByDefault={ false }
-					>
-						<UnitControl
+							onDeselect={ () => setMinWidth( undefined ) }
+							isShownByDefault={
+								isFirstToolsPanelItemShownByDefault
+							}
+						>
+							<UnitControl
+								label="Minimum width"
+								value={ minWidth }
+								onChange={ ( next ) => setMinWidth( next ) }
+							/>
+						</SingleColumnItem>
+						<SingleColumnItem
+							hasValue={ () => !! width }
 							label="Width"
-							value={ width }
-							onChange={ ( next ) => setWidth( next ) }
-						/>
-					</SingleColumnItem>
-					<SingleColumnItem
-						hasValue={ () => !! height }
-						label="Height"
-						onDeselect={ () => setHeight( undefined ) }
-						isShownByDefault={ false }
-					>
-						<UnitControl
+							onDeselect={ () => setWidth( undefined ) }
+							isShownByDefault={ false }
+						>
+							<UnitControl
+								label="Width"
+								value={ width }
+								onChange={ ( next ) => setWidth( next ) }
+							/>
+						</SingleColumnItem>
+						<SingleColumnItem
+							hasValue={ () => !! height }
 							label="Height"
-							value={ height }
-							onChange={ ( next ) => setHeight( next ) }
-						/>
-					</SingleColumnItem>
-				</ToolsPanel>
-			</Panel>
-		</PanelWrapperView>
+							onDeselect={ () => setHeight( undefined ) }
+							isShownByDefault={ false }
+						>
+							<UnitControl
+								label="Height"
+								value={ height }
+								onChange={ ( next ) => setHeight( next ) }
+							/>
+						</SingleColumnItem>
+					</ToolsPanel>
+				</Panel>
+			</PanelWrapperView>
+
+			<button
+				onClick={ () =>
+					setIsFirstToolsPanelItemShownByDefault(
+						! isFirstToolsPanelItemShownByDefault
+					)
+				}
+				aria-pressed={
+					isFirstToolsPanelItemShownByDefault ? 'true' : 'false'
+				}
+				style={ {
+					marginTop: '2rem',
+				} }
+			>
+				{ isFirstToolsPanelItemShownByDefault
+					? 'Make first PanelItem hidden by default'
+					: 'Make first PanelItem shown by default' }
+			</button>
+		</>
 	);
 };
 
 WithOptionalItemsPlusIcon.args = {
 	...Default.args,
 	label: 'Tools Panel (optional items only)',
-	// This is an extra prop that is passed to one underlying `ToolsPanelItem` to
-	// showcase the differences in `ToolsPanel` when all items are optional or not
-	// @ts-expect-error
-	isFirstToolsPanelItemShownByDefault: false,
 };
 
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
