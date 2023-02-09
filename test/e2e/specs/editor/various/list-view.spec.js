@@ -16,22 +16,32 @@ test.describe( 'List view', () => {
 		await editor.insertBlock( { name: 'core/heading' } );
 		await editor.insertBlock( { name: 'core/image' } );
 		await editor.insertBlock( { name: 'core/paragraph' } );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/heading' },
+				{ name: 'core/image' },
+				{ name: 'core/paragraph' },
+			] );
 
 		// Bring up the paragraph block selection menu.
 		await page.keyboard.press( 'Escape' );
 
-		// Define the drag source and target.
+		// Drag the paragraph above the heading.
 		const paragraphBlockDragButton = page.locator(
 			'button[draggable="true"][aria-label="Drag"]'
 		);
 		const headingBlock = page.getByRole( 'document', {
 			name: 'Block: Heading',
 		} );
-
-		// Drag the paragraph above the heading.
 		await paragraphBlockDragButton.dragTo( headingBlock, { x: 0, y: 0 } );
-
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph' },
+				{ name: 'core/heading' },
+				{ name: 'core/image' },
+			] );
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/38763.
