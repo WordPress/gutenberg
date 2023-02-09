@@ -218,3 +218,75 @@ export function useSupportedStyles( name, element ) {
 
 	return supportedPanels;
 }
+
+/**
+ * Given a settings object and a list of supported panels,
+ * returns a new settings object with the unsupported panels removed.
+ *
+ * @param {Object}   settings Settings object.
+ * @param {string[]} supports Supported style panels.
+ *
+ * @return {Object} Merge of settings and supports.
+ */
+export function overrideSettingsWithSupports( settings, supports ) {
+	const updatedSettings = { ...settings };
+
+	if ( ! supports.includes( 'fontSize' ) ) {
+		updatedSettings.typography = {
+			...updatedSettings.typography,
+			fontSizes: {},
+			customFontSize: false,
+		};
+	}
+
+	if ( ! supports.includes( 'fontFamily' ) ) {
+		updatedSettings.typography = {
+			...updatedSettings.typography,
+			fontFamilies: {},
+		};
+	}
+
+	if ( ! supports.includes( 'lineHeight' ) ) {
+		updatedSettings.typography = {
+			...updatedSettings.typography,
+			lineHeight: false,
+		};
+	}
+
+	if ( ! supports.includes( 'fontStyle' ) ) {
+		updatedSettings.typography = {
+			...updatedSettings.typography,
+			fontStyle: false,
+		};
+	}
+
+	if ( ! supports.includes( 'fontWeight' ) ) {
+		updatedSettings.typography = {
+			...updatedSettings.typography,
+			fontWeight: false,
+		};
+	}
+
+	if ( ! supports.includes( 'letterSpacing' ) ) {
+		updatedSettings.typography = {
+			...updatedSettings.typography,
+			letterSpacing: false,
+		};
+	}
+
+	if ( ! supports.includes( 'textTransform' ) ) {
+		updatedSettings.typography = {
+			...updatedSettings.typography,
+			textTransform: false,
+		};
+	}
+
+	if ( ! supports.includes( 'textDecoration' ) ) {
+		updatedSettings.typography = {
+			...updatedSettings.typography,
+			textDecoration: false,
+		};
+	}
+
+	return updatedSettings;
+}
