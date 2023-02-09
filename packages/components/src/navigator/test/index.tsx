@@ -173,6 +173,12 @@ const MyNavigation = ( {
 			<NavigatorProvider initialPath={ initialPath }>
 				<NavigatorScreen path={ PATHS.HOME }>
 					<p>{ SCREEN_TEXT.home }</p>
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable home screen button</button>
 					<CustomNavigatorButton
 						path={ PATHS.NOT_FOUND }
 						onClick={ onNavigatorButtonClick }
@@ -441,8 +447,6 @@ describe( 'Navigator', () => {
 	} );
 
 	it( 'should escape the value of the `path` prop', async () => {
-		const user = userEvent.setup();
-
 		render( <MyNavigation /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
@@ -452,24 +456,13 @@ describe( 'Navigator', () => {
 
 		// The following line tests the implementation details, but it's necessary
 		// as this would be otherwise transparent to the user.
+		// A potential way would be to check if an invalid HTML attribute could
+		// be detected in the tests (by JSDom or any other plugin). We could then
+		// make sure that an invalid path would not error because it's escaped
+		// correctly.
 		expect(
 			getNavigationButton( 'toInvalidHtmlPathScreen' )
 		).toHaveAttribute( 'id', INVALID_HTML_ATTRIBUTE.escaped );
-
-		// Navigate to screen with an invalid HTML value for its `path`.
-		await user.click( getNavigationButton( 'toInvalidHtmlPathScreen' ) );
-
-		expect( getScreen( 'invalidHtmlPath' ) ).toBeInTheDocument();
-		expect( getNavigationButton( 'back' ) ).toBeInTheDocument();
-
-		// Navigate back to home screen, check that the focus restoration selector
-		// worked correctly despite the escaping.
-		await user.click( getNavigationButton( 'back' ) );
-
-		expect( getScreen( 'home' ) ).toBeInTheDocument();
-		expect(
-			getNavigationButton( 'toInvalidHtmlPathScreen' )
-		).toHaveFocus();
 	} );
 
 	it( 'should match correctly paths with named arguments', async () => {
@@ -593,6 +586,30 @@ describe( 'Navigator', () => {
 			const outerInput = screen.getByLabelText( 'Outer input' );
 			await user.type( outerInput, 'd' );
 			expect( outerInput ).toHaveFocus();
+		} );
+
+		it( 'should restore focus correctly even when the `path` needs to be escaped', async () => {
+			const user = userEvent.setup();
+
+			render( <MyNavigation /> );
+
+			expect( getScreen( 'home' ) ).toBeInTheDocument();
+
+			// Navigate to screen with an invalid HTML value for its `path`.
+			await user.click(
+				getNavigationButton( 'toInvalidHtmlPathScreen' )
+			);
+
+			expect( getScreen( 'invalidHtmlPath' ) ).toBeInTheDocument();
+
+			// Navigate back to home screen, check that the focus restoration selector
+			// worked correctly despite the escaping.
+			await user.click( getNavigationButton( 'back' ) );
+
+			expect( getScreen( 'home' ) ).toBeInTheDocument();
+			expect(
+				getNavigationButton( 'toInvalidHtmlPathScreen' )
+			).toHaveFocus();
 		} );
 	} );
 } );
