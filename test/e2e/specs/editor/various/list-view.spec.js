@@ -151,4 +151,54 @@ test.describe( 'List view', () => {
 			} )
 		).toBeFocused();
 	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026
+	test( 'should select next block after removing the very first block', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Insert a couple of blocks of different types.
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Open list view.
+		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		const blockList = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		// The last inserted paragraph block should be selected.
+		await blockList
+			.getByRole( 'gridcell', {
+				name: 'Paragraph link',
+				selected: true,
+			} )
+			.waitFor();
+
+		// Select the image block in list view.
+		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
+		await expect(
+			blockList
+				.getByRole( 'gridcell', {
+					name: 'Image link',
+				} )
+				.locator( 'a' )
+		).toBeFocused();
+		await page.keyboard.press( 'Enter' );
+
+		// Remove the Image block via its options menu in list view.
+		await blockList
+			.getByRole( 'button', { name: 'Options for Image block' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: /Remove Image/i } ).click();
+
+		// Heading block should be selected as previous block.
+		await expect(
+			page.getByRole( 'document', {
+				name: 'Block: Heading',
+			} )
+		).toBeFocused();
+	} );
 } );
