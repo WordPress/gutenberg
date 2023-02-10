@@ -50,7 +50,7 @@ export function UnforwardedPanelBody(
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
 	const scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
 
-	const handleOnToggle = ( event: MouseEvent ) => {
+	const handleOnToggle = ( event: React.MouseEvent ) => {
 		event.preventDefault();
 		const next = ! isOpened;
 		setIsOpened( next );
@@ -107,6 +107,7 @@ const PanelBodyTitle = forwardRef(
 			icon,
 			title,
 			buttonProps,
+			onClick,
 		}: WordPressComponentProps< PanelBodyTitleProps, 'button' >,
 		ref: ForwardedRef< any >
 	) => {
@@ -118,6 +119,7 @@ const PanelBodyTitle = forwardRef(
 					className="components-panel__body-toggle"
 					aria-expanded={ isOpened }
 					ref={ ref }
+					{ ...{ onClick } }
 					{ ...buttonProps }
 				>
 					{ /*

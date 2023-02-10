@@ -109,5 +109,5 @@ export type PanelBodyTitleProps = {
 	 * A callback invoked when 'PanelBodyTitle' is clicked. It is used to
 	 * toggle the body opened or closed.
 	 */
-	onClick: ( event: MouseEvent ) => void;
+	onClick: ( event: React.MouseEvent ) => void;
 };
