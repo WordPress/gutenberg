@@ -7,6 +7,7 @@
 -  `ColorPalette`, `GradientPicker`, `PaletteEdit`, `ToolsPanel`: add new props to set a custom heading level ([43848](https://github.com/WordPress/gutenberg/pull/43848) and [#47788](https://github.com/WordPress/gutenberg/pull/47788)).
 -   `ColorPalette`: ensure text label contrast checking works with CSS variables ([#47373](https://github.com/WordPress/gutenberg/pull/47373)).
 -  `Navigator`: Support dynamic paths with parameters ([#47827](https://github.com/WordPress/gutenberg/pull/47827)).
+-  `Navigator`: Support hierarchical paths navigation and add `NavigatorToParentButton` component ([#47883](https://github.com/WordPress/gutenberg/pull/47883)).
 
 ### Internal
 
