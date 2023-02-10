@@ -114,7 +114,7 @@ Example:
 import VisualEditor from '../visual-editor';
 ```
 
-### Experimental APIs
+### Experimental and Private APIs
 
 Experimental APIs are temporary values exported from a module whose existence is either pending future revision or provides an immediate means to an end.
 
@@ -434,6 +434,31 @@ export function toggleFeature( scope, featureName ) {
 		dispatch( { type: '__private_BEFORE_TOGGLE' } );
 		// ...
 	};
+}
+```
+
+### Exposing private APIs publicly
+
+Some private APIs could benefit from community feedback and it makes sense to expose them to WordPress extenders. At the same time, it doesn't make sense to turn them into a public API in WordPress core. What should you do?
+
+You can re-export that private API as experimental and restrict it to the Gutenberg plugin:
+
+```js
+// This function can't be used by extenders in any context:
+function privateApi() {}
+
+// This function can be used by extenders with the Gutenberg plugin but not in vanilla WordPress Core:
+function experimentalApi() {}
+
+// Gutenberg treats both functions as private APIs internally:
+const privateApis = {};
+lock(privateApis, { privateApi, experimentalApi });
+
+// The experimental API is explicitly exported but will not be
+// merged into WordPress core thanks to the IS_GUTENBERG_PLUGIN
+// check.
+if ( IS_GUTENBERG_PLUGIN ) {
+   export const __experimentalApi = unlock( experiments ).experimentalApi;
 }
 ```
 
