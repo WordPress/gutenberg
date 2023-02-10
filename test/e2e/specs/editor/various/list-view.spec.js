@@ -55,10 +55,10 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/heading' } );
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
-		// Open list view.
+		// Open List View.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
 
-		// The last inserted paragraph block should be selected.
+		// The last inserted block should be selected.
 		await page
 			.getByRole( 'gridcell', {
 				name: 'Paragraph link',
@@ -66,7 +66,7 @@ test.describe( 'List View', () => {
 			} )
 			.waitFor();
 
-		// Go to the image block in list view.
+		// Go to the image block in List View.
 		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
 		await expect(
 			page
@@ -98,7 +98,7 @@ test.describe( 'List View', () => {
 		// Delete the image block in the canvas.
 		await page.keyboard.press( 'Backspace' );
 
-		// List view should have two rows.
+		// List View should have two rows.
 		await expect(
 			page.getByRole( 'gridcell', { name: /link/i } )
 		).toHaveCount( 2 );
@@ -119,10 +119,10 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/heading' } );
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
-		// Open list view.
+		// Open List View.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
 
-		// The last inserted paragraph block should be selected.
+		// The last inserted block should be selected.
 		await page
 			.getByRole( 'gridcell', {
 				name: 'Paragraph link',
@@ -130,7 +130,7 @@ test.describe( 'List View', () => {
 			} )
 			.waitFor();
 
-		// Remove the Paragraph block via its options menu in list view.
+		// Remove the Paragraph block via its options menu in List View.
 		await page
 			.getByRole( 'button', { name: 'Options for Paragraph block' } )
 			.click();
@@ -157,10 +157,10 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/heading' } );
 		await editor.insertBlock( { name: 'core/paragraph' } );
 
-		// Open list view.
+		// Open List View.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
 
-		// The last inserted paragraph block should be selected.
+		// The last inserted block should be selected.
 		await page
 			.getByRole( 'gridcell', {
 				name: 'Paragraph link',
@@ -168,7 +168,7 @@ test.describe( 'List View', () => {
 			} )
 			.waitFor();
 
-		// Select the image block in list view.
+		// Select the image block in List View.
 		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
 		await expect(
 			page
@@ -179,7 +179,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 		await page.keyboard.press( 'Enter' );
 
-		// Remove the Image block via its options menu in list view.
+		// Remove the Image block via its options menu in List View.
 		await page
 			.getByRole( 'button', { name: 'Options for Image block' } )
 			.click();
@@ -207,10 +207,10 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/image' } );
 		await editor.insertBlock( { name: 'core/heading' } );
 
-		// Open list view.
+		// Open List View.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
 
-		// The last inserted Header block should be selected.
+		// The last inserted block should be selected.
 		await page
 			.getByRole( 'gridcell', {
 				name: 'Heading link',
@@ -253,7 +253,7 @@ test.describe( 'List View', () => {
 			.first()
 			.click();
 
-		// Open list view.
+		// Open List View.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
 
 		// Things start off expanded.
@@ -285,7 +285,7 @@ test.describe( 'List View', () => {
 			page.getByRole( 'gridcell', { name: /link/i } )
 		).toHaveCount( 1 );
 
-		// Click the Cover block list view item.
+		// Click the Cover block List View item.
 		await page
 			.getByRole( 'gridcell', {
 				name: 'Cover link',
@@ -299,7 +299,7 @@ test.describe( 'List View', () => {
 			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
 
-		// The child paragraph block in the list view should be selected.
+		// The child paragraph block in List View should be selected.
 		await page
 			.getByRole( 'gridcell', {
 				name: 'Paragraph link',
@@ -320,7 +320,7 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/columns' } );
 		await editor.insertBlock( { name: 'core/group' } );
 
-		// Open list view.
+		// Open List View.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
 
 		// The last inserted block should be selected.
