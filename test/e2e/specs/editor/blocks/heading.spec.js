@@ -110,6 +110,7 @@ test.describe( 'Heading', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '### Heading' );
+		await editor.openDocumentSettingsSidebar();
 
 		const textColor = page
 			.getByRole( 'region', {
@@ -135,6 +136,7 @@ test.describe( 'Heading', () => {
 	test( 'should correctly apply named colors', async ( { editor, page } ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## Heading' );
+		await editor.openDocumentSettingsSidebar();
 
 		const textColor = page
 			.getByRole( 'region', {
