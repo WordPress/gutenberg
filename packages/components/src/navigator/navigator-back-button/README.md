@@ -12,4 +12,4 @@ Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/
 
 ### Inherited props
 
-`NavigatorBackButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`.
+`NavigatorBackButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.
