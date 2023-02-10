@@ -30,7 +30,7 @@ import { useMemo, memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useGlobalStyle } = unlock( blockEditorExperiments );
 

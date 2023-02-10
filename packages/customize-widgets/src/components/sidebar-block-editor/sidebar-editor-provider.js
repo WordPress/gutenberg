@@ -9,7 +9,7 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 import useSidebarBlockEditor from './use-sidebar-block-editor';
 import useBlocksFocusControl from '../focus-control/use-blocks-focus-control';
 
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorExperiments );
 

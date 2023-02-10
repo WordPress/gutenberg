@@ -29,12 +29,13 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import WelcomeGuide from '../welcome-guide';
+import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -170,6 +171,7 @@ export default function Editor() {
 					<GlobalStylesProvider>
 						<BlockContextProvider value={ blockContext }>
 							<SidebarComplementaryAreaFills />
+							{ isEditMode && <StartTemplateOptions /> }
 							<InterfaceSkeleton
 								enableRegionNavigation={ false }
 								className={

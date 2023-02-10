@@ -8,7 +8,7 @@
 
 ## 13.10.0 (2023-02-01)
 
-- The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^37.0.3` to requiring `^39.6.9`
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^37.0.3` to requiring `^39.6.9`
 
 ### Enhancement
 
@@ -170,6 +170,10 @@
 -   The bundled `eslint-plugin-prettier` dependency has been updated from requiring `^3.1.2` to requiring `^3.3.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
 -   The bundled `eslint-plugin-react` dependency has been updated from requiring `^7.20.0` to requiring `^7.22.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
 -   The bundled `eslint-plugin-react-hooks` dependency has been updated from requiring `^4.0.4` to requiring `^4.2.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+
+### New Features
+
+-   Enable `react-hooks/exhaustive-deps` rules in the react config in "warn" mode ([#24914](https://github.com/WordPress/gutenberg/pull/24914)).
 
 ## 7.4.0 (2020-12-17)
 

@@ -26,7 +26,7 @@ import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasVariationsPanel } from './variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useHasTypographyPanel, useGlobalSetting } = unlock(
 	blockEditorExperiments

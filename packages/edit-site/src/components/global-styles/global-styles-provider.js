@@ -15,7 +15,7 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import CanvasSpinner from '../canvas-spinner';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { GlobalStylesContext } = unlock( blockEditorExperiments );
 
