@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'List view', () => {
+test.describe( 'List View', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -108,8 +108,8 @@ test.describe( 'List view', () => {
 		await expect( hasThrownConsoleError ).toBeFalsy();
 	} );
 
-	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026
-	test( 'should select previous block after removing selected one', async ( {
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026.
+	test( 'selects the previous block after removing the selected one', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -146,8 +146,8 @@ test.describe( 'List view', () => {
 		).toBeFocused();
 	} );
 
-	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026
-	test( 'should select next block after removing the very first block', async ( {
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026.
+	test( 'selects the next block after removing the very first block', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -198,7 +198,7 @@ test.describe( 'List view', () => {
 	 * paragraph block; make sure that paragraph block gets selected after
 	 * removing blocks from ListView.
 	 */
-	test( 'should select default paragraph block after removing all blocks', async ( {
+	test( 'selects the default paragraph block after removing all blocks', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -239,7 +239,7 @@ test.describe( 'List view', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should expand nested list items', async ( {
+	test( 'expands nested list items', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -308,7 +308,7 @@ test.describe( 'List view', () => {
 			.waitFor();
 	} );
 
-	test( 'ensures the Home/End keyboard keys move focus to start/end of list', async ( {
+	test( 'moves focus to start/end of list with Home/End keys', async ( {
 		editor,
 		page,
 		pageUtils,
