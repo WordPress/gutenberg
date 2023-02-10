@@ -36,11 +36,12 @@ const MyNavigation = () => (
 ```
 **Important note**
 
-Parent/child navigation only works if the path you define are hierarchical. For example:
- - `/` is the root of all paths. 
- - `/parent/child` is a child of `/parent`. 
- - `/parent/child/grand-child` is a child of `/parent/child`.
- - `/parent/:param` is a child of `/parent` as well.
+Parent/child navigation only works if the path you define are hierarchical, following a URL-like scheme where each path segment is separated by the `/` character.
+For example:
+- `/` is the root of all paths. There should always be a screen with `path="/"`.
+- `/parent/child` is a child of `/parent`.
+- `/parent/child/grand-child` is a child of `/parent/child`.
+- `/parent/:param` is a child of `/parent` as well.
 
 ## Props
 
@@ -65,6 +66,15 @@ The `goTo` function allows navigating to a given path. The second argument can a
 The available options are:
 
 - `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
+- `isBack`: `boolean`. An optional property used to specify whether the navigation should be considered as backwards (thus enabling focus restoration when possible, and causing the animation to be backwards too)
+
+### `goToParent`: `() => void;`
+
+The `goToParent` function allows navigating to the parent screen.
+
+Parent/child navigation only works if the path you define are hierarchical (see note above).
+
+When a match is not found, the function will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) are found.
 
 ### `goBack`: `() => void`
 
