@@ -21,12 +21,12 @@ function render_block_core_image( $attributes, $content ) {
 		str_contains( $content, 'wp-element-caption' ) &&
 		! str_contains( $content, 'aria-describedby' )
 	) {
-		$unique_id = rand();
-		$content   = str_replace( '<figcaption', '<figcaption id="wp-image-caption-' . $unique_id . '"', $content );
+		$unique_id = wp_unique_id( 'wp-image-caption-' );
+		$content   = str_replace( '<figcaption', '<figcaption id="' . $unique_id . '"', $content );
 		if ( str_contains( $content, 'href' ) ) {
-			$content = str_replace( '<a', '<a aria-describedby="wp-image-caption-' . $unique_id . '"', $content );
+			$content = str_replace( '<a', '<a aria-describedby="' . $unique_id . '"', $content );
 		} else {
-			$content = str_replace( '<img', '<img aria-describedby="wp-image-caption-' . $unique_id . '"', $content );
+			$content = str_replace( '<img', '<img aria-describedby="' . $unique_id . '"', $content );
 		}
 	}
 
