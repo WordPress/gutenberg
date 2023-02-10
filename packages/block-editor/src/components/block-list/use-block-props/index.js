@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
+import { useContext, createContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__unstableGetBlockProps as getBlockProps,
@@ -44,6 +44,8 @@ import useBlockOverlayActive from '../../block-content-overlay';
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
+export const DisableBlockProps = createContext();
+
 /**
  * This hook is used to lightly mark an element as a block element. The element
  * should be the outermost element of a block. Call this hook and pass the
@@ -67,6 +69,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		wrapperProps = {},
 		isAligned,
 	} = useContext( BlockListBlockContext );
+	const disableBlockProps = useContext( DisableBlockProps );
 	const {
 		index,
 		mode,
@@ -118,9 +121,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	);
 
 	const hasOverlay = useBlockOverlayActive( clientId );
-
-	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
 		props.ref,
@@ -149,6 +149,20 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		);
 	}
 
+	const additionalClassNames = [
+		useBlockClassNames( clientId ),
+		useBlockDefaultClassName( clientId ),
+		useBlockCustomClassName( clientId ),
+		useBlockMovingModeClassNames( clientId ),
+	];
+
+	if ( disableBlockProps ) {
+		return {};
+	}
+
+	// translators: %s: Type of block (i.e. Text, Image etc)
+	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
+
 	return {
 		tabIndex: 0,
 		...wrapperProps,
@@ -169,10 +183,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			className,
 			props.className,
 			wrapperProps.className,
-			useBlockClassNames( clientId ),
-			useBlockDefaultClassName( clientId ),
-			useBlockCustomClassName( clientId ),
-			useBlockMovingModeClassNames( clientId )
+			...additionalClassNames
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};

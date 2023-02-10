@@ -1087,6 +1087,10 @@ _Returns_
 
 -   `boolean`: Whether block is first in multi-selection.
 
+### isIframeIncompatible
+
+Undocumented declaration.
+
 ### isLastBlockChangePersistent
 
 Returns true if the most recent block change is be considered persistent, or

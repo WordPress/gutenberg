@@ -6,21 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	withFilters,
-	Modal,
-	ToolbarGroup,
-	ToolbarButton,
-	Disabled,
-} from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import {
 	getBlockDefaultClassName,
 	hasBlockSupport,
 	getBlockType,
 } from '@wordpress/blocks';
-import { useContext, useMemo, useState } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import ServerSideRender from '@wordpress/server-side-render';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -28,10 +23,12 @@ import ServerSideRender from '@wordpress/server-side-render';
 import BlockContext from '../block-context';
 import { useSelect } from '@wordpress/data';
 import { store } from '../../store';
-import BlockControls from '../block-controls';
-import { useBlockProps } from '../block-list/use-block-props';
-import BlockToolbar from '../block-toolbar';
+import {
+	useBlockProps,
+	DisableBlockProps,
+} from '../block-list/use-block-props';
 import Warning from '../warning';
+import BlockPopover from '../block-popover';
 
 /**
  * Default value used for blocks which do not define their own context needs,
@@ -43,13 +40,27 @@ import Warning from '../warning';
  */
 const DEFAULT_BLOCK_CONTEXT = {};
 
-function IframeCompat( { clientId, blockType, attributes, children } ) {
+function LoadingResponsePlaceholder() {
+	return <Warning>{ __( 'Loading preview…' ) }</Warning>;
+}
+
+function IframeCompat( {
+	clientId,
+	blockType,
+	attributes,
+	isSelected,
+	children,
+} ) {
 	const isIframeIncompatible = useSelect(
 		( select ) => select( store ).isIframeIncompatible( clientId ),
 		[ clientId ]
 	);
-	const [ open, setOpen ] = useState( false );
-	const blockProps = useBlockProps();
+	const [ resizeListener, sizes ] = useResizeObserver();
+	const blockProps = useBlockProps( {
+		style: {
+			height: isSelected ? sizes?.height : undefined,
+		},
+	} );
 
 	if ( ! isIframeIncompatible ) {
 		return children;
@@ -57,35 +68,33 @@ function IframeCompat( { clientId, blockType, attributes, children } ) {
 
 	return (
 		<div { ...blockProps }>
-			{ ! open && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton onClick={ () => setOpen( true ) }>
-							{ __( 'Edit' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-			{ open && (
-				<Modal
-					title={ blockType.title }
-					onRequestClose={ () => setOpen( false ) }
-					// Third party popovers may trigger a click outside.
-					shouldCloseOnClickOutside={ false }
+			{ isSelected && (
+				<BlockPopover
+					clientId={ clientId }
+					__unstablePopoverSlot="Popover"
+					placement="overlay"
 				>
-					{ children }
-				</Modal>
+					<DisableBlockProps.Provider value={ true }>
+						<div style={ { position: 'relative' } }>
+							{ resizeListener }
+							{ children }
+						</div>
+					</DisableBlockProps.Provider>
+				</BlockPopover>
 			) }
-			<ServerSideRender
-				block={ blockType.name }
-				attributes={ attributes }
-			/>
+			{ ! isSelected && (
+				<ServerSideRender
+					block={ blockType.name }
+					attributes={ attributes }
+					LoadingResponsePlaceholder={ LoadingResponsePlaceholder }
+				/>
+			) }
 		</div>
 	);
 }
 
 export const Edit = ( props ) => {
-	const { attributes = {}, name, clientId } = props;
+	const { attributes = {}, name, clientId, isSelected } = props;
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
 
@@ -115,6 +124,7 @@ export const Edit = ( props ) => {
 				clientId={ clientId }
 				blockType={ blockType }
 				attributes={ attributes }
+				isSelected={ isSelected }
 			>
 				<Component { ...props } context={ context } />
 			</IframeCompat>
@@ -136,6 +146,7 @@ export const Edit = ( props ) => {
 			clientId={ clientId }
 			blockType={ blockType }
 			attributes={ attributes }
+			isSelected={ isSelected }
 		>
 			<Component
 				{ ...props }
