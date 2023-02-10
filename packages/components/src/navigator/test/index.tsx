@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Button } from '../../';
+import { Button } from '../../button';
 import {
 	NavigatorProvider,
 	NavigatorScreen,
@@ -87,6 +87,7 @@ type CustomTestOnClickHandler = (
 				path: string;
 		  }
 		| { type: 'goBack' }
+		| { type: 'goToParent' }
 ) => void;
 
 function CustomNavigatorButton( {
@@ -123,7 +124,6 @@ function CustomNavigatorGoToBackButton( {
 				// Used to spy on the values passed to `navigator.goTo`.
 				onClick?.( { type: 'goTo', path } );
 			} }
-			path={ path }
 			{ ...props }
 		/>
 	);
