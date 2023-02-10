@@ -134,10 +134,16 @@ test.describe( 'Heading', () => {
 			.getByRole( 'textbox', { name: 'Hex color' } )
 			.fill( '4b7f4d' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:heading {"level":3,"style":{"color":{"text":"#4b7f4d"}}} -->
-<h3 class="wp-block-heading has-text-color" style="color:#4b7f4d">Heading</h3>
-<!-- /wp:heading -->` );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'Heading',
+					level: 3,
+					style: { color: { text: '#4b7f4d' } },
+				},
+			},
+		] );
 	} );
 
 	test( 'should correctly apply named colors', async ( { editor, page } ) => {
@@ -162,9 +168,15 @@ test.describe( 'Heading', () => {
 		// Close the popover.
 		await textColor.click();
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:heading {"textColor":"luminous-vivid-orange"} -->
-<h2 class="wp-block-heading has-luminous-vivid-orange-color has-text-color">Heading</h2>
-<!-- /wp:heading -->` );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'Heading',
+					level: 2,
+					textColor: 'luminous-vivid-orange',
+				},
+			},
+		] );
 	} );
 } );
