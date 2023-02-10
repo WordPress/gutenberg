@@ -73,6 +73,7 @@ function IframeCompat( {
 					clientId={ clientId }
 					__unstablePopoverSlot="Popover"
 					placement="overlay"
+					shift={ false }
 				>
 					<DisableBlockProps.Provider value={ true }>
 						<div style={ { position: 'relative' } }>
