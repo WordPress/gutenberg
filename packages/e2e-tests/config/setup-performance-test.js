@@ -35,17 +35,19 @@ beforeAll( async () => {
 	await trashAllPosts();
 	await trashAllPosts( 'wp_block' );
 	await clearLocalStorage();
-	await setupPage();
 	await activatePlugin( 'gutenberg-test-plugin-disables-the-css-animations' );
 } );
 
-afterEach( async () => {
-	// Clear localStorage between tests so that the next test starts clean.
-	await clearLocalStorage();
-	// Close the previous page entirely and create a new page, so that the next test
+beforeEach( async () => {
+	// Close the previous page entirely and create a new page, so that the test
 	// isn't affected by page unload work.
 	await page.close();
 	page = await browser.newPage();
 	// Set up testing config on new page.
 	await setupPage();
+} );
+
+afterEach( async () => {
+	// Clear localStorage between tests so that the next test starts clean.
+	await clearLocalStorage();
 } );
