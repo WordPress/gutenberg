@@ -63,10 +63,13 @@ export function useLayoutClasses( blockAttributes = {}, blockName ) {
 		globalLayoutSettings?.definitions?.[ usedLayout?.type || 'default' ]
 			?.className
 	) {
-		layoutClassnames.push(
+		const baseClassName =
 			globalLayoutSettings?.definitions?.[ usedLayout?.type || 'default' ]
-				?.className
-		);
+				?.className;
+		const compoundClassName = `wp-block-${ name
+			.split( '/' )
+			.pop() }-${ baseClassName }`;
+		layoutClassnames.push( baseClassName, compoundClassName );
 	}
 
 	if (

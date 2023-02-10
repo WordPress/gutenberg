@@ -399,7 +399,7 @@ export function getLayoutStyles( {
 										? `${ selector } .${ className }${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }.${ className }${
+										: `:root ${ selector }-${ className }${
 												spacingStyle?.selector || ''
 										  }`;
 							}
