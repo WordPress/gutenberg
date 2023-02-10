@@ -7,10 +7,52 @@ export interface MenuData {
 	title: string;
 	content: string;
 }
-export interface Navigation {
+export interface Menu {
 	id: number;
 	content: string;
 	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
+}
+
+/**
+ * Create a classic menu
+ *
+ * @param {string} name Menu name.
+ * @return {string} Menu content.
+ */
+export async function createClassicMenu( this: RequestUtils, name: string ) {
+	const menuItems = [
+		{
+			title: 'Home',
+			url: 'http://localhost:8889/',
+			type: 'custom',
+			menu_order: 1,
+		},
+	];
+
+	const menu = await this.rest< Menu >( {
+		method: 'POST',
+		path: `/wp/v2/menus/`,
+		data: {
+			name,
+		},
+	} );
+
+	if ( menuItems?.length ) {
+		await this.batchRest(
+			menuItems.map( ( menuItem ) => ( {
+				method: 'POST',
+				path: `/wp/v2/menu-items`,
+				body: {
+					menus: menu.id,
+					object_id: undefined,
+					...menuItem,
+					parent: undefined,
+				},
+			} ) )
+		);
+	}
+
+	return menu;
 }
 
 /**
@@ -34,20 +76,33 @@ export async function createNavigationMenu(
 }
 
 /**
- * Delete all navigation menus
+ * Delete all navigation and classic menus
  *
  */
-export async function deleteAllNavigationMenus( this: RequestUtils ) {
-	const menus = await this.rest< Navigation[] >( {
+export async function deleteAllMenus( this: RequestUtils ) {
+	const navMenus = await this.rest< Menu[] >( {
 		path: `/wp/v2/navigation/`,
 	} );
 
-	if ( ! menus?.length ) return;
+	if ( navMenus?.length ) {
+		await this.batchRest(
+			navMenus.map( ( menu ) => ( {
+				method: 'DELETE',
+				path: `/wp/v2/navigation/${ menu.id }?force=true`,
+			} ) )
+		);
+	}
 
-	await this.batchRest(
-		menus.map( ( menu ) => ( {
-			method: 'DELETE',
-			path: `/wp/v2/navigation/${ menu.id }?force=true`,
-		} ) )
-	);
+	const classicMenus = await this.rest< Menu[] >( {
+		path: `/wp/v2/menus/`,
+	} );
+
+	if ( classicMenus?.length ) {
+		await this.batchRest(
+			classicMenus.map( ( menu ) => ( {
+				method: 'DELETE',
+				path: `/wp/v2/menus/${ menu.id }?force=true`,
+			} ) )
+		);
+	}
 }

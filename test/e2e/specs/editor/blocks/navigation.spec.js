@@ -13,14 +13,14 @@ test.describe(
 
 		test.beforeEach( async ( { admin, requestUtils } ) => {
 			await Promise.all( [
-				requestUtils.deleteAllNavigationMenus(),
+				requestUtils.deleteAllMenus(),
 				admin.createNewPost(),
 			] );
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
 			await Promise.all( [
-				requestUtils.deleteAllNavigationMenus(),
+				requestUtils.deleteAllMenus(),
 				requestUtils.activateTheme( 'twentytwentyone' ),
 			] );
 		} );
@@ -93,6 +93,21 @@ test.describe(
 					'role=navigation >> role=link[name="WordPress"i]'
 				)
 			).toBeVisible();
+		} );
+
+		test( 'default to the only existing classic menu if there are no block menus', async ( {
+			editor,
+			requestUtils,
+		} ) => {
+			//create a classic menu
+			requestUtils.activateTheme( 'twentytwentyone' );
+
+			await requestUtils.createClassicMenu( 'Test Classic 1' );
+			//insert a navigation block
+			await editor.insertBlock( { name: 'core/navigation' } );
+			await editor.page.pause();
+			//check the block in the canvas.
+			//check the block in the frontend.
 		} );
 	}
 );
