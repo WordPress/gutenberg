@@ -309,14 +309,11 @@ export const WithSlotFillItems: ComponentStory< typeof ToolsPanel > = ( {
 	const { width, height } = attributes;
 
 	const resetAll: typeof resetAllProp = ( resetFilters = [] ) => {
-		let newAttributes = {};
+		let newAttributes: typeof attributes = {};
 
 		resetFilters.forEach( ( resetFilter ) => {
 			newAttributes = {
 				...newAttributes,
-				// TODO: the `ResetFilter` type doesn't specify any attributes
-				// and doesn't return any objects
-				// @ts-ignore
 				...resetFilter( newAttributes ),
 			};
 		} );
@@ -408,14 +405,11 @@ export const WithConditionalDefaultControl: ComponentStory<
 	const { height, scale } = attributes;
 
 	const resetAll: typeof resetAllProp = ( resetFilters = [] ) => {
-		let newAttributes = {};
+		let newAttributes: typeof attributes = {};
 
 		resetFilters.forEach( ( resetFilter ) => {
 			newAttributes = {
 				...newAttributes,
-				// TODO: the `ResetFilter` type doesn't specify any attributes
-				// and doesn't return any objects
-				// @ts-ignore
 				...resetFilter( newAttributes ),
 			};
 		} );
@@ -507,14 +501,11 @@ export const WithConditionallyRenderedControl: ComponentStory<
 	const { height, scale } = attributes;
 
 	const resetAll: typeof resetAllProp = ( resetFilters = [] ) => {
-		let newAttributes = {};
+		let newAttributes: typeof attributes = {};
 
 		resetFilters.forEach( ( resetFilter ) => {
 			newAttributes = {
 				...newAttributes,
-				// TODO: the `ResetFilter` type doesn't specify any attributes
-				// and doesn't return any objects
-				// @ts-ignore
 				...resetFilter( newAttributes ),
 			};
 		} );
