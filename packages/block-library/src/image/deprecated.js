@@ -102,8 +102,100 @@ const deprecated = [
 	// Deprecate the version that does not use the caption to describe the image
 	// when the image has a caption but no alt text.
 	{
-		attributes: blockAttributes,
-		supports: blockSupports,
+		attributes: {
+			align: {
+				type: 'string',
+			},
+			url: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'img',
+				attribute: 'src',
+				__experimentalRole: 'content',
+			},
+			alt: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'img',
+				attribute: 'alt',
+				default: '',
+				__experimentalRole: 'content',
+			},
+			caption: {
+				type: 'string',
+				source: 'html',
+				selector: 'figcaption',
+				__experimentalRole: 'content',
+			},
+			title: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'img',
+				attribute: 'title',
+				__experimentalRole: 'content',
+			},
+			href: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'figure > a',
+				attribute: 'href',
+				__experimentalRole: 'content',
+			},
+			rel: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'figure > a',
+				attribute: 'rel',
+			},
+			linkClass: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'figure > a',
+				attribute: 'class',
+			},
+			id: {
+				type: 'number',
+				__experimentalRole: 'content',
+			},
+			width: {
+				type: 'number',
+			},
+			height: {
+				type: 'number',
+			},
+			sizeSlug: {
+				type: 'string',
+			},
+			linkDestination: {
+				type: 'string',
+			},
+			linkTarget: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'figure > a',
+				attribute: 'target',
+			},
+		},
+		supports: {
+			anchor: true,
+			color: {
+				__experimentalDuotone: 'img, .components-placeholder',
+				text: false,
+				background: false,
+			},
+			__experimentalBorder: {
+				color: true,
+				radius: true,
+				width: true,
+				__experimentalSelector: 'img, .wp-block-image__crop-area',
+				__experimentalSkipSerialization: true,
+				__experimentalDefaultControls: {
+					color: true,
+					radius: true,
+					width: true,
+				},
+			},
+		},
 		save( { attributes } ) {
 			const {
 				url,
