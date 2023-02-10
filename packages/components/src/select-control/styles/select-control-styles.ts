@@ -128,6 +128,12 @@ const sizePaddings = ( {
 	} );
 };
 
+const overflowStyles = ( { multiple }: SelectProps ) => {
+	return {
+		overflow: multiple ? 'auto' : 'hidden',
+	};
+};
+
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
@@ -145,7 +151,6 @@ export const Select = styled.select< SelectProps >`
 		width: 100%;
 		max-width: none;
 		cursor: pointer;
-		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 
@@ -153,6 +158,7 @@ export const Select = styled.select< SelectProps >`
 		${ fontSizeStyles };
 		${ sizeStyles };
 		${ sizePaddings };
+		${ overflowStyles }
 	}
 `;
 
