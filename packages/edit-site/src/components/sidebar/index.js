@@ -30,7 +30,6 @@ function SidebarScreens() {
 			<SidebarNavigationScreenTemplate postType="wp_template_part" />
 			<SidebarNavigationScreenTemplatesBrowse postType="wp_template" />
 			<SidebarNavigationScreenTemplatesBrowse postType="wp_template_part" />
-
 		</>
 	);
 }
