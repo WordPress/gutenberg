@@ -39,7 +39,6 @@ const ALLOWED_BLOCKS = [
 export default function UnsavedInnerBlocks( {
 	blocks,
 	createNavigationMenu,
-
 	hasSelection,
 } ) {
 	const originalBlocks = useRef();
