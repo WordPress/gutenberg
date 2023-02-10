@@ -49,13 +49,16 @@ describe( 'Front End Performance', () => {
 	it( 'Largest Contentful Paint (LCP)', async () => {
 		// Based on https://addyosmani.com/blog/puppeteer-recipes/#performance-observer-lcp
 		function calcLCP() {
-			window.largestContentfulPaint = 0;
+			// By using -1 we know when it didn't record any event.
+			window.largestContentfulPaint = -1;
 
 			const observer = new PerformanceObserver( ( entryList ) => {
 				const entries = entryList.getEntries();
 				const lastEntry = entries[ entries.length - 1 ];
-				window.largestContentfulPaint =
-					lastEntry.renderTime || lastEntry.loadTime;
+				// According to the spec, we can use startTime
+				// as it'll report renderTime || loadTime:
+				// https://www.w3.org/TR/largest-contentful-paint/#largestcontentfulpaint
+				window.largestContentfulPaint = lastEntry.startTime;
 			} );
 
 			observer.observe( {
@@ -77,7 +80,10 @@ describe( 'Front End Performance', () => {
 		let i = 16;
 		while ( i-- ) {
 			await page.evaluateOnNewDocument( calcLCP );
-			await page.goto( createURL( '/' ) );
+			// By waiting for networkidle we make sure navigation won't be considered finished on load,
+			// hence, it'll paint the page and largest-contentful-paint events will be dispatched.
+			// https://pptr.dev/api/puppeteer.page.goto#remarks
+			await page.goto( createURL( '/' ), { waitUntil: 'networkidle0' } );
 
 			const lcp = await page.evaluate(
 				() => window.largestContentfulPaint
