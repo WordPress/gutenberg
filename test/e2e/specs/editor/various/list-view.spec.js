@@ -8,14 +8,28 @@ test.describe( 'List View', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'allows a user to drag a block to a new sibling position', async ( {
+	test.only( 'allows a user to drag a block to a new sibling position', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		// Insert a couple of blocks of different types.
 		await editor.insertBlock( { name: 'core/heading' } );
 		await editor.insertBlock( { name: 'core/image' } );
 		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Open List View.
+		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+
+		// The last inserted block should be selected.
+		await page
+			.getByRole( 'gridcell', {
+				name: 'Paragraph link',
+				selected: true,
+			} )
+			.waitFor();
+
+		// Ensure the setup is correct before dragging.
 		await expect
 			.poll( editor.getBlocks )
 			.toMatchObject( [
@@ -24,17 +38,16 @@ test.describe( 'List View', () => {
 				{ name: 'core/paragraph' },
 			] );
 
-		// Bring up the paragraph block selection menu.
-		await page.keyboard.press( 'Escape' );
-
 		// Drag the paragraph above the heading.
-		const paragraphBlockDragButton = page.locator(
-			'button[draggable="true"][aria-label="Drag"]'
-		);
-		const headingBlock = page.getByRole( 'document', {
-			name: 'Block: Heading',
+		const paragraphBlockItem = await page.getByRole( 'gridcell', {
+			name: 'Paragraph link',
 		} );
-		await paragraphBlockDragButton.dragTo( headingBlock, { x: 0, y: 0 } );
+		const headingBlockItem = page.getByRole( 'gridcell', {
+			name: 'Heading link',
+		} );
+		await paragraphBlockItem.dragTo( headingBlockItem, { x: 0, y: 0 } );
+
+		// Ensure the block was dropped correctly.
 		await expect
 			.poll( editor.getBlocks )
 			.toMatchObject( [
