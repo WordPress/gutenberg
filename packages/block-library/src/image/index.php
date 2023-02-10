@@ -15,19 +15,30 @@
  */
 function render_block_core_image( $attributes, $content ) {
 
+	$processed_content = new WP_HTML_Tag_Processor( $content );
+
 	// If an image block has no alternative text but has a caption,
 	// and aria-describedby is not set, add aria-describedby to the image or image link.
 	if ( empty( $attributes['alt'] ) &&
 		str_contains( $content, 'wp-element-caption' ) &&
 		! str_contains( $content, 'aria-describedby' )
 	) {
-		$unique_id = wp_unique_id( 'wp-image-caption-' );
-		$content   = str_replace( '<figcaption', '<figcaption id="' . $unique_id . '"', $content );
+		$unique_id         = wp_unique_id( 'wp-image-caption-' );
+		$processed_content = new WP_HTML_Tag_Processor( $content );
 		if ( str_contains( $content, 'href' ) ) {
-			$content = str_replace( '<a', '<a aria-describedby="' . $unique_id . '"', $content );
+			$processed_content->next_tag( array( 'tag_name' => 'a' ) );
+			$processed_content->set_attribute( 'aria-describedby', $unique_id );
 		} else {
-			$content = str_replace( '<img', '<img aria-describedby="' . $unique_id . '"', $content );
+			$processed_content->next_tag( array( 'tag_name' => 'img' ) );
+			$processed_content->set_attribute( 'aria-describedby', $unique_id );
 		}
+		$processed_content->next_tag(
+			array(
+				'tag_name'   => 'figcaption',
+				'class_name' => 'wp-element-caption',
+			)
+		);
+		$processed_content->set_attribute( 'id', $unique_id );
 	}
 
 	if ( isset( $attributes['data-id'] ) ) {
@@ -36,11 +47,13 @@ function render_block_core_image( $attributes, $content ) {
 		// which now wraps Image Blocks within innerBlocks.
 		// The data-id attribute is added in a core/gallery `render_block_data` hook.
 		$data_id_attribute = 'data-id="' . esc_attr( $attributes['data-id'] ) . '"';
-		if ( ! str_contains( $content, $data_id_attribute ) ) {
-			$content = str_replace( '<img', '<img ' . $data_id_attribute . ' ', $content );
+		if ( ! str_contains( $processed_content, $data_id_attribute ) ) {
+			$processed_content->next_tag( array( 'tag_name' => 'img' ) );
+			$processed_content->set_attribute( 'data-id', esc_attr( $attributes['data-id'] ) );
 		}
 	}
-	return $content;
+
+	return $processed_content->get_updated_html();
 }
 
 
