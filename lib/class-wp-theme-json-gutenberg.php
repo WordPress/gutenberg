@@ -1298,7 +1298,7 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								} else {
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(%s .%s%s)' : '$s-$s$s';
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(%s .%s) %s' : '%s-%s%s';
 									$layout_selector = sprintf(
 										$format,
 										$selector,

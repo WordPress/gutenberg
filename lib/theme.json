@@ -252,19 +252,19 @@
 					],
 					"spacingStyles": [
 						{
-							"selector": " > :first-child",
+							"selector": " > :first-child:first-child",
 							"rules": {
-								"margin-block-start": "0 !important"
+								"margin-block-start": "0"
 							}
 						},
 						{
-							"selector": " > :last-child",
+							"selector": " > :last-child:last-child",
 							"rules": {
-								"margin-block-end": "0 !important"
+								"margin-block-end": "0"
 							}
 						},
 						{
-							"selector": " > * + *",
+							"selector": " > :where(* + *)",
 							"rules": {
 								"margin-block-start": null
 							}
@@ -316,19 +316,19 @@
 					],
 					"spacingStyles": [
 						{
-							"selector": " > :first-child",
+							"selector": " > :first-child:first-child",
 							"rules": {
-								"margin-block-start": "0 !important"
+								"margin-block-start": "0"
 							}
 						},
 						{
-							"selector": " > :last-child",
+							"selector": " > :last-child:last-child",
 							"rules": {
-								"margin-block-end": "0 !important"
+								"margin-block-end": "0"
 							}
 						},
 						{
-							"selector": " > * + *",
+							"selector": " > :where(* + *)",
 							"rules": {
 								"margin-block-start": null
 							}
@@ -349,7 +349,7 @@
 							}
 						},
 						{
-							"selector": " > *",
+							"selector": " > :where(*)",
 							"rules": {
 								"margin": "0"
 							}
