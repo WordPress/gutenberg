@@ -15,11 +15,12 @@ test.describe( 'Heading', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '### 3' );
 
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">3</h3>
-<!-- /wp:heading -->`
-		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: { content: '3', level: 3 },
+			},
+		] );
 	} );
 
 	test( 'can be created by prefixing existing content with number signs and a space', async ( {
@@ -31,10 +32,12 @@ test.describe( 'Heading', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '#### ' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading">4</h4>
-<!-- /wp:heading -->` );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: { content: '4', level: 4 },
+			},
+		] );
 	} );
 
 	test( 'should not work with the list input rule', async ( {
@@ -44,11 +47,12 @@ test.describe( 'Heading', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## 1. H' );
 
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:heading -->
-<h2 class="wp-block-heading">1. H</h2>
-<!-- /wp:heading -->`
-		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: { content: '1. H', level: 2 },
+			},
+		] );
 	} );
 
 	test( 'should work with the format input rules', async ( {
@@ -58,11 +62,12 @@ test.describe( 'Heading', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## `code`' );
 
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:heading -->
-<h2 class="wp-block-heading"><code>code</code></h2>
-<!-- /wp:heading -->`
-		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: { content: '<code>code</code>', level: 2 },
+			},
+		] );
 	} );
 
 	test( 'should create a paragraph block above when pressing enter at the start', async ( {
@@ -74,15 +79,16 @@ test.describe( 'Heading', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Enter' );
 
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->
-
-<!-- wp:heading -->
-<h2 class="wp-block-heading">a</h2>
-<!-- /wp:heading -->`
-		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+			{
+				name: 'core/heading',
+				attributes: { content: 'a', level: 2 },
+			},
+		] );
 	} );
 
 	test( 'should create a paragraph block below when pressing enter at the end', async ( {
@@ -93,15 +99,16 @@ test.describe( 'Heading', () => {
 		await page.keyboard.type( '## a' );
 		await page.keyboard.press( 'Enter' );
 
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:heading -->
-<h2 class="wp-block-heading">a</h2>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->`
-		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: { content: 'a', level: 2 },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+		] );
 	} );
 
 	test( 'should correctly apply custom colors', async ( {
