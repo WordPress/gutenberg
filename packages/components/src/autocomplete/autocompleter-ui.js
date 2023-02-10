@@ -15,10 +15,10 @@ import { useAnchor } from '@wordpress/rich-text';
 import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
-import { Fill } from '../slot-fill';
 import { VisuallyHidden } from '../visually-hidden';
+import { createPortal } from 'react-dom';
 
-export function getAutoCompleterUI( autocompleter, accessibilitySlotName ) {
+export function getAutoCompleterUI( autocompleter ) {
 	const useItems = autocompleter.useItems
 		? autocompleter.useItems
 		: getDefaultUseItems( autocompleter );
@@ -97,11 +97,11 @@ export function getAutoCompleterUI( autocompleter, accessibilitySlotName ) {
 				>
 					<ListBox />
 				</Popover>
-				{ accessibilitySlotName && (
-					<Fill name={ accessibilitySlotName }>
-						<ListBox Component={ VisuallyHidden } />
-					</Fill>
-				) }
+				{ contentRef.current &&
+					createPortal(
+						<ListBox Component={ VisuallyHidden } />,
+						contentRef.current.ownerDocument.body
+					) }
 			</>
 		);
 	}

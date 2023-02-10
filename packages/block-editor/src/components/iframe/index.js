@@ -21,10 +21,7 @@ import {
 	useRefEffect,
 	useDisabled,
 } from '@wordpress/compose';
-import {
-	__experimentalStyleProvider as StyleProvider,
-	Slot,
-} from '@wordpress/components';
+import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -103,8 +100,6 @@ async function loadScript( head, { id, src } ) {
 		head.appendChild( script );
 	} );
 }
-
-export const ACCESSIBILITY_SLOT_NAME = 'block-editor-iframe-accessibility-slot';
 
 function Iframe( {
 	contentRef,
@@ -303,8 +298,6 @@ function Iframe( {
 								<StyleProvider document={ iframeDocument }>
 									{ children }
 								</StyleProvider>
-								<div />
-								<Slot name={ ACCESSIBILITY_SLOT_NAME } />
 							</body>
 						</>,
 						iframeDocument.documentElement
