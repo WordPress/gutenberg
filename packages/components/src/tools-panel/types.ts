@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  */
 import type { HeadingSize } from '../heading/types';
 
-type ResetAllFilter = () => void;
+type ResetAllFilter = ( attributes?: any ) => any;
 type ResetAll = ( filters?: ResetAllFilter[] ) => void;
 
 export type ToolsPanelProps = {
