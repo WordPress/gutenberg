@@ -69,7 +69,7 @@ test.describe(
 
 			await editor.insertBlock( { name: 'core/navigation' } );
 
-			//check the block in the canvas.
+			// Check the block in the canvas.
 			await expect(
 				editor.canvas.locator(
 					'role=textbox[name="Navigation link text"i] >> text="WordPress"'
@@ -86,7 +86,7 @@ test.describe(
 			] );
 			await page.locator( 'role=button[name="Close panel"i]' ).click();
 
-			//check the block in the frontend.
+			// Check the block in the frontend.
 			await page.goto( '/' );
 			await expect(
 				page.locator(
@@ -99,15 +99,19 @@ test.describe(
 			editor,
 			requestUtils,
 		} ) => {
-			//create a classic menu
-			requestUtils.activateTheme( 'twentytwentyone' );
-
+			// Create a classic menu.
 			await requestUtils.createClassicMenu( 'Test Classic 1' );
-			//insert a navigation block
+
 			await editor.insertBlock( { name: 'core/navigation' } );
+			// We need to check the canvas after inserting the navigation block to be able to target the block.
+			const navigationBlock = editor.canvas.locator(
+				'role=document[name="Block: Navigation"i]'
+			);
+			await expect( navigationBlock ).toBeVisible();
+
+			// Check the block in the canvas.
+			// Check the block in the frontend.
 			await editor.page.pause();
-			//check the block in the canvas.
-			//check the block in the frontend.
 		} );
 	}
 );
