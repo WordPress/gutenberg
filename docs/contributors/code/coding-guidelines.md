@@ -244,7 +244,7 @@ Each `@wordpress` package wanting to privately access or expose experimental API
 do so by opting-in to `@wordpress/private-apis`:
 
 ```js
-// In packages/block-editorwordpress/private-apis.js:
+// In packages/block-editor/private-apis.js:
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -366,6 +366,7 @@ const {
 Remember to always register the private actions and selectors on the **registered** store.
 
 Sometimes that's easy:
+
 ```js
 export const store = createReduxStore( STORE_NAME, storeConfig() );
 // `register` uses the same `store` object created from `createReduxStore`.
