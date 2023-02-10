@@ -48,12 +48,14 @@ test.describe(
 
 			// Check the markup of the block is correct.
 			await editor.publishPost();
-			const content = await editor.getEditedPostContent();
 			const navigationMenus = await requestUtils.getNavigationMenus();
 			const latestNavigationMenu = navigationMenus[ 0 ];
-			expect( content ).toBe(
-				`<!-- wp:navigation {"ref":${ latestNavigationMenu.id }} /-->`
-			);
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/navigation',
+					attributes: { ref: latestNavigationMenu.id },
+				},
+			] );
 		} );
 
 		test( 'default to my only existing menu', async ( {
