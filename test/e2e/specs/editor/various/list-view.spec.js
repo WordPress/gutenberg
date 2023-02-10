@@ -307,4 +307,62 @@ test.describe( 'List view', () => {
 			} )
 			.waitFor();
 	} );
+
+	test( 'ensures the Home/End keyboard keys move focus to start/end of list', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Insert a couple of blocks of different types.
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/columns' } );
+		await editor.insertBlock( { name: 'core/group' } );
+
+		// Open list view.
+		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+
+		// The last inserted block should be selected.
+		await page
+			.getByRole( 'gridcell', {
+				name: 'Group link',
+				selected: true,
+			} )
+			.waitFor();
+
+		// Press Home to go to the first inserted block (image).
+		await page.keyboard.press( 'Home' );
+		await expect(
+			page
+				.getByRole( 'gridcell', {
+					name: 'Image link',
+				} )
+				.locator( 'a' )
+		).toBeFocused();
+
+		// Press End followed by Arrow Up to go to the second to last block (columns).
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'ArrowUp' );
+		await expect(
+			page
+				.getByRole( 'gridcell', {
+					name: 'Columns link',
+				} )
+				.locator( 'a' )
+		).toBeFocused();
+
+		// Navigate the right column to image block options button via Home key.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Home' );
+		await expect(
+			page.getByRole( 'button', { name: 'Options for Image block' } )
+		).toBeFocused();
+
+		// Navigate the right column to group block options button.
+		await page.keyboard.press( 'End' );
+		await expect(
+			page.getByRole( 'button', { name: 'Options for Group block' } )
+		).toBeFocused();
+	} );
 } );
