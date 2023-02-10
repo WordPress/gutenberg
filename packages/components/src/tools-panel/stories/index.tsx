@@ -600,8 +600,6 @@ WithConditionallyRenderedControl.args = {
 	panelId: 'unique-tools-panel-id',
 };
 
-export { ToolsPanelWithItemGroupSlot } from './utils/tools-panel-with-item-group-slot';
-
 const PanelWrapperView = styled.div`
 	font-size: 13px;
 
