@@ -7,7 +7,7 @@ import { writeFileSync } from 'fs';
 /**
  * WordPress dependencies
  */
-import { createURL, logout } from '@wordpress/e2e-test-utils';
+import { activateTheme, createURL, logout } from '@wordpress/e2e-test-utils';
 
 describe( 'Front End Performance', () => {
 	const results = {
@@ -16,6 +16,7 @@ describe( 'Front End Performance', () => {
 	};
 
 	beforeAll( async () => {
+		await activateTheme( 'twentytwentyone' );
 		await logout();
 	} );
 
