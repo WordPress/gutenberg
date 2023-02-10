@@ -10,7 +10,7 @@ import { Button } from '@wordpress/components';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 
 const config = {

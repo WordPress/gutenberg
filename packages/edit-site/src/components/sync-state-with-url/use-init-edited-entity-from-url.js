@@ -14,13 +14,15 @@ import { store as editSiteStore } from '../../store';
 export default function useInitEditedEntityFromURL() {
 	const { params: { postId, path = '/' } = {} } = useLocation();
 	const { isRequestingSite, homepageId } = useSelect( ( select ) => {
-		const { getEntityRecord, isResolving } = select( coreDataStore );
-		const args = [ 'root', '__unstableBase', undefined ];
-		const siteData = getEntityRecord( ...args ) || {};
+		const { getSite } = select( coreDataStore );
+		const siteData = getSite();
 
 		return {
-			isRequestingSite: isResolving( 'core', 'getEntityRecord', args ),
-			homepageId: siteData.homepage,
+			isRequestingSite: ! siteData,
+			homepageId:
+				siteData?.show_on_front === 'page'
+					? siteData.page_on_front
+					: null,
 		};
 	}, [] );
 
@@ -47,5 +49,13 @@ export default function useInitEditedEntityFromURL() {
 				}
 			}
 		}
-	}, [ path, postId, homepageId, isRequestingSite ] );
+	}, [
+		path,
+		postId,
+		homepageId,
+		isRequestingSite,
+		setPage,
+		setTemplate,
+		setTemplatePart,
+	] );
 }
