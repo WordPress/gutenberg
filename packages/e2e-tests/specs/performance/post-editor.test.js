@@ -124,16 +124,17 @@ describe( 'Post Editor Performance', () => {
 				timeout: 120000,
 			} );
 			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
-			const {
-				serverResponse,
-				firstPaint,
-				domContentLoaded,
-				loaded,
-				firstContentfulPaint,
-				firstBlock,
-			} = await getLoadingDurations();
 
 			if ( i < samples ) {
+				const {
+					serverResponse,
+					firstPaint,
+					domContentLoaded,
+					loaded,
+					firstContentfulPaint,
+					firstBlock,
+				} = await getLoadingDurations();
+
 				results.serverResponse.push( serverResponse );
 				results.firstPaint.push( firstPaint );
 				results.domContentLoaded.push( domContentLoaded );
