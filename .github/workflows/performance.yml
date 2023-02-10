@@ -51,6 +51,13 @@ jobs:
                   name: perf-test-results
                   path: ./__test-results/*.json
 
+            - name: Store performance traces
+              if: github.event_name == 'pull_request'
+              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              with:
+                name: perf-test-traces
+                path: ./__test-results/traces/*
+
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
               env:
