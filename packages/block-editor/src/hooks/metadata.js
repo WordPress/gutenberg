@@ -8,7 +8,7 @@ const META_ATTRIBUTE_NAME = 'metadata';
 
 export function hasBlockMetadataSupport( blockType, feature = '' ) {
 	// Only core blocks are allowed to use __experimentalMetadata until the fetaure is stablised.
-	if ( ! blockType.startsWith( 'core/' ) ) {
+	if ( ! blockType.name.startsWith( 'core/' ) ) {
 		return false;
 	}
 	const support = getBlockSupport( blockType, '__experimentalMetadata' );
