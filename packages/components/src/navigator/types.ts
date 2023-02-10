@@ -58,7 +58,9 @@ export type NavigatorScreenProps = {
 	children: ReactNode;
 };
 
-export type NavigatorBackButtonHookProps = ButtonAsButtonProps & {
+export type NavigatorBackButtonProps = ButtonAsButtonProps;
+
+export type NavigatorBackButtonHookProps = NavigatorBackButtonProps & {
 	/**
 	 * Whether we should navigate to the parent screen.
 	 *
@@ -67,9 +69,7 @@ export type NavigatorBackButtonHookProps = ButtonAsButtonProps & {
 	goToParent?: boolean;
 };
 
-export type NavigatorBackButtonProps = ButtonAsButtonProps;
-
-export type NavigatorToParentButtonProps = ButtonAsButtonProps;
+export type NavigatorToParentButtonProps = NavigatorBackButtonProps;
 
 export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	/**
