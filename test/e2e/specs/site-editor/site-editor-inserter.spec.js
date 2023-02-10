@@ -40,4 +40,31 @@ test.describe( 'Site Editor Inserter', () => {
 			)
 		).toBeHidden();
 	} );
+
+	// A test for https://github.com/WordPress/gutenberg/issues/43090.
+	test( 'should close the inserter when clicking on the toggle button', async ( {
+		page,
+		editor,
+	} ) => {
+		const inserterButton = page.getByRole( 'button', {
+			name: 'Toggle block inserter',
+		} );
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+
+		const beforeBlocks = await editor.getBlocks();
+
+		await inserterButton.click();
+		await blockLibrary.getByRole( 'tab', { name: 'Blocks' } ).click();
+		await blockLibrary.getByRole( 'option', { name: 'Buttons' } ).click();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ ...beforeBlocks, { name: 'core/buttons' } ] );
+
+		await inserterButton.click();
+
+		await expect( blockLibrary ).toBeHidden();
+	} );
 } );
