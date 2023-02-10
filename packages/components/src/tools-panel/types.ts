@@ -42,8 +42,9 @@ export type ToolsPanelProps = {
 	 */
 	panelId?: string | null;
 	/**
-	 * A function to call when the `Reset all` menu option is selected. This is
-	 * passed through to the panel's header component.
+	 * A function to call when the `Reset all` menu option is selected. As an
+	 * argument, it receives an array containing the `resetAllFilter` callbacks
+	 * of all the valid registered `ToolsPanelItems`.
 	 */
 	resetAll: ResetAll;
 	/**
