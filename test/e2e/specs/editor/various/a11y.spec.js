@@ -152,6 +152,9 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		).toBeVisible();
 
 		async function clickAndFocusTab( tab ) {
+			// Some browsers, e.g. Safari, don't set focus after a click. We need
+			// to ensure focus is set to start tabbing from a predictable place
+			// in the UI. This isn't part of the user flow we want to test.
 			await tab.click();
 			await tab.focus();
 		}
