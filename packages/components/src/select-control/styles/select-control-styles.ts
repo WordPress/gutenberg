@@ -102,38 +102,25 @@ const sizePaddings = ( {
 	multiple,
 	selectSize = 'default',
 }: SelectProps ) => {
-	const iconWidth = chevronIconSize;
-
-	const sizes = {
-		default: {
-			paddingLeft: 16,
-			paddingRight: 16 + iconWidth,
-		},
-		small: {
-			paddingLeft: 8,
-			paddingRight: 8 + iconWidth,
-		},
-		'__unstable-large': {
-			paddingLeft: 16,
-			paddingRight: 16 + iconWidth,
-		},
+	const padding = {
+		default: 16,
+		small: 8,
+		'__unstable-large': 16,
 	};
 
 	if ( ! __next36pxDefaultSize ) {
-		sizes.default = {
-			paddingLeft: 8,
-			paddingRight: 8 + iconWidth,
-		};
+		padding.default = 8;
 	}
 
-	const selectedSize = sizes[ selectSize ] || sizes.default;
+	const selectedPadding = padding[ selectSize ] || padding.default;
 
 	return rtl( {
-		...selectedSize,
+		paddingLeft: selectedPadding,
+		paddingRight: selectedPadding + chevronIconSize,
 		...( multiple
 			? {
-					paddingTop: selectedSize.paddingLeft,
-					paddingBottom: selectedSize.paddingLeft,
+					paddingTop: selectedPadding,
+					paddingBottom: selectedPadding,
 			  }
 			: {} ),
 	} );
