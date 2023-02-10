@@ -25,7 +25,7 @@ import { IconWithCurrentColor } from './icon-with-current-color';
 import { NavigationButtonAsItem } from './navigation-button';
 import ContextMenu from './context-menu';
 import StylesPreview from './preview';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 function ScreenRoot() {
 	const { useGlobalStyle } = unlock( blockEditorExperiments );

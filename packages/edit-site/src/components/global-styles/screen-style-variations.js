@@ -34,7 +34,7 @@ import {
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import StylesPreview from './preview';
 import ScreenHeader from './header';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { GlobalStylesContext } = unlock( blockEditorExperiments );
 

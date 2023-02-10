@@ -134,7 +134,7 @@ function formatTime( number ) {
 /**
  * Curate the raw performance results.
  *
- * @param {string} testSuite
+ * @param {string}                  testSuite
  * @param {WPRawPerformanceResults} results
  *
  * @return {WPPerformanceResults} Curated Performance results.
@@ -186,14 +186,21 @@ function curateResults( testSuite, results ) {
  *
  * @param {string} testSuite                Name of the tests set.
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
+ * @param {string} runKey                   Unique identifier for the test run, e.g. `branch-name_post-editor_run-3`.
  *
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
-async function runTestSuite( testSuite, performanceTestDirectory ) {
+async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 	await runShellScript(
 		`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
 		performanceTestDirectory
 	);
+	const resultsFile = path.join(
+		performanceTestDirectory,
+		`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
+	);
+	fs.mkdirSync( './__test-results', { recursive: true } );
+	fs.copyFileSync( resultsFile, `./__test-results/${ runKey }.results.json` );
 	const rawResults = await readJSONFile(
 		path.join(
 			performanceTestDirectory,
@@ -388,6 +395,7 @@ async function runPerformanceTests( branches, options ) {
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
+				const runKey = `${ branch }_${ testSuite }_run-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
 				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
@@ -399,7 +407,8 @@ async function runPerformanceTests( branches, options ) {
 				log( '        >> Running the test.' );
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
-					performanceTestDirectory
+					performanceTestDirectory,
+					runKey
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(

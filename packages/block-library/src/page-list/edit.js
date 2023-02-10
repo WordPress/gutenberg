@@ -182,11 +182,6 @@ export default function PageListEdit( {
 		pages?.length > 0 &&
 		pages?.length <= MAX_PAGE_COUNT;
 
-	const convertToNavigationLinks = useConvertToNavigationLinks( {
-		clientId,
-		pages,
-	} );
-
 	const pagesByParentId = useMemo( () => {
 		if ( pages === null ) {
 			return new Map();
@@ -212,6 +207,12 @@ export default function PageListEdit( {
 			return accumulator;
 		}, new Map() );
 	}, [ pages ] );
+
+	const convertToNavigationLinks = useConvertToNavigationLinks( {
+		clientId,
+		pages,
+		parentPageID,
+	} );
 
 	const blockProps = useBlockProps( {
 		className: classnames( 'wp-block-page-list', {

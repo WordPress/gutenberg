@@ -20,7 +20,7 @@ import { info } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 import Subtitle from './subtitle';
 
 const { useGlobalStyle } = unlock( blockEditorExperiments );

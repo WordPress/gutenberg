@@ -971,7 +971,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @return string The processed CSS.
 	 */
-	public function process_blocks_custom_css( $css, $selector ) {
+	protected function process_blocks_custom_css( $css, $selector ) {
 		$processed_css = '';
 
 		// Split CSS nested rules.
@@ -1551,7 +1551,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $selector Original selector.
 	 * @return string Scoped selector.
 	 */
-	protected static function scope_selector( $scope, $selector ) {
+	public static function scope_selector( $scope, $selector ) {
 		$scopes    = explode( ',', $scope );
 		$selectors = explode( ',', $selector );
 

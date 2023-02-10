@@ -9,8 +9,11 @@ import { css } from '@emotion/react';
  */
 import { Flex } from '../flex';
 import { space } from '../ui/utils/space';
+import type { ComboboxControlProps } from './types';
 
-const deprecatedDefaultSize = ( { __next36pxDefaultSize } ) =>
+const deprecatedDefaultSize = ( {
+	__next36pxDefaultSize,
+}: Pick< ComboboxControlProps, '__next36pxDefaultSize' > ) =>
 	! __next36pxDefaultSize &&
 	css`
 		height: 28px; // 30px - 2px vertical borders on parent container

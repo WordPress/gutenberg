@@ -31,7 +31,8 @@
 .edit-site-sidebar-navigation-screen__back {
 	color: $gray-200;
 
-	&:hover {
+	&:hover,
+	&:not([aria-disabled="true"]):active {
 		color: $white;
 	}
 }

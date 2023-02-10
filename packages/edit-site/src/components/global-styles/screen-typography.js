@@ -19,7 +19,7 @@ import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 import BlockPreviewPanel from './block-preview-panel';
 import { getVariationClassName } from './utils';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const { useGlobalStyle } = unlock( blockEditorExperiments );
 
@@ -109,7 +109,7 @@ function ScreenTypography( { name, variation = '' } ) {
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">
 					<VStack spacing={ 3 }>
-						<Subtitle>{ __( 'Elements' ) }</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Elements' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							<Item
 								name={ name }

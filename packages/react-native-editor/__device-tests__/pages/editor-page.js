@@ -193,6 +193,19 @@ class EditorPage {
 		return elements[ elements.length - 1 ];
 	}
 
+	// For iOS, depending on the content and how fast the block list
+	// renders blocks, it won't need to scroll down as it would find
+	// the block right away.
+	async scrollAndReturnElementByAccessibilityId( id ) {
+		const elements = await this.driver.elementsByAccessibilityId( id );
+
+		if ( elements.length === 0 ) {
+			await swipeUp( this.driver, undefined, 100, 1 );
+			return this.scrollAndReturnElementByAccessibilityId( id );
+		}
+		return elements[ elements.length - 1 ];
+	}
+
 	async getLastElementByXPath( accessibilityLabel ) {
 		const elements = await this.driver.elementsByXPath(
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`

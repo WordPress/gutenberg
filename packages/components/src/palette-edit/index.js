@@ -313,6 +313,7 @@ export default function PaletteEdit( {
 	colors = EMPTY_ARRAY,
 	onChange,
 	paletteLabel,
+	paletteLabelHeadingLevel = 2,
 	emptyMessage,
 	canOnlyChangeValues,
 	canReset,
@@ -347,7 +348,9 @@ export default function PaletteEdit( {
 	return (
 		<PaletteEditStyles>
 			<PaletteHStackHeader>
-				<PaletteHeading>{ paletteLabel }</PaletteHeading>
+				<PaletteHeading level={ paletteLabelHeadingLevel }>
+					{ paletteLabel }
+				</PaletteHeading>
 				<PaletteActionsContainer>
 					{ hasElements && isEditing && (
 						<DoneButton
