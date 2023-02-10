@@ -293,7 +293,6 @@ You can attach private selectors and actions to a public store:
 
 ```js
 // In packages/package1/store.js:
-import { privateApis as daPrivateApis } from '@wordpress/data';
 import { __experimentalHasContentRoleAttribute, ...selectors } from './selectors';
 import { __experimentalToggleFeature, ...actions } from './selectors';
 // The `lock` function is exported from the internal experiments.js file where
