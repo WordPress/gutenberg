@@ -3,6 +3,12 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+test.use( {
+	navBlockUtils: async ( { editor, page, requestUtils }, use ) => {
+		await use( new NavigationBlockUtils( { editor, page, requestUtils } ) );
+	},
+} );
+
 test.describe(
 	'As a user I want the navigation block to fallback to the best possible default',
 	() => {
@@ -11,11 +17,8 @@ test.describe(
 			await requestUtils.activateTheme( 'twentytwentythree' );
 		} );
 
-		test.beforeEach( async ( { admin, requestUtils } ) => {
-			await Promise.all( [
-				requestUtils.deleteAllMenus(),
-				admin.createNewPost(),
-			] );
+		test.beforeEach( async ( { requestUtils } ) => {
+			await Promise.all( [ requestUtils.deleteAllMenus() ] );
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
@@ -30,8 +33,10 @@ test.describe(
 		} );
 
 		test( 'default to a list of pages if there are no menus', async ( {
+			admin,
 			editor,
 		} ) => {
+			await admin.createNewPost();
 			await editor.insertBlock( { name: 'core/navigation' } );
 
 			const pageListBlock = editor.canvas.getByRole( 'document', {
@@ -57,10 +62,13 @@ test.describe(
 		} );
 
 		test( 'default to my only existing menu', async ( {
+			admin,
 			editor,
 			page,
 			requestUtils,
+			navBlockUtils,
 		} ) => {
+			await admin.createNewPost();
 			const createdMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
@@ -70,11 +78,7 @@ test.describe(
 			await editor.insertBlock( { name: 'core/navigation' } );
 
 			// Check the block in the canvas.
-			await expect(
-				editor.canvas.locator(
-					'role=textbox[name="Navigation link text"i] >> text="WordPress"'
-				)
-			).toBeVisible();
+			await navBlockUtils.selectNavigationItemOnCanvas( 'WordPress' );
 
 			// Check the markup of the block is correct.
 			await editor.publishPost();
@@ -87,20 +91,18 @@ test.describe(
 			await page.locator( 'role=button[name="Close panel"i]' ).click();
 
 			// Check the block in the frontend.
-			await page.goto( '/' );
-			await expect(
-				page.locator(
-					'role=navigation >> role=link[name="WordPress"i]'
-				)
-			).toBeVisible();
+			await navBlockUtils.selectNavigationItemOnFrontend( 'WordPress' );
 		} );
 
 		test( 'default to the only existing classic menu if there are no block menus', async ( {
+			admin,
 			editor,
 			requestUtils,
+			navBlockUtils,
 		} ) => {
 			// Create a classic menu.
 			await requestUtils.createClassicMenu( 'Test Classic 1' );
+			await admin.createNewPost();
 
 			await editor.insertBlock( { name: 'core/navigation' } );
 			// We need to check the canvas after inserting the navigation block to be able to target the block.
@@ -110,8 +112,38 @@ test.describe(
 			await expect( navigationBlock ).toBeVisible();
 
 			// Check the block in the canvas.
+			await editor.page.pause();
+			await navBlockUtils.selectNavigationItemOnCanvas( 'Home' );
+
 			// Check the block in the frontend.
+			await navBlockUtils.selectNavigationItemOnFrontend( 'Home' );
 			await editor.page.pause();
 		} );
 	}
 );
+
+class NavigationBlockUtils {
+	constructor( { editor, page, requestUtils } ) {
+		this.editor = editor;
+		this.page = page;
+		this.requestUtils = requestUtils;
+	}
+
+	async selectNavigationItemOnCanvas( name ) {
+		await expect(
+			this.editor.canvas.locator(
+				`role=textbox[name="Navigation link text"i] >> text="${ name }"`
+			)
+		).toBeVisible();
+	}
+
+	async selectNavigationItemOnFrontend( name ) {
+		await this.page.goto( '/' );
+		await this.editor.page.pause();
+		await expect(
+			this.page.locator(
+				`role=navigation >> role=link[name="${ name }"i]`
+			)
+		).toBeVisible();
+	}
+}
