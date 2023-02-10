@@ -10,8 +10,8 @@ import LeafMoreMenu from './components/off-canvas-editor/leaf-more-menu';
 /**
  * Experimental @wordpress/block-editor APIs.
  */
-export const experiments = {};
-lock( experiments, {
+export const privateApis = {};
+lock( privateApis, {
 	...globalStyles,
 	ExperimentalBlockEditorProvider,
 	LeafMoreMenu,

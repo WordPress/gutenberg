@@ -10,7 +10,7 @@ import {
 	FlexItem,
 	ColorIndicator,
 } from '@wordpress/components';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ import BlockPreviewPanel from './block-preview-panel';
 import { getVariationClassName } from './utils';
 import { unlock } from '../../private-apis';
 
-const { useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 function BackgroundColorItem( { name, parentMenu, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';

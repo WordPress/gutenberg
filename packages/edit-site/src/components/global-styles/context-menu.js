@@ -21,7 +21,7 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -37,7 +37,7 @@ import { useHasShadowControl } from './shadow-panel';
 import { unlock } from '../../private-apis';
 
 const { useHasTypographyPanel, useGlobalSetting } = unlock(
-	blockEditorExperiments
+	blockEditorPrivateApis
 );
 
 function ContextMenu( { name, parentMenu = '' } ) {

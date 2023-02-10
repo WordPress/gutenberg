@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
@@ -60,7 +60,7 @@ function GlobalStylesActionMenu() {
 				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
 		};
 	}, [] );
-	const { useGlobalStylesReset } = unlock( blockEditorExperiments );
+	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { goTo } = useNavigator();
 	const loadCustomCSS = () => goTo( '/css' );

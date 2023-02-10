@@ -1,15 +1,15 @@
 /**
- * wordpress/experimental – the utilities to enable private cross-package
- * exports of experimental APIs.
+ * wordpress/private-apis – the utilities to enable private cross-package
+ * exports of private APIs.
  *
  * This "implementation.js" file is needed for the sake of the unit tests. It
  * exports more than the public API of the package to aid in testing.
  */
 
 /**
- * The list of core modules allowed to opt-in to the experimental APIs.
+ * The list of core modules allowed to opt-in to the private APIs.
  */
-const CORE_MODULES_USING_EXPERIMENTS = [
+const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/block-editor',
 	'@wordpress/block-library',
 	'@wordpress/blocks',
@@ -24,21 +24,21 @@ const CORE_MODULES_USING_EXPERIMENTS = [
 
 /**
  * A list of core modules that already opted-in to
- * the experiments package.
+ * the privateApis package.
  *
  * @type {string[]}
  */
-const registeredExperiments = [];
+const registeredPrivateApis = [];
 
 /*
  * Warning for theme and plugin developers.
  *
- * The use of experimental developer APIs is intended for use by WordPress Core
+ * The use of private developer APIs is intended for use by WordPress Core
  * and the Gutenberg plugin exclusively.
  *
  * Dangerously opting in to using these APIs is NOT RECOMMENDED. Furthermore,
  * the WordPress Core philosophy to strive to maintain backward compatibility
- * for third-party developers DOES NOT APPLY to experimental APIs.
+ * for third-party developers DOES NOT APPLY to private APIs.
  *
  * THE CONSENT STRING FOR OPTING IN TO THESE APIS MAY CHANGE AT ANY TIME AND
  * WITHOUT NOTICE. THIS CHANGE WILL BREAK EXISTING THIRD-PARTY CODE. SUCH A
@@ -59,7 +59,7 @@ try {
 
 /**
  * Called by a @wordpress package wishing to opt-in to accessing or exposing
- * private experimental APIs.
+ * private private APIs.
  *
  * @param {string} consent    The consent string.
  * @param {string} moduleName The name of the module that is opting in.
@@ -69,7 +69,7 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 	consent,
 	moduleName
 ) => {
-	if ( ! CORE_MODULES_USING_EXPERIMENTS.includes( moduleName ) ) {
+	if ( ! CORE_MODULES_USING_PRIVATE_APIS.includes( moduleName ) ) {
 		throw new Error(
 			`You tried to opt-in to unstable APIs as module "${ moduleName }". ` +
 				'This feature is only for JavaScript modules shipped with WordPress core. ' +
@@ -80,7 +80,7 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 	}
 	if (
 		! allowReRegistration &&
-		registeredExperiments.includes( moduleName )
+		registeredPrivateApis.includes( moduleName )
 	) {
 		// This check doesn't play well with Story Books / Hot Module Reloading
 		// and isn't included in the Gutenberg plugin. It only matters in the
@@ -102,7 +102,7 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 				'your product will inevitably break on the next WordPress release.'
 		);
 	}
-	registeredExperiments.push( moduleName );
+	registeredPrivateApis.push( moduleName );
 
 	return {
 		lock,
@@ -138,10 +138,10 @@ function lock( object, privateData ) {
 	if ( ! object ) {
 		throw new Error( 'Cannot lock an undefined object.' );
 	}
-	if ( ! ( __experiment in object ) ) {
-		object[ __experiment ] = {};
+	if ( ! ( __private in object ) ) {
+		object[ __private ] = {};
 	}
-	lockedData.set( object[ __experiment ], privateData );
+	lockedData.set( object[ __private ], privateData );
 }
 
 /**
@@ -171,13 +171,13 @@ function unlock( object ) {
 	if ( ! object ) {
 		throw new Error( 'Cannot unlock an undefined object.' );
 	}
-	if ( ! ( __experiment in object ) ) {
+	if ( ! ( __private in object ) ) {
 		throw new Error(
 			'Cannot unlock an object that was not locked before. '
 		);
 	}
 
-	return lockedData.get( object[ __experiment ] );
+	return lockedData.get( object[ __private ] );
 }
 
 const lockedData = new WeakMap();
@@ -186,18 +186,18 @@ const lockedData = new WeakMap();
  * Used by lock() and unlock() to uniquely identify the private data
  * related to a containing object.
  */
-const __experiment = Symbol( 'Experiment ID' );
+const __private = Symbol( 'Private API ID' );
 
 // Unit tests utilities:
 
 /**
  * Private function to allow the unit tests to allow
- * a mock module to access the experimental APIs.
+ * a mock module to access the private APIs.
  *
  * @param {string} name The name of the module.
  */
 export function allowCoreModule( name ) {
-	CORE_MODULES_USING_EXPERIMENTS.push( name );
+	CORE_MODULES_USING_PRIVATE_APIS.push( name );
 }
 
 /**
@@ -205,16 +205,16 @@ export function allowCoreModule( name ) {
  * a custom list of allowed modules.
  */
 export function resetAllowedCoreModules() {
-	while ( CORE_MODULES_USING_EXPERIMENTS.length ) {
-		CORE_MODULES_USING_EXPERIMENTS.pop();
+	while ( CORE_MODULES_USING_PRIVATE_APIS.length ) {
+		CORE_MODULES_USING_PRIVATE_APIS.pop();
 	}
 }
 /**
  * Private function to allow the unit tests to reset
- * the list of registered experiments.
+ * the list of registered private apis.
  */
-export function resetRegisteredExperiments() {
-	while ( registeredExperiments.length ) {
-		registeredExperiments.pop();
+export function resetRegisteredPrivateApis() {
+	while ( registeredPrivateApis.length ) {
+		registeredPrivateApis.pop();
 	}
 }

@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 import {
 	Button,
 	Popover,
-	experiments as componentsExperiments,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
@@ -19,7 +19,7 @@ import LinkEditor from './link-editor';
 import { unlock } from '../../lock-unlock';
 
 const { __experimentalPopoverLegacyPositionToPlacement } = unlock(
-	componentsExperiments
+	componentsPrivateApis
 );
 
 const DEFAULT_PLACEMENT = 'bottom';

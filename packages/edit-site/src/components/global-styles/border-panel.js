@@ -3,7 +3,7 @@
  */
 import {
 	__experimentalBorderRadiusControl as BorderRadiusControl,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	__experimentalBorderBoxControl as BorderBoxControl,
@@ -21,7 +21,7 @@ import { __ } from '@wordpress/i18n';
 import { useSupportedStyles, useColorsPerOrigin } from './hooks';
 import { unlock } from '../../private-apis';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 export function useHasBorderPanel( name ) {
 	const controls = [
