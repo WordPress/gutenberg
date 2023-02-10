@@ -149,7 +149,7 @@ export const WithNonToolsPanelItems: ComponentStory< typeof ToolsPanel > = ( {
 	const resetAll: typeof resetAllProp = ( filters ) => {
 		setHeight( undefined );
 		setWidth( undefined );
-		resetAll( filters );
+		resetAllProp( filters );
 	};
 
 	return (
@@ -209,7 +209,7 @@ export const WithOptionalItemsPlusIcon: ComponentStory<
 		setHeight( undefined );
 		setWidth( undefined );
 		setMinWidth( undefined );
-		resetAll( filters );
+		resetAllProp( filters );
 	};
 
 	return (
