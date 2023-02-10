@@ -9,6 +9,15 @@ import { Icon } from '@wordpress/icons';
 
 /** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
 
+export const dynamicOptions = [
+	{
+		title: __( 'Current year' ),
+		preview: new Date().getFullYear(),
+		save: '[dynamic-text-current-year]',
+		icon: '',
+	},
+];
+
 /**
  * Creates a suggestion list for links to posts or pages.
  *
@@ -19,18 +28,7 @@ function createDynamicCompleter() {
 		name: 'links',
 		className: 'block-editor-autocompleters__dynamic',
 		triggerPrefix: '//',
-		options: () => {
-			const options = [
-				{
-					title: __( 'Current year' ),
-					preview: new Date().getFullYear(),
-					save: '[dynamic-text-current-year]',
-					icon: '',
-				},
-			];
-
-			return options;
-		},
+		options: () => dynamicOptions,
 		getOptionKeywords( item ) {
 			const expansionWords = item.title.split( /\s+/ );
 			return [ ...expansionWords ];
