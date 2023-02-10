@@ -17,7 +17,13 @@ import {
 	__experimentalUseHasRecursion as useHasRecursion,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { Spinner, Modal, MenuItem, ToolbarButton } from '@wordpress/components';
+import {
+	Spinner,
+	Modal,
+	MenuItem,
+	ToolbarButton,
+	Tooltip,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, createInterpolateElement } from '@wordpress/element';
@@ -188,9 +194,14 @@ export default function TemplatePartEdit( {
 							) }
 						</BlockSettingsMenuControls>
 						<BlockControls group="other">
-							<ToolbarButton onClick={ shuffleTemplatePart }>
-								{ __( 'Shuffle' ) }
-							</ToolbarButton>
+							<Tooltip
+								position="top center"
+								text={ __( 'Try a different design' ) }
+							>
+								<ToolbarButton onClick={ shuffleTemplatePart }>
+									{ __( 'Shuffle' ) }
+								</ToolbarButton>
+							</Tooltip>
 						</BlockControls>
 					</>
 				) }
