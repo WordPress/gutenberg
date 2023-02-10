@@ -57,6 +57,8 @@ const sizeStyles = ( {
 	selectSize = 'default',
 }: SelectProps ) => {
 	if ( multiple ) {
+		// When `multiple`, just use the native browser styles
+		// without setting explicit height.
 		return;
 	}
 
