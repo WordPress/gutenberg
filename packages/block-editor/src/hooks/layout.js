@@ -40,7 +40,7 @@ const layoutBlockSupportKey = '__experimentalLayout';
  *
  * @return { Array } Array of CSS classname strings.
  */
-export function useLayoutClasses( blockAttributes = {}, blockName ) {
+export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 	const rootPaddingAlignment = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalFeatures
@@ -66,7 +66,7 @@ export function useLayoutClasses( blockAttributes = {}, blockName ) {
 		const baseClassName =
 			globalLayoutSettings?.definitions?.[ usedLayout?.type || 'default' ]
 				?.className;
-		const compoundClassName = `wp-block-${ name
+		const compoundClassName = `wp-block-${ blockName
 			.split( '/' )
 			.pop() }-${ baseClassName }`;
 		layoutClassnames.push( baseClassName, compoundClassName );
