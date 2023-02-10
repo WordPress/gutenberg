@@ -126,6 +126,9 @@ export async function pressKeyWithModifier(
 		( keycode ) => ( keycode === CTRL ? 'Control' : capitalCase( keycode ) )
 	);
 
+	// eslint-disable-next-line no-console
+	console.log( `${ mappedModifiers.join( '+' ) }+${ key }` );
+
 	await this.page.keyboard.press(
 		`${ mappedModifiers.join( '+' ) }+${ key }`
 	);
