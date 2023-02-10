@@ -35,7 +35,7 @@ function UnconnectedNavigatorToParentButton(
  *   __experimentalNavigatorProvider as NavigatorProvider,
  *   __experimentalNavigatorScreen as NavigatorScreen,
  *   __experimentalNavigatorButton as NavigatorButton,
- *   __experimentalNavigatorBackButton as NavigatorBackButton,
+ *   __experimentalNavigatorToParentButton as NavigatorToParentButton,
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
