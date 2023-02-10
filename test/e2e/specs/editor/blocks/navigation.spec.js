@@ -168,8 +168,10 @@ test.describe( 'Navigation block', () => {
 				// Check the markup of the block is correct.
 				await editor.publishPost();
 
-				const content = await editor.getEditedPostContent();
-				expect( content ).toBe( `<!-- wp:navigation {"ref":1} /-->` );
+				await expect.poll( editor.getBlocks ).toMatchObject( [ {
+					name: 'core/navigation',
+					attributes: { ref: 1 },
+				} ] );
 
 				// Find the warning message
 				const warningMessage = editor.canvas
