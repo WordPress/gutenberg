@@ -16,6 +16,8 @@ export function useNonReactObserver( clientId ) {
 			( mutationList ) => {
 				for ( const mutation of mutationList ) {
 					for ( const addedNode of mutation.addedNodes ) {
+						if ( ! addedNode.isConnected ) continue;
+
 						if (
 							addedNode.isContentEditable ||
 							addedNode.parentElement.isContentEditable
@@ -31,7 +33,6 @@ export function useNonReactObserver( clientId ) {
 						)
 							continue;
 
-						console.log( addedNode );
 						__unstableIframeIncompatible( clientId );
 					}
 				}

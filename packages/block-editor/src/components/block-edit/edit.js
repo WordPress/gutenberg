@@ -6,18 +6,32 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { withFilters } from '@wordpress/components';
+import {
+	withFilters,
+	Modal,
+	ToolbarGroup,
+	ToolbarButton,
+	Disabled,
+} from '@wordpress/components';
 import {
 	getBlockDefaultClassName,
 	hasBlockSupport,
 	getBlockType,
 } from '@wordpress/blocks';
-import { useContext, useMemo } from '@wordpress/element';
+import { useContext, useMemo, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import ServerSideRender from '@wordpress/server-side-render';
 
 /**
  * Internal dependencies
  */
 import BlockContext from '../block-context';
+import { useSelect } from '@wordpress/data';
+import { store } from '../../store';
+import BlockControls from '../block-controls';
+import { useBlockProps } from '../block-list/use-block-props';
+import BlockToolbar from '../block-toolbar';
+import Warning from '../warning';
 
 /**
  * Default value used for blocks which do not define their own context needs,
@@ -29,8 +43,49 @@ import BlockContext from '../block-context';
  */
 const DEFAULT_BLOCK_CONTEXT = {};
 
+function IframeCompat( { clientId, blockType, attributes, children } ) {
+	const isIframeIncompatible = useSelect(
+		( select ) => select( store ).isIframeIncompatible( clientId ),
+		[ clientId ]
+	);
+	const [ open, setOpen ] = useState( false );
+	const blockProps = useBlockProps();
+
+	if ( ! isIframeIncompatible ) {
+		return children;
+	}
+
+	return (
+		<div { ...blockProps }>
+			{ ! open && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton onClick={ () => setOpen( true ) }>
+							{ __( 'Edit' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+			{ open && (
+				<Modal
+					title={ blockType.title }
+					onRequestClose={ () => setOpen( false ) }
+					// Third party popovers may trigger a click outside.
+					shouldCloseOnClickOutside={ false }
+				>
+					{ children }
+				</Modal>
+			) }
+			<ServerSideRender
+				block={ blockType.name }
+				attributes={ attributes }
+			/>
+		</div>
+	);
+}
+
 export const Edit = ( props ) => {
-	const { attributes = {}, name } = props;
+	const { attributes = {}, name, clientId } = props;
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
 
@@ -55,7 +110,15 @@ export const Edit = ( props ) => {
 	const Component = blockType.edit || blockType.save;
 
 	if ( blockType.apiVersion > 1 ) {
-		return <Component { ...props } context={ context } />;
+		return (
+			<IframeCompat
+				clientId={ clientId }
+				blockType={ blockType }
+				attributes={ attributes }
+			>
+				<Component { ...props } context={ context } />
+			</IframeCompat>
+		);
 	}
 
 	// Generate a class name for the block's editable form.
@@ -69,7 +132,17 @@ export const Edit = ( props ) => {
 	);
 
 	return (
-		<Component { ...props } context={ context } className={ className } />
+		<IframeCompat
+			clientId={ clientId }
+			blockType={ blockType }
+			attributes={ attributes }
+		>
+			<Component
+				{ ...props }
+				context={ context }
+				className={ className }
+			/>
+		</IframeCompat>
 	);
 };
 

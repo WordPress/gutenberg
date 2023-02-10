@@ -56,6 +56,7 @@
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
+		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/shortcode": "file:../shortcode",
 		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/token-list": "file:../token-list",

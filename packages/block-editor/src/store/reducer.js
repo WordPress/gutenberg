@@ -1507,12 +1507,12 @@ export function blocksMode( state = {}, action ) {
 	return state;
 }
 
-export function iframeIncompatible( state = true, action ) {
+export function iframeIncompatible( state = {}, action ) {
 	if ( action.type === 'IFRAME_INCOMPATIBLE' ) {
 		const { clientId } = action;
 		return {
 			...state,
-			[ clientId ]: false,
+			[ clientId ]: true,
 		};
 	}
 
