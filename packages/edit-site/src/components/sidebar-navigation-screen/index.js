@@ -4,7 +4,7 @@
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
+	__experimentalNavigatorToParentButton as NavigatorToParentButton,
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
 import { isRTL, __, sprintf } from '@wordpress/i18n';
@@ -29,7 +29,7 @@ export default function SidebarNavigationScreen( {
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
 					{ parentTitle ? (
-						<NavigatorBackButton
+						<NavigatorToParentButton
 							className="edit-site-sidebar-navigation-screen__back"
 							icon={ isRTL() ? chevronRight : chevronLeft }
 							aria-label={ sprintf(
@@ -37,7 +37,6 @@ export default function SidebarNavigationScreen( {
 								__( 'Navigate to the previous view: %s' ),
 								parentTitle
 							) }
-							goToParent
 						/>
 					) : (
 						<div className="edit-site-sidebar-navigation-screen__icon-placeholder" />

@@ -15,6 +15,7 @@ import {
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
+	NavigatorToParentButton,
 	useNavigator,
 } from '..';
 
@@ -256,9 +257,9 @@ const NestedNavigatorTemplate: ComponentStory< typeof NavigatorProvider > = ( {
 			<Card>
 				<CardBody>
 					This is the first child
-					<NavigatorBackButton variant="secondary" goToParent>
+					<NavigatorToParentButton variant="secondary">
 						Go back to parent
-					</NavigatorBackButton>
+					</NavigatorToParentButton>
 				</CardBody>
 			</Card>
 		</NavigatorScreen>
@@ -266,9 +267,9 @@ const NestedNavigatorTemplate: ComponentStory< typeof NavigatorProvider > = ( {
 			<Card>
 				<CardBody>
 					This is the second child
-					<NavigatorBackButton variant="secondary" goToParent>
+					<NavigatorToParentButton variant="secondary">
 						Go back to parent
-					</NavigatorBackButton>
+					</NavigatorToParentButton>
 					<NavigatorButton
 						variant="secondary"
 						path="/child2/grandchild"
@@ -282,9 +283,9 @@ const NestedNavigatorTemplate: ComponentStory< typeof NavigatorProvider > = ( {
 			<Card>
 				<CardBody>
 					This is the grand child
-					<NavigatorBackButton variant="secondary" goToParent>
+					<NavigatorToParentButton variant="secondary">
 						Go back to parent
-					</NavigatorBackButton>
+					</NavigatorToParentButton>
 				</CardBody>
 			</Card>
 		</NavigatorScreen>

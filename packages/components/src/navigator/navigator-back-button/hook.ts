@@ -9,10 +9,10 @@ import { useCallback } from '@wordpress/element';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import Button from '../../button';
 import useNavigator from '../use-navigator';
-import type { NavigatorBackButtonProps } from '../types';
+import type { NavigatorBackButtonHookProps } from '../types';
 
 export function useNavigatorBackButton(
-	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >
+	props: WordPressComponentProps< NavigatorBackButtonHookProps, 'button' >
 ) {
 	const {
 		onClick,

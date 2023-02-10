@@ -115,6 +115,7 @@ export {
 	NavigatorScreen as __experimentalNavigatorScreen,
 	NavigatorButton as __experimentalNavigatorButton,
 	NavigatorBackButton as __experimentalNavigatorBackButton,
+	NavigatorToParentButton as __experimentalNavigatorToParentButton,
 	useNavigator as __experimentalUseNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
