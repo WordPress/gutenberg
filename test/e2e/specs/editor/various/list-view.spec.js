@@ -57,12 +57,9 @@ test.describe( 'List view', () => {
 
 		// Open list view.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
-		const blockList = page.getByRole( 'treegrid', {
-			name: 'Block navigation structure',
-		} );
 
 		// The last inserted paragraph block should be selected.
-		await blockList
+		await page
 			.getByRole( 'gridcell', {
 				name: 'Paragraph link',
 				selected: true,
@@ -72,7 +69,7 @@ test.describe( 'List view', () => {
 		// Go to the image block in list view.
 		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
 		await expect(
-			blockList
+			page
 				.getByRole( 'gridcell', {
 					name: 'Image link',
 				} )
@@ -103,7 +100,7 @@ test.describe( 'List view', () => {
 
 		// List view should have two rows.
 		await expect(
-			blockList.getByRole( 'gridcell', { name: /link/i } )
+			page.getByRole( 'gridcell', { name: /link/i } )
 		).toHaveCount( 2 );
 
 		// Ensure console didn't throw an error as reported in
@@ -124,12 +121,9 @@ test.describe( 'List view', () => {
 
 		// Open list view.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
-		const blockList = page.getByRole( 'treegrid', {
-			name: 'Block navigation structure',
-		} );
 
 		// The last inserted paragraph block should be selected.
-		await blockList
+		await page
 			.getByRole( 'gridcell', {
 				name: 'Paragraph link',
 				selected: true,
@@ -137,7 +131,7 @@ test.describe( 'List view', () => {
 			.waitFor();
 
 		// Remove the Paragraph block via its options menu in list view.
-		await blockList
+		await page
 			.getByRole( 'button', { name: 'Options for Paragraph block' } )
 			.click();
 		await page
@@ -165,12 +159,9 @@ test.describe( 'List view', () => {
 
 		// Open list view.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
-		const blockList = page.getByRole( 'treegrid', {
-			name: 'Block navigation structure',
-		} );
 
 		// The last inserted paragraph block should be selected.
-		await blockList
+		await page
 			.getByRole( 'gridcell', {
 				name: 'Paragraph link',
 				selected: true,
@@ -180,7 +171,7 @@ test.describe( 'List view', () => {
 		// Select the image block in list view.
 		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
 		await expect(
-			blockList
+			page
 				.getByRole( 'gridcell', {
 					name: 'Image link',
 				} )
@@ -189,7 +180,7 @@ test.describe( 'List view', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Remove the Image block via its options menu in list view.
-		await blockList
+		await page
 			.getByRole( 'button', { name: 'Options for Image block' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: /Remove Image/i } ).click();
@@ -218,12 +209,9 @@ test.describe( 'List view', () => {
 
 		// Open list view.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
-		const blockList = page.getByRole( 'treegrid', {
-			name: 'Block navigation structure',
-		} );
 
 		// The last inserted Header block should be selected.
-		await blockList
+		await page
 			.getByRole( 'gridcell', {
 				name: 'Heading link',
 				selected: true,
@@ -232,7 +220,7 @@ test.describe( 'List view', () => {
 
 		// Select the Image block as well.
 		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
-		await blockList
+		await page
 			.getByRole( 'gridcell', {
 				name: 'Image link',
 				selected: true,
@@ -240,7 +228,7 @@ test.describe( 'List view', () => {
 			.waitFor();
 
 		// Remove both blocks.
-		await blockList
+		await page
 			.getByRole( 'button', { name: 'Options for Image block' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: /Remove blocks/i } ).click();
@@ -267,12 +255,9 @@ test.describe( 'List view', () => {
 
 		// Open list view.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
-		const blockList = page.getByRole( 'treegrid', {
-			name: 'Block navigation structure',
-		} );
 
 		// Things start off expanded.
-		await blockList
+		await page
 			.getByRole( 'gridcell', {
 				name: 'Cover link',
 				expanded: true,
@@ -280,7 +265,7 @@ test.describe( 'List view', () => {
 			.waitFor();
 
 		// The child paragraph block should be selected.
-		await blockList
+		await page
 			.getByRole( 'gridcell', {
 				name: 'Paragraph link',
 				selected: true,
@@ -288,7 +273,7 @@ test.describe( 'List view', () => {
 			.waitFor();
 
 		// Collapse the Cover block.
-		await blockList
+		await page
 			.getByRole( 'gridcell', { name: 'Cover link' } )
 			.locator( '.block-editor-list-view__expander[aria-hidden="true"]' )
 			// Force the click to bypass the visibility check. The expander is
@@ -297,11 +282,11 @@ test.describe( 'List view', () => {
 
 		// Check that we're collapsed.
 		await expect(
-			blockList.getByRole( 'gridcell', { name: /link/i } )
+			page.getByRole( 'gridcell', { name: /link/i } )
 		).toHaveCount( 1 );
 
 		// Click the Cover block list view item.
-		await blockList
+		await page
 			.getByRole( 'gridcell', {
 				name: 'Cover link',
 				expanded: false,
@@ -315,7 +300,7 @@ test.describe( 'List view', () => {
 			.click();
 
 		// The child paragraph block in the list view should be selected.
-		await blockList
+		await page
 			.getByRole( 'gridcell', {
 				name: 'Paragraph link',
 				selected: true,
