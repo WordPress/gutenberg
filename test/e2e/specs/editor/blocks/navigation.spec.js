@@ -146,3 +146,43 @@ class NavigationBlockUtils {
 		);
 	}
 }
+
+test.describe( 'Navigation block', () => {
+	test.describe(
+		'As a user I want to see a warning if the menu referenced by a navigation block is not available',
+		() => {
+			test.beforeEach( async ( { admin } ) => {
+				await admin.createNewPost();
+			} );
+
+			test( 'warning message shows when given an unknown ref', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: 1,
+					},
+				} );
+
+				// Check the markup of the block is correct.
+				await editor.publishPost();
+
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						name: 'core/navigation',
+						attributes: { ref: 1 },
+					},
+				] );
+
+				// Find the warning message
+				const warningMessage = editor.canvas
+					.getByRole( 'document', { name: 'Block: Navigation' } )
+					.getByText(
+						'Navigation menu has been deleted or is unavailable.'
+					);
+				await expect( warningMessage ).toBeVisible();
+			} );
+		}
+	);
+} );
