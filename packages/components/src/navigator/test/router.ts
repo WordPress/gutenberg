@@ -95,4 +95,28 @@ describe( 'findParent', () => {
 		] );
 		expect( result ).toEqual( '/test' );
 	} );
+
+	it( 'should return the root when no grand parent found', () => {
+		const result = findParent( '/test/nested/path', [
+			{ id: 'route1', path: '/other-path' },
+			{ id: 'route2', path: '/yet-another-path' },
+			{ id: 'root', path: '/' },
+		] );
+		expect( result ).toEqual( '/' );
+	} );
+
+	it( 'should return undefined when no potential parent found', () => {
+		const result = findParent( '/test/nested/path', [
+			{ id: 'route1', path: '/other-path' },
+			{ id: 'route2', path: '/yet-another-path' },
+		] );
+		expect( result ).toBeUndefined();
+	} );
+
+	it( 'should return undefined for non supported paths', () => {
+		const result = findParent( 'this-is-a-path', [
+			{ id: 'route', path: '/' },
+		] );
+		expect( result ).toBeUndefined();
+	} );
 } );

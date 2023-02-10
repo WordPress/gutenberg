@@ -236,10 +236,11 @@ function ProductDetails() {
 
 const NestedNavigatorTemplate: ComponentStory< typeof NavigatorProvider > = ( {
 	style,
+	...props
 } ) => (
 	<NavigatorProvider
 		style={ { ...style, height: '100vh', maxHeight: '450px' } }
-		initialPath="/"
+		{ ...props }
 	>
 		<NavigatorScreen path="/">
 			<Card>
@@ -294,3 +295,6 @@ const NestedNavigatorTemplate: ComponentStory< typeof NavigatorProvider > = ( {
 
 export const NestedNavigator: ComponentStory< typeof NavigatorProvider > =
 	NestedNavigatorTemplate.bind( {} );
+NestedNavigator.args = {
+	initialPath: '/child2/grandchild',
+};
