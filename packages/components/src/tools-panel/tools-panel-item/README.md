@@ -67,7 +67,7 @@ allows items to be injected from a shared source.
 
 -   Required: No
 
-### `resetAllFilter`: `() => void`
+### `resetAllFilter`: `( attributes?: any ) => any`
 
 A `ToolsPanel` will collect each item's `resetAllFilter` and pass an array of
 these functions through to the panel's `resetAll` callback. They can then be
