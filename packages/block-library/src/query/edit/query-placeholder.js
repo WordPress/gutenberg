@@ -59,7 +59,7 @@ export default function QueryPlaceholder( {
 		matchingVariation?.icon ||
 		blockType?.icon?.src;
 	const label = matchingVariation?.title || blockType?.title;
-	if ( isStartingBlank ) {
+	if ( ! hasPatterns || isStartingBlank ) {
 		return (
 			<QueryVariationPicker
 				clientId={ clientId }
