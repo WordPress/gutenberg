@@ -15,6 +15,7 @@ import { getDefaultBlockName, getBlockSupport } from '@wordpress/blocks';
 import { useBlockEditContext } from '../block-edit/context';
 import blockAutocompleter from '../../autocompleters/block';
 import linkAutocompleter from '../../autocompleters/link';
+import dynamicAutocompleter from '../../autocompleters/dynamic';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -27,7 +28,11 @@ const EMPTY_ARRAY = [];
 function useCompleters( { completers = EMPTY_ARRAY } ) {
 	const { name } = useBlockEditContext();
 	return useMemo( () => {
-		let filteredCompleters = [ ...completers, linkAutocompleter ];
+		let filteredCompleters = [
+			...completers,
+			linkAutocompleter,
+			dynamicAutocompleter,
+		];
 
 		if (
 			name === getDefaultBlockName() ||
