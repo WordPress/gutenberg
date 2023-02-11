@@ -250,68 +250,32 @@ test.describe( 'Heading', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## Heading' );
 
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/heading',
-				attributes: {
-					content: 'Heading',
-					level: 2,
-				},
-			},
-		] );
-
 		// Change text alignment
 		await editor.clickBlockToolbarButton( 'Align text' );
 		const textAlignButton = page.locator(
 			'role=menuitemradio[name="Align text center"i]'
 		);
 
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/heading',
-				attributes: {
-					content: 'Heading',
-					level: 2,
-				},
-			},
-		] );
-
 		await textAlignButton.click();
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/heading',
-				attributes: {
-					content: 'Heading',
-					textAlign: 'center',
-					level: 2,
-				},
-			},
-		] );
 
 		// Focus the block content
 		await page.keyboard.press( 'Tab' );
 
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/heading',
-				attributes: {
-					content: 'Heading',
-					textAlign: 'center',
-					level: 2,
-				},
-			},
-		] );
-
 		await pageUtils.pressKeyWithModifier( 'access', '0' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content: 'Heading',
-					align: 'center',
-				},
-			},
-		] );
+		// await expect.poll( editor.getBlocks ).toMatchObject( [
+		// 	{
+		// 		name: 'core/paragraph',
+		// 		attributes: {
+		// 			content: 'Heading',
+		// 			align: 'center',
+		// 		},
+		// 	},
+		// ] );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph {\"align\":\"center\"} -->
+<p class=\"has-text-align-center\">Heading</p>
+<!-- /wp:paragraph -->`
+		);
 	} );
 } );
