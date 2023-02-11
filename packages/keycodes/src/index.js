@@ -424,9 +424,8 @@ export const isKeyboardEvent = mapValues(
 			// modifier keys such as `Shift`. If the shift key is pressed, a different
 			// value may be returned depending on the keyboard layout. It is necessary to
 			// convert to the physical key value that don't take into account keyboard
-			// layout or modifier key state. For now, this process is limited to Windows only.
+			// layout or modifier key state.
 			if (
-				! _isApple() &&
 				event.shiftKey &&
 				character.length === 1 &&
 				replacementWithShiftKeyMap[ event.code ]
