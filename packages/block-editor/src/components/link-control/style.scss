@@ -462,8 +462,10 @@ $preview-image-height: 140px;
 	align-items: center;
 	justify-content: space-between;
 	margin: 0;
+	margin-top: calc(var(--wp-admin-border-width-focus) * -1);
 	padding: $grid-unit-20;
-	padding-top: 0;
+	padding-top: var(--wp-admin-border-width-focus);
+	overflow: hidden;
 }
 
 .block-editor-link-control__unlink {
