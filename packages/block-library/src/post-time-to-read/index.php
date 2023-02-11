@@ -27,12 +27,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	 */
 	$average_reading_rate = 189;
 
-	/*
-	 * translators: If your word count is based on single characters (e.g. East Asian characters),
-	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
-	 * Do not translate into your own language.
-	 */
-	$word_count_type = _x( 'words', 'Word count type. Do not translate!' );
+	$word_count_type = wp_get_word_count_type();
 
 	$minutes_to_read = max( 1, (int) round( wp_word_count( $content, $word_count_type ) / $average_reading_rate ) );
 
