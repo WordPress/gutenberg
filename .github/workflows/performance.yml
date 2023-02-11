@@ -42,7 +42,7 @@ jobs:
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
+              run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA --rounds 15
 
             - name: Store performance measurements
               if: github.event_name == 'pull_request'
