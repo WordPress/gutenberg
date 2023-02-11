@@ -8,7 +8,7 @@ import {
 	DuotonePicker,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -16,7 +16,7 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 import Subtitle from './subtitle';
 import { unlock } from '../../private-apis';
 
-const { useGlobalSetting } = unlock( blockEditorExperiments );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 const noop = () => {};
 

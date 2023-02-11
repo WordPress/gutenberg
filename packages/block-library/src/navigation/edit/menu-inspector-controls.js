@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -34,7 +34,8 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 } ) => {
-	const { OffCanvasEditor } = unlock( blockEditorExperiments );
+	const { OffCanvasEditor } = unlock( blockEditorPrivateApis );
+
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(

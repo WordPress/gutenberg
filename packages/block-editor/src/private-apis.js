@@ -7,10 +7,10 @@ import { lock } from './lock-unlock';
 import OffCanvasEditor from './components/off-canvas-editor';
 
 /**
- * Experimental @wordpress/block-editor APIs.
+ * Private @wordpress/block-editor APIs.
  */
-export const experiments = {};
-lock( experiments, {
+export const privateApis = {};
+lock( privateApis, {
 	...globalStyles,
 	ExperimentalBlockEditorProvider,
 	OffCanvasEditor,

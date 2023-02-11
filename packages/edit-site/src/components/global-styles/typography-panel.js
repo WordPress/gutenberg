@@ -8,7 +8,7 @@ import {
 	__experimentalLetterSpacingControl as LetterSpacingControl,
 	__experimentalTextTransformControl as TextTransformControl,
 	__experimentalTextDecorationControl as TextDecorationControl,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	FontSizePicker,
@@ -23,7 +23,7 @@ import { __ } from '@wordpress/i18n';
 import { getSupportedGlobalStylesPanels } from './hooks';
 import { unlock } from '../../private-apis';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 export function useHasTypographyPanel( name ) {
 	const hasFontFamily = useHasFontFamilyControl( name );
