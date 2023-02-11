@@ -431,6 +431,47 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           <div
             class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
           >
+            Toggle between editing the block visually and editing HTML
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + Shift + Alt + H"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                H
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
             Delete selection.
           </div>
           <div

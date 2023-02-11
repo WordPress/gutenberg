@@ -61,6 +61,7 @@ export default function BlockTools( {
 		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
+		toggleBlockMode,
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
@@ -103,6 +104,12 @@ export default function BlockTools( {
 			if ( clientIds.length ) {
 				event.preventDefault();
 				insertBeforeBlock( clientIds[ 0 ] );
+			}
+		} else if ( isMatch( 'core/block-editor/toggle-block-mode', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length === 1 ) {
+				event.preventDefault();
+				toggleBlockMode( clientIds[ 0 ] );
 			}
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
 			const clientIds = getSelectedBlockClientIds();

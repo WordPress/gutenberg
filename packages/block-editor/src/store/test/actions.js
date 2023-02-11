@@ -768,7 +768,21 @@ describe( 'actions', () => {
 	describe( 'toggleBlockMode', () => {
 		it( 'should return TOGGLE_BLOCK_MODE action', () => {
 			const clientId = 'myclientid';
-			expect( toggleBlockMode( clientId ) ).toEqual( {
+			const select = {
+				getBlocksByClientId: () => [
+					{
+						name: 'paragraph',
+					},
+				],
+				getSettings: () => ( {
+					codeEditingEnabled: true,
+				} ),
+			};
+			const dispatch = jest.fn();
+
+			toggleBlockMode( clientId )( { select, dispatch } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'TOGGLE_BLOCK_MODE',
 				clientId,
 			} );

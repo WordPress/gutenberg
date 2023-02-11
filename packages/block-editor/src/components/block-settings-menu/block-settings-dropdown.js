@@ -120,6 +120,9 @@ export function BlockSettingsDropdown( {
 			insertBefore: getShortcutRepresentation(
 				'core/block-editor/insert-before'
 			),
+			toggleBlockMode: getShortcutRepresentation(
+				'core/block-editor/toggle-block-mode'
+			),
 		};
 	}, [] );
 
@@ -309,6 +312,7 @@ export function BlockSettingsDropdown( {
 									<BlockModeToggle
 										clientId={ firstBlockClientId }
 										onToggle={ onClose }
+										shortcut={ shortcuts.toggleBlockMode }
 									/>
 								) }
 							</MenuGroup>

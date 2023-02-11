@@ -6,7 +6,7 @@ import TextareaAutosize from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	getBlockAttributes,
@@ -23,12 +23,14 @@ import { store as blockEditorStore } from '../../store';
 
 function BlockHTML( { clientId } ) {
 	const [ html, setHtml ] = useState( '' );
+	const [ isDirty, setIsDirty ] = useState( false );
+	const valueRef = useRef();
 	const block = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
 	);
 	const { updateBlock } = useDispatch( blockEditorStore );
-	const onChange = () => {
+	const onChange = ( value ) => {
 		const blockType = getBlockType( block.name );
 
 		if ( ! blockType ) {
@@ -37,12 +39,12 @@ function BlockHTML( { clientId } ) {
 
 		const attributes = getBlockAttributes(
 			blockType,
-			html,
+			value,
 			block.attributes
 		);
 
 		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
-		const content = html ? html : getSaveContent( blockType, attributes );
+		const content = value ? value : getSaveContent( blockType, attributes );
 		const [ isValid ] = html
 			? validateBlock( {
 					...block,
@@ -58,7 +60,7 @@ function BlockHTML( { clientId } ) {
 		} );
 
 		// Ensure the state is updated if we reset so it displays the default content.
-		if ( ! html ) {
+		if ( ! value ) {
 			setHtml( { content } );
 		}
 	};
@@ -66,13 +68,29 @@ function BlockHTML( { clientId } ) {
 	useEffect( () => {
 		setHtml( getBlockContent( block ) );
 	}, [ block ] );
+	useEffect( () => {
+		return () => {
+			if ( valueRef.current ) {
+				onChange( valueRef.current );
+			}
+		};
+	}, [] );
 
 	return (
 		<TextareaAutosize
 			className="block-editor-block-list__block-html-textarea"
 			value={ html }
-			onBlur={ onChange }
-			onChange={ ( event ) => setHtml( event.target.value ) }
+			onBlur={ () => {
+				if ( ! isDirty ) {
+					onChange( html );
+					setIsDirty( false );
+				}
+			} }
+			onChange={ ( event ) => {
+				setHtml( event.target.value );
+				setIsDirty( true );
+				valueRef.current = event.target.value;
+			} }
 		/>
 	);
 }

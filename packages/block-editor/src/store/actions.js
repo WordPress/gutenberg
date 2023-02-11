@@ -1257,12 +1257,27 @@ export function replaceInnerBlocks(
  *
  * @return {Object} Action object.
  */
-export function toggleBlockMode( clientId ) {
-	return {
-		type: 'TOGGLE_BLOCK_MODE',
-		clientId,
+export const toggleBlockMode =
+	( clientId ) =>
+	( { select, dispatch } ) => {
+		if ( ! clientId ) {
+			return;
+		}
+		const block = select.getBlocksByClientId( clientId )[ 0 ];
+		if ( ! hasBlockSupport( block.name, 'html', true ) ) {
+			return;
+		}
+		const isCodeEditingEnabled =
+			select.getSettings().codeEditingEnabled ?? true;
+		if ( ! isCodeEditingEnabled ) {
+			return;
+		}
+
+		return dispatch( {
+			type: 'TOGGLE_BLOCK_MODE',
+			clientId,
+		} );
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user has begun to type.
