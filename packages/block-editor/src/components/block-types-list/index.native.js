@@ -20,6 +20,7 @@ import {
 	usePreferredColorScheme,
 	usePreferredColorSchemeStyle,
 } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -154,6 +155,7 @@ export default function BlockTypesList( {
 		<SectionList
 			onLayout={ onLayout }
 			testID={ `InserterUI-${ name }` }
+			accessibilityLabel={ __( 'Blocks menu' ) }
 			keyboardShouldPersistTaps="always"
 			sections={ sections }
 			initialNumToRender={ initialNumToRender }

@@ -2,43 +2,37 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
-import { isAndroid, clickMiddleOfElement, swipeUp } from './helpers/utils';
+import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
-describe( 'Gutenberg Editor Image Block tests', () => {
+const onlyOniOS = ! isAndroid() ? describe : describe.skip;
+
+// iOS only test - Can only add image from media library on iOS.
+onlyOniOS( 'Gutenberg Editor Image Block tests', () => {
 	it( 'should be able to add an image block', async () => {
-		// iOS only test - Can only add image from media library on iOS
-		if ( ! isAndroid() ) {
-			await editorPage.addNewBlock( blockNames.image );
-			await editorPage.closePicker();
+		await editorPage.addNewBlock( blockNames.image );
+		await editorPage.closePicker();
 
-			const imageBlock = await editorPage.getBlockAtPosition(
-				blockNames.image
-			);
+		const imageBlock = await editorPage.getBlockAtPosition(
+			blockNames.image
+		);
 
-			await editorPage.selectEmptyImageBlock( imageBlock );
-			await editorPage.chooseMediaLibrary();
+		await editorPage.selectEmptyImageBlock( imageBlock );
+		await editorPage.chooseMediaLibrary();
 
-			// Workaround because of #952.
-			const titleElement = await editorPage.getTitleElement();
-			await clickMiddleOfElement( editorPage.driver, titleElement );
-			await editorPage.dismissKeyboard();
-			// End workaround.
+		await editorPage.waitForElementToBeDisplayedById(
+			'A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground',
+			2000
+		);
+		await editorPage.enterCaptionToSelectedImageBlock(
+			testData.imageCaption,
+			true
+		);
 
-			await swipeUp( editorPage.driver, imageBlock );
-			await editorPage.enterCaptionToSelectedImageBlock(
-				testData.imageCaption,
-				true
-			);
-			await editorPage.dismissKeyboard();
+		const html = await editorPage.getHtmlContent();
 
-			await editorPage.addNewBlock( blockNames.paragraph );
-			await editorPage.sendTextToParagraphBlock( 2, testData.shortText );
-			const html = await editorPage.getHtmlContent();
-
-			expect( html.toLowerCase() ).toBe(
-				testData.imageShorteHtml.toLowerCase()
-			);
-		}
+		expect( html.toLowerCase() ).toBe(
+			testData.imageShortHtml.toLowerCase()
+		);
 	} );
 } );

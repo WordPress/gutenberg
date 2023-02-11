@@ -42,9 +42,10 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 				true
 			);
 		} else {
+			await paragraphBlockElement.type( '\b' );
 			await editorPage.typeTextToTextBlock(
 				paragraphBlockElement,
-				`\b ${ shortText }`,
+				`${ shortText }`,
 				false
 			);
 		}

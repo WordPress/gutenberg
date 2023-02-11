@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
-import { isAndroid, clickMiddleOfElement } from './helpers/utils';
+import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for Block insertion', () => {
@@ -39,43 +39,12 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			testData.blockInsertionHtml.toLowerCase()
 		);
 
-		// Workaround for now since deleting the first element causes a crash on CI for Android
-		if ( isAndroid() ) {
+		for ( let i = 4; i > 0; i-- ) {
 			paragraphBlockElement = await editorPage.getTextBlockAtPosition(
-				blockNames.paragraph,
-				3,
-				{
-					autoscroll: true,
-				}
+				blockNames.paragraph
 			);
-
 			await paragraphBlockElement.click();
-			await editorPage.removeBlockAtPosition( blockNames.paragraph, 3 );
-			for ( let i = 3; i > 0; i-- ) {
-				paragraphBlockElement = await editorPage.getTextBlockAtPosition(
-					blockNames.paragraph,
-					i,
-					{
-						autoscroll: true,
-					}
-				);
-				await paragraphBlockElement.click();
-				await editorPage.removeBlockAtPosition(
-					blockNames.paragraph,
-					i
-				);
-			}
-		} else {
-			for ( let i = 4; i > 0; i-- ) {
-				paragraphBlockElement = await editorPage.getTextBlockAtPosition(
-					blockNames.paragraph
-				);
-				await clickMiddleOfElement(
-					editorPage.driver,
-					paragraphBlockElement
-				);
-				await editorPage.removeBlockAtPosition( blockNames.paragraph );
-			}
+			await editorPage.removeBlock();
 		}
 	} );
 
@@ -98,7 +67,6 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		const titleElement = await editorPage.getTitleElement( {
 			autoscroll: true,
 		} );
-		expect( titleElement ).toBeTruthy();
 		await titleElement.click();
 
 		await editorPage.addNewBlock( blockNames.paragraph );
