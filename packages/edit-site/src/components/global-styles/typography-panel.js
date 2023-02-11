@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -12,7 +12,7 @@ const {
 	useGlobalStyle,
 	useGlobalSetting,
 	TypographyPanel: StylesTypographyPanel,
-} = unlock( blockEditorExperiments );
+} = unlock( blockEditorPrivateApis );
 
 export default function TypographyPanel( {
 	name,

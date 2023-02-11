@@ -12,7 +12,7 @@ import { useSelect } from '@wordpress/data';
 import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
 import {
 	BlockIcon,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
@@ -29,7 +29,7 @@ import { NavigationButtonAsItem } from './navigation-button';
 import { unlock } from '../../private-apis';
 
 const { useHasTypographyPanel, useGlobalSetting } = unlock(
-	blockEditorExperiments
+	blockEditorPrivateApis
 );
 
 function useSortedBlockTypes() {
