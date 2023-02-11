@@ -212,5 +212,5 @@ export {
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 
-// Experiments.
+// Private APIs.
 export { privateApis } from './private-apis';

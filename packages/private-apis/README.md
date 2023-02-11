@@ -68,7 +68,7 @@ lock( privateApis, {
 import { privateApis } from '@wordpress/package1';
 import { unlock } from './private-apis';
 
-const { __experimentalFunction } = unlock( experiments );
+const { __experimentalFunction } = unlock( privateApis );
 ```
 
 ## Shipping experimental APIs

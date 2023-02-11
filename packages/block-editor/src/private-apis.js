@@ -8,7 +8,7 @@ import OffCanvasEditor from './components/off-canvas-editor';
 import LeafMoreMenu from './components/off-canvas-editor/leaf-more-menu';
 
 /**
- * Experimental @wordpress/block-editor APIs.
+ * Private @wordpress/block-editor APIs.
  */
 export const privateApis = {};
 lock( privateApis, {

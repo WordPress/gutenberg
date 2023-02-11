@@ -637,7 +637,7 @@ _Related_
 
 ### privateApis
 
-Experimental @wordpress/block-editor APIs.
+Private @wordpress/block-editor APIs.
 
 ### RichText
 
