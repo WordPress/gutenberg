@@ -325,7 +325,7 @@ class EditorPage {
 		const removeBlockButton = await this.driver.elementByAccessibilityId(
 			removeElement
 		);
-		await removeBlockButton.click();
+		return await removeBlockButton.click();
 	}
 
 	async dismissBottomSheet() {
