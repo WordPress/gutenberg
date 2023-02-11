@@ -21,6 +21,7 @@ function gutenberg_safe_style_attrs_6_2( $attrs ) {
 	$attrs[] = 'left';
 	$attrs[] = 'z-index';
 	$attrs[] = 'box-shadow';
+	$attrs[] = 'aspect-ratio';
 
 	return $attrs;
 }

@@ -725,8 +725,6 @@ function Navigation( {
 					<UnsavedInnerBlocks
 						createNavigationMenu={ createNavigationMenu }
 						blocks={ uncontrolledInnerBlocks }
-						templateLock={ templateLock }
-						navigationMenus={ navigationMenus }
 						hasSelection={ isSelected || isInnerBlockSelected }
 					/>
 				</ResponsiveWrapper>
