@@ -274,7 +274,7 @@ async function runPerformanceTests( branches, options ) {
 
 	const rootDirectory = getRandomTemporaryPath();
 	const performanceTestDirectory = rootDirectory + '/tests';
-	await runShellScript( 'mkdir -p ' + rootDirectory );
+	await runShellScript( 'mkdir -p ' + rootDirectory + ' || env true' );
 	await runShellScript(
 		'cp -R ' + baseDirectory + ' ' + performanceTestDirectory
 	);
@@ -307,7 +307,9 @@ async function runPerformanceTests( branches, options ) {
 		// @ts-ignore
 		branchDirectories[ branch ] = environmentDirectory;
 		const buildPath = `${ environmentDirectory }/plugin`;
-		await runShellScript( 'mkdir ' + environmentDirectory );
+		await runShellScript(
+			'mkdir -p ' + environmentDirectory + ' || env true'
+		);
 		await runShellScript( `cp -R ${ baseDirectory } ${ buildPath }` );
 
 		const fancyBranch = formats.success( branch );
