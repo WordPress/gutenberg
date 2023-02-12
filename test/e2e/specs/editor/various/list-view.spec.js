@@ -97,7 +97,7 @@ test.describe( 'List View', () => {
 
 		// Select the image block in the canvas.
 		await page.keyboard.press( 'Enter' );
-		const imageBlock = page.getByRole( 'document', {
+		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
 		} );
 		await expect(
@@ -162,7 +162,7 @@ test.describe( 'List View', () => {
 
 		// Heading block should be selected as previous block.
 		await expect(
-			page.getByRole( 'document', {
+			editor.canvas.getByRole( 'document', {
 				name: 'Block: Heading',
 			} )
 		).toBeFocused();
@@ -212,7 +212,7 @@ test.describe( 'List View', () => {
 
 		// Heading block should be selected as previous block.
 		await expect(
-			page.getByRole( 'document', {
+			editor.canvas.getByRole( 'document', {
 				name: 'Block: Heading',
 			} )
 		).toBeFocused();
@@ -263,7 +263,7 @@ test.describe( 'List View', () => {
 
 		// Newly created paragraph block should be selected.
 		await expect(
-			page.getByRole( 'document', { name: /Empty block/i } )
+			editor.canvas.getByRole( 'document', { name: /Empty block/i } )
 		).toBeFocused();
 	} );
 
@@ -276,7 +276,8 @@ test.describe( 'List View', () => {
 
 		// Click first color option from the block placeholder's color picker to
 		// make the inner blocks appear.
-		await page
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Cover' } )
 			.getByRole( 'button', { name: /Color: /i } )
 			.first()
 			.click();
@@ -325,7 +326,7 @@ test.describe( 'List View', () => {
 			.click();
 
 		// Click the Cover block title placeholder.
-		await page
+		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Cover' } )
 			.getByRole( 'document', { name: /Empty block/i } )
 			.click();
