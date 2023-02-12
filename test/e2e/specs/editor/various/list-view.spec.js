@@ -353,10 +353,13 @@ test.describe( 'List View', () => {
 
 		// Open List View.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
 
 		// The last inserted block should be selected.
 		await expect(
-			page.getByRole( 'gridcell', {
+			listView.getByRole( 'gridcell', {
 				name: 'Group link',
 				selected: true,
 			} )
@@ -365,7 +368,7 @@ test.describe( 'List View', () => {
 		// Press Home to go to the first inserted block (image).
 		await page.keyboard.press( 'Home' );
 		await expect(
-			page
+			listView
 				.getByRole( 'gridcell', {
 					name: 'Image link',
 				} )
@@ -376,7 +379,7 @@ test.describe( 'List View', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.press( 'ArrowUp' );
 		await expect(
-			page
+			listView
 				.getByRole( 'gridcell', {
 					name: 'Columns link',
 				} )
@@ -387,13 +390,13 @@ test.describe( 'List View', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Home' );
 		await expect(
-			page.getByRole( 'button', { name: 'Options for Image block' } )
+			listView.getByRole( 'button', { name: 'Options for Image block' } )
 		).toBeFocused();
 
 		// Navigate the right column to group block options button.
 		await page.keyboard.press( 'End' );
 		await expect(
-			page.getByRole( 'button', { name: 'Options for Group block' } )
+			listView.getByRole( 'button', { name: 'Options for Group block' } )
 		).toBeFocused();
 	} );
 } );
