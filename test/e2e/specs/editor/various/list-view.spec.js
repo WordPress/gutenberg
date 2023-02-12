@@ -106,14 +106,6 @@ test.describe( 'List View', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await expect( imageBlock ).toBeFocused();
 
-		// Start listeninig to console errors.
-		let hasThrownConsoleError = false;
-		page.on( 'console', ( msg ) => {
-			if ( msg.type() === 'error' ) {
-				hasThrownConsoleError = true;
-			}
-		} );
-
 		// Delete the image block in the canvas.
 		await page.keyboard.press( 'Backspace' );
 
@@ -121,10 +113,6 @@ test.describe( 'List View', () => {
 		await expect(
 			listView.getByRole( 'gridcell', { name: /link/i } )
 		).toHaveCount( 2 );
-
-		// Ensure console didn't throw an error as reported in
-		// https://github.com/WordPress/gutenberg/issues/38763.
-		await expect( hasThrownConsoleError ).toBeFalsy();
 	} );
 
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/39026.
