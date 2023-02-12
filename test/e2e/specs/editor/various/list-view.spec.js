@@ -92,7 +92,7 @@ test.describe( 'List View', () => {
 				.getByRole( 'gridcell', {
 					name: 'Image link',
 				} )
-				.locator( 'a' )
+				.getByRole( 'link', { includeHidden: true } )
 		).toBeFocused();
 
 		// Select the image block in the canvas.
@@ -188,7 +188,7 @@ test.describe( 'List View', () => {
 				.getByRole( 'gridcell', {
 					name: 'Image link',
 				} )
-				.locator( 'a' )
+				.getByRole( 'link', { includeHidden: true } )
 		).toBeFocused();
 		await page.keyboard.press( 'Enter' );
 
@@ -361,7 +361,7 @@ test.describe( 'List View', () => {
 				.getByRole( 'gridcell', {
 					name: 'Image link',
 				} )
-				.locator( 'a' )
+				.getByRole( 'link', { includeHidden: true } )
 		).toBeFocused();
 
 		// Press End followed by Arrow Up to go to the second to last block (columns).
@@ -372,7 +372,7 @@ test.describe( 'List View', () => {
 				.getByRole( 'gridcell', {
 					name: 'Columns link',
 				} )
-				.locator( 'a' )
+				.getByRole( 'link', { includeHidden: true } )
 		).toBeFocused();
 
 		// Navigate the right column to image block options button via Home key.
