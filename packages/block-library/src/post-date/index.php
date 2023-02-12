@@ -18,7 +18,7 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$post_ID = $block->context['postId'];
+	$post = get_post( $block->context['postId'] );
 
 	$classes = array();
 	if ( isset( $attributes['textAlign'] ) ) {
@@ -30,15 +30,15 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	if ( isset( $attributes['displayType'] ) && 'modified' === $attributes['displayType'] ) {
-		$formatted_date   = get_the_modified_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
-		$unformatted_date = esc_attr( get_the_modified_date( 'c', $post_ID ) );
+		$formatted_date   = get_the_modified_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post );
+		$unformatted_date = esc_attr( get_the_modified_date( 'c', $post ) );
 	} else {
-		$formatted_date   = get_the_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
-		$unformatted_date = esc_attr( get_the_date( 'c', $post_ID ) );
+		$formatted_date   = get_the_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post );
+		$unformatted_date = esc_attr( get_the_date( 'c', $post ) );
 	}
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-		$formatted_date = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $post_ID ), $formatted_date );
+		$formatted_date = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $post ), $formatted_date );
 	}
 
 	return sprintf(
