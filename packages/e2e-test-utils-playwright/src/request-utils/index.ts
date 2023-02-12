@@ -26,6 +26,7 @@ import {
 	createNavigationMenu,
 	deleteAllMenus,
 } from './menus';
+import { deleteAllPages } from './pages';
 import { resetPreferences } from './preferences';
 import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
@@ -147,6 +148,7 @@ class RequestUtils {
 	deleteAllUsers = deleteAllUsers.bind( this );
 	getSiteSettings = getSiteSettings.bind( this );
 	updateSiteSettings = updateSiteSettings.bind( this );
+	deleteAllPages = deleteAllPages.bind( this );
 }
 
 export type { StorageState };
