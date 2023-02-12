@@ -25,12 +25,12 @@ test.describe( 'List View', () => {
 		} );
 
 		// The last inserted block should be selected.
-		await listView
-			.getByRole( 'gridcell', {
+		await expect(
+			listView.getByRole( 'gridcell', {
 				name: 'Paragraph link',
 				selected: true,
 			} )
-			.waitFor();
+		).toBeVisible();
 
 		// Ensure the setup is correct before dragging.
 		await expect
@@ -78,12 +78,12 @@ test.describe( 'List View', () => {
 		} );
 
 		// The last inserted block should be selected.
-		await listView
-			.getByRole( 'gridcell', {
+		await expect(
+			listView.getByRole( 'gridcell', {
 				name: 'Paragraph link',
 				selected: true,
 			} )
-			.waitFor();
+		).toBeVisible();
 
 		// Go to the image block in List View.
 		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
@@ -145,12 +145,12 @@ test.describe( 'List View', () => {
 		} );
 
 		// The last inserted block should be selected.
-		await listView
-			.getByRole( 'gridcell', {
+		await expect(
+			listView.getByRole( 'gridcell', {
 				name: 'Paragraph link',
 				selected: true,
 			} )
-			.waitFor();
+		).toBeVisible();
 
 		// Remove the Paragraph block via its options menu in List View.
 		await listView
@@ -186,12 +186,12 @@ test.describe( 'List View', () => {
 		} );
 
 		// The last inserted block should be selected.
-		await listView
-			.getByRole( 'gridcell', {
+		await expect(
+			listView.getByRole( 'gridcell', {
 				name: 'Paragraph link',
 				selected: true,
 			} )
-			.waitFor();
+		).toBeVisible();
 
 		// Select the image block in List View.
 		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
@@ -239,21 +239,21 @@ test.describe( 'List View', () => {
 		} );
 
 		// The last inserted block should be selected.
-		await listView
-			.getByRole( 'gridcell', {
+		await expect(
+			listView.getByRole( 'gridcell', {
 				name: 'Heading link',
 				selected: true,
 			} )
-			.waitFor();
+		).toBeVisible();
 
 		// Select the Image block as well.
 		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
-		await listView
-			.getByRole( 'gridcell', {
+		await expect(
+			listView.getByRole( 'gridcell', {
 				name: 'Image link',
 				selected: true,
 			} )
-			.waitFor();
+		).toBeVisible();
 
 		// Remove both blocks.
 		await listView
@@ -288,20 +288,20 @@ test.describe( 'List View', () => {
 		} );
 
 		// Things start off expanded.
-		await listView
-			.getByRole( 'gridcell', {
+		await expect(
+			listView.getByRole( 'gridcell', {
 				name: 'Cover link',
 				expanded: true,
 			} )
-			.waitFor();
+		).toBeVisible();
 
 		// The child paragraph block should be selected.
-		await listView
-			.getByRole( 'gridcell', {
+		await expect(
+			listView.getByRole( 'gridcell', {
 				name: 'Paragraph link',
 				selected: true,
 			} )
-			.waitFor();
+		).toBeVisible();
 
 		// Collapse the Cover block.
 		await listView
@@ -331,12 +331,12 @@ test.describe( 'List View', () => {
 			.click();
 
 		// The child paragraph block in List View should be selected.
-		await listView
-			.getByRole( 'gridcell', {
+		await expect(
+			listView.getByRole( 'gridcell', {
 				name: 'Paragraph link',
 				selected: true,
 			} )
-			.waitFor();
+		).toBeVisible();
 	} );
 
 	test( 'moves focus to start/end of list with Home/End keys', async ( {
@@ -355,12 +355,12 @@ test.describe( 'List View', () => {
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
 
 		// The last inserted block should be selected.
-		await page
-			.getByRole( 'gridcell', {
+		await expect(
+			page.getByRole( 'gridcell', {
 				name: 'Group link',
 				selected: true,
 			} )
-			.waitFor();
+		).toBeVisible();
 
 		// Press Home to go to the first inserted block (image).
 		await page.keyboard.press( 'Home' );
