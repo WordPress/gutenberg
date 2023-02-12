@@ -295,7 +295,7 @@ test.describe( 'List View', () => {
 		// Collapse the Cover block.
 		await listView
 			.getByRole( 'gridcell', { name: 'Cover link' } )
-			.locator( '.block-editor-list-view__expander[aria-hidden="true"]' )
+			.getByTestId( 'list-view-expander', { includeHidden: true } )
 			// Force the click to bypass the visibility check. The expander is
 			// intentionally aria-hidden. See the implementation for details.
 			.click( { force: true } );
