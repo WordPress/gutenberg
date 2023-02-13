@@ -99,7 +99,7 @@ jobs:
 
             - name: Run the tests
               run: |
-                  npm run test:e2e:playwright -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
             - name: Archive debug artifacts (screenshots, traces)
               uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2

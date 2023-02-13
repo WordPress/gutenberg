@@ -24,6 +24,16 @@ npm run test:e2e:playwright -- <path_to_test_file> # E.g., npm run test:e2e:play
 npm run test:e2e:playwright -- --debug
 ```
 
+If you're developing in Linux, it currently requires testing Webkit browsers in headed mode. If you don't want to or can't run it with the GUI (e.g. if you don't have a graphic interface), prepend the command with [`xvfb-run`](https://manpages.ubuntu.com/manpages/xenial/man1/xvfb-run.1.html) to run it in a virtual environment.
+
+```bash
+# Run all available tests.
+xvfb-run npm run test:e2e:playwright
+
+# Only run webkit tests.
+xvfb-run -- npm run test:e2e:playwright -- --project=webkit
+```
+
 ## Best practices
 
 Read the [best practices](https://playwright.dev/docs/best-practices) guide for Playwright.
