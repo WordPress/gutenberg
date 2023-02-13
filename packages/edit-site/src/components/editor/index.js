@@ -125,10 +125,9 @@ export default function Editor() {
 		} ),
 		[ context, setEditedPostContext ]
 	);
-	const isReady = editedPostType !== undefined && editedPostId !== undefined;
 
 	let title;
-	if ( isReady && editedPost ) {
+	if ( hasLoadedPost ) {
 		const type =
 			editedPostType === 'wp_template'
 				? __( 'Template' )
@@ -143,9 +142,9 @@ export default function Editor() {
 
 	// Only announce the title once the editor is ready to prevent "Replace"
 	// action in <URlQueryController> from double-announcing.
-	useTitle( isReady && title );
+	useTitle( hasLoadedPost && title );
 
-	if ( ! isReady ) {
+	if ( ! hasLoadedPost ) {
 		return <CanvasSpinner />;
 	}
 
