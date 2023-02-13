@@ -16,11 +16,9 @@ import { store as editSiteStore } from '../../store';
 const config = {
 	wp_template: {
 		path: '/templates/single',
-		parentTitle: __( 'Templates' ),
 	},
 	wp_template_part: {
 		path: '/template-parts/single',
-		parentTitle: __( 'Template parts' ),
 	},
 };
 
@@ -39,7 +37,6 @@ export default function SidebarNavigationScreenTemplate( {
 	return (
 		<SidebarNavigationScreen
 			path={ config[ postType ].path }
-			parentTitle={ config[ postType ].parentTitle }
 			title={ getTitle() }
 			actions={
 				<Button
