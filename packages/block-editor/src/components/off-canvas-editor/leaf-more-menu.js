@@ -81,7 +81,7 @@ export default function LeafMoreMenu( props ) {
 							onClose();
 						} }
 					>
-						{ __( 'Add submenu item' ) }
+						{ __( 'Add submenu link' ) }
 					</MenuItem>
 					<MenuItem
 						onClick={ () => {
