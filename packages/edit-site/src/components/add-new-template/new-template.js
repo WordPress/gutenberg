@@ -102,7 +102,6 @@ export default function NewTemplate( {
 	const { setTemplate, setCanvasMode } = unlock(
 		useDispatch( editSiteStore )
 	);
-
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isCreatingTemplate ) {
 			return;
@@ -140,15 +139,18 @@ export default function NewTemplate( {
 
 			// Set template before navigating away to avoid initial stale value.
 			setTemplate( newTemplate.id, newTemplate.slug );
-
 			// Switch to edit mode.
 			setCanvasMode( 'edit' );
 
 			// Navigate to the created template editor.
-			history.push( {
-				postId: newTemplate.id,
-				postType: newTemplate.type,
+			window.queueMicrotask( () => {
+				history.push( {
+					postId: newTemplate.id,
+					postType: newTemplate.type,
+					path: '/templates/single',
+				} );
 			} );
+
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: Title of the created template e.g: "Category".

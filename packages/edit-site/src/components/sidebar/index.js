@@ -16,6 +16,7 @@ import useSyncPathWithURL from '../sync-state-with-url/use-sync-path-with-url';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveButton from '../save-button';
+import SidebarNavigationScreenNavigationItem from '../sidebar-navigation-screen-navigation-item';
 
 function SidebarScreens() {
 	useSyncPathWithURL();
@@ -24,6 +25,7 @@ function SidebarScreens() {
 		<>
 			<SidebarNavigationScreenMain />
 			<SidebarNavigationScreenNavigationMenus />
+			<SidebarNavigationScreenNavigationItem />
 			<SidebarNavigationScreenTemplates postType="wp_template" />
 			<SidebarNavigationScreenTemplates postType="wp_template_part" />
 			<SidebarNavigationScreenTemplate postType="wp_template" />
