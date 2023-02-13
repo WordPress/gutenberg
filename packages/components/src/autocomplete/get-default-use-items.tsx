@@ -13,7 +13,7 @@ import { useLayoutEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { escapeRegExp } from '../utils/strings';
-import type { DebouncedPromise, KeyedOption, WPCompleter } from './types';
+import type { CancelablePromise, KeyedOption, WPCompleter } from './types';
 
 function filterOptions(
 	search: RegExp,
@@ -66,7 +66,7 @@ export default function getDefaultUseItems( autocompleter: WPCompleter ) {
 			const { options, isDebounced } = autocompleter;
 			const loadOptions = debounce(
 				() => {
-					const promise: DebouncedPromise = Promise.resolve(
+					const promise: CancelablePromise = Promise.resolve(
 						typeof options === 'function'
 							? options( filterValue )
 							: options

@@ -149,7 +149,7 @@ export type AutocompleterUIProps = {
  *
  * @see `get-default-use-items.tsx`
  */
-export type DebouncedPromise< T = void > = Promise< T > & {
+export type CancelablePromise< T = void > = Promise< T > & {
 	canceled?: boolean;
 };
 
