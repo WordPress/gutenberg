@@ -3,9 +3,18 @@
  */
 import type { RequestUtils } from './index';
 
+const PAGE_STATUS = [
+	'publish',
+	'future',
+	'draft',
+	'pending',
+	'private',
+	'trash',
+] as const;
+
 export type Page = {
 	id: number;
-	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
+	status: typeof PAGE_STATUS[ number ];
 };
 
 /**
@@ -20,8 +29,8 @@ export async function deleteAllPages( this: RequestUtils ) {
 		path: '/wp/v2/pages',
 		params: {
 			per_page: 100,
-			// All possible statuses.
-			status: 'publish,future,draft,pending,private,trash',
+
+			status: PAGE_STATUS.join( ',' ),
 		},
 	} );
 
