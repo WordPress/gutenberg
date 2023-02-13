@@ -13,7 +13,7 @@ import { Grid } from '../../grid';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import type { ToolsPanelProps } from '../types';
 
-const ToolsPanel = (
+const UnconnectedToolsPanel = (
 	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) => {
@@ -42,6 +42,6 @@ const ToolsPanel = (
 	);
 };
 
-const ConnectedToolsPanel = contextConnect( ToolsPanel, 'ToolsPanel' );
+export const ToolsPanel = contextConnect( UnconnectedToolsPanel, 'ToolsPanel' );
 
-export default ConnectedToolsPanel;
+export default ToolsPanel;
