@@ -12,7 +12,7 @@ import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
 
 export default function useInitEditedEntityFromURL() {
-	const { params: { postId, path = '/' } = {} } = useLocation();
+	const { params: { postId, postType, path = '/' } = {} } = useLocation();
 	const { isRequestingSite, homepageId } = useSelect( ( select ) => {
 		const { getSite } = select( coreDataStore );
 		const siteData = getSite();
@@ -36,6 +36,11 @@ export default function useInitEditedEntityFromURL() {
 				break;
 			case '/template-parts/single':
 				setTemplatePart( postId );
+				break;
+			case '/navigation/single':
+				setPage( {
+					context: { postType, postId },
+				} );
 				break;
 			default: {
 				if ( homepageId ) {
