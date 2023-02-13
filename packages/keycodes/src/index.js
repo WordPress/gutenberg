@@ -390,6 +390,14 @@ export const isKeyboardEvent = mapValues(
 		) => {
 			const mods = getModifiers( _isApple );
 			const eventMods = getEventModifiers( event );
+			/** @type {Record<string,string>} */
+			const replacementWithShiftKeyMap = {
+				Comma: ',',
+				Backslash: '\\',
+				// Windows returns `\` for both IntlRo and IntlYen.
+				IntlRo: '\\',
+				IntlYen: '\\',
+			};
 
 			const modsDiff = mods.filter(
 				( mod ) => ! eventMods.includes( mod )
@@ -412,16 +420,17 @@ export const isKeyboardEvent = mapValues(
 				key = String.fromCharCode( event.keyCode ).toLowerCase();
 			}
 
-			// Replace some characters to match the key indicated
-			// by the shortcut on Windows.
-			if ( ! _isApple() ) {
-				if (
-					event.shiftKey &&
-					character.length === 1 &&
-					event.code === 'Comma'
-				) {
-					key = ',';
-				}
+			// `event.key` returns the value of the key pressed, taking into the state of
+			// modifier keys such as `Shift`. If the shift key is pressed, a different
+			// value may be returned depending on the keyboard layout. It is necessary to
+			// convert to the physical key value that don't take into account keyboard
+			// layout or modifier key state.
+			if (
+				event.shiftKey &&
+				character.length === 1 &&
+				replacementWithShiftKeyMap[ event.code ]
+			) {
+				key = replacementWithShiftKeyMap[ event.code ];
 			}
 
 			// For backwards compatibility.
