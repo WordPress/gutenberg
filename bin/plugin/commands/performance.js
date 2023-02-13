@@ -213,7 +213,7 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 	await runShellScript(
 		`cp -R ${ path.join(
 			performanceTestDirectory,
-			'traces'
+			'packages/e2e-tests/specs/performance/traces',
 		) } ./__test-results/traces`,
 		'/home/runner'
 	);
