@@ -293,5 +293,58 @@ test.describe( 'Block deletion', () => {
 		).toBeFocused();
 	} );
 
-	test( 'deleting all blocks when the default block is unavailable', () => {} );
+	/**
+	 * Regression Test: Previously, removing a block would not clear
+	 * selection state when there were no other blocks to select.
+	 *
+	 * See: https://github.com/WordPress/gutenberg/issues/15458
+	 * See: https://github.com/WordPress/gutenberg/pull/15543
+	 */
+	test( 'deleting all blocks when the default block is unavailable', async ( {
+		editor,
+		page,
+	} ) => {
+		// Unregister default block type. This may happen if the editor is
+		// configured to not allow the default (paragraph) block type, either
+		// by plugin editor settings filtering or user block preferences.
+		await page.waitForFunction( () => {
+			try {
+				// eslint-disable-next-line no-undef
+				const defaultBlockName = wp.data
+					.select( 'core/blocks' )
+					.getDefaultBlockName();
+				// eslint-disable-next-line no-undef
+				wp.data
+					.dispatch( 'core/blocks' )
+					.removeBlockTypes( defaultBlockName );
+				return true;
+			} catch {
+				return false;
+			}
+		} );
+
+		// Add the Image block and remove it.
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		await expect(
+			imageBlock.getByRole( 'button', { name: 'Upload' } )
+		).toBeFocused();
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( imageBlock ).toBeFocused();
+		await page.keyboard.press( 'Backspace' );
+
+		// Verify that there's no blocks and only the block appender button is
+		// visible.
+		await expect.poll( editor.getBlocks ).toHaveLength( 0 );
+		await expect(
+			editor.canvas.getByRole( 'document', { name: /Empty block/i } )
+		).not.toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'button', { name: 'Add block' } )
+		).toBeVisible();
+		// TODO: There should be expectations around where focus is placed in
+		// this scenario. Currently, a focus loss occurs, which is unacceptable.
+	} );
 } );
