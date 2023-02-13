@@ -88,7 +88,9 @@ describe( 'Post Editor Performance', () => {
 			( file ) => file.indexOf( baseName ) >= 0
 		).length;
 
-		return `${ baseName }-${ existingCount + 1 }.trace.json`;
+		const fullPath = `${ baseName }-${ existingCount + 1 }.trace.json`;
+		console.log( `Saving trace to ${ fullPath }` );
+		return fullPath;
 	};
 	let traceResults;
 
