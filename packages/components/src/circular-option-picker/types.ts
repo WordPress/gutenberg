@@ -56,7 +56,6 @@ export type OptionProps = Omit<
 	'isPressed' | 'className'
 > & {
 	className?: string;
-	// TODO: Discuss pros/cons of something like `React.ComponentProps< typeof Tooltip >[ 'text' ];`
 	tooltipText?: string;
 	isSelected: boolean;
 	// `icon` is explicitly defined as 'check' by CircleOptionPicker.Option
