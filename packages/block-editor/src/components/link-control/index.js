@@ -9,8 +9,6 @@ import classnames from 'classnames';
 import { Button, Spinner, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 
@@ -137,15 +135,6 @@ function LinkControl( {
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
-
-	const showIconLabels = useSelect(
-		( select ) =>
-			select( preferencesStore ).get(
-				'core/edit-post',
-				'showIconLabels'
-			),
-		[]
-	);
 
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
@@ -294,9 +283,7 @@ function LinkControl( {
 		<div
 			tabIndex={ -1 }
 			ref={ wrapperNode }
-			className={ classnames( 'block-editor-link-control', {
-				'show-icon-labels': showIconLabels,
-			} ) }
+			className="block-editor-link-control"
 		>
 			{ isCreatingPage && (
 				<div className="block-editor-link-control__loading">
