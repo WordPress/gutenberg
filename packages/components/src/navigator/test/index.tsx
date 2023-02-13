@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Button } from '../../button';
+import Button from '../../button';
 import {
 	NavigatorProvider,
 	NavigatorScreen,
