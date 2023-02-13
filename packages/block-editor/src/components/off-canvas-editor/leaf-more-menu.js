@@ -30,7 +30,7 @@ function AddSubmenuItem( { block, onClose } ) {
 
 	const clientId = block.clientId;
 	const isDisabled =
-		BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.indexOf( block.name ) === -1;
+		! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes( block.name );
 	return (
 		<MenuItem
 			icon={ addSubmenu }
