@@ -139,6 +139,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	}, [
 		settings,
 		hasFixedToolbar,
+		hasInlineToolbar,
 		focusMode,
 		isDistractionFree,
 		hiddenBlockTypes,
