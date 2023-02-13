@@ -7,7 +7,7 @@ export interface MenuData {
 	title: string;
 	content: string;
 }
-export interface Menu {
+export interface NavigationMenu {
 	id: number;
 	content: string;
 	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
@@ -22,14 +22,14 @@ export interface Menu {
 export async function createClassicMenu( this: RequestUtils, name: string ) {
 	const menuItems = [
 		{
-			title: 'Home',
+			title: 'Custom link',
 			url: 'http://localhost:8889/',
 			type: 'custom',
 			menu_order: 1,
 		},
 	];
 
-	const menu = await this.rest< Menu >( {
+	const menu = await this.rest< NavigationMenu >( {
 		method: 'POST',
 		path: `/wp/v2/menus/`,
 		data: {
@@ -80,7 +80,7 @@ export async function createNavigationMenu(
  *
  */
 export async function deleteAllMenus( this: RequestUtils ) {
-	const navMenus = await this.rest< Menu[] >( {
+	const navMenus = await this.rest< NavigationMenu[] >( {
 		path: `/wp/v2/navigation/`,
 	} );
 
@@ -93,7 +93,7 @@ export async function deleteAllMenus( this: RequestUtils ) {
 		);
 	}
 
-	const classicMenus = await this.rest< Menu[] >( {
+	const classicMenus = await this.rest< NavigationMenu[] >( {
 		path: `/wp/v2/menus/`,
 	} );
 

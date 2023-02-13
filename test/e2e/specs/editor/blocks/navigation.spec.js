@@ -106,17 +106,18 @@ test.describe(
 
 			await editor.insertBlock( { name: 'core/navigation' } );
 			// We need to check the canvas after inserting the navigation block to be able to target the block.
-			const navigationBlock = editor.canvas.locator(
-				'role=document[name="Block: Navigation"i]'
-			);
-			await expect( navigationBlock ).toBeVisible();
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/navigation',
+				},
+			] );
 
 			// Check the block in the canvas.
 			await editor.page.pause();
-			await navBlockUtils.selectNavigationItemOnCanvas( 'Home' );
+			await navBlockUtils.selectNavigationItemOnCanvas( 'Custom link' );
 
 			// Check the block in the frontend.
-			await navBlockUtils.selectNavigationItemOnFrontend( 'Home' );
+			await navBlockUtils.selectNavigationItemOnFrontend( 'Custom link' );
 			await editor.page.pause();
 		} );
 	}
