@@ -25,6 +25,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 				history.push( {
 					postType: attributes.type,
 					postId: attributes.id,
+					path: '/navigation/single',
 				} );
 			}
 		},

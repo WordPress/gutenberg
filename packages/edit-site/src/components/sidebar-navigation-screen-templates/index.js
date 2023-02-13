@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import {
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -14,12 +17,6 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import AddNewTemplate from '../add-new-template';
-
-function omit( object, keys ) {
-	return Object.fromEntries(
-		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
-	);
-}
 
 const config = {
 	wp_template: {
@@ -42,15 +39,13 @@ const config = {
 	},
 };
 
-const Item = ( { item } ) => {
+const TemplateItem = ( { postType, postId, ...props } ) => {
 	const linkInfo = useLink( {
-		...item.params,
-		path: config[ item.params.postType ].path + '/single',
+		postType,
+		postId,
+		path: config[ postType ].path + '/single',
 	} );
-	const props = item.params
-		? { ...omit( item, 'params' ), ...linkInfo }
-		: item;
-	return <SidebarNavigationItem { ...props } />;
+	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };
 
 export default function SidebarNavigationScreenTemplates( {
@@ -65,31 +60,6 @@ export default function SidebarNavigationScreenTemplates( {
 			per_page: -1,
 		}
 	);
-
-	let items = [];
-	if ( isLoading ) {
-		items = [
-			{
-				children: config[ postType ].labels.loading,
-			},
-		];
-	} else if ( ! templates && ! isLoading ) {
-		items = [
-			{
-				children: config[ postType ].labels.notFound,
-			},
-		];
-	} else {
-		items = templates?.map( ( template ) => ( {
-			params: {
-				postType,
-				postId: template.id,
-			},
-			children: decodeEntities(
-				template.title?.rendered || template.slug
-			),
-		} ) );
-	}
 
 	const browseAllLink = useLink( {
 		postType,
@@ -114,19 +84,37 @@ export default function SidebarNavigationScreenTemplates( {
 			}
 			content={
 				<>
-					<ItemGroup>
-						{ items.map( ( item, index ) => (
-							<Item item={ item } key={ index } />
-						) ) }
-
-						{ ! isMobileViewport && (
-							<SidebarNavigationItem
-								className="edit-site-sidebar-navigation-screen-templates__see-all"
-								{ ...browseAllLink }
-								children={ config[ postType ].labels.manage }
-							/>
-						) }
-					</ItemGroup>
+					{ isLoading && config[ postType ].labels.loading }
+					{ ! isLoading && (
+						<ItemGroup>
+							{ ! templates?.length && (
+								<Item>
+									{ config[ postType ].labels.notFound }
+								</Item>
+							) }
+							{ ( templates ?? [] ).map( ( template ) => (
+								<TemplateItem
+									postType={ postType }
+									postId={ template.id }
+									key={ template.id }
+								>
+									{ decodeEntities(
+										template.title?.rendered ||
+											template.slug
+									) }
+								</TemplateItem>
+							) ) }
+							{ ! isMobileViewport && (
+								<SidebarNavigationItem
+									className="edit-site-sidebar-navigation-screen-templates__see-all"
+									{ ...browseAllLink }
+									children={
+										config[ postType ].labels.manage
+									}
+								/>
+							) }
+						</ItemGroup>
+					) }
 				</>
 			}
 		/>
