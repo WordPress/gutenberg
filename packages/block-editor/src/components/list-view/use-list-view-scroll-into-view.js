@@ -9,7 +9,7 @@ export default function useListViewScrollIntoView( {
 	selectedClientIds,
 	rowItemRef,
 } ) {
-	const isSingleSelection = selectedClientIds?.length === 1;
+	const isSingleSelection = selectedClientIds.length === 1;
 
 	useLayoutEffect( () => {
 		// Skip scrolling into view if this particular block isn't selected,
