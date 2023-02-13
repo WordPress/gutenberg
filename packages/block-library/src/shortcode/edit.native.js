@@ -58,7 +58,7 @@ export function ShortcodeEdit( props ) {
 			<Text style={ titleStyle }>{ __( 'Shortcode' ) }</Text>
 			<View style={ shortcodeContainerStyle }>
 				<PlainText
-					__experimentalVersion={ 2 }
+					version={ 2 }
 					value={ attributes.text }
 					style={ shortcodeStyle }
 					onChange={ onChange }

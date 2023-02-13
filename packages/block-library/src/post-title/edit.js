@@ -52,11 +52,11 @@ export default function PostTitleEdit( {
 		titleElement =
 			userCanEdit && ! isDescendentOfQueryLoop ? (
 				<PlainText
+					version={ 2 }
 					tagName={ TagName }
 					placeholder={ __( 'No Title' ) }
 					value={ rawTitle }
 					onChange={ setTitle }
-					version={ 2 }
 					{ ...blockProps }
 				/>
 			) : (
@@ -72,6 +72,7 @@ export default function PostTitleEdit( {
 			userCanEdit && ! isDescendentOfQueryLoop ? (
 				<TagName { ...blockProps }>
 					<PlainText
+						version={ 2 }
 						tagName="a"
 						href={ link }
 						target={ linkTarget }
@@ -81,7 +82,6 @@ export default function PostTitleEdit( {
 						}
 						value={ rawTitle }
 						onChange={ setTitle }
-						version={ 2 }
 					/>
 				</TagName>
 			) : (
