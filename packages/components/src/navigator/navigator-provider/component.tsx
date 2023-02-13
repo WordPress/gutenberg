@@ -176,7 +176,7 @@ function UnconnectedNavigatorProvider(
 
 				return [
 					...prevLocationHistory.slice(
-						prevLocationHistory.length > MAX_HISTORY_LENGTH - 2
+						prevLocationHistory.length > MAX_HISTORY_LENGTH - 1
 							? 1
 							: 0,
 						-1
