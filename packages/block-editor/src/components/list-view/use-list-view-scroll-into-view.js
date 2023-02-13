@@ -19,7 +19,7 @@ export default function useListViewScrollIntoView( {
 		if (
 			! isSelected ||
 			numBlocksSelected !== 1 ||
-			! rowItemRef?.current ||
+			! rowItemRef.current ||
 			! rowItemRef.current.scrollIntoView
 		) {
 			return;
