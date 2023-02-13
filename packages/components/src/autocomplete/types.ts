@@ -123,7 +123,7 @@ export type AutocompleterUIProps = {
 	/**
 	 * A function to be called when an option is selected.
 	 */
-	onSelect: ( option: KeyedOption ) => void; //should the param be an index?
+	onSelect: ( option: KeyedOption ) => void;
 	/**
 	 * A function to be called when the completer is reset (e.g. when the user hits the escape key).
 	 */
