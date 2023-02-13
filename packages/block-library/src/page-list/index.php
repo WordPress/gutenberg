@@ -282,14 +282,14 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 			$pages_with_children[ $page->post_parent ][ $page->ID ] = array(
 				'page_id'   => $page->ID,
 				'title'     => $page->post_title,
-				'link'      => get_permalink( $page->ID ),
+				'link'      => get_permalink( $page ),
 				'is_active' => $is_active,
 			);
 		} else {
 			$top_level_pages[ $page->ID ] = array(
 				'page_id'   => $page->ID,
 				'title'     => $page->post_title,
-				'link'      => get_permalink( $page->ID ),
+				'link'      => get_permalink( $page ),
 				'is_active' => $is_active,
 			);
 
