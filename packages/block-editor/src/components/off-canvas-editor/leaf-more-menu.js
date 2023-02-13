@@ -24,19 +24,17 @@ const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 	'core/navigation-submenu',
 ];
 
-function AddSubmenuItem( { block, clientId, onClose } ) {
+function AddSubmenuItem( { block, onClose } ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
 
-	if (
-		BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.indexOf( block.name ) === -1
-	) {
-		return null;
-	}
-
+	const clientId = block.clientId;
+	const isDisabled =
+		BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.indexOf( block.name ) === -1;
 	return (
 		<MenuItem
 			icon={ addSubmenu }
+			disabled={ isDisabled }
 			onClick={ () => {
 				const updateSelectionOnInsert = false;
 				const newLink = createBlock( 'core/navigation-link' );
@@ -100,11 +98,7 @@ export default function LeafMoreMenu( props ) {
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup>
-					<AddSubmenuItem
-						block={ block }
-						clientId={ clientId }
-						onClose={ onClose }
-					/>
+					<AddSubmenuItem block={ block } onClose={ onClose } />
 					<MenuItem
 						onClick={ () => {
 							removeBlocks( [ clientId ], false );
