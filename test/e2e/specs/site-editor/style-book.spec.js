@@ -98,7 +98,7 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should clear Global Styles navigator history when example is clicked', async ( {
+	test( 'should allow to return Global Styles root when example is clicked', async ( {
 		page,
 	} ) => {
 		await page.click( 'role=button[name="Blocks styles"]' );
@@ -110,10 +110,11 @@ test.describe( 'Style Book', () => {
 		);
 
 		await page.click( 'role=button[name="Navigate to the previous view"]' );
+		await page.click( 'role=button[name="Navigate to the previous view"]' );
 
 		await expect(
-			page.locator( 'role=button[name="Navigate to the previous view"]' )
-		).not.toBeVisible();
+			page.locator( 'role=button[name="Blocks styles"]' )
+		).toBeVisible();
 	} );
 
 	test( 'should disappear when closed', async ( { page } ) => {
