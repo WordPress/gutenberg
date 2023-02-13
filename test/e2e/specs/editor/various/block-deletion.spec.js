@@ -161,7 +161,53 @@ test.describe( 'Block deletion', () => {
 		).toContainText( 'Second| ← caret was here' );
 	} );
 
-	test( 'deleting last selected block via backspace', () => {} );
+	test( 'deleting last selected block via backspace', async ( {
+		editor,
+		page,
+	} ) => {
+		// Add a couple of paragraphs.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+
+		// Add the Image block and focus it.
+		await editor.insertBlock( {
+			name: 'core/image',
+		} );
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		await expect(
+			imageBlock.getByRole( 'button', { name: 'Upload' } )
+		).toBeFocused();
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( imageBlock ).toBeFocused();
+
+		// Hit backspace and ensure the Image block was removed.
+		await page.keyboard.press( 'Backspace' );
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Paragraph block',
+				} )
+				.last()
+		).toContainText( 'Second' );
+
+		// Ensure the caret is in a correct position.
+		await page.keyboard.type( '| ← caret was here' );
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Paragraph block',
+				} )
+				.last()
+		).toContainText( 'Second| ← caret was here' );
+	} );
 
 	test( 'deleting last two selected blocks via backspace', () => {} );
 
