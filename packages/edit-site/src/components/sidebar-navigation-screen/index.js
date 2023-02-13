@@ -34,7 +34,19 @@ export default function SidebarNavigationScreen( {
 							aria-label={ __( 'Back' ) }
 						/>
 					) : (
-						<div className="edit-site-sidebar-navigation-screen__icon-placeholder" />
+						<NavigatorBackButton
+							className="edit-site-sidebar-navigation-screen__back"
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							aria-label={ __( 'Navigate to the Dashboard' ) }
+							href="../wp-admin"
+						/>
+						// <NavigationBackButton
+						// 	className="edit-site-sidebar-navigation-screen__back"
+						// 	icon={ isRTL() ? chevronRight : chevronLeft }
+						// 	aria-label={ __( 'Navigate to the Dashboard' ) }
+						// 	href="../wp-admin"
+						// 	backButtonLabel=" "
+						// />
 					) }
 					<h2 className="edit-site-sidebar-navigation-screen__title">
 						{ title }
