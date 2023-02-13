@@ -3,9 +3,9 @@
 		"blockName": "core/details-summary",
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n<summary class=\"wp-block-details-summary\"><h2>Details</h2></summary>\n",
+		"innerHTML": "\n<summary class=\"wp-block-details-summary\"><h2 class=\"wp-block-details-summary__summary\">Details</h2></summary>\n",
 		"innerContent": [
-			"\n<summary class=\"wp-block-details-summary\"><h2>Details</h2></summary>\n"
+			"\n<summary class=\"wp-block-details-summary\"><h2 class=\"wp-block-details-summary__summary\">Details</h2></summary>\n"
 		]
 	}
 ]
