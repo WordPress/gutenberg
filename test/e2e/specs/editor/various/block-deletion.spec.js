@@ -209,7 +209,59 @@ test.describe( 'Block deletion', () => {
 		).toContainText( 'Second| ← caret was here' );
 	} );
 
-	test( 'deleting last two selected blocks via backspace', () => {} );
+	test( 'deleting last two selected blocks via backspace', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Add a couple of paragraphs.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Third' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+
+		// Ensure the empty paragraph is focused.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} )
+		).toBeFocused();
+
+		// Select the last two paragraphs.
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await expect(
+			editor.canvas.locator( 'p.is-multi-selected' )
+		).toHaveCount( 2 );
+
+		// Hit backspace and ensure the last two paragraphs were deleted.
+		await page.keyboard.press( 'Backspace' );
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Paragraph block',
+				} )
+				.last()
+		).toContainText( 'Second' );
+
+		// Ensure a new empty block was created and focused.
+		await expect.poll( editor.getBlocks ).toHaveLength( 3 );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} )
+		).toBeFocused();
+	} );
 
 	test( 'deleting all blocks', () => {} );
 
