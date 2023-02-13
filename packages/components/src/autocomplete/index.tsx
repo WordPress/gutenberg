@@ -101,12 +101,10 @@ export function useAutocomplete( {
 					undefined !== completionData.value
 				);
 			}
-			const action = isCompletionObject( completion )
-				? completion.action
-				: 'insert-at-caret';
-			const value = isCompletionObject( completion )
-				? completion.value
-				: completion;
+
+			const { action, value } = isCompletionObject( completion )
+				? completion
+				: { action: 'insert-at-caret', value: completion };
 
 			if ( 'replace' === action ) {
 				onReplace( [ value ] );
