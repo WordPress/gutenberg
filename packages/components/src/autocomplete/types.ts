@@ -3,10 +3,6 @@
  */
 import type { WPElement } from '@wordpress/element';
 /**
- * External dependencies
- */
-import type { ReactNode, RefObject } from 'react';
-/**
  * Internal dependencies
  */
 import type { useAutocomplete } from '.';
@@ -96,7 +92,7 @@ export type WPCompleter< TCompleterOption = any > = {
 	className?: string;
 };
 
-type ContentRef = RefObject< HTMLElement >;
+type ContentRef = React.RefObject< HTMLElement >;
 
 export type AutocompleterUIProps = {
 	/**
@@ -205,7 +201,7 @@ export type AutocompleteProps = UseAutocompleteProps & {
 	 */
 	children: (
 		props: Omit< ReturnType< typeof useAutocomplete >, 'popover' >
-	) => ReactNode;
+	) => React.ReactNode;
 	/**
 	 * Whether or not the Autocomplte componenet is selected, and if its `Popover`
 	 * should be displayed.
