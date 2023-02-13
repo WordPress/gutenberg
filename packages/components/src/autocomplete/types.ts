@@ -150,7 +150,7 @@ export type CancelablePromise< T = void > = Promise< T > & {
  * When `@wordpress/rich-text` is fully typed, the following
  * types should be moved to and imported from there
  *
- * @see @wordpress/rich-text/src/create.js
+ * @see /packages/rich-text/src/create.js
  */
 type RichTextFormat = {
 	type: string;
