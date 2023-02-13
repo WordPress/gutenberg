@@ -462,8 +462,12 @@ $preview-image-height: 140px;
 	align-items: center;
 	justify-content: space-between;
 	margin: 0;
-	margin-top: calc(var(--wp-admin-border-width-focus) * -1);
 	padding: $grid-unit-20;
+
+	// To hide the horizontal scrollbar on toggle.
+	// Margin and padding are needed to prevent cutoff of the toggle button focus outline.
+	// See: https://github.com/WordPress/gutenberg/pull/47986/files
+	margin-top: calc(var(--wp-admin-border-width-focus) * -1);
 	padding-top: var(--wp-admin-border-width-focus);
 	overflow: hidden;
 }
