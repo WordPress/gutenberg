@@ -46,7 +46,9 @@ export type WPCompleter< TCompleterOption = any > = {
 	 * Options may be of any type or shape. The completer declares how those
 	 * options are rendered and what their completions should be when selected.
 	 */
-	options: Array< TCompleterOption > | GetOptions;
+	options: TCompleterOption extends Function
+		? GetOptions< TCompleterOption >
+		: Array< TCompleterOption >;
 	/**
 	 * A function that returns the keywords for the specified option.
 	 */
