@@ -9,25 +9,20 @@ export default function useListViewScrollIntoView( {
 	selectedClientIds,
 	rowItemRef,
 } ) {
-	const numBlocksSelected = selectedClientIds?.length;
+	const isSingleSelection = selectedClientIds?.length === 1;
 
 	useLayoutEffect( () => {
-		// Skip scrolling into view if more than one block is selected.
-		// This is to avoid scrolling the view in a multi selection where the user
-		// has intentionally selected multiple blocks within the list view,
-		// but the initially selected block may be out of view.
-		if (
-			! isSelected ||
-			numBlocksSelected !== 1 ||
-			! rowItemRef.current ||
-			! rowItemRef.current.scrollIntoView
-		) {
+		// Skip scrolling into view if this particular block isn't selected,
+		// or if more than one block is selected overall. This is to avoid
+		// scrolling the view in a multi selection where the user has intentionally
+		// selected multiple blocks within the list view, but the initially
+		// selected block may be out of view.
+		if ( ! isSelected || ! isSingleSelection || ! rowItemRef.current ) {
 			return;
 		}
 
 		const scrollContainer = getScrollContainer( rowItemRef.current );
 		const { ownerDocument } = rowItemRef.current;
-		const { defaultView } = ownerDocument;
 
 		const windowScroll =
 			scrollContainer === ownerDocument.body ||
@@ -39,15 +34,15 @@ export default function useListViewScrollIntoView( {
 			return;
 		}
 
-		const { top, height } = rowItemRef.current.getBoundingClientRect();
-		const topOfScrollContainer =
-			scrollContainer.getBoundingClientRect().top;
-
-		const { innerHeight } = defaultView;
+		const rowRect = rowItemRef.current.getBoundingClientRect();
+		const scrollContainerRect = scrollContainer.getBoundingClientRect();
 
 		// If the selected block is not currently visible, scroll to it.
-		if ( top < topOfScrollContainer || top + height > innerHeight ) {
+		if (
+			rowRect.top < scrollContainerRect.top ||
+			rowRect.bottom > scrollContainerRect.bottom
+		) {
 			rowItemRef.current.scrollIntoView();
 		}
-	}, [ isSelected, numBlocksSelected ] );
+	}, [ isSelected, isSingleSelection, rowItemRef ] );
 }
