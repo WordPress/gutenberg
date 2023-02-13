@@ -116,7 +116,50 @@ test.describe( 'Block deletion', () => {
 		).toContainText( 'Second| ← caret was here' );
 	} );
 
-	test( 'deleting last block via backspace from an empty paragraph', () => {} );
+	test( 'deleting last block via backspace from an empty paragraph', async ( {
+		editor,
+		page,
+	} ) => {
+		// Add a couple of paragraphs.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+
+		// Leave last paragraph empty and make sure it's focused.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await expect(
+			editor.canvas.getByRole( 'document', { name: /Empty block/ } )
+		).toBeFocused();
+
+		// Hit backspace to remove the empty paragraph.
+		await page.keyboard.press( 'Backspace' );
+
+		// Make sure the last block was removed.
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Paragraph block',
+				} )
+				.last()
+		).toContainText( 'Second' );
+
+		// Make sure the caret is in a correct position.
+		await page.keyboard.type( '| ← caret was here' );
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Paragraph block',
+				} )
+				.last()
+		).toContainText( 'Second| ← caret was here' );
+	} );
 
 	test( 'deleting last selected block via backspace', () => {} );
 
