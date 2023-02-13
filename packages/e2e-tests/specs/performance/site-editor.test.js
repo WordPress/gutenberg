@@ -84,7 +84,11 @@ describe( 'Site Editor Performance', () => {
 			new URL( document.location ).searchParams.get( 'post' )
 		);
 
-		await visitSiteEditor( { postId: id, postType: 'page' } );
+		await visitSiteEditor( {
+			postId: id,
+			postType: 'page',
+			path: '/navigation/single',
+		} );
 
 		let i = 3;
 

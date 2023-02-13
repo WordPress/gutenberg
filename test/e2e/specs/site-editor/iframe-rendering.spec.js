@@ -19,6 +19,7 @@ test.describe( 'Site editor iframe rendering mode', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			path: '/templates/single',
 		} );
 
 		const compatMode = await page
