@@ -84,6 +84,10 @@ export default function Table( { templateType } ) {
 							<Heading level={ 4 }>
 								<Link
 									params={ {
+										path:
+											template.type === 'wp_template'
+												? '/templates/single'
+												: '/template-parts/single',
 										postId: template.id,
 										postType: template.type,
 									} }
