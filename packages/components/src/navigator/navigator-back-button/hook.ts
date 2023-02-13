@@ -16,7 +16,6 @@ export function useNavigatorBackButton(
 ) {
 	const {
 		onClick,
-		href,
 		as = Button,
 		goToParent: goToParentProp = false,
 		...otherProps
@@ -39,7 +38,6 @@ export function useNavigatorBackButton(
 
 	return {
 		as,
-		href,
 		onClick: handleClick,
 		...otherProps,
 	};
