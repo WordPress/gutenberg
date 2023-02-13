@@ -69,7 +69,7 @@ describe( 'AutocompleterUI', () => {
 			const OtherElement = <div>Other Element</div>;
 
 			const Container = () => {
-				const contentRef = useRef();
+				const contentRef = useRef< HTMLElement >( null );
 
 				return (
 					<div>

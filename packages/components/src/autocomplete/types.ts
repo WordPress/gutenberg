@@ -5,7 +5,7 @@ import type { WPElement } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { MutableRefObject, ReactNode } from 'react';
+import type { ReactNode, RefObject } from 'react';
 /**
  * Internal dependencies
  */
@@ -94,7 +94,7 @@ export type WPCompleter< TCompleterOption = any > = {
 	className?: string;
 };
 
-type ContentRef = MutableRefObject< HTMLElement | undefined >;
+type ContentRef = RefObject< HTMLElement >;
 
 export type AutocompleterUIProps = {
 	/**

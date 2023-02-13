@@ -384,7 +384,7 @@ function useLastDifferentValue( value: UseAutocompleteProps[ 'record' ] ) {
 }
 
 export function useAutocompleteProps( options: UseAutocompleteProps ) {
-	const ref = useRef< HTMLElement | undefined >();
+	const ref = useRef< HTMLElement >( null );
 	const onKeyDownRef = useRef< ( event: KeyboardEvent ) => void >();
 	const { record } = options;
 	const previousRecord = useLastDifferentValue( record );
