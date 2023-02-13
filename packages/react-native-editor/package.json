@@ -110,7 +110,7 @@
 		"test:update": "npm run test -- --updateSnapshot",
 		"device-tests": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --no-cache --maxWorkers=3 --testPathIgnorePatterns='canary|gutenberg-editor-rendering' --verbose --config ./jest_ui.config.js",
 		"device-tests-canary": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --no-cache --maxWorkers=2 --testPathPattern=@canary --verbose --config ./jest_ui.config.js",
-		"device-tests:local": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --verbose --forceExit  --config ./jest_ui.config.js",
+		"device-tests:local": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --verbose --forceExit --config ./jest_ui.config.js",
 		"device-tests:debug": "cross-env NODE_ENV=test node $NODE_DEBUG_OPTION --inspect-brk node_modules/jest/bin/jest --runInBand --detectOpenHandles --verbose --config ./jest_ui.config.js",
 		"test:e2e:bundle:android": "mkdir -p android/app/src/main/assets && npm run rn-bundle -- --reset-cache --platform android --dev false --minify false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
 		"test:e2e:build-app:android": "cd android && ./gradlew clean && ./gradlew assembleDebug",
