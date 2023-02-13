@@ -263,7 +263,35 @@ test.describe( 'Block deletion', () => {
 		).toBeFocused();
 	} );
 
-	test( 'deleting all blocks', () => {} );
+	test( 'deleting all blocks', async ( { editor, page } ) => {
+		// Add one paragraph with content and ensure it's focused.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Paragraph block',
+			} )
+		).toBeFocused();
+
+		// Remove that paragraph via its options menu.
+		await editor.showBlockToolbar();
+		await editor.canvas
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page
+			.getByRole( 'menuitem', { name: /Remove Paragraph/ } )
+			.click();
+
+		// Ensure an empty block was created and focused.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} )
+		).toBeFocused();
+	} );
 
 	test( 'deleting all blocks when the default block is unavailable', () => {} );
 } );
