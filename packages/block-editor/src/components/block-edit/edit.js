@@ -12,7 +12,7 @@ import {
 	hasBlockSupport,
 	getBlockType,
 } from '@wordpress/blocks';
-import { useContext, useMemo } from '@wordpress/element';
+import { useContext, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import ServerSideRender from '@wordpress/server-side-render';
 import { useResizeObserver } from '@wordpress/compose';
@@ -56,7 +56,9 @@ function IframeCompat( {
 		[ clientId ]
 	);
 	const [ resizeListener, sizes ] = useResizeObserver();
+	const ref = useRef();
 	const blockProps = useBlockProps( {
+		ref,
 		style: {
 			height: isSelected ? sizes?.height : undefined,
 		},
@@ -72,6 +74,7 @@ function IframeCompat( {
 				<BlockPopover
 					clientId={ clientId }
 					__unstablePopoverSlot="Popover"
+					__unstableContentRef={ ref }
 					placement="overlay"
 					shift={ false }
 				>
