@@ -65,7 +65,56 @@ test.describe( 'Block deletion', () => {
 		).toContainText( 'Second| ← caret was here' );
 	} );
 
-	test( 'deleting last block via the Remove Block shortcut', () => {} );
+	test( 'deleting last block via the Remove Block shortcut', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Add a couple of paragraphs.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Third' },
+		} );
+
+		// Make sure the last paragraph is focused.
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Paragraph block',
+				} )
+				.last()
+		).toBeFocused();
+
+		// Remove the current paragraph via dedicated keyboard shortcut.
+		await pageUtils.pressKeyWithModifier( 'access', 'z' );
+
+		// Make sure the last block was removed.
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Paragraph block',
+				} )
+				.last()
+		).toContainText( 'Second' );
+
+		// Make sure the caret is in a correct position.
+		await page.keyboard.type( '| ← caret was here' );
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Paragraph block',
+				} )
+				.last()
+		).toContainText( 'Second| ← caret was here' );
+	} );
 
 	test( 'deleting last block via backspace from an empty paragraph', () => {} );
 
