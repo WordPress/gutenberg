@@ -4,6 +4,7 @@
 
 ### Bug Fix
 
+-   `ToolsPanel`: fix type inconsistencies between types, docs and normal component usage ([47944](https://github.com/WordPress/gutenberg/pull/47944)).
 -   `SelectControl`: Fix styling when `multiple` prop is enabled ([#47893](https://github.com/WordPress/gutenberg/pull/43213)).
 
 ### Enhancements
@@ -11,10 +12,6 @@
 -  `ColorPalette`, `GradientPicker`, `PaletteEdit`, `ToolsPanel`: add new props to set a custom heading level ([43848](https://github.com/WordPress/gutenberg/pull/43848) and [#47788](https://github.com/WordPress/gutenberg/pull/47788)).
 -   `ColorPalette`: ensure text label contrast checking works with CSS variables ([#47373](https://github.com/WordPress/gutenberg/pull/47373)).
 -  `Navigator`: Support dynamic paths with parameters ([#47827](https://github.com/WordPress/gutenberg/pull/47827)).
-
-### Bug fix
-
--   `ToolsPanel`: fix type inconsistencies between types, docs and normal component usage ([47944](https://github.com/WordPress/gutenberg/pull/47944)).
 
 ### Internal
 
