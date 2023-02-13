@@ -48,10 +48,8 @@ function filterOptions(
 	return filtered;
 }
 
-export default function getDefaultUseItems(
-	autocompleter: WPCompleter
-): NonNullable< WPCompleter[ 'useItems' ] > {
-	return ( filterValue ) => {
+export default function getDefaultUseItems( autocompleter: WPCompleter ) {
+	return ( filterValue: string ) => {
 		const [ items, setItems ] = useState< Array< KeyedOption > >( [] );
 		/*
 		 * We support both synchronous and asynchronous retrieval of completer options
@@ -119,6 +117,6 @@ export default function getDefaultUseItems(
 			};
 		}, [ filterValue ] );
 
-		return [ items ];
+		return [ items ] as const;
 	};
 }
