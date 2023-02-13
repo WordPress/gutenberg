@@ -83,7 +83,7 @@ export type WPCompleter< TCompleterOption = any > = {
 	 * Autocomplete UI. These items have uniform shape and have been filtered by
 	 * `AutocompleterUIProps.filterValue`.
 	 */
-	useItems?: ( filterValue: string ) => [ Array< KeyedOption > ];
+	useItems?: ( filterValue: string ) => readonly [ Array< KeyedOption > ];
 	/**
 	 * Whether or not changes to the `filterValue` should be debounced.
 	 */

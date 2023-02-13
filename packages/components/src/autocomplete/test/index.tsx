@@ -13,7 +13,8 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { getAutoCompleterUI } from '../autocompleter-ui';
-import type { WPCompleter } from '../types';
+
+type FruitOption = { visual: string; name: string; id: number };
 
 describe( 'AutocompleterUI', () => {
 	describe( 'click outside behavior', () => {
@@ -22,7 +23,7 @@ describe( 'AutocompleterUI', () => {
 
 			const resetSpy = jest.fn();
 
-			const autocompleter: WPCompleter = {
+			const autocompleter = {
 				name: 'fruit',
 				options: [
 					{ visual: '🍎', name: 'Apple', id: 1 },
@@ -31,36 +32,28 @@ describe( 'AutocompleterUI', () => {
 				],
 				// The prefix that triggers this completer
 				triggerPrefix: '~',
-				getOptionLabel: ( option ) => (
+				getOptionLabel: ( option: FruitOption ) => (
 					<span>
 						<span className="icon">{ option.visual }</span>
 						{ option.name }
 					</span>
 				),
 				// Mock useItems function to return a autocomplete item.
-				useItems: ( filterValue ) => {
-					const options = autocompleter.options as Array< {
-						visual: 'string';
-						name: 'string';
-						id: number;
-					} >;
+				useItems: ( filterValue: string ) => {
+					const options = autocompleter.options;
 					const keyedOptions = options.map(
 						( optionData, optionIndex ) => ( {
 							key: `${ autocompleter.name }-${ optionIndex }`,
 							value: optionData,
 							label: autocompleter.getOptionLabel( optionData ),
-							keywords: autocompleter.getOptionKeywords
-								? autocompleter.getOptionKeywords( optionData )
-								: [],
-							isDisabled: autocompleter.isOptionDisabled
-								? autocompleter.isOptionDisabled( optionData )
-								: false,
+							keywords: [],
+							isDisabled: false,
 						} )
 					);
 					const filteredOptions = keyedOptions.filter( ( option ) =>
 						option.value.name.includes( filterValue )
 					);
-					return [ filteredOptions ];
+					return [ filteredOptions ] as const;
 				},
 			};
 
