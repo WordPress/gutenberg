@@ -1443,35 +1443,24 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			$tail_delta = 0;
 
 			foreach ( $this->lexical_updates as $diff ) {
-				$bookmark_start_is_after_diff_start = $bookmark->start >= $diff->start;
-				$bookmark_end_is_after_diff_end     = $bookmark->end >= $diff->start;
-
-				if ( $bookmark_start_is_after_diff_start ) {
-					$bookmark_end_is_before_diff_end = $bookmark->end < $diff->end;
-					if ( $bookmark_end_is_before_diff_end ) {
-						// The bookmark is fully contained within the diff. We need to invalidate it.
-						$this->release_bookmark( $bookmark_name );
-					}
+				if ( ! $bookmark->start >= $diff->start && ! $bookmark->end >= $diff->start ) {
+					break;
 				}
 
-				if ( ! $bookmark_start_is_after_diff_start && ! $bookmark_end_is_after_diff_end ) {
-					break;
+				if ( $bookmark->start >= $diff->start && $bookmark->end < $diff->end ) {
+					$this->release_bookmark( $bookmark_name );
+					continue 2;
 				}
 
 				$delta = strlen( $diff->text ) - ( $diff->end - $diff->start );
 
-				if ( $bookmark_start_is_after_diff_start ) {
+				if ( $bookmark->start >= $diff->start ) {
 					$head_delta += $delta;
 				}
 
-				if ( $bookmark_end_is_after_diff_end ) {
+				if ( $bookmark->end >= $diff->end ) {
 					$tail_delta += $delta;
 				}
-			}
-
-			// Did we end up invalidating the bookmark?
-			if ( ! isset( $this->bookmarks[ $bookmark_name ] ) ) {
-				continue;
 			}
 
 			$bookmark->start += $head_delta;
