@@ -8,7 +8,7 @@ test.describe( 'Block deletion', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'deleting last block via the Block Toolbar options menu', async ( {
+	test( 'deleting last block via its options menu', async ( {
 		editor,
 		page,
 	} ) => {
@@ -26,7 +26,7 @@ test.describe( 'Block deletion', () => {
 			attributes: { content: 'Third' },
 		} );
 
-		// Make sure the last paragraph is focused.
+		// Ensure the last paragraph is focused.
 		await expect(
 			editor.canvas
 				.getByRole( 'document', {
@@ -45,7 +45,7 @@ test.describe( 'Block deletion', () => {
 			.getByRole( 'menuitem', { name: /Remove Paragraph/ } )
 			.click();
 
-		// Make sure the last block was removed.
+		// Ensure the last block was removed.
 		await expect(
 			editor.canvas
 				.getByRole( 'document', {
@@ -54,7 +54,7 @@ test.describe( 'Block deletion', () => {
 				.last()
 		).toContainText( 'Second' );
 
-		// Make sure the caret is in a correct position.
+		// Ensure the caret is in a correct position.
 		await page.keyboard.type( '| ← caret was here' );
 		await expect(
 			editor.canvas
@@ -65,7 +65,7 @@ test.describe( 'Block deletion', () => {
 		).toContainText( 'Second| ← caret was here' );
 	} );
 
-	test( 'deleting last block via the Remove Block shortcut', async ( {
+	test( 'deleting last block via the keyboard shortcut', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -84,7 +84,7 @@ test.describe( 'Block deletion', () => {
 			attributes: { content: 'Third' },
 		} );
 
-		// Make sure the last paragraph is focused.
+		// Ensure the last paragraph is focused.
 		await expect(
 			editor.canvas
 				.getByRole( 'document', {
@@ -96,7 +96,7 @@ test.describe( 'Block deletion', () => {
 		// Remove the current paragraph via dedicated keyboard shortcut.
 		await pageUtils.pressKeyWithModifier( 'access', 'z' );
 
-		// Make sure the last block was removed.
+		// Ensure the last block was removed.
 		await expect(
 			editor.canvas
 				.getByRole( 'document', {
@@ -105,7 +105,7 @@ test.describe( 'Block deletion', () => {
 				.last()
 		).toContainText( 'Second' );
 
-		// Make sure the caret is in a correct position.
+		// Ensure the caret is in a correct position.
 		await page.keyboard.type( '| ← caret was here' );
 		await expect(
 			editor.canvas
@@ -130,7 +130,7 @@ test.describe( 'Block deletion', () => {
 			attributes: { content: 'Second' },
 		} );
 
-		// Leave last paragraph empty and make sure it's focused.
+		// Leave last paragraph empty and ensure it's focused.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 		} );
@@ -141,7 +141,7 @@ test.describe( 'Block deletion', () => {
 		// Hit backspace to remove the empty paragraph.
 		await page.keyboard.press( 'Backspace' );
 
-		// Make sure the last block was removed.
+		// Ensure the last block was removed.
 		await expect(
 			editor.canvas
 				.getByRole( 'document', {
@@ -150,7 +150,7 @@ test.describe( 'Block deletion', () => {
 				.last()
 		).toContainText( 'Second' );
 
-		// Make sure the caret is in a correct position.
+		// Ensure the caret is in a correct position.
 		await page.keyboard.type( '| ← caret was here' );
 		await expect(
 			editor.canvas
