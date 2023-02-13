@@ -6,8 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useRef, useEffect } from '@wordpress/element';
+import {
+	useLayoutEffect,
+	useRef,
+	useEffect,
+	useState,
+} from '@wordpress/element';
 import { useAnchor } from '@wordpress/rich-text';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -42,7 +48,16 @@ export function getAutoCompleterUI( autocompleter ) {
 			value,
 		} );
 
+		const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );
 		const popoverRef = useRef();
+		const popoverRefs = useMergeRefs( [
+			popoverRef,
+			useRefEffect( ( node ) => {
+				if ( node.ownerDocument !== contentRef.current.ownerDocument ) {
+					setNeedsA11yCompat( true );
+				}
+			} ),
+		] );
 
 		useOnClickOutside( popoverRef, reset );
 
@@ -93,11 +108,11 @@ export function getAutoCompleterUI( autocompleter ) {
 					placement="top-start"
 					className="components-autocomplete__popover"
 					anchor={ popoverAnchor }
-					ref={ popoverRef }
+					ref={ popoverRefs }
 				>
 					<ListBox />
 				</Popover>
-				{ contentRef.current &&
+				{ needsA11yCompat &&
 					createPortal(
 						<ListBox Component={ VisuallyHidden } />,
 						contentRef.current.ownerDocument.body
