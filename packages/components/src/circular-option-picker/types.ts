@@ -39,7 +39,7 @@ export type CircularOptionPickerProps = {
 };
 
 export type DropdownLinkActionProps = {
-	buttonProps: Omit<
+	buttonProps?: Omit<
 		WordPressComponentProps< ButtonAsButtonProps, 'button', false >,
 		'children'
 	>;
