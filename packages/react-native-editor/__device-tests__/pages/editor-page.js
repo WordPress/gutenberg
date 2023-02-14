@@ -291,11 +291,7 @@ class EditorPage {
 
 	async openBlockSettings() {
 		const settingsButtonElement = 'Open Settings';
-		await this.driver.waitForElementByAccessibilityId(
-			settingsButtonElement,
-			wd.asserters.isDisplayed
-		);
-		const settingsButton = await this.driver.elementByAccessibilityId(
+		const settingsButton = await this.waitForElementToBeDisplayedById(
 			settingsButtonElement
 		);
 
@@ -306,24 +302,15 @@ class EditorPage {
 		const blockActionsButtonElement = isAndroid()
 			? 'Open Block Actions Menu, Double tap to open Bottom Sheet with available options'
 			: 'Open Block Actions Menu';
-		await this.driver.waitForElementByAccessibilityId(
-			blockActionsButtonElement,
-			wd.asserters.isDisplayed
-		);
-		const blockActionsMenu = await this.driver.elementByAccessibilityId(
+		const blockActionsMenu = await this.waitForElementToBeDisplayedById(
 			blockActionsButtonElement
 		);
 		await blockActionsMenu.click();
 
 		const removeElement = 'Remove block';
-		await this.driver.waitForElementByAccessibilityId(
+		const removeBlockButton = await this.waitForElementToBeDisplayedById(
 			removeElement,
-			wd.asserters.isDisplayed,
 			4000
-		);
-
-		const removeBlockButton = await this.driver.elementByAccessibilityId(
-			removeElement
 		);
 		return await removeBlockButton.click();
 	}
@@ -340,13 +327,9 @@ class EditorPage {
 		const addBlockElement = isAndroid()
 			? 'Add block, Double tap to add a block'
 			: 'Add block';
-		await this.driver.waitForElementByAccessibilityId(
+		const addButton = await this.waitForElementToBeDisplayedById(
 			addBlockElement,
-			wd.asserters.isDisplayed,
 			3000
-		);
-		const addButton = await this.driver.elementByAccessibilityId(
-			addBlockElement
 		);
 
 		if ( relativePosition === 'before' ) {
@@ -394,9 +377,8 @@ class EditorPage {
 		const inserterElement = isAndroid()
 			? 'Blocks menu'
 			: 'InserterUI-Blocks';
-		return await this.driver.waitForElementByAccessibilityId(
+		return await this.waitForElementToBeDisplayedById(
 			inserterElement,
-			wd.asserters.isDisplayed,
 			4000
 		);
 	}
@@ -861,11 +843,13 @@ class EditorPage {
 	}
 
 	async waitForElementToBeDisplayedById( id, timeout = 2000 ) {
-		return await this.driver.waitForElementByAccessibilityId(
+		await this.driver.waitForElementByAccessibilityId(
 			id,
 			wd.asserters.isDisplayed,
 			timeout
 		);
+
+		return await this.driver.elementByAccessibilityId( id );
 	}
 }
 
