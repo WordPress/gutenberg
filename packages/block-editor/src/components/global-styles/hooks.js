@@ -204,19 +204,152 @@ export function useGlobalStyle(
 	return [ result, setStyle ];
 }
 
-export function useSupportedStyles( name, element ) {
-	const { supportedPanels } = useSelect(
+/**
+ * React hook that overrides a global settings object with block and element specific settings.
+ *
+ * @param {Object}     parentSettings Settings object.
+ * @param {blockName?} blockName      Block name.
+ * @param {element?}   element        Element name.
+ *
+ * @return {Object} Merge of settings and supports.
+ */
+export function useSettingsForBlockElement(
+	parentSettings,
+	blockName,
+	element
+) {
+	const { supportedStyles, supports } = useSelect(
 		( select ) => {
 			return {
-				supportedPanels: unlock(
+				supportedStyles: unlock(
 					select( blocksStore )
-				).getSupportedStyles( name, element ),
+				).getSupportedStyles( blockName, element ),
+				supports:
+					select( blocksStore ).getBlockType( blockName )?.supports,
 			};
 		},
-		[ name, element ]
+		[ blockName, element ]
 	);
 
-	return supportedPanels;
+	return useMemo( () => {
+		const updatedSettings = { ...parentSettings };
+
+		if ( ! supportedStyles.includes( 'fontSize' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				fontSizes: {},
+				customFontSize: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'fontFamily' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				fontFamilies: {},
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'lineHeight' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				lineHeight: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'fontStyle' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				fontStyle: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'fontWeight' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				fontWeight: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'letterSpacing' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				letterSpacing: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'textTransform' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				textTransform: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'textDecoration' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				textDecoration: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'contentSize' ) ) {
+			updatedSettings.layout = {
+				...updatedSettings.layout,
+				contentSize: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'wideSize' ) ) {
+			updatedSettings.layout = {
+				...updatedSettings.layout,
+				wideSize: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'padding' ) ) {
+			updatedSettings.spacing = {
+				...updatedSettings.spacing,
+				padding: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'margin' ) ) {
+			updatedSettings.spacing = {
+				...updatedSettings.spacing,
+				margin: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'blockGap' ) ) {
+			updatedSettings.spacing = {
+				...updatedSettings.spacing,
+				blockGap: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'minHeight' ) ) {
+			updatedSettings.dimensions = {
+				...updatedSettings.dimensions,
+				minHeight: false,
+			};
+		}
+
+		[ 'padding', 'margin', 'blockGap' ].forEach( ( key ) => {
+			const sides = Array.isArray( supports?.spacing?.[ key ] )
+				? supports?.spacing?.[ key ]
+				: supports?.spacing?.[ key ]?.sides;
+			if ( sides?.length ) {
+				updatedSettings.spacing = {
+					...updatedSettings.spacing,
+					[ key ]: {
+						...updatedSettings.spacing?.[ key ],
+						sides,
+					},
+				};
+			}
+		} );
+
+		return updatedSettings;
+	}, [ parentSettings, supportedStyles, supports ] );
 }
 
 /**

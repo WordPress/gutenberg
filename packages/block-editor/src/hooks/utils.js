@@ -7,6 +7,13 @@ import { isEmpty, mapValues, get } from 'lodash';
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { useSetting } from '../components';
+import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 
 /**
  * Removed falsy values from nested object.
@@ -176,4 +183,70 @@ export function shouldSkipSerialization( blockType, featureSet, feature ) {
 	}
 
 	return skipSerialization;
+}
+
+export function useBlockSettings( name ) {
+	const fontFamilies = useSetting( 'typography.fontFamilies' );
+	const fontSizes = useSetting( 'typography.fontSizes' );
+	const customFontSize = useSetting( 'typography.customFontSize' );
+	const fontStyle = useSetting( 'typography.fontStyle' );
+	const fontWeight = useSetting( 'typography.fontWeight' );
+	const lineHeight = useSetting( 'typography.lineHeight' );
+	const textDecoration = useSetting( 'typography.textDecoration' );
+	const textTransform = useSetting( 'typography.textTransform' );
+	const letterSpacing = useSetting( 'typography.letterSpacing' );
+	const padding = useSetting( 'spacing.padding' );
+	const margin = useSetting( 'spacing.margin' );
+	const blockGap = useSetting( 'spacing.blockGap' );
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+	const units = useSetting( 'spacing.units' );
+	const minHeight = useSetting( 'dimensions.minHeight' );
+
+	const rawSettings = useMemo( () => {
+		return {
+			typography: {
+				fontFamilies: {
+					custom: fontFamilies,
+				},
+				fontSizes: {
+					custom: fontSizes,
+				},
+				customFontSize,
+				fontStyle,
+				fontWeight,
+				lineHeight,
+				textDecoration,
+				textTransform,
+				letterSpacing,
+			},
+			spacing: {
+				padding,
+				margin,
+				blockGap,
+				spacingSizes,
+				units,
+			},
+			dimensions: {
+				minHeight,
+			},
+		};
+	}, [
+		fontFamilies,
+		fontSizes,
+		customFontSize,
+		fontStyle,
+		fontWeight,
+		lineHeight,
+		textDecoration,
+		textTransform,
+		letterSpacing,
+		padding,
+		margin,
+		blockGap,
+		spacingSizes,
+		units,
+		minHeight,
+	] );
+
+	return useSettingsForBlockElement( rawSettings, name );
 }

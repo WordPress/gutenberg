@@ -1,0 +1,520 @@
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalBoxControl as BoxControl,
+	__experimentalHStack as HStack,
+	__experimentalUnitControl as UnitControl,
+	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalView as View,
+} from '@wordpress/components';
+import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { getValueFromVariable } from './utils';
+import SpacingSizesControl from '../spacing-sizes-control';
+import HeightControl from '../height-control';
+
+const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
+
+export function useHasDimensionsPanel( settings ) {
+	const hasContentSize = useHasContentSize( settings );
+	const hasWideSize = useHasWideSize( settings );
+	const hasPadding = useHasPadding( settings );
+	const hasMargin = useHasMargin( settings );
+	const hasGap = useHasGap( settings );
+	const hasMinHeight = useHasMinHeight( settings );
+
+	return (
+		hasContentSize ||
+		hasWideSize ||
+		hasPadding ||
+		hasMargin ||
+		hasGap ||
+		hasMinHeight
+	);
+}
+
+function useHasContentSize( settings ) {
+	return settings?.layout?.contentSize;
+}
+
+function useHasWideSize( settings ) {
+	return settings?.layout?.wideSize;
+}
+
+function useHasPadding( settings ) {
+	return settings?.spacing?.padding;
+}
+
+function useHasMargin( settings ) {
+	return settings?.spacing?.margin;
+}
+
+function useHasGap( settings ) {
+	return settings?.spacing?.blockGap;
+}
+
+function useHasMinHeight( settings ) {
+	return settings?.dimensions?.minHeight;
+}
+
+function useHasSpacingPresets( settings ) {
+	const {
+		custom,
+		theme,
+		default: defaultPresets,
+	} = settings?.spacing?.spacingSizes || {};
+	const presets = custom ?? theme ?? defaultPresets ?? [];
+
+	return presets.length > 0;
+}
+
+function filterValuesBySides( values, sides ) {
+	if ( ! sides ) {
+		// If no custom side configuration all sides are opted into by default.
+		return values;
+	}
+
+	// Only include sides opted into within filtered values.
+	const filteredValues = {};
+	sides.forEach( ( side ) => {
+		if ( side === 'vertical' ) {
+			filteredValues.top = values.top;
+			filteredValues.bottom = values.bottom;
+		}
+		if ( side === 'horizontal' ) {
+			filteredValues.left = values.left;
+			filteredValues.right = values.right;
+		}
+		filteredValues[ side ] = values[ side ];
+	} );
+
+	return filteredValues;
+}
+
+function splitStyleValue( value ) {
+	// Check for shorthand value (a string value).
+	if ( value && typeof value === 'string' ) {
+		// Convert to value for individual sides for BoxControl.
+		return {
+			top: value,
+			right: value,
+			bottom: value,
+			left: value,
+		};
+	}
+
+	return value;
+}
+
+function splitGapValue( value ) {
+	// Check for shorthand value (a string value).
+	if ( value && typeof value === 'string' ) {
+		// If the value is a string, treat it as a single side (top) for the spacing controls.
+		return {
+			top: value,
+		};
+	}
+
+	if ( value ) {
+		return {
+			...value,
+			right: value?.left,
+			bottom: value?.top,
+		};
+	}
+
+	return value;
+}
+
+function DimensionsToolsPanel( props ) {
+	return <ToolsPanel label={ __( 'Dimensions' ) } { ...props } />;
+}
+
+const DEFAULT_CONTROLS = {
+	contentSize: true,
+	wideSize: true,
+	padding: true,
+	margin: true,
+	blockGap: true,
+	minHeight: true,
+};
+
+export default function DimensionsPanel( {
+	as: Wrapper = DimensionsToolsPanel,
+	value,
+	onChange,
+	inheritedValue = value,
+	settings,
+	panelId,
+	defaultControls = DEFAULT_CONTROLS,
+} ) {
+	const decodeValue = ( rawValue ) =>
+		getValueFromVariable( { settings }, '', rawValue );
+
+	const showSpacingPresetsControl = useHasSpacingPresets( settings );
+	const units = useCustomUnits( {
+		availableUnits: settings?.spacing?.units || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
+	} );
+
+	// Content Size
+	const showContentSizeControl = useHasContentSize( settings );
+	const contentSizeValue = decodeValue( inheritedValue?.layout?.contentSize );
+	const setContentSizeValue = ( newValue ) => {
+		onChange( {
+			...value,
+			layout: {
+				...value?.layout,
+				contentSize: newValue,
+			},
+		} );
+	};
+	const hasUserSetContentSizeValue = () => !! value?.layout?.contentSize;
+	const resetContentSizeValue = () => setContentSizeValue( undefined );
+
+	// Wide Size
+	const showWideSizeControl = useHasWideSize( settings );
+	const wideSizeValue = decodeValue( inheritedValue?.layout?.wideSize );
+	const setWideSizeValue = ( newValue ) => {
+		onChange( {
+			...value,
+			layout: {
+				...value?.layout,
+				wideSize: newValue,
+			},
+		} );
+	};
+	const hasUserSetWideSizeValue = () => !! value?.layout?.wideSize;
+	const resetWideSizeValue = () => setWideSizeValue( undefined );
+
+	// Padding
+	const showPaddingControl = useHasPadding( settings );
+	const rawPadding = decodeValue( inheritedValue?.spacing?.padding );
+	const paddingValues = splitStyleValue( rawPadding );
+	const paddingSides = Array.isArray( settings?.spacing?.padding )
+		? settings?.spacing?.padding
+		: settings?.spacing?.padding?.sides;
+	const isAxialPadding =
+		paddingSides &&
+		paddingSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+	const setPaddingValues = ( newPaddingValues ) => {
+		const padding = filterValuesBySides( newPaddingValues, paddingSides );
+		onChange( {
+			...value,
+			spacing: {
+				...value?.spacing,
+				padding,
+			},
+		} );
+	};
+	const hasPaddingValue = () =>
+		!! value?.spacing?.padding &&
+		Object.keys( value?.spacing?.padding ).length;
+	const resetPaddingValue = () => setPaddingValues( undefined );
+
+	// Margin
+	const showMarginControl = useHasMargin( settings );
+	const rawMargin = decodeValue( inheritedValue?.spacing?.margin );
+	const marginValues = splitStyleValue( rawMargin );
+	const marginSides = Array.isArray( settings?.spacing?.margin )
+		? settings?.spacing?.margin
+		: settings?.spacing?.margin?.sides;
+	const isAxialMargin =
+		marginSides &&
+		marginSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+	const setMarginValues = ( newMarginValues ) => {
+		const margin = filterValuesBySides( newMarginValues, marginSides );
+		onChange( {
+			...value,
+			spacing: {
+				...value?.spacing,
+				margin,
+			},
+		} );
+	};
+	const hasMarginValue = () =>
+		!! value?.spacing?.margin &&
+		Object.keys( value?.spacing?.margin ).length;
+	const resetMarginValue = () => setPaddingValues( undefined );
+
+	// Block Gap
+	const showGapControl = useHasGap( settings );
+	const gapValue = decodeValue( inheritedValue?.spacing?.blockGap );
+	const gapValues = splitGapValue( gapValue );
+	const gapSides = Array.isArray( settings?.spacing?.blockGap )
+		? settings?.spacing?.blockGap
+		: settings?.spacing?.blockGap?.sides;
+	const isAxialGap =
+		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+	const setGapValue = ( newGapValue ) => {
+		onChange( {
+			...value,
+			spacing: {
+				...value?.spacing,
+				blockGap: newGapValue,
+			},
+		} );
+	};
+	const setGapValues = ( nextBoxGapValue ) => {
+		if ( ! nextBoxGapValue ) {
+			setGapValue( null );
+		}
+		// If axial gap is not enabled, treat the 'top' value as the shorthand gap value.
+		if ( ! isAxialGap && nextBoxGapValue?.hasOwnProperty( 'top' ) ) {
+			setGapValue( nextBoxGapValue.top );
+		} else {
+			setGapValue( {
+				top: nextBoxGapValue?.top,
+				left: nextBoxGapValue?.left,
+			} );
+		}
+	};
+	const resetGapValue = () => setGapValue( undefined );
+	const hasGapValue = () => !! value?.spacing?.blockGap;
+
+	// Min Height
+	const showMinHeightControl = useHasMinHeight( settings );
+	const minHeightValue = decodeValue( inheritedValue?.dimensions?.minHeight );
+	const setMinHeightValue = ( newValue ) => {
+		onChange( {
+			...value,
+			dimensions: {
+				...value?.dimensions,
+				minHeight: newValue,
+			},
+		} );
+	};
+	const resetMinHeightValue = () => setMinHeightValue( undefined );
+	const hasMinHeightValue = () => !! value?.dimensions?.minHeight;
+
+	const resetAll = () => {
+		onChange( {
+			...value,
+			layout: {
+				...value?.layout,
+				contentSize: undefined,
+				wideSize: undefined,
+			},
+			spacing: {
+				...value?.spacing,
+				padding: undefined,
+				margin: undefined,
+				blockGap: undefined,
+			},
+			dimensions: {
+				...value?.dimensions,
+				minHeight: undefined,
+			},
+		} );
+	};
+
+	return (
+		<Wrapper resetAll={ resetAll }>
+			{ ( showContentSizeControl || showWideSizeControl ) && (
+				<span className="span-columns">
+					{ __( 'Set the width of the main content area.' ) }
+				</span>
+			) }
+			{ showContentSizeControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Content size' ) }
+					hasValue={ hasUserSetContentSizeValue }
+					onDeselect={ resetContentSizeValue }
+					isShownByDefault={ defaultControls.contentSize }
+					panelId={ panelId }
+				>
+					<HStack alignment="flex-end" justify="flex-start">
+						<UnitControl
+							label={ __( 'Content' ) }
+							labelPosition="top"
+							__unstableInputWidth="80px"
+							value={ contentSizeValue || '' }
+							onChange={ ( nextContentSize ) => {
+								setContentSizeValue( nextContentSize );
+							} }
+							units={ units }
+						/>
+						<View>
+							<Icon icon={ positionCenter } />
+						</View>
+					</HStack>
+				</ToolsPanelItem>
+			) }
+			{ showWideSizeControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Wide size' ) }
+					hasValue={ hasUserSetWideSizeValue }
+					onDeselect={ resetWideSizeValue }
+					isShownByDefault={ defaultControls.wideSize }
+					panelId={ panelId }
+				>
+					<HStack alignment="flex-end" justify="flex-start">
+						<UnitControl
+							label={ __( 'Wide' ) }
+							labelPosition="top"
+							__unstableInputWidth="80px"
+							value={ wideSizeValue || '' }
+							onChange={ ( nextWideSize ) => {
+								setWideSizeValue( nextWideSize );
+							} }
+							units={ units }
+						/>
+						<View>
+							<Icon icon={ stretchWide } />
+						</View>
+					</HStack>
+				</ToolsPanelItem>
+			) }
+			{ showPaddingControl && (
+				<ToolsPanelItem
+					hasValue={ hasPaddingValue }
+					label={ __( 'Padding' ) }
+					onDeselect={ resetPaddingValue }
+					isShownByDefault={ defaultControls.padding }
+					className={ classnames( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+					} ) }
+					panelId={ panelId }
+				>
+					{ ! showSpacingPresetsControl && (
+						<BoxControl
+							values={ paddingValues }
+							onChange={ setPaddingValues }
+							label={ __( 'Padding' ) }
+							sides={ paddingSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialPadding }
+						/>
+					) }
+					{ showSpacingPresetsControl && (
+						<SpacingSizesControl
+							values={ paddingValues }
+							onChange={ setPaddingValues }
+							label={ __( 'Padding' ) }
+							sides={ paddingSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialPadding }
+						/>
+					) }
+				</ToolsPanelItem>
+			) }
+			{ showMarginControl && (
+				<ToolsPanelItem
+					hasValue={ hasMarginValue }
+					label={ __( 'Margin' ) }
+					onDeselect={ resetMarginValue }
+					isShownByDefault={ defaultControls.margin }
+					className={ classnames( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+					} ) }
+					panelId={ panelId }
+				>
+					{ ! showSpacingPresetsControl && (
+						<BoxControl
+							values={ marginValues }
+							onChange={ setMarginValues }
+							label={ __( 'Margin' ) }
+							sides={ marginSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialMargin }
+						/>
+					) }
+					{ showSpacingPresetsControl && (
+						<SpacingSizesControl
+							values={ marginValues }
+							onChange={ setMarginValues }
+							label={ __( 'Margin' ) }
+							sides={ marginSides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ isAxialMargin }
+						/>
+					) }
+				</ToolsPanelItem>
+			) }
+			{ showGapControl && (
+				<ToolsPanelItem
+					hasValue={ hasGapValue }
+					label={ __( 'Block spacing' ) }
+					onDeselect={ resetGapValue }
+					isShownByDefault={ defaultControls.blockGap }
+					className={ classnames( {
+						'tools-panel-item-spacing': showSpacingPresetsControl,
+					} ) }
+					panelId={ panelId }
+				>
+					{ ! showSpacingPresetsControl &&
+						( isAxialGap ? (
+							<BoxControl
+								label={ __( 'Block spacing' ) }
+								min={ 0 }
+								onChange={ setGapValues }
+								units={ units }
+								sides={ gapSides }
+								values={ gapValues }
+								allowReset={ false }
+								splitOnAxis={ isAxialGap }
+							/>
+						) : (
+							<UnitControl
+								label={ __( 'Block spacing' ) }
+								__unstableInputWidth="80px"
+								min={ 0 }
+								onChange={ setGapValue }
+								units={ units }
+								value={ gapValue }
+							/>
+						) ) }
+					{ showSpacingPresetsControl && (
+						<SpacingSizesControl
+							label={ __( 'Block spacing' ) }
+							min={ 0 }
+							onChange={ setGapValues }
+							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
+							values={ gapValues }
+							allowReset={ false }
+							splitOnAxis={ isAxialGap }
+						/>
+					) }
+				</ToolsPanelItem>
+			) }
+			{ showMinHeightControl && (
+				<ToolsPanelItem
+					hasValue={ hasMinHeightValue }
+					label={ __( 'Min. height' ) }
+					onDeselect={ resetMinHeightValue }
+					isShownByDefault={ defaultControls.minHeight }
+					panelId={ panelId }
+				>
+					<HeightControl
+						label={ __( 'Min. height' ) }
+						value={ minHeightValue }
+						onChange={ setMinHeightValue }
+					/>
+				</ToolsPanelItem>
+			) }
+		</Wrapper>
+	);
+}
