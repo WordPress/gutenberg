@@ -1443,7 +1443,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			$tail_delta = 0;
 
 			foreach ( $this->lexical_updates as $diff ) {
-				if ( ! $bookmark->start >= $diff->start && ! $bookmark->end >= $diff->start ) {
+				if ( $bookmark->start < $diff->start && $bookmark->end < $diff->start ) {
 					break;
 				}
 
