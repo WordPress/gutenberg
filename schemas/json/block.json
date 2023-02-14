@@ -21,6 +21,13 @@
 			"default": 1,
 			"enum": [ 1, 2 ]
 		},
+		"temporarilyDisableIframe": {
+			"type": "string",
+			"description": "This property is used to temporarily disable the iframe.",
+			"enum": [
+				"I understand that this flag will only work for two releases (6.2 and 6.3) and that the block must be updated to avoid breakage in WP 6.4."
+			]
+		},
 		"name": {
 			"type": "string",
 			"pattern": "^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$",

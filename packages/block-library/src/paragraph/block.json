@@ -1,6 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
+	"temporarilyDisableIframe": "I understand that this flag will only work for two releases (6.2 and 6.3) and that the block must be updated to avoid breakage in WP 6.4.",
 	"name": "core/paragraph",
 	"title": "Paragraph",
 	"category": "text",

@@ -36,7 +36,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { parse } from '@wordpress/blocks';
+import { parse, store as blocksStore } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -153,6 +153,17 @@ export default function VisualEditor( { styles } ) {
 	const { isCleanNewPost } = useSelect( editorStore );
 	const hasMetaBoxes = useSelect(
 		( select ) => select( editPostStore ).hasMetaBoxes(),
+		[]
+	);
+	const hasIframeIncompatibleBlocks = useSelect(
+		( select ) =>
+			select( blocksStore )
+				.getBlockTypes()
+				.some(
+					( { temporarilyDisableIframe } ) =>
+						temporarilyDisableIframe ===
+						'I understand that this flag will only work for two releases (6.2 and 6.3) and that the block must be updated to avoid breakage in WP 6.4.'
+				),
 		[]
 	);
 	const { themeHasDisabledLayoutStyles, themeSupportsLayout, isFocusMode } =
@@ -339,7 +350,9 @@ export default function VisualEditor( { styles } ) {
 				>
 					<MaybeIframe
 						shouldIframe={
-							( isBlockBasedTheme && ! hasMetaBoxes ) ||
+							( isBlockBasedTheme &&
+								! hasMetaBoxes &&
+								! hasIframeIncompatibleBlocks ) ||
 							isTemplateMode ||
 							deviceType === 'Tablet' ||
 							deviceType === 'Mobile'
