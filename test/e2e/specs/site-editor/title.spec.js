@@ -21,7 +21,6 @@ test.describe( 'Site editor title', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
-			path: '/templates/single',
 		} );
 		await editor.canvas.click( 'body' );
 		const title = await page.locator(
@@ -40,7 +39,6 @@ test.describe( 'Site editor title', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
-			path: '/template-parts/single',
 		} );
 		await editor.canvas.click( 'body' );
 		const title = await page.locator(
@@ -58,7 +56,6 @@ test.describe( 'Site editor title', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
-			path: '/templates/single',
 		} );
 		await editor.canvas.click( 'body' );
 		// Select the header template part via list view.
