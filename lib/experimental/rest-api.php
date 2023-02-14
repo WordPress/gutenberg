@@ -30,27 +30,6 @@ add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
 
 /**
- * Hook in to the template and template part post types and decorate
- * the rest endpoint with the revision count.
- *
- * When merging to core, this can be removed once Gutenberg_REST_Template_Revision_Count is
- * merged with WP_REST_Template_Controller.
- *
- * @param array  $args Current registered post type args.
- * @param string $post_type Name of post type.
- *
- * @return array
- */
-function wp_api_template_revision_args( $args, $post_type ) {
-	if ( 'wp_template' === $post_type || 'wp_template_part' === $post_type ) {
-		$args['rest_controller_class'] = 'Gutenberg_REST_Template_Revision_Count';
-	}
-
-	return $args;
-}
-add_filter( 'register_post_type_args', 'wp_api_template_revision_args', 10, 2 );
-
-/**
  * Shim for get_sample_permalink() to add support for auto-draft status.
  *
  * This function filters the return from get_sample_permalink() and essentially
