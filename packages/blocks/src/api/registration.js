@@ -301,6 +301,7 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		attributes: {},
 		providesContext: {},
 		usesContext: [],
+		selectors: {},
 		supports: {},
 		styles: [],
 		variations: [],
