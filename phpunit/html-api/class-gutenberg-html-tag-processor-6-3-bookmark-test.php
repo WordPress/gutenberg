@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../lib/compat/wordpress-6.3/html-api/class-gutenberg
  *
  * @coversDefaultClass Gutenberg_HTML_Tag_Processor_6_3
  */
-class Gutenberg_HTML_Tag_Processor_6_3_Test extends WP_UnitTestCase {
+class Gutenberg_HTML_Tag_Processor_6_3_Bookmark_Test extends WP_UnitTestCase {
 	/**
 	 * @covers has_bookmark
 	 */
