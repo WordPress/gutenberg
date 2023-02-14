@@ -353,7 +353,7 @@ test.describe( 'Image', () => {
 				width: 5,
 			} );
 
-		await expect(
+		expect(
 			await imageBlockUtils.getImageBuffer( updatedImageSrc )
 		).toMatchSnapshot();
 	} );
@@ -410,7 +410,7 @@ test.describe( 'Image', () => {
 				width: 10,
 			} );
 
-		await expect(
+		expect(
 			await imageBlockUtils.getImageBuffer( updatedImageSrc )
 		).toMatchSnapshot();
 	} );
@@ -447,7 +447,7 @@ test.describe( 'Image', () => {
 		// Assert that the image is edited.
 		const updatedImageSrc = await image.getAttribute( 'src' );
 
-		await expect(
+		expect(
 			await imageBlockUtils.getImageBuffer( updatedImageSrc )
 		).toMatchSnapshot();
 	} );
