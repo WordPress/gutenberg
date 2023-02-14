@@ -170,7 +170,8 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 					definitions[ blockName ].ancestor;
 			}
 			// The `selectors` prop is not yet included in the server provided
-			// definitions. Polyfill it as well.
+			// definitions. Polyfill it as well. This can be removed when
+			// the minimum supported WordPress is >= 6.3.
 			if (
 				serverSideBlockDefinitions[ blockName ].selectors ===
 					undefined &&
