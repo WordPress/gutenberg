@@ -8,7 +8,7 @@ test.describe( 'Block deletion', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'deleting last block via its options menu', async ( {
+	test( 'deleting the last block via its options menu', async ( {
 		editor,
 		page,
 	} ) => {
@@ -62,7 +62,7 @@ test.describe( 'Block deletion', () => {
 		] );
 	} );
 
-	test( 'deleting last block via the keyboard shortcut', async ( {
+	test( 'deleting the last block via the keyboard shortcut', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -110,7 +110,7 @@ test.describe( 'Block deletion', () => {
 		] );
 	} );
 
-	test( 'deleting last block via backspace from an empty paragraph', async ( {
+	test( 'deleting the last block via backspace from an empty paragraph', async ( {
 		editor,
 		page,
 	} ) => {
@@ -197,7 +197,7 @@ test.describe( 'Block deletion', () => {
 		] );
 	} );
 
-	test( 'deleting last two selected blocks via backspace', async ( {
+	test( 'deleting the last two selected blocks via backspace', async ( {
 		editor,
 		page,
 		pageUtils,
