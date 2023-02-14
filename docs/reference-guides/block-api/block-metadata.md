@@ -389,10 +389,31 @@ See [the block context documentation](/docs/reference-guides/block-api/block-con
 -   Localized: No
 -   Property: `selectors`
 -   Default: `{}`
+-   Since: `WordPress 6.3.0`
 
 Any custom CSS selectors, keyed by `root`, feature, or sub-feature, to be used
 when generating block styles for theme.json (global styles) stylesheets.
+Providing custom selectors allows more fine grained control over which styles
+apply to what block elements, e.g. applying typography styles only to an inner
+heading while colors are still applied on the outer block wrapper etc.
+
+
 See the [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
+
+```json
+{
+	"selectors": {
+		"root": ".my-custom-block-selector",
+		"color": {
+			"text": ".my-custom-block-selector p"
+		},
+		"typography": {
+			"root": ".my-custom-block-selector > h2",
+			"text-decoration": ".my-custom-block-selector > h2 span"
+		}
+	}
+}
+```
 
 ### Supports
 
