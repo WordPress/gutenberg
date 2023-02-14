@@ -110,6 +110,7 @@ export default function VisualEditor( { styles } ) {
 		wrapperBlockName,
 		wrapperUniqueId,
 		isBlockBasedTheme,
+		isGutenbergPlugin,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -148,6 +149,7 @@ export default function VisualEditor( { styles } ) {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
+			isGutenbergPlugin: editorSettings.__unstableIsGutenbergPlugin,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -339,7 +341,9 @@ export default function VisualEditor( { styles } ) {
 				>
 					<MaybeIframe
 						shouldIframe={
-							( isBlockBasedTheme && ! hasMetaBoxes ) ||
+							( isGutenbergPlugin &&
+								isBlockBasedTheme &&
+								! hasMetaBoxes ) ||
 							isTemplateMode ||
 							deviceType === 'Tablet' ||
 							deviceType === 'Mobile'
