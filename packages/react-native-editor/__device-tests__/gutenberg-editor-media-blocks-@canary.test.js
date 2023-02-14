@@ -79,7 +79,7 @@ describe( 'Gutenberg Editor File Block tests', () => {
 	} );
 } );
 
-// iOS only test - Can only add image from media library on iOS.
+// iOS only test - It can only add images from the media library on iOS.
 onlyOniOS( 'Gutenberg Editor Image Block tests', () => {
 	it( 'should be able to add an image block', async () => {
 		await editorPage.addNewBlock( blockNames.image );
@@ -115,7 +115,7 @@ onlyOniOS( 'Gutenberg Editor Image Block tests', () => {
 
 onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 	it( 'should displayed properly and have properly converted height (ios only)', async () => {
-		// Temporarily this test is skipped on Android,due to the inconsistency of the results,
+		// Temporarily this test is skipped on Android, due to the inconsistency of the results,
 		// which are related to getting values in raw pixels instead of density pixels on Android.
 		await editorPage.setHtmlContent( testData.coverHeightWithRemUnit );
 
@@ -136,7 +136,7 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 
 	// Testing this for iOS on a device is valuable to ensure that it properly
 	// handles opening multiple modals, as only one can be open at a time.
-	// Can only add image from media library on iOS
+	// NOTE: It can only add images from the media library on iOS.
 	it( 'allows modifying media from within block settings', async () => {
 		await editorPage.setHtmlContent( testData.coverHeightWithRemUnit );
 
