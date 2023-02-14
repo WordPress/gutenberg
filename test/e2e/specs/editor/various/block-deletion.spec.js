@@ -42,27 +42,24 @@ test.describe( 'Block deletion', () => {
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
 		await page
-			.getByRole( 'menuitem', { name: /Remove Paragraph/ } )
+			.getByRole( 'menuitem', { name: /Remove Paragraph/i } )
 			.click();
 
 		// Ensure the last block was removed.
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Paragraph block',
-				} )
-				.last()
-		).toContainText( 'Second' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
 
 		// Ensure the caret is in a correct position.
 		await page.keyboard.type( '| ← caret was here' );
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Paragraph block',
-				} )
-				.last()
-		).toContainText( 'Second| ← caret was here' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second| ← caret was here' },
+			},
+		] );
 	} );
 
 	test( 'deleting last block via the keyboard shortcut', async ( {
@@ -97,23 +94,20 @@ test.describe( 'Block deletion', () => {
 		await pageUtils.pressKeyWithModifier( 'access', 'z' );
 
 		// Ensure the last block was removed.
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Paragraph block',
-				} )
-				.last()
-		).toContainText( 'Second' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
 
 		// Ensure the caret is in a correct position.
 		await page.keyboard.type( '| ← caret was here' );
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Paragraph block',
-				} )
-				.last()
-		).toContainText( 'Second| ← caret was here' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second| ← caret was here' },
+			},
+		] );
 	} );
 
 	test( 'deleting last block via backspace from an empty paragraph', async ( {
@@ -135,30 +129,27 @@ test.describe( 'Block deletion', () => {
 			name: 'core/paragraph',
 		} );
 		await expect(
-			editor.canvas.getByRole( 'document', { name: /Empty block/ } )
+			editor.canvas.getByRole( 'document', { name: /Empty block/i } )
 		).toBeFocused();
 
 		// Hit backspace to remove the empty paragraph.
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure the last block was removed.
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Paragraph block',
-				} )
-				.last()
-		).toContainText( 'Second' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
 
 		// Ensure the caret is in a correct position.
 		await page.keyboard.type( '| ← caret was here' );
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Paragraph block',
-				} )
-				.last()
-		).toContainText( 'Second| ← caret was here' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second| ← caret was here' },
+			},
+		] );
 	} );
 
 	test( 'deleting last selected block via backspace', async ( {
@@ -190,23 +181,20 @@ test.describe( 'Block deletion', () => {
 
 		// Hit backspace and ensure the Image block was removed.
 		await page.keyboard.press( 'Backspace' );
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Paragraph block',
-				} )
-				.last()
-		).toContainText( 'Second' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
 
 		// Ensure the caret is in a correct position.
 		await page.keyboard.type( '| ← caret was here' );
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Paragraph block',
-				} )
-				.last()
-		).toContainText( 'Second| ← caret was here' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second| ← caret was here' },
+			},
+		] );
 	} );
 
 	test( 'deleting last two selected blocks via backspace', async ( {
@@ -241,20 +229,19 @@ test.describe( 'Block deletion', () => {
 		// Select the last two paragraphs.
 		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
 		await expect(
-			editor.canvas.locator( 'p.is-multi-selected' )
+			editor.canvas.locator( '.is-multi-selected' )
 		).toHaveCount( 2 );
 
-		// Hit backspace and ensure the last two paragraphs were deleted.
+		// Hit backspace and ensure the last two paragraphs were deleted, and an
+		// empty block was created.
 		await page.keyboard.press( 'Backspace' );
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Paragraph block',
-				} )
-				.last()
-		).toContainText( 'Second' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+			{ name: 'core/paragraph', attributes: { content: '' } },
+		] );
 
-		// Ensure a new empty block was created and focused.
+		// Ensure that the newly created empty block is focused.
 		await expect.poll( editor.getBlocks ).toHaveLength( 3 );
 		await expect(
 			editor.canvas.getByRole( 'document', {
@@ -282,7 +269,7 @@ test.describe( 'Block deletion', () => {
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
 		await page
-			.getByRole( 'menuitem', { name: /Remove Paragraph/ } )
+			.getByRole( 'menuitem', { name: /Remove Paragraph/i } )
 			.click();
 
 		// Ensure an empty block was created and focused.
@@ -291,6 +278,7 @@ test.describe( 'Block deletion', () => {
 				name: /Empty block/i,
 			} )
 		).toBeFocused();
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	/**
@@ -309,12 +297,10 @@ test.describe( 'Block deletion', () => {
 		// by plugin editor settings filtering or user block preferences.
 		await page.waitForFunction( () => {
 			try {
-				// eslint-disable-next-line no-undef
-				const defaultBlockName = wp.data
+				const defaultBlockName = window.wp.data
 					.select( 'core/blocks' )
 					.getDefaultBlockName();
-				// eslint-disable-next-line no-undef
-				wp.data
+				window.wp.data
 					.dispatch( 'core/blocks' )
 					.removeBlockTypes( defaultBlockName );
 				return true;
@@ -323,27 +309,34 @@ test.describe( 'Block deletion', () => {
 			}
 		} );
 
-		// Add the Image block and remove it.
+		// Add the Image block.
 		await editor.insertBlock( { name: 'core/image' } );
 		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
 		} );
+
+		// Initially, the "Upload" button is focused, so we need to move focus
+		// up to the block wrapper.
 		await expect(
 			imageBlock.getByRole( 'button', { name: 'Upload' } )
 		).toBeFocused();
 		await page.keyboard.press( 'ArrowUp' );
 		await expect( imageBlock ).toBeFocused();
+
+		// Hit backspace to remove the Image block.
 		await page.keyboard.press( 'Backspace' );
 
-		// Verify that there's no blocks and only the block appender button is
-		// visible.
+		// Ensure that there's no blocks.
 		await expect.poll( editor.getBlocks ).toHaveLength( 0 );
 		await expect(
 			editor.canvas.getByRole( 'document', { name: /Empty block/i } )
 		).not.toBeVisible();
+
+		// Ensure that the block appender button is visible.
 		await expect(
 			editor.canvas.getByRole( 'button', { name: 'Add block' } )
 		).toBeVisible();
+
 		// TODO: There should be expectations around where focus is placed in
 		// this scenario. Currently, a focus loss occurs, which is unacceptable.
 	} );
