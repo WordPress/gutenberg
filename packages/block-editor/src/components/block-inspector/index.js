@@ -176,28 +176,33 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	const blockInspectorAnimationSettings = useSelect(
 		( select ) => {
 			if ( blockType ) {
-				const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-					select( blockEditorStore );
-
-				const _selectedBlockClientId = getSelectedBlockClientId();
-				const parentNavBlockClientId = getBlockParentsByBlockName(
-					_selectedBlockClientId,
-					'core/navigation',
-					true
-				)[ 0 ];
-
-				// If the selected block is not a child of a navigation block,
-				// and not a navigation block itselt don't animate.
-				if (
-					! parentNavBlockClientId &&
-					blockType.name !== 'core/navigation'
-				) {
-					return null;
-				}
-
+				// Get the global blockInspectorAnimationSettings.
 				const globalBlockInspectorAnimationSettings =
 					select( blockEditorStore ).getSettings()
 						.blockInspectorAnimation;
+
+				// Get the name of the block that will allow it's children to be animated.
+				const animationParent =
+					globalBlockInspectorAnimationSettings?.animationParent;
+
+				// Determin whether the animationParent block is a parent of the selected block.
+				const { getSelectedBlockClientId, getBlockParentsByBlockName } =
+					select( blockEditorStore );
+				const _selectedBlockClientId = getSelectedBlockClientId();
+				const animationParentBlockClientId = getBlockParentsByBlockName(
+					_selectedBlockClientId,
+					animationParent,
+					true
+				)[ 0 ];
+
+				// If the selected block is not a child of the animationParent block,
+				// and not an animationParent block itself, don't animate.
+				if (
+					! animationParentBlockClientId &&
+					blockType.name !== animationParent
+				) {
+					return null;
+				}
 
 				return globalBlockInspectorAnimationSettings?.[
 					blockType.name

@@ -172,6 +172,7 @@ export const SETTINGS_DEFAULTS = {
 
 	// This setting is `private` now with `lock` API.
 	blockInspectorAnimation: {
+		animationParent: 'core/navigation',
 		'core/navigation': { enterDirection: 'leftToRight' },
 		'core/navigation-submenu': { enterDirection: 'rightToLeft' },
 		'core/navigation-link': { enterDirection: 'rightToLeft' },
