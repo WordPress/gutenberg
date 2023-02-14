@@ -176,9 +176,29 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	const blockInspectorAnimationSettings = useSelect(
 		( select ) => {
 			if ( blockType ) {
+				const { getSelectedBlockClientId, getBlockParentsByBlockName } =
+					select( blockEditorStore );
+
+				const _selectedBlockClientId = getSelectedBlockClientId();
+				const parentNavBlockClientId = getBlockParentsByBlockName(
+					_selectedBlockClientId,
+					'core/navigation',
+					true
+				)[ 0 ];
+
+				// If the selected block is not a child of a navigation block,
+				// and not a navigation block itselt don't animate.
+				if (
+					! parentNavBlockClientId &&
+					blockType.name !== 'core/navigation'
+				) {
+					return null;
+				}
+
 				const globalBlockInspectorAnimationSettings =
 					select( blockEditorStore ).getSettings()
 						.blockInspectorAnimation;
+
 				return globalBlockInspectorAnimationSettings?.[
 					blockType.name
 				];
