@@ -44,7 +44,10 @@ export default function ShadowPanel( { name, variation = '' } ) {
 	const [ userShadow ] = useGlobalStyle( `${ prefix }shadow`, name, 'user' );
 	const hasShadow = () => !! userShadow;
 
-	const resetShadow = () => setShadow( undefined );
+	const resetShadow = useCallback(
+		() => setShadow( undefined ),
+		[ setShadow ]
+	);
 	const resetAll = useCallback(
 		() => resetShadow( undefined ),
 		[ resetShadow ]
