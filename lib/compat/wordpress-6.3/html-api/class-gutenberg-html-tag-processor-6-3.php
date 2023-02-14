@@ -1471,7 +1471,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	}
 
 	/**
-	 * Whether a bookmark with the given name exists.
+	 * Checks whether a bookmark with the given name exists.
 	 *
 	 * @since 6.3.0
 	 *
