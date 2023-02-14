@@ -47,7 +47,7 @@ In fact, any API that returns `ElementHandle` is [discouraged](https://playwrigh
 <details>
 	<summary><h3>Use accessible selectors</h3></summary>
 
-Use the [`getByRole`](https://playwright.dev/docs/locators#locate-by-role) to construct the query wherever possible. It enables us to write accessible queries without having to rely on internal implementations.
+Use [`getByRole`](https://playwright.dev/docs/locators#locate-by-role) to construct the query wherever possible. It enables us to write accessible queries without having to rely on internal implementations.
 
 ```js
 // Select a button which includes the accessible name "Hello World" (case-insensitive).
