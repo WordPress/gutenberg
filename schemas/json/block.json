@@ -304,6 +304,17 @@
 					"description": "When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to false.",
 					"default": true
 				},
+				"dimensions": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values, if the theme declares support.\n\nWhen the block declares support for a specific dimensions property, the attributes definition is extended to include the style attribute.",
+					"properties": {
+						"minHeight": {
+							"type": "boolean",
+							"description": "Allow blocks to define a minimum height value.",
+							"default": false
+						}
+					}
+				},
 				"html": {
 					"type": "boolean",
 					"description": "By default, a block’s markup can be edited individually. To disable this behavior, set html to false.",
@@ -328,6 +339,17 @@
 					"type": "boolean",
 					"description": "A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block 'Options' dropdown by default. To disable this behavior, set lock to false.",
 					"default": true
+				},
+				"position": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values, if the theme declares support.\n\nWhen the block declares support for a specific position property, the attributes definition is extended to include the style attribute.",
+					"properties": {
+						"sticky": {
+							"type": "boolean",
+							"description": "Allow blocks to stick to their immediate parent when scrolling the page.",
+							"default": false
+						}
+					}
 				},
 				"spacing": {
 					"type": "object",

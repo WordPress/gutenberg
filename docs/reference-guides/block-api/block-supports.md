@@ -466,6 +466,39 @@ supports: {
 }
 ```
 
+## dimensions
+
+_**Note:** Since WordPress 6.2._
+
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `minHeight`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+
+```js
+supports: {
+    dimensions: {
+        minHeight: true // Enable min height control.
+    }
+}
+```
+
+When the block declares support for a specific dimensions property, the attributes definition is extended to include the `style` attribute.
+
+- `style`: attribute of `object` type with no default assigned. This is added when `minHeight` support is declared. It stores the custom values set by the user, e.g.:
+
+```js
+attributes: {
+    style: {
+        dimensions: {
+            minHeight: "50vh"
+        }
+    }
+}
+```
+
 ## html
 
 -   Type: `boolean`
@@ -533,6 +566,42 @@ A block may want to disable the ability to toggle the lock state. It can be lock
 supports: {
 	// Remove support for locking UI.
 	lock: false
+}
+```
+
+## position
+
+_**Note:** Since WordPress 6.2._
+
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `sticky`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+
+Note that sticky position controls are currently only available for blocks set at the root level of the document. Setting a block to the `sticky` position will stick the block to its most immediate parent when the user scrolls the page.
+
+```js
+supports: {
+    position: {
+        sticky: true // Enable selecting sticky position.
+    }
+}
+```
+
+When the block declares support for a specific position property, the attributes definition is extended to include the `style` attribute.
+
+- `style`: attribute of `object` type with no default assigned. This is added when `sticky` support is declared. It stores the custom values set by the user, e.g.:
+
+```js
+attributes: {
+    style: {
+        position: {
+            type: "sticky",
+            top: "0px"
+        }
+    }
 }
 ```
 
