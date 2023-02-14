@@ -208,12 +208,12 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 		performanceTestDirectory,
 		`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
 	);
-	fs.mkdirSync( './__test-results', { recursive: true } );
+	fs.mkdirSync( './__test-results/traces', { recursive: true } );
 	fs.copyFileSync( resultsFile, `./__test-results/${ runKey }.results.json` );
 	await runShellScript(
 		`cp -R ${ path.join(
 			performanceTestDirectory,
-			'packages/e2e-tests/specs/performance/traces',
+			'packages/e2e-tests/specs/performance/traces'
 		) } ./__test-results/traces`,
 		'/home/runner'
 	);
