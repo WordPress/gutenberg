@@ -2,9 +2,7 @@
  * WordPress dependencies
  */
 import { memo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 import { __experimentalNavigatorProvider as NavigatorProvider } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -37,16 +35,6 @@ function SidebarScreens() {
 }
 
 function Sidebar() {
-	const { isDirty } = useSelect( ( select ) => {
-		const { __experimentalGetDirtyEntityRecords } = select( coreStore );
-		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-		// The currently selected entity to display.
-		// Typically template or template part in the site editor.
-		return {
-			isDirty: dirtyEntityRecords.length > 0,
-		};
-	}, [] );
-
 	return (
 		<>
 			<NavigatorProvider
@@ -55,11 +43,10 @@ function Sidebar() {
 			>
 				<SidebarScreens />
 			</NavigatorProvider>
-			{ isDirty && (
-				<div className="edit-site-sidebar__footer">
-					<SaveButton />
-				</div>
-			) }
+
+			<div className="edit-site-sidebar__footer">
+				<SaveButton />
+			</div>
 		</>
 	);
 }
