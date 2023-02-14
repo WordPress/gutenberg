@@ -174,6 +174,12 @@ function Navigation( {
 		createNavigationMenuStatus,
 		createNavigationMenuError,
 		createNavigationMenuPost,
+		createNavigationMenuIsError,
+		createNavigationMenuIsSuccess,
+		handleUpdateMenu,
+		hideNavigationMenuStatusNotice,
+		isCreatingNavigationMenu,
+		showNavigationMenuStatusNotice,
 	] );
 
 	const {
