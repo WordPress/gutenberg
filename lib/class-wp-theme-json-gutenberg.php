@@ -3449,7 +3449,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return object The custom selectors set by the block.
 	 */
 	protected static function get_block_selectors( $block_type, $root_selector ) {
-		if ( isset( $block_type->selectors ) ) {
+		if ( ! empty( $block_type->selectors ) ) {
 			return $block_type->selectors;
 		}
 

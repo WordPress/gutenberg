@@ -272,7 +272,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			return null;
 		}
 
-		$has_selectors = isset( $block_type->selectors ) && ! empty( $block_type->selectors );
+		$has_selectors = ! empty( $block_type->selectors );
 
 		// Duotone (No fallback selectors for Duotone).
 		if ( 'color.duotone' === $target || array( 'color', 'duotone' ) === $target ) {
