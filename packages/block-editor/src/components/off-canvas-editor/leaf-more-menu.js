@@ -29,8 +29,9 @@ function AddSubmenuItem( { block, onClose } ) {
 		useDispatch( blockEditorStore );
 
 	const clientId = block.clientId;
-	const isDisabled =
-		! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes( block.name );
+	const isDisabled = ! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes(
+		block.name
+	);
 	return (
 		<MenuItem
 			icon={ addSubmenu }
