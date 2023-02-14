@@ -8,7 +8,6 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import ListViewBlock from './block';
-import ListViewLeafPlaceholder from './leaf-placeholder';
 import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -156,8 +155,6 @@ function ListViewBranch( props ) {
 
 				const isDragged = !! draggedClientIds?.includes( clientId );
 
-				const showBlock = isDragged || blockInView;
-
 				// Make updates to the selected or dragged blocks synchronous,
 				// but asynchronous for any other block.
 				const isSelected = isClientIdSelected(
@@ -166,6 +163,7 @@ function ListViewBranch( props ) {
 				);
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBlocks );
+				const showBlock = isDragged || blockInView || isSelected;
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (
@@ -188,10 +186,9 @@ function ListViewBranch( props ) {
 							/>
 						) }
 						{ ! showBlock && (
-							<ListViewLeafPlaceholder
-								isSelected={ isSelected }
-								selectedClientIds={ selectedClientIds }
-							/>
+							<tr>
+								<td className="block-editor-list-view-placeholder" />
+							</tr>
 						) }
 						{ hasNestedBlocks && shouldExpand && ! isDragged && (
 							<ListViewBranch
