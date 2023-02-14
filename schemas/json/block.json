@@ -430,7 +430,7 @@
 		},
 		"selectors": {
 			"type": "object",
-			"description": "Provides custom CSS selectors and mappings for the block. Selectors may be set for the block itself or per-feature e.g. typography.",
+			"description": "Provides custom CSS selectors and mappings for the block. Selectors may be set for the block itself or per-feature e.g. typography. Custom selectors per feature or sub-feature, allow different block styles to be applied to different elements within the block.",
 			"properties": {
 				"root": {
 					"type": "string",
