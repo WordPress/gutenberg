@@ -268,7 +268,7 @@ test.describe( 'Heading', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Heading',
-					textAlign: 'center',
+					align: 'center',
 				},
 			},
 		] );
