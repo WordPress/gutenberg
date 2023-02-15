@@ -107,8 +107,9 @@ export function TypographyPanel( {
 	name,
 	attributes,
 	setAttributes,
+	__unstableParentLayout,
 } ) {
-	const settings = useBlockSettings( name );
+	const settings = useBlockSettings( name, __unstableParentLayout );
 	const isEnabled = useHasTypographyPanel( settings );
 	const value = useMemo( () => {
 		return attributesToStyle( {

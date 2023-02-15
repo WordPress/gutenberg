@@ -12,11 +12,12 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalView as View,
 } from '@wordpress/components';
-import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
+import { Icon, layout, positionCenter, stretchWide } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,6 +25,8 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 import { getValueFromVariable } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
+import ChildLayoutControl from '../child-layout-control';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -34,6 +37,7 @@ export function useHasDimensionsPanel( settings ) {
 	const hasMargin = useHasMargin( settings );
 	const hasGap = useHasGap( settings );
 	const hasMinHeight = useHasMinHeight( settings );
+	const hasChildLayout = useHasChildLayout( settings );
 
 	return (
 		hasContentSize ||
@@ -41,7 +45,8 @@ export function useHasDimensionsPanel( settings ) {
 		hasPadding ||
 		hasMargin ||
 		hasGap ||
-		hasMinHeight
+		hasMinHeight ||
+		hasChildLayout
 	);
 }
 
@@ -67,6 +72,20 @@ function useHasGap( settings ) {
 
 function useHasMinHeight( settings ) {
 	return settings?.dimensions?.minHeight;
+}
+
+function useHasChildLayout( settings ) {
+	const {
+		type: parentLayoutType = 'default',
+		default: { type: defaultParentLayoutType = 'default' } = {},
+		allowSizingOnChildren = false,
+	} = settings?.parentLayout;
+
+	const support =
+		( defaultParentLayoutType === 'flex' || parentLayoutType === 'flex' ) &&
+		allowSizingOnChildren;
+
+	return !! settings?.layout && support;
 }
 
 function useHasSpacingPresets( settings ) {
@@ -252,7 +271,7 @@ export default function DimensionsPanel( {
 	const hasMarginValue = () =>
 		!! value?.spacing?.margin &&
 		Object.keys( value?.spacing?.margin ).length;
-	const resetMarginValue = () => setPaddingValues( undefined );
+	const resetMarginValue = () => setMarginValues( undefined );
 
 	// Block Gap
 	const showGapControl = useHasGap( settings );
@@ -301,17 +320,44 @@ export default function DimensionsPanel( {
 			},
 		} );
 	};
-	const resetMinHeightValue = () => setMinHeightValue( undefined );
+	const resetMinHeightValue = () => {
+		setMinHeightValue( undefined );
+	};
 	const hasMinHeightValue = () => !! value?.dimensions?.minHeight;
+
+	// Child Layout
+	const showChildLayoutControl = useHasChildLayout( settings );
+	const childLayout = inheritedValue?.layout;
+	const { orientation = 'horizontal' } = settings?.parentLayout;
+	const childLayoutOrientationLabel =
+		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
+	const setChildLayout = ( newChildLayout ) => {
+		onChange( {
+			...value,
+			layout: {
+				...layout,
+				...newChildLayout,
+			},
+		} );
+	};
+	const resetChildLayoutValue = () => {
+		setChildLayout( {
+			selfStretch: undefined,
+			flexSize: undefined,
+		} );
+	};
+	const hasChildLayoutValue = () => !! value?.layout;
 
 	const resetAll = () => {
 		onChange( {
 			...value,
-			layout: {
+			layout: cleanEmptyObject( {
 				...value?.layout,
 				contentSize: undefined,
 				wideSize: undefined,
-			},
+				selfStretch: undefined,
+				flexSize: undefined,
+			} ),
 			spacing: {
 				...value?.spacing,
 				padding: undefined,
@@ -514,6 +560,23 @@ export default function DimensionsPanel( {
 						onChange={ setMinHeightValue }
 					/>
 				</ToolsPanelItem>
+			) }
+			{ showChildLayoutControl && (
+				<VStack
+					as={ ToolsPanelItem }
+					spacing={ 2 }
+					hasValue={ hasChildLayoutValue }
+					label={ childLayoutOrientationLabel }
+					onDeselect={ resetChildLayoutValue }
+					isShownByDefault={ defaultControls.childLayout }
+					panelId={ panelId }
+				>
+					<ChildLayoutControl
+						value={ childLayout }
+						onChange={ setChildLayout }
+						parentLayout={ settings?.parentLayout }
+					/>
+				</VStack>
 			) }
 		</Wrapper>
 	);

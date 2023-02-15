@@ -185,7 +185,7 @@ export function shouldSkipSerialization( blockType, featureSet, feature ) {
 	return skipSerialization;
 }
 
-export function useBlockSettings( name ) {
+export function useBlockSettings( name, parentLayout ) {
 	const fontFamilies = useSetting( 'typography.fontFamilies' );
 	const fontSizes = useSetting( 'typography.fontSizes' );
 	const customFontSize = useSetting( 'typography.customFontSize' );
@@ -201,6 +201,7 @@ export function useBlockSettings( name ) {
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 	const units = useSetting( 'spacing.units' );
 	const minHeight = useSetting( 'dimensions.minHeight' );
+	const layout = useSetting( 'layout' );
 
 	const rawSettings = useMemo( () => {
 		return {
@@ -231,6 +232,8 @@ export function useBlockSettings( name ) {
 			dimensions: {
 				minHeight,
 			},
+			layout,
+			parentLayout,
 		};
 	}, [
 		fontFamilies,
@@ -248,6 +251,8 @@ export function useBlockSettings( name ) {
 		spacingSizes,
 		units,
 		minHeight,
+		layout,
+		parentLayout,
 	] );
 
 	return useSettingsForBlockElement( rawSettings, name );

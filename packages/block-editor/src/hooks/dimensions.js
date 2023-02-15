@@ -16,14 +16,6 @@ import {
 } from '../components/global-styles';
 /*import { MarginVisualizer } from './margin';
 import { PaddingVisualizer } from './padding';
-import {
-	ChildLayoutEdit,
-	hasChildLayoutSupport,
-	hasChildLayoutValue,
-	resetChildLayout,
-	useIsChildLayoutDisabled,
-	childLayoutOrientation,
-} from './child-layout';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 */
@@ -59,8 +51,14 @@ function DimensionsInspectorControl( { children } ) {
 }
 
 export function DimensionsPanel( props ) {
-	const { clientId, name, attributes, setAttributes } = props;
-	const settings = useBlockSettings( name );
+	const {
+		clientId,
+		name,
+		attributes,
+		setAttributes,
+		__unstableParentLayout,
+	} = props;
+	const settings = useBlockSettings( name, __unstableParentLayout );
 	const isEnabled = useHasDimensionsPanel( settings );
 	const value = attributes.style;
 	//const paddingMouseOver = useVisualizerMouseOver();
@@ -88,8 +86,6 @@ export function DimensionsPanel( props ) {
 		...defaultSpacingControls,
 	};
 
-	// const { __unstableParentLayout: parentLayout } = props;
-
 	return (
 		<>
 			<StylesDimensionsPanel
@@ -102,23 +98,6 @@ export function DimensionsPanel( props ) {
 				defaultControls={ defaultControls }
 			/>
 			{ /*
-			{ ! isChildLayoutDisabled && (
-					<VStack
-						as={ ToolsPanelItem }
-						spacing={ 2 }
-						hasValue={ () => hasChildLayoutValue( props ) }
-						label={ childLayoutOrientation( parentLayout ) }
-						onDeselect={ () => resetChildLayout( props ) }
-						resetAllFilter={ createResetAllFilter(
-							'selfStretch',
-							'layout'
-						) }
-						isShownByDefault={ false }
-						panelId={ props.clientId }
-					>
-						<ChildLayoutEdit { ...props } />
-					</VStack>
-				) }
 			{ ! isPaddingDisabled && (
 				<PaddingVisualizer
 					forceShow={ paddingMouseOver.isMouseOver }
