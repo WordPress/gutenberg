@@ -98,6 +98,7 @@ test.describe(
 
 		test( 'default to the only existing classic menu if there are no block menus', async ( {
 			admin,
+			page,
 			editor,
 			requestUtils,
 		} ) => {
