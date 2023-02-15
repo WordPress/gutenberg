@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { addSubmenu, moreVertical } from '@wordpress/icons';
+import {
+	addSubmenu,
+	chevronUp,
+	chevronDown,
+	moreVertical,
+} from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -111,6 +116,7 @@ export default function LeafMoreMenu( props ) {
 				<MenuGroup>
 					<AddSubmenuItem block={ block } onClose={ onClose } />
 					<MenuItem
+						icon={ chevronUp }
 						onClick={ () => {
 							moveBlocksUp( [ clientId ], rootClientId );
 							onClose();
@@ -119,6 +125,7 @@ export default function LeafMoreMenu( props ) {
 						{ __( 'Move up' ) }
 					</MenuItem>
 					<MenuItem
+						icon={ chevronDown }
 						onClick={ () => {
 							moveBlocksDown( [ clientId ], rootClientId );
 							onClose();
