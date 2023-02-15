@@ -246,47 +246,20 @@ export function overrideSettingsWithSupports( settings, supports ) {
 		};
 	}
 
-	if ( ! supports.includes( 'lineHeight' ) ) {
-		updatedSettings.typography = {
-			...updatedSettings.typography,
-			lineHeight: false,
-		};
-	}
-
-	if ( ! supports.includes( 'fontStyle' ) ) {
-		updatedSettings.typography = {
-			...updatedSettings.typography,
-			fontStyle: false,
-		};
-	}
-
-	if ( ! supports.includes( 'fontWeight' ) ) {
-		updatedSettings.typography = {
-			...updatedSettings.typography,
-			fontWeight: false,
-		};
-	}
-
-	if ( ! supports.includes( 'letterSpacing' ) ) {
-		updatedSettings.typography = {
-			...updatedSettings.typography,
-			letterSpacing: false,
-		};
-	}
-
-	if ( ! supports.includes( 'textTransform' ) ) {
-		updatedSettings.typography = {
-			...updatedSettings.typography,
-			textTransform: false,
-		};
-	}
-
-	if ( ! supports.includes( 'textDecoration' ) ) {
-		updatedSettings.typography = {
-			...updatedSettings.typography,
-			textDecoration: false,
-		};
-	}
+	[
+		'lineHeight',
+		'fontStyle',
+		'fontWeight',
+		'letterSpacing',
+		'textTransform',
+	].forEach( ( key ) => {
+		if ( ! supports.includes( key ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				[ key ]: false,
+			};
+		}
+	} );
 
 	return updatedSettings;
 }
