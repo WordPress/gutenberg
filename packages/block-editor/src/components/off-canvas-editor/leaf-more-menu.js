@@ -113,35 +113,39 @@ export default function LeafMoreMenu( props ) {
 			{ ...props }
 		>
 			{ ( { onClose } ) => (
-				<MenuGroup>
-					<AddSubmenuItem block={ block } onClose={ onClose } />
-					<MenuItem
-						icon={ chevronUp }
-						onClick={ () => {
-							moveBlocksUp( [ clientId ], rootClientId );
-							onClose();
-						} }
-					>
-						{ __( 'Move up' ) }
-					</MenuItem>
-					<MenuItem
-						icon={ chevronDown }
-						onClick={ () => {
-							moveBlocksDown( [ clientId ], rootClientId );
-							onClose();
-						} }
-					>
-						{ __( 'Move down' ) }
-					</MenuItem>
-					<MenuItem
-						onClick={ () => {
-							removeBlocks( [ clientId ], false );
-							onClose();
-						} }
-					>
-						{ removeLabel }
-					</MenuItem>
-				</MenuGroup>
+				<>
+					<MenuGroup>
+						<MenuItem
+							icon={ chevronUp }
+							onClick={ () => {
+								moveBlocksUp( [ clientId ], rootClientId );
+								onClose();
+							} }
+						>
+							{ __( 'Move up' ) }
+						</MenuItem>
+						<MenuItem
+							icon={ chevronDown }
+							onClick={ () => {
+								moveBlocksDown( [ clientId ], rootClientId );
+								onClose();
+							} }
+						>
+							{ __( 'Move down' ) }
+						</MenuItem>
+						<AddSubmenuItem block={ block } onClose={ onClose } />
+					</MenuGroup>
+					<MenuGroup>
+						<MenuItem
+							onClick={ () => {
+								removeBlocks( [ clientId ], false );
+								onClose();
+							} }
+						>
+							{ removeLabel }
+						</MenuItem>
+					</MenuGroup>
+				</>
 			) }
 		</DropdownMenu>
 	);
