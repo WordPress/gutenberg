@@ -49,6 +49,13 @@ const myGradientPicker = () => {
 
 The component accepts the following props:
 
+### className
+
+The class name added to the wrapper.
+
+-   Type: `string`
+-   Required: No
+
 ### value
 
 The current value of the gradient. Pass a css gradient like `linear-gradient(90deg, rgb(6, 147, 227) 0%, rgb(155, 81, 224) 100%)`. Optionally pass in a `null` value to specify no gradient is currently selected.
