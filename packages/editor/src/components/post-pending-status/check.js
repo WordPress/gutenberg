@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -31,11 +26,7 @@ export default compose(
 		const { isCurrentPostPublished, getCurrentPostType, getCurrentPost } =
 			select( editorStore );
 		return {
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
+			hasPublishAction: getCurrentPost()._links?.[ 'wp:action-publish' ],
 			isPublished: isCurrentPostPublished(),
 			postType: getCurrentPostType(),
 		};

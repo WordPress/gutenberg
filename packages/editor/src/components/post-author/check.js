@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -21,11 +16,7 @@ export default function PostAuthorCheck( { children } ) {
 		const post = select( editorStore ).getCurrentPost();
 		const authors = select( coreStore ).getUsers( AUTHORS_QUERY );
 		return {
-			hasAssignAuthorAction: get(
-				post,
-				[ '_links', 'wp:action-assign-author' ],
-				false
-			),
+			hasAssignAuthorAction: post._links?.[ 'wp:action-assign-author' ],
 			hasAuthors: authors?.length >= 1,
 		};
 	}, [] );

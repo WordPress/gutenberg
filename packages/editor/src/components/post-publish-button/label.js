@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -64,11 +59,7 @@ export default compose( [
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isPublishing: isPublishingPost(),
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
+			hasPublishAction: getCurrentPost()._links?.[ 'wp:action-publish' ],
 			postType: getCurrentPostType(),
 			isAutosaving: isAutosavingPost(),
 		};
