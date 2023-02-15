@@ -8,7 +8,6 @@ import userEvent from '@testing-library/user-event';
  * Internal dependencies
  */
 import { PanelBody } from '../body';
-import type { PanelBodyProps } from '../types';
 
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
@@ -51,7 +50,7 @@ describe( 'PanelBody', () => {
 		it( 'should call the children function, if specified', () => {
 			const { rerender } = render(
 				<PanelBody opened>
-					{ ( { opened }: PanelBodyProps ) => (
+					{ ( { opened } ) => (
 						<div hidden={ opened } data-testid="inner-content">
 							Content
 						</div>
@@ -67,7 +66,7 @@ describe( 'PanelBody', () => {
 
 			rerender(
 				<PanelBody opened={ false }>
-					{ ( { opened }: PanelBodyProps ) => (
+					{ ( { opened } ) => (
 						<div hidden={ opened } data-testid="inner-content">
 							Content
 						</div>

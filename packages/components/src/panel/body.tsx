@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
-import type { ForwardedRef } from 'react';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
 /**
@@ -24,7 +23,7 @@ const noop = () => {};
 
 export function UnforwardedPanelBody(
 	props: PanelBodyProps,
-	ref: ForwardedRef< HTMLDivElement >
+	ref: React.ForwardedRef< HTMLDivElement >
 ) {
 	const {
 		buttonProps = {},
@@ -58,7 +57,7 @@ export function UnforwardedPanelBody(
 	};
 
 	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value.
-	const scrollAfterOpenRef = useRef< boolean | null >( null );
+	const scrollAfterOpenRef = useRef< boolean | undefined >( undefined );
 	scrollAfterOpenRef.current = scrollAfterOpen;
 	// Runs after initial render.
 	useUpdateEffect( () => {
@@ -91,10 +90,10 @@ export function UnforwardedPanelBody(
 				isOpened={ Boolean( isOpened ) }
 				onClick={ handleOnToggle }
 				title={ title }
-				buttonProps={ buttonProps }
+				{ ...buttonProps }
 			/>
 			{ typeof children === 'function'
-				? children( { opened: isOpened } )
+				? children( { opened: Boolean( isOpened ) } )
 				: isOpened && children }
 		</div>
 	);
@@ -106,10 +105,9 @@ const PanelBodyTitle = forwardRef(
 			isOpened,
 			icon,
 			title,
-			buttonProps,
-			onClick,
+			...props
 		}: WordPressComponentProps< PanelBodyTitleProps, 'button' >,
-		ref: ForwardedRef< any >
+		ref: React.ForwardedRef< any >
 	) => {
 		if ( ! title ) return null;
 
@@ -119,8 +117,7 @@ const PanelBodyTitle = forwardRef(
 					className="components-panel__body-toggle"
 					aria-expanded={ isOpened }
 					ref={ ref }
-					{ ...{ onClick } }
-					{ ...buttonProps }
+					{ ...props }
 				>
 					{ /*
 					Firefox + NVDA don't announce aria-expanded because the browser

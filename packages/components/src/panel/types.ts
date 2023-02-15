@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-import type { ButtonProps } from '../button/types';
+import type { ButtonAsButtonProps } from '../button/types';
+import type { WordPressComponentProps } from '../ui/context';
 
 export type PanelProps = {
 	/**
@@ -44,16 +45,24 @@ export type PanelRowProps = {
 
 export type PanelBodyProps = {
 	/**
-	 * Props that are passed to the Button component in the PanelBodyTitle within the panel body.
+	 * Props that are passed to the `Button` component in title within the
+	 * `PanelBody`.
 	 *
 	 * @default {}
 	 */
-	buttonProps?: ButtonProps;
+	buttonProps?: WordPressComponentProps<
+		Omit< ButtonAsButtonProps, 'icon' >,
+		'button',
+		false
+	>;
 	/**
-	 * The content to display within the panel body.
-	 *  If the children is a Function, it will be called with an object with the opened property and return its value.
+	 * The content to display in the `PanelBody`.If a function is provided for
+	 * this prop, it will receive an object with the `opened` prop as an argument.
 	 */
-	children?: React.ReactNode | ( ( {} ) => React.ReactNode );
+	children?:
+		| React.ReactNode
+		| ( ( props: { opened: boolean } ) => React.ReactNode );
+
 	/**
 	 * The CSS class to apply to the wrapper element.
 	 */
@@ -69,7 +78,7 @@ export type PanelBodyProps = {
 	/**
 	 * A function that is called when the user clicks on the PanelBody title after the open state is changed.
 	 *
-	 * @default true
+	 * @default noop
 	 */
 	onToggle?: ( next: boolean ) => void;
 	/**
@@ -90,13 +99,7 @@ export type PanelBodyProps = {
 	scrollAfterOpen?: boolean;
 };
 
-export type PanelBodyTitleProps = {
-	/**
-	 * Props that are passed to the Button component in the PanelBodyTitle within the panel body.
-	 *
-	 * @default {}
-	 */
-	buttonProps?: ButtonProps;
+export type PanelBodyTitleProps = Omit< ButtonAsButtonProps, 'icon' > & {
 	/**
 	 * An icon to be shown next to the PanelBody title.
 	 */
@@ -106,8 +109,7 @@ export type PanelBodyTitleProps = {
 	 */
 	isOpened?: boolean;
 	/**
-	 * A callback invoked when 'PanelBodyTitle' is clicked. It is used to
-	 * toggle the body opened or closed.
+	 * The title text.
 	 */
-	onClick: ( event: React.MouseEvent ) => void;
+	title?: string;
 };
