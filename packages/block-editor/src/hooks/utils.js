@@ -220,10 +220,12 @@ export function useBlockSettings( name ) {
 				letterSpacing,
 			},
 			spacing: {
+				spacingSizes: {
+					custom: spacingSizes,
+				},
 				padding,
 				margin,
 				blockGap,
-				spacingSizes,
 				units,
 			},
 			dimensions: {
