@@ -11,15 +11,12 @@
  * Core class used to submit forms (using the form block) via the REST API.
  *
  * @see   WP_REST_Controller
- *
- * @since 6.2.0
  */
 class Gutenberg_REST_Block_Form_Submit_Controller extends WP_REST_Controller {
 
 	/**
 	 * The namespace of this controller's route.
 	 *
-	 * @since 6.2.0
 	 * @var string
 	 */
 	protected $namespace = 'wp/v2';
@@ -27,7 +24,6 @@ class Gutenberg_REST_Block_Form_Submit_Controller extends WP_REST_Controller {
 	/**
 	 * The base of this controller's route.
 	 *
-	 * @since 6.2.0
 	 * @var string
 	 */
 	protected $rest_base = 'block-form-submit';
@@ -36,8 +32,6 @@ class Gutenberg_REST_Block_Form_Submit_Controller extends WP_REST_Controller {
 	 * Registers the routes for the objects of the controller.
 	 *
 	 * @see   register_rest_route()
-	 *
-	 * @since 6.2.0
 	 */
 	public function register_routes() {
 		register_rest_route(
@@ -56,8 +50,6 @@ class Gutenberg_REST_Block_Form_Submit_Controller extends WP_REST_Controller {
 	/**
 	 * Checks whether a given request has permission to read block patterns.
 	 *
-	 * @since 6.2.0
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_Error|bool True if the request has read access, WP_Error object otherwise.
@@ -69,8 +61,6 @@ class Gutenberg_REST_Block_Form_Submit_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves all block pattern categories.
 	 *
-	 * @since 6.2.0
-	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 */
 	public function form_submit( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
@@ -78,8 +68,6 @@ class Gutenberg_REST_Block_Form_Submit_Controller extends WP_REST_Controller {
 
 		/**
 		 * Allow short-circuiting the form submission.
-		 *
-		 * @since 6.2.0
 		 *
 		 * @param array $params The form parameters.
 		 *
