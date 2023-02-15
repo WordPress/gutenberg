@@ -16,8 +16,8 @@ export interface NavigationMenu {
 /**
  * Create a classic menu
  *
- * @param  name Menu name.
- * @return {string} Menu content.
+ * @param name Menu name.
+ * @return Menu content.
  */
 export async function createClassicMenu( this: RequestUtils, name: string ) {
 	const menuItems = [
