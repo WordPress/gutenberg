@@ -117,6 +117,7 @@ export {
 	useBlockSelectionClearer as __unstableUseBlockSelectionClearer,
 } from './block-selection-clearer';
 export { default as BlockSettingsMenu } from './block-settings-menu';
+export { default as BlockSettingsDropdown } from './block-settings-menu/block-settings-dropdown.js';
 export { default as BlockSettingsMenuControls } from './block-settings-menu-controls';
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';

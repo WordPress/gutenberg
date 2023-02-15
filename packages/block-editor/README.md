@@ -205,6 +205,10 @@ _Returns_
 
 Undocumented declaration.
 
+### BlockSettingsDropdown
+
+Undocumented declaration.
+
 ### BlockSettingsMenu
 
 Undocumented declaration.

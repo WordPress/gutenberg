@@ -56,6 +56,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {boolean} props.showBlockMovers Flag to enable block movers
  * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
  * @param {boolean} props.showAppender    Flag to show or hide the block appender.
+ * @param {Object}  props.MoreMenuComponent Optional more menu substitution.
  * @param {Object}  ref                   Forwarded ref
  */
 function ListViewComponent(
@@ -65,6 +66,7 @@ function ListViewComponent(
 		showBlockMovers = false,
 		isExpanded = false,
 		showAppender = false,
+		MoreMenuComponent,
 	},
 	ref
 ) {
@@ -177,8 +179,16 @@ function ListViewComponent(
 			expandedState,
 			expand,
 			collapse,
+			MoreMenuComponent,
 		} ),
-		[ isMounted.current, draggedClientIds, expandedState, expand, collapse ]
+		[
+			isMounted.current,
+			draggedClientIds,
+			expandedState,
+			expand,
+			collapse,
+			MoreMenuComponent,
+		]
 	);
 
 	// If there are no blocks to show, do not render the list view.

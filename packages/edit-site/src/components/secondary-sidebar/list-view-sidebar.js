@@ -2,6 +2,10 @@
  * WordPress dependencies
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	__experimentalListView as ListView,
+	BlockSettingsDropdown,
+} from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import {
 	useFocusOnMount,
@@ -60,7 +64,7 @@ export default function ListViewSidebar() {
 					focusOnMountRef,
 				] ) }
 			>
-				<PrivateListView />
+				<PrivateListView MoreMenuComponent={ BlockSettingsDropdown } />
 			</div>
 		</div>
 	);
