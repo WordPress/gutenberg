@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.4.0 (2023-02-15)
+
 ### Bug Fix
 
 -   `LinkControl`: fix scrollbar displayed on toggle link settings ([#47986](https://github.com/WordPress/gutenberg/pull/47986)).
