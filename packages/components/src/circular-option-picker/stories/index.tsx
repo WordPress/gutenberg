@@ -5,11 +5,16 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import CircularOptionPicker from '..';
+
+const CircularOptionPickerStoryContext = createContext< {
+	currentColor?: string;
+	setCurrentColor?: ( v: string | undefined ) => void;
+} >( {} );
 
 const meta: ComponentMeta< typeof CircularOptionPicker > = {
 	title: 'Components/CircularOptionPicker',
@@ -24,6 +29,23 @@ const meta: ComponentMeta< typeof CircularOptionPicker > = {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},
+	decorators: [
+		// Share current color state between main component, `actions` and `options`
+		( Story ) => {
+			const [ currentColor, setCurrentColor ] = useState< string >();
+
+			return (
+				<CircularOptionPickerStoryContext.Provider
+					value={ {
+						currentColor,
+						setCurrentColor,
+					} }
+				>
+					<Story />
+				</CircularOptionPickerStoryContext.Provider>
+			);
+		},
+	],
 };
 export default meta;
 
@@ -33,14 +55,12 @@ const colors = [
 	{ color: '#0af', name: 'Blue' },
 ];
 
-// TODO: ask if there's a more elegant way to access a state handler from a second story
-let resetColor: React.Dispatch< React.SetStateAction< number | undefined > >;
+const DefaultOptions = () => {
+	const { currentColor, setCurrentColor } = useContext(
+		CircularOptionPickerStoryContext
+	);
 
-const Template: ComponentStory< typeof CircularOptionPicker > = ( props ) => {
-	const [ currentColor, setCurrentColor ] = useState< number >();
-	resetColor = setCurrentColor;
-
-	const colorOptions = (
+	return (
 		<>
 			{ colors.map( ( { color, name }, index ) => {
 				return (
@@ -48,34 +68,47 @@ const Template: ComponentStory< typeof CircularOptionPicker > = ( props ) => {
 						key={ `${ color }-${ index }` }
 						tooltipText={ name }
 						style={ { backgroundColor: color, color } }
-						isSelected={ index === currentColor }
-						onClick={ () => setCurrentColor( index ) }
+						isSelected={ color === currentColor }
+						onClick={ () => {
+							setCurrentColor?.( color );
+						} }
 						aria-label={ name }
 					/>
 				);
 			} ) }
 		</>
 	);
-	return <CircularOptionPicker { ...props } options={ colorOptions } />;
 };
 
-export const Default = Template.bind( {} );
-Default.args = { actions: <></> };
+const DefaultActions = () => {
+	const { setCurrentColor } = useContext( CircularOptionPickerStoryContext );
 
-export const WithButtonAction = Template.bind( {} );
-WithButtonAction.args = {
-	actions: (
+	return (
 		<CircularOptionPicker.ButtonAction
-			onClick={ () => resetColor( undefined ) }
+			onClick={ () => setCurrentColor?.( undefined ) }
 		>
 			{ 'Clear' }
 		</CircularOptionPicker.ButtonAction>
-	),
+	);
+};
+
+const Template: ComponentStory< typeof CircularOptionPicker > = ( props ) => (
+	<CircularOptionPicker { ...props } />
+);
+
+export const Default = Template.bind( {} );
+Default.args = { actions: <></>, options: <DefaultOptions /> };
+
+export const WithButtonAction = Template.bind( {} );
+WithButtonAction.args = {
+	...Default.args,
+	actions: <DefaultActions />,
 };
 WithButtonAction.storyName = 'With ButtonAction';
 
 export const WithDropdownLinkAction = Template.bind( {} );
 WithDropdownLinkAction.args = {
+	...Default.args,
 	actions: (
 		<CircularOptionPicker.DropdownLinkAction
 			dropdownProps={ {
