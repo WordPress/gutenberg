@@ -16,8 +16,8 @@ export interface NavigationMenu {
 /**
  * Create a classic menu
  *
- * @param {string} name Menu name.
- * @return {string} Menu content.
+ * @param name Menu name.
+ * @return Menu content.
  */
 export async function createClassicMenu( this: RequestUtils, name: string ) {
 	const menuItems = [
@@ -37,20 +37,18 @@ export async function createClassicMenu( this: RequestUtils, name: string ) {
 		},
 	} );
 
-	if ( menuItems?.length ) {
-		await this.batchRest(
-			menuItems.map( ( menuItem ) => ( {
-				method: 'POST',
-				path: `/wp/v2/menu-items`,
-				body: {
-					menus: menu.id,
-					object_id: undefined,
-					...menuItem,
-					parent: undefined,
-				},
-			} ) )
-		);
-	}
+	await this.batchRest(
+		menuItems.map( ( menuItem ) => ( {
+			method: 'POST',
+			path: `/wp/v2/menu-items`,
+			body: {
+				menus: menu.id,
+				object_id: undefined,
+				...menuItem,
+				parent: undefined,
+			},
+		} ) )
+	);
 
 	return menu;
 }
@@ -58,7 +56,7 @@ export async function createClassicMenu( this: RequestUtils, name: string ) {
 /**
  * Create a navigation menu
  *
- * @param {Object} menuData navigation menu post data.
+ * @param  menuData navigation menu post data.
  * @return {string} Menu content.
  */
 export async function createNavigationMenu(
@@ -84,7 +82,7 @@ export async function deleteAllMenus( this: RequestUtils ) {
 		path: `/wp/v2/navigation/`,
 	} );
 
-	if ( navMenus?.length ) {
+	if ( navMenus.length ) {
 		await this.batchRest(
 			navMenus.map( ( menu ) => ( {
 				method: 'DELETE',
@@ -97,7 +95,7 @@ export async function deleteAllMenus( this: RequestUtils ) {
 		path: `/wp/v2/menus/`,
 	} );
 
-	if ( classicMenus?.length ) {
+	if ( classicMenus.length ) {
 		await this.batchRest(
 			classicMenus.map( ( menu ) => ( {
 				method: 'DELETE',
