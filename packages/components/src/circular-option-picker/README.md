@@ -9,7 +9,7 @@ This component is not exported, and therefore can only be used internally to the
 ## Usage
 
 ```jsx
-import { CircularOptionPicker } from '@wordpress/components';
+import { CircularOptionPicker } from '../circular-option-picker';
 import { useState } from '@wordpress/element';
 
 const Example = () => {
