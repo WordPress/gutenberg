@@ -244,8 +244,8 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func fetchRequest(_ path: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        self.delegate?.gutenbergDidRequestFetch(path: path, completion: { (result) in
+    func fetchRequest(_ path: String, options: NSDictionary? = nil, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        self.delegate?.gutenbergDidRequestFetch(path: path, options: options, completion: { (result) in
             switch result {
             case .success(let response):
                 resolver(response)

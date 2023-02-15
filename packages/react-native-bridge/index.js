@@ -290,11 +290,11 @@ export function requestMediaEditor( mediaUrl, callback ) {
 	);
 }
 
-export function fetchRequest( path, enableCaching = true ) {
+export function fetchRequest( path, enableCaching = true, options = null ) {
 	if ( isAndroid ) {
 		return RNReactNativeGutenbergBridge.fetchRequest( path, enableCaching );
 	}
-	return RNReactNativeGutenbergBridge.fetchRequest( path );
+	return RNReactNativeGutenbergBridge.fetchRequest( path, options );
 }
 
 export function showUserSuggestions() {
