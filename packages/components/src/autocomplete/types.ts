@@ -133,7 +133,7 @@ export type AutocompleterUIProps = {
 	 */
 	reset: ( event: Event ) => void;
 	/**
-	 * The rich text value object the autocomleter is being applied to.
+	 * The rich text value object the autocompleter is being applied to.
 	 */
 	value: RichTextValue;
 	/**
@@ -166,7 +166,7 @@ type RichTextValue = {
 
 export type UseAutocompleteProps = {
 	/**
-	 * The rich text value object the autocomleter is being applied to.
+	 * The rich text value object the autocompleter is being applied to.
 	 */
 	record: RichTextValue & {
 		start: NonNullable< RichTextValue[ 'start' ] >;
