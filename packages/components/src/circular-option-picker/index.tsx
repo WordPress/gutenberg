@@ -22,7 +22,7 @@ import type {
 import type { WordPressComponentProps } from '../ui/context';
 import type { ButtonAsButtonProps } from '../button/types';
 
-function Option( {
+export function Option( {
 	className,
 	isSelected,
 	selectedIconProps,
@@ -58,7 +58,7 @@ function Option( {
 	);
 }
 
-function DropdownLinkAction( {
+export function DropdownLinkAction( {
 	buttonProps,
 	className,
 	dropdownProps,
@@ -86,7 +86,7 @@ function DropdownLinkAction( {
 	);
 }
 
-function ButtonAction( {
+export function ButtonAction( {
 	className,
 	children,
 	...additionalProps

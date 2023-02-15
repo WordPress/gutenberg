@@ -9,7 +9,12 @@ import { useState, createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CircularOptionPicker from '..';
+import {
+	default as CircularOptionPicker,
+	ButtonAction,
+	DropdownLinkAction,
+	Option,
+} from '..';
 
 const CircularOptionPickerStoryContext = createContext< {
 	currentColor?: string;
@@ -19,6 +24,11 @@ const CircularOptionPickerStoryContext = createContext< {
 const meta: ComponentMeta< typeof CircularOptionPicker > = {
 	title: 'Components/CircularOptionPicker',
 	component: CircularOptionPicker,
+	subcomponents: {
+		'CircularOptionPicker.Option': Option,
+		'CircularOptionPicker.ButtonAction': ButtonAction,
+		'CircularOptionPicker.DropdownLinkAction': DropdownLinkAction,
+	},
 	argTypes: {
 		actions: { control: { type: null } },
 		options: { control: { type: null } },
