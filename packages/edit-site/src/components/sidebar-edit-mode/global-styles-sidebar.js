@@ -37,8 +37,8 @@ export default function GlobalStylesSidebar() {
 			closeLabel={ __( 'Close Styles sidebar' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
-				<Flex>
-					<FlexBlock>
+				<Flex className="edit-site-global-styles-sidebar__header">
+					<FlexBlock style={ { minWidth: 'min-content' } }>
 						<strong>{ __( 'Styles' ) }</strong>
 					</FlexBlock>
 					<FlexItem>
