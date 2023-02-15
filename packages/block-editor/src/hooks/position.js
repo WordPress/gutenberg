@@ -10,7 +10,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import {
 	BaseControl,
-	experiments as componentsExperiments,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -32,7 +32,7 @@ import { cleanEmptyObject } from './utils';
 import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
 
-const { CustomSelectControl } = unlock( componentsExperiments );
+const { CustomSelectControl } = unlock( componentsPrivateApis );
 
 const POSITION_SUPPORT_KEY = 'position';
 

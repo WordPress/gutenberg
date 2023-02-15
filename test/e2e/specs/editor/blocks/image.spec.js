@@ -5,7 +5,8 @@ const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { v4: uuid } = require( 'uuid' );
-const snapshotDiff = require( 'snapshot-diff' );
+
+/** @typedef {import('@playwright/test').Page} Page */
 
 /**
  * WordPress dependencies
@@ -312,7 +313,12 @@ test.describe( 'Image', () => {
 
 		// Assert that the image is initially unscaled and unedited.
 		const initialImageSrc = await image.getAttribute( 'src' );
-		const initialImageDataURL = await imageBlockUtils.getDataURL( image );
+		await expect
+			.poll( () => image.boundingBox() )
+			.toMatchObject( {
+				height: 10,
+				width: 10,
+			} );
 
 		// Zoom in to twice the amount using the zoom input.
 		await editor.clickBlockToolbarButton( 'Crop' );
@@ -340,11 +346,15 @@ test.describe( 'Image', () => {
 		const updatedImageSrc = await image.getAttribute( 'src' );
 		expect( initialImageSrc ).not.toEqual( updatedImageSrc );
 
-		const updatedImageDataURL = await imageBlockUtils.getDataURL( image );
-		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
+		await expect
+			.poll( () => image.boundingBox() )
+			.toMatchObject( {
+				height: 5,
+				width: 5,
+			} );
 
 		expect(
-			snapshotDiff( initialImageDataURL, updatedImageDataURL )
+			await imageBlockUtils.getImageBuffer( updatedImageSrc )
 		).toMatchSnapshot();
 	} );
 
@@ -369,7 +379,12 @@ test.describe( 'Image', () => {
 
 		// Assert that the image is initially unscaled and unedited.
 		const initialImageSrc = await image.getAttribute( 'src' );
-		const initialImageDataURL = await imageBlockUtils.getDataURL( image );
+		await expect
+			.poll( () => image.boundingBox() )
+			.toMatchObject( {
+				height: 10,
+				width: 10,
+			} );
 
 		// Zoom in to twice the amount using the zoom input.
 		await editor.clickBlockToolbarButton( 'Crop' );
@@ -386,13 +401,17 @@ test.describe( 'Image', () => {
 
 		// Assert that the image is edited.
 		const updatedImageSrc = await image.getAttribute( 'src' );
-		const updatedImageDataURL = await imageBlockUtils.getDataURL( image );
+		expect( updatedImageSrc ).not.toEqual( initialImageSrc );
 
-		expect( initialImageSrc ).not.toEqual( updatedImageSrc );
-		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
+		await expect
+			.poll( () => image.boundingBox() )
+			.toMatchObject( {
+				height: 6,
+				width: 10,
+			} );
 
 		expect(
-			snapshotDiff( initialImageDataURL, updatedImageDataURL )
+			await imageBlockUtils.getImageBuffer( updatedImageSrc )
 		).toMatchSnapshot();
 	} );
 
@@ -415,9 +434,6 @@ test.describe( 'Image', () => {
 
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
 
-		// Assert that the image is initially unscaled and unedited.
-		const initialImageDataURL = await imageBlockUtils.getDataURL( image );
-
 		// Rotate the image.
 		await editor.clickBlockToolbarButton( 'Crop' );
 		await editor.clickBlockToolbarButton( 'Rotate' );
@@ -429,14 +445,10 @@ test.describe( 'Image', () => {
 		).toBeHidden();
 
 		// Assert that the image is edited.
-		await expect
-			.poll( async () => imageBlockUtils.getDataURL( image ) )
-			.not.toBe( initialImageDataURL );
-
-		const updatedImageDataURL = await imageBlockUtils.getDataURL( image );
+		const updatedImageSrc = await image.getAttribute( 'src' );
 
 		expect(
-			snapshotDiff( initialImageDataURL, updatedImageDataURL )
+			await imageBlockUtils.getImageBuffer( updatedImageSrc )
 		).toMatchSnapshot();
 	} );
 
@@ -530,6 +542,7 @@ test.describe( 'Image', () => {
 
 class ImageBlockUtils {
 	constructor( { page } ) {
+		/** @type {Page} */
 		this.page = page;
 
 		this.TEST_IMAGE_FILE_PATH = path.join(
@@ -555,14 +568,40 @@ class ImageBlockUtils {
 		return filename;
 	}
 
-	async getDataURL( element ) {
+	async getImageBuffer( url ) {
+		const response = await this.page.request.get( url );
+		return await response.body();
+	}
+
+	async getHexString( element ) {
 		return element.evaluate( ( node ) => {
 			const canvas = document.createElement( 'canvas' );
-			const context = canvas.getContext( '2d' );
 			canvas.width = node.width;
 			canvas.height = node.height;
+
+			const context = canvas.getContext( '2d' );
 			context.drawImage( node, 0, 0 );
-			return canvas.toDataURL( 'image/jpeg' );
+			const imageData = context.getImageData(
+				0,
+				0,
+				canvas.width,
+				canvas.height
+			);
+			const pixels = imageData.data;
+
+			let hexString = '';
+			for ( let i = 0; i < pixels.length; i += 4 ) {
+				if ( i !== 0 && i % ( canvas.width * 4 ) === 0 ) {
+					hexString += '\n';
+				}
+
+				const r = pixels[ i ].toString( 16 ).padStart( 2, '0' );
+				const g = pixels[ i + 1 ].toString( 16 ).padStart( 2, '0' );
+				const b = pixels[ i + 2 ].toString( 16 ).padStart( 2, '0' );
+				const a = pixels[ i + 3 ].toString( 16 ).padStart( 2, '0' );
+				hexString += '#' + r + g + b + a;
+			}
+			return hexString;
 		} );
 	}
 }

@@ -36,6 +36,8 @@ xvfb-run -- npm run test:e2e:playwright -- --project=webkit
 
 ## Best practices
 
+Read the [best practices](https://playwright.dev/docs/best-practices) guide for Playwright.
+
 <details>
 	<summary><h3>Forbid `$`, use `locator` instead</h3></summary>
 
@@ -45,26 +47,22 @@ In fact, any API that returns `ElementHandle` is [discouraged](https://playwrigh
 <details>
 	<summary><h3>Use accessible selectors</h3></summary>
 
-Use the selector engine [role-selector](https://playwright.dev/docs/selectors#role-selector) to construct the query wherever possible. It enables us to write accessible queries without having to rely on internal implementations. The syntax should be straightforward and looks like this:
+Use [`getByRole`](https://playwright.dev/docs/locators#locate-by-role) to construct the query wherever possible. It enables us to write accessible queries without having to rely on internal implementations.
 
 ```js
-// Select a button with the accessible name "Hello World" (case-insensitive).
-page.locator( 'role=button[name="Hello World"i]' );
-
-// Using short-form API, the `name` is case-insensitive by default.
+// Select a button which includes the accessible name "Hello World" (case-insensitive).
 page.getByRole( 'button', { name: 'Hello World' } );
 ```
 
-It's recommended to append `i` to the name attribute to match it case-insensitively wherever it makes sense. It can also be chained with built-in selector engines to perform complex queries:
+It can also be chained to perform complex queries:
 
 ```js
-// Select a button with a name ends with `Back` and is visible on the screen.
-page.locator( 'role=button[name=/Back$/] >> visible=true' );
-// Select a button with the (exact) name "View options" under `#some-section`.
-page.locator( 'css=#some-section >> role=button[name="View options"]' );
+// Select an option with a name "Buttons" under the "Block Library" region.
+page.getByRole( 'region', { name: 'Block Library' } )
+	.getByRole( 'option', { name: 'Buttons' } )
 ```
 
-See the [official documentation](https://playwright.dev/docs/selectors#role-selector) for more info on how to use them.
+See the [official documentation](https://playwright.dev/docs/locators) for more info on how to use them.
 </details>
 
 <details>

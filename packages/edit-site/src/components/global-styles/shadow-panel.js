@@ -22,7 +22,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -31,7 +31,7 @@ import { useSupportedStyles } from './hooks';
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { unlock } from '../../private-apis';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 export function useHasShadowControl( name ) {
 	const supports = useSupportedStyles( name );
@@ -44,7 +44,10 @@ export default function ShadowPanel( { name, variation = '' } ) {
 	const [ userShadow ] = useGlobalStyle( `${ prefix }shadow`, name, 'user' );
 	const hasShadow = () => !! userShadow;
 
-	const resetShadow = () => setShadow( undefined );
+	const resetShadow = useCallback(
+		() => setShadow( undefined ),
+		[ setShadow ]
+	);
 	const resetAll = useCallback(
 		() => resetShadow( undefined ),
 		[ resetShadow ]

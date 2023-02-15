@@ -25,6 +25,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 				history.push( {
 					postType: attributes.type,
 					postId: attributes.id,
+					path: '/navigation/single',
 				} );
 			}
 		},
@@ -33,7 +34,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	return (
 		<SidebarNavigationScreen
 			path="/navigation"
-			parentTitle={ __( 'Design' ) }
 			title={ __( 'Navigation' ) }
 			content={
 				<div className="edit-site-sidebar-navigation-screen-navigation-menus">

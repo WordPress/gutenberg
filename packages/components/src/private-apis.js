@@ -15,8 +15,8 @@ export const { lock, unlock } =
 		'@wordpress/components'
 	);
 
-export const experiments = {};
-lock( experiments, {
+export const privateApis = {};
+lock( privateApis, {
 	CustomSelectControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 } );

@@ -218,3 +218,48 @@ export function useSupportedStyles( name, element ) {
 
 	return supportedPanels;
 }
+
+/**
+ * Given a settings object and a list of supported panels,
+ * returns a new settings object with the unsupported panels removed.
+ *
+ * @param {Object}   settings Settings object.
+ * @param {string[]} supports Supported style panels.
+ *
+ * @return {Object} Merge of settings and supports.
+ */
+export function overrideSettingsWithSupports( settings, supports ) {
+	const updatedSettings = { ...settings };
+
+	if ( ! supports.includes( 'fontSize' ) ) {
+		updatedSettings.typography = {
+			...updatedSettings.typography,
+			fontSizes: {},
+			customFontSize: false,
+		};
+	}
+
+	if ( ! supports.includes( 'fontFamily' ) ) {
+		updatedSettings.typography = {
+			...updatedSettings.typography,
+			fontFamilies: {},
+		};
+	}
+
+	[
+		'lineHeight',
+		'fontStyle',
+		'fontWeight',
+		'letterSpacing',
+		'textTransform',
+	].forEach( ( key ) => {
+		if ( ! supports.includes( key ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				[ key ]: false,
+			};
+		}
+	} );
+
+	return updatedSettings;
+}

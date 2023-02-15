@@ -21,7 +21,8 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,14 +36,22 @@ import { IconWithCurrentColor } from './icon-with-current-color';
 import { ScreenVariations } from './screen-variations';
 import { useHasShadowControl } from './shadow-panel';
 import { unlock } from '../../private-apis';
+import { useSupportedStyles } from './hooks';
 
-const { useHasTypographyPanel, useGlobalSetting } = unlock(
-	blockEditorExperiments
-);
+const {
+	useHasTypographyPanel,
+	useGlobalSetting,
+	overrideSettingsWithSupports,
+} = unlock( blockEditorPrivateApis );
 
 function ContextMenu( { name, parentMenu = '' } ) {
-	const [ settings ] = useGlobalSetting( '', name );
-	const hasTypographyPanel = useHasTypographyPanel( name, null, settings );
+	const [ rawSettings ] = useGlobalSetting( '', name );
+	const supports = useSupportedStyles( name );
+	const settings = useMemo(
+		() => overrideSettingsWithSupports( rawSettings, supports ),
+		[ rawSettings, supports ]
+	);
+	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasEffectsPanel = useHasShadowControl( name );
