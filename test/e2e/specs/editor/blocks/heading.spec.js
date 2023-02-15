@@ -263,11 +263,14 @@ test.describe( 'Heading', () => {
 
 		await pageUtils.pressKeyWithModifier( 'access', '0' );
 
-		// Somehow, if we use toMatchObject, it fails with GitHub Actions.
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:paragraph {\"align\":\"center\"} -->
-<p class=\"has-text-align-center\">Heading</p>
-<!-- /wp:paragraph -->`
-		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Heading',
+					textAlign: 'center',
+				},
+			},
+		] );
 	} );
 } );
