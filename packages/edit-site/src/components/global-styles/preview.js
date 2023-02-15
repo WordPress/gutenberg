@@ -4,7 +4,7 @@
 import {
 	__unstableIframe as Iframe,
 	__unstableEditorStyles as EditorStyles,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	__unstableMotion as motion,
@@ -20,7 +20,7 @@ import { useState, useMemo } from '@wordpress/element';
 import { unlock } from '../../private-apis';
 
 const { useGlobalSetting, useGlobalStyle, useGlobalStylesOutput } = unlock(
-	blockEditorExperiments
+	blockEditorPrivateApis
 );
 
 const firstFrame = {

@@ -1247,7 +1247,7 @@ test.describe( 'List', () => {
 			page.locator( 'role=document[name="Block: List"i]' )
 		);
 
-		await page.getByRole( 'button', { name: 'List' } ).click();
+		await page.getByRole( 'button', { name: 'List', exact: true } ).click();
 		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();

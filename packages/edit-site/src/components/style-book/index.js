@@ -21,7 +21,7 @@ import {
 } from '@wordpress/blocks';
 import {
 	BlockPreview,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { closeSmall } from '@wordpress/icons';
 import { useResizeObserver } from '@wordpress/compose';
@@ -32,7 +32,7 @@ import { useMemo, memo } from '@wordpress/element';
  */
 import { unlock } from '../../private-apis';
 
-const { useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 const SLOT_FILL_NAME = 'EditSiteStyleBook';
 const { Slot: StyleBookSlot, Fill: StyleBookFill } =

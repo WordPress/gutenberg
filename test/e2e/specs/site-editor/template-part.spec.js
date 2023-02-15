@@ -23,13 +23,13 @@ test.describe( 'Template Part', () => {
 		admin,
 		editor,
 		page,
-		siteEditor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			path: '/template-parts/single',
 		} );
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 
 		// Insert a new template block and 'start blank'.
 		await editor.insertBlock( { name: 'core/template-part' } );
@@ -54,11 +54,10 @@ test.describe( 'Template Part', () => {
 		admin,
 		editor,
 		page,
-		siteEditor,
 	} ) => {
 		// Visit the index.
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 		const headerTemplateParts = editor.canvas.locator(
 			'[data-type="core/template-part"]'
 		);
@@ -81,12 +80,11 @@ test.describe( 'Template Part', () => {
 		admin,
 		editor,
 		page,
-		siteEditor,
 	} ) => {
 		const paragraphText = 'Test 2';
 
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 		// Add a block and select it.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -121,13 +119,12 @@ test.describe( 'Template Part', () => {
 		admin,
 		editor,
 		page,
-		siteEditor,
 	} ) => {
 		const paragraphText1 = 'Test 3';
 		const paragraphText2 = 'Test 4';
 
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 		// Add a block and select it.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -181,7 +178,6 @@ test.describe( 'Template Part', () => {
 	test( 'can detach blocks from a template part', async ( {
 		admin,
 		editor,
-		siteEditor,
 	} ) => {
 		const paragraphText = 'Test 3';
 
@@ -189,8 +185,9 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			path: '/template-parts/single',
 		} );
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: {
@@ -201,7 +198,7 @@ test.describe( 'Template Part', () => {
 
 		// Visit the index.
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 		// Check that the header contains the paragraph added earlier.
 		const paragraph = editor.canvas.locator(
 			`p >> text="${ paragraphText }"`
@@ -226,15 +223,15 @@ test.describe( 'Template Part', () => {
 	test( 'shows changes in a template when a template part it contains is modified', async ( {
 		admin,
 		editor,
-		siteEditor,
 	} ) => {
 		const paragraphText = 'Test 1';
 
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			path: '/template-parts/single',
 		} );
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 		// Edit the header.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -247,7 +244,7 @@ test.describe( 'Template Part', () => {
 
 		// Visit the index.
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 		const paragraph = editor.canvas.locator(
 			`p >> text="${ paragraphText }"`
 		);
@@ -260,15 +257,15 @@ test.describe( 'Template Part', () => {
 		admin,
 		editor,
 		page,
-		siteEditor,
 	} ) => {
 		const paragraphText = 'Test 4';
 
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			path: '/template-parts/single',
 		} );
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: {
@@ -302,12 +299,11 @@ test.describe( 'Template Part', () => {
 
 	test( 'can import a widget area into an empty template part', async ( {
 		admin,
-		siteEditor,
 		editor,
 		page,
 	} ) => {
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 
 		// Add a block and select it.
 		await editor.insertBlock( {
@@ -344,12 +340,11 @@ test.describe( 'Template Part', () => {
 
 	test( 'can not import a widget area into a non-empty template part', async ( {
 		admin,
-		siteEditor,
 		editor,
 		page,
 	} ) => {
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 
 		// Select existing header template part.
 		await editor.selectBlocks(

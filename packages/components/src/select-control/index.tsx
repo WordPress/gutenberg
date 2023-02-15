@@ -101,7 +101,9 @@ function UnforwardedSelectControl(
 				isFocused={ isFocused }
 				label={ label }
 				size={ size }
-				suffix={ suffix || <SelectControlChevronDown /> }
+				suffix={
+					suffix || ( ! multiple && <SelectControlChevronDown /> )
+				}
 				prefix={ prefix }
 				labelPosition={ labelPosition }
 				__next36pxDefaultSize={ __next36pxDefaultSize }
