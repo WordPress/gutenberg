@@ -107,7 +107,7 @@ const Template: ComponentStory< typeof CircularOptionPicker > = ( props ) => (
 );
 
 export const Default = Template.bind( {} );
-Default.args = { actions: <></>, options: <DefaultOptions /> };
+Default.args = { options: <DefaultOptions /> };
 
 export const WithButtonAction = Template.bind( {} );
 WithButtonAction.args = {
