@@ -1,8 +1,11 @@
 /**
  * External dependencies
  */
-import { measurePerformance } from 'reassure';
-import { fireEvent } from '@testing-library/react-native';
+import {
+	changeTextOfRichText,
+	fireEvent,
+	measurePerformance,
+} from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -10,23 +13,11 @@ import { fireEvent } from '@testing-library/react-native';
 import { RichText } from '@wordpress/block-editor';
 
 describe( 'RichText Performance', () => {
-	it( 'measures performance', async () => {
-		const onChange = jest.fn();
-
-		const changeTextOfRichText = ( richText, text ) => {
-			fireEvent( richText, 'focus' );
-			fireEvent( richText, 'onChange', {
-				nativeEvent: {
-					eventCount: 1,
-					target: undefined,
-					text,
-				},
-			} );
-		};
-
+	// eslint-disable-next-line jest/no-done-callback
+	it( 'performance is stable', async ( screen ) => {
 		const scenario = async () => {
-			const richTextInput = <RichText />;
-			// Simulate user typing text.
+			const richTextInput = screen.getByTestId( 'performance' );
+
 			fireEvent( richTextInput, 'focus' );
 
 			changeTextOfRichText(
@@ -35,10 +26,10 @@ describe( 'RichText Performance', () => {
 			);
 
 			// Check if the onChange is called and the state is updated.
-			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( changeTextOfRichText ).toHaveBeenCalledTimes( 1 );
 		};
 
-		await measurePerformance( <RichText onChange={ onChange } />, {
+		await measurePerformance( <RichText testID="performance" />, {
 			scenario,
 		} );
 	} );
