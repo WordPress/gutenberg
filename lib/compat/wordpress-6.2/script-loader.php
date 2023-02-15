@@ -165,8 +165,6 @@ add_filter(
 		// We must override what core is passing now.
 		$settings['__unstableResolvedAssets']    = gutenberg_resolve_assets_override();
 		$settings['__unstableIsBlockBasedTheme'] = wp_is_block_theme();
-		// As the name suggests, this shouldn't be backported to core.
-		$settings['__unstableIsGutenbergPlugin'] = IS_GUTENBERG_PLUGIN;
 		return $settings;
 	},
 	100

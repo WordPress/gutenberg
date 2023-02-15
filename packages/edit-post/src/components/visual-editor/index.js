@@ -44,6 +44,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editPostStore } from '../../store';
 
+const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
+
 function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
@@ -110,7 +112,6 @@ export default function VisualEditor( { styles } ) {
 		wrapperBlockName,
 		wrapperUniqueId,
 		isBlockBasedTheme,
-		isGutenbergPlugin,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -149,7 +150,6 @@ export default function VisualEditor( { styles } ) {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
-			isGutenbergPlugin: editorSettings.__unstableIsGutenbergPlugin,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
