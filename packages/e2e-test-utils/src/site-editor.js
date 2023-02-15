@@ -166,13 +166,14 @@ export async function openPreviousGlobalStylesPanel() {
  * Enters edit mode.
  */
 export async function enterEditMode() {
-	const isViewMode = await page.$(
-		'.edit-site-visual-editor__editor-canvas[role="button"]'
-	);
+	const isSidebarVisible = await page.$( '.edit-site-layout__sidebar' );
 	// This check is necessary for the performance tests in old branches
 	// where the site editor toggle was not implemented yet.
-	if ( ! isViewMode ) {
+	if ( ! isSidebarVisible ) {
 		return;
 	}
+	await page.waitForSelector(
+		'.edit-site-visual-editor__editor-canvas[role="button"]'
+	);
 	await canvas().click( 'body' );
 }
