@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 15.1.1 =
+
+
+
+## Changelog
+
+### Various
+
+- Fonts API: Add missing files to lib/load.php. ([48108](https://github.com/WordPress/gutenberg/pull/48108))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@hellofromtonya
+
+
 = 15.1.0 =
 
 ## Changelog
