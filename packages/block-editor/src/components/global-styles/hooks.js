@@ -249,61 +249,39 @@ export function useSettingsForBlockElement(
 			};
 		}
 
-		if ( ! supportedStyles.includes( 'lineHeight' ) ) {
-			updatedSettings.typography = {
-				...updatedSettings.typography,
-				lineHeight: false,
-			};
-		}
+		[
+			'lineHeight',
+			'fontStyle',
+			'fontWeight',
+			'letterSpacing',
+			'textTransform',
+			'textDecoration',
+		].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.typography = {
+					...updatedSettings.typography,
+					[ key ]: false,
+				};
+			}
+		} );
 
-		if ( ! supportedStyles.includes( 'fontStyle' ) ) {
-			updatedSettings.typography = {
-				...updatedSettings.typography,
-				fontStyle: false,
-			};
-		}
+		[ 'contentSize', 'wideSize' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.layout = {
+					...updatedSettings.layout,
+					[ key ]: false,
+				};
+			}
+		} );
 
-		if ( ! supportedStyles.includes( 'fontWeight' ) ) {
-			updatedSettings.typography = {
-				...updatedSettings.typography,
-				fontWeight: false,
-			};
-		}
-
-		if ( ! supportedStyles.includes( 'letterSpacing' ) ) {
-			updatedSettings.typography = {
-				...updatedSettings.typography,
-				letterSpacing: false,
-			};
-		}
-
-		if ( ! supportedStyles.includes( 'textTransform' ) ) {
-			updatedSettings.typography = {
-				...updatedSettings.typography,
-				textTransform: false,
-			};
-		}
-
-		if ( ! supportedStyles.includes( 'textDecoration' ) ) {
-			updatedSettings.typography = {
-				...updatedSettings.typography,
-				textDecoration: false,
-			};
-		}
-
-		if ( ! supportedStyles.includes( 'contentSize' ) ) {
-			updatedSettings.layout = {
-				...updatedSettings.layout,
-				contentSize: false,
-			};
-		}
-
-		if ( ! supportedStyles.includes( 'wideSize' ) ) {
-			updatedSettings.layout = {
-				...updatedSettings.layout,
-				wideSize: false,
-			};
-		}
+		[ 'padding', 'margin', 'blockGap' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.spacing = {
+					...updatedSettings.spacing,
+					[ key ]: false,
+				};
+			}
+		} );
 
 		if ( ! supportedStyles.includes( 'padding' ) ) {
 			updatedSettings.spacing = {
