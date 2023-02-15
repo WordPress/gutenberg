@@ -33,7 +33,8 @@ export type WPCompleter< TCompleterOption = any > = {
 	name: string;
 	/**
 	 * The string prefix that should trigger the completer. For example,
-	 * Gutenberg's block completer is triggered when the '/' character is entered.
+	 * Gutenberg's block completer is triggered when the '/' character is
+	 * entered.
 	 */
 	triggerPrefix: string;
 	/**
@@ -67,7 +68,8 @@ export type WPCompleter< TCompleterOption = any > = {
 	allowContext?: ( before: string, after: string ) => boolean;
 	/**
 	 * A function that takes an option and returns how the option should
-	 * be completed. By default, the result is a value to be inserted in the text.
+	 * be completed. By default, the result is a value to be inserted in the
+	 * text.
 	 * However, a completer may explicitly declare how a completion should be
 	 * treated by returning an object with `action` and `value` properties. The
 	 * `action` declares what should be done with the `value`.
@@ -125,7 +127,8 @@ export type AutocompleterUIProps = {
 	 */
 	onSelect: ( option: KeyedOption ) => void;
 	/**
-	 * A function to be called when the completer is reset (e.g. when the user hits the escape key).
+	 * A function to be called when the completer is reset
+	 * (e.g. when the user hits the escape key).
 	 */
 	onReset?: () => void;
 	/**
@@ -137,7 +140,8 @@ export type AutocompleterUIProps = {
 	 */
 	value: RichTextValue;
 	/**
-	 * A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
+	 * A ref containing the editable element that will serve as the anchor for
+	 * `Autocomplete`'s `Popover`.
 	 */
 	contentRef: ContentRef;
 };
@@ -173,11 +177,13 @@ export type UseAutocompleteProps = {
 		end: NonNullable< RichTextValue[ 'end' ] >;
 	};
 	/**
-	 * A function to be called when an option is selected to insert into the existing text.
+	 * A function to be called when an option is selected to insert into the
+	 * existing text.
 	 */
 	onChange: ( value: string ) => void;
 	/**
-	 * A function to be called when an option is selected to replace the existing text.
+	 * A function to be called when an option is selected to replace the
+	 * existing text.
 	 */
 	onReplace: ( arg: [ OptionCompletion[ 'value' ] ] ) => void;
 	/**
@@ -185,7 +191,8 @@ export type UseAutocompleteProps = {
 	 */
 	completers: Array< WPCompleter >;
 	/**
-	 * A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
+	 * A ref containing the editable element that will serve as the anchor for
+	 * `Autocomplete`'s `Popover`.
 	 */
 	contentRef: ContentRef;
 };
@@ -198,7 +205,8 @@ export type AutocompleteProps = UseAutocompleteProps & {
 		props: Omit< ReturnType< typeof useAutocomplete >, 'popover' >
 	) => React.ReactNode;
 	/**
-	 * Whether or not the Autocomplte componenet is selected, and if its `Popover`
+	 * Whether or not the Autocomplte componenet is selected, and if its
+	 * `Popover`
 	 * should be displayed.
 	 */
 	isSelected: boolean;
