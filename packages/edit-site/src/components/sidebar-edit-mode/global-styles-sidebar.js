@@ -44,11 +44,7 @@ export default function GlobalStylesSidebar() {
 					<FlexItem>
 						<Button
 							icon={ seen }
-							label={
-								isStyleBookOpened
-									? __( 'Close Style Book' )
-									: __( 'Open Style Book' )
-							}
+							label={ __( 'Style Book' ) }
 							isPressed={ isStyleBookOpened }
 							disabled={ editorMode !== 'visual' }
 							onClick={ () => {

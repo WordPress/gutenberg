@@ -68,7 +68,7 @@ function GlobalStylesActionMenu() {
 		<GlobalStylesMenuFill>
 			<DropdownMenu
 				icon={ moreVertical }
-				label={ __( 'More Styles actions' ) }
+				label={ __( 'Styles actions' ) }
 				controls={ [
 					{
 						title: __( 'Reset to defaults' ),
