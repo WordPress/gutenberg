@@ -99,7 +99,7 @@
 		"@octokit/rest": "16.26.0",
 		"@octokit/types": "6.34.0",
 		"@octokit/webhooks-types": "5.6.0",
-		"@playwright/test": "1.27.1",
+		"@playwright/test": "1.30.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.2",
 		"@storybook/addon-a11y": "6.5.7",
 		"@storybook/addon-actions": "6.5.7",
