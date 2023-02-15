@@ -119,7 +119,7 @@ test.describe( 'Style Book', () => {
 
 	test( 'should disappear when closed', async ( { page } ) => {
 		await page.click(
-			'role=region[name="Style Book"i] >> role=button[name="Close Style Book"i]'
+			'role=region[name="Style Book"i] >> role=button[name="Style Book"i]'
 		);
 
 		await expect(
@@ -145,6 +145,6 @@ class StyleBook {
 	async open() {
 		await this.disableWelcomeGuide();
 		await this.page.click( 'role=button[name="Styles"i]' );
-		await this.page.click( 'role=button[name="Open Style Book"i]' );
+		await this.page.click( 'role=button[name="Style Book"i]' );
 	}
 }
