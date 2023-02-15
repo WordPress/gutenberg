@@ -79,7 +79,7 @@ function useHasChildLayout( settings ) {
 		type: parentLayoutType = 'default',
 		default: { type: defaultParentLayoutType = 'default' } = {},
 		allowSizingOnChildren = false,
-	} = settings?.parentLayout;
+	} = settings?.parentLayout ?? {};
 
 	const support =
 		( defaultParentLayoutType === 'flex' || parentLayoutType === 'flex' ) &&
@@ -328,7 +328,7 @@ export default function DimensionsPanel( {
 	// Child Layout
 	const showChildLayoutControl = useHasChildLayout( settings );
 	const childLayout = inheritedValue?.layout;
-	const { orientation = 'horizontal' } = settings?.parentLayout;
+	const { orientation = 'horizontal' } = settings?.parentLayout ?? {};
 	const childLayoutOrientationLabel =
 		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
 	const setChildLayout = ( newChildLayout ) => {
