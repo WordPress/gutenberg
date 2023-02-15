@@ -115,7 +115,7 @@ test.describe(
 
 			// Check the block in the canvas.
 			await expect(
-				this.editor.canvas.locator(
+				editor.canvas.locator(
 					`role=textbox[name="Navigation link text"i] >> text="Custom link"`
 				)
 			).toBeVisible();
