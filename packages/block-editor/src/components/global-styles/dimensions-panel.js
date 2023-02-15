@@ -178,6 +178,7 @@ export default function DimensionsPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
+	onVisualize = () => {},
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
@@ -247,6 +248,7 @@ export default function DimensionsPanel( {
 		!! value?.spacing?.padding &&
 		Object.keys( value?.spacing?.padding ).length;
 	const resetPaddingValue = () => setPaddingValues( undefined );
+	const onMouseOverPadding = () => onVisualize( 'padding' );
 
 	// Margin
 	const showMarginControl = useHasMargin( settings );
@@ -272,6 +274,7 @@ export default function DimensionsPanel( {
 		!! value?.spacing?.margin &&
 		Object.keys( value?.spacing?.margin ).length;
 	const resetMarginValue = () => setMarginValues( undefined );
+	const onMouseOverMargin = () => onVisualize( 'margin' );
 
 	// Block Gap
 	const showGapControl = useHasGap( settings );
@@ -370,6 +373,7 @@ export default function DimensionsPanel( {
 			},
 		} );
 	};
+	const onMouseLeaveControls = () => onVisualize( false );
 
 	return (
 		<Wrapper resetAll={ resetAll }>
@@ -450,6 +454,8 @@ export default function DimensionsPanel( {
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialPadding }
+							onMouseOver={ onMouseOverPadding }
+							onMouseOut={ onMouseLeaveControls }
 						/>
 					) }
 					{ showSpacingPresetsControl && (
@@ -461,6 +467,8 @@ export default function DimensionsPanel( {
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialPadding }
+							onMouseOver={ onMouseOverPadding }
+							onMouseOut={ onMouseLeaveControls }
 						/>
 					) }
 				</ToolsPanelItem>
@@ -485,6 +493,8 @@ export default function DimensionsPanel( {
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialMargin }
+							onMouseOver={ onMouseOverMargin }
+							onMouseOut={ onMouseLeaveControls }
 						/>
 					) }
 					{ showSpacingPresetsControl && (
@@ -496,6 +506,8 @@ export default function DimensionsPanel( {
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialMargin }
+							onMouseOver={ onMouseOverMargin }
+							onMouseOut={ onMouseLeaveControls }
 						/>
 					) }
 				</ToolsPanelItem>

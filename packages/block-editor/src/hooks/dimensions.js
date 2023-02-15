@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-/*import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';*/
+import { useState, useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 
@@ -14,11 +14,11 @@ import {
 	DimensionsPanel as StylesDimensionsPanel,
 	useHasDimensionsPanel,
 } from '../components/global-styles';
-/*import { MarginVisualizer } from './margin';
+import { MarginVisualizer } from './margin';
 import { PaddingVisualizer } from './padding';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-*/
+
 import { cleanEmptyObject, useBlockSettings } from './utils';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
@@ -26,23 +26,21 @@ export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
-/*function useVisualizerMouseOver() {
-	const [ isMouseOver, setIsMouseOver ] = useState( false );
+function useVisualizer() {
+	const [ property, setProperty ] = useState( false );
 	const { hideBlockInterface, showBlockInterface } = unlock(
 		useDispatch( blockEditorStore )
 	);
-	const onMouseOver = ( e ) => {
-		e.stopPropagation();
-		hideBlockInterface();
-		setIsMouseOver( true );
-	};
-	const onMouseOut = ( e ) => {
-		e.stopPropagation();
-		showBlockInterface();
-		setIsMouseOver( false );
-	};
-	return { isMouseOver, onMouseOver, onMouseOut };
-}*/
+	useEffect( () => {
+		if ( ! property ) {
+			showBlockInterface();
+		} else {
+			hideBlockInterface();
+		}
+	}, [ property, showBlockInterface, hideBlockInterface ] );
+
+	return [ property, setProperty ];
+}
 
 function DimensionsInspectorControl( { children } ) {
 	return (
@@ -61,8 +59,7 @@ export function DimensionsPanel( props ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const isEnabled = useHasDimensionsPanel( settings );
 	const value = attributes.style;
-	//const paddingMouseOver = useVisualizerMouseOver();
-	//const marginMouseOver = useVisualizerMouseOver();
+	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const onChange = ( newStyle ) => {
 		setAttributes( {
 			style: cleanEmptyObject( newStyle ),
@@ -96,21 +93,20 @@ export function DimensionsPanel( props ) {
 				value={ value }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
+				onVisualize={ setVisualizedProperty }
 			/>
-			{ /*
-			{ ! isPaddingDisabled && (
+			{ !! settings?.spacing?.padding && (
 				<PaddingVisualizer
-					forceShow={ paddingMouseOver.isMouseOver }
+					forceShow={ visualizedProperty === 'padding' }
 					{ ...props }
 				/>
 			) }
-			{ ! isMarginDisabled && (
+			{ !! settings?.spacing?.margin && (
 				<MarginVisualizer
-					forceShow={ marginMouseOver.isMouseOver }
+					forceShow={ visualizedProperty === 'margin' }
 					{ ...props }
 				/>
 			) }
-			/*/ }
 		</>
 	);
 }
