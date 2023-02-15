@@ -65,7 +65,10 @@ function useAsyncList< T >(
 				...state,
 				...list.slice( nextIndex, nextIndex + step ),
 			] );
-			asyncQueue.add( {}, append( nextIndex + step ) );
+
+			queueMicrotask( () =>
+				asyncQueue.add( {}, append( nextIndex + step ) )
+			);
 		};
 		asyncQueue.add( {}, append( firstItems.length ) );
 
