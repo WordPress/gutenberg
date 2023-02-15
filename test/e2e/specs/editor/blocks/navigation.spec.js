@@ -88,9 +88,9 @@ test.describe(
 			await page.locator( 'role=button[name="Close panel"i]' ).click();
 
 			// Check the block in the frontend.
-			await this.page.goto( '/' );
+			await page.goto( '/' );
 			await expect(
-				this.page.locator(
+				page.locator(
 					`role=navigation >> role=link[name="WordPress"i]`
 				)
 			).toBeVisible();
