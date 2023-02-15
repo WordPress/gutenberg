@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { createBlock } from '@wordpress/blocks';
 import {
 	InspectorControls,
+	BlockControls,
 	useBlockProps,
 	useInnerBlocksProps,
 	getColorClassName,
@@ -17,13 +18,14 @@ import {
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
+	ToolbarButton,
 	Spinner,
 	Notice,
 	ComboboxControl,
 	Button,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
@@ -107,6 +109,29 @@ function BlockContent( {
 	if ( pages.length > 0 ) {
 		return <ul { ...innerBlocksProps }></ul>;
 	}
+}
+
+function ConvertToLinks( { onClick, disabled } ) {
+	const [ isOpen, setOpen ] = useState( false );
+	const openModal = () => setOpen( true );
+	const closeModal = () => setOpen( false );
+
+	return (
+		<>
+			<BlockControls group="other">
+				<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
+					{ __( 'Edit' ) }
+				</ToolbarButton>
+			</BlockControls>
+			{ isOpen && (
+				<ConvertToLinksModal
+					onClick={ onClick }
+					onClose={ closeModal }
+					disabled={ disabled }
+				/>
+			) }
+		</>
+	);
 }
 
 export default function PageListEdit( {
@@ -298,7 +323,7 @@ export default function PageListEdit( {
 				) }
 			</InspectorControls>
 			{ allowConvertToLinks && (
-				<ConvertToLinksModal
+				<ConvertToLinks
 					disabled={ ! hasResolvedPages }
 					onClick={ convertToNavigationLinks }
 				/>
