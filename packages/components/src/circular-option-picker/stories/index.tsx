@@ -14,6 +14,11 @@ import CircularOptionPicker from '..';
 const meta: ComponentMeta< typeof CircularOptionPicker > = {
 	title: 'Components/CircularOptionPicker',
 	component: CircularOptionPicker,
+	argTypes: {
+		actions: { control: { type: null } },
+		options: { control: { type: null } },
+		children: { control: { type: 'text' } },
+	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
