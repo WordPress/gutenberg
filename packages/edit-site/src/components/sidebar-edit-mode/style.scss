@@ -22,8 +22,13 @@
 	flex-direction: column;
 	min-height: 100%;
 
-	&__panel,
-	&__navigator-provider {
+	&__panel {
+		.components-spacer {
+			padding-left: $grid-unit-20;
+		}
+	}
+	&__navigator-provider,
+	&__panel {
 		display: flex;
 		flex-direction: column;
 		flex: 1;
@@ -31,6 +36,10 @@
 
 	&__navigator-screen {
 		flex: 1;
+		.components-card-body {
+			padding-left: 0;
+			padding-right: 0;
+		}
 	}
 }
 
