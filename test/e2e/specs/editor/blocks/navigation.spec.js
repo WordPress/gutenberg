@@ -121,9 +121,10 @@ test.describe(
 			).toBeVisible();
 
 			// Check the block in the frontend.
-			await this.page.goto( '/' );
+			await page.goto( '/' );
+
 			await expect(
-				this.page.locator(
+				page.locator(
 					`role=navigation >> role=link[name="Custom link"i]`
 				)
 			).toBeVisible();
