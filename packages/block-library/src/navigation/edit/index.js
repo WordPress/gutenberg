@@ -27,7 +27,7 @@ import {
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import { EntityProvider } from '@wordpress/core-data';
 
 import { useDispatch } from '@wordpress/data';
 import {
@@ -112,7 +112,6 @@ function Navigation( {
 
 	const recursionId = `navigationMenu/${ ref }`;
 	const hasAlreadyRendered = useHasRecursion( recursionId );
-	const { editEntityRecord } = useDispatch( coreStore );
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -126,11 +125,6 @@ function Navigation( {
 	const [ showClassicMenuConversionNotice, hideClassicMenuConversionNotice ] =
 		useNavigationNotice( {
 			name: 'block-library/core/navigation/classic-menu-conversion',
-		} );
-
-	const [ showMenuAutoPublishDraftNotice, hideMenuAutoPublishDraftNotice ] =
-		useNavigationNotice( {
-			name: 'block-library/core/navigation/auto-publish-draft',
 		} );
 
 	const [
@@ -209,7 +203,6 @@ function Navigation( {
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
 		navigationMenus,
-		navigationMenu,
 		canUserUpdateNavigationMenu,
 		hasResolvedCanUserUpdateNavigationMenu,
 		canUserDeleteNavigationMenu,
@@ -536,26 +529,6 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
-	// Prompt the user to publish the menu they have set as a draft
-	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
-	useEffect( () => {
-		hideMenuAutoPublishDraftNotice();
-		if ( ! isDraftNavigationMenu ) {
-			return;
-		}
-		editEntityRecord(
-			'postType',
-			'wp_navigation',
-			navigationMenu?.id,
-			{ status: 'publish' },
-			{ throwOnError: true }
-		).catch( () => {
-			showMenuAutoPublishDraftNotice(
-				__( 'Error occurred while publishing the navigation menu.' )
-			);
-		} );
-	}, [ isDraftNavigationMenu, navigationMenu ] );
-
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const stylingInspectorControls = (
 		<>
@@ -752,8 +725,6 @@ function Navigation( {
 					<UnsavedInnerBlocks
 						createNavigationMenu={ createNavigationMenu }
 						blocks={ uncontrolledInnerBlocks }
-						templateLock={ templateLock }
-						navigationMenus={ navigationMenus }
 						hasSelection={ isSelected || isInnerBlockSelected }
 					/>
 				</ResponsiveWrapper>

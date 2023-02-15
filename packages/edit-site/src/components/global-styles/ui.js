@@ -10,10 +10,11 @@ import {
 } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -36,7 +37,8 @@ import { ScreenVariation } from './screen-variations';
 import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
+import ScreenEffects from './screen-effects';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
 const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
@@ -44,7 +46,21 @@ const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 
 function GlobalStylesActionMenu() {
 	const { toggle } = useDispatch( preferencesStore );
-	const { useGlobalStylesReset } = unlock( blockEditorExperiments );
+	const { canEditCSS } = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+
+		return {
+			canEditCSS:
+				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+		};
+	}, [] );
+	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { goTo } = useNavigator();
 	const loadCustomCSS = () => goTo( '/css' );
@@ -64,10 +80,14 @@ function GlobalStylesActionMenu() {
 						onClick: () =>
 							toggle( 'core/edit-site', 'welcomeGuideStyles' ),
 					},
-					{
-						title: __( 'Additional CSS' ),
-						onClick: loadCustomCSS,
-					},
+					...( canEditCSS
+						? [
+								{
+									title: __( 'Additional CSS' ),
+									onClick: loadCustomCSS,
+								},
+						  ]
+						: [] ),
 				] }
 			/>
 		</GlobalStylesMenuFill>
@@ -209,6 +229,10 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 				<ScreenBorder name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
+			<GlobalStylesNavigationScreen path={ parentMenu + '/effects' }>
+				<ScreenEffects name={ name } variation={ variation } />
+			</GlobalStylesNavigationScreen>
+
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
 				<ScreenLayout name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
@@ -243,11 +267,6 @@ function GlobalStylesStyleBook( { onClose } ) {
 				)
 			}
 			onSelect={ ( blockName ) => {
-				// Clear navigator history by going back to the root.
-				const depth = path.match( /\//g ).length;
-				for ( let i = 0; i < depth; i++ ) {
-					navigator.goBack();
-				}
 				// Now go to the selected block.
 				navigator.goTo( '/blocks/' + encodeURIComponent( blockName ) );
 			} }

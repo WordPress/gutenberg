@@ -39,7 +39,6 @@ const ALLOWED_BLOCKS = [
 export default function UnsavedInnerBlocks( {
 	blocks,
 	createNavigationMenu,
-
 	hasSelection,
 } ) {
 	const originalBlocks = useRef();
@@ -91,37 +90,34 @@ export default function UnsavedInnerBlocks( {
 		}
 	);
 
-	const { isSaving, draftNavigationMenus, hasResolvedDraftNavigationMenus } =
-		useSelect(
-			( select ) => {
-				if ( isDisabled ) {
-					return EMPTY_OBJECT;
-				}
+	const { isSaving, hasResolvedDraftNavigationMenus } = useSelect(
+		( select ) => {
+			if ( isDisabled ) {
+				return EMPTY_OBJECT;
+			}
 
-				const {
-					getEntityRecords,
-					hasFinishedResolution,
-					isSavingEntityRecord,
-				} = select( coreStore );
+			const {
+				getEntityRecords,
+				hasFinishedResolution,
+				isSavingEntityRecord,
+			} = select( coreStore );
 
-				return {
-					isSaving: isSavingEntityRecord(
-						'postType',
-						'wp_navigation'
-					),
-					draftNavigationMenus: getEntityRecords(
-						...DRAFT_MENU_PARAMS
-					),
-					hasResolvedDraftNavigationMenus: hasFinishedResolution(
-						'getEntityRecords',
-						DRAFT_MENU_PARAMS
-					),
-				};
-			},
-			[ isDisabled ]
-		);
+			return {
+				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
+				draftNavigationMenus: getEntityRecords(
+					// This is needed so that hasResolvedDraftNavigationMenus gives the correct status.
+					...DRAFT_MENU_PARAMS
+				),
+				hasResolvedDraftNavigationMenus: hasFinishedResolution(
+					'getEntityRecords',
+					DRAFT_MENU_PARAMS
+				),
+			};
+		},
+		[ isDisabled ]
+	);
 
-	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
+	const { hasResolvedNavigationMenus } = useNavigationMenu();
 
 	// Automatically save the uncontrolled blocks.
 	useEffect( () => {
@@ -154,11 +150,8 @@ export default function UnsavedInnerBlocks( {
 		isSaving,
 		hasResolvedDraftNavigationMenus,
 		hasResolvedNavigationMenus,
-		draftNavigationMenus,
-		navigationMenus,
+		innerBlocksAreDirty,
 		hasSelection,
-		createNavigationMenu,
-		blocks,
 	] );
 
 	const Wrapper = isSaving ? Disabled : 'div';

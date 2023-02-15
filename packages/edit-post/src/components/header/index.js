@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
@@ -48,8 +43,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
 
-	const classes = classnames( 'edit-post-header' );
-
 	const slideY = {
 		hidden: isDistractionFree ? { y: '-50' } : { y: 0 },
 		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
@@ -61,7 +54,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	};
 
 	return (
-		<div className={ classes }>
+		<div className="edit-post-header">
 			<MainDashboardButton.Slot>
 				<motion.div
 					variants={ slideX }

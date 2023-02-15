@@ -1,7 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG, TextControl, Popover, Button } from '@wordpress/components';
+import {
+	Path,
+	SVG,
+	Popover,
+	Button,
+	__experimentalNumberControl as NumberControl,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
@@ -70,19 +77,21 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					event.preventDefault();
 				} }
 			>
-				<TextControl
-					className="block-editor-format-toolbar__image-container-value"
-					type="number"
-					label={ __( 'Width' ) }
-					value={ width }
-					min={ 1 }
-					onChange={ ( newWidth ) => setWidth( newWidth ) }
-				/>
-				<Button
-					icon={ keyboardReturn }
-					label={ __( 'Apply' ) }
-					type="submit"
-				/>
+				<HStack alignment="bottom" spacing="0">
+					<NumberControl
+						className="block-editor-format-toolbar__image-container-value"
+						label={ __( 'Width' ) }
+						value={ width }
+						min={ 1 }
+						onChange={ ( newWidth ) => setWidth( newWidth ) }
+					/>
+					<Button
+						className="block-editor-format-toolbar__image-container-button"
+						icon={ keyboardReturn }
+						label={ __( 'Apply' ) }
+						type="submit"
+					/>
+				</HStack>
 			</form>
 		</Popover>
 	);

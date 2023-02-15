@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent, within } from '@testing-library/react';
-import { act } from 'react-test-renderer';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -169,19 +169,19 @@ const getMenuButton = () => {
 /**
  * Helper to find the menu button and simulate a user click.
  *
- * @return {HTMLElement} The menuButton.
  */
 const openDropdownMenu = async () => {
+	const user = userEvent.setup();
 	const menuButton = getMenuButton();
-	fireEvent.click( menuButton );
-	await act( () => Promise.resolve() );
+	await user.click( menuButton );
 	return menuButton;
 };
 
 // Opens dropdown then selects the menu item by label before simulating a click.
 const selectMenuItem = async ( label ) => {
+	const user = userEvent.setup();
 	const menuItem = await screen.findByText( label );
-	fireEvent.click( menuItem );
+	await user.click( menuItem );
 };
 
 describe( 'ToolsPanel', () => {
@@ -314,6 +314,71 @@ describe( 'ToolsPanel', () => {
 				'Example hidden and reset to default'
 			);
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
+		} );
+
+		it( 'should render optional panel item when value is updated externally and panel has an ID', async () => {
+			const ToolsPanelOptional = ( { toolsPanelItemValue } ) => {
+				const itemProps = {
+					attributes: { value: toolsPanelItemValue },
+					hasValue: () => !! toolsPanelItemValue,
+					label: 'Alt',
+					onDeselect: jest.fn(),
+					onSelect: jest.fn(),
+				};
+
+				return (
+					<ToolsPanel { ...defaultProps }>
+						<ToolsPanelItem { ...itemProps }>
+							<div>Optional control</div>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				);
+			};
+			const { rerender } = render( <ToolsPanelOptional /> );
+
+			const control = screen.queryByText( 'Optional control' );
+
+			expect( control ).not.toBeInTheDocument();
+
+			rerender( <ToolsPanelOptional toolsPanelItemValue={ 100 } /> );
+
+			const controlRerendered = screen.getByText( 'Optional control' );
+
+			expect( controlRerendered ).toBeInTheDocument();
+		} );
+
+		it( 'should render optional item when value is updated externally and panelId is null', async () => {
+			// This test partially covers: https://github.com/WordPress/gutenberg/issues/47368
+			const ToolsPanelOptional = ( { toolsPanelItemValue } ) => {
+				const itemProps = {
+					attributes: { value: toolsPanelItemValue },
+					hasValue: () => !! toolsPanelItemValue,
+					label: 'Alt',
+					onDeselect: jest.fn(),
+					onSelect: jest.fn(),
+				};
+
+				// The null panelId below simulates the panel prop when there
+				// are multiple blocks selected.
+				return (
+					<ToolsPanel { ...defaultProps } panelId={ null }>
+						<ToolsPanelItem { ...itemProps }>
+							<div>Optional control</div>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				);
+			};
+
+			const { rerender } = render( <ToolsPanelOptional /> );
+			const control = screen.queryByText( 'Optional control' );
+
+			expect( control ).not.toBeInTheDocument();
+
+			rerender( <ToolsPanelOptional toolsPanelItemValue={ 99 } /> );
+
+			const controlRerendered = screen.getByText( 'Optional control' );
+
+			expect( controlRerendered ).toBeInTheDocument();
 		} );
 
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {

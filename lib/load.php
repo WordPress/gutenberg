@@ -50,12 +50,15 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 6.3 compat.
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-pattern-directory-controller-6-3.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-templates-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/rest-api.php';
 
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
+	require_once __DIR__ . '/experimental/class-gutenberg-rest-template-revision-count.php';
+
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
 
@@ -91,12 +94,16 @@ require __DIR__ . '/compat/wordpress-6.2/block-editor-settings.php';
 require __DIR__ . '/compat/wordpress-6.2/theme.php';
 require __DIR__ . '/compat/wordpress-6.2/widgets.php';
 
+if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
+	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-attribute-token.php';
+	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-span.php';
+	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-text-replacement.php';
+	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-tag-processor.php';
+}
+
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
-if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
-	require __DIR__ . '/experimental/html/wp-html.php';
-}
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';

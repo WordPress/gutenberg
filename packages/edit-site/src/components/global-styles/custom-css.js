@@ -12,7 +12,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 	transformStyles,
 } from '@wordpress/block-editor';
 import { info } from '@wordpress/icons';
@@ -20,10 +20,10 @@ import { info } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 import Subtitle from './subtitle';
 
-const { useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 function CustomCSSControl( { blockName } ) {
 	// If blockName is defined, we are customizing CSS at the block level:
 	// styles.blocks.blockName.css
@@ -101,7 +101,7 @@ function CustomCSSControl( { blockName } ) {
 				</Panel>
 			) }
 			<VStack spacing={ 3 }>
-				<Subtitle>{ __( 'ADDITIONAL CSS' ) }</Subtitle>
+				<Subtitle>{ __( 'Additional CSS' ) }</Subtitle>
 				<TextareaControl
 					__nextHasNoMarginBottom
 					value={

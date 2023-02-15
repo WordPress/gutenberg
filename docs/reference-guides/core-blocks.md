@@ -248,7 +248,7 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 
 -	**Name:** core/file
 -	**Category:** media
--	**Supports:** align, anchor
+-	**Supports:** align, anchor, color (background, gradients, link, ~~text~~)
 -	**Attributes:** displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
 ## Classic
@@ -320,7 +320,7 @@ Display a list of your most recent comments. ([Source](https://github.com/WordPr
 
 -	**Name:** core/latest-comments
 -	**Category:** widgets
--	**Supports:** align, anchor, spacing (margin, padding), ~~html~~
+-	**Supports:** align, anchor, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** commentsToShow, displayAvatar, displayDate, displayExcerpt
 
 ## Latest Posts
@@ -546,7 +546,7 @@ Display a post's excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/
 -	**Name:** core/post-excerpt
 -	**Category:** theme
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** moreText, showMoreOnNewLine, textAlign
+-	**Attributes:** excerptLength, moreText, showMoreOnNewLine, textAlign
 
 ## Post Featured Image
 
@@ -555,7 +555,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/post-featured-image
 -	**Category:** theme
 -	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
--	**Attributes:** customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, width
+-	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, width
 
 ## Post Navigation Link
 

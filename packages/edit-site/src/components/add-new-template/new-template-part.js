@@ -20,6 +20,7 @@ import {
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
 } from '../../utils/template-part-create';
+import { unlock } from '../../private-apis';
 
 export default function NewTemplatePart( {
 	postType,
@@ -30,7 +31,7 @@ export default function NewTemplatePart( {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const existingTemplateParts = useExistingTemplateParts();
 
 	async function createTemplatePart( { title, area } ) {
@@ -63,12 +64,15 @@ export default function NewTemplatePart( {
 			setIsModalOpen( false );
 
 			// Switch to edit mode.
-			__unstableSetCanvasMode( 'edit' );
+			setCanvasMode( 'edit' );
 
 			// Navigate to the created template part editor.
-			history.push( {
-				postId: templatePart.id,
-				postType: templatePart.type,
+			window.queueMicrotask( () => {
+				history.push( {
+					postId: templatePart.id,
+					postType: 'wp_template_part',
+					path: '/template-parts/single',
+				} );
 			} );
 
 			// TODO: Add a success notice?
