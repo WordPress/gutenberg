@@ -9,6 +9,7 @@ const SUPPORTED_ENDPOINTS = [
 	/wp\/v2\/(media|categories|blocks|themes)\/?\d*?.*/i,
 	/wp\/v2\/search\?.*/i,
 	/oembed\/1\.0\/proxy\?.*/i,
+	/wpcom\/v2\/(videopress)\/?\d*?.*/i,
 ];
 
 // [ONLY ON ANDROID] The requests made to these endpoints won't be cached.
@@ -17,12 +18,16 @@ const DISABLED_CACHING_ENDPOINTS = [ /wp\/v2\/(blocks)\/?\d*?.*/i ];
 const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 
-const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
+const fetchHandler = ( { path, ...options }, retries = 20, retryCount = 1 ) => {
 	if ( ! isPathSupported( path ) ) {
 		return Promise.reject( `Unsupported path: ${ path }` );
 	}
 
-	const responsePromise = fetchRequest( path, shouldEnableCaching( path ) );
+	const responsePromise = fetchRequest(
+		path,
+		shouldEnableCaching( path ),
+		options ?? null
+	);
 
 	const parseResponse = ( response ) => {
 		if ( typeof response === 'string' ) {
