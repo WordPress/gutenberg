@@ -52,11 +52,20 @@ export function getAutoCompleterUI( autocompleter ) {
 		const popoverRef = useRef();
 		const popoverRefs = useMergeRefs( [
 			popoverRef,
-			useRefEffect( ( node ) => {
-				if ( node.ownerDocument !== contentRef.current.ownerDocument ) {
-					setNeedsA11yCompat( true );
-				}
-			} ),
+			useRefEffect(
+				( node ) => {
+					if ( ! contentRef.current ) return;
+
+					// If the popover is rendered in a different document than
+					// the content, we need to duplicate the options list in the
+					// content document so that it's available to the screen
+					// readers, which check the DOM ID based aira-* attributes.
+					setNeedsA11yCompat(
+						node.ownerDocument !== contentRef.current.ownerDocument
+					);
+				},
+				[ contentRef ]
+			),
 		] );
 
 		useOnClickOutside( popoverRef, reset );
@@ -112,7 +121,8 @@ export function getAutoCompleterUI( autocompleter ) {
 				>
 					<ListBox />
 				</Popover>
-				{ needsA11yCompat &&
+				{ contentRef.current &&
+					needsA11yCompat &&
 					createPortal(
 						<ListBox Component={ VisuallyHidden } />,
 						contentRef.current.ownerDocument.body
