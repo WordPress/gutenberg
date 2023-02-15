@@ -131,4 +131,50 @@ CircularOptionPicker.Option = Option;
 CircularOptionPicker.ButtonAction = ButtonAction;
 CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
 
+/**
+ *`CircularOptionPicker` is a component that displays a set of options as circular buttons.
+ *
+ * ```jsx
+ * import { CircularOptionPicker } from '../circular-option-picker';
+ * import { useState } from '@wordpress/element';
+ *
+ * const Example = () => {
+ * 	const [ currentColor, setCurrentColor ] = useState();
+ * 	const colors = [
+ * 		{ color: '#f00', name: 'Red' },
+ * 		{ color: '#0f0', name: 'Green' },
+ * 		{ color: '#00f', name: 'Blue' },
+ * 	];
+ * 	const colorOptions = (
+ * 		<>
+ * 			{ colors.map( ( { color, name }, index ) => {
+ * 				return (
+ * 					<CircularOptionPicker.Option
+ * 						key={ `${ color }-${ index }` }
+ * 						tooltipText={ name }
+ * 						style={ { backgroundColor: color, color } }
+ * 						isSelected={ index === currentColor }
+ * 						onClick={ () => setCurrentColor( index ) }
+ * 						aria-label={ name }
+ * 					/>
+ * 				);
+ * 			} ) }
+ * 		</>
+ * 	);
+ * 	return (
+ * 		<CircularOptionPicker
+ * 				options={ colorOptions }
+ * 				actions={
+ * 					<CircularOptionPicker.ButtonAction
+ * 						onClick={ () => setCurrentColor( undefined ) }
+ * 					>
+ * 						{ 'Clear' }
+ * 					</CircularOptionPicker.ButtonAction>
+ * 				}
+ * 			/>
+ * 	);
+ * };
+ * ```
+ */
+
 export default CircularOptionPicker;
