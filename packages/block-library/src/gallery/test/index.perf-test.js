@@ -1,28 +1,91 @@
 /**
  * External dependencies
  */
-import { measurePerformance } from 'reassure';
-import { getBlock, setupCoreBlocks } from 'test/helpers';
+import {
+	fireEvent,
+	getBlock,
+	measurePerformance,
+	setupCoreBlocks,
+	within,
+} from 'test/helpers';
 
 /**
  * Internal dependencies
  */
-import { addGalleryBlock } from './helpers';
+import {
+	addGalleryBlock,
+	initializeWithGalleryBlock,
+	getGalleryItem,
+} from './helpers';
+
+const media = [
+	{
+		localId: 1,
+		localUrl: 'file:///local-image-1.jpeg',
+		serverId: 2000,
+		serverUrl: 'https://test-site.files.wordpress.com/local-image-1.jpeg',
+	},
+	{
+		localId: 2,
+		localUrl: 'file:///local-image-2.jpeg',
+		serverId: 2001,
+		serverUrl: 'https://test-site.files.wordpress.com/local-image-2.jpeg',
+	},
+	{
+		localId: 3,
+		localUrl: 'file:///local-image-3.jpeg',
+		serverId: 2002,
+		serverUrl: 'https://test-site.files.wordpress.com/local-image-3.jpeg',
+	},
+];
 
 setupCoreBlocks();
 
 describe( 'Gallery block', () => {
-	it( 'measures performance', async () => {
-		// This test fails because...
-		// This returns a RNTL screen...
+	it( 'inserts block', async () => {
 		const screen = await addGalleryBlock();
-		// This returns a rendered view...
-		const galleryBlock = getBlock( screen, 'Gallery' );
-		// This expects the first argument to be a component to render, not a
-		// rendered component. Also, I do not see a `screen` option documented..
-		// E.g. `await measurePerformance( <GalleryBlock /> )`
-		await measurePerformance( galleryBlock, { screen } );
-		// There may be a way to leverage our helpers with Reassure, but they may
-		// be incompatible given that Reassure wants to control rendering.
+
+		expect( getBlock( screen, 'Gallery' ) ).toBeVisible();
+
+		await measurePerformance( screen );
+	} );
+
+	it( 'selects a gallery item', async () => {
+		const { galleryBlock } = await initializeWithGalleryBlock( {
+			numberOfItems: 1,
+			media,
+			selected: false,
+		} );
+
+		const scenario = async () => {
+			const galleryItem = getGalleryItem( galleryBlock, 1 );
+			fireEvent.press( galleryItem );
+
+			expect( galleryItem ).toBeVisible();
+		};
+
+		await measurePerformance( galleryBlock, { scenario } );
+	} );
+
+	it( 'shows appender button when gallery has images', async () => {
+		const { galleryBlock } = await initializeWithGalleryBlock( {
+			numberOfItems: 1,
+			media,
+		} );
+
+		const scenario = async ( screen ) => {
+			const appenderButton = within( galleryBlock ).getByTestId(
+				'media-placeholder-appender-icon'
+			);
+			fireEvent.press( appenderButton );
+
+			expect( screen.getByText( 'Choose from device' ) ).toBeVisible();
+			expect( screen.getByText( 'Take a Photo' ) ).toBeVisible();
+			expect(
+				screen.getByText( 'WordPress Media Library' )
+			).toBeVisible();
+		};
+
+		await measurePerformance( galleryBlock, { scenario } );
 	} );
 } );
