@@ -25,7 +25,7 @@ import {
 	toHTMLString,
 	insert,
 } from '@wordpress/rich-text';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
@@ -40,6 +40,7 @@ import { store as editorStore } from '../../store';
 const REGEXP_NEWLINES = /[\r\n]+/g;
 
 function PostTitle( _, forwardedRef ) {
+	const postTitleId = useInstanceId( PostTitle, 'post-title' );
 	const ref = useRef();
 	const [ isSelected, setIsSelected ] = useState( false );
 	const { editPost } = useDispatch( editorStore );
@@ -226,6 +227,7 @@ function PostTitle( _, forwardedRef ) {
 	return (
 		<PostTypeSupportCheck supportKeys="title">
 			<h1
+				id={ postTitleId }
 				ref={ useMergeRefs( [ richTextRef, ref ] ) }
 				contentEditable
 				className={ className }

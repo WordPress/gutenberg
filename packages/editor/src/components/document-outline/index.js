@@ -76,7 +76,11 @@ export const DocumentOutline = ( {
 	let prevHeadingLevel = 1;
 
 	// Not great but it's the simplest way to locate the title right now.
-	const titleNode = document.querySelector( '.editor-post-title__input' );
+	const titleNode =
+		document.querySelector( '.editor-post-title__input' ) ||
+		window.frames[ 'editor-canvas' ]?.document.querySelector(
+			'.editor-post-title__input'
+		);
 	const hasTitle = isTitleSupported && title && titleNode;
 	const countByLevel = headings.reduce(
 		( acc, heading ) => ( {
@@ -94,7 +98,10 @@ export const DocumentOutline = ( {
 					<DocumentOutlineItem
 						level={ __( 'Title' ) }
 						isValid
-						onSelect={ onSelect }
+						onSelect={ () => {
+							titleNode.focus();
+							onSelect?.();
+						} }
 						href={ `#${ titleNode.id }` }
 						isDisabled={ hasOutlineItemsDisabled }
 					>
