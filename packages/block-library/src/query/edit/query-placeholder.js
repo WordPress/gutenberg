@@ -6,7 +6,7 @@ import {
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	useBlockProps,
 	store as blockEditorStore,
@@ -53,13 +53,19 @@ export default function QueryPlaceholder( {
 		[ name, blockNameForPatterns, clientId ]
 	);
 
+	useEffect( () => {
+		if ( ! hasPatterns ) {
+			setIsStartingBlank( true );
+		}
+	}, [ hasPatterns ] );
+
 	const matchingVariation = getMatchingVariation( attributes, allVariations );
 	const icon =
 		matchingVariation?.icon?.src ||
 		matchingVariation?.icon ||
 		blockType?.icon?.src;
 	const label = matchingVariation?.title || blockType?.title;
-	if ( ! hasPatterns || isStartingBlank ) {
+	if ( isStartingBlank ) {
 		return (
 			<QueryVariationPicker
 				clientId={ clientId }
