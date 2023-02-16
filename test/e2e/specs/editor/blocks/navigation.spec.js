@@ -130,6 +130,54 @@ test.describe(
 				)
 			).toBeVisible();
 		} );
+
+		test( 'default to my most recently created menu', async ( {
+			admin,
+			page,
+			editor,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			await requestUtils.createNavigationMenu( {
+				title: 'Test Menu 1',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			const latestMenu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu 2',
+				content:
+					'<!-- wp:navigation-link {"label":"My site link","type":"custom","url":"http://localhost:8889/#my-site-link","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			// Check the block in the canvas.
+			await expect(
+				editor.canvas.locator(
+					`role=textbox[name="Navigation link text"i] >> text="My site link"`
+				)
+			).toBeVisible();
+
+			// Check the markup of the block is correct.
+			await editor.publishPost();
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/navigation',
+					attributes: { ref: latestMenu.id },
+				},
+			] );
+			await page.locator( 'role=button[name="Close panel"i]' ).click();
+
+			// Check the block in the frontend.
+			await page.goto( '/' );
+			await expect(
+				page.locator(
+					`role=navigation >> role=link[name="My site link"i]`
+				)
+			).toBeVisible();
+		} );
 	}
 );
 
