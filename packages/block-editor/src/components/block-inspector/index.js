@@ -185,7 +185,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				const animationParent =
 					globalBlockInspectorAnimationSettings?.animationParent;
 
-				// Determin whether the animationParent block is a parent of the selected block.
+				// Determine whether the animationParent block is a parent of the selected block.
 				const { getSelectedBlockClientId, getBlockParentsByBlockName } =
 					select( blockEditorStore );
 				const _selectedBlockClientId = getSelectedBlockClientId();
