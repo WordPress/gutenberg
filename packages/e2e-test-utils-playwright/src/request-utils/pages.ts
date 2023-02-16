@@ -17,6 +17,12 @@ export type Page = {
 	status: typeof PAGE_STATUS[ number ];
 };
 
+export type CreatePagePayload = {
+	title?: string;
+	content?: string;
+	status: typeof PAGE_STATUS[ number ];
+};
+
 /**
  * Delete all pages using REST API.
  *
@@ -48,4 +54,24 @@ export async function deleteAllPages( this: RequestUtils ) {
 			} )
 		)
 	);
+}
+
+/**
+ * Create a new page.
+ *
+ * @param this
+ * @param payload The page payload.
+ */
+export async function createPage(
+	this: RequestUtils,
+	payload: CreatePagePayload
+) {
+	// https://developer.wordpress.org/rest-api/reference/pages/#create-a-page
+	const page = await this.rest< Page >( {
+		method: 'POST',
+		path: `/wp/v2/pages`,
+		params: payload,
+	} );
+
+	return page;
 }
