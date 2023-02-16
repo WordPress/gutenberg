@@ -13,23 +13,23 @@ test.use( {
 	},
 } );
 
+test.beforeAll( async ( { requestUtils } ) => {
+	await Promise.all( [
+		requestUtils.deleteAllPosts(),
+		requestUtils.deleteAllPages(),
+	] );
+} );
+
+test.afterAll( async ( { requestUtils } ) => {
+	await Promise.all( [
+		requestUtils.deleteAllPosts(),
+		requestUtils.deleteAllPages(),
+	] );
+} );
+
 test.describe(
 	'Clicking "Switch to draft" on a published/scheduled post/page',
 	() => {
-		test.beforeAll( async ( { requestUtils } ) => {
-			await Promise.all( [
-				requestUtils.deleteAllPosts(),
-				requestUtils.deleteAllPages(),
-			] );
-		} );
-
-		test.afterAll( async ( { requestUtils } ) => {
-			await Promise.all( [
-				requestUtils.deleteAllPosts(),
-				requestUtils.deleteAllPages(),
-			] );
-		} );
-
 		[ 'schedule', 'publish' ].forEach( ( postStatus ) => {
 			[ 'large', 'small' ].forEach( ( viewport ) => {
 				[ 'post', 'page' ].forEach( ( postType ) => {
