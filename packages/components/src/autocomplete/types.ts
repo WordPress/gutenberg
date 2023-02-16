@@ -7,10 +7,6 @@ import type { WPElement } from '@wordpress/element';
  */
 import type { useAutocomplete } from '.';
 
-type GetOptions< TCompleterOption = any > = (
-	filterValue: AutocompleterUIProps[ 'filterValue' ]
-) => Array< TCompleterOption > | Promise< Array< TCompleterOption > >;
-
 export type OptionCompletion = {
 	action: 'insert-at-caret' | 'replace';
 	value: string | WPElement;
@@ -43,7 +39,13 @@ export type WPCompleter< TCompleterOption = any > = {
 	 * Options may be of any type or shape. The completer declares how those
 	 * options are rendered and what their completions should be when selected.
 	 */
-	options: Array< TCompleterOption > | GetOptions;
+	options:
+		| ( (
+				query: string
+		  ) =>
+				| PromiseLike< readonly TCompleterOption[] >
+				| readonly TCompleterOption[] )
+		| readonly TCompleterOption[];
 	/**
 	 * A function that returns the keywords for the specified option.
 	 */
