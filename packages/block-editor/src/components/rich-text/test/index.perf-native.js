@@ -5,6 +5,7 @@ import {
 	changeTextOfRichText,
 	fireEvent,
 	measurePerformance,
+	screen,
 } from 'test/helpers';
 
 /**
@@ -13,10 +14,9 @@ import {
 import { RichText } from '@wordpress/block-editor';
 
 describe( 'RichText Performance', () => {
-	// eslint-disable-next-line jest/no-done-callback
-	it( 'performance is stable', async ( screen ) => {
+	it( 'performance is stable', async () => {
 		const scenario = async () => {
-			const richTextInput = screen.getByTestId( 'performance' );
+			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
 
 			fireEvent( richTextInput, 'focus' );
 
@@ -24,12 +24,9 @@ describe( 'RichText Performance', () => {
 				richTextInput,
 				'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> text'
 			);
-
-			// Check if the onChange is called and the state is updated.
-			expect( changeTextOfRichText ).toHaveBeenCalledTimes( 1 );
 		};
 
-		await measurePerformance( <RichText testID="performance" />, {
+		await measurePerformance( <RichText onChange={ jest.fn() } />, {
 			scenario,
 		} );
 	} );
