@@ -59,6 +59,8 @@ describe( 'Site Editor Performance', () => {
 		);
 
 		await createNewPost( { postType: 'page' } );
+		await page.keyboard.type( 'Site Editor Performance Tests' );
+
 		await page.evaluate( ( _html ) => {
 			const { parse } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
@@ -81,6 +83,12 @@ describe( 'Site Editor Performance', () => {
 	} );
 
 	afterAll( async () => {
+		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
+		writeFileSync(
+			join( __dirname, resultsFilename ),
+			JSON.stringify( results, null, 2 )
+		);
+
 		await deleteAllTemplates( 'wp_template' );
 		await deleteAllTemplates( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
@@ -91,96 +99,88 @@ describe( 'Site Editor Performance', () => {
 			postId: id,
 			postType: 'page',
 		} );
-	} );
 
-	it( 'Loading', async () => {
-		const editorURL = await page.url();
-
-		// Number of sample measurements to take.
-		const samples = 3;
-		// Number of throwaway measurements to perform before recording samples.
-		// Having at least one helps ensure that caching quirks don't manifest in
-		// the results.
-		const throwaway = 1;
-
-		let i = throwaway + samples;
-
-		// Measuring loading time.
-		while ( i-- ) {
-			await page.close();
-			page = await browser.newPage();
-
-			await page.goto( editorURL );
-			await page.waitForSelector( '.edit-site-visual-editor', {
-				timeout: 120000,
-			} );
-			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
-
-			if ( i < samples ) {
-				const {
-					serverResponse,
-					firstPaint,
-					domContentLoaded,
-					loaded,
-					firstContentfulPaint,
-					firstBlock,
-				} = await getLoadingDurations();
-
-				results.serverResponse.push( serverResponse );
-				results.firstPaint.push( firstPaint );
-				results.domContentLoaded.push( domContentLoaded );
-				results.loaded.push( loaded );
-				results.firstContentfulPaint.push( firstContentfulPaint );
-				results.firstBlock.push( firstBlock );
-			}
-		}
-	} );
-
-	it( 'Typing', async () => {
-		await page.waitForSelector( '.edit-site-visual-editor', {
-			timeout: 120000,
-		} );
-		await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
-
-		// Measuring typing performance inside the post content.
+		// Wait for the canvas to become actionable.
 		await canvas().waitForSelector(
-			'[data-type="core/post-content"] [data-type="core/paragraph"]'
+			'[data-rich-text-placeholder="Write site tagline…"]'
 		);
-		await enterEditMode();
-		await canvas().focus(
-			'[data-type="core/post-content"] [data-type="core/paragraph"]'
-		);
-		await insertBlock( 'Paragraph' );
-		let i = 200;
-		const traceFile = __dirname + '/trace.json';
-		await page.tracing.start( {
-			path: traceFile,
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
-		} );
-		while ( i-- ) {
-			await page.keyboard.type( 'x' );
-		}
-		await page.tracing.stop();
-		const traceResults = JSON.parse( readFile( traceFile ) );
-		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-			getTypingEventDurations( traceResults );
+	} );
 
-		for ( let j = 0; j < keyDownEvents.length; j++ ) {
-			results.type.push(
-				keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
+	describe( 'Loading', () => {
+		const samples = 3;
+		const throwaway = 1;
+		const iterations = Array.from(
+			{ length: samples + throwaway },
+			( _, i ) => i + 1
+		);
+
+		it.each( iterations )(
+			`iteration %i of ${ iterations.length }`,
+			async ( i ) => {
+				if ( i > 1 ) {
+					const {
+						serverResponse,
+						firstPaint,
+						domContentLoaded,
+						loaded,
+						firstContentfulPaint,
+						firstBlock,
+					} = await getLoadingDurations();
+
+					results.serverResponse.push( serverResponse );
+					results.firstPaint.push( firstPaint );
+					results.domContentLoaded.push( domContentLoaded );
+					results.loaded.push( loaded );
+					results.firstContentfulPaint.push( firstContentfulPaint );
+					results.firstBlock.push( firstBlock );
+				}
+
+				expect( true ).toBe( true );
+			}
+		);
+	} );
+
+	describe( 'Typing', () => {
+		it( 'trace 200 characters typing sequence', async () => {
+			// Measure typing performance inside the post content.
+			await enterEditMode();
+
+			// Insert a new paragraph right after the first one.
+			const targetParagraph = await canvas().waitForXPath(
+				'//p[contains(text(), "Lorem ipsum dolor sit amet")]'
 			);
-		}
+			// The second click is needed to get the cursor inside the target
+			// paragraph.
+			await targetParagraph.click();
+			await targetParagraph.click();
+			await insertBlock( 'Paragraph' );
 
-		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
+			// Start tracing.
+			const traceFile = __dirname + '/trace.json';
+			await page.tracing.start( {
+				path: traceFile,
+				screenshots: false,
+				categories: [ 'devtools.timeline' ],
+			} );
 
-		writeFileSync(
-			join( __dirname, resultsFilename ),
-			JSON.stringify( results, null, 2 )
-		);
+			// Type "x" 200 times.
+			await page.keyboard.type( new Array( 200 ).fill( 'x' ).join( '' ) );
 
-		deleteFile( traceFile );
+			// Stop tracing and save results.
+			await page.tracing.stop();
+			const traceResults = JSON.parse( readFile( traceFile ) );
+			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+				getTypingEventDurations( traceResults );
+			for ( let i = 0; i < keyDownEvents.length; i++ ) {
+				results.type.push(
+					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
+				);
+			}
 
-		expect( true ).toBe( true );
+			// Delete the original trace file.
+			deleteFile( traceFile );
+
+			expect( true ).toBe( true );
+		} );
 	} );
 } );
