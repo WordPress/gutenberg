@@ -27,6 +27,7 @@ import { sprintf, __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ListViewLeaf from './leaf';
+import useListViewScrollIntoView from './use-list-view-scroll-into-view';
 import {
 	BlockMoverUpButton,
 	BlockMoverDownButton,
@@ -57,6 +58,7 @@ function ListViewBlock( {
 	isSyncedBranch,
 } ) {
 	const cellRef = useRef( null );
+	const rowRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
 
@@ -220,6 +222,15 @@ function ListViewBlock( {
 		? selectedClientIds
 		: [ clientId ];
 
+	// Pass in a ref to the row, so that it can be scrolled
+	// into view when selected. For long lists, the placeholder for the
+	// selected block is also observed, within ListViewLeafPlaceholder.
+	useListViewScrollIntoView( {
+		isSelected,
+		rowItemRef: rowRef,
+		selectedClientIds,
+	} );
+
 	return (
 		<ListViewLeaf
 			className={ classes }
@@ -235,6 +246,7 @@ function ListViewBlock( {
 			data-block={ clientId }
 			isExpanded={ canExpand ? isExpanded : undefined }
 			aria-selected={ !! isSelected || forceSelectionContentLock }
+			ref={ rowRef }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"

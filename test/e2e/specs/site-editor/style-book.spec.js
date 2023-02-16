@@ -145,6 +145,6 @@ class StyleBook {
 	async open() {
 		await this.disableWelcomeGuide();
 		await this.page.click( 'role=button[name="Styles"i]' );
-		await this.page.click( 'role=button[name="Open Style Book"i]' );
+		await this.page.click( 'role=button[name="Style Book"i]' );
 	}
 }

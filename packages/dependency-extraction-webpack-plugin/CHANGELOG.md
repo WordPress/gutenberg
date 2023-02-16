@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.10.0 (2023-02-15)
+
 ### Bug Fix
 
 -   The bundled `json2php` dependency has been upgraded from requiring `^0.0.5` to `^0.0.7` ([#47831](https://github.com/WordPress/gutenberg/pull/47831)).

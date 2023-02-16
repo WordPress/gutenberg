@@ -148,34 +148,6 @@ function Navigation( {
 		createNavigationMenu( '' );
 	};
 
-	useEffect( () => {
-		hideNavigationMenuStatusNotice();
-
-		if ( isCreatingNavigationMenu ) {
-			speak( __( `Creating Navigation Menu.` ) );
-		}
-
-		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost.id, {
-				focusNavigationBlock: true,
-			} );
-
-			showNavigationMenuStatusNotice(
-				__( `Navigation Menu successfully created.` )
-			);
-		}
-
-		if ( createNavigationMenuIsError ) {
-			showNavigationMenuStatusNotice(
-				__( 'Failed to create Navigation Menu.' )
-			);
-		}
-	}, [
-		createNavigationMenuStatus,
-		createNavigationMenuError,
-		createNavigationMenuPost,
-	] );
-
 	const {
 		hasUncontrolledInnerBlocks,
 		uncontrolledInnerBlocks,
@@ -420,6 +392,40 @@ function Navigation( {
 	const onSelectNavigationMenu = ( menuId ) => {
 		handleUpdateMenu( menuId );
 	};
+
+	useEffect( () => {
+		hideNavigationMenuStatusNotice();
+
+		if ( isCreatingNavigationMenu ) {
+			speak( __( `Creating Navigation Menu.` ) );
+		}
+
+		if ( createNavigationMenuIsSuccess ) {
+			handleUpdateMenu( createNavigationMenuPost.id, {
+				focusNavigationBlock: true,
+			} );
+
+			showNavigationMenuStatusNotice(
+				__( `Navigation Menu successfully created.` )
+			);
+		}
+
+		if ( createNavigationMenuIsError ) {
+			showNavigationMenuStatusNotice(
+				__( 'Failed to create Navigation Menu.' )
+			);
+		}
+	}, [
+		createNavigationMenuStatus,
+		createNavigationMenuError,
+		createNavigationMenuPost,
+		createNavigationMenuIsError,
+		createNavigationMenuIsSuccess,
+		handleUpdateMenu,
+		hideNavigationMenuStatusNotice,
+		isCreatingNavigationMenu,
+		showNavigationMenuStatusNotice,
+	] );
 
 	useEffect( () => {
 		hideClassicMenuConversionNotice();
