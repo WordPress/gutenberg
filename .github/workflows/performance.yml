@@ -92,3 +92,11 @@ jobs:
                   COMMITTED_AT: ${{ steps.commit-timestamp.outputs.result }}
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
               run: ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 $COMMITTED_AT
+
+            - name: Run Reassure performance tests
+              run: cd gutenberg/bin && ./reassure-tests.sh
+
+            - name: Run Danger.js
+              run: yarn danger ci
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
