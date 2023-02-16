@@ -68,7 +68,7 @@ export type PanelBodyProps = {
 	 */
 	className?: string;
 	/**
-	 * An icon to be shown next to the PanelBody title.
+	 * An icon to be shown next to the title.
 	 */
 	icon?: JSX.Element;
 	/**
@@ -76,23 +76,24 @@ export type PanelBodyProps = {
 	 */
 	initialOpen?: boolean;
 	/**
-	 * A function that is called when the user clicks on the PanelBody title after the open state is changed.
+	 * A function that is called any time the component is toggled from its closed
+	 * state to its opened state, or vice versa.
 	 *
 	 * @default noop
 	 */
 	onToggle?: ( next: boolean ) => void;
 	/**
-	 * If opened is true then the Panel will remain open regardless of the initialOpen prop and the panel will be prevented from being closed.
+	 * When set to `true`, the component will remain open regardless of the
+	 * `initialOpen` prop and the panel will be prevented from being closed.
 	 */
 	opened?: boolean;
 	/**
-	 * Title of the PanelBody. This shows even when it is closed.
+	 * Title text. It shows even when it is closed.
 	 */
 	title?: string;
 	/**
-	 * Scrolls the content into view when visible.
-	 * This improves the UX when there are multiple stacking Panel Body components.
-	 * components in a scrollable container.
+	 * Scrolls the content into view when visible. This improves the UX when
+	 * multiple `PanelBody` are stacked in a scrollable container.
 	 *
 	 * @default true
 	 */
@@ -101,11 +102,11 @@ export type PanelBodyProps = {
 
 export type PanelBodyTitleProps = Omit< ButtonAsButtonProps, 'icon' > & {
 	/**
-	 * An icon to be shown next to the PanelBody title.
+	 * An icon to be shown next to the title.
 	 */
 	icon?: JSX.Element;
 	/**
-	 * Whether or not the panel body is currently opened or not.
+	 * Whether or not the `PanelBody` is currently opened or not.
 	 */
 	isOpened?: boolean;
 	/**
