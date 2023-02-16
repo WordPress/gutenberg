@@ -28,6 +28,14 @@ export default function LatestComments( { attributes, setAttributes } ) {
 	const { commentsToShow, displayAvatar, displayDate, displayExcerpt } =
 		attributes;
 
+	const serverSideAttributes = {
+		...attributes,
+		style: {
+			...attributes?.style,
+			spacing: undefined,
+		},
+	};
+
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
@@ -71,8 +79,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 			<Disabled>
 				<ServerSideRender
 					block="core/latest-comments"
-					attributes={ attributes }
-					skipBlockSupportAttributes
+					attributes={ serverSideAttributes }
 					// The preview uses the site's locale to make it more true to how
 					// the block appears on the frontend. Setting the locale
 					// explicitly prevents any middleware from setting it to 'user'.

@@ -8,15 +8,15 @@ import {
 	DuotonePicker,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import Subtitle from './subtitle';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
-const { useGlobalSetting } = unlock( blockEditorExperiments );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 const noop = () => {};
 
@@ -75,6 +75,7 @@ export default function GradientPalettePanel( { name } ) {
 					gradients={ themeGradients }
 					onChange={ setThemeGradients }
 					paletteLabel={ __( 'Theme' ) }
+					paletteLabelHeadingLevel={ 3 }
 				/>
 			) }
 			{ !! defaultGradients &&
@@ -86,12 +87,14 @@ export default function GradientPalettePanel( { name } ) {
 						gradients={ defaultGradients }
 						onChange={ setDefaultGradients }
 						paletteLabel={ __( 'Default' ) }
+						paletteLabelLevel={ 3 }
 					/>
 				) }
 			<PaletteEdit
 				gradients={ customGradients }
 				onChange={ setCustomGradients }
 				paletteLabel={ __( 'Custom' ) }
+				paletteLabelLevel={ 3 }
 				emptyMessage={ __(
 					'Custom gradients are empty! Add some gradients to create your own palette.'
 				) }
@@ -99,7 +102,7 @@ export default function GradientPalettePanel( { name } ) {
 			/>
 			{ !! duotonePalette && !! duotonePalette.length && (
 				<div>
-					<Subtitle>{ __( 'Duotone' ) }</Subtitle>
+					<Subtitle level={ 3 }>{ __( 'Duotone' ) }</Subtitle>
 					<Spacer margin={ 3 } />
 					<DuotonePicker
 						duotonePalette={ duotonePalette }

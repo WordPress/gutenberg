@@ -3,14 +3,12 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
-import { SelectControl } from '@wordpress/components';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	store as blockEditorStore,
 	BlockEditorProvider,
 } from '@wordpress/block-editor';
 import { speak } from '@wordpress/a11y';
-import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -20,7 +18,7 @@ import NavigationMenu from './navigation-menu';
 
 const NAVIGATION_MENUS_QUERY = [ { per_page: -1, status: 'publish' } ];
 
-export default function NavigationInspector() {
+export default function NavigationInspector( { onSelect } ) {
 	const {
 		selectedNavigationBlockId,
 		clientIdToRef,
@@ -71,11 +69,6 @@ export default function NavigationInspector() {
 		};
 	}, [] );
 
-	const navMenuListId = useInstanceId(
-		NavigationMenu,
-		'edit-site-navigation-inspector-menu'
-	);
-
 	const firstNavRefInTemplate = clientIdToRef[ firstNavigationBlockId ];
 	const firstNavigationMenuRef = navigationMenus?.[ 0 ]?.id;
 
@@ -98,14 +91,6 @@ export default function NavigationInspector() {
 			setCurrentMenuId( clientIdToRef[ selectedNavigationBlockId ] );
 		}
 	}, [ selectedNavigationBlockId ] );
-
-	let options = [];
-	if ( navigationMenus ) {
-		options = navigationMenus.map( ( { id, title } ) => ( {
-			value: id,
-			label: title.rendered,
-		} ) );
-	}
 
 	const [ innerBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -136,8 +121,6 @@ export default function NavigationInspector() {
 	);
 
 	const isLoading = ! ( hasResolvedNavigationMenus && hasLoadedInnerBlocks );
-
-	const hasMoreThanOneNavigationMenu = navigationMenus?.length > 1;
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 
@@ -178,21 +161,6 @@ export default function NavigationInspector() {
 			{ ! hasResolvedNavigationMenus && (
 				<div className="edit-site-navigation-inspector__placeholder" />
 			) }
-			{ hasResolvedNavigationMenus && hasMoreThanOneNavigationMenu && (
-				<SelectControl
-					__nextHasNoMarginBottom
-					className="edit-site-navigation-inspector__select-menu"
-					aria-controls={
-						// aria-controls should only apply when referenced element is in DOM
-						hasLoadedInnerBlocks ? navMenuListId : undefined
-					}
-					value={ currentMenuId || defaultNavigationMenuId }
-					options={ options }
-					onChange={ ( newMenuId ) =>
-						setCurrentMenuId( Number( newMenuId ) )
-					}
-				/>
-			) }
 			{ isLoading && (
 				<>
 					<div className="edit-site-navigation-inspector__placeholder is-child" />
@@ -206,7 +174,10 @@ export default function NavigationInspector() {
 					onChange={ onChange }
 					onInput={ onInput }
 				>
-					<NavigationMenu innerBlocks={ publishedInnerBlocks } />
+					<NavigationMenu
+						innerBlocks={ publishedInnerBlocks }
+						onSelect={ onSelect }
+					/>
 				</BlockEditorProvider>
 			) }
 

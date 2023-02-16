@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -11,22 +12,55 @@ import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
 
 export default function useInitEditedEntityFromURL() {
+	const { params: { postId, postType, path = '/' } = {} } = useLocation();
+	const { isRequestingSite, homepageId } = useSelect( ( select ) => {
+		const { getSite } = select( coreDataStore );
+		const siteData = getSite();
+
+		return {
+			isRequestingSite: ! siteData,
+			homepageId:
+				siteData?.show_on_front === 'page'
+					? siteData.page_on_front
+					: null,
+		};
+	}, [] );
+
 	const { setTemplate, setTemplatePart, setPage } =
 		useDispatch( editSiteStore );
-	const {
-		params: { postId, postType },
-	} = useLocation();
 
-	// Set correct entity on page navigation.
 	useEffect( () => {
-		// This URL scheme mean we can't open a template part with the context of a given post.
-		// Potentially posts and pages could be moved to a "context" query string instead.
-		if ( 'page' === postType || 'post' === postType ) {
-			setPage( { context: { postType, postId } } ); // Resolves correct template based on ID.
-		} else if ( 'wp_template' === postType ) {
-			setTemplate( postId );
-		} else if ( 'wp_template_part' === postType ) {
-			setTemplatePart( postId );
+		switch ( path ) {
+			case '/templates/single':
+				setTemplate( postId );
+				break;
+			case '/template-parts/single':
+				setTemplatePart( postId );
+				break;
+			case '/navigation/single':
+				setPage( {
+					context: { postType, postId },
+				} );
+				break;
+			default: {
+				if ( homepageId ) {
+					setPage( {
+						context: { postType: 'page', postId: homepageId },
+					} );
+				} else if ( ! isRequestingSite ) {
+					setPage( {
+						path: '/',
+					} );
+				}
+			}
 		}
-	}, [ postId, postType ] );
+	}, [
+		path,
+		postId,
+		homepageId,
+		isRequestingSite,
+		setPage,
+		setTemplate,
+		setTemplatePart,
+	] );
 }

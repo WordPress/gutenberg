@@ -8,13 +8,15 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  */
 import Button from '../../button';
 import { Card, CardBody, CardFooter, CardHeader } from '../../card';
-import { HStack } from '../../h-stack';
+import { VStack } from '../../v-stack';
 import Dropdown from '../../dropdown';
 import {
 	NavigatorProvider,
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
+	NavigatorToParentButton,
+	useNavigator,
 } from '..';
 
 const meta: ComponentMeta< typeof NavigatorProvider > = {
@@ -46,7 +48,7 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 				<CardBody>
 					<p>This is the home screen.</p>
 
-					<HStack justify="flex-start" wrap>
+					<VStack alignment="left">
 						<NavigatorButton variant="secondary" path="/child">
 							Navigate to child screen.
 						</NavigatorButton>
@@ -60,6 +62,10 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 
 						<NavigatorButton variant="secondary" path="/stickies">
 							Navigate to screen with sticky content.
+						</NavigatorButton>
+
+						<NavigatorButton variant="secondary" path="/product/1">
+							Navigate to product screen with id 1.
 						</NavigatorButton>
 
 						<Dropdown
@@ -86,7 +92,7 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 								</Card>
 							) }
 						/>
-					</HStack>
+					</VStack>
 				</CardBody>
 			</Card>
 		</NavigatorScreen>
@@ -166,6 +172,10 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 				</CardFooter>
 			</Card>
 		</NavigatorScreen>
+
+		<NavigatorScreen path="/product/:id">
+			<ProductDetails />
+		</NavigatorScreen>
 	</NavigatorProvider>
 );
 
@@ -208,3 +218,83 @@ function MetaphorIpsum( { quantity }: { quantity: number } ) {
 		</>
 	);
 }
+
+function ProductDetails() {
+	const { params } = useNavigator();
+
+	return (
+		<Card>
+			<CardBody>
+				<NavigatorBackButton variant="secondary">
+					Go back
+				</NavigatorBackButton>
+				<p>This is the screen for the product with id: { params.id }</p>
+			</CardBody>
+		</Card>
+	);
+}
+
+const NestedNavigatorTemplate: ComponentStory< typeof NavigatorProvider > = ( {
+	style,
+	...props
+} ) => (
+	<NavigatorProvider
+		style={ { ...style, height: '100vh', maxHeight: '450px' } }
+		{ ...props }
+	>
+		<NavigatorScreen path="/">
+			<Card>
+				<CardBody>
+					<NavigatorButton variant="secondary" path="/child1">
+						Go to first child.
+					</NavigatorButton>
+					<NavigatorButton variant="secondary" path="/child2">
+						Go to second child.
+					</NavigatorButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+		<NavigatorScreen path="/child1">
+			<Card>
+				<CardBody>
+					This is the first child
+					<NavigatorToParentButton variant="secondary">
+						Go back to parent
+					</NavigatorToParentButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+		<NavigatorScreen path="/child2">
+			<Card>
+				<CardBody>
+					This is the second child
+					<NavigatorToParentButton variant="secondary">
+						Go back to parent
+					</NavigatorToParentButton>
+					<NavigatorButton
+						variant="secondary"
+						path="/child2/grandchild"
+					>
+						Go to grand child.
+					</NavigatorButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+		<NavigatorScreen path="/child2/grandchild">
+			<Card>
+				<CardBody>
+					This is the grand child
+					<NavigatorToParentButton variant="secondary">
+						Go back to parent
+					</NavigatorToParentButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+	</NavigatorProvider>
+);
+
+export const NestedNavigator: ComponentStory< typeof NavigatorProvider > =
+	NestedNavigatorTemplate.bind( {} );
+NestedNavigator.args = {
+	initialPath: '/child2/grandchild',
+};

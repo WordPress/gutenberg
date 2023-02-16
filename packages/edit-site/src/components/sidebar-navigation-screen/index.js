@@ -4,19 +4,33 @@
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
+	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	Button,
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
-import { isRTL, __, sprintf } from '@wordpress/i18n';
+import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
+import { unlock } from '../../private-apis';
 
 export default function SidebarNavigationScreen( {
 	path,
-	parentTitle,
 	title,
 	actions,
 	content,
 } ) {
+	const { dashboardLink } = useSelect( ( select ) => {
+		const { getSettings } = unlock( select( editSiteStore ) );
+		return {
+			dashboardLink: getSettings().__experimentalDashboardLink,
+		};
+	}, [] );
+
 	return (
 		<NavigatorScreen
 			className="edit-site-sidebar-navigation-screen"
@@ -28,18 +42,20 @@ export default function SidebarNavigationScreen( {
 					justify="flex-start"
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
-					{ parentTitle ? (
-						<NavigatorBackButton
+					{ path !== '/' ? (
+						<NavigatorToParentButton
 							className="edit-site-sidebar-navigation-screen__back"
 							icon={ isRTL() ? chevronRight : chevronLeft }
-							aria-label={ sprintf(
-								/* translators: %s: previous page. */
-								__( 'Navigate to the previous view: %s' ),
-								parentTitle
-							) }
+							aria-label={ __( 'Back' ) }
 						/>
 					) : (
-						<div className="edit-site-sidebar-navigation-screen__icon-placeholder" />
+						<Button
+							className="edit-site-sidebar-navigation-screen__back"
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							aria-label={ __( 'Navigate to the Dashboard' ) }
+							href={ dashboardLink || 'index.php' }
+							label={ __( 'Dashboard' ) }
+						/>
 					) }
 					<h2 className="edit-site-sidebar-navigation-screen__title">
 						{ title }
