@@ -2,9 +2,14 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { addSubmenu, moreVertical } from '@wordpress/icons';
+import {
+	addSubmenu,
+	chevronUp,
+	chevronDown,
+	moreVertical,
+} from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -80,12 +85,22 @@ function AddSubmenuItem( { block, onClose } ) {
 export default function LeafMoreMenu( props ) {
 	const { clientId, block } = props;
 
-	const { removeBlocks } = useDispatch( blockEditorStore );
+	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
+		useDispatch( blockEditorStore );
 
-	const label = sprintf(
+	const removeLabel = sprintf(
 		/* translators: %s: block name */
 		__( 'Remove %s' ),
 		BlockTitle( { clientId, maximumLength: 25 } )
+	);
+
+	const rootClientId = useSelect(
+		( select ) => {
+			const { getBlockRootClientId } = select( blockEditorStore );
+
+			return getBlockRootClientId( clientId );
+		},
+		[ clientId ]
 	);
 
 	return (
@@ -98,17 +113,39 @@ export default function LeafMoreMenu( props ) {
 			{ ...props }
 		>
 			{ ( { onClose } ) => (
-				<MenuGroup>
-					<AddSubmenuItem block={ block } onClose={ onClose } />
-					<MenuItem
-						onClick={ () => {
-							removeBlocks( [ clientId ], false );
-							onClose();
-						} }
-					>
-						{ label }
-					</MenuItem>
-				</MenuGroup>
+				<>
+					<MenuGroup>
+						<MenuItem
+							icon={ chevronUp }
+							onClick={ () => {
+								moveBlocksUp( [ clientId ], rootClientId );
+								onClose();
+							} }
+						>
+							{ __( 'Move up' ) }
+						</MenuItem>
+						<MenuItem
+							icon={ chevronDown }
+							onClick={ () => {
+								moveBlocksDown( [ clientId ], rootClientId );
+								onClose();
+							} }
+						>
+							{ __( 'Move down' ) }
+						</MenuItem>
+						<AddSubmenuItem block={ block } onClose={ onClose } />
+					</MenuGroup>
+					<MenuGroup>
+						<MenuItem
+							onClick={ () => {
+								removeBlocks( [ clientId ], false );
+								onClose();
+							} }
+						>
+							{ removeLabel }
+						</MenuItem>
+					</MenuGroup>
+				</>
 			) }
 		</DropdownMenu>
 	);
