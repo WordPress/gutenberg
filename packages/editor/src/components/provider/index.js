@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
+import { asyncLoadBlock, getAsyncBlocks } from '@wordpress/block-library';
+import {
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useReducer,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { EntityProvider, useEntityBlockEditor } from '@wordpress/core-data';
@@ -33,6 +39,25 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 	} ) => {
+		const [ loadedBlocks, setBlockLoaded ] = useReducer(
+			( alreadyLoadedBlocks, blockType ) => [
+				...alreadyLoadedBlocks,
+				blockType,
+			],
+			[]
+		);
+		const asyncBlocks = getAsyncBlocks();
+
+		useEffect( () => {
+			asyncBlocks.forEach( async ( blockType ) => {
+				if ( loadedBlocks.includes( blockType ) ) {
+					return;
+				}
+				await asyncLoadBlock( blockType );
+				setBlockLoaded( blockType );
+			} );
+		}, [] );
+
 		const defaultBlockContext = useMemo( () => {
 			if ( post.type === 'wp_template' ) {
 				return {};
@@ -58,7 +83,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 			'postType',
 			type,
-			{ id }
+			{ id },
+			loadedBlocks
 		);
 		const blockEditorSettings = useBlockEditorSettings(
 			editorSettings,

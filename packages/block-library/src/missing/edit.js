@@ -13,7 +13,13 @@ import {
 } from '@wordpress/block-editor';
 import { safeHTML } from '@wordpress/dom';
 
+/**
+ * Internal dependencies
+ */
+import { getAsyncBlocks } from '../../';
+
 function MissingBlockWarning( { attributes, convertToHTML, clientId } ) {
+	const asyncBlocks = getAsyncBlocks();
 	const { originalName, originalUndelimitedContent } = attributes;
 	const hasContent = !! originalUndelimitedContent;
 	const hasHTMLBlock = useSelect(
@@ -31,7 +37,13 @@ function MissingBlockWarning( { attributes, convertToHTML, clientId } ) {
 
 	const actions = [];
 	let messageHTML;
-	if ( hasContent && hasHTMLBlock ) {
+	if ( asyncBlocks.includes( originalName.replace( 'core/', '' ) ) ) {
+		messageHTML = sprintf(
+			/* translators: %s: block name */
+			__( 'The block "%s" is still loading.' ),
+			originalName
+		);
+	} else if ( hasContent && hasHTMLBlock ) {
 		messageHTML = sprintf(
 			/* translators: %s: block name */
 			__(

@@ -47,12 +47,10 @@ import * as commentsTitle from './comments-title';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
-import * as gallery from './gallery';
 import * as group from './group';
 import * as heading from './heading';
 import * as homeLink from './home-link';
 import * as html from './html';
-import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
@@ -126,9 +124,7 @@ const getAllBlocks = () =>
 		// Common blocks are grouped at the top to prioritize their display
 		// in various contexts — like the inserter and auto-complete components.
 		paragraph,
-		image,
 		heading,
-		gallery,
 		list,
 		listItem,
 		quote,
@@ -225,6 +221,13 @@ const getAllBlocks = () =>
 		queryTitle,
 		postAuthorBiography,
 	].filter( Boolean );
+
+export const getAsyncBlocks = () => [ 'image', 'gallery' ].filter( Boolean );
+
+export const asyncLoadBlock = async ( blockType ) => {
+	const { init } = await import( './' + blockType + '/index.js' );
+	init();
+};
 
 /**
  * Function to get all the core blocks in an array.
