@@ -166,14 +166,15 @@ export async function openPreviousGlobalStylesPanel() {
  * Enters edit mode.
  */
 export async function enterEditMode() {
-	const isSidebarVisible = await page.$( '.edit-site-layout__sidebar' );
-	// This check is necessary for the performance tests in old branches
-	// where the site editor toggle was not implemented yet.
-	if ( ! isSidebarVisible ) {
-		return;
+	try {
+		await page.waitForSelector(
+			'.edit-site-visual-editor__editor-canva[role="button"]',
+			{ timeout: 3000 }
+		);
+
+		await canvas().click( 'body' );
+	} catch {
+		// This catch is necessary for the performance tests in old branches
+		// where the site editor toggle was not implemented yet.
 	}
-	await page.waitForSelector(
-		'.edit-site-visual-editor__editor-canvas[role="button"]'
-	);
-	await canvas().click( 'body' );
 }
