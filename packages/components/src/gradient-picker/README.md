@@ -77,6 +77,7 @@ An array of objects of predefined gradients which show up as `CircularOptionPick
 
 -   Type: `array`
 -   Required: No
+// NTS: I think `gradients` should be required. It can be an empty array, but if it's omitted the component breaks. Maybe we default to empty?
 
 ### clearable
 

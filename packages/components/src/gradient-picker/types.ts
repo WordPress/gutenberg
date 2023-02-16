@@ -3,30 +3,30 @@
  */
 import type { HeadingSize } from '../heading/types';
 
-type Gradient = any; //TODO narrow this type
+export type GradientObject = {
+	gradient: string; //TODO: can this be typed more narrowly?
+	name: string;
+	slug: string;
+};
+type OriginObject = { name: string; gradients: GradientObject[] };
 
-export type GradientPickerProps = {
+type GradientPickerBaseProps = {
 	/**
 	 * The class name added to the wrapper.
 	 */
 	className?: string;
-	/**
-	 * The current value of the gradient. Pass a css gradient string (See default value for example).
-	 * Optionally pass in a `null` value to specify no gradient is currently selected.
-	 *
-	 * @default 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'
-	 */
-	value?: string; //TODO: can this be typed more narrowly?
 	/**
 	 * The function called when a new gradient has been defined. It is passed to
 	 * the `currentGradient` as an arugment.
 	 */
 	onChange: ( currentGradient: string | undefined ) => void;
 	/**
-	 * An array of object os predefined gradients which show up as
-	 * `CircularOptionPicker` above the gradient selector.
+	 * The current value of the gradient. Pass a css gradient string (See default value for example).
+	 * Optionally pass in a `null` value to specify no gradient is currently selected.
+	 *
+	 * @default 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'
 	 */
-	gradients?: Gradient[];
+	value?: GradientObject[ 'gradient' ];
 	/**
 	 * Whether the palette should have a clearing button or not.
 	 *
@@ -39,12 +39,22 @@ export type GradientPickerProps = {
 	 */
 	clearGradient?: ( currentGradient: string ) => void;
 	/**
-	 * If true, the gradient pickerwill not be displayed and only defined
-	 * gradients from `gradients` will be shown.
+	 * The heading level.
 	 *
-	 * @default false
+	 * @default 2
 	 */
-	disableCustomGradients?: boolean;
+	headingLevel?: HeadingSize;
+};
+
+export type GradientPickerComponentProps = GradientPickerBaseProps & {
+	/**
+	 * An array of objects as predefined gradients which show up as
+	 * `CircularOptionPicker` above the gradient selector. Alternatively, if
+	 * there are multiple sets (or 'origins') of gradients, you can pass an
+	 * array of objects each with a `name` and a `gradients` array which will
+	 * in turn contain the predifined gradient objects.
+	 */
+	gradients: GradientObject[] | OriginObject[];
 	/**
 	 * Start opting in to the new margin-free styles that will become the default
 	 * in a future version, currently scheduled to be WordPress 6.4. (The prop
@@ -54,15 +64,28 @@ export type GradientPickerProps = {
 	 */
 	__nextHasNoMargin?: boolean;
 	/**
-	 * The heading level.
+	 * If true, the gradient pickerwill not be displayed and only defined
+	 * gradients from `gradients` will be shown.
 	 *
-	 * @default 2
+	 * @default false
 	 */
-	headingLevel?: HeadingSize;
+	disableCustomGradients?: boolean;
 	/**
 	 * Whether this is rendered in the sidebar.
 	 *
 	 * @default false
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
+};
+
+export type SingleOriginGradientPickerProps = GradientPickerBaseProps & {
+	gradients: GradientObject[];
+	onChange: ( currentGradient: string | undefined, index: number ) => void;
+	actions?: React.ReactNode;
+};
+
+export type MultipleOriginGradientPickerProps = GradientPickerBaseProps & {
+	gradients: OriginObject[];
+	onChange: ( currentGradient: string | undefined, index: number ) => void;
+	actions?: React.ReactNode;
 };
