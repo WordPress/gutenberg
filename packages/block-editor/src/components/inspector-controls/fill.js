@@ -12,6 +12,7 @@ import {
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +24,7 @@ export default function InspectorControlsFill( {
 	children,
 	group = 'default',
 	__experimentalGroup,
+	resetAllFilter,
 } ) {
 	if ( __experimentalGroup ) {
 		deprecated(
@@ -50,18 +52,40 @@ export default function InspectorControlsFill( {
 		<StyleProvider document={ document }>
 			<Fill>
 				{ ( fillProps ) => {
-					// Children passed to InspectorControlsFill will not have
-					// access to any React Context whose Provider is part of
-					// the InspectorControlsSlot tree. So we re-create the
-					// Provider in this subtree.
-					const value = ! isEmpty( fillProps ) ? fillProps : null;
 					return (
-						<ToolsPanelContext.Provider value={ value }>
-							{ children }
-						</ToolsPanelContext.Provider>
+						<ToolPanelInspectorControl
+							fillProps={ fillProps }
+							children={ children }
+							resetAllFilter={ resetAllFilter }
+						/>
 					);
 				} }
 			</Fill>
 		</StyleProvider>
+	);
+}
+
+function ToolPanelInspectorControl( { children, resetAllFilter, fillProps } ) {
+	const { registerResetAllFilter, deregisterResetAllFilter } = fillProps;
+	useEffect( () => {
+		if ( resetAllFilter && registerResetAllFilter ) {
+			registerResetAllFilter( resetAllFilter );
+		}
+		return () => {
+			if ( resetAllFilter && deregisterResetAllFilter ) {
+				deregisterResetAllFilter( resetAllFilter );
+			}
+		};
+	}, [ resetAllFilter, registerResetAllFilter, deregisterResetAllFilter ] );
+
+	// Children passed to InspectorControlsFill will not have
+	// access to any React Context whose Provider is part of
+	// the InspectorControlsSlot tree. So we re-create the
+	// Provider in this subtree.
+	const value = ! isEmpty( fillProps ) ? fillProps : null;
+	return (
+		<ToolsPanelContext.Provider value={ value }>
+			{ children }
+		</ToolsPanelContext.Provider>
 	);
 }

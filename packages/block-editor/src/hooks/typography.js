@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -46,9 +46,64 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LETTER_SPACING_SUPPORT_KEY,
 ];
 
-function TypographyInspectorControl( { children } ) {
+function styleToAttributes( style ) {
+	const updatedStyle = { ...omit( style, [ 'fontFamily' ] ) };
+	const fontSizeValue = style?.typography?.fontSize;
+	const fontFamilyValue = style?.typography?.fontFamily;
+	const fontSizeSlug = fontSizeValue?.startsWith( 'var:preset|font-size|' )
+		? fontSizeValue.substring( 'var:preset|font-size|'.length )
+		: undefined;
+	const fontFamilySlug = fontFamilyValue?.startsWith(
+		'var:preset|font-family|'
+	)
+		? fontFamilyValue.substring( 'var:preset|font-family|'.length )
+		: undefined;
+	updatedStyle.typography = {
+		...omit( updatedStyle.typography, [ 'fontFamily' ] ),
+		fontSize: fontSizeSlug ? undefined : fontSizeValue,
+	};
+	return {
+		style: cleanEmptyObject( updatedStyle ),
+		fontFamily: fontFamilySlug,
+		fontSize: fontSizeSlug,
+	};
+}
+
+function attributesToStyle( attributes ) {
+	return {
+		...attributes.style,
+		typography: {
+			...attributes.style?.typography,
+			fontFamily: attributes.fontFamily
+				? 'var:preset|font-family|' + attributes.fontFamily
+				: undefined,
+			fontSize: attributes.fontSize
+				? 'var:preset|font-size|' + attributes.fontSize
+				: attributes.style?.typography?.fontSize,
+		},
+	};
+}
+
+function TypographyInspectorControl( { children, resetAllFilter } ) {
+	const attributesResetAllFilter = useCallback(
+		( attributes ) => {
+			const existingStyle = attributesToStyle( attributes );
+			const updatedStyle = resetAllFilter( existingStyle );
+			return {
+				...attributes,
+				...styleToAttributes( updatedStyle ),
+			};
+		},
+		[ resetAllFilter ]
+	);
+
 	return (
-		<InspectorControls group="typography">{ children }</InspectorControls>
+		<InspectorControls
+			group="typography"
+			resetAllFilter={ attributesResetAllFilter }
+		>
+			{ children }
+		</InspectorControls>
 	);
 }
 
@@ -106,43 +161,15 @@ export function TypographyPanel( {
 	const settings = useBlockSettings( name );
 	const isEnabled = useHasTypographyPanel( settings );
 	const value = useMemo( () => {
-		return {
-			...attributes.style,
-			typography: {
-				...attributes.style?.typography,
-				fontFamily: attributes.fontFamily
-					? 'var:preset|font-family|' + attributes.fontFamily
-					: undefined,
-				fontSize: attributes.fontSize
-					? 'var:preset|font-size|' + attributes.fontSize
-					: attributes.style?.typography?.fontSize,
-			},
-		};
+		return attributesToStyle( {
+			style: attributes.style,
+			fontFamily: attributes.fontFamily,
+			fontSize: attributes.fontSize,
+		} );
 	}, [ attributes.style, attributes.fontSize, attributes.fontFamily ] );
 
 	const onChange = ( newStyle ) => {
-		const updatedStyle = { ...omit( newStyle, [ 'fontFamily' ] ) };
-		const fontSizeValue = newStyle?.typography?.fontSize;
-		const fontFamilyValue = newStyle?.typography?.fontFamily;
-		const fontSizeSlug = fontSizeValue?.startsWith(
-			'var:preset|font-size|'
-		)
-			? fontSizeValue.substring( 'var:preset|font-size|'.length )
-			: undefined;
-		const fontFamilySlug = fontFamilyValue?.startsWith(
-			'var:preset|font-family|'
-		)
-			? fontFamilyValue.substring( 'var:preset|font-family|'.length )
-			: undefined;
-		updatedStyle.typography = {
-			...omit( updatedStyle.typography, [ 'fontFamily' ] ),
-			fontSize: fontSizeSlug ? undefined : fontSizeValue,
-		};
-		setAttributes( {
-			style: cleanEmptyObject( updatedStyle ),
-			fontFamily: fontFamilySlug,
-			fontSize: fontSizeSlug,
-		} );
+		setAttributes( styleToAttributes( newStyle ) );
 	};
 
 	if ( ! isEnabled ) {

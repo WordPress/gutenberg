@@ -104,6 +104,8 @@ const panelContext: ToolsPanelContextType = {
 	shouldRenderPlaceholderItems: false,
 	registerPanelItem: jest.fn(),
 	deregisterPanelItem: jest.fn(),
+	registerResetAllFilter: jest.fn(),
+	deregisterResetAllFilter: jest.fn(),
 	flagItemCustomization: noop,
 	areAllOptionalControlsHidden: true,
 };
@@ -971,6 +973,8 @@ describe( 'ToolsPanel', () => {
 				shouldRenderPlaceholderItems: false,
 				registerPanelItem: noop,
 				deregisterPanelItem: noop,
+				registerResetAllFilter: noop,
+				deregisterResetAllFilter: noop,
 				flagItemCustomization: noop,
 				areAllOptionalControlsHidden: true,
 			};
