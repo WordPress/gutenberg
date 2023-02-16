@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	ContrastChecker,
 	__experimentalColorGradientControl as ColorGradientControl,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -13,6 +14,7 @@ import { TabPanel } from '@wordpress/components';
  */
 import ScreenHeader from './header';
 import { useSupportedStyles, useColorsPerOrigin } from './hooks';
+import { useContrastCheckerColors } from './color-utils';
 import { unlock } from '../../private-apis';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
@@ -63,6 +65,11 @@ function ScreenLinkColor( { name, variation = '' } ) {
 			)[ 0 ],
 		},
 	};
+
+	const { backgroundColor, linkColor, textColor } = useContrastCheckerColors(
+		name,
+		variation
+	);
 
 	if ( ! hasLinkColor ) {
 		return null;
@@ -117,6 +124,13 @@ function ScreenLinkColor( { name, variation = '' } ) {
 					);
 				} }
 			</TabPanel>
+			{ name === undefined && (
+				<ContrastChecker
+					backgroundColor={ backgroundColor }
+					textColor={ textColor }
+					linkColor={ linkColor }
+				/>
+			) }
 		</>
 	);
 }

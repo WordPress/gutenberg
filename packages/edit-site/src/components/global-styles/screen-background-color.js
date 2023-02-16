@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalColorGradientControl as ColorGradientControl,
+	ContrastChecker,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 
@@ -21,6 +22,7 @@ import {
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
+import { useContrastCheckerColors } from './color-utils';
 import { unlock } from '../../private-apis';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
@@ -65,6 +67,11 @@ function ScreenBackgroundColor( { name, variation = '' } ) {
 		prefix + 'color.gradient',
 		name,
 		'user'
+	);
+
+	const { textColor, linkColor } = useContrastCheckerColors(
+		name,
+		variation
 	);
 
 	if ( ! hasBackgroundColor && ! hasGradientColor ) {
@@ -125,6 +132,13 @@ function ScreenBackgroundColor( { name, variation = '' } ) {
 				headingLevel={ 3 }
 				{ ...controlProps }
 			/>
+			{ name === undefined && (
+				<ContrastChecker
+					backgroundColor={ backgroundColor }
+					textColor={ textColor }
+					linkColor={ linkColor }
+				/>
+			) }
 		</>
 	);
 }

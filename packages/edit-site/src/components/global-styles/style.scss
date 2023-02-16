@@ -201,6 +201,15 @@
 .edit-site-global-styles-sidebar__navigator-screen {
 	display: flex;
 	flex-direction: column;
+
+	// Ensure color contrast checker has consistent spacing across navigation screens.
+	.block-editor-contrast-checker {
+		margin-left: $grid-unit-20;
+		margin-right: $grid-unit-20;
+		.components-notice__content {
+			margin-right: 0;
+		}
+	}
 }
 
 .edit-site-global-styles__shadow-panel {

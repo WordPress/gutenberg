@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	ContrastChecker,
 	__experimentalColorGradientControl as ColorGradientControl,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -12,6 +13,7 @@ import {
  */
 import ScreenHeader from './header';
 import { useSupportedStyles, useColorsPerOrigin } from './hooks';
+import { useContrastCheckerColors } from './color-utils';
 import { unlock } from '../../private-apis';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
@@ -30,6 +32,11 @@ function ScreenTextColor( { name, variation = '' } ) {
 
 	const [ color, setColor ] = useGlobalStyle( prefix + 'color.text', name );
 	const [ userColor ] = useGlobalStyle( prefix + 'color.text', name, 'user' );
+
+	const { backgroundColor, linkColor } = useContrastCheckerColors(
+		name,
+		variation
+	);
 
 	if ( ! hasTextColor ) {
 		return null;
@@ -55,6 +62,13 @@ function ScreenTextColor( { name, variation = '' } ) {
 				clearable={ color === userColor }
 				headingLevel={ 3 }
 			/>
+			{ name === undefined && (
+				<ContrastChecker
+					backgroundColor={ backgroundColor }
+					textColor={ color }
+					linkColor={ linkColor }
+				/>
+			) }
 		</>
 	);
 }

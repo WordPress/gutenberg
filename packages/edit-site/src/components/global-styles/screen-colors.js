@@ -10,7 +10,10 @@ import {
 	FlexItem,
 	ColorIndicator,
 } from '@wordpress/components';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	ContrastChecker,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -23,6 +26,7 @@ import Subtitle from './subtitle';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 import BlockPreviewPanel from './block-preview-panel';
 import { getVariationClassName } from './utils';
+import { useContrastCheckerColors } from './color-utils';
 import { unlock } from '../../private-apis';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
@@ -217,6 +221,11 @@ function ScreenColors( { name, variation = '' } ) {
 		name === undefined ? '' : '/blocks/' + encodeURIComponent( name );
 	const variationClassName = getVariationClassName( variation );
 
+	const { backgroundColor, textColor, linkColor } = useContrastCheckerColors(
+		name,
+		variation
+	);
+
 	return (
 		<>
 			<ScreenHeader
@@ -264,6 +273,13 @@ function ScreenColors( { name, variation = '' } ) {
 					</VStack>
 				</VStack>
 			</div>
+			{ name === undefined && (
+				<ContrastChecker
+					backgroundColor={ backgroundColor }
+					textColor={ textColor }
+					linkColor={ linkColor }
+				/>
+			) }
 		</>
 	);
 }
