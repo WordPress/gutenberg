@@ -24,7 +24,7 @@ describe( 'block mover', () => {
 					negativeDirection
 				)
 			).toBe(
-				`Block ${ label } is at the beginning of the content and can’t be moved up`
+				`Block "${ label }" is at the beginning of the content and can’t be moved up`
 			);
 		} );
 
@@ -39,7 +39,7 @@ describe( 'block mover', () => {
 					positiveDirection
 				)
 			).toBe(
-				`Block ${ label } is at the end of the content and can’t be moved down`
+				`Block "${ label }" is at the end of the content and can’t be moved down`
 			);
 		} );
 
@@ -53,7 +53,9 @@ describe( 'block mover', () => {
 					false,
 					negativeDirection
 				)
-			).toBe( `Move ${ label } block from position 2 up to position 1` );
+			).toBe(
+				`Move "${ label }" block from position 2 up to position 1`
+			);
 		} );
 
 		it( 'generates a title for the second item moving down', () => {
@@ -67,7 +69,7 @@ describe( 'block mover', () => {
 					positiveDirection
 				)
 			).toBe(
-				`Move ${ label } block from position 2 down to position 3`
+				`Move "${ label }" block from position 2 down to position 3`
 			);
 		} );
 
@@ -81,7 +83,9 @@ describe( 'block mover', () => {
 					true,
 					positiveDirection
 				)
-			).toBe( `Block ${ label } is the only block, and cannot be moved` );
+			).toBe(
+				`Block "${ label }" is the only block, and cannot be moved`
+			);
 		} );
 
 		it( 'indicates that the block can be moved left when the orientation is horizontal and the direction is negative', () => {
@@ -96,7 +100,7 @@ describe( 'block mover', () => {
 					'horizontal'
 				)
 			).toBe(
-				`Move ${ label } block from position 2 left to position 1`
+				`Move "${ label }" block from position 2 left to position 1`
 			);
 		} );
 
@@ -112,7 +116,7 @@ describe( 'block mover', () => {
 					'horizontal'
 				)
 			).toBe(
-				`Move ${ label } block from position 2 right to position 3`
+				`Move "${ label }" block from position 2 right to position 3`
 			);
 		} );
 
@@ -128,7 +132,7 @@ describe( 'block mover', () => {
 					'horizontal'
 				)
 			).toBe(
-				`Block ${ label } is at the beginning of the content and can’t be moved left`
+				`Block "${ label }" is at the beginning of the content and can’t be moved left`
 			);
 		} );
 
@@ -144,7 +148,7 @@ describe( 'block mover', () => {
 					'horizontal'
 				)
 			).toBe(
-				`Block ${ label } is at the end of the content and can’t be moved right`
+				`Block "${ label }" is at the end of the content and can’t be moved right`
 			);
 		} );
 	} );
