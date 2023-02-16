@@ -4,6 +4,7 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
+	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -20,7 +21,6 @@ import AddNewTemplate from '../add-new-template';
 
 const config = {
 	wp_template: {
-		path: '/templates',
 		labels: {
 			title: __( 'Templates' ),
 			loading: __( 'Loading templates' ),
@@ -29,7 +29,6 @@ const config = {
 		},
 	},
 	wp_template_part: {
-		path: '/template-parts',
 		labels: {
 			title: __( 'Template parts' ),
 			loading: __( 'Loading template parts' ),
@@ -43,14 +42,14 @@ const TemplateItem = ( { postType, postId, ...props } ) => {
 	const linkInfo = useLink( {
 		postType,
 		postId,
-		path: config[ postType ].path + '/single',
 	} );
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };
 
-export default function SidebarNavigationScreenTemplates( {
-	postType = 'wp_template',
-} ) {
+export default function SidebarNavigationScreenTemplates() {
+	const {
+		params: { postType },
+	} = useNavigator();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
@@ -62,14 +61,11 @@ export default function SidebarNavigationScreenTemplates( {
 	);
 
 	const browseAllLink = useLink( {
-		postType,
-		postId: undefined,
-		path: config[ postType ].path + '/all',
+		path: '/' + postType + '/all',
 	} );
 
 	return (
 		<SidebarNavigationScreen
-			path={ config[ postType ].path }
 			title={ config[ postType ].labels.title }
 			actions={
 				! isMobileViewport && (

@@ -143,12 +143,9 @@ export default function NewTemplate( {
 			setCanvasMode( 'edit' );
 
 			// Navigate to the created template editor.
-			window.queueMicrotask( () => {
-				history.push( {
-					postId: newTemplate.id,
-					postType: newTemplate.type,
-					path: '/templates/single',
-				} );
+			history.push( {
+				postId: newTemplate.id,
+				postType: newTemplate.type,
 			} );
 
 			createSuccessNotice(

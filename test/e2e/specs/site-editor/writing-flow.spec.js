@@ -23,7 +23,6 @@ test.describe( 'Site editor writing flow', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
-			path: '/template-parts/single',
 		} );
 		await editor.canvas.click( 'body' );
 		// Select the first site title block.
@@ -52,7 +51,6 @@ test.describe( 'Site editor writing flow', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
-			path: '/template-parts/single',
 		} );
 		await editor.canvas.click( 'body' );
 		// Make sure the sidebar is open.

@@ -7,5 +7,5 @@
  * @return {boolean} Is list page or not.
  */
 export default function getIsListPage( { path } ) {
-	return path === '/templates/all' || path === '/template-parts/all';
+	return path === '/wp_template/all' || path === '/wp_template_part/all';
 }
