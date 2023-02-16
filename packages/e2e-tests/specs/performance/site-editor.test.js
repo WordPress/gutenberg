@@ -107,7 +107,11 @@ describe( 'Site Editor Performance', () => {
 	} );
 
 	describe( 'Loading', () => {
+		// Number of measurements to take.
 		const samples = 3;
+		// Number of throwaway measurements to perform before recording samples.
+		// Having at least one helps ensure that caching quirks don't manifest
+		// in the results.
 		const throwaway = 1;
 		const iterations = Array.from(
 			{ length: samples + throwaway },
