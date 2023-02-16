@@ -74,7 +74,7 @@ describe( 'AlignmentUI', () => {
 			screen.getAllByRole( 'menuitemradio', {
 				name: /^Align text \w+$/,
 			} )
-		).toHaveLength( 3 );
+		).toHaveLength( 4 );
 
 		// Cancel running effects, like delayed dropdown menu popover positioning.
 		unmount();

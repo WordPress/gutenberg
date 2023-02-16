@@ -3,7 +3,12 @@
  */
 import { __, isRTL } from '@wordpress/i18n';
 import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
-import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
+import {
+	alignLeft,
+	alignRight,
+	alignCenter,
+	alignJustify,
+} from '@wordpress/icons';
 
 const DEFAULT_ALIGNMENT_CONTROLS = [
 	{
@@ -20,6 +25,11 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 		icon: alignRight,
 		title: __( 'Align text right' ),
 		align: 'right',
+	},
+	{
+		icon: alignJustify,
+		title: __( 'Align text justify' ),
+		align: 'justify',
 	},
 ];
 

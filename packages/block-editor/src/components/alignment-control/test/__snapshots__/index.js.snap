@@ -164,6 +164,29 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
         </svg>
       </button>
     </div>
+    <div>
+      <button
+        align="justify"
+        aria-label="Align text justify"
+        aria-pressed="false"
+        class="components-button components-toolbar__control has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="https://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12.8h16v-1.5H4v1.5zm0 7h12.4v-1.5H4v1.5zM4 4.3v1.5h16V4.3H4z"
+          />
+        </svg>
+      </button>
+    </div>
   </div>
 </div>
 `;
