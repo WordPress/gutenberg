@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import removeAccents from 'remove-accents';
 
 /**
@@ -54,7 +53,7 @@ export function PageAttributesParent() {
 			const pageId = getEditedPostAttribute( 'parent' );
 			const pType = getPostType( postTypeSlug );
 			const postId = getCurrentPostId();
-			const isHierarchical = get( pType, [ 'hierarchical' ], false );
+			const isHierarchical = pType?.hierarchical;
 			const query = {
 				per_page: 100,
 				exclude: postId,
@@ -83,8 +82,8 @@ export function PageAttributesParent() {
 		[ fieldValue ]
 	);
 
-	const isHierarchical = get( postType, [ 'hierarchical' ], false );
-	const parentPageLabel = get( postType, [ 'labels', 'parent_item_colon' ] );
+	const isHierarchical = postType?.hierarchical;
+	const parentPageLabel = postType?.labels?.parent_item_colon;
 	const pageItems = items || [];
 
 	const parentOptions = useMemo( () => {

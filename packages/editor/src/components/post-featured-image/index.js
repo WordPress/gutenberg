@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -105,7 +100,7 @@ function PostFeaturedImage( {
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
-	const postLabel = get( postType, [ 'labels' ], {} );
+	const postLabel = postType?.labels ?? {};
 	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
 		media,
 		currentPostId

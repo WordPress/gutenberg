@@ -9,11 +9,6 @@ import { __ } from '@wordpress/i18n';
 import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../constants';
 
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * Builds the arguments for a success notification dispatch.
  *
  * @param {Object} data Incoming data to build the arguments from.
@@ -24,7 +19,7 @@ import { get } from 'lodash';
 export function getNotificationArgumentsForSaveSuccess( data ) {
 	const { previousPost, post, postType } = data;
 	// Autosaves are neither shown a notice nor redirected.
-	if ( get( data.options, [ 'isAutosave' ] ) ) {
+	if ( data.options?.isAutosave ) {
 		return [];
 	}
 
@@ -38,7 +33,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 	const willPublish = publishStatus.includes( post.status );
 
 	let noticeMessage;
-	let shouldShowLink = get( postType, [ 'viewable' ], false );
+	let shouldShowLink = postType?.viewable;
 	let isDraft;
 
 	// Always should a notice, which will be spoken for accessibility.
