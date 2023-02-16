@@ -198,7 +198,7 @@ describe( 'Basic rendering', () => {
 			within( resultsList ).getAllByRole( 'option' );
 
 		expect( searchResultElements ).toHaveLength(
-			// The fauxEntitySuggestions length plus the 'Press ENTER to add this link' button.
+			// The fauxEntitySuggestions length plus the 'Press the Enter key to add this link' button.
 			fauxEntitySuggestions.length + 1
 		);
 
@@ -577,7 +577,7 @@ describe( 'Searching for a link', () => {
 			expect( lastSearchResultItem ).toHaveTextContent( searchTerm );
 			expect( lastSearchResultItem ).toHaveTextContent( 'URL' );
 			expect( lastSearchResultItem ).toHaveTextContent(
-				'Press ENTER to add this link'
+				'Press the Enter key to add this link'
 			);
 		}
 	);
@@ -632,7 +632,7 @@ describe( 'Manual link entry', () => {
 			expect( searchResultElements ).toHaveTextContent( searchTerm );
 			expect( searchResultElements ).toHaveTextContent( 'URL' );
 			expect( searchResultElements ).toHaveTextContent(
-				'Press ENTER to add this link'
+				'Press the Enter key to add this link'
 			);
 		}
 	);
@@ -890,7 +890,7 @@ describe( 'Manual link entry', () => {
 				expect( searchResultElements ).toHaveTextContent( searchTerm );
 				expect( searchResultElements ).toHaveTextContent( searchType );
 				expect( searchResultElements ).toHaveTextContent(
-					'Press ENTER to add this link'
+					'Press the Enter key to add this link'
 				);
 			}
 		);
