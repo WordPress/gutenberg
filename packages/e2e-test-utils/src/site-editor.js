@@ -168,7 +168,7 @@ export async function openPreviousGlobalStylesPanel() {
 export async function enterEditMode() {
 	try {
 		await page.waitForSelector(
-			'.edit-site-visual-editor__editor-canva[role="button"]',
+			'.edit-site-visual-editor__editor-canvas[role="button"]',
 			{ timeout: 3000 }
 		);
 
