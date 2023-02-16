@@ -6,7 +6,7 @@ import { groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { useMemo, useEffect } from '@wordpress/element';
 import { pipe, useAsyncList } from '@wordpress/compose';
 
@@ -137,13 +137,13 @@ export function BlockTypesTab( {
 				{ didRenderAllCategories && uncategorizedItems.length > 0 && (
 					<InserterPanel
 						className="block-editor-inserter__uncategorized-blocks-panel"
-						title={ __( 'Uncategorized' ) }
+						title={ _x( 'Uncategorized', 'block category' ) }
 					>
 						<BlockTypesList
 							items={ uncategorizedItems }
 							onSelect={ onSelectItem }
 							onHover={ onHover }
-							label={ __( 'Uncategorized' ) }
+							label={ _x( 'Uncategorized', 'block category' ) }
 						/>
 					</InserterPanel>
 				) }

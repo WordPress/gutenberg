@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 import { Icon, starEmpty, starFilled, starHalf } from '@wordpress/icons';
 
 function Stars( { rating } ) {
@@ -15,7 +15,7 @@ function Stars( { rating } ) {
 		<span
 			aria-label={ sprintf(
 				/* translators: %s: number of stars. */
-				__( '%s out of 5 stars' ),
+				_n( '%s star out of 5', '%s stars out of 5', stars ),
 				stars
 			) }
 		>

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { SelectControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ export default function FontFamilyControl( {
 	}
 
 	const options = [
-		{ value: '', label: __( 'Default' ) },
+		{ value: '', label: _x( 'Default', 'font family' ) },
 		...fontFamilies.map( ( { fontFamily, name } ) => {
 			return {
 				value: fontFamily,

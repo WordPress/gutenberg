@@ -85,7 +85,7 @@ const FloatingToolbar = ( {
 				{ showNavUpButton && (
 					<ToolbarGroup passedStyle={ styles.toolbar }>
 						<ToolbarButton
-							title={ __( 'Navigate Up' ) }
+							title={ __( 'Navigate up' ) }
 							onClick={
 								! showPrevious &&
 								( () => onNavigateUp( parentId ) )

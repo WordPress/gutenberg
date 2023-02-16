@@ -18,7 +18,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 
 /**
@@ -91,7 +91,7 @@ export default function SpacingInputControl( {
 				name: ! isMixed
 					? // translators: A custom measurement, eg. a number followed by a unit like 12px.
 					  sprintf( __( 'Custom (%s)' ), value )
-					: __( 'Mixed' ),
+					: _x( 'Mixed', 'CSS values' ),
 				slug: 'custom',
 				size: value,
 			},
@@ -146,11 +146,11 @@ export default function SpacingInputControl( {
 		onChange( [ next, selectedUnit ].join( '' ) );
 	};
 
-	const allPlaceholder = isMixed ? __( 'Mixed' ) : null;
+	const allPlaceholder = isMixed ? _x( 'Mixed', 'CSS values' ) : null;
 
 	const currentValueHint = ! isMixed
 		? customTooltipContent( currentValue )
-		: __( 'Mixed' );
+		: _x( 'Mixed', 'CSS values' );
 
 	const options = selectListSizes.map( ( size, index ) => ( {
 		key: index,
@@ -164,7 +164,7 @@ export default function SpacingInputControl( {
 
 	const ariaLabel = sprintf(
 		// translators: 1: The side of the block being modified (top, bottom, left, etc.). 2. Type of spacing being modified (Padding, margin, etc)
-		__( '%1$s %2$s' ),
+		_x( '%1$s %2$s', 'block side and spacing type' ),
 		LABELS[ side ],
 		type?.toLowerCase()
 	);

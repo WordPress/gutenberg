@@ -131,7 +131,7 @@ const LinkControlSearchInput = forwardRef(
 					className={ inputClasses }
 					value={ value }
 					onChange={ onInputChange }
-					placeholder={ placeholder ?? __( 'Search or type url' ) }
+					placeholder={ placeholder ?? __( 'Search or type URL' ) }
 					__experimentalRenderSuggestions={
 						showSuggestions ? handleRenderSuggestions : null
 					}

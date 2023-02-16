@@ -95,7 +95,7 @@ export default function LeafMoreMenu( props ) {
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
-		__( 'Remove %s' ),
+		__( 'Remove "%s"' ),
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 

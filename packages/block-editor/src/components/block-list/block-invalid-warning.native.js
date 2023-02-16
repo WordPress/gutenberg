@@ -19,7 +19,7 @@ import { store as blockEditorStore } from '../../store';
 export default function BlockInvalidWarning( { blockTitle, icon, clientId } ) {
 	const accessibilityLabel = sprintf(
 		/* translators: accessibility text for blocks with invalid content. %d: localized block title */
-		__( '%s block. This block has invalid content' ),
+		__( '"%s" block. This block has invalid content' ),
 		blockTitle
 	);
 
@@ -51,8 +51,10 @@ export default function BlockInvalidWarning( { blockTitle, icon, clientId } ) {
 			<Warning
 				title={ blockTitle }
 				// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
-				message={ __(
-					'Problem displaying block. \nTap to attempt block recovery.'
+				message={ sprintf(
+					'%1$s \n%2$s',
+					__( 'Problem displaying block.' ),
+					__( 'Tap to attempt block recovery.' )
 				) }
 				icon={ icon }
 				accessibilityLabel={ accessibilityLabel }

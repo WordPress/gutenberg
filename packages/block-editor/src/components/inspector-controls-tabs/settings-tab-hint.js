@@ -29,7 +29,7 @@ export default function InspectorControlsTabsHint() {
 		<div ref={ ref } className="block-editor-inspector-controls-tabs__hint">
 			<div className="block-editor-inspector-controls-tabs__hint-content">
 				{ __(
-					"Looking for other block settings? They've moved to the styles tab."
+					'Looking for other block settings? They have moved to the styles tab.'
 				) }
 			</div>
 			<Button

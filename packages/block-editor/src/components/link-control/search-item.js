@@ -85,7 +85,7 @@ export const LinkControlSearchItem = ( {
 							safeDecodeURI( suggestion.url )
 						) ||
 							'' ) }
-					{ isURL && __( 'Press ENTER to add this link' ) }
+					{ isURL && __( 'Press the Enter key to add this link' ) }
 				</span>
 			</span>
 			{ shouldShowType && suggestion.type && (

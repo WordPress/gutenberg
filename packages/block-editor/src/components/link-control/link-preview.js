@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
 	ExternalLink,
@@ -59,7 +59,7 @@ export default function LinkPreview( {
 
 	return (
 		<div
-			aria-label={ __( 'Currently selected' ) }
+			aria-label={ _x( 'Currently selected', 'link' ) }
 			className={ classnames( 'block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,

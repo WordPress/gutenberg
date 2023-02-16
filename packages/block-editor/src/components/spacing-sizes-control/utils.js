@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Checks is given value is a spacing preset.
@@ -137,7 +137,7 @@ export const LABELS = {
 	bottom: __( 'Bottom' ),
 	left: __( 'Left' ),
 	right: __( 'Right' ),
-	mixed: __( 'Mixed' ),
+	mixed: _x( 'Mixed', 'spacing sides' ),
 	vertical: __( 'Vertical' ),
 	horizontal: __( 'Horizontal' ),
 };

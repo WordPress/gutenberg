@@ -129,7 +129,7 @@ function MediaList( {
 	mediaList,
 	category,
 	onClick,
-	label = __( 'Media List' ),
+	label = __( 'Media list' ),
 } ) {
 	const composite = useCompositeState();
 	const onPreviewClick = useCallback(

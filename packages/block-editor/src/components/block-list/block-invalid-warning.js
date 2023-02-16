@@ -58,7 +58,7 @@ export function BlockInvalidWarning( {
 						onClick={ attemptBlockRecovery }
 						variant="primary"
 					>
-						{ __( 'Attempt Block Recovery' ) }
+						{ __( 'Attempt block recovery' ) }
 					</Button>,
 				] }
 				secondaryActions={ hiddenActions }
@@ -69,7 +69,7 @@ export function BlockInvalidWarning( {
 				<Modal
 					title={
 						// translators: Dialog title to fix block content
-						__( 'Resolve Block' )
+						__( 'Resolve block' )
 					}
 					onRequestClose={ onCompareClose }
 					className="block-editor-block-compare"
@@ -79,7 +79,7 @@ export function BlockInvalidWarning( {
 						onKeep={ convertToHTML }
 						onConvert={ convertToBlocks }
 						convertor={ blockToBlocks }
-						convertButtonText={ __( 'Convert to Blocks' ) }
+						convertButtonText={ __( 'Convert to blocks' ) }
 					/>
 				</Modal>
 			) }

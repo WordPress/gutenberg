@@ -96,31 +96,31 @@ export class Inserter extends Component {
 	getInsertionOptions() {
 		const addBeforeOption = {
 			value: 'before',
-			label: __( 'Add Block Before' ),
+			label: __( 'Add block before' ),
 			icon: plusCircle,
 		};
 
 		const replaceCurrentOption = {
 			value: 'replace',
-			label: __( 'Replace Current Block' ),
+			label: __( 'Replace current block' ),
 			icon: plusCircleFilled,
 		};
 
 		const addAfterOption = {
 			value: 'after',
-			label: __( 'Add Block After' ),
+			label: __( 'Add block after' ),
 			icon: plusCircle,
 		};
 
 		const addToBeginningOption = {
 			value: 'start',
-			label: __( 'Add To Beginning' ),
+			label: __( 'Add to beginning' ),
 			icon: insertBefore,
 		};
 
 		const addToEndOption = {
 			value: 'end',
-			label: __( 'Add To End' ),
+			label: __( 'Add to end' ),
 			icon: insertAfter,
 		};
 

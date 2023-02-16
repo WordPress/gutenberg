@@ -59,7 +59,7 @@ export function getBlockMoverDescription(
 	if ( isFirst && isLast ) {
 		return sprintf(
 			// translators: %s: Type of block (i.e. Text, Image etc)
-			__( 'Block %s is the only block, and cannot be moved' ),
+			__( 'Block "%s" is the only block, and cannot be moved' ),
 			type
 		);
 	}
@@ -72,7 +72,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
 				__(
-					'Move %1$s block from position %2$d down to position %3$d'
+					'Move "%1$s" block from position %2$d down to position %3$d'
 				),
 				type,
 				position,
@@ -84,7 +84,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
 				__(
-					'Move %1$s block from position %2$d left to position %3$d'
+					'Move "%1$s" block from position %2$d left to position %3$d'
 				),
 				type,
 				position,
@@ -96,7 +96,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
 				__(
-					'Move %1$s block from position %2$d right to position %3$d'
+					'Move "%1$s" block from position %2$d right to position %3$d'
 				),
 				type,
 				position,
@@ -113,7 +113,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
-					'Block %1$s is at the end of the content and can’t be moved down'
+					'Block "%1$s" is at the end of the content and can’t be moved down'
 				),
 				type
 			);
@@ -123,7 +123,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
-					'Block %1$s is at the end of the content and can’t be moved left'
+					'Block "%1$s" is at the end of the content and can’t be moved left'
 				),
 				type
 			);
@@ -133,7 +133,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
-					'Block %1$s is at the end of the content and can’t be moved right'
+					'Block "%1$s" is at the end of the content and can’t be moved right'
 				),
 				type
 			);
@@ -147,7 +147,9 @@ export function getBlockMoverDescription(
 		if ( movementDirection === 'up' ) {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
-				__( 'Move %1$s block from position %2$d up to position %3$d' ),
+				__(
+					'Move "%1$s" block from position %2$d up to position %3$d'
+				),
 				type,
 				position,
 				position - 1
@@ -158,7 +160,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
 				__(
-					'Move %1$s block from position %2$d left to position %3$d'
+					'Move "%1$s" block from position %2$d left to position %3$d'
 				),
 				type,
 				position,
@@ -170,7 +172,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
 				__(
-					'Move %1$s block from position %2$d right to position %3$d'
+					'Move "%1$s" block from position %2$d right to position %3$d'
 				),
 				type,
 				position,
@@ -187,7 +189,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
-					'Block %1$s is at the beginning of the content and can’t be moved up'
+					'Block "%1$s" is at the beginning of the content and can’t be moved up'
 				),
 				type
 			);
@@ -197,7 +199,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
-					'Block %1$s is at the beginning of the content and can’t be moved left'
+					'Block "%1$s" is at the beginning of the content and can’t be moved left'
 				),
 				type
 			);
@@ -207,7 +209,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc)
 				__(
-					'Block %1$s is at the beginning of the content and can’t be moved right'
+					'Block "%1$s" is at the beginning of the content and can’t be moved right'
 				),
 				type
 			);

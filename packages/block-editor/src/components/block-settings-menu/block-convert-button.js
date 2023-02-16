@@ -9,6 +9,6 @@ export default function BlockConvertButton( { shouldRender, onClick, small } ) {
 		return null;
 	}
 
-	const label = __( 'Convert to Blocks' );
+	const label = __( 'Convert to blocks' );
 	return <MenuItem onClick={ onClick }>{ ! small && label }</MenuItem>;
 }

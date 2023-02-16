@@ -13,7 +13,7 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 	const value = isDefined ? lineHeight : BASE_DEFAULT_VALUE;
 	return (
 		<UnitControl
-			label={ __( 'Line Height' ) }
+			label={ __( 'Line height' ) }
 			// Set minimun value of 1 since lower values break on Android
 			min={ 1 }
 			max={ 5 }

@@ -42,7 +42,7 @@ function InserterPreviewPanel( { item } ) {
 					</div>
 				) : (
 					<div className="block-editor-inserter__preview-content-missing">
-						{ __( 'No Preview Available.' ) }
+						{ __( 'No preview available.' ) }
 					</div>
 				) }
 			</div>

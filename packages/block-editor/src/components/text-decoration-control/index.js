@@ -8,11 +8,11 @@ import classnames from 'classnames';
  */
 import { BaseControl, Button } from '@wordpress/components';
 import { reset, formatStrikethrough, formatUnderline } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 const TEXT_DECORATIONS = [
 	{
-		name: __( 'None' ),
+		name: _x( 'None', 'text decoration' ),
 		value: 'none',
 		icon: reset,
 	},
