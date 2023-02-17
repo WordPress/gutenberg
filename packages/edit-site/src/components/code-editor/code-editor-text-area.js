@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import Textarea from 'react-autosize-textarea';
+import Textarea from 'react-textarea-autosize';
 
 /**
  * WordPress dependencies

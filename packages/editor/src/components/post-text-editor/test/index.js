@@ -16,7 +16,7 @@ import PostTextEditor from '../';
 
 // "Downgrade" ReactAutosizeTextarea to a regular textarea. Assumes aligned
 // props interface.
-jest.mock( 'react-autosize-textarea', () => ( props ) => (
+jest.mock( 'react-textarea-autosize', () => ( props ) => (
 	<textarea { ...props } />
 ) );
 
