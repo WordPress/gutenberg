@@ -10,7 +10,7 @@ const { Fill, Slot } = createSlotFill( 'SettingsToolbarButton' );
 
 const SettingsButton = ( { openGeneralSidebar } ) => (
 	<ToolbarButton
-		title={ __( 'Open Settings' ) }
+		title={ __( 'Open settings' ) }
 		icon={ cog }
 		onClick={ openGeneralSidebar }
 	/>
