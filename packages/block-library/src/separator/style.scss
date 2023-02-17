@@ -7,6 +7,14 @@
 	border-left: none;
 	border-right: none;
 
+	&.is-style-default {
+		width: 200px;
+	}
+
+	&.is-style-wide {
+		width: 100%;
+	}
+
 	// Dots style
 	&.is-style-dots {
 		// Override any background themes often set on the hr tag for this style.
