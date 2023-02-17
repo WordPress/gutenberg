@@ -99,7 +99,7 @@ function NonDefaultControls( { format, onChange } ) {
 	);
 	const customOption = {
 		key: 'custom',
-		name: __( 'Custom' ),
+		name: __( 'Custom format' ),
 		className:
 			'block-editor-date-format-picker__custom-format-select-control__custom-option',
 		__experimentalHint: __( 'Enter your own date format' ),
@@ -137,6 +137,7 @@ function NonDefaultControls( { format, onChange } ) {
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision
 					help={ createInterpolateElement(
+						// translators: <Link> creates a link to the WordPress.org documentation on date and time formatting.
 						__(
 							'Enter a date or time <Link>format string</Link>.'
 						),
