@@ -33,10 +33,10 @@
 // Provide special styling for the placeholder.
 // @todo: this particular minimal style of placeholder could be componentized further.
 .wp-block-site-logo.wp-block-site-logo {
-	// Match the default logo size.
+
 	&.is-default-size .components-placeholder {
-		height: 120px;
-		width: 120px;
+		height: 80px;
+		width: 80px;
 	}
 
 	// Inherit radius.
