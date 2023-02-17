@@ -19,7 +19,7 @@ function block_core_navigation_submenu_build_css_colors( $context, $attributes )
 		'inline_styles' => '',
 	);
 
-	$is_sub_menu = isset( $attributes['isTopLevelItem'] ) ? ( ! $attributes['isTopLevelItem'] ) : false;
+	$is_sub_menu = false; //isset( $attributes['isTopLevelItem'] ) ? ( ! $attributes['isTopLevelItem'] ) : false;
 
 	// Text color.
 	$named_text_color  = null;
@@ -250,6 +250,19 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 
 	if ( $has_submenu ) {
+
+		if ( array_key_exists( 'customOverlayTextColor', $block->context ) ) {
+			$custom_text_color = $block->context['customOverlayTextColor'];
+		} elseif ( array_key_exists( 'overlayTextColor', $block->context ) ) {
+			$named_text_color = $block->context['overlayTextColor'];
+		}
+
+		if ( array_key_exists( 'customOverlayBackgroundColor', $block->context ) ) {
+			$custom_background_color = $block->context['customOverlayBackgroundColor'];
+		} elseif ( array_key_exists( 'overlayBackgroundColor', $block->context ) ) {
+			$named_background_color = $block->context['overlayBackgroundColor'];
+		}
+
 		$inner_blocks_html = '';
 		foreach ( $block->inner_blocks as $inner_block ) {
 			$inner_blocks_html .= $inner_block->render();
@@ -264,7 +277,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		}
 
 		$html .= sprintf(
-			'<ul class="wp-block-navigation__submenu-container">%s</ul>',
+			'<ul class="wp-block-navigation__submenu-container has-background has-' . $named_background_color . '-background-color has-text-color has-' . $named_text_color . '-color">%s</ul>',
 			$inner_blocks_html
 		);
 	}
