@@ -61,7 +61,10 @@ function BlockCompare( {
 	return (
 		<div className="block-editor-block-compare__wrapper">
 			<BlockView
-				title={ __( 'Current' ) }
+				title={
+					/* translators: Current block HTML before conversion, for comparisons. */
+					__( 'Current' )
+				}
 				className="block-editor-block-compare__current"
 				action={ onKeep }
 				actionText={ __( 'Convert to HTML' ) }
@@ -70,7 +73,7 @@ function BlockCompare( {
 			/>
 
 			<BlockView
-				title={ __( 'After Conversion' ) }
+				title={ __( 'After conversion' ) }
 				className="block-editor-block-compare__converted"
 				action={ onConvert }
 				actionText={ convertButtonText }
