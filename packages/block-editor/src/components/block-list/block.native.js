@@ -72,7 +72,7 @@ function BlockForType( {
 	}, [
 		defaultColors,
 		globalStyle,
-		// I couldn't simply use attributes and wrapperProps.styles as a dependency because they are almost always a new reference.
+		// I could not simply use attributes and wrapperProps.styles as a dependency because they are almost always a new reference.
 		// Thanks to the JSON.stringify we check if the value is the same instead of reference.
 		JSON.stringify( wrapperProps.style ),
 		JSON.stringify(

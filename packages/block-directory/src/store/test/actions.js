@@ -120,7 +120,7 @@ describe( 'actions', () => {
 			// Check that notice was displayed.
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toMatchObject( [
-				{ content: 'Block "Test Block" installed and added.' },
+				{ content: 'Block Test Block installed and added.' },
 			] );
 		} );
 
@@ -156,7 +156,7 @@ describe( 'actions', () => {
 			// Check that notice was displayed.
 			const notices = registry.select( noticesStore ).getNotices();
 			expect( notices ).toMatchObject( [
-				{ content: 'Block "Test Block" installed and added.' },
+				{ content: 'Block Test Block installed and added.' },
 			] );
 		} );
 

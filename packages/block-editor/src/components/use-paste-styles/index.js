@@ -203,7 +203,7 @@ export default function usePasteStyles() {
 				createSuccessNotice(
 					sprintf(
 						// translators: %s: Name of the block being pasted, e.g. "Paragraph".
-						__( 'Pasted styles to "%s".' ),
+						__( 'Pasted styles to %s.' ),
 						title
 					),
 					{ type: 'snackbar' }

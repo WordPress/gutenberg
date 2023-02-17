@@ -176,7 +176,7 @@ function MediaPlaceholder( props ) {
 						<TouchableWithoutFeedback
 							accessibilityLabel={ sprintf(
 								/* translators: accessibility text for the media block empty state. %s: media type */
-								__( '"%s" block. Empty' ),
+								__( '%s block. Empty' ),
 								placeholderTitle
 							) }
 							accessibilityRole={ 'button' }

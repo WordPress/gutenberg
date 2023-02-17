@@ -165,7 +165,7 @@ test.describe( 'Template Part', () => {
 			{ has: paragraphBlock2 }
 		);
 
-		// TODO: I couldn't find an easy way to assert that the same template
+		// TODO: I could not find an easy way to assert that the same template
 		// part locator contains both paragraphs. It'd be nice to improve this.
 		await expect( templatePartWithParagraph1 ).toBeVisible();
 		await expect( templatePartWithParagraph2 ).toBeVisible();

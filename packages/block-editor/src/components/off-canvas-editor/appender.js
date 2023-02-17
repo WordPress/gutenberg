@@ -65,7 +65,7 @@ export const Appender = forwardRef(
 		const descriptionId = `off-canvas-editor-appender__${ instanceId }`;
 		const description = sprintf(
 			/* translators: 1: The name of the block. 2: The numerical position of the block. 3: The level of nesting for the block. */
-			__( 'Append to "%1$s" block at position %2$d, level %3$d' ),
+			__( 'Append to %1$s block at position %2$d, level %3$d' ),
 			blockTitle,
 			blockCount + 1,
 			nestingLevel

@@ -364,7 +364,7 @@ function getIssueFeature( issue ) {
 		return 'Block Library';
 	}
 
-	// Fallback - if we couldn't find a good match.
+	// Fallback - if we could not find a good match.
 	return UNKNOWN_FEATURE_FALLBACK_NAME;
 }
 

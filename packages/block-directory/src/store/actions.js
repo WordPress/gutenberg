@@ -135,7 +135,7 @@ export const installBlockType =
 			registry.dispatch( noticesStore ).createInfoNotice(
 				sprintf(
 					// translators: %s is the block title.
-					__( 'Block "%s" installed and added.' ),
+					__( 'Block %s installed and added.' ),
 					block.title
 				),
 				{

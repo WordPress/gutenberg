@@ -66,7 +66,7 @@ const BlockTransformationsMenu = ( {
 		);
 		const successNotice = sprintf(
 			/* translators: 1: From block title, e.g. Paragraph. 2: To block title, e.g. Header. */
-			__( '"%1$s" transformed to "%2$s"' ),
+			__( '%1$s transformed to %2$s' ),
 			blockTitle,
 			selectedItem.label
 		);
@@ -82,7 +82,7 @@ const BlockTransformationsMenu = ( {
 			leftAlign={ true }
 			getAnchor={ getAnchor }
 			// translators: %s: block title e.g: "Paragraph".
-			title={ sprintf( __( 'Transform "%s" to' ), blockTitle ) }
+			title={ sprintf( __( 'Transform %s to' ), blockTitle ) }
 		/>
 	);
 };

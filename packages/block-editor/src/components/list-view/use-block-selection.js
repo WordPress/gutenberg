@@ -132,7 +132,7 @@ export default function useBlockSelection() {
 				if ( title ) {
 					label = sprintf(
 						/* translators: %s: block name */
-						__( '"%s" block deselected.' ),
+						__( '%s deselected.' ),
 						title
 					);
 				}

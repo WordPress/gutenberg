@@ -42,7 +42,7 @@ program
 		'--title <value>',
 		'display title for the block and the WordPress plugin'
 	)
-	// The name "description" is used internally so it couldn't be used.
+	// The name "description" is used internally so it could not be used.
 	.option(
 		'--short-description <value>',
 		'short description for the block and the WordPress plugin'

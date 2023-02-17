@@ -212,7 +212,7 @@ describe( 'Tooltip', () => {
 			expect( button ).toBeDisabled();
 
 			// Note: this is testing for implementation details,
-			// but couldn't find a better way.
+			// but could not find a better way.
 			const buttonRect = button.getBoundingClientRect();
 			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 			const eventCatcher = container.querySelector( '.event-catcher' );

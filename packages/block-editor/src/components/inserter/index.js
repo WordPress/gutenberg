@@ -403,7 +403,7 @@ export default compose( [
 
 				const message = sprintf(
 					// translators: %s: the name of the block that has been added
-					__( '"%s" block added' ),
+					__( '%s block added' ),
 					allowedBlockType.title
 				);
 				speak( message );
