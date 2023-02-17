@@ -1515,13 +1515,13 @@ export const __unstableSetEditorMode =
 		if ( mode === 'navigation' ) {
 			speak(
 				__(
-					'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
+					'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press the Enter key.'
 				)
 			);
 		} else if ( mode === 'edit' ) {
 			speak(
 				__(
-					'You are currently in edit mode. To return to the navigation mode, press Escape.'
+					'You are currently in edit mode. To return to the navigation mode, press the Escape key.'
 				)
 			);
 		} else if ( mode === 'zoom-out' ) {
@@ -1542,7 +1542,7 @@ export const setBlockMovingClientId =
 		if ( hasBlockMovingClientId ) {
 			speak(
 				__(
-					'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.'
+					'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press the Enter or Space keys to move the block.'
 				)
 			);
 		}
