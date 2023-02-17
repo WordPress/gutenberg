@@ -39,7 +39,7 @@ function render_block_core_template_part( $attributes ) {
 				),
 				'posts_per_page'      => 1,
 				'no_found_rows'       => true,
-				'lazy_load_term_meta' => false,
+				'lazy_load_term_meta' => false, // Do not lazy load term meta, as template parts only have one term.
 			)
 		);
 		$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
