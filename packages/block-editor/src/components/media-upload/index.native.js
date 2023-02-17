@@ -33,9 +33,9 @@ export const MEDIA_TYPE_VIDEO = 'video';
 export const MEDIA_TYPE_AUDIO = 'audio';
 export const MEDIA_TYPE_ANY = 'any';
 
-export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
-export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
-export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
+export const OPTION_TAKE_VIDEO = __( 'Take a video' );
+export const OPTION_TAKE_PHOTO = __( 'Take a photo' );
+export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a photo or video' );
 export const OPTION_INSERT_FROM_URL = __( 'Insert from URL' );
 export const OPTION_WORDPRESS_MEDIA_LIBRARY = __( 'WordPress Media Library' );
 
@@ -88,7 +88,7 @@ export class MediaUpload extends Component {
 		const cameraImageSource = {
 			id: mediaSources.deviceCamera, // ID is the value sent to native.
 			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
-			label: __( 'Take a Photo' ),
+			label: __( 'Take a photo' ),
 			requiresModal: true,
 			types: [ MEDIA_TYPE_IMAGE ],
 			icon: capturePhoto,
@@ -97,7 +97,7 @@ export class MediaUpload extends Component {
 		const cameraVideoSource = {
 			id: mediaSources.deviceCamera,
 			value: mediaSources.deviceCamera,
-			label: __( 'Take a Video' ),
+			label: __( 'Take a video' ),
 			requiresModal: true,
 			types: [ MEDIA_TYPE_VIDEO ],
 			icon: captureVideo,
