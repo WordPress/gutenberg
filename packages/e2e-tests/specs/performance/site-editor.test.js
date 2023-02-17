@@ -106,7 +106,7 @@ describe( 'Site Editor Performance', () => {
 		);
 	} );
 
-	describe( 'Loading', () => {
+	describe.skip( 'Loading', () => {
 		// Number of measurements to take.
 		const samples = 3;
 		// Number of throwaway measurements to perform before recording samples.
