@@ -59,7 +59,7 @@ describe( 'Site Editor Performance', () => {
 		);
 
 		await createNewPost( { postType: 'page' } );
-		await page.keyboard.type( 'Site Editor Performance Tests' );
+		// await page.keyboard.type( 'Site Editor Performance Tests' );
 
 		await page.evaluate( ( _html ) => {
 			const { parse } = window.wp.blocks;
@@ -94,18 +94,6 @@ describe( 'Site Editor Performance', () => {
 		await activateTheme( 'twentytwentyone' );
 	} );
 
-	beforeEach( async () => {
-		await visitSiteEditor( {
-			postId: id,
-			postType: 'page',
-		} );
-
-		// Wait for the canvas to become actionable.
-		await canvas().waitForSelector(
-			'[data-rich-text-placeholder="Write site tagline…"]'
-		);
-	} );
-
 	describe( 'Loading', () => {
 		// Number of measurements to take.
 		const samples = 3;
@@ -122,6 +110,17 @@ describe( 'Site Editor Performance', () => {
 			`iteration %i of ${ iterations.length }`,
 			async ( i ) => {
 				expect( true ).toBe( false );
+
+				// Open the test page in Site Editor.
+				await visitSiteEditor( {
+					postId: id,
+					postType: 'page',
+				} );
+
+				// Wait for the canvas to become actionable.
+				await canvas().waitForSelector(
+					'[data-rich-text-placeholder="Write site tagline…"]'
+				);
 
 				if ( i > 1 ) {
 					const {
@@ -149,6 +148,17 @@ describe( 'Site Editor Performance', () => {
 	describe( 'Typing', () => {
 		it( 'trace 200 characters typing sequence', async () => {
 			expect( true ).toBe( false );
+
+			// Open the test page in Site Editor.
+			await visitSiteEditor( {
+				postId: id,
+				postType: 'page',
+			} );
+
+			// Wait for the canvas to become actionable.
+			await canvas().waitForSelector(
+				'[data-rich-text-placeholder="Write site tagline…"]'
+			);
 
 			// Measure typing performance inside the post content.
 			await enterEditMode();
