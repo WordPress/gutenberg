@@ -11,6 +11,14 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.88.0 
+-   [*] Bump Android `minSdkVersion` to 24 [#47604]
+-   [*] Update React Native Reanimated to 2.9.1-wp-3 [#47574]
+-   [*] Bump Aztec version to `1.6.3` [#47610]
+
+## 1.87.3
+-   [*] Fix insert blocks not handling raw string properly in unsupported block editor [#47472]
+
 ## 1.87.2
 -   [*] Add boolean contentStyle and clientId check to Column Edit InnerBlocks [#47234]
 -   [*] Line-height and font-size regression fixes [#47284]

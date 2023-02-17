@@ -114,6 +114,7 @@ export { default as justifyLeft } from './library/justify-left';
 export { default as justifyCenter } from './library/justify-center';
 export { default as justifyRight } from './library/justify-right';
 export { default as justifySpaceBetween } from './library/justify-space-between';
+export { default as justifyStretch } from './library/justify-stretch';
 export { default as key } from './library/key';
 export { default as keyboardClose } from './library/keyboard-close';
 export { default as keyboardReturn } from './library/keyboard-return';

@@ -70,7 +70,7 @@ export function getPresetValueFromCustomValue( value, spacingSizes ) {
  *
  * @param {string} value Value to convert.
  *
- * @return {string} CSS var string for given spacing preset value.
+ * @return {string | undefined} CSS var string for given spacing preset value.
  */
 export function getSpacingPresetCssVar( value ) {
 	if ( ! value ) {

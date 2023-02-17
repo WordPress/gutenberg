@@ -97,8 +97,6 @@ function mapMenuItemsToBlocks( menuItems, level = 0 ) {
  * For more documentation on the individual fields present on a menu item please see:
  * https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L789
  *
- * Changes made here should also be mirrored in packages/edit-navigation/src/store/utils.js.
- *
  * @typedef WPNavMenuItem
  *
  * @property {Object} title       stores the raw and rendered versions of the title/label for this menu item.

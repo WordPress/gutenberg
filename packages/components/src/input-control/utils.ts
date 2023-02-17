@@ -21,7 +21,7 @@ import type { InputChangeCallback } from './types';
 /**
  * Gets a CSS cursor value based on a drag direction.
  *
- * @param  dragDirection The drag direction.
+ * @param dragDirection The drag direction.
  * @return  The CSS cursor value.
  */
 export function getDragCursor( dragDirection: string ): string {

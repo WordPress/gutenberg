@@ -26,27 +26,26 @@ export default function SidebarNavigationScreenMain() {
 			} ),
 		};
 	} );
+
 	return (
 		<SidebarNavigationScreen
-			path="/"
+			isRoot
 			title={ __( 'Design' ) }
 			content={
 				<ItemGroup>
-					{ !! window?.__experimentalEnableOffCanvasNavigationEditor &&
-						!! navigationMenus &&
-						navigationMenus.length > 0 && (
-							<NavigatorButton
-								as={ SidebarNavigationItem }
-								path="/navigation"
-								withChevron
-								icon={ navigation }
-							>
-								{ __( 'Navigation' ) }
-							</NavigatorButton>
-						) }
+					{ !! navigationMenus && navigationMenus.length > 0 && (
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/navigation"
+							withChevron
+							icon={ navigation }
+						>
+							{ __( 'Navigation' ) }
+						</NavigatorButton>
+					) }
 					<NavigatorButton
 						as={ SidebarNavigationItem }
-						path="/templates"
+						path="/wp_template"
 						withChevron
 						icon={ layout }
 					>
@@ -54,7 +53,7 @@ export default function SidebarNavigationScreenMain() {
 					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
-						path="/template-parts"
+						path="/wp_template_part"
 						withChevron
 						icon={ symbolFilled }
 					>

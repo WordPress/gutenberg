@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalColorGradientControl as ColorGradientControl,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { TabPanel } from '@wordpress/components';
 
@@ -12,38 +12,36 @@ import { TabPanel } from '@wordpress/components';
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
-import { unlock } from '../../experiments';
+import { useSupportedStyles, useColorsPerOrigin } from './hooks';
+import { unlock } from '../../private-apis';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
-function ScreenLinkColor( { name, variationPath = '' } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useGlobalSetting( 'color.palette', name );
+function ScreenLinkColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const supports = useSupportedStyles( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
-
 	const colorsPerOrigin = useColorsPerOrigin( name );
-
 	const [ isLinkEnabled ] = useGlobalSetting( 'color.link', name );
 
 	const hasLinkColor =
 		supports.includes( 'linkColor' ) &&
 		isLinkEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
 	const pseudoStates = {
 		default: {
 			label: __( 'Default' ),
 			value: useGlobalStyle(
-				variationPath + 'elements.link.color.text',
+				prefix + 'elements.link.color.text',
 				name
 			)[ 0 ],
 			handler: useGlobalStyle(
-				variationPath + 'elements.link.color.text',
+				prefix + 'elements.link.color.text',
 				name
 			)[ 1 ],
 			userValue: useGlobalStyle(
-				variationPath + 'elements.link.color.text',
+				prefix + 'elements.link.color.text',
 				name,
 				'user'
 			)[ 0 ],
@@ -51,15 +49,15 @@ function ScreenLinkColor( { name, variationPath = '' } ) {
 		hover: {
 			label: __( 'Hover' ),
 			value: useGlobalStyle(
-				variationPath + 'elements.link.:hover.color.text',
+				prefix + 'elements.link.:hover.color.text',
 				name
 			)[ 0 ],
 			handler: useGlobalStyle(
-				variationPath + 'elements.link.:hover.color.text',
+				prefix + 'elements.link.:hover.color.text',
 				name
 			)[ 1 ],
 			userValue: useGlobalStyle(
-				variationPath + 'elements.link.:hover.color.text',
+				prefix + 'elements.link.:hover.color.text',
 				name,
 				'user'
 			)[ 0 ],
@@ -113,6 +111,7 @@ function ScreenLinkColor( { name, variationPath = '' } ) {
 									pseudoSelectorConfig.value ===
 									pseudoSelectorConfig.userValue
 								}
+								headingLevel={ 3 }
 							/>
 						</>
 					);

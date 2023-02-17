@@ -102,6 +102,7 @@ const SocialLinkEdit = ( {
 				>
 					<PanelRow>
 						<TextControl
+							__nextHasNoMarginBottom
 							label={ __( 'Link label' ) }
 							help={ __(
 								'Briefly describe the link to help screen reader users.'
@@ -114,8 +115,9 @@ const SocialLinkEdit = ( {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
 					onChange={ ( value ) => setAttributes( { rel: value } ) }

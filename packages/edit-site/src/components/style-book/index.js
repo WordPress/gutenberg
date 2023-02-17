@@ -21,7 +21,7 @@ import {
 } from '@wordpress/blocks';
 import {
 	BlockPreview,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { closeSmall } from '@wordpress/icons';
 import { useResizeObserver } from '@wordpress/compose';
@@ -30,9 +30,9 @@ import { useMemo, memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
-const { useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 const SLOT_FILL_NAME = 'EditSiteStyleBook';
 const { Slot: StyleBookSlot, Fill: StyleBookFill } =
@@ -70,10 +70,14 @@ function getExamples() {
 	};
 
 	const otherExamples = getBlockTypes()
-		.filter(
-			( blockType ) =>
-				blockType.name !== 'core/heading' && !! blockType.example
-		)
+		.filter( ( blockType ) => {
+			const { name, example, supports } = blockType;
+			return (
+				name !== 'core/heading' &&
+				!! example &&
+				supports.inserter !== false
+			);
+		} )
 		.map( ( blockType ) => ( {
 			name: blockType.name,
 			title: blockType.title,

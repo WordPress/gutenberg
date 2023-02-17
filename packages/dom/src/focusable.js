@@ -95,7 +95,7 @@ function isValidFocusableArea( element ) {
  *                                       not sequentially focusable.
  *                                       https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
  *
- * @return {Element[]} Focusable elements.
+ * @return {HTMLElement[]} Focusable elements.
  */
 export function find( context, { sequential = false } = {} ) {
 	/* eslint-disable jsdoc/no-undefined-types */

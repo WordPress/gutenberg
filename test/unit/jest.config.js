@@ -17,7 +17,7 @@ module.exports = {
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
-		'<rootDir>/test/unit/config/is-gutenberg-plugin.js',
+		'<rootDir>/test/unit/config/gutenberg-env.js',
 	],
 	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
 	testURL: 'http://localhost',

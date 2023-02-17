@@ -1756,7 +1756,7 @@ export function lastBlockAttributesChange( state = null, action ) {
  * @param {?string} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string | undefined} Updated state.
  */
 export function automaticChangeStatus( state, action ) {
 	switch ( action.type ) {
