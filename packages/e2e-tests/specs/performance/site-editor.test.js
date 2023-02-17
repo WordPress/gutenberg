@@ -87,7 +87,10 @@ describe( 'Site Editor Performance', () => {
 	} );
 
 	beforeEach( async () => {
-		await visitSiteEditor( { postId: id, postType: 'page' } );
+		await visitSiteEditor( {
+			postId: id,
+			postType: 'page',
+		} );
 	} );
 
 	it( 'Loading', async () => {

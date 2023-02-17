@@ -68,7 +68,7 @@ function GlobalStylesActionMenu() {
 		<GlobalStylesMenuFill>
 			<DropdownMenu
 				icon={ moreVertical }
-				label={ __( 'More Styles actions' ) }
+				label={ __( 'Styles actions' ) }
 				controls={ [
 					{
 						title: __( 'Reset to defaults' ),
@@ -267,11 +267,6 @@ function GlobalStylesStyleBook( { onClose } ) {
 				)
 			}
 			onSelect={ ( blockName ) => {
-				// Clear navigator history by going back to the root.
-				const depth = path.match( /\//g ).length;
-				for ( let i = 0; i < depth; i++ ) {
-					navigator.goBack();
-				}
 				// Now go to the selected block.
 				navigator.goTo( '/blocks/' + encodeURIComponent( blockName ) );
 			} }
