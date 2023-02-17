@@ -1,8 +1,14 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
 import classnames from 'classnames';
+import type {
+	ComponentPropsWithoutRef,
+	ForwardedRef,
+	HTMLAttributes,
+	MouseEvent,
+	ReactElement,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -17,8 +23,9 @@ import { useInstanceId } from '@wordpress/compose';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
+import type { ButtonProps, DeprecatedButtonProps } from './types';
 
-const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
+const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
 
 function useDeprecatedProps( {
 	isDefault,
@@ -28,7 +35,7 @@ function useDeprecatedProps( {
 	isLink,
 	variant,
 	...otherProps
-} ) {
+}: ButtonProps & DeprecatedButtonProps ): ButtonProps {
 	let computedVariant = variant;
 
 	if ( isPrimary ) {
@@ -63,10 +70,11 @@ function useDeprecatedProps( {
 	};
 }
 
-export function Button( props, ref ) {
+export function UnforwardedButton(
+	props: ButtonProps,
+	ref: ForwardedRef< any >
+) {
 	const {
-		href,
-		target,
 		isSmall,
 		isPressed,
 		isBusy,
@@ -85,18 +93,26 @@ export function Button( props, ref ) {
 		variant,
 		__experimentalIsFocusable: isFocusable,
 		describedBy,
-		...additionalProps
+		...buttonOrAnchorProps
 	} = useDeprecatedProps( props );
+
+	const { href, target, ...additionalProps } =
+		'href' in buttonOrAnchorProps
+			? buttonOrAnchorProps
+			: { href: undefined, target: undefined, ...buttonOrAnchorProps };
+
 	const instanceId = useInstanceId(
 		Button,
 		'components-button__description'
 	);
 
 	const hasChildren =
-		children?.[ 0 ] &&
-		children[ 0 ] !== null &&
-		// Tooltip should not considered as a child
-		children?.[ 0 ]?.props?.className !== 'components-tooltip';
+		( 'string' === typeof children && !! children ) ||
+		( Array.isArray( children ) &&
+			children?.[ 0 ] &&
+			children[ 0 ] !== null &&
+			// Tooltip should not considered as a child
+			children?.[ 0 ]?.props?.className !== 'components-tooltip' );
 
 	const classes = classnames( 'components-button', className, {
 		'is-secondary': variant === 'secondary',
@@ -113,24 +129,29 @@ export function Button( props, ref ) {
 
 	const trulyDisabled = disabled && ! isFocusable;
 	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
-	const tagProps =
-		Tag === 'a'
-			? { href, target }
-			: {
+	const buttonProps: ComponentPropsWithoutRef< 'button' > =
+		Tag === 'button'
+			? {
 					type: 'button',
 					disabled: trulyDisabled,
 					'aria-pressed': isPressed,
-			  };
+			  }
+			: {};
+	const anchorProps: ComponentPropsWithoutRef< 'a' > =
+		Tag === 'a' ? { href, target } : {};
 
 	if ( disabled && isFocusable ) {
 		// In this case, the button will be disabled, but still focusable and
 		// perceivable by screen reader users.
-		tagProps[ 'aria-disabled' ] = true;
+		buttonProps[ 'aria-disabled' ] = true;
+		anchorProps[ 'aria-disabled' ] = true;
 
 		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
-			additionalProps[ disabledEvent ] = ( event ) => {
-				event.stopPropagation();
-				event.preventDefault();
+			additionalProps[ disabledEvent ] = ( event: MouseEvent ) => {
+				if ( event ) {
+					event.stopPropagation();
+					event.preventDefault();
+				}
 			};
 		}
 	}
@@ -145,24 +166,24 @@ export function Button( props, ref ) {
 			// There's a label and...
 			( !! label &&
 				// The children are empty and...
-				! children?.length &&
+				! ( children as string | ReactElement[] )?.length &&
 				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
-	const descriptionId = describedBy ? instanceId : null;
+	const descriptionId = describedBy ? instanceId : undefined;
 
 	const describedById =
 		additionalProps[ 'aria-describedby' ] || descriptionId;
 
-	const element = (
-		<Tag
-			{ ...tagProps }
-			{ ...additionalProps }
-			className={ classes }
-			aria-label={ additionalProps[ 'aria-label' ] || label }
-			aria-describedby={ describedById }
-			ref={ ref }
-		>
+	const commonProps = {
+		className: classes,
+		'aria-label': additionalProps[ 'aria-label' ] || label,
+		'aria-describedby': describedById,
+		ref,
+	};
+
+	const elementChildren = (
+		<>
 			{ icon && iconPosition === 'left' && (
 				<Icon icon={ icon } size={ iconSize } />
 			) }
@@ -171,8 +192,27 @@ export function Button( props, ref ) {
 				<Icon icon={ icon } size={ iconSize } />
 			) }
 			{ children }
-		</Tag>
+		</>
 	);
+
+	const element =
+		Tag === 'a' ? (
+			<a
+				{ ...anchorProps }
+				{ ...( additionalProps as HTMLAttributes< HTMLAnchorElement > ) }
+				{ ...commonProps }
+			>
+				{ elementChildren }
+			</a>
+		) : (
+			<button
+				{ ...buttonProps }
+				{ ...( additionalProps as HTMLAttributes< HTMLButtonElement > ) }
+				{ ...commonProps }
+			>
+				{ elementChildren }
+			</button>
+		);
 
 	if ( ! shouldShowTooltip ) {
 		return (
@@ -190,7 +230,12 @@ export function Button( props, ref ) {
 	return (
 		<>
 			<Tooltip
-				text={ children?.length && describedBy ? describedBy : label }
+				text={
+					( children as string | ReactElement[] )?.length &&
+					describedBy
+						? describedBy
+						: label
+				}
 				shortcut={ shortcut }
 				position={ tooltipPosition }
 			>
@@ -205,4 +250,20 @@ export function Button( props, ref ) {
 	);
 }
 
-export default forwardRef( Button );
+/**
+ * Lets users take actions and make choices with a single click or tap.
+ *
+ * ```jsx
+ * import { Button } from '@wordpress/components';
+ * const Mybutton = () => (
+ *   <Button
+ *     variant="primary"
+ *     onClick={ handleClick }
+ *   >
+ *     Click here
+ *   </Button>
+ * );
+ * ```
+ */
+export const Button = forwardRef( UnforwardedButton );
+export default Button;

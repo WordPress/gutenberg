@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 
 /**
  * Internal dependencies

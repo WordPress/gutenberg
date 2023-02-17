@@ -10,9 +10,13 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { uploadMedia } from '@wordpress/media-utils';
-import { isTemplatePart } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
+
+/**
+ * Internal dependencies
+ */
+import { getFilteredTemplatePartBlocks } from './utils';
 
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
@@ -268,32 +272,8 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			'wp_template_part',
 			{ per_page: -1 }
 		);
-		const templatePartsById = templateParts
-			? // Key template parts by their ID.
-			  templateParts.reduce(
-					( newTemplateParts, part ) => ( {
-						...newTemplateParts,
-						[ part.id ]: part,
-					} ),
-					{}
-			  )
-			: {};
 
-		return ( template.blocks ?? [] )
-			.filter( ( block ) => isTemplatePart( block ) )
-			.map( ( block ) => {
-				const {
-					attributes: { theme, slug },
-				} = block;
-				const templatePartId = `${ theme }//${ slug }`;
-				const templatePart = templatePartsById[ templatePartId ];
-
-				return {
-					templatePart,
-					block,
-				};
-			} )
-			.filter( ( { templatePart } ) => !! templatePart );
+		return getFilteredTemplatePartBlocks( template.blocks, templateParts );
 	}
 );
 

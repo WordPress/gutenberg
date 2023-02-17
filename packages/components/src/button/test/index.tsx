@@ -12,8 +12,8 @@ import { plusCircle } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Button from '../';
-import { Tooltip } from '../../';
+import Button from '..';
+import Tooltip from '../../tooltip';
 
 jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
 
@@ -126,6 +126,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should not pass the prop target into the element', () => {
+			// @ts-expect-error - `target` requires `href`
 			render( <Button target="_blank" /> );
 
 			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
@@ -139,13 +140,12 @@ describe( 'Button', () => {
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'gutenberg' );
 		} );
 
-		it( 'should render an additional WordPress prop of value awesome', () => {
-			render( <Button WordPress="awesome" /> );
+		it( 'should pass additional props to the element', () => {
+			render( <Button type="submit" /> );
 
-			expect( console ).toHaveErrored();
 			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'wordpress',
-				'awesome'
+				'type',
+				'submit'
 			);
 		} );
 
@@ -342,6 +342,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should become a button again when disabled is supplied', () => {
+			// @ts-expect-error - a button should not have `href`
 			render( <Button href="https://wordpress.org/" disabled /> );
 
 			expect( screen.getByRole( 'button' ) ).toBeVisible();
@@ -360,11 +361,13 @@ describe( 'Button', () => {
 
 	describe( 'deprecated props', () => {
 		it( 'should not break when the legacy isPrimary prop is passed', () => {
+			// @ts-expect-error
 			render( <Button isPrimary /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-primary' );
 		} );
 
 		it( 'should not break when the legacy isSecondary prop is passed', () => {
+			// @ts-expect-error
 			render( <Button isSecondary /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass(
 				'is-secondary'
@@ -372,21 +375,41 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should not break when the legacy isTertiary prop is passed', () => {
+			// @ts-expect-error
 			render( <Button isTertiary /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-tertiary' );
 		} );
 
 		it( 'should not break when the legacy isLink prop is passed', () => {
+			// @ts-expect-error
 			render( <Button isLink /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-link' );
 		} );
 
 		it( 'should warn when the isDefault prop is passed', () => {
+			// @ts-expect-error
 			render( <Button isDefault /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass(
 				'is-secondary'
 			);
 			expect( console ).toHaveWarned();
 		} );
+	} );
+
+	describe( 'static typing', () => {
+		<>
+			<Button href="foo" />
+			{ /* @ts-expect-error - `target` requires `href` */ }
+			<Button target="foo" />
+			{ /* @ts-expect-error - `disabled` is only for buttons */ }
+			<Button href="foo" disabled />
+			<Button href="foo" type="image/png" />
+			{ /* @ts-expect-error - if button, type must be submit/reset/button */ }
+			<Button type="image/png" />
+			{ /* @ts-expect-error */ }
+			<Button type="invalidtype" />
+			{ /* @ts-expect-error - although the runtime behavior will allow this to be an anchor, this is probably a mistake. */ }
+			<Button disabled __experimentalIsFocusable href="foo" />
+		</>;
 	} );
 } );
