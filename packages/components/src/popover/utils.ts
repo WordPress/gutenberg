@@ -74,7 +74,7 @@ const POSITION_TO_PLACEMENT: Record<
  * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
  * (used by `floating-ui`).
  *
- * @param  position The legacy position
+ * @param position The legacy position
  * @return The corresponding placement
  */
 export const positionToPlacement = (
@@ -112,7 +112,7 @@ const PLACEMENT_TO_ANIMATION_ORIGIN: Record<
  * Given the floating-ui `placement`, compute the framer-motion props for the
  * popover's entry animation.
  *
- * @param  placement A placement string from floating ui
+ * @param placement A placement string from floating ui
  * @return The object containing the motion props
  */
 export const placementToMotionAnimationProps = (
@@ -142,7 +142,7 @@ export const placementToMotionAnimationProps = (
 /**
  * Returns the offset of a document's frame element.
  *
- * @param  document The iframe's owner document.
+ * @param document The iframe's owner document.
  *
  * @return The offset of the document's frame element, or undefined if the
  * document has no frame element.

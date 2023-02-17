@@ -20,7 +20,7 @@ import {
 	__experimentalUseCustomSides as useCustomSides,
 	HeightControl,
 	__experimentalSpacingSizesControl as SpacingSizesControl,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 
@@ -28,9 +28,9 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
  * Internal dependencies
  */
 import { useSupportedStyles } from './hooks';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 

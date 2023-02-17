@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-
 import { useSupportedStyles } from './hooks';
 
 export function useHasColorPanel( name ) {

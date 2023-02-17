@@ -8,25 +8,33 @@ import type { ReactNode } from 'react';
  */
 import type { ButtonAsButtonProps } from '../button/types';
 
+export type MatchParams = Record< string, string | string[] >;
+
 type NavigateOptions = {
 	focusTargetSelector?: string;
+	isBack?: boolean;
 };
 
 export type NavigatorLocation = NavigateOptions & {
 	isInitial?: boolean;
-	isBack?: boolean;
 	path?: string;
 	hasRestoredFocus?: boolean;
 };
 
-export type NavigatorContext = {
+// Returned by the `useNavigator` hook.
+export type Navigator = {
 	location: NavigatorLocation;
+	params: MatchParams;
 	goTo: ( path: string, options?: NavigateOptions ) => void;
 	goBack: () => void;
+	goToParent: () => void;
 };
 
-// Returned by the `useNavigator` hook.
-export type Navigator = NavigatorContext;
+export type NavigatorContext = Navigator & {
+	addScreen: ( screen: Screen ) => void;
+	removeScreen: ( screen: Screen ) => void;
+	match?: string;
+};
 
 export type NavigatorProviderProps = {
 	/**
@@ -52,6 +60,17 @@ export type NavigatorScreenProps = {
 
 export type NavigatorBackButtonProps = ButtonAsButtonProps;
 
+export type NavigatorBackButtonHookProps = NavigatorBackButtonProps & {
+	/**
+	 * Whether we should navigate to the parent screen.
+	 *
+	 * @default 'false'
+	 */
+	goToParent?: boolean;
+};
+
+export type NavigatorToParentButtonProps = NavigatorBackButtonProps;
+
 export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	/**
 	 * The path of the screen to navigate to. The value of this prop needs to be
@@ -65,4 +84,9 @@ export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	 * @default 'id'
 	 */
 	attributeName?: string;
+};
+
+export type Screen = {
+	id: string;
+	path: string;
 };

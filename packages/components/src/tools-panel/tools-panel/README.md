@@ -155,6 +155,7 @@ Flags that the items in this ToolsPanel will be contained within an inner
 wrapper element allowing the panel to lay them out accordingly.
 
 - Required: No
+- Default: `false`
 
 ### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
 
@@ -170,7 +171,7 @@ panel's dropdown menu.
 
 - Required: Yes
 
-### `panelId`: `string`
+### `panelId`: `string | null`
 
 If a `panelId` is set, it is passed through the `ToolsPanelContext` and used
 to restrict panel items. When a `panelId` is set, items can only register
@@ -179,10 +180,9 @@ exactly.
 
 - Required: No
 
-### `resetAll`: `() => void`
+### `resetAll`: `( filters?: ResetAllFilter[] ) => void`
 
-A function to call when the `Reset all` menu option is selected. This is passed
-through to the panel's header component.
+A function to call when the `Reset all` menu option is selected. As an argument, it receives an array containing the `resetAllFilter` callbacks of all the valid registered `ToolsPanelItems`.
 
 - Required: Yes
 
@@ -192,3 +192,4 @@ Advises the `ToolsPanel` that all of its `ToolsPanelItem` children should render
 placeholder content (instead of `null`) when they are toggled off and hidden.
 
 - Required: No
+- Default: `false`

@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import {
 	__experimentalColorGradientControl as ColorGradientControl,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 
@@ -21,9 +21,9 @@ import {
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 function ScreenHeadingColor( { name, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';

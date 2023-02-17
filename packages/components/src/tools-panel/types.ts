@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  */
 import type { HeadingSize } from '../heading/types';
 
-type ResetAllFilter = () => void;
+type ResetAllFilter = ( attributes?: any ) => any;
 type ResetAll = ( filters?: ResetAllFilter[] ) => void;
 
 export type ToolsPanelProps = {
@@ -19,8 +19,10 @@ export type ToolsPanelProps = {
 	/**
 	 * Flags that the items in this ToolsPanel will be contained within an inner
 	 * wrapper element allowing the panel to lay them out accordingly.
+	 *
+	 * @default false
 	 */
-	hasInnerWrapper: boolean;
+	hasInnerWrapper?: boolean;
 	/**
 	 * The heading level of the panel's header.
 	 *
@@ -34,20 +36,24 @@ export type ToolsPanelProps = {
 	label: string;
 	/**
 	 * If a `panelId` is set, it is passed through the `ToolsPanelContext` and
-	 * used to restrict panel items. Only items with a matching `panelId` will
-	 * be able to register themselves with this panel.
+	 * used to restrict panel items. When a `panelId` is set, items can only
+	 * register themselves if the `panelId` is explicitly `null` or the item's
+	 * `panelId` matches exactly.
 	 */
-	panelId: string;
+	panelId?: string | null;
 	/**
-	 * A function to call when the `Reset all` menu option is selected. This is
-	 * passed through to the panel's header component.
+	 * A function to call when the `Reset all` menu option is selected. As an
+	 * argument, it receives an array containing the `resetAllFilter` callbacks
+	 * of all the valid registered `ToolsPanelItems`.
 	 */
 	resetAll: ResetAll;
 	/**
 	 * Advises the `ToolsPanel` that its child `ToolsPanelItem`s should render
 	 * placeholder content instead of null when they are toggled off and hidden.
+	 *
+	 * @default false
 	 */
-	shouldRenderPlaceholderItems: boolean;
+	shouldRenderPlaceholderItems?: boolean;
 	/**
 	 * Experimental prop allowing for a custom CSS class to be applied to the
 	 * first visible `ToolsPanelItem` within the `ToolsPanel`.
@@ -96,8 +102,10 @@ export type ToolsPanelItem = {
 	 * This prop identifies the current item as being displayed by default. This
 	 * means it will show regardless of whether it has a value set or is toggled
 	 * on in the panel's menu.
+	 *
+	 * @default false
 	 */
-	isShownByDefault: boolean;
+	isShownByDefault?: boolean;
 	/**
 	 * The supplied label is dual purpose. It is used as:
 	 * 1. the human-readable label for the panel's dropdown menu
@@ -108,17 +116,20 @@ export type ToolsPanelItem = {
 	 */
 	label: string;
 	/**
-	 * Panel items will ensure they are only registering with their intended
-	 * panel by comparing the `panelId` props set on both the item and the panel
-	 * itself. This allows items to be injected from a shared source.
+	 * Panel items will ensure they are only registering with their intended panel
+	 * by comparing the `panelId` props set on both the item and the panel itself,
+	 * or if the `panelId` is explicitly `null`. This allows items to be injected
+	 * from a shared source.
 	 */
-	panelId: string;
+	panelId?: string | null;
 	/**
 	 * A `ToolsPanel` will collect each item's `resetAllFilter` and pass an
 	 * array of these functions through to the panel's `resetAll` callback. They
 	 * can then be iterated over to perform additional tasks.
+	 *
+	 * @default noop
 	 */
-	resetAllFilter: ResetAllFilter;
+	resetAllFilter?: ResetAllFilter;
 };
 
 export type ToolsPanelItemProps = ToolsPanelItem & {
@@ -145,7 +156,7 @@ export type ToolsPanelMenuItems = {
 };
 
 export type ToolsPanelContext = {
-	panelId?: string;
+	panelId?: string | null;
 	menuItems: ToolsPanelMenuItems;
 	hasMenuItems: boolean;
 	registerPanelItem: ( item: ToolsPanelItem ) => void;
