@@ -27,7 +27,7 @@ const BlockInsertionPoint = ( { getStylesFromColorScheme } ) => {
 	return (
 		<View style={ styles.containerStyleAddHere }>
 			<View style={ lineStyle }></View>
-			<Text style={ labelStyle }>{ __( 'ADD BLOCK HERE' ) }</Text>
+			<Text style={ labelStyle }>{ __( 'Add block here' ) }</Text>
 			<View style={ lineStyle }></View>
 		</View>
 	);
