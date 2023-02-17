@@ -126,6 +126,14 @@ test.describe( 'Style Book', () => {
 			page.locator( 'role=region[name="Style Book"i]' )
 		).not.toBeVisible();
 	} );
+
+	test( 'should close when Escape key is pressed', async ( { page } ) => {
+		await page.keyboard.press( 'Escape' );
+
+		await expect(
+			page.locator( 'role=region[name="Style Book"i]' )
+		).not.toBeVisible();
+	} );
 } );
 
 class StyleBook {
