@@ -106,7 +106,7 @@ describe( 'Site Editor Performance', () => {
 		);
 	} );
 
-	describe.skip( 'Loading', () => {
+	describe( 'Loading', () => {
 		// Number of measurements to take.
 		const samples = 3;
 		// Number of throwaway measurements to perform before recording samples.
@@ -121,6 +121,8 @@ describe( 'Site Editor Performance', () => {
 		it.each( iterations )(
 			`iteration %i of ${ iterations.length }`,
 			async ( i ) => {
+				expect( true ).toBe( false );
+
 				if ( i > 1 ) {
 					const {
 						serverResponse,
@@ -146,6 +148,8 @@ describe( 'Site Editor Performance', () => {
 
 	describe( 'Typing', () => {
 		it( 'trace 200 characters typing sequence', async () => {
+			expect( true ).toBe( false );
+
 			// Measure typing performance inside the post content.
 			await enterEditMode();
 
