@@ -66,22 +66,20 @@ function Image( block ) {
 
 export default function PostFormatPanel() {
 	const [ isUploading, setIsUploading ] = useState( false );
-	const externalImages = useSelect( ( select ) => {
-		const { getEditorBlocks } = select( editorStore );
-		return flattenBlocks( getEditorBlocks() ).filter( ( block ) => {
-			return (
-				block.name === 'core/image' &&
-				block.attributes.url &&
-				! block.attributes.id
-			);
-		} );
-	}, [] );
+	const { editorBlocks, mediaUpload } = useSelect(
+		( select ) => ( {
+			editorBlocks: select( editorStore ).getEditorBlocks(),
+			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
+		} ),
+		[]
+	);
+	const externalImages = flattenBlocks( editorBlocks ).filter(
+		( block ) =>
+			block.name === 'core/image' &&
+			block.attributes.url &&
+			! block.attributes.id
+	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-
-		return getSettings().mediaUpload;
-	}, [] );
 
 	if ( ! mediaUpload || ! externalImages.length ) {
 		return null;
