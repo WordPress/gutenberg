@@ -8,18 +8,21 @@ import { Tip } from '@wordpress/components';
 const globalTips = [
 	createInterpolateElement(
 		__(
+			// translators: Do not remove the <kbd> code.
 			'While writing, you can press <kbd>/</kbd> to quickly insert new blocks.'
 		),
 		{ kbd: <kbd /> }
 	),
 	createInterpolateElement(
 		__(
+			// translators: Do not remove the <kbd> code.
 			'Indent a list by pressing <kbd>space</kbd> at the beginning of a line.'
 		),
 		{ kbd: <kbd /> }
 	),
 	createInterpolateElement(
 		__(
+			// translators: Do not remove the <kbd> code.
 			'Outdent a list by pressing <kbd>backspace</kbd> at the beginning of a line.'
 		),
 		{ kbd: <kbd /> }
