@@ -83,3 +83,19 @@
 .edit-site-global-styles-sidebar hr {
 	margin: 0;
 }
+
+.show-icon-labels {
+	.edit-site-global-styles-sidebar__header {
+		.components-button.has-icon {
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+				font-size: $helptext-font-size;
+			}
+		}
+	}
+}

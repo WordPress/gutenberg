@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, unescape as unescapeString } from 'lodash';
+import { get } from 'lodash';
 import removeAccents from 'remove-accents';
 
 /**
@@ -93,7 +93,7 @@ export function PageAttributesParent() {
 				{
 					value: treeNode.id,
 					label:
-						'— '.repeat( level ) + unescapeString( treeNode.name ),
+						'— '.repeat( level ) + decodeEntities( treeNode.name ),
 					rawName: treeNode.name,
 				},
 				...getOptionsFromTree( treeNode.children || [], level + 1 ),

@@ -65,13 +65,12 @@ A react hook used to retrieve the setting applied to a given context.
 import { useGlobalSetting } from '@wordpress/block-editor';
 
 function MyComponent() {
-	// The default color palette.
-	const [ colorPalette, setColorPalette ] = useGlobalSetting( 'color.palette' ); 
+	// The theme color palette.
+	const [ colorPalette, setColorPalette ] = useGlobalSetting( 'color.palette.theme' ); 
 
-	// The base (theme + core) color palette for the paragraph block,
-	// ignoring user provided palette.
+	// The theme color palette for the paragraph block, ignoring user changes.
 	// If the palette is not defined for the paragraph block, the root one is returned.
-	const [ pColor, setPColor ] = useGlobalSetting( 'color.palette', 'core/paragraph', 'base' ); 
+	const [ pColor, setPColor ] = useGlobalSetting( 'color.palette.theme', 'core/paragraph', 'base' ); 
 
 	return "Something";
 }

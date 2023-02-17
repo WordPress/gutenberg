@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, render, screen, within } from '@testing-library/react';
+import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -15,8 +15,6 @@ import { copy } from '@wordpress/icons';
  * Internal dependencies
  */
 import { BlockSwitcher, BlockSwitcherDropdownMenu } from '../';
-
-jest.useFakeTimers();
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 jest.mock( '../../block-title/use-block-display-title', () =>
@@ -185,9 +183,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 		} );
 
 		test( 'should simulate a keydown event, which should open transform toggle.', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
@@ -212,26 +208,27 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				} ),
 				'[ArrowDown]'
 			);
-			await act( () => Promise.resolve() );
 
-			expect(
-				screen.getByRole( 'button', {
-					name: 'Block Name',
-					expanded: true,
-				} )
-			).toBeVisible();
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Block Name',
+						expanded: true,
+					} )
+				).toBeVisible()
+			);
 
-			const menu = screen.getByRole( 'menu', {
-				name: 'Block Name',
-			} );
-			expect( menu ).toBeInTheDocument();
-			expect( menu ).not.toBeVisible();
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'menu', {
+						name: 'Block Name',
+					} )
+				).toBeVisible()
+			);
 		} );
 
 		test( 'should simulate a click event, which should call onToggle.', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
@@ -255,26 +252,27 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 					expanded: false,
 				} )
 			);
-			await act( () => Promise.resolve() );
 
-			expect(
-				screen.getByRole( 'button', {
-					name: 'Block Name',
-					expanded: true,
-				} )
-			).toBeVisible();
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Block Name',
+						expanded: true,
+					} )
+				).toBeVisible()
+			);
 
-			const menu = screen.getByRole( 'menu', {
-				name: 'Block Name',
-			} );
-			expect( menu ).toBeInTheDocument();
-			expect( menu ).not.toBeVisible();
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'menu', {
+						name: 'Block Name',
+					} )
+				).toBeVisible()
+			);
 		} );
 
 		test( 'should create the transform items for the chosen block.', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
@@ -286,15 +284,16 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 					expanded: false,
 				} )
 			);
-			await act( () => Promise.resolve() );
 
-			expect(
-				within(
-					screen.getByRole( 'menu', {
-						name: 'Block Name',
-					} )
-				).getByRole( 'menuitem' )
-			).toBeInTheDocument();
+			await waitFor( () =>
+				expect(
+					within(
+						screen.getByRole( 'menu', {
+							name: 'Block Name',
+						} )
+					).getByRole( 'menuitem' )
+				).toBeInTheDocument()
+			);
 		} );
 	} );
 } );

@@ -8,7 +8,6 @@ import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
-	useSetting,
 	store as blockEditorStore,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
@@ -36,23 +35,13 @@ export default function QueryContent( {
 		query,
 		displayLayout,
 		tagName: TagName = 'div',
-		layout = {},
 	} = attributes;
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const instanceId = useInstanceId( QueryContent );
-	const { themeSupportsLayout } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return { themeSupportsLayout: getSettings()?.supportsLayout };
-	}, [] );
-	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = ! layout?.type
-		? { ...defaultLayout, ...layout, type: 'default' }
-		: { ...defaultLayout, ...layout };
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 	} );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -122,7 +111,7 @@ export default function QueryContent( {
 					openPatternSelectionModal={ openPatternSelectionModal }
 				/>
 			</BlockControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<SelectControl
 					__nextHasNoMarginBottom
 					label={ __( 'HTML element' ) }

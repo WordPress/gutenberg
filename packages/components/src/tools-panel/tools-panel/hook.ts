@@ -35,12 +35,11 @@ const generateMenuItems = ( {
 	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
 		const group = isShownByDefault ? 'default' : 'optional';
 
-		// If a menu item for this label already exists, do not overwrite its value.
-		// This can cause default controls that have been flagged as customized to
-		// lose their value.
+		// If a menu item for this label has already been flagged as customized
+		// (for default controls), or toggled on (for optional controls), do not
+		// overwrite its value as those controls would lose that state.
 		const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
-		const value =
-			existingItemValue !== undefined ? existingItemValue : hasValue();
+		const value = existingItemValue ? existingItemValue : hasValue();
 
 		menuItems[ group ][ label ] = shouldReset ? false : value;
 	} );
@@ -57,10 +56,11 @@ export function useToolsPanel(
 ) {
 	const {
 		className,
+		headingLevel = 2,
 		resetAll,
 		panelId,
-		hasInnerWrapper,
-		shouldRenderPlaceholderItems,
+		hasInnerWrapper = false,
+		shouldRenderPlaceholderItems = false,
 		__experimentalFirstVisibleItemClass,
 		__experimentalLastVisibleItemClass,
 		...otherProps
@@ -307,6 +307,7 @@ export function useToolsPanel(
 
 	return {
 		...otherProps,
+		headingLevel,
 		panelContext,
 		resetAllItems,
 		toggleItem,

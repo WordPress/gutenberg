@@ -5,10 +5,16 @@ import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
+	createSlotFill,
+	DropdownMenu,
 } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
-
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { moreVertical } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -31,6 +37,62 @@ import { ScreenVariation } from './screen-variations';
 import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
+import { unlock } from '../../private-apis';
+import ScreenEffects from './screen-effects';
+
+const SLOT_FILL_NAME = 'GlobalStylesMenu';
+const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
+	createSlotFill( SLOT_FILL_NAME );
+
+function GlobalStylesActionMenu() {
+	const { toggle } = useDispatch( preferencesStore );
+	const { canEditCSS } = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+
+		return {
+			canEditCSS:
+				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+		};
+	}, [] );
+	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
+	const [ canReset, onReset ] = useGlobalStylesReset();
+	const { goTo } = useNavigator();
+	const loadCustomCSS = () => goTo( '/css' );
+	return (
+		<GlobalStylesMenuFill>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Styles actions' ) }
+				controls={ [
+					{
+						title: __( 'Reset to defaults' ),
+						onClick: onReset,
+						isDisabled: ! canReset,
+					},
+					{
+						title: __( 'Welcome Guide' ),
+						onClick: () =>
+							toggle( 'core/edit-site', 'welcomeGuideStyles' ),
+					},
+					...( canEditCSS
+						? [
+								{
+									title: __( 'Additional CSS' ),
+									onClick: loadCustomCSS,
+								},
+						  ]
+						: [] ),
+				] }
+			/>
+		</GlobalStylesMenuFill>
+	);
+}
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -68,6 +130,7 @@ function BlockStyleVariationsScreens( { name } ) {
 				'/variations/' +
 				encodeURIComponent( variation.name )
 			}
+			variation={ variation.name }
 		/>
 	) );
 }
@@ -87,15 +150,7 @@ function BlockStylesNavigationScreens( {
 	) );
 }
 
-function ContextScreens( { name, parentMenu = '' } ) {
-	const hasVariationPath = parentMenu.search( 'variations' );
-	const variationPath =
-		hasVariationPath !== -1
-			? parentMenu
-					.substring( hasVariationPath )
-					.replace( '/', '.' )
-					.concat( '', '.' )
-			: '';
+function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 	const blockStyleVariations = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -107,10 +162,7 @@ function ContextScreens( { name, parentMenu = '' } ) {
 	return (
 		<>
 			<GlobalStylesNavigationScreen path={ parentMenu + '/typography' }>
-				<ScreenTypography
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenTypography name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
@@ -138,7 +190,7 @@ function ContextScreens( { name, parentMenu = '' } ) {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors' }>
-				<ScreenColors name={ name } variationPath={ variationPath } />
+				<ScreenColors name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
@@ -150,50 +202,39 @@ function ContextScreens( { name, parentMenu = '' } ) {
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/background' }
 			>
-				<ScreenBackgroundColor
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenBackgroundColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/text' }>
-				<ScreenTextColor
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenTextColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/link' }>
-				<ScreenLinkColor
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenLinkColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/heading' }
 			>
-				<ScreenHeadingColor
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenHeadingColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/button' }
 			>
-				<ScreenButtonColor
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenButtonColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>
-				<ScreenBorder name={ name } variationPath={ variationPath } />
+				<ScreenBorder name={ name } variation={ variation } />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path={ parentMenu + '/effects' }>
+				<ScreenEffects name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
-				<ScreenLayout name={ name } variationPath={ variationPath } />
+				<ScreenLayout name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/css' }>
@@ -226,11 +267,6 @@ function GlobalStylesStyleBook( { onClose } ) {
 				)
 			}
 			onSelect={ ( blockName ) => {
-				// Clear navigator history by going back to the root.
-				const depth = path.match( /\//g ).length;
-				for ( let i = 0; i < depth; i++ ) {
-					navigator.goBack();
-				}
 				// Now go to the selected block.
 				navigator.goTo( '/blocks/' + encodeURIComponent( blockName ) );
 			} }
@@ -289,8 +325,10 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 			{ isStyleBookOpened && (
 				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
 			) }
+
+			<GlobalStylesActionMenu />
 		</NavigatorProvider>
 	);
 }
-
+export { GlobalStylesMenuSlot };
 export default GlobalStylesUI;

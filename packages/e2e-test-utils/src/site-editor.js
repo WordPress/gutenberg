@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { visitAdminPage } from '@wordpress/e2e-test-utils';
+import { canvas, visitAdminPage } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -166,11 +166,13 @@ export async function openPreviousGlobalStylesPanel() {
  * Enters edit mode.
  */
 export async function enterEditMode() {
-	const editSiteToggle = await page.$( '.edit-site-site-hub__edit-button' );
+	const isViewMode = await page.$(
+		'.edit-site-visual-editor__editor-canvas[role="button"]'
+	);
 	// This check is necessary for the performance tests in old branches
 	// where the site editor toggle was not implemented yet.
-	if ( ! editSiteToggle ) {
+	if ( ! isViewMode ) {
 		return;
 	}
-	await page.click( '.edit-site-site-hub__edit-button' );
+	await canvas().click( 'body' );
 }

@@ -358,6 +358,9 @@ export default function NavigationSubmenuEdit( {
 	useEffect( () => {
 		// If block becomes empty, transform to Navigation Link.
 		if ( ! hasChildren && prevHasChildren ) {
+			// This side-effect should not create an undo level as those should
+			// only be created via user interactions.
+			__unstableMarkNextChangeAsNotPersistent();
 			transformToLink();
 		}
 	}, [ hasChildren, prevHasChildren ] );
