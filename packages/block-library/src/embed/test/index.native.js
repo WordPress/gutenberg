@@ -432,7 +432,7 @@ describe( 'Embed block', () => {
 			);
 
 			// Open Block Settings.
-			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
+			fireEvent.press( await editor.findByLabelText( 'Open settings' ) );
 
 			// Wait for Block Settings to be visible.
 			const blockSettingsModal = editor.getByTestId(
@@ -456,7 +456,7 @@ describe( 'Embed block', () => {
 			);
 
 			// Open Block Settings.
-			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
+			fireEvent.press( await editor.findByLabelText( 'Open settings' ) );
 
 			// Wait for Block Settings to be visible.
 			const blockSettingsModal = editor.getByTestId(
@@ -501,7 +501,7 @@ describe( 'Embed block', () => {
 			);
 
 			// Open Block Settings.
-			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
+			fireEvent.press( await editor.findByLabelText( 'Open settings' ) );
 
 			// Wait for Block Settings to be visible.
 			const blockSettingsModal = editor.getByTestId(
@@ -541,7 +541,7 @@ describe( 'Embed block', () => {
 			);
 
 			// Open Block Settings.
-			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
+			fireEvent.press( await editor.findByLabelText( 'Open settings' ) );
 
 			// Get Block Settings modal.
 			const blockSettingsModal = editor.getByTestId(
@@ -634,7 +634,7 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
 			// Open Block Settings.
-			fireEvent.press( await editor.findByLabelText( 'Open Settings' ) );
+			fireEvent.press( await editor.findByLabelText( 'Open settings' ) );
 
 			// Wait for Block Settings to be visible.
 			const blockSettingsModal = editor.getByTestId(
@@ -1091,7 +1091,7 @@ describe( 'Embed block', () => {
 
 			// Open Block Settings.
 			fireEvent.press(
-				await waitFor( () => getByLabelText( 'Open Settings' ) )
+				await waitFor( () => getByLabelText( 'Open settings' ) )
 			);
 
 			// Untoggle resize for smaller devices.
@@ -1108,7 +1108,7 @@ describe( 'Embed block', () => {
 
 			// Open Block Settings.
 			fireEvent.press(
-				await waitFor( () => getByLabelText( 'Open Settings' ) )
+				await waitFor( () => getByLabelText( 'Open settings' ) )
 			);
 
 			// Wait for media settings panel.

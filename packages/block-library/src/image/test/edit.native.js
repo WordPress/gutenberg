@@ -86,7 +86,7 @@ describe( 'Image Block', () => {
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'Media File' ) );
 		fireEvent.press( screen.getByText( 'None' ) );
@@ -113,7 +113,7 @@ describe( 'Image Block', () => {
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Media File' ) );
@@ -140,7 +140,7 @@ describe( 'Image Block', () => {
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
@@ -177,7 +177,7 @@ describe( 'Image Block', () => {
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Media File' ) );
@@ -219,7 +219,7 @@ describe( 'Image Block', () => {
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'Media File' ) );
 
@@ -242,7 +242,7 @@ describe( 'Image Block', () => {
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
 
-		const settingsButton = screen.getByLabelText( 'Open Settings' );
+		const settingsButton = screen.getByLabelText( 'Open settings' );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () => fireEvent.press( settingsButton ) );
@@ -273,7 +273,7 @@ describe( 'Image Block', () => {
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
 
-		const settingsButton = screen.getByLabelText( 'Open Settings' );
+		const settingsButton = screen.getByLabelText( 'Open settings' );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () => fireEvent.press( settingsButton ) );

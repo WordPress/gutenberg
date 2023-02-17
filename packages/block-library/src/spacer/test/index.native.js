@@ -64,7 +64,7 @@ describe( 'Spacer block', () => {
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		fireEvent.press( screen.getByLabelText( 'Open settings' ) );
 		await waitFor(
 			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
 		);
@@ -91,7 +91,7 @@ describe( 'Spacer block', () => {
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		fireEvent.press( screen.getByLabelText( 'Open settings' ) );
 		await waitFor(
 			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
 		);
@@ -122,7 +122,7 @@ describe( 'Spacer block', () => {
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		fireEvent.press( screen.getByLabelText( 'Open settings' ) );
 		await waitFor(
 			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
 		);
@@ -153,7 +153,7 @@ describe( 'Spacer block', () => {
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		fireEvent.press( screen.getByLabelText( 'Open settings' ) );
 		await waitFor(
 			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
 		);

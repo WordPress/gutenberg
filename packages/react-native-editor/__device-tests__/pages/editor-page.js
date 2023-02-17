@@ -290,7 +290,7 @@ class EditorPage {
 	}
 
 	async openBlockSettings() {
-		const settingsButtonElement = 'Open Settings';
+		const settingsButtonElement = 'Open settings';
 		const settingsButton = await this.waitForElementToBeDisplayedById(
 			settingsButtonElement
 		);

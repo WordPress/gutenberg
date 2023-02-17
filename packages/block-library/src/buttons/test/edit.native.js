@@ -77,7 +77,7 @@ describe( 'Buttons block', () => {
 			fireEvent.press( buttonInnerBlock );
 
 			const settingsButton = await editor.findByLabelText(
-				'Open Settings'
+				'Open settings'
 			);
 			fireEvent.press( settingsButton );
 

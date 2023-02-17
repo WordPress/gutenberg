@@ -265,7 +265,7 @@ describe( 'List block', () => {
 		// Set order to reverse
 
 		// Open block settings
-		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		fireEvent.press( screen.getByLabelText( 'Open settings' ) );
 		await waitFor(
 			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
 		);
@@ -306,7 +306,7 @@ describe( 'List block', () => {
 		// Set order to reverse
 
 		// Open block settings
-		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		fireEvent.press( screen.getByLabelText( 'Open settings' ) );
 		await waitFor(
 			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
 		);
@@ -406,11 +406,11 @@ describe( 'List block', () => {
 		"<!-- wp:paragraph -->
 		<p>A quick brown fox.</p>
 		<!-- /wp:paragraph -->
-		
+
 		<!-- wp:paragraph -->
 		<p>One</p>
 		<!-- /wp:paragraph -->
-		
+
 		<!-- wp:list -->
 		<ul><!-- wp:list-item -->
 		<li>Two</li>
