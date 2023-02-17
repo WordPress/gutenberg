@@ -55,6 +55,7 @@ function DetailsSummaryBlock( { attributes, setAttributes } ) {
 					tagName={ tagName }
 					className={ additionalClassNames }
 					aria-label={ __( 'Add summary' ) }
+					allowedFormats={ [] }
 					withoutInteractiveFormatting
 					value={ !! summary ? summary : __( 'Details' ) }
 					onChange={ ( newSummary ) =>
