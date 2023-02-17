@@ -1309,7 +1309,10 @@ function selectionHelper( state = {}, action ) {
 
 			return {};
 		case 'REPLACE_BLOCKS': {
-			if ( action.clientIds.indexOf( state.clientId ) === -1 ) {
+			if (
+				state.clientId &&
+				action.clientIds.indexOf( state.clientId ) === -1
+			) {
 				return state;
 			}
 
