@@ -426,7 +426,7 @@ describe( 'Block Actions Menu', () => {
 			// Get Picker title
 			const pickerHeader = getByRole( 'header' );
 			const headerTitle = within( pickerHeader ).getByText(
-				/Transform Paragraph to/
+				/Transform "Paragraph" to/
 			);
 			expect( headerTitle ).toBeVisible();
 
