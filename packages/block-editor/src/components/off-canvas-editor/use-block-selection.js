@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { UP, DOWN, HOME, END } from '@wordpress/keycodes';
@@ -132,14 +132,18 @@ export default function useBlockSelection() {
 				if ( title ) {
 					label = sprintf(
 						/* translators: %s: block name */
-						__( '%s deselected.' ),
+						__( '"%s" block deselected.' ),
 						title
 					);
 				}
 			} else if ( selectionDiff.length > 1 ) {
 				label = sprintf(
-					/* translators: %s: number of deselected blocks */
-					__( '%s blocks deselected.' ),
+					/* translators: %d: number of deselected blocks */
+					_n(
+						'%d block deselected.',
+						'%d blocks deselected.',
+						selectionDiff.length
+					),
 					selectionDiff.length
 				);
 			}
