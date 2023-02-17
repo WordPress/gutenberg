@@ -31,6 +31,10 @@ const getSelectedTab = () => screen.getByRole( 'tab', { selected: true } );
 
 let originalGetClientRects: () => DOMRectList;
 
+// TODO: - check correct aria attributes (tablist/tab/tabpanel, aria-controls, orientation)
+// TODO: check focused but disabled tabs
+// TODO: check tooltips
+
 describe.each( [
 	[ 'uncontrolled', TabPanel ],
 	// The controlled component tests will be added once we certify the
@@ -88,6 +92,11 @@ describe.each( [
 			);
 			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
+
+		it( 'should fall back to first enabled tab if the active tab is disabled', async () => {
+			// Both initially, and as a re-render
+			expect( true ).toBe( false );
+		} );
 	} );
 
 	describe( 'With `initialTabName`', () => {
@@ -111,6 +120,8 @@ describe.each( [
 					children={ () => undefined }
 				/>
 			);
+
+			// TODO: effectively check that not tabs are rendered
 
 			// No tab should be rendered i.e. it doesn't fall back to first tab.
 			expect(
@@ -138,30 +149,10 @@ describe.each( [
 			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
 
-		it( 'should fall back to initial tab if active tab is removed', async () => {
-			const user = userEvent.setup();
-			const mockOnSelect = jest.fn();
-			const { rerender } = render(
-				<Component
-					initialTabName="gamma"
-					tabs={ TABS }
-					children={ () => undefined }
-					onSelect={ mockOnSelect }
-				/>
-			);
+		it( 'should fall back to initial tab if active tab is removed', async () => {} );
 
-			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
-
-			rerender(
-				<Component
-					initialTabName="gamma"
-					tabs={ TABS.slice( 1 ) /* remove alpha */ }
-					children={ () => undefined }
-					onSelect={ mockOnSelect }
-				/>
-			);
-
-			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+		it( 'should ??? when the tab associated to `initialTabName` is removed while being the active tab', async () => {
+			expect( true ).toBe( false );
 		} );
 
 		it( 'waits for the tab with the `initialTabName` to be present in the `tabs` array before selecting it', () => {
@@ -199,6 +190,13 @@ describe.each( [
 			expect( getSelectedTab() ).toHaveTextContent( 'Delta' );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'delta' );
 		} );
+
+		it( 'should select first available tab if the tab associated to `initialTabName` is disabled', () => {
+			// TODO: Both initially, and as a re-render
+			// - what happens if the tab is not disabled anymore?
+
+			expect( true ).toBe( false );
+		} );
 	} );
 
 	describe( 'Disabled Tab', () => {
@@ -235,6 +233,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 		} );
 
+		// See if this behaviour changes when `initialTabName` prop is provided
 		it( 'should select first enabled tab when initial tab is disabled', () => {
 			const mockOnSelect = jest.fn();
 
@@ -302,13 +301,17 @@ describe.each( [
 				/>
 			);
 
+			// Alpha is the initially selected tab
 			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect(
 				screen.getByRole( 'tabpanel', { name: 'Alpha' } )
 			).toBeInTheDocument();
+			// TODO: should `mockOnSelect` be called?
+			// TODO: should it be called when we pass `initialTabName` ?
 			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
+			// Click on Beta, make sure beta is the selected tab
 			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
 
 			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
@@ -318,6 +321,7 @@ describe.each( [
 			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 1 ] );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
+			// Click on Alpha, make sure beta is the selected tab
 			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
 
 			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
@@ -328,6 +332,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 		} );
 
+		// TODO: are up/down arrow keys supported too?
 		it( 'defaults to automatic tab activation', async () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
@@ -421,6 +426,8 @@ describe.each( [
 			// No need to test the "wrap-around" behaviour, as it is being
 			// tested in the "automatic tab activation" test above.
 		} );
+
+		// TODO: check that disabled tabs are ignored by clicks, and skipped when using arrows
 	} );
 
 	describe( 'Tab Attributes', () => {
@@ -450,6 +457,8 @@ describe.each( [
 				/>
 			);
 
+			// Make sure that only the selected tab has the active class
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( getSelectedTab() ).toHaveClass( activeClass );
 			screen
 				.getAllByRole( 'tab', { selected: false } )
@@ -457,8 +466,11 @@ describe.each( [
 					expect( unselectedTab ).not.toHaveClass( activeClass );
 				} );
 
+			// Click the 'Beta' tab
 			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
 
+			// Make sure that only the selected tab has the active class
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 			expect( getSelectedTab() ).toHaveClass( activeClass );
 			screen
 				.getAllByRole( 'tab', { selected: false } )
