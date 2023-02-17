@@ -247,7 +247,32 @@ export function useRichText( {
 	] );
 
 	return {
-		value: record.current,
+		// Instead of exposing the record as ref, create getters for the
+		// properties so event handlers in useRichText implementations have
+		// access to the most recent value. For example when listening to input
+		// events, we internally update the state, but this state is not yet
+		// available to the input event handler because React may re-render
+		// asynchronously.
+		value: {
+			get text() {
+				return record.current.text;
+			},
+			get formats() {
+				return record.current.formats;
+			},
+			get replacements() {
+				return record.current.replacements;
+			},
+			get start() {
+				return record.current.start;
+			},
+			get end() {
+				return record.current.end;
+			},
+			get activeFormats() {
+				return record.current.activeFormats;
+			},
+		},
 		onChange: handleChange,
 		ref: mergedRefs,
 	};
