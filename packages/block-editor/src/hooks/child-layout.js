@@ -6,7 +6,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 
 /**
@@ -88,17 +88,17 @@ export function ChildLayoutEdit( {
 				<ToggleGroupControlOption
 					key={ 'fit' }
 					value={ 'fit' }
-					label={ __( 'Fit' ) }
+					label={ _x( 'Fit', 'CSS flex size' ) }
 				/>
 				<ToggleGroupControlOption
 					key={ 'fill' }
 					value={ 'fill' }
-					label={ __( 'Fill' ) }
+					label={ _x( 'Fill', 'CSS flex size' ) }
 				/>
 				<ToggleGroupControlOption
 					key={ 'fixed' }
 					value={ 'fixed' }
-					label={ __( 'Fixed' ) }
+					label={ _x( 'Fixed', 'CSS flex size' ) }
 				/>
 			</ToggleGroupControl>
 			{ selfStretch === 'fixed' && (
