@@ -388,9 +388,9 @@ test.describe( 'Image', () => {
 
 		// Zoom in to twice the amount using the zoom input.
 		await editor.clickBlockToolbarButton( 'Crop' );
-		await editor.clickBlockToolbarButton( 'Aspect Ratio' );
+		await editor.clickBlockToolbarButton( 'Aspect ratio' );
 		await page.click(
-			'role=menu[name="Aspect Ratio"i] >> role=menuitemradio[name="16:10"i]'
+			'role=menu[name="Aspect ratio"i] >> role=menuitemradio[name="16:10"i]'
 		);
 		await editor.clickBlockToolbarButton( 'Apply' );
 
