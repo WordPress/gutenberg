@@ -333,16 +333,16 @@ describe( 'Reusable blocks', () => {
 
 		// Make an edit to the reusable block and assert that there's only a
 		// paragraph in a reusable block.
-		await page.waitForSelector( 'p[aria-label="Paragraph block"]' );
+		await page.waitForSelector( 'p[aria-label=""Paragraph" block"]' ); // eslint-disable-line prettier/prettier
 		await page.click( 'p[aria-label="Paragraph block"]' );
 		await page.keyboard.type( '2' );
 		const selector =
-			'//div[@aria-label="Block: Reusable block"]//p[@aria-label="Paragraph block"][.="12"]';
+			'//div[@aria-label="Block: Reusable block"]//p[@aria-label=""Paragraph" block"][.="12"]'; // eslint-disable-line prettier/prettier
 		const reusableBlockWithParagraph = await page.$x( selector );
 		expect( reusableBlockWithParagraph ).toBeTruthy();
 
 		// Convert back to regular blocks.
-		await clickBlockToolbarButton( 'Select Reusable block' );
+		await clickBlockToolbarButton( 'Select "Reusable block"' );
 		await clickBlockToolbarButton( 'Convert to regular block' );
 		await page.waitForXPath( selector, {
 			hidden: true,
