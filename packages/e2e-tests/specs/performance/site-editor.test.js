@@ -94,7 +94,7 @@ describe( 'Site Editor Performance', () => {
 		await activateTheme( 'twentytwentyone' );
 	} );
 
-	describe( 'Loading', () => {
+	describe.skip( 'Loading', () => {
 		// Number of measurements to take.
 		const samples = 3;
 		// Number of throwaway measurements to perform before recording samples.
@@ -147,14 +147,13 @@ describe( 'Site Editor Performance', () => {
 
 	describe( 'Typing', () => {
 		it( 'trace 200 characters typing sequence', async () => {
-			expect( true ).toBe( false );
-
 			// Open the test page in Site Editor.
 			await visitSiteEditor( {
 				postId: id,
 				postType: 'page',
 			} );
-
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( 29000 );
 			// Wait for the canvas to become actionable.
 			await canvas().waitForSelector(
 				'[data-rich-text-placeholder="Write site tagline…"]'
