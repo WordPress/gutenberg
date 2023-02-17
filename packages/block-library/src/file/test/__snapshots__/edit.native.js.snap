@@ -432,7 +432,7 @@ exports[`File block renders placeholder without crashing 1`] = `
 >
   <View
     accessibilityHint="Double tap to select"
-    accessibilityLabel="File block. Empty"
+    accessibilityLabel="\"File\" block. Empty"
     accessibilityRole="button"
     accessible={true}
     focusable={true}

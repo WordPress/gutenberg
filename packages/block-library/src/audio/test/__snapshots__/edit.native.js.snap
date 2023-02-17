@@ -362,7 +362,7 @@ exports[`Audio block renders placeholder without crashing 1`] = `
   >
     <View
       accessibilityHint="Double tap to select an audio file"
-      accessibilityLabel="Audio block. Empty"
+      accessibilityLabel="\"Audio\" block. Empty"
       accessibilityRole="button"
       accessible={true}
       focusable={true}

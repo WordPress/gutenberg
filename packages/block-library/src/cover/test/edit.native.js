@@ -334,7 +334,7 @@ describe( 'color settings', () => {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );
 
-		const block = await screen.findByLabelText( 'Cover block. Empty' );
+		const block = await screen.findByLabelText( '"Cover" block. Empty' );
 		expect( block ).toBeDefined();
 
 		// Select a color from the placeholder palette.
@@ -425,7 +425,7 @@ describe( 'color settings', () => {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );
 
-		const block = await screen.findByLabelText( 'Cover block. Empty' );
+		const block = await screen.findByLabelText( '"Cover" block. Empty' );
 		expect( block ).toBeDefined();
 
 		// Select a color from the placeholder palette.

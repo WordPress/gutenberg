@@ -681,7 +681,7 @@ class EditorPage {
 		const accessibilityId = await block.getAttribute(
 			this.accessibilityIdKey
 		);
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="\"Image\" block. Empty"]`;
 		const imageBlockInnerElement = await this.driver.elementByXPath(
 			blockLocator
 		);
