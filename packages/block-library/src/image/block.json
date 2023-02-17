@@ -90,7 +90,8 @@
 			"background": false
 		},
 		"typography": {
-			"fontSize": true
+			"fontSize": true,
+			"__experimentalSelector": ".wp-block-image figcaption"
 		},
 		"__experimentalBorder": {
 			"color": true,
