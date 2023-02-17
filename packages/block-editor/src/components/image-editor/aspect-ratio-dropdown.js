@@ -3,7 +3,7 @@
  */
 import { check, aspectRatio as aspectRatioIcon } from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -39,7 +39,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 	return (
 		<DropdownMenu
 			icon={ aspectRatioIcon }
-			label={ __( 'Aspect Ratio' ) }
+			label={ __( 'Aspect ratio' ) }
 			popoverProps={ POPOVER_PROPS }
 			toggleProps={ toggleProps }
 			className="wp-block-image__aspect-ratio"
@@ -56,11 +56,11 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						aspectRatios={ [
 							// All ratios should be mirrored in PostFeaturedImage in @wordpress/block-library
 							{
-								title: __( 'Original' ),
+								title: _x( 'Original', 'aspect ratio' ),
 								aspect: defaultAspect,
 							},
 							{
-								title: __( 'Square' ),
+								title: _x( 'Square', 'aspect ratio' ),
 								aspect: 1,
 							},
 						] }
@@ -75,19 +75,19 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						value={ aspect }
 						aspectRatios={ [
 							{
-								title: __( '16:10' ),
+								title: _x( '16:10', 'aspect ratio' ),
 								aspect: 16 / 10,
 							},
 							{
-								title: __( '16:9' ),
+								title: _x( '16:9', 'aspect ratio' ),
 								aspect: 16 / 9,
 							},
 							{
-								title: __( '4:3' ),
+								title: _x( '4:3', 'aspect ratio' ),
 								aspect: 4 / 3,
 							},
 							{
-								title: __( '3:2' ),
+								title: _x( '3:2', 'aspect ratio' ),
 								aspect: 3 / 2,
 							},
 						] }
@@ -102,19 +102,19 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						value={ aspect }
 						aspectRatios={ [
 							{
-								title: __( '10:16' ),
+								title: _x( '10:16', 'aspect ratio' ),
 								aspect: 10 / 16,
 							},
 							{
-								title: __( '9:16' ),
+								title: _x( '9:16', 'aspect ratio' ),
 								aspect: 9 / 16,
 							},
 							{
-								title: __( '3:4' ),
+								title: _x( '3:4', 'aspect ratio' ),
 								aspect: 3 / 4,
 							},
 							{
-								title: __( '2:3' ),
+								title: _x( '2:3', 'aspect ratio' ),
 								aspect: 2 / 3,
 							},
 						] }
