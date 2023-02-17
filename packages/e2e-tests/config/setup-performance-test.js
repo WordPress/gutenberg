@@ -20,6 +20,7 @@ const PUPPETEER_TIMEOUT = process.env.PUPPETEER_TIMEOUT;
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 
 async function setupPage() {
+	await clearLocalStorage();
 	await setBrowserViewport( 'large' );
 	await page.emulateMediaFeatures( [
 		{ name: 'prefers-reduced-motion', value: 'reduce' },
@@ -34,14 +35,11 @@ beforeAll( async () => {
 
 	await trashAllPosts();
 	await trashAllPosts( 'wp_block' );
-	await clearLocalStorage();
 	await setupPage();
 	await activatePlugin( 'gutenberg-test-plugin-disables-the-css-animations' );
 } );
 
 afterEach( async () => {
-	// Clear localStorage between tests so that the next test starts clean.
-	await clearLocalStorage();
 	// Close the previous page entirely and create a new page, so that the next test
 	// isn't affected by page unload work.
 	await page.close();
