@@ -1493,10 +1493,10 @@ _Parameters_
 
 -   _clientId_ `string`: Block client ID.
 
-### selectPreviousBlock
+### selectPreviousBlockOrFirstParent
 
 Yields action objects used in signalling that the block preceding the given
-clientId should be selected.
+clientId or it's first parent from bottom to top should be selected.
 
 _Parameters_
 

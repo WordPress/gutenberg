@@ -232,17 +232,22 @@ export function selectBlock( clientId, initialPosition = 0 ) {
 
 /**
  * Yields action objects used in signalling that the block preceding the given
- * clientId should be selected.
+ * clientId or it's first parent from bottom to top should be selected.
  *
  * @param {string} clientId Block client ID.
  */
-export const selectPreviousBlock =
+export const selectPreviousBlockOrFirstParent =
 	( clientId ) =>
 	( { select, dispatch } ) => {
 		const previousBlockClientId =
 			select.getPreviousBlockClientId( clientId );
 		if ( previousBlockClientId ) {
 			dispatch.selectBlock( previousBlockClientId, -1 );
+		} else {
+			const firstParentClientId = select.getBlockRootClientId( clientId );
+			if ( firstParentClientId ) {
+				dispatch.selectBlock( firstParentClientId, -1 );
+			}
 		}
 	};
 
@@ -1197,7 +1202,7 @@ export const removeBlocks =
 		}
 
 		if ( selectPrevious ) {
-			dispatch.selectPreviousBlock( clientIds[ 0 ] );
+			dispatch.selectPreviousBlockOrFirstParent( clientIds[ 0 ] );
 		}
 
 		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
