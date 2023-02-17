@@ -8,7 +8,7 @@ import { colord, extend } from 'colord';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 
@@ -42,12 +42,12 @@ function ContrastChecker( {
 
 	const textColors = [
 		{
+			context: 'text',
 			color: currentTextColor,
-			description: __( 'text color' ),
 		},
 		{
+			context: 'link',
 			color: currentLinkColor,
-			description: __( 'link color' ),
 		},
 	];
 	const colordBackgroundColor = colord( currentBackgroundColor );
@@ -82,21 +82,24 @@ function ContrastChecker( {
 				continue;
 			}
 			message =
-				backgroundColorBrightness < colordTextColor.brightness()
-					? sprintf(
-							// translators: %s is a type of text color, e.g., "text color" or "link color".
-							__(
-								'This color combination may be hard for people to read. Try using a darker background color and/or a brighter %s.'
-							),
-							item.description
+				item.context === 'text'
+					? __(
+							'This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.'
 					  )
-					: sprintf(
-							// translators: %s is a type of text color, e.g., "text color" or "link color".
-							__(
-								'This color combination may be hard for people to read. Try using a brighter background color and/or a darker %s.'
-							),
-							item.description
+					: __(
+							'This color combination may be hard for people to read. Try using a darker background color and/or a brighter link color.'
 					  );
+			if ( backgroundColorBrightness >= colordTextColor.brightness() ) {
+				message =
+					item.context === 'text'
+						? __(
+								'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+						  )
+						: __(
+								'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color.'
+						  );
+			}
+
 			speakMessage = __(
 				'This color combination may be hard for people to read.'
 			);
