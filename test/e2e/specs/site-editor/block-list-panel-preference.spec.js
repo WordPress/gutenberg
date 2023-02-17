@@ -16,7 +16,6 @@ test.describe( 'Block list view', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
-			path: '/templates/single',
 		} );
 
 		await editor.canvas.click( 'body' );

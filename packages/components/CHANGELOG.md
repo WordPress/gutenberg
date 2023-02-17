@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 23.4.0 (2023-02-15)
+
 ### Bug Fix
 
 -   `ToolsPanel`: fix type inconsistencies between types, docs and normal component usage ([47944](https://github.com/WordPress/gutenberg/pull/47944)).

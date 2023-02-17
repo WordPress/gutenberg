@@ -67,12 +67,9 @@ export default function NewTemplatePart( {
 			setCanvasMode( 'edit' );
 
 			// Navigate to the created template part editor.
-			window.queueMicrotask( () => {
-				history.push( {
-					postId: templatePart.id,
-					postType: 'wp_template_part',
-					path: '/template-parts/single',
-				} );
+			history.push( {
+				postId: templatePart.id,
+				postType: 'wp_template_part',
 			} );
 
 			// TODO: Add a success notice?

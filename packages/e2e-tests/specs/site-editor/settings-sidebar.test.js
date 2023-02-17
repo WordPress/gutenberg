@@ -69,7 +69,6 @@ describe( 'Settings sidebar', () => {
 			await visitSiteEditor( {
 				postId: 'emptytheme//singular',
 				postType: 'wp_template',
-				path: '/templates/single',
 			} );
 			await enterEditMode();
 			const templateCardAfterNavigation = await getTemplateCard();
