@@ -99,53 +99,47 @@ The `PanelBody` creates a collapsible container that can be toggled open or clos
 
 ##### Props
 
-###### title
+###### title: `string`
 
 Title text. It shows even when it is closed.
 
--   Type: `String`
 -   Required: No
 
-###### opened
+###### opened: `boolean`
 
 When set to `true`, the component will remain open regardless of the `initialOpen` prop and the
 panel will be prevented from being closed.
 
--   Type: `Boolean`
 -   Required: No
 
-###### className
+###### className: `string`
 
 The CSS class to apply to the wrapper element.
 
--   Type: `String`
 -   Required: No
 
-###### icon
+###### icon: `JSX.Element`
 
 An icon to be shown next to the title.
 
--   Type: `JSX.Element`
 -   Required: No
 
-###### onToggle
+###### onToggle: `( next: boolean ) => void;`
 
 A function that is called any time the component is toggled from its closed state to its
 opened state, or vice versa.
 
--   Type: `function`
 -   Required: No
--   Default: noop
+-   Default: `noop`
 
-###### initialOpen
+###### initialOpen: `boolean`
 
 Whether or not the panel will start open.
 
--   Type: `Boolean`
 -   Required: No
--   Default: true
+-   Default: `true`
 
-###### children
+###### children: `| React.ReactNode | ( ( props: { opened: boolean } ) => React.ReactNode )`
 
 The content to display in the `PanelBody`.If a function is provided for this prop, it will
 receive an object with the `opened` prop as an argument.
@@ -153,22 +147,20 @@ receive an object with the `opened` prop as an argument.
 -   Type: `React.ReactNode | Function`
 -   Required: No
 
-###### buttonProps
+###### buttonProps: `WordPressComponentProps<Omit< ButtonAsButtonProps, 'icon' >, 'button', false>`
 
 Props that are passed to the `Button` component in title within the `PanelBody`.
 
--   Type: `Object`
 -   Required: No
 -   Default: `{}`
 
-###### scrollAfterOpen
+###### scrollAfterOpen: `boolean`
 
 Scrolls the content into view when visible. This improves the UX when multiple `PanelBody`
 components are stacked in a scrollable container.
 
--   Type: `Boolean`
 -   Required: No
--   Default: true
+-   Default: `true`
 
 ---
 
