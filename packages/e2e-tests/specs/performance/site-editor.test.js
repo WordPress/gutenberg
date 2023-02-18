@@ -94,7 +94,7 @@ describe( 'Site Editor Performance', () => {
 		await activateTheme( 'twentytwentyone' );
 	} );
 
-	describe.skip( 'Loading', () => {
+	describe( 'Loading', () => {
 		// Number of measurements to take.
 		const samples = 3;
 		// Number of throwaway measurements to perform before recording samples.
@@ -122,7 +122,7 @@ describe( 'Site Editor Performance', () => {
 					'[data-rich-text-placeholder="Write site tagline…"]'
 				);
 
-				if ( i > 1 ) {
+				if ( i > throwaway ) {
 					const {
 						serverResponse,
 						firstPaint,
@@ -152,8 +152,7 @@ describe( 'Site Editor Performance', () => {
 				postId: id,
 				postType: 'page',
 			} );
-			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( 29000 );
+
 			// Wait for the canvas to become actionable.
 			await canvas().waitForSelector(
 				'[data-rich-text-placeholder="Write site tagline…"]'
