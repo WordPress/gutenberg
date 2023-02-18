@@ -77,18 +77,23 @@ const MyPanel = () => (
 
 ##### Props
 
-###### className
+###### header:`string`
 
-The class that will be added with `components-panel`. If no `className` is passed only `components-panel__body` and `is-opened` is used.
+The text that will be rendered as the title of the panel. Text will be rendered inside an
+`<h2>` tag.
 
--   Type: `String`
 -   Required: No
 
-###### header
+###### className: `string`
 
-Title of the `Panel`. Text will be rendered inside an `<h2>` tag.
+The CSS class to apply to the wrapper element.
 
--   Type: `String`
+-   Required: No
+
+###### children: `React.ReactNode`
+
+The content to display within the panel row.
+
 -   Required: No
 
 ---
@@ -144,7 +149,6 @@ Whether or not the panel will start open.
 The content to display in the `PanelBody`.If a function is provided for this prop, it will
 receive an object with the `opened` prop as an argument.
 
--   Type: `React.ReactNode | Function`
 -   Required: No
 
 ###### buttonProps: `WordPressComponentProps<Omit< ButtonAsButtonProps, 'icon' >, 'button', false>`
@@ -170,11 +174,16 @@ components are stacked in a scrollable container.
 
 ##### Props
 
-###### className
+###### className: `string`
 
-The class that will be added with `components-panel__row`. to the classes of the wrapper div. If no `className` is passed only `components-panel__row` is used.
+The CSS class to apply to the wrapper element.
 
--   Type: `String`
+-   Required: No
+
+###### children: `React.ReactNode`
+
+The content to display within the panel row.
+
 -   Required: No
 
 ##### Ref
@@ -191,11 +200,16 @@ PanelRow accepts a forwarded ref that will be added to the wrapper div. Usage:
 
 ##### Props
 
-###### label
+###### label: `string`
 
 The text that will be rendered as the title of the `Panel`. Will be rendered in an `<h2>` tag.
 
--   Type: `String`
+-   Required: No
+
+###### children: `React.ReactNode`
+
+The content to display within the panel row.
+
 -   Required: No
 
 ## Related components
