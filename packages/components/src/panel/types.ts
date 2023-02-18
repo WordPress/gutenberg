@@ -93,7 +93,7 @@ export type PanelBodyProps = {
 	title?: string;
 	/**
 	 * Scrolls the content into view when visible. This improves the UX when
-	 * multiple `PanelBody` are stacked in a scrollable container.
+	 * multiple `PanelBody` components are stacked in a scrollable container.
 	 *
 	 * @default true
 	 */
