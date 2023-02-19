@@ -68,8 +68,8 @@ It is recommended to use the main `wp-polyfill` script handle which takes care o
 ## Bundling and code sharing
 
 When using a JavaScript bundler like [webpack](https://webpack.js.org/), the scripts mentioned here
-can be excluded from the bundle and provided by WordPress in the form of script dependencies [(see
-`wp_enqueue_script`)][https://developer.wordpress.org/reference/functions/wp_enqueue_script/#default-scripts-included-and-registered-by-wordpress].
+can be excluded from the bundle and provided by WordPress in the form of script dependencies [see
+`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/#default-scripts-included-and-registered-by-wordpress).
 
 The
 [`@wordpress/dependency-extraction-webpack-plugin`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-extraction-webpack-plugin)
