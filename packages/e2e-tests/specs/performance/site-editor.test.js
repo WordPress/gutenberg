@@ -59,7 +59,7 @@ describe( 'Site Editor Performance', () => {
 		);
 
 		await createNewPost( { postType: 'page' } );
-		await page.evaluate( ( _html ) => {
+		await page.evaluate( async ( _html ) => {
 			const { parse } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
 			const blocks = parse( _html );
@@ -71,8 +71,9 @@ describe( 'Site Editor Performance', () => {
 				}
 			} );
 
-			dispatch( 'core/block-editor' ).resetBlocks( blocks );
+			await dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		}, html );
+		await page.waitForTimeout( 3000 ); // eslint-disable-line no-restricted-syntax
 		await saveDraft();
 
 		id = await page.evaluate( () =>
