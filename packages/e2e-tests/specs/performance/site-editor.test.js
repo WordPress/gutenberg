@@ -144,6 +144,9 @@ describe( 'Site Editor Performance', () => {
 		} );
 		await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
 
+		await canvas().waitForNavigation( {
+			waitUntil: [ 'load', 'networkidle0' ],
+		} );
 		try {
 			// Measuring typing performance inside the post content.
 			await canvas().waitForSelector(
