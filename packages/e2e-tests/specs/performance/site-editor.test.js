@@ -142,11 +142,20 @@ describe( 'Site Editor Performance', () => {
 		} );
 		await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
 
-		// Measuring typing performance inside the post content.
-		await canvas().waitForSelector(
-			'[data-type="core/post-content"] [data-type="core/paragraph"]',
-			{ timeout: 240000 }
-		);
+		try {
+			// Measuring typing performance inside the post content.
+			await canvas().waitForSelector(
+				'[data-type="core/post-content"] [data-type="core/paragraph"]',
+				{ timeout: 240000 }
+			);
+		} catch ( err ) {
+			await require( 'fs/promises' ).writeFile(
+				'artifacts/canvas.html',
+				await canvas().content(),
+				'utf-8'
+			);
+			throw err;
+		}
 		await enterEditMode();
 		await canvas().click(
 			'[data-type="core/post-content"] [data-type="core/paragraph"]',
