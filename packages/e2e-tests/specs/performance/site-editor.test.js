@@ -163,7 +163,7 @@ describe( 'Site Editor Performance', () => {
 			throw err;
 		}
 		await enterEditMode();
-		await canvas().click(
+		await canvas().focus(
 			'[data-type="core/post-content"] [data-type="core/paragraph"]',
 			{ timeout: 240000 }
 		);
