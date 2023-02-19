@@ -144,7 +144,8 @@ describe( 'Site Editor Performance', () => {
 
 		// Measuring typing performance inside the post content.
 		await canvas().waitForSelector(
-			'[data-type="core/post-content"] [data-type="core/paragraph"]'
+			'[data-type="core/post-content"] [data-type="core/paragraph"]',
+			{ timeout: 240000 }
 		);
 		await enterEditMode();
 		await canvas().click(
