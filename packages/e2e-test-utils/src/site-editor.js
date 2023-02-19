@@ -175,4 +175,9 @@ export async function enterEditMode() {
 		return;
 	}
 	await canvas().click( 'body' );
+
+	await page.waitForSelector(
+		'[role="region"][aria-label="Navigation sidebar"]',
+		{ hidden: true }
+	);
 }

@@ -73,7 +73,6 @@ describe( 'Site Editor Performance', () => {
 
 			await dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		}, html );
-		await page.waitForTimeout( 3000 ); // eslint-disable-line no-restricted-syntax
 		await saveDraft();
 
 		id = await page.evaluate( () =>
@@ -144,9 +143,6 @@ describe( 'Site Editor Performance', () => {
 		} );
 		await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
 
-		await canvas().waitForNavigation( {
-			waitUntil: [ 'load', 'networkidle0' ],
-		} );
 		try {
 			// Measuring typing performance inside the post content.
 			await canvas().waitForSelector(
