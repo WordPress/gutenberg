@@ -6,6 +6,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /** @typedef {import('@playwright/test').Page} Page */
 /** @typedef {import('@wordpress/e2e-test-utils-playwright').Editor} Editor */
 
+/**
+ * Some tests in this file use the character `|` to represent the caret's position
+ * in a more readable format.
+ */
 test.describe( 'Multi-block selection', () => {
 	test.use( {
 		multiBlockSelectionUtils: async ( { page, editor }, use ) => {
@@ -94,10 +98,10 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Shift+ArrowDown' );
 
 		// Should type at the end of the paragraph.
-		await page.keyboard.type( '$' );
+		await page.keyboard.type( '|' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{ name: 'core/paragraph', attributes: { content: '1<br>2$' } },
+			{ name: 'core/paragraph', attributes: { content: '1<br>2|' } },
 			{ name: 'core/paragraph', attributes: { content: '3' } },
 		] );
 	} );
@@ -505,7 +509,7 @@ test.describe( 'Multi-block selection', () => {
 				{ attributes: { content: 'second paragraph' } },
 			] );
 
-		await page.keyboard.type( '$' );
+		await page.keyboard.type( '|' );
 		await expect
 			.poll(
 				editor.getBlocks,
@@ -513,18 +517,18 @@ test.describe( 'Multi-block selection', () => {
 			)
 			.toMatchObject( [
 				{ attributes: { content: 'first paragraph' } },
-				{ attributes: { content: 'second paragraph$' } },
+				{ attributes: { content: 'second paragraph|' } },
 			] );
 
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
-		await page.keyboard.type( '$' );
+		await page.keyboard.type( '|' );
 		await expect
 			.poll( editor.getBlocks, 'should replace blocks' )
 			.toMatchObject( [
 				{ attributes: { content: 'first paragraph' } },
-				{ attributes: { content: 'second paragraph$' } },
+				{ attributes: { content: 'second paragraph|' } },
 			] );
 		await page.keyboard.press( 'Backspace' );
 
@@ -532,14 +536,14 @@ test.describe( 'Multi-block selection', () => {
 			await page.keyboard.press( 'ArrowLeft' );
 		}
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
-		await page.keyboard.type( '$' );
+		await page.keyboard.type( '|' );
 		await expect
 			.poll( editor.getBlocks, 'should paste mid-block' )
 			.toMatchObject( [
 				{ attributes: { content: 'first paragraph' } },
 				{ attributes: { content: 'second paragr' } },
 				{ attributes: { content: 'first paragraph' } },
-				{ attributes: { content: 'second paragraph$' } },
+				{ attributes: { content: 'second paragraph|' } },
 				{ attributes: { content: 'aph' } },
 			] );
 	} );
@@ -1017,11 +1021,11 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Delete' );
 
 		// Ensure selection is in the correct place.
-		await page.keyboard.type( '$' );
+		await page.keyboard.type( '|' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/heading',
-				attributes: { level: 2, content: '1$2' },
+				attributes: { level: 2, content: '1|2' },
 			},
 		] );
 	} );
@@ -1042,11 +1046,11 @@ test.describe( 'Multi-block selection', () => {
 		await pageUtils.pressKeyTimes( 'Shift+ArrowLeft', 3 );
 
 		// Ensure selection is in the correct place.
-		await page.keyboard.type( '$' );
+		await page.keyboard.type( '|' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: '1$2' },
+				attributes: { content: '1|2' },
 			},
 		] );
 	} );
@@ -1079,7 +1083,7 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Ensure selection is in the correct place.
-		await page.keyboard.type( '$' );
+		await page.keyboard.type( '|' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
@@ -1087,7 +1091,7 @@ test.describe( 'Multi-block selection', () => {
 			},
 			{
 				name: 'core/paragraph',
-				attributes: { content: '$' },
+				attributes: { content: '|' },
 			},
 			{
 				name: 'core/heading',
@@ -1121,11 +1125,11 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure selection is in the correct place.
-		await page.keyboard.type( '$' );
+		await page.keyboard.type( '|' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: '$' },
+				attributes: { content: '|' },
 			},
 		] );
 	} );
@@ -1159,11 +1163,11 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure selection is in the correct place.
-		await page.keyboard.type( '$' );
+		await page.keyboard.type( '|' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: '<strong>1</strong>$2' },
+				attributes: { content: '<strong>1</strong>|2' },
 			},
 		] );
 	} );
@@ -1296,16 +1300,19 @@ class MultiBlockSelectionUtils {
 			window.getSelection()
 		);
 
-		const { selectionStart, selectionEnd } = await this.#page.evaluate(
-			() => {
-				const { getSelectionStart, getSelectionEnd } =
-					window.wp.data.select( 'core/block-editor' );
+		const { isMultiSelected, selectionStart, selectionEnd } =
+			await this.#page.evaluate( () => {
+				const {
+					hasMultiSelection,
+					getSelectionStart,
+					getSelectionEnd,
+				} = window.wp.data.select( 'core/block-editor' );
 				return {
+					isMultiSelected: hasMultiSelection(),
 					selectionStart: getSelectionStart().clientId,
 					selectionEnd: getSelectionEnd().clientId,
 				};
-			}
-		);
+			} );
 		const startBlock = this.#editor.canvas.locator(
 			`[data-block="${ selectionStart }"]`
 		);
@@ -1321,8 +1328,6 @@ class MultiBlockSelectionUtils {
 		const range = await selection.evaluateHandle( ( _selection ) =>
 			_selection.getRangeAt( 0 )
 		);
-
-		const isMultiSelected = selectionStart !== selectionEnd;
 		const isCollapsed = await range.evaluate(
 			( { collapsed } ) => collapsed
 		);
