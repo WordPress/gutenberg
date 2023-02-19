@@ -155,6 +155,11 @@ describe( 'Site Editor Performance', () => {
 				await canvas().content(),
 				'utf-8'
 			);
+			await require( 'fs/promises' ).writeFile(
+				'artifacts/page.html',
+				await page.content(),
+				'utf-8'
+			);
 			throw err;
 		}
 		await enterEditMode();
