@@ -92,6 +92,10 @@ describe( 'Site Editor Performance', () => {
 			postId: id,
 			postType: 'page',
 		} );
+		// eslint-disable-next-line no-console
+		console.log( 'Visited the site editor.' );
+		// eslint-disable-next-line no-console
+		console.log( await page.url() );
 	} );
 
 	it( 'Loading', async () => {
@@ -138,12 +142,22 @@ describe( 'Site Editor Performance', () => {
 	} );
 
 	it( 'Typing', async () => {
+		// eslint-disable-next-line no-console
+		console.log( 'Starting the typing test.' );
+		// eslint-disable-next-line no-console
+		console.log( await page.url() );
+
 		await page.waitForSelector( '.edit-site-visual-editor', {
 			timeout: 120000,
 		} );
 		await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
 
 		try {
+			// eslint-disable-next-line no-console
+			console.log( 'Trying to access the paragraph block.' );
+			// eslint-disable-next-line no-console
+			console.log( await page.url() );
+
 			// Measuring typing performance inside the post content.
 			await canvas().waitForSelector(
 				'[data-type="core/post-content"] [data-type="core/paragraph"]',
