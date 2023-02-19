@@ -147,8 +147,9 @@ describe( 'Site Editor Performance', () => {
 			'[data-type="core/post-content"] [data-type="core/paragraph"]'
 		);
 		await enterEditMode();
-		await canvas().click(
-			'[data-type="core/post-content"] [data-type="core/paragraph"]'
+		await canvas().focus(
+			'[data-type="core/post-content"] [data-type="core/paragraph"]',
+			{ timeout: 240000 }
 		);
 		await insertBlock( 'Paragraph' );
 		let i = 200;
