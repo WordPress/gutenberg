@@ -91,6 +91,7 @@ describe( 'Site Editor Performance', () => {
 		await visitSiteEditor( {
 			postId: id,
 			postType: 'page',
+			path: '/navigation/single',
 		} );
 		// eslint-disable-next-line no-console
 		console.log( 'Visited the site editor.' );
