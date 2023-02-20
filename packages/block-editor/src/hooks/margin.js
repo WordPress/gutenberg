@@ -152,6 +152,7 @@ export function MarginEdit( props ) {
 						splitOnAxis={ splitOnAxis }
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
+						inputProps={ { min: -Infinity } }
 					/>
 				) }
 				{ spacingSizes?.length > 0 && (
@@ -165,6 +166,7 @@ export function MarginEdit( props ) {
 						splitOnAxis={ false }
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
+						minimumCustomValue={ -Infinity }
 					/>
 				) }
 			</>

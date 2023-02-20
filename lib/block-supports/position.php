@@ -48,7 +48,7 @@ function gutenberg_render_position_support( $block_content, $block ) {
 	$theme_has_fixed_support  = _wp_array_get( $global_settings, array( 'position', 'fixed' ), false );
 
 	// Only allow output for position types that the theme supports.
-	$allowed_position_types = array();
+	$allowed_position_types = array( 'relative' );
 	if ( true === $theme_has_sticky_support ) {
 		$allowed_position_types[] = 'sticky';
 	}
@@ -61,7 +61,12 @@ function gutenberg_render_position_support( $block_content, $block ) {
 	$selector        = ".$class_name";
 	$position_styles = array();
 	$position_type   = _wp_array_get( $style_attribute, array( 'position', 'type' ), '' );
+	$z_index         = _wp_array_get( $style_attribute, array( 'position', 'zIndex' ), null );
 	$wrapper_classes = array();
+
+	if ( empty( $position_type ) && ! empty( $z_index ) ) {
+		$position_type = 'relative';
+	}
 
 	if (
 		in_array( $position_type, $allowed_position_types, true )
@@ -69,6 +74,14 @@ function gutenberg_render_position_support( $block_content, $block ) {
 		$wrapper_classes[] = $class_name;
 		$wrapper_classes[] = 'is-position-' . $position_type;
 		$sides             = array( 'top', 'right', 'bottom', 'left' );
+
+		$position_styles[] =
+			array(
+				'selector'     => $selector,
+				'declarations' => array(
+					'position' => $position_type,
+				),
+			);
 
 		foreach ( $sides as $side ) {
 			$side_value = _wp_array_get( $style_attribute, array( 'position', $side ) );
@@ -100,14 +113,23 @@ function gutenberg_render_position_support( $block_content, $block ) {
 			}
 		}
 
-		$position_styles[] =
-			array(
-				'selector'     => $selector,
-				'declarations' => array(
-					'position' => $position_type,
-					'z-index'  => '10', // TODO: Replace hard-coded z-index value with a z-index preset approach in theme.json.
-				),
-			);
+		if (
+			! isset( $z_index ) &&
+			in_array( $position_type, array( 'fixed', 'sticky' ), true )
+		) {
+			$z_index = '10'; // TODO: Replace hard-coded z-index value with a z-index preset approach in theme.json.
+		}
+
+		if ( isset( $z_index ) ) {
+			$position_styles[] =
+				array(
+					'selector'     => $selector,
+					'declarations' => array(
+						'position' => $position_type,
+						'z-index' => $z_index,
+					),
+				);
+		}
 	}
 
 	if ( ! empty( $position_styles ) ) {

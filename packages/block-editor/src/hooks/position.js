@@ -66,8 +66,29 @@ const FIXED_OPTION = {
 	),
 };
 
+const ZINDEX_OPTIONS = [
+	{
+		key: 'auto',
+		value: '',
+		name: __( 'Auto' ),
+		className: OPTION_CLASSNAME,
+	},
+	{
+		key: '5',
+		value: '5',
+		name: __( 'Top' ),
+		className: OPTION_CLASSNAME,
+	},
+	{
+		key: '-1',
+		value: '-1',
+		name: __( 'Bottom' ),
+		className: OPTION_CLASSNAME,
+	},
+];
+
 const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];
-const VALID_POSITION_TYPES = [ 'sticky', 'fixed' ];
+const VALID_POSITION_TYPES = [ 'relative', 'sticky', 'fixed' ];
 
 /**
  * Get calculated position CSS.
@@ -79,27 +100,39 @@ const VALID_POSITION_TYPES = [ 'sticky', 'fixed' ];
  */
 export function getPositionCSS( { selector, style } ) {
 	let output = '';
+	const rules = [];
 
-	const { type: positionType } = style?.position || {};
+	const { type: positionType, zIndex } = style?.position || {};
 
-	if ( ! VALID_POSITION_TYPES.includes( positionType ) ) {
-		return output;
+	if (
+		VALID_POSITION_TYPES.includes( positionType ) ||
+		zIndex !== undefined
+	) {
+		rules.push( `position: ${ positionType || 'relative' };` );
+		POSITION_SIDES.forEach( ( side ) => {
+			if ( style?.position?.[ side ] !== undefined ) {
+				rules.push( `${ side }: ${ style.position[ side ] };` );
+			}
+		} );
 	}
 
-	output += `${ selector } {`;
-	output += `position: ${ positionType };`;
-
-	POSITION_SIDES.forEach( ( side ) => {
-		if ( style?.position?.[ side ] !== undefined ) {
-			output += `${ side }: ${ style.position[ side ] };`;
-		}
-	} );
-
-	if ( positionType === 'sticky' || positionType === 'fixed' ) {
+	if (
+		( positionType === 'sticky' || positionType === 'fixed' ) &&
+		style?.zIndex === undefined
+	) {
 		// TODO: Replace hard-coded z-index value with a z-index preset approach in theme.json.
-		output += `z-index: 10`;
+		rules.push( `z-index: 10` );
 	}
-	output += `}`;
+
+	if ( zIndex !== undefined ) {
+		rules.push( `z-index: ${ parseInt( zIndex, 10 ) };` );
+	}
+
+	if ( rules.length ) {
+		output += `${ selector } {`;
+		output += rules.join( '' );
+		output += `}`;
+	}
 
 	return output;
 }
@@ -220,7 +253,8 @@ export function PositionPanel( props ) {
 
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
-	const value = style?.position?.type;
+	const positionValue = style?.position?.type;
+	const zIndexValue = style?.position?.zIndex;
 
 	const { hasParents } = useSelect(
 		( select ) => {
@@ -239,15 +273,15 @@ export function PositionPanel( props ) {
 		// or if the block already has a sticky position value set.
 		if (
 			( allowSticky && ! hasParents ) ||
-			value === STICKY_OPTION.value
+			positionValue === STICKY_OPTION.value
 		) {
 			availableOptions.push( STICKY_OPTION );
 		}
-		if ( allowFixed || value === FIXED_OPTION.value ) {
+		if ( allowFixed || positionValue === FIXED_OPTION.value ) {
 			availableOptions.push( FIXED_OPTION );
 		}
 		return availableOptions;
-	}, [ allowFixed, allowSticky, hasParents, value ] );
+	}, [ allowFixed, allowSticky, hasParents, positionValue ] );
 
 	const onChangeType = ( next ) => {
 		// For now, use a hard-coded `0px` value for the position.
@@ -272,9 +306,29 @@ export function PositionPanel( props ) {
 		} );
 	};
 
-	const selectedOption = value
-		? options.find( ( option ) => option.value === value ) || DEFAULT_OPTION
+	const onChangeZIndex = ( next ) => {
+		const newStyle = {
+			...style,
+			position: {
+				...style?.position,
+				zIndex: next,
+			},
+		};
+
+		setAttributes( {
+			style: cleanEmptyObject( newStyle ),
+		} );
+	};
+
+	const selectedOption = positionValue
+		? options.find( ( option ) => option.value === positionValue ) ||
+		  DEFAULT_OPTION
 		: DEFAULT_OPTION;
+
+	const selectedZIndex = zIndexValue
+		? ZINDEX_OPTIONS.find( ( option ) => option.value === zIndexValue ) ||
+		  ZINDEX_OPTIONS[ 0 ]
+		: ZINDEX_OPTIONS[ 0 ];
 
 	// Only display position controls if there is at least one option to choose from.
 	return Platform.select( {
@@ -298,6 +352,26 @@ export function PositionPanel( props ) {
 							__experimentalShowSelectedHint
 							onChange={ ( { selectedItem } ) => {
 								onChangeType( selectedItem.value );
+							} }
+							size={ '__unstable-large' }
+						/>
+					</BaseControl>
+					<BaseControl className="block-editor-hooks__position-selection">
+						<CustomSelectControl
+							__nextUnconstrainedWidth
+							__next36pxDefaultSize
+							className="block-editor-hooks__position-selection__select-control"
+							label={ __( 'Layer (Z-Index)' ) }
+							describedBy={ sprintf(
+								// translators: %s: Currently selected z-index.
+								__( 'Currently selected z-index: %s' ),
+								selectedZIndex.name
+							) }
+							options={ ZINDEX_OPTIONS }
+							value={ selectedZIndex }
+							__experimentalShowSelectedHint
+							onChange={ ( { selectedItem } ) => {
+								onChangeZIndex( selectedItem.value );
 							} }
 							size={ '__unstable-large' }
 						/>
