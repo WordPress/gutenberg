@@ -113,6 +113,8 @@ export default function SiteTitleEdit( {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
+			</BlockControls>
+			<BlockControls group="other">
 				<FontAppearanceControl { ...fontAppearanceProps } />
 			</BlockControls>
 			<InspectorControls>
