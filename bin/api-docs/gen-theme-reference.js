@@ -211,6 +211,37 @@ styleSections.forEach( ( section ) => {
 	autogen += getSectionMarkup( section, styles[ section ], 'styles' );
 } );
 
+// customTemplates
+const customTemplates = themejson.properties.customTemplates.items.properties;
+autogen += '## customTemplates' + '\n\n';
+autogen += themejson.properties.customTemplates.description + '\n';
+autogen +=
+	'Type: `' + themejson.properties.customTemplates.items.type + '`.\n\n';
+const ctSections = keys( customTemplates );
+ctSections.forEach( ( key ) => {
+	autogen += '`' + key + '`: ';
+	autogen += customTemplates[ key ].description + ' ';
+	autogen += 'Type: `' + customTemplates[ key ].type + '`.\n';
+} );
+autogen += '\n\n';
+
+// templateParts
+const templateParts = themejson.properties.templateParts.items.properties;
+autogen += '## templateParts' + '\n\n';
+autogen += themejson.properties.templateParts.description + '\n';
+autogen += 'Type: `' + themejson.properties.templateParts.items.type + '`.\n\n';
+keys( templateParts ).forEach( ( key ) => {
+	autogen += '`' + key + '`: ';
+	autogen += templateParts[ key ].description + ' ';
+	autogen += 'Type: `' + templateParts[ key ].type + '`.\n';
+} );
+autogen += '\n\n';
+
+// Patterns
+autogen += '## Patterns' + '\n\n';
+autogen += themejson.properties.patterns.description + '\n';
+autogen += 'Type: `' + themejson.properties.patterns.type + '`.\n\n';
+
 // Read existing file to wrap auto generated content.
 let docsContent = fs.readFileSync( THEME_JSON_REF_DOC, {
 	encoding: 'utf8',
