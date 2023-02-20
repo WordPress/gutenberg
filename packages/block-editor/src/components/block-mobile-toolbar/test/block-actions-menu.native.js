@@ -421,7 +421,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
 
 			// Tap on the Transform block button
-			fireEvent.press( getByLabelText( /Transform block…/ ) );
+			fireEvent.press( getByLabelText( /Transform block/ ) );
 
 			// Get Picker title
 			const pickerHeader = getByRole( 'header' );
