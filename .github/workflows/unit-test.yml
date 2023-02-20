@@ -134,7 +134,7 @@ jobs:
                   locale -a
 
             - name: Start Docker environment
-              run: npm run wp-env start
+              run: npm run wp-env start --update
 
             - name: Log running Docker containers
               run: docker ps -a
