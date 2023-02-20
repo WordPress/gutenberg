@@ -157,10 +157,6 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 			// in the UI. This isn't part of the user flow we want to test.
 			await tab.click();
 			await tab.focus();
-			// Perform actionability checks implicitly to wait for the modal content
-			// to be attached with certain attributes. This is necessary for solving
-			// a flaky result where Playwright runs too fast before DOM catching up.
-			await expect( preferencesModalContent ).toBeVisible();
 		}
 
 		// The General tab panel content is short and not scrollable.
@@ -174,12 +170,15 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		// The Blocks tab panel content is long and scrollable.
 		// Check it's focusable.
 		await clickAndFocusTab( blocksTab );
-		await page.keyboard.press( 'Shift+Tab' );
-		await expect( closeButton ).toBeFocused();
+		// Explicitly wait for the modal content to be attached with certain attributes.
+		// This is necessary for solving a flaky result where Playwright runs too fast
+		// before DOM catching up.
 		await expect( preferencesModalContent ).toHaveAttribute(
 			'aria-label',
 			'Scrollable section'
 		);
+		await page.keyboard.press( 'Shift+Tab' );
+		await expect( closeButton ).toBeFocused();
 		await page.keyboard.press( 'Shift+Tab' );
 		await expect( preferencesModalContent ).toBeFocused();
 
