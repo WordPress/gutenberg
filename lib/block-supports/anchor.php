@@ -11,6 +11,10 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_anchor_support( $block_type ) {
+	if ( ! $block_type->render_callback ) {
+		return;
+	}
+
 	$has_anchor_support = _wp_array_get( $block_type->supports, array( 'anchor' ), true );
 	if ( ! $has_anchor_support ) {
 		return;
