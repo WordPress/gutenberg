@@ -157,6 +157,10 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 			// in the UI. This isn't part of the user flow we want to test.
 			await tab.click();
 			await tab.focus();
+			// Perform actionability checks implicitly to wait for the modal content
+			// to be attached with certain attributes. This is necessary for solving
+			// a flaky result where Playwright runs too fast before DOM catching up.
+			await expect( preferencesModalContent ).toBeVisible();
 		}
 
 		// The General tab panel content is short and not scrollable.
