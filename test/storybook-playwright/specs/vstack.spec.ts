@@ -19,7 +19,7 @@ test.describe( 'VStack', () => {
 	} );
 
 	test( 'should render', async ( { page } ) => {
-		// This test is going to run slow. Tripe the default timeout.
+		// This test is going to run slow. Triple the default timeout.
 		test.slow();
 
 		await page.waitForSelector( '.components-v-stack' );
