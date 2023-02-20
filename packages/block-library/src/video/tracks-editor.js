@@ -95,7 +95,11 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 					{ __( 'Edit track' ) }
 				</span>
 				<span>
-					{ __( 'File' ) }: <b>{ fileName }</b>
+					{ sprintf(
+						/* translators: %s: Name of the file e.g: "track-en.vtt" */
+						__( 'File: %s' ),
+						'<b>' + fileName + '</b>'
+					) }
 				</span>
 				<Grid columns={ 2 } gap={ 4 }>
 					<TextControl

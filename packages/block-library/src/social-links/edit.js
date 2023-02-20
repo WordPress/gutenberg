@@ -24,16 +24,16 @@ import {
 	ToggleControl,
 	ToolbarDropdownMenu,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 
 const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
 const sizeOptions = [
-	{ name: __( 'Small' ), value: 'has-small-icon-size' },
-	{ name: __( 'Normal' ), value: 'has-normal-icon-size' },
-	{ name: __( 'Large' ), value: 'has-large-icon-size' },
-	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
+	{ name: _x( 'Small', 'social icon size' ), value: 'has-small-icon-size' },
+	{ name: _x( 'Normal', 'social icon size' ), value: 'has-normal-icon-size' },
+	{ name: _x( 'Large', 'social icon size' ), value: 'has-large-icon-size' },
+	{ name: _x( 'Huge', 'social icon size' ), value: 'has-huge-icon-size' },
 ];
 
 export function SocialLinksEdit( props ) {

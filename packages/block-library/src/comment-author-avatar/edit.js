@@ -10,7 +10,7 @@ import {
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 
 export default function Edit( {
 	attributes,
@@ -94,7 +94,11 @@ export default function Edit( {
 				src={
 					avatarUrls ? avatarUrls[ avatarUrls.length - 1 ] : avatarURL
 				}
-				alt={ `${ authorName } ${ __( 'Avatar' ) }` }
+				alt={ sprintf(
+					/* translators: %s: author name. */
+					__( '%s Avatar' ),
+					authorName
+				) }
 				{ ...blockProps }
 			/>
 		</ResizableBox>

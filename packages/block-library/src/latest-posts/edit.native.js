@@ -271,7 +271,7 @@ class LatestPostsEdit extends Component {
 					<Icon icon={ icon } { ...iconStyle } />
 					<Text style={ titleStyle }>{ blockTitle }</Text>
 					<Text style={ styles.latestPostBlockSubtitle }>
-						{ __( 'CUSTOMIZE' ) }
+						{ __( 'Customize' ) }
 					</Text>
 				</View>
 			</TouchableWithoutFeedback>

@@ -19,7 +19,7 @@ import {
 	ToggleControl,
 	Icon,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -252,9 +252,11 @@ export default function SearchEdit( {
 			return 'search-block-button';
 		}
 
-		return `${ __(
-			'Search button. Current button text is'
-		) } ${ buttonText }`;
+		return sprintf(
+			// translators: %s: current search button text.
+			__( 'Search button. Current button text is %s' ),
+			buttonText
+		);
 	};
 
 	/**
@@ -271,7 +273,11 @@ export default function SearchEdit( {
 
 		const title = __( 'Search input field.' );
 		const description = placeholder
-			? `${ __( 'Current placeholder text is' ) } ${ placeholder }`
+			? sprintf(
+					// translators: %s: current placeholder text.
+					__( 'Current placeholder text is %s' ),
+					placeholder
+			  )
 			: __( 'No custom placeholder set' );
 		return `${ title } ${ description }`;
 	};
@@ -287,7 +293,11 @@ export default function SearchEdit( {
 			return 'search-block-label';
 		}
 
-		return `${ __( 'Search block label. Current text is' ) } ${ label }`;
+		return sprintf(
+			// translators: %s: current search label text.
+			__( 'Search block label. Current text is %s' ),
+			label
+		);
 	};
 
 	const renderTextField = () => {
