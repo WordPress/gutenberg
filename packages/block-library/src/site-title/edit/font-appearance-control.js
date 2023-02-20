@@ -45,6 +45,7 @@ export default function FontAppearanceControl( {
 			className="font-appearance-toolbar-control"
 			label={ __( 'Change font appareance' ) }
 			icon={ formatCapitalize }
+			toggleProps={ { isPressed: isBold || isItalic } }
 		>
 			{ () => (
 				<MenuGroup label={ __( 'Font appareance' ) }>
