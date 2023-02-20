@@ -206,8 +206,8 @@ const BlockActionsMenu = ( {
 					sprintf(
 						/* translators: %s: name of the reusable block */
 						_n(
-							'"%s" converted to regular block',
-							'"%s" converted to regular blocks',
+							'%s converted to regular block',
+							'%s converted to regular blocks',
 							innerBlockCount
 						),
 						reusableBlock?.title?.raw || blockTitle
