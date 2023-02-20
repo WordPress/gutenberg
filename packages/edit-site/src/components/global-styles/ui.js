@@ -24,6 +24,7 @@ import ScreenBlockList from './screen-block-list';
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
+import ScreenFilters from './screen-filters';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackgroundColor from './screen-background-color';
@@ -203,6 +204,10 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 				path={ parentMenu + '/colors/background' }
 			>
 				<ScreenBackgroundColor name={ name } variation={ variation } />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path={ parentMenu + '/filters' }>
+				<ScreenFilters name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/text' }>
