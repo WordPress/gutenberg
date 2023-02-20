@@ -121,7 +121,7 @@ describe( 'Gallery block', () => {
 
 		// Observe that the block is selected, this is done by checking if the block settings
 		// button is visible
-		const blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
+		const blockActionsButton = getByLabelText( /Open block Actions menu/ );
 		expect( blockActionsButton ).toBeVisible();
 	} );
 
@@ -537,7 +537,7 @@ describe( 'Gallery block', () => {
 		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ media[ 0 ].localId }} -->
 		<figure class="wp-block-image"><img src="${ media[ 0 ].localUrl }" alt="" class="wp-image-${ media[ 0 ].localId }"/></figure>
 		<!-- /wp:image -->
-		
+
 		<!-- wp:image {"id":${ media[ 1 ].localId },"linkDestination":"attachment"} -->
 		<figure class="wp-block-image"><img src="${ media[ 1 ].localUrl }" alt="" class="wp-image-${ media[ 1 ].localId }"/></figure>
 		<!-- /wp:image --></figure>

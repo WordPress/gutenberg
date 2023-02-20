@@ -179,7 +179,7 @@ describe( 'Social links block', () => {
 		fireEvent.press( firstLinkBlock );
 
 		// Open block actions menu
-		const blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
+		const blockActionsButton = getByLabelText( /Open block Actions menu/ );
 		fireEvent.press( blockActionsButton );
 
 		// Delete the social link

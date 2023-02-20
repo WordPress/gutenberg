@@ -175,7 +175,7 @@ describe( 'Columns block', () => {
 		fireEvent.press( firstColumnBlock );
 
 		// Open block actions menu
-		const blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
+		const blockActionsButton = getByLabelText( /Open block Actions menu/ );
 		fireEvent.press( blockActionsButton );
 
 		// Delete block
@@ -200,7 +200,7 @@ describe( 'Columns block', () => {
 		fireEvent.press( firstColumnBlock );
 
 		// Open block actions menu
-		let blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
+		let blockActionsButton = getByLabelText( /Open block Actions menu/ );
 		fireEvent.press( blockActionsButton );
 
 		// Delete block
@@ -212,7 +212,7 @@ describe( 'Columns block', () => {
 		fireEvent.press( lastColumnBlock );
 
 		// Open block actions menu
-		blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
+		blockActionsButton = getByLabelText( /Open block Actions menu/ );
 		fireEvent.press( blockActionsButton );
 
 		// Delete block

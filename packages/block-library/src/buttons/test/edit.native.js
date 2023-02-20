@@ -228,7 +228,7 @@ describe( 'Buttons block', () => {
 
 				// Open block actions menu
 				const blockActionsButton = screen.getByLabelText(
-					/Open Block Actions Menu/
+					/Open block Actions menu/
 				);
 				fireEvent.press( blockActionsButton );
 

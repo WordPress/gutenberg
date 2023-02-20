@@ -43,7 +43,7 @@ describe( 'Block Actions Menu', () => {
 		fireEvent.press( paragraphBlock );
 
 		// Open block actions menu
-		const blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
+		const blockActionsButton = getByLabelText( /Open block Actions menu/ );
 		fireEvent.press( blockActionsButton );
 
 		// Get Picker title
@@ -86,7 +86,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( spacerBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Get block actions modal
 			let blockActionsMenu = await getByTestId( 'block-actions-menu' );
@@ -103,7 +103,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( headingBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Get block actions modal
 			blockActionsMenu = await getByTestId( 'block-actions-menu' );
@@ -145,7 +145,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( paragraphBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Get block actions modal
 			const blockActionsMenu = await getByTestId( 'block-actions-menu' );
@@ -194,7 +194,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( headingBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Get block actions modal
 			const blockActionsMenu = await getByTestId( 'block-actions-menu' );
@@ -243,7 +243,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( headingBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Tap on the Copy button
 			fireEvent.press( getByLabelText( /Copy block/ ) );
@@ -253,7 +253,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( paragraphBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Tap on the Paste block after button
 			fireEvent.press( getByLabelText( /Paste block after/ ) );
@@ -290,7 +290,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( headingBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Tap on the Copy button
 			fireEvent.press( getByLabelText( /Copy block/ ) );
@@ -300,7 +300,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( paragraphBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Tap on the Past block after button
 			fireEvent.press( getByLabelText( /Paste block after/ ) );
@@ -335,7 +335,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( paragraphBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Tap on the Cut button
 			fireEvent.press( getByLabelText( /Cut block/ ) );
@@ -346,7 +346,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( headingBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Tap on the Cut button
 			fireEvent.press( getByLabelText( /Paste block after/ ) );
@@ -383,7 +383,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( spacerBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Tap on the Duplicate button
 			fireEvent.press( getByLabelText( /Duplicate block/ ) );
@@ -418,7 +418,7 @@ describe( 'Block Actions Menu', () => {
 			fireEvent.press( paragraphBlock );
 
 			// Open block actions menu
-			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+			fireEvent.press( getByLabelText( /Open block Actions menu/ ) );
 
 			// Tap on the Transform block button
 			fireEvent.press( getByLabelText( /Transform block/ ) );

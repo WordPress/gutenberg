@@ -296,7 +296,7 @@ const BlockActionsMenu = ( {
 				leftAlign={ true }
 				getAnchor={ getAnchor }
 				// translators: %s: block title e.g: "Paragraph".
-				title={ sprintf( __( '"%s" block options' ), blockTitle ) }
+				title={ sprintf( __( '%s block options' ), blockTitle ) }
 			/>
 			<BlockTransformationsMenu
 				anchorNodeRef={ anchorNodeRef }
