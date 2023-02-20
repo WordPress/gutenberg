@@ -27,7 +27,7 @@ export default function FontAppearanceControl( {
 			title: __( 'Bold' ),
 			style: { fontWeight: 'bold' },
 			onClick: toggleBold,
-			isSelected: isBold,
+			isActive: isBold,
 			role: 'menuitemcheckbox',
 		},
 		{
@@ -35,7 +35,7 @@ export default function FontAppearanceControl( {
 			title: __( 'Italic' ),
 			style: { fontStyle: 'italic' },
 			onClick: toggleItalic,
-			isSelected: isItalic,
+			isActive: isItalic,
 			role: 'menuitemcheckbox',
 		},
 	];
@@ -58,10 +58,10 @@ export default function FontAppearanceControl( {
 								'font-appearance-toolbar-control__option',
 								'components-dropdown-menu__menu-item',
 								{
-									'is-active': control.isSelected,
+									'is-active': control.isActive,
 								}
 							) }
-							isSelected={ control.isSelected }
+							isSelected={ control.isActive }
 							style={ control.style }
 						>
 							{ control.title }
