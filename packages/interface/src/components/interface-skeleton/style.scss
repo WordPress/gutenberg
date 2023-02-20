@@ -184,16 +184,20 @@ html.interface-interface-skeleton__html-container {
 
 	&:focus,
 	&:focus-within {
-		top: $admin-bar-height-big;
+		top: auto;
+		bottom: 0;
 
-		@include break-medium() {
-			border-left: $border-width solid $gray-300;
-			top: $admin-bar-height;
+		.is-entity-save-view-open & {
+			top: $admin-bar-height-big;
 
-			.is-fullscreen-mode & {
-				top: 0;
+			@include break-medium() {
+				border-left: $border-width solid $gray-300;
+				top: $admin-bar-height;
+
+				.is-fullscreen-mode & {
+					top: 0;
+				}
 			}
 		}
-		bottom: 0;
 	}
 }

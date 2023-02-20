@@ -11,8 +11,8 @@ type AsyncListConfig = {
 /**
  * Returns the first items from list that are present on state.
  *
- * @param  list  New array.
- * @param  state Current state.
+ * @param list  New array.
+ * @param state Current state.
  * @return First items present iin state.
  */
 function getFirstItemsPresentInState< T >( list: T[], state: T[] ): T[] {
@@ -34,8 +34,8 @@ function getFirstItemsPresentInState< T >( list: T[], state: T[] ): T[] {
  * React hook returns an array which items get asynchronously appended from a source array.
  * This behavior is useful if we want to render a list of items asynchronously for performance reasons.
  *
- * @param  list   Source array.
- * @param  config Configuration object.
+ * @param list   Source array.
+ * @param config Configuration object.
  *
  * @return Async array.
  */

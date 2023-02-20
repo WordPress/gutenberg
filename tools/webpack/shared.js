@@ -66,7 +66,7 @@ const plugins = [
 		// Inject the `IS_GUTENBERG_PLUGIN` global, used for feature flagging.
 		'process.env.IS_GUTENBERG_PLUGIN':
 			process.env.npm_package_config_IS_GUTENBERG_PLUGIN,
-		// Inject the `ALLOW_EXPERIMENT_REREGISTRATION` global, used by @wordpress/experiments.
+		// Inject the `ALLOW_EXPERIMENT_REREGISTRATION` global, used by @wordpress/private-apis.
 		'process.env.ALLOW_EXPERIMENT_REREGISTRATION':
 			process.env.npm_package_config_ALLOW_EXPERIMENT_REREGISTRATION,
 	} ),

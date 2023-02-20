@@ -31,7 +31,7 @@ module.exports = {
 	env: ( config ) => ( {
 		...config,
 		// Inject the `ALLOW_EXPERIMENT_REREGISTRATION` global, used by
-		// @wordpress/experiments.
+		// @wordpress/private-apis.
 		ALLOW_EXPERIMENT_REREGISTRATION: true,
 	} ),
 };

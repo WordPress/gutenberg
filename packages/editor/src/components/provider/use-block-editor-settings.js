@@ -73,6 +73,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableHasCustomAppender',
 	'__unstableIsPreviewMode',
 	'__unstableResolvedAssets',
+	'__unstableIsBlockBasedTheme',
 ];
 
 /**

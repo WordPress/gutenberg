@@ -16,7 +16,7 @@ import type {
 /**
  * Returns terms in a tree form.
  *
- * @param  flatTerms Array of terms in flat format.
+ * @param flatTerms Array of terms in flat format.
  *
  * @return Terms in tree format.
  */

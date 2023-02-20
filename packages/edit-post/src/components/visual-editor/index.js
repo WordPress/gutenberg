@@ -44,6 +44,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editPostStore } from '../../store';
 
+const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
+
 function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
@@ -339,7 +341,9 @@ export default function VisualEditor( { styles } ) {
 				>
 					<MaybeIframe
 						shouldIframe={
-							( isBlockBasedTheme && ! hasMetaBoxes ) ||
+							( isGutenbergPlugin &&
+								isBlockBasedTheme &&
+								! hasMetaBoxes ) ||
 							isTemplateMode ||
 							deviceType === 'Tablet' ||
 							deviceType === 'Mobile'

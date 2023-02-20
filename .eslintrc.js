@@ -392,6 +392,7 @@ module.exports = {
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
+				'playwright/no-page-pause': 'error',
 				'no-restricted-syntax': [
 					'error',
 					{

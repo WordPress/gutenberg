@@ -75,7 +75,7 @@ export function Draggable( {
 	/**
 	 * Removes the element clone, resets cursor, and removes drag listener.
 	 *
-	 * @param  event The non-custom DragEvent.
+	 * @param event The non-custom DragEvent.
 	 */
 	function end( event: DragEvent ) {
 		event.preventDefault();
@@ -94,7 +94,7 @@ export function Draggable( {
 	 * - Sets transfer data.
 	 * - Adds dragover listener.
 	 *
-	 * @param  event The non-custom DragEvent.
+	 * @param event The non-custom DragEvent.
 	 */
 	function start( event: DragEvent ) {
 		const { ownerDocument } = event.target as HTMLElement;

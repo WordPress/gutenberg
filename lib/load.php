@@ -50,12 +50,14 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 6.3 compat.
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-pattern-directory-controller-6-3.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-templates-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/rest-api.php';
 
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
+
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
 
@@ -106,15 +108,20 @@ require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 
 // Fonts API.
-require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider.php';
-require __DIR__ . '/experimental/fonts-api/deprecations/webfonts-deprecations.php';
-require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-provider.php';
-require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts.php';
-require __DIR__ . '/experimental/fonts-api/class-wp-fonts-utils.php';
-require __DIR__ . '/experimental/fonts-api/register-fonts-from-theme-json.php';
-require __DIR__ . '/experimental/fonts-api/class-wp-fonts.php';
-require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider-local.php';
-require __DIR__ . '/experimental/fonts-api/fonts-api.php';
+if ( ! class_exists( 'WP_Fonts' ) ) {
+	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider.php';
+	require __DIR__ . '/experimental/fonts-api/deprecations/webfonts-deprecations.php';
+	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-utils.php';
+	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-provider.php';
+	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-provider-local.php';
+	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts.php';
+	require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-web-fonts.php';
+	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-utils.php';
+	require __DIR__ . '/experimental/fonts-api/register-fonts-from-theme-json.php';
+	require __DIR__ . '/experimental/fonts-api/class-wp-fonts.php';
+	require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider-local.php';
+	require __DIR__ . '/experimental/fonts-api/fonts-api.php';
+}
 
 // Plugin specific code.
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';

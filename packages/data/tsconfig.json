@@ -10,7 +10,7 @@
 		{ "path": "../compose" },
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
-		{ "path": "../experiments" },
+		{ "path": "../private-apis" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../priority-queue" },
 		{ "path": "../redux-routine" }
