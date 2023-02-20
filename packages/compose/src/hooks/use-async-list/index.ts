@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { flushSync, useEffect, useState } from '@wordpress/element';
 import { createQueue } from '@wordpress/priority-queue';
 
 type AsyncListConfig = {
@@ -61,10 +61,12 @@ function useAsyncList< T >(
 			if ( list.length <= nextIndex ) {
 				return;
 			}
-			setCurrent( ( state ) => [
-				...state,
-				...list.slice( nextIndex, nextIndex + step ),
-			] );
+			flushSync( () => {
+				setCurrent( ( state ) => [
+					...state,
+					...list.slice( nextIndex, nextIndex + step ),
+				] );
+			} );
 			asyncQueue.add( {}, append( nextIndex + step ) );
 		};
 		asyncQueue.add( {}, append( firstItems.length ) );
