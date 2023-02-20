@@ -176,6 +176,10 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		await clickAndFocusTab( blocksTab );
 		await page.keyboard.press( 'Shift+Tab' );
 		await expect( closeButton ).toBeFocused();
+		await expect( preferencesModalContent ).toHaveAttribute(
+			'aria-label',
+			'Scrollable section'
+		);
 		await page.keyboard.press( 'Shift+Tab' );
 		await expect( preferencesModalContent ).toBeFocused();
 
