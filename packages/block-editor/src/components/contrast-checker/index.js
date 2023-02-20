@@ -43,14 +43,14 @@ function getContrastMessage( backgroundIsDarker, suggestions, colorItem ) {
 			? sprintf(
 					// translators: %s is a type of text color, e.g., "text color" or "link color".
 					__(
-						'This color combination may be hard for people to read. Try using a darker %s.'
+						'This color combination may be hard for people to read. Try using a brighter %s.'
 					),
 					colorItem.description
 			  )
 			: sprintf(
 					// translators: %s is a type of text color, e.g., "text color" or "link color".
 					__(
-						'This color combination may be hard for people to read. Try using a brighter %s.'
+						'This color combination may be hard for people to read. Try using a darker %s.'
 					),
 					colorItem.description
 			  );
