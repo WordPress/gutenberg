@@ -57,19 +57,16 @@ function useAsyncList< T >(
 		setCurrent( firstItems );
 
 		const asyncQueue = createQueue();
-		const append = ( nextIndex: number ) => () => {
-			if ( list.length <= nextIndex ) {
-				return;
-			}
-			flushSync( () => {
-				setCurrent( ( state ) => [
-					...state,
-					...list.slice( nextIndex, nextIndex + step ),
-				] );
+		for ( let i = firstItems.length; i < list.length; i += step ) {
+			asyncQueue.add( {}, () => {
+				flushSync( () => {
+					setCurrent( ( state ) => [
+						...state,
+						...list.slice( i, i + step ),
+					] );
+				} );
 			} );
-			asyncQueue.add( {}, append( nextIndex + step ) );
-		};
-		asyncQueue.add( {}, append( firstItems.length ) );
+		}
 
 		return () => asyncQueue.reset();
 	}, [ list ] );
