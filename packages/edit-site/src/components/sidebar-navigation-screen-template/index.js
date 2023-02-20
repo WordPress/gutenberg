@@ -13,18 +13,7 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 
-const config = {
-	wp_template: {
-		path: '/templates/single',
-	},
-	wp_template_part: {
-		path: '/template-parts/single',
-	},
-};
-
-export default function SidebarNavigationScreenTemplate( {
-	postType = 'wp_template',
-} ) {
+export default function SidebarNavigationScreenTemplate() {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { getDescription, getTitle, record } = useEditedEntityRecord();
 	let description = getDescription();
@@ -36,7 +25,6 @@ export default function SidebarNavigationScreenTemplate( {
 
 	return (
 		<SidebarNavigationScreen
-			path={ config[ postType ].path }
 			title={ getTitle() }
 			actions={
 				<Button

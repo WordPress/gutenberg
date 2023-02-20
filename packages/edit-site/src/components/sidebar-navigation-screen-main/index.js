@@ -29,7 +29,7 @@ export default function SidebarNavigationScreenMain() {
 
 	return (
 		<SidebarNavigationScreen
-			path="/"
+			isRoot
 			title={ __( 'Design' ) }
 			content={
 				<ItemGroup>
@@ -45,7 +45,7 @@ export default function SidebarNavigationScreenMain() {
 					) }
 					<NavigatorButton
 						as={ SidebarNavigationItem }
-						path="/templates"
+						path="/wp_template"
 						withChevron
 						icon={ layout }
 					>
@@ -53,7 +53,7 @@ export default function SidebarNavigationScreenMain() {
 					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
-						path="/template-parts"
+						path="/wp_template_part"
 						withChevron
 						icon={ symbolFilled }
 					>
