@@ -5,7 +5,8 @@ import {
 	Button,
 	ButtonGroup,
 	SelectControl,
-	TextControl,
+	__experimentalNumberControl as NumberControl,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -46,12 +47,10 @@ export default function ImageSizeControl( {
 			) }
 			{ isResizable && (
 				<div className="block-editor-image-size-control">
-					<p className="block-editor-image-size-control__row">
-						{ __( 'Image dimensions' ) }
-					</p>
-					<div className="block-editor-image-size-control__row">
-						<TextControl
-							type="number"
+					<p>{ __( 'Image dimensions' ) }</p>
+
+					<HStack align="baseline" spacing="3">
+						<NumberControl
 							className="block-editor-image-size-control__width"
 							label={ __( 'Width' ) }
 							value={ currentWidth }
@@ -60,8 +59,7 @@ export default function ImageSizeControl( {
 								updateDimension( 'width', value )
 							}
 						/>
-						<TextControl
-							type="number"
+						<NumberControl
 							className="block-editor-image-size-control__height"
 							label={ __( 'Height' ) }
 							value={ currentHeight }
@@ -70,8 +68,8 @@ export default function ImageSizeControl( {
 								updateDimension( 'height', value )
 							}
 						/>
-					</div>
-					<div className="block-editor-image-size-control__row">
+					</HStack>
+					<HStack>
 						<ButtonGroup aria-label={ __( 'Image size presets' ) }>
 							{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
 								const scaledWidth = Math.round(
@@ -108,7 +106,7 @@ export default function ImageSizeControl( {
 						<Button isSmall onClick={ () => updateDimensions() }>
 							{ __( 'Reset' ) }
 						</Button>
-					</div>
+					</HStack>
 				</div>
 			) }
 		</>

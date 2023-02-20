@@ -78,7 +78,7 @@ function useInserterMediaCategories() {
 	} = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
-			inserterMediaCategories: settings.__unstableInserterMediaCategories,
+			inserterMediaCategories: settings.inserterMediaCategories,
 			allowedMimeTypes: settings.allowedMimeTypes,
 			enableOpenverseMediaCategory: settings.enableOpenverseMediaCategory,
 		};
@@ -143,7 +143,7 @@ export function useMediaCategories( rootClientId ) {
 	useEffect( () => {
 		( async () => {
 			const _categories = [];
-			// If `__unstableInserterMediaCategories` is not defined in
+			// If `inserterMediaCategories` is not defined in
 			// block editor settings, do not show any media categories.
 			if ( ! inserterMediaCategories ) {
 				return;

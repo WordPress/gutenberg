@@ -3,8 +3,8 @@
  */
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Button, Notice } from '@wordpress/components';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import { Notice } from '@wordpress/components';
+import { EntityProvider } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockContextProvider,
@@ -16,12 +16,8 @@ import {
 	ComplementaryArea,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import {
-	EditorNotices,
-	EditorSnackbars,
-	EntitiesSavedStates,
-} from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
+import { EditorNotices, EditorSnackbars } from '@wordpress/editor';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -33,11 +29,14 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import WelcomeGuide from '../welcome-guide';
+import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
+import { unlock } from '../../private-apis';
+import useEditedEntityRecord from '../use-edited-entity-record';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -52,58 +51,42 @@ const interfaceLabels = {
 
 export default function Editor() {
 	const {
-		editedPostId,
-		editedPostType,
-		editedPost,
+		record: editedPost,
+		getTitle,
+		isLoaded: hasLoadedPost,
+	} = useEditedEntityRecord();
+
+	const { id: editedPostId, type: editedPostType } = editedPost;
+
+	const {
 		context,
-		hasLoadedPost,
 		editorMode,
 		canvasMode,
 		blockEditorMode,
 		isRightSidebarOpen,
 		isInserterOpen,
 		isListViewOpen,
-		isSaveViewOpen,
 		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
-			getEditedPostType,
-			getEditedPostId,
 			getEditedPostContext,
 			getEditorMode,
-			__unstableGetCanvasMode,
+			getCanvasMode,
 			isInserterOpened,
 			isListViewOpened,
-			isSaveViewOpened,
-		} = select( editSiteStore );
-		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
+		} = unlock( select( editSiteStore ) );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
-		const postType = getEditedPostType();
-		const postId = getEditedPostId();
 
 		// The currently selected entity to display.
 		// Typically template or template part in the site editor.
 		return {
-			editedPostId: postId,
-			editedPostType: postType,
-			editedPost: postId
-				? getEntityRecord( 'postType', postType, postId )
-				: null,
 			context: getEditedPostContext(),
-			hasLoadedPost: postId
-				? hasFinishedResolution( 'getEntityRecord', [
-						'postType',
-						postType,
-						postId,
-				  ] )
-				: false,
 			editorMode: getEditorMode(),
-			canvasMode: __unstableGetCanvasMode(),
+			canvasMode: getCanvasMode(),
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isSaveViewOpen: isSaveViewOpened(),
 			isRightSidebarOpen: getActiveComplementaryArea(
 				editSiteStore.name
 			),
@@ -113,8 +96,7 @@ export default function Editor() {
 			),
 		};
 	}, [] );
-	const { setIsSaveViewOpened, setEditedPostContext } =
-		useDispatch( editSiteStore );
+	const { setEditedPostContext } = useDispatch( editSiteStore );
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
@@ -141,15 +123,28 @@ export default function Editor() {
 					} ),
 			],
 		} ),
-		[ context ]
+		[ context, setEditedPostContext ]
 	);
-	const isReady = editedPostType !== undefined && editedPostId !== undefined;
+
+	let title;
+	if ( hasLoadedPost ) {
+		const type =
+			editedPostType === 'wp_template'
+				? __( 'Template' )
+				: __( 'Template Part' );
+		title = sprintf(
+			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
+			__( '%1$s ‹ %2$s ‹ Editor' ),
+			getTitle(),
+			type
+		);
+	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
 	// action in <URlQueryController> from double-announcing.
-	useTitle( isReady && __( 'Editor (beta)' ) );
+	useTitle( hasLoadedPost && title );
 
-	if ( ! isReady ) {
+	if ( ! hasLoadedPost ) {
 		return <CanvasSpinner />;
 	}
 
@@ -166,6 +161,7 @@ export default function Editor() {
 					<GlobalStylesProvider>
 						<BlockContextProvider value={ blockContext }>
 							<SidebarComplementaryAreaFills />
+							{ isEditMode && <StartTemplateOptions /> }
 							<InterfaceSkeleton
 								enableRegionNavigation={ false }
 								className={
@@ -208,38 +204,6 @@ export default function Editor() {
 									isEditMode &&
 									isRightSidebarOpen && (
 										<ComplementaryArea.Slot scope="core/edit-site" />
-									)
-								}
-								actions={
-									isEditMode && (
-										<>
-											{ isSaveViewOpen ? (
-												<EntitiesSavedStates
-													close={ () =>
-														setIsSaveViewOpened(
-															false
-														)
-													}
-												/>
-											) : (
-												<div className="edit-site-editor__toggle-save-panel">
-													<Button
-														variant="secondary"
-														className="edit-site-editor__toggle-save-panel-button"
-														onClick={ () =>
-															setIsSaveViewOpened(
-																true
-															)
-														}
-														aria-expanded={ false }
-													>
-														{ __(
-															'Open save panel'
-														) }
-													</Button>
-												</div>
-											) }
-										</>
 									)
 								}
 								footer={

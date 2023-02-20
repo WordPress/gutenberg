@@ -80,6 +80,7 @@ $preview-image-height: 140px;
 	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
 	justify-content: flex-start;
 	gap: $grid-unit-10;
+	order: 20;
 }
 
 .components-button .block-editor-link-control__search-submit .has-icon {
@@ -427,12 +428,48 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__drawer {
+	display: flex; // allow for ordering.
+	order: 30;
+	flex-direction: column;
+	flex-basis: 100%; // occupy full width.
+}
+
+// Inner div required to avoid padding/margin
+// causing janky animation.
+.block-editor-link-control__drawer-inner {
+	display: flex; // allow for ordering.
+	flex-direction: column;
+	flex-basis: 100%; // occupy full width.
+	margin-top: $grid-unit-20;
+	padding-top: $grid-unit-20;
+	position: relative;
+
+	&::after {
+		content: "";
+		display: block;
+		height: 1px;
+		background-color: $gray-300;
+		position: absolute;
+		left: -$grid-unit-20;
+		right: -$grid-unit-20;
+		top: 0;
+	}
+}
+
+.block-editor-link-control__tools {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
-	border-top: $border-width solid $gray-300;
 	margin: 0;
 	padding: $grid-unit-20;
+
+	// To hide the horizontal scrollbar on toggle.
+	// Margin and padding are needed to prevent cutoff of the toggle button focus outline.
+	// See: https://github.com/WordPress/gutenberg/pull/47986
+	margin-top: calc(var(--wp-admin-border-width-focus) * -1);
+	padding-top: var(--wp-admin-border-width-focus);
+	overflow: hidden;
 }
 
 .block-editor-link-control__unlink {
@@ -444,11 +481,6 @@ $preview-image-height: 140px;
 	flex: 1;
 	margin: 0;
 
-
-	:last-child {
-		margin-bottom: 0;
-	}
-
 	.is-alternate & {
 		border-top: $border-width solid $gray-900;
 	}
@@ -457,7 +489,7 @@ $preview-image-height: 140px;
 .block-editor-link-control__setting {
 	margin-bottom: $grid-unit-20;
 
-	:last-child {
+	&.block-editor-link-control__setting:last-child {
 		margin-bottom: 0;
 	}
 }

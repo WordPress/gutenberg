@@ -29,7 +29,7 @@ const PositionControls = () => {
 			title={ __( 'Position' ) }
 			initialOpen={ false }
 		>
-			<InspectorControls.Slot __experimentalGroup="position" />
+			<InspectorControls.Slot group="position" />
 		</PanelBody>
 	);
 };

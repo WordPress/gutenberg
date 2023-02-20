@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,6 +34,7 @@ import {
 	placeCaretAtHorizontalEdge,
 	__unstableStripHTML as stripHTML,
 } from '@wordpress/dom';
+import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import {
 	store as coreStore,
@@ -261,6 +261,9 @@ export default function NavigationLinkEdit( {
 	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
 		if ( hasChildren ) {
+			// This side-effect should not create an undo level as those should
+			// only be created via user interactions.
+			__unstableMarkNextChangeAsNotPersistent();
 			transformToSubmenu();
 		}
 	}, [ hasChildren ] );
@@ -576,7 +579,7 @@ export default function NavigationLinkEdit( {
 													// Unescape is used here to "recover" the escaped characters
 													// so they display without encoding.
 													// See `updateAttributes` for more details.
-													`${ unescape(
+													`${ decodeEntities(
 														label
 													) } ${ placeholderText }`.trim()
 												}

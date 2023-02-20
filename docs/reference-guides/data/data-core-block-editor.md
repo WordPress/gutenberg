@@ -86,7 +86,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the given block is allowed to be moved.
+-   `boolean | undefined`: Whether the given block is allowed to be moved.
 
 ### canMoveBlocks
 
@@ -305,6 +305,20 @@ _Parameters_
 _Returns_
 
 -   `string`: Block name.
+
+### getBlockNamesByClientId
+
+Given an array of block client IDs, returns the corresponding array of block
+names.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientIds_ `string[]`: Client IDs for which block names are to be returned.
+
+_Returns_
+
+-   `string[]`: Block names.
 
 ### getBlockOrder
 
@@ -568,18 +582,6 @@ _Properties_
 -   _keywords_ `string[]`: Keywords that can be searched to find this item.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
-
-### getLastInsertedBlocksClientIds
-
-Gets the client ids of the last inserted blocks.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `Array|undefined`: Client Ids of the last inserted block(s).
 
 ### getLastMultiSelectedBlockClientId
 

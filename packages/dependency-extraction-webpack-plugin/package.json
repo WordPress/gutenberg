@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dependency-extraction-webpack-plugin",
-	"version": "4.8.0",
+	"version": "4.10.0",
 	"description": "Extract WordPress script dependencies from webpack bundles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,7 +29,7 @@
 	"main": "lib/index.js",
 	"types": "lib/types.d.ts",
 	"dependencies": {
-		"json2php": "^0.0.5",
+		"json2php": "^0.0.7",
 		"webpack-sources": "^3.2.2"
 	},
 	"peerDependencies": {

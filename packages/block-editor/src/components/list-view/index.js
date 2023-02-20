@@ -174,6 +174,11 @@ function ListView(
 		[ isMounted.current, draggedClientIds, expandedState, expand, collapse ]
 	);
 
+	// If there are no blocks to show, do not render the list view.
+	if ( ! clientIdsTree.length ) {
+		return null;
+	}
+
 	return (
 		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator

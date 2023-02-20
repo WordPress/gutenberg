@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalColorGradientControl as ColorGradientControl,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 
 /**
@@ -17,24 +17,22 @@ import {
  */
 import ScreenHeader from './header';
 import {
-	getSupportedGlobalStylesPanels,
+	useSupportedStyles,
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
-function ScreenBackgroundColor( { name, variationPath = '' } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useGlobalSetting( 'color.palette', name );
-	const [ gradients ] = useGlobalSetting( 'color.gradients', name );
+function ScreenBackgroundColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const supports = useSupportedStyles( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ areCustomGradientsEnabled ] = useGlobalSetting(
 		'color.customGradient',
 		name
 	);
-
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const gradientsPerOrigin = useGradientsPerOrigin( name );
 
@@ -46,25 +44,25 @@ function ScreenBackgroundColor( { name, variationPath = '' } ) {
 	const hasBackgroundColor =
 		supports.includes( 'backgroundColor' ) &&
 		isBackgroundEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 	const hasGradientColor =
 		supports.includes( 'background' ) &&
-		( gradients.length > 0 || areCustomGradientsEnabled );
+		( gradientsPerOrigin.length > 0 || areCustomGradientsEnabled );
 	const [ backgroundColor, setBackgroundColor ] = useGlobalStyle(
-		variationPath + 'color.background',
+		prefix + 'color.background',
 		name
 	);
 	const [ userBackgroundColor ] = useGlobalStyle(
-		variationPath + 'color.background',
+		prefix + 'color.background',
 		name,
 		'user'
 	);
 	const [ gradient, setGradient ] = useGlobalStyle(
-		variationPath + 'color.gradient',
+		prefix + 'color.gradient',
 		name
 	);
 	const [ userGradient ] = useGlobalStyle(
-		variationPath + 'color.gradient',
+		prefix + 'color.gradient',
 		name,
 		'user'
 	);
@@ -124,6 +122,7 @@ function ScreenBackgroundColor( { name, variationPath = '' } ) {
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar
+				headingLevel={ 3 }
 				{ ...controlProps }
 			/>
 		</>

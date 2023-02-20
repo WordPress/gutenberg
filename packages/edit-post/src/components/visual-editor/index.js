@@ -44,6 +44,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editPostStore } from '../../store';
 
+const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
+
 function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
@@ -82,7 +84,7 @@ function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
  *
  * @param {Array} blocks A list of blocks.
  *
- * @return {Object} The Post Content block.
+ * @return {Object | undefined} The Post Content block.
  */
 function findPostContent( blocks ) {
 	for ( let i = 0; i < blocks.length; i++ ) {
@@ -339,7 +341,9 @@ export default function VisualEditor( { styles } ) {
 				>
 					<MaybeIframe
 						shouldIframe={
-							( isBlockBasedTheme && ! hasMetaBoxes ) ||
+							( isGutenbergPlugin &&
+								isBlockBasedTheme &&
+								! hasMetaBoxes ) ||
 							isTemplateMode ||
 							deviceType === 'Tablet' ||
 							deviceType === 'Mobile'

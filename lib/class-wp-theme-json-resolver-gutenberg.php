@@ -290,7 +290,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * So we take theme supports, transform it to theme.json shape
 		 * and merge the static::$theme upon that.
 		 */
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_legacy_theme_supports_for_theme_json() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
 		if ( ! wp_theme_has_theme_json() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();

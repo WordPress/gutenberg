@@ -10,6 +10,7 @@ export interface Post {
 }
 
 export interface CreatePostPayload {
+	title?: string;
 	content: string;
 	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
 }
@@ -17,7 +18,7 @@ export interface CreatePostPayload {
 /**
  * Delete all posts using REST API.
  *
- * @param {} this RequestUtils.
+ * @param {RequestUtils} this
  */
 export async function deleteAllPosts( this: RequestUtils ) {
 	// List all posts.
@@ -50,8 +51,8 @@ export async function deleteAllPosts( this: RequestUtils ) {
 /**
  * Creates a new post using the REST API.
  *
- * @param {} this    RequestUtils.
- * @param {} payload Post attributes.
+ * @param {RequestUtils}      this
+ * @param {CreatePostPayload} payload Post attributes.
  */
 export async function createPost(
 	this: RequestUtils,

@@ -8,28 +8,17 @@ test.describe( 'Font Size Picker', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterEach( async ( { page } ) => {
+		const closeButton = page.locator(
+			'role=region[name="Editor settings"i] >> role=button[name^="Close settings"i]'
+		);
+
+		if ( await closeButton.isVisible() ) {
+			await closeButton.click();
+		}
+	} );
+
 	test.describe( 'Common', () => {
-		test( 'should apply a named font size using the font size input', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.openDocumentSettingsSidebar();
-			await page.click( 'role=button[name="Add default block"i]' );
-			await page.keyboard.type( 'Paragraph to be made "small"' );
-			await page.click(
-				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
-			);
-			await page.click( 'role=spinbutton[name="Custom"i]' );
-
-			// This should be the "small" font-size of the editor defaults.
-			await page.keyboard.type( '13' );
-
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph {"fontSize":"small"} -->
-<p class="has-small-font-size">Paragraph to be made "small"</p>
-<!-- /wp:paragraph -->` );
-		} );
-
 		test( 'should apply a custom font size using the font size input', async ( {
 			editor,
 			page,
@@ -92,11 +81,11 @@ test.describe( 'Font Size Picker', () => {
 					return doSet( obj, 0 );
 				}
 
-				window.wp.data.dispatch( 'core/block-editor' ).updateSettings(
+				window.wp.data.dispatch( 'core/editor' ).updateEditorSettings(
 					setDeep(
 						window.wp.data
-							.select( 'core/block-editor' )
-							.getSettings(),
+							.select( 'core/editor' )
+							.getEditorSettings(),
 						[
 							'__experimentalFeatures',
 							'typography',
@@ -183,6 +172,7 @@ test.describe( 'Font Size Picker', () => {
 
 			await page.click( 'role=button[name="Typography options"i]' );
 			await page.click( 'role=menuitem[name="Reset Font size"i]' );
+			await page.keyboard.press( 'Escape' ); // Close the menu
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->
@@ -263,6 +253,7 @@ test.describe( 'Font Size Picker', () => {
 
 			await page.click( 'role=button[name="Typography options"i]' );
 			await page.click( 'role=menuitem[name="Reset Font size"i]' );
+			await page.keyboard.press( 'Escape' ); // Close the menu
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->

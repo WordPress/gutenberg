@@ -12,6 +12,7 @@ import {
 import {
 	typography,
 	border,
+	shadow,
 	color,
 	layout,
 	chevronLeft,
@@ -20,6 +21,8 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,16 +30,31 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
-import { useHasTypographyPanel } from './typography-panel';
 import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { ScreenVariations } from './screen-variations';
+import { useHasShadowControl } from './shadow-panel';
+import { unlock } from '../../private-apis';
+import { useSupportedStyles } from './hooks';
+
+const {
+	useHasTypographyPanel,
+	useGlobalSetting,
+	overrideSettingsWithSupports,
+} = unlock( blockEditorPrivateApis );
 
 function ContextMenu( { name, parentMenu = '' } ) {
-	const hasTypographyPanel = useHasTypographyPanel( name );
+	const [ rawSettings ] = useGlobalSetting( '', name );
+	const supports = useSupportedStyles( name );
+	const settings = useMemo(
+		() => overrideSettingsWithSupports( rawSettings, supports ),
+		[ rawSettings, supports ]
+	);
+	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
+	const hasEffectsPanel = useHasShadowControl( name );
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
 	const hasLayoutPanel = hasDimensionsPanel;
 	const hasVariationsPanel = useHasVariationsPanel( name, parentMenu );
@@ -85,9 +103,18 @@ function ContextMenu( { name, parentMenu = '' } ) {
 					<NavigationButtonAsItem
 						icon={ border }
 						path={ parentMenu + '/border' }
-						aria-label={ __( 'Border styles' ) }
+						aria-label={ __( 'Border' ) }
 					>
 						{ __( 'Border' ) }
+					</NavigationButtonAsItem>
+				) }
+				{ hasEffectsPanel && (
+					<NavigationButtonAsItem
+						icon={ shadow }
+						path={ parentMenu + '/effects' }
+						aria-label={ __( 'Shadow' ) }
+					>
+						{ __( 'Shadow' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasLayoutPanel && (
