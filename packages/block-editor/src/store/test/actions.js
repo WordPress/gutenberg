@@ -619,14 +619,14 @@ describe( 'actions', () => {
 				canRemoveBlocks: () => true,
 			};
 			const dispatch = Object.assign( jest.fn(), {
-				selectPreviousBlockOrFirstParent: jest.fn(),
+				selectPreviousBlock: jest.fn(),
 			} );
 
 			removeBlocks( clientIds )( { select, dispatch } );
 
-			expect(
-				dispatch.selectPreviousBlockOrFirstParent
-			).toHaveBeenCalledWith( clientId );
+			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
+				clientId
+			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REMOVE_BLOCKS',
@@ -728,14 +728,14 @@ describe( 'actions', () => {
 				canRemoveBlocks: () => true,
 			};
 			const dispatch = Object.assign( jest.fn(), {
-				selectPreviousBlockOrFirstParent: jest.fn(),
+				selectPreviousBlock: jest.fn(),
 			} );
 
 			removeBlock( clientId )( { select, dispatch } );
 
-			expect(
-				dispatch.selectPreviousBlockOrFirstParent
-			).toHaveBeenCalledWith( clientId );
+			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
+				clientId
+			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REMOVE_BLOCKS',
@@ -751,14 +751,12 @@ describe( 'actions', () => {
 				canRemoveBlocks: () => true,
 			};
 			const dispatch = Object.assign( jest.fn(), {
-				selectPreviousBlockOrFirstParent: jest.fn(),
+				selectPreviousBlock: jest.fn(),
 			} );
 
 			removeBlocks( [ clientId ], false )( { select, dispatch } );
 
-			expect(
-				dispatch.selectPreviousBlockOrFirstParent
-			).not.toHaveBeenCalled();
+			expect( dispatch.selectPreviousBlock ).not.toHaveBeenCalled();
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REMOVE_BLOCKS',

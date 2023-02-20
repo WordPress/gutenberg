@@ -1493,7 +1493,7 @@ _Parameters_
 
 -   _clientId_ `string`: Block client ID.
 
-### selectPreviousBlockOrFirstParent
+### selectPreviousBlock
 
 Yields action objects used in signalling that the block preceding the given
 clientId or it's first parent from bottom to top should be selected.
@@ -1501,6 +1501,7 @@ clientId or it's first parent from bottom to top should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+-   _orFirstParent_ `boolean`: If true, select the first parent if there is no previous block.
 
 ### setBlockMovingClientId
 
