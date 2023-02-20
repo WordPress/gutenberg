@@ -16,7 +16,7 @@ test.describe( 'Preformatted', () => {
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		await editor.clickBlockOptionsMenuItem( 'Convert to Blocks' );
+		await editor.clickBlockOptionsMenuItem( 'Convert to blocks' );
 		// Once it's edited, it should be saved as BR tags.
 		await page.keyboard.type( '0' );
 		await page.keyboard.press( 'Enter' );

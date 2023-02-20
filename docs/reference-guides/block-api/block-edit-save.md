@@ -517,13 +517,13 @@ If a block is detected to be invalid, the user will be prompted to choose how to
 
 ![Invalid block prompt](https://user-images.githubusercontent.com/7753001/88754471-4cf7e900-d191-11ea-9123-3cee20719d10.png)
 
-Clicking **Attempt Block Recovery** button will attempt recovery action as much as possible.
+Clicking **Attempt block recovery** button will attempt recovery action as much as possible.
 
 Clicking the "3-dot" menu on the side of the block displays three options:
 
 -   **Resolve**: Open Resolve Block dialog box with two buttons:
     -   **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
-    -   **Convert to Blocks**: Protects the original markup from the saved post content and convert the block from its original type to the validated block type.
+    -   **Convert to blocks**: Protects the original markup from the saved post content and convert the block from its original type to the validated block type.
 -   **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
 -   **Convert to Classic Block**: Protects the original markup from the saved post content as correct. Since the block will be converted from its original type to the Classic block type, it will no longer be possible to edit the content using controls available for the original block type.
 

@@ -182,7 +182,7 @@ describe( 'Buttons block', () => {
 
 			// Check the Add block here placeholder is not visible
 			const addBlockHerePlaceholders =
-				screen.queryAllByLabelText( 'ADD BLOCK HERE' );
+				screen.queryAllByLabelText( 'Add block here' );
 			expect( addBlockHerePlaceholders.length ).toBe( 0 );
 
 			// Add a new Button block

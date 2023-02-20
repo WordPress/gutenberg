@@ -19,7 +19,7 @@ import { store as blockEditorStore } from '../../store';
 export default function BlockInvalidWarning( { blockTitle, icon, clientId } ) {
 	const accessibilityLabel = sprintf(
 		/* translators: accessibility text for blocks with invalid content. %d: localized block title */
-		__( '"%s" block. This block has invalid content' ),
+		__( '%s block. This block has invalid content' ),
 		blockTitle
 	);
 
