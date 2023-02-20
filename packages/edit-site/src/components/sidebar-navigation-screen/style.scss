@@ -33,6 +33,7 @@
 	color: $gray-200;
 
 	&:hover,
+	&:focus,
 	&:not([aria-disabled="true"]):active {
 		color: $white;
 	}
