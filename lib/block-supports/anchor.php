@@ -11,7 +11,7 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_anchor_support( $block_type ) {
-	if ( ! $block_type->render_callback ) {
+	if ( ! $block_type->is_dynamic() ) {
 		return;
 	}
 
