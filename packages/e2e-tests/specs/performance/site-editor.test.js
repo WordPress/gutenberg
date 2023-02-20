@@ -90,6 +90,7 @@ describe( 'Site Editor Performance', () => {
 		await visitSiteEditor( {
 			postId: id,
 			postType: 'page',
+			path: '/navigation/single',
 		} );
 	} );
 
