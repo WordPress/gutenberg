@@ -46,7 +46,7 @@ const results = {
 	listViewOpen: [],
 };
 
-let id;
+let postId;
 
 describe( 'Site Editor Performance', () => {
 	beforeAll( async () => {
@@ -77,7 +77,7 @@ describe( 'Site Editor Performance', () => {
 		}, html );
 		await saveDraft();
 
-		id = await page.evaluate( () =>
+		postId = await page.evaluate( () =>
 			new URL( document.location ).searchParams.get( 'post' )
 		);
 	} );
@@ -113,8 +113,9 @@ describe( 'Site Editor Performance', () => {
 
 				// Open the test page in Site Editor.
 				await visitSiteEditor( {
-					postId: id,
+					postId,
 					postType: 'page',
+					path: '/navigation/single',
 				} );
 
 				// Wait for the canvas to become actionable.
@@ -149,8 +150,9 @@ describe( 'Site Editor Performance', () => {
 		it( 'trace 200 characters typing sequence', async () => {
 			// Open the test page in Site Editor.
 			await visitSiteEditor( {
-				postId: id,
+				postId,
 				postType: 'page',
+				path: '/navigation/single',
 			} );
 
 			// Wait for the canvas to become actionable.
