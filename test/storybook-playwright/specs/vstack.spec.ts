@@ -1,29 +1,55 @@
 /**
  * External dependencies
  */
-import { test } from '@playwright/test';
+import { test, Page } from '@playwright/test';
 
 /**
  * Internal dependencies
  */
 import {
 	gotoStoryId,
-	testAllSnapshotsCombinationsWithE2EControls,
+	getAllPropsPermutations,
+	testSnapshotForPropsConfig,
 } from '../utils';
+
+const PROP_VALUES_TO_TEST = [
+	{
+		propName: 'alignment',
+		valuesToTest: [
+			undefined,
+			'top',
+			'topLeft',
+			'topRight',
+			'left',
+			'center',
+			'right',
+			'bottom',
+			'bottomLeft',
+			'bottomRight',
+			'edge',
+			'stretch',
+		],
+	},
+	{
+		propName: 'direction',
+		valuesToTest: [ undefined, 'row', 'column' ],
+	},
+];
 
 test.describe( 'VStack', () => {
 	test.beforeEach( async ( { page } ) => {
 		await gotoStoryId( page, 'components-experimental-vstack--default', {
-			decorators: { marginChecker: 'show' },
+			decorators: { marginChecker: 'show', customE2EControls: 'show' },
 		} );
 	} );
 
-	test( 'should render', async ( { page } ) => {
-		// This test is going to run slow. Triple the default timeout.
-		test.slow();
+	getAllPropsPermutations( PROP_VALUES_TO_TEST ).forEach( ( propsConfig ) => {
+		test( `should render with ${ JSON.stringify( propsConfig ) }`, async ( {
+			page,
+		} ) => {
+			await page.waitForSelector( '.components-v-stack' );
 
-		await page.waitForSelector( '.components-v-stack' );
-
-		await testAllSnapshotsCombinationsWithE2EControls( page );
+			await testSnapshotForPropsConfig( page, propsConfig );
+		} );
 	} );
 } );

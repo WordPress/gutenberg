@@ -9,53 +9,6 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
 import { View } from '../../../view';
 import { VStack } from '../..';
 
-const E2E_CONTROLS_PROPS: {
-	name: keyof Omit< React.ComponentProps< typeof VStack >, 'children' >;
-	required: boolean;
-	values: Record< string, any >;
-}[] = [
-	{
-		name: 'alignment',
-		required: false,
-		values: {
-			top: 'top',
-			topLeft: 'topLeft',
-			topRight: 'topRight',
-			left: 'left',
-			center: 'center',
-			right: 'right',
-			bottom: 'bottom',
-			bottomLeft: 'bottomLeft',
-			bottomRight: 'bottomRight',
-			edge: 'edge',
-			stretch: 'stretch',
-		},
-	},
-	{
-		name: 'direction',
-		required: false,
-		values: {
-			row: 'row',
-			column: 'column',
-		},
-	},
-	{
-		name: 'justify',
-		required: false,
-		values: {
-			spaceAround: 'space-around',
-			spaceBetween: 'space-between',
-			spaceEvenly: 'space-evenly',
-			stretch: 'stretch',
-			center: 'center',
-			end: 'end',
-			flexEnd: 'flex-end',
-			flexStart: 'flex-start',
-			start: 'start',
-		},
-	},
-];
-
 const meta: ComponentMeta< typeof VStack > = {
 	component: VStack,
 	title: 'Components (Experimental)/VStack',
@@ -80,8 +33,4 @@ const Template: ComponentStory< typeof VStack > = ( props ) => {
 export const Default: ComponentStory< typeof VStack > = Template.bind( {} );
 Default.args = {
 	spacing: 3,
-	// The `customE2EControlsProps` is used by custom decorator
-	// used for Storybook-powered e2e tests
-	// @ts-expect-error
-	customE2EControlsProps: E2E_CONTROLS_PROPS,
 };
