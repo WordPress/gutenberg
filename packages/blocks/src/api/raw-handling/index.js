@@ -18,6 +18,7 @@ import shortcodeConverter from './shortcode-converter';
 import { deepFilterHTML, getBlockContentSchema } from './utils';
 
 export { pasteHandler } from './paste-handler';
+export { htmlToBlocks } from './html-to-blocks';
 
 export function deprecatedGetPhrasingContentSchema( context ) {
 	deprecated( 'wp.blocks.getPhrasingContentSchema', {

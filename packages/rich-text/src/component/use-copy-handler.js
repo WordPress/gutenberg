@@ -29,18 +29,18 @@ export function useCopyHandler( props ) {
 
 			const selectedRecord = slice( record.current );
 			const plainText = getTextContent( selectedRecord );
+			const tagName = element.tagName.toLowerCase();
 			const html = toHTMLString( {
 				value: selectedRecord,
 				multilineTag,
 				preserveWhiteSpace,
 			} );
 			event.clipboardData.setData( 'text/plain', plainText );
-			event.clipboardData.setData( 'text/html', html );
-			event.clipboardData.setData( 'rich-text', 'true' );
 			event.clipboardData.setData(
-				'rich-text-multi-line-tag',
-				multilineTag || ''
+				'text/html',
+				`<${ tagName }>${ html }</${ tagName }>`
 			);
+			event.clipboardData.setData( 'rich-text', 'true' );
 			event.preventDefault();
 
 			if ( event.type === 'cut' ) {

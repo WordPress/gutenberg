@@ -47,6 +47,7 @@ export {
 export {
 	pasteHandler,
 	rawHandler,
+	htmlToBlocks,
 	deprecatedGetPhrasingContentSchema as getPhrasingContentSchema,
 } from './raw-handling';
 
