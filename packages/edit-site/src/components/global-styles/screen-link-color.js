@@ -129,6 +129,11 @@ function ScreenLinkColor( { name, variation = '' } ) {
 					backgroundColor={ backgroundColor }
 					textColor={ textColor }
 					linkColor={ linkColor }
+					suggestions={ {
+						backgroundColor: false,
+						textColor: false,
+						linkColor: true,
+					} }
 				/>
 			) }
 		</>

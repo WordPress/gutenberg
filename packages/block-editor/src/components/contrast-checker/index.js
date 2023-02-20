@@ -14,6 +14,67 @@ import { speak } from '@wordpress/a11y';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
+function getContrastMessage( backgroundIsDarker, suggestions, colorItem ) {
+	let message = '';
+
+	if ( suggestions?.backgroundColor && suggestions?.[ colorItem.key ] ) {
+		// Get message for both background and text color.
+		message = backgroundIsDarker
+			? sprintf(
+					// translators: %s is a type of text color, e.g., "text color" or "link color".
+					__(
+						'This color combination may be hard for people to read. Try using a darker background color and/or a brighter %s.'
+					),
+					colorItem.description
+			  )
+			: sprintf(
+					// translators: %s is a type of text color, e.g., "text color" or "link color".
+					__(
+						'This color combination may be hard for people to read. Try using a brighter background color and/or a darker %s.'
+					),
+					colorItem.description
+			  );
+	} else if (
+		! suggestions?.backgroundColor &&
+		suggestions?.[ colorItem.key ]
+	) {
+		// Get message for text / link color only.
+		message = backgroundIsDarker
+			? sprintf(
+					// translators: %s is a type of text color, e.g., "text color" or "link color".
+					__(
+						'This color combination may be hard for people to read. Try using a darker %s.'
+					),
+					colorItem.description
+			  )
+			: sprintf(
+					// translators: %s is a type of text color, e.g., "text color" or "link color".
+					__(
+						'This color combination may be hard for people to read. Try using a brighter %s.'
+					),
+					colorItem.description
+			  );
+	} else if (
+		suggestions?.backgroundColor &&
+		! suggestions?.[ colorItem.key ]
+	) {
+		// Get message for background color only.
+		message = backgroundIsDarker
+			? __(
+					'This color combination may be hard for people to read. Try using a darker background color.'
+			  )
+			: __(
+					'This color combination may be hard for people to read. Try using a brighter background color.'
+			  );
+	} else {
+		message = __(
+			'This color combination may be hard for people to read.'
+		);
+	}
+
+	return message;
+}
+
 function ContrastChecker( {
 	backgroundColor,
 	fallbackBackgroundColor,
@@ -24,6 +85,11 @@ function ContrastChecker( {
 	textColor,
 	linkColor,
 	enableAlphaChecker = false,
+	suggestions = {
+		backgroundColor: true,
+		linkColor: true,
+		textColor: true,
+	},
 } ) {
 	const currentBackgroundColor = backgroundColor || fallbackBackgroundColor;
 
@@ -44,10 +110,12 @@ function ContrastChecker( {
 		{
 			color: currentTextColor,
 			description: __( 'text color' ),
+			key: 'textColor',
 		},
 		{
 			color: currentLinkColor,
 			description: __( 'link color' ),
+			key: 'linkColor',
 		},
 	];
 	const colordBackgroundColor = colord( currentBackgroundColor );
@@ -81,22 +149,13 @@ function ContrastChecker( {
 			if ( backgroundColorHasTransparency || textHasTransparency ) {
 				continue;
 			}
-			message =
-				backgroundColorBrightness < colordTextColor.brightness()
-					? sprintf(
-							// translators: %s is a type of text color, e.g., "text color" or "link color".
-							__(
-								'This color combination may be hard for people to read. Try using a darker background color and/or a brighter %s.'
-							),
-							item.description
-					  )
-					: sprintf(
-							// translators: %s is a type of text color, e.g., "text color" or "link color".
-							__(
-								'This color combination may be hard for people to read. Try using a brighter background color and/or a darker %s.'
-							),
-							item.description
-					  );
+
+			message = getContrastMessage(
+				backgroundColorBrightness < colordTextColor.brightness(),
+				suggestions,
+				item
+			);
+
 			speakMessage = __(
 				'This color combination may be hard for people to read.'
 			);
