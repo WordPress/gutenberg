@@ -386,10 +386,10 @@ async function runPerformanceTests( branches, options ) {
 	log( '\n>> Running the tests' );
 
 	const testSuites = [
-		// 'post-editor',
+		'post-editor',
 		'site-editor',
-		// 'front-end-classic-theme',
-		// 'front-end-block-theme',
+		'front-end-classic-theme',
+		'front-end-block-theme',
 	];
 
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
