@@ -90,6 +90,9 @@ describe( 'Site Editor Performance', () => {
 		await visitSiteEditor( {
 			postId: id,
 			postType: 'page',
+			// This shouldn't be necessary, but without it the tests fail.
+			// Could be related to having the necessary cookies in the browser.
+			// See https://github.com/WordPress/gutenberg/pull/48240/files#r1111760556
 			path: '/navigation/single',
 		} );
 	} );
