@@ -290,7 +290,7 @@ class EditorPage {
 	}
 
 	async openBlockSettings() {
-		const settingsButtonElement = 'Open Settings';
+		const settingsButtonElement = 'Open settings';
 		const settingsButton = await this.waitForElementToBeDisplayedById(
 			settingsButtonElement
 		);
@@ -300,8 +300,8 @@ class EditorPage {
 
 	async removeBlock() {
 		const blockActionsButtonElement = isAndroid()
-			? 'Open Block Actions Menu, Double tap to open Bottom Sheet with available options'
-			: 'Open Block Actions Menu';
+			? 'Open block Actions menu, Double tap to open Bottom Sheet with available options'
+			: 'Open block Actions menu';
 		const blockActionsMenu = await this.waitForElementToBeDisplayedById(
 			blockActionsButtonElement
 		);
@@ -346,8 +346,8 @@ class EditorPage {
 				customElementSize
 			);
 			const addBlockBeforeButtonLocator = isAndroid()
-				? '//android.widget.Button[@content-desc="Add Block Before"]'
-				: '//XCUIElementTypeButton[@name="Add Block Before"]';
+				? '//android.widget.Button[@content-desc="Add block before"]'
+				: '//XCUIElementTypeButton[@name="Add block before"]';
 
 			await clickIfClickable( this.driver, addBlockBeforeButtonLocator );
 		} else {
@@ -504,7 +504,7 @@ class EditorPage {
 		const buttonElementName = isAndroid()
 			? '//*'
 			: '//XCUIElementTypeButton';
-		const blockActionsMenuButtonIdentifier = `Open Block Actions Menu`;
+		const blockActionsMenuButtonIdentifier = `Open block Actions menu`;
 		const blockActionsMenuButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockActionsMenuButtonIdentifier }")]`;
 		const blockActionsMenuButton = await waitForVisible(
 			this.driver,

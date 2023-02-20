@@ -77,7 +77,7 @@ describe( 'Buttons block', () => {
 			fireEvent.press( buttonInnerBlock );
 
 			const settingsButton = await editor.findByLabelText(
-				'Open Settings'
+				'Open settings'
 			);
 			fireEvent.press( settingsButton );
 
@@ -182,7 +182,7 @@ describe( 'Buttons block', () => {
 
 			// Check the Add block here placeholder is not visible
 			const addBlockHerePlaceholders =
-				screen.queryAllByLabelText( 'ADD BLOCK HERE' );
+				screen.queryAllByLabelText( 'Add block here' );
 			expect( addBlockHerePlaceholders.length ).toBe( 0 );
 
 			// Add a new Button block
@@ -228,7 +228,7 @@ describe( 'Buttons block', () => {
 
 				// Open block actions menu
 				const blockActionsButton = screen.getByLabelText(
-					/Open Block Actions Menu/
+					/Open block Actions menu/
 				);
 				fireEvent.press( blockActionsButton );
 

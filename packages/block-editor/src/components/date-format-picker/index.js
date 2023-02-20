@@ -99,7 +99,7 @@ function NonDefaultControls( { format, onChange } ) {
 	);
 	const customOption = {
 		key: 'custom',
-		name: __( 'Custom format' ),
+		name: __( 'Custom' ),
 		className:
 			'block-editor-date-format-picker__custom-format-select-control__custom-option',
 		__experimentalHint: __( 'Enter your own date format' ),

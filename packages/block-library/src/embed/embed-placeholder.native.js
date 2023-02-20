@@ -132,7 +132,7 @@ const EmbedPlaceholder = ( {
 							<BlockIcon icon={ icon } />
 							<Text style={ labelStyle }>{ label }</Text>
 							<Text style={ actionStyle }>
-								{ __( 'ADD LINK' ) }
+								{ __( 'Add link' ) }
 							</Text>
 						</>
 					) }

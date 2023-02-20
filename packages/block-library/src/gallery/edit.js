@@ -64,8 +64,8 @@ import GapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
-	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
-	{ value: LINK_DESTINATION_MEDIA, label: __( 'Media File' ) },
+	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment page' ) },
+	{ value: LINK_DESTINATION_MEDIA, label: __( 'Media file' ) },
 	{
 		value: LINK_DESTINATION_NONE,
 		label: _x( 'None', 'Media item link option' ),
@@ -75,7 +75,7 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const allowedBlocks = [ 'core/image' ];
 
 const PLACEHOLDER_TEXT = Platform.isNative
-	? __( 'ADD MEDIA' )
+	? __( 'Add media' )
 	: __( 'Drag images, upload new ones or select files from your library.' );
 
 const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative

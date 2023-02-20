@@ -92,7 +92,7 @@ describe( 'Gallery block', () => {
 		fireEvent.press( appenderButton );
 
 		expect( getByText( 'Choose from device' ) ).toBeVisible();
-		expect( getByText( 'Take a Photo' ) ).toBeVisible();
+		expect( getByText( 'Take a photo' ) ).toBeVisible();
 		expect( getByText( 'WordPress Media Library' ) ).toBeVisible();
 	} );
 
@@ -106,7 +106,7 @@ describe( 'Gallery block', () => {
 			} );
 
 		// Tap on Gallery block
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 
 		// Observe that media options picker is displayed
 		expect( getByText( 'Choose images' ) ).toBeVisible();
@@ -121,7 +121,7 @@ describe( 'Gallery block', () => {
 
 		// Observe that the block is selected, this is done by checking if the block settings
 		// button is visible
-		const blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
+		const blockActionsButton = getByLabelText( /Open block Actions menu/ );
 		expect( blockActionsButton ).toBeVisible();
 	} );
 
@@ -216,7 +216,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Choose from device' ) );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
@@ -254,7 +254,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Choose from device' ) );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
@@ -308,8 +308,8 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Take a photo
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
-		fireEvent.press( getByText( 'Take a Photo' ) );
+		fireEvent.press( getByText( 'Add media' ) );
+		fireEvent.press( getByText( 'Take a photo' ) );
 		expectMediaPickerCall( 'DEVICE_CAMERA', [ 'image' ], true );
 
 		// Return media item from photo taken
@@ -362,7 +362,7 @@ describe( 'Gallery block', () => {
 		);
 
 		// Upload images from free photo library
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Free Photo Library' ) );
 		expectMediaPickerCall( 'stock-photo-library', [ 'image' ], true );
 
@@ -402,7 +402,7 @@ describe( 'Gallery block', () => {
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
 
 		// Upload images from device
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Choose from device' ) );
 		expectMediaPickerCall( 'DEVICE_MEDIA_LIBRARY', [ 'image' ], true );
 
@@ -501,7 +501,7 @@ describe( 'Gallery block', () => {
 		);
 
 		// Upload images from other apps
-		fireEvent.press( getByText( 'ADD MEDIA' ) );
+		fireEvent.press( getByText( 'Add media' ) );
 		fireEvent.press( getByText( 'Other Apps' ) );
 		expectMediaPickerCall( 'other-files', [ 'image' ], true );
 
@@ -537,7 +537,7 @@ describe( 'Gallery block', () => {
 		<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ media[ 0 ].localId }} -->
 		<figure class="wp-block-image"><img src="${ media[ 0 ].localUrl }" alt="" class="wp-image-${ media[ 0 ].localId }"/></figure>
 		<!-- /wp:image -->
-		
+
 		<!-- wp:image {"id":${ media[ 1 ].localId },"linkDestination":"attachment"} -->
 		<figure class="wp-block-image"><img src="${ media[ 1 ].localUrl }" alt="" class="wp-image-${ media[ 1 ].localId }"/></figure>
 		<!-- /wp:image --></figure>
@@ -549,7 +549,7 @@ describe( 'Gallery block', () => {
 		// Set "Link to" setting via Gallery block settings
 		await openBlockSettings( screen );
 		fireEvent.press( getByText( 'Link to' ) );
-		fireEvent.press( getByText( 'Media File' ) );
+		fireEvent.press( getByText( 'Media file' ) );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );

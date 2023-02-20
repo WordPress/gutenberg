@@ -15,6 +15,6 @@ import { waitForModalVisible } from './wait-for-modal-visible';
  */
 export const openBlockSettings = async ( screen ) => {
 	const { getByLabelText, getByTestId } = screen;
-	fireEvent.press( getByLabelText( 'Open Settings' ) );
+	fireEvent.press( getByLabelText( 'Open settings' ) );
 	return waitForModalVisible( getByTestId( 'block-settings-modal' ) );
 };

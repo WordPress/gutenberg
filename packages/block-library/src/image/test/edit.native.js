@@ -86,9 +86,9 @@ describe( 'Image Block', () => {
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open settings' ) )
 		);
-		fireEvent.press( screen.getByText( 'Media File' ) );
+		fireEvent.press( screen.getByText( 'Media file' ) );
 		fireEvent.press( screen.getByText( 'None' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
@@ -97,7 +97,7 @@ describe( 'Image Block', () => {
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 
-	it( 'sets link to Media File', async () => {
+	it( 'sets link to media file', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
 		<figure class="wp-block-image size-large is-style-default">
@@ -113,10 +113,10 @@ describe( 'Image Block', () => {
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
-		fireEvent.press( screen.getByText( 'Media File' ) );
+		fireEvent.press( screen.getByText( 'Media file' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
 <figure class="wp-block-image size-large is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
@@ -140,7 +140,7 @@ describe( 'Image Block', () => {
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
@@ -177,10 +177,10 @@ describe( 'Image Block', () => {
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
-		fireEvent.press( screen.getByText( 'Media File' ) );
+		fireEvent.press( screen.getByText( 'Media file' ) );
 		await screen.findByText( 'Custom URL' );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
 		// Await asynchronous fetch of clipboard
@@ -193,7 +193,7 @@ describe( 'Image Block', () => {
 		fireEvent.press( await screen.findByText( 'Custom URL' ) );
 		// Await asynchronous fetch of clipboard
 		await act( () => clipboardPromise );
-		fireEvent.press( screen.getByText( 'Media File' ) );
+		fireEvent.press( screen.getByText( 'Media file' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
 <figure class="wp-block-image size-large is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
@@ -201,7 +201,7 @@ describe( 'Image Block', () => {
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 
-	it( 'does not display the Link To URL within the Custom URL input when set to Media File and query parameters are present', async () => {
+	it( 'does not display the Link To URL within the Custom URL input when set to f and query parameters are present', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
 		<figure class="wp-block-image size-large is-style-default">
@@ -219,9 +219,9 @@ describe( 'Image Block', () => {
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open settings' ) )
 		);
-		fireEvent.press( screen.getByText( 'Media File' ) );
+		fireEvent.press( screen.getByText( 'Media file' ) );
 
 		expect( screen.queryByLabelText( /https:\/\/cldup\.com/ ) ).toBeNull();
 	} );
@@ -242,7 +242,7 @@ describe( 'Image Block', () => {
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
 
-		const settingsButton = screen.getByLabelText( 'Open Settings' );
+		const settingsButton = screen.getByLabelText( 'Open settings' );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () => fireEvent.press( settingsButton ) );
@@ -273,7 +273,7 @@ describe( 'Image Block', () => {
 		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
 
-		const settingsButton = screen.getByLabelText( 'Open Settings' );
+		const settingsButton = screen.getByLabelText( 'Open settings' );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () => fireEvent.press( settingsButton ) );
@@ -430,7 +430,7 @@ describe( 'Image Block', () => {
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
 
-		fireEvent.press( screen.getByText( 'ADD IMAGE' ) );
+		fireEvent.press( screen.getByText( 'Add image' ) );
 		fireEvent.press( screen.getByText( 'WordPress Media Library' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":${ IMAGE.id },"sizeSlug":"large","linkDestination":"none"} -->

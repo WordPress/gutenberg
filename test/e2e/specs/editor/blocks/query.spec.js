@@ -34,7 +34,7 @@ test.describe( 'Query block', () => {
 
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Query Loop' } )
-				.getByRole( 'button', { name: 'Choose' } )
+				.getByRole( 'button', { name: 'Choose pattern' } )
 				.click();
 
 			await page
