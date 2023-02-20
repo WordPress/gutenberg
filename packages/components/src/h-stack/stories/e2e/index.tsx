@@ -37,25 +37,8 @@ const E2E_CONTROLS_PROPS: {
 		values: {
 			row: 'row',
 			column: 'column',
-			// responsive: 'responsive',
 		},
 	},
-	// {
-	// 	name: 'expanded',
-	// 	required: false,
-	// 	values: {
-	// 		true: true,
-	// 		false: false,
-	// 	},
-	// },
-	// {
-	// 	name: 'isReversed',
-	// 	required: false,
-	// 	values: {
-	// 		true: true,
-	// 		false: false,
-	// 	},
-	// },
 	{
 		name: 'justify',
 		required: false,
@@ -71,14 +54,6 @@ const E2E_CONTROLS_PROPS: {
 			start: 'start',
 		},
 	},
-	// {
-	// 	name: 'wrap',
-	// 	required: false,
-	// 	values: {
-	// 		true: true,
-	// 		false: false,
-	// 	},
-	// },
 ];
 
 const meta: ComponentMeta< typeof HStack > = {
