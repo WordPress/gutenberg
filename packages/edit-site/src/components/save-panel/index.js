@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Button, Modal } from '@wordpress/components';
@@ -46,7 +51,9 @@ export default function SavePanel() {
 
 	return (
 		<NavigableRegion
-			className="edit-site-layout__actions"
+			className={ classnames( 'edit-site-layout__actions', {
+				'is-entity-save-view-open': isSaveViewOpen,
+			} ) }
 			ariaLabel={ __( 'Save sidebar' ) }
 		>
 			{ isSaveViewOpen ? (
