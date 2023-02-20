@@ -217,8 +217,7 @@ autogen += '## customTemplates' + '\n\n';
 autogen += themejson.properties.customTemplates.description + '\n';
 autogen +=
 	'Type: `' + themejson.properties.customTemplates.items.type + '`.\n\n';
-const ctSections = keys( customTemplates );
-ctSections.forEach( ( key ) => {
+keys( customTemplates ).forEach( ( key ) => {
 	autogen += '`' + key + '`: ';
 	autogen += customTemplates[ key ].description + ' ';
 	autogen += 'Type: `' + customTemplates[ key ].type + '`.\n';
