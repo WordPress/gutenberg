@@ -109,8 +109,6 @@ describe( 'Site Editor Performance', () => {
 		it.each( iterations )(
 			`iteration %i of ${ iterations.length }`,
 			async ( i ) => {
-				expect( true ).toBe( false );
-
 				// Open the test page in Site Editor.
 				await visitSiteEditor( {
 					postId,
