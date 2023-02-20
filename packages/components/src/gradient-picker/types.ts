@@ -8,7 +8,8 @@ export type GradientObject = {
 	name: string;
 	slug: string;
 };
-type OriginObject = { name: string; gradients: GradientObject[] };
+export type OriginObject = { name: string; gradients: GradientObject[] };
+export type GradientsProp = GradientObject[] | OriginObject[];
 
 type GradientPickerBaseProps = {
 	/**
@@ -54,7 +55,7 @@ export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	 * array of objects each with a `name` and a `gradients` array which will
 	 * in turn contain the predifined gradient objects.
 	 */
-	gradients: GradientObject[] | OriginObject[];
+	gradients: GradientsProp;
 	/**
 	 * Start opting in to the new margin-free styles that will become the default
 	 * in a future version, currently scheduled to be WordPress 6.4. (The prop
@@ -78,14 +79,12 @@ export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	__experimentalIsRenderedInSidebar?: boolean;
 };
 
-export type SingleOriginGradientPickerProps = GradientPickerBaseProps & {
-	gradients: GradientObject[];
-	onChange: ( currentGradient: string | undefined, index: number ) => void;
-	actions?: React.ReactNode;
-};
-
-export type MultipleOriginGradientPickerProps = GradientPickerBaseProps & {
-	gradients: OriginObject[];
-	onChange: ( currentGradient: string | undefined, index: number ) => void;
-	actions?: React.ReactNode;
-};
+export type PickerProps< TOriginType extends GradientObject | OriginObject > =
+	GradientPickerBaseProps & {
+		onChange: (
+			currentGradient: string | undefined,
+			index: number
+		) => void;
+		actions?: React.ReactNode;
+		gradients: TOriginType[];
+	};

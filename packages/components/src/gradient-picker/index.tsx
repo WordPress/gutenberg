@@ -16,21 +16,27 @@ import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
 import { Spacer } from '../spacer';
 import type {
+	GradientsProp,
 	GradientPickerComponentProps,
-	MultipleOriginGradientPickerProps,
-	SingleOriginGradientPickerProps,
+	PickerProps,
+	OriginObject,
+	GradientObject,
 } from './types';
 
-// The Multiple Origin Gradients have a `gradients` property (an array of
-// gradient objects), while Single Origin ones have a `gradient` property.
-const isMultipleOriginObject = ( obj ) =>
-	Array.isArray( obj.gradients ) && ! ( 'gradient' in obj );
-
-const isMultipleOriginArray = ( arr ) => {
-	return (
-		arr.length > 0 &&
-		arr.every( ( gradientObj ) => isMultipleOriginObject( gradientObj ) )
-	);
+// NTS: This typeguard needed some adjustment. With GradientPicker, the prop is *always* `gradients` and never `gradient`, but the shape of the object changes.
+// For Single Origin Gradients, the `gradients` property
+// is an array of Gradient objects.
+// For Multiple Origin Gradients, the `gradients` property is an array of
+// objects, each with a `name` property and an internal `gradients` property,
+// which is the array of Gradient objects.
+const isMultipleOrigin = ( arr: GradientsProp ) => {
+	// NTS: We can't use `Array.every` here because of a TS bug https://github.com/microsoft/TypeScript/issues/44373
+	let allElementsAreOrigins;
+	for ( const gradientObj of arr ) {
+		allElementsAreOrigins = 'gradients' in gradientObj;
+		if ( ! allElementsAreOrigins ) break;
+	}
+	return arr !== undefined && arr.length > 0 && allElementsAreOrigins;
 };
 
 function SingleOrigin( {
@@ -40,7 +46,7 @@ function SingleOrigin( {
 	onChange,
 	value,
 	actions,
-}: SingleOriginGradientPickerProps ) {
+}: PickerProps< GradientObject > ) {
 	const gradientOptions = useMemo( () => {
 		return gradients?.map( ( { gradient, name }, index ) => (
 			<CircularOptionPicker.Option
@@ -85,7 +91,7 @@ function MultipleOrigin( {
 	value,
 	actions,
 	headingLevel,
-}: MultipleOriginGradientPickerProps ) {
+}: PickerProps< OriginObject > ) {
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ gradients?.map( ( { name, gradients: gradientSet }, index ) => {
@@ -128,7 +134,7 @@ export default function GradientPicker( {
 		() => onChange( undefined ),
 		[ onChange ]
 	);
-	const Component = isMultipleOriginArray( gradients )
+	const Component = isMultipleOrigin( gradients )
 		? MultipleOrigin
 		: SingleOrigin;
 
