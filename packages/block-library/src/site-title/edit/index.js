@@ -17,16 +17,15 @@ import {
 	useBlockProps,
 	__experimentalUseFontAppearanceStyles as useFontAppearanceStyles,
 } from '@wordpress/block-editor';
-import { ToggleControl, PanelBody, ToolbarButton } from '@wordpress/components';
+import { ToggleControl, PanelBody } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-import { formatBold, formatItalic } from '@wordpress/icons';
-import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import LevelControl from './level-toolbar';
+import FontAppearanceControl from './font-appearance-control';
 
 export default function SiteTitleEdit( {
 	attributes,
@@ -54,13 +53,8 @@ export default function SiteTitleEdit( {
 		} );
 	}
 
-	const {
-		isBold,
-		isItalic,
-		toggleBold,
-		toggleItalic,
-		onKeyDownToggleFontAppearance,
-	} = useFontAppearanceStyles( { attributes, setAttributes } );
+	const { onKeyDownToggleFontAppearance, ...fontAppearanceProps } =
+		useFontAppearanceStyles( { attributes, setAttributes } );
 
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const blockProps = useBlockProps( {
@@ -119,20 +113,7 @@ export default function SiteTitleEdit( {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
-				<ToolbarButton
-					icon={ formatBold }
-					label={ __( 'Bold' ) }
-					isPressed={ isBold }
-					onClick={ toggleBold }
-					shortcut={ displayShortcut.primary( 'b' ) }
-				/>
-				<ToolbarButton
-					icon={ formatItalic }
-					label={ __( 'Italic' ) }
-					isPressed={ isItalic }
-					onClick={ toggleItalic }
-					shortcut={ displayShortcut.primary( 'i' ) }
-				/>
+				<FontAppearanceControl { ...fontAppearanceProps } />
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>

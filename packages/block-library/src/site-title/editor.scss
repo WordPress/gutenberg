@@ -8,3 +8,20 @@
 		color: inherit;
 	}
 }
+
+.font-appearance-toolbar-control__option .components-menu-item__item {
+	min-width: auto;
+}
+
+.components-dropdown-menu__menu .font-appearance-toolbar-control__option.components-dropdown-menu__menu-item {
+	svg {
+		color: transparent;
+	}
+
+	&.is-active svg {
+		color: currentColor;
+		box-shadow: none;
+		border: none;
+		background-color: transparent;
+	}
+}

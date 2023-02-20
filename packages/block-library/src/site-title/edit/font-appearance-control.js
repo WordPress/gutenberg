@@ -1,0 +1,74 @@
+/**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import {
+	MenuGroup,
+	MenuItem,
+	ToolbarDropdownMenu,
+} from '@wordpress/components';
+import { formatCapitalize, check } from '@wordpress/icons';
+
+import { __ } from '@wordpress/i18n';
+
+export default function FontAppearanceControl( {
+	isBold,
+	isItalic,
+	toggleBold,
+	toggleItalic,
+} ) {
+	const controls = [
+		{
+			key: 'bold',
+			title: __( 'Bold' ),
+			style: { fontWeight: 'bold' },
+			onClick: toggleBold,
+			isSelected: isBold,
+			role: 'menuitemcheckbox',
+		},
+		{
+			key: 'italic',
+			title: __( 'Italic' ),
+			style: { fontStyle: 'italic' },
+			onClick: toggleItalic,
+			isSelected: isItalic,
+			role: 'menuitemcheckbox',
+		},
+	];
+
+	return (
+		<ToolbarDropdownMenu
+			className="font-appearance-toolbar-control"
+			label={ __( 'Change font appareance' ) }
+			icon={ formatCapitalize }
+		>
+			{ () => (
+				<MenuGroup label={ __( 'Font appareance' ) }>
+					{ controls.map( ( control ) => (
+						<MenuItem
+							key={ control.key }
+							onClick={ control.onClick }
+							role={ control.role }
+							icon={ check }
+							className={ classNames(
+								'font-appearance-toolbar-control__option',
+								'components-dropdown-menu__menu-item',
+								{
+									'is-active': control.isSelected,
+								}
+							) }
+							isSelected={ control.isSelected }
+							style={ control.style }
+						>
+							{ control.title }
+						</MenuItem>
+					) ) }
+				</MenuGroup>
+			) }
+		</ToolbarDropdownMenu>
+	);
+}
