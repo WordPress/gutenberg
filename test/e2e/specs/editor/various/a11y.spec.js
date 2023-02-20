@@ -174,8 +174,8 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		// This is necessary for solving a flaky result where Playwright runs too fast
 		// before DOM catching up.
 		await expect( preferencesModalContent ).toHaveAttribute(
-			'aria-label',
-			'Scrollable section'
+			'tabindex',
+			'0'
 		);
 		await page.keyboard.press( 'Shift+Tab' );
 		await expect( closeButton ).toBeFocused();
