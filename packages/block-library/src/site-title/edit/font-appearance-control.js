@@ -43,12 +43,12 @@ export default function FontAppearanceControl( {
 	return (
 		<ToolbarDropdownMenu
 			className="font-appearance-toolbar-control"
-			label={ __( 'Change font appareance' ) }
+			label={ __( 'Change font appearance' ) }
 			icon={ formatCapitalize }
 			toggleProps={ { isPressed: isBold || isItalic } }
 		>
 			{ () => (
-				<MenuGroup label={ __( 'Font appareance' ) }>
+				<MenuGroup label={ __( 'Font appearance' ) }>
 					{ controls.map( ( control ) => (
 						<MenuItem
 							key={ control.key }
