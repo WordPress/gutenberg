@@ -42,8 +42,7 @@ export const gotoStoryId = (
 };
 
 /**
- * Parses the Story, looking for e2e tests-specific controls, and generates
- * all possible permutations of those controls.
+ * Generate all possible permutations of those controls.
  *
  * @param propsConfig
  */
