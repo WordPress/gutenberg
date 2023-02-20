@@ -10,6 +10,7 @@ type Decorators = {
 	css?: 'none' | 'basic' | 'wordpress';
 	direction?: 'ltr' | 'rtl';
 	marginChecker?: 'show' | 'hide';
+	customE2EControls?: 'show' | 'hide';
 };
 type Options = { decorators?: Decorators };
 
