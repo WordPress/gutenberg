@@ -59,7 +59,7 @@ describe( 'Site Editor Performance', () => {
 		);
 
 		await createNewPost( { postType: 'page' } );
-		await page.evaluate( ( _html ) => {
+		await page.evaluate( async ( _html ) => {
 			const { parse } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
 			const blocks = parse( _html );
@@ -71,7 +71,7 @@ describe( 'Site Editor Performance', () => {
 				}
 			} );
 
-			dispatch( 'core/block-editor' ).resetBlocks( blocks );
+			await dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		}, html );
 		await saveDraft();
 
@@ -90,6 +90,7 @@ describe( 'Site Editor Performance', () => {
 		await visitSiteEditor( {
 			postId: id,
 			postType: 'page',
+			path: '/navigation/single',
 		} );
 	} );
 
@@ -148,8 +149,7 @@ describe( 'Site Editor Performance', () => {
 		);
 		await enterEditMode();
 		await canvas().focus(
-			'[data-type="core/post-content"] [data-type="core/paragraph"]',
-			{ timeout: 240000 }
+			'[data-type="core/post-content"] [data-type="core/paragraph"]'
 		);
 		await insertBlock( 'Paragraph' );
 		let i = 200;
