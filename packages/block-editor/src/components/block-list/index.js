@@ -32,7 +32,6 @@ import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
-import { useCheckEmptyMediaCategories } from '../inserter/media-tab/hooks';
 import { LayoutProvider, defaultLayout } from './layout';
 import BlockToolsBackCompat from '../block-tools/back-compat';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
@@ -127,9 +126,6 @@ function Root( { className, ...settings } ) {
 
 export default function BlockList( settings ) {
 	usePreParsePatterns();
-	// We need to check if there is at least one item for each media category before
-	// opening the inserter, in order to avoid late rendering of the media tab.
-	useCheckEmptyMediaCategories();
 	return (
 		<BlockToolsBackCompat>
 			<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>

@@ -189,24 +189,3 @@ export function useMediaCategories( rootClientId ) {
 	] );
 	return categories;
 }
-
-export function useCheckEmptyMediaCategories() {
-	const isPreviewMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().__unstableIsPreviewMode,
-		[]
-	);
-	const inserterMediaCategories = useInserterMediaCategories();
-	useEffect( () => {
-		if ( isPreviewMode || ! inserterMediaCategories ) {
-			return;
-		}
-		// Loop through categories to check if they have at least one media item.
-		inserterMediaCategories.forEach( ( category ) => {
-			// Some sources are external and we don't need to make a request.
-			if ( ! category.isExternalResource ) {
-				category.fetch( { per_page: 1 } );
-			}
-		} );
-	}, [ isPreviewMode, inserterMediaCategories ] );
-}
