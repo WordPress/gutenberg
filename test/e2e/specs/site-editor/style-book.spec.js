@@ -117,21 +117,30 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should disappear when closed', async ( { page } ) => {
+	test( 'should disappear when closed via click event or Escape key', async ( {
+		page,
+	} ) => {
+		// Close Style Book via click event.
 		await page.click(
 			'role=region[name="Style Book"i] >> role=button[name="Close Style Book"i]'
 		);
-
 		await expect(
-			page.locator( 'role=region[name="Style Book"i]' )
+			page.locator( 'role=region[name="Style Book"i]' ),
+			'should close when close button is clicked'
 		).not.toBeVisible();
-	} );
 
-	test( 'should close when Escape key is pressed', async ( { page } ) => {
-		await page.keyboard.press( 'Escape' );
-
+		// Open Style Book again.
+		await page.click( 'role=button[name="Style Book"i]' );
 		await expect(
-			page.locator( 'role=region[name="Style Book"i]' )
+			page.locator( 'role=region[name="Style Book"i]' ),
+			'style book should be visible'
+		).toBeVisible();
+
+		// Close Style Book via Escape key.
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			page.locator( 'role=region[name="Style Book"i]' ),
+			'should close when Escape key is pressed'
 		).not.toBeVisible();
 	} );
 } );
