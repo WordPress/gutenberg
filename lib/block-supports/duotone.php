@@ -464,17 +464,17 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	// !important is needed because these styles render before global styles,
 	// and they should be overriding the duotone filters set by global styles.
-	$filter_style = gutenberg_style_engine_get_stylesheet_from_css_rules(
+	gutenberg_style_engine_get_stylesheet_from_css_rules(
 		array(
 			array(
-				'selector' => $selector,
+				'selector'     => $selector,
 				'declarations' => array(
 					'filter' => $filter_property . ' !important',
 				),
 			),
 		),
 		array(
-			'context' => 'block-supports'
+			'context' => 'block-supports',
 		)
 	);
 
