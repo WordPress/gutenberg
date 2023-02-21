@@ -30,12 +30,20 @@ class PageUtils {
 		this.browser = this.context.browser()!;
 	}
 
-	dragFiles = dragFiles.bind( this );
-	isCurrentURL = isCurrentURL.bind( this );
-	pressKeyTimes = pressKeyTimes.bind( this );
-	pressKeyWithModifier = pressKeyWithModifier.bind( this );
-	setBrowserViewport = setBrowserViewport.bind( this );
-	setClipboardData = setClipboardData.bind( this );
+	/** @borrows dragFiles as this.dragFiles */
+	dragFiles: typeof dragFiles = dragFiles.bind( this );
+	/** @borrows isCurrentURL as this.isCurrentURL */
+	isCurrentURL: typeof isCurrentURL = isCurrentURL.bind( this );
+	/** @borrows pressKeyTimes as this.pressKeyTimes */
+	pressKeyTimes: typeof pressKeyTimes = pressKeyTimes.bind( this );
+	/** @borrows pressKeyWithModifier as this.pressKeyWithModifier */
+	pressKeyWithModifier: typeof pressKeyWithModifier =
+		pressKeyWithModifier.bind( this );
+	/** @borrows setBrowserViewport as this.setBrowserViewport */
+	setBrowserViewport: typeof setBrowserViewport =
+		setBrowserViewport.bind( this );
+	/** @borrows setClipboardData as this.setClipboardData */
+	setClipboardData: typeof setClipboardData = setClipboardData.bind( this );
 }
 
 export { PageUtils };
