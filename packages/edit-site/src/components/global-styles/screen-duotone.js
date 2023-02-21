@@ -3,13 +3,19 @@
  */
 import { __ } from '@wordpress/i18n';
 import { DuotonePicker } from '@wordpress/components';
-import { useSetting } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	useSetting,
+} from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
+import BlockPreviewPanel from './block-preview-panel';
+import { unlock } from '../../private-apis';
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -31,8 +37,11 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 	);
 }
 
-function ScreenDuotone() {
-	const duotone = 'unset';
+function ScreenDuotone( { name } ) {
+	const [ themeDuotone, setThemeDuotone ] = useGlobalSetting(
+		'filter.duotone',
+		name
+	);
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -52,14 +61,21 @@ function ScreenDuotone() {
 	}
 	return (
 		<>
-			<ScreenHeader title={ __( 'Duotone panel!' ) } />
+			<ScreenHeader
+				title={ __( 'Duotone' ) }
+				description={ __(
+					'Create a two-tone color effect without losing your original image.'
+				) }
+			/>
+			<BlockPreviewPanel name={ name } />
 			<div className="edit-site-global-styles-screen-filters">
 				<DuotonePicker
 					colorPalette={ colorPalette }
 					duotonePalette={ duotonePalette }
 					disableCustomColors={ disableCustomColors }
 					disableCustomDuotone={ disableCustomDuotone }
-					value={ duotone }
+					value={ themeDuotone }
+					onChange={ setThemeDuotone }
 				/>
 			</div>
 		</>

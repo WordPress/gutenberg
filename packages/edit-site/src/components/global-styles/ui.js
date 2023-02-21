@@ -208,13 +208,13 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/filters' }>
-				<ScreenFilters name={ name } variation={ variation } />
+				<ScreenFilters name={ name } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/filters/duotone' }
 			>
-				<ScreenDuotone name={ name } variation={ variation } />
+				<ScreenDuotone name={ name } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/text' }>
