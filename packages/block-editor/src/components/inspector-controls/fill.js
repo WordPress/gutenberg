@@ -53,7 +53,7 @@ export default function InspectorControlsFill( {
 			<Fill>
 				{ ( fillProps ) => {
 					return (
-						<ToolPanelInspectorControl
+						<ToolsPanelInspectorControl
 							fillProps={ fillProps }
 							children={ children }
 							resetAllFilter={ resetAllFilter }
@@ -65,7 +65,7 @@ export default function InspectorControlsFill( {
 	);
 }
 
-function ToolPanelInspectorControl( { children, resetAllFilter, fillProps } ) {
+function ToolsPanelInspectorControl( { children, resetAllFilter, fillProps } ) {
 	const { registerResetAllFilter, deregisterResetAllFilter } = fillProps;
 	useEffect( () => {
 		if ( resetAllFilter && registerResetAllFilter ) {

@@ -93,14 +93,24 @@ function useHasTextDecorationControl( settings ) {
 	return settings?.typography?.textDecoration;
 }
 
-function TypographyToolsPanel( { resetAllFilter, onChange, value, children } ) {
+function TypographyToolsPanel( {
+	resetAllFilter,
+	onChange,
+	value,
+	panelId,
+	children,
+} ) {
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
 	};
 
 	return (
-		<ToolsPanel label={ __( 'Typography' ) } resetAll={ resetAll }>
+		<ToolsPanel
+			label={ __( 'Typography' ) }
+			resetAll={ resetAll }
+			panelId={ panelId }
+		>
 			{ children }
 		</ToolsPanel>
 	);
@@ -282,6 +292,7 @@ export default function TypographyPanel( {
 			resetAllFilter={ resetAllFilter }
 			value={ value }
 			onChange={ onChange }
+			panelId={ panelId }
 		>
 			{ hasFontFamilyEnabled && (
 				<ToolsPanelItem
