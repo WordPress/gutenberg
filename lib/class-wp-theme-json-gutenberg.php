@@ -2266,6 +2266,42 @@ class WP_Theme_JSON_Gutenberg {
 		return $nodes;
 	}
 
+	private function gutenberg_get_preset_from_declaration( $declaration ) {
+		preg_match('/var\(--wp--preset--duotone--(.*)\)/', $declaration['value'], $matches );
+		$preset_slug = $matches[1];
+		$supports_theme_json = wp_theme_has_theme_json();
+
+		$origins = array( 'default', 'theme', 'custom' );
+		if ( ! $supports_theme_json ) {
+			$origins = array( 'default' );
+		}
+
+		// Copied from get_svg_filters
+		$blocks_metadata = static::get_blocks_metadata();
+		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
+		$filters = '';
+		foreach ( $setting_nodes as $metadata ) {
+			$node = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			if ( empty( $node['color']['duotone'] ) ) {
+				continue;
+			}
+
+			$duotone_presets = $node['color']['duotone'];
+
+			foreach ( $origins as $origin ) {
+				if ( ! isset( $duotone_presets[ $origin ] ) ) {
+					continue;
+				}
+				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
+					if( $duotone_preset['slug'] === $preset_slug ) {
+						return $duotone_preset;
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
@@ -2425,8 +2461,34 @@ class WP_Theme_JSON_Gutenberg {
 		$declarations_duotone = array();
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
-				unset( $declarations[ $index ] );
+				$filter_preset = $this->gutenberg_get_preset_from_declaration( $declarations[ $index ] );
+				$filter_svg = gutenberg_get_duotone_filter_svg( $filter_preset );
+
+				add_action(
+					'wp_footer',
+					static function () use ( $filter_svg, $selector ) {
+						echo $filter_svg;
+
+						/*
+						 * Safari renders elements incorrectly on first paint when the
+						 * SVG filter comes after the content that it is filtering, so
+						 * we force a repaint with a WebKit hack which solves the issue.
+						 */
+						global $is_safari;
+						if ( $is_safari ) {
+							/*
+							 * Simply accessing el.offsetHeight flushes layout and style
+							 * changes in WebKit without having to wait for setTimeout.
+							 */
+							printf(
+								'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
+								wp_json_encode( $selector )
+							);
+						}
+					}
+				);
 				$declarations_duotone[] = $declaration;
+				unset( $declarations[ $index ] );
 			}
 		}
 
