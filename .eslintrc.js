@@ -394,7 +394,10 @@ module.exports = {
 			],
 			parserOptions: {
 				tsconfigRootDir: __dirname,
-				project: [ './test/e2e/tsconfig.json' ],
+				project: [
+					'./test/e2e/tsconfig.json',
+					'./packages/e2e-test-utils-playwright/tsconfig.json',
+				],
 			},
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
