@@ -332,7 +332,11 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should render optional panel item when value is updated externally and panel has an ID', async () => {
-			const ToolsPanelOptional = ( { toolsPanelItemValue } ) => {
+			const ToolsPanelOptional = ( {
+				toolsPanelItemValue,
+			}: {
+				toolsPanelItemValue?: number;
+			} ) => {
 				const itemProps = {
 					attributes: { value: toolsPanelItemValue },
 					hasValue: () => !! toolsPanelItemValue,
@@ -364,7 +368,11 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render optional item when value is updated externally and panelId is null', async () => {
 			// This test partially covers: https://github.com/WordPress/gutenberg/issues/47368
-			const ToolsPanelOptional = ( { toolsPanelItemValue } ) => {
+			const ToolsPanelOptional = ( {
+				toolsPanelItemValue,
+			}: {
+				toolsPanelItemValue?: number;
+			} ) => {
 				const itemProps = {
 					attributes: { value: toolsPanelItemValue },
 					hasValue: () => !! toolsPanelItemValue,
