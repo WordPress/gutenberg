@@ -182,6 +182,10 @@ const files = glob.sync(
 
 let autogen = '';
 
+autogen += `Last updated: ${
+	new Date().toISOString().split( 'T' )[ 0 ]
+}. \n\n`;
+
 files.forEach( ( file ) => {
 	const markup = readBlockJSON( file );
 	autogen += markup;
