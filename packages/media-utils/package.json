@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-utils",
-	"version": "4.17.1",
+	"version": "4.17.2",
 	"description": "WordPress Media Upload Utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
