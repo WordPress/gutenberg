@@ -19,7 +19,7 @@ defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE',
 gutenberg_pre_init();
 
 /**
- * Display a version notice and deactivate the Gutenberg plugin.
+ * Display a version notice and deactivate Gutenberg.
  *
  * @since 0.1.0
  */
