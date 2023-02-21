@@ -3,7 +3,6 @@
  */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { ComponentProps } from 'react';
 
 /**
  * Internal dependencies
@@ -122,7 +121,7 @@ const renderGroupedItemsInPanel = () => {
 const WrappedItem = ( {
 	text,
 	...props
-}: ComponentProps< typeof ToolsPanelItem > & { text: string } ) => {
+}: React.ComponentProps< typeof ToolsPanelItem > & { text: string } ) => {
 	return (
 		<div>
 			<span>Wrapper</span>
@@ -1011,7 +1010,10 @@ describe( 'ToolsPanel', () => {
 			// See: https://github.com/WordPress/gutenberg/pull/34085
 			const TestSlotFillPanel = ( {
 				panelId,
-			}: Pick< ComponentProps< typeof ToolsPanelItem >, 'panelId' > ) => (
+			}: Pick<
+				React.ComponentProps< typeof ToolsPanelItem >,
+				'panelId'
+			> ) => (
 				<SlotFillProvider>
 					<ToolsPanelItems>
 						<ToolsPanelItem { ...altControlProps } panelId="1234">
