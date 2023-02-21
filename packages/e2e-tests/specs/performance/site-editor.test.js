@@ -116,7 +116,7 @@ describe( 'Site Editor Performance', () => {
 					path: '/navigation/single',
 				} );
 
-				// Wait for the canvas to become actionable.
+				// Wait for the canvas to become editable.
 				await canvas().waitForSelector(
 					'[data-rich-text-placeholder="Write site tagline…"]'
 				);
