@@ -1203,7 +1203,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param string $selector_format   The selector to use for the layout rules with `%s` as a placeholder for the layout rule's selector.
 	 * @param array  $layout_definition The layout definition to get styles for.
-	 * @param array  $rules_type		The key for the set of layout rules to use (e.g. 'marginStyles' or 'spacingStyles').
+	 * @param string $rules_type		The key for the set of layout rules to use (e.g. 'marginStyles' or 'spacingStyles').
 	 * @return string CSS string containing the layout rules.
 	 */
 	protected function construct_layout_rules( $selector_format, $layout_definition, $rules_type, $replacement_value ) {
