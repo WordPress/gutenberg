@@ -1146,6 +1146,68 @@ describe( 'ToolsPanel', () => {
 			// The dropdown toggle no longer has a description.
 			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
 		} );
+
+		it( 'should not call reset all for different panelIds', async () => {
+			const resetItem = jest.fn();
+			const resetItemB = jest.fn();
+
+			const children = (
+				<>
+					<ToolsPanelItem
+						label="a"
+						hasValue={ () => true }
+						panelId="a"
+						resetAllFilter={ resetItem }
+						isShownByDefault
+					>
+						<div>Example control</div>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label="b"
+						hasValue={ () => true }
+						panelId="b"
+						resetAllFilter={ resetItemB }
+						isShownByDefault
+					>
+						<div>Alt control</div>
+					</ToolsPanelItem>
+				</>
+			);
+
+			const resetAllCallback = ( filters ) =>
+				filters.forEach( ( f ) => f() );
+
+			const { rerender } = render(
+				<ToolsPanel
+					{ ...defaultProps }
+					panelId="a"
+					resetAll={ resetAllCallback }
+				>
+					{ children }
+				</ToolsPanel>
+			);
+
+			await openDropdownMenu();
+			await selectMenuItem( 'Reset all' );
+			expect( resetItem ).toHaveBeenCalled();
+			expect( resetItemB ).not.toHaveBeenCalled();
+
+			resetItem.mockClear();
+
+			rerender(
+				<ToolsPanel
+					{ ...defaultProps }
+					panelId="b"
+					resetAll={ resetAllCallback }
+				>
+					{ children }
+				</ToolsPanel>
+			);
+
+			await selectMenuItem( 'Reset all' );
+			expect( resetItem ).not.toHaveBeenCalled();
+			expect( resetItemB ).toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'reset all button', () => {

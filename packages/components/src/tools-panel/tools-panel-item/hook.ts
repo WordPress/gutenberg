@@ -89,12 +89,19 @@ export function useToolsPanelItem(
 	] );
 
 	useEffect( () => {
-		registerResetAllFilter( resetAllFilterCallback );
-		return () => deregisterResetAllFilter( resetAllFilterCallback );
+		if ( hasMatchingPanel ) {
+			registerResetAllFilter( resetAllFilterCallback );
+		}
+		return () => {
+			if ( hasMatchingPanel ) {
+				deregisterResetAllFilter( resetAllFilterCallback );
+			}
+		};
 	}, [
 		registerResetAllFilter,
 		deregisterResetAllFilter,
 		resetAllFilterCallback,
+		hasMatchingPanel,
 	] );
 
 	// Note: `label` is used as a key when building menu item state in
