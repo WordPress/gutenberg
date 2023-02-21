@@ -126,7 +126,7 @@ function gutenberg_block_type_metadata_multiple_view_scripts( $metadata ) {
 	) {
 		return $metadata;
 	}
-	
+
 	// Register all viewScript items.
 	foreach ( $metadata['viewScript'] as $view_script ) {
 		$item_metadata               = $metadata;
