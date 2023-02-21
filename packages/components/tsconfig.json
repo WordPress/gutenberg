@@ -55,7 +55,6 @@
 		"src/higher-order/with-focus-return",
 		"src/higher-order/with-notices",
 		"src/navigation",
-		"src/panel/body.js",
-		"src/toolbar"
+		"src/panel/body.js"
 	]
 }
