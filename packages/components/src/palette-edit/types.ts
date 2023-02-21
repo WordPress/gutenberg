@@ -90,10 +90,10 @@ export type PaletteEditProps =
 type EditingElement = number | null;
 export type SlugPrefix = string;
 
-export type ColorPickerPopoverProps = {
-	element: PaletteElement;
+export type ColorPickerPopoverProps< T extends Color | Gradient > = {
+	element: T;
 	isGradient?: boolean;
-	onChange: ( newElement: PaletteElement ) => void;
+	onChange: ( newElement: T ) => void;
 	onClose?: () => void;
 };
 
@@ -103,25 +103,25 @@ export type NameInputProps = {
 	value: PaletteElement[ 'name' ];
 };
 
-export type OptionProps = {
+export type OptionProps< T extends Color | Gradient > = {
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
-	element: PaletteElement;
+	element: T;
 	isEditing: boolean;
 	isGradient?: boolean;
 	key: Key;
-	onChange: ( newElement: PaletteElement ) => void;
+	onChange: ( newElement: T ) => void;
 	onRemove: MouseEventHandler< HTMLButtonElement >;
 	onStartEditing: () => void;
 	onStopEditing: () => void;
 	slugPrefix: SlugPrefix;
 };
 
-export type PaletteEditListViewProps = {
+export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
-	elements: Color[] | Gradient[];
+	elements: T[];
 	isGradient?: boolean;
-	onChange: PaletteEditProps[ 'onChange' ];
+	onChange: ( newElements?: T[] ) => void;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
 	slugPrefix: SlugPrefix;
 };

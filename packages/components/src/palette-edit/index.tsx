@@ -104,12 +104,12 @@ export function getNameForPosition(
 	);
 }
 
-function ColorPickerPopover( {
+function ColorPickerPopover< T extends Color | Gradient >( {
 	isGradient,
 	element,
 	onChange,
 	onClose = () => {},
-}: ColorPickerPopoverProps ) {
+}: ColorPickerPopoverProps< T > ) {
 	return (
 		<Popover
 			placement="left-start"
@@ -167,7 +167,7 @@ function getValue( element: PaletteElement, isGradient?: boolean ) {
 	return '';
 }
 
-function Option( {
+function Option< T extends Color | Gradient >( {
 	canOnlyChangeValues,
 	element,
 	onChange,
@@ -177,7 +177,7 @@ function Option( {
 	onStopEditing,
 	slugPrefix,
 	isGradient,
-}: OptionProps ) {
+}: OptionProps< T > ) {
 	const focusOutsideProps = useFocusOutside( onStopEditing );
 	const value = getValue( element, isGradient );
 
@@ -253,7 +253,7 @@ function isTemporaryElement( slugPrefix: string, element: Color | Gradient ) {
 	);
 }
 
-function PaletteEditListView( {
+function PaletteEditListView< T extends Color | Gradient >( {
 	elements,
 	onChange,
 	editingElement,
@@ -261,9 +261,9 @@ function PaletteEditListView( {
 	canOnlyChangeValues,
 	slugPrefix,
 	isGradient,
-}: PaletteEditListViewProps ) {
+}: PaletteEditListViewProps< T > ) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
-	const elementsReference = useRef< Color[] | Gradient[] >();
+	const elementsReference = useRef< typeof elements >();
 	useEffect( () => {
 		elementsReference.current = elements;
 	}, [ elements ] );
@@ -301,7 +301,7 @@ function PaletteEditListView( {
 								setEditingElement( index );
 							}
 						} }
-						onChange={ ( newElement ) => {
+						onChange={ ( newElement: T ) => {
 							debounceOnChange(
 								elements.map(
 									( currentElement, currentIndex ) => {
