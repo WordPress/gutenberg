@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'List', () => {
+test.describe( 'List (@firefox)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -84,7 +84,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace', async ( {
+	test( 'should undo asterisk transform with backspace (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -99,7 +99,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace after selection changes', async ( {
+	test( 'should undo asterisk transform with backspace after selection changes (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -115,7 +115,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace setting isTyping state', async ( {
+	test( 'should undo asterisk transform with backspace setting isTyping state (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -131,7 +131,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace after selection changes without requestIdleCallback', async ( {
+	test( 'should undo asterisk transform with backspace after selection changes without requestIdleCallback (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -148,7 +148,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with escape', async ( {
+	test( 'should undo asterisk transform with escape (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -1009,7 +1009,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should preserve indentation after merging backward and forward', async ( {
+	test( 'should preserve indentation after merging backward and forward (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
