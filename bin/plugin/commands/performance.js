@@ -52,6 +52,7 @@ const config = require( '../config' );
  *
  * @property {number=} timeToFirstByte        Represents the time since the browser started the request until it received a response.
  * @property {number=} largestContentfulPaint Represents the time when the main content of the page has likely loaded.
+ * @property {number=} lcpMinusTtfb           Represents the difference between LCP and TTFB.
  * @property {number=} serverResponse         Represents the time the server takes to respond.
  * @property {number=} firstPaint             Represents the time when the user agent first rendered after navigation.
  * @property {number=} domContentLoaded       Represents the time immediately after the document's DOMContentLoaded event completes.
@@ -132,9 +133,12 @@ function curateResults( testSuite, results ) {
 		testSuite === 'front-end-classic-theme' ||
 		testSuite === 'front-end-block-theme'
 	) {
+		const timeToFirstByte = median( results.timeToFirstByte );
+		const largestContentfulPaint = median( results.largestContentfulPaint );
 		return {
-			timeToFirstByte: median( results.timeToFirstByte ),
-			largestContentfulPaint: median( results.largestContentfulPaint ),
+			timeToFirstByte,
+			largestContentfulPaint,
+			lcpMinusTtfb: largestContentfulPaint - timeToFirstByte,
 		};
 	}
 
