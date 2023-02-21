@@ -214,13 +214,13 @@ styleSections.forEach( ( section ) => {
 // customTemplates
 const customTemplates = themejson.properties.customTemplates.items.properties;
 autogen += '## customTemplates' + '\n\n';
-autogen += themejson.properties.customTemplates.description + '\n';
+autogen += themejson.properties.customTemplates.description + '\n\n';
 autogen +=
 	'Type: `' + themejson.properties.customTemplates.items.type + '`.\n\n';
+autogen += '| Property | Description | Type |\n';
+autogen += '| ---      | ---         | ---  |\n';
 keys( customTemplates ).forEach( ( key ) => {
-	autogen += '`' + key + '`: ';
-	autogen += customTemplates[ key ].description + ' ';
-	autogen += 'Type: `' + customTemplates[ key ].type + '`.\n';
+	autogen += `| ${ key } | ${ customTemplates[ key ].description } | ${ customTemplates[ key ].type } |\n`;
 } );
 autogen += '\n\n';
 

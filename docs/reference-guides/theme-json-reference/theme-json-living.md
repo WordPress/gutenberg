@@ -248,11 +248,14 @@ Sets custom CSS to apply styling not covered by other theme.json properties.
 ## customTemplates
 
 Additional metadata for custom templates defined in the templates folder.
+
 Type: `object`.
 
-`name`: Filename, without extension, of the template in the templates folder. Type: `string`.
-`title`: Title of the template, translatable. Type: `string`.
-`postTypes`: List of post types that can use this custom template. Type: `array`.
+| Property | Description | Type |
+| ---      | ---         | ---  |
+| name | Filename, without extension, of the template in the templates folder. | string |
+| title | Title of the template, translatable. | string |
+| postTypes | List of post types that can use this custom template. | array |
 
 
 ## templateParts
