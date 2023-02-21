@@ -104,12 +104,12 @@ export function getNameForPosition(
 	);
 }
 
-function ColorPickerPopover< T extends Color | Gradient >( {
+function ColorPickerPopover( {
 	isGradient,
 	element,
 	onChange,
 	onClose = () => {},
-}: ColorPickerPopoverProps< T > ) {
+}: ColorPickerPopoverProps ) {
 	return (
 		<Popover
 			placement="left-start"
@@ -117,7 +117,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 			className="components-palette-edit__popover"
 			onClose={ onClose }
 		>
-			{ ! isGradient && getIsColor( element ) && (
+			{ ! isGradient && ! getIsGradient( element ) ? (
 				<ColorPicker
 					color={ element.color }
 					enableAlpha
@@ -128,8 +128,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 						} )
 					}
 				/>
-			) }
-			{ isGradient && getIsGradient( element ) && (
+			) : (
 				<div className="components-palette-edit__popover-gradient-picker">
 					<CustomGradientPicker
 						__nextHasNoMargin
@@ -167,7 +166,7 @@ function getValue( element: PaletteElement, isGradient?: boolean ) {
 	return '';
 }
 
-function Option< T extends Color | Gradient >( {
+function Option( {
 	canOnlyChangeValues,
 	element,
 	onChange,
@@ -177,7 +176,7 @@ function Option< T extends Color | Gradient >( {
 	onStopEditing,
 	slugPrefix,
 	isGradient,
-}: OptionProps< T > ) {
+}: OptionProps ) {
 	const focusOutsideProps = useFocusOutside( onStopEditing );
 	const value = getValue( element, isGradient );
 
@@ -253,7 +252,7 @@ function isTemporaryElement( slugPrefix: string, element: Color | Gradient ) {
 	);
 }
 
-function PaletteEditListView< T extends Color | Gradient >( {
+function PaletteEditListView( {
 	elements,
 	onChange,
 	editingElement,
@@ -261,7 +260,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	canOnlyChangeValues,
 	slugPrefix,
 	isGradient,
-}: PaletteEditListViewProps< T > ) {
+}: PaletteEditListViewProps ) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
 	const elementsReference = useRef< typeof elements >();
 	useEffect( () => {

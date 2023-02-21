@@ -65,7 +65,7 @@ type PaletteEditColors = {
 	/**
 	 * Runs on changing the value.
 	 */
-	onChange: ( newColors: Color[] ) => void;
+	onChange: ( newColors?: Color[] ) => void;
 }
 
 type PaletteEditGradients = {
@@ -90,12 +90,25 @@ export type PaletteEditProps =
 type EditingElement = number | null;
 export type SlugPrefix = string;
 
-export type ColorPickerPopoverProps< T extends Color | Gradient > = {
-	element: T;
-	isGradient?: boolean;
-	onChange: ( newElement: T ) => void;
+type BaseColorPickerPopover = {
 	onClose?: () => void;
-};
+}
+
+type ColorPickerPopoverColor = {
+	element: Color;
+	isGradient?: false;
+	onChange: ( newElement: Color ) => void;
+}
+
+type ColorPickerPopoverGradient = {
+	element: Gradient;
+	isGradient: true;
+	onChange: ( newElement: Gradient ) => void;
+}
+
+export type ColorPickerPopoverProps =
+	| BaseColorPickerPopover & ColorPickerPopoverColor
+	| BaseColorPickerPopover & ColorPickerPopoverGradient;
 
 export type NameInputProps = {
 	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;
@@ -103,25 +116,51 @@ export type NameInputProps = {
 	value: PaletteElement[ 'name' ];
 };
 
-export type OptionProps< T extends Color | Gradient > = {
+type BaseOption = {
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
-	element: T;
 	isEditing: boolean;
 	isGradient?: boolean;
 	key: Key;
-	onChange: ( newElement: T ) => void;
 	onRemove: MouseEventHandler< HTMLButtonElement >;
 	onStartEditing: () => void;
 	onStopEditing: () => void;
 	slugPrefix: SlugPrefix;
+}
+
+type OptionColor = {
+	element: Color;
+	onChange: ( newColor: Color ) => void;
 };
 
-export type PaletteEditListViewProps< T extends Color | Gradient > = {
+type OptionGradient = {
+	element: Gradient;
+	onChange: ( newColor: Gradient ) => void;
+};
+
+export type OptionProps =
+	| BaseOption & OptionColor
+	| BaseOption & OptionGradient;
+
+type BasePaletteEditListView = {
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
-	elements: T[];
 	isGradient?: boolean;
-	onChange: ( newElements?: T[] ) => void;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
 	slugPrefix: SlugPrefix;
 };
+
+type PaletteEditListViewColors = {
+	elements: Color[]
+	onChange: ( newColors?: Color[] ) => void;
+	isGradient?: false;
+}
+
+type PaletteEditListViewGradients = {
+	elements: Gradient[]
+	onChange: ( newColors?: Gradient[] ) => void;
+	isGradient: true;
+}
+
+export type PaletteEditListViewProps =
+| BasePaletteEditListView & PaletteEditListViewColors
+| BasePaletteEditListView & PaletteEditListViewGradients
