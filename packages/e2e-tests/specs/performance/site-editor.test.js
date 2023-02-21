@@ -107,7 +107,7 @@ describe( 'Site Editor Performance', () => {
 		);
 
 		it.each( iterations )(
-			`iteration %i of ${ iterations.length }`,
+			`trace large post loading durations (%i of ${ iterations.length })`,
 			async ( i ) => {
 				// Open the test page in Site Editor.
 				await visitSiteEditor( {
@@ -145,7 +145,7 @@ describe( 'Site Editor Performance', () => {
 	} );
 
 	describe( 'Typing', () => {
-		it( 'trace 200 characters typing sequence', async () => {
+		it( 'trace 200 characters typing sequence inside a large post', async () => {
 			// Open the test page in Site Editor.
 			await visitSiteEditor( {
 				postId,
@@ -153,22 +153,19 @@ describe( 'Site Editor Performance', () => {
 				path: '/navigation/single',
 			} );
 
-			// Wait for the canvas to become actionable.
+			// Wait for the canvas to become editable.
 			await canvas().waitForSelector(
 				'[data-rich-text-placeholder="Write site tagline…"]'
 			);
 
-			// Measure typing performance inside the post content.
+			// Get inside the post content.
 			await enterEditMode();
 
-			// Insert a new paragraph right after the first one.
-			const targetParagraph = await canvas().waitForXPath(
+			// Insert a new paragraph right under the first one.
+			const firstParagraph = await canvas().waitForXPath(
 				'//p[contains(text(), "Lorem ipsum dolor sit amet")]'
 			);
-			// The second click is needed to get the cursor inside the target
-			// paragraph.
-			await targetParagraph.click();
-			await targetParagraph.click();
+			await firstParagraph.focus();
 			await insertBlock( 'Paragraph' );
 
 			// Start tracing.
