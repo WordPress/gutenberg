@@ -214,10 +214,9 @@ test.describe( 'Autocomplete', () => {
 			await expect(
 				page.locator( `role=option[name="${ testData.optionText }"i]` )
 			).toBeVisible();
-			await page;
-			page.locator(
-				`role=option[name="${ testData.optionText }"i]`
-			).click();
+			await page
+				.locator( `role=option[name="${ testData.optionText }"i]` )
+				.click();
 
 			await expect
 				.poll( editor.getEditedPostContent )
