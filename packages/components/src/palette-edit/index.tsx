@@ -117,7 +117,7 @@ function ColorPickerPopover( {
 			className="components-palette-edit__popover"
 			onClose={ onClose }
 		>
-			{ ! isGradient && ! getIsGradient( element ) ? (
+			{ ! isGradient && ! getIsGradient( element ) && (
 				<ColorPicker
 					color={ element.color }
 					enableAlpha
@@ -128,7 +128,8 @@ function ColorPickerPopover( {
 						} )
 					}
 				/>
-			) : (
+			) }
+			{ isGradient && getIsGradient( element ) && (
 				<div className="components-palette-edit__popover-gradient-picker">
 					<CustomGradientPicker
 						__nextHasNoMargin
@@ -315,7 +316,7 @@ function PaletteEditListView( {
 						onRemove={ () => {
 							setEditingElement( null );
 							const newElements = elements.filter(
-								( _currentElement, currentIndex ) => {
+								( _currentElement: typeof elements[ number ], currentIndex: number ) => {
 									if ( currentIndex === index ) {
 										return false;
 									}
@@ -561,7 +562,7 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 						<ColorPickerPopover
 							isGradient={ isGradient }
 							onClose={ () => setEditingElement( null ) }
-							onChange={ ( newElement: PaletteElement ) => {
+							onChange={ ( newElement: typeof elements[ number ] ) => {
 								debounceOnChange(
 									elements.map(
 										( currentElement, currentIndex ) => {
