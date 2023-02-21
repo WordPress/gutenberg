@@ -1,0 +1,53 @@
+# Styles Keys with theme.json and Style editor versions
+
+| Key | theme.json Since| Style Editor Since |
+| --- | :---: | :---: |
+| `color.gradient` | 5.8 | ? |
+| `color.background` | 5.8 | ? |
+| `color.text` | 5.8 | ? |
+| `border.color` | 5.9 | ? |
+| `border.width` | 5.9 | ? |
+| `border.style` | 5.9 | ? |
+| `border.radius` | ? | ? |
+| `border.radius.topLeft` | ? | ? |
+| `border.radius.topRight` | ? | ? |
+| `border.radius.bottomLeft` | ? | ? |
+| `border.radius.bottomRight` | ? | ? |
+| `border.top.color` | 6.1 | ? |
+| `border.top.width` | 6.1 | ? |
+| `border.top.style` | 6.1 | ? |
+| `border.right.color` | 6.1 | ? |
+| `border.right.width` | 6.1 | ? |
+| `border.right.style` | 6.1 | ? |
+| `border.bottom.color` | 6.1 | ? |
+| `border.bottom.width` | 6.1 | ? |
+| `border.bottom.style` | 6.1 | ? |
+| `border.left.color` | 6.1 | ? |
+| `border.left.width` | 6.1 | ? |
+| `border.left.style` | 6.1 | ? |
+| `typography.fontFamily` | ? | ? |
+| `typography.fontSize` | ? | ? |
+| `typography.fontStyle` | ? | ? |
+| `typography.fontWeight` | ? | ? |
+| `typography.letterSpacing` | ? | ? |
+| `typography.lineHeight` | ? | ? |
+| `typography.textDecoration` | ? | ? |
+| `typography.textTransform`| ? | ? |
+| `spacing.padding` | ? | ? |
+| `spacing.padding.top` | ? | ? |
+| `spacing.padding.right` | ? | ? |
+| `spacing.padding.left` | ? | ? |
+| `spacing.padding.bottom` | ? | ? |
+| `spacing.padding` | ? | ? |
+| `spacing.margin.top` | ? | ? |
+| `spacing.margin.right` | ? | ? |
+| `spacing.margin.left` | ? | ? |
+| `spacing.margin.bottom` | ? | ? |
+| `spacing.blockGap` | ? | ? |
+| `dimensions.minHeight` | ? | ? |
+| `outline.color` | ? | ? |
+| `outline.offset` | ? | ? |
+| `outline.style` | ? | ? |
+| `outline.width` | ? | ? |
+| `filter.duotone` | ? | ? |
+| `shadow` | ? | ? |
