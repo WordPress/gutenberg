@@ -37,7 +37,8 @@ function PostPublishPanelPrepublish( { children } ) {
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
 		return {
-			hasPublishAction: getCurrentPost()._links?.[ 'wp:action-publish' ],
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isRequestingSiteIcon: isResolving( 'getEntityRecord', [
 				'root',

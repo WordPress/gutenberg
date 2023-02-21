@@ -241,7 +241,8 @@ export default compose( [
 			isPostSavingLocked: isPostSavingLocked(),
 			isPublishable: isEditedPostPublishable(),
 			isPublished: isCurrentPostPublished(),
-			hasPublishAction: getCurrentPost()._links?.[ 'wp:action-publish' ],
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),

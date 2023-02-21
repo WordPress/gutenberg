@@ -59,7 +59,8 @@ export default compose( [
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isPublishing: isPublishingPost(),
-			hasPublishAction: getCurrentPost()._links?.[ 'wp:action-publish' ],
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			postType: getCurrentPostType(),
 			isAutosaving: isAutosavingPost(),
 		};

@@ -18,7 +18,8 @@ export default compose( [
 	withSelect( ( select ) => {
 		const { getCurrentPost, getCurrentPostType } = select( editorStore );
 		return {
-			hasPublishAction: getCurrentPost()._links?.[ 'wp:action-publish' ],
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			postType: getCurrentPostType(),
 		};
 	} ),

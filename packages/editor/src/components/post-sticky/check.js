@@ -21,7 +21,7 @@ export default compose( [
 	withSelect( ( select ) => {
 		const post = select( editorStore ).getCurrentPost();
 		return {
-			hasStickyAction: post._links?.[ 'wp:action-sticky' ],
+			hasStickyAction: post._links?.[ 'wp:action-sticky' ] ?? false,
 			postType: select( editorStore ).getCurrentPostType(),
 		};
 	} ),

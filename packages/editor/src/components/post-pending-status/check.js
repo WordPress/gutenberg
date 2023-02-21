@@ -26,7 +26,8 @@ export default compose(
 		const { isCurrentPostPublished, getCurrentPostType, getCurrentPost } =
 			select( editorStore );
 		return {
-			hasPublishAction: getCurrentPost()._links?.[ 'wp:action-publish' ],
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			isPublished: isCurrentPostPublished(),
 			postType: getCurrentPostType(),
 		};

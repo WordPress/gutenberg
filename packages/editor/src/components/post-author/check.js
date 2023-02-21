@@ -16,7 +16,8 @@ export default function PostAuthorCheck( { children } ) {
 		const post = select( editorStore ).getCurrentPost();
 		const authors = select( coreStore ).getUsers( AUTHORS_QUERY );
 		return {
-			hasAssignAuthorAction: post._links?.[ 'wp:action-assign-author' ],
+			hasAssignAuthorAction:
+				post._links?.[ 'wp:action-assign-author' ] ?? false,
 			hasAuthors: authors?.length >= 1,
 		};
 	}, [] );
