@@ -113,7 +113,6 @@ describe( 'Site Editor Performance', () => {
 				await visitSiteEditor( {
 					postId,
 					postType: 'page',
-					path: '/navigation/single',
 				} );
 
 				// Wait for the canvas to become editable.
@@ -150,7 +149,6 @@ describe( 'Site Editor Performance', () => {
 			await visitSiteEditor( {
 				postId,
 				postType: 'page',
-				path: '/navigation/single',
 			} );
 
 			// Wait for the canvas to become editable.
