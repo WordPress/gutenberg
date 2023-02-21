@@ -1199,6 +1199,69 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Gets the CSS layout rules for a particular block from theme.json layout definitions.
 	 *
+	 * @since 6.3.0
+	 *
+	 * @param string $selector_format   The selector to use for the layout rules with `%s` as a placeholder for the layout rule's selector.
+	 * @param array  $layout_definition The layout definition to get styles for.
+	 * @param array  $rules_type		The key for the set of layout rules to use (e.g. 'marginStyles' or 'spacingStyles').
+	 * @return string CSS string containing the layout rules.
+	 */
+	protected function construct_layout_rules( $selector_format, $layout_definition, $rules_type, $replacement_value ) {
+		$layout_rules             = _wp_array_get( $layout_definition, array( $rules_type ), array() );
+		$layout_selector_pattern  = '/^[a-zA-Z0-9\-\.\ *+>:\(\)]*$/'; // Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
+
+		$block_rules = '';
+
+		if (
+			! empty( $selector_format ) &&
+			! empty( $layout_rules )
+		) {
+			foreach ( $layout_rules as $layout_rule ) {
+				if (
+					isset( $layout_rule['selector'] ) &&
+					preg_match( $layout_selector_pattern, $layout_rule['selector'] ) &&
+					! empty( $layout_rule['rules'] )
+				) {
+					$declarations = array();
+					foreach ( $layout_rule['rules'] as $css_property => $css_value ) {
+						if ( is_string( $css_value ) ) {
+							if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
+								$declarations[] = array(
+									'name' => $css_property,
+									'value' => $css_value,
+								);
+							}
+						} elseif ( isset( $replacement_value ) && ! is_array( $replacement_value ) ) {
+							$declarations[] = array(
+								'name' => $css_property,
+								'value' => $replacement_value,
+							);
+						} elseif ( isset( $replacement_value[ $css_property ] ) ) {
+							if ( static::is_safe_css_declaration( $css_property, $replacement_value[ $css_property ] ) ) {
+								$declarations[] = array(
+									'name' => $css_property,
+									'value' => $replacement_value[ $css_property ],
+								);
+							}
+						}
+					}
+
+					$layout_selector = sprintf(
+						$selector_format,
+						$layout_rule['selector'],
+					);
+
+					$block_rules .= static::to_ruleset( $layout_selector, $declarations );
+				}
+			}
+		}
+
+		return $block_rules;
+	}
+
+	/**
+	 * Gets the CSS layout rules for a particular block from theme.json layout definitions.
+	 *
 	 * @since 6.1.0
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
@@ -1272,54 +1335,23 @@ class WP_Theme_JSON_Gutenberg {
 					// Add layout aware margin rules for each supported layout type.
 					foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) {
 						$class_name   = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), '' ) );
-						$margin_rules = _wp_array_get( $layout_definition, array( 'marginStyles' ), array() );
+						$block_rules .= $this->construct_layout_rules(
+							'.' . $class_name . '%s' . $selector,
+							$layout_definition,
+							'marginStyles',
+							$margin_styles['declarations']
+						);
 
-						if (
-							! empty( $class_name ) &&
-							! empty( $margin_rules )
-						) {
-							foreach ( $margin_rules as $margin_rule ) {
-								if (
-									isset( $margin_rule['selector'] ) &&
-									preg_match( $layout_selector_pattern, $margin_rule['selector'] ) &&
-									! empty( $margin_rule['rules'] )
-								) {
-									$declarations = array();
-									foreach ( $margin_rule['rules'] as $css_property => $css_value ) {
-										if ( is_string( $css_value ) ) {
-											if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
-												$declarations[] = array(
-													'name' => $css_property,
-													'value' => $css_value,
-												);
-											}
-										} elseif ( isset( $margin_styles['declarations'][ $css_property ] ) ) {
-											if ( static::is_safe_css_declaration( $css_property, $margin_styles['declarations'][ $css_property ] ) ) {
-												$declarations[] = array(
-													'name' => $css_property,
-													'value' => $margin_styles['declarations'][ $css_property ],
-												);
-											}
-										}
-									}
-									$layout_selector = sprintf(
-										'.%s%s%s',
-										$class_name,
-										$margin_rule['selector'],
-										$selector
-									);
-
-									$block_rules .= static::to_ruleset( $layout_selector, $declarations );
-								}
-							}
+						// Add layout aware margin rule for children of the root site blocks class.
+						if ( 'default' === $layout_definition_key ) {
+							$block_rules .= $this->construct_layout_rules(
+								'.wp-site-blocks%s' . $selector,
+								$layout_definition,
+								'marginStyles',
+								$margin_styles['declarations']
+							);
 						}
 					}
-					// Add layout aware margin rule for children of the root site blocks class.
-					$block_rules .= sprintf(
-						'.wp-site-blocks > * + %s {%s}',
-						$selector,
-						$margin_styles['css']
-					);
 				}
 			}
 
@@ -1331,53 +1363,22 @@ class WP_Theme_JSON_Gutenberg {
 						continue;
 					}
 
-					$class_name    = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), false ) );
-					$spacing_rules = _wp_array_get( $layout_definition, array( 'spacingStyles' ), array() );
+					$class_name             = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), false ) );
+					$layout_selector_format = '';
 
-					if (
-						! empty( $class_name ) &&
-						! empty( $spacing_rules )
-					) {
-						foreach ( $spacing_rules as $spacing_rule ) {
-							$declarations = array();
-							if (
-								isset( $spacing_rule['selector'] ) &&
-								preg_match( $layout_selector_pattern, $spacing_rule['selector'] ) &&
-								! empty( $spacing_rule['rules'] )
-							) {
-								// Iterate over each of the styling rules and substitute non-string values such as `null` with the real `blockGap` value.
-								foreach ( $spacing_rule['rules'] as $css_property => $css_value ) {
-									$current_css_value = is_string( $css_value ) ? $css_value : $block_gap_value;
-									if ( static::is_safe_css_declaration( $css_property, $current_css_value ) ) {
-										$declarations[] = array(
-											'name'  => $css_property,
-											'value' => $current_css_value,
-										);
-									}
-								}
-
-								if ( ! $has_block_gap_support ) {
-									// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(.%2$s%3$s)' : ':where(%1$s.%2$s%3$s)';
-									$layout_selector = sprintf(
-										$format,
-										$selector,
-										$class_name,
-										$spacing_rule['selector']
-									);
-								} else {
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%s .%s%s' : '%s.%s%s';
-									$layout_selector = sprintf(
-										$format,
-										$selector,
-										$class_name,
-										$spacing_rule['selector']
-									);
-								}
-								$block_rules .= static::to_ruleset( $layout_selector, $declarations );
-							}
-						}
+					if ( ! $has_block_gap_support ) {
+						// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
+						$layout_selector_format = static::ROOT_BLOCK_SELECTOR === $selector ? ":where(.$class_name%s)" : ":where($selector.$class_name%s)";
+					} else {
+						$layout_selector_format = static::ROOT_BLOCK_SELECTOR === $selector ? "$selector .$class_name%s" : "$selector.$class_name%s";
 					}
+
+					$block_rules .= $this->construct_layout_rules(
+						$layout_selector_format,
+						$layout_definition,
+						'spacingStyles',
+						$block_gap_value
+					);
 				}
 			}
 		}
