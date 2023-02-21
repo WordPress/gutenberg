@@ -24,6 +24,16 @@ exports[`RichText should apply multiple formats when selection is collapsed 1`] 
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should copy/paste heading 1`] = `
+"<!-- wp:heading -->
+<h2 class=\\"wp-block-heading\\">Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading -->
+<h2 class=\\"wp-block-heading\\">Heading</h2>
+<!-- /wp:heading -->"
+`;
+
 exports[`RichText should handle Home and End keys 1`] = `
 "<!-- wp:paragraph -->
 <p>-<strong>12</strong>+</p>
