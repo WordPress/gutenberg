@@ -79,13 +79,16 @@ function MultipleOrigin( {
 	onChange,
 	value,
 	actions,
+	headingLevel,
 } ) {
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading>{ name }</ColorHeading>
+						<ColorHeading level={ headingLevel }>
+							{ name }
+						</ColorHeading>
 						<SingleOrigin
 							clearGradient={ clearGradient }
 							gradients={ gradientSet }
@@ -114,6 +117,7 @@ export default function GradientPicker( {
 	clearable = true,
 	disableCustomGradients = false,
 	__experimentalIsRenderedInSidebar,
+	headingLevel = 2,
 } ) {
 	const clearGradient = useCallback(
 		() => onChange( undefined ),
@@ -170,6 +174,7 @@ export default function GradientPicker( {
 								</CircularOptionPicker.ButtonAction>
 							)
 						}
+						headingLevel={ headingLevel }
 					/>
 				) }
 			</VStack>

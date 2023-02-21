@@ -37,18 +37,14 @@ export default function GlobalStylesSidebar() {
 			closeLabel={ __( 'Close Styles sidebar' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
-				<Flex>
-					<FlexBlock>
+				<Flex className="edit-site-global-styles-sidebar__header">
+					<FlexBlock style={ { minWidth: 'min-content' } }>
 						<strong>{ __( 'Styles' ) }</strong>
 					</FlexBlock>
 					<FlexItem>
 						<Button
 							icon={ seen }
-							label={
-								isStyleBookOpened
-									? __( 'Close Style Book' )
-									: __( 'Open Style Book' )
-							}
+							label={ __( 'Style Book' ) }
 							isPressed={ isStyleBookOpened }
 							disabled={ editorMode !== 'visual' }
 							onClick={ () => {

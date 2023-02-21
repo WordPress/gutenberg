@@ -55,7 +55,6 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		<AnglePickerControl
 			__nextHasNoMarginBottom
 			onChange={ onAngleChange }
-			labelPosition="top"
 			value={ hasGradient ? angle : '' }
 		/>
 	);

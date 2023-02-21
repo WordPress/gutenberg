@@ -141,6 +141,7 @@ figure.wp-block-image:not(.wp-block) {
 	// smoother UX.
 	.reactEasyCrop_Container .reactEasyCrop_Image {
 		border: none;
+		border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
 	}
 }
 

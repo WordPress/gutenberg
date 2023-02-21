@@ -30,54 +30,57 @@ const config = require( '../config' );
 /**
  * @typedef WPRawPerformanceResults
  *
- * @property {number[]} timeToFirstByte      Represents the time since the browser started the request until it received a response.
- * @property {number[]} serverResponse       Represents the time the server takes to respond.
- * @property {number[]} firstPaint           Represents the time when the user agent first rendered after navigation.
- * @property {number[]} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
- * @property {number[]} loaded               Represents the time when the load event of the current document is completed.
- * @property {number[]} firstContentfulPaint Represents the time when the browser first renders any text or media.
- * @property {number[]} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number[]} type                 Average type time.
- * @property {number[]} typeContainer        Average type time within a container.
- * @property {number[]} focus                Average block selection time.
- * @property {number[]} inserterOpen         Average time to open global inserter.
- * @property {number[]} inserterSearch       Average time to search the inserter.
- * @property {number[]} inserterHover        Average time to move mouse between two block item in the inserter.
- * @property {number[]} listViewOpen         Average time to open listView
+ * @property {number[]} timeToFirstByte        Represents the time since the browser started the request until it received a response.
+ * @property {number[]} largestContentfulPaint Represents the time when the main content of the page has likely loaded.
+ * @property {number[]} serverResponse         Represents the time the server takes to respond.
+ * @property {number[]} firstPaint             Represents the time when the user agent first rendered after navigation.
+ * @property {number[]} domContentLoaded       Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number[]} loaded                 Represents the time when the load event of the current document is completed.
+ * @property {number[]} firstContentfulPaint   Represents the time when the browser first renders any text or media.
+ * @property {number[]} firstBlock             Represents the time when Puppeteer first sees a block selector in the DOM.
+ * @property {number[]} type                   Average type time.
+ * @property {number[]} typeContainer          Average type time within a container.
+ * @property {number[]} focus                  Average block selection time.
+ * @property {number[]} inserterOpen           Average time to open global inserter.
+ * @property {number[]} inserterSearch         Average time to search the inserter.
+ * @property {number[]} inserterHover          Average time to move mouse between two block item in the inserter.
+ * @property {number[]} listViewOpen           Average time to open listView
  */
 
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number=} timeToFirstByteMedian Represents the time since the browser started the request until it received a response (median).
- * @property {number=} timeToFirstByteP75    Represents the time since the browser started the request until it received a response (75th percentile).
- * @property {number=} serverResponse        Represents the time the server takes to respond.
- * @property {number=} firstPaint            Represents the time when the user agent first rendered after navigation.
- * @property {number=} domContentLoaded      Represents the time immediately after the document's DOMContentLoaded event completes.
- * @property {number=} loaded                Represents the time when the load event of the current document is completed.
- * @property {number=} firstContentfulPaint  Represents the time when the browser first renders any text or media.
- * @property {number=} firstBlock            Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number=} type                  Average type time.
- * @property {number=} minType               Minimum type time.
- * @property {number=} maxType               Maximum type time.
- * @property {number=} typeContainer         Average type time within a container.
- * @property {number=} minTypeContainer      Minimum type time within a container.
- * @property {number=} maxTypeContainer      Maximum type time within a container.
- * @property {number=} focus                 Average block selection time.
- * @property {number=} minFocus              Min block selection time.
- * @property {number=} maxFocus              Max block selection time.
- * @property {number=} inserterOpen          Average time to open global inserter.
- * @property {number=} minInserterOpen       Min time to open global inserter.
- * @property {number=} maxInserterOpen       Max time to open global inserter.
- * @property {number=} inserterSearch        Average time to open global inserter.
- * @property {number=} minInserterSearch     Min time to open global inserter.
- * @property {number=} maxInserterSearch     Max time to open global inserter.
- * @property {number=} inserterHover         Average time to move mouse between two block item in the inserter.
- * @property {number=} minInserterHover      Min time to move mouse between two block item in the inserter.
- * @property {number=} maxInserterHover      Max time to move mouse between two block item in the inserter.
- * @property {number=} listViewOpen          Average time to open list view.
- * @property {number=} minListViewOpen       Min time to open list view.
- * @property {number=} maxListViewOpen       Max time to open list view.
+ * @property {number=} timeToFirstByteMedian        Represents the time since the browser started the request until it received a response (median).
+ * @property {number=} timeToFirstByteP75           Represents the time since the browser started the request until it received a response (75th percentile).
+ * @property {number=} largestContentfulPaintMedian Represents the time when the main content of the page has likely loaded (median).
+ * @property {number=} largestContentfulPaintP75    Represents the time when the main content of the page has likely loaded (75th percentile).
+ * @property {number=} serverResponse               Represents the time the server takes to respond.
+ * @property {number=} firstPaint                   Represents the time when the user agent first rendered after navigation.
+ * @property {number=} domContentLoaded             Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number=} loaded                       Represents the time when the load event of the current document is completed.
+ * @property {number=} firstContentfulPaint         Represents the time when the browser first renders any text or media.
+ * @property {number=} firstBlock                   Represents the time when Puppeteer first sees a block selector in the DOM.
+ * @property {number=} type                         Average type time.
+ * @property {number=} minType                      Minimum type time.
+ * @property {number=} maxType                      Maximum type time.
+ * @property {number=} typeContainer                Average type time within a container.
+ * @property {number=} minTypeContainer             Minimum type time within a container.
+ * @property {number=} maxTypeContainer             Maximum type time within a container.
+ * @property {number=} focus                        Average block selection time.
+ * @property {number=} minFocus                     Min block selection time.
+ * @property {number=} maxFocus                     Max block selection time.
+ * @property {number=} inserterOpen                 Average time to open global inserter.
+ * @property {number=} minInserterOpen              Min time to open global inserter.
+ * @property {number=} maxInserterOpen              Max time to open global inserter.
+ * @property {number=} inserterSearch               Average time to open global inserter.
+ * @property {number=} minInserterSearch            Min time to open global inserter.
+ * @property {number=} maxInserterSearch            Max time to open global inserter.
+ * @property {number=} inserterHover                Average time to move mouse between two block item in the inserter.
+ * @property {number=} minInserterHover             Min time to move mouse between two block item in the inserter.
+ * @property {number=} maxInserterHover             Max time to move mouse between two block item in the inserter.
+ * @property {number=} listViewOpen                 Average time to open list view.
+ * @property {number=} minListViewOpen              Min time to open list view.
+ * @property {number=} maxListViewOpen              Max time to open list view.
  */
 
 /**
@@ -134,7 +137,7 @@ function formatTime( number ) {
 /**
  * Curate the raw performance results.
  *
- * @param {string} testSuite
+ * @param {string}                  testSuite
  * @param {WPRawPerformanceResults} results
  *
  * @return {WPPerformanceResults} Curated Performance results.
@@ -147,6 +150,12 @@ function curateResults( testSuite, results ) {
 		return {
 			timeToFirstByteMedian: median( results.timeToFirstByte ),
 			timeToFirstByteP75: percentile75( results.timeToFirstByte ),
+			largestContentfulPaintMedian: median(
+				results.largestContentfulPaint
+			),
+			largestContentfulPaintP75: percentile75(
+				results.largestContentfulPaint
+			),
 		};
 	}
 
@@ -186,14 +195,21 @@ function curateResults( testSuite, results ) {
  *
  * @param {string} testSuite                Name of the tests set.
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
+ * @param {string} runKey                   Unique identifier for the test run, e.g. `branch-name_post-editor_run-3`.
  *
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
-async function runTestSuite( testSuite, performanceTestDirectory ) {
+async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 	await runShellScript(
 		`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
 		performanceTestDirectory
 	);
+	const resultsFile = path.join(
+		performanceTestDirectory,
+		`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
+	);
+	fs.mkdirSync( './__test-results', { recursive: true } );
+	fs.copyFileSync( resultsFile, `./__test-results/${ runKey }.results.json` );
 	const rawResults = await readJSONFile(
 		path.join(
 			performanceTestDirectory,
@@ -307,13 +323,13 @@ async function runPerformanceTests( branches, options ) {
 			log( `        >> Fetching the ${ fancyBranch } branch` );
 			// @ts-ignore
 			await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
-
-			log( `        >> Building the ${ fancyBranch } branch` );
-			await runShellScript(
-				'npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
-				buildPath
-			);
 		}
+
+		log( `        >> Building the ${ fancyBranch } branch` );
+		await runShellScript(
+			'npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
+			buildPath
+		);
 
 		await runShellScript(
 			'cp ' +
@@ -388,6 +404,7 @@ async function runPerformanceTests( branches, options ) {
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
+				const runKey = `${ branch }_${ testSuite }_run-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
 				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
@@ -399,7 +416,8 @@ async function runPerformanceTests( branches, options ) {
 				log( '        >> Running the test.' );
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
-					performanceTestDirectory
+					performanceTestDirectory,
+					runKey
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(

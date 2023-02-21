@@ -20,10 +20,10 @@ test.describe( 'Template Revert', () => {
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
-	test.beforeEach( async ( { admin, requestUtils, siteEditor } ) => {
+	test.beforeEach( async ( { admin, requestUtils, editor } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 	} );
 
 	test( 'should delete the template after saving the reverted template', async ( {
@@ -248,7 +248,6 @@ test.describe( 'Template Revert', () => {
 		editor,
 		page,
 		templateRevertUtils,
-		siteEditor,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -267,7 +266,7 @@ test.describe( 'Template Revert', () => {
 
 		await editor.saveSiteEditorEntities();
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 		const contentAfter =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfter ).toEqual( contentBefore );

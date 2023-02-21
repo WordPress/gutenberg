@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * Internal dependencies
  */
 import {
@@ -278,6 +283,55 @@ describe( 'getMappedColumnWidths', () => {
 		expect( result ).toEqual( [
 			{ clientId: 'a', attributes: { width: '25%' } },
 			{ clientId: 'b', attributes: { width: '35%' } },
+		] );
+	} );
+
+	it( 'always returns new objects and does not mutate input blocks', () => {
+		const blocks = [
+			deepFreeze( { clientId: 'a', attributes: { width: 30 } } ),
+			deepFreeze( { clientId: 'b', attributes: { width: 40 } } ),
+		];
+		const widths = {
+			a: 25,
+			b: 35,
+		};
+
+		const result = getMappedColumnWidths( blocks, widths );
+
+		expect( blocks[ 0 ] ).not.toBe( result[ 0 ] );
+		expect( blocks[ 1 ] ).not.toBe( result[ 1 ] );
+	} );
+
+	it( 'merges to block attributes if original blocks do not have any attributes', () => {
+		const blocks = [ { clientId: 'a' }, { clientId: 'b' } ];
+		const widths = {
+			a: 25,
+			b: 35,
+		};
+
+		const result = getMappedColumnWidths( blocks, widths );
+
+		expect( result ).toEqual( [
+			{ clientId: 'a', attributes: { width: '25%' } },
+			{ clientId: 'b', attributes: { width: '35%' } },
+		] );
+	} );
+
+	it( 'merges to block attributes if original blocks do not have a width attribute', () => {
+		const blocks = [
+			{ clientId: 'a', attributes: { align: 'left' } },
+			{ clientId: 'b', attributes: { align: 'right' } },
+		];
+		const widths = {
+			a: 25,
+			b: 35,
+		};
+
+		const result = getMappedColumnWidths( blocks, widths );
+
+		expect( result ).toEqual( [
+			{ clientId: 'a', attributes: { align: 'left', width: '25%' } },
+			{ clientId: 'b', attributes: { align: 'right', width: '35%' } },
 		] );
 	} );
 } );

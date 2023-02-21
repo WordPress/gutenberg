@@ -21,6 +21,13 @@ import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
 import { createPost, deleteAllPosts } from './posts';
+import {
+	createClassicMenu,
+	createNavigationMenu,
+	deleteAllMenus,
+	getNavigationMenus,
+} from './menus';
+import { deleteAllPages, createPage } from './pages';
 import { resetPreferences } from './preferences';
 import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
@@ -125,6 +132,10 @@ class RequestUtils {
 	deleteAllBlocks = deleteAllBlocks;
 	createPost = createPost.bind( this );
 	deleteAllPosts = deleteAllPosts.bind( this );
+	createClassicMenu = createClassicMenu.bind( this );
+	createNavigationMenu = createNavigationMenu.bind( this );
+	deleteAllMenus = deleteAllMenus.bind( this );
+	getNavigationMenus = getNavigationMenus.bind( this );
 	createComment = createComment.bind( this );
 	deleteAllComments = deleteAllComments.bind( this );
 	deleteAllWidgets = deleteAllWidgets.bind( this );
@@ -139,6 +150,8 @@ class RequestUtils {
 	deleteAllUsers = deleteAllUsers.bind( this );
 	getSiteSettings = getSiteSettings.bind( this );
 	updateSiteSettings = updateSiteSettings.bind( this );
+	deleteAllPages = deleteAllPages.bind( this );
+	createPage = createPage.bind( this );
 }
 
 export type { StorageState };

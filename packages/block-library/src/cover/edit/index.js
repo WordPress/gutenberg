@@ -116,7 +116,10 @@ function CoverEdit( {
 	// we define the url and background type
 	// depending on the value of the useFeaturedImage flag
 	// to preview in edit the dynamic featured image
-	const url = useFeaturedImage ? mediaUrl : attributes.url;
+	const url = useFeaturedImage
+		? mediaUrl
+		: // Ensure the url is not malformed due to sanitization through `wp_kses`.
+		  attributes.url?.replaceAll( '&amp;', '&' );
 	const backgroundType = useFeaturedImage
 		? IMAGE_BACKGROUND_TYPE
 		: attributes.backgroundType;

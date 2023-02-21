@@ -32,6 +32,7 @@
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
 		{ "path": "../react-i18n" },
 		{ "path": "../warning" }
 	],
@@ -45,7 +46,6 @@
 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
 		"src/index.js",
 		"src/autocomplete",
-		"src/combobox-control",
 		"src/dimension-control",
 		"src/duotone-picker",
 		"src/guide",
@@ -54,7 +54,6 @@
 		"src/higher-order/with-filters",
 		"src/higher-order/with-focus-return",
 		"src/higher-order/with-notices",
-		"src/menu-items-choice",
 		"src/navigation",
 		"src/panel/body.js",
 		"src/toolbar"

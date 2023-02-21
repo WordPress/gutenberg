@@ -3,6 +3,11 @@
  */
 import type { Key, MouseEventHandler } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { HeadingSize } from '../heading/types';
+
 export type Color = {
 	color: string;
 	name: string;
@@ -35,6 +40,12 @@ export type BasePaletteEdit = {
 	 * Whether the user can reset the editor.
 	 */
 	canReset?: boolean;
+	/**
+	 * The label's heading level.
+	 *
+	 * @default 2
+	 */
+	paletteLabelHeadingLevel?: HeadingSize;
 	/**
 	 * The prefix for the element slug.
 	 *

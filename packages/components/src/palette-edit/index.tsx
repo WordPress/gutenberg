@@ -355,6 +355,7 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 	const {
 		onChange,
 		paletteLabel,
+		paletteLabelHeadingLevel = 2,
 		emptyMessage,
 		canOnlyChangeValues,
 		canReset,
@@ -409,7 +410,9 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 	return (
 		<PaletteEditStyles>
 			<PaletteHStackHeader>
-				<PaletteHeading>{ paletteLabel }</PaletteHeading>
+				<PaletteHeading level={ paletteLabelHeadingLevel }>
+					{ paletteLabel }
+				</PaletteHeading>
 				<PaletteActionsContainer>
 					{ hasElements && isEditing && (
 						<DoneButton

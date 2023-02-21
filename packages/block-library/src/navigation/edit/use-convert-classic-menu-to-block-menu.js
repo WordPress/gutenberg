@@ -120,56 +120,59 @@ function useConvertClassicToBlockMenu( clientId ) {
 		return navigationMenu;
 	}
 
-	const convert = useCallback( async ( menuId, menuName, postStatus ) => {
-		// Check whether this classic menu is being imported already.
-		if ( classicMenuBeingConvertedId === menuId ) {
-			return;
-		}
+	const convert = useCallback(
+		async ( menuId, menuName, postStatus ) => {
+			// Check whether this classic menu is being imported already.
+			if ( classicMenuBeingConvertedId === menuId ) {
+				return;
+			}
 
-		// Set the ID for the currently importing classic menu.
-		classicMenuBeingConvertedId = menuId;
+			// Set the ID for the currently importing classic menu.
+			classicMenuBeingConvertedId = menuId;
 
-		if ( ! menuId || ! menuName ) {
-			setError( 'Unable to convert menu. Missing menu details.' );
-			setStatus( CLASSIC_MENU_CONVERSION_ERROR );
-			return;
-		}
-
-		setStatus( CLASSIC_MENU_CONVERSION_PENDING );
-		setError( null );
-
-		return await convertClassicMenuToBlockMenu(
-			menuId,
-			menuName,
-			postStatus
-		)
-			.then( ( navigationMenu ) => {
-				setStatus( CLASSIC_MENU_CONVERSION_SUCCESS );
-				// Reset the ID for the currently importing classic menu.
-				classicMenuBeingConvertedId = null;
-				return navigationMenu;
-			} )
-			.catch( ( err ) => {
-				setError( err?.message );
-				// Reset the ID for the currently importing classic menu.
+			if ( ! menuId || ! menuName ) {
+				setError( 'Unable to convert menu. Missing menu details.' );
 				setStatus( CLASSIC_MENU_CONVERSION_ERROR );
+				return;
+			}
 
-				// Reset the ID for the currently importing classic menu.
-				classicMenuBeingConvertedId = null;
+			setStatus( CLASSIC_MENU_CONVERSION_PENDING );
+			setError( null );
 
-				// Rethrow error for debugging.
-				throw new Error(
-					sprintf(
-						// translators: %s: the name of a menu (e.g. Header navigation).
-						__( `Unable to create Navigation Menu "%s".` ),
-						menuName
-					),
-					{
-						cause: err,
-					}
-				);
-			} );
-	}, [] );
+			return await convertClassicMenuToBlockMenu(
+				menuId,
+				menuName,
+				postStatus
+			)
+				.then( ( navigationMenu ) => {
+					setStatus( CLASSIC_MENU_CONVERSION_SUCCESS );
+					// Reset the ID for the currently importing classic menu.
+					classicMenuBeingConvertedId = null;
+					return navigationMenu;
+				} )
+				.catch( ( err ) => {
+					setError( err?.message );
+					// Reset the ID for the currently importing classic menu.
+					setStatus( CLASSIC_MENU_CONVERSION_ERROR );
+
+					// Reset the ID for the currently importing classic menu.
+					classicMenuBeingConvertedId = null;
+
+					// Rethrow error for debugging.
+					throw new Error(
+						sprintf(
+							// translators: %s: the name of a menu (e.g. Header navigation).
+							__( `Unable to create Navigation Menu "%s".` ),
+							menuName
+						),
+						{
+							cause: err,
+						}
+					);
+				} );
+		},
+		[ convertClassicMenuToBlockMenu ]
+	);
 
 	return {
 		convert,
