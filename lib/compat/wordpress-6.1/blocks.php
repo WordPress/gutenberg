@@ -118,13 +118,12 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_block_type_metadata_view_
  * @return array
  */
 function gutenberg_block_type_metadata_multiple_view_scripts( $metadata ) {
-
-	// Early return if viewScript is empty, or not an array.
-	if ( ! isset( $metadata['viewScript'] ) || ! is_array( $metadata['viewScript'] ) ) {
-		return $metadata;
-	}
-
-	if ( ! isset( $metadata['file'] ) || ! str_starts_with( $metadata['file'], wp_normalize_path( gutenberg_dir_path() ) ) ) {
+	if (
+		! isset( $metadata['viewScript'] ) ||
+		! is_array( $metadata['viewScript'] ) ||
+		! isset( $metadata['file'] ) ||
+		! str_starts_with( $metadata['file'], wp_normalize_path( gutenberg_dir_path() ) )
+	) {
 		return $metadata;
 	}
 	
