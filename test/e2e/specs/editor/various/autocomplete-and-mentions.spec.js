@@ -47,7 +47,7 @@ const userList = [
 		password: 'sm1lingsmyfavorite',
 	},
 ];
-test.describe( 'Autocomplete', () => {
+test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all(
 			userList.map( ( user ) =>

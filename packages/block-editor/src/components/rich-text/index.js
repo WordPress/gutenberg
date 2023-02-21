@@ -281,6 +281,7 @@ function RichTextWrapper(
 
 	const {
 		value,
+		getValue,
 		onChange,
 		ref: richTextRef,
 	} = useRichText( {
@@ -401,7 +402,7 @@ function RichTextWrapper(
 					richTextRef,
 					useBeforeInputRules( { value, onChange } ),
 					useInputRules( {
-						value,
+						getValue,
 						onChange,
 						__unstableAllowPrefixTransformations,
 						formatTypes,

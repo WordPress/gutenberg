@@ -49,12 +49,15 @@ export function useInputRules( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function inputRule() {
-			const { value, onReplace, selectionChange } = propsRef.current;
+			const { getValue, onReplace, selectionChange } = propsRef.current;
 
 			if ( ! onReplace ) {
 				return;
 			}
 
+			// We must use getValue() here because value may be update
+			// asynchronously.
+			const value = getValue();
 			const { start, text } = value;
 			const characterBefore = text.slice( start - 1, start );
 
@@ -91,7 +94,7 @@ export function useInputRules( props ) {
 		function onInput( event ) {
 			const { inputType, type } = event;
 			const {
-				value,
+				getValue,
 				onChange,
 				__unstableAllowPrefixTransformations,
 				formatTypes,
@@ -106,6 +109,7 @@ export function useInputRules( props ) {
 				inputRule();
 			}
 
+			const value = getValue();
 			const transformed = formatTypes.reduce(
 				( accumlator, { __unstableInputRule } ) => {
 					if ( __unstableInputRule ) {
