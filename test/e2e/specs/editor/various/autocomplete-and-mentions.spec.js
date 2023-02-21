@@ -461,13 +461,19 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	test( 'should hide UI when selection changes (by mouse)', async ( {
 		page,
 		editor,
+		pageUtils,
 	} ) => {
 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
-		await page.keyboard.type( '@fr' );
+		await page.keyboard.type( '@' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( 'f' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( 'r' );
 		await expect(
 			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
 		).toBeVisible();
-		await editor.canvas.click( '[data-type="core/paragraph"]' );
+		// Use the strong tag to move the selection by mouse within the mention.
+		await editor.canvas.click( '[data-type="core/paragraph"] strong' );
 		await expect(
 			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
 		).not.toBeVisible();
