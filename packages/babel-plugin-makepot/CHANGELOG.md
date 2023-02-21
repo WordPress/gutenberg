@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Lodash: Refactor away from `_.merge()` ([#48239](https://github.com/WordPress/gutenberg/pull/48239)).
+-   Lodash: Refactor away from `_.merge()` and remove Lodash dependency ([#48239](https://github.com/WordPress/gutenberg/pull/48239)).
 
 ## 5.11.0 (2023-02-15)
 
