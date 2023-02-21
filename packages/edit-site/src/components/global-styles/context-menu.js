@@ -12,6 +12,7 @@ import {
 import {
 	typography,
 	border,
+	filter,
 	shadow,
 	color,
 	layout,
@@ -121,7 +122,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 				) }
 				{ hasFilterPanel && (
 					<NavigationButtonAsItem
-						icon={ typography }
+						icon={ filter }
 						path={ parentMenu + '/filters' }
 						aria-label={ __( 'Filters styles' ) }
 					>
