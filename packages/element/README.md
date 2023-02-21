@@ -213,6 +213,14 @@ _Parameters_
 
 -   _component_ `import('./react').WPComponent`: Component's instance.
 
+### flushSync
+
+Forces React to flush any updates inside the provided callback synchronously.
+
+_Parameters_
+
+-   _callback_ `Function`: Callback to run synchronously.
+
 ### forwardRef
 
 Component enhancer used to enable passing a ref to its wrapped component.
