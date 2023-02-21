@@ -323,13 +323,13 @@ async function runPerformanceTests( branches, options ) {
 			log( `        >> Fetching the ${ fancyBranch } branch` );
 			// @ts-ignore
 			await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
-
-			log( `        >> Building the ${ fancyBranch } branch` );
-			await runShellScript(
-				'npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
-				buildPath
-			);
 		}
+
+		log( `        >> Building the ${ fancyBranch } branch` );
+		await runShellScript(
+			'npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
+			buildPath
+		);
 
 		await runShellScript(
 			'cp ' +
