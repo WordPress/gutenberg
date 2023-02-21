@@ -20,4 +20,4 @@ export * from './elements';
 export * from './utils';
 export { storeConfig, store } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';
-export { experiments } from './private-apis';
+export { privateApis } from './private-apis';

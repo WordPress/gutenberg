@@ -6,6 +6,12 @@
 
 - Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
 
+## 11.4.0 (2023-02-15)
+
+### Bug Fix
+
+-   `LinkControl`: fix scrollbar displayed on toggle link settings ([#47986](https://github.com/WordPress/gutenberg/pull/47986)).
+
 ## 11.3.0 (2023-02-01)
 
 ## 11.2.0 (2023-01-11)

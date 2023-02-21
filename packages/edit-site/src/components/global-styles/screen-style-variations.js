@@ -25,7 +25,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	store as blockEditorStore,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 
 /**
@@ -36,7 +36,7 @@ import StylesPreview from './preview';
 import ScreenHeader from './header';
 import { unlock } from '../../private-apis';
 
-const { GlobalStylesContext } = unlock( blockEditorExperiments );
+const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
 function compareVariations( a, b ) {
 	return (

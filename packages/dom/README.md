@@ -135,7 +135,8 @@ _Returns_
 
 ### getScrollContainer
 
-Given a DOM node, finds the closest scrollable container node.
+Given a DOM node, finds the closest scrollable container node or the node
+itself, if scrollable.
 
 _Parameters_
 

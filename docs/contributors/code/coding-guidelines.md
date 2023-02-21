@@ -244,7 +244,7 @@ Each `@wordpress` package wanting to privately access or expose experimental API
 do so by opting-in to `@wordpress/private-apis`:
 
 ```js
-// In packages/block-editorwordpress/private-apis.js:
+// In packages/block-editor/private-apis.js:
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -293,7 +293,6 @@ You can attach private selectors and actions to a public store:
 
 ```js
 // In packages/package1/store.js:
-import { experiments as dataExperiments } from '@wordpress/data';
 import { __experimentalHasContentRoleAttribute, ...selectors } from './selectors';
 import { __experimentalToggleFeature, ...actions } from './selectors';
 // The `lock` function is exported from the internal experiments.js file where
@@ -340,9 +339,9 @@ function MyComponent() {
 // In packages/package1/index.js:
 import { lock } from './private-apis';
 
-export const experiments = {};
+export const privateApis = {};
 /* Attach private data to the exported object */
-lock( experiments, {
+lock( privateApis, {
 	__experimentalCallback: function () {},
 	__experimentalReactComponent: function ExperimentalComponent() {
 		return <div />;
@@ -352,7 +351,7 @@ lock( experiments, {
 } );
 
 // In packages/package2/index.js:
-import { experiments } from '@wordpress/package1';
+import { privateApis } from '@wordpress/package1';
 import { unlock } from './private-apis';
 
 const {
@@ -366,6 +365,7 @@ const {
 Remember to always register the private actions and selectors on the **registered** store.
 
 Sometimes that's easy:
+
 ```js
 export const store = createReduxStore( STORE_NAME, storeConfig() );
 // `register` uses the same `store` object created from `createReduxStore`.

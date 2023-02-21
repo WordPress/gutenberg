@@ -18,9 +18,9 @@ test.describe( 'Style Book', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, siteEditor, styleBook, page } ) => {
+	test.beforeEach( async ( { admin, editor, styleBook, page } ) => {
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 		await styleBook.open();
 		await expect(
 			page.locator( 'role=region[name="Style Book"i]' )
@@ -98,7 +98,7 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should clear Global Styles navigator history when example is clicked', async ( {
+	test( 'should allow to return Global Styles root when example is clicked', async ( {
 		page,
 	} ) => {
 		await page.click( 'role=button[name="Blocks styles"]' );
@@ -110,10 +110,11 @@ test.describe( 'Style Book', () => {
 		);
 
 		await page.click( 'role=button[name="Navigate to the previous view"]' );
+		await page.click( 'role=button[name="Navigate to the previous view"]' );
 
 		await expect(
-			page.locator( 'role=button[name="Navigate to the previous view"]' )
-		).not.toBeVisible();
+			page.locator( 'role=button[name="Blocks styles"]' )
+		).toBeVisible();
 	} );
 
 	test( 'should disappear when closed', async ( { page } ) => {
@@ -144,6 +145,6 @@ class StyleBook {
 	async open() {
 		await this.disableWelcomeGuide();
 		await this.page.click( 'role=button[name="Styles"i]' );
-		await this.page.click( 'role=button[name="Open Style Book"i]' );
+		await this.page.click( 'role=button[name="Style Book"i]' );
 	}
 }

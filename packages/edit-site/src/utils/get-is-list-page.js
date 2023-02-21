@@ -1,11 +1,11 @@
 /**
  * Returns if the params match the list page route.
  *
- * @param {Object} params          The search params.
- * @param {string} params.postId   The post ID.
- * @param {string} params.postType The post type.
+ * @param {Object} params      The url params.
+ * @param {string} params.path The current path.
+ *
  * @return {boolean} Is list page or not.
  */
-export default function getIsListPage( { postId, postType } ) {
-	return !! ( ! postId && postType );
+export default function getIsListPage( { path } ) {
+	return path === '/wp_template/all' || path === '/wp_template_part/all';
 }

@@ -5,6 +5,7 @@ import {
 	createNewPost,
 	insertBlock,
 	getEditedPostContent,
+	isListViewOpen,
 	openListView,
 	pressKeyWithModifier,
 	pressKeyTimes,
@@ -326,5 +327,88 @@ describe( 'List view', () => {
 			'button[aria-label="Options for Group block"]'
 		);
 		await expect( listViewGroupBlockRight ).toHaveFocus();
+	} );
+
+	async function getActiveElementLabel() {
+		return page.evaluate(
+			() =>
+				document.activeElement.getAttribute( 'aria-label' ) ||
+				document.activeElement.textContent
+		);
+	}
+
+	// If list view sidebar is open and focus is not inside the sidebar, move focus to the sidebar when using the shortcut. If focus is inside the sidebar, shortcut should close the sidebar.
+	it( 'ensures the list view global shortcut works properly', async () => {
+		// Insert some blocks of different types.
+		await insertBlock( 'Image' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Paragraph text.' );
+
+		// Open list view sidebar.
+		await pressKeyWithModifier( 'access', 'o' );
+
+		// Navigate to the image block.
+		await page.keyboard.press( 'ArrowUp' );
+		// Check if image block link in the list view has focus by XPath selector.
+		const listViewImageBlock = await page.waitForXPath(
+			'//a[contains(., "Image")]'
+		);
+		await expect( listViewImageBlock ).toHaveFocus();
+		// Select the image block in the list view to move focus to it in the canvas.
+		await page.keyboard.press( 'Enter' );
+
+		// Check if image block upload button has focus by XPath selector.
+		const imageBlockUploadButton = await page.waitForXPath(
+			'//button[contains(text(), "Upload")]'
+		);
+		await expect( imageBlockUploadButton ).toHaveFocus();
+
+		// Since focus is now at the image block upload button in the canvas, pressing the list view shortcut should bring focus back to the image block in the list view.
+		await pressKeyWithModifier( 'access', 'o' );
+		await expect( listViewImageBlock ).toHaveFocus();
+
+		// Since focus is now inside the list view, the shortcut should close the sidebar.
+		await pressKeyWithModifier( 'access', 'o' );
+		// Focus should now be on the paragraph block since that is where we opened the list view sidebar. This is not a perfect solution, but current functionality prevents a better way at the moment. Get the current block aria-label and compare.
+		await expect( await getActiveElementLabel() ).toEqual(
+			'Paragraph block'
+		);
+		// List view sidebar should be closed.
+		await expect( await isListViewOpen() ).toBeFalsy();
+
+		// Open list view sidebar.
+		await pressKeyWithModifier( 'access', 'o' );
+
+		// Focus the list view close button and make sure the shortcut will close the list view. This is to catch a bug where elements could be out of range of the sidebar region. Must shift+tab 3 times to reach cclose button before tabs.
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveElementLabel() ).toEqual(
+			'Close Document Overview Sidebar'
+		);
+
+		// Close the list view sidebar.
+		await pressKeyWithModifier( 'access', 'o' );
+		// List view sidebar should be closed.
+		await expect( await isListViewOpen() ).toBeFalsy();
+
+		// Open list view sidebar.
+		await pressKeyWithModifier( 'access', 'o' );
+
+		// Focus the outline tab and select it. This test ensures the outline tab receives similar focus events based on the shortcut.
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveElementLabel() ).toEqual( 'Outline' );
+		await page.keyboard.press( 'Enter' );
+
+		// From here, tab in to the editor so focus can be checked on return to the outline tab in the sidebar.
+		await pressKeyTimes( 'Tab', 2 );
+		// Focus should be placed on the outline tab button since there is nothing to focus inside the tab itself.
+		await pressKeyWithModifier( 'access', 'o' );
+		await expect( await getActiveElementLabel() ).toEqual( 'Outline' );
+
+		// Close the list view sidebar.
+		await pressKeyWithModifier( 'access', 'o' );
+		// List view sidebar should be closed.
+		await expect( await isListViewOpen() ).toBeFalsy();
 	} );
 } );

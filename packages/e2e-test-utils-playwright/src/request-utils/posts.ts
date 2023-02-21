@@ -10,8 +10,11 @@ export interface Post {
 }
 
 export interface CreatePostPayload {
-	content: string;
+	title?: string;
+	content?: string;
 	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
+	date?: string;
+	date_gmt: string;
 }
 
 /**

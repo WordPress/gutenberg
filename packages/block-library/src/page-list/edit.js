@@ -23,7 +23,6 @@ import {
 	Notice,
 	ComboboxControl,
 	Button,
-	Modal,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect } from '@wordpress/element';
@@ -34,16 +33,15 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
+import {
+	convertDescription,
+	ConvertToLinksModal,
+} from './convert-to-links-modal';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
-
-const convertDescription = __(
-	'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking "Edit" below.'
-);
-
 function BlockContent( {
 	blockProps,
 	innerBlocksProps,
@@ -113,7 +111,7 @@ function BlockContent( {
 	}
 }
 
-function ConvertToLinksModal( { onClick, disabled } ) {
+function ConvertToLinks( { onClick, disabled } ) {
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
@@ -126,30 +124,11 @@ function ConvertToLinksModal( { onClick, disabled } ) {
 				</ToolbarButton>
 			</BlockControls>
 			{ isOpen && (
-				<Modal
-					onRequestClose={ closeModal }
-					title={ __( 'Edit this menu' ) }
-					className={ 'wp-block-page-list-modal' }
-					aria={ {
-						describedby: 'wp-block-page-list-modal__description',
-					} }
-				>
-					<p id={ 'wp-block-page-list-modal__description' }>
-						{ convertDescription }
-					</p>
-					<div className="wp-block-page-list-modal-buttons">
-						<Button variant="tertiary" onClick={ closeModal }>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							disabled={ disabled }
-							onClick={ onClick }
-						>
-							{ __( 'Edit' ) }
-						</Button>
-					</div>
-				</Modal>
+				<ConvertToLinksModal
+					onClick={ onClick }
+					onClose={ closeModal }
+					disabled={ disabled }
+				/>
 			) }
 		</>
 	);
@@ -344,7 +323,7 @@ export default function PageListEdit( {
 				) }
 			</InspectorControls>
 			{ allowConvertToLinks && (
-				<ConvertToLinksModal
+				<ConvertToLinks
 					disabled={ ! hasResolvedPages }
 					onClick={ convertToNavigationLinks }
 				/>
