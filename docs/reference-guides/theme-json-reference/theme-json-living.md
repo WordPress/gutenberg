@@ -261,11 +261,14 @@ Type: `object`.
 ## templateParts
 
 Additional metadata for template parts defined in the parts folder.
+
 Type: `object`.
 
-`name`: Filename, without extension, of the template in the parts folder. Type: `string`.
-`title`: Title of the template, translatable. Type: `string`.
-`area`: The area the template part is used for. Block variations for `header` and `footer` values exist and will be used when the area is set to one of those. Type: `string`.
+| Property | Description | Type |
+| ---      | ---         | ---  |
+| name | Filename, without extension, of the template in the parts folder. | string |
+| title | Title of the template, translatable. | string |
+| area | The area the template part is used for. Block variations for `header` and `footer` values exist and will be used when the area is set to one of those. | string |
 
 
 ## Patterns

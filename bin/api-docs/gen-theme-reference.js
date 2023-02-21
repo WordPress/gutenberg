@@ -227,12 +227,12 @@ autogen += '\n\n';
 // templateParts
 const templateParts = themejson.properties.templateParts.items.properties;
 autogen += '## templateParts' + '\n\n';
-autogen += themejson.properties.templateParts.description + '\n';
+autogen += themejson.properties.templateParts.description + '\n\n';
 autogen += 'Type: `' + themejson.properties.templateParts.items.type + '`.\n\n';
+autogen += '| Property | Description | Type |\n';
+autogen += '| ---      | ---         | ---  |\n';
 keys( templateParts ).forEach( ( key ) => {
-	autogen += '`' + key + '`: ';
-	autogen += templateParts[ key ].description + ' ';
-	autogen += 'Type: `' + templateParts[ key ].type + '`.\n';
+	autogen += `| ${ key } | ${ templateParts[ key ].description } | ${ templateParts[ key ].type } |\n`;
 } );
 autogen += '\n\n';
 
