@@ -1,5 +1,13 @@
 # DuotonePicker & DuotoneSwatch
 
+## Storybook tool
+
+Try out the DuotonePicker component interactively.
+
+The Gutenberg [Storybook tool](https://wordpress.github.io/gutenberg/) enables you to interactively set various options for individual components and then copy the code for use in your project.
+
+[View the DuotonePicker component on Storybook](https://wordpress.github.io/gutenberg/?path=/story/components-duotonepicker--default).
+
 ## Usage
 
 ```jsx

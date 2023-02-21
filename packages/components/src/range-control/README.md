@@ -8,9 +8,18 @@ A RangeControl for volume
 
 ## Table of contents
 
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
+1. [Storybook tool](#storybook-tool)
+2. [Design guidelines](#design-guidelines)
+3. [Development guidelines](#development-guidelines)
+4. [Related components](#related-components)
+
+## Storybook tool
+
+Try out the RangeControl component interactively.
+
+The Gutenberg [Storybook tool](https://wordpress.github.io/gutenberg/) enables you to interactively set various options for individual components and then copy the code for use in your project.
+
+[View the RangeControl component on Storybook](https://wordpress.github.io/gutenberg/?path=/story/components-rangecontrol--default).
 
 ## Design guidelines
 
