@@ -55,7 +55,6 @@ export type BasePaletteEdit = {
 };
 
 type PaletteEditColors = {
-	gradients: never;
 	/**
 	 * The colors in the palette.
 	 *
@@ -69,7 +68,6 @@ type PaletteEditColors = {
 }
 
 type PaletteEditGradients = {
-	colors: never;
 	/**
 	 * The gradients in the palette.
 	 */
@@ -119,7 +117,6 @@ export type NameInputProps = {
 type BaseOption = {
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	isEditing: boolean;
-	isGradient?: boolean;
 	key: Key;
 	onRemove: MouseEventHandler< HTMLButtonElement >;
 	onStartEditing: () => void;
@@ -129,11 +126,13 @@ type BaseOption = {
 
 type OptionColor = {
 	element: Color;
+	isGradient?: false;
 	onChange: ( newColor: Color ) => void;
 };
 
 type OptionGradient = {
 	element: Gradient;
+	isGradient: true;
 	onChange: ( newColor: Gradient ) => void;
 };
 
@@ -144,7 +143,6 @@ export type OptionProps =
 type BasePaletteEditListView = {
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
-	isGradient?: boolean;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
 	slugPrefix: SlugPrefix;
 };
@@ -157,7 +155,7 @@ type PaletteEditListViewColors = {
 
 type PaletteEditListViewGradients = {
 	elements: Gradient[]
-	onChange: ( newColors?: Gradient[] ) => void;
+	onChange: ( newGradients?: Gradient[] ) => void;
 	isGradient: true;
 }
 

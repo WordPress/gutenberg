@@ -300,7 +300,7 @@ function PaletteEditListView( {
 								setEditingElement( index );
 							}
 						} }
-						onChange={ ( newElement: T ) => {
+						onChange={ ( newElement ) => {
 							debounceOnChange(
 								elements.map(
 									( currentElement, currentIndex ) => {
