@@ -100,7 +100,6 @@ function PostFeaturedImage( {
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
-	const postLabel = postType?.labels ?? {};
 	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
 		media,
 		currentPostId
@@ -154,7 +153,7 @@ function PostFeaturedImage( {
 				<MediaUploadCheck fallback={ instructions }>
 					<MediaUpload
 						title={
-							postLabel.featured_image ||
+							postType?.labels?.featured_image ||
 							DEFAULT_FEATURE_IMAGE_LABEL
 						}
 						onSelect={ onUpdateImage }
@@ -196,7 +195,8 @@ function PostFeaturedImage( {
 									{ isLoading && <Spinner /> }
 									{ ! featuredImageId &&
 										! isLoading &&
-										( postLabel.set_featured_image ||
+										( postType?.labels
+											?.set_featured_image ||
 											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
 								</Button>
 								<DropZone onFilesDrop={ onDropFiles } />
@@ -210,7 +210,7 @@ function PostFeaturedImage( {
 						{ media && (
 							<MediaUpload
 								title={
-									postLabel.featured_image ||
+									postType?.labels?.featured_image ||
 									DEFAULT_FEATURE_IMAGE_LABEL
 								}
 								onSelect={ onUpdateImage }
@@ -232,7 +232,7 @@ function PostFeaturedImage( {
 							variant="link"
 							isDestructive
 						>
-							{ postLabel.remove_featured_image ||
+							{ postType?.labels?.remove_featured_image ||
 								DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
 						</Button>
 					</MediaUploadCheck>

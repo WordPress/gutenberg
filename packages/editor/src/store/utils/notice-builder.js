@@ -33,7 +33,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 	const willPublish = publishStatus.includes( post.status );
 
 	let noticeMessage;
-	let shouldShowLink = postType?.viewable;
+	let shouldShowLink = postType?.viewable ?? false;
 	let isDraft;
 
 	// Always should a notice, which will be spoken for accessibility.

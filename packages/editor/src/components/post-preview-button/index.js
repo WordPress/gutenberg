@@ -255,7 +255,7 @@ export default compose( [
 				forcePreviewLink !== undefined ? forcePreviewLink : previewLink,
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
-			isViewable: postType?.viewable,
+			isViewable: postType?.viewable ?? false,
 			isDraft:
 				[ 'draft', 'auto-draft' ].indexOf(
 					getEditedPostAttribute( 'status' )

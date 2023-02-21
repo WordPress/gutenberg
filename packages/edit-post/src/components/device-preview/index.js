@@ -30,7 +30,7 @@ export default function DevicePreview() {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			isPostSaveable: select( editorStore ).isEditedPostSaveable(),
-			isViewable: postType?.viewable,
+			isViewable: postType?.viewable ?? false,
 			deviceType:
 				select( editPostStore ).__experimentalGetPreviewDeviceType(),
 		};

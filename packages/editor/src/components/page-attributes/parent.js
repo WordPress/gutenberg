@@ -43,46 +43,47 @@ export const getItemPriority = ( name, searchValue ) => {
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
 	const [ fieldValue, setFieldValue ] = useState( false );
-	const { parentPost, parentPostId, items, postType } = useSelect(
-		( select ) => {
-			const { getPostType, getEntityRecords, getEntityRecord } =
-				select( coreStore );
-			const { getCurrentPostId, getEditedPostAttribute } =
-				select( editorStore );
-			const postTypeSlug = getEditedPostAttribute( 'type' );
-			const pageId = getEditedPostAttribute( 'parent' );
-			const pType = getPostType( postTypeSlug );
-			const postId = getCurrentPostId();
-			const isHierarchical = pType?.hierarchical;
-			const query = {
-				per_page: 100,
-				exclude: postId,
-				parent_exclude: postId,
-				orderby: 'menu_order',
-				order: 'asc',
-				_fields: 'id,title,parent',
-			};
+	const { isHierarchical, parentPost, parentPostId, items, postType } =
+		useSelect(
+			( select ) => {
+				const { getPostType, getEntityRecords, getEntityRecord } =
+					select( coreStore );
+				const { getCurrentPostId, getEditedPostAttribute } =
+					select( editorStore );
+				const postTypeSlug = getEditedPostAttribute( 'type' );
+				const pageId = getEditedPostAttribute( 'parent' );
+				const pType = getPostType( postTypeSlug );
+				const postId = getCurrentPostId();
+				const postIsHierarchical = pType?.hierarchical ?? false;
+				const query = {
+					per_page: 100,
+					exclude: postId,
+					parent_exclude: postId,
+					orderby: 'menu_order',
+					order: 'asc',
+					_fields: 'id,title,parent',
+				};
 
-			// Perform a search when the field is changed.
-			if ( !! fieldValue ) {
-				query.search = fieldValue;
-			}
+				// Perform a search when the field is changed.
+				if ( !! fieldValue ) {
+					query.search = fieldValue;
+				}
 
-			return {
-				parentPostId: pageId,
-				parentPost: pageId
-					? getEntityRecord( 'postType', postTypeSlug, pageId )
-					: null,
-				items: isHierarchical
-					? getEntityRecords( 'postType', postTypeSlug, query )
-					: [],
-				postType: pType,
-			};
-		},
-		[ fieldValue ]
-	);
+				return {
+					postIsHierarchical,
+					parentPostId: pageId,
+					parentPost: pageId
+						? getEntityRecord( 'postType', postTypeSlug, pageId )
+						: null,
+					items: postIsHierarchical
+						? getEntityRecords( 'postType', postTypeSlug, query )
+						: [],
+					postType: pType,
+				};
+			},
+			[ fieldValue ]
+		);
 
-	const isHierarchical = postType?.hierarchical;
 	const parentPageLabel = postType?.labels?.parent_item_colon;
 	const pageItems = items || [];
 
