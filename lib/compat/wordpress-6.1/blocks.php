@@ -124,6 +124,10 @@ function gutenberg_block_type_metadata_multiple_view_scripts( $metadata ) {
 		return $metadata;
 	}
 
+	if ( ! isset( $metadata['file'] ) || ! str_starts_with( $metadata['file'], wp_normalize_path( gutenberg_dir_path() ) ) ) {
+		return $metadata;
+	}
+	
 	// Register all viewScript items.
 	foreach ( $metadata['viewScript'] as $view_script ) {
 		$item_metadata               = $metadata;
