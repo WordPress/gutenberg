@@ -233,6 +233,15 @@ video.wp-block-cover__video-background {
 	z-index: z-index(".wp-block-cover__image-background");
 }
 
+// Duotone styles
+.wp-block-cover {
+	--wp--style--filter: initial;
+	> .wp-block-cover__image-background,
+	> .wp-block-cover__video-background {
+		filter: var(--wp--style--filter);
+	}
+}
+
 // Styles below only exist to support older versions of the block.
 // Versions that not had inner blocks and used an h2 heading had a section (and not a div) with a class wp-block-cover-image (and not a wp-block-cover).
 // We are using the previous referred differences to target old versions.

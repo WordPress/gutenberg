@@ -24,6 +24,59 @@ function render_block_core_image( $attributes, $content ) {
 			$content = str_replace( '<img', '<img ' . $data_id_attribute . ' ', $content );
 		}
 	}
+
+	$attrs = array();
+
+	/*
+	 * Filter out styles on the wrapper to add back with wrapper_attributes.
+	 */
+	$preg_style_pattern = '/style="([^"]*)"/';
+	preg_match(
+		'/^<figure[^>]+?' . substr( $preg_style_pattern, 1, -1 ) . '[^>]*>/',
+		$content,
+		$style_matches
+	);
+	if ( isset( $style_matches[1] ) ) {
+		$attrs['style'] = $style_matches[1];
+		$content = preg_replace(
+			$preg_style_pattern,
+			'',
+			$content,
+			1
+		);
+	}
+
+	$preg_class_pattern = '/class="([^"]*)"/';
+	preg_match(
+		/*
+		 * The figure should always have the `wp-block-image` class which
+		 * means it should always be the first match, so we don't have to
+		 * do the extra checks for if the class is for the figure or not.
+		 */
+		$preg_class_pattern,
+		$content,
+		$class_matches
+	);
+	if ( isset( $class_matches[1] ) ) {
+		/*
+		 * get_block_wrapper_attributes includes the `wp-block-image` class,
+		 * so it needs to be removed first to avoid duplication.
+		 */
+		$classes = explode( ' ', $class_matches[1] );
+		$classes = array_diff( $classes, array( 'wp-block-image' ) ) ;
+		$classes = implode( ' ', $classes );
+		$attrs['class'] = $classes;
+
+		$wrapper_attributes = get_block_wrapper_attributes( $attrs );
+
+		$content = preg_replace(
+			$preg_class_pattern,
+			$wrapper_attributes,
+			$content,
+			1
+		);
+	}
+
 	return $content;
 }
 

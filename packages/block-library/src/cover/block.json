@@ -97,6 +97,9 @@
 			"text": false,
 			"background": false
 		},
+		"filter": {
+			"duotone": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
