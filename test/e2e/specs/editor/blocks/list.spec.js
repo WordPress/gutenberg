@@ -1158,7 +1158,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
-	test( 'can be created by pasting an empty list', async ( {
+	test( 'can be created by pasting an empty list (-firefox)', async ( {
 		editor,
 		pageUtils,
 	} ) => {
@@ -1176,7 +1176,11 @@ test.describe( 'List (@firefox)', () => {
 		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Verify no WSOD and content is proper.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
 	} );
 
 	test( 'should merge two list with same attributes', async ( {
@@ -1231,7 +1235,15 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->` );
 	} );
 
 	test( 'selects all transformed output', async ( { editor, page } ) => {
@@ -1250,11 +1262,26 @@ test.describe( 'List (@firefox)', () => {
 		await page.getByRole( 'button', { name: 'List', exact: true } ).click();
 		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->` );
 
 		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
 		await page.getByRole( 'menuitem', { name: 'List' } ).click();
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
 	} );
 } );
