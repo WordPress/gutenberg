@@ -50,6 +50,7 @@ Prompt visitors to take action with a button-style link. ([Source](https://githu
 
 -	**Name:** core/button
 -	**Category:** design
+-	**Parent:** core/buttons
 -	**Supports:** anchor, color (background, gradients, text), shadow, spacing (padding), typography (fontSize, lineHeight), ~~alignWide~~, ~~align~~, ~~reusable~~
 -	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, text, textAlign, textColor, title, url, width
 
@@ -95,6 +96,7 @@ A single column within a columns block. ([Source](https://github.com/WordPress/g
 
 -	**Name:** core/column
 -	**Category:** text
+-	**Parent:** core/columns
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** allowedBlocks, templateLock, verticalAlignment, width
 
@@ -112,6 +114,7 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 This block is deprecated. Please use the Avatar block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar))
 
 -	**Name:** core/comment-author-avatar
+-	**Experimental:** fse
 -	**Category:** theme
 -	**Supports:** anchor, color (background, ~~text~~), spacing (margin, padding), ~~html~~, ~~inserter~~
 -	**Attributes:** height, width
@@ -167,6 +170,7 @@ Contains the block elements used to display a comment, like the title, date, aut
 
 -	**Name:** core/comment-template
 -	**Category:** design
+-	**Parent:** core/comments
 -	**Supports:** align, anchor, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
@@ -185,6 +189,7 @@ Displays a paginated navigation to next/previous set of comments, when applicabl
 
 -	**Name:** core/comments-pagination
 -	**Category:** theme
+-	**Parent:** core/comments
 -	**Supports:** align, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
@@ -194,6 +199,7 @@ Displays the next comment's page link. ([Source](https://github.com/WordPress/gu
 
 -	**Name:** core/comments-pagination-next
 -	**Category:** theme
+-	**Parent:** core/comments-pagination
 -	**Supports:** anchor, color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
@@ -203,6 +209,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 
 -	**Name:** core/comments-pagination-numbers
 -	**Category:** theme
+-	**Parent:** core/comments-pagination
 -	**Supports:** anchor, color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
@@ -212,6 +219,7 @@ Displays the previous comment's page link. ([Source](https://github.com/WordPres
 
 -	**Name:** core/comments-pagination-previous
 -	**Category:** theme
+-	**Parent:** core/comments-pagination
 -	**Supports:** anchor, color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
@@ -293,6 +301,7 @@ Create a link that always points to the homepage of the site. Usually not necess
 
 -	**Name:** core/home-link
 -	**Category:** design
+-	**Parent:** core/navigation
 -	**Supports:** anchor, typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
@@ -347,6 +356,7 @@ Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/
 
 -	**Name:** core/list-item
 -	**Category:** text
+-	**Parent:** core/list
 -	**Supports:** typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, placeholder
 
@@ -401,6 +411,7 @@ Add a page, link, or another item to your navigation. ([Source](https://github.c
 
 -	**Name:** core/navigation-link
 -	**Category:** design
+-	**Parent:** core/navigation
 -	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelLink, kind, label, opensInNewTab, rel, title, type, url
 
@@ -410,6 +421,7 @@ Add a submenu to your navigation. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/navigation-submenu
 -	**Category:** design
+-	**Parent:** core/navigation
 -	**Supports:** ~~html~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelItem, kind, label, opensInNewTab, rel, title, type, url
 
@@ -419,6 +431,7 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 
 -	**Name:** core/nextpage
 -	**Category:** design
+-	**Parent:** core/post-content
 -	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~
 -	**Attributes:** 
 
@@ -437,6 +450,7 @@ Displays a page inside a list of all pages. ([Source](https://github.com/WordPre
 
 -	**Name:** core/page-list-item
 -	**Category:** widgets
+-	**Parent:** core/page-list
 -	**Supports:** ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
 -	**Attributes:** hasChildren, id, label, link, title
 
@@ -490,6 +504,7 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
 
 -	**Name:** core/post-comment
+-	**Experimental:** fse
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~inserter~~
 -	**Attributes:** commentId
@@ -499,6 +514,7 @@ This block is deprecated. Please use the Comments block instead. ([Source](https
 Display a post's comments count. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-count))
 
 -	**Name:** core/post-comments-count
+-	**Experimental:** fse
 -	**Category:** theme
 -	**Supports:** anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
@@ -517,6 +533,7 @@ Display a post's comments form. ([Source](https://github.com/WordPress/gutenberg
 Displays the link to the current post comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-link))
 
 -	**Name:** core/post-comments-link
+-	**Experimental:** fse
 -	**Category:** theme
 -	**Supports:** anchor, color (background, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
@@ -572,6 +589,7 @@ Contains the block elements used to render a post, like the title, date, feature
 
 -	**Name:** core/post-template
 -	**Category:** theme
+-	**Parent:** core/query
 -	**Supports:** align, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
@@ -626,6 +644,7 @@ Contains the block elements used to render content when no query results are fou
 
 -	**Name:** core/query-no-results
 -	**Category:** theme
+-	**Parent:** core/query
 -	**Supports:** align, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
@@ -635,6 +654,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable. 
 
 -	**Name:** core/query-pagination
 -	**Category:** theme
+-	**Parent:** core/query
 -	**Supports:** align, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
@@ -644,6 +664,7 @@ Displays the next posts page link. ([Source](https://github.com/WordPress/gutenb
 
 -	**Name:** core/query-pagination-next
 -	**Category:** theme
+-	**Parent:** core/query-pagination
 -	**Supports:** anchor, color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
@@ -653,6 +674,7 @@ Displays a list of page numbers for pagination ([Source](https://github.com/Word
 
 -	**Name:** core/query-pagination-numbers
 -	**Category:** theme
+-	**Parent:** core/query-pagination
 -	**Supports:** anchor, color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
@@ -662,6 +684,7 @@ Displays the previous posts page link. ([Source](https://github.com/WordPress/gu
 
 -	**Name:** core/query-pagination-previous
 -	**Category:** theme
+-	**Parent:** core/query-pagination
 -	**Supports:** anchor, color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
@@ -761,6 +784,7 @@ Display an icon linking to a social media profile or site. ([Source](https://git
 
 -	**Name:** core/social-link
 -	**Category:** widgets
+-	**Parent:** core/social-links
 -	**Supports:** anchor, ~~html~~, ~~reusable~~
 -	**Attributes:** label, rel, service, url
 
@@ -796,6 +820,7 @@ Create structured content in rows and columns to display information. ([Source](
 Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table-of-contents))
 
 -	**Name:** core/table-of-contents
+-	**Experimental:** true
 -	**Category:** layout
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** headings, onlyIncludeCurrentPage
