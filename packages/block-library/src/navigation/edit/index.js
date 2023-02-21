@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
+	useCallback,
 	useState,
 	useEffect,
 	useRef,
@@ -365,16 +366,16 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const handleUpdateMenu = (
-		menuId,
-		options = { focusNavigationBlock: false }
-	) => {
-		const { focusNavigationBlock } = options;
-		setRef( menuId );
-		if ( focusNavigationBlock ) {
-			selectBlock( clientId );
-		}
-	};
+	const handleUpdateMenu = useCallback(
+		( menuId, options = { focusNavigationBlock: false } ) => {
+			const { focusNavigationBlock } = options;
+			setRef( menuId );
+			if ( focusNavigationBlock ) {
+				selectBlock( clientId );
+			}
+		},
+		[ selectBlock, clientId ]
+	);
 
 	const onSelectClassicMenu = async ( classicMenu ) => {
 		const navMenu = await convertClassicMenu(
@@ -421,9 +422,9 @@ function Navigation( {
 		createNavigationMenuPost,
 		createNavigationMenuIsError,
 		createNavigationMenuIsSuccess,
+		isCreatingNavigationMenu,
 		handleUpdateMenu,
 		hideNavigationMenuStatusNotice,
-		isCreatingNavigationMenu,
 		showNavigationMenuStatusNotice,
 	] );
 
