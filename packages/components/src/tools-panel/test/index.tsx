@@ -15,6 +15,8 @@ const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const resetAll = jest.fn();
 const noop = () => undefined;
 
+type ControlValue = boolean | undefined;
+
 // Default props for the tools panel.
 const defaultProps = {
 	label: 'Panel header',
@@ -22,7 +24,7 @@ const defaultProps = {
 };
 
 // Default props for an enabled control to be rendered within panel.
-let controlValue: boolean | undefined = true;
+let controlValue: ControlValue = true;
 const controlProps = {
 	hasValue: jest.fn().mockImplementation( () => {
 		return !! controlValue;
@@ -36,7 +38,7 @@ const controlProps = {
 
 // Default props without a value for an alternate control to be rendered within
 // the panel.
-let altControlValue: boolean | undefined = false;
+let altControlValue: ControlValue = false;
 const altControlProps = {
 	hasValue: jest.fn().mockImplementation( () => {
 		return !! altControlValue;
@@ -47,7 +49,7 @@ const altControlProps = {
 };
 
 // Default props for wrapped or grouped panel items.
-let nestedControlValue: boolean | undefined = true;
+let nestedControlValue: ControlValue = true;
 const nestedControlProps = {
 	hasValue: jest.fn().mockImplementation( () => {
 		return !! nestedControlValue;
@@ -61,7 +63,7 @@ const nestedControlProps = {
 };
 
 // Alternative props for wrapped or grouped panel items.
-const altNestedControlValue: boolean | undefined = false;
+const altNestedControlValue: ControlValue = false;
 const altNestedControlProps = {
 	hasValue: jest.fn().mockImplementation( () => {
 		return !! altNestedControlValue;
