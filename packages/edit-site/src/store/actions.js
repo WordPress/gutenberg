@@ -526,7 +526,7 @@ export const switchEditorMode =
 
 		if ( mode === 'visual' ) {
 			speak( __( 'Visual editor selected' ), 'assertive' );
-		} else if ( mode === 'mosaic' ) {
-			speak( __( 'Mosaic view selected' ), 'assertive' );
+		} else if ( mode === 'text' ) {
+			speak( __( 'Code editor selected' ), 'assertive' );
 		}
 	};

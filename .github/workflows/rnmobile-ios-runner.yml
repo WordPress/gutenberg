@@ -37,7 +37,7 @@ jobs:
               run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
 
             - name: Restore build cache
-              uses: actions/cache@627f0f41f6904a5b1efbaed9f96d9eb58e92e920 # v3.2.4
+              uses: actions/cache@6998d139ddd3e68c71e9e398d8e40b71a2f39812 # v3.2.5
               with:
                   path: |
                       packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
@@ -45,7 +45,7 @@ jobs:
                   key: ${{ runner.os }}-ios-build-${{ matrix.xcode }}-${{ matrix.device }}-${{ hashFiles('ios-checksums.txt') }}
 
             - name: Restore pods cache
-              uses: actions/cache@627f0f41f6904a5b1efbaed9f96d9eb58e92e920 # v3.2.4
+              uses: actions/cache@6998d139ddd3e68c71e9e398d8e40b71a2f39812 # v3.2.5
               with:
                   path: |
                       packages/react-native-editor/ios/Pods

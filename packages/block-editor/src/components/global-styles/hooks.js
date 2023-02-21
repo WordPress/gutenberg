@@ -252,6 +252,7 @@ export function overrideSettingsWithSupports( settings, supports ) {
 		'fontWeight',
 		'letterSpacing',
 		'textTransform',
+		'textDecoration',
 	].forEach( ( key ) => {
 		if ( ! supports.includes( key ) ) {
 			updatedSettings.typography = {
