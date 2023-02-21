@@ -882,6 +882,29 @@ class EditorPage {
 		return await waitForVisible( this.driver, blockLocator );
 	}
 
+	// =========================
+	// Button Block functions
+	// =========================
+
+	async getButtonBlockTextInputAtPosition( blockName, position = 1 ) {
+		// iOS needs a click to get the text element
+		if ( ! isAndroid() ) {
+			const textBlockLocator = `(//XCUIElementTypeButton[contains(@name, "Button Block. Row ${ position }")])`;
+
+			const textBlock = await waitForVisible(
+				this.driver,
+				textBlockLocator
+			);
+			await textBlock.click();
+		}
+
+		const blockLocator = isAndroid()
+			? `//android.view.ViewGroup[@content-desc="Button Block. Row ${ position }"]/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText`
+			: `//XCUIElementTypeButton[contains(@name, "Button Block. Row ${ position }")]//XCUIElementTypeTextView`;
+
+		return await waitForVisible( this.driver, blockLocator );
+	}
+
 	async waitForElementToBeDisplayedById( id, timeout = 2000 ) {
 		return await this.driver.waitForElementByAccessibilityId(
 			id,
@@ -919,6 +942,8 @@ const blockNames = {
 	verse: 'Verse',
 	shortcode: 'Shortcode',
 	group: 'Group',
+	buttons: 'Buttons',
+	button: 'Button',
 };
 
 module.exports = { initializeEditorPage, blockNames };
