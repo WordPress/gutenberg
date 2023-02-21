@@ -15,7 +15,7 @@ import { useMemo } from '@wordpress/element';
 import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 import { unlock } from '../../private-apis';
-const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -38,7 +38,7 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 }
 
 function ScreenDuotone( { name } ) {
-	const [ themeDuotone, setThemeDuotone ] = useGlobalSetting(
+	const [ themeDuotone, setThemeDuotone ] = useGlobalStyle(
 		'filter.duotone',
 		name
 	);

@@ -25,7 +25,9 @@ function ScreenFilters( { name } ) {
 		<>
 			<ScreenHeader
 				title={ __( 'Filters' ) }
-				description={ __( 'TODO description' ) }
+				description={ __(
+					'Filter and effects work without replacing your original image'
+				) }
 			/>
 			<BlockPreviewPanel name={ name } />
 
