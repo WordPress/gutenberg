@@ -70,7 +70,7 @@ export function PageAttributesParent() {
 				}
 
 				return {
-					postIsHierarchical,
+					isHierarchical: postIsHierarchical,
 					parentPostId: pageId,
 					parentPost: pageId
 						? getEntityRecord( 'postType', postTypeSlug, pageId )
