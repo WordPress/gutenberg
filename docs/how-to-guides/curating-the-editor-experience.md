@@ -12,7 +12,11 @@ Users have the ability to lock and unlock blocks via the editor. The locking UI 
 
 ![Image of locking interface](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/Locking%20interface.png?raw=true)
 
-Keep in mind that each block you want to lock will need to be individually locked as desired. There is not a way to mass lock blocks currently. 
+Keep in mind that you can apply the locking options to blocks inside of the initial block you are locking by turning on the "Apply to all blocks inside" option but you cannot mass lock blocks otherwise. 
+
+**Lock the ability to edit certain blocks**
+
+Alongside the ability to lock moving or removing blocks, the [Navigation Block](https://github.com/WordPress/gutenberg/pull/44739) and [Reusable block](https://github.com/WordPress/gutenberg/pull/39950) have an additional capability: lock the ability to edit the contents of the block. This locks the ability to make changes to any blocks inside of either block type. 
 
 **Apply block locking to patterns or templates**
 
@@ -300,11 +304,13 @@ To fully remove patterns bundled with WordPress core from being accessed in the 
 
 ## Utilizing patterns
 
-**Prioritize post content patterns for new pages**
+**Prioritize starter patterns for any post type**
 
-When a user creates a page, they are met with an empty page. However, that experience can be improved thanks to the option to have patterns from a specific type prioritized upon page creation in a modal. The modal appears each time the user creates a new page when there are patterns on their website that declare support for the core/post-content block types. By default, WordPress 6.0  does not include any of these patterns, so the modal will not appear without some of these post content patterns being added.
+When a user creates new content, whether a page or post, they are met with an empty canvas. However, that experience can be improved thanks to the option to have patterns from a specific type prioritized upon creation of a new piece of content. The modal appears each time the user creates a new item when there are patterns on their website that declare support for the core/post-content block types. By default, WordPress does not include any of these patterns, so the modal will not appear without some of these post content patterns being added. 
 
-Read more about this functionality in the [Page creation patterns in WordPress 6.0 dev note](https://make.wordpress.org/core/2022/05/03/page-creation-patterns-in-wordpress-6-0/).
+To opt into this, include core/post-content in the blockTypes for your pattern. [Here's an example of a pattern](https://gist.github.com/annezazu/ead4c4965345251ec999b716c0c84f32) that would appear when creating a new post. 
+
+Read more about this functionality in the [Page creation patterns in WordPress 6.0 dev note](https://make.wordpress.org/core/2022/05/03/page-creation-patterns-in-wordpress-6-0/) and note that WordPress 6.1 brought this functionality to all post types.  
 
 **Lock patterns**
 
@@ -330,3 +336,4 @@ Keep in mind that the above approaches can be combined as you see fit. For examp
 
 - [Builder Basics – Working with Templates in Full Site Editing (Part 3)](https://wordpress.tv/2022/05/24/nick-diego-builder-basics-working-with-templates-in-full-site-editing-part-3/)
 - [Core Editor Improvement: Curated experiences with locking APIs & theme.json](https://make.wordpress.org/core/2022/02/09/core-editor-improvement-curated-experiences-with-locking-apis-theme-json/)
+- [Learn WordPress session on Curating the Editor Experience](https://wordpress.tv/2022/07/22/nick-diego-curating-the-editor-experience/)
