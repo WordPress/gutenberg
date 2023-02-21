@@ -104,3 +104,19 @@ export async function deleteAllMenus( this: RequestUtils ) {
 		);
 	}
 }
+
+/**
+ * Get latest navigation menus
+ *
+ * @return {string} Menu content.
+ */
+export async function getNavigationMenus( this: RequestUtils ) {
+	const navigationMenus = await this.rest< NavigationMenu[] >( {
+		method: 'GET',
+		path: `/wp/v2/navigation/`,
+		data: {
+			status: 'publish',
+		},
+	} );
+	return navigationMenus;
+}
