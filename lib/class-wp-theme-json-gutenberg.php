@@ -1201,14 +1201,15 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 *
-	 * @param string $selector_format   The selector to use for the layout rules with `%s` as a placeholder for the layout rule's selector.
-	 * @param array  $layout_definition The layout definition to get styles for.
-	 * @param string $rules_type		The key for the set of layout rules to use (e.g. 'marginStyles' or 'spacingStyles').
+	 * @param string       $selector_format   The selector to use for the layout rules with `%s` as a placeholder for the layout rule's selector.
+	 * @param array        $layout_definition The layout definition to get styles for.
+	 * @param string       $rules_type        The key for the set of layout rules to use (e.g. 'marginStyles' or 'spacingStyles').
+	 * @param array|string $replacement_value The value to be output where layout rules define a null placeholder value.
 	 * @return string CSS string containing the layout rules.
 	 */
 	protected function construct_layout_rules( $selector_format, $layout_definition, $rules_type, $replacement_value ) {
-		$layout_rules             = _wp_array_get( $layout_definition, array( $rules_type ), array() );
-		$layout_selector_pattern  = '/^[a-zA-Z0-9\-\.\ *+>:\(\)]*$/'; // Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
+		$layout_rules            = _wp_array_get( $layout_definition, array( $rules_type ), array() );
+		$layout_selector_pattern = '/^[a-zA-Z0-9\-\.\ *+>:\(\)]*$/'; // Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
 
 		$block_rules = '';
 
@@ -1227,19 +1228,19 @@ class WP_Theme_JSON_Gutenberg {
 						if ( is_string( $css_value ) ) {
 							if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
 								$declarations[] = array(
-									'name' => $css_property,
+									'name'  => $css_property,
 									'value' => $css_value,
 								);
 							}
 						} elseif ( isset( $replacement_value ) && ! is_array( $replacement_value ) ) {
 							$declarations[] = array(
-								'name' => $css_property,
+								'name'  => $css_property,
 								'value' => $replacement_value,
 							);
 						} elseif ( isset( $replacement_value[ $css_property ] ) ) {
 							if ( static::is_safe_css_declaration( $css_property, $replacement_value[ $css_property ] ) ) {
 								$declarations[] = array(
-									'name' => $css_property,
+									'name'  => $css_property,
 									'value' => $replacement_value[ $css_property ],
 								);
 							}
@@ -1248,7 +1249,7 @@ class WP_Theme_JSON_Gutenberg {
 
 					$layout_selector = sprintf(
 						$selector_format,
-						$layout_rule['selector'],
+						$layout_rule['selector']
 					);
 
 					$block_rules .= static::to_ruleset( $layout_selector, $declarations );
