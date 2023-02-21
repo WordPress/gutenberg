@@ -136,7 +136,7 @@ describe( 'Site Editor Performance', () => {
 		}
 	} );
 
-	it( 'Typing', async () => {
+	it.only( 'Typing', async () => {
 		await page.waitForSelector( '.edit-site-visual-editor', {
 			timeout: 120000,
 		} );

@@ -145,7 +145,7 @@ describe( 'Post Editor Performance', () => {
 		}
 	} );
 
-	it( 'Typing', async () => {
+	it.only( 'Typing', async () => {
 		await loadHtmlIntoTheBlockEditor(
 			readFile( join( __dirname, '../../assets/large-post.html' ) )
 		);
