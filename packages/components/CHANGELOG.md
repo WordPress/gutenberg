@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-  `ToolsPanel`: Separate reset all filter registration from items registration and support global resets ([#48123](https://github.com/WordPress/gutenberg/pull/48123#pullrequestreview-1308386926)).
+
 ## 23.4.0 (2023-02-15)
 
 ### Bug Fix
