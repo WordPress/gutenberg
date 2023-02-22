@@ -36,6 +36,7 @@ import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
+import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 
 function useContentBlocks( blockTypes, block ) {
 	const contentBlocksObjectAux = useMemo( () => {
@@ -56,7 +57,7 @@ function useContentBlocks( blockTypes, block ) {
 		( blockName ) => {
 			return !! contentBlocksObjectAux[ blockName ];
 		},
-		[ blockTypes ]
+		[ contentBlocksObjectAux ]
 	);
 	return useMemo( () => {
 		return getContentBlocks( [ block ], isContentBlock );
@@ -173,43 +174,15 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	const availableTabs = useInspectorControlsTabs( blockType?.name );
 	const showTabs = availableTabs?.length > 1;
 
-	const blockInspectorAnimationSettings = useSelect(
-		( select ) => {
-			if ( blockType ) {
-				const globalBlockInspectorAnimationSettings =
-					select( blockEditorStore ).getSettings()
-						.blockInspectorAnimation;
-
-				// Get the name of the block that will allow it's children to be animated.
-				const animationParent =
-					globalBlockInspectorAnimationSettings?.animationParent;
-
-				// Determine whether the animationParent block is a parent of the selected block.
-				const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-					select( blockEditorStore );
-				const _selectedBlockClientId = getSelectedBlockClientId();
-				const animationParentBlockClientId = getBlockParentsByBlockName(
-					_selectedBlockClientId,
-					animationParent,
-					true
-				)[ 0 ];
-
-				// If the selected block is not a child of the animationParent block,
-				// and not an animationParent block itself, don't animate.
-				if (
-					! animationParentBlockClientId &&
-					blockType.name !== animationParent
-				) {
-					return null;
-				}
-
-				return globalBlockInspectorAnimationSettings?.[
-					blockType.name
-				];
-			}
-			return null;
-		},
-		[ selectedBlockClientId, blockType ]
+	// The block inspector animation settings will be completely
+	// removed in the future to create an API which allows the block
+	// inspector to transition between what it
+	// displays based on the relationship between the selected block
+	// and its parent, and only enable it if the parent is controlling
+	// its children blocks.
+	const blockInspectorAnimationSettings = useBlockInspectorAnimationSettings(
+		blockType,
+		selectedBlockClientId
 	);
 
 	if ( count > 1 ) {
