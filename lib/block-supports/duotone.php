@@ -448,7 +448,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// 3. 'unset' (remove filter).
 	$duotone_attr = $block['attrs']['style']['color']['duotone'];
 
-	$is_duotone_colors_array = is_array( $duotone_attr ) && count( $duotone_attr ) === 2;
+	$is_duotone_colors_array = is_array( $duotone_attr );
 	$is_duotone_unset        = 'unset' === $duotone_attr;
 	$is_duotone_preset       = ! $is_duotone_colors_array && ! $is_duotone_unset;
 
@@ -465,7 +465,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// - an array of colors.
 
 		// Build a unique slug for the filter based on the array of colors.
-		$filter_key      = is_array( $duotone_attr ) ? implode( '-', $duotone_attr ) : $duotone_attr;
+		$filter_key      = $is_duotone_colors_array ? implode( '-', $duotone_attr ) : $duotone_attr;
 		$filter_preset   = array(
 			'slug' => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
 		);
