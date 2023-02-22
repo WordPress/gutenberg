@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useBlockProps, BlockControls } from '@wordpress/block-editor';
 import { __experimentalFetchUrlData } from '@wordpress/core-data';
 import {
@@ -11,40 +11,29 @@ import {
 	Button,
 	ToolbarGroup,
 	ToolbarButton,
+	Notice,
 } from '@wordpress/components';
 import { link, edit } from '@wordpress/icons';
+/**
+ * Internal dependencies
+ */
+import { Content } from './content';
 
 export default function LinkPreviewEdit( props ) {
-	const {
-		attributes: { url, title, icon, image },
-		setAttributes,
-	} = props;
+	const { attributes, setAttributes } = props;
+	const { url, title } = attributes;
 	const [ isFetching, setIsFetching ] = useState( false );
-	const [ isEditingUrl, setIsEditingUrl ] = useState( ! url );
+	const [ isEditingUrl, setIsEditingUrl ] = useState( ! url || ! title );
 	const [ urlValue, setURLValue ] = useState( '' );
+	const [ hasError, setHasError ] = useState( false );
 
 	const blockProps = useBlockProps( {
-		href: url,
-		className: image ? 'has-image' : undefined,
 		onClick: isEditingUrl
 			? undefined
 			: ( event ) => {
 					event.preventDefault();
 			  },
 	} );
-
-	useEffect( () => {
-		if ( url && ! title && ! icon && ! image ) {
-			setIsFetching( true );
-			__experimentalFetchUrlData( url )
-				.then( ( data ) => {
-					setAttributes( data );
-				} )
-				.finally( () => {
-					setIsFetching( false );
-				} );
-		}
-	}, [] );
 
 	if ( isEditingUrl ) {
 		return (
@@ -56,20 +45,33 @@ export default function LinkPreviewEdit( props ) {
 						'Paste a link to the content you want to display on your site.'
 					) }
 				>
+					{ hasError && (
+						<Notice status="error" isDismissible={ false }>
+							{ __( 'No data found for this URL.' ) }
+						</Notice>
+					) }
 					<form
-						onSubmit={ () => {
-							setAttributes( {
-								url: urlValue,
-								title: '',
-								icon: '',
-								image: '',
-								description: '',
-							} );
+						onSubmit={ ( event ) => {
+							event.preventDefault();
+							setHasError( false );
 							setIsFetching( true );
 							__experimentalFetchUrlData( urlValue )
+								.catch( () => {
+									setHasError( true );
+								} )
 								.then( ( data ) => {
-									setAttributes( data );
-									setIsEditingUrl( false );
+									if ( ! data || ! data.title ) {
+										setHasError( true );
+									} else {
+										setAttributes( {
+											url: urlValue,
+											title: data.title,
+											icon: data.icon,
+											image: data.image,
+											description: data.description,
+										} );
+										setIsEditingUrl( false );
+									}
 								} )
 								.finally( () => {
 									setIsFetching( false );
@@ -97,7 +99,7 @@ export default function LinkPreviewEdit( props ) {
 	}
 
 	return (
-		<a { ...blockProps }>
+		<>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
@@ -111,18 +113,7 @@ export default function LinkPreviewEdit( props ) {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			{ image && <img src={ image } alt={ title } /> }
-			<div>
-				{ title && <strong>{ title }</strong> }
-				{ icon && (
-					<img
-						className="link-preview__icon"
-						src={ icon }
-						alt={ new URL( url ).host }
-					/>
-				) }
-				{ title ? new URL( url ).host.replace( /^www\./, '' ) : url }
-			</div>
-		</a>
+			<Content props={ blockProps } attributes={ attributes } />
+		</>
 	);
 }
