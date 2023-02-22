@@ -462,15 +462,26 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	}
 	$selector = implode( ', ', $scoped );
 
-	// !important is needed because these styles render before global styles,
-	// and they should be overriding the duotone filters set by global styles.
-	$filter_style = SCRIPT_DEBUG
-		? $selector . " {\n\tfilter: " . $filter_property . " !important;\n}\n"
-		: $selector . '{filter:' . $filter_property . ' !important;}';
-
-	wp_register_style( $filter_id, false, array(), true, true );
-	wp_add_inline_style( $filter_id, $filter_style );
-	wp_enqueue_style( $filter_id );
+	// Calling gutenberg_style_engine_get_stylesheet_from_css_rules ensures that
+	// the styles are rendered in an inline for block supports because we're
+	// using the `context` option to instruct it so.
+	gutenberg_style_engine_get_stylesheet_from_css_rules(
+		array(
+			array(
+				'selector'     => $selector,
+				'declarations' => array(
+					// !important is needed because these styles
+					// render before global styles,
+					// and they should be overriding the duotone
+					// filters set by global styles.
+					'filter' => $filter_property . ' !important',
+				),
+			),
+		),
+		array(
+			'context' => 'block-supports',
+		)
+	);
 
 	if ( 'unset' !== $colors ) {
 		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_preset );
