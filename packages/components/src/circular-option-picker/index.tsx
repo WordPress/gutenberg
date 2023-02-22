@@ -105,32 +105,6 @@ export function ButtonAction( {
 	);
 }
 
-function CircularOptionPicker( props: CircularOptionPickerProps ) {
-	const { actions, className, options, children } = props;
-	return (
-		<div
-			className={ classnames(
-				'components-circular-option-picker',
-				className
-			) }
-		>
-			<div className="components-circular-option-picker__swatches">
-				{ options }
-			</div>
-			{ children }
-			{ actions && (
-				<div className="components-circular-option-picker__custom-clear-wrapper">
-					{ actions }
-				</div>
-			) }
-		</div>
-	);
-}
-
-CircularOptionPicker.Option = Option;
-CircularOptionPicker.ButtonAction = ButtonAction;
-CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
-
 /**
  *`CircularOptionPicker` is a component that displays a set of options as circular buttons.
  *
@@ -176,5 +150,31 @@ CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
  * };
  * ```
  */
+
+function CircularOptionPicker( props: CircularOptionPickerProps ) {
+	const { actions, className, options, children } = props;
+	return (
+		<div
+			className={ classnames(
+				'components-circular-option-picker',
+				className
+			) }
+		>
+			<div className="components-circular-option-picker__swatches">
+				{ options }
+			</div>
+			{ children }
+			{ actions && (
+				<div className="components-circular-option-picker__custom-clear-wrapper">
+					{ actions }
+				</div>
+			) }
+		</div>
+	);
+}
+
+CircularOptionPicker.Option = Option;
+CircularOptionPicker.ButtonAction = ButtonAction;
+CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
 
 export default CircularOptionPicker;
