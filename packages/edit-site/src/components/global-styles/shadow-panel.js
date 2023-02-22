@@ -167,8 +167,9 @@ function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
 			<Button
 				className="edit-site-global-styles__shadow-indicator"
 				onClick={ onSelect }
-				aria-label={ label }
+				label={ label }
 				style={ { boxShadow: shadow } }
+				showTooltip
 			>
 				{ isActive && <Icon icon={ check } /> }
 			</Button>
