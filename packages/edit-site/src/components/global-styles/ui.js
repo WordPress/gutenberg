@@ -25,7 +25,6 @@ import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
 import ScreenFilters from './screen-filters';
-import ScreenDuotone from './screen-duotone';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackgroundColor from './screen-background-color';
@@ -209,12 +208,6 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/filters' }>
 				<ScreenFilters name={ name } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/filters/duotone' }
-			>
-				<ScreenDuotone name={ name } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/text' }>
