@@ -185,6 +185,16 @@ export function shouldSkipSerialization( blockType, featureSet, feature ) {
 	return skipSerialization;
 }
 
+/**
+ * Based on the block and its context, returns an object of all the block settings.
+ * This object can be passed as a prop to all the Styles UI components
+ * (TypographyPanel, DimensionsPanel...).
+ *
+ * @param {string} name         Block name.
+ * @param {*}      parentLayout Parent layout.
+ *
+ * @return {Object} Settings object.
+ */
 export function useBlockSettings( name, parentLayout ) {
 	const fontFamilies = useSetting( 'typography.fontFamilies' );
 	const fontSizes = useSetting( 'typography.fontSizes' );
