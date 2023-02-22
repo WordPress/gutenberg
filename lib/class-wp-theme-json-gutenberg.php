@@ -2426,6 +2426,9 @@ class WP_Theme_JSON_Gutenberg {
 
 		$block_rules = '';
 
+		// TODO
+		do_action( 'theme_json_register_declarations', $declarations, $selector );
+
 		/*
 		 * 1. Separate the declarations that use the general selector
 		 * from the ones using the duotone selector.
@@ -2433,9 +2436,8 @@ class WP_Theme_JSON_Gutenberg {
 		$declarations_duotone = array();
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
-				static::$duotone_presets[] = $declarations[ $index ]['value'];
-				$declarations_duotone[]  = $declaration;
 				unset( $declarations[ $index ] );
+				$declarations_duotone[]  = $declaration;
 			}
 		}
 
@@ -2709,13 +2711,7 @@ class WP_Theme_JSON_Gutenberg {
 					continue;
 				}
 				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
-					// Get the CSS variable for the preset.
-					$duotone_preset_css_var = $this->get_preset_css_var( array( 'color', 'duotone' ), $duotone_preset['slug'] );
-
-					// Only output the preset if it's used by a block.
-					if ( in_array( $duotone_preset_css_var, static::$duotone_presets, true ) ) {
-						$filters .= wp_get_duotone_filter_svg( $duotone_preset );
-					}
+					$filters .= apply_filters( 'theme_json_get_filter_svg', $duotone_preset );
 				}
 			}
 		}
@@ -2732,8 +2728,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $slug Slug of the preset.
 	 * @return string CSS variable.
 	 */
-	function get_preset_css_var( $path, $slug ) {
-		$duotone_preset_metadata = $this->get_preset_metadata_from_path( $path );
+	public static function get_preset_css_var( $path, $slug ) {
+		$duotone_preset_metadata = static::get_preset_metadata_from_path( $path );
 		return 'var(' . static::replace_slug_in_string( $duotone_preset_metadata['css_vars'], $slug ) . ')';
 	}
 
@@ -2745,7 +2741,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $path Path to the preset.
 	 * @return array Preset metadata.
 	 */
-	function get_preset_metadata_from_path( $path ) {
+	static function get_preset_metadata_from_path( $path ) {
 		$preset_metadata = array_filter(
 			static::PRESETS_METADATA,
 			function( $preset ) use ( &$path ) {

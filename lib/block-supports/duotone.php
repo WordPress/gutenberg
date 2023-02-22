@@ -519,3 +519,44 @@ WP_Block_Supports::get_instance()->register(
 // Remove WordPress core filter to avoid rendering duplicate support elements.
 remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );
+
+class WP_Duotone {
+	/**
+	 * An array of Duotone presets.
+	 *
+	 * @since 6.3.0
+	 * @var array
+	 */
+	static $duotone_presets;
+
+	/**
+	 * Registers the duotone preset.
+	 *
+	 * @param array $settings The block editor settings.
+	 *
+	 * @return array The block editor settings.
+	 */
+	public static function duotone_declarations( $declarations, $selector ) {
+		foreach ( $declarations as $index => $declaration ) {
+			if ( 'filter' === $declaration['name'] ) {
+				static::$duotone_presets[] = $declarations[ $index ]['value'];
+			}
+		}
+	}
+
+	public static function get_filter_svg( $duotone_preset ) {
+		$filters = '';
+		// Get the CSS variable for the preset.
+		$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $duotone_preset['slug'] );
+
+		// Only output the preset if it's used by a block.
+		if ( in_array( $duotone_preset_css_var, WP_Duotone::$duotone_presets, true ) ) {
+			$filters .= wp_get_duotone_filter_svg( $duotone_preset );
+		}
+
+		return $filters;
+	}
+}
+add_action( 'theme_json_register_declarations', array( 'WP_Duotone', 'duotone_declarations' ), 10, 2 );
+
+add_filter( 'theme_json_get_filter_svg', array( 'WP_Duotone', 'get_filter_svg' ), 10, 2 );
