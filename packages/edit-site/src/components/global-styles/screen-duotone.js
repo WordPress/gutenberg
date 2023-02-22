@@ -52,12 +52,8 @@ function ScreenDuotone( { name } ) {
 		presetSetting: 'color.palette',
 		defaultSetting: 'color.defaultPalette',
 	} );
-	const disableCustomColors = ! useSetting( 'color.custom' );
-	const disableCustomDuotone =
-		! useSetting( 'color.customDuotone' ) ||
-		( colorPalette?.length === 0 && disableCustomColors );
 
-	if ( duotonePalette?.length === 0 && disableCustomDuotone ) {
+	if ( duotonePalette?.length === 0 ) {
 		return null;
 	}
 	return (
@@ -72,8 +68,8 @@ function ScreenDuotone( { name } ) {
 					<DuotonePicker
 						colorPalette={ colorPalette }
 						duotonePalette={ duotonePalette }
-						disableCustomColors={ disableCustomColors }
-						disableCustomDuotone={ disableCustomDuotone }
+						disableCustomColors={ true }
+						disableCustomDuotone={ true }
 						value={ themeDuotone }
 						onChange={ setThemeDuotone }
 					/>
