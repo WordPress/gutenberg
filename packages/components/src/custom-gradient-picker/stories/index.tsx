@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CustomGradientPicker from '../';
+import CustomGradientPicker from '..';
 
 export default {
 	title: 'Components/CustomGradientPicker',
