@@ -2271,12 +2271,6 @@ class WP_Theme_JSON_Gutenberg {
 		return $nodes;
 	}
 
-	private function gutenberg_get_preset_slug_from_declaration( $declaration ) {
-		var_dump( $this->theme_json);
-		preg_match('/var\(--wp--preset--duotone--(.*)\)/', $declaration['value'], $matches );
-		return $matches[1];
-	}
-
 	/**
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
