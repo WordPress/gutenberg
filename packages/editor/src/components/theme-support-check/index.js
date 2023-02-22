@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
@@ -23,7 +18,7 @@ export function ThemeSupportCheck( {
 	const isSupported = (
 		Array.isArray( supportKeys ) ? supportKeys : [ supportKeys ]
 	 ).some( ( key ) => {
-		const supported = get( themeSupports, [ key ], false );
+		const supported = themeSupports[ key ] ?? false;
 		// 'post-thumbnails' can be boolean or an array of post types.
 		// In the latter case, we need to verify `postType` exists
 		// within `supported`. If `postType` isn't passed, then the check

@@ -10,7 +10,12 @@ import { ThemeSupportCheck } from '../index';
 
 describe( 'ThemeSupportCheck', () => {
 	it( "should not render if there's no support check provided", () => {
-		render( <ThemeSupportCheck>foobar</ThemeSupportCheck> );
+		const themeSupports = {};
+		render(
+			<ThemeSupportCheck themeSupports={ themeSupports }>
+				foobar
+			</ThemeSupportCheck>
+		);
 		expect( screen.queryByText( 'foobar' ) ).not.toBeInTheDocument();
 	} );
 
