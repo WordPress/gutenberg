@@ -3493,5 +3493,4 @@ class WP_Theme_JSON_Gutenberg {
 
 		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_sizes );
 	}
-
 }
