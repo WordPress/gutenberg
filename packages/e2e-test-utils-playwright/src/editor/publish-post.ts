@@ -7,7 +7,7 @@ import type { Editor } from './index';
  * Publishes the post, resolving once the request is complete (once a notice
  * is displayed).
  *
- * @param {Editor} this
+ * @param this
  */
 export async function publishPost( this: Editor ) {
 	await this.page.click( 'role=button[name="Publish"i]' );

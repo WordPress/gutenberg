@@ -128,8 +128,8 @@ async function rest< RestResponse = any >(
 /**
  * Get the maximum batch size for the REST API.
  *
- * @param {RequestUtils} this
- * @param {boolean?}     forceRefetch Force revalidate the cached max batch size.
+ * @param this
+ * @param forceRefetch Force revalidate the cached max batch size.
  */
 async function getMaxBatchSize( this: RequestUtils, forceRefetch = false ) {
 	if ( ! forceRefetch && this.maxBatchSize ) {
