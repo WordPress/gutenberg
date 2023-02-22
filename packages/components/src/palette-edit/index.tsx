@@ -366,7 +366,7 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 	} = props;
 
 	const isGradient = isGradientPalette( props );
-	const elements = 'colors' in props ? props.colors : props.gradients;
+	const elements = getElements( props );
 	const [ isEditing, setIsEditing ] = useState( false );
 	const [ editingElement, setEditingElement ] = useState<
 		number | null | undefined
