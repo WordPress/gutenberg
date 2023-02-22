@@ -8,6 +8,7 @@ import { render, screen, within } from '@testing-library/react';
  */
 import { useResizeObserver } from '@wordpress/compose';
 import { SVG, Path } from '@wordpress/primitives';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -41,6 +42,9 @@ const Placeholder = (
 
 const getPlaceholder = () => screen.getByTestId( 'placeholder' );
 
+jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+const mockedSpeak = jest.mocked( speak );
+
 describe( 'Placeholder', () => {
 	beforeEach( () => {
 		// @ts-ignore
@@ -48,6 +52,7 @@ describe( 'Placeholder', () => {
 			<div key="1" />,
 			{ width: 320 },
 		] );
+		mockedSpeak.mockReset();
 	} );
 
 	describe( 'basic rendering', () => {
@@ -123,9 +128,22 @@ describe( 'Placeholder', () => {
 					<div>Placeholder content</div>
 				</Placeholder>
 			);
-			const instructionsContainer = screen.getByText( instructions );
+			const placeholder = getPlaceholder();
+			const instructionsContainer =
+				within( placeholder ).getByText( instructions );
 
 			expect( instructionsContainer ).toBeInTheDocument();
+		} );
+
+		it( 'should announce instructions to screen readers', () => {
+			const instructions = 'Awesome block placeholder instructions.';
+			render(
+				<Placeholder instructions={ instructions }>
+					<div>Placeholder content</div>
+				</Placeholder>
+			);
+
+			expect( speak ).toHaveBeenCalledWith( instructions );
 		} );
 
 		it( 'should add an additional className to the top container', () => {

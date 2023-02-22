@@ -6,9 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useResizeObserver, useDebounce } from '@wordpress/compose';
+import { useResizeObserver } from '@wordpress/compose';
 import { SVG, Path } from '@wordpress/primitives';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -83,21 +83,14 @@ export function Placeholder< IconProps = unknown >(
 		'is-column-layout': isColumnLayout,
 	} );
 
-	const debouncedSpeak = useDebounce( speak, 100 );
-	const [ isInitialFocus, setIsInitialFocus ] = useState( false );
-
 	useEffect( () => {
-		if ( instructions && isInitialFocus ) {
-			debouncedSpeak( instructions );
+		if ( instructions ) {
+			speak( instructions );
 		}
-	}, [ instructions, debouncedSpeak, isInitialFocus ] );
+	}, [ instructions ] );
 
 	return (
-		<div
-			{ ...additionalProps }
-			className={ classes }
-			onFocus={ () => setIsInitialFocus( true ) }
-		>
+		<div { ...additionalProps } className={ classes }>
 			{ withIllustration ? PlaceholderIllustration : null }
 			{ resizeListener }
 			{ notices }
