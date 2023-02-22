@@ -175,7 +175,7 @@ test.describe( 'List (@firefox)', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
 
-	test( 'should not undo asterisk transform with backspace after selection change', async ( {
+	test( 'should not undo asterisk transform with backspace after selection change (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {

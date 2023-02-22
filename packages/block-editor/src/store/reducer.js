@@ -1761,29 +1761,6 @@ export function lastBlockAttributesChange( state = null, action ) {
 }
 
 /**
- * Reducer returning automatic change state.
- *
- * @param {?string} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {string | undefined} Updated state.
- */
-export function automaticChangeStatus( state, action ) {
-	switch ( action.type ) {
-		case 'MARK_AUTOMATIC_CHANGE':
-			return 'pending';
-		case 'MARK_AUTOMATIC_CHANGE_FINAL':
-			if ( state === 'pending' ) {
-				return 'final';
-			}
-
-			return;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning current highlighted block.
  *
  * @param {boolean} state  Current highlighted block.
@@ -1875,7 +1852,6 @@ const combinedReducers = combineReducers( {
 	lastBlockAttributesChange,
 	editorMode,
 	hasBlockMovingClientId,
-	automaticChangeStatus,
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
@@ -1890,6 +1866,28 @@ function withAutomaticChangeReset( reducer ) {
 			return nextState;
 		}
 
+		// Take over the last value without creating a new reference.
+		nextState.automaticChangeStatus = state.automaticChangeStatus;
+
+		if ( action.type === 'MARK_AUTOMATIC_CHANGE' ) {
+			return {
+				...nextState,
+				automaticChangeStatus: 'pending',
+			};
+		}
+
+		if (
+			action.type === 'MARK_AUTOMATIC_CHANGE_FINAL' &&
+			state.automaticChangeStatus === 'pending'
+		) {
+			return {
+				...nextState,
+				automaticChangeStatus: 'final',
+			};
+		}
+
+		// If there's a change that doesn't affect blocks or selection, maintain
+		// the current status.
 		if (
 			nextState.blocks === state.blocks &&
 			nextState.selection === state.selection
@@ -1897,6 +1895,7 @@ function withAutomaticChangeReset( reducer ) {
 			return nextState;
 		}
 
+		// As long as the state is not final, ignore any selection changes.
 		if (
 			nextState.automaticChangeStatus !== 'final' &&
 			nextState.selection !== state.selection
@@ -1904,6 +1903,7 @@ function withAutomaticChangeReset( reducer ) {
 			return nextState;
 		}
 
+		// Reset the status if blocks change or selection changes (when status is final).
 		return {
 			...nextState,
 			automaticChangeStatus: undefined,
