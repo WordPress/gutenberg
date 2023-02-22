@@ -13,7 +13,7 @@ describe( 'Front End Performance', () => {
 	const results = {
 		timeToFirstByte: [],
 		largestContentfulPaint: [],
-		lcpMinusTTFB: [],
+		lcpMinusTtfb: [],
 	};
 
 	beforeAll( async () => {
@@ -76,7 +76,7 @@ describe( 'Front End Performance', () => {
 
 			results.largestContentfulPaint.push( lcp );
 			results.timeToFirstByte.push( ttfb );
-			results.lcpMinusTTFB.push( lcp - ttfb );
+			results.lcpMinusTtfb.push( lcp - ttfb );
 		}
 	} );
 } );
