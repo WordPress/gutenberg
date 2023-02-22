@@ -257,6 +257,8 @@ const withDuotoneStyles = createHigherOrderComponent(
 			defaultSetting: 'color.defaultDuotone',
 		} );
 
+		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
+
 		let colors = props?.attributes?.style?.color?.duotone;
 
 		if ( ! Array.isArray( colors ) ) {
@@ -270,8 +272,6 @@ const withDuotoneStyles = createHigherOrderComponent(
 		if ( ! duotoneSupport || ! colors ) {
 			return <BlockListBlock { ...props } />;
 		}
-
-		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
 
 		// Extra .editor-styles-wrapper specificity is needed in the editor
 		// since we're not using inline styles to apply the filter. We need to
