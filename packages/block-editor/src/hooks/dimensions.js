@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
@@ -42,9 +42,26 @@ function useVisualizer() {
 	return [ property, setProperty ];
 }
 
-function DimensionsInspectorControl( { children } ) {
+function DimensionsInspectorControl( { children, resetAllFilter } ) {
+	const attributesResetAllFilter = useCallback(
+		( attributes ) => {
+			const existingStyle = attributes.style;
+			const updatedStyle = resetAllFilter( existingStyle );
+			return {
+				...attributes,
+				style: updatedStyle,
+			};
+		},
+		[ resetAllFilter ]
+	);
+
 	return (
-		<InspectorControls group="dimensions">{ children }</InspectorControls>
+		<InspectorControls
+			group="dimensions"
+			resetAllFilter={ attributesResetAllFilter }
+		>
+			{ children }
+		</InspectorControls>
 	);
 }
 

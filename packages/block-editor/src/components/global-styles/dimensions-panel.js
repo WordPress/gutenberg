@@ -18,6 +18,7 @@ import {
 	__experimentalView as View,
 } from '@wordpress/components';
 import { Icon, layout, positionCenter, stretchWide } from '@wordpress/icons';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -157,8 +158,27 @@ function splitGapValue( value ) {
 	return value;
 }
 
-function DimensionsToolsPanel( props ) {
-	return <ToolsPanel label={ __( 'Dimensions' ) } { ...props } />;
+function DimensionsToolsPanel( {
+	resetAllFilter,
+	onChange,
+	value,
+	panelId,
+	children,
+} ) {
+	const resetAll = () => {
+		const updatedValue = resetAllFilter( value );
+		onChange( updatedValue );
+	};
+
+	return (
+		<ToolsPanel
+			label={ __( 'Dimensions' ) }
+			resetAll={ resetAll }
+			panelId={ panelId }
+		>
+			{ children }
+		</ToolsPanel>
+	);
 }
 
 const DEFAULT_CONTROLS = {
@@ -351,32 +371,38 @@ export default function DimensionsPanel( {
 	};
 	const hasChildLayoutValue = () => !! value?.layout;
 
-	const resetAll = () => {
-		onChange( {
-			...value,
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
 			layout: cleanEmptyObject( {
-				...value?.layout,
+				...previousValue?.layout,
 				contentSize: undefined,
 				wideSize: undefined,
 				selfStretch: undefined,
 				flexSize: undefined,
 			} ),
 			spacing: {
-				...value?.spacing,
+				...previousValue?.spacing,
 				padding: undefined,
 				margin: undefined,
 				blockGap: undefined,
 			},
 			dimensions: {
-				...value?.dimensions,
+				...previousValue?.dimensions,
 				minHeight: undefined,
 			},
-		} );
-	};
+		};
+	}, [] );
+
 	const onMouseLeaveControls = () => onVisualize( false );
 
 	return (
-		<Wrapper resetAll={ resetAll }>
+		<Wrapper
+			resetAllFilter={ resetAllFilter }
+			value={ value }
+			onChange={ onChange }
+			panelId={ panelId }
+		>
 			{ ( showContentSizeControl || showWideSizeControl ) && (
 				<span className="span-columns">
 					{ __( 'Set the width of the main content area.' ) }
