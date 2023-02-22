@@ -25,7 +25,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
 import BlockEditor from '../block-editor';
 import CodeEditor from '../code-editor';
-import KeyboardShortcuts from '../keyboard-shortcuts';
+import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import WelcomeGuide from '../welcome-guide';
@@ -151,7 +151,6 @@ export default function Editor() {
 	return (
 		<>
 			{ isEditMode && <WelcomeGuide /> }
-			<KeyboardShortcuts.Register />
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
 					kind="postType"
@@ -188,7 +187,9 @@ export default function Editor() {
 												) }
 											</Notice>
 										) }
-										{ isEditMode && <KeyboardShortcuts /> }
+										{ isEditMode && (
+											<KeyboardShortcutsEditMode />
+										) }
 									</>
 								}
 								secondarySidebar={

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -52,11 +47,9 @@ export function PageAttributes() {
 	return (
 		<PageAttributesCheck>
 			<PanelBody
-				title={ get(
-					postType,
-					[ 'labels', 'attributes' ],
-					__( 'Page attributes' )
-				) }
+				title={
+					postType?.labels?.attributes ?? __( 'Page attributes' )
+				}
 				opened={ isOpened }
 				onToggle={ onTogglePanel }
 			>

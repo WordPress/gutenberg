@@ -147,7 +147,7 @@ describe( 'Site Editor Performance', () => {
 			'[data-type="core/post-content"] [data-type="core/paragraph"]'
 		);
 		await enterEditMode();
-		await canvas().click(
+		await canvas().focus(
 			'[data-type="core/post-content"] [data-type="core/paragraph"]'
 		);
 		await insertBlock( 'Paragraph' );

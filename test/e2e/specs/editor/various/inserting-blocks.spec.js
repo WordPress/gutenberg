@@ -328,7 +328,7 @@ test.describe( 'insert media from inserter', () => {
 		);
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
-		Promise.all( [
+		await Promise.all( [
 			requestUtils.deleteAllMedia(),
 			requestUtils.deleteAllPosts(),
 		] );

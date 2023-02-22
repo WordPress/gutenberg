@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHStack as HStack,
-	Icon,
-	Tooltip,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -20,62 +16,47 @@ import {
 	plugins as pluginIcon,
 	globe as globeIcon,
 } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
 
-function CustomizedTooltip( { isCustomized, children } ) {
-	if ( ! isCustomized ) {
-		return children;
-	}
-
-	return (
-		<Tooltip text={ __( 'This template has been customized' ) }>
-			{ children }
-		</Tooltip>
-	);
-}
-
-function BaseAddedBy( { text, icon, imageUrl, isCustomized } ) {
+function BaseAddedBy( { text, icon, imageUrl, isCustomized, templateType } ) {
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 
 	return (
 		<HStack alignment="left">
-			<CustomizedTooltip isCustomized={ isCustomized }>
-				{ imageUrl ? (
-					<div
-						className={ classnames(
-							'edit-site-list-added-by__avatar',
-							{
-								'is-loaded': isImageLoaded,
-							}
-						) }
-					>
-						<img
-							onLoad={ () => setIsImageLoaded( true ) }
-							alt=""
-							src={ imageUrl }
-						/>
-					</div>
-				) : (
-					<div
-						className={ classnames(
-							'edit-site-list-added-by__icon',
-							{
-								'is-customized': isCustomized,
-							}
-						) }
-					>
-						<Icon icon={ icon } />
-					</div>
+			{ imageUrl ? (
+				<div
+					className={ classnames( 'edit-site-list-added-by__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
+				>
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt=""
+						src={ imageUrl }
+					/>
+				</div>
+			) : (
+				<div className="edit-site-list-added-by__icon">
+					<Icon icon={ icon } />
+				</div>
+			) }
+			<span>
+				{ text }
+				{ isCustomized && (
+					<span className="edit-site-list-added-by__customized-info">
+						{ templateType === 'wp_template'
+							? _x( 'Customized', 'template' )
+							: _x( 'Customized', 'template part' ) }
+					</span>
 				) }
-			</CustomizedTooltip>
-			<span>{ text }</span>
+			</span>
 		</HStack>
 	);
 }
 
-function AddedByTheme( { slug, isCustomized } ) {
+function AddedByTheme( { slug, isCustomized, templateType } ) {
 	const theme = useSelect(
 		( select ) => select( coreStore ).getTheme( slug ),
 		[ slug ]
@@ -86,11 +67,12 @@ function AddedByTheme( { slug, isCustomized } ) {
 			icon={ themeIcon }
 			text={ theme?.name?.rendered || slug }
 			isCustomized={ isCustomized }
+			templateType={ templateType }
 		/>
 	);
 }
 
-function AddedByPlugin( { slug, isCustomized } ) {
+function AddedByPlugin( { slug, isCustomized, templateType } ) {
 	const plugin = useSelect(
 		( select ) => select( coreStore ).getPlugin( slug ),
 		[ slug ]
@@ -101,11 +83,12 @@ function AddedByPlugin( { slug, isCustomized } ) {
 			icon={ pluginIcon }
 			text={ plugin?.name || slug }
 			isCustomized={ isCustomized }
+			templateType={ templateType }
 		/>
 	);
 }
 
-function AddedByAuthor( { id } ) {
+function AddedByAuthor( { id, templateType } ) {
 	const user = useSelect(
 		( select ) => select( coreStore ).getUser( id ),
 		[ id ]
@@ -116,11 +99,12 @@ function AddedByAuthor( { id } ) {
 			icon={ authorIcon }
 			imageUrl={ user?.avatar_urls?.[ 48 ] }
 			text={ user?.nickname }
+			templateType={ templateType }
 		/>
 	);
 }
 
-function AddedBySite() {
+function AddedBySite( { templateType } ) {
 	const { name, logoURL } = useSelect( ( select ) => {
 		const { getEntityRecord, getMedia } = select( coreStore );
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
@@ -134,7 +118,12 @@ function AddedBySite() {
 	}, [] );
 
 	return (
-		<BaseAddedBy icon={ globeIcon } imageUrl={ logoURL } text={ name } />
+		<BaseAddedBy
+			icon={ globeIcon }
+			imageUrl={ logoURL }
+			text={ name }
+			templateType={ templateType }
+		/>
 	);
 }
 
@@ -158,6 +147,7 @@ export default function AddedBy( { templateType, template } ) {
 				<AddedByTheme
 					slug={ template.theme }
 					isCustomized={ template.source === 'custom' }
+					templateType={ templateType }
 				/>
 			);
 		}
@@ -168,6 +158,7 @@ export default function AddedBy( { templateType, template } ) {
 				<AddedByPlugin
 					slug={ template.theme }
 					isCustomized={ template.source === 'custom' }
+					templateType={ templateType }
 				/>
 			);
 		}
@@ -180,11 +171,13 @@ export default function AddedBy( { templateType, template } ) {
 			template.source === 'custom' &&
 			! template.author
 		) {
-			return <AddedBySite />;
+			return <AddedBySite templateType={ templateType } />;
 		}
 	}
 
 	// Simply show the author for templates created from scratch that have an
 	// author or for any other post type.
-	return <AddedByAuthor id={ template.author } />;
+	return (
+		<AddedByAuthor id={ template.author } templateType={ templateType } />
+	);
 }
