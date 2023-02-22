@@ -117,7 +117,7 @@ function ColorPickerPopover( {
 			className="components-palette-edit__popover"
 			onClose={ onClose }
 		>
-			{ ! isGradient && ! getIsGradient( element ) && (
+			{ ! isGradient && 'color' in element && (
 				<ColorPicker
 					color={ element.color }
 					enableAlpha
@@ -316,7 +316,10 @@ function PaletteEditListView( {
 						onRemove={ () => {
 							setEditingElement( null );
 							const newElements = elements.filter(
-								( _currentElement: typeof elements[ number ], currentIndex: number ) => {
+								(
+									_currentElement: typeof elements[ number ],
+									currentIndex: number
+								) => {
 									if ( currentIndex === index ) {
 										return false;
 									}
@@ -341,13 +344,13 @@ function PaletteEditListView( {
 	);
 }
 
-function getElements(props: PaletteEditProps) {
-	return isGradientPalette( props )
-		? props.gradients
-		: props.colors;
+function getElements( props: PaletteEditProps ) {
+	return isGradientPalette( props ) ? props.gradients : props.colors;
 }
 
-function isGradientPalette( props: PaletteEditProps ): props is PaletteEditGradientsProps {
+function isGradientPalette(
+	props: PaletteEditProps
+): props is PaletteEditGradientsProps {
 	return 'gradients' in props;
 }
 
@@ -363,7 +366,7 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 	} = props;
 
 	const isGradient = isGradientPalette( props );
-	const elements = getElements( props );
+	const elements = 'colors' in props ? props.colors : props.gradients;
 	const [ isEditing, setIsEditing ] = useState( false );
 	const [ editingElement, setEditingElement ] = useState<
 		number | null | undefined
@@ -562,10 +565,15 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 						<ColorPickerPopover
 							isGradient={ isGradient }
 							onClose={ () => setEditingElement( null ) }
-							onChange={ ( newElement: typeof elements[ number ] ) => {
+							onChange={ (
+								newElement: typeof elements[ number ]
+							) => {
 								debounceOnChange(
 									elements.map(
-										( currentElement, currentIndex ) => {
+										(
+											currentElement: typeof elements[ number ],
+											currentIndex: number
+										) => {
 											if (
 												currentIndex === editingElement
 											) {
