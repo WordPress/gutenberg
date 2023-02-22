@@ -445,14 +445,29 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$colors          = $block['attrs']['style']['color']['duotone'];
-	$filter_key      = is_array( $colors ) ? implode( '-', $colors ) : $colors;
-	$filter_preset   = array(
-		'slug'   => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
-		'colors' => $colors,
-	);
-	$filter_property = gutenberg_get_duotone_filter_property( $filter_preset );
-	$filter_id       = gutenberg_get_duotone_filter_id( $filter_preset );
+	// Possible values for duotone attribute:
+	// 1. array('#000000', '#ffffff')
+	// 2. 'preset-slug'
+	// 3. 'unset' (remove filter)
+	$duotone_attr = $block['attrs']['style']['color']['duotone'];
+
+	if ( ! is_array( $duotone_attr ) && $duotone_attr !== 'unset' ) {
+		// If we have a preset slug we need to fetch the details for that preset.
+		$filter_preset   = array(
+			'slug' => $duotone_attr,
+		);
+		$filter_property = "var(--wp--preset--duotone--$duotone_attr)";
+	} else {
+		// If we have an array of colors not a preset slug.
+		$filter_key      = is_array( $duotone_attr ) ? implode( '-', $duotone_attr ) : $duotone_attr;
+		$filter_preset   = array(
+			'slug'   => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
+			'colors' => $duotone_attr,
+		);
+		$filter_property = gutenberg_get_duotone_filter_property( $filter_preset );
+	}
+
+	$filter_id = gutenberg_get_duotone_filter_id( $filter_preset );
 
 	$scope     = '.' . $filter_id;
 	$selectors = explode( ',', $duotone_support );
@@ -483,7 +498,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		)
 	);
 
-	if ( 'unset' !== $colors ) {
+	if ( is_array( $duotone_attr ) ) {
 		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_preset );
 		add_action(
 			'wp_footer',
