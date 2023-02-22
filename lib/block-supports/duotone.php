@@ -453,22 +453,33 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$is_duotone_preset       = ! $is_duotone_colors_array && ! $is_duotone_unset;
 
 	if ( $is_duotone_preset ) {
-		// If we have a preset slug we need to fetch the details for that preset.
 		$filter_preset   = array(
 			'slug' => $duotone_attr,
 		);
+
+		// Utilise existing CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$duotone_attr)";
 	} else {
-		// If we have an array of colors not a preset slug.
+		// Handle when Duotone is either:
+		// - "unset"
+		// - an array of colors.
+
+		// Build a unique slug for the filter based on the array of colors.
 		$filter_key      = is_array( $duotone_attr ) ? implode( '-', $duotone_attr ) : $duotone_attr;
 		$filter_preset   = array(
 			'slug' => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
 		);
+
+		// Build a customised CSS filter property for unique slug.
 		$filter_property = $is_duotone_unset ? 'none' : gutenberg_get_duotone_filter_property( $filter_preset );
 	}
 
+	// - Applied as a class attribute to the block wrapper.
+	// - Used as a selector to apply the filter to the block.
 	$filter_id = gutenberg_get_duotone_filter_id( $filter_preset );
 
+	// Build the CSS selectors to which the filter will be applied.
+	// Todo - encapsulate this in a function.
 	$scope     = '.' . $filter_id;
 	$selectors = explode( ',', $duotone_support );
 	$scoped    = array();
