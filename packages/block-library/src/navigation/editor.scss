@@ -560,7 +560,7 @@ body.editor-styles-wrapper
 // Space spinner to give it breathing
 // room when block is selected and has focus outline.
 .wp-block-navigation .components-spinner {
-	padding: $grid-unit-10 $grid-unit-15;
+	margin: $grid-unit-10 $grid-unit-15;
 }
 
 .wp-block-navigation .wp-block-navigation__uncontrolled-inner-blocks-loading-indicator {
