@@ -77,7 +77,10 @@ add_action( 'set_current_user', 'gutenberg_override_core_kses_init_filters' );
  * @param string $css_test_string The CSS to test.
  */
 function allow_filter_in_styles( $allow_css, $css_test_string ) {
-	if ( strpos( $css_test_string, "filter: url('#wp-duotone" ) !== false ) {
+	if ( preg_match(
+		"/^filter: url\('#wp-duotone-[-a-zA-Z0-9]+'\) \!important$/",
+		$css_test_string
+	) ) {
 		return true;
 	}
 	return $allow_css;

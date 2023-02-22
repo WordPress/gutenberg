@@ -462,13 +462,18 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	}
 	$selector = implode( ', ', $scoped );
 
-	// !important is needed because these styles render before global styles,
-	// and they should be overriding the duotone filters set by global styles.
+	// Calling gutenberg_style_engine_get_stylesheet_from_css_rules ensures that
+	// the styles are rendered in an inline for block supports because we're
+	// useing the `context` option to instruct it so.
 	gutenberg_style_engine_get_stylesheet_from_css_rules(
 		array(
 			array(
 				'selector'     => $selector,
 				'declarations' => array(
+					// !important is needed because these styles
+					// render before global styles,
+					// and they should be overriding the duotone
+					// filters set by global styles.
 					'filter' => $filter_property . ' !important',
 				),
 			),
