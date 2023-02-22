@@ -332,7 +332,7 @@ export const getEntityRecord = createSelector(
 			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
 			for ( let f = 0; f < fields.length; f++ ) {
 				const field = fields[ f ].split( '.' );
-				let value = { ...item };
+				let value = item;
 				field.forEach( ( fieldName ) => {
 					value = value[ fieldName ];
 				} );
