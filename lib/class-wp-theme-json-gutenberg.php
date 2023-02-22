@@ -2272,6 +2272,7 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	private function gutenberg_get_preset_slug_from_declaration( $declaration ) {
+		var_dump( $this->theme_json);
 		preg_match('/var\(--wp--preset--duotone--(.*)\)/', $declaration['value'], $matches );
 		return $matches[1];
 	}
@@ -2435,8 +2436,7 @@ class WP_Theme_JSON_Gutenberg {
 		$declarations_duotone = array();
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
-				$filter_preset_slug = $this->gutenberg_get_preset_slug_from_declaration( $declarations[ $index ] );
-				self::$duotone_presets[] = $filter_preset_slug;
+				self::$duotone_presets[] = $declarations[ $index ]['value'];
 				$declarations_duotone[] = $declaration;
 				unset( $declarations[ $index ] );
 			}
@@ -2712,7 +2712,11 @@ class WP_Theme_JSON_Gutenberg {
 					continue;
 				}
 				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
-					if ( in_array( $duotone_preset['slug'], self::$duotone_presets ) ) {
+					// Get the CSS variable for the preset.
+					$duotone_preset_css_var = $this->get_preset_css_var( array( 'color', 'duotone' ), $duotone_preset['slug'] );
+
+					// Only output the preset if it's used by a block.
+					if ( in_array( $duotone_preset_css_var, self::$duotone_presets ) ) {
 						$filters .= wp_get_duotone_filter_svg( $duotone_preset );
 					}
 				}
@@ -2720,6 +2724,38 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $filters;
+	}
+
+	/**
+	 * Returns the CSS variable for a preset.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param array  $path Path to the preset.
+	 * @param string $slug Slug of the preset.
+	 * @return string CSS variable.
+	 */
+	function get_preset_css_var( $path, $slug ) {
+		$duotone_preset_metadata = $this->get_preset_metadata_from_path( $path );
+		return 'var(' . static::replace_slug_in_string( $duotone_preset_metadata['css_vars'], $slug ) .')';
+	}
+
+	/**
+	 * Returns the metadata for a preset.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param array $path Path to the preset.
+	 * @return array Preset metadata.
+	 */
+	function get_preset_metadata_from_path( $path ) {
+		$preset_metadata = array_filter( static::PRESETS_METADATA, function( $preset ) use ( &$path ) {
+			if ( $preset['path'] === $path ) {
+				return $preset;
+			}
+		} );
+
+		return reset($preset_metadata);
 	}
 
 	/**
