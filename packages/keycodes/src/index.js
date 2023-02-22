@@ -151,7 +151,7 @@ export { isAppleOS };
 /**
  * Map the values of an object with a specified callback and return the result object.
  *
- * @template T
+ * @template {{ [s: string]: any; } | ArrayLike<any>} T
  *
  * @param {T}                     object Object to map values of.
  * @param {( value: any ) => any} mapFn  Mapping function

@@ -33,7 +33,7 @@ type BaseButtonProps = {
 	/**
 	 * If provided, renders an Icon component inside the button.
 	 */
-	icon?: IconProps< unknown >[ 'icon' ];
+	icon?: IconProps< {} >[ 'icon' ];
 	/**
 	 * If provided with `icon`, sets the position of icon relative to the `text`.
 	 *
@@ -45,7 +45,7 @@ type BaseButtonProps = {
 	 * Please refer to the Icon component for more details regarding
 	 * the default value of its `size` prop.
 	 */
-	iconSize?: IconProps< unknown >[ 'size' ];
+	iconSize?: IconProps< {} >[ 'size' ];
 	/**
 	 * Indicates activity while a action is being performed.
 	 */

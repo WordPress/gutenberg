@@ -20,9 +20,12 @@ import { SVG } from '@wordpress/primitives';
 import Dashicon from '../dashicon';
 import type { IconKey as DashiconIconKey } from '../dashicon/types';
 
-export type IconType< P > = DashiconIconKey | ComponentType< P > | JSX.Element;
+export type IconType< P extends {} > =
+	| DashiconIconKey
+	| ComponentType< P >
+	| JSX.Element;
 
-interface BaseProps< P > {
+interface BaseProps< P extends {} > {
 	/**
 	 * The icon to render. Supported values are: Dashicons (specified as
 	 * strings), functions, Component instances and `null`.
@@ -44,9 +47,10 @@ type AdditionalProps< T > = T extends ComponentType< infer U >
 	? SVGProps< SVGSVGElement >
 	: {};
 
-export type Props< P > = BaseProps< P > & AdditionalProps< IconType< P > >;
+export type Props< P extends {} > = BaseProps< P > &
+	AdditionalProps< IconType< P > >;
 
-function Icon< P >( {
+function Icon< P extends {} >( {
 	icon = null,
 	size = 'string' === typeof icon ? 20 : 24,
 	...additionalProps
