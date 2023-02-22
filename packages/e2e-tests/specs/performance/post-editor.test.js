@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { basename, join } from 'path';
-import { writeFileSync } from 'fs';
+import { mkdirSync, readdirSync, writeFileSync } from 'fs';
 
 /**
  * WordPress dependencies
@@ -23,7 +23,6 @@ import {
  */
 import {
 	readFile,
-	deleteFile,
 	getTypingEventDurations,
 	getClickEventDurations,
 	getHoverEventDurations,
@@ -77,7 +76,20 @@ describe( 'Post Editor Performance', () => {
 		inserterHover: [],
 		inserterSearch: [],
 	};
-	const traceFile = __dirname + '/trace.json';
+	/** @param {string} testName descriptive name for test to identify results file. */
+	const traceFilename = ( testName ) => {
+		const baseDir = join( __dirname, 'traces' );
+		mkdirSync( baseDir, { recursive: true } );
+
+		const suiteName = basename( __filename, '.test.js' );
+		const baseName = join( baseDir, `${ suiteName }-${ testName }` );
+
+		const existingCount = readdirSync( baseDir, 'utf8' ).filter(
+			( file ) => file.indexOf( baseName ) >= 0
+		).length;
+
+		return `${ baseName }-${ existingCount + 1 }.trace.json`;
+	};
 	let traceResults;
 
 	afterAll( async () => {
@@ -86,7 +98,6 @@ describe( 'Post Editor Performance', () => {
 			join( __dirname, resultsFilename ),
 			JSON.stringify( results, null, 2 )
 		);
-		deleteFile( traceFile );
 	} );
 
 	beforeEach( async () => {
@@ -151,6 +162,7 @@ describe( 'Post Editor Performance', () => {
 		);
 		await insertBlock( 'Paragraph' );
 		let i = 20;
+		const traceFile = traceFilename( 'type' );
 		await page.tracing.start( {
 			path: traceFile,
 			screenshots: false,
@@ -200,6 +212,7 @@ describe( 'Post Editor Performance', () => {
 		await page.keyboard.type( 'x' );
 
 		let i = 10;
+		const traceFile = traceFilename( 'typeContainer' );
 		await page.tracing.start( {
 			path: traceFile,
 			screenshots: false,
@@ -235,6 +248,7 @@ describe( 'Post Editor Performance', () => {
 	it( 'Selecting blocks', async () => {
 		await load1000Paragraphs();
 		const paragraphs = await canvas().$$( '.wp-block' );
+		const traceFile = traceFilename( 'selectBlocks' );
 		await page.tracing.start( {
 			path: traceFile,
 			screenshots: false,
@@ -256,6 +270,7 @@ describe( 'Post Editor Performance', () => {
 	it( 'Opening persistent list view', async () => {
 		await load1000Paragraphs();
 		for ( let j = 0; j < 10; j++ ) {
+			const traceFile = traceFilename( 'openListView' );
 			await page.tracing.start( {
 				path: traceFile,
 				screenshots: false,
@@ -275,6 +290,7 @@ describe( 'Post Editor Performance', () => {
 	it( 'Opening the inserter', async () => {
 		await load1000Paragraphs();
 		for ( let j = 0; j < 10; j++ ) {
+			const traceFile = traceFilename( 'openInserter' );
 			await page.tracing.start( {
 				path: traceFile,
 				screenshots: false,
@@ -301,6 +317,7 @@ describe( 'Post Editor Performance', () => {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 500 );
+			const traceFile = traceFilename( 'searchInserter' );
 			await page.tracing.start( {
 				path: traceFile,
 				screenshots: false,
@@ -340,6 +357,7 @@ describe( 'Post Editor Performance', () => {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 200 );
+			const traceFile = traceFilename( 'hoverInserter' );
 			await page.tracing.start( {
 				path: traceFile,
 				screenshots: false,
