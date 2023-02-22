@@ -29,14 +29,8 @@ import type {
 // For Multiple Origin Gradients, the `gradients` property is an array of
 // objects, each with a `name` property and an internal `gradients` property,
 // which is the array of Gradient objects.
-const isMultipleOrigin = ( arr: GradientsProp ) => {
-	// NTS: We can't use `Array.every` here because of a TS bug https://github.com/microsoft/TypeScript/issues/44373
-	let allElementsAreOrigins;
-	for ( const gradientObj of arr ) {
-		allElementsAreOrigins = 'gradients' in gradientObj;
-		if ( ! allElementsAreOrigins ) break;
-	}
-	return arr !== undefined && arr.length > 0 && allElementsAreOrigins;
+const isMultipleOrigin = ( arr: GradientsProp ): arr is OriginObject[] => {
+	return ( arr as any[] ).every( ( obj ) => 'gradients' in obj );
 };
 
 function SingleOrigin( {
@@ -118,6 +112,13 @@ function MultipleOrigin( {
 	);
 }
 
+function Component( props: PickerProps< any > ) {
+	if ( isMultipleOrigin( props.gradients ) ) {
+		return <MultipleOrigin { ...props } />;
+	}
+	return <SingleOrigin { ...props } />;
+}
+
 export default function GradientPicker( {
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMargin = false,
@@ -134,9 +135,6 @@ export default function GradientPicker( {
 		() => onChange( undefined ),
 		[ onChange ]
 	);
-	const Component = isMultipleOrigin( gradients )
-		? MultipleOrigin
-		: SingleOrigin;
 
 	if ( ! __nextHasNoMargin ) {
 		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
