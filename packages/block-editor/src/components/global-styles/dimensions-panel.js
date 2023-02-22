@@ -18,7 +18,7 @@ import {
 	__experimentalView as View,
 } from '@wordpress/components';
 import { Icon, layout, positionCenter, stretchWide } from '@wordpress/icons';
-import { useCallback } from '@wordpress/element';
+import { useCallback, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -41,13 +41,14 @@ export function useHasDimensionsPanel( settings ) {
 	const hasChildLayout = useHasChildLayout( settings );
 
 	return (
-		hasContentSize ||
-		hasWideSize ||
-		hasPadding ||
-		hasMargin ||
-		hasGap ||
-		hasMinHeight ||
-		hasChildLayout
+		Platform.OS === 'web' &&
+		( hasContentSize ||
+			hasWideSize ||
+			hasPadding ||
+			hasMargin ||
+			hasGap ||
+			hasMinHeight ||
+			hasChildLayout )
 	);
 }
 
