@@ -13,6 +13,7 @@ export { metadata, name };
 export const settings = {
 	icon,
 	edit,
+	example: {},
 	deprecated,
 };
 
