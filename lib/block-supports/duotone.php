@@ -451,7 +451,10 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// 3. 'unset' (remove filter)
 	$duotone_attr = $block['attrs']['style']['color']['duotone'];
 
-	if ( ! is_array( $duotone_attr ) && $duotone_attr !== 'unset' ) {
+	$is_duotone_colors_array = is_array( $duotone_attr ) && count( $duotone_attr ) === 2;
+	$is_duotone_unset        = $duotone_attr === 'unset';
+
+	if ( ! $is_duotone_colors_array && ! $is_duotone_unset ) {
 		// If we have a preset slug we need to fetch the details for that preset.
 		$filter_preset   = array(
 			'slug' => $duotone_attr,
@@ -498,7 +501,9 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		)
 	);
 
-	if ( is_array( $duotone_attr ) ) {
+	// For *non*-presets then generate an SVG for the filter.
+	// Note: duotone presets are already pre-generated so no need to do this again.
+	if ( $is_duotone_colors_array ) {
 		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_preset );
 		add_action(
 			'wp_footer',
