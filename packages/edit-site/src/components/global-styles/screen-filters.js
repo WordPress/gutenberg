@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ScreenDuotone from './screen-duotone';
+import BlockPreviewPanel from './block-preview-panel';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ function ScreenFilters( { name } ) {
 					'Filter and effects work without replacing your original image'
 				) }
 			/>
+			<BlockPreviewPanel name={ name } />
 			<ScreenDuotone name={ name } />
 		</>
 	);

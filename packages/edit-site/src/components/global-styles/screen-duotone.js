@@ -15,7 +15,6 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import BlockPreviewPanel from './block-preview-panel';
 import { unlock } from '../../private-apis';
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
@@ -63,7 +62,6 @@ function ScreenDuotone( { name } ) {
 	}
 	return (
 		<>
-			<BlockPreviewPanel name={ name } />
 			<ToolsPanel label={ __( 'Duotone' ) } headingLevel={ 3 }>
 				<span className="span-columns">
 					{ __(
