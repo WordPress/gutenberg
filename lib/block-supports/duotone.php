@@ -311,9 +311,6 @@ function gutenberg_get_duotone_filter_id( $preset ) {
  * @return string        Duotone CSS filter property url value.
  */
 function gutenberg_get_duotone_filter_property( $preset ) {
-	if ( isset( $preset['colors'] ) && 'unset' === $preset['colors'] ) {
-		return 'none';
-	}
 	$filter_id = gutenberg_get_duotone_filter_id( $preset );
 	return "url('#" . $filter_id . "')";
 }
@@ -446,15 +443,16 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	}
 
 	// Possible values for duotone attribute:
-	// 1. array('#000000', '#ffffff')
-	// 2. 'preset-slug'
-	// 3. 'unset' (remove filter)
+	// 1. array('#000000', '#ffffff').
+	// 2. 'preset-slug'.
+	// 3. 'unset' (remove filter).
 	$duotone_attr = $block['attrs']['style']['color']['duotone'];
 
 	$is_duotone_colors_array = is_array( $duotone_attr ) && count( $duotone_attr ) === 2;
 	$is_duotone_unset        = $duotone_attr === 'unset';
+	$is_duotone_preset       = ! $is_duotone_colors_array && ! $is_duotone_unset;
 
-	if ( ! $is_duotone_colors_array && ! $is_duotone_unset ) {
+	if ( $is_duotone_preset ) {
 		// If we have a preset slug we need to fetch the details for that preset.
 		$filter_preset   = array(
 			'slug' => $duotone_attr,
@@ -464,10 +462,9 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// If we have an array of colors not a preset slug.
 		$filter_key      = is_array( $duotone_attr ) ? implode( '-', $duotone_attr ) : $duotone_attr;
 		$filter_preset   = array(
-			'slug'   => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
-			'colors' => $duotone_attr,
+			'slug' => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
 		);
-		$filter_property = gutenberg_get_duotone_filter_property( $filter_preset );
+		$filter_property = $is_duotone_unset ? 'none' : gutenberg_get_duotone_filter_property( $filter_preset );
 	}
 
 	$filter_id = gutenberg_get_duotone_filter_id( $filter_preset );
