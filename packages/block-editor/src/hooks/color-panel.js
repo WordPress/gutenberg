@@ -32,6 +32,7 @@ export default function ColorPanel( {
 		if ( ! enableContrastChecking ) {
 			return;
 		}
+
 		if ( ! definedColors.length ) {
 			if ( detectedBackgroundColor ) {
 				setDetectedBackgroundColor();
@@ -42,35 +43,55 @@ export default function ColorPanel( {
 			if ( detectedLinkColor ) {
 				setDetectedColor();
 			}
+
+			setDetectedColor( getComputedStyle( ref.current ).color );
+
+			const firstLinkElement = ref.current?.querySelector( 'a' );
+			if ( firstLinkElement && !! firstLinkElement.innerText ) {
+				setDetectedLinkColor(
+					getComputedStyle( firstLinkElement ).color
+				);
+			}
+
+			let backgroundColorNode = ref.current;
+			let backgroundColor =
+				getComputedStyle( backgroundColorNode ).backgroundColor;
+			while (
+				backgroundColor === 'rgba(0, 0, 0, 0)' &&
+				backgroundColorNode.parentNode &&
+				backgroundColorNode.parentNode.nodeType ===
+					backgroundColorNode.parentNode.ELEMENT_NODE
+			) {
+				backgroundColorNode = backgroundColorNode.parentNode;
+				backgroundColor =
+					getComputedStyle( backgroundColorNode ).backgroundColor;
+			}
+
+			setDetectedBackgroundColor( backgroundColor );
 			return;
 		}
 
 		if ( ! ref.current ) {
 			return;
 		}
-		setDetectedColor( getComputedStyle( ref.current ).color );
 
-		const firstLinkElement = ref.current?.querySelector( 'a' );
-		if ( firstLinkElement && !! firstLinkElement.innerText ) {
-			setDetectedLinkColor( getComputedStyle( firstLinkElement ).color );
-		}
-
-		let backgroundColorNode = ref.current;
-		let backgroundColor =
-			getComputedStyle( backgroundColorNode ).backgroundColor;
-		while (
-			backgroundColor === 'rgba(0, 0, 0, 0)' &&
-			backgroundColorNode.parentNode &&
-			backgroundColorNode.parentNode.nodeType ===
-				backgroundColorNode.parentNode.ELEMENT_NODE
-		) {
-			backgroundColorNode = backgroundColorNode.parentNode;
-			backgroundColor =
-				getComputedStyle( backgroundColorNode ).backgroundColor;
-		}
-
-		setDetectedBackgroundColor( backgroundColor );
-	} );
+		definedColors.forEach( ( element ) => {
+			if ( 'Background' === element.label ) {
+				setDetectedBackgroundColor( element.colorValue );
+			} else if ( 'Text' === element.label ) {
+				setDetectedColor( element.colorValue );
+			} else if ( 'Link' === element.label ) {
+				setDetectedLinkColor( element.colorValue );
+			}
+		} );
+	}, [
+		enableContrastChecking,
+		definedColors,
+		ref,
+		detectedBackgroundColor,
+		detectedColor,
+		detectedLinkColor,
+	] );
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
