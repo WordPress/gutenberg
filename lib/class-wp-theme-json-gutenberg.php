@@ -2418,31 +2418,20 @@ class WP_Theme_JSON_Gutenberg {
 
 		$block_rules = '';
 
-		/*
-		 * 1. Separate the declarations that use the general selector
-		 * from the ones using the duotone selector.
-		 */
-		$declarations_duotone = array();
+		// 1. Update duotone selectors to be correctly scoped.
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
-				unset( $declarations[ $index ] );
-				$declarations_duotone[] = $declaration;
+				$selector = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
 			}
 		}
 
-		// Update declarations if there are separators with only background color defined.
+		// 2. Update declarations if there are separators with only background color defined.
 		if ( '.wp-block-separator' === $selector ) {
 			$declarations = static::update_separator_declarations( $declarations );
 		}
 
-		// 2. Generate and append the rules that use the general selector.
+		// 3. Generate and append the rules that use the general selector.
 		$block_rules .= static::to_ruleset( $selector, $declarations );
-
-		// 3. Generate and append the rules that use the duotone selector.
-		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
-			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
-			$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
-		}
 
 		// 4. Generate Layout block gap styles.
 		if (
