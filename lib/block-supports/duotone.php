@@ -527,7 +527,7 @@ class WP_Duotone {
 	 * @since 6.3.0
 	 * @var array
 	 */
-	static $duotone_presets;
+	static $duotone_presets = array();
 
 	/**
 	 * Registers the duotone preset.
