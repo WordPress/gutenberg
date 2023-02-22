@@ -77,7 +77,7 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 
 function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
-	const duotone = style?.color?.duotone;
+	let duotone = style?.color?.duotone;
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -96,6 +96,17 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		return null;
 	}
 
+	if ( ! Array.isArray( duotone ) ) {
+		// find the duotone preset with the slug duotone
+		// if found, return duotone.colors
+		// if not found, return false
+		const preset = duotonePalette.find( ( duotonePreset ) => {
+			return duotonePreset.slug === duotone;
+		} );
+
+		duotone = preset?.colors;
+	}
+
 	return (
 		<BlockControls group="block" __experimentalShareWithChildBlocks>
 			<DuotoneControl
@@ -105,11 +116,21 @@ function DuotonePanel( { attributes, setAttributes } ) {
 				disableCustomColors={ disableCustomColors }
 				value={ duotone }
 				onChange={ ( newDuotone ) => {
+					// See if there is a duotone preset with the same colors
+					// as the new duotone colors.
+					const preset = duotonePalette.find( ( duotonePreset ) => {
+						return duotonePreset?.colors?.every(
+							( val, index ) => val === newDuotone[ index ]
+						);
+					} );
+
 					const newStyle = {
 						...style,
 						color: {
 							...style?.color,
-							duotone: newDuotone,
+							// If there is a preset, store the preset slug,
+							// otherwise store the colors array.
+							duotone: preset ? preset.slug : newDuotone,
 						},
 					};
 					setAttributes( { style: newStyle } );
@@ -224,7 +245,20 @@ const withDuotoneStyles = createHigherOrderComponent(
 			props.name,
 			'color.__experimentalDuotone'
 		);
-		const colors = props?.attributes?.style?.color?.duotone;
+		const duotonePalette = useMultiOriginPresets( {
+			presetSetting: 'color.duotone',
+			defaultSetting: 'color.defaultDuotone',
+		} );
+
+		let colors = props?.attributes?.style?.color?.duotone;
+
+		if ( ! Array.isArray( colors ) ) {
+			const duotone = duotonePalette.find( ( dt ) => dt.slug === colors );
+
+			if ( duotone ) {
+				colors = duotone.colors;
+			}
+		}
 
 		if ( ! duotoneSupport || ! colors ) {
 			return <BlockListBlock { ...props } />;
