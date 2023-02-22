@@ -24,10 +24,6 @@ export type PaletteElement = Color | Gradient;
 
 export type BasePaletteEdit = {
 	/**
-	 * A heading label for the palette.
-	 */
-	paletteLabel: string;
-	/**
 	 * A message to show if there's nothing to edit.
 	 */
 	emptyMessage?: string;
@@ -40,6 +36,10 @@ export type BasePaletteEdit = {
 	 * Whether the user can reset the editor.
 	 */
 	canReset?: boolean;
+	/**
+	 * A heading label for the palette.
+	 */
+	paletteLabel: string;
 	/**
 	 * The label's heading level.
 	 *
@@ -78,7 +78,7 @@ type PaletteEditGradients = {
 	onChange: ( newGradients?: Gradient[] ) => void;
 }
 
-type PaletteEditColorsProps = BasePaletteEdit & PaletteEditColors;
+export type PaletteEditColorsProps = BasePaletteEdit & PaletteEditColors;
 export type PaletteEditGradientsProps = BasePaletteEdit & PaletteEditGradients;
 
 export type PaletteEditProps =

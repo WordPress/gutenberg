@@ -129,7 +129,7 @@ function ColorPickerPopover( {
 					}
 				/>
 			) }
-			{ isGradient && getIsGradient( element ) && (
+			{ isGradient && 'gradient' in element && (
 				<div className="components-palette-edit__popover-gradient-picker">
 					<CustomGradientPicker
 						__nextHasNoMargin
