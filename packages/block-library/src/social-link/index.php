@@ -59,15 +59,15 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$link .= esc_html( $label );
 	$link .= '</span></a></li>';
 
-	$w = new WP_HTML_Tag_Processor( $link );
-	$w->next_tag( 'a' );
+	$processor = new WP_HTML_Tag_Processor( $link );
+	$processor->next_tag( 'a' );
 	if ( $open_in_new_tab ) {
-		$w->set_attribute( 'rel', esc_attr( $rel ) . ' noopener nofollow' );
-		$w->set_attribute( 'target', '_blank' );
+		$processor->set_attribute( 'rel', esc_attr( $rel ) . ' noopener nofollow' );
+		$processor->set_attribute( 'target', '_blank' );
 	} elseif ( '' !== $rel ) {
-		$w->set_attribute( 'rel', esc_attr( $rel ) );
+		$processor->set_attribute( 'rel', esc_attr( $rel ) );
 	}
-	return $w;
+	return $processor->get_updated_html();
 }
 
 /**

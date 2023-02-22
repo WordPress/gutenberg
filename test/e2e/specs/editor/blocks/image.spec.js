@@ -220,7 +220,7 @@ test.describe( 'Image', () => {
 		// Add caption and navigate to inline toolbar.
 		await editor.clickBlockToolbarButton( 'Add caption' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
-		await expect(
+		expect(
 			await page.evaluate( () =>
 				document.activeElement.getAttribute( 'aria-label' )
 			)
@@ -234,7 +234,7 @@ test.describe( 'Image', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		// Italic to bold.
 		await page.keyboard.press( 'ArrowLeft' );
-		await expect(
+		expect(
 			await page.evaluate( () =>
 				document.activeElement.getAttribute( 'aria-label' )
 			)

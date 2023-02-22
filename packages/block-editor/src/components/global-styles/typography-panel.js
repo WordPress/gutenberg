@@ -7,6 +7,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,29 +18,16 @@ import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
-import { useSupportedStyles } from './hooks';
 import { getValueFromVariable } from './utils';
 
-export function useHasTypographyPanel( name, element, settings ) {
-	const hasFontFamily = useHasFontFamilyControl( name, element, settings );
-	const hasLineHeight = useHasLineHeightControl( name, element, settings );
-	const hasFontAppearance = useHasAppearanceControl(
-		name,
-		element,
-		settings
-	);
-	const hasLetterSpacing = useHasLetterSpacingControl(
-		name,
-		element,
-		settings
-	);
-	const hasTextTransform = useHasTextTransformControl(
-		name,
-		element,
-		settings
-	);
-	const hasTextDecoration = useHasTextDecorationControl( name, element );
-	const hasFontSize = useHasFontSizeControl( name, element, settings );
+export function useHasTypographyPanel( settings ) {
+	const hasFontFamily = useHasFontFamilyControl( settings );
+	const hasLineHeight = useHasLineHeightControl( settings );
+	const hasFontAppearance = useHasAppearanceControl( settings );
+	const hasLetterSpacing = useHasLetterSpacingControl( settings );
+	const hasTextTransform = useHasTextTransformControl( settings );
+	const hasTextDecoration = useHasTextDecorationControl( settings );
+	const hasFontSize = useHasFontSizeControl( settings );
 
 	return (
 		hasFontFamily ||
@@ -52,52 +40,38 @@ export function useHasTypographyPanel( name, element, settings ) {
 	);
 }
 
-function useHasFontSizeControl( name, element, settings ) {
-	const supports = useSupportedStyles( name, element );
+function useHasFontSizeControl( settings ) {
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
 	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
 	const fontSizes =
 		fontSizesPerOrigin?.custom ??
 		fontSizesPerOrigin?.theme ??
 		fontSizesPerOrigin.default;
-	return (
-		supports.includes( 'fontSize' ) &&
-		( !! fontSizes?.length || ! disableCustomFontSizes )
-	);
+	return !! fontSizes?.length || ! disableCustomFontSizes;
 }
 
-function useHasFontFamilyControl( name, element, settings ) {
-	const supports = useSupportedStyles( name, element );
+function useHasFontFamilyControl( settings ) {
 	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
 	const fontFamilies =
 		fontFamiliesPerOrigin?.custom ??
 		fontFamiliesPerOrigin?.theme ??
 		fontFamiliesPerOrigin?.default;
-	return supports.includes( 'fontFamily' ) && !! fontFamilies?.length;
+	return !! fontFamilies?.length;
 }
 
-function useHasLineHeightControl( name, element, settings ) {
-	const supports = useSupportedStyles( name, element );
-	return (
-		settings?.typography?.lineHeight && supports.includes( 'lineHeight' )
-	);
+function useHasLineHeightControl( settings ) {
+	return settings?.typography?.lineHeight;
 }
 
-function useHasAppearanceControl( name, element, settings ) {
-	const supports = useSupportedStyles( name, element );
-	const hasFontStyles =
-		settings?.typography?.fontStyle && supports.includes( 'fontStyle' );
-	const hasFontWeights =
-		settings?.typography?.fontWeight && supports.includes( 'fontWeight' );
+function useHasAppearanceControl( settings ) {
+	const hasFontStyles = settings?.typography?.fontStyle;
+	const hasFontWeights = settings?.typography?.fontWeight;
 	return hasFontStyles || hasFontWeights;
 }
 
-function useAppearanceControlLabel( name, element, settings ) {
-	const supports = useSupportedStyles( name, element );
-	const hasFontStyles =
-		settings?.typography?.fontStyle && supports.includes( 'fontStyle' );
-	const hasFontWeights =
-		settings?.typography?.fontWeight && supports.includes( 'fontWeight' );
+function useAppearanceControlLabel( settings ) {
+	const hasFontStyles = settings?.typography?.fontStyle;
+	const hasFontWeights = settings?.typography?.fontWeight;
 	if ( ! hasFontStyles ) {
 		return __( 'Font weight' );
 	}
@@ -107,31 +81,39 @@ function useAppearanceControlLabel( name, element, settings ) {
 	return __( 'Appearance' );
 }
 
-function useHasLetterSpacingControl( name, element, settings ) {
-	const setting = settings?.typography?.letterSpacing;
-	const supports = useSupportedStyles( name, element );
-	if ( ! setting ) {
-		return false;
-	}
-	return supports.includes( 'letterSpacing' );
+function useHasLetterSpacingControl( settings ) {
+	return settings?.typography?.letterSpacing;
 }
 
-function useHasTextTransformControl( name, element, settings ) {
-	const setting = settings?.typography?.textTransform;
-	const supports = useSupportedStyles( name, element );
-	if ( ! setting ) {
-		return false;
-	}
-	return supports.includes( 'textTransform' );
+function useHasTextTransformControl( settings ) {
+	return settings?.typography?.textTransform;
 }
 
-function useHasTextDecorationControl( name, element ) {
-	const supports = useSupportedStyles( name, element );
-	return supports.includes( 'textDecoration' );
+function useHasTextDecorationControl( settings ) {
+	return settings?.typography?.textDecoration;
 }
 
-function TypographyToolsPanel( { ...props } ) {
-	return <ToolsPanel label={ __( 'Typography' ) } { ...props } />;
+function TypographyToolsPanel( {
+	resetAllFilter,
+	onChange,
+	value,
+	panelId,
+	children,
+} ) {
+	const resetAll = () => {
+		const updatedValue = resetAllFilter( value );
+		onChange( updatedValue );
+	};
+
+	return (
+		<ToolsPanel
+			label={ __( 'Typography' ) }
+			resetAll={ resetAll }
+			panelId={ panelId }
+		>
+			{ children }
+		</ToolsPanel>
+	);
 }
 
 const DEFAULT_CONTROLS = {
@@ -146,8 +128,6 @@ const DEFAULT_CONTROLS = {
 
 export default function TypographyPanel( {
 	as: Wrapper = TypographyToolsPanel,
-	name,
-	element,
 	value,
 	onChange,
 	inheritedValue = value,
@@ -159,11 +139,7 @@ export default function TypographyPanel( {
 		getValueFromVariable( { settings }, '', rawValue );
 
 	// Font Family
-	const hasFontFamilyEnabled = useHasFontFamilyControl(
-		name,
-		element,
-		settings
-	);
+	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
 	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
 	const fontFamilies =
 		fontFamiliesPerOrigin?.custom ??
@@ -188,7 +164,7 @@ export default function TypographyPanel( {
 	const resetFontFamily = () => setFontFamily( undefined );
 
 	// Font Size
-	const hasFontSizeEnabled = useHasFontSizeControl( name, element, settings );
+	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
 	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
 	const fontSizes =
@@ -213,16 +189,8 @@ export default function TypographyPanel( {
 	const resetFontSize = () => setFontSize( undefined );
 
 	// Appearance
-	const hasAppearanceControl = useHasAppearanceControl(
-		name,
-		element,
-		settings
-	);
-	const appearanceControlLabel = useAppearanceControlLabel(
-		name,
-		element,
-		settings
-	);
+	const hasAppearanceControl = useHasAppearanceControl( settings );
+	const appearanceControlLabel = useAppearanceControlLabel( settings );
 	const hasFontStyles = settings?.typography?.fontStyle;
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
@@ -247,11 +215,7 @@ export default function TypographyPanel( {
 	};
 
 	// Line Height
-	const hasLineHeightEnabled = useHasLineHeightControl(
-		name,
-		element,
-		settings
-	);
+	const hasLineHeightEnabled = useHasLineHeightControl( settings );
 	const lineHeight = decodeValue( inheritedValue?.typography?.lineHeight );
 	const setLineHeight = ( newValue ) => {
 		onChange( {
@@ -266,11 +230,7 @@ export default function TypographyPanel( {
 	const resetLineHeight = () => setLineHeight( undefined );
 
 	// Letter Spacing
-	const hasLetterSpacingControl = useHasLetterSpacingControl(
-		name,
-		element,
-		settings
-	);
+	const hasLetterSpacingControl = useHasLetterSpacingControl( settings );
 	const letterSpacing = decodeValue(
 		inheritedValue?.typography?.letterSpacing
 	);
@@ -287,11 +247,7 @@ export default function TypographyPanel( {
 	const resetLetterSpacing = () => setLetterSpacing( undefined );
 
 	// Text Transform
-	const hasTextTransformControl = useHasTextTransformControl(
-		name,
-		element,
-		settings
-	);
+	const hasTextTransformControl = useHasTextTransformControl( settings );
 	const textTransform = decodeValue(
 		inheritedValue?.typography?.textTransform
 	);
@@ -308,10 +264,7 @@ export default function TypographyPanel( {
 	const resetTextTransform = () => setTextTransform( undefined );
 
 	// Text Decoration
-	const hasTextDecorationControl = useHasTextDecorationControl(
-		name,
-		element
-	);
+	const hasTextDecorationControl = useHasTextDecorationControl( settings );
 	const textDecoration = decodeValue(
 		inheritedValue?.typography?.textDecoration
 	);
@@ -327,15 +280,20 @@ export default function TypographyPanel( {
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
 	const resetTextDecoration = () => setTextDecoration( undefined );
 
-	const resetAll = () => {
-		onChange( {
-			...value,
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
 			typography: {},
-		} );
-	};
+		};
+	}, [] );
 
 	return (
-		<Wrapper resetAll={ resetAll }>
+		<Wrapper
+			resetAllFilter={ resetAllFilter }
+			value={ value }
+			onChange={ onChange }
+			panelId={ panelId }
+		>
 			{ hasFontFamilyEnabled && (
 				<ToolsPanelItem
 					label={ __( 'Font family' ) }

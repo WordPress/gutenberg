@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { memo } from '@wordpress/element';
-import { __experimentalNavigatorProvider as NavigatorProvider } from '@wordpress/components';
+import {
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -21,15 +24,24 @@ function SidebarScreens() {
 
 	return (
 		<>
-			<SidebarNavigationScreenMain />
-			<SidebarNavigationScreenNavigationMenus />
-			<SidebarNavigationScreenNavigationItem />
-			<SidebarNavigationScreenTemplates postType="wp_template" />
-			<SidebarNavigationScreenTemplates postType="wp_template_part" />
-			<SidebarNavigationScreenTemplate postType="wp_template" />
-			<SidebarNavigationScreenTemplate postType="wp_template_part" />
-			<SidebarNavigationScreenTemplatesBrowse postType="wp_template" />
-			<SidebarNavigationScreenTemplatesBrowse postType="wp_template_part" />
+			<NavigatorScreen path="/">
+				<SidebarNavigationScreenMain />
+			</NavigatorScreen>
+			<NavigatorScreen path="/navigation">
+				<SidebarNavigationScreenNavigationMenus />
+			</NavigatorScreen>
+			<NavigatorScreen path="/navigation/:postType/:postId">
+				<SidebarNavigationScreenNavigationItem />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template|wp_template_part)">
+				<SidebarNavigationScreenTemplates />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
+				<SidebarNavigationScreenTemplatesBrowse />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/:postId">
+				<SidebarNavigationScreenTemplate />
+			</NavigatorScreen>
 		</>
 	);
 }
@@ -45,7 +57,7 @@ function Sidebar() {
 			</NavigatorProvider>
 
 			<div className="edit-site-sidebar__footer">
-				<SaveButton />
+				<SaveButton showTooltip={ false } />
 			</div>
 		</>
 	);

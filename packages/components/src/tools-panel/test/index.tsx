@@ -9,10 +9,16 @@ import userEvent from '@testing-library/user-event';
  */
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+import type {
+	ToolsPanelContext as ToolsPanelContextType,
+	ResetAllFilter,
+} from '../types';
 
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const resetAll = jest.fn();
 const noop = () => undefined;
+
+type ControlValue = boolean | undefined;
 
 // Default props for the tools panel.
 const defaultProps = {
@@ -21,24 +27,24 @@ const defaultProps = {
 };
 
 // Default props for an enabled control to be rendered within panel.
+let controlValue: ControlValue = true;
 const controlProps = {
-	attributes: { value: true },
 	hasValue: jest.fn().mockImplementation( () => {
-		return !! controlProps.attributes.value;
+		return !! controlValue;
 	} ),
 	label: 'Example',
 	onDeselect: jest.fn().mockImplementation( () => {
-		controlProps.attributes.value = undefined;
+		controlValue = undefined;
 	} ),
 	onSelect: jest.fn(),
 };
 
 // Default props without a value for an alternate control to be rendered within
 // the panel.
+let altControlValue: ControlValue = false;
 const altControlProps = {
-	attributes: { value: false },
 	hasValue: jest.fn().mockImplementation( () => {
-		return !! altControlProps.attributes.value;
+		return !! altControlValue;
 	} ),
 	label: 'Alt',
 	onDeselect: jest.fn(),
@@ -46,24 +52,24 @@ const altControlProps = {
 };
 
 // Default props for wrapped or grouped panel items.
+let nestedControlValue: ControlValue = true;
 const nestedControlProps = {
-	attributes: { value: true },
 	hasValue: jest.fn().mockImplementation( () => {
-		return !! nestedControlProps.attributes.value;
+		return !! nestedControlValue;
 	} ),
 	label: 'Nested Control 1',
 	onDeselect: jest.fn().mockImplementation( () => {
-		nestedControlProps.attributes.value = undefined;
+		nestedControlValue = undefined;
 	} ),
 	onSelect: jest.fn(),
 	isShownByDefault: true,
 };
 
 // Alternative props for wrapped or grouped panel items.
+const altNestedControlValue: ControlValue = false;
 const altNestedControlProps = {
-	attributes: { value: false },
 	hasValue: jest.fn().mockImplementation( () => {
-		return !! altNestedControlProps.attributes.value;
+		return !! altNestedControlValue;
 	} ),
 	label: 'Nested Control 2',
 	onDeselect: jest.fn(),
@@ -90,7 +96,7 @@ const GroupedItems = ( {
 
 // This context object is used to help simulate different scenarios in which
 // `ToolsPanelItem` registration or deregistration requires testing.
-const panelContext = {
+const panelContext: ToolsPanelContextType = {
 	panelId: '1234',
 	menuItems: {
 		default: {},
@@ -101,6 +107,8 @@ const panelContext = {
 	shouldRenderPlaceholderItems: false,
 	registerPanelItem: jest.fn(),
 	deregisterPanelItem: jest.fn(),
+	registerResetAllFilter: jest.fn(),
+	deregisterResetAllFilter: jest.fn(),
 	flagItemCustomization: noop,
 	areAllOptionalControlsHidden: true,
 };
@@ -117,7 +125,10 @@ const renderGroupedItemsInPanel = () => {
 
 // Custom component rendering a panel item within a wrapping element. Also used
 // to test panel item registration and rendering.
-const WrappedItem = ( { text, ...props } ) => {
+const WrappedItem = ( {
+	text,
+	...props
+}: React.ComponentProps< typeof ToolsPanelItem > & { text: string } ) => {
 	return (
 		<div>
 			<span>Wrapper</span>
@@ -178,7 +189,7 @@ const openDropdownMenu = async () => {
 };
 
 // Opens dropdown then selects the menu item by label before simulating a click.
-const selectMenuItem = async ( label ) => {
+const selectMenuItem = async ( label: string ) => {
 	const user = userEvent.setup();
 	const menuItem = await screen.findByText( label );
 	await user.click( menuItem );
@@ -186,8 +197,8 @@ const selectMenuItem = async ( label ) => {
 
 describe( 'ToolsPanel', () => {
 	afterEach( () => {
-		controlProps.attributes.value = true;
-		altControlProps.attributes.value = false;
+		controlValue = true;
+		altControlValue = false;
 	} );
 
 	describe( 'basic rendering', () => {
@@ -229,10 +240,20 @@ describe( 'ToolsPanel', () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					{ false && (
-						<ToolsPanelItem>Should not show</ToolsPanelItem>
+						<ToolsPanelItem
+							label="Not rendered 1"
+							hasValue={ () => false }
+						>
+							Should not show
+						</ToolsPanelItem>
 					) }
 					{ false && (
-						<ToolsPanelItem>Not shown either</ToolsPanelItem>
+						<ToolsPanelItem
+							label="Not rendered 2"
+							hasValue={ () => false }
+						>
+							Not shown either
+						</ToolsPanelItem>
 					) }
 					<span>Visible but insignificant</span>
 				</ToolsPanel>
@@ -317,7 +338,11 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should render optional panel item when value is updated externally and panel has an ID', async () => {
-			const ToolsPanelOptional = ( { toolsPanelItemValue } ) => {
+			const ToolsPanelOptional = ( {
+				toolsPanelItemValue,
+			}: {
+				toolsPanelItemValue?: number;
+			} ) => {
 				const itemProps = {
 					attributes: { value: toolsPanelItemValue },
 					hasValue: () => !! toolsPanelItemValue,
@@ -349,7 +374,11 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render optional item when value is updated externally and panelId is null', async () => {
 			// This test partially covers: https://github.com/WordPress/gutenberg/issues/47368
-			const ToolsPanelOptional = ( { toolsPanelItemValue } ) => {
+			const ToolsPanelOptional = ( {
+				toolsPanelItemValue,
+			}: {
+				toolsPanelItemValue?: number;
+			} ) => {
 				const itemProps = {
 					attributes: { value: toolsPanelItemValue },
 					hasValue: () => !! toolsPanelItemValue,
@@ -452,10 +481,10 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should render default controls with conditional isShownByDefault', async () => {
+			const linkedControlValue = false;
 			const linkedControlProps = {
-				attributes: { value: false },
 				hasValue: jest.fn().mockImplementation( () => {
-					return !! linkedControlProps.attributes.value;
+					return !! linkedControlValue;
 				} ),
 				label: 'Linked',
 				onDeselect: jest.fn(),
@@ -472,7 +501,7 @@ describe( 'ToolsPanel', () => {
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						{ ...linkedControlProps }
-						isShownByDefault={ !! altControlProps.attributes.value }
+						isShownByDefault={ !! altControlValue }
 					>
 						<div>Linked control</div>
 					</ToolsPanelItem>
@@ -495,13 +524,14 @@ describe( 'ToolsPanel', () => {
 			expect( menuGroups.length ).toEqual( 3 );
 
 			// The linked control should be in the second group, of optional controls.
-			let optionalItem = within( menuGroups[ 1 ] ).getByText( 'Linked' );
-			expect( optionalItem ).toBeInTheDocument();
+			expect(
+				within( menuGroups[ 1 ] ).getByText( 'Linked' )
+			).toBeInTheDocument();
 
 			// Simulate the main control having a value set which should
 			// trigger the linked control becoming a default control via the
 			// conditional `isShownByDefault` prop.
-			altControlProps.attributes.value = true;
+			altControlValue = true;
 
 			rerender( <TestPanel /> );
 
@@ -526,17 +556,18 @@ describe( 'ToolsPanel', () => {
 			// Optional controls have an additional aria-label. This can be used
 			// to confirm the conditional default control has been removed from
 			// the optional menu item group.
-			optionalItem = screen.queryByRole( 'menuitemcheckbox', {
-				name: 'Show Linked',
-			} );
-			expect( optionalItem ).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'menuitemcheckbox', {
+					name: 'Show Linked',
+				} )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'should handle conditionally rendered default control', async () => {
+			const conditionalControlValue = false;
 			const conditionalControlProps = {
-				attributes: { value: false },
 				hasValue: jest.fn().mockImplementation( () => {
-					return !! conditionalControlProps.attributes.value;
+					return !! conditionalControlValue;
 				} ),
 				label: 'Conditional',
 				onDeselect: jest.fn(),
@@ -551,7 +582,7 @@ describe( 'ToolsPanel', () => {
 					>
 						<div>Default control</div>
 					</ToolsPanelItem>
-					{ !! altControlProps.attributes.value && (
+					{ !! altControlValue && (
 						<ToolsPanelItem
 							{ ...conditionalControlProps }
 							isShownByDefault={ true }
@@ -579,7 +610,7 @@ describe( 'ToolsPanel', () => {
 
 			// Simulate the main control having a value set which will now
 			// render the new default control into the ToolsPanel.
-			altControlProps.attributes.value = true;
+			altControlValue = true;
 
 			rerender( <TestPanel /> );
 
@@ -614,7 +645,7 @@ describe( 'ToolsPanel', () => {
 			// themselves, while those for the old panelId deregister.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/36588
-			const context = { ...panelContext };
+			const context: ToolsPanelContextType = { ...panelContext };
 			const TestPanel = () => (
 				<ToolsPanelContext.Provider value={ context }>
 					<ToolsPanelItem { ...altControlProps } panelId="1234">
@@ -678,7 +709,10 @@ describe( 'ToolsPanel', () => {
 			// individual items should still render themselves in this case.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/37216
-			const context = { ...panelContext, panelId: null };
+			const context: ToolsPanelContextType = {
+				...panelContext,
+				panelId: null,
+			};
 			const TestPanel = () => (
 				<ToolsPanelContext.Provider value={ context }>
 					<ToolsPanelItem { ...altControlProps } panelId="1234">
@@ -942,6 +976,8 @@ describe( 'ToolsPanel', () => {
 				shouldRenderPlaceholderItems: false,
 				registerPanelItem: noop,
 				deregisterPanelItem: noop,
+				registerResetAllFilter: noop,
+				deregisterResetAllFilter: noop,
 				flagItemCustomization: noop,
 				areAllOptionalControlsHidden: true,
 			};
@@ -981,7 +1017,12 @@ describe( 'ToolsPanel', () => {
 			// test that no orphaned items appear registered in the panel menu.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/34085
-			const TestSlotFillPanel = ( { panelId } ) => (
+			const TestSlotFillPanel = ( {
+				panelId,
+			}: Pick<
+				React.ComponentProps< typeof ToolsPanelItem >,
+				'panelId'
+			> ) => (
 				<SlotFillProvider>
 					<ToolsPanelItems>
 						<ToolsPanelItem { ...altControlProps } panelId="1234">
@@ -1004,37 +1045,38 @@ describe( 'ToolsPanel', () => {
 
 			// Only the item matching the panelId should have been registered
 			// and appear in the panel menu.
-			let altMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Show Alt',
-			} );
-			let exampleMenuItem = screen.queryByRole( 'menuitemcheckbox', {
-				name: 'Hide and reset Example',
-			} );
-
-			expect( altMenuItem ).toBeInTheDocument();
-			expect( exampleMenuItem ).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemcheckbox', {
+					name: 'Show Alt',
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'menuitemcheckbox', {
+					name: 'Hide and reset Example',
+				} )
+			).not.toBeInTheDocument();
 
 			// Re-render the panel with different panelID simulating a block
 			// selection change.
 			rerender( <TestSlotFillPanel panelId="9999" /> );
-
-			altMenuItem = screen.queryByRole( 'menuitemcheckbox', {
-				name: 'Show Alt',
-			} );
-			exampleMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Hide and reset Example',
-			} );
-
-			expect( altMenuItem ).not.toBeInTheDocument();
-			expect( exampleMenuItem ).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'menuitemcheckbox', {
+					name: 'Show Alt',
+				} )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemcheckbox', {
+					name: 'Hide and reset Example',
+				} )
+			).toBeInTheDocument();
 		} );
 	} );
 
 	describe( 'panel header icon toggle', () => {
+		const defaultControlsValue = false;
 		const defaultControls = {
-			attributes: { value: false },
 			hasValue: jest.fn().mockImplementation( () => {
-				return !! defaultControls.attributes.value;
+				return !! defaultControlsValue;
 			} ),
 			label: 'Default',
 			onDeselect: jest.fn(),
@@ -1042,10 +1084,10 @@ describe( 'ToolsPanel', () => {
 			isShownByDefault: true,
 		};
 
+		const optionalControlsValue = false;
 		const optionalControls = {
-			attributes: { value: false },
 			hasValue: jest.fn().mockImplementation( () => {
-				return !! optionalControls.attributes.value;
+				return !! optionalControlsValue;
 			} ),
 			label: 'Optional',
 			onDeselect: jest.fn(),
@@ -1107,6 +1149,69 @@ describe( 'ToolsPanel', () => {
 			// The dropdown toggle no longer has a description.
 			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
 		} );
+
+		it( 'should not call reset all for different panelIds', async () => {
+			const resetItem = jest.fn();
+			const resetItemB = jest.fn();
+
+			const children = (
+				<>
+					<ToolsPanelItem
+						label="a"
+						hasValue={ () => true }
+						panelId="a"
+						resetAllFilter={ resetItem }
+						isShownByDefault
+					>
+						<div>Example control</div>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label="b"
+						hasValue={ () => true }
+						panelId="b"
+						resetAllFilter={ resetItemB }
+						isShownByDefault
+					>
+						<div>Alt control</div>
+					</ToolsPanelItem>
+				</>
+			);
+
+			const resetAllCallback = (
+				filters: ResetAllFilter[] | undefined
+			) => filters?.forEach( ( f ) => f() );
+
+			const { rerender } = render(
+				<ToolsPanel
+					{ ...defaultProps }
+					panelId="a"
+					resetAll={ resetAllCallback }
+				>
+					{ children }
+				</ToolsPanel>
+			);
+
+			await openDropdownMenu();
+			await selectMenuItem( 'Reset all' );
+			expect( resetItem ).toHaveBeenCalled();
+			expect( resetItemB ).not.toHaveBeenCalled();
+
+			resetItem.mockClear();
+
+			rerender(
+				<ToolsPanel
+					{ ...defaultProps }
+					panelId="b"
+					resetAll={ resetAllCallback }
+				>
+					{ children }
+				</ToolsPanel>
+			);
+
+			await selectMenuItem( 'Reset all' );
+			expect( resetItem ).not.toHaveBeenCalled();
+			expect( resetItemB ).toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'reset all button', () => {
@@ -1115,9 +1220,10 @@ describe( 'ToolsPanel', () => {
 			await openDropdownMenu();
 
 			const resetAllItem = await screen.findByRole( 'menuitem', {
-				disabled: false,
+				name: 'Reset all',
 			} );
 			expect( resetAllItem ).toBeInTheDocument();
+			expect( resetAllItem ).toHaveAttribute( 'aria-disabled', 'false' );
 
 			await selectMenuItem( 'Reset all' );
 
@@ -1126,9 +1232,13 @@ describe( 'ToolsPanel', () => {
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 
 			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
-				disabled: true,
+				name: 'Reset all',
 			} );
 			expect( disabledResetAllItem ).toBeInTheDocument();
+			expect( disabledResetAllItem ).toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
 		} );
 	} );
 
