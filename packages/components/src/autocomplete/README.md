@@ -37,7 +37,7 @@ An array of all of the completers to apply to the current element.
 A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
 
 -   Required: Yes
--   `MutableRefObject< HTMLElement | undefined >
+-   `MutableRefObject< HTMLElement | undefined >`
 
 ### children
 
