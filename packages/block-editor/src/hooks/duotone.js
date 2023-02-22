@@ -75,9 +75,29 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 	);
 }
 
+function getColorsFromDuotonePreset( duotone, duotonePalette ) {
+	if ( ! duotone ) {
+		return;
+	}
+	const preset = duotonePalette.find( ( { slug } ) => {
+		return slug === duotone;
+	} );
+
+	return preset ? preset.colors : duotone;
+}
+
+function getDuotonePresetFromColors( colors, duotonePalette ) {
+	const preset = duotonePalette.find( ( duotonePreset ) => {
+		return duotonePreset?.colors?.every(
+			( val, index ) => val === colors[ index ]
+		);
+	} );
+
+	return preset ? preset.slug : colors;
+}
+
 function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
-	let duotone = style?.color?.duotone;
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -96,16 +116,10 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		return null;
 	}
 
-	if ( ! Array.isArray( duotone ) ) {
-		// find the duotone preset with the slug duotone
-		// if found, return duotone.colors
-		// if not found, return false
-		const preset = duotonePalette.find( ( duotonePreset ) => {
-			return duotonePreset.slug === duotone;
-		} );
-
-		duotone = preset?.colors;
-	}
+	const duotone = getColorsFromDuotonePreset(
+		style?.color?.duotone,
+		duotonePalette
+	);
 
 	return (
 		<BlockControls group="block" __experimentalShareWithChildBlocks>
@@ -116,21 +130,14 @@ function DuotonePanel( { attributes, setAttributes } ) {
 				disableCustomColors={ disableCustomColors }
 				value={ duotone }
 				onChange={ ( newDuotone ) => {
-					// See if there is a duotone preset with the same colors
-					// as the new duotone colors.
-					const preset = duotonePalette.find( ( duotonePreset ) => {
-						return duotonePreset?.colors?.every(
-							( val, index ) => val === newDuotone[ index ]
-						);
-					} );
-
 					const newStyle = {
 						...style,
 						color: {
 							...style?.color,
-							// If there is a preset, store the preset slug,
-							// otherwise store the colors array.
-							duotone: preset ? preset.slug : newDuotone,
+							duotone: getDuotonePresetFromColors(
+								newDuotone,
+								duotonePalette
+							),
 						},
 					};
 					setAttributes( { style: newStyle } );
