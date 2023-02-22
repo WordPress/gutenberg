@@ -702,7 +702,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'.is-layout-flow > .wp-block-cover { margin-block-start: 0; margin-bottom: 50px }.is-layout-flow > * + .wp-block-cover { margin-top: 25px; margin-bottom: 50px }.is-layout-flow > *:last-child.wp-block-cover { margin-top: 25px; margin-block-end: 0 }.wp-site-blocks > * + .wp-block-cover { margin-top: 25px; margin-bottom: 50px; }'
+				'.is-layout-flow > .wp-block-cover { margin-block-start: 0; margin-bottom: 50px; }.is-layout-flow > * + .wp-block-cover { margin-top: 25px; margin-bottom: 50px; }.is-layout-flow > *:last-child.wp-block-cover { margin-top: 25px; margin-block-end: 0; }.wp-site-blocks > .wp-block-cover { margin-block-start: 0; margin-bottom: 50px; }.wp-site-blocks > * + .wp-block-cover { margin-top: 25px; margin-bottom: 50px; }.wp-site-blocks > *:last-child.wp-block-cover { margin-top: 25px; margin-block-end: 0; }'
 			);
 		} );
 	} );

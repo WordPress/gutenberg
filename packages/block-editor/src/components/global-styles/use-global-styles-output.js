@@ -14,7 +14,7 @@ import {
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
-import { compileCSS, getCSSRules } from '@wordpress/style-engine';
+import { getCSSRules } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -321,6 +321,70 @@ export function getStylesDeclarations(
 }
 
 /**
+ * Gets the CSS rules for a given layout definition.
+ *
+ * @param {string}               selectorFormat   The string for a selector where `%s` is replaced by the layout rules' selector.
+ * @param {Object}               layoutDefinition The layout definition object.
+ * @param {string}               rulesType        The type of rules to get (e.g. 'marginStyles' or 'spacingStyles').
+ * @param {string|number|Object} replacementValue The value to use for any undefined rules.
+ * @return {string} Generated CSS rules for the layout styles.
+ */
+function getLayoutDefinitionRules(
+	selectorFormat,
+	layoutDefinition,
+	rulesType,
+	replacementValue
+) {
+	const layoutRules = layoutDefinition?.[ rulesType ];
+	let ruleset = '';
+
+	if ( layoutRules?.length ) {
+		layoutRules.forEach( ( layoutRule ) => {
+			if (
+				layoutRule?.selector !== undefined &&
+				layoutRule?.rules &&
+				selectorFormat
+			) {
+				const declarations = [];
+				Object.entries( layoutRule.rules ).forEach(
+					( [ cssProperty, cssValue ] ) => {
+						if ( cssValue ) {
+							declarations.push(
+								`${ cssProperty }: ${ cssValue }`
+							);
+						} else if (
+							typeof replacementValue === 'string' ||
+							typeof replacementValue === 'number'
+						) {
+							declarations.push(
+								`${ cssProperty }: ${ replacementValue }`
+							);
+						} else if (
+							replacementValue?.[ cssProperty ] !== undefined
+						) {
+							declarations.push(
+								`${ cssProperty }: ${ replacementValue[ cssProperty ] }`
+							);
+						}
+					}
+				);
+				const selector = selectorFormat.replace(
+					'%s',
+					layoutRule.selector
+				);
+				if ( declarations.length ) {
+					ruleset += `${ selector } { ${ declarations.join(
+						'; '
+					) }; }`;
+				}
+			}
+		} );
+	}
+
+	return ruleset;
+}
+
+/**
  * Get generated CSS for layout styles by looking up layout definitions provided
  * in theme.json, and outputting common layout styles, and specific blockGap values.
  *
@@ -362,10 +426,6 @@ export function getLayoutStyles( {
 		style?.spacing?.margin &&
 		tree?.settings?.layout?.definitions
 	) {
-		const marginString = compileCSS( {
-			spacing: { margin: style.spacing.margin },
-		} );
-
 		// Get margin rules keyed by CSS class name.
 		const marginRules = getCSSRules( {
 			spacing: { margin: style.spacing.margin },
@@ -380,90 +440,59 @@ export function getLayoutStyles( {
 		if ( marginRules ) {
 			// Add layout aware margin rules for each supported layout type.
 			Object.values( tree.settings.layout.definitions ).forEach(
-				( { className, marginStyles } ) => {
-					if ( marginStyles?.length ) {
-						marginStyles.forEach( ( marginStyle ) => {
-							const declarations = [];
-
-							Object.entries( marginStyle.rules ).forEach(
-								( [ cssProperty, cssValue ] ) => {
-									if ( cssValue ) {
-										declarations.push(
-											`${ cssProperty }: ${ cssValue }`
-										);
-									} else if ( marginRules[ cssProperty ] ) {
-										declarations.push(
-											`${ cssProperty }: ${ marginRules[ cssProperty ] }`
-										);
-									}
-								}
-							);
-
-							ruleset += `.${ className }${
-								marginStyle?.selector
-							}${ selector } { ${ declarations.join( '; ' ) } }`;
-						} );
+				( layoutDefinition ) => {
+					ruleset += getLayoutDefinitionRules(
+						`.${ layoutDefinition.className }%s${ selector }`,
+						layoutDefinition,
+						'marginStyles',
+						marginRules
+					);
+					// Add layout aware margin rule for children of the root site blocks class.
+					if ( layoutDefinition.name === 'default' ) {
+						ruleset += getLayoutDefinitionRules(
+							`.wp-site-blocks%s${ selector }`,
+							layoutDefinition,
+							'marginStyles',
+							marginRules
+						);
 					}
 				}
 			);
-			// Add layout aware margin rule for children of the root site blocks class.
-			ruleset += `.wp-site-blocks > * + ${ selector } { ${ marginString } }`;
 		}
 	}
 
 	if ( gapValue && tree?.settings?.layout?.definitions ) {
 		Object.values( tree.settings.layout.definitions ).forEach(
-			( { className, name, spacingStyles } ) => {
+			( layoutDefinition ) => {
 				// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
-				if ( ! hasBlockGapSupport && 'flex' !== name ) {
+				if (
+					! hasBlockGapSupport &&
+					'flex' !== layoutDefinition?.name
+				) {
 					return;
 				}
 
-				if ( spacingStyles?.length ) {
-					spacingStyles.forEach( ( spacingStyle ) => {
-						const declarations = [];
+				let combinedSelector = '';
 
-						if ( spacingStyle.rules ) {
-							Object.entries( spacingStyle.rules ).forEach(
-								( [ cssProperty, cssValue ] ) => {
-									declarations.push(
-										`${ cssProperty }: ${
-											cssValue ? cssValue : gapValue
-										}`
-									);
-								}
-							);
-						}
-
-						if ( declarations.length ) {
-							let combinedSelector = '';
-
-							if ( ! hasBlockGapSupport ) {
-								// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
-								combinedSelector =
-									selector === ROOT_BLOCK_SELECTOR
-										? `:where(.${ className }${
-												spacingStyle?.selector || ''
-										  })`
-										: `:where(${ selector }.${ className }${
-												spacingStyle?.selector || ''
-										  })`;
-							} else {
-								combinedSelector =
-									selector === ROOT_BLOCK_SELECTOR
-										? `${ selector } .${ className }${
-												spacingStyle?.selector || ''
-										  }`
-										: `${ selector }.${ className }${
-												spacingStyle?.selector || ''
-										  }`;
-							}
-							ruleset += `${ combinedSelector } { ${ declarations.join(
-								'; '
-							) }; }`;
-						}
-					} );
+				if ( ! hasBlockGapSupport ) {
+					// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
+					combinedSelector =
+						selector === ROOT_BLOCK_SELECTOR
+							? `:where(.${ layoutDefinition.className }%s)`
+							: `:where(${ selector }.${ layoutDefinition.className }%s)`;
+				} else {
+					combinedSelector =
+						selector === ROOT_BLOCK_SELECTOR
+							? `${ selector } .${ layoutDefinition.className }%s`
+							: `${ selector }.${ layoutDefinition.className }%s`;
 				}
+
+				ruleset += getLayoutDefinitionRules(
+					combinedSelector,
+					layoutDefinition,
+					'spacingStyles',
+					gapValue
+				);
 			}
 		);
 		// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
