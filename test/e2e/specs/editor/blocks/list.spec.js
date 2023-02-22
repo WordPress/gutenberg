@@ -1166,7 +1166,7 @@ test.describe( 'List (@firefox)', () => {
 		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Paste empty list block
-		await pageUtils.setClipboardData( {
+		pageUtils.setClipboardData( {
 			plainText:
 				'<!-- wp:list -->\n<ul><li></li></ul>\n<!-- /wp:list -->',
 		} );
