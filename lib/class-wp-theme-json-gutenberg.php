@@ -152,7 +152,7 @@ class WP_Theme_JSON_Gutenberg {
 			'path'              => array( 'color', 'duotone' ),
 			'prevent_override'  => array( 'color', 'defaultDuotone' ),
 			'use_default_names' => false,
-			'value_func'        => 'gutenberg_get_duotone_filter_property',
+			'value_func'        => null, // Don't output CSS Custom Properties for duotone.
 			'css_vars'          => '--wp--preset--duotone--$slug',
 			'classes'           => array(),
 			'properties'        => array( 'filter' ),
@@ -1463,7 +1463,6 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $theme_vars_declarations as $theme_vars_declaration ) {
 				$declarations[] = $theme_vars_declaration;
 			}
-
 			$stylesheet .= static::to_ruleset( $selector, $declarations );
 		}
 
@@ -2722,7 +2721,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	public static function get_preset_css_var( $path, $slug ) {
 		$duotone_preset_metadata = static::get_preset_metadata_from_path( $path );
-		return 'var(' . static::replace_slug_in_string( $duotone_preset_metadata['css_vars'], $slug ) . ')';
+		return static::replace_slug_in_string( $duotone_preset_metadata['css_vars'], $slug );
 	}
 
 	/**

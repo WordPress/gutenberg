@@ -548,9 +548,12 @@ class WP_Duotone {
 		$filters = '';
 		// Get the CSS variable for the preset.
 		$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $duotone_preset['slug'] );
-
+		$duotone_preset_css_var_with_wrapper = 'var(' . $duotone_preset_css_var . ')';
 		// Only output the preset if it's used by a block.
-		if ( in_array( $duotone_preset_css_var, WP_Duotone::$duotone_presets, true ) ) {
+		if ( in_array( $duotone_preset_css_var_with_wrapper, WP_Duotone::$duotone_presets, true ) ) {
+			// Output the CSS for the preset.
+			// I think we should do this differently, but I'm not sure how.
+			$filters .= '<style>body{' . $duotone_preset_css_var . ':'. gutenberg_get_duotone_filter_property( $duotone_preset ) . ';}</style>';
 			$filters .= wp_get_duotone_filter_svg( $duotone_preset );
 		}
 
