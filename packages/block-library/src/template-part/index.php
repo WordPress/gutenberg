@@ -29,7 +29,6 @@ function render_block_core_template_part( $attributes ) {
 			array(
 				'post_type'      => 'wp_template_part',
 				'post_status'    => 'publish',
-				'post_name__in'  => array( $attributes['slug'] ),
 				'tax_query'      => array(
 					array(
 						'taxonomy' => 'wp_theme',
@@ -37,11 +36,18 @@ function render_block_core_template_part( $attributes ) {
 						'terms'    => $attributes['theme'],
 					),
 				),
-				'posts_per_page' => 1,
+				'posts_per_page' => -1,
 				'no_found_rows'  => true,
 			)
 		);
-		$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
+		$template_part_post  = null;
+		if ( $template_part_query->have_posts() ) {
+			foreach ( $template_part_query->posts as $template_post ) {
+				if ( $template_post->post_name === $attributes['slug'] ) {
+					$template_part_post = $template_post;
+				}
+			}
+		}
 		if ( $template_part_post ) {
 			// A published post might already exist if this template part was customized elsewhere
 			// or if it's part of a customized template.
