@@ -464,7 +464,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	// Calling gutenberg_style_engine_get_stylesheet_from_css_rules ensures that
 	// the styles are rendered in an inline for block supports because we're
-	// useing the `context` option to instruct it so.
+	// using the `context` option to instruct it so.
 	gutenberg_style_engine_get_stylesheet_from_css_rules(
 		array(
 			array(
