@@ -41,12 +41,22 @@ function ResponsiveWrapper( {
 	if ( Children.count( children ) !== 1 ) {
 		return null;
 	}
-	const imageStyle = {
-		paddingBottom:
+
+	let paddingBottom = '';
+
+	if ( undefined === naturalWidth ) {
+		paddingBottom = '100%';
+	} else {
+		paddingBottom =
 			naturalWidth < ( containerWidth ?? 0 )
-				? naturalHeight
-				: ( naturalHeight / naturalWidth ) * 100 + '%',
+				? String( naturalHeight )
+				: ( naturalHeight / naturalWidth ) * 100 + '%';
+	}
+
+	const imageStyle = {
+		paddingBottom,
 	};
+
 	const TagName = isInline ? 'span' : 'div';
 	return (
 		<TagName className="components-responsive-wrapper">
