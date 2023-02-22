@@ -568,14 +568,6 @@ class WP_Theme_JSON_Gutenberg {
 	const LATEST_SCHEMA = 2;
 
 	/**
-	 * An array of Duotone presets.
-	 *
-	 * @since 6.3.0
-	 * @var array
-	 */
-	static $duotone_presets;
-
-	/**
 	 * Constructor.
 	 *
 	 * @since 5.8.0
@@ -2437,7 +2429,7 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
 				unset( $declarations[ $index ] );
-				$declarations_duotone[]  = $declaration;
+				$declarations_duotone[] = $declaration;
 			}
 		}
 
