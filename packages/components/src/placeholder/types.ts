@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  */
 import type { IconType } from '../icon';
 
-export type PlaceholderProps< IconProps = unknown > = {
+export type PlaceholderProps< IconProps extends {} > = {
 	/**
 	 * The children elements.
 	 */

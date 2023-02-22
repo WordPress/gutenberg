@@ -74,7 +74,7 @@ export type RangeMarkProps = {
 
 export type ControlledRangeValue = number | '' | null;
 
-export type RangeControlProps< IconProps = unknown > = Pick<
+export type RangeControlProps< IconProps extends {} > = Pick<
 	BaseControlProps,
 	'hideLabelFromVision' | 'help' | '__nextHasNoMarginBottom'
 > &

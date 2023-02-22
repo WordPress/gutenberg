@@ -8,7 +8,7 @@ import type { MouseEvent, ReactNode } from 'react';
  */
 import type { IconType } from '../icon';
 
-type Tab< IconProps = unknown > = {
+type Tab< IconProps extends {} = {} > = {
 	/**
 	 * The key of the tab.
 	 */
@@ -31,7 +31,7 @@ type Tab< IconProps = unknown > = {
 	disabled?: boolean;
 } & Record< any, any >;
 
-export type TabButtonProps< IconProps = unknown > = {
+export type TabButtonProps< IconProps extends {} = {} > = {
 	children: ReactNode;
 	label?: string;
 	onClick: ( event: MouseEvent ) => void;
