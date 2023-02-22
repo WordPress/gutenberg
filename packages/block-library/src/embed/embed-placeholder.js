@@ -4,6 +4,7 @@
 import { __, _x } from '@wordpress/i18n';
 import { Button, Placeholder, ExternalLink } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
 
 const EmbedPlaceholder = ( {
 	icon,
@@ -14,6 +15,7 @@ const EmbedPlaceholder = ( {
 	cannotEmbed,
 	fallback,
 	tryAgain,
+	onReplace,
 } ) => {
 	return (
 		<Placeholder
@@ -56,6 +58,18 @@ const EmbedPlaceholder = ( {
 					</Button>{ ' ' }
 					<Button variant="secondary" onClick={ fallback }>
 						{ _x( 'Convert to link', 'button label' ) }
+					</Button>{ ' ' }
+					<Button
+						variant="secondary"
+						onClick={ () => {
+							onReplace(
+								createBlock( 'core/link-preview', {
+									url: value,
+								} )
+							);
+						} }
+					>
+						{ _x( 'Convert to link preview', 'button label' ) }
 					</Button>
 				</div>
 			) }
