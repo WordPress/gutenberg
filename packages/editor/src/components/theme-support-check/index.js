@@ -18,7 +18,7 @@ export function ThemeSupportCheck( {
 	const isSupported = (
 		Array.isArray( supportKeys ) ? supportKeys : [ supportKeys ]
 	 ).some( ( key ) => {
-		const supported = themeSupports[ key ] ?? false;
+		const supported = themeSupports?.[ key ] ?? false;
 		// 'post-thumbnails' can be boolean or an array of post types.
 		// In the latter case, we need to verify `postType` exists
 		// within `supported`. If `postType` isn't passed, then the check
