@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useBlockProps, BlockControls } from '@wordpress/block-editor';
 import { __experimentalFetchUrlData } from '@wordpress/core-data';
 import {
@@ -14,6 +14,7 @@ import {
 	Notice,
 } from '@wordpress/components';
 import { link, edit } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
@@ -23,8 +24,8 @@ export default function LinkPreviewEdit( props ) {
 	const { attributes, setAttributes } = props;
 	const { url, title } = attributes;
 	const [ isFetching, setIsFetching ] = useState( false );
-	const [ isEditingUrl, setIsEditingUrl ] = useState( ! url || ! title );
-	const [ urlValue, setURLValue ] = useState( '' );
+	const [ isEditingUrl, setIsEditingUrl ] = useState( ! url );
+	const [ urlValue, setURLValue ] = useState( url );
 	const [ hasError, setHasError ] = useState( false );
 
 	const blockProps = useBlockProps( {
@@ -35,7 +36,34 @@ export default function LinkPreviewEdit( props ) {
 			  },
 	} );
 
-	if ( isEditingUrl ) {
+	useEffect( () => {
+		if ( url && ! title ) {
+			setIsFetching( true );
+			__experimentalFetchUrlData( url )
+				.catch( () => {
+					setHasError( true );
+				} )
+				.then( ( data ) => {
+					if ( ! data || ! data.title ) {
+						setHasError( true );
+					} else {
+						setHasError( false );
+						setIsEditingUrl( false );
+						setAttributes( {
+							title: data.title,
+							icon: data.icon,
+							image: data.image,
+							description: data.description,
+						} );
+					}
+				} )
+				.finally( () => {
+					setIsFetching( false );
+				} );
+		}
+	}, [ url, title, setAttributes ] );
+
+	if ( isEditingUrl || hasError ) {
 		return (
 			<div { ...blockProps }>
 				<Placeholder
@@ -53,29 +81,13 @@ export default function LinkPreviewEdit( props ) {
 					<form
 						onSubmit={ ( event ) => {
 							event.preventDefault();
-							setHasError( false );
-							setIsFetching( true );
-							__experimentalFetchUrlData( urlValue )
-								.catch( () => {
-									setHasError( true );
-								} )
-								.then( ( data ) => {
-									if ( ! data || ! data.title ) {
-										setHasError( true );
-									} else {
-										setAttributes( {
-											url: urlValue,
-											title: data.title,
-											icon: data.icon,
-											image: data.image,
-											description: data.description,
-										} );
-										setIsEditingUrl( false );
-									}
-								} )
-								.finally( () => {
-									setIsFetching( false );
-								} );
+							setAttributes( {
+								url: urlValue,
+								title: '',
+								icon: '',
+								image: '',
+								description: '',
+							} );
 						} }
 					>
 						<input

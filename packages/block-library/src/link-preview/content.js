@@ -1,5 +1,6 @@
 export function Content( { props, attributes } ) {
 	const { url, title, image, icon } = attributes;
+	if ( ! url ) return null;
 	return (
 		<a
 			{ ...props }
