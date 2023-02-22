@@ -146,9 +146,9 @@ function ShadowPopoverContainer( { shadow, onShadowChange } ) {
 function ShadowPresets( { presets, activeShadow, onSelect } ) {
 	return ! presets ? null : (
 		<Grid columns={ 6 } gap={ 0 } align="center" justify="center">
-			{ presets.map( ( { name, shadow }, i ) => (
+			{ presets.map( ( { name, slug, shadow } ) => (
 				<ShadowIndicator
-					key={ i }
+					key={ slug }
 					label={ name }
 					isActive={ shadow === activeShadow }
 					onSelect={ () =>
