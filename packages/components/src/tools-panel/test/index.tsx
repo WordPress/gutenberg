@@ -9,7 +9,10 @@ import userEvent from '@testing-library/user-event';
  */
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
-import type { ToolsPanelContext as ToolsPanelContextType } from '../types';
+import type {
+	ToolsPanelContext as ToolsPanelContextType,
+	ResetAllFilter,
+} from '../types';
 
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const resetAll = jest.fn();
@@ -1174,8 +1177,9 @@ describe( 'ToolsPanel', () => {
 				</>
 			);
 
-			const resetAllCallback = ( filters ) =>
-				filters.forEach( ( f ) => f() );
+			const resetAllCallback = (
+				filters: ResetAllFilter[] | undefined
+			) => filters?.forEach( ( f ) => f() );
 
 			const { rerender } = render(
 				<ToolsPanel
