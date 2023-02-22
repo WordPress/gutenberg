@@ -569,6 +569,9 @@ class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * An array of Duotone presets.
+	 *
+	 * @since 6.3.0
+	 * @var array
 	 */
 	static $duotone_presets;
 
@@ -2430,7 +2433,7 @@ class WP_Theme_JSON_Gutenberg {
 		$declarations_duotone = array();
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
-				self::$duotone_presets[] = $declarations[ $index ]['value'];
+				static::$duotone_presets[] = $declarations[ $index ]['value'];
 				$declarations_duotone[]  = $declaration;
 				unset( $declarations[ $index ] );
 			}
@@ -2710,7 +2713,7 @@ class WP_Theme_JSON_Gutenberg {
 					$duotone_preset_css_var = $this->get_preset_css_var( array( 'color', 'duotone' ), $duotone_preset['slug'] );
 
 					// Only output the preset if it's used by a block.
-					if ( in_array( $duotone_preset_css_var, self::$duotone_presets, true ) ) {
+					if ( in_array( $duotone_preset_css_var, static::$duotone_presets, true ) ) {
 						$filters .= wp_get_duotone_filter_svg( $duotone_preset );
 					}
 				}
