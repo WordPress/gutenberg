@@ -175,13 +175,16 @@ test.describe( 'List (@firefox)', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
 
-	test( 'should not undo asterisk transform with backspace after selection change (-firefox)', async ( {
+	test( 'should not undo asterisk transform with backspace after selection change', async ( {
 		editor,
 		page,
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '* ' );
 		await expect( page.locator( '[data-type="core/list"]' ) ).toBeVisible();
+		// Wait until the automatic change is marked as "final", which is done
+		// with an idle callback, see __unstableMarkAutomaticChange.
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
