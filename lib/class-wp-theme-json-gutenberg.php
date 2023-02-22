@@ -2431,7 +2431,7 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
 				self::$duotone_presets[] = $declarations[ $index ]['value'];
-				$declarations_duotone[] = $declaration;
+				$declarations_duotone[]  = $declaration;
 				unset( $declarations[ $index ] );
 			}
 		}
@@ -2710,7 +2710,7 @@ class WP_Theme_JSON_Gutenberg {
 					$duotone_preset_css_var = $this->get_preset_css_var( array( 'color', 'duotone' ), $duotone_preset['slug'] );
 
 					// Only output the preset if it's used by a block.
-					if ( in_array( $duotone_preset_css_var, self::$duotone_presets ) ) {
+					if ( in_array( $duotone_preset_css_var, self::$duotone_presets, true ) ) {
 						$filters .= wp_get_duotone_filter_svg( $duotone_preset );
 					}
 				}
@@ -2731,7 +2731,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	function get_preset_css_var( $path, $slug ) {
 		$duotone_preset_metadata = $this->get_preset_metadata_from_path( $path );
-		return 'var(' . static::replace_slug_in_string( $duotone_preset_metadata['css_vars'], $slug ) .')';
+		return 'var(' . static::replace_slug_in_string( $duotone_preset_metadata['css_vars'], $slug ) . ')';
 	}
 
 	/**
@@ -2743,13 +2743,16 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array Preset metadata.
 	 */
 	function get_preset_metadata_from_path( $path ) {
-		$preset_metadata = array_filter( static::PRESETS_METADATA, function( $preset ) use ( &$path ) {
-			if ( $preset['path'] === $path ) {
-				return $preset;
+		$preset_metadata = array_filter(
+			static::PRESETS_METADATA,
+			function( $preset ) use ( &$path ) {
+				if ( $preset['path'] === $path ) {
+					return $preset;
+				}
 			}
-		} );
+		);
 
-		return reset($preset_metadata);
+		return reset( $preset_metadata );
 	}
 
 	/**
