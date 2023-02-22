@@ -12,7 +12,7 @@ Users have the ability to lock and unlock blocks via the editor. The locking UI 
 
 ![Image of locking interface](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/Locking%20interface.png?raw=true)
 
-Keep in mind that you can apply the locking options to blocks inside of the initial block you are locking by turning on the "Apply to all blocks inside" option but you cannot mass lock blocks otherwise. 
+Keep in mind that you can apply locking options to blocks nested inside of a containing block by turning on the "Apply to all blocks inside" option. However, you cannot mass lock blocks otherwise.
 
 **Lock the ability to edit certain blocks**
 
