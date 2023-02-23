@@ -467,7 +467,8 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// Build a unique slug for the filter based on the array of colors.
 		$filter_key    = $is_duotone_colors_array ? implode( '-', $duotone_attr ) : $duotone_attr;
 		$filter_preset = array(
-			'slug' => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
+			'slug'   => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
+			'colors' => $duotone_attr, // required for building the SVG with gutenberg_get_duotone_filter_svg.
 		);
 
 		// Build a customised CSS filter property for unique slug.
@@ -513,6 +514,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// Note: duotone presets are already pre-generated so no need to do this again.
 	if ( $is_duotone_colors_array ) {
 		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_preset );
+
 		add_action(
 			'wp_footer',
 			static function () use ( $filter_svg, $selector ) {
