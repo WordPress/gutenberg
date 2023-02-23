@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentProps, ComponentStory } from '@storybook/react';
+import type { FunctionComponent } from 'react';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -25,7 +26,7 @@ const meta: ComponentMeta< typeof PaletteEdit > = {
 };
 export default meta;
 
-export const ColorsTemplate: ComponentStory< ComponentProps< PaletteEditColorsProps > > = ( args ) => {
+export const ColorsTemplate: ComponentStory< FunctionComponent< PaletteEditColorsProps > > = ( args ) => {
 	const {
 		colors,
 		onChange,
