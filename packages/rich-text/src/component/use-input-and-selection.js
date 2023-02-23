@@ -295,13 +295,6 @@ export function useInputAndSelection( props ) {
 		element.addEventListener( 'compositionstart', onCompositionStart );
 		element.addEventListener( 'compositionend', onCompositionEnd );
 		element.addEventListener( 'focus', onFocus );
-		// Selection updates must be done at these events as they
-		// happen before the `selectionchange` event. In some cases,
-		// the `selectionchange` event may not even fire, for
-		// example when the window receives focus again on click.
-		element.addEventListener( 'keyup', handleSelectionChange );
-		element.addEventListener( 'mouseup', handleSelectionChange );
-		element.addEventListener( 'touchend', handleSelectionChange );
 		ownerDocument.addEventListener(
 			'selectionchange',
 			handleSelectionChange
@@ -314,9 +307,6 @@ export function useInputAndSelection( props ) {
 			);
 			element.removeEventListener( 'compositionend', onCompositionEnd );
 			element.removeEventListener( 'focus', onFocus );
-			element.removeEventListener( 'keyup', handleSelectionChange );
-			element.removeEventListener( 'mouseup', handleSelectionChange );
-			element.removeEventListener( 'touchend', handleSelectionChange );
 			ownerDocument.removeEventListener(
 				'selectionchange',
 				handleSelectionChange
