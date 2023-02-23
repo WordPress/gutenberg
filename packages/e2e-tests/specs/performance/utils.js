@@ -41,6 +41,10 @@ function isFocusEvent( item ) {
 	return isEvent( item ) && item.args.data.type === 'focus';
 }
 
+function isFocusInEvent( item ) {
+	return isEvent( item ) && item.args.data.type === 'focusin';
+}
+
 function isClickEvent( item ) {
 	return isEvent( item ) && item.args.data.type === 'click';
 }
@@ -51,6 +55,10 @@ function isMouseOverEvent( item ) {
 
 function isMouseOutEvent( item ) {
 	return isEvent( item ) && item.args.data.type === 'mouseout';
+}
+
+function isSelectionChangeEvent( item ) {
+	return isEvent( item ) && item.args.data.type === 'selectionchange';
 }
 
 function getEventDurationsForType( trace, filterFunction ) {
@@ -68,7 +76,11 @@ export function getTypingEventDurations( trace ) {
 }
 
 export function getSelectionEventDurations( trace ) {
-	return [ getEventDurationsForType( trace, isFocusEvent ) ];
+	return [
+		getEventDurationsForType( trace, isFocusEvent ),
+		getEventDurationsForType( trace, isFocusInEvent ),
+		getEventDurationsForType( trace, isSelectionChangeEvent ),
+	];
 }
 
 export function getClickEventDurations( trace ) {
