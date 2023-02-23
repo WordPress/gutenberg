@@ -164,11 +164,6 @@ describe.each( [
 			);
 			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
-
-		it( 'should fall back to first enabled tab if the active tab is disabled', async () => {
-			// Both initially, and as a re-render
-			expect( true ).toBe( false );
-		} );
 	} );
 
 	describe( 'With `initialTabName`', () => {
@@ -222,10 +217,72 @@ describe.each( [
 			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
 
-		it( 'should fall back to initial tab if active tab is removed', async () => {} );
+		it( 'should fall back to the tab associated to `initialTabName` if the currently active tab is removed', async () => {
+			const user = userEvent.setup();
+			const mockOnSelect = jest.fn();
 
-		it( 'should ??? when the tab associated to `initialTabName` is removed while being the active tab', async () => {
-			expect( true ).toBe( false );
+			const { rerender } = render(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			rerender(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS.slice( 1 ) } // Remove alpha
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+		} );
+
+		it( 'should have no active tabs when the tab associated to `initialTabName` is removed while being the active tab', () => {
+			const mockOnSelect = jest.fn();
+
+			const { rerender } = render(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			rerender(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS.slice( 0, 2 ) } // Remove gamma
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
+			expect(
+				screen.queryByRole( 'tab', { selected: true } )
+			).not.toBeInTheDocument();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'waits for the tab with the `initialTabName` to be present in the `tabs` array before selecting it', () => {
@@ -263,13 +320,6 @@ describe.each( [
 			expect( getSelectedTab() ).toHaveTextContent( 'Delta' );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'delta' );
 		} );
-
-		it( 'should select first available tab if the tab associated to `initialTabName` is disabled', () => {
-			// TODO: Both initially, and as a re-render
-			// - what happens if the tab is not disabled anymore?
-
-			expect( true ).toBe( false );
-		} );
 	} );
 
 	describe( 'Disabled Tab', () => {
@@ -306,11 +356,45 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		// See if this behaviour changes when `initialTabName` prop is provided
-		it( 'should select first enabled tab when initial tab is disabled', () => {
+		it( 'should select first enabled tab when the initial tab is disabled', () => {
 			const mockOnSelect = jest.fn();
 
-			render(
+			const { rerender } = render(
+				<Component
+					// Disable alpha
+					tabs={ TABS.map( ( tab ) => {
+						if ( tab.name !== 'alpha' ) {
+							return tab;
+						}
+						return { ...tab, disabled: true };
+					} ) }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// As alpha (first tab) is disabled,
+			// the first enabled tab should be gamma.
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+
+			// Re-enable all tabs
+			rerender(
+				<Component
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// Even if the initial tab becomes enabled again, the selected tab doesn't
+			// change.
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+		} );
+
+		it( 'should select first enabled tab when the tab associated to `initialTabName` is disabled', () => {
+			const mockOnSelect = jest.fn();
+
+			const { rerender } = render(
 				<Component
 					tabs={ TABS.map( ( tab ) => {
 						if ( tab.name === 'gamma' ) {
@@ -326,9 +410,21 @@ describe.each( [
 
 			// As alpha (first tab), and beta (the initial tab), are both
 			// disabled the first enabled tab should be gamma.
-			expect(
-				screen.queryByRole( 'tab', { selected: true } )
-			).toHaveTextContent( 'Gamma' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+
+			// Re-enable all tabs
+			rerender(
+				<Component
+					tabs={ TABS }
+					initialTabName="beta"
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// Even if the initial tab becomes enabled again, the selected tab doesn't
+			// change.
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
 		} );
 
 		it( 'should select the first enabled tab when the selected tab becomes disabled', () => {
@@ -342,6 +438,8 @@ describe.each( [
 			);
 
 			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			rerender(
 				<Component
@@ -357,6 +455,66 @@ describe.each( [
 			);
 
 			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+
+			rerender(
+				<Component
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+		} );
+
+		it( 'should select the first enabled tab when the tab associated to `initialTabName` becomes disabled while being the active tab', () => {
+			const mockOnSelect = jest.fn();
+
+			const { rerender } = render(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			rerender(
+				<Component
+					initialTabName="gamma"
+					tabs={ [
+						TABS[ 0 ],
+						TABS[ 1 ],
+						{ ...TABS[ 2 ], disabled: true },
+					] } // Disable gamma
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			rerender(
+				<Component
+					initialTabName="gamma"
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );
 
@@ -379,8 +537,6 @@ describe.each( [
 			expect(
 				screen.getByRole( 'tabpanel', { name: 'Alpha' } )
 			).toBeInTheDocument();
-			// TODO: should `mockOnSelect` be called?
-			// TODO: should it be called when we pass `initialTabName` ?
 			expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
@@ -672,8 +828,6 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 		} );
-
-		// TODO: check that disabled tabs are ignored by clicks, and skipped when using arrows
 	} );
 
 	describe( 'Tab Attributes', () => {
