@@ -265,6 +265,25 @@ export function useInputAndSelection( props ) {
 			);
 		}
 
+		function removeSelectionAfterFocusHandlers() {
+			[ 'keyup', 'mouseup', 'touchend' ].forEach( ( eventName ) => {
+				element.removeEventListener(
+					eventName,
+					handleSelectionAfterFocusOnce
+				);
+			} );
+			element.removeEventListener(
+				'selectionchange',
+				removeSelectionAfterFocusHandlers
+			);
+		}
+
+		function handleSelectionAfterFocusOnce( event ) {
+			// Should only be handled once, so remove the listeners.
+			removeSelectionAfterFocusHandlers();
+			handleSelectionChange( event );
+		}
+
 		function onFocus() {
 			const { record, isSelected, onSelectionChange, applyRecord } =
 				propsRef.current;
@@ -287,6 +306,19 @@ export function useInputAndSelection( props ) {
 					end: index,
 					activeFormats: EMPTY_ACTIVE_FORMATS,
 				};
+
+				[ 'keyup', 'mouseup', 'touchend' ].forEach( ( eventName ) => {
+					element.addEventListener(
+						eventName,
+						handleSelectionAfterFocusOnce
+					);
+				} );
+				// If focus is not the result of a mouseup, touchend, or keyup
+				// event, we don't want to keep listening to those events.
+				element.addEventListener(
+					'selectionchange',
+					removeSelectionAfterFocusHandlers
+				);
 			} else {
 				applyRecord( record.current );
 				onSelectionChange( record.current.start, record.current.end );
@@ -303,13 +335,6 @@ export function useInputAndSelection( props ) {
 		element.addEventListener( 'compositionstart', onCompositionStart );
 		element.addEventListener( 'compositionend', onCompositionEnd );
 		element.addEventListener( 'focus', onFocus );
-		// Selection updates must be done at these events as they
-		// happen before the `selectionchange` event. In some cases,
-		// the `selectionchange` event may not even fire, for
-		// example when the window receives focus again on click.
-		element.addEventListener( 'keyup', handleSelectionChange );
-		element.addEventListener( 'mouseup', handleSelectionChange );
-		element.addEventListener( 'touchend', handleSelectionChange );
 		ownerDocument.addEventListener(
 			'selectionchange',
 			handleSelectionChange
@@ -322,9 +347,7 @@ export function useInputAndSelection( props ) {
 			);
 			element.removeEventListener( 'compositionend', onCompositionEnd );
 			element.removeEventListener( 'focus', onFocus );
-			element.removeEventListener( 'keyup', handleSelectionChange );
-			element.removeEventListener( 'mouseup', handleSelectionChange );
-			element.removeEventListener( 'touchend', handleSelectionChange );
+			removeSelectionAfterFocusHandlers();
 			ownerDocument.removeEventListener(
 				'selectionchange',
 				handleSelectionChange
