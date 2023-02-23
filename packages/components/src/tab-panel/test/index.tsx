@@ -1,8 +1,13 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { wordpress, category, media } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -30,8 +35,6 @@ const TABS = [
 const getSelectedTab = () => screen.getByRole( 'tab', { selected: true } );
 
 let originalGetClientRects: () => DOMRectList;
-
-// TODO: check tooltips
 
 describe.each( [
 	[ 'uncontrolled', TabPanel ],
@@ -87,6 +90,43 @@ describe.each( [
 				'aria-labelledby',
 				allTabs[ 0 ].getAttribute( 'id' )
 			);
+		} );
+
+		test( 'should display a tooltip when hovering tabs provided with an icon', async () => {
+			const user = userEvent.setup();
+
+			const panelRenderFunction = jest.fn();
+
+			const TABS_WITH_ICON = [
+				{ ...TABS[ 0 ], icon: wordpress },
+				{ ...TABS[ 1 ], icon: category },
+				{ ...TABS[ 2 ], icon: media },
+			];
+
+			render(
+				<Component
+					tabs={ TABS_WITH_ICON }
+					children={ panelRenderFunction }
+				/>
+			);
+
+			const allTabs = screen.getAllByRole( 'tab' );
+
+			for ( let i = 0; i < allTabs.length; i++ ) {
+				expect(
+					screen.queryByText( TABS_WITH_ICON[ i ].title )
+				).not.toBeInTheDocument();
+
+				await user.hover( allTabs[ i ] );
+
+				await waitFor( () =>
+					expect(
+						screen.getByText( TABS_WITH_ICON[ i ].title )
+					).toBeVisible()
+				);
+
+				await user.unhover( allTabs[ i ] );
+			}
 		} );
 	} );
 
