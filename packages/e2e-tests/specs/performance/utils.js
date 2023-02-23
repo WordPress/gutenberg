@@ -15,34 +15,31 @@ export function deleteFile( filePath ) {
 	}
 }
 
-function isEvent( item ) {
+function isEvent( item, type ) {
 	return (
 		item.cat === 'devtools.timeline' &&
 		item.name === 'EventDispatch' &&
 		item.dur &&
 		item.args &&
-		item.args.data
+		item.args.data &&
+		item.args.data.type === type
 	);
 }
 
 function isKeyDownEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'keydown';
-}
-
-function isFocusEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'focus';
+	return isEvent( item, 'keydown' );
 }
 
 function isClickEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'click';
+	return isEvent( item, 'click' );
 }
 
 function isMouseOverEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'mouseover';
+	return isEvent( item, 'mouseover' );
 }
 
 function isMouseOutEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'mouseout';
+	return isEvent( item, 'mouseout' );
 }
 
 function getEventDurationsForType( trace, filterFunction ) {
@@ -61,11 +58,10 @@ export function getTypingEventDurations( trace ) {
 	return [ getEventStartForType( trace, isKeyDownEvent ) ];
 }
 
-export function getSelectionEventDurations( trace ) {
-	return [
-		getEventStartForType( trace, isFocusEvent ),
-		getEventStartForType( trace, isKeyDownEvent ),
-	];
+export function getDiffBetweenEventStarts( trace, aType, bType ) {
+	const aEvent = trace.traceEvents.find( ( item ) => isEvent( item, aType ) );
+	const bEvent = trace.traceEvents.find( ( item ) => isEvent( item, bType ) );
+	return ( bEvent.ts - aEvent.ts ) / 1000;
 }
 
 export function getClickEventDurations( trace ) {

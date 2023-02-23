@@ -27,9 +27,9 @@ import {
 	getTypingEventDurations,
 	getClickEventDurations,
 	getHoverEventDurations,
-	getSelectionEventDurations,
 	getLoadingDurations,
 	sum,
+	getDiffBetweenEventStarts,
 } from './utils';
 
 jest.setTimeout( 1000000 );
@@ -242,9 +242,13 @@ describe( 'Post Editor Performance', () => {
 			await page.keyboard.type( 'a' );
 			await page.tracing.stop();
 			traceResults = JSON.parse( readFile( traceFile ) );
-			const [ focusEvents, keyDownEvents ] =
-				getSelectionEventDurations( traceResults );
-			results.focus.push( keyDownEvents[ 0 ] - focusEvents[ 0 ] );
+			results.focus.push(
+				getDiffBetweenEventStarts(
+					traceResults,
+					'pointerdown',
+					'keydown'
+				)
+			);
 		}
 	} );
 
