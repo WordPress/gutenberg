@@ -290,12 +290,6 @@ export function useInputAndSelection( props ) {
 				applyRecord( record.current );
 				onSelectionChange( record.current.start, record.current.end );
 			}
-
-			// Update selection as soon as possible, which is at the next animation
-			// frame. The event listener for selection changes may be added too late
-			// at this point, but this focus event is still too early to calculate
-			// the selection.
-			window.queueMicrotask( handleSelectionChange );
 		}
 
 		element.addEventListener( 'input', onInput );
