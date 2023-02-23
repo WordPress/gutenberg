@@ -30,11 +30,21 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 	const [ isBusy, setIsBusy ] = useState( false );
 
 	const registry = useRegistry();
-	const sidebars = useSelect( ( select ) => {
-		return select( coreStore ).getSidebars( {
-			per_page: -1,
-			_fields: 'id,name,description,status,widgets',
-		} );
+	const { sidebars, hasResolved } = useSelect( ( select ) => {
+		const { getSidebars, hasFinishedResolution } = select( coreStore );
+
+		return {
+			sidebars: getSidebars( {
+				per_page: -1,
+				_fields: 'id,name,description,status,widgets',
+			} ),
+			hasResolved: hasFinishedResolution( 'getSidebars', [
+				{
+					per_page: -1,
+					_fields: 'id,name,description,status,widgets',
+				},
+			] ),
+		};
 	}, [] );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -66,6 +76,12 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 			...sidebarOptions,
 		];
 	}, [ sidebars ] );
+
+	// Only bailout from rendering after data is loaded, and there is nothing to import,
+	// to avoid SlotFill re-positioning issue. See: https://github.com/WordPress/gutenberg/issues/15641.
+	if ( hasResolved && ! options.length ) {
+		return null;
+	}
 
 	async function createFromWidgets( event ) {
 		event.preventDefault();
