@@ -65,7 +65,7 @@ type PaletteEditColors = {
 	 * Runs on changing the value.
 	 */
 	onChange: ( newColors?: Color[] ) => void;
-}
+};
 
 type PaletteEditGradients = {
 	/**
@@ -76,7 +76,7 @@ type PaletteEditGradients = {
 	 * Runs on changing the value.
 	 */
 	onChange: ( newGradients?: Gradient[] ) => void;
-}
+};
 
 export type PaletteEditColorsProps = BasePaletteEdit & PaletteEditColors;
 export type PaletteEditGradientsProps = BasePaletteEdit & PaletteEditGradients;
@@ -93,7 +93,7 @@ export type ColorPickerPopoverProps< T extends Color | Gradient > = {
 	onChange: ( newElement: T ) => void;
 	onClose?: () => void;
 	isGradient?: boolean;
-}
+};
 
 export type NameInputProps = {
 	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;
@@ -112,7 +112,7 @@ export type OptionProps< T extends Color | Gradient > = {
 	onStartEditing: () => void;
 	onStopEditing: () => void;
 	slugPrefix: SlugPrefix;
-}
+};
 
 export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	elements: T[];
@@ -122,4 +122,4 @@ export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	editingElement?: EditingElement;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
 	slugPrefix: SlugPrefix;
-}
+};

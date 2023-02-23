@@ -74,7 +74,7 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
  * It expects slugs to be in the format: slugPrefix + color- + number.
  * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
  *
- * @param elements An array of color palette items.
+ * @param elements   An array of color palette items.
  * @param slugPrefix The slug prefix used to match the element slug.
  *
  * @return A unique name for a palette item.
@@ -125,7 +125,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 						onChange( {
 							...element,
 							color: newColor,
-						} )
+						} );
 					} }
 				/>
 			) }
@@ -139,7 +139,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 							onChange( {
 								...element,
 								gradient: newGradient,
-							} )
+							} );
 						} }
 					/>
 				</div>
@@ -554,7 +554,11 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 						<PaletteEditListView
 							canOnlyChangeValues={ canOnlyChangeValues }
 							elements={ elements }
-							onChange={ onChange as ( newElement?: ( Color | Gradient )[] ) => void }
+							onChange={
+								onChange as (
+									newElement?: ( Color | Gradient )[]
+								) => void
+							}
 							editingElement={ editingElement }
 							setEditingElement={ setEditingElement }
 							slugPrefix={ slugPrefix }

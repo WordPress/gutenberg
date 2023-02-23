@@ -26,12 +26,10 @@ const meta: ComponentMeta< typeof PaletteEdit > = {
 };
 export default meta;
 
-export const ColorsTemplate: ComponentStory< FunctionComponent< PaletteEditColorsProps > > = ( args ) => {
-	const {
-		colors,
-		onChange,
-		...props
-	} = args;
+export const ColorsTemplate: ComponentStory<
+	FunctionComponent< PaletteEditColorsProps >
+> = ( args ) => {
+	const { colors, onChange, ...props } = args;
 
 	const [ controlledColors, setControlledColors ] = useState( colors );
 
@@ -40,7 +38,7 @@ export const ColorsTemplate: ComponentStory< FunctionComponent< PaletteEditColor
 			colors={ controlledColors }
 			onChange={ ( newColors?: Color[] ) => {
 				if ( newColors ) {
-					setControlledColors( newColors);
+					setControlledColors( newColors );
 				}
 			} }
 			{ ...props }
