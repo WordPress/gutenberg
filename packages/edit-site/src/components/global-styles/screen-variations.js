@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 /**
  * Internal dependencies
@@ -26,9 +26,11 @@ export function ScreenVariations( props ) {
 		<div className="edit-site-global-styles-screen-variations">
 			<VStack spacing={ 3 }>
 				<p>
-					{ __( 'Customize variations of the block:' ) +
-						' ' +
-						blockName }
+					{ sprintf(
+						// Translators: Name of the block.
+						__( 'Customize variations of the block: %s' ),
+						blockName
+					) }
 				</p>
 				<Subtitle>{ __( 'Style Variations' ) }</Subtitle>
 				<VariationsPanel name={ name } />
