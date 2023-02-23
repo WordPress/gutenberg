@@ -31,7 +31,6 @@ const getSelectedTab = () => screen.getByRole( 'tab', { selected: true } );
 
 let originalGetClientRects: () => DOMRectList;
 
-// TODO: check focused but disabled tabs
 // TODO: check tooltips
 
 describe.each( [
@@ -321,7 +320,7 @@ describe.each( [
 	} );
 
 	describe( 'Tab Activation', () => {
-		it( 'should render a tabpanel, and clicking should change tabs', async () => {
+		it( 'defaults to automatic tab activation (pointer clicks)', async () => {
 			const user = userEvent.setup();
 			const panelRenderFunction = jest.fn();
 			const mockOnSelect = jest.fn();
@@ -365,8 +364,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 		} );
 
-		// TODO: are up/down arrow keys supported too?
-		it( 'defaults to automatic tab activation', async () => {
+		it( 'defaults to automatic tab activation (arrow keys)', async () => {
 			const user = userEvent.setup();
 			const mockOnSelect = jest.fn();
 
@@ -381,34 +379,211 @@ describe.each( [
 			// onSelect gets called on the initial render.
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
-			// Click on Alpha. Make sure alpha is selected.
-			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
-			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+			// Tab to focus the tablist. Make sure alpha is focused.
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).not.toHaveFocus();
+			await user.keyboard( '[Tab]' );
+			await expect( getSelectedTab() ).toHaveFocus();
 
 			// Navigate forward with arrow keys and make sure the Beta tab is
 			// selected automatically.
 			await user.keyboard( '[ArrowRight]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
-			// Navigate forward with arrow keys. Make sure gamma (last tab) is
+			// Navigate backwards with arrow keys. Make sure alpha is
+			// selected automatically.
+			await user.keyboard( '[ArrowLeft]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+		} );
+
+		it( 'wraps around the last/first tab when using arrow keys', async () => {
+			const user = userEvent.setup();
+			const mockOnSelect = jest.fn();
+
+			render(
+				<Component
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// onSelect gets called on the initial render.
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+			// Tab to focus the tablist. Make sure Alpha is focused.
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).not.toHaveFocus();
+			await user.keyboard( '[Tab]' );
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Navigate backwards with arrow keys and make sure that the Gamma tab
+			// (the last tab) is selected automatically.
+			await user.keyboard( '[ArrowLeft]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			// Navigate forward with arrow keys. Make sure alpha (the first tab) is
 			// selected automatically.
 			await user.keyboard( '[ArrowRight]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+		} );
+
+		it( 'should not move tab selection when pressing the up/down arrow keys, unless the orientation is changed to `vertical`', async () => {
+			const user = userEvent.setup();
+			const mockOnSelect = jest.fn();
+
+			const { rerender } = render(
+				<Component
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// onSelect gets called on the initial render.
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+			// Tab to focus the tablist. Make sure alpha is focused.
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).not.toHaveFocus();
+			await user.keyboard( '[Tab]' );
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Press the arrow up key, nothing happens.
+			await user.keyboard( '[ArrowUp]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			// Press the arrow down key, nothing happens
+			await user.keyboard( '[ArrowDown]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			// Change orientation to `vertical`. When the orientation is vertical,
+			// left/right arrow keys are replaced by up/down arrow keys.
+			rerender(
+				<Component
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+					orientation="vertical"
+				/>
+			);
+
+			expect( screen.getByRole( 'tablist' ) ).toHaveAttribute(
+				'aria-orientation',
+				'vertical'
+			);
+
+			// Make sure alpha is still focused.
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Navigate forward with arrow keys and make sure the Beta tab is
+			// selected automatically.
+			await user.keyboard( '[ArrowDown]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+
+			// Navigate backwards with arrow keys. Make sure alpha is
+			// selected automatically.
+			await user.keyboard( '[ArrowUp]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			// Navigate backwards with arrow keys. Make sure alpha is
+			// selected automatically.
+			await user.keyboard( '[ArrowUp]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			await expect( getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
-			// Navigate forward with arrow keys. Make sure Alpha (first tab) is
+			// Navigate backwards with arrow keys. Make sure alpha is
 			// selected automatically.
-			await user.keyboard( '[ArrowRight]' );
+			await user.keyboard( '[ArrowDown]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 5 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+		} );
 
-			// Navigate backwards with arrow keys. Make sure Gamma (last tab) is
-			// selected automatically.
-			await user.keyboard( '[ArrowLeft]' );
-			expect( mockOnSelect ).toHaveBeenCalledTimes( 6 );
+		it( 'should move focus on a tab even if disabled with arrow key, but not with pointer clicks', async () => {
+			const user = userEvent.setup();
+			const mockOnSelect = jest.fn();
+
+			render(
+				<Component
+					tabs={ [
+						...TABS,
+						{
+							name: 'delta',
+							title: 'Delta',
+							className: 'delta-class',
+							disabled: true,
+						},
+					] }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// onSelect gets called on the initial render.
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+			// Tab to focus the tablist. Make sure Alpha is focused.
+			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+			await expect( getSelectedTab() ).not.toHaveFocus();
+			await user.keyboard( '[Tab]' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+			// Press the right arrow key three times. Since the delta tab is disabled:
+			// - it won't be selected. The gamma tab will be selected instead, since
+			//   it was the tab that was last selected before delta. Therefore, the
+			//   `mockOnSelect` function gets called only twice (and not three times)
+			// - it will receive focus, when using arrow keys
+			await user.keyboard( '[ArrowRight][ArrowRight][ArrowRight]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			await expect(
+				screen.getByRole( 'tab', { name: 'Delta' } )
+			).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			// Navigate backwards with arrow keys. The gamma tab receives focus.
+			await user.keyboard( '[ArrowLeft]' );
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+
+			// Click on on the disabled tab. Compared to using arrow keys to move the
+			// focus, disabled tabs ignore pointer clicks — and therefore, they don't
+			// receive focus, nor they cause the `mockOnSelect` function to fire.
+			await user.click( screen.getByRole( 'tab', { name: 'Delta' } ) );
+			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
+			await expect( getSelectedTab() ).toHaveFocus();
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 		} );
 
 		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
@@ -455,9 +630,6 @@ describe.each( [
 			await user.keyboard( '[Space]' );
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
-
-			// No need to test the "wrap-around" behaviour, as it is being
-			// tested in the "automatic tab activation" test above.
 		} );
 
 		// TODO: check that disabled tabs are ignored by clicks, and skipped when using arrows
