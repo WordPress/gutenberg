@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import type gradientParser from 'gradient-parser';
+
 export type CustomGradientPickerProps = {
 	/**
 	 * Start opting in to the new margin-free styles that will become the default
@@ -25,4 +30,12 @@ export type CustomGradientPickerProps = {
 	 * @default false
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
+};
+
+export type GradientAnglePickerProps = {
+	gradientAST:
+		| gradientParser.LinearGradientNode
+		| gradientParser.RepeatingLinearGradientNode;
+	hasGradient: boolean;
+	onChange: ( gradient: string ) => void;
 };

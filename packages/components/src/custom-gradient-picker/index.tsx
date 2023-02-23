@@ -36,18 +36,25 @@ import {
 	AccessoryWrapper,
 	SelectWrapper,
 } from './styles/custom-gradient-picker-styles';
-import type { CustomGradientPickerProps } from './types';
+import type {
+	CustomGradientPickerProps,
+	GradientAnglePickerProps,
+} from './types';
 
-const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
+const GradientAnglePicker = ( {
+	gradientAST,
+	hasGradient,
+	onChange,
+}: GradientAnglePickerProps ) => {
 	const angle =
 		gradientAST?.orientation?.value ?? DEFAULT_LINEAR_GRADIENT_ANGLE;
-	const onAngleChange = ( newAngle ) => {
+	const onAngleChange = ( newAngle: number ) => {
 		onChange(
 			serializeGradient( {
 				...gradientAST,
 				orientation: {
 					type: 'angular',
-					value: newAngle,
+					value: `${ newAngle }`,
 				},
 			} )
 		);
