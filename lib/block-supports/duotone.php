@@ -418,6 +418,16 @@ function gutenberg_register_duotone_support( $block_type ) {
 	}
 }
 
+class WP_Duotone {
+	/**
+	 * An array of Duotone presets.
+	 *
+	 * @since 6.3.0
+	 * @var array
+	 */
+	static $duotone_presets = array();
+}
+
 /**
  * Render out the duotone stylesheet and SVG.
  *
@@ -538,6 +548,8 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 				}
 			}
 		);
+	} else {
+		WP_Duotone::$duotone_presets[] = $filter_preset['slug'];
 	}
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
@@ -560,3 +572,44 @@ WP_Block_Supports::get_instance()->register(
 // Remove WordPress core filter to avoid rendering duplicate support elements.
 remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );
+
+add_action(
+	'wp_footer',
+	static function () {
+		// Get the presets from the theme.json.
+		$tree = WP_Theme_JSON_Resolver::get_merged_data();
+		$settings = $tree->get_settings();
+		$presets_by_origin = _wp_array_get( $settings, array( 'color', 'duotone' ), array() );
+		$flat_presets = [];
+		// Flatten the array
+		foreach( $presets_by_origin as $presets ) {
+			foreach( $presets as $preset ) {
+				$flat_presets[ _wp_to_kebab_case( $preset['slug'] ) ] = $preset;
+			}
+		}
+
+		foreach( WP_Duotone::$duotone_presets as $preset_slug ) {
+			// Convert $preset from a slug to an array of colors.
+			$duotone_preset = $flat_presets[ $preset_slug ];
+			$filter_svg = gutenberg_get_duotone_filter_svg( $duotone_preset );
+			echo $filter_svg;
+		}
+
+		/*
+		 * Safari renders elements incorrectly on first paint when the
+		 * SVG filter comes after the content that it is filtering, so
+		 * we force a repaint with a WebKit hack which solves the issue.
+		 */
+		global $is_safari;
+		if ( $is_safari ) {
+			/*
+			 * Simply accessing el.offsetHeight flushes layout and style
+			 * changes in WebKit without having to wait for setTimeout.
+			 */
+			printf(
+				'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
+				wp_json_encode( $selector )
+			);
+		}
+	}
+);
