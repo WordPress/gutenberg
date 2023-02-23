@@ -88,28 +88,12 @@ export type PaletteEditProps =
 type EditingElement = number | null;
 export type SlugPrefix = string;
 
-type BaseColorPickerPopover = {
+export type ColorPickerPopoverProps< T extends Color | Gradient > = {
 	onClose?: () => void;
+	element: T;
+	isGradient?: boolean;
+	onChange: ( newElement: T ) => void;
 }
-
-type ColorPickerPopoverColor = {
-	element: Color;
-	isGradient?: false;
-	onChange: ( newElement: Color ) => void;
-}
-
-type ColorPickerPopoverGradient = {
-	element: Gradient;
-	isGradient: true;
-	onChange: ( newElement: Gradient ) => void;
-}
-
-export type ColorPickerPopoverPropsColor = BaseColorPickerPopover & ColorPickerPopoverColor;
-export type ColorPickerPopoverPropsGradient = BaseColorPickerPopover & ColorPickerPopoverGradient;
-
-export type ColorPickerPopoverProps =
-	| ColorPickerPopoverPropsColor
-	| ColorPickerPopoverPropsGradient;
 
 export type NameInputProps = {
 	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;

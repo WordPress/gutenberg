@@ -104,12 +104,12 @@ export function getNameForPosition(
 	);
 }
 
-function ColorPickerPopover( {
+function ColorPickerPopover< T extends Color | Gradient >( {
 	isGradient,
 	element,
 	onChange,
 	onClose = () => {},
-}: ColorPickerPopoverProps ) {
+}: ColorPickerPopoverProps< T > ) {
 	return (
 		<Popover
 			placement="left-start"
@@ -121,12 +121,12 @@ function ColorPickerPopover( {
 				<ColorPicker
 					color={ element.color }
 					enableAlpha
-					onChange={ ( newColor ) =>
+					onChange={ ( newColor ) => {
 						onChange( {
 							...element,
 							color: newColor,
 						} )
-					}
+					} }
 				/>
 			) }
 			{ isGradient && 'gradient' in element && (
@@ -135,12 +135,12 @@ function ColorPickerPopover( {
 						__nextHasNoMargin
 						__experimentalIsRenderedInSidebar
 						value={ element.gradient }
-						onChange={ ( newGradient: Gradient[ 'gradient' ] ) =>
+						onChange={ ( newGradient: Gradient[ 'gradient' ] ) => {
 							onChange( {
 								...element,
 								gradient: newGradient,
 							} )
-						}
+						} }
 					/>
 				</div>
 			) }
