@@ -1207,7 +1207,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array|string $replacement_value The value to be output where layout rules define a null placeholder value.
 	 * @return string CSS string containing the layout rules.
 	 */
-	protected function construct_layout_rules( $selector_format, $layout_definition, $rules_type, $replacement_value ) {
+	protected function get_layout_definition_rules( $selector_format, $layout_definition, $rules_type, $replacement_value ) {
 		$layout_rules            = _wp_array_get( $layout_definition, array( $rules_type ), array() );
 		$layout_selector_pattern = '/^[a-zA-Z0-9\-\.\ *+>:\(\)]*$/'; // Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
 
@@ -1336,7 +1336,7 @@ class WP_Theme_JSON_Gutenberg {
 					// Add layout aware margin rules for each supported layout type.
 					foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) {
 						$class_name   = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), '' ) );
-						$block_rules .= $this->construct_layout_rules(
+						$block_rules .= $this->get_layout_definition_rules(
 							'.' . $class_name . '%s' . $selector,
 							$layout_definition,
 							'marginStyles',
@@ -1345,7 +1345,7 @@ class WP_Theme_JSON_Gutenberg {
 
 						// Add layout aware margin rule for children of the root site blocks class.
 						if ( 'default' === $layout_definition_key ) {
-							$block_rules .= $this->construct_layout_rules(
+							$block_rules .= $this->get_layout_definition_rules(
 								'.wp-site-blocks%s' . $selector,
 								$layout_definition,
 								'marginStyles',
@@ -1374,7 +1374,7 @@ class WP_Theme_JSON_Gutenberg {
 						$layout_selector_format = static::ROOT_BLOCK_SELECTOR === $selector ? "$selector .$class_name%s" : "$selector.$class_name%s";
 					}
 
-					$block_rules .= $this->construct_layout_rules(
+					$block_rules .= $this->get_layout_definition_rules(
 						$layout_selector_format,
 						$layout_definition,
 						'spacingStyles',
