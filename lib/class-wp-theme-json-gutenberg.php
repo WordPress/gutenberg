@@ -2425,8 +2425,10 @@ class WP_Theme_JSON_Gutenberg {
 		$declarations_duotone = array();
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
-				unset( $declarations[ $index ] );
-				$declarations_duotone[] = $declaration;
+				if ( 'unset' !== $declaration['value'] ) {
+					$declarations_duotone[] = $declaration;
+					unset( $declarations[ $index ] );
+				}
 			}
 		}
 
