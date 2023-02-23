@@ -450,7 +450,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// Handle custom values for duotone attribute.
 
 		// 1. Array of colors - e.g. array('#000000', '#ffffff').
-		// 2. The string 'unset' (only for backwards compatibility, see presets below).
+		// 2. The string 'unset' - indicates explicitly "override the theme duotone with `filter: none !important`".
 		$custom_duotone = $block['attrs']['style']['color']['duotone'];
 
 		// Build a unique slug for the filter based on the array of colors.
@@ -466,7 +466,6 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// Handle preset values for duotone iff the preset is set and there is no custom duotone.
 
 		// 1. Slug of an existing Duotone preset - e.g. 'green-blue'.
-		// 2. TODO: The string 'unset' - indicates explicitly "override the theme duotone with no filter".
 		$preset_duotone = $block['attrs']['duotone'];
 		$filter_data    = array(
 			'slug' => $preset_duotone,
