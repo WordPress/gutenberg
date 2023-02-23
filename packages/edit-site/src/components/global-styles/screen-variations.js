@@ -15,7 +15,8 @@ import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 import Subtitle from './subtitle';
 
-export function ScreenVariations( { name, path = '' } ) {
+export function ScreenVariations( props ) {
+	const { blockName, name, path } = props;
 	const hasVariationsPanel = useHasVariationsPanel( name, path );
 
 	if ( ! hasVariationsPanel ) {
@@ -24,7 +25,11 @@ export function ScreenVariations( { name, path = '' } ) {
 	return (
 		<div className="edit-site-global-styles-screen-variations">
 			<VStack spacing={ 3 }>
-				<p>Manage style variations, saved block appearence presets.</p>
+				<p>
+					{ __( 'Customize variations of the block:' ) +
+						' ' +
+						blockName }
+				</p>
 				<Subtitle>{ __( 'Style Variations' ) }</Subtitle>
 				<VariationsPanel name={ name } />
 			</VStack>
