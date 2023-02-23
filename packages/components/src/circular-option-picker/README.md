@@ -74,7 +74,7 @@ Usually a `CircularOptionPicker.Option` component.
 
 - Required: No
 
-### `children`: `ReactNode
+### `children`: `ReactNode`
 
 The child elements.
 
