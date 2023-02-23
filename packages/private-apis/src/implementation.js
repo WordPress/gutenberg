@@ -49,12 +49,15 @@ const requiredConsent =
 
 /** @type {boolean} */
 let allowReRegistration;
-// Use try/catch to force "false" if the environment variable is not explicitly
-// set to true (e.g. when building WordPress core).
+// The safety measure is meant for WordPress core where ALLOW_EXPERIMENT_REREGISTRATION
+// is set to false.
+// For the general use-case, the re-registration should be allowed by default
+// Let's default to true, then. Try/catch will fall back to "true" even if the
+// environment variable is not explicitly defined.
 try {
-	allowReRegistration = process.env.ALLOW_EXPERIMENT_REREGISTRATION ?? false;
+	allowReRegistration = process.env.ALLOW_EXPERIMENT_REREGISTRATION ?? true;
 } catch ( error ) {
-	allowReRegistration = false;
+	allowReRegistration = true;
 }
 
 /**
