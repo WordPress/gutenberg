@@ -44,15 +44,25 @@ function getMediaSourceUrlBySizeSlug( media, slug ) {
 	);
 }
 
-function PostFeaturedImageDisplay( {
+export default function PostFeaturedImageEdit( {
 	clientId,
 	attributes,
 	setAttributes,
 	context: { postId, postType: postTypeSlug, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const { isLink, height, width, scale, sizeSlug, rel, linkTarget, title } =
-		attributes;
+	const {
+		isLink,
+		aspectRatio,
+		height,
+		width,
+		scale,
+		sizeSlug,
+		rel,
+		linkTarget,
+    title,
+	} = attributes;
+
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
@@ -89,7 +99,7 @@ function PostFeaturedImageDisplay( {
 		} ) );
 
 	const blockProps = useBlockProps( {
-		style: { width, height },
+		style: { width, height, aspectRatio },
 	} );
 	const borderProps = useBorderProps( attributes );
 
@@ -101,7 +111,10 @@ function PostFeaturedImageDisplay( {
 					borderProps.className
 				) }
 				withIllustration={ true }
-				style={ borderProps.style }
+				style={ {
+					...blockProps.style,
+					...borderProps.style,
+				} }
 			>
 				{ content }
 			</Placeholder>
@@ -160,6 +173,7 @@ function PostFeaturedImageDisplay( {
 								checked={ linkTarget === '_blank' }
 							/>
 							<TextControl
+								__nextHasNoMarginBottom
 								label={ __( 'Link rel' ) }
 								value={ rel }
 								onChange={ ( newRel ) =>
@@ -192,6 +206,11 @@ function PostFeaturedImageDisplay( {
 		</>
 	);
 	let image;
+
+	/**
+	 * A post featured image block placed in a query loop
+	 * does not have image replacement or upload options.
+	 */
 	if ( ! featuredImage && isDescendentOfQueryLoop ) {
 		return (
 			<>
@@ -208,13 +227,47 @@ function PostFeaturedImageDisplay( {
 		);
 	}
 
+	/**
+	 * A post featured image placed in a block template, outside a query loop,
+	 * does not have a postId and will always be a placeholder image.
+	 * It does not have image replacement, upload, or link options.
+	 */
+	if ( ! featuredImage && ! postId ) {
+		return (
+			<>
+				<DimensionControls
+					clientId={ clientId }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					imageSizeOptions={ imageSizeOptions }
+				/>
+				<div { ...blockProps }>
+					{ placeholder() }
+					<Overlay
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						clientId={ clientId }
+					/>
+				</div>
+			</>
+		);
+	}
+
 	const label = __( 'Add a featured image' );
 	const imageStyles = {
 		...borderProps.style,
-		height,
-		objectFit: height && scale,
+		height: ( !! aspectRatio && '100%' ) || height,
+		width: !! aspectRatio && '100%',
+		objectFit: !! ( height || aspectRatio ) && scale,
 	};
 
+	/**
+	 * When the post featured image block is placed in a context where:
+	 * - It has a postId (for example in a single post)
+	 * - It is not inside a query loop
+	 * - It has no image assigned yet
+	 * Then display the placeholder with the image upload option.
+	 */
 	if ( ! featuredImage ) {
 		image = (
 			<MediaPlaceholder
@@ -262,6 +315,12 @@ function PostFeaturedImageDisplay( {
 		);
 	}
 
+	/**
+	 * When the post featured image block:
+	 * - Has an image assigned
+	 * - Is not inside a query loop
+	 * Then display the image and the image replacement option.
+	 */
 	return (
 		<>
 			{ controls }
@@ -291,30 +350,4 @@ function PostFeaturedImageDisplay( {
 			</figure>
 		</>
 	);
-}
-
-export default function PostFeaturedImageEdit( props ) {
-	const blockProps = useBlockProps();
-	const borderProps = useBorderProps( props.attributes );
-
-	if ( ! props.context?.postId ) {
-		return (
-			<div { ...blockProps }>
-				<Placeholder
-					className={ classnames(
-						'block-editor-media-placeholder',
-						borderProps.className
-					) }
-					withIllustration={ true }
-					style={ borderProps.style }
-				/>
-				<Overlay
-					attributes={ props.attributes }
-					setAttributes={ props.setAttributes }
-					clientId={ props.clientId }
-				/>
-			</div>
-		);
-	}
-	return <PostFeaturedImageDisplay { ...props } />;
 }

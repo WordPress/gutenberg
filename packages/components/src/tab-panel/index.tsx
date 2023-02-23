@@ -25,7 +25,7 @@ const TabButton = ( {
 }: TabButtonProps ) => (
 	<Button
 		role="tab"
-		tabIndex={ selected ? null : -1 }
+		tabIndex={ selected ? undefined : -1 }
 		aria-selected={ selected }
 		id={ tabId }
 		__experimentalIsFocusable
@@ -103,25 +103,47 @@ export function TabPanel( {
 	const selectedTab = tabs.find( ( { name } ) => name === selected );
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
+	// Handle selecting the initial tab.
 	useEffect( () => {
-		const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
+		// If there's a selected tab, don't override it.
+		if ( selectedTab ) {
+			return;
+		}
+
 		const initialTab = tabs.find( ( tab ) => tab.name === initialTabName );
-		if ( ! selectedTab?.name && firstEnabledTab ) {
-			handleTabSelection(
-				initialTab && ! initialTab.disabled
-					? initialTab.name
-					: firstEnabledTab.name
-			);
-		} else if ( selectedTab?.disabled && firstEnabledTab ) {
+
+		// Wait for the denoted initial tab to be declared before making a
+		// selection. This ensures that if a tab is declared lazily it can
+		// still receive initial selection.
+		if ( initialTabName && ! initialTab ) {
+			return;
+		}
+
+		if ( initialTab && ! initialTab.disabled ) {
+			// Select the initial tab if it's not disabled.
+			handleTabSelection( initialTab.name );
+		} else {
+			// Fallback to the first enabled tab when the initial is disabled.
+			const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
+			if ( firstEnabledTab ) handleTabSelection( firstEnabledTab.name );
+		}
+	}, [ tabs, selectedTab, initialTabName, handleTabSelection ] );
+
+	// Handle the currently selected tab becoming disabled.
+	useEffect( () => {
+		// This effect only runs when the selected tab is defined and becomes disabled.
+		if ( ! selectedTab?.disabled ) {
+			return;
+		}
+
+		const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
+
+		// If the currently selected tab becomes disabled, select the first enabled tab.
+		// (if there is one).
+		if ( firstEnabledTab ) {
 			handleTabSelection( firstEnabledTab.name );
 		}
-	}, [
-		tabs,
-		selectedTab?.name,
-		selectedTab?.disabled,
-		initialTabName,
-		handleTabSelection,
-	] );
+	}, [ tabs, selectedTab?.disabled, handleTabSelection ] );
 
 	return (
 		<div className={ className }>

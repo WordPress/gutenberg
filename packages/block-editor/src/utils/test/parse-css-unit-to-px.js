@@ -22,20 +22,17 @@ describe( 'getPxFromCssUnit', () => {
 			[ '40Q', '38px' ], // 40 Q should be 1 cm.
 		];
 
+		test.each( testData )( 'getPxFromCssUnit( %s )', ( unit, expected ) => {
+			expect( getPxFromCssUnit( unit ) ).toBe( expected );
+		} );
 		test.each( testData )(
-			'test getPxFromCssUnit( %s )',
-			( unit, expected ) => {
-				expect( getPxFromCssUnit( unit ) ).toBe( expected );
-			}
-		);
-		test.each( testData )(
-			'test memoizedGetPxFromCssUnit( %s )',
+			'memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit ) ).toBe( expected );
 			}
 		);
 		test.each( testData )(
-			'test cached memoizedGetPxFromCssUnit( %s )',
+			'cached memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit ) ).toBe( expected );
 			}
@@ -63,14 +60,11 @@ describe( 'getPxFromCssUnit', () => {
 			[ '120%', '12px' ],
 		];
 
+		test.each( testData )( 'getPxFromCssUnit( %s )', ( unit, expected ) => {
+			expect( getPxFromCssUnit( unit, settings ) ).toBe( expected );
+		} );
 		test.each( testData )(
-			'test getPxFromCssUnit( %s )',
-			( unit, expected ) => {
-				expect( getPxFromCssUnit( unit, settings ) ).toBe( expected );
-			}
-		);
-		test.each( testData )(
-			'test memoizedGetPxFromCssUnit( %s )',
+			'memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
 					expected
@@ -78,7 +72,7 @@ describe( 'getPxFromCssUnit', () => {
 			}
 		);
 		test.each( testData )(
-			'test cached memoizedGetPxFromCssUnit( %s )',
+			'cached memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
 					expected
@@ -121,16 +115,14 @@ describe( 'getPxFromCssUnit', () => {
 			[ 'abc', null ],
 			[ 'console.log("howdy"); + 10px', null ],
 			[ 'calc(12vw * 10px', null ], // Missing closing bracket.
+			[ 'calc( 1em + 0.875rem )', '30px' ], // Decimals
 		];
 
+		test.each( testData )( 'getPxFromCssUnit( %s )', ( unit, expected ) => {
+			expect( getPxFromCssUnit( unit, settings ) ).toBe( expected );
+		} );
 		test.each( testData )(
-			'test getPxFromCssUnit( %s )',
-			( unit, expected ) => {
-				expect( getPxFromCssUnit( unit, settings ) ).toBe( expected );
-			}
-		);
-		test.each( testData )(
-			'test memoizedGetPxFromCssUnit( %s )',
+			'memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
 					expected
@@ -138,7 +130,7 @@ describe( 'getPxFromCssUnit', () => {
 			}
 		);
 		test.each( testData )(
-			'test cached memoizedGetPxFromCssUnit( %s )',
+			'cached memoizedGetPxFromCssUnit( %s )',
 			( unit, expected ) => {
 				expect( memoizedGetPxFromCssUnit( unit, settings ) ).toBe(
 					expected

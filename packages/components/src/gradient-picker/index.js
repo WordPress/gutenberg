@@ -14,6 +14,18 @@ import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
 import { Spacer } from '../spacer';
 
+// The Multiple Origin Gradients have a `gradients` property (an array of
+// gradient objects), while Single Origin ones have a `gradient` property.
+const isMultipleOriginObject = ( obj ) =>
+	Array.isArray( obj.gradients ) && ! ( 'gradient' in obj );
+
+const isMultipleOriginArray = ( arr ) => {
+	return (
+		arr.length > 0 &&
+		arr.every( ( gradientObj ) => isMultipleOriginObject( gradientObj ) )
+	);
+};
+
 function SingleOrigin( {
 	className,
 	clearGradient,
@@ -65,13 +77,16 @@ function MultipleOrigin( {
 	onChange,
 	value,
 	actions,
+	headingLevel,
 } ) {
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading>{ name }</ColorHeading>
+						<ColorHeading level={ headingLevel }>
+							{ name }
+						</ColorHeading>
 						<SingleOrigin
 							clearGradient={ clearGradient }
 							gradients={ gradientSet }
@@ -100,15 +115,15 @@ export default function GradientPicker( {
 	clearable = true,
 	disableCustomGradients = false,
 	__experimentalIsRenderedInSidebar,
+	headingLevel = 2,
 } ) {
 	const clearGradient = useCallback(
 		() => onChange( undefined ),
 		[ onChange ]
 	);
-	const Component =
-		gradients?.length && gradients[ 0 ].gradients
-			? MultipleOrigin
-			: SingleOrigin;
+	const Component = isMultipleOriginArray( gradients )
+		? MultipleOrigin
+		: SingleOrigin;
 
 	if ( ! __nextHasNoMargin ) {
 		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
@@ -157,6 +172,7 @@ export default function GradientPicker( {
 								</CircularOptionPicker.ButtonAction>
 							)
 						}
+						headingLevel={ headingLevel }
 					/>
 				) }
 			</VStack>

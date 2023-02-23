@@ -6,12 +6,6 @@
 	padding: $grid-unit-30;
 	display: flex;
 	justify-content: center;
-
-	.interface-interface-skeleton__actions:focus &,
-	.interface-interface-skeleton__actions:focus-within & {
-		top: auto;
-		bottom: 0;
-	}
 }
 
 // Adjust the position of the notices

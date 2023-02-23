@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	openDocumentSettingsSidebar,
 	getListViewBlocks,
+	switchBlockInspectorTab,
 } from '@wordpress/e2e-test-utils';
 
 async function openListViewSidebar() {
@@ -20,6 +21,20 @@ async function tabToColumnsControl() {
 	let isColumnsControl = false;
 	do {
 		await page.keyboard.press( 'Tab' );
+
+		const isBlockInspectorTab = await page.evaluate( () => {
+			const activeElement = document.activeElement;
+			return (
+				activeElement.getAttribute( 'role' ) === 'tab' &&
+				activeElement.attributes.getNamedItem( 'aria-label' ).value ===
+					'Styles'
+			);
+		} );
+
+		if ( isBlockInspectorTab ) {
+			await page.keyboard.press( 'ArrowRight' );
+		}
+
 		isColumnsControl = await page.evaluate( () => {
 			const activeElement = document.activeElement;
 			return (
@@ -60,6 +75,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Tweak the columns count.
 		await openDocumentSettingsSidebar();
+		await switchBlockInspectorTab( 'Settings' );
 		await page.focus(
 			'.block-editor-block-inspector [aria-label="Columns"][type="number"]'
 		);

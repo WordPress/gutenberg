@@ -6,11 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createBlock, hasBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
-	MenuItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
@@ -34,7 +33,6 @@ import {
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
-import BlockEditButton from './block-edit-button';
 import { useListViewContext } from './context';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -56,7 +54,6 @@ function ListViewBlock( {
 	isExpanded,
 	selectedClientIds,
 	preventAnnouncement,
-	selectBlockInCanvas,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -86,8 +83,7 @@ function ListViewBlock( {
 		( isSelected &&
 			selectedClientIds[ selectedClientIds.length - 1 ] === clientId );
 
-	const { insertBlock, replaceBlock, toggleBlockHighlight } =
-		useDispatch( blockEditorStore );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const block = useSelect(
@@ -128,7 +124,8 @@ function ListViewBlock( {
 		[ selectBlock ]
 	);
 
-	const { isTreeGridMounted, expand, collapse } = useListViewContext();
+	const { isTreeGridMounted, expand, collapse, LeafMoreMenu } =
+		useListViewContext();
 
 	const toggleExpanded = useCallback(
 		( event ) => {
@@ -187,15 +184,6 @@ function ListViewBlock( {
 		  )
 		: __( 'Options' );
 
-	const editAriaLabel = blockInformation
-		? sprintf(
-				// translators: %s: The title of the block.
-				__( 'Edit %s block' ),
-				blockInformation.title
-		  )
-		: __( 'Edit' );
-
-	const isEditable = !! block && block.name !== 'core/page-list-item';
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = classnames(
@@ -208,16 +196,11 @@ function ListViewBlock( {
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
 
-	const listViewBlockEditClassName = classnames(
-		'block-editor-list-view-block__menu-cell',
-		{ 'is-visible': isHovered || isFirstSelectedBlock }
-	);
-
 	let colSpan;
 	if ( hasRenderedMovers ) {
-		colSpan = 2;
+		colSpan = 1;
 	} else if ( ! showBlockActions ) {
-		colSpan = 3;
+		colSpan = 2;
 	}
 
 	const classes = classnames( {
@@ -236,6 +219,10 @@ function ListViewBlock( {
 	const dropdownClientIds = selectedClientIds.includes( clientId )
 		? selectedClientIds
 		: [ clientId ];
+
+	const MoreMenuComponent = LeafMoreMenu
+		? LeafMoreMenu
+		: BlockSettingsDropdown;
 
 	return (
 		<ListViewLeaf
@@ -266,13 +253,7 @@ function ListViewBlock( {
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
 							block={ block }
-							onClick={
-								selectBlockInCanvas
-									? selectEditorBlock
-									: ( event ) => {
-											event.preventDefault();
-									  }
-							}
+							onClick={ selectEditorBlock }
 							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
@@ -328,85 +309,33 @@ function ListViewBlock( {
 
 			{ showBlockActions && (
 				<>
-					{ isEditable && (
-						<TreeGridCell
-							className={ listViewBlockEditClassName }
-							aria-selected={
-								!! isSelected || forceSelectionContentLock
-							}
-						>
-							{ ( props ) => (
-								<BlockEditButton
-									{ ...props }
-									label={ editAriaLabel }
-									clientId={ clientId }
-								/>
-							) }
-						</TreeGridCell>
-					) }
 					<TreeGridCell
 						className={ listViewBlockSettingsClassName }
 						aria-selected={
 							!! isSelected || forceSelectionContentLock
 						}
-						colSpan={ isEditable ? 1 : 2 } // When an item is not editable then we don't output the cell for the edit button, so we need to adjust the colspan so that the HTML is valid.
 					>
 						{ ( { ref, tabIndex, onFocus } ) => (
-							<BlockSettingsDropdown
-								clientIds={ dropdownClientIds }
-								icon={ moreVertical }
-								label={ settingsAriaLabel }
-								toggleProps={ {
-									ref,
-									className:
-										'block-editor-list-view-block__menu',
-									tabIndex,
-									onFocus,
-								} }
-								disableOpenOnArrowDown
-								__experimentalSelectBlock={ updateSelection }
-							>
-								{ ( { onClose } ) => (
-									<MenuItem
-										onClick={ () => {
-											const newLink = createBlock(
-												'core/navigation-link'
-											);
-											if (
-												block.name ===
-												'core/navigation-submenu'
-											) {
-												const updateSelectionOnInsert = false;
-												insertBlock(
-													newLink,
-													block.innerBlocks.length,
-													clientId,
-													updateSelectionOnInsert
-												);
-											} else {
-												// Convert to a submenu if the block currently isn't one.
-												const newSubmenu = createBlock(
-													'core/navigation-submenu',
-													block.attributes,
-													block.innerBlocks
-														? [
-																...block.innerBlocks,
-																newLink,
-														  ]
-														: [ newLink ]
-												);
-												replaceBlock(
-													clientId,
-													newSubmenu
-												);
-											}
-											onClose();
-										} }
-									>
-										{ __( 'Add submenu item' ) }
-									</MenuItem>
-								) }
-							</BlockSettingsDropdown>
+							<>
+								<MoreMenuComponent
+									clientIds={ dropdownClientIds }
+									block={ block }
+									clientId={ clientId }
+									icon={ moreVertical }
+									label={ settingsAriaLabel }
+									toggleProps={ {
+										ref,
+										className:
+											'block-editor-list-view-block__menu',
+										tabIndex,
+										onFocus,
+									} }
+									disableOpenOnArrowDown
+									__experimentalSelectBlock={
+										updateSelection
+									}
+								/>
+							</>
 						) }
 					</TreeGridCell>
 				</>

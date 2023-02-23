@@ -43,6 +43,7 @@ const SocialLinkURLPopover = ( {
 		>
 			<div className="block-editor-url-input">
 				<URLInput
+					__nextHasNoMarginBottom
 					value={ url }
 					onChange={ ( nextURL ) =>
 						setAttributes( { url: nextURL } )
@@ -101,11 +102,12 @@ const SocialLinkEdit = ( {
 				>
 					<PanelRow>
 						<TextControl
+							__nextHasNoMarginBottom
 							label={ __( 'Link label' ) }
 							help={ __(
 								'Briefly describe the link to help screen reader users.'
 							) }
-							value={ label }
+							value={ label || '' }
 							onChange={ ( value ) =>
 								setAttributes( { label: value } )
 							}
@@ -113,8 +115,9 @@ const SocialLinkEdit = ( {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
 					onChange={ ( value ) => setAttributes( { rel: value } ) }

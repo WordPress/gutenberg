@@ -11,6 +11,9 @@
 			"type": "boolean",
 			"default": false
 		},
+		"aspectRatio": {
+			"type": "string"
+		},
 		"width": {
 			"type": "string"
 		},
@@ -56,6 +59,7 @@
 	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
 		"align": [ "left", "right", "center", "wide", "full" ],
+		"anchor": true,
 		"color": {
 			"__experimentalDuotone": "img, .wp-block-post-featured-image__placeholder, .components-placeholder__illustration, .components-placeholder::before",
 			"text": false,

@@ -10,7 +10,10 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
-import { BlockIcon } from '@wordpress/block-editor';
+import {
+	BlockIcon,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 
@@ -20,9 +23,17 @@ import { speak } from '@wordpress/a11y';
 import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
-import { useHasTypographyPanel } from './typography-panel';
+import { useHasVariationsPanel } from './variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
+import { unlock } from '../../private-apis';
+import { useSupportedStyles } from './hooks';
+
+const {
+	useHasTypographyPanel,
+	useGlobalSetting,
+	overrideSettingsWithSupports,
+} = unlock( blockEditorPrivateApis );
 
 function useSortedBlockTypes() {
 	const blockItems = useSelect(
@@ -48,13 +59,23 @@ function useSortedBlockTypes() {
 }
 
 function BlockMenuItem( { block } ) {
-	const hasTypographyPanel = useHasTypographyPanel( block.name );
+	const [ rawSettings ] = useGlobalSetting( '', block.name );
+	const supports = useSupportedStyles( block.name );
+	const settings = useMemo(
+		() => overrideSettingsWithSupports( rawSettings, supports ),
+		[ rawSettings, supports ]
+	);
+	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( block.name );
 	const hasBorderPanel = useHasBorderPanel( block.name );
 	const hasDimensionsPanel = useHasDimensionsPanel( block.name );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
+	const hasVariationsPanel = useHasVariationsPanel( block.name );
 	const hasBlockMenuItem =
-		hasTypographyPanel || hasColorPanel || hasLayoutPanel;
+		hasTypographyPanel ||
+		hasColorPanel ||
+		hasLayoutPanel ||
+		hasVariationsPanel;
 
 	if ( ! hasBlockMenuItem ) {
 		return null;

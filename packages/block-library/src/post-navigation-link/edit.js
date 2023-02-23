@@ -77,6 +77,7 @@ export default function PostNavigationLinkEdit( {
 						/>
 					) }
 					<ToggleGroupControl
+						__nextHasNoMarginBottom
 						label={ __( 'Arrow' ) }
 						value={ arrow }
 						onChange={ ( value ) => {

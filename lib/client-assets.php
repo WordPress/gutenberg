@@ -387,15 +387,6 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	gutenberg_override_style(
 		$styles,
-		'wp-edit-navigation',
-		gutenberg_url( 'build/edit-navigation/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks' ),
-		$version
-	);
-	$styles->add_data( 'wp-edit-navigation', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
 		'wp-edit-site',
 		gutenberg_url( 'build/edit-site/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks' ),

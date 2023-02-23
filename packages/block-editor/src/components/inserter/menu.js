@@ -67,23 +67,33 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-	const { showPatterns, hasReusableBlocks } = useSelect(
-		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } =
-				select( blockEditorStore );
-			return {
-				showPatterns: !! __experimentalGetAllowedPatterns(
-					destinationRootClientId
-				).length,
-				hasReusableBlocks:
-					!! getSettings().__experimentalReusableBlocks?.length,
-			};
-		},
-		[ destinationRootClientId ]
-	);
+	const { showPatterns, inserterItems, enableOpenverseMediaCategory } =
+		useSelect(
+			( select ) => {
+				const {
+					__experimentalGetAllowedPatterns,
+					getInserterItems,
+					getSettings,
+				} = select( blockEditorStore );
+				return {
+					showPatterns: !! __experimentalGetAllowedPatterns(
+						destinationRootClientId
+					).length,
+					inserterItems: getInserterItems( destinationRootClientId ),
+					enableOpenverseMediaCategory:
+						getSettings().enableOpenverseMediaCategory,
+				};
+			},
+			[ destinationRootClientId ]
+		);
+	const hasReusableBlocks = useMemo( () => {
+		return inserterItems.some(
+			( { category } ) => category === 'reusable'
+		);
+	}, [ inserterItems ] );
 
 	const mediaCategories = useMediaCategories( destinationRootClientId );
-	const showMedia = !! mediaCategories.length;
+	const showMedia = !! mediaCategories.length || enableOpenverseMediaCategory;
 
 	const onInsert = useCallback(
 		( blocks, meta, shouldForceFocusBlock ) => {
@@ -107,6 +117,13 @@ function InserterMenu(
 			setHoveredItem( item );
 		},
 		[ onToggleInsertionPoint, setHoveredItem ]
+	);
+
+	const onHoverPattern = useCallback(
+		( item ) => {
+			onToggleInsertionPoint( !! item );
+		},
+		[ onToggleInsertionPoint ]
 	);
 
 	const onClickPatternCategory = useCallback(
@@ -292,6 +309,7 @@ function InserterMenu(
 				<BlockPatternsCategoryDialog
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsertPattern }
+					onHover={ onHoverPattern }
 					category={ selectedPatternCategory }
 					showTitlesAsTooltip
 				/>

@@ -56,6 +56,9 @@
 				"width": true
 			}
 		},
+		"position": {
+			"sticky": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,

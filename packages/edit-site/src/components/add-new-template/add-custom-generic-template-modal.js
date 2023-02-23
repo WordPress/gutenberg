@@ -10,10 +10,10 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	Flex,
-	FlexItem,
 	Modal,
 	TextControl,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
 /**
@@ -52,7 +52,6 @@ function AddCustomGenericTemplateModal( {
 	return (
 		<Modal
 			title={ __( 'Create custom template' ) }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ () => {
 				onClose();
 			} }
@@ -60,27 +59,22 @@ function AddCustomGenericTemplateModal( {
 		>
 			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			<form onSubmit={ onCreateTemplate }>
-				<Flex align="flex-start" gap={ 8 }>
-					<FlexItem>
-						<TextControl
-							label={ __( 'Name' ) }
-							value={ title }
-							onChange={ setTitle }
-							placeholder={ defaultTitle }
-							disabled={ isBusy }
-							help={ __(
-								'Describe the template, e.g. "Post with sidebar".'
-							) }
-						/>
-					</FlexItem>
-				</Flex>
-
-				<Flex
-					className="edit-site-custom-generic-template__modal-actions"
-					justify="flex-end"
-					expanded={ false }
-				>
-					<FlexItem>
+				<VStack spacing={ 6 }>
+					<TextControl
+						__nextHasNoMarginBottom
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+						placeholder={ defaultTitle }
+						disabled={ isBusy }
+						help={ __(
+							'Describe the template, e.g. "Post with sidebar".'
+						) }
+					/>
+					<HStack
+						className="edit-site-custom-generic-template__modal-actions"
+						justify="right"
+					>
 						<Button
 							variant="tertiary"
 							onClick={ () => {
@@ -89,8 +83,6 @@ function AddCustomGenericTemplateModal( {
 						>
 							{ __( 'Cancel' ) }
 						</Button>
-					</FlexItem>
-					<FlexItem>
 						<Button
 							variant="primary"
 							type="submit"
@@ -99,8 +91,8 @@ function AddCustomGenericTemplateModal( {
 						>
 							{ __( 'Create' ) }
 						</Button>
-					</FlexItem>
-				</Flex>
+					</HStack>
+				</VStack>
 			</form>
 		</Modal>
 	);

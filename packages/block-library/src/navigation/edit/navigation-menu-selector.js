@@ -6,11 +6,8 @@ import {
 	MenuItem,
 	MenuItemsChoice,
 	DropdownMenu,
-	Button,
-	VisuallyHidden,
 } from '@wordpress/components';
-import { useEntityProp } from '@wordpress/core-data';
-import { Icon, chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -29,16 +26,11 @@ function NavigationMenuSelector( {
 	actionLabel,
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
-	toggleProps = {},
 } ) {
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
 	const [ selectorLabel, setSelectorLabel ] = useState( '' );
-	const [ isPressed, setIsPressed ] = useState( false );
-	const [ enableOptions, setEnableOptions ] = useState( false );
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
 
 	actionLabel = actionLabel || createActionLabel;
@@ -48,29 +40,23 @@ function NavigationMenuSelector( {
 	const {
 		navigationMenus,
 		hasResolvedNavigationMenus,
-		isNavigationMenuResolved,
 		canUserCreateNavigationMenu,
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
-	const [ currentTitle ] = useEntityProp(
-		'postType',
-		'wp_navigation',
-		'title'
-	);
-
-	const shouldEnableMenuSelector =
-		( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
-		hasResolvedNavigationMenus &&
-		! isCreatingMenu;
-
 	const menuChoices = useMemo( () => {
 		return (
-			navigationMenus?.map( ( { id, title } ) => {
-				const label = decodeEntities( title.rendered );
+			navigationMenus?.map( ( { id, title }, index ) => {
+				const label =
+					decodeEntities( title?.rendered ) ||
+					/* translators: %s is the index of the menu in the list of menus. */
+					sprintf( __( '(no title %s)' ), index + 1 );
+
 				if ( id === currentMenuId && ! isCreatingMenu ) {
-					setSelectorLabel( currentTitle );
-					setEnableOptions( shouldEnableMenuSelector );
+					setSelectorLabel(
+						/* translators: %s is the name of a navigation menu. */
+						sprintf( __( 'You are currently editing %s' ), label )
+					);
 				}
 				return {
 					value: id,
@@ -79,14 +65,7 @@ function NavigationMenuSelector( {
 				};
 			} ) || []
 		);
-	}, [
-		currentTitle,
-		currentMenuId,
-		navigationMenus,
-		createNavigationMenuIsSuccess,
-		isNavigationMenuResolved,
-		hasResolvedNavigationMenus,
-	] );
+	}, [ currentMenuId, navigationMenus, actionLabel, isCreatingMenu ] );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
@@ -99,11 +78,10 @@ function NavigationMenuSelector( {
 		hasResolvedNavigationMenus && currentMenuId === null;
 
 	useEffect( () => {
-		if ( ! hasResolvedNavigationMenus ) {
+		if ( ! hasResolvedNavigationMenus && ! canUserCreateNavigationMenu ) {
 			setSelectorLabel( __( 'Loading …' ) );
 		} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
-			setSelectorLabel( __( 'Select menu' ) );
-			setEnableOptions( shouldEnableMenuSelector );
+			setSelectorLabel( __( 'Choose or create a Navigation menu' ) );
 		}
 
 		if (
@@ -112,74 +90,13 @@ function NavigationMenuSelector( {
 		) {
 			setIsCreatingMenu( false );
 		}
-	}, [
-		currentMenuId,
-		hasNavigationMenus,
-		hasResolvedNavigationMenus,
-		createNavigationMenuIsSuccess,
-		isNavigationMenuResolved,
-	] );
+	}, [ hasResolvedNavigationMenus, createNavigationMenuIsSuccess ] );
 
-	toggleProps = {
-		...toggleProps,
-		className: 'wp-block-navigation__navigation-selector-button',
-		children: (
-			<>
-				<VisuallyHidden as="span">
-					{ __( 'Select Menu' ) }
-				</VisuallyHidden>
-				<Icon
-					icon={ isPressed ? chevronUp : chevronDown }
-					className="wp-block-navigation__navigation-selector-button__icon"
-				/>
-			</>
-		),
-		isBusy: ! enableOptions,
-		disabled: ! enableOptions,
-		__experimentalIsFocusable: true,
-		onClick: () => {
-			setIsPressed( ! isPressed );
-		},
-	};
-
-	if (
-		! hasNavigationMenus &&
-		! hasClassicMenus &&
-		! isOffCanvasNavigationEditorEnabled
-	) {
-		return (
-			<Button
-				className="wp-block-navigation__navigation-selector-button--createnew"
-				isBusy={ ! enableOptions }
-				disabled={ ! enableOptions }
-				__experimentalIsFocusable
-				onClick={ () => {
-					onCreateNew();
-					setIsCreatingMenu( true );
-					setSelectorLabel( __( 'Loading …' ) );
-					setEnableOptions( false );
-				} }
-			>
-				{ __( 'Create new menu' ) }
-			</Button>
-		);
-	}
-
-	return (
+	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu
-			className={
-				isOffCanvasNavigationEditorEnabled
-					? ''
-					: 'wp-block-navigation__navigation-selector'
-			}
 			label={ selectorLabel }
-			text={ isOffCanvasNavigationEditorEnabled ? '' : selectorLabel }
-			icon={ isOffCanvasNavigationEditorEnabled ? moreVertical : null }
-			toggleProps={
-				isOffCanvasNavigationEditorEnabled
-					? { isSmall: true }
-					: toggleProps
-			}
+			icon={ moreVertical }
+			toggleProps={ { isSmall: true } }
 		>
 			{ ( { onClose } ) => (
 				<>
@@ -188,9 +105,13 @@ function NavigationMenuSelector( {
 							<MenuItemsChoice
 								value={ currentMenuId }
 								onSelect={ ( menuId ) => {
+									setSelectorLabel( __( 'Loading …' ) );
+									setIsCreatingMenu( true );
 									onSelectNavigationMenu( menuId );
+									onClose();
 								} }
 								choices={ menuChoices }
+								disabled={ isCreatingMenu }
 							/>
 						</MenuGroup>
 					) }
@@ -204,7 +125,7 @@ function NavigationMenuSelector( {
 											setSelectorLabel(
 												__( 'Loading …' )
 											);
-											setEnableOptions( false );
+											setIsCreatingMenu( true );
 											onSelectClassicMenu( menu );
 											onClose();
 										} }
@@ -213,6 +134,7 @@ function NavigationMenuSelector( {
 											createActionLabel,
 											label
 										) }
+										disabled={ isCreatingMenu }
 									>
 										{ label }
 									</MenuItem>
@@ -224,12 +146,12 @@ function NavigationMenuSelector( {
 					{ canUserCreateNavigationMenu && (
 						<MenuGroup label={ __( 'Tools' ) }>
 							<MenuItem
+								disabled={ isCreatingMenu }
 								onClick={ () => {
 									onClose();
 									onCreateNew();
 									setIsCreatingMenu( true );
 									setSelectorLabel( __( 'Loading …' ) );
-									setEnableOptions( false );
 								} }
 							>
 								{ __( 'Create new menu' ) }
@@ -240,6 +162,8 @@ function NavigationMenuSelector( {
 			) }
 		</DropdownMenu>
 	);
+
+	return NavigationMenuSelectorDropdown;
 }
 
 export default NavigationMenuSelector;

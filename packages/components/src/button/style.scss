@@ -282,14 +282,15 @@
 
 		&.has-text {
 			justify-content: start;
+			padding-right: 12px;
 		}
 
 		&.has-text svg {
-			margin-right: 8px;
+			margin-right: $grid-unit-10;
 		}
 
 		&.has-text .dashicon {
-			margin-right: 10px;
+			margin-right: $grid-unit-10 + 2px;
 		}
 	}
 

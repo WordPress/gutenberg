@@ -83,7 +83,7 @@ function Layout( { styles } ) {
 		isInserterOpened,
 		isListViewOpened,
 		showIconLabels,
-		isDistractionFree,
+		isDistractionFreeMode,
 		showBlockBreadcrumbs,
 		isTemplateMode,
 		documentLabel,
@@ -116,9 +116,8 @@ function Layout( { styles } ) {
 			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ) &&
-				isLargeViewport,
+			isDistractionFreeMode:
+				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
@@ -127,13 +126,8 @@ function Layout( { styles } ) {
 		};
 	}, [] );
 
-	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
-		'is-sidebar-opened': sidebarIsOpened,
-		'has-fixed-toolbar': hasFixedToolbar,
-		'has-metaboxes': hasActiveMetaboxes,
-		'show-icon-labels': showIconLabels,
-		'is-distraction-free': isDistractionFree,
-	} );
+	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
+
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
@@ -164,6 +158,15 @@ function Layout( { styles } ) {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
+
+	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
+		'is-sidebar-opened': sidebarIsOpened,
+		'has-fixed-toolbar': hasFixedToolbar,
+		'has-metaboxes': hasActiveMetaboxes,
+		'show-icon-labels': showIconLabels,
+		'is-distraction-free': isDistractionFree,
+		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
+	} );
 
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )

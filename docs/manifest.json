@@ -642,12 +642,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "BaseField",
-		"slug": "base-field",
-		"markdown_source": "../packages/components/src/base-field/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "BorderBoxControl",
 		"slug": "border-box-control",
 		"markdown_source": "../packages/components/src/border-box-control/border-box-control/README.md",
@@ -1068,6 +1062,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigatorToParentButton",
+		"slug": "navigator-to-parent-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-to-parent-button/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Notice",
 		"slug": "notice",
 		"markdown_source": "../packages/components/src/notice/README.md",
@@ -1230,12 +1230,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "Theme",
-		"slug": "theme",
-		"markdown_source": "../packages/components/src/theme/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "ToggleControl",
 		"slug": "toggle-control",
 		"markdown_source": "../packages/components/src/toggle-control/README.md",
@@ -1268,31 +1262,31 @@
 	{
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
-		"markdown_source": "../packages/components/src/toolbar-button/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-button/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarDropdownMenu",
 		"slug": "toolbar-dropdown-menu",
-		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-dropdown-menu/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarGroup",
 		"slug": "toolbar-group",
-		"markdown_source": "../packages/components/src/toolbar-group/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-group/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarItem",
 		"slug": "toolbar-item",
-		"markdown_source": "../packages/components/src/toolbar-item/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-item/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "Toolbar",
 		"slug": "toolbar",
-		"markdown_source": "../packages/components/src/toolbar/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1620,12 +1614,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/experiments",
-		"slug": "packages-experiments",
-		"markdown_source": "../packages/experiments/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",
@@ -1779,6 +1767,12 @@
 		"title": "@wordpress/priority-queue",
 		"slug": "packages-priority-queue",
 		"markdown_source": "../packages/priority-queue/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/private-apis",
+		"slug": "packages-private-apis",
+		"markdown_source": "../packages/private-apis/README.md",
 		"parent": "packages"
 	},
 	{

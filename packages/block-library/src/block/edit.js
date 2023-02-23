@@ -130,6 +130,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 			<InspectorControls>
 				<PanelBody>
 					<TextControl
+						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }

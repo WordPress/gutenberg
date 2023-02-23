@@ -50,6 +50,7 @@ const restrictedImports = [
 			'castArray',
 			'chunk',
 			'clamp',
+			'clone',
 			'cloneDeep',
 			'compact',
 			'concat',
@@ -101,9 +102,11 @@ const restrictedImports = [
 			'keys',
 			'last',
 			'lowerCase',
+			'map',
 			'mapKeys',
 			'maxBy',
 			'memoize',
+			'merge',
 			'negate',
 			'noop',
 			'nth',
@@ -115,11 +118,13 @@ const restrictedImports = [
 			'partial',
 			'partialRight',
 			'pick',
+			'pickBy',
 			'random',
 			'reduce',
 			'reject',
 			'repeat',
 			'reverse',
+			'setWith',
 			'size',
 			'snakeCase',
 			'some',
@@ -136,6 +141,7 @@ const restrictedImports = [
 			'toString',
 			'trim',
 			'truncate',
+			'unescape',
 			'unionBy',
 			'uniq',
 			'uniqBy',
@@ -184,11 +190,6 @@ const restrictedImports = [
 		name: '@wordpress/edit-widgets',
 		message:
 			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
-	},
-	{
-		name: '@wordpress/edit-navigation',
-		message:
-			"edit-navigation is a WordPress top level package that shouldn't be imported into other packages",
 	},
 ];
 
@@ -367,10 +368,12 @@ module.exports = {
 				'packages/react-native-*/**/*.[tj]s?(x)',
 				'test/native/**/*.[tj]s?(x)',
 				'test/e2e/**/*.[tj]s?(x)',
+				'test/storybook-playwright/**/*.[tj]s?(x)',
 			],
 			extends: [
 				'plugin:jest-dom/recommended',
 				'plugin:testing-library/react',
+				'plugin:jest/recommended',
 			],
 		},
 		{
@@ -386,10 +389,21 @@ module.exports = {
 				'test/e2e/**/*.[tj]s',
 				'packages/e2e-test-utils-playwright/**/*.[tj]s',
 			],
-			extends: [ 'plugin:eslint-plugin-playwright/playwright-test' ],
+			extends: [
+				'plugin:eslint-plugin-playwright/playwright-test',
+				'plugin:@typescript-eslint/base',
+			],
+			parserOptions: {
+				tsconfigRootDir: __dirname,
+				project: [
+					'./test/e2e/tsconfig.json',
+					'./packages/e2e-test-utils-playwright/tsconfig.json',
+				],
+			},
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
+				'playwright/no-page-pause': 'error',
 				'no-restricted-syntax': [
 					'error',
 					{
@@ -408,6 +422,9 @@ module.exports = {
 						message: 'Prefer page.locator instead.',
 					},
 				],
+				'@typescript-eslint/await-thenable': 'error',
+				'@typescript-eslint/no-floating-promises': 'error',
+				'@typescript-eslint/no-misused-promises': 'error',
 			},
 		},
 		{

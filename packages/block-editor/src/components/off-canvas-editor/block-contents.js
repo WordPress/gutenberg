@@ -12,6 +12,7 @@ import { forwardRef, useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
@@ -51,12 +52,16 @@ const ListViewBlockContents = forwardRef(
 				const {
 					hasBlockMovingClientId,
 					getSelectedBlockClientId,
-					getLastInsertedBlockClientId,
-				} = select( blockEditorStore );
+					getLastInsertedBlocksClientIds,
+				} = unlock( select( blockEditorStore ) );
+				const lastInsertedBlocksClientIds =
+					getLastInsertedBlocksClientIds();
 				return {
 					blockMovingClientId: hasBlockMovingClientId(),
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
-					lastInsertedBlockClientId: getLastInsertedBlockClientId(),
+					lastInsertedBlockClientId:
+						lastInsertedBlocksClientIds &&
+						lastInsertedBlocksClientIds[ 0 ],
 				};
 			},
 			[ clientId ]
@@ -68,7 +73,7 @@ const ListViewBlockContents = forwardRef(
 			setInsertedBlockAttributes,
 		} = useInsertedBlock( lastInsertedBlockClientId );
 
-		const hasExistingLinkValue = insertedBlockAttributes?.id;
+		const hasExistingLinkValue = insertedBlockAttributes?.url;
 
 		useEffect( () => {
 			if (
@@ -116,6 +121,7 @@ const ListViewBlockContents = forwardRef(
 							);
 							setIsLinkUIOpen( false );
 						} }
+						onCancel={ () => setIsLinkUIOpen( false ) }
 					/>
 				) }
 				<BlockDraggable clientIds={ draggableClientIds }>

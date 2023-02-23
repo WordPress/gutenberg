@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import ColorPalette from '..';
 
-jest.useFakeTimers();
-
 const EXAMPLE_COLORS = [
 	{ name: 'red', color: '#f00' },
 	{ name: 'green', color: '#0f0' },
@@ -54,9 +52,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should call onClick on an active button with undefined', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -76,9 +72,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should call onClick on an inactive button', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -104,9 +98,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -139,9 +131,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should render dropdown and its content', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(

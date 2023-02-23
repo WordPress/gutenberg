@@ -11,7 +11,8 @@
 			"dimRatio": 30,
 			"backgroundType": "image",
 			"customGradient": "linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%)",
-			"isDark": true
+			"isDark": true,
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{

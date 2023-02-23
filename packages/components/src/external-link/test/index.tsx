@@ -9,12 +9,7 @@ import userEvent from '@testing-library/user-event';
  */
 import { ExternalLink } from '..';
 
-jest.useFakeTimers();
-
-const setupUser = () =>
-	userEvent.setup( {
-		advanceTimers: jest.advanceTimersByTime,
-	} );
+const setupUser = () => userEvent.setup();
 
 describe( 'ExternalLink', () => {
 	test( 'should call function passed in onClick handler when clicking the link', async () => {

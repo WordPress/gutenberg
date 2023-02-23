@@ -46,6 +46,7 @@ export class PostSlug extends Component {
 		return (
 			<PostSlugCheck>
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Slug' ) }
 					autoComplete="off"
 					spellCheck="false"
