@@ -15,6 +15,7 @@
 			"type": "string"
 		}
 	},
+	"example": {},
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
