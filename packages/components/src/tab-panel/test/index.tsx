@@ -184,7 +184,7 @@ describe.each( [
 			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
 
-		it( 'should not render a tab when initialTabName does not exist', () => {
+		it( 'should not select a tab when `initialTabName` does not match any known tab', () => {
 			render(
 				<Component
 					initialTabName="does-not-exist"
@@ -193,12 +193,13 @@ describe.each( [
 				/>
 			);
 
-			// TODO: effectively check that not tabs are rendered
-
-			// No tab should be rendered i.e. it doesn't fall back to first tab.
+			// No tab should be selected i.e. it doesn't fall back to first tab.
 			expect(
 				screen.queryByRole( 'tab', { selected: true } )
 			).not.toBeInTheDocument();
+
+			// No tabpanel should be rendered either
+			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should not change tabs when initialTabName is changed', () => {
