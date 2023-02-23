@@ -53,6 +53,10 @@ function isMouseOutEvent( item ) {
 	return isEvent( item ) && item.args.data.type === 'mouseout';
 }
 
+function isSelectionChangeEvent( item ) {
+	return isEvent( item ) && item.args.data.type === 'selectionchange';
+}
+
 function getEventDurationsForType( trace, filterFunction ) {
 	return trace.traceEvents
 		.filter( filterFunction )
@@ -68,7 +72,10 @@ export function getTypingEventDurations( trace ) {
 }
 
 export function getSelectionEventDurations( trace ) {
-	return [ getEventDurationsForType( trace, isFocusEvent ) ];
+	return [
+		getEventDurationsForType( trace, isFocusEvent ),
+		getEventDurationsForType( trace, isSelectionChangeEvent ),
+	];
 }
 
 export function getClickEventDurations( trace ) {
