@@ -32,13 +32,20 @@ function ScreenCSS( { name } ) {
 
 	return (
 		<>
-			<ScreenHeader title={ __( 'CSS' ) } description={ description } />
-			<ExternalLink
-				href="https://wordpress.org/support/article/css/"
-				className="edit-site-global-styles-screen-css-help-link"
-			>
-				{ __( 'Learn more about CSS' ) }
-			</ExternalLink>
+			<ScreenHeader
+				title={ __( 'CSS' ) }
+				description={
+					<>
+						{ description }
+						<ExternalLink
+							href="https://wordpress.org/support/article/css/"
+							className="edit-site-global-styles-screen-css-help-link"
+						>
+							{ __( 'Learn more about CSS' ) }
+						</ExternalLink>
+					</>
+				}
+			/>
 			<div className="edit-site-global-styles-screen-css">
 				<CustomCSSControl blockName={ name } />
 			</div>

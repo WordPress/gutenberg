@@ -38,7 +38,7 @@ type FocusNormalizedButton =
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
  *
- * @param  eventTarget The target from a mouse or touch event.
+ * @param eventTarget The target from a mouse or touch event.
  *
  * @return Whether the element is a button element subject to focus normalization.
  */
@@ -75,8 +75,8 @@ type UseFocusOutsideReturn = {
  * A react hook that can be used to check whether focus has moved outside the
  * element the event handlers are bound to.
  *
- * @param  onFocusOutside A callback triggered when focus moves outside
- *                        the element the event handlers are bound to.
+ * @param onFocusOutside A callback triggered when focus moves outside
+ *                       the element the event handlers are bound to.
  *
  * @return An object containing event handlers. Bind the event handlers to a
  * wrapping element element to capture when focus moves outside that element.
@@ -119,7 +119,7 @@ export default function useFocusOutside(
 	 * button elements when clicked, while others do. The logic here
 	 * intends to normalize this as treating click on buttons as focus.
 	 *
-	 * @param  event
+	 * @param event
 	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 	 */
 	const normalizeButtonFocus: EventHandler< MouseEvent | TouchEvent > =

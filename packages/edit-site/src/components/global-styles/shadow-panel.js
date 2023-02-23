@@ -22,19 +22,19 @@ import {
 import { __ } from '@wordpress/i18n';
 import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels } from './hooks';
+import { useSupportedStyles } from './hooks';
 import { IconWithCurrentColor } from './icon-with-current-color';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 export function useHasShadowControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	return supports.includes( 'shadow' );
 }
 
@@ -44,7 +44,10 @@ export default function ShadowPanel( { name, variation = '' } ) {
 	const [ userShadow ] = useGlobalStyle( `${ prefix }shadow`, name, 'user' );
 	const hasShadow = () => !! userShadow;
 
-	const resetShadow = () => setShadow( undefined );
+	const resetShadow = useCallback(
+		() => setShadow( undefined ),
+		[ setShadow ]
+	);
 	const resetAll = useCallback(
 		() => resetShadow( undefined ),
 		[ resetShadow ]
@@ -129,7 +132,7 @@ function ShadowPopoverContainer( { shadow, onShadowChange } ) {
 	return (
 		<div className="edit-site-global-styles__shadow-panel">
 			<VStack spacing={ 4 }>
-				<Heading level={ 5 }>{ __( 'Shadows' ) }</Heading>
+				<Heading level={ 5 }>{ __( 'Shadow' ) }</Heading>
 				<ShadowPresets
 					presets={ shadows }
 					activeShadow={ shadow }
@@ -143,9 +146,9 @@ function ShadowPopoverContainer( { shadow, onShadowChange } ) {
 function ShadowPresets( { presets, activeShadow, onSelect } ) {
 	return ! presets ? null : (
 		<Grid columns={ 6 } gap={ 0 } align="center" justify="center">
-			{ presets.map( ( { name, shadow }, i ) => (
+			{ presets.map( ( { name, slug, shadow } ) => (
 				<ShadowIndicator
-					key={ i }
+					key={ slug }
 					label={ name }
 					isActive={ shadow === activeShadow }
 					onSelect={ () =>
@@ -164,8 +167,9 @@ function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
 			<Button
 				className="edit-site-global-styles__shadow-indicator"
 				onClick={ onSelect }
-				aria-label={ label }
+				label={ label }
 				style={ { boxShadow: shadow } }
+				showTooltip
 			>
 				{ isActive && <Icon icon={ check } /> }
 			</Button>

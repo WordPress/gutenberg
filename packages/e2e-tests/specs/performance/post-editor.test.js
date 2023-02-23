@@ -105,28 +105,43 @@ describe( 'Post Editor Performance', () => {
 			readFile( join( __dirname, '../../assets/large-post.html' ) )
 		);
 		await saveDraft();
-		let i = 5;
+		const draftURL = await page.url();
+
+		// Number of sample measurements to take.
+		const samples = 5;
+		// Number of throwaway measurements to perform before recording samples.
+		// Having at least one helps ensure that caching quirks don't manifest in
+		// the results.
+		const throwaway = 1;
+
+		let i = throwaway + samples;
 		while ( i-- ) {
-			await page.reload();
+			await page.close();
+			page = await browser.newPage();
+
+			await page.goto( draftURL );
 			await page.waitForSelector( '.edit-post-layout', {
 				timeout: 120000,
 			} );
 			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
-			const {
-				serverResponse,
-				firstPaint,
-				domContentLoaded,
-				loaded,
-				firstContentfulPaint,
-				firstBlock,
-			} = await getLoadingDurations();
 
-			results.serverResponse.push( serverResponse );
-			results.firstPaint.push( firstPaint );
-			results.domContentLoaded.push( domContentLoaded );
-			results.loaded.push( loaded );
-			results.firstContentfulPaint.push( firstContentfulPaint );
-			results.firstBlock.push( firstBlock );
+			if ( i < samples ) {
+				const {
+					serverResponse,
+					firstPaint,
+					domContentLoaded,
+					loaded,
+					firstContentfulPaint,
+					firstBlock,
+				} = await getLoadingDurations();
+
+				results.serverResponse.push( serverResponse );
+				results.firstPaint.push( firstPaint );
+				results.domContentLoaded.push( domContentLoaded );
+				results.loaded.push( loaded );
+				results.firstContentfulPaint.push( firstContentfulPaint );
+				results.firstBlock.push( firstBlock );
+			}
 		}
 	} );
 

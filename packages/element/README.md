@@ -38,11 +38,9 @@ Let's render a customized greeting into an empty element:
 		);
 	}
 
-	wp.element.createRoot(document.getElementById( 'greeting' ))
-		.render(
-			wp.element.createElement( Greeting, { toWhom: 'World' } )
-		)
-	);
+	wp.element
+		.createRoot( document.getElementById( 'greeting' ) )
+		.render( wp.element.createElement( Greeting, { toWhom: 'World' } ) );
 </script>
 ```
 
@@ -214,6 +212,14 @@ Finds the dom node of a React component.
 _Parameters_
 
 -   _component_ `import('./react').WPComponent`: Component's instance.
+
+### flushSync
+
+Forces React to flush any updates inside the provided callback synchronously.
+
+_Parameters_
+
+-   _callback_ `Function`: Callback to run synchronously.
 
 ### forwardRef
 

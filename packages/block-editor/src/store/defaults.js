@@ -170,6 +170,13 @@ export const SETTINGS_DEFAULTS = {
 	__unstableGalleryWithImageBlocks: false,
 	__unstableIsPreviewMode: false,
 
+	// This setting is `private` now with `lock` API.
+	blockInspectorAnimation: {
+		'core/navigation': { enterDirection: 'leftToRight' },
+		'core/navigation-submenu': { enterDirection: 'rightToLeft' },
+		'core/navigation-link': { enterDirection: 'rightToLeft' },
+	},
+
 	generateAnchors: false,
 	// gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.

@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'List', () => {
+test.describe( 'List (@firefox)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -84,7 +84,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace', async ( {
+	test( 'should undo asterisk transform with backspace (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -99,7 +99,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace after selection changes', async ( {
+	test( 'should undo asterisk transform with backspace after selection changes (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -115,7 +115,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace setting isTyping state', async ( {
+	test( 'should undo asterisk transform with backspace setting isTyping state (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -131,7 +131,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace after selection changes without requestIdleCallback', async ( {
+	test( 'should undo asterisk transform with backspace after selection changes without requestIdleCallback (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -148,7 +148,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with escape', async ( {
+	test( 'should undo asterisk transform with escape (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -1009,7 +1009,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should preserve indentation after merging backward and forward', async ( {
+	test( 'should preserve indentation after merging backward and forward (-firefox)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -1158,7 +1158,7 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'can be created by pasting an empty list', async ( {
+	test( 'can be created by pasting an empty list (-firefox)', async ( {
 		editor,
 		pageUtils,
 	} ) => {
@@ -1166,7 +1166,7 @@ test.describe( 'List', () => {
 		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Paste empty list block
-		await pageUtils.setClipboardData( {
+		pageUtils.setClipboardData( {
 			plainText:
 				'<!-- wp:list -->\n<ul><li></li></ul>\n<!-- /wp:list -->',
 		} );
@@ -1176,7 +1176,11 @@ test.describe( 'List', () => {
 		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Verify no WSOD and content is proper.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
 	} );
 
 	test( 'should merge two list with same attributes', async ( {
@@ -1231,7 +1235,15 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->` );
 	} );
 
 	test( 'selects all transformed output', async ( { editor, page } ) => {
@@ -1247,14 +1259,29 @@ test.describe( 'List', () => {
 			page.locator( 'role=document[name="Block: List"i]' )
 		);
 
-		await page.getByRole( 'button', { name: 'List' } ).click();
+		await page.getByRole( 'button', { name: 'List', exact: true } ).click();
 		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() )
+			.toBe( `<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->` );
 
 		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
 		await page.getByRole( 'menuitem', { name: 'List' } ).click();
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
 	} );
 } );

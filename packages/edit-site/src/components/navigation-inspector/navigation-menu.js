@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
@@ -11,7 +11,7 @@ import { useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const ALLOWED_BLOCKS = {
 	'core/navigation': [
@@ -36,10 +36,10 @@ const ALLOWED_BLOCKS = {
 	],
 };
 
-export default function NavigationMenu( { innerBlocks } ) {
+export default function NavigationMenu( { innerBlocks, onSelect } ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
-	const { OffCanvasEditor } = unlock( blockEditorExperiments );
+	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
 
 	//TODO: Block settings are normally updated as a side effect of rendering InnerBlocks in BlockList
 	//Think through a better way of doing this, possible with adding allowed blocks to block library metadata
@@ -56,5 +56,11 @@ export default function NavigationMenu( { innerBlocks } ) {
 		} );
 	}, [ updateBlockListSettings, innerBlocks ] );
 
-	return <OffCanvasEditor blocks={ innerBlocks } />;
+	return (
+		<OffCanvasEditor
+			blocks={ innerBlocks }
+			onSelect={ onSelect }
+			LeafMoreMenu={ LeafMoreMenu }
+		/>
+	);
 }
