@@ -20,7 +20,6 @@ function ScreenBlock( { name } ) {
 			<ContextMenu
 				parentMenu={ '/blocks/' + encodeURIComponent( name ) }
 				name={ name }
-				blockTitle={ blockType.title }
 			/>
 		</>
 	);

@@ -3,6 +3,8 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { __experimentalVStack as VStack } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -15,8 +17,12 @@ import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 import Subtitle from './subtitle';
 
-export function ScreenVariations( { blockTitle, name, path } ) {
+export function ScreenVariations( { name, path } ) {
 	const hasVariationsPanel = useHasVariationsPanel( name, path );
+	const blockTitle = useSelect(
+		( select ) => select( blocksStore ).getBlockType( name ).title,
+		[ name ]
+	);
 
 	if ( ! hasVariationsPanel ) {
 		return null;

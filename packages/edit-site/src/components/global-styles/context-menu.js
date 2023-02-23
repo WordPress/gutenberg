@@ -44,7 +44,7 @@ const {
 	overrideSettingsWithSupports,
 } = unlock( blockEditorPrivateApis );
 
-function ContextMenu( { blockTitle, name, parentMenu = '' } ) {
+function ContextMenu( { name, parentMenu = '' } ) {
 	const [ rawSettings ] = useGlobalSetting( '', name );
 	const supports = useSupportedStyles( name );
 	const settings = useMemo(
@@ -127,11 +127,7 @@ function ContextMenu( { blockTitle, name, parentMenu = '' } ) {
 					</NavigationButtonAsItem>
 				) }
 				{ hasVariationsPanel && (
-					<ScreenVariations
-						blockTitle={ blockTitle }
-						name={ name }
-						path={ parentMenu }
-					/>
+					<ScreenVariations name={ name } path={ parentMenu } />
 				) }
 				{ isBlocksPanel && canEditCSS && (
 					<>
