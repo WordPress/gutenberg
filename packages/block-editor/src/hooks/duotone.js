@@ -134,14 +134,16 @@ function DuotonePanel( { attributes, setAttributes } ) {
 				disableCustomColors={ disableCustomColors }
 				value={ duotonePresetOrColors }
 				onChange={ ( newDuotone ) => {
+					const maybePreset = getDuotonePresetFromColors(
+						newDuotone,
+						duotonePalette
+					);
+
 					const newStyle = {
 						...style,
 						color: {
 							...style?.color,
-							duotone: getDuotonePresetFromColors(
-								newDuotone,
-								duotonePalette
-							),
+							duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
 						},
 					};
 					setAttributes( { style: newStyle } );
