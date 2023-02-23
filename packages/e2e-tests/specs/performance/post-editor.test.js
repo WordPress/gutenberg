@@ -249,8 +249,16 @@ describe( 'Post Editor Performance', () => {
 		}
 		await page.tracing.stop();
 		traceResults = JSON.parse( readFile( traceFile ) );
-		const [ focusEvents ] = getSelectionEventDurations( traceResults );
-		results.focus = focusEvents;
+		const [ focusEvents, focusInEvents, selectionChangeEvents ] =
+			getSelectionEventDurations( traceResults );
+
+		for ( let j = 0; j < focusEvents.length; j++ ) {
+			results.focus.push(
+				focusEvents[ j ] +
+					focusInEvents[ j ] +
+					selectionChangeEvents[ j ]
+			);
+		}
 	} );
 
 	it( 'Opening persistent list view', async () => {
