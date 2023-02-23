@@ -122,7 +122,6 @@ describe( 'Links', () => {
 		// Navigate to and toggle the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 
 		// Toggle should still have focus and be checked.
@@ -135,7 +134,6 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Tab back to the Submit and apply the link.
-		await pressKeyWithModifier( 'shift', 'Tab' );
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
@@ -530,7 +528,6 @@ describe( 'Links', () => {
 		// Navigate to and toggle the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 
 		// Confirm that focus was not prematurely returned to the paragraph on
@@ -766,7 +763,6 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			// Move focus back to RichText for the underlying link.
-			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Tab' );

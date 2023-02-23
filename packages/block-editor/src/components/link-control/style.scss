@@ -64,6 +64,7 @@ $preview-image-height: 140px;
 		width: calc(100% - #{$grid-unit-20 * 2});
 		display: block;
 		padding: 11px $grid-unit-20;
+		padding-right: ( $button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
 		margin: 0;
 		position: relative;
 		border: 1px solid $gray-300;
@@ -76,11 +77,20 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__search-actions {
-	display: flex;
-	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
-	justify-content: flex-start;
-	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
-	gap: $grid-unit-10;
+	position: absolute;
+	/*
+	 * Actions must be positioned on top of URLInput, since the input will grow
+	 * when suggestions are rendered.
+	 *
+	 * Compensate for:
+	 *  - Border (1px)
+	 *  - Vertically, for the difference in height between the input (40px) and
+	 *    the icon buttons.
+	 *  - Horizontally, pad to the minimum of: default input padding, or the
+	 *    equivalent of the vertical padding.
+	 */
+	top: 1px + ( ( 40px - $button-size ) * 0.5 );
+	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) * 0.5);
 }
 
 .components-button .block-editor-link-control__search-submit .has-icon {
@@ -469,8 +479,14 @@ $preview-image-height: 140px;
 		position: absolute;
 		left: auto;
 		bottom: auto;
+		/*
+		 * Position spinner to the left of the actions.
+		 *
+		 * Compensate for:
+		 *  - Input padding right ($button-size)
+		 */
 		top: calc(50% - #{$spinner-size} / 2);
-		right: $grid-unit-20;
+		right: $button-size;
 	}
 }
 
