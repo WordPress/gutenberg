@@ -13,71 +13,6 @@
  * @return array New block editor settings.
  */
 function gutenberg_get_block_editor_settings( $settings ) {
-	global $post_id;
-
-	$template_slug = get_page_template_slug( $post_id );
-
-	if ( ! $template_slug ) {
-		$post_slug      = 'singular';
-		$page_slug      = 'singular';
-		$template_types = get_block_templates();
-
-		foreach ( $template_types as $template_type ) {
-			if ( 'page' === $template_type->slug ) {
-				$page_slug = 'page';
-			}
-			if ( 'single' === $template_type->slug ) {
-				$post_slug = 'single';
-			}
-		}
-
-		$what_post_type = get_post_type( $post_id );
-		switch ( $what_post_type ) {
-			case 'post':
-				$template_slug = $post_slug;
-				break;
-			case 'page':
-				$template_slug = $page_slug;
-				break;
-		}
-	}
-
-	$current_template = gutenberg_get_block_templates( array( 'slug__in' => array( $template_slug ) ) );
-
-	/**
-	 * Finds Post Content in an array of blocks
-	 *
-	 * @param array $blocks Array of blocks.
-	 *
-	 * @return array Post Content block.
-	 */
-	function get_post_content_block( $blocks ) {
-		foreach ( $blocks as $block ) {
-			if ( 'core/post-content' === $block['blockName'] ) {
-				return $block;
-			}
-			if ( ! empty( $block['innerBlocks'] ) ) {
-				$post_content = get_post_content_block( $block['innerBlocks'] );
-
-				if ( ! empty( $post_content ) ) {
-					return $post_content;
-				}
-			}
-		}
-	}
-
-	if ( ! empty( $current_template ) ) {
-		$template_blocks    = parse_blocks( $current_template[0]->content );
-		$post_content_block = get_post_content_block( $template_blocks );
-
-		if ( ! empty( $post_content_block ) ) {
-			// mismatched naming x(.
-			if ( empty( $post_content_block['attributes'] ) && ! empty( $post_content_block['attrs'] ) ) {
-				$post_content_block['attributes'] = $post_content_block['attrs'];
-			}
-			$settings['postContentBlock'] = $post_content_block;
-		}
-	}
 	// Set what is the context for this data request.
 	$context = 'other';
 	if (
@@ -91,21 +26,21 @@ function gutenberg_get_block_editor_settings( $settings ) {
 
 	if ( 'other' === $context ) {
 		global $wp_version;
-		$is_wp_5_9 = version_compare( $wp_version, '5.9', ' >= ' ) && version_compare( $wp_version, '6.0 - beta1', ' < ' );
-		$is_wp_6_0 = version_compare( $wp_version, '6.0 - beta1', ' >= ' );
+		$is_wp_5_9 = version_compare( $wp_version, '5.9', '>=' ) && version_compare( $wp_version, '6.0-beta1', '<' );
+		$is_wp_6_0 = version_compare( $wp_version, '6.0-beta1', '>=' );
 
 		// Make sure the styles array exists.
-		// In some contexts, like the navigation editor, it doesn't .
+		// In some contexts, like the navigation editor, it doesn't.
 		if ( ! isset( $settings['styles'] ) ) {
 			$settings['styles'] = array();
 		}
 
-			// Remove existing global styles provided by core.
-			$styles_without_existing_global_styles = array();
+		// Remove existing global styles provided by core.
+		$styles_without_existing_global_styles = array();
 		foreach ( $settings['styles'] as $style ) {
 			if (
-			( $is_wp_5_9 && ! gutenberg_is_global_styles_in_5_9( $style ) ) || // Can be removed when plugin minimum version is 6.0.
-			( $is_wp_6_0 && ( ! isset( $style['isGlobalStyles'] ) || ! $style['isGlobalStyles'] ) )
+				( $is_wp_5_9 && ! gutenberg_is_global_styles_in_5_9( $style ) ) || // Can be removed when plugin minimum version is 6.0.
+				( $is_wp_6_0 && ( ! isset( $style['isGlobalStyles'] ) || ! $style['isGlobalStyles'] ) )
 			) {
 				$styles_without_existing_global_styles[] = $style;
 			}
@@ -139,40 +74,26 @@ function gutenberg_get_block_editor_settings( $settings ) {
 				'__unstableType' => 'theme',
 				'isGlobalStyles' => true,
 			);
-			foreach ( $presets as $preset_style ) {
-				$actual_css = gutenberg_get_global_stylesheet( array( $preset_style['css'] ) );
-				if ( '' !== $actual_css ) {
-					$preset_style['css'] = $actual_css;
-					$new_global_styles[] = $preset_style;
-				}
+			$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'] ) );
+			if ( '' !== $actual_css ) {
+				$block_classes['css'] = $actual_css;
+				$new_global_styles[]  = $block_classes;
 			}
-
-			if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
-				$block_classes = array(
-					'css'            => 'styles',
-					'__unstableType' => 'theme',
-					'isGlobalStyles' => true,
-				);
-				$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'] ) );
-				if ( '' !== $actual_css ) {
-					$block_classes['css'] = $actual_css;
-					$new_global_styles[]  = $block_classes;
-				}
-			} else {
-				// If there is no `theme.json` file, ensure base layout styles are still available.
-				$block_classes = array(
-					'css'            => 'base-layout-styles',
-					'__unstableType' => 'base-layout',
-					'isGlobalStyles' => true,
-				);
-				$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'] ) );
-				if ( '' !== $actual_css ) {
-					$block_classes['css'] = $actual_css;
-					$new_global_styles[]  = $block_classes;
-				}
+		} else {
+			// If there is no `theme.json` file, ensure base layout styles are still available.
+			$block_classes = array(
+				'css'            => 'base-layout-styles',
+				'__unstableType' => 'base-layout',
+				'isGlobalStyles' => true,
+			);
+			$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'] ) );
+			if ( '' !== $actual_css ) {
+				$block_classes['css'] = $actual_css;
+				$new_global_styles[]  = $block_classes;
 			}
+		}
 
-			$settings['styles'] = array_merge( $new_global_styles, $styles_without_existing_global_styles );
+		$settings['styles'] = array_merge( $new_global_styles, $styles_without_existing_global_styles );
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
