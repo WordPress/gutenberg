@@ -114,25 +114,12 @@ export type OptionProps< T extends Color | Gradient > = {
 	slugPrefix: SlugPrefix;
 }
 
-type BasePaletteEditList = {
+export type PaletteEditListViewProps< T extends ( Gradient | Color ) > = {
+	elements: T[]
+	onChange: ( newGradients?: T[] ) => void;
+	isGradient?: boolean;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
 	slugPrefix: SlugPrefix;
 }
-
-type PaletteEditListColors = {
-	elements: Color[];
-	onChange: ( newColors: Color[] ) => void;
-	isGradient?: false;
-}
-
-type PaletteEditListGradients = {
-	elements: Gradient[];
-	onChange: ( newGradients: Gradient[] ) => void;
-	isGradient: true;
-}
-
-export type PaletteEditListViewProps =
-	| BasePaletteEditList & PaletteEditListColors
-	| BasePaletteEditList & PaletteEditListGradients;

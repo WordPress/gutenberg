@@ -253,7 +253,7 @@ function isTemporaryElement( slugPrefix: string, element: Color | Gradient ) {
 	);
 }
 
-function PaletteEditListView( {
+function PaletteEditListView< T extends Color | Gradient >( {
 	elements,
 	onChange,
 	editingElement,
@@ -261,7 +261,7 @@ function PaletteEditListView( {
 	canOnlyChangeValues,
 	slugPrefix,
 	isGradient,
-}: PaletteEditListViewProps ) {
+}: PaletteEditListViewProps< T > ) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
 	const elementsReference = useRef< typeof elements >();
 	useEffect( () => {
@@ -345,7 +345,7 @@ function PaletteEditListView( {
 }
 
 function getElements( props: PaletteEditProps ) {
-	return 'gradients' in props ? props.gradients : props.colors;
+	return isGradientPalette( props ) ? props.gradients : props.colors;
 }
 
 function isGradientPalette(
