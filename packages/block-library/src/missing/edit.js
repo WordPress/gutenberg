@@ -16,7 +16,7 @@ import { safeHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { getAsyncBlocks } from '../../';
+import { getAsyncBlocks } from '../';
 
 function MissingBlockWarning( { attributes, convertToHTML, clientId } ) {
 	const asyncBlocks = [ ...new Set( getAsyncBlocks().flat() ) ];
