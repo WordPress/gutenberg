@@ -81,7 +81,7 @@ export default function VisualEditor( { styles } ) {
 		deviceType,
 		isWelcomeGuideVisible,
 		isTemplateMode,
-		postContentBlock,
+		postContentAttributes,
 		wrapperBlockName,
 		wrapperUniqueId,
 		isBlockBasedTheme,
@@ -108,7 +108,7 @@ export default function VisualEditor( { styles } ) {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			isTemplateMode: _isTemplateMode,
-			postContentBlock: getEditorSettings().postContentBlock,
+			postContentAttributes: getEditorSettings().postContentAttributes,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
@@ -192,7 +192,12 @@ export default function VisualEditor( { styles } ) {
 		return { type: 'default' };
 	}, [ isTemplateMode, themeSupportsLayout, globalLayoutSettings ] );
 
-	const postContentLayoutClasses = useLayoutClasses( postContentBlock );
+	const layout = postContentAttributes?.layout || {};
+
+	const postContentLayoutClasses = useLayoutClasses(
+		layout,
+		'core/post-content'
+	);
 
 	const blockListLayoutClass = classnames(
 		{
@@ -202,11 +207,10 @@ export default function VisualEditor( { styles } ) {
 	);
 
 	const postContentLayoutStyles = useLayoutStyles(
-		postContentBlock,
+		postContentAttributes,
+		'core/post-content',
 		'.block-editor-block-list__layout.is-root-container'
 	);
-
-	const layout = postContentBlock?.attributes?.layout || {};
 
 	// Update type for blocks using legacy layouts.
 	const postContentLayout = useMemo( () => {
@@ -227,7 +231,7 @@ export default function VisualEditor( { styles } ) {
 
 	// If there is a Post Content block we use its layout for the block list;
 	// if not, this must be a classic theme, in which case we use the fallback layout.
-	const blockListLayout = postContentBlock?.isValid
+	const blockListLayout = postContentAttributes
 		? postContentLayout
 		: fallbackLayout;
 

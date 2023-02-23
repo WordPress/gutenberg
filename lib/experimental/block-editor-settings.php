@@ -73,15 +73,12 @@ function gutenberg_get_block_editor_settings_experimental( $settings ) {
 	}
 
 	if ( ! empty( $current_template ) ) {
-		$template_blocks    = parse_blocks( $current_template[0]->content );
-		$post_content_block = get_post_content_block( $template_blocks );
+		$template_blocks         = parse_blocks( $current_template[0]->content );
+		$post_content_block      = get_post_content_block( $template_blocks );
+		$post_content_attributes = $post_content_block['attrs'];
 
-		if ( ! empty( $post_content_block ) ) {
-			// mismatched naming x(.
-			if ( empty( $post_content_block['attributes'] ) && ! empty( $post_content_block['attrs'] ) ) {
-				$post_content_block['attributes'] = $post_content_block['attrs'];
-			}
-			$settings['postContentBlock'] = $post_content_block;
+		if ( ! empty( $post_content_attributes ) ) {
+			$settings['postContentAttributes'] = $post_content_attributes;
 		}
 	}
 
