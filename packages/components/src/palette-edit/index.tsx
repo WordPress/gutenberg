@@ -345,7 +345,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
 }
 
 function getElements( props: PaletteEditProps ) {
-	return isGradientPalette( props ) ? props.gradients : props.colors;
+	return 'gradients' in props ? props.gradients : props.colors;
 }
 
 function isGradientPalette(
