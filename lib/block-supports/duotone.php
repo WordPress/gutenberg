@@ -443,9 +443,9 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	}
 
 	// Possible values for duotone attribute:
-	// 1. array('#000000', '#ffffff').
-	// 2. 'preset-slug'.
-	// 3. 'unset' (remove filter).
+	// 1. Array of colors - e.g. array('#000000', '#ffffff').
+	// 2. Slug of an existing Duotone preset - e.g. 'green-blue'.
+	// 3. The string 'unset' - indicates explicitly "no Duotone"..
 	$duotone_attr = $block['attrs']['style']['color']['duotone'];
 
 	$is_duotone_colors_array = is_array( $duotone_attr );
@@ -453,7 +453,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$is_duotone_preset       = ! $is_duotone_colors_array && ! $is_duotone_unset;
 
 	if ( $is_duotone_preset ) {
-		$filter_preset   = array(
+		$filter_preset = array(
 			'slug' => $duotone_attr,
 		);
 
@@ -465,8 +465,8 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// - an array of colors.
 
 		// Build a unique slug for the filter based on the array of colors.
-		$filter_key      = $is_duotone_colors_array ? implode( '-', $duotone_attr ) : $duotone_attr;
-		$filter_preset   = array(
+		$filter_key    = $is_duotone_colors_array ? implode( '-', $duotone_attr ) : $duotone_attr;
+		$filter_preset = array(
 			'slug' => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
 		);
 
