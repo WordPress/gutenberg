@@ -89,10 +89,10 @@ type EditingElement = number | null;
 export type SlugPrefix = string;
 
 export type ColorPickerPopoverProps< T extends Color | Gradient > = {
-	onClose?: () => void;
 	element: T;
-	isGradient?: boolean;
 	onChange: ( newElement: T ) => void;
+	onClose?: () => void;
+	isGradient: T extends Gradient ? true : false | undefined;
 }
 
 export type NameInputProps = {
@@ -104,7 +104,7 @@ export type NameInputProps = {
 export type OptionProps< T extends Color | Gradient > = {
 	element: T;
 	onChange: ( newElement: T ) => void;
-	isGradient?: boolean;
+	isGradient: T extends Gradient ? true : false | undefined;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	isEditing: boolean;
 	key: Key;
@@ -117,7 +117,7 @@ export type OptionProps< T extends Color | Gradient > = {
 export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	elements: T[];
 	onChange: ( newElement?: T[] ) => void;
-	isGradient?: boolean;
+	isGradient: T extends Gradient ? true : false | undefined;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
