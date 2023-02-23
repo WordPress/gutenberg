@@ -15,8 +15,7 @@ import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 import Subtitle from './subtitle';
 
-export function ScreenVariations( props ) {
-	const { blockName, name, path } = props;
+export function ScreenVariations( { blockTitle, name, path } ) {
 	const hasVariationsPanel = useHasVariationsPanel( name, path );
 
 	if ( ! hasVariationsPanel ) {
@@ -29,7 +28,7 @@ export function ScreenVariations( props ) {
 					{ sprintf(
 						// Translators: Name of the block.
 						__( 'Customize variations of the block: %s' ),
-						blockName
+						blockTitle
 					) }
 				</p>
 				<Subtitle>{ __( 'Style Variations' ) }</Subtitle>
