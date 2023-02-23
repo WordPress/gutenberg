@@ -175,6 +175,13 @@ function addDuotoneAttributes( settings ) {
 			},
 		} );
 	}
+	if ( ! settings.attributes.duotone ) {
+		Object.assign( settings.attributes, {
+			duotone: {
+				type: 'string',
+			},
+		} );
+	}
 
 	return settings;
 }
