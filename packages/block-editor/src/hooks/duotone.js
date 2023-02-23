@@ -75,18 +75,18 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 	);
 }
 
-function getColorsFromDuotonePreset( duotone, duotonePalette ) {
+export function getColorsFromDuotonePreset( duotone, duotonePalette ) {
 	if ( ! duotone ) {
 		return;
 	}
-	const preset = duotonePalette.find( ( { slug } ) => {
+	const preset = duotonePalette?.find( ( { slug } ) => {
 		return slug === duotone;
 	} );
 
-	return preset ? preset.colors : duotone;
+	return preset ? preset.colors : undefined;
 }
 
-function getDuotonePresetFromColors( colors, duotonePalette ) {
+export function getDuotonePresetFromColors( colors, duotonePalette ) {
 	if ( ! colors ) {
 		return;
 	}
@@ -102,6 +102,7 @@ function getDuotonePresetFromColors( colors, duotonePalette ) {
 
 function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
+	const duotoneStyle = style?.color?.duotone;
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -120,10 +121,9 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		return null;
 	}
 
-	const duotone = getColorsFromDuotonePreset(
-		style?.color?.duotone,
-		duotonePalette
-	);
+	const duotonePresetOrColors = ! Array.isArray( duotoneStyle )
+		? getColorsFromDuotonePreset( duotoneStyle, duotonePalette )
+		: duotoneStyle;
 
 	return (
 		<BlockControls group="block" __experimentalShareWithChildBlocks>
@@ -132,7 +132,7 @@ function DuotonePanel( { attributes, setAttributes } ) {
 				colorPalette={ colorPalette }
 				disableCustomDuotone={ disableCustomDuotone }
 				disableCustomColors={ disableCustomColors }
-				value={ duotone }
+				value={ duotonePresetOrColors }
 				onChange={ ( newDuotone ) => {
 					const newStyle = {
 						...style,
