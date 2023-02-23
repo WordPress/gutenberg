@@ -124,10 +124,15 @@ export default function CustomGradientPicker( {
 	const hasGradient = gradientAstValue !== DEFAULT_GRADIENT;
 	// Control points color option may be hex from presets, custom colors will be rgb.
 	// The position should always be a percentage.
-	const controlPoints = gradientAST.colorStops.map( ( colorStop ) => ( {
-		color: getStopCssColor( colorStop ),
-		position: parseInt( colorStop.length.value ),
-	} ) );
+	const controlPoints = gradientAST.colorStops.map( ( colorStop ) => {
+		// Although it's already been checked by `hasUnsupportedLength` in `getGradientAstWithDefault`,
+		// TypeScript doesn't know that `colorStop.length` is not undefined here.
+		//NTS: Is there may be a more elegant way to help TS see that for itself? 🤔
+		return {
+			color: getStopCssColor( colorStop ),
+			position: parseInt( colorStop.length!.value ),
+		};
+	} );
 
 	if ( ! __nextHasNoMargin ) {
 		deprecated(
