@@ -87,17 +87,17 @@ export function getColorsFromDuotonePreset( duotone, duotonePalette ) {
 }
 
 export function getDuotonePresetFromColors( colors, duotonePalette ) {
-	if ( ! colors ) {
+	if ( ! colors || ! Array.isArray( colors ) ) {
 		return;
 	}
 
-	const preset = duotonePalette.find( ( duotonePreset ) => {
+	const preset = duotonePalette?.find( ( duotonePreset ) => {
 		return duotonePreset?.colors?.every(
 			( val, index ) => val === colors[ index ]
 		);
 	} );
 
-	return preset ? preset.slug : colors;
+	return preset ? preset.slug : undefined;
 }
 
 function DuotonePanel( { attributes, setAttributes } ) {

@@ -1,9 +1,12 @@
 /**
  * Internal dependencies
  */
-import { getColorsFromDuotonePreset } from '../duotone';
+import {
+	getColorsFromDuotonePreset,
+	getDuotonePresetFromColors,
+} from '../duotone';
 
-describe( 'getColorsFromDuotonePreset', () => {
+describe( 'Duotone utilities', () => {
 	const duotonePalette = [
 		{
 			name: 'Dark grayscale',
@@ -21,25 +24,76 @@ describe( 'getColorsFromDuotonePreset', () => {
 			slug: 'purple-yellow',
 		},
 	];
-	it( 'should return undefined if no arguments are provided', () => {
-		expect( getColorsFromDuotonePreset() ).toBeUndefined();
+	describe( 'getColorsFromDuotonePreset', () => {
+		it( 'should return undefined if no arguments are provided', () => {
+			expect( getColorsFromDuotonePreset() ).toBeUndefined();
+		} );
+
+		it( 'should return undefined if no duotone preset is provided', () => {
+			expect(
+				getColorsFromDuotonePreset( undefined, duotonePalette )
+			).toBeUndefined();
+		} );
+
+		it( 'should return undefined if a non-existent preset is provided', () => {
+			expect(
+				getColorsFromDuotonePreset( 'does-not-exist', duotonePalette )
+			).toBeUndefined();
+		} );
+
+		it( 'should return the colors from the preset if found', () => {
+			expect(
+				getColorsFromDuotonePreset(
+					duotonePalette[ 2 ].slug,
+					duotonePalette
+				)
+			).toEqual( duotonePalette[ 2 ].colors );
+		} );
 	} );
 
-	it( 'should return undefined if no duotone preset is provided', () => {
-		expect(
-			getColorsFromDuotonePreset( undefined, duotonePalette )
-		).toBeUndefined();
-	} );
+	describe( 'getDuotonePresetFromColors', () => {
+		it( 'should return undefined if no arguments are provided', () => {
+			expect( getDuotonePresetFromColors() ).toBeUndefined();
+		} );
 
-	it( 'should return undefined if a non-existent preset is provided', () => {
-		expect(
-			getColorsFromDuotonePreset( 'does-not-exist', duotonePalette )
-		).toBeUndefined();
-	} );
+		it( 'should return undefined if no colors are provided', () => {
+			expect(
+				getDuotonePresetFromColors( undefined, duotonePalette )
+			).toBeUndefined();
+		} );
 
-	it( 'should return the colors from the preset if found', () => {
-		expect(
-			getColorsFromDuotonePreset( 'purple-yellow', duotonePalette )
-		).toEqual( [ '#8c00b7', '#fcff41' ] );
+		it( 'should return undefined if provided colors is not of valid type', () => {
+			const notAnArrayOfColorStrings = 'purple-yellow';
+			expect(
+				getDuotonePresetFromColors(
+					notAnArrayOfColorStrings,
+					duotonePalette
+				)
+			).toBeUndefined();
+		} );
+
+		it( 'should return undefined if no duotone palette is provided', () => {
+			expect(
+				getDuotonePresetFromColors( [ '#8c00b7', '#fcff41' ] )
+			).toBeUndefined();
+		} );
+
+		it( 'should return undefined if the provided colors do not match any preset', () => {
+			expect(
+				getDuotonePresetFromColors(
+					[ '#000000', '#000000' ],
+					duotonePalette
+				)
+			).toBeUndefined();
+		} );
+
+		it( 'should return the slug of the preset if found', () => {
+			expect(
+				getDuotonePresetFromColors(
+					duotonePalette[ 2 ].colors,
+					duotonePalette
+				)
+			).toEqual( duotonePalette[ 2 ].slug );
+		} );
 	} );
 } );
