@@ -274,7 +274,6 @@ function LinkControl( {
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
 	const showTextControl = hasLinkValue && hasTextControl;
 
-	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
 	return (
 		<div
 			tabIndex={ -1 }
@@ -287,7 +286,7 @@ function LinkControl( {
 				</div>
 			) }
 
-			{ isEditing && (
+			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
 				<>
 					<div
 						className={ classnames( {
@@ -336,6 +335,19 @@ function LinkControl( {
 							{ errorMessage }
 						</Notice>
 					) }
+					<div className="block-editor-link-control__search-actions">
+						<Button
+							variant="primary"
+							onClick={ handleSubmit }
+							className="xblock-editor-link-control__search-submit"
+							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+						>
+							{ __( 'Apply' ) }
+						</Button>
+						<Button variant="tertiary" onClick={ handleCancel }>
+							{ __( 'Cancel' ) }
+						</Button>
+					</div>
 				</>
 			) }
 
@@ -350,34 +362,15 @@ function LinkControl( {
 				/>
 			) }
 
-			<div className="block-editor-link-control__drawer">
-				{ showSettingsDrawer && (
-					<div className="block-editor-link-control__tools">
-						<LinkControlSettingsDrawer
-							value={ value }
-							settings={ settings }
-							onChange={ onChange }
-						/>
-					</div>
-				) }
-
-				{ isEditing && (
-					<div className="block-editor-link-control__search-actions">
-						<Button
-							variant="primary"
-							onClick={ handleSubmit }
-							className="xblock-editor-link-control__search-submit"
-							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
-						>
-							{ __( 'Apply' ) }
-						</Button>
-						<Button variant="tertiary" onClick={ handleCancel }>
-							{ __( 'Cancel' ) }
-						</Button>
-					</div>
-				) }
-			</div>
-
+			{ showSettingsDrawer && (
+				<div className="block-editor-link-control__tools">
+					<LinkControlSettingsDrawer
+						value={ value }
+						settings={ settings }
+						onChange={ onChange }
+					/>
+				</div>
+			) }
 			{ renderControlBottom && renderControlBottom() }
 		</div>
 	);

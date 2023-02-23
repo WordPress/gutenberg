@@ -121,6 +121,8 @@ describe( 'Links', () => {
 
 		// Navigate to and toggle the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 
 		// Toggle should still have focus and be checked.
@@ -133,7 +135,8 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Tab back to the Submit and apply the link.
-		await page.keyboard.press( 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		// The link should have been inserted.
@@ -526,6 +529,8 @@ describe( 'Links', () => {
 
 		// Navigate to and toggle the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 
 		// Confirm that focus was not prematurely returned to the paragraph on
@@ -534,8 +539,7 @@ describe( 'Links', () => {
 
 		// Close dialog. Expect that "Open in new tab" would have been applied
 		// immediately.
-
-		await pressKeyWithModifier( 'shift', 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		// Wait for Gutenberg to finish the job.
