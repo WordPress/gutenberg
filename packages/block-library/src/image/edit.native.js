@@ -153,7 +153,7 @@ function LinkSettings( {
 	};
 
 	return (
-		<PanelBody title={ __( 'Link Settings' ) }>
+		<PanelBody title={ __( 'Link settings' ) }>
 			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
 				url={ url }
