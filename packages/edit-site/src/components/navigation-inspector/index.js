@@ -2,13 +2,11 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	store as blockEditorStore,
 	BlockEditorProvider,
-	BlockTools,
-	BlockList,
 } from '@wordpress/block-editor';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
@@ -18,90 +16,129 @@ import { __ } from '@wordpress/i18n';
  */
 import NavigationMenu from './navigation-menu';
 
-const NAVIGATION_MENUS_QUERY = [
-	'postType',
-	'wp_navigation',
-	[ { per_page: 1, status: 'publish' } ],
-];
-
-function NavigationBlockEditorLoader( { onSelect, navigationPostId } ) {
-	const [ innerBlocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		'wp_navigation',
-		{ id: navigationPostId }
-	);
-	return (
-		<BlockEditorProvider
-			value={ innerBlocks }
-			onChange={ onChange }
-			onInput={ onInput }
-		>
-			<NavigationMenu onSelect={ onSelect } />
-			<div style={ { visibility: 'hidden' } }>
-				<BlockTools>
-					<BlockList />
-				</BlockTools>
-			</div>
-		</BlockEditorProvider>
-	);
-}
+const NAVIGATION_MENUS_QUERY = [ { per_page: -1, status: 'publish' } ];
 
 export default function NavigationInspector( { onSelect } ) {
 	const {
-		navigationBlockId,
-		navigationPostId,
-		isLoadingInnerBlocks,
-		hasLoadedInnerBlocks,
+		selectedNavigationBlockId,
+		clientIdToRef,
+		navigationMenus,
+		isResolvingNavigationMenus,
+		hasResolvedNavigationMenus,
+		firstNavigationBlockId,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetActiveBlockIdByBlockNames,
 			__experimentalGetGlobalBlocksByName,
 			getBlock,
 		} = select( blockEditorStore );
-		const { isResolving, hasFinishedResolution, getEntityRecords } =
+
+		const { getEntityRecords, hasFinishedResolution, isResolving } =
 			select( coreStore );
 
-		const selectedNavBlockId =
-			__experimentalGetActiveBlockIdByBlockNames( 'core/navigation' ) ||
-			__experimentalGetGlobalBlocksByName( 'core/navigation' )?.[ 0 ];
+		const navigationMenusQuery = [
+			'postType',
+			'wp_navigation',
+			NAVIGATION_MENUS_QUERY[ 0 ],
+		];
 
-		let navigationPost, isLoading, hasLoaded;
-		if ( selectedNavBlockId ) {
-			navigationPost = getBlock( selectedNavBlockId )?.attributes?.ref;
-			isLoading = isResolving( 'getEntityRecord', [
-				'postType',
-				'wp_navigation',
-				navigationPost,
-			] );
-			hasLoaded = hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				'wp_navigation',
-				navigationPost,
-			] );
-		} else {
-			const navigationMenus = getEntityRecords(
-				...NAVIGATION_MENUS_QUERY
-			);
-			if ( navigationMenus?.length > 0 ) {
-				navigationPost = navigationMenus[ 0 ].id;
-			}
-			isLoading = isResolving(
-				'getEntityRecords',
-				NAVIGATION_MENUS_QUERY
-			);
-			hasLoaded = hasFinishedResolution(
-				'getEntityRecords',
-				NAVIGATION_MENUS_QUERY
-			);
-		}
+		// Get the active Navigation block (if present).
+		const selectedNavId =
+			__experimentalGetActiveBlockIdByBlockNames( 'core/navigation' );
 
+		// Get all Navigation blocks currently within the editor canvas.
+		const navBlockIds =
+			__experimentalGetGlobalBlocksByName( 'core/navigation' );
+		const idToRef = {};
+		navBlockIds.forEach( ( id ) => {
+			idToRef[ id ] = getBlock( id )?.attributes?.ref;
+		} );
 		return {
-			navigationPostId: navigationPost,
-			navigationBlockId: selectedNavBlockId,
-			isLoadingInnerBlocks: isLoading,
-			hasLoadedInnerBlocks: hasLoaded,
+			selectedNavigationBlockId: selectedNavId,
+			firstNavigationBlockId: navBlockIds?.[ 0 ],
+			clientIdToRef: idToRef,
+			navigationMenus: getEntityRecords( ...navigationMenusQuery ),
+			isResolvingNavigationMenus: isResolving(
+				'getEntityRecords',
+				navigationMenusQuery
+			),
+			hasResolvedNavigationMenus: hasFinishedResolution(
+				'getEntityRecords',
+				navigationMenusQuery
+			),
 		};
 	}, [] );
+
+	const firstNavRefInTemplate = clientIdToRef[ firstNavigationBlockId ];
+	const firstNavigationMenuRef = navigationMenus?.[ 0 ]?.id;
+
+	// Default Navigation Menu is either:
+	// - the Navigation Menu referenced by the first Nav block within the template.
+	// - the first of the available Navigation Menus (`wp_navigation`) posts.
+	const defaultNavigationMenuId =
+		firstNavRefInTemplate || firstNavigationMenuRef;
+
+	// The Navigation Menu manually selected by the user within the Nav inspector.
+	const [ currentMenuId, setCurrentMenuId ] = useState(
+		firstNavRefInTemplate
+	);
+
+	// If a Nav block is selected within the canvas then set the
+	// Navigation Menu referenced by it's `ref` attribute  to be
+	// active within the Navigation sidebar.
+	useEffect( () => {
+		if ( selectedNavigationBlockId ) {
+			setCurrentMenuId( clientIdToRef[ selectedNavigationBlockId ] );
+		}
+	}, [ selectedNavigationBlockId ] );
+
+	const [ innerBlocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_navigation',
+		{ id: currentMenuId || defaultNavigationMenuId }
+	);
+
+	const { isLoadingInnerBlocks, hasLoadedInnerBlocks } = useSelect(
+		( select ) => {
+			const { isResolving, hasFinishedResolution } = select( coreStore );
+			return {
+				isLoadingInnerBlocks: isResolving( 'getEntityRecord', [
+					'postType',
+					'wp_navigation',
+					currentMenuId || defaultNavigationMenuId,
+				] ),
+				hasLoadedInnerBlocks: hasFinishedResolution(
+					'getEntityRecord',
+					[
+						'postType',
+						'wp_navigation',
+						currentMenuId || defaultNavigationMenuId,
+					]
+				),
+			};
+		},
+		[ currentMenuId, defaultNavigationMenuId ]
+	);
+
+	const isLoading = ! ( hasResolvedNavigationMenus && hasLoadedInnerBlocks );
+
+	const hasNavigationMenus = !! navigationMenus?.length;
+
+	// Entity block editor will return entities that are not currently published.
+	// Guard by only allowing their usage if there are published Nav Menus.
+	const publishedInnerBlocks = hasNavigationMenus ? innerBlocks : [];
+
+	const hasInnerBlocks = !! publishedInnerBlocks?.length;
+
+	useEffect( () => {
+		if ( isResolvingNavigationMenus ) {
+			speak( 'Loading Navigation sidebar menus.' );
+		}
+
+		if ( hasResolvedNavigationMenus ) {
+			speak( 'Navigation sidebar menus have loaded.' );
+		}
+	}, [ isResolvingNavigationMenus, hasResolvedNavigationMenus ] );
 
 	useEffect( () => {
 		if ( isLoadingInnerBlocks ) {
@@ -115,39 +152,37 @@ export default function NavigationInspector( { onSelect } ) {
 
 	return (
 		<div className="edit-site-navigation-inspector">
-			{ hasLoadedInnerBlocks &&
-				! isLoadingInnerBlocks &&
-				! navigationBlockId &&
-				! navigationPostId && (
-					<p className="edit-site-navigation-inspector__empty-msg">
-						{ __( 'There are no Navigation Menus.' ) }
-					</p>
-				) }
+			{ hasResolvedNavigationMenus && ! hasNavigationMenus && (
+				<p className="edit-site-navigation-inspector__empty-msg">
+					{ __( 'There are no Navigation Menus.' ) }
+				</p>
+			) }
 
-			{ ! hasLoadedInnerBlocks && (
+			{ ! hasResolvedNavigationMenus && (
 				<div className="edit-site-navigation-inspector__placeholder" />
 			) }
-			{ isLoadingInnerBlocks && (
+			{ isLoading && (
 				<>
 					<div className="edit-site-navigation-inspector__placeholder is-child" />
 					<div className="edit-site-navigation-inspector__placeholder is-child" />
 					<div className="edit-site-navigation-inspector__placeholder is-child" />
 				</>
 			) }
-			{ navigationBlockId && navigationPostId && hasLoadedInnerBlocks && (
-				<NavigationMenu
-					onSelect={ onSelect }
-					navigationBlockId={ navigationBlockId }
-				/>
+			{ hasInnerBlocks && ! isLoading && (
+				<BlockEditorProvider
+					value={ publishedInnerBlocks }
+					onChange={ onChange }
+					onInput={ onInput }
+				>
+					<NavigationMenu onSelect={ onSelect } />
+				</BlockEditorProvider>
 			) }
-			{ ! navigationBlockId &&
-				navigationPostId &&
-				hasLoadedInnerBlocks && (
-					<NavigationBlockEditorLoader
-						onSelect={ onSelect }
-						navigationPostId={ navigationPostId }
-					/>
-				) }
+
+			{ ! hasInnerBlocks && ! isLoading && (
+				<p className="edit-site-navigation-inspector__empty-msg">
+					{ __( 'Navigation Menu is empty.' ) }
+				</p>
+			) }
 		</div>
 	);
 }
