@@ -25,8 +25,9 @@ const renderQueue = createQueue();
  */
 /**
  * @typedef {import('../../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
- * @template State,Selectors
+ * @template State
  * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template Selectors
  */
 /** @typedef {import('../../types').MapSelect} MapSelect */
 /**
