@@ -368,8 +368,8 @@ export default function PaletteEdit< T extends Color | Gradient >(
 		elements &&
 		elements[ editingElement ] &&
 		! elements[ editingElement ].slug;
-	const elementsLength = elements.length;
-	const hasElements = elementsLength > 0;
+	const elementsLength = elements?.length;
+	const hasElements = elementsLength && elementsLength > 0;
 	const debounceOnChange = useDebounce( onChange, 100 );
 	const onSelectPaletteItem = useCallback(
 		(
