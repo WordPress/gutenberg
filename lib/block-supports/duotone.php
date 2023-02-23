@@ -548,7 +548,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 				}
 			}
 		);
-	} else {
+	} else if ( ! $is_duotone_unset ) {
 		WP_Duotone::$duotone_presets[] = $filter_preset['slug'];
 	}
 
