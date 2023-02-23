@@ -48,6 +48,7 @@ import type {
 	Gradient,
 	NameInputProps,
 	OptionProps,
+	PaletteEditGradientsProps,
 	PaletteEditListViewProps,
 	PaletteEditProps,
 	PaletteElement,
@@ -343,9 +344,17 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	);
 }
 
-export default function PaletteEdit< T extends Color | Gradient >(
-	props: PaletteEditProps< T >
-) {
+function getElements( props: PaletteEditProps ) {
+	return isGradientPalette( props ) ? props.gradients : props.colors;
+}
+
+function isGradientPalette(
+	props: PaletteEditProps
+): props is PaletteEditGradientsProps {
+	return 'gradients' in props;
+}
+
+export default function PaletteEdit( props: PaletteEditProps ) {
 	const {
 		onChange,
 		paletteLabel,
@@ -356,8 +365,8 @@ export default function PaletteEdit< T extends Color | Gradient >(
 		slugPrefix = '',
 	} = props;
 
-	const isGradient = 'gradients' in props;
-	const elements = isGradient ? props.gradients : props.colors;
+	const isGradient = isGradientPalette( props );
+	const elements = getElements( props );
 	const [ isEditing, setIsEditing ] = useState( false );
 	const [ editingElement, setEditingElement ] = useState<
 		number | null | undefined
@@ -435,7 +444,7 @@ export default function PaletteEdit< T extends Color | Gradient >(
 									slugPrefix
 								);
 
-								if ( 'gradients' in props ) {
+								if ( isGradientPalette( props ) ) {
 									props.onChange( [
 										...props.gradients,
 										{

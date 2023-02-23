@@ -22,24 +22,7 @@ export type Gradient = {
 
 export type PaletteElement = Color | Gradient;
 
-export type PaletteEditProps< T extends Color | Gradient > = {
-	/**
-	 * The colors in the palette.
-	 *
-	 * @default []
-	 */
-	colors: T[] | never;
-	/**
-	 * Runs on changing the value.
-	 */
-	onChange: ( newElements?: T[] ) => void;
-	/**
-	 * The gradients in the palette.
-	 */
-	gradients: T[] | never;
-	/**
-	 * Runs on changing the value.
-	 */
+export type BasePaletteEdit = {
 	/**
 	 * A message to show if there's nothing to edit.
 	 */
@@ -71,6 +54,37 @@ export type PaletteEditProps< T extends Color | Gradient > = {
 	slugPrefix?: SlugPrefix;
 };
 
+type PaletteEditColors = {
+	/**
+	 * The colors in the palette.
+	 *
+	 * @default []
+	 */
+	colors: Color[];
+	/**
+	 * Runs on changing the value.
+	 */
+	onChange: ( newColors?: Color[] ) => void;
+}
+
+type PaletteEditGradients = {
+	/**
+	 * The gradients in the palette.
+	 */
+	gradients: Gradient[];
+	/**
+	 * Runs on changing the value.
+	 */
+	onChange: ( newGradients?: Gradient[] ) => void;
+}
+
+export type PaletteEditColorsProps = BasePaletteEdit & PaletteEditColors;
+export type PaletteEditGradientsProps = BasePaletteEdit & PaletteEditGradients;
+
+export type PaletteEditProps =
+	| PaletteEditColorsProps
+	| PaletteEditGradientsProps;
+
 type EditingElement = number | null;
 export type SlugPrefix = string;
 
@@ -91,7 +105,7 @@ export type OptionProps< T extends Color | Gradient > = {
 	element: T;
 	onChange: ( newElement: T ) => void;
 	isGradient?: boolean;
-	canOnlyChangeValues: PaletteEditProps< T >[ 'canOnlyChangeValues' ];
+	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	isEditing: boolean;
 	key: Key;
 	onRemove: MouseEventHandler< HTMLButtonElement >;
@@ -104,7 +118,7 @@ export type PaletteEditListViewProps< T extends ( Gradient | Color ) > = {
 	elements: T[]
 	onChange: ( newGradients?: T[] ) => void;
 	isGradient?: boolean;
-	canOnlyChangeValues: PaletteEditProps< T >[ 'canOnlyChangeValues' ];
+	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
 	slugPrefix: SlugPrefix;
