@@ -187,7 +187,7 @@ function addDuotoneAttributes( settings ) {
  *
  * @return {Function} Wrapped component.
  */
-const withDuotoneControls = createHigherOrderComponent(
+export const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const hasDuotoneSupport = hasBlockSupport(
 			props.name,

@@ -1,10 +1,113 @@
 /**
+ * External dependencies
+ */
+import { render, screen } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { SlotFillProvider } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
+import BlockEditorProvider from '../../components/provider';
+import BlockControls from '../../components/block-controls';
+// eslint-disable-next-line no-unused-vars
+import BlockEdit from '../../components/block-edit';
 import {
+	withDuotoneControls,
 	getColorsFromDuotonePreset,
 	getDuotonePresetFromColors,
 } from '../duotone';
+
+describe( 'withDuotoneControls', () => {
+	const blockName = 'core/test-block';
+
+	const blockSettings = {
+		save: () => {},
+		category: 'media',
+		title: 'Block Title',
+		edit: ( { children } ) => <>{ children }</>,
+		supports: {
+			color: {
+				__experimentalDuotone: 'img',
+			},
+		},
+	};
+
+	const componentProps = {
+		name: blockName,
+		attributes: {},
+		isSelected: true,
+	};
+
+	const settings = {
+		__experimentalFeatures: {
+			color: {
+				palette: {
+					default: [
+						{
+							name: 'Pale pink',
+							slug: 'pale-pink',
+							color: '#f78da7',
+						},
+						{
+							name: 'Vivid green cyan',
+							slug: 'vivid-green-cyan',
+							color: '#00d084',
+						},
+					],
+				},
+				defaultDuotone: true,
+				duotone: {
+					default: [
+						{
+							name: 'Black and white',
+							slug: 'black-and-white',
+							colors: [ '#000000', '#FFFFFF' ],
+						},
+						{
+							name: 'Pale pink and green',
+							slug: 'palepink-green',
+							colors: [ '#f78da7', '#00d084' ],
+						},
+					],
+				},
+			},
+		},
+	};
+
+	beforeEach( () => {
+		registerBlockType( blockName, blockSettings );
+	} );
+
+	afterEach( () => {
+		unregisterBlockType( blockName );
+	} );
+
+	it( 'should show Duotone control in toolbar', () => {
+		const EnhancedComponent = withDuotoneControls( ( { wrapperProps } ) => (
+			<div { ...wrapperProps } />
+		) );
+
+		render(
+			<BlockEditorProvider settings={ settings } value={ [] }>
+				<SlotFillProvider>
+					<EnhancedComponent { ...componentProps } />
+					<BlockControls.Slot group="block" />
+				</SlotFillProvider>
+			</BlockEditorProvider>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Apply duotone filter"',
+			} )
+		).toBeInTheDocument();
+	} );
+} );
 
 describe( 'Duotone utilities', () => {
 	const duotonePalette = [
