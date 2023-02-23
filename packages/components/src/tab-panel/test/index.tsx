@@ -31,7 +31,6 @@ const getSelectedTab = () => screen.getByRole( 'tab', { selected: true } );
 
 let originalGetClientRects: () => DOMRectList;
 
-// TODO: - check correct aria attributes (tablist/tab/tabpanel, aria-controls, orientation)
 // TODO: check focused but disabled tabs
 // TODO: check tooltips
 
@@ -56,6 +55,40 @@ describe.each( [
 
 	afterAll( () => {
 		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
+	} );
+
+	describe( 'Accessibility and semantics', () => {
+		test( 'should use the correct aria attributes', () => {
+			const panelRenderFunction = jest.fn();
+
+			render(
+				<Component tabs={ TABS } children={ panelRenderFunction } />
+			);
+
+			const tabList = screen.getByRole( 'tablist' );
+			const allTabs = screen.getAllByRole( 'tab' );
+			const selectedTabPanel = screen.getByRole( 'tabpanel' );
+
+			expect( tabList ).toBeVisible();
+			expect( tabList ).toHaveAttribute(
+				'aria-orientation',
+				'horizontal'
+			);
+
+			expect( allTabs ).toHaveLength( TABS.length );
+
+			// The selected `tab` aria-controls the active `tabpanel`,
+			// which is `aria-labelledby` the selected `tab`.
+			expect( selectedTabPanel ).toBeVisible();
+			expect( allTabs[ 0 ] ).toHaveAttribute(
+				'aria-controls',
+				selectedTabPanel.getAttribute( 'id' )
+			);
+			expect( selectedTabPanel ).toHaveAttribute(
+				'aria-labelledby',
+				allTabs[ 0 ].getAttribute( 'id' )
+			);
+		} );
 	} );
 
 	describe( 'Without `initialTabName`', () => {
