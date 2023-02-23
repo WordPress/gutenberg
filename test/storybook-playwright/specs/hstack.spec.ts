@@ -36,7 +36,7 @@ const PROP_VALUES_TO_TEST = [
 	},
 ];
 
-test.describe( 'HStack', () => {
+test.describe.parallel( 'HStack', () => {
 	test.beforeEach( async ( { page } ) => {
 		await gotoStoryId( page, 'components-experimental-hstack--default', {
 			decorators: { marginChecker: 'show', customE2EControls: 'show' },
