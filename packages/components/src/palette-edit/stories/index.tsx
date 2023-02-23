@@ -38,8 +38,10 @@ export const ColorsTemplate: ComponentStory< FunctionComponent< PaletteEditColor
 	return (
 		<PaletteEdit
 			colors={ controlledColors }
-			onChange={ ( newColors: Color[] ) => {
-				setControlledColors( newColors);
+			onChange={ ( newColors?: Color[] ) => {
+				if ( newColors ) {
+					setControlledColors( newColors);
+				}
 			} }
 			{ ...props }
 		/>

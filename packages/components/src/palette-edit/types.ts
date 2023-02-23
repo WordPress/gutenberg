@@ -104,9 +104,12 @@ type ColorPickerPopoverGradient = {
 	onChange: ( newElement: Gradient ) => void;
 }
 
+export type ColorPickerPopoverPropsColor = BaseColorPickerPopover & ColorPickerPopoverColor;
+export type ColorPickerPopoverPropsGradient = BaseColorPickerPopover & ColorPickerPopoverGradient;
+
 export type ColorPickerPopoverProps =
-	| BaseColorPickerPopover & ColorPickerPopoverColor
-	| BaseColorPickerPopover & ColorPickerPopoverGradient;
+	| ColorPickerPopoverPropsColor
+	| ColorPickerPopoverPropsGradient;
 
 export type NameInputProps = {
 	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;
