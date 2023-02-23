@@ -118,7 +118,7 @@ function filterValuesBySides( values, sides ) {
 			filteredValues.left = values.left;
 			filteredValues.right = values.right;
 		}
-		filteredValues[ side ] = values?.[ side ];
+		filteredValues[ side ] = values[ side ];
 	} );
 
 	return filteredValues;
@@ -200,6 +200,9 @@ export default function DimensionsPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	onVisualize = () => {},
+	// Special case because the layout controls are not part of the dimensions panel
+	// in global styles but not in block inspector.
+	includeLayoutControls = false,
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
@@ -216,7 +219,8 @@ export default function DimensionsPanel( {
 	} );
 
 	// Content Size
-	const showContentSizeControl = useHasContentSize( settings );
+	const showContentSizeControl =
+		useHasContentSize( settings ) && includeLayoutControls;
 	const contentSizeValue = decodeValue( inheritedValue?.layout?.contentSize );
 	const setContentSizeValue = ( newValue ) => {
 		onChange( {
@@ -231,7 +235,8 @@ export default function DimensionsPanel( {
 	const resetContentSizeValue = () => setContentSizeValue( undefined );
 
 	// Wide Size
-	const showWideSizeControl = useHasWideSize( settings );
+	const showWideSizeControl =
+		useHasWideSize( settings ) && includeLayoutControls;
 	const wideSizeValue = decodeValue( inheritedValue?.layout?.wideSize );
 	const setWideSizeValue = ( newValue ) => {
 		onChange( {
