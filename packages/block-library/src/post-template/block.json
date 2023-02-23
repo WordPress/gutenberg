@@ -21,7 +21,7 @@
 		"align": true,
 		"anchor": true,
 		"__experimentalLayout": {
-			"allowEditing": false
+			"allowSwitching": true
 		},
 		"color": {
 			"gradients": true,
@@ -30,6 +30,9 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"spacing": {
+			"blockGap": true
 		},
 		"typography": {
 			"fontSize": true,
