@@ -311,6 +311,9 @@ function gutenberg_get_duotone_filter_id( $preset ) {
  * @return string        Duotone CSS filter property url value.
  */
 function gutenberg_get_duotone_filter_property( $preset ) {
+	if ( isset( $preset['colors'] ) && 'unset' === $preset['colors'] ) {
+		return 'none';
+	}
 	$filter_id = gutenberg_get_duotone_filter_id( $preset );
 	return "url('#" . $filter_id . "')";
 }
@@ -433,51 +436,49 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
 	}
 
-	$has_duotone_attribute = isset( $block['attrs']['style']['color']['duotone'] );
+	$has_custom_duotone = isset( $block['attrs']['style']['color']['duotone'] );
+	$has_preset_duotone = isset( $block['attrs']['duotone'] );
 
 	if (
 		! $duotone_support ||
-		! $has_duotone_attribute
+		( ! $has_custom_duotone && ! $has_preset_duotone )
 	) {
 		return $block_content;
 	}
 
-	// Possible values for duotone attribute:
-	// 1. Array of colors - e.g. array('#000000', '#ffffff').
-	// 2. Slug of an existing Duotone preset - e.g. 'green-blue'.
-	// 3. The string 'unset' - indicates explicitly "no Duotone"..
-	$duotone_attr = $block['attrs']['style']['color']['duotone'];
+	if ( $has_custom_duotone ) {
+		// Handle custom values for duotone attribute.
 
-	$is_duotone_colors_array = is_array( $duotone_attr );
-	$is_duotone_unset        = 'unset' === $duotone_attr;
-	$is_duotone_preset       = ! $is_duotone_colors_array && ! $is_duotone_unset;
-
-	if ( $is_duotone_preset ) {
-		$filter_preset = array(
-			'slug' => $duotone_attr,
-		);
-
-		// Utilise existing CSS custom property.
-		$filter_property = "var(--wp--preset--duotone--$duotone_attr)";
-	} else {
-		// Handle when Duotone is either:
-		// - "unset"
-		// - an array of colors.
+		// 1. Array of colors - e.g. array('#000000', '#ffffff').
+		// 2. The string 'unset' (only for backwards compatibility, see presets below).
+		$custom_duotone = $block['attrs']['style']['color']['duotone'];
 
 		// Build a unique slug for the filter based on the array of colors.
-		$filter_key    = $is_duotone_colors_array ? implode( '-', $duotone_attr ) : $duotone_attr;
-		$filter_preset = array(
+		$filter_key  = is_array( $custom_duotone ) ? implode( '-', $custom_duotone ) : $custom_duotone;
+		$filter_data = array(
 			'slug'   => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
-			'colors' => $duotone_attr, // required for building the SVG with gutenberg_get_duotone_filter_svg.
+			'colors' => $custom_duotone, // required for building the SVG with gutenberg_get_duotone_filter_svg.
 		);
 
-		// Build a customised CSS filter property for unique slug.
-		$filter_property = $is_duotone_unset ? 'none' : gutenberg_get_duotone_filter_property( $filter_preset );
+		// Build a customized CSS filter property for unique slug.
+		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
+	} elseif ( $has_preset_duotone ) {
+		// Handle preset values for duotone iff the preset is set and there is no custom duotone.
+
+		// 1. Slug of an existing Duotone preset - e.g. 'green-blue'.
+		// 2. TODO: The string 'unset' - indicates explicitly "override the theme duotone with no filter".
+		$preset_duotone = $block['attrs']['duotone'];
+		$filter_data    = array(
+			'slug' => $preset_duotone,
+		);
+
+		// Utilize existing CSS custom property.
+		$filter_property = "var(--wp--preset--duotone--$preset_duotone)";
 	}
 
 	// - Applied as a class attribute to the block wrapper.
 	// - Used as a selector to apply the filter to the block.
-	$filter_id = gutenberg_get_duotone_filter_id( $filter_preset );
+	$filter_id = gutenberg_get_duotone_filter_id( $filter_data );
 
 	// Build the CSS selectors to which the filter will be applied.
 	// Todo - encapsulate this in a function.
@@ -510,10 +511,9 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		)
 	);
 
-	// For *non*-presets then generate an SVG for the filter.
-	// Note: duotone presets are already pre-generated so no need to do this again.
-	if ( $is_duotone_colors_array ) {
-		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_preset );
+	// Only custom duotone filters with values need to be rendered here.
+	if ( is_array( $custom_duotone ) ) {
+		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
 
 		add_action(
 			'wp_footer',
