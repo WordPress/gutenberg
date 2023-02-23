@@ -551,10 +551,10 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 			{ hasElements && (
 				<>
 					{ isEditing && (
-						<PaletteEditListView< Color | Gradient >
+						<PaletteEditListView
 							canOnlyChangeValues={ canOnlyChangeValues }
 							elements={ elements }
-							onChange={ onChange }
+							onChange={ onChange as ( newElement?: ( Color | Gradient )[] ) => void }
 							editingElement={ editingElement }
 							setEditingElement={ setEditingElement }
 							slugPrefix={ slugPrefix }
@@ -569,6 +569,7 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 								newElement: typeof elements[ number ]
 							) => {
 								debounceOnChange(
+									// @ts-expect-error
 									elements.map(
 										(
 											currentElement: typeof elements[ number ],
