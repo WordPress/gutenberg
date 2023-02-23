@@ -34,6 +34,20 @@
 		"anchor": true,
 		"align": true,
 		"alignWide": false,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"width": true,
+			"style": true,
+			"__experimentalSelector": "img, .components-placeholder__illustration, .components-placeholder::before",
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"width": true,
+				"style": true
+			}
+		},
 		"color": {
 			"__experimentalDuotone": "img, .components-placeholder__illustration, .components-placeholder::before",
 			"text": false,

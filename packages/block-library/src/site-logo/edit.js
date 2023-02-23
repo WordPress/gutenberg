@@ -34,6 +34,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalImageEditor as ImageEditor,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -55,7 +56,7 @@ const ACCEPT_MEDIA_STRING = 'image/*';
 
 const SiteLogo = ( {
 	alt,
-	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
+	attributes,
 	containerRef,
 	isSelected,
 	setAttributes,
@@ -67,6 +68,8 @@ const SiteLogo = ( {
 	setIcon,
 	canUserEdit,
 } ) => {
+	const { align, width, height, isLink, linkTarget, shouldSyncIcon } =
+		attributes;
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
@@ -74,6 +77,7 @@ const SiteLogo = ( {
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
+	const borderProps = useBorderProps( attributes );
 	const classes = classnames( 'custom-logo-link', {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
@@ -115,7 +119,7 @@ const SiteLogo = ( {
 
 	const img = (
 		<img
-			className="custom-logo"
+			className={ `custom-logo ${ borderProps.className }` }
 			src={ logoUrl }
 			alt={ alt }
 			onLoad={ ( event ) => {
@@ -124,6 +128,7 @@ const SiteLogo = ( {
 					naturalHeight: event.target.naturalHeight,
 				} );
 			} }
+			style={ borderProps.style }
 		/>
 	);
 
@@ -354,7 +359,7 @@ export default function LogoEdit( {
 } ) {
 	const { width, shouldSyncIcon } = attributes;
 	const ref = useRef();
-
+	const borderProps = useBorderProps( attributes );
 	const {
 		siteLogoId,
 		canUserEdit,
@@ -507,9 +512,7 @@ export default function LogoEdit( {
 				className={ placeholderClassName }
 				preview={ logoImage }
 				withIllustration={ true }
-				style={ {
-					width,
-				} }
+				style={ ( width, borderProps.style ) }
 			>
 				{ content }
 			</Placeholder>
