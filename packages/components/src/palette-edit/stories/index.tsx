@@ -26,7 +26,7 @@ const meta: ComponentMeta< typeof PaletteEdit > = {
 };
 export default meta;
 
-export const ColorsTemplate: ComponentStory< FunctionComponent< PaletteEditColorsProps > > = ( args ) => {
+export const ColorsTemplate: ComponentStory< typeof PaletteEdit > = ( args ) => {
 	const {
 		colors,
 		onChange,
