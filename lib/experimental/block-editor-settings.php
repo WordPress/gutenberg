@@ -13,13 +13,13 @@
  * @return array New block editor settings.
  */
 function gutenberg_get_block_editor_settings_experimental( $settings ) {
-    $is_block_theme = wp_is_block_theme();
+	$is_block_theme = wp_is_block_theme();
 
-    if ( ! $is_block_theme ) {
-        return $settings;
-    }
+	if ( ! $is_block_theme ) {
+		return $settings;
+	}
 
-    global $post_id;
+	global $post_id;
 
 	$template_slug = get_page_template_slug( $post_id );
 
@@ -50,7 +50,7 @@ function gutenberg_get_block_editor_settings_experimental( $settings ) {
 
 	$current_template = gutenberg_get_block_templates( array( 'slug__in' => array( $template_slug ) ) );
 
-    /**
+	/**
 	 * Finds Post Content in an array of blocks
 	 *
 	 * @param array $blocks Array of blocks.
@@ -72,7 +72,7 @@ function gutenberg_get_block_editor_settings_experimental( $settings ) {
 		}
 	}
 
-    if ( ! empty( $current_template ) ) {
+	if ( ! empty( $current_template ) ) {
 		$template_blocks    = parse_blocks( $current_template[0]->content );
 		$post_content_block = get_post_content_block( $template_blocks );
 
@@ -84,8 +84,8 @@ function gutenberg_get_block_editor_settings_experimental( $settings ) {
 			$settings['postContentBlock'] = $post_content_block;
 		}
 	}
-    
-    return $settings;
+
+	return $settings;
 }
 
 add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_experimental', PHP_INT_MAX );
