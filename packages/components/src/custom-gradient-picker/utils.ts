@@ -27,44 +27,52 @@ export function getLinearGradientRepresentation( gradientAST ) {
 	} );
 }
 
-function hasUnsupportedLength( item ) {
+function hasUnsupportedLength( item: gradientParser.ColorStop ) {
 	return item.length === undefined || item.length.type !== '%';
 }
 
-export function getGradientAstWithDefault( value ) {
+export function getGradientAstWithDefault( value?: string ) {
 	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
 	// More information of its structure available at https://www.npmjs.com/package/gradient-parser#ast.
-	let gradientAST;
+	let gradientAST: gradientParser.GradientNode;
+	let gradientAstValue: string | undefined;
+
+	const valueToParse = value ?? DEFAULT_GRADIENT;
 
 	try {
-		gradientAST = gradientParser.parse( value )[ 0 ];
-		gradientAST.value = value;
+		gradientAST = gradientParser.parse( valueToParse )[ 0 ];
+		gradientAstValue = valueToParse;
 	} catch ( error ) {
 		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
-		gradientAST.value = DEFAULT_GRADIENT;
+		gradientAstValue = DEFAULT_GRADIENT;
 	}
 
-	if ( gradientAST.orientation?.type === 'directional' ) {
-		gradientAST.orientation.type = 'angular';
-		gradientAST.orientation.value =
-			DIRECTIONAL_ORIENTATION_ANGLE_MAP[
+	if (
+		! Array.isArray( gradientAST.orientation ) &&
+		gradientAST.orientation?.type === 'directional'
+	) {
+		gradientAST.orientation = {
+			type: 'angular',
+			value: DIRECTIONAL_ORIENTATION_ANGLE_MAP[
 				gradientAST.orientation.value
-			].toString();
+			].toString(),
+		};
 	}
 
 	if ( gradientAST.colorStops.some( hasUnsupportedLength ) ) {
+		// NTS: Followup - `colorStops` is destructured before being mutated, but it's never reinserted into `gradientAST`. This could mean the original object might still have unspoorted lengths. Investigate.
 		const { colorStops } = gradientAST;
 		const step = 100 / ( colorStops.length - 1 );
 		colorStops.forEach( ( stop, index ) => {
 			stop.length = {
-				value: step * index,
+				value: `${ step * index }`,
 				type: '%',
 			};
 		} );
-		gradientAST.value = serializeGradient( gradientAST );
+		gradientAstValue = serializeGradient( gradientAST );
 	}
 
-	return gradientAST;
+	return { gradientAST, gradientAstValue };
 }
 
 export function getGradientAstWithControlPoints(
