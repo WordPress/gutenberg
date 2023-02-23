@@ -8,9 +8,6 @@
 	"keywords": [ "description" ],
 	"textdomain": "default",
 	"attributes": {
-		"placeholder": {
-			"type": "string"
-		},
 		"textAlign": {
 			"type": "string"
 		}

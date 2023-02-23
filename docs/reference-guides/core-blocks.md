@@ -60,7 +60,7 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 -	**Name:** core/buttons
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, spacing (blockGap, margin), typography (fontSize, lineHeight)
--	**Attributes:**
+-	**Attributes:** 
 
 ## Calendar
 
@@ -168,7 +168,7 @@ Contains the block elements used to display a comment, like the title, date, aut
 -	**Name:** core/comment-template
 -	**Category:** design
 -	**Supports:** align, anchor, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Comments
 
@@ -204,7 +204,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 -	**Name:** core/comments-pagination-numbers
 -	**Category:** theme
 -	**Supports:** anchor, color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Comments Previous Page
 
@@ -420,7 +420,7 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Name:** core/nextpage
 -	**Category:** design
 -	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Page List
 
@@ -528,7 +528,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 -	**Name:** core/post-content
 -	**Category:** theme
 -	**Supports:** align (full, wide), anchor, dimensions (minHeight), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Post Date
 
@@ -573,7 +573,7 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Name:** core/post-template
 -	**Category:** theme
 -	**Supports:** align, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Post Terms
 
@@ -627,7 +627,7 @@ Contains the block elements used to render content when no query results are fou
 -	**Name:** core/query-no-results
 -	**Category:** theme
 -	**Supports:** align, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Pagination
 
@@ -654,7 +654,7 @@ Displays a list of page numbers for pagination ([Source](https://github.com/Word
 -	**Name:** core/query-pagination-numbers
 -	**Category:** theme
 -	**Supports:** anchor, color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Attributes:** 
 
 ## Previous Page
 
