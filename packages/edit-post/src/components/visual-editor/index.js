@@ -278,7 +278,7 @@ export default function VisualEditor( { styles } ) {
 
 	// If there is a Post Content block we use its layout for the block list;
 	// if not, this must be a classic theme, in which case we use the fallback layout.
-	const blockListLayout = postContentBlock
+	const blockListLayout = postContentBlock?.isValid
 		? postContentLayout
 		: fallbackLayout;
 
