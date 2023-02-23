@@ -87,6 +87,10 @@ function getColorsFromDuotonePreset( duotone, duotonePalette ) {
 }
 
 function getDuotonePresetFromColors( colors, duotonePalette ) {
+	if ( ! colors ) {
+		return;
+	}
+
 	const preset = duotonePalette.find( ( duotonePreset ) => {
 		return duotonePreset?.colors?.every(
 			( val, index ) => val === colors[ index ]
