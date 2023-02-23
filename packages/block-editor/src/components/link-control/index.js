@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
+import {
+	Button,
+	ButtonGroup,
+	Spinner,
+	Notice,
+	TextControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -335,7 +341,7 @@ function LinkControl( {
 							{ errorMessage }
 						</Notice>
 					) }
-					<div className="block-editor-link-control__search-actions">
+					<ButtonGroup className="block-editor-link-control__search-actions">
 						<Button
 							variant="primary"
 							onClick={ handleSubmit }
@@ -347,7 +353,7 @@ function LinkControl( {
 						<Button variant="tertiary" onClick={ handleCancel }>
 							{ __( 'Cancel' ) }
 						</Button>
-					</div>
+					</ButtonGroup>
 				</>
 			) }
 
