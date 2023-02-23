@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { merge, mapValues } from 'lodash';
+import { mapValues } from 'lodash';
 
 /**
  * Returns a column width attribute value rounded to standard precision.
@@ -121,13 +121,13 @@ export function hasExplicitPercentColumnWidths( blocks ) {
  * @return {WPBlock[]} blocks Mapped block objects.
  */
 export function getMappedColumnWidths( blocks, widths ) {
-	return blocks.map( ( block ) =>
-		merge( {}, block, {
-			attributes: {
-				width: `${ widths[ block.clientId ] }%`,
-			},
-		} )
-	);
+	return blocks.map( ( block ) => ( {
+		...block,
+		attributes: {
+			...block.attributes,
+			width: `${ widths[ block.clientId ] }%`,
+		},
+	} ) );
 }
 
 /**

@@ -170,6 +170,26 @@ export const SETTINGS_DEFAULTS = {
 	__unstableGalleryWithImageBlocks: false,
 	__unstableIsPreviewMode: false,
 
+	// These settings will be completely revamped in the future.
+	// The goal is to evolve this into an API which will instruct
+	// the block inspector to animate transitions between what it
+	// displays based on the relationship between the selected block
+	// and its parent, and only enable it if the parent is controlling
+	// its children blocks.
+	blockInspectorAnimation: {
+		animationParent: 'core/navigation',
+		'core/navigation': { enterDirection: 'leftToRight' },
+		'core/navigation-submenu': { enterDirection: 'rightToLeft' },
+		'core/navigation-link': { enterDirection: 'rightToLeft' },
+		'core/search': { enterDirection: 'rightToLeft' },
+		'core/social-links': { enterDirection: 'rightToLeft' },
+		'core/page-list': { enterDirection: 'rightToLeft' },
+		'core/spacer': { enterDirection: 'rightToLeft' },
+		'core/home-link': { enterDirection: 'rightToLeft' },
+		'core/site-title': { enterDirection: 'rightToLeft' },
+		'core/site-logo': { enterDirection: 'rightToLeft' },
+	},
+
 	generateAnchors: false,
 	// gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.

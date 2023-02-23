@@ -285,19 +285,15 @@ function useAutocomplete( {
 			return;
 		}
 
-		const text = removeAccents( textContent );
-		const textAfterSelection = getTextContent(
-			slice( record, undefined, getTextContent( record ).length )
-		);
 		const completer = completers?.find(
 			( { triggerPrefix, allowContext } ) => {
-				const index = text.lastIndexOf( triggerPrefix );
+				const index = textContent.lastIndexOf( triggerPrefix );
 
 				if ( index === -1 ) {
 					return false;
 				}
 
-				const textWithoutTrigger = text.slice(
+				const textWithoutTrigger = textContent.slice(
 					index + triggerPrefix.length
 				);
 
@@ -339,9 +335,16 @@ function useAutocomplete( {
 					return false;
 				}
 
+				const textAfterSelection = getTextContent(
+					slice( record, undefined, getTextContent( record ).length )
+				);
+
 				if (
 					allowContext &&
-					! allowContext( text.slice( 0, index ), textAfterSelection )
+					! allowContext(
+						textContent.slice( 0, index ),
+						textAfterSelection
+					)
 				) {
 					return false;
 				}
@@ -363,6 +366,7 @@ function useAutocomplete( {
 		}
 
 		const safeTrigger = escapeRegExp( completer.triggerPrefix );
+		const text = removeAccents( textContent );
 		const match = text
 			.slice( text.lastIndexOf( completer.triggerPrefix ) )
 			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );

@@ -168,12 +168,6 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'context'     => array( 'mobile' ),
 				),
 
-				'__experimentalBlockInspectorAnimation'  => array(
-					'description' => __( 'Whether to enable animation when showing and hiding the block inspector.', 'gutenberg' ),
-					'type'        => 'object',
-					'context'     => array( 'site-editor' ),
-				),
-
 				'alignWide'                              => array(
 					'description' => __( 'Enable/Disable Wide/Full Alignments.', 'gutenberg' ),
 					'type'        => 'boolean',

@@ -17,7 +17,7 @@ import {
 	__unstableUseTypingObserver as useTypingObserver,
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	useMergeRefs,
@@ -37,9 +37,9 @@ import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import StyleBook from '../style-book';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorExperiments );
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 const LAYOUT = {
 	type: 'default',
@@ -51,13 +51,14 @@ export default function BlockEditor() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
 	const { storedSettings, templateType, canvasMode } = useSelect(
 		( select ) => {
-			const { getSettings, getEditedPostType, __unstableGetCanvasMode } =
-				select( editSiteStore );
+			const { getSettings, getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
 			return {
 				storedSettings: getSettings( setIsInserterOpened ),
 				templateType: getEditedPostType(),
-				canvasMode: __unstableGetCanvasMode(),
+				canvasMode: getCanvasMode(),
 			};
 		},
 		[ setIsInserterOpened ]
