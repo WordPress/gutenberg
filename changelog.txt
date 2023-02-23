@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 15.2.1 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+- Skip redundant registration for Fonts API-registered fonts. ([48341](https://github.com/WordPress/gutenberg/pull/48341))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ironprogrammer
+
+
 = 15.2.0 =
 
 ## Changelog
