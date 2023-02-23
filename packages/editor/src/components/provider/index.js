@@ -49,12 +49,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const asyncBlocks = getAsyncBlocks();
 
 		useEffect( () => {
-			asyncBlocks.forEach( async ( blockType ) => {
-				if ( loadedBlocks.includes( blockType ) ) {
-					return;
-				}
-				await asyncLoadBlock( blockType );
-				setBlockLoaded( blockType );
+			asyncBlocks.forEach( ( blockGroup ) => {
+				blockGroup.forEach( async ( blockType ) => {
+					if ( loadedBlocks.includes( blockType ) ) {
+						return;
+					}
+					await asyncLoadBlock( blockType );
+					setBlockLoaded( blockType );
+				} );
 			} );
 		}, [] );
 

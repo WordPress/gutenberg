@@ -19,7 +19,7 @@ import { safeHTML } from '@wordpress/dom';
 import { getAsyncBlocks } from '../../';
 
 function MissingBlockWarning( { attributes, convertToHTML, clientId } ) {
-	const asyncBlocks = getAsyncBlocks();
+	const asyncBlocks = [ ...new Set( getAsyncBlocks().flat() ) ];
 	const { originalName, originalUndelimitedContent } = attributes;
 	const hasContent = !! originalUndelimitedContent;
 	const hasHTMLBlock = useSelect(

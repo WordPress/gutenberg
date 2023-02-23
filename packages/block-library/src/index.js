@@ -23,14 +23,10 @@ import {
 import * as archives from './archives';
 import * as avatar from './avatar';
 import * as audio from './audio';
-import * as button from './button';
-import * as buttons from './buttons';
 import * as calendar from './calendar';
 import * as categories from './categories';
 import * as classic from './freeform';
 import * as code from './code';
-import * as column from './column';
-import * as columns from './columns';
 import * as comments from './comments';
 import * as commentAuthorAvatar from './comment-author-avatar';
 import * as commentAuthorName from './comment-author-name';
@@ -38,18 +34,12 @@ import * as commentContent from './comment-content';
 import * as commentDate from './comment-date';
 import * as commentEditLink from './comment-edit-link';
 import * as commentReplyLink from './comment-reply-link';
-import * as commentTemplate from './comment-template';
-import * as commentsPaginationPrevious from './comments-pagination-previous';
-import * as commentsPagination from './comments-pagination';
-import * as commentsPaginationNext from './comments-pagination-next';
-import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as commentsTitle from './comments-title';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
 import * as group from './group';
 import * as heading from './heading';
-import * as homeLink from './home-link';
 import * as html from './html';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
@@ -59,13 +49,7 @@ import * as logInOut from './loginout';
 import * as mediaText from './media-text';
 import * as missing from './missing';
 import * as more from './more';
-import * as navigation from './navigation';
-import * as navigationLink from './navigation-link';
-import * as navigationSubmenu from './navigation-submenu';
-import * as nextpage from './nextpage';
 import * as pattern from './pattern';
-import * as pageList from './page-list';
-import * as pageListItem from './page-list-item';
 import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
@@ -74,23 +58,15 @@ import * as postComment from './post-comment';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
 import * as postCommentsLink from './post-comments-link';
-import * as postContent from './post-content';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
 import * as postNavigationLink from './post-navigation-link';
-import * as postTemplate from './post-template';
 import * as postTerms from './post-terms';
 import * as postTimeToRead from './post-time-to-read';
 import * as postTitle from './post-title';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
-import * as query from './query';
-import * as queryNoResults from './query-no-results';
-import * as queryPagination from './query-pagination';
-import * as queryPaginationNext from './query-pagination-next';
-import * as queryPaginationNumbers from './query-pagination-numbers';
-import * as queryPaginationPrevious from './query-pagination-previous';
 import * as queryTitle from './query-title';
 import * as quote from './quote';
 import * as reusableBlock from './block';
@@ -102,8 +78,6 @@ import * as shortcode from './shortcode';
 import * as siteLogo from './site-logo';
 import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
-import * as socialLink from './social-link';
-import * as socialLinks from './social-links';
 import * as spacer from './spacer';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
@@ -132,14 +106,10 @@ const getAllBlocks = () =>
 		// Register all remaining core blocks.
 		archives,
 		audio,
-		button,
-		buttons,
 		calendar,
 		categories,
 		...( window.wp && window.wp.oldEditor ? [ classic ] : [] ), // Only add the classic block in WP Context.
 		code,
-		column,
-		columns,
 		commentAuthorAvatar,
 		cover,
 		embed,
@@ -151,9 +121,6 @@ const getAllBlocks = () =>
 		mediaText,
 		missing,
 		more,
-		nextpage,
-		pageList,
-		pageListItem,
 		pattern,
 		preformatted,
 		pullquote,
@@ -162,8 +129,6 @@ const getAllBlocks = () =>
 		search,
 		separator,
 		shortcode,
-		socialLink,
-		socialLinks,
 		spacer,
 		table,
 		tagCloud,
@@ -172,19 +137,14 @@ const getAllBlocks = () =>
 		video,
 
 		// theme blocks
-		navigation,
-		navigationLink,
-		navigationSubmenu,
 		siteLogo,
 		siteTitle,
 		siteTagline,
-		query,
 		templatePart,
 		avatar,
 		postTitle,
 		postExcerpt,
 		postFeaturedImage,
-		postContent,
 		postAuthor,
 		postAuthorName,
 		postComment,
@@ -192,14 +152,8 @@ const getAllBlocks = () =>
 		postCommentsLink,
 		postDate,
 		postTerms,
-		postNavigationLink,
-		postTemplate,
 		postTimeToRead,
-		queryPagination,
-		queryPaginationNext,
-		queryPaginationNumbers,
-		queryPaginationPrevious,
-		queryNoResults,
+		postNavigationLink,
 		readMore,
 		comments,
 		commentAuthorName,
@@ -207,22 +161,40 @@ const getAllBlocks = () =>
 		commentDate,
 		commentEditLink,
 		commentReplyLink,
-		commentTemplate,
 		commentsTitle,
-		commentsPagination,
-		commentsPaginationNext,
-		commentsPaginationNumbers,
-		commentsPaginationPrevious,
 		postCommentsForm,
 		tableOfContents,
-		homeLink,
 		logInOut,
 		termDescription,
 		queryTitle,
 		postAuthorBiography,
 	].filter( Boolean );
 
-export const getAsyncBlocks = () => [ 'image', 'gallery' ].filter( Boolean );
+export const getAsyncBlocks = () => [
+	[ 'button', 'buttons' ],
+	[ 'column', 'columns' ],
+	[ 'image', 'gallery' ],
+	[
+		'post-template',
+		'query-pagination-previous',
+		'query-pagination-numbers',
+		'query-pagination-next',
+		'query-pagination',
+		'query-no-results',
+		'query',
+	],
+	[
+		'comments-pagination-previous',
+		'comments-pagination-next',
+		'comments-pagination-numbers',
+		'comments-pagination',
+		'comment-template',
+	],
+	[ 'home-link', 'navigation-link', 'navigation-submenu', 'navigation' ],
+	[ 'page-list', 'page-list-item' ],
+	[ 'social-link', 'social-links' ],
+	[ 'nextpage', 'post-content' ],
+];
 
 export const asyncLoadBlock = async ( blockType ) => {
 	const { init } = await import( './' + blockType + '/index.js' );
