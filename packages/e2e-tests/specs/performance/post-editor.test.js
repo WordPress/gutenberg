@@ -29,6 +29,7 @@ import {
 	getHoverEventDurations,
 	getSelectionEventDurations,
 	getLoadingDurations,
+	sum,
 } from './utils';
 
 jest.setTimeout( 1000000 );
@@ -235,28 +236,24 @@ describe( 'Post Editor Performance', () => {
 	it( 'Selecting blocks', async () => {
 		await load1000Paragraphs();
 		const paragraphs = await canvas().$$( '.wp-block' );
-		await page.tracing.start( {
-			path: traceFile,
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
-		} );
 		await paragraphs[ 0 ].click();
 		for ( let j = 1; j <= 10; j++ ) {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 1000 );
+			await page.tracing.start( {
+				path: traceFile,
+				screenshots: false,
+				categories: [ 'devtools.timeline' ],
+			} );
 			await paragraphs[ j ].click();
-		}
-		await page.tracing.stop();
-		traceResults = JSON.parse( readFile( traceFile ) );
-		const [ focusEvents, focusInEvents, selectionChangeEvents ] =
-			getSelectionEventDurations( traceResults );
-
-		for ( let j = 0; j < focusEvents.length; j++ ) {
+			await page.tracing.stop();
+			traceResults = JSON.parse( readFile( traceFile ) );
+			const allDurations = getSelectionEventDurations( traceResults );
 			results.focus.push(
-				focusEvents[ j ] +
-					focusInEvents[ j ] +
-					selectionChangeEvents[ j ]
+				allDurations.reduce( ( acc, eventDurations ) => {
+					return acc + sum( eventDurations );
+				}, 0 )
 			);
 		}
 	} );
@@ -300,9 +297,6 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Searching the inserter', async () => {
-		function sum( arr ) {
-			return arr.reduce( ( a, b ) => a + b, 0 );
-		}
 		await load1000Paragraphs();
 		await openGlobalBlockInserter();
 		for ( let j = 0; j < 10; j++ ) {
