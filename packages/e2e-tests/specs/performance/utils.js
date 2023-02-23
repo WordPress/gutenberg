@@ -29,20 +29,8 @@ function isKeyDownEvent( item ) {
 	return isEvent( item ) && item.args.data.type === 'keydown';
 }
 
-function isKeyPressEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'keypress';
-}
-
-function isKeyUpEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'keyup';
-}
-
 function isFocusEvent( item ) {
 	return isEvent( item ) && item.args.data.type === 'focus';
-}
-
-function isFocusInEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'focusin';
 }
 
 function isClickEvent( item ) {
@@ -63,18 +51,20 @@ function getEventDurationsForType( trace, filterFunction ) {
 		.map( ( item ) => item.dur / 1000 );
 }
 
+function getEventStartForType( trace, filterFunction ) {
+	return trace.traceEvents
+		.filter( filterFunction )
+		.map( ( item ) => item.ts / 1000 );
+}
+
 export function getTypingEventDurations( trace ) {
-	return [
-		getEventDurationsForType( trace, isKeyDownEvent ),
-		getEventDurationsForType( trace, isKeyPressEvent ),
-		getEventDurationsForType( trace, isKeyUpEvent ),
-	];
+	return [ getEventStartForType( trace, isKeyDownEvent ) ];
 }
 
 export function getSelectionEventDurations( trace ) {
 	return [
-		getEventDurationsForType( trace, isFocusEvent ),
-		getEventDurationsForType( trace, isFocusInEvent ),
+		getEventStartForType( trace, isFocusEvent ),
+		getEventStartForType( trace, isKeyDownEvent ),
 	];
 }
 

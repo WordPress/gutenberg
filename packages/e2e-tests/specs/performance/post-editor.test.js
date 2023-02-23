@@ -162,24 +162,16 @@ describe( 'Post Editor Performance', () => {
 			// The timeout should be big enough to allow all async tasks tor run.
 			// And also to allow Rich Text to mark the change as persistent.
 			// eslint-disable-next-line no-restricted-syntax
-			await page.waitForTimeout( 2000 );
 			await page.keyboard.type( 'x' );
 		}
+		await page.keyboard.type( 'x' );
 		await page.tracing.stop();
 		traceResults = JSON.parse( readFile( traceFile ) );
-		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-			getTypingEventDurations( traceResults );
-		if (
-			keyDownEvents.length === keyPressEvents.length &&
-			keyPressEvents.length === keyUpEvents.length
-		) {
-			// The first character typed triggers a longer time (isTyping change)
-			// It can impact the stability of the metric, so we exclude it.
-			for ( let j = 1; j < keyDownEvents.length; j++ ) {
-				results.type.push(
-					keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
-				);
-			}
+		const [ keyDownEvents ] = getTypingEventDurations( traceResults );
+		// The first character typed triggers a longer time (isTyping change)
+		// It can impact the stability of the metric, so we exclude it.
+		for ( let j = 1; j < keyDownEvents.length; j++ ) {
+			results.type.push( keyDownEvents[ j ] - keyDownEvents[ j - 1 ] );
 		}
 	} );
 
@@ -247,14 +239,12 @@ describe( 'Post Editor Performance', () => {
 				categories: [ 'devtools.timeline' ],
 			} );
 			await paragraphs[ j ].click();
+			await page.keyboard.type( 'a' );
 			await page.tracing.stop();
 			traceResults = JSON.parse( readFile( traceFile ) );
-			const allDurations = getSelectionEventDurations( traceResults );
-			results.focus.push(
-				allDurations.reduce( ( acc, eventDurations ) => {
-					return acc + sum( eventDurations );
-				}, 0 )
-			);
+			const [ focusEvents, keyDownEvents ] =
+				getSelectionEventDurations( traceResults );
+			results.focus.push( keyDownEvents[ 0 ] - focusEvents[ 0 ] );
 		}
 	} );
 
