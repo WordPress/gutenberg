@@ -104,7 +104,7 @@ export type NameInputProps = {
 export type OptionProps< T extends Color | Gradient > = {
 	element: T;
 	onChange: ( newElement: T ) => void;
-	isGradient: true;
+	isGradient?: boolean;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	isEditing: boolean;
 	key: Key;
@@ -114,7 +114,7 @@ export type OptionProps< T extends Color | Gradient > = {
 	slugPrefix: SlugPrefix;
 }
 
-export type PaletteEditListViewProps< T extends Color | Gradient > = {
+export type PaletteEditListViewProps< T extends ( Gradient | Color ) > = {
 	elements: T[]
 	onChange: ( newGradients?: T[] ) => void;
 	isGradient?: boolean;
