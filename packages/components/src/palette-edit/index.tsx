@@ -551,7 +551,7 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 			{ hasElements && (
 				<>
 					{ isEditing && (
-						<PaletteEditListView
+						<PaletteEditListView< Color | Gradient >
 							canOnlyChangeValues={ canOnlyChangeValues }
 							elements={ elements }
 							onChange={ onChange }
