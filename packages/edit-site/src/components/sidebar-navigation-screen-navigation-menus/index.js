@@ -31,7 +31,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 				history.push( {
 					postType: 'page',
 					postId: attributes.id,
-					path: '/navigation/single',
 				} );
 			}
 		},
