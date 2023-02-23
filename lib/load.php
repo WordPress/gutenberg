@@ -89,6 +89,7 @@ require __DIR__ . '/compat/wordpress-6.2/block-editor.php';
 require __DIR__ . '/compat/wordpress-6.2/block-editor-settings.php';
 require __DIR__ . '/compat/wordpress-6.2/theme.php';
 require __DIR__ . '/compat/wordpress-6.2/widgets.php';
+require __DIR__ . '/compat/wordpress-6.2/menu.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
