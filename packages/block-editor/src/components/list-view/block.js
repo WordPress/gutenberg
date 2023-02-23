@@ -268,7 +268,7 @@ function ListViewBlock( {
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
 							ref={ ref }
-							tabIndex={ tabIndex }
+							tabIndex={ !! isSelected ? 0 : tabIndex }
 							onFocus={ onFocus }
 							isExpanded={ isExpanded }
 							selectedClientIds={ selectedClientIds }
@@ -295,7 +295,7 @@ function ListViewBlock( {
 									orientation="vertical"
 									clientIds={ [ clientId ] }
 									ref={ ref }
-									tabIndex={ tabIndex }
+									tabIndex={ !! isSelected ? 0 : tabIndex }
 									onFocus={ onFocus }
 								/>
 							) }
@@ -306,7 +306,7 @@ function ListViewBlock( {
 									orientation="vertical"
 									clientIds={ [ clientId ] }
 									ref={ ref }
-									tabIndex={ tabIndex }
+									tabIndex={ !! isSelected ? 0 : tabIndex }
 									onFocus={ onFocus }
 								/>
 							) }
@@ -328,7 +328,7 @@ function ListViewBlock( {
 							toggleProps={ {
 								ref,
 								className: 'block-editor-list-view-block__menu',
-								tabIndex,
+								tabIndex: !! isSelected ? 0 : tabIndex,
 								onFocus,
 							} }
 							disableOpenOnArrowDown
