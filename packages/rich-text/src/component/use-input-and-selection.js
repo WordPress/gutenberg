@@ -112,11 +112,10 @@ export function useInputAndSelection( props ) {
 		}
 
 		/**
-		 * Syncs the selection to local state. A callback for the `selectionchange`
-		 * native events, `keyup`, `mouseup` and `touchend` synthetic events, and
-		 * animation frames after the `focus` event.
+		 * Syncs the selection to local state. A callback for the
+		 * `selectionchange`, `keyup`, `mouseup` and `touchend` events.
 		 *
-		 * @param {Event|undefined} event
+		 * @param {Event} event
 		 */
 		function handleSelectionChange( event ) {
 			const {
@@ -179,7 +178,7 @@ export function useInputAndSelection( props ) {
 				return;
 			}
 
-			if ( event?.type !== 'selectionchange' && ! isSelected ) {
+			if ( event.type !== 'selectionchange' && ! isSelected ) {
 				return;
 			}
 
