@@ -36,4 +36,10 @@ describe( 'getColorsFromDuotonePreset', () => {
 			getColorsFromDuotonePreset( 'does-not-exist', duotonePalette )
 		).toBeUndefined();
 	} );
+
+	it( 'should return the colors from the preset if found', () => {
+		expect(
+			getColorsFromDuotonePreset( 'purple-yellow', duotonePalette )
+		).toEqual( [ '#8c00b7', '#fcff41' ] );
+	} );
 } );
