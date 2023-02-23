@@ -124,6 +124,10 @@ describe( 'getPxFromCssUnit', () => {
 				'clamp(5rem, 5.25rem + ((1vw - 0.48rem) * 9.096), 8rem)',
 				'80px',
 			],
+			[
+				'clamp(2.625rem, calc(2.625rem + ((1vw - 0.48rem) * 8.4135)), 3.25rem)',
+				'42px',
+			],
 		];
 
 		test.each( testData )( 'getPxFromCssUnit( %s )', ( unit, expected ) => {

@@ -123,23 +123,27 @@ function evalMathExpression( cssUnit ) {
 	// Convert every part of the expression to px values.
 	// The following regex matches numbers that have a following unit
 	// E.g. 5.25rem, 1vw
-	const regex = /\d+\.?\d*[a-zA-Z]+|\.\d+[a-zA-Z]+/g;
-	cssUnit = cssUnit.replace( regex, ( foundUnit ) => {
+	const cssUnitsBits = cssUnit.match( /\d+\.?\d*[a-zA-Z]+|\.\d+[a-zA-Z]+/g );
+	for ( const unit of cssUnitsBits ) {
 		// Standardize the unit to px and extract the value.
-		const parsedUnit = parseUnit( getPxFromCssUnit( foundUnit ) );
+		const parsedUnit = parseUnit( getPxFromCssUnit( unit ) );
 		if ( ! parseFloat( parsedUnit.value ) ) {
 			errorFound = true;
-			return;
+			// End early since we are dealing with a null value.
+			break;
 		}
-		return parsedUnit.value;
-	} );
+		cssUnit = cssUnit.replace( unit, parsedUnit.value );
+	}
 
 	// For mixed math expressions wrapped within CSS expressions
 	if ( ! errorFound && cssUnit.match( /(max|min|clamp)/g ) ) {
 		const values = cssUnit.split( ',' );
 		for ( const currentValue of values ) {
-			if ( isMathExpression( currentValue ) ) {
-				const calculatedExpression = calculate( currentValue );
+			// Check for nested calc() and remove them to calculate the value.
+			const rawCurrentValue = currentValue.replace( /\s|calc/g, '' );
+
+			if ( isMathExpression( rawCurrentValue ) ) {
+				const calculatedExpression = calculate( rawCurrentValue );
 
 				if ( calculatedExpression ) {
 					const calculatedValue =
