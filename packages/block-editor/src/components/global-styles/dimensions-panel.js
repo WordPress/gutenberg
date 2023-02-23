@@ -118,7 +118,7 @@ function filterValuesBySides( values, sides ) {
 			filteredValues.left = values.left;
 			filteredValues.right = values.right;
 		}
-		filteredValues[ side ] = values[ side ];
+		filteredValues[ side ] = values?.[ side ];
 	} );
 
 	return filteredValues;
