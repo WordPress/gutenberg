@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { FunctionComponent } from 'react';
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
@@ -12,7 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import PaletteEdit from '..';
-import type { Color } from '../types';
+import type { Color, PaletteEditColorsProps } from '../types';
 
 const meta: ComponentMeta< typeof PaletteEdit > = {
 	title: 'Components/PaletteEdit',
@@ -28,7 +29,6 @@ export default meta;
 export const ColorsTemplate: ComponentStory< typeof PaletteEdit > = ( args ) => {
 	const {
 		colors,
-		gradients,
 		onChange,
 		...props
 	} = args;

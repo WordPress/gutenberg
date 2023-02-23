@@ -28,7 +28,7 @@ export type PaletteEditProps< T extends Color | Gradient > = {
 	 *
 	 * @default []
 	 */
-	colors?: T extends Color ? T[] : never;
+	colors: T[] | never;
 	/**
 	 * Runs on changing the value.
 	 */
@@ -36,7 +36,10 @@ export type PaletteEditProps< T extends Color | Gradient > = {
 	/**
 	 * The gradients in the palette.
 	 */
-	gradients?: T extends Gradient ? T[] : never;
+	gradients: T[] | never;
+	/**
+	 * Runs on changing the value.
+	 */
 	/**
 	 * A message to show if there's nothing to edit.
 	 */
