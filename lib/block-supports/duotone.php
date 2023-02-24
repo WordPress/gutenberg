@@ -614,7 +614,7 @@ add_action(
 	}
 );
 
-function gutenberg_render_duotone_svgs( $block_content, $block ) {
+function gutenberg_save_duotone_preset_svgs( $block_content, $block ) {
 	// Get the per block settings from the theme.json.
 	$tree = WP_Theme_JSON_Resolver::get_merged_data();
 	$block_nodes = $tree->get_styles_block_nodes();
@@ -645,4 +645,4 @@ function gutenberg_render_duotone_svgs( $block_content, $block ) {
 	// Don't change the block content.
 	return $block_content;
 }
-add_action( 'render_block', 'gutenberg_render_duotone_svgs', 10, 2 );
+add_action( 'render_block', 'gutenberg_save_duotone_preset_svgs', 10, 2 );
