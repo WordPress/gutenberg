@@ -158,7 +158,11 @@ function AlignControls( props ) {
 
 const ConditionalAlignControls = ifCondition( ( props ) =>
 	hasBlockSupport( props.name, 'align' )
-)( AlignControls );
+)( ( props ) => (
+	<BlockControls group="block" __experimentalShareWithChildBlocks>
+		<AlignControls { ...props } />
+	</BlockControls>
+) );
 
 /**
  * Override the default edit UI to include new toolbar controls for block
@@ -172,9 +176,7 @@ export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) =>
 		(
 			<>
-				<BlockControls group="block" __experimentalShareWithChildBlocks>
-					<ConditionalAlignControls { ...props } />
-				</BlockControls>
+				<ConditionalAlignControls { ...props } />
 				<BlockEdit { ...props } />
 			</>
 		),
