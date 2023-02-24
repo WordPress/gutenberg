@@ -228,7 +228,7 @@ export function useRichText( {
 		useSelectObject(),
 		useFormatBoundaries( { record, applyRecord } ),
 		useDelete( {
-			createRecord,
+			record,
 			handleChange,
 			multilineTag,
 		} ),
