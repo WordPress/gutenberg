@@ -498,7 +498,7 @@ test.describe( 'Image', () => {
 			await page.click( 'role=button[name="Edit"i]' );
 			// Replace the url.
 			await page.fill( 'role=combobox[name="URL"i]', imageUrl );
-			await page.click( 'role=button[name="Apply"i]' );
+			await page.click( 'role=button[name="Submit"i]' );
 
 			const regex = new RegExp(
 				`<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
