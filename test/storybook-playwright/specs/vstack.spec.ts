@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { test, Page } from '@playwright/test';
+import { test } from '@playwright/test';
 
 /**
  * Internal dependencies
