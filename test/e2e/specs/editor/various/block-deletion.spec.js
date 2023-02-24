@@ -42,7 +42,7 @@ test.describe( 'Block deletion', () => {
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
 		await page
-			.getByRole( 'menuitem', { name: /Remove Paragraph/i } )
+			.getByRole( 'menuitem', { name: 'Remove Paragraph' } )
 			.click();
 
 		// Ensure the last block was removed.
@@ -129,7 +129,7 @@ test.describe( 'Block deletion', () => {
 			name: 'core/paragraph',
 		} );
 		await expect(
-			editor.canvas.getByRole( 'document', { name: /Empty block/i } )
+			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
 		).toBeFocused();
 
 		// Hit backspace to remove the empty paragraph.
@@ -222,7 +222,7 @@ test.describe( 'Block deletion', () => {
 		// Ensure the empty paragraph is focused.
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: /Empty block/i,
+				name: 'Empty block',
 			} )
 		).toBeFocused();
 
@@ -245,7 +245,7 @@ test.describe( 'Block deletion', () => {
 		await expect.poll( editor.getBlocks ).toHaveLength( 3 );
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: /Empty block/i,
+				name: 'Empty block',
 			} )
 		).toBeFocused();
 	} );
@@ -269,13 +269,13 @@ test.describe( 'Block deletion', () => {
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
 		await page
-			.getByRole( 'menuitem', { name: /Remove Paragraph/i } )
+			.getByRole( 'menuitem', { name: 'Remove Paragraph' } )
 			.click();
 
 		// Ensure an empty block was created and focused.
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: /Empty block/i,
+				name: 'Empty block',
 			} )
 		).toBeFocused();
 		await expect.poll( editor.getBlocks ).toEqual( [] );
@@ -329,7 +329,7 @@ test.describe( 'Block deletion', () => {
 		// Ensure that there's no blocks.
 		await expect.poll( editor.getBlocks ).toHaveLength( 0 );
 		await expect(
-			editor.canvas.getByRole( 'document', { name: /Empty block/i } )
+			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
 		).not.toBeVisible();
 
 		// Ensure that the block appender button is visible.
