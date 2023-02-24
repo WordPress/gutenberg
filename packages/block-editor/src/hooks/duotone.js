@@ -123,9 +123,15 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		return null;
 	}
 
-	const duotonePresetOrColors = duotonePreset
-		? getColorsFromDuotonePreset( duotonePreset, duotonePalette )
-		: duotoneColors;
+	let duotonePresetOrColors;
+
+	if ( duotoneColors === 'unset' ) {
+		duotonePresetOrColors = 'unset';
+	} else {
+		duotonePresetOrColors = duotonePreset
+			? getColorsFromDuotonePreset( duotonePreset, duotonePalette )
+			: duotoneColors;
+	}
 
 	return (
 		<BlockControls group="block" __experimentalShareWithChildBlocks>
@@ -146,6 +152,13 @@ function DuotonePanel( { attributes, setAttributes } ) {
 					if ( maybePreset ) {
 						// Duotone presets are stored in a separate attribute.
 						newDuotoneAttributes.duotone = maybePreset;
+						newDuotoneAttributes.style = {
+							...style,
+							color: {
+								...style?.color,
+								duotone: '', // remove any custom colors
+							},
+						};
 
 						// Todo: should we store the custom colors **as well**
 						// in the style attribute as a fallback?
@@ -158,6 +171,8 @@ function DuotonePanel( { attributes, setAttributes } ) {
 								duotone: newDuotone, // custom colors
 							},
 						};
+						// Remove any presets.
+						newDuotoneAttributes.duotone = '';
 					}
 
 					setAttributes( newDuotoneAttributes );
