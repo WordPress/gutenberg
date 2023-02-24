@@ -663,4 +663,4 @@ function gutenberg_get_duotone_slug_from_preset_css_variable( $css_variable ) {
 		}
 	}
 }
-add_action( 'render_block', 'gutenberg_save_duotone_preset_svgs', 10, 2 );
+add_filter( 'render_block', 'gutenberg_save_duotone_preset_svgs', 10, 2 );
