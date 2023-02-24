@@ -47,7 +47,6 @@ export default function BlockEdit( props ) {
 				getBlockName,
 				isFirstMultiSelectedBlock,
 				getMultiSelectedBlockClientIds,
-				hasSelectedInnerBlock,
 			} = select( blockEditorStore );
 
 			if ( isFirstMultiSelectedBlock( clientId ) ) {
@@ -56,6 +55,14 @@ export default function BlockEdit( props ) {
 				);
 			}
 
+			return false;
+		},
+		[ clientId, isSelected, name ]
+	);
+	const shouldDisplayControlsWithinChildren = useSelect(
+		( select ) => {
+			const { getBlockName, hasSelectedInnerBlock } =
+				select( blockEditorStore );
 			return (
 				hasBlockSupport(
 					getBlockName( clientId ),
@@ -73,6 +80,7 @@ export default function BlockEdit( props ) {
 		layout: layoutSupport ? layout : null,
 		__unstableLayoutClassNames,
 		shouldDisplayControls,
+		shouldDisplayControlsWithinChildren,
 	};
 	return (
 		<BlockEditContextProvider

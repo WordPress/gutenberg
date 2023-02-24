@@ -169,10 +169,13 @@ function AlignControls( props ) {
  */
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const { shouldDisplayControls, shouldDisplayControlsWithinChildren } =
+			useBlockEditContext();
 		return (
 			<>
-				{ useBlockEditContext().shouldDisplayControls &&
-					!! getBlockSupport( props.name, 'align' ) && (
+				{ ( shouldDisplayControls ||
+					shouldDisplayControlsWithinChildren ) &&
+					hasBlockSupport( props.name, 'align' ) && (
 						<AlignControls { ...props } />
 					) }
 				<BlockEdit { ...props } />
