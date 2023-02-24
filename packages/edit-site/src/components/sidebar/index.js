@@ -6,6 +6,9 @@ import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -52,6 +55,23 @@ function SidebarScreens() {
 function Sidebar() {
 	const { params: urlParams } = useLocation();
 	const initialPath = useRef( getPathFromURL( urlParams ) );
+	const { isDirty, isSaving } = useSelect( ( select ) => {
+		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
+			select( coreStore );
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+		// The currently selected entity to display.
+		// Typically template or template part in the site editor.
+		return {
+			isDirty: dirtyEntityRecords.length > 0,
+			isSaving: dirtyEntityRecords.some( ( record ) =>
+				isSavingEntityRecord( record.kind, record.name, record.key )
+			),
+		};
+	}, [] );
+	// The wasDirty variable is used to prevent the save button from showing
+	// in the sidebar if the saving was triggered without edits.
+	// For instance: when renaming templates.
+	const wasDirty = usePrevious( isDirty );
 
 	return (
 		<>
@@ -61,10 +81,11 @@ function Sidebar() {
 			>
 				<SidebarScreens />
 			</NavigatorProvider>
-
-			<div className="edit-site-sidebar__footer">
-				<SaveButton showTooltip={ false } />
-			</div>
+			{ ( ( isSaving && wasDirty ) || ( isDirty && ! isSaving ) ) && (
+				<div className="edit-site-sidebar__footer">
+					<SaveButton showTooltip={ false } />
+				</div>
+			) }
 		</>
 	);
 }
