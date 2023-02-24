@@ -109,6 +109,55 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
+function AlignControls( props ) {
+	const { name: blockName } = props;
+	// Compute the block valid alignments by taking into account,
+	// if the theme supports wide alignments or not and the layout's
+	// availble alignments. We do that for conditionally rendering
+	// Slot.
+	const blockAllowedAlignments = getValidAlignments(
+		getBlockSupport( blockName, 'align' ),
+		hasBlockSupport( blockName, 'alignWide', true )
+	);
+
+	const validAlignments = useAvailableAlignments(
+		blockAllowedAlignments
+	).map( ( { name } ) => name );
+	const isContentLocked = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).__unstableGetContentLockingParent(
+				props.clientId
+			);
+		},
+		[ props.clientId ]
+	);
+
+	if ( ! validAlignments.length || isContentLocked ) {
+		return null;
+	}
+
+	const updateAlignment = ( nextAlign ) => {
+		if ( ! nextAlign ) {
+			const blockType = getBlockType( props.name );
+			const blockDefaultAlign = blockType?.attributes?.align?.default;
+			if ( blockDefaultAlign ) {
+				nextAlign = '';
+			}
+		}
+		props.setAttributes( { align: nextAlign } );
+	};
+
+	return (
+		<BlockControls group="block" __experimentalShareWithChildBlocks>
+			<BlockAlignmentControl
+				value={ props.attributes.align }
+				onChange={ updateAlignment }
+				controls={ validAlignments }
+			/>
+		</BlockControls>
+	);
+}
+
 /**
  * Override the default edit UI to include new toolbar controls for block
  * alignment, if block defines support.
@@ -119,53 +168,13 @@ export function addAttribute( settings ) {
  */
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const blockEdit = <BlockEdit key="edit" { ...props } />;
-		const { name: blockName } = props;
-		// Compute the block valid alignments by taking into account,
-		// if the theme supports wide alignments or not and the layout's
-		// availble alignments. We do that for conditionally rendering
-		// Slot.
-		const blockAllowedAlignments = getValidAlignments(
-			getBlockSupport( blockName, 'align' ),
-			hasBlockSupport( blockName, 'alignWide', true )
-		);
-
-		const validAlignments = useAvailableAlignments(
-			blockAllowedAlignments
-		).map( ( { name } ) => name );
-		const isContentLocked = useSelect(
-			( select ) => {
-				return select(
-					blockEditorStore
-				).__unstableGetContentLockingParent( props.clientId );
-			},
-			[ props.clientId ]
-		);
-		if ( ! validAlignments.length || isContentLocked ) {
-			return blockEdit;
-		}
-
-		const updateAlignment = ( nextAlign ) => {
-			if ( ! nextAlign ) {
-				const blockType = getBlockType( props.name );
-				const blockDefaultAlign = blockType?.attributes?.align?.default;
-				if ( blockDefaultAlign ) {
-					nextAlign = '';
-				}
-			}
-			props.setAttributes( { align: nextAlign } );
-		};
-
 		return (
 			<>
-				<BlockControls group="block" __experimentalShareWithChildBlocks>
-					<BlockAlignmentControl
-						value={ props.attributes.align }
-						onChange={ updateAlignment }
-						controls={ validAlignments }
-					/>
-				</BlockControls>
-				{ blockEdit }
+				{ props.isSelected &&
+					!! getBlockSupport( props.name, 'align' ) && (
+						<AlignControls { ...props } />
+					) }
+				<BlockEdit { ...props } />
 			</>
 		);
 	},
