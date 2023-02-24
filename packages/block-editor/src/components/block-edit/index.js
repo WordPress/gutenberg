@@ -4,11 +4,14 @@
 import { useMemo } from '@wordpress/element';
 
 import { hasBlockSupport } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
 import Edit from './edit';
 import { BlockEditContextProvider, useBlockEditContext } from './context';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * The `useBlockEditContext` hook provides information about the block this hook is being used in.
@@ -34,12 +37,42 @@ export default function BlockEdit( props ) {
 		'__experimentalLayout',
 		false
 	);
+	const shouldDisplayControls = useSelect(
+		( select ) => {
+			if ( isSelected ) {
+				return true;
+			}
+
+			const {
+				getBlockName,
+				isFirstMultiSelectedBlock,
+				getMultiSelectedBlockClientIds,
+				hasSelectedInnerBlock,
+			} = select( blockEditorStore );
+
+			if ( isFirstMultiSelectedBlock( clientId ) ) {
+				return getMultiSelectedBlockClientIds().every(
+					( id ) => getBlockName( id ) === name
+				);
+			}
+
+			return (
+				hasBlockSupport(
+					getBlockName( clientId ),
+					'__experimentalExposeControlsToChildren',
+					false
+				) && hasSelectedInnerBlock( clientId )
+			);
+		},
+		[ clientId, isSelected, name ]
+	);
 	const context = {
 		name,
 		isSelected,
 		clientId,
 		layout: layoutSupport ? layout : null,
 		__unstableLayoutClassNames,
+		shouldDisplayControls,
 	};
 	return (
 		<BlockEditContextProvider

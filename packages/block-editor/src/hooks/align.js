@@ -21,6 +21,7 @@ import { useSelect } from '@wordpress/data';
 import { BlockControls, BlockAlignmentControl } from '../components';
 import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
 import { store as blockEditorStore } from '../store';
+import { useBlockEditContext } from '../components/block-edit/context';
 
 /**
  * An array which includes all possible valid alignments,
@@ -170,7 +171,7 @@ export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		return (
 			<>
-				{ props.isSelected &&
+				{ useBlockEditContext().shouldDisplayControls &&
 					!! getBlockSupport( props.name, 'align' ) && (
 						<AlignControls { ...props } />
 					) }
