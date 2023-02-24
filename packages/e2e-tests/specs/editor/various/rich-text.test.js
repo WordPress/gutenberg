@@ -419,7 +419,6 @@ describe( 'RichText', () => {
 		await page.keyboard.press( 'Tab' );
 		// Select color other than black.
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
