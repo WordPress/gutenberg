@@ -18,8 +18,7 @@ export function useDelete( props ) {
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode } = event;
-			const { createRecord, handleChange, multilineTag } =
-				propsRef.current;
+			const { record, handleChange, multilineTag } = propsRef.current;
 
 			if ( event.defaultPrevented ) {
 				return;
@@ -29,13 +28,12 @@ export function useDelete( props ) {
 				return;
 			}
 
-			const currentValue = createRecord();
-			const { start, end, text } = currentValue;
+			const { start, end, text } = record;
 			const isReverse = keyCode === BACKSPACE;
 
 			// Always handle full content deletion ourselves.
 			if ( start === 0 && end !== 0 && end === text.length ) {
-				handleChange( remove( currentValue ) );
+				handleChange( remove( record ) );
 				event.preventDefault();
 				return;
 			}
@@ -46,13 +44,13 @@ export function useDelete( props ) {
 				// Check to see if we should remove the first item if empty.
 				if (
 					isReverse &&
-					currentValue.start === 0 &&
-					currentValue.end === 0 &&
-					isEmptyLine( currentValue )
+					record.start === 0 &&
+					record.end === 0 &&
+					isEmptyLine( record )
 				) {
-					newValue = removeLineSeparator( currentValue, ! isReverse );
+					newValue = removeLineSeparator( record, ! isReverse );
 				} else {
-					newValue = removeLineSeparator( currentValue, isReverse );
+					newValue = removeLineSeparator( record, isReverse );
 				}
 
 				if ( newValue ) {
