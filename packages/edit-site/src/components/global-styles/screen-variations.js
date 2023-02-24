@@ -15,7 +15,7 @@ import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 import Subtitle from './subtitle';
 
-export function ScreenVariations( { name, path } ) {
+export function ScreenVariations( { name, path = '' } ) {
 	const hasVariationsPanel = useHasVariationsPanel( name, path );
 
 	if ( ! hasVariationsPanel ) {
