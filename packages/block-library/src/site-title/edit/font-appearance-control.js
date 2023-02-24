@@ -11,7 +11,7 @@ import {
 	MenuItem,
 	ToolbarDropdownMenu,
 } from '@wordpress/components';
-import { formatCapitalize, check } from '@wordpress/icons';
+import { typography, check } from '@wordpress/icons';
 
 import { __ } from '@wordpress/i18n';
 
@@ -44,7 +44,7 @@ export default function FontAppearanceControl( {
 		<ToolbarDropdownMenu
 			className="font-appearance-toolbar-control"
 			label={ __( 'Change font appearance' ) }
-			icon={ formatCapitalize }
+			icon={ typography }
 			toggleProps={ { isPressed: isBold || isItalic } }
 		>
 			{ () => (
