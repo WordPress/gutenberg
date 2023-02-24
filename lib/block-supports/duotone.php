@@ -633,16 +633,27 @@ function gutenberg_save_duotone_preset_svgs( $block_content, $block ) {
 	};
 	if ( $block_metadata ) {
 		$theme_json = $tree->get_raw_data();
-		$styles     = _wp_array_get( $theme_json, $block_metadata['path'], array() );
-		$duotone_filter = _wp_array_get( $styles, array( 'filter', 'duotone' ), array() );
-		if ( $duotone_filter ) {
-			preg_match('/var\(--wp--preset--duotone--(.*)\)/', $duotone_filter, $matches );
+		// Define the path to the duotone filter.
+		$duotone_filter_path = array_merge( $block_metadata['path'],  array( 'filter', 'duotone' ) );
+		$duotone_filter = _wp_array_get( $theme_json, $duotone_filter_path, array() );
+		$duotone_slug = gutenberg_get_duotone_slug_from_preset_css_variable( $duotone_filter );
+		if ( $duotone_slug ) {
 			// Save the preset slug to be used later.
-			WP_Duotone::$duotone_presets[ $matches[1] ] = true;
+			WP_Duotone::$duotone_presets[ $duotone_slug ] = true;
 		}
 	}
 
 	// Don't change the block content.
 	return $block_content;
+}
+
+function gutenberg_get_duotone_slug_from_preset_css_variable( $css_variable ) {
+	if ( ! empty( $css_variable ) ) {
+		// Get the preset slug from the filter.
+		preg_match('/var\(--wp--preset--duotone--(.*)\)/', $css_variable, $matches );
+		if ( $matches[1] ) {
+			return $matches[1];
+		}
+	}
 }
 add_action( 'render_block', 'gutenberg_save_duotone_preset_svgs', 10, 2 );
