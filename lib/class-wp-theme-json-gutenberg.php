@@ -2424,11 +2424,19 @@ class WP_Theme_JSON_Gutenberg {
 		 */
 		$declarations_duotone = array();
 		foreach ( $declarations as $index => $declaration ) {
-			if (
-				'filter' === $declaration['name'] &&
-				'unset' !== $declaration['value']
-			) {
-				$declarations_duotone[] = $declaration;
+			if ( 'filter' === $declaration['name'] ) {
+				/*
+				 * 'unset' filters happen when a filter is unset
+				 * in the site-editor UI. Because the 'unset' value
+				 * in the user origin overrides the value in the
+				 * theme origin, we can skip rendering anything
+				 * here as no filter needs to be applied anymore.
+				 * So only add declarations to with values other
+				 * than 'unset'.
+				 */
+				if ( 'unset' !== $declaration['value'] ) {
+					$declarations_duotone[] = $declaration;
+				}
 				unset( $declarations[ $index ] );
 			}
 		}
