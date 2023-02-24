@@ -228,9 +228,15 @@ test.describe( 'Block deletion', () => {
 
 		// Select the last two paragraphs.
 		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
-		await expect(
-			editor.canvas.locator( '.is-multi-selected' )
-		).toHaveCount( 2 );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getMultiSelectedBlocks()
+				)
+			)
+			.toHaveLength( 2 );
 
 		// Hit backspace and ensure the last two paragraphs were deleted, and an
 		// empty block was created.
