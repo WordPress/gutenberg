@@ -53,4 +53,5 @@ extension SourceFile {
     static let preventAutosaves = SourceFile(name: "prevent-autosaves", type: .js)
     static let gutenbergObserver = SourceFile(name: "gutenberg-observer", type: .js)
     static let supportedBlocks = SourceFile(name: "supported-blocks", type: .json)
+    static let editorBehavior = SourceFile(name: "editor-behavior-overrides", type: .js)
 }
