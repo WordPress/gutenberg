@@ -245,6 +245,49 @@ function scopeSelector( scope, selector ) {
 	return selectorsScoped.join( ', ' );
 }
 
+function BlockDuotoneStyles( { name, duotoneStyle, id } ) {
+	const duotonePalette = useMultiOriginPresets( {
+		presetSetting: 'color.duotone',
+		defaultSetting: 'color.defaultDuotone',
+	} );
+
+	const element = useContext( BlockList.__unstableElementContext );
+
+	// Portals cannot exist without a container.
+	// Guard against empty Duotone styles.
+	if ( ! element || ! duotoneStyle ) {
+		return null;
+	}
+
+	let colors = duotoneStyle;
+
+	if ( ! Array.isArray( colors ) && colors !== 'unset' ) {
+		colors = getColorsFromDuotonePreset( colors, duotonePalette );
+	}
+
+	const duotoneSupportSelectors = getBlockSupport(
+		name,
+		'color.__experimentalDuotone'
+	);
+
+	// Extra .editor-styles-wrapper specificity is needed in the editor
+	// since we're not using inline styles to apply the filter. We need to
+	// override duotone applied by global styles and theme.json.
+	const selectorsGroup = scopeSelector(
+		`.editor-styles-wrapper .${ id }`,
+		duotoneSupportSelectors
+	);
+
+	return createPortal(
+		<InlineDuotone
+			selector={ selectorsGroup }
+			id={ id }
+			colors={ colors }
+		/>,
+		element
+	);
+}
+
 /**
  * Override the default block element to include duotone styles.
  *
@@ -258,50 +301,26 @@ const withDuotoneStyles = createHigherOrderComponent(
 			props.name,
 			'color.__experimentalDuotone'
 		);
-		const duotonePalette = useMultiOriginPresets( {
-			presetSetting: 'color.duotone',
-			defaultSetting: 'color.defaultDuotone',
-		} );
 
-		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
+		const id = `wp-duotone-flibble-${ useInstanceId( BlockListBlock ) }`;
+		const className = classnames( props?.className, id );
+		const duotoneStyle = props?.attributes?.style?.color?.duotone;
 
-		let colors = props?.attributes?.style?.color?.duotone;
-
-		if ( ! Array.isArray( colors ) ) {
-			const duotone = duotonePalette.find( ( dt ) => dt.slug === colors );
-
-			if ( duotone ) {
-				colors = duotone.colors;
-			}
-		}
-
-		if ( ! duotoneSupport || ! colors ) {
+		// CAUTION: code added before the early return will be executed
+		// for all blocks, not just those that support duotone. Code added
+		// above this line should be carefully evaluated for its impact on
+		// performance.
+		if ( ! duotoneSupport || ! duotoneStyle ) {
 			return <BlockListBlock { ...props } />;
 		}
 
-		// Extra .editor-styles-wrapper specificity is needed in the editor
-		// since we're not using inline styles to apply the filter. We need to
-		// override duotone applied by global styles and theme.json.
-		const selectorsGroup = scopeSelector(
-			`.editor-styles-wrapper .${ id }`,
-			duotoneSupport
-		);
-
-		const className = classnames( props?.className, id );
-
-		const element = useContext( BlockList.__unstableElementContext );
-
 		return (
 			<>
-				{ element &&
-					createPortal(
-						<InlineDuotone
-							selector={ selectorsGroup }
-							id={ id }
-							colors={ colors }
-						/>,
-						element
-					) }
+				<BlockDuotoneStyles
+					name={ props?.name }
+					duotoneStyle={ duotoneStyle }
+					id={ id }
+				/>
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
