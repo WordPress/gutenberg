@@ -121,6 +121,29 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	}
 
 	/*
+	 * For the remaining types (presets, styles), we do consider origins:
+	 *
+	 * - themes without theme.json: only the classes for the presets defined by core
+	 * - themes with theme.json: the presets and styles classes, both from core and the theme
+	 */
+
+	// We need to do this first for duotone.
+	$styles_rest = '';
+	if ( ! empty( $types ) ) {
+		/*
+		 * We only use the default, theme, and custom origins.
+		 * This is because styles for blocks origin are added
+		 * at a later phase (render cycle) so we only render the ones in use.
+		 * @see wp_add_global_styles_for_blocks
+		 */
+		$origins = array( 'default', 'theme', 'custom' );
+		if ( ! $supports_theme_json ) {
+			$origins = array( 'default' );
+		}
+		$styles_rest = $tree->get_stylesheet( $types, $origins );
+	}
+
+	/*
 	 * If variables are part of the stylesheet,
 	 * we add them.
 	 *
@@ -141,26 +164,6 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		$types            = array_diff( $types, array( 'variables' ) );
 	}
 
-	/*
-	 * For the remaining types (presets, styles), we do consider origins:
-	 *
-	 * - themes without theme.json: only the classes for the presets defined by core
-	 * - themes with theme.json: the presets and styles classes, both from core and the theme
-	 */
-	$styles_rest = '';
-	if ( ! empty( $types ) ) {
-		/*
-		 * We only use the default, theme, and custom origins.
-		 * This is because styles for blocks origin are added
-		 * at a later phase (render cycle) so we only render the ones in use.
-		 * @see wp_add_global_styles_for_blocks
-		 */
-		$origins = array( 'default', 'theme', 'custom' );
-		if ( ! $supports_theme_json ) {
-			$origins = array( 'default' );
-		}
-		$styles_rest = $tree->get_stylesheet( $types, $origins );
-	}
 	$stylesheet = $styles_variables . $styles_rest;
 	if ( $can_use_cached ) {
 		wp_cache_set( $cache_key, $stylesheet, $cache_group );
