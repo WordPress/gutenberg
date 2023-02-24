@@ -59,7 +59,7 @@ export {
 	useCompositeState as __unstableUseCompositeState,
 } from './composite';
 export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
-export { default as CustomSelectControl } from './custom-select-control';
+export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
@@ -115,6 +115,7 @@ export {
 	NavigatorScreen as __experimentalNavigatorScreen,
 	NavigatorButton as __experimentalNavigatorButton,
 	NavigatorBackButton as __experimentalNavigatorBackButton,
+	NavigatorToParentButton as __experimentalNavigatorToParentButton,
 	useNavigator as __experimentalUseNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
@@ -126,7 +127,6 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
-export { positionToPlacement as __experimentalPopoverPositionToPlacement } from './popover/utils';
 export { default as QueryControls } from './query-controls';
 export { default as __experimentalRadio } from './radio-group/radio';
 export { default as __experimentalRadioGroup } from './radio-group';
@@ -212,3 +212,6 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+
+// Private APIs.
+export { privateApis } from './private-apis';

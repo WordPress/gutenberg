@@ -31,10 +31,12 @@ export default function TemplateDetails( { template, onClose } ) {
 	);
 	const { revertTemplate } = useDispatch( editSiteStore );
 
+	// TODO: We should update this to filter by template part's areas as well.
 	const browseAllLinkProps = useLink( {
-		// TODO: We should update this to filter by template part's areas as well.
+		canvas: 'view',
 		postType: template.type,
 		postId: undefined,
+		path: '/' + template.type + '/all',
 	} );
 
 	const isTemplatePart = template.type === 'wp_template_part';

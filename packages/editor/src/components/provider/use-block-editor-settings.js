@@ -19,6 +19,63 @@ import { store as editorStore } from '../../store';
 
 const EMPTY_BLOCKS_LIST = [];
 
+const BLOCK_EDITOR_SETTINGS = [
+	'__experimentalBlockDirectory',
+	'__experimentalDiscussionSettings',
+	'__experimentalFeatures',
+	'__experimentalGlobalStylesBaseStyles',
+	'__experimentalPreferredStyleVariations',
+	'__experimentalSetIsInserterOpened',
+	'__unstableGalleryWithImageBlocks',
+	'alignWide',
+	'allowedBlockTypes',
+	'blockInspectorTabs',
+	'allowedMimeTypes',
+	'bodyPlaceholder',
+	'canLockBlocks',
+	'capabilities',
+	'clearBlockSelection',
+	'codeEditingEnabled',
+	'colors',
+	'disableCustomColors',
+	'disableCustomFontSizes',
+	'disableCustomSpacingSizes',
+	'disableCustomGradients',
+	'disableLayoutStyles',
+	'enableCustomLineHeight',
+	'enableCustomSpacing',
+	'enableCustomUnits',
+	'enableOpenverseMediaCategory',
+	'focusMode',
+	'fontSizes',
+	'gradients',
+	'generateAnchors',
+	'hasFixedToolbar',
+	'hasInlineToolbar',
+	'isDistractionFree',
+	'imageDefaultSize',
+	'imageDimensions',
+	'imageEditing',
+	'imageSizes',
+	'isRTL',
+	'keepCaretInsideBlock',
+	'locale',
+	'maxWidth',
+	'onUpdateDefaultBlockStyles',
+	'postsPerPage',
+	'readOnly',
+	'styles',
+	'template',
+	'templateLock',
+	'titlePlaceholder',
+	'supportsLayout',
+	'widgetTypesToHideFromLegacyWidgetBlock',
+	'__unstableHasCustomAppender',
+	'__unstableIsPreviewMode',
+	'__unstableResolvedAssets',
+	'__unstableIsBlockBasedTheme',
+];
+
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
@@ -131,7 +188,11 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 
 	return useMemo(
 		() => ( {
-			...settings,
+			...Object.fromEntries(
+				Object.entries( settings ).filter( ( [ key ] ) =>
+					BLOCK_EDITOR_SETTINGS.includes( key )
+				)
+			),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,

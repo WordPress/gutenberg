@@ -97,7 +97,6 @@ function ListViewBranch( props ) {
 		isExpanded,
 		parentId,
 		shouldShowInnerBlocks = true,
-		selectBlockInCanvas,
 	} = props;
 
 	const isContentLocked = useSelect(
@@ -117,8 +116,8 @@ function ListViewBranch( props ) {
 		return null;
 	}
 
-	// Only show the appender at the first level.
-	const showAppender = level === 1;
+	// Only show the appender at the first level and if there is a parent block.
+	const showAppender = level === 1 && parentId;
 
 	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
@@ -186,7 +185,6 @@ function ListViewBranch( props ) {
 								isExpanded={ shouldExpand }
 								listPosition={ nextPosition }
 								selectedClientIds={ selectedClientIds }
-								selectBlockInCanvas={ selectBlockInCanvas }
 							/>
 						) }
 						{ ! showBlock && (
@@ -207,7 +205,6 @@ function ListViewBranch( props ) {
 								isBranchSelected={ isSelectedBranch }
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
-								selectBlockInCanvas={ selectBlockInCanvas }
 							/>
 						) }
 					</AsyncModeProvider>
@@ -223,6 +220,7 @@ function ListViewBranch( props ) {
 					<TreeGridCell>
 						{ ( treeGridCellProps ) => (
 							<Appender
+								clientId={ parentId }
 								nestingLevel={ level }
 								blockCount={ blockCount }
 								{ ...treeGridCellProps }

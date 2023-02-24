@@ -212,6 +212,64 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	}
 
 	/**
+	 * @covers WP_REST_Pattern_Directory_Controller::prepare_item_for_response
+	 *
+	 * @since 5.8.0
+	 * @since 6.2.0 Added `block_types` property.
+	 */
+	public function test_prepare_item() {
+		$raw_patterns                 = json_decode( self::get_raw_response( 'browse-all' ) );
+		$raw_patterns[0]->extra_field = 'this should be removed';
+
+		$prepared_pattern = static::$controller->prepare_response_for_collection(
+			static::$controller->prepare_item_for_response( $raw_patterns[0], new WP_REST_Request() )
+		);
+
+		$this->assertPatternMatchesSchema( $prepared_pattern );
+		$this->assertArrayNotHasKey( 'extra_field', $prepared_pattern );
+	}
+
+	/**
+	 * Asserts that the pattern matches the expected response schema.
+	 *
+	 * @param WP_REST_Response[] $pattern An individual pattern from the REST API response.
+	 */
+	public function assertPatternMatchesSchema( $pattern ) {
+		$schema     = static::$controller->get_item_schema();
+		$pattern_id = isset( $pattern->id ) ? $pattern->id : '{pattern ID is missing}';
+
+		$this->assertTrue(
+			rest_validate_value_from_schema( $pattern, $schema ),
+			"Pattern ID `$pattern_id` doesn't match the response schema."
+		);
+
+		$this->assertSame(
+			array_keys( $schema['properties'] ),
+			array_keys( $pattern ),
+			"Pattern ID `$pattern_id` doesn't contain all of the fields expected from the schema."
+		);
+	}
+
+	/**
+	 * Get a mocked raw response from api.wordpress.org.
+	 *
+	 * @return string
+	 */
+	private static function get_raw_response( $action ) {
+		$fixtures_dir = __DIR__ . '/fixtures/pattern-directory';
+
+		switch ( $action ) {
+			default:
+			case 'browse-all':
+				// Response from https://api.wordpress.org/patterns/1.0/.
+				$response = file_get_contents( $fixtures_dir . '/browse-all.json' );
+				break;
+		}
+
+		return $response;
+	}
+
+	/**
 	 * @doesNotPerformAssertions
 	 */
 	public function test_context_param() {
@@ -222,13 +280,6 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @doesNotPerformAssertions
 	 */
 	public function test_get_items() {
-		// Covered by the core test.
-	}
-
-	/**
-	 * @doesNotPerformAssertions
-	 */
-	public function test_prepare_item() {
 		// Covered by the core test.
 	}
 

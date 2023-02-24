@@ -348,10 +348,6 @@ _Returns_
 
 Undocumented declaration.
 
-### experiments
-
-Experimental @wordpress/block-editor APIs.
-
 ### FontSizePicker
 
 _Related_
@@ -401,7 +397,7 @@ _Returns_
 
 ### getComputedFluidTypographyValue
 
-Computes a fluid font-size value that uses clamp(). A minimum and maxinmum
+Computes a fluid font-size value that uses clamp(). A minimum and maximum
 font size OR a single font size can be specified.
 
 If a single font size is specified, it is scaled up and down by
@@ -531,6 +527,25 @@ _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
 
+### HeightControl
+
+HeightControl renders a linked unit control and range control for adjusting the height of a block.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/height-control/README.md>
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.label_ `?string`: A label for the control.
+-   _props.onChange_ `( value: string ) => void`: Called when the height changes.
+-   _props.value_ `string`: The current height value.
+
+_Returns_
+
+-   `WPComponent`: The component to be rendered.
+
 ### InnerBlocks
 
 _Related_
@@ -620,6 +635,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
 
+### privateApis
+
+Private @wordpress/block-editor APIs.
+
 ### RichText
 
 _Related_
@@ -660,8 +679,8 @@ _Properties_
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
 -   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
 -   _enableOpenverseMediaCategory_ `boolean`: Enable/Disable the Openverse media category in the inserter.
+-   _clearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
--   _\_\_experimentalClearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
@@ -738,7 +757,7 @@ to try to find a match we need to things:
 1\. Block's client id to extract it's current attributes.
 2\. A block variation should have set `isActive` prop to a proper function.
 
-If for any reason a block variaton match cannot be found,
+If for any reason a block variation match cannot be found,
 the returned information come from the Block Type.
 If no blockType is found with the provided clientId, returns null.
 

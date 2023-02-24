@@ -29,8 +29,8 @@ type ContextConnectOptions = {
  * Forwards ref (React.ForwardRef) and "Connects" (or registers) a component
  * within the Context system under a specified namespace.
  *
- * @param  Component The component to register into the Context system.
- * @param  namespace The namespace to register the component under.
+ * @param Component The component to register into the Context system.
+ * @param namespace The namespace to register the component under.
  * @return The connected WordPressComponent
  */
 export function contextConnect<
@@ -50,8 +50,8 @@ export function contextConnect<
  * "Connects" (or registers) a component within the Context system under a specified namespace.
  * Does not forward a ref.
  *
- * @param  Component The component to register into the Context system.
- * @param  namespace The namespace to register the component under.
+ * @param Component The component to register into the Context system.
+ * @param namespace The namespace to register the component under.
  * @return The connected WordPressComponent
  */
 export function contextConnectWithoutRef< P >(
@@ -110,7 +110,7 @@ function _contextConnect<
 /**
  * Attempts to retrieve the connected namespace from a component.
  *
- * @param  Component The component to retrieve a namespace from.
+ * @param Component The component to retrieve a namespace from.
  * @return The connected namespaces.
  */
 export function getConnectNamespace(
@@ -138,8 +138,8 @@ export function getConnectNamespace(
 /**
  * Checks to see if a component is connected within the Context system.
  *
- * @param  Component The component to retrieve a namespace from.
- * @param  match     The namespace to check.
+ * @param Component The component to retrieve a namespace from.
+ * @param match     The namespace to check.
  */
 export function hasConnectNamespace(
 	Component: ReactNode,

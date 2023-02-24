@@ -34,12 +34,12 @@ interface UseResizeLabelArgs {
  * Custom hook that manages resize listener events. It also provides a label
  * based on current resize width x height values.
  *
- * @param  props
- * @param  props.axis        Only shows the label corresponding to the axis.
- * @param  props.fadeTimeout Duration (ms) before deactivating the resize label.
- * @param  props.onResize    Callback when a resize occurs. Provides { width, height } callback.
- * @param  props.position    Adjusts label value.
- * @param  props.showPx      Whether to add `PX` to the label.
+ * @param props
+ * @param props.axis        Only shows the label corresponding to the axis.
+ * @param props.fadeTimeout Duration (ms) before deactivating the resize label.
+ * @param props.onResize    Callback when a resize occurs. Provides { width, height } callback.
+ * @param props.position    Adjusts label value.
+ * @param props.showPx      Whether to add `PX` to the label.
  *
  * @return Properties for hook.
  */
@@ -174,14 +174,14 @@ interface GetSizeLabelArgs {
 /**
  * Gets the resize label based on width and height values (as well as recent changes).
  *
- * @param  props
- * @param  props.axis     Only shows the label corresponding to the axis.
- * @param  props.height   Height value.
- * @param  props.moveX    Recent width (x axis) changes.
- * @param  props.moveY    Recent width (y axis) changes.
- * @param  props.position Adjusts label value.
- * @param  props.showPx   Whether to add `PX` to the label.
- * @param  props.width    Width value.
+ * @param props
+ * @param props.axis     Only shows the label corresponding to the axis.
+ * @param props.height   Height value.
+ * @param props.moveX    Recent width (x axis) changes.
+ * @param props.moveY    Recent width (y axis) changes.
+ * @param props.position Adjusts label value.
+ * @param props.showPx   Whether to add `PX` to the label.
+ * @param props.width    Width value.
  *
  * @return The rendered label.
  */

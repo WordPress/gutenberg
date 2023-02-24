@@ -8,7 +8,10 @@ import classnames from 'classnames';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { BaseControl, CustomSelectControl } from '@wordpress/components';
+import {
+	BaseControl,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import {
@@ -26,7 +29,10 @@ import BlockList from '../components/block-list';
 import useSetting from '../components/use-setting';
 import InspectorControls from '../components/inspector-controls';
 import { cleanEmptyObject } from './utils';
+import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
+
+const { CustomSelectControl } = unlock( componentsPrivateApis );
 
 const POSITION_SUPPORT_KEY = 'position';
 
@@ -365,6 +371,10 @@ export const withPositionStyles = createHigherOrderComponent(
 		// Attach a `wp-container-` id-based class name.
 		const className = classnames( props?.className, {
 			[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+			[ `is-position-${ attributes?.style?.position?.type }` ]:
+				allowPositionStyles &&
+				!! css &&
+				!! attributes?.style?.position?.type,
 		} );
 
 		return (
