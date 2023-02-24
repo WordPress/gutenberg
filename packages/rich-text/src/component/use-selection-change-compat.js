@@ -15,6 +15,14 @@ import { useRefEffect } from '@wordpress/compose';
 export function useSelectionChangeCompat() {
 	return useRefEffect( ( element ) => {
 		const { ownerDocument } = element;
+		const { defaultView } = ownerDocument;
+		const selection = defaultView.getSelection();
+
+		let range;
+
+		function getRange() {
+			return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+		}
 
 		function onDown( event ) {
 			const type = event.type === 'keydown' ? 'keyup' : 'pointerup';
@@ -30,12 +38,15 @@ export function useSelectionChangeCompat() {
 
 			function onUp() {
 				onCancel();
+				if ( range === getRange() ) return;
 				ownerDocument.dispatchEvent( new Event( 'selectionchange' ) );
 			}
 
 			ownerDocument.addEventListener( type, onUp );
 			ownerDocument.addEventListener( 'selectionchange', onCancel );
 			ownerDocument.addEventListener( 'input', onCancel );
+
+			range = getRange();
 		}
 
 		element.addEventListener( 'pointerdown', onDown );

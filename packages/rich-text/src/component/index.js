@@ -238,7 +238,6 @@ export function useRichText( {
 			applyRecord,
 			createRecord,
 			handleChange,
-			isSelected,
 			onSelectionChange,
 		} ),
 		useSelectionChangeCompat(),

@@ -113,18 +113,11 @@ export function useInputAndSelection( props ) {
 
 		/**
 		 * Syncs the selection to local state. A callback for the
-		 * `selectionchange` native events.
-		 *
-		 * @param {Event} event
+		 * `selectionchange` event.
 		 */
-		function handleSelectionChange( event ) {
-			const {
-				record,
-				applyRecord,
-				createRecord,
-				isSelected,
-				onSelectionChange,
-			} = propsRef.current;
+		function handleSelectionChange() {
+			const { record, applyRecord, createRecord, onSelectionChange } =
+				propsRef.current;
 
 			// Check if the implementor disabled editing. `contentEditable`
 			// does disable input, but not text selection, so we must ignore
@@ -175,10 +168,6 @@ export function useInputAndSelection( props ) {
 					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
 					onSelectionChange( undefined, offset );
 				}
-				return;
-			}
-
-			if ( event.type !== 'selectionchange' && ! isSelected ) {
 				return;
 			}
 
