@@ -9,6 +9,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { getActiveFormats } from '../get-active-formats';
 import { updateFormats } from '../update-formats';
+import { create } from '../create';
 
 /**
  * All inserting input types that would insert HTML into the DOM.
@@ -62,8 +63,25 @@ export function useInputAndSelection( props ) {
 	return useRefEffect( ( element ) => {
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
+		const selection = defaultView.getSelection();
 
 		let isComposing = false;
+
+		function createRecord() {
+			const { multilineTag, preserveWhiteSpace } = propsRef.current;
+			const range =
+				selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
+
+			return create( {
+				element,
+				range,
+				multilineTag,
+				multilineWrapperTags:
+					multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
+				__unstableIsEditableTree: true,
+				preserveWhiteSpace,
+			} );
+		}
 
 		function onInput( event ) {
 			// Do not trigger a change if characters are being composed.
@@ -81,8 +99,7 @@ export function useInputAndSelection( props ) {
 				inputType = event.inputType;
 			}
 
-			const { record, applyRecord, createRecord, handleChange } =
-				propsRef.current;
+			const { record, applyRecord, handleChange } = propsRef.current;
 
 			// The browser formatted something or tried to insert HTML.
 			// Overwrite it. It will be handled later by the format library if
@@ -118,13 +135,8 @@ export function useInputAndSelection( props ) {
 		 * @param {Event} event
 		 */
 		function handleSelectionChange( event ) {
-			const {
-				record,
-				applyRecord,
-				createRecord,
-				isSelected,
-				onSelectionChange,
-			} = propsRef.current;
+			const { record, applyRecord, isSelected, onSelectionChange } =
+				propsRef.current;
 
 			// Check if the implementor disabled editing. `contentEditable`
 			// does disable input, but not text selection, so we must ignore
@@ -151,7 +163,6 @@ export function useInputAndSelection( props ) {
 					return;
 				}
 
-				const selection = defaultView.getSelection();
 				const { anchorNode, focusNode } = selection;
 
 				if (

@@ -39,25 +39,6 @@ export function useRichText( {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const ref = useRef();
 
-	function createRecord() {
-		const {
-			ownerDocument: { defaultView },
-		} = ref.current;
-		const selection = defaultView.getSelection();
-		const range =
-			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
-
-		return create( {
-			element: ref.current,
-			range,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-			__unstableIsEditableTree: true,
-			preserveWhiteSpace,
-		} );
-	}
-
 	function applyRecord( newRecord, { domOnly } = {} ) {
 		apply( {
 			value: newRecord,
@@ -235,10 +216,11 @@ export function useRichText( {
 		useInputAndSelection( {
 			record,
 			applyRecord,
-			createRecord,
 			handleChange,
 			isSelected,
 			onSelectionChange,
+			multilineTag,
+			preserveWhiteSpace,
 		} ),
 		useRefEffect( () => {
 			applyFromProps();
