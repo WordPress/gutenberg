@@ -7,11 +7,7 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	createHigherOrderComponent,
-	ifCondition,
-	useInstanceId,
-} from '@wordpress/compose';
+import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -45,7 +41,7 @@ const layoutBlockSupportKey = '__experimentalLayout';
  */
 export function useLayoutClasses( block = {} ) {
 	const hasLayoutBlockSupport = hasBlockSupport(
-		name,
+		block.name,
 		layoutBlockSupportKey
 	);
 	const rootPaddingAlignment = useSelect(
@@ -60,7 +56,7 @@ export function useLayoutClasses( block = {} ) {
 	const globalLayoutSettings =
 		useSetting( hasLayoutBlockSupport ? 'layout' : undefined ) || {};
 
-	if ( ! hasLayoutBlockSupport ) return [];
+	if ( ! hasLayoutBlockSupport ) return null;
 
 	const { attributes = {}, name } = block;
 	const { layout } = attributes;
@@ -356,9 +352,7 @@ export const withInspectorControls = createHigherOrderComponent(
 	'withInspectorControls'
 );
 
-const ConditionLayoutStyles = ifCondition( ( props ) =>
-	hasBlockSupport( props.name, layoutBlockSupportKey )
-)( ( props ) => {
+function ConditionalLayoutStyles( props ) {
 	const { name, attributes, id } = props;
 	const disableLayoutStyles = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -409,7 +403,7 @@ const ConditionLayoutStyles = ifCondition( ( props ) =>
 			element
 		)
 	);
-} );
+}
 
 /**
  * Override the default block element to add the layout styles.
@@ -421,13 +415,20 @@ const ConditionLayoutStyles = ifCondition( ( props ) =>
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const id = useInstanceId( BlockListBlock );
+		const hasLayoutSupport = hasBlockSupport(
+			props.name,
+			layoutBlockSupportKey
+		);
 		return (
 			<>
-				<ConditionLayoutStyles { ...props } id={ id } />
+				{ hasLayoutSupport && (
+					<ConditionalLayoutStyles { ...props } id={ id } />
+				) }
 				<BlockListBlock
 					{ ...props }
 					__unstableLayoutClassNames={ classnames(
-						`wp-container-${ id }`,
+						props.className,
+						{ [ `wp-container-${ id }` ]: hasLayoutSupport },
 						useLayoutClasses( props.block )
 					) }
 				/>
@@ -435,6 +436,40 @@ export const withLayoutStyles = createHigherOrderComponent(
 		);
 	}
 );
+
+function ConditionalChildLayoutStyles( props ) {
+	const { attributes, id } = props;
+	const { style: { layout = {} } = {} } = attributes;
+	const { selfStretch, flexSize } = layout;
+	const disableLayoutStyles = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return !! getSettings().disableLayoutStyles;
+	} );
+	const shouldRenderChildLayoutStyles = ! disableLayoutStyles;
+
+	const element = useContext( BlockList.__unstableElementContext );
+	const selector = `.wp-container-content-${ id }`;
+
+	let css = '';
+
+	if ( selfStretch === 'fixed' && flexSize ) {
+		css += `${ selector } {
+				flex-basis: ${ flexSize };
+				box-sizing: border-box;
+			}`;
+	} else if ( selfStretch === 'fill' ) {
+		css += `${ selector } {
+				flex-grow: 1;
+			}`;
+	}
+
+	return (
+		shouldRenderChildLayoutStyles &&
+		element &&
+		!! css &&
+		createPortal( <style>{ css }</style>, element )
+	);
+}
 
 /**
  * Override the default block element to add the child layout styles.
@@ -445,47 +480,21 @@ export const withLayoutStyles = createHigherOrderComponent(
  */
 export const withChildLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { attributes } = props;
-		const { style: { layout = {} } = {} } = attributes;
-		const { selfStretch, flexSize } = layout;
-		const hasChildLayout = selfStretch || flexSize;
-		const disableLayoutStyles = useSelect( ( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return !! getSettings().disableLayoutStyles;
-		} );
-		const shouldRenderChildLayoutStyles =
-			hasChildLayout && ! disableLayoutStyles;
-
-		const element = useContext( BlockList.__unstableElementContext );
 		const id = useInstanceId( BlockListBlock );
-		const selector = `.wp-container-content-${ id }`;
-
-		let css = '';
-
-		if ( selfStretch === 'fixed' && flexSize ) {
-			css += `${ selector } {
-				flex-basis: ${ flexSize };
-				box-sizing: border-box;
-			}`;
-		} else if ( selfStretch === 'fill' ) {
-			css += `${ selector } {
-				flex-grow: 1;
-			}`;
-		}
-
-		// Attach a `wp-container-content` id-based classname.
-		const className = classnames( props?.className, {
-			[ `wp-container-content-${ id }` ]:
-				shouldRenderChildLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
-		} );
-
+		const hasChildLayout =
+			props.attributes?.layout?.selfStretch ||
+			props.attributes?.layout?.flexSize;
 		return (
 			<>
-				{ shouldRenderChildLayoutStyles &&
-					element &&
-					!! css &&
-					createPortal( <style>{ css }</style>, element ) }
-				<BlockListBlock { ...props } className={ className } />
+				{ hasChildLayout && (
+					<ConditionalChildLayoutStyles { ...props } id={ id } />
+				) }
+				<BlockListBlock
+					{ ...props }
+					className={ classnames( props?.className, {
+						[ `wp-container-content-${ id }` ]: hasChildLayout,
+					} ) }
+				/>
 			</>
 		);
 	}
