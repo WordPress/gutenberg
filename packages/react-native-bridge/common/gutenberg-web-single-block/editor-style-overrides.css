@@ -44,6 +44,11 @@
     top: 0px;
 }
 
+/* Hide block actions unrelated to editing a single block */
+.block-editor-block-settings-menu {
+	display: none;
+}
+
 /*
  Moves the whole editor to the top.
  There was an extra top margin after removing the WP Admin bar.
