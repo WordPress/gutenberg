@@ -451,13 +451,13 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 		// 1. Array of colors - e.g. array('#000000', '#ffffff').
 		// 2. The string 'unset' - indicates explicitly "override the theme duotone with `filter: none !important`".
-		$custom_duotone = $block['attrs']['style']['color']['duotone'];
+		$duotone_attr = $block['attrs']['style']['color']['duotone'];
 
 		// Build a unique slug for the filter based on the array of colors.
-		$filter_key  = is_array( $custom_duotone ) ? implode( '-', $custom_duotone ) : $custom_duotone;
+		$filter_key  = is_array( $duotone_attr ) ? implode( '-', $duotone_attr ) : $duotone_attr;
 		$filter_data = array(
 			'slug'   => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
-			'colors' => $custom_duotone, // required for building the SVG with gutenberg_get_duotone_filter_svg.
+			'colors' => $duotone_attr, // required for building the SVG with gutenberg_get_duotone_filter_svg.
 		);
 
 		// Build a customized CSS filter property for unique slug.
@@ -466,13 +466,13 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// Handle preset values for duotone iff the preset is set and there is no custom duotone.
 
 		// 1. Slug of an existing Duotone preset - e.g. 'green-blue'.
-		$preset_duotone = $block['attrs']['duotone'];
+		$duotone_attr = $block['attrs']['duotone'];
 		$filter_data    = array(
-			'slug' => $preset_duotone,
+			'slug' => $duotone_attr,
 		);
 
 		// Utilize existing CSS custom property.
-		$filter_property = "var(--wp--preset--duotone--$preset_duotone)";
+		$filter_property = "var(--wp--preset--duotone--$duotone_attr)";
 	}
 
 	// - Applied as a class attribute to the block wrapper.
@@ -504,7 +504,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	);
 
 	// Only custom duotone filters with values need to be rendered here.
-	if ( is_array( $custom_duotone ) ) {
+	if ( is_array( $duotone_attr ) ) {
 		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
 
 		add_action(
