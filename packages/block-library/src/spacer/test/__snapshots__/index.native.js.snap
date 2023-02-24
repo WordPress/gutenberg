@@ -19,14 +19,14 @@ exports[`Spacer block inserts block 1`] = `
 `;
 
 exports[`Spacer block inserts block with spacingSizes preset 1`] = `
-"<!-- wp:spacer {\\"height\\":\\"70px\\"} -->
-<div style=\\"height:70px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+"<!-- wp:spacer {"height":"70px"} -->
+<div style="height:70px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->"
 `;
 
 exports[`Spacer block inserts block with spacingSizes preset without matching global styles values 1`] = `
-"<!-- wp:spacer {\\"height\\":\\"120px\\"} -->
-<div style=\\"height:120px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+"<!-- wp:spacer {"height":"120px"} -->
+<div style="height:120px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->"
 `;
 
