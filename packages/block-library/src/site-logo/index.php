@@ -50,7 +50,6 @@ function render_block_core_site_logo( $attributes ) {
 		$custom_logo = $processor->get_updated_html();
 	}
 
-	// Apply the border to the image
 	$border_attributes = get_block_core_site_logo_border_attributes( $attributes );
 	if ( $border_attributes ) {
 		$processor = new WP_HTML_Tag_Processor( $custom_logo );
