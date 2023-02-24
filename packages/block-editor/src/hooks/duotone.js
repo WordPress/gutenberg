@@ -75,9 +75,34 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 	);
 }
 
+export function getColorsFromDuotonePreset( duotone, duotonePalette ) {
+	if ( ! duotone ) {
+		return;
+	}
+	const preset = duotonePalette?.find( ( { slug } ) => {
+		return slug === duotone;
+	} );
+
+	return preset ? preset.colors : undefined;
+}
+
+export function getDuotonePresetFromColors( colors, duotonePalette ) {
+	if ( ! colors || ! Array.isArray( colors ) ) {
+		return;
+	}
+
+	const preset = duotonePalette?.find( ( duotonePreset ) => {
+		return duotonePreset?.colors?.every(
+			( val, index ) => val === colors[ index ]
+		);
+	} );
+
+	return preset ? preset.slug : undefined;
+}
+
 function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
-	const duotone = style?.color?.duotone;
+	const duotoneStyle = style?.color?.duotone;
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -96,6 +121,10 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		return null;
 	}
 
+	const duotonePresetOrColors = ! Array.isArray( duotoneStyle )
+		? getColorsFromDuotonePreset( duotoneStyle, duotonePalette )
+		: duotoneStyle;
+
 	return (
 		<BlockControls group="block" __experimentalShareWithChildBlocks>
 			<DuotoneControl
@@ -103,13 +132,18 @@ function DuotonePanel( { attributes, setAttributes } ) {
 				colorPalette={ colorPalette }
 				disableCustomDuotone={ disableCustomDuotone }
 				disableCustomColors={ disableCustomColors }
-				value={ duotone }
+				value={ duotonePresetOrColors }
 				onChange={ ( newDuotone ) => {
+					const maybePreset = getDuotonePresetFromColors(
+						newDuotone,
+						duotonePalette
+					);
+
 					const newStyle = {
 						...style,
 						color: {
 							...style?.color,
-							duotone: newDuotone,
+							duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
 						},
 					};
 					setAttributes( { style: newStyle } );
@@ -224,13 +258,26 @@ const withDuotoneStyles = createHigherOrderComponent(
 			props.name,
 			'color.__experimentalDuotone'
 		);
-		const colors = props?.attributes?.style?.color?.duotone;
+		const duotonePalette = useMultiOriginPresets( {
+			presetSetting: 'color.duotone',
+			defaultSetting: 'color.defaultDuotone',
+		} );
+
+		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
+
+		let colors = props?.attributes?.style?.color?.duotone;
+
+		if ( ! Array.isArray( colors ) ) {
+			const duotone = duotonePalette.find( ( dt ) => dt.slug === colors );
+
+			if ( duotone ) {
+				colors = duotone.colors;
+			}
+		}
 
 		if ( ! duotoneSupport || ! colors ) {
 			return <BlockListBlock { ...props } />;
 		}
-
-		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
 
 		// Extra .editor-styles-wrapper specificity is needed in the editor
 		// since we're not using inline styles to apply the filter. We need to

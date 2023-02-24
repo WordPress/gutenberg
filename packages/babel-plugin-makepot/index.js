@@ -32,8 +32,9 @@
  * External dependencies
  */
 
+const deepmerge = require( 'deepmerge' );
+const { isPlainObject } = require( 'is-plain-object' );
 const { po } = require( 'gettext-parser' );
-const { merge, isEmpty } = require( 'lodash' );
 const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -312,7 +313,10 @@ module.exports = () => {
 				},
 				exit( path, state ) {
 					const { filename } = this.file.opts;
-					if ( isEmpty( strings[ filename ] ) ) {
+					if (
+						! strings[ filename ] ||
+						! Object.values( strings[ filename ] ).length
+					) {
 						delete strings[ filename ];
 						return;
 					}
@@ -362,7 +366,13 @@ module.exports = () => {
 					}, {} );
 
 					// Merge translations from individual files into headers
-					const data = merge( {}, baseData, { translations } );
+					const data = deepmerge(
+						baseData,
+						{ translations },
+						{
+							isMergeableObject: isPlainObject,
+						}
+					);
 
 					// Ideally we could wait until Babel has finished parsing
 					// all files or at least asynchronously write, but the

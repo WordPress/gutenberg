@@ -3,14 +3,12 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
-import { SelectControl } from '@wordpress/components';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	store as blockEditorStore,
 	BlockEditorProvider,
 } from '@wordpress/block-editor';
 import { speak } from '@wordpress/a11y';
-import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -71,11 +69,6 @@ export default function NavigationInspector( { onSelect } ) {
 		};
 	}, [] );
 
-	const navMenuListId = useInstanceId(
-		NavigationMenu,
-		'edit-site-navigation-inspector-menu'
-	);
-
 	const firstNavRefInTemplate = clientIdToRef[ firstNavigationBlockId ];
 	const firstNavigationMenuRef = navigationMenus?.[ 0 ]?.id;
 
@@ -98,14 +91,6 @@ export default function NavigationInspector( { onSelect } ) {
 			setCurrentMenuId( clientIdToRef[ selectedNavigationBlockId ] );
 		}
 	}, [ selectedNavigationBlockId ] );
-
-	let options = [];
-	if ( navigationMenus ) {
-		options = navigationMenus.map( ( { id, title } ) => ( {
-			value: id,
-			label: title.rendered,
-		} ) );
-	}
 
 	const [ innerBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -136,8 +121,6 @@ export default function NavigationInspector( { onSelect } ) {
 	);
 
 	const isLoading = ! ( hasResolvedNavigationMenus && hasLoadedInnerBlocks );
-
-	const hasMoreThanOneNavigationMenu = navigationMenus?.length > 1;
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 
@@ -177,21 +160,6 @@ export default function NavigationInspector( { onSelect } ) {
 
 			{ ! hasResolvedNavigationMenus && (
 				<div className="edit-site-navigation-inspector__placeholder" />
-			) }
-			{ hasResolvedNavigationMenus && hasMoreThanOneNavigationMenu && (
-				<SelectControl
-					__nextHasNoMarginBottom
-					className="edit-site-navigation-inspector__select-menu"
-					aria-controls={
-						// aria-controls should only apply when referenced element is in DOM
-						hasLoadedInnerBlocks ? navMenuListId : undefined
-					}
-					value={ currentMenuId || defaultNavigationMenuId }
-					options={ options }
-					onChange={ ( newMenuId ) =>
-						setCurrentMenuId( Number( newMenuId ) )
-					}
-				/>
 			) }
 			{ isLoading && (
 				<>

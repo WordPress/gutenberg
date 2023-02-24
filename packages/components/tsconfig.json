@@ -32,6 +32,7 @@
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
 		{ "path": "../react-i18n" },
 		{ "path": "../warning" }
 	],
@@ -44,9 +45,7 @@
 		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
 		"src/index.js",
-		"src/angle-picker-control",
 		"src/autocomplete",
-		"src/combobox-control",
 		"src/custom-gradient-picker",
 		"src/dimension-control",
 		"src/duotone-picker",
@@ -57,10 +56,8 @@
 		"src/higher-order/with-filters",
 		"src/higher-order/with-focus-return",
 		"src/higher-order/with-notices",
-		"src/menu-items-choice",
 		"src/navigation",
 		"src/palette-edit",
-		"src/panel/body.js",
-		"src/toolbar"
+		"src/panel/body.js"
 	]
 }

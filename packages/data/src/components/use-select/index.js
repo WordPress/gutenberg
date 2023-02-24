@@ -21,17 +21,19 @@ const renderQueue = createQueue();
 
 /**
  * @typedef {import('../../types').StoreDescriptor<C>} StoreDescriptor
- * @template C
+ * @template {import('../../types').AnyConfig} C
  */
 /**
  * @typedef {import('../../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
- * @template State,Actions,Selectors
- */
-/**
- * @typedef {import('../../types').UseSelectReturn<T>} UseSelectReturn
- * @template T
+ * @template State
+ * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template Selectors
  */
 /** @typedef {import('../../types').MapSelect} MapSelect */
+/**
+ * @typedef {import('../../types').UseSelectReturn<T>} UseSelectReturn
+ * @template {MapSelect|StoreDescriptor<any>} T
+ */
 
 function Store( registry, suspense ) {
 	const select = suspense ? registry.suspendSelect : registry.select;

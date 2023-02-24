@@ -21,7 +21,6 @@ const EMPTY_BLOCKS_LIST = [];
 
 const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalBlockDirectory',
-	'__experimentalBlockInspectorAnimation',
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
@@ -74,6 +73,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableHasCustomAppender',
 	'__unstableIsPreviewMode',
 	'__unstableResolvedAssets',
+	'__unstableIsBlockBasedTheme',
 ];
 
 /**

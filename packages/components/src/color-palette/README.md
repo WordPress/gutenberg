@@ -66,6 +66,13 @@ colors.
 -   Required: No
 -   Default: `false`
 
+### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
+
+The heading level.
+
+-   Required: No
+-   Default: `2`
+
 ### `value`: `string`
 
 Currently active value.

@@ -155,8 +155,6 @@ function ListViewBranch( props ) {
 
 				const isDragged = !! draggedClientIds?.includes( clientId );
 
-				const showBlock = isDragged || blockInView;
-
 				// Make updates to the selected or dragged blocks synchronous,
 				// but asynchronous for any other block.
 				const isSelected = isClientIdSelected(
@@ -165,6 +163,7 @@ function ListViewBranch( props ) {
 				);
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBlocks );
+				const showBlock = isDragged || blockInView || isSelected;
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (

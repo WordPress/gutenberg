@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
@@ -14,7 +9,7 @@ import deprecated from '@wordpress/deprecated';
 import createReduxStore from './redux-store';
 import coreDataStore from './store';
 import { createEmitter } from './utils/emitter';
-import { lock, unlock } from './experiments';
+import { lock, unlock } from './private-apis';
 
 /** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
@@ -198,14 +193,19 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	// Deprecated
 	// TODO: Remove this after `use()` is removed.
 	function withPlugins( attributes ) {
-		return mapValues( attributes, ( attribute, key ) => {
-			if ( typeof attribute !== 'function' ) {
-				return attribute;
-			}
-			return function () {
-				return registry[ key ].apply( null, arguments );
-			};
-		} );
+		return Object.fromEntries(
+			Object.entries( attributes ).map( ( [ key, attribute ] ) => {
+				if ( typeof attribute !== 'function' ) {
+					return [ key, attribute ];
+				}
+				return [
+					key,
+					function () {
+						return registry[ key ].apply( null, arguments );
+					},
+				];
+			} )
+		);
 	}
 
 	/**

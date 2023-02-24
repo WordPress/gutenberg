@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Icon, MenuGroup } from '@wordpress/components';
@@ -35,7 +30,7 @@ export default function DevicePreview() {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			isPostSaveable: select( editorStore ).isEditedPostSaveable(),
-			isViewable: get( postType, [ 'viewable' ], false ),
+			isViewable: postType?.viewable ?? false,
 			deviceType:
 				select( editPostStore ).__experimentalGetPreviewDeviceType(),
 		};

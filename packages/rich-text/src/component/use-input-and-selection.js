@@ -287,7 +287,6 @@ export function useInputAndSelection( props ) {
 					end: index,
 					activeFormats: EMPTY_ACTIVE_FORMATS,
 				};
-				onSelectionChange( index, index );
 			} else {
 				applyRecord( record.current );
 				onSelectionChange( record.current.start, record.current.end );
