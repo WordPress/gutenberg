@@ -432,6 +432,50 @@ class WP_Duotone {
 	 * @var array
 	 */
 	static $duotone_presets = array();
+
+	static function gutenberg_save_duotone_preset_svgs( $block_content, $block ) {
+		// Get the per block settings from the theme.json.
+		$tree = WP_Theme_JSON_Resolver::get_merged_data();
+		$block_nodes = $tree->get_styles_block_nodes();
+
+		// For each of the block settings, if there's a preset then save it
+		$block_metadata = null;
+		foreach( $block_nodes as $node ) {
+			// If the block doesn't support Duotone then skip it.
+			if ( empty( $node['duotone'] ) ) {
+				continue;
+			}
+
+			if( $node['name'] === $block['blockName'] ) {
+				$block_metadata = $node;
+				break;
+			}
+		};
+		if ( $block_metadata ) {
+			$theme_json = $tree->get_raw_data();
+			// Define the path to the duotone filter.
+			$duotone_filter_path = array_merge( $block_metadata['path'],  array( 'filter', 'duotone' ) );
+			$duotone_filter = _wp_array_get( $theme_json, $duotone_filter_path, array() );
+			$duotone_slug = static::gutenberg_get_duotone_slug_from_preset_css_variable( $duotone_filter );
+			if ( $duotone_slug ) {
+				// Save the preset slug to be used later.
+				WP_Duotone::$duotone_presets[ $duotone_slug ] = true;
+			}
+		}
+
+		// Don't change the block content.
+		return $block_content;
+	}
+
+	static function gutenberg_get_duotone_slug_from_preset_css_variable( $css_variable ) {
+		if ( ! empty( $css_variable ) ) {
+			// Get the preset slug from the filter.
+			preg_match('/var\(--wp--preset--duotone--(.*)\)/', $css_variable, $matches );
+			if ( $matches[1] ) {
+				return $matches[1];
+			}
+		}
+	}
 }
 
 /**
@@ -598,7 +642,14 @@ add_action(
 			// Convert $preset from a slug to an array of colors.
 			$duotone_preset = $flat_presets[ $preset_slug ];
 			$filter_svg = gutenberg_get_duotone_filter_svg( $duotone_preset );
+			$filter_css = gutenberg_get_duotone_filter_property( $duotone_preset );
+
 			echo $filter_svg;
+
+			// This is for classic themes - in block themes, the CSS is added in the head via the value_func.
+			$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $preset_slug );
+			wp_add_inline_style( 'core-block-supports', 'body{' . $duotone_preset_css_var . ' :' . $filter_css . ';}' );
+
 		}
 
 		/*
@@ -620,47 +671,4 @@ add_action(
 	}
 );
 
-function gutenberg_save_duotone_preset_svgs( $block_content, $block ) {
-	// Get the per block settings from the theme.json.
-	$tree = WP_Theme_JSON_Resolver::get_merged_data();
-	$block_nodes = $tree->get_styles_block_nodes();
-
-	// For each of the block settings, if there's a preset then save it
-	$block_metadata = null;
-	foreach( $block_nodes as $node ) {
-		// If the block doesn't support Duotone then skip it.
-		if ( empty( $node['duotone'] ) ) {
-			continue;
-		}
-
-		if( $node['name'] === $block['blockName'] ) {
-			$block_metadata = $node;
-			break;
-		}
-	};
-	if ( $block_metadata ) {
-		$theme_json = $tree->get_raw_data();
-		// Define the path to the duotone filter.
-		$duotone_filter_path = array_merge( $block_metadata['path'],  array( 'filter', 'duotone' ) );
-		$duotone_filter = _wp_array_get( $theme_json, $duotone_filter_path, array() );
-		$duotone_slug = gutenberg_get_duotone_slug_from_preset_css_variable( $duotone_filter );
-		if ( $duotone_slug ) {
-			// Save the preset slug to be used later.
-			WP_Duotone::$duotone_presets[ $duotone_slug ] = true;
-		}
-	}
-
-	// Don't change the block content.
-	return $block_content;
-}
-
-function gutenberg_get_duotone_slug_from_preset_css_variable( $css_variable ) {
-	if ( ! empty( $css_variable ) ) {
-		// Get the preset slug from the filter.
-		preg_match('/var\(--wp--preset--duotone--(.*)\)/', $css_variable, $matches );
-		if ( $matches[1] ) {
-			return $matches[1];
-		}
-	}
-}
-add_filter( 'render_block', 'gutenberg_save_duotone_preset_svgs', 10, 2 );
+add_filter( 'render_block', array( 'WP_Duotone', 'gutenberg_save_duotone_preset_svgs' ), 10, 2 );
