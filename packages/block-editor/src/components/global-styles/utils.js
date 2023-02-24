@@ -57,6 +57,7 @@ export const PRESET_METADATA = [
 	},
 	{
 		path: [ 'color', 'duotone' ],
+		valueKey: 'colors',
 		cssVarInfix: 'duotone',
 		valueFunc: ( { slug } ) => `url( '#wp-duotone-${ slug }' )`,
 		classes: [],
@@ -95,6 +96,7 @@ export const PRESET_METADATA = [
 export const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'color.background': 'color',
 	'color.text': 'color',
+	'filter.duotone': 'duotone',
 	'elements.link.color.text': 'color',
 	'elements.link.:hover.color.text': 'color',
 	'elements.link.typography.fontFamily': 'font-family',
