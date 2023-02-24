@@ -328,13 +328,11 @@ export function addAttribute( settings ) {
 export const withInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
-		const supportLayout = hasBlockSupport(
-			blockName,
-			layoutBlockSupportKey
-		);
-
 		return [
-			supportLayout && <LayoutPanel key="layout" { ...props } />,
+			props.isSelected &&
+				hasBlockSupport( blockName, layoutBlockSupportKey ) && (
+					<LayoutPanel key="layout" { ...props } />
+				),
 			<BlockEdit key="edit" { ...props } />,
 		];
 	},

@@ -179,6 +179,27 @@ function addDuotoneAttributes( settings ) {
 	return settings;
 }
 
+function DuoToneControls( props ) {
+	const hasDuotoneSupport = hasBlockSupport(
+		props.name,
+		'color.__experimentalDuotone'
+	);
+	const isContentLocked = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).__unstableGetContentLockingParent(
+				props.clientId
+			);
+		},
+		[ props.clientId ]
+	);
+
+	if ( ! hasDuotoneSupport || isContentLocked ) {
+		return null;
+	}
+
+	return <DuotonePanel { ...props } />;
+}
+
 /**
  * Override the default edit UI to include toolbar controls for duotone if the
  * block supports duotone.
@@ -189,28 +210,13 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const hasDuotoneSupport = hasBlockSupport(
-			props.name,
-			'color.__experimentalDuotone'
-		);
-		const isContentLocked = useSelect(
-			( select ) => {
-				return select(
-					blockEditorStore
-				).__unstableGetContentLockingParent( props.clientId );
-			},
-			[ props.clientId ]
-		);
-
 		// CAUTION: code added before this line will be executed
 		// for all blocks, not just those that support duotone. Code added
 		// above this line should be carefully evaluated for its impact on
 		// performance.
 		return (
 			<>
-				{ hasDuotoneSupport && ! isContentLocked && (
-					<DuotonePanel { ...props } />
-				) }
+				{ props.isSelected && <DuoToneControls { ...props } /> }
 				<BlockEdit { ...props } />
 			</>
 		);
