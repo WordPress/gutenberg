@@ -1634,12 +1634,12 @@ class WP_Theme_JSON_Gutenberg {
 				) {
 					$value_func = $preset_metadata['value_func'];
 					$value      = call_user_func( $value_func, $preset );
-				} else {
-					// If we don't have a value, then don't add it to the result.
-					continue;
 				}
 
-				$result[ $slug ] = $value;
+				// If we don't have a value, then don't add it to the result.
+				if ( ! empty( $value) ) {
+					$result[ $slug ] = $value;
+				}
 			}
 		}
 		return $result;

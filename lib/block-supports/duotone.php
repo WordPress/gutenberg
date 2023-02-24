@@ -311,8 +311,10 @@ function gutenberg_get_duotone_filter_id( $preset ) {
  * @return string        Duotone CSS filter property url value.
  */
 function gutenberg_get_duotone_filter_property( $preset ) {
-	$filter_id = gutenberg_get_duotone_filter_id( $preset );
-	return "url('#" . $filter_id . "')";
+	if( array_key_exists( $preset['slug'], WP_Duotone::$duotone_presets ) ) {
+		$filter_id = gutenberg_get_duotone_filter_id( $preset );
+		return "url('#" . $filter_id . "')";
+	}
 }
 
 /**
@@ -626,6 +628,7 @@ function gutenberg_save_duotone_preset_svgs( $block_content, $block ) {
 		if ( empty( $node['duotone'] ) ) {
 			continue;
 		}
+		// TODO: Why do some nodes not have a name?
 		if( ! empty( $node['name'] ) && $node['name'] === $block['blockName'] ) {
 			$block_metadata = $node;
 			break;
