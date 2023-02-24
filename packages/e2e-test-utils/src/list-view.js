@@ -5,7 +5,7 @@ async function toggleListView() {
 	);
 }
 
-async function isListViewOpen() {
+export async function isListViewOpen() {
 	return await page.evaluate( () => {
 		// selector .edit-post-header-toolbar__list-view-toggle is still required because the performance tests also execute against older versions that still use that selector.
 		return !! document.querySelector(

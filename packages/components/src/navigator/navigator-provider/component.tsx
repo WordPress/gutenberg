@@ -13,6 +13,7 @@ import {
 	useCallback,
 	useReducer,
 	useRef,
+	useEffect,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -33,10 +34,12 @@ import type {
 	NavigatorContext as NavigatorContextType,
 	Screen,
 } from '../types';
-import { patternMatch } from '../utils/router';
+import { patternMatch, findParent } from '../utils/router';
 
 type MatchedPath = ReturnType< typeof patternMatch >;
 type ScreenAction = { type: string; screen: Screen };
+
+const MAX_HISTORY_LENGTH = 50;
 
 function screensReducer(
 	state: Screen[] = [],
@@ -66,7 +69,15 @@ function UnconnectedNavigatorProvider(
 			path: initialPath,
 		},
 	] );
+	const currentLocationHistory = useRef< NavigatorLocation[] >( [] );
 	const [ screens, dispatch ] = useReducer( screensReducer, [] );
+	const currentScreens = useRef< Screen[] >( [] );
+	useEffect( () => {
+		currentScreens.current = screens;
+	}, [ screens ] );
+	useEffect( () => {
+		currentLocationHistory.current = locationHistory;
+	}, [ locationHistory ] );
 	const currentMatch = useRef< MatchedPath >();
 	const matchedPath = useMemo( () => {
 		let currentPath: string | undefined;
@@ -115,39 +126,6 @@ function UnconnectedNavigatorProvider(
 		[]
 	);
 
-	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
-		( path, options = {} ) => {
-			setLocationHistory( ( prevLocationHistory ) => {
-				const { focusTargetSelector, ...restOptions } = options;
-
-				const newLocation = {
-					...restOptions,
-					path,
-					isBack: false,
-					hasRestoredFocus: false,
-				};
-
-				if ( prevLocationHistory.length < 1 ) {
-					return [ newLocation ];
-				}
-
-				return [
-					...prevLocationHistory.slice( 0, -1 ),
-					// Assign `focusTargetSelector` to the previous location in history
-					// (the one we just navigated from).
-					{
-						...prevLocationHistory[
-							prevLocationHistory.length - 1
-						],
-						focusTargetSelector,
-					},
-					newLocation,
-				];
-			} );
-		},
-		[]
-	);
-
 	const goBack: NavigatorContextType[ 'goBack' ] = useCallback( () => {
 		setLocationHistory( ( prevLocationHistory ) => {
 			if ( prevLocationHistory.length <= 1 ) {
@@ -164,6 +142,79 @@ function UnconnectedNavigatorProvider(
 		} );
 	}, [] );
 
+	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
+		( path, options = {} ) => {
+			const {
+				focusTargetSelector,
+				isBack = false,
+				...restOptions
+			} = options;
+
+			const isNavigatingToPreviousPath =
+				isBack &&
+				currentLocationHistory.current.length > 1 &&
+				currentLocationHistory.current[
+					currentLocationHistory.current.length - 2
+				].path === path;
+
+			if ( isNavigatingToPreviousPath ) {
+				goBack();
+				return;
+			}
+
+			setLocationHistory( ( prevLocationHistory ) => {
+				const newLocation = {
+					...restOptions,
+					path,
+					isBack,
+					hasRestoredFocus: false,
+				};
+
+				if ( prevLocationHistory.length < 1 ) {
+					return [ newLocation ];
+				}
+
+				return [
+					...prevLocationHistory.slice(
+						prevLocationHistory.length > MAX_HISTORY_LENGTH - 1
+							? 1
+							: 0,
+						-1
+					),
+					// Assign `focusTargetSelector` to the previous location in history
+					// (the one we just navigated from).
+					{
+						...prevLocationHistory[
+							prevLocationHistory.length - 1
+						],
+						focusTargetSelector,
+					},
+					newLocation,
+				];
+			} );
+		},
+		[ goBack ]
+	);
+
+	const goToParent: NavigatorContextType[ 'goToParent' ] =
+		useCallback( () => {
+			const currentPath =
+				currentLocationHistory.current[
+					currentLocationHistory.current.length - 1
+				].path;
+			if ( currentPath === undefined ) {
+				return;
+			}
+			const parentPath = findParent(
+				currentPath,
+				currentScreens.current
+			);
+			if ( parentPath === undefined ) {
+				return;
+			}
+			goTo( parentPath, { isBack: true } );
+		}, [ goTo ] );
+
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
 			location: {
@@ -174,10 +225,19 @@ function UnconnectedNavigatorProvider(
 			match: matchedPath ? matchedPath.id : undefined,
 			goTo,
 			goBack,
+			goToParent,
 			addScreen,
 			removeScreen,
 		} ),
-		[ locationHistory, matchedPath, goTo, goBack, addScreen, removeScreen ]
+		[
+			locationHistory,
+			matchedPath,
+			goTo,
+			goBack,
+			goToParent,
+			addScreen,
+			removeScreen,
+		]
 	);
 
 	const cx = useCx();

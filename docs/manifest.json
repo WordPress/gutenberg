@@ -714,6 +714,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "CircularOptionPicker",
+		"slug": "circular-option-picker",
+		"markdown_source": "../packages/components/src/circular-option-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ClipboardButton",
 		"slug": "clipboard-button",
 		"markdown_source": "../packages/components/src/clipboard-button/README.md",
@@ -1059,6 +1065,12 @@
 		"title": "NavigatorScreen",
 		"slug": "navigator-screen",
 		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorToParentButton",
+		"slug": "navigator-to-parent-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-to-parent-button/README.md",
 		"parent": "components"
 	},
 	{

@@ -23,6 +23,7 @@ Setting that enables the following UI tools:
 - border: color, radius, style, width
 - color: link
 - dimensions: minHeight
+- position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
 

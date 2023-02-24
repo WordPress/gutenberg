@@ -16,7 +16,7 @@ function ScreenBorder( { name, variation = '' } ) {
 	const variationClassName = getVariationClassName( variation );
 	return (
 		<>
-			<ScreenHeader title={ __( 'Border & Shadow' ) } />
+			<ScreenHeader title={ __( 'Border' ) } />
 			<BlockPreviewPanel name={ name } variation={ variationClassName } />
 			{ hasBorderPanel && (
 				<BorderPanel name={ name } variation={ variation } />

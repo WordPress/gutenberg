@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, useDispatch } from '@wordpress/data';
 import { create, getTextContent } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -68,7 +68,7 @@ export const DocumentOutline = ( {
 	hasOutlineItemsDisabled,
 } ) => {
 	const headings = computeOutlineHeadings( blocks );
-
+	const { selectBlock } = useDispatch( blockEditorStore );
 	if ( headings.length < 1 ) {
 		return null;
 	}
@@ -121,7 +121,10 @@ export const DocumentOutline = ( {
 							isValid={ isValid }
 							isDisabled={ hasOutlineItemsDisabled }
 							href={ `#block-${ item.clientId }` }
-							onSelect={ onSelect }
+							onSelect={ () => {
+								selectBlock( item.clientId );
+								onSelect?.();
+							} }
 						>
 							{ item.isEmpty
 								? emptyHeadingContent

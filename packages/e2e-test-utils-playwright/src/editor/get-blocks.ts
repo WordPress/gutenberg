@@ -12,10 +12,16 @@ import type { Editor } from './index';
  */
 export async function getBlocks( this: Editor ) {
 	return await this.page.evaluate( () => {
+		const blocks = window.wp.data.select( 'core/block-editor' ).getBlocks();
+
 		// The editor might still contain an unmodified empty block even when it's technically "empty".
-		if ( window.wp.data.select( 'core/editor' ).isEditedPostEmpty() ) {
+		if (
+			blocks.length === 1 &&
+			window.wp.blocks.isUnmodifiedDefaultBlock( blocks[ 0 ] )
+		) {
 			return [];
 		}
-		return window.wp.data.select( 'core/block-editor' ).getBlocks();
+
+		return blocks;
 	} );
 }

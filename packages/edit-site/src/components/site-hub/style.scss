@@ -5,11 +5,6 @@
 	gap: $grid-unit-10;
 }
 
-.edit-site-site-hub__edit-button {
-	height: $grid-unit-40;
-	color: $white;
-}
-
 .edit-site-site-hub__post-type {
 	opacity: 0.6;
 }
@@ -18,12 +13,7 @@
 	height: $header-height;
 	width: $header-height + 4px;
 	flex-shrink: 0;
-}
-
-.edit-site-layout.is-edit-mode {
-	.edit-site-site-hub__view-mode-toggle-container {
-		width: $header-height;
-	}
+	background: $gray-900;
 }
 
 .edit-site-site-hub__text-content {

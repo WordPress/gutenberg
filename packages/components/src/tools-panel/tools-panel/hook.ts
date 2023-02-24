@@ -21,6 +21,7 @@ import type {
 	ToolsPanelMenuItems,
 	ToolsPanelMenuItemsConfig,
 	ToolsPanelProps,
+	ResetAllFilter,
 } from '../types';
 
 const DEFAULT_COLUMNS = 2;
@@ -59,8 +60,8 @@ export function useToolsPanel(
 		headingLevel = 2,
 		resetAll,
 		panelId,
-		hasInnerWrapper,
-		shouldRenderPlaceholderItems,
+		hasInnerWrapper = false,
+		shouldRenderPlaceholderItems = false,
 		__experimentalFirstVisibleItemClass,
 		__experimentalLastVisibleItemClass,
 		...otherProps
@@ -81,6 +82,9 @@ export function useToolsPanel(
 
 	// Allow panel items to register themselves.
 	const [ panelItems, setPanelItems ] = useState< ToolsPanelItem[] >( [] );
+	const [ resetAllFilters, setResetAllFilters ] = useState<
+		ResetAllFilter[]
+	>( [] );
 
 	const registerPanelItem = useCallback(
 		( item: ToolsPanelItem ) => {
@@ -121,6 +125,26 @@ export function useToolsPanel(
 			} );
 		},
 		[ setPanelItems ]
+	);
+
+	const registerResetAllFilter = useCallback(
+		( newFilter: ResetAllFilter ) => {
+			setResetAllFilters( ( filters ) => {
+				return [ ...filters, newFilter ];
+			} );
+		},
+		[ setResetAllFilters ]
+	);
+
+	const deregisterResetAllFilter = useCallback(
+		( filterToRemove: ResetAllFilter ) => {
+			setResetAllFilters( ( filters ) => {
+				return filters.filter(
+					( filter ) => filter !== filterToRemove
+				);
+			} );
+		},
+		[ setResetAllFilters ]
 	);
 
 	// Manage and share display state of menu items representing child controls.
@@ -237,16 +261,7 @@ export function useToolsPanel(
 	const resetAllItems = useCallback( () => {
 		if ( typeof resetAll === 'function' ) {
 			isResetting.current = true;
-
-			// Collect available reset filters from panel items.
-			const filters: Array< () => void > = [];
-			panelItems.forEach( ( item ) => {
-				if ( item.resetAllFilter ) {
-					filters.push( item.resetAllFilter );
-				}
-			} );
-
-			resetAll( filters );
+			resetAll( resetAllFilters );
 		}
 
 		// Turn off display of all non-default items.
@@ -255,7 +270,7 @@ export function useToolsPanel(
 			shouldReset: true,
 		} );
 		setMenuItems( resetMenuItems );
-	}, [ panelItems, resetAll, setMenuItems ] );
+	}, [ panelItems, resetAllFilters, resetAll, setMenuItems ] );
 
 	// Assist ItemGroup styling when there are potentially hidden placeholder
 	// items by identifying first & last items that are toggled on for display.
@@ -277,6 +292,7 @@ export function useToolsPanel(
 		() => ( {
 			areAllOptionalControlsHidden,
 			deregisterPanelItem,
+			deregisterResetAllFilter,
 			firstDisplayedItem,
 			flagItemCustomization,
 			hasMenuItems: !! panelItems.length,
@@ -285,6 +301,7 @@ export function useToolsPanel(
 			menuItems,
 			panelId,
 			registerPanelItem,
+			registerResetAllFilter,
 			shouldRenderPlaceholderItems,
 			__experimentalFirstVisibleItemClass,
 			__experimentalLastVisibleItemClass,
@@ -292,12 +309,14 @@ export function useToolsPanel(
 		[
 			areAllOptionalControlsHidden,
 			deregisterPanelItem,
+			deregisterResetAllFilter,
 			firstDisplayedItem,
 			flagItemCustomization,
 			lastDisplayedItem,
 			menuItems,
 			panelId,
 			panelItems,
+			registerResetAllFilter,
 			registerPanelItem,
 			shouldRenderPlaceholderItems,
 			__experimentalFirstVisibleItemClass,

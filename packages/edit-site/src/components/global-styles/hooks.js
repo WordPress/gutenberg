@@ -10,7 +10,7 @@ import a11yPlugin from 'colord/plugins/a11y';
 import { _x } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { store as blocksStore } from '@wordpress/blocks';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 import { unlock } from '../../private-apis';
 import { useSelect } from '@wordpress/data';
 
-const { useGlobalSetting } = unlock( blockEditorExperiments );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );

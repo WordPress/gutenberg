@@ -32,8 +32,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	);
 	return (
 		<SidebarNavigationScreen
-			path="/navigation"
-			parentTitle={ __( 'Design' ) }
 			title={ __( 'Navigation' ) }
 			content={
 				<div className="edit-site-sidebar-navigation-screen-navigation-menus">

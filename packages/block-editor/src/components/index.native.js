@@ -74,6 +74,11 @@ export {
 } from './block-settings';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
+export {
+	getSpacingPresetCssVar,
+	getCustomValueFromPreset,
+	isValueSpacingPreset,
+} from './spacing-sizes-control/utils';
 // Content Related Components.
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
