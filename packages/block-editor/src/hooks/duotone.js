@@ -165,8 +165,8 @@ function DuotonePanel( { attributes, setAttributes } ) {
 				<DuotoneControl
 					duotonePalette={ duotonePalette }
 					colorPalette={ colorPalette }
-					disableCustomDuotone={ disableCustomDuotone }
-					disableCustomColors={ disableCustomColors }
+					disableCustomDuotone={ true }
+					disableCustomColors={ true }
 					value={ duotonePresetOrColors }
 					onChange={ ( newDuotone ) => {
 						const maybePreset = getDuotonePresetFromColors(
