@@ -12,6 +12,8 @@ import { link, more, wordpress } from '@wordpress/icons';
  * Internal dependencies
  */
 import TabPanel from '..';
+import Popover from '../../popover';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta: ComponentMeta< typeof TabPanel > = {
 	title: 'Components/TabPanel',
@@ -63,7 +65,17 @@ DisabledTab.args = {
 	],
 };
 
-export const WithTabIconsAndTooltips = Template.bind( {} );
+const SlotFillTemplate: ComponentStory< typeof TabPanel > = ( props ) => {
+	return (
+		<SlotFillProvider>
+			<TabPanel { ...props } />
+			{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
+			<Popover.Slot />
+		</SlotFillProvider>
+	);
+};
+
+export const WithTabIconsAndTooltips = SlotFillTemplate.bind( {} );
 WithTabIconsAndTooltips.args = {
 	children: ( tab ) => <p>Selected tab: { tab.title }</p>,
 	tabs: [
