@@ -143,6 +143,8 @@ const v4ToV5Supports = {
 	},
 };
 
+// Version with non-rounded background position attribute for focal point.
+// See: https://github.com/WordPress/gutenberg/pull/33915
 const v5 = {
 	attributes: v4ToV5BlockAttributes,
 	supports: v4ToV5Supports,
@@ -255,6 +257,7 @@ const v5 = {
 };
 
 // Version with CSS grid
+// See: https://github.com/WordPress/gutenberg/pull/40806
 const v4 = {
 	attributes: v4ToV5BlockAttributes,
 	supports: v4ToV5Supports,
@@ -350,6 +353,8 @@ const v4 = {
 	},
 };
 
+// Version with ad-hoc color attributes
+// See: https://github.com/WordPress/gutenberg/pull/21169
 const v3 = {
 	attributes: {
 		...baseAttributes,
@@ -496,6 +501,8 @@ const v3 = {
 	},
 };
 
+// Version with stack on mobile off by default
+// See: https://github.com/WordPress/gutenberg/pull/14364
 const v2 = {
 	attributes: {
 		...baseAttributes,
@@ -596,6 +603,8 @@ const v2 = {
 	},
 };
 
+// Version without the wp-image-#### class on image
+// See: https://github.com/WordPress/gutenberg/pull/11922
 const v1 = {
 	attributes: {
 		...baseAttributes,
