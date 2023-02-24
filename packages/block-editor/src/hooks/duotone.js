@@ -316,17 +316,19 @@ const withDuotoneStyles = createHigherOrderComponent(
 		// for all blocks, not just those that support duotone. Code added
 		// above this line should be carefully evaluated for its impact on
 		// performance.
-		if ( ! duotoneSupport || ! duotoneStyle ) {
+		if ( ! duotoneSupport ) {
 			return <BlockListBlock { ...props } />;
 		}
 
 		return (
 			<>
-				<BlockDuotoneStyles
-					name={ props?.name }
-					duotoneStyle={ duotoneStyle }
-					id={ id }
-				/>
+				{ duotoneStyle && (
+					<BlockDuotoneStyles
+						name={ props?.name }
+						duotoneStyle={ duotoneStyle }
+						id={ id }
+					/>
+				) }
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
