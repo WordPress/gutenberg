@@ -60,7 +60,7 @@ export default function PostFeaturedImageEdit( {
 		sizeSlug,
 		rel,
 		linkTarget,
-    title,
+		title,
 	} = attributes;
 
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
