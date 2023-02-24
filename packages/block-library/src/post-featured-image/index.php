@@ -85,7 +85,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$image_caption = '';
 	if ( $caption ) {
 		$image_caption = '<figcaption class="wp-element-caption">' . $caption . '</figcaption>';
-	} else if ( $display_caption ) {
+	} elseif ( $display_caption ) {
 		$image_caption = '<figcaption class="wp-element-caption">' . get_the_post_thumbnail_caption() . '</figcaption>';
 	}
 
