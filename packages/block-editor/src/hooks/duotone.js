@@ -202,12 +202,18 @@ const withDuotoneControls = createHigherOrderComponent(
 			[ props.clientId ]
 		);
 
+		// CAUTION: code added before the early return will be executed
+		// for all blocks, not just those that support duotone. Code added
+		// above this line should be carefully evaluated for its impact on
+		// performance.
+		if ( ! hasDuotoneSupport || isContentLocked ) {
+			return <BlockEdit { ...props } />;
+		}
+
 		return (
 			<>
+				<DuotonePanel { ...props } />
 				<BlockEdit { ...props } />
-				{ hasDuotoneSupport && ! isContentLocked && (
-					<DuotonePanel { ...props } />
-				) }
 			</>
 		);
 	},
