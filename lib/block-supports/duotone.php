@@ -305,7 +305,7 @@ function gutenberg_get_duotone_filter_id( $preset ) {
 }
 
 function gutenberg_get_duotone_preset_value( $preset ) {
-	if( array_key_exists( $preset['slug'], WP_Duotone::$duotone_presets ) ) {
+	if( array_key_exists( $preset['slug'], WP_Duotone::$duotone_output ) ) {
 		return gutenberg_get_duotone_filter_property( $preset );
 	}
 }
@@ -426,55 +426,134 @@ function gutenberg_register_duotone_support( $block_type ) {
 
 class WP_Duotone {
 	/**
-	 * An array of Duotone presets.
-	 *
+	 * An array of Duotone presets from global, theme, and custom styles.
+	 * 
+	 * Example: 
+	 * [
+	 * 		'blue-orange' => 
+	 * 			[
+	 * 				'slug'	=> 'blue-orange',
+	 * 				'colors' => [ '#0000ff', '#ffcc00' ],
+	 * 			]
+	 * 		],
+	 * 		…
+	 * ]
+	 * 
 	 * @since 6.3.0
 	 * @var array
 	 */
 	static $duotone_presets = array();
 
-	static function gutenberg_save_duotone_preset_svgs( $block_content, $block ) {
+	/** 
+	 * An array of block names from global, theme, and custom styles that have duotone presets. We'll use this to quickly
+	 * check if a block being rendered needs to have duotone applied, and which duotone preset to use.
+	 * 
+	 * Example: 
+	 * 	[
+	 *		'core/featured-image' => 'blue-orange',
+	 * 		 …
+	 * 	]
+	 *
+	 */
+	static $duotone_block_names = array();
+	
+	/**
+	 * An array of Duotone SVG and CSS ouput needed for the frontend duotone rendering based on what is
+	 * being ouptput on the page. Organized by a slug of the preset/color group and the information needed
+	 * to generate the SVG and CSS at render.
+	 * 
+	 * Example:
+	 *  [
+     * 		'blue-orange' => [
+     * 			'slug'	=> 'blue-orange',
+     * 			'colors' => [ '#0000ff', '#ffcc00' ],
+     * 		],
+     * 		'wp-duotone-000000-ffffff-2' => [
+     * 			'slug' => 'wp-duotone-000000-ffffff-2',
+     * 			'colors' => [ '#000000', '#ffffff' ],
+     * 		],
+     * ]
+	 * 
+	 * @since 6.3.0
+	 * @var array
+	 */
+	static $duotone_output = array();
+
+
+
+	/**
+	 * Get all possible duotone presets from global and theme styles and store as slug => [ colors array ]
+	 * We only want to process this one time. On block render we'll access and output only the needed presets for that page.
+	 * 
+	 */
+	static function gutenberg_save_duotone_presets() {
+		// Get the per block settings from the theme.json.
+		$tree = WP_Theme_JSON_Resolver::get_merged_data();
+		$settings = $tree->get_settings();
+		$presets_by_origin = _wp_array_get( $settings, array( 'color', 'duotone' ), array() );
+		$flat_presets = [];
+		// Flatten the array
+		foreach( $presets_by_origin as $presets ) {
+			foreach( $presets as $preset ) {
+				// $flat_presets[ _wp_to_kebab_case( $preset['slug'] ) ] = $preset;
+				self::$duotone_presets[ _wp_to_kebab_case( $preset['slug'] ) ] = [
+					'slug'	=> $preset[ 'slug' ],
+					'colors' => $preset[ 'colors' ],
+				];
+			}
+		}
+	}
+
+	static function gutenberg_save_duotone_block_names() {
 		// Get the per block settings from the theme.json.
 		$tree = WP_Theme_JSON_Resolver::get_merged_data();
 		$block_nodes = $tree->get_styles_block_nodes();
+		$theme_json = $tree->get_raw_data();
+		
 
-		// For each of the block settings, if there's a preset then save it
-		$block_metadata = null;
-		foreach( $block_nodes as $node ) {
-			// If the block doesn't support Duotone then skip it.
-			if ( empty( $node['duotone'] ) ) {
+		foreach( $block_nodes as $block_node ) {
+			// This block definition doesn't include any duotone settings. Skip it.
+			if ( empty( $block_node['duotone'] ) ) {
 				continue;
 			}
 
-			if( $node['name'] === $block['blockName'] ) {
-				$block_metadata = $node;
-				break;
-			}
-		};
-		if ( $block_metadata ) {
-			$theme_json = $tree->get_raw_data();
-			// Define the path to the duotone filter.
-			$duotone_filter_path = array_merge( $block_metadata['path'],  array( 'filter', 'duotone' ) );
+			// Value looks like this: 'var(--wp--preset--duotone--blue-orange)'
+			$duotone_filter_path = array_merge( $block_node['path'], array( 'filter', 'duotone' ) );
 			$duotone_filter = _wp_array_get( $theme_json, $duotone_filter_path, array() );
-			$duotone_slug = static::gutenberg_get_duotone_slug_from_preset_css_variable( $duotone_filter );
-			if ( $duotone_slug ) {
-				// Save the preset slug to be used later.
-				WP_Duotone::$duotone_presets[ $duotone_slug ] = true;
+			
+			if( empty( $duotone_filter ) ) {
+				continue;
 			}
-		}
 
-		// Don't change the block content.
-		return $block_content;
+			// If it has a duotone preset, save the block name and the preset slug.
+			self::$duotone_block_names[ $block_node[ 'name' ] ] = self::gutenberg_get_duotone_slug_from_preset_css_variable( $duotone_filter );
+		}
 	}
 
 	static function gutenberg_get_duotone_slug_from_preset_css_variable( $css_variable ) {
 		if ( ! empty( $css_variable ) ) {
 			// Get the preset slug from the filter.
+			// TODO: Support var:preset|duotone|slug syntax.
 			preg_match('/var\(--wp--preset--duotone--(.*)\)/', $css_variable, $matches );
 			if ( $matches[1] ) {
 				return $matches[1];
 			}
 		}
+	}
+
+	/**
+	 * Get all possible duotone presets from global and theme styles. We only want to process this one time. On block render we'll access and output only the needed presets for that page.
+	 * 
+	 */
+	static function gutenberg_identify_used_duotone_blocks( $block_content, $block ) {
+		// If the block name exists in our pre-defined list of block selectors that use duotone in theme.json (or related), add it to our list of duotone to output
+		if( array_key_exists( $block['blockName'], self::$duotone_block_names ) ) {
+			$preset_slug = self::$duotone_block_names[ $block['blockName'] ];
+
+			self::$duotone_output[ $preset_slug ] = self::$duotone_presets[ $preset_slug ];
+		}
+
+		return $block_content;
 	}
 }
 
@@ -573,33 +652,13 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// For *non*-presets then generate an SVG for the filter.
 	// Note: duotone presets are already pre-generated so no need to do this again.
 	if ( $is_duotone_colors_array ) {
-		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_preset );
-
-		add_action(
-			'wp_footer',
-			static function () use ( $filter_svg, $selector ) {
-				echo $filter_svg;
-
-				/*
-				 * Safari renders elements incorrectly on first paint when the
-				 * SVG filter comes after the content that it is filtering, so
-				 * we force a repaint with a WebKit hack which solves the issue.
-				 */
-				global $is_safari;
-				if ( $is_safari ) {
-					/*
-					 * Simply accessing el.offsetHeight flushes layout and style
-					 * changes in WebKit without having to wait for setTimeout.
-					 */
-					printf(
-						'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
-						wp_json_encode( $selector )
-					);
-				}
-			}
-		);
+		WP_Duotone::$duotone_output[ $filter_preset[ 'slug' ] ] = $filter_preset;
 	} else if ( ! $is_duotone_unset ) {
-		WP_Duotone::$duotone_presets[ $filter_preset['slug'] ] = true;
+		WP_Duotone::$duotone_output[ $filter_preset['slug'] ] = WP_Duotone::$duotone_presets[ $filter_preset['slug'] ];
+	}
+
+	if( ! $is_duotone_unset ) {
+		duotone_safari_rerender_hack( $selector );
 	}
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
@@ -626,49 +685,48 @@ add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );
 add_action(
 	'wp_footer',
 	static function () {
-		// Get the presets from the theme.json.
-		$tree = WP_Theme_JSON_Resolver::get_merged_data();
-		$settings = $tree->get_settings();
-		$presets_by_origin = _wp_array_get( $settings, array( 'color', 'duotone' ), array() );
-		$flat_presets = [];
-		// Flatten the array
-		foreach( $presets_by_origin as $presets ) {
-			foreach( $presets as $preset ) {
-				$flat_presets[ _wp_to_kebab_case( $preset['slug'] ) ] = $preset;
-			}
-		}
-
-		foreach( WP_Duotone::$duotone_presets as $preset_slug => $value ) {
+		foreach( WP_Duotone::$duotone_output as $duotone_data ) {
 			// Convert $preset from a slug to an array of colors.
-			$duotone_preset = $flat_presets[ $preset_slug ];
-			$filter_svg = gutenberg_get_duotone_filter_svg( $duotone_preset );
-			$filter_css = gutenberg_get_duotone_filter_property( $duotone_preset );
+			$filter_svg = gutenberg_get_duotone_filter_svg( $duotone_data );
+			$filter_css = gutenberg_get_duotone_filter_property( $duotone_data );
 
 			echo $filter_svg;
 
 			// This is for classic themes - in block themes, the CSS is added in the head via the value_func.
-			$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $preset_slug );
+			$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $duotone_data[ 'slug'] );
 			wp_add_inline_style( 'core-block-supports', 'body{' . $duotone_preset_css_var . ' :' . $filter_css . ';}' );
 
-		}
-
-		/*
-		 * Safari renders elements incorrectly on first paint when the
-		 * SVG filter comes after the content that it is filtering, so
-		 * we force a repaint with a WebKit hack which solves the issue.
-		 */
-		global $is_safari;
-		if ( $is_safari ) {
-			/*
-			 * Simply accessing el.offsetHeight flushes layout and style
-			 * changes in WebKit without having to wait for setTimeout.
-			 */
-			printf(
-				'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
-				wp_json_encode( $selector )
-			);
 		}
 	}
 );
 
-add_filter( 'render_block', array( 'WP_Duotone', 'gutenberg_save_duotone_preset_svgs' ), 10, 2 );
+/**
+ * Safari renders elements incorrectly on first paint when the SVG filter comes after the content that it is filtering,
+ * so we force a repaint with a WebKit hack which solves the issue.
+ *
+ * @param string $selector The selector to apply the hack for.
+ */
+function duotone_safari_rerender_hack( $selector ) {
+	add_action(
+		'wp_footer',
+		static function () use ( $selector ) {
+			global $is_safari;
+		
+			// TODO: Move is_safari check to before the add_action, so we don't add the action unless we're on safari
+			if ( $is_safari ) {
+				/*
+				* Simply accessing el.offsetHeight flushes layout and style
+				* changes in WebKit without having to wait for setTimeout.
+				*/
+				printf(
+					'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
+					wp_json_encode( $selector )
+				);
+			}
+		}
+	);
+}
+
+add_action( 'wp_loaded', array( 'WP_Duotone', 'gutenberg_save_duotone_presets' ), 10 );
+add_action( 'wp_loaded', array( 'WP_Duotone', 'gutenberg_save_duotone_block_names' ), 10 );
+add_filter( 'block_render', array( 'WP_Duotone', 'gutenberg_identify_used_duotone_blocks' ), 10, 2 );
