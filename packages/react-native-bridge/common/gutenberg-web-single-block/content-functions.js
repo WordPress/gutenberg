@@ -76,3 +76,49 @@ window.startObservingGutenberg = () => {
 		window.subscribed = true;
 	}
 };
+
+const editor = document.querySelector( '#editor' );
+
+function _toggleBlockSelectedClass( isBlockSelected ) {
+	if ( isBlockSelected ) {
+		editor.classList.add( 'is-block-selected' );
+	} else {
+		editor.classList.remove( 'is-block-selected' );
+	}
+}
+
+/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
+
+/**
+ * Toggle the `is-block-selected` class on the editor container when a block is
+ * selected. This is used to hide the sidebar toggle button when a block is not
+ * selected.
+ *
+ * @param {WPDataRegistry} registry Data registry.
+ * @return {WPDataRegistry} Modified data registry.
+ */
+function toggleBlockSelectedStyles( registry ) {
+	return {
+		dispatch: ( namespace ) => {
+			const namespaceName =
+				typeof namespace === 'string' ? namespace : namespace.name;
+			const actions = { ...registry.dispatch( namespaceName ) };
+
+			const originalSelectBlockAction = actions.selectBlock;
+			actions.selectBlock = ( ...args ) => {
+				_toggleBlockSelectedClass( true );
+				return originalSelectBlockAction( ...args );
+			};
+
+			const originalClearSelectedBlockAction = actions.clearSelectedBlock;
+			actions.clearSelectedBlock = ( ...args ) => {
+				_toggleBlockSelectedClass( false );
+				return originalClearSelectedBlockAction( ...args );
+			};
+
+			return actions;
+		},
+	};
+}
+
+window.wp.data.use( toggleBlockSelectedStyles );
