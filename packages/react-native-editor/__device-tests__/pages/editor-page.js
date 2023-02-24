@@ -28,7 +28,24 @@ const {
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
 	await isEditorVisible( driver );
-	return new EditorPage( driver );
+	const initialValues = await setupInitialValues( driver );
+	return new EditorPage( driver, initialValues );
+};
+
+const ADD_BLOCK_ID = isAndroid()
+	? 'Add block, Double tap to add a block'
+	: 'Add block';
+
+// Stores initial values from the editor for different helpers.
+const setupInitialValues = async ( driver ) => {
+	const initialValues = {};
+	const addButton = await driver.elementsByAccessibilityId( ADD_BLOCK_ID );
+
+	if ( addButton.length !== 0 ) {
+		initialValues.addButtonLocation = await addButton[ 0 ].getLocation();
+	}
+
+	return initialValues;
 };
 
 class EditorPage {
@@ -39,10 +56,11 @@ class EditorPage {
 	verseBlockName = 'Verse';
 	orderedListButtonName = 'Ordered';
 
-	constructor( driver ) {
+	constructor( driver, initialValues ) {
 		this.driver = driver;
 		this.accessibilityIdKey = 'name';
 		this.accessibilityIdXPathAttrib = 'name';
+		this.initialValues = initialValues;
 
 		if ( isAndroid() ) {
 			this.accessibilityIdXPathAttrib = 'content-desc';
@@ -52,6 +70,13 @@ class EditorPage {
 
 	async getBlockList() {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
+	}
+
+	async getAddBlockButton( options = { timeout: 3000 } ) {
+		return await this.waitForElementToBeDisplayedById(
+			ADD_BLOCK_ID,
+			options.timeout
+		);
 	}
 
 	// ===============================
@@ -180,12 +205,11 @@ class EditorPage {
 			titleElement
 		);
 
-		if (
-			( elements.length === 0 || ! elements[ 0 ].isDisplayed() ) &&
-			options.autoscroll
-		) {
-			await swipeDown( this.driver );
-			return this.getTitleElement( options );
+		if ( elements.length === 0 || ! elements[ 0 ].isDisplayed() ) {
+			if ( options.autoscroll ) {
+				await swipeDown( this.driver );
+			}
+			return await this.getTitleElement( options );
 		}
 		return elements[ 0 ];
 	}
@@ -261,18 +285,40 @@ class EditorPage {
 	}
 
 	async dismissKeyboard() {
+		const orientation = await this.driver.getOrientation();
 		const keyboardShown = await this.driver.isKeyboardShown();
 		if ( ! keyboardShown ) {
 			return;
 		}
-		if ( isAndroid() ) {
+
+		// On Android with the landspace orientation set, we use the
+		// driver functionality to hide the keyboard.
+		if ( isAndroid() && orientation === 'LANDSCAPE' ) {
 			return await this.driver.hideDeviceKeyboard();
 		}
 
-		await clickIfClickable(
-			this.driver,
-			'//XCUIElementTypeButton[@name="Hide keyboard"]'
-		);
+		const hideKeyboardButton = isAndroid()
+			? await this.waitForElementToBeDisplayedById(
+					'Hide keyboard, Tap to hide the keyboard'
+			  )
+			: await this.waitForElementToBeDisplayedByXPath(
+					'//XCUIElementTypeButton[@name="Hide keyboard"]'
+			  );
+
+		await hideKeyboardButton.click();
+		await this.waitForKeyboardToBeHidden();
+	}
+
+	// Takes the add block button as reference for the keyboard to be
+	// fully hidden.
+	async waitForKeyboardToBeHidden() {
+		const { addButtonLocation } = this.initialValues;
+		const addButton = await this.getAddBlockButton();
+		const location = await addButton.getLocation();
+
+		if ( location.y < addButtonLocation?.y ) {
+			await this.waitForKeyboardToBeHidden();
+		}
 	}
 
 	async dismissAndroidClipboardSmartSuggestion() {
@@ -324,13 +370,7 @@ class EditorPage {
 	// =========================
 
 	async addNewBlock( blockName, relativePosition ) {
-		const addBlockElement = isAndroid()
-			? 'Add block, Double tap to add a block'
-			: 'Add block';
-		const addButton = await this.waitForElementToBeDisplayedById(
-			addBlockElement,
-			3000
-		);
+		const addButton = await this.getAddBlockButton();
 
 		if ( relativePosition === 'before' ) {
 			// On Android it doesn't get the right size of the button
@@ -843,13 +883,19 @@ class EditorPage {
 	}
 
 	async waitForElementToBeDisplayedById( id, timeout = 2000 ) {
-		await this.driver.waitForElementByAccessibilityId(
+		return await this.driver.waitForElementByAccessibilityId(
 			id,
 			wd.asserters.isDisplayed,
 			timeout
 		);
+	}
 
-		return await this.driver.elementByAccessibilityId( id );
+	async waitForElementToBeDisplayedByXPath( id, timeout = 2000 ) {
+		return await this.driver.waitForElementByXPath(
+			id,
+			wd.asserters.isDisplayed,
+			timeout
+		);
 	}
 }
 
