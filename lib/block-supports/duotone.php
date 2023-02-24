@@ -628,8 +628,8 @@ function gutenberg_save_duotone_preset_svgs( $block_content, $block ) {
 		if ( empty( $node['duotone'] ) ) {
 			continue;
 		}
-		// TODO: Why do some nodes not have a name?
-		if( ! empty( $node['name'] ) && $node['name'] === $block['blockName'] ) {
+
+		if( $node['name'] === $block['blockName'] ) {
 			$block_metadata = $node;
 			break;
 		}
