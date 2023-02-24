@@ -58,7 +58,7 @@ function DuotonePanel( { name } ) {
 	}
 	return (
 		<>
-			<ToolsPanel label={ __( 'Duotone' ) } headingLevel={ 3 }>
+			<ToolsPanel label={ __( 'Duotone' ) }>
 				<span className="span-columns">
 					{ __(
 						'Create a two-tone color effect without losing your original image.'
