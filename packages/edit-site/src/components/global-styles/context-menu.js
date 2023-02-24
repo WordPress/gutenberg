@@ -31,7 +31,7 @@ import { useMemo } from '@wordpress/element';
 import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
-import { useHasFilterPanel } from './filter-panel';
+import { useHasFilterPanel } from './filter-utils';
 import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
 import { IconWithCurrentColor } from './icon-with-current-color';
