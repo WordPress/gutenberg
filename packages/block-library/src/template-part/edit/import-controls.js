@@ -25,6 +25,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useCreateTemplatePartFromBlocks } from './utils/hooks';
 import { transformWidgetToBlock } from './utils/transformers';
 
+const SIDEBARS_QUERY = {
+	per_page: -1,
+	_fields: 'id,name,description,status,widgets',
+};
+
 export function TemplatePartImportControls( { area, setAttributes } ) {
 	const [ selectedSidebar, setSelectedSidebar ] = useState( '' );
 	const [ isBusy, setIsBusy ] = useState( false );
@@ -34,15 +39,9 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		const { getSidebars, hasFinishedResolution } = select( coreStore );
 
 		return {
-			sidebars: getSidebars( {
-				per_page: -1,
-				_fields: 'id,name,description,status,widgets',
-			} ),
+			sidebars: getSidebars( SIDEBARS_QUERY ),
 			hasResolved: hasFinishedResolution( 'getSidebars', [
-				{
-					per_page: -1,
-					_fields: 'id,name,description,status,widgets',
-				},
+				SIDEBARS_QUERY,
 			] ),
 		};
 	}, [] );
@@ -77,10 +76,10 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		];
 	}, [ sidebars ] );
 
-	// Only bailout from rendering after data is loaded, and there is nothing to import,
+	// Render an empty node while data is loading or when there is nothing to import;
 	// to avoid SlotFill re-positioning issue. See: https://github.com/WordPress/gutenberg/issues/15641.
-	if ( hasResolved && ! options.length ) {
-		return null;
+	if ( ! hasResolved || ( hasResolved && ! options.length ) ) {
+		return <Spacer marginBottom="0" />;
 	}
 
 	async function createFromWidgets( event ) {
