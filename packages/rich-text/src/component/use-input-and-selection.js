@@ -113,7 +113,7 @@ export function useInputAndSelection( props ) {
 
 		/**
 		 * Syncs the selection to local state. A callback for the
-		 * `selectionchange`, `keyup`, `mouseup` and `touchend` events.
+		 * `selectionchange` native events.
 		 *
 		 * @param {Event} event
 		 */
