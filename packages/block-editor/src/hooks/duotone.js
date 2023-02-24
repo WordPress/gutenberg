@@ -306,7 +306,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 			'color.__experimentalDuotone'
 		);
 
-		const id = `wp-duotone-flibble-${ useInstanceId( BlockListBlock ) }`;
+		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
 		const className = duotoneSupport
 			? classnames( props?.className, id )
 			: props?.className;
