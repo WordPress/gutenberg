@@ -115,6 +115,8 @@ export default function useSetting( path ) {
 
 	return useSelect(
 		( select ) => {
+			if ( ! path ) return;
+
 			if ( blockedPaths.includes( path ) ) {
 				// eslint-disable-next-line no-console
 				console.warn(

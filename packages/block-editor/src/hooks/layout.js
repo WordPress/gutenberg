@@ -7,7 +7,11 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	ifCondition,
+	useInstanceId,
+} from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -40,12 +44,23 @@ const layoutBlockSupportKey = '__experimentalLayout';
  * @return { Array } Array of CSS classname strings.
  */
 export function useLayoutClasses( block = {} ) {
-	const rootPaddingAlignment = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalFeatures
-			?.useRootPaddingAwareAlignments;
-	}, [] );
-	const globalLayoutSettings = useSetting( 'layout' ) || {};
+	const hasLayoutBlockSupport = hasBlockSupport(
+		name,
+		layoutBlockSupportKey
+	);
+	const rootPaddingAlignment = useSelect(
+		( select ) => {
+			if ( ! hasLayoutBlockSupport ) return;
+			const { getSettings } = select( blockEditorStore );
+			return getSettings().__experimentalFeatures
+				?.useRootPaddingAwareAlignments;
+		},
+		[ hasLayoutBlockSupport ]
+	);
+	const globalLayoutSettings =
+		useSetting( hasLayoutBlockSupport ? 'layout' : undefined ) || {};
+
+	if ( ! hasLayoutBlockSupport ) return [];
 
 	const { attributes = {}, name } = block;
 	const { layout } = attributes;
@@ -341,6 +356,61 @@ export const withInspectorControls = createHigherOrderComponent(
 	'withInspectorControls'
 );
 
+const ConditionLayoutStyles = ifCondition( ( props ) =>
+	hasBlockSupport( props.name, layoutBlockSupportKey )
+)( ( props ) => {
+	const { name, attributes, id } = props;
+	const disableLayoutStyles = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return !! getSettings().disableLayoutStyles;
+	} );
+	const shouldRenderLayoutStyles = ! disableLayoutStyles;
+	const defaultThemeLayout = useSetting( 'layout' ) || {};
+	const element = useContext( BlockList.__unstableElementContext );
+	const { layout } = attributes;
+	const { default: defaultBlockLayout } =
+		getBlockSupport( name, layoutBlockSupportKey ) || {};
+	const usedLayout =
+		layout?.inherit || layout?.contentSize || layout?.wideSize
+			? { ...layout, type: 'constrained' }
+			: layout || defaultBlockLayout || {};
+	// Higher specificity to override defaults from theme.json.
+	const selector = `.wp-container-${ id }.wp-container-${ id }`;
+	const blockGapSupport = useSetting( 'spacing.blockGap' );
+	const hasBlockGapSupport = blockGapSupport !== null;
+
+	// Get CSS string for the current layout type.
+	// The CSS and `style` element is only output if it is not empty.
+	let css;
+	if ( shouldRenderLayoutStyles ) {
+		const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
+		css = fullLayoutType?.getLayoutStyle?.( {
+			blockName: name,
+			selector,
+			layout: usedLayout,
+			layoutDefinitions: defaultThemeLayout?.definitions,
+			style: attributes?.style,
+			hasBlockGapSupport,
+		} );
+	}
+
+	return (
+		shouldRenderLayoutStyles &&
+		element &&
+		!! css &&
+		createPortal(
+			<LayoutStyle
+				blockName={ name }
+				selector={ selector }
+				css={ css }
+				layout={ usedLayout }
+				style={ attributes?.style }
+			/>,
+			element
+		)
+	);
+} );
+
 /**
  * Override the default block element to add the layout styles.
  *
@@ -350,78 +420,16 @@ export const withInspectorControls = createHigherOrderComponent(
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { name, attributes, block } = props;
-		const hasLayoutBlockSupport = hasBlockSupport(
-			name,
-			layoutBlockSupportKey
-		);
-		const disableLayoutStyles = useSelect( ( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return !! getSettings().disableLayoutStyles;
-		} );
-		const shouldRenderLayoutStyles =
-			hasLayoutBlockSupport && ! disableLayoutStyles;
 		const id = useInstanceId( BlockListBlock );
-		const defaultThemeLayout = useSetting( 'layout' ) || {};
-		const element = useContext( BlockList.__unstableElementContext );
-		const { layout } = attributes;
-		const { default: defaultBlockLayout } =
-			getBlockSupport( name, layoutBlockSupportKey ) || {};
-		const usedLayout =
-			layout?.inherit || layout?.contentSize || layout?.wideSize
-				? { ...layout, type: 'constrained' }
-				: layout || defaultBlockLayout || {};
-		const layoutClasses = hasLayoutBlockSupport
-			? useLayoutClasses( block )
-			: null;
-		// Higher specificity to override defaults from theme.json.
-		const selector = `.wp-container-${ id }.wp-container-${ id }`;
-		const blockGapSupport = useSetting( 'spacing.blockGap' );
-		const hasBlockGapSupport = blockGapSupport !== null;
-
-		// Get CSS string for the current layout type.
-		// The CSS and `style` element is only output if it is not empty.
-		let css;
-		if ( shouldRenderLayoutStyles ) {
-			const fullLayoutType = getLayoutType(
-				usedLayout?.type || 'default'
-			);
-			css = fullLayoutType?.getLayoutStyle?.( {
-				blockName: name,
-				selector,
-				layout: usedLayout,
-				layoutDefinitions: defaultThemeLayout?.definitions,
-				style: attributes?.style,
-				hasBlockGapSupport,
-			} );
-		}
-
-		// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
-		const layoutClassNames = classnames(
-			{
-				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
-			},
-			layoutClasses
-		);
-
 		return (
 			<>
-				{ shouldRenderLayoutStyles &&
-					element &&
-					!! css &&
-					createPortal(
-						<LayoutStyle
-							blockName={ name }
-							selector={ selector }
-							css={ css }
-							layout={ usedLayout }
-							style={ attributes?.style }
-						/>,
-						element
-					) }
+				<ConditionLayoutStyles { ...props } id={ id } />
 				<BlockListBlock
 					{ ...props }
-					__unstableLayoutClassNames={ layoutClassNames }
+					__unstableLayoutClassNames={ classnames(
+						`wp-container-${ id }`,
+						useLayoutClasses( props.block )
+					) }
 				/>
 			</>
 		);
