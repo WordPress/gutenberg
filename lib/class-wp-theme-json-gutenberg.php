@@ -2427,8 +2427,6 @@ class WP_Theme_JSON_Gutenberg {
 			if ( 'filter' === $declaration['name'] ) {
 				unset( $declarations[ $index ] );
 				$declarations_duotone[] = $declaration;
-
-				// TODO:  What if this isn't a preset?
 				$preset_slug = gutenberg_get_duotone_slug_from_preset_css_variable( $declaration['value'] );
 				WP_Duotone::$duotone_presets[ $preset_slug ] = true;
 			}
