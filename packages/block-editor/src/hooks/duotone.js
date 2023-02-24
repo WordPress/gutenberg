@@ -102,12 +102,14 @@ export function getDuotonePresetFromColors( colors, duotonePalette ) {
 
 function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
-	const duotoneStyle = style?.color?.duotone;
+	const duotonePreset = attributes?.duotone;
+	const duotoneColors = style?.color?.duotone;
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
 		defaultSetting: 'color.defaultDuotone',
 	} );
+
 	const colorPalette = useMultiOriginPresets( {
 		presetSetting: 'color.palette',
 		defaultSetting: 'color.defaultPalette',
@@ -121,9 +123,9 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		return null;
 	}
 
-	const duotonePresetOrColors = ! Array.isArray( duotoneStyle )
-		? getColorsFromDuotonePreset( duotoneStyle, duotonePalette )
-		: duotoneStyle;
+	const duotonePresetOrColors = duotonePreset
+		? getColorsFromDuotonePreset( duotonePreset, duotonePalette )
+		: duotoneColors;
 
 	return (
 		<BlockControls group="block" __experimentalShareWithChildBlocks>
@@ -139,14 +141,26 @@ function DuotonePanel( { attributes, setAttributes } ) {
 						duotonePalette
 					);
 
-					const newStyle = {
-						...style,
-						color: {
-							...style?.color,
-							duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
-						},
-					};
-					setAttributes( { style: newStyle } );
+					const newDuotoneAttributes = {};
+
+					if ( maybePreset ) {
+						// Duotone presets are stored in a separate attribute.
+						newDuotoneAttributes.duotone = maybePreset;
+
+						// Todo: should we store the custom colors **as well**
+						// in the style attribute as a fallback?
+					} else {
+						// Custom duotone colors are stored in the style attribute.
+						newDuotoneAttributes.style = {
+							...style,
+							color: {
+								...style?.color,
+								duotone: newDuotone, // custom colors
+							},
+						};
+					}
+
+					setAttributes( newDuotoneAttributes );
 				} }
 			/>
 		</BlockControls>
@@ -175,6 +189,9 @@ function addDuotoneAttributes( settings ) {
 			},
 		} );
 	}
+
+	// Duotone presets are stored in a dedicated attribute.
+	// See https://github.com/WordPress/gutenberg/issues/48371.
 	if ( ! settings.attributes.duotone ) {
 		Object.assign( settings.attributes, {
 			duotone: {
@@ -265,6 +282,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 			props.name,
 			'color.__experimentalDuotone'
 		);
+
 		const duotonePalette = useMultiOriginPresets( {
 			presetSetting: 'color.duotone',
 			defaultSetting: 'color.defaultDuotone',
