@@ -20,7 +20,7 @@ import {
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
 } from '../../utils/template-part-create';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 export default function NewTemplatePart( {
 	postType,
@@ -69,7 +69,7 @@ export default function NewTemplatePart( {
 			// Navigate to the created template part editor.
 			history.push( {
 				postId: templatePart.id,
-				postType: templatePart.type,
+				postType: 'wp_template_part',
 			} );
 
 			// TODO: Add a success notice?

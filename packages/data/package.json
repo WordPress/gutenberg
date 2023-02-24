@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data",
-	"version": "8.3.0",
+	"version": "8.4.0",
 	"description": "Data module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,9 +32,9 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
-		"@wordpress/experiments": "file:../experiments",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/priority-queue": "file:../priority-queue",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/redux-routine": "file:../redux-routine",
 		"deepmerge": "^4.3.0",
 		"equivalent-key-map": "^0.2.2",

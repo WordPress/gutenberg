@@ -98,10 +98,10 @@ export const combineReducers = turboCombineReducers;
  * ```
  *
  * @return {Object} Object containing the store's selectors.
- *
- * @type {(storeNameOrDescriptor: StoreDescriptor|string) => Object}
  */
-export const select = defaultRegistry.select;
+export function select( storeNameOrDescriptor ) {
+	return defaultRegistry.select( storeNameOrDescriptor );
+}
 
 /**
  * Given a store descriptor, returns an object containing the store's selectors pre-bound to state
@@ -156,10 +156,10 @@ export const suspendSelect = defaultRegistry.suspendSelect;
  * dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
  * ```
  * @return {Object} Object containing the action creators.
- *
- * @type {(storeNameOrDescriptor: StoreDescriptor|string) => Object}
  */
-export const dispatch = defaultRegistry.dispatch;
+export function dispatch( storeNameOrDescriptor ) {
+	return defaultRegistry.dispatch( storeNameOrDescriptor );
+}
 
 /**
  * Given a listener function, the function will be called any time the state value

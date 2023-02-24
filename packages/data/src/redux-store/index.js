@@ -15,7 +15,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { builtinControls } from '../controls';
-import { lock } from '../experiments';
+import { lock } from '../private-apis';
 import promise from '../promise-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import createThunkMiddleware from './thunk-middleware';
@@ -30,8 +30,9 @@ import * as metadataActions from './metadata/actions';
  */
 /**
  * @typedef {import('../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
- * @template State,Selectors
+ * @template State
  * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template Selectors
  */
 
 const trimUndefinedValues = ( array ) => {
@@ -117,8 +118,9 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @template State,Selectors
+ * @template State
  * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template Selectors
  * @param {string}                                    key     Unique namespace identifier.
  * @param {ReduxStoreConfig<State,Actions,Selectors>} options Registered store options, with properties
  *                                                            describing reducer, actions, selectors,
