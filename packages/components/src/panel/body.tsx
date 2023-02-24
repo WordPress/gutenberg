@@ -57,7 +57,7 @@ export function UnforwardedPanelBody(
 	};
 
 	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value.
-	const scrollAfterOpenRef = useRef< boolean | undefined >( undefined );
+	const scrollAfterOpenRef = useRef< boolean | undefined >();
 	scrollAfterOpenRef.current = scrollAfterOpen;
 	// Runs after initial render.
 	useUpdateEffect( () => {
