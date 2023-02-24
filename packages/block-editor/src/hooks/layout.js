@@ -326,18 +326,14 @@ export function addAttribute( settings ) {
  * @return {Function} Wrapped component.
  */
 export const withInspectorControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const supportLayout = hasBlockSupport(
-			blockName,
-			layoutBlockSupportKey
-		);
-
-		return [
-			supportLayout && <LayoutPanel key="layout" { ...props } />,
+	( BlockEdit ) => ( props ) =>
+		[
+			props.isSelected &&
+				hasBlockSupport( props.name, layoutBlockSupportKey ) && (
+					<LayoutPanel key="layout" { ...props } />
+				),
 			<BlockEdit key="edit" { ...props } />,
-		];
-	},
+		],
 	'withInspectorControls'
 );
 
