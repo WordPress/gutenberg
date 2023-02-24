@@ -463,7 +463,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// Build a customized CSS filter property for unique slug.
 		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
 	} elseif ( $has_preset_duotone ) {
-		// Handle preset values for duotone iff the preset is set and there is no custom duotone.
+		// Handle preset values for duotone if the preset is set and there is no custom duotone.
 
 		// 1. Slug of an existing Duotone preset - e.g. 'green-blue'.
 		$duotone_attr = $block['attrs']['duotone'];
