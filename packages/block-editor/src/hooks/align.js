@@ -178,6 +178,23 @@ export const withToolbarControls = createHigherOrderComponent(
 	'withToolbarControls'
 );
 
+function BlockListBlockWithAlign( { BlockListBlock, ...props } ) {
+	const { name, attributes } = props;
+	const { align } = attributes;
+	const blockAllowedAlignments = getValidAlignments(
+		getBlockSupport( name, 'align' ),
+		hasBlockSupport( name, 'alignWide', true )
+	);
+	const validAlignments = useAvailableAlignments( blockAllowedAlignments );
+
+	let wrapperProps = props.wrapperProps;
+	if ( validAlignments.some( ( alignment ) => alignment.name === align ) ) {
+		wrapperProps = { ...wrapperProps, 'data-align': align };
+	}
+
+	return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+}
+
 /**
  * Override the default block element to add alignment wrapper props.
  *
@@ -187,30 +204,18 @@ export const withToolbarControls = createHigherOrderComponent(
  */
 export const withDataAlign = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
-		const { align } = attributes;
-		const blockAllowedAlignments = getValidAlignments(
-			getBlockSupport( name, 'align' ),
-			hasBlockSupport( name, 'alignWide', true )
-		);
-		const validAlignments = useAvailableAlignments(
-			blockAllowedAlignments
-		);
-
 		// If an alignment is not assigned, there's no need to go through the
 		// effort to validate or assign its value.
-		if ( align === undefined ) {
+		if ( props.attributes.align === undefined ) {
 			return <BlockListBlock { ...props } />;
 		}
 
-		let wrapperProps = props.wrapperProps;
-		if (
-			validAlignments.some( ( alignment ) => alignment.name === align )
-		) {
-			wrapperProps = { ...wrapperProps, 'data-align': align };
-		}
-
-		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+		return (
+			<BlockListBlockWithAlign
+				{ ...props }
+				BlockListBlock={ BlockListBlock }
+			/>
+		);
 	}
 );
 

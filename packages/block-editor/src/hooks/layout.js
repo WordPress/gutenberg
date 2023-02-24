@@ -339,6 +339,75 @@ export const withInspectorControls = createHigherOrderComponent(
 	'withInspectorControls'
 );
 
+function BlockListBlockWithLayout( { BlockListBlock, ...props } ) {
+	const { name, attributes, block } = props;
+	const disableLayoutStyles = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return !! getSettings().disableLayoutStyles;
+	} );
+	const shouldRenderLayoutStyles = ! disableLayoutStyles;
+	const id = useInstanceId( BlockListBlock );
+	const defaultThemeLayout = useSetting( 'layout' ) || {};
+	const element = useContext( BlockList.__unstableElementContext );
+	const { layout } = attributes;
+	const { default: defaultBlockLayout } =
+		getBlockSupport( name, layoutBlockSupportKey ) || {};
+	const usedLayout =
+		layout?.inherit || layout?.contentSize || layout?.wideSize
+			? { ...layout, type: 'constrained' }
+			: layout || defaultBlockLayout || {};
+	const layoutClasses = useLayoutClasses( block );
+	// Higher specificity to override defaults from theme.json.
+	const selector = `.wp-container-${ id }.wp-container-${ id }`;
+	const blockGapSupport = useSetting( 'spacing.blockGap' );
+	const hasBlockGapSupport = blockGapSupport !== null;
+
+	// Get CSS string for the current layout type.
+	// The CSS and `style` element is only output if it is not empty.
+	let css;
+	if ( shouldRenderLayoutStyles ) {
+		const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
+		css = fullLayoutType?.getLayoutStyle?.( {
+			blockName: name,
+			selector,
+			layout: usedLayout,
+			layoutDefinitions: defaultThemeLayout?.definitions,
+			style: attributes?.style,
+			hasBlockGapSupport,
+		} );
+	}
+
+	// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
+	const layoutClassNames = classnames(
+		{
+			[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+		},
+		layoutClasses
+	);
+
+	return (
+		<>
+			{ shouldRenderLayoutStyles &&
+				element &&
+				!! css &&
+				createPortal(
+					<LayoutStyle
+						blockName={ name }
+						selector={ selector }
+						css={ css }
+						layout={ usedLayout }
+						style={ attributes?.style }
+					/>,
+					element
+				) }
+			<BlockListBlock
+				{ ...props }
+				__unstableLayoutClassNames={ layoutClassNames }
+			/>
+		</>
+	);
+}
+
 /**
  * Override the default block element to add the layout styles.
  *
@@ -348,80 +417,20 @@ export const withInspectorControls = createHigherOrderComponent(
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { name, attributes, block } = props;
 		const hasLayoutBlockSupport = hasBlockSupport(
-			name,
+			props.name,
 			layoutBlockSupportKey
 		);
-		const disableLayoutStyles = useSelect( ( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return !! getSettings().disableLayoutStyles;
-		} );
-		const shouldRenderLayoutStyles =
-			hasLayoutBlockSupport && ! disableLayoutStyles;
-		const id = useInstanceId( BlockListBlock );
-		const defaultThemeLayout = useSetting( 'layout' ) || {};
-		const element = useContext( BlockList.__unstableElementContext );
-		const { layout } = attributes;
-		const { default: defaultBlockLayout } =
-			getBlockSupport( name, layoutBlockSupportKey ) || {};
-		const usedLayout =
-			layout?.inherit || layout?.contentSize || layout?.wideSize
-				? { ...layout, type: 'constrained' }
-				: layout || defaultBlockLayout || {};
-		const layoutClasses = hasLayoutBlockSupport
-			? useLayoutClasses( block )
-			: null;
-		// Higher specificity to override defaults from theme.json.
-		const selector = `.wp-container-${ id }.wp-container-${ id }`;
-		const blockGapSupport = useSetting( 'spacing.blockGap' );
-		const hasBlockGapSupport = blockGapSupport !== null;
 
-		// Get CSS string for the current layout type.
-		// The CSS and `style` element is only output if it is not empty.
-		let css;
-		if ( shouldRenderLayoutStyles ) {
-			const fullLayoutType = getLayoutType(
-				usedLayout?.type || 'default'
-			);
-			css = fullLayoutType?.getLayoutStyle?.( {
-				blockName: name,
-				selector,
-				layout: usedLayout,
-				layoutDefinitions: defaultThemeLayout?.definitions,
-				style: attributes?.style,
-				hasBlockGapSupport,
-			} );
+		if ( ! hasLayoutBlockSupport ) {
+			return <BlockListBlock { ...props } />;
 		}
 
-		// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
-		const layoutClassNames = classnames(
-			{
-				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
-			},
-			layoutClasses
-		);
-
 		return (
-			<>
-				{ shouldRenderLayoutStyles &&
-					element &&
-					!! css &&
-					createPortal(
-						<LayoutStyle
-							blockName={ name }
-							selector={ selector }
-							css={ css }
-							layout={ usedLayout }
-							style={ attributes?.style }
-						/>,
-						element
-					) }
-				<BlockListBlock
-					{ ...props }
-					__unstableLayoutClassNames={ layoutClassNames }
-				/>
-			</>
+			<BlockListBlockWithLayout
+				BlockListBlock={ BlockListBlock }
+				{ ...props }
+			/>
 		);
 	}
 );
