@@ -1,0 +1,97 @@
+diff --git a/packages/block-editor/src/components/list-view/block-select-button.js b/packages/block-editor/src/components/list-view/block-select-button.js
+index 39baf78d5a..eb6ff4f513 100644
+--- a/packages/block-editor/src/components/list-view/block-select-button.js
++++ b/packages/block-editor/src/components/list-view/block-select-button.js
+@@ -35,6 +35,7 @@ function ListViewBlockSelectButton(
+ 		onDragStart,
+ 		onDragEnd,
+ 		draggable,
++		...props
+ 	},
+ 	ref
+ ) {
+@@ -76,7 +77,7 @@ function ListViewBlockSelectButton(
+ 				onDragEnd={ onDragEnd }
+ 				draggable={ draggable }
+ 				href={ `#block-${ clientId }` }
+-				aria-hidden={ true }
++				{ ...props }
+ 			>
+ 				<ListViewExpander onClick={ onToggleExpanded } />
+ 				<BlockIcon icon={ blockInformation?.icon } showColors />
+diff --git a/packages/block-editor/src/components/list-view/block.js b/packages/block-editor/src/components/list-view/block.js
+index bf024b1fb7..a0951b2020 100644
+--- a/packages/block-editor/src/components/list-view/block.js
++++ b/packages/block-editor/src/components/list-view/block.js
+@@ -54,7 +54,6 @@ function ListViewBlock( {
+ 	path,
+ 	isExpanded,
+ 	selectedClientIds,
+-	preventAnnouncement,
+ 	isSyncedBranch,
+ } ) {
+ 	const cellRef = useRef( null );
+@@ -112,21 +111,13 @@ function ListViewBlock( {
+ 		level
+ 	);
+ 
+-	let blockAriaLabel = __( 'Link' );
+-	if ( blockInformation ) {
+-		blockAriaLabel = isLocked
+-			? sprintf(
+-					// translators: %s: The title of the block. This string indicates a link to select the locked block.
+-					__( '%s link (locked)' ),
+-					blockInformation.title
+-			  )
+-			: sprintf(
+-					// translators: %s: The title of the block. This string indicates a link to select the block.
+-					__( '%s link' ),
+-					blockInformation.title
+-			  );
+-	}
+-
++	const blockAriaLabel = isLocked
++		? sprintf(
++				// translators: %s: The title of the block. This string indicates a link to select the locked block.
++				__( '%s link (locked)' ),
++				blockInformation.title
++		  )
++		: blockInformation.title;
+ 	const settingsAriaLabel = blockInformation
+ 		? sprintf(
+ 				// translators: %s: The title of the block.
+@@ -252,10 +243,6 @@ function ListViewBlock( {
+ 				className="block-editor-list-view-block__contents-cell"
+ 				colSpan={ colSpan }
+ 				ref={ cellRef }
+-				aria-label={ blockAriaLabel }
+-				aria-selected={ !! isSelected || forceSelectionContentLock }
+-				aria-expanded={ canExpand ? isExpanded : undefined }
+-				aria-describedby={ descriptionId }
+ 			>
+ 				{ ( { ref, tabIndex, onFocus } ) => (
+ 					<div className="block-editor-list-view-block__contents-container">
+@@ -272,7 +259,9 @@ function ListViewBlock( {
+ 							onFocus={ onFocus }
+ 							isExpanded={ isExpanded }
+ 							selectedClientIds={ selectedClientIds }
+-							preventAnnouncement={ preventAnnouncement }
++							aria-label={ blockAriaLabel }
++							aria-expanded={ canExpand ? isExpanded : undefined }
++							aria-describedby={ descriptionId }
+ 						/>
+ 						<div
+ 							className="block-editor-list-view-block-select-button__description"
+diff --git a/packages/block-editor/src/components/list-view/use-block-selection.js b/packages/block-editor/src/components/list-view/use-block-selection.js
+index 59aaaeacb0..4d410d6d39 100644
+--- a/packages/block-editor/src/components/list-view/use-block-selection.js
++++ b/packages/block-editor/src/components/list-view/use-block-selection.js
+@@ -145,7 +145,7 @@ export default function useBlockSelection() {
+ 			}
+ 
+ 			if ( label ) {
+-				speak( label );
++				speak( label, 'assertive' );
+ 			}
+ 		},
+ 		[
