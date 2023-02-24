@@ -179,7 +179,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
       <button
         aria-expanded="false"
         aria-haspopup="true"
-        aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
+        aria-label="Custom color picker. The currently selected color is called "red" and has a value of "f00"."
         class="components-flex components-color-palette__custom-color emotion-2 emotion-1"
         data-wp-c16t="true"
         data-wp-component="Flex"
