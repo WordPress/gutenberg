@@ -163,6 +163,26 @@ export default function PostFeaturedImageEdit( {
 		},
 	];
 
+	const MediaLibraryCaptionControls = () => {
+		return (
+			<ToolbarButton
+				onClick={ () => {
+					setAttributes( {
+						displayCaption: !! displayCaption ? false : true,
+						caption: undefined,
+					} );
+				} }
+				icon={ captionIcon }
+				isPressed={ displayCaption }
+				label={
+					!! displayCaption
+						? __( 'Hide Media Library caption' )
+						: __( 'Show Media Library caption' )
+				}
+			/>
+		);
+	};
+
 	const imageSizes = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().imageSizes,
 		[]
@@ -238,23 +258,7 @@ export default function PostFeaturedImageEdit( {
 					/>
 				) }
 				{ mediaLibraryCaption && isDescendentOfQueryLoop && (
-					<ToolbarButton
-						onClick={ () => {
-							setAttributes( {
-								displayCaption: !! displayCaption
-									? false
-									: true,
-								caption: undefined,
-							} );
-						} }
-						icon={ captionIcon }
-						isPressed={ displayCaption }
-						label={
-							!! displayCaption
-								? __( 'Hide Media Library caption' )
-								: __( 'Show Media Library caption' )
-						}
-					/>
+					<MediaLibraryCaptionControls />
 				) }
 			</BlockControls>
 			<DimensionControls
@@ -334,25 +338,9 @@ export default function PostFeaturedImageEdit( {
 		return (
 			<>
 				<BlockControls group="block">
-					<ToolbarButton
-						onClick={ () => {
-							setAttributes( {
-								displayCaption: !! displayCaption
-									? false
-									: true,
-								caption: undefined,
-							} );
-						} }
-						icon={ captionIcon }
-						isPressed={ displayCaption }
-						label={
-							!! displayCaption
-								? __( 'Hide Media Library caption' )
-								: __( 'Show Media Library caption' )
-						}
-					/>
+					<MediaLibraryCaptionControls />
 				</BlockControls>
-        <DimensionControls
+				<DimensionControls
 					clientId={ clientId }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
@@ -446,6 +434,7 @@ export default function PostFeaturedImageEdit( {
 	 * - Is not inside a query loop
 	 * Then display the image and the image replacement option.
 	 */
+
 	return (
 		<>
 			{ controls }
