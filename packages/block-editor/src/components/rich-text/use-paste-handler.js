@@ -9,6 +9,8 @@ import {
 	findTransform,
 	getBlockTransforms,
 	htmlToBlocks,
+	hasBlockSupport,
+	getBlockInnerHTML,
 } from '@wordpress/blocks';
 import {
 	isEmpty,
@@ -43,6 +45,15 @@ function adjustLines( value, isMultiline ) {
 	}
 
 	return replace( value, new RegExp( LINE_SEPARATOR, 'g' ), '\n' );
+}
+
+function maybeInline( blocks, mode ) {
+	if ( mode !== 'AUTO' ) return blocks;
+	if ( blocks.length !== 1 ) return blocks;
+	const [ block ] = blocks;
+	if ( ! hasBlockSupport( block.name, '__unstablePasteTextInline', false ) )
+		return blocks;
+	return getBlockInnerHTML( block );
 }
 
 export function usePasteHandler( props ) {
@@ -215,7 +226,7 @@ export function usePasteHandler( props ) {
 			// pasted content and remove inline styles.
 			const isInternal = !! clipboardData.getData( 'rich-text' );
 			const content = isInternal
-				? htmlToBlocks( html )
+				? maybeInline( htmlToBlocks( html ), mode )
 				: pasteHandler( {
 						HTML: html,
 						plainText,
