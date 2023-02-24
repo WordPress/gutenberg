@@ -212,8 +212,8 @@ export const withDataAlign = createHigherOrderComponent(
 
 		return (
 			<BlockListBlockWithAlign
-				{ ...props }
 				BlockListBlock={ BlockListBlock }
+				{ ...props }
 			/>
 		);
 	}
