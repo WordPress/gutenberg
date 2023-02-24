@@ -233,7 +233,7 @@ function ListViewBlock( {
 
 	// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
 	const currentlyEditingBlockInCanvas =
-		isSelected && selectedClientIds.lenth === 1;
+		isSelected && selectedClientIds.length === 1;
 
 	return (
 		<ListViewLeaf
