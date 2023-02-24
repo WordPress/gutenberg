@@ -206,13 +206,13 @@ const withDuotoneControls = createHigherOrderComponent(
 		// for all blocks, not just those that support duotone. Code added
 		// above this line should be carefully evaluated for its impact on
 		// performance.
-		if ( ! hasDuotoneSupport || isContentLocked ) {
+		if ( ! hasDuotoneSupport ) {
 			return <BlockEdit { ...props } />;
 		}
 
 		return (
 			<>
-				<DuotonePanel { ...props } />
+				{ ! isContentLocked && <DuotonePanel { ...props } /> }
 				<BlockEdit { ...props } />
 			</>
 		);
