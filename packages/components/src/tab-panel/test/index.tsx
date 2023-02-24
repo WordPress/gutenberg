@@ -13,6 +13,8 @@ import { wordpress, category, media } from '@wordpress/icons';
  * Internal dependencies
  */
 import TabPanel from '..';
+import Popover from '../../popover';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 
 const TABS = [
 	{
@@ -104,10 +106,17 @@ describe.each( [
 			];
 
 			render(
-				<Component
-					tabs={ TABS_WITH_ICON }
-					children={ panelRenderFunction }
-				/>
+				// In order for the tooltip to display properly, there needs to be
+				// `Popover.Slot` in which the `Popover` renders outside of the
+				// `TabPanel` component, otherwise the tooltip renders inline.
+				<SlotFillProvider>
+					<Component
+						tabs={ TABS_WITH_ICON }
+						children={ panelRenderFunction }
+					/>
+					{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
+					<Popover.Slot />
+				</SlotFillProvider>
 			);
 
 			const allTabs = screen.getAllByRole( 'tab' );
@@ -127,6 +136,74 @@ describe.each( [
 
 				await user.unhover( allTabs[ i ] );
 			}
+		} );
+
+		test( 'should display a tooltip when moving the selection via the keyboard on tabs provided with an icon', async () => {
+			const user = userEvent.setup();
+
+			const mockOnSelect = jest.fn();
+			const panelRenderFunction = jest.fn();
+
+			const TABS_WITH_ICON = [
+				{ ...TABS[ 0 ], icon: wordpress },
+				{ ...TABS[ 1 ], icon: category },
+				{ ...TABS[ 2 ], icon: media },
+			];
+
+			render(
+				// In order for the tooltip to display properly, there needs to be
+				// `Popover.Slot` in which the `Popover` renders outside of the
+				// `TabPanel` component, otherwise the tooltip renders inline.
+				<SlotFillProvider>
+					<Component
+						tabs={ TABS_WITH_ICON }
+						children={ panelRenderFunction }
+						onSelect={ mockOnSelect }
+					/>
+					{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
+					<Popover.Slot />
+				</SlotFillProvider>
+			);
+
+			expect( getSelectedTab() ).not.toHaveTextContent( 'Alpha' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+			await expect( getSelectedTab() ).not.toHaveFocus();
+
+			// Tab to focus the tablist. Make sure alpha is focused, and that the
+			// corresponding tooltip is shown.
+			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
+			await user.keyboard( '[Tab]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Move selection with arrow keys. Make sure beta is focused, and that
+			// the corresponding tooltip is shown.
+			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
+			await user.keyboard( '[ArrowRight]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Move selection with arrow keys. Make sure gamma is focused, and that
+			// the corresponding tooltip is shown.
+			expect( screen.queryByText( 'Gamma' ) ).not.toBeInTheDocument();
+			await user.keyboard( '[ArrowRight]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+			expect( screen.getByText( 'Gamma' ) ).toBeInTheDocument();
+			await expect( getSelectedTab() ).toHaveFocus();
+
+			// Move selection with arrow keys. Make sure beta is focused, and that
+			// the corresponding tooltip is shown.
+			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
+			await user.keyboard( '[ArrowLeft]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+			await expect( getSelectedTab() ).toHaveFocus();
 		} );
 	} );
 
