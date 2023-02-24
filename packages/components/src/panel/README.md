@@ -77,20 +77,20 @@ const MyPanel = () => (
 
 ##### Props
 
-###### header:`string`
+###### `header`: `string`
 
 The text that will be rendered as the title of the panel. Text will be rendered inside an
 `<h2>` tag.
 
 -   Required: No
 
-###### className: `string`
+###### `className`: `string`
 
 The CSS class to apply to the wrapper element.
 
 -   Required: No
 
-###### children: `React.ReactNode`
+###### `children`: `React.ReactNode`
 
 The content to display within the panel row.
 
@@ -104,32 +104,32 @@ The `PanelBody` creates a collapsible container that can be toggled open or clos
 
 ##### Props
 
-###### title: `string`
+###### `title`: `string`
 
 Title text. It shows even when it is closed.
 
 -   Required: No
 
-###### opened: `boolean`
+###### `opened`: `boolean`
 
 When set to `true`, the component will remain open regardless of the `initialOpen` prop and the
 panel will be prevented from being closed.
 
 -   Required: No
 
-###### className: `string`
+###### `className`: `string`
 
 The CSS class to apply to the wrapper element.
 
 -   Required: No
 
-###### icon: `JSX.Element`
+###### `icon`: `JSX.Element`
 
 An icon to be shown next to the title.
 
 -   Required: No
 
-###### onToggle: `( next: boolean ) => void;`
+###### `onToggle`: `( next: boolean ) => void;`
 
 A function that is called any time the component is toggled from its closed state to its
 opened state, or vice versa.
@@ -137,28 +137,27 @@ opened state, or vice versa.
 -   Required: No
 -   Default: `noop`
 
-###### initialOpen: `boolean`
+###### `initialOpen`: `boolean`
 
 Whether or not the panel will start open.
 
 -   Required: No
 -   Default: `true`
 
-###### children: `| React.ReactNode | ( ( props: { opened: boolean } ) => React.ReactNode )`
+###### `children`: `| React.ReactNode | ( ( props: { opened: boolean } ) => React.ReactNode )`
 
-The content to display in the `PanelBody`.If a function is provided for this prop, it will
-receive an object with the `opened` prop as an argument.
+The content to display in the `PanelBody`. If a function is provided for this prop, it will receive an object with the `opened` prop as an argument.
 
 -   Required: No
 
-###### buttonProps: `WordPressComponentProps<Omit< ButtonAsButtonProps, 'icon' >, 'button', false>`
+###### `buttonProps`: `WordPressComponentProps<Omit< ButtonAsButtonProps, 'icon' >, 'button', false>`
 
 Props that are passed to the `Button` component in title within the `PanelBody`.
 
 -   Required: No
 -   Default: `{}`
 
-###### scrollAfterOpen: `boolean`
+###### `scrollAfterOpen`: `boolean`
 
 Scrolls the content into view when visible. This improves the UX when multiple `PanelBody`
 components are stacked in a scrollable container.
@@ -174,13 +173,13 @@ components are stacked in a scrollable container.
 
 ##### Props
 
-###### className: `string`
+###### `className`: `string`
 
 The CSS class to apply to the wrapper element.
 
 -   Required: No
 
-###### children: `React.ReactNode`
+###### `children`: `React.ReactNode`
 
 The content to display within the panel row.
 
@@ -200,13 +199,13 @@ PanelRow accepts a forwarded ref that will be added to the wrapper div. Usage:
 
 ##### Props
 
-###### label: `string`
+###### `label`: `string`
 
 The text that will be rendered as the title of the `Panel`. Will be rendered in an `<h2>` tag.
 
 -   Required: No
 
-###### children: `React.ReactNode`
+###### `children`: `React.ReactNode`
 
 The content to display within the panel row.
 
