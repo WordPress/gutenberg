@@ -304,6 +304,12 @@ function gutenberg_get_duotone_filter_id( $preset ) {
 	return 'wp-duotone-' . $preset['slug'];
 }
 
+function gutenberg_get_duotone_preset_value( $preset ) {
+	if( array_key_exists( $preset['slug'], WP_Duotone::$duotone_presets ) ) {
+		return gutenberg_get_duotone_filter_property( $preset );
+	}
+}
+
 /**
  * Returns the CSS filter property url to reference the rendered SVG.
  *
@@ -311,10 +317,8 @@ function gutenberg_get_duotone_filter_id( $preset ) {
  * @return string        Duotone CSS filter property url value.
  */
 function gutenberg_get_duotone_filter_property( $preset ) {
-	if( array_key_exists( $preset['slug'], WP_Duotone::$duotone_presets ) ) {
-		$filter_id = gutenberg_get_duotone_filter_id( $preset );
-		return "url('#" . $filter_id . "')";
-	}
+	$filter_id = gutenberg_get_duotone_filter_id( $preset );
+	return "url('#" . $filter_id . "')";
 }
 
 /**
