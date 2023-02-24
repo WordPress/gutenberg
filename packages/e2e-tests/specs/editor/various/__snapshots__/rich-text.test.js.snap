@@ -136,17 +136,17 @@ exports[`RichText should paste paragraph contents into list 1`] = `
 
 exports[`RichText should preserve internal formatting 1`] = `
 "<!-- wp:paragraph -->
-<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-gray-color\\">1</mark></p>
+<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`RichText should preserve internal formatting 2`] = `
 "<!-- wp:paragraph -->
-<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-gray-color\\">1</mark></p>
+<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-gray-color\\">1</mark></p>
+<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
 <!-- /wp:paragraph -->"
 `;
 
