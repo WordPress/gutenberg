@@ -450,15 +450,16 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	$is_duotone_colors_array = is_array( $duotone_attr );
 	$is_duotone_unset        = 'unset' === $duotone_attr;
-	$is_duotone_preset       = ! $is_duotone_colors_array && ! $is_duotone_unset;
+	$is_duotone_preset       = ! $is_duotone_colors_array && strpos( $duotone_attr, 'var:preset|duotone|' ) === 0;
 
 	if ( $is_duotone_preset ) {
+		$slug = str_replace( 'var:preset|duotone|', '', $duotone_attr );
 		$filter_preset = array(
-			'slug' => $duotone_attr,
+			'slug' => $slug,
 		);
 
 		// Utilise existing CSS custom property.
-		$filter_property = "var(--wp--preset--duotone--$duotone_attr)";
+		$filter_property = "var(--wp--preset--duotone--$slug)";
 	} else {
 		// Handle when Duotone is either:
 		// - "unset"
