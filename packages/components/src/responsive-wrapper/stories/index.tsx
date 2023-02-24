@@ -36,3 +36,15 @@ Default.args = {
 		/>
 	),
 };
+
+export const SVGImage = Template.bind( {} );
+SVGImage.args = {
+	naturalWidth: undefined,
+	naturalHeight: undefined,
+	children: (
+		<img
+			src="https://stp-cdn.lottiefiles.com/wordpress_seeklogo_com_75e7d26fcb.svg"
+			alt="WordPress"
+		/>
+	),
+};
