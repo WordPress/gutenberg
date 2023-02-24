@@ -327,7 +327,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         mWebView.evaluateJavascript(injectCssScript, message -> {
             if (message != null) {
                 String editorStyle = getFileContentFromAssets("gutenberg-web-single-block/editor-style-overrides.css");
-                editorStyle = removeWhiteSpace(removeNewLines(editorStyle));
+                editorStyle = removeNewLines(editorStyle);
                 evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, editorStyle));
 
                 String injectWPBarsCssScript = getFileContentFromAssets("gutenberg-web-single-block/wp-bar-override.css");
