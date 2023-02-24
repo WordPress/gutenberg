@@ -25,16 +25,25 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useCreateTemplatePartFromBlocks } from './utils/hooks';
 import { transformWidgetToBlock } from './utils/transformers';
 
+const SIDEBARS_QUERY = {
+	per_page: -1,
+	_fields: 'id,name,description,status,widgets',
+};
+
 export function TemplatePartImportControls( { area, setAttributes } ) {
 	const [ selectedSidebar, setSelectedSidebar ] = useState( '' );
 	const [ isBusy, setIsBusy ] = useState( false );
 
 	const registry = useRegistry();
-	const sidebars = useSelect( ( select ) => {
-		return select( coreStore ).getSidebars( {
-			per_page: -1,
-			_fields: 'id,name,description,status,widgets',
-		} );
+	const { sidebars, hasResolved } = useSelect( ( select ) => {
+		const { getSidebars, hasFinishedResolution } = select( coreStore );
+
+		return {
+			sidebars: getSidebars( SIDEBARS_QUERY ),
+			hasResolved: hasFinishedResolution( 'getSidebars', [
+				SIDEBARS_QUERY,
+			] ),
+		};
 	}, [] );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -66,6 +75,16 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 			...sidebarOptions,
 		];
 	}, [ sidebars ] );
+
+	// Render an empty node while data is loading to avoid SlotFill re-positioning bug.
+	// See: https://github.com/WordPress/gutenberg/issues/15641.
+	if ( ! hasResolved ) {
+		return <Spacer marginBottom="0" />;
+	}
+
+	if ( hasResolved && ! options.length ) {
+		return null;
+	}
 
 	async function createFromWidgets( event ) {
 		event.preventDefault();

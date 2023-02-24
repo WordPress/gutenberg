@@ -182,6 +182,9 @@ test.describe( 'List (@firefox)', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '* ' );
 		await expect( page.locator( '[data-type="core/list"]' ) ).toBeVisible();
+		// Wait until the automatic change is marked as "final", which is done
+		// with an idle callback, see __unstableMarkAutomaticChange.
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );

@@ -744,7 +744,7 @@ Describe in a few words what the site is about. The tagline can be used in searc
 -	**Name:** core/site-tagline
 -	**Category:** theme
 -	**Supports:** align (full, wide), anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** placeholder, textAlign
+-	**Attributes:** textAlign
 
 ## Site Title
 

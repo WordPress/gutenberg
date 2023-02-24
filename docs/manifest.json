@@ -714,6 +714,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "CircularOptionPicker",
+		"slug": "circular-option-picker",
+		"markdown_source": "../packages/components/src/circular-option-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ClipboardButton",
 		"slug": "clipboard-button",
 		"markdown_source": "../packages/components/src/clipboard-button/README.md",
