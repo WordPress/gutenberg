@@ -17,7 +17,7 @@ import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 import Subtitle from './subtitle';
 
-export function ScreenVariations( { name, path } ) {
+export function ScreenVariations( { name, path = '' } ) {
 	const hasVariationsPanel = useHasVariationsPanel( name, path );
 	const blockTitle = useSelect(
 		( select ) => select( blocksStore ).getBlockType( name ).title,
