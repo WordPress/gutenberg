@@ -290,17 +290,20 @@ const withDuotoneStyles = createHigherOrderComponent(
 
 		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
 
-		let colors = props?.attributes?.style?.color?.duotone;
+		const duotoneColors = props?.attributes?.style?.color?.duotone;
+		const duotonePreset = props?.attributes?.duotone;
 
-		if ( ! Array.isArray( colors ) ) {
-			const duotone = duotonePalette.find( ( dt ) => dt.slug === colors );
+		// Default to custom colors.
+		let duotoneValue = duotoneColors;
 
-			if ( duotone ) {
-				colors = duotone.colors;
-			}
+		// If a duotone preset is set, get the colors from the palette.
+		if ( duotonePreset ) {
+			duotoneValue = // preset may not exist so conditionally set.
+				getColorsFromDuotonePreset( duotonePreset, duotonePalette ) ??
+				duotoneColors;
 		}
 
-		if ( ! duotoneSupport || ! colors ) {
+		if ( ! duotoneSupport || ! duotoneValue ) {
 			return <BlockListBlock { ...props } />;
 		}
 
@@ -323,7 +326,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 						<InlineDuotone
 							selector={ selectorsGroup }
 							id={ id }
-							colors={ colors }
+							colors={ duotoneValue }
 						/>,
 						element
 					) }
