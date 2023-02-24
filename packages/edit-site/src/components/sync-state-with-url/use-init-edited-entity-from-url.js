@@ -13,7 +13,7 @@ import { store as editSiteStore } from '../../store';
 
 export default function useInitEditedEntityFromURL() {
 	const { params: { postId, postType } = {} } = useLocation();
-	const { isRequestingSite, homepageId } = useSelect( ( select ) => {
+	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
 		const { getSite } = select( coreDataStore );
 		const siteData = getSite();
 
@@ -23,6 +23,7 @@ export default function useInitEditedEntityFromURL() {
 				siteData?.show_on_front === 'page'
 					? siteData.page_on_front
 					: null,
+			url: siteData?.url,
 		};
 	}, [] );
 
@@ -60,10 +61,11 @@ export default function useInitEditedEntityFromURL() {
 			} );
 		} else if ( ! isRequestingSite ) {
 			setPage( {
-				path: '/',
+				path: url,
 			} );
 		}
 	}, [
+		url,
 		postId,
 		postType,
 		homepageId,
