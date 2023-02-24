@@ -231,6 +231,10 @@ function ListViewBlock( {
 		selectedClientIds,
 	} );
 
+	// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
+	const currentlyEditingBlockInCanvas =
+		isSelected && selectedClientIds.lenth === 1;
+
 	return (
 		<ListViewLeaf
 			className={ classes }
@@ -268,7 +272,9 @@ function ListViewBlock( {
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
 							ref={ ref }
-							tabIndex={ !! isSelected ? 0 : tabIndex }
+							tabIndex={
+								currentlyEditingBlockInCanvas ? 0 : tabIndex
+							}
 							onFocus={ onFocus }
 							isExpanded={ isExpanded }
 							selectedClientIds={ selectedClientIds }
@@ -295,7 +301,7 @@ function ListViewBlock( {
 									orientation="vertical"
 									clientIds={ [ clientId ] }
 									ref={ ref }
-									tabIndex={ !! isSelected ? 0 : tabIndex }
+									tabIndex={ tabIndex }
 									onFocus={ onFocus }
 								/>
 							) }
@@ -306,7 +312,7 @@ function ListViewBlock( {
 									orientation="vertical"
 									clientIds={ [ clientId ] }
 									ref={ ref }
-									tabIndex={ !! isSelected ? 0 : tabIndex }
+									tabIndex={ tabIndex }
 									onFocus={ onFocus }
 								/>
 							) }
@@ -328,7 +334,7 @@ function ListViewBlock( {
 							toggleProps={ {
 								ref,
 								className: 'block-editor-list-view-block__menu',
-								tabIndex: !! isSelected ? 0 : tabIndex,
+								tabIndex,
 								onFocus,
 							} }
 							disableOpenOnArrowDown
