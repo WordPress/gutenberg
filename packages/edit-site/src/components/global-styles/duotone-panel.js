@@ -38,7 +38,7 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 	);
 }
 
-function ScreenDuotone( { name } ) {
+function DuotonePanel( { name } ) {
 	const [ themeDuotone, setThemeDuotone ] = useGlobalStyle(
 		'filter.duotone',
 		name
@@ -79,4 +79,4 @@ function ScreenDuotone( { name } ) {
 	);
 }
 
-export default ScreenDuotone;
+export default DuotonePanel;
