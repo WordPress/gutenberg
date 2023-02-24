@@ -467,7 +467,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 		// 1. Slug of an existing Duotone preset - e.g. 'green-blue'.
 		$duotone_attr = $block['attrs']['duotone'];
-		$filter_data    = array(
+		$filter_data  = array(
 			'slug' => $duotone_attr,
 		);
 
