@@ -480,8 +480,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$filter_id = gutenberg_get_duotone_filter_id( $filter_data );
 
 	// Build the CSS selectors to which the filter will be applied.
-	$scope = '.' . $filter_id;
-	$selector = WP_Theme_JSON_Gutenberg::scope_selector( $scope, $duotone_support );
+	$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_support );
 
 	// Calling gutenberg_style_engine_get_stylesheet_from_css_rules ensures that
 	// the styles are rendered in an inline for block supports because we're
