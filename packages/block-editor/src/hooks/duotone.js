@@ -23,6 +23,7 @@ import { useSelect } from '@wordpress/data';
  */
 import {
 	BlockControls,
+	InspectorControls,
 	__experimentalDuotoneControl as DuotoneControl,
 	useSetting,
 } from '../components';
@@ -132,30 +133,59 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		: duotoneStyle;
 
 	return (
-		<BlockControls group="block" __experimentalShareWithChildBlocks>
-			<DuotoneControl
-				duotonePalette={ duotonePalette }
-				colorPalette={ colorPalette }
-				disableCustomDuotone={ disableCustomDuotone }
-				disableCustomColors={ disableCustomColors }
-				value={ duotonePresetOrColors }
-				onChange={ ( newDuotone ) => {
-					const maybePreset = getDuotonePresetFromColors(
-						newDuotone,
-						duotonePalette
-					);
+		<>
+			<InspectorControls
+				group="filter"
+				__experimentalShareWithChildBlocks
+			>
+				<DuotoneControl
+					duotonePalette={ duotonePalette }
+					colorPalette={ colorPalette }
+					disableCustomDuotone={ disableCustomDuotone }
+					disableCustomColors={ disableCustomColors }
+					value={ duotonePresetOrColors }
+					onChange={ ( newDuotone ) => {
+						const maybePreset = getDuotonePresetFromColors(
+							newDuotone,
+							duotonePalette
+						);
 
-					const newStyle = {
-						...style,
-						color: {
-							...style?.color,
-							duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
-						},
-					};
-					setAttributes( { style: newStyle } );
-				} }
-			/>
-		</BlockControls>
+						const newStyle = {
+							...style,
+							color: {
+								...style?.color,
+								duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
+							},
+						};
+						setAttributes( { style: newStyle } );
+					} }
+				/>
+			</InspectorControls>
+			<BlockControls group="block" __experimentalShareWithChildBlocks>
+				<DuotoneControl
+					duotonePalette={ duotonePalette }
+					colorPalette={ colorPalette }
+					disableCustomDuotone={ disableCustomDuotone }
+					disableCustomColors={ disableCustomColors }
+					value={ duotonePresetOrColors }
+					onChange={ ( newDuotone ) => {
+						const maybePreset = getDuotonePresetFromColors(
+							newDuotone,
+							duotonePalette
+						);
+
+						const newStyle = {
+							...style,
+							color: {
+								...style?.color,
+								duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
+							},
+						};
+						setAttributes( { style: newStyle } );
+					} }
+				/>
+			</BlockControls>
+		</>
 	);
 }
 
