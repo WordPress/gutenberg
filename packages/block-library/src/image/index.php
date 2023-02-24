@@ -15,11 +15,14 @@
  */
 function render_block_core_image( $attributes, $content ) {
 
-	$processed_content = new WP_HTML_Tag_Processor( $content );
+	// Check if the image block has an alternative text.
+	$find_alt_attribute = new WP_HTML_Tag_Processor( $content );
+	$find_alt_attribute->next_tag( array( 'tag_name' => 'img' ) );
+	$alt = $find_alt_attribute->get_attribute( 'alt' ) ? $find_alt_attribute->get_attribute( 'alt' ) : '';
 
 	// If an image block has no alternative text but has a caption,
 	// and aria-describedby is not set, add aria-describedby to the image or image link.
-	if ( empty( $attributes['alt'] ) &&
+	if ( empty( $alt ) &&
 		str_contains( $content, 'wp-element-caption' ) &&
 		! str_contains( $content, 'aria-describedby' )
 	) {
@@ -39,6 +42,7 @@ function render_block_core_image( $attributes, $content ) {
 			)
 		);
 		$processed_content->set_attribute( 'id', $unique_id );
+		$content = $processed_content->get_updated_html();
 	}
 
 	if ( isset( $attributes['data-id'] ) ) {
@@ -46,16 +50,13 @@ function render_block_core_image( $attributes, $content ) {
 		// to provide backwards compatibility for the Gallery Block,
 		// which now wraps Image Blocks within innerBlocks.
 		// The data-id attribute is added in a core/gallery `render_block_data` hook.
-		$data_id_attribute = 'data-id="' . esc_attr( $attributes['data-id'] ) . '"';
-		if ( ! str_contains( $processed_content, $data_id_attribute ) ) {
-			$processed_content->next_tag( array( 'tag_name' => 'img' ) );
-			$processed_content->set_attribute( 'data-id', esc_attr( $attributes['data-id'] ) );
-		}
+		$processor = new WP_HTML_Tag_Processor( $content );
+		$processor->next_tag( 'img' );
+		$processor->set_attribute( 'data-id', $attributes['data-id'] );
+		$content = $processor->get_updated_html();
 	}
-
-	return $processed_content->get_updated_html();
+	return $content;
 }
-
 
 /**
  * Registers the `core/image` block on server.
