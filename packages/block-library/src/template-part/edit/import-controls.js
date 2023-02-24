@@ -76,10 +76,14 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		];
 	}, [ sidebars ] );
 
-	// Render an empty node while data is loading or when there is nothing to import;
-	// to avoid SlotFill re-positioning issue. See: https://github.com/WordPress/gutenberg/issues/15641.
-	if ( ! hasResolved || ( hasResolved && ! options.length ) ) {
+	// Render an empty node while data is loading to avoid SlotFill re-positioning bug.
+	// See: https://github.com/WordPress/gutenberg/issues/15641.
+	if ( ! hasResolved ) {
 		return <Spacer marginBottom="0" />;
+	}
+
+	if ( hasResolved && ! options.length ) {
+		return null;
 	}
 
 	async function createFromWidgets( event ) {
