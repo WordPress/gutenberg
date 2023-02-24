@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 5.12.0 (2023-02-15)
+
+## 5.11.0 (2023-02-01)
+
 ### Bug fix
 
 -   PHP 7.3 and 7.4 must use PHPUnit 9.

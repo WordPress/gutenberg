@@ -12,6 +12,7 @@ import { forwardRef, useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
@@ -52,7 +53,7 @@ const ListViewBlockContents = forwardRef(
 					hasBlockMovingClientId,
 					getSelectedBlockClientId,
 					getLastInsertedBlocksClientIds,
-				} = select( blockEditorStore );
+				} = unlock( select( blockEditorStore ) );
 				const lastInsertedBlocksClientIds =
 					getLastInsertedBlocksClientIds();
 				return {
@@ -72,7 +73,7 @@ const ListViewBlockContents = forwardRef(
 			setInsertedBlockAttributes,
 		} = useInsertedBlock( lastInsertedBlockClientId );
 
-		const hasExistingLinkValue = insertedBlockAttributes?.id;
+		const hasExistingLinkValue = insertedBlockAttributes?.url;
 
 		useEffect( () => {
 			if (
@@ -120,6 +121,7 @@ const ListViewBlockContents = forwardRef(
 							);
 							setIsLinkUIOpen( false );
 						} }
+						onCancel={ () => setIsLinkUIOpen( false ) }
 					/>
 				) }
 				<BlockDraggable clientIds={ draggableClientIds }>

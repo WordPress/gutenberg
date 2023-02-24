@@ -4,6 +4,7 @@
 import {
 	createPortal,
 	findDOMNode,
+	flushSync,
 	render,
 	hydrate,
 	unmountComponentAtNode,
@@ -27,6 +28,13 @@ export { createPortal };
  * @param {import('./react').WPComponent} component Component's instance.
  */
 export { findDOMNode };
+
+/**
+ * Forces React to flush any updates inside the provided callback synchronously.
+ *
+ * @param {Function} callback Callback to run synchronously.
+ */
+export { flushSync };
 
 /**
  * Renders a given element into the target DOM node.

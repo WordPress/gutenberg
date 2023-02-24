@@ -59,8 +59,8 @@ if ( ! function_exists( 'gutenberg_register_fonts_from_theme_json' ) ) {
 				$font_family['fontFace'] = (array) $font_family['fontFace'];
 
 				foreach ( $font_family['fontFace'] as $font_face ) {
-					// Skip if the webfont was registered through the Webfonts API.
-					if ( isset( $font_face['origin'] ) && 'gutenberg_wp_webfonts_api' === $font_face['origin'] ) {
+					// Skip if the font was registered through the Fonts API.
+					if ( isset( $font_face['origin'] ) && 'gutenberg_wp_fonts_api' === $font_face['origin'] ) {
 						continue;
 					}
 
@@ -121,8 +121,11 @@ if ( ! function_exists( 'gutenberg_add_registered_fonts_to_theme_json' ) ) {
 	 */
 	function gutenberg_add_registered_fonts_to_theme_json( $data ) {
 		$font_families_registered = wp_fonts()->get_registered_font_families();
-		$font_families_from_theme = ! empty( $data['settings']['typography']['fontFamilies'] )
-			? $data['settings']['typography']['fontFamilies']
+
+		$raw_data = $data->get_raw_data();
+
+		$font_families_from_theme = ! empty( $raw_data['settings']['typography']['fontFamilies']['theme'] )
+			? $raw_data['settings']['typography']['fontFamilies']['theme']
 			: array();
 
 		/**
@@ -157,21 +160,24 @@ if ( ! function_exists( 'gutenberg_add_registered_fonts_to_theme_json' ) ) {
 
 		// Make sure the path to settings.typography.fontFamilies.theme exists
 		// before adding missing fonts.
-		if ( empty( $data['settings'] ) ) {
-			$data['settings'] = array();
+		if ( empty( $raw_data['settings'] ) ) {
+			$raw_data['settings'] = array();
 		}
-		if ( empty( $data['settings']['typography'] ) ) {
-			$data['settings']['typography'] = array();
+		if ( empty( $raw_data['settings']['typography'] ) ) {
+			$raw_data['settings']['typography'] = array();
 		}
-		if ( empty( $data['settings']['typography']['fontFamilies'] ) ) {
-			$data['settings']['typography']['fontFamilies'] = array();
+		if ( empty( $raw_data['settings']['typography']['fontFamilies'] ) ) {
+			$raw_data['settings']['typography']['fontFamilies'] = array();
+		}
+		if ( empty( $raw_data['settings']['typography']['fontFamilies'] ) ) {
+			$raw_data['settings']['typography']['fontFamilies']['theme'] = array();
 		}
 
 		foreach ( $to_add as $font_family_handle ) {
-			$data['settings']['typography']['fontFamilies'][] = wp_fonts()->to_theme_json( $font_family_handle );
+			$raw_data['settings']['typography']['fontFamilies']['theme'][] = wp_fonts()->to_theme_json( $font_family_handle );
 		}
 
-		return $data;
+		return new WP_Theme_JSON_Gutenberg( $raw_data );
 	}
 }
 

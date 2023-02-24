@@ -137,6 +137,7 @@ export function LinkUI( props ) {
 			placement="bottom"
 			onClose={ props.onClose }
 			anchor={ props.anchor }
+			__unstableSlotName={ '__unstable-block-tools-after' }
 			shift
 		>
 			<LinkControl
@@ -151,6 +152,7 @@ export function LinkUI( props ) {
 				suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 				onChange={ props.onChange }
 				onRemove={ props.onRemove }
+				onCancel={ props.onCancel }
 				renderControlBottom={
 					! url
 						? () => (

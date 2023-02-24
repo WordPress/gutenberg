@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import CustomSelectControl from '../';
+import CustomSelectControl from '..';
 
 export default {
 	title: 'Components/CustomSelectControl',
@@ -10,9 +10,9 @@ export default {
 		__next36pxDefaultSize: { control: { type: 'boolean' } },
 		__experimentalShowSelectedHint: { control: { type: 'boolean' } },
 		size: {
+			options: [ 'small', 'default', '__unstable-large' ],
 			control: {
 				type: 'radio',
-				options: [ 'small', 'default', '__unstable-large' ],
 			},
 		},
 	},

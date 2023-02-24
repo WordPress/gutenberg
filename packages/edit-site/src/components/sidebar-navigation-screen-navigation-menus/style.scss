@@ -1,0 +1,8 @@
+.edit-site-sidebar-navigation-screen-navigation-menus {
+	.offcanvas-editor-list-view-leaf {
+		max-width: calc(100% - #{ $grid-unit-05 });
+	}
+	.block-editor-list-view-leaf .block-editor-list-view-block__contents-cell {
+		width: 100%;
+	}
+}

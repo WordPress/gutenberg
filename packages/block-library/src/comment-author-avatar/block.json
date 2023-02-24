@@ -20,6 +20,7 @@
 	},
 	"usesContext": [ "commentId" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"inserter": false,
 		"__experimentalBorder": {

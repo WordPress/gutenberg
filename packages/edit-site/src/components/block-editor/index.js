@@ -7,22 +7,17 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useMemo, useRef } from '@wordpress/element';
-import {
-	useEntityBlockEditor,
-	__experimentalFetchMedia as fetchMedia,
-	store as coreStore,
-} from '@wordpress/core-data';
+import { useMemo, useRef } from '@wordpress/element';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockList,
-	BlockEditorProvider,
-	__experimentalLinkControl,
 	BlockInspector,
 	BlockTools,
 	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	useMergeRefs,
@@ -34,14 +29,17 @@ import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 /**
  * Internal dependencies
  */
+import inserterMediaCategories from './inserter-media-categories';
 import TemplatePartConverter from '../template-part-converter';
-import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar-edit-mode';
 import { store as editSiteStore } from '../../store';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import StyleBook from '../style-book';
+import { unlock } from '../../private-apis';
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 const LAYOUT = {
 	type: 'default',
@@ -50,16 +48,17 @@ const LAYOUT = {
 };
 
 export default function BlockEditor() {
-	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
+	const { setIsInserterOpened } = useDispatch( editSiteStore );
 	const { storedSettings, templateType, canvasMode } = useSelect(
 		( select ) => {
-			const { getSettings, getEditedPostType, __unstableGetCanvasMode } =
-				select( editSiteStore );
+			const { getSettings, getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
 			return {
 				storedSettings: getSettings( setIsInserterOpened ),
 				templateType: getEditedPostType(),
-				canvasMode: __unstableGetCanvasMode(),
+				canvasMode: getCanvasMode(),
 			};
 		},
 		[ setIsInserterOpened ]
@@ -122,7 +121,7 @@ export default function BlockEditor() {
 
 		return {
 			...restStoredSettings,
-			__unstableFetchMedia: fetchMedia,
+			inserterMediaCategories,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 		};
@@ -155,7 +154,7 @@ export default function BlockEditor() {
 		( isTemplatePart && hasBlocks ) || isViewMode ? false : undefined;
 
 	return (
-		<BlockEditorProvider
+		<ExperimentalBlockEditorProvider
 			settings={ settings }
 			value={ blocks }
 			onInput={ onInput }
@@ -163,17 +162,6 @@ export default function BlockEditor() {
 			useSubRegistry={ false }
 		>
 			<TemplatePartConverter />
-			<__experimentalLinkControl.ViewerFill>
-				{ useCallback(
-					( fillProps ) => (
-						<NavigateToLink
-							{ ...fillProps }
-							onActivePageChange={ setPage }
-						/>
-					),
-					[]
-				) }
-			</__experimentalLinkControl.ViewerFill>
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
@@ -225,6 +213,6 @@ export default function BlockEditor() {
 				}
 			</StyleBook.Slot>
 			<ReusableBlocksMenuItems />
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 }

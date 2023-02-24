@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -14,29 +15,48 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import Inserter from '../inserter';
 
 export const Appender = forwardRef(
-	( { nestingLevel, blockCount, ...props }, ref ) => {
+	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
+		const [ insertedBlock, setInsertedBlock ] = useState( null );
+
 		const instanceId = useInstanceId( Appender );
-		const { hideInserter, clientId } = useSelect( ( select ) => {
-			const {
-				getTemplateLock,
-				__unstableGetEditorMode,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
+		const { hideInserter } = useSelect(
+			( select ) => {
+				const { getTemplateLock, __unstableGetEditorMode } =
+					select( blockEditorStore );
 
-			const _clientId = getSelectedBlockClientId();
-
-			return {
-				clientId: getSelectedBlockClientId(),
-				hideInserter:
-					!! getTemplateLock( _clientId ) ||
-					__unstableGetEditorMode() === 'zoom-out',
-			};
-		}, [] );
+				return {
+					hideInserter:
+						!! getTemplateLock( clientId ) ||
+						__unstableGetEditorMode() === 'zoom-out',
+				};
+			},
+			[ clientId ]
+		);
 
 		const blockTitle = useBlockDisplayTitle( {
 			clientId,
 			context: 'list-view',
 		} );
+
+		const insertedBlockTitle = useBlockDisplayTitle( {
+			clientId: insertedBlock?.clientId,
+			context: 'list-view',
+		} );
+
+		useEffect( () => {
+			if ( ! insertedBlockTitle?.length ) {
+				return;
+			}
+
+			speak(
+				sprintf(
+					// translators: %s: name of block being inserted (i.e. Paragraph, Image, Group etc)
+					__( '%s block inserted' ),
+					insertedBlockTitle
+				),
+				'assertive'
+			);
+		}, [ insertedBlockTitle ] );
 
 		if ( hideInserter ) {
 			return null;
@@ -63,6 +83,11 @@ export const Appender = forwardRef(
 					__experimentalIsQuick
 					{ ...props }
 					toggleProps={ { 'aria-describedby': descriptionId } }
+					onSelectOrClose={ ( maybeInsertedBlock ) => {
+						if ( maybeInsertedBlock?.clientId ) {
+							setInsertedBlock( maybeInsertedBlock );
+						}
+					} }
 				/>
 				<div
 					className="offcanvas-editor-appender__description"

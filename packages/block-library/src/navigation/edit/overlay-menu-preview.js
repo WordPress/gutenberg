@@ -26,6 +26,7 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 			/>
 
 			<ToggleGroupControl
+				__nextHasNoMarginBottom
 				label={ __( 'Icon' ) }
 				value={ icon }
 				onChange={ ( value ) => setAttributes( { icon: value } ) }

@@ -200,7 +200,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		);
 
 		if ( 'horizontal' === $layout_orientation ) {
-			$justify_content_options += array( 'space-between' => 'space-between' );
+			$justify_content_options    += array( 'space-between' => 'space-between' );
+			$vertical_alignment_options += array( 'stretch' => 'stretch' );
+		} else {
+			$justify_content_options    += array( 'stretch' => 'stretch' );
+			$vertical_alignment_options += array( 'space-between' => 'space-between' );
 		}
 
 		if ( ! empty( $layout['flexWrap'] ) && 'nowrap' === $layout['flexWrap'] ) {
@@ -267,6 +271,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$layout_styles[] = array(
 					'selector'     => $selector,
 					'declarations' => array( 'align-items' => 'flex-start' ),
+				);
+			}
+			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'justify-content' => $vertical_alignment_options[ $layout['verticalAlignment'] ] ),
 				);
 			}
 		}
@@ -370,14 +380,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return (string) $content;
 	}
 
-	$global_settings               = gutenberg_get_global_settings();
-	$block_gap                     = _wp_array_get( $global_settings, array( 'spacing', 'blockGap' ), null );
-	$has_block_gap_support         = isset( $block_gap );
-	$global_layout_settings        = _wp_array_get( $global_settings, array( 'layout' ), null );
-	$root_padding_aware_alignments = _wp_array_get( $global_settings, array( 'useRootPaddingAwareAlignments' ), false );
-
-	$default_block_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
-	$used_layout          = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+	$global_settings        = gutenberg_get_global_settings();
+	$global_layout_settings = _wp_array_get( $global_settings, array( 'layout' ), null );
+	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] && ! $global_layout_settings ) {
 		return $block_content;
@@ -392,6 +397,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
 		$used_layout['type'] = 'constrained';
 	}
+
+	$root_padding_aware_alignments = _wp_array_get( $global_settings, array( 'useRootPaddingAwareAlignments' ), false );
 
 	if (
 		$root_padding_aware_alignments &&
@@ -459,6 +466,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 * don't apply the user-defined value to the styles.
 		 */
 		$should_skip_gap_serialization = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
+
+		$block_gap             = _wp_array_get( $global_settings, array( 'spacing', 'blockGap' ), null );
+		$has_block_gap_support = isset( $block_gap );
 
 		$style = gutenberg_get_layout_style(
 			".$container_class.$container_class",
