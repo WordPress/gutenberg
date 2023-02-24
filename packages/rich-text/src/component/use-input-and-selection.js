@@ -64,7 +64,6 @@ export function useInputAndSelection( props ) {
 		const { defaultView } = ownerDocument;
 
 		let isComposing = false;
-		let rafId;
 
 		function onInput( event ) {
 			// Do not trigger a change if characters are being composed.
@@ -113,11 +112,10 @@ export function useInputAndSelection( props ) {
 		}
 
 		/**
-		 * Syncs the selection to local state. A callback for the `selectionchange`
-		 * native events, `keyup`, `mouseup` and `touchend` synthetic events, and
-		 * animation frames after the `focus` event.
+		 * Syncs the selection to local state. A callback for the
+		 * `selectionchange`, `keyup`, `mouseup` and `touchend` events.
 		 *
-		 * @param {Event|DOMHighResTimeStamp} event
+		 * @param {Event} event
 		 */
 		function handleSelectionChange( event ) {
 			const {
@@ -291,12 +289,6 @@ export function useInputAndSelection( props ) {
 				applyRecord( record.current );
 				onSelectionChange( record.current.start, record.current.end );
 			}
-
-			// Update selection as soon as possible, which is at the next animation
-			// frame. The event listener for selection changes may be added too late
-			// at this point, but this focus event is still too early to calculate
-			// the selection.
-			rafId = defaultView.requestAnimationFrame( handleSelectionChange );
 		}
 
 		element.addEventListener( 'input', onInput );
@@ -329,7 +321,6 @@ export function useInputAndSelection( props ) {
 				'selectionchange',
 				handleSelectionChange
 			);
-			defaultView.cancelAnimationFrame( rafId );
 		};
 	}, [] );
 }
