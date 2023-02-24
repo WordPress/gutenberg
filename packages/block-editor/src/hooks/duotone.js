@@ -309,20 +309,18 @@ const withDuotoneStyles = createHigherOrderComponent(
 		);
 
 		const id = `wp-duotone-flibble-${ useInstanceId( BlockListBlock ) }`;
-		const className = classnames( props?.className, id );
+		const className = duotoneSupport
+			? classnames( props?.className, id )
+			: props?.className;
 		const duotoneStyle = props?.attributes?.style?.color?.duotone;
 
-		// CAUTION: code added before the early return will be executed
+		// CAUTION: code added before this line will be executed
 		// for all blocks, not just those that support duotone. Code added
 		// above this line should be carefully evaluated for its impact on
 		// performance.
-		if ( ! duotoneSupport ) {
-			return <BlockListBlock { ...props } />;
-		}
-
 		return (
 			<>
-				{ duotoneStyle && (
+				{ duotoneSupport && duotoneStyle && (
 					<BlockDuotoneStyles
 						name={ props?.name }
 						duotoneStyle={ duotoneStyle }
