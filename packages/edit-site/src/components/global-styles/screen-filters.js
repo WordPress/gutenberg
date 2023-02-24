@@ -17,12 +17,7 @@ import ScreenHeader from './header';
 function ScreenFilters( { name } ) {
 	return (
 		<>
-			<ScreenHeader
-				title={ __( 'Filters' ) }
-				description={ __(
-					'Filter and effects work without replacing your original image'
-				) }
-			/>
+			<ScreenHeader title={ __( 'Filters' ) } />
 			<BlockPreviewPanel name={ name } />
 			<DuotonePanel name={ name } />
 		</>
