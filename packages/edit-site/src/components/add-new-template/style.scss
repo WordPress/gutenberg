@@ -73,7 +73,7 @@
 
 	@include break-small() {
 		height: 232px;
-		overflow: scroll;
+		overflow-y: auto;
 	}
 
 	&__list-item {
