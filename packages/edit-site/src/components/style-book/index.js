@@ -24,8 +24,14 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { closeSmall } from '@wordpress/icons';
-import { useResizeObserver } from '@wordpress/compose';
+import {
+	useResizeObserver,
+	useFocusOnMount,
+	useFocusReturn,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { useMemo, memo } from '@wordpress/element';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -90,6 +96,9 @@ function getExamples() {
 
 function StyleBook( { isSelected, onSelect, onClose } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+	const sectionFocusReturnRef = useFocusReturn();
+
 	const [ textColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const examples = useMemo( getExamples, [] );
@@ -108,8 +117,17 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 				} ) ),
 		[ examples ]
 	);
+
+	function closeOnEscape( event ) {
+		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+			event.preventDefault();
+			onClose();
+		}
+	}
+
 	return (
 		<StyleBookFill>
+			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<section
 				className={ classnames( 'edit-site-style-book', {
 					'is-wide': sizes.width > 600,
@@ -119,6 +137,11 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 					background: backgroundColor,
 				} }
 				aria-label={ __( 'Style Book' ) }
+				onKeyDown={ closeOnEscape }
+				ref={ useMergeRefs( [
+					sectionFocusReturnRef,
+					focusOnMountRef,
+				] ) }
 			>
 				{ resizeObserver }
 				<Button
@@ -126,6 +149,7 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 					icon={ closeSmall }
 					label={ __( 'Close Style Book' ) }
 					onClick={ onClose }
+					showTooltip={ false }
 				/>
 				<TabPanel
 					className="edit-site-style-book__tab-panel"

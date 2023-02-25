@@ -6,7 +6,7 @@ exports[`Missing block renders without crashing 1`] = `
   accessibilityLabel="Help button"
   accessibilityRole="button"
   accessibilityState={
-    Object {
+    {
       "disabled": true,
     }
   }

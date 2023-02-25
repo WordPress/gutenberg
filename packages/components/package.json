@@ -36,7 +36,7 @@
 		"@emotion/serialize": "^1.0.2",
 		"@emotion/styled": "^11.6.0",
 		"@emotion/utils": "^1.0.0",
-		"@floating-ui/react-dom": "^1.0.0",
+		"@floating-ui/react-dom": "1.0.0",
 		"@use-gesture/react": "^10.2.6",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
@@ -76,7 +76,7 @@
 		"remove-accents": "^0.4.2",
 		"use-lilius": "^2.0.1",
 		"uuid": "^8.3.0",
-		"valtio": "^1.7.0"
+		"valtio": "1.7.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
