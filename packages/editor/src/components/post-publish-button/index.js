@@ -168,7 +168,7 @@ export class PostPublishButton extends Component {
 		const buttonProps = {
 			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
-			isBusy: ! isAutoSaving && isSaving && isPublished,
+			isBusy: ! isAutoSaving && isSaving,
 			variant: 'primary',
 			onClick: this.createOnClick( onClickButton ),
 		};
@@ -194,6 +194,7 @@ export class PostPublishButton extends Component {
 
 		const componentProps = isToggle ? toggleProps : buttonProps;
 		const componentChildren = isToggle ? toggleChildren : buttonChildren;
+
 		return (
 			<>
 				<Button
