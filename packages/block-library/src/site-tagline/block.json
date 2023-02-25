@@ -8,13 +8,11 @@
 	"keywords": [ "description" ],
 	"textdomain": "default",
 	"attributes": {
-		"placeholder": {
-			"type": "string"
-		},
 		"textAlign": {
 			"type": "string"
 		}
 	},
+	"example": {},
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
