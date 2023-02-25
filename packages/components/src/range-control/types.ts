@@ -74,7 +74,7 @@ export type RangeMarkProps = {
 
 export type ControlledRangeValue = number | '' | null;
 
-export type RangeControlProps< IconProps extends {} > = Pick<
+export type RangeControlProps = Pick<
 	BaseControlProps,
 	'hideLabelFromVision' | 'help' | '__nextHasNoMarginBottom'
 > &
@@ -86,7 +86,7 @@ export type RangeControlProps< IconProps extends {} > = Pick<
 		 * For more information on `IconType` see the Icon component:
 		 * /packages/components/src/icon/index.tsx
 		 */
-		afterIcon?: IconType< IconProps >;
+		afterIcon?: IconType;
 		/**
 		 * If this property is true, a button to reset the slider is
 		 * rendered.
@@ -101,7 +101,7 @@ export type RangeControlProps< IconProps extends {} > = Pick<
 		 * For more information on `IconType` see the Icon component:
 		 * /packages/components/src/icon/index.tsx
 		 */
-		beforeIcon?: IconType< IconProps >;
+		beforeIcon?: IconType;
 		/**
 		 * CSS color string for the `RangeControl` wrapper.
 		 *

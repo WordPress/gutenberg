@@ -40,12 +40,8 @@ import type { WordPressComponentProps } from '../ui/context';
 
 const noop = () => {};
 
-function UnforwardedRangeControl< IconProps extends {} >(
-	props: WordPressComponentProps<
-		RangeControlProps< IconProps >,
-		'input',
-		false
-	>,
+function UnforwardedRangeControl(
+	props: WordPressComponentProps< RangeControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {

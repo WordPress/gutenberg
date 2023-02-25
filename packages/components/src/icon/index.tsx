@@ -9,7 +9,6 @@ import type { ComponentType, HTMLProps, SVGProps } from 'react';
 import {
 	cloneElement,
 	createElement,
-	Component,
 	isValidElement,
 } from '@wordpress/element';
 import { SVG } from '@wordpress/primitives';
@@ -20,19 +19,20 @@ import { SVG } from '@wordpress/primitives';
 import Dashicon from '../dashicon';
 import type { IconKey as DashiconIconKey } from '../dashicon/types';
 
-export type IconType< P extends {} > =
+export type IconType =
 	| DashiconIconKey
-	| ComponentType< P >
+	| ComponentType< { size?: number } >
+	| ( ( props: { size?: number } ) => JSX.Element )
 	| JSX.Element;
 
-interface BaseProps< P extends {} > {
+interface BaseProps {
 	/**
 	 * The icon to render. Supported values are: Dashicons (specified as
 	 * strings), functions, Component instances and `null`.
 	 *
 	 * @default null
 	 */
-	icon?: IconType< P > | null;
+	icon?: IconType | null;
 	/**
 	 * The size (width and height) of the icon.
 	 *
@@ -47,14 +47,13 @@ type AdditionalProps< T > = T extends ComponentType< infer U >
 	? SVGProps< SVGSVGElement >
 	: {};
 
-export type Props< P extends {} > = BaseProps< P > &
-	AdditionalProps< IconType< P > >;
+export type Props = BaseProps & AdditionalProps< IconType >;
 
-function Icon< P extends {} >( {
+function Icon( {
 	icon = null,
 	size = 'string' === typeof icon ? 20 : 24,
 	...additionalProps
-}: Props< P > ) {
+}: Props ) {
 	if ( 'string' === typeof icon ) {
 		return (
 			<Dashicon
@@ -72,14 +71,7 @@ function Icon< P extends {} >( {
 	}
 
 	if ( 'function' === typeof icon ) {
-		if ( icon.prototype instanceof Component ) {
-			return createElement( icon, {
-				size,
-				...additionalProps,
-			} as unknown as P );
-		}
-
-		return ( icon as ( ...args: any[] ) => JSX.Element )( {
+		return createElement( icon, {
 			size,
 			...additionalProps,
 		} );
