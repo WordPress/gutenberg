@@ -18,19 +18,15 @@ import Actions from './actions';
 import AddedBy from './added-by';
 
 export default function Table( { templateType } ) {
-	const { records: templates, isResolving: isLoading } = useEntityRecords(
-		'postType',
-		templateType,
-		{
-			per_page: -1,
-		}
-	);
+	const { records: templates } = useEntityRecords( 'postType', templateType, {
+		per_page: -1,
+	} );
 	const postType = useSelect(
 		( select ) => select( coreStore ).getPostType( templateType ),
 		[ templateType ]
 	);
 
-	if ( ! templates || isLoading ) {
+	if ( ! templates ) {
 		return null;
 	}
 
