@@ -9,8 +9,6 @@ import { applyFilters } from '@wordpress/hooks';
 import '../anchor';
 import { immutableSet } from '../utils';
 
-const noop = () => {};
-
 describe( 'immutableSet', () => {
 	describe( 'handling falsy values properly', () => {
 		it( 'should create a new object if `undefined` is passed', () => {
@@ -116,7 +114,6 @@ describe( 'immutableSet', () => {
 
 describe( 'anchor', () => {
 	const blockSettings = {
-		save: noop,
 		category: 'text',
 		title: 'block title',
 	};
@@ -133,15 +130,49 @@ describe( 'anchor', () => {
 			expect( settings.attributes ).toBe( undefined );
 		} );
 
-		it( 'should assign a new anchor attribute', () => {
-			const settings = registerBlockType( {
-				...blockSettings,
-				supports: {
-					anchor: true,
+		it( 'should assign a new anchor attribute depending on the value of the save property', () => {
+			const saveDefinitions = [
+				// The anchor attribute should be stored as a comment delimiter.
+				{
+					value: null,
+					schema: {
+						type: 'string',
+					},
 				},
-			} );
+				{
+					value: () => null,
+					schema: {
+						type: 'string',
+					},
+				},
+				{
+					value: undefined,
+					schema: {
+						type: 'string',
+					},
+				},
+				// The anchor attributes should be saved as part of the markup.
+				{
+					value: () => <div className="default" />,
+					schema: {
+						attribute: 'id',
+						selector: '*',
+						source: 'attribute',
+						type: 'string',
+					},
+				},
+			];
 
-			expect( settings.attributes ).toHaveProperty( 'anchor' );
+			saveDefinitions.forEach( ( { value, schema } ) => {
+				const settings = registerBlockType( {
+					...blockSettings,
+					save: value,
+					supports: {
+						anchor: true,
+					},
+				} );
+				expect( settings.attributes.anchor ).toEqual( schema );
+			} );
 		} );
 
 		it( 'should not override attributes defined in settings', () => {

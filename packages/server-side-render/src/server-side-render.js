@@ -112,9 +112,15 @@ export default function ServerSideRender( props ) {
 
 		setIsLoading( true );
 
-		let sanitizedAttributes =
-			attributes &&
-			__experimentalSanitizeBlockAttributes( block, attributes );
+		let sanitizedAttributes;
+		if ( attributes ) {
+			// Anchor attribute isn't supported on the server side and
+			// should be excluded from the parameters.
+			const { anchor, ...restAttributes } = attributes;
+			sanitizedAttributes =
+				restAttributes &&
+				__experimentalSanitizeBlockAttributes( block, restAttributes );
+		}
 
 		if ( skipBlockSupportAttributes ) {
 			sanitizedAttributes =

@@ -40,12 +40,39 @@ export function addAttribute( settings ) {
 	if ( 'type' in ( settings.attributes?.anchor ?? {} ) ) {
 		return settings;
 	}
+
+	// Gracefully handle if settings.attributes is undefined.
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
-		// Gracefully handle if settings.attributes is undefined.
-		settings.attributes = {
-			...settings.attributes,
-			anchor: ANCHOR_SCHEMA,
-		};
+		let saveElement;
+		try {
+			saveElement =
+				typeof settings.save === 'function'
+					? settings.save()
+					: settings.save;
+			if ( saveElement === null || saveElement === undefined ) {
+				// If the save function returns null or undefined, save the anchor
+				// attribute as a block's comment delimiter without specifying
+				// the source.
+				settings.attributes = {
+					...settings.attributes,
+					anchor: {
+						type: ANCHOR_SCHEMA.type,
+					},
+				};
+			} else {
+				settings.attributes = {
+					...settings.attributes,
+					anchor: ANCHOR_SCHEMA,
+				};
+			}
+		} catch ( error ) {
+			// If the save function returns an error, the anchor will be saved
+			// in the markup as an id attribute.
+			settings.attributes = {
+				...settings.attributes,
+				anchor: ANCHOR_SCHEMA,
+			};
+		}
 	}
 
 	return settings;
