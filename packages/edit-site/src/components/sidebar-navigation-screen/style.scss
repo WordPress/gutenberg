@@ -30,6 +30,10 @@
 	margin: 0;
 }
 
+.edit-site-sidebar-navigation-screen__button {
+	flex-shrink: 0;
+}
+
 .edit-site-sidebar-navigation-screen__back {
 	color: $gray-200;
 
