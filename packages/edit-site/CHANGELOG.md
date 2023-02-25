@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Hide horizontal scrollbar when adding new page template ([#48442](https://github.com/WordPress/gutenberg/pull/48442)).
+
 ## 5.4.0 (2023-02-15)
 
 ## 5.3.0 (2023-02-01)
