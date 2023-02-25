@@ -38,7 +38,7 @@
 
 		.block-editor-link-control__tools {
 			justify-content: flex-end;
-			padding: $grid-unit-20 0 0;
+			padding: $grid-unit-20 var(--wp-admin-border-width-focus) var(--wp-admin-border-width-focus);
 		}
 
 		.block-editor-link-control__search-item.is-current {
