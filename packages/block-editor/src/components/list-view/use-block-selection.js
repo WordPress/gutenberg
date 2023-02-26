@@ -145,7 +145,7 @@ export default function useBlockSelection() {
 			}
 
 			if ( label ) {
-				speak( label );
+				speak( label, 'assertive' );
 			}
 		},
 		[
