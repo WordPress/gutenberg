@@ -11,6 +11,7 @@ import {
 	useMemo,
 	useCallback,
 	RawHTML,
+	useState,
 } from '@wordpress/element';
 import {
 	getBlockType,
@@ -28,8 +29,9 @@ import {
 	withSelect,
 	useDispatch,
 	useSelect,
+	useRegistry,
 } from '@wordpress/data';
-import { compose, pure, ifCondition } from '@wordpress/compose';
+import { compose, pure } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 
 /**
@@ -78,7 +80,7 @@ function Block( { children, isHtml, ...props } ) {
 }
 
 function BlockListBlock( {
-	block: { __unstableBlockSource },
+	__unstableBlockSource,
 	mode,
 	isLocked,
 	canRemove,
@@ -283,7 +285,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	// This function should never be called when a block is not present in
 	// the state. It happens now because the order in withSelect rendering
 	// is not correct.
-	const { name, attributes, isValid } = block || {};
+	const { name, isValid, __unstableBlockSource } = block || {};
 
 	// Do not add new properties here, use `useSelect` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
@@ -297,10 +299,11 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		// access the block prop.
 		// Ideally these blocks would rely on the clientId prop only.
 		// This is kept for backward compatibility reasons.
-		block,
+		// block,
 		name,
-		attributes,
+		// attributes,
 		isValid,
+		__unstableBlockSource,
 		isSelected,
 	};
 } );
@@ -540,9 +543,39 @@ export default compose(
 	pure,
 	applyWithSelect,
 	applyWithDispatch,
+	( WrappedComponent ) => ( props ) => {
+		const [ subscriptions, setSubscriptions ] = useState( new Set() );
+		const registry = useRegistry();
+		const attributes = useSelect(
+			( select ) =>
+				Object.fromEntries(
+					Object.entries(
+						select( blockEditorStore ).getBlockAttributes(
+							props.clientId
+						)
+					).filter( ( [ key ] ) => subscriptions.has( key ) )
+				),
+			[ subscriptions, props.clientId ]
+		);
+
+		const proxy = new Proxy( attributes, {
+			get( target, name ) {
+				if ( ! subscriptions.has( name ) ) {
+					window.queueMicrotask( () => {
+						setSubscriptions( ( subs ) => subs.add( name ) );
+					} );
+					return registry
+						.select( blockEditorStore )
+						.getBlockAttributes( props.clientId )[ name ];
+				}
+				return target[ name ];
+			},
+		} );
+		return <WrappedComponent { ...props } attributes={ proxy } />;
+	},
 	// Block is sometimes not mounted at the right time, causing it be undefined
 	// see issue for more info
 	// https://github.com/WordPress/gutenberg/issues/17013
-	ifCondition( ( { block } ) => !! block ),
+	// ifCondition( ( { block } ) => !! block ),
 	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );

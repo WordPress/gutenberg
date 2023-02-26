@@ -350,7 +350,7 @@ export const withInspectorControls = createHigherOrderComponent(
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { name, attributes, block } = props;
+		const { name, attributes } = props;
 		const hasLayoutBlockSupport = hasBlockSupport(
 			name,
 			layoutBlockSupportKey
@@ -372,7 +372,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 				? { ...layout, type: 'constrained' }
 				: layout || defaultBlockLayout || {};
 		const layoutClasses = hasLayoutBlockSupport
-			? useLayoutClasses( block )
+			? useLayoutClasses( { name, attributes } )
 			: null;
 		// Higher specificity to override defaults from theme.json.
 		const selector = `.wp-container-${ id }.wp-container-${ id }`;

@@ -23,6 +23,7 @@ export function useOnEnter( props ) {
 		getBlockName,
 		getBlock,
 		getNextBlockClientId,
+		getBlockAttributes,
 	} = useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
@@ -36,7 +37,8 @@ export function useOnEnter( props ) {
 				return;
 			}
 
-			const { content, clientId } = propsRef.current;
+			const { clientId } = propsRef.current;
+			const { content } = getBlockAttributes( clientId );
 
 			// The paragraph should be empty.
 			if ( content.length ) {
