@@ -54,7 +54,6 @@ function ListViewBlock( {
 	path,
 	isExpanded,
 	selectedClientIds,
-	preventAnnouncement,
 	isSyncedBranch,
 } ) {
 	const cellRef = useRef( null );
@@ -112,20 +111,13 @@ function ListViewBlock( {
 		level
 	);
 
-	let blockAriaLabel = __( 'Link' );
-	if ( blockInformation ) {
-		blockAriaLabel = isLocked
-			? sprintf(
-					// translators: %s: The title of the block. This string indicates a link to select the locked block.
-					__( '%s link (locked)' ),
-					blockInformation.title
-			  )
-			: sprintf(
-					// translators: %s: The title of the block. This string indicates a link to select the block.
-					__( '%s link' ),
-					blockInformation.title
-			  );
-	}
+	const blockAriaLabel = isLocked
+		? sprintf(
+				// translators: %s: The title of the block. This string indicates a link to select the locked block.
+				__( '%s (locked)' ),
+				blockInformation.title
+		  )
+		: blockInformation.title;
 
 	const settingsAriaLabel = blockInformation
 		? sprintf(
@@ -245,17 +237,13 @@ function ListViewBlock( {
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
 			isExpanded={ canExpand ? isExpanded : undefined }
-			aria-selected={ !! isSelected || forceSelectionContentLock }
 			ref={ rowRef }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
 				colSpan={ colSpan }
 				ref={ cellRef }
-				aria-label={ blockAriaLabel }
 				aria-selected={ !! isSelected || forceSelectionContentLock }
-				aria-expanded={ canExpand ? isExpanded : undefined }
-				aria-describedby={ descriptionId }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
@@ -272,7 +260,9 @@ function ListViewBlock( {
 							onFocus={ onFocus }
 							isExpanded={ isExpanded }
 							selectedClientIds={ selectedClientIds }
-							preventAnnouncement={ preventAnnouncement }
+							ariaLabel={ blockAriaLabel }
+							ariaExpanded={ canExpand ? isExpanded : undefined }
+							ariaDescribedBy={ descriptionId }
 						/>
 						<div
 							className="block-editor-list-view-block-select-button__description"
