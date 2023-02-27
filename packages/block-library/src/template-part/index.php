@@ -166,7 +166,7 @@ function render_block_core_template_part( $attributes ) {
 		$html_tag = esc_attr( $attributes['tagName'] );
 	}
 
-	if ( 'none' == $html_tag ) {
+	if ( 'none' === $html_tag ) {
 		return str_replace( ']]>', ']]&gt;', $content );
 	} else {
 		$wrapper_attributes = get_block_wrapper_attributes();
