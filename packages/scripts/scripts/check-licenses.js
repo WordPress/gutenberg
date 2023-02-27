@@ -358,8 +358,9 @@ function checkDepLicense( path ) {
  * In that case, the software is only compatible if all of the licenses in the list are
  * compatible.
  *
- * @param {Array} packageLicenses the licenses that a package is licensed under.
- * @param {Array} compatibleLicenses the list of compatible licenses.
+ * @param {Array} packageLicenses    The licenses that a package is licensed under.
+ * @param {Array} compatibleLicenses The list of compatible licenses.
+ *
  * @return {boolean} true if all of the packageLicenses appear in compatibleLicenses.
  */
 function checkAllCompatible( packageLicenses, compatibleLicenses ) {
