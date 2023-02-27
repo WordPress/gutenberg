@@ -1,5 +1,30 @@
 == Changelog ==
 
+= 15.2.2 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Layout
+- Post Editor: Update postContentBlock check to see if the block is valid. ([48386](https://github.com/WordPress/gutenberg/pull/48386))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@andrewserong
+
+
 = 15.2.1 =
 
 
