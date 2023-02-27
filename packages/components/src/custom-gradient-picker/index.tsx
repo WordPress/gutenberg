@@ -4,6 +4,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import type gradientParser from 'gradient-parser';
 
 /**
  * WordPress dependencies
@@ -39,6 +40,7 @@ import {
 import type {
 	CustomGradientPickerProps,
 	GradientAnglePickerProps,
+	GradientTypePickerProps,
 } from './types';
 
 const GradientAnglePicker = ( {
@@ -68,8 +70,13 @@ const GradientAnglePicker = ( {
 	);
 };
 
-const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
+const GradientTypePicker = ( {
+	gradientAST,
+	hasGradient,
+	onChange,
+}: GradientTypePickerProps ) => {
 	const { type } = gradientAST;
+
 	const onSetLinearGradient = () => {
 		onChange(
 			serializeGradient( {
@@ -78,7 +85,8 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 					? {}
 					: { orientation: HORIZONTAL_GRADIENT_ORIENTATION } ),
 				type: 'linear-gradient',
-			} )
+				// NTS: this isn't very elegant, but the `orientation` props between linear and radial gradients don't overlap (according to DefinitelyTyped) so TypeScript gets confused by this manual change.
+			} as gradientParser.LinearGradientNode )
 		);
 	};
 
@@ -92,11 +100,13 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		);
 	};
 
-	const handleOnChange = ( next ) => {
-		if ( next === 'linear-gradient' ) {
+	const handleOnChange = ( next: string | string[] ) => {
+		// NTS: Because `SelectControl.onChange` (below) can accept an array, we need to accept one here. We shouldn't ever see an array here, but I'm adding a check just in case.
+		const nextValue = Array.isArray( next ) ? next[ 0 ] : next;
+		if ( nextValue === 'linear-gradient' ) {
 			onSetLinearGradient();
 		}
-		if ( next === 'radial-gradient' ) {
+		if ( nextValue === 'radial-gradient' ) {
 			onSetRadialGradient();
 		}
 	};
@@ -110,7 +120,8 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 			onChange={ handleOnChange }
 			options={ GRADIENT_OPTIONS }
 			size="__unstable-large"
-			value={ hasGradient && type }
+			// NTS: Small runtime change. Previously, if `type` was undefined (which I don't think should ever happen) this check would return `false`, which would be an invalid value.
+			value={ hasGradient ? type : undefined }
 		/>
 	);
 };

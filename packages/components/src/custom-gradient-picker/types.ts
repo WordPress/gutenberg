@@ -39,3 +39,9 @@ export type GradientAnglePickerProps = {
 	hasGradient: boolean;
 	onChange: ( gradient: string ) => void;
 };
+
+export type GradientTypePickerProps = {
+	gradientAST: gradientParser.GradientNode;
+	hasGradient: boolean;
+	onChange: ( gradient: string ) => void;
+};
