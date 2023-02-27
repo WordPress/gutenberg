@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Platform } from '@wordpress/element';
@@ -20,13 +15,13 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	);
 
 	imageProps.url =
-		get( image, [ 'sizes', sizeSlug, 'url' ] ) ||
-		get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] ) ||
+		image?.sizes?.[ sizeSlug ]?.url ||
+		image?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
 		image.url ||
 		image.source_url;
 	const fullUrl =
-		get( image, [ 'sizes', 'full', 'url' ] ) ||
-		get( image, [ 'media_details', 'sizes', 'full', 'source_url' ] );
+		image?.sizes?.full?.url ||
+		image?.media_details?.sizes?.full?.source_url;
 	if ( fullUrl ) {
 		imageProps.fullUrl = fullUrl;
 	}
