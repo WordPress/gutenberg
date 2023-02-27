@@ -114,6 +114,7 @@ describe( 'Site Editor Performance', () => {
 			await page.waitForSelector( '.edit-site-visual-editor', {
 				timeout: 120000,
 			} );
+			expect( true ).toBe( false ); // TMP: Test the artifacts upload
 			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
 
 			if ( i < samples ) {
