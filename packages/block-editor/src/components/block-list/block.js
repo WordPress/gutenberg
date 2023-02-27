@@ -317,6 +317,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 		removeBlock,
 	} = dispatch( blockEditorStore );
 
+	const queue = [];
+	let rIC;
+
 	// Do not add new properties here, use `useDispatch` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
@@ -330,7 +333,20 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				? multiSelectedBlockClientIds
 				: [ clientId ];
 
-			updateBlockAttributes( clientIds, newAttributes );
+			queue.push( () => {
+				updateBlockAttributes( clientIds, newAttributes );
+			} );
+
+			window.cancelIdleCallback( rIC );
+			rIC = window.requestIdleCallback(
+				() => {
+					registry.batch( () => {
+						queue.forEach( ( callback ) => callback() );
+						queue.length = 0;
+					} );
+				},
+				{ timeout: 1000 }
+			);
 		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;
