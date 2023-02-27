@@ -8,7 +8,7 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	imageProps.url =
 		image?.sizes?.[ sizeSlug ]?.url ||
 		image?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
-		image.url;
+		image?.url;
 	const fullUrl =
 		image?.sizes?.full?.url ||
 		image?.media_details?.sizes?.full?.source_url;
