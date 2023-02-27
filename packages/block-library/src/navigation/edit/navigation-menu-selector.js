@@ -39,7 +39,6 @@ function NavigationMenuSelector( {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
-	// const [ selectorLabel, setSelectorLabel ] = useState( '' );
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
 
 	actionLabel = actionLabel || createActionLabel;
@@ -102,7 +101,11 @@ function NavigationMenuSelector( {
 		) {
 			setIsCreatingMenu( false );
 		}
-	}, [ hasResolvedNavigationMenus, createNavigationMenuIsSuccess ] );
+	}, [
+		isCreatingMenu,
+		createNavigationMenuIsError,
+		createNavigationMenuIsSuccess,
+	] );
 
 	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu
@@ -117,7 +120,6 @@ function NavigationMenuSelector( {
 							<MenuItemsChoice
 								value={ currentMenuId }
 								onSelect={ ( menuId ) => {
-									// setSelectorLabel( __( 'Loading …' ) );
 									setIsCreatingMenu( true );
 									onSelectNavigationMenu( menuId );
 									onClose();
