@@ -23,10 +23,15 @@
 
 .edit-site-sidebar-navigation-screen__title {
 	font-size: calc(1.56 * 13px);
+	line-height: normal;
 	font-weight: 500;
 	flex-grow: 1;
 	color: $white;
 	margin: 0;
+}
+
+.edit-site-sidebar-navigation-screen__edit {
+	flex-shrink: 0;
 }
 
 .edit-site-sidebar-navigation-screen__back {
