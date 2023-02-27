@@ -30,9 +30,9 @@ export default function useImageSizes( images, isSelected, getSettings ) {
 				}
 
 				const sizes = imageSizes.reduce( ( currentSizes, size ) => {
-					const defaultUrl = img?.sizes?.[ size.slug ]?.url;
+					const defaultUrl = img.sizes?.[ size.slug ]?.url;
 					const mediaDetailsUrl =
-						img?.media_details?.sizes?.[ size.slug ]?.source_url;
+						img.media_details?.sizes?.[ size.slug ]?.source_url;
 					return {
 						...currentSizes,
 						[ size.slug ]: defaultUrl || mediaDetailsUrl,
