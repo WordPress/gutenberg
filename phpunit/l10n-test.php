@@ -1,11 +1,11 @@
 <?php
 /**
- * Tests_Formatting_Wordcount class
+ * Tests_L10n_wpWordcount class
  *
  * @package WordPress
  */
 
-class Tests_Formatting_Wordcount extends WP_UnitTestCase {
+class Tests_L10n_wpWordcount extends WP_UnitTestCase {
 	/**
 	 * Tests that words are counted correctly based on the type
 	 *
