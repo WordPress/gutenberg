@@ -283,7 +283,7 @@ function useAutocomplete( {
 
 	useEffect( () => {
 		if ( ! textContent ) {
-			reset();
+			if ( autocompleter ) reset();
 			return;
 		}
 
@@ -363,7 +363,7 @@ function useAutocomplete( {
 		);
 
 		if ( ! completer ) {
-			reset();
+			if ( autocompleter ) reset();
 			return;
 		}
 
