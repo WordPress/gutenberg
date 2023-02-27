@@ -6,6 +6,10 @@
 
 -   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
 
+### Enhancements
+
+-   License check script supports conjunctive (AND) licenses. ([46801](https://github.com/WordPress/gutenberg/pull/46801))
+
 ## 24.6.0 (2022-11-16)
 
 ## 24.5.0 (2022-11-02)
