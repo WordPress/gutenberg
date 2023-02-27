@@ -289,30 +289,22 @@ function Iframe( {
 				srcDoc={ srcDoc }
 				title={ __( 'Editor canvas' ) }
 			>
-				{ head &&
-					createPortal(
-						<>
-							{ headChildren }
-						</>,
-						head
-					) }
+				{ head && createPortal( headChildren, head ) }
 				{ iframeDocument &&
 					createPortal(
-						<>
-							<body
-								ref={ bodyRef }
-								className={ classnames(
-									'block-editor-iframe__body',
-									'editor-styles-wrapper',
-									...bodyClasses
-								) }
-							>
-								{ contentResizeListener }
-								<StyleProvider document={ iframeDocument }>
-									{ children }
-								</StyleProvider>
-							</body>
-						</>,
+						<body
+							ref={ bodyRef }
+							className={ classnames(
+								'block-editor-iframe__body',
+								'editor-styles-wrapper',
+								...bodyClasses
+							) }
+						>
+							{ contentResizeListener }
+							<StyleProvider document={ iframeDocument }>
+								{ children }
+							</StyleProvider>
+						</body>,
 						iframeDocument.documentElement
 					) }
 			</iframe>
