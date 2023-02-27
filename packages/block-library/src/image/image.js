@@ -433,6 +433,9 @@ export default function Image( {
 						isResizable={ isResizable }
 						imageWidth={ naturalWidth }
 						imageHeight={ naturalHeight }
+						imageSizeHelp={ __(
+							"Select which image size to load. This changes the resolution of the image, not it's visual size."
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
