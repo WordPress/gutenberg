@@ -194,7 +194,6 @@ export class PostPublishButton extends Component {
 
 		const componentProps = isToggle ? toggleProps : buttonProps;
 		const componentChildren = isToggle ? toggleChildren : buttonChildren;
-
 		return (
 			<>
 				<Button
