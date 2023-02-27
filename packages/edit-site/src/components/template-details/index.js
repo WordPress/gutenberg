@@ -18,7 +18,6 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import { store as editSiteStore } from '../../store';
-import TemplateAreas from './template-areas';
 import EditTemplateTitle from './edit-template-title';
 import { useLink } from '../routes/link';
 import TemplatePartAreaSelector from './template-part-area-selector';
@@ -88,8 +87,6 @@ export default function TemplateDetails( { template, onClose } ) {
 					<TemplatePartAreaSelector id={ template.id } />
 				</div>
 			) }
-
-			<TemplateAreas closeTemplateDetailsDropdown={ onClose } />
 
 			{ isTemplateRevertable( template ) && (
 				<MenuGroup className="edit-site-template-details__group edit-site-template-details__revert">
