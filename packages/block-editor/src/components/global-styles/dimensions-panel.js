@@ -17,7 +17,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalView as View,
 } from '@wordpress/components';
-import { Icon, layout, positionCenter, stretchWide } from '@wordpress/icons';
+import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 import { useCallback, Platform } from '@wordpress/element';
 
 /**
@@ -364,7 +364,7 @@ export default function DimensionsPanel( {
 		onChange( {
 			...value,
 			layout: {
-				...layout,
+				...value?.layout,
 				...newChildLayout,
 			},
 		} );
