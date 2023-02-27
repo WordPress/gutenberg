@@ -170,7 +170,7 @@ export default function BorderPanel( { name, variation = '' } ) {
 			// global styles are saved.
 			setBorder( { radius: border?.radius, ...updatedBorder } );
 		},
-		[ setBorder ]
+		[ setBorder, border?.radius ]
 	);
 
 	return (
