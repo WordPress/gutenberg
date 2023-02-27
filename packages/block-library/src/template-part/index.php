@@ -165,9 +165,13 @@ function render_block_core_template_part( $attributes ) {
 	} else {
 		$html_tag = esc_attr( $attributes['tagName'] );
 	}
-	$wrapper_attributes = get_block_wrapper_attributes();
 
-	return "<$html_tag $wrapper_attributes>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
+	if ( $html_tag === 'none' ) {
+		return str_replace( ']]>', ']]&gt;', $content );
+	} else {
+		$wrapper_attributes = get_block_wrapper_attributes();
+		return "<$html_tag $wrapper_attributes>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
+	}
 }
 
 /**

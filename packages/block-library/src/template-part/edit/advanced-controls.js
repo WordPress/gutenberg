@@ -113,6 +113,7 @@ export function TemplatePartAdvancedControls( {
 					{ label: '<aside>', value: 'aside' },
 					{ label: '<footer>', value: 'footer' },
 					{ label: '<div>', value: 'div' },
+					{ label: 'None (front only)', value: 'none' },
 				] }
 				value={ tagName || '' }
 				onChange={ ( value ) => setAttributes( { tagName: value } ) }

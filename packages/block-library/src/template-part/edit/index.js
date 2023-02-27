@@ -91,7 +91,8 @@ export default function TemplatePartEdit( {
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
-	const TagName = tagName || areaObject.tagName;
+	const TagName =
+		tagName === 'none' ? areaObject.tagName : tagName || areaObject.tagName;
 
 	// The `isSelected` check ensures the `BlockSettingsMenuControls` fill
 	// doesn't render multiple times. The block controls has similar internal check.
