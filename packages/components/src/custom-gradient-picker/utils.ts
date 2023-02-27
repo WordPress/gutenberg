@@ -16,15 +16,22 @@ import {
 	DIRECTIONAL_ORIENTATION_ANGLE_MAP,
 } from './constants';
 import { serializeGradient } from './serializer';
+import type { ControlPoint } from './types';
 
 extend( [ namesPlugin ] );
 
-export function getLinearGradientRepresentation( gradientAST ) {
+export function getLinearGradientRepresentation(
+	gradientAST: gradientParser.GradientNode
+) {
 	return serializeGradient( {
 		type: 'linear-gradient',
-		orientation: HORIZONTAL_GRADIENT_ORIENTATION,
+		orientation: {
+			...HORIZONTAL_GRADIENT_ORIENTATION,
+			value: `${ HORIZONTAL_GRADIENT_ORIENTATION.value }`,
+		},
 		colorStops: gradientAST.colorStops,
-	} );
+		// NTS: As noted elsewhere, gradientParser's DefinetelyTyped values provide no overlap between the different `orientation` values for linear vs radial nodes.
+	} as gradientParser.LinearGradientNode );
 }
 
 function hasUnsupportedLength( item: gradientParser.ColorStop ) {
@@ -76,8 +83,8 @@ export function getGradientAstWithDefault( value?: string ) {
 }
 
 export function getGradientAstWithControlPoints(
-	gradientAST,
-	newControlPoints
+	gradientAST: gradientParser.GradientNode,
+	newControlPoints: ControlPoint[]
 ) {
 	return {
 		...gradientAST,
@@ -95,7 +102,7 @@ export function getGradientAstWithControlPoints(
 	};
 }
 
-export function getStopCssColor( colorStop ) {
+export function getStopCssColor( colorStop: gradientParser.ColorStop ) {
 	switch ( colorStop.type ) {
 		case 'hex':
 			return `#${ colorStop.value }`;
