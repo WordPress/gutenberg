@@ -45,3 +45,5 @@ export type GradientTypePickerProps = {
 	hasGradient: boolean;
 	onChange: ( gradient: string ) => void;
 };
+
+export type ControlPoint = { color: string; position: number };
