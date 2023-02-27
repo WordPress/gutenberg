@@ -25,16 +25,16 @@ const {
 	clickIfClickable,
 } = require( '../helpers/utils' );
 
+const ADD_BLOCK_ID = isAndroid()
+	? 'Add block, Double tap to add a block'
+	: 'Add block';
+
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
 	await isEditorVisible( driver );
 	const initialValues = await setupInitialValues( driver );
 	return new EditorPage( driver, initialValues );
 };
-
-const ADD_BLOCK_ID = isAndroid()
-	? 'Add block, Double tap to add a block'
-	: 'Add block';
 
 // Stores initial values from the editor for different helpers.
 const setupInitialValues = async ( driver ) => {
