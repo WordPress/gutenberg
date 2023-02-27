@@ -71,7 +71,7 @@ function NavigationMenuSelector( {
 				};
 			} ) || []
 		);
-	}, [ currentMenuId, navigationMenus, actionLabel, isCreatingMenu ] );
+	}, [ navigationMenus, actionLabel ] );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
