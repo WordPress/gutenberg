@@ -25,8 +25,9 @@ import {
 	createClassicMenu,
 	createNavigationMenu,
 	deleteAllMenus,
+	getNavigationMenus,
 } from './menus';
-import { deleteAllPages } from './pages';
+import { deleteAllPages, createPage } from './pages';
 import { resetPreferences } from './preferences';
 import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
@@ -134,6 +135,7 @@ class RequestUtils {
 	createClassicMenu = createClassicMenu.bind( this );
 	createNavigationMenu = createNavigationMenu.bind( this );
 	deleteAllMenus = deleteAllMenus.bind( this );
+	getNavigationMenus = getNavigationMenus.bind( this );
 	createComment = createComment.bind( this );
 	deleteAllComments = deleteAllComments.bind( this );
 	deleteAllWidgets = deleteAllWidgets.bind( this );
@@ -149,6 +151,7 @@ class RequestUtils {
 	getSiteSettings = getSiteSettings.bind( this );
 	updateSiteSettings = updateSiteSettings.bind( this );
 	deleteAllPages = deleteAllPages.bind( this );
+	createPage = createPage.bind( this );
 }
 
 export type { StorageState };

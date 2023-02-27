@@ -29,6 +29,7 @@ test.describe(
 		test( 'default to a list of pages if there are no menus', async ( {
 			admin,
 			editor,
+			requestUtils,
 		} ) => {
 			await admin.createNewPost();
 			await editor.insertBlock( { name: 'core/navigation' } );
@@ -47,12 +48,14 @@ test.describe(
 
 			// Check the markup of the block is correct.
 			await editor.publishPost();
-			const content = await editor.getEditedPostContent();
-			expect( content ).toBe(
-				`<!-- wp:navigation -->
-<!-- wp:page-list /-->
-<!-- /wp:navigation -->`
-			);
+			const navigationMenus = await requestUtils.getNavigationMenus();
+			const latestNavigationMenu = navigationMenus[ 0 ];
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/navigation',
+					attributes: { ref: latestNavigationMenu.id },
+				},
+			] );
 		} );
 
 		test( 'default to my only existing menu', async ( {
