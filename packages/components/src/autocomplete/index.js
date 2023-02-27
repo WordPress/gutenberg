@@ -123,7 +123,7 @@ function useAutocomplete( {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const instanceId = useInstanceId( useAutocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
-	const [ filteredOptions, setFilteredOptions ] = useState( [] );
+	const [ filteredOptions, setFilteredOptions ] = useState( EMTPY_ARRAY );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
