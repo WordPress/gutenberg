@@ -38,6 +38,7 @@ const renderQueue = createQueue();
 function Store( registry, suspense ) {
 	const select = suspense ? registry.suspendSelect : registry.select;
 	const queueContext = {};
+	createQueue.batch = registry.batch;
 	let lastMapSelect;
 	let lastMapResult;
 	let lastMapResultValid = false;

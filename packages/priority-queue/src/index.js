@@ -71,6 +71,8 @@ export const createQueue = () => {
 	const waitingList = new Map();
 	let isRunning = false;
 
+	createQueue.batch = () => {};
+
 	/**
 	 * Callback to process as much queue as time permits.
 	 *
@@ -88,17 +90,19 @@ export const createQueue = () => {
 	 *                                       animation frame timestamp.
 	 */
 	const runWaitingList = ( deadline ) => {
-		for ( const [ nextElement, callback ] of waitingList ) {
-			waitingList.delete( nextElement );
-			callback();
+		createQueue.batch( () => {
+			for ( const [ nextElement, callback ] of waitingList ) {
+				waitingList.delete( nextElement );
+				callback();
 
-			if (
-				'number' === typeof deadline ||
-				deadline.timeRemaining() <= 0
-			) {
-				break;
+				if (
+					'number' === typeof deadline ||
+					deadline.timeRemaining() <= 0
+				) {
+					break;
+				}
 			}
-		}
+		} );
 
 		if ( waitingList.size === 0 ) {
 			isRunning = false;
