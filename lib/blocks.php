@@ -90,6 +90,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-featured-image.php'          => 'core/post-featured-image',
 				'post-navigation-link.php'         => 'core/post-navigation-link',
 				'post-terms.php'                   => 'core/post-terms',
+				'post-time-to-read.php'            => 'core/post-time-to-read',
 				'post-title.php'                   => 'core/post-title',
 				'query.php'                        => 'core/query',
 				'post-template.php'                => 'core/post-template',
