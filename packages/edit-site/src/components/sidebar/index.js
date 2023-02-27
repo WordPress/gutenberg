@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { memo } from '@wordpress/element';
+import { memo, useRef } from '@wordpress/element';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
@@ -13,11 +13,14 @@ import {
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
-import useSyncPathWithURL from '../sync-state-with-url/use-sync-path-with-url';
+import useSyncPathWithURL, {
+	getPathFromURL,
+} from '../sync-state-with-url/use-sync-path-with-url';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveButton from '../save-button';
 import SidebarNavigationScreenNavigationItem from '../sidebar-navigation-screen-navigation-item';
+import { useLocation } from '../routes';
 
 function SidebarScreens() {
 	useSyncPathWithURL();
@@ -47,11 +50,14 @@ function SidebarScreens() {
 }
 
 function Sidebar() {
+	const { params: urlParams } = useLocation();
+	const initialPath = useRef( getPathFromURL( urlParams ) );
+
 	return (
 		<>
 			<NavigatorProvider
 				className="edit-site-sidebar__content"
-				initialPath="/"
+				initialPath={ initialPath.current }
 			>
 				<SidebarScreens />
 			</NavigatorProvider>
