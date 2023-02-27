@@ -150,7 +150,7 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 
 	if ( url ) {
 		const input = await page.waitForSelector(
-			'input[placeholder="Search or type url"]'
+			'input[placeholder="Search or type URL"]'
 		);
 		await input.type( url );
 

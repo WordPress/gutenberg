@@ -150,7 +150,7 @@ describe( 'MediaUpload component', () => {
 	} );
 
 	it( 'can select media by capturing', () => {
-		expectMediaPickerForOption( 'Take a Video', false, requestMediaPicker );
+		expectMediaPickerForOption( 'Take a video', false, requestMediaPicker );
 	} );
 
 	it( 'can select multiple media from device library', () => {

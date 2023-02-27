@@ -81,7 +81,7 @@ The argument of the callback is an object containing the following properties:
 
 ### onFinishMediaUploadWithFailure
 
-Callback called when the media file couldn't be uploaded.
+Callback called when the media file could not be uploaded.
 
 -   Type: `Function`
 -   Required: No

@@ -61,7 +61,7 @@ export default function DefaultStylePicker( { blockName } ) {
 					__nextHasNoMarginBottom
 					options={ selectOptions }
 					value={ preferredStyle || '' }
-					label={ __( 'Default Style' ) }
+					label={ __( 'Default style' ) }
 					onChange={ selectOnChange }
 				/>
 			</div>

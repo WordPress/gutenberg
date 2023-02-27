@@ -157,7 +157,7 @@ const ImageURLInputUI = ( {
 		const linkDestinations = [
 			{
 				linkDestination: LINK_DESTINATION_MEDIA,
-				title: __( 'Media File' ),
+				title: __( 'Media file' ),
 				url: mediaType === 'image' ? mediaUrl : undefined,
 				icon,
 			},
@@ -165,7 +165,7 @@ const ImageURLInputUI = ( {
 		if ( mediaType === 'image' && mediaLink ) {
 			linkDestinations.push( {
 				linkDestination: LINK_DESTINATION_ATTACHMENT,
-				title: __( 'Attachment Page' ),
+				title: __( 'Attachment page' ),
 				url: mediaType === 'image' ? mediaLink : undefined,
 				icon: (
 					<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -225,7 +225,7 @@ const ImageURLInputUI = ( {
 			/>
 			<TextControl
 				__nextHasNoMarginBottom
-				label={ __( 'Link CSS Class' ) }
+				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }
 			/>

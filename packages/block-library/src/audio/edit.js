@@ -228,12 +228,24 @@ function AudioEdit( {
 							} )
 						}
 						options={ [
-							{ value: '', label: __( 'Browser default' ) },
-							{ value: 'auto', label: __( 'Auto' ) },
-							{ value: 'metadata', label: __( 'Metadata' ) },
+							{
+								value: '',
+								label: _x(
+									'Browser default',
+									'Audio preload value'
+								),
+							},
+							{
+								value: 'auto',
+								label: _x( 'Auto', 'Audio preload value' ),
+							},
+							{
+								value: 'metadata',
+								label: _x( 'Metadata', 'Audio preload value' ),
+							},
 							{
 								value: 'none',
-								label: _x( 'None', 'Preload value' ),
+								label: _x( 'None', 'Audio preload value' ),
 							},
 						] }
 					/>

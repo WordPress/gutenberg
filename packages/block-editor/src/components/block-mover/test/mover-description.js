@@ -24,7 +24,7 @@ describe( 'block mover', () => {
 					negativeDirection
 				)
 			).toBe(
-				`Block ${ label } is at the beginning of the content and can’t be moved up`
+				`Block ${ label } is at the beginning of the content and can not be moved up`
 			);
 		} );
 
@@ -39,7 +39,7 @@ describe( 'block mover', () => {
 					positiveDirection
 				)
 			).toBe(
-				`Block ${ label } is at the end of the content and can’t be moved down`
+				`Block ${ label } is at the end of the content and can not be moved down`
 			);
 		} );
 
@@ -128,7 +128,7 @@ describe( 'block mover', () => {
 					'horizontal'
 				)
 			).toBe(
-				`Block ${ label } is at the beginning of the content and can’t be moved left`
+				`Block ${ label } is at the beginning of the content and can not be moved left`
 			);
 		} );
 
@@ -144,7 +144,7 @@ describe( 'block mover', () => {
 					'horizontal'
 				)
 			).toBe(
-				`Block ${ label } is at the end of the content and can’t be moved right`
+				`Block ${ label } is at the end of the content and can not be moved right`
 			);
 		} );
 	} );

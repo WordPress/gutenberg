@@ -7,7 +7,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Icon,
 	positionCenter,
@@ -28,7 +28,7 @@ import { shouldSkipSerialization } from '../hooks/utils';
 
 export default {
 	name: 'constrained',
-	label: __( 'Constrained' ),
+	label: _x( 'Constrained', 'block layout' ),
 	inspectorControls: function DefaultLayoutInspectorControls( {
 		layout,
 		onChange,
@@ -93,7 +93,7 @@ export default {
 					<div className="block-editor-hooks__layout-controls-unit">
 						<UnitControl
 							className="block-editor-hooks__layout-controls-unit-input"
-							label={ __( 'Wide' ) }
+							label={ _x( 'Wide', 'block layout' ) }
 							labelPosition="top"
 							__unstableInputWidth="80px"
 							value={ wideSize || contentSize || '' }
@@ -119,7 +119,7 @@ export default {
 				</p>
 				<ToggleGroupControl
 					__nextHasNoMarginBottom
-					label={ __( 'Justification' ) }
+					label={ _x( 'Justification', 'layout' ) }
 					value={ justifyContent }
 					onChange={ onJustificationChange }
 				>

@@ -554,7 +554,7 @@ function ButtonEdit( props ) {
 							selectedWidth={ width }
 							setAttributes={ setAttributes }
 						/>
-						<PanelBody title={ __( 'Link Settings' ) }>
+						<PanelBody title={ __( 'Link settings' ) }>
 							{ getLinkSettings( true ) }
 						</PanelBody>
 					</InspectorControls>

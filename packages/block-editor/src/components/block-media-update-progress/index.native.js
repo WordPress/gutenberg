@@ -8,7 +8,7 @@ import { View } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	subscribeMediaUpload,
 	subscribeMediaSave,
@@ -265,12 +265,16 @@ export class BlockMediaUpdateProgress extends Component {
 			this.state.isUploadInProgress || this.state.isSaveInProgress;
 		const progress = this.state.progress * 100;
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
-		const retryMessageSave = __(
-			'Failed to save files.\nPlease tap for options.'
+		const retryMessageSave = sprintf(
+			'%1$s \n%2$s',
+			__( 'Failed to save files.' ),
+			__( 'Please tap for options.' )
 		);
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
-		const retryMessageUpload = __(
-			'Failed to upload files.\nPlease tap for options.'
+		const retryMessageUpload = sprintf(
+			'%1$s \n%2$s',
+			__( 'Failed to upload files.' ),
+			__( 'Please tap for options.' )
 		);
 		let retryMessage = retryMessageSave;
 		if ( isUploadFailed ) {

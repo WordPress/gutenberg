@@ -81,7 +81,7 @@ describe.each( [
 		);
 		fireEvent.press( block );
 		fireEvent.press( block );
-		fireEvent.press( await subject.findByLabelText( 'Open Settings' ) );
+		fireEvent.press( await subject.findByLabelText( 'Open settings' ) );
 
 		// Assert.
 		const linkToField = await subject.findByLabelText(
@@ -113,7 +113,7 @@ describe.each( [
 				fireEvent.press( block );
 				fireEvent.press( block );
 				fireEvent.press(
-					await subject.findByLabelText( 'Open Settings' )
+					await subject.findByLabelText( 'Open settings' )
 				);
 				fireEvent.press(
 					await subject.findByLabelText(
@@ -158,7 +158,7 @@ describe.each( [
 				fireEvent.press( block );
 				fireEvent.press( block );
 				fireEvent.press(
-					await subject.findByLabelText( 'Open Settings' )
+					await subject.findByLabelText( 'Open settings' )
 				);
 				fireEvent.press(
 					await subject.findByLabelText(
@@ -223,7 +223,7 @@ describe.each( [
 					fireEvent.press( block );
 					fireEvent.press( block );
 					fireEvent.press(
-						await subject.findByLabelText( 'Open Settings' )
+						await subject.findByLabelText( 'Open settings' )
 					);
 					fireEvent.press(
 						await subject.findByLabelText(
@@ -276,7 +276,7 @@ describe.each( [
 					fireEvent.press( block );
 					fireEvent.press( block );
 					fireEvent.press(
-						await subject.findByLabelText( 'Open Settings' )
+						await subject.findByLabelText( 'Open settings' )
 					);
 					fireEvent.press(
 						await subject.findByLabelText(

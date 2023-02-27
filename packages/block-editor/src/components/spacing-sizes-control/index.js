@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { BaseControl } from '@wordpress/components';
 
 /**
@@ -23,7 +23,7 @@ import useSetting from '../use-setting';
 export default function SpacingSizesControl( {
 	inputProps,
 	onChange,
-	label = __( 'Spacing Control' ),
+	label = __( 'Spacing control' ),
 	values,
 	sides,
 	splitOnAxis = false,
@@ -39,7 +39,7 @@ export default function SpacingSizesControl( {
 
 	if ( spacingSizes.length > 8 ) {
 		spacingSizes.unshift( {
-			name: __( 'Default' ),
+			name: _x( 'Default', 'size' ),
 			slug: 'default',
 			size: undefined,
 		} );

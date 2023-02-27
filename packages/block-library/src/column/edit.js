@@ -22,7 +22,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { sprintf, __ } from '@wordpress/i18n';
+import { sprintf, __, _x } from '@wordpress/i18n';
 
 function ColumnEdit( {
 	attributes: { verticalAlignment, width, templateLock, allowedBlocks },
@@ -81,7 +81,7 @@ function ColumnEdit( {
 
 	const label = sprintf(
 		/* translators: 1: Block label (i.e. "Block: Column"), 2: Position of the selected block, 3: Total number of sibling blocks of the same type */
-		__( '%1$s (%2$d of %3$d)' ),
+		_x( '%1$s (%2$d of %3$d)', 'columns editing' ),
 		blockProps[ 'aria-label' ],
 		currentColumnPosition,
 		columnsCount

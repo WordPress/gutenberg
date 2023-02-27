@@ -89,43 +89,43 @@ const DimensionControls = ( {
 					options={ [
 						// These should use the same values as AspectRatioDropdown in @wordpress/block-editor
 						{
-							label: __( 'Original' ),
+							label: _x( 'Original', 'aspect ratio' ),
 							value: 'auto',
 						},
 						{
-							label: __( 'Square' ),
+							label: _x( 'Square', 'aspect ratio' ),
 							value: '1',
 						},
 						{
-							label: __( '16:10' ),
+							label: _x( '16:10', 'aspect ratio' ),
 							value: '16/10',
 						},
 						{
-							label: __( '16:9' ),
+							label: _x( '16:9', 'aspect ratio' ),
 							value: '16/9',
 						},
 						{
-							label: __( '4:3' ),
+							label: _x( '4:3', 'aspect ratio' ),
 							value: '4/3',
 						},
 						{
-							label: __( '3:2' ),
+							label: _x( '3:2', 'aspect ratio' ),
 							value: '3/2',
 						},
 						{
-							label: __( '10:16' ),
+							label: _x( '10:16', 'aspect ratio' ),
 							value: '10/16',
 						},
 						{
-							label: __( '9:16' ),
+							label: _x( '9:16', 'aspect ratio' ),
 							value: '9/16',
 						},
 						{
-							label: __( '3:4' ),
+							label: _x( '3:4', 'aspect ratio' ),
 							value: '3/4',
 						},
 						{
-							label: __( '2:3' ),
+							label: _x( '2:3', 'aspect ratio' ),
 							value: '2/3',
 						},
 					] }

@@ -16,7 +16,7 @@ import {
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { Platform } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -281,7 +281,7 @@ export function BorderPanel( props ) {
 			{ isRadiusSupported && (
 				<ToolsPanelItem
 					hasValue={ () => hasBorderRadiusValue( props ) }
-					label={ __( 'Radius' ) }
+					label={ _x( 'Radius', 'border radius' ) }
 					onDeselect={ () => resetBorderRadius( props ) }
 					isShownByDefault={ defaultBorderControls?.radius }
 					resetAllFilter={ ( newAttributes ) => ( {

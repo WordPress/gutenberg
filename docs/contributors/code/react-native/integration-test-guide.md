@@ -254,12 +254,12 @@ fireEvent.press( await waitFor( () => getByText( `Paragraph` ) ) );
 
 ### Open block settings
 
-The block settings can be accessed by tapping the "Open Settings" button after selecting the block, here is an example:
+The block settings can be accessed by tapping the "Open settings" button after selecting the block, here is an example:
 
 ```js
 fireEvent.press( block );
 
-const settingsButton = await waitFor( () => getByLabelText( 'Open Settings' ) );
+const settingsButton = await waitFor( () => getByLabelText( 'Open settings' ) );
 fireEvent.press( settingsButton );
 ```
 

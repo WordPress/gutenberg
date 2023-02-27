@@ -5,7 +5,7 @@ import {
 	PanelBody,
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -26,7 +26,7 @@ const AdvancedControls = () => {
 	return (
 		<PanelBody
 			className="block-editor-block-inspector__advanced"
-			title={ __( 'Advanced' ) }
+			title={ _x( 'Advanced', 'settings' ) }
 			initialOpen={ false }
 		>
 			<InspectorControls.Slot group="advanced" />

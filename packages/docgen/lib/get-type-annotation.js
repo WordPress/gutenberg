@@ -499,7 +499,7 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 			return getTypeAnnotation( member.typeAnnotation.typeAnnotation );
 		}
 	}
-	// If we couldn't find a specific member for the type then we'll just return something like `Type[ memberName ]` to indicate the parameter is a member of that type.
+	// If we could not find a specific member for the type then we'll just return something like `Type[ memberName ]` to indicate the parameter is a member of that type.
 	const typeAnnotation = getTypeAnnotation( paramType );
 	return `${ typeAnnotation }[ '${ memberName }' ]`;
 }

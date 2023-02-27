@@ -68,7 +68,7 @@ describe( 'Inserter', () => {
 
 			// Get Add To Beginning option
 			const addBlockToBeginningButton = await getByLabelText(
-				'Add To Beginning'
+				'Add to beginning'
 			);
 			expect( addBlockToBeginningButton ).toBeVisible();
 			fireEvent.press( addBlockToBeginningButton );
@@ -98,7 +98,7 @@ describe( 'Inserter', () => {
 
 			// Get Add Block Before option
 			const addBlockBeforeButton = await getByLabelText(
-				'Add Block Before'
+				'Add block before'
 			);
 			expect( addBlockBeforeButton ).toBeVisible();
 			fireEvent.press( addBlockBeforeButton );
@@ -136,7 +136,7 @@ describe( 'Inserter', () => {
 
 			// Get Add Block After option
 			const addBlockAfterButton = await getByLabelText(
-				'Add Block After'
+				'Add block after'
 			);
 			expect( addBlockAfterButton ).toBeVisible();
 			fireEvent.press( addBlockAfterButton );
@@ -171,7 +171,7 @@ describe( 'Inserter', () => {
 			fireEvent( addBlockButton, 'onLongPress' );
 
 			// Get Add To End option
-			const addBlockToEndButton = await getByLabelText( 'Add To End' );
+			const addBlockToEndButton = await getByLabelText( 'Add to end' );
 			expect( addBlockToEndButton ).toBeVisible();
 			fireEvent.press( addBlockToEndButton );
 

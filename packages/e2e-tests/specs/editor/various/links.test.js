@@ -605,7 +605,7 @@ describe( 'Links', () => {
 			await pressKeyWithModifier( 'primary', 'K' );
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
+				'//button[contains(@aria-label, "Link settings")]'
 			);
 			await settingsToggle.click();
 
@@ -638,7 +638,7 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
+				'//button[contains(@aria-label, "Link settings")]'
 			);
 			await settingsToggle.click();
 
@@ -702,7 +702,7 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
+				'//button[contains(@aria-label, "Link settings")]'
 			);
 			await settingsToggle.click();
 
@@ -737,7 +737,7 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
+				'//button[contains(@aria-label, "Link settings")]'
 			);
 			await settingsToggle.click();
 
@@ -788,7 +788,7 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Link Settings")]'
+				'//button[contains(@aria-label, "Link settings")]'
 			);
 			await settingsToggle.click();
 

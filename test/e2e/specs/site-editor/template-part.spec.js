@@ -68,7 +68,7 @@ test.describe( 'Template Part', () => {
 		await editor.insertBlock( { name: 'core/template-part' } );
 		await editor.canvas.click( 'role=button[name="Choose"i]' );
 		await page.click(
-			'role=listbox[name="Block Patterns"i] >> role=option[name="header"i]'
+			'role=listbox[name="Block patterns"i] >> role=option[name="header"i]'
 		);
 
 		// There are now two header template parts.
@@ -165,7 +165,7 @@ test.describe( 'Template Part', () => {
 			{ has: paragraphBlock2 }
 		);
 
-		// TODO: I couldn't find an easy way to assert that the same template
+		// TODO: I could not find an easy way to assert that the same template
 		// part locator contains both paragraphs. It'd be nice to improve this.
 		await expect( templatePartWithParagraph1 ).toBeVisible();
 		await expect( templatePartWithParagraph2 ).toBeVisible();

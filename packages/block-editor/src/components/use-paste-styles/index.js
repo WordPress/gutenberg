@@ -5,7 +5,7 @@ import { useCallback } from '@wordpress/element';
 import { getBlockType, parse } from '@wordpress/blocks';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -168,7 +168,7 @@ export default function usePasteStyles() {
 			if ( ! html || ! hasSerializedBlocks( html ) ) {
 				createWarningNotice(
 					__(
-						"Unable to paste styles. Block styles couldn't be found within the copied content."
+						'Unable to paste styles. Block styles could not be found within the copied content.'
 					),
 					{
 						type: 'snackbar',
@@ -202,7 +202,7 @@ export default function usePasteStyles() {
 				const title = getBlockType( targetBlocks[ 0 ].name )?.title;
 				createSuccessNotice(
 					sprintf(
-						// Translators: Name of the block being pasted, e.g. "Paragraph".
+						// translators: %s: Name of the block being pasted, e.g. "Paragraph".
 						__( 'Pasted styles to %s.' ),
 						title
 					),
@@ -211,8 +211,12 @@ export default function usePasteStyles() {
 			} else {
 				createSuccessNotice(
 					sprintf(
-						// Translators: The number of the blocks.
-						__( 'Pasted styles to %d blocks.' ),
+						// translators: %d: The number of the blocks.
+						_n(
+							'Pasted styles to %d block.',
+							'Pasted styles to %d blocks.',
+							targetBlocks.length
+						),
 						targetBlocks.length
 					),
 					{ type: 'snackbar' }

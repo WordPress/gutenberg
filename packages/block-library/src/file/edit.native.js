@@ -554,7 +554,7 @@ export class FileEdit extends Component {
 					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
 						title: __( 'File' ),
-						instructions: __( 'CHOOSE A FILE' ),
+						instructions: __( 'Choose a file' ),
 					} }
 					onSelect={ this.onSelectFile }
 					onFocus={ this.props.onFocus }

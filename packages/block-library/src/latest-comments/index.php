@@ -97,7 +97,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 
 			$list_items_markup .= sprintf(
 				/* translators: 1: author name (inside <a> or <span> tag, based on if they have a URL), 2: post title related to this comment */
-				__( '%1$s on %2$s' ),
+				_x( '%1$s on %2$s', 'latest comments block' ),
 				$author_markup,
 				$post_title
 			);

@@ -351,7 +351,7 @@ describe( 'color settings', () => {
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
-		const settingsButton = await screen.findByLabelText( 'Open Settings' );
+		const settingsButton = await screen.findByLabelText( 'Open settings' );
 		fireEvent.press( settingsButton );
 
 		// Wait for Block Settings to be visible.
@@ -386,7 +386,7 @@ describe( 'color settings', () => {
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
-		const settingsButton = await screen.findByLabelText( 'Open Settings' );
+		const settingsButton = await screen.findByLabelText( 'Open settings' );
 		fireEvent.press( settingsButton );
 
 		// Wait for Block Settings to be visible.
@@ -442,7 +442,7 @@ describe( 'color settings', () => {
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
-		const settingsButton = await screen.findByLabelText( 'Open Settings' );
+		const settingsButton = await screen.findByLabelText( 'Open settings' );
 		fireEvent.press( settingsButton );
 
 		// Wait for Block Settings to be visible.
@@ -498,7 +498,7 @@ describe( 'color settings', () => {
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
-		const settingsButton = await screen.findByLabelText( 'Open Settings' );
+		const settingsButton = await screen.findByLabelText( 'Open settings' );
 		fireEvent.press( settingsButton );
 
 		// Wait for Block Settings to be visible.

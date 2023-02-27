@@ -113,7 +113,7 @@ function ImageLinkDestinationsScreen( props ) {
 				/>
 				<LinkDestination
 					isSelected={ linkDestination === LINK_DESTINATION_MEDIA }
-					label={ __( 'Media File' ) }
+					label={ __( 'Media file' ) }
 					onPress={ setLinkDestination( LINK_DESTINATION_MEDIA ) }
 				/>
 				{ !! attachmentPageUrl && (
@@ -121,7 +121,7 @@ function ImageLinkDestinationsScreen( props ) {
 						isSelected={
 							linkDestination === LINK_DESTINATION_ATTACHMENT
 						}
-						label={ __( 'Attachment Page' ) }
+						label={ __( 'Attachment page' ) }
 						onPress={ setLinkDestination(
 							LINK_DESTINATION_ATTACHMENT
 						) }

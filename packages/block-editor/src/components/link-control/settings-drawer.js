@@ -47,7 +47,7 @@ function LinkSettingsDrawer( {
 				aria-expanded={ settingsOpen }
 				onClick={ () => setSettingsOpen( ! settingsOpen ) }
 				icon={ settingsIcon }
-				label={ __( 'Link Settings' ) }
+				label={ __( 'Link settings' ) }
 				aria-controls={ settingsDrawerId }
 			/>
 			<MaybeAnimatePresence>

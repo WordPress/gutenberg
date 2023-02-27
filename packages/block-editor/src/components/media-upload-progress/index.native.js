@@ -8,7 +8,7 @@ import { View } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
 
 /**
@@ -121,8 +121,10 @@ export class MediaUploadProgress extends Component {
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
-		const retryMessage = __(
-			'Failed to insert media.\nTap for more info.'
+		const retryMessage = sprintf(
+			'%1$s\n%2$s',
+			__( 'Failed to insert media.' ),
+			__( 'Tap for more info.' )
 		);
 
 		const progressBarStyle = [

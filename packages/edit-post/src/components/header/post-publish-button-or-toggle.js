@@ -42,7 +42,7 @@ export function PostPublishButtonOrToggle( {
 	 * - is published
 	 * - is scheduled to be published
 	 * - is pending and can't be published (but only for viewports >= medium).
-	 * 	 Originally, we considered showing a button for pending posts that couldn't be published
+	 * 	 Originally, we considered showing a button for pending posts that could not be published
 	 * 	 (for example, for an author with the contributor role). Some languages can have
 	 * 	 long translations for "Submit for review", so given the lack of UI real estate available
 	 * 	 we decided to take into account the viewport in that case.

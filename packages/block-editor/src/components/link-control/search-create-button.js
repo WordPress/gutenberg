@@ -32,8 +32,8 @@ export const LinkControlSearchCreate = ( {
 		text = createInterpolateElement(
 			sprintf(
 				/* translators: %s: search term. */
-				__( 'Create: <mark>%s</mark>' ),
-				searchTerm
+				__( 'Create: %s' ),
+				'<mark>' + searchTerm + '</mark>'
 			),
 			{ mark: <mark /> }
 		);

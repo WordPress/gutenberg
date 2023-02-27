@@ -133,9 +133,9 @@ export const SETTINGS_DEFAULTS = {
 
 	imageSizes: [
 		{ slug: 'thumbnail', name: __( 'Thumbnail' ) },
-		{ slug: 'medium', name: __( 'Medium' ) },
-		{ slug: 'large', name: __( 'Large' ) },
-		{ slug: 'full', name: __( 'Full Size' ) },
+		{ slug: 'medium', name: _x( 'Medium', 'image size' ) },
+		{ slug: 'large', name: _x( 'Large', 'image size' ) },
+		{ slug: 'full', name: _x( 'Full Size', 'image size' ) },
 	],
 
 	// Allow plugin to disable Image Editor if need be.

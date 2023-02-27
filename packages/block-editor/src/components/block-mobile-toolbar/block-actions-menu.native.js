@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	isReusableBlock,
 } from '@wordpress/blocks';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect, useSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { moreHorizontalMobile } from '@wordpress/icons';
@@ -130,7 +130,7 @@ const BlockActionsMenu = ( {
 		},
 		transformButton: {
 			id: 'transformButtonOption',
-			label: __( 'Transform block…' ),
+			label: __( 'Transform block' ),
 			value: 'transformButtonOption',
 			onSelect: () => {
 				if ( blockTransformationMenuPickerRef.current ) {
@@ -195,21 +195,21 @@ const BlockActionsMenu = ( {
 		},
 		convertToRegularBlocks: {
 			id: 'convertToRegularBlocksOption',
-			label:
-				innerBlockCount > 1
-					? __( 'Convert to regular blocks' )
-					: __( 'Convert to regular block' ),
+			label: _n(
+				'Convert to regular block',
+				'Convert to regular blocks',
+				innerBlockCount
+			),
 			value: 'convertToRegularBlocksOption',
 			onSelect: () => {
-				const successNotice =
-					innerBlockCount > 1
-						? /* translators: %s: name of the reusable block */
-						  __( '%s converted to regular blocks' )
-						: /* translators: %s: name of the reusable block */
-						  __( '%s converted to regular block' );
 				createSuccessNotice(
 					sprintf(
-						successNotice,
+						/* translators: %s: name of the reusable block */
+						_n(
+							'%s converted to regular block',
+							'%s converted to regular blocks',
+							innerBlockCount
+						),
 						reusableBlock?.title?.raw || blockTitle
 					)
 				);
@@ -237,7 +237,7 @@ const BlockActionsMenu = ( {
 	if ( ! options.length ) {
 		return (
 			<ToolbarButton
-				title={ __( 'Open Block Actions Menu' ) }
+				title={ __( 'Open block Actions menu' ) }
 				icon={ moreHorizontalMobile }
 				disabled={ true }
 			/>
@@ -278,7 +278,7 @@ const BlockActionsMenu = ( {
 	return (
 		<>
 			<ToolbarButton
-				title={ __( 'Open Block Actions Menu' ) }
+				title={ __( 'Open block Actions menu' ) }
 				onClick={ onPickerPresent }
 				icon={ moreHorizontalMobile }
 				extraProps={ {

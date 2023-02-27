@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { BaseControl, Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	reset,
 	formatCapitalize,
@@ -17,7 +17,7 @@ import {
 
 const TEXT_TRANSFORMS = [
 	{
-		name: __( 'None' ),
+		name: _x( 'None', 'text transform' ),
 		value: 'none',
 		icon: reset,
 	},

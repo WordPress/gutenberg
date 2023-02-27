@@ -3,7 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * External dependencies
@@ -60,12 +60,17 @@ class Video extends Component {
 					Alert.alert(
 						__( 'Problem opening the video' ),
 						__(
-							'No application can handle this request. Please install a Web browser.'
+							'No application can handle this request. Please install a web browser.'
 						)
 					);
 					window.console.warn(
-						'No application found that can open the video with URL: ' +
+						sprintf(
+							// translators: %s: URL to open.
+							__(
+								'No application found that can open the video with URL: %s'
+							),
 							url
+						)
 					);
 				} else {
 					return Linking.openURL( url );
@@ -77,7 +82,13 @@ class Video extends Component {
 					__( 'An unknown error occurred. Please try again.' )
 				);
 				window.console.error(
-					'An error occurred while opening the video URL: ' + url,
+					sprintf(
+						// translators: %s: URL to open.
+						__(
+							'An error occurred while opening the video URL: %s'
+						),
+						url
+					),
 					err
 				);
 			} );

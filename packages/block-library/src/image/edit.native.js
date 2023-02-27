@@ -124,10 +124,10 @@ function LinkSettings( {
 	let valueMask;
 	switch ( linkDestination ) {
 		case LINK_DESTINATION_MEDIA:
-			valueMask = __( 'Media File' );
+			valueMask = __( 'Media file' );
 			break;
 		case LINK_DESTINATION_ATTACHMENT:
-			valueMask = __( 'Attachment Page' );
+			valueMask = __( 'Attachment page' );
 			break;
 		case LINK_DESTINATION_CUSTOM:
 			valueMask = __( 'Custom URL' );
@@ -153,7 +153,7 @@ function LinkSettings( {
 	};
 
 	return (
-		<PanelBody title={ __( 'Link Settings' ) }>
+		<PanelBody title={ __( 'Link settings' ) }>
 			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
 				url={ url }

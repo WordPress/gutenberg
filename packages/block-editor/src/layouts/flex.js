@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	justifyLeft,
 	justifyCenter,
@@ -401,12 +401,12 @@ function OrientationControl( { layout, onChange } ) {
 			<ToggleGroupControlOptionIcon
 				icon={ arrowRight }
 				value={ 'horizontal' }
-				label={ __( 'Horizontal' ) }
+				label={ _x( 'Horizontal', 'layout' ) }
 			/>
 			<ToggleGroupControlOptionIcon
 				icon={ arrowDown }
 				value={ 'vertical' }
-				label={ __( 'Vertical' ) }
+				label={ _x( 'Vertical', 'layout' ) }
 			/>
 		</ToggleGroupControl>
 	);

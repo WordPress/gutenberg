@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import {
 	BaseControl,
@@ -42,14 +42,14 @@ const OPTION_CLASSNAME =
 const DEFAULT_OPTION = {
 	key: 'default',
 	value: '',
-	name: __( 'Default' ),
+	name: _x( 'Default', 'CSS position' ),
 	className: OPTION_CLASSNAME,
 };
 
 const STICKY_OPTION = {
 	key: 'sticky',
 	value: 'sticky',
-	name: __( 'Sticky' ),
+	name: _x( 'Sticky', 'CSS position' ),
 	className: OPTION_CLASSNAME,
 	__experimentalHint: __(
 		'The block will stick to the top of the window instead of scrolling.'
@@ -59,7 +59,7 @@ const STICKY_OPTION = {
 const FIXED_OPTION = {
 	key: 'fixed',
 	value: 'fixed',
-	name: __( 'Fixed' ),
+	name: _x( 'Fixed', 'CSS position' ),
 	className: OPTION_CLASSNAME,
 	__experimentalHint: __(
 		'The block will not move when the page is scrolled.'

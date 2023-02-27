@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Path, SVG } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 const variations = [
 	{
 		name: 'one-column-full',
-		title: __( '100' ),
+		title: _x( '100', 'column variation title' ),
 		description: __( 'One column' ),
 		icon: (
 			<SVG
@@ -35,7 +35,7 @@ const variations = [
 	},
 	{
 		name: 'two-columns-equal',
-		title: __( '50 / 50' ),
+		title: _x( '50 / 50', 'column variation title' ),
 		description: __( 'Two columns; equal split' ),
 		icon: (
 			<SVG
@@ -57,7 +57,7 @@ const variations = [
 	},
 	{
 		name: 'two-columns-one-third-two-thirds',
-		title: __( '33 / 66' ),
+		title: _x( '33 / 66', 'column variation title' ),
 		description: __( 'Two columns; one-third, two-thirds split' ),
 		icon: (
 			<SVG
@@ -81,7 +81,7 @@ const variations = [
 	},
 	{
 		name: 'two-columns-two-thirds-one-third',
-		title: __( '66 / 33' ),
+		title: _x( '66 / 33', 'column variation title' ),
 		description: __( 'Two columns; two-thirds, one-third split' ),
 		icon: (
 			<SVG
@@ -105,7 +105,7 @@ const variations = [
 	},
 	{
 		name: 'three-columns-equal',
-		title: __( '33 / 33 / 33' ),
+		title: _x( '33 / 33 / 33', 'column variation title' ),
 		description: __( 'Three columns; equal split' ),
 		icon: (
 			<SVG
@@ -129,7 +129,7 @@ const variations = [
 	},
 	{
 		name: 'three-columns-wider-center',
-		title: __( '25 / 50 / 25' ),
+		title: _x( '25 / 50 / 25', 'column variation title' ),
 		description: __( 'Three columns; wide center column' ),
 		icon: (
 			<SVG

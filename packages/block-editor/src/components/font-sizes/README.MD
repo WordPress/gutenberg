@@ -10,19 +10,19 @@ There is an equivalent component exposed under @wordpress/components. The differ
 ```jsx
 import { FontSizePicker } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 
 ...
 const MyFontSizePicker = () => {
 	const [ fontSize, setFontSize ] = useState( 16 );
 	const fontSizes = [
 		{
-			name: __( 'Small' ),
+			name: _x( 'Small', 'font size' ),
 			slug: 'small',
 			size: 12,
 		},
 		{
-			name: __( 'Big' ),
+			name: _x( 'Big', 'font size' ),
 			slug: 'big',
 			size: 26,
 		},

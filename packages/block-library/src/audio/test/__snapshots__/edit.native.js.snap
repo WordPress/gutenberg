@@ -401,7 +401,7 @@ exports[`Audio block renders placeholder without crashing 1`] = `
         Audio
       </Text>
       <Text>
-        ADD AUDIO
+        Add audio
       </Text>
     </View>
   </View>
