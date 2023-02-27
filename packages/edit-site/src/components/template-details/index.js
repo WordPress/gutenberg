@@ -107,8 +107,8 @@ export default function TemplateDetails( { template, onClose } ) {
 				{ ...browseAllLinkProps }
 			>
 				{ template?.type === 'wp_template'
-					? __( 'Browse all templates' )
-					: __( 'Browse all template parts' ) }
+					? __( 'Manage all templates' )
+					: __( 'Manage all template parts' ) }
 			</Button>
 		</div>
 	);
