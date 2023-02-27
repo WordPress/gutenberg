@@ -57,7 +57,7 @@ function Sidebar() {
 			</NavigatorProvider>
 
 			<div className="edit-site-sidebar__footer">
-				<SaveButton />
+				<SaveButton showTooltip={ false } />
 			</div>
 		</>
 	);

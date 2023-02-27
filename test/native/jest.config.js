@@ -68,5 +68,9 @@ module.exports = {
 		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|@react-native|react-clone-referenced-element|@react-navigation))',
 	],
 	snapshotSerializers: [ '@emotion/jest/serializer' ],
+	snapshotFormat: {
+		escapeString: false,
+		printBasicPrototype: false,
+	},
 	reporters: [ 'default', 'jest-junit' ],
 };
