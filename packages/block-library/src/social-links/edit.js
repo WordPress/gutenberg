@@ -109,7 +109,7 @@ export function SocialLinksEdit( props ) {
 		allowedBlocks: ALLOWED_BLOCKS,
 		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
-		orientation: attributes.layout?.orientation,
+		orientation: attributes.layout?.orientation ?? 'horizontal',
 		__experimentalAppenderTagName: 'li',
 	} );
 
