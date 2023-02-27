@@ -40,6 +40,15 @@ import type { WordPressComponentProps } from '../ui/context';
 
 const noop = () => {};
 
+function useUniqueId( idProp?: string ) {
+	const id = useInstanceId(
+		UnforwardedRangeControl,
+		'inspector-range-control'
+	);
+
+	return idProp || id;
+}
+
 function UnforwardedRangeControl< IconProps = unknown >(
 	props: WordPressComponentProps<
 		RangeControlProps< IconProps >,
@@ -59,6 +68,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 		disabled = false,
 		help,
 		hideLabelFromVision = false,
+		id: idProp,
 		initialPosition,
 		isShiftStepEnabled = true,
 		label,
@@ -125,10 +135,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 		!! marks && 'is-marked'
 	);
 
-	const id = useInstanceId(
-		UnforwardedRangeControl,
-		'inspector-range-control'
-	);
+	const id = useUniqueId( idProp );
 	const describedBy = !! help ? `${ id }__help` : undefined;
 	const enableTooltip = hasTooltip !== false && Number.isFinite( value );
 
