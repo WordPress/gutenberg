@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, AsyncModeProvider } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 
 /**
@@ -41,12 +41,14 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 export const BlockEditorProvider = ( props ) => {
 	return (
-		<ExperimentalBlockEditorProvider
-			{ ...props }
-			stripExperimentalSettings={ true }
-		>
-			{ props.children }
-		</ExperimentalBlockEditorProvider>
+		<AsyncModeProvider value={ true }>
+			<ExperimentalBlockEditorProvider
+				{ ...props }
+				stripExperimentalSettings={ true }
+			>
+				{ props.children }
+			</ExperimentalBlockEditorProvider>
+		</AsyncModeProvider>
 	);
 };
 
