@@ -170,7 +170,6 @@ function Iframe( {
 			);
 
 			contentDocument.dir = ownerDocument.dir;
-
 			documentElement.removeChild( contentDocument.body );
 
 			iFrameDocument.addEventListener(
