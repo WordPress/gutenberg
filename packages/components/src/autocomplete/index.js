@@ -35,7 +35,7 @@ import { speak } from '@wordpress/a11y';
 import { getAutoCompleterUI } from './autocompleter-ui';
 import { escapeRegExp } from '../utils/strings';
 
-const EMTPY_ARRAY = [];
+const EMPTY_ARRAY = [];
 
 /**
  * A raw completer option.
@@ -123,7 +123,7 @@ function useAutocomplete( {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const instanceId = useInstanceId( useAutocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
-	const [ filteredOptions, setFilteredOptions ] = useState( EMTPY_ARRAY );
+	const [ filteredOptions, setFilteredOptions ] = useState( EMPTY_ARRAY );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
@@ -171,7 +171,7 @@ function useAutocomplete( {
 
 	function reset() {
 		setSelectedIndex( 0 );
-		setFilteredOptions( EMTPY_ARRAY );
+		setFilteredOptions( EMPTY_ARRAY );
 		setFilterValue( '' );
 		setAutocompleter( null );
 		setAutocompleterUI( null );
