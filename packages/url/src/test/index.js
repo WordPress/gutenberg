@@ -898,49 +898,49 @@ describe( 'prependHTTPS', () => {
 		expect( prependHTTPS( url ) ).toBe( 'https://' + url );
 	} );
 
-	it( 'shouldn’t prepend https to an email', () => {
+	it( 'should not prepend https to an email', () => {
 		const url = 'foo@wordpress.org';
 
 		expect( prependHTTPS( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend https to an absolute URL', () => {
+	it( 'should not prepend https to an absolute URL', () => {
 		const url = '/wordpress';
 
 		expect( prependHTTPS( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend https to a relative URL', () => {
+	it( 'should not prepend https to a relative URL', () => {
 		const url = './wordpress';
 
 		expect( prependHTTPS( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend https to an anchor URL', () => {
+	it( 'should not prepend https to an anchor URL', () => {
 		const url = '#wordpress';
 
 		expect( prependHTTPS( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend https to a URL that already has https', () => {
+	it( 'should not prepend https to a URL that already has https', () => {
 		const url = 'https://wordpress.org';
 
 		expect( prependHTTPS( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend https to a URL that already has http', () => {
+	it( 'should not prepend https to a URL that already has http', () => {
 		const url = 'http://wordpress.org';
 
 		expect( prependHTTPS( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend https to a URL that already has ftp', () => {
+	it( 'should not prepend https to a URL that already has ftp', () => {
 		const url = 'ftp://wordpress.org';
 
 		expect( prependHTTPS( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend https to a URL that already has mailto', () => {
+	it( 'should not prepend https to a URL that already has mailto', () => {
 		const url = 'mailto:foo@wordpress.org';
 
 		expect( prependHTTPS( url ) ).toBe( url );

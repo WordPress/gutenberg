@@ -485,6 +485,8 @@ _Returns_
 
 Prepends "https\://" to a url, if it looks like something that is meant to be a TLD.
 
+Note: this will not replace "http\://" with "<https://">.
+
 _Usage_
 
 ```js
