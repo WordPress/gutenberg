@@ -128,6 +128,7 @@ describe( 'getPxFromCssUnit', () => {
 				'clamp(2.625rem, calc(2.625rem + ((1vw - 0.48rem) * 8.4135)), 3.25rem)',
 				'42px',
 			],
+			[ 'var:preset|font-size|medium', null ],
 		];
 
 		test.each( testData )( 'getPxFromCssUnit( %s )', ( unit, expected ) => {
