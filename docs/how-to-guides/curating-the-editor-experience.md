@@ -306,7 +306,7 @@ To fully remove patterns bundled with WordPress core from being accessed in the 
 
 **Prioritize starter patterns for any post type**
 
-When a user creates new content, whether a page or post, they are met with an empty canvas. However, that experience can be improved thanks to the option to have patterns from a specific type prioritized upon creation of a new piece of content. The modal appears each time the user creates a new item when there are patterns on their website that declare support for the core/post-content block types. By default, WordPress does not include any of these patterns, so the modal will not appear without some of these post content patterns being added. 
+When a user creates new content, regardless of post type, they are met with an empty canvas. However, that experience can be improved thanks to the option to have patterns from a specific type prioritized upon creation of a new piece of content. The modal appears each time the user creates a new item when there are patterns on their website that declare support for the `core/post-content` block types. By default, WordPress does not include any of these patterns, so the modal will not appear without at least two of these post content patterns being added. 
 
 To opt into this, include core/post-content in the blockTypes for your pattern. [Here's an example of a pattern](https://gist.github.com/annezazu/ead4c4965345251ec999b716c0c84f32) that would appear when creating a new post. 
 
