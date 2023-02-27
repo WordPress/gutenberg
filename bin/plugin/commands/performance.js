@@ -187,34 +187,33 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 			`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
 			performanceTestDirectory
 		);
-		const resultsFile = path.join(
-			performanceTestDirectory,
-			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
-		);
-		fs.mkdirSync( './__test-results', { recursive: true } );
-		fs.copyFileSync(
-			resultsFile,
-			`./__test-results/${ runKey }.results.json`
-		);
-		const rawResults = await readJSONFile(
-			path.join(
-				performanceTestDirectory,
-				`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
-			)
-		);
-		return curateResults( testSuite, rawResults );
 	} catch ( error ) {
 		fs.mkdirSync( './__test-results/artifacts', { recursive: true } );
 		const artifactsFolder = path.join(
 			performanceTestDirectory,
-			'artifacts'
+			'artifacts/'
 		);
 		await runShellScript(
-			'cp -Rv ' + artifactsFolder + ' ' + './__test-results/artifacts'
+			'cp -Rv ' + artifactsFolder + ' ' + './__test-results/artifacts/'
 		);
 
 		throw error;
 	}
+
+	const resultsFile = path.join(
+		performanceTestDirectory,
+		`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
+	);
+	fs.mkdirSync( './__test-results', { recursive: true } );
+	fs.copyFileSync( resultsFile, `./__test-results/${ runKey }.results.json` );
+	const rawResults = await readJSONFile(
+		path.join(
+			performanceTestDirectory,
+			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
+		)
+	);
+
+	return curateResults( testSuite, rawResults );
 }
 
 /**
