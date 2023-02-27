@@ -1496,7 +1496,8 @@ _Parameters_
 ### selectPreviousBlock
 
 Yields action objects used in signalling that the block preceding the given
-clientId or it's first parent from bottom to top should be selected.
+clientId (or optionally, its first parent from bottom to top)
+should be selected.
 
 _Parameters_
 

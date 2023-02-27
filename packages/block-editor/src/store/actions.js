@@ -232,7 +232,8 @@ export function selectBlock( clientId, initialPosition = 0 ) {
 
 /**
  * Yields action objects used in signalling that the block preceding the given
- * clientId or it's first parent from bottom to top should be selected.
+ * clientId (or optionally, its first parent from bottom to top)
+ * should be selected.
  *
  * @param {string}  clientId      Block client ID.
  * @param {boolean} orFirstParent If true, select the first parent if there is no previous block.
@@ -1203,7 +1204,8 @@ export const removeBlocks =
 		}
 
 		if ( selectPrevious ) {
-			dispatch.selectPreviousBlock( clientIds[ 0 ], true );
+			const shouldSelectParent = true;
+			dispatch.selectPreviousBlock( clientIds[ 0 ], shouldSelectParent );
 		}
 
 		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );

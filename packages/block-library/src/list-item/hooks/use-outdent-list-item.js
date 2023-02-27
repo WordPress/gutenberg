@@ -112,7 +112,8 @@ export default function useOutdentListItem( clientId ) {
 					getBlockIndex( parentListItemId ) + 1
 				);
 				if ( ! getBlockOrder( parentListId ).length ) {
-					removeBlock( parentListId, false );
+					const shouldSelectParent = false;
+					removeBlock( parentListId, shouldSelectParent );
 				}
 			} );
 		}, [] ),
