@@ -122,3 +122,36 @@ function toggleBlockSelectedStyles( registry ) {
 }
 
 window.wp.data.use( toggleBlockSelectedStyles );
+
+// The editor-canvas iframe relies upon `srcdoc`, which does not trigger a
+// `load` event. Thus, we must poll for the iframe to be ready.
+let editorOverridesAttempts = 0;
+const editorOverridesInterval = setInterval( () => {
+	editorOverridesAttempts++;
+	const editorCanvasFrameHead = document.querySelector(
+		'iframe[name="editor-canvas"]'
+	).contentWindow.document.head;
+
+	if ( editorCanvasFrameHead ) {
+		clearInterval( editorOverridesInterval );
+
+		// Clone the editor styles so that they can be copied to the iframe, as
+		// elements within an iframe cannot be styled from the parent context.
+		const editorOverrideStyles = document
+			.querySelector( '#editor-style-overrides' )
+			.cloneNode( true );
+		editorOverrideStyles.id = 'editor-styles-overrides-2';
+		editorCanvasFrameHead.appendChild( editorOverrideStyles );
+
+		// Select the first block.
+		const { blockEditorSelect, blockEditorDispatch } =
+			window.getBlockEditorStore();
+		const clientId = blockEditorSelect.getBlocks()[ 0 ].clientId;
+		blockEditorDispatch.selectBlock( clientId );
+	}
+
+	// Safeguard against infinite loop.
+	if ( editorOverridesAttempts > 30 ) {
+		clearInterval( editorOverridesInterval );
+	}
+}, 300 );

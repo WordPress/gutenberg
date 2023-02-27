@@ -29,6 +29,10 @@ public struct SourceFile {
 }
 
 extension SourceFile {
+    public func getName() -> String {
+        return self.name
+    }
+    
     public func jsScript(with argument: String? = nil) throws -> WKUserScript {
         let content = try getContent()
         let formatted = String(format: content, argument ?? [])

@@ -32,7 +32,7 @@ public struct FallbackJavascriptInjection {
         }
 
         func getInjectCssScript(with source: SourceFile) throws -> WKUserScript {
-            "window.injectCss(`\(try source.getContent())`)".toJsScript()
+            "window.injectCss(`\(try source.getContent())`, `\(source.getName())`)".toJsScript()
         }
 
         userContentScripts = [
