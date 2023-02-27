@@ -35,6 +35,8 @@ import { speak } from '@wordpress/a11y';
 import { getAutoCompleterUI } from './autocompleter-ui';
 import { escapeRegExp } from '../utils/strings';
 
+const EMTPY_ARRAY = [];
+
 /**
  * A raw completer option.
  *
@@ -169,7 +171,7 @@ function useAutocomplete( {
 
 	function reset() {
 		setSelectedIndex( 0 );
-		setFilteredOptions( [] );
+		setFilteredOptions( EMTPY_ARRAY );
 		setFilterValue( '' );
 		setAutocompleter( null );
 		setAutocompleterUI( null );
