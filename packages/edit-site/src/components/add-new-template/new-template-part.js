@@ -86,11 +86,12 @@ export default function NewTemplatePart( {
 			setIsModalOpen( false );
 		}
 	}
+	const { as: Toggle = Button, ...restToggleProps } = toggleProps ?? {};
 
 	return (
 		<>
-			<Button
-				{ ...toggleProps }
+			<Toggle
+				{ ...restToggleProps }
 				onClick={ () => {
 					setIsModalOpen( true );
 				} }
@@ -98,7 +99,7 @@ export default function NewTemplatePart( {
 				label={ postType.labels.add_new }
 			>
 				{ showIcon ? null : postType.labels.add_new }
-			</Button>
+			</Toggle>
 			{ isModalOpen && (
 				<CreateTemplatePartModal
 					closeModal={ () => setIsModalOpen( false ) }
