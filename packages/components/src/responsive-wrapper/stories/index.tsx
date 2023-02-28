@@ -38,10 +38,13 @@ Default.args = {
 };
 
 /**
- * Since SVG images don't have the equivalent of a natural width and height,
- * it is possible that the `naturalWidth` and `naturalHeight` properties are not
- * specified. In this case, the SVG simply keeps scaling up to fill its
- * container, unless the `height` and `width` attributes are specified.
+ * When passing an `SVG` element as the `<ResponsiveWrapper />`'s child, make
+ * sure that it has the `viewbox` and the `preserveAspectRatio` set.
+ *
+ * When dealing with SVGs, it may not be possible to derive its `naturalWidth`
+ * and `naturalHeight` and therefore passing them as propertied to
+ * `<ResponsiveWrapper />`. In this case, the SVG simply keeps scaling up to fill
+ * its container, unless the `height` and `width` attributes are specified.
  */
 export const WithSVG: ComponentStory< typeof ResponsiveWrapper > =
 	Template.bind( {} );
