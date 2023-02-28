@@ -129,10 +129,6 @@ _Returns_
 
 Undocumented declaration.
 
-### BlockContent
-
-Undocumented declaration.
-
 ### BlockContextProvider
 
 Component which merges passed value with current consumed block context.
@@ -208,6 +204,10 @@ _Parameters_
 _Returns_
 
 -   `WPComponent`: The component to be rendered.
+
+### BlockRoot
+
+Undocumented declaration.
 
 ### BlockSelectionClearer
 

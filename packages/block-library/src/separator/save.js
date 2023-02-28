@@ -7,8 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
+	BlockRoot,
 	getColorClassName,
-	useBlockProps,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 
@@ -37,5 +37,5 @@ export default function separatorSave( { attributes } ) {
 		backgroundColor: colorProps?.style?.backgroundColor,
 		color: colorClass ? undefined : customColor,
 	};
-	return <hr { ...useBlockProps.save( { className, style: styles } ) } />;
+	return <BlockRoot as="hr" className={ className } style={ styles } />;
 }

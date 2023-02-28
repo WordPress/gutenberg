@@ -4,6 +4,7 @@
 import {
 	Component,
 	cloneElement,
+	EnvironmentContext,
 	renderToString,
 	RawHTML,
 } from '@wordpress/element';
@@ -190,7 +191,9 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 
 	return renderToString(
-		getSaveElement( blockType, attributes, innerBlocks )
+		<EnvironmentContext.Provider value="save">
+			{ getSaveElement( blockType, attributes, innerBlocks ) }
+		</EnvironmentContext.Provider>
 	);
 }
 

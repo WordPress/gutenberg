@@ -99,7 +99,6 @@ export {
 /*
  * Content Related Components
  */
-export { BlockContent } from './block-content';
 export { default as __unstableBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as __unstableBlockToolbarLastItem } from './block-toolbar/block-toolbar-last-item';
 export { default as __unstableBlockNameContext } from './block-toolbar/block-name-context';
@@ -109,6 +108,7 @@ export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';
+export { BlockRoot } from './block-root';
 export { LayoutStyle as __experimentalLayoutStyle } from './block-list/layout';
 export { default as BlockMover } from './block-mover';
 export {

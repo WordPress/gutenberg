@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { HorizontalRule } from '@wordpress/components';
 import {
-	useBlockProps,
+	BlockRoot,
 	getColorClassName,
 	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
@@ -46,13 +46,10 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 	};
 
 	return (
-		<>
-			<HorizontalRule
-				{ ...useBlockProps( {
-					className,
-					style: hasCustomColor ? styles : undefined,
-				} ) }
-			/>
-		</>
+		<BlockRoot
+			as={ HorizontalRule }
+			className={ className }
+			style={ hasCustomColor ? styles : undefined }
+		/>
 	);
 }
