@@ -269,7 +269,11 @@ function UnforwardedRangeControl< IconProps = unknown >(
 						style={ { width: fillValueOffset } }
 						trackColor={ trackColor }
 					/>
-					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
+					<ThumbWrapper
+						className="components-range-control__thumb-wrapper"
+						style={ offsetStyle }
+						disabled={ disabled }
+					>
 						<Thumb
 							aria-hidden={ true }
 							isFocused={ isThumbFocused }
