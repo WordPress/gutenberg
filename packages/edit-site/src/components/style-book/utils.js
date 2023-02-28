@@ -35,7 +35,7 @@ export function getValueAsPx( rawValue ) {
 
 	const acceptableUnitsGroup = acceptableUnits?.join( '|' );
 	const regexUnits = new RegExp(
-		`^(\\d*\\.?\\d+)(${ acceptableUnitsGroup }){1,1}$`
+		`^(-?\\d*\\.?\\d+)(${ acceptableUnitsGroup }){1,1}$`
 	);
 
 	const matches = rawValue.match( regexUnits );
@@ -57,7 +57,7 @@ export function getValueAsPx( rawValue ) {
 	return returnValue;
 }
 
-export function getMarginBoxValuesFromCSSShadowValue( cssShadowValue ) {
+export function getMarginBoxValuesFromShadowValue( cssShadowValue ) {
 	// Strip all the values inside parentheses.
 	const filteredValue = cssShadowValue.replace( /\(.*?\)/g, '' );
 
@@ -82,6 +82,7 @@ export function getMarginBoxValuesFromCSSShadowValue( cssShadowValue ) {
 		// Split by space, and only extract the first three elements (x-offset, y-offset, blur-radius).
 		const shadowValueParts = shadowValue.trim().split( ' ' ).slice( 0, 3 );
 
+		// Only support simple `px`, `em`, and `rem` values.
 		if (
 			shadowValueParts.every( ( part ) =>
 				part.match( /([-0-9.]+)(px|em|rem)/ )
@@ -89,6 +90,7 @@ export function getMarginBoxValuesFromCSSShadowValue( cssShadowValue ) {
 		) {
 			const xOffset = getValueAsPx( shadowValueParts[ 0 ] ) || 0;
 			const yOffset = getValueAsPx( shadowValueParts[ 1 ] ) || 0;
+
 			const currentBlurRadius =
 				getValueAsPx( shadowValueParts[ 2 ] ) || 0;
 
@@ -96,20 +98,20 @@ export function getMarginBoxValuesFromCSSShadowValue( cssShadowValue ) {
 				blurRadius = currentBlurRadius;
 			}
 
-			if ( xOffset - blurRadius < marginLeft ) {
-				marginLeft = xOffset - blurRadius;
-			}
-
-			if ( yOffset - blurRadius < marginTop ) {
-				marginTop = xOffset - blurRadius;
-			}
-
-			if ( yOffset + blurRadius > marginBottom ) {
-				marginBottom = yOffset + blurRadius;
+			if ( -xOffset + blurRadius > marginLeft ) {
+				marginLeft = -xOffset + blurRadius;
 			}
 
 			if ( xOffset + blurRadius > marginRight ) {
 				marginRight = xOffset + blurRadius;
+			}
+
+			if ( -yOffset + blurRadius > marginTop ) {
+				marginTop = -yOffset + blurRadius;
+			}
+
+			if ( yOffset + blurRadius > marginBottom ) {
+				marginBottom = yOffset + blurRadius;
 			}
 
 			if (

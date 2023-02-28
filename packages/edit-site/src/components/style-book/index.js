@@ -37,7 +37,7 @@ import { ESCAPE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
-import { getMarginBoxValuesFromCSSShadowValue } from './utils';
+import { getMarginBoxValuesFromShadowValue } from './utils';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
@@ -200,10 +200,7 @@ function useShadowValueFromInnerBlocks( block ) {
 		block?.innerBlocks?.[ ( block?.innerBlocks?.length || 1 ) - 1 ]?.name
 	);
 
-	const results = [ firstInnerBlockShadow, lastInnerBlockShadow ].filter(
-		Boolean
-	);
-	return results[ 0 ];
+	return firstInnerBlockShadow || lastInnerBlockShadow;
 }
 
 const Example = memo( ( { name, title, blocks, isSelected, onClick } ) => {
@@ -213,9 +210,11 @@ const Example = memo( ( { name, title, blocks, isSelected, onClick } ) => {
 	const innerShadow = useShadowValueFromInnerBlocks( blocks );
 	const foundShadow = shadow || innerShadow;
 
+	// If a shadow is found for either the block or its first/last inner block,
+	// add a margin to the preview that is big enough to accommodate the shadow.
 	if ( foundShadow ) {
 		const marginBoxValues =
-			getMarginBoxValuesFromCSSShadowValue( foundShadow );
+			getMarginBoxValuesFromShadowValue( foundShadow );
 
 		[ 'left', 'top', 'right', 'bottom' ].forEach( ( side ) => {
 			if ( marginBoxValues[ side ] ) {
@@ -224,8 +223,10 @@ const Example = memo( ( { name, title, blocks, isSelected, onClick } ) => {
 		} );
 	}
 
-	cssRules += `.is-root-container > .wp-block { margin-top: 0 }`;
-	cssRules += `.is-root-container > .wp-block { margin-bottom: 0 }`;
+	// Ensure that margin is not applied to the first and last blocks within the preview.
+	// This prevents block-level margin styles from unexpectedly affecting the preview.
+	cssRules += `.is-root-container > .wp-block:first-child { margin-top: 0 }`;
+	cssRules += `.is-root-container > .wp-block:last-child { margin-bottom: 0 }`;
 
 	return (
 		<button
