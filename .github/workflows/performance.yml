@@ -86,15 +86,6 @@ jobs:
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
                   ./bin/plugin/cli.js perf $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 --tests-branch $GITHUB_SHA --wp-version "$WP_MAJOR"
 
-            - uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975 # v6.4.0
-              if: github.event_name == 'push'
-              id: commit-timestamp
-              with:
-                  github-token: ${{secrets.GITHUB_TOKEN}}
-                  script: |
-                      const commit_details = await github.rest.git.getCommit({owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha});
-                      return parseInt((new Date( commit_details.data.author.date ).getTime() / 1000).toFixed(0))
-
             - name: Compare performance with custom branches
               if: github.event_name == 'workflow_dispatch'
               env:
@@ -102,6 +93,16 @@ jobs:
                   WP_VERSION: ${{ github.event.inputs.wpversion }}
               run: |
                   ./bin/plugin/cli.js perf $(echo $BRANCHES | tr ',' ' ') --tests-branch $GITHUB_SHA --wp-version "$WP_VERSION"
+
+            - name: Get commit timestamp
+              uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975 # v6.4.0
+              if: github.event_name == 'push'
+              id: commit-timestamp
+              with:
+                  github-token: ${{secrets.GITHUB_TOKEN}}
+                  script: |
+                      const commit_details = await github.rest.git.getCommit({owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha});
+                      return parseInt((new Date( commit_details.data.author.date ).getTime() / 1000).toFixed(0))
 
             - name: Publish performance results
               if: github.event_name == 'push'
