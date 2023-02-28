@@ -460,7 +460,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			'slug' => $slug,
 		);
 
-		// Utilise existing CSS custom property.
+		// Utilize existing CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
 	} else {
 		// Handle when Duotone is either:
@@ -474,7 +474,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			'colors' => $duotone_attr, // required for building the SVG with gutenberg_get_duotone_filter_svg.
 		);
 
-		// Build a customised CSS filter property for unique slug.
+		// Build a customized CSS filter property for unique slug.
 		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
 	}
 
