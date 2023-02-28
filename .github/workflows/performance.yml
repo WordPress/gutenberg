@@ -60,14 +60,6 @@ jobs:
                   name: perf-test-results
                   path: ./__test-results/*.json
 
-            - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-              if: github.event_name == 'pull_request'
-              with:
-                  name: failures-artifacts
-                  path: ./__test-results/artifacts
-                  if-no-files-found: ignore
-
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
               env:
@@ -117,3 +109,11 @@ jobs:
                   COMMITTED_AT: ${{ steps.commit-timestamp.outputs.result }}
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
               run: ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 $COMMITTED_AT
+
+            - name: Archive debug artifacts (screenshots, HTML snapshots)
+              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+              if: always()
+              with:
+                  name: failures-artifacts
+                  path: ./__test-results/artifacts
+                  if-no-files-found: ignore
