@@ -104,7 +104,7 @@ export function useLayoutClasses( layout, blockName ) {
  *
  * @return { string } CSS rule.
  */
-export function useLayoutStyles( blockAttributes, blockName, selector ) {
+export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	const { layout = {}, style = {} } = blockAttributes;
 	// Update type for blocks using legacy layouts.
 	const usedLayout =

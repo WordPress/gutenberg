@@ -36,6 +36,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { parse } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -76,12 +78,39 @@ function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	);
 }
 
+/**
+ * Given an array of nested blocks, find the first Post Content
+ * block inside it, recursing through any nesting levels,
+ * and return its attributes.
+ *
+ * @param {Array} blocks A list of blocks.
+ *
+ * @return {Object | undefined} The Post Content block.
+ */
+function getPostContentAttributes( blocks ) {
+	for ( let i = 0; i < blocks.length; i++ ) {
+		if ( blocks[ i ].name === 'core/post-content' ) {
+			return blocks[ i ].attributes;
+		}
+		if ( blocks[ i ].innerBlocks.length ) {
+			const nestedPostContent = getPostContentAttributes(
+				blocks[ i ].innerBlocks
+			);
+
+			if ( nestedPostContent ) {
+				return nestedPostContent;
+			}
+		}
+	}
+}
+
 export default function VisualEditor( { styles } ) {
 	const {
 		deviceType,
 		isWelcomeGuideVisible,
 		isTemplateMode,
 		postContentAttributes,
+		editedPostTemplate = {},
 		wrapperBlockName,
 		wrapperUniqueId,
 		isBlockBasedTheme,
@@ -89,6 +118,7 @@ export default function VisualEditor( { styles } ) {
 		const {
 			isFeatureActive,
 			isEditingTemplate,
+			getEditedPostTemplate,
 			__experimentalGetPreviewDeviceType,
 		} = select( editPostStore );
 		const { getCurrentPostId, getCurrentPostType, getEditorSettings } =
@@ -103,12 +133,21 @@ export default function VisualEditor( { styles } ) {
 		}
 
 		const editorSettings = getEditorSettings();
+		const supportsTemplateMode = editorSettings.supportsTemplateMode;
+		const canEditTemplate = select( coreStore ).canUser(
+			'create',
+			'templates'
+		);
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			isTemplateMode: _isTemplateMode,
 			postContentAttributes: getEditorSettings().postContentAttributes,
+			editedPostTemplate:
+				supportsTemplateMode && canEditTemplate
+					? getEditedPostTemplate()
+					: undefined,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
@@ -192,7 +231,29 @@ export default function VisualEditor( { styles } ) {
 		return { type: 'default' };
 	}, [ isTemplateMode, themeSupportsLayout, globalLayoutSettings ] );
 
-	const layout = postContentAttributes?.layout || {};
+	const newestPostContentAttributes = useMemo( () => {
+		if ( ! editedPostTemplate?.content && ! editedPostTemplate?.blocks ) {
+			return postContentAttributes;
+		}
+		// When in template editing mode, we can access the blocks directly.
+		if ( editedPostTemplate?.blocks ) {
+			return getPostContentAttributes( editedPostTemplate?.blocks );
+		}
+		// If there are no blocks, we have to parse the content string.
+		// Best double-check it's a string otherwise the parse function gets unhappy.
+		const parseableContent =
+			typeof editedPostTemplate?.content === 'string'
+				? editedPostTemplate?.content
+				: '';
+
+		return getPostContentAttributes( parse( parseableContent ) ) || {};
+	}, [
+		editedPostTemplate?.content,
+		editedPostTemplate?.blocks,
+		postContentAttributes,
+	] );
+
+	const layout = newestPostContentAttributes?.layout || {};
 
 	const postContentLayoutClasses = useLayoutClasses(
 		layout,
@@ -207,7 +268,7 @@ export default function VisualEditor( { styles } ) {
 	);
 
 	const postContentLayoutStyles = useLayoutStyles(
-		postContentAttributes,
+		newestPostContentAttributes,
 		'core/post-content',
 		'.block-editor-block-list__layout.is-root-container'
 	);
@@ -222,6 +283,7 @@ export default function VisualEditor( { styles } ) {
 			? { ...globalLayoutSettings, ...layout, type: 'constrained' }
 			: { ...globalLayoutSettings, ...layout, type: 'default' };
 	}, [
+		layout,
 		layout?.type,
 		layout?.inherit,
 		layout?.contentSize,
