@@ -92,21 +92,24 @@ export function getMarginBoxValuesFromCSSShadowValue( cssShadowValue ) {
 			const currentBlurRadius =
 				getValueAsPx( shadowValueParts[ 2 ] ) || 0;
 
-			if ( xOffset < marginLeft ) {
-				marginLeft = xOffset;
-			}
-			if ( xOffset > marginRight ) {
-				marginRight = xOffset;
-			}
-			if ( yOffset < marginTop ) {
-				marginTop = yOffset;
-			}
-			if ( yOffset > marginBottom ) {
-				marginBottom = yOffset;
-			}
-
 			if ( currentBlurRadius > blurRadius ) {
 				blurRadius = currentBlurRadius;
+			}
+
+			if ( xOffset - blurRadius < marginLeft ) {
+				marginLeft = xOffset - blurRadius;
+			}
+
+			if ( yOffset - blurRadius < marginTop ) {
+				marginTop = xOffset - blurRadius;
+			}
+
+			if ( yOffset + blurRadius > marginBottom ) {
+				marginBottom = yOffset + blurRadius;
+			}
+
+			if ( xOffset + blurRadius > marginRight ) {
+				marginRight = xOffset + blurRadius;
 			}
 
 			if (
@@ -116,18 +119,10 @@ export function getMarginBoxValuesFromCSSShadowValue( cssShadowValue ) {
 				marginBottom ||
 				blurRadius
 			) {
-				output.left = `calc(${ Math.abs(
-					marginLeft
-				) }px + ${ blurRadius }px)`;
-				output.right = `calc(${ Math.abs(
-					marginRight
-				) }px + ${ blurRadius }px)`;
-				output.top = `calc(${ Math.abs(
-					marginTop
-				) }px + ${ blurRadius }px)`;
-				output.bottom = `calc(${ Math.abs(
-					marginBottom
-				) }px + ${ blurRadius }px)`;
+				output.left = Math.abs( marginLeft ) + 'px';
+				output.right = Math.abs( marginRight ) + 'px';
+				output.top = Math.abs( marginTop ) + 'px';
+				output.bottom = Math.abs( marginBottom ) + 'px';
 			}
 		}
 	} );
