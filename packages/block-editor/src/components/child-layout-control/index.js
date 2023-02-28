@@ -15,10 +15,9 @@ function helpText( selfStretch, parentLayout ) {
 	if ( selfStretch === 'fill' ) {
 		return __( 'Stretch to fill available space.' );
 	}
-	if ( selfStretch === 'fixed' ) {
-		if ( orientation === 'horizontal' ) {
-			return __( 'Specify a fixed width.' );
-		}
+	if ( selfStretch === 'fixed' && orientation === 'horizontal' ) {
+		return __( 'Specify a fixed width.' );
+	} else if ( selfStretch === 'fixed' ) {
 		return __( 'Specify a fixed height.' );
 	}
 	return __( 'Fit contents.' );
