@@ -9,6 +9,12 @@
 	"keywords": [ "link" ],
 	"textdomain": "default",
 	"attributes": {
+		"role": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "a",
+			"attribute": "role"
+		},
 		"textAlign": {
 			"type": "string"
 		},
@@ -83,7 +89,6 @@
 			}
 		},
 		"reusable": false,
-		"role": true,
 		"shadow": true,
 		"spacing": {
 			"__experimentalSkipSerialization": true,
