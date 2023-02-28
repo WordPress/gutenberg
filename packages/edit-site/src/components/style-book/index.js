@@ -37,6 +37,7 @@ import { ESCAPE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
+import { getMarginBoxValuesFromCSSShadowValue } from './utils';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
@@ -176,6 +177,7 @@ const Examples = memo( ( { examples, category, isSelected, onSelect } ) => (
 			.map( ( example ) => (
 				<Example
 					key={ example.name }
+					name={ example.name }
 					title={ example.title }
 					blocks={ example.blocks }
 					isSelected={ isSelected( example.name ) }
@@ -187,34 +189,73 @@ const Examples = memo( ( { examples, category, isSelected, onSelect } ) => (
 	</div>
 ) );
 
-const Example = memo( ( { title, blocks, isSelected, onClick } ) => (
-	<button
-		className={ classnames( 'edit-site-style-book__example', {
-			'is-selected': isSelected,
-		} ) }
-		aria-label={ sprintf(
-			// translators: %s: Title of a block, e.g. Heading.
-			__( 'Open %s styles in Styles panel' ),
-			title
-		) }
-		onClick={ onClick }
-	>
-		<span className="edit-site-style-book__example-title">{ title }</span>
-		<div className="edit-site-style-book__example-preview">
-			<BlockPreview
-				blocks={ blocks }
-				viewportWidth={ 0 }
-				additionalStyles={ [
-					{
-						css:
-							'.is-root-container > .wp-block:first-child { margin-top: 16px; }' +
-							'.is-root-container > .wp-block:last-child { margin-bottom: 16px; }',
-					},
-				] }
-			/>
-		</div>
-	</button>
-) );
+function useShadowValueFromInnerBlocks( block ) {
+	const [ firstInnerBlockShadow ] = useGlobalStyle(
+		'shadow',
+		block?.innerBlocks?.[ 0 ]?.name
+	);
+
+	const [ lastInnerBlockShadow ] = useGlobalStyle(
+		'shadow',
+		block?.innerBlocks?.[ ( block?.innerBlocks?.length || 1 ) - 1 ]?.name
+	);
+
+	const results = [ firstInnerBlockShadow, lastInnerBlockShadow ].filter(
+		Boolean
+	);
+	return results[ 0 ];
+}
+
+const Example = memo( ( { name, title, blocks, isSelected, onClick } ) => {
+	let cssRules = '';
+
+	const [ shadow ] = useGlobalStyle( 'shadow', name );
+	const innerShadow = useShadowValueFromInnerBlocks( blocks );
+	const foundShadow = shadow || innerShadow;
+
+	if ( foundShadow ) {
+		const marginBoxValues =
+			getMarginBoxValuesFromCSSShadowValue( foundShadow );
+
+		[ 'left', 'top', 'right', 'bottom' ].forEach( ( side ) => {
+			if ( marginBoxValues[ side ] ) {
+				cssRules += `.is-root-container { margin-${ side }: ${ marginBoxValues[ side ] }; }`;
+			}
+		} );
+	}
+
+	cssRules += `.is-root-container > .wp-block { margin-top: 0 }`;
+	cssRules += `.is-root-container > .wp-block { margin-bottom: 0 }`;
+
+	return (
+		<button
+			className={ classnames( 'edit-site-style-book__example', {
+				'is-selected': isSelected,
+			} ) }
+			aria-label={ sprintf(
+				// translators: %s: Title of a block, e.g. Heading.
+				__( 'Open %s styles in Styles panel' ),
+				title
+			) }
+			onClick={ onClick }
+		>
+			<span className="edit-site-style-book__example-title">
+				{ title }
+			</span>
+			<div className="edit-site-style-book__example-preview">
+				<BlockPreview
+					blocks={ blocks }
+					viewportWidth={ 0 }
+					additionalStyles={ [
+						{
+							css: cssRules,
+						},
+					] }
+				/>
+			</div>
+		</button>
+	);
+} );
 
 function useHasStyleBook() {
 	const fills = useSlotFills( SLOT_FILL_NAME );
