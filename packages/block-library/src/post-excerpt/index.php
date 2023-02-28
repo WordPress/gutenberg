@@ -83,9 +83,9 @@ add_action( 'init', 'register_block_core_post_excerpt' );
  * the excerpt length block setting has no effect.
  * Returns 100 because 100 is the max length in the setting.
  */
-if ( is_admin() ||
-	defined( 'REST_REQUEST' ) ||
-	'REST_REQUEST' ) {
+if ( is_admin() &&
+	defined( 'REST_REQUEST' ) &&
+	REST_REQUEST ) {
 	add_filter(
 		'excerpt_length',
 		function() {
