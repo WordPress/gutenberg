@@ -36,10 +36,10 @@ If true, the wrapper will be `span` instead of `div`.
 
 The intrinsic height of the element to wrap. Will be used to determine the aspect ratio.
 
--   Required: Yes
+-   Required: No
 
 ### `naturalWidth`: `number`
 
 The intrinsic width of the element to wrap. Will be used to determine the aspect ratio.
 
--   Required: Yes
+-   Required: No
