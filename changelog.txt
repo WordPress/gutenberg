@@ -1,5 +1,20 @@
 == Changelog ==
 
+= 15.2.3 =
+
+## Changelog
+
+### Bug Fixes
+
+- useAsyncList: flush state updates when processing queue (https://github.com/WordPress/gutenberg/pull/48238).
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@jsnajdr 
+
+
 = 15.2.2 =
 
 
