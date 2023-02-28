@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -42,11 +37,8 @@ function PostPublishPanelPrepublish( { children } ) {
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
 		return {
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isRequestingSiteIcon: isResolving( 'getEntityRecord', [
 				'root',

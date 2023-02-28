@@ -15,26 +15,23 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import Inserter from '../inserter';
 
 export const Appender = forwardRef(
-	( { nestingLevel, blockCount, ...props }, ref ) => {
+	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
 		const [ insertedBlock, setInsertedBlock ] = useState( null );
 
 		const instanceId = useInstanceId( Appender );
-		const { hideInserter, clientId } = useSelect( ( select ) => {
-			const {
-				getTemplateLock,
-				__unstableGetEditorMode,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
+		const { hideInserter } = useSelect(
+			( select ) => {
+				const { getTemplateLock, __unstableGetEditorMode } =
+					select( blockEditorStore );
 
-			const _clientId = getSelectedBlockClientId();
-
-			return {
-				clientId: getSelectedBlockClientId(),
-				hideInserter:
-					!! getTemplateLock( _clientId ) ||
-					__unstableGetEditorMode() === 'zoom-out',
-			};
-		}, [] );
+				return {
+					hideInserter:
+						!! getTemplateLock( clientId ) ||
+						__unstableGetEditorMode() === 'zoom-out',
+				};
+			},
+			[ clientId ]
+		);
 
 		const blockTitle = useBlockDisplayTitle( {
 			clientId,

@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  */
 import type { HeadingSize } from '../heading/types';
 
-type ResetAllFilter = ( attributes?: any ) => any;
+export type ResetAllFilter = ( attributes?: any ) => any;
 type ResetAll = ( filters?: ResetAllFilter[] ) => void;
 
 export type ToolsPanelProps = {
@@ -122,14 +122,6 @@ export type ToolsPanelItem = {
 	 * from a shared source.
 	 */
 	panelId?: string | null;
-	/**
-	 * A `ToolsPanel` will collect each item's `resetAllFilter` and pass an
-	 * array of these functions through to the panel's `resetAll` callback. They
-	 * can then be iterated over to perform additional tasks.
-	 *
-	 * @default noop
-	 */
-	resetAllFilter?: ResetAllFilter;
 };
 
 export type ToolsPanelItemProps = ToolsPanelItem & {
@@ -147,6 +139,15 @@ export type ToolsPanelItemProps = ToolsPanelItem & {
 	 * menu.
 	 */
 	onSelect?: () => void;
+
+	/**
+	 * A `ToolsPanel` will collect each item's `resetAllFilter` and pass an
+	 * array of these functions through to the panel's `resetAll` callback. They
+	 * can then be iterated over to perform additional tasks.
+	 *
+	 * @default noop
+	 */
+	resetAllFilter?: ResetAllFilter;
 };
 
 export type ToolsPanelMenuItemKey = 'default' | 'optional';
@@ -161,6 +162,8 @@ export type ToolsPanelContext = {
 	hasMenuItems: boolean;
 	registerPanelItem: ( item: ToolsPanelItem ) => void;
 	deregisterPanelItem: ( label: string ) => void;
+	registerResetAllFilter: ( filter: ResetAllFilter ) => void;
+	deregisterResetAllFilter: ( filter: ResetAllFilter ) => void;
 	flagItemCustomization: (
 		label: string,
 		group?: ToolsPanelMenuItemKey

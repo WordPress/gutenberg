@@ -23,16 +23,33 @@
 
 .edit-site-sidebar-navigation-screen__title {
 	font-size: calc(1.56 * 13px);
+	line-height: normal;
 	font-weight: 500;
 	flex-grow: 1;
 	color: $white;
 	margin: 0;
 }
 
+.edit-site-sidebar-navigation-screen__edit {
+	flex-shrink: 0;
+}
+
 .edit-site-sidebar-navigation-screen__back {
 	color: $gray-200;
 
+	// Focus (resets default button focus and use focus-visible).
+	&:focus:not(:disabled) {
+		box-shadow: none;
+		outline: none;
+	}
+	&:focus-visible:not(:disabled) {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		outline: 3px solid transparent;
+	}
+
 	&:hover,
+	&:focus-visible,
+	&:focus,
 	&:not([aria-disabled="true"]):active {
 		color: $white;
 	}

@@ -33,6 +33,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -1058,8 +1059,9 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaFileUploadFailed(mediaId);
     }
 
-    public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId) {
-        mDeferredEventEmitter.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId);
+    public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId, final
+                                         WritableNativeMap metadata) {
+        mDeferredEventEmitter.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId, metadata);
     }
 
     public void clearMediaFileURL(final int mediaId) {
