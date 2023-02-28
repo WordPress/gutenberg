@@ -280,15 +280,13 @@ export default function Layout() {
 									whileHover={
 										canvasMode === 'view'
 											? {
-													top: '8px',
-													bottom: '8px',
-													left: '-8px',
+													scale: 1.01,
 													transition: {
 														duration:
 															disableMotion ||
 															isResizing
 																? 0
-																: ANIMATION_DURATION,
+																: 0.2,
 													},
 											  }
 											: {}
