@@ -296,9 +296,9 @@ In the following example, the data from the current theme's theme.json file is u
 ```
 // Disable color controls for all users except Administrators.
 function example_filter_theme_json_data_theme( $theme_json ){
-    $is_admin = current_user_can( 'edit_theme_options' );
+    $is_administrator = current_user_can( 'edit_theme_options' );
 
-    if ( $is_admin ) {
+    if ( $is_administrator ) {
         $new_data = array(
             'version'  => 2,
             'settings' => array(
