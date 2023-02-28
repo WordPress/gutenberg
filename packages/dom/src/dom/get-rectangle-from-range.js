@@ -89,7 +89,7 @@ export default function getRectangleFromRange( range ) {
 	// by adding a temporary text node with zero-width space to the range.
 	//
 	// See: https://stackoverflow.com/a/6847328/995445
-	if ( ! rect ) {
+	if ( ! rect || rect.height === 0 ) {
 		assertIsDefined( ownerDocument, 'ownerDocument' );
 		const padNode = ownerDocument.createTextNode( '\u200b' );
 		// Do not modify the live range.

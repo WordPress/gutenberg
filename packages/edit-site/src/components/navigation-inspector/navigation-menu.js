@@ -4,6 +4,8 @@
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
+	BlockList,
+	BlockTools,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
@@ -34,6 +36,7 @@ const ALLOWED_BLOCKS = {
 		'core/navigation-link',
 		'core/navigation-submenu',
 	],
+	'core/page-list': [ 'core/page-list-item' ],
 };
 
 export default function NavigationMenu( { innerBlocks, onSelect } ) {
@@ -56,11 +59,20 @@ export default function NavigationMenu( { innerBlocks, onSelect } ) {
 		} );
 	}, [ updateBlockListSettings, innerBlocks ] );
 
+	// The hidden block is needed because it makes block edit side effects trigger.
+	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
-		<OffCanvasEditor
-			blocks={ innerBlocks }
-			onSelect={ onSelect }
-			LeafMoreMenu={ LeafMoreMenu }
-		/>
+		<>
+			<OffCanvasEditor
+				blocks={ innerBlocks }
+				onSelect={ onSelect }
+				LeafMoreMenu={ LeafMoreMenu }
+			/>
+			<div style={ { display: 'none' } }>
+				<BlockTools>
+					<BlockList />
+				</BlockTools>
+			</div>
+		</>
 	);
 }

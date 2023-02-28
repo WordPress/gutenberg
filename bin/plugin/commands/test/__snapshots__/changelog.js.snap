@@ -41,7 +41,7 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Correct \`function_exists()\` check typo introduced in #33331. ([33513](https://github.com/WordPress/gutenberg/pull/33513))
 - ESLint Plugin: Include .jsx extenstion when linting import statements. ([33746](https://github.com/WordPress/gutenberg/pull/33746))
 - Fix block appender position in classic themes. ([33895](https://github.com/WordPress/gutenberg/pull/33895))
-- Fix misspelling of \\"queries\\" in filter documentation. ([33799](https://github.com/WordPress/gutenberg/pull/33799))
+- Fix misspelling of "queries" in filter documentation. ([33799](https://github.com/WordPress/gutenberg/pull/33799))
 - Fix positioning discrepancy with draggable chip. ([33893](https://github.com/WordPress/gutenberg/pull/33893))
 - Navigation Editor: Avoid React warning when creating a new menu. ([33843](https://github.com/WordPress/gutenberg/pull/33843))
 

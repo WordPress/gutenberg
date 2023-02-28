@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
@@ -15,15 +14,21 @@ import { Icon, check } from '@wordpress/icons';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
+import type {
+	CircularOptionPickerProps,
+	DropdownLinkActionProps,
+	OptionProps,
+} from './types';
+import type { WordPressComponentProps } from '../ui/context';
+import type { ButtonAsButtonProps } from '../button/types';
 
-function Option( props ) {
-	const {
-		className,
-		isSelected,
-		selectedIconProps,
-		tooltipText,
-		...additionalProps
-	} = props;
+export function Option( {
+	className,
+	isSelected,
+	selectedIconProps,
+	tooltipText,
+	...additionalProps
+}: OptionProps ) {
 	const optionButton = (
 		<Button
 			isPressed={ isSelected }
@@ -53,8 +58,12 @@ function Option( props ) {
 	);
 }
 
-function DropdownLinkAction( props ) {
-	const { buttonProps, className, dropdownProps, linkText } = props;
+export function DropdownLinkAction( {
+	buttonProps,
+	className,
+	dropdownProps,
+	linkText,
+}: DropdownLinkActionProps ) {
 	return (
 		<Dropdown
 			className={ classnames(
@@ -77,8 +86,11 @@ function DropdownLinkAction( props ) {
 	);
 }
 
-function ButtonAction( props ) {
-	const { className, children, ...additionalProps } = props;
+export function ButtonAction( {
+	className,
+	children,
+	...additionalProps
+}: WordPressComponentProps< ButtonAsButtonProps, 'button', false > ) {
 	return (
 		<Button
 			className={ classnames(
@@ -93,7 +105,53 @@ function ButtonAction( props ) {
 	);
 }
 
-export default function CircularOptionPicker( props ) {
+/**
+ *`CircularOptionPicker` is a component that displays a set of options as circular buttons.
+ *
+ * ```jsx
+ * import { CircularOptionPicker } from '../circular-option-picker';
+ * import { useState } from '@wordpress/element';
+ *
+ * const Example = () => {
+ * 	const [ currentColor, setCurrentColor ] = useState();
+ * 	const colors = [
+ * 		{ color: '#f00', name: 'Red' },
+ * 		{ color: '#0f0', name: 'Green' },
+ * 		{ color: '#00f', name: 'Blue' },
+ * 	];
+ * 	const colorOptions = (
+ * 		<>
+ * 			{ colors.map( ( { color, name }, index ) => {
+ * 				return (
+ * 					<CircularOptionPicker.Option
+ * 						key={ `${ color }-${ index }` }
+ * 						tooltipText={ name }
+ * 						style={ { backgroundColor: color, color } }
+ * 						isSelected={ index === currentColor }
+ * 						onClick={ () => setCurrentColor( index ) }
+ * 						aria-label={ name }
+ * 					/>
+ * 				);
+ * 			} ) }
+ * 		</>
+ * 	);
+ * 	return (
+ * 		<CircularOptionPicker
+ * 				options={ colorOptions }
+ * 				actions={
+ * 					<CircularOptionPicker.ButtonAction
+ * 						onClick={ () => setCurrentColor( undefined ) }
+ * 					>
+ * 						{ 'Clear' }
+ * 					</CircularOptionPicker.ButtonAction>
+ * 				}
+ * 			/>
+ * 	);
+ * };
+ * ```
+ */
+
+function CircularOptionPicker( props: CircularOptionPickerProps ) {
 	const { actions, className, options, children } = props;
 	return (
 		<div
@@ -118,3 +176,5 @@ export default function CircularOptionPicker( props ) {
 CircularOptionPicker.Option = Option;
 CircularOptionPicker.ButtonAction = ButtonAction;
 CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
+
+export default CircularOptionPicker;

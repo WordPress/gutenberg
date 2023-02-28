@@ -17,6 +17,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import BlockTitle from '../block-title';
+import { useListViewContext } from './context';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -30,6 +31,7 @@ const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 ];
 
 function AddSubmenuItem( { block, onClose } ) {
+	const { expandedState, expand } = useListViewContext();
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
 
@@ -73,6 +75,9 @@ function AddSubmenuItem( { block, onClose } ) {
 						[ newLink ],
 						updateSelectionOnInsert
 					);
+				}
+				if ( ! expandedState[ block.clientId ] ) {
+					expand( block.clientId );
 				}
 				onClose();
 			} }

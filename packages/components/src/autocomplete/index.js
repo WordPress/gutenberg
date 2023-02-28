@@ -35,6 +35,8 @@ import { speak } from '@wordpress/a11y';
 import { getAutoCompleterUI } from './autocompleter-ui';
 import { escapeRegExp } from '../utils/strings';
 
+const EMPTY_ARRAY = [];
+
 /**
  * A raw completer option.
  *
@@ -121,7 +123,7 @@ function useAutocomplete( {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const instanceId = useInstanceId( useAutocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
-	const [ filteredOptions, setFilteredOptions ] = useState( [] );
+	const [ filteredOptions, setFilteredOptions ] = useState( EMPTY_ARRAY );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
@@ -169,7 +171,7 @@ function useAutocomplete( {
 
 	function reset() {
 		setSelectedIndex( 0 );
-		setFilteredOptions( [] );
+		setFilteredOptions( EMPTY_ARRAY );
 		setFilterValue( '' );
 		setAutocompleter( null );
 		setAutocompleterUI( null );
@@ -281,23 +283,19 @@ function useAutocomplete( {
 
 	useEffect( () => {
 		if ( ! textContent ) {
-			reset();
+			if ( autocompleter ) reset();
 			return;
 		}
 
-		const text = removeAccents( textContent );
-		const textAfterSelection = getTextContent(
-			slice( record, undefined, getTextContent( record ).length )
-		);
 		const completer = completers?.find(
 			( { triggerPrefix, allowContext } ) => {
-				const index = text.lastIndexOf( triggerPrefix );
+				const index = textContent.lastIndexOf( triggerPrefix );
 
 				if ( index === -1 ) {
 					return false;
 				}
 
-				const textWithoutTrigger = text.slice(
+				const textWithoutTrigger = textContent.slice(
 					index + triggerPrefix.length
 				);
 
@@ -339,9 +337,16 @@ function useAutocomplete( {
 					return false;
 				}
 
+				const textAfterSelection = getTextContent(
+					slice( record, undefined, getTextContent( record ).length )
+				);
+
 				if (
 					allowContext &&
-					! allowContext( text.slice( 0, index ), textAfterSelection )
+					! allowContext(
+						textContent.slice( 0, index ),
+						textAfterSelection
+					)
 				) {
 					return false;
 				}
@@ -358,11 +363,12 @@ function useAutocomplete( {
 		);
 
 		if ( ! completer ) {
-			reset();
+			if ( autocompleter ) reset();
 			return;
 		}
 
 		const safeTrigger = escapeRegExp( completer.triggerPrefix );
+		const text = removeAccents( textContent );
 		const match = text
 			.slice( text.lastIndexOf( completer.triggerPrefix ) )
 			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );

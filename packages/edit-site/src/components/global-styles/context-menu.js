@@ -12,6 +12,7 @@ import {
 import {
 	typography,
 	border,
+	filter,
 	shadow,
 	color,
 	layout,
@@ -30,6 +31,7 @@ import { useMemo } from '@wordpress/element';
 import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
+import { useHasFilterPanel } from './filter-utils';
 import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
 import { IconWithCurrentColor } from './icon-with-current-color';
@@ -55,6 +57,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 	const hasColorPanel = useHasColorPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasEffectsPanel = useHasShadowControl( name );
+	const hasFilterPanel = useHasFilterPanel( name );
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
 	const hasLayoutPanel = hasDimensionsPanel;
 	const hasVariationsPanel = useHasVariationsPanel( name, parentMenu );
@@ -115,6 +118,15 @@ function ContextMenu( { name, parentMenu = '' } ) {
 						aria-label={ __( 'Shadow' ) }
 					>
 						{ __( 'Shadow' ) }
+					</NavigationButtonAsItem>
+				) }
+				{ hasFilterPanel && (
+					<NavigationButtonAsItem
+						icon={ filter }
+						path={ parentMenu + '/filters' }
+						aria-label={ __( 'Filters styles' ) }
+					>
+						{ __( 'Filters' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasLayoutPanel && (

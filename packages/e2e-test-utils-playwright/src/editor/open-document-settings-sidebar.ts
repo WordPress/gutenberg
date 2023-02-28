@@ -7,7 +7,7 @@ import type { Editor } from './index';
  * Clicks on the button in the header which opens Document Settings sidebar when
  * it is closed.
  *
- * @param {Editor} this
+ * @param this
  */
 export async function openDocumentSettingsSidebar( this: Editor ) {
 	const toggleButton = this.page

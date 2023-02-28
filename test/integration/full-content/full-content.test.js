@@ -2,7 +2,6 @@
  * External dependencies
  */
 import glob from 'fast-glob';
-import { get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -252,11 +251,8 @@ describe( 'full post content fixture', () => {
 								JSON.parse( jsonFixtureContent );
 							// The name of the first block that this fixture file
 							// contains (if any).
-							const firstBlock = get(
-								parserOutput,
-								[ '0', 'name' ],
-								null
-							);
+							const firstBlock =
+								parserOutput?.[ '0' ]?.name ?? null;
 							return {
 								filename: htmlFixtureFileName,
 								parserOutput,

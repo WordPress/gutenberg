@@ -196,7 +196,7 @@ class ToolbarRovingTabindexUtils {
 				document.activeElement.getAttribute( 'aria-label' )
 			);
 		}
-		await expect( ariaLabel ).toBe( label );
+		expect( ariaLabel ).toBe( label );
 	}
 
 	async wrapCurrentBlockWithGroup( currentBlockTitle ) {
