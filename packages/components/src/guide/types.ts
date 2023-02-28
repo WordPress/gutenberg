@@ -36,6 +36,8 @@ export type GuideProps = {
 	contentLabel: ModalProps[ 'contentLabel' ];
 	/**
 	 * Use this to customize the label of the _Finish_ button shown at the end of the guide.
+	 *
+	 * @default 'Finish'
 	 */
 	finishButtonText?: string;
 	/**
@@ -44,6 +46,8 @@ export type GuideProps = {
 	onFinish: ModalProps[ 'onRequestClose' ];
 	/**
 	 * An array of objects describing each page in the guide.
+	 *
+	 * @default []
 	 */
 	pages?: Page[];
 };
