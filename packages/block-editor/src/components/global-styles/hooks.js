@@ -281,37 +281,7 @@ export function useSettingsForBlockElement(
 					[ key ]: false,
 				};
 			}
-		} );
 
-		if ( ! supportedStyles.includes( 'padding' ) ) {
-			updatedSettings.spacing = {
-				...updatedSettings.spacing,
-				padding: false,
-			};
-		}
-
-		if ( ! supportedStyles.includes( 'margin' ) ) {
-			updatedSettings.spacing = {
-				...updatedSettings.spacing,
-				margin: false,
-			};
-		}
-
-		if ( ! supportedStyles.includes( 'blockGap' ) ) {
-			updatedSettings.spacing = {
-				...updatedSettings.spacing,
-				blockGap: false,
-			};
-		}
-
-		if ( ! supportedStyles.includes( 'minHeight' ) ) {
-			updatedSettings.dimensions = {
-				...updatedSettings.dimensions,
-				minHeight: false,
-			};
-		}
-
-		[ 'padding', 'margin', 'blockGap' ].forEach( ( key ) => {
 			const sides = Array.isArray( supports?.spacing?.[ key ] )
 				? supports?.spacing?.[ key ]
 				: supports?.spacing?.[ key ]?.sides;
@@ -325,6 +295,13 @@ export function useSettingsForBlockElement(
 				};
 			}
 		} );
+
+		if ( ! supportedStyles.includes( 'minHeight' ) ) {
+			updatedSettings.dimensions = {
+				...updatedSettings.dimensions,
+				minHeight: false,
+			};
+		}
 
 		return updatedSettings;
 	}, [ parentSettings, supportedStyles, supports ] );
