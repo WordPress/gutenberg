@@ -39,21 +39,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			}
 			return { postId: post.id, postType: post.type };
 		}, [ post.id, post.type ] );
-		const { editorSettings, selection, isReady } = useSelect(
-			( select ) => {
-				const {
-					getEditorSettings,
-					getEditorSelection,
-					__unstableIsEditorReady,
-				} = select( editorStore );
-				return {
-					editorSettings: getEditorSettings(),
-					isReady: __unstableIsEditorReady(),
-					selection: getEditorSelection(),
-				};
-			},
-			[]
-		);
+		const { editorSettings, isReady } = useSelect( ( select ) => {
+			const { getEditorSettings, __unstableIsEditorReady } =
+				select( editorStore );
+			return {
+				editorSettings: getEditorSettings(),
+				isReady: __unstableIsEditorReady(),
+			};
+		}, [] );
 		const { id, type } = __unstableTemplate ?? post;
 		const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 			'postType',
@@ -125,7 +118,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							value={ blocks }
 							onChange={ onChange }
 							onInput={ onInput }
-							selection={ selection }
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
