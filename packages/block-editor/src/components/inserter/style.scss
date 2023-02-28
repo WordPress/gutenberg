@@ -697,3 +697,14 @@ $block-inserter-tabs-height: 44px;
 		height: 100%;
 	}
 }
+
+
+.block-editor-inserter-media-tab-media-preview-inserter-external-image-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+
+	p {
+		margin: 0;
+	}
+}

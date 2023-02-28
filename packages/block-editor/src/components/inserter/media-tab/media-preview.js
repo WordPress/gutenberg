@@ -13,6 +13,11 @@ import {
 	MenuGroup,
 	MenuItem,
 	Spinner,
+	Modal,
+	Flex,
+	FlexItem,
+	Button,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useCallback, useState } from '@wordpress/element';
@@ -69,7 +74,47 @@ function MediaPreviewOptions( { category, media } ) {
 	);
 }
 
+function InsertExternalImageModal( { onClose, onClick } ) {
+	return (
+		<Modal
+			title={ __( 'Insert external image' ) }
+			onRequestClose={ onClose }
+			className="block-editor-inserter-media-tab-media-preview-inserter-external-image-modal"
+		>
+			<VStack spacing={ 3 }>
+				<p>
+					{ __(
+						'This image cannot be uploaded to your Media Library, but it can still be inserted as an external image.'
+					) }
+				</p>
+				<p>
+					{ __(
+						'External images can be removed by the external provider without warning and could even have legal compliance issues related to GDPR.'
+					) }
+				</p>
+			</VStack>
+			<Flex
+				className="block-editor-block-lock-modal__actions"
+				justify="flex-end"
+				expanded={ false }
+			>
+				<FlexItem>
+					<Button variant="tertiary" onClick={ onClose }>
+						{ __( 'Cancel' ) }
+					</Button>
+				</FlexItem>
+				<FlexItem>
+					<Button variant="primary" onClick={ onClick }>
+						{ __( 'Insert' ) }
+					</Button>
+				</FlexItem>
+			</Flex>
+		</Modal>
+	);
+}
+
 export function MediaPreview( { media, onClick, composite, category } ) {
+	const [ showModal, setShowModal ] = useState( false );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isInserting, setIsInserting ] = useState( false );
 	const [ block, preview ] = useMemo(
@@ -134,13 +179,7 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 					} );
 				} )
 				.catch( () => {
-					createErrorNotice(
-						__(
-							'The image cannot be uploaded to the media library. External images can be removed by the external provider without warning and could even have legal compliance issues related to GDPR.'
-						),
-						{ type: 'snackbar' }
-					);
-					onClick( clonedBlock );
+					setShowModal( true );
 					setIsInserting( false );
 				} );
 		},
@@ -162,53 +201,67 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 	const onMouseEnter = useCallback( () => setIsHovered( true ), [] );
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
 	return (
-		<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
-			{ ( { draggable, onDragStart, onDragEnd } ) => (
-				<div
-					className={ classnames(
-						'block-editor-inserter__media-list__list-item',
-						{
-							'is-hovered': isHovered,
-						}
-					) }
-					draggable={ draggable }
-					onDragStart={ onDragStart }
-					onDragEnd={ onDragEnd }
-				>
-					<Tooltip text={ truncatedTitle || title }>
-						{ /* Adding `is-hovered` class to the wrapper element is needed
+		<>
+			<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
+				{ ( { draggable, onDragStart, onDragEnd } ) => (
+					<div
+						className={ classnames(
+							'block-editor-inserter__media-list__list-item',
+							{
+								'is-hovered': isHovered,
+							}
+						) }
+						draggable={ draggable }
+						onDragStart={ onDragStart }
+						onDragEnd={ onDragEnd }
+					>
+						<Tooltip text={ truncatedTitle || title }>
+							{ /* Adding `is-hovered` class to the wrapper element is needed
 							because the options Popover is rendered outside of this node. */ }
-						<div
-							onMouseEnter={ onMouseEnter }
-							onMouseLeave={ onMouseLeave }
-						>
-							<CompositeItem
-								role="option"
-								as="div"
-								{ ...composite }
-								className="block-editor-inserter__media-list__item"
-								onClick={ () => onMediaInsert( block ) }
-								aria-label={ title }
+							<div
+								onMouseEnter={ onMouseEnter }
+								onMouseLeave={ onMouseLeave }
 							>
-								<div className="block-editor-inserter__media-list__item-preview">
-									{ preview }
-									{ isInserting && (
-										<div className="block-editor-inserter__media-list__item-preview-spinner">
-											<Spinner />
-										</div>
-									) }
-								</div>
-							</CompositeItem>
-							{ ! isInserting && (
-								<MediaPreviewOptions
-									category={ category }
-									media={ media }
-								/>
-							) }
-						</div>
-					</Tooltip>
-				</div>
+								<CompositeItem
+									role="option"
+									as="div"
+									{ ...composite }
+									className="block-editor-inserter__media-list__item"
+									onClick={ () => onMediaInsert( block ) }
+									aria-label={ title }
+								>
+									<div className="block-editor-inserter__media-list__item-preview">
+										{ preview }
+										{ isInserting && (
+											<div className="block-editor-inserter__media-list__item-preview-spinner">
+												<Spinner />
+											</div>
+										) }
+									</div>
+								</CompositeItem>
+								{ ! isInserting && (
+									<MediaPreviewOptions
+										category={ category }
+										media={ media }
+									/>
+								) }
+							</div>
+						</Tooltip>
+					</div>
+				) }
+			</InserterDraggableBlocks>
+			{ showModal && (
+				<InsertExternalImageModal
+					onClose={ () => setShowModal( false ) }
+					onClick={ () => {
+						onClick( cloneBlock( block ) );
+						createSuccessNotice( __( 'Image inserted.' ), {
+							type: 'snackbar',
+						} );
+						setShowModal( false );
+					} }
+				/>
 			) }
-		</InserterDraggableBlocks>
+		</>
 	);
 }
