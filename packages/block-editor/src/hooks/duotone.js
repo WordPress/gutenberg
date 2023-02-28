@@ -80,7 +80,7 @@ export function getColorsFromDuotonePreset( duotone, duotonePalette ) {
 		return;
 	}
 	const preset = duotonePalette?.find( ( { slug } ) => {
-		return duotone === 'var:preset|duotone|' + slug;
+		return duotone === `var:preset|duotone|${ slug }`;
 	} );
 
 	return preset ? preset.colors : undefined;
@@ -97,7 +97,7 @@ export function getDuotonePresetFromColors( colors, duotonePalette ) {
 		);
 	} );
 
-	return preset ? 'var:preset|duotone|' + preset.slug : undefined;
+	return preset ? `var:preset|duotone|${ preset.slug }` : undefined;
 }
 
 function DuotonePanel( { attributes, setAttributes } ) {
