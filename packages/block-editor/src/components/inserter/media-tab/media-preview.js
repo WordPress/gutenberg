@@ -74,7 +74,7 @@ function MediaPreviewOptions( { category, media } ) {
 	);
 }
 
-function InsertExternalImageModal( { onClose, onClick } ) {
+function InsertExternalImageModal( { onClose, onSubmit } ) {
 	return (
 		<Modal
 			title={ __( 'Insert external image' ) }
@@ -104,7 +104,7 @@ function InsertExternalImageModal( { onClose, onClick } ) {
 					</Button>
 				</FlexItem>
 				<FlexItem>
-					<Button variant="primary" onClick={ onClick }>
+					<Button variant="primary" onClick={ onSubmit }>
 						{ __( 'Insert' ) }
 					</Button>
 				</FlexItem>
@@ -114,7 +114,8 @@ function InsertExternalImageModal( { onClose, onClick } ) {
 }
 
 export function MediaPreview( { media, onClick, composite, category } ) {
-	const [ showModal, setShowModal ] = useState( false );
+	const [ showExternalUploadModal, setShowExternalUploadModal ] =
+		useState( false );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isInserting, setIsInserting ] = useState( false );
 	const [ block, preview ] = useMemo(
@@ -179,7 +180,7 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 					} );
 				} )
 				.catch( () => {
-					setShowModal( true );
+					setShowExternalUploadModal( true );
 					setIsInserting( false );
 				} );
 		},
@@ -250,15 +251,15 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 					</div>
 				) }
 			</InserterDraggableBlocks>
-			{ showModal && (
+			{ showExternalUploadModal && (
 				<InsertExternalImageModal
-					onClose={ () => setShowModal( false ) }
-					onClick={ () => {
+					onClose={ () => setShowExternalUploadModal( false ) }
+					onSubmit={ () => {
 						onClick( cloneBlock( block ) );
 						createSuccessNotice( __( 'Image inserted.' ), {
 							type: 'snackbar',
 						} );
-						setShowModal( false );
+						setShowExternalUploadModal( false );
 					} }
 				/>
 			) }
