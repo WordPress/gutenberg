@@ -51,7 +51,6 @@
 		"src/duotone-picker",
 		"src/gradient-picker",
 		"src/guide",
-		"src/higher-order/navigate-regions",
 		"src/higher-order/with-fallback-styles",
 		"src/higher-order/with-filters",
 		"src/higher-order/with-focus-return",
