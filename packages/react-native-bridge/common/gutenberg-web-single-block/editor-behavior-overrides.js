@@ -128,30 +128,42 @@ window.wp.data.use( toggleBlockSelectedStyles );
 let editorOverridesAttempts = 0;
 const editorOverridesInterval = setInterval( () => {
 	editorOverridesAttempts++;
-	const editorCanvasFrameHead = document.querySelector(
+	const editorOverrideStyles = document.querySelector(
+		'#editor-style-overrides'
+	);
+	const editorCanvasFrame = document.querySelector(
 		'iframe[name="editor-canvas"]'
-	).contentWindow.document.head;
+	);
 
-	if ( editorCanvasFrameHead ) {
+	if (
+		editorOverrideStyles &&
+		editorCanvasFrame &&
+		editorCanvasFrame.contentWindow &&
+		editorCanvasFrame.contentWindow.document &&
+		editorCanvasFrame.contentWindow.document.head
+	) {
 		clearInterval( editorOverridesInterval );
 
 		// Clone the editor styles so that they can be copied to the iframe, as
 		// elements within an iframe cannot be styled from the parent context.
-		const editorOverrideStyles = document
-			.querySelector( '#editor-style-overrides' )
-			.cloneNode( true );
-		editorOverrideStyles.id = 'editor-styles-overrides-2';
-		editorCanvasFrameHead.appendChild( editorOverrideStyles );
+		const editorOverrideStylesClone =
+			editorOverrideStyles.cloneNode( true );
+		editorOverrideStylesClone.id = 'editor-styles-overrides-2';
+		editorCanvasFrame.contentWindow.document.head.appendChild(
+			editorOverrideStylesClone
+		);
 
 		// Select the first block.
 		const { blockEditorSelect, blockEditorDispatch } =
 			window.getBlockEditorStore();
-		const clientId = blockEditorSelect.getBlocks()[ 0 ].clientId;
-		blockEditorDispatch.selectBlock( clientId );
+		const firstBlock = blockEditorSelect.getBlocks()[ 0 ];
+		if ( firstBlock ) {
+			blockEditorDispatch.selectBlock( firstBlock.clientId );
+		}
 	}
 
-	// Safeguard against infinite loop.
-	if ( editorOverridesAttempts > 30 ) {
+	// Safeguard against an infinite loop.
+	if ( editorOverridesAttempts > 100 ) {
 		clearInterval( editorOverridesInterval );
 	}
 }, 300 );
