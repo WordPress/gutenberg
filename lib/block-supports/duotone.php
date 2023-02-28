@@ -457,38 +457,32 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	if ( $is_preset ) {
 		// Extract the slug from the variable string.
-		$slug        = str_replace( 'var:preset|duotone|', '', $duotone_attr );
-		$filter_data = array(
-			'slug' => $slug,
-		);
+		$slug = str_replace( 'var:preset|duotone|', '', $duotone_attr );
 
 		// Utilize existing CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
 	} else if ( $is_css ) {
 		// Build a unique slug for the filter based on the CSS value.
-		$slug        = wp_unique_id( sanitize_key( $duotone_attr . '-' ) );
-		$filter_data = array(
-			'slug'   => $slug,
-			'colors' => $duotone_attr,
-		);
+		$slug = wp_unique_id( sanitize_key( $duotone_attr . '-' ) );
 
 		// Pass through the CSS value.
 		$filter_property = $duotone_attr;
 	} else if ( $is_custom ) {
 		// Build a unique slug for the filter based on the array of colors.
 		$slug        = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
-		$filter_data = array(
+
+		// Build a customized CSS filter property for unique slug.
+		$filter_data     = array(
 			'slug'   => $slug,
 			'colors' => $duotone_attr,
 		);
-
-		// Build a customized CSS filter property for unique slug.
 		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
+		$filter_svg      = gutenberg_get_duotone_filter_svg( $filter_data );
 	}
 
 	// - Applied as a class attribute to the block wrapper.
 	// - Used as a selector to apply the filter to the block.
-	$filter_id = gutenberg_get_duotone_filter_id( $filter_data );
+	$filter_id = gutenberg_get_duotone_filter_id( array( 'slug' => $slug ) );
 
 	// Build the CSS selectors to which the filter will be applied.
 	$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_support );
@@ -514,11 +508,8 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		)
 	);
 
-	// For *non*-presets then generate an SVG for the filter.
-	// Note: duotone presets are already pre-generated so no need to do this again.
-	if ( $is_custom ) {
-		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
-
+	// If we needed to generate an SVG, output it on the page.
+	if ( isset( $filter_svg ) ) {
 		add_action(
 			'wp_footer',
 			static function () use ( $filter_svg, $selector ) {
