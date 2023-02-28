@@ -277,6 +277,22 @@ export default function Layout() {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<motion.div
+									whileHover={
+										canvasMode === 'view'
+											? {
+													top: '8px',
+													bottom: '8px',
+													left: '-8px',
+													transition: {
+														duration:
+															disableMotion ||
+															isResizing
+																? 0
+																: ANIMATION_DURATION,
+													},
+											  }
+											: {}
+									}
 									initial={ false }
 									layout="position"
 									className="edit-site-layout__canvas"
