@@ -14,3 +14,4 @@ export {
 	default as DimensionsPanel,
 	useHasDimensionsPanel,
 } from './dimensions-panel';
+export { default as BorderPanel, useHasBorderPanel } from './border-panel';
