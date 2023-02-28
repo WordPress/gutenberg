@@ -89,7 +89,7 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 				</p>
 				<p>
 					{ __(
-						'External images can be removed by the external provider without warning and could even have legal compliance issues related to GDPR.'
+						'External images can be removed by the external provider without warning and could even have legal compliance issues related to privacy legislation.'
 					) }
 				</p>
 			</VStack>
