@@ -48,7 +48,7 @@ function render_block() {
 -   Type: `boolean`
 -   Default value: `false`
 
-Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
+Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link. _Important: It doesn't work with dynamic blocks yet._
 
 ```js
 // Declare support for anchor links.
