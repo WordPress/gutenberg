@@ -31,13 +31,7 @@ export default function useInitEditedEntityFromURL() {
 		useDispatch( editSiteStore );
 
 	useEffect( () => {
-		if (
-			postType &&
-			postId &&
-			// This is just a special case to support old WP versions that perform redirects.
-			// This code should be removed when we minimum WP version becomes 6.2.
-			postId !== 'none'
-		) {
+		if ( postType && postId ) {
 			switch ( postType ) {
 				case 'wp_template':
 					setTemplate( postId );
