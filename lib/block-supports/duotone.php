@@ -477,7 +477,9 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			'colors' => $duotone_attr,
 		);
 		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
-		$filter_svg      = gutenberg_get_duotone_filter_svg( $filter_data );
+
+		// SVG will be output on the page later.
+		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
 	}
 
 	// - Applied as a class attribute to the block wrapper.
