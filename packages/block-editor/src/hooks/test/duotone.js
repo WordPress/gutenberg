@@ -95,7 +95,9 @@ describe( 'withDuotoneControls', () => {
 		render(
 			<BlockEditorProvider settings={ settings } value={ [] }>
 				<SlotFillProvider>
-					<EnhancedComponent { ...componentProps } />
+					<BlockEdit { ...componentProps }>
+						<EnhancedComponent { ...componentProps } />
+					</BlockEdit>
 					<BlockControls.Slot group="block" />
 				</SlotFillProvider>
 			</BlockEditorProvider>
@@ -103,7 +105,7 @@ describe( 'withDuotoneControls', () => {
 
 		expect(
 			screen.getByRole( 'button', {
-				name: 'Apply duotone filter"',
+				name: 'Apply duotone filter',
 			} )
 		).toBeInTheDocument();
 	} );
