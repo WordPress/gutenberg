@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
  */
 import MediaList from './media-list';
 import useDebouncedInput from '../hooks/use-debounced-input';
-import { useMediaResults, useOnMediaInsert } from './hooks';
+import { useMediaResults } from './hooks';
 import InserterNoResults from '../no-results';
 
 const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
@@ -42,7 +42,6 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		per_page: !! debouncedSearch ? 20 : INITIAL_MEDIA_ITEMS_PER_PAGE,
 		search: debouncedSearch,
 	} );
-	const onMediaInsert = useOnMediaInsert( onInsert );
 	const baseCssClass = 'block-editor-inserter__media-panel';
 	const searchLabel = category.labels.search_items || __( 'Search' );
 	return (
@@ -63,7 +62,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 			{ ! isLoading && !! mediaList?.length && (
 				<MediaList
 					rootClientId={ rootClientId }
-					onClick={ onMediaInsert }
+					onClick={ onInsert }
 					mediaList={ mediaList }
 					category={ category }
 				/>

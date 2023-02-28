@@ -1,24 +1,13 @@
 /**
  * WordPress dependencies
  */
-import {
-	useEffect,
-	useState,
-	useRef,
-	useMemo,
-	useCallback,
-} from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as noticesStore } from '@wordpress/notices';
-import { isBlobURL } from '@wordpress/blob';
+import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
-
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 /**
  * Interface for inserter media requests.
@@ -192,68 +181,4 @@ export function useMediaCategories( rootClientId ) {
 		inserterMediaCategories,
 	] );
 	return categories;
-}
-
-export function useOnMediaInsert( onInsert ) {
-	const { createErrorNotice, createSuccessNotice } =
-		useDispatch( noticesStore );
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
-	return useCallback(
-		( block ) => {
-			const { id, url, caption } = block.attributes;
-			// Media item already exists in library, so just insert it.
-			if ( !! id ) {
-				onInsert( block );
-				return;
-			}
-			// Media item does not exist in library, so try to upload it.
-			// Fist fetch the image data. This may fail if the image host
-			// doesn't allow CORS with the domain.
-			// If this happens, we insert the image block using the external
-			// URL and let the user know about the possible implications.
-			window
-				.fetch( url )
-				.then( ( response ) => response.blob() )
-				.then( ( blob ) => {
-					mediaUpload( {
-						filesList: [ blob ],
-						additionalData: { caption },
-						onFileChange( [ img ] ) {
-							if ( isBlobURL( img.url ) ) {
-								return;
-							}
-							onInsert( {
-								...block,
-								attributes: {
-									...block.attributes,
-									id: img.id,
-									url: img.url,
-								},
-							} );
-							createSuccessNotice(
-								__( 'Image uploaded and inserted.' ),
-								{ type: 'snackbar' }
-							);
-						},
-						allowedTypes: ALLOWED_MEDIA_TYPES,
-						onError( message ) {
-							createErrorNotice( message, { type: 'snackbar' } );
-						},
-					} );
-				} )
-				.catch( () => {
-					createErrorNotice(
-						__(
-							'The image cannot be uploaded to the media library. External images can be removed by the external provider without warning and could even have legal compliance issues related to GDPR.'
-						),
-						{ type: 'snackbar' }
-					);
-					onInsert( block );
-				} );
-		},
-		[ onInsert, mediaUpload, createErrorNotice, createSuccessNotice ]
-	);
 }
