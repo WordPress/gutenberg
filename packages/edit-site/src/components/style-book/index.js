@@ -207,8 +207,9 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => (
 				additionalStyles={ [
 					{
 						css:
-							'.is-root-container > .wp-block:first-child { margin-top: 16px; }' +
-							'.is-root-container > .wp-block:last-child { margin-bottom: 16px; }',
+							'.is-root-container { margin: 16px; }' +
+							'.is-root-container > .wp-block:first-child { margin-top: 0; }' +
+							'.is-root-container > .wp-block:last-child { margin-bottom: 0; }',
 					},
 				] }
 			/>
