@@ -109,13 +109,6 @@ function useInserterMediaCategories() {
 			) {
 				return false;
 			}
-			// When a category has set `isExternalResource` to `true`, we
-			// don't need to check for allowed mime types, as they are used
-			// for restricting uploads for this media type and not for
-			// inserting media from external sources.
-			if ( category.isExternalResource ) {
-				return true;
-			}
 			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
 				mimeType.startsWith( `${ category.mediaType }/` )
 			);
@@ -242,9 +235,7 @@ export function useOnMediaInsert( onInsert ) {
 							} );
 							createSuccessNotice(
 								__( 'Image uploaded and inserted.' ),
-								{
-									type: 'snackbar',
-								}
+								{ type: 'snackbar' }
 							);
 						},
 						allowedTypes: ALLOWED_MEDIA_TYPES,
