@@ -959,6 +959,24 @@ describe( 'prependHTTPS', () => {
 	} );
 } );
 
+	it( 'should prepend https to a domain with an anchor', () => {
+		const url = 'wordpress.org#something';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+	} );
+
+	it( 'should prepend https to a domain with path', () => {
+		const url = 'wordpress.org/some/thing';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+	} );
+
+	it( 'should prepend https to a domain with query arguments', () => {
+		const url = 'wordpress.org?foo=bar';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+	} );
+
 describe( 'safeDecodeURI', () => {
 	it( 'should decode URI if formed well', () => {
 		const encoded = 'https://mozilla.org/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B';
