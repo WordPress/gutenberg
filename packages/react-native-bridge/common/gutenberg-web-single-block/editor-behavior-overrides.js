@@ -136,10 +136,8 @@ const overrideInterval = setInterval( () => {
 	if (
 		overrideStyles &&
 		canvasIframe &&
-		canvasIframe.contentWindow &&
-		canvasIframe.contentWindow.document &&
-		canvasIframe.contentWindow.document.head &&
-		canvasIframe.contentWindow.document.head.childElementCount > 0
+		canvasIframe.contentDocument &&
+		canvasIframe.contentDocument.documentElement
 	) {
 		clearInterval( overrideInterval );
 
@@ -147,7 +145,9 @@ const overrideInterval = setInterval( () => {
 		// elements within an iframe cannot be styled from the parent context.
 		const overrideStylesClone = overrideStyles.cloneNode( true );
 		overrideStylesClone.id = 'editor-styles-overrides-2';
-		canvasIframe.contentWindow.document.head.appendChild(
+		// Append to document rather than the head, as React will remove this
+		// mutation.
+		canvasIframe.contentDocument.documentElement.appendChild(
 			overrideStylesClone
 		);
 
