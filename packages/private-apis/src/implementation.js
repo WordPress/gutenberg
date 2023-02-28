@@ -49,13 +49,13 @@ const requiredConsent =
 
 /** @type {boolean} */
 let allowReRegistration;
-// The safety measure is meant for WordPress core where ALLOW_EXPERIMENT_REREGISTRATION
-// is set to false.
+// The safety measure is meant for WordPress core where IS_WORDPRESS_CORE
+// is set to true.
 // For the general use-case, the re-registration should be allowed by default
 // Let's default to true, then. Try/catch will fall back to "true" even if the
 // environment variable is not explicitly defined.
 try {
-	allowReRegistration = process.env.ALLOW_EXPERIMENT_REREGISTRATION ?? true;
+	allowReRegistration = process.env.IS_WORDPRESS_CORE ? false : true;
 } catch ( error ) {
 	allowReRegistration = true;
 }
