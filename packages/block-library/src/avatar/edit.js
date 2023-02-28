@@ -122,7 +122,6 @@ const ResizableAvatar = ( {
 				<img
 					src={ doubledSizedSrc }
 					alt={ avatar.alt }
-					{ ...borderProps }
 					className={ classnames(
 						'avatar',
 						'avatar-' + attributes.size,
@@ -130,9 +129,7 @@ const ResizableAvatar = ( {
 						'wp-block-avatar__image',
 						borderProps.className
 					) }
-					style={ {
-						...borderProps.style, // Border radius, width and style.
-					} }
+					style={ borderProps.style }
 				/>
 			</ResizableBox>
 		</div>

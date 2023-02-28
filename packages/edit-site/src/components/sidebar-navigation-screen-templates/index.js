@@ -66,6 +66,8 @@ export default function SidebarNavigationScreenTemplates() {
 			per_page: -1,
 		}
 	);
+	const sortedTemplates = templates ? [ ...templates ] : [];
+	sortedTemplates.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
 
 	const browseAllLink = useLink( {
 		path: '/' + postType + '/all',
@@ -98,7 +100,7 @@ export default function SidebarNavigationScreenTemplates() {
 									{ config[ postType ].labels.notFound }
 								</Item>
 							) }
-							{ ( templates ?? [] ).map( ( template ) => (
+							{ sortedTemplates.map( ( template ) => (
 								<TemplateItem
 									postType={ postType }
 									postId={ template.id }

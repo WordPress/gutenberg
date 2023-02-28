@@ -45,6 +45,7 @@ export default function SidebarNavigationScreenNavigationItem() {
 			actions={
 				<Button
 					variant="primary"
+					className="edit-site-sidebar-navigation-screen__edit"
 					onClick={ () => setCanvasMode( 'edit' ) }
 				>
 					{ __( 'Edit' ) }
