@@ -119,6 +119,11 @@ export default function UnsavedInnerBlocks( {
 
 	const { hasResolvedNavigationMenus } = useNavigationMenu();
 
+	// We need to use a ref to track whether the effect has been called.
+	// Otherwise the effect will be called when blocks changes, which
+	// happens faster than the state of navigation menu creation is updated.
+	const createNavigationEffectCalled = useRef( false );
+
 	// Automatically save the uncontrolled blocks.
 	useEffect( () => {
 		// The block will be disabled when used in a BlockPreview.
@@ -139,11 +144,14 @@ export default function UnsavedInnerBlocks( {
 			! hasResolvedDraftNavigationMenus ||
 			! hasResolvedNavigationMenus ||
 			! hasSelection ||
-			! innerBlocksAreDirty
+			! innerBlocksAreDirty ||
+			createNavigationEffectCalled.current
 		) {
 			return;
 		}
 
+		// Setting this to true so that this effect is only called once.
+		createNavigationEffectCalled.current = true;
 		createNavigationMenu( null, blocks );
 	}, [
 		blocks,
@@ -154,6 +162,7 @@ export default function UnsavedInnerBlocks( {
 		hasResolvedNavigationMenus,
 		innerBlocksAreDirty,
 		hasSelection,
+		createNavigationEffectCalled,
 	] );
 
 	const Wrapper = isSaving ? Disabled : 'div';

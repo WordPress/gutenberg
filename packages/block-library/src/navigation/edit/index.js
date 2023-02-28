@@ -275,6 +275,7 @@ function Navigation( {
 		isCreatingNavigationMenu,
 		fallbackNavigationMenus,
 		hasUncontrolledInnerBlocks,
+		createNavigationMenuIsSuccess,
 	] );
 
 	const isEntityAvailable =
