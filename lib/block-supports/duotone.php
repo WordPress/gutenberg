@@ -447,7 +447,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	// Possible values for duotone attribute:
 	// 1. Array of colors - e.g. array('#000000', '#ffffff').
-	// 2. Slug of an existing Duotone preset - e.g. 'green-blue'.
+	// 2. Variable for an existing Duotone preset - e.g. 'var:preset|duotone|green-blue'.
 	// 3. The string 'unset' - indicates explicitly "no Duotone"..
 	$duotone_attr = $block['attrs']['style']['color']['duotone'];
 
