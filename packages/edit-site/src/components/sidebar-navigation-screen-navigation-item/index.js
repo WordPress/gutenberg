@@ -9,6 +9,7 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { pencil } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -44,12 +45,11 @@ export default function SidebarNavigationScreenNavigationItem() {
 			title={ post ? decodeEntities( post?.title?.rendered ) : null }
 			actions={
 				<Button
-					variant="primary"
 					className="edit-site-sidebar-navigation-screen__edit"
 					onClick={ () => setCanvasMode( 'edit' ) }
-				>
-					{ __( 'Edit' ) }
-				</Button>
+					label={ __( 'Edit' ) }
+					icon={ pencil }
+				/>
 			}
 			content={
 				post ? decodeEntities( post?.description?.rendered ) : null

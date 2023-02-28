@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
+import { pencil } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -28,12 +29,11 @@ export default function SidebarNavigationScreenTemplate() {
 			title={ getTitle() }
 			actions={
 				<Button
-					variant="primary"
 					className="edit-site-sidebar-navigation-screen__edit"
 					onClick={ () => setCanvasMode( 'edit' ) }
-				>
-					{ __( 'Edit' ) }
-				</Button>
+					label={ __( 'Edit' ) }
+					icon={ pencil }
+				/>
 			}
 			content={ description ? <p>{ description }</p> : undefined }
 		/>
