@@ -434,7 +434,7 @@
 			"properties": {
 				"root": {
 					"type": "string",
-					"description": "The primary CSS class to apply to the block. This replaces the `.wp-block-name` class if set. "
+					"description": "The primary CSS class to apply to the block. This replaces the `.wp-block-name` class if set."
 				},
 				"border": {
 					"description": "Custom CSS selector used to generate rules for the block's theme.json border styles.",
