@@ -23,14 +23,12 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
-import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasFilterPanel } from './filter-utils';
 import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
@@ -38,27 +36,23 @@ import { IconWithCurrentColor } from './icon-with-current-color';
 import { ScreenVariations } from './screen-variations';
 import { useHasShadowControl } from './shadow-panel';
 import { unlock } from '../../private-apis';
-import { useSupportedStyles } from './hooks';
 
 const {
+	useHasDimensionsPanel,
 	useHasTypographyPanel,
 	useGlobalSetting,
-	overrideSettingsWithSupports,
+	useSettingsForBlockElement,
 } = unlock( blockEditorPrivateApis );
 
 function ContextMenu( { name, parentMenu = '' } ) {
 	const [ rawSettings ] = useGlobalSetting( '', name );
-	const supports = useSupportedStyles( name );
-	const settings = useMemo(
-		() => overrideSettingsWithSupports( rawSettings, supports ),
-		[ rawSettings, supports ]
-	);
+	const settings = useSettingsForBlockElement( rawSettings, name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasEffectsPanel = useHasShadowControl( name );
 	const hasFilterPanel = useHasFilterPanel( name );
-	const hasDimensionsPanel = useHasDimensionsPanel( name );
+	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasDimensionsPanel;
 	const hasVariationsPanel = useHasVariationsPanel( name, parentMenu );
 
