@@ -30,6 +30,9 @@ import {
 
 jest.setTimeout( 1000000 );
 
+const sequence = ( start, length ) =>
+	Array.from( { length }, ( _, i ) => i + start );
+
 const results = {
 	serverResponse: [],
 	firstPaint: [],
@@ -101,10 +104,7 @@ describe( 'Site Editor Performance', () => {
 		// Having at least one helps ensure that caching quirks don't manifest
 		// in the results.
 		const throwaway = 1;
-		const iterations = Array.from(
-			{ length: samples + throwaway },
-			( _, i ) => i + 1
-		);
+		const iterations = sequence( 1, samples + throwaway );
 
 		it.each( iterations )(
 			`trace large post loading durations (%i of ${ iterations.length })`,
