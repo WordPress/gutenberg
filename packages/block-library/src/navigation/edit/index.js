@@ -282,7 +282,8 @@ function Navigation( {
 			ref ||
 			! hasResolvedNavigationMenus ||
 			isConvertingClassicMenu ||
-			fallbackNavigationMenus?.length > 0
+			fallbackNavigationMenus?.length > 0 ||
+			hasUnsavedBlocks
 		) {
 			return;
 		}
@@ -323,13 +324,14 @@ function Navigation( {
 			if ( getBlockType( 'core/page-list' ) ) {
 				defaultBlocks = [ createBlock( 'core/page-list' ) ];
 			}
+
 			createNavigationMenu(
 				'Navigation', // TODO - use the template slug in future
 				defaultBlocks,
 				'publish'
 			);
 		}
-	}, [ hasResolvedNavigationMenus ] );
+	}, [ hasResolvedNavigationMenus, hasUnsavedBlocks ] );
 
 	const navRef = useRef();
 
