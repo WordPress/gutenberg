@@ -80,7 +80,6 @@ export {
 	isValueSpacingPreset,
 } from './spacing-sizes-control/utils';
 // Content Related Components.
-export { BlockContent } from './block-content';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';
@@ -90,6 +89,7 @@ export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { useBlockProps } from './block-list/use-block-props';
+export { BlockRoot } from './block-root';
 export { default as FloatingToolbar } from './floating-toolbar';
 
 // State Related Components.

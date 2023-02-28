@@ -13,10 +13,10 @@ import { useBlockProps } from '@wordpress/block-editor';
  */
 import SeparatorEdit from '../edit';
 
-jest.mock( '@wordpress/block-editor', () => ( {
-	...jest.requireActual( '@wordpress/block-editor' ),
-	useBlockProps: jest.fn(),
-} ) );
+jest.mock(
+	'@wordpress/block-editor/src/components/block-list/use-block-props',
+	() => ( { useBlockProps: jest.fn() } )
+);
 
 const defaultAttributes = {
 	backgroundColor: undefined,
@@ -38,6 +38,7 @@ describe( 'Separator block edit method', () => {
 		render( <SeparatorEdit { ...defaultProps } /> );
 		expect( useBlockProps ).toHaveBeenCalledWith( {
 			className: 'has-alpha-channel-opacity',
+			ref: null,
 			style: undefined,
 		} );
 	} );
@@ -50,6 +51,7 @@ describe( 'Separator block edit method', () => {
 		render( <SeparatorEdit { ...props } /> );
 		expect( useBlockProps ).toHaveBeenCalledWith( {
 			className: 'has-css-opacity',
+			ref: null,
 			style: undefined,
 		} );
 	} );
@@ -68,6 +70,7 @@ describe( 'Separator block edit method', () => {
 			// is-style-dots as this class was always added to v1 blocks, so may be expected by themes and plugins.
 			className:
 				'has-text-color has-alpha-channel-opacity has-background',
+			ref: null,
 			style: {
 				backgroundColor: '#ff0000',
 				color: '#ff0000',
@@ -88,6 +91,7 @@ describe( 'Separator block edit method', () => {
 		expect( useBlockProps ).toHaveBeenCalledWith( {
 			className:
 				'has-text-color has-alpha-channel-opacity has-background',
+			ref: null,
 			style: {
 				backgroundColor: '#ff0000',
 				color: '#ff0000',
@@ -109,6 +113,7 @@ describe( 'Separator block edit method', () => {
 		expect( useBlockProps ).toHaveBeenCalledWith( {
 			className:
 				'has-text-color has-banana-color has-alpha-channel-opacity has-banana-background-color has-background',
+			ref: null,
 			style: undefined,
 		} );
 	} );

@@ -43,7 +43,7 @@ import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
-export const BlockListBlockContext = createContext();
+export const BlockListBlockContext = createContext( {} );
 
 /**
  * Merges wrapper props with special handling for classNames and styles.

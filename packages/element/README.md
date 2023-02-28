@@ -94,62 +94,39 @@ This assumes that you will import the `createElement` function in any file where
 
 ### Children
 
-Object that provides utilities for dealing with React children.
+_Related_
+
+-   <https://reactjs.org/docs/react-api.html#children>
 
 ### cloneElement
 
-Creates a copy of an element with extended props.
+_Related_
 
-_Parameters_
-
--   _element_ `WPElement`: Element
--   _props_ `?Object`: Props to apply to cloned element
-
-_Returns_
-
--   `WPElement`: Cloned element.
+-   <https://reactjs.org/docs/react-api.html#cloneelement>
 
 ### Component
 
-A base class to create WordPress Components (Refs, state and lifecycle hooks)
+_Related_
+
+-   <https://reactjs.org/docs/react-api.html#component>
 
 ### concatChildren
 
-Concatenate two or more React children objects.
+Object containing a React synthetic event.
 
-_Parameters_
+_Type Definition_
 
--   _childrenArguments_ `...?Object`: Array of children arguments (array of arrays/strings/objects) to concatenate.
-
-_Returns_
-
--   `Array`: The concatenated value.
+-   _WPSyntheticEvent_ `import('react').SyntheticEvent`
 
 ### createContext
 
-Creates a context object containing two components: a provider and consumer.
+_Related_
 
-_Parameters_
-
--   _defaultValue_ `Object`: A default data stored in the context.
-
-_Returns_
-
--   `Object`: Context object.
+-   <https://reactjs.org/docs/react-api.html#createcontext>
 
 ### createElement
 
-Returns a new element of given type. Type can be either a string tag name or another function which itself returns an element.
-
-_Parameters_
-
--   _type_ `?(string|Function)`: Tag name or element creator
--   _props_ `Object`: Element properties, either attribute set to apply to DOM node or values to pass through to element creator
--   _children_ `...WPElement`: Descendant elements
-
-_Returns_
-
--   `WPElement`: Element.
+Undocumented declaration.
 
 ### createInterpolateElement
 
@@ -196,11 +173,9 @@ _Parameters_
 
 ### createRef
 
-Returns an object tracking a reference to a rendered element via its `current` property as either a DOMElement or Element, dependent upon the type of element rendered with the ref attribute.
+_Related_
 
-_Returns_
-
--   `Object`: Ref object.
+-   <https://reactjs.org/docs/react-api.html#createref>
 
 ### createRoot
 
@@ -236,19 +211,15 @@ _Parameters_
 
 ### forwardRef
 
-Component enhancer used to enable passing a ref to its wrapped component. Pass a function argument which receives `props` and `ref` as its arguments, returning an element using the forwarded ref. The return value is a new component which forwards its ref.
+_Related_
 
-_Parameters_
-
--   _forwarder_ `Function`: Function passed `props` and `ref`, expected to return an element.
-
-_Returns_
-
--   `WPComponent`: Enhanced component.
+-   <https://reactjs.org/docs/react-api.html#forwardref>
 
 ### Fragment
 
-A component which renders its children without any wrapping element.
+_Related_
+
+-   <https://reactjs.org/docs/react-api.html#fragment>
 
 ### hydrate
 
@@ -286,15 +257,9 @@ _Returns_
 
 ### isValidElement
 
-Checks if an object is a valid WPElement.
+_Related_
 
-_Parameters_
-
--   _objectToCheck_ `Object`: The object to be checked.
-
-_Returns_
-
--   `boolean`: true if objectToTest is a valid WPElement and false otherwise.
+-   <https://reactjs.org/docs/react-api.html#isvalidelement>
 
 ### lazy
 
@@ -375,7 +340,9 @@ _Related_
 
 ### StrictMode
 
-Component that activates additional checks and warnings for its descendants.
+_Related_
+
+-   <https://reactjs.org/docs/react-api.html#strictmode>
 
 ### Suspense
 

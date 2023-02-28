@@ -4,6 +4,7 @@
 import {
 	Component,
 	cloneElement,
+	createElement,
 	EnvironmentContext,
 	renderToString,
 	RawHTML,
@@ -191,9 +192,11 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 
 	return renderToString(
-		<EnvironmentContext.Provider value="save">
-			{ getSaveElement( blockType, attributes, innerBlocks ) }
-		</EnvironmentContext.Provider>
+		createElement(
+			EnvironmentContext.Provider,
+			{ value: 'save' },
+			getSaveElement( blockType, attributes, innerBlocks )
+		)
 	);
 }
 
