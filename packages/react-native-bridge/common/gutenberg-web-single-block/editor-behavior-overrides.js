@@ -125,32 +125,30 @@ window.wp.data.use( toggleBlockSelectedStyles );
 
 // The editor-canvas iframe relies upon `srcdoc`, which does not trigger a
 // `load` event. Thus, we must poll for the iframe to be ready.
-let editorOverridesAttempts = 0;
-const editorOverridesInterval = setInterval( () => {
-	editorOverridesAttempts++;
-	const editorOverrideStyles = document.querySelector(
-		'#editor-style-overrides'
-	);
-	const editorCanvasFrame = document.querySelector(
+let overrideAttempts = 0;
+const overrideInterval = setInterval( () => {
+	overrideAttempts++;
+	const overrideStyles = document.querySelector( '#editor-style-overrides' );
+	const canvasIframe = document.querySelector(
 		'iframe[name="editor-canvas"]'
 	);
 
 	if (
-		editorOverrideStyles &&
-		editorCanvasFrame &&
-		editorCanvasFrame.contentWindow &&
-		editorCanvasFrame.contentWindow.document &&
-		editorCanvasFrame.contentWindow.document.head
+		overrideStyles &&
+		canvasIframe &&
+		canvasIframe.contentWindow &&
+		canvasIframe.contentWindow.document &&
+		canvasIframe.contentWindow.document.head &&
+		canvasIframe.contentWindow.document.head.childElementCount > 0
 	) {
-		clearInterval( editorOverridesInterval );
+		clearInterval( overrideInterval );
 
 		// Clone the editor styles so that they can be copied to the iframe, as
 		// elements within an iframe cannot be styled from the parent context.
-		const editorOverrideStylesClone =
-			editorOverrideStyles.cloneNode( true );
-		editorOverrideStylesClone.id = 'editor-styles-overrides-2';
-		editorCanvasFrame.contentWindow.document.head.appendChild(
-			editorOverrideStylesClone
+		const overrideStylesClone = overrideStyles.cloneNode( true );
+		overrideStylesClone.id = 'editor-styles-overrides-2';
+		canvasIframe.contentWindow.document.head.appendChild(
+			overrideStylesClone
 		);
 
 		// Select the first block.
@@ -163,7 +161,7 @@ const editorOverridesInterval = setInterval( () => {
 	}
 
 	// Safeguard against an infinite loop.
-	if ( editorOverridesAttempts > 100 ) {
-		clearInterval( editorOverridesInterval );
+	if ( overrideAttempts > 100 ) {
+		clearInterval( overrideInterval );
 	}
 }, 300 );
