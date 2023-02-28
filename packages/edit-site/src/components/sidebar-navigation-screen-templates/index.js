@@ -20,6 +20,7 @@ import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import AddNewTemplate from '../add-new-template';
 import { store as editSiteStore } from '../../store';
+import SidebarButton from '../sidebar-button';
 
 const config = {
 	wp_template: {
@@ -84,8 +85,7 @@ export default function SidebarNavigationScreenTemplates() {
 					<AddNewTemplate
 						templateType={ postType }
 						toggleProps={ {
-							className:
-								'edit-site-sidebar-navigation-screen-templates__add-button',
+							as: SidebarButton,
 						} }
 					/>
 				)
