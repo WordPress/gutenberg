@@ -7,10 +7,16 @@ import type { WPElement } from '@wordpress/element';
  */
 import type { useAutocomplete } from '.';
 
-export type OptionCompletion = {
-	action: 'insert-at-caret' | 'replace';
-	value: string | WPElement;
+// Insert the `value` into the text.
+export type InsertOption = {
+	action: 'insert-at-caret';
+	value: React.ReactNode;
 };
+
+// Replace the current block with the block specified in the `value` property
+export type ReplaceOption = { action: 'replace'; value: RichTextValue };
+
+export type OptionCompletion = React.ReactNode | InsertOption | ReplaceOption;
 
 type OptionLabel = string | WPElement | Array< string | WPElement >;
 export type KeyedOption = {
@@ -77,7 +83,7 @@ export type WPCompleter< TCompleterOption = any > = {
 	getOptionCompletion?: (
 		option: TCompleterOption,
 		query: string
-	) => OptionCompletion | OptionCompletion[ 'value' ];
+	) => OptionCompletion;
 	/**
 	 * A function that returns an array of items to be displayed in the
 	 * Autocomplete UI. These items have uniform shape and have been filtered by
@@ -185,7 +191,7 @@ export type UseAutocompleteProps = {
 	 * A function to be called when an option is selected to replace the
 	 * existing text.
 	 */
-	onReplace: ( arg: [ OptionCompletion[ 'value' ] ] ) => void;
+	onReplace: ( values: RichTextValue[] ) => void;
 	/**
 	 * An array of all of the completers to apply to the current element.
 	 */

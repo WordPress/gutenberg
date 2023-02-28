@@ -39,8 +39,10 @@ import { escapeRegExp } from '../utils/strings';
 import type {
 	AutocompleteProps,
 	AutocompleterUIProps,
+	InsertOption,
 	KeyedOption,
 	OptionCompletion,
+	ReplaceOption,
 	UseAutocompleteProps,
 	WPCompleter,
 } from './types';
@@ -71,7 +73,7 @@ export function useAutocomplete( {
 
 	const backspacing = useRef( false );
 
-	function insertCompletion( replacement: OptionCompletion[ 'value' ] ) {
+	function insertCompletion( replacement: React.ReactNode ) {
 		if ( autocompleter === null ) {
 			return;
 		}
@@ -93,26 +95,31 @@ export function useAutocomplete( {
 		if ( getOptionCompletion ) {
 			const completion = getOptionCompletion( option.value, filterValue );
 
-			function isCompletionObject(
-				completionData: any
-			): completionData is OptionCompletion {
+			const isCompletionObject = (
+				obj: OptionCompletion
+			): obj is InsertOption | ReplaceOption => {
 				return (
-					undefined !== completionData.action &&
-					undefined !== completionData.value
+					obj !== null &&
+					typeof obj === 'object' &&
+					'action' in obj &&
+					'value' in obj
 				);
-			}
+			};
 
-			const { action, value } = isCompletionObject( completion )
+			const completionObject = isCompletionObject( completion )
 				? completion
-				: { action: 'insert-at-caret', value: completion };
+				: ( {
+						action: 'insert-at-caret',
+						value: completion,
+				  } as InsertOption );
 
-			if ( 'replace' === action ) {
-				onReplace( [ value ] );
+			if ( 'replace' === completionObject.action ) {
+				onReplace( [ completionObject.value ] );
 				// When replacing, the component will unmount, so don't reset
 				// state (below) on an unmounted component.
 				return;
-			} else if ( 'insert-at-caret' === action ) {
-				insertCompletion( value );
+			} else if ( 'insert-at-caret' === completionObject.action ) {
+				insertCompletion( completionObject.value );
 			}
 		}
 
