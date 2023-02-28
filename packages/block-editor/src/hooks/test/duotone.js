@@ -96,7 +96,7 @@ describe( 'withDuotoneControls', () => {
 			<BlockEditorProvider settings={ settings } value={ [] }>
 				<SlotFillProvider>
 					<BlockEdit { ...componentProps }>
-						<EnhancedComponent { ...componentProps } />
+						<EnhancedComponent />
 					</BlockEdit>
 					<BlockControls.Slot group="block" />
 				</SlotFillProvider>
