@@ -83,7 +83,7 @@ describe( 'withDuotoneControls', () => {
 	const duotonePresets =
 		blockEditorSettings.__experimentalFeatures.color.duotone.default;
 
-	const EnhancedComponent = withDuotoneControls( ( { wrapperProps } ) => (
+	const WithDuotoneControls = withDuotoneControls( ( { wrapperProps } ) => (
 		<div { ...wrapperProps } />
 	) );
 
@@ -112,7 +112,7 @@ describe( 'withDuotoneControls', () => {
 			<BlockEditorProvider settings={ blockEditorSettings } value={ [] }>
 				<SlotFillProvider>
 					<BlockEdit { ...blockNoDuotoneProps }>
-						<EnhancedComponent />
+						<WithDuotoneControls />
 					</BlockEdit>
 					<BlockControls.Slot group="block" />
 				</SlotFillProvider>
@@ -131,7 +131,7 @@ describe( 'withDuotoneControls', () => {
 			<BlockEditorProvider settings={ blockEditorSettings } value={ [] }>
 				<SlotFillProvider>
 					<BlockEdit { ...blockProps }>
-						<EnhancedComponent />
+						<WithDuotoneControls />
 					</BlockEdit>
 					<BlockControls.Slot group="block" />
 				</SlotFillProvider>
@@ -161,6 +161,44 @@ describe( 'withDuotoneControls', () => {
 			} );
 			expect( presetOption ).toBeInTheDocument();
 		} );
+	} );
+
+	it( 'should select the duotone preset in the panel when the block attribute contains a duotone preset', async () => {
+		const user = userEvent.setup();
+		const duotonePreset = duotonePresets[ 0 ];
+		const blockWithDuotoneProps = {
+			...blockProps,
+			attributes: {
+				style: {
+					color: {
+						duotone: duotonePreset.slug,
+					},
+				},
+			},
+		};
+
+		render(
+			<BlockEditorProvider settings={ blockEditorSettings } value={ [] }>
+				<SlotFillProvider>
+					<BlockEdit { ...blockWithDuotoneProps }>
+						<WithDuotoneControls />
+					</BlockEdit>
+					<BlockControls.Slot group="block" />
+				</SlotFillProvider>
+			</BlockEditorProvider>
+		);
+
+		const duotoneToggleButton = screen.getByRole( 'button', {
+			name: 'Apply duotone filter',
+		} );
+
+		await user.click( duotoneToggleButton );
+
+		const presetOption = screen.queryByRole( 'button', {
+			name: `Duotone: ${ duotonePreset.name }`,
+			pressed: true, // the selected preset should be pressed.
+		} );
+		expect( presetOption ).toBeInTheDocument();
 	} );
 } );
 
