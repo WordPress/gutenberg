@@ -10,7 +10,7 @@ export function useVStack(
 ) {
 	const {
 		expanded = false,
-		alignment = 'strech',
+		alignment = 'stretch',
 		...otherProps
 	} = useContextSystem( props, 'VStack' );
 
