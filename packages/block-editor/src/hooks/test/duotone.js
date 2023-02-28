@@ -38,7 +38,7 @@ describe( 'withDuotoneControls', () => {
 		},
 	};
 
-	const componentProps = {
+	const blockProps = {
 		name: blockName,
 		attributes: {},
 		isSelected: true,
@@ -95,12 +95,42 @@ describe( 'withDuotoneControls', () => {
 		unregisterBlockType( blockName );
 	} );
 
+	it( 'should not show Duotone panel in toolbar for blocks that do not support Duotone', () => {
+		// A Block with no duotone support.
+		registerBlockType( 'test/no-duotone-support-block', {
+			...blockSettings,
+			name: 'Block with no duotone support',
+			supports: {}, // no duotone support.
+		} );
+
+		const blockNoDuotoneProps = {
+			...blockProps,
+			name: 'test/no-duotone-support-block',
+		};
+
+		render(
+			<BlockEditorProvider settings={ blockEditorSettings } value={ [] }>
+				<SlotFillProvider>
+					<BlockEdit { ...blockNoDuotoneProps }>
+						<EnhancedComponent />
+					</BlockEdit>
+					<BlockControls.Slot group="block" />
+				</SlotFillProvider>
+			</BlockEditorProvider>
+		);
+
+		const duotoneToggleButton = screen.queryByRole( 'button', {
+			name: 'Apply duotone filter',
+		} );
+		expect( duotoneToggleButton ).not.toBeInTheDocument();
+	} );
+
 	it( 'should show Duotone panel with presets in toolbar for blocks that support Duotone', async () => {
 		const user = userEvent.setup();
 		render(
 			<BlockEditorProvider settings={ blockEditorSettings } value={ [] }>
 				<SlotFillProvider>
-					<BlockEdit { ...componentProps }>
+					<BlockEdit { ...blockProps }>
 						<EnhancedComponent />
 					</BlockEdit>
 					<BlockControls.Slot group="block" />
