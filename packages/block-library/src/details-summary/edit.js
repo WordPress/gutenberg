@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -21,20 +16,12 @@ import { __ } from '@wordpress/i18n';
 import HeadingLevelDropdown from './heading-level-dropdown';
 
 function DetailsSummaryBlock( { attributes, setAttributes } ) {
-	const { level, summary, style } = attributes;
+	const { level, summary } = attributes;
 	const tagName = 'h' + level;
 	const fluidTypographySettings = useSetting( 'typography.fluid' );
 	const typographyProps = useTypographyProps(
 		attributes,
 		fluidTypographySettings
-	);
-
-	const additionalClassNames = classnames(
-		'wp-block-details-summary__summary',
-		typographyProps.className,
-		{
-			'has-custom-font-size': style?.typography?.fontSize ? true : false,
-		}
 	);
 
 	return (
@@ -50,19 +37,21 @@ function DetailsSummaryBlock( { attributes, setAttributes } ) {
 			<summary
 				{ ...useBlockProps() }
 				onClick={ ( event ) => event.preventDefault() }
+				style={ typographyProps.style }
 			>
-				<RichText
-					tagName={ tagName }
-					className={ additionalClassNames }
-					aria-label={ __( 'Add summary' ) }
-					allowedFormats={ [] }
-					withoutInteractiveFormatting
-					value={ !! summary ? summary : __( 'Details' ) }
-					onChange={ ( newSummary ) =>
-						setAttributes( { summary: newSummary } )
-					}
-					style={ typographyProps.style }
-				/>
+				<div className="wp-block-details-summary__summary">
+					<RichText
+						tagName={ tagName }
+						aria-label={ __( 'Add summary' ) }
+						allowedFormats={ [] }
+						withoutInteractiveFormatting
+						value={ !! summary ? summary : __( 'Details' ) }
+						onChange={ ( newSummary ) =>
+							setAttributes( { summary: newSummary } )
+						}
+						style={ typographyProps.style }
+					/>
+				</div>
 			</summary>
 		</>
 	);

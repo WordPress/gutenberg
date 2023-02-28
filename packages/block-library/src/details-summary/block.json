@@ -53,7 +53,9 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
-			}
+			},
+			"__experimentalSelector": ".wp-block-details-summary__summary h1,.wp-block-details-summary__summary h2,.wp-block-details-summary__summary h3,.wp-block-details-summary__summary h4,.wp-block-details-summary__summary h5,.wp-block-details-summary__summary h6",
+			"__experimentalSkipSerialization": true
 		}
 	},
 	"style": "wp-block-details"
