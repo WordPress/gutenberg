@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -43,7 +44,7 @@ describe( 'withDuotoneControls', () => {
 		isSelected: true,
 	};
 
-	const settings = {
+	const blockEditorSettings = {
 		__experimentalFeatures: {
 			color: {
 				palette: {
@@ -79,6 +80,13 @@ describe( 'withDuotoneControls', () => {
 		},
 	};
 
+	const duotonePresets =
+		blockEditorSettings.__experimentalFeatures.color.duotone.default;
+
+	const EnhancedComponent = withDuotoneControls( ( { wrapperProps } ) => (
+		<div { ...wrapperProps } />
+	) );
+
 	beforeEach( () => {
 		registerBlockType( blockName, blockSettings );
 	} );
@@ -87,13 +95,10 @@ describe( 'withDuotoneControls', () => {
 		unregisterBlockType( blockName );
 	} );
 
-	it( 'should show Duotone control in toolbar', () => {
-		const EnhancedComponent = withDuotoneControls( ( { wrapperProps } ) => (
-			<div { ...wrapperProps } />
-		) );
-
+	it( 'should show Duotone panel with presets in toolbar for blocks that support Duotone', async () => {
+		const user = userEvent.setup();
 		render(
-			<BlockEditorProvider settings={ settings } value={ [] }>
+			<BlockEditorProvider settings={ blockEditorSettings } value={ [] }>
 				<SlotFillProvider>
 					<BlockEdit { ...componentProps }>
 						<EnhancedComponent />
@@ -103,11 +108,29 @@ describe( 'withDuotoneControls', () => {
 			</BlockEditorProvider>
 		);
 
-		expect(
-			screen.getByRole( 'button', {
-				name: 'Apply duotone filter',
-			} )
-		).toBeInTheDocument();
+		const duotoneToggleButton = screen.getByRole( 'button', {
+			name: 'Apply duotone filter',
+		} );
+
+		await user.click( duotoneToggleButton );
+
+		const duotonePopover = screen.queryByRole( 'group', {
+			name: 'Duotone',
+		} );
+		expect( duotonePopover ).toBeInTheDocument();
+
+		const unsetOption = screen.queryByRole( 'button', {
+			name: 'Unset',
+		} );
+		expect( unsetOption ).toBeInTheDocument();
+
+		duotonePresets?.forEach( ( preset ) => {
+			// check in document
+			const presetOption = screen.queryByRole( 'button', {
+				name: `Duotone: ${ preset.name }`,
+			} );
+			expect( presetOption ).toBeInTheDocument();
+		} );
 	} );
 } );
 
