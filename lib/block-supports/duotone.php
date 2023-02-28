@@ -469,7 +469,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		$filter_property = $duotone_attr;
 	} else if ( $is_custom ) {
 		// Build a unique slug for the filter based on the array of colors.
-		$slug        = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
+		$slug = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
 
 		// Build a customized CSS filter property for unique slug.
 		$filter_data     = array(
