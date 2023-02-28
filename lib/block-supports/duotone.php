@@ -451,8 +451,8 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
 	$duotone_attr = $block['attrs']['style']['color']['duotone'];
 
-	$is_duotone_colors_array = is_array( $duotone_attr );
-	$is_duotone_preset       = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === 0;
+	$is_duotone_custom_colors = is_array( $duotone_attr );
+	$is_duotone_preset        = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === 0;
 
 	if ( $is_duotone_preset ) {
 		$slug          = str_replace( 'var:preset|duotone|', '', $duotone_attr );
@@ -468,7 +468,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// - an array of colors.
 
 		// Build a unique slug for the filter based on the array of colors.
-		$filter_key    = $is_duotone_colors_array ? implode( '-', $duotone_attr ) : $duotone_attr;
+		$filter_key    = $is_duotone_custom_colors ? implode( '-', $duotone_attr ) : $duotone_attr;
 		$filter_data = array(
 			'slug'   => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
 			'colors' => $duotone_attr, // required for building the SVG with gutenberg_get_duotone_filter_svg.
@@ -508,7 +508,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	// For *non*-presets then generate an SVG for the filter.
 	// Note: duotone presets are already pre-generated so no need to do this again.
-	if ( $is_duotone_colors_array ) {
+	if ( $is_duotone_custom_colors ) {
 		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
 
 		add_action(
