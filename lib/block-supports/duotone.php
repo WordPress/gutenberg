@@ -453,7 +453,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$is_duotone_preset       = ! $is_duotone_colors_array && strpos( $duotone_attr, 'var:preset|duotone|' ) === 0;
 
 	if ( $is_duotone_preset ) {
-		$slug = str_replace( 'var:preset|duotone|', '', $duotone_attr );
+		$slug          = str_replace( 'var:preset|duotone|', '', $duotone_attr );
 		$filter_preset = array(
 			'slug' => $slug,
 		);
