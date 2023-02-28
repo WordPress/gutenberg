@@ -149,7 +149,15 @@ export function useMediaCategories( rootClientId ) {
 						if ( category.isExternalResource ) {
 							return [ category.name, true ];
 						}
-						const results = await category.fetch( { per_page: 1 } );
+						let results = [];
+						try {
+							results = await category.fetch( {
+								per_page: 1,
+							} );
+						} catch ( e ) {
+							// If the request fails, we shallow the error and just don't show
+							// the category, in order to not break the media tab.
+						}
 						return [ category.name, !! results.length ];
 					} )
 				)
