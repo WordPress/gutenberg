@@ -98,7 +98,7 @@ class MediaTextEdit extends Component {
 		if ( mediaType === 'image' && media.sizes ) {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src =
-				media?.sizes?.large?.url ||
+				media.sizes.large?.url ||
 				media?.media_details?.sizes?.large?.source_url;
 		}
 
