@@ -456,7 +456,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	if ( $is_duotone_preset ) {
 		$slug          = str_replace( 'var:preset|duotone|', '', $duotone_attr );
-		$filter_preset = array(
+		$filter_data = array(
 			'slug' => $slug,
 		);
 
@@ -469,18 +469,18 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 		// Build a unique slug for the filter based on the array of colors.
 		$filter_key    = $is_duotone_colors_array ? implode( '-', $duotone_attr ) : $duotone_attr;
-		$filter_preset = array(
+		$filter_data = array(
 			'slug'   => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
 			'colors' => $duotone_attr, // required for building the SVG with gutenberg_get_duotone_filter_svg.
 		);
 
 		// Build a customised CSS filter property for unique slug.
-		$filter_property = gutenberg_get_duotone_filter_property( $filter_preset );
+		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
 	}
 
 	// - Applied as a class attribute to the block wrapper.
 	// - Used as a selector to apply the filter to the block.
-	$filter_id = gutenberg_get_duotone_filter_id( $filter_preset );
+	$filter_id = gutenberg_get_duotone_filter_id( $filter_data );
 
 	// Build the CSS selectors to which the filter will be applied.
 	// Todo - encapsulate this in a function.
@@ -516,7 +516,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// For *non*-presets then generate an SVG for the filter.
 	// Note: duotone presets are already pre-generated so no need to do this again.
 	if ( $is_duotone_colors_array ) {
-		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_preset );
+		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
 
 		add_action(
 			'wp_footer',
