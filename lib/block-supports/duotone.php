@@ -311,6 +311,9 @@ function gutenberg_get_duotone_filter_id( $preset ) {
  * @return string        Duotone CSS filter property url value.
  */
 function gutenberg_get_duotone_filter_property( $preset ) {
+	if ( isset( $preset['colors'] ) && 'unset' === $preset['colors'] ) {
+		return 'none';
+	}
 	$filter_id = gutenberg_get_duotone_filter_id( $preset );
 	return "url('#" . $filter_id . "')";
 }
@@ -473,7 +476,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		);
 
 		// Build a customised CSS filter property for unique slug.
-		$filter_property = $is_duotone_unset ? 'none' : gutenberg_get_duotone_filter_property( $filter_preset );
+		$filter_property = gutenberg_get_duotone_filter_property( $filter_preset );
 	}
 
 	// - Applied as a class attribute to the block wrapper.
