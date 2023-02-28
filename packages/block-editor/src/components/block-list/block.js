@@ -11,7 +11,7 @@ import {
 	useMemo,
 	useCallback,
 	RawHTML,
-	useState,
+	useRef,
 } from '@wordpress/element';
 import {
 	getBlockType,
@@ -544,7 +544,7 @@ export default compose(
 	applyWithSelect,
 	applyWithDispatch,
 	( WrappedComponent ) => ( props ) => {
-		const [ subscriptions, setSubscriptions ] = useState( new Set() );
+		const subscriptions = useRef( new Set() );
 		const registry = useRegistry();
 		const attributes = useSelect(
 			( select ) =>
@@ -553,22 +553,21 @@ export default compose(
 						select( blockEditorStore ).getBlockAttributes(
 							props.clientId
 						)
-					).filter( ( [ key ] ) => subscriptions.has( key ) )
+					).filter( ( [ key ] ) => subscriptions.current.has( key ) )
 				),
-			[ subscriptions, props.clientId ]
+			[ props.clientId ]
 		);
 
 		const proxy = new Proxy( attributes, {
 			get( target, name ) {
-				if ( ! subscriptions.has( name ) ) {
-					window.queueMicrotask( () => {
-						setSubscriptions( ( subs ) => subs.add( name ) );
-					} );
-					return registry
-						.select( blockEditorStore )
-						.getBlockAttributes( props.clientId )[ name ];
+				if ( target.hasOwnProperty( name ) ) {
+					return target[ name ];
 				}
-				return target[ name ];
+
+				subscriptions.current.add( name );
+				return registry
+					.select( blockEditorStore )
+					.getBlockAttributes( props.clientId )[ name ];
 			},
 		} );
 		return <WrappedComponent { ...props } attributes={ proxy } />;
