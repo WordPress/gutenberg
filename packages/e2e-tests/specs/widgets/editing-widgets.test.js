@@ -425,8 +425,6 @@ describe( 'Widgets screen', () => {
 				if ( existingMarqueeWidgets ) {
 					await existingMarqueeWidgets.focus();
 					await pressKeyWithModifier( 'access', 'z' );
-					await closedPanelBody.focus();
-					await closedPanelBody.click();
 				}
 			}
 		}
