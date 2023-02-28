@@ -200,6 +200,52 @@ describe( 'withDuotoneControls', () => {
 		} );
 		expect( presetOption ).toBeInTheDocument();
 	} );
+
+	it( 'should not show a selected Duotone preset in the panel when the block attribute contains a custom duotone', async () => {
+		const user = userEvent.setup();
+		const blockWithDuotoneProps = {
+			...blockProps,
+			attributes: {
+				style: {
+					color: {
+						duotone: [ 'rgb(0, 0, 0)', 'rgb(255, 255, 255)' ],
+					},
+				},
+			},
+		};
+
+		render(
+			<BlockEditorProvider settings={ blockEditorSettings } value={ [] }>
+				<SlotFillProvider>
+					<BlockEdit { ...blockWithDuotoneProps }>
+						<WithDuotoneControls />
+					</BlockEdit>
+					<BlockControls.Slot group="block" />
+				</SlotFillProvider>
+			</BlockEditorProvider>
+		);
+
+		const duotoneToggleButton = screen.getByRole( 'button', {
+			name: 'Apply duotone filter',
+		} );
+
+		await user.click( duotoneToggleButton );
+
+		const unsetOption = screen.queryByRole( 'button', {
+			name: 'Unset',
+			pressed: false, // the unset option should not be pressed.
+		} );
+		expect( unsetOption ).toBeInTheDocument();
+
+		duotonePresets?.forEach( ( preset ) => {
+			// check in document
+			const presetOption = screen.queryByRole( 'button', {
+				name: `Duotone: ${ preset.name }`,
+				pressed: false, // no preset should be pressed.
+			} );
+			expect( presetOption ).toBeInTheDocument();
+		} );
+	} );
 } );
 
 describe( 'Duotone utilities', () => {
