@@ -40,7 +40,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => 'Existing Navigation Menu 2',
-				'post_content' => '<!-- wp:page-list /-->',
+				'post_content' => '<!-- wp:navigation-link {"label":"Hello world","type":"post","id":1,"url":"/hello-world","kind":"post-type"} /-->',
 			)
 		);
 
