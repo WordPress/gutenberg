@@ -8,7 +8,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -98,8 +98,9 @@ function BorderToolsPanel( {
 }
 
 const DEFAULT_CONTROLS = {
-	borderStyle: true,
-	borderRadius: true,
+	radius: true,
+	color: true,
+	width: true,
 };
 
 export default function BorderPanel( {
@@ -111,12 +112,52 @@ export default function BorderPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 } ) {
+	const colors = useColorsPerOrigin( settings );
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
-	const border = inheritedValue?.border;
+	const encodeColorValue = ( colorValue ) => {
+		const allColors = colors.flatMap(
+			( { colors: originColors } ) => originColors
+		);
+		const colorObject = allColors.find(
+			( { color } ) => color === colorValue
+		);
+		return colorObject
+			? 'var:preset|color|' + colorObject.slug
+			: colorValue;
+	};
+	const decodeColorValue = useCallback(
+		( colorValue ) => {
+			const allColors = colors.flatMap(
+				( { colors: originColors } ) => originColors
+			);
+			const colorObject = allColors.find(
+				( { slug } ) => colorValue === 'var:preset|color|' + slug
+			);
+			return colorObject ? colorObject.color : colorValue;
+		},
+		[ colors ]
+	);
+	const border = useMemo( () => {
+		if ( hasSplitBorders( inheritedValue?.border ) ) {
+			const borderValue = { ...inheritedValue?.border };
+			[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
+				borderValue[ side ] = {
+					...borderValue[ side ],
+					color: decodeColorValue( borderValue[ side ]?.color ),
+				};
+			} );
+			return borderValue;
+		}
+		return {
+			...inheritedValue?.border,
+			color: inheritedValue?.border?.color
+				? decodeColorValue( inheritedValue?.border?.color )
+				: undefined,
+		};
+	}, [ inheritedValue?.border, decodeColorValue ] );
 	const setBorder = ( newBorder ) =>
 		onChange( { ...value, border: newBorder } );
-	const colors = useColorsPerOrigin( settings );
 	const showBorderColor = useHasBorderColorControl( settings );
 	const showBorderStyle = useHasBorderStyleControl( settings );
 	const showBorderWidth = useHasBorderWidthControl( settings );
@@ -172,6 +213,13 @@ export default function BorderPanel( {
 					...newBorderWithStyle,
 			  };
 
+		[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
+			updatedBorder[ side ] = {
+				...updatedBorder[ side ],
+				color: encodeColorValue( updatedBorder[ side ]?.color ),
+			};
+		} );
+
 		// As radius is maintained separately to color, style, and width
 		// maintain its value. Undefined values here will be cleaned when
 		// global styles are saved.
@@ -185,6 +233,9 @@ export default function BorderPanel( {
 		};
 	}, [] );
 
+	const showBorderByDefault =
+		defaultControls?.color || defaultControls?.width;
+
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -197,7 +248,8 @@ export default function BorderPanel( {
 					hasValue={ () => isDefinedBorder( value?.border ) }
 					label={ __( 'Border' ) }
 					onDeselect={ () => resetBorder() }
-					isShownByDefault={ defaultControls.borderStyle }
+					isShownByDefault={ showBorderByDefault }
+					panelId={ panelId }
 				>
 					<BorderBoxControl
 						colors={ colors }
@@ -217,7 +269,8 @@ export default function BorderPanel( {
 					hasValue={ hasBorderRadius }
 					label={ __( 'Radius' ) }
 					onDeselect={ () => setBorderRadius( undefined ) }
-					isShownByDefault={ defaultControls.borderRadius }
+					isShownByDefault={ defaultControls.radius }
+					panelId={ panelId }
 				>
 					<BorderRadiusControl
 						values={ borderRadiusValues }
