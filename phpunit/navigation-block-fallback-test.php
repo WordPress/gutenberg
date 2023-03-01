@@ -201,6 +201,36 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$this->assertEmpty( $fallback_blocks );
 	}
 
+	public function test_should_filter_out_empty_blocks_from_fallbacks() {
+
+		$navigation_post = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => 'Existing Navigation Menu',
+				'post_content' => '    <!-- wp:page-list /-->         ',
+			)
+		);
+
+		$fallback_blocks = gutenberg_block_core_navigation_get_fallback_blocks();
+
+		$first_block = $fallback_blocks[0];
+
+		// There should only be a single page list block and no "null" blocks.
+		$this->assertCount( 1, $fallback_blocks );
+		$this->assertEquals( $first_block['blockName'], 'core/page-list' );
+
+		// Check that no "empty" blocks exist with a blockName of 'null'.
+		// If the block parser encounters whitespace it will return a block with a blockName of null.
+		// This is an intentional feature, but is undesirable for our fallbacks.
+		$null_blocks = array_filter(
+			$fallback_blocks,
+			function( $block ) {
+				return $block['blockName'] === null;
+			}
+		);
+		$this->assertEmpty( $null_blocks );
+	}
+
 	public function test_should_return_filtered_blocks_fallback_is_filtered() {
 
 		function use_site_logo() {
