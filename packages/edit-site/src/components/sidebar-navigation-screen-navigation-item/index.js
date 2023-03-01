@@ -49,7 +49,12 @@ export default function SidebarNavigationScreenNavigationItem() {
 				/>
 			}
 			content={
-				post ? decodeEntities( post?.description?.rendered ) : null
+				<>
+					<a href={ post?.link }>{ post?.link }</a>
+					{ post
+						? decodeEntities( post?.description?.rendered )
+						: null }
+				</>
 			}
 		/>
 	);
