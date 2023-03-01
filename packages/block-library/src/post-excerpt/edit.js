@@ -16,8 +16,8 @@ import {
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, ToggleControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ import { __ } from '@wordpress/i18n';
 import { useCanEditEntity } from '../utils/hooks';
 
 export default function PostExcerptEditor( {
-	attributes: { textAlign, moreText, showMoreOnNewLine },
+	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
 	setAttributes,
 	isSelected,
 	context: { postId, postType, queryId },
@@ -33,6 +33,7 @@ export default function PostExcerptEditor( {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
+
 	const [
 		rawExcerpt,
 		setExcerpt,
@@ -43,6 +44,14 @@ export default function PostExcerptEditor( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+
+	/**
+	 * translators: If your word count is based on single characters (e.g. East Asian characters),
+	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
+	 * Do not translate into your own language.
+	 */
+	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
+
 	/**
 	 * When excerpt is editable, strip the html tags from
 	 * rendered excerpt. This will be used if the entity's
@@ -109,21 +118,67 @@ export default function PostExcerptEditor( {
 	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {
 		'is-inline': ! showMoreOnNewLine,
 	} );
+
+	/**
+	 * The excerpt length setting needs to be applied to both
+	 * the raw and the rendered excerpt depending on which is being used.
+	 */
+	const rawOrRenderedExcerpt = !! renderedExcerpt
+		? strippedRenderedExcerpt
+		: rawExcerpt;
+
+	let trimmedExcerpt = '';
+	if ( wordCountType === 'words' ) {
+		trimmedExcerpt = rawOrRenderedExcerpt
+			.trim()
+			.split( ' ', excerptLength )
+			.join( ' ' );
+	} else if ( wordCountType === 'characters_excluding_spaces' ) {
+		/*
+		 * 1. Split the excerpt at the character limit,
+		 * then join the substrings back into one string.
+		 * 2. Count the number of spaces in the excerpt
+		 * by comparing the lengths of the string with and without spaces.
+		 * 3. Add the number to the length of the visible excerpt,
+		 * so that the spaces are excluded from the word count.
+		 */
+		const excerptWithSpaces = rawOrRenderedExcerpt
+			.trim()
+			.split( '', excerptLength )
+			.join( '' );
+
+		const numberOfSpaces =
+			excerptWithSpaces.length -
+			excerptWithSpaces.replaceAll( ' ', '' ).length;
+
+		trimmedExcerpt = rawOrRenderedExcerpt
+			.trim()
+			.split( '', excerptLength + numberOfSpaces )
+			.join( '' );
+	} else if ( wordCountType === 'characters_including_spaces' ) {
+		trimmedExcerpt = rawOrRenderedExcerpt.trim().split( '', excerptLength );
+	}
+
+	trimmedExcerpt = trimmedExcerpt + '...';
+
 	const excerptContent = isEditable ? (
 		<RichText
 			className={ excerptClassName }
 			aria-label={ __( 'Post excerpt text' ) }
 			value={
-				rawExcerpt ||
-				strippedRenderedExcerpt ||
-				( isSelected ? '' : __( 'No post excerpt found' ) )
+				isSelected
+					? rawOrRenderedExcerpt
+					: ( trimmedExcerpt !== '...' ? trimmedExcerpt : '' ) ||
+					  __( 'No post excerpt found' )
 			}
 			onChange={ setExcerpt }
 			tagName="p"
 		/>
 	) : (
 		<p className={ excerptClassName }>
-			{ strippedRenderedExcerpt || __( 'No post excerpt found' ) }
+			{ trimmedExcerpt !== '...'
+				? trimmedExcerpt
+				: __( 'No post excerpt found' ) }
 		</p>
 	);
 	return (
@@ -139,6 +194,7 @@ export default function PostExcerptEditor( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show link on new line' ) }
 						checked={ showMoreOnNewLine }
 						onChange={ ( newShowMoreOnNewLine ) =>
@@ -146,6 +202,16 @@ export default function PostExcerptEditor( {
 								showMoreOnNewLine: newShowMoreOnNewLine,
 							} )
 						}
+					/>
+					<RangeControl
+						label={ __( 'Max number of words' ) }
+						value={ excerptLength }
+						onChange={ ( value ) => {
+							setAttributes( { excerptLength: value } );
+							setExcerpt();
+						} }
+						min="10"
+						max="100"
 					/>
 				</PanelBody>
 			</InspectorControls>

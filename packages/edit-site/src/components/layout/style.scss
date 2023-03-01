@@ -1,5 +1,3 @@
-$hub-height: $grid-unit-20 * 2 + $button-size;
-
 .edit-site-layout {
 	height: 100%;
 	background: $gray-900;
@@ -10,33 +8,11 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 
 .edit-site-layout__hub {
 	position: fixed;
-	top: $canvas-padding;
-	left: $canvas-padding;
+	top: 0;
+	left: 0;
 	width: calc(100vw - #{$canvas-padding * 2});
-	height: $hub-height;
+	height: $header-height;
 	z-index: z-index(".edit-site-layout__hub");
-
-	background: $black;
-	padding: $grid-unit-20;
-	padding-left: 0;
-	border-radius: $radius-block-ui * 4;
-	box-shadow: $shadow-modal;
-
-	.edit-site-layout.is-full-canvas & {
-		top: 0;
-		left: 0;
-		padding: 0;
-		padding-right: $grid-unit-20;
-		height: $header-height;
-		border-radius: 0;
-		width: 100vw;
-		box-shadow: none;
-
-		@include break-medium {
-			width: auto;
-			padding-right: 0;
-		}
-	}
 
 	.edit-site-layout.is-full-canvas.is-edit-mode & {
 		width: auto;
@@ -45,6 +21,18 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 
 	@include break-medium {
 		width: calc(#{$nav-sidebar-width} - #{$canvas-padding * 2});
+	}
+
+	.edit-site-layout.is-full-canvas & {
+		padding-right: $grid-unit-20;
+		border-radius: 0;
+		width: 100vw;
+		box-shadow: none;
+
+		@include break-medium {
+			width: auto;
+			padding-right: 0;
+		}
 	}
 }
 
@@ -219,8 +207,15 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 
 	&:focus,
 	&:focus-within {
-		top: 0;
+		top: auto;
 		bottom: 0;
+	}
+
+	&.is-entity-save-view-open {
+		&:focus,
+		&:focus-within {
+			top: 0;
+		}
 	}
 
 	@include break-medium {

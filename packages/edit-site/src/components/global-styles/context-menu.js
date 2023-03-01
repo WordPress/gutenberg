@@ -12,6 +12,7 @@ import {
 import {
 	typography,
 	border,
+	filter,
 	shadow,
 	color,
 	layout,
@@ -21,26 +22,37 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
-import { useHasDimensionsPanel } from './dimensions-panel';
-import { useHasTypographyPanel } from './typography-panel';
+import { useHasFilterPanel } from './filter-utils';
 import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { ScreenVariations } from './screen-variations';
 import { useHasShadowControl } from './shadow-panel';
+import { unlock } from '../../private-apis';
+
+const {
+	useHasDimensionsPanel,
+	useHasTypographyPanel,
+	useGlobalSetting,
+	useSettingsForBlockElement,
+} = unlock( blockEditorPrivateApis );
 
 function ContextMenu( { name, parentMenu = '' } ) {
-	const hasTypographyPanel = useHasTypographyPanel( name );
+	const [ rawSettings ] = useGlobalSetting( '', name );
+	const settings = useSettingsForBlockElement( rawSettings, name );
+	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasEffectsPanel = useHasShadowControl( name );
-	const hasDimensionsPanel = useHasDimensionsPanel( name );
+	const hasFilterPanel = useHasFilterPanel( name );
+	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasDimensionsPanel;
 	const hasVariationsPanel = useHasVariationsPanel( name, parentMenu );
 
@@ -100,6 +112,15 @@ function ContextMenu( { name, parentMenu = '' } ) {
 						aria-label={ __( 'Shadow' ) }
 					>
 						{ __( 'Shadow' ) }
+					</NavigationButtonAsItem>
+				) }
+				{ hasFilterPanel && (
+					<NavigationButtonAsItem
+						icon={ filter }
+						path={ parentMenu + '/filters' }
+						aria-label={ __( 'Filters styles' ) }
+					>
+						{ __( 'Filters' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasLayoutPanel && (

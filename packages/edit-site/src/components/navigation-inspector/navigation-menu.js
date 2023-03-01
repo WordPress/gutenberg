@@ -2,16 +2,18 @@
  * WordPress dependencies
  */
 import {
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
+	BlockList,
+	BlockTools,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
 const ALLOWED_BLOCKS = {
 	'core/navigation': [
@@ -34,12 +36,19 @@ const ALLOWED_BLOCKS = {
 		'core/navigation-link',
 		'core/navigation-submenu',
 	],
+	'core/page-list': [ 'core/page-list-item' ],
 };
 
 export default function NavigationMenu( { innerBlocks, onSelect } ) {
+	const { clientIdsTree } = useSelect( ( select ) => {
+		const { __unstableGetClientIdsTree } = select( blockEditorStore );
+		return {
+			clientIdsTree: __unstableGetClientIdsTree(),
+		};
+	} );
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
-	const { OffCanvasEditor } = unlock( blockEditorExperiments );
+	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
 
 	//TODO: Block settings are normally updated as a side effect of rendering InnerBlocks in BlockList
 	//Think through a better way of doing this, possible with adding allowed blocks to block library metadata
@@ -56,5 +65,20 @@ export default function NavigationMenu( { innerBlocks, onSelect } ) {
 		} );
 	}, [ updateBlockListSettings, innerBlocks ] );
 
-	return <OffCanvasEditor blocks={ innerBlocks } onSelect={ onSelect } />;
+	// The hidden block is needed because it makes block edit side effects trigger.
+	// For example a navigation page list load its items has an effect on edit to load its items.
+	return (
+		<>
+			<OffCanvasEditor
+				blocks={ clientIdsTree }
+				onSelect={ onSelect }
+				LeafMoreMenu={ LeafMoreMenu }
+			/>
+			<div style={ { display: 'none' } }>
+				<BlockTools>
+					<BlockList />
+				</BlockTools>
+			</div>
+		</>
+	);
 }

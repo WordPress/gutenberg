@@ -6,6 +6,15 @@ on:
         types: [published]
     push:
         branches: [trunk]
+    workflow_dispatch:
+        inputs:
+            branches:
+                description: 'branches or commits to compare (comma separated)'
+                required: true
+            wpversion:
+                description: 'The base WP version to use for the tests (latest or 6.0, 6.1...)'
+                required: false
+                default: 'latest'
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -44,6 +53,13 @@ jobs:
               if: github.event_name == 'pull_request'
               run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
 
+            - name: Store performance measurements
+              if: github.event_name == 'pull_request'
+              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              with:
+                  name: perf-test-results
+                  path: ./__test-results/*.json
+
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
               env:
@@ -78,6 +94,14 @@ jobs:
                   script: |
                       const commit_details = await github.rest.git.getCommit({owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha});
                       return parseInt((new Date( commit_details.data.author.date ).getTime() / 1000).toFixed(0))
+
+            - name: Compare performance with custom branches
+              if: github.event_name == 'workflow_dispatch'
+              env:
+                  BRANCHES: ${{ github.event.inputs.branches }}
+                  WP_VERSION: ${{ github.event.inputs.wpversion }}
+              run: |
+                  ./bin/plugin/cli.js perf $(echo $BRANCHES | tr ',' ' ') --tests-branch $GITHUB_SHA --wp-version "$WP_VERSION"
 
             - name: Publish performance results
               if: github.event_name == 'push'

@@ -121,6 +121,7 @@ const ListViewBlockContents = forwardRef(
 							);
 							setIsLinkUIOpen( false );
 						} }
+						onCancel={ () => setIsLinkUIOpen( false ) }
 					/>
 				) }
 				<BlockDraggable clientIds={ draggableClientIds }>

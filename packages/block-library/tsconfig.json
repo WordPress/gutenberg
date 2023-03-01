@@ -21,14 +21,15 @@
 		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../escape-html" },
-		{ "path": "../experiments" },
+		{ "path": "../private-apis" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
-		{ "path": "../url" }
+		{ "path": "../url" },
+		{ "path": "../wordcount" }
 	],
 	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
 }

@@ -1,10 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import {
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	__experimentalUseNavigator as useNavigator,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -14,27 +18,12 @@ import { useViewportMatch } from '@wordpress/compose';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import { useLocation } from '../routes';
-import { store as editSiteStore } from '../../store';
 import AddNewTemplate from '../add-new-template';
-
-function omit( object, keys ) {
-	return Object.fromEntries(
-		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
-	);
-}
-
-const Item = ( { item } ) => {
-	const linkInfo = useLink( item.params );
-	const props = item.params
-		? { ...omit( item, 'params' ), ...linkInfo }
-		: item;
-	return <SidebarNavigationItem { ...props } />;
-};
+import { store as editSiteStore } from '../../store';
+import SidebarButton from '../sidebar-button';
 
 const config = {
 	wp_template: {
-		path: '/templates',
 		labels: {
 			title: __( 'Templates' ),
 			loading: __( 'Loading templates' ),
@@ -43,7 +32,6 @@ const config = {
 		},
 	},
 	wp_template_part: {
-		path: '/template-parts',
 		labels: {
 			title: __( 'Template parts' ),
 			loading: __( 'Loading template parts' ),
@@ -53,21 +41,23 @@ const config = {
 	},
 };
 
-export default function SidebarNavigationScreenTemplates( {
-	postType = 'wp_template',
-} ) {
-	const { params } = useLocation();
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
+const TemplateItem = ( { postType, postId, ...props } ) => {
+	const linkInfo = useLink( {
+		postType,
+		postId,
+	} );
+	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
+};
 
-	// Ideally the URL params would be enough.
-	// Loading the editor should ideally redirect to the home page
-	// instead of fetching the edited entity here.
-	const { editedPostId, editedPostType } = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		return {
-			editedPostId: getEditedPostId(),
-			editedPostType: getEditedPostType(),
-		};
+export default function SidebarNavigationScreenTemplates() {
+	const {
+		params: { postType },
+	} = useNavigator();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isTemplatePartsMode = useSelect( ( select ) => {
+		const settings = select( editSiteStore ).getSettings();
+
+		return !! settings.supportsTemplatePartsMode;
 	}, [] );
 
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
@@ -77,78 +67,62 @@ export default function SidebarNavigationScreenTemplates( {
 			per_page: -1,
 		}
 	);
+	const sortedTemplates = templates ? [ ...templates ] : [];
+	sortedTemplates.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
 
-	let items = [];
-	if ( isLoading ) {
-		items = [
-			{
-				children: config[ postType ].labels.loading,
-			},
-		];
-	} else if ( ! templates && ! isLoading ) {
-		items = [
-			{
-				children: config[ postType ].labels.notFound,
-			},
-		];
-	} else {
-		items = templates?.map( ( template ) => ( {
-			params: {
-				postType,
-				postId: template.id,
-			},
-			children: decodeEntities(
-				template.title?.rendered || template.slug
-			),
-			'aria-current':
-				( params.postType === postType &&
-					params.postId === template.id ) ||
-				// This is a special case for the home page.
-				( editedPostId === template.id &&
-					editedPostType === postType &&
-					!! params.postId )
-					? 'page'
-					: undefined,
-		} ) );
-	}
+	const browseAllLink = useLink( {
+		path: '/' + postType + '/all',
+	} );
+
+	const canCreate = ! isMobileViewport && ! isTemplatePartsMode;
 
 	return (
 		<SidebarNavigationScreen
-			path={ config[ postType ].path }
-			parentTitle={ __( 'Design' ) }
+			isRoot={ isTemplatePartsMode }
 			title={ config[ postType ].labels.title }
 			actions={
-				! isMobileViewport && (
+				canCreate && (
 					<AddNewTemplate
 						templateType={ postType }
 						toggleProps={ {
-							className:
-								'edit-site-sidebar-navigation-screen-templates__add-button',
+							as: SidebarButton,
 						} }
 					/>
 				)
 			}
 			content={
 				<>
-					<ItemGroup>
-						{ items.map( ( item, index ) => (
-							<Item item={ item } key={ index } />
-						) ) }
-
-						<SidebarNavigationItem
-							className="edit-site-sidebar-navigation-screen-templates__see-all"
-							{ ...useLink( {
-								postType,
-								postId: undefined,
-							} ) }
-							aria-current={
-								params.postType === postType && ! params.postId
-									? 'page'
-									: undefined
-							}
-							children={ config[ postType ].labels.manage }
-						/>
-					</ItemGroup>
+					{ isLoading && config[ postType ].labels.loading }
+					{ ! isLoading && (
+						<ItemGroup>
+							{ ! templates?.length && (
+								<Item>
+									{ config[ postType ].labels.notFound }
+								</Item>
+							) }
+							{ sortedTemplates.map( ( template ) => (
+								<TemplateItem
+									postType={ postType }
+									postId={ template.id }
+									key={ template.id }
+								>
+									{ decodeEntities(
+										template.title?.rendered ||
+											template.slug
+									) }
+								</TemplateItem>
+							) ) }
+							{ ! isMobileViewport && (
+								<SidebarNavigationItem
+									className="edit-site-sidebar-navigation-screen-templates__see-all"
+									{ ...browseAllLink }
+									children={
+										config[ postType ].labels.manage
+									}
+								/>
+							) }
+						</ItemGroup>
+					) }
 				</>
 			}
 		/>

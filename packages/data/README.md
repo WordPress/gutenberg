@@ -164,13 +164,21 @@ Integrating an existing redux store with its own reducers, store enhancers and m
 _Example:_
 
 ```js
-import { mapValues } from 'lodash';
 import { register } from '@wordpress/data';
 import existingSelectors from './existing-app/selectors';
 import existingActions from './existing-app/actions';
 import createStore from './existing-app/store';
 
 const reduxStore = createStore();
+
+const mapValues = ( obj, callback ) =>
+	Object.entries( obj ).reduce(
+		( acc, [ key, value ] ) => ( {
+			...acc,
+			[ key ]: callback( value ),
+		} ),
+		{}
+	);
 
 const boundSelectors = mapValues(
 	existingSelectors,
@@ -500,10 +508,6 @@ import { store as myCustomStore } from 'my-custom-store';
 dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 ```
 
-_Type_
-
--   `(storeNameOrDescriptor: StoreDescriptor|string) => Object`
-
 _Parameters_
 
 -   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
@@ -650,10 +654,6 @@ import { store as myCustomStore } from 'my-custom-store';
 
 select( myCustomStore ).getPrice( 'hammer' );
 ```
-
-_Type_
-
--   `(storeNameOrDescriptor: StoreDescriptor|string) => Object`
 
 _Parameters_
 

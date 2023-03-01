@@ -110,8 +110,8 @@ test.describe( 'Classic', () => {
 	} ) => {
 		// Based on docs routing diables caching.
 		// See: https://playwright.dev/docs/api/class-page#page-route
-		await page.route( '**', ( route ) => {
-			route.continue();
+		await page.route( '**', async ( route ) => {
+			await route.continue();
 		} );
 
 		await editor.insertBlock( { name: 'core/freeform' } );

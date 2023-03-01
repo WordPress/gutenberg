@@ -38,7 +38,7 @@ export default function NavigationPlaceholder( {
 		if ( hasResolvedMenus ) {
 			speak( __( 'Navigation block setup options ready.' ) );
 		}
-	}, [ isResolvingMenus, isSelected ] );
+	}, [ hasResolvedMenus, isResolvingMenus, isSelected ] );
 
 	const isResolvingActions =
 		isResolvingMenus && isResolvingCanUserCreateNavigationMenu;
