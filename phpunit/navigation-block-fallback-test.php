@@ -146,6 +146,86 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 	}
+
+	public function test_should_return_empty_fallback_blocks_when_no_navigations_exist() {
+		$fallback_blocks = gutenberg_block_core_navigation_get_fallback_blocks();
+
+		$this->assertIsArray( $fallback_blocks );
+		$this->assertEmpty( $fallback_blocks );
+	}
+
+	public function test_should_return_blocks_from_most_recently_created_navigation() {
+
+		$navigation_post_1 = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => 'Existing Navigation Menu 1',
+				'post_content' => '<!-- wp:page-list /-->',
+			)
+		);
+
+		$navigation_post_2 = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => 'Existing Navigation Menu 2',
+				'post_content' => '<!-- wp:navigation-link {"label":"Hello world","type":"post","id":1,"url":"/hello-world","kind":"post-type"} /-->',
+			)
+		);
+
+		$most_recently_published_nav = $navigation_post_2;
+
+		$fallback_blocks = gutenberg_block_core_navigation_get_fallback_blocks();
+
+		$block = $fallback_blocks[0];
+
+		// Check blocks match most recently Navigation Post data.
+		$this->assertEquals( $block['blockName'], 'core/navigation-link' );
+		$this->assertEquals( $block['attrs']['label'], 'Hello world' );
+		$this->assertEquals( $block['attrs']['url'], '/hello-world' );
+
+	}
+
+	public function test_should_return_empty_array_if_most_recently_created_navigation_is_empty() {
+
+		$navigation_post_2 = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => 'Existing Navigation Menu',
+				'post_content' => '', // empty.
+			)
+		);
+
+		$fallback_blocks = gutenberg_block_core_navigation_get_fallback_blocks();
+
+		$this->assertIsArray( $fallback_blocks );
+		$this->assertEmpty( $fallback_blocks );
+	}
+
+	public function test_should_return_filtered_blocks_fallback_is_filtered() {
+
+		function use_site_logo() {
+			return parse_blocks( '<!-- wp:site-logo /-->' );
+		}
+
+		add_filter( 'block_core_navigation_render_fallback', 'use_site_logo' );
+
+		$navigation_post_2 = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => 'Existing Navigation Menu',
+				'post_content' => '<!-- wp:navigation-link {"label":"Hello world","type":"post","id":1,"url":"/hello-world","kind":"post-type"} /-->',
+			)
+		);
+
+		$fallback_blocks = gutenberg_block_core_navigation_get_fallback_blocks();
+
+		$block = $fallback_blocks[0];
+
+		// Check blocks match most recently Navigation Post data.
+		$this->assertEquals( $block['blockName'], 'core/site-logo' );
+
+		remove_filter( 'block_core_navigation_render_fallback', 'use_site_logo' );
+	}
 }
 
 
