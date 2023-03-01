@@ -452,7 +452,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$duotone_attr = $block['attrs']['style']['color']['duotone'];
 
 	$is_preset = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === 0;
-	$is_css    = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === -1;
+	$is_css    = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === false;
 	$is_custom = is_array( $duotone_attr );
 
 	// Generate the pieces needed for rendering a duotone to the page.
