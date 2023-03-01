@@ -211,7 +211,7 @@ styleSections.forEach( ( section ) => {
 	autogen += getSectionMarkup( section, styles[ section ], 'styles' );
 } );
 
-const templateTableGeneration = ( themeJson, templates, context ) => {
+const templateTableGeneration = ( themeJson, context ) => {
 	let content = '';
 	content += '## ' + context + '\n\n';
 	content += themeJson.properties[ context ].description + '\n\n';
@@ -219,27 +219,21 @@ const templateTableGeneration = ( themeJson, templates, context ) => {
 		'Type: `' + themeJson.properties[ context ].items.type + '`.\n\n';
 	content += '| Property | Description | Type |\n';
 	content += '| ---      | ---         | ---  |\n';
-	keys( templates ).forEach( ( key ) => {
-		content += `| ${ key } | ${ templates[ key ].description } | ${ templates[ key ].type } |\n`;
-	} );
+	keys( themeJson.properties[ context ].items.properties ).forEach(
+		( key ) => {
+			content += `| ${ key } | ${ themeJson.properties[ context ].items.properties[ key ].description } | ${ themeJson.properties[ context ].items.properties[ key ].type } |\n`;
+		}
+	);
 	content += '\n\n';
 
 	return content;
 };
 
 // customTemplates
-autogen += templateTableGeneration(
-	themejson,
-	themejson.properties.customTemplates.items.properties,
-	'customTemplates'
-);
+autogen += templateTableGeneration( themejson, 'customTemplates' );
 
 // templateParts
-autogen += templateTableGeneration(
-	themejson,
-	themejson.properties.templateParts.items.properties,
-	'templateParts'
-);
+autogen += templateTableGeneration( themejson, 'templateParts' );
 
 // Patterns
 autogen += '## Patterns' + '\n\n';
