@@ -119,15 +119,6 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const PRESETS_METADATA = array(
 		array(
-			'path'              => array( 'shadow', 'presets' ),
-			'prevent_override'  => array( 'shadow', 'defaultPresets' ),
-			'use_default_names' => false,
-			'value_key'         => 'shadow',
-			'css_vars'          => '--wp--preset--shadow--$slug',
-			'classes'           => array(),
-			'properties'        => array( 'box-shadow' ),
-		),
-		array(
 			'path'              => array( 'color', 'palette' ),
 			'prevent_override'  => array( 'color', 'defaultPalette' ),
 			'use_default_names' => false,
@@ -184,6 +175,15 @@ class WP_Theme_JSON_Gutenberg {
 			'css_vars'          => '--wp--preset--spacing--$slug',
 			'classes'           => array(),
 			'properties'        => array( 'padding', 'margin' ),
+		),
+		array(
+			'path'              => array( 'shadow', 'presets' ),
+			'prevent_override'  => array( 'shadow', 'defaultPresets' ),
+			'use_default_names' => false,
+			'value_key'         => 'shadow',
+			'css_vars'          => '--wp--preset--shadow--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'box-shadow' ),
 		),
 	);
 
