@@ -50,7 +50,9 @@ export default function SidebarNavigationScreenNavigationItem() {
 			}
 			content={
 				<>
-					<a href={ post?.link }>{ post?.link }</a>
+					<a href={ post?.link } target="_blank" rel="noreferrer">
+						{ post?.link }
+					</a>
 					{ post
 						? decodeEntities( post?.description?.rendered )
 						: null }
