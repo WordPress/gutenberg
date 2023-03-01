@@ -23,13 +23,21 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	* automatically generated and user-created excerpts.
 	* Because the excerpt_length filter only applies to auto generated excerpts,
 	* wp_trim_words is used instead.
+	* A high-priority filter is added here to ensure the excerpt returned by
+	* get_the_excerpt() is as long as the max length that can be applied in the
+	* block settings. The filter is removed after the excerpt is loaded.
 	*/
+	$filter_excerpt_length = function() {
+		return 100;
+	};
+	add_filter( 'excerpt_length', $filter_excerpt_length, PHP_INT_MAX );
 	$excerpt_length = $attributes['excerptLength'];
 	if ( isset( $excerpt_length ) ) {
 		$excerpt = wp_trim_words( get_the_excerpt(), $excerpt_length );
 	} else {
 		$excerpt = get_the_excerpt();
 	}
+	remove_filter( 'excerpt_length', $filter_excerpt_length, PHP_INT_MAX );
 	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
 	$filter_excerpt_more = function( $more ) use ( $more_text ) {
 		return empty( $more_text ) ? $more : '';
