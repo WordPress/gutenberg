@@ -54,7 +54,10 @@ export default function SidebarNavigationScreenNavigationItem() {
 			content={
 				<>
 					{ post?.link ? (
-						<ExternalLink href={ post.link }>
+						<ExternalLink
+							className="edit-site-sidebar-navigation-screen__page-link"
+							href={ post.link }
+						>
 							{ post.link }
 						</ExternalLink>
 					) : null }
