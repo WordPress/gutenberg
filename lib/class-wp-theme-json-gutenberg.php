@@ -262,21 +262,6 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
-	 * Protected style properties.
-	 *
-	 * These style properties are only rendered if a setting enables it
-	 * via a value other than `null`.
-	 *
-	 * Each element maps the style property to the corresponding theme.json
-	 * setting key.
-	 *
-	 * @since 5.9.0
-	 */
-	const PROTECTED_PROPERTIES = array(
-		'spacing.blockGap' => array( 'spacing', 'blockGap' ),
-	);
-
-	/**
 	 * Indirect metadata for style properties that are not directly output.
 	 *
 	 * Each element maps from a CSS property name to an array of
@@ -304,6 +289,21 @@ class WP_Theme_JSON_Gutenberg {
 			array( 'layout', 'contentSize' ),
 			array( 'layout', 'wideSize' ),
 		),
+	);
+
+	/**
+	 * Protected style properties.
+	 *
+	 * These style properties are only rendered if a setting enables it
+	 * via a value other than `null`.
+	 *
+	 * Each element maps the style property to the corresponding theme.json
+	 * setting key.
+	 *
+	 * @since 5.9.0
+	 */
+	const PROTECTED_PROPERTIES = array(
+		'spacing.blockGap' => array( 'spacing', 'blockGap' ),
 	);
 
 	/**
