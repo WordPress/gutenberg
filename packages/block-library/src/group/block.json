@@ -15,6 +15,12 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
+		},
+		"role": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "*",
+			"attribute": "role"
 		}
 	},
 	"supports": {
@@ -23,7 +29,6 @@
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"ariaLabel": true,
-		"role": true,
 		"html": false,
 		"color": {
 			"gradients": true,

@@ -89,7 +89,12 @@ function GroupEdit( {
 		[ clientId ]
 	);
 
-	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const {
+		tagName: TagName = 'div',
+		templateLock,
+		layout = {},
+		role,
+	} = attributes;
 
 	// Layout settings.
 	const defaultLayout = useSetting( 'layout' ) || {};
@@ -145,12 +150,12 @@ function GroupEdit( {
 				/>
 			) }
 			{ layoutSupportEnabled && ! showPlaceholder && (
-				<TagName { ...innerBlocksProps } />
+				<TagName { ...innerBlocksProps } role={ role } />
 			) }
 			{ /* Ideally this is not needed but it's there for backward compatibility reason
 				to keep this div for themes that might rely on its presence */ }
 			{ ! layoutSupportEnabled && ! showPlaceholder && (
-				<TagName { ...blockProps }>
+				<TagName { ...blockProps } role={ role }>
 					<div { ...innerBlocksProps } />
 				</TagName>
 			) }
