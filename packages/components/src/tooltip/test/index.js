@@ -26,13 +26,17 @@ function getWrappingPopoverElement( element ) {
 
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
-		it( 'should not render the tooltip if multiple children are passed', () => {
+		it( 'should not render the tooltip if multiple children are passed', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<Tooltip { ...props }>
 					<Button>Button 1</Button>
 					<Button>Button 2</Button>
 				</Tooltip>
 			);
+
+			await user.tab();
 
 			expect(
 				screen.queryByText( 'tooltip text' )
@@ -62,8 +66,6 @@ describe( 'Tooltip', () => {
 					<Button>Hover Me!</Button>
 				</Tooltip>
 			);
-
-			expect( document.body ).toHaveFocus();
 
 			await user.tab();
 
