@@ -44,6 +44,7 @@ const FormTokenFieldWithState = ( {
 				setSelectedValue( tokens );
 				onChange?.( tokens );
 			} }
+			__nextHasNoMarginBottom
 		/>
 	);
 };
