@@ -76,7 +76,7 @@ export function QueryControls( {
 	...props
 }: QueryControlsProps ) {
 	return (
-		<VStack spacing="2">
+		<VStack spacing="4">
 			{ [
 				onOrderChange && onOrderByChange && (
 					<SelectControl
