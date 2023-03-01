@@ -13,8 +13,13 @@ import { useLayoutEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { escapeRegExp } from '../utils/strings';
+import type { CancelablePromise, KeyedOption, WPCompleter } from './types';
 
-function filterOptions( search, options = [], maxResults = 10 ) {
+function filterOptions(
+	search: RegExp,
+	options: Array< KeyedOption > = [],
+	maxResults = 10
+) {
 	const filtered = [];
 	for ( let i = 0; i < options.length; i++ ) {
 		const option = options[ i ];
@@ -43,9 +48,9 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 	return filtered;
 }
 
-export default function getDefaultUseItems( autocompleter ) {
-	return ( filterValue ) => {
-		const [ items, setItems ] = useState( [] );
+export default function getDefaultUseItems( autocompleter: WPCompleter ) {
+	return ( filterValue: string ) => {
+		const [ items, setItems ] = useState< Array< KeyedOption > >( [] );
 		/*
 		 * We support both synchronous and asynchronous retrieval of completer options
 		 * but internally treat all as async so we maintain a single, consistent code path.
@@ -61,7 +66,7 @@ export default function getDefaultUseItems( autocompleter ) {
 			const { options, isDebounced } = autocompleter;
 			const loadOptions = debounce(
 				() => {
-					const promise = Promise.resolve(
+					const promise: CancelablePromise = Promise.resolve(
 						typeof options === 'function'
 							? options( filterValue )
 							: options
@@ -112,6 +117,6 @@ export default function getDefaultUseItems( autocompleter ) {
 			};
 		}, [ filterValue ] );
 
-		return [ items ];
+		return [ items ] as const;
 	};
 }
