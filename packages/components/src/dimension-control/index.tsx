@@ -17,6 +17,29 @@ import sizesTable, { findSizeBySlug } from './sizes';
 import type { DimensionControlProps, Size } from './types';
 import type { SelectControlProps } from '../select-control/types';
 
+/**
+ * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
+ *
+ * This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ *
+ * ```jsx
+ * import { useState } from 'react';
+ * import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
+ *
+ * export default function MyCustomDimensionControl() {
+ * 	const [ paddingSize, setPaddingSize ] = useState( '' );
+ *
+ * 	return (
+ * 		<DimensionControl
+ * 			label={ 'Padding' }
+ * 			icon={ 'desktop' }
+ * 			onChange={ ( value ) => setPaddingSize( value ) }
+ * 			value={ paddingSize }
+ * 		/>
+ * 	);
+ * }
+ * ```
+ */
 export function DimensionControl( props: DimensionControlProps ) {
 	const {
 		label,
@@ -77,24 +100,4 @@ export function DimensionControl( props: DimensionControlProps ) {
 	);
 }
 
-/**
- * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
- *
- * This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
- *
- *  * ```jsx
- * import {
- *	__experimentalDimensionControl as DimensionControl
- * } from '@wordpress/components';
- *
- * const MyDimensionControl = () => {
- * 	return (
- *		<DimensionConrol
- *			label="Please select a size"
- *			onChange={ (size) => console.log(size) }
- *		/>
- * 	);
- * };
- * ```
- */
 export default DimensionControl;

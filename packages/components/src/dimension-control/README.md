@@ -8,52 +8,23 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ## Usage
 
-In a block's `edit` implementation, render a `<DimensionControl />` component.
-
 ```jsx
-import { registerBlockType } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
-import { DimensionControl } from '@wordpress/components';
+import { useState } from 'react';
+import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
 
-const partialRight =
-	( fn, ...partialArgs ) =>
-	( ...args ) =>
-		fn( ...args, ...partialArgs );
+export default function MyCustomDimensionControl() {
+	const [ paddingSize, setPaddingSize ] = useState( '' );
 
-registerBlockType( 'my-plugin/my-block', {
-	// ...
-
-	attributes: {
-		// other attributes here
-		// ...
-
-		paddingSize: {
-			type: 'string',
-		},
-	},
-
-	edit( { attributes, setAttributes, clientId } ) {
-		const { paddingSize } = attributes;
-
-		const updateSpacing = ( dimension, size, device = '' ) => {
-			setAttributes( {
-				[ `${ dimension }${ device }` ]: size,
-			} );
-		};
-
-		return (
-			<DimensionControl
-				label={ __( 'Padding' ) }
-				icon={ 'desktop' }
-				onChange={ partialRight( updateSpacing, 'paddingSize' ) }
-				value={ paddingSize }
-			/>
-		);
-	},
-} );
+	return (
+		<DimensionControl
+			label={ 'Padding' }
+			icon={ 'desktop' }
+			onChange={ ( value ) => setPaddingSize( value ) }
+			value={ paddingSize }
+		/>
+	);
+}
 ```
-
-_Note:_ it is recommended to partially apply the value of the Block attribute to be updated (eg: `paddingSize`, `marginSize`...etc) to your callback functions. This avoids the need to unnecessarily couple the component to the Block attribute schema.
 
 _Note:_ by default, if you do not provide an initial `value` prop for the current dimension value, then no value will be selected (ie: there is no default dimension set).
 
