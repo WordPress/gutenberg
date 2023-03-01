@@ -77,17 +77,8 @@ function ButtonEdit( props ) {
 		onReplace,
 		mergeBlocks,
 	} = props;
-	const {
-		textAlign,
-		linkTarget,
-		placeholder,
-		rel,
-		style,
-		text,
-		url,
-		width,
-		role,
-	} = attributes;
+	const { textAlign, linkTarget, placeholder, rel, style, text, url, width } =
+		attributes;
 
 	function onToggleOpenInNewTab( value ) {
 		const newLinkTarget = value ? '_blank' : undefined;
@@ -201,7 +192,6 @@ function ButtonEdit( props ) {
 					onReplace={ onReplace }
 					onMerge={ mergeBlocks }
 					identifier="text"
-					role={ role }
 				/>
 			</div>
 			<BlockControls group="block">

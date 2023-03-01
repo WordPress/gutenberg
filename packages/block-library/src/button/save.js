@@ -26,7 +26,6 @@ export default function save( { attributes, className } ) {
 		title,
 		url,
 		width,
-		role,
 	} = attributes;
 
 	if ( ! text ) {
@@ -74,7 +73,6 @@ export default function save( { attributes, className } ) {
 				value={ text }
 				target={ linkTarget }
 				rel={ rel }
-				role={ role }
 			/>
 		</div>
 	);
