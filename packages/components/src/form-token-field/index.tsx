@@ -7,6 +7,7 @@ import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
@@ -22,7 +23,10 @@ import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
 import { FlexItem } from '../flex';
-import { StyledLabel } from '../base-control/styles/base-control-styles';
+import {
+	StyledHelp,
+	StyledLabel,
+} from '../base-control/styles/base-control-styles';
 
 const identity = ( value: string ) => value;
 
@@ -67,7 +71,16 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalShowHowTo = true,
 		__next36pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
+		__nextHasNoMarginBottom = false,
 	} = props;
+
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated( 'Bottom margin styles for wp.blockEditor.URLInput', {
+			since: '6.2',
+			version: '6.5',
+			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
+		} );
+	}
 
 	const instanceId = useInstanceId( FormTokenField );
 
@@ -717,16 +730,17 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				) }
 			</div>
 			{ __experimentalShowHowTo && (
-				<p
+				<StyledHelp
 					id={ `components-form-token-suggestions-howto-${ instanceId }` }
-					className="components-form-token-field__help"
+					className="components-base-control__help"
+					__nextHasNoMarginBottom
 				>
 					{ tokenizeOnSpace
 						? __(
 								'Separate with commas, spaces, or the Enter key.'
 						  )
 						: __( 'Separate with commas or the Enter key.' ) }
-				</p>
+				</StyledHelp>
 			) }
 		</div>
 	);
