@@ -74,7 +74,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$fallback = gutenberg_block_core_navigation_create_fallback();
 
 		$this->assertEquals( 'Existing Classic Menu', $fallback->post_title, );
-		$this->assertEquals( 'wp_navigation', $fallback->post_type, );
+		$this->assertEquals( 'wp_navigation', $fallback->post_type );
 		$this->assertEquals( 'publish', $fallback->post_status );
 
 		// Assert that the fallback contains a navigation-link block.
