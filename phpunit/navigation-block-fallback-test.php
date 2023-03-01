@@ -23,7 +23,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 			)
 		);
 
-		return $navs_in_db->posts ?? array();
+		return $navs_in_db->posts ? $navs_in_db->posts : array();
 	}
 
 	public function test_gets_fallback_navigation_with_existing_navigation_menu_if_found() {
@@ -71,7 +71,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		$fallback = gutenberg_block_core_navigation_create_fallback();
 
-		$this->assertEquals( 'Existing Classic Menu', $fallback->post_title, );
+		$this->assertEquals( 'Existing Classic Menu', $fallback->post_title );
 		$this->assertEquals( 'wp_navigation', $fallback->post_type );
 		$this->assertEquals( 'publish', $fallback->post_status );
 
