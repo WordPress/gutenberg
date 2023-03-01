@@ -20,7 +20,7 @@ function getDefaultOrigin( type: AnimateType ) {
 /**
  * @return {string | void} ClassName that applies the animations
  */
-export function getAnimateClassName( options: AnimateOptions ): string | void {
+export function getAnimateClassName( options: AnimateOptions ): string {
 	if ( options.type === 'loading' ) {
 		return classnames( 'components-animate__loading' );
 	}
@@ -41,11 +41,12 @@ export function getAnimateClassName( options: AnimateOptions ): string | void {
 			'is-from-' + origin
 		);
 	}
+	return '';
 }
 
-// @ts-ignore Reason: Planned for deprecation
 export default function Animate( {
 	type,
+	// @ts-ignore Reason: Planned for deprecation
 	options = {},
 	children,
 }: AnimateProps ) {

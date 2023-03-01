@@ -73,9 +73,10 @@ export type AnimateOptions =
 /**
  * Component type for Animate
  */
-export type AnimateProps =
-	| LoadingOptions
+export type AnimateProps = (
 	| SlideInOptions
-	| ( AppearOptions & {
-			children: ( props: { className?: string } ) => ReactNode;
-	  } );
+	| AppearOptions
+	| LoadingOptions
+ ) & {
+	children: ( props: { className?: string } ) => ReactNode;
+};
