@@ -315,8 +315,20 @@ class EditorPage {
 		const { addButtonLocation } = this.initialValues;
 		const addButton = await this.getAddBlockButton();
 		const location = await addButton.getLocation();
+		let YLocation = addButtonLocation?.y;
+		const currentOrientation = await this.driver.getOrientation();
+		const isLandscape = currentOrientation === 'LANDSCAPE';
 
-		if ( location.y < addButtonLocation?.y ) {
+		if ( isLandscape ) {
+			const windowSize = await this.driver.getWindowSize();
+			const safeAreaOffset = 32;
+			YLocation = Math.floor(
+				( windowSize.height * YLocation ) / windowSize.width -
+					safeAreaOffset
+			);
+		}
+
+		if ( location.y < YLocation ) {
 			await this.waitForKeyboardToBeHidden();
 		}
 	}
