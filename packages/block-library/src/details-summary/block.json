@@ -9,14 +9,8 @@
 	"description": "Clicking on the summary will show or hide the content inside the details.",
 	"textdomain": "default",
 	"attributes": {
-		"level": {
-			"type": "number",
-			"default": 2
-		},
 		"summary": {
-			"type": "string",
-			"source": "html",
-			"selector": "h1,h2,h3,h4,h5,h6"
+			"type": "string"
 		}
 	},
 	"supports": {
@@ -53,10 +47,7 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
-			},
-			"__experimentalSelector": ".wp-block-details-summary__summary h1,.wp-block-details-summary__summary h2,.wp-block-details-summary__summary h3,.wp-block-details-summary__summary h4,.wp-block-details-summary__summary h5,.wp-block-details-summary__summary h6",
-			"__experimentalSkipSerialization": true
+			}
 		}
-	},
-	"style": "wp-block-details"
+	}
 }

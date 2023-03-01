@@ -9,10 +9,7 @@
 			{
 				"name": "core/details-summary",
 				"isValid": true,
-				"attributes": {
-					"level": 2,
-					"summary": "Details"
-				},
+				"attributes": {},
 				"innerBlocks": []
 			},
 			{
