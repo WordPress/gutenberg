@@ -28,7 +28,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 	public function test_gets_fallback_navigation_with_existing_navigation_menu_if_found() {
 
-		$navigation_post_1 = self::factory()->post->create_and_get(
+		self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => 'Existing Navigation Menu 1',
@@ -36,15 +36,13 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 			)
 		);
 
-		$navigation_post_2 = self::factory()->post->create_and_get(
+		$most_recently_published_nav = self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => 'Existing Navigation Menu 2',
 				'post_content' => '<!-- wp:navigation-link {"label":"Hello world","type":"post","id":1,"url":"/hello-world","kind":"post-type"} /-->',
 			)
 		);
-
-		$most_recently_published_nav = $navigation_post_2;
 
 		$fallback = gutenberg_block_core_navigation_create_fallback();
 
@@ -107,7 +105,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 	public function test_creates_fallback_from_existing_navigation_menu_even_if_classic_menu_exists() {
 
-		// Create a Navigation Post
+		// Create a Navigation Post.
 		$navigation_post = self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
@@ -156,7 +154,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 	public function test_should_return_blocks_from_most_recently_created_navigation() {
 
-		$navigation_post_1 = self::factory()->post->create_and_get(
+		self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => 'Existing Navigation Menu 1',
@@ -164,15 +162,13 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 			)
 		);
 
-		$navigation_post_2 = self::factory()->post->create_and_get(
+		$most_recently_published_nav = self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => 'Existing Navigation Menu 2',
 				'post_content' => '<!-- wp:navigation-link {"label":"Hello world","type":"post","id":1,"url":"/hello-world","kind":"post-type"} /-->',
 			)
 		);
-
-		$most_recently_published_nav = $navigation_post_2;
 
 		$fallback_blocks = gutenberg_block_core_navigation_get_fallback_blocks();
 
@@ -187,7 +183,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 	public function test_should_return_empty_array_if_most_recently_created_navigation_is_empty() {
 
-		$navigation_post_2 = self::factory()->post->create_and_get(
+		self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => 'Existing Navigation Menu',
@@ -239,7 +235,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		add_filter( 'block_core_navigation_render_fallback', 'use_site_logo' );
 
-		$navigation_post_2 = self::factory()->post->create_and_get(
+		self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => 'Existing Navigation Menu',
