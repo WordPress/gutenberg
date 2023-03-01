@@ -62,7 +62,6 @@ describe( 'Site Editor Performance', () => {
 		);
 
 		await createNewPost( { postType: 'page' } );
-		// await page.keyboard.type( 'Site Editor Performance Tests' );
 
 		await page.evaluate( ( _html ) => {
 			const { parse } = window.wp.blocks;
@@ -115,9 +114,9 @@ describe( 'Site Editor Performance', () => {
 					postType: 'page',
 				} );
 
-				// Wait for the canvas to become editable.
+				// Wait for the first content block to render.
 				await canvas().waitForSelector(
-					'[data-rich-text-placeholder="Write site tagline…"]'
+					'[data-type="core/post-content"] .wp-block'
 				);
 
 				if ( i > throwaway ) {
@@ -151,18 +150,15 @@ describe( 'Site Editor Performance', () => {
 				postType: 'page',
 			} );
 
-			// Wait for the canvas to become editable.
-			await canvas().waitForSelector(
-				'[data-rich-text-placeholder="Write site tagline…"]'
+			// Wait for the first paragraph to be ready.
+			const firstParagraph = await canvas().waitForXPath(
+				'//p[contains(text(), "Lorem ipsum dolor sit amet")]'
 			);
 
 			// Get inside the post content.
 			await enterEditMode();
 
 			// Insert a new paragraph right under the first one.
-			const firstParagraph = await canvas().waitForXPath(
-				'//p[contains(text(), "Lorem ipsum dolor sit amet")]'
-			);
 			await firstParagraph.focus();
 			await insertBlock( 'Paragraph' );
 
