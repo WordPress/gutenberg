@@ -431,7 +431,6 @@ class WP_Theme_JSON_Gutenberg {
 			'gradient'   => null,
 			'text'       => null,
 		),
-		'css'        => null,
 		'dimensions' => array(
 			'minHeight' => null,
 		),
@@ -460,6 +459,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textDecoration' => null,
 			'textTransform'  => null,
 		),
+		'css'        => null,
 	);
 
 	/**
