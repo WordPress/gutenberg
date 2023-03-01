@@ -455,11 +455,12 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$is_css    = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === -1;
 	$is_custom = is_array( $duotone_attr );
 
+	// Generate the pieces needed for rendering a duotone to the page.
 	if ( $is_preset ) {
-		// Extract the slug from the variable string.
+		// Extract the slug from the preset variable string.
 		$slug = str_replace( 'var:preset|duotone|', '', $duotone_attr );
 
-		// Utilize existing CSS custom property.
+		// Utilize existing preset CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
 	} else if ( $is_css ) {
 		// Build a unique slug for the filter based on the CSS value.
@@ -471,11 +472,14 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// Build a unique slug for the filter based on the array of colors.
 		$slug = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
 
-		// Build a customized CSS filter property for unique slug.
-		$filter_data     = array(
+		// This has the same shape as a preset, so it can be used in place of a
+		// preset when getting the filter property and SVG filter.
+		$filter_data = array(
 			'slug'   => $slug,
 			'colors' => $duotone_attr,
 		);
+
+		// Build a customized CSS filter property for unique slug.
 		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
 
 		// SVG will be output on the page later.
