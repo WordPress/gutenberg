@@ -196,9 +196,12 @@ A callback invoked when the popover should be closed.
 
 -   Required: No
 
-### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
+### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'overlay'`
 
 Used to specify the popover's position with respect to its anchor.
+
+`overlay` is a special case that places the popover over the reference element.
+Please note that other placement related props may not behave as excepted.
 
 -   Required: No
 -   Default: `"bottom-start"`

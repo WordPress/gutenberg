@@ -8,6 +8,36 @@
 
 class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	/**
+	 * Administrator ID.
+	 *
+	 * @var int
+	 */
+	private static $administrator_id;
+
+	/**
+	 * User ID.
+	 *
+	 * @var int
+	 */
+	private static $user_id;
+
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+
+		static::$administrator_id = self::factory()->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+
+		if ( is_multisite() ) {
+			grant_super_admin( self::$administrator_id );
+		}
+
+		static::$user_id = self::factory()->user->create();
+	}
+
+	/**
 	 * @dataProvider data_get_layout_definitions
 	 *
 	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
@@ -446,7 +476,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'shadow' => array(
-						'palette' => array(
+						'presets' => array(
 							array(
 								'slug'   => 'natural',
 								'shadow' => '5px 5px 5px 0 black',
@@ -472,7 +502,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'shadow' => array(
-						'palette' => array(
+						'presets' => array(
 							array(
 								'slug'   => 'natural',
 								'shadow' => '5px 5px 0 0 black',
@@ -892,6 +922,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'color' => array(
 									'text'       => 'red',
 									'background' => 'blue',
+								),
+							),
+							':seen'  => array(
+								'color' => array(
+									'background' => 'ivory',
 								),
 							),
 						),
@@ -1407,7 +1442,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'selector' => 'body',
 		);
 
-		$expected    = 'body { margin: 0;}.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }body{--wp--style--root--padding-top: 10px;--wp--style--root--padding-right: 12px;--wp--style--root--padding-bottom: 10px;--wp--style--root--padding-left: 12px;}';
+		$expected    = 'body { margin: 0;}.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }body{--wp--style--root--padding-top: 10px;--wp--style--root--padding-right: 12px;--wp--style--root--padding-bottom: 10px;--wp--style--root--padding-left: 12px;}';
 		$root_rules  = $theme_json->get_root_layout_rules( WP_Theme_JSON::ROOT_BLOCK_SELECTOR, $metadata );
 		$style_rules = $theme_json->get_styles_for_block( $metadata );
 		$this->assertEquals( $expected, $root_rules . $style_rules );
@@ -1467,6 +1502,300 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$root_rules  = $theme_json->get_root_layout_rules( WP_Theme_JSON::ROOT_BLOCK_SELECTOR, $metadata );
 		$style_rules = $theme_json->get_styles_for_block( $metadata );
 		$this->assertEquals( $expected, $root_rules . $style_rules );
+	}
+
+	/**
+	 * @dataProvider data_sanitize_for_block_with_style_variations
+	 *
+	 * @param array $theme_json_variations Theme.json variations to test.
+	 * @param array $expected_sanitized    Expected results after sanitizing.
+	 */
+	public function test_sanitize_for_block_with_style_variations( $theme_json_variations, $expected_sanitized ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => 2,
+				'styles'  => array(
+					'blocks' => array(
+						'core/quote' => $theme_json_variations,
+					),
+				),
+			)
+		);
+
+		// Validate structure is sanitized.
+		$sanitized_theme_json = $theme_json->get_raw_data();
+		$this->assertIsArray( $sanitized_theme_json, 'Sanitized theme.json is not an array data type' );
+		$this->assertArrayHasKey( 'styles', $sanitized_theme_json, 'Sanitized theme.json does not have an "styles" key' );
+		$this->assertSameSetsWithIndex( $expected_sanitized, $sanitized_theme_json['styles'], 'Sanitized theme.json styles does not match' );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_sanitize_for_block_with_style_variations() {
+		return array(
+			'1 variation with 1 invalid property'   => array(
+				'theme_json_variations' => array(
+					'variations' => array(
+						'plain' => array(
+							'color' => array(
+								'background' => 'hotpink',
+							),
+						),
+					),
+				),
+				'expected_sanitized'    => array(
+					'blocks' => array(
+						'core/quote' => array(
+							'variations' => array(
+								'plain' => array(
+									'color' => array(
+										'background' => 'hotpink',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			'1 variation with 2 invalid properties' => array(
+				'theme_json_variations' => array(
+					'variations' => array(
+						'plain' => array(
+							'color'            => array(
+								'background' => 'hotpink',
+							),
+							'invalidProperty1' => 'value1',
+							'invalidProperty2' => 'value2',
+						),
+					),
+				),
+				'expected_sanitized'    => array(
+					'blocks' => array(
+						'core/quote' => array(
+							'variations' => array(
+								'plain' => array(
+									'color' => array(
+										'background' => 'hotpink',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			'2 variations with 1 invalid property'  => array(
+				'theme_json_variations' => array(
+					'variations' => array(
+						'plain' => array(
+							'color'            => array(
+								'background' => 'hotpink',
+							),
+							'invalidProperty1' => 'value1',
+						),
+						'basic' => array(
+							'color' => array(
+								'background' => '#ffffff',
+								'text'       => '#000000',
+							),
+							'foo'   => 'bar',
+						),
+					),
+				),
+				'expected_sanitized'    => array(
+					'blocks' => array(
+						'core/quote' => array(
+							'variations' => array(
+								'plain' => array(
+									'color' => array(
+										'background' => 'hotpink',
+									),
+								),
+								'basic' => array(
+									'color' => array(
+										'background' => '#ffffff',
+										'text'       => '#000000',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider data_sanitize_with_invalid_style_variation
+	 *
+	 * @param array $theme_json_variations The theme.json variations to test.
+	 */
+	public function test_sanitize_with_invalid_style_variation( $theme_json_variations ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => 2,
+				'styles'  => array(
+					'blocks' => array(
+						'core/quote' => $theme_json_variations,
+					),
+				),
+			)
+		);
+
+		// Validate structure is sanitized.
+		$sanitized_theme_json = $theme_json->get_raw_data();
+		$this->assertIsArray( $sanitized_theme_json, 'Sanitized theme.json is not an array data type' );
+		$this->assertArrayNotHasKey( 'styles', $sanitized_theme_json, 'Sanitized theme.json should not have a "styles" key' );
+
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_sanitize_with_invalid_style_variation() {
+		return array(
+			'empty string variation' => array(
+				array(
+					'variations' => '',
+				),
+			),
+			'boolean variation'      => array(
+				array(
+					'variations' => false,
+				),
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider data_get_styles_for_block_with_style_variations
+	 *
+	 * @param array  $theme_json_variations Theme.json variations to test.
+	 * @param string $metadata_variations   Style variations to test.
+	 * @param string $expected              Expected results for styling.
+	 */
+	public function test_get_styles_for_block_with_style_variations( $theme_json_variations, $metadata_variations, $expected ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => 2,
+				'styles'  => array(
+					'blocks' => array(
+						'core/quote' => $theme_json_variations,
+					),
+				),
+			)
+		);
+
+		// Validate styles are generated properly.
+		$metadata      = array(
+			'path'       => array( 'styles', 'blocks', 'core/quote' ),
+			'selector'   => '.wp-block-quote',
+			'variations' => $metadata_variations,
+		);
+		$actual_styles = $theme_json->get_styles_for_block( $metadata );
+		$this->assertSame( $expected, $actual_styles );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_get_styles_for_block_with_style_variations() {
+		$plain = array(
+			'metadata' => array(
+				'path'     => array( 'styles', 'blocks', 'core/quote', 'variations', 'plain' ),
+				'selector' => '.is-style-plain.is-style-plain.wp-block-quote',
+			),
+			'styles'   => '.is-style-plain.is-style-plain.wp-block-quote{background-color: hotpink;}',
+		);
+		$basic = array(
+			'metadata' => array(
+				'path'     => array( 'styles', 'blocks', 'core/quote', 'variations', 'basic' ),
+				'selector' => '.is-style-basic.is-style-basic.wp-block-quote',
+			),
+			'styles'   => '.is-style-basic.is-style-basic.wp-block-quote{background-color: #ffffff;color: #000000;}',
+		);
+
+		return array(
+			'1 variation with 1 invalid property'   => array(
+				'theme_json_variations' => array(
+					'variations' => array(
+						'plain' => array(
+							'color' => array(
+								'background' => 'hotpink',
+							),
+						),
+					),
+				),
+				'metadata_variation'    => array( $plain['metadata'] ),
+				'expected'              => $plain['styles'],
+			),
+			'1 variation with 2 invalid properties' => array(
+				'theme_json_variations' => array(
+					'variations' => array(
+						'plain' => array(
+							'color'            => array(
+								'background' => 'hotpink',
+							),
+							'invalidProperty1' => 'value1',
+							'invalidProperty2' => 'value2',
+						),
+					),
+				),
+				'metadata_variation'    => array( $plain['metadata'] ),
+				'expected'              => $plain['styles'],
+			),
+			'2 variations with 1 invalid property'  => array(
+				'theme_json_variations' => array(
+					'variations' => array(
+						'plain' => array(
+							'color'            => array(
+								'background' => 'hotpink',
+							),
+							'invalidProperty1' => 'value1',
+						),
+						'basic' => array(
+							'color' => array(
+								'background' => '#ffffff',
+								'text'       => '#000000',
+							),
+							'foo'   => 'bar',
+						),
+					),
+				),
+				'metadata_variation'    => array( $plain['metadata'], $basic['metadata'] ),
+				'expected_styles'       => $plain['styles'] . $basic['styles'],
+			),
+			'2 variations with multiple invalid properties' => array(
+				'theme_json_variations' => array(
+					'variations' => array(
+						'plain' => array(
+							'color'            => array(
+								'background' => 'hotpink',
+							),
+							'invalidProperty1' => 'value1',
+							'invalidProperty2' => 'value2',
+						),
+						'basic' => array(
+							'foo'   => 'foo',
+							'color' => array(
+								'background' => '#ffffff',
+								'text'       => '#000000',
+							),
+							'bar'   => 'bar',
+							'baz'   => 'baz',
+						),
+					),
+				),
+				'metadata_variation'    => array( $plain['metadata'], $basic['metadata'] ),
+				'expected_styles'       => $plain['styles'] . $basic['styles'],
+			),
+		);
 	}
 
 	public function test_update_separator_declarations() {
@@ -1580,17 +1909,144 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	}
 
-	public function test_get_stylesheet_handles_custom_css() {
+	public function test_get_custom_css_handles_global_custom_css() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
-					'css' => 'body { color:purple; }',
+					'css'    => 'body {color:purple;}',
+					'blocks' => array(
+						'core/paragraph' => array(
+							'css' => 'color:red;',
+						),
+					),
 				),
 			)
 		);
 
-		$custom_css = 'body { color:purple; }';
-		$this->assertEquals( $custom_css, $theme_json->get_stylesheet( array( 'custom-css' ) ) );
+		$custom_css = 'body {color:purple;}p{color:red;}';
+		$this->assertEquals( $custom_css, $theme_json->get_custom_css() );
+	}
+
+	/**
+	 * @dataProvider data_custom_css_for_user_caps
+	 *
+	 * @param string $user_property The property name for current user.
+	 * @param array  $expected      Expected results.
+	 */
+	public function test_custom_css_for_user_caps( $user_property, array $expected ) {
+		wp_set_current_user( static::${$user_property} );
+
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'css'    => 'body { color:purple; }',
+					'blocks' => array(
+						'core/separator' => array(
+							'color' => array(
+								'background' => 'blue',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertSameSetsWithIndex( $expected, $actual );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_custom_css_for_user_caps() {
+		return array(
+			'allows custom css for users with caps'     => array(
+				'user_property' => 'administrator_id',
+				'expected'      => array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'css'    => 'body { color:purple; }',
+						'blocks' => array(
+							'core/separator' => array(
+								'color' => array(
+									'background' => 'blue',
+								),
+							),
+						),
+					),
+				),
+			),
+			'removes custom css for users without caps' => array(
+				'user_property' => 'user_id',
+				'expected'      => array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/separator' => array(
+								'color' => array(
+									'background' => 'blue',
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider data_process_blocks_custom_css
+	 *
+	 * @param array  $input    An array containing the selector and css to test.
+	 * @param string $expected Expected results.
+	 */
+	public function test_process_blocks_custom_css( $input, $expected ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(),
+			)
+		);
+		$reflection = new ReflectionMethod( $theme_json, 'process_blocks_custom_css' );
+		$reflection->setAccessible( true );
+
+		$this->assertEquals( $expected, $reflection->invoke( $theme_json, $input['css'], $input['selector'] ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_process_blocks_custom_css() {
+		return array(
+			// Simple CSS without any child selectors.
+			'no child selectors'                => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'color: red; margin: auto;',
+				),
+				'expected' => '.foo{color: red; margin: auto;}',
+			),
+			// CSS with child selectors.
+			'with children'                     => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'color: red; margin: auto; & .bar{color: blue;}',
+				),
+				'expected' => '.foo{color: red; margin: auto;}.foo .bar{color: blue;}',
+			),
+			// CSS with child selectors and pseudo elements.
+			'with children and pseudo elements' => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'color: red; margin: auto; & .bar{color: blue;} &::before{color: green;}',
+				),
+				'expected' => '.foo{color: red; margin: auto;}.foo .bar{color: blue;}.foo::before{color: green;}',
+			),
+		);
 	}
 }

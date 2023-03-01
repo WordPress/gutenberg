@@ -737,6 +737,7 @@ describe( 'createRegistry', () => {
 	describe( 'use', () => {
 		it( 'should pass through options object to plugin', () => {
 			const expectedOptions = {};
+			const anyObject = expect.any( Object );
 			let actualOptions;
 
 			function plugin( _registry, options ) {
@@ -748,7 +749,7 @@ describe( 'createRegistry', () => {
 					Object.fromEntries(
 						Object.entries( registry ).map( ( [ key ] ) => {
 							if ( key === 'stores' ) {
-								return [ key, expect.any( Object ) ];
+								return [ key, anyObject ];
 							}
 							// TODO: Remove this after namsespaces is removed.
 							if ( key === 'namespaces' ) {

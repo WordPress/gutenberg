@@ -13,7 +13,7 @@ const MyDropdown = () => (
 	<Dropdown
 		className="my-container-class-name"
 		contentClassName="my-popover-content-classname"
-		position="bottom right"
+		popoverProps={ { placement: 'bottom-start' } }
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<Button
 				variant="primary"
@@ -89,13 +89,6 @@ Properties of popoverProps object will be passed as props to the `Popover` compo
 Use this object to access properties/features of the `Popover` component that are not already exposed in the `Dropdown` component, e.g.: the ability to have the popover without an arrow.
 
 -   Required: No
-
-### `position`: `PopoverProps[ 'position' ]`
-
-The direction in which the popover should open relative to its parent node. Specify a y- and an x-axis as a space-separated string. Supports `"top"`, `"bottom"` y-axis, and `"left"`, `"center"`, `"right"` x-axis.
-
--   Required: No
--   Default: `"top center"`
 
 ### `renderContent`: `( props: CallbackProps ) => ReactNode`
 

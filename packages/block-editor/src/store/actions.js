@@ -25,6 +25,7 @@ import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
+import { __experimentalUpdateSettings } from './private-actions';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -231,17 +232,24 @@ export function selectBlock( clientId, initialPosition = 0 ) {
 
 /**
  * Yields action objects used in signalling that the block preceding the given
- * clientId should be selected.
+ * clientId (or optionally, its first parent from bottom to top)
+ * should be selected.
  *
- * @param {string} clientId Block client ID.
+ * @param {string}  clientId      Block client ID.
+ * @param {boolean} orFirstParent If true, select the first parent if there is no previous block.
  */
 export const selectPreviousBlock =
-	( clientId ) =>
+	( clientId, orFirstParent = false ) =>
 	( { select, dispatch } ) => {
 		const previousBlockClientId =
 			select.getPreviousBlockClientId( clientId );
 		if ( previousBlockClientId ) {
 			dispatch.selectBlock( previousBlockClientId, -1 );
+		} else if ( orFirstParent ) {
+			const firstParentClientId = select.getBlockRootClientId( clientId );
+			if ( firstParentClientId ) {
+				dispatch.selectBlock( firstParentClientId, -1 );
+			}
 		}
 	};
 
@@ -1196,7 +1204,8 @@ export const removeBlocks =
 		}
 
 		if ( selectPrevious ) {
-			dispatch.selectPreviousBlock( clientIds[ 0 ] );
+			const shouldSelectParent = true;
+			dispatch.selectPreviousBlock( clientIds[ 0 ], shouldSelectParent );
 		}
 
 		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
@@ -1260,28 +1269,6 @@ export function toggleBlockMode( clientId ) {
 	return {
 		type: 'TOGGLE_BLOCK_MODE',
 		clientId,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be hidden.
- *
- * @return {Object} Action object.
- */
-export function __experimentalHideBlockInterface() {
-	return {
-		type: 'HIDE_BLOCK_INTERFACE',
-	};
-}
-
-/**
- * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be shown.
- *
- * @return {Object} Action object.
- */
-export function __experimentalShowBlockInterface() {
-	return {
-		type: 'SHOW_BLOCK_INTERFACE',
 	};
 }
 
@@ -1442,10 +1429,7 @@ export function updateBlockListSettings( clientId, settings ) {
  * @return {Object} Action object
  */
 export function updateSettings( settings ) {
-	return {
-		type: 'UPDATE_SETTINGS',
-		settings,
-	};
+	return __experimentalUpdateSettings( settings, true );
 }
 
 /**

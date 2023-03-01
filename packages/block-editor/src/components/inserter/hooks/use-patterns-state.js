@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
@@ -41,7 +36,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
 		onInsert(
-			map( blocks, ( block ) => cloneBlock( block ) ),
+			( blocks ?? [] ).map( ( block ) => cloneBlock( block ) ),
 			pattern.name
 		);
 		createSuccessNotice(

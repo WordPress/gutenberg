@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and isActive functions 1`] = `
-Object {
+{
   "extraProp": "extraProp",
   "name": "core/navigation-link",
-  "variations": Array [
-    Object {
-      "attributes": Object {},
+  "variations": [
+    {
+      "attributes": {},
       "description": "A link to a custom URL.",
       "icon": <SVG
         viewBox="0 0 24 24"
@@ -20,8 +20,8 @@ Object {
       "name": "link",
       "title": "Custom Link",
     },
-    Object {
-      "attributes": Object {
+    {
+      "attributes": {
         "type": "post",
       },
       "description": "A link to a post.",
@@ -37,8 +37,8 @@ Object {
       "name": "post",
       "title": "Post Link",
     },
-    Object {
-      "attributes": Object {
+    {
+      "attributes": {
         "type": "page",
       },
       "description": "A link to a page.",
@@ -54,8 +54,8 @@ Object {
       "name": "page",
       "title": "Page Link",
     },
-    Object {
-      "attributes": Object {
+    {
+      "attributes": {
         "type": "category",
       },
       "description": "A link to a category.",
@@ -73,8 +73,8 @@ Object {
       "name": "category",
       "title": "Category Link",
     },
-    Object {
-      "attributes": Object {
+    {
+      "attributes": {
         "type": "tag",
       },
       "description": "A link to a tag.",

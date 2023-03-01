@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "11.1.0",
+	"version": "11.4.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -53,6 +53,8 @@
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/shortcode": "file:../shortcode",
 		"@wordpress/style-engine": "file:../style-engine",

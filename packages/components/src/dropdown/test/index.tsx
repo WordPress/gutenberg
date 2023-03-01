@@ -9,13 +9,9 @@ import userEvent from '@testing-library/user-event';
  */
 import Dropdown from '..';
 
-jest.useFakeTimers();
-
 describe( 'Dropdown', () => {
 	it( 'should toggle the dropdown properly', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const { unmount } = render(
 			<Dropdown
 				className="container"
@@ -49,9 +45,7 @@ describe( 'Dropdown', () => {
 	} );
 
 	it( 'should close the dropdown when calling onClose', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		render(
 			<Dropdown
 				className="container"

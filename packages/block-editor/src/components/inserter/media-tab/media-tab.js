@@ -15,7 +15,7 @@ import {
 	FlexBlock,
 	Button,
 } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { Icon, chevronRight } from '@wordpress/icons';
 
 /**
@@ -49,6 +49,14 @@ function MediaTab( {
 		},
 		[ onInsert ]
 	);
+	const mobileMediaCategories = useMemo(
+		() =>
+			mediaCategories.map( ( mediaCategory ) => ( {
+				...mediaCategory,
+				label: mediaCategory.labels.name,
+			} ) ),
+		[ mediaCategories ]
+	);
 	return (
 		<>
 			{ ! isMobile && (
@@ -70,7 +78,7 @@ function MediaTab( {
 												mediaCategory,
 										}
 									) }
-									aria-label={ mediaCategory.label }
+									aria-label={ mediaCategory.labels.name }
 									aria-current={
 										mediaCategory === selectedCategory
 											? 'true'
@@ -79,7 +87,7 @@ function MediaTab( {
 								>
 									<HStack>
 										<FlexBlock>
-											{ mediaCategory.label }
+											{ mediaCategory.labels.name }
 										</FlexBlock>
 										<Icon icon={ chevronRight } />
 									</HStack>
@@ -118,7 +126,7 @@ function MediaTab( {
 				</div>
 			) }
 			{ isMobile && (
-				<MobileTabNavigation categories={ mediaCategories }>
+				<MobileTabNavigation categories={ mobileMediaCategories }>
 					{ ( category ) => (
 						<MediaCategoryPanel
 							onInsert={ onInsert }

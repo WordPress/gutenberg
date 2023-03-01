@@ -11,6 +11,7 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 	__unstableUseNavigateRegions as useNavigateRegions,
+	ResizableBox,
 } from '@wordpress/components';
 import {
 	useReducedMotion,
@@ -18,7 +19,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
@@ -35,13 +36,32 @@ import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import SiteHub from '../site-hub';
+import ResizeHandle from '../block-editor/resize-handle';
+import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
+import { unlock } from '../../private-apis';
+import SavePanel from '../save-panel';
+import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
+import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 
 const ANIMATION_DURATION = 0.5;
+const emptyResizeHandleStyles = {
+	position: undefined,
+	userSelect: undefined,
+	cursor: undefined,
+	width: undefined,
+	height: undefined,
+	top: undefined,
+	right: undefined,
+	bottom: undefined,
+	left: undefined,
+};
 
-export default function Layout( { onError } ) {
+export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
+	useSyncCanvasModeWithURL();
 
+	const hubRef = useRef();
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
@@ -50,9 +70,9 @@ export default function Layout( { onError } ) {
 			const { getAllShortcutKeyCombinations } = select(
 				keyboardShortcutsStore
 			);
-			const { __unstableGetCanvasMode } = select( editSiteStore );
+			const { getCanvasMode } = unlock( select( editSiteStore ) );
 			return {
-				canvasMode: __unstableGetCanvasMode(),
+				canvasMode: getCanvasMode(),
 				previousShortcut: getAllShortcutKeyCombinations(
 					'core/edit-site/previous-region'
 				),
@@ -69,35 +89,42 @@ export default function Layout( { onError } ) {
 	} );
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const [ isMobileCanvasVisible, setIsMobileCanvasVisible ] =
-		useState( false );
 	const canvasPadding = isMobileViewport ? 0 : 24;
 	const showSidebar =
-		( isMobileViewport && ! isMobileCanvasVisible ) ||
+		( isMobileViewport && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
-		( isMobileViewport && isMobileCanvasVisible ) || ! isMobileViewport;
+		( isMobileViewport && isEditorPage && canvasMode === 'edit' ) ||
+		! isMobileViewport ||
+		! isEditorPage;
 	const showFrame =
-		! isEditorPage || ( canvasMode === 'view' && ! isMobileViewport );
-
+		( ! isEditorPage && ! isMobileViewport ) ||
+		( ! isMobileViewport && isEditorPage && canvasMode === 'view' );
 	const isFullCanvas =
-		( isEditorPage && canvasMode === 'edit' && ! isMobileViewport ) ||
-		isMobileCanvasVisible;
-	// Ideally this effect could be removed if we move the "isMobileCanvasVisible" into the store.
+		( isMobileViewport && isListPage ) ||
+		( isEditorPage && canvasMode === 'edit' );
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer, fullSize ] = useResizeObserver();
-	useEffect( () => {
-		if ( canvasMode === 'view' && isMobileViewport ) {
-			setIsMobileCanvasVisible( false );
-		}
+	const [ forcedWidth, setForcedWidth ] = useState( null );
+	const [ isResizing, setIsResizing ] = useState( false );
+	const isResizingEnabled = ! isMobileViewport && canvasMode === 'view';
+	const defaultSidebarWidth = isMobileViewport ? '100vw' : 360;
+	let canvasWidth = isResizing ? '100%' : fullSize.width;
+	if ( showFrame && ! isResizing ) {
+		canvasWidth = canvasSize.width - canvasPadding;
+	}
 
-		if ( canvasMode === 'edit' && isMobileViewport ) {
-			setIsMobileCanvasVisible( true );
-		}
-	}, [ canvasMode, isMobileViewport ] );
+	// Synchronizing the URL with the store value of canvasMode happens in an effect
+	// This condition ensures the component is only rendered after the synchronization happens
+	// which prevents any animations due to potential canvasMode value change.
+	if ( canvasMode === 'init' ) {
+		return null;
+	}
 
 	return (
 		<>
+			<KeyboardShortcutsRegister />
+			<KeyboardShortcutsGlobal />
 			{ fullResizer }
 			<div
 				{ ...navigateRegionsProps }
@@ -112,44 +139,48 @@ export default function Layout( { onError } ) {
 				) }
 			>
 				<SiteHub
+					ref={ hubRef }
 					className="edit-site-layout__hub"
-					isMobileCanvasVisible={ isMobileCanvasVisible }
-					setIsMobileCanvasVisible={ setIsMobileCanvasVisible }
+					style={ {
+						width:
+							isResizingEnabled && forcedWidth
+								? forcedWidth - 48
+								: undefined,
+					} }
 				/>
 
 				<AnimatePresence initial={ false }>
-					{ isEditorPage &&
-						( canvasMode === 'edit' || isMobileCanvasVisible ) && (
-							<NavigableRegion
-								className="edit-site-layout__header"
-								ariaLabel={ __( 'Editor top bar' ) }
-								as={ motion.div }
-								animate={ {
-									y: 0,
-								} }
-								initial={ {
-									y: '-100%',
-								} }
-								exit={ {
-									y: '-100%',
-								} }
-								transition={ {
-									type: 'tween',
-									duration: disableMotion
-										? 0
-										: ANIMATION_DURATION,
-									ease: 'easeOut',
-								} }
-							>
-								{ canvasMode === 'edit' && <Header /> }
-							</NavigableRegion>
-						) }
+					{ isEditorPage && canvasMode === 'edit' && (
+						<NavigableRegion
+							className="edit-site-layout__header"
+							ariaLabel={ __( 'Editor top bar' ) }
+							as={ motion.div }
+							animate={ {
+								y: 0,
+							} }
+							initial={ {
+								y: '-100%',
+							} }
+							exit={ {
+								y: '-100%',
+							} }
+							transition={ {
+								type: 'tween',
+								duration: disableMotion
+									? 0
+									: ANIMATION_DURATION,
+								ease: 'easeOut',
+							} }
+						>
+							{ canvasMode === 'edit' && <Header /> }
+						</NavigableRegion>
+					) }
 				</AnimatePresence>
 
 				<div className="edit-site-layout__content">
 					<AnimatePresence initial={ false }>
 						{ showSidebar && (
-							<NavigableRegion
+							<ResizableBox
 								as={ motion.div }
 								initial={ {
 									opacity: 0,
@@ -162,22 +193,82 @@ export default function Layout( { onError } ) {
 								} }
 								transition={ {
 									type: 'tween',
-									duration: disableMotion
-										? 0
-										: ANIMATION_DURATION,
+									duration:
+										disableMotion || isResizing
+											? 0
+											: ANIMATION_DURATION,
 									ease: 'easeOut',
 								} }
+								size={ {
+									height: '100%',
+									width:
+										isResizingEnabled && forcedWidth
+											? forcedWidth
+											: defaultSidebarWidth,
+								} }
 								className="edit-site-layout__sidebar"
-								ariaLabel={ __( 'Navigation sidebar' ) }
+								enable={ {
+									right: isResizingEnabled,
+								} }
+								onResizeStop={ ( event, direction, elt ) => {
+									setForcedWidth( elt.clientWidth );
+									setIsResizing( false );
+								} }
+								onResizeStart={ () => {
+									setIsResizing( true );
+								} }
+								onResize={ ( event, direction, elt ) => {
+									// This is a performance optimization
+									// We set the width imperatively to avoid re-rendering
+									// the whole component while resizing.
+									hubRef.current.style.width =
+										elt.clientWidth - 48 + 'px';
+								} }
+								handleComponent={ {
+									right: (
+										<ResizeHandle
+											direction="right"
+											variation="separator"
+											resizeWidthBy={ ( delta ) => {
+												setForcedWidth(
+													( forcedWidth ??
+														defaultSidebarWidth ) +
+														delta
+												);
+											} }
+										/>
+									),
+								} }
+								handleClasses={ undefined }
+								handleStyles={ {
+									right: emptyResizeHandleStyles,
+								} }
+								minWidth={ isResizingEnabled ? 320 : undefined }
+								maxWidth={
+									isResizingEnabled && fullSize
+										? fullSize.width - 360
+										: undefined
+								}
 							>
-								<Sidebar />
-							</NavigableRegion>
+								<NavigableRegion
+									ariaLabel={ __( 'Navigation sidebar' ) }
+								>
+									<Sidebar />
+								</NavigableRegion>
+							</ResizableBox>
 						) }
 					</AnimatePresence>
 
+					<SavePanel />
+
 					{ showCanvas && (
 						<div
-							className="edit-site-layout__canvas-container"
+							className={ classnames(
+								'edit-site-layout__canvas-container',
+								{
+									'is-resizing': isResizing,
+								}
+							) }
 							style={ {
 								paddingTop: showFrame ? canvasPadding : 0,
 								paddingBottom: showFrame ? canvasPadding : 0,
@@ -191,9 +282,10 @@ export default function Layout( { onError } ) {
 									className="edit-site-layout__canvas"
 									transition={ {
 										type: 'tween',
-										duration: disableMotion
-											? 0
-											: ANIMATION_DURATION,
+										duration:
+											disableMotion || isResizing
+												? 0
+												: ANIMATION_DURATION,
 										ease: 'easeOut',
 									} }
 								>
@@ -206,20 +298,18 @@ export default function Layout( { onError } ) {
 										} }
 										initial={ false }
 										animate={ {
-											width: showFrame
-												? canvasSize.width -
-												  canvasPadding
-												: fullSize.width,
+											width: canvasWidth,
 										} }
 										transition={ {
 											type: 'tween',
-											duration: disableMotion
-												? 0
-												: ANIMATION_DURATION,
+											duration:
+												disableMotion || isResizing
+													? 0
+													: ANIMATION_DURATION,
 											ease: 'easeOut',
 										} }
 									>
-										<ErrorBoundary onError={ onError }>
+										<ErrorBoundary>
 											{ isEditorPage && <Editor /> }
 											{ isListPage && <ListPage /> }
 										</ErrorBoundary>

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, pickBy } from 'lodash';
+import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -104,16 +104,15 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				categories && categories.length > 0
 					? categories.map( ( cat ) => cat.id )
 					: [];
-			const latestPostsQuery = pickBy(
-				{
+			const latestPostsQuery = Object.fromEntries(
+				Object.entries( {
 					categories: catIds,
 					author: selectedAuthor,
 					order,
 					orderby: orderBy,
 					per_page: postsToShow,
 					_embed: 'wp:featuredmedia',
-				},
-				( value ) => typeof value !== 'undefined'
+				} ).filter( ( [ , value ] ) => typeof value !== 'undefined' )
 			);
 
 			return {
@@ -248,6 +247,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 			<PanelBody title={ __( 'Post meta settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Display author name' ) }
 					checked={ displayAuthor }
 					onChange={ ( value ) =>
@@ -255,6 +255,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					}
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Display post date' ) }
 					checked={ displayPostDate }
 					onChange={ ( value ) =>
@@ -265,6 +266,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 			<PanelBody title={ __( 'Featured image settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Display featured image' ) }
 					checked={ displayFeaturedImage }
 					onChange={ ( value ) =>
@@ -316,6 +318,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							/>
 						</BaseControl>
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Add link to featured image' ) }
 							checked={ addLinkToFeaturedImage }
 							onChange={ ( value ) =>

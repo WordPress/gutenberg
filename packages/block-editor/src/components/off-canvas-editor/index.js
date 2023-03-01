@@ -32,7 +32,6 @@ import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
-import { Appender } from './appender';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -55,32 +54,36 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
 /**
  * Show a hierarchical list of blocks.
  *
- * @param {Object}  props                     Components props.
- * @param {string}  props.id                  An HTML element id for the root element of ListView.
- * @param {Array}   props.blocks              Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {boolean} props.showBlockMovers     Flag to enable block movers
- * @param {boolean} props.isExpanded          Flag to determine whether nested levels are expanded by default.
- * @param {boolean} props.selectBlockInCanvas Flag to determine whether the list view should be a block selection mechanism.
- * @param {Object}  props.LeafMoreMenu        Optional more menu substitution.
- * @param {Object}  ref                       Forwarded ref
+ * @param {Object}  props                 Components props.
+ * @param {string}  props.id              An HTML element id for the root element of ListView.
+ * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean} props.showBlockMovers Flag to enable block movers
+ * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
+ * @param {Object}  props.LeafMoreMenu    Optional more menu substitution.
+ * @param {string}  props.description     Optional accessible description for the tree grid component.
+ * @param {string}  props.onSelect        Optional callback to be invoked when a block is selected.
+ * @param {Object}  ref                   Forwarded ref
  */
-function __ExperimentalOffCanvasEditor(
+function OffCanvasEditor(
 	{
 		id,
 		blocks,
 		showBlockMovers = false,
 		isExpanded = false,
-		selectBlockInCanvas = true,
 		LeafMoreMenu,
+		description = __( 'Block navigation structure' ),
+		onSelect,
 	},
 	ref
 ) {
+	const { getBlock } = useSelect( blockEditorStore );
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
 		useListViewClientIds( blocks );
 
-	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
+	const { visibleBlockCount, shouldShowInnerBlocks, parentId } = useSelect(
 		( select ) => {
 			const {
+				getBlockRootClientId,
 				getGlobalBlockCount,
 				getClientIdsOfDescendants,
 				__unstableGetEditorMode,
@@ -92,9 +95,13 @@ function __ExperimentalOffCanvasEditor(
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
 				shouldShowInnerBlocks: __unstableGetEditorMode() !== 'zoom-out',
+				parentId:
+					blocks.length > 0
+						? getBlockRootClientId( blocks[ 0 ].clientId )
+						: undefined,
 			};
 		},
-		[ draggedClientIds ]
+		[ draggedClientIds, blocks ]
 	);
 
 	const { updateBlockSelection } = useBlockSelection();
@@ -114,8 +121,11 @@ function __ExperimentalOffCanvasEditor(
 		( event, blockClientId ) => {
 			updateBlockSelection( event, blockClientId );
 			setSelectedTreeId( blockClientId );
+			if ( onSelect ) {
+				onSelect( getBlock( blockClientId ) );
+			}
 		},
-		[ setSelectedTreeId, updateBlockSelection ]
+		[ setSelectedTreeId, updateBlockSelection, onSelect, getBlock ]
 	);
 	useEffect( () => {
 		isMounted.current = true;
@@ -217,10 +227,12 @@ function __ExperimentalOffCanvasEditor(
 					onCollapseRow={ collapseRow }
 					onExpandRow={ expandRow }
 					onFocusRow={ focusRow }
-					applicationAriaLabel={ __( 'Block navigation structure' ) }
+					// eslint-disable-next-line jsx-a11y/aria-props
+					aria-description={ description }
 				>
 					<ListViewContext.Provider value={ contextValue }>
 						<ListViewBranch
+							parentId={ parentId }
 							blocks={ clientIdsTree }
 							selectBlock={ selectEditorBlock }
 							showBlockMovers={ showBlockMovers }
@@ -228,7 +240,6 @@ function __ExperimentalOffCanvasEditor(
 							selectedClientIds={ selectedClientIds }
 							isExpanded={ isExpanded }
 							shouldShowInnerBlocks={ shouldShowInnerBlocks }
-							selectBlockInCanvas={ selectBlockInCanvas }
 						/>
 						<TreeGridRow
 							level={ 1 }
@@ -236,11 +247,6 @@ function __ExperimentalOffCanvasEditor(
 							positionInSet={ 1 }
 							isExpanded={ true }
 						>
-							<TreeGridCell>
-								{ ( treeGridCellProps ) => (
-									<Appender { ...treeGridCellProps } />
-								) }
-							</TreeGridCell>
 							{ ! clientIdsTree.length && (
 								<TreeGridCell withoutGridItem>
 									<div className="offcanvas-editor-list-view-is-empty">
@@ -258,4 +264,4 @@ function __ExperimentalOffCanvasEditor(
 	);
 }
 
-export default forwardRef( __ExperimentalOffCanvasEditor );
+export default forwardRef( OffCanvasEditor );

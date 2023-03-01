@@ -77,9 +77,17 @@ export function useBeforeInputRules( props ) {
 			const { defaultView } = ownerDocument;
 			const newEvent = new defaultView.InputEvent( 'input', init );
 
-			// Dispatch an input event with the new data. This will trigger the
+			// Dispatch an `input` event with the new data. This will trigger the
 			// input rules.
-			event.target.dispatchEvent( newEvent );
+			// Postpone the `input` to the next event loop tick so that the dispatch
+			// doesn't happen synchronously in the middle of `beforeinput` dispatch.
+			// This is closer to how native `input` event would be timed, and also
+			// makes sure that the `input` event is dispatched only after the `onChange`
+			// call few lines above has fully updated the data store state and rerendered
+			// all affected components.
+			window.queueMicrotask( () => {
+				event.target.dispatchEvent( newEvent );
+			} );
 			event.preventDefault();
 		}
 
