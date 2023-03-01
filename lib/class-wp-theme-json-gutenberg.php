@@ -2358,6 +2358,7 @@ class WP_Theme_JSON_Gutenberg {
 						} else {
 							$style_variation_declarations[ $combined_feature_selectors ] = $new_feature_declarations;
 						}
+
 						/*
 						 * Remove the feature from the variation's node now the
 						 * styles will be included under the feature level selector.
@@ -2369,6 +2370,7 @@ class WP_Theme_JSON_Gutenberg {
 				$style_variation_declarations[ $style_variation_selector ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
 			}
 		}
+
 		/*
 		 * Get a reference to element name from path.
 		 * $block_metadata['path'] = array( 'styles','elements','link' );
