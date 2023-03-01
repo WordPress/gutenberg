@@ -25,7 +25,7 @@ class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
 	}
 
 	public function test_gutenberg_render_duotone_support_css() {
-		$block = array(
+		$block         = array(
 			'blockName' => 'core/image',
 			'attrs'     => array( 'style' => array( 'color' => array( 'duotone' => 'unset' ) ) ),
 		);
@@ -35,7 +35,7 @@ class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
 	}
 
 	public function test_gutenberg_render_duotone_support_custom() {
-		$block = array(
+		$block         = array(
 			'blockName' => 'core/image',
 			'attrs'     => array( 'style' => array( 'color' => array( 'duotone' => array( '#FFFFFF', '#000000' ) ) ) ),
 		);
