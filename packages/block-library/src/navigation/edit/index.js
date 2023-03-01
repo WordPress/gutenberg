@@ -41,7 +41,6 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { createBlock, getBlockType } from '@wordpress/blocks';
 import { close, Icon } from '@wordpress/icons';
 
 /**
@@ -307,71 +306,6 @@ function Navigation( {
 	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
-
-	useEffect( () => {
-		if (
-			ref ||
-			! hasResolvedNavigationMenus ||
-			isConvertingClassicMenu ||
-			fallbackNavigationMenus?.length > 0 ||
-			hasUnsavedBlocks
-		) {
-			return;
-		}
-
-		// If there's non fallback navigation menus and
-		// a classic menu with a `primary` location or slug,
-		// then create a new navigation menu based on it.
-		// Otherwise, use the most recently created classic menu.
-		if ( classicMenus?.length ) {
-			const primaryMenus = classicMenus.filter(
-				( classicMenu ) =>
-					classicMenu.locations.includes( 'primary' ) ||
-					classicMenu.slug === 'primary'
-			);
-
-			if ( primaryMenus.length ) {
-				convertClassicMenu(
-					primaryMenus[ 0 ].id,
-					primaryMenus[ 0 ].name,
-					'publish'
-				);
-			} else {
-				classicMenus.sort( ( a, b ) => {
-					return b.id - a.id;
-				} );
-				convertClassicMenu(
-					classicMenus[ 0 ].id,
-					classicMenus[ 0 ].name,
-					'publish'
-				);
-			}
-		} else {
-			// If there are no fallback navigation menus and no classic menus,
-			// then create a new navigation menu.
-
-			// Check that we have a page-list block type.
-			let defaultBlocks = [];
-			if ( getBlockType( 'core/page-list' ) ) {
-				defaultBlocks = [ createBlock( 'core/page-list' ) ];
-			}
-
-			createNavigationMenu(
-				'Navigation', // TODO - use the template slug in future
-				defaultBlocks,
-				'publish'
-			);
-		}
-	}, [
-		hasResolvedNavigationMenus,
-		hasUnsavedBlocks,
-		classicMenus,
-		convertClassicMenu,
-		createNavigationMenu,
-		fallbackNavigationMenus?.length,
-		isConvertingClassicMenu,
-		ref,
-	] );
 
 	const navRef = useRef();
 

@@ -463,15 +463,14 @@ function block_core_navigation_get_default_pages_fallback() {
 }
 
 /**
- * Retrieves the appropriate fallback to be used on the front of the
- * site when there is no menu assigned to the Nav block.
- *
- * This aims to mirror how the fallback mechanic for wp_nav_menu works.
- * See https://developer.wordpress.org/reference/functions/wp_nav_menu/#more-information.
- *
- * @return array the array of blocks to be used as a fallback.
+ * Creates the appropriate fallback to be used on the front of the site.
  */
-function block_core_navigation_get_fallback_blocks() {
+function block_core_navigation_create_fallback() {
+	$should_skip = apply_filters( 'block_core_navigation_skip_fallback', false );
+	if ( $should_skip ) {
+		return;
+	}
+
 	// Get the most recently published Navigation post.
 	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
@@ -485,6 +484,21 @@ function block_core_navigation_get_fallback_blocks() {
 	if ( ! $navigation_post ) {
 		$navigation_post = block_core_navigation_get_default_pages_fallback();
 	}
+}
+
+
+/**
+ * Retrieves the appropriate fallback to be used on the front of the
+ * site when there is no menu assigned to the Nav block.
+ *
+ * This aims to mirror how the fallback mechanic for wp_nav_menu works.
+ * See https://developer.wordpress.org/reference/functions/wp_nav_menu/#more-information.
+ *
+ * @return array the array of blocks to be used as a fallback.
+ */
+function block_core_navigation_get_fallback_blocks() {
+	// Get the most recently published Navigation post.
+	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
 	// Use the first non-empty Navigation as fallback, there should always be one.
 	if ( $navigation_post ) {
@@ -899,3 +913,7 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 }
 
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
+
+// We have to aply this action on both init and admin init, as the code loads after init when in wp-admin.
+add_action( 'init', 'block_core_navigation_create_fallback' );
+add_action( 'admin_init', 'block_core_navigation_create_fallback' );
