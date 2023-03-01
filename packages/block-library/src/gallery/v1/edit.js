@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -105,17 +105,10 @@ function GalleryEdit( props ) {
 					}
 					const image = getMedia( id );
 					const sizes = imageSizes.reduce( ( currentSizes, size ) => {
-						const defaultUrl = get( image, [
-							'sizes',
-							size.slug,
-							'url',
-						] );
-						const mediaDetailsUrl = get( image, [
-							'media_details',
-							'sizes',
-							size.slug,
-							'source_url',
-						] );
+						const defaultUrl = image?.sizes?.[ size.slug ]?.url;
+						const mediaDetailsUrl =
+							image?.media_details?.sizes?.[ size.slug ]
+								?.source_url;
 						return {
 							...currentSizes,
 							[ size.slug ]: defaultUrl || mediaDetailsUrl,
@@ -310,10 +303,8 @@ function GalleryEdit( props ) {
 			if ( ! image.id ) {
 				return image;
 			}
-			const url = get( resizedImages, [
-				parseInt( image.id, 10 ),
-				newSizeSlug,
-			] );
+			const url =
+				resizedImages[ parseInt( image.id, 10 ) ]?.[ newSizeSlug ];
 			return {
 				...image,
 				...( url && { url } ),

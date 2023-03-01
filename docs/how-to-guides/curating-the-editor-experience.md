@@ -130,31 +130,31 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
-	      "color": {
-              	"custom": true,
-              	"customDuotone": true
-        	},
+		"color": {
+			"custom": true,
+			"customDuotone": true
+		},
 		"blocks": {
-              	"core/post-featured-image": {
-                   		"color": {
-                          		"duotone": [
+			"core/post-featured-image": {
+				"color": {
+					"duotone": [
 						{
-                   		 			"colors": [ "#282828", "#ff5837" ],
-                   		 			"slug": "black-and-orange",
-                   		 			"name": "Black and Orange"
-               				},
+							"colors": [ "#282828", "#ff5837" ],
+							"slug": "black-and-orange",
+							"name": "Black and Orange"
+						},
 						{
-                   		 			"colors": [ "#282828", "#0288d1" ],
-                   		 			"slug": "black-and-blue", 
-                   		 			"name": "Black and Blue"
-               				}
+							"colors": [ "#282828", "#0288d1" ],
+							"slug": "black-and-blue", 
+							"name": "Black and Blue"
+						}
 					],
-                          		"customDuotone": true,
-                          		"custom": true
+					"customDuotone": true,
+					"custom": true
 				}
 			}
-} 
-}
+		}
+	}
 }
 ```
 
@@ -165,31 +165,31 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
-	      "color": {
-              	"custom": true,
-              	"customDuotone": true
-},	
+		"color": {
+			"custom": true,
+			"customDuotone": true
+		},	
 		"blocks": {
-              	"core/post-featured-image": {
-                   		"color": {
-                          		"duotone": [
+			"core/post-featured-image": {
+				"color": {
+					"duotone": [
 						{
-                   		 			"colors": [ "#282828", "#ff5837" ],
-                   		 			"slug": "black-and-orange",
-                   		 			"name": "Black and Orange"
-               				},
+							"colors": [ "#282828", "#ff5837" ],
+							"slug": "black-and-orange",
+							"name": "Black and Orange"
+						},
 						{
-                   		 			"colors": [ "#282828", "#0288d1" ],
-                   		 			"slug": "black-and-blue",
-                   		 			"name": "Black and Blue"
-               				}
+							"colors": [ "#282828", "#0288d1" ],
+							"slug": "black-and-blue",
+							"name": "Black and Blue"
+						}
 					],
-                          		"customDuotone": false,
-                          		"custom": false
+					"customDuotone": false,
+					"custom": false
 				}
 			}
-} 
-}
+		} 
+	}
 }
 ```
 
@@ -208,27 +208,27 @@ Continuing the examples with duotone, this means you could allow full access to 
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
-	      "color": {
-            		"custom": true,
-      			"customDuotone": true
-        	},
+		"color": {
+			"custom": true,
+			"customDuotone": true
+		},
 		"blocks": {
-           	"core/image": {
-           		"color": {
-                      	"duotone": [],
-                      	"customDuotone": true,
-                 		"custom": true
+			"core/image": {
+				"color": {
+					"duotone": [],
+					"customDuotone": true,
+					"custom": true
 				}
 			},
 			"core/post-featured-image": {
-                 	"color": {
-                      	"duotone": [],
-                      	"customDuotone": false,
-                      	"custom": false
+				"color": {
+					"duotone": [],
+					"customDuotone": false,
+					"custom": false
 				}
 			}
-} 
-}
+		}
+	}
 }
 ```
 
@@ -281,6 +281,52 @@ When using theme.json in a block or classic theme, these settings will stop the 
 ```
 
 To enable something from the above, just set whatever value you want to change to `true` for more granularity.
+
+## Limiting interface options with theme.json filters
+
+The theme.json file is a great way to control interface options, but it only allows for global or block-level modifications, which can be limiting in some scenarios.
+
+For instance, in the previous section, color and typography controls were disabled globally using theme.json. But let's say you want to enable color settings for users who are Administrators. 
+
+To provide more flexibility, WordPress 6.1 introduced server-side filters allowing you to customize theme.json data at four different data layers.
+
+- `wp_theme_json_data_default` - Hooks into the default data provided by WordPress
+- `wp_theme_json_data_blocks` - Hooks into the data provided by blocks.
+- `wp_theme_json_data_theme` - Hooks into the data provided by the current theme.
+- `wp_theme_json_data_user` - Hooks into the data provided by the user.
+
+In the following example, the data from the current theme's theme.json file is updated using the `wp_theme_json_data_theme` filter. Color controls are restored if the current user is an Administrator.
+
+```
+// Disable color controls for all users except Administrators.
+function example_filter_theme_json_data_theme( $theme_json ){
+    $is_administrator = current_user_can( 'edit_theme_options' );
+
+    if ( $is_administrator ) {
+        $new_data = array(
+            'version'  => 2,
+            'settings' => array(
+                'color' => array(
+                    'background'       => true,
+                    'custom'           => true,
+                    'customDuotone'    => true,
+                    'customGradient'   => true,
+                    'defaultGradients' => true,
+                    'defaultPalette'   => true,
+                    'text'             => true,
+                ),
+            ),
+        );
+    }
+
+	return $theme_json->update_with( $new_data );
+}
+add_filter( 'wp_theme_json_data_theme', 'example_filter_theme_json_data_theme' );
+```
+
+The filter receives an instance of the `WP_Theme_JSON_Data class` with the data for the respective layer. Then, you pass new data in a valid theme.json-like structure to the `update_with( $new_data )` method. A theme.json version number is required in `$new_data`. 
+
+Read more about this functionality in the [Filters for theme.json data dev note](https://make.wordpress.org/core/2022/10/10/filters-for-theme-json-data/).
 
 ## Remove access to functionality
 
