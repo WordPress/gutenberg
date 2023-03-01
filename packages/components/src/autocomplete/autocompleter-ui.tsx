@@ -84,7 +84,11 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 			return null;
 		}
 
-		const ListBox = ( { Component = 'div' } ) => (
+		const ListBox = ( {
+			Component = 'div',
+		}: {
+			Component?: React.ElementType;
+		} ) => (
 			<Component
 				id={ listBoxId }
 				role="listbox"
