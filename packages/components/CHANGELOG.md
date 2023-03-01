@@ -70,6 +70,8 @@
 -   `Higher Order` -- `with-constrained-tabbing`: Convert to TypeScript ([#48162](https://github.com/WordPress/gutenberg/pull/48162)).
 -   `Autocomplete`: Convert to TypeScript ([#47751](https://github.com/WordPress/gutenberg/pull/47751)).
 -   `Autocomplete`: avoid calling setState on input ([#48565](https://github.com/WordPress/gutenberg/pull/48565)).
+-   `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom`([47515](https://github.com/WordPress/gutenberg/pull/47515)).
+-   `FormTokenField`: Remove margin bottom from help text with `__nextHasNoMarginBottom`([48609](https://github.com/WordPress/gutenberg/pull/48609)).
 
 ## 23.4.0 (2023-02-15)
 
