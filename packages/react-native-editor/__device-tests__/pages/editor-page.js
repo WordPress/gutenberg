@@ -575,6 +575,28 @@ class EditorPage {
 	}
 
 	// =========================
+	// Formatting toolbar functions
+	// =========================
+
+	async toggleFormatting( formatting ) {
+		const identifier = isAndroid()
+			? `//android.widget.Button[@content-desc="${ formatting }"]/android.view.ViewGroup`
+			: `//XCUIElementTypeButton[@name="${ formatting }"]`;
+		const toggleElement = await this.waitForElementToBeDisplayedByXPath(
+			identifier
+		);
+		return await toggleElement.click();
+	}
+
+	async openLinkToSettings() {
+		const element = await this.waitForElementToBeDisplayedById(
+			'Link to, Search or type URL'
+		);
+
+		await element.click();
+	}
+
+	// =========================
 	// Paragraph Block functions
 	// =========================
 
@@ -886,23 +908,21 @@ class EditorPage {
 	// Button Block functions
 	// =========================
 
-	async getButtonBlockTextInputAtPosition( blockName, position = 1 ) {
-		// iOS needs a click to get the text element
-		if ( ! isAndroid() ) {
-			const textBlockLocator = `(//XCUIElementTypeButton[contains(@name, "Button Block. Row ${ position }")])`;
-
-			const textBlock = await waitForVisible(
-				this.driver,
-				textBlockLocator
-			);
-			await textBlock.click();
-		}
-
+	async getButtonBlockTextInputAtPosition( position = 1 ) {
 		const blockLocator = isAndroid()
 			? `//android.view.ViewGroup[@content-desc="Button Block. Row ${ position }"]/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText`
 			: `//XCUIElementTypeButton[contains(@name, "Button Block. Row ${ position }")]//XCUIElementTypeTextView`;
 
-		return await waitForVisible( this.driver, blockLocator );
+		return await this.waitForElementToBeDisplayedByXPath( blockLocator );
+	}
+
+	async addButtonWithInlineAppender( position = 1 ) {
+		const appenderButton = isAndroid()
+			? await this.waitForElementToBeDisplayedByXPath(
+					`//android.view.ViewGroup[@content-desc="block-list"]/android.view.ViewGroup[${ position }]/android.widget.Button`
+			  )
+			: await this.waitForElementToBeDisplayedById( 'appender-button' );
+		await appenderButton.click();
 	}
 
 	async waitForElementToBeDisplayedById( id, timeout = 2000 ) {
