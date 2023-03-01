@@ -30,14 +30,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		}
 	}
 
-	public function test_creates_fallback_navigation_with_page_list_by_default() {
-		$fallback = gutenberg_block_core_navigation_create_fallback();
 
-		$this->assertEquals( $fallback->post_type, 'wp_navigation' );
-		$this->assertEquals( $fallback->post_title, 'Navigation' );
-		$this->assertEquals( $fallback->post_content, '<!-- wp:page-list /-->' );
-		$this->assertEquals( $fallback->post_status, 'publish' );
-	}
 
 	public function test_gets_fallback_navigation_with_existing_navigation_menu_if_found() {
 
@@ -88,6 +81,15 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		// Cleanup.
 		wp_delete_nav_menu( $menu_id );
+	}
+
+	public function test_creates_fallback_navigation_with_page_list_by_default() {
+		$fallback = gutenberg_block_core_navigation_create_fallback();
+
+		$this->assertEquals( 'wp_navigation', $fallback->post_type );
+		$this->assertEquals( 'Navigation', $fallback->post_title, );
+		$this->assertEquals( '<!-- wp:page-list /-->', $fallback->post_content );
+		$this->assertEquals( 'publish', $fallback->post_status );
 	}
 
 	public function test_should_skip_if_filter_returns_truthy() {
