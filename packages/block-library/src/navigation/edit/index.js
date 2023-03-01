@@ -642,6 +642,7 @@ function Navigation( {
 							<>
 								<h3>{ __( 'Submenus' ) }</h3>
 								<ToggleControl
+									__nextHasNoMarginBottom
 									checked={ openSubmenusOnClick }
 									onChange={ ( value ) => {
 										setAttributes( {
@@ -655,6 +656,7 @@ function Navigation( {
 								/>
 
 								<ToggleControl
+									__nextHasNoMarginBottom
 									checked={ showSubmenuIcon }
 									onChange={ ( value ) => {
 										setAttributes( {
