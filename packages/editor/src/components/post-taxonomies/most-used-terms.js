@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { BaseControl, Button } from '@wordpress/components';
@@ -46,7 +41,6 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
 	}
 
 	const terms = unescapeTerms( _terms );
-	const label = get( taxonomy, [ 'labels', 'most_used' ] );
 
 	return (
 		<div className="editor-post-taxonomies__flat-term-most-used">
@@ -54,7 +48,7 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
 				as="h3"
 				className="editor-post-taxonomies__flat-term-most-used-label"
 			>
-				{ label }
+				{ taxonomy.labels.most_used }
 			</BaseControl.VisualLabel>
 			{ /*
 			 * Disable reason: The `list` ARIA role is redundant but

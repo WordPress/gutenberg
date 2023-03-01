@@ -128,13 +128,6 @@ function Layout( { styles } ) {
 
 	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
 
-	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
-		'is-sidebar-opened': sidebarIsOpened,
-		'has-fixed-toolbar': hasFixedToolbar,
-		'has-metaboxes': hasActiveMetaboxes,
-		'show-icon-labels': showIconLabels,
-		'is-distraction-free': isDistractionFree,
-	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
@@ -165,6 +158,15 @@ function Layout( { styles } ) {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
+
+	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
+		'is-sidebar-opened': sidebarIsOpened,
+		'has-fixed-toolbar': hasFixedToolbar,
+		'has-metaboxes': hasActiveMetaboxes,
+		'show-icon-labels': showIconLabels,
+		'is-distraction-free': isDistractionFree,
+		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
+	} );
 
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )

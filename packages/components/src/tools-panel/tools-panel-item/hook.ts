@@ -33,6 +33,8 @@ export function useToolsPanelItem(
 	const {
 		panelId: currentPanelId,
 		menuItems,
+		registerResetAllFilter,
+		deregisterResetAllFilter,
 		registerPanelItem,
 		deregisterPanelItem,
 		flagItemCustomization,
@@ -62,7 +64,6 @@ export function useToolsPanelItem(
 				hasValue: hasValueCallback,
 				isShownByDefault,
 				label,
-				resetAllFilter: resetAllFilterCallback,
 				panelId,
 			} );
 		}
@@ -83,9 +84,24 @@ export function useToolsPanelItem(
 		hasValueCallback,
 		panelId,
 		previousPanelId,
-		resetAllFilterCallback,
 		registerPanelItem,
 		deregisterPanelItem,
+	] );
+
+	useEffect( () => {
+		if ( hasMatchingPanel ) {
+			registerResetAllFilter( resetAllFilterCallback );
+		}
+		return () => {
+			if ( hasMatchingPanel ) {
+				deregisterResetAllFilter( resetAllFilterCallback );
+			}
+		};
+	}, [
+		registerResetAllFilter,
+		deregisterResetAllFilter,
+		resetAllFilterCallback,
+		hasMatchingPanel,
 	] );
 
 	// Note: `label` is used as a key when building menu item state in

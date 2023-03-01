@@ -12,8 +12,8 @@ import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
 
 export default function useInitEditedEntityFromURL() {
-	const { params: { postId, postType, path = '/' } = {} } = useLocation();
-	const { isRequestingSite, homepageId } = useSelect( ( select ) => {
+	const { params: { postId, postType } = {} } = useLocation();
+	const { isRequestingSite, homepageId, url } = useSelect( ( select ) => {
 		const { getSite } = select( coreDataStore );
 		const siteData = getSite();
 
@@ -23,6 +23,7 @@ export default function useInitEditedEntityFromURL() {
 				siteData?.show_on_front === 'page'
 					? siteData.page_on_front
 					: null,
+			url: siteData?.url,
 		};
 	}, [] );
 
@@ -30,33 +31,37 @@ export default function useInitEditedEntityFromURL() {
 		useDispatch( editSiteStore );
 
 	useEffect( () => {
-		switch ( path ) {
-			case '/templates/single':
-				setTemplate( postId );
-				break;
-			case '/template-parts/single':
-				setTemplatePart( postId );
-				break;
-			case '/navigation/single':
-				setPage( {
-					context: { postType, postId },
-				} );
-				break;
-			default: {
-				if ( homepageId ) {
+		if ( postType && postId ) {
+			switch ( postType ) {
+				case 'wp_template':
+					setTemplate( postId );
+					break;
+				case 'wp_template_part':
+					setTemplatePart( postId );
+					break;
+				default:
 					setPage( {
-						context: { postType: 'page', postId: homepageId },
+						context: { postType, postId },
 					} );
-				} else if ( ! isRequestingSite ) {
-					setPage( {
-						path: '/',
-					} );
-				}
 			}
+
+			return;
+		}
+
+		// In all other cases, we need to set the home page in the site editor view.
+		if ( homepageId ) {
+			setPage( {
+				context: { postType: 'page', postId: homepageId },
+			} );
+		} else if ( ! isRequestingSite ) {
+			setPage( {
+				path: url,
+			} );
 		}
 	}, [
-		path,
+		url,
 		postId,
+		postType,
 		homepageId,
 		isRequestingSite,
 		setPage,

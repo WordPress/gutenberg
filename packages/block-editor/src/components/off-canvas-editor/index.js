@@ -80,9 +80,10 @@ function OffCanvasEditor(
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
 		useListViewClientIds( blocks );
 
-	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
+	const { visibleBlockCount, shouldShowInnerBlocks, parentId } = useSelect(
 		( select ) => {
 			const {
+				getBlockRootClientId,
 				getGlobalBlockCount,
 				getClientIdsOfDescendants,
 				__unstableGetEditorMode,
@@ -94,9 +95,13 @@ function OffCanvasEditor(
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
 				shouldShowInnerBlocks: __unstableGetEditorMode() !== 'zoom-out',
+				parentId:
+					blocks.length > 0
+						? getBlockRootClientId( blocks[ 0 ].clientId )
+						: undefined,
 			};
 		},
-		[ draggedClientIds ]
+		[ draggedClientIds, blocks ]
 	);
 
 	const { updateBlockSelection } = useBlockSelection();
@@ -227,6 +232,7 @@ function OffCanvasEditor(
 				>
 					<ListViewContext.Provider value={ contextValue }>
 						<ListViewBranch
+							parentId={ parentId }
 							blocks={ clientIdsTree }
 							selectBlock={ selectEditorBlock }
 							showBlockMovers={ showBlockMovers }

@@ -15,7 +15,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	const history = useHistory();
 	const onSelect = useCallback(
 		( selectedBlock ) => {
-			const { attributes } = selectedBlock;
+			const { attributes, name } = selectedBlock;
 			if (
 				attributes.kind === 'post-type' &&
 				attributes.id &&
@@ -25,7 +25,12 @@ export default function SidebarNavigationScreenNavigationMenus() {
 				history.push( {
 					postType: attributes.type,
 					postId: attributes.id,
-					path: '/navigation/single',
+				} );
+			}
+			if ( name === 'core/page-list-item' && attributes.id && history ) {
+				history.push( {
+					postType: 'page',
+					postId: attributes.id,
 				} );
 			}
 		},
@@ -33,7 +38,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	);
 	return (
 		<SidebarNavigationScreen
-			path="/navigation"
 			title={ __( 'Navigation' ) }
 			content={
 				<div className="edit-site-sidebar-navigation-screen-navigation-menus">

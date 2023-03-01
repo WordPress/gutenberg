@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "15.2.0-rc.1",
+	"version": "15.3.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -19,8 +19,7 @@
 		"npm": ">=6.9.0 <7"
 	},
 	"config": {
-		"IS_GUTENBERG_PLUGIN": true,
-		"ALLOW_EXPERIMENT_REREGISTRATION": true
+		"IS_GUTENBERG_PLUGIN": true
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
@@ -300,11 +299,12 @@
 		"test": "npm-run-all lint test:unit",
 		"test:create-block": "bash ./bin/test-create-block.sh",
 		"test:e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
-		"test:e2e:debug": "wp-scripts --inspect-brk test-e2e --config packages/e2e-tests/jest.config.js --puppeteer-devtools",
+		"test:e2e:debug": "wp-scripts --inspect-brk test-e2e  --runInBand --no-cache --verbose --config packages/e2e-tests/jest.config.js --puppeteer-devtools",
 		"test:e2e:playwright": "playwright test --config test/e2e/playwright.config.ts",
 		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
+		"test:performance:debug": "wp-scripts --inspect-brk test-e2e --runInBand --no-cache --verbose --config packages/e2e-tests/jest.performance.config.js --puppeteer-devtools",
 		"test:php": "npm-run-all lint:php test:unit:php",
 		"test:php:watch": "wp-env run composer run-script test:watch",
 		"test:unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",

@@ -67,12 +67,9 @@ export default function NewTemplatePart( {
 			setCanvasMode( 'edit' );
 
 			// Navigate to the created template part editor.
-			window.queueMicrotask( () => {
-				history.push( {
-					postId: templatePart.id,
-					postType: 'wp_template_part',
-					path: '/template-parts/single',
-				} );
+			history.push( {
+				postId: templatePart.id,
+				postType: 'wp_template_part',
 			} );
 
 			// TODO: Add a success notice?
@@ -89,11 +86,12 @@ export default function NewTemplatePart( {
 			setIsModalOpen( false );
 		}
 	}
+	const { as: Toggle = Button, ...restToggleProps } = toggleProps ?? {};
 
 	return (
 		<>
-			<Button
-				{ ...toggleProps }
+			<Toggle
+				{ ...restToggleProps }
 				onClick={ () => {
 					setIsModalOpen( true );
 				} }
@@ -101,7 +99,7 @@ export default function NewTemplatePart( {
 				label={ postType.labels.add_new }
 			>
 				{ showIcon ? null : postType.labels.add_new }
-			</Button>
+			</Toggle>
 			{ isModalOpen && (
 				<CreateTemplatePartModal
 					closeModal={ () => setIsModalOpen( false ) }

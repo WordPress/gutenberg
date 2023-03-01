@@ -11,13 +11,5 @@
 			}
 		},
 		"innerBlocks": []
-	},
-	{
-		"name": "core/freeform",
-		"isValid": true,
-		"attributes": {
-			"content": ""
-		},
-		"innerBlocks": []
 	}
 ]

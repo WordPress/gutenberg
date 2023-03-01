@@ -44,6 +44,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editPostStore } from '../../store';
 
+const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
+
 function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
@@ -278,7 +280,7 @@ export default function VisualEditor( { styles } ) {
 
 	// If there is a Post Content block we use its layout for the block list;
 	// if not, this must be a classic theme, in which case we use the fallback layout.
-	const blockListLayout = postContentBlock
+	const blockListLayout = postContentBlock?.isValid
 		? postContentLayout
 		: fallbackLayout;
 
@@ -339,7 +341,9 @@ export default function VisualEditor( { styles } ) {
 				>
 					<MaybeIframe
 						shouldIframe={
-							( isBlockBasedTheme && ! hasMetaBoxes ) ||
+							( isGutenbergPlugin &&
+								isBlockBasedTheme &&
+								! hasMetaBoxes ) ||
 							isTemplateMode ||
 							deviceType === 'Tablet' ||
 							deviceType === 'Mobile'

@@ -243,6 +243,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const mediaTextGeneralSettings = (
 		<PanelBody title={ __( 'Settings' ) }>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Stack on mobile' ) }
 				checked={ isStackedOnMobile }
 				onChange={ () =>
@@ -253,6 +254,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			/>
 			{ mediaType === 'image' && (
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Crop image to fill entire column' ) }
 					checked={ imageFill }
 					onChange={ () =>

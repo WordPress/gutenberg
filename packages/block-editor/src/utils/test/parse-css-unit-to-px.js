@@ -116,6 +116,18 @@ describe( 'getPxFromCssUnit', () => {
 			[ 'console.log("howdy"); + 10px', null ],
 			[ 'calc(12vw * 10px', null ], // Missing closing bracket.
 			[ 'calc( 1em + 0.875rem )', '30px' ], // Decimals
+			[
+				'clamp(1.8rem, 1.8rem + ((1vw / 0.48rem + 1rem) * 2.885), 3rem)',
+				'48px',
+			],
+			[
+				'clamp(5rem, 5.25rem + ((1vw - 0.48rem) * 9.096), 8rem)',
+				'80px',
+			],
+			[
+				'clamp(2.625rem, calc(2.625rem + ((1vw - 0.48rem) * 8.4135)), 3.25rem)',
+				'42px',
+			],
 		];
 
 		test.each( testData )( 'getPxFromCssUnit( %s )', ( unit, expected ) => {

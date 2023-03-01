@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
+	useCallback,
 	useState,
 	useEffect,
 	useRef,
@@ -40,7 +41,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 import { close, Icon } from '@wordpress/icons';
 
 /**
@@ -148,34 +149,6 @@ function Navigation( {
 		createNavigationMenu( '' );
 	};
 
-	useEffect( () => {
-		hideNavigationMenuStatusNotice();
-
-		if ( isCreatingNavigationMenu ) {
-			speak( __( `Creating Navigation Menu.` ) );
-		}
-
-		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost.id, {
-				focusNavigationBlock: true,
-			} );
-
-			showNavigationMenuStatusNotice(
-				__( `Navigation Menu successfully created.` )
-			);
-		}
-
-		if ( createNavigationMenuIsError ) {
-			showNavigationMenuStatusNotice(
-				__( 'Failed to create Navigation Menu.' )
-			);
-		}
-	}, [
-		createNavigationMenuStatus,
-		createNavigationMenuError,
-		createNavigationMenuPost,
-	] );
-
 	const {
 		hasUncontrolledInnerBlocks,
 		uncontrolledInnerBlocks,
@@ -237,6 +210,40 @@ function Navigation( {
 		[ navigationMenus ]
 	);
 
+	// This useEffect adds snackbar and speak status notices when menus are created.
+	// If there are no fallback navigation menus then we don't show these messages,
+	// because this means that we are creating the first, fallback navigation menu.
+	useEffect( () => {
+		hideNavigationMenuStatusNotice();
+
+		if ( fallbackNavigationMenus && isCreatingNavigationMenu ) {
+			speak( __( `Creating Navigation Menu.` ) );
+		}
+
+		if ( createNavigationMenuIsSuccess ) {
+			handleUpdateMenu( createNavigationMenuPost.id, {
+				focusNavigationBlock: true,
+			} );
+
+			if ( fallbackNavigationMenus ) {
+				showNavigationMenuStatusNotice(
+					__( `Navigation Menu successfully created.` )
+				);
+			}
+		}
+
+		if ( createNavigationMenuIsError ) {
+			showNavigationMenuStatusNotice(
+				__( 'Failed to create Navigation Menu.' )
+			);
+		}
+	}, [
+		createNavigationMenuStatus,
+		createNavigationMenuError,
+		createNavigationMenuPost,
+		fallbackNavigationMenus,
+	] );
+
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
 	// - the are uncontrolled inner blocks already present in the block.
 	// - the user is creating a new menu.
@@ -270,12 +277,24 @@ function Navigation( {
 		hasUncontrolledInnerBlocks,
 	] );
 
+	const isEntityAvailable =
+		! isNavigationMenuMissing && isNavigationMenuResolved;
+
+	// If the block has inner blocks, but no menu id, then these blocks are either:
+	// - inserted via a pattern.
+	// - inserted directly via Code View (or otherwise).
+	// - from an older version of navigation block added before the block used a wp_navigation entity.
+	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
+	// that automatically saves the menu as an entity when changes are made to the inner blocks.
+	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
+
 	useEffect( () => {
 		if (
+			ref ||
 			! hasResolvedNavigationMenus ||
 			isConvertingClassicMenu ||
 			fallbackNavigationMenus?.length > 0 ||
-			! classicMenus?.length
+			hasUnsavedBlocks
 		) {
 			return;
 		}
@@ -284,29 +303,46 @@ function Navigation( {
 		// a classic menu with a `primary` location or slug,
 		// then create a new navigation menu based on it.
 		// Otherwise, use the most recently created classic menu.
-		const primaryMenus = classicMenus.filter(
-			( classicMenu ) =>
-				classicMenu.locations.includes( 'primary' ) ||
-				classicMenu.slug === 'primary'
-		);
-
-		if ( primaryMenus.length ) {
-			convertClassicMenu(
-				primaryMenus[ 0 ].id,
-				primaryMenus[ 0 ].name,
-				'publish'
+		if ( classicMenus?.length ) {
+			const primaryMenus = classicMenus.filter(
+				( classicMenu ) =>
+					classicMenu.locations.includes( 'primary' ) ||
+					classicMenu.slug === 'primary'
 			);
+
+			if ( primaryMenus.length ) {
+				convertClassicMenu(
+					primaryMenus[ 0 ].id,
+					primaryMenus[ 0 ].name,
+					'publish'
+				);
+			} else {
+				classicMenus.sort( ( a, b ) => {
+					return b.id - a.id;
+				} );
+				convertClassicMenu(
+					classicMenus[ 0 ].id,
+					classicMenus[ 0 ].name,
+					'publish'
+				);
+			}
 		} else {
-			classicMenus.sort( ( a, b ) => {
-				return b.id - a.id;
-			} );
-			convertClassicMenu(
-				classicMenus[ 0 ].id,
-				classicMenus[ 0 ].name,
+			// If there are no fallback navigation menus and no classic menus,
+			// then create a new navigation menu.
+
+			// Check that we have a page-list block type.
+			let defaultBlocks = [];
+			if ( getBlockType( 'core/page-list' ) ) {
+				defaultBlocks = [ createBlock( 'core/page-list' ) ];
+			}
+
+			createNavigationMenu(
+				'Navigation', // TODO - use the template slug in future
+				defaultBlocks,
 				'publish'
 			);
 		}
-	}, [ hasResolvedNavigationMenus ] );
+	}, [ hasResolvedNavigationMenus, hasUnsavedBlocks ] );
 
 	const navRef = useRef();
 
@@ -325,22 +361,6 @@ function Navigation( {
 		hasResolvedNavigationMenus &&
 		classicMenus?.length === 0 &&
 		! hasUncontrolledInnerBlocks;
-
-	useEffect( () => {
-		if ( isPlaceholder ) {
-			/**
-			 *  this fallback only displays (both in editor and on front)
-			 *  the list of pages block if no menu is available as a fallback.
-			 *  We don't want the fallback to request a save,
-			 *  nor to be undoable, hence we mark it non persistent.
-			 */
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, [ createBlock( 'core/page-list' ) ] );
-		}
-	}, [ clientId, isPlaceholder, ref ] );
-
-	const isEntityAvailable =
-		! isNavigationMenuMissing && isNavigationMenuResolved;
 
 	// "loading" state:
 	// - there is a menu creation process in progress.
@@ -393,16 +413,16 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const handleUpdateMenu = (
-		menuId,
-		options = { focusNavigationBlock: false }
-	) => {
-		const { focusNavigationBlock } = options;
-		setRef( menuId );
-		if ( focusNavigationBlock ) {
-			selectBlock( clientId );
-		}
-	};
+	const handleUpdateMenu = useCallback(
+		( menuId, options = { focusNavigationBlock: false } ) => {
+			const { focusNavigationBlock } = options;
+			setRef( menuId );
+			if ( focusNavigationBlock ) {
+				selectBlock( clientId );
+			}
+		},
+		[ selectBlock, clientId ]
+	);
 
 	const onSelectClassicMenu = async ( classicMenu ) => {
 		const navMenu = await convertClassicMenu(
@@ -420,6 +440,40 @@ function Navigation( {
 	const onSelectNavigationMenu = ( menuId ) => {
 		handleUpdateMenu( menuId );
 	};
+
+	useEffect( () => {
+		hideNavigationMenuStatusNotice();
+
+		if ( isCreatingNavigationMenu ) {
+			speak( __( `Creating Navigation Menu.` ) );
+		}
+
+		if ( createNavigationMenuIsSuccess ) {
+			handleUpdateMenu( createNavigationMenuPost.id, {
+				focusNavigationBlock: true,
+			} );
+
+			showNavigationMenuStatusNotice(
+				__( `Navigation Menu successfully created.` )
+			);
+		}
+
+		if ( createNavigationMenuIsError ) {
+			showNavigationMenuStatusNotice(
+				__( 'Failed to create Navigation Menu.' )
+			);
+		}
+	}, [
+		createNavigationMenuStatus,
+		createNavigationMenuError,
+		createNavigationMenuPost,
+		createNavigationMenuIsError,
+		createNavigationMenuIsSuccess,
+		isCreatingNavigationMenu,
+		handleUpdateMenu,
+		hideNavigationMenuStatusNotice,
+		showNavigationMenuStatusNotice,
+	] );
 
 	useEffect( () => {
 		hideClassicMenuConversionNotice();
@@ -598,6 +652,7 @@ function Navigation( {
 							<>
 								<h3>{ __( 'Submenus' ) }</h3>
 								<ToggleControl
+									__nextHasNoMarginBottom
 									checked={ openSubmenusOnClick }
 									onChange={ ( value ) => {
 										setAttributes( {
@@ -611,6 +666,7 @@ function Navigation( {
 								/>
 
 								<ToggleControl
+									__nextHasNoMarginBottom
 									checked={ showSubmenuIcon }
 									onChange={ ( value ) => {
 										setAttributes( {
@@ -681,14 +737,6 @@ function Navigation( {
 			</InspectorControls>
 		</>
 	);
-
-	// If the block has inner blocks, but no menu id, then these blocks are either:
-	// - inserted via a pattern.
-	// - inserted directly via Code View (or otherwise).
-	// - from an older version of navigation block added before the block used a wp_navigation entity.
-	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
-	// that automatically saves the menu as an entity when changes are made to the inner blocks.
-	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;

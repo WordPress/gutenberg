@@ -3,7 +3,7 @@
  */
 import createSelector from 'rememo';
 import EquivalentKeyMap from 'equivalent-key-map';
-import { get, set } from 'lodash';
+import { set } from 'lodash';
 
 /**
  * Internal dependencies
@@ -66,7 +66,10 @@ function getQueriedItemsUncached( state, query ) {
 
 			for ( let f = 0; f < fields.length; f++ ) {
 				const field = fields[ f ].split( '.' );
-				const value = get( item, field );
+				let value = item;
+				field.forEach( ( fieldName ) => {
+					value = value[ fieldName ];
+				} );
 				set( filteredItem, field, value );
 			}
 		} else {

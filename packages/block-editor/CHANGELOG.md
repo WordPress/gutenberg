@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).
+
 ## 11.4.0 (2023-02-15)
 
 ### Bug Fix

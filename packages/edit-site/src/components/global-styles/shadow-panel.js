@@ -146,9 +146,9 @@ function ShadowPopoverContainer( { shadow, onShadowChange } ) {
 function ShadowPresets( { presets, activeShadow, onSelect } ) {
 	return ! presets ? null : (
 		<Grid columns={ 6 } gap={ 0 } align="center" justify="center">
-			{ presets.map( ( { name, shadow }, i ) => (
+			{ presets.map( ( { name, slug, shadow } ) => (
 				<ShadowIndicator
-					key={ i }
+					key={ slug }
 					label={ name }
 					isActive={ shadow === activeShadow }
 					onSelect={ () =>
@@ -167,8 +167,9 @@ function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
 			<Button
 				className="edit-site-global-styles__shadow-indicator"
 				onClick={ onSelect }
-				aria-label={ label }
+				label={ label }
 				style={ { boxShadow: shadow } }
+				showTooltip
 			>
 				{ isActive && <Icon icon={ check } /> }
 			</Button>
