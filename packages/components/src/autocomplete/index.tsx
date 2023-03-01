@@ -103,7 +103,9 @@ export function useAutocomplete( {
 					obj !== null &&
 					typeof obj === 'object' &&
 					'action' in obj &&
-					'value' in obj
+					obj.action !== undefined &&
+					'value' in obj &&
+					obj.value !== undefined
 				);
 			};
 
