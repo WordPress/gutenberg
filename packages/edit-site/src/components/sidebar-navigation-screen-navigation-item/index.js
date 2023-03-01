@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
+import {
+	__experimentalUseNavigator as useNavigator,
+	ExternalLink,
+} from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { pencil } from '@wordpress/icons';
@@ -50,9 +53,11 @@ export default function SidebarNavigationScreenNavigationItem() {
 			}
 			content={
 				<>
-					<a href={ post?.link } target="_blank" rel="noreferrer">
-						{ post?.link }
-					</a>
+					{ post?.link ? (
+						<ExternalLink href={ post.link }>
+							{ post.link }
+						</ExternalLink>
+					) : null }
 					{ post
 						? decodeEntities( post?.description?.rendered )
 						: null }
