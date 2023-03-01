@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { cloneElement, Children } from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -35,30 +36,28 @@ function ResponsiveWrapper( {
 	children,
 	isInline = false,
 }: ResponsiveWrapperProps ) {
+	const [ containerResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
 	if ( Children.count( children ) !== 1 ) {
 		return null;
 	}
-
+	const imageStyle = {
+		paddingBottom:
+			naturalWidth < ( containerWidth ?? 0 )
+				? naturalHeight
+				: ( naturalHeight / naturalWidth ) * 100 + '%',
+	};
 	const TagName = isInline ? 'span' : 'div';
-	let aspectRatio;
-	if ( naturalWidth && naturalHeight ) {
-		aspectRatio = `${ naturalWidth } / ${ naturalHeight }`;
-	}
-
 	return (
 		<TagName className="components-responsive-wrapper">
-			<div>
-				{ cloneElement( children, {
-					className: classnames(
-						'components-responsive-wrapper__content',
-						children.props.className
-					),
-					style: {
-						...children.props.style,
-						aspectRatio,
-					},
-				} ) }
-			</div>
+			{ containerResizeListener }
+			<TagName style={ imageStyle } />
+			{ cloneElement( children, {
+				className: classnames(
+					'components-responsive-wrapper__content',
+					children.props.className
+				),
+			} ) }
 		</TagName>
 	);
 }
