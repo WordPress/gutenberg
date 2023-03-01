@@ -137,15 +137,9 @@ function UnconnectedNavigatorScreen(
 	}
 
 	return (
-		<>
-			<View
-				ref={ mergedWrapperRef }
-				className={ classes }
-				{ ...otherProps }
-			>
-				{ children }
-			</View>
-		</>
+		<View ref={ mergedWrapperRef } className={ classes } { ...otherProps }>
+			{ children }
+		</View>
 	);
 }
 
