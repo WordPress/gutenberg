@@ -47,7 +47,7 @@ import type {
 	WPCompleter,
 } from './types';
 
-const EMPTY_ARRAY: any[] = [];
+const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
 export function useAutocomplete( {
 	record,
@@ -60,8 +60,9 @@ export function useAutocomplete( {
 	const instanceId = useInstanceId( useAutocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
 
-	const [ filteredOptions, setFilteredOptions ] =
-		useState< Array< KeyedOption > >( EMPTY_ARRAY );
+	const [ filteredOptions, setFilteredOptions ] = useState<
+		Array< KeyedOption >
+	>( EMPTY_FILTERED_OPTIONS );
 	const [ filterValue, setFilterValue ] =
 		useState< AutocompleterUIProps[ 'filterValue' ] >( '' );
 	const [ autocompleter, setAutocompleter ] = useState< WPCompleter | null >(
@@ -130,7 +131,7 @@ export function useAutocomplete( {
 
 	function reset() {
 		setSelectedIndex( 0 );
-		setFilteredOptions( EMPTY_ARRAY );
+		setFilteredOptions( EMPTY_FILTERED_OPTIONS );
 		setFilterValue( '' );
 		setAutocompleter( null );
 		setAutocompleterUI( null );
