@@ -2,30 +2,30 @@
 
 exports[`undo should immediately create an undo level on typing 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`undo should undo typing after a pause 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">before pause after pause</p>
+<p class="wp-block-paragraph">before pause after pause</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`undo should undo typing after a pause 2`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">before pause</p>
+<p class="wp-block-paragraph">before pause</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`undo should undo typing after non input change 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">before keyboard <strong>after keyboard</strong></p>
+<p class="wp-block-paragraph">before keyboard <strong>after keyboard</strong></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`undo should undo typing after non input change 2`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">before keyboard </p>
+<p class="wp-block-paragraph">before keyboard </p>
 <!-- /wp:paragraph -->"
 `;

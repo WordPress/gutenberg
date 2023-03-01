@@ -7,6 +7,13 @@ import { isEmpty, mapValues, get } from 'lodash';
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { useSetting } from '../components';
+import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 
 /**
  * Removed falsy values from nested object.
@@ -176,4 +183,87 @@ export function shouldSkipSerialization( blockType, featureSet, feature ) {
 	}
 
 	return skipSerialization;
+}
+
+/**
+ * Based on the block and its context, returns an object of all the block settings.
+ * This object can be passed as a prop to all the Styles UI components
+ * (TypographyPanel, DimensionsPanel...).
+ *
+ * @param {string} name         Block name.
+ * @param {*}      parentLayout Parent layout.
+ *
+ * @return {Object} Settings object.
+ */
+export function useBlockSettings( name, parentLayout ) {
+	const fontFamilies = useSetting( 'typography.fontFamilies' );
+	const fontSizes = useSetting( 'typography.fontSizes' );
+	const customFontSize = useSetting( 'typography.customFontSize' );
+	const fontStyle = useSetting( 'typography.fontStyle' );
+	const fontWeight = useSetting( 'typography.fontWeight' );
+	const lineHeight = useSetting( 'typography.lineHeight' );
+	const textDecoration = useSetting( 'typography.textDecoration' );
+	const textTransform = useSetting( 'typography.textTransform' );
+	const letterSpacing = useSetting( 'typography.letterSpacing' );
+	const padding = useSetting( 'spacing.padding' );
+	const margin = useSetting( 'spacing.margin' );
+	const blockGap = useSetting( 'spacing.blockGap' );
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+	const units = useSetting( 'spacing.units' );
+	const minHeight = useSetting( 'dimensions.minHeight' );
+	const layout = useSetting( 'layout' );
+
+	const rawSettings = useMemo( () => {
+		return {
+			typography: {
+				fontFamilies: {
+					custom: fontFamilies,
+				},
+				fontSizes: {
+					custom: fontSizes,
+				},
+				customFontSize,
+				fontStyle,
+				fontWeight,
+				lineHeight,
+				textDecoration,
+				textTransform,
+				letterSpacing,
+			},
+			spacing: {
+				spacingSizes: {
+					custom: spacingSizes,
+				},
+				padding,
+				margin,
+				blockGap,
+				units,
+			},
+			dimensions: {
+				minHeight,
+			},
+			layout,
+			parentLayout,
+		};
+	}, [
+		fontFamilies,
+		fontSizes,
+		customFontSize,
+		fontStyle,
+		fontWeight,
+		lineHeight,
+		textDecoration,
+		textTransform,
+		letterSpacing,
+		padding,
+		margin,
+		blockGap,
+		spacingSizes,
+		units,
+		minHeight,
+		layout,
+		parentLayout,
+	] );
+
+	return useSettingsForBlockElement( rawSettings, name );
 }

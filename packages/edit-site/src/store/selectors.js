@@ -289,17 +289,6 @@ export function getEditorMode( state ) {
 }
 
 /**
- * Returns the current canvas mode.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Canvas mode.
- */
-export function __unstableGetCanvasMode( state ) {
-	return state.canvasMode;
-}
-
-/**
  * @deprecated
  */
 export function getCurrentTemplateNavigationPanelSubMenu() {

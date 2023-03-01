@@ -2,29 +2,29 @@
 
 exports[`Navigating the block hierarchy should appear and function even without nested blocks 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">and I say hello</p>
+<p class="wp-block-paragraph">and I say hello</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->"
 `;
 
 exports[`Navigating the block hierarchy should navigate block hierarchy using only the keyboard 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"><!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">First column</p>
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:paragraph -->
+<p class="wp-block-paragraph">First column</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-column"></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"><!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">Third column</p>
+<div class="wp-block-column"><!-- wp:paragraph -->
+<p class="wp-block-paragraph">Third column</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
@@ -32,32 +32,32 @@ exports[`Navigating the block hierarchy should navigate block hierarchy using on
 
 exports[`Navigating the block hierarchy should navigate using the list view sidebar 1`] = `
 "<!-- wp:columns -->
-<div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"><!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">First column</p>
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:paragraph -->
+<p class="wp-block-paragraph">First column</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"></div>
+<div class="wp-block-column"></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
-<div class=\\"wp-block-column\\"><!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">Third column</p>
+<div class="wp-block-column"><!-- wp:paragraph -->
+<p class="wp-block-paragraph">Third column</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
 
 exports[`Navigating the block hierarchy should select the wrapper div for a group 1`] = `
-"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
-<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">just a paragraph</p>
+"<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p class="wp-block-paragraph">just a paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:separator -->
-<hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
 <!-- /wp:separator --></div>
 <!-- /wp:group -->"
 `;

@@ -7,13 +7,14 @@
 
 .edit-site-sidebar-navigation-screen__content {
 	margin: 0 $grid-unit-20 $grid-unit-20 $button-size;
+	color: $gray-600;
 }
 
 .edit-site-sidebar-navigation-screen__title-icon {
 	position: sticky;
 	top: 0;
 	background: $gray-900;
-	padding-top: $grid-unit-60 + $hub-height + $canvas-padding * 2;
+	padding-top: $grid-unit-60 + $header-height;
 	box-shadow: 0 $grid-unit-10 $grid-unit-20 $gray-900;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
@@ -22,20 +23,9 @@
 
 .edit-site-sidebar-navigation-screen__title {
 	font-size: calc(1.56 * 13px);
+	line-height: normal;
 	font-weight: 500;
 	flex-grow: 1;
 	color: $white;
 	margin: 0;
-}
-
-.edit-site-sidebar-navigation-screen__back {
-	color: $gray-200;
-
-	&:hover {
-		color: $white;
-	}
-}
-
-.edit-site-sidebar-navigation-screen__icon-placeholder {
-	width: $button-size;
 }

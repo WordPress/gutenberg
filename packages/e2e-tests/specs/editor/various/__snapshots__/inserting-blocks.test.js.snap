@@ -54,65 +54,65 @@ lines preserved[/myshortcode]
 `;
 
 exports[`Inserting blocks inserts a block in proper place after having clicked \`Browse All\` from block appender 1`] = `
-"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
-<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">Paragraph inside group</p>
+"<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p class="wp-block-paragraph">Paragraph inside group</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">Paragraph after group</p>
+<p class="wp-block-paragraph">Paragraph after group</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`Inserting blocks inserts a block in proper place after having clicked \`Browse All\` from inline inserter 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">First paragraph</p>
+<p class="wp-block-paragraph">First paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\">Heading</h2>
+<h2 class="wp-block-heading">Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">Second paragraph</p>
+<p class="wp-block-paragraph">Second paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">Third paragraph</p>
+<p class="wp-block-paragraph">Third paragraph</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`Inserting blocks inserts a block in proper place after having clicked \`Browse All\` from inline inserter 2`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">First paragraph</p>
+<p class="wp-block-paragraph">First paragraph</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:cover {\\"isDark\\":false} -->
-<div class=\\"wp-block-cover is-light\\"><span aria-hidden=\\"true\\" class=\\"wp-block-cover__background has-background-dim-100 has-background-dim\\"></span><div class=\\"wp-block-cover__inner-container\\"></div></div>
+<!-- wp:cover {"isDark":false} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"></div></div>
 <!-- /wp:cover -->
 
 <!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\">Heading</h2>
+<h2 class="wp-block-heading">Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">Second paragraph</p>
+<p class="wp-block-paragraph">Second paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">Third paragraph</p>
+<p class="wp-block-paragraph">Third paragraph</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`Inserting blocks inserts blocks at root level when using the root appender while selection is in an inner block 1`] = `
 "<!-- wp:buttons -->
-<div class=\\"wp-block-buttons\\"><!-- wp:button -->
-<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link wp-element-button\\">1.1</a></div>
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">1.1</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph -->"
 `;

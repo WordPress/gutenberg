@@ -148,10 +148,10 @@ describe( 'Block Grouping', () => {
 			await clickBlockToolbarButton( 'Options' );
 			await clickMenuItem( 'Group' );
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
-			"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
-			<div class=\\"wp-block-group\\"><!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
-			<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
-			<p class=\\"wp-block-paragraph\\">1</p>
+			"<!-- wp:group {"layout":{"type":"constrained"}} -->
+			<div class="wp-block-group"><!-- wp:group {"layout":{"type":"constrained"}} -->
+			<div class="wp-block-group"><!-- wp:paragraph -->
+			<p class="wp-block-paragraph">1</p>
 			<!-- /wp:paragraph --></div>
 			<!-- /wp:group --></div>
 			<!-- /wp:group -->"

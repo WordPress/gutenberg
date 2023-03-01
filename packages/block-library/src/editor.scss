@@ -93,3 +93,8 @@
  * These are only output in the editor, but styles here are NOT prefixed .editor-styles-wrapper.
  * This allows us to create normalization styles that are easily overridden by editor styles.
  */
+
+// Remove the browser default border for iframe in Custom HTML block, Embed block, etc.
+.editor-styles-wrapper iframe:not([frameborder]) {
+	border: 0;
+}

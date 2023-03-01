@@ -2,25 +2,25 @@
 
 exports[`Social links block inserts block with the default icons and the WordPress link set as active 1`] = `
 "<!-- wp:social-links -->
-<ul class=\\"wp-block-social-links\\"><!-- wp:social-link {\\"url\\":\\"https://wordpress.org\\",\\"service\\":\\"wordpress\\"} /-->
+<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->
 
-<!-- wp:social-link {\\"service\\":\\"facebook\\"} /-->
+<!-- wp:social-link {"service":"facebook"} /-->
 
-<!-- wp:social-link {\\"service\\":\\"twitter\\"} /-->
+<!-- wp:social-link {"service":"twitter"} /-->
 
-<!-- wp:social-link {\\"service\\":\\"instagram\\"} /--></ul>
+<!-- wp:social-link {"service":"instagram"} /--></ul>
 <!-- /wp:social-links -->"
 `;
 
 exports[`Social links block shows active links correctly when not selected 1`] = `
 "<!-- wp:social-links -->
-<ul class=\\"wp-block-social-links\\"><!-- wp:social-link {\\"url\\":\\"https://wordpress.org\\",\\"service\\":\\"wordpress\\"} /-->
+<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->
 
-<!-- wp:social-link {\\"service\\":\\"facebook\\"} /-->
+<!-- wp:social-link {"service":"facebook"} /-->
 
-<!-- wp:social-link {\\"service\\":\\"twitter\\"} /-->
+<!-- wp:social-link {"service":"twitter"} /-->
 
-<!-- wp:social-link {\\"service\\":\\"instagram\\"} /--></ul>
+<!-- wp:social-link {"service":"instagram"} /--></ul>
 <!-- /wp:social-links -->
 
 <!-- wp:paragraph -->
@@ -30,11 +30,11 @@ exports[`Social links block shows active links correctly when not selected 1`] =
 
 exports[`Social links block shows the ghost placeholder when no icon is active 1`] = `
 "<!-- wp:social-links -->
-<ul class=\\"wp-block-social-links\\"><!-- wp:social-link {\\"service\\":\\"facebook\\"} /-->
+<ul class="wp-block-social-links"><!-- wp:social-link {"service":"facebook"} /-->
 
-<!-- wp:social-link {\\"service\\":\\"twitter\\"} /-->
+<!-- wp:social-link {"service":"twitter"} /-->
 
-<!-- wp:social-link {\\"service\\":\\"instagram\\"} /--></ul>
+<!-- wp:social-link {"service":"instagram"} /--></ul>
 <!-- /wp:social-links -->
 
 <!-- wp:paragraph -->
@@ -44,14 +44,14 @@ exports[`Social links block shows the ghost placeholder when no icon is active 1
 
 exports[`Social links block shows the social links bottom sheet when tapping on the inline appender 1`] = `
 "<!-- wp:social-links -->
-<ul class=\\"wp-block-social-links\\"><!-- wp:social-link {\\"url\\":\\"https://wordpress.org\\",\\"service\\":\\"wordpress\\"} /-->
+<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->
 
-<!-- wp:social-link {\\"service\\":\\"facebook\\"} /-->
+<!-- wp:social-link {"service":"facebook"} /-->
 
-<!-- wp:social-link {\\"service\\":\\"twitter\\"} /-->
+<!-- wp:social-link {"service":"twitter"} /-->
 
-<!-- wp:social-link {\\"service\\":\\"instagram\\"} /-->
+<!-- wp:social-link {"service":"instagram"} /-->
 
-<!-- wp:social-link-amazon {\\"url\\":\\"\\"} /--></ul>
+<!-- wp:social-link-amazon {"url":""} /--></ul>
 <!-- /wp:social-links -->"
 `;

@@ -27,10 +27,10 @@ let clipboardDataHolder: {
  * Sets the clipboard data that can be pasted with
  * `pressKeyWithModifier( 'primary', 'v' )`.
  *
- * @param  this
- * @param  clipboardData
- * @param  clipboardData.plainText
- * @param  clipboardData.html
+ * @param this
+ * @param clipboardData
+ * @param clipboardData.plainText
+ * @param clipboardData.html
  */
 export function setClipboardData(
 	this: PageUtils,
@@ -95,9 +95,9 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
  * Performs a key press with modifier (Shift, Control, Meta, Alt), where each modifier
  * is normalized to platform-specific modifier.
  *
- * @param  this
- * @param  modifier
- * @param  key
+ * @param this
+ * @param modifier
+ * @param key
  */
 export async function pressKeyWithModifier(
 	this: PageUtils,

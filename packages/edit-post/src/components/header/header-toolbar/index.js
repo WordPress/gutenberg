@@ -91,10 +91,13 @@ function HeaderToolbar() {
 			/>
 		</>
 	);
-	const openInserter = useCallback( () => {
+	const toggleInserter = useCallback( () => {
 		if ( isInserterOpened ) {
-			// Focusing the inserter button closes the inserter popover.
+			// Focusing the inserter button should close the inserter popover.
+			// However, there are some cases it won't close when the focus is lost.
+			// See https://github.com/WordPress/gutenberg/issues/43090 for more details.
 			inserterButton.current.focus();
+			setIsInserterOpened( false );
 		} else {
 			setIsInserterOpened( true );
 		}
@@ -120,7 +123,7 @@ function HeaderToolbar() {
 					variant="primary"
 					isPressed={ isInserterOpened }
 					onMouseDown={ preventDefault }
-					onClick={ openInserter }
+					onClick={ toggleInserter }
 					disabled={ ! isInserterEnabled }
 					icon={ plus }
 					label={ showIconLabels ? shortLabel : longLabel }

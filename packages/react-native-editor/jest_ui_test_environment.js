@@ -3,7 +3,10 @@
  */
 const {
 	initializeEditorPage,
+	blockNames,
 } = require( './__device-tests__/pages/editor-page' );
+const utils = require( './__device-tests__/helpers/utils' );
+const testData = require( './__device-tests__/helpers/test-data' );
 
 /**
  * External dependencies
@@ -16,6 +19,9 @@ class CustomEnvironment extends JSDOMEnvironment {
 		try {
 			await super.setup();
 			this.global.editorPage = await initializeEditorPage();
+			this.global.editorPage.blockNames = blockNames;
+			this.global.e2eUtils = utils;
+			this.global.e2eTestData = testData;
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'E2E setup exception:', error );

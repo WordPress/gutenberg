@@ -164,13 +164,21 @@ Integrating an existing redux store with its own reducers, store enhancers and m
 _Example:_
 
 ```js
-import { mapValues } from 'lodash';
 import { register } from '@wordpress/data';
 import existingSelectors from './existing-app/selectors';
 import existingActions from './existing-app/actions';
 import createStore from './existing-app/store';
 
 const reduxStore = createStore();
+
+const mapValues = ( obj, callback ) =>
+	Object.entries( obj ).reduce(
+		( acc, [ key, value ] ) => ( {
+			...acc,
+			[ key ]: callback( value ),
+		} ),
+		{}
+	);
 
 const boundSelectors = mapValues(
 	existingSelectors,

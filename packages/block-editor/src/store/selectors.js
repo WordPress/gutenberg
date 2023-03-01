@@ -56,6 +56,17 @@ const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
 const EMPTY_ARRAY = [];
 
 /**
+ * Shared reference to an empty Set for cases where it is important to avoid
+ * returning a new Set reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ *
+ * @type {Set}
+ */
+const EMPTY_SET = new Set();
+
+/**
  * Returns a block's name given its client ID, or null if no block exists with
  * the client ID.
  *
@@ -497,6 +508,10 @@ export const getBlockParents = createSelector(
 		while ( !! state.blocks.parents.get( current ) ) {
 			current = state.blocks.parents.get( current );
 			parents.push( current );
+		}
+
+		if ( ! parents.length ) {
+			return EMPTY_ARRAY;
 		}
 
 		return ascending ? parents : parents.reverse();
@@ -2722,11 +2737,15 @@ export function isBlockVisible( state, clientId ) {
  */
 export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => {
-		return new Set(
+		const visibleBlocks = new Set(
 			Object.keys( state.blockVisibility ).filter(
 				( key ) => state.blockVisibility[ key ]
 			)
 		);
+		if ( visibleBlocks.size === 0 ) {
+			return EMPTY_SET;
+		}
+		return visibleBlocks;
 	},
 	( state ) => [ state.blockVisibility ]
 );
@@ -2742,7 +2761,10 @@ export const __unstableGetContentLockingParent = createSelector(
 		let result;
 		while ( state.blocks.parents.has( current ) ) {
 			current = state.blocks.parents.get( current );
-			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
+			if (
+				current &&
+				getTemplateLock( state, current ) === 'contentOnly'
+			) {
 				result = current;
 			}
 		}

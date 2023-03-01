@@ -4,21 +4,21 @@
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalColorGradientControl as ColorGradientControl,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
-import { unlock } from '../../experiments';
+import { useSupportedStyles, useColorsPerOrigin } from './hooks';
+import { unlock } from '../../private-apis';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 function ScreenTextColor( { name, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ isTextEnabled ] = useGlobalSetting( 'color.text', name );
 	const colorsPerOrigin = useColorsPerOrigin( name );
@@ -53,6 +53,7 @@ function ScreenTextColor( { name, variation = '' } ) {
 				colorValue={ color }
 				onColorChange={ setColor }
 				clearable={ color === userColor }
+				headingLevel={ 3 }
 			/>
 		</>
 	);

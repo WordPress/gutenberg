@@ -2,18 +2,18 @@
 
 exports[`Order of block keyboard navigation should navigate correctly with multi selection 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">3</p>
+<p class="wp-block-paragraph">3</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">4</p>
+<p class="wp-block-paragraph">4</p>
 <!-- /wp:paragraph -->"
 `;

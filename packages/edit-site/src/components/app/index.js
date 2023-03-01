@@ -35,7 +35,6 @@ export default function App() {
 			<SlotFillProvider>
 				<Popover.Slot />
 				<UnsavedChangesWarning />
-
 				<Routes>
 					<Layout />
 					<PluginArea onError={ onPluginAreaError } />

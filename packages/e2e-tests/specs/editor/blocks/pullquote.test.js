@@ -20,8 +20,8 @@ describe( 'Quote', () => {
 
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:quote -->
-		<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
-		<p class=\\"wp-block-paragraph\\">test</p>
+		<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+		<p class="wp-block-paragraph">test</p>
 		<!-- /wp:paragraph --></blockquote>
 		<!-- /wp:quote -->"
 	` );
@@ -30,7 +30,7 @@ describe( 'Quote', () => {
 
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:pullquote -->
-		<figure class=\\"wp-block-pullquote\\"><blockquote><p>test</p></blockquote></figure>
+		<figure class="wp-block-pullquote"><blockquote><p>test</p></blockquote></figure>
 		<!-- /wp:pullquote -->"
 	` );
 
@@ -38,8 +38,8 @@ describe( 'Quote', () => {
 
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:quote -->
-		<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
-		<p class=\\"wp-block-paragraph\\">test</p>
+		<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+		<p class="wp-block-paragraph">test</p>
 		<!-- /wp:paragraph --></blockquote>
 		<!-- /wp:quote -->"
 	` );

@@ -154,7 +154,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		expect( await getCurrentPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p class=\\"wp-block-paragraph\\">Hi world!</p>
+		<p class="wp-block-paragraph">Hi world!</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );

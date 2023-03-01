@@ -29,6 +29,7 @@ import {
 	getHoverEventDurations,
 	getSelectionEventDurations,
 	getLoadingDurations,
+	sum,
 } from './utils';
 
 jest.setTimeout( 1000000 );
@@ -105,28 +106,43 @@ describe( 'Post Editor Performance', () => {
 			readFile( join( __dirname, '../../assets/large-post.html' ) )
 		);
 		await saveDraft();
-		let i = 5;
+		const draftURL = await page.url();
+
+		// Number of sample measurements to take.
+		const samples = 5;
+		// Number of throwaway measurements to perform before recording samples.
+		// Having at least one helps ensure that caching quirks don't manifest in
+		// the results.
+		const throwaway = 1;
+
+		let i = throwaway + samples;
 		while ( i-- ) {
-			await page.reload();
+			await page.close();
+			page = await browser.newPage();
+
+			await page.goto( draftURL );
 			await page.waitForSelector( '.edit-post-layout', {
 				timeout: 120000,
 			} );
 			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
-			const {
-				serverResponse,
-				firstPaint,
-				domContentLoaded,
-				loaded,
-				firstContentfulPaint,
-				firstBlock,
-			} = await getLoadingDurations();
 
-			results.serverResponse.push( serverResponse );
-			results.firstPaint.push( firstPaint );
-			results.domContentLoaded.push( domContentLoaded );
-			results.loaded.push( loaded );
-			results.firstContentfulPaint.push( firstContentfulPaint );
-			results.firstBlock.push( firstBlock );
+			if ( i < samples ) {
+				const {
+					serverResponse,
+					firstPaint,
+					domContentLoaded,
+					loaded,
+					firstContentfulPaint,
+					firstBlock,
+				} = await getLoadingDurations();
+
+				results.serverResponse.push( serverResponse );
+				results.firstPaint.push( firstPaint );
+				results.domContentLoaded.push( domContentLoaded );
+				results.loaded.push( loaded );
+				results.firstContentfulPaint.push( firstContentfulPaint );
+				results.firstBlock.push( firstBlock );
+			}
 		}
 	} );
 
@@ -220,22 +236,26 @@ describe( 'Post Editor Performance', () => {
 	it( 'Selecting blocks', async () => {
 		await load1000Paragraphs();
 		const paragraphs = await canvas().$$( '.wp-block' );
-		await page.tracing.start( {
-			path: traceFile,
-			screenshots: false,
-			categories: [ 'devtools.timeline' ],
-		} );
 		await paragraphs[ 0 ].click();
 		for ( let j = 1; j <= 10; j++ ) {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 1000 );
+			await page.tracing.start( {
+				path: traceFile,
+				screenshots: false,
+				categories: [ 'devtools.timeline' ],
+			} );
 			await paragraphs[ j ].click();
+			await page.tracing.stop();
+			traceResults = JSON.parse( readFile( traceFile ) );
+			const allDurations = getSelectionEventDurations( traceResults );
+			results.focus.push(
+				allDurations.reduce( ( acc, eventDurations ) => {
+					return acc + sum( eventDurations );
+				}, 0 )
+			);
 		}
-		await page.tracing.stop();
-		traceResults = JSON.parse( readFile( traceFile ) );
-		const [ focusEvents ] = getSelectionEventDurations( traceResults );
-		results.focus = focusEvents;
 	} );
 
 	it( 'Opening persistent list view', async () => {
@@ -277,9 +297,6 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Searching the inserter', async () => {
-		function sum( arr ) {
-			return arr.reduce( ( a, b ) => a + b, 0 );
-		}
 		await load1000Paragraphs();
 		await openGlobalBlockInserter();
 		for ( let j = 0; j < 10; j++ ) {

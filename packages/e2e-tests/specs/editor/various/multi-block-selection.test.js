@@ -307,7 +307,7 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( 'new content' );
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p class=\\"wp-block-paragraph\\">new content</p>
+		<p class="wp-block-paragraph">new content</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
@@ -359,9 +359,9 @@ describe( 'Multi-block selection', () => {
 		await page.mouse.up();
 		await page.keyboard.type( 'hi' );
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
-		"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
-		<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
-		<p class=\\"wp-block-paragraph\\">hih text in group</p>
+		"<!-- wp:group {"layout":{"type":"constrained"}} -->
+		<div class="wp-block-group"><!-- wp:paragraph -->
+		<p class="wp-block-paragraph">hih text in group</p>
 		<!-- /wp:paragraph --></div>
 		<!-- /wp:group -->"
 	` );

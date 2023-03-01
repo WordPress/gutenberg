@@ -437,7 +437,7 @@ describe( 'undo', () => {
 		await page.click( '.editor-history__redo[aria-disabled="false"]' );
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p class=\\"wp-block-paragraph\\">tonis</p>
+		<p class="wp-block-paragraph">tonis</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );

@@ -13,7 +13,7 @@ import type { ToolsPanelItemProps } from '../types';
 
 // This wraps controls to be conditionally displayed within a tools panel. It
 // prevents props being applied to HTML elements that would make them invalid.
-const ToolsPanelItem = (
+const UnconnectedToolsPanelItem = (
 	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) => {
@@ -37,9 +37,9 @@ const ToolsPanelItem = (
 	);
 };
 
-const ConnectedToolsPanelItem = contextConnect(
-	ToolsPanelItem,
+export const ToolsPanelItem = contextConnect(
+	UnconnectedToolsPanelItem,
 	'ToolsPanelItem'
 );
 
-export default ConnectedToolsPanelItem;
+export default ToolsPanelItem;

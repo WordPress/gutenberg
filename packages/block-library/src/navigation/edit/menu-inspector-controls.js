@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -13,15 +13,15 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import NavigationMenuSelector from './navigation-menu-selector';
-import { LeafMoreMenu } from '../leaf-more-menu';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 import DeletedNavigationWarning from './deleted-navigation-warning';
+import useNavigationMenu from '../use-navigation-menu';
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );
@@ -33,7 +33,7 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 } ) => {
-	const { OffCanvasEditor } = unlock( blockEditorExperiments );
+	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(
@@ -43,12 +43,13 @@ const MainContent = ( {
 		},
 		[ clientId ]
 	);
+	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return <p>{ __( 'Select or create a menu' ) }</p>;
 	}
 
-	if ( isNavigationMenuMissing ) {
+	if ( currentMenuId && isNavigationMenuMissing ) {
 		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
 	}
 
@@ -56,11 +57,21 @@ const MainContent = ( {
 		return <Spinner />;
 	}
 
+	const description = navigationMenu
+		? sprintf(
+				/* translators: %s: The name of a menu. */
+				__( 'Structure for navigation menu: %s' ),
+				navigationMenu?.title || __( 'Untitled menu' )
+		  )
+		: __(
+				'You have not yet created any menus. Displaying a list of your Pages'
+		  );
 	return (
 		<OffCanvasEditor
 			blocks={ clientIdsTree }
 			isExpanded={ true }
 			LeafMoreMenu={ LeafMoreMenu }
+			description={ description }
 		/>
 	);
 };
