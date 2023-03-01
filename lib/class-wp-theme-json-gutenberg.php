@@ -346,10 +346,6 @@ class WP_Theme_JSON_Gutenberg {
 			'style'  => null,
 			'width'  => null,
 		),
-		'shadow'                        => array(
-			'presets'        => null,
-			'defaultPresets' => null,
-		),
 		'color'                         => array(
 			'background'       => null,
 			'custom'           => null,
@@ -385,6 +381,10 @@ class WP_Theme_JSON_Gutenberg {
 			'margin'            => null,
 			'padding'           => null,
 			'units'             => null,
+		),
+		'shadow'                        => array(
+			'presets'        => null,
+			'defaultPresets' => null,
 		),
 		'typography'                    => array(
 			'fluid'          => null,
