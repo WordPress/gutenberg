@@ -105,6 +105,34 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$this->assertCount( 1, $navs_in_db );
 	}
 
+	public function test_creates_fallback_from_existing_navigation_menu_even_if_classic_menu_exists() {
+
+		// Create a Navigation Post
+		$navigation_post = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => 'Existing Navigation Menu',
+				'post_content' => '<!-- wp:page-list /-->',
+			)
+		);
+
+		// Also create a Classic Menu - this should be ignored.
+		$menu_id = wp_create_nav_menu( 'Existing Classic Menu' );
+
+		$fallback = gutenberg_block_core_navigation_create_fallback();
+
+		$this->assertEquals( $fallback->post_title, $navigation_post->post_title );
+		$this->assertEquals( $fallback->post_type, $navigation_post->post_type );
+		$this->assertEquals( $fallback->post_content, $navigation_post->post_content );
+		$this->assertEquals( $fallback->post_status, $navigation_post->post_status );
+
+		$navs_in_db = $this->get_navigations_in_database();
+		$this->assertCount( 1, $navs_in_db );
+
+		// Cleanup.
+		wp_delete_nav_menu( $menu_id );
+	}
+
 	public function test_should_skip_if_filter_returns_truthy() {
 		add_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 
