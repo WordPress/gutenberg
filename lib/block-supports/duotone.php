@@ -462,13 +462,13 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 		// Utilize existing preset CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
-	} else if ( $is_css ) {
+	} elseif ( $is_css ) {
 		// Build a unique slug for the filter based on the CSS value.
 		$slug = wp_unique_id( sanitize_key( $duotone_attr . '-' ) );
 
 		// Pass through the CSS value.
 		$filter_property = $duotone_attr;
-	} else if ( $is_custom ) {
+	} elseif ( $is_custom ) {
 		// Build a unique slug for the filter based on the array of colors.
 		$slug = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
 
