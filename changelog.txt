@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 15.2.4 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+- [post-excerpt][15.2.3] Fix the "is rest api?" condition in the `post-excerpt` PHP package entry point. ([48654](https://github.com/WordPress/gutenberg/pull/48654))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@fullofcaffeine
+
+
 = 15.2.3 =
 
 ## Changelog
