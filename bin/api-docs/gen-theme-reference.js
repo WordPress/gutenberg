@@ -211,30 +211,35 @@ styleSections.forEach( ( section ) => {
 	autogen += getSectionMarkup( section, styles[ section ], 'styles' );
 } );
 
+const templateTableGeneration = ( themeJson, templates, context ) => {
+	let content = '';
+	content += '## ' + context + '\n\n';
+	content += themeJson.properties[ context ].description + '\n\n';
+	content +=
+		'Type: `' + themeJson.properties[ context ].items.type + '`.\n\n';
+	content += '| Property | Description | Type |\n';
+	content += '| ---      | ---         | ---  |\n';
+	keys( templates ).forEach( ( key ) => {
+		content += `| ${ key } | ${ templates[ key ].description } | ${ templates[ key ].type } |\n`;
+	} );
+	content += '\n\n';
+
+	return content;
+};
+
 // customTemplates
-const customTemplates = themejson.properties.customTemplates.items.properties;
-autogen += '## customTemplates' + '\n\n';
-autogen += themejson.properties.customTemplates.description + '\n\n';
-autogen +=
-	'Type: `' + themejson.properties.customTemplates.items.type + '`.\n\n';
-autogen += '| Property | Description | Type |\n';
-autogen += '| ---      | ---         | ---  |\n';
-keys( customTemplates ).forEach( ( key ) => {
-	autogen += `| ${ key } | ${ customTemplates[ key ].description } | ${ customTemplates[ key ].type } |\n`;
-} );
-autogen += '\n\n';
+autogen += templateTableGeneration(
+	themejson,
+	themejson.properties.customTemplates.items.properties,
+	'customTemplates'
+);
 
 // templateParts
-const templateParts = themejson.properties.templateParts.items.properties;
-autogen += '## templateParts' + '\n\n';
-autogen += themejson.properties.templateParts.description + '\n\n';
-autogen += 'Type: `' + themejson.properties.templateParts.items.type + '`.\n\n';
-autogen += '| Property | Description | Type |\n';
-autogen += '| ---      | ---         | ---  |\n';
-keys( templateParts ).forEach( ( key ) => {
-	autogen += `| ${ key } | ${ templateParts[ key ].description } | ${ templateParts[ key ].type } |\n`;
-} );
-autogen += '\n\n';
+autogen += templateTableGeneration(
+	themejson,
+	themejson.properties.templateParts.items.properties,
+	'templateParts'
+);
 
 // Patterns
 autogen += '## Patterns' + '\n\n';
