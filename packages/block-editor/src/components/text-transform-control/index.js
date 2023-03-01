@@ -32,7 +32,7 @@ const TEXT_TRANSFORMS = [
 		icon: formatLowercase,
 	},
 	{
-		name: __( 'Capitalize' ),
+		name: __( 'Initial Caps' ),
 		value: 'capitalize',
 		icon: formatCapitalize,
 	},
