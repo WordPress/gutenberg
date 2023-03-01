@@ -1700,10 +1700,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * for the presets and adds them to the $declarations array
 	 * following the format:
 	 *
-	 *     array(
-	 *       'name'  => 'property_name',
-	 *       'value' => 'property_value,
-	 *     )
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$origins` parameter.
@@ -1732,10 +1734,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * for the custom values and adds them to the $declarations
 	 * array following the format:
 	 *
-	 *     array(
-	 *       'name'  => 'property_name',
-	 *       'value' => 'property_value,
-	 *     )
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
 	 *
 	 * @since 5.8.0
 	 *
@@ -1819,10 +1823,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * Given a styles array, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
-	 *     array(
-	 *       'name'  => 'property_name',
-	 *       'value' => 'property_value,
-	 *     )
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$settings` and `$properties` parameters.
