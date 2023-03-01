@@ -18,7 +18,6 @@ import {
 	useId,
 } from '@wordpress/element';
 import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
-import { isRTL } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
 
 /**
@@ -170,22 +169,13 @@ function UnconnectedNavigatorScreen(
 			duration: animationEnterDuration,
 			ease: 'easeInOut',
 		},
-		x: 0,
 	};
 	const initial = {
 		opacity: 0,
-		x:
-			( isRTL() && location.isBack ) || ( ! isRTL() && ! location.isBack )
-				? 50
-				: -50,
 	};
 	const exit = {
 		delay: animationExitDelay,
 		opacity: 0,
-		x:
-			( ! isRTL() && location.isBack ) || ( isRTL() && ! location.isBack )
-				? 50
-				: -50,
 		transition: {
 			duration: animationExitDuration,
 			ease: 'easeInOut',
