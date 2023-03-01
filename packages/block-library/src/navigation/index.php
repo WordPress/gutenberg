@@ -484,6 +484,8 @@ function block_core_navigation_create_fallback() {
 	if ( ! $navigation_post ) {
 		$navigation_post = block_core_navigation_get_default_pages_fallback();
 	}
+
+	return $navigation_post;
 }
 
 
