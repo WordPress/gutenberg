@@ -7,34 +7,14 @@
 
 class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
-	/**
-	 * @var WP_Post
-	 */
-	protected static $navigation_post;
-
-
-
-
 	public function set_up() {
 		parent::set_up();
 		switch_theme( 'emptytheme' );
 	}
 
-	public static function wpSetUpBeforeClass() {
-
-	}
-
-	public static function wpTearDownAfterClass() {
-		if ( ! empty( self::$post_with_comments_disabled->ID ) ) {
-			wp_delete_post( self::$navigation_post->ID, true );
-		}
-	}
-
-
-
 	public function test_gets_fallback_navigation_with_existing_navigation_menu_if_found() {
 
-		self::$navigation_post = self::factory()->post->create_and_get(
+		$navigation_post = self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => 'Existing Navigation Menu',
@@ -44,10 +24,10 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		$fallback = gutenberg_block_core_navigation_create_fallback();
 
-		$this->assertEquals( $fallback->post_title, self::$navigation_post->post_title );
-		$this->assertEquals( $fallback->post_type, self::$navigation_post->post_type );
-		$this->assertEquals( $fallback->post_content, self::$navigation_post->post_content );
-		$this->assertEquals( $fallback->post_status, self::$navigation_post->post_status );
+		$this->assertEquals( $fallback->post_title, $navigation_post->post_title );
+		$this->assertEquals( $fallback->post_type, $navigation_post->post_type );
+		$this->assertEquals( $fallback->post_content, $navigation_post->post_content );
+		$this->assertEquals( $fallback->post_status, $navigation_post->post_status );
 	}
 
 	public function test_gets_fallback_navigation_with_existing_classic_menu_if_found() {
@@ -97,7 +77,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		$actual = gutenberg_block_core_navigation_create_fallback();
 
-		// Asserr no fallback is created.
+		// Assert no fallback is created.
 		$this->assertEquals( $actual, null );
 
 		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
