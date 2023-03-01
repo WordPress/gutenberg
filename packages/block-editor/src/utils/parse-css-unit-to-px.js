@@ -24,7 +24,11 @@ function parseUnit( cssUnit ) {
  * @return {number} evaluated expression.
  */
 function calculate( expression ) {
-	return Function( `'use strict'; return (${ expression })` )();
+	try {
+		return Function( `'use strict'; return (${ expression })` )();
+	} catch ( err ) {
+		return null;
+	}
 }
 
 /**
@@ -117,7 +121,9 @@ function isMathExpression( cssUnit ) {
 function evalMathExpression( cssUnit ) {
 	let errorFound = false;
 	// Convert every part of the expression to px values.
-	const cssUnitsBits = cssUnit.split( /[+-/*/]/g ).filter( Boolean );
+	// The following regex matches numbers that have a following unit
+	// E.g. 5.25rem, 1vw
+	const cssUnitsBits = cssUnit.match( /\d+\.?\d*[a-zA-Z]+|\.\d+[a-zA-Z]+/g );
 	for ( const unit of cssUnitsBits ) {
 		// Standardize the unit to px and extract the value.
 		const parsedUnit = parseUnit( getPxFromCssUnit( unit ) );
@@ -129,7 +135,33 @@ function evalMathExpression( cssUnit ) {
 		cssUnit = cssUnit.replace( unit, parsedUnit.value );
 	}
 
-	return errorFound ? null : calculate( cssUnit ).toFixed( 0 ) + 'px';
+	// For mixed math expressions wrapped within CSS expressions
+	if ( ! errorFound && cssUnit.match( /(max|min|clamp)/g ) ) {
+		const values = cssUnit.split( ',' );
+		for ( const currentValue of values ) {
+			// Check for nested calc() and remove them to calculate the value.
+			const rawCurrentValue = currentValue.replace( /\s|calc/g, '' );
+
+			if ( isMathExpression( rawCurrentValue ) ) {
+				const calculatedExpression = calculate( rawCurrentValue );
+
+				if ( calculatedExpression ) {
+					const calculatedValue =
+						calculatedExpression.toFixed( 0 ) + 'px';
+					cssUnit = cssUnit.replace( currentValue, calculatedValue );
+				}
+			}
+		}
+		const parsedValue = parseUnitFunction( cssUnit );
+		return ! parsedValue ? null : parsedValue.value + parsedValue.unit;
+	}
+
+	if ( errorFound ) {
+		return null;
+	}
+
+	const calculatedResult = calculate( cssUnit );
+	return calculatedResult ? calculatedResult.toFixed( 0 ) + 'px' : null;
 }
 
 /**

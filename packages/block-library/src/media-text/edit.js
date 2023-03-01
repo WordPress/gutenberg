@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -225,12 +224,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		setAttributes( { verticalAlignment: alignment } );
 	};
 
-	const imageSizeOptions = map(
-		imageSizes.filter( ( { slug } ) =>
-			getImageSourceUrlBySizeSlug( image, slug )
-		),
-		( { name, slug } ) => ( { value: slug, label: name } )
-	);
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) => getImageSourceUrlBySizeSlug( image, slug ) )
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 	const updateImage = ( newMediaSizeSlug ) => {
 		const newUrl = getImageSourceUrlBySizeSlug( image, newMediaSizeSlug );
 
@@ -247,6 +243,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const mediaTextGeneralSettings = (
 		<PanelBody title={ __( 'Settings' ) }>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Stack on mobile' ) }
 				checked={ isStackedOnMobile }
 				onChange={ () =>
@@ -257,6 +254,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			/>
 			{ mediaType === 'image' && (
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Crop image to fill entire column' ) }
 					checked={ imageFill }
 					onChange={ () =>

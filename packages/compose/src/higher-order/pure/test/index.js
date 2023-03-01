@@ -14,8 +14,6 @@ import { Component } from '@wordpress/element';
  */
 import pure from '../';
 
-jest.useFakeTimers();
-
 describe( 'pure', () => {
 	it( 'functional component should rerender only when props change', () => {
 		let i = 0;
@@ -42,9 +40,7 @@ describe( 'pure', () => {
 	} );
 
 	it( 'class component should rerender if the props or state change', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		let i = 0;
 		const MyComp = pure(
 			class extends Component {

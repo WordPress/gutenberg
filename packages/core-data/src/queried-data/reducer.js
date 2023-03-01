@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, mapValues } from 'lodash';
+import { mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -230,7 +230,7 @@ const receiveQueries = compose( [
 
 	return getMergedItemIds(
 		state || [],
-		map( action.items, key ),
+		action.items.map( ( item ) => item[ key ] ),
 		page,
 		perPage
 	);

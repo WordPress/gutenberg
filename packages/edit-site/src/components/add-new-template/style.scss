@@ -69,8 +69,6 @@
 }
 
 .edit-site-custom-template-modal__suggestions_list {
-	margin-top: $grid-unit-20;
-
 	@include break-small() {
 		height: 232px;
 		overflow: scroll;
@@ -130,10 +128,7 @@
 	border: 1px solid $gray-400;
 	border-radius: $radius-block-ui;
 	padding: $grid-unit-20;
-	margin-bottom: 0;
-	margin-top: $grid-unit-20;
 }
-
 
 .edit-site-custom-generic-template__modal {
 	.components-base-control {
@@ -149,10 +144,6 @@
 	.components-modal__content::before {
 		margin-bottom: $grid-unit-05;
 	}
-}
-
-.edit-site-custom-generic-template__modal-actions {
-	margin-top: $grid-unit-15;
 }
 
 .edit-site-template-actions-loading-screen-modal {

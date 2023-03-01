@@ -7,22 +7,20 @@ import type { Editor } from './index';
  * Publishes the post, resolving once the request is complete (once a notice
  * is displayed).
  *
- * @param {Editor} this
+ * @param this
  */
 export async function publishPost( this: Editor ) {
 	await this.page.click( 'role=button[name="Publish"i]' );
-	const publishEditorPanel = this.page.locator(
-		'role=region[name="Editor publish"i]'
+	const entitiesSaveButton = this.page.locator(
+		'role=region[name="Editor publish"i] >> role=button[name="Save"i]'
 	);
 
-	const isPublishEditorVisible = await publishEditorPanel.isVisible();
+	const isEntitiesSavePanelVisible = await entitiesSaveButton.isVisible();
 
 	// Save any entities.
-	if ( isPublishEditorVisible ) {
+	if ( isEntitiesSavePanelVisible ) {
 		// Handle saving entities.
-		await this.page.click(
-			'role=region[name="Editor publish"i] >> role=button[name="Save"i]'
-		);
+		await entitiesSaveButton.click();
 	}
 
 	// Handle saving just the post.

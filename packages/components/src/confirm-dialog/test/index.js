@@ -15,8 +15,6 @@ import userEvent from '@testing-library/user-event';
  */
 import { ConfirmDialog } from '..';
 
-jest.useFakeTimers();
-
 const noop = () => {};
 
 describe( 'Confirm', () => {
@@ -82,9 +80,7 @@ describe( 'Confirm', () => {
 			} );
 
 			it( 'should not render if closed by clicking `OK`, and the `onConfirm` callback should be called', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
@@ -104,9 +100,7 @@ describe( 'Confirm', () => {
 			} );
 
 			it( 'should not render if closed by clicking `Cancel`, and the `onCancel` callback should be called', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 
@@ -126,9 +120,7 @@ describe( 'Confirm', () => {
 			} );
 
 			it( 'should be dismissable even if an `onCancel` callback is not provided', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<ConfirmDialog onConfirm={ noop }>
@@ -166,9 +158,7 @@ describe( 'Confirm', () => {
 			} );
 
 			it( 'should not render if dialog is closed by pressing `Escape`, and the `onCancel` callback should be called', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				const onCancel = jest.fn().mockName( 'onCancel()' );
 
@@ -187,9 +177,7 @@ describe( 'Confirm', () => {
 			} );
 
 			it( 'should not render if dialog is closed by pressing `Enter`, and the `onConfirm` callback should be called', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
@@ -245,9 +233,7 @@ describe( 'Confirm', () => {
 		} );
 
 		it( 'should call the `onConfirm` callback if `OK`', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
@@ -265,9 +251,7 @@ describe( 'Confirm', () => {
 		} );
 
 		it( 'should call the `onCancel` callback if `Cancel` is clicked', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onCancel = jest.fn().mockName( 'onCancel()' );
 
@@ -313,9 +297,7 @@ describe( 'Confirm', () => {
 		} );
 
 		it( 'should call the `onCancel` callback if the `Escape` key is pressed', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onCancel = jest.fn().mockName( 'onCancel()' );
 
@@ -331,9 +313,7 @@ describe( 'Confirm', () => {
 		} );
 
 		it( 'should call the `onConfirm` callback if the `Enter` key is pressed', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onConfirm = jest.fn().mockName( 'onConfirm()' );
 

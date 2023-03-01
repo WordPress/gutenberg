@@ -13,7 +13,7 @@ import ImportForm from '../import-form';
 function ImportDropdown( { onUpload } ) {
 	return (
 		<Dropdown
-			position="bottom right"
+			popoverProps={ { placement: 'bottom-start' } }
 			contentClassName="list-reusable-blocks-import-dropdown__content"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button

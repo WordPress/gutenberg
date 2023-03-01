@@ -188,9 +188,7 @@ Inspector Advanced Controls appear under the _Advanced_ panel of a block's [Insp
 ### Usage
 
 ```js
-import {
-	TextControl,
-} from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
 import {
 	InspectorControls,
 	InspectorAdvancedControls,
@@ -199,11 +197,9 @@ import {
 function MyBlockEdit( { attributes, setAttributes } ) {
 	return (
 		<>
-			<div>
-				{ /* Block markup goes here */ }
-			</div
+			<div>{ /* Block markup goes here */ }</div>
 			<InspectorControls>
-				{ /* Regular control goes here */
+				{ /* Regular control goes here */ }
 			</InspectorControls>
 			<InspectorAdvancedControls>
 				<TextControl

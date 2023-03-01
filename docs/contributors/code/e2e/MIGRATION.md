@@ -12,22 +12,8 @@ This document outlines a typical flow of migrating a Jest + Puppeteer test to Pl
 3. Change all occurrences of `describe`, `beforeAll`, `beforeEach`, `afterEach` and `afterAll` with the `test.` prefix. For instance, `describe` turns into `test.describe`.
 4. Use the [fixtures API](https://playwright.dev/docs/test-fixtures) to require previously global variables like `page` and `browser`.
 5. Delete all the imports of `e2e-test-utils`. Instead, use the fixtures API to directly get the `admin`, `editor`, `pageUtils` and `requestUtils`. (However, `admin`, `editor` and `pageUtils` are not allowed in `beforeAll` and `afterAll`, rewrite them using `requestUtils` instead.)
-6. If tests are for the site editor, configure the editor utils to use an iframe:
-    ```js
-    const {
-        test,
-        expect,
-        Editor,
-    } = require( '@wordpress/e2e-test-utils-playwright' );
-
-    test.use( {
-        editor: async ( { page }, use ) => {
-            await use( new Editor( { page, hasIframe: true } ) );
-        },
-    } );
-    ```
-7. If there's a missing util, try to inline the operations directly in the test if there are only a few steps. If you think it deserves to be implemented as a test util, then follow the [guide](#migration-steps-for-test-utils) below.
-8. Manually migrate other details in the tests following the proposed [best practices](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/README.md#best-practices). Note that even though the differences in the API of Playwright and Puppeteer are similar, some manual changes are still required.
+6. If there's a missing util, try to inline the operations directly in the test if there are only a few steps. If you think it deserves to be implemented as a test util, then follow the [guide](#migration-steps-for-test-utils) below.
+7. Manually migrate other details in the tests following the proposed [best practices](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/README.md#best-practices). Note that even though the differences in the API of Playwright and Puppeteer are similar, some manual changes are still required.
 
 ## Migration steps for test utils
 

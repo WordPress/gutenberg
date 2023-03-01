@@ -87,7 +87,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public static function wpTearDownAfterClass() {
 		foreach ( self::$pages as $page_to_delete ) {
-			wp_delete_post( $page_to_delete );
+			wp_delete_post( $page_to_delete->ID );
 		}
 		foreach ( self::$terms as $term_to_delete ) {
 			wp_delete_term( $term_to_delete->term_id, $term_to_delete->taxonomy );

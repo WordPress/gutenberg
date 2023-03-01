@@ -9,8 +9,8 @@ import {
 	ExternalLink,
 	VisuallyHidden,
 	CustomSelectControl,
-	BaseControl,
 	ToggleControl,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
 // So that we can illustrate the different formats in the dropdown properly,
@@ -50,14 +50,12 @@ export default function DateFormatPicker( {
 		<fieldset className="block-editor-date-format-picker">
 			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
 			<ToggleControl
-				label={
-					<>
-						{ __( 'Default format' ) }
-						<span className="block-editor-date-format-picker__default-format-toggle-control__hint">
-							{ dateI18n( defaultFormat, EXAMPLE_DATE ) }
-						</span>
-					</>
-				}
+				__nextHasNoMarginBottom
+				label={ __( 'Default format' ) }
+				help={ `${ __( 'Example:' ) }  ${ dateI18n(
+					defaultFormat,
+					EXAMPLE_DATE
+				) }` }
 				checked={ ! format }
 				onChange={ ( checked ) =>
 					onChange( checked ? null : defaultFormat )
@@ -110,31 +108,30 @@ function NonDefaultControls( { format, onChange } ) {
 	);
 
 	return (
-		<>
-			<BaseControl className="block-editor-date-format-picker__custom-format-select-control">
-				<CustomSelectControl
-					__nextUnconstrainedWidth
-					label={ __( 'Choose a format' ) }
-					options={ [ ...suggestedOptions, customOption ] }
-					value={
-						isCustom
-							? customOption
-							: suggestedOptions.find(
-									( option ) => option.format === format
-							  ) ?? customOption
+		<VStack>
+			<CustomSelectControl
+				__nextUnconstrainedWidth
+				label={ __( 'Choose a format' ) }
+				options={ [ ...suggestedOptions, customOption ] }
+				value={
+					isCustom
+						? customOption
+						: suggestedOptions.find(
+								( option ) => option.format === format
+						  ) ?? customOption
+				}
+				onChange={ ( { selectedItem } ) => {
+					if ( selectedItem === customOption ) {
+						setIsCustom( true );
+					} else {
+						setIsCustom( false );
+						onChange( selectedItem.format );
 					}
-					onChange={ ( { selectedItem } ) => {
-						if ( selectedItem === customOption ) {
-							setIsCustom( true );
-						} else {
-							setIsCustom( false );
-							onChange( selectedItem.format );
-						}
-					} }
-				/>
-			</BaseControl>
+				} }
+			/>
 			{ isCustom && (
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision
 					help={ createInterpolateElement(
@@ -155,6 +152,6 @@ function NonDefaultControls( { format, onChange } ) {
 					onChange={ ( value ) => onChange( value ) }
 				/>
 			) }
-		</>
+		</VStack>
 	);
 }

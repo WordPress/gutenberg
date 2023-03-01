@@ -10,6 +10,7 @@ import {
 	FlexItem,
 	ColorIndicator,
 } from '@wordpress/components';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,18 +18,27 @@ import {
 import ScreenHeader from './header';
 import Palette from './palette';
 import { NavigationButtonAsItem } from './navigation-button';
-import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
+import { useSupportedStyles } from './hooks';
 import Subtitle from './subtitle';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 import BlockPreviewPanel from './block-preview-panel';
+import { getVariationClassName } from './utils';
+import { unlock } from '../../private-apis';
 
-function BackgroundColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+
+function BackgroundColorItem( { name, parentMenu, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const urlPrefix = variation ? `/variations/${ variation }` : '';
+	const supports = useSupportedStyles( name );
 	const hasSupport =
 		supports.includes( 'backgroundColor' ) ||
 		supports.includes( 'background' );
-	const [ backgroundColor ] = useStyle( 'color.background', name );
-	const [ gradientValue ] = useStyle( 'color.gradient', name );
+	const [ backgroundColor ] = useGlobalStyle(
+		prefix + 'color.background',
+		name
+	);
+	const [ gradientValue ] = useGlobalStyle( prefix + 'color.gradient', name );
 
 	if ( ! hasSupport ) {
 		return null;
@@ -36,7 +46,7 @@ function BackgroundColorItem( { name, parentMenu } ) {
 
 	return (
 		<NavigationButtonAsItem
-			path={ parentMenu + '/colors/background' }
+			path={ parentMenu + urlPrefix + '/colors/background' }
 			aria-label={ __( 'Colors background styles' ) }
 		>
 			<HStack justify="flex-start">
@@ -54,10 +64,12 @@ function BackgroundColorItem( { name, parentMenu } ) {
 	);
 }
 
-function TextColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+function TextColorItem( { name, parentMenu, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const urlPrefix = variation ? `/variations/${ variation }` : '';
+	const supports = useSupportedStyles( name );
 	const hasSupport = supports.includes( 'color' );
-	const [ color ] = useStyle( 'color.text', name );
+	const [ color ] = useGlobalStyle( prefix + 'color.text', name );
 
 	if ( ! hasSupport ) {
 		return null;
@@ -65,7 +77,7 @@ function TextColorItem( { name, parentMenu } ) {
 
 	return (
 		<NavigationButtonAsItem
-			path={ parentMenu + '/colors/text' }
+			path={ parentMenu + urlPrefix + '/colors/text' }
 			aria-label={ __( 'Colors text styles' ) }
 		>
 			<HStack justify="flex-start">
@@ -83,11 +95,19 @@ function TextColorItem( { name, parentMenu } ) {
 	);
 }
 
-function LinkColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+function LinkColorItem( { name, parentMenu, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const urlPrefix = variation ? `/variations/${ variation }` : '';
+	const supports = useSupportedStyles( name );
 	const hasSupport = supports.includes( 'linkColor' );
-	const [ color ] = useStyle( 'elements.link.color.text', name );
-	const [ colorHover ] = useStyle( 'elements.link.:hover.color.text', name );
+	const [ color ] = useGlobalStyle(
+		prefix + 'elements.link.color.text',
+		name
+	);
+	const [ colorHover ] = useGlobalStyle(
+		prefix + 'elements.link.:hover.color.text',
+		name
+	);
 
 	if ( ! hasSupport ) {
 		return null;
@@ -95,7 +115,7 @@ function LinkColorItem( { name, parentMenu } ) {
 
 	return (
 		<NavigationButtonAsItem
-			path={ parentMenu + '/colors/link' }
+			path={ parentMenu + urlPrefix + '/colors/link' }
 			aria-label={ __( 'Colors link styles' ) }
 		>
 			<HStack justify="flex-start">
@@ -115,11 +135,19 @@ function LinkColorItem( { name, parentMenu } ) {
 	);
 }
 
-function HeadingColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+function HeadingColorItem( { name, parentMenu, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const urlPrefix = variation ? `/variations/${ variation }` : '';
+	const supports = useSupportedStyles( name );
 	const hasSupport = supports.includes( 'color' );
-	const [ color ] = useStyle( 'elements.heading.color.text', name );
-	const [ bgColor ] = useStyle( 'elements.heading.color.background', name );
+	const [ color ] = useGlobalStyle(
+		prefix + 'elements.heading.color.text',
+		name
+	);
+	const [ bgColor ] = useGlobalStyle(
+		prefix + 'elements.heading.color.background',
+		name
+	);
 
 	if ( ! hasSupport ) {
 		return null;
@@ -127,7 +155,7 @@ function HeadingColorItem( { name, parentMenu } ) {
 
 	return (
 		<NavigationButtonAsItem
-			path={ parentMenu + '/colors/heading' }
+			path={ parentMenu + urlPrefix + '/colors/heading' }
 			aria-label={ __( 'Colors heading styles' ) }
 		>
 			<HStack justify="flex-start">
@@ -145,18 +173,28 @@ function HeadingColorItem( { name, parentMenu } ) {
 	);
 }
 
-function ButtonColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+function ButtonColorItem( { name, parentMenu, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const urlPrefix = variation ? `/variations/${ variation }` : '';
+	const supports = useSupportedStyles( name );
 	const hasSupport = supports.includes( 'buttonColor' );
-	const [ color ] = useStyle( 'elements.button.color.text', name );
-	const [ bgColor ] = useStyle( 'elements.button.color.background', name );
+	const [ color ] = useGlobalStyle(
+		prefix + 'elements.button.color.text',
+		name
+	);
+	const [ bgColor ] = useGlobalStyle(
+		prefix + 'elements.button.color.background',
+		name
+	);
 
 	if ( ! hasSupport ) {
 		return null;
 	}
 
 	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/button' }>
+		<NavigationButtonAsItem
+			path={ parentMenu + urlPrefix + '/colors/button' }
+		>
 			<HStack justify="flex-start">
 				<ZStack isLayered={ false } offset={ -8 }>
 					<ColorIndicatorWrapper expanded={ false }>
@@ -174,9 +212,10 @@ function ButtonColorItem( { name, parentMenu } ) {
 	);
 }
 
-function ScreenColors( { name } ) {
+function ScreenColors( { name, variation = '' } ) {
 	const parentMenu =
 		name === undefined ? '' : '/blocks/' + encodeURIComponent( name );
+	const variationClassName = getVariationClassName( variation );
 
 	return (
 		<>
@@ -187,34 +226,39 @@ function ScreenColors( { name } ) {
 				) }
 			/>
 
-			<BlockPreviewPanel name={ name } />
+			<BlockPreviewPanel name={ name } variation={ variationClassName } />
 
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 10 }>
 					<Palette name={ name } />
 
 					<VStack spacing={ 3 }>
-						<Subtitle>{ __( 'Elements' ) }</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Elements' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							<BackgroundColorItem
 								name={ name }
 								parentMenu={ parentMenu }
+								variation={ variation }
 							/>
 							<TextColorItem
 								name={ name }
 								parentMenu={ parentMenu }
+								variation={ variation }
 							/>
 							<LinkColorItem
 								name={ name }
 								parentMenu={ parentMenu }
+								variation={ variation }
 							/>
 							<HeadingColorItem
 								name={ name }
 								parentMenu={ parentMenu }
+								variation={ variation }
 							/>
 							<ButtonColorItem
 								name={ name }
 								parentMenu={ parentMenu }
+								variation={ variation }
 							/>
 						</ItemGroup>
 					</VStack>

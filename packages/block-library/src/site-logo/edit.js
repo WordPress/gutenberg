@@ -34,7 +34,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalImageEditor as ImageEditor,
-	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -79,18 +78,15 @@ const SiteLogo = ( {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
 			'root',
 			'__unstableBase'
 		);
 		return {
 			title: siteEntities?.name,
-			...Object.fromEntries(
-				Object.entries( getSettings() ).filter( ( [ key ] ) =>
-					[ 'imageEditing', 'maxWidth' ].includes( key )
-				)
-			),
+			imageEditing: settings.imageEditing,
+			maxWidth: settings.maxWidth,
 		};
 	}, [] );
 
@@ -219,27 +215,21 @@ const SiteLogo = ( {
 
 	const imgEdit =
 		canEditImage && isEditingImage ? (
-			<ImageEditingProvider
+			<ImageEditor
 				id={ logoId }
 				url={ logoUrl }
-				naturalWidth={ naturalWidth }
-				naturalHeight={ naturalHeight }
+				width={ currentWidth }
+				height={ currentHeight }
 				clientWidth={ clientWidth }
+				naturalHeight={ naturalHeight }
+				naturalWidth={ naturalWidth }
 				onSaveImage={ ( imageAttributes ) => {
 					setLogo( imageAttributes.id );
 				} }
-				isEditing={ isEditingImage }
-				onFinishEditing={ () => setIsEditingImage( false ) }
-			>
-				<ImageEditor
-					url={ logoUrl }
-					width={ currentWidth }
-					height={ currentHeight }
-					clientWidth={ clientWidth }
-					naturalHeight={ naturalHeight }
-					naturalWidth={ naturalWidth }
-				/>
-			</ImageEditingProvider>
+				onFinishEditing={ () => {
+					setIsEditingImage( false );
+				} }
+			/>
 		) : (
 			<ResizableBox
 				size={ {
@@ -310,6 +300,7 @@ const SiteLogo = ( {
 						disabled={ ! isResizable }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link image to home' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
@@ -317,6 +308,7 @@ const SiteLogo = ( {
 					{ isLink && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -330,6 +322,7 @@ const SiteLogo = ( {
 					{ canUserEdit && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Use as site icon' ) }
 								onChange={ ( value ) => {
 									setAttributes( { shouldSyncIcon: value } );

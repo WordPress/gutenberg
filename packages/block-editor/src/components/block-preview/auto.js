@@ -23,9 +23,8 @@ const MAX_HEIGHT = 2000;
 function ScaledBlockPreview( {
 	viewportWidth,
 	containerWidth,
-	__experimentalPadding,
-	__experimentalMinHeight,
-	__experimentalStyles,
+	minHeight,
+	additionalStyles = [],
 } ) {
 	if ( ! viewportWidth ) {
 		viewportWidth = containerWidth;
@@ -46,16 +45,16 @@ function ScaledBlockPreview( {
 		if ( styles ) {
 			return [
 				...styles,
-				...__experimentalStyles,
 				{
-					css: 'body{height:auto;overflow:hidden;}',
+					css: 'body{height:auto;overflow:hidden;border:none;padding:0;}',
 					__unstableType: 'presets',
 				},
+				...additionalStyles,
 			];
 		}
 
 		return styles;
-	}, [ styles, __experimentalStyles ] );
+	}, [ styles, additionalStyles ] );
 
 	const svgFilters = useMemo( () => {
 		return [ ...( duotone?.default ?? [] ), ...( duotone?.theme ?? [] ) ];
@@ -73,7 +72,7 @@ function ScaledBlockPreview( {
 				height: contentHeight * scale,
 				maxHeight:
 					contentHeight > MAX_HEIGHT ? MAX_HEIGHT * scale : undefined,
-				minHeight: __experimentalMinHeight,
+				minHeight,
 			} }
 		>
 			<Iframe
@@ -87,7 +86,6 @@ function ScaledBlockPreview( {
 					);
 					documentElement.style.position = 'absolute';
 					documentElement.style.width = '100%';
-					bodyElement.style.padding = __experimentalPadding + 'px';
 
 					// Necessary for contentResizeListener to work.
 					bodyElement.style.boxSizing = 'border-box';
@@ -105,9 +103,9 @@ function ScaledBlockPreview( {
 					// See: https://github.com/WordPress/gutenberg/pull/38175.
 					maxHeight: MAX_HEIGHT,
 					minHeight:
-						scale !== 0 && scale < 1 && __experimentalMinHeight
-							? __experimentalMinHeight / scale
-							: __experimentalMinHeight,
+						scale !== 0 && scale < 1 && minHeight
+							? minHeight / scale
+							: minHeight,
 				} }
 			>
 				{ contentResizeListener }

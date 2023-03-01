@@ -69,7 +69,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
 
@@ -164,12 +164,12 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
@@ -180,7 +180,7 @@ jobs:
                   NO_CHECKS: 'true'
 
             - name: Upload artifact
-              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               with:
                   name: gutenberg-plugin
                   path: ./gutenberg.zip
@@ -203,7 +203,7 @@ jobs:
 
             - name: Upload release notes artifact
               if: ${{ needs.bump-version.outputs.new_version }}
-              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               with:
                   name: release-notes
                   path: ./release-notes.txt
@@ -219,7 +219,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
@@ -307,13 +307,13 @@ jobs:
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   path: main
                   ref: trunk
 
             - name: Checkout (for publishing)
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
@@ -327,7 +327,7 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Setup Node (for CLI)
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'

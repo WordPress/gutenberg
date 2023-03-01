@@ -55,12 +55,6 @@ describe( 'editEntityRecord', () => {
 describe( 'deleteEntityRecord', () => {
 	beforeEach( async () => {
 		apiFetch.mockReset();
-		jest.useFakeTimers();
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	it( 'triggers a DELETE request for an existing record', async () => {
@@ -182,12 +176,6 @@ describe( 'deleteEntityRecord', () => {
 describe( 'saveEditedEntityRecord', () => {
 	beforeEach( async () => {
 		apiFetch.mockReset();
-		jest.useFakeTimers();
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	it( 'Uses "id" as a key when no entity key is provided', async () => {
@@ -277,17 +265,11 @@ describe( 'saveEntityRecord', () => {
 
 	beforeEach( async () => {
 		apiFetch.mockReset();
-		jest.useFakeTimers();
 		dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	it( 'triggers a POST request for a new record', async () => {

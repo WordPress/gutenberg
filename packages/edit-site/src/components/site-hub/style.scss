@@ -5,18 +5,15 @@
 	gap: $grid-unit-10;
 }
 
-.edit-site-site-hub__edit-button {
-	height: $grid-unit-40;
-}
-
 .edit-site-site-hub__post-type {
 	opacity: 0.6;
 }
 
 .edit-site-site-hub__view-mode-toggle-container {
 	height: $header-height;
-	width: $header-height;
+	width: $header-height + 4px;
 	flex-shrink: 0;
+	background: $gray-900;
 }
 
 .edit-site-site-hub__text-content {
