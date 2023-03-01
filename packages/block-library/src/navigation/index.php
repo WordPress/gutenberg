@@ -436,11 +436,12 @@ function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
 }
 
 /**
- * Create and returns a navigation menu containing a page-list as a fallback.
+ * Create and returns a navigation menu containing default fallback content.
+ * (ideally a page-list).
  *
  * @return array the newly created navigation menu.
  */
-function block_core_navigation_get_default_pages_fallback() {
+function block_core_navigation_get_default_fallback() {
 	$registry = WP_Block_Type_Registry::get_instance();
 
 	// If `core/page-list` is not registered then use empty blocks.
@@ -486,7 +487,7 @@ function block_core_navigation_create_fallback() {
 
 	// If there are no navigation posts then default to a list of Pages.
 	if ( ! $navigation_post ) {
-		$navigation_post = block_core_navigation_get_default_pages_fallback();
+		$navigation_post = block_core_navigation_get_default_fallback();
 	}
 
 	return $navigation_post;
