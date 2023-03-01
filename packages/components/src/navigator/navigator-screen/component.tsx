@@ -3,7 +3,6 @@
  */
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { motion, MotionProps } from 'framer-motion';
 import { css } from '@emotion/react';
 
 /**
@@ -17,7 +16,7 @@ import {
 	useRef,
 	useId,
 } from '@wordpress/element';
-import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 import { escapeAttribute } from '@wordpress/escape-html';
 
 /**
@@ -33,20 +32,8 @@ import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import type { NavigatorScreenProps } from '../types';
 
-const animationEnterDelay = 0;
-const animationEnterDuration = 0.14;
-const animationExitDuration = 0.14;
-const animationExitDelay = 0;
-
-// Props specific to `framer-motion` can't be currently passed to `NavigatorScreen`,
-// as some of them would overlap with HTML props (e.g. `onAnimationStart`, ...)
-type Props = Omit<
-	WordPressComponentProps< NavigatorScreenProps, 'div', false >,
-	keyof MotionProps
->;
-
 function UnconnectedNavigatorScreen(
-	props: Props,
+	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const screenId = useId();
@@ -55,7 +42,6 @@ function UnconnectedNavigatorScreen(
 		'NavigatorScreen'
 	);
 
-	const prefersReducedMotion = useReducedMotion();
 	const { location, match, addScreen, removeScreen } =
 		useContext( NavigatorContext );
 	const isMatch = match === screenId;
@@ -150,8 +136,8 @@ function UnconnectedNavigatorScreen(
 		return null;
 	}
 
-	if ( prefersReducedMotion ) {
-		return (
+	return (
+		<>
 			<View
 				ref={ mergedWrapperRef }
 				className={ classes }
@@ -159,44 +145,7 @@ function UnconnectedNavigatorScreen(
 			>
 				{ children }
 			</View>
-		);
-	}
-
-	const animate = {
-		opacity: 1,
-		transition: {
-			delay: animationEnterDelay,
-			duration: animationEnterDuration,
-			ease: 'easeInOut',
-		},
-	};
-	const initial = {
-		opacity: 0,
-	};
-	const exit = {
-		delay: animationExitDelay,
-		opacity: 0,
-		transition: {
-			duration: animationExitDuration,
-			ease: 'easeInOut',
-		},
-	};
-
-	const animatedProps = {
-		animate,
-		exit,
-		initial,
-	};
-
-	return (
-		<motion.div
-			ref={ mergedWrapperRef }
-			className={ classes }
-			{ ...otherProps }
-			{ ...animatedProps }
-		>
-			{ children }
-		</motion.div>
+		</>
 	);
 }
 
