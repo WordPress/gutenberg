@@ -20,19 +20,18 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
-import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasVariationsPanel } from './variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
 import { unlock } from '../../private-apis';
-import { useSupportedStyles } from './hooks';
 
 const {
+	useHasDimensionsPanel,
 	useHasTypographyPanel,
+	useHasBorderPanel,
 	useGlobalSetting,
-	overrideSettingsWithSupports,
+	useSettingsForBlockElement,
 } = unlock( blockEditorPrivateApis );
 
 function useSortedBlockTypes() {
@@ -60,15 +59,11 @@ function useSortedBlockTypes() {
 
 function BlockMenuItem( { block } ) {
 	const [ rawSettings ] = useGlobalSetting( '', block.name );
-	const supports = useSupportedStyles( block.name );
-	const settings = useMemo(
-		() => overrideSettingsWithSupports( rawSettings, supports ),
-		[ rawSettings, supports ]
-	);
+	const settings = useSettingsForBlockElement( rawSettings, block.name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( block.name );
-	const hasBorderPanel = useHasBorderPanel( block.name );
-	const hasDimensionsPanel = useHasDimensionsPanel( block.name );
+	const hasBorderPanel = useHasBorderPanel( settings );
+	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
 	const hasVariationsPanel = useHasVariationsPanel( block.name );
 	const hasBlockMenuItem =

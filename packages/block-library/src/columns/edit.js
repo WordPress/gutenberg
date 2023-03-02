@@ -110,6 +110,7 @@ function ColumnsEditContainer( {
 						</Notice>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Stack on mobile' ) }
 						checked={ isStackedOnMobile }
 						onChange={ () =>

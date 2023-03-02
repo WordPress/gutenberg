@@ -114,18 +114,10 @@ class WP_Theme_JSON_Gutenberg {
 	 *              `use_default_names` preset key, and simplified the metadata structure.
 	 * @since 6.0.0 Replaced `override` with `prevent_override` and updated the
 	 *              `prevent_override` value for `color.duotone` to use `color.defaultDuotone`.
+	 * @since 6.2.0 Added 'shadow' presets.
 	 * @var array
 	 */
 	const PRESETS_METADATA = array(
-		array(
-			'path'              => array( 'shadow', 'presets' ),
-			'prevent_override'  => array( 'shadow', 'defaultPresets' ),
-			'use_default_names' => false,
-			'value_key'         => 'shadow',
-			'css_vars'          => '--wp--preset--shadow--$slug',
-			'classes'           => array(),
-			'properties'        => array( 'box-shadow' ),
-		),
 		array(
 			'path'              => array( 'color', 'palette' ),
 			'prevent_override'  => array( 'color', 'defaultPalette' ),
@@ -184,6 +176,15 @@ class WP_Theme_JSON_Gutenberg {
 			'classes'           => array(),
 			'properties'        => array( 'padding', 'margin' ),
 		),
+		array(
+			'path'              => array( 'shadow', 'presets' ),
+			'prevent_override'  => array( 'shadow', 'defaultPresets' ),
+			'use_default_names' => false,
+			'value_key'         => 'shadow',
+			'css_vars'          => '--wp--preset--shadow--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'box-shadow' ),
+		),
 	);
 
 	/**
@@ -200,7 +201,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added the `border-*-color`, `border-*-width`, `border-*-style`,
 	 *              `--wp--style--root--padding-*`, and `box-shadow` properties,
 	 *              removed the `--wp--style--block-gap` property.
-	 * @since 6.2.0 Added `min-height`.
+	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
+	 *
 	 * @var array
 	 */
 	const PROPERTIES_METADATA = array(
@@ -260,31 +262,17 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
-	 * Protected style properties.
-	 *
-	 * These style properties are only rendered if a setting enables it
-	 * via a value other than `null`.
-	 *
-	 * Each element maps the style property to the corresponding theme.json
-	 * setting key.
-	 *
-	 * @since 5.9.0
-	 */
-	const PROTECTED_PROPERTIES = array(
-		'spacing.blockGap' => array( 'spacing', 'blockGap' ),
-	);
-
-	/**
 	 * Indirect metadata for style properties that are not directly output.
 	 *
-	 * Each element is a direct mapping from a CSS property name to the
-	 * path to the value in theme.json & block attributes.
+	 * Each element maps from a CSS property name to an array of
+	 * paths to the value in theme.json & block attributes.
 	 *
 	 * Indirect properties are not output directly by `compute_style_properties`,
 	 * but are used elsewhere in the processing of global styles. The indirect
 	 * property is used to validate whether or not a style value is allowed.
 	 *
 	 * @since 6.2.0
+	 *
 	 * @var array
 	 */
 	const INDIRECT_PROPERTIES_METADATA = array(
@@ -304,6 +292,21 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
+	 * Protected style properties.
+	 *
+	 * These style properties are only rendered if a setting enables it
+	 * via a value other than `null`.
+	 *
+	 * Each element maps the style property to the corresponding theme.json
+	 * setting key.
+	 *
+	 * @since 5.9.0
+	 */
+	const PROTECTED_PROPERTIES = array(
+		'spacing.blockGap' => array( 'spacing', 'blockGap' ),
+	);
+
+	/**
 	 * The top-level keys a theme.json can have.
 	 *
 	 * @since 5.8.0 As `ALLOWED_TOP_LEVEL_KEYS`.
@@ -317,8 +320,8 @@ class WP_Theme_JSON_Gutenberg {
 		'settings',
 		'styles',
 		'templateParts',
-		'version',
 		'title',
+		'version',
 	);
 
 	/**
@@ -330,7 +333,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *              and `typography`, and renamed others according to the new schema.
 	 * @since 6.0.0 Added `color.defaultDuotone`.
 	 * @since 6.1.0 Added `layout.definitions` and `useRootPaddingAwareAlignments`.
-	 * @since 6.2.0 Added `dimensions.minHeight`, `position.fixed` and `position.sticky`.
+	 * @since 6.2.0 Added `dimensions.minHeight`, 'shadow.presets', 'shadow.defaultPresets',
+	 *              `position.fixed` and `position.sticky`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -341,10 +345,6 @@ class WP_Theme_JSON_Gutenberg {
 			'radius' => null,
 			'style'  => null,
 			'width'  => null,
-		),
-		'shadow'                        => array(
-			'presets'        => null,
-			'defaultPresets' => null,
 		),
 		'color'                         => array(
 			'background'       => null,
@@ -382,6 +382,10 @@ class WP_Theme_JSON_Gutenberg {
 			'padding'           => null,
 			'units'             => null,
 		),
+		'shadow'                        => array(
+			'presets'        => null,
+			'defaultPresets' => null,
+		),
 		'typography'                    => array(
 			'fluid'          => null,
 			'customFontSize' => null,
@@ -407,7 +411,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added new side properties for `border`,
 	 *              added new property `shadow`,
 	 *              updated `blockGap` to be allowed at any level.
-	 * @since 6.2.0 Added `dimensions.minHeight`.
+	 * @since 6.2.0 Added `outline`, and `minHeight` properties.
+	 *
 	 * @var array
 	 */
 	const VALID_STYLES = array(
@@ -426,7 +431,6 @@ class WP_Theme_JSON_Gutenberg {
 			'gradient'   => null,
 			'text'       => null,
 		),
-		'css'        => null,
 		'dimensions' => array(
 			'minHeight' => null,
 		),
@@ -455,6 +459,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textDecoration' => null,
 			'textTransform'  => null,
 		),
+		'css'        => null,
 	);
 
 	/**
@@ -888,7 +893,6 @@ class WP_Theme_JSON_Gutenberg {
 				}
 				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = implode( ',', $element_selector );
 			}
-
 			// If the block has style variations, append their selectors to the block metadata.
 			if ( ! empty( $block_type->styles ) ) {
 				$style_selectors = array();
@@ -964,27 +968,6 @@ class WP_Theme_JSON_Gutenberg {
 		} else {
 			return $this->theme_json['settings'];
 		}
-	}
-
-	/**
-	 * Processes the CSS, to apply nesting.
-	 *
-	 * @param string $css      The CSS to process.
-	 * @param string $selector The selector to nest.
-	 *
-	 * @return string The processed CSS.
-	 */
-	protected function process_blocks_custom_css( $css, $selector ) {
-		$processed_css = '';
-
-		// Split CSS nested rules.
-		$parts = explode( '&', $css );
-		foreach ( $parts as $part ) {
-			$processed_css .= ( ! str_contains( $part, '{' ) )
-				? trim( $selector ) . '{' . trim( $part ) . '}' // If the part doesn't contain braces, it applies to the root level.
-				: trim( $selector . $part ); // Prepend the selector, which effectively replaces the "&" character.
-		}
-		return $processed_css;
 	}
 
 	/**
@@ -1094,11 +1077,33 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Processes the CSS, to apply nesting.
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $css      The CSS to process.
+	 * @param string $selector The selector to nest.
+	 * @return string The processed CSS.
+	 */
+	protected function process_blocks_custom_css( $css, $selector ) {
+		$processed_css = '';
+
+		// Split CSS nested rules.
+		$parts = explode( '&', $css );
+		foreach ( $parts as $part ) {
+			$processed_css .= ( ! str_contains( $part, '{' ) )
+				? trim( $selector ) . '{' . trim( $part ) . '}' // If the part doesn't contain braces, it applies to the root level.
+				: trim( $selector . $part ); // Prepend the selector, which effectively replaces the "&" character.
+		}
+		return $processed_css;
+	}
+
+	/**
 	 * Returns the global styles custom css.
 	 *
 	 * @since 6.2.0
 	 *
-	 * @return string
+	 * @return string The global styles custom CSS.
 	 */
 	public function get_custom_css() {
 		// Add the global styles root CSS.
@@ -1114,6 +1119,7 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
+
 		return $stylesheet;
 	}
 
@@ -2330,11 +2336,13 @@ class WP_Theme_JSON_Gutenberg {
 						if ( empty( $style_variation_node[ $feature_name ] ) ) {
 							continue;
 						}
+						// If feature selector includes block classname, remove it but leave the whitespace in.
+						$shortened_feature_selector = str_replace( $block_metadata['selector'] . ' ', ' ', $feature_selector );
 						// Prepend the variation selector to the feature selector.
-						$split_feature_selectors    = explode( ',', $feature_selector );
+						$split_feature_selectors    = explode( ',', $shortened_feature_selector );
 						$feature_selectors          = array_map(
 							static function( $split_feature_selector ) use ( $clean_style_variation_selector ) {
-								return $clean_style_variation_selector . trim( $split_feature_selector );
+								return $clean_style_variation_selector . $split_feature_selector;
 							},
 							$split_feature_selectors
 						);
@@ -2344,10 +2352,10 @@ class WP_Theme_JSON_Gutenberg {
 						$new_feature_declarations = static::compute_style_properties( array( $feature_name => $style_variation_node[ $feature_name ] ), $settings, null, $this->theme_json );
 
 						/*
-						* Merge new declarations with any that already exist for
-						* the feature selector. This may occur when multiple block
-						* support features use the same custom selector.
-						*/
+						 * Merge new declarations with any that already exist for
+						 * the feature selector. This may occur when multiple block
+						 * support features use the same custom selector.
+						 */
 						if ( isset( $style_variation_declarations[ $combined_feature_selectors ] ) ) {
 							$style_variation_declarations[ $combined_feature_selectors ] = array_merge( $style_variation_declarations[ $combined_feature_selectors ], $new_feature_declarations );
 						} else {
@@ -2355,11 +2363,10 @@ class WP_Theme_JSON_Gutenberg {
 						}
 
 						/*
-						* Remove the feature from the variation's node now the
-						* styles will be included under the feature level selector.
-						*/
+						 * Remove the feature from the variation's node now the
+						 * styles will be included under the feature level selector.
+						 */
 						unset( $style_variation_node[ $feature_name ] );
-
 					}
 				}
 				// Compute declarations for remaining styles not covered by feature level selectors.
@@ -2425,8 +2432,19 @@ class WP_Theme_JSON_Gutenberg {
 		$declarations_duotone = array();
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
+				/*
+				 * 'unset' filters happen when a filter is unset
+				 * in the site-editor UI. Because the 'unset' value
+				 * in the user origin overrides the value in the
+				 * theme origin, we can skip rendering anything
+				 * here as no filter needs to be applied anymore.
+				 * So only add declarations to with values other
+				 * than 'unset'.
+				 */
+				if ( 'unset' !== $declaration['value'] ) {
+					$declarations_duotone[] = $declaration;
+				}
 				unset( $declarations[ $index ] );
-				$declarations_duotone[] = $declaration;
 			}
 		}
 
@@ -2559,13 +2577,13 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @param array      $data    The data to inspect.
-	 * @param bool|array $path    Boolean or path to a boolean.
-	 * @param bool       $default Default value if the referenced path is missing.
-	 *                            Default false.
+	 * @param array      $data          The data to inspect.
+	 * @param bool|array $path          Boolean or path to a boolean.
+	 * @param bool       $default_value Default value if the referenced path is missing.
+	 *                                  Default false.
 	 * @return bool Value of boolean metadata.
 	 */
-	protected static function get_metadata_boolean( $data, $path, $default = false ) {
+	protected static function get_metadata_boolean( $data, $path, $default_value = false ) {
 		if ( is_bool( $path ) ) {
 			return $path;
 		}
@@ -2577,7 +2595,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		return $default;
+		return $default_value;
 	}
 
 	/**
@@ -2992,18 +3010,9 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $paths ) {
-			foreach ( $paths as $path ) {
-				$value = _wp_array_get( $input, $path, array() );
-				if (
-					isset( $value ) &&
-					! is_array( $value ) &&
-					static::is_safe_css_declaration( $property, $value )
-				) {
-					_wp_array_set( $output, $path, $value );
-				}
-			}
-		}
+		// Ensure indirect properties not included in any `PRESETS_METADATA` value are allowed.
+		static::remove_indirect_properties( $input, $output );
+
 		return $output;
 	}
 
@@ -3035,18 +3044,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// Ensure indirect properties not handled by `compute_style_properties` are allowed.
-		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $paths ) {
-			foreach ( $paths as $path ) {
-				$value = _wp_array_get( $input, $path, array() );
-				if (
-					isset( $value ) &&
-					! is_array( $value ) &&
-					static::is_safe_css_declaration( $property, $value )
-				) {
-					_wp_array_set( $output, $path, $value );
-				}
-			}
-		}
+		static::remove_indirect_properties( $input, $output );
 
 		return $output;
 	}
@@ -3064,6 +3062,29 @@ class WP_Theme_JSON_Gutenberg {
 		$style_to_validate = $property_name . ': ' . $property_value;
 		$filtered          = esc_html( safecss_filter_attr( $style_to_validate ) );
 		return ! empty( trim( $filtered ) );
+	}
+
+	/**
+	 * Removes indirect properties from the given input node and
+	 * sets in the given output node.
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param array $input  Node to process.
+	 * @param array $output The processed node. Passed by reference.
+	 */
+	private static function remove_indirect_properties( $input, &$output ) {
+		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $paths ) {
+			foreach ( $paths as $path ) {
+				$value = _wp_array_get( $input, $path );
+				if (
+					is_string( $value ) &&
+					static::is_safe_css_declaration( $property, $value )
+				) {
+					_wp_array_set( $output, $path, $value );
+				}
+			}
+		}
 	}
 
 	/**

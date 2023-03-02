@@ -40,6 +40,10 @@ module.exports = {
 		'@emotion/jest/serializer',
 		'snapshot-diff/serializer',
 	],
+	snapshotFormat: {
+		escapeString: false,
+		printBasicPrototype: false,
+	},
 	watchPlugins: [
 		'jest-watch-typeahead/filename',
 		'jest-watch-typeahead/testname',

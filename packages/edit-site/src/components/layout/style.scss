@@ -51,9 +51,6 @@
 .edit-site-layout__content {
 	flex-grow: 1;
 	display: flex;
-
-	// Hide scrollbars during the edit/view animation.
-	overflow: hidden;
 }
 
 .edit-site-layout__sidebar {

@@ -22,6 +22,20 @@ $preview-image-height: 140px;
 		width: 90vw;
 		max-width: $modal-min-width;
 	}
+
+	.show-icon-labels & {
+		.components-button.has-icon {
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			// Uses ::before as ::after is already used for active tab styling.
+			&::before {
+				content: attr(aria-label);
+			}
+		}
+	}
 }
 
 // Provides positioning context for reset button. Without this then when an
@@ -72,7 +86,7 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__search-error {
-	margin: -$grid-unit-20*0.5 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
+	margin: -$grid-unit-20 * 0.5 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
 }
 
 .block-editor-link-control__search-actions {
@@ -103,7 +117,7 @@ $preview-image-height: 140px;
 	}
 
 	&::before {
-		height: $grid-unit-20*0.5;
+		height: $grid-unit-20 * 0.5;
 		top: 0;
 		bottom: auto;
 	}
@@ -123,7 +137,7 @@ $preview-image-height: 140px;
 
 .block-editor-link-control__search-results {
 	margin: 0;
-	padding: $grid-unit-20*0.5 $grid-unit-20 $grid-unit-20*0.5;
+	padding: $grid-unit-20 * 0.5 $grid-unit-20 $grid-unit-20 * 0.5;
 	max-height: 200px;
 	overflow-y: auto; // allow results list to scroll
 
@@ -223,7 +237,6 @@ $preview-image-height: 140px;
 		width: 32px;
 		max-height: 32px;
 	}
-
 
 	.block-editor-link-control__search-item-info,
 	.block-editor-link-control__search-item-title {
@@ -344,16 +357,13 @@ $preview-image-height: 140px;
 	width: 100%;
 }
 
-
 .block-editor-link-control__search-item.is-fetching {
-
 	.block-editor-link-control__search-item-description {
 		&::before,
 		&::after {
 			animation: loadingpulse 1s linear infinite;
 			animation-delay: 0.5s; // avoid animating for fast network responses
 		}
-
 	}
 
 	.block-editor-link-control__search-item-image {
@@ -403,7 +413,7 @@ $preview-image-height: 140px;
 	&::before {
 		content: "";
 		position: absolute;
-		top: -#{$block-selected-child-margin*2};
+		top: -#{$block-selected-child-margin * 2};
 		left: 0;
 		display: block;
 		width: 100%;

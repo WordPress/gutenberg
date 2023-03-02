@@ -1,0 +1,20 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"__experimental": true,
+	"name": "core/post-time-to-read",
+	"title": "Time To Read",
+	"category": "theme",
+	"description": "Show minutes required to finish reading the post.",
+	"textdomain": "default",
+	"usesContext": [ "postId", "postType" ],
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"html": false,
+		"multiple": false
+	}
+}

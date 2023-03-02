@@ -60,10 +60,6 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point.
 
-		if ( isAndroid() ) {
-			await editorPage.dismissKeyboard();
-		}
-
 		const titleElement = await editorPage.getTitleElement( {
 			autoscroll: true,
 		} );

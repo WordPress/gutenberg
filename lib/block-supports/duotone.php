@@ -311,8 +311,8 @@ function gutenberg_get_duotone_filter_id( $preset ) {
  * @return string        Duotone CSS filter property url value.
  */
 function gutenberg_get_duotone_filter_property( $preset ) {
-	if ( isset( $preset['colors'] ) && 'unset' === $preset['colors'] ) {
-		return 'none';
+	if ( isset( $preset['colors'] ) && is_string( $preset['colors'] ) ) {
+		return $preset['colors'];
 	}
 	$filter_id = gutenberg_get_duotone_filter_id( $preset );
 	return "url('#" . $filter_id . "')";
@@ -445,22 +445,53 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$colors          = $block['attrs']['style']['color']['duotone'];
-	$filter_key      = is_array( $colors ) ? implode( '-', $colors ) : $colors;
-	$filter_preset   = array(
-		'slug'   => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
-		'colors' => $colors,
-	);
-	$filter_property = gutenberg_get_duotone_filter_property( $filter_preset );
-	$filter_id       = gutenberg_get_duotone_filter_id( $filter_preset );
+	// Possible values for duotone attribute:
+	// 1. Array of colors - e.g. array('#000000', '#ffffff').
+	// 2. Variable for an existing Duotone preset - e.g. 'var:preset|duotone|green-blue'.
+	// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
+	$duotone_attr = $block['attrs']['style']['color']['duotone'];
 
-	$scope     = '.' . $filter_id;
-	$selectors = explode( ',', $duotone_support );
-	$scoped    = array();
-	foreach ( $selectors as $sel ) {
-		$scoped[] = $scope . ' ' . trim( $sel );
+	$is_preset = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === 0;
+	$is_css    = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === false;
+	$is_custom = is_array( $duotone_attr );
+
+	// Generate the pieces needed for rendering a duotone to the page.
+	if ( $is_preset ) {
+		// Extract the slug from the preset variable string.
+		$slug = str_replace( 'var:preset|duotone|', '', $duotone_attr );
+
+		// Utilize existing preset CSS custom property.
+		$filter_property = "var(--wp--preset--duotone--$slug)";
+	} elseif ( $is_css ) {
+		// Build a unique slug for the filter based on the CSS value.
+		$slug = wp_unique_id( sanitize_key( $duotone_attr . '-' ) );
+
+		// Pass through the CSS value.
+		$filter_property = $duotone_attr;
+	} elseif ( $is_custom ) {
+		// Build a unique slug for the filter based on the array of colors.
+		$slug = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
+
+		// This has the same shape as a preset, so it can be used in place of a
+		// preset when getting the filter property and SVG filter.
+		$filter_data = array(
+			'slug'   => $slug,
+			'colors' => $duotone_attr,
+		);
+
+		// Build a customized CSS filter property for unique slug.
+		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
+
+		// SVG will be output on the page later.
+		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
 	}
-	$selector = implode( ', ', $scoped );
+
+	// - Applied as a class attribute to the block wrapper.
+	// - Used as a selector to apply the filter to the block.
+	$filter_id = gutenberg_get_duotone_filter_id( array( 'slug' => $slug ) );
+
+	// Build the CSS selectors to which the filter will be applied.
+	$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_support );
 
 	// Calling gutenberg_style_engine_get_stylesheet_from_css_rules ensures that
 	// the styles are rendered in an inline for block supports because we're
@@ -483,8 +514,8 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		)
 	);
 
-	if ( 'unset' !== $colors ) {
-		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_preset );
+	// If we needed to generate an SVG, output it on the page.
+	if ( isset( $filter_svg ) ) {
 		add_action(
 			'wp_footer',
 			static function () use ( $filter_svg, $selector ) {

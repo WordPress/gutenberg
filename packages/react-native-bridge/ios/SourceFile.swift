@@ -29,6 +29,10 @@ public struct SourceFile {
 }
 
 extension SourceFile {
+    public func getName() -> String {
+        return self.name
+    }
+    
     public func jsScript(with argument: String? = nil) throws -> WKUserScript {
         let content = try getContent()
         let formatted = String(format: content, argument ?? [])
@@ -53,4 +57,5 @@ extension SourceFile {
     static let preventAutosaves = SourceFile(name: "prevent-autosaves", type: .js)
     static let gutenbergObserver = SourceFile(name: "gutenberg-observer", type: .js)
     static let supportedBlocks = SourceFile(name: "supported-blocks", type: .json)
+    static let editorBehavior = SourceFile(name: "editor-behavior-overrides", type: .js)
 }

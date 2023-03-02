@@ -91,6 +91,9 @@ function DropdownMenu( dropdownMenuProps ) {
 						onToggle();
 					}
 				};
+				const { as: Toggle = Button, ...restToggleProps } =
+					toggleProps ?? {};
+
 				const mergedToggleProps = mergeProps(
 					{
 						className: classnames(
@@ -100,11 +103,11 @@ function DropdownMenu( dropdownMenuProps ) {
 							}
 						),
 					},
-					toggleProps
+					restToggleProps
 				);
 
 				return (
-					<Button
+					<Toggle
 						{ ...mergedToggleProps }
 						icon={ icon }
 						onClick={ ( event ) => {
@@ -126,7 +129,7 @@ function DropdownMenu( dropdownMenuProps ) {
 						showTooltip={ toggleProps?.showTooltip ?? true }
 					>
 						{ mergedToggleProps.children }
-					</Button>
+					</Toggle>
 				);
 			} }
 			renderContent={ ( props ) => {
