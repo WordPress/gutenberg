@@ -16,6 +16,7 @@
 -   `Higher Order` -- `with-constrained-tabbing`: Convert to TypeScript ([#48162](https://github.com/WordPress/gutenberg/pull/48162)).
 -   `Autocomplete`: Convert to TypeScript ([#47751](https://github.com/WordPress/gutenberg/pull/47751)).
 -   `Autocomplete`: avoid calling setState on input ([#48565](https://github.com/WordPress/gutenberg/pull/48565)).
+-   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
 
 ## 23.4.0 (2023-02-15)
 
@@ -50,7 +51,6 @@
 -   `Navigator`: add more pattern matching tests, refine existing tests ([47910](https://github.com/WordPress/gutenberg/pull/47910)).
 -   `ToolsPanel`: Refactor Storybook examples to TypeScript ([47944](https://github.com/WordPress/gutenberg/pull/47944)).
 -   `ToolsPanel`: Refactor unit tests to TypeScript ([48275](https://github.com/WordPress/gutenberg/pull/48275)).
--   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
 
 ## 23.3.0 (2023-02-01)
 
