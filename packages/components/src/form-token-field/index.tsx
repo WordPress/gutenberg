@@ -75,7 +75,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	} = props;
 
 	if ( ! __nextHasNoMarginBottom ) {
-		deprecated( 'Bottom margin styles for wp.blockEditor.URLInput', {
+		deprecated( 'Bottom margin styles for wp.components.FormTokenField', {
 			since: '6.2',
 			version: '6.5',
 			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
@@ -732,7 +732,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			{ __experimentalShowHowTo && (
 				<StyledHelp
 					id={ `components-form-token-suggestions-howto-${ instanceId }` }
-					className="components-base-control__help"
+					className="components-form-token-field__help"
 					__nextHasNoMarginBottom
 				>
 					{ tokenizeOnSpace
