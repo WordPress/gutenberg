@@ -106,6 +106,7 @@ function NavigationMenuSelector( {
 		isCreatingMenu,
 		createNavigationMenuIsError,
 		createNavigationMenuIsSuccess,
+		setIsCreatingMenu
 	] );
 
 	const NavigationMenuSelectorDropdown = (
