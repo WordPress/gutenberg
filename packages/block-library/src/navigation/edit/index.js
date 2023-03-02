@@ -441,7 +441,7 @@ function Navigation( {
 				selectBlock( clientId );
 			}
 		},
-		[ selectBlock, clientId ]
+		[ selectBlock, clientId, setRef ]
 	);
 
 	const onSelectClassicMenu = async ( classicMenu ) => {
