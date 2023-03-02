@@ -2,12 +2,9 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
-import {
-	store as blockEditorStore,
-	BlockEditorProvider,
-} from '@wordpress/block-editor';
+import { BlockEditorProvider } from '@wordpress/block-editor';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 
@@ -20,19 +17,10 @@ const NAVIGATION_MENUS_QUERY = [ { per_page: -1, status: 'publish' } ];
 
 export default function NavigationInspector( { onSelect } ) {
 	const {
-		selectedNavigationBlockId,
-		clientIdToRef,
 		navigationMenus,
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
-		firstNavigationBlockId,
 	} = useSelect( ( select ) => {
-		const {
-			__experimentalGetActiveBlockIdByBlockNames,
-			__experimentalGetGlobalBlocksByName,
-			getBlock,
-		} = select( blockEditorStore );
-
 		const { getEntityRecords, hasFinishedResolution, isResolving } =
 			select( coreStore );
 
@@ -41,22 +29,7 @@ export default function NavigationInspector( { onSelect } ) {
 			'wp_navigation',
 			NAVIGATION_MENUS_QUERY[ 0 ],
 		];
-
-		// Get the active Navigation block (if present).
-		const selectedNavId =
-			__experimentalGetActiveBlockIdByBlockNames( 'core/navigation' );
-
-		// Get all Navigation blocks currently within the editor canvas.
-		const navBlockIds =
-			__experimentalGetGlobalBlocksByName( 'core/navigation' );
-		const idToRef = {};
-		navBlockIds.forEach( ( id ) => {
-			idToRef[ id ] = getBlock( id )?.attributes?.ref;
-		} );
 		return {
-			selectedNavigationBlockId: selectedNavId,
-			firstNavigationBlockId: navBlockIds?.[ 0 ],
-			clientIdToRef: idToRef,
 			navigationMenus: getEntityRecords( ...navigationMenusQuery ),
 			isResolvingNavigationMenus: isResolving(
 				'getEntityRecords',
@@ -69,33 +42,25 @@ export default function NavigationInspector( { onSelect } ) {
 		};
 	}, [] );
 
-	const firstNavRefInTemplate = clientIdToRef[ firstNavigationBlockId ];
-	const firstNavigationMenuRef = navigationMenus?.[ 0 ]?.id;
-
-	// Default Navigation Menu is either:
-	// - the Navigation Menu referenced by the first Nav block within the template.
-	// - the first of the available Navigation Menus (`wp_navigation`) posts.
-	const defaultNavigationMenuId =
-		firstNavRefInTemplate || firstNavigationMenuRef;
-
-	// The Navigation Menu manually selected by the user within the Nav inspector.
-	const [ currentMenuId, setCurrentMenuId ] = useState(
-		firstNavRefInTemplate
+	// This is copied from the edit component of the Navigation block.
+	const fallbackNavigationMenus = useMemo(
+		() =>
+			navigationMenus
+				?.filter( ( menu ) => menu.status === 'publish' )
+				?.sort( ( menuA, menuB ) => {
+					const menuADate = new Date( menuA.date );
+					const menuBDate = new Date( menuB.date );
+					return menuADate.getTime() > menuBDate.getTime(); // This condition is the other way in the navigation block... hmmmm...
+				} ),
+		[ navigationMenus ]
 	);
+	const fallbackNavigationId = fallbackNavigationMenus?.[ 0 ]?.id;
 
-	// If a Nav block is selected within the canvas then set the
-	// Navigation Menu referenced by it's `ref` attribute  to be
-	// active within the Navigation sidebar.
-	useEffect( () => {
-		if ( selectedNavigationBlockId ) {
-			setCurrentMenuId( clientIdToRef[ selectedNavigationBlockId ] );
-		}
-	}, [ selectedNavigationBlockId ] );
-
+	// Do we need to fetch the fallback menu again, or can we do this in the useSelect above?
 	const [ innerBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_navigation',
-		{ id: currentMenuId || defaultNavigationMenuId }
+		{ id: fallbackNavigationId }
 	);
 
 	const { isLoadingInnerBlocks, hasLoadedInnerBlocks } = useSelect(
@@ -105,19 +70,15 @@ export default function NavigationInspector( { onSelect } ) {
 				isLoadingInnerBlocks: isResolving( 'getEntityRecord', [
 					'postType',
 					'wp_navigation',
-					currentMenuId || defaultNavigationMenuId,
+					fallbackNavigationId,
 				] ),
 				hasLoadedInnerBlocks: hasFinishedResolution(
 					'getEntityRecord',
-					[
-						'postType',
-						'wp_navigation',
-						currentMenuId || defaultNavigationMenuId,
-					]
+					[ 'postType', 'wp_navigation', fallbackNavigationId ]
 				),
 			};
 		},
-		[ currentMenuId, defaultNavigationMenuId ]
+		[ fallbackNavigationId ]
 	);
 
 	const isLoading = ! ( hasResolvedNavigationMenus && hasLoadedInnerBlocks );
