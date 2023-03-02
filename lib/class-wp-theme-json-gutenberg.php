@@ -547,7 +547,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Options that settings.appearanceTools enables.
 	 *
 	 * @since 6.0.0
-	 * @since 6.2.0 Added `position.fixed` and `position.sticky`.
+	 * @since 6.2.0 Added `dimensions.minHeight` and `position.sticky`.
 	 * @var array
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
@@ -557,7 +557,12 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'border', 'width' ),
 		array( 'color', 'link' ),
 		array( 'dimensions', 'minHeight' ),
+		// BEGIN EXPERIMENTAL.
+		// Allow `position.fixed` to be opted-in by default.
+		// Sticky position support was backported to WordPress 6.2 in https://core.trac.wordpress.org/ticket/57618.
+		// While `fixed` was included as a valid setting, exposing it by default is still experimental.
 		array( 'position', 'fixed' ),
+		// END EXPERIMENTAL.
 		array( 'position', 'sticky' ),
 		array( 'spacing', 'blockGap' ),
 		array( 'spacing', 'margin' ),
