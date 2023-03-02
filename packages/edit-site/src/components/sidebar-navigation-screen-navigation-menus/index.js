@@ -79,22 +79,8 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		{ id: firstNavigationMenu }
 	);
 
-	const { hasLoadedInnerBlocks } = useSelect(
-		( select ) => {
-			const { hasFinishedResolution } = select( coreStore );
-			return {
-				hasLoadedInnerBlocks: hasFinishedResolution(
-					'getEntityRecord',
-					[ 'postType', 'wp_navigation', firstNavigationMenu ]
-				),
-			};
-		},
-		[ firstNavigationMenu ]
-	);
-
-	const isLoading = ! ( hasResolvedNavigationMenus && hasLoadedInnerBlocks );
+	const isLoading = ! hasResolvedNavigationMenus;
 	const hasNavigationMenus = !! navigationMenus?.length;
-	const publishedInnerBlocks = hasNavigationMenus ? innerBlocks : [];
 
 	const onSelect = useCallback(
 		( selectedBlock ) => {
@@ -140,7 +126,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 
 	return (
 		<BlockEditorProvider
-			value={ publishedInnerBlocks }
+			value={ innerBlocks }
 			onChange={ onChange }
 			onInput={ onInput }
 		>
@@ -157,10 +143,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 				}
 			>
 				<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
-					<NavigationMenuContent
-						innerBlocks={ publishedInnerBlocks }
-						onSelect={ onSelect }
-					/>
+					<NavigationMenuContent onSelect={ onSelect } />
 				</div>
 			</SidebarNavigationScreenWrapper>
 		</BlockEditorProvider>
