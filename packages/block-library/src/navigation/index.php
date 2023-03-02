@@ -344,7 +344,6 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 		return;
 	}
 
-
 	// Create a new navigation menu from the classic menu.
 	$wp_insert_post_result = wp_insert_post(
 		array(
@@ -356,9 +355,6 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 		),
 		true // So that we can check whether the result is an error.
 	);
-
-
-
 
 	if ( is_wp_error( $wp_insert_post_result ) ) {
 		return;

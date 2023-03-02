@@ -95,7 +95,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$fallback = gutenberg_block_core_navigation_create_fallback();
 
 		$this->assertEquals( 'wp_navigation', $fallback->post_type );
-		$this->assertEquals( 'Navigation', $fallback->post_title, );
+		$this->assertEquals( 'Navigation', $fallback->post_title );
 		$this->assertEquals( '<!-- wp:page-list /-->', $fallback->post_content );
 		$this->assertEquals( 'publish', $fallback->post_status );
 
@@ -154,6 +154,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 	public function test_should_return_blocks_from_most_recently_created_navigation() {
 
+		// Create a fallback navigation.
 		self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
@@ -162,7 +163,8 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 			)
 		);
 
-		$most_recently_published_nav = self::factory()->post->create_and_get(
+		// Create another fallback navigation.
+		self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => 'Existing Navigation Menu 2',
@@ -199,7 +201,8 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 	public function test_should_filter_out_empty_blocks_from_fallbacks() {
 
-		$navigation_post = self::factory()->post->create_and_get(
+		// Create a fallback navigation.
+		self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
 				'post_title'   => 'Existing Navigation Menu',
@@ -221,7 +224,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$null_blocks = array_filter(
 			$fallback_blocks,
 			function( $block ) {
-				return $block['blockName'] === null;
+				return null === $block['blockName'];
 			}
 		);
 		$this->assertEmpty( $null_blocks );
