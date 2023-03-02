@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import {
 	Button,
+	Disabled,
 	TabPanel,
 	createSlotFill,
 	__experimentalUseSlotFills as useSlotFills,
@@ -20,9 +21,13 @@ import {
 	createBlock,
 } from '@wordpress/blocks';
 import {
-	BlockPreview,
+	BlockList,
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+	__unstableEditorStyles as EditorStyles,
+	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import {
 	useResizeObserver,
@@ -38,7 +43,9 @@ import { ESCAPE } from '@wordpress/keycodes';
  */
 import { unlock } from '../../private-apis';
 
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
+	blockEditorPrivateApis
+);
 
 const SLOT_FILL_NAME = 'EditSiteStyleBook';
 const { Slot: StyleBookSlot, Fill: StyleBookFill } =
@@ -118,6 +125,15 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 		[ examples ]
 	);
 
+	const originalSettings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings(),
+		[]
+	);
+	const settings = useMemo(
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		[ originalSettings ]
+	);
+
 	function closeOnEscape( event ) {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
@@ -156,12 +172,51 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 					tabs={ tabs }
 				>
 					{ ( tab ) => (
-						<Examples
-							examples={ examples }
-							category={ tab.name }
-							isSelected={ isSelected }
-							onSelect={ onSelect }
-						/>
+						<Iframe
+							head={
+								<>
+									<EditorStyles styles={ settings.styles } />
+									<style>{
+										// Forming a "block formatting context" to prevent margin collapsing.
+										// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+										`.is-root-container { display: flow-root; }
+										body { position: relative; padding: 32px !important; }
+
+										.edit-site-style-book__example {
+											background: none;
+											border-radius: 2px;
+											border: none;
+											color: inherit;
+											cursor: pointer;
+											display: flex;
+											flex-direction: column;
+											gap: 40px;
+											margin-bottom: 40px;
+											padding: 16px;
+											width: 100%;
+											box-sizing: border-box;
+										}
+
+										.edit-site-style-book__example.is-selected {
+											box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+										}
+
+										.edit-site-style-book.is-wide .edit-site-style-book__example {
+											flex-direction: row;
+										}
+										`
+									}</style>
+								</>
+							}
+							texIndex={ -1 }
+						>
+							<Examples
+								examples={ examples }
+								category={ tab.name }
+								isSelected={ isSelected }
+								onSelect={ onSelect }
+							/>
+						</Iframe>
 					) }
 				</TabPanel>
 			</section>
@@ -187,34 +242,46 @@ const Examples = memo( ( { examples, category, isSelected, onSelect } ) => (
 	</div>
 ) );
 
-const Example = memo( ( { title, blocks, isSelected, onClick } ) => (
-	<button
-		className={ classnames( 'edit-site-style-book__example', {
-			'is-selected': isSelected,
-		} ) }
-		aria-label={ sprintf(
-			// translators: %s: Title of a block, e.g. Heading.
-			__( 'Open %s styles in Styles panel' ),
-			title
-		) }
-		onClick={ onClick }
-	>
-		<span className="edit-site-style-book__example-title">{ title }</span>
-		<div className="edit-site-style-book__example-preview">
-			<BlockPreview
-				blocks={ blocks }
-				viewportWidth={ 0 }
-				additionalStyles={ [
-					{
-						css:
-							'.wp-block:first-child { margin-top: 0; }' +
-							'.wp-block:last-child { margin-bottom: 0; }',
-					},
-				] }
-			/>
+const Example = memo( ( { title, blocks, isSelected, onClick } ) => {
+	const originalSettings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings(),
+		[]
+	);
+	const settings = useMemo(
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		[ originalSettings ]
+	);
+
+	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+	return (
+		<div
+			className={ classnames( 'edit-site-style-book__example', {
+				'is-selected': isSelected,
+			} ) }
+			aria-label={ sprintf(
+				// translators: %s: Title of a block, e.g. Heading.
+				__( 'Open %s styles in Styles panel' ),
+				title
+			) }
+			onClick={ onClick }
+		>
+			<span className="edit-site-style-book__example-title">
+				{ title }
+			</span>
+			<div className="edit-site-style-book__example-preview">
+				<Disabled className="edit-site-style-book__example-preview__content">
+					<ExperimentalBlockEditorProvider
+						value={ Array.isArray( blocks ) ? blocks : [ blocks ] }
+						settings={ settings }
+					>
+						<BlockList renderAppender={ false } />
+					</ExperimentalBlockEditorProvider>
+				</Disabled>
+			</div>
 		</div>
-	</button>
-) );
+	);
+	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+} );
 
 function useHasStyleBook() {
 	const fills = useSlotFills( SLOT_FILL_NAME );
