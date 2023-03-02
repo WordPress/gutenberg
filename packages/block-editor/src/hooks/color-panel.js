@@ -17,6 +17,7 @@ function getComputedStyle( node ) {
 }
 
 export default function ColorPanel( {
+	isSelected,
 	enableAlpha = false,
 	settings,
 	clientId,
@@ -29,68 +30,66 @@ export default function ColorPanel( {
 	const definedColors = settings.filter( ( setting ) => setting?.colorValue );
 
 	useEffect( () => {
+		// If contrast checking is disabled, don't do anything.
 		if ( ! enableContrastChecking ) {
 			return;
 		}
 
-		if ( ! definedColors.length ) {
-			if ( detectedBackgroundColor ) {
-				setDetectedBackgroundColor();
-			}
-			if ( detectedColor ) {
-				setDetectedColor();
-			}
-			if ( detectedLinkColor ) {
-				setDetectedColor();
-			}
+		// Try to detect the colors for the text, link and backrgound based on the
+		// current ref.
+		setDetectedColor( getComputedStyle( ref.current ).color );
 
-			setDetectedColor( getComputedStyle( ref.current ).color );
+		const firstLinkElement = ref.current?.querySelector( 'a' );
+		if ( firstLinkElement && !! firstLinkElement.innerText ) {
+			setDetectedLinkColor( getComputedStyle( firstLinkElement ).color );
+		}
 
-			const firstLinkElement = ref.current?.querySelector( 'a' );
-			if ( firstLinkElement && !! firstLinkElement.innerText ) {
-				setDetectedLinkColor(
-					getComputedStyle( firstLinkElement ).color
-				);
-			}
-
-			let backgroundColorNode = ref.current;
-			let backgroundColor =
+		// If the current node has a transparent background color, we need to
+		// find the first parent node with a non-transparent background color.
+		let backgroundColorNode = ref.current;
+		let backgroundColor =
+			getComputedStyle( backgroundColorNode ).backgroundColor;
+		while (
+			backgroundColor === 'rgba(0, 0, 0, 0)' &&
+			backgroundColorNode.parentNode &&
+			backgroundColorNode.parentNode.nodeType ===
+				backgroundColorNode.parentNode.ELEMENT_NODE
+		) {
+			backgroundColorNode = backgroundColorNode.parentNode;
+			backgroundColor =
 				getComputedStyle( backgroundColorNode ).backgroundColor;
-			while (
-				backgroundColor === 'rgba(0, 0, 0, 0)' &&
-				backgroundColorNode.parentNode &&
-				backgroundColorNode.parentNode.nodeType ===
-					backgroundColorNode.parentNode.ELEMENT_NODE
-			) {
-				backgroundColorNode = backgroundColorNode.parentNode;
-				backgroundColor =
-					getComputedStyle( backgroundColorNode ).backgroundColor;
-			}
-
-			setDetectedBackgroundColor( backgroundColor );
-			return;
 		}
 
-		if ( ! ref.current ) {
-			return;
-		}
+		setDetectedBackgroundColor( backgroundColor );
 
-		definedColors.forEach( ( element ) => {
-			if ( 'Background' === element.label ) {
-				setDetectedBackgroundColor( element.colorValue );
-			} else if ( 'Text' === element.label ) {
-				setDetectedColor( element.colorValue );
-			} else if ( 'Link' === element.label ) {
-				setDetectedLinkColor( element.colorValue );
-			}
-		} );
+		// If colors are defined, overwrite detected colors with the defined colors.
+		if ( definedColors.length ) {
+			definedColors.forEach( ( element ) => {
+				if ( 'Background' === element.label ) {
+					if ( element.colorValue ) {
+						setDetectedBackgroundColor( element.colorValue );
+					}
+				} else if ( 'Text' === element.label ) {
+					if ( element.colorValue ) {
+						setDetectedColor( element.colorValue );
+					}
+				} else if ( 'Link' === element.label ) {
+					if ( element.colorValue ) {
+						setDetectedLinkColor( element.colorValue );
+					}
+				}
+			} );
+		}
 	}, [
 		enableContrastChecking,
 		definedColors,
 		ref,
 		detectedBackgroundColor,
 		detectedColor,
+		enableAlpha,
 		detectedLinkColor,
+		clientId,
+		isSelected,
 	] );
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
