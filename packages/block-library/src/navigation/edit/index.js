@@ -560,7 +560,11 @@ function Navigation( {
 				setDetectedOverlayBackgroundColor
 			);
 		}
-	} );
+	}, [
+		enableContrastChecking,
+		overlayTextColor.color,
+		overlayBackgroundColor.color,
+	] );
 
 	useEffect( () => {
 		if ( ! isSelected && ! isInnerBlockSelected ) {
