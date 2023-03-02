@@ -16,6 +16,19 @@ import NavigationMenuContent from './navigation-menu-content';
 import SidebarButton from '../sidebar-button';
 
 const NAVIGATION_MENUS_QUERY = { per_page: -1, status: 'publish' };
+const settings = {
+	allowedBlockTypes: [
+		'core/navigation-link',
+		'core/search',
+		'core/social-links',
+		'core/page-list',
+		'core/spacer',
+		'core/home-link',
+		'core/site-title',
+		'core/site-logo',
+		'core/navigation-submenu',
+	],
+};
 
 function SidebarNavigationScreenWrapper( { children, actions } ) {
 	return (
@@ -129,6 +142,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 			value={ innerBlocks }
 			onChange={ onChange }
 			onInput={ onInput }
+			settings={ settings }
 		>
 			<SidebarNavigationScreenWrapper
 				actions={
@@ -138,7 +152,10 @@ export default function SidebarNavigationScreenNavigationMenus() {
 						selectBlockOnInsert={ false }
 						shouldDirectInsert={ false }
 						__experimentalIsQuick
-						toggleProps={ { as: SidebarButton } }
+						toggleProps={ {
+							as: SidebarButton,
+							label: __( 'Add menu item' ),
+						} }
 					/>
 				}
 			>
