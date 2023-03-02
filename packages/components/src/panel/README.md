@@ -94,7 +94,7 @@ The CSS class to apply to the wrapper element.
 
 The content to display within the panel row.
 
--   Required: No
+-   Required: Yes
 
 ---
 
@@ -106,7 +106,7 @@ The `PanelBody` creates a collapsible container that can be toggled open or clos
 
 ###### `title`: `string`
 
-Title text. It shows even when it is closed.
+Title text. It shows even when the component is closed.
 
 -   Required: No
 
