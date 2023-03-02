@@ -124,3 +124,7 @@ export async function getLoadingDurations() {
 export function sum( arr ) {
 	return arr.reduce( ( a, b ) => a + b, 0 );
 }
+
+export function sequence( start, length ) {
+	return Array.from( { length }, ( _, i ) => i + start );
+}

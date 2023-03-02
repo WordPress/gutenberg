@@ -26,12 +26,10 @@ import {
 	deleteFile,
 	getTypingEventDurations,
 	getLoadingDurations,
+	sequence,
 } from './utils';
 
 jest.setTimeout( 1000000 );
-
-const sequence = ( start, length ) =>
-	Array.from( { length }, ( _, i ) => i + start );
 
 const results = {
 	serverResponse: [],
