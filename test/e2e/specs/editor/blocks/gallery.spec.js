@@ -47,7 +47,7 @@ test.describe( 'Gallery', () => {
 	} ) => {
 		await admin.createNewPost();
 
-		await pageUtils.setClipboardData( {
+		pageUtils.setClipboardData( {
 			plainText: `[gallery ids="${ uploadedMedia.id }"]`,
 		} );
 

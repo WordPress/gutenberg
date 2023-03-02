@@ -49,6 +49,7 @@ const EmbedControls = ( {
 					className="blocks-responsive"
 				>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Resize for smaller devices' ) }
 						checked={ allowResponsive }
 						help={ getResponsiveHelp }

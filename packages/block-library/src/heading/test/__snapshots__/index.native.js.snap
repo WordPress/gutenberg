@@ -2,6 +2,6 @@
 
 exports[`Heading block inserts block 1`] = `
 "<!-- wp:heading -->
-<h2 class=\\"wp-block-heading\\"></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->"
 `;

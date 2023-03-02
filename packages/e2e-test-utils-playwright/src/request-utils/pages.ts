@@ -39,7 +39,7 @@ export async function deletePage( this: RequestUtils, id: number ) {
 /**
  * Delete all pages using REST API.
  *
- * @param {RequestUtils} this
+ * @param this
  */
 export async function deleteAllPages( this: RequestUtils ) {
 	// List all pages.

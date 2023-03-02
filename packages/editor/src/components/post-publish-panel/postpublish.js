@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { PanelBody, Button, TextControl } from '@wordpress/components';
@@ -90,9 +85,9 @@ class PostPublishPanelPostpublish extends Component {
 
 	render() {
 		const { children, isScheduled, post, postType } = this.props;
-		const postLabel = get( postType, [ 'labels', 'singular_name' ] );
-		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
-		const addNewPostLabel = get( postType, [ 'labels', 'add_new_item' ] );
+		const postLabel = postType?.labels?.singular_name;
+		const viewPostLabel = postType?.labels?.view_item;
+		const addNewPostLabel = postType?.labels?.add_new_item;
 		const link =
 			post.status === 'future' ? getFuturePostUrl( post ) : post.link;
 		const addLink = addQueryArgs( 'post-new.php', {

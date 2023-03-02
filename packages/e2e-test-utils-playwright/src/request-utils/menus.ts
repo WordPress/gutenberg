@@ -56,8 +56,8 @@ export async function createClassicMenu( this: RequestUtils, name: string ) {
 /**
  * Create a navigation menu
  *
- * @param  menuData navigation menu post data.
- * @return {string} Menu content.
+ * @param menuData navigation menu post data.
+ * @return Menu content.
  */
 export async function createNavigationMenu(
 	this: RequestUtils,
@@ -103,4 +103,20 @@ export async function deleteAllMenus( this: RequestUtils ) {
 			} ) )
 		);
 	}
+}
+
+/**
+ * Get latest navigation menus
+ *
+ * @return {string} Menu content.
+ */
+export async function getNavigationMenus( this: RequestUtils ) {
+	const navigationMenus = await this.rest< NavigationMenu[] >( {
+		method: 'GET',
+		path: `/wp/v2/navigation/`,
+		data: {
+			status: 'publish',
+		},
+	} );
+	return navigationMenus;
 }

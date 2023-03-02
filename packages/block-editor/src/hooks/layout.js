@@ -128,13 +128,25 @@ export function useLayoutStyles( block = {}, selector ) {
 	return css;
 }
 
-function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
+function LayoutPanel( {
+	clientId,
+	setAttributes,
+	attributes,
+	name: blockName,
+} ) {
 	const { layout } = attributes;
 	const defaultThemeLayout = useSetting( 'layout' );
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().supportsLayout;
-	}, [] );
+	const { themeSupportsLayout, isContentLocked } = useSelect(
+		( select ) => {
+			const { getSettings, __unstableGetContentLockingParent } =
+				select( blockEditorStore );
+			return {
+				themeSupportsLayout: getSettings().supportsLayout,
+				isContentLocked: __unstableGetContentLockingParent( clientId ),
+			};
+		},
+		[ clientId ]
+	);
 
 	const layoutBlockSupport = getBlockSupport(
 		blockName,
@@ -199,6 +211,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					{ showInheritToggle && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								className="block-editor-hooks__toggle-control"
 								label={ __( 'Inner blocks use content width' ) }
 								checked={
@@ -254,7 +267,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			{ ! inherit && layoutType && (
+			{ ! inherit && ! isContentLocked && layoutType && (
 				<layoutType.toolBarControls
 					layout={ usedLayout }
 					onChange={ onChangeLayout }

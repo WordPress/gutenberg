@@ -359,8 +359,8 @@ describe( 'Multi-block selection', () => {
 		await page.mouse.up();
 		await page.keyboard.type( 'hi' );
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
-		"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
-		<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+		"<!-- wp:group {"layout":{"type":"constrained"}} -->
+		<div class="wp-block-group"><!-- wp:paragraph -->
 		<p>hih text in group</p>
 		<!-- /wp:paragraph --></div>
 		<!-- /wp:group -->"

@@ -165,6 +165,7 @@ export function LinkUI( props ) {
 			placement="bottom"
 			onClose={ props.onClose }
 			anchor={ props.anchor }
+			__unstableSlotName={ '__unstable-block-tools-after' }
 			shift
 		>
 			<LinkControl

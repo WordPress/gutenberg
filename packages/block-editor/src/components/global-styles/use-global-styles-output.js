@@ -790,9 +790,10 @@ export const toStyles = (
 				if ( duotoneDeclarations.length > 0 ) {
 					ruleset =
 						ruleset +
-						`${ duotoneSelector }{${ duotoneDeclarations.join(
-							';'
-						) };}`;
+						`${ scopeSelector(
+							selector,
+							duotoneSelector
+						) }{${ duotoneDeclarations.join( ';' ) };}`;
 				}
 			}
 
