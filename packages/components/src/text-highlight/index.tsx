@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createInterpolateElement } from '@wordpress/element';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -27,9 +28,10 @@ import type { TextHighlightProps } from './types';
 export const TextHighlight = ( props: TextHighlightProps ) => {
 	const { text = '', highlight = '' } = props;
 	const trimmedHighlightText = highlight.trim();
+	const plainText = stripHTML( text );
 
 	if ( ! trimmedHighlightText ) {
-		return <>{ text }</>;
+		return <>{ plainText }</>;
 	}
 
 	const regex = new RegExp(
@@ -37,9 +39,12 @@ export const TextHighlight = ( props: TextHighlightProps ) => {
 		'gi'
 	);
 
-	return createInterpolateElement( text.replace( regex, '<mark>$&</mark>' ), {
-		mark: <mark />,
-	} );
+	return createInterpolateElement(
+		plainText.replace( regex, '<mark>$&</mark>' ),
+		{
+			mark: <mark />,
+		}
+	);
 };
 
 export default TextHighlight;
