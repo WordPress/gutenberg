@@ -62,7 +62,7 @@ export interface Options {
 	enabled: boolean;
 }
 
-export interface QuerySelectResponse< Data > {
+interface QuerySelectResponse< Data > {
 	/** the requested selector return value */
 	data: Data;
 

@@ -7,16 +7,8 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import memoize from './memoize';
-import { Status } from './constants';
+import { Status, META_SELECTORS } from './constants';
 import type { EnrichedSelectors } from './types';
-
-export const META_SELECTORS = [
-	'getIsResolving',
-	'hasStartedResolution',
-	'hasFinishedResolution',
-	'isResolving',
-	'getCachedResolvers',
-];
 
 export interface QuerySelectResponse< Data > {
 	/** the requested selector return value */

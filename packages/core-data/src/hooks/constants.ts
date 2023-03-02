@@ -6,3 +6,11 @@ export const enum Status {
 }
 
 export const EMPTY_ARRAY = [];
+
+export const META_SELECTORS = [
+	'getIsResolving',
+	'hasStartedResolution',
+	'hasFinishedResolution',
+	'isResolving',
+	'getCachedResolvers',
+];
