@@ -39,7 +39,7 @@ const ALLOWED_BLOCKS = {
 	'core/page-list': [ 'core/page-list-item' ],
 };
 
-export default function NavigationMenu( { innerBlocks, onSelect } ) {
+export default function NavigationMenuContent( { innerBlocks, onSelect } ) {
 	const { clientIdsTree } = useSelect( ( select ) => {
 		const { __unstableGetClientIdsTree } = select( blockEditorStore );
 		return {
@@ -73,6 +73,7 @@ export default function NavigationMenu( { innerBlocks, onSelect } ) {
 				blocks={ clientIdsTree }
 				onSelect={ onSelect }
 				LeafMoreMenu={ LeafMoreMenu }
+				showAppender={ false }
 			/>
 			<div style={ { display: 'none' } }>
 				<BlockTools>

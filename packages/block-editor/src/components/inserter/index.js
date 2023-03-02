@@ -44,7 +44,7 @@ const defaultRenderToggle = ( {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
 
-	const { onClick, ...rest } = toggleProps;
+	const { as: Wrapper = Button, onClick, ...rest } = toggleProps;
 
 	// Handle both onClick functions from the toggle and the parent component.
 	function handleClick( event ) {
@@ -57,7 +57,7 @@ const defaultRenderToggle = ( {
 	}
 
 	return (
-		<Button
+		<Wrapper
 			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
