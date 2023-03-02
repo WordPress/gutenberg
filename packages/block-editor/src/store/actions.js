@@ -1183,8 +1183,8 @@ export const mergeBlocks =
  *
  * @param {string|string[]} clientIds      Client IDs of blocks to remove.
  * @param {boolean}         selectPrevious True if the previous block
- *                                         or the immediate parent,
- *                                         if no previous block exists,
+ *                                         or the immediate parent
+ *                                         (if no previous block exists)
  *                                         should be selected
  *                                         when a block is removed.
  */
