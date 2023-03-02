@@ -346,7 +346,16 @@ function Navigation( {
 				'publish'
 			);
 		}
-	}, [ hasResolvedNavigationMenus, hasUnsavedBlocks ] );
+	}, [
+		hasResolvedNavigationMenus,
+		hasUnsavedBlocks,
+		classicMenus,
+		convertClassicMenu,
+		createNavigationMenu,
+		fallbackNavigationMenus?.length,
+		isConvertingClassicMenu,
+		ref,
+	] );
 
 	const navRef = useRef();
 
