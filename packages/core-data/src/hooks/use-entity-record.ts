@@ -10,48 +10,7 @@ import { useMemo } from '@wordpress/element';
  */
 import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
-import type { Status } from './constants';
-
-export interface EntityRecordResolution< RecordType > {
-	/** The requested entity record */
-	record: RecordType | null;
-
-	/** The edited entity record */
-	editedRecord: Partial< RecordType >;
-
-	/** Apply local (in-browser) edits to the edited entity record */
-	edit: ( diff: Partial< RecordType > ) => void;
-
-	/** Persist the edits to the server */
-	save: () => Promise< void >;
-
-	/**
-	 * Is the record still being resolved?
-	 */
-	isResolving: boolean;
-
-	/**
-	 * Does the record have any local edits?
-	 */
-	hasEdits: boolean;
-
-	/**
-	 * Is the record resolved by now?
-	 */
-	hasResolved: boolean;
-
-	/** Resolution status */
-	status: Status;
-}
-
-export interface Options {
-	/**
-	 * Whether to run the query or short-circuit and return null.
-	 *
-	 * @default true
-	 */
-	enabled: boolean;
-}
+import type { Options, EntityRecordResolution } from './types';
 
 /**
  * Resolves the specified entity record.
@@ -160,7 +119,7 @@ export default function useEntityRecord< RecordType >(
 					...saveOptions,
 				} ),
 		} ),
-		[ recordId ]
+		[ editEntityRecord, kind, name, recordId, saveEditedEntityRecord ]
 	);
 
 	const { editedRecord, hasEdits } = useSelect(

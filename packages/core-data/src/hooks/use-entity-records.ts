@@ -9,28 +9,8 @@ import deprecated from '@wordpress/deprecated';
  */
 import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
-import type { Options } from './use-entity-record';
-import type { Status } from './constants';
-
-interface EntityRecordsResolution< RecordType > {
-	/** The requested entity record */
-	records: RecordType[] | null;
-
-	/**
-	 * Is the record still being resolved?
-	 */
-	isResolving: boolean;
-
-	/**
-	 * Is the record resolved by now?
-	 */
-	hasResolved: boolean;
-
-	/** Resolution status */
-	status: Status;
-}
-
-const EMPTY_ARRAY = [];
+import type { Options, EntityRecordsResolution } from './types';
+import { EMPTY_ARRAY } from './constants';
 
 /**
  * Resolves the specified entity records.

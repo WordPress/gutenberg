@@ -8,6 +8,7 @@ import { useSelect } from '@wordpress/data';
  */
 import memoize from './memoize';
 import { Status } from './constants';
+import type { EnrichedSelectors } from './types';
 
 export const META_SELECTORS = [
 	'getIsResolving',
@@ -17,7 +18,7 @@ export const META_SELECTORS = [
 	'getCachedResolvers',
 ];
 
-interface QuerySelectResponse< Data > {
+export interface QuerySelectResponse< Data > {
 	/** the requested selector return value */
 	data: Data;
 
@@ -79,16 +80,6 @@ export default function useQuerySelect( mapQuerySelect, deps ) {
 		const resolve = ( store ) => enrichSelectors( select( store ) );
 		return mapQuerySelect( resolve, registry );
 	}, deps );
-}
-
-interface EnrichedSelectors {
-	< Selectors extends Record< string, ( ...args: any[] ) => any > >(
-		selectors: Selectors
-	): {
-		[ Selector in keyof Selectors ]: (
-			...args: Parameters< Selectors[ Selector ] >
-		) => QuerySelectResponse< ReturnType< Selectors[ Selector ] > >;
-	};
 }
 
 /**

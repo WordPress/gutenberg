@@ -4,3 +4,5 @@ export const enum Status {
 	Error = 'ERROR',
 	Success = 'SUCCESS',
 }
+
+export const EMPTY_ARRAY = [];
