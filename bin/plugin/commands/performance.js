@@ -182,9 +182,14 @@ function curateResults( testSuite, results ) {
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
 async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
+	fs.mkdirSync( './__test-results', { recursive: true } );
+	const testResultsFilePath = path.resolve(
+		`./__test-results/${ runKey }.results.json`
+	);
+
 	try {
 		await runShellScript(
-			`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
+			`TEST_RESULTS_FILE_PATH="${ testResultsFilePath }" npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
 			performanceTestDirectory
 		);
 	} catch ( error ) {
@@ -200,20 +205,10 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 		throw error;
 	}
 
-	const resultsFile = path.join(
-		performanceTestDirectory,
-		`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
+	return curateResults(
+		testSuite,
+		await readJSONFile( testResultsFilePath )
 	);
-	fs.mkdirSync( './__test-results', { recursive: true } );
-	fs.copyFileSync( resultsFile, `./__test-results/${ runKey }.results.json` );
-	const rawResults = await readJSONFile(
-		path.join(
-			performanceTestDirectory,
-			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
-		)
-	);
-
-	return curateResults( testSuite, rawResults );
 }
 
 /**

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { basename, join } from 'path';
-import { writeFileSync } from 'fs';
+import { join } from 'path';
 
 /**
  * WordPress dependencies
@@ -24,6 +23,7 @@ import {
 import {
 	readFile,
 	deleteFile,
+	writeTestResultsFile,
 	getTypingEventDurations,
 	getClickEventDurations,
 	getHoverEventDurations,
@@ -82,11 +82,7 @@ describe( 'Post Editor Performance', () => {
 	let traceResults;
 
 	afterAll( async () => {
-		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
-		writeFileSync(
-			join( __dirname, resultsFilename ),
-			JSON.stringify( results, null, 2 )
-		);
+		writeTestResultsFile( __filename, results );
 		deleteFile( traceFile );
 	} );
 
