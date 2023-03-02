@@ -474,7 +474,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Note: this will affect both top-level and block-level elements.
 	 *
 	 * @since 6.1.0
-	 * @since 6.2.0 Added support for ':link' and ':any-link'.
+	 * @since 6.2.0 Added support for `:link` and `:any-link`.
 	 */
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
 		'link'   => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':active' ),
