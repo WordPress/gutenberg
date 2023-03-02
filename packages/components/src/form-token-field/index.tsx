@@ -733,7 +733,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				<StyledHelp
 					id={ `components-form-token-suggestions-howto-${ instanceId }` }
 					className="components-form-token-field__help"
-					__nextHasNoMarginBottom
+					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				>
 					{ tokenizeOnSpace
 						? __(

@@ -1,7 +1,6 @@
 .components-form-token-field__input-container {
 	@include input-control();
 	width: 100%;
-	margin: 0 0 $grid-unit-10 0;
 	padding: 0;
 	cursor: text;
 
