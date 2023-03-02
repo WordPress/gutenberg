@@ -18,12 +18,6 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.89.0 
 * No User facing changes *
 
-## 1.89.1 
--   [*] Fix inaccessible block settings within the unsupported block editor [#48435]
-
-## 1.89.0 
-* No User facing changes *
-
 ## 1.88.0 
 -   [*] Bump Android `minSdkVersion` to 24 [#47604]
 -   [*] Update React Native Reanimated to 2.9.1-wp-3 [#47574]
