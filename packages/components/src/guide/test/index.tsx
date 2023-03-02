@@ -7,17 +7,23 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import Guide from '../';
+import Guide from '..';
+
+const defaultProps = {
+	onFinish: () => {},
+	contentLabel: 'Arbitrary Content Label',
+};
 
 describe( 'Guide', () => {
 	it( 'renders nothing when there are no pages', () => {
-		render( <Guide pages={ [] } /> );
+		render( <Guide { ...defaultProps } pages={ [] } /> );
 		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'renders one page at a time', () => {
 		render(
 			<Guide
+				{ ...defaultProps }
 				pages={ [
 					{ content: <p>Page 1</p> },
 					{ content: <p>Page 2</p> },
@@ -33,6 +39,7 @@ describe( 'Guide', () => {
 	it( 'hides back button and shows forward button on the first page', () => {
 		render(
 			<Guide
+				{ ...defaultProps }
 				pages={ [
 					{ content: <p>Page 1</p> },
 					{ content: <p>Page 2</p> },
@@ -55,6 +62,7 @@ describe( 'Guide', () => {
 		const user = userEvent.setup();
 		render(
 			<Guide
+				{ ...defaultProps }
 				pages={ [
 					{ content: <p>Page 1</p> },
 					{ content: <p>Page 2</p> },
@@ -78,7 +86,12 @@ describe( 'Guide', () => {
 	} );
 
 	it( "doesn't display the page control if there is only one page", () => {
-		render( <Guide pages={ [ { content: <p>Page 1</p> } ] } /> );
+		render(
+			<Guide
+				{ ...defaultProps }
+				pages={ [ { content: <p>Page 1</p> } ] }
+			/>
+		);
 		expect(
 			screen.queryByRole( 'list', { name: 'Guide controls' } )
 		).not.toBeInTheDocument();
@@ -89,6 +102,7 @@ describe( 'Guide', () => {
 		const onFinish = jest.fn();
 		render(
 			<Guide
+				{ ...defaultProps }
 				onFinish={ onFinish }
 				pages={ [ { content: <p>Page 1</p> } ] }
 			/>
@@ -103,6 +117,7 @@ describe( 'Guide', () => {
 		const onFinish = jest.fn();
 		render(
 			<Guide
+				{ ...defaultProps }
 				onFinish={ onFinish }
 				pages={ [ { content: <p>Page 1</p> } ] }
 			/>
@@ -115,7 +130,7 @@ describe( 'Guide', () => {
 
 	describe( 'page navigation', () => {
 		it( 'renders an empty list when there are no pages', () => {
-			render( <Guide pages={ [] } /> );
+			render( <Guide { ...defaultProps } pages={ [] } /> );
 			expect(
 				screen.queryByRole( 'list', {
 					name: 'Guide controls',
@@ -131,6 +146,7 @@ describe( 'Guide', () => {
 		it( 'renders a button for each page', () => {
 			render(
 				<Guide
+					{ ...defaultProps }
 					pages={ [
 						{ content: <p>Page 1</p> },
 						{ content: <p>Page 2</p> },
@@ -154,6 +170,7 @@ describe( 'Guide', () => {
 
 			render(
 				<Guide
+					{ ...defaultProps }
 					pages={ [
 						{ content: <p>Page 1</p> },
 						{ content: <p>Page 2</p> },
@@ -196,6 +213,7 @@ describe( 'Guide', () => {
 
 			render(
 				<Guide
+					{ ...defaultProps }
 					pages={ [
 						{ content: <p>Page 1</p> },
 						{ content: <p>Page 2</p> },

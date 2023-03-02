@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
+
 ## 23.5.0 (2023-03-01)
 
 ### Enhancements

@@ -17,16 +17,49 @@ import { focus } from '@wordpress/dom';
 import Modal from '../modal';
 import Button from '../button';
 import PageControl from './page-control';
+import type { GuideProps } from './types';
 
-export default function Guide( {
+/**
+ * `Guide` is a React component that renders a _user guide_ in a modal. The guide consists of several pages which the user can step through one by one. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
+ *
+ * ```jsx
+ * function MyTutorial() {
+ * 	const [ isOpen, setIsOpen ] = useState( true );
+ *
+ * 	if ( ! isOpen ) {
+ * 		return null;
+ * 	}
+ *
+ * 	return (
+ * 		<Guide
+ * 			onFinish={ () => setIsOpen( false ) }
+ * 			pages={ [
+ * 				{
+ * 					content: <p>Welcome to the ACME Store!</p>,
+ * 				},
+ * 				{
+ * 					image: <img src="https://acmestore.com/add-to-cart.png" />,
+ * 					content: (
+ * 						<p>
+ * 							Click <i>Add to Cart</i> to buy a product.
+ * 						</p>
+ * 					),
+ * 				},
+ * 			] }
+ * 		/>
+ * 	);
+ * }
+ * ```
+ */
+function Guide( {
 	children,
 	className,
 	contentLabel,
-	finishButtonText,
+	finishButtonText = __( 'Finish' ),
 	onFinish,
 	pages = [],
-} ) {
-	const guideContainer = useRef();
+}: GuideProps ) {
+	const guideContainer = useRef< HTMLDivElement >( null );
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
 	useEffect( () => {
@@ -42,12 +75,17 @@ export default function Guide( {
 		// Each time we change the current page, start from the first element of the page.
 		// This also solves any focus loss that can happen.
 		if ( guideContainer.current ) {
-			focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
+			(
+				focus.tabbable.find( guideContainer.current ) as HTMLElement[]
+			 )[ 0 ]?.focus();
 		}
 	}, [ currentPage ] );
 
 	if ( Children.count( children ) ) {
-		pages = Children.map( children, ( child ) => ( { content: child } ) );
+		pages =
+			Children.map( children, ( child ) => ( {
+				content: child,
+			} ) ) ?? [];
 	}
 
 	const canGoBack = currentPage > 0;
@@ -124,7 +162,7 @@ export default function Guide( {
 							className="components-guide__finish-button"
 							onClick={ onFinish }
 						>
-							{ finishButtonText || __( 'Finish' ) }
+							{ finishButtonText }
 						</Button>
 					) }
 				</div>
@@ -132,3 +170,5 @@ export default function Guide( {
 		</Modal>
 	);
 }
+
+export default Guide;

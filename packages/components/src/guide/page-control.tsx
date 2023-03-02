@@ -8,12 +8,13 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import Button from '../button';
 import { PageControlIcon } from './icons';
+import type { PageControlProps } from './types';
 
 export default function PageControl( {
 	currentPage,
 	numberOfPages,
 	setCurrentPage,
-} ) {
+}: PageControlProps ) {
 	return (
 		<ul
 			className="components-guide__page-control"
