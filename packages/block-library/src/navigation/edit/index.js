@@ -605,6 +605,9 @@ function Navigation( {
 		canUserCreateNavigationMenu,
 		hasResolvedCanUserCreateNavigationMenu,
 		ref,
+		hideNavigationMenuPermissionsNotice,
+		showNavigationMenuPermissionsNotice,
+		navMenuResolvedButMissing,
 	] );
 
 	const hasManagePermissions =
