@@ -250,6 +250,7 @@ function Navigation( {
 		isCreatingNavigationMenu,
 		showNavigationMenuStatusNotice,
 		createNavigationMenuPostId,
+		fallbackNavigationMenus,
 	] );
 
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
