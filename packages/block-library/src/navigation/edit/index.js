@@ -274,9 +274,11 @@ function Navigation( {
 		setRef( fallbackNavigationMenus[ 0 ].id );
 	}, [
 		ref,
+		setRef,
 		isCreatingNavigationMenu,
 		fallbackNavigationMenus,
 		hasUncontrolledInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
 	const isEntityAvailable =
