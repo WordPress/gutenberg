@@ -10,6 +10,11 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.90.0
+-   [*] Fix parsing of css units for null matched values [#48484]
+-   [*] Spacer block - Add initial support for spacing presets [#47258]
+-   [*] Support Visual Regression testing [#47845]
 -   [*] Add metadata parameter to media upload events [#48103]  
 
 ## 1.89.1 
