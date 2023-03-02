@@ -238,10 +238,12 @@ function Navigation( {
 			);
 		}
 	}, [
-		createNavigationMenuStatus,
-		createNavigationMenuError,
-		createNavigationMenuPost,
-		fallbackNavigationMenus,
+		createNavigationMenuIsError,
+		createNavigationMenuIsSuccess,
+		handleUpdateMenu,
+		hideNavigationMenuStatusNotice,
+		isCreatingNavigationMenu,
+		showNavigationMenuStatusNotice,
 	] );
 
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
