@@ -7,6 +7,7 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import apiFetch from '..';
+import { parseAndThrowError } from '../utils/response';
 
 /**
  * Apply query arguments to both URL and Path, whichever is present.
@@ -91,7 +92,7 @@ const fetchAllMiddleware = async ( options, next ) => {
 		} ),
 		// Ensure headers are returned for page 1.
 		parse: false,
-	} );
+	} ).catch( parseAndThrowError );
 
 	const results = await parseResponse( response );
 
@@ -117,7 +118,7 @@ const fetchAllMiddleware = async ( options, next ) => {
 			url: nextPage,
 			// Ensure we still get headers so we can identify the next page.
 			parse: false,
-		} );
+		} ).catch( parseAndThrowError );
 		const nextResults = await parseResponse( nextResponse );
 		mergedResults = mergedResults.concat( nextResults );
 		nextPage = getNextPageUrl( nextResponse );
