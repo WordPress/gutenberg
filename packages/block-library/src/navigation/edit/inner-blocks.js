@@ -24,6 +24,7 @@ const ALLOWED_BLOCKS = [
 	'core/home-link',
 	'core/site-title',
 	'core/site-logo',
+	'core/loginout',
 	'core/navigation-submenu',
 ];
 
