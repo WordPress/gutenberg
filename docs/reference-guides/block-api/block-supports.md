@@ -605,6 +605,19 @@ attributes: {
 }
 ```
 
+## role
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Role attributes let you add semantic meaning to non-semantic HTML elements. This property allows enabling the definition of a role for the block, without exposing a UI field.
+
+```js
+supports: {
+    role: true,
+}
+```
+
 ## spacing
 
 -   Type: `Object`
