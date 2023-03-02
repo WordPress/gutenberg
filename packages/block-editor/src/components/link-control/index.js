@@ -366,6 +366,7 @@ function LinkControl( {
 						<Button
 							variant="primary"
 							onClick={ handleSubmit }
+							className="block-editor-link-control__search-submit"
 							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
 						>
 							{ __( 'Apply' ) }
