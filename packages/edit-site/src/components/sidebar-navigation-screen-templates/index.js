@@ -4,9 +4,11 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
+	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -17,10 +19,11 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import AddNewTemplate from '../add-new-template';
+import { store as editSiteStore } from '../../store';
+import SidebarButton from '../sidebar-button';
 
 const config = {
 	wp_template: {
-		path: '/templates',
 		labels: {
 			title: __( 'Templates' ),
 			loading: __( 'Loading templates' ),
@@ -29,7 +32,6 @@ const config = {
 		},
 	},
 	wp_template_part: {
-		path: '/template-parts',
 		labels: {
 			title: __( 'Template parts' ),
 			loading: __( 'Loading template parts' ),
@@ -43,15 +45,20 @@ const TemplateItem = ( { postType, postId, ...props } ) => {
 	const linkInfo = useLink( {
 		postType,
 		postId,
-		path: config[ postType ].path + '/single',
 	} );
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };
 
-export default function SidebarNavigationScreenTemplates( {
-	postType = 'wp_template',
-} ) {
+export default function SidebarNavigationScreenTemplates() {
+	const {
+		params: { postType },
+	} = useNavigator();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isTemplatePartsMode = useSelect( ( select ) => {
+		const settings = select( editSiteStore ).getSettings();
+
+		return !! settings.supportsTemplatePartsMode;
+	}, [] );
 
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
@@ -60,24 +67,25 @@ export default function SidebarNavigationScreenTemplates( {
 			per_page: -1,
 		}
 	);
+	const sortedTemplates = templates ? [ ...templates ] : [];
+	sortedTemplates.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
 
 	const browseAllLink = useLink( {
-		postType,
-		postId: undefined,
-		path: config[ postType ].path + '/all',
+		path: '/' + postType + '/all',
 	} );
+
+	const canCreate = ! isMobileViewport && ! isTemplatePartsMode;
 
 	return (
 		<SidebarNavigationScreen
-			path={ config[ postType ].path }
+			isRoot={ isTemplatePartsMode }
 			title={ config[ postType ].labels.title }
 			actions={
-				! isMobileViewport && (
+				canCreate && (
 					<AddNewTemplate
 						templateType={ postType }
 						toggleProps={ {
-							className:
-								'edit-site-sidebar-navigation-screen-templates__add-button',
+							as: SidebarButton,
 						} }
 					/>
 				)
@@ -92,7 +100,7 @@ export default function SidebarNavigationScreenTemplates( {
 									{ config[ postType ].labels.notFound }
 								</Item>
 							) }
-							{ ( templates ?? [] ).map( ( template ) => (
+							{ sortedTemplates.map( ( template ) => (
 								<TemplateItem
 									postType={ postType }
 									postId={ template.id }

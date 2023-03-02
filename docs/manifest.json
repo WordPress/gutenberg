@@ -714,6 +714,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "CircularOptionPicker",
+		"slug": "circular-option-picker",
+		"markdown_source": "../packages/components/src/circular-option-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ClipboardButton",
 		"slug": "clipboard-button",
 		"markdown_source": "../packages/components/src/clipboard-button/README.md",
@@ -2116,6 +2122,24 @@
 		"slug": "testing-overview",
 		"markdown_source": "../docs/contributors/code/testing-overview.md",
 		"parent": "code"
+	},
+	{
+		"title": "End-to-End Testing",
+		"slug": "e2e",
+		"markdown_source": "../docs/contributors/code/e2e/README.md",
+		"parent": "testing-overview"
+	},
+	{
+		"title": "Migration guide",
+		"slug": "migration",
+		"markdown_source": "../docs/contributors/code/e2e/migration.md",
+		"parent": "e2e"
+	},
+	{
+		"title": "Overusing snapshots",
+		"slug": "overusing-snapshots",
+		"markdown_source": "../docs/contributors/code/e2e/overusing-snapshots.md",
+		"parent": "e2e"
 	},
 	{
 		"title": "Block Grammar",

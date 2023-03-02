@@ -46,6 +46,9 @@ export default function Table( { templateType } ) {
 		);
 	}
 
+	const sortedTemplates = [ ...templates ];
+	sortedTemplates.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
+
 	return (
 		// These explicit aria roles are needed for Safari.
 		// See https://developer.mozilla.org/en-US/docs/Web/CSS/display#tables
@@ -74,7 +77,7 @@ export default function Table( { templateType } ) {
 			</thead>
 
 			<tbody>
-				{ templates.map( ( template ) => (
+				{ sortedTemplates.map( ( template ) => (
 					<tr
 						key={ template.id }
 						className="edit-site-list-table-row"
@@ -84,10 +87,6 @@ export default function Table( { templateType } ) {
 							<Heading level={ 4 }>
 								<Link
 									params={ {
-										path:
-											template.type === 'wp_template'
-												? '/templates/single'
-												: '/template-parts/single',
 										postId: template.id,
 										postType: template.type,
 									} }

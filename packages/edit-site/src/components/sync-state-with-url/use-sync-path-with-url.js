@@ -9,28 +9,83 @@ import { useEffect, useRef } from '@wordpress/element';
  */
 import { useLocation, useHistory } from '../routes';
 
-export default function useSyncPathWithURL() {
-	const history = useHistory();
-	const { params } = useLocation();
-	const { path = '/' } = params;
-	const { location, goTo } = useNavigator();
-	const currentPath = useRef( path );
-	const currentNavigatorLocation = useRef( location.path );
-	useEffect( () => {
-		currentPath.current = path;
-		if ( path !== currentNavigatorLocation.current ) {
-			goTo( path );
+export function getPathFromURL( urlParams ) {
+	let path = urlParams?.path ?? '/';
+
+	// Compute the navigator path based on the URL params.
+	if ( urlParams?.postType && urlParams?.postId ) {
+		switch ( urlParams.postType ) {
+			case 'wp_template':
+			case 'wp_template_part':
+				path = `/${ encodeURIComponent(
+					urlParams.postType
+				) }/${ encodeURIComponent( urlParams.postId ) }`;
+				break;
+			default:
+				path = `/navigation/${ encodeURIComponent(
+					urlParams.postType
+				) }/${ encodeURIComponent( urlParams.postId ) }`;
 		}
-	}, [ path ] );
-	useEffect( () => {
-		currentNavigatorLocation.current = location.path;
-		if ( location.path !== currentPath.current ) {
-			history.push( {
-				...params,
-				path: location.path,
-			} );
-		}
-	}, [ location.path, history ] );
+	}
 
 	return path;
+}
+
+export default function useSyncPathWithURL() {
+	const history = useHistory();
+	const { params: urlParams } = useLocation();
+	const {
+		location: navigatorLocation,
+		params: navigatorParams,
+		goTo,
+	} = useNavigator();
+	const currentUrlParams = useRef( urlParams );
+	const currentPath = useRef( navigatorLocation.path );
+
+	useEffect( () => {
+		function updateUrlParams( newUrlParams ) {
+			if (
+				Object.entries( newUrlParams ).every( ( [ key, value ] ) => {
+					return currentUrlParams.current[ key ] === value;
+				} )
+			) {
+				return;
+			}
+			const updatedParams = {
+				...currentUrlParams.current,
+				...newUrlParams,
+			};
+			currentUrlParams.current = updatedParams;
+			history.push( updatedParams );
+		}
+
+		if ( navigatorParams?.postType && navigatorParams?.postId ) {
+			updateUrlParams( {
+				postType: navigatorParams?.postType,
+				postId: navigatorParams?.postId,
+				path: undefined,
+			} );
+		} else if ( navigatorParams?.postType && ! navigatorParams?.postId ) {
+			updateUrlParams( {
+				postType: navigatorParams?.postType,
+				path: navigatorLocation.path,
+				postId: undefined,
+			} );
+		} else {
+			updateUrlParams( {
+				postType: undefined,
+				postId: undefined,
+				path: navigatorLocation.path,
+			} );
+		}
+	}, [ navigatorLocation?.path, navigatorParams, history ] );
+
+	useEffect( () => {
+		currentUrlParams.current = urlParams;
+		const path = getPathFromURL( urlParams );
+		if ( currentPath.current !== path ) {
+			currentPath.current = path;
+			goTo( path );
+		}
+	}, [ urlParams, goTo ] );
 }

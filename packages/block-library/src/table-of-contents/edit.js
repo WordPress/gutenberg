@@ -251,6 +251,7 @@ export default function TableOfContentsEdit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Only include current page' ) }
 					checked={ onlyIncludeCurrentPage }
 					onChange={ ( value ) =>

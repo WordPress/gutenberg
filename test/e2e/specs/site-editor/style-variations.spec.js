@@ -38,7 +38,6 @@ test.describe( 'Global styles variations', () => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
-			path: '/templates/single',
 		} );
 		await editor.canvas.click( 'body' );
 
@@ -76,7 +75,6 @@ test.describe( 'Global styles variations', () => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
-			path: '/templates/single',
 		} );
 		await editor.canvas.click( 'body' );
 		await siteEditorStyleVariations.browseStyles();
@@ -118,7 +116,6 @@ test.describe( 'Global styles variations', () => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
-			path: '/templates/single',
 		} );
 		await editor.canvas.click( 'body' );
 		await siteEditorStyleVariations.browseStyles();
@@ -166,7 +163,6 @@ test.describe( 'Global styles variations', () => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
-			path: '/templates/single',
 		} );
 		await editor.canvas.click( 'body' );
 		await siteEditorStyleVariations.browseStyles();
@@ -199,7 +195,6 @@ test.describe( 'Global styles variations', () => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
-			path: '/templates/single',
 		} );
 		await editor.canvas.click( 'body' );
 		await siteEditorStyleVariations.browseStyles();

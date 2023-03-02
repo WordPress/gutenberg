@@ -27,7 +27,6 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
-			path: '/template-parts/single',
 		} );
 		await editor.canvas.click( 'body' );
 
@@ -185,7 +184,6 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
-			path: '/template-parts/single',
 		} );
 		await editor.canvas.click( 'body' );
 		await editor.insertBlock( {
@@ -229,7 +227,6 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
-			path: '/template-parts/single',
 		} );
 		await editor.canvas.click( 'body' );
 		// Edit the header.
@@ -263,7 +260,6 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
-			path: '/template-parts/single',
 		} );
 		await editor.canvas.click( 'body' );
 		await editor.insertBlock( {

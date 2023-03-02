@@ -44,11 +44,11 @@ test.describe( 'Nonce', () => {
 					url.href.startsWith(
 						requestUtils.storageState.rootURL.slice( 0, -1 )
 					),
-				( route ) => {
+				async ( route ) => {
 					if ( refreshed ) {
-						route.continue();
+						await route.continue();
 					} else {
-						route.fulfill( {
+						await route.fulfill( {
 							status: 403,
 							contentType: 'application/json; charset=UTF-8',
 							body: JSON.stringify( {
@@ -63,7 +63,7 @@ test.describe( 'Nonce', () => {
 		}
 
 		const saveDraftResponses = [];
-		page.on( 'response', async ( response ) => {
+		page.on( 'response', ( response ) => {
 			const request = response.request();
 			if (
 				request.method() === 'POST' &&

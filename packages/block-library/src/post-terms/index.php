@@ -87,6 +87,7 @@ function register_block_core_post_terms() {
 				'term' => $taxonomy->name,
 			),
 			'isActive'    => array( 'term' ),
+			'scope'       => array( 'inserter', 'transform' ),
 		);
 		// Set the category variation as the default one.
 		if ( 'category' === $taxonomy->name ) {

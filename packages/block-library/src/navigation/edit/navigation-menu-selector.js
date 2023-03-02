@@ -65,7 +65,7 @@ function NavigationMenuSelector( {
 				};
 			} ) || []
 		);
-	}, [ currentMenuId, navigationMenus, actionLabel ] );
+	}, [ currentMenuId, navigationMenus, actionLabel, isCreatingMenu ] );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;

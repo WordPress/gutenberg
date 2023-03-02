@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "8.3.0",
+	"version": "8.5.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -59,6 +59,7 @@
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
+		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
 		"classnames": "^2.3.1",
 		"colord": "^2.7.0",

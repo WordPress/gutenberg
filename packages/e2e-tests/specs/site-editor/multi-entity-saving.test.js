@@ -265,7 +265,6 @@ describe( 'Multi-entity save flow', () => {
 			await visitSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
-				path: '/templates/single',
 			} );
 
 			await enterEditMode();
@@ -305,7 +304,6 @@ describe( 'Multi-entity save flow', () => {
 			await visitSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
-				path: '/templates/single',
 			} );
 
 			await enterEditMode();

@@ -28,10 +28,4 @@ module.exports = {
 		emotionAlias: false,
 		storyStoreV7: true,
 	},
-	env: ( config ) => ( {
-		...config,
-		// Inject the `ALLOW_EXPERIMENT_REREGISTRATION` global, used by
-		// @wordpress/private-apis.
-		ALLOW_EXPERIMENT_REREGISTRATION: true,
-	} ),
 };

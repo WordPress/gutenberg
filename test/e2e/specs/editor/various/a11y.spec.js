@@ -170,6 +170,13 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		// The Blocks tab panel content is long and scrollable.
 		// Check it's focusable.
 		await clickAndFocusTab( blocksTab );
+		// Explicitly wait for the modal content to be attached with certain attributes.
+		// This is necessary for solving a flaky result where Playwright runs too fast
+		// before DOM catching up.
+		await expect( preferencesModalContent ).toHaveAttribute(
+			'tabindex',
+			'0'
+		);
 		await page.keyboard.press( 'Shift+Tab' );
 		await expect( closeButton ).toBeFocused();
 		await page.keyboard.press( 'Shift+Tab' );
