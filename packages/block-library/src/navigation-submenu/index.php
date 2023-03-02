@@ -279,7 +279,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 		$html .= sprintf(
 			'<ul %s>%s</ul>',
-			esc_attr( $wrapper_attributes ),
+			$wrapper_attributes,
 			$inner_blocks_html
 		);
 	}
