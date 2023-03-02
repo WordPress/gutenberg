@@ -558,7 +558,7 @@ class WP_Theme_JSON_Gutenberg {
 		// BEGIN EXPERIMENTAL.
 		// Allow `position.fixed` to be opted-in by default.
 		// Sticky position support was backported to WordPress 6.2 in https://core.trac.wordpress.org/ticket/57618.
-		// While `fixed` was included as a valid setting, exposing it by default it still experimental.
+		// While `fixed` was included as a valid setting, exposing it by default is still experimental.
 		array( 'position', 'fixed' ),
 		// END EXPERIMENTAL.
 		array( 'position', 'sticky' ),
