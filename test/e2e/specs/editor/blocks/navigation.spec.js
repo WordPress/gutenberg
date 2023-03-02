@@ -117,18 +117,20 @@ test.describe(
 				},
 			] );
 
+			// Snackbar notification should appear
+			await expect(
+				page.getByRole( 'button', {
+					name: 'Dismiss this notice',
+					text: 'Navigation Menu successfully created.',
+				} )
+			).toBeVisible();
+
 			// Check the block in the canvas.
 			await expect(
 				editor.canvas.locator(
 					`role=textbox[name="Navigation link text"i] >> text="Custom link"`
 				)
-			).toBeVisible( {
-				// Wait for the Nav block API request to resolve.
-				// Note: avoid waiting on network requests as these are not perceivable
-				// to the user.
-				// See: https://github.com/WordPress/gutenberg/pull/45070#issuecomment-1373712007.
-				timeout: 10000,
-			} );
+			).toBeVisible();
 
 			// Check the block in the frontend.
 			await page.goto( '/' );
