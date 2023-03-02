@@ -660,6 +660,17 @@ $block-inserter-tabs-height: 44px;
 				margin: 0 auto;
 				max-width: 100%;
 			}
+
+			.block-editor-inserter__media-list__item-preview-spinner {
+				display: flex;
+				height: 100%;
+				width: 100%;
+				position: absolute;
+				justify-content: center;
+				background: rgba($white, 0.7);
+				align-items: center;
+				pointer-events: none;
+			}
 		}
 
 		&:focus .block-editor-inserter__media-list__item-preview {
@@ -684,5 +695,16 @@ $block-inserter-tabs-height: 44px;
 
 	> * {
 		height: 100%;
+	}
+}
+
+
+.block-editor-inserter-media-tab-media-preview-inserter-external-image-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+
+	p {
+		margin: 0;
 	}
 }

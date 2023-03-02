@@ -116,8 +116,8 @@ function ListViewBranch( props ) {
 		return null;
 	}
 
-	// Only show the appender at the first level and if there is a parent block.
-	const showAppender = level === 1 && parentId;
+	// Only show the appender at the first level.
+	const showAppender = level === 1;
 
 	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;

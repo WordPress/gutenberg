@@ -194,6 +194,7 @@ export default function PostExcerptEditor( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show link on new line' ) }
 						checked={ showMoreOnNewLine }
 						onChange={ ( newShowMoreOnNewLine ) =>
