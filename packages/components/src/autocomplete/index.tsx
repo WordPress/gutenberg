@@ -26,6 +26,8 @@ import {
 	insert,
 	isCollapsed,
 	getTextContent,
+	// Error expected because `@wordpress/rich-text` is not yet fully typed.
+	// @ts-expect-error
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
 
@@ -34,102 +36,48 @@ import { speak } from '@wordpress/a11y';
  */
 import { getAutoCompleterUI } from './autocompleter-ui';
 import { escapeRegExp } from '../utils/strings';
+import type {
+	AutocompleteProps,
+	AutocompleterUIProps,
+	InsertOption,
+	KeyedOption,
+	OptionCompletion,
+	ReplaceOption,
+	UseAutocompleteProps,
+	WPCompleter,
+} from './types';
 
-const EMPTY_ARRAY = [];
+const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
-/**
- * A raw completer option.
- *
- * @typedef {*} CompleterOption
- */
-
-/**
- * @callback FnGetOptions
- *
- * @return {(CompleterOption[]|Promise.<CompleterOption[]>)} The completer options or a promise for them.
- */
-
-/**
- * @callback FnGetOptionKeywords
- * @param {CompleterOption} option a completer option.
- *
- * @return {string[]} list of key words to search.
- */
-
-/**
- * @callback FnIsOptionDisabled
- * @param {CompleterOption} option a completer option.
- *
- * @return {string[]} whether or not the given option is disabled.
- */
-
-/**
- * @callback FnGetOptionLabel
- * @param {CompleterOption} option a completer option.
- *
- * @return {(string|Array.<(string|WPElement)>)} list of react components to render.
- */
-
-/**
- * @callback FnAllowContext
- * @param {string} before the string before the auto complete trigger and query.
- * @param {string} after  the string after the autocomplete trigger and query.
- *
- * @return {boolean} true if the completer can handle.
- */
-
-/**
- * @typedef {Object} OptionCompletion
- * @property {'insert-at-caret'|'replace'} action the intended placement of the completion.
- * @property {OptionCompletionValue}       value  the completion value.
- */
-
-/**
- * A completion value.
- *
- * @typedef {(string|WPElement|Object)} OptionCompletionValue
- */
-
-/**
- * @callback FnGetOptionCompletion
- * @param {CompleterOption} value the value of the completer option.
- * @param {string}          query the text value of the autocomplete query.
- *
- * @return {(OptionCompletion|OptionCompletionValue)} the completion for the given option. If an
- * 													   OptionCompletionValue is returned, the
- * 													   completion action defaults to `insert-at-caret`.
- */
-
-/**
- * @typedef {Object} WPCompleter
- * @property {string}                           name                a way to identify a completer, useful for selective overriding.
- * @property {?string}                          className           A class to apply to the popup menu.
- * @property {string}                           triggerPrefix       the prefix that will display the menu.
- * @property {(CompleterOption[]|FnGetOptions)} options             the completer options or a function to get them.
- * @property {?FnGetOptionKeywords}             getOptionKeywords   get the keywords for a given option.
- * @property {?FnIsOptionDisabled}              isOptionDisabled    get whether or not the given option is disabled.
- * @property {FnGetOptionLabel}                 getOptionLabel      get the label for a given option.
- * @property {?FnAllowContext}                  allowContext        filter the context under which the autocomplete activates.
- * @property {FnGetOptionCompletion}            getOptionCompletion get the completion associated with a given option.
- */
-
-function useAutocomplete( {
+export function useAutocomplete( {
 	record,
 	onChange,
 	onReplace,
 	completers,
 	contentRef,
-} ) {
+}: UseAutocompleteProps ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const instanceId = useInstanceId( useAutocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
-	const [ filteredOptions, setFilteredOptions ] = useState( EMPTY_ARRAY );
-	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ autocompleter, setAutocompleter ] = useState( null );
-	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
+
+	const [ filteredOptions, setFilteredOptions ] = useState<
+		Array< KeyedOption >
+	>( EMPTY_FILTERED_OPTIONS );
+	const [ filterValue, setFilterValue ] =
+		useState< AutocompleterUIProps[ 'filterValue' ] >( '' );
+	const [ autocompleter, setAutocompleter ] = useState< WPCompleter | null >(
+		null
+	);
+	const [ AutocompleterUI, setAutocompleterUI ] = useState<
+		( ( props: AutocompleterUIProps ) => JSX.Element | null ) | null
+	>( null );
+
 	const backspacing = useRef( false );
 
-	function insertCompletion( replacement ) {
+	function insertCompletion( replacement: React.ReactNode ) {
+		if ( autocompleter === null ) {
+			return;
+		}
 		const end = record.start;
 		const start =
 			end - autocompleter.triggerPrefix.length - filterValue.length;
@@ -138,7 +86,7 @@ function useAutocomplete( {
 		onChange( insert( record, toInsert, start, end ) );
 	}
 
-	function select( option ) {
+	function select( option: KeyedOption ) {
 		const { getOptionCompletion } = autocompleter || {};
 
 		if ( option.isDisabled ) {
@@ -148,19 +96,33 @@ function useAutocomplete( {
 		if ( getOptionCompletion ) {
 			const completion = getOptionCompletion( option.value, filterValue );
 
-			const { action, value } =
-				undefined === completion.action ||
-				undefined === completion.value
-					? { action: 'insert-at-caret', value: completion }
-					: completion;
+			const isCompletionObject = (
+				obj: OptionCompletion
+			): obj is InsertOption | ReplaceOption => {
+				return (
+					obj !== null &&
+					typeof obj === 'object' &&
+					'action' in obj &&
+					obj.action !== undefined &&
+					'value' in obj &&
+					obj.value !== undefined
+				);
+			};
 
-			if ( 'replace' === action ) {
-				onReplace( [ value ] );
+			const completionObject = isCompletionObject( completion )
+				? completion
+				: ( {
+						action: 'insert-at-caret',
+						value: completion,
+				  } as InsertOption );
+
+			if ( 'replace' === completionObject.action ) {
+				onReplace( [ completionObject.value ] );
 				// When replacing, the component will unmount, so don't reset
 				// state (below) on an unmounted component.
 				return;
-			} else if ( 'insert-at-caret' === action ) {
-				insertCompletion( value );
+			} else if ( 'insert-at-caret' === completionObject.action ) {
+				insertCompletion( completionObject.value );
 			}
 		}
 
@@ -171,13 +133,13 @@ function useAutocomplete( {
 
 	function reset() {
 		setSelectedIndex( 0 );
-		setFilteredOptions( EMPTY_ARRAY );
+		setFilteredOptions( EMPTY_FILTERED_OPTIONS );
 		setFilterValue( '' );
 		setAutocompleter( null );
 		setAutocompleterUI( null );
 	}
 
-	function announce( options ) {
+	function announce( options: Array< KeyedOption > ) {
 		if ( ! debouncedSpeak ) {
 			return;
 		}
@@ -204,7 +166,7 @@ function useAutocomplete( {
 	 *
 	 * @param {Array} options
 	 */
-	function onChangeOptions( options ) {
+	function onChangeOptions( options: Array< KeyedOption > ) {
 		setSelectedIndex(
 			options.length === filteredOptions.length ? selectedIndex : 0
 		);
@@ -212,7 +174,7 @@ function useAutocomplete( {
 		announce( options );
 	}
 
-	function handleKeyDown( event ) {
+	function handleKeyDown( event: KeyboardEvent ) {
 		backspacing.current = event.key === 'Backspace';
 
 		if ( ! autocompleter ) {
@@ -380,7 +342,7 @@ function useAutocomplete( {
 				? getAutoCompleterUI( completer )
 				: AutocompleterUI
 		);
-		setFilterValue( query );
+		setFilterValue( query === null ? '' : query );
 		// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
 		// See https://github.com/WordPress/gutenberg/pull/41820
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -391,7 +353,7 @@ function useAutocomplete( {
 	const isExpanded = !! autocompleter && filteredOptions.length > 0;
 	const listBoxId = isExpanded
 		? `components-autocomplete-listbox-${ instanceId }`
-		: null;
+		: undefined;
 	const activeId = isExpanded
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;
@@ -418,53 +380,47 @@ function useAutocomplete( {
 	};
 }
 
-export function useAutocompleteProps( options ) {
-	const [ isVisible, setIsVisible ] = useState( false );
-	const ref = useRef();
-	const recordAfterInput = useRef();
-	const onKeyDownRef = useRef();
+function useLastDifferentValue( value: UseAutocompleteProps[ 'record' ] ) {
+	const history = useRef< Set< typeof value > >( new Set() );
+
+	history.current.add( value );
+
+	// Keep the history size to 2.
+	if ( history.current.size > 2 ) {
+		history.current.delete( Array.from( history.current )[ 0 ] );
+	}
+
+	return Array.from( history.current )[ 0 ];
+}
+
+export function useAutocompleteProps( options: UseAutocompleteProps ) {
+	const ref = useRef< HTMLElement >( null );
+	const onKeyDownRef = useRef< ( event: KeyboardEvent ) => void >();
+	const { record } = options;
+	const previousRecord = useLastDifferentValue( record );
 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
 		...options,
 		contentRef: ref,
 	} );
 	onKeyDownRef.current = onKeyDown;
 
-	useEffect( () => {
-		if ( isVisible ) {
-			if ( ! recordAfterInput.current ) {
-				recordAfterInput.current = options.record;
-			} else if (
-				recordAfterInput.current.start !== options.record.start ||
-				recordAfterInput.current.end !== options.record.end
-			) {
-				setIsVisible( false );
-				recordAfterInput.current = null;
-			}
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ options.record ] );
-
 	const mergedRefs = useMergeRefs( [
 		ref,
-		useRefEffect( ( element ) => {
-			function _onKeyDown( event ) {
-				onKeyDownRef.current( event );
-			}
-			function _onInput() {
-				// Only show auto complete UI if the user is inputting text.
-				setIsVisible( true );
-				recordAfterInput.current = null;
+		useRefEffect( ( element: HTMLElement ) => {
+			function _onKeyDown( event: KeyboardEvent ) {
+				onKeyDownRef.current?.( event );
 			}
 			element.addEventListener( 'keydown', _onKeyDown );
-			element.addEventListener( 'input', _onInput );
 			return () => {
 				element.removeEventListener( 'keydown', _onKeyDown );
-				element.removeEventListener( 'input', _onInput );
 			};
 		}, [] ),
 	] );
 
-	if ( ! isVisible ) {
+	// We only want to show the popover if the user has typed something.
+	const didUserInput = record.text !== previousRecord?.text;
+
+	if ( ! didUserInput ) {
 		return { ref: mergedRefs };
 	}
 
@@ -477,7 +433,11 @@ export function useAutocompleteProps( options ) {
 	};
 }
 
-export default function Autocomplete( { children, isSelected, ...options } ) {
+export default function Autocomplete( {
+	children,
+	isSelected,
+	...options
+}: AutocompleteProps ) {
 	const { popover, ...props } = useAutocomplete( options );
 	return (
 		<>

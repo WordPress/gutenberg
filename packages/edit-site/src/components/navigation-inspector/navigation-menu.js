@@ -8,7 +8,7 @@ import {
 	BlockTools,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -40,6 +40,12 @@ const ALLOWED_BLOCKS = {
 };
 
 export default function NavigationMenu( { innerBlocks, onSelect } ) {
+	const { clientIdsTree } = useSelect( ( select ) => {
+		const { __unstableGetClientIdsTree } = select( blockEditorStore );
+		return {
+			clientIdsTree: __unstableGetClientIdsTree(),
+		};
+	} );
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
 	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
@@ -64,7 +70,7 @@ export default function NavigationMenu( { innerBlocks, onSelect } ) {
 	return (
 		<>
 			<OffCanvasEditor
-				blocks={ innerBlocks }
+				blocks={ clientIdsTree }
 				onSelect={ onSelect }
 				LeafMoreMenu={ LeafMoreMenu }
 			/>

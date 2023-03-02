@@ -62,6 +62,53 @@ test.describe( 'Block deletion', () => {
 		] );
 	} );
 
+	// this test should be moved to a new testing story about focus management.
+	test( 'deleting a block focuses the parent block', async ( {
+		editor,
+		page,
+	} ) => {
+		// Add a group with a paragraph in it.
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Paragraph child of group' },
+				},
+			],
+		} );
+
+		// Select the paragraph.
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Paragraph block',
+		} );
+		await editor.selectBlocks( paragraph );
+
+		// Remove the current paragraph via the Block Toolbar options menu.
+		await editor.showBlockToolbar();
+		await editor.canvas
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page
+			.getByRole( 'menuitem', { name: 'Remove Paragraph' } )
+			.click();
+
+		// Ensure the paragraph was removed.
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/group', attributes: {} } ] );
+
+		// Ensure the group block is focused.
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Group',
+				} )
+				.last()
+		).toBeFocused();
+	} );
+
 	test( 'deleting the last block via the keyboard shortcut', async ( {
 		editor,
 		page,
