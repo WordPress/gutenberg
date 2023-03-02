@@ -380,6 +380,11 @@ const selectTextFromTextInput = async ( driver, element ) => {
 		await longPressMiddleOfElement( driver, element, 0 );
 	} else {
 		await doubleTap( driver, element );
+		await driver.waitForElementByXPath(
+			'//XCUIElementTypeMenuItem[@name="Copy"]',
+			wd.asserters.isDisplayed,
+			4000
+		);
 	}
 };
 
