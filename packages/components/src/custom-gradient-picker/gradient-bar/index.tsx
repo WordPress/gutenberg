@@ -16,6 +16,8 @@ import { useRef, useReducer } from '@wordpress/element';
 import ControlPoints from './control-points';
 import { getHorizontalRelativeGradientPosition } from './utils';
 import { MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT } from './constants';
+import type { CustomGradientBarProps } from '../types';
+import type { LegacyRef, MouseEventHandler } from 'react';
 
 function customGradientBarReducer( state, action ) {
 	switch ( action.type ) {
@@ -76,18 +78,26 @@ export default function CustomGradientBar( {
 	disableInserter = false,
 	disableAlpha = false,
 	__experimentalIsRenderedInSidebar,
-} ) {
-	const gradientMarkersContainerDomRef = useRef();
+}: CustomGradientBarProps ) {
+	const gradientMarkersContainerDomRef: LegacyRef< HTMLDivElement > =
+		useRef( null );
 
 	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
 		customGradientBarReducer,
 		customGradientBarReducerInitialState
 	);
-	const onMouseEnterAndMove = ( event ) => {
+	const onMouseEnterAndMove: MouseEventHandler< HTMLDivElement > = (
+		event
+	) => {
 		const insertPosition = getHorizontalRelativeGradientPosition(
 			event.clientX,
 			gradientMarkersContainerDomRef.current
 		);
+
+		// NTS: `getHorizontalRelativeGradientPosition` will return `undefined` if the `containerElement` arg is falsey.
+		if ( insertPosition === undefined ) {
+			return;
+		}
 
 		// If the insert point is close to an existing control point don't show it.
 		if (

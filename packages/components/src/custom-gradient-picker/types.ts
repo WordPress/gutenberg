@@ -55,3 +55,13 @@ export type ColorStopTypeAndValue = DistributiveOmit<
 	gradientParser.ColorStop,
 	'length'
 >;
+
+export type CustomGradientBarProps = {
+	background: React.CSSProperties[ 'background' ];
+	hasGradient: boolean;
+	value: ControlPoint[];
+	onChange: ( newControlPoints: ControlPoint[] ) => void;
+	disableInserter?: boolean;
+	disableAlpha?: boolean;
+	__experimentalIsRenderedInSidebar: boolean;
+};
