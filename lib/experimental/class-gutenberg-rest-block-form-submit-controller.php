@@ -59,7 +59,7 @@ class Gutenberg_REST_Block_Form_Submit_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves all block pattern categories.
+	 * Process the form submission.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 */
