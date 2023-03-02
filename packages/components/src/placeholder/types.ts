@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  */
 import type { IconType } from '../icon';
 
-export type PlaceholderProps< IconProps = unknown > = {
+export type PlaceholderProps = {
 	/**
 	 * The children elements.
 	 */
@@ -20,7 +20,7 @@ export type PlaceholderProps< IconProps = unknown > = {
 	/**
 	 * If provided, renders an icon next to the label.
 	 */
-	icon?: IconType< IconProps >;
+	icon?: IconType;
 	/**
 	 * Instructions of the placeholder.
 	 */

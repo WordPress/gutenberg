@@ -119,15 +119,6 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const PRESETS_METADATA = array(
 		array(
-			'path'              => array( 'shadow', 'presets' ),
-			'prevent_override'  => array( 'shadow', 'defaultPresets' ),
-			'use_default_names' => false,
-			'value_key'         => 'shadow',
-			'css_vars'          => '--wp--preset--shadow--$slug',
-			'classes'           => array(),
-			'properties'        => array( 'box-shadow' ),
-		),
-		array(
 			'path'              => array( 'color', 'palette' ),
 			'prevent_override'  => array( 'color', 'defaultPalette' ),
 			'use_default_names' => false,
@@ -184,6 +175,15 @@ class WP_Theme_JSON_Gutenberg {
 			'css_vars'          => '--wp--preset--spacing--$slug',
 			'classes'           => array(),
 			'properties'        => array( 'padding', 'margin' ),
+		),
+		array(
+			'path'              => array( 'shadow', 'presets' ),
+			'prevent_override'  => array( 'shadow', 'defaultPresets' ),
+			'use_default_names' => false,
+			'value_key'         => 'shadow',
+			'css_vars'          => '--wp--preset--shadow--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'box-shadow' ),
 		),
 	);
 
@@ -262,21 +262,6 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
-	 * Protected style properties.
-	 *
-	 * These style properties are only rendered if a setting enables it
-	 * via a value other than `null`.
-	 *
-	 * Each element maps the style property to the corresponding theme.json
-	 * setting key.
-	 *
-	 * @since 5.9.0
-	 */
-	const PROTECTED_PROPERTIES = array(
-		'spacing.blockGap' => array( 'spacing', 'blockGap' ),
-	);
-
-	/**
 	 * Indirect metadata for style properties that are not directly output.
 	 *
 	 * Each element maps from a CSS property name to an array of
@@ -304,6 +289,21 @@ class WP_Theme_JSON_Gutenberg {
 			array( 'layout', 'contentSize' ),
 			array( 'layout', 'wideSize' ),
 		),
+	);
+
+	/**
+	 * Protected style properties.
+	 *
+	 * These style properties are only rendered if a setting enables it
+	 * via a value other than `null`.
+	 *
+	 * Each element maps the style property to the corresponding theme.json
+	 * setting key.
+	 *
+	 * @since 5.9.0
+	 */
+	const PROTECTED_PROPERTIES = array(
+		'spacing.blockGap' => array( 'spacing', 'blockGap' ),
 	);
 
 	/**
@@ -346,10 +346,6 @@ class WP_Theme_JSON_Gutenberg {
 			'style'  => null,
 			'width'  => null,
 		),
-		'shadow'                        => array(
-			'presets'        => null,
-			'defaultPresets' => null,
-		),
 		'color'                         => array(
 			'background'       => null,
 			'custom'           => null,
@@ -385,6 +381,10 @@ class WP_Theme_JSON_Gutenberg {
 			'margin'            => null,
 			'padding'           => null,
 			'units'             => null,
+		),
+		'shadow'                        => array(
+			'presets'        => null,
+			'defaultPresets' => null,
 		),
 		'typography'                    => array(
 			'fluid'          => null,
@@ -431,7 +431,6 @@ class WP_Theme_JSON_Gutenberg {
 			'gradient'   => null,
 			'text'       => null,
 		),
-		'css'        => null,
 		'dimensions' => array(
 			'minHeight' => null,
 		),
@@ -460,6 +459,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textDecoration' => null,
 			'textTransform'  => null,
 		),
+		'css'        => null,
 	);
 
 	/**
@@ -971,27 +971,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Processes the CSS, to apply nesting.
-	 *
-	 * @param string $css      The CSS to process.
-	 * @param string $selector The selector to nest.
-	 *
-	 * @return string The processed CSS.
-	 */
-	protected function process_blocks_custom_css( $css, $selector ) {
-		$processed_css = '';
-
-		// Split CSS nested rules.
-		$parts = explode( '&', $css );
-		foreach ( $parts as $part ) {
-			$processed_css .= ( ! str_contains( $part, '{' ) )
-				? trim( $selector ) . '{' . trim( $part ) . '}' // If the part doesn't contain braces, it applies to the root level.
-				: trim( $selector . $part ); // Prepend the selector, which effectively replaces the "&" character.
-		}
-		return $processed_css;
-	}
-
-	/**
 	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
 	 *
@@ -1095,6 +1074,28 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $stylesheet;
+	}
+
+	/**
+	 * Processes the CSS, to apply nesting.
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $css      The CSS to process.
+	 * @param string $selector The selector to nest.
+	 * @return string The processed CSS.
+	 */
+	protected function process_blocks_custom_css( $css, $selector ) {
+		$processed_css = '';
+
+		// Split CSS nested rules.
+		$parts = explode( '&', $css );
+		foreach ( $parts as $part ) {
+			$processed_css .= ( ! str_contains( $part, '{' ) )
+				? trim( $selector ) . '{' . trim( $part ) . '}' // If the part doesn't contain braces, it applies to the root level.
+				: trim( $selector . $part ); // Prepend the selector, which effectively replaces the "&" character.
+		}
+		return $processed_css;
 	}
 
 	/**
@@ -2335,11 +2336,13 @@ class WP_Theme_JSON_Gutenberg {
 						if ( empty( $style_variation_node[ $feature_name ] ) ) {
 							continue;
 						}
+						// If feature selector includes block classname, remove it but leave the whitespace in.
+						$shortened_feature_selector = str_replace( $block_metadata['selector'] . ' ', ' ', $feature_selector );
 						// Prepend the variation selector to the feature selector.
-						$split_feature_selectors    = explode( ',', $feature_selector );
+						$split_feature_selectors    = explode( ',', $shortened_feature_selector );
 						$feature_selectors          = array_map(
 							static function( $split_feature_selector ) use ( $clean_style_variation_selector ) {
-								return $clean_style_variation_selector . trim( $split_feature_selector );
+								return $clean_style_variation_selector . $split_feature_selector;
 							},
 							$split_feature_selectors
 						);
@@ -2574,13 +2577,13 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @param array      $data    The data to inspect.
-	 * @param bool|array $path    Boolean or path to a boolean.
-	 * @param bool       $default Default value if the referenced path is missing.
-	 *                            Default false.
+	 * @param array      $data          The data to inspect.
+	 * @param bool|array $path          Boolean or path to a boolean.
+	 * @param bool       $default_value Default value if the referenced path is missing.
+	 *                                  Default false.
 	 * @return bool Value of boolean metadata.
 	 */
-	protected static function get_metadata_boolean( $data, $path, $default = false ) {
+	protected static function get_metadata_boolean( $data, $path, $default_value = false ) {
 		if ( is_bool( $path ) ) {
 			return $path;
 		}
@@ -2592,7 +2595,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		return $default;
+		return $default_value;
 	}
 
 	/**

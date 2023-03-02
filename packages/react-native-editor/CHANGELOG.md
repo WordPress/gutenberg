@@ -12,6 +12,9 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] Add metadata parameter to media upload events [#48103]  
 
+## 1.89.1 
+-   [*] Fix inaccessible block settings within the unsupported block editor [#48435]
+
 ## 1.89.0 
 * No User facing changes *
 
