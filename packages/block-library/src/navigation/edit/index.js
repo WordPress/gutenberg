@@ -526,7 +526,11 @@ function Navigation( {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { orientation } );
 		}
-	}, [ orientation ] );
+	}, [
+		orientation,
+		__unstableMarkNextChangeAsNotPersistent,
+		setAttributes,
+	] );
 
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
