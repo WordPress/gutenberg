@@ -21,6 +21,25 @@ export default function Table( { templateType } ) {
 	const { records: templates } = useEntityRecords( 'postType', templateType, {
 		per_page: -1,
 	} );
+
+	const deletedTemplates = useSelect(
+		( select ) => {
+			const result = {};
+			for ( const template of templates || [] ) {
+				const isDeleting = select( coreStore ).isDeletingEntityRecord(
+					'postType',
+					templateType,
+					template.id
+				);
+				if ( isDeleting ) {
+					result[ template.id ] = true;
+				}
+			}
+			return result;
+		},
+		[ templates ]
+	);
+
 	const postType = useSelect(
 		( select ) => select( coreStore ).getPostType( templateType ),
 		[ templateType ]
@@ -70,40 +89,51 @@ export default function Table( { templateType } ) {
 			</thead>
 
 			<tbody>
-				{ templates.map( ( template ) => (
-					<tr
-						key={ template.id }
-						className="edit-site-list-table-row"
-						role="row"
-					>
-						<td className="edit-site-list-table-column" role="cell">
-							<Heading level={ 4 }>
-								<Link
-									params={ {
-										postId: template.id,
-										postType: template.type,
-									} }
-								>
-									{ decodeEntities(
-										template.title?.rendered ||
-											template.slug
-									) }
-								</Link>
-							</Heading>
-							{ decodeEntities( template.description ) }
-						</td>
+				{ templates
+					.filter( ( template ) => ! deletedTemplates[ template.id ] )
+					.map( ( template ) => (
+						<tr
+							key={ template.id }
+							className="edit-site-list-table-row"
+							role="row"
+						>
+							<td
+								className="edit-site-list-table-column"
+								role="cell"
+							>
+								<Heading level={ 4 }>
+									<Link
+										params={ {
+											postId: template.id,
+											postType: template.type,
+										} }
+									>
+										{ decodeEntities(
+											template.title?.rendered ||
+												template.slug
+										) }
+									</Link>
+								</Heading>
+								{ decodeEntities( template.description ) }
+							</td>
 
-						<td className="edit-site-list-table-column" role="cell">
-							<AddedBy
-								templateType={ templateType }
-								template={ template }
-							/>
-						</td>
-						<td className="edit-site-list-table-column" role="cell">
-							<Actions template={ template } />
-						</td>
-					</tr>
-				) ) }
+							<td
+								className="edit-site-list-table-column"
+								role="cell"
+							>
+								<AddedBy
+									templateType={ templateType }
+									template={ template }
+								/>
+							</td>
+							<td
+								className="edit-site-list-table-column"
+								role="cell"
+							>
+								<Actions template={ template } />
+							</td>
+						</tr>
+					) ) }
 			</tbody>
 		</table>
 	);
