@@ -61,6 +61,9 @@ export default function Table( { templateType } ) {
 		);
 	}
 
+	const sortedTemplates = [ ...templates ];
+	sortedTemplates.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
+
 	return (
 		// These explicit aria roles are needed for Safari.
 		// See https://developer.mozilla.org/en-US/docs/Web/CSS/display#tables
@@ -116,7 +119,6 @@ export default function Table( { templateType } ) {
 								</Heading>
 								{ decodeEntities( template.description ) }
 							</td>
-
 							<td
 								className="edit-site-list-table-column"
 								role="cell"

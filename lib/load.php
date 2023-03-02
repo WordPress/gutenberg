@@ -109,6 +109,7 @@ require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
+require __DIR__ . '/experimental/l10n.php';
 
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {

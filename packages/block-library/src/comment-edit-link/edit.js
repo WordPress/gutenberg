@@ -39,6 +39,7 @@ export default function Edit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Link settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Open in new tab' ) }
 					onChange={ ( value ) =>
 						setAttributes( {

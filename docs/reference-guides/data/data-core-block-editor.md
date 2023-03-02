@@ -1382,7 +1382,7 @@ the set of specified client IDs are to be removed.
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Client IDs of blocks to remove.
--   _selectPrevious_ `boolean`: True if the previous block should be selected when a block is removed.
+-   _selectPrevious_ `boolean`: True if the previous block or the immediate parent (if no previous block exists) should be selected when a block is removed.
 
 ### replaceBlock
 
@@ -1496,11 +1496,13 @@ _Parameters_
 ### selectPreviousBlock
 
 Yields action objects used in signalling that the block preceding the given
-clientId should be selected.
+clientId (or optionally, its first parent from bottom to top)
+should be selected.
 
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+-   _fallbackToParent_ `boolean`: If true, select the first parent if there is no previous block.
 
 ### setBlockMovingClientId
 

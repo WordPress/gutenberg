@@ -42,7 +42,7 @@ test.describe( 'List View', () => {
 			] );
 
 		// Drag the paragraph above the heading.
-		const paragraphBlockItem = await listView.getByRole( 'gridcell', {
+		const paragraphBlockItem = listView.getByRole( 'gridcell', {
 			name: 'Paragraph link',
 		} );
 		const headingBlockItem = listView.getByRole( 'gridcell', {
@@ -506,5 +506,59 @@ test.describe( 'List View', () => {
 		// Close List View and ensure it's closed.
 		await pageUtils.pressKeyWithModifier( 'access', 'o' );
 		await expect( listView ).not.toBeVisible();
+	} );
+
+	test( 'should place focus on the currently selected block in the canvas', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Insert a couple of blocks of different types.
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Open List View.
+		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		// The last inserted block should be selected.
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Paragraph link',
+				selected: true,
+			} )
+		).toBeVisible();
+
+		// Go to the image block in List View.
+		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
+		await expect(
+			listView
+				.getByRole( 'gridcell', {
+					name: 'Image link',
+				} )
+				.getByRole( 'link', { includeHidden: true } )
+		).toBeFocused();
+
+		// Select the image block in the canvas.
+		await page.keyboard.press( 'Enter' );
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		await expect(
+			imageBlock.getByRole( 'button', { name: 'Upload' } )
+		).toBeFocused();
+
+		// Triggering the List View shortcut should result in the image block gaining focus.
+		await pageUtils.pressKeyWithModifier( 'access', 'o' );
+		await expect(
+			listView
+				.getByRole( 'gridcell', {
+					name: 'Image link',
+				} )
+				.getByRole( 'link', { includeHidden: true } )
+		).toBeFocused();
 	} );
 } );

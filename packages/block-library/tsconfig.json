@@ -28,7 +28,8 @@
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
-		{ "path": "../url" }
+		{ "path": "../url" },
+		{ "path": "../wordcount" }
 	],
 	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
 }
