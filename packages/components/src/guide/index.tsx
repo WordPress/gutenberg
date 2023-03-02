@@ -55,7 +55,7 @@ function Guide( {
 	children,
 	className,
 	contentLabel,
-	finishButtonText,
+	finishButtonText = __( 'Finish' ),
 	onFinish,
 	pages = [],
 }: GuideProps ) {
@@ -162,7 +162,7 @@ function Guide( {
 							className="components-guide__finish-button"
 							onClick={ onFinish }
 						>
-							{ finishButtonText || __( 'Finish' ) }
+							{ finishButtonText }
 						</Button>
 					) }
 				</div>
