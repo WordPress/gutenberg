@@ -19,6 +19,16 @@ import { RichTextData } from '@wordpress/rich-text';
 import { BLOCK_ICON_DEFAULT } from './constants';
 import { getBlockType, getDefaultBlockName } from './registration';
 
+/**
+ * @typedef {import('../types').Block} Block
+ * @typedef {import('../types').BlockType} BlockType
+ * @typedef {import('../types').AxialDirection} AxialDirection
+ * @typedef {import('../types').BlockAttributes} BlockAttributes
+ * @typedef {import('../types').BlockIcon} BlockIcon
+ * @typedef {import('../types').BlockIconNormalized} BlockIconNormalized
+ * @typedef {import('../types').BlockIconRenderer} BlockIconRenderer
+ */
+
 extend( [ namesPlugin, a11yPlugin ] );
 
 /**
@@ -33,7 +43,7 @@ const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
  * Determines whether the block's attributes are equal to the default attributes
  * which means the block is unmodified.
  *
- * @param {WPBlock} block Block Object
+ * @param {Block} block Block Object
  *
  * @return {boolean} Whether the block is an unmodified block.
  */
@@ -64,7 +74,7 @@ export function isUnmodifiedBlock( block ) {
  * Determines whether the block is a default block and its attributes are equal
  * to the default attributes which means the block is unmodified.
  *
- * @param {WPBlock} block Block Object
+ * @param {Block} block Block Object
  *
  * @return {boolean} Whether the block is an unmodified default block.
  */
@@ -77,7 +87,7 @@ export function isUnmodifiedDefaultBlock( block ) {
  *
  * @param {*} icon Parameter to be checked.
  *
- * @return {boolean} True if the parameter is a valid icon and false otherwise.
+ * @return {icon is BlockIconRenderer} True if the parameter is a valid icon and false otherwise.
  */
 
 export function isValidIcon( icon ) {
@@ -95,11 +105,11 @@ export function isValidIcon( icon ) {
  * and returns a new icon object that is normalized so we can rely on just on possible icon structure
  * in the codebase.
  *
- * @param {WPBlockTypeIconRender} icon Render behavior of a block type icon;
- *                                     one of a Dashicon slug, an element, or a
- *                                     component.
+ * @param {BlockIcon} icon Render behavior of a block type icon;
+ *                         one of a Dashicon slug, an element, or a
+ *                         component.
  *
- * @return {WPBlockTypeIconDescriptor} Object describing the icon.
+ * @return {BlockIconNormalized} Object describing the icon.
  */
 export function normalizeIconObject( icon ) {
 	icon = icon || BLOCK_ICON_DEFAULT;
@@ -133,9 +143,9 @@ export function normalizeIconObject( icon ) {
  * it converts it to the matching block type object.
  * It passes the original object otherwise.
  *
- * @param {string|Object} blockTypeOrName Block type or name.
+ * @param {BlockType|string} blockTypeOrName Block type or name.
  *
- * @return {?Object} Block type.
+ * @return {BlockType|undefined} Block type.
  */
 export function normalizeBlockType( blockTypeOrName ) {
 	if ( typeof blockTypeOrName === 'string' ) {
@@ -149,9 +159,9 @@ export function normalizeBlockType( blockTypeOrName ) {
  * Get the label for the block, usually this is either the block title,
  * or the value of the block's `label` function when that's specified.
  *
- * @param {Object} blockType  The block type.
- * @param {Object} attributes The values of the block's attributes.
- * @param {Object} context    The intended use for the label.
+ * @param {BlockType}       blockType  The block type.
+ * @param {BlockAttributes} attributes The values of the block's attributes.
+ * @param {Object}          context    The intended use for the label.
  *
  * @return {string} The block label.
  */
@@ -173,10 +183,10 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
  * than the visual label and includes the block title and the value of the
  * `getLabel` function if it's specified.
  *
- * @param {?Object} blockType              The block type.
- * @param {Object}  attributes             The values of the block's attributes.
- * @param {?number} position               The position of the block in the block list.
- * @param {string}  [direction='vertical'] The direction of the block layout.
+ * @param {BlockType|undefined} blockType  The block type.
+ * @param {BlockAttributes}     attributes The values of the block's attributes.
+ * @param {number=}             position   The position of the block in the block list.
+ * @param {AxialDirection=}     direction  The direction of the block layout.
  *
  * @return {string} The block label.
  */
@@ -265,9 +275,9 @@ export function getDefault( attributeSchema ) {
  * Ensure attributes contains only values defined by block type, and merge
  * default values for missing attributes.
  *
- * @param {string} name       The block's name.
- * @param {Object} attributes The block's attributes.
- * @return {Object} The sanitized attributes.
+ * @param {string}          name       The block's name.
+ * @param {BlockAttributes} attributes The block's attributes.
+ * @return {BlockAttributes} The sanitized attributes.
  */
 export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 	// Get the type definition associated with a registered block.

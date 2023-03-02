@@ -27,6 +27,13 @@ import {
 import { normalizeBlockType, getDefault } from '../utils';
 
 /**
+ * @typedef {import('../../types').BlockType} BlockType
+ * @typedef {import('../../types').BlockAttributes} BlockAttributes
+ * @typedef {import('../../types').BlockAttributeSchema<any>} BlockAttributeSchema
+ * @typedef {import('../../types').AttributeSchemaType} AttributeSchemaType
+ */
+
+/**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
  * or false depending on whether the original matcher returns undefined. This
  * is useful for boolean attributes (e.g. disabled) whose attribute values may
@@ -61,8 +68,8 @@ export const toBooleanAttributeMatcher = ( matcher ) =>
  *
  * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
  *
- * @param {*}      value Value to test.
- * @param {string} type  Type to test.
+ * @param {*}                   value Value to test.
+ * @param {AttributeSchemaType} type  Type to test.
  *
  * @return {boolean} Whether value is of type.
  */
@@ -100,8 +107,8 @@ export function isOfType( value, type ) {
  *
  * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
  *
- * @param {*}        value Value to test.
- * @param {string[]} types Types to test.
+ * @param {*}                     value Value to test.
+ * @param {AttributeSchemaType[]} types Types to test.
  *
  * @return {boolean} Whether value is of types.
  */
@@ -114,11 +121,11 @@ export function isOfTypes( value, types ) {
  * commentAttributes returns the attribute value depending on its source
  * definition of the given attribute key.
  *
- * @param {string} attributeKey      Attribute key.
- * @param {Object} attributeSchema   Attribute's schema.
- * @param {Node}   innerDOM          Parsed DOM of block's inner HTML.
- * @param {Object} commentAttributes Block's comment attributes.
- * @param {string} innerHTML         Raw HTML from block node's innerHTML property.
+ * @param {string}               attributeKey      Attribute key.
+ * @param {BlockAttributeSchema} attributeSchema   Attribute's schema.
+ * @param {Node}                 innerDOM          Parsed DOM of block's inner HTML.
+ * @param {Record<string, any>}  commentAttributes Block's comment attributes.
+ * @param {string}               innerHTML         Raw HTML from block node's innerHTML property.
  *
  * @return {*} Attribute value.
  */
@@ -178,8 +185,8 @@ export function getBlockAttribute(
  *
  * @see https://json-schema.org/latest/json-schema-validation.html#rfc.section.6.1.1
  *
- * @param {*}                       value Value to test.
- * @param {?(Array<string>|string)} type  Block attribute schema type.
+ * @param {*}                                            value Value to test.
+ * @param {(AttributeSchemaType|AttributeSchemaType[])=} type  Block attribute schema type.
  *
  * @return {boolean} Whether value is valid.
  */
@@ -196,8 +203,8 @@ export function isValidByType( value, type ) {
  *
  * @see https://json-schema.org/latest/json-schema-validation.html#rfc.section.6.1.2
  *
- * @param {*}      value   Value to test.
- * @param {?Array} enumSet Block attribute schema enum.
+ * @param {*}         value   Value to test.
+ * @param {string[]=} enumSet Block attribute schema enum.
  *
  * @return {boolean} Whether value is valid.
  */
@@ -208,7 +215,7 @@ export function isValidByEnum( value, enumSet ) {
 /**
  * Returns an hpq matcher given a source object.
  *
- * @param {Object} sourceConfig Attribute Source object.
+ * @param {BlockAttributeSchema} sourceConfig Attribute Source object.
  *
  * @return {Function} A hpq Matcher.
  */
@@ -271,10 +278,12 @@ function parseHtml( innerHTML ) {
  * Given a block's raw content and an attribute's schema returns the attribute's
  * value depending on its source.
  *
- * @param {string|Node} innerHTML       Block's raw content.
- * @param {Object}      attributeSchema Attribute's schema.
+ * @template {BlockAttributeSchema} AttributeSchema
  *
- * @return {*} Attribute value.
+ * @param {string|Node}     innerHTML       Block's raw content.
+ * @param {AttributeSchema} attributeSchema Attribute's schema.
+ *
+ * @return {import('../../types').SourceReturnValue<AttributeSchema>} Attribute value.
  */
 export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
 	return matcherFromSource( attributeSchema )( parseHtml( innerHTML ) );
@@ -283,11 +292,13 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
 /**
  * Returns the block attributes of a registered block node given its type.
  *
- * @param {string|Object} blockTypeOrName Block type or name.
- * @param {string|Node}   innerHTML       Raw block content.
- * @param {?Object}       attributes      Known block attributes (from delimiters).
+ * @template {BlockType} T
  *
- * @return {Object} All block attributes.
+ * @param {T|string}                  blockTypeOrName Block type or name.
+ * @param {string|Node}               innerHTML       Raw block content.
+ * @param {Partial<BlockAttributes>=} attributes      Known block attributes (from delimiters).
+ *
+ * @return {T extends import('../../types').BlockType<infer U> ? U : Record<string, any>} All block attributes.
  */
 export function getBlockAttributes(
 	blockTypeOrName,

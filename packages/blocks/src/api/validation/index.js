@@ -21,10 +21,21 @@ import {
 } from '../registration';
 import { normalizeBlockType } from '../utils';
 
-/** @typedef {import('../parser').WPBlock} WPBlock */
-/** @typedef {import('../registration').WPBlockType} WPBlockType */
-/** @typedef {import('./logger').LoggerItem} LoggerItem */
+/**
+ * @typedef {import('simple-html-tokenizer').Token} Token
+ * @typedef {import('../../types').BlockAttributes} BlockAttributes
+ * @typedef {import('../../types').Block} Block
+ * @typedef {import('../../types').BlockType} BlockType
+ * @typedef {import('./logger').LoggerItem} LoggerItem
+ */
 
+/**
+ * Directly returns the value provided.
+ *
+ * @template Value
+ * @param {Value} x The input value.
+ * @return {Value} The output value.
+ */
 const identity = ( x ) => x;
 
 /**
@@ -61,7 +72,7 @@ const REGEXP_STYLE_URL_TYPE = /^url\s*\(['"\s]*(.*?)['"\s]*\)$/;
  *         [ tr.firstChild.textContent.trim() ]: true
  *     } ), {} ) ).sort();
  *
- * @type {Array}
+ * @type {string[]}
  */
 const BOOLEAN_ATTRIBUTES = [
 	'allowfullscreen',
@@ -108,7 +119,7 @@ const BOOLEAN_ATTRIBUTES = [
  *         [ tr.firstChild.textContent.trim() ]: true
  *     } ), {} ) ).sort();
  *
- * @type {Array}
+ * @type {string[]}
  */
 const ENUMERATED_ATTRIBUTES = [
 	'autocapitalize',
@@ -139,7 +150,7 @@ const ENUMERATED_ATTRIBUTES = [
  * Meaningful attributes are those who cannot be safely ignored when omitted in
  * one HTML markup string and not another.
  *
- * @type {Array}
+ * @type {string[]}
  */
 const MEANINGFUL_ATTRIBUTES = [
 	...BOOLEAN_ATTRIBUTES,
@@ -151,7 +162,7 @@ const MEANINGFUL_ATTRIBUTES = [
  * behavior for consideration in text token equivalence, carefully ordered from
  * least-to-most expensive operations.
  *
- * @type {Array}
+ * @type {Array<(value: string) => string>}
  */
 const TEXT_NORMALIZATIONS = [ identity, getTextWithCollapsedWhitespace ];
 
@@ -235,7 +246,7 @@ export class DecodeEntityParser {
 	 *
 	 * @param {string} entity Entity fragment discovered in HTML.
 	 *
-	 * @return {string | undefined} Entity substitute value.
+	 * @return {string|void} Entity substitute value.
 	 */
 	parse( entity ) {
 		if ( isValidCharacterReference( entity ) ) {
@@ -279,9 +290,9 @@ export function getTextWithCollapsedWhitespace( text ) {
  *
  * @see MEANINGFUL_ATTRIBUTES
  *
- * @param {Object} token StartTag token.
+ * @param {Token} token StartTag token.
  *
- * @return {Array[]} Attribute pairs.
+ * @return {[string, string][]} Attribute pairs.
  */
 export function getMeaningfulAttributePairs( token ) {
 	return token.attributes.filter( ( pair ) => {
@@ -298,8 +309,8 @@ export function getMeaningfulAttributePairs( token ) {
  * Returns true if two text tokens (with `chars` property) are equivalent, or
  * false otherwise.
  *
- * @param {Object} actual   Actual token.
- * @param {Object} expected Expected token.
+ * @param {Token}  actual   Actual token.
+ * @param {Token}  expected Expected token.
  * @param {Object} logger   Validation logger object.
  *
  * @return {boolean} Whether two text tokens are equivalent.
@@ -438,9 +449,9 @@ export const isEqualAttributesOfName = {
  * Given two sets of attribute tuples, returns true if the attribute sets are
  * equivalent.
  *
- * @param {Array[]} actual   Actual attributes tuples.
- * @param {Array[]} expected Expected attributes tuples.
- * @param {Object}  logger   Validation logger object.
+ * @param {[string, string][]} actual   Actual attributes tuples.
+ * @param {[string, string][]} expected Expected attributes tuples.
+ * @param {Object}             logger   Validation logger object.
  *
  * @return {boolean} Whether attributes are equivalent.
  */
@@ -512,7 +523,7 @@ export function isEqualTagAttributePairs(
 /**
  * Token-type-specific equality handlers
  *
- * @type {Object}
+ * @type {Record<string, (actual: Token, expected: Token, logger: any) => boolean>}
  */
 export const isEqualTokensOfType = {
 	StartTag: ( actual, expected, logger = createLogger() ) => {
@@ -546,9 +557,9 @@ export const isEqualTokensOfType = {
  *
  * Mutates the tokens array.
  *
- * @param {Object[]} tokens Set of tokens to search.
+ * @param {Token[]} tokens Set of tokens to search.
  *
- * @return {Object | undefined} Next non-whitespace token.
+ * @return {Token|void} Next non-whitespace token.
  */
 export function getNextNonWhitespaceToken( tokens ) {
 	let token;
@@ -570,7 +581,7 @@ export function getNextNonWhitespaceToken( tokens ) {
  * @param {string} html   HTML string to tokenize.
  * @param {Object} logger Validation logger object.
  *
- * @return {Object[]|null} Array of valid tokenized HTML elements, or null on error
+ * @return {Token[]|null} Array of valid tokenized HTML elements, or null on error
  */
 function getHTMLTokens( html, logger = createLogger() ) {
 	try {
@@ -585,8 +596,8 @@ function getHTMLTokens( html, logger = createLogger() ) {
 /**
  * Returns true if the next HTML token closes the current token.
  *
- * @param {Object}           currentToken Current token to compare with.
- * @param {Object|undefined} nextToken    Next token to compare against.
+ * @param {Token}  currentToken Current token to compare with.
+ * @param {Token=} nextToken    Next token to compare against.
  *
  * @return {boolean} true if `nextToken` closes `currentToken`, false otherwise
  */
@@ -702,22 +713,8 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  * with assumed attributes, the content matches the original value. If block is
  * invalid, this function returns all validations issues as well.
  *
- * @param {string|Object} blockTypeOrName      Block type.
- * @param {Object}        attributes           Parsed block attributes.
- * @param {string}        originalBlockContent Original block content.
- * @param {Object}        logger               Validation logger object.
- *
- * @return {Object} Whether block is valid and contains validation messages.
- */
-
-/**
- * Returns an object with `isValid` property set to `true` if the parsed block
- * is valid given the input content. A block is considered valid if, when serialized
- * with assumed attributes, the content matches the original value. If block is
- * invalid, this function returns all validations issues as well.
- *
- * @param {WPBlock}            block                          block object.
- * @param {WPBlockType|string} [blockTypeOrName = block.name] Block type or name, inferred from block if not given.
+ * @param {Block}               block           block object.
+ * @param {(BlockType|string)=} blockTypeOrName Block type or name, inferred from block if not given.
  *
  * @return {[boolean,Array<LoggerItem>]} validation results.
  */
@@ -773,9 +770,9 @@ export function validateBlock( block, blockTypeOrName = block.name ) {
  *
  * @deprecated Use validateBlock instead to avoid data loss.
  *
- * @param {string|Object} blockTypeOrName      Block type.
- * @param {Object}        attributes           Parsed block attributes.
- * @param {string}        originalBlockContent Original block content.
+ * @param {BlockType|string} blockTypeOrName      Block type.
+ * @param {BlockAttributes}  attributes           Parsed block attributes.
+ * @param {string}           originalBlockContent Original block content.
  *
  * @return {boolean} Whether block is valid.
  */

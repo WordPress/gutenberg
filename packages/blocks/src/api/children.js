@@ -10,17 +10,15 @@ import deprecated from '@wordpress/deprecated';
 import * as node from './node';
 
 /**
- * A representation of a block's rich text value.
- *
- * @typedef {WPBlockNode[]} WPBlockChildren
+ * @typedef {import('react').ReactChild} ReactChild
  */
 
 /**
  * Given block children, returns a serialize-capable WordPress element.
  *
- * @param {WPBlockChildren} children Block children object to convert.
+ * @param {ReactChild[]} children Block children object to convert.
  *
- * @return {Element} A serialize-capable element.
+ * @return {ReactChild[]} A serialize-capable element.
  */
 export function getSerializeCapableElement( children ) {
 	// The fact that block children are compatible with the element serializer is
@@ -35,9 +33,11 @@ export function getSerializeCapableElement( children ) {
 /**
  * Given block children, returns an array of block nodes.
  *
- * @param {WPBlockChildren} children Block children object to convert.
+ * @param {ReactChild[]} children Block children object to convert.
  *
- * @return {Array<WPBlockNode>} An array of individual block nodes.
+ * @return {ReactChild[]} An array of individual block nodes.
+ *
+ * @deprecated since 11.17.0. Use the html source instead.
  */
 function getChildrenArray( children ) {
 	deprecated( 'wp.blocks.children.getChildrenArray', {
@@ -56,9 +56,11 @@ function getChildrenArray( children ) {
  * Given two or more block nodes, returns a new block node representing a
  * concatenation of its values.
  *
- * @param {...WPBlockChildren} blockNodes Block nodes to concatenate.
+ * @param {...ReactChild[]} blockNodes Block nodes to concatenate.
  *
- * @return {WPBlockChildren} Concatenated block node.
+ * @return {ReactChild[]} Concatenated block node.
+ *
+ * @deprecated since 11.17.0. Use the html source instead.
  */
 export function concat( ...blockNodes ) {
 	deprecated( 'wp.blocks.children.concat', {
@@ -94,9 +96,11 @@ export function concat( ...blockNodes ) {
  * Given an iterable set of DOM nodes, returns equivalent block children.
  * Ignores any non-element/text nodes included in set.
  *
- * @param {Iterable.<Node>} domNodes Iterable set of DOM nodes to convert.
+ * @param {ArrayLike<Node>} domNodes Iterable set of DOM nodes to convert.
  *
- * @return {WPBlockChildren} Block children equivalent to DOM nodes.
+ * @return {ReactChild[]} Block children equivalent to DOM nodes.
+ *
+ * @deprecated since 11.17.0. Use the html source instead.
  */
 export function fromDOM( domNodes ) {
 	deprecated( 'wp.blocks.children.fromDOM', {
@@ -121,9 +125,11 @@ export function fromDOM( domNodes ) {
 /**
  * Given a block node, returns its HTML string representation.
  *
- * @param {WPBlockChildren} children Block node(s) to convert to string.
+ * @param {ReactChild[]} children Block node(s) to convert to string.
  *
  * @return {string} String HTML representation of block node.
+ *
+ * @deprecated since 11.17.0. Use the html source instead.
  */
 export function toHTML( children ) {
 	deprecated( 'wp.blocks.children.toHTML', {
@@ -139,12 +145,14 @@ export function toHTML( children ) {
 }
 
 /**
- * Given a selector, returns an hpq matcher generating a WPBlockChildren value
+ * Given a selector, returns an hpq matcher generating a BlockChildren value
  * matching the selector result.
  *
- * @param {string} selector DOM selector.
+ * @param {string=} selector DOM selector.
  *
- * @return {Function} hpq matcher.
+ * @return {(domNode: Node & ParentNode) => ReactChild[]} hpq matcher.
+ *
+ * @deprecated since 11.17.0. Use the html source instead.
  */
 export function matcher( selector ) {
 	deprecated( 'wp.blocks.children.matcher', {
@@ -155,6 +163,7 @@ export function matcher( selector ) {
 	} );
 
 	return ( domNode ) => {
+		/** @type {(Node & ParentNode)|null} */
 		let match = domNode;
 
 		if ( selector ) {

@@ -16,7 +16,7 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { STORE_NAME } from './name';
 import { updateFootnotesFromMeta } from './footnotes';
 
-/** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
+/** @typedef {import('@wordpress/blocks').Block} WPBlock */
 
 const EMPTY_ARRAY = [];
 

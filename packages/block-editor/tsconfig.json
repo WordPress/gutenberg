@@ -8,6 +8,7 @@
 		{ "path": "../a11y" },
 		{ "path": "../api-fetch" },
 		{ "path": "../blob" },
+		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },

@@ -12,6 +12,7 @@
 		{ "path": "../autop" },
 		{ "path": "../blob" },
 		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../core-data" },

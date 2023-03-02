@@ -4,11 +4,11 @@
 import { getCommentDelimitedContent } from '../serializer';
 
 /**
- * @typedef {Object}   Options                   Serialization options.
- * @property {boolean} [isCommentDelimited=true] Whether to output HTML comments around blocks.
+ * @typedef {import('../../types').BlockNode} BlockNode
+ * @typedef {import('../serializer')} serialize
+ * @typedef {import('../serializer').serializeBlock} serializeBlock
+ * @typedef {import('../types').BlockSerializationOptions} BlockSerializationOptions
  */
-
-/** @typedef {import("./").WPRawBlock} WPRawBlock */
 
 /**
  * Serializes a block node into the native HTML-comment-powered block format.
@@ -20,13 +20,11 @@ import { getCommentDelimitedContent } from '../serializer';
  * @see serializeBlock
  * @see serialize
  *
- * For more on the format of block nodes as returned by valid parsers:
+ * @see {@link https://github.com/WordPress/gutenberg/tree/trunk/packages/block-serialization-default-parser block-serialization-default-parser}
+ * @see {@link https://github.com/WordPress/gutenberg/tree/trunk/packages/block-serialization-spec-parser block-serialization-spec-parser}
  *
- * @see `@wordpress/block-serialization-default-parser` package
- * @see `@wordpress/block-serialization-spec-parser` package
- *
- * @param {WPRawBlock} rawBlock     A block node as returned by a valid parser.
- * @param {Options}    [options={}] Serialization options.
+ * @param {BlockNode}                  rawBlock A block node as returned by a valid parser.
+ * @param {BlockSerializationOptions=} options  Serialization options.
  *
  * @return {string} An HTML string representing a block.
  */

@@ -9,24 +9,20 @@ import deprecated from '@wordpress/deprecated';
 import * as children from './children';
 
 /**
- * A representation of a single node within a block's rich text value. If
- * representing a text node, the value is simply a string of the node value.
- * As representing an element node, it is an object of:
- *
- * 1. `type` (string): Tag name.
- * 2. `props` (object): Attributes and children array of WPBlockNode.
- *
- * @typedef {string|Object} WPBlockNode
+ * @typedef {import('react').ReactChild} ReactChild
+ * @typedef {import('react').ReactElement} ReactElement
  */
 
 /**
  * Given a single node and a node type (e.g. `'br'`), returns true if the node
  * corresponds to that type, false otherwise.
  *
- * @param {WPBlockNode} node Block node to test
- * @param {string}      type Node to type to test against.
+ * @param {JSX.Element}          node Block node to test
+ * @param {ReactElement['type']} type Node to type to test against.
  *
  * @return {boolean} Whether node is of intended type.
+ *
+ * @deprecated since 11.17.0. Use the html source instead.
  */
 function isNodeOfType( node, type ) {
 	deprecated( 'wp.blocks.node.isNodeOfType', {
@@ -66,7 +62,9 @@ export function getNamedNodeMapAsObject( nodeMap ) {
  *
  * @param {Node} domNode DOM node to convert.
  *
- * @return {WPBlockNode} Block node equivalent to DOM node.
+ * @return {JSX.Element} Block node equivalent to DOM node.
+ *
+ * @deprecated since 11.17.0. Use the html source instead.
  */
 export function fromDOM( domNode ) {
 	deprecated( 'wp.blocks.node.fromDOM', {
@@ -99,9 +97,11 @@ export function fromDOM( domNode ) {
 /**
  * Given a block node, returns its HTML string representation.
  *
- * @param {WPBlockNode} node Block node to convert to string.
+ * @param {ReactChild} node Block node to convert to string.
  *
  * @return {string} String HTML representation of block node.
+ *
+ * @deprecated since 11.17.0. Use the html source instead.
  */
 export function toHTML( node ) {
 	deprecated( 'wp.blocks.node.toHTML', {
@@ -115,12 +115,14 @@ export function toHTML( node ) {
 }
 
 /**
- * Given a selector, returns an hpq matcher generating a WPBlockNode value
+ * Given a selector, returns an hpq matcher generating a BlockNode value
  * matching the selector result.
  *
- * @param {string} selector DOM selector.
+ * @param {string=} selector DOM selector.
  *
- * @return {Function} hpq matcher.
+ * @return {(domNode: Node & ParentNode) => ReactChild[]} hpq matcher.
+ *
+ * @deprecated since 11.17.0. Use the html source instead.
  */
 export function matcher( selector ) {
 	deprecated( 'wp.blocks.node.matcher', {

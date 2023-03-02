@@ -28,9 +28,9 @@ Given a block object, returns a copy of the block object, optionally merging new
 
 _Parameters_
 
--   _block_ `Object`: Block instance.
--   _mergeAttributes_ `Object`: Block attributes.
--   _newInnerBlocks_ `?Array`: Nested blocks.
+-   _block_ `Block`: Block instance.
+-   _mergeAttributes_ `BlockAttributes`: Block attributes.
+-   _newInnerBlocks_ `Block[]=`: Nested blocks.
 
 _Returns_
 
@@ -43,12 +43,12 @@ Returns a block object given its type and attributes.
 _Parameters_
 
 -   _name_ `string`: Block name.
--   _attributes_ `Object`: Block attributes.
--   _innerBlocks_ `?Array`: Nested blocks.
+-   _attributes_ `BlockAttributes`: Block attributes.
+-   _innerBlocks_ `Block[]=`: Nested blocks.
 
 _Returns_
 
--   `Object`: Block object.
+-   `Block`: Block object.
 
 ### createBlocksFromInnerBlocksTemplate
 
@@ -56,11 +56,11 @@ Given an array of InnerBlocks templates or Block Objects, returns an array of cr
 
 _Parameters_
 
--   _innerBlocksOrTemplate_ `Array`: Nested blocks or InnerBlocks templates.
+-   _innerBlocksOrTemplate_ `Array<Block|InnerBlockTemplate>`: Nested blocks or InnerBlocks templates.
 
 _Returns_
 
--   `Object[]`: Array of Block objects.
+-   `Block[]`: Array of Block objects.
 
 ### doBlocksMatchTemplate
 
@@ -68,8 +68,8 @@ Checks whether a list of blocks matches a template by comparing the block names.
 
 _Parameters_
 
--   _blocks_ `Array`: Block list.
--   _template_ `Array`: Block template.
+-   _blocks_ `Block[]`: Block list.
+-   _template_ `InnerBlockTemplate[]`: Block template.
 
 _Returns_
 
@@ -81,12 +81,12 @@ Given an array of transforms, returns the highest-priority transform where the p
 
 _Parameters_
 
--   _transforms_ `Object[]`: Transforms to search.
--   _predicate_ `Function`: Function returning true on matching transform.
+-   _transforms_ `Transform[]`: Transforms to search.
+-   _predicate_ `(transform: Transform) => boolean`: Function returning true on matching transform.
 
 _Returns_
 
--   `?Object`: Highest-priority transform candidate.
+-   `Transform|undefined`: Highest-priority transform candidate.
 
 ### getBlockAttributes
 
@@ -94,13 +94,13 @@ Returns the block attributes of a registered block node given its type.
 
 _Parameters_
 
--   _blockTypeOrName_ `string|Object`: Block type or name.
+-   _blockTypeOrName_ `T|string`: Block type or name.
 -   _innerHTML_ `string|Node`: Raw block content.
--   _attributes_ `?Object`: Known block attributes (from delimiters).
+-   _attributes_ `Partial<BlockAttributes>=`: Known block attributes (from delimiters).
 
 _Returns_
 
--   `Object`: All block attributes.
+-   `T extends import('../../types').BlockType<infer U> ? U : Record<string, any>`: All block attributes.
 
 ### getBlockContent
 
@@ -108,7 +108,7 @@ Given a block object, returns the Block's Inner HTML markup.
 
 _Parameters_
 
--   _block_ `Object`: Block instance.
+-   _block_ `Block`: Block instance.
 
 _Returns_
 
@@ -133,11 +133,11 @@ Create a block object from the example API.
 _Parameters_
 
 -   _name_ `string`:
--   _example_ `Object`:
+-   _example_ `Block`:
 
 _Returns_
 
--   `Object`: block.
+-   `Block`: block.
 
 ### getBlockMenuDefaultClassName
 
@@ -157,13 +157,13 @@ Returns the block support value for a feature, if defined.
 
 _Parameters_
 
--   _nameOrType_ `(string|Object)`: Block name or type object
--   _feature_ `string`: Feature to retrieve
+-   _nameOrType_ `string|BlockType`: Block name or type object
+-   _feature_ `keyof BlockSupports`: Feature to retrieve
 -   _defaultSupports_ `*`: Default value to return if not explicitly defined
 
 _Returns_
 
--   `?*`: Block support value
+-   `*`: Block support value
 
 ### getBlockTransforms
 
@@ -171,12 +171,12 @@ Returns normal block transforms for a given transform direction, optionally for 
 
 _Parameters_
 
--   _direction_ `string`: Transform direction ("to", "from").
--   _blockTypeOrName_ `string|Object`: Block type or name.
+-   _direction_ `'from'|'to'`: Transform direction ("to", "from").
+-   _blockTypeOrName_ `BlockType|string`: Block type or name.
 
 _Returns_
 
--   `Array`: Block transforms for direction.
+-   `Transform[]`: Block transforms for direction.
 
 ### getBlockType
 
@@ -188,7 +188,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: Block type.
+-   `BlockType|undefined`: Block type.
 
 ### getBlockTypes
 
@@ -196,7 +196,7 @@ Returns all registered blocks.
 
 _Returns_
 
--   `Array`: Block settings.
+-   `BlockType[]`: Block settings.
 
 ### getChildBlockNames
 
@@ -208,7 +208,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: Array of child block names.
+-   `string[]`: Array of child block names.
 
 ### getDefaultBlockName
 
@@ -216,7 +216,7 @@ Retrieves the default block name.
 
 _Returns_
 
--   `?string`: Block name.
+-   `string|undefined`: Block name.
 
 ### getFreeformContentHandlerName
 
@@ -224,7 +224,7 @@ Retrieves name of block handling non-block content, or undefined if no handler h
 
 _Returns_
 
--   `?string`: Block name.
+-   `string|undefined`: Block name.
 
 ### getGroupingBlockName
 
@@ -232,7 +232,7 @@ Retrieves name of block used for handling grouping interactions.
 
 _Returns_
 
--   `?string`: Block name.
+-   `string|undefined`: Block name.
 
 ### getPhrasingContentSchema
 
@@ -244,11 +244,11 @@ Returns an array of block types that the set of blocks received as argument can 
 
 _Parameters_
 
--   _blocks_ `Array`: Blocks array.
+-   _blocks_ `Block[]`: Blocks array.
 
 _Returns_
 
--   `Array`: Block types that the blocks argument can be transformed to.
+-   `BlockType[]`: Block types that the blocks argument can be transformed to.
 
 ### getSaveContent
 
@@ -256,9 +256,9 @@ Given a block type containing a save render implementation and attributes, retur
 
 _Parameters_
 
--   _blockTypeOrName_ `string|Object`: Block type or name.
--   _attributes_ `Object`: Block attributes.
--   _innerBlocks_ `?Array`: Nested blocks.
+-   _blockTypeOrName_ `BlockType|string`: Block type or name.
+-   _attributes_ `BlockAttributes`: Block attributes.
+-   _innerBlocks_ `Block[]=`: Nested blocks.
 
 _Returns_
 
@@ -270,13 +270,13 @@ Given a block type containing a save render implementation and attributes, retur
 
 _Parameters_
 
--   _blockTypeOrName_ `string|Object`: Block type or name.
--   _attributes_ `Object`: Block attributes.
--   _innerBlocks_ `?Array`: Nested blocks.
+-   _blockTypeOrName_ `BlockType|string`: Block type or name.
+-   _attributes_ `BlockAttributes`: Block attributes.
+-   _innerBlocks_ `Block[]=`: Nested blocks.
 
 _Returns_
 
--   `Object|string`: Save element or raw HTML string.
+-   `BlockSaveResult|string`: Save element or raw HTML string.
 
 ### getUnregisteredTypeHandlerName
 
@@ -284,7 +284,7 @@ Retrieves name of block handling unregistered block types, or undefined if no ha
 
 _Returns_
 
--   `?string`: Block name.
+-   `string|undefined`: Block name.
 
 ### hasBlockSupport
 
@@ -292,8 +292,8 @@ Returns true if the block defines support for a feature, or false otherwise.
 
 _Parameters_
 
--   _nameOrType_ `(string|Object)`: Block name or type object.
--   _feature_ `string`: Feature to test.
+-   _nameOrType_ `string|BlockType`: Block name or type object.
+-   _feature_ `keyof BlockSupports`: Feature to test.
 -   _defaultSupports_ `boolean`: Whether feature is supported by default if not explicitly defined.
 
 _Returns_
@@ -330,7 +330,7 @@ Determines whether or not the given block is a reusable block. This is a special
 
 _Parameters_
 
--   _blockOrType_ `Object`: Block or Block Type to test.
+-   _blockOrType_ `BlockType|Block`: Block or Block Type to test.
 
 _Returns_
 
@@ -342,7 +342,7 @@ Determines whether or not the given block is a template part. This is a special 
 
 _Parameters_
 
--   _blockOrType_ `Object`: Block or Block Type to test.
+-   _blockOrType_ `Block|BlockType`: Block or Block Type to test.
 
 _Returns_
 
@@ -354,7 +354,7 @@ Determines whether the block's attributes are equal to the default attributes wh
 
 _Parameters_
 
--   _block_ `WPBlock`: Block Object
+-   _block_ `Block`: Block Object
 
 _Returns_
 
@@ -366,7 +366,7 @@ Determines whether the block is a default block and its attributes are equal to 
 
 _Parameters_
 
--   _block_ `WPBlock`: Block Object
+-   _block_ `Block`: Block Object
 
 _Returns_
 
@@ -382,8 +382,8 @@ Logs to console in development environments when invalid.
 
 _Parameters_
 
--   _blockTypeOrName_ `string|Object`: Block type.
--   _attributes_ `Object`: Parsed block attributes.
+-   _blockTypeOrName_ `BlockType|string`: Block type.
+-   _attributes_ `BlockAttributes`: Parsed block attributes.
 -   _originalBlockContent_ `string`: Original block content.
 
 _Returns_
@@ -400,7 +400,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: True if the parameter is a valid icon and false otherwise.
+-   `icon is BlockIconRenderer`: True if the parameter is a valid icon and false otherwise.
 
 ### normalizeIconObject
 
@@ -408,11 +408,11 @@ Function that receives an icon as set by the blocks during the registration and 
 
 _Parameters_
 
--   _icon_ `WPBlockTypeIconRender`: Render behavior of a block type icon; one of a Dashicon slug, an element, or a component.
+-   _icon_ `BlockIcon`: Render behavior of a block type icon; one of a Dashicon slug, an element, or a component.
 
 _Returns_
 
--   `WPBlockTypeIconDescriptor`: Object describing the icon.
+-   `BlockIconNormalized`: Object describing the icon.
 
 ### parse
 
@@ -427,11 +427,11 @@ _Related_
 _Parameters_
 
 -   _content_ `string`: The post content.
--   _options_ `ParseOptions`: Extra options for handling block parsing.
+-   _options_ `BlockParseOptions`: Extra options for handling block parsing.
 
 _Returns_
 
--   `Array`: Block list.
+-   `Block[]`: Block list.
 
 ### parseWithAttributeSchema
 
@@ -440,11 +440,11 @@ Given a block's raw content and an attribute's schema returns the attribute's va
 _Parameters_
 
 -   _innerHTML_ `string|Node`: Block's raw content.
--   _attributeSchema_ `Object`: Attribute's schema.
+-   _attributeSchema_ `AttributeSchema`: Attribute's schema.
 
 _Returns_
 
--   `*`: Attribute value.
+-   `import('../../types').SourceReturnValue<AttributeSchema>`: Attribute value.
 
 ### pasteHandler
 
@@ -501,9 +501,7 @@ registerBlockType( 'my-collection/block-name', {
 _Parameters_
 
 -   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace.
--   _settings_ `Object`: The block collection settings.
--   _settings.title_ `string`: The title to display in the block inserter.
--   _settings.icon_ `[Object]`: The icon to display in the block inserter.
+-   _settings_ `BlockCollection`: The block collection settings.
 
 ### registerBlockStyle
 
@@ -537,7 +535,7 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _blockName_ `string`: Name of block (example: “core/latest-posts”).
--   _styleVariation_ `Object`: Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
+-   _styleVariation_ `BlockStyle`: Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
 
 ### registerBlockType
 
@@ -560,12 +558,12 @@ registerBlockType( 'namespace/block-name', {
 
 _Parameters_
 
--   _blockNameOrMetadata_ `string|Object`: Block type name or its metadata.
--   _settings_ `Object`: Block settings.
+-   _blockNameOrMetadata_ `string|BlockMetadata`: Block type name or its metadata.
+-   _settings_ `(Partial<BlockMetadata>|BlockMetadata)=`: Block settings.
 
 _Returns_
 
--   `WPBlockType | undefined`: The block, if it has been successfully registered; otherwise `undefined`.
+-   `BlockType|undefined`: The block, if it has been successfully registered; otherwise `undefined`.
 
 ### registerBlockVariation
 
@@ -600,7 +598,7 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
--   _variation_ `WPBlockVariation`: Object describing a block variation.
+-   _variation_ `BlockVariation`: Object describing a block variation.
 
 ### serialize
 
@@ -608,8 +606,8 @@ Takes a block or set of blocks and returns the serialized post content.
 
 _Parameters_
 
--   _blocks_ `Array`: Block(s) to serialize.
--   _options_ `WPBlockSerializationOptions`: Serialization options.
+-   _blocks_ `Block[]`: Block(s) to serialize.
+-   _options_ `BlockSerializationOptions=`: Serialization options.
 
 _Returns_
 
@@ -622,14 +620,14 @@ Serializes a block node into the native HTML-comment-powered block format. CAVEA
 _Related_
 
 -   serializeBlock
--   serialize For more on the format of block nodes as returned by valid parsers:
--   `@wordpress/block-serialization-default-parser` package
--   `@wordpress/block-serialization-spec-parser` package
+-   serialize
+-
+-
 
 _Parameters_
 
--   _rawBlock_ `WPRawBlock`: A block node as returned by a valid parser.
--   _options_ `[Options]`: Serialization options.
+-   _rawBlock_ `BlockNode`: A block node as returned by a valid parser.
+-   _options_ `BlockSerializationOptions=`: Serialization options.
 
 _Returns_
 
@@ -672,7 +670,7 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _categories_ `WPBlockCategory[]`: Block categories.
+-   _categories_ `BlockCategory[]`: Block categories.
 
 ### setDefaultBlockName
 
@@ -754,12 +752,12 @@ Switch one or more blocks into one or more blocks of the new block type.
 
 _Parameters_
 
--   _blocks_ `Array|Object`: Blocks array or block object.
+-   _blocks_ `Block[]|Block`: Blocks array or block object.
 -   _name_ `string`: Block name.
 
 _Returns_
 
--   `?Array`: Array of blocks or null.
+-   `Block[]|null`: Array of blocks or null.
 
 ### synchronizeBlocksWithTemplate
 
@@ -769,12 +767,12 @@ Synchronizing a block list with a block template means that we loop over the blo
 
 _Parameters_
 
--   _blocks_ `Array`: Block list.
--   _template_ `Array`: Block template.
+-   _blocks_ `Block[]`: Block list.
+-   _template_ `InnerBlockTemplate[]=`: Block template.
 
 _Returns_
 
--   `Array`: Updated Block list.
+-   `Block[]`: Updated Block list.
 
 ### unregisterBlockStyle
 
@@ -832,7 +830,7 @@ _Parameters_
 
 _Returns_
 
--   `WPBlockType | undefined`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
+-   `BlockType|undefined`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
 
 ### unregisterBlockVariation
 
@@ -890,7 +888,7 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _slug_ `string`: Block category slug.
--   _category_ `WPBlockCategory`: Object containing the category properties that should be updated.
+-   _category_ `BlockCategory`: Object containing the category properties that should be updated.
 
 ### validateBlock
 
@@ -898,8 +896,8 @@ Returns an object with `isValid` property set to `true` if the parsed block is v
 
 _Parameters_
 
--   _block_ `WPBlock`: block object.
--   _blockTypeOrName_ `[WPBlockType|string]`: Block type or name, inferred from block if not given.
+-   _block_ `Block`: block object.
+-   _blockTypeOrName_ `(BlockType|string)=`: Block type or name, inferred from block if not given.
 
 _Returns_
 

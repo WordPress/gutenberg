@@ -8,9 +8,17 @@ import deprecated from '@wordpress/deprecated';
  */
 import { processBlockType } from './process-block-type';
 
-/** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
-/** @typedef {import('../api/registration').WPBlockType} WPBlockType */
-/** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
+/**
+ * @typedef {import('../types').BlockAttributes} BlockAttributes
+ * @typedef {import('../types').BlockCategory} BlockCategory
+ * @typedef {import('../types').BlockCollection} BlockCollection
+ * @typedef {import('../types').BlockDeprecation} BlockDeprecation
+ * @typedef {import('../types').BlockIconRenderer} BlockIconRenderer
+ * @typedef {import('../types').BlockVariation} BlockVariation
+ * @typedef {import('../types').BlockStyle} BlockStyle
+ * @typedef {import('../types').BlockType} BlockType
+ * @typedef {import('../types').BlockTypeCategory} BlockTypeCategory
+ */
 
 /**
  * Returns an action object used in signalling that block types have been added.
@@ -18,7 +26,7 @@ import { processBlockType } from './process-block-type';
  *
  * @ignore
  *
- * @param {WPBlockType|WPBlockType[]} blockTypes Object or array of objects representing blocks to added.
+ * @param {BlockType|BlockType[]} blockTypes Object or array of objects representing blocks to added.
  *
  *
  * @return {Object} Action object.
@@ -98,8 +106,8 @@ export function removeBlockTypes( names ) {
  * Returns an action object used in signalling that new block styles have been added.
  * Ignored from documentation as the recommended usage for this action through registerBlockStyle from @wordpress/blocks.
  *
- * @param {string}       blockName Block name.
- * @param {Array|Object} styles    Block style object or array of block style objects.
+ * @param {string}                  blockName Block name.
+ * @param {BlockStyle|BlockStyle[]} styles    Block style object or array of block style objects.
  *
  * @ignore
  *
@@ -119,8 +127,8 @@ export function addBlockStyles( blockName, styles ) {
  *
  * @ignore
  *
- * @param {string}       blockName  Block name.
- * @param {Array|string} styleNames Block style names or array of block style names.
+ * @param {string}          blockName  Block name.
+ * @param {string|string[]} styleNames Block style names or array of block style names.
  *
  * @return {Object} Action object.
  */
@@ -138,8 +146,8 @@ export function removeBlockStyles( blockName, styleNames ) {
  *
  * @ignore
  *
- * @param {string}                              blockName  Block name.
- * @param {WPBlockVariation|WPBlockVariation[]} variations Block variations.
+ * @param {string}                          blockName  Block name.
+ * @param {BlockVariation|BlockVariation[]} variations Block variations.
  *
  * @return {Object} Action object.
  */
@@ -250,7 +258,7 @@ export function setGroupingBlockName( name ) {
  *
  * @ignore
  *
- * @param {WPBlockCategory[]} categories Block categories.
+ * @param {BlockCategory[]} categories Block categories.
  *
  * @return {Object} Action object.
  */
@@ -267,8 +275,8 @@ export function setCategories( categories ) {
  *
  * @ignore
  *
- * @param {string} slug     Block category slug.
- * @param {Object} category Object containing the category properties that should be updated.
+ * @param {string}                 slug     Block category slug.
+ * @param {Partial<BlockCategory>} category Object containing the category properties that should be updated.
  *
  * @return {Object} Action object.
  */
@@ -286,9 +294,9 @@ export function updateCategory( slug, category ) {
  *
  * @ignore
  *
- * @param {string} namespace The namespace of the blocks to put in the collection
- * @param {string} title     The title to display in the block inserter
- * @param {Object} icon      (optional) The icon to display in the block inserter
+ * @param {string}            namespace The namespace of the blocks to put in the collection
+ * @param {string}            title     The title to display in the block inserter
+ * @param {BlockIconRenderer} icon      (optional) The icon to display in the block inserter
  *
  * @return {Object} Action object.
  */

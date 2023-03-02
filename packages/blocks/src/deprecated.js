@@ -4,6 +4,10 @@
 import deprecated from '@wordpress/deprecated';
 
 /**
+ * @typedef {import('@wordpress/element').WPComponent} WPComponent
+ */
+
+/**
  * A Higher Order Component used to inject BlockContent using context to the
  * wrapped component.
  *
