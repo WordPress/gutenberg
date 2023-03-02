@@ -15,12 +15,6 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
-		},
-		"role": {
-			"type": "string",
-			"source": "attribute",
-			"selector": "*",
-			"attribute": "role"
 		}
 	},
 	"supports": {
@@ -65,6 +59,7 @@
 		"position": {
 			"sticky": true
 		},
+		"role": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,

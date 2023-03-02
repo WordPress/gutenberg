@@ -335,6 +335,11 @@
 					"description": "A block may want to disable the ability of being converted into a reusable block. By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.",
 					"default": true
 				},
+				"role": {
+					"type": "boolean",
+					"description": "Role attributes let you add semantic meaning to non-semantic HTML elements. This property allows enabling the definition of a role for the block, without exposing a UI field.",
+					"default": false
+				},
 				"lock": {
 					"type": "boolean",
 					"description": "A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block 'Options' dropdown by default. To disable this behavior, set lock to false.",
