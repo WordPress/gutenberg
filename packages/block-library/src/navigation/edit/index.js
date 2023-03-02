@@ -512,7 +512,12 @@ function Navigation( {
 				__( 'Classic menu import failed.' )
 			);
 		}
-	}, [ classicMenuConversionStatus, classicMenuConversionError ] );
+	}, [
+		classicMenuConversionStatus,
+		classicMenuConversionError,
+		hideClassicMenuConversionNotice,
+		showClassicMenuConversionNotice,
+	] );
 
 	// Spacer block needs orientation from context. This is a patch until
 	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
