@@ -235,7 +235,7 @@ const v6Supports = {
 };
 
 // Version with wide as the default alignment.
-// See: https://github.com/WordPress/gutenberg/pull/46971
+// See: https://github.com/WordPress/gutenberg/pull/48404
 const v6 = {
 	attributes: v6Attributes,
 	supports: v6Supports,
