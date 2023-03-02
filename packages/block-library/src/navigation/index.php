@@ -572,6 +572,9 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
+	// First things first, let's create the fallback.
+	block_core_navigation_create_fallback();
+
 	static $seen_menu_names = array();
 
 	// Flag used to indicate whether the rendered output is considered to be
@@ -917,6 +920,5 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
 
-// We have to aply this action on both init and admin init, as the code loads after init when in wp-admin.
-add_action( 'init', 'block_core_navigation_create_fallback' );
-add_action( 'admin_init', 'block_core_navigation_create_fallback' );
+// We apply this action on render_block_data, so that we generate a navigation in the dashboard.
+add_action( 'render_block_data', 'block_core_navigation_create_fallback' );
