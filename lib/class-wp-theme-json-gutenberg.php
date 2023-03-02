@@ -3010,18 +3010,9 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $paths ) {
-			foreach ( $paths as $path ) {
-				$value = _wp_array_get( $input, $path, array() );
-				if (
-					isset( $value ) &&
-					! is_array( $value ) &&
-					static::is_safe_css_declaration( $property, $value )
-				) {
-					_wp_array_set( $output, $path, $value );
-				}
-			}
-		}
+		// Ensure indirect properties not included in any `PRESETS_METADATA` value are allowed.
+		static::remove_indirect_properties( $input, $output );
+
 		return $output;
 	}
 
@@ -3053,18 +3044,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// Ensure indirect properties not handled by `compute_style_properties` are allowed.
-		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $paths ) {
-			foreach ( $paths as $path ) {
-				$value = _wp_array_get( $input, $path, array() );
-				if (
-					isset( $value ) &&
-					! is_array( $value ) &&
-					static::is_safe_css_declaration( $property, $value )
-				) {
-					_wp_array_set( $output, $path, $value );
-				}
-			}
-		}
+		static::remove_indirect_properties( $input, $output );
 
 		return $output;
 	}
@@ -3082,6 +3062,29 @@ class WP_Theme_JSON_Gutenberg {
 		$style_to_validate = $property_name . ': ' . $property_value;
 		$filtered          = esc_html( safecss_filter_attr( $style_to_validate ) );
 		return ! empty( trim( $filtered ) );
+	}
+
+	/**
+	 * Removes indirect properties from the given input node and
+	 * sets in the given output node.
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param array $input  Node to process.
+	 * @param array $output The processed node. Passed by reference.
+	 */
+	private static function remove_indirect_properties( $input, &$output ) {
+		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $paths ) {
+			foreach ( $paths as $path ) {
+				$value = _wp_array_get( $input, $path );
+				if (
+					is_string( $value ) &&
+					static::is_safe_css_declaration( $property, $value )
+				) {
+					_wp_array_set( $output, $path, $value );
+				}
+			}
+		}
 	}
 
 	/**
