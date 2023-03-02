@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -122,7 +117,7 @@ function Iframe( {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ head, setHead ] = useState();
-	const [ bodyClasses, setBodyClasses ] = useState( [] );
+	const [ body, setBody ] = useState();
 	const styles = useParsedAssets( assets?.styles );
 	const styleIds = styles.map( ( style ) => style.id );
 	const compatStyles = useCompatibilityStyles();
@@ -149,6 +144,27 @@ function Iframe( {
 				setHead( contentDocument.head );
 			}
 
+			if ( contentDocument.body ) {
+				// Ideally ALL classes that are added through get_body_class should
+				// be added in the editor too, which we'll somehow have to get from
+				// the server in the future (which will run the PHP filters).
+				const bodyClasses = Array.from(
+					ownerDocument.body.classList
+				).filter(
+					( name ) =>
+						name.startsWith( 'admin-color-' ) ||
+						name.startsWith( 'post-type-' ) ||
+						name === 'wp-embed-responsive'
+				);
+				contentDocument.body.classList.add(
+					'block-editor-iframe__body',
+					'editor-styles-wrapper',
+					...bodyClasses
+				);
+
+				setBody( contentDocument.body );
+			}
+
 			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
 			}
@@ -157,20 +173,7 @@ function Iframe( {
 			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
 
-			// Ideally ALL classes that are added through get_body_class should
-			// be added in the editor too, which we'll somehow have to get from
-			// the server in the future (which will run the PHP filters).
-			setBodyClasses(
-				Array.from( ownerDocument.body.classList ).filter(
-					( name ) =>
-						name.startsWith( 'admin-color-' ) ||
-						name.startsWith( 'post-type-' ) ||
-						name === 'wp-embed-responsive'
-				)
-			);
-
 			contentDocument.dir = ownerDocument.dir;
-			documentElement.removeChild( contentDocument.body );
 
 			iFrameDocument.addEventListener(
 				'dragover',
@@ -219,7 +222,7 @@ function Iframe( {
 	}, [ head, scripts ] );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
-	const bodyRef = useMergeRefs( [
+	const wrapperRef = useMergeRefs( [
 		contentRef,
 		clearerRef,
 		writingFlowRef,
@@ -289,22 +292,15 @@ function Iframe( {
 				title={ __( 'Editor canvas' ) }
 			>
 				{ head && createPortal( headChildren, head ) }
-				{ iframeDocument &&
+				{ body &&
 					createPortal(
-						<body
-							ref={ bodyRef }
-							className={ classnames(
-								'block-editor-iframe__body',
-								'editor-styles-wrapper',
-								...bodyClasses
-							) }
-						>
+						<div ref={ wrapperRef }>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
 								{ children }
 							</StyleProvider>
-						</body>,
-						iframeDocument.documentElement
+						</div>,
+						body
 					) }
 			</iframe>
 			{ tabIndex >= 0 && after }
