@@ -19,8 +19,6 @@ function block_core_navigation_link_build_css_colors( $context, $attributes ) {
 		'inline_styles' => '',
 	);
 
-	$is_sub_menu = false; //isset( $attributes['isTopLevelLink'] ) ? ( ! $attributes['isTopLevelLink'] ) : false;
-
 	// Text color.
 	$named_text_color  = null;
 	$custom_text_color = null;
