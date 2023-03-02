@@ -2336,11 +2336,13 @@ class WP_Theme_JSON_Gutenberg {
 						if ( empty( $style_variation_node[ $feature_name ] ) ) {
 							continue;
 						}
+						// If feature selector includes block classname, remove it but leave the whitespace in.
+						$shortened_feature_selector = str_replace( $block_metadata['selector'] . ' ', ' ', $feature_selector );
 						// Prepend the variation selector to the feature selector.
-						$split_feature_selectors    = explode( ',', $feature_selector );
+						$split_feature_selectors    = explode( ',', $shortened_feature_selector );
 						$feature_selectors          = array_map(
 							static function( $split_feature_selector ) use ( $clean_style_variation_selector ) {
-								return $clean_style_variation_selector . trim( $split_feature_selector );
+								return $clean_style_variation_selector . $split_feature_selector;
 							},
 							$split_feature_selectors
 						);
