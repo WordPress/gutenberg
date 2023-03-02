@@ -45,7 +45,7 @@ export type GuideProps = {
 	 */
 	onFinish: ModalProps[ 'onRequestClose' ];
 	/**
-	 * An array of objects describing each page in the guide.
+	 * A list of objects describing each page in the guide. Each object **must** contain a `'content'` property and may optionally contain a `'image'` property.
 	 *
 	 * @default []
 	 */
