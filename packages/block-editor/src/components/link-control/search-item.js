@@ -73,7 +73,7 @@ export const LinkControlSearchItem = ( {
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
 					<TextHighlight
-						// we are stripping HTML here because the title may include markup which can cause issues with TextHighlight
+						// The component expects a plain text string.
 						text={ stripHTML( suggestion.title ) }
 						highlight={ searchTerm }
 					/>
