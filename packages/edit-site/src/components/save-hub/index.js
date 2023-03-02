@@ -38,7 +38,7 @@ export default function SaveButton() {
 	const label = disabled ? __( 'Saved' ) : __( 'Save' );
 
 	return (
-		<HStack className="edit-site-save-hub" alignment="right">
+		<HStack className="edit-site-save-hub" alignment="right" spacing={ 4 }>
 			{ isDirty && (
 				<span>
 					{ sprintf(
