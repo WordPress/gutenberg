@@ -148,8 +148,6 @@ function Navigation( {
 		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
 
-	const { id: createNavigationMenuPostId } = createNavigationMenuPost;
-
 	const createUntitledEmptyNavigationMenu = () => {
 		createNavigationMenu( '' );
 	};
@@ -215,6 +213,17 @@ function Navigation( {
 		[ navigationMenus ]
 	);
 
+	const handleUpdateMenu = useCallback(
+		( menuId, options = { focusNavigationBlock: false } ) => {
+			const { focusNavigationBlock } = options;
+			setRef( menuId );
+			if ( focusNavigationBlock ) {
+				selectBlock( clientId );
+			}
+		},
+		[ selectBlock, clientId, setRef ]
+	);
+
 	// This useEffect adds snackbar and speak status notices when menus are created.
 	// If there are no fallback navigation menus then we don't show these messages,
 	// because this means that we are creating the first, fallback navigation menu.
@@ -226,7 +235,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPostId, {
+			handleUpdateMenu( createNavigationMenuPost?.id, {
 				focusNavigationBlock: true,
 			} );
 
@@ -249,7 +258,7 @@ function Navigation( {
 		hideNavigationMenuStatusNotice,
 		isCreatingNavigationMenu,
 		showNavigationMenuStatusNotice,
-		createNavigationMenuPostId,
+		createNavigationMenuPost?.id,
 		fallbackNavigationMenus,
 	] );
 
@@ -433,17 +442,6 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const handleUpdateMenu = useCallback(
-		( menuId, options = { focusNavigationBlock: false } ) => {
-			const { focusNavigationBlock } = options;
-			setRef( menuId );
-			if ( focusNavigationBlock ) {
-				selectBlock( clientId );
-			}
-		},
-		[ selectBlock, clientId, setRef ]
-	);
-
 	const onSelectClassicMenu = async ( classicMenu ) => {
 		const navMenu = await convertClassicMenu(
 			classicMenu.id,
@@ -469,7 +467,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPostId, {
+			handleUpdateMenu( createNavigationMenuPost?.id, {
 				focusNavigationBlock: true,
 			} );
 
@@ -486,7 +484,7 @@ function Navigation( {
 	}, [
 		createNavigationMenuStatus,
 		createNavigationMenuError,
-		createNavigationMenuPostId,
+		createNavigationMenuPost?.id,
 		createNavigationMenuIsError,
 		createNavigationMenuIsSuccess,
 		isCreatingNavigationMenu,
