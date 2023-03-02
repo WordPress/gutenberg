@@ -148,6 +148,8 @@ function Navigation( {
 		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
 
+	const { id: createNavigationMenuPostId } = createNavigationMenuPost;
+
 	const createUntitledEmptyNavigationMenu = () => {
 		createNavigationMenu( '' );
 	};
@@ -224,7 +226,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost.id, {
+			handleUpdateMenu( createNavigationMenuPostId, {
 				focusNavigationBlock: true,
 			} );
 
@@ -247,6 +249,7 @@ function Navigation( {
 		hideNavigationMenuStatusNotice,
 		isCreatingNavigationMenu,
 		showNavigationMenuStatusNotice,
+		createNavigationMenuPostId,
 	] );
 
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
@@ -465,7 +468,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost.id, {
+			handleUpdateMenu( createNavigationMenuPostId, {
 				focusNavigationBlock: true,
 			} );
 
@@ -482,7 +485,7 @@ function Navigation( {
 	}, [
 		createNavigationMenuStatus,
 		createNavigationMenuError,
-		createNavigationMenuPost,
+		createNavigationMenuPostId,
 		createNavigationMenuIsError,
 		createNavigationMenuIsSuccess,
 		isCreatingNavigationMenu,
