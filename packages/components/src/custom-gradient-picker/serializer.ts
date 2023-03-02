@@ -2,8 +2,15 @@
  * External dependencies
  */
 import type gradientParser from 'gradient-parser';
+/**
+ * Internal dependencies
+ */
+import type { ColorStopTypeAndValue } from './types';
 
-export function serializeGradientColor( { type, value } ) {
+export function serializeGradientColor( {
+	type,
+	value,
+}: ColorStopTypeAndValue ) {
 	if ( type === 'literal' ) {
 		return value;
 	}
@@ -13,7 +20,9 @@ export function serializeGradientColor( { type, value } ) {
 	return `${ type }(${ value.join( ',' ) })`;
 }
 
-export function serializeGradientPosition( position ) {
+export function serializeGradientPosition(
+	position: gradientParser.ColorStop[ 'length' ]
+) {
 	if ( ! position ) {
 		return '';
 	}
@@ -21,15 +30,25 @@ export function serializeGradientPosition( position ) {
 	return `${ value }${ type }`;
 }
 
-export function serializeGradientColorStop( { type, value, length } ) {
+export function serializeGradientColorStop( {
+	type,
+	value,
+	length,
+}: gradientParser.ColorStop ) {
 	return `${ serializeGradientColor( {
 		type,
 		value,
-	} ) } ${ serializeGradientPosition( length ) }`;
+	} as ColorStopTypeAndValue ) } ${ serializeGradientPosition( length ) }`;
 }
 
-export function serializeGradientOrientation( orientation ) {
-	if ( ! orientation || orientation.type !== 'angular' ) {
+export function serializeGradientOrientation(
+	orientation: gradientParser.GradientNode[ 'orientation' ]
+) {
+	if (
+		Array.isArray( orientation ) ||
+		! orientation ||
+		orientation.type !== 'angular'
+	) {
 		return;
 	}
 	return `${ orientation.value }deg`;
@@ -43,9 +62,17 @@ export function serializeGradient( {
 	const serializedOrientation = serializeGradientOrientation( orientation );
 	const serializedColorStops = colorStops
 		.sort( ( colorStop1, colorStop2 ) => {
+			const getNumericStopValue = (
+				colorStop: gradientParser.ColorStop
+			) => {
+				return colorStop?.length?.value === undefined
+					? 0
+					: parseInt( colorStop?.length?.value );
+			};
+
 			return (
-				( colorStop1?.length?.value ?? 0 ) -
-				( colorStop2?.length?.value ?? 0 )
+				getNumericStopValue( colorStop1 ) -
+				getNumericStopValue( colorStop2 )
 			);
 		} )
 		.map( serializeGradientColorStop );

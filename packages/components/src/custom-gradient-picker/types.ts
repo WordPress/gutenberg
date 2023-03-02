@@ -47,3 +47,11 @@ export type GradientTypePickerProps = {
 };
 
 export type ControlPoint = { color: string; position: number };
+
+type DistributiveOmit< T, K extends keyof any > = T extends any
+	? Omit< T, K >
+	: never;
+export type ColorStopTypeAndValue = DistributiveOmit<
+	gradientParser.ColorStop,
+	'length'
+>;
