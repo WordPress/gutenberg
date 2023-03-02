@@ -96,10 +96,14 @@ export function getGradientAstWithControlPoints(
 					value: position?.toString(),
 				},
 				type: a < 1 ? 'rgba' : 'rgb',
-				value: a < 1 ? [ r, g, b, a ] : [ r, g, b ],
+				value:
+					a < 1
+						? [ `${ r }`, `${ g }`, `${ b }`, `${ a }` ]
+						: [ `${ r }`, `${ g }`, `${ b }` ],
 			};
 		} ),
-	};
+		// NTS: there are a few `as` calls throughout the changes. Some are to avoid conflicts between union members. Note that in your description.
+	} as gradientParser.GradientNode;
 }
 
 export function getStopCssColor( colorStop: gradientParser.ColorStop ) {
