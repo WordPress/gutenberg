@@ -20,7 +20,7 @@ function gutenberg_register_role_support( $block_type ) {
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
 	}
-	
+
 	if ( ! array_key_exists( 'role', $block_type->attributes ) ) {
 		$block_type->attributes['role'] = array(
 			'type' => 'string',
@@ -52,7 +52,7 @@ function gutenberg_apply_role_support( $block_type, $block_attributes ) {
 	}
 	// Return early if the block doesn't have a role attribute.
 	$has_role = array_key_exists( 'role', $block_attributes );
-	if ( ! $has_role ) { 
+	if ( ! $has_role ) {
 		return array();
 	}
 
