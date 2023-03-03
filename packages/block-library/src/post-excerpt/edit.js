@@ -123,14 +123,15 @@ export default function PostExcerptEditor( {
 	 * The excerpt length setting needs to be applied to both
 	 * the raw and the rendered excerpt depending on which is being used.
 	 */
-	const rawOrRenderedExcerpt = !! renderedExcerpt
+	let rawOrRenderedExcerpt = !! renderedExcerpt
 		? strippedRenderedExcerpt
 		: rawExcerpt;
+
+	rawOrRenderedExcerpt = rawOrRenderedExcerpt.trim();
 
 	let trimmedExcerpt = '';
 	if ( wordCountType === 'words' ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.trim()
 			.split( ' ', excerptLength )
 			.join( ' ' );
 	} else if ( wordCountType === 'characters_excluding_spaces' ) {
@@ -143,7 +144,6 @@ export default function PostExcerptEditor( {
 		 * so that the spaces are excluded from the word count.
 		 */
 		const excerptWithSpaces = rawOrRenderedExcerpt
-			.trim()
 			.split( '', excerptLength )
 			.join( '' );
 
@@ -152,14 +152,13 @@ export default function PostExcerptEditor( {
 			excerptWithSpaces.replaceAll( ' ', '' ).length;
 
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.trim()
 			.split( '', excerptLength + numberOfSpaces )
 			.join( '' );
 	} else if ( wordCountType === 'characters_including_spaces' ) {
-		trimmedExcerpt = rawOrRenderedExcerpt.trim().split( '', excerptLength );
+		trimmedExcerpt = rawOrRenderedExcerpt.split( '', excerptLength );
 	}
 
-	trimmedExcerpt = trimmedExcerpt + '...';
+	const isTrimmed = trimmedExcerpt !== rawOrRenderedExcerpt ? true : false;
 
 	const excerptContent = isEditable ? (
 		<RichText
@@ -168,7 +167,9 @@ export default function PostExcerptEditor( {
 			value={
 				isSelected
 					? rawOrRenderedExcerpt
-					: ( trimmedExcerpt !== '...' ? trimmedExcerpt : '' ) ||
+					: ( ! isTrimmed
+							? rawOrRenderedExcerpt
+							: trimmedExcerpt + '…' ) ||
 					  __( 'No post excerpt found' )
 			}
 			onChange={ setExcerpt }
@@ -176,9 +177,9 @@ export default function PostExcerptEditor( {
 		/>
 	) : (
 		<p className={ excerptClassName }>
-			{ trimmedExcerpt !== '...'
-				? trimmedExcerpt
-				: __( 'No post excerpt found' ) }
+			{ ! isTrimmed
+				? rawOrRenderedExcerpt || __( 'No post excerpt found' )
+				: trimmedExcerpt + '…' }
 		</p>
 	);
 	return (
