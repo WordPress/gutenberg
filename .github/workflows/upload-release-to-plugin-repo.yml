@@ -5,14 +5,32 @@ on:
         types: [published]
 
 jobs:
+    compute-latest-stable:
+        name: Get latest stable version
+        runs-on: ubuntu-latest
+        outputs:
+            latest_stable_tag: ${{ steps.get_latest_stable_tag.outputs.latest_stable_tag }}
+
+        steps:
+            - uses: hmarr/debug-action@v2
+            - name: Get latest stable ta
+              id: get_latest_stable_tag
+              run: |
+                  curl \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    -o latest.json \
+                    "https://api.github.com/repos/${{ github.repository }}/releases/latest"
+                  LATEST_STABLE_TAG=$(jq --raw-output '.tag_name' latest.json)
+                  echo "latest_stable_tag=${LATEST_STABLE_TAG}" >> $GITHUB_OUTPUT
+
     get-release-branch:
         name: Get release branch name
         runs-on: ubuntu-latest
-        if: github.event.release.assets[0]
         outputs:
             release_branch: ${{ steps.get_release_branch.outputs.release_branch }}
 
         steps:
+            - uses: hmarr/debug-action@v2
             - name: Compute release branch name
               id: get_release_branch
               env:
@@ -25,7 +43,8 @@ jobs:
     update-changelog:
         name: Update Changelog on ${{ matrix.branch }} branch
         runs-on: ubuntu-latest
-        if: github.event.release.assets[0]
+        if: |
+            github.event.release.assets[0]
         needs: get-release-branch
         env:
             TAG: ${{ github.event.release.tag_name }}
@@ -38,11 +57,12 @@ jobs:
                       label: release
 
         steps:
+            - uses: hmarr/debug-action@v2
             - name: Checkout code
               uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   ref: ${{ matrix.branch }}
-                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  token: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Update the Changelog to include the release notes
               run: |
@@ -95,25 +115,24 @@ jobs:
                   path: ./changelog.txt
 
     upload:
-        name: Upload Gutenberg Plugin
+        name: Publish as trunk (and tag)
         runs-on: ubuntu-latest
         environment: wp.org plugin
-        needs: update-changelog
-        if: ${{ !github.event.release.prerelease && github.event.release.assets[0] }}
+        needs: [compute-latest-stable, update-changelog]
+        if: |
+            endsWith( github.ref, needs.compute-latest-stable.outputs.latest_stable_tag ) &&
+            !github.event.release.prerelease && github.event.release.assets[0]
         env:
-            PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
+            PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
             VERSION: ${{ github.event.release.name }}
 
         steps:
+            - uses: hmarr/debug-action@v2
             - name: Check out Gutenberg trunk from WP.org plugin repo
-              run: svn checkout "$PLUGIN_REPO_URL/trunk"
-
-            - name: Get previous stable version
-              id: get_previous_stable_version
-              run: echo "stable_version=$(awk -F ':\ ' '$1 == "Stable tag" {print $2}' ./trunk/readme.txt)" >> $GITHUB_OUTPUT
+              run: svn checkout "$PLUGIN_REPO_URL/trunk" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
             - name: Delete everything
               working-directory: ./trunk
@@ -130,8 +149,8 @@ jobs:
             - name: Replace the stable tag placeholder with the existing stable tag on the SVN repository
               env:
                   STABLE_TAG_PLACEHOLDER: 'Stable tag: V\.V\.V'
-                  STABLE_TAG: 'Stable tag: ${{ steps.get_previous_stable_version.outputs.stable_version }}'
-              run: sed -i "s/${STABLE_TAG_PLACEHOLDER}/${STABLE_TAG}/g" ./trunk/readme.txt
+              run: |
+                  sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./trunk/readme.txt
 
             - name: Download Changelog Artifact
               uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
@@ -158,4 +177,60 @@ jobs:
               run: |
                   sed -i "s/Stable tag: ${STABLE_VERSION_REGEX}/Stable tag: ${VERSION}/g" ./readme.txt
                   svn commit -m "Releasing version $VERSION" \
+                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+
+    upload-branch:
+        name: Publish as branch (and tag)
+        runs-on: ubuntu-latest
+        environment: wp.org plugin
+        needs: [compute-latest-stable, update-changelog]
+        if: |
+            !endsWith( github.ref, needs.compute-latest-stable.outputs.latest_stable_tag ) &&
+            !github.event.release.prerelease && github.event.release.assets[0]
+        env:
+            PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
+            STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
+            SVN_USERNAME: ${{ secrets.svn_username }}
+            SVN_PASSWORD: ${{ secrets.svn_password }}
+            VERSION: ${{ github.event.release.name }}
+
+        steps:
+            - uses: hmarr/debug-action@v2
+
+            - name: Check out Gutenberg branches from WP.org plugin repo
+              run: svn checkout "$PLUGIN_REPO_URL/branches" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+
+            - name: Download and unzip Gutenberg plugin asset into trunk folder
+              env:
+                  PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
+              run: |
+                  # do the magic here
+                  curl -L -o gutenberg.zip $PLUGIN_URL
+                  unzip gutenberg.zip -d branches/$VERSION
+                  rm gutenberg.zip
+
+            - name: Replace the stable tag placeholder with the existing stable tag on the SVN repository
+              env:
+                  STABLE_TAG_PLACEHOLDER: 'Stable tag: V\.V\.V'
+              run: |
+                  sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./branches/$VERSION/readme.txt
+
+            - name: Download Changelog Artifact
+              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+              with:
+                  name: changelog trunk
+                  path: branches/$VERSION
+
+            - name: Commit the content changes
+              working-directory: ./branches
+              run: |
+                  svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
+                  svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
+                  svn commit -m "Committing version $VERSION" \
+                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+
+            - name: Create the SVN tag
+              working-directory: ./branches
+              run: |
+                  svn copy "$PLUGIN_REPO_URL/branches/$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Tagging version $VERSION" \
                    --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
