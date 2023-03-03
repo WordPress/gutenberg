@@ -164,6 +164,7 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 	}, [ editableContentElement, tagName, className ] );
 
 	return useMemo( () => {
+		if ( ! anchor ) return;
 		return anchor.hasOwnProperty( 'ownerDocument' )
 			? anchor
 			: createVirtualAnchorElement( anchor, editableContentElement );
