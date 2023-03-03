@@ -35,10 +35,10 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 
 	// .closest( selector ), but with a boundary. Check if the element matches
 	// the selector. If it doesn't match, try the parent element if it's not the
-	// editorable wrapper. We don't want to try to match ancestors of the
-	// editable wrapper, which is what .closest( selector ) would do. When the
-	// element is the editable wrapper (which is most likely the case because
-	// most text is unformatted), this never runs.
+	// editable wrapper. We don't want to try to match ancestors of the editable
+	// wrapper, which is what .closest( selector ) would do. When the element is
+	// the editable wrapper (which is most likely the case because most text is
+	// unformatted), this never runs.
 	while ( element !== editableContentElement ) {
 		if ( element.matches( selector ) ) {
 			return element;
@@ -152,8 +152,8 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 			attach();
 		}
 
-		editableContentElement.addEventListener( 'focus', attach );
-		editableContentElement.addEventListener( 'blur', detach );
+		editableContentElement.addEventListener( 'focusin', attach );
+		editableContentElement.addEventListener( 'focusout', detach );
 
 		return detach;
 	}, [ editableContentElement, tagName, className ] );
