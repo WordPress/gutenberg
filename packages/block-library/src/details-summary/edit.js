@@ -4,7 +4,7 @@
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-function DetailsSummaryBlock( { attributes, setAttributes } ) {
+function DetailsSummaryEdit( { attributes, setAttributes } ) {
 	const summary = attributes.summary ? attributes.summary : __( 'Details' );
 	return (
 		<summary
@@ -24,4 +24,4 @@ function DetailsSummaryBlock( { attributes, setAttributes } ) {
 	);
 }
 
-export default DetailsSummaryBlock;
+export default DetailsSummaryEdit;

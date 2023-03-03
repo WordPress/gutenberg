@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 
 const TEMPLATE = [ [ 'core/details-summary' ], [ 'core/details-content' ] ];
 
-function DetailsBlock( { attributes, setAttributes, clientId } ) {
+function DetailsEdit( { attributes, setAttributes, clientId } ) {
 	const { showContent } = attributes;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -56,4 +56,4 @@ function DetailsBlock( { attributes, setAttributes, clientId } ) {
 	);
 }
 
-export default DetailsBlock;
+export default DetailsEdit;

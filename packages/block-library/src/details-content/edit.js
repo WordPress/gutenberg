@@ -15,7 +15,7 @@ const TEMPLATE = [
 	],
 ];
 
-function DetailsContentBlock() {
+function DetailsContentEdit() {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
@@ -25,4 +25,4 @@ function DetailsContentBlock() {
 	return <div { ...innerBlocksProps }></div>;
 }
 
-export default DetailsContentBlock;
+export default DetailsContentEdit;
