@@ -7,6 +7,7 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { isRangeEqual } from '../is-range-equal';
+
 /**
  * Sometimes some browsers are not firing a `selectionchange` event when
  * changing the selection by mouse or keyboard. This hook makes sure that, if we
