@@ -15,6 +15,7 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useHistory } from '../routes';
 import NavigationMenuContent from './navigation-menu-content';
 import SidebarButton from '../sidebar-button';
+import { NavigationMenuLoader } from './loader';
 
 const noop = () => {};
 const NAVIGATION_MENUS_QUERY = { per_page: -1, status: 'publish' };
@@ -118,9 +119,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	if ( ! hasResolvedNavigationMenus || isLoading ) {
 		return (
 			<SidebarNavigationScreenWrapper>
-				<div className="edit-site-sidebar-navigation-screen-navigation-menus__placeholder" />
-				<div className="edit-site-sidebar-navigation-screen-navigation-menus__placeholder" />
-				<div className="edit-site-sidebar-navigation-screen-navigation-menus__placeholder" />
+				<NavigationMenuLoader />
 			</SidebarNavigationScreenWrapper>
 		);
 	}

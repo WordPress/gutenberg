@@ -13,13 +13,19 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
+import { NavigationMenuLoader } from './loader';
 
 export default function NavigationMenuContent( { rootClientId, onSelect } ) {
-	const { clientIdsTree } = useSelect(
+	const { clientIdsTree, isLoading } = useSelect(
 		( select ) => {
-			const { __unstableGetClientIdsTree } = select( blockEditorStore );
+			const { __unstableGetClientIdsTree, areInnerBlocksControlled } =
+				select( blockEditorStore );
 			return {
 				clientIdsTree: __unstableGetClientIdsTree( rootClientId ),
+
+				// This is a small hack to wait for the navigation block
+				// to actually load its inner blocks.
+				isLoading: ! areInnerBlocksControlled( rootClientId ),
 			};
 		},
 		[ rootClientId ]
@@ -31,12 +37,15 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
 		<>
-			<OffCanvasEditor
-				blocks={ clientIdsTree }
-				onSelect={ onSelect }
-				LeafMoreMenu={ LeafMoreMenu }
-				showAppender={ false }
-			/>
+			{ isLoading && <NavigationMenuLoader /> }
+			{ ! isLoading && (
+				<OffCanvasEditor
+					blocks={ clientIdsTree }
+					onSelect={ onSelect }
+					LeafMoreMenu={ LeafMoreMenu }
+					showAppender={ false }
+				/>
+			) }
 			<div style={ { display: 'none' } }>
 				<BlockTools>
 					<BlockList />
