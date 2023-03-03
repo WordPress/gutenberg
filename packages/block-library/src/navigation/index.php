@@ -472,6 +472,11 @@ function block_core_navigation_create_fallback() {
 		return;
 	}
 
+	// Don't create a fallback if the theme is not a block theme.
+	if ( ! wp_is_block_theme() ) {
+		return;
+	}
+
 	// Get the most recently published Navigation post.
 	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
@@ -488,6 +493,9 @@ function block_core_navigation_create_fallback() {
 
 	return $navigation_post;
 }
+// Run on switching Theme and when installing WP for the first time.
+add_action( 'switch_theme', 'block_core_navigation_create_fallback' );
+add_action( 'wp_install', 'block_core_navigation_create_fallback' );
 
 
 /**
@@ -572,8 +580,6 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
-	// First things first, let's create the fallback.
-	block_core_navigation_create_fallback();
 
 	static $seen_menu_names = array();
 
@@ -920,5 +926,5 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
 
-// We apply this action on render_block_data, so that we generate a navigation in the dashboard.
-add_action( 'render_block_data', 'block_core_navigation_create_fallback' );
+
+
