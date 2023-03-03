@@ -28,7 +28,8 @@ export const useNavigationTreeItem = (
 		const isMenuActive = activeMenu === menu;
 		const isItemVisible =
 			! search ||
-			( !! props.title && normalizedSearch( props.title, search ) );
+			( props.title !== undefined &&
+				normalizedSearch( props.title, search ) );
 
 		addItem( itemId, {
 			...props,
