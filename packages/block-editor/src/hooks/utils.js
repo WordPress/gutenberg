@@ -212,9 +212,27 @@ export function useBlockSettings( name, parentLayout ) {
 	const units = useSetting( 'spacing.units' );
 	const minHeight = useSetting( 'dimensions.minHeight' );
 	const layout = useSetting( 'layout' );
+	const borderColor = useSetting( 'border.color' );
+	const borderRadius = useSetting( 'border.radius' );
+	const borderStyle = useSetting( 'border.style' );
+	const borderWidth = useSetting( 'border.width' );
+	const customColorsEnabled = useSetting( 'color.custom' );
+	const customColors = useSetting( 'color.palette.custom' );
+	const themeColors = useSetting( 'color.palette.theme' );
+	const defaultColors = useSetting( 'color.palette.default' );
+	const defaultPalette = useSetting( 'color.defaultPalette' );
 
 	const rawSettings = useMemo( () => {
 		return {
+			color: {
+				palette: {
+					custom: customColors,
+					theme: themeColors,
+					default: defaultColors,
+				},
+				defaultPalette,
+				custom: customColorsEnabled,
+			},
 			typography: {
 				fontFamilies: {
 					custom: fontFamilies,
@@ -238,6 +256,12 @@ export function useBlockSettings( name, parentLayout ) {
 				margin,
 				blockGap,
 				units,
+			},
+			border: {
+				color: borderColor,
+				radius: borderRadius,
+				style: borderStyle,
+				width: borderWidth,
 			},
 			dimensions: {
 				minHeight,
@@ -263,6 +287,15 @@ export function useBlockSettings( name, parentLayout ) {
 		minHeight,
 		layout,
 		parentLayout,
+		borderColor,
+		borderRadius,
+		borderStyle,
+		borderWidth,
+		customColorsEnabled,
+		customColors,
+		themeColors,
+		defaultColors,
+		defaultPalette,
 	] );
 
 	return useSettingsForBlockElement( rawSettings, name );

@@ -4,7 +4,14 @@
 import { useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
-export default function GuidePage( props ) {
+/**
+ * Internal dependencies
+ */
+import type { WordPressComponentProps } from '../ui/context';
+
+export default function GuidePage(
+	props: WordPressComponentProps< {}, 'div', false >
+) {
 	useEffect( () => {
 		deprecated( '<GuidePage>', {
 			since: '5.5',

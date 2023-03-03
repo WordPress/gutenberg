@@ -89,9 +89,7 @@ describe( 'PanelBody', () => {
 				</PanelBody>
 			);
 
-			let panelContent = screen.getByTestId( 'inner-content' );
-
-			expect( panelContent ).toBeVisible();
+			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
 
 			rerender(
 				<PanelBody opened={ false }>
@@ -99,9 +97,9 @@ describe( 'PanelBody', () => {
 				</PanelBody>
 			);
 
-			panelContent = screen.queryByTestId( 'inner-content' );
-
-			expect( panelContent ).not.toBeInTheDocument();
+			expect(
+				screen.queryByTestId( 'inner-content' )
+			).not.toBeInTheDocument();
 
 			rerender(
 				<PanelBody opened>
@@ -109,9 +107,7 @@ describe( 'PanelBody', () => {
 				</PanelBody>
 			);
 
-			panelContent = screen.getByTestId( 'inner-content' );
-
-			expect( panelContent ).toBeVisible();
+			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
 		} );
 
 		it( 'should toggle when clicking header', async () => {
@@ -123,22 +119,21 @@ describe( 'PanelBody', () => {
 				</PanelBody>
 			);
 
-			let panelContent = screen.queryByTestId( 'inner-content' );
 			const panelToggle = screen.getByRole( 'button', { name: 'Panel' } );
 
-			expect( panelContent ).not.toBeInTheDocument();
+			expect(
+				screen.queryByTestId( 'inner-content' )
+			).not.toBeInTheDocument();
 
 			await user.click( panelToggle );
 
-			panelContent = screen.getByTestId( 'inner-content' );
-
-			expect( panelContent ).toBeVisible();
+			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
 
 			await user.click( panelToggle );
 
-			panelContent = screen.queryByTestId( 'inner-content' );
-
-			expect( panelContent ).not.toBeInTheDocument();
+			expect(
+				screen.queryByTestId( 'inner-content' )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'should pass button props to panel title', async () => {

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.5.0 (2023-03-01)
+
 ### New Features
 
 -   Started exporting the `flushSync` function from `react-dom`

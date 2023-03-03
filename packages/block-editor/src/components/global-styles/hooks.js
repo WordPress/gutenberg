@@ -10,6 +10,7 @@ import { get, set } from 'lodash';
 import { useContext, useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -55,7 +56,7 @@ const VALID_SETTINGS = [
 	'spacing.margin',
 	'spacing.padding',
 	'spacing.units',
-	'typography.fuild',
+	'typography.fluid',
 	'typography.customFontSize',
 	'typography.dropCap',
 	'typography.fontFamilies',
@@ -303,6 +304,67 @@ export function useSettingsForBlockElement(
 			};
 		}
 
+		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
+			if (
+				! supportedStyles.includes(
+					'border' + key.charAt( 0 ).toUpperCase() + key.slice( 1 )
+				)
+			) {
+				updatedSettings.border = {
+					...updatedSettings.border,
+					[ key ]: false,
+				};
+			}
+		} );
+
 		return updatedSettings;
 	}, [ parentSettings, supportedStyles, supports ] );
+}
+
+export function useColorsPerOrigin( settings ) {
+	const customColors = settings?.color?.palette?.custom;
+	const themeColors = settings?.color?.palette?.theme;
+	const defaultColors = settings?.color?.palette?.default;
+	const shouldDisplayDefaultColors = settings?.color?.defaultPalette;
+
+	return useMemo( () => {
+		const result = [];
+		if ( themeColors && themeColors.length ) {
+			result.push( {
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
+				colors: themeColors,
+			} );
+		}
+		if (
+			shouldDisplayDefaultColors &&
+			defaultColors &&
+			defaultColors.length
+		) {
+			result.push( {
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
+				colors: defaultColors,
+			} );
+		}
+		if ( customColors && customColors.length ) {
+			result.push( {
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
+				colors: customColors,
+			} );
+		}
+		return result;
+	}, [
+		customColors,
+		themeColors,
+		defaultColors,
+		shouldDisplayDefaultColors,
+	] );
 }

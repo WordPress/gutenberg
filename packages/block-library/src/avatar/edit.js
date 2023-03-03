@@ -48,6 +48,7 @@ const AvatarInspectorControls = ( {
 				value={ attributes?.size }
 			/>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Link to user profile' ) }
 				onChange={ () =>
 					setAttributes( { isLink: ! attributes.isLink } )
