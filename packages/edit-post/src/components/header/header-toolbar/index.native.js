@@ -99,8 +99,13 @@ function HeaderToolbar( {
 		? wasNoContentSelected.current
 		: noContentSelected;
 
+	/* translators: accessibility text for the editor toolbar */
+	const toolbarAriaLabel = __( 'Document tools' );
+
 	return (
 		<View
+			testID={ toolbarAriaLabel }
+			accessibilityLabel={ toolbarAriaLabel }
 			style={ [
 				getStylesFromColorScheme(
 					styles[ 'header-toolbar__container' ],

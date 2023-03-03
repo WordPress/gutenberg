@@ -381,6 +381,10 @@ class EditorPage {
 	// Block toolbar functions
 	// =========================
 
+	async getToolbar() {
+		return await this.driver.elementsByAccessibilityId( 'Document tools' );
+	}
+
 	async addNewBlock( blockName, relativePosition ) {
 		const addButton = await this.getAddBlockButton();
 
