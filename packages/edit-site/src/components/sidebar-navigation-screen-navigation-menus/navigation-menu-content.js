@@ -68,7 +68,7 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 					showAppender={ false }
 				/>
 			) }
-			<div style={ { display: 'none' } }>
+			<div style={ { visibility: 'hidden' } }>
 				<BlockTools>
 					<BlockList />
 				</BlockTools>
