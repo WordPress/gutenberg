@@ -11,6 +11,8 @@ export type NavigationItem = {
 
 	title?: string;
 	href?: string;
+};
+
 export type NavigationMenu = {
 	menu: string;
 	parentMenu?: string;
