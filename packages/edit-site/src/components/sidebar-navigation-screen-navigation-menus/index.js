@@ -3,9 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { BlockEditorProvider, Inserter } from '@wordpress/block-editor';
+import {
+	BlockEditorProvider,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -18,6 +21,7 @@ import SidebarButton from '../sidebar-button';
 import { NavigationMenuLoader } from './loader';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
+import { plus } from '@wordpress/icons';
 
 const noop = () => {};
 const NAVIGATION_MENUS_QUERY = { per_page: -1, status: 'publish' };
@@ -37,6 +41,29 @@ function SidebarNavigationScreenWrapper( { children, actions } ) {
 					{ children }
 				</>
 			}
+		/>
+	);
+}
+
+function PageLinkInserter( { rootClientId } ) {
+	const { insertBlock } = useDispatch( blockEditorStore );
+	const { getBlockOrder } = useSelect( blockEditorStore );
+	const insertPageLink = useCallback( () => {
+		insertBlock(
+			createBlock( 'core/navigation-link', {
+				type: 'page',
+				kind: 'post-type',
+			} ),
+			getBlockOrder( rootClientId ).length,
+			rootClientId
+		);
+	}, [ insertBlock, rootClientId, getBlockOrder ] );
+	return (
+		<SidebarButton
+			icon={ plus }
+			label={ __( 'Add menu item' ) }
+			tooltipPosition="bottom"
+			onClick={ insertPageLink }
 		/>
 	);
 }
@@ -133,18 +160,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		>
 			<SidebarNavigationScreenWrapper
 				actions={
-					<Inserter
-						rootClientId={ blocks[ 0 ].clientId }
-						position="bottom right"
-						isAppender
-						selectBlockOnInsert={ false }
-						shouldDirectInsert={ false }
-						__experimentalIsQuick
-						toggleProps={ {
-							as: SidebarButton,
-							label: __( 'Add menu item' ),
-						} }
-					/>
+					<PageLinkInserter rootClientId={ blocks[ 0 ].clientId } />
 				}
 			>
 				<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
