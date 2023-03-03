@@ -39,4 +39,8 @@ export type ToolbarButtonContainerProps = {
 	 * Children to be rendered inside the button container.
 	 */
 	children?: ReactNode;
+	/**
+	 * An optional class name for the button container.
+	 */
+	className?: string;
 };
