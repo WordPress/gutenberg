@@ -25,9 +25,9 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useEffect } from '@wordpress/element';
+import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -121,7 +121,7 @@ export default function PageListEdit( {
 } ) {
 	const { parentPageID } = attributes;
 	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
+	const openModal = useCallback( () => setOpen( true ), [] );
 	const closeModal = () => setOpen( false );
 
 	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
@@ -243,38 +243,69 @@ export default function PageListEdit( {
 		parentPageID,
 	] );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/page-list-item' ],
-		renderAppender: false,
-		__unstableDisableDropZone: true,
-		templateLock: 'all',
-		onInput: NOOP,
-		onChange: () => {
-			if ( hasResolvedPages ) {
-				openModal();
-			}
-		},
-		value: blockList,
-	} );
-
-	const { isNested } = useSelect(
+	const {
+		isNested,
+		hasSelectedChild,
+		parentBlock,
+		hasDraggedChild,
+		isChildOfNavigation,
+	} = useSelect(
 		( select ) => {
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
+			const {
+				getBlockParentsByBlockName,
+				hasSelectedInnerBlock,
+				getBlockRootClientId,
+				hasDraggedInnerBlock,
+			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
 				clientId,
 				'core/navigation-submenu',
 				true
 			);
+			const navigationBlockParents = getBlockParentsByBlockName(
+				clientId,
+				'core/navigation',
+				true
+			);
 			return {
 				isNested: blockParents.length > 0,
+				isChildOfNavigation: navigationBlockParents.length > 0,
+				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
+				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
+				parentBlock: getBlockRootClientId( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: [ 'core/page-list-item' ],
+		renderAppender: false,
+		__unstableDisableDropZone: true,
+		templateLock: isChildOfNavigation ? false : 'all',
+		onInput: NOOP,
+		onChange: NOOP,
+		value: blockList,
+	} );
+
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( hasSelectedChild || hasDraggedChild ) {
+			openModal();
+			selectBlock( parentBlock );
+		}
+	}, [
+		hasSelectedChild,
+		hasDraggedChild,
+		parentBlock,
+		selectBlock,
+		openModal,
+	] );
+
 	useEffect( () => {
 		setAttributes( { isNested } );
-	}, [ isNested ] );
+	}, [ isNested, setAttributes ] );
 
 	return (
 		<>
