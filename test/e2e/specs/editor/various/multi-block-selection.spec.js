@@ -64,7 +64,7 @@ test.describe( 'Multi-block selection', () => {
 			attributes: { content: '' },
 		} );
 		await editor.canvas
-			.getByRole( 'document', { name: /Empty block/i } )
+			.getByRole( 'document', { name: 'Empty block' } )
 			.click();
 		// Move to the middle of the first line.
 		await pageUtils.pressKeyTimes( 'ArrowUp', 4 );
@@ -532,9 +532,7 @@ test.describe( 'Multi-block selection', () => {
 			] );
 		await page.keyboard.press( 'Backspace' );
 
-		for ( let i = 0; i < 3; i += 1 ) {
-			await page.keyboard.press( 'ArrowLeft' );
-		}
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 3 );
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
 		await page.keyboard.type( '|' );
 		await expect
@@ -821,14 +819,22 @@ test.describe( 'Multi-block selection', () => {
 			.click();
 
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
-			.toContainEqual(
-				expect.objectContaining( { name: 'core/paragraph' } )
-			);
+			.toMatchObject( [ { name: 'core/list-item' } ] );
+
+		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [ { name: 'core/list' } ] );
+
+		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph' },
+				{ name: 'core/list' },
+			] );
 	} );
 
 	test( 'should select all from empty selection', async ( {
@@ -1153,7 +1159,9 @@ test.describe( 'Multi-block selection', () => {
 			.click();
 
 		await page.keyboard.press( 'ArrowLeft' );
-		const strongText = page.getByText( '1', { exact: true } );
+		const strongText = editor.canvas
+			.getByRole( 'region', { name: 'Editor content' } )
+			.getByText( '1', { exact: true } );
 		const strongBox = await strongText.boundingBox();
 		await strongText.click( {
 			// Ensure clicking on the right half of the element.
