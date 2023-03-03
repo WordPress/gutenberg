@@ -62,6 +62,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {Object}  props.LeafMoreMenu    Optional more menu substitution.
  * @param {string}  props.description     Optional accessible description for the tree grid component.
  * @param {string}  props.onSelect        Optional callback to be invoked when a block is selected.
+ * @param {string}  props.showAppender    Flag to show or hide the block appender.
  * @param {Object}  ref                   Forwarded ref
  */
 function OffCanvasEditor(
@@ -70,6 +71,7 @@ function OffCanvasEditor(
 		blocks,
 		showBlockMovers = false,
 		isExpanded = false,
+		showAppender = true,
 		LeafMoreMenu,
 		description = __( 'Block navigation structure' ),
 		onSelect,
@@ -234,6 +236,7 @@ function OffCanvasEditor(
 							selectedClientIds={ selectedClientIds }
 							isExpanded={ isExpanded }
 							shouldShowInnerBlocks={ shouldShowInnerBlocks }
+							showAppender={ showAppender }
 						/>
 						<TreeGridRow
 							level={ 1 }
