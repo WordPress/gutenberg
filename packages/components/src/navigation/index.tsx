@@ -18,7 +18,10 @@ import { NavigationContext } from './context';
 import { NavigationUI } from './styles/navigation-styles';
 import { useCreateNavigationTree } from './use-create-navigation-tree';
 
-import type { NavigationProps } from './types';
+import type {
+	NavigationProps,
+	NavigationContext as NavigationContextType,
+} from './types';
 
 const noop = () => {};
 
@@ -34,7 +37,10 @@ export default function Navigation( {
 	const navigationTree = useCreateNavigationTree();
 	const defaultSlideOrigin = isRTL() ? 'right' : 'left';
 
-	const setActiveMenu = ( menuId, slideInOrigin = defaultSlideOrigin ) => {
+	const setActiveMenu: NavigationContextType[ 'setActiveMenu' ] = (
+		menuId,
+		slideInOrigin = defaultSlideOrigin
+	) => {
 		if ( ! navigationTree.getMenu( menuId ) ) {
 			return;
 		}

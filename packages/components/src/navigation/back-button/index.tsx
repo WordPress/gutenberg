@@ -34,7 +34,10 @@ function NavigationBackButton(
 		className
 	);
 
-	const parentMenuTitle = navigationTree.getMenu( parentMenu )?.title;
+	const parentMenuTitle =
+		parentMenu !== undefined
+			? navigationTree.getMenu( parentMenu )?.title
+			: undefined;
 
 	const handleOnClick: React.MouseEventHandler< HTMLElement > = ( event ) => {
 		if ( typeof onClick === 'function' ) {

@@ -1,3 +1,23 @@
+export type NavigationItem = {
+	/**
+	 * The group id
+	 */
+	group?: string;
+	/**
+	 * The menu id
+	 */
+	menu?: string;
+	_isVisible: boolean;
+
+	title?: string;
+	href?: string;
+export type NavigationMenu = {
+	menu: string;
+	parentMenu?: string;
+	isEmpty?: boolean;
+	title?: string;
+};
+
 export type NavigationProps = {
 	/**
 	 * The active item slug.
@@ -187,4 +207,42 @@ export type NavigationSearchNoResultsFoundProps = Pick<
 	NavigationMenuProps,
 	'search'
 >;
+
+export type NavigationGroupContext = {
+	/**
+	 * The unique id of the group
+	 */
+	group?: string;
+};
+
+export type NavigationMenuContext = {
+	menu?: string;
+	search?: string;
+};
+
+export type NavigationContext = {
+	activeItem?: string;
+	activeMenu: string;
+	setActiveMenu: (
+		parentMenu: string,
+		animationDirection?: 'left' | 'right'
+	) => void;
+
+	navigationTree: {
+		items: Record< string, NavigationItem >;
+		getItem: ( itemId: string ) => NavigationItem | undefined;
+		addItem: ( itemId: string, itemProps: NavigationItem ) => void;
+		removeItem: ( itemId: string ) => void;
+
+		menus: Record< string, NavigationMenu >;
+		getMenu: ( menuId: string ) => NavigationMenu | undefined;
+		addMenu: ( menuId: string, menuProps: NavigationMenu ) => void;
+		removeMenu: ( menuId: string ) => void;
+		childMenu: Record< string, string[] >;
+		traverseMenu: (
+			startMenu: string,
+			callback: ( menuObject: NavigationMenu ) => boolean | undefined
+		) => void;
+		isMenuEmpty: ( menuId: string ) => boolean;
+	};
 };
