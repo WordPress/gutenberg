@@ -8,11 +8,12 @@ import classnames from 'classnames';
  */
 import {
 	useState,
-	createPortal,
 	forwardRef,
+	useEffect,
 	useMemo,
 	useReducer,
 	renderToString,
+	hydrateRoot,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -121,6 +122,7 @@ function Iframe( {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
+	const [ iframeRoot, setIframeRoot ] = useState();
 	const styles = useParsedAssets( assets?.styles );
 	const styleIds = styles.map( ( style ) => style.id );
 	const compatStyles = useCompatibilityStyles();
@@ -164,8 +166,6 @@ function Iframe( {
 			);
 
 			contentDocument.dir = ownerDocument.dir;
-			documentElement.removeChild( contentDocument.head );
-			documentElement.removeChild( contentDocument.body );
 
 			iFrameDocument.addEventListener(
 				'dragover',
@@ -217,27 +217,33 @@ function Iframe( {
 		disabledRef,
 	] );
 
-	const styleAssets = (
-		<>
-			<style>{ 'html{height:auto!important;}body{margin:0}' }</style>
-			{ [ ...styles, ...neededCompatStyles ].map(
-				( { tagName, href, id, rel, media, textContent } ) => {
-					const TagName = tagName.toLowerCase();
+	const styleAssets = useMemo(
+		() => (
+			<>
+				<style>{ 'html{height:auto!important;}body{margin:0}' }</style>
+				{ [ ...styles, ...neededCompatStyles ].map(
+					( { tagName, href, id, rel, media, textContent } ) => {
+						const TagName = tagName.toLowerCase();
 
-					if ( TagName === 'style' ) {
+						if ( TagName === 'style' ) {
+							return (
+								<TagName { ...{ id } } key={ id }>
+									{ textContent }
+								</TagName>
+							);
+						}
+
 						return (
-							<TagName { ...{ id } } key={ id }>
-								{ textContent }
-							</TagName>
+							<TagName
+								{ ...{ href, id, rel, media } }
+								key={ id }
+							/>
 						);
 					}
-
-					return (
-						<TagName { ...{ href, id, rel, media } } key={ id } />
-					);
-				}
-			) }
-		</>
+				) }
+			</>
+		),
+		[ neededCompatStyles, styles ]
 	);
 
 	// Correct doctype is required to enable rendering in standards
@@ -251,6 +257,64 @@ function Iframe( {
 	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
 	// top or bottom margin is 0.55 / 2 ((1 - scale) / 2).
 	const marginFromScaling = ( contentHeight * ( 1 - scale ) ) / 2;
+
+	useEffect( () => {
+		if ( ! iframeRoot && iframeDocument?.head && iframeDocument?.body ) {
+			// Hydrate the iframe initially with an empty head and body.
+			setIframeRoot(
+				hydrateRoot(
+					iframeDocument.documentElement,
+					<>
+						<head />
+						<body />
+					</>
+				)
+			);
+		}
+	}, [
+		iframeDocument?.documentElement,
+		iframeDocument?.head,
+		iframeDocument?.body,
+		iframeRoot,
+	] );
+
+	useEffect(
+		() =>
+			iframeRoot?.render &&
+			iframeRoot.render(
+				<>
+					<head ref={ headRef }>
+						{ styleAssets }
+						{ head }
+					</head>
+					<body
+						ref={ bodyRef }
+						className={ classnames(
+							'block-editor-iframe__body',
+							'editor-styles-wrapper',
+							...bodyClasses
+						) }
+					>
+						{ contentResizeListener }
+						<StyleProvider document={ iframeDocument }>
+							{ children }
+						</StyleProvider>
+					</body>
+				</>
+			),
+		[
+			bodyClasses,
+			bodyRef,
+			children,
+			contentResizeListener,
+			head,
+			headRef,
+			iframeDocument,
+			iframeRoot,
+			iframeRoot?.render,
+			styleAssets,
+		]
+	);
 
 	return (
 		<>
@@ -278,31 +342,7 @@ function Iframe( {
 				// content.
 				srcDoc={ srcDoc }
 				title={ __( 'Editor canvas' ) }
-			>
-				{ iframeDocument &&
-					createPortal(
-						<>
-							<head ref={ headRef }>
-								{ styleAssets }
-								{ head }
-							</head>
-							<body
-								ref={ bodyRef }
-								className={ classnames(
-									'block-editor-iframe__body',
-									'editor-styles-wrapper',
-									...bodyClasses
-								) }
-							>
-								{ contentResizeListener }
-								<StyleProvider document={ iframeDocument }>
-									{ children }
-								</StyleProvider>
-							</body>
-						</>,
-						iframeDocument.documentElement
-					) }
-			</iframe>
+			/>
 			{ tabIndex >= 0 && after }
 		</>
 	);
