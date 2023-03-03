@@ -9,11 +9,28 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 import { Component } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
-export default ( mapNodeToProps ) =>
+type Props = {
+	node?: HTMLElement;
+	[ key: string ]: any;
+};
+
+type State = {
+	fallbackStyles?: { [ key: string ]: any };
+	grabStylesCompleted: boolean;
+};
+
+export default (
+	mapNodeToProps: (
+		node: HTMLElement,
+		props: Props
+	) => { [ key: string ]: any }
+) =>
 	createHigherOrderComponent( ( WrappedComponent ) => {
-		return class extends Component {
-			constructor() {
-				super( ...arguments );
+		return class extends Component< Props, State > {
+			nodeRef?: HTMLElement;
+
+			constructor( props: Props ) {
+				super( props );
 				this.nodeRef = this.props.node;
 				this.state = {
 					fallbackStyles: undefined,
@@ -23,7 +40,7 @@ export default ( mapNodeToProps ) =>
 				this.bindRef = this.bindRef.bind( this );
 			}
 
-			bindRef( node ) {
+			bindRef( node: HTMLDivElement ) {
 				if ( ! node ) {
 					return;
 				}
