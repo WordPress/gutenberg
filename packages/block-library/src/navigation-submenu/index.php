@@ -249,12 +249,13 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 
 	if ( $has_submenu ) {
-		$colors          = block_core_navigation_submenu_build_css_colors( $block->context, $attributes, true );
-		$classes         = array_merge(
+		$colors      = block_core_navigation_submenu_build_css_colors( $block->context, $attributes, $has_submenu );
+		$classes     = array_merge(
 			array( 'wp-block-navigation__submenu-container' ),
 			$colors['css_classes']
 		);
-		$css_classes     = trim( implode( ' ', $classes ) );
+		$css_classes = trim( implode( ' ', $classes ) );
+
 		$style_attribute = $colors['inline_styles'];
 
 		$inner_blocks_html = '';
@@ -282,6 +283,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 			$wrapper_attributes,
 			$inner_blocks_html
 		);
+
 	}
 
 	$html .= '</li>';
