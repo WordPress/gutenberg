@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useSyncExternalStore, useRef } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 
 /** @typedef {import('../register-format-type').RichTextFormatType} RichTextFormatType */
 /** @typedef {import('../create').RichTextValue} RichTextValue */
@@ -73,8 +73,6 @@ function createVirtualAnchorElement( range, editableContentElement ) {
 	};
 }
 
-const virtualAnchorCache = new WeakMap();
-
 function isRangeEqual( a, b ) {
 	return (
 		a === b ||
@@ -85,6 +83,30 @@ function isRangeEqual( a, b ) {
 			a.endContainer === b.endContainer &&
 			a.endOffset === b.endOffset )
 	);
+}
+
+function getAnchor( editableContentElement, tagName, className ) {
+	if ( ! editableContentElement ) return;
+
+	const { ownerDocument } = editableContentElement;
+	const { defaultView } = ownerDocument;
+	const selection = defaultView.getSelection();
+
+	if ( ! selection ) return;
+	if ( ! selection.rangeCount ) return;
+
+	const range = selection.getRangeAt( 0 );
+
+	if ( ! range || ! range.startContainer ) return;
+
+	const formatElement = getFormatElement(
+		range,
+		editableContentElement,
+		tagName,
+		className
+	);
+
+	return formatElement || range;
 }
 
 /**
@@ -100,75 +122,50 @@ function isRangeEqual( a, b ) {
  * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
  */
 export function useAnchor( { editableContentElement, settings = {} } ) {
-	const lastRange = useRef();
-	const lastSnapshot = useRef();
 	const { tagName, className } = settings;
-
-	// Let the store be the selection and range, and the anchor be derived data.
-
-	// Only re-subscribe when the window changes.
-	const subscribe = useCallback(
-		( callback ) => {
-			if ( ! editableContentElement ) return;
-
-			const { ownerDocument } = editableContentElement;
-			const { defaultView } = ownerDocument;
-
-			defaultView.addEventListener( 'selectionchange', callback );
-			return () => {
-				defaultView.removeEventListener( 'selectionchange', callback );
-			};
-		},
-		[ editableContentElement ]
+	const [ anchor, setAnchor ] = useState(
+		getAnchor( editableContentElement, tagName, className )
 	);
 
-	function getSnapshot() {
+	useEffect( () => {
 		if ( ! editableContentElement ) return;
 
 		const { ownerDocument } = editableContentElement;
 
-		if ( editableContentElement !== ownerDocument.activeElement )
-			return lastSnapshot.current;
+		function callback() {
+			if ( editableContentElement !== ownerDocument.activeElement ) {
+				return;
+			}
 
-		const { defaultView } = ownerDocument;
-		const selection = defaultView.getSelection();
+			setAnchor( ( oldAnchor ) => {
+				const { defaultView } = ownerDocument;
+				const newAnchor = getAnchor(
+					editableContentElement,
+					tagName,
+					className
+				);
 
-		if ( ! selection ) return;
-		if ( ! selection.rangeCount ) return;
+				if (
+					newAnchor instanceof defaultView.Range &&
+					oldAnchor instanceof defaultView.Range &&
+					isRangeEqual( newAnchor, oldAnchor )
+				) {
+					return oldAnchor;
+				}
 
-		const range = selection.getRangeAt( 0 );
-
-		if ( ! range || ! range.startContainer ) return;
-
-		const formatElement = getFormatElement(
-			range,
-			editableContentElement,
-			tagName,
-			className
-		);
-
-		if ( formatElement ) return formatElement;
-
-		let key = lastRange.current;
-
-		if ( ! isRangeEqual( range, lastRange.current ) ) {
-			key = lastRange.current = range;
+				return newAnchor;
+			} );
 		}
 
-		// Ensure the same reference is returned between re-renderes. This is
-		// important for getSnapShot.
-		if ( ! virtualAnchorCache.has( key ) ) {
-			virtualAnchorCache.set(
-				key,
-				createVirtualAnchorElement( range, editableContentElement )
-			);
-		}
+		ownerDocument.addEventListener( 'selectionchange', callback );
+		return () => {
+			ownerDocument.removeEventListener( 'selectionchange', callback );
+		};
+	}, [ editableContentElement, tagName, className ] );
 
-		return virtualAnchorCache.get( key );
-	}
-
-	return useSyncExternalStore( subscribe, () => {
-		lastSnapshot.current = getSnapshot();
-		return lastSnapshot.current;
-	} );
+	return useMemo( () => {
+		return anchor.hasOwnProperty( 'ownerDocument' )
+			? anchor
+			: createVirtualAnchorElement( anchor, editableContentElement );
+	}, [ anchor, editableContentElement ] );
 }
