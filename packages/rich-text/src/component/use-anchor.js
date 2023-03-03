@@ -101,27 +101,38 @@ function isRangeEqual( a, b ) {
  */
 export function useAnchor( { editableContentElement, settings = {} } ) {
 	const lastRange = useRef();
+	const lastSnapshot = useRef();
 	const { tagName, className } = settings;
-	const win = editableContentElement?.ownerDocument?.defaultView;
 
 	// Let the store be the selection and range, and the anchor be derived data.
-	// It's worth noting that the selection reference never changes.
-	const selection = win?.getSelection();
 
 	// Only re-subscribe when the window changes.
 	const subscribe = useCallback(
 		( callback ) => {
-			if ( ! win ) return;
-			win.addEventListener( 'selectionchange', callback );
+			if ( ! editableContentElement ) return;
+
+			const { ownerDocument } = editableContentElement;
+			const { defaultView } = ownerDocument;
+
+			defaultView.addEventListener( 'selectionchange', callback );
 			return () => {
-				win.removeEventListener( 'selectionchange', callback );
+				defaultView.removeEventListener( 'selectionchange', callback );
 			};
 		},
-		[ win ]
+		[ editableContentElement ]
 	);
 
 	function getSnapshot() {
 		if ( ! editableContentElement ) return;
+
+		const { ownerDocument } = editableContentElement;
+
+		if ( editableContentElement !== ownerDocument.activeElement )
+			return lastSnapshot.current;
+
+		const { defaultView } = ownerDocument;
+		const selection = defaultView.getSelection();
+
 		if ( ! selection ) return;
 		if ( ! selection.rangeCount ) return;
 
@@ -156,5 +167,8 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 		return virtualAnchorCache.get( key );
 	}
 
-	return useSyncExternalStore( subscribe, getSnapshot );
+	return useSyncExternalStore( subscribe, () => {
+		lastSnapshot.current = getSnapshot();
+		return lastSnapshot.current;
+	} );
 }
