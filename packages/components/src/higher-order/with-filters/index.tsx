@@ -13,11 +13,37 @@ const ANIMATION_FRAME_PERIOD = 16;
  * to be mounted. When a filter is added or removed that matches the hook name,
  * the wrapped component re-renders.
  *
- * @param {string} hookName Hook name exposed to be used by filters.
+ * @param hookName Hook name exposed to be used by filters.
  *
- * @return {Function} Higher-order component factory.
+ * @return Higher-order component factory.
+ *
+ * ```jsx
+ * import { withFilters } from '@wordpress/components';
+ * import { addFilter } from '@wordpress/hooks';
+ *
+ * const MyComponent = ( { title } ) => <h1>{ title }</h1>;
+ *
+ * const ComponentToAppend = () => <div>Appended component</div>;
+ *
+ * function withComponentAppended( FilteredComponent ) {
+ * 	return ( props ) => (
+ * 		<>
+ * 			<FilteredComponent { ...props } />
+ * 			<ComponentToAppend />
+ * 		</>
+ * 	);
+ * }
+ *
+ * addFilter(
+ * 	'MyHookName',
+ * 	'my-plugin/with-component-appended',
+ * 	withComponentAppended
+ * );
+ *
+ * const MyComponentWithFilters = withFilters( 'MyHookName' )( MyComponent );
+ * ```
  */
-export default function withFilters( hookName ) {
+export default function withFilters( hookName: string ) {
 	return createHigherOrderComponent( ( OriginalComponent ) => {
 		const namespace = 'core/with-filters/' + hookName;
 
@@ -25,10 +51,8 @@ export default function withFilters( hookName ) {
 		 * The component definition with current filters applied. Each instance
 		 * reuse this shared reference as an optimization to avoid excessive
 		 * calls to `applyFilters` when many instances exist.
-		 *
-		 * @type {?Component}
 		 */
-		let FilteredComponent;
+		let FilteredComponent: React.ComponentType;
 
 		/**
 		 * Initializes the FilteredComponent variable once, if not already
@@ -36,13 +60,18 @@ export default function withFilters( hookName ) {
 		 */
 		function ensureFilteredComponent() {
 			if ( FilteredComponent === undefined ) {
-				FilteredComponent = applyFilters( hookName, OriginalComponent );
+				FilteredComponent = applyFilters(
+					hookName,
+					OriginalComponent
+				) as React.ComponentType;
 			}
 		}
 
 		class FilteredComponentRenderer extends Component {
-			constructor() {
-				super( ...arguments );
+			static instances: FilteredComponentRenderer[];
+
+			constructor( props: { [ key: string ]: any } ) {
+				super( props );
 
 				ensureFilteredComponent();
 			}
@@ -86,7 +115,10 @@ export default function withFilters( hookName ) {
 		const throttledForceUpdate = debounce( () => {
 			// Recreate the filtered component, only after delay so that it's
 			// computed once, even if many filters added.
-			FilteredComponent = applyFilters( hookName, OriginalComponent );
+			FilteredComponent = applyFilters(
+				hookName,
+				OriginalComponent
+			) as React.ComponentType;
 
 			// Force each instance to render.
 			FilteredComponentRenderer.instances.forEach( ( instance ) => {
@@ -99,9 +131,9 @@ export default function withFilters( hookName ) {
 		 * mounted instance should re-render with the new filters having been
 		 * applied to the original component.
 		 *
-		 * @param {string} updatedHookName Name of the hook that was updated.
+		 * @param updatedHookName Name of the hook that was updated.
 		 */
-		function onHooksUpdated( updatedHookName ) {
+		function onHooksUpdated( updatedHookName: string ) {
 			if ( updatedHookName === hookName ) {
 				throttledForceUpdate();
 			}
