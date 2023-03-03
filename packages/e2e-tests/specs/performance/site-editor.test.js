@@ -112,11 +112,10 @@ describe( 'Site Editor Performance', () => {
 					postType: 'page',
 				} );
 
-				// Wait for the first content block to render.
-				await canvas().waitForSelector(
-					'[data-type="core/post-content"] .wp-block'
-				);
+				// Wait for the first block.
+				await canvas().waitForSelector( '.wp-block' );
 
+				// Save results.
 				if ( i > throwaway ) {
 					const {
 						serverResponse,
