@@ -144,7 +144,7 @@ export type NavigationItemProps = {
 	 */
 	href?: string;
 	/**
-	 * If no `children` are passed, this prop allows specifying a custom icon for
+	 * If no `children` are passed, this prop allows to specify a custom icon for
 	 * the menu item.
 	 */
 	icon?: JSX.Element;
