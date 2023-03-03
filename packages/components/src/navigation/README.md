@@ -122,7 +122,7 @@ The unique identifier of the menu. The root menu can omit this, and it will defa
 
 ### onSearch
 
--   Type: `function`
+-   Type: `( searchString: string ) => void;`
 -   Required: No
 
 When `hasSearch` is active, this function handles the search input's `onChange` event, making it controlled from the outside. It requires setting the `search` prop as well.
@@ -242,7 +242,7 @@ Indicates whether this item should be hidden if the menu specified in `navigateT
 
 ### `onClick`
 
--   Type: `function`
+-   Type: `React.MouseEventHandler`
 -   Required: No
 
 A callback to handle clicking on a menu item.
