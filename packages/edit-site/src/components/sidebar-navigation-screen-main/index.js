@@ -31,35 +31,40 @@ export default function SidebarNavigationScreenMain() {
 		<SidebarNavigationScreen
 			isRoot
 			title={ __( 'Design' ) }
+			description={ __(
+				'Customise your Navigation menus, Templates, and more.'
+			) }
 			content={
-				<ItemGroup>
-					{ !! navigationMenus && navigationMenus.length > 0 && (
+				<>
+					<ItemGroup>
+						{ !! navigationMenus && navigationMenus.length > 0 && (
+							<NavigatorButton
+								as={ SidebarNavigationItem }
+								path="/navigation"
+								withChevron
+								icon={ navigation }
+							>
+								{ __( 'Navigation' ) }
+							</NavigatorButton>
+						) }
 						<NavigatorButton
 							as={ SidebarNavigationItem }
-							path="/navigation"
+							path="/wp_template"
 							withChevron
-							icon={ navigation }
+							icon={ layout }
 						>
-							{ __( 'Navigation' ) }
+							{ __( 'Templates' ) }
 						</NavigatorButton>
-					) }
-					<NavigatorButton
-						as={ SidebarNavigationItem }
-						path="/wp_template"
-						withChevron
-						icon={ layout }
-					>
-						{ __( 'Templates' ) }
-					</NavigatorButton>
-					<NavigatorButton
-						as={ SidebarNavigationItem }
-						path="/wp_template_part"
-						withChevron
-						icon={ symbolFilled }
-					>
-						{ __( 'Template Parts' ) }
-					</NavigatorButton>
-				</ItemGroup>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/wp_template_part"
+							withChevron
+							icon={ symbolFilled }
+						>
+							{ __( 'Template Parts' ) }
+						</NavigatorButton>
+					</ItemGroup>
+				</>
 			}
 		/>
 	);
