@@ -62,13 +62,13 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		[]
 	);
 
-	// This is copied from the edit component of the Navigation block.
+	// Sort navigation menus by date.
 	const orderedNavigationMenus = useMemo(
 		() =>
 			navigationMenus?.sort( ( menuA, menuB ) => {
 				const menuADate = new Date( menuA.date );
 				const menuBDate = new Date( menuB.date );
-				return menuADate.getTime() > menuBDate.getTime(); // This condition is the other way in the navigation block... hmmmm...
+				return menuADate.getTime() > menuBDate.getTime();
 			} ),
 		[ navigationMenus ]
 	);
