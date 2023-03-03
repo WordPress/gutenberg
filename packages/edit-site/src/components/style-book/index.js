@@ -228,6 +228,13 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 										.edit-site-style-book__example-preview {
 											width: 100%;
 										}
+
+										.edit-site-style-book__example-preview .is-root-container > .wp-block:first-child {
+											margin-top: 0;
+										}
+										.edit-site-style-book__example-preview .is-root-container > .wp-block:last-child {
+											margin-bottom: 0;
+										}
 										`
 									}</style>
 								</>
