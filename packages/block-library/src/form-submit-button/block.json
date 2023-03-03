@@ -9,9 +9,5 @@
 	"description": "A submission button for forms.",
 	"keywords": [ "submit", "button", "form" ],
 	"textdomain": "default",
-	"supports": {
-		"lock": false,
-		"multiple": false
-	},
 	"style": [ "wp-block-form-submit-button" ]
 }

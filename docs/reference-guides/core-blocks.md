@@ -301,7 +301,7 @@ A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/
 
 -	**Name:** core/form-submit-button
 -	**Category:** common
--	**Supports:** ~~lock~~, ~~multiple~~
+-	**Supports:** 
 -	**Attributes:** 
 
 ## Classic
