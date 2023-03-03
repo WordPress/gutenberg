@@ -278,7 +278,7 @@ export default function Layout() {
 							{ !! canvasSize.width && (
 								<motion.div
 									whileHover={
-										canvasMode === 'view'
+										isEditorPage && canvasMode === 'view'
 											? {
 													scale: 1.01,
 													transition: {
