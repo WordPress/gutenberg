@@ -7,7 +7,9 @@ import {
 	BlockList,
 	BlockTools,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,8 +32,28 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 		},
 		[ rootClientId ]
 	);
+	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
+
+	const offCanvasOnselect = useCallback(
+		( block ) => {
+			if (
+				block.name === 'core/navigation-link' &&
+				! block.attributes.url
+			) {
+				__unstableMarkNextChangeAsNotPersistent();
+				replaceBlock(
+					block.clientId,
+					createBlock( 'core/navigation-link', block.attributes )
+				);
+			} else {
+				onSelect( block );
+			}
+		},
+		[ onSelect, __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
+	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
@@ -41,7 +63,7 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 			{ ! isLoading && (
 				<OffCanvasEditor
 					blocks={ clientIdsTree }
-					onSelect={ onSelect }
+					onSelect={ offCanvasOnselect }
 					LeafMoreMenu={ LeafMoreMenu }
 					showAppender={ false }
 				/>
