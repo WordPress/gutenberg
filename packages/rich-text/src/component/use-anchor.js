@@ -125,7 +125,7 @@ function getAnchor( editableContentElement, tagName, className ) {
  */
 export function useAnchor( { editableContentElement, settings = {} } ) {
 	const { tagName, className } = settings;
-	const [ anchor, setAnchor ] = useState(
+	const [ anchor, setAnchor ] = useState( () =>
 		getAnchor( editableContentElement, tagName, className )
 	);
 
