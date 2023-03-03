@@ -182,6 +182,11 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 										`.is-root-container { display: flow-root; }
 										body { position: relative; padding: 32px !important; }
 
+										.edit-site-style-book__examples {
+											max-width: 900px;
+											margin: 0 auto;
+										}
+
 										.edit-site-style-book__example {
 											background: none;
 											border-radius: 2px;
@@ -201,16 +206,41 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 											box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
 										}
 
-										.edit-site-style-book.is-wide .edit-site-style-book__example {
+										.edit-site-style-book__examples.is-wide .edit-site-style-book__example {
 											flex-direction: row;
+										}
+
+										.edit-site-style-book__example-title {
+											font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+											font-size: 11px;
+											font-weight: 500;
+											line-height: normal;
+											margin: 0;
+											text-align: left;
+											text-transform: uppercase;
+										}
+
+										.edit-site-style-book__examples.is-wide .edit-site-style-book__example-title {
+											text-align: right;
+											width: 120px;
+										}
+
+										.edit-site-style-book__example-preview {
+											width: 100%;
 										}
 										`
 									}</style>
 								</>
 							}
-							texIndex={ -1 }
+							tabIndex={ -1 }
 						>
 							<Examples
+								className={ classnames(
+									'edit-site-style-book__examples',
+									{
+										'is-wide': sizes.width > 600,
+									}
+								) }
 								examples={ examples }
 								category={ tab.name }
 								isSelected={ isSelected }
@@ -224,23 +254,25 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 	);
 }
 
-const Examples = memo( ( { examples, category, isSelected, onSelect } ) => (
-	<div className="edit-site-style-book__examples">
-		{ examples
-			.filter( ( example ) => example.category === category )
-			.map( ( example ) => (
-				<Example
-					key={ example.name }
-					title={ example.title }
-					blocks={ example.blocks }
-					isSelected={ isSelected( example.name ) }
-					onClick={ () => {
-						onSelect( example.name );
-					} }
-				/>
-			) ) }
-	</div>
-) );
+const Examples = memo(
+	( { className, examples, category, isSelected, onSelect } ) => (
+		<div className={ className }>
+			{ examples
+				.filter( ( example ) => example.category === category )
+				.map( ( example ) => (
+					<Example
+						key={ example.name }
+						title={ example.title }
+						blocks={ example.blocks }
+						isSelected={ isSelected( example.name ) }
+						onClick={ () => {
+							onSelect( example.name );
+						} }
+					/>
+				) ) }
+		</div>
+	)
+);
 
 const Example = memo( ( { title, blocks, isSelected, onClick } ) => {
 	const originalSettings = useSelect(
