@@ -239,8 +239,10 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 									}</style>
 								</>
 							}
-							tabIndex={ -1 }
+							tabIndex={ 0 }
 						>
+							{ /* Filters need to be rendered before children to avoid Safari rendering issues. */ }
+							{ settings.svgFilters }
 							<Examples
 								className={ classnames(
 									'edit-site-style-book__examples',
@@ -303,6 +305,7 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => {
 				title
 			) }
 			onClick={ onClick }
+			tabIndex={ 0 }
 		>
 			<span className="edit-site-style-book__example-title">
 				{ title }
