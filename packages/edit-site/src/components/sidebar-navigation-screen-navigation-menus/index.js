@@ -65,13 +65,11 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	// This is copied from the edit component of the Navigation block.
 	const orderedNavigationMenus = useMemo(
 		() =>
-			navigationMenus
-				?.filter( ( menu ) => menu.status === 'publish' )
-				?.sort( ( menuA, menuB ) => {
-					const menuADate = new Date( menuA.date );
-					const menuBDate = new Date( menuB.date );
-					return menuADate.getTime() > menuBDate.getTime(); // This condition is the other way in the navigation block... hmmmm...
-				} ),
+			navigationMenus?.sort( ( menuA, menuB ) => {
+				const menuADate = new Date( menuA.date );
+				const menuBDate = new Date( menuB.date );
+				return menuADate.getTime() > menuBDate.getTime(); // This condition is the other way in the navigation block... hmmmm...
+			} ),
 		[ navigationMenus ]
 	);
 	const firstNavigationMenu = orderedNavigationMenus?.[ 0 ]?.id;
