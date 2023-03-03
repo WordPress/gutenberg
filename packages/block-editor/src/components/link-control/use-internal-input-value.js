@@ -16,7 +16,7 @@ export default function useInternalInputValue( value ) {
 		if ( value && value !== internalInputValue ) {
 			setInternalInputValue( value );
 		}
-	}, [ value ] );
+	}, [ internalInputValue, value ] );
 
 	return [ internalInputValue, setInternalInputValue ];
 }

@@ -42,6 +42,9 @@ const LinkSettingsScreen = ( {
 	const [ opensInNewWindow, setOpensInNewWindows ] = useState(
 		activeAttributes.target === '_blank'
 	);
+	const [ markedAsNoFollow, setMarkedAsNoFollow ] = useState(
+		( activeAttributes.rel = 'nofollow' )
+	);
 	const [ linkValues, setLinkValues ] = useState( {
 		isActiveLink: isActive,
 		isRemovingLink: false,
@@ -64,7 +67,7 @@ const LinkSettingsScreen = ( {
 		onHandleClosingBottomSheet( () => {
 			submit( inputValue, { skipStateUpdates: true } );
 		} );
-	}, [ inputValue, opensInNewWindow, text ] );
+	}, [ inputValue, opensInNewWindow, markedAsNoFollow, text ] );
 
 	useEffect( () => {
 		const { isActiveLink, isRemovingLink } = linkValues;
@@ -99,6 +102,7 @@ const LinkSettingsScreen = ( {
 		const format = createLinkFormat( {
 			url,
 			opensInNewWindow,
+			markedAsNoFollow,
 			text: linkText,
 		} );
 		let newAttributes;
@@ -211,6 +215,15 @@ const LinkSettingsScreen = ( {
 							label={ __( 'Open in new tab' ) }
 							value={ opensInNewWindow }
 							onValueChange={ setOpensInNewWindows }
+							separatorType={ 'fullWidth' }
+						/>
+						<BottomSheet.SwitchCell
+							icon={ external }
+							label={ __(
+								'Search engines should ignore this link (mark as nofollow)'
+							) }
+							value={ markedAsNoFollow }
+							onValueChange={ setMarkedAsNoFollow }
 							separatorType={ 'fullWidth' }
 						/>
 						<BottomSheet.Cell

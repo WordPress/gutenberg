@@ -28,11 +28,14 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  *
  * @typedef WPLinkControlDefaultValue
  *
- * @property {string}   url           Link URL.
- * @property {string=}  title         Link title.
- * @property {boolean=} opensInNewTab Whether link should open in a new browser
- *                                    tab. This value is only assigned if not
- *                                    providing a custom `settings` prop.
+ * @property {string}   url            Link URL.
+ * @property {string=}  title          Link title.
+ * @property {boolean=} opensInNewTab  Whether link should open in a new browser
+ *                                     tab. This value is only assigned if not
+ *                                     providing a custom `settings` prop.
+ * @property {boolean=} markAsNoFollow Whether link should be marked as
+ *                                     `nofollow`. This value is only assigned
+ *                                     if not providing a custom `settings` prop.
  */
 
 /* eslint-disable jsdoc/valid-types */
