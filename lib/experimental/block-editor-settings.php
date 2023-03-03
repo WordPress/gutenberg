@@ -73,12 +73,11 @@ function gutenberg_get_block_editor_settings_experimental( $settings ) {
 	}
 
 	if ( ! empty( $current_template ) ) {
-		$template_blocks         = parse_blocks( $current_template[0]->content );
-		$post_content_block      = get_post_content_block( $template_blocks );
-		$post_content_attributes = $post_content_block['attrs'];
+		$template_blocks    = parse_blocks( $current_template[0]->content );
+		$post_content_block = get_post_content_block( $template_blocks );
 
-		if ( ! empty( $post_content_attributes ) ) {
-			$settings['postContentAttributes'] = $post_content_attributes;
+		if ( ! empty( $post_content_block['attrs'] ) ) {
+			$settings['postContentAttributes'] = $post_content_block['attrs'];
 		}
 	}
 
