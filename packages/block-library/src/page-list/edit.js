@@ -55,7 +55,9 @@ function BlockContent( {
 	if ( ! hasResolvedPages ) {
 		return (
 			<div { ...blockProps }>
-				<Spinner />
+				<div className="wp-block-page-list__loading-indicator-container">
+					<Spinner className="wp-block-page-list__loading-indicator" />
+				</div>
 			</div>
 		);
 	}

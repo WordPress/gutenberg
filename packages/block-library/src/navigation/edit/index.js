@@ -850,7 +850,9 @@ function Navigation( {
 
 				{ isLoading && (
 					<TagName { ...blockProps }>
-						<Spinner className="wp-block-navigation__loading-indicator" />
+						<div className="wp-block-navigation__loading-indicator-container">
+							<Spinner className="wp-block-navigation__loading-indicator" />
+						</div>
 					</TagName>
 				) }
 
