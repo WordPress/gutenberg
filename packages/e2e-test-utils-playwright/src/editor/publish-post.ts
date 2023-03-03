@@ -30,7 +30,7 @@ export async function publishPost( this: Editor ) {
 
 	const urlString = await this.page
 		.getByRole( 'region', { name: 'Editor publish' } )
-		.getByRole( 'textbox', { name: /address/i } )
+		.getByRole( 'textbox', { name: 'address' } )
 		.inputValue();
 	const url = new URL( urlString );
 	const postId = url.searchParams.get( 'p' );
