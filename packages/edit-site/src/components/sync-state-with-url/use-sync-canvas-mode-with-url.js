@@ -20,22 +20,47 @@ export default function useSyncCanvasModeWithURL() {
 	);
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const currentCanvasMode = useRef( canvasMode );
-	const { canvas: canvasInUrl = 'view' } = params;
+	const { canvas: canvasInUrl } = params;
 	const currentCanvasInUrl = useRef( canvasInUrl );
 	useEffect( () => {
 		currentCanvasMode.current = canvasMode;
-		if ( currentCanvasMode !== currentCanvasInUrl ) {
+		if ( canvasMode === 'init' ) {
+			return;
+		}
+
+		if (
+			canvasMode === 'edit' &&
+			currentCanvasInUrl.current !== canvasMode
+		) {
 			history.push( {
 				...params,
-				canvas: canvasMode,
+				canvas: 'edit',
+			} );
+		}
+
+		if (
+			canvasMode === 'view' &&
+			currentCanvasInUrl.current !== undefined
+		) {
+			history.push( {
+				...params,
+				canvas: undefined,
 			} );
 		}
 	}, [ canvasMode ] );
 
 	useEffect( () => {
 		currentCanvasInUrl.current = canvasInUrl;
-		if ( canvasInUrl !== currentCanvasMode.current ) {
-			setCanvasMode( canvasInUrl );
+		if (
+			canvasInUrl === undefined &&
+			currentCanvasMode.current !== 'view'
+		) {
+			setCanvasMode( 'view' );
+		} else if (
+			canvasInUrl === 'edit' &&
+			currentCanvasInUrl.current !== 'edit'
+		) {
+			setCanvasMode( 'edit' );
 		}
-	}, [ canvasInUrl ] );
+	}, [ canvasInUrl, params ] );
 }

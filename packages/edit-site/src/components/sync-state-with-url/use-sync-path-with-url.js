@@ -75,7 +75,10 @@ export default function useSyncPathWithURL() {
 			updateUrlParams( {
 				postType: undefined,
 				postId: undefined,
-				path: navigatorLocation.path,
+				path:
+					navigatorLocation.path === '/'
+						? undefined
+						: navigatorLocation.path,
 			} );
 		}
 	}, [ navigatorLocation?.path, navigatorParams, history ] );
