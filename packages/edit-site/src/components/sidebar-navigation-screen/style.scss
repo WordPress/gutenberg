@@ -10,6 +10,19 @@
 	color: $gray-600;
 }
 
+.edit-site-sidebar-navigation-screen__page-link {
+	color: $gray-600;
+
+	&:hover,
+	&:focus {
+		color: $white;
+	}
+
+	.components-external-link__icon {
+		margin-left: $grid-unit-05;
+	}
+}
+
 .edit-site-sidebar-navigation-screen__title-icon {
 	position: sticky;
 	top: 0;

@@ -13,14 +13,19 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import type { PanelBodyProps, PanelBodyTitleProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 import Button from '../button';
 import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
 
 const noop = () => {};
 
-export function PanelBody(
-	{
+export function UnforwardedPanelBody(
+	props: PanelBodyProps,
+	ref: React.ForwardedRef< HTMLDivElement >
+) {
+	const {
 		buttonProps = {},
 		children,
 		className,
@@ -30,19 +35,21 @@ export function PanelBody(
 		opened,
 		title,
 		scrollAfterOpen = true,
-	},
-	ref
-) {
-	const [ isOpened, setIsOpened ] = useControlledState( opened, {
-		initial: initialOpen === undefined ? true : initialOpen,
-	} );
-	const nodeRef = useRef();
+	} = props;
+	const [ isOpened, setIsOpened ] = useControlledState< boolean | undefined >(
+		opened,
+		{
+			initial: initialOpen === undefined ? true : initialOpen,
+			fallback: false,
+		}
+	);
+	const nodeRef = useRef< HTMLElement >( null );
 
 	// Defaults to 'smooth' scrolling
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
 	const scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
 
-	const handleOnToggle = ( event ) => {
+	const handleOnToggle = ( event: React.MouseEvent ) => {
 		event.preventDefault();
 		const next = ! isOpened;
 		setIsOpened( next );
@@ -50,7 +57,7 @@ export function PanelBody(
 	};
 
 	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value.
-	const scrollAfterOpenRef = useRef();
+	const scrollAfterOpenRef = useRef< boolean | undefined >();
 	scrollAfterOpenRef.current = scrollAfterOpen;
 	// Runs after initial render.
 	useUpdateEffect( () => {
@@ -80,20 +87,28 @@ export function PanelBody(
 		<div className={ classes } ref={ useMergeRefs( [ nodeRef, ref ] ) }>
 			<PanelBodyTitle
 				icon={ icon }
-				isOpened={ isOpened }
+				isOpened={ Boolean( isOpened ) }
 				onClick={ handleOnToggle }
 				title={ title }
 				{ ...buttonProps }
 			/>
 			{ typeof children === 'function'
-				? children( { opened: isOpened } )
+				? children( { opened: Boolean( isOpened ) } )
 				: isOpened && children }
 		</div>
 	);
 }
 
 const PanelBodyTitle = forwardRef(
-	( { isOpened, icon, title, ...props }, ref ) => {
+	(
+		{
+			isOpened,
+			icon,
+			title,
+			...props
+		}: WordPressComponentProps< PanelBodyTitleProps, 'button' >,
+		ref: React.ForwardedRef< any >
+	) => {
 		if ( ! title ) return null;
 
 		return (
@@ -128,7 +143,6 @@ const PanelBodyTitle = forwardRef(
 	}
 );
 
-const ForwardedComponent = forwardRef( PanelBody );
-ForwardedComponent.displayName = 'PanelBody';
+export const PanelBody = forwardRef( UnforwardedPanelBody );
 
-export default ForwardedComponent;
+export default PanelBody;

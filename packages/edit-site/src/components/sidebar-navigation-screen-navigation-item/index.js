@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
+import {
+	__experimentalUseNavigator as useNavigator,
+	ExternalLink,
+} from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { pencil } from '@wordpress/icons';
@@ -49,7 +52,19 @@ export default function SidebarNavigationScreenNavigationItem() {
 				/>
 			}
 			content={
-				post ? decodeEntities( post?.description?.rendered ) : null
+				<>
+					{ post?.link ? (
+						<ExternalLink
+							className="edit-site-sidebar-navigation-screen__page-link"
+							href={ post.link }
+						>
+							{ post.link }
+						</ExternalLink>
+					) : null }
+					{ post
+						? decodeEntities( post?.description?.rendered )
+						: null }
+				</>
 			}
 		/>
 	);
