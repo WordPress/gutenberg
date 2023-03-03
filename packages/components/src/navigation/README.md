@@ -162,6 +162,13 @@ Indicates whether the menu is empty or not. Used together with the `hideIfTarget
 
 The menu title. It's also the field used by the menu search function.
 
+### `titleAction`
+
+-   Type: `React.ReactNode`
+-   Required: No
+
+Use this prop to render additional actions in the menu title.
+
 ## Navigation Group Props
 
 `NavigationGroup` supports the following props.

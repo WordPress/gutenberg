@@ -107,6 +107,10 @@ export type NavigationMenuProps = {
 	 * The menu title. It's also the field used by the menu search function.
 	 */
 	title?: string;
+	/**
+	 * Use this prop to render additional actions in the menu title.
+	 */
+	titleAction?: React.ReactNode;
 };
 
 export type NavigationGroupProps = {
