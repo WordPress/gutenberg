@@ -158,3 +158,4 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/anchor.php';
 require __DIR__ . '/block-supports/shadow.php';
+require __DIR__ . '/block-supports/role.php';
