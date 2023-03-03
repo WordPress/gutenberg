@@ -45,6 +45,8 @@ export default function ListViewSidebar() {
 	const contentFocusReturnRef = useFocusReturn();
 
 	function closeOnEscape( event ) {
+		// If there is a block selection, then skip closing the list view
+		// and clear out the block selection instead.
 		if (
 			event.keyCode === ESCAPE &&
 			! event.defaultPrevented &&

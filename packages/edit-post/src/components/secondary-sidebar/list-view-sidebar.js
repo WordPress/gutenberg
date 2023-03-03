@@ -46,6 +46,7 @@ export default function ListViewSidebar() {
 		// If there is a block selection, then skip closing the list view
 		// and clear out the block selection instead.
 		if (
+			tab === 'list-view' &&
 			event.keyCode === ESCAPE &&
 			! event.defaultPrevented &&
 			hasBlockSelection
