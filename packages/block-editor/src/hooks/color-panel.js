@@ -35,6 +35,13 @@ export default function ColorPanel( {
 			return;
 		}
 
+		if ( definedColors.length === 0 ) {
+			setDetectedBackgroundColor( undefined );
+			setDetectedLinkColor( undefined );
+			setDetectedColor( undefined );
+			return;
+		}
+
 		if ( ! ref.current ) {
 			return;
 		}
