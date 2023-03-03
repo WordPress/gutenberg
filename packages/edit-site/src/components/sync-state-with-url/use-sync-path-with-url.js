@@ -55,6 +55,7 @@ export default function useSyncPathWithURL() {
 				...currentUrlParams.current,
 				...newUrlParams,
 			};
+
 			currentUrlParams.current = updatedParams;
 			history.push( updatedParams );
 		}

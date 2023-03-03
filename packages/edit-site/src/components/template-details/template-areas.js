@@ -27,6 +27,7 @@ function TemplatePartItemMore( {
 		{
 			postId: templatePart.id,
 			postType: templatePart.type,
+			path: undefined,
 		},
 		{
 			fromTemplateId: params.postId,
