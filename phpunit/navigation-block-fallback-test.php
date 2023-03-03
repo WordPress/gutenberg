@@ -9,7 +9,13 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
+		// Navigation menu will be created on Theme switch. Therefore in order to test
+		// the behaviour of `gutenberg_block_core_navigation_create_fallback`
+		// the auto-creation of a fallback must be disabled for this initial
+		// theme switch.
+		add_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 		switch_theme( 'emptytheme' );
+		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 	}
 
 	public function get_navigations_in_database() {
