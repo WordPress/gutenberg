@@ -36,6 +36,9 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		// Remove any existing disabling filters.
 		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 
+		$navs_in_db = $this->get_navigations_in_database();
+		$this->assertCount( 0, $navs_in_db );
+
 		// Should trigger creation of Navigation Menu if one does not already exist.
 		switch_theme( 'emptytheme' );
 
@@ -45,6 +48,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 	public function test_should_not_auto_create_navigation_menu_on_theme_switch_if_one_already_exists() {
 
+		// Pre-add a Navigation Menu to simulate when a user already has a menu.
 		self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
