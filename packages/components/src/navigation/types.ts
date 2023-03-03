@@ -57,11 +57,11 @@ export type NavigationMenuProps = {
 	 * A callback to handle clicking on the back button.
 	 * If this prop is provided then the back button will be shown.
 	 */
-	onBackButtonClick?: () => void;
+	onBackButtonClick?: React.MouseEventHandler< HTMLElement >;
 	/**
 	 * The childred components.
 	 */
-	children: React.ReactNode;
+	children?: React.ReactNode;
 	/**
 	 * Optional classname for the component.
 	 */

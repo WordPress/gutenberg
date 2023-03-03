@@ -14,7 +14,7 @@ import NavigationMenu from '../../menu';
 
 export function MoreExamplesStory() {
 	const [ activeItem, setActiveItem ] = useState( 'child-1' );
-	const [ delayedBadge, setDelayedBadge ] = useState();
+	const [ delayedBadge, setDelayedBadge ] = useState< number | undefined >();
 	useEffect( () => {
 		const timeout = setTimeout( () => setDelayedBadge( 2 ), 1500 );
 		return () => clearTimeout( timeout );
@@ -64,6 +64,7 @@ export function MoreExamplesStory() {
 					<NavigationItem
 						href="https://wordpress.org/"
 						item="item-4"
+						// @ts-expect-error TODO: have NavigationItem accept more props from Button
 						target="_blank"
 						title="WordPress.org"
 					/>
@@ -126,10 +127,14 @@ export function MoreExamplesStory() {
 				menu="custom-back-click-handler-prevented-menu"
 				title="Custom back button click handler prevented"
 				parentMenu="root"
-				onBackButtonClick={ ( event ) => {
-					event.preventDefault();
-					setBackButtonPreventedBadge( backButtonPreventedBadge + 1 );
-				} }
+				onBackButtonClick={
+					( ( event ) => {
+						event.preventDefault();
+						setBackButtonPreventedBadge(
+							backButtonPreventedBadge + 1
+						);
+					} ) as React.MouseEventHandler
+				}
 				backButtonLabel="Increment badge"
 			>
 				<NavigationItem

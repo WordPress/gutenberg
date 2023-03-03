@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import Button from '../../../button';
 import Navigation from '../..';
 import NavigationItem from '../../item';
 import NavigationMenu from '../../menu';
@@ -16,15 +16,23 @@ export function ControlledStateStory() {
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
 	// Mock navigation link.
-	const MockLink = ( { href, children } ) => (
+	const MockLink = ( {
+		href,
+		children,
+	}: {
+		href: string;
+		children: React.ReactNode;
+	} ) => (
 		<Button
 			href={ href }
 			// Since we're not actually navigating pages, simulate it with onClick.
-			onClick={ ( event ) => {
-				event.preventDefault();
-				const item = href.replace( 'https://example.com/', '' );
-				setActiveItem( item );
-			} }
+			onClick={
+				( ( event ) => {
+					event.preventDefault();
+					const item = href.replace( 'https://example.com/', '' );
+					setActiveItem( item );
+				} ) as React.MouseEventHandler< HTMLAnchorElement >
+			}
 		>
 			{ children }
 		</Button>
