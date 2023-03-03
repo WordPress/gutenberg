@@ -34,7 +34,7 @@ export type NavigationProps = {
 	/**
 	 * The childred components.
 	 */
-	children: React.ReactNode;
+	children?: React.ReactNode;
 	/**
 	 * Optional classname for the component.
 	 */
