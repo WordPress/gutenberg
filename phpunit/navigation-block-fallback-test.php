@@ -18,7 +18,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 	}
 
-	public function get_navigations_in_database() {
+	private function get_navigations_in_database() {
 		$navs_in_db = new WP_Query(
 			array(
 				'post_type'      => 'wp_navigation',
@@ -30,6 +30,42 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		);
 
 		return $navs_in_db->posts ? $navs_in_db->posts : array();
+	}
+
+	public function test_should_auto_create_navigation_menu_on_theme_switch() {
+		// Remove any existing disabling filters.
+		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
+
+		// Should trigger creation of Navigation Menu if one does not already exist.
+		switch_theme( 'emptytheme' );
+
+		$navs_in_db = $this->get_navigations_in_database();
+		$this->assertCount( 1, $navs_in_db );
+	}
+
+	public function test_should_not_auto_create_navigation_menu_on_theme_switch_if_one_already_exists() {
+
+		self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => 'Existing Navigation Menu',
+				'post_content' => '<!-- wp:navigation-link {"label":"Hello world","type":"post","id":1,"url":"/hello-world","kind":"post-type"} /-->',
+			)
+		);
+
+		// Remove any existing disabling filters.
+		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
+
+		// Should trigger creation of Navigation Menu if one does not already exist.
+		switch_theme( 'emptytheme' );
+
+		$navs_in_db = $this->get_navigations_in_database();
+
+		// There should still only be one Navigation Menu.
+		$this->assertCount( 1, $navs_in_db );
+
+		// The existing Navigation Menu should be unchanged.
+		$this->assertEquals( 'Existing Navigation Menu', $navs_in_db[0]->post_title );
 	}
 
 	public function test_gets_fallback_navigation_with_existing_navigation_menu_if_found() {
@@ -261,6 +297,8 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		remove_filter( 'block_core_navigation_render_fallback', 'use_site_logo' );
 	}
+
+
 }
 
 
