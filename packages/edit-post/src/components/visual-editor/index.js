@@ -256,7 +256,7 @@ export default function VisualEditor( { styles } ) {
 	const layout = newestPostContentAttributes?.layout || {};
 
 	const postContentLayoutClasses = useLayoutClasses(
-		layout,
+		newestPostContentAttributes,
 		'core/post-content'
 	);
 

@@ -35,18 +35,20 @@ const layoutBlockSupportKey = '__experimentalLayout';
 /**
  * Generates the utility classnames for the given block's layout attributes.
  *
- * @param { Object } layout    Layout object.
- * @param { string } blockName Block name.
+ * @param { Object } blockAttributes Block attributes.
+ * @param { string } blockName       Block name.
  *
  * @return { Array } Array of CSS classname strings.
  */
-export function useLayoutClasses( layout, blockName ) {
+export function useLayoutClasses( blockAttributes = {}, blockName ) {
 	const rootPaddingAlignment = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalFeatures
 			?.useRootPaddingAwareAlignments;
 	}, [] );
 	const globalLayoutSettings = useSetting( 'layout' ) || {};
+
+	const { layout = {} } = blockAttributes;
 
 	const { default: defaultBlockLayout } =
 		getBlockSupport( blockName, layoutBlockSupportKey ) || {};
@@ -370,7 +372,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 				? { ...layout, type: 'constrained' }
 				: layout || defaultBlockLayout || {};
 		const layoutClasses = hasLayoutBlockSupport
-			? useLayoutClasses( layout, name )
+			? useLayoutClasses( attributes, name )
 			: null;
 		// Higher specificity to override defaults from theme.json.
 		const selector = `.wp-container-${ id }.wp-container-${ id }`;
