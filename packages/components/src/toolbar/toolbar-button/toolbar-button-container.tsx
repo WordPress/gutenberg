@@ -7,7 +7,7 @@ import type { WordPressComponentProps } from '../../ui/context';
 const ToolbarButtonContainer = ( {
 	className,
 	children,
-}: WordPressComponentProps< ToolbarButtonContainerProps, 'div', false > ) => (
+}: ToolbarButtonContainerProps ) => (
 	<div className={ className }>{ children }</div>
 );
 
