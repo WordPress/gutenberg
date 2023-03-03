@@ -11,7 +11,12 @@ import { useNavigationGroupContext } from '../group/context';
 import { useNavigationMenuContext } from '../menu/context';
 import { normalizedSearch } from '../utils';
 
-export const useNavigationTreeItem = ( itemId, props ) => {
+import type { NavigationItemProps } from '../types';
+
+export const useNavigationTreeItem = (
+	itemId: string,
+	props: NavigationItemProps
+) => {
 	const {
 		activeMenu,
 		navigationTree: { addItem, removeItem },

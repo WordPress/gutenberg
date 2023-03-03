@@ -18,9 +18,11 @@ import { ItemUI, ItemIconUI } from '../styles/navigation-styles';
 import NavigationItemBaseContent from './base-content';
 import NavigationItemBase from './base';
 
+import type { NavigationItemProps } from '../types';
+
 const noop = () => {};
 
-export default function NavigationItem( props ) {
+export default function NavigationItem( props: NavigationItemProps ) {
 	const {
 		badge,
 		children,
@@ -59,7 +61,9 @@ export default function NavigationItem( props ) {
 		'is-active': isActive,
 	} );
 
-	const onItemClick = ( event ) => {
+	const onItemClick: React.MouseEventHandler<
+		HTMLButtonElement | HTMLAnchorElement
+	> = ( event ) => {
 		if ( navigateToMenu ) {
 			setActiveMenu( navigateToMenu );
 		}

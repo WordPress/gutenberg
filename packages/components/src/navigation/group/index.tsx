@@ -15,9 +15,15 @@ import { NavigationGroupContext } from './context';
 import { GroupTitleUI } from '../styles/navigation-styles';
 import { useNavigationContext } from '../context';
 
+import type { NavigationGroupProps } from '../types';
+
 let uniqueId = 0;
 
-export default function NavigationGroup( { children, className, title } ) {
+export default function NavigationGroup( {
+	children,
+	className,
+	title,
+}: NavigationGroupProps ) {
 	const [ groupId ] = useState( `group-${ ++uniqueId }` );
 	const {
 		navigationTree: { items },

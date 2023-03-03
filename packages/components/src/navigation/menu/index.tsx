@@ -21,7 +21,9 @@ import NavigationSearchNoResultsFound from './search-no-results-found';
 import { NavigableMenu } from '../../navigable-container';
 import { MenuUI } from '../styles/navigation-styles';
 
-export default function NavigationMenu( props ) {
+import type { NavigationMenuProps } from '../types';
+
+export default function NavigationMenu( props: NavigationMenuProps ) {
 	const {
 		backButtonLabel,
 		children,

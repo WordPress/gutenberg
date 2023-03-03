@@ -18,6 +18,8 @@ import { NavigationContext } from './context';
 import { NavigationUI } from './styles/navigation-styles';
 import { useCreateNavigationTree } from './use-create-navigation-tree';
 
+import type { NavigationProps } from './types';
+
 const noop = () => {};
 
 export default function Navigation( {
@@ -26,9 +28,9 @@ export default function Navigation( {
 	children,
 	className,
 	onActivateMenu = noop,
-} ) {
+}: NavigationProps ) {
 	const [ menu, setMenu ] = useState( activeMenu );
-	const [ slideOrigin, setSlideOrigin ] = useState();
+	const [ slideOrigin, setSlideOrigin ] = useState< 'left' | 'right' >();
 	const navigationTree = useCreateNavigationTree();
 	const defaultSlideOrigin = isRTL() ? 'right' : 'left';
 
@@ -76,9 +78,14 @@ export default function Navigation( {
 		<NavigationUI className={ classes }>
 			<div
 				key={ menu }
-				className={ classnames( {
-					[ animateClassName ]: isMounted.current && slideOrigin,
-				} ) }
+				className={
+					animateClassName
+						? classnames( {
+								[ animateClassName ]:
+									isMounted.current && slideOrigin,
+						  } )
+						: undefined
+				}
 			>
 				<NavigationContext.Provider value={ context }>
 					{ children }

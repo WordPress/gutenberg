@@ -9,7 +9,9 @@ import { useEffect } from '@wordpress/element';
 import { useNavigationContext } from '../context';
 import { ROOT_MENU } from '../constants';
 
-export const useNavigationTreeMenu = ( props ) => {
+import type { NavigationMenuProps } from '../types';
+
+export const useNavigationTreeMenu = ( props: NavigationMenuProps ) => {
 	const {
 		navigationTree: { addMenu, removeMenu },
 	} = useNavigationContext();

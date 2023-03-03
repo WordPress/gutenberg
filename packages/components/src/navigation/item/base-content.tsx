@@ -3,7 +3,11 @@
  */
 import { ItemBadgeUI, ItemTitleUI } from '../styles/navigation-styles';
 
-export default function NavigationItemBaseContent( props ) {
+import type { NavigationItemBaseContentProps } from '../types';
+
+export default function NavigationItemBaseContent(
+	props: NavigationItemBaseContentProps
+) {
 	const { badge, title } = props;
 
 	return (
@@ -11,6 +15,7 @@ export default function NavigationItemBaseContent( props ) {
 			{ title && (
 				<ItemTitleUI
 					className="components-navigation__item-title"
+					// @ts-expect-error The only allowed variant is `muted` ?
 					variant="body.small"
 					as="span"
 				>
