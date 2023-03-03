@@ -113,29 +113,6 @@ function BlockContent( {
 	}
 }
 
-function ConvertToLinks( { onClick, disabled } ) {
-	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
-	const closeModal = () => setOpen( false );
-
-	return (
-		<>
-			<BlockControls group="other">
-				<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
-					{ __( 'Edit' ) }
-				</ToolbarButton>
-			</BlockControls>
-			{ isOpen && (
-				<ConvertToLinksModal
-					onClick={ onClick }
-					onClose={ closeModal }
-					disabled={ disabled }
-				/>
-			) }
-		</>
-	);
-}
-
 export default function PageListEdit( {
 	context,
 	clientId,
@@ -143,6 +120,9 @@ export default function PageListEdit( {
 	setAttributes,
 } ) {
 	const { parentPageID } = attributes;
+	const [ isOpen, setOpen ] = useState( false );
+	const openModal = () => setOpen( true );
+	const closeModal = () => setOpen( false );
 
 	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
 		'postType',
@@ -269,7 +249,11 @@ export default function PageListEdit( {
 		__unstableDisableDropZone: true,
 		templateLock: 'all',
 		onInput: NOOP,
-		onChange: NOOP,
+		onChange: () => {
+			if ( hasResolvedPages ) {
+				openModal();
+			}
+		},
 		value: blockList,
 	} );
 
@@ -325,10 +309,23 @@ export default function PageListEdit( {
 				) }
 			</InspectorControls>
 			{ allowConvertToLinks && (
-				<ConvertToLinks
-					disabled={ ! hasResolvedPages }
-					onClick={ convertToNavigationLinks }
-				/>
+				<>
+					<BlockControls group="other">
+						<ToolbarButton
+							title={ __( 'Edit' ) }
+							onClick={ openModal }
+						>
+							{ __( 'Edit' ) }
+						</ToolbarButton>
+					</BlockControls>
+					{ isOpen && (
+						<ConvertToLinksModal
+							onClick={ convertToNavigationLinks }
+							onClose={ closeModal }
+							disabled={ ! hasResolvedPages }
+						/>
+					) }
+				</>
 			) }
 			<BlockContent
 				blockProps={ blockProps }

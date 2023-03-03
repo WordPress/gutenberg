@@ -2,10 +2,10 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
 /**
  * WordPress dependencies
  */
+import { useEffect } from '@wordpress/element';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -35,7 +35,12 @@ function useFrontPageId() {
 	}, [] );
 }
 
-export default function PageListItemEdit( { context, attributes } ) {
+export default function PageListItemEdit( {
+	context,
+	attributes,
+	isSelected,
+	setAttributes,
+} ) {
 	const { id, label, link, hasChildren } = attributes;
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
@@ -49,6 +54,12 @@ export default function PageListItemEdit( { context, attributes } ) {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps );
+
+	useEffect( () => {
+		if ( isSelected ) {
+			setAttributes( { isSelected: true } );
+		}
+	}, [ isSelected ] );
 
 	return (
 		<li
