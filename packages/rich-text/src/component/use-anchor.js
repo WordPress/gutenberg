@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useSyncExternalStore } from '@wordpress/element';
+import { useCallback, useSyncExternalStore, useRef } from '@wordpress/element';
 
 /** @typedef {import('../register-format-type').RichTextFormatType} RichTextFormatType */
 /** @typedef {import('../create').RichTextValue} RichTextValue */
@@ -75,6 +75,18 @@ function createVirtualAnchorElement( range, editableContentElement ) {
 
 const virtualAnchorCache = new WeakMap();
 
+function isRangeEqual( a, b ) {
+	return (
+		a === b ||
+		( a &&
+			b &&
+			a.startContainer === b.startContainer &&
+			a.startOffset === b.startOffset &&
+			a.endContainer === b.endContainer &&
+			a.endOffset === b.endOffset )
+	);
+}
+
 /**
  * This hook, to be used in a format type's Edit component, returns the active
  * element that is formatted, or a virtual element for the selection range if
@@ -88,6 +100,7 @@ const virtualAnchorCache = new WeakMap();
  * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
  */
 export function useAnchor( { editableContentElement, settings = {} } ) {
+	const lastRange = useRef();
 	const { tagName, className } = settings;
 	const win = editableContentElement?.ownerDocument?.defaultView;
 
@@ -125,16 +138,22 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 
 		if ( formatElement ) return formatElement;
 
+		let key = lastRange.current;
+
+		if ( ! isRangeEqual( range, lastRange.current ) ) {
+			key = lastRange.current = range;
+		}
+
 		// Ensure the same reference is returned between re-renderes. This is
 		// important for getSnapShot.
-		if ( ! virtualAnchorCache.has( range ) ) {
+		if ( ! virtualAnchorCache.has( key ) ) {
 			virtualAnchorCache.set(
-				range,
+				key,
 				createVirtualAnchorElement( range, editableContentElement )
 			);
 		}
 
-		return virtualAnchorCache.get( range );
+		return virtualAnchorCache.get( key );
 	}
 
 	return useSyncExternalStore( subscribe, getSnapshot );
