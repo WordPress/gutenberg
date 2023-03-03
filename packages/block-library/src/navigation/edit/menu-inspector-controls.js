@@ -89,9 +89,7 @@ const MenuInspectorControls = ( props ) => {
 
 	return (
 		<InspectorControls group="list">
-			<PanelBody
-				title={ process.env.IS_GUTENBERG_PLUGIN ? null : __( 'Menu' ) }
-			>
+			<PanelBody title={ null }>
 				<HStack className="wp-block-navigation-off-canvas-editor__header">
 					<Heading
 						className="wp-block-navigation-off-canvas-editor__title"

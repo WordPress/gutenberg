@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -166,8 +166,8 @@ export default function Image( {
 		! isContentLocked &&
 		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = imageSizes
-		.filter( ( { slug } ) =>
-			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
+		.filter(
+			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
 		)
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
@@ -259,12 +259,7 @@ export default function Image( {
 	}
 
 	function updateImage( newSizeSlug ) {
-		const newUrl = get( image, [
-			'media_details',
-			'sizes',
-			newSizeSlug,
-			'source_url',
-		] );
+		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
 		if ( ! newUrl ) {
 			return null;
 		}

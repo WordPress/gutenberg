@@ -10,6 +10,7 @@ import { get, set } from 'lodash';
 import { useContext, useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -55,7 +56,7 @@ const VALID_SETTINGS = [
 	'spacing.margin',
 	'spacing.padding',
 	'spacing.units',
-	'typography.fuild',
+	'typography.fluid',
 	'typography.customFontSize',
 	'typography.dropCap',
 	'typography.fontFamilies',
@@ -204,63 +205,166 @@ export function useGlobalStyle(
 	return [ result, setStyle ];
 }
 
-export function useSupportedStyles( name, element ) {
-	const { supportedPanels } = useSelect(
-		( select ) => {
-			return {
-				supportedPanels: unlock(
-					select( blocksStore )
-				).getSupportedStyles( name, element ),
-			};
-		},
-		[ name, element ]
-	);
-
-	return supportedPanels;
-}
-
 /**
- * Given a settings object and a list of supported panels,
- * returns a new settings object with the unsupported panels removed.
+ * React hook that overrides a global settings object with block and element specific settings.
  *
- * @param {Object}   settings Settings object.
- * @param {string[]} supports Supported style panels.
+ * @param {Object}     parentSettings Settings object.
+ * @param {blockName?} blockName      Block name.
+ * @param {element?}   element        Element name.
  *
  * @return {Object} Merge of settings and supports.
  */
-export function overrideSettingsWithSupports( settings, supports ) {
-	const updatedSettings = { ...settings };
+export function useSettingsForBlockElement(
+	parentSettings,
+	blockName,
+	element
+) {
+	const { supportedStyles, supports } = useSelect(
+		( select ) => {
+			return {
+				supportedStyles: unlock(
+					select( blocksStore )
+				).getSupportedStyles( blockName, element ),
+				supports:
+					select( blocksStore ).getBlockType( blockName )?.supports,
+			};
+		},
+		[ blockName, element ]
+	);
 
-	if ( ! supports.includes( 'fontSize' ) ) {
-		updatedSettings.typography = {
-			...updatedSettings.typography,
-			fontSizes: {},
-			customFontSize: false,
-		};
-	}
+	return useMemo( () => {
+		const updatedSettings = { ...parentSettings };
 
-	if ( ! supports.includes( 'fontFamily' ) ) {
-		updatedSettings.typography = {
-			...updatedSettings.typography,
-			fontFamilies: {},
-		};
-	}
-
-	[
-		'lineHeight',
-		'fontStyle',
-		'fontWeight',
-		'letterSpacing',
-		'textTransform',
-		'textDecoration',
-	].forEach( ( key ) => {
-		if ( ! supports.includes( key ) ) {
+		if ( ! supportedStyles.includes( 'fontSize' ) ) {
 			updatedSettings.typography = {
 				...updatedSettings.typography,
-				[ key ]: false,
+				fontSizes: {},
+				customFontSize: false,
 			};
 		}
-	} );
 
-	return updatedSettings;
+		if ( ! supportedStyles.includes( 'fontFamily' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				fontFamilies: {},
+			};
+		}
+
+		[
+			'lineHeight',
+			'fontStyle',
+			'fontWeight',
+			'letterSpacing',
+			'textTransform',
+			'textDecoration',
+		].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.typography = {
+					...updatedSettings.typography,
+					[ key ]: false,
+				};
+			}
+		} );
+
+		[ 'contentSize', 'wideSize' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.layout = {
+					...updatedSettings.layout,
+					[ key ]: false,
+				};
+			}
+		} );
+
+		[ 'padding', 'margin', 'blockGap' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.spacing = {
+					...updatedSettings.spacing,
+					[ key ]: false,
+				};
+			}
+
+			const sides = Array.isArray( supports?.spacing?.[ key ] )
+				? supports?.spacing?.[ key ]
+				: supports?.spacing?.[ key ]?.sides;
+			if ( sides?.length ) {
+				updatedSettings.spacing = {
+					...updatedSettings.spacing,
+					[ key ]: {
+						...updatedSettings.spacing?.[ key ],
+						sides,
+					},
+				};
+			}
+		} );
+
+		if ( ! supportedStyles.includes( 'minHeight' ) ) {
+			updatedSettings.dimensions = {
+				...updatedSettings.dimensions,
+				minHeight: false,
+			};
+		}
+
+		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
+			if (
+				! supportedStyles.includes(
+					'border' + key.charAt( 0 ).toUpperCase() + key.slice( 1 )
+				)
+			) {
+				updatedSettings.border = {
+					...updatedSettings.border,
+					[ key ]: false,
+				};
+			}
+		} );
+
+		return updatedSettings;
+	}, [ parentSettings, supportedStyles, supports ] );
+}
+
+export function useColorsPerOrigin( settings ) {
+	const customColors = settings?.color?.palette?.custom;
+	const themeColors = settings?.color?.palette?.theme;
+	const defaultColors = settings?.color?.palette?.default;
+	const shouldDisplayDefaultColors = settings?.color?.defaultPalette;
+
+	return useMemo( () => {
+		const result = [];
+		if ( themeColors && themeColors.length ) {
+			result.push( {
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
+				colors: themeColors,
+			} );
+		}
+		if (
+			shouldDisplayDefaultColors &&
+			defaultColors &&
+			defaultColors.length
+		) {
+			result.push( {
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
+				colors: defaultColors,
+			} );
+		}
+		if ( customColors && customColors.length ) {
+			result.push( {
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
+				colors: customColors,
+			} );
+		}
+		return result;
+	}, [
+		customColors,
+		themeColors,
+		defaultColors,
+		shouldDisplayDefaultColors,
+	] );
 }

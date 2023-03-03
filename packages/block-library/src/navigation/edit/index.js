@@ -277,12 +277,24 @@ function Navigation( {
 		hasUncontrolledInnerBlocks,
 	] );
 
+	const isEntityAvailable =
+		! isNavigationMenuMissing && isNavigationMenuResolved;
+
+	// If the block has inner blocks, but no menu id, then these blocks are either:
+	// - inserted via a pattern.
+	// - inserted directly via Code View (or otherwise).
+	// - from an older version of navigation block added before the block used a wp_navigation entity.
+	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
+	// that automatically saves the menu as an entity when changes are made to the inner blocks.
+	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
+
 	useEffect( () => {
 		if (
 			ref ||
 			! hasResolvedNavigationMenus ||
 			isConvertingClassicMenu ||
-			fallbackNavigationMenus?.length > 0
+			fallbackNavigationMenus?.length > 0 ||
+			hasUnsavedBlocks
 		) {
 			return;
 		}
@@ -323,13 +335,14 @@ function Navigation( {
 			if ( getBlockType( 'core/page-list' ) ) {
 				defaultBlocks = [ createBlock( 'core/page-list' ) ];
 			}
+
 			createNavigationMenu(
 				'Navigation', // TODO - use the template slug in future
 				defaultBlocks,
 				'publish'
 			);
 		}
-	}, [ hasResolvedNavigationMenus ] );
+	}, [ hasResolvedNavigationMenus, hasUnsavedBlocks ] );
 
 	const navRef = useRef();
 
@@ -348,9 +361,6 @@ function Navigation( {
 		hasResolvedNavigationMenus &&
 		classicMenus?.length === 0 &&
 		! hasUncontrolledInnerBlocks;
-
-	const isEntityAvailable =
-		! isNavigationMenuMissing && isNavigationMenuResolved;
 
 	// "loading" state:
 	// - there is a menu creation process in progress.
@@ -642,6 +652,7 @@ function Navigation( {
 							<>
 								<h3>{ __( 'Submenus' ) }</h3>
 								<ToggleControl
+									__nextHasNoMarginBottom
 									checked={ openSubmenusOnClick }
 									onChange={ ( value ) => {
 										setAttributes( {
@@ -655,6 +666,7 @@ function Navigation( {
 								/>
 
 								<ToggleControl
+									__nextHasNoMarginBottom
 									checked={ showSubmenuIcon }
 									onChange={ ( value ) => {
 										setAttributes( {
@@ -725,14 +737,6 @@ function Navigation( {
 			</InspectorControls>
 		</>
 	);
-
-	// If the block has inner blocks, but no menu id, then these blocks are either:
-	// - inserted via a pattern.
-	// - inserted directly via Code View (or otherwise).
-	// - from an older version of navigation block added before the block used a wp_navigation entity.
-	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
-	// that automatically saves the menu as an entity when changes are made to the inner blocks.
-	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
@@ -894,7 +898,9 @@ function Navigation( {
 
 				{ isLoading && (
 					<TagName { ...blockProps }>
-						<Spinner className="wp-block-navigation__loading-indicator" />
+						<div className="wp-block-navigation__loading-indicator-container">
+							<Spinner className="wp-block-navigation__loading-indicator" />
+						</div>
 					</TagName>
 				) }
 

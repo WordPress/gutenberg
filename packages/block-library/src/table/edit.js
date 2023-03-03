@@ -478,6 +478,7 @@ function TableEdit( {
 					className="blocks-table-settings"
 				>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Fixed width table cells' ) }
 						checked={ !! hasFixedLayout }
 						onChange={ onChangeFixedLayout }
@@ -485,11 +486,13 @@ function TableEdit( {
 					{ ! isEmpty && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Header section' ) }
 								checked={ !! ( head && head.length ) }
 								onChange={ onToggleHeaderSection }
 							/>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Footer section' ) }
 								checked={ !! ( foot && foot.length ) }
 								onChange={ onToggleFooterSection }

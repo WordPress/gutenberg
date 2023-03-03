@@ -11,6 +11,7 @@ import {
 	SearchControl,
 	TextHighlight,
 	__experimentalText as Text,
+	__experimentalVStack as VStack,
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
@@ -158,9 +159,12 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 				</Composite>
 			) }
 			{ debouncedSearch && ! suggestions?.length && (
-				<p className="edit-site-custom-template-modal__no-results">
+				<Text
+					as="p"
+					className="edit-site-custom-template-modal__no-results"
+				>
 					{ labels.not_found }
-				</p>
+				</Text>
 			) }
 		</>
 	);
@@ -188,12 +192,12 @@ function AddCustomTemplateModal( {
 		>
 			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			{ ! showSearchEntities && (
-				<>
-					<p>
+				<VStack spacing={ 4 }>
+					<Text as="p">
 						{ __(
 							'Select whether to create a single template for all items or a specific one.'
 						) }
-					</p>
+					</Text>
 					<Flex
 						className={ `${ baseCssClass }__contents` }
 						gap="4"
@@ -245,20 +249,20 @@ function AddCustomTemplateModal( {
 							</Text>
 						</FlexItem>
 					</Flex>
-				</>
+				</VStack>
 			) }
 			{ showSearchEntities && (
-				<>
-					<p>
+				<VStack spacing={ 4 }>
+					<Text as="p">
 						{ __(
 							'This template will be used only for the specific item chosen.'
 						) }
-					</p>
+					</Text>
 					<SuggestionList
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
 					/>
-				</>
+				</VStack>
 			) }
 		</Modal>
 	);
