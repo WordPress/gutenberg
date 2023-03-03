@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
+import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -19,6 +19,94 @@ import {
 import { _x } from '@wordpress/i18n';
 
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
+
+/**
+ *
+ * @typedef AddedByData
+ * @type {Object}
+ * @property {JSX.Element} icon         The icon to display.
+ * @property {string}      [imageUrl]   The optional image URL to display.
+ * @property {string}      [text]       The text to display.
+ * @property {boolean}     isCustomized Whether the template has been customized.
+ *
+ * @param    {Object}      template     The template object.
+ * @return {AddedByData} The added by object or null.
+ */
+export function useAddedBy( template ) {
+	return useSelect(
+		( select ) => {
+			const { getTheme, getPlugin, getEntityRecord, getMedia, getUser } =
+				select( coreStore );
+			if ( TEMPLATE_POST_TYPE_NAMES.includes( template.type ) ) {
+				// Added by theme.
+				// Template originally provided by a theme, but customized by a user.
+				// Templates originally didn't have the 'origin' field so identify
+				// older customized templates by checking for no origin and a 'theme'
+				// or 'custom' source.
+				if (
+					template.has_theme_file &&
+					( template.origin === 'theme' ||
+						( ! template.origin &&
+							[ 'theme', 'custom' ].includes(
+								template.source
+							) ) )
+				) {
+					return {
+						icon: themeIcon,
+						text:
+							getTheme( template.theme )?.name?.rendered ||
+							template.theme,
+						isCustomized: template.source === 'custom',
+					};
+				}
+
+				// Added by plugin.
+				// Template originally provided by a plugin, but customized by a user.
+				if ( template.has_theme_file && template.origin === 'plugin' ) {
+					return {
+						icon: pluginIcon,
+						text:
+							getPlugin( template.theme )?.name || template.theme,
+						isCustomized: template.source === 'custom',
+					};
+				}
+
+				// Added by site.
+				// Template was created from scratch, but has no author. Author support
+				// was only added to templates in WordPress 5.9. Fallback to showing the
+				// site logo and title.
+				if (
+					! template.has_theme_file &&
+					template.source === 'custom' &&
+					! template.author
+				) {
+					const siteData = getEntityRecord(
+						'root',
+						'__unstableBase'
+					);
+					return {
+						icon: globeIcon,
+						imageUrl: siteData?.site_logo
+							? getMedia( siteData.site_logo )?.source_url
+							: undefined,
+						text: siteData?.name,
+						isCustomized: false,
+					};
+				}
+			}
+
+			// Added by user.
+			const user = getUser( template.author );
+			return {
+				icon: authorIcon,
+				imageUrl: user?.avatar_urls?.[ 48 ],
+				text: user?.nickname,
+				isCustomized: false,
+			};
+		},
+		[ template ]
+	);
+}
 
 function BaseAddedBy( { text, icon, imageUrl, isCustomized, templateType } ) {
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
@@ -56,128 +144,16 @@ function BaseAddedBy( { text, icon, imageUrl, isCustomized, templateType } ) {
 	);
 }
 
-function AddedByTheme( { slug, isCustomized, templateType } ) {
-	const theme = useSelect(
-		( select ) => select( coreStore ).getTheme( slug ),
-		[ slug ]
-	);
+export default function AddedBy( { template } ) {
+	const addedBy = useAddedBy( template );
 
 	return (
 		<BaseAddedBy
-			icon={ themeIcon }
-			text={ theme?.name?.rendered || slug }
-			isCustomized={ isCustomized }
-			templateType={ templateType }
+			icon={ addedBy.icon }
+			imageUrl={ addedBy.imageUrl }
+			text={ addedBy.text }
+			isCustomized={ addedBy.isCustomized }
+			templateType={ template.type }
 		/>
-	);
-}
-
-function AddedByPlugin( { slug, isCustomized, templateType } ) {
-	const plugin = useSelect(
-		( select ) => select( coreStore ).getPlugin( slug ),
-		[ slug ]
-	);
-
-	return (
-		<BaseAddedBy
-			icon={ pluginIcon }
-			text={ plugin?.name || slug }
-			isCustomized={ isCustomized }
-			templateType={ templateType }
-		/>
-	);
-}
-
-function AddedByAuthor( { id, templateType } ) {
-	const user = useSelect(
-		( select ) => select( coreStore ).getUser( id ),
-		[ id ]
-	);
-
-	return (
-		<BaseAddedBy
-			icon={ authorIcon }
-			imageUrl={ user?.avatar_urls?.[ 48 ] }
-			text={ user?.nickname }
-			templateType={ templateType }
-		/>
-	);
-}
-
-function AddedBySite( { templateType } ) {
-	const { name, logoURL } = useSelect( ( select ) => {
-		const { getEntityRecord, getMedia } = select( coreStore );
-		const siteData = getEntityRecord( 'root', '__unstableBase' );
-
-		return {
-			name: siteData?.name,
-			logoURL: siteData?.site_logo
-				? getMedia( siteData.site_logo )?.source_url
-				: undefined,
-		};
-	}, [] );
-
-	return (
-		<BaseAddedBy
-			icon={ globeIcon }
-			imageUrl={ logoURL }
-			text={ name }
-			templateType={ templateType }
-		/>
-	);
-}
-
-export default function AddedBy( { templateType, template } ) {
-	if ( ! template ) {
-		return;
-	}
-
-	if ( TEMPLATE_POST_TYPE_NAMES.includes( templateType ) ) {
-		// Template originally provided by a theme, but customized by a user.
-		// Templates originally didn't have the 'origin' field so identify
-		// older customized templates by checking for no origin and a 'theme'
-		// or 'custom' source.
-		if (
-			template.has_theme_file &&
-			( template.origin === 'theme' ||
-				( ! template.origin &&
-					[ 'theme', 'custom' ].includes( template.source ) ) )
-		) {
-			return (
-				<AddedByTheme
-					slug={ template.theme }
-					isCustomized={ template.source === 'custom' }
-					templateType={ templateType }
-				/>
-			);
-		}
-
-		// Template originally provided by a plugin, but customized by a user.
-		if ( template.has_theme_file && template.origin === 'plugin' ) {
-			return (
-				<AddedByPlugin
-					slug={ template.theme }
-					isCustomized={ template.source === 'custom' }
-					templateType={ templateType }
-				/>
-			);
-		}
-
-		// Template was created from scratch, but has no author. Author support
-		// was only added to templates in WordPress 5.9. Fallback to showing the
-		// site logo and title.
-		if (
-			! template.has_theme_file &&
-			template.source === 'custom' &&
-			! template.author
-		) {
-			return <AddedBySite templateType={ templateType } />;
-		}
-	}
-
-	// Simply show the author for templates created from scratch that have an
-	// author or for any other post type.
-	return (
-		<AddedByAuthor id={ template.author } templateType={ templateType } />
 	);
 }

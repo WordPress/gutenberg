@@ -101,10 +101,9 @@ export default function Table( { templateType } ) {
 						</td>
 
 						<td className="edit-site-list-table-column" role="cell">
-							<AddedBy
-								templateType={ templateType }
-								template={ template }
-							/>
+							{ template ? (
+								<AddedBy template={ template } />
+							) : null }
 						</td>
 						<td className="edit-site-list-table-column" role="cell">
 							<Actions template={ template } />

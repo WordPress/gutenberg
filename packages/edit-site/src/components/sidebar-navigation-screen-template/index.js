@@ -14,6 +14,19 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
+import { useAddedBy } from '../list/added-by';
+
+function AddedByDescription( { template } ) {
+	const addedBy = useAddedBy( template );
+
+	if ( ! addedBy.text ) return null;
+
+	return sprintf(
+		/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
+		__( 'Added by %s.' ),
+		addedBy.text
+	);
+}
 
 export default function SidebarNavigationScreenTemplate() {
 	const { params } = useNavigator();
@@ -48,7 +61,13 @@ export default function SidebarNavigationScreenTemplate() {
 					icon={ pencil }
 				/>
 			}
-			description={ description }
+			description={
+				description ? (
+					description
+				) : (
+					<AddedByDescription template={ record } />
+				)
+			}
 		/>
 	);
 }
