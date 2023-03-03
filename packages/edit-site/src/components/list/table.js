@@ -29,7 +29,7 @@ export default function Table( { templateType } ) {
 	const templates = useSelect(
 		( select ) =>
 			allTemplates?.filter( ( template ) =>
-				select( coreStore ).isDeletingEntityRecord(
+				! select( coreStore ).isDeletingEntityRecord(
 					'postType',
 					templateType,
 					template.id
