@@ -51,6 +51,66 @@ const SLOT_FILL_NAME = 'EditSiteStyleBook';
 const { Slot: StyleBookSlot, Fill: StyleBookFill } =
 	createSlotFill( SLOT_FILL_NAME );
 
+// The content area of the Style Book is rendered within an iframe so that global styles
+// affect and are displayed within the entire content area. To support elements that are
+// no part of the block previews, such as headings, and layout for the block previews,
+// additional CSS rules need to be passed into the iframe. These are hard-coded below.
+const STYLE_BOOK_IFRAME_STYLES = `
+	.edit-site-style-book__examples {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+
+	.edit-site-style-book__example {
+		background: none;
+		border-radius: 2px;
+		border: none;
+		color: inherit;
+		cursor: pointer;
+		display: flex;
+		flex-direction: column;
+		gap: 40px;
+		margin-bottom: 40px;
+		padding: 16px;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.edit-site-style-book__example.is-selected {
+		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+	}
+
+	.edit-site-style-book__examples.is-wide .edit-site-style-book__example {
+		flex-direction: row;
+	}
+
+	.edit-site-style-book__example-title {
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+		font-size: 11px;
+		font-weight: 500;
+		line-height: normal;
+		margin: 0;
+		text-align: left;
+		text-transform: uppercase;
+	}
+
+	.edit-site-style-book__examples.is-wide .edit-site-style-book__example-title {
+		text-align: right;
+		width: 120px;
+	}
+
+	.edit-site-style-book__example-preview {
+		width: 100%;
+	}
+
+	.edit-site-style-book__example-preview .is-root-container > .wp-block:first-child {
+		margin-top: 0;
+	}
+	.edit-site-style-book__example-preview .is-root-container > .wp-block:last-child {
+		margin-bottom: 0;
+	}
+`;
+
 function getExamples() {
 	// Use our own example for the Heading block so that we can show multiple
 	// heading levels.
@@ -177,67 +237,15 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 							head={
 								<>
 									<EditorStyles styles={ settings.styles } />
-									<style>{
-										// Forming a "block formatting context" to prevent margin collapsing.
-										// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-										`.is-root-container { display: flow-root; }
-										body { position: relative; padding: 32px !important; }
-
-										.edit-site-style-book__examples {
-											max-width: 900px;
-											margin: 0 auto;
+									<style>
+										{
+											// Forming a "block formatting context" to prevent margin collapsing.
+											// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+											`.is-root-container { display: flow-root; }
+											body { position: relative; padding: 32px !important; }` +
+												STYLE_BOOK_IFRAME_STYLES
 										}
-
-										.edit-site-style-book__example {
-											background: none;
-											border-radius: 2px;
-											border: none;
-											color: inherit;
-											cursor: pointer;
-											display: flex;
-											flex-direction: column;
-											gap: 40px;
-											margin-bottom: 40px;
-											padding: 16px;
-											width: 100%;
-											box-sizing: border-box;
-										}
-
-										.edit-site-style-book__example.is-selected {
-											box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
-										}
-
-										.edit-site-style-book__examples.is-wide .edit-site-style-book__example {
-											flex-direction: row;
-										}
-
-										.edit-site-style-book__example-title {
-											font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-											font-size: 11px;
-											font-weight: 500;
-											line-height: normal;
-											margin: 0;
-											text-align: left;
-											text-transform: uppercase;
-										}
-
-										.edit-site-style-book__examples.is-wide .edit-site-style-book__example-title {
-											text-align: right;
-											width: 120px;
-										}
-
-										.edit-site-style-book__example-preview {
-											width: 100%;
-										}
-
-										.edit-site-style-book__example-preview .is-root-container > .wp-block:first-child {
-											margin-top: 0;
-										}
-										.edit-site-style-book__example-preview .is-root-container > .wp-block:last-child {
-											margin-bottom: 0;
-										}
-										`
-									}</style>
+									</style>
 								</>
 							}
 							tabIndex={ 0 }
