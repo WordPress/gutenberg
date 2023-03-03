@@ -289,6 +289,7 @@ The settings section has the following structure:
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true
 		},
@@ -824,6 +825,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"fontWeight": "value",
 			"letterSpacing": "value",
 			"lineHeight": "value",
+			"textColumns": "value",
 			"textDecoration": "value",
 			"textTransform": "value"
 		},
