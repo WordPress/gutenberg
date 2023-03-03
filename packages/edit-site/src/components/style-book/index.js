@@ -36,7 +36,7 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { useMemo, memo } from '@wordpress/element';
-import { ESCAPE } from '@wordpress/keycodes';
+import { ENTER, ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -173,6 +173,7 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 				>
 					{ ( tab ) => (
 						<Iframe
+							className="edit-site-style-book__iframe"
 							head={
 								<>
 									<EditorStyles styles={ settings.styles } />
@@ -293,6 +294,13 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => {
 		[ originalSettings ]
 	);
 
+	const selectOnEnter = ( event ) => {
+		if ( event.keyCode === ENTER ) {
+			event.preventDefault();
+			onClick();
+		}
+	};
+
 	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	return (
 		<div
@@ -304,7 +312,9 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => {
 				__( 'Open %s styles in Styles panel' ),
 				title
 			) }
+			role="button"
 			onClick={ onClick }
+			onKeyDown={ selectOnEnter }
 			tabIndex={ 0 }
 		>
 			<span className="edit-site-style-book__example-title">
