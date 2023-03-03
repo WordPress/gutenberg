@@ -238,7 +238,7 @@ Add an image or video with a text overlay — great for headers. ([Source](https
 A block that displays a summary and shows or hides additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details))
 
 -	**Name:** core/details
--	**Category:** theme
+-	**Category:** text
 -	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** showContent
 
@@ -247,7 +247,7 @@ A block that displays a summary and shows or hides additional content. ([Source]
 The content inside the details is hidden until the details are expanded. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-content))
 
 -	**Name:** core/details-content
--	**Category:** theme
+-	**Category:** text
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~align~~, ~~html~~, ~~lock~~, ~~multiple~~, ~~reusable~~
 -	**Attributes:** 
 
@@ -256,7 +256,7 @@ The content inside the details is hidden until the details are expanded. ([Sourc
 Clicking on the summary will show or hide the content inside the details. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-summary))
 
 -	**Name:** core/details-summary
--	**Category:** theme
+-	**Category:** text
 -	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~align~~, ~~html~~, ~~lock~~, ~~multiple~~, ~~reusable~~
 -	**Attributes:** summary
 

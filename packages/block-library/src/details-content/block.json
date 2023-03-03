@@ -4,7 +4,7 @@
 	"__experimental": true,
 	"name": "core/details-content",
 	"title": "Details Content",
-	"category": "theme",
+	"category": "text",
 	"parent": [ "core/details" ],
 	"description": "The content inside the details is hidden until the details are expanded.",
 	"textdomain": "default",
