@@ -142,10 +142,6 @@ export type AutocompleterUIProps = {
 	 */
 	reset: ( event: Event ) => void;
 	/**
-	 * The rich text value object the autocompleter is being applied to.
-	 */
-	value: RichTextValue;
-	/**
 	 * A ref containing the editable element that will serve as the anchor for
 	 * `Autocomplete`'s `Popover`.
 	 */

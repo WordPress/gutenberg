@@ -22,12 +22,30 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 
 	// If the caret is right before the element, select the next element.
 	element = element.nextElementSibling || element;
-	element = element.parentElement;
+
+	if ( element.nodeType !== element.ELEMENT_NODE ) {
+		element = element.parentElement;
+	}
 
 	if ( ! element ) return;
 	if ( element === editableContentElement ) return;
+	if ( ! editableContentElement.contains( element ) ) return;
 
-	return element.closest( tagName + ( className ? '.' + className : '' ) );
+	const selector = tagName + ( className ? '.' + className : '' );
+
+	// .closest( selector ), but with a boundary. Check if the element matches
+	// the selector. If it doesn't match, try the parent element if it's not the
+	// editorable wrapper. We don't want to try to match ancestors of the
+	// editable wrapper, which is what .closest( selector ) would do. When the
+	// element is the editable wrapper (which is most likely the case because
+	// most text is unformatted), this never runs.
+	while ( element !== editableContentElement ) {
+		if ( element.matches( selector ) ) {
+			return element;
+		}
+
+		element = element.parentElement;
+	}
 }
 
 /**
