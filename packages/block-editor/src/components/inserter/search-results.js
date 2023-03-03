@@ -88,8 +88,26 @@ function InserterSearchResults( {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
+
+		const forceBlockSearchResults = [
+			'core/navigation-link/page',
+			'core/navigation-link',
+		]?.reverse(); // force first item to be the one that is shown first
+
+		const comparator = forceBlockSearchResults?.length
+			? ( resultItem ) => {
+					if ( forceBlockSearchResults.includes( resultItem.id ) ) {
+						return (
+							10000 +
+							forceBlockSearchResults.indexOf( resultItem.id )
+						);
+					}
+					return resultItem.frecency;
+			  }
+			: 'frecency';
+
 		const results = searchBlockItems(
-			orderBy( blockTypes, 'frecency', 'desc' ),
+			orderBy( blockTypes, comparator, 'desc' ),
 			blockTypeCategories,
 			blockTypeCollections,
 			filterValue
