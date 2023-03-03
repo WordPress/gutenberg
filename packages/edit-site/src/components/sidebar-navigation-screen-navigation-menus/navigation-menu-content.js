@@ -14,13 +14,16 @@ import { useSelect } from '@wordpress/data';
  */
 import { unlock } from '../../private-apis';
 
-export default function NavigationMenuContent( { onSelect } ) {
-	const { clientIdsTree } = useSelect( ( select ) => {
-		const { __unstableGetClientIdsTree } = select( blockEditorStore );
-		return {
-			clientIdsTree: __unstableGetClientIdsTree(),
-		};
-	} );
+export default function NavigationMenuContent( { rootClientId, onSelect } ) {
+	const { clientIdsTree } = useSelect(
+		( select ) => {
+			const { __unstableGetClientIdsTree } = select( blockEditorStore );
+			return {
+				clientIdsTree: __unstableGetClientIdsTree( rootClientId ),
+			};
+		},
+		[ rootClientId ]
+	);
 
 	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
 

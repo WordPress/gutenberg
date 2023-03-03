@@ -4,8 +4,9 @@
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { BlockEditorProvider, Inserter } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,20 +16,8 @@ import { useHistory } from '../routes';
 import NavigationMenuContent from './navigation-menu-content';
 import SidebarButton from '../sidebar-button';
 
+const noop = () => {};
 const NAVIGATION_MENUS_QUERY = { per_page: -1, status: 'publish' };
-const settings = {
-	allowedBlockTypes: [
-		'core/navigation-link',
-		'core/search',
-		'core/social-links',
-		'core/page-list',
-		'core/spacer',
-		'core/home-link',
-		'core/site-title',
-		'core/site-logo',
-		'core/navigation-submenu',
-	],
-};
 
 function SidebarNavigationScreenWrapper( { children, actions } ) {
 	return (
@@ -85,12 +74,11 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		[ navigationMenus ]
 	);
 	const firstNavigationMenu = orderedNavigationMenus?.[ 0 ]?.id;
-
-	const [ innerBlocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		'wp_navigation',
-		{ id: firstNavigationMenu }
-	);
+	const blocks = useMemo( () => {
+		return [
+			createBlock( 'core/navigation', { ref: firstNavigationMenu } ),
+		];
+	}, [ firstNavigationMenu ] );
 
 	const isLoading = ! hasResolvedNavigationMenus;
 	const hasNavigationMenus = !! navigationMenus?.length;
@@ -139,14 +127,14 @@ export default function SidebarNavigationScreenNavigationMenus() {
 
 	return (
 		<BlockEditorProvider
-			value={ innerBlocks }
-			onChange={ onChange }
-			onInput={ onInput }
-			settings={ settings }
+			value={ blocks }
+			onChange={ noop }
+			onInput={ noop }
 		>
 			<SidebarNavigationScreenWrapper
 				actions={
 					<Inserter
+						rootClientId={ blocks[ 0 ].clientId }
 						position="bottom right"
 						isAppender
 						selectBlockOnInsert={ false }
@@ -160,7 +148,10 @@ export default function SidebarNavigationScreenNavigationMenus() {
 				}
 			>
 				<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
-					<NavigationMenuContent onSelect={ onSelect } />
+					<NavigationMenuContent
+						rootClientId={ blocks[ 0 ].clientId }
+						onSelect={ onSelect }
+					/>
 				</div>
 			</SidebarNavigationScreenWrapper>
 		</BlockEditorProvider>
