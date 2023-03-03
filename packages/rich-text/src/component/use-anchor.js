@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useLayoutEffect, useMemo } from '@wordpress/element';
 
 /** @typedef {import('../register-format-type').RichTextFormatType} RichTextFormatType */
 /** @typedef {import('../create').RichTextValue} RichTextValue */
@@ -127,7 +127,7 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 		getAnchor( editableContentElement, tagName, className )
 	);
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! editableContentElement ) return;
 
 		const { ownerDocument } = editableContentElement;
@@ -157,10 +157,22 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 			} );
 		}
 
-		ownerDocument.addEventListener( 'selectionchange', callback );
-		return () => {
+		function attach() {
+			ownerDocument.addEventListener( 'selectionchange', callback );
+		}
+
+		function detach() {
 			ownerDocument.removeEventListener( 'selectionchange', callback );
-		};
+		}
+
+		if ( editableContentElement === ownerDocument.activeElement ) {
+			attach();
+		}
+
+		editableContentElement.addEventListener( 'focus', attach );
+		editableContentElement.addEventListener( 'blur', detach );
+
+		return detach;
 	}, [ editableContentElement, tagName, className ] );
 
 	return useMemo( () => {
