@@ -400,7 +400,6 @@ test.describe( 'undo', () => {
 			)
 		).toBeVisible();
 		await page.reload();
-		await page.waitForSelector( '.edit-post-layout' );
 
 		// Issue is demonstrated by forcing state merges (multiple inputs) on
 		// an existing text after a fresh reload.
@@ -469,7 +468,6 @@ test.describe( 'undo', () => {
 			)
 		).toBeVisible();
 		await page.reload();
-		await page.waitForSelector( '.edit-post-layout' );
 
 		// Expect undo button to be disabled.
 		await expect(
@@ -508,9 +506,6 @@ test.describe( 'undo', () => {
 		await editor.publishPost();
 		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
-		await page.waitForSelector(
-			'.editor-history__redo[aria-disabled="false"]'
-		);
 		await page.click( '.editor-history__redo[aria-disabled="false"]' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
