@@ -49,7 +49,6 @@
 		"src/dimension-control",
 		"src/duotone-picker",
 		"src/gradient-picker",
-		"src/higher-order/navigate-regions",
 		"src/higher-order/with-filters",
 		"src/higher-order/with-focus-return",
 		"src/higher-order/with-notices",
