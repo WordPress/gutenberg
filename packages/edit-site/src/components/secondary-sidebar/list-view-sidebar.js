@@ -1,14 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import {
 	useFocusOnMount,
 	useFocusReturn,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
@@ -26,6 +29,14 @@ const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
+	const { hasBlockSelection } = useSelect(
+		( select ) => ( {
+			hasBlockSelection:
+				!! select( blockEditorStore ).getBlockSelectionStart(),
+		} ),
+		[]
+	);
 
 	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
@@ -34,6 +45,16 @@ export default function ListViewSidebar() {
 	const contentFocusReturnRef = useFocusReturn();
 
 	function closeOnEscape( event ) {
+		if (
+			event.keyCode === ESCAPE &&
+			! event.defaultPrevented &&
+			hasBlockSelection
+		) {
+			event.preventDefault();
+			selectBlock();
+			return;
+		}
+
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			setIsListViewOpened( false );
 		}
