@@ -959,23 +959,23 @@ describe( 'prependHTTPS', () => {
 	} );
 } );
 
-	it( 'should prepend https to a domain with an anchor', () => {
-		const url = 'wordpress.org#something';
+it( 'should prepend https to a domain with an anchor', () => {
+	const url = 'wordpress.org#something';
 
-		expect( prependHTTPS( url ) ).toBe( 'https://' + url );
-	} );
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
 
-	it( 'should prepend https to a domain with path', () => {
-		const url = 'wordpress.org/some/thing';
+it( 'should prepend https to a domain with path', () => {
+	const url = 'wordpress.org/some/thing';
 
-		expect( prependHTTPS( url ) ).toBe( 'https://' + url );
-	} );
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
 
-	it( 'should prepend https to a domain with query arguments', () => {
-		const url = 'wordpress.org?foo=bar';
+it( 'should prepend https to a domain with query arguments', () => {
+	const url = 'wordpress.org?foo=bar';
 
-		expect( prependHTTPS( url ) ).toBe( 'https://' + url );
-	} );
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
 
 describe( 'safeDecodeURI', () => {
 	it( 'should decode URI if formed well', () => {
