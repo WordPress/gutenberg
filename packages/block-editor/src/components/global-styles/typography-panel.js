@@ -7,6 +7,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -92,8 +93,27 @@ function useHasTextDecorationControl( settings ) {
 	return settings?.typography?.textDecoration;
 }
 
-function TypographyToolsPanel( { ...props } ) {
-	return <ToolsPanel label={ __( 'Typography' ) } { ...props } />;
+function TypographyToolsPanel( {
+	resetAllFilter,
+	onChange,
+	value,
+	panelId,
+	children,
+} ) {
+	const resetAll = () => {
+		const updatedValue = resetAllFilter( value );
+		onChange( updatedValue );
+	};
+
+	return (
+		<ToolsPanel
+			label={ __( 'Typography' ) }
+			resetAll={ resetAll }
+			panelId={ panelId }
+		>
+			{ children }
+		</ToolsPanel>
+	);
 }
 
 const DEFAULT_CONTROLS = {
@@ -260,15 +280,20 @@ export default function TypographyPanel( {
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
 	const resetTextDecoration = () => setTextDecoration( undefined );
 
-	const resetAll = () => {
-		onChange( {
-			...value,
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
 			typography: {},
-		} );
-	};
+		};
+	}, [] );
 
 	return (
-		<Wrapper resetAll={ resetAll }>
+		<Wrapper
+			resetAllFilter={ resetAllFilter }
+			value={ value }
+			onChange={ onChange }
+			panelId={ panelId }
+		>
 			{ hasFontFamilyEnabled && (
 				<ToolsPanelItem
 					label={ __( 'Font family' ) }

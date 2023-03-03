@@ -80,7 +80,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		'post_type'           => $template_type,
 		'posts_per_page'      => -1,
 		'no_found_rows'       => true,
-		'lazy_load_term_meta' => false,
+		'lazy_load_term_meta' => false,  // Do not lazy load term meta, as template post types only have one term.
 		'tax_query'           => array(
 			array(
 				'taxonomy' => 'wp_theme',

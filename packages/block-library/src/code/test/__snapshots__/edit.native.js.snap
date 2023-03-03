@@ -2,12 +2,12 @@
 
 exports[`Code renders given text without crashing 1`] = `
 "<!-- wp:code -->
-<pre class=\\"wp-block-code\\"><code>Sample text</code></pre>
+<pre class="wp-block-code"><code>Sample text</code></pre>
 <!-- /wp:code -->"
 `;
 
 exports[`Code renders without crashing 1`] = `
 "<!-- wp:code -->
-<pre class=\\"wp-block-code\\"><code></code></pre>
+<pre class="wp-block-code"><code></code></pre>
 <!-- /wp:code -->"
 `;

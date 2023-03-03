@@ -76,6 +76,7 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
         onGutenbergReadyScripts().forEach(evaluateJavascript)
         evaluateJavascript(jsInjection.preventAutosavesScript)
         evaluateJavascript(jsInjection.insertBlockScript)
+        evaluateJavascript(jsInjection.editorBehaviorScript)
         DispatchQueue.main.async { [weak self] in
             self?.removeCoverViewAnimated()
         }

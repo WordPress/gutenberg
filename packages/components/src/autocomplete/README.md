@@ -2,6 +2,57 @@
 
 This component is used to provide autocompletion support for a child input component.
 
+## Props
+
+The following props are used to control the behavior of the component.
+
+### record
+
+The rich text value object the autocomleter is being applied to.
+
+-   Required: Yes
+-   Type: `RichTextValue`
+
+### onChange
+
+A function to be called when an option is selected to insert into the existing text.
+
+-   Required: Yes
+-   Type: `( value: string ) => void`
+
+A function to be called when an option is selected to replace the existing text.
+
+-   Required: Yes
+-   Type: `( arg: [ OptionCompletion[ 'value' ] ] ) => void;`
+
+### completers
+
+An array of all of the completers to apply to the current element.
+
+-   Required: Yes
+-   Type: `Array< WPCompleter >`
+ 
+### contentRef
+
+A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
+
+-   Required: Yes
+-   `MutableRefObject< HTMLElement | undefined >`
+
+### children
+
+A function that returns nodes to be rendered within the Autocomplete.
+
+-   Required: Yes
+-   Type: `Function`
+
+### isSelected
+
+Whether or not the Autocomplte componenet is selected, and if its `Popover` should be displayed.
+
+- Required: Yes
+- Type: `Boolean`
+
 ## Autocompleters
 
 Autocompleters enable us to offer users options for completing text input. For example, Gutenberg includes a user autocompleter that provides a list of user names and completes a selection with a user mention like `@mary`.

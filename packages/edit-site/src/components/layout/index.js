@@ -40,6 +40,8 @@ import ResizeHandle from '../block-editor/resize-handle';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
+import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
+import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
@@ -121,6 +123,8 @@ export default function Layout() {
 
 	return (
 		<>
+			<KeyboardShortcutsRegister />
+			<KeyboardShortcutsGlobal />
 			{ fullResizer }
 			<div
 				{ ...navigateRegionsProps }
@@ -273,6 +277,20 @@ export default function Layout() {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<motion.div
+									whileHover={
+										isEditorPage && canvasMode === 'view'
+											? {
+													scale: 1.01,
+													transition: {
+														duration:
+															disableMotion ||
+															isResizing
+																? 0
+																: 0.2,
+													},
+											  }
+											: {}
+									}
 									initial={ false }
 									layout="position"
 									className="edit-site-layout__canvas"

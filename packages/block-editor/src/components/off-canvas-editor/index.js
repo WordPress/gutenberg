@@ -62,6 +62,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {Object}  props.LeafMoreMenu    Optional more menu substitution.
  * @param {string}  props.description     Optional accessible description for the tree grid component.
  * @param {string}  props.onSelect        Optional callback to be invoked when a block is selected.
+ * @param {string}  props.showAppender    Flag to show or hide the block appender.
  * @param {Object}  ref                   Forwarded ref
  */
 function OffCanvasEditor(
@@ -70,6 +71,7 @@ function OffCanvasEditor(
 		blocks,
 		showBlockMovers = false,
 		isExpanded = false,
+		showAppender = true,
 		LeafMoreMenu,
 		description = __( 'Block navigation structure' ),
 		onSelect,
@@ -80,9 +82,10 @@ function OffCanvasEditor(
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
 		useListViewClientIds( blocks );
 
-	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
+	const { visibleBlockCount, shouldShowInnerBlocks, parentId } = useSelect(
 		( select ) => {
 			const {
+				getBlockRootClientId,
 				getGlobalBlockCount,
 				getClientIdsOfDescendants,
 				__unstableGetEditorMode,
@@ -94,9 +97,13 @@ function OffCanvasEditor(
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
 				shouldShowInnerBlocks: __unstableGetEditorMode() !== 'zoom-out',
+				parentId:
+					blocks.length > 0
+						? getBlockRootClientId( blocks[ 0 ].clientId )
+						: undefined,
 			};
 		},
-		[ draggedClientIds ]
+		[ draggedClientIds, blocks ]
 	);
 
 	const { updateBlockSelection } = useBlockSelection();
@@ -227,6 +234,7 @@ function OffCanvasEditor(
 				>
 					<ListViewContext.Provider value={ contextValue }>
 						<ListViewBranch
+							parentId={ parentId }
 							blocks={ clientIdsTree }
 							selectBlock={ selectEditorBlock }
 							showBlockMovers={ showBlockMovers }
@@ -234,6 +242,7 @@ function OffCanvasEditor(
 							selectedClientIds={ selectedClientIds }
 							isExpanded={ isExpanded }
 							shouldShowInnerBlocks={ shouldShowInnerBlocks }
+							showAppender={ showAppender }
 						/>
 						<TreeGridRow
 							level={ 1 }

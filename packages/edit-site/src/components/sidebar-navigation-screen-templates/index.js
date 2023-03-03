@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -18,6 +19,8 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import AddNewTemplate from '../add-new-template';
+import { store as editSiteStore } from '../../store';
+import SidebarButton from '../sidebar-button';
 
 const config = {
 	wp_template: {
@@ -51,6 +54,11 @@ export default function SidebarNavigationScreenTemplates() {
 		params: { postType },
 	} = useNavigator();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isTemplatePartsMode = useSelect( ( select ) => {
+		const settings = select( editSiteStore ).getSettings();
+
+		return !! settings.supportsTemplatePartsMode;
+	}, [] );
 
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
@@ -59,21 +67,25 @@ export default function SidebarNavigationScreenTemplates() {
 			per_page: -1,
 		}
 	);
+	const sortedTemplates = templates ? [ ...templates ] : [];
+	sortedTemplates.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
 
 	const browseAllLink = useLink( {
 		path: '/' + postType + '/all',
 	} );
 
+	const canCreate = ! isMobileViewport && ! isTemplatePartsMode;
+
 	return (
 		<SidebarNavigationScreen
+			isRoot={ isTemplatePartsMode }
 			title={ config[ postType ].labels.title }
 			actions={
-				! isMobileViewport && (
+				canCreate && (
 					<AddNewTemplate
 						templateType={ postType }
 						toggleProps={ {
-							className:
-								'edit-site-sidebar-navigation-screen-templates__add-button',
+							as: SidebarButton,
 						} }
 					/>
 				)
@@ -88,7 +100,7 @@ export default function SidebarNavigationScreenTemplates() {
 									{ config[ postType ].labels.notFound }
 								</Item>
 							) }
-							{ ( templates ?? [] ).map( ( template ) => (
+							{ sortedTemplates.map( ( template ) => (
 								<TemplateItem
 									postType={ postType }
 									postId={ template.id }
