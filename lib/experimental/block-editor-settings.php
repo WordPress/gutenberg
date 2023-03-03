@@ -39,11 +39,11 @@ function gutenberg_get_block_editor_settings_experimental( $settings ) {
 
 		$what_post_type = get_post_type( $post_id );
 		switch ( $what_post_type ) {
-			case 'post':
-				$template_slug = $post_slug;
-				break;
 			case 'page':
 				$template_slug = $page_slug;
+				break;
+			default:
+				$template_slug = $post_slug;
 				break;
 		}
 	}
