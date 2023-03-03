@@ -23,3 +23,5 @@
  */
 add_action( 'start_previewing_theme', '_gutenberg_clean_theme_json_caches' );
 add_action( 'switch_theme', '_gutenberg_clean_theme_json_caches' );
+
+add_filter( 'should_load_separate_core_block_assets', '__return_false', 9999 );
