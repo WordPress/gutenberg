@@ -372,6 +372,7 @@ export function useAutocomplete( {
 				selectedIndex={ selectedIndex }
 				onChangeOptions={ onChangeOptions }
 				onSelect={ select }
+				value={ record }
 				contentRef={ contentRef }
 				reset={ reset }
 			/>
