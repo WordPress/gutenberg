@@ -187,68 +187,74 @@ export default function NewTemplate( {
 						{ isCreatingTemplate && (
 							<TemplateActionsLoadingScreen />
 						) }
-						<MenuGroup label={ postType.labels.add_new_item }>
-							{ missingTemplates.map( ( template ) => {
-								const {
-									title,
-									description,
-									slug,
-									onClick,
-									icon,
-								} = template;
-								return (
-									<Tooltip
-										key={ slug }
-										position="top right"
-										text={ description }
-									>
-										<MenuItem
-											icon={
-												icon ||
-												TEMPLATE_ICONS[ slug ] ||
-												post
-											}
-											iconPosition="left"
-											onClick={ () =>
-												onClick
-													? onClick( template )
-													: createTemplate( template )
-											}
+						<div className="edit-site-new-template-dropdown__menu-groups">
+							<MenuGroup label={ postType.labels.add_new_item }>
+								{ missingTemplates.map( ( template ) => {
+									const {
+										title,
+										description,
+										slug,
+										onClick,
+										icon,
+									} = template;
+									return (
+										<Tooltip
+											key={ slug }
+											position="top right"
+											text={ description }
+											className="edit-site-new-template-dropdown__menu-item-tooltip"
 										>
-											{ title }
-											{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
-											 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
-											<VisuallyHidden>
-												{ description }
-											</VisuallyHidden>
-										</MenuItem>
-									</Tooltip>
-								);
-							} ) }
-						</MenuGroup>
-						<MenuGroup>
-							<Tooltip
-								position="top right"
-								text={ customTemplateDescription }
-							>
-								<MenuItem
-									icon={ customGenericTemplateIcon }
-									iconPosition="left"
-									onClick={ () =>
-										setShowCustomGenericTemplateModal(
-											true
-										)
-									}
+											<MenuItem
+												icon={
+													icon ||
+													TEMPLATE_ICONS[ slug ] ||
+													post
+												}
+												iconPosition="left"
+												onClick={ () =>
+													onClick
+														? onClick( template )
+														: createTemplate(
+																template
+														  )
+												}
+											>
+												{ title }
+												{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
+												 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
+												<VisuallyHidden>
+													{ description }
+												</VisuallyHidden>
+											</MenuItem>
+										</Tooltip>
+									);
+								} ) }
+							</MenuGroup>
+							<MenuGroup>
+								<Tooltip
+									position="top right"
+									text={ customTemplateDescription }
+									className="edit-site-new-template-dropdown__menu-item-tooltip"
 								>
-									{ __( 'Custom template' ) }
-									{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
-									 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
-									<VisuallyHidden>
-										{ customTemplateDescription }
-									</VisuallyHidden>
-								</MenuItem>
-							</Tooltip>
-						</MenuGroup>
+									<MenuItem
+										icon={ customGenericTemplateIcon }
+										iconPosition="left"
+										onClick={ () =>
+											setShowCustomGenericTemplateModal(
+												true
+											)
+										}
+									>
+										{ __( 'Custom template' ) }
+										{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
+										 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
+										<VisuallyHidden>
+											{ customTemplateDescription }
+										</VisuallyHidden>
+									</MenuItem>
+								</Tooltip>
+							</MenuGroup>
+						</div>
 					</>
 				) }
 			</DropdownMenu>

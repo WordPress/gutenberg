@@ -1,6 +1,19 @@
 .edit-site-new-template-dropdown {
-	@include break-small() {
-		min-width: 300px;
+	.edit-site-new-template-dropdown__menu-groups {
+		@include break-small() {
+			min-width: 300px;
+		}
+	}
+
+	// The specificity is needed to override the default tooltip styles.
+	&__menu-item-tooltip.components-tooltip .components-popover__content {
+		max-width: 400px;
+		padding: $grid-unit-10 $grid-unit-15;
+		border-radius: 2px;
+		white-space: pre-wrap;
+		min-width: 0;
+		width: auto;
+		text-align: left;
 	}
 }
 
