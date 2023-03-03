@@ -46,6 +46,7 @@ function InserterSearchResults( {
 	shouldFocusBlock = true,
 	prioritizePatterns,
 	selectBlockOnInsert,
+	forceBlockInserterItems,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -89,17 +90,30 @@ function InserterSearchResults( {
 			return [];
 		}
 
-		const forceBlockSearchResults = [
-			'core/navigation-link/page',
-			'core/navigation-link',
-		]?.reverse(); // force first item to be the one that is shown first
+		// Force first block to be the one that is shown first
+		const reversedforceBlockInserterItems =
+			forceBlockInserterItems?.reverse();
 
-		const comparator = forceBlockSearchResults?.length
+		/**
+		 * Allow for consumer to overide the default sorting of the block types.
+		 * This is useful for when you want to force a block(s) to be shown first.
+		 * The remaining blocks will obey the "frecency" sorting.
+		 *
+		 * @param {Object} resultItem a block type item result to be sorted.
+		 * @return {number} the sorting value.
+		 */
+		const comparatorField = reversedforceBlockInserterItems?.length
 			? ( resultItem ) => {
-					if ( forceBlockSearchResults.includes( resultItem.id ) ) {
+					if (
+						reversedforceBlockInserterItems.includes(
+							resultItem.id
+						)
+					) {
 						return (
 							10000 +
-							forceBlockSearchResults.indexOf( resultItem.id )
+							reversedforceBlockInserterItems.indexOf(
+								resultItem.id
+							)
 						);
 					}
 					return resultItem.frecency;
@@ -107,7 +121,7 @@ function InserterSearchResults( {
 			: 'frecency';
 
 		const results = searchBlockItems(
-			orderBy( blockTypes, comparator, 'desc' ),
+			orderBy( blockTypes, comparatorField, 'desc' ),
 			blockTypeCategories,
 			blockTypeCollections,
 			filterValue

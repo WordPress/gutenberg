@@ -150,6 +150,7 @@ class Inserter extends Component {
 			prioritizePatterns,
 			onSelectOrClose,
 			selectBlockOnInsert,
+			__unstableForceBlockInserterItems: forceBlockInserterItems,
 		} = this.props;
 
 		if ( isQuick ) {
@@ -173,6 +174,7 @@ class Inserter extends Component {
 					isAppender={ isAppender }
 					prioritizePatterns={ prioritizePatterns }
 					selectBlockOnInsert={ selectBlockOnInsert }
+					forceBlockInserterItems={ forceBlockInserterItems }
 				/>
 			);
 		}

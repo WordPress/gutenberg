@@ -88,6 +88,10 @@ export const Appender = forwardRef(
 							setInsertedBlock( maybeInsertedBlock );
 						}
 					} }
+					__unstableForceBlockInserterItems={ [
+						'core/navigation-link/page',
+						'core/navigation-link',
+					] }
 				/>
 				<div
 					className="offcanvas-editor-appender__description"
