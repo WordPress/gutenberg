@@ -20,6 +20,7 @@ import NavigationMenuContent from './navigation-menu-content';
 import SidebarButton from '../sidebar-button';
 import { NavigationMenuLoader } from './loader';
 import { unlock } from '../../private-apis';
+import { store as editSiteStore } from '../../store';
 
 const noop = () => {};
 const NAVIGATION_MENUS_QUERY = { per_page: -1, status: 'publish' };
@@ -44,8 +45,9 @@ const prioritizedInserterBlocks = [
 
 export default function SidebarNavigationScreenNavigationMenus() {
 	const history = useHistory();
-	const { navigationMenus, hasResolvedNavigationMenus } = useSelect(
-		( select ) => {
+	const { navigationMenus, hasResolvedNavigationMenus, storedSettings } =
+		useSelect( ( select ) => {
+			const { getSettings } = unlock( select( editSiteStore ) );
 			const { getEntityRecords, hasFinishedResolution } =
 				select( coreStore );
 
@@ -55,15 +57,14 @@ export default function SidebarNavigationScreenNavigationMenus() {
 				NAVIGATION_MENUS_QUERY,
 			];
 			return {
+				storedSettings: getSettings( false ),
 				navigationMenus: getEntityRecords( ...navigationMenusQuery ),
 				hasResolvedNavigationMenus: hasFinishedResolution(
 					'getEntityRecords',
 					navigationMenusQuery
 				),
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	// Sort navigation menus by date.
 	const orderedNavigationMenus = useMemo(
@@ -133,6 +134,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	const { PrivateInserter } = unlock( blockEditorPrivateApis );
 	return (
 		<BlockEditorProvider
+			settings={ storedSettings }
 			value={ blocks }
 			onChange={ noop }
 			onInput={ noop }
