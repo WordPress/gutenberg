@@ -1,3 +1,6 @@
 .wp-block-details-summary {
 	cursor: pointer;
+	&::marker {
+		margin-right: 0.5rem;
+	}
 }
