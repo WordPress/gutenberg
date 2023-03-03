@@ -6,6 +6,7 @@ import {
 	MenuGroup,
 	MenuItem,
 	Tooltip,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
@@ -164,6 +165,11 @@ export default function NewTemplate( {
 	if ( ! missingTemplates.length ) {
 		return null;
 	}
+
+	const customTemplateDescription = __(
+		'Custom templates can be applied to any post or page.'
+	);
+
 	return (
 		<>
 			<DropdownMenu
@@ -210,6 +216,11 @@ export default function NewTemplate( {
 											}
 										>
 											{ title }
+											{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
+											 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
+											<VisuallyHidden>
+												{ description }
+											</VisuallyHidden>
 										</MenuItem>
 									</Tooltip>
 								);
@@ -218,9 +229,7 @@ export default function NewTemplate( {
 						<MenuGroup>
 							<Tooltip
 								position="top right"
-								text={ __(
-									'Custom templates can be applied to any post or page.'
-								) }
+								text={ customTemplateDescription }
 							>
 								<MenuItem
 									icon={ customGenericTemplateIcon }
@@ -232,6 +241,11 @@ export default function NewTemplate( {
 									}
 								>
 									{ __( 'Custom template' ) }
+									{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
+									 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
+									<VisuallyHidden>
+										{ customTemplateDescription }
+									</VisuallyHidden>
 								</MenuItem>
 							</Tooltip>
 						</MenuGroup>
