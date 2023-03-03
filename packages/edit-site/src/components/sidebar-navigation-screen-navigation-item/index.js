@@ -38,8 +38,12 @@ export default function SidebarNavigationScreenNavigationItem() {
 			}
 			description={
 				postType === 'page'
-					? __( 'This is a static page.' )
-					: __( 'This is your posts page' )
+					? __(
+							'Pages are static and are not listed by date. Pages do not use tags or categories.'
+					  )
+					: __(
+							'Posts are entries listed in reverse chronological order on the site homepage or on the posts page.'
+					  )
 			}
 			content={
 				<>

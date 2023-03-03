@@ -61,7 +61,6 @@ export default function SidebarNavigationScreen( {
 			<nav className="edit-site-sidebar-navigation-screen__content">
 				{ description && (
 					<p className="edit-site-sidebar-navigation-screen__description">
-						{ ' ' }
 						{ description }
 					</p>
 				) }

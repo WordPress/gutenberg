@@ -26,9 +26,9 @@ export default function SidebarNavigationScreenTemplate() {
 	let description = getDescription();
 	if ( ! description ) {
 		if ( record.type === 'wp_template' && record.is_custom ) {
-		description = __(
-			'This is a custom template that can be applied manually to any Post or Page.'
-		);
+			description = __(
+				'This is a custom template that can be applied manually to any Post or Page.'
+			);
 		} else if ( record.type === 'wp_template_part' ) {
 			description = sprintf(
 				// translators: %s: template part title e.g: "Header".

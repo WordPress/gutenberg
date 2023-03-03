@@ -13,7 +13,7 @@ const config = {
 	wp_template: {
 		title: __( 'All templates' ),
 		description: __(
-			'Create new templates, or reset any customisations made to the templates supplied by your theme." seems good'
+			'Create new templates, or reset any customizations made to the templates supplied by your theme.'
 		),
 	},
 	wp_template_part: {
