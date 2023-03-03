@@ -89,27 +89,27 @@ const virtualAnchorCache = new WeakMap();
  */
 export function useAnchor( { editableContentElement, settings = {} } ) {
 	const { tagName, className } = settings;
-	const {
-		ownerDocument: { defaultView },
-	} = editableContentElement;
+	const win = editableContentElement?.ownerDocument?.defaultView;
 
 	// Let the store be the selection and range, and the anchor be derived data.
 	// It's worth noting that the selection reference never changes.
-	const selection = defaultView.getSelection();
+	const selection = win?.getSelection();
 
 	// Only re-subscribe when the window changes.
 	const subscribe = useCallback(
 		( callback ) => {
-			defaultView.addEventListener( 'selectionchange', callback );
+			if ( ! win ) return;
+			win.addEventListener( 'selectionchange', callback );
 			return () => {
-				defaultView.removeEventListener( 'selectionchange', callback );
+				win.removeEventListener( 'selectionchange', callback );
 			};
 		},
-		[ defaultView ]
+		[ win ]
 	);
 
 	function getSnapshot() {
 		if ( ! editableContentElement ) return;
+		if ( ! selection ) return;
 		if ( ! selection.rangeCount ) return;
 
 		const range = selection.getRangeAt( 0 );
