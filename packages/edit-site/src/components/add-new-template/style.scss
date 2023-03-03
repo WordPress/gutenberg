@@ -1,8 +1,6 @@
 .edit-site-new-template-dropdown {
-	.edit-site-new-template-dropdown__popover {
-		@include break-small() {
-			min-width: 300px;
-		}
+	@include break-small() {
+		min-width: 300px;
 	}
 }
 

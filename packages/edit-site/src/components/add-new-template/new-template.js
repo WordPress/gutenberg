@@ -5,7 +5,7 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	NavigableMenu,
+	Tooltip,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
@@ -181,17 +181,21 @@ export default function NewTemplate( {
 						{ isCreatingTemplate && (
 							<TemplateActionsLoadingScreen />
 						) }
-						<NavigableMenu className="edit-site-new-template-dropdown__popover">
-							<MenuGroup label={ postType.labels.add_new_item }>
-								{ missingTemplates.map( ( template ) => {
-									const {
-										title,
-										description,
-										slug,
-										onClick,
-										icon,
-									} = template;
-									return (
+						<MenuGroup label={ postType.labels.add_new_item }>
+							{ missingTemplates.map( ( template ) => {
+								const {
+									title,
+									description,
+									slug,
+									onClick,
+									icon,
+								} = template;
+								return (
+									<Tooltip
+										key={ slug }
+										position="top right"
+										text={ description }
+									>
 										<MenuItem
 											icon={
 												icon ||
@@ -199,8 +203,6 @@ export default function NewTemplate( {
 												post
 											}
 											iconPosition="left"
-											info={ description }
-											key={ slug }
 											onClick={ () =>
 												onClick
 													? onClick( template )
@@ -209,17 +211,20 @@ export default function NewTemplate( {
 										>
 											{ title }
 										</MenuItem>
-									);
-								} ) }
-							</MenuGroup>
-							<MenuGroup>
+									</Tooltip>
+								);
+							} ) }
+						</MenuGroup>
+						<MenuGroup>
+							<Tooltip
+								position="top right"
+								text={ __(
+									'Custom templates can be applied to any post or page.'
+								) }
+							>
 								<MenuItem
 									icon={ customGenericTemplateIcon }
 									iconPosition="left"
-									info={ __(
-										'Custom templates can be applied to any post or page.'
-									) }
-									key="custom-template"
 									onClick={ () =>
 										setShowCustomGenericTemplateModal(
 											true
@@ -228,8 +233,8 @@ export default function NewTemplate( {
 								>
 									{ __( 'Custom template' ) }
 								</MenuItem>
-							</MenuGroup>
-						</NavigableMenu>
+							</Tooltip>
+						</MenuGroup>
 					</>
 				) }
 			</DropdownMenu>
