@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useLayoutEffect, useMemo } from '@wordpress/element';
+import { useState, useLayoutEffect } from '@wordpress/element';
 
 /** @typedef {import('../register-format-type').RichTextFormatType} RichTextFormatType */
 /** @typedef {import('../create').RichTextValue} RichTextValue */
@@ -73,18 +73,18 @@ function createVirtualAnchorElement( range, editableContentElement ) {
 	};
 }
 
-function isRangeEqual( a, b ) {
-	return (
-		a === b ||
-		( a &&
-			b &&
-			a.startContainer === b.startContainer &&
-			a.startOffset === b.startOffset &&
-			a.endContainer === b.endContainer &&
-			a.endOffset === b.endOffset )
-	);
-}
-
+/**
+ * Get the anchor: a format element if there is a matching one based on the
+ * tagName and className or a range otherwise.
+ *
+ * @param {HTMLElement} editableContentElement The editable wrapper.
+ * @param {string}      tagName                The tag name of the format
+ *                                             element.
+ * @param {string}      className              The class name of the format
+ *                                             element.
+ *
+ * @return {HTMLElement|VirtualAnchorElement|undefined} The anchor.
+ */
 function getAnchor( editableContentElement, tagName, className ) {
 	if ( ! editableContentElement ) return;
 
@@ -106,7 +106,9 @@ function getAnchor( editableContentElement, tagName, className ) {
 		className
 	);
 
-	return formatElement || range;
+	if ( formatElement ) return formatElement;
+
+	return createVirtualAnchorElement( range, editableContentElement );
 }
 
 /**
@@ -133,28 +135,9 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 		const { ownerDocument } = editableContentElement;
 
 		function callback() {
-			if ( editableContentElement !== ownerDocument.activeElement ) {
-				return;
-			}
-
-			setAnchor( ( oldAnchor ) => {
-				const { defaultView } = ownerDocument;
-				const newAnchor = getAnchor(
-					editableContentElement,
-					tagName,
-					className
-				);
-
-				if (
-					newAnchor instanceof defaultView.Range &&
-					oldAnchor instanceof defaultView.Range &&
-					isRangeEqual( newAnchor, oldAnchor )
-				) {
-					return oldAnchor;
-				}
-
-				return newAnchor;
-			} );
+			setAnchor(
+				getAnchor( editableContentElement, tagName, className )
+			);
 		}
 
 		function attach() {
@@ -175,10 +158,5 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 		return detach;
 	}, [ editableContentElement, tagName, className ] );
 
-	return useMemo( () => {
-		if ( ! anchor ) return;
-		return anchor.hasOwnProperty( 'ownerDocument' )
-			? anchor
-			: createVirtualAnchorElement( anchor, editableContentElement );
-	}, [ anchor, editableContentElement ] );
+	return anchor;
 }
