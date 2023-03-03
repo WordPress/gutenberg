@@ -58,7 +58,7 @@ export default function useSyncCanvasModeWithURL() {
 			setCanvasMode( 'view' );
 		} else if (
 			canvasInUrl === 'edit' &&
-			currentCanvasInUrl.current !== 'edit'
+			currentCanvasMode.current !== 'edit'
 		) {
 			setCanvasMode( 'edit' );
 		}

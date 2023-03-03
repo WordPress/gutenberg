@@ -45,7 +45,6 @@ const TemplateItem = ( { postType, postId, ...props } ) => {
 	const linkInfo = useLink( {
 		postType,
 		postId,
-		path: undefined,
 	} );
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };
@@ -73,8 +72,7 @@ export default function SidebarNavigationScreenTemplates() {
 
 	const browseAllLink = useLink( {
 		path: '/' + postType + '/all',
-		postType,
-		postId: undefined,
+		canvas: undefined,
 	} );
 
 	const canCreate = ! isMobileViewport && ! isTemplatePartsMode;

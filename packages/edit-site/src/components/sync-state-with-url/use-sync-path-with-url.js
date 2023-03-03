@@ -55,7 +55,6 @@ export default function useSyncPathWithURL() {
 				...currentUrlParams.current,
 				...newUrlParams,
 			};
-
 			currentUrlParams.current = updatedParams;
 			history.push( updatedParams );
 		}
@@ -65,12 +64,6 @@ export default function useSyncPathWithURL() {
 				postType: navigatorParams?.postType,
 				postId: navigatorParams?.postId,
 				path: undefined,
-			} );
-		} else if ( navigatorParams?.postType && ! navigatorParams?.postId ) {
-			updateUrlParams( {
-				postType: navigatorParams?.postType,
-				path: navigatorLocation.path,
-				postId: undefined,
 			} );
 		} else {
 			updateUrlParams( {
