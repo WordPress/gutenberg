@@ -42,7 +42,7 @@ import { isAppleOS } from './platform';
  *
  * @typedef {(character: string, isApple?: () => boolean) => T} WPKeyHandler
  */
-/** @typedef {(event: import('react').KeyboardEvent<HTMLElement>, character: string, isApple?: () => boolean) => boolean} WPEventKeyHandler */
+/** @typedef {(event: import('react').KeyboardEvent<HTMLElement> | KeyboardEvent, character: string, isApple?: () => boolean) => boolean} WPEventKeyHandler */
 
 /** @typedef {( isApple: () => boolean ) => WPModifierPart[]} WPModifier */
 
@@ -346,7 +346,7 @@ export const shortcutAriaLabel = mapValues(
  * From a given KeyboardEvent, returns an array of active modifier constants for
  * the event.
  *
- * @param {import('react').KeyboardEvent<HTMLElement>} event Keyboard event.
+ * @param {import('react').KeyboardEvent<HTMLElement> | KeyboardEvent} event Keyboard event.
  *
  * @return {Array<WPModifierPart>} Active modifier constants.
  */
