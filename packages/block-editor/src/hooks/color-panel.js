@@ -35,7 +35,11 @@ export default function ColorPanel( {
 			return;
 		}
 
-		// Try to detect the colors for the text, link and backrgound based on the
+		if ( ! ref.current ) {
+			return;
+		}
+
+		// Try to detect the colors for the text, link and background based on the
 		// current ref.
 		setDetectedColor( getComputedStyle( ref.current ).color );
 
@@ -44,11 +48,12 @@ export default function ColorPanel( {
 			setDetectedLinkColor( getComputedStyle( firstLinkElement ).color );
 		}
 
-		// If the current node has a transparent background color, we need to
-		// find the first parent node with a non-transparent background color.
 		let backgroundColorNode = ref.current;
 		let backgroundColor =
 			getComputedStyle( backgroundColorNode ).backgroundColor;
+
+		// If the current node has a transparent background color, we need to
+		// find the first parent node with a non-transparent background color.
 		while (
 			backgroundColor === 'rgba(0, 0, 0, 0)' &&
 			backgroundColorNode.parentNode &&
@@ -64,19 +69,21 @@ export default function ColorPanel( {
 
 		// If colors are defined, overwrite detected colors with the defined colors.
 		if ( definedColors.length ) {
-			definedColors.forEach( ( element ) => {
-				if ( 'Background' === element.label ) {
-					if ( element.colorValue ) {
-						setDetectedBackgroundColor( element.colorValue );
-					}
-				} else if ( 'Text' === element.label ) {
-					if ( element.colorValue ) {
-						setDetectedColor( element.colorValue );
-					}
-				} else if ( 'Link' === element.label ) {
-					if ( element.colorValue ) {
-						setDetectedLinkColor( element.colorValue );
-					}
+			definedColors.forEach( ( color ) => {
+				if ( ! color.colorValue ) {
+					return;
+				}
+
+				if ( 'Background' === color.label ) {
+					setDetectedBackgroundColor( color.colorValue );
+				}
+
+				if ( 'Text' === color.label ) {
+					setDetectedColor( color.colorValue );
+				}
+
+				if ( 'Link' === color.label ) {
+					setDetectedLinkColor( color.colorValue );
 				}
 			} );
 		}
