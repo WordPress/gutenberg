@@ -574,6 +574,7 @@ export function PaletteEdit( props: PaletteEditProps ) {
 								newElement: typeof elements[ number ]
 							) => {
 								debounceOnChange(
+									// @ts-expect-error
 									elements.map(
 										(
 											currentElement: typeof elements[ number ],
