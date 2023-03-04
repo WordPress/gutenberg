@@ -7,7 +7,7 @@
 
 	// The specificity is needed to override the default tooltip styles.
 	&__menu-item-tooltip.components-tooltip .components-popover__content {
-		max-width: 400px;
+		max-width: 320px;
 		padding: $grid-unit-10 $grid-unit-15;
 		border-radius: 2px;
 		white-space: pre-wrap;
