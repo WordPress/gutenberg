@@ -355,7 +355,7 @@ function isGradientPalette(
 	return 'gradients' in props;
 }
 
-export default function PaletteEdit( props: PaletteEditProps ) {
+export function PaletteEdit( props: PaletteEditProps ) {
 	const {
 		onChange,
 		paletteLabel,
@@ -574,7 +574,6 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 								newElement: typeof elements[ number ]
 							) => {
 								debounceOnChange(
-									// @ts-expect-error
 									elements.map(
 										(
 											currentElement: typeof elements[ number ],
@@ -595,13 +594,15 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 					) }
 					{ ! isEditing &&
 						( isGradient ? (
-							// @ts-expect-error TODO: Remove when GradientPicker is refactored to TS.
 							<GradientPicker
 								__nextHasNoMargin
 								gradients={ props.gradients }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomGradients={ true }
+								value={ undefined }
+								__experimentalIsRenderedInSidebar={ undefined }
+								className={ undefined }
 							/>
 						) : (
 							<ColorPalette
@@ -617,3 +618,5 @@ export default function PaletteEdit( props: PaletteEditProps ) {
 		</PaletteEditStyles>
 	);
 }
+
+export default PaletteEdit;
