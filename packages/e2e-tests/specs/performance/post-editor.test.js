@@ -146,12 +146,12 @@ describe( 'Post Editor Performance', () => {
 		}
 	} );
 
-	it( 'Typing', async () => {
+	it.only( 'Typing', async () => {
 		await loadHtmlIntoTheBlockEditor(
 			readFile( join( __dirname, '../../assets/large-post.html' ) )
 		);
 		await insertBlock( 'Paragraph' );
-		let i = 20;
+		let i = 450;
 		await page.tracing.start( {
 			path: traceFile,
 			screenshots: false,
