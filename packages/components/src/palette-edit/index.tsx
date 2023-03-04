@@ -198,6 +198,7 @@ function Option< T extends Color | Gradient >( {
 				<FlexItem>
 					<IndicatorStyled
 						style={ { background: value, color: 'transparent' } }
+						isSelected={ isEditing }
 					/>
 				</FlexItem>
 				<FlexItem>
