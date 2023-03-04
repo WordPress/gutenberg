@@ -139,6 +139,9 @@ export type NavigationItemProps = {
 	 * default item UI.
 	 */
 	children?: React.ReactNode;
+	/**
+	 * Optional classname for the component.
+	 */
 	className?: string;
 	/**
 	 * If provided, causes the component to render an `<a />` element
@@ -188,10 +191,26 @@ export type NavigationItemBaseContentProps = Pick<
 >;
 
 export type NavigationBackButtonProps = {
+	/**
+	 * The text displayed for the button
+	 */
 	backButtonLabel?: string;
+	/**
+	 * Optional classname for the component.
+	 */
 	className?: string;
+	/**
+	 * If provided, causes the component to render an `<a />` element
+	 * instead of a `<button />` element.
+	 */
 	href?: string;
+	/**
+	 * Callback function called when the button is clicked.
+	 */
 	onClick?: React.MouseEventHandler;
+	/**
+	 * Id of the parent menu
+	 */
 	parentMenu?: string;
 };
 
