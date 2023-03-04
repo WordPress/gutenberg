@@ -104,50 +104,6 @@ export function getNameForPosition(
 	);
 }
 
-function ColorPickerPopover< T extends Color | Gradient >( {
-	isGradient,
-	element,
-	onChange,
-	onClose = () => {},
-}: ColorPickerPopoverProps< T > ) {
-	return (
-		<Popover
-			placement="left-start"
-			offset={ 20 }
-			className="components-palette-edit__popover"
-			onClose={ onClose }
-		>
-			{ ! isGradient && 'color' in element && (
-				<ColorPicker
-					color={ element.color }
-					enableAlpha
-					onChange={ ( newColor ) => {
-						onChange( {
-							...element,
-							color: newColor,
-						} );
-					} }
-				/>
-			) }
-			{ isGradient && 'gradient' in element && (
-				<div className="components-palette-edit__popover-gradient-picker">
-					<CustomGradientPicker
-						__nextHasNoMargin
-						__experimentalIsRenderedInSidebar
-						value={ element.gradient }
-						onChange={ ( newGradient: Gradient[ 'gradient' ] ) => {
-							onChange( {
-								...element,
-								gradient: newGradient,
-							} );
-						} }
-					/>
-				</div>
-			) }
-		</Popover>
-	);
-}
-
 function getIsColor( element: PaletteElement ): element is Color {
 	return 'color' in element;
 }
@@ -165,6 +121,50 @@ function getValue( element: PaletteElement, isGradient?: boolean ) {
 	}
 
 	return '';
+}
+
+function ColorPickerPopover< T extends Color | Gradient >( {
+	isGradient,
+	element,
+	onChange,
+	onClose = () => {},
+}: ColorPickerPopoverProps< T > ) {
+	return (
+		<Popover
+			placement="left-start"
+			offset={ 20 }
+			className="components-palette-edit__popover"
+			onClose={ onClose }
+		>
+			{ ! isGradient && getIsColor( element ) && (
+				<ColorPicker
+					color={ element.color }
+					enableAlpha
+					onChange={ ( newColor ) => {
+						onChange( {
+							...element,
+							color: newColor,
+						} );
+					} }
+				/>
+			) }
+			{ isGradient && getIsGradient( element ) && (
+				<div className="components-palette-edit__popover-gradient-picker">
+					<CustomGradientPicker
+						__nextHasNoMargin
+						__experimentalIsRenderedInSidebar
+						value={ element.gradient }
+						onChange={ ( newGradient: Gradient[ 'gradient' ] ) => {
+							onChange( {
+								...element,
+								gradient: newGradient,
+							} );
+						} }
+					/>
+				</div>
+			) }
+		</Popover>
+	);
 }
 
 function Option< T extends Color | Gradient >( {
