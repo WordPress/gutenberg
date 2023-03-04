@@ -274,7 +274,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * @since 6.2.0
 	 * @var string
 	 */
-	private $html;
+	protected $html;
 
 	/**
 	 * The last query passed to next_tag().
@@ -722,7 +722,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 		}
 
 		$this->bookmarks[ $name ] = new WP_HTML_Span(
-			$this->tag_name_starts_at - 1,
+			$this->tag_name_starts_at - ( $this->is_closing_tag ? 2 : 1 ),
 			$this->tag_ends_at
 		);
 
@@ -1519,7 +1519,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 		$this->bytes_already_parsed = $this->bookmarks[ $bookmark_name ]->start;
 		$this->bytes_already_copied = $this->bytes_already_parsed;
 		$this->output_buffer        = substr( $this->html, 0, $this->bytes_already_copied );
-		return $this->next_tag();
+		return $this->next_tag( array( 'tag_closers' => 'visit' ) );
 	}
 
 	/**

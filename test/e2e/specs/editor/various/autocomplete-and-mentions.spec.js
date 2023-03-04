@@ -118,10 +118,8 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			// Ensure `aria-owns` is part of the same document and ensure the
 			// selected option is equal to the active descendant.
 			await expect(
-				await editor.canvas
-					.locator( `#${ ariaOwns } [aria-selected="true"]` )
-					.getAttribute( 'id' )
-			).toBe( ariaActiveDescendant );
+				editor.canvas.locator( `#${ ariaOwns } [aria-selected="true"]` )
+			).toHaveAttribute( 'id', ariaActiveDescendant );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
 
@@ -239,10 +237,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			await expect(
 				page.locator( `role=option[name="${ testData.optionText }"i]` )
 			).toBeVisible();
-			await page;
-			page.locator(
-				`role=option[name="${ testData.optionText }"i]`
-			).click();
+			await page
+				.locator( `role=option[name="${ testData.optionText }"i]` )
+				.click();
 
 			await expect
 				.poll( editor.getEditedPostContent )

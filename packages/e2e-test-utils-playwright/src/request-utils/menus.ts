@@ -56,8 +56,8 @@ export async function createClassicMenu( this: RequestUtils, name: string ) {
 /**
  * Create a navigation menu
  *
- * @param  menuData navigation menu post data.
- * @return {string} Menu content.
+ * @param menuData navigation menu post data.
+ * @return Menu content.
  */
 export async function createNavigationMenu(
 	this: RequestUtils,

@@ -49,6 +49,7 @@ export default function QueryTitleEdit( {
 				<InspectorControls>
 					<PanelBody title={ __( 'Settings' ) }>
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Show archive type in title' ) }
 							onChange={ () =>
 								setAttributes( { showPrefix: ! showPrefix } )
@@ -72,6 +73,7 @@ export default function QueryTitleEdit( {
 				<InspectorControls>
 					<PanelBody title={ __( 'Settings' ) }>
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Show search term in title' ) }
 							onChange={ () =>
 								setAttributes( {

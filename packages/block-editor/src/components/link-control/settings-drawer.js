@@ -11,6 +11,7 @@ import { settings as settingsIcon } from '@wordpress/icons';
 import { useReducedMotion, useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -46,7 +47,7 @@ function LinkSettingsDrawer( {
 				aria-expanded={ settingsOpen }
 				onClick={ () => setSettingsOpen( ! settingsOpen ) }
 				icon={ settingsIcon }
-				label={ __( 'Toggle link settings' ) }
+				label={ __( 'Link Settings' ) }
 				aria-controls={ settingsDrawerId }
 			/>
 			<MaybeAnimatePresence>
