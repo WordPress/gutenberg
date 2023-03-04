@@ -25,7 +25,7 @@ import type {
 
 const noop = () => {};
 
-export default function Navigation( {
+export function Navigation( {
 	activeItem,
 	activeMenu = ROOT_MENU,
 	children,
@@ -100,3 +100,5 @@ export default function Navigation( {
 		</NavigationUI>
 	);
 }
+
+export default Navigation;

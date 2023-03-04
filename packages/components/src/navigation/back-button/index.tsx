@@ -17,7 +17,7 @@ import { MenuBackButtonUI } from '../styles/navigation-styles';
 
 import type { NavigationBackButtonProps } from '../types';
 
-function NavigationBackButton(
+function UnforwardedNavigationBackButton(
 	{
 		backButtonLabel,
 		className,
@@ -63,4 +63,9 @@ function NavigationBackButton(
 		</MenuBackButtonUI>
 	);
 }
-export default forwardRef( NavigationBackButton );
+
+export const NavigationBackButton = forwardRef(
+	UnforwardedNavigationBackButton
+);
+
+export default NavigationBackButton;

@@ -22,7 +22,7 @@ import type { NavigationItemProps } from '../types';
 
 const noop = () => {};
 
-export default function NavigationItem( props: NavigationItemProps ) {
+export function NavigationItem( props: NavigationItemProps ) {
 	const {
 		badge,
 		children,
@@ -103,3 +103,5 @@ export default function NavigationItem( props: NavigationItemProps ) {
 		</NavigationItemBase>
 	);
 }
+
+export default NavigationItem;

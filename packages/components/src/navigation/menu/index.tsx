@@ -23,7 +23,7 @@ import { MenuUI } from '../styles/navigation-styles';
 
 import type { NavigationMenuProps } from '../types';
 
-export default function NavigationMenu( props: NavigationMenuProps ) {
+export function NavigationMenu( props: NavigationMenuProps ) {
 	const {
 		backButtonLabel,
 		children,
@@ -98,3 +98,5 @@ export default function NavigationMenu( props: NavigationMenuProps ) {
 		</NavigationMenuContext.Provider>
 	);
 }
+
+export default NavigationMenu;

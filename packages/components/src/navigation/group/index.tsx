@@ -19,7 +19,7 @@ import type { NavigationGroupProps } from '../types';
 
 let uniqueId = 0;
 
-export default function NavigationGroup( {
+export function NavigationGroup( {
 	children,
 	className,
 	title,
@@ -66,3 +66,5 @@ export default function NavigationGroup( {
 		</NavigationGroupContext.Provider>
 	);
 }
+
+export default NavigationGroup;
