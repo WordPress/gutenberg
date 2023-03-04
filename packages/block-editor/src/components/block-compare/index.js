@@ -10,7 +10,7 @@ import { diffChars } from 'diff/lib/diff/character';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getSaveContent } from '@wordpress/blocks';
+import { getSaveContent, serializeRawBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -55,8 +55,11 @@ function BlockCompare( {
 		return newContent.join( '' );
 	}
 
+	const rawContent = serializeRawBlock( block.__unstableBlockSource, {
+		delimiters: 'no-top-level',
+	} );
 	const converted = getConvertedContent( convertor( block ) );
-	const difference = getDifference( block.originalContent, converted );
+	const difference = getDifference( rawContent, converted );
 
 	return (
 		<div className="block-editor-block-compare__wrapper">
@@ -65,8 +68,8 @@ function BlockCompare( {
 				className="block-editor-block-compare__current"
 				action={ onKeep }
 				actionText={ __( 'Convert to HTML' ) }
-				rawContent={ block.originalContent }
-				renderedContent={ block.originalContent }
+				rawContent={ rawContent }
+				renderedContent={ rawContent }
 			/>
 
 			<BlockView

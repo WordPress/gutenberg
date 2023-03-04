@@ -3,9 +3,11 @@
  */
 import { getCommentDelimitedContent } from '../serializer';
 
+/** @typedef {'all' | 'none' | 'no-top-level'} DelimiterSet */
+
 /**
- * @typedef {Object}   Options                   Serialization options.
- * @property {boolean} [isCommentDelimited=true] Whether to output HTML comments around blocks.
+ * @typedef {Object}        Options            Serialization options.
+ * @property {DelimiterSet} [delimiters='all'] Whether to output HTML comments around blocks.
  */
 
 /** @typedef {import("./").WPRawBlock} WPRawBlock */
@@ -31,7 +33,7 @@ import { getCommentDelimitedContent } from '../serializer';
  * @return {string} An HTML string representing a block.
  */
 export function serializeRawBlock( rawBlock, options = {} ) {
-	const { isCommentDelimited = true } = options;
+	const { delimiters = 'all' } = options;
 	const {
 		blockName,
 		attrs = {},
@@ -45,13 +47,18 @@ export function serializeRawBlock( rawBlock, options = {} ) {
 			// `null` denotes a nested block, otherwise we have an HTML fragment.
 			item !== null
 				? item
-				: serializeRawBlock( innerBlocks[ childIndex++ ], options )
+				: serializeRawBlock(
+						innerBlocks[ childIndex++ ],
+						delimiters === 'no-top-level'
+							? { ...options, delimiters: 'all' }
+							: options
+				  )
 		)
 		.join( '\n' )
 		.replace( /\n+/g, '\n' )
 		.trim();
 
-	return isCommentDelimited
+	return 'all' === delimiters
 		? getCommentDelimitedContent( blockName, attrs, content )
 		: content;
 }

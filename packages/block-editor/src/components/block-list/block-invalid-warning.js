@@ -4,7 +4,12 @@
 import { __, _x } from '@wordpress/i18n';
 import { Button, Modal } from '@wordpress/components';
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import { getBlockType, createBlock, rawHandler } from '@wordpress/blocks';
+import {
+	getBlockType,
+	createBlock,
+	parse,
+	serializeRawBlock,
+} from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 
@@ -89,16 +94,25 @@ export function BlockInvalidWarning( {
 
 const blockToClassic = ( block ) =>
 	createBlock( 'core/freeform', {
-		content: block.originalContent,
+		content: serializeRawBlock( block.__unstableBlockSource, {
+			delimiters: 'none',
+		} ),
 	} );
+
 const blockToHTML = ( block ) =>
 	createBlock( 'core/html', {
-		content: block.originalContent,
+		content: serializeRawBlock( block.__unstableBlockSource, {
+			delimiters: 'none',
+		} ),
 	} );
+
 const blockToBlocks = ( block ) =>
-	rawHandler( {
-		HTML: block.originalContent,
-	} );
+	parse(
+		serializeRawBlock( block.__unstableBlockSource, {
+			delimiters: 'no-top-level',
+		} )
+	);
+
 const recoverBlock = ( { name, attributes, innerBlocks } ) =>
 	createBlock( name, attributes, innerBlocks );
 

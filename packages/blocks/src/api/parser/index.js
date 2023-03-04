@@ -130,13 +130,13 @@ function createMissingBlockType( rawBlock ) {
 	// handler. A block node's `innerHTML` isn't enough, as that field only
 	// carries the block's own HTML and not its nested blocks.
 	const originalUndelimitedContent = serializeRawBlock( rawBlock, {
-		isCommentDelimited: false,
+		delimiters: 'none',
 	} );
 
 	// Preserve full block content for use by the unregistered type
 	// handler, block boundaries included.
 	const originalContent = serializeRawBlock( rawBlock, {
-		isCommentDelimited: true,
+		delimiters: 'all',
 	} );
 
 	return {
