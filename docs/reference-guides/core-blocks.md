@@ -347,7 +347,7 @@ Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/
 
 -	**Name:** core/list-item
 -	**Category:** text
--	**Supports:** typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** anchor, typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, placeholder
 
 ## Login/out
