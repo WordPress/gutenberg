@@ -24,7 +24,39 @@ export type NavigationProps = {
 	 */
 	onActivateMenu?: ( activeMenuSlug: string ) => void;
 };
-export type NavigationMenuProps = {
+
+// When `onSearch` is specified, `search` should be specified too
+type _NavigationMenuSearchProps =
+	| {
+			/**
+			 * When the `hasSearch` prop is `true`, this callback handles the search
+			 * input's `onChange` event, making it controlled from the outside.
+			 * When using this prop, the `search` prop should be also set.
+			 */
+			onSearch: ( searchString: string ) => void;
+			/**
+			 * When the `hasSearch` is `true` and the `onSearch` prop is provided, this
+			 * prop controls the value of the search input.
+			 * Required when the `onSearch` prop is provided.
+			 */
+			search: string;
+	  }
+	| {
+			/**
+			 * When the `hasSearch` prop is `true`, this callback handles the search
+			 * input's `onChange` event, making it controlled from the outside.
+			 * When using this prop, the `search` prop should be also set.
+			 */
+			onSearch?: ( searchString: string ) => void;
+			/**
+			 * When the `hasSearch` is `true` and the `onSearch` prop is provided, this
+			 * prop controls the value of the search input.
+			 * Required when the `onSearch` prop is provided.
+			 */
+			search?: string;
+	  };
+
+export type NavigationMenuProps = _NavigationMenuSearchProps & {
 	/**
 	 * The back button label used in nested menus.
 	 * If not provided, the label will be inferred from the parent menu's title.
@@ -51,6 +83,17 @@ export type NavigationMenuProps = {
 	 */
 	hasSearch?: boolean;
 	/**
+	 * Indicates whether the menu is empty or not. Used together with the
+	 * `hideIfTargetMenuEmpty` prop of `NavigationItem`.
+	 */
+	isEmpty?: boolean;
+	/**
+	 * Indicates whether the search is debouncing or not. In case of `true`, the
+	 * "No results found." text is omitted. Used to prevent showing the
+	 * "No results found." text between debounced searches.
+	 */
+	isSearchDebouncing?: boolean;
+	/**
 	 * The unique identifier of the menu.
 	 * The root menu can omit this prop, and it will default to "root".
 	 * All other menus need to specify it.
@@ -59,32 +102,9 @@ export type NavigationMenuProps = {
 	 */
 	menu?: string;
 	/**
-	 * When the `hasSearch` prop is `true`, this callback handles the search
-	 * input's `onChange` event, making it controlled from the outside.
-	 * When using this prop, the `search` prop should be also set.
-	 */
-	onSearch?: ( searchString: string ) => void;
-	/**
-	 * Indicates whether the search is debouncing or not. In case of `true`, the
-	 * "No results found." text is omitted. Used to prevent showing the
-	 * "No results found." text between debounced searches.
-	 */
-	isSearchDebouncing?: boolean;
-	/**
 	 * The parent menu slug; used by nested menus to indicate their parent menu.
 	 */
 	parentMenu?: string;
-	/**
-	 * When the `hasSearch` is `true` and the `onSearch` prop is provided, this
-	 * prop controls the value of the search input.
-	 * Required when the `onSearch` prop is provided.
-	 */
-	search?: string;
-	/**
-	 * Indicates whether the menu is empty or not. Used together with the
-	 * `hideIfTargetMenuEmpty` prop of `NavigationItem`.
-	 */
-	isEmpty?: boolean;
 	/**
 	 * The menu title. It's also the field used by the menu search function.
 	 */
