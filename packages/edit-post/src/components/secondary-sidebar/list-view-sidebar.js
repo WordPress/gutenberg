@@ -15,6 +15,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { useRef, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -27,7 +28,7 @@ import ListViewOutline from './list-view-outline';
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editPostStore );
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { hasBlockSelection } = useSelect(
 		( select ) => ( {
 			hasBlockSelection:
@@ -52,7 +53,8 @@ export default function ListViewSidebar() {
 			hasBlockSelection
 		) {
 			event.preventDefault();
-			selectBlock();
+			clearSelectedBlock();
+			speak( __( 'All blocks deselected.' ), 'assertive' );
 			return;
 		}
 
