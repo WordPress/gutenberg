@@ -24,10 +24,6 @@ export type PaletteElement = Color | Gradient;
 
 export type BasePaletteEdit = {
 	/**
-	 * A message to show if there's nothing to edit.
-	 */
-	emptyMessage?: string;
-	/**
 	 * Whether the user can only change the color or gradient values.
 	 * If true, they cannot change names or delete values.
 	 */
@@ -36,6 +32,10 @@ export type BasePaletteEdit = {
 	 * Whether the user can reset the editor.
 	 */
 	canReset?: boolean;
+	/**
+	 * A message to show if there's nothing to edit.
+	 */
+	emptyMessage?: string;
 	/**
 	 * A heading label for the palette.
 	 */
@@ -90,13 +90,13 @@ export type SlugPrefix = string;
 export type ColorPickerPopoverProps< T extends Color | Gradient > = {
 	element: T;
 	onChange: ( newElement: T ) => void;
-	onClose?: () => void;
 	isGradient?: T extends Gradient ? true : false;
+	onClose?: () => void;
 };
 
 export type NameInputProps = {
-	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;
 	label: string;
+	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;
 	value: PaletteElement[ 'name' ];
 };
 
