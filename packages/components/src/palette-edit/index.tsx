@@ -357,7 +357,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
  *
  * ```jsx
  * import { PaletteEdit } from '@wordpress/components';
- * const MyPaletteEdit = () => (
+ * const MyPaletteEdit = () => {
  *   const [ controlledColors, setControlledColors ] = useState( colors );
  *
  *   return (
@@ -371,7 +371,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
  *       paletteLabel="Here is a label"
  *     />
  *   );
- * )
+ * };
  * ```
  */
 export function PaletteEdit( props: PaletteEditProps ) {
