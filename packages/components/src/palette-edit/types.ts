@@ -58,7 +58,6 @@ type PaletteEditColors = {
 	/**
 	 * The colors in the palette.
 	 *
-	 * @default []
 	 */
 	colors: Color[];
 	/**

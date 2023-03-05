@@ -624,7 +624,7 @@ export function PaletteEdit( props: PaletteEditProps ) {
 							/>
 						) : (
 							<ColorPalette
-								colors={ 'colors' in props ? props.colors : [] }
+								colors={ props.colors }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomColors={ true }
