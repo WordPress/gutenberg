@@ -355,6 +355,28 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	);
 }
 
+/**
+ * Allows editing a palette of colors or gradients.
+ *
+ * ```jsx
+ * import { PaletteEdit } from '@wordpress/components';
+ * const MyPaletteEdit = () => (
+ *   const [ controlledColors, setControlledColors ] = useState( colors );
+ *
+ *   return (
+ *     <PaletteEdit
+ *       colors={ controlledColors }
+ *       onChange={ ( newColors?: Color[] ) => {
+ *         if ( newColors ) {
+ *           setControlledColors( newColors );
+ *         }
+ *       } }
+ *       paletteLabel="Here is a label"
+ *     />
+ *   );
+ * )
+ * ```
+ */
 export function PaletteEdit( props: PaletteEditProps ) {
 	const {
 		onChange,
