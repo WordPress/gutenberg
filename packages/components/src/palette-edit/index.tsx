@@ -397,7 +397,7 @@ export function PaletteEdit( props: PaletteEditProps ) {
 		elements &&
 		elements[ editingElement ] &&
 		! elements[ editingElement ].slug;
-	const elementsLength = elements.length;
+	const elementsLength = elements?.length;
 	const hasElements = elementsLength > 0;
 	const debounceOnChange = useDebounce( onChange, 100 );
 	const onSelectPaletteItem = useCallback(
