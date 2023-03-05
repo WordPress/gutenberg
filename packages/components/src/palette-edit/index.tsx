@@ -119,7 +119,10 @@ function isGradientPalette(
 }
 
 function getElements( props: PaletteEditProps ) {
-	return isGradientPalette( props ) ? props.gradients : props.colors;
+	const elements = isGradientPalette( props )
+		? props.gradients
+		: props.colors;
+	return elements ?? [];
 }
 
 function getValue( element: PaletteElement, isGradient?: boolean ) {
@@ -397,7 +400,7 @@ export function PaletteEdit( props: PaletteEditProps ) {
 		elements &&
 		elements[ editingElement ] &&
 		! elements[ editingElement ].slug;
-	const elementsLength = elements?.length;
+	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
 	const debounceOnChange = useDebounce( onChange, 100 );
 	const onSelectPaletteItem = useCallback(
@@ -463,7 +466,7 @@ export function PaletteEdit( props: PaletteEditProps ) {
 
 								if ( isGradientPalette( props ) ) {
 									props.onChange( [
-										...props.gradients,
+										...( props.gradients ?? [] ),
 										{
 											gradient: DEFAULT_GRADIENT,
 											name: tempOptionName,
@@ -474,7 +477,7 @@ export function PaletteEdit( props: PaletteEditProps ) {
 									] );
 								} else {
 									props.onChange( [
-										...props.colors,
+										...( props.colors ?? [] ),
 										{
 											color: DEFAULT_COLOR,
 											name: tempOptionName,
