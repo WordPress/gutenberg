@@ -15,12 +15,15 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14.0.0",
-		"npm": ">=6.9.0 <7"
+		"node": ">=18",
+		"npm": ">=9"
 	},
 	"config": {
 		"IS_GUTENBERG_PLUGIN": true
 	},
+	"workspaces": [
+		"packages/*"
+	],
 	"dependencies": {
 		"@types/gradient-parser": "0.1.2",
 		"@wordpress/a11y": "file:packages/a11y",
@@ -200,7 +203,7 @@
 		"jest-junit": "13.0.0",
 		"jest-message-util": "29.5.0",
 		"jest-watch-typeahead": "2.2.2",
-		"lerna": "5.5.2",
+		"lerna": "6.5.1",
 		"lint-staged": "10.0.1",
 		"lodash": "4.17.21",
 		"make-dir": "3.0.0",
@@ -280,7 +283,7 @@
 		"prelint:php": "wp-env run composer \"update --no-interaction\"",
 		"lint:php": "wp-env run composer run-script lint",
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
-		"native": "npm run --prefix packages/react-native-editor",
+		"native": "npm run --workspace=packages/react-native-editor",
 		"other:changelog": "node ./bin/plugin/cli.js changelog",
 		"other:check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"preother:check-local-changes": "npm run docs:build",

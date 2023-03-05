@@ -2,11 +2,15 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#48950](https://github.com/WordPress/gutenberg/pull/48950)).
+
 ## 9.0.0 (2023-03-29)
 
 ### Breaking Changes
 
--   The `registry.register` function will no longer register a store if another instance is registered with the same name.
+-   The `registry.register` function will no longer register a store if another instance is registered with the same name.(Upgrade npm)
 
 ## 8.6.0 (2023-03-15)
 

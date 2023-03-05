@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#48950](https://github.com/WordPress/gutenberg/pull/48950)).
+
 ## 23.7.0 (2023-03-29)
 
 -   `ImageSizeControl`: Remove the "Image Dimensions" label ([#49414](https://github.com/WordPress/gutenberg/pull/49414)).
@@ -29,7 +33,7 @@
 
 ### Internal
 
--   `DuotonePicker`, `DuotoneSwatch`: Convert to TypeScript ([#49060](https://github.com/WordPress/gutenberg/pull/49060)).
+-   `DuotonePicker`, `DuotoneSwatch`: Convert to TypeScript ([#49060](https://github.com/WordPress/gutenberg/pull/49060)).(Upgrade npm)
 
 ## 23.6.0 (2023-03-15)
 

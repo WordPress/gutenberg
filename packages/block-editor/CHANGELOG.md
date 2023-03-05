@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#48950](https://github.com/WordPress/gutenberg/pull/48950)).
+
 ## 11.7.0 (2023-03-29)
 
--   `ImageSizeControl`: Update image size label ([#49112](https://github.com/WordPress/gutenberg/pull/49112)).
+-   `ImageSizeControl`: Update image size label ([#49112](https://github.com/WordPress/gutenberg/pull/49112)).(Upgrade npm)
 
 ## 11.6.0 (2023-03-15)
 

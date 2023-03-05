@@ -21,10 +21,10 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 ```
 
 Quit and restart terminal
-Install Node.js v14.
+Install Node.js v18.
 
 ```
-nvm install 14
+nvm install 18
 ```
 
 **2. WordPress Development Site**
@@ -57,7 +57,7 @@ The tools are used to convert the JavaScript we are going to write into a format
 
 For Mac and Linux, it is recommended to use the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm). Using `nvm` to install node allows installing specific versions, plus installs locally in your home directory and avoids any global permission issues.
 
-For Windows, or alternative installs, you can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, v14 is recommended. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
+For Windows, or alternative installs, you can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, v18 is recommended. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
 
 Here are the quick instructions to install using nvm, see the [full installation instructions](https://github.com/nvm-sh/nvm#installing-and-updating) for additional details.
 
@@ -71,16 +71,16 @@ Note: On macOS, the required developer tools are not installed by default, if no
 
 <img src="https://developer.wordpress.org/files/2020/07/git-install-prompt.png" alt="Mac git command requires command line developer tools" width="400" height="195"/>
 
-After installing nvm, you need to use it to install Node.js, to install v14, run:
+After installing nvm, you need to use it to install Node.js, to install v18, run:
 
 ```sh
-nvm install 14
+nvm install 18
 ```
 
 If there is an error running the above command, for example a common error that occurs is:
 
 ```sh
-$ nvm install 14
+$ nvm install 18
 zsh: command not found: nvm
 ```
 
@@ -93,20 +93,20 @@ On macOS Catalina, the default shell is zsh, to create the profile file type `to
 After creating the profile file, re-run the install command:
 
 ```sh
-nvm install 14
+nvm install 18
 ```
 
 The important part after installing is being able to use them in your terminal. Open a terminal command-line and type `node -v` and `npm -v` to confirm they are installed.
 
 ```sh
 > node -v
-v14.19.0
+v18.14.2
 
 > npm -v
-6.14.16
+9.6.0
 ```
 
-Your versions may not match exactly, that is fine. The minimum version for Node.js is >= 12 and for npm >= 6.9, using v14 will be supported until upgrade is required.
+Your versions may not match exactly, that is fine. The minimum version for Node.js is >= 18 and for npm >= 9, using v18 will be supported until upgrade is required.
 
 ## WordPress Development Site
 

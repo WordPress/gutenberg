@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   Use Node.js v16 in the action runner ([#48950](https://github.com/WordPress/gutenberg/pull/48950)).
+
 ## 1.29.0 (2023-03-29)
 
 ## 1.28.0 (2023-03-15)

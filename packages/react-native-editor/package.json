@@ -23,8 +23,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12",
-		"npm": ">=6.9"
+		"node": ">=14"
 	},
 	"main": "src/index.js",
 	"react-native": "src/index",

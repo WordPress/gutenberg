@@ -20,7 +20,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['14']
+                node: ['18']
                 os: [macos-latest, ubuntu-latest, windows-latest]
 
         steps:

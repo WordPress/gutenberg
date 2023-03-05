@@ -20,8 +20,8 @@ const { red, yellow } = require( 'chalk' );
 // @ts-ignore
 const packageLock = require( '../package-lock' );
 
-const dependencies = Object.entries( packageLock.dependencies );
-for ( const [ name, dependency ] of dependencies ) {
+const packages = Object.entries( packageLock.packages );
+for ( const [ name, dependency ] of packages ) {
 	if ( dependency.resolved === false ) {
 		console.log(
 			`Invalid resolved dependency in package-lock.json.
@@ -38,6 +38,6 @@ To fix, try removing the node_modules directory and reverting package-lock.json,
 	}
 
 	if ( dependency.dependencies ) {
-		dependencies.push( ...Object.entries( dependency.dependencies ) );
+		packages.push( ...Object.entries( dependency.dependencies ) );
 	}
 }

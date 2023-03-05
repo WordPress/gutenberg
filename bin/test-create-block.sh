@@ -63,10 +63,10 @@ if [ "$expected" -ne "$actual" ]; then
 fi
 
 status "Formatting files..."
-../node_modules/.bin/wp-scripts format
+npx wp-scripts format
 
 status "Building block..."
-../node_modules/.bin/wp-scripts build
+npx wp-scripts build
 
 status "Verifying build..."
 expected=5
@@ -77,10 +77,10 @@ if [ "$expected" -ne "$actual" ]; then
 fi
 
 status "Linting CSS files..."
-../node_modules/.bin/wp-scripts lint-style
+npx wp-scripts lint-style
 
 status "Linting JavaScript files..."
-../node_modules/.bin/wp-scripts lint-js
+npx wp-scripts lint-js
 
 status "Creating a plugin zip file..."
-../node_modules/.bin/wp-scripts plugin-zip
+npx wp-scripts plugin-zip
