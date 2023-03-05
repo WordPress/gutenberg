@@ -353,7 +353,7 @@ function getRenderPropPaths() {
 				);
 				return false;
 			}
-			return filepath;
+			return filepath.replace( /\\/g, '/' );
 		}
 		return false;
 	} );
