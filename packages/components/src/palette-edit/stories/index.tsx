@@ -57,8 +57,8 @@ Default.args = {
 		{ color: '#1a4548', name: 'Primary', slug: 'primary' },
 		{ color: '#0000ff', name: 'Secondary', slug: 'secondary' },
 	],
-	paletteLabel: 'This is a label',
-	emptyMessage: 'There is no color',
+	paletteLabel: 'Colors',
+	emptyMessage: 'Colors are empty',
 };
 
 const GradientsTemplate: ComponentStory<
@@ -98,6 +98,6 @@ Gradients.args = {
 			slug: 'midnight',
 		},
 	],
-	paletteLabel: 'This is a label',
-	emptyMessage: 'There is no gradient',
+	paletteLabel: 'Gradients',
+	emptyMessage: 'Gradients are empty',
 };
