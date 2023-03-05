@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import type { ButtonProps } from '../button/types';
+
 // React Components
 
 export type NavigationProps = {
@@ -129,7 +134,24 @@ export type NavigationGroupProps = {
 	 */
 	children: React.ReactNode;
 };
-export type NavigationItemProps = {
+
+type _NavigationItemButtonProps =
+	| ( ButtonProps & {
+			/**
+			 * If set to `true` the menu item will only act as a text-only item,
+			 * rather than a `<button />` or `<a />` element.
+			 */
+			isText?: false;
+	  } )
+	| {
+			/**
+			 * If set to `true` the menu item will only act as a text-only item,
+			 * rather than a `<button />` or `<a />` element.
+			 */
+			isText: true;
+	  };
+
+export type NavigationItemBaseProps = {
 	/**
 	 * The item badge content.
 	 */
@@ -175,15 +197,13 @@ export type NavigationItemProps = {
 	 */
 	onClick?: React.MouseEventHandler;
 	/**
-	 * If set to `true` the menu item will only act as a text-only item,
-	 * rather than a `<button />` or `<a />` element.
-	 */
-	isText?: boolean;
-	/**
 	 * The item title.
 	 */
 	title?: string;
 };
+
+export type NavigationItemProps = _NavigationItemButtonProps &
+	NavigationItemBaseProps;
 
 export type NavigationItemBaseContentProps = Pick<
 	NavigationItemProps,
@@ -235,7 +255,7 @@ export type NavigationSearchNoResultsFoundProps = Pick<
 
 // Data objects & context
 
-export type Item = NavigationItemProps & {
+export type Item = NavigationItemBaseProps & {
 	/**
 	 * The group id
 	 */

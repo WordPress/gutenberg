@@ -35,7 +35,6 @@ const TestNavigation = ( {
 			<NavigationItem
 				href="http://example.com"
 				item="item-2"
-				// @ts-expect-error TODO: have NavigationItem accept more props from Button
 				target="_blank"
 				title="Item 2"
 			/>

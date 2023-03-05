@@ -78,7 +78,6 @@ export const MoreExamplesStory: ComponentStory< typeof Navigation > = ( {
 					<NavigationItem
 						href="https://wordpress.org/"
 						item="item-4"
-						// @ts-expect-error TODO: have NavigationItem accept more props from Button
 						target="_blank"
 						title="WordPress.org"
 					/>
