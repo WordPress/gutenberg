@@ -16,7 +16,7 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
-**Note**: This package requires Node.js 14.0.0 or later, and `npm` 6.14.4 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 18.0.0 or later, and `npm` 9 or later. It is not compatible with older versions.
 
 ## Setup
 

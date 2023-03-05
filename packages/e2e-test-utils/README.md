@@ -14,7 +14,7 @@ Install the module
 npm install @wordpress/e2e-test-utils --save-dev
 ```
 
-**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 18.0.0 or later. It is not compatible with older versions.
 
 ## API
 

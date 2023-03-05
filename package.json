@@ -15,12 +15,15 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14.0.0",
-		"npm": ">=6.9.0 <7"
+		"node": ">=18",
+		"npm": ">=9"
 	},
 	"config": {
 		"IS_GUTENBERG_PLUGIN": true
 	},
+	"workspaces": [
+		"packages/*"
+	],
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
@@ -199,7 +202,7 @@
 		"jest-junit": "13.0.0",
 		"jest-message-util": "29.5.0",
 		"jest-watch-typeahead": "2.2.2",
-		"lerna": "5.5.2",
+		"lerna": "6.5.1",
 		"lint-staged": "10.0.1",
 		"lodash": "4.17.21",
 		"make-dir": "3.0.0",

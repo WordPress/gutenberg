@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14"
+		"node": ">=18"
 	},
 	"dependencies": {
 		"@wordpress/e2e-test-utils": "file:../e2e-test-utils",

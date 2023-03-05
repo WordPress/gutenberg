@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { join, relative, resolve, sep, dirname } = require( 'path' );
+const { relative, resolve, sep, dirname } = require( 'path' );
 const glob = require( 'fast-glob' );
 const execa = require( 'execa' );
 const { Transform } = require( 'stream' );
@@ -217,15 +217,9 @@ glob.stream( [
 				path = findDefaultSourcePath( dirname( file ) ),
 			] of tokens ) {
 				await execa(
-					`"${ join(
-						__dirname,
-						'..',
-						'..',
-						'node_modules',
-						'.bin',
-						'docgen'
-					) }"`,
+					'npx',
 					[
+						'docgen',
 						relative( ROOT_DIR, resolve( dirname( file ), path ) ),
 						`--output ${ output }`,
 						'--to-token',

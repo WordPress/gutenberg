@@ -20,8 +20,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14",
-		"npm": ">=6.9"
+		"node": ">=18",
+		"npm": ">=9"
 	},
 	"main": "build/index.js",
 	"types": "build-types",

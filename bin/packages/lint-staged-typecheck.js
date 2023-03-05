@@ -12,7 +12,6 @@ const execa = require( 'execa' );
 require( './validate-typescript-version' );
 
 const repoRoot = path.join( __dirname, '..', '..' );
-const tscPath = path.join( repoRoot, 'node_modules', '.bin', 'tsc' );
 
 // lint-staged passes full paths to staged changes
 const changedFiles = process.argv.slice( 2 );
@@ -28,7 +27,7 @@ const changedPackages = _.uniq(
 );
 
 try {
-	execa.sync( tscPath, [ '--build', ...changedPackages ] );
+	execa.sync( 'npx', [ 'tsc', '--build', ...changedPackages ] );
 } catch ( err ) {
 	console.error( err.stdout );
 	process.exitCode = 1;

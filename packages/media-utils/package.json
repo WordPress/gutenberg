@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",

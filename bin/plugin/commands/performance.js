@@ -407,7 +407,7 @@ async function runPerformanceTests( branches, options ) {
 				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
 				log( '        >> Starting the environment.' );
 				await runShellScript(
-					'../../tests/node_modules/.bin/wp-env start',
+					'npx wp-env start',
 					environmentDirectory
 				);
 				log( '        >> Running the test.' );
@@ -417,10 +417,7 @@ async function runPerformanceTests( branches, options ) {
 					runKey
 				);
 				log( '        >> Stopping the environment' );
-				await runShellScript(
-					'../../tests/node_modules/.bin/wp-env stop',
-					environmentDirectory
-				);
+				await runShellScript( 'npx wp-env stop', environmentDirectory );
 			}
 		}
 
