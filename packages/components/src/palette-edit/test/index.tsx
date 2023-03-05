@@ -82,7 +82,6 @@ describe( 'getNameForPosition', () => {
 
 describe( 'PaletteEdit', () => {
 	const defaultProps = {
-		gradients: [],
 		colors: [ { color: '#ffffff', name: 'Base', slug: 'base' } ],
 		onChange: jest.fn(),
 		paletteLabel: 'Test label',
