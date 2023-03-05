@@ -8,6 +8,7 @@
 -   `PanelBody`: Convert to TypeScript ([#47702](https://github.com/WordPress/gutenberg/pull/47702)).
 -   `withFallbackStyles` HOC: Convert to TypeScript ([#48720](https://github.com/WordPress/gutenberg/pull/48720)).
 -   `navigateRegions` HOC: Convert to TypeScript ([#48632](https://github.com/WordPress/gutenberg/pull/48632)).
+-   `PaletteEdit`: Convert to TypeScript ([#47764](https://github.com/WordPress/gutenberg/pull/47764)).
 
 ## 23.5.0 (2023-03-01)
 
