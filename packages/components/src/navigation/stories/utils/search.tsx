@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,10 +11,10 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Navigation from '../..';
-import NavigationGroup from '../../group';
-import NavigationItem from '../../item';
-import NavigationMenu from '../../menu';
+import { Navigation } from '../..';
+import { NavigationGroup } from '../../group';
+import { NavigationItem } from '../../item';
+import { NavigationMenu } from '../../menu';
 import { normalizedSearch } from '../../utils';
 
 const searchItems = [
@@ -24,12 +29,21 @@ const searchItems = [
 	{ item: 'waldo', title: 'Waldo' },
 ];
 
-export function SearchStory() {
+export const SearchStory: ComponentStory< typeof Navigation > = ( {
+	className,
+	...props
+} ) => {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ search, setSearch ] = useState( '' );
 
 	return (
-		<Navigation activeItem={ activeItem } className="navigation-story">
+		<Navigation
+			{ ...props }
+			activeItem={ activeItem }
+			className={ [ 'navigation-story', className ]
+				.filter( Boolean )
+				.join( ' ' ) }
+		>
 			<NavigationMenu hasSearch title="Home">
 				<NavigationGroup title="Items">
 					{ searchItems.map( ( { item, title } ) => (
@@ -74,4 +88,4 @@ export function SearchStory() {
 			</NavigationMenu>
 		</Navigation>
 	);
-}
+};

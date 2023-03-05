@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,15 +11,24 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Navigation from '../..';
-import NavigationItem from '../../item';
-import NavigationMenu from '../../menu';
+import { Navigation } from '../..';
+import { NavigationItem } from '../../item';
+import { NavigationMenu } from '../../menu';
 
-export function DefaultStory() {
+export const DefaultStory: ComponentStory< typeof Navigation > = ( {
+	className,
+	...props
+} ) => {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 
 	return (
-		<Navigation activeItem={ activeItem } className="navigation-story">
+		<Navigation
+			{ ...props }
+			activeItem={ activeItem }
+			className={ [ 'navigation-story', className ]
+				.filter( Boolean )
+				.join( ' ' ) }
+		>
 			<NavigationMenu title="Home">
 				<NavigationItem
 					item="item-1"
@@ -75,4 +89,4 @@ export function DefaultStory() {
 			</NavigationMenu>
 		</Navigation>
 	);
-}
+};

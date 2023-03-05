@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -7,11 +12,14 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../../../button';
-import Navigation from '../..';
-import NavigationItem from '../../item';
-import NavigationMenu from '../../menu';
+import { Navigation } from '../..';
+import { NavigationItem } from '../../item';
+import { NavigationMenu } from '../../menu';
 
-export function ControlledStateStory() {
+export const ControlledStateStory: ComponentStory< typeof Navigation > = ( {
+	className,
+	...props
+} ) => {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
@@ -41,9 +49,12 @@ export function ControlledStateStory() {
 	return (
 		<>
 			<Navigation
+				{ ...props }
 				activeItem={ activeItem }
 				activeMenu={ activeMenu }
-				className="navigation-story"
+				className={ [ 'navigation-story', className ]
+					.filter( Boolean )
+					.join( ' ' ) }
 				onActivateMenu={ setActiveMenu }
 			>
 				<NavigationMenu title="Home">
@@ -132,4 +143,4 @@ export function ControlledStateStory() {
 			</div>
 		</>
 	);
-}
+};
