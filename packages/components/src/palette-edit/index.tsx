@@ -327,10 +327,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
 						onRemove={ () => {
 							setEditingElement( null );
 							const newElements = elements.filter(
-								(
-									_currentElement: typeof elements[ number ],
-									currentIndex: number
-								) => {
+								( _currentElement, currentIndex ) => {
 									if ( currentIndex === index ) {
 										return false;
 									}
