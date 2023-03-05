@@ -223,7 +223,7 @@ function Option< T extends Color | Gradient >( {
 							onChange={ ( nextName?: string ) =>
 								onChange( {
 									...element,
-									name: nextName ?? '',
+									name: nextName,
 									slug: slugPrefix + kebabCase( nextName ),
 								} )
 							}
