@@ -410,17 +410,14 @@ export function PaletteEdit( props: PaletteEditProps ) {
 			}
 
 			const selectedElement = elements[ newEditingElementIndex ];
-			if ( ! selectedElement ) {
-				return;
-			}
-
 			// Ensures that the index returned matches a known element value.
 			if (
-				( getIsGradient( selectedElement ) &&
+				!! selectedElement &&
+				( ( getIsGradient( selectedElement ) &&
 					isGradient &&
 					selectedElement.gradient === value ) ||
-				( getIsColor( selectedElement ) &&
-					selectedElement.color === value )
+					( getIsColor( selectedElement ) &&
+						selectedElement.color === value ) )
 			) {
 				setEditingElement( newEditingElementIndex );
 			} else {
