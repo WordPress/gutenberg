@@ -66,12 +66,12 @@ const GradientsTemplate: ComponentStory<
 > = ( args ) => {
 	const { gradients, onChange, ...props } = args;
 
-	const [ controlledGradiens, setControlledGradients ] =
+	const [ controlledGradients, setControlledGradients ] =
 		useState( gradients );
 
 	return (
 		<PaletteEdit
-			gradients={ controlledGradiens }
+			gradients={ controlledGradients }
 			onChange={ ( newGradients?: Gradient[] ) => {
 				if ( newGradients ) {
 					setControlledGradients( newGradients );
