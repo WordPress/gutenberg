@@ -1,7 +1,7 @@
 <?php
 
 if ( ! function_exists( 'emptytheme_support' ) ) :
-	function emptytheme_support()  {
+	function emptytheme_support() {
 
 		// Adding support for core block visual styles.
 		add_theme_support( 'wp-block-styles' );
