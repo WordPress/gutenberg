@@ -8,11 +8,7 @@ import { useState } from '@wordpress/element';
  */
 import { useNavigationTreeNodes } from './use-navigation-tree-nodes';
 
-import type {
-	NavigationContext,
-	NavigationItem,
-	NavigationMenu,
-} from './types';
+import type { NavigationContext, Item, Menu } from './types';
 
 export const useCreateNavigationTree = () => {
 	const {
@@ -20,14 +16,14 @@ export const useCreateNavigationTree = () => {
 		getNode: getItem,
 		addNode: addItem,
 		removeNode: removeItem,
-	} = useNavigationTreeNodes< NavigationItem >();
+	} = useNavigationTreeNodes< Item >();
 
 	const {
 		nodes: menus,
 		getNode: getMenu,
 		addNode: addMenu,
 		removeNode: removeMenu,
-	} = useNavigationTreeNodes< NavigationMenu >();
+	} = useNavigationTreeNodes< Menu >();
 
 	/**
 	 * Stores direct nested menus of menus
@@ -45,7 +41,7 @@ export const useCreateNavigationTree = () => {
 		( startMenu, callback ) => {
 			const visited: string[] = [];
 			let queue = [ startMenu ];
-			let current: NavigationMenu;
+			let current: Menu;
 
 			while ( queue.length > 0 ) {
 				// Type cast to string is safe because of the `length > 0` check above.
@@ -67,7 +63,7 @@ export const useCreateNavigationTree = () => {
 	const isMenuEmpty = ( menuToCheck: string ) => {
 		let isEmpty = true;
 
-		traverseMenu( menuToCheck, ( current: NavigationMenu ) => {
+		traverseMenu( menuToCheck, ( current: Menu ) => {
 			if ( ! current.isEmpty ) {
 				isEmpty = false;
 				return false;
@@ -87,7 +83,7 @@ export const useCreateNavigationTree = () => {
 
 		menus,
 		getMenu,
-		addMenu: ( key: string, value: NavigationMenu ) => {
+		addMenu: ( key: string, value: Menu ) => {
 			setChildMenu( ( state ) => {
 				const newState = { ...state };
 

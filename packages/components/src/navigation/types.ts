@@ -1,24 +1,4 @@
-export type NavigationItem = {
-	/**
-	 * The group id
-	 */
-	group?: string;
-	/**
-	 * The menu id
-	 */
-	menu?: string;
-	_isVisible: boolean;
-
-	title?: string;
-	href?: string;
-};
-
-export type NavigationMenu = {
-	menu: string;
-	parentMenu?: string;
-	isEmpty?: boolean;
-	title?: string;
-};
+// React Components
 
 export type NavigationProps = {
 	/**
@@ -233,6 +213,29 @@ export type NavigationSearchNoResultsFoundProps = Pick<
 	'search'
 >;
 
+// Data objects & context
+
+export type Item = NavigationItemProps & {
+	/**
+	 * The group id
+	 */
+	group?: string;
+	/**
+	 * The menu id
+	 */
+	menu?: string;
+	/**
+	 * True is the item is currently visible (ie. the item is part
+	 * of the active menu, and — if there is a search query — its title
+	 * matches the search query).
+	 */
+	_isVisible: boolean;
+};
+
+export type Menu = NavigationMenuProps & {
+	menu: string;
+};
+
 export type NavigationGroupContext = {
 	/**
 	 * The unique id of the group
@@ -254,19 +257,19 @@ export type NavigationContext = {
 	) => void;
 
 	navigationTree: {
-		items: Record< string, NavigationItem >;
-		getItem: ( itemId: string ) => NavigationItem | undefined;
-		addItem: ( itemId: string, itemProps: NavigationItem ) => void;
+		items: Record< string, Item >;
+		getItem: ( itemId: string ) => Item | undefined;
+		addItem: ( itemId: string, itemProps: Item ) => void;
 		removeItem: ( itemId: string ) => void;
 
-		menus: Record< string, NavigationMenu >;
-		getMenu: ( menuId: string ) => NavigationMenu | undefined;
-		addMenu: ( menuId: string, menuProps: NavigationMenu ) => void;
+		menus: Record< string, Menu >;
+		getMenu: ( menuId: string ) => Menu | undefined;
+		addMenu: ( menuId: string, menuProps: Menu ) => void;
 		removeMenu: ( menuId: string ) => void;
 		childMenu: Record< string, string[] >;
 		traverseMenu: (
 			startMenu: string,
-			callback: ( menuObject: NavigationMenu ) => boolean | undefined
+			callback: ( menuObject: Menu ) => boolean | undefined
 		) => void;
 		isMenuEmpty: ( menuId: string ) => boolean;
 	};
