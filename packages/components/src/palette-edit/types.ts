@@ -57,9 +57,8 @@ export type BasePaletteEdit = {
 type PaletteEditColors = {
 	/**
 	 * The colors in the palette.
-	 *
 	 */
-	colors: Color[];
+	colors?: Color[];
 	/**
 	 * Runs on changing the value.
 	 */
@@ -70,7 +69,7 @@ type PaletteEditGradients = {
 	/**
 	 * The gradients in the palette.
 	 */
-	gradients: Gradient[];
+	gradients?: Gradient[];
 	/**
 	 * Runs on changing the value.
 	 */
