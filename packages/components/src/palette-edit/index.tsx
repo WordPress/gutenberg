@@ -112,6 +112,16 @@ function getIsGradient( element: PaletteElement ): element is Gradient {
 	return 'gradient' in element;
 }
 
+function isGradientPalette(
+	props: PaletteEditProps
+): props is PaletteEditGradientsProps {
+	return 'gradients' in props;
+}
+
+function getElements( props: PaletteEditProps ) {
+	return isGradientPalette( props ) ? props.gradients : props.colors;
+}
+
 function getValue( element: PaletteElement, isGradient?: boolean ) {
 	if ( isGradient && getIsGradient( element ) ) {
 		return element.gradient;
@@ -345,16 +355,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	);
 }
 
-function getElements( props: PaletteEditProps ) {
-	return isGradientPalette( props ) ? props.gradients : props.colors;
-}
-
-function isGradientPalette(
-	props: PaletteEditProps
-): props is PaletteEditGradientsProps {
-	return 'gradients' in props;
-}
-
 export function PaletteEdit( props: PaletteEditProps ) {
 	const {
 		onChange,
@@ -552,9 +552,9 @@ export function PaletteEdit( props: PaletteEditProps ) {
 			{ hasElements && (
 				<>
 					{ isEditing && (
-						<PaletteEditListView
+						<PaletteEditListView< typeof elements[ number ] >
 							canOnlyChangeValues={ canOnlyChangeValues }
-							elements={ elements as Array< Color | Gradient > }
+							elements={ elements }
 							onChange={
 								onChange as (
 									newElement?: Array< Color | Gradient >
@@ -595,15 +595,13 @@ export function PaletteEdit( props: PaletteEditProps ) {
 					) }
 					{ ! isEditing &&
 						( isGradient ? (
+							// @ts-expect-error TODO: Remove when GradientPicker is typed.
 							<GradientPicker
 								__nextHasNoMargin
 								gradients={ props.gradients }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomGradients={ true }
-								value={ undefined }
-								__experimentalIsRenderedInSidebar={ undefined }
-								className={ undefined }
 							/>
 						) : (
 							<ColorPalette

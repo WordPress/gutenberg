@@ -92,7 +92,7 @@ export type ColorPickerPopoverProps< T extends Color | Gradient > = {
 	element: T;
 	onChange: ( newElement: T ) => void;
 	onClose?: () => void;
-	isGradient: T extends Gradient ? true : false | undefined;
+	isGradient?: boolean;
 };
 
 export type NameInputProps = {
@@ -104,7 +104,7 @@ export type NameInputProps = {
 export type OptionProps< T extends Color | Gradient > = {
 	element: T;
 	onChange: ( newElement: T ) => void;
-	isGradient: T extends Gradient ? true : false | undefined;
+	isGradient?: boolean;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	isEditing: boolean;
 	key: Key;
@@ -117,7 +117,7 @@ export type OptionProps< T extends Color | Gradient > = {
 export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	elements: T[];
 	onChange: ( newElement?: T[] ) => void;
-	isGradient: T extends Gradient ? true : false | undefined;
+	isGradient?: boolean;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
