@@ -573,7 +573,7 @@ export function PaletteEdit( props: PaletteEditProps ) {
 							elements={ elements }
 							onChange={
 								onChange as (
-									newElement?: Array< Color | Gradient >
+									newElements?: Array< Color | Gradient >
 								) => void
 							}
 							editingElement={ editingElement }
