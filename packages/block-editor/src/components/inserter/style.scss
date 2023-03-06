@@ -35,6 +35,7 @@ $block-inserter-tabs-height: 44px;
 	.components-popover__content {
 		border: none;
 		outline: none;
+		box-shadow: $shadow-popover;
 
 		.block-editor-inserter__quick-inserter > * {
 			border-left: $border-width solid $gray-400;
