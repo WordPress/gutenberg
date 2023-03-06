@@ -103,10 +103,14 @@ function NavigationMenuSelector( {
 			setIsCreatingMenu( false );
 		}
 	}, [
-		isCreatingMenu,
-		createNavigationMenuIsError,
+		hasResolvedNavigationMenus,
 		createNavigationMenuIsSuccess,
-		setIsCreatingMenu,
+		canUserCreateNavigationMenu,
+		createNavigationMenuIsError,
+		isCreatingMenu,
+		menuUnavailable,
+		noBlockMenus,
+		noMenuSelected,
 	] );
 
 	const NavigationMenuSelectorDropdown = (

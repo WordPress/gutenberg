@@ -107,9 +107,12 @@ function Navigation( {
 
 	const ref = attributes.ref;
 
-	const setRef = ( postId ) => {
-		setAttributes( { ref: postId } );
-	};
+	const setRef = useCallback(
+		( postId ) => {
+			setAttributes( { ref: postId } );
+		},
+		[ setAttributes ]
+	);
 
 	const recursionId = `navigationMenu/${ ref }`;
 	const hasAlreadyRendered = useHasRecursion( recursionId );
@@ -210,6 +213,17 @@ function Navigation( {
 		[ navigationMenus ]
 	);
 
+	const handleUpdateMenu = useCallback(
+		( menuId, options = { focusNavigationBlock: false } ) => {
+			const { focusNavigationBlock } = options;
+			setRef( menuId );
+			if ( focusNavigationBlock ) {
+				selectBlock( clientId );
+			}
+		},
+		[ selectBlock, clientId, setRef ]
+	);
+
 	// This useEffect adds snackbar and speak status notices when menus are created.
 	// If there are no fallback navigation menus then we don't show these messages,
 	// because this means that we are creating the first, fallback navigation menu.
@@ -221,7 +235,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost.id, {
+			handleUpdateMenu( createNavigationMenuPost?.id, {
 				focusNavigationBlock: true,
 			} );
 
@@ -238,9 +252,13 @@ function Navigation( {
 			);
 		}
 	}, [
-		createNavigationMenuStatus,
-		createNavigationMenuError,
-		createNavigationMenuPost,
+		createNavigationMenuIsError,
+		createNavigationMenuIsSuccess,
+		handleUpdateMenu,
+		hideNavigationMenuStatusNotice,
+		isCreatingNavigationMenu,
+		showNavigationMenuStatusNotice,
+		createNavigationMenuPost?.id,
 		fallbackNavigationMenus,
 	] );
 
@@ -272,9 +290,11 @@ function Navigation( {
 		setRef( fallbackNavigationMenus[ 0 ].id );
 	}, [
 		ref,
+		setRef,
 		isCreatingNavigationMenu,
 		fallbackNavigationMenus,
 		hasUncontrolledInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
 	const isEntityAvailable =
@@ -342,7 +362,16 @@ function Navigation( {
 				'publish'
 			);
 		}
-	}, [ hasResolvedNavigationMenus, hasUnsavedBlocks ] );
+	}, [
+		hasResolvedNavigationMenus,
+		hasUnsavedBlocks,
+		classicMenus,
+		convertClassicMenu,
+		createNavigationMenu,
+		fallbackNavigationMenus?.length,
+		isConvertingClassicMenu,
+		ref,
+	] );
 
 	const navRef = useRef();
 
@@ -413,17 +442,6 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const handleUpdateMenu = useCallback(
-		( menuId, options = { focusNavigationBlock: false } ) => {
-			const { focusNavigationBlock } = options;
-			setRef( menuId );
-			if ( focusNavigationBlock ) {
-				selectBlock( clientId );
-			}
-		},
-		[ selectBlock, clientId ]
-	);
-
 	const onSelectClassicMenu = async ( classicMenu ) => {
 		const navMenu = await convertClassicMenu(
 			classicMenu.id,
@@ -449,7 +467,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost.id, {
+			handleUpdateMenu( createNavigationMenuPost?.id, {
 				focusNavigationBlock: true,
 			} );
 
@@ -466,7 +484,7 @@ function Navigation( {
 	}, [
 		createNavigationMenuStatus,
 		createNavigationMenuError,
-		createNavigationMenuPost,
+		createNavigationMenuPost?.id,
 		createNavigationMenuIsError,
 		createNavigationMenuIsSuccess,
 		isCreatingNavigationMenu,
@@ -492,7 +510,12 @@ function Navigation( {
 				__( 'Classic menu import failed.' )
 			);
 		}
-	}, [ classicMenuConversionStatus, classicMenuConversionError ] );
+	}, [
+		classicMenuConversionStatus,
+		classicMenuConversionError,
+		hideClassicMenuConversionNotice,
+		showClassicMenuConversionNotice,
+	] );
 
 	// Spacer block needs orientation from context. This is a patch until
 	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
@@ -501,7 +524,11 @@ function Navigation( {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { orientation } );
 		}
-	}, [ orientation ] );
+	}, [
+		orientation,
+		__unstableMarkNextChangeAsNotPersistent,
+		setAttributes,
+	] );
 
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
@@ -531,7 +558,11 @@ function Navigation( {
 				setDetectedOverlayBackgroundColor
 			);
 		}
-	} );
+	}, [
+		enableContrastChecking,
+		overlayTextColor.color,
+		overlayBackgroundColor.color,
+	] );
 
 	useEffect( () => {
 		if ( ! isSelected && ! isInnerBlockSelected ) {
@@ -572,6 +603,9 @@ function Navigation( {
 		canUserCreateNavigationMenu,
 		hasResolvedCanUserCreateNavigationMenu,
 		ref,
+		hideNavigationMenuPermissionsNotice,
+		showNavigationMenuPermissionsNotice,
+		navMenuResolvedButMissing,
 	] );
 
 	const hasManagePermissions =

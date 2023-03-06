@@ -1,5 +1,34 @@
 == Changelog ==
 
+= 15.3.0-rc.2 =
+
+
+
+## Changelog
+
+### Code Quality
+
+- Tag Processor: Make `$html` field `protected`. ([48681](https://github.com/WordPress/gutenberg/pull/48681))
+
+
+### Various
+
+- WP_HTML_Tag_Processor: Support tag closer bookmarks. ([48692](https://github.com/WordPress/gutenberg/pull/48692))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ockham
+
+
 = 15.2.4 =
 
 
