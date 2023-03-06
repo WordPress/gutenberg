@@ -2,6 +2,11 @@
 /** @typedef {import('./create').RichTextFormatList} RichTextFormatList */
 
 /**
+ * Internal dependencies
+ */
+import { slice } from './slice';
+
+/**
  * Gets the all format objects at the start of the selection.
  *
  * @param {RichTextValue} value                Value to inspect.
@@ -10,10 +15,8 @@
  *
  * @return {RichTextFormatList} Active format objects.
  */
-export function getActiveFormats(
-	{ formats, start, end, activeFormats },
-	EMPTY_ACTIVE_FORMATS = []
-) {
+export function getActiveFormats( value, EMPTY_ACTIVE_FORMATS = [] ) {
+	const { formats, start, end, activeFormats } = value;
 	if ( start === undefined ) {
 		return EMPTY_ACTIVE_FORMATS;
 	}
@@ -37,5 +40,30 @@ export function getActiveFormats(
 		return formatsAfter;
 	}
 
-	return formats[ start ] || EMPTY_ACTIVE_FORMATS;
+	// If there's no formats at the start index, there are not active formats.
+	if ( ! formats[ start ] ) {
+		return EMPTY_ACTIVE_FORMATS;
+	}
+
+	const selectedValue = slice( value );
+
+	let _activeFormats = selectedValue.formats[ 0 ];
+	let i = selectedValue.formats.length;
+
+	while ( i-- ) {
+		const formatsAtIndex = selectedValue.formats[ i ];
+
+		// If we run into any index without formats, we're sure that there's no
+		// active formats.
+		if ( ! formatsAtIndex ) {
+			return EMPTY_ACTIVE_FORMATS;
+		}
+
+		// Only keep an acive format if it's active for every single index.
+		_activeFormats = _activeFormats.filter(
+			( format, index ) => format === formatsAtIndex[ index ]
+		);
+	}
+
+	return _activeFormats || EMPTY_ACTIVE_FORMATS;
 }

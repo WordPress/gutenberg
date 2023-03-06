@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	getActiveFormat,
-	getActiveObject,
-	isCollapsed,
-} from '@wordpress/rich-text';
+import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
 
 export default function FormatEdit( {
 	formatTypes,
@@ -22,36 +18,10 @@ export default function FormatEdit( {
 		}
 
 		const activeFormat = getActiveFormat( value, name );
-		let isActive = activeFormat !== undefined;
+		const isActive = activeFormat !== undefined;
 		const activeObject = getActiveObject( value );
 		const isObjectActive =
 			activeObject !== undefined && activeObject.type === name;
-
-		// Edge case: un-collapsed link formats.
-		// If there is a missing link format at either end of the selection
-		// then we shouldn't show the Edit UI because the selection has exceeded
-		// the bounds of the link format.
-		// Also if the format objects don't match then we're dealing with two separate
-		// links so we should not allow the link to be modified over the top.
-		if ( name === 'core/link' && ! isCollapsed( value ) ) {
-			const formats = value.formats;
-
-			const linkFormatAtStart = formats[ value.start ]?.find(
-				( { type } ) => type === 'core/link'
-			);
-
-			const linkFormatAtEnd = formats[ value.end - 1 ]?.find(
-				( { type } ) => type === 'core/link'
-			);
-
-			if (
-				! linkFormatAtStart ||
-				! linkFormatAtEnd ||
-				linkFormatAtStart !== linkFormatAtEnd
-			) {
-				isActive = false;
-			}
-		}
 
 		return (
 			<Edit
