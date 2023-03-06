@@ -32,6 +32,18 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		return $navs_in_db->posts ? $navs_in_db->posts : array();
 	}
 
+	private function mock_wp_install() {
+		$user = get_current_user();
+		do_action( 'wp_install', $user );
+	}
+
+	public function test_should_auto_create_navigation_menu_on_wp_install() {
+		$this->mock_wp_install();
+
+		$navs_in_db = $this->get_navigations_in_database();
+		$this->assertCount( 1, $navs_in_db );
+	}
+
 	public function test_should_auto_create_navigation_menu_on_theme_switch() {
 		// Remove any existing disabling filters.
 		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
