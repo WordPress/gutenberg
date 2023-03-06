@@ -37,6 +37,9 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		do_action( 'wp_install', $user );
 	}
 
+	/**
+	 * @covers ::block_core_navigation_get_default_fallback
+	 */
 	public function test_should_auto_create_navigation_menu_on_wp_install() {
 		$this->mock_wp_install();
 
@@ -49,13 +52,13 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 
 		$navs_in_db = $this->get_navigations_in_database();
-		$this->assertCount( 0, $navs_in_db );
+		$this->assertCount( 0, $navs_in_db, 'Navigation Menu should not exist before running the tests.' );
 
 		// Should trigger creation of Navigation Menu if one does not already exist.
 		switch_theme( 'emptytheme' );
 
 		$navs_in_db = $this->get_navigations_in_database();
-		$this->assertCount( 1, $navs_in_db );
+		$this->assertCount( 1, $navs_in_db, 'No Navigation Menu was found.' );
 	}
 
 	public function test_should_not_auto_create_navigation_menu_on_theme_switch_to_classic_theme() {
