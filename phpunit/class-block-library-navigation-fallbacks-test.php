@@ -231,7 +231,7 @@ class Block_Library_Navigation_Fallbacks_Test extends WP_UnitTestCase {
 	public function test_should_skip_if_filter_returns_truthy() {
 		add_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 
-		$actual = gutenberg_block_core_navigation_create_fallback();
+		gutenberg_block_core_navigation_create_fallback();
 
 		$navs_in_db = $this->get_navigations_in_database();
 		$this->assertCount( 0, $navs_in_db, 'No Navigation Menus should have been created.' );
