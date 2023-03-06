@@ -464,7 +464,17 @@ function block_core_navigation_get_default_fallback() {
 }
 
 /**
- * Creates the appropriate fallback to be used on the front of the site.
+ * Creates an appropriate fallback Navigation Menu (`wp_navigation` Post)
+ * to be used by the Navigation block.
+ *
+ * Behaviour:
+ * 1. If there is a Navigation menu already then use it.
+ * 2. If there is a Classic menu then convert it to a Navigation menu.
+ * 3. If there is no Navigation menu and no Classic menu then create a default menu.
+ *
+ * The fallback menu is only created if the theme is a block theme.
+ *
+ * @return void
  */
 function block_core_navigation_create_fallback() {
 	$should_skip = apply_filters( 'block_core_navigation_skip_fallback', false );
@@ -490,8 +500,6 @@ function block_core_navigation_create_fallback() {
 	if ( ! $navigation_post ) {
 		$navigation_post = block_core_navigation_get_default_fallback();
 	}
-
-	return $navigation_post;
 }
 // Run on switching Theme and when installing WP for the first time.
 add_action( 'switch_theme', 'block_core_navigation_create_fallback' );
