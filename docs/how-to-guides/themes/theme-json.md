@@ -321,6 +321,7 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 - border: color, radius, style, width
 - color: link
 - dimensions: minHeight
+- position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
 
