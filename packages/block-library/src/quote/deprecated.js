@@ -47,7 +47,7 @@ const migrateTextAlign = ( attributes ) => {
 		: attributes;
 };
 
-// Renamed the 'align' attribute to 'textAlign'.
+// Version before the 'align' attribute was replaced with 'textAlign'.
 const v4 = {
 	attributes: {
 		value: {
@@ -65,34 +65,41 @@ const v4 = {
 			default: '',
 			__experimentalRole: 'content',
 		},
-		textAlign: {
+		align: {
 			type: 'string',
 		},
 	},
 	supports: {
-		align: [ 'wide', 'full' ],
 		anchor: true,
-		__experimentalSlashInserter: true,
+		__experimentalOnEnter: true,
 		typography: {
 			fontSize: true,
 			lineHeight: true,
-			__experimentalFontStyle: true,
+			__experimentalFontFamily: true,
 			__experimentalFontWeight: true,
-			__experimentalLetterSpacing: true,
+			__experimentalFontStyle: true,
 			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
 			__experimentalDefaultControls: {
 				fontSize: true,
 				fontAppearance: true,
 			},
 		},
+		color: {
+			gradients: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
 	},
 	save( { attributes } ) {
 		const { align, citation } = attributes;
-
 		const className = classnames( {
 			[ `has-text-align-${ align }` ]: align,
 		} );
-
 		return (
 			<blockquote { ...useBlockProps.save( { className } ) }>
 				<InnerBlocks.Content />
@@ -222,15 +229,17 @@ const v1 = {
 	migrate( attributes ) {
 		if ( attributes.style === 2 ) {
 			const { style, ...restAttributes } = attributes;
-			return migrateToQuoteV2( {
-				...restAttributes,
-				className: attributes.className
-					? attributes.className + ' is-style-large'
-					: 'is-style-large',
-			} );
+			return migrateTextAlign(
+				migrateToQuoteV2( {
+					...restAttributes,
+					className: attributes.className
+						? attributes.className + ' is-style-large'
+						: 'is-style-large',
+				} )
+			);
 		}
 
-		return migrateToQuoteV2( attributes );
+		return migrateTextAlign( migrateToQuoteV2( attributes ) );
 	},
 
 	save( { attributes } ) {
@@ -277,12 +286,14 @@ const v0 = {
 	migrate( attributes ) {
 		if ( ! isNaN( parseInt( attributes.style ) ) ) {
 			const { style, ...restAttributes } = attributes;
-			return migrateToQuoteV2( {
-				...restAttributes,
-			} );
+			return migrateTextAlign(
+				migrateToQuoteV2( {
+					...restAttributes,
+				} )
+			);
 		}
 
-		return migrateToQuoteV2( attributes );
+		return migrateTextAlign( migrateToQuoteV2( attributes ) );
 	},
 
 	save( { attributes } ) {
