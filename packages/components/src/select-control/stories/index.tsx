@@ -2,7 +2,6 @@
  * External dependencies
  */
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
-import type { ComponentProps } from 'react';
 
 /**
  * WordPress dependencies
@@ -32,34 +31,34 @@ const meta: ComponentMeta< typeof SelectControl > = {
 };
 export default meta;
 
-const SelectControlWithState: ComponentStory< typeof SelectControl > = ( {
-	onChange,
-	multiple,
-	...args
-} ) => {
-	const [ selection, setSelection ] =
-		useState< ComponentProps< typeof SelectControl >[ 'value' ] >();
+const SelectControlWithState: ComponentStory< typeof SelectControl > = (
+	props
+) => {
+	const [ selection, setSelection ] = useState< string[] >();
 
-	const handleOnChange: ComponentProps<
-		typeof SelectControl
-	>[ 'onChange' ] = ( value ) => {
-		setSelection( value );
-		onChange?.( value );
-	};
+	if ( props.multiple ) {
+		return (
+			<SelectControl
+				{ ...props }
+				multiple
+				value={ selection }
+				onChange={ ( value ) => {
+					setSelection( value );
+					props.onChange?.( value );
+				} }
+			/>
+		);
+	}
 
-	return multiple ? (
+	return (
 		<SelectControl
-			{ ...args }
-			multiple={ multiple }
-			value={ selection as string[] }
-			onChange={ handleOnChange }
-		/>
-	) : (
-		<SelectControl
-			{ ...args }
-			multiple={ multiple }
-			value={ selection as string }
-			onChange={ handleOnChange }
+			{ ...props }
+			multiple={ false }
+			value={ selection?.[ 0 ] }
+			onChange={ ( value ) => {
+				setSelection( [ value ] );
+				props.onChange?.( value );
+			} }
 		/>
 	);
 };
