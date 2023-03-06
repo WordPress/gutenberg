@@ -48,7 +48,8 @@ export function getActiveFormats( value, EMPTY_ACTIVE_FORMATS = [] ) {
 
 	const selectedValue = slice( value );
 
-	const _activeFormats = selectedValue.formats[ 0 ];
+	// Clone the formats so we're not mutating the live value.
+	const _activeFormats = [ ...selectedValue.formats[ 0 ] ];
 	let i = selectedValue.formats.length;
 
 	// For performance reasons, start from the end where it's much quicker to
