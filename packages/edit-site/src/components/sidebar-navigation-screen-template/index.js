@@ -21,11 +21,17 @@ function AddedByDescription( { template } ) {
 
 	if ( ! addedBy.text ) return null;
 
-	return sprintf(
-		/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
-		__( 'Added by %s.' ),
-		addedBy.text
-	);
+	return addedBy.isCustomized
+		? sprintf(
+				/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
+				__( 'Added by %s (customized).' ),
+				addedBy.text
+		  )
+		: sprintf(
+				/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
+				__( 'Added by %s.' ),
+				addedBy.text
+		  );
 }
 
 export default function SidebarNavigationScreenTemplate() {
