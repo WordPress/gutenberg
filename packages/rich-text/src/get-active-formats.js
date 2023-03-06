@@ -4,6 +4,7 @@
 /**
  * Internal dependencies
  */
+import { isFormatEqual } from './is-format-equal';
 import { slice } from './slice';
 
 /**
@@ -47,9 +48,11 @@ export function getActiveFormats( value, EMPTY_ACTIVE_FORMATS = [] ) {
 
 	const selectedValue = slice( value );
 
-	let _activeFormats = selectedValue.formats[ 0 ];
+	const _activeFormats = selectedValue.formats[ 0 ];
 	let i = selectedValue.formats.length;
 
+	// For performance reasons, start from the end where it's much quicker to
+	// realise that there are no active formats.
 	while ( i-- ) {
 		const formatsAtIndex = selectedValue.formats[ i ];
 
@@ -59,10 +62,26 @@ export function getActiveFormats( value, EMPTY_ACTIVE_FORMATS = [] ) {
 			return EMPTY_ACTIVE_FORMATS;
 		}
 
-		// Only keep an active format if it's active for every single index.
-		_activeFormats = _activeFormats.filter(
-			( format, index ) => format === formatsAtIndex[ index ]
-		);
+		let ii = _activeFormats.length;
+
+		// Loop over the active formats and remove any that are not present at
+		// the current index.
+		while ( ii-- ) {
+			const format = _activeFormats[ ii ];
+
+			if (
+				! formatsAtIndex.find( ( _format ) =>
+					isFormatEqual( format, _format )
+				)
+			) {
+				_activeFormats.splice( ii, 1 );
+			}
+		}
+
+		// If there are no active formats, we can stop.
+		if ( _activeFormats.length === 0 ) {
+			return EMPTY_ACTIVE_FORMATS;
+		}
 	}
 
 	return _activeFormats || EMPTY_ACTIVE_FORMATS;

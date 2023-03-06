@@ -20,9 +20,12 @@ describe( 'toggleFormat', () => {
 				,
 				,
 				,
-				[ strong ],
-				[ strong, em ],
-				[ strong, em ],
+				// In reality, formats at a different index are never the same
+				// value. Only formats that create the same tag are the same
+				// value.
+				[ { type: 'strong' } ],
+				[ em, strong ],
+				[ em, strong ],
 				[ em ],
 				,
 				,
