@@ -25,16 +25,10 @@ function SidebarNavigationScreenWrapper( { children, actions } ) {
 		<SidebarNavigationScreen
 			title={ __( 'Navigation' ) }
 			actions={ actions }
-			content={
-				<>
-					<p className="edit-site-sidebar-navigation-screen-navigation-menus__description">
-						{ __(
-							'Browse your site, edit pages, and manage your primary navigation menu.'
-						) }
-					</p>
-					{ children }
-				</>
-			}
+			description={ __(
+				'Browse your site, edit pages, and manage your primary navigation menu.'
+			) }
+			content={ children }
 		/>
 	);
 }
