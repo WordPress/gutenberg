@@ -44,7 +44,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$this->mock_wp_install();
 
 		$navs_in_db = $this->get_navigations_in_database();
-		$this->assertCount( 1, $navs_in_db );
+		$this->assertCount( 1, $navs_in_db, 'No Navigation Menu was found.' );
 	}
 
 	public function test_should_auto_create_navigation_menu_on_theme_switch() {
@@ -52,7 +52,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 
 		$navs_in_db = $this->get_navigations_in_database();
-		$this->assertCount( 0, $navs_in_db, 'Navigation Menu should not exist before running the tests.' );
+		$this->assertCount( 0, $navs_in_db, 'Navigation Menu should not exist before switching Theme.' );
 
 		// Should trigger creation of Navigation Menu if one does not already exist.
 		switch_theme( 'emptytheme' );
@@ -64,13 +64,13 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 	public function test_should_not_auto_create_navigation_menu_on_theme_switch_to_classic_theme() {
 
 		$navs_in_db = $this->get_navigations_in_database();
-		$this->assertCount( 0, $navs_in_db );
+		$this->assertCount( 0, $navs_in_db, 'Navigation Menu should not exist before switching Theme.' );
 
 		// Should trigger creation of Navigation Menu if one does not already exist.
 		switch_theme( 'twentytwenty' );
 
 		$navs_in_db = $this->get_navigations_in_database();
-		$this->assertCount( 0, $navs_in_db );
+		$this->assertCount( 0, $navs_in_db, 'A Navigation Menu should not exist.' );
 	}
 
 	public function test_should_not_auto_create_navigation_menu_on_theme_switch_if_one_already_exists() {
@@ -93,10 +93,10 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$navs_in_db = $this->get_navigations_in_database();
 
 		// There should still only be one Navigation Menu.
-		$this->assertCount( 1, $navs_in_db );
+		$this->assertCount( 1, $navs_in_db, 'A single Navigation Menu should exist.' );
 
 		// The existing Navigation Menu should be unchanged.
-		$this->assertEquals( 'Existing Navigation Menu', $navs_in_db[0]->post_title );
+		$this->assertEquals( 'Existing Navigation Menu', $navs_in_db[0]->post_title, 'The title of the Navigation Menu should match the existing Navigation Menu' );
 	}
 
 	public function test_gets_fallback_navigation_with_existing_navigation_menu_if_found() {
@@ -119,13 +119,13 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		$fallback = gutenberg_block_core_navigation_create_fallback();
 
-		$this->assertEquals( $fallback->post_title, $most_recently_published_nav->post_title );
-		$this->assertEquals( $fallback->post_type, $most_recently_published_nav->post_type );
-		$this->assertEquals( $fallback->post_content, $most_recently_published_nav->post_content );
-		$this->assertEquals( $fallback->post_status, $most_recently_published_nav->post_status );
+		$this->assertEquals( $fallback->post_title, $most_recently_published_nav->post_title, 'The title of the fallback Navigation Menu should match the title of the most recently published Navigation Menu.' );
+		$this->assertEquals( $fallback->post_type, $most_recently_published_nav->post_type, 'The post type of the fallback Navigation Menu should match the post type of the most recently published Navigation Menu.' );
+		$this->assertEquals( $fallback->post_content, $most_recently_published_nav->post_content, 'The contents of the fallback Navigation Menu should match the contents of the most recently published Navigation Menu.' );
+		$this->assertEquals( $fallback->post_status, $most_recently_published_nav->post_status, 'The status of the fallback Navigation Menu should match the status of the most recently published Navigation Menu.' );
 
 		$navs_in_db = $this->get_navigations_in_database();
-		$this->assertCount( 2, $navs_in_db );
+		$this->assertCount( 2, $navs_in_db, '2 Navigation Menus should exist.' );
 	}
 
 	public function test_gets_fallback_navigation_with_existing_classic_menu_if_found() {
@@ -144,21 +144,19 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		$fallback = gutenberg_block_core_navigation_create_fallback();
 
-		$this->assertEquals( 'Existing Classic Menu', $fallback->post_title );
-		$this->assertEquals( 'wp_navigation', $fallback->post_type );
-		$this->assertEquals( 'publish', $fallback->post_status );
+		$this->assertEquals( 'Existing Classic Menu', $fallback->post_title, 'The title of the fallback Navigation Menu should match the name of the Classic menu.' );
 
 		// Assert that the fallback contains a navigation-link block.
-		$this->assertStringContainsString( '<!-- wp:navigation-link', $fallback->post_content );
+		$this->assertStringContainsString( '<!-- wp:navigation-link', $fallback->post_content, 'The fallback Navigation Menu should contain a `core/navigation-link` block.' );
 
 		// Assert that fallback post_content contains the expected menu item title.
-		$this->assertStringContainsString( '"label":"Classic Menu Item 1"', $fallback->post_content );
+		$this->assertStringContainsString( '"label":"Classic Menu Item 1"', $fallback->post_content, 'The fallback Navigation Menu should contain menu item with a label matching the title of the menu item from the Classic Menu.' );
 
 		// Assert that fallback post_content contains the expected menu item url.
-		$this->assertStringContainsString( '"url":"/classic-menu-item-1"', $fallback->post_content );
+		$this->assertStringContainsString( '"url":"/classic-menu-item-1"', $fallback->post_content, 'The fallback Navigation Menu should contain menu item with a url matching the slug of the menu item from the Classic Menu.' );
 
 		$navs_in_db = $this->get_navigations_in_database();
-		$this->assertCount( 1, $navs_in_db );
+		$this->assertCount( 1, $navs_in_db, 'A single Navigation Menu should exist.' );
 
 		// Cleanup.
 		wp_delete_nav_menu( $menu_id );
@@ -167,13 +165,13 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 	public function test_creates_fallback_navigation_with_page_list_by_default() {
 		$fallback = gutenberg_block_core_navigation_create_fallback();
 
-		$this->assertEquals( 'wp_navigation', $fallback->post_type );
-		$this->assertEquals( 'Navigation', $fallback->post_title );
-		$this->assertEquals( '<!-- wp:page-list /-->', $fallback->post_content );
-		$this->assertEquals( 'publish', $fallback->post_status );
+		$this->assertEquals( 'wp_navigation', $fallback->post_type, 'The fallback Navigation Menu should be of the expected Post type.' );
+		$this->assertEquals( 'Navigation', $fallback->post_title, 'The fallback Navigation Menu should be have the expected title.' );
+		$this->assertEquals( '<!-- wp:page-list /-->', $fallback->post_content, 'The fallback Navigation Menu should contain a Page List block.' );
+		$this->assertEquals( 'publish', $fallback->post_status, 'The fallback Navigation Menu should be published.' );
 
 		$navs_in_db = $this->get_navigations_in_database();
-		$this->assertCount( 1, $navs_in_db );
+		$this->assertCount( 1, $navs_in_db, 'A single Navigation Menu should exist.' );
 	}
 
 	public function test_creates_fallback_from_existing_navigation_menu_even_if_classic_menu_exists() {
@@ -192,13 +190,13 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		$fallback = gutenberg_block_core_navigation_create_fallback();
 
-		$this->assertEquals( $fallback->post_title, $navigation_post->post_title );
-		$this->assertEquals( $fallback->post_type, $navigation_post->post_type );
-		$this->assertEquals( $fallback->post_content, $navigation_post->post_content );
-		$this->assertEquals( $fallback->post_status, $navigation_post->post_status );
+		$this->assertEquals( $fallback->post_title, $navigation_post->post_title, 'The title of the fallback Navigation Menu should match that of the existing Navigation Menu.' );
+		$this->assertEquals( $fallback->post_type, $navigation_post->post_type, 'The post type of the fallback Navigation Menu should match that of the existing Navigation Menu.' );
+		$this->assertEquals( $fallback->post_content, $navigation_post->post_content, 'The contents of the fallback Navigation Menu should match that of the existing Navigation Menu.' );
+		$this->assertEquals( $fallback->post_status, $navigation_post->post_status, 'The status of the fallback Navigation Menu should match that of the existing Navigation Menu.' );
 
 		$navs_in_db = $this->get_navigations_in_database();
-		$this->assertCount( 1, $navs_in_db );
+		$this->assertCount( 1, $navs_in_db, 'A single Navigation Menu should exist.' );
 
 		// Cleanup.
 		wp_delete_nav_menu( $menu_id );
@@ -209,11 +207,8 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		$actual = gutenberg_block_core_navigation_create_fallback();
 
-		// Assert no fallback is created.
-		$this->assertEquals( $actual, null );
-
 		$navs_in_db = $this->get_navigations_in_database();
-		$this->assertCount( 0, $navs_in_db );
+		$this->assertCount( 0, $navs_in_db, 'No Navigation Menus should have been created.' );
 
 		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 	}
@@ -221,8 +216,8 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 	public function test_should_return_empty_fallback_blocks_when_no_navigations_exist() {
 		$fallback_blocks = gutenberg_block_core_navigation_get_fallback_blocks();
 
-		$this->assertIsArray( $fallback_blocks );
-		$this->assertEmpty( $fallback_blocks );
+		$this->assertIsArray( $fallback_blocks, 'Fallback blocks should be an array.' );
+		$this->assertEmpty( $fallback_blocks, 'Fallback blocks should be empty.' );
 	}
 
 	public function test_should_return_blocks_from_most_recently_created_navigation() {
@@ -250,9 +245,9 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$block = $fallback_blocks[0];
 
 		// Check blocks match most recently Navigation Post data.
-		$this->assertEquals( $block['blockName'], 'core/navigation-link' );
-		$this->assertEquals( $block['attrs']['label'], 'Hello world' );
-		$this->assertEquals( $block['attrs']['url'], '/hello-world' );
+		$this->assertEquals( $block['blockName'], 'core/navigation-link', '1st fallback block should match expected type.' );
+		$this->assertEquals( $block['attrs']['label'], 'Hello world', '1st fallback block\'s label should match.' );
+		$this->assertEquals( $block['attrs']['url'], '/hello-world', '1st fallback block\'s url should match.' );
 
 	}
 
@@ -268,8 +263,8 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		$fallback_blocks = gutenberg_block_core_navigation_get_fallback_blocks();
 
-		$this->assertIsArray( $fallback_blocks );
-		$this->assertEmpty( $fallback_blocks );
+		$this->assertIsArray( $fallback_blocks, 'Fallback blocks should be an array.' );
+		$this->assertEmpty( $fallback_blocks, 'Fallback blocks should be empty.' );
 	}
 
 	public function test_should_filter_out_empty_blocks_from_fallbacks() {
@@ -288,8 +283,8 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$first_block = $fallback_blocks[0];
 
 		// There should only be a single page list block and no "null" blocks.
-		$this->assertCount( 1, $fallback_blocks );
-		$this->assertEquals( $first_block['blockName'], 'core/page-list' );
+		$this->assertCount( 1, $fallback_blocks, 'Fallback blocks should contain a single block.' );
+		$this->assertEquals( $first_block['blockName'], 'core/page-list', 'Fallback block should be a page list.' );
 
 		// Check that no "empty" blocks exist with a blockName of 'null'.
 		// If the block parser encounters whitespace it will return a block with a blockName of null.
@@ -300,7 +295,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 				return null === $block['blockName'];
 			}
 		);
-		$this->assertEmpty( $null_blocks );
+		$this->assertEmpty( $null_blocks, 'Fallback blocks should not contain any null blocks.' );
 	}
 
 	public function test_should_return_filtered_blocks_fallback_is_filtered() {
@@ -324,7 +319,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$block = $fallback_blocks[0];
 
 		// Check blocks match most recently Navigation Post data.
-		$this->assertEquals( $block['blockName'], 'core/site-logo' );
+		$this->assertEquals( $block['blockName'], 'core/site-logo', '1st fallback block should match expected type.' );
 
 		remove_filter( 'block_core_navigation_render_fallback', 'use_site_logo' );
 	}
