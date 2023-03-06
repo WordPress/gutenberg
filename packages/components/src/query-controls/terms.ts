@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { groupBy } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import type {
@@ -13,6 +8,11 @@ import type {
 	TermsByParent,
 } from './types';
 
+const ensureParents = (
+	terms: TermWithParentAndChildren[]
+): terms is ( TermWithParentAndChildren & { parent: number } )[] => {
+	return terms.every( ( term ) => term.parent !== null );
+};
 /**
  * Returns terms in a tree form.
  *
@@ -31,13 +31,22 @@ export function buildTermsTree( flatTerms: readonly ( Author | Category )[] ) {
 			};
 		} );
 
-	const termsByParent: TermsByParent = groupBy(
-		flatTermsWithParentAndChildren,
-		'parent'
-	);
-	if ( termsByParent.null && termsByParent.null.length ) {
+	if ( ! ensureParents( flatTermsWithParentAndChildren ) ) {
 		return flatTermsWithParentAndChildren;
 	}
+
+	const termsByParent = flatTermsWithParentAndChildren.reduce(
+		( acc: TermsByParent, term ) => {
+			const parent = term.parent.toString();
+			if ( ! acc[ parent ] ) {
+				acc[ parent ] = [];
+			}
+			acc[ parent ].push( term );
+			return acc;
+		},
+		{}
+	);
+
 	const fillWithChildren = (
 		terms: TermWithParentAndChildren[]
 	): TermWithParentAndChildren[] => {
