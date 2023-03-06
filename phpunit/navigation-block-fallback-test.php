@@ -38,7 +38,7 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::block_core_navigation_get_default_fallback
+	 * @covers ::block_core_navigation_create_fallback
 	 */
 	public function test_should_auto_create_navigation_menu_on_wp_install() {
 		$this->mock_wp_install();
@@ -47,6 +47,9 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$this->assertCount( 1, $navs_in_db, 'No Navigation Menu was found.' );
 	}
 
+	/**
+	 * @covers ::block_core_navigation_create_fallback
+	 */
 	public function test_should_auto_create_navigation_menu_on_theme_switch() {
 		// Remove any existing disabling filters.
 		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
@@ -61,6 +64,9 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$this->assertCount( 1, $navs_in_db, 'No Navigation Menu was found.' );
 	}
 
+	/**
+	 * @covers ::block_core_navigation_create_fallback
+	 */
 	public function test_should_not_auto_create_navigation_menu_on_theme_switch_to_classic_theme() {
 
 		$navs_in_db = $this->get_navigations_in_database();
@@ -73,6 +79,9 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$this->assertCount( 0, $navs_in_db, 'A Navigation Menu should not exist.' );
 	}
 
+	/**
+	 * @covers ::block_core_navigation_create_fallback
+	 */
 	public function test_should_not_auto_create_navigation_menu_on_theme_switch_if_one_already_exists() {
 
 		// Pre-add a Navigation Menu to simulate when a user already has a menu.
@@ -99,7 +108,10 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$this->assertEquals( 'Existing Navigation Menu', $navs_in_db[0]->post_title, 'The title of the Navigation Menu should match the existing Navigation Menu' );
 	}
 
-	public function test_gets_fallback_navigation_with_existing_navigation_menu_if_found() {
+	/**
+	 * @covers ::block_core_navigation_create_fallback
+	 */
+	public function test_creates_fallback_navigation_with_existing_navigation_menu_if_found() {
 
 		self::factory()->post->create_and_get(
 			array(
@@ -128,7 +140,10 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$this->assertCount( 2, $navs_in_db, '2 Navigation Menus should exist.' );
 	}
 
-	public function test_gets_fallback_navigation_with_existing_classic_menu_if_found() {
+	/**
+	 * @covers ::block_core_navigation_create_fallback
+	 */
+	public function test_creates_fallback_navigation_with_existing_classic_menu_if_found() {
 
 		$menu_id = wp_create_nav_menu( 'Existing Classic Menu' );
 
@@ -162,6 +177,9 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		wp_delete_nav_menu( $menu_id );
 	}
 
+	/**
+	 * @covers ::block_core_navigation_create_fallback
+	 */
 	public function test_creates_fallback_navigation_with_page_list_by_default() {
 		$fallback = gutenberg_block_core_navigation_create_fallback();
 
@@ -174,6 +192,9 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$this->assertCount( 1, $navs_in_db, 'A single Navigation Menu should exist.' );
 	}
 
+	/**
+	 * @covers ::block_core_navigation_create_fallback
+	 */
 	public function test_creates_fallback_from_existing_navigation_menu_even_if_classic_menu_exists() {
 
 		// Create a Navigation Post.
@@ -202,6 +223,9 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		wp_delete_nav_menu( $menu_id );
 	}
 
+	/**
+	 * @covers ::block_core_navigation_create_fallback
+	 */
 	public function test_should_skip_if_filter_returns_truthy() {
 		add_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 
@@ -213,14 +237,21 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		remove_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 	}
 
-	public function test_should_return_empty_fallback_blocks_when_no_navigations_exist() {
+
+	/**
+	 * @covers ::gutenberg_block_core_navigation_get_fallback_blocks
+	 */
+	public function test_should_get_fallback_blocks_when_no_navigations_exist() {
 		$fallback_blocks = gutenberg_block_core_navigation_get_fallback_blocks();
 
 		$this->assertIsArray( $fallback_blocks, 'Fallback blocks should be an array.' );
 		$this->assertEmpty( $fallback_blocks, 'Fallback blocks should be empty.' );
 	}
 
-	public function test_should_return_blocks_from_most_recently_created_navigation() {
+	/**
+	 * @covers ::gutenberg_block_core_navigation_get_fallback_blocks
+	 */
+	public function test_should_get_blocks_from_most_recently_created_navigation() {
 
 		// Create a fallback navigation.
 		self::factory()->post->create_and_get(
@@ -251,7 +282,10 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 	}
 
-	public function test_should_return_empty_array_if_most_recently_created_navigation_is_empty() {
+	/**
+	 * @covers ::gutenberg_block_core_navigation_get_fallback_blocks
+	 */
+	public function test_should_get_empty_array_if_most_recently_created_navigation_is_empty() {
 
 		self::factory()->post->create_and_get(
 			array(
@@ -267,6 +301,9 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$this->assertEmpty( $fallback_blocks, 'Fallback blocks should be empty.' );
 	}
 
+	/**
+	 * @covers ::gutenberg_block_core_navigation_get_fallback_blocks
+	 */
 	public function test_should_filter_out_empty_blocks_from_fallbacks() {
 
 		// Create a fallback navigation.
@@ -298,7 +335,10 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 		$this->assertEmpty( $null_blocks, 'Fallback blocks should not contain any null blocks.' );
 	}
 
-	public function test_should_return_filtered_blocks_fallback_is_filtered() {
+	/**
+	 * @covers ::gutenberg_block_core_navigation_get_fallback_blocks
+	 */
+	public function test_should_get_filtered_blocks_if_fallback_is_filtered() {
 
 		function use_site_logo() {
 			return parse_blocks( '<!-- wp:site-logo /-->' );
@@ -323,8 +363,6 @@ class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
 
 		remove_filter( 'block_core_navigation_render_fallback', 'use_site_logo' );
 	}
-
-
 }
 
 
