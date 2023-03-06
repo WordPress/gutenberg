@@ -246,8 +246,7 @@ class Block_Library_Navigation_Fallbacks_Test extends WP_UnitTestCase {
 	public function test_should_get_fallback_blocks_when_no_navigations_exist() {
 		$fallback_blocks = gutenberg_block_core_navigation_get_fallback_blocks();
 
-		$this->assertIsArray( $fallback_blocks, 'Fallback blocks should be an array.' );
-		$this->assertEmpty( $fallback_blocks, 'Fallback blocks should be empty.' );
+		$this->assertSame( array(), $fallback_blocks, 'Fallback blocks should be an empty array.' );
 	}
 
 	/**
