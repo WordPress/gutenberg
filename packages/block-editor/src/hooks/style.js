@@ -32,7 +32,6 @@ import {
 	SPACING_SUPPORT_KEY,
 	DimensionsPanel,
 } from './dimensions';
-import useDisplayBlockControls from '../components/use-display-block-controls';
 import { shouldSkipSerialization } from './utils';
 
 const styleSupportKeys = [
@@ -343,12 +342,6 @@ export function addEditProps( settings ) {
  * @param {Object} props
  */
 export const StyleBlockControls = ( props ) => {
-	const shouldDisplayControls = useDisplayBlockControls();
-
-	if ( ! shouldDisplayControls ) {
-		return null;
-	}
-
 	return (
 		<>
 			<ColorEdit { ...props } />

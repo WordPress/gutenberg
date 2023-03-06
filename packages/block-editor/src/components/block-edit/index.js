@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useEffect, useReducer } from '@wordpress/element';
 
 import { hasBlockSupport } from '@wordpress/blocks';
-import { filters } from '@wordpress/hooks';
+import { filters, addAction, removeAction } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -24,27 +24,8 @@ import { store as blockEditorStore } from '../../store';
  */
 export { useBlockEditContext };
 
-export default function BlockEdit( props ) {
-	const {
-		name,
-		isSelected,
-		clientId,
-		attributes = {},
-		__unstableLayoutClassNames,
-	} = props;
-	const { layout = null } = attributes;
-	const layoutSupport = hasBlockSupport(
-		name,
-		'__experimentalLayout',
-		false
-	);
-	const context = {
-		name,
-		isSelected,
-		clientId,
-		layout: layoutSupport ? layout : null,
-		__unstableLayoutClassNames,
-	};
+function BlockControlFilters( props ) {
+	const { name, isSelected, clientId } = props;
 	const shouldDisplayControls = useSelect(
 		( select ) => {
 			if ( isSelected ) {
@@ -74,6 +55,66 @@ export default function BlockEdit( props ) {
 		},
 		[ clientId, isSelected, name ]
 	);
+
+	const hookName = 'editor.BlockControls';
+	const [ , forceRender ] = useReducer( () => [] );
+
+	useEffect( () => {
+		const namespace = 'core/block-edit/block-controls';
+
+		function onHooksUpdated( updatedHookName ) {
+			if ( updatedHookName === hookName ) {
+				forceRender();
+			}
+		}
+
+		addAction( 'hookRemoved', namespace, onHooksUpdated );
+		addAction( 'hookAdded', namespace, onHooksUpdated );
+
+		return () => {
+			removeAction( 'hookRemoved', namespace );
+			removeAction( 'hookAdded', namespace );
+		};
+	} );
+
+	if ( ! shouldDisplayControls ) {
+		return;
+	}
+
+	const blockControlFilters = filters[ hookName ];
+
+	if ( ! blockControlFilters ) {
+		return;
+	}
+
+	return blockControlFilters.handlers.map(
+		( { callback: Controls, namespace } ) => (
+			<Controls { ...props } key={ namespace } />
+		)
+	);
+}
+
+export default function BlockEdit( props ) {
+	const {
+		name,
+		isSelected,
+		clientId,
+		attributes = {},
+		__unstableLayoutClassNames,
+	} = props;
+	const { layout = null } = attributes;
+	const layoutSupport = hasBlockSupport(
+		name,
+		'__experimentalLayout',
+		false
+	);
+	const context = {
+		name,
+		isSelected,
+		clientId,
+		layout: layoutSupport ? layout : null,
+		__unstableLayoutClassNames,
+	};
 	return (
 		<BlockEditContextProvider
 			// It is important to return the same object if props haven't
@@ -81,12 +122,7 @@ export default function BlockEdit( props ) {
 			// See https://reactjs.org/docs/context.html#caveats.
 			value={ useMemo( () => context, Object.values( context ) ) }
 		>
-			{ shouldDisplayControls &&
-				filters[ 'editor.BlockControls' ].handlers.map(
-					( { callback: Controls, namespace } ) => (
-						<Controls { ...props } key={ namespace } />
-					)
-				) }
+			<BlockControlFilters { ...props } />
 			<Edit { ...props } />
 		</BlockEditContextProvider>
 	);
