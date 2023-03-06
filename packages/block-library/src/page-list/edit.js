@@ -200,7 +200,10 @@ export default function PageListEdit( {
 			const hasChildren = pagesByParentId.has( page.id );
 			const pageProps = {
 				id: page.id,
-				label: page.title?.rendered,
+				label:
+					page.title?.rendered !== ''
+						? page.title?.rendered
+						: __( '(No title)' ),
 				title: page.title?.rendered,
 				link: page.url,
 				hasChildren,
