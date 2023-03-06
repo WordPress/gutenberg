@@ -12,7 +12,7 @@ class Block_Library_Navigation_Fallbacks_Test extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		// Navigation menu will be created on Theme switch. Therefore in order to test
-		// the behaviour of `gutenberg_block_core_navigation_create_and_get_fallback`
+		// the behaviour of `gutenberg_block_core_navigation_create_fallback`
 		// the auto-creation of a fallback must be disabled for this initial
 		// theme switch.
 		add_filter( 'block_core_navigation_skip_fallback', '__return_true' );
@@ -131,7 +131,9 @@ class Block_Library_Navigation_Fallbacks_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$fallback = gutenberg_block_core_navigation_create_and_get_fallback();
+		gutenberg_block_core_navigation_create_fallback();
+
+		$fallback = $this->get_navigations_in_database()[0];
 
 		$this->assertEquals( $fallback->post_title, $most_recently_published_nav->post_title, 'The title of the fallback Navigation Menu should match the title of the most recently published Navigation Menu.' );
 		$this->assertEquals( $fallback->post_type, $most_recently_published_nav->post_type, 'The post type of the fallback Navigation Menu should match the post type of the most recently published Navigation Menu.' );
@@ -159,7 +161,9 @@ class Block_Library_Navigation_Fallbacks_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$fallback = gutenberg_block_core_navigation_create_and_get_fallback();
+		gutenberg_block_core_navigation_create_fallback();
+
+		$fallback = $this->get_navigations_in_database()[0];
 
 		$this->assertEquals( 'Existing Classic Menu', $fallback->post_title, 'The title of the fallback Navigation Menu should match the name of the Classic menu.' );
 
@@ -183,7 +187,9 @@ class Block_Library_Navigation_Fallbacks_Test extends WP_UnitTestCase {
 	 * @covers ::block_core_navigation_create_fallback
 	 */
 	public function test_creates_fallback_navigation_with_page_list_by_default() {
-		$fallback = gutenberg_block_core_navigation_create_and_get_fallback();
+		gutenberg_block_core_navigation_create_fallback();
+
+		$fallback = $this->get_navigations_in_database()[0];
 
 		$this->assertEquals( 'wp_navigation', $fallback->post_type, 'The fallback Navigation Menu should be of the expected Post type.' );
 		$this->assertEquals( 'Navigation', $fallback->post_title, 'The fallback Navigation Menu should be have the expected title.' );
@@ -211,7 +217,9 @@ class Block_Library_Navigation_Fallbacks_Test extends WP_UnitTestCase {
 		// Also create a Classic Menu - this should be ignored.
 		$menu_id = wp_create_nav_menu( 'Existing Classic Menu' );
 
-		$fallback = gutenberg_block_core_navigation_create_and_get_fallback();
+		gutenberg_block_core_navigation_create_fallback();
+
+		$fallback = $this->get_navigations_in_database()[0];
 
 		$this->assertEquals( $fallback->post_title, $navigation_post->post_title, 'The title of the fallback Navigation Menu should match that of the existing Navigation Menu.' );
 		$this->assertEquals( $fallback->post_type, $navigation_post->post_type, 'The post type of the fallback Navigation Menu should match that of the existing Navigation Menu.' );
@@ -231,7 +239,7 @@ class Block_Library_Navigation_Fallbacks_Test extends WP_UnitTestCase {
 	public function test_should_skip_if_filter_returns_truthy() {
 		add_filter( 'block_core_navigation_skip_fallback', '__return_true' );
 
-		gutenberg_block_core_navigation_create_and_get_fallback();
+		gutenberg_block_core_navigation_create_fallback();
 
 		$navs_in_db = $this->get_navigations_in_database();
 		$this->assertCount( 0, $navs_in_db, 'No Navigation Menus should have been created.' );
