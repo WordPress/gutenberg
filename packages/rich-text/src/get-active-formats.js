@@ -59,7 +59,7 @@ export function getActiveFormats( value, EMPTY_ACTIVE_FORMATS = [] ) {
 			return EMPTY_ACTIVE_FORMATS;
 		}
 
-		// Only keep an acive format if it's active for every single index.
+		// Only keep an active format if it's active for every single index.
 		_activeFormats = _activeFormats.filter(
 			( format, index ) => format === formatsAtIndex[ index ]
 		);

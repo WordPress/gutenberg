@@ -14,15 +14,15 @@ describe( 'toggleFormat', () => {
 	const strong = { type: 'strong' };
 	const em = { type: 'em' };
 
-	it( 'should remove format if it exists at start of selection', () => {
+	it( 'should remove format if it is active', () => {
 		const record = {
 			formats: [
 				,
 				,
 				,
 				[ strong ],
-				[ em, strong ],
-				[ em ],
+				[ strong, em ],
+				[ strong, em ],
 				[ em ],
 				,
 				,
@@ -31,12 +31,14 @@ describe( 'toggleFormat', () => {
 				,
 				,
 			],
+			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 3,
 			end: 6,
 		};
 		const expected = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			replacements: [ , , , , , , , , , , , , , ],
 			activeFormats: [],
 			text: 'one two three',
 			start: 3,
