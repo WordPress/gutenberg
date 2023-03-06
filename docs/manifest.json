@@ -1500,12 +1500,6 @@
 		"parent": "packages-create-block"
 	},
 	{
-		"title": "@wordpress/custom-templated-path-webpack-plugin",
-		"slug": "packages-custom-templated-path-webpack-plugin",
-		"markdown_source": "../packages/custom-templated-path-webpack-plugin/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/customize-widgets",
 		"slug": "packages-customize-widgets",
 		"markdown_source": "../packages/customize-widgets/README.md",
@@ -1695,12 +1689,6 @@
 		"title": "@wordpress/lazy-import",
 		"slug": "packages-lazy-import",
 		"markdown_source": "../packages/lazy-import/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/library-export-default-webpack-plugin",
-		"slug": "packages-library-export-default-webpack-plugin",
-		"markdown_source": "../packages/library-export-default-webpack-plugin/README.md",
 		"parent": "packages"
 	},
 	{
