@@ -48,7 +48,7 @@ export function useLayoutClasses( blockAttributes = {}, blockName ) {
 	}, [] );
 	const globalLayoutSettings = useSetting( 'layout' ) || {};
 
-	const { layout = {} } = blockAttributes;
+	const { layout } = blockAttributes;
 
 	const { default: defaultBlockLayout } =
 		getBlockSupport( blockName, layoutBlockSupportKey ) || {};
