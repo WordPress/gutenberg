@@ -22,14 +22,12 @@ const ensureParents = (
  */
 export function buildTermsTree( flatTerms: readonly ( Author | Category )[] ) {
 	const flatTermsWithParentAndChildren: TermWithParentAndChildren[] =
-		flatTerms.map( ( term ) => {
-			return {
-				children: [],
-				parent: null,
-				...term,
-				id: String( term.id ),
-			};
-		} );
+		flatTerms.map( ( term ) => ( {
+			children: [],
+			parent: null,
+			...term,
+			id: String( term.id ),
+		} ) );
 
 	if ( ! ensureParents( flatTermsWithParentAndChildren ) ) {
 		return flatTermsWithParentAndChildren;
@@ -37,7 +35,7 @@ export function buildTermsTree( flatTerms: readonly ( Author | Category )[] ) {
 
 	const termsByParent = flatTermsWithParentAndChildren.reduce(
 		( acc: TermsByParent, term ) => {
-			const parent = term.parent.toString();
+			const { parent } = term;
 			if ( ! acc[ parent ] ) {
 				acc[ parent ] = [];
 			}
