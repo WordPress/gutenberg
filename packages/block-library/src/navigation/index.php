@@ -433,7 +433,7 @@ function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
 
 /**
  * Create and returns a navigation menu containing default fallback content.
- * (ideally a page-list).
+ * (a page-list if registered).
  *
  * @return array the newly created navigation menu.
  */
