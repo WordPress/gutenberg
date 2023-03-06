@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -19,12 +19,12 @@ function Edit( { attributes: { uniqueId } } ) {
 	const hasRecursion = useHasRecursion( uniqueId );
 
 	if ( hasRecursion ) {
-		return <div className={ `wp-block__${ name }--halted` }>Halt</div>;
+		return <div data-testid={ `wp-block__${ name }--halted` }>Halt</div>;
 	}
 
 	return (
 		<RecursionProvider uniqueId={ uniqueId }>
-			<div className={ `wp-block__${ name }` }>
+			<div data-testid={ `wp-block__${ name }` }>
 				{ uniqueId === 'SIMPLE' && <p>Done</p> }
 				{ uniqueId === 'SINGLY-RECURSIVE' && (
 					<Edit attributes={ { uniqueId } } />
@@ -51,76 +51,74 @@ describe( 'useHasRecursion/RecursionProvider', () => {
 	const context = { name: 'reusable-block' };
 
 	it( 'allows a single block to render', () => {
-		const { container } = render(
+		render(
 			<BlockEditContextProvider value={ context }>
 				<Edit attributes={ { uniqueId: 'SIMPLE' } } />
 			</BlockEditContextProvider>
 		);
 		expect(
-			container.querySelectorAll( '.wp-block__reusable-block' )
-		).toHaveLength( 1 );
+			screen.getByTestId( 'wp-block__reusable-block' )
+		).toBeVisible();
 		expect(
-			container.querySelectorAll( '.wp-block__reusable-block--halted' )
-		).toHaveLength( 0 );
+			screen.queryByTestId( 'wp-block__reusable-block--halted' )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'allows equal but sibling blocks to render', () => {
-		const { container } = render(
+		render(
 			<BlockEditContextProvider value={ context }>
 				<Edit attributes={ { uniqueId: 'SIMPLE' } } />
 				<Edit attributes={ { uniqueId: 'SIMPLE' } } />
 			</BlockEditContextProvider>
 		);
 		expect(
-			container.querySelectorAll( '.wp-block__reusable-block' )
+			screen.getAllByTestId( 'wp-block__reusable-block' )
 		).toHaveLength( 2 );
 		expect(
-			container.querySelectorAll( '.wp-block__reusable-block--halted' )
-		).toHaveLength( 0 );
+			screen.queryByTestId( 'wp-block__reusable-block--halted' )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'prevents a block from rendering itself', () => {
-		const { container } = render(
+		render(
 			<BlockEditContextProvider value={ context }>
 				<Edit attributes={ { uniqueId: 'SINGLY-RECURSIVE' } } />
 			</BlockEditContextProvider>
 		);
 		expect(
-			container.querySelectorAll( '.wp-block__reusable-block' )
-		).toHaveLength( 1 );
+			screen.getByTestId( 'wp-block__reusable-block' )
+		).toBeVisible();
 		expect(
-			container.querySelectorAll( '.wp-block__reusable-block--halted' )
-		).toHaveLength( 1 );
+			screen.getByTestId( 'wp-block__reusable-block--halted' )
+		).toBeVisible();
 	} );
 
 	it( 'prevents a block from rendering itself only when the same block type', () => {
-		const { container } = render(
+		render(
 			<BlockEditContextProvider value={ context }>
 				<Edit attributes={ { uniqueId: 'ANOTHER-BLOCK-SAME-ID' } } />
 			</BlockEditContextProvider>
 		);
 		expect(
-			container.querySelectorAll( '.wp-block__reusable-block' )
-		).toHaveLength( 1 );
+			screen.getByTestId( 'wp-block__reusable-block' )
+		).toBeVisible();
+		expect( screen.getByTestId( 'wp-block__another-block' ) ).toBeVisible();
 		expect(
-			container.querySelectorAll( '.wp-block__another-block' )
-		).toHaveLength( 1 );
-		expect(
-			container.querySelectorAll( '.wp-block__another-block--halted' )
-		).toHaveLength( 1 );
+			screen.getByTestId( 'wp-block__another-block--halted' )
+		).toBeVisible();
 	} );
 
 	it( 'prevents mutual recursion between two blocks', () => {
-		const { container } = render(
+		render(
 			<BlockEditContextProvider value={ context }>
 				<Edit attributes={ { uniqueId: 'MUTUALLY-RECURSIVE-1' } } />
 			</BlockEditContextProvider>
 		);
 		expect(
-			container.querySelectorAll( '.wp-block__reusable-block' )
+			screen.getAllByTestId( 'wp-block__reusable-block' )
 		).toHaveLength( 2 );
 		expect(
-			container.querySelectorAll( '.wp-block__reusable-block--halted' )
-		).toHaveLength( 1 );
+			screen.getByTestId( 'wp-block__reusable-block--halted' )
+		).toBeVisible();
 	} );
 } );

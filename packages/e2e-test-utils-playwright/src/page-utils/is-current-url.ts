@@ -7,10 +7,10 @@ import type { PageUtils } from './';
 /**
  * Checks if current path of the URL matches the provided path.
  *
- * @param {PageUtils} this
- * @param {string}    path String to be serialized as pathname.
+ * @param this
+ * @param path String to be serialized as pathname.
  *
- * @return {boolean} Boolean represents whether current URL is or not a WordPress path.
+ * @return Boolean represents whether current URL is or not a WordPress path.
  */
 export function isCurrentURL( this: PageUtils, path: string ) {
 	const currentURL = new URL( this.page.url() );

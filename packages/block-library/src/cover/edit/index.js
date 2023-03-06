@@ -94,6 +94,7 @@ function CoverEdit( {
 		alt,
 		allowedBlocks,
 		templateLock,
+		tagName: TagName = 'div',
 	} = attributes;
 
 	const [ featuredImage ] = useEntityProp(
@@ -115,7 +116,10 @@ function CoverEdit( {
 	// we define the url and background type
 	// depending on the value of the useFeaturedImage flag
 	// to preview in edit the dynamic featured image
-	const url = useFeaturedImage ? mediaUrl : attributes.url;
+	const url = useFeaturedImage
+		? mediaUrl
+		: // Ensure the url is not malformed due to sanitization through `wp_kses`.
+		  attributes.url?.replaceAll( '&amp;', '&' );
 	const backgroundType = useFeaturedImage
 		? IMAGE_BACKGROUND_TYPE
 		: attributes.backgroundType;
@@ -188,7 +192,9 @@ function CoverEdit( {
 			className: 'wp-block-cover__inner-container',
 		},
 		{
-			template: innerBlocksTemplate,
+			// Avoid template sync when the `templateLock` value is `all` or `contentOnly`.
+			// See: https://github.com/WordPress/gutenberg/pull/45632
+			template: ! hasInnerBlocks ? innerBlocksTemplate : undefined,
 			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
@@ -245,7 +251,7 @@ function CoverEdit( {
 			<>
 				{ blockControls }
 				{ inspectorControls }
-				<div
+				<TagName
 					{ ...blockProps }
 					className={ classnames(
 						'is-placeholder',
@@ -284,7 +290,7 @@ function CoverEdit( {
 						} }
 						showHandle={ isSelected }
 					/>
-				</div>
+				</TagName>
 			</>
 		);
 	}
@@ -306,7 +312,7 @@ function CoverEdit( {
 		<>
 			{ blockControls }
 			{ inspectorControls }
-			<div
+			<TagName
 				{ ...blockProps }
 				className={ classnames( classes, blockProps.className ) }
 				style={ { ...style, ...blockProps.style } }
@@ -397,7 +403,7 @@ function CoverEdit( {
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 				/>
 				<div { ...innerBlocksProps } />
-			</div>
+			</TagName>
 		</>
 	);
 }

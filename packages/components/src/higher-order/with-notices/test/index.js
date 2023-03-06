@@ -49,7 +49,7 @@ const BaseComponent = ( { noticeOperations, noticeUI, notifications } ) => {
 				noticeOperations.createNotice( item )
 			);
 		}
-	}, [] );
+	}, [ noticeOperations, notifications ] );
 	return (
 		<div>
 			{ noticeUI }
@@ -101,6 +101,7 @@ describe( 'withNotices operations', () => {
 		act( () => {
 			handle.current.createErrorNotice( message );
 		} );
+		// eslint-disable-next-line testing-library/no-node-access
 		expect( getByText( message )?.closest( '.is-error' ) ).not.toBeNull();
 	} );
 

@@ -24,6 +24,24 @@ function gutenberg_template_parts_screen_menu() {
 		return;
 	}
 
+	global $submenu;
+	if ( ! isset( $submenu['themes.php'] ) ) {
+		return;
+	}
+
+	$needs_custom_page = true;
+	foreach ( $submenu['themes.php'] as $menu_item ) {
+		if ( str_contains( $menu_item[2], 'site-editor.php?postType=wp_template_part' ) ) {
+			$needs_custom_page = false;
+			break;
+		}
+	}
+
+	// Don't use the custom 'Template Parts' page with WP 6.1 and above.
+	if ( ! $needs_custom_page ) {
+		return;
+	}
+
 	add_theme_page(
 		__( 'Template Parts', 'gutenberg' ),
 		__( 'Template Parts', 'gutenberg' ),
@@ -98,18 +116,9 @@ function gutenberg_template_parts_screen_init( $hook ) {
 		'styles'                    => get_block_editor_theme_styles(),
 		'defaultTemplateTypes'      => $indexed_template_types,
 		'defaultTemplatePartAreas'  => get_allowed_block_template_part_areas(),
-		'supportsLayout'            => WP_Theme_JSON_Resolver::theme_has_support(),
+		'supportsLayout'            => wp_theme_has_theme_json(),
 		'supportsTemplatePartsMode' => ! wp_is_block_theme() && current_theme_supports( 'block-template-parts' ),
-		'__unstableHomeTemplate'    => gutenberg_resolve_home_template(),
 	);
-
-	/**
-	 * We don't need home template resolution when block template parts are supported.
-	 * Set the value to true to satisfy the editor initialization guard clause.
-	 */
-	if ( $custom_settings['supportsTemplatePartsMode'] ) {
-		$custom_settings['__unstableHomeTemplate'] = true;
-	}
 
 	// Add additional back-compat patterns registered by `current_screen` et al.
 	$custom_settings['__experimentalAdditionalBlockPatterns']          = WP_Block_Patterns_Registry::get_instance()->get_all_registered( true );
@@ -125,7 +134,7 @@ function gutenberg_template_parts_screen_init( $hook ) {
 	}
 
 	$active_global_styles_id = WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
-	$active_theme            = wp_get_theme()->get_stylesheet();
+	$active_theme            = get_stylesheet();
 	$preload_paths           = array(
 		array( '/wp/v2/media', 'OPTIONS' ),
 		'/wp/v2/types?context=view',

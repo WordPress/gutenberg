@@ -15,6 +15,7 @@ function useForceUpdate() {
 	const mounted = useRef( true );
 
 	useEffect( () => {
+		mounted.current = true;
 		return () => {
 			mounted.current = false;
 		};
@@ -32,7 +33,7 @@ export default function Fill( { name, children } ) {
 	const ref = useRef( { rerender: useForceUpdate() } );
 
 	useEffect( () => {
-		// We register fills so we can keep track of their existance.
+		// We register fills so we can keep track of their existence.
 		// Some Slot implementations need to know if there're already fills
 		// registered so they can choose to render themselves or not.
 		registerFill( ref );

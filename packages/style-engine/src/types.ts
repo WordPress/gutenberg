@@ -38,6 +38,9 @@ export interface Style {
 		bottom?: BorderIndividualStyles< 'bottom' >;
 		left?: BorderIndividualStyles< 'left' >;
 	};
+	dimensions?: {
+		minHeight?: CSSProperties[ 'minHeight' ];
+	};
 	spacing?: {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;
 		padding?: CSSProperties[ 'padding' ] | Box< 'padding' >;
@@ -49,6 +52,7 @@ export interface Style {
 		fontStyle?: CSSProperties[ 'fontStyle' ];
 		letterSpacing?: CSSProperties[ 'letterSpacing' ];
 		lineHeight?: CSSProperties[ 'lineHeight' ];
+		textColumns?: CSSProperties[ 'columnCount' ];
 		textDecoration?: CSSProperties[ 'textDecoration' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
 	};

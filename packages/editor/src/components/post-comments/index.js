@@ -19,6 +19,7 @@ function PostComments( { commentStatus = 'open', ...props } ) {
 
 	return (
 		<CheckboxControl
+			__nextHasNoMarginBottom
 			label={ __( 'Allow comments' ) }
 			checked={ commentStatus === 'open' }
 			onChange={ onToggleComments }

@@ -41,11 +41,11 @@ describe( 'Android', () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		fireEvent.press(
-			screen.getByA11yLabel( 'Link to, Search or type URL' )
+			screen.getByLabelText( 'Link to, Search or type URL' )
 		);
 		// Await back button to allow async state updates to complete
 		const backButton = await waitFor( () =>
-			screen.getByA11yLabel( 'Go back' )
+			screen.getByLabelText( 'Go back' )
 		);
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
@@ -58,7 +58,7 @@ describe( 'Android', () => {
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete
 		const backButton = await waitFor( () =>
-			screen.getByA11yLabel( 'Apply' )
+			screen.getByLabelText( 'Apply' )
 		);
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
@@ -82,7 +82,7 @@ describe( 'iOS', () => {
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete
 		const backButton = await waitFor( () =>
-			screen.getByA11yLabel( 'Go back' )
+			screen.getByLabelText( 'Go back' )
 		);
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
@@ -95,7 +95,7 @@ describe( 'iOS', () => {
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete
 		const backButton = await waitFor( () =>
-			screen.getByA11yLabel( 'Apply' )
+			screen.getByLabelText( 'Apply' )
 		);
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );

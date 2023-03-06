@@ -8,3 +8,7 @@ updates:
       schedule:
           interval: 'daily'
       open-pull-requests-limit: 10
+      labels:
+          - 'GitHub Actions'
+          - 'Automated Testing'
+          - '[Type] Build Tooling'

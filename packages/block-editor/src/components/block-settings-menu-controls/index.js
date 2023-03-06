@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -33,17 +28,14 @@ const BlockSettingsMenuControlsSlot = ( {
 	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
 		( select ) => {
 			const {
-				getBlocksByClientId,
+				getBlockNamesByClientId,
 				getSelectedBlockClientIds,
 				canRemoveBlocks,
 			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
-				selectedBlocks: map(
-					getBlocksByClientId( ids ).filter( Boolean ),
-					( block ) => block.name
-				),
+				selectedBlocks: getBlockNamesByClientId( ids ),
 				selectedClientIds: ids,
 				canRemove: canRemoveBlocks( ids ),
 			};

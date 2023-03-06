@@ -38,23 +38,25 @@ exports[`props should render alignLabel 1`] = `
   }
 }
 
-<div
-  class="components-form-group emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="FormGroup"
->
-  <label
-    class="components-truncate components-text components-control-label emotion-2 emotion-1"
+<div>
+  <div
+    class="components-form-group emotion-0 emotion-1"
     data-wp-c16t="true"
-    data-wp-component="ControlLabel"
-    for="fname"
+    data-wp-component="FormGroup"
   >
-    First name
-  </label>
-  <input
-    id="fname"
-    type="text"
-  />
+    <label
+      class="components-truncate components-text components-control-label emotion-2 emotion-1"
+      data-wp-c16t="true"
+      data-wp-component="ControlLabel"
+      for="fname"
+    >
+      First name
+    </label>
+    <input
+      id="fname"
+      type="text"
+    />
+  </div>
 </div>
 `;
 
@@ -96,22 +98,24 @@ exports[`props should render vertically 1`] = `
   }
 }
 
-<div
-  class="components-form-group emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="FormGroup"
->
-  <label
-    class="components-truncate components-text components-control-label emotion-2 emotion-1"
+<div>
+  <div
+    class="components-form-group emotion-0 emotion-1"
     data-wp-c16t="true"
-    data-wp-component="ControlLabel"
-    for="fname"
+    data-wp-component="FormGroup"
   >
-    First name
-  </label>
-  <input
-    id="fname"
-    type="text"
-  />
+    <label
+      class="components-truncate components-text components-control-label emotion-2 emotion-1"
+      data-wp-c16t="true"
+      data-wp-component="ControlLabel"
+      for="fname"
+    >
+      First name
+    </label>
+    <input
+      id="fname"
+      type="text"
+    />
+  </div>
 </div>
 `;

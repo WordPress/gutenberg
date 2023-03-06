@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { createSlotFill, PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { cog } from '@wordpress/icons';
+import { isRTL, __ } from '@wordpress/i18n';
+import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { useEffect, Fragment } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -14,7 +14,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import DefaultSidebar from './default-sidebar';
 import GlobalStylesSidebar from './global-styles-sidebar';
-import NavigationMenuSidebar from './navigation-menu-sidebar';
 import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import TemplateCard from './template-card';
@@ -64,22 +63,13 @@ export function SidebarComplementaryAreaFills() {
 		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
 	}
 
-	// Conditionally include NavMenu sidebar in Plugin only.
-	// Optimise for dead code elimination.
-	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
-	let MaybeNavigationMenuSidebar = Fragment;
-
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		MaybeNavigationMenuSidebar = NavigationMenuSidebar;
-	}
-
 	return (
 		<>
 			<DefaultSidebar
 				identifier={ sidebarName }
 				title={ __( 'Settings' ) }
-				icon={ cog }
-				closeLabel={ __( 'Close settings sidebar' ) }
+				icon={ isRTL() ? drawerLeft : drawerRight }
+				closeLabel={ __( 'Close settings' ) }
 				header={ <SettingsHeader sidebarName={ sidebarName } /> }
 				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
 			>
@@ -93,7 +83,6 @@ export function SidebarComplementaryAreaFills() {
 				) }
 			</DefaultSidebar>
 			{ supportsGlobalStyles && <GlobalStylesSidebar /> }
-			<MaybeNavigationMenuSidebar />
 		</>
 	);
 }

@@ -55,7 +55,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_template_fallback( $request ) {
-		$hierarchy         = get_template_hierarchy( $request['slug'], $request['is_custom'], $request['template_prefix'] );
+		$hierarchy         = gutenberg_get_template_hierarchy( $request['slug'], $request['is_custom'], $request['template_prefix'] );
 		$fallback_template = resolve_block_template( $request['slug'], $hierarchy, '' );
 		$response          = $this->prepare_item_for_response( $fallback_template, $request );
 		return rest_ensure_response( $response );
@@ -228,7 +228,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';
 			$changes->tax_input   = array(
-				'wp_theme' => isset( $request['theme'] ) ? $request['theme'] : wp_get_theme()->get_stylesheet(),
+				'wp_theme' => isset( $request['theme'] ) ? $request['theme'] : get_stylesheet(),
 			);
 		} elseif ( 'custom' !== $template->source ) {
 			$changes->post_name   = $template->slug;

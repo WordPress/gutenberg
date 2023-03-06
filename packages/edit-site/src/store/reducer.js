@@ -4,11 +4,6 @@
 import { combineReducers } from '@wordpress/data';
 
 /**
- * Internal dependencies
- */
-import { MENU_ROOT } from '../components/navigation-sidebar/navigation-panel/constants';
-
-/**
  * Reducer returning the editing canvas device type.
  *
  * @param {Object} state  Current state.
@@ -56,85 +51,19 @@ export function settings( state = {}, action ) {
  */
 export function editedPost( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SET_TEMPLATE':
-		case 'SET_PAGE':
+		case 'SET_EDITED_POST':
 			return {
-				type: 'wp_template',
-				id: action.templateId,
-				page: action.page,
+				postType: action.postType,
+				id: action.id,
+				context: action.context,
 			};
-		case 'SET_TEMPLATE_PART':
+		case 'SET_EDITED_POST_CONTEXT':
 			return {
-				type: 'wp_template_part',
-				id: action.templatePartId,
+				...state,
+				context: action.context,
 			};
 	}
 
-	return state;
-}
-
-/**
- * Reducer for information about the site's homepage.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function homeTemplateId( state, action ) {
-	switch ( action.type ) {
-		case 'SET_HOME_TEMPLATE':
-			return action.homeTemplateId;
-	}
-
-	return state;
-}
-
-/**
- * Reducer for information about the navigation panel, such as its active menu
- * and whether it should be opened or closed.
- *
- * Note: this reducer interacts with the inserter and list view panels reducers
- * to make sure that only one of the three panels is open at the same time.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- */
-export function navigationPanel(
-	state = { menu: MENU_ROOT, isOpen: false },
-	action
-) {
-	switch ( action.type ) {
-		case 'SET_NAVIGATION_PANEL_ACTIVE_MENU':
-			return {
-				...state,
-				menu: action.menu,
-			};
-		case 'OPEN_NAVIGATION_PANEL_TO_MENU':
-			return {
-				...state,
-				isOpen: true,
-				menu: action.menu,
-			};
-		case 'SET_IS_NAVIGATION_PANEL_OPENED':
-			return {
-				...state,
-				menu: ! action.isOpen ? MENU_ROOT : state.menu, // Set menu to root when closing panel.
-				isOpen: action.isOpen,
-			};
-		case 'SET_IS_LIST_VIEW_OPENED':
-			return {
-				...state,
-				menu: state.isOpen && action.isOpen ? MENU_ROOT : state.menu, // Set menu to root when closing panel.
-				isOpen: action.isOpen ? false : state.isOpen,
-			};
-		case 'SET_IS_INSERTER_OPENED':
-			return {
-				...state,
-				menu: state.isOpen && action.value ? MENU_ROOT : state.menu, // Set menu to root when closing panel.
-				isOpen: action.value ? false : state.isOpen,
-			};
-	}
 	return state;
 }
 
@@ -149,13 +78,12 @@ export function navigationPanel(
  */
 export function blockInserterPanel( state = false, action ) {
 	switch ( action.type ) {
-		case 'OPEN_NAVIGATION_PANEL_TO_MENU':
-			return false;
-		case 'SET_IS_NAVIGATION_PANEL_OPENED':
 		case 'SET_IS_LIST_VIEW_OPENED':
 			return action.isOpen ? false : state;
 		case 'SET_IS_INSERTER_OPENED':
 			return action.value;
+		case 'SET_CANVAS_MODE':
+			return false;
 	}
 	return state;
 }
@@ -171,15 +99,44 @@ export function blockInserterPanel( state = false, action ) {
  */
 export function listViewPanel( state = false, action ) {
 	switch ( action.type ) {
-		case 'OPEN_NAVIGATION_PANEL_TO_MENU':
-			return false;
-		case 'SET_IS_NAVIGATION_PANEL_OPENED':
-			return action.isOpen ? false : state;
 		case 'SET_IS_INSERTER_OPENED':
 			return action.value ? false : state;
 		case 'SET_IS_LIST_VIEW_OPENED':
 			return action.isOpen;
+		case 'SET_CANVAS_MODE':
+			return false;
 	}
+	return state;
+}
+
+/**
+ * Reducer to set the save view panel open or closed.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+export function saveViewPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_SAVE_VIEW_OPENED':
+			return action.isOpen;
+		case 'SET_CANVAS_MODE':
+			return false;
+	}
+	return state;
+}
+
+/**
+ * Reducer used to track the site editor canvas mode (edit or view).
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+function canvasMode( state = 'init', action ) {
+	switch ( action.type ) {
+		case 'SET_CANVAS_MODE':
+			return action.mode;
+	}
+
 	return state;
 }
 
@@ -187,8 +144,8 @@ export default combineReducers( {
 	deviceType,
 	settings,
 	editedPost,
-	homeTemplateId,
-	navigationPanel,
 	blockInserterPanel,
 	listViewPanel,
+	saveViewPanel,
+	canvasMode,
 } );

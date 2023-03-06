@@ -1,60 +1,67 @@
 /**
  * WordPress dependencies
  */
-import { DropdownMenu, FlexItem, FlexBlock, Flex } from '@wordpress/components';
+import { FlexItem, FlexBlock, Flex, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { styles, moreVertical } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
+import { styles, seen } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
-import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
+import { GlobalStylesUI } from '../global-styles';
+import { store as editSiteStore } from '../../store';
+import { GlobalStylesMenuSlot } from '../global-styles/ui';
 
 export default function GlobalStylesSidebar() {
-	const [ canReset, onReset ] = useGlobalStylesReset();
-	const { toggle } = useDispatch( preferencesStore );
+	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState( false );
+	const editorMode = useSelect(
+		( select ) => select( editSiteStore ).getEditorMode(),
+		[]
+	);
 
+	useEffect( () => {
+		if ( editorMode !== 'visual' ) {
+			setIsStyleBookOpened( false );
+		}
+	}, [ editorMode ] );
 	return (
 		<DefaultSidebar
 			className="edit-site-global-styles-sidebar"
 			identifier="edit-site/global-styles"
 			title={ __( 'Styles' ) }
 			icon={ styles }
-			closeLabel={ __( 'Close global styles sidebar' ) }
+			closeLabel={ __( 'Close Styles sidebar' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
-				<Flex>
-					<FlexBlock>
+				<Flex className="edit-site-global-styles-sidebar__header">
+					<FlexBlock style={ { minWidth: 'min-content' } }>
 						<strong>{ __( 'Styles' ) }</strong>
 					</FlexBlock>
 					<FlexItem>
-						<DropdownMenu
-							icon={ moreVertical }
-							label={ __( 'More Global Styles Actions' ) }
-							controls={ [
-								{
-									title: __( 'Reset to defaults' ),
-									onClick: onReset,
-									isDisabled: ! canReset,
-								},
-								{
-									title: __( 'Welcome Guide' ),
-									onClick: () =>
-										toggle(
-											'core/edit-site',
-											'welcomeGuideStyles'
-										),
-								},
-							] }
+						<Button
+							icon={ seen }
+							label={ __( 'Style Book' ) }
+							isPressed={ isStyleBookOpened }
+							disabled={ editorMode !== 'visual' }
+							onClick={ () => {
+								setIsStyleBookOpened( ! isStyleBookOpened );
+							} }
 						/>
+					</FlexItem>
+					<FlexItem>
+						<GlobalStylesMenuSlot />
 					</FlexItem>
 				</Flex>
 			}
 		>
-			<GlobalStylesUI />
+			<GlobalStylesUI
+				isStyleBookOpened={ isStyleBookOpened }
+				onCloseStyleBook={ () => setIsStyleBookOpened( false ) }
+			/>
 		</DefaultSidebar>
 	);
 }

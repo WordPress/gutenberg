@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { orderBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -20,6 +15,7 @@ import { searchBlockItems } from '../components/inserter/search-items';
 import useBlockTypesState from '../components/inserter/hooks/use-block-types-state';
 import BlockIcon from '../components/block-icon';
 import { store as blockEditorStore } from '../store';
+import { orderBy } from '../utils/sorting';
 
 const noop = () => {};
 const SHOWN_BLOCK_TYPES = 9;
@@ -68,7 +64,7 @@ function createBlockCompleter() {
 							collections,
 							filterValue
 					  )
-					: orderBy( items, [ 'frecency' ], [ 'desc' ] );
+					: orderBy( items, 'frecency', 'desc' );
 
 				return initialFilteredItems
 					.filter( ( item ) => item.name !== selectedBlockName )

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "3.18.0",
+	"version": "4.5.0",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,8 +39,8 @@
 		"@wordpress/url": "file:../url"
 	},
 	"peerDependencies": {
-		"react": "^17.0.0",
-		"react-dom": "^17.0.0"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

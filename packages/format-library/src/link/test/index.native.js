@@ -48,13 +48,13 @@ describe( 'Android', () => {
 				} }
 			/>
 		);
-		fireEvent.press( screen.getByA11yLabel( 'Link' ) );
+		fireEvent.press( screen.getByLabelText( 'Link' ) );
 		fireEvent.press(
-			screen.getByA11yLabel( 'Link to, Search or type URL' )
+			screen.getByLabelText( 'Link to, Search or type URL' )
 		);
 		// Await back button to allow async state updates to complete
 		const backButton = await waitFor( () =>
-			screen.getByA11yLabel( 'Go back' )
+			screen.getByLabelText( 'Go back' )
 		);
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
@@ -63,7 +63,7 @@ describe( 'Android', () => {
 	} );
 
 	it( 'improves apply animation performance by dismissing keyboard beforehand', async () => {
-		const { getByA11yLabel } = render(
+		const { getByLabelText } = render(
 			<LinkEditSlot
 				activeAttributes={ {} }
 				onChange={ () => {} }
@@ -74,10 +74,10 @@ describe( 'Android', () => {
 				} }
 			/>
 		);
-		fireEvent.press( getByA11yLabel( 'Link' ) );
-		fireEvent.press( getByA11yLabel( 'Link to, Search or type URL' ) );
+		fireEvent.press( getByLabelText( 'Link' ) );
+		fireEvent.press( getByLabelText( 'Link to, Search or type URL' ) );
 		// Await back button to allow async state updates to complete
-		const backButton = await waitFor( () => getByA11yLabel( 'Apply' ) );
+		const backButton = await waitFor( () => getByLabelText( 'Apply' ) );
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
 
@@ -107,13 +107,13 @@ describe( 'iOS', () => {
 				} }
 			/>
 		);
-		fireEvent.press( screen.getByA11yLabel( 'Link' ) );
+		fireEvent.press( screen.getByLabelText( 'Link' ) );
 		fireEvent.press(
-			screen.getByA11yLabel( 'Link to, Search or type URL' )
+			screen.getByLabelText( 'Link to, Search or type URL' )
 		);
 		// Await back button to allow async state updates to complete
 		const backButton = await waitFor( () =>
-			screen.getByA11yLabel( 'Go back' )
+			screen.getByLabelText( 'Go back' )
 		);
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
@@ -122,7 +122,7 @@ describe( 'iOS', () => {
 	} );
 
 	it( 'improves apply animation performance by dismissing keyboard beforehand', async () => {
-		const { getByA11yLabel } = render(
+		const { getByLabelText } = render(
 			<LinkEditSlot
 				activeAttributes={ {} }
 				onChange={ () => {} }
@@ -133,10 +133,10 @@ describe( 'iOS', () => {
 				} }
 			/>
 		);
-		fireEvent.press( getByA11yLabel( 'Link' ) );
-		fireEvent.press( getByA11yLabel( 'Link to, Search or type URL' ) );
+		fireEvent.press( getByLabelText( 'Link' ) );
+		fireEvent.press( getByLabelText( 'Link to, Search or type URL' ) );
 		// Await back button to allow async state updates to complete
-		const backButton = await waitFor( () => getByA11yLabel( 'Apply' ) );
+		const backButton = await waitFor( () => getByLabelText( 'Apply' ) );
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
 

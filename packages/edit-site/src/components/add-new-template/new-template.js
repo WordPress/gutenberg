@@ -1,13 +1,12 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	NavigableMenu,
+	Tooltip,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
@@ -21,6 +20,7 @@ import {
 	media,
 	notFound,
 	page,
+	plus,
 	post,
 	postAuthor,
 	postDate,
@@ -47,6 +47,7 @@ import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../private-apis';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
@@ -79,7 +80,11 @@ const TEMPLATE_ICONS = {
 	attachment: media,
 };
 
-export default function NewTemplate( { postType } ) {
+export default function NewTemplate( {
+	postType,
+	toggleProps,
+	showIcon = true,
+} ) {
 	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
 		useState( false );
 	const [
@@ -93,27 +98,16 @@ export default function NewTemplate( { postType } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const { setTemplate } = useDispatch( editSiteStore );
-
+	const { setTemplate, setCanvasMode } = unlock(
+		useDispatch( editSiteStore )
+	);
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isCreatingTemplate ) {
 			return;
 		}
 		setIsCreatingTemplate( true );
 		try {
-			const { title, description, slug, templatePrefix } = template;
-			let templateContent = template.content;
-			// Try to find fallback content from existing templates.
-			if ( ! templateContent ) {
-				const fallbackTemplate = await apiFetch( {
-					path: addQueryArgs( '/wp/v2/templates/lookup', {
-						slug,
-						is_custom: ! isWPSuggestion,
-						template_prefix: templatePrefix,
-					} ),
-				} );
-				templateContent = fallbackTemplate.content.raw;
-			}
+			const { title, description, slug } = template;
 			const newTemplate = await saveEntityRecord(
 				'postType',
 				'wp_template',
@@ -123,7 +117,6 @@ export default function NewTemplate( { postType } ) {
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-					content: templateContent,
 					// This adds a post meta field in template that is part of `is_custom` value calculation.
 					is_wp_suggestion: isWPSuggestion,
 				},
@@ -132,12 +125,15 @@ export default function NewTemplate( { postType } ) {
 
 			// Set template before navigating away to avoid initial stale value.
 			setTemplate( newTemplate.id, newTemplate.slug );
+			// Switch to edit mode.
+			setCanvasMode( 'edit' );
 
 			// Navigate to the created template editor.
 			history.push( {
 				postId: newTemplate.id,
 				postType: newTemplate.type,
 			} );
+
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: Title of the created template e.g: "Category".
@@ -169,26 +165,29 @@ export default function NewTemplate( { postType } ) {
 	if ( ! missingTemplates.length ) {
 		return null;
 	}
+
+	const customTemplateDescription = __(
+		'Custom templates can be applied to any post or page.'
+	);
+
 	return (
 		<>
 			<DropdownMenu
 				className="edit-site-new-template-dropdown"
-				icon={ null }
-				text={ postType.labels.add_new }
+				icon={ showIcon ? plus : null }
+				text={ showIcon ? null : postType.labels.add_new }
 				label={ postType.labels.add_new_item }
 				popoverProps={ {
 					noArrow: false,
 				} }
-				toggleProps={ {
-					variant: 'primary',
-				} }
+				toggleProps={ toggleProps }
 			>
 				{ () => (
 					<>
 						{ isCreatingTemplate && (
 							<TemplateActionsLoadingScreen />
 						) }
-						<NavigableMenu className="edit-site-new-template-dropdown__popover">
+						<div className="edit-site-new-template-dropdown__menu-groups">
 							<MenuGroup label={ postType.labels.add_new_item }>
 								{ missingTemplates.map( ( template ) => {
 									const {
@@ -199,44 +198,63 @@ export default function NewTemplate( { postType } ) {
 										icon,
 									} = template;
 									return (
-										<MenuItem
-											icon={
-												icon ||
-												TEMPLATE_ICONS[ slug ] ||
-												post
-											}
-											iconPosition="left"
-											info={ description }
+										<Tooltip
 											key={ slug }
-											onClick={ () =>
-												onClick
-													? onClick( template )
-													: createTemplate( template )
-											}
+											position="top right"
+											text={ description }
+											className="edit-site-new-template-dropdown__menu-item-tooltip"
 										>
-											{ title }
-										</MenuItem>
+											<MenuItem
+												icon={
+													icon ||
+													TEMPLATE_ICONS[ slug ] ||
+													post
+												}
+												iconPosition="left"
+												onClick={ () =>
+													onClick
+														? onClick( template )
+														: createTemplate(
+																template
+														  )
+												}
+											>
+												{ title }
+												{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
+												 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
+												<VisuallyHidden>
+													{ description }
+												</VisuallyHidden>
+											</MenuItem>
+										</Tooltip>
 									);
 								} ) }
 							</MenuGroup>
 							<MenuGroup>
-								<MenuItem
-									icon={ customGenericTemplateIcon }
-									iconPosition="left"
-									info={ __(
-										'Custom templates can be applied to any post or page.'
-									) }
-									key="custom-template"
-									onClick={ () =>
-										setShowCustomGenericTemplateModal(
-											true
-										)
-									}
+								<Tooltip
+									position="top right"
+									text={ customTemplateDescription }
+									className="edit-site-new-template-dropdown__menu-item-tooltip"
 								>
-									{ __( 'Custom template' ) }
-								</MenuItem>
+									<MenuItem
+										icon={ customGenericTemplateIcon }
+										iconPosition="left"
+										onClick={ () =>
+											setShowCustomGenericTemplateModal(
+												true
+											)
+										}
+									>
+										{ __( 'Custom template' ) }
+										{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
+										 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
+										<VisuallyHidden>
+											{ customTemplateDescription }
+										</VisuallyHidden>
+									</MenuItem>
+								</Tooltip>
 							</MenuGroup>
-						</NavigableMenu>
+						</div>
 					</>
 				) }
 			</DropdownMenu>

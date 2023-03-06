@@ -8,6 +8,8 @@
 
 /**
  * Tests for registering, storing and generating styles.
+ *
+ * @group style-engine
  */
 class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
@@ -163,6 +165,21 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_valid_dimensions_style'                => array(
+				'block_styles'    => array(
+					'dimensions' => array(
+						'minHeight' => '50vh',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'min-height:50vh;',
+					'declarations' => array(
+						'min-height' => '50vh',
+					),
+				),
+			),
+
 			'inline_valid_typography_style'                => array(
 				'block_styles'    => array(
 					'typography' => array(
@@ -171,6 +188,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'fontStyle'      => 'italic',
 						'fontWeight'     => '800',
 						'lineHeight'     => '1.3',
+						'textColumns'    => '2',
 						'textDecoration' => 'underline',
 						'textTransform'  => 'uppercase',
 						'letterSpacing'  => '2',
@@ -178,13 +196,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;text-decoration:underline;text-transform:uppercase;letter-spacing:2;',
+					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;column-count:2;text-decoration:underline;text-transform:uppercase;letter-spacing:2;',
 					'declarations' => array(
 						'font-size'       => 'clamp(2em, 2vw, 4em)',
 						'font-family'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
 						'font-style'      => 'italic',
 						'font-weight'     => '800',
 						'line-height'     => '1.3',
+						'column-count'    => '2',
 						'text-decoration' => 'underline',
 						'text-transform'  => 'uppercase',
 						'letter-spacing'  => '2',

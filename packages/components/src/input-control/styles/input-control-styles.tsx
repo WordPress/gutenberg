@@ -34,6 +34,7 @@ const rootFocusedStyles = ( { isFocused }: RootProps ) => {
 };
 
 export const Root = styled( Flex )< RootProps >`
+	box-sizing: border-box;
 	position: relative;
 	border-radius: 2px;
 	padding-top: 0;

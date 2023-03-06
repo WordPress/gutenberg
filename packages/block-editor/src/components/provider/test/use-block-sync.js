@@ -14,7 +14,17 @@ import { render } from '@testing-library/react';
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
+
 import { store as blockEditorStore } from '../../../store';
+jest.mock( '../../../store/actions', () => {
+	const actions = jest.requireActual( '../../../store/actions' );
+	return {
+		...actions,
+		resetBlocks: jest.fn( actions.resetBlocks ),
+		replaceInnerBlocks: jest.fn( actions.replaceInnerBlocks ),
+		setHasControlledInnerBlocks: jest.fn( actions.replaceInnerBlocks ),
+	};
+} );
 
 const TestWrapper = withRegistryProvider( ( props ) => {
 	if ( props.setRegistry ) {

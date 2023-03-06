@@ -2,7 +2,7 @@
 
 ## Overview
 
-A block typically inserts markup (HTML) into post content that you want to style in someway. This guides walks through a few different ways you can use CSS with the block editor and how to work with styles and stylesheets.
+A block typically inserts markup (HTML) into post content that you want to style in some way. This guide walks through a few different ways you can use CSS with the block editor and how to work with styles and stylesheets.
 
 ## Before you start
 
@@ -156,6 +156,37 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 		},
 	} );
 } )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+```
+
+{% end %}
+
+### Build or add dependency
+
+In order to include the blockEditor as a dependency, make sure to run the build step, or update the asset php file.
+
+{% codetabs %}
+{% JSX %}
+
+Build the scripts and update the asset file which is used to keep track of dependencies and the build version.
+```bash
+npm run build
+```
+
+{% Plain %}
+
+Edit the asset file to include the block-editor dependency for the scripts.
+
+```php
+<?php return
+	array( 'dependencies' =>
+		array(
+			'wp-blocks',
+			'wp-element',
+			'wp-block-editor',
+			'wp-polyfill'
+		),
+		'version' => '0.1'
+	);
 ```
 
 {% end %}

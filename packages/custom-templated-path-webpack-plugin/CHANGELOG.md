@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+## 2.13.0 (2023-03-06)
+
+### Deprecations
+
+-   This plugin is deprecated for webpack 5. Please use [`output.filename`](https://webpack.js.org/configuration/output/#outputfilename) instead.
+
+## 2.12.0 (2023-03-01)
+
+## 2.11.0 (2023-02-15)
+
+## 2.10.0 (2023-02-01)
+
+## 2.9.0 (2023-01-11)
+
+## 2.8.0 (2023-01-02)
+
+## 2.7.0 (2022-12-14)
+
+## 2.6.0 (2022-11-16)
+
+## 2.5.0 (2022-11-02)
+
 ## 2.4.0 (2022-10-19)
 
 ## 2.3.0 (2022-10-05)

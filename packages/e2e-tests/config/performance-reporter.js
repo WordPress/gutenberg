@@ -36,6 +36,7 @@ class PerformanceReporter {
 			firstContentfulPaint,
 			firstBlock,
 			type,
+			typeContainer,
 			focus,
 			listViewOpen,
 			inserterOpen,
@@ -68,7 +69,7 @@ Average time to first block: ${ success(
 		if ( type && type.length ) {
 			// eslint-disable-next-line no-console
 			console.log( `
-${ title( 'Typing Performance:' ) }
+${ title( 'Typing:' ) }
 Average time to type character: ${ success( round( average( type ) ) + 'ms' ) }
 Slowest time to type character: ${ success(
 				round( Math.max( ...type ) ) + 'ms'
@@ -78,10 +79,25 @@ Fastest time to type character: ${ success(
 			) }` );
 		}
 
+		if ( typeContainer && typeContainer.length ) {
+			// eslint-disable-next-line no-console
+			console.log( `
+${ title( 'Typing within a container:' ) }
+Average time to type within a container: ${ success(
+				round( average( typeContainer ) ) + 'ms'
+			) }
+Slowest time to type within a container: ${ success(
+				round( Math.max( ...typeContainer ) ) + 'ms'
+			) }
+Fastest time to type within a container: ${ success(
+				round( Math.min( ...typeContainer ) ) + 'ms'
+			) }` );
+		}
+
 		if ( focus && focus.length ) {
 			// eslint-disable-next-line no-console
 			console.log( `
-${ title( 'Block Selection Performance:' ) }
+${ title( 'Block Selection:' ) }
 Average time to select a block: ${ success( round( average( focus ) ) + 'ms' ) }
 Slowest time to select a block: ${ success(
 				round( Math.max( ...focus ) ) + 'ms'
@@ -94,7 +110,7 @@ Fastest time to select a block: ${ success(
 		if ( listViewOpen && listViewOpen.length ) {
 			// eslint-disable-next-line no-console
 			console.log( `
-${ title( 'Opening List View Performance:' ) }
+${ title( 'Opening List View:' ) }
 Average time to open list view: ${ success(
 				round( average( listViewOpen ) ) + 'ms'
 			) }
@@ -109,7 +125,7 @@ Fastest time to open list view: ${ success(
 		if ( inserterOpen && inserterOpen.length ) {
 			// eslint-disable-next-line no-console
 			console.log( `
-${ title( 'Opening Global Inserter Performance:' ) }
+${ title( 'Opening Global Inserter:' ) }
 Average time to open global inserter: ${ success(
 				round( average( inserterOpen ) ) + 'ms'
 			) }
@@ -124,7 +140,7 @@ Fastest time to open global inserter: ${ success(
 		if ( inserterSearch && inserterSearch.length ) {
 			// eslint-disable-next-line no-console
 			console.log( `
-${ title( 'Inserter Search Performance:' ) }
+${ title( 'Inserter Search:' ) }
 Average time to type the inserter search input: ${ success(
 				round( average( inserterSearch ) ) + 'ms'
 			) }
@@ -139,7 +155,7 @@ Fastest time to type the inserter search input: ${ success(
 		if ( inserterHover && inserterHover.length ) {
 			// eslint-disable-next-line no-console
 			console.log( `
-${ title( 'Inserter Block Item Hover Performance:' ) }
+${ title( 'Inserter Block Item Hover:' ) }
 Average time to move mouse between two block item in the inserter: ${ success(
 				round( average( inserterHover ) ) + 'ms'
 			) }

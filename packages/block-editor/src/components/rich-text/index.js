@@ -19,12 +19,9 @@ import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
 	__unstableCreateElement,
-	isEmpty,
-	isCollapsed,
 	removeFormat,
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { Popover } from '@wordpress/components';
 
 /**
@@ -39,11 +36,13 @@ import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
 import { useBeforeInputRules } from './use-before-input-rules';
 import { useInputRules } from './use-input-rules';
+import { useDelete } from './use-delete';
 import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
 import { useShortcuts } from './use-shortcuts';
 import { useInputEvents } from './use-input-events';
+import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
@@ -97,7 +96,6 @@ function RichTextWrapper(
 		onReplace,
 		placeholder,
 		allowedFormats,
-		formattingControls,
 		withoutInteractiveFormatting,
 		onRemove,
 		onMerge,
@@ -110,7 +108,6 @@ function RichTextWrapper(
 		__unstableEmbedURLOnPaste,
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
-		unstableOnFocus,
 		__unstableAllowPrefixTransformations,
 		...props
 	},
@@ -165,7 +162,6 @@ function RichTextWrapper(
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
-		formattingControls,
 		disableFormats,
 	} );
 	const hasFormats =
@@ -282,6 +278,7 @@ function RichTextWrapper(
 
 	const {
 		value,
+		getValue,
 		onChange,
 		ref: richTextRef,
 	} = useRichText( {
@@ -317,45 +314,6 @@ function RichTextWrapper(
 	const keyboardShortcuts = useRef( new Set() );
 	const inputEvents = useRef( new Set() );
 
-	function onKeyDown( event ) {
-		const { keyCode } = event;
-
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			const { start, end, text } = value;
-			const isReverse = keyCode === BACKSPACE;
-			const hasActiveFormats =
-				value.activeFormats && !! value.activeFormats.length;
-
-			// Only process delete if the key press occurs at an uncollapsed edge.
-			if (
-				! isCollapsed( value ) ||
-				hasActiveFormats ||
-				( isReverse && start !== 0 ) ||
-				( ! isReverse && end !== text.length )
-			) {
-				return;
-			}
-
-			if ( onMerge ) {
-				onMerge( ! isReverse );
-			}
-
-			// Only handle remove on Backspace. This serves dual-purpose of being
-			// an intentional user interaction distinguishing between Backspace and
-			// Delete to remove the empty field, but also to avoid merge & remove
-			// causing destruction of two fields (merge, then removed merged).
-			if ( onRemove && isEmpty( value ) && isReverse ) {
-				onRemove( ! isReverse );
-			}
-
-			event.preventDefault();
-		}
-	}
-
 	function onFocus() {
 		anchorRef.current?.focus();
 	}
@@ -369,6 +327,7 @@ function RichTextWrapper(
 						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 							{ children &&
 								children( { value, onChange, onFocus } ) }
+
 							<FormatEdit
 								value={ value }
 								onChange={ onChange }
@@ -401,13 +360,14 @@ function RichTextWrapper(
 					richTextRef,
 					useBeforeInputRules( { value, onChange } ),
 					useInputRules( {
-						value,
+						getValue,
 						onChange,
 						__unstableAllowPrefixTransformations,
 						formatTypes,
 						onReplace,
 						selectionChange,
 					} ),
+					useInsertReplacementText(),
 					useRemoveBrowserShortcuts(),
 					useShortcuts( keyboardShortcuts ),
 					useInputEvents( inputEvents ),
@@ -426,6 +386,11 @@ function RichTextWrapper(
 						multilineTag,
 						preserveWhiteSpace,
 						pastePlainText,
+					} ),
+					useDelete( {
+						value,
+						onMerge,
+						onRemove,
 					} ),
 					useEnter( {
 						removeEditorOnlyFormats,
@@ -448,8 +413,6 @@ function RichTextWrapper(
 					props.className,
 					'rich-text'
 				) }
-				onFocus={ unstableOnFocus }
-				onKeyDown={ onKeyDown }
 			/>
 		</>
 	);

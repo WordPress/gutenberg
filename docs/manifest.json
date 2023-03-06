@@ -234,7 +234,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Getting Started with JavaScript",
+		"title": "How to use JavaScript with the Block Editor",
 		"slug": "javascript",
 		"markdown_source": "../docs/how-to-guides/javascript/README.md",
 		"parent": "how-to-guides"
@@ -642,12 +642,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "BaseField",
-		"slug": "base-field",
-		"markdown_source": "../packages/components/src/base-field/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "BorderBoxControl",
 		"slug": "border-box-control",
 		"markdown_source": "../packages/components/src/border-box-control/border-box-control/README.md",
@@ -717,6 +711,12 @@
 		"title": "CheckboxControl",
 		"slug": "checkbox-control",
 		"markdown_source": "../packages/components/src/checkbox-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CircularOptionPicker",
+		"slug": "circular-option-picker",
+		"markdown_source": "../packages/components/src/circular-option-picker/README.md",
 		"parent": "components"
 	},
 	{
@@ -1068,6 +1068,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigatorToParentButton",
+		"slug": "navigator-to-parent-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-to-parent-button/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Notice",
 		"slug": "notice",
 		"markdown_source": "../packages/components/src/notice/README.md",
@@ -1230,12 +1236,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "Theme",
-		"slug": "theme",
-		"markdown_source": "../packages/components/src/theme/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "ToggleControl",
 		"slug": "toggle-control",
 		"markdown_source": "../packages/components/src/toggle-control/README.md",
@@ -1268,31 +1268,31 @@
 	{
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
-		"markdown_source": "../packages/components/src/toolbar-button/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-button/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarDropdownMenu",
 		"slug": "toolbar-dropdown-menu",
-		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-dropdown-menu/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarGroup",
 		"slug": "toolbar-group",
-		"markdown_source": "../packages/components/src/toolbar-group/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-group/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarItem",
 		"slug": "toolbar-item",
-		"markdown_source": "../packages/components/src/toolbar-item/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-item/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "Toolbar",
 		"slug": "toolbar",
-		"markdown_source": "../packages/components/src/toolbar/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1620,12 +1620,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/experiments",
-		"slug": "packages-experiments",
-		"markdown_source": "../packages/experiments/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",
@@ -1734,12 +1728,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/nux",
-		"slug": "packages-nux",
-		"markdown_source": "../packages/nux/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
@@ -1785,6 +1773,12 @@
 		"title": "@wordpress/priority-queue",
 		"slug": "packages-priority-queue",
 		"markdown_source": "../packages/priority-queue/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/private-apis",
+		"slug": "packages-private-apis",
+		"markdown_source": "../packages/private-apis/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1974,12 +1968,6 @@
 		"parent": "data"
 	},
 	{
-		"title": "The NUX (New User Experience) Data",
-		"slug": "data-core-nux",
-		"markdown_source": "../docs/reference-guides/data/data-core-nux.md",
-		"parent": "data"
-	},
-	{
 		"title": "Preferences",
 		"slug": "data-core-preferences",
 		"markdown_source": "../docs/reference-guides/data/data-core-preferences.md",
@@ -2134,6 +2122,24 @@
 		"slug": "testing-overview",
 		"markdown_source": "../docs/contributors/code/testing-overview.md",
 		"parent": "code"
+	},
+	{
+		"title": "End-to-End Testing",
+		"slug": "e2e",
+		"markdown_source": "../docs/contributors/code/e2e/README.md",
+		"parent": "testing-overview"
+	},
+	{
+		"title": "Migration guide",
+		"slug": "migration",
+		"markdown_source": "../docs/contributors/code/e2e/migration.md",
+		"parent": "e2e"
+	},
+	{
+		"title": "Overusing snapshots",
+		"slug": "overusing-snapshots",
+		"markdown_source": "../docs/contributors/code/e2e/overusing-snapshots.md",
+		"parent": "e2e"
 	},
 	{
 		"title": "Block Grammar",

@@ -10,20 +10,25 @@ import { View } from '../../view';
 import { Flex, FlexBlock, FlexItem } from '../';
 
 describe( 'props', () => {
-	beforeEach( () => {
+	test( 'should render correctly', () => {
 		render(
 			<Flex data-testid="base-flex">
 				<FlexItem>Item</FlexItem>
 				<FlexBlock>Item</FlexBlock>
 			</Flex>
 		);
-	} );
 
-	test( 'should render correctly', () => {
 		expect( screen.getByTestId( 'base-flex' ) ).toMatchSnapshot();
 	} );
 
 	test( 'should render + wrap non Flex children', () => {
+		render(
+			<Flex data-testid="base-flex">
+				<FlexItem>Item</FlexItem>
+				<FlexBlock>Item</FlexBlock>
+			</Flex>
+		);
+
 		render(
 			<Flex data-testid="flex">
 				<FlexItem>Item</FlexItem>
@@ -40,6 +45,13 @@ describe( 'props', () => {
 
 	test( 'should render align', () => {
 		render(
+			<Flex data-testid="base-flex">
+				<FlexItem>Item</FlexItem>
+				<FlexBlock>Item</FlexBlock>
+			</Flex>
+		);
+
+		render(
 			<Flex align="flex-start" data-testid="flex">
 				<FlexItem>Item</FlexItem>
 				<FlexBlock>Item</FlexBlock>
@@ -52,6 +64,13 @@ describe( 'props', () => {
 
 	test( 'should render justify', () => {
 		render(
+			<Flex data-testid="base-flex">
+				<FlexItem>Item</FlexItem>
+				<FlexBlock>Item</FlexBlock>
+			</Flex>
+		);
+
+		render(
 			<Flex justify="flex-start" data-testid="flex">
 				<FlexItem>Item</FlexItem>
 				<FlexBlock>Item</FlexBlock>
@@ -63,6 +82,13 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render spacing', () => {
+		render(
+			<Flex data-testid="base-flex">
+				<FlexItem>Item</FlexItem>
+				<FlexBlock>Item</FlexBlock>
+			</Flex>
+		);
+
 		render(
 			<>
 				<Flex>

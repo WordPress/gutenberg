@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { reduce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -333,18 +328,16 @@ export const hideBlockTypes =
 	};
 
 /**
- * Returns an action object used in signaling
- * what Meta boxes are available in which location.
+ * Stores info about which Meta boxes are available in which location.
  *
  * @param {Object} metaBoxesPerLocation Meta boxes per location.
  */
-export const setAvailableMetaBoxesPerLocation =
-	( metaBoxesPerLocation ) =>
-	( { dispatch } ) =>
-		dispatch( {
-			type: 'SET_META_BOXES_PER_LOCATIONS',
-			metaBoxesPerLocation,
-		} );
+export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
+	return {
+		type: 'SET_META_BOXES_PER_LOCATIONS',
+		metaBoxesPerLocation,
+	};
+}
 
 /**
  * Update a metabox.
@@ -387,16 +380,12 @@ export const requestMetaBoxUpdates =
 		];
 
 		// Merge all form data objects into a single one.
-		const formData = reduce(
-			formDataToMerge,
-			( memo, currentFormData ) => {
-				for ( const [ key, value ] of currentFormData ) {
-					memo.append( key, value );
-				}
-				return memo;
-			},
-			new window.FormData()
-		);
+		const formData = formDataToMerge.reduce( ( memo, currentFormData ) => {
+			for ( const [ key, value ] of currentFormData ) {
+				memo.append( key, value );
+			}
+			return memo;
+		}, new window.FormData() );
 		additionalData.forEach( ( [ key, value ] ) =>
 			formData.append( key, value )
 		);

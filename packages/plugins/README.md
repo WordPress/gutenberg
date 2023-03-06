@@ -174,7 +174,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPPlugin`: The previous plugin settings object, if it has been successfully unregistered; otherwise `undefined`.
+-   `WPPlugin | undefined`: The previous plugin settings object, if it has been successfully unregistered; otherwise `undefined`.
 
 #### withPluginContext
 

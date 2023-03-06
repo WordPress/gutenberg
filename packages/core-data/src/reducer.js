@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { map, groupBy, isEqual, get } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
+import { groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -67,10 +68,7 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 				},
 				queries: {
 					...state.queries,
-					[ action.queryID ]: map(
-						action.users,
-						( user ) => user.id
-					),
+					[ action.queryID ]: action.users.map( ( user ) => user.id ),
 				},
 			};
 	}
@@ -245,18 +243,14 @@ function entity( entityConfig ) {
 										// Edits are the "raw" attribute values, but records may have
 										// objects with more properties, so we use `get` here for the
 										// comparison.
-										! isEqual(
+										! fastDeepEqual(
 											edits[ key ],
-											get(
-												record[ key ],
-												'raw',
-												record[ key ]
-											)
+											record[ key ]?.raw ?? record[ key ]
 										) &&
 										// Sometimes the server alters the sent value which means
 										// we need to also remove the edits before the api request.
 										( ! action.persistedEdits ||
-											! isEqual(
+											! fastDeepEqual(
 												edits[ key ],
 												action.persistedEdits[ key ]
 											) )

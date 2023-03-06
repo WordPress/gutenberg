@@ -222,6 +222,8 @@ export default function SpacingInputControl( {
 					<UnitControl
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
+						onFocus={ onMouseOver }
+						onBlur={ onMouseOut }
 						onChange={ ( newSize ) =>
 							onChange( getNewCustomValue( newSize ) )
 						}
@@ -233,13 +235,14 @@ export default function SpacingInputControl( {
 						label={ ariaLabel }
 						hideLabelFromVision={ true }
 						className="components-spacing-sizes-control__custom-value-input"
-						style={ { gridColumn: '1' } }
 						size={ '__unstable-large' }
 					/>
 
 					<RangeControl
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
+						onFocus={ onMouseOver }
+						onBlur={ onMouseOut }
 						value={ customRangeValue }
 						min={ 0 }
 						max={ CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.max ?? 10 }
@@ -249,6 +252,7 @@ export default function SpacingInputControl( {
 						withInputField={ false }
 						onChange={ handleCustomValueSliderChange }
 						className="components-spacing-sizes-control__custom-value-range"
+						__nextHasNoMarginBottom
 					/>
 				</>
 			) }
@@ -278,6 +282,8 @@ export default function SpacingInputControl( {
 					label={ ariaLabel }
 					hideLabelFromVision={ true }
 					__nextHasNoMarginBottom={ true }
+					onFocus={ onMouseOver }
+					onBlur={ onMouseOut }
 				/>
 			) }
 			{ ! showRangeControl && ! showCustomValueControl && (
@@ -303,6 +309,8 @@ export default function SpacingInputControl( {
 					size={ '__unstable-large' }
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
+					onFocus={ onMouseOver }
+					onBlur={ onMouseOut }
 				/>
 			) }
 		</>

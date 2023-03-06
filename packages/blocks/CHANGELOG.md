@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 12.5.0 (2023-03-01)
+
+## 12.4.0 (2023-02-15)
+
+## 12.3.0 (2023-02-01)
+
+## 12.2.0 (2023-01-11)
+
+## 12.1.0 (2023-01-02)
+
+## 12.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 11.21.0 (2022-11-16)
+
+## 11.20.0 (2022-11-02)
+
 ## 11.19.0 (2022-10-19)
 
 ## 11.18.0 (2022-10-05)
@@ -29,7 +49,7 @@
 
 ### Deprecations
 
--   `withBlockContentContext` is no longer used by the block editor and therefore got deprecated ([#41395](https://github.com/WordPress/gutenberg/pull/3204139530)).
+-   `withBlockContentContext` is no longer used by the block editor and therefore got deprecated ([#41395](https://github.com/WordPress/gutenberg/pull/41395)).
 
 ### New API
 

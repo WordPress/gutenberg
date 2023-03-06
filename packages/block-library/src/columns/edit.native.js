@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View, Dimensions } from 'react-native';
-import { map } from 'lodash';
+
 /**
  * WordPress dependencies
  */
@@ -332,11 +332,6 @@ const ColumnsEditContainerWrapper = withDispatch(
 				width: value,
 			} );
 		},
-		updateBlockSettings( settings ) {
-			const { clientId } = ownProps;
-			const { updateBlockListSettings } = dispatch( blockEditorStore );
-			updateBlockListSettings( clientId, settings );
-		},
 		/**
 		 * Updates the column columnCount, including necessary revisions to child Column
 		 * blocks to grant required or redistribute available space.
@@ -450,7 +445,7 @@ const ColumnsEdit = ( props ) => {
 	const {
 		columnCount,
 		isDefaultColumns,
-		innerWidths = [],
+		innerBlocks,
 		hasParents,
 		parentBlockAlignment,
 		editorSidebarOpened,
@@ -463,24 +458,20 @@ const ColumnsEdit = ( props ) => {
 				getBlockAttributes,
 			} = select( blockEditorStore );
 			const { isEditorSidebarOpened } = select( 'core/edit-post' );
-			const innerBlocks = getBlocks( clientId );
 
-			const isContentEmpty = map(
-				innerBlocks,
-				( innerBlock ) => innerBlock.innerBlocks.length
+			const innerBlocksList = getBlocks( clientId );
+
+			const isContentEmpty = innerBlocksList.every(
+				( innerBlock ) => innerBlock.innerBlocks.length === 0
 			);
 
-			const innerColumnsWidths = innerBlocks.map( ( inn ) => ( {
-				clientId: inn.clientId,
-				attributes: { width: inn.attributes.width },
-			} ) );
 			const parents = getBlockParents( clientId, true );
 
 			return {
 				columnCount: getBlockCount( clientId ),
-				isDefaultColumns: ! isContentEmpty.filter( Boolean ).length,
-				innerWidths: innerColumnsWidths,
-				hasParents: !! parents.length,
+				isDefaultColumns: isContentEmpty,
+				innerBlocks: innerBlocksList,
+				hasParents: parents.length > 0,
 				parentBlockAlignment: getBlockAttributes( parents[ 0 ] )?.align,
 				editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			};
@@ -488,13 +479,14 @@ const ColumnsEdit = ( props ) => {
 		[ clientId, isSelected ]
 	);
 
-	const memoizedInnerWidths = useMemo( () => {
-		return innerWidths;
-	}, [
-		// The JSON.stringify is used because innerWidth is always a new reference.
-		// The innerBlocks is a new reference after each attribute change of any nested block.
-		JSON.stringify( innerWidths ),
-	] );
+	const innerWidths = useMemo(
+		() =>
+			innerBlocks.map( ( inn ) => ( {
+				clientId: inn.clientId,
+				attributes: { width: inn.attributes.width },
+			} ) ),
+		[ innerBlocks ]
+	);
 
 	const [ isVisible, setIsVisible ] = useState( false );
 
@@ -514,7 +506,7 @@ const ColumnsEdit = ( props ) => {
 		<View style={ style }>
 			<ColumnsEditContainerWrapper
 				columnCount={ columnCount }
-				innerWidths={ memoizedInnerWidths }
+				innerWidths={ innerWidths }
 				hasParents={ hasParents }
 				parentBlockAlignment={ parentBlockAlignment }
 				editorSidebarOpened={ editorSidebarOpened }

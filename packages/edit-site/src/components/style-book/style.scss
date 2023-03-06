@@ -1,0 +1,78 @@
+.edit-site-style-book {
+	background: $white; // Fallback color, overriden by JavaScript.
+	border-radius: $radius-block-ui;
+	bottom: 0;
+	left: 0;
+	overflow: hidden;
+	position: absolute;
+	right: 0;
+	top: 0;
+	transition: all 0.3s; // Match .block-editor-iframe__body transition.
+}
+
+.edit-site-style-book__close-button {
+	position: absolute;
+	right: $grid-unit-10;
+	top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
+}
+
+.edit-site-style-book__tab-panel {
+	.components-tab-panel__tabs {
+		background: $white;
+		color: $gray-900;
+	}
+
+	.components-tab-panel__tab-content {
+		bottom: 0;
+		left: 0;
+		overflow: auto;
+		padding: $grid-unit-40;
+		position: absolute;
+		right: 0;
+		top: $grid-unit-60; // Height of tabs.
+	}
+}
+
+.edit-site-style-book__examples {
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+.edit-site-style-book__example {
+	background: none;
+	border-radius: $radius-block-ui;
+	border: none;
+	color: inherit;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-50;
+	margin-bottom: $grid-unit-50;
+	padding: $grid-unit-20;
+	width: 100%;
+
+	&.is-selected {
+		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+	}
+
+	.edit-site-style-book.is-wide & {
+		flex-direction: row;
+	}
+}
+
+.edit-site-style-book__example-title {
+	font-size: 11px;
+	font-weight: 500;
+	margin: 0;
+	text-align: left;
+	text-transform: uppercase;
+
+	.edit-site-style-book.is-wide & {
+		text-align: right;
+		width: 120px;
+	}
+}
+
+.edit-site-style-book__example-preview {
+	width: 100%;
+}

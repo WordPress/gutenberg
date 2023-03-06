@@ -31,9 +31,7 @@ describe( 'DropdownMenu', () => {
 	} );
 
 	it( 'should open menu when pressing arrow down on the toggle and the controls prop is used to define menu items', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const controls = [
 			{
@@ -65,11 +63,10 @@ describe( 'DropdownMenu', () => {
 
 		await user.keyboard( '[ArrowDown]' );
 
-		let menu;
-		await waitFor( () => {
-			menu = screen.getByRole( 'menu' );
-			return expect( menu ).toBeVisible();
-		} );
+		const menu = screen.getByRole( 'menu' );
+
+		// we need to wait because showing the dropdown is animated
+		await waitFor( () => expect( menu ).toBeVisible() );
 
 		expect( within( menu ).getAllByRole( 'menuitem' ) ).toHaveLength(
 			controls.length
@@ -77,9 +74,7 @@ describe( 'DropdownMenu', () => {
 	} );
 
 	it( 'should open menu when pressing arrow down on the toggle and the children prop is used to define menu items', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<DropdownMenu
@@ -87,16 +82,15 @@ describe( 'DropdownMenu', () => {
 			/>
 		);
 
-		const button = screen.getByRole( 'button' );
-		button.focus();
+		// Move focus on the toggle button
+		await user.tab();
 
 		await user.keyboard( '[ArrowDown]' );
 
-		let menu;
-		await waitFor( () => {
-			menu = screen.getByRole( 'menu' );
-			return expect( menu ).toBeVisible();
-		} );
+		const menu = screen.getByRole( 'menu' );
+
+		// we need to wait because showing the dropdown is animated
+		await waitFor( () => expect( menu ).toBeVisible() );
 
 		// Clicking the menu item will close the dropdown menu
 		await user.click( within( menu ).getByRole( 'menuitem' ) );

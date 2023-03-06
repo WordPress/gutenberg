@@ -12,11 +12,30 @@ Users have the ability to lock and unlock blocks via the editor. The locking UI 
 
 ![Image of locking interface](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/Locking%20interface.png?raw=true)
 
-Keep in mind that each block you want to lock will need to be individually locked as desired. There is not a way to mass lock blocks currently. 
+Keep in mind that you can apply locking options to blocks nested inside of a containing block by turning on the "Apply to all blocks inside" option. However, you cannot mass lock blocks otherwise.
 
-**Lock patterns or templates**
+**Lock the ability to edit certain blocks**
+
+Alongside the ability to lock moving or removing blocks, the [Navigation Block](https://github.com/WordPress/gutenberg/pull/44739) and [Reusable block](https://github.com/WordPress/gutenberg/pull/39950) have an additional capability: lock the ability to edit the contents of the block. This locks the ability to make changes to any blocks inside of either block type. 
+
+**Apply block locking to patterns or templates**
 
 When building patterns or templates, theme authors can use these same UI tools to set the default locked state of blocks. For example, a theme author could lock various pieces of a header. Keep in mind that by default, users with editing access can unlock these blocks. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways and here’s more context on [creating a template with locked blocks](https://make.wordpress.org/core/2022/02/09/core-editor-improvement-curated-experiences-with-locking-apis-theme-json/). You can build these patterns in the editor itself, including adding locking options, before following the [documentation to register them](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-patterns/).
+
+**Apply content only editing in patterns or templates**
+
+This functionality was introduced in WordPress 6.1. In contrast to block locking, which disables the ability to move or remove blocks, content only editing is both designed for use at the pattern or template level and hides all design tools, while still allowing for the ability to edit the content of the blocks. This provides a great way to simplify the interface for users and preserve a design. When this option is added, the following changes occur:  
+
+- Non-content child blocks (containers, spacers, columns, etc) are hidden from list view, un-clickable on the canvas, and entirely un-editable.
+- The Inspector will display a list of all child 'content' blocks. Clicking a block in this list reveals its settings panel. 
+- The main List View only shows content blocks, all at the same level regardless of actual nesting.
+- Children blocks within the overall content locked container are automatically move / remove locked.
+- Additional child blocks cannot be inserted, further preserving the design and layout.
+- There is a link in the block toolbar to ‘Modify’ that a user can toggle on/off to have access to the broader design tools. Currently, it's not possibly to programmatically remove this option.
+
+This option can be applied to Columns, Cover, and Group blocks as well as third-party blocks that have the templateLock attribute in its block.json. To adopt this functionality, you need to use `"templateLock":"contentOnly"`. [Here's an example of a pattern](https://gist.github.com/annezazu/d62acd2514cea558be6cea97fe28ff3c) with this functionality in place. For more information, please [review the relevant documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-templates/#locking). 
+
+Note: There is no UI in place to manage content locking and it must be managed at the code level. 
 
 **Change permissions to control locking ability**
 
@@ -111,31 +130,31 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
-	      "color": {
-              	"custom": true,
-              	"customDuotone": true
-        	},
+		"color": {
+			"custom": true,
+			"customDuotone": true
+		},
 		"blocks": {
-              	"core/post-featured-image": {
-                   		"color": {
-                          		"duotone": [
+			"core/post-featured-image": {
+				"color": {
+					"duotone": [
 						{
-                   		 			"colors": [ "#282828", "#ff5837" ],
-                   		 			"slug": "black-and-orange",
-                   		 			"name": "Black and Orange"
-               				},
+							"colors": [ "#282828", "#ff5837" ],
+							"slug": "black-and-orange",
+							"name": "Black and Orange"
+						},
 						{
-                   		 			"colors": [ "#282828", "#0288d1" ],
-                   		 			"slug": "black-and-blue", 
-                   		 			"name": "Black and Blue"
-               				}
+							"colors": [ "#282828", "#0288d1" ],
+							"slug": "black-and-blue", 
+							"name": "Black and Blue"
+						}
 					],
-                          		"customDuotone": true,
-                          		"custom": true
+					"customDuotone": true,
+					"custom": true
 				}
 			}
-} 
-}
+		}
+	}
 }
 ```
 
@@ -146,31 +165,31 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
-	      "color": {
-              	"custom": true,
-              	"customDuotone": true
-},	
+		"color": {
+			"custom": true,
+			"customDuotone": true
+		},	
 		"blocks": {
-              	"core/post-featured-image": {
-                   		"color": {
-                          		"duotone": [
+			"core/post-featured-image": {
+				"color": {
+					"duotone": [
 						{
-                   		 			"colors": [ "#282828", "#ff5837" ],
-                   		 			"slug": "black-and-orange",
-                   		 			"name": "Black and Orange"
-               				},
+							"colors": [ "#282828", "#ff5837" ],
+							"slug": "black-and-orange",
+							"name": "Black and Orange"
+						},
 						{
-                   		 			"colors": [ "#282828", "#0288d1" ],
-                   		 			"slug": "black-and-blue",
-                   		 			"name": "Black and Blue"
-               				}
+							"colors": [ "#282828", "#0288d1" ],
+							"slug": "black-and-blue",
+							"name": "Black and Blue"
+						}
 					],
-                          		"customDuotone": false,
-                          		"custom": false
+					"customDuotone": false,
+					"custom": false
 				}
 			}
-} 
-}
+		} 
+	}
 }
 ```
 
@@ -189,27 +208,27 @@ Continuing the examples with duotone, this means you could allow full access to 
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
-	      "color": {
-            		"custom": true,
-      			"customDuotone": true
-        	},
+		"color": {
+			"custom": true,
+			"customDuotone": true
+		},
 		"blocks": {
-           	"core/image": {
-           		"color": {
-                      	"duotone": [],
-                      	"customDuotone": true,
-                 		"custom": true
+			"core/image": {
+				"color": {
+					"duotone": [],
+					"customDuotone": true,
+					"custom": true
 				}
 			},
 			"core/post-featured-image": {
-                 	"color": {
-                      	"duotone": [],
-                      	"customDuotone": false,
-                      	"custom": false
+				"color": {
+					"duotone": [],
+					"customDuotone": false,
+					"custom": false
 				}
 			}
-} 
-}
+		}
+	}
 }
 ```
 
@@ -263,6 +282,52 @@ When using theme.json in a block or classic theme, these settings will stop the 
 
 To enable something from the above, just set whatever value you want to change to `true` for more granularity.
 
+## Limiting interface options with theme.json filters
+
+The theme.json file is a great way to control interface options, but it only allows for global or block-level modifications, which can be limiting in some scenarios.
+
+For instance, in the previous section, color and typography controls were disabled globally using theme.json. But let's say you want to enable color settings for users who are Administrators. 
+
+To provide more flexibility, WordPress 6.1 introduced server-side filters allowing you to customize theme.json data at four different data layers.
+
+- [`wp_theme_json_data_default`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_default/) - Hooks into the default data provided by WordPress
+- [`wp_theme_json_data_blocks`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_blocks/) - Hooks into the data provided by blocks.
+- [`wp_theme_json_data_theme`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_theme/) - Hooks into the data provided by the current theme.
+- [`wp_theme_json_data_user`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_user/) - Hooks into the data provided by the user.
+
+In the following example, the data from the current theme's theme.json file is updated using the `wp_theme_json_data_theme` filter. Color controls are restored if the current user is an Administrator.
+
+```
+// Disable color controls for all users except Administrators.
+function example_filter_theme_json_data_theme( $theme_json ){
+    $is_administrator = current_user_can( 'edit_theme_options' );
+
+    if ( $is_administrator ) {
+        $new_data = array(
+            'version'  => 2,
+            'settings' => array(
+                'color' => array(
+                    'background'       => true,
+                    'custom'           => true,
+                    'customDuotone'    => true,
+                    'customGradient'   => true,
+                    'defaultGradients' => true,
+                    'defaultPalette'   => true,
+                    'text'             => true,
+                ),
+            ),
+        );
+    }
+
+	return $theme_json->update_with( $new_data );
+}
+add_filter( 'wp_theme_json_data_theme', 'example_filter_theme_json_data_theme' );
+```
+
+The filter receives an instance of the `WP_Theme_JSON_Data class` with the data for the respective layer. Then, you pass new data in a valid theme.json-like structure to the `update_with( $new_data )` method. A theme.json version number is required in `$new_data`. 
+
+Read more about this functionality in the [Filters for theme.json data dev note](https://make.wordpress.org/core/2022/10/10/filters-for-theme-json-data/).
+
 ## Remove access to functionality
 
 **Remove access to the template editor**
@@ -285,11 +350,13 @@ To fully remove patterns bundled with WordPress core from being accessed in the 
 
 ## Utilizing patterns
 
-**Prioritize post content patterns for new pages**
+**Prioritize starter patterns for any post type**
 
-When a user creates a page, they are met with an empty page. However, that experience can be improved thanks to the option to have patterns from a specific type prioritized upon page creation in a modal. The modal appears each time the user creates a new page when there are patterns on their website that declare support for the core/post-content block types. By default, WordPress 6.0  does not include any of these patterns, so the modal will not appear without some of these post content patterns being added.
+When a user creates new content, regardless of post type, they are met with an empty canvas. However, that experience can be improved thanks to the option to have patterns from a specific type prioritized upon creation of a new piece of content. The modal appears each time the user creates a new item when there are patterns on their website that declare support for the `core/post-content` block types. By default, WordPress does not include any of these patterns, so the modal will not appear without at least two of these post content patterns being added. 
 
-Read more about this functionality in the [Page creation patterns in WordPress 6.0 dev note](https://make.wordpress.org/core/2022/05/03/page-creation-patterns-in-wordpress-6-0/).
+To opt into this, include `core/post-content` in the Block Types for your pattern. From there you can control which post types the pattern should show up for via the Post Types option. [Here's an example of a pattern](https://gist.github.com/annezazu/ead4c4965345251ec999b716c0c84f32) that would appear when creating a new post. 
+
+Read more about this functionality in the [Page creation patterns in WordPress 6.0 dev note](https://make.wordpress.org/core/2022/05/03/page-creation-patterns-in-wordpress-6-0/) and [note that WordPress 6.1 brought this functionality to all post types](https://make.wordpress.org/core/2022/10/10/miscellaneous-editor-changes-for-wordpress-6-1/#start-content-patterns-for-all-post-types).  
 
 **Lock patterns**
 
@@ -315,3 +382,4 @@ Keep in mind that the above approaches can be combined as you see fit. For examp
 
 - [Builder Basics – Working with Templates in Full Site Editing (Part 3)](https://wordpress.tv/2022/05/24/nick-diego-builder-basics-working-with-templates-in-full-site-editing-part-3/)
 - [Core Editor Improvement: Curated experiences with locking APIs & theme.json](https://make.wordpress.org/core/2022/02/09/core-editor-improvement-curated-experiences-with-locking-apis-theme-json/)
+- [Learn WordPress session on Curating the Editor Experience](https://wordpress.tv/2022/07/22/nick-diego-curating-the-editor-experience/)

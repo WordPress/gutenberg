@@ -12,7 +12,7 @@ describe( 'BlockBreadcrumb', () => {
 	it( 'should render correctly', () => {
 		const { container } = render( <BlockBreadcrumb /> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	describe( 'Root label text', () => {

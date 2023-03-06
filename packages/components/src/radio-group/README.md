@@ -1,6 +1,10 @@
 # RadioGroup
 
 <div class="callout callout-alert">
+This component is deprecated. Consider using `RadioControl` or `ToggleGroupControl` instead.
+</div>
+
+<div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 

@@ -1,29 +1,50 @@
 @import "../../interface/src/style.scss";
 
+@import "./components/add-new-template/style.scss";
 @import "./components/block-editor/style.scss";
+@import "./components/canvas-spinner/style.scss";
 @import "./components/code-editor/style.scss";
 @import "./components/global-styles/style.scss";
 @import "./components/header-edit-mode/style.scss";
 @import "./components/header-edit-mode/document-actions/style.scss";
-@import "./components/navigation-sidebar/navigation-toggle/style.scss";
-@import "./components/navigation-sidebar/navigation-panel/style.scss";
 @import "./components/list/style.scss";
-@import "./components/add-new-template/style.scss";
 @import "./components/sidebar-edit-mode/style.scss";
 @import "./components/sidebar-edit-mode/settings-header/style.scss";
-@import "./components/sidebar-edit-mode/navigation-menu-sidebar/style.scss";
 @import "./components/sidebar-edit-mode/template-card/style.scss";
 @import "./components/editor/style.scss";
 @import "./components/template-details/style.scss";
 @import "./components/create-template-part-modal/style.scss";
 @import "./components/secondary-sidebar/style.scss";
 @import "./components/welcome-guide/style.scss";
+@import "./components/start-template-options/style.scss";
 @import "./components/keyboard-shortcut-help-modal/style.scss";
+@import "./components/layout/style.scss";
+@import "./components/save-hub/style.scss";
+@import "./components/save-panel/style.scss";
+@import "./components/sidebar/style.scss";
+@import "./components/sidebar-button/style.scss";
+@import "./components/sidebar-navigation-item/style.scss";
+@import "./components/sidebar-navigation-screen/style.scss";
+@import "./components/sidebar-navigation-screen-templates/style.scss";
+@import "./components/site-hub/style.scss";
+@import "./components/sidebar-navigation-screen-navigation-menus/style.scss";
+@import "./components/site-icon/style.scss";
+@import "./components/style-book/style.scss";
+@import "./hooks/push-changes-to-global-styles/style.scss";
+
+html #wpadminbar {
+	display: none;
+}
+
+html #wpbody {
+	padding-top: 0;
+}
 
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color.
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations.
 html.wp-toolbar {
 	background: $white;
+	padding-top: 0;
 }
 
 body.appearance_page_gutenberg-template-parts,
@@ -38,13 +59,15 @@ body.site-editor-php {
 }
 
 .edit-site {
+	height: 100vh;
+
 	// On mobile the main content area has to scroll, otherwise you can invoke
 	// the over-scroll bounce on the non-scrolling container, for a bad experience.
 	@include break-small {
 		bottom: 0;
 		left: 0;
 		min-height: 100vh;
-		position: absolute;
+		position: fixed;
 		right: 0;
 		top: 0;
 	}
