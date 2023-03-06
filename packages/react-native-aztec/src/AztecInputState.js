@@ -6,8 +6,10 @@ import TextInputState from 'react-native/Libraries/Components/TextInput/TextInpu
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 const focusChangeListeners = [];
+const caretChangeListeners = [];
 
 let currentFocusedElement = null;
+let currentCaretYCoordinate = null;
 
 /**
  * Adds a listener that will be called in the following cases:
@@ -44,6 +46,37 @@ export const removeFocusChangeListener = ( listener ) => {
 const notifyListeners = ( { isFocused } ) => {
 	focusChangeListeners.forEach( ( listener ) => {
 		listener( { isFocused } );
+	} );
+};
+
+/**
+ * Adds a listener that will be called when the caret's Y position
+ * changes for the focused Aztec view.
+ *
+ * @param {Function} listener
+ */
+export const addCaretChangeListener = ( listener ) => {
+	caretChangeListeners.push( listener );
+};
+
+/**
+ * Removes a listener from the caret change listeners list.
+ *
+ * @param {Function} listener
+ */
+export const removeCaretChangeListener = ( listener ) => {
+	const itemIndex = caretChangeListeners.indexOf( listener );
+	if ( itemIndex !== -1 ) {
+		caretChangeListeners.splice( itemIndex, 1 );
+	}
+};
+
+/**
+ *	Notifies listeners about caret changes in focused Aztec view.
+ */
+const notifyCaretChangeListeners = () => {
+	caretChangeListeners.forEach( ( listener ) => {
+		listener( { caretY: getCurrentCaretYCoordinate() } );
 	} );
 };
 
@@ -100,6 +133,7 @@ export const focus = ( element ) => {
  */
 export const blur = ( element ) => {
 	TextInputState.blurTextInput( element );
+	setCurrentCaretYCoordinate( null );
 	notifyInputChange();
 };
 
@@ -110,4 +144,25 @@ export const blurCurrentFocusedElement = () => {
 	if ( isFocused() ) {
 		blur( getCurrentFocusedElement() );
 	}
+};
+
+/**
+ * Sets the current focused element caret's Y coordinate.
+ *
+ * @param {?number} yCoordinate Caret's Y coordinate.
+ */
+export const setCurrentCaretYCoordinate = ( yCoordinate ) => {
+	if ( isFocused() ) {
+		currentCaretYCoordinate = yCoordinate;
+		notifyCaretChangeListeners();
+	}
+};
+
+/**
+ * Get the current focused element caret's Y coordinate.
+ *
+ * @return {?number} Current caret's Y Coordinate.
+ */
+export const getCurrentCaretYCoordinate = () => {
+	return currentCaretYCoordinate;
 };

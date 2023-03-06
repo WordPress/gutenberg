@@ -198,15 +198,10 @@ class AztecView extends Component {
 		}
 
 		if (
-			this.props.onCaretVerticalPositionChange &&
 			this.selectionEndCaretY !== event.nativeEvent.selectionEndCaretY
 		) {
 			const caretY = event.nativeEvent.selectionEndCaretY;
-			this.props.onCaretVerticalPositionChange(
-				event.nativeEvent.target,
-				caretY,
-				this.selectionEndCaretY
-			);
+			AztecInputState.setCurrentCaretYCoordinate( caretY );
 			this.selectionEndCaretY = caretY;
 		}
 	}
