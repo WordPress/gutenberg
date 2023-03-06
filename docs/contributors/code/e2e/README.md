@@ -3,7 +3,7 @@
 This living document serves to prescribe instructions and best practices for writing end-to-end (E2E) tests with Playwright in the Gutenberg project.
 
 > **Note**
-> See the dedicated guide if you're working with the previous Jest + Puppeteer framework. See the [migration guide](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/MIGRATION.md) if you're migrating tests from Jest + Puppeteer.
+> See the dedicated guide if you're working with the previous Jest + Puppeteer framework. See the [migration guide](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/migration.md) if you're migrating tests from Jest + Puppeteer.
 
 ## Running tests
 

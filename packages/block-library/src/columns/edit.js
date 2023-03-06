@@ -61,10 +61,13 @@ function ColumnsEditContainer( {
 } ) {
 	const { isStackedOnMobile, verticalAlignment } = attributes;
 
-	const { count } = useSelect(
+	const { count, canInsertColumnBlock } = useSelect(
 		( select ) => {
 			return {
 				count: select( blockEditorStore ).getBlockCount( clientId ),
+				canInsertColumnBlock: select(
+					blockEditorStore
+				).canInsertBlockType( 'core/column', clientId ),
 			};
 		},
 		[ clientId ]
@@ -94,22 +97,32 @@ function ColumnsEditContainer( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
-					<RangeControl
-						__nextHasNoMarginBottom
-						label={ __( 'Columns' ) }
-						value={ count }
-						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 1 }
-						max={ Math.max( 6, count ) }
-					/>
-					{ count > 6 && (
-						<Notice status="warning" isDismissible={ false }>
-							{ __(
-								'This column count exceeds the recommended amount and may cause visual breakage.'
+					{ canInsertColumnBlock && (
+						<>
+							<RangeControl
+								__nextHasNoMarginBottom
+								label={ __( 'Columns' ) }
+								value={ count }
+								onChange={ ( value ) =>
+									updateColumns( count, value )
+								}
+								min={ 1 }
+								max={ Math.max( 6, count ) }
+							/>
+							{ count > 6 && (
+								<Notice
+									status="warning"
+									isDismissible={ false }
+								>
+									{ __(
+										'This column count exceeds the recommended amount and may cause visual breakage.'
+									) }
+								</Notice>
 							) }
-						</Notice>
+						</>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Stack on mobile' ) }
 						checked={ isStackedOnMobile }
 						onChange={ () =>

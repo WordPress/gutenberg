@@ -22,7 +22,7 @@ export default function SiteTaglineEdit( {
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { placeholder, textAlign } = attributes;
+	const { textAlign } = attributes;
 	const { canUserEdit, tagline } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
@@ -57,7 +57,7 @@ export default function SiteTaglineEdit( {
 			allowedFormats={ [] }
 			onChange={ setTagline }
 			aria-label={ __( 'Site tagline text' ) }
-			placeholder={ placeholder || __( 'Write site tagline…' ) }
+			placeholder={ __( 'Write site tagline…' ) }
 			tagName="p"
 			value={ tagline }
 			disableLineBreaks

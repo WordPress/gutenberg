@@ -280,7 +280,7 @@ export default function VisualEditor( { styles } ) {
 
 	// If there is a Post Content block we use its layout for the block list;
 	// if not, this must be a classic theme, in which case we use the fallback layout.
-	const blockListLayout = postContentBlock
+	const blockListLayout = postContentBlock?.isValid
 		? postContentLayout
 		: fallbackLayout;
 
@@ -376,15 +376,11 @@ export default function VisualEditor( { styles } ) {
 						{ ! isTemplateMode && (
 							<div
 								className={ classnames(
-									// This wrapper div should have the same
-									// classes as the block list beneath.
-									'is-root-container',
-									'block-editor-block-list__layout',
 									'edit-post-visual-editor__post-title-wrapper',
 									{
 										'is-focus-mode': isFocusMode,
 									},
-									blockListLayoutClass
+									'is-layout-flow'
 								) }
 								contentEditable={ false }
 							>

@@ -182,10 +182,24 @@ function curateResults( testSuite, results ) {
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
 async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
-	await runShellScript(
-		`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
-		performanceTestDirectory
-	);
+	try {
+		await runShellScript(
+			`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
+			performanceTestDirectory
+		);
+	} catch ( error ) {
+		fs.mkdirSync( './__test-results/artifacts', { recursive: true } );
+		const artifactsFolder = path.join(
+			performanceTestDirectory,
+			'artifacts/'
+		);
+		await runShellScript(
+			'cp -Rv ' + artifactsFolder + ' ' + './__test-results/artifacts/'
+		);
+
+		throw error;
+	}
+
 	const resultsFile = path.join(
 		performanceTestDirectory,
 		`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
@@ -198,6 +212,7 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
 		)
 	);
+
 	return curateResults( testSuite, rawResults );
 }
 

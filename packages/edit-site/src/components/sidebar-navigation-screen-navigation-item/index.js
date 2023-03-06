@@ -4,11 +4,12 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	Button,
 	__experimentalUseNavigator as useNavigator,
+	ExternalLink,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { pencil } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
+import SidebarButton from '../sidebar-button';
 
 export default function SidebarNavigationScreenNavigationItem() {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
@@ -43,15 +45,26 @@ export default function SidebarNavigationScreenNavigationItem() {
 		<SidebarNavigationScreen
 			title={ post ? decodeEntities( post?.title?.rendered ) : null }
 			actions={
-				<Button
-					variant="primary"
+				<SidebarButton
 					onClick={ () => setCanvasMode( 'edit' ) }
-				>
-					{ __( 'Edit' ) }
-				</Button>
+					label={ __( 'Edit' ) }
+					icon={ pencil }
+				/>
 			}
 			content={
-				post ? decodeEntities( post?.description?.rendered ) : null
+				<>
+					{ post?.link ? (
+						<ExternalLink
+							className="edit-site-sidebar-navigation-screen__page-link"
+							href={ post.link }
+						>
+							{ post.link }
+						</ExternalLink>
+					) : null }
+					{ post
+						? decodeEntities( post?.description?.rendered )
+						: null }
+				</>
 			}
 		/>
 	);

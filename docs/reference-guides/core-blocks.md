@@ -584,6 +584,15 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** prefix, separator, suffix, term, textAlign
 
+## Time To Read
+
+Show minutes required to finish reading the post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
+
+-	**Name:** core/post-time-to-read
+-	**Category:** theme
+-	**Supports:** ~~html~~, ~~multiple~~
+-	**Attributes:** textAlign
+
 ## Post Title
 
 Displays the title of a post, page, or any other content-type. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-title))
@@ -744,7 +753,7 @@ Describe in a few words what the site is about. The tagline can be used in searc
 -	**Name:** core/site-tagline
 -	**Category:** theme
 -	**Supports:** align (full, wide), anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** placeholder, textAlign
+-	**Attributes:** textAlign
 
 ## Site Title
 
