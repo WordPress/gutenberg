@@ -93,7 +93,7 @@ test.describe( 'Style Book', () => {
 		page,
 	} ) => {
 		await page
-			.frameLocator( '.edit-site-style-book__iframe' )
+			.frameLocator( '[name="style-book-canvas"]' )
 			.getByRole( 'button', {
 				name: 'Open Headings styles in Styles panel',
 			} )
