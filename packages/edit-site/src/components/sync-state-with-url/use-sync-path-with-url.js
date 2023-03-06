@@ -41,8 +41,16 @@ export default function useSyncPathWithURL() {
 	} = useNavigator();
 	const currentUrlParams = useRef( urlParams );
 	const currentPath = useRef( navigatorLocation.path );
+	const isMounting = useRef( true );
 
 	useEffect( () => {
+		// The navigatorParams are only initially filled properly when the
+		// navigator screens mount. so we ignore the first synchronisation.
+		if ( isMounting.current ) {
+			isMounting.current = false;
+			return;
+		}
+
 		function updateUrlParams( newUrlParams ) {
 			if (
 				Object.entries( newUrlParams ).every( ( [ key, value ] ) => {
