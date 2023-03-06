@@ -33,7 +33,6 @@ export default function TemplateDetails( { template, onClose } ) {
 	// TODO: We should update this to filter by template part's areas as well.
 	const browseAllLinkProps = useLink( {
 		path: '/' + template.type + '/all',
-		canvas: undefined,
 	} );
 
 	const isTemplatePart = template.type === 'wp_template_part';
