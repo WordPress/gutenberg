@@ -20,6 +20,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useScopedBlockVariations } from '../utils';
+import { name as queryLoopName } from '../block.json';
 
 export default function QueryPlaceholder( {
 	attributes,
@@ -33,19 +34,32 @@ export default function QueryPlaceholder( {
 
 	const { blockType, allVariations, hasPatterns } = useSelect(
 		( select ) => {
-			const { getBlockVariations, getBlockType } = select( blocksStore );
+			const {
+				getBlockVariations,
+				getBlockType,
+				getActiveBlockVariation,
+			} = select( blocksStore );
 			const { getBlockRootClientId, getPatternsByBlockTypes } =
 				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
+			const activeVariationName = getActiveBlockVariation(
+				queryLoopName,
+				attributes
+			)?.name;
+			const blockName = activeVariationName
+				? `${ queryLoopName }/${ activeVariationName }`
+				: name;
 
 			return {
 				blockType: getBlockType( name ),
 				allVariations: getBlockVariations( name ),
-				hasPatterns: !! getPatternsByBlockTypes( name, rootClientId )
-					.length,
+				hasPatterns: !! getPatternsByBlockTypes(
+					blockName,
+					rootClientId
+				).length,
 			};
 		},
-		[ name, clientId ]
+		[ name, clientId, attributes ]
 	);
 
 	const matchingVariation = getMatchingVariation( attributes, allVariations );
