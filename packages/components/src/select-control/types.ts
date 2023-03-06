@@ -23,16 +23,6 @@ type SelectControlBaseProps = Pick<
 	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
 		onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
 		onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
-		/**
-		 * A function that receives the value of the new option that is being selected as input.
-		 *
-		 * If `multiple` is `true`, the value received is an array of the selected value.
-		 * Otherwise, the value received is a single value with the new selected value.
-		 */
-		onChange?: (
-			value: string | string[],
-			extra?: { event?: ChangeEvent< HTMLSelectElement > }
-		) => void;
 		options?: {
 			/**
 			 * The label to be shown to the user.
