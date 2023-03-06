@@ -144,6 +144,8 @@ export default function VisualEditor( { styles } ) {
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			isTemplateMode: _isTemplateMode,
 			postContentAttributes: getEditorSettings().postContentAttributes,
+			// Post template fetch returns a 404 on classic themes, which
+			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
 				supportsTemplateMode && canEditTemplate
 					? getEditedPostTemplate()
