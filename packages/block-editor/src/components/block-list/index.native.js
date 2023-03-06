@@ -6,7 +6,7 @@ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component, createContext } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
@@ -33,7 +33,6 @@ import {
 import { BlockDraggableWrapper } from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
 
-export const OnCaretVerticalPositionChange = createContext();
 const identity = ( x ) => x;
 
 const stylesMemo = {};
@@ -70,12 +69,8 @@ export class BlockList extends Component {
 		};
 		this.renderItem = this.renderItem.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
-		this.onCaretVerticalPositionChange =
-			this.onCaretVerticalPositionChange.bind( this );
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
-		this.shouldFlatListPreventAutomaticScroll =
-			this.shouldFlatListPreventAutomaticScroll.bind( this );
 		this.shouldShowInnerBlockAppender =
 			this.shouldShowInnerBlockAppender.bind( this );
 		this.renderEmptyList = this.renderEmptyList.bind( this );
@@ -94,21 +89,8 @@ export class BlockList extends Component {
 		this.props.insertBlock( newBlock, this.props.blockCount );
 	}
 
-	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
-		KeyboardAwareFlatList.handleCaretVerticalPositionChange(
-			this.scrollViewRef,
-			targetId,
-			caretY,
-			previousCaretY
-		);
-	}
-
 	scrollViewInnerRef( ref ) {
 		this.scrollViewRef = ref;
-	}
-
-	shouldFlatListPreventAutomaticScroll() {
-		return this.props.isBlockInsertionPointVisible;
 	}
 
 	shouldShowInnerBlockAppender() {
@@ -209,13 +191,7 @@ export class BlockList extends Component {
 			</BlockListConsumer>
 		);
 
-		return (
-			<OnCaretVerticalPositionChange.Provider
-				value={ this.onCaretVerticalPositionChange }
-			>
-				{ blockList }
-			</OnCaretVerticalPositionChange.Provider>
-		);
+		return blockList;
 	}
 
 	renderList( extraProps = {} ) {
@@ -250,6 +226,10 @@ export class BlockList extends Component {
 		const isContentStretch = contentResizeMode === 'stretch';
 		const isMultiBlocks = blockClientIds.length > 1;
 		const { isWider } = alignmentHelpers;
+		const extraScrollHeight = blockToolbar.height + blockBorder.width;
+		const inputAccessoryViewHeight =
+			headerToolbar.height +
+			( isFloatingToolbarVisible ? floatingToolbar.height : 0 );
 
 		return (
 			<View
@@ -263,24 +243,12 @@ export class BlockList extends Component {
 						? { removeClippedSubviews: false }
 						: {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
-					autoScroll={ this.props.autoScroll }
 					innerRef={ ( ref ) => {
 						this.scrollViewInnerRef( parentScrollRef || ref );
 					} }
-					extraScrollHeight={
-						blockToolbar.height + blockBorder.width
-					}
-					inputAccessoryViewHeight={
-						headerToolbar.height +
-						( isFloatingToolbarVisible
-							? floatingToolbar.height
-							: 0 )
-					}
+					extraScrollHeight={ extraScrollHeight }
+					inputAccessoryViewHeight={ inputAccessoryViewHeight }
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ [
-						{ flex: isRootList ? 1 : 0 },
-						! isRootList && styles.overflowVisible,
-					] }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
 					contentContainerStyle={ [
@@ -299,9 +267,6 @@ export class BlockList extends Component {
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
 					CellRendererComponent={ this.getCellRendererComponent }
-					shouldPreventAutomaticScroll={
-						this.shouldFlatListPreventAutomaticScroll
-					}
 					title={ title }
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }

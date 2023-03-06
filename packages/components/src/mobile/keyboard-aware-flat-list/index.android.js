@@ -24,8 +24,4 @@ export const KeyboardAwareFlatList = ( { innerRef, onScroll, ...props } ) => {
 	);
 };
 
-KeyboardAwareFlatList.handleCaretVerticalPositionChange = () => {
-	// no need to handle on Android, it is system managed
-};
-
 export default KeyboardAwareFlatList;
