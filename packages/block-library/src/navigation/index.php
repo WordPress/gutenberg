@@ -476,8 +476,9 @@ function block_core_navigation_get_default_fallback() {
  *
  * @return void
  */
-function block_core_navigation_create_fallback() {
+function block_core_navigation_create_and_get_fallback() {
 	$should_skip = apply_filters( 'block_core_navigation_skip_fallback', false );
+
 	if ( $should_skip ) {
 		return;
 	}
@@ -487,23 +488,29 @@ function block_core_navigation_create_fallback() {
 		return;
 	}
 
-	// Get the most recently published Navigation post.
-	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
+	// Get the most recently published Navigation menu.
+	$navigation_menu = block_core_navigation_get_most_recently_published_navigation();
 
-	// If there are no navigation posts then try to find a classic menu
-	// and convert it into a block based navigation menu.
-	if ( ! $navigation_post ) {
-		$navigation_post = block_core_navigation_maybe_use_classic_menu_fallback();
+	if ( $navigation_menu ) {
+		return $navigation_menu;
+	}
+
+	// If there are no Navigation menus then try to find a Classic menu
+	// and convert it into a Navigation menu.
+
+	$navigation_menu = block_core_navigation_maybe_use_classic_menu_fallback();
+
+	if ( $navigation_menu ) {
+		return $navigation_menu;
 	}
 
 	// If there are no navigation posts then default to a list of Pages.
-	if ( ! $navigation_post ) {
-		$navigation_post = block_core_navigation_get_default_fallback();
-	}
+	return block_core_navigation_get_default_fallback();
+
 }
 // Run on switching Theme and when installing WP for the first time.
-add_action( 'switch_theme', 'block_core_navigation_create_fallback' );
-add_action( 'wp_install', 'block_core_navigation_create_fallback' );
+add_action( 'switch_theme', 'block_core_navigation_create_and_get_fallback' );
+add_action( 'wp_install', 'block_core_navigation_create_and_get_fallback' );
 
 
 /**
