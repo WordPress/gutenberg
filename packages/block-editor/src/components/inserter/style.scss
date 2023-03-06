@@ -37,6 +37,17 @@ $block-inserter-tabs-height: 44px;
 		outline: none;
 
 		.block-editor-inserter__quick-inserter > * {
+			border-left: $border-width solid $gray-400;
+			border-right: $border-width solid $gray-400;
+
+			&:first-child {
+				border-top: $border-width solid $gray-400;
+			}
+
+			&:last-child {
+				border-bottom: $border-width solid $gray-400;
+			}
+
 			&.components-button {
 				border: $border-width solid $gray-900;
 			}
