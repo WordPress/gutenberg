@@ -151,6 +151,7 @@ export function LinkUI( props ) {
 				suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 				onChange={ props.onChange }
 				onRemove={ props.onRemove }
+				onCancel={ props.onCancel }
 				renderControlBottom={
 					! url
 						? () => (

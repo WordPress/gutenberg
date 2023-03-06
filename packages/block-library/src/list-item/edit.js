@@ -88,9 +88,16 @@ export default function ListItemEdit( {
 					placeholder={ placeholder || __( 'List' ) }
 					onSplit={ onSplit }
 					onMerge={ onMerge }
-					onReplace={ ( blocks, ...args ) => {
-						onReplace( convertToListItems( blocks ), ...args );
-					} }
+					onReplace={
+						onReplace
+							? ( blocks, ...args ) => {
+									onReplace(
+										convertToListItems( blocks ),
+										...args
+									);
+							  }
+							: undefined
+					}
 				/>
 				{ innerBlocksProps.children }
 			</li>

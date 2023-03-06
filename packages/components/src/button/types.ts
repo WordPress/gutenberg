@@ -11,8 +11,11 @@ import type { PopoverProps } from '../popover/types';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 
 export type ButtonProps =
-	| WordPressComponentProps< BaseButtonProps & _ButtonProps, 'button', false >
-	| WordPressComponentProps< BaseButtonProps & AnchorProps, 'a', false >;
+	| WordPressComponentProps< ButtonAsButtonProps, 'button', false >
+	| WordPressComponentProps< ButtonAsAnchorProps, 'a', false >;
+
+export type ButtonAsButtonProps = BaseButtonProps & _ButtonProps;
+export type ButtonAsAnchorProps = BaseButtonProps & AnchorProps;
 
 type BaseButtonProps = {
 	/**
@@ -30,7 +33,7 @@ type BaseButtonProps = {
 	/**
 	 * If provided, renders an Icon component inside the button.
 	 */
-	icon?: IconProps< unknown >[ 'icon' ];
+	icon?: IconProps[ 'icon' ];
 	/**
 	 * If provided with `icon`, sets the position of icon relative to the `text`.
 	 *
@@ -42,7 +45,7 @@ type BaseButtonProps = {
 	 * Please refer to the Icon component for more details regarding
 	 * the default value of its `size` prop.
 	 */
-	iconSize?: IconProps< unknown >[ 'size' ];
+	iconSize?: IconProps[ 'size' ];
 	/**
 	 * Indicates activity while a action is being performed.
 	 */

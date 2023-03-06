@@ -32,12 +32,12 @@ import { pullLeft, pullRight, replace } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { WIDTH_CONSTRAINT_PERCENTAGE } from './constants';
 import MediaContainer from './media-container';
 import styles from './style.scss';
 
 const TEMPLATE = [ [ 'core/paragraph' ] ];
 // this limits the resize to a safe zone to avoid making broken layouts
-const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const BREAKPOINTS = {
 	mobile: 480,
 };

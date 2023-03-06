@@ -117,9 +117,9 @@
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @ellatrix @fluiddot
-/packages/rich-text                             @ellatrix @fluiddot
-/packages/block-editor/src/components/rich-text @ellatrix @fluiddot
+/packages/format-library                        @ellatrix @fluiddot @dcalhoun
+/packages/rich-text                             @ellatrix @fluiddot @dcalhoun
+/packages/block-editor/src/components/rich-text @ellatrix @fluiddot @dcalhoun
 
 # Project Management
 /.github

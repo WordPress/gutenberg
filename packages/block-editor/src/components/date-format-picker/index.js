@@ -50,14 +50,12 @@ export default function DateFormatPicker( {
 		<fieldset className="block-editor-date-format-picker">
 			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
 			<ToggleControl
-				label={
-					<>
-						{ __( 'Default format' ) }
-						<span className="block-editor-date-format-picker__default-format-toggle-control__hint">
-							{ dateI18n( defaultFormat, EXAMPLE_DATE ) }
-						</span>
-					</>
-				}
+				__nextHasNoMarginBottom
+				label={ __( 'Default format' ) }
+				help={ `${ __( 'Example:' ) }  ${ dateI18n(
+					defaultFormat,
+					EXAMPLE_DATE
+				) }` }
 				checked={ ! format }
 				onChange={ ( checked ) =>
 					onChange( checked ? null : defaultFormat )

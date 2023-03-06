@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
@@ -24,6 +24,7 @@ import ScreenBlockList from './screen-block-list';
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
+import ScreenFilters from './screen-filters';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackgroundColor from './screen-background-color';
@@ -37,7 +38,7 @@ import { ScreenVariation } from './screen-variations';
 import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 import ScreenEffects from './screen-effects';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
@@ -60,7 +61,7 @@ function GlobalStylesActionMenu() {
 				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
 		};
 	}, [] );
-	const { useGlobalStylesReset } = unlock( blockEditorExperiments );
+	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { goTo } = useNavigator();
 	const loadCustomCSS = () => goTo( '/css' );
@@ -68,7 +69,7 @@ function GlobalStylesActionMenu() {
 		<GlobalStylesMenuFill>
 			<DropdownMenu
 				icon={ moreVertical }
-				label={ __( 'More Styles actions' ) }
+				label={ __( 'Styles actions' ) }
 				controls={ [
 					{
 						title: __( 'Reset to defaults' ),
@@ -205,6 +206,10 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 				<ScreenBackgroundColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
+			<GlobalStylesNavigationScreen path={ parentMenu + '/filters' }>
+				<ScreenFilters name={ name } />
+			</GlobalStylesNavigationScreen>
+
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/text' }>
 				<ScreenTextColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
@@ -267,11 +272,6 @@ function GlobalStylesStyleBook( { onClose } ) {
 				)
 			}
 			onSelect={ ( blockName ) => {
-				// Clear navigator history by going back to the root.
-				const depth = path.match( /\//g ).length;
-				for ( let i = 0; i < depth; i++ ) {
-					navigator.goBack();
-				}
 				// Now go to the selected block.
 				navigator.goTo( '/blocks/' + encodeURIComponent( blockName ) );
 			} }

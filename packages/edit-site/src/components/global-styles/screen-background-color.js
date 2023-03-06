@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalColorGradientControl as ColorGradientControl,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 
 /**
@@ -21,9 +21,9 @@ import {
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 function ScreenBackgroundColor( { name, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
@@ -122,6 +122,7 @@ function ScreenBackgroundColor( { name, variation = '' } ) {
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar
+				headingLevel={ 3 }
 				{ ...controlProps }
 			/>
 		</>

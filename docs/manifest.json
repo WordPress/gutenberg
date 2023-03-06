@@ -642,12 +642,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "BaseField",
-		"slug": "base-field",
-		"markdown_source": "../packages/components/src/base-field/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "BorderBoxControl",
 		"slug": "border-box-control",
 		"markdown_source": "../packages/components/src/border-box-control/border-box-control/README.md",
@@ -717,6 +711,12 @@
 		"title": "CheckboxControl",
 		"slug": "checkbox-control",
 		"markdown_source": "../packages/components/src/checkbox-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CircularOptionPicker",
+		"slug": "circular-option-picker",
+		"markdown_source": "../packages/components/src/circular-option-picker/README.md",
 		"parent": "components"
 	},
 	{
@@ -1065,6 +1065,12 @@
 		"title": "NavigatorScreen",
 		"slug": "navigator-screen",
 		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorToParentButton",
+		"slug": "navigator-to-parent-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-to-parent-button/README.md",
 		"parent": "components"
 	},
 	{
@@ -1614,12 +1620,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/experiments",
-		"slug": "packages-experiments",
-		"markdown_source": "../packages/experiments/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",
@@ -1773,6 +1773,12 @@
 		"title": "@wordpress/priority-queue",
 		"slug": "packages-priority-queue",
 		"markdown_source": "../packages/priority-queue/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/private-apis",
+		"slug": "packages-private-apis",
+		"markdown_source": "../packages/private-apis/README.md",
 		"parent": "packages"
 	},
 	{
@@ -2116,6 +2122,24 @@
 		"slug": "testing-overview",
 		"markdown_source": "../docs/contributors/code/testing-overview.md",
 		"parent": "code"
+	},
+	{
+		"title": "End-to-End Testing",
+		"slug": "e2e",
+		"markdown_source": "../docs/contributors/code/e2e/README.md",
+		"parent": "testing-overview"
+	},
+	{
+		"title": "Migration guide",
+		"slug": "migration",
+		"markdown_source": "../docs/contributors/code/e2e/migration.md",
+		"parent": "e2e"
+	},
+	{
+		"title": "Overusing snapshots",
+		"slug": "overusing-snapshots",
+		"markdown_source": "../docs/contributors/code/e2e/overusing-snapshots.md",
+		"parent": "e2e"
 	},
 	{
 		"title": "Block Grammar",

@@ -398,6 +398,7 @@
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true
 		},

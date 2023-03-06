@@ -302,23 +302,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 }
 
 /**
- * Gets classname from last tag in a string of HTML.
- *
- * @param string $html markup to be processed.
- * @return string String of inner wrapper classnames.
- */
-function gutenberg_get_classnames_from_last_tag( $html ) {
-	$tags            = new WP_HTML_Tag_Processor( $html );
-	$last_classnames = '';
-
-	while ( $tags->next_tag() ) {
-		$last_classnames = $tags->get_attribute( 'class' );
-	}
-
-	return (string) $last_classnames;
-}
-
-/**
  * Renders the layout config to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
@@ -380,14 +363,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return (string) $content;
 	}
 
-	$global_settings               = gutenberg_get_global_settings();
-	$block_gap                     = _wp_array_get( $global_settings, array( 'spacing', 'blockGap' ), null );
-	$has_block_gap_support         = isset( $block_gap );
-	$global_layout_settings        = _wp_array_get( $global_settings, array( 'layout' ), null );
-	$root_padding_aware_alignments = _wp_array_get( $global_settings, array( 'useRootPaddingAwareAlignments' ), false );
-
-	$default_block_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
-	$used_layout          = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+	$global_settings        = gutenberg_get_global_settings();
+	$global_layout_settings = _wp_array_get( $global_settings, array( 'layout' ), null );
+	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] && ! $global_layout_settings ) {
 		return $block_content;
@@ -402,6 +380,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
 		$used_layout['type'] = 'constrained';
 	}
+
+	$root_padding_aware_alignments = _wp_array_get( $global_settings, array( 'useRootPaddingAwareAlignments' ), false );
 
 	if (
 		$root_padding_aware_alignments &&
@@ -470,6 +450,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 */
 		$should_skip_gap_serialization = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
 
+		$block_gap             = _wp_array_get( $global_settings, array( 'spacing', 'blockGap' ), null );
+		$has_block_gap_support = isset( $block_gap );
+
 		$style = gutenberg_get_layout_style(
 			".$container_class.$container_class",
 			$used_layout,
@@ -502,7 +485,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	* The first chunk of innerContent contains the block markup up until the inner blocks start.
 	* We want to target the opening tag of the inner blocks wrapper, which is the last tag in that chunk.
 	*/
-	$inner_content_classnames = isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) ? gutenberg_get_classnames_from_last_tag( $block['innerContent'][0] ) : '';
+	$inner_content_classnames = '';
+
+	if ( isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) && count( $block['innerContent'] ) > 1 ) {
+		$tags            = new WP_HTML_Tag_Processor( $block['innerContent'][0] );
+		$last_classnames = '';
+		while ( $tags->next_tag() ) {
+			$last_classnames = $tags->get_attribute( 'class' );
+		}
+
+		$inner_content_classnames = (string) $last_classnames;
+	}
 
 	$content = $content_with_outer_classnames ? new WP_HTML_Tag_Processor( $content_with_outer_classnames ) : new WP_HTML_Tag_Processor( $block_content );
 

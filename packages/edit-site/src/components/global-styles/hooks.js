@@ -10,15 +10,16 @@ import a11yPlugin from 'colord/plugins/a11y';
 import { _x } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { store as blocksStore } from '@wordpress/blocks';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 import { useSelect } from '@wordpress/data';
 
-const { useGlobalSetting } = unlock( blockEditorExperiments );
+const { useGlobalSetting, useColorsPerOrigin: useColorsPerOriginFromSettings } =
+	unlock( blockEditorPrivateApis );
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );
@@ -31,41 +32,16 @@ export function useColorsPerOrigin( name ) {
 		'color.defaultPalette'
 	);
 
-	return useMemo( () => {
-		const result = [];
-		if ( themeColors && themeColors.length ) {
-			result.push( {
-				name: _x(
-					'Theme',
-					'Indicates this palette comes from the theme.'
-				),
-				colors: themeColors,
-			} );
-		}
-		if (
-			shouldDisplayDefaultColors &&
-			defaultColors &&
-			defaultColors.length
-		) {
-			result.push( {
-				name: _x(
-					'Default',
-					'Indicates this palette comes from WordPress.'
-				),
-				colors: defaultColors,
-			} );
-		}
-		if ( customColors && customColors.length ) {
-			result.push( {
-				name: _x(
-					'Custom',
-					'Indicates this palette is created by the user.'
-				),
-				colors: customColors,
-			} );
-		}
-		return result;
-	}, [ customColors, themeColors, defaultColors ] );
+	return useColorsPerOriginFromSettings( {
+		color: {
+			palette: {
+				custom: customColors,
+				theme: themeColors,
+				default: defaultColors,
+			},
+			defaultPalette: shouldDisplayDefaultColors,
+		},
+	} );
 }
 
 export function useGradientsPerOrigin( name ) {

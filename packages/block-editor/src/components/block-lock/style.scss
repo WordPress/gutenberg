@@ -18,11 +18,6 @@
 	.components-checkbox-control__label {
 		font-weight: 600;
 	}
-
-	.components-base-control__field {
-		align-items: center;
-		display: flex;
-	}
 }
 .block-editor-block-lock-modal__checklist-item {
 	display: flex;
@@ -48,10 +43,6 @@
 	border-top: $border-width solid $gray-300;
 	margin-top: $grid-unit-20;
 	padding: $grid-unit-15 0;
-
-	.components-base-control__field {
-		margin: 0;
-	}
 }
 
 .block-editor-block-lock-modal__actions {

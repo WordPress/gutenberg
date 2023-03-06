@@ -23,6 +23,7 @@ Setting that enables the following UI tools:
 - border: color, radius, style, width
 - color: link
 - dimensions: minHeight
+- position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
 
@@ -133,6 +134,7 @@ Settings related to typography.
 | fluid | undefined | false |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
+| textColumns | boolean | false |  |
 | textDecoration | boolean | true |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
@@ -203,6 +205,7 @@ Typography styles.
 | fontWeight | string, object |  |
 | letterSpacing | string, object |  |
 | lineHeight | string, object |  |
+| textColumns | string |  |
 | textDecoration | string, object |  |
 | textTransform | string, object |  |
 

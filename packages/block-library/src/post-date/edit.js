@@ -151,6 +151,7 @@ export default function PostDateEdit( {
 						}
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={
 							postType?.labels.singular_name
 								? sprintf(
@@ -164,6 +165,7 @@ export default function PostDateEdit( {
 						checked={ isLink }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display last modified date' ) }
 						onChange={ ( value ) =>
 							setAttributes( {

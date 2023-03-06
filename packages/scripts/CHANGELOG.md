@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 25.5.1 (2023-03-06)
+
+### Bug Fix
+
+-   Fix `render.php` isn't copied in Windows OS ([#48735](https://github.com/WordPress/gutenberg/pull/48735)).
+
+## 25.5.0 (2023-03-01)
+
+## 25.4.0 (2023-02-15)
+
 ### New Features
 
 -   The `WP_DEVTOOL` environment variable can now be used to set the Webpack devtool option for sourcemaps in production builds ([#46812](https://github.com/WordPress/gutenberg/pull/46812)). Previously, this only worked for development builds.

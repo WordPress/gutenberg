@@ -51,8 +51,8 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 
 		// Remove the blocks
 		await spacerBlock.click();
-		await editorPage.removeBlockAtPosition( blockNames.spacer, 2 );
-		await editorPage.removeBlockAtPosition( blockNames.paragraph, 1 );
+		await editorPage.removeBlock();
+		await editorPage.removeBlock();
 	} );
 
 	onlyOnAndroid(
@@ -84,7 +84,7 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 			expect( paragraphText ).toMatch( testData.shortText );
 
 			// Remove the block
-			await editorPage.removeBlockAtPosition( blockNames.paragraph );
+			await editorPage.removeBlock();
 		}
 	);
 
@@ -118,7 +118,7 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 			expect( shortcodeText ).toMatch( testData.shortText );
 
 			// Remove the block
-			await editorPage.removeBlockAtPosition( blockNames.shortcode );
+			await editorPage.removeBlock();
 		}
 	);
 
@@ -158,6 +158,6 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		expect( secondBlockText ).toMatch( testData.shortText );
 
 		// Remove the block
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
+		await editorPage.removeBlock();
 	} );
 } );

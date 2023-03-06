@@ -108,6 +108,7 @@ function Iframe( {
 	tabIndex = 0,
 	scale = 1,
 	frameSize = 0,
+	expand = false,
 	readonly,
 	forwardedRef: ref,
 	...props
@@ -246,11 +247,30 @@ function Iframe( {
 		return '<!doctype html>' + renderToString( styleAssets );
 	}, [] );
 
+	// We need to counter the margin created by scaling the iframe. If the scale
+	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
+	// top or bottom margin is 0.55 / 2 ((1 - scale) / 2).
+	const marginFromScaling = ( contentHeight * ( 1 - scale ) ) / 2;
+
 	return (
 		<>
 			{ tabIndex >= 0 && before }
 			<iframe
 				{ ...props }
+				style={ {
+					...props.style,
+					height: expand ? contentHeight : props.style?.height,
+					marginTop: scale
+						? -marginFromScaling + frameSize
+						: props.style?.marginTop,
+					marginBottom: scale
+						? -marginFromScaling + frameSize
+						: props.style?.marginBottom,
+					transform: scale
+						? `scale( ${ scale } )`
+						: props.style?.transform,
+					transition: 'all .3s',
+				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
 				// Correct doctype is required to enable rendering in standards
@@ -265,13 +285,6 @@ function Iframe( {
 							<head ref={ headRef }>
 								{ styleAssets }
 								{ head }
-								<style>
-									{ `html { transition: background 5s; ${
-										frameSize
-											? 'background: #2f2f2f; transition: background 0s;'
-											: ''
-									} }` }
-								</style>
 							</head>
 							<body
 								ref={ bodyRef }
@@ -280,17 +293,6 @@ function Iframe( {
 									'editor-styles-wrapper',
 									...bodyClasses
 								) }
-								style={ {
-									// This is the remaining percentage from the scaling down
-									// of the iframe body(`scale(0.45)`). We also need to subtract
-									// the body's bottom margin.
-									marginBottom: `-${
-										contentHeight * ( 1 - scale ) -
-										frameSize
-									}px`,
-									marginTop: frameSize,
-									transform: `scale( ${ scale } )`,
-								} }
 							>
 								{ contentResizeListener }
 								<StyleProvider document={ iframeDocument }>
