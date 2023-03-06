@@ -4,50 +4,16 @@
  * Internal dependencies
  */
 import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
+import type { ControlPoint } from '../types';
 
-/**
- * Control point for the gradient bar.
- *
- * @typedef {Object} ControlPoint
- * @property {string} color    Color of the control point.
- * @property {number} position Integer position of the control point as a percentage.
- */
-
-/**
- * Color as parsed from the gradient by gradient-parser.
- *
- * @typedef {Object} Color
- * @property {string} r   Red component.
- * @property {string} g   Green component.
- * @property {string} b   Green component.
- * @property {string} [a] Optional alpha component.
- */
-
-/**
- * Clamps a number between 0 and 100.
- *
- * @param {number} value Value to clamp.
- *
- * @return {number} Value clamped between 0 and 100.
- */
-export function clampPercent( value ) {
+export function clampPercent( value: number ) {
 	return Math.max( 0, Math.min( 100, value ) );
 }
 
-/**
- * Check if a control point is overlapping with another.
- *
- * @param {ControlPoint[]} value        Array of control points.
- * @param {number}         initialIndex Index of the position to test.
- * @param {number}         newPosition  New position of the control point.
- * @param {number}         minDistance  Distance considered to be overlapping.
- *
- * @return {boolean} True if the point is overlapping.
- */
 export function isOverlapping(
-	value,
-	initialIndex,
-	newPosition,
+	value: ControlPoint[],
+	initialIndex: number,
+	newPosition: number,
 	minDistance = MINIMUM_DISTANCE_BETWEEN_POINTS
 ) {
 	const initialPosition = value[ initialIndex ].position;
@@ -63,16 +29,11 @@ export function isOverlapping(
 	} );
 }
 
-/**
- * Adds a control point from an array and returns the new array.
- *
- * @param {ControlPoint[]} points   Array of control points.
- * @param {number}         position Position to insert the new point.
- * @param {Color}          color    Color to update the control point at index.
- *
- * @return {ControlPoint[]} New array of control points.
- */
-export function addControlPoint( points, position, color ) {
+export function addControlPoint(
+	points: ControlPoint[],
+	position: number,
+	color: string
+) {
 	const nextIndex = points.findIndex(
 		( point ) => point.position > position
 	);
@@ -82,45 +43,27 @@ export function addControlPoint( points, position, color ) {
 	return newPoints;
 }
 
-/**
- * Removes a control point from an array and returns the new array.
- *
- * @param {ControlPoint[]} points Array of control points.
- * @param {number}         index  Index to remove.
- *
- * @return {ControlPoint[]} New array of control points.
- */
-export function removeControlPoint( points, index ) {
-	return points.filter( ( point, pointIndex ) => {
+export function removeControlPoint( points: ControlPoint[], index: number ) {
+	return points.filter( ( _point, pointIndex ) => {
 		return pointIndex !== index;
 	} );
 }
 
-/**
- * Updates a control point from an array and returns the new array.
- *
- * @param {ControlPoint[]} points   Array of control points.
- * @param {number}         index    Index to update.
- * @param {ControlPoint[]} newPoint New control point to replace the index.
- *
- * @return {ControlPoint[]} New array of control points.
- */
-export function updateControlPoint( points, index, newPoint ) {
+export function updateControlPoint(
+	points: ControlPoint[],
+	index: number,
+	newPoint: ControlPoint
+) {
 	const newValue = points.slice();
 	newValue[ index ] = newPoint;
 	return newValue;
 }
 
-/**
- * Updates the position of a control point from an array and returns the new array.
- *
- * @param {ControlPoint[]} points      Array of control points.
- * @param {number}         index       Index to update.
- * @param {number}         newPosition Position to move the control point at index.
- *
- * @return {ControlPoint[]} New array of control points.
- */
-export function updateControlPointPosition( points, index, newPosition ) {
+export function updateControlPointPosition(
+	points: ControlPoint[],
+	index: number,
+	newPosition: ControlPoint[ 'position' ]
+) {
 	if ( isOverlapping( points, index, newPosition ) ) {
 		return points;
 	}
@@ -131,16 +74,11 @@ export function updateControlPointPosition( points, index, newPosition ) {
 	return updateControlPoint( points, index, newPoint );
 }
 
-/**
- * Updates the position of a control point from an array and returns the new array.
- *
- * @param {ControlPoint[]} points   Array of control points.
- * @param {number}         index    Index to update.
- * @param {Color}          newColor Color to update the control point at index.
- *
- * @return {ControlPoint[]} New array of control points.
- */
-export function updateControlPointColor( points, index, newColor ) {
+export function updateControlPointColor(
+	points: ControlPoint[],
+	index: number,
+	newColor: string
+) {
 	const newPoint = {
 		...points[ index ],
 		color: newColor,
@@ -148,35 +86,18 @@ export function updateControlPointColor( points, index, newColor ) {
 	return updateControlPoint( points, index, newPoint );
 }
 
-/**
- * Updates the position of a control point from an array and returns the new array.
- *
- * @param {ControlPoint[]} points   Array of control points.
- * @param {number}         position Position of the color stop.
- * @param {string}         newColor Color to update the control point at index.
- *
- * @return {ControlPoint[]} New array of control points.
- */
 export function updateControlPointColorByPosition(
-	points,
-	position,
-	newColor
+	points: ControlPoint[],
+	position: ControlPoint[ 'position' ],
+	newColor: string
 ) {
 	const index = points.findIndex( ( point ) => point.position === position );
 	return updateControlPointColor( points, index, newColor );
 }
 
-/**
- * Gets the horizontal coordinate when dragging a control point with the mouse.
- *
- * @param {number}  mouseXCoordinate Horizontal coordinate of the mouse position.
- * @param {Element} containerElement Container for the gradient picker.
- *
- * @return {number | undefined} Whole number percentage from the left.
- */
 export function getHorizontalRelativeGradientPosition(
-	mouseXCoordinate,
-	containerElement
+	mouseXCoordinate: number,
+	containerElement: HTMLDivElement | null
 ) {
 	if ( ! containerElement ) {
 		return;
