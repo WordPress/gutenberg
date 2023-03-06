@@ -65,8 +65,8 @@ if ( hasArgInCLI( '--puppeteer-devtools' ) ) {
 	process.env.PUPPETEER_DEVTOOLS = 'true';
 }
 
-// Set the default artifacts path.
-process.env.WP_ARTIFACTS_PATH = './artifacts';
+// Make sure the artifacts folder path is set.
+process.env.WP_ARTIFACTS_PATH = process.env.WP_ARTIFACTS_PATH || 'artifacts';
 
 const configsMapping = {
 	WP_BASE_URL: '--wordpress-base-url',
