@@ -4,9 +4,10 @@
  *
  * @package    Gutenberg
  * @subpackage block-library
+ * @group     Navigation block
  */
 
-class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
+class Block_Library_Navigation_Fallbacks_Test extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
