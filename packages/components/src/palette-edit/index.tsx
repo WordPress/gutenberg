@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
+import { paramCase as kebabCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -227,7 +227,9 @@ function Option< T extends Color | Gradient >( {
 								onChange( {
 									...element,
 									name: nextName,
-									slug: slugPrefix + kebabCase( nextName ),
+									slug:
+										slugPrefix +
+										kebabCase( nextName ?? '' ),
 								} )
 							}
 						/>
