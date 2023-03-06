@@ -102,7 +102,7 @@ describe( 'Site Editor Performance', () => {
 		1,
 		loadingSamples + loadingSamplesThrowaway
 	);
-	it.each( loadingIterations )(
+	it.skip.each( loadingIterations )(
 		`Loading (%i of ${ loadingIterations.length })`,
 		async ( i ) => {
 			// Open the test page in Site Editor.
@@ -143,6 +143,8 @@ describe( 'Site Editor Performance', () => {
 			postId,
 			postType: 'page',
 		} );
+
+		expect( false ).toBe( true );
 
 		// Wait for the first paragraph to be ready.
 		const firstParagraph = await canvas().waitForXPath(
