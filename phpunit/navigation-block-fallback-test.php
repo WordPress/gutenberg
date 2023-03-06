@@ -2,7 +2,8 @@
 /**
  * Tests Fallback Behavior for Navigation block
  *
- * @package WordPress
+ * @package    Gutenberg
+ * @subpackage block-library
  */
 
 class Tests_Block_Navigation_Fallbacks extends WP_UnitTestCase {
