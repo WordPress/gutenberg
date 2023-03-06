@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useContext, useMemo, createPortal } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -418,33 +418,28 @@ const withElementsStyles = createHigherOrderComponent(
 			return elementCssRules.length > 0 ? elementCssRules : undefined;
 		}, [ props.attributes.style?.elements ] );
 
-		const element = useContext( BlockList.__unstableElementContext );
+		BlockList.useRootPortal(
+			styles && (
+				<style
+					dangerouslySetInnerHTML={ {
+						__html: styles,
+					} }
+				/>
+			)
+		);
 
 		return (
-			<>
-				{ styles &&
-					element &&
-					createPortal(
-						<style
-							dangerouslySetInnerHTML={ {
-								__html: styles,
-							} }
-						/>,
-						element
-					) }
-
-				<BlockListBlock
-					{ ...props }
-					className={
-						props.attributes.style?.elements
-							? classnames(
-									props.className,
-									blockElementsContainerIdentifier
-							  )
-							: props.className
-					}
-				/>
-			</>
+			<BlockListBlock
+				{ ...props }
+				className={
+					props.attributes.style?.elements
+						? classnames(
+								props.className,
+								blockElementsContainerIdentifier
+						  )
+						: props.className
+				}
+			/>
 		);
 	}
 );

@@ -18,7 +18,6 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useContext, createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -364,7 +363,6 @@ export const withLayoutStyles = createHigherOrderComponent(
 			hasLayoutBlockSupport && ! disableLayoutStyles;
 		const id = useInstanceId( BlockListBlock );
 		const defaultThemeLayout = useSetting( 'layout' ) || {};
-		const element = useContext( BlockList.__unstableElementContext );
 		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
 			getBlockSupport( name, layoutBlockSupportKey ) || {};
@@ -405,26 +403,23 @@ export const withLayoutStyles = createHigherOrderComponent(
 			layoutClasses
 		);
 
-		return (
-			<>
-				{ shouldRenderLayoutStyles &&
-					element &&
-					!! css &&
-					createPortal(
-						<LayoutStyle
-							blockName={ name }
-							selector={ selector }
-							css={ css }
-							layout={ usedLayout }
-							style={ attributes?.style }
-						/>,
-						element
-					) }
-				<BlockListBlock
-					{ ...props }
-					__unstableLayoutClassNames={ layoutClassNames }
+		BlockList.useRootPortal(
+			shouldRenderLayoutStyles && !! css && (
+				<LayoutStyle
+					blockName={ name }
+					selector={ selector }
+					css={ css }
+					layout={ usedLayout }
+					style={ attributes?.style }
 				/>
-			</>
+			)
+		);
+
+		return (
+			<BlockListBlock
+				{ ...props }
+				__unstableLayoutClassNames={ layoutClassNames }
+			/>
 		);
 	}
 );
@@ -449,7 +444,6 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 		const shouldRenderChildLayoutStyles =
 			hasChildLayout && ! disableLayoutStyles;
 
-		const element = useContext( BlockList.__unstableElementContext );
 		const id = useInstanceId( BlockListBlock );
 		const selector = `.wp-container-content-${ id }`;
 
@@ -472,15 +466,11 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 				shouldRenderChildLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
 		} );
 
-		return (
-			<>
-				{ shouldRenderChildLayoutStyles &&
-					element &&
-					!! css &&
-					createPortal( <style>{ css }</style>, element ) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
+		BlockList.useRootPortal(
+			shouldRenderChildLayoutStyles && !! css && <style>{ css }</style>
 		);
+
+		return <BlockListBlock { ...props } className={ className } />;
 	}
 );
 

@@ -19,9 +19,14 @@ import {
 } from '@wordpress/compose';
 import {
 	createContext,
-	useState,
 	useMemo,
 	useCallback,
+	useLayoutEffect,
+	useContext,
+	useRef,
+	Fragment,
+	createElement,
+	useReducer,
 } from '@wordpress/element';
 
 /**
@@ -41,13 +46,55 @@ import {
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
 
-const elementContext = createContext();
+const componentsContext = createContext();
 
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 
+function useRootPortal( component ) {
+	const components = useContext( componentsContext );
+
+	useLayoutEffect( () => {
+		if ( ! components ) return;
+		components.add( component );
+		return () => {
+			components.delete( component );
+		};
+	} );
+}
+
+function Components( { subscriber, components } ) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
+	subscriber.current = forceRender;
+	return createElement( Fragment, null, ...components.current );
+}
+
+function ComponentRenderer( { children } ) {
+	const subscriber = useRef( () => {} );
+	const components = useRef( new Set() );
+	return (
+		<componentsContext.Provider
+			value={ useMemo(
+				() => ( {
+					add( component ) {
+						components.current.add( component );
+						subscriber.current();
+					},
+					delete( component ) {
+						components.current.delete( component );
+						subscriber.current();
+					},
+				} ),
+				[]
+			) }
+		>
+			<Components subscriber={ subscriber } components={ components } />
+			{ children }
+		</componentsContext.Provider>
+	);
+}
+
 function Root( { className, ...settings } ) {
-	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { isOutlineMode, isFocusMode, editorMode } = useSelect(
 		( select ) => {
@@ -105,7 +152,6 @@ function Root( { className, ...settings } ) {
 			ref: useMergeRefs( [
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
-				setElement,
 			] ),
 			className: classnames( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
@@ -116,11 +162,13 @@ function Root( { className, ...settings } ) {
 		settings
 	);
 	return (
-		<elementContext.Provider value={ element }>
-			<IntersectionObserver.Provider value={ intersectionObserver }>
-				<div { ...innerBlocksProps } />
-			</IntersectionObserver.Provider>
-		</elementContext.Provider>
+		<IntersectionObserver.Provider value={ intersectionObserver }>
+			<div { ...innerBlocksProps }>
+				<ComponentRenderer>
+					{ innerBlocksProps.children }
+				</ComponentRenderer>
+			</div>
+		</IntersectionObserver.Provider>
 	);
 }
 
@@ -135,7 +183,7 @@ export default function BlockList( settings ) {
 	);
 }
 
-BlockList.__unstableElementContext = elementContext;
+BlockList.useRootPortal = useRootPortal;
 
 function Items( {
 	placeholder,

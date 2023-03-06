@@ -11,7 +11,7 @@ import namesPlugin from 'colord/plugins/names';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { useMemo, useContext, createPortal } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -255,14 +255,6 @@ function BlockDuotoneStyles( { name, duotoneStyle, id } ) {
 		defaultSetting: 'color.defaultDuotone',
 	} );
 
-	const element = useContext( BlockList.__unstableElementContext );
-
-	// Portals cannot exist without a container.
-	// Guard against empty Duotone styles.
-	if ( ! element || ! duotoneStyle ) {
-		return null;
-	}
-
 	let colors = duotoneStyle;
 
 	if ( ! Array.isArray( colors ) && colors !== 'unset' ) {
@@ -282,13 +274,12 @@ function BlockDuotoneStyles( { name, duotoneStyle, id } ) {
 		duotoneSupportSelectors
 	);
 
-	return createPortal(
+	BlockList.useRootPortal(
 		<InlineDuotone
 			selector={ selectorsGroup }
 			id={ id }
 			colors={ colors }
-		/>,
-		element
+		/>
 	);
 }
 

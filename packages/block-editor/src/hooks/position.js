@@ -14,12 +14,7 @@ import {
 } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import {
-	useContext,
-	useMemo,
-	createPortal,
-	Platform,
-} from '@wordpress/element';
+import { useMemo, Platform } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -353,7 +348,6 @@ export const withPositionStyles = createHigherOrderComponent(
 			hasPositionBlockSupport && ! useIsPositionDisabled( props );
 
 		const id = useInstanceId( BlockListBlock );
-		const element = useContext( BlockList.__unstableElementContext );
 
 		// Higher specificity to override defaults in editor UI.
 		const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
@@ -377,15 +371,11 @@ export const withPositionStyles = createHigherOrderComponent(
 				!! attributes?.style?.position?.type,
 		} );
 
-		return (
-			<>
-				{ allowPositionStyles &&
-					element &&
-					!! css &&
-					createPortal( <style>{ css }</style>, element ) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
+		BlockList.useRootPortal(
+			allowPositionStyles && !! css && <style>{ css }</style>
 		);
+
+		return <BlockListBlock { ...props } className={ className } />;
 	}
 );
 
