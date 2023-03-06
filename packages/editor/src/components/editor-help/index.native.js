@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
+import { paramCase as kebabCase } from 'change-case';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { TransitionPresets } from '@react-navigation/stack';
 
