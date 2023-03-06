@@ -340,30 +340,24 @@ export function addEditProps( settings ) {
  * Override the default edit UI to include new inspector controls for
  * all the custom styles configs.
  *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
+ * @param {Object} props
  */
-export const withBlockControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const shouldDisplayControls = useDisplayBlockControls();
+export const StyleBlockControls = ( props ) => {
+	const shouldDisplayControls = useDisplayBlockControls();
 
-		return (
-			<>
-				{ shouldDisplayControls && (
-					<>
-						<ColorEdit { ...props } />
-						<TypographyPanel { ...props } />
-						<BorderPanel { ...props } />
-						<DimensionsPanel { ...props } />
-					</>
-				) }
-				<BlockEdit { ...props } />
-			</>
-		);
-	},
-	'withToolbarControls'
-);
+	if ( ! shouldDisplayControls ) {
+		return null;
+	}
+
+	return (
+		<>
+			<ColorEdit { ...props } />
+			<TypographyPanel { ...props } />
+			<BorderPanel { ...props } />
+			<DimensionsPanel { ...props } />
+		</>
+	);
+};
 
 /**
  * Override the default block element to include elements styles.
@@ -468,9 +462,9 @@ addFilter(
 );
 
 addFilter(
-	'editor.BlockEdit',
+	'editor.BlockControls',
 	'core/style/with-block-controls',
-	withBlockControls
+	StyleBlockControls
 );
 
 addFilter(

@@ -183,40 +183,30 @@ function addDuotoneAttributes( settings ) {
  * Override the default edit UI to include toolbar controls for duotone if the
  * block supports duotone.
  *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
+ * @param {Object} props
  */
-const withDuotoneControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const hasDuotoneSupport = hasBlockSupport(
-			props.name,
-			'color.__experimentalDuotone'
-		);
-		const isContentLocked = useSelect(
-			( select ) => {
-				return select(
-					blockEditorStore
-				).__unstableGetContentLockingParent( props.clientId );
-			},
-			[ props.clientId ]
-		);
+const DuotoneControls = ( props ) => {
+	const hasDuotoneSupport = hasBlockSupport(
+		props.name,
+		'color.__experimentalDuotone'
+	);
+	const isContentLocked = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).__unstableGetContentLockingParent(
+				props.clientId
+			);
+		},
+		[ props.clientId ]
+	);
 
-		// CAUTION: code added before this line will be executed
-		// for all blocks, not just those that support duotone. Code added
-		// above this line should be carefully evaluated for its impact on
-		// performance.
-		return (
-			<>
-				{ hasDuotoneSupport && ! isContentLocked && (
-					<DuotonePanel { ...props } />
-				) }
-				<BlockEdit { ...props } />
-			</>
-		);
-	},
-	'withDuotoneControls'
-);
+	// CAUTION: code added before this line will be executed
+	// for all blocks, not just those that support duotone. Code added
+	// above this line should be carefully evaluated for its impact on
+	// performance.
+	return (
+		hasDuotoneSupport && ! isContentLocked && <DuotonePanel { ...props } />
+	);
+};
 
 /**
  * Function that scopes a selector with another one. This works a bit like
@@ -338,9 +328,9 @@ addFilter(
 	addDuotoneAttributes
 );
 addFilter(
-	'editor.BlockEdit',
+	'editor.BlockControls',
 	'core/editor/duotone/with-editor-controls',
-	withDuotoneControls
+	DuotoneControls
 );
 addFilter(
 	'editor.BlockListBlock',

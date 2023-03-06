@@ -27,7 +27,7 @@ export const settings = {
 };
 
 export const init = () => {
-	addFilter( 'editor.BlockEdit', 'core/query', queryInspectorControls );
+	addFilter( 'editor.BlockControls', 'core/query', queryInspectorControls );
 
 	return initBlock( { name, metadata, settings } );
 };

@@ -4,11 +4,15 @@
 import { useMemo } from '@wordpress/element';
 
 import { hasBlockSupport } from '@wordpress/blocks';
+import { filters } from '@wordpress/hooks';
+import { useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
 import Edit from './edit';
 import { BlockEditContextProvider, useBlockEditContext } from './context';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * The `useBlockEditContext` hook provides information about the block this hook is being used in.
@@ -41,6 +45,35 @@ export default function BlockEdit( props ) {
 		layout: layoutSupport ? layout : null,
 		__unstableLayoutClassNames,
 	};
+	const shouldDisplayControls = useSelect(
+		( select ) => {
+			if ( isSelected ) {
+				return true;
+			}
+
+			const {
+				getBlockName,
+				isFirstMultiSelectedBlock,
+				getMultiSelectedBlockClientIds,
+				hasSelectedInnerBlock,
+			} = select( blockEditorStore );
+
+			if ( isFirstMultiSelectedBlock( clientId ) ) {
+				return getMultiSelectedBlockClientIds().every(
+					( id ) => getBlockName( id ) === name
+				);
+			}
+
+			return (
+				hasBlockSupport(
+					getBlockName( clientId ),
+					'__experimentalExposeControlsToChildren',
+					false
+				) && hasSelectedInnerBlock( clientId )
+			);
+		},
+		[ clientId, isSelected, name ]
+	);
 	return (
 		<BlockEditContextProvider
 			// It is important to return the same object if props haven't
@@ -48,6 +81,12 @@ export default function BlockEdit( props ) {
 			// See https://reactjs.org/docs/context.html#caveats.
 			value={ useMemo( () => context, Object.values( context ) ) }
 		>
+			{ shouldDisplayControls &&
+				filters[ 'editor.BlockControls' ].handlers.map(
+					( { callback: Controls, namespace } ) => (
+						<Controls { ...props } key={ namespace } />
+					)
+				) }
 			<Edit { ...props } />
 		</BlockEditContextProvider>
 	);

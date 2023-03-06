@@ -10,7 +10,6 @@ import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -43,50 +42,35 @@ export function addAttribute( settings ) {
  * assigning the custom class name, if block supports custom class name.
  * The control is displayed within the Advanced panel in the block inspector.
  *
- * @param {WPComponent} BlockEdit Original component.
- *
- * @return {WPComponent} Wrapped component.
+ * @param {Object} props
  */
-export const withInspectorControl = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			const hasCustomClassName = hasBlockSupport(
-				props.name,
-				'customClassName',
-				true
-			);
-			if ( hasCustomClassName && props.isSelected ) {
-				return (
-					<>
-						<BlockEdit { ...props } />
-						<InspectorControls group="advanced">
-							<TextControl
-								__nextHasNoMarginBottom
-								autoComplete="off"
-								label={ __( 'Additional CSS class(es)' ) }
-								value={ props.attributes.className || '' }
-								onChange={ ( nextValue ) => {
-									props.setAttributes( {
-										className:
-											nextValue !== ''
-												? nextValue
-												: undefined,
-									} );
-								} }
-								help={ __(
-									'Separate multiple classes with spaces.'
-								) }
-							/>
-						</InspectorControls>
-					</>
-				);
-			}
+export const InspectorControl = ( props ) => {
+	const hasCustomClassName = hasBlockSupport(
+		props.name,
+		'customClassName',
+		true
+	);
+	if ( ! hasCustomClassName || ! props.isSelected ) {
+		return null;
+	}
 
-			return <BlockEdit { ...props } />;
-		};
-	},
-	'withInspectorControl'
-);
+	return (
+		<InspectorControls group="advanced">
+			<TextControl
+				__nextHasNoMarginBottom
+				autoComplete="off"
+				label={ __( 'Additional CSS class(es)' ) }
+				value={ props.attributes.className || '' }
+				onChange={ ( nextValue ) => {
+					props.setAttributes( {
+						className: nextValue !== '' ? nextValue : undefined,
+					} );
+				} }
+				help={ __( 'Separate multiple classes with spaces.' ) }
+			/>
+		</InspectorControls>
+	);
+};
 
 /**
  * Override props assigned to save component to inject the className, if block
@@ -158,9 +142,9 @@ addFilter(
 	addAttribute
 );
 addFilter(
-	'editor.BlockEdit',
+	'editor.BlockControls',
 	'core/editor/custom-class-name/with-inspector-control',
-	withInspectorControl
+	InspectorControl
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',

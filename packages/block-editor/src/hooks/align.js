@@ -113,64 +113,55 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include new toolbar controls for block
  * alignment, if block defines support.
  *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
+ * @param {Object} props
  */
-export const withToolbarControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const blockEdit = <BlockEdit key="edit" { ...props } />;
-		const { name: blockName } = props;
-		// Compute the block valid alignments by taking into account,
-		// if the theme supports wide alignments or not and the layout's
-		// availble alignments. We do that for conditionally rendering
-		// Slot.
-		const blockAllowedAlignments = getValidAlignments(
-			getBlockSupport( blockName, 'align' ),
-			hasBlockSupport( blockName, 'alignWide', true )
-		);
+export const ToolbarControls = ( props ) => {
+	const { name: blockName } = props;
+	// Compute the block valid alignments by taking into account,
+	// if the theme supports wide alignments or not and the layout's
+	// availble alignments. We do that for conditionally rendering
+	// Slot.
+	const blockAllowedAlignments = getValidAlignments(
+		getBlockSupport( blockName, 'align' ),
+		hasBlockSupport( blockName, 'alignWide', true )
+	);
 
-		const validAlignments = useAvailableAlignments(
-			blockAllowedAlignments
-		).map( ( { name } ) => name );
-		const isContentLocked = useSelect(
-			( select ) => {
-				return select(
-					blockEditorStore
-				).__unstableGetContentLockingParent( props.clientId );
-			},
-			[ props.clientId ]
-		);
-		if ( ! validAlignments.length || isContentLocked ) {
-			return blockEdit;
-		}
+	const validAlignments = useAvailableAlignments(
+		blockAllowedAlignments
+	).map( ( { name } ) => name );
+	const isContentLocked = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).__unstableGetContentLockingParent(
+				props.clientId
+			);
+		},
+		[ props.clientId ]
+	);
+	if ( ! validAlignments.length || isContentLocked ) {
+		return null;
+	}
 
-		const updateAlignment = ( nextAlign ) => {
-			if ( ! nextAlign ) {
-				const blockType = getBlockType( props.name );
-				const blockDefaultAlign = blockType?.attributes?.align?.default;
-				if ( blockDefaultAlign ) {
-					nextAlign = '';
-				}
+	const updateAlignment = ( nextAlign ) => {
+		if ( ! nextAlign ) {
+			const blockType = getBlockType( props.name );
+			const blockDefaultAlign = blockType?.attributes?.align?.default;
+			if ( blockDefaultAlign ) {
+				nextAlign = '';
 			}
-			props.setAttributes( { align: nextAlign } );
-		};
+		}
+		props.setAttributes( { align: nextAlign } );
+	};
 
-		return (
-			<>
-				<BlockControls group="block" __experimentalShareWithChildBlocks>
-					<BlockAlignmentControl
-						value={ props.attributes.align }
-						onChange={ updateAlignment }
-						controls={ validAlignments }
-					/>
-				</BlockControls>
-				{ blockEdit }
-			</>
-		);
-	},
-	'withToolbarControls'
-);
+	return (
+		<BlockControls group="block" __experimentalShareWithChildBlocks>
+			<BlockAlignmentControl
+				value={ props.attributes.align }
+				onChange={ updateAlignment }
+				controls={ validAlignments }
+			/>
+		</BlockControls>
+	);
+};
 
 /**
  * Override the default block element to add alignment wrapper props.
@@ -248,9 +239,9 @@ addFilter(
 	withDataAlign
 );
 addFilter(
-	'editor.BlockEdit',
+	'editor.BlockControls',
 	'core/editor/align/with-toolbar-controls',
-	withToolbarControls
+	ToolbarControls
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',

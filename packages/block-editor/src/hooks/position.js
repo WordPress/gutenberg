@@ -311,29 +311,20 @@ export function PositionPanel( props ) {
 /**
  * Override the default edit UI to include position controls.
  *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
+ * @param {Object} props
  */
-export const withInspectorControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const positionSupport = hasBlockSupport(
-			blockName,
-			POSITION_SUPPORT_KEY
-		);
-		const showPositionControls =
-			positionSupport && ! useIsPositionDisabled( props );
+export const PositionInspectorControls = ( props ) => {
+	const { name: blockName } = props;
+	const positionSupport = hasBlockSupport( blockName, POSITION_SUPPORT_KEY );
+	const isPositionDisabled = useIsPositionDisabled( props );
+	const showPositionControls = positionSupport && ! isPositionDisabled;
 
-		return [
-			showPositionControls && (
-				<PositionPanel key="position" { ...props } />
-			),
-			<BlockEdit key="edit" { ...props } />,
-		];
-	},
-	'withInspectorControls'
-);
+	if ( ! showPositionControls ) {
+		return null;
+	}
+
+	return <PositionPanel { ...props } />;
+};
 
 /**
  * Override the default block element to add the position styles.
@@ -395,7 +386,7 @@ addFilter(
 	withPositionStyles
 );
 addFilter(
-	'editor.BlockEdit',
+	'editor.BlockControls',
 	'core/editor/position/with-inspector-controls',
-	withInspectorControls
+	PositionInspectorControls
 );

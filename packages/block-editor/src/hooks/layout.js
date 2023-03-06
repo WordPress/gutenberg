@@ -322,25 +322,18 @@ export function addAttribute( settings ) {
 /**
  * Override the default edit UI to include layout controls
  *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
+ * @param {Object} props
  */
-export const withInspectorControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const supportLayout = hasBlockSupport(
-			blockName,
-			layoutBlockSupportKey
-		);
+export const LayoutInspectorControls = ( props ) => {
+	const { name: blockName } = props;
+	const supportLayout = hasBlockSupport( blockName, layoutBlockSupportKey );
 
-		return [
-			supportLayout && <LayoutPanel key="layout" { ...props } />,
-			<BlockEdit key="edit" { ...props } />,
-		];
-	},
-	'withInspectorControls'
-);
+	if ( ! supportLayout ) {
+		return null;
+	}
+
+	return <LayoutPanel { ...props } />;
+};
 
 /**
  * Override the default block element to add the layout styles.
@@ -500,7 +493,7 @@ addFilter(
 	withChildLayoutStyles
 );
 addFilter(
-	'editor.BlockEdit',
+	'editor.BlockControls',
 	'core/editor/layout/with-inspector-controls',
-	withInspectorControls
+	LayoutInspectorControls
 );
