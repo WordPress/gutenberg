@@ -22,17 +22,18 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: normal;
-  -webkit-box-align: normal;
-  -ms-flex-align: normal;
-  align-items: normal;
+  -webkit-align-items: stretch;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
   gap: calc(4px * 1);
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-  justify-content: space-between;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
 }
 
 .emotion-4>* {
@@ -54,17 +55,18 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: normal;
-  -webkit-box-align: normal;
-  -ms-flex-align: normal;
-  align-items: normal;
+  -webkit-align-items: stretch;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
   gap: calc(4px * 3);
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-  justify-content: space-between;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
 }
 
 .emotion-8>* {
@@ -117,114 +119,116 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   min-width: 0;
 }
 
-<div
-  class="components-base-control block-editor-color-gradient-control emotion-0 emotion-1"
->
+<div>
   <div
-    class="components-base-control__field emotion-2 emotion-3"
+    class="components-base-control block-editor-color-gradient-control emotion-0 emotion-1"
   >
-    <fieldset
-      class="block-editor-color-gradient-control__fieldset"
+    <div
+      class="components-base-control__field emotion-2 emotion-3"
     >
-      <div
-        class="components-flex components-h-stack components-v-stack emotion-4 emotion-5"
-        data-wp-c16t="true"
-        data-wp-component="VStack"
+      <fieldset
+        class="block-editor-color-gradient-control__fieldset"
       >
-        <legend>
-          <div
-            class="block-editor-color-gradient-control__color-indicator"
-          >
-            <span
-              class="components-base-control__label emotion-6 emotion-7"
-            >
-              Test Color
-            </span>
-          </div>
-        </legend>
         <div
-          class="block-editor-color-gradient-control__panel"
+          class="components-flex components-h-stack components-v-stack emotion-4 emotion-5"
+          data-wp-c16t="true"
+          data-wp-component="VStack"
         >
+          <legend>
+            <div
+              class="block-editor-color-gradient-control__color-indicator"
+            >
+              <span
+                class="components-base-control__label emotion-6 emotion-7"
+              >
+                Test Color
+              </span>
+            </div>
+          </legend>
           <div
-            class="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
-            data-wp-c16t="true"
-            data-wp-component="VStack"
+            class="block-editor-color-gradient-control__panel"
           >
             <div
-              class="components-dropdown"
-              tabindex="-1"
-            >
-              <button
-                aria-expanded="false"
-                aria-haspopup="true"
-                aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
-                class="components-flex components-color-palette__custom-color emotion-10 emotion-5"
-                data-wp-c16t="true"
-                data-wp-component="Flex"
-                style="background: rgb(255, 0, 0); color: rgb(0, 0, 0);"
-              >
-                <span
-                  class="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-13 emotion-5"
-                  data-wp-c16t="true"
-                  data-wp-component="FlexItem"
-                >
-                  red
-                </span>
-                <span
-                  class="components-flex-item components-color-palette__custom-color-value emotion-15 emotion-5"
-                  data-wp-c16t="true"
-                  data-wp-component="FlexItem"
-                >
-                  f00
-                </span>
-              </button>
-            </div>
-            <div
-              class="components-circular-option-picker"
+              class="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
+              data-wp-c16t="true"
+              data-wp-component="VStack"
             >
               <div
-                class="components-circular-option-picker__swatches"
-              >
-                <div
-                  class="components-circular-option-picker__option-wrapper"
-                >
-                  <button
-                    aria-label="Color: red"
-                    aria-pressed="true"
-                    class="components-button components-circular-option-picker__option is-pressed"
-                    style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
-                    type="button"
-                  />
-                  <svg
-                    aria-hidden="true"
-                    fill="#000"
-                    focusable="false"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div
-                class="components-circular-option-picker__custom-clear-wrapper"
+                class="components-dropdown"
+                tabindex="-1"
               >
                 <button
-                  class="components-button components-circular-option-picker__clear is-tertiary"
-                  type="button"
+                  aria-expanded="false"
+                  aria-haspopup="true"
+                  aria-label="Custom color picker. The currently selected color is called "red" and has a value of "f00"."
+                  class="components-flex components-color-palette__custom-color emotion-10 emotion-5"
+                  data-wp-c16t="true"
+                  data-wp-component="Flex"
+                  style="background: rgb(255, 0, 0); color: rgb(0, 0, 0);"
                 >
-                  Clear
+                  <span
+                    class="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-13 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexItem"
+                  >
+                    red
+                  </span>
+                  <span
+                    class="components-flex-item components-color-palette__custom-color-value emotion-15 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexItem"
+                  >
+                    f00
+                  </span>
                 </button>
+              </div>
+              <div
+                class="components-circular-option-picker"
+              >
+                <div
+                  class="components-circular-option-picker__swatches"
+                >
+                  <div
+                    class="components-circular-option-picker__option-wrapper"
+                  >
+                    <button
+                      aria-label="Color: red"
+                      aria-pressed="true"
+                      class="components-button components-circular-option-picker__option is-pressed"
+                      style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
+                      type="button"
+                    />
+                    <svg
+                      aria-hidden="true"
+                      fill="#000"
+                      focusable="false"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <div
+                  class="components-circular-option-picker__custom-clear-wrapper"
+                >
+                  <button
+                    class="components-button components-circular-option-picker__clear is-tertiary"
+                    type="button"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </fieldset>
+      </fieldset>
+    </div>
   </div>
 </div>
 `;

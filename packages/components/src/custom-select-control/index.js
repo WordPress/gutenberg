@@ -79,6 +79,9 @@ export default function CustomSelectControl( props ) {
 		value: _selectedItem,
 		onMouseOver,
 		onMouseOut,
+		onFocus,
+		onBlur,
+		__experimentalShowSelectedHint = false,
 	} = props;
 
 	const {
@@ -101,6 +104,16 @@ export default function CustomSelectControl( props ) {
 	} );
 
 	const [ isFocused, setIsFocused ] = useState( false );
+
+	function handleOnFocus( e ) {
+		setIsFocused( true );
+		onFocus?.( e );
+	}
+
+	function handleOnBlur( e ) {
+		setIsFocused( false );
+		onBlur?.( e );
+	}
 
 	if ( ! __nextUnconstrainedWidth ) {
 		deprecated(
@@ -181,8 +194,8 @@ export default function CustomSelectControl( props ) {
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
 					as="button"
-					onFocus={ () => setIsFocused( true ) }
-					onBlur={ () => setIsFocused( false ) }
+					onFocus={ handleOnFocus }
+					onBlur={ handleOnBlur }
 					selectSize={ size }
 					__next36pxDefaultSize={ __next36pxDefaultSize }
 					{ ...getToggleButtonProps( {
@@ -194,6 +207,12 @@ export default function CustomSelectControl( props ) {
 					} ) }
 				>
 					{ itemToString( selectedItem ) }
+					{ __experimentalShowSelectedHint &&
+						selectedItem.__experimentalHint && (
+							<span className="components-custom-select-control__hint">
+								{ selectedItem.__experimentalHint }
+							</span>
+						) }
 				</SelectControlSelect>
 			</InputBaseWithBackCompatMinWidth>
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
@@ -236,5 +255,14 @@ export default function CustomSelectControl( props ) {
 					) ) }
 			</ul>
 		</div>
+	);
+}
+
+export function StableCustomSelectControl( props ) {
+	return (
+		<CustomSelectControl
+			{ ...props }
+			__experimentalShowSelectedHint={ false }
+		/>
 	);
 }

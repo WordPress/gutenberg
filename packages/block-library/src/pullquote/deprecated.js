@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, includes } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -140,7 +140,7 @@ const v4 = {
 			className,
 		} = attributes;
 
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 
 		let figureClasses, figureStyles;
 
@@ -206,7 +206,7 @@ const v4 = {
 		customTextColor,
 		...attributes
 	} ) {
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 		let style;
 
 		if ( customMainColor ) {
@@ -270,7 +270,7 @@ const v3 = {
 			figureStyle,
 		} = attributes;
 
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 
 		let figureClasses, figureStyles;
 
@@ -345,7 +345,7 @@ const v3 = {
 		customTextColor,
 		...attributes
 	} ) {
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 		let style;
 
 		if ( customMainColor ) {
@@ -416,7 +416,7 @@ const v2 = {
 			citation,
 			className,
 		} = attributes;
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 
 		let figureClass, figureStyles;
 		// Is solid color style
@@ -484,7 +484,7 @@ const v2 = {
 		customTextColor,
 		...attributes
 	} ) {
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const isSolidColorStyle = className?.includes( SOLID_COLOR_CLASS );
 		let style = {};
 
 		if ( customMainColor ) {

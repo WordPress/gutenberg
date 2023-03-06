@@ -30,7 +30,6 @@ import { getActiveFormat } from '../get-active-format';
 export function useAnchorRef( { ref, value, settings = {} } ) {
 	deprecated( '`useAnchorRef` hook', {
 		since: '6.1',
-		version: '6.3',
 		alternative: '`useAnchor` hook',
 	} );
 

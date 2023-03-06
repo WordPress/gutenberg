@@ -161,7 +161,7 @@ function VideoEdit( {
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url: newSrc },
 			} );
-			if ( undefined !== embedBlock ) {
+			if ( undefined !== embedBlock && onReplace ) {
 				onReplace( embedBlock );
 				return;
 			}
@@ -224,8 +224,14 @@ function VideoEdit( {
 					} }
 					icon={ captionIcon }
 					isPressed={ showCaption }
-					label={ __( 'Caption' ) }
+					label={
+						showCaption
+							? __( 'Remove caption' )
+							: __( 'Add caption' )
+					}
 				/>
+			</BlockControls>
+			<BlockControls>
 				<TracksEditor
 					tracks={ tracks }
 					onChange={ ( newTracks ) => {
@@ -321,6 +327,7 @@ function VideoEdit( {
 				{ showCaption &&
 					( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
+							identifier="caption"
 							tagName="figcaption"
 							className={ __experimentalGetElementClassName(
 								'caption'

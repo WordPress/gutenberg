@@ -118,6 +118,7 @@ export default function PostTitleEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Make title a link' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
@@ -125,6 +126,7 @@ export default function PostTitleEdit( {
 					{ isLink && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -134,6 +136,7 @@ export default function PostTitleEdit( {
 								checked={ linkTarget === '_blank' }
 							/>
 							<TextControl
+								__nextHasNoMarginBottom
 								label={ __( 'Link rel' ) }
 								value={ rel }
 								onChange={ ( newRel ) =>

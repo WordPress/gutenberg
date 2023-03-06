@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -50,10 +49,10 @@ export function DimensionControl( props ) {
 	};
 
 	const selectLabel = (
-		<Fragment>
+		<>
 			{ icon && <Icon icon={ icon } /> }
 			{ label }
-		</Fragment>
+		</>
 	);
 
 	return (

@@ -27,7 +27,11 @@ import {
 	TYPOGRAPHY_SUPPORT_KEY,
 	TYPOGRAPHY_SUPPORT_KEYS,
 } from './typography';
-import { SPACING_SUPPORT_KEY, DimensionsPanel } from './dimensions';
+import {
+	DIMENSIONS_SUPPORT_KEY,
+	SPACING_SUPPORT_KEY,
+	DimensionsPanel,
+} from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
 import { shouldSkipSerialization } from './utils';
 
@@ -35,6 +39,7 @@ const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
+	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 ];
 
@@ -98,8 +103,11 @@ const skipSerializationPathsEdit = {
 	[ `${ TYPOGRAPHY_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		TYPOGRAPHY_SUPPORT_KEY,
 	],
+	[ `${ DIMENSIONS_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		DIMENSIONS_SUPPORT_KEY,
+	],
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
-		'spacing',
+		SPACING_SUPPORT_KEY,
 	],
 };
 

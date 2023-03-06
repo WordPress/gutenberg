@@ -32,7 +32,7 @@ const getMovementDirection = ( moveDirection, orientation ) => {
  * @param {string}  orientation   The orientation of the block movers, vertical or
  *                                horizontal.
  *
- * @return {string} Label for the block movement controls.
+ * @return {string | undefined} Label for the block movement controls.
  */
 export function getBlockMoverDescription(
 	selectedCount,
@@ -227,7 +227,7 @@ export function getBlockMoverDescription(
  * @param {string}  orientation   The orientation of the block movers, vertical or
  *                                horizontal.
  *
- * @return {string} Label for the block movement controls.
+ * @return {string | undefined} Label for the block movement controls.
  */
 export function getMultiBlockMoverDescription(
 	selectedCount,

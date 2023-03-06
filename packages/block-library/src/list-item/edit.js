@@ -67,6 +67,7 @@ export default function ListItemEdit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
 		renderAppender: false,
+		__unstableDisableDropZone: true,
 	} );
 	const useEnterRef = useEnter( { content, clientId } );
 	const useSpaceRef = useSpace( clientId );
@@ -87,9 +88,16 @@ export default function ListItemEdit( {
 					placeholder={ placeholder || __( 'List' ) }
 					onSplit={ onSplit }
 					onMerge={ onMerge }
-					onReplace={ ( blocks, ...args ) => {
-						onReplace( convertToListItems( blocks ), ...args );
-					} }
+					onReplace={
+						onReplace
+							? ( blocks, ...args ) => {
+									onReplace(
+										convertToListItems( blocks ),
+										...args
+									);
+							  }
+							: undefined
+					}
 				/>
 				{ innerBlocksProps.children }
 			</li>

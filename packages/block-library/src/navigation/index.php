@@ -65,58 +65,58 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 
 		return $menu_items_by_parent_id;
 	}
+}
 
-	/**
-	 * Turns menu item data into a nested array of parsed blocks
-	 *
-	 * @param array $menu_items               An array of menu items that represent
-	 *                                        an individual level of a menu.
-	 * @param array $menu_items_by_parent_id  An array keyed by the id of the
-	 *                                        parent menu where each element is an
-	 *                                        array of menu items that belong to
-	 *                                        that parent.
-	 * @return array An array of parsed block data.
-	 */
-	function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
-		if ( empty( $menu_items ) ) {
-			return array();
-		}
-
-		$blocks = array();
-
-		foreach ( $menu_items as $menu_item ) {
-			$class_name       = ! empty( $menu_item->classes ) ? implode( ' ', (array) $menu_item->classes ) : null;
-			$id               = ( null !== $menu_item->object_id && 'custom' !== $menu_item->object ) ? $menu_item->object_id : null;
-			$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
-			$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
-			$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
-
-			$block = array(
-				'blockName' => isset( $menu_items_by_parent_id[ $menu_item->ID ] ) ? 'core/navigation-submenu' : 'core/navigation-link',
-				'attrs'     => array(
-					'className'     => $class_name,
-					'description'   => $menu_item->description,
-					'id'            => $id,
-					'kind'          => $kind,
-					'label'         => $menu_item->title,
-					'opensInNewTab' => $opens_in_new_tab,
-					'rel'           => $rel,
-					'title'         => $menu_item->attr_title,
-					'type'          => $menu_item->object,
-					'url'           => $menu_item->url,
-				),
-			);
-
-			$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-				? block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
-				: array();
-			$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
-
-			$blocks[] = $block;
-		}
-
-		return $blocks;
+/**
+ * Turns menu item data into a nested array of parsed blocks
+ *
+ * @param array $menu_items               An array of menu items that represent
+ *                                        an individual level of a menu.
+ * @param array $menu_items_by_parent_id  An array keyed by the id of the
+ *                                        parent menu where each element is an
+ *                                        array of menu items that belong to
+ *                                        that parent.
+ * @return array An array of parsed block data.
+ */
+function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
+	if ( empty( $menu_items ) ) {
+		return array();
 	}
+
+	$blocks = array();
+
+	foreach ( $menu_items as $menu_item ) {
+		$class_name       = ! empty( $menu_item->classes ) ? implode( ' ', (array) $menu_item->classes ) : null;
+		$id               = ( null !== $menu_item->object_id && 'custom' !== $menu_item->object ) ? $menu_item->object_id : null;
+		$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
+		$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
+		$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
+
+		$block = array(
+			'blockName' => isset( $menu_items_by_parent_id[ $menu_item->ID ] ) ? 'core/navigation-submenu' : 'core/navigation-link',
+			'attrs'     => array(
+				'className'     => $class_name,
+				'description'   => $menu_item->description,
+				'id'            => $id,
+				'kind'          => $kind,
+				'label'         => $menu_item->title,
+				'opensInNewTab' => $opens_in_new_tab,
+				'rel'           => $rel,
+				'title'         => $menu_item->attr_title,
+				'type'          => $menu_item->object,
+				'url'           => $menu_item->url,
+			),
+		);
+
+		$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
+			? block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
+			: array();
+		$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
+
+		$blocks[] = $block;
+	}
+
+	return $blocks;
 }
 
 /**
@@ -257,10 +257,32 @@ function block_core_navigation_get_classic_menu_fallback() {
 	$classic_nav_menus = wp_get_nav_menus();
 
 	// If menus exist.
-	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) && count( $classic_nav_menus ) === 1 ) {
-		// Use the first classic menu only. Handles simple use case where user has a single
-		// classic menu and switches to a block theme. In future this maybe expanded to
-		// determine the most appropriate classic menu to be used based on location.
+	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) ) {
+		// Handles simple use case where user has a classic menu and switches to a block theme.
+
+		// Returns the menu assigned to location `primary`.
+		$locations = get_nav_menu_locations();
+		if ( isset( $locations['primary'] ) ) {
+			$primary_menu = wp_get_nav_menu_object( $locations['primary'] );
+			if ( $primary_menu ) {
+				return $primary_menu;
+			}
+		}
+
+		// Returns a menu if `primary` is its slug.
+		foreach ( $classic_nav_menus as $classic_nav_menu ) {
+			if ( 'primary' === $classic_nav_menu->slug ) {
+				return $classic_nav_menu;
+			}
+		}
+
+		// Otherwise return the most recently created classic menu.
+		usort(
+			$classic_nav_menus,
+			function( $a, $b ) {
+				return $b->term_id - $a->term_id;
+			}
+		);
 		return $classic_nav_menus[0];
 	}
 }
@@ -351,12 +373,14 @@ function block_core_navigation_get_most_recently_published_navigation() {
 
 	// Default to the most recently created menu.
 	$parsed_args = array(
-		'post_type'      => 'wp_navigation',
-		'no_found_rows'  => true,
-		'order'          => 'DESC',
-		'orderby'        => 'date',
-		'post_status'    => 'publish',
-		'posts_per_page' => 1, // get only the most recent.
+		'post_type'              => 'wp_navigation',
+		'no_found_rows'          => true,
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => false,
+		'order'                  => 'DESC',
+		'orderby'                => 'date',
+		'post_status'            => 'publish',
+		'posts_per_page'         => 1, // get only the most recent.
 	);
 
 	$navigation_post = new WP_Query( $parsed_args );
@@ -389,6 +413,56 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 }
 
 /**
+ * Returns true if the navigation block contains a nested navigation block.
+ *
+ * @param WP_Block_List $inner_blocks Inner block instance to be normalized.
+ * @return bool true if the navigation block contains a nested navigation block.
+ */
+function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
+	foreach ( $inner_blocks as $block ) {
+		if ( 'core/navigation' === $block->name ) {
+			return true;
+		}
+		if ( $block->inner_blocks && block_core_navigation_block_contains_core_navigation( $block->inner_blocks ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Create and returns a navigation menu containing a page-list as a fallback.
+ *
+ * @return array the newly created navigation menu.
+ */
+function block_core_navigation_get_default_pages_fallback() {
+	$registry = WP_Block_Type_Registry::get_instance();
+
+	// If `core/page-list` is not registered then use empty blocks.
+	$default_blocks = $registry->is_registered( 'core/page-list' ) ? '<!-- wp:page-list /-->' : '';
+
+	// Create a new navigation menu from the fallback blocks.
+	$wp_insert_post_result = wp_insert_post(
+		array(
+			'post_content' => $default_blocks,
+			'post_title'   => 'Navigation', // TODO - use the template slug in future.
+			'post_name'    => 'Navigation', // TODO - use the template slug in future.
+			'post_status'  => 'publish',
+			'post_type'    => 'wp_navigation',
+		),
+		true // So that we can check whether the result is an error.
+	);
+
+	if ( is_wp_error( $wp_insert_post_result ) ) {
+		return;
+	}
+
+	// Fetch the most recently published navigation which will be the default one created above.
+	return block_core_navigation_get_most_recently_published_navigation();
+}
+
+/**
  * Retrieves the appropriate fallback to be used on the front of the
  * site when there is no menu assigned to the Nav block.
  *
@@ -398,19 +472,7 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
  * @return array the array of blocks to be used as a fallback.
  */
 function block_core_navigation_get_fallback_blocks() {
-	$page_list_fallback = array(
-		array(
-			'blockName' => 'core/page-list',
-		),
-	);
-
-	$registry = WP_Block_Type_Registry::get_instance();
-
-	// If `core/page-list` is not registered then return empty blocks.
-	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
-
-	// Default to a list of Pages.
-
+	// Get the most recently published Navigation post.
 	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
 	// If there are no navigation posts then try to find a classic menu
@@ -419,14 +481,20 @@ function block_core_navigation_get_fallback_blocks() {
 		$navigation_post = block_core_navigation_maybe_use_classic_menu_fallback();
 	}
 
-	// Use the first non-empty Navigation as fallback if available.
-	if ( $navigation_post ) {
-		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( parse_blocks( $navigation_post->post_content ) );
-
-		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
-		// In this case default to the (Page List) fallback.
-		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
+	// If there are no navigation posts then default to a list of Pages.
+	if ( ! $navigation_post ) {
+		$navigation_post = block_core_navigation_get_default_pages_fallback();
 	}
+
+	// Use the first non-empty Navigation as fallback, there should always be one.
+	if ( $navigation_post ) {
+		$parsed_blocks  = parse_blocks( $navigation_post->post_content );
+		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+	}
+
+	// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
+	// In this case default empty blocks.
+	$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : array();
 
 	/**
 	 * Filters the fallback experience for the Navigation block.
@@ -487,7 +555,6 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
-
 	static $seen_menu_names = array();
 
 	// Flag used to indicate whether the rendered output is considered to be
@@ -601,6 +668,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
 	}
 
+	if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
+		return '';
+	}
+
 	/**
 	 * Filter navigation block $inner_blocks.
 	 * Allows modification of a navigation block menu items.
@@ -651,22 +722,41 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		_prime_post_caches( $post_ids, false, false );
 	}
 
+	$list_item_nav_blocks = array(
+		'core/navigation-link',
+		'core/home-link',
+		'core/site-title',
+		'core/site-logo',
+		'core/navigation-submenu',
+	);
+
+	$needs_list_item_wrapper = array(
+		'core/site-title',
+		'core/site-logo',
+	);
+
 	$inner_blocks_html = '';
 	$is_list_open      = false;
 	foreach ( $inner_blocks as $inner_block ) {
-		if ( ( 'core/navigation-link' === $inner_block->name || 'core/home-link' === $inner_block->name || 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name || 'core/navigation-submenu' === $inner_block->name ) && ! $is_list_open ) {
+		$is_list_item = in_array( $inner_block->name, $list_item_nav_blocks, true );
+
+		if ( $is_list_item && ! $is_list_open ) {
 			$is_list_open       = true;
 			$inner_blocks_html .= '<ul class="wp-block-navigation__container">';
 		}
-		if ( 'core/navigation-link' !== $inner_block->name && 'core/home-link' !== $inner_block->name && 'core/site-title' !== $inner_block->name && 'core/site-logo' !== $inner_block->name && 'core/navigation-submenu' !== $inner_block->name && $is_list_open ) {
+
+		if ( ! $is_list_item && $is_list_open ) {
 			$is_list_open       = false;
 			$inner_blocks_html .= '</ul>';
 		}
+
 		$inner_block_content = $inner_block->render();
-		if ( 'core/site-title' === $inner_block->name || ( 'core/site-logo' === $inner_block->name && $inner_block_content ) ) {
-			$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
-		} else {
-			$inner_blocks_html .= $inner_block_content;
+		if ( ! empty( $inner_block_content ) ) {
+			if ( in_array( $inner_block->name, $needs_list_item_wrapper, true ) ) {
+				$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
+			} else {
+				$inner_blocks_html .= $inner_block_content;
+			}
 		}
 	}
 

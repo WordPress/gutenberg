@@ -407,7 +407,7 @@ test.describe( 'Copy/cut/paste', () => {
 		// back to default browser behaviour, allowing the browser to insert
 		// unfiltered HTML. When we swap out the post title in the post editor
 		// with the proper block, this test can be removed.
-		await pageUtils.setClipboardData( {
+		pageUtils.setClipboardData( {
 			html: '<span style="border: 1px solid black">Hello World</span>',
 		} );
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
@@ -423,7 +423,7 @@ test.describe( 'Copy/cut/paste', () => {
 	} ) => {
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pageUtils.setClipboardData( {
+		pageUtils.setClipboardData( {
 			html: '<span style="border: 1px solid black">x</span>',
 		} );
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
@@ -432,5 +432,20 @@ test.describe( 'Copy/cut/paste', () => {
 		expect(
 			await page.evaluate( () => document.activeElement.innerHTML )
 		).toBe( 'axyb' );
+	} );
+
+	test( 'should paste preformatted in list', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		pageUtils.setClipboardData( {
+			html: '<pre>x</pre>',
+		} );
+		await editor.insertBlock( { name: 'core/list' } );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( 'y' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

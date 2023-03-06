@@ -2,7 +2,7 @@
  * External dependencies
  */
 import removeAccents from 'remove-accents';
-import { find, words } from 'lodash';
+import { noCase } from 'change-case';
 
 // Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
@@ -11,6 +11,25 @@ const defaultGetDescription = ( item ) => item.description || '';
 const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultGetCategory = ( item ) => item.category;
 const defaultGetCollection = () => null;
+
+/**
+ * Extracts words from an input string.
+ *
+ * @param {string} input The input string.
+ *
+ * @return {Array} Words, extracted from the input string.
+ */
+function extractWords( input = '' ) {
+	return noCase( input, {
+		splitRegexp: [
+			/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
+			/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
+		],
+		stripRegexp: /(\p{C}|\p{P}|\p{S})+/giu, // Anything that's not a punctuation, symbol or control/format character.
+	} )
+		.split( ' ' )
+		.filter( Boolean );
+}
 
 /**
  * Sanitizes the search input string.
@@ -43,7 +62,7 @@ function normalizeSearchInput( input = '' ) {
  * @return {string[]} The normalized list of search terms.
  */
 export const getNormalizedSearchTerms = ( input = '' ) => {
-	return words( normalizeSearchInput( input ) );
+	return extractWords( normalizeSearchInput( input ) );
 };
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
@@ -68,7 +87,7 @@ export const searchBlockItems = (
 
 	const config = {
 		getCategory: ( item ) =>
-			find( categories, { slug: item.category } )?.title,
+			categories.find( ( { slug } ) => slug === item.category )?.title,
 		getCollection: ( item ) =>
 			collections[ item.name.split( '/' )[ 0 ] ]?.title,
 	};
@@ -150,7 +169,7 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 			category,
 			collection,
 		].join( ' ' );
-		const normalizedSearchTerms = words( normalizedSearchInput );
+		const normalizedSearchTerms = extractWords( normalizedSearchInput );
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,
 			terms

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { useMemoOne } from 'use-memo-one';
-
-/**
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
@@ -11,11 +6,10 @@ import {
 	useRef,
 	useCallback,
 	useMemo,
-	useReducer,
+	useSyncExternalStore,
 	useDebugValue,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -23,22 +17,145 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
 
-const noop = () => {};
 const renderQueue = createQueue();
 
 /**
  * @typedef {import('../../types').StoreDescriptor<C>} StoreDescriptor
- * @template C
+ * @template {import('../../types').AnyConfig} C
  */
 /**
  * @typedef {import('../../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
- * @template State,Actions,Selectors
- */
-/**
- * @typedef {import('../../types').UseSelectReturn<T>} UseSelectReturn
- * @template T
+ * @template State
+ * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template Selectors
  */
 /** @typedef {import('../../types').MapSelect} MapSelect */
+/**
+ * @typedef {import('../../types').UseSelectReturn<T>} UseSelectReturn
+ * @template {MapSelect|StoreDescriptor<any>} T
+ */
+
+function Store( registry, suspense ) {
+	const select = suspense ? registry.suspendSelect : registry.select;
+	const queueContext = {};
+	let lastMapSelect;
+	let lastMapResult;
+	let lastMapResultValid = false;
+	let lastIsAsync;
+	let subscribe;
+
+	const createSubscriber = ( stores ) => ( listener ) => {
+		// Invalidate the value right after subscription was created. React will
+		// call `getValue` after subscribing, to detect store updates that happened
+		// in the interval between the `getValue` call during render and creating
+		// the subscription, which is slightly delayed. We need to ensure that this
+		// second `getValue` call will compute a fresh value.
+		lastMapResultValid = false;
+
+		const onStoreChange = () => {
+			// Invalidate the value on store update, so that a fresh value is computed.
+			lastMapResultValid = false;
+			listener();
+		};
+
+		const onChange = () => {
+			if ( lastIsAsync ) {
+				renderQueue.add( queueContext, onStoreChange );
+			} else {
+				onStoreChange();
+			}
+		};
+
+		const unsubs = stores.map( ( storeName ) => {
+			return registry.subscribe( onChange, storeName );
+		} );
+
+		return () => {
+			// The return value of the subscribe function could be undefined if the store is a custom generic store.
+			for ( const unsub of unsubs ) {
+				unsub?.();
+			}
+			// Cancel existing store updates that were already scheduled.
+			renderQueue.cancel( queueContext );
+		};
+	};
+
+	return ( mapSelect, resubscribe, isAsync ) => {
+		const selectValue = () => mapSelect( select, registry );
+
+		function updateValue( selectFromStore ) {
+			// If the last value is valid, and the `mapSelect` callback hasn't changed,
+			// then we can safely return the cached value. The value can change only on
+			// store update, and in that case value will be invalidated by the listener.
+			if ( lastMapResultValid && mapSelect === lastMapSelect ) {
+				return lastMapResult;
+			}
+
+			const mapResult = selectFromStore();
+
+			// If the new value is shallow-equal to the old one, keep the old one so
+			// that we don't trigger unwanted updates that do a `===` check.
+			if ( ! isShallowEqual( lastMapResult, mapResult ) ) {
+				lastMapResult = mapResult;
+			}
+			lastMapResultValid = true;
+		}
+
+		function getValue() {
+			// Update the value in case it's been invalidated or `mapSelect` has changed.
+			updateValue( selectValue );
+			return lastMapResult;
+		}
+
+		// When transitioning from async to sync mode, cancel existing store updates
+		// that have been scheduled, and invalidate the value so that it's freshly
+		// computed. It might have been changed by the update we just cancelled.
+		if ( lastIsAsync && ! isAsync ) {
+			lastMapResultValid = false;
+			renderQueue.cancel( queueContext );
+		}
+
+		// Either initialize the `subscribe` function, or create a new one if `mapSelect`
+		// changed and has dependencies.
+		// Usage without dependencies, `useSelect( ( s ) => { ... } )`, will subscribe
+		// only once, at mount, and won't resubscibe even if `mapSelect` changes.
+		if ( ! subscribe || ( resubscribe && mapSelect !== lastMapSelect ) ) {
+			// Find out what stores the `mapSelect` callback is selecting from and
+			// use that list to create subscriptions to specific stores.
+			const listeningStores = { current: null };
+			updateValue( () =>
+				registry.__unstableMarkListeningStores(
+					selectValue,
+					listeningStores
+				)
+			);
+			subscribe = createSubscriber( listeningStores.current );
+		} else {
+			updateValue( selectValue );
+		}
+
+		lastIsAsync = isAsync;
+		lastMapSelect = mapSelect;
+
+		// Return a pair of functions that can be passed to `useSyncExternalStore`.
+		return { subscribe, getValue };
+	};
+}
+
+function useStaticSelect( storeName ) {
+	return useRegistry().select( storeName );
+}
+
+function useMappingSelect( suspense, mapSelect, deps ) {
+	const registry = useRegistry();
+	const isAsync = useAsyncMode();
+	const store = useMemo( () => Store( registry, suspense ), [ registry ] );
+	const selector = useCallback( mapSelect, deps );
+	const { subscribe, getValue } = store( selector, !! deps, isAsync );
+	const result = useSyncExternalStore( subscribe, getValue, getValue );
+	useDebugValue( result );
+	return result;
+}
 
 /**
  * Custom react hook for retrieving props from registered selectors.
@@ -105,162 +222,26 @@ const renderQueue = createQueue();
  * @return {UseSelectReturn<T>} A custom react hook.
  */
 export default function useSelect( mapSelect, deps ) {
-	const hasMappingFunction = 'function' === typeof mapSelect;
+	// On initial call, on mount, determine the mode of this `useSelect` call
+	// and then never allow it to change on subsequent updates.
+	const staticSelectMode = typeof mapSelect !== 'function';
+	const staticSelectModeRef = useRef( staticSelectMode );
 
-	// If we're recalling a store by its name or by
-	// its descriptor then we won't be caching the
-	// calls to `mapSelect` because we won't be calling it.
-	if ( ! hasMappingFunction ) {
-		deps = [];
-	}
-
-	// Because of the "rule of hooks" we have to call `useCallback`
-	// on every invocation whether or not we have a real function
-	// for `mapSelect`. we'll create this intermediate variable to
-	// fulfill that need and then reference it with our "real"
-	// `_mapSelect` if we can.
-	const callbackMapper = useCallback(
-		hasMappingFunction ? mapSelect : noop,
-		deps
-	);
-	const _mapSelect = hasMappingFunction ? callbackMapper : null;
-
-	const registry = useRegistry();
-	const isAsync = useAsyncMode();
-
-	const latestRegistry = useRef( registry );
-	const latestMapSelect = useRef();
-	const latestIsAsync = useRef( isAsync );
-	const latestMapOutput = useRef();
-	const latestMapOutputError = useRef();
-
-	// Keep track of the stores being selected in the _mapSelect function,
-	// and only subscribe to those stores later.
-	const listeningStores = useRef( [] );
-	const wrapSelect = useCallback(
-		( callback ) =>
-			registry.__unstableMarkListeningStores(
-				() => callback( registry.select, registry ),
-				listeningStores
-			),
-		[ registry ]
-	);
-
-	// Generate a "flag" for used in the effect dependency array.
-	// It's different than just using `mapSelect` since deps could be undefined,
-	// in that case, we would still want to memoize it.
-	const depsChangedFlag = useMemo( () => ( {} ), deps || [] );
-
-	let mapOutput;
-
-	let selectorRan = false;
-	if ( _mapSelect ) {
-		mapOutput = latestMapOutput.current;
-		const hasReplacedRegistry = latestRegistry.current !== registry;
-		const hasReplacedMapSelect = latestMapSelect.current !== _mapSelect;
-		const hasLeftAsyncMode = latestIsAsync.current && ! isAsync;
-		const lastMapSelectFailed = !! latestMapOutputError.current;
-
-		if (
-			hasReplacedRegistry ||
-			hasReplacedMapSelect ||
-			hasLeftAsyncMode ||
-			lastMapSelectFailed
-		) {
-			try {
-				mapOutput = wrapSelect( _mapSelect );
-				selectorRan = true;
-			} catch ( error ) {
-				let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
-
-				if ( latestMapOutputError.current ) {
-					errorMessage += `\nThe error may be correlated with this previous error:\n`;
-					errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
-					errorMessage += 'Original stack trace:';
-				}
-
-				// eslint-disable-next-line no-console
-				console.error( errorMessage );
-			}
-		}
-	}
-
-	useIsomorphicLayoutEffect( () => {
-		if ( ! hasMappingFunction ) {
-			return;
-		}
-
-		latestRegistry.current = registry;
-		latestMapSelect.current = _mapSelect;
-		latestIsAsync.current = isAsync;
-		if ( selectorRan ) {
-			latestMapOutput.current = mapOutput;
-		}
-		latestMapOutputError.current = undefined;
-	} );
-
-	// React can sometimes clear the `useMemo` cache.
-	// We use the cache-stable `useMemoOne` to avoid
-	// losing queues.
-	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
-	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
-	const isMounted = useRef( false );
-
-	useIsomorphicLayoutEffect( () => {
-		if ( ! hasMappingFunction ) {
-			return;
-		}
-
-		const onStoreChange = () => {
-			try {
-				const newMapOutput = wrapSelect( latestMapSelect.current );
-
-				if ( isShallowEqual( latestMapOutput.current, newMapOutput ) ) {
-					return;
-				}
-				latestMapOutput.current = newMapOutput;
-			} catch ( error ) {
-				latestMapOutputError.current = error;
-			}
-			forceRender();
-		};
-
-		const onChange = () => {
-			if ( ! isMounted.current ) {
-				return;
-			}
-
-			if ( latestIsAsync.current ) {
-				renderQueue.add( queueContext, onStoreChange );
-			} else {
-				onStoreChange();
-			}
-		};
-
-		// Catch any possible state changes during mount before the subscription
-		// could be set.
-		onStoreChange();
-
-		const unsubscribers = listeningStores.current.map( ( storeName ) =>
-			registry.__unstableSubscribeStore( storeName, onChange )
+	if ( staticSelectMode !== staticSelectModeRef.current ) {
+		const prevMode = staticSelectModeRef.current ? 'static' : 'mapping';
+		const nextMode = staticSelectMode ? 'static' : 'mapping';
+		throw new Error(
+			`Switching useSelect from ${ prevMode } to ${ nextMode } is not allowed`
 		);
+	}
 
-		isMounted.current = true;
-
-		return () => {
-			// The return value of the subscribe function could be undefined if the store is a custom generic store.
-			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
-			renderQueue.cancel( queueContext );
-			isMounted.current = false;
-		};
-		// If you're tempted to eliminate the spread dependencies below don't do it!
-		// We're passing these in from the calling function and want to make sure we're
-		// examining every individual value inside the `deps` array.
-	}, [ registry, wrapSelect, hasMappingFunction, depsChangedFlag ] );
-
-	useDebugValue( mapOutput );
-
-	return hasMappingFunction ? mapOutput : registry.select( mapSelect );
+	/* eslint-disable react-hooks/rules-of-hooks */
+	// `staticSelectMode` is not allowed to change during the hook instance's,
+	// lifetime, so the rules of hooks are not really violated.
+	return staticSelectMode
+		? useStaticSelect( mapSelect )
+		: useMappingSelect( false, mapSelect, deps );
+	/* eslint-enable react-hooks/rules-of-hooks */
 }
 
 /**
@@ -279,117 +260,5 @@ export default function useSelect( mapSelect, deps ) {
  * @return {Object} Data object returned by the `mapSelect` function.
  */
 export function useSuspenseSelect( mapSelect, deps ) {
-	const _mapSelect = useCallback( mapSelect, deps );
-
-	const registry = useRegistry();
-	const isAsync = useAsyncMode();
-
-	const latestRegistry = useRef( registry );
-	const latestMapSelect = useRef();
-	const latestIsAsync = useRef( isAsync );
-	const latestMapOutput = useRef();
-	const latestMapOutputError = useRef();
-
-	// Keep track of the stores being selected in the `mapSelect` function,
-	// and only subscribe to those stores later.
-	const listeningStores = useRef( [] );
-	const wrapSelect = useCallback(
-		( callback ) =>
-			registry.__unstableMarkListeningStores(
-				() => callback( registry.suspendSelect, registry ),
-				listeningStores
-			),
-		[ registry ]
-	);
-
-	// Generate a "flag" for used in the effect dependency array.
-	// It's different than just using `mapSelect` since deps could be undefined,
-	// in that case, we would still want to memoize it.
-	const depsChangedFlag = useMemo( () => ( {} ), deps || [] );
-
-	let mapOutput = latestMapOutput.current;
-	let mapOutputError = latestMapOutputError.current;
-
-	const hasReplacedRegistry = latestRegistry.current !== registry;
-	const hasReplacedMapSelect = latestMapSelect.current !== _mapSelect;
-	const hasLeftAsyncMode = latestIsAsync.current && ! isAsync;
-
-	let selectorRan = false;
-	if ( hasReplacedRegistry || hasReplacedMapSelect || hasLeftAsyncMode ) {
-		try {
-			mapOutput = wrapSelect( _mapSelect );
-			selectorRan = true;
-		} catch ( error ) {
-			mapOutputError = error;
-		}
-	}
-
-	useIsomorphicLayoutEffect( () => {
-		latestRegistry.current = registry;
-		latestMapSelect.current = _mapSelect;
-		latestIsAsync.current = isAsync;
-		if ( selectorRan ) {
-			latestMapOutput.current = mapOutput;
-		}
-		latestMapOutputError.current = mapOutputError;
-	} );
-
-	// React can sometimes clear the `useMemo` cache.
-	// We use the cache-stable `useMemoOne` to avoid
-	// losing queues.
-	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
-	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
-	const isMounted = useRef( false );
-
-	useIsomorphicLayoutEffect( () => {
-		const onStoreChange = () => {
-			try {
-				const newMapOutput = wrapSelect( latestMapSelect.current );
-
-				if ( isShallowEqual( latestMapOutput.current, newMapOutput ) ) {
-					return;
-				}
-				latestMapOutput.current = newMapOutput;
-			} catch ( error ) {
-				latestMapOutputError.current = error;
-			}
-
-			forceRender();
-		};
-
-		const onChange = () => {
-			if ( ! isMounted.current ) {
-				return;
-			}
-
-			if ( latestIsAsync.current ) {
-				renderQueue.add( queueContext, onStoreChange );
-			} else {
-				onStoreChange();
-			}
-		};
-
-		// catch any possible state changes during mount before the subscription
-		// could be set.
-		onStoreChange();
-
-		const unsubscribers = listeningStores.current.map( ( storeName ) =>
-			registry.__unstableSubscribeStore( storeName, onChange )
-		);
-
-		isMounted.current = true;
-
-		return () => {
-			// The return value of the subscribe function could be undefined if the store is a custom generic store.
-			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
-			renderQueue.cancel( queueContext );
-			isMounted.current = false;
-		};
-	}, [ registry, wrapSelect, depsChangedFlag ] );
-
-	if ( mapOutputError ) {
-		throw mapOutputError;
-	}
-
-	return mapOutput;
+	return useMappingSelect( true, mapSelect, deps );
 }

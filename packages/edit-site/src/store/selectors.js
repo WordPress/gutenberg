@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -11,23 +10,13 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { uploadMedia } from '@wordpress/media-utils';
-import { isTemplatePart } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import {
-	MENU_ROOT,
-	MENU_TEMPLATE_PARTS,
-	MENU_TEMPLATES_UNUSED,
-	TEMPLATE_PARTS_SUB_MENUS,
-} from '../components/navigation-sidebar/navigation-panel/constants';
-import {
-	getTemplateLocation,
-	isTemplateSuperseded,
-} from '../components/navigation-sidebar/navigation-panel/template-hierarchy';
+import { getFilteredTemplatePartBlocks } from './utils';
 
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
@@ -161,18 +150,13 @@ export const getSettings = createSelector(
 );
 
 /**
- * Returns the current home template ID.
- *
- * @param {Object} state Global application state.
- *
- * @return {number?} Home template ID.
+ * @deprecated
  */
-export function getHomeTemplateId( state ) {
-	return state.homeTemplateId;
-}
-
-function getCurrentEditedPost( state ) {
-	return state.editedPost;
+export function getHomeTemplateId() {
+	deprecated( "select( 'core/edit-site' ).getHomeTemplateId", {
+		since: '6.2',
+		version: '6.4',
+	} );
 }
 
 /**
@@ -183,7 +167,7 @@ function getCurrentEditedPost( state ) {
  * @return {TemplateType?} Template type.
  */
 export function getEditedPostType( state ) {
-	return getCurrentEditedPost( state ).type;
+	return state.editedPost.postType;
 }
 
 /**
@@ -194,95 +178,31 @@ export function getEditedPostType( state ) {
  * @return {string?} Post ID.
  */
 export function getEditedPostId( state ) {
-	return getCurrentEditedPost( state ).id;
+	return state.editedPost.id;
+}
+
+/**
+ * Returns the edited post's context object.
+ *
+ * @deprecated
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Page.
+ */
+export function getEditedPostContext( state ) {
+	return state.editedPost.context;
 }
 
 /**
  * Returns the current page object.
  *
+ * @deprecated
  * @param {Object} state Global application state.
  *
  * @return {Object} Page.
  */
 export function getPage( state ) {
-	return getCurrentEditedPost( state ).page;
-}
-
-/**
- * Returns the active menu in the navigation panel.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Active menu.
- */
-export function getNavigationPanelActiveMenu( state ) {
-	return state.navigationPanel.menu;
-}
-
-/**
- * Returns the current template or template part's corresponding
- * navigation panel's sub menu, to be used with `openNavigationPanelToMenu`.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} The current template or template part's sub menu.
- */
-export const getCurrentTemplateNavigationPanelSubMenu = createRegistrySelector(
-	( select ) => ( state ) => {
-		const templateType = getEditedPostType( state );
-		const templateId = getEditedPostId( state );
-		const template = templateId
-			? select( coreDataStore ).getEntityRecord(
-					'postType',
-					templateType,
-					templateId
-			  )
-			: null;
-
-		if ( ! template ) {
-			return MENU_ROOT;
-		}
-
-		if ( 'wp_template_part' === templateType ) {
-			return (
-				TEMPLATE_PARTS_SUB_MENUS.find(
-					( submenu ) => submenu.area === template?.area
-				)?.menu || MENU_TEMPLATE_PARTS
-			);
-		}
-
-		const templates = select( coreDataStore ).getEntityRecords(
-			'postType',
-			'wp_template'
-		);
-		const showOnFront = select( coreDataStore ).getEditedEntityRecord(
-			'root',
-			'site'
-		).show_on_front;
-
-		if (
-			isTemplateSuperseded(
-				template.slug,
-				map( templates, 'slug' ),
-				showOnFront
-			)
-		) {
-			return MENU_TEMPLATES_UNUSED;
-		}
-
-		return getTemplateLocation( template.slug );
-	}
-);
-
-/**
- * Returns the current opened/closed state of the navigation panel.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} True if the navigation panel should be open; false if closed.
- */
-export function isNavigationOpened( state ) {
-	return state.navigationPanel.isOpen;
+	return { context: state.editedPost.context };
 }
 
 /**
@@ -321,6 +241,17 @@ export function isListViewOpened( state ) {
 }
 
 /**
+ * Returns the current opened/closed state of the save panel.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if the save panel should be open; false if closed.
+ */
+export function isSaveViewOpened( state ) {
+	return state.saveViewPanel;
+}
+
+/**
  * Returns the template parts and their blocks for the current edited template.
  *
  * @param {Object} state Global application state.
@@ -341,32 +272,8 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			'wp_template_part',
 			{ per_page: -1 }
 		);
-		const templatePartsById = templateParts
-			? // Key template parts by their ID.
-			  templateParts.reduce(
-					( newTemplateParts, part ) => ( {
-						...newTemplateParts,
-						[ part.id ]: part,
-					} ),
-					{}
-			  )
-			: {};
 
-		return ( template.blocks ?? [] )
-			.filter( ( block ) => isTemplatePart( block ) )
-			.map( ( block ) => {
-				const {
-					attributes: { theme, slug },
-				} = block;
-				const templatePartId = `${ theme }//${ slug }`;
-				const templatePart = templatePartsById[ templatePartId ];
-
-				return {
-					templatePart,
-					block,
-				};
-			} )
-			.filter( ( { templatePart } ) => !! templatePart );
+		return getFilteredTemplatePartBlocks( template.blocks, templateParts );
 	}
 );
 
@@ -379,4 +286,37 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
  */
 export function getEditorMode( state ) {
 	return __unstableGetPreference( state, 'editorMode' );
+}
+
+/**
+ * @deprecated
+ */
+export function getCurrentTemplateNavigationPanelSubMenu() {
+	deprecated(
+		"dispatch( 'core/edit-site' ).getCurrentTemplateNavigationPanelSubMenu",
+		{
+			since: '6.2',
+			version: '6.4',
+		}
+	);
+}
+
+/**
+ * @deprecated
+ */
+export function getNavigationPanelActiveMenu() {
+	deprecated( "dispatch( 'core/edit-site' ).getNavigationPanelActiveMenu", {
+		since: '6.2',
+		version: '6.4',
+	} );
+}
+
+/**
+ * @deprecated
+ */
+export function isNavigationOpened() {
+	deprecated( "dispatch( 'core/edit-site' ).isNavigationOpened", {
+		since: '6.2',
+		version: '6.4',
+	} );
 }

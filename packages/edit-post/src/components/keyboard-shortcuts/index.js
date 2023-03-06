@@ -7,11 +7,12 @@ import {
 	useShortcut,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -53,6 +54,38 @@ function KeyboardShortcuts() {
 		closeGeneralSidebar();
 	};
 
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
+		useSelect( blockEditorStore );
+
+	const handleTextLevelShortcut = ( event, level ) => {
+		event.preventDefault();
+		const destinationBlockName =
+			level === 0 ? 'core/paragraph' : 'core/heading';
+		const currentClientId = getSelectedBlockClientId();
+		if ( currentClientId === null ) {
+			return;
+		}
+		const blockName = getBlockName( currentClientId );
+		if ( blockName !== 'core/paragraph' && blockName !== 'core/heading' ) {
+			return;
+		}
+		const attributes = getBlockAttributes( currentClientId );
+		const textAlign =
+			blockName === 'core/paragraph' ? 'align' : 'textAlign';
+		const destinationTextAlign =
+			destinationBlockName === 'core/paragraph' ? 'align' : 'textAlign';
+
+		replaceBlocks(
+			currentClientId,
+			createBlock( destinationBlockName, {
+				level,
+				content: attributes.content,
+				...{ [ destinationTextAlign ]: attributes[ textAlign ] },
+			} )
+		);
+	};
+
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-mode',
@@ -67,7 +100,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-distraction-free',
 			category: 'global',
-			description: __( 'Toggle disrtaction free mode.' ),
+			description: __( 'Toggle distraction free mode.' ),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: '\\',
@@ -133,6 +166,10 @@ function KeyboardShortcuts() {
 					modifier: 'access',
 					character: 'p',
 				},
+				{
+					modifier: 'ctrlShift',
+					character: '~',
+				},
 			],
 		} );
 
@@ -144,6 +181,28 @@ function KeyboardShortcuts() {
 				modifier: 'access',
 				character: 'h',
 			},
+		} );
+
+		registerShortcut( {
+			name: `core/edit-post/transform-heading-to-paragraph`,
+			category: 'block-library',
+			description: __( 'Transform heading to paragraph.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: `0`,
+			},
+		} );
+
+		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+			registerShortcut( {
+				name: `core/edit-post/transform-paragraph-to-heading-${ level }`,
+				category: 'block-library',
+				description: __( 'Transform paragraph to heading.' ),
+				keyCombination: {
+					modifier: 'access',
+					character: `${ level }`,
+				},
+			} );
 		} );
 	}, [] );
 
@@ -168,14 +227,12 @@ function KeyboardShortcuts() {
 		setIsListViewOpened( false );
 		toggleDistractionFree();
 		toggleFeature( 'distractionFree' );
-		const modeState = isFeatureActive( 'distractionFree' )
-			? __( 'on' )
-			: __( 'off' );
 		createInfoNotice(
-			// translators: Mode of distraction free can be 'on' or 'off';
-			sprintf( __( 'Distraction free mode turned %s.' ), modeState ),
+			isFeatureActive( 'distractionFree' )
+				? __( 'Distraction free mode turned on.' )
+				: __( 'Distraction free mode turned off.' ),
 			{
-				speak: true,
+				id: 'core/edit-post/distraction-free-mode/notice',
 				type: 'snackbar',
 			}
 		);
@@ -196,9 +253,26 @@ function KeyboardShortcuts() {
 		}
 	} );
 
-	useShortcut( 'core/edit-post/toggle-list-view', () =>
-		setIsListViewOpened( ! isListViewOpened() )
+	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
+	useShortcut( 'core/edit-post/toggle-list-view', () => {
+		if ( ! isListViewOpened() ) {
+			setIsListViewOpened( true );
+		}
+	} );
+
+	useShortcut( 'core/edit-post/transform-heading-to-paragraph', ( event ) =>
+		handleTextLevelShortcut( event, 0 )
 	);
+
+	[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+		//the loop is based off on a constant therefore
+		//the hook will execute the same way every time
+		//eslint-disable-next-line react-hooks/rules-of-hooks
+		useShortcut(
+			`core/edit-post/transform-paragraph-to-heading-${ level }`,
+			( event ) => handleTextLevelShortcut( event, level )
+		);
+	} );
 
 	return null;
 }

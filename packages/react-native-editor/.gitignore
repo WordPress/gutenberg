@@ -61,6 +61,7 @@ xcuserdata
 *.moved-aside
 DerivedData
 *.xcuserstatee
+ios/.xcode.env.local
 
 # Android/IntelliJ
 #
@@ -89,9 +90,10 @@ buck-out/
 # For more information about the recommended setup visit:
 # https://docs.fastlane.tools/best-practices/source-control/
 
-*/fastlane/report.xml
-*/fastlane/Preview.html
-*/fastlane/screenshots
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
 
 # Bundle artifact
 *.jsbundle
@@ -115,7 +117,8 @@ bin/wp-cli.phar
 # Report generated from jest-junit
 /junit.xml
 
-# Cocoapods
+# Ruby / CocoaPods
 
 ios/Pods
 ios/vendor
+/vendor/bundle/

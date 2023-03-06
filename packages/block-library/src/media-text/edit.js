@@ -2,12 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map, filter } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
 import {
@@ -37,30 +36,20 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import MediaContainer from './media-container';
-import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
-
-/**
- * Constants
- */
-const TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			placeholder: _x( 'Content…', 'content placeholder' ),
-		},
-	],
-];
+import {
+	DEFAULT_MEDIA_SIZE_SLUG,
+	WIDTH_CONSTRAINT_PERCENTAGE,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_ATTACHMENT,
+	TEMPLATE,
+} from './constants';
 
 // this limits the resize to a safe zone to avoid making broken layouts
-const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) =>
 	Math.max(
 		WIDTH_CONSTRAINT_PERCENTAGE,
 		Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE )
 	);
-
-const LINK_DESTINATION_MEDIA = 'media';
-const LINK_DESTINATION_ATTACHMENT = 'attachment';
 
 function getImageSourceUrlBySizeSlug( image, slug ) {
 	// eslint-disable-next-line camelcase
@@ -199,7 +188,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		setAttributes( {
 			mediaWidth: applyWidthConstraints( width ),
 		} );
-		setTemporaryMediaWidth( applyWidthConstraints( width ) );
+		setTemporaryMediaWidth( null );
 	};
 
 	const classNames = classnames( {
@@ -225,12 +214,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		setAttributes( { verticalAlignment: alignment } );
 	};
 
-	const imageSizeOptions = map(
-		filter( imageSizes, ( { slug } ) =>
-			getImageSourceUrlBySizeSlug( image, slug )
-		),
-		( { name, slug } ) => ( { value: slug, label: name } )
-	);
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) => getImageSourceUrlBySizeSlug( image, slug ) )
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 	const updateImage = ( newMediaSizeSlug ) => {
 		const newUrl = getImageSourceUrlBySizeSlug( image, newMediaSizeSlug );
 
@@ -247,6 +233,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const mediaTextGeneralSettings = (
 		<PanelBody title={ __( 'Settings' ) }>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Stack on mobile' ) }
 				checked={ isStackedOnMobile }
 				onChange={ () =>
@@ -257,6 +244,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			/>
 			{ mediaType === 'image' && (
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Crop image to fill entire column' ) }
 					checked={ imageFill }
 					onChange={ () =>
@@ -268,6 +256,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			) }
 			{ imageFill && mediaUrl && mediaType === 'image' && (
 				<FocalPointPicker
+					__nextHasNoMarginBottom
 					label={ __( 'Focal point picker' ) }
 					url={ mediaUrl }
 					value={ focalPoint }
@@ -280,6 +269,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			) }
 			{ mediaType === 'image' && (
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Alt text (alternative text)' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
@@ -306,6 +296,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			) }
 			{ mediaUrl && (
 				<RangeControl
+					__nextHasNoMarginBottom
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
 					onChange={ commitWidthChange }

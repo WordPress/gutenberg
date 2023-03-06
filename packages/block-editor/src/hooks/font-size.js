@@ -150,45 +150,11 @@ export function FontSizeEdit( props ) {
 			onChange={ onChange }
 			value={ fontSizeValue }
 			withReset={ false }
+			withSlider
 			size="__unstable-large"
 			__nextHasNoMarginBottom
 		/>
 	);
-}
-
-/**
- * Checks if there is a current value set for the font size block support.
- *
- * @param {Object} props Block props.
- * @return {boolean}     Whether or not the block has a font size value set.
- */
-export function hasFontSizeValue( props ) {
-	const { fontSize, style } = props.attributes;
-	return !! fontSize || !! style?.typography?.fontSize;
-}
-
-/**
- * Resets the font size block support attribute. This can be used when
- * disabling the font size support controls for a block via a progressive
- * discovery panel.
- *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
- */
-export function resetFontSize( { attributes = {}, setAttributes } ) {
-	const { style } = attributes;
-
-	setAttributes( {
-		fontSize: undefined,
-		style: cleanEmptyObject( {
-			...style,
-			typography: {
-				...style?.typography,
-				fontSize: undefined,
-			},
-		} ),
-	} );
 }
 
 /**
@@ -267,7 +233,7 @@ const MIGRATION_PATHS = {
 	fontSize: [ [ 'fontSize' ], [ 'style', 'typography', 'fontSize' ] ],
 };
 
-export function addTransforms( result, source, index, results ) {
+function addTransforms( result, source, index, results ) {
 	const destinationBlockType = result.name;
 	const activeSupports = {
 		fontSize: hasBlockSupport(
@@ -323,13 +289,22 @@ function addEditPropsForFluidCustomFontSizes( blockType ) {
 		// BlockListContext.Provider. If we set fontSize using editor.
 		// BlockListBlock instead of using getEditWrapperProps then the value is
 		// clobbered when the core/style/addEditProps filter runs.
-		const isFluidTypographyEnabled =
-			!! select( blockEditorStore ).getSettings().__experimentalFeatures
+		const fluidTypographyConfig =
+			select( blockEditorStore ).getSettings().__experimentalFeatures
 				?.typography?.fluid;
 
+		const fluidTypographySettings =
+			typeof fluidTypographyConfig === 'object'
+				? fluidTypographyConfig
+				: {};
+
 		const newFontSize =
-			fontSize && isFluidTypographyEnabled
-				? getComputedFluidTypographyValue( { fontSize } )
+			fontSize && !! fluidTypographyConfig
+				? getComputedFluidTypographyValue( {
+						fontSize,
+						minimumFontSizeLimit:
+							fluidTypographySettings?.minFontSize,
+				  } )
 				: null;
 
 		if ( newFontSize === null ) {

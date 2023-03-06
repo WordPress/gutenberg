@@ -141,6 +141,7 @@ figure.wp-block-image:not(.wp-block) {
 	// smoother UX.
 	.reactEasyCrop_Container .reactEasyCrop_Image {
 		border: none;
+		border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
 	}
 }
 
@@ -160,17 +161,6 @@ figure.wp-block-image:not(.wp-block) {
 	.components-popover__content {
 		min-width: 260px;
 		overflow: visible !important;
-	}
-
-	.components-range-control {
-		flex: 1;
-	}
-
-	.components-base-control__field {
-		display: flex;
-		margin-bottom: 0;
-		flex-direction: column;
-		align-items: flex-start;
 	}
 }
 

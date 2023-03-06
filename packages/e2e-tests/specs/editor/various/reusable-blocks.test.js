@@ -108,7 +108,7 @@ describe( 'Reusable blocks', () => {
 		await insertReusableBlock( 'Surprised greeting block' );
 
 		// Convert block to a regular block.
-		await clickBlockToolbarButton( 'Convert to regular blocks' );
+		await clickBlockToolbarButton( 'Convert to regular block' );
 
 		// Check that we have a paragraph block on the page.
 		const paragraphBlock = await page.$(
@@ -343,7 +343,7 @@ describe( 'Reusable blocks', () => {
 
 		// Convert back to regular blocks.
 		await clickBlockToolbarButton( 'Select Reusable block' );
-		await clickBlockToolbarButton( 'Convert to regular blocks' );
+		await clickBlockToolbarButton( 'Convert to regular block' );
 		await page.waitForXPath( selector, {
 			hidden: true,
 		} );

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Switch } from 'react-native';
-import { isEmpty } from 'lodash';
+
 /**
  * WordPress dependencies
  */
@@ -20,7 +20,7 @@ export default function BottomSheetSwitchCell( props ) {
 	};
 
 	const getAccessibilityLabel = () => {
-		if ( isEmpty( cellProps.help ) ) {
+		if ( ! cellProps.help ) {
 			return value
 				? sprintf(
 						/* translators: accessibility text. Switch setting ON state. %s: Switch title. */

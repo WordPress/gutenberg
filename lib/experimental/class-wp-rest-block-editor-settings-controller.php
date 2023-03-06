@@ -115,7 +115,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'__unstableEnableFullSiteEditingBlocks'  => array(
-					'description' => __( 'Enables experimental Full Site Editing blocks', 'gutenberg' ),
+					'description' => __( 'Enables experimental Site Editor blocks', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
@@ -127,7 +127,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				),
 
 				'supportsTemplateMode'                   => array(
-					'description' => __( 'Returns if the current theme is full site editing-enabled or not.', 'gutenberg' ),
+					'description' => __( 'Indicates whether the current theme supports block-based templates.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
@@ -189,6 +189,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				'blockCategories'                        => array(
 					'description' => __( 'Returns all the categories for block types that will be shown in the block editor.', 'gutenberg' ),
 					'type'        => 'array',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+
+				'blockInspectorTabs'                     => array(
+					'description' => __( 'Block inspector tab display overrides.', 'gutenberg' ),
+					'type'        => 'object',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
 
