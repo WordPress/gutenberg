@@ -14,6 +14,10 @@ test.describe( 'Writing Flow', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test( 'Should navigate inner blocks with arrow keys', async ( {
 		editor,
 		page,

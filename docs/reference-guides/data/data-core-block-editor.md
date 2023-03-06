@@ -86,7 +86,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the given block is allowed to be moved.
+-   `boolean | undefined`: Whether the given block is allowed to be moved.
 
 ### canMoveBlocks
 
@@ -158,6 +158,19 @@ _Parameters_
 _Returns_
 
 -   `?string`: Return the client ID of the block, or null if none exists.
+
+### getAllowedBlocks
+
+Returns the list of allowed inserter blocks for inner blocks children.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `Array?`: The list of allowed block types.
 
 ### getBlock
 
@@ -292,6 +305,20 @@ _Parameters_
 _Returns_
 
 -   `string`: Block name.
+
+### getBlockNamesByClientId
+
+Given an array of block client IDs, returns the corresponding array of block
+names.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientIds_ `string[]`: Client IDs for which block names are to be returned.
+
+_Returns_
+
+-   `string[]`: Block names.
 
 ### getBlockOrder
 
@@ -661,6 +688,24 @@ _Returns_
 
 -   `?string`: Adjacent block's client ID, or null if none exists.
 
+### getPatternsByBlockTypes
+
+Returns the list of patterns based on their declared `blockTypes`
+and a block's name.
+Patterns can use `blockTypes` to integrate in work flows like
+suggesting appropriate patterns in a Placeholder state(during insertion)
+or blocks transformations.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _blockNames_ `string|string[]`: Block's name or array of block names to find matching pattens.
+-   _rootClientId_ `?string`: Optional target root client ID.
+
+_Returns_
+
+-   `Array`: The list of matched block patterns based on declared `blockTypes` and block name.
+
 ### getPreviousBlockClientId
 
 Returns the previous block's client ID from the given reference start ID.
@@ -801,7 +846,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Block Template Lock
+-   `string|false`: Block Template Lock
 
 ### hasBlockMovingClientId
 
@@ -1337,7 +1382,7 @@ the set of specified client IDs are to be removed.
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Client IDs of blocks to remove.
--   _selectPrevious_ `boolean`: True if the previous block should be selected when a block is removed.
+-   _selectPrevious_ `boolean`: True if the previous block or the immediate parent (if no previous block exists) should be selected when a block is removed.
 
 ### replaceBlock
 
@@ -1451,11 +1496,13 @@ _Parameters_
 ### selectPreviousBlock
 
 Yields action objects used in signalling that the block preceding the given
-clientId should be selected.
+clientId (or optionally, its first parent from bottom to top)
+should be selected.
 
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+-   _fallbackToParent_ `boolean`: If true, select the first parent if there is no previous block.
 
 ### setBlockMovingClientId
 

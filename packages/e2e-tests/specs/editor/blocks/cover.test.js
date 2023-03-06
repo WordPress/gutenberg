@@ -13,6 +13,7 @@ import {
 	insertBlock,
 	createNewPost,
 	openDocumentSettingsSidebar,
+	switchBlockInspectorTab,
 	transformBlockTo,
 } from '@wordpress/e2e-test-utils';
 
@@ -126,22 +127,23 @@ describe( 'Cover', () => {
 			'.components-circular-option-picker__option-wrapper:first-child button'
 		);
 
-		// Select the cover block.By default the child paragraph gets selected.
-		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
+		// Select the cover block. By default the child paragraph gets selected.
+		await page.click(
+			'.edit-post-header-toolbar__document-overview-toggle'
+		);
 		await page.click(
 			'.block-editor-list-view-block__contents-container a'
 		);
 
-		const heightInput = (
-			await page.$x(
-				'//div[./label[contains(text(),"Minimum height of cover")]]//input'
-			)
-		 )[ 0 ];
+		switchBlockInspectorTab( 'Styles' );
+		const heightInputHandle = await page.waitForSelector(
+			'input[id*="block-cover-height-input"]'
+		);
 
 		// Verify the height of the cover is not defined.
 		expect(
-			await page.evaluate( ( { value } ) => value, heightInput )
-		).toBeFalsy();
+			await page.evaluate( ( { value } ) => value, heightInputHandle )
+		).toBe( '' );
 
 		const resizeButton = await page.$(
 			'.components-resizable-box__handle-bottom'
@@ -186,7 +188,7 @@ describe( 'Cover', () => {
 		expect(
 			await page.evaluate(
 				( { value } ) => Number.parseInt( value ),
-				heightInput
+				heightInputHandle
 			)
 		).toBeGreaterThan( 100 );
 	} );

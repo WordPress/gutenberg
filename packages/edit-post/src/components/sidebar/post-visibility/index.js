@@ -21,6 +21,7 @@ export function PostVisibility() {
 			// Anchor the popover to the middle of the entire row so that it doesn't
 			// move around when the label changes.
 			anchor: popoverAnchor,
+			placement: 'bottom-end',
 		} ),
 		[ popoverAnchor ]
 	);
@@ -40,7 +41,6 @@ export function PostVisibility() {
 					) }
 					{ canEdit && (
 						<Dropdown
-							position="bottom left"
 							contentClassName="edit-post-post-visibility__dialog"
 							popoverProps={ popoverProps }
 							focusOnMount

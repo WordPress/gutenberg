@@ -54,8 +54,8 @@ lines preserved[/myshortcode]
 `;
 
 exports[`Inserting blocks inserts a block in proper place after having clicked \`Browse All\` from block appender 1`] = `
-"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
-<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+"<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
 <p>Paragraph inside group</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
@@ -71,7 +71,7 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2>Heading</h2>
+<h2 class="wp-block-heading">Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -88,12 +88,12 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 <p>First paragraph</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:cover {\\"isDark\\":false} -->
-<div class=\\"wp-block-cover is-light\\"><span aria-hidden=\\"true\\" class=\\"wp-block-cover__background has-background-dim-100 has-background-dim\\"></span><div class=\\"wp-block-cover__inner-container\\"></div></div>
+<!-- wp:cover {"isDark":false} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"></div></div>
 <!-- /wp:cover -->
 
 <!-- wp:heading -->
-<h2>Heading</h2>
+<h2 class="wp-block-heading">Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -107,8 +107,8 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 
 exports[`Inserting blocks inserts blocks at root level when using the root appender while selection is in an inner block 1`] = `
 "<!-- wp:buttons -->
-<div class=\\"wp-block-buttons\\"><!-- wp:button -->
-<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link wp-element-button\\">1.1</a></div>
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">1.1</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->
 

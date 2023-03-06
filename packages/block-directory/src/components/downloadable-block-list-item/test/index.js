@@ -66,9 +66,7 @@ describe( 'DownloadableBlockListItem', () => {
 	} );
 
 	it( 'should try to install the block plugin', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		useSelect.mockImplementation( () => ( {
 			isInstalling: false,

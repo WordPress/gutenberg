@@ -13,22 +13,20 @@ describe( 'props', () => {
 	const baseTooltipId = 'base-tooltip';
 	const baseTooltipTriggerContent = 'WordPress.org - Base trigger content';
 	const byId = ( id ) => ( t ) => t.id === id;
-	const renderVisibleTooltip = () => {
-		render(
-			<Tooltip baseId={ baseTooltipId } content="Code is Poetry" visible>
-				<Text>{ baseTooltipTriggerContent }</Text>
-			</Tooltip>
-		);
-	};
+	const VisibleTooltip = () => (
+		<Tooltip baseId={ baseTooltipId } content="Code is Poetry" visible>
+			<Text>{ baseTooltipTriggerContent }</Text>
+		</Tooltip>
+	);
 
 	test( 'should render correctly', () => {
-		renderVisibleTooltip();
+		render( <VisibleTooltip /> );
 		const tooltip = screen.getByRole( /tooltip/i );
 		expect( tooltip ).toMatchSnapshot();
 	} );
 
 	test( 'should render invisible', () => {
-		renderVisibleTooltip();
+		render( <VisibleTooltip /> );
 		const invisibleTooltipTriggerContent = 'WordPress.org - Invisible';
 		render(
 			<Tooltip
@@ -52,7 +50,7 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render without children', () => {
-		renderVisibleTooltip();
+		render( <VisibleTooltip /> );
 		const childlessTooltipId = 'tooltip-without-children';
 		render(
 			<Tooltip
@@ -67,7 +65,7 @@ describe( 'props', () => {
 	} );
 
 	test( 'should not render a tooltip without content', () => {
-		renderVisibleTooltip();
+		render( <VisibleTooltip /> );
 		const contentlessTooltipId = 'contentless-tooltip';
 		render(
 			<Tooltip baseId={ contentlessTooltipId } visible>

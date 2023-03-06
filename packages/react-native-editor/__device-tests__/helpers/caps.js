@@ -36,4 +36,5 @@ exports.android = {
 	deviceOrientation: 'portrait',
 	appiumVersion: '1.22.1',
 	app: undefined,
+	disableWindowAnimation: true,
 };

@@ -24,22 +24,24 @@ import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
-import type { Color, ColorOrigin, Colors, DropdownProps } from '../types';
+import type { ColorObject } from '../../color-palette/types';
+import { isMultiplePaletteArray } from '../../color-palette/utils';
+import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
+import type { ColorProps, DropdownProps } from '../types';
 
-const noop = () => undefined;
 const getColorObject = (
 	colorValue: CSSProperties[ 'borderColor' ],
-	colors: Colors | undefined,
-	hasMultipleColorOrigins: boolean
+	colors: ColorProps[ 'colors' ] | undefined
 ) => {
 	if ( ! colorValue || ! colors ) {
 		return;
 	}
 
-	if ( hasMultipleColorOrigins ) {
+	if ( isMultiplePaletteArray( colors ) ) {
+		// Multiple origins
 		let matchedColor;
 
-		( colors as ColorOrigin[] ).some( ( origin ) =>
+		colors.some( ( origin ) =>
 			origin.colors.some( ( color ) => {
 				if ( color.color === colorValue ) {
 					matchedColor = color;
@@ -53,14 +55,13 @@ const getColorObject = (
 		return matchedColor;
 	}
 
-	return ( colors as Color[] ).find(
-		( color ) => color.color === colorValue
-	);
+	// Single origin
+	return colors.find( ( color ) => color.color === colorValue );
 };
 
 const getToggleAriaLabel = (
 	colorValue: CSSProperties[ 'borderColor' ],
-	colorObject: Color | undefined,
+	colorObject: ColorObject | undefined,
 	style: CSSProperties[ 'borderStyle' ],
 	isStyleEnabled: boolean
 ) => {
@@ -125,12 +126,12 @@ const BorderControlDropdown = (
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		border,
 		colors,
 		disableCustomColors,
 		enableAlpha,
+		enableStyle,
 		indicatorClassName,
 		indicatorWrapperClassName,
 		onReset,
@@ -140,17 +141,12 @@ const BorderControlDropdown = (
 		popoverControlsClassName,
 		resetButtonClassName,
 		showDropdownHeader,
-		enableStyle = true,
 		__unstablePopoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );
 
 	const { color, style } = border || {};
-	const colorObject = getColorObject(
-		color,
-		colors,
-		!! __experimentalHasMultipleOrigins
-	);
+	const colorObject = getColorObject( color, colors );
 
 	const toggleAriaLabel = getToggleAriaLabel(
 		color,
@@ -164,12 +160,14 @@ const BorderControlDropdown = (
 		? 'bottom left'
 		: undefined;
 
-	const renderToggle = ( { onToggle = noop } ) => (
+	const renderToggle: DropdownComponentProps[ 'renderToggle' ] = ( {
+		onToggle,
+	} ) => (
 		<Button
 			onClick={ onToggle }
 			variant="tertiary"
 			aria-label={ toggleAriaLabel }
-			position={ dropdownPosition }
+			tooltipPosition={ dropdownPosition }
 			label={ __( 'Border color and style picker' ) }
 			showTooltip={ true }
 		>
@@ -182,8 +180,9 @@ const BorderControlDropdown = (
 		</Button>
 	);
 
-	// TODO: update types once Dropdown component is refactored to TypeScript.
-	const renderContent = ( { onClose }: { onClose: () => void } ) => (
+	const renderContent: DropdownComponentProps[ 'renderContent' ] = ( {
+		onClose,
+	} ) => (
 		<>
 			<DropdownContentWrapper paddingSize="medium">
 				<VStack className={ popoverControlsClassName } spacing={ 6 }>
@@ -203,9 +202,6 @@ const BorderControlDropdown = (
 						value={ color }
 						onChange={ onColorChange }
 						{ ...{ colors, disableCustomColors } }
-						__experimentalHasMultipleOrigins={
-							__experimentalHasMultipleOrigins
-						}
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}

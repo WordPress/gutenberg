@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
@@ -17,7 +17,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { store as postEditorStore } from '../../../store';
 
-function WritingMenu( { onClose } ) {
+function WritingMenu() {
+	const registry = useRegistry();
 	const isDistractionFree = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().isDistractionFree,
@@ -36,14 +37,15 @@ function WritingMenu( { onClose } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const toggleDistractionFree = () => {
-		setPreference( 'core/edit-post', 'fixedToolbar', false );
-		setIsInserterOpened( false );
-		setIsListViewOpened( false );
-		closeGeneralSidebar();
-		onClose();
-		if ( ! isDistractionFree ) {
-			selectBlock( blocks[ 0 ].clientId );
-		}
+		registry.batch( () => {
+			setPreference( 'core/edit-post', 'fixedToolbar', false );
+			setIsInserterOpened( false );
+			setIsListViewOpened( false );
+			closeGeneralSidebar();
+			if ( ! isDistractionFree && !! blocks.length ) {
+				selectBlock( blocks[ 0 ].clientId );
+			}
+		} );
 	};
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -84,7 +86,7 @@ function WritingMenu( { onClose } ) {
 			<PreferenceToggleMenuItem
 				scope="core/edit-post"
 				name="distractionFree"
-				toggleHandler={ toggleDistractionFree }
+				onToggle={ toggleDistractionFree }
 				label={ __( 'Distraction free' ) }
 				info={ __( 'Write with calmness' ) }
 				messageActivated={ __( 'Distraction free mode activated' ) }

@@ -12,7 +12,6 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
-/* eslint-disable-next-line jest/no-jest-import */
 const jest = require( 'jest' );
 const { sync: spawn } = require( 'cross-spawn' );
 
@@ -52,6 +51,7 @@ const config = configFile
 	? [ '--config', JSON.stringify( require( configFile ) ) ]
 	: [];
 
+// Force e2e tests to run serially, not in parallel. They test against a shared Docker instance
 const hasRunInBand = hasArgInCLI( '--runInBand' ) || hasArgInCLI( '-i' );
 const runInBand = ! hasRunInBand ? [ '--runInBand' ] : [];
 

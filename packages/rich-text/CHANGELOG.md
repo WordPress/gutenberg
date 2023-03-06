@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 6.5.0 (2023-03-01)
+
+## 6.4.0 (2023-02-15)
+
+## 6.3.0 (2023-02-01)
+
+## 6.2.0 (2023-01-11)
+
+## 6.1.0 (2023-01-02)
+
+## 6.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 5.20.0 (2022-11-16)
+
+## 5.19.0 (2022-11-02)
+
+### Deprecations
+
+-   Update deprecation message for the `useAnchorRef` hook ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
+
+## 5.18.0 (2022-10-19)
+
 ## 5.17.0 (2022-10-05)
 
 ## 5.16.0 (2022-09-21)

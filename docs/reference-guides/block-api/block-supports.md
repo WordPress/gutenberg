@@ -48,7 +48,7 @@ function render_block() {
 -   Type: `boolean`
 -   Default value: `false`
 
-Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link. _Important: It doesn't work with dynamic blocks yet._
+Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 
 ```js
 // Declare support for anchor links.
@@ -351,36 +351,25 @@ supports: {
 Link color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
 
 
-When the block declares support for `color.link`, the attributes definition is extended to include two new attributes: `linkColor` and `style`:
-
-- `linkColor`: attribute of `string` type with no default assigned.
-
-  When a user chooses from the list of preset link colors, the preset slug is stored in the `linkColor` attribute.
-
-  The block can apply a default preset text color by specifying its own attribute with a default e.g.:
-
-  ```js
-  attributes: {
-      linkColor: {
-          type: 'string',
-          default: 'some-preset-link-color-slug',
-      }
-  }
-  ```
+When the block declares support for `color.link`, the attributes definition is extended to include the `style` attribute:
 
 - `style`: attribute of `object` type with no default assigned.
 
-  When a custom link color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.link` attribute.
+  When a link color is selected, the color value is stored in the `style.elements.link.color.text` attribute.
 
-  The block can apply a default custom link color by specifying its own attribute with a default e.g.:
+  The block can apply a default link color by specifying its own attribute with a default e.g.:
 
   ```js
   attributes: {
       style: {
           type: 'object',
           default: {
-              color: {
-                  link: '#ff0000',
+              elements: {
+                  link: {
+                      color: {
+                          text: '#ff0000',
+                      }
+                  }
               }
           }
       }
@@ -477,6 +466,39 @@ supports: {
 }
 ```
 
+## dimensions
+
+_**Note:** Since WordPress 6.2._
+
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `minHeight`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+
+```js
+supports: {
+    dimensions: {
+        minHeight: true // Enable min height control.
+    }
+}
+```
+
+When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
+
+- `style`: attribute of `object` type with no default assigned. This is added when `minHeight` support is declared. It stores the custom values set by the user, e.g.:
+
+```js
+attributes: {
+    style: {
+        dimensions: {
+            minHeight: "50vh"
+        }
+    }
+}
+```
+
 ## html
 
 -   Type: `boolean`
@@ -496,7 +518,7 @@ supports: {
 -   Type: `boolean`
 -   Default value: `true`
 
-By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
+By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set `inserter` to `false`.
 
 ```js
 supports: {
@@ -547,6 +569,42 @@ supports: {
 }
 ```
 
+## position
+
+_**Note:** Since WordPress 6.2._
+
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `sticky`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+
+Note that sticky position controls are currently only available for blocks set at the root level of the document. Setting a block to the `sticky` position will stick the block to its most immediate parent when the user scrolls the page.
+
+```js
+supports: {
+    position: {
+        sticky: true // Enable selecting sticky position.
+    }
+}
+```
+
+When the block declares support for a specific position property, its attributes definition is extended to include the `style` attribute.
+
+- `style`: attribute of `object` type with no default assigned. This is added when `sticky` support is declared. It stores the custom values set by the user, e.g.:
+
+```js
+attributes: {
+    style: {
+        position: {
+            type: "sticky",
+            top: "0px"
+        }
+    }
+}
+```
+
 ## spacing
 
 -   Type: `Object`
@@ -556,7 +614,7 @@ supports: {
     -   `padding`: type `boolean` or `array`, default value `false`
     -   `blockGap`: type `boolean` or `array`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
 
 ```js
 supports: {
@@ -568,7 +626,7 @@ supports: {
 }
 ```
 
-When the block declares support for a specific spacing property, the attributes definition is extended to include the `style` attribute.
+When the block declares support for a specific spacing property, its attributes definition is extended to include the `style` attribute.
 
 - `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user, e.g.:
 
@@ -583,7 +641,7 @@ attributes: {
 }
 ```
 
-A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed. 
+A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed.
 
 Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
 

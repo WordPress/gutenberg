@@ -50,6 +50,7 @@ function BlockListCompact( props ) {
 			{ blockClientIds.map( ( currentClientId ) => (
 				<BlockListBlock
 					clientId={ currentClientId }
+					rootClientId={ rootClientId }
 					key={ currentClientId }
 					marginHorizontal={ marginHorizontal }
 					marginVertical={ marginVertical }

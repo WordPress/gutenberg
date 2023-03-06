@@ -10,14 +10,16 @@ import { Icon } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
 import { memo } from '@wordpress/element';
 
-function BlockIcon( { icon, showColors = false, className } ) {
+function BlockIcon( { icon, showColors = false, className, context } ) {
 	if ( icon?.src === 'block-default' ) {
 		icon = {
 			src: blockDefault,
 		};
 	}
 
-	const renderedIcon = <Icon icon={ icon && icon.src ? icon.src : icon } />;
+	const renderedIcon = (
+		<Icon icon={ icon && icon.src ? icon.src : icon } context={ context } />
+	);
 	const style = showColors
 		? {
 				backgroundColor: icon && icon.background,

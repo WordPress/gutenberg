@@ -3,6 +3,7 @@ const transformationCategories = {
 		'core/paragraph',
 		'core/heading',
 		'core/list',
+		'core/list-item',
 		'core/quote',
 		'core/pullquote',
 		'core/preformatted',

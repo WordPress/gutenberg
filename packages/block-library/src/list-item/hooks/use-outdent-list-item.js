@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
@@ -61,7 +56,9 @@ export default function useOutdentListItem( clientId ) {
 	return [
 		canOutdent,
 		useCallback( ( clientIds = getSelectedBlockClientIds() ) => {
-			clientIds = castArray( clientIds );
+			if ( ! Array.isArray( clientIds ) ) {
+				clientIds = [ clientIds ];
+			}
 
 			if ( ! clientIds.length ) return;
 
@@ -115,7 +112,8 @@ export default function useOutdentListItem( clientId ) {
 					getBlockIndex( parentListItemId ) + 1
 				);
 				if ( ! getBlockOrder( parentListId ).length ) {
-					removeBlock( parentListId );
+					const shouldSelectParent = false;
+					removeBlock( parentListId, shouldSelectParent );
 				}
 			} );
 		}, [] ),

@@ -28,3 +28,7 @@
 	width: $button-size-small;
 	height: $button-size-small;
 }
+
+.block-editor-block-card.is-synced .block-editor-block-icon {
+	color: var(--wp-block-synced-color);
+}

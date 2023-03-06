@@ -110,7 +110,6 @@ export default function KeyboardShortcutHelpModal( {
 		<Modal
 			className="customize-widgets-keyboard-shortcut-help-modal"
 			title={ __( 'Keyboard shortcuts' ) }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ toggleModal }
 		>
 			<ShortcutSection

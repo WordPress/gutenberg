@@ -14,11 +14,13 @@ $ wp-env start
 
 The local environment will be available at http://localhost:8888 (Username: `admin`, Password: `password`).
 
+The database credentials are: user `root`, password `password`. For a comprehensive guide on connecting directly to the database, refer to [Accessing the MySQL Database](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/getting-started-with-code-contribution.md#accessing-the-mysql-database).
+
 ## Prerequisites
 
 `wp-env` requires Docker to be installed. There are instructions available for installing Docker on [Windows](https://docs.docker.com/desktop/install/windows-install/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/desktop/install/linux-install/).
 
-Node.js and NPM are required. The latest LTS version of Node.js is used to develop `wp-env` and is recommended.
+Node.js and npm are required. The latest LTS version of Node.js is used to develop `wp-env` and is recommended.
 
 ## Installation
 
@@ -221,7 +223,7 @@ npm run wp-env start -- --xdebug
 npx wp-env start --xdebug
 ```
 
-If you forget about that, the `--xdebug` parameter will be passed to NPM instead of the `wp-env start` command and it will be ignored.
+If you forget about that, the `--xdebug` parameter will be passed to npm instead of the `wp-env start` command and it will be ignored.
 
 You can see a reference on each of the Xdebug modes and what they do in the [Xdebug documentation](https://xdebug.org/docs/all_settings#mode).
 

@@ -92,7 +92,7 @@ The element should be stored in state rather than a plain ref to ensure reactive
 
 ### `anchorRect`: `DomRectWithOwnerDocument`
 
-_Note: this prop is deprecated and will be removed in WordPress 6.3. Please use the `anchor` prop instead._
+_Note: this prop is deprecated. Please use the `anchor` prop instead._
 
 An object extending a `DOMRect` with an additional optional `ownerDocument` property, used to specify a fixed popover position.
 
@@ -100,7 +100,7 @@ An object extending a `DOMRect` with an additional optional `ownerDocument` prop
 
 ### `anchorRef`: `Element | PopoverAnchorRefReference | PopoverAnchorRefTopBottom | Range`
 
-_Note: this prop is deprecated and will be removed in WordPress 6.3. Please use the `anchor` prop instead._
+_Note: this prop is deprecated. Please use the `anchor` prop instead._
 
 Used to specify a fixed popover position. It can be an `Element`, a React reference to an `element`, an object with a `top` and a `bottom` properties (both pointing to elements), or a `range`.
 
@@ -157,7 +157,7 @@ When not provided, the `onClose` callback will be called instead.
 
 ### `getAnchorRect`: `( fallbackReferenceElement: Element | null ) => DomRectWithOwnerDocument`
 
-_Note: this prop is deprecated and will be removed in WordPress 6.3. Please use the `anchor` prop instead._
+_Note: this prop is deprecated. Please use the `anchor` prop instead._
 
 A function returning the same value as the one expected by the `anchorRect` prop, used to specify a dynamic popover position.
 
@@ -170,6 +170,8 @@ Used to customize the header text shown when the popover is toggled to fullscree
 -   Required: No
 
 ### `isAlternate`: `boolean`
+
+_Note: this prop is deprecated. Please use the `variant` prop with the `'toolbar'` values instead._
 
 Used to enable a different visual style for the popover.
 
@@ -194,9 +196,12 @@ A callback invoked when the popover should be closed.
 
 -   Required: No
 
-### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
+### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'overlay'`
 
 Used to specify the popover's position with respect to its anchor.
+
+`overlay` is a special case that places the popover over the reference element.
+Please note that other placement related props may not behave as excepted.
 
 -   Required: No
 -   Default: `"bottom-start"`
@@ -212,8 +217,7 @@ Possible values:
 - `yAxis`: `'top' | 'middle' | 'bottom'`
 - `xAxis`: `'left' | 'center' | 'right'`
 - `corner`: `'top' | 'right' | 'bottom' | 'left'`
-
-
+<!-- Break into two separate lists using an HTML comment -->
 -   Required: No
 
 ### `resize`: `boolean`
@@ -223,8 +227,12 @@ Adjusts the size of the popover to prevent its contents from going out of view w
 -   Required: No
 -   Default: `true`
 
-### `range`: `unknown`
+### `variant`: `'toolbar' | 'unstyled'`
 
-_Note: this prop is deprecated and will be removed in WordPress 6.3. It has no effect on the component._
+Specifies the popover's style.
 
+Leave undefined for the default style. Possible values are:
+-   `unstyled`:  The popover is essentially without any visible style, it has no background, border, outline or drop shadow, but the popover contents are still displayed.
+-   `toolbar`: A style that has no elevation, but a high contrast with other elements. This matches the style of the [`Toolbar` component](/packages/components/toolbar/README.md).
+<!-- Break into two separate lists using an HTML comment -->
 -   Required: No

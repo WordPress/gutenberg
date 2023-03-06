@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
-import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,6 +19,9 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
+	switchToBlockType,
+	getDefaultBlockName,
+	isUnmodifiedBlock,
 } from '@wordpress/blocks';
 import { useSetting } from '@wordpress/block-editor';
 
@@ -32,6 +34,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
+import { useLayout } from './layout';
 
 const emptyArray = [];
 function BlockForType( {
@@ -41,7 +44,7 @@ function BlockForType( {
 	getBlockWidth,
 	insertBlocksAfter,
 	isSelected,
-	mergeBlocks,
+	onMerge,
 	name,
 	onBlockFocus,
 	onChange,
@@ -73,9 +76,15 @@ function BlockForType( {
 		// Thanks to the JSON.stringify we check if the value is the same instead of reference.
 		JSON.stringify( wrapperProps.style ),
 		JSON.stringify(
-			pick( attributes, GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES )
+			Object.fromEntries(
+				Object.entries( attributes ?? {} ).filter( ( [ key ] ) =>
+					GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES.includes( key )
+				)
+			)
 		),
 	] );
+
+	const parentLayout = useLayout();
 
 	return (
 		<GlobalStylesContext.Provider value={ mergedStyle }>
@@ -87,7 +96,7 @@ function BlockForType( {
 				onFocus={ onBlockFocus }
 				onReplace={ onReplace }
 				insertBlocksAfter={ insertBlocksAfter }
-				mergeBlocks={ mergeBlocks }
+				mergeBlocks={ onMerge }
 				// Block level styles.
 				wrapperProps={ wrapperProps }
 				// Inherited styles merged with block level styles.
@@ -98,6 +107,7 @@ function BlockForType( {
 				onDeleteBlock={ onDeleteBlock }
 				blockWidth={ blockWidth }
 				parentBlockAlignment={ parentBlockAlignment }
+				__unstableParentLayout={ parentLayout }
 			/>
 			<View onLayout={ getBlockWidth } />
 		</GlobalStylesContext.Provider>
@@ -407,31 +417,190 @@ export default compose( [
 			),
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps, { select } ) => {
+	withDispatch( ( dispatch, ownProps, registry ) => {
 		const {
 			insertBlocks,
 			mergeBlocks,
 			replaceBlocks,
 			selectBlock,
 			updateBlockAttributes,
+			moveBlocksToPosition,
+			removeBlock,
 		} = dispatch( blockEditorStore );
 
 		return {
-			mergeBlocks( forward ) {
-				const { clientId } = ownProps;
-				const { getPreviousBlockClientId, getNextBlockClientId } =
-					select( blockEditorStore );
+			onMerge( forward ) {
+				const { clientId, rootClientId } = ownProps;
+				const {
+					getPreviousBlockClientId,
+					getNextBlockClientId,
+					getBlock,
+					getBlockAttributes,
+					getBlockName,
+					getBlockOrder,
+					getBlockIndex,
+					getBlockRootClientId,
+					canInsertBlockType,
+				} = registry.select( blockEditorStore );
 
+				/**
+				 * Moves the block with clientId up one level. If the block type
+				 * cannot be inserted at the new location, it will be attempted to
+				 * convert to the default block type.
+				 *
+				 * @param {string}  _clientId       The block to move.
+				 * @param {boolean} changeSelection Whether to change the selection
+				 *                                  to the moved block.
+				 */
+				function moveFirstItemUp( _clientId, changeSelection = true ) {
+					const targetRootClientId =
+						getBlockRootClientId( _clientId );
+					const blockOrder = getBlockOrder( _clientId );
+					const [ firstClientId ] = blockOrder;
+
+					if (
+						blockOrder.length === 1 &&
+						isUnmodifiedBlock( getBlock( firstClientId ) )
+					) {
+						removeBlock( _clientId );
+					} else {
+						if (
+							canInsertBlockType(
+								getBlockName( firstClientId ),
+								targetRootClientId
+							)
+						) {
+							moveBlocksToPosition(
+								[ firstClientId ],
+								_clientId,
+								targetRootClientId,
+								getBlockIndex( _clientId )
+							);
+						} else {
+							const replacement = switchToBlockType(
+								getBlock( firstClientId ),
+								getDefaultBlockName()
+							);
+
+							if ( replacement && replacement.length ) {
+								registry.batch( () => {
+									insertBlocks(
+										replacement,
+										getBlockIndex( _clientId ),
+										targetRootClientId,
+										changeSelection
+									);
+									removeBlock( firstClientId, false );
+								} );
+							}
+						}
+
+						if (
+							! getBlockOrder( _clientId ).length &&
+							isUnmodifiedBlock( getBlock( _clientId ) )
+						) {
+							removeBlock( _clientId, false );
+						}
+					}
+				}
+
+				// For `Delete` or forward merge, we should do the exact same thing
+				// as `Backspace`, but from the other block.
 				if ( forward ) {
+					if ( rootClientId ) {
+						const nextRootClientId =
+							getNextBlockClientId( rootClientId );
+
+						if ( nextRootClientId ) {
+							// If there is a block that follows with the same parent
+							// block name and the same attributes, merge the inner
+							// blocks.
+							if (
+								getBlockName( rootClientId ) ===
+								getBlockName( nextRootClientId )
+							) {
+								const rootAttributes =
+									getBlockAttributes( rootClientId );
+								const previousRootAttributes =
+									getBlockAttributes( nextRootClientId );
+
+								if (
+									Object.keys( rootAttributes ).every(
+										( key ) =>
+											rootAttributes[ key ] ===
+											previousRootAttributes[ key ]
+									)
+								) {
+									registry.batch( () => {
+										moveBlocksToPosition(
+											getBlockOrder( nextRootClientId ),
+											nextRootClientId,
+											rootClientId
+										);
+										removeBlock( nextRootClientId, false );
+									} );
+									return;
+								}
+							} else {
+								mergeBlocks( rootClientId, nextRootClientId );
+								return;
+							}
+						}
+					}
+
 					const nextBlockClientId = getNextBlockClientId( clientId );
-					if ( nextBlockClientId ) {
+
+					if ( ! nextBlockClientId ) {
+						return;
+					}
+
+					if ( getBlockOrder( nextBlockClientId ).length ) {
+						moveFirstItemUp( nextBlockClientId, false );
+					} else {
 						mergeBlocks( clientId, nextBlockClientId );
 					}
 				} else {
 					const previousBlockClientId =
 						getPreviousBlockClientId( clientId );
+
 					if ( previousBlockClientId ) {
 						mergeBlocks( previousBlockClientId, clientId );
+					} else if ( rootClientId ) {
+						const previousRootClientId =
+							getPreviousBlockClientId( rootClientId );
+
+						// If there is a preceding block with the same parent block
+						// name and the same attributes, merge the inner blocks.
+						if (
+							previousRootClientId &&
+							getBlockName( rootClientId ) ===
+								getBlockName( previousRootClientId )
+						) {
+							const rootAttributes =
+								getBlockAttributes( rootClientId );
+							const previousRootAttributes =
+								getBlockAttributes( previousRootClientId );
+
+							if (
+								Object.keys( rootAttributes ).every(
+									( key ) =>
+										rootAttributes[ key ] ===
+										previousRootAttributes[ key ]
+								)
+							) {
+								registry.batch( () => {
+									moveBlocksToPosition(
+										getBlockOrder( rootClientId ),
+										rootClientId,
+										previousRootClientId
+									);
+									removeBlock( rootClientId, false );
+								} );
+								return;
+							}
+						}
+
+						moveFirstItemUp( rootClientId );
 					}
 				}
 			},

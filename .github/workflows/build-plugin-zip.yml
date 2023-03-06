@@ -36,11 +36,11 @@ jobs:
                     "https://api.github.com/repos/${{ github.repository }}/releases/latest"
                   LATEST_STABLE_TAG=$(jq --raw-output '.tag_name' latest.json)
                   IFS='.' read LATEST_STABLE_MAJOR LATEST_STABLE_MINOR LATEST_STABLE_PATCH <<< "${LATEST_STABLE_TAG#v}"
-                  echo "::set-output name=current_stable_branch::release/${LATEST_STABLE_MAJOR}.${LATEST_STABLE_MINOR}"
+                  echo "current_stable_branch=release/${LATEST_STABLE_MAJOR}.${LATEST_STABLE_MINOR}" >> $GITHUB_OUTPUT
                   if [[ ${LATEST_STABLE_MINOR} == "9" ]]; then
-                    echo "::set-output name=next_stable_branch::release/$((LATEST_STABLE_MAJOR + 1)).0"
+                    echo "next_stable_branch=release/$((LATEST_STABLE_MAJOR + 1)).0" >> $GITHUB_OUTPUT
                   else
-                    echo "::set-output name=next_stable_branch::release/${LATEST_STABLE_MAJOR}.$((LATEST_STABLE_MINOR + 1))"
+                    echo "next_stable_branch=release/${LATEST_STABLE_MAJOR}.$((LATEST_STABLE_MINOR + 1))" >> $GITHUB_OUTPUT
                   fi
 
     bump-version:
@@ -69,7 +69,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
 
@@ -77,7 +77,7 @@ jobs:
               id: get_version
               run: |
                   OLD_VERSION=$(jq --raw-output '.version' package.json)
-                  echo "::set-output name=old_version::$(echo $OLD_VERSION)"
+                  echo "old_version=${OLD_VERSION}" >> $GITHUB_OUTPUT
                   if [[ ${{ github.event.inputs.version }} == 'stable' ]]; then
                     NEW_VERSION=$(npx semver $OLD_VERSION -i patch)
                   else
@@ -93,10 +93,10 @@ jobs:
                       fi
                     fi
                   fi
-                  echo "::set-output name=new_version::$(echo $NEW_VERSION)"
+                  echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
                   IFS='.' read -r -a NEW_VERSION_ARRAY <<< "$NEW_VERSION"
                   RELEASE_BRANCH="release/${NEW_VERSION_ARRAY[0]}.${NEW_VERSION_ARRAY[1]}"
-                  echo "::set-output name=release_branch::$(echo $RELEASE_BRANCH)"
+                  echo "release_branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
 
             - name: Configure git user name and email
               run: |
@@ -131,7 +131,7 @@ jobs:
                   git add gutenberg.php package.json package-lock.json
                   git commit -m "Bump plugin version to ${{ steps.get_version.outputs.new_version }}"
                   git push --set-upstream origin "${{ steps.get_version.outputs.release_branch }}"
-                  echo "::set-output name=version_bump_commit::$(git rev-parse --verify --short HEAD)"
+                  echo "version_bump_commit=$(git rev-parse --verify --short HEAD)" >> $GITHUB_OUTPUT
 
             - name: Fetch trunk
               if: ${{ github.ref != 'refs/heads/trunk' }}
@@ -146,7 +146,7 @@ jobs:
                   if [[ ${{ steps.get_version.outputs.old_version }} == "$TRUNK_VERSION" ]]; then
                     git cherry-pick "${{ steps.get_version.outputs.release_branch }}"
                     git push
-                    echo "::set-output name=version_bump_commit::$(git rev-parse --verify --short HEAD)"
+                    echo "version_bump_commit=$(git rev-parse --verify --short HEAD)" >> $GITHUB_OUTPUT
                   fi
 
     build:
@@ -164,12 +164,12 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
@@ -180,7 +180,7 @@ jobs:
                   NO_CHECKS: 'true'
 
             - name: Upload artifact
-              uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               with:
                   name: gutenberg-plugin
                   path: ./gutenberg.zip
@@ -203,7 +203,7 @@ jobs:
 
             - name: Upload release notes artifact
               if: ${{ needs.bump-version.outputs.new_version }}
-              uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               with:
                   name: release-notes
                   path: ./release-notes.txt
@@ -219,7 +219,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
@@ -263,15 +263,15 @@ jobs:
               id: get_release_version
               env:
                   VERSION: ${{ needs.bump-version.outputs.new_version }}
-              run: echo ::set-output name=version::$(echo $VERSION | cut -d / -f 3 | sed 's/-rc./ RC/' )
+              run: echo "version=$(echo $VERSION | cut -d / -f 3 | sed 's/-rc./ RC/' )" >> $GITHUB_OUTPUT
 
             - name: Download Plugin Zip Artifact
-              uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
                   name: gutenberg-plugin
 
             - name: Download Release Notes Artifact
-              uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
                   name: release-notes
 
@@ -307,13 +307,13 @@ jobs:
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   path: main
                   ref: trunk
 
             - name: Checkout (for publishing)
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
@@ -327,7 +327,7 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Setup Node (for CLI)
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'

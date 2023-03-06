@@ -20,7 +20,7 @@
 
 @implementation gutenbergTests
 
-- (BOOL)findSubviewInView:(UIView *)view matching:(BOOL(^)(UIView *view))test
+- (BOOL)findSubviewInView:(UIView *)view matching:(BOOL (^)(UIView *view))test
 {
   if (test(view)) {
     return YES;
@@ -50,12 +50,14 @@
     [[NSRunLoop mainRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     [[NSRunLoop mainRunLoop] runMode:NSRunLoopCommonModes beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
 
-    foundElement = [self findSubviewInView:vc.view matching:^BOOL(UIView *view) {
-      if ([view.accessibilityLabel isEqualToString:TEXT_TO_LOOK_FOR]) {
-        return YES;
-      }
-      return NO;
-    }];
+    foundElement = [self findSubviewInView:vc.view
+        matching:^BOOL(UIView *view) {
+          if ([view.accessibilityLabel isEqualToString:TEXT_TO_LOOK_FOR]) {
+            return YES;
+          }
+          return NO;
+        }];
+}
   }
 
   RCTSetLogFunction(RCTDefaultLogFunction);

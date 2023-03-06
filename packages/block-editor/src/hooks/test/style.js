@@ -21,12 +21,15 @@ describe( 'getInlineStyles', () => {
 		expect(
 			getInlineStyles( {
 				color: { text: 'red', background: 'black' },
-				typography: { lineHeight: 1.5, fontSize: 10 },
+				typography: { lineHeight: 1.5, fontSize: 10, textColumns: 2 },
 				border: {
 					radius: '10px',
 					width: '1em',
 					style: 'dotted',
 					color: '#21759b',
+				},
+				dimensions: {
+					minHeight: '50vh',
 				},
 				spacing: {
 					blockGap: '1em',
@@ -41,9 +44,11 @@ describe( 'getInlineStyles', () => {
 			borderStyle: 'dotted',
 			borderWidth: '1em',
 			color: 'red',
+			columnCount: 2,
 			lineHeight: 1.5,
 			fontSize: 10,
 			marginBottom: '15px',
+			minHeight: '50vh',
 			paddingTop: '10px',
 		} );
 	} );

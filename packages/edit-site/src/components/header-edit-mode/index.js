@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { useCallback, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
@@ -26,6 +27,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -36,16 +38,13 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
+import { useHasStyleBook } from '../style-book';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-export default function Header( {
-	openEntitiesSavedStates,
-	isEntitiesSavedStatesOpen,
-	showIconLabels,
-} ) {
+export default function HeaderEditMode() {
 	const inserterButton = useRef();
 	const {
 		deviceType,
@@ -54,8 +53,9 @@ export default function Header( {
 		isListViewOpen,
 		listViewShortcut,
 		isVisualMode,
-		settings,
 		blockEditorMode,
+		homeUrl,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -63,12 +63,15 @@ export default function Header( {
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
-			getSettings,
 		} = select( editSiteStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		const postType = getEditedPostType();
+
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
@@ -79,8 +82,12 @@ export default function Header( {
 				'core/edit-site/toggle-list-view'
 			),
 			isVisualMode: getEditorMode() === 'visual',
-			settings: getSettings(),
 			blockEditorMode: __unstableGetEditorMode(),
+			homeUrl: getUnstableBase()?.home,
+			showIconLabels: select( preferencesStore ).get(
+				'core/edit-site',
+				'showIconLabels'
+			),
 		};
 	}, [] );
 
@@ -93,10 +100,13 @@ export default function Header( {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const openInserter = useCallback( () => {
+	const toggleInserter = useCallback( () => {
 		if ( isInserterOpen ) {
-			// Focusing the inserter button closes the inserter popover.
+			// Focusing the inserter button should close the inserter popover.
+			// However, there are some cases it won't close when the focus is lost.
+			// See https://github.com/WordPress/gutenberg/issues/43090 for more details.
 			inserterButton.current.focus();
+			setIsInserterOpened( false );
 		} else {
 			setIsInserterOpened( true );
 		}
@@ -106,6 +116,8 @@ export default function Header( {
 		() => setIsListViewOpened( ! isListViewOpen ),
 		[ setIsListViewOpened, isListViewOpen ]
 	);
+
+	const hasStyleBook = useHasStyleBook();
 
 	const isFocusMode = templateType === 'wp_template_part';
 
@@ -121,93 +133,102 @@ export default function Header( {
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
 
 	return (
-		<div className="edit-site-header-edit-mode">
-			<NavigableToolbar
-				className="edit-site-header-edit-mode__start"
-				aria-label={ __( 'Document tools' ) }
-			>
-				<div className="edit-site-header-edit-mode__toolbar">
-					<ToolbarItem
-						ref={ inserterButton }
-						as={ Button }
-						className="edit-site-header-edit-mode__inserter-toggle"
-						variant="primary"
-						isPressed={ isInserterOpen }
-						onMouseDown={ preventDefault }
-						onClick={ openInserter }
-						disabled={ ! isVisualMode }
-						icon={ plus }
-						label={ showIconLabels ? shortLabel : longLabel }
-						showTooltip={ ! showIconLabels }
-					/>
-					{ isLargeViewport && (
-						<>
-							<ToolbarItem
-								as={ ToolSelector }
-								showTooltip={ ! showIconLabels }
-								variant={
-									showIconLabels ? 'tertiary' : undefined
-								}
-								disabled={ ! isVisualMode }
-							/>
-							<ToolbarItem
-								as={ UndoButton }
-								showTooltip={ ! showIconLabels }
-								variant={
-									showIconLabels ? 'tertiary' : undefined
-								}
-							/>
-							<ToolbarItem
-								as={ RedoButton }
-								showTooltip={ ! showIconLabels }
-								variant={
-									showIconLabels ? 'tertiary' : undefined
-								}
-							/>
-							<ToolbarItem
-								as={ Button }
-								className="edit-site-header-edit-mode__list-view-toggle"
-								disabled={ ! isVisualMode && isZoomedOutView }
-								icon={ listView }
-								isPressed={ isListViewOpen }
-								/* translators: button label text should, if possible, be under 16 characters. */
-								label={ __( 'List View' ) }
-								onClick={ toggleListView }
-								shortcut={ listViewShortcut }
-								showTooltip={ ! showIconLabels }
-								variant={
-									showIconLabels ? 'tertiary' : undefined
-								}
-							/>
-							{ isZoomedOutViewExperimentEnabled && (
+		<div
+			className={ classnames( 'edit-site-header-edit-mode', {
+				'show-icon-labels': showIconLabels,
+			} ) }
+		>
+			{ ! hasStyleBook && (
+				<NavigableToolbar
+					className="edit-site-header-edit-mode__start"
+					aria-label={ __( 'Document tools' ) }
+				>
+					<div className="edit-site-header-edit-mode__toolbar">
+						<ToolbarItem
+							ref={ inserterButton }
+							as={ Button }
+							className="edit-site-header-edit-mode__inserter-toggle"
+							variant="primary"
+							isPressed={ isInserterOpen }
+							onMouseDown={ preventDefault }
+							onClick={ toggleInserter }
+							disabled={ ! isVisualMode }
+							icon={ plus }
+							label={ showIconLabels ? shortLabel : longLabel }
+							showTooltip={ ! showIconLabels }
+						/>
+						{ isLargeViewport && (
+							<>
+								<ToolbarItem
+									as={ ToolSelector }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+									disabled={ ! isVisualMode }
+								/>
+								<ToolbarItem
+									as={ UndoButton }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+								/>
+								<ToolbarItem
+									as={ RedoButton }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+								/>
 								<ToolbarItem
 									as={ Button }
-									icon={ chevronUpDown }
-									isPressed={ isZoomedOutView }
+									className="edit-site-header-edit-mode__list-view-toggle"
+									disabled={
+										! isVisualMode || isZoomedOutView
+									}
+									icon={ listView }
+									isPressed={ isListViewOpen }
 									/* translators: button label text should, if possible, be under 16 characters. */
-									label={ __( 'Zoom-out View' ) }
-									onClick={ () => {
-										setPreviewDeviceType( 'desktop' );
-										__unstableSetEditorMode(
-											isZoomedOutView
-												? 'edit'
-												: 'zoom-out'
-										);
-									} }
+									label={ __( 'List View' ) }
+									onClick={ toggleListView }
+									shortcut={ listViewShortcut }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
 								/>
-							) }
-						</>
-					) }
-				</div>
-			</NavigableToolbar>
+								{ isZoomedOutViewExperimentEnabled && (
+									<ToolbarItem
+										as={ Button }
+										className="edit-site-header-edit-mode__zoom-out-view-toggle"
+										icon={ chevronUpDown }
+										isPressed={ isZoomedOutView }
+										/* translators: button label text should, if possible, be under 16 characters. */
+										label={ __( 'Zoom-out View' ) }
+										onClick={ () => {
+											setPreviewDeviceType( 'desktop' );
+											__unstableSetEditorMode(
+												isZoomedOutView
+													? 'edit'
+													: 'zoom-out'
+											);
+										} }
+									/>
+								) }
+							</>
+						) }
+					</div>
+				</NavigableToolbar>
+			) }
 
 			<div className="edit-site-header-edit-mode__center">
-				<DocumentActions />
+				{ hasStyleBook ? __( 'Style Book' ) : <DocumentActions /> }
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
-					{ ! isFocusMode && (
+					{ ! isFocusMode && ! hasStyleBook && (
 						<div
 							className={ classnames(
 								'edit-site-header-edit-mode__preview-options',
@@ -222,7 +243,7 @@ export default function Header( {
 							>
 								<MenuGroup>
 									<MenuItem
-										href={ settings?.siteUrl }
+										href={ homeUrl }
 										target="_blank"
 										icon={ external }
 									>
@@ -238,10 +259,7 @@ export default function Header( {
 							</PreviewOptions>
 						</div>
 					) }
-					<SaveButton
-						openEntitiesSavedStates={ openEntitiesSavedStates }
-						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
-					/>
+					<SaveButton />
 					<PinnedItems.Slot scope="core/edit-site" />
 					<MoreMenu showIconLabels={ showIconLabels } />
 				</div>

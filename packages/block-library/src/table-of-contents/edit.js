@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -204,7 +204,7 @@ export default function TableOfContentsEdit( {
 				}
 			}
 
-			if ( isEqual( headings, _latestHeadings ) ) {
+			if ( fastDeepEqual( headings, _latestHeadings ) ) {
 				return null;
 			}
 			return _latestHeadings;
@@ -251,6 +251,7 @@ export default function TableOfContentsEdit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Only include current page' ) }
 					checked={ onlyIncludeCurrentPage }
 					onChange={ ( value ) =>
@@ -279,7 +280,7 @@ export default function TableOfContentsEdit( {
 				<div { ...blockProps }>
 					<Placeholder
 						icon={ <BlockIcon icon={ icon } /> }
-						label="Table of Contents"
+						label={ __( 'Table of Contents' ) }
 						instructions={ __(
 							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
 						) }
