@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.5.1 (2023-03-06)
+
 ### Bug Fix
 
 -   Fix `render.php` isn't copied in Windows OS ([#48735](https://github.com/WordPress/gutenberg/pull/48735)).
