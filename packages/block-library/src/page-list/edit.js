@@ -201,6 +201,7 @@ export default function PageListEdit( {
 			const pageProps = {
 				id: page.id,
 				label:
+					// translators: displayed when a page has an empty title.
 					page.title?.rendered !== ''
 						? page.title?.rendered
 						: __( '(No title)' ),
