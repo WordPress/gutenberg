@@ -950,6 +950,88 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );
 
+		it( 'should hide the suggestion list on blur and empty input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'on' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.clear( input );
+			// Clicking document.body to trigger a blur event on the input.
+			await user.click( document.body );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should hide the suggestion list on blur and invalid input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render(
+				<FormTokenFieldWithState
+					suggestions={ suggestions }
+					__experimentalValidateInput={ ( token ) =>
+						suggestions.includes( token )
+					}
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'on' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.click( document.body );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not hide the suggestion list on blur and valid input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render(
+				<FormTokenFieldWithState
+					suggestions={ suggestions }
+					__experimentalValidateInput={ ( token ) =>
+						suggestions.includes( token )
+					}
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'One' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.click( document.body );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+		} );
+
 		it( 'matches the search text with the suggestions in a case-insensitive way', async () => {
 			const user = userEvent.setup();
 
