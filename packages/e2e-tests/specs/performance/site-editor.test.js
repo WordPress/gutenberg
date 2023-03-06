@@ -94,97 +94,95 @@ describe( 'Site Editor Performance', () => {
 		await activateTheme( 'twentytwentyone' );
 	} );
 
-	describe( 'Loading', () => {
-		// Number of measurements to take.
-		const samples = 3;
-		// Number of throwaway measurements to perform before recording samples.
-		// Having at least one helps ensure that caching quirks don't manifest
-		// in the results.
-		const throwaway = 1;
-		const iterations = sequence( 1, samples + throwaway );
-
-		it.each( iterations )(
-			`trace large post loading durations (%i of ${ iterations.length })`,
-			async ( i ) => {
-				// Open the test page in Site Editor.
-				await visitSiteEditor( {
-					postId,
-					postType: 'page',
-				} );
-
-				// Wait for the first block.
-				await canvas().waitForSelector( '.wp-block' );
-
-				// Save results.
-				if ( i > throwaway ) {
-					const {
-						serverResponse,
-						firstPaint,
-						domContentLoaded,
-						loaded,
-						firstContentfulPaint,
-						firstBlock,
-					} = await getLoadingDurations();
-
-					results.serverResponse.push( serverResponse );
-					results.firstPaint.push( firstPaint );
-					results.domContentLoaded.push( domContentLoaded );
-					results.loaded.push( loaded );
-					results.firstContentfulPaint.push( firstContentfulPaint );
-					results.firstBlock.push( firstBlock );
-				}
-
-				expect( true ).toBe( true );
-			}
-		);
-	} );
-
-	describe( 'Typing', () => {
-		it( 'trace 200 characters typing sequence inside a large post', async () => {
+	// Number of loading measurements to take.
+	const loadingSamples = 3;
+	// Number of throwaway measurements to perform before recording samples.
+	// Having at least one helps ensure that caching quirks don't manifest
+	// in the results.
+	const loadingSamplesThrowaway = 1;
+	const loadingIterations = sequence(
+		1,
+		loadingSamples + loadingSamplesThrowaway
+	);
+	it.each( loadingIterations )(
+		`Loading (%i of ${ loadingIterations.length })`,
+		async ( i ) => {
 			// Open the test page in Site Editor.
 			await visitSiteEditor( {
 				postId,
 				postType: 'page',
 			} );
 
-			// Wait for the first paragraph to be ready.
-			const firstParagraph = await canvas().waitForXPath(
-				'//p[contains(text(), "Lorem ipsum dolor sit amet")]'
-			);
+			// Wait for the first block.
+			await canvas().waitForSelector( '.wp-block' );
 
-			// Get inside the post content.
-			await enterEditMode();
+			// Save results.
+			if ( i > loadingSamplesThrowaway ) {
+				const {
+					serverResponse,
+					firstPaint,
+					domContentLoaded,
+					loaded,
+					firstContentfulPaint,
+					firstBlock,
+				} = await getLoadingDurations();
 
-			// Insert a new paragraph right under the first one.
-			await firstParagraph.focus();
-			await insertBlock( 'Paragraph' );
-
-			// Start tracing.
-			const traceFile = __dirname + '/trace.json';
-			await page.tracing.start( {
-				path: traceFile,
-				screenshots: false,
-				categories: [ 'devtools.timeline' ],
-			} );
-
-			// Type "x" 200 times.
-			await page.keyboard.type( new Array( 200 ).fill( 'x' ).join( '' ) );
-
-			// Stop tracing and save results.
-			await page.tracing.stop();
-			const traceResults = JSON.parse( readFile( traceFile ) );
-			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-				getTypingEventDurations( traceResults );
-			for ( let i = 0; i < keyDownEvents.length; i++ ) {
-				results.type.push(
-					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
-				);
+				results.serverResponse.push( serverResponse );
+				results.firstPaint.push( firstPaint );
+				results.domContentLoaded.push( domContentLoaded );
+				results.loaded.push( loaded );
+				results.firstContentfulPaint.push( firstContentfulPaint );
+				results.firstBlock.push( firstBlock );
 			}
 
-			// Delete the original trace file.
-			deleteFile( traceFile );
-
 			expect( true ).toBe( true );
+		}
+	);
+
+	it( 'Typing', async () => {
+		// Open the test page in Site Editor.
+		await visitSiteEditor( {
+			postId,
+			postType: 'page',
 		} );
+
+		// Wait for the first paragraph to be ready.
+		const firstParagraph = await canvas().waitForXPath(
+			'//p[contains(text(), "Lorem ipsum dolor sit amet")]'
+		);
+
+		// Get inside the post content.
+		await enterEditMode();
+
+		// Insert a new paragraph right under the first one.
+		await firstParagraph.focus();
+		await insertBlock( 'Paragraph' );
+
+		// Start tracing.
+		const traceFile = __dirname + '/trace.json';
+		await page.tracing.start( {
+			path: traceFile,
+			screenshots: false,
+			categories: [ 'devtools.timeline' ],
+		} );
+
+		// Type "x" 200 times.
+		await page.keyboard.type( new Array( 200 ).fill( 'x' ).join( '' ) );
+
+		// Stop tracing and save results.
+		await page.tracing.stop();
+		const traceResults = JSON.parse( readFile( traceFile ) );
+		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+			getTypingEventDurations( traceResults );
+		for ( let i = 0; i < keyDownEvents.length; i++ ) {
+			results.type.push(
+				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
+			);
+		}
+
+		// Delete the original trace file.
+		deleteFile( traceFile );
+
+		expect( true ).toBe( true );
 	} );
 } );
