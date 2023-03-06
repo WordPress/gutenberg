@@ -16,10 +16,18 @@ import { useRef, useReducer } from '@wordpress/element';
 import ControlPoints from './control-points';
 import { getHorizontalRelativeGradientPosition } from './utils';
 import { MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT } from './constants';
-import type { CustomGradientBarProps } from '../types';
+import type {
+	CustomGradientBarProps,
+	CustomGradientBarReducerState,
+	CustomGradientBarReducerAction,
+	CustomGradientBarIdleState,
+} from '../types';
 import type { LegacyRef, MouseEventHandler } from 'react';
 
-function customGradientBarReducer( state, action ) {
+const customGradientBarReducer = (
+	state: CustomGradientBarReducerState,
+	action: CustomGradientBarReducerAction
+): CustomGradientBarReducerState => {
 	switch ( action.type ) {
 		case 'MOVE_INSERTER':
 			if ( state.id === 'IDLE' || state.id === 'MOVING_INSERTER' ) {
@@ -67,8 +75,10 @@ function customGradientBarReducer( state, action ) {
 			break;
 	}
 	return state;
-}
-const customGradientBarReducerInitialState = { id: 'IDLE' };
+};
+const customGradientBarReducerInitialState: CustomGradientBarIdleState = {
+	id: 'IDLE',
+};
 
 export default function CustomGradientBar( {
 	background,

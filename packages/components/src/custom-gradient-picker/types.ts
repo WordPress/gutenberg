@@ -65,3 +65,28 @@ export type CustomGradientBarProps = {
 	disableAlpha?: boolean;
 	__experimentalIsRenderedInSidebar: boolean;
 };
+
+export type CustomGradientBarIdleState = { id: 'IDLE' };
+type CustomGradientBarMovingInserterState = {
+	id: 'MOVING_INSERTER';
+	insertPosition: number;
+};
+type CustomGradientBarInsertingControlPointState = {
+	id: 'INSERTING_CONTROL_POINT';
+	insertPosition: number;
+};
+type CustomGradientBarMovingControlPointState = { id: 'MOVING_CONTROL_POINT' };
+
+export type CustomGradientBarReducerState =
+	| CustomGradientBarIdleState
+	| CustomGradientBarMovingInserterState
+	| CustomGradientBarInsertingControlPointState
+	| CustomGradientBarMovingControlPointState;
+
+export type CustomGradientBarReducerAction =
+	| { type: 'MOVE_INSERTER'; insertPosition: number }
+	| { type: 'STOP_INSERTER_MOVE' }
+	| { type: 'OPEN_INSERTER' }
+	| { type: 'CLOSE_INSERTER' }
+	| { type: 'START_CONTROL_CHANGE' }
+	| { type: 'STOP_CONTROL_CHANGE' };
