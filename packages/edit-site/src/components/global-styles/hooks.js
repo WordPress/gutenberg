@@ -7,8 +7,6 @@ import a11yPlugin from 'colord/plugins/a11y';
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -18,8 +16,11 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../private-apis';
 import { useSelect } from '@wordpress/data';
 
-const { useGlobalSetting, useColorsPerOrigin: useColorsPerOriginFromSettings } =
-	unlock( blockEditorPrivateApis );
+const {
+	useGlobalSetting,
+	useColorsPerOrigin: useColorsPerOriginFromSettings,
+	useGradientsPerOrigin: useGradientsPerOriginFromSettings,
+} = unlock( blockEditorPrivateApis );
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );
@@ -61,41 +62,16 @@ export function useGradientsPerOrigin( name ) {
 		'color.defaultGradients'
 	);
 
-	return useMemo( () => {
-		const result = [];
-		if ( themeGradients && themeGradients.length ) {
-			result.push( {
-				name: _x(
-					'Theme',
-					'Indicates this palette comes from the theme.'
-				),
-				gradients: themeGradients,
-			} );
-		}
-		if (
-			shouldDisplayDefaultGradients &&
-			defaultGradients &&
-			defaultGradients.length
-		) {
-			result.push( {
-				name: _x(
-					'Default',
-					'Indicates this palette comes from WordPress.'
-				),
-				gradients: defaultGradients,
-			} );
-		}
-		if ( customGradients && customGradients.length ) {
-			result.push( {
-				name: _x(
-					'Custom',
-					'Indicates this palette is created by the user.'
-				),
-				gradients: customGradients,
-			} );
-		}
-		return result;
-	}, [ customGradients, themeGradients, defaultGradients ] );
+	return useGradientsPerOriginFromSettings( {
+		color: {
+			gradients: {
+				custom: customGradients,
+				theme: themeGradients,
+				default: defaultGradients,
+			},
+			defaultGradients: shouldDisplayDefaultGradients,
+		},
+	} );
 }
 
 export function useColorRandomizer( name ) {

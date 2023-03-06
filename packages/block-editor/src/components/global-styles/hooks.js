@@ -251,6 +251,34 @@ export function useSettingsForBlockElement(
 			};
 		}
 
+		if ( ! supportedStyles.includes( 'color' ) ) {
+			updatedSettings.color = {
+				...updatedSettings.color,
+				text: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'backgroundColor' ) ) {
+			updatedSettings.color = {
+				...updatedSettings.color,
+				backgroundColor: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'background' ) ) {
+			updatedSettings.color = {
+				...updatedSettings.color,
+				gradient: false,
+			};
+		}
+
+		if ( ! supportedStyles.includes( 'linkColor' ) ) {
+			updatedSettings.color = {
+				...updatedSettings.color,
+				link: false,
+			};
+		}
+
 		[
 			'lineHeight',
 			'fontStyle',
@@ -377,5 +405,53 @@ export function useColorsPerOrigin( settings ) {
 		themeColors,
 		defaultColors,
 		shouldDisplayDefaultColors,
+	] );
+}
+
+export function useGradientsPerOrigin( settings ) {
+	const customGradients = settings?.color?.gradients?.custom;
+	const themeGradients = settings?.color?.gradients?.theme;
+	const defaultGradients = settings?.color?.gradients?.default;
+	const shouldDisplayDefaultGradients = settings?.color?.defaultGradients;
+
+	return useMemo( () => {
+		const result = [];
+		if ( themeGradients && themeGradients.length ) {
+			result.push( {
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
+				gradients: themeGradients,
+			} );
+		}
+		if (
+			shouldDisplayDefaultGradients &&
+			defaultGradients &&
+			defaultGradients.length
+		) {
+			result.push( {
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
+				gradients: defaultGradients,
+			} );
+		}
+		if ( customGradients && customGradients.length ) {
+			result.push( {
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
+				gradients: customGradients,
+			} );
+		}
+		return result;
+	}, [
+		customGradients,
+		themeGradients,
+		defaultGradients,
+		shouldDisplayDefaultGradients,
 	] );
 }
