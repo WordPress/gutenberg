@@ -66,13 +66,13 @@ if ( hasArgInCLI( '--puppeteer-devtools' ) ) {
 }
 
 // Make sure the artifacts folder path is set.
-process.env.WP_ARTIFACTS_PATH = process.env.WP_ARTIFACTS_PATH || 'artifacts';
+// process.env.WP_ARTIFACTS_PATH = process.env.WP_ARTIFACTS_PATH || 'artifacts';
 
 const configsMapping = {
 	WP_BASE_URL: '--wordpress-base-url',
 	WP_USERNAME: '--wordpress-username',
 	WP_PASSWORD: '--wordpress-password',
-	WP_ARTIFACTS_PATH: '--wordpress-artifacts-path',
+	// WP_ARTIFACTS_PATH: '--wordpress-artifacts-path',
 };
 
 Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
