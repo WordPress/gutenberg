@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
+import { paramCase } from 'change-case';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { TransitionPresets } from '@react-navigation/stack';
 
@@ -64,6 +64,10 @@ const kebabCaseSettings = {
 	],
 	stripRegexp: /(\p{C}|\p{P}|\p{S})+/giu, // Anything that's not a punctuation, symbol or control/format character.
 };
+
+function kebabCase( string ) {
+	return paramCase( string, kebabCaseSettings );
+}
 
 function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 	const { postType } = useSelect( ( select ) => ( {
@@ -153,10 +157,7 @@ function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 														index
 													) => {
 														const labelSlug =
-															kebabCase(
-																label,
-																kebabCaseSettings
-															);
+															kebabCase( label );
 														const isLastItem =
 															index ===
 															HELP_TOPICS.length -
@@ -189,7 +190,7 @@ function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 					</BottomSheet.NavigationScreen>
 					{ /* Print out help detail screens. */ }
 					{ HELP_TOPICS.map( ( { view, label } ) => {
-						const labelSlug = kebabCase( label, kebabCaseSettings );
+						const labelSlug = kebabCase( label );
 						return (
 							<HelpDetailNavigationScreen
 								key={ labelSlug }
