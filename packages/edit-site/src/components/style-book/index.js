@@ -69,10 +69,7 @@ const STYLE_BOOK_IFRAME_STYLES = `
 	}
 
 	.edit-site-style-book__example {
-		background: none;
 		border-radius: 2px;
-		border: none;
-		color: inherit;
 		cursor: pointer;
 		display: flex;
 		flex-direction: column;
