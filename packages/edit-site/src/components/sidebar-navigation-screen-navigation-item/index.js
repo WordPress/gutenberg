@@ -36,6 +36,15 @@ export default function SidebarNavigationScreenNavigationItem() {
 					icon={ pencil }
 				/>
 			}
+			description={
+				postType === 'page'
+					? __(
+							'Pages are static and are not listed by date. Pages do not use tags or categories.'
+					  )
+					: __(
+							'Posts are entries listed in reverse chronological order on the site homepage or on the posts page.'
+					  )
+			}
 			content={
 				<>
 					{ record?.link ? (

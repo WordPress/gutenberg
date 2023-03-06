@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
 import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
@@ -24,10 +24,18 @@ export default function SidebarNavigationScreenTemplate() {
 		postId
 	);
 	let description = getDescription();
-	if ( ! description && record.is_custom ) {
-		description = __(
-			'This is a custom template that can be applied manually to any Post or Page.'
-		);
+	if ( ! description ) {
+		if ( record.type === 'wp_template' && record.is_custom ) {
+			description = __(
+				'This is a custom template that can be applied manually to any Post or Page.'
+			);
+		} else if ( record.type === 'wp_template_part' ) {
+			description = sprintf(
+				// translators: %s: template part title e.g: "Header".
+				__( 'This is your %s template part.' ),
+				getTitle()
+			);
+		}
 	}
 
 	return (
@@ -40,7 +48,7 @@ export default function SidebarNavigationScreenTemplate() {
 					icon={ pencil }
 				/>
 			}
-			content={ description ? <p>{ description }</p> : undefined }
+			description={ description }
 		/>
 	);
 }
