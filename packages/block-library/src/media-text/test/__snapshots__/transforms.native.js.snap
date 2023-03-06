@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Media & Text block transformations to Columns block 1`] = `
+"<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
+<div class="wp-block-column" style="flex-basis:100%"><!-- wp:media-text {"mediaId":4674,"mediaType":"image","isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
+<div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-4674 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
+<p class="has-large-font-size">Mountain</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`Media & Text block transformations to Cover block 1`] = `
+"<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":4674,"dimRatio":50,"align":"wide"} -->
+<div class="wp-block-cover alignwide"><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><img class="wp-block-cover__image-background wp-image-4674" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"className":"has-large-font-size"} -->
+<p class="has-large-font-size">Mountain</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->"
+`;
+
+exports[`Media & Text block transformations to Group block 1`] = `
+"<!-- wp:group {"align":"wide","layout":{"type":"constrained"}} -->
+<div class="wp-block-group alignwide"><!-- wp:media-text {"mediaId":4674,"mediaType":"image","isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
+<div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-4674 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
+<p class="has-large-font-size">Mountain</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text --></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Media & Text block transformations to Image block 1`] = `
+"<!-- wp:image {"id":4674} -->
+<figure class="wp-block-image"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-4674"/></figure>
+<!-- /wp:image -->"
+`;
