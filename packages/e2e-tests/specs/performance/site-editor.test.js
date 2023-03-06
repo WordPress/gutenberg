@@ -23,7 +23,8 @@ import {
 import {
 	readFile,
 	deleteFile,
-	writeTestResultsFile,
+	getTestResultsFilename,
+	saveTestResultsFile,
 	getTypingEventDurations,
 	getLoadingDurations,
 	sequence,
@@ -83,7 +84,8 @@ describe( 'Site Editor Performance', () => {
 	} );
 
 	afterAll( async () => {
-		writeTestResultsFile( __filename, results );
+		const resultsFilename = getTestResultsFilename( __filename );
+		saveTestResultsFile( resultsFilename, results );
 
 		await deleteAllTemplates( 'wp_template' );
 		await deleteAllTemplates( 'wp_template_part' );

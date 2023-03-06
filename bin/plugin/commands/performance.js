@@ -182,28 +182,21 @@ function curateResults( testSuite, results ) {
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
 async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
-	fs.mkdirSync( './__test-results', { recursive: true } );
-	const testResultsFilePath = path.resolve(
-		`./__test-results/${ runKey }.results.json`
+	const resultsFilename = `${ runKey }.results.json`;
+
+	await runShellScript(
+		`TEST_RESULTS_FILENAME=${ resultsFilename } npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
+		performanceTestDirectory
 	);
 
-	try {
-		await runShellScript(
-			`TEST_RESULTS_FILE_PATH="${ testResultsFilePath }" npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
-			performanceTestDirectory
-		);
-	} catch ( error ) {
-		fs.mkdirSync( './__test-results/artifacts', { recursive: true } );
-		const artifactsFolder = path.join(
-			performanceTestDirectory,
-			'artifacts/'
-		);
-		await runShellScript(
-			'cp -Rv ' + artifactsFolder + ' ' + './__test-results/artifacts/'
-		);
-
-		throw error;
+	if ( process.env.WP_ARTIFACTS_PATH === undefined ) {
+		throw new Error( 'WP_ARTIFACTS_PATH variable is not defined' );
 	}
+
+	const testResultsFilePath = path.join(
+		process.env.WP_ARTIFACTS_PATH,
+		resultsFilename
+	);
 
 	return curateResults(
 		testSuite,

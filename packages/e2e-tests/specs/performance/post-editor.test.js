@@ -23,7 +23,8 @@ import {
 import {
 	readFile,
 	deleteFile,
-	writeTestResultsFile,
+	getTestResultsFilename,
+	saveTestResultsFile,
 	getTypingEventDurations,
 	getClickEventDurations,
 	getHoverEventDurations,
@@ -82,7 +83,9 @@ describe( 'Post Editor Performance', () => {
 	let traceResults;
 
 	afterAll( async () => {
-		writeTestResultsFile( __filename, results );
+		const resultsFilename = getTestResultsFilename( __filename );
+		saveTestResultsFile( resultsFilename, results );
+
 		deleteFile( traceFile );
 	} );
 

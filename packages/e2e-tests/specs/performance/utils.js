@@ -1,20 +1,8 @@
 /**
  * External dependencies
  */
+import path from 'path';
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
-
-export function writeTestResultsFile( testFilePath, results ) {
-	const testResultsFilePath =
-		process.env.TEST_RESULTS_FILE_PATH ||
-		// Fall back to the same directory as the test file. Useful when e.g.
-		// running the tests locally.
-		testFilePath.replace( '.js', '.results.json' );
-
-	return writeFileSync(
-		testResultsFilePath,
-		JSON.stringify( results, null, 2 )
-	);
-}
 
 export function readFile( filePath ) {
 	return existsSync( filePath )
@@ -26,6 +14,20 @@ export function deleteFile( filePath ) {
 	if ( existsSync( filePath ) ) {
 		unlinkSync( filePath );
 	}
+}
+
+export function getTestResultsFilename( testFilename ) {
+	return (
+		process.env.TEST_RESULTS_FILENAME ||
+		path.basename( testFilename, '.js' ) + '.results.json'
+	);
+}
+
+export function saveTestResultsFile( filename, results ) {
+	return writeFileSync(
+		path.join( process.env.WP_ARTIFACTS_PATH, filename ),
+		JSON.stringify( results, null, 2 )
+	);
 }
 
 function isEvent( item ) {
