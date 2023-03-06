@@ -367,9 +367,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
  *     <PaletteEdit
  *       colors={ controlledColors }
  *       onChange={ ( newColors?: Color[] ) => {
- *         if ( newColors ) {
- *           setControlledColors( newColors );
- *         }
+ *         setControlledColors( newColors );
  *       } }
  *       paletteLabel="Here is a label"
  *     />

@@ -35,16 +35,13 @@ const ColorsTemplate: ComponentStory<
 	FunctionComponent< PaletteEditColorsProps >
 > = ( args ) => {
 	const { colors, onChange, ...props } = args;
-
 	const [ controlledColors, setControlledColors ] = useState( colors );
 
 	return (
 		<PaletteEdit
 			colors={ controlledColors }
 			onChange={ ( newColors?: Color[] ) => {
-				if ( newColors ) {
-					setControlledColors( newColors );
-				}
+				setControlledColors( newColors );
 			} }
 			{ ...props }
 		/>
@@ -65,7 +62,6 @@ const GradientsTemplate: ComponentStory<
 	FunctionComponent< PaletteEditGradientsProps >
 > = ( args ) => {
 	const { gradients, onChange, ...props } = args;
-
 	const [ controlledGradients, setControlledGradients ] =
 		useState( gradients );
 
@@ -73,9 +69,7 @@ const GradientsTemplate: ComponentStory<
 		<PaletteEdit
 			gradients={ controlledGradients }
 			onChange={ ( newGradients?: Gradient[] ) => {
-				if ( newGradients ) {
-					setControlledGradients( newGradients );
-				}
+				setControlledGradients( newGradients );
 			} }
 			{ ...props }
 		/>
