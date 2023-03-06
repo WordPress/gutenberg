@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+-   Updated: `stylelint` to `15.1.0`.
+-   Removed: `at-rule-name-space-after`, `block-closing-brace-newline-after` and `block-opening-brace-space-before` options in `stylelint-config-wordpress/scss` shared config.
+
 ## 21.11.0 (2023-03-01)
 
 ## 21.10.0 (2023-02-15)
