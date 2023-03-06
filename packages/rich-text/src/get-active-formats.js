@@ -5,7 +5,6 @@
  * Internal dependencies
  */
 import { isFormatEqual } from './is-format-equal';
-import { slice } from './slice';
 
 /**
  * Gets the all format objects at the start of the selection.
@@ -46,16 +45,16 @@ export function getActiveFormats( value, EMPTY_ACTIVE_FORMATS = [] ) {
 		return EMPTY_ACTIVE_FORMATS;
 	}
 
-	const selectedValue = slice( value );
+	const selectedFormats = formats.slice( start, end );
 
 	// Clone the formats so we're not mutating the live value.
-	const _activeFormats = [ ...selectedValue.formats[ 0 ] ];
-	let i = selectedValue.formats.length;
+	const _activeFormats = [ ...selectedFormats[ 0 ] ];
+	let i = selectedFormats.length;
 
 	// For performance reasons, start from the end where it's much quicker to
 	// realise that there are no active formats.
 	while ( i-- ) {
-		const formatsAtIndex = selectedValue.formats[ i ];
+		const formatsAtIndex = selectedFormats[ i ];
 
 		// If we run into any index without formats, we're sure that there's no
 		// active formats.

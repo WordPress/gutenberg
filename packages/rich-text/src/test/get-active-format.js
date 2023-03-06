@@ -20,7 +20,6 @@ describe( 'getActiveFormat', () => {
 	it( 'should return format when active over whole selection', () => {
 		const record = {
 			formats: [ [ em ], [ strong ], , ],
-			replacements: [ , , , ],
 			text: 'one',
 			start: 0,
 			end: 1,
@@ -32,7 +31,6 @@ describe( 'getActiveFormat', () => {
 	it( 'should return not return format when not active over whole selection', () => {
 		const record = {
 			formats: [ [ em ], [ strong ], , ],
-			replacements: [ , , , ],
 			text: 'one',
 			start: 0,
 			end: 2,

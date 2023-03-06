@@ -34,14 +34,12 @@ describe( 'toggleFormat', () => {
 				,
 				,
 			],
-			replacements: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 3,
 			end: 6,
 		};
 		const expected = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			replacements: [ , , , , , , , , , , , , , ],
 			activeFormats: [],
 			text: 'one two three',
 			start: 3,
