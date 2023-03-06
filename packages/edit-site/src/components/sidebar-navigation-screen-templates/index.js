@@ -72,7 +72,6 @@ export default function SidebarNavigationScreenTemplates() {
 
 	const browseAllLink = useLink( {
 		path: '/' + postType + '/all',
-		canvas: undefined,
 	} );
 
 	const canCreate = ! isMobileViewport && ! isTemplatePartsMode;
