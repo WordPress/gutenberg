@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { paramCase as kebabCase } from 'change-case';
+import { kebabCase } from 'lodash';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { TransitionPresets } from '@react-navigation/stack';
 
@@ -56,6 +56,14 @@ const HELP_TOPICS = [
 		view: <CustomizeBlocks />,
 	},
 ];
+
+const kebabCaseSettings = {
+	splitRegexp: [
+		/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
+		/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
+	],
+	stripRegexp: /(\p{C}|\p{P}|\p{S})+/giu, // Anything that's not a punctuation, symbol or control/format character.
+};
 
 function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 	const { postType } = useSelect( ( select ) => ( {
@@ -145,7 +153,10 @@ function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 														index
 													) => {
 														const labelSlug =
-															kebabCase( label );
+															kebabCase(
+																label,
+																kebabCaseSettings
+															);
 														const isLastItem =
 															index ===
 															HELP_TOPICS.length -
@@ -178,7 +189,7 @@ function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 					</BottomSheet.NavigationScreen>
 					{ /* Print out help detail screens. */ }
 					{ HELP_TOPICS.map( ( { view, label } ) => {
-						const labelSlug = kebabCase( label );
+						const labelSlug = kebabCase( label, kebabCaseSettings );
 						return (
 							<HelpDetailNavigationScreen
 								key={ labelSlug }
