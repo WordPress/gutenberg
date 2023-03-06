@@ -22,6 +22,11 @@ export default function useSyncCanvasModeWithURL() {
 	const currentCanvasMode = useRef( canvasMode );
 	const { canvas: canvasInUrl } = params;
 	const currentCanvasInUrl = useRef( canvasInUrl );
+	const currentUrlParams = useRef( params );
+	useEffect( () => {
+		currentUrlParams.current = params;
+	}, [ params ] );
+
 	useEffect( () => {
 		currentCanvasMode.current = canvasMode;
 		if ( canvasMode === 'init' ) {
@@ -33,7 +38,7 @@ export default function useSyncCanvasModeWithURL() {
 			currentCanvasInUrl.current !== canvasMode
 		) {
 			history.push( {
-				...params,
+				...currentUrlParams.current,
 				canvas: 'edit',
 			} );
 		}
@@ -43,11 +48,11 @@ export default function useSyncCanvasModeWithURL() {
 			currentCanvasInUrl.current !== undefined
 		) {
 			history.push( {
-				...params,
+				...currentUrlParams.current,
 				canvas: undefined,
 			} );
 		}
-	}, [ canvasMode ] );
+	}, [ canvasMode, history ] );
 
 	useEffect( () => {
 		currentCanvasInUrl.current = canvasInUrl;
@@ -62,5 +67,5 @@ export default function useSyncCanvasModeWithURL() {
 		) {
 			setCanvasMode( 'edit' );
 		}
-	}, [ canvasInUrl, params ] );
+	}, [ canvasInUrl, setCanvasMode ] );
 }
