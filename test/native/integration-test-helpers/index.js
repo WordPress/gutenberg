@@ -8,6 +8,7 @@ export { getBlock } from './get-block';
 export { getEditorHtml } from './get-editor-html';
 export { getInnerBlock } from './get-inner-block';
 export { initializeEditor } from './initialize-editor';
+export { openBlockActionsMenu } from './open-block-actions-menu';
 export { openBlockSettings } from './open-block-settings';
 export { changeAndSelectTextOfRichText } from './rich-text-change-and-select-text';
 export { changeTextOfRichText } from './rich-text-change-text';

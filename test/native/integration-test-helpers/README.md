@@ -30,6 +30,10 @@ Gets an inner block from another block.
 
 Initialize an editor for test assertions.
 
+### [`openBlockActionsMenu`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/open-block-actions-menu.js)
+
+Opens the block's actions menu of the current selected block.
+
 ### [`openBlockSettings`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/open-block-settings.js)
 
 Opens the block settings of the current selected block.
