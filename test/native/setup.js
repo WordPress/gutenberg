@@ -132,6 +132,15 @@ jest.mock( 'react-native-svg', () => {
 	};
 } );
 
+jest.mock(
+	'react-native-video',
+	() => {
+		const { forwardRef } = require( 'react' );
+		return forwardRef( mockComponent( 'ReactNativeVideo' ) );
+	},
+	{ virtual: true }
+);
+
 jest.mock( 'react-native-safe-area', () => {
 	const addEventListener = jest.fn();
 	addEventListener.mockReturnValue( { remove: () => {} } );
