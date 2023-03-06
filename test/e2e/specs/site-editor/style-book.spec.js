@@ -60,35 +60,30 @@ test.describe( 'Style Book', () => {
 		await expect( page.locator( 'role=tab[name="Theme"i]' ) ).toBeVisible();
 
 		// Buttons to select block examples are rendered within the Style Book iframe.
-		let styleBookIframeLocator = page.frameLocator(
-			'.edit-site-style-book__iframe'
+		const styleBookIframe = page.frameLocator(
+			'[name="style-book-canvas"]'
 		);
 
 		await expect(
-			styleBookIframeLocator.getByRole( 'button', {
+			styleBookIframe.getByRole( 'button', {
 				name: 'Open Headings styles in Styles panel',
 			} )
 		).toBeVisible();
 		await expect(
-			styleBookIframeLocator.getByRole( 'button', {
+			styleBookIframe.getByRole( 'button', {
 				name: 'Open Paragraph styles in Styles panel',
 			} )
 		).toBeVisible();
 
 		await page.click( 'role=tab[name="Media"i]' );
 
-		// The tab has changed, which means the iframe has been re-rendered.
-		styleBookIframeLocator = page.frameLocator(
-			'.edit-site-style-book__iframe'
-		);
-
 		await expect(
-			styleBookIframeLocator.getByRole( 'button', {
+			styleBookIframe.getByRole( 'button', {
 				name: 'Open Image styles in Styles panel',
 			} )
 		).toBeVisible();
 		await expect(
-			styleBookIframeLocator.getByRole( 'button', {
+			styleBookIframe.getByRole( 'button', {
 				name: 'Open Gallery styles in Styles panel',
 			} )
 		).toBeVisible();
@@ -119,7 +114,7 @@ test.describe( 'Style Book', () => {
 		await page.click( 'role=button[name="Typography styles"]' );
 
 		await page
-			.frameLocator( '.edit-site-style-book__iframe' )
+			.frameLocator( '[name="style-book-canvas"]' )
 			.getByRole( 'button', {
 				name: 'Open Quote styles in Styles panel',
 			} )

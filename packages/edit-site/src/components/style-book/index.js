@@ -36,7 +36,7 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { useMemo, memo } from '@wordpress/element';
-import { ENTER, ESCAPE } from '@wordpress/keycodes';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -52,13 +52,20 @@ const { Slot: StyleBookSlot, Fill: StyleBookFill } =
 	createSlotFill( SLOT_FILL_NAME );
 
 // The content area of the Style Book is rendered within an iframe so that global styles
-// affect and are displayed within the entire content area. To support elements that are
-// no part of the block previews, such as headings, and layout for the block previews,
+// are applied to elements within the entire content area. To support elements that are
+// not part of the block previews, such as headings and layout for the block previews,
 // additional CSS rules need to be passed into the iframe. These are hard-coded below.
+// Note that button styles are unset, and then focus rules from the `Button` component are
+// applied to the `button` element, targeted via `.edit-site-style-book__example`.
+// This is to ensure that browser default styles for buttons are not applied to the previews.
 const STYLE_BOOK_IFRAME_STYLES = `
 	.edit-site-style-book__examples {
 		max-width: 900px;
 		margin: 0 auto;
+	}
+
+	.edit-site-style-book__example {
+		all: unset;
 	}
 
 	.edit-site-style-book__example {
@@ -77,7 +84,12 @@ const STYLE_BOOK_IFRAME_STYLES = `
 	}
 
 	.edit-site-style-book__example.is-selected {
-		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+	}
+
+	.edit-site-style-book__example:focus:not(:disabled) {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		outline: 3px solid transparent;
 	}
 
 	.edit-site-style-book__examples.is-wide .edit-site-style-book__example {
@@ -248,6 +260,7 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 									</style>
 								</>
 							}
+							name="style-book-canvas"
 							tabIndex={ 0 }
 						>
 							{ /* Filters need to be rendered before children to avoid Safari rendering issues. */ }
@@ -302,16 +315,8 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => {
 		[ originalSettings ]
 	);
 
-	const selectOnEnter = ( event ) => {
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-			onClick();
-		}
-	};
-
-	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	return (
-		<div
+		<button
 			className={ classnames( 'edit-site-style-book__example', {
 				'is-selected': isSelected,
 			} ) }
@@ -320,10 +325,7 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => {
 				__( 'Open %s styles in Styles panel' ),
 				title
 			) }
-			role="button"
 			onClick={ onClick }
-			onKeyDown={ selectOnEnter }
-			tabIndex={ 0 }
 		>
 			<span className="edit-site-style-book__example-title">
 				{ title }
@@ -338,9 +340,8 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => {
 					</ExperimentalBlockEditorProvider>
 				</Disabled>
 			</div>
-		</div>
+		</button>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 } );
 
 function useHasStyleBook() {
