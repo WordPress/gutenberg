@@ -325,9 +325,10 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
 }
 
 /**
- * If there's a the classic menu then use it as a fallback.
+ * Checks for a Classic Menu and attempts to convert into a block-based
+ * Navigation menu.
  *
- * @return array the normalized parsed blocks.
+ * @return int|WP_Error The Navigation menu post ID on success. A WP_Error on failure.
  */
 function block_core_navigation_create_classic_menu_fallback() {
 	// See if we have a Classic menu.
@@ -360,9 +361,7 @@ function block_core_navigation_create_classic_menu_fallback() {
 		$return_errors // So that we can check whether the result is an error.
 	);
 
-
 	return $wp_insert_post_result;
-
 }
 
 /**
@@ -433,10 +432,10 @@ function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
 }
 
 /**
- * Create and returns a navigation menu containing default fallback content.
+ * Creates a navigation menu containing default fallback content.
  * (a page-list if registered).
  *
- * @return array the newly created navigation menu.
+ * @return int|WP_Error The post ID on success. A WP_Error on failure.
  */
 function block_core_navigation_create_default_fallback() {
 	$registry = WP_Block_Type_Registry::get_instance();
@@ -485,19 +484,19 @@ function block_core_navigation_create_fallback() {
 	}
 
 	// Get the most recently published Navigation menu.
-	$navigation_menu = block_core_navigation_get_most_recently_published_navigation();
+	$existing_navigation_menu = block_core_navigation_get_most_recently_published_navigation();
 
 	// If there is already a Navigation menu then exit.
-	if ( $navigation_menu ) {
+	if ( $existing_navigation_menu ) {
 		return;
 	}
 
 	// If there are no Navigation menus then try to find a Classic menu
 	// and attempt to convert it into a Navigation menu.
-	$navigation_menu = block_core_navigation_create_classic_menu_fallback();
+	$converted_classic_menu_id = block_core_navigation_create_classic_menu_fallback();
 
 	// If the conversion + creation was successful then exit.
-	if ( ! is_wp_error( $navigation_menu ) ) {
+	if ( ! is_wp_error( $converted_classic_menu_id ) ) {
 		return;
 	}
 
