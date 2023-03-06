@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
+import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -15,8 +16,13 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 
 export default function SidebarNavigationScreenTemplate() {
+	const { params } = useNavigator();
+	const { postType, postId } = params;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { getDescription, getTitle, record } = useEditedEntityRecord();
+	const { getDescription, getTitle, record } = useEditedEntityRecord(
+		postType,
+		postId
+	);
 	let description = getDescription();
 	if ( ! description && record.is_custom ) {
 		description = __(
