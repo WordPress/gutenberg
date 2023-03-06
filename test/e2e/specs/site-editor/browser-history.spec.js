@@ -40,4 +40,26 @@ test.describe( 'Site editor browser history', () => {
 		await page.goBack();
 		expect( page.url() ).toEqual( baseUrl + '/wp-admin/index.php' );
 	} );
+
+	test( 'Opens the template list from the template details view', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postType: 'wp_template',
+			postId: 'emptytheme//index',
+			canvas: 'edit',
+		} );
+
+		// Navigate to the template list
+		await page.click( 'role=button[name="Show template details"]' );
+		await page.click( 'role=link[name="Manage all templates"]' );
+
+		expect( page.url() ).toEqual(
+			baseUrl + '/wp-admin/site-editor.php?path=%2Fwp_template%2Fall'
+		);
+
+		const title = page.locator( '.edit-site-list-header__title' );
+		await expect( title ).toHaveText( 'Templates' );
+	} );
 } );
