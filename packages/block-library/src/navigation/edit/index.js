@@ -119,7 +119,8 @@ function Navigation( {
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
-	const { menus: classicMenus } = useNavigationEntities();
+	const { menus: classicMenus, hasResolvedMenus: hasResolvedClassicMenus } =
+		useNavigationEntities();
 
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
@@ -311,6 +312,7 @@ function Navigation( {
 	useEffect( () => {
 		if (
 			ref ||
+			! hasResolvedClassicMenus ||
 			! hasResolvedNavigationMenus ||
 			isConvertingClassicMenu ||
 			fallbackNavigationMenus?.length > 0 ||
@@ -363,6 +365,7 @@ function Navigation( {
 			);
 		}
 	}, [
+		hasResolvedClassicMenus,
 		hasResolvedNavigationMenus,
 		hasUnsavedBlocks,
 		classicMenus,
