@@ -83,9 +83,7 @@ describe( 'CheckboxControl', () => {
 
 	describe( 'Value', () => {
 		it( 'should flip the checked property when clicked', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			let state = false;
 			const setState = jest.fn(

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find, get, includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Button, PanelBody } from '@wordpress/components';
@@ -19,9 +14,9 @@ import { store as editorStore } from '../../store';
 
 const getSuggestion = ( supportedFormats, suggestedPostFormat ) => {
 	const formats = POST_FORMATS.filter( ( format ) =>
-		includes( supportedFormats, format.id )
+		supportedFormats?.includes( format.id )
 	);
-	return find( formats, ( format ) => format.id === suggestedPostFormat );
+	return formats.find( ( format ) => format.id === suggestedPostFormat );
 };
 
 const PostFormatSuggestion = ( {
@@ -41,11 +36,8 @@ export default function PostFormatPanel() {
 	const { currentPostFormat, suggestion } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getSuggestedPostFormat } =
 			select( editorStore );
-		const supportedFormats = get(
-			select( coreStore ).getThemeSupports(),
-			[ 'formats' ],
-			[]
-		);
+		const supportedFormats =
+			select( coreStore ).getThemeSupports().formats ?? [];
 		return {
 			currentPostFormat: getEditedPostAttribute( 'format' ),
 			suggestion: getSuggestion(

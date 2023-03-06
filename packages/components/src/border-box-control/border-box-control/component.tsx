@@ -11,7 +11,6 @@ import { useMergeRefs } from '@wordpress/compose';
 import BorderBoxControlLinkedButton from '../border-box-control-linked-button';
 import BorderBoxControlSplitControls from '../border-box-control-split-controls';
 import { BorderControl } from '../../border-control';
-import { HStack } from '../../h-stack';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import { View } from '../../view';
 import { VisuallyHidden } from '../../visually-hidden';
@@ -38,8 +37,8 @@ const BorderLabel = ( props: LabelProps ) => {
 	);
 };
 
-const BorderBoxControl = (
-	props: WordPressComponentProps< BorderBoxControlProps, 'div' >,
+const UnconnectedBorderBoxControl = (
+	props: WordPressComponentProps< BorderBoxControlProps, 'div', false >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
@@ -59,11 +58,11 @@ const BorderBoxControl = (
 		onSplitChange,
 		popoverPlacement,
 		popoverOffset,
+		size,
 		splitValue,
 		toggleLinked,
-		__experimentalHasMultipleOrigins,
+		wrapperClassName,
 		__experimentalIsRenderedInSidebar,
-		__next36pxDefaultSize = false,
 		...otherProps
 	} = useBorderBoxControl( props );
 
@@ -96,7 +95,7 @@ const BorderBoxControl = (
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
-			<HStack alignment={ 'start' } expanded={ true } spacing={ 0 }>
+			<View className={ wrapperClassName }>
 				{ isLinked ? (
 					<BorderControl
 						className={ linkedControlClassName }
@@ -113,14 +112,13 @@ const BorderBoxControl = (
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
 						withSlider={ true }
-						width={ '110px' }
-						__experimentalHasMultipleOrigins={
-							__experimentalHasMultipleOrigins
+						width={
+							size === '__unstable-large' ? '116px' : '110px'
 						}
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						__next36pxDefaultSize={ __next36pxDefaultSize }
+						size={ size }
 					/>
 				) : (
 					<BorderBoxControlSplitControls
@@ -132,28 +130,74 @@ const BorderBoxControl = (
 						popoverPlacement={ popoverPlacement }
 						popoverOffset={ popoverOffset }
 						value={ splitValue }
-						__experimentalHasMultipleOrigins={
-							__experimentalHasMultipleOrigins
-						}
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						__next36pxDefaultSize={ __next36pxDefaultSize }
+						size={ size }
 					/>
 				) }
 				<BorderBoxControlLinkedButton
 					onClick={ toggleLinked }
 					isLinked={ isLinked }
-					__next36pxDefaultSize={ __next36pxDefaultSize }
+					size={ size }
 				/>
-			</HStack>
+			</View>
 		</View>
 	);
 };
 
-const ConnectedBorderBoxControl = contextConnect(
-	BorderBoxControl,
+/**
+ * The `BorderBoxControl` effectively has two view states. The first, a "linked"
+ * view, allows configuration of a flat border via a single `BorderControl`.
+ * The second, a "split" view, contains a `BorderControl` for each side
+ * as well as a visualizer for the currently selected borders. Each view also
+ * contains a button to toggle between the two.
+ *
+ * When switching from the "split" view to "linked", if the individual side
+ * borders are not consistent, the "linked" view will display any border
+ * properties selections that are consistent while showing a mixed state for
+ * those that aren't. For example, if all borders had the same color and style
+ * but different widths, then the border dropdown in the "linked" view's
+ * `BorderControl` would show that consistent color and style but the "linked"
+ * view's width input would show "Mixed" placeholder text.
+ *
+ * ```jsx
+ * import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
+ * import { __ } from '@wordpress/i18n';
+ *
+ * const colors = [
+ * 	{ name: 'Blue 20', color: '#72aee6' },
+ * 	// ...
+ * ];
+ *
+ * const MyBorderBoxControl = () => {
+ * 	const defaultBorder = {
+ * 		color: '#72aee6',
+ * 		style: 'dashed',
+ * 		width: '1px',
+ * 	};
+ * 	const [ borders, setBorders ] = useState( {
+ * 		top: defaultBorder,
+ * 		right: defaultBorder,
+ * 		bottom: defaultBorder,
+ * 		left: defaultBorder,
+ * 	} );
+ * 	const onChange = ( newBorders ) => setBorders( newBorders );
+ *
+ * 	return (
+ * 		<BorderBoxControl
+ * 			colors={ colors }
+ * 			label={ __( 'Borders' ) }
+ * 			onChange={ onChange }
+ * 			value={ borders }
+ * 		/>
+ * 	);
+ * };
+ * ```
+ */
+export const BorderBoxControl = contextConnect(
+	UnconnectedBorderBoxControl,
 	'BorderBoxControl'
 );
 
-export default ConnectedBorderBoxControl;
+export default BorderBoxControl;

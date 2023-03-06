@@ -6,37 +6,6 @@
  */
 
 /**
- * This function takes care of adding inline styles
- * in the proper place, depending on the theme in use.
- *
- * This method was added to core in 5.9.1, but with a single param ($style). The second param ($priority) was
- * added post 6.0, so the 6.1 release needs to have wp_enqueue_block_support_styles updated to include this param.
- *
- * For block themes, it's loaded in the head.
- * For classic ones, it's loaded in the body
- * because the wp_head action  happens before
- * the render_block.
- *
- * @link https://core.trac.wordpress.org/ticket/53494.
- *
- * @param string $style String containing the CSS styles to be added.
- * @param int    $priority To set the priority for the add_action.
- */
-function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
-	$action_hook_name = 'wp_footer';
-	if ( wp_is_block_theme() ) {
-		$action_hook_name = 'wp_head';
-	}
-	add_action(
-		$action_hook_name,
-		static function () use ( $style ) {
-			echo "<style>$style</style>\n";
-		},
-		$priority
-	);
-}
-
-/**
  * This applies a filter to the list of style nodes that comes from `get_style_nodes` in WP_Theme_JSON.
  * This particular filter removes all of the blocks from the array.
  *
@@ -106,8 +75,6 @@ function gutenberg_enqueue_global_styles() {
 
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
 remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
-remove_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_assets' );
-remove_action( 'wp_footer', 'gutenberg_enqueue_global_styles_assets' );
 
 // Enqueue global styles, and then block supports styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles' );

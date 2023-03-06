@@ -109,25 +109,13 @@ _Parameters_
 
 -   _buttonLabel_ `string`: The label to search the button for.
 
-### clickSiteEditorMenuItem
-
-Searches for an item in the navigation panel with the label provided and clicks it.
-
-_Parameters_
-
--   _label_ `string`: The label to search the menu item for.
-
 ### closeGlobalBlockInserter
 
-Undocumented declaration.
+Closes the global inserter.
 
 ### closeListView
 
 Closes list view
-
-### closeSiteEditorNavigationPanel
-
-Closes the site editor navigation panel if open
 
 ### createEmbeddingMatcher
 
@@ -322,11 +310,15 @@ Enables Pre-publish checks.
 
 ### ensureSidebarOpened
 
-Verifies that the edit post sidebar is opened, and if it is not, opens it.
+Verifies that the edit post/site/widgets sidebar is opened, and if it is not, opens it.
 
 _Returns_
 
--   `Promise`: Promise resolving once the edit post sidebar is opened.
+-   `Promise`: Promise resolving once the sidebar is opened.
+
+### enterEditMode
+
+Enters edit mode.
 
 ### findSidebarPanelToggleButtonWithTitle
 
@@ -453,18 +445,6 @@ _Returns_
 
 -   `Promise<?string>`: Promise resolving to a string or null, depending whether a page error is present.
 
-### getSiteEditorMenuItem
-
-Searches for an item in the site editor navigation menu with the provided label.
-
-_Parameters_
-
--   _label_ `string`: The label to search the menu item for.
-
-_Returns_
-
--   `Promise<?ElementHandle>`: The menu item handle or `null`
-
 ### hasBlockSwitcher
 
 Returns a boolean indicating if the current selected block has a block switcher or not.
@@ -475,41 +455,37 @@ _Returns_
 
 ### insertBlock
 
-Opens the inserter, searches for the given term, then selects the first
-result that appears. It then waits briefly for the block list to update.
+Inserts a block matching a given search term via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term by which to find the block to insert.
 
 ### insertBlockDirectoryBlock
 
-Opens the inserter, searches for the given block, then selects the
-first result that appears from the block directory. It then waits briefly for the block list to
-update.
+Inserts a Block Directory block matching a given search term via the global
+inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term by which to find the Block Directory block to insert.
 
 ### insertPattern
 
-Opens the inserter, searches for the given pattern, then selects the first
-result that appears. It then waits briefly for the block list to update.
+Inserts a pattern matching a given search term via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term by which to find the pattern to insert.
 
 ### insertReusableBlock
 
-Opens the inserter, searches for the given reusable block, then selects the
-first result that appears. It then waits briefly for the block list to
-update.
+Inserts a reusable block matching a given search term via the global
+inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term by which to find the reusable block to insert.
 
 ### installPlugin
 
@@ -551,20 +527,13 @@ _Returns_
 
 -   `Promise`: Promise resolving with a boolean indicating if the focused block is the default block.
 
-### isOfflineMode
+### isListViewOpen
 
 Undocumented declaration.
 
-### isSiteEditorRoot
+### isOfflineMode
 
-Returns `true` if in the site editor navigation root
-
-Checks whether the “Back to dashboard” button is visible. If
-not in the root, a “Back” button would be visible instead.
-
-_Returns_
-
--   `Promise<boolean>`: Whether it currently is the navigation root or not
+Undocumented declaration.
 
 ### isThemeInstalled
 
@@ -587,6 +556,10 @@ _Parameters_
 -   _username_ `?string`: String to be used as user credential.
 -   _password_ `?string`: String to be used as user credential.
 
+### logout
+
+Performs log out.
+
 ### mockOrTransform
 
 Mocks a request with the supplied mock object, or allows it to run with an optional transform, based on the
@@ -602,21 +575,13 @@ _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
 
-### navigateSiteEditorBack
-
-Navigates the site editor back
-
-### navigateSiteEditorBackToRoot
-
-Goes back until it gets to the root
-
 ### openDocumentSettingsSidebar
 
 Clicks on the button in the header which opens Document Settings sidebar when it is closed.
 
 ### openGlobalBlockInserter
 
-Opens the global block inserter.
+Opens the global inserter.
 
 ### openGlobalStylesPanel
 
@@ -649,10 +614,6 @@ Opens the previous global styles panel.
 ### openPublishPanel
 
 Opens the publish panel.
-
-### openSiteEditorNavigationPanel
-
-Opens the site editor navigation panel if closed
 
 ### openTypographyToolsPanelMenu
 
@@ -710,27 +671,51 @@ _Returns_
 
 ### searchForBlock
 
-Search for block in the global inserter
+Searches for a block via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of block to be inserted or null if nothing was found.
+
+### searchForBlockDirectoryBlock
+
+Searches for a Block Directory block via the global inserter.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The term to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of the Block Directory block to be inserted or null if nothing was found.
 
 ### searchForPattern
 
-Search for pattern in the global inserter
+Searches for a pattern via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of the pattern to be inserted or null if nothing was found.
 
 ### searchForReusableBlock
 
-Search for reusable block in the global inserter.
+Searches for a reusable block via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of the reusable block to be inserted or null if nothing was found.
 
 ### selectBlockByClientId
 
@@ -820,13 +805,14 @@ _Parameters_
 The block toolbar is not always visible while typing.
 Call this function to reveal it.
 
-### siteEditorNavigateSequence
+### switchBlockInspectorTab
 
-Navigates through a sequence of links in the site editor navigation panel
+Clicks on the block inspector tab button with the supplied label and waits
+for the tab switch.
 
 _Parameters_
 
--   _labels_ `string[] | string`: Labels to navigate through
+-   _label_ `string`: Aria label to find tab button by.
 
 ### switchEditorModeTo
 

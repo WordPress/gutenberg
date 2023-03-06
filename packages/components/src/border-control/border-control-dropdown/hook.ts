@@ -19,10 +19,13 @@ export function useBorderControlDropdown(
 	const {
 		border,
 		className,
-		colors,
+		colors = [],
+		enableAlpha = false,
+		enableStyle = true,
 		onChange,
 		previousStyleSelection,
-		__next36pxDefaultSize,
+		size = 'default',
+		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControlDropdown' );
 
@@ -53,18 +56,16 @@ export function useBorderControlDropdown(
 	// Generate class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.borderControlDropdown(), className );
-	}, [ className, cx ] );
+		return cx( styles.borderControlDropdown( size ), className );
+	}, [ className, cx, size ] );
 
 	const indicatorClassName = useMemo( () => {
 		return cx( styles.borderColorIndicator );
 	}, [ cx ] );
 
 	const indicatorWrapperClassName = useMemo( () => {
-		return cx(
-			styles.colorIndicatorWrapper( border, __next36pxDefaultSize )
-		);
-	}, [ border, cx, __next36pxDefaultSize ] );
+		return cx( styles.colorIndicatorWrapper( border, size ) );
+	}, [ border, cx, size ] );
 
 	const popoverControlsClassName = useMemo( () => {
 		return cx( styles.borderControlPopoverControls );
@@ -83,6 +84,8 @@ export function useBorderControlDropdown(
 		border,
 		className: classes,
 		colors,
+		enableAlpha,
+		enableStyle,
 		indicatorClassName,
 		indicatorWrapperClassName,
 		onColorChange,
@@ -91,5 +94,6 @@ export function useBorderControlDropdown(
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
+		__experimentalIsRenderedInSidebar,
 	};
 }

@@ -4,9 +4,9 @@
 import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { CustomSelectControl } from '@wordpress/components';
+import CustomSelectControl from '..';
 
 describe( 'CustomSelectControl', () => {
 	it( 'Captures the keypress event and does not let it propagate', () => {
@@ -45,5 +45,44 @@ describe( 'CustomSelectControl', () => {
 		fireEvent.keyDown( customSelect );
 
 		expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
+	} );
+
+	it( 'does not show selected hint by default', () => {
+		render(
+			<CustomSelectControl
+				label="Custom select"
+				options={ [
+					{
+						key: 'one',
+						name: 'One',
+						__experimentalHint: 'Hint',
+					},
+				] }
+				__nextUnconstrainedWidth
+			/>
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Custom select' } )
+		).not.toHaveTextContent( 'Hint' );
+	} );
+
+	it( 'shows selected hint when __experimentalShowSelectedHint is set', () => {
+		render(
+			<CustomSelectControl
+				label="Custom select"
+				options={ [
+					{
+						key: 'one',
+						name: 'One',
+						__experimentalHint: 'Hint',
+					},
+				] }
+				__experimentalShowSelectedHint
+				__nextUnconstrainedWidth
+			/>
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Custom select' } )
+		).toHaveTextContent( 'Hint' );
 	} );
 } );

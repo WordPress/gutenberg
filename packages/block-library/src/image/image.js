@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, isEmpty, map, pick, includes } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,11 +28,16 @@ import {
 	store as blockEditorStore,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
-	__experimentalImageEditingProvider as ImageEditingProvider,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
+import {
+	useEffect,
+	useMemo,
+	useState,
+	useRef,
+	useCallback,
+} from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import {
@@ -93,7 +98,6 @@ export default function Image( {
 		sizeSlug,
 	} = attributes;
 	const imageRef = useRef();
-	const captionRef = useRef();
 	const prevCaption = usePrevious( caption );
 	const [ showCaption, setShowCaption ] = useState( !! caption );
 	const { allowResize = true } = context;
@@ -130,15 +134,13 @@ export default function Image( {
 				} = select( blockEditorStore );
 
 				const rootClientId = getBlockRootClientId( clientId );
-				const settings = pick( getSettings(), [
-					'imageEditing',
-					'imageSizes',
-					'maxWidth',
-					'mediaUpload',
-				] );
+				const settings = getSettings();
 
 				return {
-					...settings,
+					imageEditing: settings.imageEditing,
+					imageSizes: settings.imageSizes,
+					maxWidth: settings.maxWidth,
+					mediaUpload: settings.mediaUpload,
 					canInsertCover: canInsertBlockType(
 						'core/cover',
 						rootClientId
@@ -151,7 +153,7 @@ export default function Image( {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const isWideAligned = includes( [ 'wide', 'full' ], align );
+	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const [
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
@@ -163,12 +165,11 @@ export default function Image( {
 		allowResize &&
 		! isContentLocked &&
 		! ( isWideAligned && isLargeViewport );
-	const imageSizeOptions = map(
-		filter( imageSizes, ( { slug } ) =>
-			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
-		),
-		( { name, slug } ) => ( { value: slug, label: name } )
-	);
+	const imageSizeOptions = imageSizes
+		.filter(
+			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
+		)
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -195,11 +196,14 @@ export default function Image( {
 	}, [ caption, prevCaption ] );
 
 	// Focus the caption when we click to add one.
-	useEffect( () => {
-		if ( showCaption && ! caption ) {
-			captionRef.current?.focus();
-		}
-	}, [ caption, showCaption ] );
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
 
 	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -255,12 +259,7 @@ export default function Image( {
 	}
 
 	function updateImage( newSizeSlug ) {
-		const newUrl = get( image, [
-			'media_details',
-			'sizes',
-			newSizeSlug,
-			'source_url',
-		] );
+		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
 		if ( ! newUrl ) {
 			return null;
 		}
@@ -343,7 +342,11 @@ export default function Image( {
 						} }
 						icon={ captionIcon }
 						isPressed={ showCaption }
-						label={ __( 'Caption' ) }
+						label={
+							showCaption
+								? __( 'Remove caption' )
+								: __( 'Add caption' )
+						}
 					/>
 				) }
 				{ ! multiImageSelection && ! isEditingImage && (
@@ -397,6 +400,7 @@ export default function Image( {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ ! multiImageSelection && (
 						<TextareaControl
+							__nextHasNoMarginBottom
 							label={ __( 'Alt text (alternative text)' ) }
 							value={ alt }
 							onChange={ updateAlt }
@@ -427,8 +431,9 @@ export default function Image( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
@@ -508,13 +513,20 @@ export default function Image( {
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
-				borderProps={ isRounded ? undefined : borderProps }
+				id={ id }
 				url={ url }
 				width={ width }
 				height={ height }
 				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
+				onSaveImage={ ( imageAttributes ) =>
+					setAttributes( imageAttributes )
+				}
+				onFinishEditing={ () => {
+					setIsEditingImage( false );
+				} }
+				borderProps={ isRounded ? undefined : borderProps }
 			/>
 		);
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
@@ -595,6 +607,7 @@ export default function Image( {
 						height: parseInt( currentHeight + delta.height, 10 ),
 					} );
 				} }
+				resizeRatio={ align === 'center' ? 2 : 1 }
 			>
 				{ img }
 			</ResizableBox>
@@ -602,18 +615,7 @@ export default function Image( {
 	}
 
 	return (
-		<ImageEditingProvider
-			id={ id }
-			url={ url }
-			naturalWidth={ naturalWidth }
-			naturalHeight={ naturalHeight }
-			clientWidth={ clientWidth }
-			onSaveImage={ ( imageAttributes ) =>
-				setAttributes( imageAttributes )
-			}
-			isEditing={ isEditingImage }
-			onFinishEditing={ () => setIsEditingImage( false ) }
-		>
+		<>
 			{ /* Hide controls during upload to avoid component remount,
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
@@ -621,6 +623,7 @@ export default function Image( {
 			{ showCaption &&
 				( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
+						identifier="caption"
 						className={ __experimentalGetElementClassName(
 							'caption'
 						) }
@@ -640,6 +643,6 @@ export default function Image( {
 						}
 					/>
 				) }
-		</ImageEditingProvider>
+		</>
 	);
 }

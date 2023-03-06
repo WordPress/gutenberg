@@ -14,6 +14,7 @@ import {
 	PanelBody,
 	Spinner,
 	Placeholder,
+	ToolbarButton,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -28,11 +29,11 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { video as icon } from '@wordpress/icons';
+import { video as icon, caption as captionIcon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -76,6 +77,8 @@ function VideoEdit( {
 	const videoPlayer = useRef();
 	const posterImageButton = useRef();
 	const { id, caption, controls, poster, src, tracks } = attributes;
+	const prevCaption = usePrevious( caption );
+	const [ showCaption, setShowCaption ] = useState( !! caption );
 	const isTemporaryVideo = ! id && isBlobURL( src );
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -103,6 +106,30 @@ function VideoEdit( {
 		}
 	}, [ poster ] );
 
+	// We need to show the caption when changes come from
+	// history navigation(undo/redo).
+	useEffect( () => {
+		if ( caption && ! prevCaption ) {
+			setShowCaption( true );
+		}
+	}, [ caption, prevCaption ] );
+
+	// Focus the caption when we click to add one.
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
+
+	useEffect( () => {
+		if ( ! isSelected && ! caption ) {
+			setShowCaption( false );
+		}
+	}, [ isSelected, caption ] );
+
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
 			// In this case there was an error
@@ -112,6 +139,7 @@ function VideoEdit( {
 				src: undefined,
 				id: undefined,
 				poster: undefined,
+				caption: undefined,
 			} );
 			return;
 		}
@@ -123,6 +151,7 @@ function VideoEdit( {
 			id: media.id,
 			poster:
 				media.image?.src !== media.icon ? media.image?.src : undefined,
+			caption: media.caption,
 		} );
 	}
 
@@ -132,7 +161,7 @@ function VideoEdit( {
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url: newSrc },
 			} );
-			if ( undefined !== embedBlock ) {
+			if ( undefined !== embedBlock && onReplace ) {
 				onReplace( embedBlock );
 				return;
 			}
@@ -186,6 +215,23 @@ function VideoEdit( {
 	return (
 		<>
 			<BlockControls group="block">
+				<ToolbarButton
+					onClick={ () => {
+						setShowCaption( ! showCaption );
+						if ( showCaption && caption ) {
+							setAttributes( { caption: undefined } );
+						}
+					} }
+					icon={ captionIcon }
+					isPressed={ showCaption }
+					label={
+						showCaption
+							? __( 'Remove caption' )
+							: __( 'Add caption' )
+					}
+				/>
+			</BlockControls>
+			<BlockControls>
 				<TracksEditor
 					tracks={ tracks }
 					onChange={ ( newTracks ) => {
@@ -278,26 +324,29 @@ function VideoEdit( {
 					</video>
 				</Disabled>
 				{ isTemporaryVideo && <Spinner /> }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						tagName="figcaption"
-						className={ __experimentalGetElementClassName(
-							'caption'
-						) }
-						aria-label={ __( 'Video caption text' ) }
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
-						onChange={ ( value ) =>
-							setAttributes( { caption: value } )
-						}
-						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
-						}
-					/>
-				) }
+				{ showCaption &&
+					( ! RichText.isEmpty( caption ) || isSelected ) && (
+						<RichText
+							identifier="caption"
+							tagName="figcaption"
+							className={ __experimentalGetElementClassName(
+								'caption'
+							) }
+							aria-label={ __( 'Video caption text' ) }
+							ref={ captionRef }
+							placeholder={ __( 'Add caption' ) }
+							value={ caption }
+							onChange={ ( value ) =>
+								setAttributes( { caption: value } )
+							}
+							inlineToolbar
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+							}
+						/>
+					) }
 			</figure>
 		</>
 	);

@@ -13,7 +13,7 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 	"category": "text",
 	"parent": [ "core/group" ],
 	"icon": "star",
-	"description": "Shows warning, error or success notices…",
+	"description": "Shows warning, error or success notices...",
 	"keywords": [ "alert", "message" ],
 	"version": "1.0.3",
 	"textdomain": "my-plugin",
@@ -252,7 +252,7 @@ The `ancestor` property makes a block available inside the specified block types
 
 An icon property should be specified to make it easier to identify a block. These can be any of WordPress' Dashicons (slug serving also as a fallback in non-js contexts).
 
-**Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. This colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/packages-primitives) component to add accessibility attributes (aria-hidden, role, and focusable).
+**Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. This colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/primitives/README.md) component to add accessibility attributes (aria-hidden, role, and focusable).
 
 ### Description
 
@@ -408,7 +408,7 @@ It contains as set of options to control features used in the editor. See the [t
 
 Block styles can be used to provide alternative styles to block. It works by adding a class name to the block's wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.
 
-Plugins and Themes can also register [custom block style](/docs/reference-guides/filters/block-filters.md#block-styles) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/reference-guides/block-api/block-styles.md) for existing blocks.
 
 ### Example
 
@@ -646,7 +646,7 @@ return array(
 Starting in the WordPress 5.8 release, it is possible to instruct WordPress to enqueue scripts and styles for a block type only when rendered on the frontend. It applies to the following asset fields in the `block.json` file:
 
 -   `script`
--   `viewScript` (when the block defines `render_callback` during registration in PHP or a `render` field in its `block.json`, then the script is registered but the block author is responsible for enqueuing it)
+-   `viewScript`
 -   `style`
 
 ## Internationalization

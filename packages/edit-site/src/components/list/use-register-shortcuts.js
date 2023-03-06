@@ -39,6 +39,10 @@ export default function useRegisterShortcuts() {
 					modifier: 'access',
 					character: 'p',
 				},
+				{
+					modifier: 'ctrlShift',
+					character: '~',
+				},
 			],
 		} );
 	}, [] );

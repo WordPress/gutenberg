@@ -144,6 +144,7 @@ export function getAutoCompleterUI( autocompleter ) {
 					<Animated.View style={ contentStyles }>
 						<BackgroundView>
 							<ScrollView
+								testID="autocompleter"
 								ref={ scrollViewRef }
 								horizontal
 								contentContainerStyle={

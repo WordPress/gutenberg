@@ -42,6 +42,36 @@ const BUTTON_OPTIONS = [
 	{ value: 'no-button', label: __( 'No button' ) },
 ];
 
+function useIsScreenReaderEnabled() {
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
+		useState( false );
+
+	useEffect( () => {
+		let mounted = true;
+
+		const changeListener = AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			( enabled ) => setIsScreenReaderEnabled( enabled )
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			( screenReaderEnabled ) => {
+				if ( mounted && screenReaderEnabled ) {
+					setIsScreenReaderEnabled( screenReaderEnabled );
+				}
+			}
+		);
+
+		return () => {
+			mounted = false;
+
+			changeListener.remove();
+		};
+	}, [] );
+
+	return isScreenReaderEnabled;
+}
+
 export default function SearchEdit( {
 	onFocus,
 	isSelected,
@@ -57,8 +87,7 @@ export default function SearchEdit( {
 		useState( false );
 	const [ isLongButton, setIsLongButton ] = useState( false );
 	const [ buttonWidth, setButtonWidth ] = useState( MIN_BUTTON_WIDTH );
-	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
-		useState( false );
+	const isScreenReaderEnabled = useIsScreenReaderEnabled();
 
 	const textInputRef = useRef( null );
 
@@ -70,31 +99,6 @@ export default function SearchEdit( {
 		placeholder,
 		buttonText,
 	} = attributes;
-
-	/*
-	 * Check if screenreader is enabled and save to state. This is important for
-	 * properly creating accessibilityLabel text.
-	 */
-	useEffect( () => {
-		const a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
-			'screenReaderChanged',
-			handleScreenReaderToggled
-		);
-
-		AccessibilityInfo.isScreenReaderEnabled().then(
-			( screenReaderEnabled ) => {
-				setIsScreenReaderEnabled( screenReaderEnabled );
-			}
-		);
-
-		return () => {
-			a11yInfoChangeSubscription.remove();
-		};
-	}, [] );
-
-	const handleScreenReaderToggled = ( screenReaderEnabled ) => {
-		setIsScreenReaderEnabled( screenReaderEnabled );
-	};
 
 	/*
 	 * Called when the value of isSelected changes. Blurs the PlainText component

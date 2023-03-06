@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "24.3.0",
+	"version": "25.5.1",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -89,8 +89,8 @@
 		"webpack-dev-server": "^4.4.0"
 	},
 	"peerDependencies": {
-		"react": "^17.0.0",
-		"react-dom": "^17.0.0"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

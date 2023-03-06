@@ -24,6 +24,6 @@ describe( 'PluginPostStatusInfo', () => {
 			</SlotFillProvider>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

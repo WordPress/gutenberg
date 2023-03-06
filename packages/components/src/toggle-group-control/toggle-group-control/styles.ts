@@ -11,8 +11,10 @@ import { CONFIG, COLORS, reduceMotion } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
 export const ToggleGroupControl = ( {
+	isBlock,
+	isDeselectable,
 	size,
-}: {
+}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => css`
 	background: ${ COLORS.ui.background };
@@ -26,22 +28,29 @@ export const ToggleGroupControl = ( {
 	${ reduceMotion( 'transition' ) }
 
 	${ toggleGroupControlSize( size ) }
-
-	&:focus-within {
-		border-color: ${ COLORS.ui.borderFocus };
-		box-shadow: ${ CONFIG.controlBoxShadowFocus };
-		outline: none;
-		z-index: 1;
-	}
+	${ ! isDeselectable && enclosingBorders( isBlock ) }
 `;
 
-export const border = css`
-	border-color: ${ COLORS.ui.border };
+const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
+	const enclosingBorder = css`
+		border-color: ${ COLORS.ui.border };
+	`;
 
-	&:hover {
-		border-color: ${ COLORS.ui.borderHover };
-	}
-`;
+	return css`
+		${ isBlock && enclosingBorder }
+
+		&:hover {
+			border-color: ${ COLORS.ui.borderHover };
+		}
+
+		&:focus-within {
+			border-color: ${ COLORS.ui.borderFocus };
+			box-shadow: ${ CONFIG.controlBoxShadowFocus };
+			outline: none;
+			z-index: 1;
+		}
+	`;
+};
 
 export const toggleGroupControlSize = (
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
@@ -64,7 +73,6 @@ export const block = css`
 export const BackdropView = styled.div`
 	background: ${ COLORS.gray[ 900 ] };
 	border-radius: ${ CONFIG.controlBorderRadius };
-	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
 	left: 0;
 	position: absolute;
 	top: 2px;

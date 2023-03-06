@@ -173,6 +173,7 @@ function BlockPopover(
 				'block-editor-block-popover',
 				props.className
 			) }
+			variant="unstyled"
 		>
 			{ __unstableCoverTarget && <div style={ style }>{ children }</div> }
 			{ ! __unstableCoverTarget && children }

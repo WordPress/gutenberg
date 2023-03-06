@@ -20,9 +20,9 @@ const CANVAS_SELECTOR = 'iframe[title="Editor canvas"i]';
  *
  * By default, it also skips the welcome guide. The option can be disabled if need be.
  *
- * @param {Admin}                 this
- * @param {SiteEditorQueryParams} query            Query params to be serialized as query portion of URL.
- * @param {boolean}               skipWelcomeGuide Whether to skip the welcome guide as part of the navigation.
+ * @param this
+ * @param query            Query params to be serialized as query portion of URL.
+ * @param skipWelcomeGuide Whether to skip the welcome guide as part of the navigation.
  */
 export async function visitSiteEditor(
 	this: Admin,
@@ -38,13 +38,10 @@ export async function visitSiteEditor(
 
 	if ( skipWelcomeGuide ) {
 		await this.page.evaluate( () => {
-			// TODO, type `window.wp`.
-			// @ts-ignore
 			window.wp.data
 				.dispatch( 'core/preferences' )
 				.set( 'core/edit-site', 'welcomeGuide', false );
 
-			// @ts-ignore
 			window.wp.data
 				.dispatch( 'core/preferences' )
 				.toggle( 'core/edit-site', 'welcomeGuideStyles', false );

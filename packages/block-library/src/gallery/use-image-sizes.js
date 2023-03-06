@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -35,17 +30,9 @@ export default function useImageSizes( images, isSelected, getSettings ) {
 				}
 
 				const sizes = imageSizes.reduce( ( currentSizes, size ) => {
-					const defaultUrl = get( img, [
-						'sizes',
-						size.slug,
-						'url',
-					] );
-					const mediaDetailsUrl = get( img, [
-						'media_details',
-						'sizes',
-						size.slug,
-						'source_url',
-					] );
+					const defaultUrl = img.sizes?.[ size.slug ]?.url;
+					const mediaDetailsUrl =
+						img.media_details?.sizes?.[ size.slug ]?.source_url;
 					return {
 						...currentSizes,
 						[ size.slug ]: defaultUrl || mediaDetailsUrl,
@@ -57,9 +44,10 @@ export default function useImageSizes( images, isSelected, getSettings ) {
 				};
 			}, {} );
 		}
+		const resizedImageSizes = Object.values( resizedImages );
 		return imageSizes
 			.filter( ( { slug } ) =>
-				some( resizedImages, ( sizes ) => sizes[ slug ] )
+				resizedImageSizes.some( ( sizes ) => sizes[ slug ] )
 			)
 			.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 	}

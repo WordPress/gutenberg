@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, pickBy } from 'lodash';
+import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -104,16 +104,15 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				categories && categories.length > 0
 					? categories.map( ( cat ) => cat.id )
 					: [];
-			const latestPostsQuery = pickBy(
-				{
+			const latestPostsQuery = Object.fromEntries(
+				Object.entries( {
 					categories: catIds,
 					author: selectedAuthor,
 					order,
 					orderby: orderBy,
 					per_page: postsToShow,
 					_embed: 'wp:featuredmedia',
-				},
-				( value ) => typeof value !== 'undefined'
+				} ).filter( ( [ , value ] ) => typeof value !== 'undefined' )
 			);
 
 			return {
@@ -196,7 +195,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		} );
 		// We do nothing if the category is not selected
 		// from suggestions.
-		if ( includes( allCategories, null ) ) {
+		if ( allCategories.includes( null ) ) {
 			return false;
 		}
 		setAttributes( { categories: allCategories } );
@@ -234,6 +233,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				{ displayPostContent &&
 					displayPostContentRadio === 'excerpt' && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Max number of words in excerpt' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
@@ -247,6 +247,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 			<PanelBody title={ __( 'Post meta settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Display author name' ) }
 					checked={ displayAuthor }
 					onChange={ ( value ) =>
@@ -254,6 +255,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					}
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Display post date' ) }
 					checked={ displayPostDate }
 					onChange={ ( value ) =>
@@ -264,6 +266,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 			<PanelBody title={ __( 'Featured image settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Display featured image' ) }
 					checked={ displayFeaturedImage }
 					onChange={ ( value ) =>
@@ -315,6 +318,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							/>
 						</BaseControl>
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Add link to featured image' ) }
 							checked={ addLinkToFeaturedImage }
 							onChange={ ( value ) =>
@@ -355,6 +359,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 				{ postLayout === 'grid' && (
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>
@@ -431,7 +436,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				<ToolbarGroup controls={ layoutControls } />
 			</BlockControls>
 			<ul { ...blockProps }>
-				{ displayPosts.map( ( post, i ) => {
+				{ displayPosts.map( ( post ) => {
 					const titleTrimmed = post.title.rendered.trim();
 					let excerpt = post.excerpt.rendered;
 					const currentAuthor = authorList?.find(
@@ -491,7 +496,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					);
 
 					return (
-						<li key={ i }>
+						<li key={ post.id }>
 							{ renderFeaturedImage && (
 								<div className={ imageClasses }>
 									{ addLinkToFeaturedImage ? (

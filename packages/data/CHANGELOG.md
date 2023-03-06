@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 8.5.0 (2023-03-01)
+
+## 8.4.0 (2023-02-15)
+
+## 8.3.0 (2023-02-01)
+
+## 8.2.0 (2023-01-11)
+
+## 8.1.0 (2023-01-02)
+
+## 8.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+### Enhancements
+
+-   The `registry.subscribe` function can now subscribe to updates only from one specific store, with a new optional parameter.
+
+## 7.6.0 (2022-11-16)
+
+## 7.5.0 (2022-11-02)
+
+## 7.4.0 (2022-10-19)
+
 ## 7.3.0 (2022-10-05)
 
 ## 7.2.0 (2022-09-21)

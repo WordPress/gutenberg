@@ -75,7 +75,7 @@ const PostStatus = ( { isOpened, onTogglePanel } ) => (
 	>
 		<PluginPostStatusInfo.Slot>
 			{ ( fills ) => (
-				<Fragment>
+				<>
 					<PostVisibility />
 					<PostSchedule />
 					<PostFormat />
@@ -84,7 +84,7 @@ const PostStatus = ( { isOpened, onTogglePanel } ) => (
 					<PostAuthor />
 					{ fills }
 					<PostTrash />
-				</Fragment>
+				</>
 			) }
 		</PluginPostStatusInfo.Slot>
 	</PanelBody>

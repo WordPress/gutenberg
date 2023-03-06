@@ -28,6 +28,7 @@
 :where(.wp-block-file__button) {
 	border-radius: 2em;
 	padding: 0.5em 1em;
+	display: inline-block;
 
 	&:is(a) {
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "12.18.0",
+	"version": "13.5.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -42,6 +42,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
@@ -52,12 +53,15 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.3.1",
+		"date-fns": "^2.28.0",
+		"escape-html": "^1.0.3",
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
@@ -65,8 +69,8 @@
 		"remove-accents": "^0.4.2"
 	},
 	"peerDependencies": {
-		"react": "^17.0.0",
-		"react-dom": "^17.0.0"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

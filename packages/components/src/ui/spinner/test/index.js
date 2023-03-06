@@ -10,23 +10,23 @@ import { Spinner } from '..';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {
-		const base = render( <Spinner /> );
-		expect( base.container.firstChild ).toMatchSnapshot();
+		const { container } = render( <Spinner /> );
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render color', () => {
-		const base = render( <Spinner /> );
-		const { container } = render( <Spinner color="blue" /> );
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
+		const { container } = render( <Spinner /> );
+		const { container: secondRenderContainer } = render(
+			<Spinner color="blue" />
 		);
+		expect( secondRenderContainer ).toMatchDiffSnapshot( container );
 	} );
 
 	test( 'should render size', () => {
-		const base = render( <Spinner /> );
-		const { container } = render( <Spinner size={ 31 } /> );
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
+		const { container } = render( <Spinner /> );
+		const { container: secondRenderContainer } = render(
+			<Spinner size={ 31 } />
 		);
+		expect( secondRenderContainer ).toMatchDiffSnapshot( container );
 	} );
 } );

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter, includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
@@ -38,7 +33,7 @@ function BlockManager( {
 			hasBlockSupport( blockType, 'inserter', true ) &&
 			( ! search || isMatchingSearchTerm( blockType, search ) ) &&
 			( ! blockType.parent ||
-				includes( blockType.parent, 'core/post-content' ) )
+				blockType.parent.includes( 'core/post-content' ) )
 	);
 
 	// Announce search results on change
@@ -71,6 +66,7 @@ function BlockManager( {
 				</div>
 			) }
 			<SearchControl
+				__nextHasNoMarginBottom
 				label={ __( 'Search for a block' ) }
 				placeholder={ __( 'Search for a block' ) }
 				value={ search }
@@ -92,15 +88,15 @@ function BlockManager( {
 					<BlockManagerCategory
 						key={ category.slug }
 						title={ category.title }
-						blockTypes={ filter( blockTypes, {
-							category: category.slug,
-						} ) }
+						blockTypes={ blockTypes.filter(
+							( blockType ) =>
+								blockType.category === category.slug
+						) }
 					/>
 				) ) }
 				<BlockManagerCategory
 					title={ __( 'Uncategorized' ) }
-					blockTypes={ filter(
-						blockTypes,
+					blockTypes={ blockTypes.filter(
 						( { category } ) => ! category
 					) }
 				/>

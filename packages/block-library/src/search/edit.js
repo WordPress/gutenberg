@@ -114,10 +114,10 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
-	const fluidTypographyEnabled = useSetting( 'typography.fluid' );
+	const fluidTypographySettings = useSetting( 'typography.fluid' );
 	const typographyProps = useTypographyProps(
 		attributes,
-		fluidTypographyEnabled
+		fluidTypographySettings
 	);
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
@@ -363,7 +363,7 @@ export default function SearchEdit( {
 									widthUnit: newUnit,
 								} );
 							} }
-							style={ { maxWidth: 80 } }
+							__unstableInputWidth={ '80px' }
 							value={ `${ width }${ widthUnit }` }
 							units={ units }
 						/>

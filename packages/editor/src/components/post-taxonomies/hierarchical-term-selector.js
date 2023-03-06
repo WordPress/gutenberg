@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find, get, some, unescape as unescapeString, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
@@ -14,11 +9,13 @@ import {
 	TextControl,
 	TreeSelect,
 	withFilters,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -95,7 +92,7 @@ export function sortBySelected( termsTree, terms ) {
  * @return {Object} Term object.
  */
 export function findTerm( terms, parent, name ) {
-	return find( terms, ( term ) => {
+	return terms.find( ( term ) => {
 		return (
 			( ( ! term.parent && ! parent ) ||
 				parseInt( term.parent ) === parseInt( parent ) ) &&
@@ -178,27 +175,18 @@ export function HierarchicalTermSelector( { slug } ) {
 			const { getTaxonomy, getEntityRecords, isResolving } =
 				select( coreStore );
 			const _taxonomy = getTaxonomy( slug );
+			const post = getCurrentPost();
 
 			return {
 				hasCreateAction: _taxonomy
-					? get(
-							getCurrentPost(),
-							[
-								'_links',
-								'wp:action-create-' + _taxonomy.rest_base,
-							],
-							false
-					  )
+					? post._links?.[
+							'wp:action-create-' + _taxonomy.rest_base
+					  ] ?? false
 					: false,
 				hasAssignAction: _taxonomy
-					? get(
-							getCurrentPost(),
-							[
-								'_links',
-								'wp:action-assign-' + _taxonomy.rest_base,
-							],
-							false
-					  )
+					? post._links?.[
+							'wp:action-assign-' + _taxonomy.rest_base
+					  ] ?? false
 					: false,
 				terms: _taxonomy
 					? getEditedPostAttribute( _taxonomy.rest_base )
@@ -258,7 +246,7 @@ export function HierarchicalTermSelector( { slug } ) {
 	const onChange = ( termId ) => {
 		const hasTerm = terms.includes( termId );
 		const newTerms = hasTerm
-			? without( terms, termId )
+			? terms.filter( ( id ) => id !== termId )
 			: [ ...terms, termId ];
 		onUpdateTerms( newTerms );
 	};
@@ -290,7 +278,7 @@ export function HierarchicalTermSelector( { slug } ) {
 		const existingTerm = findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
 			// If the term we are adding exists but is not selected select it.
-			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
+			if ( ! terms.some( ( term ) => term === existingTerm.id ) ) {
 				onUpdateTerms( [ ...terms, existingTerm.id ] );
 			}
 
@@ -306,14 +294,12 @@ export function HierarchicalTermSelector( { slug } ) {
 			parent: formParent ? formParent : undefined,
 		} );
 
+		const defaultName =
+			slug === 'category' ? __( 'Category' ) : __( 'Term' );
 		const termAddedMessage = sprintf(
 			/* translators: %s: taxonomy name */
 			_x( '%s added', 'term' ),
-			get(
-				taxonomy,
-				[ 'labels', 'singular_name' ],
-				slug === 'category' ? __( 'Category' ) : __( 'Term' )
-			)
+			taxonomy?.labels?.singular_name ?? defaultName
 		);
 		speak( termAddedMessage, 'assertive' );
 		setAdding( false );
@@ -358,12 +344,13 @@ export function HierarchicalTermSelector( { slug } ) {
 					className="editor-post-taxonomies__hierarchical-terms-choice"
 				>
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						checked={ terms.indexOf( term.id ) !== -1 }
 						onChange={ () => {
 							const termId = parseInt( term.id, 10 );
 							onChange( termId );
 						} }
-						label={ unescapeString( term.name ) }
+						label={ decodeEntities( term.name ) }
 					/>
 					{ !! term.children.length && (
 						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
@@ -380,11 +367,9 @@ export function HierarchicalTermSelector( { slug } ) {
 		fallbackIsCategory,
 		fallbackIsNotCategory
 	) =>
-		get(
-			taxonomy,
-			[ 'labels', labelProperty ],
-			slug === 'category' ? fallbackIsCategory : fallbackIsNotCategory
-		);
+		taxonomy?.labels?.[ labelProperty ] ??
+		( slug === 'category' ? fallbackIsCategory : fallbackIsNotCategory );
+
 	const newTermButtonLabel = labelWithFallback(
 		'add_new_item',
 		__( 'Add new category' ),
@@ -402,18 +387,15 @@ export function HierarchicalTermSelector( { slug } ) {
 	);
 	const noParentOption = `— ${ parentSelectLabel } —`;
 	const newTermSubmitLabel = newTermButtonLabel;
-	const filterLabel = get(
-		taxonomy,
-		[ 'labels', 'search_items' ],
-		__( 'Search Terms' )
-	);
-	const groupLabel = get( taxonomy, [ 'name' ], __( 'Terms' ) );
+	const filterLabel = taxonomy?.labels?.search_items ?? __( 'Search Terms' );
+	const groupLabel = taxonomy?.name ?? __( 'Terms' );
 	const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
 
 	return (
 		<>
 			{ showFilter && (
 				<TextControl
+					__nextHasNoMarginBottom
 					className="editor-post-taxonomies__hierarchical-terms-filter"
 					label={ filterLabel }
 					value={ filterValue }
@@ -442,22 +424,25 @@ export function HierarchicalTermSelector( { slug } ) {
 			) }
 			{ showForm && (
 				<form onSubmit={ onAddTerm }>
-					<TextControl
-						className="editor-post-taxonomies__hierarchical-terms-input"
-						label={ newTermLabel }
-						value={ formName }
-						onChange={ onChangeFormName }
-						required
-					/>
-					{ !! availableTerms.length && (
-						<TreeSelect
-							label={ parentSelectLabel }
-							noOptionLabel={ noParentOption }
-							onChange={ onChangeFormParent }
-							selectedId={ formParent }
-							tree={ availableTermsTree }
+					<VStack>
+						<TextControl
+							__nextHasNoMarginBottom
+							className="editor-post-taxonomies__hierarchical-terms-input"
+							label={ newTermLabel }
+							value={ formName }
+							onChange={ onChangeFormName }
+							required
 						/>
-					) }
+						{ !! availableTerms.length && (
+							<TreeSelect
+								label={ parentSelectLabel }
+								noOptionLabel={ noParentOption }
+								onChange={ onChangeFormParent }
+								selectedId={ formParent }
+								tree={ availableTermsTree }
+							/>
+						) }
+					</VStack>
 					<Button
 						variant="secondary"
 						type="submit"

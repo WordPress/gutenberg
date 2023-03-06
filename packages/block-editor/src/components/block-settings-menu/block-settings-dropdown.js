@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -41,13 +36,14 @@ const noop = () => {};
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
-	isAlternate: true,
+	variant: 'toolbar',
 };
 
-function CopyMenuItem( { blocks, onCopy } ) {
+function CopyMenuItem( { blocks, onCopy, label } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	const copyMenuItemLabel =
+	const copyMenuItemBlocksLabel =
 		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
+	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
@@ -58,7 +54,9 @@ export function BlockSettingsDropdown( {
 	__unstableDisplayLocation,
 	...props
 } ) {
-	const blockClientIds = castArray( clientIds );
+	const blockClientIds = Array.isArray( clientIds )
+		? clientIds
+		: [ clientIds ];
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const {
@@ -149,7 +147,9 @@ export function BlockSettingsDropdown( {
 		__experimentalSelectBlock
 			? () => {
 					const blockToSelect =
-						previousBlockClientId || nextBlockClientId;
+						previousBlockClientId ||
+						nextBlockClientId ||
+						firstParentClientId;
 
 					if (
 						blockToSelect &&
@@ -168,6 +168,7 @@ export function BlockSettingsDropdown( {
 			__experimentalSelectBlock,
 			previousBlockClientId,
 			nextBlockClientId,
+			firstParentClientId,
 			selectedBlockClientIds,
 		]
 	);
@@ -192,6 +193,11 @@ export function BlockSettingsDropdown( {
 		},
 	} );
 
+	// This can occur when the selected block (the parent)
+	// displays child blocks within a List View.
+	const parentBlockIsSelected =
+		selectedBlockClientIds?.includes( firstParentClientId );
+
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -207,6 +213,7 @@ export function BlockSettingsDropdown( {
 				onInsertBefore,
 				onRemove,
 				onCopy,
+				onPasteStyles,
 				onMoveTo,
 				blocks,
 			} ) => (
@@ -224,26 +231,33 @@ export function BlockSettingsDropdown( {
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
-								{ !! firstParentClientId && (
-									<MenuItem
-										{ ...showParentOutlineGestures }
-										ref={ selectParentButtonRef }
-										icon={
-											<BlockIcon
-												icon={ parentBlockType.icon }
-											/>
-										}
-										onClick={ () =>
-											selectBlock( firstParentClientId )
-										}
-									>
-										{ sprintf(
-											/* translators: %s: Name of the block's parent. */
-											__( 'Select parent block (%s)' ),
-											parentBlockType.title
-										) }
-									</MenuItem>
-								) }
+								{ ! parentBlockIsSelected &&
+									!! firstParentClientId && (
+										<MenuItem
+											{ ...showParentOutlineGestures }
+											ref={ selectParentButtonRef }
+											icon={
+												<BlockIcon
+													icon={
+														parentBlockType.icon
+													}
+												/>
+											}
+											onClick={ () =>
+												selectBlock(
+													firstParentClientId
+												)
+											}
+										>
+											{ sprintf(
+												/* translators: %s: Name of the block's parent. */
+												__(
+													'Select parent block (%s)'
+												),
+												parentBlockType.title
+											) }
+										</MenuItem>
+									) }
 								{ count === 1 && (
 									<BlockHTMLConvertButton
 										clientId={ firstBlockClientId }
@@ -300,6 +314,16 @@ export function BlockSettingsDropdown( {
 										onToggle={ onClose }
 									/>
 								) }
+							</MenuGroup>
+							<MenuGroup>
+								<CopyMenuItem
+									blocks={ blocks }
+									onCopy={ onCopy }
+									label={ __( 'Copy styles' ) }
+								/>
+								<MenuItem onClick={ onPasteStyles }>
+									{ __( 'Paste styles' ) }
+								</MenuItem>
 							</MenuGroup>
 							<BlockSettingsMenuControls.Slot
 								fillProps={ { onClose } }

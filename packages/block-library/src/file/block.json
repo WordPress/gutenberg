@@ -67,6 +67,15 @@
 					"bottom": "1.5em"
 				}
 			}
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"link": true
+			}
 		}
 	},
 	"viewScript": "file:./view.min.js",

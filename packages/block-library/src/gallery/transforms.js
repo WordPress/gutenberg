@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
@@ -144,7 +139,7 @@ const transforms = {
 					? sizeSlug
 					: undefined;
 
-				const validImages = filter( attributes, ( { url } ) => url );
+				const validImages = attributes.filter( ( { url } ) => url );
 
 				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = validImages.map( ( image ) => {

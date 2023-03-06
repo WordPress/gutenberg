@@ -42,6 +42,17 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 }
 
 .emotion-6 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-8 {
   margin-top: calc(4px * 2);
   margin-bottom: 0;
   font-size: 12px;
@@ -73,7 +84,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </h1>
       </div>
       <button
-        aria-label="Close dialog"
+        aria-label="Close"
         class="components-button has-icon"
         type="button"
       >
@@ -91,411 +102,427 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </svg>
       </button>
     </div>
-    <div
-      class="interface-preferences__tabs"
-    >
+    <div>
       <div
-        aria-orientation="vertical"
-        class="components-tab-panel__tabs"
-        role="tablist"
+        class="interface-preferences__tabs"
       >
-        <button
-          aria-controls="tab-panel-0-general-view"
-          aria-selected="true"
-          class="components-button components-tab-panel__tabs-item is-active"
-          id="tab-panel-0-general"
-          role="tab"
-          type="button"
+        <div
+          aria-orientation="vertical"
+          class="components-tab-panel__tabs"
+          role="tablist"
         >
-          General
-        </button>
-        <button
-          aria-controls="tab-panel-0-blocks-view"
-          aria-selected="false"
-          class="components-button components-tab-panel__tabs-item"
-          id="tab-panel-0-blocks"
-          role="tab"
-          tabindex="-1"
-          type="button"
+          <button
+            aria-controls="tab-panel-0-general-view"
+            aria-selected="true"
+            class="components-button components-tab-panel__tabs-item is-active"
+            id="tab-panel-0-general"
+            role="tab"
+            type="button"
+          >
+            General
+          </button>
+          <button
+            aria-controls="tab-panel-0-blocks-view"
+            aria-selected="false"
+            class="components-button components-tab-panel__tabs-item"
+            id="tab-panel-0-blocks"
+            role="tab"
+            tabindex="-1"
+            type="button"
+          >
+            Blocks
+          </button>
+          <button
+            aria-controls="tab-panel-0-panels-view"
+            aria-selected="false"
+            class="components-button components-tab-panel__tabs-item"
+            id="tab-panel-0-panels"
+            role="tab"
+            tabindex="-1"
+            type="button"
+          >
+            Panels
+          </button>
+        </div>
+        <div
+          aria-labelledby="tab-panel-0-general"
+          class="components-tab-panel__tab-content"
+          id="tab-panel-0-general-view"
+          role="tabpanel"
         >
-          Blocks
-        </button>
-        <button
-          aria-controls="tab-panel-0-panels-view"
-          aria-selected="false"
-          class="components-button components-tab-panel__tabs-item"
-          id="tab-panel-0-panels"
-          role="tab"
-          tabindex="-1"
-          type="button"
-        >
-          Panels
-        </button>
-      </div>
-      <div
-        aria-labelledby="tab-panel-0-general"
-        class="components-tab-panel__tab-content"
-        id="tab-panel-0-general-view"
-        role="tabpanel"
-      >
-        <fieldset
-          class="interface-preferences-modal__section"
-        >
-          <legend
-            class="interface-preferences-modal__section-legend"
+          <fieldset
+            class="interface-preferences-modal__section"
           >
-            <h2
-              class="interface-preferences-modal__section-title"
+            <legend
+              class="interface-preferences-modal__section-legend"
             >
-              Publishing
-            </h2>
-            <p
-              class="interface-preferences-modal__section-description"
-            >
-              Change options related to publishing.
-            </p>
-          </legend>
-          <div
-            class="interface-preferences-modal__option"
-          >
+              <h2
+                class="interface-preferences-modal__section-title"
+              >
+                Publishing
+              </h2>
+              <p
+                class="interface-preferences-modal__section-description"
+              >
+                Change options related to publishing.
+              </p>
+            </legend>
             <div
-              class="components-base-control components-toggle-control emotion-0 emotion-1"
+              class="interface-preferences-modal__option"
             >
               <div
-                class="components-base-control__field emotion-2 emotion-3"
+                class="components-base-control components-toggle-control emotion-0 emotion-1"
               >
                 <div
-                  class="components-flex components-h-stack emotion-4 emotion-5"
-                  data-wp-c16t="true"
-                  data-wp-component="HStack"
+                  class="components-base-control__field emotion-2 emotion-3"
                 >
-                  <span
-                    class="components-form-toggle"
+                  <div
+                    class="components-flex components-h-stack emotion-4 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="HStack"
                   >
-                    <input
-                      aria-describedby="inspector-toggle-control-0__help"
-                      class="components-form-toggle__input"
-                      id="inspector-toggle-control-0"
-                      type="checkbox"
-                    />
                     <span
-                      class="components-form-toggle__track"
-                    />
-                    <span
-                      class="components-form-toggle__thumb"
-                    />
-                  </span>
-                  <label
-                    class="components-toggle-control__label"
-                    for="inspector-toggle-control-0"
-                  >
-                    Include pre-publish checklist
-                  </label>
+                      class="components-form-toggle"
+                    >
+                      <input
+                        aria-describedby="inspector-toggle-control-0__help"
+                        class="components-form-toggle__input"
+                        id="inspector-toggle-control-0"
+                        type="checkbox"
+                      />
+                      <span
+                        class="components-form-toggle__track"
+                      />
+                      <span
+                        class="components-form-toggle__thumb"
+                      />
+                    </span>
+                    <label
+                      class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                      data-wp-c16t="true"
+                      data-wp-component="FlexBlock"
+                      for="inspector-toggle-control-0"
+                    >
+                      Include pre-publish checklist
+                    </label>
+                  </div>
                 </div>
+                <p
+                  class="components-base-control__help emotion-8 emotion-9"
+                  id="inspector-toggle-control-0__help"
+                >
+                  Review settings, such as visibility and tags.
+                </p>
               </div>
-              <p
-                class="components-base-control__help emotion-6 emotion-7"
-                id="inspector-toggle-control-0__help"
-              >
-                Review settings, such as visibility and tags.
-              </p>
             </div>
-          </div>
-        </fieldset>
-        <fieldset
-          class="interface-preferences-modal__section"
-        >
-          <legend
-            class="interface-preferences-modal__section-legend"
+          </fieldset>
+          <fieldset
+            class="interface-preferences-modal__section"
           >
-            <h2
-              class="interface-preferences-modal__section-title"
+            <legend
+              class="interface-preferences-modal__section-legend"
             >
-              Appearance
-            </h2>
-            <p
-              class="interface-preferences-modal__section-description"
-            >
-              Customize options related to the block editor interface and editing flow.
-            </p>
-          </legend>
-          <div
-            class="interface-preferences-modal__option"
-          >
+              <h2
+                class="interface-preferences-modal__section-title"
+              >
+                Appearance
+              </h2>
+              <p
+                class="interface-preferences-modal__section-description"
+              >
+                Customize options related to the block editor interface and editing flow.
+              </p>
+            </legend>
             <div
-              class="components-base-control components-toggle-control emotion-0 emotion-1"
+              class="interface-preferences-modal__option"
             >
               <div
-                class="components-base-control__field emotion-2 emotion-3"
+                class="components-base-control components-toggle-control emotion-0 emotion-1"
               >
                 <div
-                  class="components-flex components-h-stack emotion-4 emotion-5"
-                  data-wp-c16t="true"
-                  data-wp-component="HStack"
+                  class="components-base-control__field emotion-2 emotion-3"
                 >
-                  <span
-                    class="components-form-toggle"
+                  <div
+                    class="components-flex components-h-stack emotion-4 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="HStack"
                   >
-                    <input
-                      aria-describedby="inspector-toggle-control-1__help"
-                      class="components-form-toggle__input"
-                      id="inspector-toggle-control-1"
-                      type="checkbox"
-                    />
                     <span
-                      class="components-form-toggle__track"
-                    />
-                    <span
-                      class="components-form-toggle__thumb"
-                    />
-                  </span>
-                  <label
-                    class="components-toggle-control__label"
-                    for="inspector-toggle-control-1"
-                  >
-                    Distraction Free
-                  </label>
+                      class="components-form-toggle"
+                    >
+                      <input
+                        aria-describedby="inspector-toggle-control-1__help"
+                        class="components-form-toggle__input"
+                        id="inspector-toggle-control-1"
+                        type="checkbox"
+                      />
+                      <span
+                        class="components-form-toggle__track"
+                      />
+                      <span
+                        class="components-form-toggle__thumb"
+                      />
+                    </span>
+                    <label
+                      class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                      data-wp-c16t="true"
+                      data-wp-component="FlexBlock"
+                      for="inspector-toggle-control-1"
+                    >
+                      Distraction free
+                    </label>
+                  </div>
                 </div>
+                <p
+                  class="components-base-control__help emotion-8 emotion-9"
+                  id="inspector-toggle-control-1__help"
+                >
+                  Reduce visual distractions by hiding the toolbar and other elements to focus on writing.
+                </p>
               </div>
-              <p
-                class="components-base-control__help emotion-6 emotion-7"
-                id="inspector-toggle-control-1__help"
-              >
-                Reduce visual distractions by hiding the toolbar and other elements to focus on writing.
-              </p>
             </div>
-          </div>
-          <div
-            class="interface-preferences-modal__option"
-          >
             <div
-              class="components-base-control components-toggle-control emotion-0 emotion-1"
+              class="interface-preferences-modal__option"
             >
               <div
-                class="components-base-control__field emotion-2 emotion-3"
+                class="components-base-control components-toggle-control emotion-0 emotion-1"
               >
                 <div
-                  class="components-flex components-h-stack emotion-4 emotion-5"
-                  data-wp-c16t="true"
-                  data-wp-component="HStack"
+                  class="components-base-control__field emotion-2 emotion-3"
                 >
-                  <span
-                    class="components-form-toggle"
+                  <div
+                    class="components-flex components-h-stack emotion-4 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="HStack"
                   >
-                    <input
-                      aria-describedby="inspector-toggle-control-2__help"
-                      class="components-form-toggle__input"
-                      id="inspector-toggle-control-2"
-                      type="checkbox"
-                    />
                     <span
-                      class="components-form-toggle__track"
-                    />
-                    <span
-                      class="components-form-toggle__thumb"
-                    />
-                  </span>
-                  <label
-                    class="components-toggle-control__label"
-                    for="inspector-toggle-control-2"
-                  >
-                    Spotlight mode
-                  </label>
+                      class="components-form-toggle"
+                    >
+                      <input
+                        aria-describedby="inspector-toggle-control-2__help"
+                        class="components-form-toggle__input"
+                        id="inspector-toggle-control-2"
+                        type="checkbox"
+                      />
+                      <span
+                        class="components-form-toggle__track"
+                      />
+                      <span
+                        class="components-form-toggle__thumb"
+                      />
+                    </span>
+                    <label
+                      class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                      data-wp-c16t="true"
+                      data-wp-component="FlexBlock"
+                      for="inspector-toggle-control-2"
+                    >
+                      Spotlight mode
+                    </label>
+                  </div>
                 </div>
+                <p
+                  class="components-base-control__help emotion-8 emotion-9"
+                  id="inspector-toggle-control-2__help"
+                >
+                  Highlights the current block and fades other content.
+                </p>
               </div>
-              <p
-                class="components-base-control__help emotion-6 emotion-7"
-                id="inspector-toggle-control-2__help"
-              >
-                Highlights the current block and fades other content.
-              </p>
             </div>
-          </div>
-          <div
-            class="interface-preferences-modal__option"
-          >
             <div
-              class="components-base-control components-toggle-control emotion-0 emotion-1"
+              class="interface-preferences-modal__option"
             >
               <div
-                class="components-base-control__field emotion-2 emotion-3"
+                class="components-base-control components-toggle-control emotion-0 emotion-1"
               >
                 <div
-                  class="components-flex components-h-stack emotion-4 emotion-5"
-                  data-wp-c16t="true"
-                  data-wp-component="HStack"
+                  class="components-base-control__field emotion-2 emotion-3"
                 >
-                  <span
-                    class="components-form-toggle"
+                  <div
+                    class="components-flex components-h-stack emotion-4 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="HStack"
                   >
-                    <input
-                      aria-describedby="inspector-toggle-control-3__help"
-                      class="components-form-toggle__input"
-                      id="inspector-toggle-control-3"
-                      type="checkbox"
-                    />
                     <span
-                      class="components-form-toggle__track"
-                    />
-                    <span
-                      class="components-form-toggle__thumb"
-                    />
-                  </span>
-                  <label
-                    class="components-toggle-control__label"
-                    for="inspector-toggle-control-3"
-                  >
-                    Show button text labels
-                  </label>
+                      class="components-form-toggle"
+                    >
+                      <input
+                        aria-describedby="inspector-toggle-control-3__help"
+                        class="components-form-toggle__input"
+                        id="inspector-toggle-control-3"
+                        type="checkbox"
+                      />
+                      <span
+                        class="components-form-toggle__track"
+                      />
+                      <span
+                        class="components-form-toggle__thumb"
+                      />
+                    </span>
+                    <label
+                      class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                      data-wp-c16t="true"
+                      data-wp-component="FlexBlock"
+                      for="inspector-toggle-control-3"
+                    >
+                      Show button text labels
+                    </label>
+                  </div>
                 </div>
+                <p
+                  class="components-base-control__help emotion-8 emotion-9"
+                  id="inspector-toggle-control-3__help"
+                >
+                  Show text instead of icons on buttons.
+                </p>
               </div>
-              <p
-                class="components-base-control__help emotion-6 emotion-7"
-                id="inspector-toggle-control-3__help"
-              >
-                Show text instead of icons on buttons.
-              </p>
             </div>
-          </div>
-          <div
-            class="interface-preferences-modal__option"
-          >
             <div
-              class="components-base-control components-toggle-control emotion-0 emotion-1"
+              class="interface-preferences-modal__option"
             >
               <div
-                class="components-base-control__field emotion-2 emotion-3"
+                class="components-base-control components-toggle-control emotion-0 emotion-1"
               >
                 <div
-                  class="components-flex components-h-stack emotion-4 emotion-5"
-                  data-wp-c16t="true"
-                  data-wp-component="HStack"
+                  class="components-base-control__field emotion-2 emotion-3"
                 >
-                  <span
-                    class="components-form-toggle"
+                  <div
+                    class="components-flex components-h-stack emotion-4 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="HStack"
                   >
-                    <input
-                      aria-describedby="inspector-toggle-control-4__help"
-                      class="components-form-toggle__input"
-                      id="inspector-toggle-control-4"
-                      type="checkbox"
-                    />
                     <span
-                      class="components-form-toggle__track"
-                    />
-                    <span
-                      class="components-form-toggle__thumb"
-                    />
-                  </span>
-                  <label
-                    class="components-toggle-control__label"
-                    for="inspector-toggle-control-4"
-                  >
-                    Always open list view
-                  </label>
+                      class="components-form-toggle"
+                    >
+                      <input
+                        aria-describedby="inspector-toggle-control-4__help"
+                        class="components-form-toggle__input"
+                        id="inspector-toggle-control-4"
+                        type="checkbox"
+                      />
+                      <span
+                        class="components-form-toggle__track"
+                      />
+                      <span
+                        class="components-form-toggle__thumb"
+                      />
+                    </span>
+                    <label
+                      class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                      data-wp-c16t="true"
+                      data-wp-component="FlexBlock"
+                      for="inspector-toggle-control-4"
+                    >
+                      Always open list view
+                    </label>
+                  </div>
                 </div>
+                <p
+                  class="components-base-control__help emotion-8 emotion-9"
+                  id="inspector-toggle-control-4__help"
+                >
+                  Opens the block list view sidebar by default.
+                </p>
               </div>
-              <p
-                class="components-base-control__help emotion-6 emotion-7"
-                id="inspector-toggle-control-4__help"
-              >
-                Opens the block list view sidebar by default.
-              </p>
             </div>
-          </div>
-          <div
-            class="interface-preferences-modal__option"
-          >
             <div
-              class="components-base-control components-toggle-control emotion-0 emotion-1"
+              class="interface-preferences-modal__option"
             >
               <div
-                class="components-base-control__field emotion-2 emotion-3"
+                class="components-base-control components-toggle-control emotion-0 emotion-1"
               >
                 <div
-                  class="components-flex components-h-stack emotion-4 emotion-5"
-                  data-wp-c16t="true"
-                  data-wp-component="HStack"
+                  class="components-base-control__field emotion-2 emotion-3"
                 >
-                  <span
-                    class="components-form-toggle"
+                  <div
+                    class="components-flex components-h-stack emotion-4 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="HStack"
                   >
-                    <input
-                      aria-describedby="inspector-toggle-control-5__help"
-                      class="components-form-toggle__input"
-                      id="inspector-toggle-control-5"
-                      type="checkbox"
-                    />
                     <span
-                      class="components-form-toggle__track"
-                    />
-                    <span
-                      class="components-form-toggle__thumb"
-                    />
-                  </span>
-                  <label
-                    class="components-toggle-control__label"
-                    for="inspector-toggle-control-5"
-                  >
-                    Use theme styles
-                  </label>
+                      class="components-form-toggle"
+                    >
+                      <input
+                        aria-describedby="inspector-toggle-control-5__help"
+                        class="components-form-toggle__input"
+                        id="inspector-toggle-control-5"
+                        type="checkbox"
+                      />
+                      <span
+                        class="components-form-toggle__track"
+                      />
+                      <span
+                        class="components-form-toggle__thumb"
+                      />
+                    </span>
+                    <label
+                      class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                      data-wp-c16t="true"
+                      data-wp-component="FlexBlock"
+                      for="inspector-toggle-control-5"
+                    >
+                      Use theme styles
+                    </label>
+                  </div>
                 </div>
+                <p
+                  class="components-base-control__help emotion-8 emotion-9"
+                  id="inspector-toggle-control-5__help"
+                >
+                  Make the editor look like your theme.
+                </p>
               </div>
-              <p
-                class="components-base-control__help emotion-6 emotion-7"
-                id="inspector-toggle-control-5__help"
-              >
-                Make the editor look like your theme.
-              </p>
             </div>
-          </div>
-          <div
-            class="interface-preferences-modal__option"
-          >
             <div
-              class="components-base-control components-toggle-control emotion-0 emotion-1"
+              class="interface-preferences-modal__option"
             >
               <div
-                class="components-base-control__field emotion-2 emotion-3"
+                class="components-base-control components-toggle-control emotion-0 emotion-1"
               >
                 <div
-                  class="components-flex components-h-stack emotion-4 emotion-5"
-                  data-wp-c16t="true"
-                  data-wp-component="HStack"
+                  class="components-base-control__field emotion-2 emotion-3"
                 >
-                  <span
-                    class="components-form-toggle"
+                  <div
+                    class="components-flex components-h-stack emotion-4 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="HStack"
                   >
-                    <input
-                      aria-describedby="inspector-toggle-control-6__help"
-                      class="components-form-toggle__input"
-                      id="inspector-toggle-control-6"
-                      type="checkbox"
-                    />
                     <span
-                      class="components-form-toggle__track"
-                    />
-                    <span
-                      class="components-form-toggle__thumb"
-                    />
-                  </span>
-                  <label
-                    class="components-toggle-control__label"
-                    for="inspector-toggle-control-6"
-                  >
-                    Display block breadcrumbs
-                  </label>
+                      class="components-form-toggle"
+                    >
+                      <input
+                        aria-describedby="inspector-toggle-control-6__help"
+                        class="components-form-toggle__input"
+                        id="inspector-toggle-control-6"
+                        type="checkbox"
+                      />
+                      <span
+                        class="components-form-toggle__track"
+                      />
+                      <span
+                        class="components-form-toggle__thumb"
+                      />
+                    </span>
+                    <label
+                      class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                      data-wp-c16t="true"
+                      data-wp-component="FlexBlock"
+                      for="inspector-toggle-control-6"
+                    >
+                      Display block breadcrumbs
+                    </label>
+                  </div>
                 </div>
+                <p
+                  class="components-base-control__help emotion-8 emotion-9"
+                  id="inspector-toggle-control-6__help"
+                >
+                  Shows block breadcrumbs at the bottom of the editor.
+                </p>
               </div>
-              <p
-                class="components-base-control__help emotion-6 emotion-7"
-                id="inspector-toggle-control-6__help"
-              >
-                Shows block breadcrumbs at the bottom of the editor.
-              </p>
             </div>
-          </div>
-        </fieldset>
+          </fieldset>
+        </div>
       </div>
     </div>
   </div>
@@ -508,6 +535,11 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 }
 
 .emotion-2 {
+  overflow-x: auto;
+  max-height: 100%;
+}
+
+.emotion-3 {
   background-color: #fff;
   color: #1e1e1e;
   position: relative;
@@ -517,47 +549,47 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   border-radius: calc(2px - 1px);
 }
 
-.emotion-4 {
+.emotion-5 {
   height: 100%;
 }
 
-.emotion-6 {
+.emotion-7 {
   box-sizing: border-box;
   height: auto;
   max-height: 100%;
   padding: calc(4px * 4);
 }
 
-.emotion-6:first-of-type {
+.emotion-7:first-of-type {
   border-top-left-radius: calc(2px - 1px);
   border-top-right-radius: calc(2px - 1px);
 }
 
-.emotion-6:last-of-type {
+.emotion-7:last-of-type {
   border-bottom-left-radius: calc(2px - 1px);
   border-bottom-right-radius: calc(2px - 1px);
 }
 
-.emotion-8 {
+.emotion-9 {
   border-radius: 2px;
 }
 
-.emotion-8>*:first-of-type>* {
+.emotion-9>*:first-of-type>* {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
 
-.emotion-8>*:last-of-type>* {
+.emotion-9>*:last-of-type>* {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
 
-.emotion-10 {
+.emotion-11 {
   width: 100%;
   display: block;
 }
 
-.emotion-12 {
+.emotion-13 {
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -565,8 +597,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   border: 1px solid transparent;
   cursor: pointer;
   background: none;
-  text-align: left;
+  text-align: start;
   padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
+  box-sizing: border-box;
   width: 100%;
   display: block;
   margin: 0;
@@ -574,18 +607,18 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   border-radius: 2px;
 }
 
-.emotion-12:hover {
-  color: var( --wp-admin-theme-color, #007cba);
+.emotion-13:hover {
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 }
 
-.emotion-12:focus {
+.emotion-13:focus {
   background-color: transparent;
-  color: var( --wp-admin-theme-color, #007cba);
-  border-color: var( --wp-admin-theme-color, #007cba);
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
   outline: 3px solid transparent;
 }
 
-.emotion-14 {
+.emotion-15 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -604,11 +637,11 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   width: 100%;
 }
 
-.emotion-14>* {
+.emotion-15>* {
   min-width: 0;
 }
 
-.emotion-16 {
+.emotion-17 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -616,14 +649,14 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   min-width: 0;
 }
 
-.emotion-18 {
+.emotion-19 {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.emotion-46 {
+.emotion-47 {
   background: transparent;
   display: block;
   margin: 0!important;
@@ -643,7 +676,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-  .emotion-46 {
+  .emotion-47 {
     transition-duration: 0ms;
   }
 }
@@ -672,7 +705,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </h1>
       </div>
       <button
-        aria-label="Close dialog"
+        aria-label="Close"
         class="components-button has-icon"
         type="button"
       >
@@ -690,198 +723,200 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
         </svg>
       </button>
     </div>
-    <div
-      class="components-navigator-provider interface-preferences__provider emotion-0 emotion-1"
-      data-wp-c16t="true"
-      data-wp-component="NavigatorProvider"
-    >
+    <div>
       <div
-        class="components-navigator-screen"
+        class="components-navigator-provider interface-preferences__provider emotion-0 emotion-1"
         data-wp-c16t="true"
-        data-wp-component="NavigatorScreen"
-        style="opacity: 0; transform: translateX(50px) translateZ(0);"
+        data-wp-component="NavigatorProvider"
       >
         <div
-          class="components-surface components-card emotion-2 emotion-1"
+          class="emotion-2 components-navigator-screen"
           data-wp-c16t="true"
-          data-wp-component="Card"
+          data-wp-component="NavigatorScreen"
+          style="opacity: 0; transform: translateX(50px) translateZ(0);"
         >
           <div
-            class="emotion-4 emotion-1"
+            class="components-surface components-card emotion-3 emotion-1"
+            data-wp-c16t="true"
+            data-wp-component="Card"
           >
             <div
-              class="components-card__body components-card-body emotion-6 emotion-1"
-              data-wp-c16t="true"
-              data-wp-component="CardBody"
+              class="emotion-5 emotion-1"
             >
               <div
-                class="components-item-group emotion-8 emotion-1"
+                class="components-card__body components-card-body emotion-7 emotion-1"
                 data-wp-c16t="true"
-                data-wp-component="ItemGroup"
-                role="list"
+                data-wp-component="CardBody"
               >
                 <div
-                  class="emotion-10"
-                  role="listitem"
+                  class="components-item-group emotion-9 emotion-1"
+                  data-wp-c16t="true"
+                  data-wp-component="ItemGroup"
+                  role="list"
                 >
-                  <button
-                    class="components-item components-navigator-button emotion-1 emotion-12 emotion-1"
-                    data-wp-c16t="true"
-                    data-wp-component="NavigatorButton"
-                    id="general"
+                  <div
+                    class="emotion-11"
+                    role="listitem"
                   >
-                    <div
-                      class="components-flex components-h-stack emotion-14 emotion-1"
+                    <button
+                      class="components-item components-navigator-button emotion-1 emotion-13 emotion-1"
                       data-wp-c16t="true"
-                      data-wp-component="HStack"
+                      data-wp-component="NavigatorButton"
+                      id="general"
                     >
                       <div
-                        class="components-flex-item emotion-16 emotion-1"
+                        class="components-flex components-h-stack emotion-15 emotion-1"
                         data-wp-c16t="true"
-                        data-wp-component="FlexItem"
+                        data-wp-component="HStack"
                       >
-                        <span
-                          class="components-truncate emotion-18 emotion-1"
+                        <div
+                          class="components-flex-item emotion-17 emotion-1"
                           data-wp-c16t="true"
-                          data-wp-component="Truncate"
+                          data-wp-component="FlexItem"
                         >
-                          General
-                        </span>
-                      </div>
-                      <div
-                        class="components-flex-item emotion-16 emotion-1"
-                        data-wp-c16t="true"
-                        data-wp-component="FlexItem"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          focusable="false"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          width="24"
-                          xmlns="http://www.w3.org/2000/svg"
+                          <span
+                            class="components-truncate emotion-19 emotion-1"
+                            data-wp-c16t="true"
+                            data-wp-component="Truncate"
+                          >
+                            General
+                          </span>
+                        </div>
+                        <div
+                          class="components-flex-item emotion-17 emotion-1"
+                          data-wp-c16t="true"
+                          data-wp-component="FlexItem"
                         >
-                          <path
-                            d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
-                          />
-                        </svg>
+                          <svg
+                            aria-hidden="true"
+                            focusable="false"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            width="24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
+                            />
+                          </svg>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                </div>
-                <div
-                  class="emotion-10"
-                  role="listitem"
-                >
-                  <button
-                    class="components-item components-navigator-button emotion-1 emotion-12 emotion-1"
-                    data-wp-c16t="true"
-                    data-wp-component="NavigatorButton"
-                    id="blocks"
+                    </button>
+                  </div>
+                  <div
+                    class="emotion-11"
+                    role="listitem"
                   >
-                    <div
-                      class="components-flex components-h-stack emotion-14 emotion-1"
+                    <button
+                      class="components-item components-navigator-button emotion-1 emotion-13 emotion-1"
                       data-wp-c16t="true"
-                      data-wp-component="HStack"
+                      data-wp-component="NavigatorButton"
+                      id="blocks"
                     >
                       <div
-                        class="components-flex-item emotion-16 emotion-1"
+                        class="components-flex components-h-stack emotion-15 emotion-1"
                         data-wp-c16t="true"
-                        data-wp-component="FlexItem"
+                        data-wp-component="HStack"
                       >
-                        <span
-                          class="components-truncate emotion-18 emotion-1"
+                        <div
+                          class="components-flex-item emotion-17 emotion-1"
                           data-wp-c16t="true"
-                          data-wp-component="Truncate"
+                          data-wp-component="FlexItem"
                         >
-                          Blocks
-                        </span>
-                      </div>
-                      <div
-                        class="components-flex-item emotion-16 emotion-1"
-                        data-wp-c16t="true"
-                        data-wp-component="FlexItem"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          focusable="false"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          width="24"
-                          xmlns="http://www.w3.org/2000/svg"
+                          <span
+                            class="components-truncate emotion-19 emotion-1"
+                            data-wp-c16t="true"
+                            data-wp-component="Truncate"
+                          >
+                            Blocks
+                          </span>
+                        </div>
+                        <div
+                          class="components-flex-item emotion-17 emotion-1"
+                          data-wp-c16t="true"
+                          data-wp-component="FlexItem"
                         >
-                          <path
-                            d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
-                          />
-                        </svg>
+                          <svg
+                            aria-hidden="true"
+                            focusable="false"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            width="24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
+                            />
+                          </svg>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                </div>
-                <div
-                  class="emotion-10"
-                  role="listitem"
-                >
-                  <button
-                    class="components-item components-navigator-button emotion-1 emotion-12 emotion-1"
-                    data-wp-c16t="true"
-                    data-wp-component="NavigatorButton"
-                    id="panels"
+                    </button>
+                  </div>
+                  <div
+                    class="emotion-11"
+                    role="listitem"
                   >
-                    <div
-                      class="components-flex components-h-stack emotion-14 emotion-1"
+                    <button
+                      class="components-item components-navigator-button emotion-1 emotion-13 emotion-1"
                       data-wp-c16t="true"
-                      data-wp-component="HStack"
+                      data-wp-component="NavigatorButton"
+                      id="panels"
                     >
                       <div
-                        class="components-flex-item emotion-16 emotion-1"
+                        class="components-flex components-h-stack emotion-15 emotion-1"
                         data-wp-c16t="true"
-                        data-wp-component="FlexItem"
+                        data-wp-component="HStack"
                       >
-                        <span
-                          class="components-truncate emotion-18 emotion-1"
+                        <div
+                          class="components-flex-item emotion-17 emotion-1"
                           data-wp-c16t="true"
-                          data-wp-component="Truncate"
+                          data-wp-component="FlexItem"
                         >
-                          Panels
-                        </span>
-                      </div>
-                      <div
-                        class="components-flex-item emotion-16 emotion-1"
-                        data-wp-c16t="true"
-                        data-wp-component="FlexItem"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          focusable="false"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          width="24"
-                          xmlns="http://www.w3.org/2000/svg"
+                          <span
+                            class="components-truncate emotion-19 emotion-1"
+                            data-wp-c16t="true"
+                            data-wp-component="Truncate"
+                          >
+                            Panels
+                          </span>
+                        </div>
+                        <div
+                          class="components-flex-item emotion-17 emotion-1"
+                          data-wp-c16t="true"
+                          data-wp-component="FlexItem"
                         >
-                          <path
-                            d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
-                          />
-                        </svg>
+                          <svg
+                            aria-hidden="true"
+                            focusable="false"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            width="24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
+                            />
+                          </svg>
+                        </div>
                       </div>
-                    </div>
-                  </button>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
+            <div
+              aria-hidden="true"
+              class="components-elevation emotion-47 emotion-1"
+              data-wp-c16t="true"
+              data-wp-component="Elevation"
+            />
+            <div
+              aria-hidden="true"
+              class="components-elevation emotion-47 emotion-1"
+              data-wp-c16t="true"
+              data-wp-component="Elevation"
+            />
           </div>
-          <div
-            aria-hidden="true"
-            class="components-elevation emotion-46 emotion-1"
-            data-wp-c16t="true"
-            data-wp-component="Elevation"
-          />
-          <div
-            aria-hidden="true"
-            class="components-elevation emotion-46 emotion-1"
-            data-wp-c16t="true"
-            data-wp-component="Elevation"
-          />
         </div>
       </div>
     </div>

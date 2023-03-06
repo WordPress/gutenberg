@@ -168,7 +168,7 @@ const variations = [
 		keywords: [ 'polldaddy', __( 'survey' ) ],
 		description: __( 'Embed Crowdsignal (formerly Polldaddy) content.' ),
 		patterns: [
-			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i,
+			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.crowdsignal\.net|.+\.survey\.fm)\/.+/i,
 		],
 		attributes: { providerNameSlug: 'crowdsignal', responsive: true },
 	},
@@ -309,7 +309,7 @@ const variations = [
 		icon: embedTumblrIcon,
 		keywords: [ __( 'social' ) ],
 		description: __( 'Embed a Tumblr post.' ),
-		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],
+		patterns: [ /^https?:\/\/(.+)\.tumblr\.com\/.+/i ],
 		attributes: { providerNameSlug: 'tumblr', responsive: true },
 	},
 	{

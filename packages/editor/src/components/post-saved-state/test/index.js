@@ -94,9 +94,7 @@ describe( 'PostSavedState', () => {
 	} );
 
 	it( 'should return Save button if edits to be saved', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		useSelect.mockImplementation( () => ( {
 			isDirty: true,

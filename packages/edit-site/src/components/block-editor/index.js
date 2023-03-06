@@ -7,38 +7,39 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useMemo, useRef, Fragment } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockList,
-	BlockEditorProvider,
-	__experimentalLinkControl,
 	BlockInspector,
 	BlockTools,
-	__unstableBlockToolbarLastItem,
-	__unstableBlockSettingsMenuFirstItem,
+	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
-	__unstableBlockNameContext,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useViewportMatch,
+	useResizeObserver,
+} from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
-import { listView } from '@wordpress/icons';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
+import inserterMediaCategories from './inserter-media-categories';
 import TemplatePartConverter from '../template-part-converter';
-import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar-edit-mode';
 import { store as editSiteStore } from '../../store';
-import BlockInspectorButton from './block-inspector-button';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
+import EditorCanvas from './editor-canvas';
+import StyleBook from '../style-book';
+import { unlock } from '../../private-apis';
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 const LAYOUT = {
 	type: 'default',
@@ -46,32 +47,21 @@ const LAYOUT = {
 	alignments: [],
 };
 
-const NAVIGATION_SIDEBAR_NAME = 'edit-site/navigation-menu';
-
-export default function BlockEditor( { setIsInserterOpen } ) {
-	const {
-		storedSettings,
-		templateType,
-		templateId,
-		page,
-		isNavigationSidebarOpen,
-	} = useSelect(
+export default function BlockEditor() {
+	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const { storedSettings, templateType, canvasMode } = useSelect(
 		( select ) => {
-			const { getSettings, getEditedPostType, getEditedPostId, getPage } =
-				select( editSiteStore );
+			const { getSettings, getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
 			return {
-				storedSettings: getSettings( setIsInserterOpen ),
+				storedSettings: getSettings( setIsInserterOpened ),
 				templateType: getEditedPostType(),
-				templateId: getEditedPostId(),
-				page: getPage(),
-				isNavigationSidebarOpen:
-					select( interfaceStore ).getActiveComplementaryArea(
-						editSiteStore.name
-					) === NAVIGATION_SIDEBAR_NAME,
+				canvasMode: getCanvasMode(),
 			};
 		},
-		[ setIsInserterOpen ]
+		[ setIsInserterOpened ]
 	);
 
 	const settingsBlockPatterns =
@@ -131,6 +121,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 
 		return {
 			...restStoredSettings,
+			inserterMediaCategories,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 		};
@@ -140,50 +131,30 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		'postType',
 		templateType
 	);
-	const { setPage } = useDispatch( editSiteStore );
-	const { enableComplementaryArea, disableComplementaryArea } =
-		useDispatch( interfaceStore );
-	const toggleNavigationSidebar = useCallback( () => {
-		const toggleComplementaryArea = isNavigationSidebarOpen
-			? disableComplementaryArea
-			: enableComplementaryArea;
-		toggleComplementaryArea( editSiteStore.name, NAVIGATION_SIDEBAR_NAME );
-	}, [ isNavigationSidebarOpen ] );
+
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
+	const mergedRefs = useMergeRefs( [
+		contentRef,
+		useClipboardHandler(),
+		useTypingObserver(),
+	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const isTemplatePart = templateType === 'wp_template_part';
 	const hasBlocks = blocks.length !== 0;
-
-	const NavMenuSidebarToggle = () => (
-		<ToolbarGroup>
-			<ToolbarButton
-				className="components-toolbar__control"
-				label={
-					isNavigationSidebarOpen
-						? __( 'Close list view' )
-						: __( 'Open list view' )
-				}
-				onClick={ toggleNavigationSidebar }
-				icon={ listView }
-				isActive={ isNavigationSidebarOpen }
-			/>
-		</ToolbarGroup>
-	);
-
-	// Conditionally include NavMenu sidebar in Plugin only.
-	// Optimise for dead code elimination.
-	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
-	let MaybeNavMenuSidebarToggle = Fragment;
-
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		MaybeNavMenuSidebarToggle = NavMenuSidebarToggle;
-	}
+	const enableResizing =
+		isTemplatePart &&
+		canvasMode !== 'view' &&
+		// Disable resizing in mobile viewport.
+		! isMobileViewport;
+	const isViewMode = canvasMode === 'view';
+	const showBlockAppender =
+		( isTemplatePart && hasBlocks ) || isViewMode ? false : undefined;
 
 	return (
-		<BlockEditorProvider
+		<ExperimentalBlockEditorProvider
 			settings={ settings }
 			value={ blocks }
 			onInput={ onInput }
@@ -191,70 +162,57 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			useSubRegistry={ false }
 		>
 			<TemplatePartConverter />
-			<__experimentalLinkControl.ViewerFill>
-				{ useCallback(
-					( fillProps ) => (
-						<NavigateToLink
-							{ ...fillProps }
-							activePage={ page }
-							onActivePageChange={ setPage }
-						/>
-					),
-					[ page ]
-				) }
-			</__experimentalLinkControl.ViewerFill>
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<BlockTools
-				className={ classnames( 'edit-site-visual-editor', {
-					'is-focus-mode': isTemplatePart,
-				} ) }
-				__unstableContentRef={ contentRef }
-				onClick={ ( event ) => {
-					// Clear selected block when clicking on the gray background.
-					if ( event.target === event.currentTarget ) {
-						clearSelectedBlock();
-					}
-				} }
-			>
-				<BlockEditorKeyboardShortcuts.Register />
-				<BackButton />
-				<ResizableEditor
-					// Reinitialize the editor and reset the states when the template changes.
-					key={ templateId }
-					enableResizing={
-						isTemplatePart &&
-						// Disable resizing in mobile viewport.
-						! isMobileViewport
-					}
-					settings={ settings }
-					contentRef={ mergedRefs }
-				>
-					<BlockList
-						className="edit-site-block-editor__block-list wp-site-blocks"
-						__experimentalLayout={ LAYOUT }
-						renderAppender={
-							isTemplatePart && hasBlocks ? false : undefined
-						}
-					/>
-				</ResizableEditor>
-				<__unstableBlockSettingsMenuFirstItem>
-					{ ( { onClose } ) => (
-						<BlockInspectorButton onClick={ onClose } />
-					) }
-				</__unstableBlockSettingsMenuFirstItem>
-				<__unstableBlockToolbarLastItem>
-					<__unstableBlockNameContext.Consumer>
-						{ ( blockName ) =>
-							blockName === 'core/navigation' && (
-								<MaybeNavMenuSidebarToggle />
-							)
-						}
-					</__unstableBlockNameContext.Consumer>
-				</__unstableBlockToolbarLastItem>
-			</BlockTools>
+			{ /* Potentially this could be a generic slot (e.g. EditorCanvas.Slot) if there are other uses for it. */ }
+			<StyleBook.Slot>
+				{ ( [ styleBook ] ) =>
+					styleBook ? (
+						<div className="edit-site-visual-editor is-focus-mode">
+							<ResizableEditor enableResizing>
+								{ styleBook }
+							</ResizableEditor>
+						</div>
+					) : (
+						<BlockTools
+							className={ classnames( 'edit-site-visual-editor', {
+								'is-focus-mode': isTemplatePart || !! styleBook,
+								'is-view-mode': isViewMode,
+							} ) }
+							__unstableContentRef={ contentRef }
+							onClick={ ( event ) => {
+								// Clear selected block when clicking on the gray background.
+								if ( event.target === event.currentTarget ) {
+									clearSelectedBlock();
+								}
+							} }
+						>
+							<BlockEditorKeyboardShortcuts.Register />
+							<BackButton />
+							<ResizableEditor
+								enableResizing={ enableResizing }
+								height={ sizes.height ?? '100%' }
+							>
+								<EditorCanvas
+									enableResizing={ enableResizing }
+									settings={ settings }
+									contentRef={ mergedRefs }
+									readonly={ canvasMode === 'view' }
+								>
+									{ resizeObserver }
+									<BlockList
+										className="edit-site-block-editor__block-list wp-site-blocks"
+										__experimentalLayout={ LAYOUT }
+										renderAppender={ showBlockAppender }
+									/>
+								</EditorCanvas>
+							</ResizableEditor>
+						</BlockTools>
+					)
+				}
+			</StyleBook.Slot>
 			<ReusableBlocksMenuItems />
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 }

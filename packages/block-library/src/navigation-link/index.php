@@ -9,17 +9,16 @@
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the navigation markup in the front-end.
  *
- * @param  array $context    Navigation block context.
- * @param  array $attributes Block attributes.
+ * @param  array $context     Navigation block context.
+ * @param  array $attributes  Block attributes.
+ * @param  bool  $is_sub_menu Whether the link is part of a sub-menu.
  * @return array Colors CSS classes and inline styles.
  */
-function block_core_navigation_link_build_css_colors( $context, $attributes ) {
+function block_core_navigation_link_build_css_colors( $context, $attributes, $is_sub_menu = false ) {
 	$colors = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
-
-	$is_sub_menu = isset( $attributes['isTopLevelLink'] ) ? ( ! $attributes['isTopLevelLink'] ) : false;
 
 	// Text color.
 	$named_text_color  = null;
@@ -121,6 +120,33 @@ function block_core_navigation_link_render_submenu_icon() {
 }
 
 /**
+ * Decodes a url if it's encoded, returning the same url if not.
+ *
+ * @param string $url The url to decode.
+ *
+ * @return string $url Returns the decoded url.
+ */
+function block_core_navigation_link_maybe_urldecode( $url ) {
+	$is_url_encoded = false;
+	$query          = parse_url( $url, PHP_URL_QUERY );
+	$query_params   = wp_parse_args( $query );
+
+	foreach ( $query_params as $query_param ) {
+		if ( rawurldecode( $query_param ) !== $query_param ) {
+			$is_url_encoded = true;
+			break;
+		}
+	}
+
+	if ( $is_url_encoded ) {
+		return rawurldecode( $url );
+	}
+
+	return $url;
+}
+
+
+/**
  * Renders the `core/navigation-link` block.
  *
  * @param array    $attributes The block attributes.
@@ -171,7 +197,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['url'] ) ) {
-		$html .= ' href="' . esc_url( $attributes['url'] ) . '"';
+		$html .= ' href="' . esc_url( block_core_navigation_link_maybe_urldecode( $attributes['url'] ) ) . '"';
 	}
 
 	if ( $is_active ) {

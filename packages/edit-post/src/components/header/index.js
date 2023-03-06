@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
@@ -24,12 +19,14 @@ import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import TemplateTitle from './template-title';
 
-function Header( { setEntitiesSavedStatesCallback, isDistractionFree } ) {
+function Header( { setEntitiesSavedStatesCallback } ) {
+	const isLargeViewport = useViewportMatch( 'large' );
 	const {
 		hasActiveMetaboxes,
 		isPublishSidebarOpened,
 		isSaving,
 		showIconLabels,
+		isDistractionFreeMode,
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -38,13 +35,13 @@ function Header( { setEntitiesSavedStatesCallback, isDistractionFree } ) {
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+			isDistractionFreeMode:
+				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 		} ),
 		[]
 	);
 
-	const isLargeViewport = useViewportMatch( 'large' );
-
-	const classes = classnames( 'edit-post-header' );
+	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
 
 	const slideY = {
 		hidden: isDistractionFree ? { y: '-50' } : { y: 0 },
@@ -57,7 +54,7 @@ function Header( { setEntitiesSavedStatesCallback, isDistractionFree } ) {
 	};
 
 	return (
-		<div className={ classes }>
+		<div className="edit-post-header">
 			<MainDashboardButton.Slot>
 				<motion.div
 					variants={ slideX }

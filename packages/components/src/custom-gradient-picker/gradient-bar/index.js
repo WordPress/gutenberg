@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-
-import { some } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -91,7 +89,7 @@ export default function CustomGradientBar( {
 
 		// If the insert point is close to an existing control point don't show it.
 		if (
-			some( controlPoints, ( { position } ) => {
+			controlPoints.some( ( { position } ) => {
 				return (
 					Math.abs( insertPosition - position ) <
 					MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT

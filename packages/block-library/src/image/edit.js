@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, isEmpty, pick } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -58,10 +58,15 @@ import {
 } from './constants';
 
 export const pickRelevantMediaFiles = ( image, size ) => {
-	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
+	const imageProps = Object.fromEntries(
+		Object.entries( image ?? {} ).filter( ( [ key ] ) =>
+			[ 'alt', 'id', 'link', 'caption' ].includes( key )
+		)
+	);
+
 	imageProps.url =
-		get( image, [ 'sizes', size, 'url' ] ) ||
-		get( image, [ 'media_details', 'sizes', size, 'source_url' ] ) ||
+		image?.sizes?.[ size ]?.url ||
+		image?.media_details?.sizes?.[ size ]?.source_url ||
 		image.url;
 	return imageProps;
 };
@@ -187,7 +192,7 @@ export function ImageEdit( {
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
+		if ( captionRef.current && ! mediaAttributes.caption ) {
 			const { caption: omittedCaption, ...restMediaAttributes } =
 				mediaAttributes;
 			mediaAttributes = restMediaAttributes;

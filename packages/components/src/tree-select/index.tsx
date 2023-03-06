@@ -1,12 +1,9 @@
 /**
- * External dependencies
- */
-import { unescape as unescapeString } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+
 /**
  * Internal dependencies
  */
@@ -18,7 +15,7 @@ function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
 		{
 			value: treeNode.id,
 			label:
-				'\u00A0'.repeat( level * 3 ) + unescapeString( treeNode.name ),
+				'\u00A0'.repeat( level * 3 ) + decodeEntities( treeNode.name ),
 		},
 		...getSelectOptions( treeNode.children || [], level + 1 ),
 	] );
