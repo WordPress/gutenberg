@@ -71,7 +71,7 @@ The placeholder text that will display in the component's cell and subsheet when
 
 ### cellPlaceholder
 
-The placeholder text that will display in the component's cell when there is no set value. The cellPlaceholder will override the more generic placeholder prop when set, enabling the placeholders in the component's cell and subsheet to be different if desired.
+The placeholder text that will display in the component's cell when there is no set value. The `cellPlaceholder` will override the more generic placeholder prop when set, enabling the placeholders in the component's cell and subsheet to be different if desired.
 
 -   Type: `String`
 -   Required: No
