@@ -17,7 +17,7 @@ import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
 
 function TemplateDescription( { template, getTitle } ) {
-	const addedBy = useAddedBy( template );
+	const addedBy = useAddedBy( template.type, template.id );
 
 	// Still loading for the metadata.
 	if ( ! addedBy.text ) return null;

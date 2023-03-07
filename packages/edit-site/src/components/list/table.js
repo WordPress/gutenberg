@@ -102,7 +102,10 @@ export default function Table( { templateType } ) {
 
 						<td className="edit-site-list-table-column" role="cell">
 							{ template ? (
-								<AddedBy template={ template } />
+								<AddedBy
+									postType={ template.type }
+									postId={ template.id }
+								/>
 							) : null }
 						</td>
 						<td className="edit-site-list-table-column" role="cell">

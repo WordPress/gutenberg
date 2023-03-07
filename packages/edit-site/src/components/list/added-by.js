@@ -18,25 +18,41 @@ import {
 } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 
+/** @typedef {'wp_template'|'wp_template_part'} TemplateType */
+
+/** @type {TemplateType} */
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
 
 /**
  *
  * @typedef AddedByData
  * @type {Object}
- * @property {JSX.Element} icon         The icon to display.
- * @property {string}      [imageUrl]   The optional image URL to display.
- * @property {string}      [text]       The text to display.
- * @property {boolean}     isCustomized Whether the template has been customized.
+ * @property {JSX.Element}  icon         The icon to display.
+ * @property {string}       [imageUrl]   The optional image URL to display.
+ * @property {string}       [text]       The text to display.
+ * @property {boolean}      isCustomized Whether the template has been customized.
  *
- * @param    {Object}      template     The template object.
+ * @param    {TemplateType} postType     The template post type.
+ * @param    {number}       postId       The template post id.
  * @return {AddedByData} The added by object or null.
  */
-export function useAddedBy( template ) {
+export function useAddedBy( postType, postId ) {
 	return useSelect(
 		( select ) => {
-			const { getTheme, getPlugin, getEntityRecord, getMedia, getUser } =
-				select( coreStore );
+			const {
+				getTheme,
+				getPlugin,
+				getEntityRecord,
+				getMedia,
+				getUser,
+				getEditedEntityRecord,
+			} = select( coreStore );
+			const template = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+
 			if ( TEMPLATE_POST_TYPE_NAMES.includes( template.type ) ) {
 				// Added by theme.
 				// Template originally provided by a theme, but customized by a user.
@@ -103,7 +119,7 @@ export function useAddedBy( template ) {
 				isCustomized: false,
 			};
 		},
-		[ template ]
+		[ postType, postId ]
 	);
 }
 
@@ -129,8 +145,16 @@ function AvatarImage( { imageUrl } ) {
 	);
 }
 
-export default function AddedBy( { template } ) {
-	const { text, icon, imageUrl, isCustomized } = useAddedBy( template );
+/**
+ * @param {Object}       props
+ * @param {TemplateType} props.postType The template post type.
+ * @param {number}       props.postId   The template post id.
+ */
+export default function AddedBy( { postType, postId } ) {
+	const { text, icon, imageUrl, isCustomized } = useAddedBy(
+		postType,
+		postId
+	);
 
 	return (
 		<HStack alignment="left">
@@ -145,7 +169,7 @@ export default function AddedBy( { template } ) {
 				{ text }
 				{ isCustomized && (
 					<span className="edit-site-list-added-by__customized-info">
-						{ template.type === 'wp_template'
+						{ postType === 'wp_template'
 							? _x( 'Customized', 'template' )
 							: _x( 'Customized', 'template part' ) }
 					</span>
