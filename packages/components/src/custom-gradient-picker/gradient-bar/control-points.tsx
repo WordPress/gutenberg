@@ -188,133 +188,149 @@ function ControlPoints( {
 		};
 	}, [] );
 
-	return controlPoints.map( ( point, index ) => {
-		const initialPosition = point?.position;
-		return (
-			ignoreMarkerPosition !== initialPosition && (
-				<GradientColorPickerDropdown
-					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
-					key={ index }
-					onClose={ onStopControlPointChange }
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<ControlPointButton
+	return (
+		<>
+			{ controlPoints.map( ( point, index ) => {
+				const initialPosition = point?.position;
+				return (
+					ignoreMarkerPosition !== initialPosition && (
+						<GradientColorPickerDropdown
+							isRenderedInSidebar={
+								__experimentalIsRenderedInSidebar
+							}
 							key={ index }
-							onClick={ () => {
-								if (
-									controlPointMoveState.current &&
-									controlPointMoveState.current
-										.significantMoveHappened
-								) {
-									return;
-								}
-								if ( isOpen ) {
-									onStopControlPointChange();
-								} else {
-									onStartControlPointChange();
-								}
-								onToggle();
-							} }
-							onMouseDown={ () => {
-								if ( window && window.addEventListener ) {
-									controlPointMoveState.current = {
-										initialPosition,
-										index,
-										significantMoveHappened: false,
-										listenersActivated: true,
-									};
-									onStartControlPointChange();
-									window.addEventListener(
-										'mousemove',
-										onMouseMove
-									);
-									window.addEventListener(
-										'mouseup',
-										cleanEventListeners
-									);
-								}
-							} }
-							onKeyDown={ ( event ) => {
-								if ( event.code === 'ArrowLeft' ) {
-									// Stop propagation of the key press event to avoid focus moving
-									// to another editor area.
-									event.stopPropagation();
-									onChange(
-										updateControlPointPosition(
-											controlPoints,
-											index,
-											clampPercent(
-												point.position -
-													KEYBOARD_CONTROL_POINT_VARIATION
-											)
-										)
-									);
-								} else if ( event.code === 'ArrowRight' ) {
-									// Stop propagation of the key press event to avoid focus moving
-									// to another editor area.
-									event.stopPropagation();
-									onChange(
-										updateControlPointPosition(
-											controlPoints,
-											index,
-											clampPercent(
-												point.position +
-													KEYBOARD_CONTROL_POINT_VARIATION
-											)
-										)
-									);
-								}
-							} }
-							isOpen={ isOpen }
-							position={ point.position }
-							color={ point.color }
-						/>
-					) }
-					renderContent={ ( { onClose } ) => (
-						<>
-							<ColorPicker
-								enableAlpha={ ! disableAlpha }
-								color={ point.color }
-								onChange={ ( color ) => {
-									onChange(
-										updateControlPointColor(
-											controlPoints,
-											index,
-											colord( color ).toRgbString()
-										)
-									);
-								} }
-							/>
-							{ ! disableRemove && controlPoints.length > 2 && (
-								<HStack
-									className="components-custom-gradient-picker__remove-control-point-wrapper"
-									alignment="center"
-								>
-									<Button
-										onClick={ () => {
+							onClose={ onStopControlPointChange }
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<ControlPointButton
+									key={ index }
+									onClick={ () => {
+										if (
+											controlPointMoveState.current &&
+											controlPointMoveState.current
+												.significantMoveHappened
+										) {
+											return;
+										}
+										if ( isOpen ) {
+											onStopControlPointChange();
+										} else {
+											onStartControlPointChange();
+										}
+										onToggle();
+									} }
+									onMouseDown={ () => {
+										if (
+											window &&
+											window.addEventListener
+										) {
+											controlPointMoveState.current = {
+												initialPosition,
+												index,
+												significantMoveHappened: false,
+												listenersActivated: true,
+											};
+											onStartControlPointChange();
+											window.addEventListener(
+												'mousemove',
+												onMouseMove
+											);
+											window.addEventListener(
+												'mouseup',
+												cleanEventListeners
+											);
+										}
+									} }
+									onKeyDown={ ( event ) => {
+										if ( event.code === 'ArrowLeft' ) {
+											// Stop propagation of the key press event to avoid focus moving
+											// to another editor area.
+											event.stopPropagation();
 											onChange(
-												removeControlPoint(
+												updateControlPointPosition(
 													controlPoints,
-													index
+													index,
+													clampPercent(
+														point.position -
+															KEYBOARD_CONTROL_POINT_VARIATION
+													)
 												)
 											);
-											onClose();
-										} }
-										variant="link"
-									>
-										{ __( 'Remove Control Point' ) }
-									</Button>
-								</HStack>
+										} else if (
+											event.code === 'ArrowRight'
+										) {
+											// Stop propagation of the key press event to avoid focus moving
+											// to another editor area.
+											event.stopPropagation();
+											onChange(
+												updateControlPointPosition(
+													controlPoints,
+													index,
+													clampPercent(
+														point.position +
+															KEYBOARD_CONTROL_POINT_VARIATION
+													)
+												)
+											);
+										}
+									} }
+									isOpen={ isOpen }
+									position={ point.position }
+									color={ point.color }
+								/>
 							) }
-						</>
-					) }
-					style={ {
-						left: `${ point.position }%`,
-						transform: 'translateX( -50% )',
-					} }
-				/>
-			)
-		);
-	} );
+							renderContent={ ( { onClose } ) => (
+								<>
+									<ColorPicker
+										enableAlpha={ ! disableAlpha }
+										color={ point.color }
+										onChange={ ( color ) => {
+											onChange(
+												updateControlPointColor(
+													controlPoints,
+													index,
+													colord(
+														color
+													).toRgbString()
+												)
+											);
+										} }
+									/>
+									{ ! disableRemove &&
+										controlPoints.length > 2 && (
+											<HStack
+												className="components-custom-gradient-picker__remove-control-point-wrapper"
+												alignment="center"
+											>
+												<Button
+													onClick={ () => {
+														onChange(
+															removeControlPoint(
+																controlPoints,
+																index
+															)
+														);
+														onClose();
+													} }
+													variant="link"
+												>
+													{ __(
+														'Remove Control Point'
+													) }
+												</Button>
+											</HStack>
+										) }
+								</>
+							) }
+							style={ {
+								left: `${ point.position }%`,
+								transform: 'translateX( -50% )',
+							} }
+						/>
+					)
+				);
+			} ) }
+		</>
+	);
 }
 
 function InsertPoint( {
