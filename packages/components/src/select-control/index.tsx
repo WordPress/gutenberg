@@ -16,10 +16,7 @@ import BaseControl from '../base-control';
 import InputBase from '../input-control/input-base';
 import { Select } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../ui/context';
-import type {
-	SelectControlProps,
-	SelectControlMultipleSelectionProps,
-} from './types';
+import type { SelectControlProps } from './types';
 import SelectControlChevronDown from './chevron-down';
 
 const noop = () => {};
@@ -30,10 +27,6 @@ function useUniqueId( idProp?: string ) {
 
 	return idProp || id;
 }
-
-const isMultipleSelectControlProps = (
-	props: SelectControlProps
-): props is SelectControlMultipleSelectionProps => props.multiple === true;
 
 function UnforwardedSelectControl(
 	props: WordPressComponentProps< SelectControlProps, 'select', false >,
@@ -81,7 +74,7 @@ function UnforwardedSelectControl(
 	const handleOnChange = (
 		event: React.ChangeEvent< HTMLSelectElement >
 	) => {
-		if ( isMultipleSelectControlProps( props ) ) {
+		if ( props.multiple ) {
 			const selectedOptions = Array.from( event.target.options ).filter(
 				( { selected } ) => selected
 			);
