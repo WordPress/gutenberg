@@ -561,3 +561,142 @@ WP_Block_Supports::get_instance()->register(
 // Remove WordPress core filter to avoid rendering duplicate support elements.
 remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );
+
+
+class WP_Duotone {
+	/**
+	 * An array of Duotone presets from global, theme, and custom styles.
+	 * 
+	 * Example: 
+	 * [
+	 * 		'blue-orange' => 
+	 * 			[
+	 * 				'slug'	=> 'blue-orange',
+	 * 				'colors' => [ '#0000ff', '#ffcc00' ],
+	 * 			]
+	 * 		],
+	 * 		…
+	 * ]
+	 * 
+	 * @since 6.3.0
+	 * @var array
+	 */
+	static $duotone_presets = array();
+
+	/** 
+	 * An array of block names from global, theme, and custom styles that have duotone presets. We'll use this to quickly
+	 * check if a block being rendered needs to have duotone applied, and which duotone preset to use.
+	 * 
+	 * Example: 
+	 * 	[
+	 *		'core/featured-image' => 'blue-orange',
+	 * 		 …
+	 * 	]
+	 *
+	 */
+	static $duotone_block_names = array();
+	
+	/**
+	 * An array of Duotone SVG and CSS ouput needed for the frontend duotone rendering based on what is
+	 * being ouptput on the page. Organized by a slug of the preset/color group and the information needed
+	 * to generate the SVG and CSS at render.
+	 * 
+	 * Example:
+	 *  [
+     * 		'blue-orange' => [
+     * 			'slug'	=> 'blue-orange',
+     * 			'colors' => [ '#0000ff', '#ffcc00' ],
+     * 		],
+     * 		'wp-duotone-000000-ffffff-2' => [
+     * 			'slug' => 'wp-duotone-000000-ffffff-2',
+     * 			'colors' => [ '#000000', '#ffffff' ],
+     * 		],
+     * ]
+	 * 
+	 * @since 6.3.0
+	 * @var array
+	 */
+	static $duotone_output = array();
+
+
+
+	/**
+	 * Get all possible duotone presets from global and theme styles and store as slug => [ colors array ]
+	 * We only want to process this one time. On block render we'll access and output only the needed presets for that page.
+	 * 
+	 */
+	static function gutenberg_save_duotone_presets() {
+		// Get the per block settings from the theme.json.
+		$tree = WP_Theme_JSON_Resolver::get_merged_data();
+		$settings = $tree->get_settings();
+		$presets_by_origin = _wp_array_get( $settings, array( 'color', 'duotone' ), array() );
+		$flat_presets = [];
+		// Flatten the array
+		foreach( $presets_by_origin as $presets ) {
+			foreach( $presets as $preset ) {
+				// $flat_presets[ _wp_to_kebab_case( $preset['slug'] ) ] = $preset;
+				self::$duotone_presets[ _wp_to_kebab_case( $preset['slug'] ) ] = [
+					'slug'	=> $preset[ 'slug' ],
+					'colors' => $preset[ 'colors' ],
+				];
+			}
+		}
+	}
+
+	static function gutenberg_save_duotone_block_names() {
+		// Get the per block settings from the theme.json.
+		$tree = WP_Theme_JSON_Resolver::get_merged_data();
+		$block_nodes = $tree->get_styles_block_nodes();
+		$theme_json = $tree->get_raw_data();
+		
+
+		foreach( $block_nodes as $block_node ) {
+			// This block definition doesn't include any duotone settings. Skip it.
+			if ( empty( $block_node['duotone'] ) ) {
+				continue;
+			}
+
+			// Value looks like this: 'var(--wp--preset--duotone--blue-orange)'
+			$duotone_filter_path = array_merge( $block_node['path'], array( 'filter', 'duotone' ) );
+			$duotone_filter = _wp_array_get( $theme_json, $duotone_filter_path, array() );
+			
+			if( empty( $duotone_filter ) ) {
+				continue;
+			}
+
+			// If it has a duotone preset, save the block name and the preset slug.
+			self::$duotone_block_names[ $block_node[ 'name' ] ] = self::gutenberg_get_duotone_slug_from_preset_css_variable( $duotone_filter );
+		}
+	}
+
+	static function gutenberg_get_duotone_slug_from_preset_css_variable( $css_variable ) {
+		if ( ! empty( $css_variable ) ) {
+			// Get the preset slug from the filter.
+			// TODO: Support var:preset|duotone|slug syntax.
+			preg_match('/var\(--wp--preset--duotone--(.*)\)/', $css_variable, $matches );
+			if ( $matches[1] ) {
+				return $matches[1];
+			}
+		}
+	}
+
+	/**
+	 * Get all possible duotone presets from global and theme styles. We only want to process this one time. On block render we'll access and output only the needed presets for that page.
+	 * 
+	 */
+	static function gutenberg_identify_used_duotone_blocks( $block_content, $block ) {
+		// If the block name exists in our pre-defined list of block selectors that use duotone in theme.json (or related), add it to our list of duotone to output
+		if( array_key_exists( $block['blockName'], self::$duotone_block_names ) ) {
+			$preset_slug = self::$duotone_block_names[ $block['blockName'] ];
+
+			self::$duotone_output[ $preset_slug ] = self::$duotone_presets[ $preset_slug ];
+		}
+
+		return $block_content;
+	}
+}
+
+
+add_action( 'wp_loaded', array( 'WP_Duotone', 'gutenberg_save_duotone_presets' ), 10 );
+add_action( 'wp_loaded', array( 'WP_Duotone', 'gutenberg_save_duotone_block_names' ), 10 );
+add_filter( 'block_render', array( 'WP_Duotone', 'gutenberg_identify_used_duotone_blocks' ), 10, 2 );
