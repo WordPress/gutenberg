@@ -8,6 +8,9 @@ import classnames from 'classnames';
  */
 import {
 	Button,
+	__unstableComposite as Composite,
+	__unstableUseCompositeState as useCompositeState,
+	__unstableCompositeItem as CompositeItem,
 	Disabled,
 	TabPanel,
 	createSlotFill,
@@ -65,10 +68,6 @@ const STYLE_BOOK_IFRAME_STYLES = `
 	}
 
 	.edit-site-style-book__example {
-		all: unset;
-	}
-
-	.edit-site-style-book__example {
 		border-radius: 2px;
 		cursor: pointer;
 		display: flex;
@@ -110,6 +109,11 @@ const STYLE_BOOK_IFRAME_STYLES = `
 
 	.edit-site-style-book__example-preview {
 		width: 100%;
+	}
+
+	.edit-site-style-book__example-preview .block-editor-block-list__insertion-point,
+	.edit-site-style-book__example-preview .block-list-appender {
+		display: none;
 	}
 
 	.edit-site-style-book__example-preview .is-root-container > .wp-block:first-child {
@@ -271,6 +275,13 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 								) }
 								examples={ examples }
 								category={ tab.name }
+								label={ sprintf(
+									// translators: %s: Category of blocks, e.g. Text.
+									__(
+										'Examples of blocks in the %s category'
+									),
+									tab.title
+								) }
 								isSelected={ isSelected }
 								onSelect={ onSelect }
 							/>
@@ -283,69 +294,84 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 }
 
 const Examples = memo(
-	( { className, examples, category, isSelected, onSelect } ) => (
-		<div className={ className }>
-			{ examples
-				.filter( ( example ) => example.category === category )
-				.map( ( example ) => (
-					<Example
-						key={ example.name }
-						title={ example.title }
-						blocks={ example.blocks }
-						isSelected={ isSelected( example.name ) }
-						onClick={ () => {
-							onSelect( example.name );
-						} }
-					/>
-				) ) }
-		</div>
-	)
+	( { className, examples, category, label, isSelected, onSelect } ) => {
+		const composite = useCompositeState( { orientation: 'vertical' } );
+		return (
+			<Composite
+				{ ...composite }
+				className={ className }
+				aria-label={ label }
+			>
+				{ examples
+					.filter( ( example ) => example.category === category )
+					.map( ( example, index ) => (
+						<Example
+							key={ example.name }
+							id={ `example-${ index }` }
+							composite={ composite }
+							title={ example.title }
+							blocks={ example.blocks }
+							isSelected={ isSelected( example.name ) }
+							onClick={ () => {
+								onSelect( example.name );
+							} }
+						/>
+					) ) }
+			</Composite>
+		);
+	}
 );
 
-const Example = memo( ( { title, blocks, isSelected, onClick } ) => {
-	const originalSettings = useSelect(
-		( select ) => select( blockEditorStore ).getSettings(),
-		[]
-	);
-	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
-		[ originalSettings ]
-	);
+const Example = memo(
+	( { composite, id, title, blocks, isSelected, onClick } ) => {
+		const originalSettings = useSelect(
+			( select ) => select( blockEditorStore ).getSettings(),
+			[]
+		);
+		const settings = useMemo(
+			() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+			[ originalSettings ]
+		);
 
-	// Cache the list of blocks to avoid additional processing when the component is re-rendered.
-	const renderedBlocks = useMemo(
-		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
-		[ blocks ]
-	);
+		// Cache the list of blocks to avoid additional processing when the component is re-rendered.
+		const renderedBlocks = useMemo(
+			() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+			[ blocks ]
+		);
 
-	return (
-		<button
-			className={ classnames( 'edit-site-style-book__example', {
-				'is-selected': isSelected,
-			} ) }
-			aria-label={ sprintf(
-				// translators: %s: Title of a block, e.g. Heading.
-				__( 'Open %s styles in Styles panel' ),
-				title
-			) }
-			onClick={ onClick }
-		>
-			<span className="edit-site-style-book__example-title">
-				{ title }
-			</span>
-			<div className="edit-site-style-book__example-preview">
-				<Disabled className="edit-site-style-book__example-preview__content">
-					<ExperimentalBlockEditorProvider
-						value={ renderedBlocks }
-						settings={ settings }
-					>
-						<BlockList renderAppender={ false } />
-					</ExperimentalBlockEditorProvider>
-				</Disabled>
-			</div>
-		</button>
-	);
-} );
+		return (
+			<CompositeItem
+				{ ...composite }
+				className={ classnames( 'edit-site-style-book__example', {
+					'is-selected': isSelected,
+				} ) }
+				id={ id }
+				aria-label={ sprintf(
+					// translators: %s: Title of a block, e.g. Heading.
+					__( 'Open %s styles in Styles panel' ),
+					title
+				) }
+				onClick={ onClick }
+				role="button"
+				as="div"
+			>
+				<span className="edit-site-style-book__example-title">
+					{ title }
+				</span>
+				<div className="edit-site-style-book__example-preview">
+					<Disabled className="edit-site-style-book__example-preview__content">
+						<ExperimentalBlockEditorProvider
+							value={ renderedBlocks }
+							settings={ settings }
+						>
+							<BlockList renderAppender={ false } />
+						</ExperimentalBlockEditorProvider>
+					</Disabled>
+				</div>
+			</CompositeItem>
+		);
+	}
+);
 
 function useHasStyleBook() {
 	const fills = useSlotFills( SLOT_FILL_NAME );
