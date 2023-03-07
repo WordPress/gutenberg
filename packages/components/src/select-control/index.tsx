@@ -79,7 +79,7 @@ function UnforwardedSelectControl(
 				( { selected } ) => selected
 			);
 			const newValues = selectedOptions.map( ( { value } ) => value );
-			props.onChange?.( newValues );
+			props.onChange?.( newValues, { event } );
 			return;
 		}
 
