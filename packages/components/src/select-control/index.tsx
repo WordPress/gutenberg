@@ -88,7 +88,6 @@ function UnforwardedSelectControl(
 
 	const classes = classNames( 'components-select-control', className );
 
-	/* eslint-disable jsx-a11y/no-onchange */
 	return (
 		<BaseControl
 			help={ help }
@@ -145,7 +144,6 @@ function UnforwardedSelectControl(
 			</InputBase>
 		</BaseControl>
 	);
-	/* eslint-enable jsx-a11y/no-onchange */
 }
 
 /**
