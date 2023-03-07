@@ -72,7 +72,9 @@ export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
 
 export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
 	/**
-	 * If this property is added, multiple values can be selected. The value passed should be an array.
+	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
+	 *
+	 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
 	 *
 	 * @default false
 	 */
