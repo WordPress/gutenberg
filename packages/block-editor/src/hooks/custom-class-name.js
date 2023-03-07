@@ -10,6 +10,7 @@ import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
+import { ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -45,12 +46,7 @@ export function addAttribute( settings ) {
  * @param {Object} props
  */
 export const InspectorControl = ( props ) => {
-	const hasCustomClassName = hasBlockSupport(
-		props.name,
-		'customClassName',
-		true
-	);
-	if ( ! hasCustomClassName || ! props.isSelected ) {
+	if ( ! props.isSelected ) {
 		return null;
 	}
 
@@ -144,7 +140,9 @@ addFilter(
 addFilter(
 	'editor.BlockControls',
 	'core/editor/custom-class-name/with-inspector-control',
-	InspectorControl
+	ifCondition( ( { name } ) =>
+		hasBlockSupport( name, 'customClassName', true )
+	)( InspectorControl )
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',

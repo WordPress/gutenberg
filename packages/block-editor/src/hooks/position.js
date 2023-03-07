@@ -12,7 +12,11 @@ import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	ifCondition,
+	useInstanceId,
+} from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import {
 	useContext,
@@ -314,12 +318,9 @@ export function PositionPanel( props ) {
  * @param {Object} props
  */
 export const PositionInspectorControls = ( props ) => {
-	const { name: blockName } = props;
-	const positionSupport = hasBlockSupport( blockName, POSITION_SUPPORT_KEY );
 	const isPositionDisabled = useIsPositionDisabled( props );
-	const showPositionControls = positionSupport && ! isPositionDisabled;
 
-	if ( ! showPositionControls ) {
+	if ( isPositionDisabled ) {
 		return null;
 	}
 
@@ -388,5 +389,7 @@ addFilter(
 addFilter(
 	'editor.BlockControls',
 	'core/editor/position/with-inspector-controls',
-	PositionInspectorControls
+	ifCondition( ( { name } ) =>
+		hasBlockSupport( name, POSITION_SUPPORT_KEY )
+	)( PositionInspectorControls )
 );

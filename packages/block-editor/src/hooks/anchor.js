@@ -6,6 +6,7 @@ import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
+import { ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -57,9 +58,7 @@ export function addAttribute( settings ) {
  * @param {Object} props
  */
 export const InspectorControl = ( props ) => {
-	const hasAnchor = hasBlockSupport( props.name, 'anchor' );
-
-	if ( ! hasAnchor || ! props.isSelected ) {
+	if ( ! props.isSelected ) {
 		return null;
 	}
 
@@ -146,7 +145,9 @@ addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
 addFilter(
 	'editor.BlockControls',
 	'core/editor/anchor/with-inspector-control',
-	InspectorControl
+	ifCondition( ( { name } ) => hasBlockSupport( name, 'anchor' ) )(
+		InspectorControl
+	)
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',

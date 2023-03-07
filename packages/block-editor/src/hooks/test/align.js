@@ -18,11 +18,10 @@ import { SlotFillProvider } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockControls from '../../components/block-controls';
-import BlockEdit from '../../components/block-edit';
 import BlockEditorProvider from '../../components/provider';
 import {
 	getValidAlignments,
-	withToolbarControls,
+	ToolbarControls,
 	withDataAlign,
 	addAssignedAlign,
 } from '../align';
@@ -157,7 +156,7 @@ describe( 'align', () => {
 		} );
 	} );
 
-	describe( 'withToolbarControls', () => {
+	describe( 'ToolbarControls', () => {
 		const componentProps = {
 			name: 'core/foo',
 			attributes: {},
@@ -167,15 +166,9 @@ describe( 'align', () => {
 		it( 'should do nothing if no valid alignments', () => {
 			registerBlockType( 'core/foo', blockSettings );
 
-			const EnhancedComponent = withToolbarControls(
-				( { wrapperProps } ) => <div { ...wrapperProps } />
-			);
-
 			render(
 				<SlotFillProvider>
-					<BlockEdit { ...componentProps }>
-						<EnhancedComponent { ...componentProps } />
-					</BlockEdit>
+					<ToolbarControls { ...componentProps } />
 					<BlockControls.Slot group="block" />
 				</SlotFillProvider>
 			);
@@ -197,15 +190,9 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = withToolbarControls(
-				( { wrapperProps } ) => <div { ...wrapperProps } />
-			);
-
 			render(
 				<SlotFillProvider>
-					<BlockEdit { ...componentProps }>
-						<EnhancedComponent { ...componentProps } />
-					</BlockEdit>
+					<ToolbarControls { ...componentProps } />
 					<BlockControls.Slot group="block" />
 				</SlotFillProvider>
 			);

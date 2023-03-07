@@ -9,7 +9,11 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	ifCondition,
+	useInstanceId,
+} from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useContext, createPortal } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -186,10 +190,6 @@ function addDuotoneAttributes( settings ) {
  * @param {Object} props
  */
 const DuotoneControls = ( props ) => {
-	const hasDuotoneSupport = hasBlockSupport(
-		props.name,
-		'color.__experimentalDuotone'
-	);
 	const isContentLocked = useSelect(
 		( select ) => {
 			return select( blockEditorStore ).__unstableGetContentLockingParent(
@@ -203,9 +203,7 @@ const DuotoneControls = ( props ) => {
 	// for all blocks, not just those that support duotone. Code added
 	// above this line should be carefully evaluated for its impact on
 	// performance.
-	return (
-		hasDuotoneSupport && ! isContentLocked && <DuotonePanel { ...props } />
-	);
+	return ! isContentLocked && <DuotonePanel { ...props } />;
 };
 
 /**
@@ -330,7 +328,9 @@ addFilter(
 addFilter(
 	'editor.BlockControls',
 	'core/editor/duotone/with-editor-controls',
-	DuotoneControls
+	ifCondition( ( { name } ) =>
+		hasBlockSupport( name, 'color.__experimentalDuotone' )
+	)( DuotoneControls )
 );
 addFilter(
 	'editor.BlockListBlock',

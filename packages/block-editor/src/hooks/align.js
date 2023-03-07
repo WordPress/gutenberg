@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, ifCondition } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -241,7 +241,9 @@ addFilter(
 addFilter(
 	'editor.BlockControls',
 	'core/editor/align/with-toolbar-controls',
-	ToolbarControls
+	ifCondition( ( { name } ) => hasBlockSupport( name, 'align' ) )(
+		ToolbarControls
+	)
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',

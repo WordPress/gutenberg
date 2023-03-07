@@ -7,7 +7,11 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	ifCondition,
+	useInstanceId,
+} from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -320,22 +324,6 @@ export function addAttribute( settings ) {
 }
 
 /**
- * Override the default edit UI to include layout controls
- *
- * @param {Object} props
- */
-export const LayoutInspectorControls = ( props ) => {
-	const { name: blockName } = props;
-	const supportLayout = hasBlockSupport( blockName, layoutBlockSupportKey );
-
-	if ( ! supportLayout ) {
-		return null;
-	}
-
-	return <LayoutPanel { ...props } />;
-};
-
-/**
  * Override the default block element to add the layout styles.
  *
  * @param {Function} BlockListBlock Original component.
@@ -495,5 +483,7 @@ addFilter(
 addFilter(
 	'editor.BlockControls',
 	'core/editor/layout/with-inspector-controls',
-	LayoutInspectorControls
+	ifCondition( ( { name } ) =>
+		hasBlockSupport( name, layoutBlockSupportKey )
+	)( LayoutPanel )
 );
