@@ -178,29 +178,26 @@ function curateResults( testSuite, results ) {
  * @param {string} testSuite                Name of the tests set.
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
  * @param {string} runKey                   Unique identifier for the test run, e.g. `branch-name_post-editor_run-3`.
+ * @param {string} artifactsPath            Path to save the test artifacts at.
  *
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
-async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
+async function runTestSuite(
+	testSuite,
+	performanceTestDirectory,
+	runKey,
+	artifactsPath
+) {
 	const resultsFilename = `${ runKey }.results.json`;
 
 	await runShellScript(
-		`TEST_RESULTS_FILENAME=${ resultsFilename } npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
+		`npm run test:performance -- ${ testSuite } --wordpress-artifacts-path=${ artifactsPath } --results-filename=${ resultsFilename }`,
 		performanceTestDirectory
-	);
-
-	if ( process.env.WP_ARTIFACTS_PATH === undefined ) {
-		throw new Error( 'WP_ARTIFACTS_PATH variable is not defined' );
-	}
-
-	const testResultsFilePath = path.join(
-		process.env.WP_ARTIFACTS_PATH,
-		resultsFilename
 	);
 
 	return curateResults(
 		testSuite,
-		await readJSONFile( testResultsFilePath )
+		await readJSONFile( path.join( artifactsPath, resultsFilename ) )
 	);
 }
 
@@ -213,6 +210,7 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 async function runPerformanceTests( branches, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
 	const TEST_ROUNDS = options.rounds || 1;
+	const ARTIFACTS_PATH = process.env.WP_ARTIFACTS_PATH || 'artifacts';
 
 	log( process.version );
 	log( JSON.stringify( process.env, null, 2 ) );
@@ -405,7 +403,8 @@ async function runPerformanceTests( branches, options ) {
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
 					performanceTestDirectory,
-					runKey
+					runKey,
+					ARTIFACTS_PATH
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(

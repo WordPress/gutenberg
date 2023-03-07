@@ -18,7 +18,7 @@ export function deleteFile( filePath ) {
 
 export function getTestResultsFilename( testFilename ) {
 	return (
-		process.env.TEST_RESULTS_FILENAME ||
+		process.env.RESULTS_FILENAME ||
 		path.basename( testFilename, '.js' ) + '.results.json'
 	);
 }
