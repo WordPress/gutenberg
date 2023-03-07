@@ -26,7 +26,6 @@
 			}
 		},
 		"spacing": {
-			"margin": true,
 			"padding": true
 		},
 		"typography": {
