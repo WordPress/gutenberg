@@ -322,8 +322,8 @@ export const withInspectorControls = createHigherOrderComponent(
 			blockName,
 			POSITION_SUPPORT_KEY
 		);
-		const showPositionControls =
-			positionSupport && ! useIsPositionDisabled( props );
+		const isPositionDisabled = useIsPositionDisabled( props );
+		const showPositionControls = positionSupport && ! isPositionDisabled;
 
 		return [
 			showPositionControls && (

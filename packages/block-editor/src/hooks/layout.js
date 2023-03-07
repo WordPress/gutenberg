@@ -50,6 +50,10 @@ export function useLayoutClasses( blockAttributes = {}, blockName ) {
 
 	const { layout } = blockAttributes;
 
+	if ( ! hasBlockSupport( blockName, layoutBlockSupportKey ) ) {
+		return [];
+	}
+
 	const { default: defaultBlockLayout } =
 		getBlockSupport( blockName, layoutBlockSupportKey ) || {};
 	const usedLayout =
@@ -372,9 +376,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 			layout?.inherit || layout?.contentSize || layout?.wideSize
 				? { ...layout, type: 'constrained' }
 				: layout || defaultBlockLayout || {};
-		const layoutClasses = hasLayoutBlockSupport
-			? useLayoutClasses( attributes, name )
-			: null;
+		const layoutClasses = useLayoutClasses( attributes, name );
 		// Higher specificity to override defaults from theme.json.
 		const selector = `.wp-container-${ id }.wp-container-${ id }`;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
