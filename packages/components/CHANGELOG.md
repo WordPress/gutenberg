@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Enhancements
+-   `FontSizePicker`: Allow custom units for custom font size control ([#48468](https://github.com/WordPress/gutenberg/pull/48468)).
+
 ### Internal
 
 -   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
