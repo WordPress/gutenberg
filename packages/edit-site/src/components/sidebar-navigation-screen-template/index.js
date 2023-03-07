@@ -16,22 +16,26 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
 
-function AddedByText( { template } ) {
+function AddedByDescription( { template } ) {
 	const addedBy = useAddedBy( template );
 
 	if ( ! addedBy.text ) return null;
 
-	return addedBy.isCustomized
-		? sprintf(
-				/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
-				__( 'Added by %s (customized).' ),
-				addedBy.text
-		  )
-		: sprintf(
-				/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
-				__( 'Added by %s.' ),
-				addedBy.text
-		  );
+	return (
+		<p>
+			{ addedBy.isCustomized
+				? sprintf(
+						/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
+						__( 'Added by %s (customized).' ),
+						addedBy.text
+				  )
+				: sprintf(
+						/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
+						__( 'Added by %s.' ),
+						addedBy.text
+				  ) }
+		</p>
+	);
 }
 
 export default function SidebarNavigationScreenTemplate() {
@@ -67,9 +71,8 @@ export default function SidebarNavigationScreenTemplate() {
 					icon={ pencil }
 				/>
 			}
-			description={
-				description ? description : <AddedByText template={ record } />
-			}
+			description={ description }
+			content={ <AddedByDescription template={ record } /> }
 		/>
 	);
 }
