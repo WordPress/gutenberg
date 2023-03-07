@@ -262,7 +262,7 @@ export type NavigationSearchNoResultsFoundProps = Pick<
 
 // Data objects & context
 
-export type Item = NavigationItemBaseProps & {
+export type Item = Omit< NavigationItemBaseProps, 'children' > & {
 	/**
 	 * The group id
 	 */
@@ -279,7 +279,7 @@ export type Item = NavigationItemBaseProps & {
 	_isVisible: boolean;
 };
 
-export type Menu = NavigationMenuProps & {
+export type Menu = Omit< NavigationMenuProps, 'children' > & {
 	menu: string;
 };
 
