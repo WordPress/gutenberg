@@ -608,7 +608,7 @@ Add text that respects your spacing and tabs, and also allows styling. ([Source]
 
 -	**Name:** core/preformatted
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** anchor, color (background, gradients, text), spacing (padding), typography (fontSize, lineHeight)
 -	**Attributes:** content
 
 ## Pullquote
