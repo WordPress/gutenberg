@@ -31,6 +31,9 @@ export default function SidebarNavigationScreenMain() {
 		<SidebarNavigationScreen
 			isRoot
 			title={ __( 'Design' ) }
+			description={ __(
+				'Customize the appearance of your website using the block editor.'
+			) }
 			content={
 				<ItemGroup>
 					{ !! navigationMenus && navigationMenus.length > 0 && (

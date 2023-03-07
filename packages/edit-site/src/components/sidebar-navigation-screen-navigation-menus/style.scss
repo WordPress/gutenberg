@@ -1,6 +1,5 @@
-.edit-site-sidebar-navigation-screen-navigation-menus__description {
-	margin-top: 0;
-	margin-bottom: $grid-unit-40;
+.edit-site-sidebar-navigation-screen__description {
+	margin: 0 0 $grid-unit-40 $grid-unit-20;
 }
 
 .edit-site-sidebar-navigation-screen-navigation-menus__placeholder {
@@ -26,6 +25,7 @@
 .edit-site-sidebar-navigation-screen-navigation-menus__content {
 	.offcanvas-editor-list-view-leaf {
 		max-width: calc(100% - #{ $grid-unit-05 });
+		border-radius: $radius-block-ui;
 		&:hover,
 		&:focus,
 		&[aria-current] {
