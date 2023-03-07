@@ -94,10 +94,14 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		}
 	}
 
+	$in_same_term   = isset( $attributes['inSameTerm'] ) ? $attributes['inSameTerm'] : false;
+	$excluded_terms = isset( $attributes['excludedTerms'] ) && $in_same_term ? $attributes['excludedTerms'] : '';
+	$taxonomy       = isset( $attributes['taxonomy'] ) && $in_same_term ? $attributes['taxonomy'] : '';
+
 	// The dynamic portion of the function name, `$navigation_type`,
 	// refers to the type of adjacency, 'next' or 'previous'.
 	$get_link_function = "get_{$navigation_type}_post_link";
-	$content           = $get_link_function( $format, $link );
+	$content           = $get_link_function( $format, $link, $in_same_term, $excluded_terms, $taxonomy );
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,

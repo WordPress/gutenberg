@@ -10,7 +10,9 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToggleControl,
+	SelectControl,
 	PanelBody,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -22,7 +24,17 @@ import {
 import { __, _x } from '@wordpress/i18n';
 
 export default function PostNavigationLinkEdit( {
-	attributes: { type, label, showTitle, textAlign, linkLabel, arrow },
+	attributes: {
+		type,
+		label,
+		showTitle,
+		textAlign,
+		linkLabel,
+		arrow,
+		inSameTerm,
+		taxonomy,
+		excludedTerms,
+	},
 	setAttributes,
 } ) {
 	const isNext = type === 'next';
@@ -47,6 +59,7 @@ export default function PostNavigationLinkEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+
 	return (
 		<>
 			<InspectorControls>
@@ -112,6 +125,46 @@ export default function PostNavigationLinkEdit( {
 							) }
 						/>
 					</ToggleGroupControl>
+					<ToggleControl
+						label={ __(
+							'Only link to posts in the same taxonomy term'
+						) }
+						checked={ !! inSameTerm }
+						onChange={ () =>
+							setAttributes( {
+								inSameTerm: ! inSameTerm,
+							} )
+						}
+					/>
+					{ inSameTerm && (
+						<>
+							<SelectControl
+								label={ __( 'Taxonomy' ) }
+								value={ taxonomy }
+								options={ [
+									{
+										value: 'category',
+										label: __( 'Category' ),
+									},
+									{
+										value: 'post_tag',
+										label: __( 'Tag' ),
+									},
+								] }
+								onChange={ ( value ) =>
+									setAttributes( { taxonomy: value } )
+								}
+							/>
+							<InputControl
+								label={ __( 'Add terms to exclude' ) }
+								help={ __( 'Separate terms with comma.' ) }
+								value={ excludedTerms }
+								onChange={ ( value ) =>
+									setAttributes( { excludedTerms: value } )
+								}
+							/>
+						</>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<BlockControls>

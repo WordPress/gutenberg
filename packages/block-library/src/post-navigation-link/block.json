@@ -28,6 +28,16 @@
 		"arrow": {
 			"type": "string",
 			"default": "none"
+		},
+		"excludedTerms": {
+			"type": "string"
+		},
+		"inSameTerm": {
+			"type": "boolean"
+		},
+		"taxonomy": {
+			"type": "string",
+			"default": "category"
 		}
 	},
 	"supports": {
