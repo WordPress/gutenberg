@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { InspectorControls } from '@wordpress/block-editor';
 
 const CreateNewPostLink = ( {
@@ -27,19 +28,26 @@ const CreateNewPostLink = ( {
 /**
  * Override the default edit UI to include layout controls
  *
- * @param {Object} props
+ * @param {Function} BlockEdit Original component
+ * @return {Function}           Wrapped component
  */
-const queryTopInspectorControls = ( props ) => {
-	const { name, isSelected } = props;
-	if ( name !== 'core/query' || ! isSelected ) {
-		return null;
-	}
+const queryTopInspectorControls = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		const { name, isSelected } = props;
+		if ( name !== 'core/query' || ! isSelected ) {
+			return <BlockEdit key="edit" { ...props } />;
+		}
 
-	return (
-		<InspectorControls>
-			<CreateNewPostLink { ...props } />
-		</InspectorControls>
-	);
-};
+		return (
+			<>
+				<InspectorControls>
+					<CreateNewPostLink { ...props } />
+				</InspectorControls>
+				<BlockEdit key="edit" { ...props } />
+			</>
+		);
+	},
+	'withInspectorControls'
+);
 
 export default queryTopInspectorControls;

@@ -21,6 +21,7 @@ import { useSelect } from '@wordpress/data';
 import { BlockControls, BlockAlignmentControl } from '../components';
 import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
 import { store as blockEditorStore } from '../store';
+import { blockControlsFilterName } from '../components/block-edit';
 
 /**
  * An array which includes all possible valid alignments,
@@ -239,7 +240,7 @@ addFilter(
 	withDataAlign
 );
 addFilter(
-	'editor.BlockControls',
+	blockControlsFilterName,
 	'core/editor/align/with-toolbar-controls',
 	ifCondition( ( { name } ) => hasBlockSupport( name, 'align' ) )(
 		ToolbarControls

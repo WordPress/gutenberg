@@ -33,6 +33,7 @@ import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
 import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
+import { blockControlsFilterName } from '../components/block-edit';
 
 const layoutBlockSupportKey = '__experimentalLayout';
 
@@ -481,7 +482,7 @@ addFilter(
 	withChildLayoutStyles
 );
 addFilter(
-	'editor.BlockControls',
+	blockControlsFilterName,
 	'core/editor/layout/with-inspector-controls',
 	ifCondition( ( { name } ) =>
 		hasBlockSupport( name, layoutBlockSupportKey )

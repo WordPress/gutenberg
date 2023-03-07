@@ -33,6 +33,7 @@ import {
 	__unstableDuotoneUnsetStylesheet as DuotoneUnsetStylesheet,
 } from '../components/duotone';
 import { store as blockEditorStore } from '../store';
+import { blockControlsFilterName } from '../components/block-edit';
 
 const EMPTY_ARRAY = [];
 
@@ -326,7 +327,7 @@ addFilter(
 	addDuotoneAttributes
 );
 addFilter(
-	'editor.BlockControls',
+	blockControlsFilterName,
 	'core/editor/duotone/with-editor-controls',
 	ifCondition( ( { name } ) =>
 		hasBlockSupport( name, 'color.__experimentalDuotone' )

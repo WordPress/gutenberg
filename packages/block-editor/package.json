@@ -74,7 +74,8 @@
 		"react-easy-crop": "^4.5.1",
 		"rememo": "^4.0.0",
 		"remove-accents": "^0.4.2",
-		"traverse": "^0.6.6"
+		"traverse": "^0.6.6",
+		"uuid": "8.3.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

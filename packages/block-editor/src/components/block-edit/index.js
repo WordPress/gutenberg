@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { v4 as uuid } from 'uuid';
+
+/**
  * WordPress dependencies
  */
 import { useMemo, useEffect, useReducer } from '@wordpress/element';
@@ -23,6 +28,9 @@ import { store as blockEditorStore } from '../../store';
  * @return {Object} Block edit context
  */
 export { useBlockEditContext };
+
+// Please do not export this at the package level until we have a stable API.
+export const blockControlsFilterName = uuid();
 
 function BlockControlFilters( props ) {
 	const { name, isSelected, clientId } = props;
@@ -56,14 +64,13 @@ function BlockControlFilters( props ) {
 		[ clientId, isSelected, name ]
 	);
 
-	const hookName = 'editor.BlockControls';
 	const [ , forceRender ] = useReducer( () => [] );
 
 	useEffect( () => {
 		const namespace = 'core/block-edit/block-controls';
 
 		function onHooksUpdated( updatedHookName ) {
-			if ( updatedHookName === hookName ) {
+			if ( updatedHookName === blockControlsFilterName ) {
 				forceRender();
 			}
 		}
@@ -81,16 +88,16 @@ function BlockControlFilters( props ) {
 		return;
 	}
 
-	const blockControlFilters = filters[ hookName ];
+	const blockControlFilters = filters[ blockControlsFilterName ];
 
 	if ( ! blockControlFilters ) {
 		return;
 	}
 
 	return blockControlFilters.handlers.map(
-		( { callback: Controls, namespace } ) => (
-			<Controls { ...props } key={ namespace } />
-		)
+		( { callback: Controls, namespace } ) => {
+			return <Controls { ...props } key={ namespace } />;
+		}
 	);
 }
 

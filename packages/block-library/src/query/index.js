@@ -27,7 +27,9 @@ export const settings = {
 };
 
 export const init = () => {
-	addFilter( 'editor.BlockControls', 'core/query', queryInspectorControls );
+	// This is a temporary solution so the link is displayed at the top.
+	// See https://github.com/WordPress/gutenberg/pull/31833/files#r634291993.
+	addFilter( 'editor.BlockEdit', 'core/query', queryInspectorControls );
 
 	return initBlock( { name, metadata, settings } );
 };

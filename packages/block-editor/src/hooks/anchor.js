@@ -12,6 +12,7 @@ import { ifCondition } from '@wordpress/compose';
  * Internal dependencies
  */
 import { InspectorControls } from '../components';
+import { blockControlsFilterName } from '../components/block-edit';
 
 /**
  * Regular expression matching invalid anchor characters for replacement.
@@ -143,7 +144,7 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 
 addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
 addFilter(
-	'editor.BlockControls',
+	blockControlsFilterName,
 	'core/editor/anchor/with-inspector-control',
 	ifCondition( ( { name } ) => hasBlockSupport( name, 'anchor' ) )(
 		InspectorControl

@@ -33,6 +33,7 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import { shouldSkipSerialization } from './utils';
+import { blockControlsFilterName } from '../components/block-edit';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -455,7 +456,7 @@ addFilter(
 );
 
 addFilter(
-	'editor.BlockControls',
+	blockControlsFilterName,
 	'core/style/with-block-controls',
 	StyleBlockControls
 );

@@ -12,6 +12,7 @@ import { useEffect, useRef, useCallback } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 import { BlockControls, BlockSettingsMenuControls } from '../components';
+import { blockControlsFilterName } from '../components/block-edit';
 
 function StopEditingAsBlocksOnOutsideSelect( {
 	clientId,
@@ -146,7 +147,7 @@ export const LockUIBlockControls = ( props ) => {
 };
 
 addFilter(
-	'editor.BlockControls',
+	blockControlsFilterName,
 	'core/content-lock-ui/with-block-controls',
 	LockUIBlockControls
 );
