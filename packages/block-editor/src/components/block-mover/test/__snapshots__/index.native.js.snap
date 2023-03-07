@@ -2,7 +2,7 @@
 
 exports[`Block Mover Picker moving blocks disables the Move Down button for the last block 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">Hello!</p>
+<p class="wp-block-paragraph">Hello!</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:spacer -->
@@ -16,7 +16,7 @@ exports[`Block Mover Picker moving blocks disables the Move Down button for the 
 
 exports[`Block Mover Picker moving blocks disables the Move Up button for the first block 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">Hello!</p>
+<p class="wp-block-paragraph">Hello!</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:spacer -->
@@ -34,7 +34,7 @@ exports[`Block Mover Picker moving blocks moves blocks up and down 1`] = `
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">Hello!</p>
+<p class="wp-block-paragraph">Hello!</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:spacer -->

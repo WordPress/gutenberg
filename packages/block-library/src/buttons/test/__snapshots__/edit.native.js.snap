@@ -26,7 +26,7 @@ exports[`Buttons block when a button is shown adds another button using the inli
 <!-- /wp:buttons -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\"></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -50,6 +50,6 @@ exports[`Buttons block when a button is shown adjusts the border radius 1`] = `
 
 exports[`Buttons block when a button is shown removing button along with buttons block removes the button and buttons block when deleting the block using the block delete action 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\"></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;

@@ -62,7 +62,7 @@ exports[`Columns block removes column with the remove button 1`] = `
 
 exports[`Columns block removes the only one left Column with the remove button 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\"></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;
 

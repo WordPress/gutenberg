@@ -14,7 +14,7 @@ exports[`Links can be created by selecting text and clicking Link 1`] = `
 
 exports[`Links can be created by selecting text and using keyboard shortcuts 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">This is Gutenberg</p>
+<p class="wp-block-paragraph">This is Gutenberg</p>
 <!-- /wp:paragraph -->"
 `;
 

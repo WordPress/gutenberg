@@ -2,7 +2,7 @@
 
 exports[`BlockDraggable moves blocks: Initial order 1`] = `
 "<!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">This is a paragraph.</p>
+<p class="wp-block-paragraph">This is a paragraph.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image {"sizeSlug":"large"} -->
@@ -30,7 +30,7 @@ exports[`BlockDraggable moves blocks: Paragraph block moved from first to second
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">This is a paragraph.</p>
+<p class="wp-block-paragraph">This is a paragraph.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:spacer -->
@@ -58,7 +58,7 @@ exports[`BlockDraggable moves blocks: Spacer block moved from third to first pos
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\">This is a paragraph.</p>
+<p class="wp-block-paragraph">This is a paragraph.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:gallery {"linkTo":"none"} -->

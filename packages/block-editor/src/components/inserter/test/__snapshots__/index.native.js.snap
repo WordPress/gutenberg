@@ -24,7 +24,7 @@ exports[`Inserter can add blocks after another block 1`] = `
 <!-- /wp:more -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\"></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -34,7 +34,7 @@ exports[`Inserter can add blocks before another block 1`] = `
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\"></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -48,7 +48,7 @@ exports[`Inserter can add blocks creates a new Paragraph block tapping on the em
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\"></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -94,7 +94,7 @@ exports[`Inserter can add blocks to the beginning 1`] = `
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\"></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -108,7 +108,7 @@ exports[`Inserter can add blocks to the end 1`] = `
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\"></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:more -->

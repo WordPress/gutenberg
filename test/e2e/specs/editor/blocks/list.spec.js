@@ -1245,7 +1245,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->` );
 	} );
 
@@ -1267,11 +1267,11 @@ test.describe( 'List (@firefox)', () => {
 
 		expect( await editor.getEditedPostContent() )
 			.toBe( `<!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph -->` );
 
 		await page.getByRole( 'button', { name: 'Paragraph' } ).click();

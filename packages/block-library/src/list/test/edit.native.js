@@ -404,13 +404,13 @@ describe( 'List block', () => {
 
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p class=\\"wp-block-paragraph\\">A quick brown fox.</p>
+		<p class="wp-block-paragraph">A quick brown fox.</p>
 		<!-- /wp:paragraph -->
-		
+
 		<!-- wp:paragraph -->
-		<p class=\\"wp-block-paragraph\\">One</p>
+		<p class="wp-block-paragraph">One</p>
 		<!-- /wp:paragraph -->
-		
+
 		<!-- wp:list -->
 		<ul><!-- wp:list-item -->
 		<li>Two</li>

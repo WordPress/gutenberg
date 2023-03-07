@@ -24,7 +24,7 @@ exports[`Social links block shows active links correctly when not selected 1`] =
 <!-- /wp:social-links -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\"></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -38,7 +38,7 @@ exports[`Social links block shows the ghost placeholder when no icon is active 1
 <!-- /wp:social-links -->
 
 <!-- wp:paragraph -->
-<p class=\\"wp-block-paragraph\\"></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;
 
