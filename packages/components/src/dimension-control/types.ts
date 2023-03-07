@@ -21,6 +21,10 @@ export type DimensionControlProps = {
 	label: string;
 	/**
 	 * An array of sizes to choose from.
+	 *
+	 * @default DEFAULT_SIZES
+	 *
+	 * @see packages/components/src/dimension-control/sizes.ts
 	 */
 	sizes?: Size[];
 	/**
