@@ -146,7 +146,7 @@ export const mediaBlocks = `<!-- wp:image -->
 
 <!-- wp:media-text {"isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
 <div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
-<p class="has-large-font-size"></p>
+<p class="wp-block-paragraph has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->
 
