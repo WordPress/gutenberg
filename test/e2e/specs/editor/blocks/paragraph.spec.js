@@ -165,7 +165,7 @@ test.describe( 'Paragraph', () => {
 			} ) => {
 				await editor.setContent( `
 					<!-- wp:paragraph -->
-					<p></p>
+					<p class="wp-block-paragraph"></p>
 					<!-- /wp:paragraph -->
 
 					<!-- wp:heading -->
@@ -280,7 +280,7 @@ test.describe( 'Paragraph', () => {
 					<!-- /wp:heading -->
 
 					<!-- wp:paragraph -->
-					<p></p>
+					<p class="wp-block-paragraph"></p>
 					<!-- /wp:paragraph -->
 				` );
 
@@ -387,11 +387,11 @@ test.describe( 'Paragraph', () => {
 			} ) => {
 				await editor.setContent( `
 					<!-- wp:paragraph -->
-					<p></p>
+					<p class="wp-block-paragraph"></p>
 					<!-- /wp:paragraph -->
 
 					<!-- wp:paragraph -->
-					<p></p>
+					<p class="wp-block-paragraph"></p>
 					<!-- /wp:paragraph -->
 				` );
 

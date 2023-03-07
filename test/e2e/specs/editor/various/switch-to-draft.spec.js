@@ -122,7 +122,7 @@ class SwitchToDraftUtils {
 			title: `Switch scheduled ${ postType } to draft`,
 			status: 'publish',
 			content: `<!-- wp:paragraph -->
-<p>This will be a scheduled ${ postType } edited in a ${ viewport } viewport</p>
+<p class="wp-block-paragraph">This will be a scheduled ${ postType } edited in a ${ viewport } viewport</p>
 <!-- /wp:paragraph -->`,
 		};
 

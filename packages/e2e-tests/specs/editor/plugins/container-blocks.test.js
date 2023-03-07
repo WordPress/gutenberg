@@ -27,7 +27,7 @@ describe( 'InnerBlocks Template Sync', () => {
 	const insertBlockAndAddParagraphInside = async ( blockName, blockSlug ) => {
 		const paragraphToAdd = `
 			<!-- wp:paragraph -->
-			<p>added paragraph</p>
+			<p class="wp-block-paragraph">added paragraph</p>
 			<!-- /wp:paragraph -->
 		`;
 		await insertBlock( blockName );

@@ -10,7 +10,7 @@ describe( 'serializeRawBlock', () => {
 				<!-- wp:column -->
 				<div class="wp-block-column">
 					<!-- wp:paragraph -->
-					<p>A</p>
+					<p class="wp-block-paragraph">A</p>
 					<!-- /wp:paragraph -->
 				</div>
 				<!-- /wp:column -->
