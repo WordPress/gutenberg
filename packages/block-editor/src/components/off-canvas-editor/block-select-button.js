@@ -62,13 +62,22 @@ function ListViewBlockSelectButton(
 		}
 	}
 
-	const editAriaLabel = blockInformation
+	let editAriaLabel = blockInformation
 		? sprintf(
 				// translators: %s: The title of the block.
 				__( 'Edit %s block' ),
 				blockInformation.title
 		  )
 		: __( 'Edit' );
+
+	editAriaLabel =
+		block.attributes?.id && block.attributes?.label
+			? sprintf(
+					// translators: %s: The title of the page.
+					__( 'View %s' ),
+					block.attributes?.label
+			  )
+			: editAriaLabel;
 
 	return (
 		<>
