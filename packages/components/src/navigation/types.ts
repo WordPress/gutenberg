@@ -238,8 +238,11 @@ export type NavigationMenuTitleSearchProps = Pick<
 	NavigationMenuProps,
 	'onSearch' | 'search' | 'title'
 > & {
-	// TODO: grab types from useDebounce / speak ?
-	debouncedSpeak: ( message: string ) => void;
+	// @see `speak` function from `@wordpress/a11y`
+	debouncedSpeak: (
+		message: string,
+		ariaLive?: 'off' | 'polite' | 'assertive'
+	) => void;
 	onCloseSearch: () => void;
 };
 
