@@ -369,7 +369,7 @@ describe( 'List block', () => {
 
 	it( 'unwraps first item when attempting to merge with non-list block', async () => {
 		const initialHtml = `<!-- wp:paragraph -->
-		<p>A quick brown fox.</p>
+		<p class="wp-block-paragraph">A quick brown fox.</p>
 		<!-- /wp:paragraph -->
 		<!-- wp:list -->
 		<ul><!-- wp:list-item -->
