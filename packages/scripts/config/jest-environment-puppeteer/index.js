@@ -48,7 +48,7 @@ const ARTIFACTS_PATH = path.resolve(
 	process.env.WP_ARTIFACTS_PATH || 'artifacts'
 );
 
-process.env.WP_ARTIFACTS_PATH = ARTIFACTS_PATH;
+// process.env.WP_ARTIFACTS_PATH = ARTIFACTS_PATH;
 
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer

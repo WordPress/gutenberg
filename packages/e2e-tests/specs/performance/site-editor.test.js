@@ -144,7 +144,7 @@ describe( 'Site Editor Performance', () => {
 			postType: 'page',
 		} );
 
-		expect( false ).toBe( true );
+		expect( [ JSON.stringify( process.env, 0, 2 ) ] ).toBe( '' );
 
 		// Wait for the first paragraph to be ready.
 		const firstParagraph = await canvas().waitForXPath(
