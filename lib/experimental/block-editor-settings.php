@@ -15,11 +15,11 @@
 function gutenberg_get_block_editor_settings_experimental( $settings ) {
 	$is_block_theme = wp_is_block_theme();
 
-	if ( ! $is_block_theme ) {
+	global $post_id;
+
+	if ( ! $is_block_theme || ! $post_id ) {
 		return $settings;
 	}
-
-	global $post_id;
 
 	$template_slug = get_page_template_slug( $post_id );
 
