@@ -50,7 +50,7 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		const { isEligible = stubFalse } = deprecatedDefinitions[ i ];
 		if (
 			block.isValid &&
-			! isEligible( parsedAttributes, block.innerBlocks )
+			! isEligible( parsedAttributes, block.innerBlocks, { block } )
 		) {
 			continue;
 		}
