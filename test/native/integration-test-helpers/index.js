@@ -5,6 +5,7 @@ export {
 } from './advance-animation';
 export { dismissModal } from './dismiss-modal';
 export { getBlock } from './get-block';
+export { getBlockTransformOptions } from './get-block-transform-options';
 export { getEditorHtml } from './get-editor-html';
 export { getInnerBlock } from './get-inner-block';
 export { initializeEditor } from './initialize-editor';

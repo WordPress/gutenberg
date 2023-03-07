@@ -18,6 +18,10 @@ Dismisses a modal.
 
 Gets a block from the root block list.
 
+### [`getBlockTransformOptions`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/get-block-transform-options.js)
+
+Get the block transform options of a block.
+
 ### [`getEditorHtml`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/get-editor-html.js)
 
 Gets the current HTML output of the editor.
