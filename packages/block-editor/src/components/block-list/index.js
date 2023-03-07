@@ -24,9 +24,8 @@ import {
 	useLayoutEffect,
 	useContext,
 	useRef,
-	Fragment,
-	createElement,
 	useReducer,
+	useId,
 } from '@wordpress/element';
 
 /**
@@ -53,42 +52,79 @@ const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 
 function useRootPortal( component ) {
 	const components = useContext( componentsContext );
+	const id = useId();
 
+	// Run every time the component rerenders.
 	useLayoutEffect( () => {
-		if ( ! component ) return;
-		components.add( component );
-		return () => {
-			components.delete( component );
-		};
-	} );
+		if ( component ) {
+			components.render( id, component );
+		} else {
+			components.unmount( id );
+		}
+	}, [ components, id, component ] );
+
+	// Run only on unmount.
+	useLayoutEffect( () => () => components.unmount( id ), [ components, id ] );
 }
 
-function Components( { subscriber, components } ) {
+function Component( { id, componentsById, renderById } ) {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
-	subscriber.current = forceRender;
-	return createElement( Fragment, null, ...components.current );
+	useLayoutEffect( () => {
+		renderById.current.set( id, forceRender );
+	}, [ id, renderById ] );
+	return componentsById.current.get( id );
+}
+
+function Components( { componentsById, renderById, renderAll } ) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
+
+	useLayoutEffect( () => {
+		renderAll.current = forceRender;
+	}, [ renderAll ] );
+
+	return Array.from( componentsById.current.keys() ).map( ( key ) => (
+		<Component
+			key={ key }
+			id={ key }
+			componentsById={ componentsById }
+			renderById={ renderById }
+		/>
+	) );
 }
 
 function ComponentRenderer( { children } ) {
-	const subscriber = useRef( () => {} );
-	const components = useRef( new Set() );
+	const componentsById = useRef( new Map() );
+	const renderById = useRef( new Map() );
+	const renderAll = useRef( () => {} );
 	return (
 		<componentsContext.Provider
 			value={ useMemo(
 				() => ( {
-					add( component ) {
-						components.current.add( component );
-						subscriber.current();
+					render( id, component ) {
+						if ( componentsById.current.has( id ) ) {
+							componentsById.current.set( id, component );
+							renderById.current.get( id )();
+						} else {
+							componentsById.current.set( id, component );
+							renderAll.current();
+						}
 					},
-					delete( component ) {
-						components.current.delete( component );
-						subscriber.current();
+					unmount( id ) {
+						if ( componentsById.current.has( id ) ) {
+							componentsById.current.delete( id );
+							renderById.current.delete( id );
+							renderAll.current();
+						}
 					},
 				} ),
 				[]
 			) }
 		>
-			<Components subscriber={ subscriber } components={ components } />
+			<Components
+				componentsById={ componentsById }
+				renderById={ renderById }
+				renderAll={ renderAll }
+			/>
 			{ children }
 		</componentsContext.Provider>
 	);

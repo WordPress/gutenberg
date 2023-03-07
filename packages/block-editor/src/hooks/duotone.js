@@ -297,9 +297,10 @@ const useDuotoneStyles = ( props, blockType, attributes ) => {
 	);
 
 	const id = `wp-duotone-${ useInstanceId( useDuotoneStyles ) }`;
+	const duotoneStyle = attributes?.style?.color?.duotone;
 
 	BlockList.useRootPortal(
-		duotoneSupport && (
+		duotoneSupport && duotoneStyle && (
 			<ConditionalInlineDuotone
 				id={ id }
 				blockType={ blockType }
@@ -308,6 +309,10 @@ const useDuotoneStyles = ( props, blockType, attributes ) => {
 		)
 	);
 
+	// CAUTION: code added before this line will be executed
+	// for all blocks, not just those that support duotone. Code added
+	// above this line should be carefully evaluated for its impact on
+	// performance.
 	return {
 		...props,
 		className: duotoneSupport
