@@ -304,10 +304,10 @@ const Examples = memo(
 			>
 				{ examples
 					.filter( ( example ) => example.category === category )
-					.map( ( example, index ) => (
+					.map( ( example ) => (
 						<Example
 							key={ example.name }
-							id={ `example-${ index }` }
+							id={ `example-${ example.name }` }
 							composite={ composite }
 							title={ example.title }
 							blocks={ example.blocks }
@@ -322,56 +322,54 @@ const Examples = memo(
 	}
 );
 
-const Example = memo(
-	( { composite, id, title, blocks, isSelected, onClick } ) => {
-		const originalSettings = useSelect(
-			( select ) => select( blockEditorStore ).getSettings(),
-			[]
-		);
-		const settings = useMemo(
-			() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
-			[ originalSettings ]
-		);
+const Example = ( { composite, id, title, blocks, isSelected, onClick } ) => {
+	const originalSettings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings(),
+		[]
+	);
+	const settings = useMemo(
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		[ originalSettings ]
+	);
 
-		// Cache the list of blocks to avoid additional processing when the component is re-rendered.
-		const renderedBlocks = useMemo(
-			() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
-			[ blocks ]
-		);
+	// Cache the list of blocks to avoid additional processing when the component is re-rendered.
+	const renderedBlocks = useMemo(
+		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+		[ blocks ]
+	);
 
-		return (
-			<CompositeItem
-				{ ...composite }
-				className={ classnames( 'edit-site-style-book__example', {
-					'is-selected': isSelected,
-				} ) }
-				id={ id }
-				aria-label={ sprintf(
-					// translators: %s: Title of a block, e.g. Heading.
-					__( 'Open %s styles in Styles panel' ),
-					title
-				) }
-				onClick={ onClick }
-				role="button"
-				as="div"
-			>
-				<span className="edit-site-style-book__example-title">
-					{ title }
-				</span>
-				<div className="edit-site-style-book__example-preview">
-					<Disabled className="edit-site-style-book__example-preview__content">
-						<ExperimentalBlockEditorProvider
-							value={ renderedBlocks }
-							settings={ settings }
-						>
-							<BlockList renderAppender={ false } />
-						</ExperimentalBlockEditorProvider>
-					</Disabled>
-				</div>
-			</CompositeItem>
-		);
-	}
-);
+	return (
+		<CompositeItem
+			{ ...composite }
+			className={ classnames( 'edit-site-style-book__example', {
+				'is-selected': isSelected,
+			} ) }
+			id={ id }
+			aria-label={ sprintf(
+				// translators: %s: Title of a block, e.g. Heading.
+				__( 'Open %s styles in Styles panel' ),
+				title
+			) }
+			onClick={ onClick }
+			role="button"
+			as="div"
+		>
+			<span className="edit-site-style-book__example-title">
+				{ title }
+			</span>
+			<div className="edit-site-style-book__example-preview" aria-hidden>
+				<Disabled className="edit-site-style-book__example-preview__content">
+					<ExperimentalBlockEditorProvider
+						value={ renderedBlocks }
+						settings={ settings }
+					>
+						<BlockList renderAppender={ false } />
+					</ExperimentalBlockEditorProvider>
+				</Disabled>
+			</div>
+		</CompositeItem>
+	);
+};
 
 function useHasStyleBook() {
 	const fills = useSlotFills( SLOT_FILL_NAME );
