@@ -25,7 +25,10 @@ const resultsFiles = [
 
 const performanceResults = resultsFiles.map( ( { file } ) =>
 	JSON.parse(
-		fs.readFileSync( path.join( __dirname, '../' + file ), 'utf8' )
+		fs.readFileSync(
+			path.join( process.env.WP_ARTIFACTS_PATH, file ),
+			'utf8'
+		)
 	)
 );
 

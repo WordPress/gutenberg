@@ -470,7 +470,7 @@ async function runPerformanceTests( branches, options ) {
 
 		const resultsFilename = testSuite + '-performance-results.json';
 		fs.writeFileSync(
-			path.resolve( __dirname, '../../../', resultsFilename ),
+			path.resolve( ARTIFACTS_PATH, resultsFilename ),
 			JSON.stringify( results[ testSuite ], null, 2 )
 		);
 	}
