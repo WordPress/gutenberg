@@ -48,8 +48,6 @@ const ARTIFACTS_PATH = path.resolve(
 	process.env.WP_ARTIFACTS_PATH || 'artifacts'
 );
 
-// process.env.WP_ARTIFACTS_PATH = ARTIFACTS_PATH;
-
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
 	// the setTimeout function, see https://github.com/facebook/jest/blob/v23.1.0/packages/jest-runtime/src/index.js#L823

@@ -210,10 +210,7 @@ async function runTestSuite(
 async function runPerformanceTests( branches, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
 	const TEST_ROUNDS = options.rounds || 1;
-	const ARTIFACTS_PATH = process.env.WP_ARTIFACTS_PATH || 'artifacts';
-
-	log( process.version );
-	log( JSON.stringify( process.env, null, 2 ) );
+	const ARTIFACTS_PATH = process.env.WP_ARTIFACTS_PATH || '';
 
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
@@ -374,10 +371,10 @@ async function runPerformanceTests( branches, options ) {
 	log( '\n>> Running the tests' );
 
 	const testSuites = [
-		// 'post-editor',
+		'post-editor',
 		'site-editor',
-		// 'front-end-classic-theme',
-		// 'front-end-block-theme',
+		'front-end-classic-theme',
+		'front-end-block-theme',
 	];
 
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
