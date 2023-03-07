@@ -4,13 +4,15 @@
 import type { ButtonProps } from '../button/types';
 
 type IfDiscriminantDefinedBothRequired< TDiscriminant, TOther > =
-	// When props in TDiscriminant are specified, then props from U are required too
+	// When props in TDiscriminant are specified,
+	// then props from TOther are required too
 	| {
 			[ K in keyof ( TDiscriminant & TOther ) ]: NonNullable<
 				( TDiscriminant & TOther )[ K ]
 			>;
 	  }
-	// When props in T are not specified, then props from U are optional
+	// When props in TDiscriminant are not specified,
+	// then props from TOther are optional
 	| ( {
 			[ K in keyof TDiscriminant ]?: never;
 	  } & {
