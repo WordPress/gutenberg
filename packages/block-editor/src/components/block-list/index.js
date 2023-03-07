@@ -45,7 +45,7 @@ import {
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
 
-const componentsContext = createContext();
+const componentsContext = createContext( { render() {}, unmount() {} } );
 
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();

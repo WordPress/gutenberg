@@ -23,7 +23,7 @@ import BlockEditorProvider from '../../components/provider';
 import {
 	getValidAlignments,
 	withToolbarControls,
-	withDataAlign,
+	useDataAlign,
 	addAssignedAlign,
 } from '../align';
 
@@ -219,7 +219,7 @@ describe( 'align', () => {
 		} );
 	} );
 
-	describe( 'withDataAlign', () => {
+	describe( 'useDataAlign', () => {
 		it( 'should render with wrapper props', () => {
 			registerBlockType( 'core/foo', {
 				...blockSettings,
@@ -229,21 +229,20 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<button { ...wrapperProps } />
-			) );
+			const EnhancedComponent = () => (
+				<button
+					{ ...useDataAlign( {}, 'core/foo', {
+						align: 'wide',
+					} ) }
+				/>
+			);
 
 			render(
 				<BlockEditorProvider
 					settings={ { alignWide: true, supportsLayout: false } }
 					value={ [] }
 				>
-					<EnhancedComponent
-						attributes={ {
-							align: 'wide',
-						} }
-						name="core/foo"
-					/>
+					<EnhancedComponent />
 				</BlockEditorProvider>
 			);
 
@@ -262,21 +261,20 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<button { ...wrapperProps } />
-			) );
+			const EnhancedComponent = () => (
+				<button
+					{ ...useDataAlign( {}, 'core/foo', {
+						align: 'wide',
+					} ) }
+				/>
+			);
 
 			render(
 				<BlockEditorProvider
 					settings={ { alignWide: false } }
 					value={ [] }
 				>
-					<EnhancedComponent
-						name="core/foo"
-						attributes={ {
-							align: 'wide',
-						} }
-					/>
+					<EnhancedComponent />
 				</BlockEditorProvider>
 			);
 
@@ -295,21 +293,20 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<button { ...wrapperProps } />
-			) );
+			const EnhancedComponent = () => (
+				<button
+					{ ...useDataAlign( {}, 'core/foo', {
+						align: 'wide',
+					} ) }
+				/>
+			);
 
 			render(
 				<BlockEditorProvider
 					settings={ { alignWide: true } }
 					value={ [] }
 				>
-					<EnhancedComponent
-						name="core/foo"
-						attributes={ {
-							align: 'wide',
-						} }
-					/>
+					<EnhancedComponent />
 				</BlockEditorProvider>
 			);
 

@@ -13,7 +13,7 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
  */
 import BlockEditorProvider from '../../components/provider';
 import { cleanEmptyObject } from '../utils';
-import { withColorPaletteStyles } from '../color';
+import { useColorPaletteStyles } from '../color';
 
 describe( 'cleanEmptyObject', () => {
 	it( 'should remove nested keys', () => {
@@ -45,11 +45,16 @@ describe( 'withColorPaletteStyles', () => {
 		},
 	};
 
-	const EnhancedComponent = withColorPaletteStyles(
-		( { getStyleObj, wrapperProps } ) => (
-			<div>{ getStyleObj( wrapperProps.style ) }</div>
-		)
-	);
+	const EnhancedComponent = ( { attributes, getStyleObj } ) => {
+		const wrapperProps = useColorPaletteStyles(
+			{},
+			'core/test-block',
+			attributes
+		);
+		return (
+			<div { ...wrapperProps }>{ getStyleObj( wrapperProps.style ) }</div>
+		);
+	};
 
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
