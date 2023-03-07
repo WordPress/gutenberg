@@ -72,7 +72,7 @@ const Example = () => {
 };
 ```
 
-It is also possible to remove panels from the admin using the `removeEditorPanel` function passing the name of the registered panel.
+It is also possible to remove panels from the admin using the `removeEditorPanel` function by passing the name of the registered panel.
 
 ```js
 import { useDispatch } from '@wordpress/data';
