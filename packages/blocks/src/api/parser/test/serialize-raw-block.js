@@ -22,7 +22,7 @@ describe( 'serializeRawBlock', () => {
 						<ul><li>B</li><li>C</li></ul>
 						<!-- /wp:list -->
 						<!-- wp:paragraph -->
-						<p>D</p>
+						<p class="wp-block-paragraph">D</p>
 						<!-- /wp:paragraph -->
 					</div>
 					<!-- /wp:group -->
@@ -42,8 +42,10 @@ describe( 'serializeRawBlock', () => {
 							blockName: 'core/paragraph',
 							attrs: {},
 							innerBlocks: [],
-							innerHTML: '<p>A</p>',
-							innerContent: [ '<p>A</p>' ],
+							innerHTML: '<p class="wp-block-paragraph">A</p>',
+							innerContent: [
+								'<p class="wp-block-paragraph">A</p>',
+							],
 						},
 					],
 					innerHTML: '<div class="wp-block-column"></div>',
@@ -74,8 +76,11 @@ describe( 'serializeRawBlock', () => {
 									blockName: 'core/paragraph',
 									attrs: {},
 									innerBlocks: [],
-									innerHTML: '<p>D</p>',
-									innerContent: [ '<p>D</p>' ],
+									innerHTML:
+										'<p class="wp-block-paragraph">D</p>',
+									innerContent: [
+										'<p class="wp-block-paragraph">D</p>',
+									],
 								},
 							],
 							innerHTML: '<div class="wp-block-group"></div>',
