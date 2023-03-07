@@ -323,8 +323,49 @@ export default function ColorPanel( {
 		inheritedValue?.elements?.link?.color?.text
 	);
 	const userLinkColor = decodeValue( value?.elements?.link?.color?.text );
-	const hasLinkColor = () => !! userLinkColor;
 	const setLinkColor = ( newColor ) => {
+		onChange( {
+			...value,
+			elements: {
+				...value?.elements,
+				link: {
+					...value?.elements?.link,
+					color: {
+						...value?.elements?.link?.color,
+						text: encodeColorValue( newColor ),
+					},
+				},
+			},
+		} );
+	};
+
+	const hoverLinkColor = decodeValue(
+		inheritedValue?.elements?.link?.[ ':hover' ]?.color?.text
+	);
+	const userHoverLinkColor = decodeValue(
+		value?.elements?.link?.[ ':hover' ]?.color?.text
+	);
+	const setHoverLinkColor = ( newColor ) => {
+		onChange( {
+			...value,
+			elements: {
+				...value?.color?.elements,
+				link: {
+					...value?.elements?.link,
+					':hover': {
+						...value?.elements?.link?.[ ':hover' ],
+						color: {
+							...value?.elements?.link?.[ ':hover' ]?.color,
+							text: encodeColorValue( newColor ),
+						},
+					},
+				},
+			},
+		} );
+	};
+
+	const hasLink = () => !! userLinkColor || !! userHoverLinkColor;
+	const resetLink = () =>
 		onChange( {
 			...value,
 			elements: {
@@ -333,13 +374,19 @@ export default function ColorPanel( {
 					...value?.color?.elements?.link,
 					color: {
 						...value?.color?.elements?.link?.color,
-						text: encodeColorValue( newColor ),
+						text: undefined,
+					},
+					':hover': {
+						...value?.color?.elements?.link?.[ ':hover' ],
+						color: {
+							...value?.color?.elements?.link?.[ ':hover' ]
+								?.color,
+							text: undefined,
+						},
 					},
 				},
 			},
 		} );
-	};
-	const resetLinkColor = () => setLinkColor( undefined );
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -394,17 +441,24 @@ export default function ColorPanel( {
 		showLinkPanel && {
 			key: 'link',
 			label: __( 'Link' ),
-			hasValue: hasLinkColor,
-			resetValue: resetLinkColor,
+			hasValue: hasLink,
+			resetValue: resetLink,
 			isShownByDefault: defaultControls.link,
-			indicators: [ linkColor ],
+			indicators: [ linkColor, hoverLinkColor ],
 			tabs: [
 				{
 					key: 'link',
-					label: __( 'Link' ),
+					label: __( 'Default' ),
 					inheritedValue: linkColor,
 					setValue: setLinkColor,
 					userValue: userLinkColor,
+				},
+				{
+					key: 'hover',
+					label: __( 'Hover' ),
+					inheritedValue: hoverLinkColor,
+					setValue: setHoverLinkColor,
+					userValue: userHoverLinkColor,
 				},
 			],
 		},
