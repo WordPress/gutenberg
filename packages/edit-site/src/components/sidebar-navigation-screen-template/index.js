@@ -16,25 +16,41 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
 
-function AddedByDescription( { template } ) {
+function TemplateDescription( { template, getTitle } ) {
 	const addedBy = useAddedBy( template );
 
+	// Still loading for the metadata.
 	if ( ! addedBy.text ) return null;
 
-	return (
-		<p>
-			{ addedBy.isCustomized
-				? sprintf(
-						/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
-						__( 'Added by %s (customized).' ),
-						addedBy.text
-				  )
-				: sprintf(
-						/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
-						__( 'Added by %s.' ),
-						addedBy.text
-				  ) }
-		</p>
+	const authorText = addedBy.isCustomized
+		? sprintf(
+				/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
+				__( '%s (customized)' ),
+				addedBy.text
+		  )
+		: addedBy.text;
+
+	if ( template.type === 'wp_template' && template.is_custom ) {
+		return sprintf(
+			/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
+			__(
+				'This is a custom template that can be applied manually to any Post or Page, added by %s.'
+			),
+			authorText
+		);
+	} else if ( template.type === 'wp_template_part' ) {
+		return sprintf(
+			// translators: 1: template part title e.g: "Header". 2: The author. Could be either the theme's name, plugin's name, or user's name.
+			__( 'This is your %1$s template part, added by %2$s' ),
+			getTitle(),
+			authorText
+		);
+	}
+
+	return sprintf(
+		/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
+		__( 'Added by %s.' ),
+		authorText
 	);
 }
 
@@ -46,20 +62,7 @@ export default function SidebarNavigationScreenTemplate() {
 		postType,
 		postId
 	);
-	let description = getDescription();
-	if ( ! description ) {
-		if ( record.type === 'wp_template' && record.is_custom ) {
-			description = __(
-				'This is a custom template that can be applied manually to any Post or Page.'
-			);
-		} else if ( record.type === 'wp_template_part' ) {
-			description = sprintf(
-				// translators: %s: template part title e.g: "Header".
-				__( 'This is your %s template part.' ),
-				getTitle()
-			);
-		}
-	}
+	const description = getDescription();
 
 	return (
 		<SidebarNavigationScreen
@@ -71,8 +74,15 @@ export default function SidebarNavigationScreenTemplate() {
 					icon={ pencil }
 				/>
 			}
-			description={ description }
-			content={ <AddedByDescription template={ record } /> }
+			description={
+				description ||
+				( !! record && (
+					<TemplateDescription
+						template={ record }
+						getTitle={ getTitle }
+					/>
+				) )
+			}
 		/>
 	);
 }
