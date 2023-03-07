@@ -16,57 +16,63 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
 
-function TemplateDescription( { template, getTitle } ) {
-	const addedBy = useAddedBy( template.type, template.id );
+function useTemplateTitleAndDescription( postType, postId ) {
+	const { getDescription, getTitle, record } = useEditedEntityRecord(
+		postType,
+		postId
+	);
+	const addedBy = useAddedBy( postType, postId );
+	const title = getTitle();
+	let description = getDescription();
 
-	// Still loading for the metadata.
-	if ( ! addedBy.text ) return null;
+	if ( ! description && addedBy.text ) {
+		const authorText = addedBy.isCustomized
+			? sprintf(
+					/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
+					__( '%s (customized)' ),
+					addedBy.text
+			  )
+			: addedBy.text;
 
-	const authorText = addedBy.isCustomized
-		? sprintf(
+		if ( record.type === 'wp_template' && record.is_custom ) {
+			description = sprintf(
 				/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
-				__( '%s (customized)' ),
-				addedBy.text
-		  )
-		: addedBy.text;
-
-	if ( template.type === 'wp_template' && template.is_custom ) {
-		return sprintf(
-			/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
-			__(
-				'This is a custom template that can be applied manually to any Post or Page, added by %s.'
-			),
-			authorText
-		);
-	} else if ( template.type === 'wp_template_part' ) {
-		return sprintf(
-			// translators: 1: template part title e.g: "Header". 2: The author. Could be either the theme's name, plugin's name, or user's name.
-			__( 'This is your %1$s template part, added by %2$s' ),
-			getTitle(),
-			authorText
-		);
+				__(
+					'This is a custom template that can be applied manually to any Post or Page, added by %s.'
+				),
+				authorText
+			);
+		} else if ( record.type === 'wp_template_part' ) {
+			description = sprintf(
+				// translators: 1: template part title e.g: "Header". 2: The author. Could be either the theme's name, plugin's name, or user's name.
+				__( 'This is your %1$s template part, added by %2$s.' ),
+				getTitle(),
+				authorText
+			);
+		} else {
+			description = sprintf(
+				/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
+				__( 'Added by %s.' ),
+				authorText
+			);
+		}
 	}
 
-	return sprintf(
-		/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
-		__( 'Added by %s.' ),
-		authorText
-	);
+	return { title, description };
 }
 
 export default function SidebarNavigationScreenTemplate() {
 	const { params } = useNavigator();
 	const { postType, postId } = params;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { getDescription, getTitle, record } = useEditedEntityRecord(
+	const { title, description } = useTemplateTitleAndDescription(
 		postType,
 		postId
 	);
-	const description = getDescription();
 
 	return (
 		<SidebarNavigationScreen
-			title={ getTitle() }
+			title={ title }
 			actions={
 				<SidebarButton
 					onClick={ () => setCanvasMode( 'edit' ) }
@@ -74,15 +80,7 @@ export default function SidebarNavigationScreenTemplate() {
 					icon={ pencil }
 				/>
 			}
-			description={
-				description ||
-				( !! record && (
-					<TemplateDescription
-						template={ record }
-						getTitle={ getTitle }
-					/>
-				) )
-			}
+			description={ description }
 		/>
 	);
 }
