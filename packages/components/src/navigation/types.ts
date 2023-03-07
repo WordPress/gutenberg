@@ -3,6 +3,20 @@
  */
 import type { ButtonProps } from '../button/types';
 
+type IfDiscriminantDefinedBothRequired< TDiscriminant, TOther > =
+	// When props in TDiscriminant are specified, then props from U are required too
+	| {
+			[ K in keyof ( TDiscriminant & TOther ) ]: NonNullable<
+				( TDiscriminant & TOther )[ K ]
+			>;
+	  }
+	// When props in T are not specified, then props from U are optional
+	| ( {
+			[ K in keyof TDiscriminant ]?: never;
+	  } & {
+			[ K in keyof TOther ]?: TOther[ K ];
+	  } );
+
 // React Components
 
 export type NavigationProps = {
@@ -25,41 +39,31 @@ export type NavigationProps = {
 	 */
 	className?: string;
 	/**
-	 * Callback used to sync the active menu between the external state and the Navigation's internal state.
+	 * Callback used to sync the active menu between the external state
+	 * and the Navigation's internal state.
 	 */
 	onActivateMenu?: ( activeMenuSlug: string ) => void;
 };
 
 // When `onSearch` is specified, `search` should be specified too
-type _NavigationMenuSearchProps =
-	| {
-			/**
-			 * When the `hasSearch` prop is `true`, this callback handles the search
-			 * input's `onChange` event, making it controlled from the outside.
-			 * When using this prop, the `search` prop should be also set.
-			 */
-			onSearch: ( searchString: string ) => void;
-			/**
-			 * When the `hasSearch` is `true` and the `onSearch` prop is provided, this
-			 * prop controls the value of the search input.
-			 * Required when the `onSearch` prop is provided.
-			 */
-			search: string;
-	  }
-	| {
-			/**
-			 * When the `hasSearch` prop is `true`, this callback handles the search
-			 * input's `onChange` event, making it controlled from the outside.
-			 * When using this prop, the `search` prop should be also set.
-			 */
-			onSearch?: ( searchString: string ) => void;
-			/**
-			 * When the `hasSearch` is `true` and the `onSearch` prop is provided, this
-			 * prop controls the value of the search input.
-			 * Required when the `onSearch` prop is provided.
-			 */
-			search?: string;
-	  };
+type _NavigationMenuSearchProps = IfDiscriminantDefinedBothRequired<
+	{
+		/**
+		 * When the `hasSearch` prop is `true`, this callback handles the search
+		 * input's `onChange` event, making it controlled from the outside.
+		 * When using this prop, the `search` prop should be also set.
+		 */
+		onSearch: ( searchString: string ) => void;
+	},
+	{
+		/**
+		 * When the `hasSearch` is `true` and the `onSearch` prop is provided, this
+		 * prop controls the value of the search input.
+		 * Required when the `onSearch` prop is provided.
+		 */
+		search: string;
+	}
+>;
 
 export type NavigationMenuProps = _NavigationMenuSearchProps & {
 	/**
