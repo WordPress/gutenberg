@@ -75,7 +75,7 @@ function BlockControlFilters( props ) {
 			removeAction( 'hookRemoved', namespace );
 			removeAction( 'hookAdded', namespace );
 		};
-	} );
+	}, [] );
 
 	if ( ! shouldDisplayControls ) {
 		return;
