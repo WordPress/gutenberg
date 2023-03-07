@@ -90,3 +90,38 @@ export type CustomGradientBarReducerAction =
 	| { type: 'CLOSE_INSERTER' }
 	| { type: 'START_CONTROL_CHANGE' }
 	| { type: 'STOP_CONTROL_CHANGE' };
+
+export type ControlPointButtonProps = {
+	isOpen: boolean;
+	position: ControlPoint[ 'position' ];
+	color: string;
+};
+
+export type ControlPointsProps = {
+	disableRemove: boolean;
+	disableAlpha: boolean;
+	gradientPickerDomRef: React.RefObject< HTMLDivElement >;
+	ignoreMarkerPosition?: number;
+	value: ControlPoint[];
+	onChange: ( conrolPoints: ControlPoint[] ) => void;
+	onStartControlPointChange: () => void;
+	onStopControlPointChange: () => void;
+	__experimentalIsRenderedInSidebar: boolean;
+};
+
+export type ControlPointMoveState = {
+	initialPosition: number;
+	index: number;
+	significantMoveHappened: boolean;
+	listenersActivated: boolean;
+};
+
+export type InsertPointProps = {
+	value: ControlPoint[];
+	onChange: ( controlPoints: ControlPoint[] ) => void;
+	onOpenInserter: () => void;
+	onCloseInserter: () => void;
+	insertPosition: number;
+	disableAlpha: boolean;
+	__experimentalIsRenderedInSidebar: boolean;
+};

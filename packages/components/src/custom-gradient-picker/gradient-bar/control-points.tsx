@@ -36,8 +36,22 @@ import {
 	MINIMUM_SIGNIFICANT_MOVE,
 	KEYBOARD_CONTROL_POINT_VARIATION,
 } from './constants';
+import type { WordPressComponentProps } from '../../ui/context';
+import type {
+	ControlPointButtonProps,
+	ControlPointMoveState,
+	ControlPointsProps,
+	InsertPointProps,
+} from '../types';
+import type { DropdownProps } from '../../dropdown/types';
+import type { CustomColorPickerDropdownProps } from '../../color-palette/types';
 
-function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
+function ControlPointButton( {
+	isOpen,
+	position,
+	color,
+	...additionalProps
+}: WordPressComponentProps< ControlPointButtonProps, 'button', true > ) {
 	const instanceId = useInstanceId( ControlPointButton );
 	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
 	return (
@@ -75,9 +89,9 @@ function GradientColorPickerDropdown( {
 	isRenderedInSidebar,
 	className,
 	...props
-} ) {
+}: WordPressComponentProps< CustomColorPickerDropdownProps, 'div', true > ) {
 	// Open the popover below the gradient control/insertion point
-	const popoverProps = useMemo(
+	const popoverProps: DropdownProps[ 'popoverProps' ] = useMemo(
 		() => ( {
 			placement: 'bottom',
 			offset: 8,
@@ -110,16 +124,29 @@ function ControlPoints( {
 	onStartControlPointChange,
 	onStopControlPointChange,
 	__experimentalIsRenderedInSidebar,
-} ) {
-	const controlPointMoveState = useRef();
+}: ControlPointsProps ) {
+	const controlPointMoveState: React.MutableRefObject<
+		ControlPointMoveState | undefined
+	> = useRef();
 
-	const onMouseMove = ( event ) => {
+	const onMouseMove = ( event: MouseEvent ) => {
 		const relativePosition = getHorizontalRelativeGradientPosition(
 			event.clientX,
 			gradientPickerDomRef.current
 		);
+
 		const { initialPosition, index, significantMoveHappened } =
-			controlPointMoveState.current;
+			controlPointMoveState?.current ?? {};
+
+		if (
+			initialPosition === undefined ||
+			relativePosition === undefined ||
+			index === undefined ||
+			controlPointMoveState.current === undefined
+		) {
+			return;
+		}
+
 		if (
 			! significantMoveHappened &&
 			Math.abs( initialPosition - relativePosition ) >=
@@ -150,12 +177,14 @@ function ControlPoints( {
 	// Adding `cleanEventListeners` to the dependency array below requires the function itself to be wrapped in a `useCallback`
 	// This memoization would prevent the event listeners from being properly cleaned.
 	// Instead, we'll pass a ref to the function in our `useEffect` so `cleanEventListeners` itself is no longer a dependency.
-	const cleanEventListenersRef = useRef();
+	const cleanEventListenersRef: React.MutableRefObject<
+		( () => void ) | undefined
+	> = useRef();
 	cleanEventListenersRef.current = cleanEventListeners;
 
 	useEffect( () => {
 		return () => {
-			cleanEventListenersRef.current();
+			cleanEventListenersRef.current?.();
 		};
 	}, [] );
 
@@ -296,7 +325,7 @@ function InsertPoint( {
 	insertPosition,
 	disableAlpha,
 	__experimentalIsRenderedInSidebar,
-} ) {
+}: InsertPointProps ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
 	return (
 		<GradientColorPickerDropdown
