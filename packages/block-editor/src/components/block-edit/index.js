@@ -30,7 +30,8 @@ import { store as blockEditorStore } from '../../store';
 export { useBlockEditContext };
 
 // Please do not export this at the package level until we have a stable API.
-export const blockControlsFilterName = uuid();
+// Hook names must start with a letter.
+export const blockControlsFilterName = 'a' + uuid();
 
 function BlockControlFilters( props ) {
 	const { name, isSelected, clientId } = props;
