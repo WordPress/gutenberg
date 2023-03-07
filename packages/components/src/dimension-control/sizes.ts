@@ -21,8 +21,8 @@ import type { Size } from './types';
  * Finds the correct size object from the provided sizes
  * table by size slug (eg: `medium`)
  *
- * @param  sizes containing objects for each size definition.
- * @param  slug  a string representation of the size (eg: `medium`).
+ * @param sizes containing objects for each size definition.
+ * @param slug  a string representation of the size (eg: `medium`).
  */
 export const findSizeBySlug = ( sizes: Size[], slug: string ) =>
 	sizes.find( ( size ) => slug === size.slug );
