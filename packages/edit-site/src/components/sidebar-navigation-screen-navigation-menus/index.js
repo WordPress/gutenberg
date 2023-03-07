@@ -19,6 +19,7 @@ import { useHistory } from '../routes';
 import NavigationMenuContent from './navigation-menu-content';
 import SidebarButton from '../sidebar-button';
 import { NavigationMenuLoader } from './loader';
+import { unlock } from '../../private-apis';
 
 const noop = () => {};
 const NAVIGATION_MENUS_QUERY = { per_page: -1, status: 'publish' };
