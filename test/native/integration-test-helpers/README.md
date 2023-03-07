@@ -66,6 +66,10 @@ Sets up the media upload mock functions for testing.
 
 Changes the text of a TextInput component.
 
+### [`transformBlock`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/transform-block.js)
+
+Transform the specified block to another block using the Block actions menu.
+
 ### [`triggerBlockListLayout`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/trigger-block-list-layout.js)
 
 Helper for ensuring that all items of a Block List component are rendered.

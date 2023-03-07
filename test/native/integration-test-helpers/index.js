@@ -17,6 +17,7 @@ export { setupCoreBlocks } from './setup-core-blocks';
 export { setupMediaPicker } from './setup-media-picker';
 export { setupMediaUpload } from './setup-media-upload';
 export { changeTextOfTextInput } from './text-input-change-text';
+export { transformBlock } from './transform-block';
 export { triggerBlockListLayout } from './trigger-block-list-layout';
 export { waitForModalVisible } from './wait-for-modal-visible';
 export { waitForStoreResolvers } from './wait-for-store-resolvers';
