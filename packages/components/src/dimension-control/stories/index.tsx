@@ -29,6 +29,10 @@ export default {
 				mobile,
 			},
 		},
+		parameters: {
+			controls: { expanded: true },
+			docs: { source: { state: 'open' } },
+		},
 	},
 } as ComponentMeta< typeof DimensionControl >;
 
