@@ -16,7 +16,7 @@ import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../list/added-by';
 
-function AddedByDescription( { template } ) {
+function AddedByText( { template } ) {
 	const addedBy = useAddedBy( template );
 
 	if ( ! addedBy.text ) return null;
@@ -68,11 +68,7 @@ export default function SidebarNavigationScreenTemplate() {
 				/>
 			}
 			description={
-				description ? (
-					description
-				) : (
-					<AddedByDescription template={ record } />
-				)
+				description ? description : <AddedByText template={ record } />
 			}
 		/>
 	);
