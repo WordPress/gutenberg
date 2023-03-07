@@ -375,7 +375,7 @@ const tapPasteAboveElement = async ( driver, element ) => {
 	}
 };
 
-const selectTextFromTextInput = async ( driver, element ) => {
+const selectTextFromElement = async ( driver, element ) => {
 	if ( isAndroid() ) {
 		await longPressMiddleOfElement( driver, element, 0 );
 	} else {
@@ -697,7 +697,7 @@ module.exports = {
 	longPressMiddleOfElement,
 	setClipboard,
 	setupDriver,
-	selectTextFromTextInput,
+	selectTextFromElement,
 	stopDriver,
 	swipeDown,
 	swipeFromTo,
