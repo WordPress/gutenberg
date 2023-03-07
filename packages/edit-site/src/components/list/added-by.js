@@ -61,7 +61,6 @@ export function useAddedBy( template ) {
 				}
 
 				// Added by plugin.
-				// Template originally provided by a plugin, but customized by a user.
 				if ( template.has_theme_file && template.origin === 'plugin' ) {
 					return {
 						icon: pluginIcon,
@@ -108,23 +107,35 @@ export function useAddedBy( template ) {
 	);
 }
 
-function BaseAddedBy( { text, icon, imageUrl, isCustomized, templateType } ) {
+/**
+ * @param {Object} props
+ * @param {string} props.imageUrl
+ */
+function AvatarImage( { imageUrl } ) {
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
+
+	return (
+		<div
+			className={ classnames( 'edit-site-list-added-by__avatar', {
+				'is-loaded': isImageLoaded,
+			} ) }
+		>
+			<img
+				onLoad={ () => setIsImageLoaded( true ) }
+				alt=""
+				src={ imageUrl }
+			/>
+		</div>
+	);
+}
+
+export default function AddedBy( { template } ) {
+	const { text, icon, imageUrl, isCustomized } = useAddedBy( template );
 
 	return (
 		<HStack alignment="left">
 			{ imageUrl ? (
-				<div
-					className={ classnames( 'edit-site-list-added-by__avatar', {
-						'is-loaded': isImageLoaded,
-					} ) }
-				>
-					<img
-						onLoad={ () => setIsImageLoaded( true ) }
-						alt=""
-						src={ imageUrl }
-					/>
-				</div>
+				<AvatarImage imageUrl={ imageUrl } />
 			) : (
 				<div className="edit-site-list-added-by__icon">
 					<Icon icon={ icon } />
@@ -134,26 +145,12 @@ function BaseAddedBy( { text, icon, imageUrl, isCustomized, templateType } ) {
 				{ text }
 				{ isCustomized && (
 					<span className="edit-site-list-added-by__customized-info">
-						{ templateType === 'wp_template'
+						{ template.type === 'wp_template'
 							? _x( 'Customized', 'template' )
 							: _x( 'Customized', 'template part' ) }
 					</span>
 				) }
 			</span>
 		</HStack>
-	);
-}
-
-export default function AddedBy( { template } ) {
-	const addedBy = useAddedBy( template );
-
-	return (
-		<BaseAddedBy
-			icon={ addedBy.icon }
-			imageUrl={ addedBy.imageUrl }
-			text={ addedBy.text }
-			isCustomized={ addedBy.isCustomized }
-			templateType={ template.type }
-		/>
 	);
 }
