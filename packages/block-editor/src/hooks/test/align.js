@@ -18,6 +18,7 @@ import { SlotFillProvider } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockControls from '../../components/block-controls';
+import BlockEdit from '../../components/block-edit';
 import BlockEditorProvider from '../../components/provider';
 import {
 	getValidAlignments,
@@ -168,7 +169,9 @@ describe( 'align', () => {
 
 			render(
 				<SlotFillProvider>
-					<ToolbarControls { ...componentProps } />
+					<BlockEdit { ...componentProps }>
+						<ToolbarControls { ...componentProps } />
+					</BlockEdit>
 					<BlockControls.Slot group="block" />
 				</SlotFillProvider>
 			);
@@ -192,7 +195,9 @@ describe( 'align', () => {
 
 			render(
 				<SlotFillProvider>
-					<ToolbarControls { ...componentProps } />
+					<BlockEdit { ...componentProps }>
+						<ToolbarControls { ...componentProps } />
+					</BlockEdit>
 					<BlockControls.Slot group="block" />
 				</SlotFillProvider>
 			);

@@ -7,6 +7,7 @@ import { removeFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import './layout.js';
+import { blockControlsFilterName } from '../components/block-edit';
 
 // This filter is removed because layout styles shouldn't be added
 // until layout types are supported in the native version.
@@ -18,6 +19,6 @@ removeFilter(
 // This filter is removed because the layout controls shouldn't be
 // enabled until layout types are supported in the native version.
 removeFilter(
-	'editor.BlockEdit',
+	blockControlsFilterName,
 	'core/editor/layout/with-inspector-controls'
 );
