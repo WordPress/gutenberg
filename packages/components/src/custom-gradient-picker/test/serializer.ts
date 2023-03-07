@@ -12,24 +12,31 @@ import {
 describe( 'It should serialize a gradient', () => {
 	test( 'serializeGradientColor', () => {
 		expect(
-			serializeGradientColor( { type: 'rgba', value: [ 1, 2, 3, 0.5 ] } )
+			serializeGradientColor( {
+				type: 'rgba',
+				//NTS: For entire file - our tests were using numbers, but `gradientParser` (according to DefinitelyTyped) expects strings. I've updated the tests accordingly. Alternatively we could add some logic to our serializer so it accepts both and converts numbers to strings on the fly.
+				value: [ '1', '2', '3', '0.5' ],
+			} )
 		).toBe( 'rgba(1,2,3,0.5)' );
 
 		expect(
-			serializeGradientColor( { type: 'rgb', value: [ 255, 0, 0 ] } )
+			serializeGradientColor( {
+				type: 'rgb',
+				value: [ '255', '0', '0' ],
+			} )
 		).toBe( 'rgb(255,0,0)' );
 	} );
 
 	test( 'serializeGradientPosition', () => {
-		expect( serializeGradientPosition( { type: '%', value: 70 } ) ).toBe(
+		expect( serializeGradientPosition( { type: '%', value: '70' } ) ).toBe(
 			'70%'
 		);
 
-		expect( serializeGradientPosition( { type: '%', value: 0 } ) ).toBe(
+		expect( serializeGradientPosition( { type: '%', value: '0' } ) ).toBe(
 			'0%'
 		);
 
-		expect( serializeGradientPosition( { type: 'px', value: 4 } ) ).toBe(
+		expect( serializeGradientPosition( { type: 'px', value: '4' } ) ).toBe(
 			'4px'
 		);
 	} );
@@ -38,35 +45,35 @@ describe( 'It should serialize a gradient', () => {
 		expect(
 			serializeGradientColorStop( {
 				type: 'rgba',
-				value: [ 1, 2, 3, 0.5 ],
-				length: { type: '%', value: 70 },
+				value: [ '1', '2', '3', ' 0.5' ],
+				length: { type: '%', value: '70' },
 			} )
 		).toBe( 'rgba(1,2,3,0.5) 70%' );
 
 		expect(
 			serializeGradientColorStop( {
 				type: 'rgb',
-				value: [ 255, 0, 0 ],
-				length: { type: '%', value: 0 },
+				value: [ '255', '0', '0' ],
+				length: { type: '%', value: '0' },
 			} )
 		).toBe( 'rgb(255,0,0) 0%' );
 
 		expect(
 			serializeGradientColorStop( {
 				type: 'rgba',
-				value: [ 1, 2, 3, 0.5 ],
-				length: { type: 'px', value: 100 },
+				value: [ '1', '2', '3', ' 0.5' ],
+				length: { type: 'px', value: '100' },
 			} )
 		).toBe( 'rgba(1,2,3,0.5) 100px' );
 	} );
 
 	test( 'serializeGradientOrientation', () => {
 		expect(
-			serializeGradientOrientation( { type: 'angular', value: 40 } )
+			serializeGradientOrientation( { type: 'angular', value: '40' } )
 		).toBe( '40deg' );
 
 		expect(
-			serializeGradientOrientation( { type: 'angular', value: 0 } )
+			serializeGradientOrientation( { type: 'angular', value: '0' } )
 		).toBe( '0deg' );
 	} );
 
@@ -74,17 +81,17 @@ describe( 'It should serialize a gradient', () => {
 		expect(
 			serializeGradient( {
 				type: 'linear-gradient',
-				orientation: { type: 'angular', value: 40 },
+				orientation: { type: 'angular', value: '40' },
 				colorStops: [
 					{
 						type: 'rgba',
-						value: [ 1, 2, 3, 0.5 ],
-						length: { type: '%', value: 70 },
+						value: [ '1', '2', '3', '0.5' ],
+						length: { type: '%', value: '70' },
 					},
 					{
 						type: 'rgba',
-						value: [ 255, 1, 1, 0.9 ],
-						length: { type: '%', value: 40 },
+						value: [ '255', '1', '1', '0.9' ],
+						length: { type: '%', value: '40' },
 					},
 				],
 			} )
@@ -98,13 +105,13 @@ describe( 'It should serialize a gradient', () => {
 				colorStops: [
 					{
 						type: 'rgba',
-						value: [ 1, 2, 3, 0.5 ],
-						length: { type: '%', value: 70 },
+						value: [ '1', '2', '3', '0.5' ],
+						length: { type: '%', value: '70' },
 					},
 					{
 						type: 'rgba',
-						value: [ 255, 1, 1, 0.9 ],
-						length: { type: '%', value: 40 },
+						value: [ '255', '1', '1', '0.9' ],
+						length: { type: '%', value: '40' },
 					},
 				],
 			} )
@@ -117,12 +124,12 @@ describe( 'It should serialize a gradient', () => {
 					{
 						type: 'hex',
 						value: '000',
-						length: { type: '%', value: 70 },
+						length: { type: '%', value: '70' },
 					},
 					{
 						type: 'hex',
 						value: 'fff',
-						length: { type: '%', value: 40 },
+						length: { type: '%', value: '40' },
 					},
 				],
 			} )
@@ -131,27 +138,27 @@ describe( 'It should serialize a gradient', () => {
 		expect(
 			serializeGradient( {
 				type: 'linear-gradient',
-				orientation: { type: 'angular', value: 0 },
+				orientation: { type: 'angular', value: '0' },
 				colorStops: [
 					{
 						type: 'rgba',
-						value: [ 1, 2, 3, 0.5 ],
-						length: { type: '%', value: 0 },
+						value: [ '1', '2', '3', '0.5' ],
+						length: { type: '%', value: '0' },
 					},
 					{
 						type: 'rgba',
-						value: [ 255, 1, 1, 0.9 ],
-						length: { type: '%', value: 40 },
+						value: [ '255', '1', '1', '0.9' ],
+						length: { type: '%', value: '40' },
 					},
 					{
 						type: 'rgba',
-						value: [ 1, 2, 3, 0.5 ],
-						length: { type: '%', value: 100 },
+						value: [ '1', '2', '3', '0.5' ],
+						length: { type: '%', value: '100' },
 					},
 					{
 						type: 'rgba',
-						value: [ 10, 20, 30, 0.5 ],
-						length: { type: '%', value: 20 },
+						value: [ '10', '20', '30', '0.5' ],
+						length: { type: '%', value: '20' },
 					},
 				],
 			} )
