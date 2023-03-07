@@ -349,8 +349,9 @@ export const withPositionStyles = createHigherOrderComponent(
 			name,
 			POSITION_SUPPORT_KEY
 		);
+		const isPositionDisabled = useIsPositionDisabled( props );
 		const allowPositionStyles =
-			hasPositionBlockSupport && ! useIsPositionDisabled( props );
+			hasPositionBlockSupport && ! isPositionDisabled;
 
 		const id = useInstanceId( BlockListBlock );
 		const element = useContext( BlockList.__unstableElementContext );
