@@ -214,6 +214,17 @@ function Navigation( {
 		[ navigationMenus ]
 	);
 
+	const handleUpdateMenu = useCallback(
+		( menuId, options = { focusNavigationBlock: false } ) => {
+			const { focusNavigationBlock } = options;
+			setRef( menuId );
+			if ( focusNavigationBlock ) {
+				selectBlock( clientId );
+			}
+		},
+		[ selectBlock, clientId, setRef ]
+	);
+
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
 	// - the are uncontrolled inner blocks already present in the block.
 	// - the user is creating a new menu.
@@ -340,7 +351,13 @@ function Navigation( {
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceInnerBlocks( clientId, [ createBlock( 'core/page-list' ) ] );
 		}
-	}, [ clientId, isPlaceholder, ref ] );
+	}, [
+		clientId,
+		isPlaceholder,
+		ref,
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceInnerBlocks,
+	] );
 
 	// "loading" state:
 	// - there is a menu creation process in progress.
