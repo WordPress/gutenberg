@@ -14,7 +14,7 @@ export type Size = {
 	slug: string;
 };
 
-export type DimensionControlProps< IconProps = unknown > = {
+export type DimensionControlProps = {
 	/**
 	 * Label for the control.
 	 */
@@ -26,7 +26,7 @@ export type DimensionControlProps< IconProps = unknown > = {
 	/**
 	 * Optional icon rendered in front on the label.
 	 */
-	icon?: IconType< IconProps >;
+	icon?: IconType;
 	/**
 	 * Used to externally control the current value of the control.
 	 */
