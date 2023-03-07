@@ -214,6 +214,7 @@ async function runPerformanceTests( branches, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
 	const TEST_ROUNDS = options.rounds || 1;
 
+	log( process.version );
 	log( JSON.stringify( process.env, null, 2 ) );
 
 	// The default value doesn't work because commander provides an array.
