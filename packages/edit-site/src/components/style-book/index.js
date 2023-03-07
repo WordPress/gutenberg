@@ -312,6 +312,12 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => {
 		[ originalSettings ]
 	);
 
+	// Cache the list of blocks to avoid additional processing when the component is re-rendered.
+	const renderedBlocks = useMemo(
+		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+		[ blocks ]
+	);
+
 	return (
 		<button
 			className={ classnames( 'edit-site-style-book__example', {
@@ -330,7 +336,7 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => {
 			<div className="edit-site-style-book__example-preview">
 				<Disabled className="edit-site-style-book__example-preview__content">
 					<ExperimentalBlockEditorProvider
-						value={ Array.isArray( blocks ) ? blocks : [ blocks ] }
+						value={ renderedBlocks }
 						settings={ settings }
 					>
 						<BlockList renderAppender={ false } />
