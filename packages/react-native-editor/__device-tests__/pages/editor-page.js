@@ -201,14 +201,19 @@ class EditorPage {
 		const titleElement = isAndroid()
 			? 'Post title. Welcome to Gutenberg!, Updates the title.'
 			: 'post-title';
+
+		if ( options.autoscroll ) {
+			await swipeDown( this.driver );
+		}
+
 		const elements = await this.driver.elementsByAccessibilityId(
 			titleElement
 		);
 
-		if ( elements.length === 0 || ! elements[ 0 ].isDisplayed() ) {
-			if ( options.autoscroll ) {
-				await swipeDown( this.driver );
-			}
+		if (
+			elements.length === 0 ||
+			! ( await elements[ 0 ].isDisplayed() )
+		) {
 			return await this.getTitleElement( options );
 		}
 		return elements[ 0 ];
