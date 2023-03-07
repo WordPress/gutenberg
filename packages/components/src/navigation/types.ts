@@ -17,7 +17,7 @@ export type NavigationProps = {
 	 */
 	activeMenu?: string;
 	/**
-	 * The childred components.
+	 * The children components.
 	 */
 	children?: React.ReactNode;
 	/**
@@ -76,7 +76,7 @@ export type NavigationMenuProps = _NavigationMenuSearchProps & {
 	 */
 	onBackButtonClick?: React.MouseEventHandler< HTMLElement >;
 	/**
-	 * The childred components.
+	 * The children components.
 	 */
 	children?: React.ReactNode;
 	/**
@@ -130,7 +130,7 @@ export type NavigationGroupProps = {
 	 */
 	title?: string;
 	/**
-	 * The childred components.
+	 * The children components.
 	 */
 	children: React.ReactNode;
 };
@@ -157,7 +157,7 @@ export type NavigationItemBaseProps = {
 	 */
 	badge?: string | number;
 	/**
-	 * The childred components. When not specified, the item will render the
+	 * The children components. When not specified, the item will render the
 	 * default item UI.
 	 */
 	children?: React.ReactNode;
