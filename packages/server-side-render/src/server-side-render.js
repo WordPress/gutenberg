@@ -16,6 +16,26 @@ import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
 
 const EMPTY_OBJECT = {};
 
+// TODO: Hook this up to the actual logic in removeBlockSupportAttributes
+export const KNOWN_ATTRIBUTES = new Set( [
+	'backgroundColor',
+	'borderColor',
+	'fontFamily',
+	'fontSize',
+	'gradient',
+	'textColor',
+	'className',
+] );
+
+// TODO: Hook this up to the actual logic in removeBlockSupportAttributes
+export const KNOWN_STYLES = new Set( [
+	'border',
+	'color',
+	'elements',
+	'spacing',
+	'typography',
+] );
+
 export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {
 		context: 'edit',
