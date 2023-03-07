@@ -81,6 +81,7 @@ function ColorToolsPanel( {
 			label={ __( 'Color' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			hasInnerWrapper
 		>
 			{ children }
 		</ToolsPanel>
@@ -89,6 +90,8 @@ function ColorToolsPanel( {
 
 const DEFAULT_CONTROLS = {
 	text: true,
+	background: true,
+	link: true,
 };
 
 const popoverProps = {
@@ -157,11 +160,11 @@ function ColorPanelDropdown( {
 
 	return (
 		<ToolsPanelItem
+			className="block-editor-tools-panel-color-gradient-settings__item single-column"
 			hasValue={ hasValue }
 			label={ label }
 			onDeselect={ resetValue }
 			isShownByDefault={ isShownByDefault }
-			className="block-editor-tools-panel-color-gradient-settings__item"
 			panelId={ panelId }
 		>
 			<Dropdown
