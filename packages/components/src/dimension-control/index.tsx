@@ -15,7 +15,7 @@ import Icon from '../icon';
 import SelectControl from '../select-control';
 import sizesTable, { findSizeBySlug } from './sizes';
 import type { DimensionControlProps, Size } from './types';
-import type { SelectControlProps } from '../select-control/types';
+import type { SelectControlSingleSelectionProps } from '../select-control/types';
 
 /**
  * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
@@ -50,18 +50,16 @@ export function DimensionControl( props: DimensionControlProps ) {
 		className = '',
 	} = props;
 
-	const onChangeSpacingSize: SelectControlProps[ 'onChange' ] = ( val ) => {
-		/* TODO: We know `val` is going to be a string (and not an array of strings) because
-		we don't pass `multiple` to `SelectControl`. Reevaluate if we can get rid of the type cast
-		after https://github.com/WordPress/gutenberg/pull/47390 is finished. */
-		const theSize = findSizeBySlug( sizes, val as string );
+	const onChangeSpacingSize: SelectControlSingleSelectionProps[ 'onChange' ] =
+		( val ) => {
+			const theSize = findSizeBySlug( sizes, val );
 
-		if ( ! theSize || value === theSize.slug ) {
-			onChange?.( undefined );
-		} else if ( typeof onChange === 'function' ) {
-			onChange( theSize.slug );
-		}
-	};
+			if ( ! theSize || value === theSize.slug ) {
+				onChange?.( undefined );
+			} else if ( typeof onChange === 'function' ) {
+				onChange( theSize.slug );
+			}
+		};
 
 	const formatSizesAsOptions = ( theSizes: Size[] ) => {
 		const options = theSizes.map( ( { name, slug } ) => ( {
