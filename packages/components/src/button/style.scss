@@ -157,7 +157,15 @@
 		white-space: nowrap;
 		color: $components-color-accent;
 		background: transparent;
-		padding: $grid-unit-15 * 0.5; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
+
+		&:hover:not(:disabled) {
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			box-shadow: none;
+		}
+
+		&:active:not(:disabled) {
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+		}
 
 		.dashicon {
 			display: inline-block;
