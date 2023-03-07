@@ -64,7 +64,6 @@
 /packages/browserslist-config                   @ntwb @nerrad @ajitbohra
 /packages/create-block                          @gziolo @ryanwelcher
 /packages/create-block-tutorial-template        @gziolo @ryanwelcher
-/packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/docgen
 /packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
@@ -74,7 +73,6 @@
 /packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-puppeteer-axe                    @gziolo @ntwb @nerrad @ajitbohra
-/packages/library-export-default-webpack-plugin @ntwb @nerrad @ajitbohra
 /packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
 /packages/prettier-config                       @ntwb @gziolo
@@ -117,9 +115,9 @@
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @ellatrix @fluiddot
-/packages/rich-text                             @ellatrix @fluiddot
-/packages/block-editor/src/components/rich-text @ellatrix @fluiddot
+/packages/format-library                        @ellatrix @fluiddot @dcalhoun
+/packages/rich-text                             @ellatrix @fluiddot @dcalhoun
+/packages/block-editor/src/components/rich-text @ellatrix @fluiddot @dcalhoun
 
 # Project Management
 /.github

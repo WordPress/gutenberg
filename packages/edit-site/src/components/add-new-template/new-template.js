@@ -5,7 +5,8 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	NavigableMenu,
+	Tooltip,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
@@ -164,6 +165,11 @@ export default function NewTemplate( {
 	if ( ! missingTemplates.length ) {
 		return null;
 	}
+
+	const customTemplateDescription = __(
+		'Custom templates can be applied to any post or page.'
+	);
+
 	return (
 		<>
 			<DropdownMenu
@@ -181,7 +187,7 @@ export default function NewTemplate( {
 						{ isCreatingTemplate && (
 							<TemplateActionsLoadingScreen />
 						) }
-						<NavigableMenu className="edit-site-new-template-dropdown__popover">
+						<div className="edit-site-new-template-dropdown__menu-groups">
 							<MenuGroup label={ postType.labels.add_new_item }>
 								{ missingTemplates.map( ( template ) => {
 									const {
@@ -192,44 +198,63 @@ export default function NewTemplate( {
 										icon,
 									} = template;
 									return (
-										<MenuItem
-											icon={
-												icon ||
-												TEMPLATE_ICONS[ slug ] ||
-												post
-											}
-											iconPosition="left"
-											info={ description }
+										<Tooltip
 											key={ slug }
-											onClick={ () =>
-												onClick
-													? onClick( template )
-													: createTemplate( template )
-											}
+											position="top right"
+											text={ description }
+											className="edit-site-new-template-dropdown__menu-item-tooltip"
 										>
-											{ title }
-										</MenuItem>
+											<MenuItem
+												icon={
+													icon ||
+													TEMPLATE_ICONS[ slug ] ||
+													post
+												}
+												iconPosition="left"
+												onClick={ () =>
+													onClick
+														? onClick( template )
+														: createTemplate(
+																template
+														  )
+												}
+											>
+												{ title }
+												{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
+												 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
+												<VisuallyHidden>
+													{ description }
+												</VisuallyHidden>
+											</MenuItem>
+										</Tooltip>
 									);
 								} ) }
 							</MenuGroup>
 							<MenuGroup>
-								<MenuItem
-									icon={ customGenericTemplateIcon }
-									iconPosition="left"
-									info={ __(
-										'Custom templates can be applied to any post or page.'
-									) }
-									key="custom-template"
-									onClick={ () =>
-										setShowCustomGenericTemplateModal(
-											true
-										)
-									}
+								<Tooltip
+									position="top right"
+									text={ customTemplateDescription }
+									className="edit-site-new-template-dropdown__menu-item-tooltip"
 								>
-									{ __( 'Custom template' ) }
-								</MenuItem>
+									<MenuItem
+										icon={ customGenericTemplateIcon }
+										iconPosition="left"
+										onClick={ () =>
+											setShowCustomGenericTemplateModal(
+												true
+											)
+										}
+									>
+										{ __( 'Custom template' ) }
+										{ /* TODO: This probably won't be needed if the <Tooltip> component is accessible.
+										 * @see https://github.com/WordPress/gutenberg/issues/48222 */ }
+										<VisuallyHidden>
+											{ customTemplateDescription }
+										</VisuallyHidden>
+									</MenuItem>
+								</Tooltip>
 							</MenuGroup>
-						</NavigableMenu>
+						</div>
 					</>
 				) }
 			</DropdownMenu>

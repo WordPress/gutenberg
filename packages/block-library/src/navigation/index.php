@@ -348,7 +348,7 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 	$wp_insert_post_result = wp_insert_post(
 		array(
 			'post_content' => $classic_nav_menu_blocks,
-			'post_title'   => $classic_nav_menu->slug,
+			'post_title'   => $classic_nav_menu->name,
 			'post_name'    => $classic_nav_menu->slug,
 			'post_status'  => 'publish',
 			'post_type'    => 'wp_navigation',
@@ -446,8 +446,8 @@ function block_core_navigation_get_default_pages_fallback() {
 	$wp_insert_post_result = wp_insert_post(
 		array(
 			'post_content' => $default_blocks,
-			'post_title'   => 'Navigation', // TODO - use the template slug in future.
-			'post_name'    => 'Navigation', // TODO - use the template slug in future.
+			'post_title'   => _x( 'Navigation', 'Title of a Navigation menu' ),
+			'post_name'    => 'navigation',
 			'post_status'  => 'publish',
 			'post_type'    => 'wp_navigation',
 		),

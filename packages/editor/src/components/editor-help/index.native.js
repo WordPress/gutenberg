@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
+import { paramCase } from 'change-case';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { TransitionPresets } from '@react-navigation/stack';
 
@@ -56,6 +56,18 @@ const HELP_TOPICS = [
 		view: <CustomizeBlocks />,
 	},
 ];
+
+const kebabCaseSettings = {
+	splitRegexp: [
+		/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
+		/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
+	],
+	stripRegexp: /(\p{C}|\p{P}|\p{S})+/giu, // Anything that's not a punctuation, symbol or control/format character.
+};
+
+function kebabCase( string ) {
+	return paramCase( string, kebabCaseSettings );
+}
 
 function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 	const { postType } = useSelect( ( select ) => ( {

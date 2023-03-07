@@ -10,6 +10,7 @@ import { get, set } from 'lodash';
 import { useContext, useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -64,6 +65,7 @@ const VALID_SETTINGS = [
 	'typography.fontWeight',
 	'typography.letterSpacing',
 	'typography.lineHeight',
+	'typography.textColumns',
 	'typography.textDecoration',
 	'typography.textTransform',
 ];
@@ -177,7 +179,7 @@ export function useGlobalStyle(
 	switch ( source ) {
 		case 'all':
 			rawResult =
-				// The stlyes.css path is allowed to be empty, so don't revert to base if undefined.
+				// The styles.css path is allowed to be empty, so don't revert to base if undefined.
 				finalPath === 'styles.css'
 					? get( userConfig, finalPath )
 					: get( mergedConfig, finalPath );
@@ -265,6 +267,16 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
+		// The column-count style is named text column to reduce confusion with
+		// the columns block and manage expectations from the support.
+		// See: https://github.com/WordPress/gutenberg/pull/33587
+		if ( ! supportedStyles.includes( 'columnCount' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				textColumns: false,
+			};
+		}
+
 		[ 'contentSize', 'wideSize' ].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
 				updatedSettings.layout = {
@@ -303,6 +315,67 @@ export function useSettingsForBlockElement(
 			};
 		}
 
+		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
+			if (
+				! supportedStyles.includes(
+					'border' + key.charAt( 0 ).toUpperCase() + key.slice( 1 )
+				)
+			) {
+				updatedSettings.border = {
+					...updatedSettings.border,
+					[ key ]: false,
+				};
+			}
+		} );
+
 		return updatedSettings;
 	}, [ parentSettings, supportedStyles, supports ] );
+}
+
+export function useColorsPerOrigin( settings ) {
+	const customColors = settings?.color?.palette?.custom;
+	const themeColors = settings?.color?.palette?.theme;
+	const defaultColors = settings?.color?.palette?.default;
+	const shouldDisplayDefaultColors = settings?.color?.defaultPalette;
+
+	return useMemo( () => {
+		const result = [];
+		if ( themeColors && themeColors.length ) {
+			result.push( {
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
+				colors: themeColors,
+			} );
+		}
+		if (
+			shouldDisplayDefaultColors &&
+			defaultColors &&
+			defaultColors.length
+		) {
+			result.push( {
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
+				colors: defaultColors,
+			} );
+		}
+		if ( customColors && customColors.length ) {
+			result.push( {
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
+				colors: customColors,
+			} );
+		}
+		return result;
+	}, [
+		customColors,
+		themeColors,
+		defaultColors,
+		shouldDisplayDefaultColors,
+	] );
 }
