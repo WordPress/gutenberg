@@ -17,7 +17,6 @@ import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { forwardRef } from '@wordpress/element';
-import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -25,13 +24,10 @@ import { getQueryArgs } from '@wordpress/url';
 import { store as editSiteStore } from '../../store';
 import SiteIcon from '../site-icon';
 import { unlock } from '../../private-apis';
-import { useHistory } from '../routes';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
 const SiteHub = forwardRef( ( props, ref ) => {
-	const history = useHistory();
-	const { fromTemplateList } = getQueryArgs( window.location.href );
 	const { canvasMode, dashboardLink } = useSelect( ( select ) => {
 		select( editSiteStore ).getEditedPostType();
 		const { getCanvasMode, getSettings } = unlock(
@@ -56,14 +52,6 @@ const SiteHub = forwardRef( ( props, ref ) => {
 				label: __( 'Open Navigation Sidebar' ),
 				onClick: () => {
 					clearSelectedBlock();
-					if ( fromTemplateList ) {
-						history.push( {
-							path: '/wp_template/all',
-							postType: 'wp_template',
-							postId: undefined,
-							fromTemplateList: undefined,
-						} );
-					}
 					setCanvasMode( 'view' );
 				},
 		  };
