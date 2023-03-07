@@ -15,8 +15,6 @@ export default function NavigationItemBaseContent(
 			{ title && (
 				<ItemTitleUI
 					className="components-navigation__item-title"
-					// @ts-expect-error The only allowed variant is `muted` ?
-					variant="body.small"
 					as="span"
 				>
 					{ title }
