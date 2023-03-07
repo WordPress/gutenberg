@@ -353,7 +353,7 @@ module.exports = {
 			files: [
 				// Components package.
 				'packages/components/src/**/*.[tj]s?(x)',
-				// Navigaiton block.
+				// Navigation block.
 				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
 			],
 			excludedFiles: [ ...developmentFiles ],
