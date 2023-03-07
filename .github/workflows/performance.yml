@@ -60,7 +60,7 @@ jobs:
               uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
               with:
                   name: performance-results
-                  path: ${{ github.workspace }}/artifacts/*.results.json
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/*.results.json
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
@@ -109,5 +109,5 @@ jobs:
               if: always()
               with:
                   name: failures-artifacts
-                  path: ${{ github.workspace }}/artifacts/
+                  path: ${{ env.WP_ARTIFACTS_PATH }}
                   if-no-files-found: ignore

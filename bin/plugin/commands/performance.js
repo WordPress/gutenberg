@@ -210,7 +210,7 @@ async function runTestSuite(
 async function runPerformanceTests( branches, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
 	const TEST_ROUNDS = options.rounds || 1;
-	const ARTIFACTS_PATH = process.env.WP_ARTIFACTS_PATH || '';
+	const artifactsPath = process.env.WP_ARTIFACTS_PATH || '';
 
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
@@ -401,7 +401,7 @@ async function runPerformanceTests( branches, options ) {
 					testSuite,
 					performanceTestDirectory,
 					runKey,
-					ARTIFACTS_PATH
+					artifactsPath
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(
@@ -470,7 +470,7 @@ async function runPerformanceTests( branches, options ) {
 
 		const resultsFilename = testSuite + '-performance-results.json';
 		fs.writeFileSync(
-			path.resolve( ARTIFACTS_PATH, resultsFilename ),
+			path.resolve( artifactsPath, resultsFilename ),
 			JSON.stringify( results[ testSuite ], null, 2 )
 		);
 	}
