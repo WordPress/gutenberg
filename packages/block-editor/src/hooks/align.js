@@ -175,38 +175,30 @@ export const withToolbarControls = createHigherOrderComponent(
 /**
  * Override the default block element to add alignment wrapper props.
  *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
+ * @param {Object} props      Additional props applied to edit element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
  */
-export const withDataAlign = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
-		const { align } = attributes;
-		const blockAllowedAlignments = getValidAlignments(
-			getBlockSupport( name, 'align' ),
-			hasBlockSupport( name, 'alignWide', true )
-		);
-		const validAlignments = useAvailableAlignments(
-			blockAllowedAlignments
-		);
+export const useDataAlign = ( props, blockType, attributes ) => {
+	const { align } = attributes;
+	const blockAllowedAlignments = getValidAlignments(
+		getBlockSupport( blockType, 'align' ),
+		hasBlockSupport( blockType, 'alignWide', true )
+	);
+	const validAlignments = useAvailableAlignments( blockAllowedAlignments );
 
-		// If an alignment is not assigned, there's no need to go through the
-		// effort to validate or assign its value.
-		if ( align === undefined ) {
-			return <BlockListBlock { ...props } />;
-		}
-
-		let wrapperProps = props.wrapperProps;
-		if (
-			validAlignments.some( ( alignment ) => alignment.name === align )
-		) {
-			wrapperProps = { ...wrapperProps, 'data-align': align };
-		}
-
-		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	// If an alignment is not assigned, there's no need to go through the
+	// effort to validate or assign its value.
+	if ( align === undefined ) {
+		return props;
 	}
-);
+
+	if ( validAlignments.some( ( alignment ) => alignment.name === align ) ) {
+		return { ...props, 'data-align': align };
+	}
+
+	return props;
+};
 
 /**
  * Override props assigned to save component to inject alignment class name if
@@ -243,9 +235,9 @@ addFilter(
 	addAttribute
 );
 addFilter(
-	'editor.BlockListBlock',
+	'blockEditor.useBlockProps',
 	'core/editor/align/with-data-align',
-	withDataAlign
+	useDataAlign
 );
 addFilter(
 	'editor.BlockEdit',

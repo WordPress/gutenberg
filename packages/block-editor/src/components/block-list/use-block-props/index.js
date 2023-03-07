@@ -16,6 +16,7 @@ import {
 import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -75,6 +76,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
+		blockType,
+		attributes,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -95,22 +98,24 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
 			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
-			const attributes = getBlockAttributes( clientId );
-			const match = getActiveBlockVariation( blockName, attributes );
+			const _blockType = getBlockType( blockName );
+			const _attributes = getBlockAttributes( clientId );
+			const match = getActiveBlockVariation( blockName, _attributes );
 
 			return {
 				index: getBlockIndex( clientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
-				blockApiVersion: blockType?.apiVersion || 1,
-				blockTitle: match?.title || blockType?.title,
+				blockApiVersion: _blockType?.apiVersion || 1,
+				blockTitle: match?.title || _blockType?.title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+				blockType: _blockType,
+				attributes: _attributes,
 			};
 		},
 		[ clientId ]
@@ -147,9 +152,16 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		);
 	}
 
+	const filteredWrapperProps = applyFilters(
+		'blockEditor.useBlockProps',
+		wrapperProps,
+		blockType,
+		attributes
+	);
+
 	return {
 		tabIndex: 0,
-		...wrapperProps,
+		...filteredWrapperProps,
 		...props,
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
@@ -166,13 +178,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			} ),
 			className,
 			props.className,
-			wrapperProps.className,
+			filteredWrapperProps.className,
 			useBlockClassNames( clientId ),
 			useBlockDefaultClassName( clientId ),
 			useBlockCustomClassName( clientId ),
 			useBlockMovingModeClassNames( clientId )
 		),
-		style: { ...wrapperProps.style, ...props.style },
+		style: { ...filteredWrapperProps.style, ...props.style },
 	};
 }
 

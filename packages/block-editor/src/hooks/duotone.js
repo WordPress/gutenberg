@@ -11,7 +11,7 @@ import namesPlugin from 'colord/plugins/names';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { useMemo, useContext, createPortal } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -249,19 +249,11 @@ function scopeSelector( scope, selector ) {
 	return selectorsScoped.join( ', ' );
 }
 
-function BlockDuotoneStyles( { name, duotoneStyle, id } ) {
+function ConditionalInlineDuotone( { blockType, id, duotoneStyle } ) {
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
 		defaultSetting: 'color.defaultDuotone',
 	} );
-
-	const element = useContext( BlockList.__unstableElementContext );
-
-	// Portals cannot exist without a container.
-	// Guard against empty Duotone styles.
-	if ( ! element || ! duotoneStyle ) {
-		return null;
-	}
 
 	let colors = duotoneStyle;
 
@@ -270,7 +262,7 @@ function BlockDuotoneStyles( { name, duotoneStyle, id } ) {
 	}
 
 	const duotoneSupportSelectors = getBlockSupport(
-		name,
+		blockType,
 		'color.__experimentalDuotone'
 	);
 
@@ -282,55 +274,47 @@ function BlockDuotoneStyles( { name, duotoneStyle, id } ) {
 		duotoneSupportSelectors
 	);
 
-	return createPortal(
+	return (
 		<InlineDuotone
 			selector={ selectorsGroup }
 			id={ id }
 			colors={ colors }
-		/>,
-		element
+		/>
 	);
 }
 
 /**
  * Override the default block element to include duotone styles.
  *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
+ * @param {Object} props      Additional props applied to edit element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
  */
-const withDuotoneStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const duotoneSupport = getBlockSupport(
-			props.name,
-			'color.__experimentalDuotone'
-		);
+const useDuotoneStyles = ( props, blockType, attributes ) => {
+	const duotoneSupport = getBlockSupport(
+		blockType,
+		'color.__experimentalDuotone'
+	);
 
-		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
-		const className = duotoneSupport
-			? classnames( props?.className, id )
-			: props?.className;
-		const duotoneStyle = props?.attributes?.style?.color?.duotone;
+	const id = `wp-duotone-${ useInstanceId( useDuotoneStyles ) }`;
 
-		// CAUTION: code added before this line will be executed
-		// for all blocks, not just those that support duotone. Code added
-		// above this line should be carefully evaluated for its impact on
-		// performance.
-		return (
-			<>
-				{ duotoneSupport && duotoneStyle && (
-					<BlockDuotoneStyles
-						name={ props?.name }
-						duotoneStyle={ duotoneStyle }
-						id={ id }
-					/>
-				) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
-		);
-	},
-	'withDuotoneStyles'
-);
+	BlockList.useRootPortal(
+		duotoneSupport && (
+			<ConditionalInlineDuotone
+				id={ id }
+				blockType={ blockType }
+				duotoneStyle={ attributes?.style?.color?.duotone }
+			/>
+		)
+	);
+
+	return {
+		...props,
+		className: duotoneSupport
+			? classnames( props.className, id )
+			: props.className,
+	};
+};
 
 addFilter(
 	'blocks.registerBlockType',
@@ -343,7 +327,7 @@ addFilter(
 	withDuotoneControls
 );
 addFilter(
-	'editor.BlockListBlock',
+	'blockEditor.useBlockProps',
 	'core/editor/duotone/with-styles',
-	withDuotoneStyles
+	useDuotoneStyles
 );

@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { getBlockSupport } from '@wordpress/blocks';
 import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import { Platform, useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
@@ -331,66 +330,58 @@ function addEditProps( settings ) {
  * This adds inline styles for color palette colors.
  * Ideally, this is not needed and themes should load their palettes on the editor.
  *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type definition.
+ * @param {Object} attributes Block's attributes.
  */
-export const withBorderColorPaletteStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
-		const { borderColor, style } = attributes;
-		const { colors } = useMultipleOriginColorsAndGradients();
+export const useBorderColorPaletteStyles = ( props, blockType, attributes ) => {
+	const { borderColor, style } = attributes;
+	const { colors } = useMultipleOriginColorsAndGradients();
 
-		if (
-			! hasBorderSupport( name, 'color' ) ||
-			shouldSkipSerialization( name, BORDER_SUPPORT_KEY, 'color' )
-		) {
-			return <BlockListBlock { ...props } />;
-		}
-
-		const { color: borderColorValue } = getMultiOriginColor( {
-			colors,
-			namedColor: borderColor,
-		} );
-		const { color: borderTopColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable( style?.border?.top?.color ),
-		} );
-		const { color: borderRightColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable( style?.border?.right?.color ),
-		} );
-
-		const { color: borderBottomColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable(
-				style?.border?.bottom?.color
-			),
-		} );
-		const { color: borderLeftColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable( style?.border?.left?.color ),
-		} );
-
-		const extraStyles = {
-			borderTopColor: borderTopColor || borderColorValue,
-			borderRightColor: borderRightColor || borderColorValue,
-			borderBottomColor: borderBottomColor || borderColorValue,
-			borderLeftColor: borderLeftColor || borderColorValue,
-		};
-
-		let wrapperProps = props.wrapperProps;
-		wrapperProps = {
-			...props.wrapperProps,
-			style: {
-				...props.wrapperProps?.style,
-				...extraStyles,
-			},
-		};
-
-		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	if (
+		! hasBorderSupport( blockType, 'color' ) ||
+		shouldSkipSerialization( blockType, BORDER_SUPPORT_KEY, 'color' )
+	) {
+		return props;
 	}
-);
+
+	const { color: borderColorValue } = getMultiOriginColor( {
+		colors,
+		namedColor: borderColor,
+	} );
+	const { color: borderTopColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.top?.color ),
+	} );
+	const { color: borderRightColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.right?.color ),
+	} );
+
+	const { color: borderBottomColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.bottom?.color ),
+	} );
+	const { color: borderLeftColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.left?.color ),
+	} );
+
+	const extraStyles = {
+		borderTopColor: borderTopColor || borderColorValue,
+		borderRightColor: borderRightColor || borderColorValue,
+		borderBottomColor: borderBottomColor || borderColorValue,
+		borderLeftColor: borderLeftColor || borderColorValue,
+	};
+
+	return {
+		...props,
+		style: {
+			...props.style,
+			...extraStyles,
+		},
+	};
+};
 
 addFilter(
 	'blocks.registerBlockType',
@@ -411,7 +402,7 @@ addFilter(
 );
 
 addFilter(
-	'editor.BlockListBlock',
+	'blockEditor.useBlockProps',
 	'core/border/with-border-color-palette-styles',
-	withBorderColorPaletteStyles
+	useBorderColorPaletteStyles
 );

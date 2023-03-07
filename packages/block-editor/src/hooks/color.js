@@ -10,7 +10,6 @@ import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useRef, useEffect, useMemo, Platform } from '@wordpress/element';
-import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -536,64 +535,58 @@ export function ColorEdit( props ) {
  * This adds inline styles for color palette colors.
  * Ideally, this is not needed and themes should load their palettes on the editor.
  *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
  */
-export const withColorPaletteStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
-		const { backgroundColor, textColor } = attributes;
-		const userPalette = useSetting( 'color.palette.custom' );
-		const themePalette = useSetting( 'color.palette.theme' );
-		const defaultPalette = useSetting( 'color.palette.default' );
-		const colors = useMemo(
-			() => [
-				...( userPalette || [] ),
-				...( themePalette || [] ),
-				...( defaultPalette || [] ),
-			],
-			[ userPalette, themePalette, defaultPalette ]
-		);
-		if (
-			! hasColorSupport( name ) ||
-			shouldSkipSerialization( name, COLOR_SUPPORT_KEY )
-		) {
-			return <BlockListBlock { ...props } />;
-		}
-		const extraStyles = {};
-
-		if (
-			textColor &&
-			! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'text' )
-		) {
-			extraStyles.color = getColorObjectByAttributeValues(
-				colors,
-				textColor
-			)?.color;
-		}
-		if (
-			backgroundColor &&
-			! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'background' )
-		) {
-			extraStyles.backgroundColor = getColorObjectByAttributeValues(
-				colors,
-				backgroundColor
-			)?.color;
-		}
-
-		let wrapperProps = props.wrapperProps;
-		wrapperProps = {
-			...props.wrapperProps,
-			style: {
-				...extraStyles,
-				...props.wrapperProps?.style,
-			},
-		};
-
-		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+export const useColorPaletteStyles = ( props, blockType, attributes ) => {
+	const { backgroundColor, textColor } = attributes;
+	const userPalette = useSetting( 'color.palette.custom' );
+	const themePalette = useSetting( 'color.palette.theme' );
+	const defaultPalette = useSetting( 'color.palette.default' );
+	const colors = useMemo(
+		() => [
+			...( userPalette || [] ),
+			...( themePalette || [] ),
+			...( defaultPalette || [] ),
+		],
+		[ userPalette, themePalette, defaultPalette ]
+	);
+	if (
+		! hasColorSupport( blockType ) ||
+		shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY )
+	) {
+		return props;
 	}
-);
+	const extraStyles = {};
+
+	if (
+		textColor &&
+		! shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY, 'text' )
+	) {
+		extraStyles.color = getColorObjectByAttributeValues(
+			colors,
+			textColor
+		)?.color;
+	}
+	if (
+		backgroundColor &&
+		! shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY, 'background' )
+	) {
+		extraStyles.backgroundColor = getColorObjectByAttributeValues(
+			colors,
+			backgroundColor
+		)?.color;
+	}
+
+	return {
+		...props,
+		style: {
+			...extraStyles,
+			...props.style,
+		},
+	};
+};
 
 const MIGRATION_PATHS = {
 	linkColor: [ [ 'style', 'elements', 'link', 'color', 'text' ] ],
@@ -642,9 +635,9 @@ addFilter(
 );
 
 addFilter(
-	'editor.BlockListBlock',
+	'blockEditor.useBlockProps',
 	'core/color/with-color-palette-styles',
-	withColorPaletteStyles
+	useColorPaletteStyles
 );
 
 addFilter(

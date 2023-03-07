@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useContext, useMemo, createPortal } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -365,89 +365,99 @@ export const withBlockControls = createHigherOrderComponent(
 	'withToolbarControls'
 );
 
+function ElementStyles( {
+	blockType,
+	rawElementsStyles,
+	blockElementsContainerIdentifier,
+} ) {
+	const skipLinkColorSerialization = shouldSkipSerialization(
+		blockType,
+		COLOR_SUPPORT_KEY,
+		'link'
+	);
+	const styles = useMemo( () => {
+		const elementCssRules = [];
+		if (
+			rawElementsStyles &&
+			Object.keys( rawElementsStyles ).length > 0
+		) {
+			// Remove values based on whether serialization has been skipped for a specific style.
+			const filteredElementsStyles = {
+				...rawElementsStyles,
+				link: {
+					...rawElementsStyles.link,
+					color: ! skipLinkColorSerialization
+						? rawElementsStyles.link?.color
+						: undefined,
+				},
+			};
+
+			for ( const [ elementName, elementStyles ] of Object.entries(
+				filteredElementsStyles
+			) ) {
+				const cssRule = compileCSS( elementStyles, {
+					// The .editor-styles-wrapper selector is required on elements styles. As it is
+					// added to all other editor styles, not providing it causes reset and global
+					// styles to override element styles because of higher specificity.
+					selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
+				} );
+				if ( !! cssRule ) {
+					elementCssRules.push( cssRule );
+				}
+			}
+		}
+		return elementCssRules.length > 0 ? elementCssRules : undefined;
+	}, [
+		rawElementsStyles,
+		blockElementsContainerIdentifier,
+		skipLinkColorSerialization,
+	] );
+
+	if ( ! styles ) {
+		return null;
+	}
+
+	return (
+		<style
+			dangerouslySetInnerHTML={ {
+				__html: styles,
+			} }
+		/>
+	);
+}
+
 /**
  * Override the default block element to include elements styles.
  *
- * @param {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
+ * @param {Object} props      Additional props applied to edit element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
  */
-const withElementsStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
-			BlockListBlock
-		) }`;
+const useElementsStyles = ( props, blockType, attributes ) => {
+	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
+		useElementsStyles
+	) }`;
+	const rawElementsStyles = attributes.style?.elements;
 
-		const skipLinkColorSerialization = shouldSkipSerialization(
-			props.name,
-			COLOR_SUPPORT_KEY,
-			'link'
-		);
-
-		const styles = useMemo( () => {
-			const rawElementsStyles = props.attributes.style?.elements;
-			const elementCssRules = [];
-			if (
-				rawElementsStyles &&
-				Object.keys( rawElementsStyles ).length > 0
-			) {
-				// Remove values based on whether serialization has been skipped for a specific style.
-				const filteredElementsStyles = {
-					...rawElementsStyles,
-					link: {
-						...rawElementsStyles.link,
-						color: ! skipLinkColorSerialization
-							? rawElementsStyles.link?.color
-							: undefined,
-					},
-				};
-
-				for ( const [ elementName, elementStyles ] of Object.entries(
-					filteredElementsStyles
-				) ) {
-					const cssRule = compileCSS( elementStyles, {
-						// The .editor-styles-wrapper selector is required on elements styles. As it is
-						// added to all other editor styles, not providing it causes reset and global
-						// styles to override element styles because of higher specificity.
-						selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
-					} );
-					if ( !! cssRule ) {
-						elementCssRules.push( cssRule );
-					}
+	BlockList.useRootPortal(
+		rawElementsStyles && (
+			<ElementStyles
+				blockType={ blockType }
+				rawElementsStyles={ rawElementsStyles }
+				blockElementsContainerIdentifier={
+					blockElementsContainerIdentifier
 				}
-			}
-			return elementCssRules.length > 0 ? elementCssRules : undefined;
-		}, [ props.attributes.style?.elements ] );
+			/>
+		)
+	);
 
-		const element = useContext( BlockList.__unstableElementContext );
-
-		return (
-			<>
-				{ styles &&
-					element &&
-					createPortal(
-						<style
-							dangerouslySetInnerHTML={ {
-								__html: styles,
-							} }
-						/>,
-						element
-					) }
-
-				<BlockListBlock
-					{ ...props }
-					className={
-						props.attributes.style?.elements
-							? classnames(
-									props.className,
-									blockElementsContainerIdentifier
-							  )
-							: props.className
-					}
-				/>
-			</>
-		);
-	}
-);
+	return {
+		...props,
+		className: attributes.style?.elements
+			? classnames( props.className, blockElementsContainerIdentifier )
+			: props.className,
+	};
+};
 
 addFilter(
 	'blocks.registerBlockType',
@@ -474,7 +484,7 @@ addFilter(
 );
 
 addFilter(
-	'editor.BlockListBlock',
+	'blockEditor.useBlockProps',
 	'core/editor/with-elements-styles',
-	withElementsStyles
+	useElementsStyles
 );

@@ -5,10 +5,8 @@ import {
 	BlockList,
 	__experimentalGetGapCSSValue as getGapCSSValue,
 } from '@wordpress/block-editor';
-import { useContext, createPortal } from '@wordpress/element';
 
 export default function GapStyles( { blockGap, clientId } ) {
-	const styleElement = useContext( BlockList.__unstableElementContext );
 	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
 	// gap on the gallery.
 	const fallbackValue = `var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )`;
@@ -35,11 +33,5 @@ export default function GapStyles( { blockGap, clientId } ) {
 		gap: ${ gapValue }
 	}`;
 
-	const GapStyle = () => {
-		return <style>{ gap }</style>;
-	};
-
-	return gap && styleElement
-		? createPortal( <GapStyle />, styleElement )
-		: null;
+	BlockList.useRootPortal( gap ? <style>{ gap }</style> : null );
 }

@@ -14,12 +14,7 @@ import {
 } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import {
-	useContext,
-	useMemo,
-	createPortal,
-	Platform,
-} from '@wordpress/element';
+import { useMemo, Platform } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -338,61 +333,57 @@ export const withInspectorControls = createHigherOrderComponent(
 /**
  * Override the default block element to add the position styles.
  *
- * @param {Function} BlockListBlock Original component.
  *
- * @return {Function} Wrapped component.
+ * @param {Object} props      Additional props applied to edit element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
  */
-export const withPositionStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
-		const hasPositionBlockSupport = hasBlockSupport(
-			name,
-			POSITION_SUPPORT_KEY
-		);
-		const allowPositionStyles =
-			hasPositionBlockSupport && ! useIsPositionDisabled( props );
+export const usePositionStyles = ( props, blockType, attributes ) => {
+	const hasPositionBlockSupport = hasBlockSupport(
+		blockType,
+		POSITION_SUPPORT_KEY
+	);
+	const allowPositionStyles = ! useIsPositionDisabled( props );
+	const id = useInstanceId( usePositionStyles );
 
-		const id = useInstanceId( BlockListBlock );
-		const element = useContext( BlockList.__unstableElementContext );
+	// Higher specificity to override defaults in editor UI.
+	const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
 
-		// Higher specificity to override defaults in editor UI.
-		const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
-
-		// Get CSS string for the current position values.
-		let css;
-		if ( allowPositionStyles ) {
-			css =
-				getPositionCSS( {
-					selector: positionSelector,
-					style: attributes?.style,
-				} ) || '';
-		}
-
-		// Attach a `wp-container-` id-based class name.
-		const className = classnames( props?.className, {
-			[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
-			[ `is-position-${ attributes?.style?.position?.type }` ]:
-				allowPositionStyles &&
-				!! css &&
-				!! attributes?.style?.position?.type,
-		} );
-
-		return (
-			<>
-				{ allowPositionStyles &&
-					element &&
-					!! css &&
-					createPortal( <style>{ css }</style>, element ) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
-		);
+	// Get CSS string for the current position values.
+	let css;
+	if ( allowPositionStyles ) {
+		css =
+			getPositionCSS( {
+				selector: positionSelector,
+				style: attributes?.style,
+			} ) || '';
 	}
-);
+
+	// Attach a `wp-container-` id-based class name.
+	const className = classnames( props?.className, {
+		[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+		[ `is-position-${ attributes?.style?.position?.type }` ]:
+			allowPositionStyles &&
+			!! css &&
+			!! attributes?.style?.position?.type,
+	} );
+
+	BlockList.useRootPortal(
+		hasPositionBlockSupport && allowPositionStyles && !! css && (
+			<style>{ css }</style>
+		)
+	);
+
+	return {
+		...props,
+		className,
+	};
+};
 
 addFilter(
-	'editor.BlockListBlock',
+	'blockEditor.useBlockProps',
 	'core/editor/position/with-position-styles',
-	withPositionStyles
+	usePositionStyles
 );
 addFilter(
 	'editor.BlockEdit',
