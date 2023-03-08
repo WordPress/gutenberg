@@ -200,7 +200,8 @@ function Navigation( {
 	const isConvertingClassicMenu =
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
-	// Only autofallback to published menus.
+	// Only auto-fallback to the latest published menu.
+	// The REST API already returns items sorted by publishing date.
 	const fallbackNavigationMenuId = navigationMenus?.find(
 		( menu ) => menu.status === 'publish'
 	)?.id;
