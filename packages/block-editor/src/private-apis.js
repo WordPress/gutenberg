@@ -6,6 +6,7 @@ import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import OffCanvasEditor from './components/off-canvas-editor';
 import LeafMoreMenu from './components/off-canvas-editor/leaf-more-menu';
+import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -16,4 +17,5 @@ lock( privateApis, {
 	ExperimentalBlockEditorProvider,
 	LeafMoreMenu,
 	OffCanvasEditor,
+	PrivateInserter,
 } );

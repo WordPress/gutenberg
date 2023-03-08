@@ -13,15 +13,18 @@
 import { _x } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import type { Size } from './types';
+
+/**
  * Finds the correct size object from the provided sizes
  * table by size slug (eg: `medium`)
  *
- * @param {Array}  sizes containing objects for each size definition.
- * @param {string} slug  a string representation of the size (eg: `medium`).
- *
- * @return {Object} the matching size definition.
+ * @param sizes containing objects for each size definition.
+ * @param slug  a string representation of the size (eg: `medium`).
  */
-export const findSizeBySlug = ( sizes, slug ) =>
+export const findSizeBySlug = ( sizes: Size[], slug: string ) =>
 	sizes.find( ( size ) => slug === size.slug );
 
 export default [

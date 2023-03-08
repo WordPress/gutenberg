@@ -699,5 +699,28 @@ describe( 'FontSizePicker', () => {
 				screen.queryByRole( 'button', { name: 'Reset' } )
 			).not.toBeInTheDocument();
 		} );
+
+		it( 'applies custom units to custom font size control', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<FontSizePicker
+					__nextHasNoMarginBottom
+					fontSizes={ fontSizes }
+					value={ fontSizes[ 0 ].size }
+					units={ [ 'px', 'ch', 'ex' ] }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Set custom size' } )
+			);
+
+			const units = screen.getAllByRole( 'option' );
+			expect( units ).toHaveLength( 3 );
+			expect( units[ 0 ] ).toHaveAccessibleName( 'px' );
+			expect( units[ 1 ] ).toHaveAccessibleName( 'ch' );
+			expect( units[ 2 ] ).toHaveAccessibleName( 'ex' );
+		} );
 	}
 } );
