@@ -180,6 +180,10 @@ class WP_Style_Engine_CSS_Declarations {
 		$spacer              = $should_prettify ? ' ' : '';
 
 		foreach ( $declarations_array as $property => $value ) {
+			if ( 0 === strpos( $property, '--' ) ) { // Account for CSS variables.
+				$declarations_output .= "{$indent}{$property}:{$spacer}{$value};$suffix";
+				continue;
+			}
 			$filtered_declaration = static::filter_declaration( $property, $value, $spacer );
 			if ( $filtered_declaration ) {
 				$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
