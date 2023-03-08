@@ -44,7 +44,7 @@ describe( 'It should serialize a gradient', () => {
 		expect(
 			serializeGradientColorStop( {
 				type: 'rgba',
-				value: [ '1', '2', '3', ' 0.5' ],
+				value: [ '1', '2', '3', '0.5' ],
 				length: { type: '%', value: '70' },
 			} )
 		).toBe( 'rgba(1,2,3,0.5) 70%' );
@@ -60,7 +60,7 @@ describe( 'It should serialize a gradient', () => {
 		expect(
 			serializeGradientColorStop( {
 				type: 'rgba',
-				value: [ '1', '2', '3', ' 0.5' ],
+				value: [ '1', '2', '3', '0.5' ],
 				length: { type: 'px', value: '100' },
 			} )
 		).toBe( 'rgba(1,2,3,0.5) 100px' );
