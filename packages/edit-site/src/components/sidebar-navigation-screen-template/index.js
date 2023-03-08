@@ -1,10 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
+import {
+	__experimentalUseNavigator as useNavigator,
+	Icon,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,40 +26,55 @@ function useTemplateTitleAndDescription( postType, postId ) {
 	);
 	const addedBy = useAddedBy( postType, postId );
 	const title = getTitle();
-	let description = getDescription();
+	let descriptionText = getDescription();
 
-	if ( ! description && addedBy.text ) {
-		const authorText = addedBy.isCustomized
-			? sprintf(
-					/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
-					__( '%s (customized)' ),
-					addedBy.text
-			  )
-			: addedBy.text;
-
+	if ( ! descriptionText && addedBy.text ) {
 		if ( record.type === 'wp_template' && record.is_custom ) {
-			description = sprintf(
-				/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
-				__(
-					'This is a custom template that can be applied manually to any Post or Page, added by %s.'
-				),
-				authorText
+			descriptionText = __(
+				'This is a custom template that can be applied manually to any Post or Page.'
 			);
 		} else if ( record.type === 'wp_template_part' ) {
-			description = sprintf(
-				// translators: 1: template part title e.g: "Header". 2: The author. Could be either the theme's name, plugin's name, or user's name.
-				__( 'This is your %1$s template part, added by %2$s.' ),
-				getTitle(),
-				authorText
-			);
-		} else {
-			description = sprintf(
-				/* translators: %s: The author. Could be either the theme's name, plugin's name, or user's name. */
-				__( 'Added by %s.' ),
-				authorText
+			descriptionText = sprintf(
+				// translators: %s: template part title e.g: "Header".
+				__( 'This is your %s template part.' ),
+				getTitle()
 			);
 		}
 	}
+
+	const description = (
+		<>
+			{ descriptionText }
+
+			{ addedBy.text && (
+				<span className="edit-site-sidebar-navigation-screen-template__added-by-description">
+					<span className="edit-site-sidebar-navigation-screen-template__added-by-description-author">
+						<span className="edit-site-sidebar-navigation-screen-template__added-by-description-author-icon">
+							{ addedBy.imageUrl ? (
+								<img
+									src={ addedBy.imageUrl }
+									alt=""
+									width="24"
+									height="24"
+								/>
+							) : (
+								<Icon icon={ addedBy.icon } />
+							) }
+						</span>
+						{ addedBy.text }
+					</span>
+
+					{ addedBy.isCustomized && (
+						<span className="edit-site-sidebar-navigation-screen-template__added-by-description-customized">
+							{ postType === 'wp_template'
+								? _x( '(Customized)', 'template' )
+								: _x( '(Customized)', 'template part' ) }
+						</span>
+					) }
+				</span>
+			) }
+		</>
+	);
 
 	return { title, description };
 }
