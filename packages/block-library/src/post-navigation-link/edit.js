@@ -22,6 +22,8 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 export default function PostNavigationLinkEdit( {
 	attributes: {
@@ -59,6 +61,41 @@ export default function PostNavigationLinkEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+
+	// We need to know the post type in order to get all supported taxonomies.
+	const postType = useSelect(
+		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+		// Blocks can be loaded into a *non-post* block editor.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		( select ) => select( 'core/editor' ).getCurrentPostType(),
+		[]
+	);
+	const taxonomies = useSelect( ( select ) => {
+		const { getTaxonomies } = select( coreStore );
+		const filteredTaxonomies = getTaxonomies( {
+			type: postType,
+			per_page: -1,
+			context: 'view',
+		} );
+		return filteredTaxonomies;
+	}, [] );
+	const getTaxonomyOptions = () => {
+		const selectOption = {
+			label: __( '- Select -' ),
+			value: '',
+			disabled: true,
+		};
+		const taxonomyOptions = ( taxonomies ?? [] )
+			.filter( ( tax ) => tax.slug !== 'nav_menu' )
+			.map( ( item ) => {
+				return {
+					value: item.slug,
+					label: item.name,
+				};
+			} );
+
+		return [ selectOption, ...taxonomyOptions ];
+	};
 
 	return (
 		<>
@@ -125,6 +162,8 @@ export default function PostNavigationLinkEdit( {
 							) }
 						/>
 					</ToggleGroupControl>
+				</PanelBody>
+				<PanelBody title={ __( 'Filters' ) }>
 					<ToggleControl
 						label={ __(
 							'Only link to posts in the same taxonomy term'
@@ -137,34 +176,23 @@ export default function PostNavigationLinkEdit( {
 						}
 					/>
 					{ inSameTerm && (
-						<>
-							<SelectControl
-								label={ __( 'Taxonomy' ) }
-								value={ taxonomy }
-								options={ [
-									{
-										value: 'category',
-										label: __( 'Category' ),
-									},
-									{
-										value: 'post_tag',
-										label: __( 'Tag' ),
-									},
-								] }
-								onChange={ ( value ) =>
-									setAttributes( { taxonomy: value } )
-								}
-							/>
-							<InputControl
-								label={ __( 'Add terms to exclude' ) }
-								help={ __( 'Separate terms with comma.' ) }
-								value={ excludedTerms }
-								onChange={ ( value ) =>
-									setAttributes( { excludedTerms: value } )
-								}
-							/>
-						</>
+						<SelectControl
+							label={ __( 'Taxonomy' ) }
+							value={ taxonomy }
+							options={ getTaxonomyOptions() }
+							onChange={ ( value ) =>
+								setAttributes( { taxonomy: value } )
+							}
+						/>
 					) }
+					<InputControl
+						label={ __( 'Add terms to exclude' ) }
+						help={ __( 'Separate terms with comma.' ) }
+						value={ excludedTerms }
+						onChange={ ( value ) =>
+							setAttributes( { excludedTerms: value } )
+						}
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<BlockControls>

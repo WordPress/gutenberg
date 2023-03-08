@@ -95,8 +95,30 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	}
 
 	$in_same_term   = isset( $attributes['inSameTerm'] ) ? $attributes['inSameTerm'] : false;
-	$excluded_terms = isset( $attributes['excludedTerms'] ) && $in_same_term ? $attributes['excludedTerms'] : '';
 	$taxonomy       = isset( $attributes['taxonomy'] ) && $in_same_term ? $attributes['taxonomy'] : '';
+	$excluded_terms = '';
+
+	// Get the term id of each excluded term.
+	if ( isset( $attributes['excludedTerms'] ) ) {
+		$excluded_terms = explode( ',', sanitize_text_field( $attributes['excludedTerms'] ) );
+		//Get the taxonomies of the current post type
+		$taxonomies = get_object_taxonomies( get_post_type() );
+		//The user may have entered the taxonomy slug, name or id.
+		$types  = array( 'slug', 'name', 'term_id', 'id', 'ID', 'term_taxonomy_id' );
+		$result = array();
+		foreach ( $excluded_terms as $term ) {
+			$term = trim( $term );
+			foreach ( $taxonomies as $taxonomy ) {
+				foreach ( $types as $type ) {
+					$termid = get_term_by( $type, $term, $taxonomy );
+					if ( $termid ) {
+						$result[] = $termid->term_taxonomy_id;
+					}
+				}
+			}
+		}
+		$excluded_terms = array_unique( $result );
+	}
 
 	// The dynamic portion of the function name, `$navigation_type`,
 	// refers to the type of adjacency, 'next' or 'previous'.
