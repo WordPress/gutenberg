@@ -25,6 +25,7 @@
 .edit-site-sidebar-navigation-screen-navigation-menus__content {
 	.offcanvas-editor-list-view-leaf {
 		max-width: calc(100% - #{ $grid-unit-05 });
+		border-radius: $radius-block-ui;
 		&:hover,
 		&:focus,
 		&[aria-current] {
@@ -59,4 +60,8 @@
 			color: $white;
 		}
 	}
+}
+
+.edit-site-sidebar-navigation-screen-navigation-menus__content .popover-slot .wp-block-navigation-submenu {
+	display: none;
 }

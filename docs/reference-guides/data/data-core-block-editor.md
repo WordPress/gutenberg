@@ -860,6 +860,20 @@ _Returns_
 
 -   `string`: Client Id of moving block.
 
+### hasDraggedInnerBlock
+
+Returns true if one of the block's inner blocks is dragged.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block client ID.
+-   _deep_ `boolean`: Perform a deep check.
+
+_Returns_
+
+-   `boolean`: Whether the block has an inner block dragged
+
 ### hasInserterItems
 
 Determines whether there are items to show in the inserter.
@@ -909,7 +923,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the block as an inner block selected
+-   `boolean`: Whether the block has an inner block selected
 
 ### isAncestorBeingDragged
 
