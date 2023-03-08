@@ -536,11 +536,8 @@ export function PaletteEdit( {
 						<PaletteEditListView< typeof elements[ number ] >
 							canOnlyChangeValues={ canOnlyChangeValues }
 							elements={ elements }
-							onChange={
-								onChange as (
-									newElements?: Array< Color | Gradient >
-								) => void
-							}
+							// @ts-expect-error TODO: Don't know how to resolve
+							onChange={ onChange }
 							editingElement={ editingElement }
 							setEditingElement={ setEditingElement }
 							slugPrefix={ slugPrefix }
@@ -555,7 +552,7 @@ export function PaletteEdit( {
 								newElement: typeof elements[ number ]
 							) => {
 								debounceOnChange(
-									// @ts-expect-error
+									// @ts-expect-error TODO: Don't know how to resolve
 									elements.map(
 										(
 											currentElement: typeof elements[ number ],
