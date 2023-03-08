@@ -285,7 +285,6 @@ export default function VisualEditor( { styles } ) {
 			? { ...globalLayoutSettings, ...layout, type: 'constrained' }
 			: { ...globalLayoutSettings, ...layout, type: 'default' };
 	}, [
-		layout,
 		layout?.type,
 		layout?.inherit,
 		layout?.contentSize,
