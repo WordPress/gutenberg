@@ -379,6 +379,11 @@ async function runPerformanceTests( branches, options ) {
 
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
 	const results = {};
+	const wpEnvPath = path.join(
+		performanceTestDirectory,
+		'node_modules/.bin/wp-env'
+	);
+
 	for ( const testSuite of testSuites ) {
 		results[ testSuite ] = {};
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
@@ -393,7 +398,7 @@ async function runPerformanceTests( branches, options ) {
 				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
 				log( '        >> Starting the environment.' );
 				await runShellScript(
-					'../../tests/node_modules/.bin/wp-env start',
+					`${ wpEnvPath } start`,
 					environmentDirectory
 				);
 				log( '        >> Running the test.' );
@@ -405,7 +410,7 @@ async function runPerformanceTests( branches, options ) {
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(
-					'../../tests/node_modules/.bin/wp-env stop',
+					`${ wpEnvPath } stop`,
 					environmentDirectory
 				);
 			}
