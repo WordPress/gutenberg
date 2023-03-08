@@ -32,13 +32,24 @@ export default function PostExcerptEditor( {
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
-	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
-
 	const [
 		rawExcerpt,
 		setExcerpt,
 		{ rendered: renderedExcerpt, protected: isProtected } = {},
 	] = useEntityProp( 'postType', postType, 'excerpt', postId );
+
+	/**
+	 * The excerpt is editable if:
+	 * - The user can edit the post
+	 * - It is not a descendent of a Query Loop block
+	 * - The post type supports excerpts
+	 */
+	const isEditable =
+		userCanEdit &&
+		! isDescendentOfQueryLoop &&
+		renderedExcerpt &&
+		rawExcerpt;
+
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -122,10 +133,11 @@ export default function PostExcerptEditor( {
 	/**
 	 * The excerpt length setting needs to be applied to both
 	 * the raw and the rendered excerpt depending on which is being used.
+	 * If there is no excerpt the value is set to '' to make sure it is not undefined.
 	 */
 	let rawOrRenderedExcerpt = !! renderedExcerpt
 		? strippedRenderedExcerpt
-		: rawExcerpt;
+		: rawExcerpt || '';
 
 	rawOrRenderedExcerpt = rawOrRenderedExcerpt.trim();
 
