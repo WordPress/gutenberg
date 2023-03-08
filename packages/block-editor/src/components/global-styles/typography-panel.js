@@ -228,7 +228,7 @@ export default function TypographyPanel( {
 			immutableSet( value, [ 'typography', 'lineHeight' ], newValue )
 		);
 	};
-	const hasLineHeight = () => !! value?.typography?.lineHeight;
+	const hasLineHeight = () => value?.typography?.lineHeight !== undefined;
 	const resetLineHeight = () => setLineHeight( undefined );
 
 	// Letter Spacing
