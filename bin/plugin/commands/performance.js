@@ -387,7 +387,7 @@ async function runPerformanceTests( branches, options ) {
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
-				const runKey = `${ branch }_${ testSuite }_run-${ i }`;
+				const runKey = `${ testSuite }_${ branch }_run-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
 				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
