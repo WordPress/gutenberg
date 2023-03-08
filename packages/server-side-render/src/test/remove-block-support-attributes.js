@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * External dependencies
  */
@@ -44,43 +46,35 @@ describe( 'removeBlockSupportAttributes', () => {
 	} );
 
 	it( 'its constant KNOWN_ATTRIBUTES is up to date', () => {
-		const attributes = new Set();
-		const dir = readdirSync( BLOCK_SUPPORTS_DIR );
+		// Get all PHP files in lib/block-supports
+		const sourceFiles = readdirSync( BLOCK_SUPPORTS_DIR )
+			.filter( ( file ) => file.match( /\.php$/ ) )
+			.map( ( file ) => join( BLOCK_SUPPORTS_DIR, file ) );
 
-		for ( const fileName of dir ) {
-			if ( fileName.match( /\.php$/ ) ) {
-				const path = join( BLOCK_SUPPORTS_DIR, fileName );
-				for ( let attributeName of grep(
-					path,
-					ATTRIBUTE_KEY_PATTERN
-				) ) {
-					if ( attributeName === 'class' )
-						attributeName = 'className';
-					attributes.add( attributeName );
-				}
-			}
-		}
-
-		// Styles are handled separately.
-		attributes.delete( 'style' );
+		// Get all unique attribute names from the PHP files
+		const attributes = new Set(
+			sourceFiles.flatMap( ( file ) =>
+				grep( file, ATTRIBUTE_KEY_PATTERN )
+					.filter( ( attribute ) => attribute !== 'style' ) // Styles are handled separately
+					.map( ( attribute ) =>
+						attribute.replace( /^class$/, 'className' )
+					)
+			)
+		);
 
 		expect( attributes ).toEqual( KNOWN_ATTRIBUTES );
 	} );
 
 	it( 'its constant KNOWN_STYLES is up to date', () => {
-		const styles = new Set();
-		const dir = readdirSync( BLOCK_SUPPORTS_DIR );
+		// Get all PHP files in lib/block-supports
+		const sourceFiles = readdirSync( BLOCK_SUPPORTS_DIR )
+			.filter( ( file ) => file.match( /\.php$/ ) )
+			.map( ( file ) => join( BLOCK_SUPPORTS_DIR, file ) );
 
-		for ( const fileName of dir ) {
-			if ( fileName.match( /\.php$/ ) ) {
-				const path = join( BLOCK_SUPPORTS_DIR, fileName );
-				for ( let attributeName of grep( path, STYLE_KEY_PATTERN ) ) {
-					if ( attributeName === 'class' )
-						attributeName = 'className';
-					styles.add( attributeName );
-				}
-			}
-		}
+		// Get all unique style keys from the PHP files
+		const styles = new Set(
+			sourceFiles.flatMap( ( file ) => grep( file, STYLE_KEY_PATTERN ) )
+		);
 
 		// styles should be a subset of KNOWN_STYLES
 		expect( Array.from( KNOWN_STYLES ) ).not.toEqual(
@@ -90,12 +84,15 @@ describe( 'removeBlockSupportAttributes', () => {
 } );
 
 /**
+ * Given a filename and a RegExp pattern, return all fragments of text in the
+ * given file that match the pattern.
+ *
  * @param {string} filename Path to the source file.
  * @param {RegExp} pattern  Regular expression to match against.
- * @return {Set<string>}    Set of matching attribute names.
+ * @return {string[]}       Set of matching attribute names.
  */
 function grep( filename, pattern ) {
 	const contents = readFileSync( filename, 'utf8' ).toString();
 	const matches = Array.from( contents.matchAll( pattern ) );
-	return new Set( matches.map( ( [ , match ] ) => match ) );
+	return matches.map( ( [ , match ] ) => match );
 }
