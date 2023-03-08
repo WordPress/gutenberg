@@ -88,8 +88,10 @@
 		"spacing": {
 			"padding": true,
 			"margin": [ "top", "bottom" ],
+			"blockGap": true,
 			"__experimentalDefaultControls": {
-				"padding": true
+				"padding": true,
+				"blockGap": true
 			}
 		},
 		"color": {
