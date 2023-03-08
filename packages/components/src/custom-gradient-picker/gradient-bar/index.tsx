@@ -104,7 +104,6 @@ export default function CustomGradientBar( {
 			gradientMarkersContainerDomRef.current
 		);
 
-		// NTS: `getHorizontalRelativeGradientPosition` will return `undefined` if the `containerElement` arg is falsey.
 		if ( insertPosition === undefined ) {
 			return;
 		}

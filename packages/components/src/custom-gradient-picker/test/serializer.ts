@@ -14,7 +14,6 @@ describe( 'It should serialize a gradient', () => {
 		expect(
 			serializeGradientColor( {
 				type: 'rgba',
-				//NTS: For entire file - our tests were using numbers, but `gradientParser` (according to DefinitelyTyped) expects strings. I've updated the tests accordingly. Alternatively we could add some logic to our serializer so it accepts both and converts numbers to strings on the fly.
 				value: [ '1', '2', '3', '0.5' ],
 			} )
 		).toBe( 'rgba(1,2,3,0.5)' );

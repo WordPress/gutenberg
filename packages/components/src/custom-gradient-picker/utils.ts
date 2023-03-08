@@ -30,7 +30,6 @@ export function getLinearGradientRepresentation(
 			value: `${ HORIZONTAL_GRADIENT_ORIENTATION.value }`,
 		},
 		colorStops: gradientAST.colorStops,
-		// NTS: As noted elsewhere, gradientParser's DefinetelyTyped values provide no overlap between the different `orientation` values for linear vs radial nodes.
 	} as gradientParser.LinearGradientNode );
 }
 
@@ -67,7 +66,6 @@ export function getGradientAstWithDefault( value?: string ) {
 	}
 
 	if ( gradientAST.colorStops.some( hasUnsupportedLength ) ) {
-		// NTS: Followup - `colorStops` is destructured before being mutated, but it's never reinserted into `gradientAST`. This could mean the original object might still have unspoorted lengths. Investigate.
 		const { colorStops } = gradientAST;
 		const step = 100 / ( colorStops.length - 1 );
 		colorStops.forEach( ( stop, index ) => {
@@ -102,7 +100,6 @@ export function getGradientAstWithControlPoints(
 						: [ `${ r }`, `${ g }`, `${ b }` ],
 			};
 		} ),
-		// NTS: there are a few `as` calls throughout the changes. Some are to avoid conflicts between union members. Note that in your description.
 	} as gradientParser.GradientNode;
 }
 

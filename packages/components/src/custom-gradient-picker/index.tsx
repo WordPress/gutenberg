@@ -85,7 +85,6 @@ const GradientTypePicker = ( {
 					? {}
 					: { orientation: HORIZONTAL_GRADIENT_ORIENTATION } ),
 				type: 'linear-gradient',
-				// NTS: this isn't very elegant, but the `orientation` props between linear and radial gradients don't overlap (according to DefinitelyTyped) so TypeScript gets confused by this manual change.
 			} as gradientParser.LinearGradientNode )
 		);
 	};
@@ -101,7 +100,6 @@ const GradientTypePicker = ( {
 	};
 
 	const handleOnChange = ( next: string | string[] ) => {
-		// NTS: Because `SelectControl.onChange` (below) can accept an array, we need to accept one here. We shouldn't ever see an array here, but I'm adding a check just in case.
 		const nextValue = Array.isArray( next ) ? next[ 0 ] : next;
 		if ( nextValue === 'linear-gradient' ) {
 			onSetLinearGradient();
@@ -120,7 +118,6 @@ const GradientTypePicker = ( {
 			onChange={ handleOnChange }
 			options={ GRADIENT_OPTIONS }
 			size="__unstable-large"
-			// NTS: Small runtime change. Previously, if `type` was undefined (which I don't think should ever happen) this check would return `false`, which would be an invalid value.
 			value={ hasGradient ? type : undefined }
 		/>
 	);
@@ -166,7 +163,6 @@ export function CustomGradientPicker( {
 	const controlPoints = gradientAST.colorStops.map( ( colorStop ) => {
 		// Although it's already been checked by `hasUnsupportedLength` in `getGradientAstWithDefault`,
 		// TypeScript doesn't know that `colorStop.length` is not undefined here.
-		//NTS: Is there may be a more elegant way to help TS see that for itself? 🤔
 		return {
 			color: getStopCssColor( colorStop ),
 			position: parseInt( colorStop.length!.value ),
