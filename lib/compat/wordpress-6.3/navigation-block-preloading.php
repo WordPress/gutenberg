@@ -9,7 +9,7 @@
 /**
  * Preloads requests needed for Navigation posts
  *
- * @param array                   $preload_paths    Preload paths to be filtered.
+ * @param array $preload_paths    Preload paths to be filtered.
  * @return array
  */
 function gutenberg_preload_navigation_permissions( $preload_paths ) {
