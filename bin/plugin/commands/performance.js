@@ -468,7 +468,7 @@ async function runPerformanceTests( branches, options ) {
 		);
 		console.table( invertedResult );
 
-		const resultsFilename = testSuite + '-performance-results.json';
+		const resultsFilename = testSuite + '-performance.results.json';
 		fs.writeFileSync(
 			path.resolve( artifactsPath, resultsFilename ),
 			JSON.stringify( results[ testSuite ], null, 2 )
