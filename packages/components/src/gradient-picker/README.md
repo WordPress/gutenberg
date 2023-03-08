@@ -101,3 +101,11 @@ Start opting into the new margin-free styles that will become the default in a f
 -   Type: `Boolean`
 -   Required: No
 -   Default: `false`
+
+### headingLevel
+
+The heading level.
+
+-   Type: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
+-   Required: No
+-   Default: `2`

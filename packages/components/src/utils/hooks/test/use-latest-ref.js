@@ -45,12 +45,6 @@ function Example() {
 	);
 }
 
-function sleep( milliseconds ) {
-	return new Promise( ( resolve ) =>
-		window.setTimeout( resolve, milliseconds )
-	);
-}
-
 function getCount() {
 	return screen.getByText( /Count:/ ).innerHTML;
 }
@@ -74,47 +68,52 @@ describe( 'useLatestRef', () => {
 		// Prove the example works as expected.
 		it( 'should start at 0', () => {
 			render( <Example /> );
+
 			expect( getCount() ).toEqual( 'Count: 0' );
 		} );
 
 		it( 'should increment immediately', () => {
 			render( <Example /> );
+
 			incrementCount();
+
 			expect( getCount() ).toEqual( 'Count: 1' );
 		} );
 
 		it( 'should increment after debouncing', async () => {
 			render( <Example /> );
-			incrementCountDebounced();
-			expect( getCount() ).toEqual( 'Count: 0' );
 
-			await waitFor( () => sleep( 0 ) );
-			expect( getCount() ).toEqual( 'Count: 1' );
+			incrementCountDebounced();
+
+			expect( getCount() ).toEqual( 'Count: 0' );
+			await waitFor( () => expect( getCount() ).toEqual( 'Count: 1' ) );
 		} );
 
 		it( 'should increment after debouncing with latest ref', async () => {
 			render( <Example /> );
-			incrementCountDebouncedRef();
-			expect( getCount() ).toEqual( 'Count: 0' );
 
-			await waitFor( () => sleep( 0 ) );
-			expect( getCount() ).toEqual( 'Count: 1' );
+			incrementCountDebouncedRef();
+
+			expect( getCount() ).toEqual( 'Count: 0' );
+			await waitFor( () => expect( getCount() ).toEqual( 'Count: 1' ) );
 		} );
 	} );
 
 	it( 'should increment to one', async () => {
 		render( <Example /> );
+
 		incrementCountDebounced();
 		incrementCount();
-		await waitFor( () => sleep( 0 ) );
-		expect( getCount() ).toEqual( 'Count: 1' );
+
+		await waitFor( () => expect( getCount() ).toEqual( 'Count: 1' ) );
 	} );
 
 	it( 'should increment to two', async () => {
 		render( <Example /> );
+
 		incrementCountDebouncedRef();
 		incrementCount();
-		await waitFor( () => sleep( 0 ) );
-		expect( getCount() ).toEqual( 'Count: 2' );
+
+		await waitFor( () => expect( getCount() ).toEqual( 'Count: 2' ) );
 	} );
 } );

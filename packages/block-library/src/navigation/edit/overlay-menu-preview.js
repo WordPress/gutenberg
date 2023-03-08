@@ -17,6 +17,7 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 	return (
 		<>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Show icon button' ) }
 				help={ __(
 					'Configure the visual appearance of the button opening the overlay menu.'
@@ -26,6 +27,7 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 			/>
 
 			<ToggleGroupControl
+				__nextHasNoMarginBottom
 				label={ __( 'Icon' ) }
 				value={ icon }
 				onChange={ ( value ) => setAttributes( { icon: value } ) }

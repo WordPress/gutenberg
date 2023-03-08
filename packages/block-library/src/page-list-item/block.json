@@ -44,7 +44,8 @@
 		"reusable": false,
 		"html": false,
 		"lock": false,
-		"inserter": false
+		"inserter": false,
+		"__experimentalToolbar": false
 	},
 	"editorStyle": "wp-block-page-list-editor",
 	"style": "wp-block-page-list"

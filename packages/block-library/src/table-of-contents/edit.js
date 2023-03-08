@@ -251,6 +251,7 @@ export default function TableOfContentsEdit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Only include current page' ) }
 					checked={ onlyIncludeCurrentPage }
 					onChange={ ( value ) =>
@@ -279,7 +280,7 @@ export default function TableOfContentsEdit( {
 				<div { ...blockProps }>
 					<Placeholder
 						icon={ <BlockIcon icon={ icon } /> }
-						label="Table of Contents"
+						label={ __( 'Table of Contents' ) }
 						instructions={ __(
 							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
 						) }

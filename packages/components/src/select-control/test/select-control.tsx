@@ -9,10 +9,7 @@ import userEvent from '@testing-library/user-event';
  */
 import SelectControl from '..';
 
-const setupUser = () =>
-	userEvent.setup( {
-		advanceTimers: jest.advanceTimersByTime,
-	} );
+const setupUser = () => userEvent.setup();
 
 describe( 'SelectControl', () => {
 	it( 'should not render when no options or children are provided', () => {

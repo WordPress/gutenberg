@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -164,7 +159,7 @@ export default function PostLockedModal() {
 		_wpnonce: postLockUtils.nonce,
 	} );
 	const allPostsUrl = addQueryArgs( 'edit.php', {
-		post_type: get( postType, [ 'slug' ] ),
+		post_type: postType?.slug,
 	} );
 	const allPostsLabel = __( 'Exit editor' );
 	return (

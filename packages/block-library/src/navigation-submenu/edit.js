@@ -42,6 +42,10 @@ import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
 import { LinkUI } from '../navigation-link/link-ui';
 import { updateAttributes } from '../navigation-link/update-attributes';
+import {
+	getColors,
+	getNavigationChildBlockProps,
+} from '../navigation/edit/utils';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -103,61 +107,6 @@ const useIsDraggingWithin = ( elementRef ) => {
 
 	return isDraggingWithin;
 };
-
-/**
- * Determine the colors for a menu.
- *
- * Order of priority is:
- * 1: Overlay custom colors (if submenu)
- * 2: Overlay theme colors (if submenu)
- * 3: Custom colors
- * 4: Theme colors
- * 5: Global styles
- *
- * @param {Object}  context
- * @param {boolean} isSubMenu
- */
-function getColors( context, isSubMenu ) {
-	const {
-		textColor,
-		customTextColor,
-		backgroundColor,
-		customBackgroundColor,
-		overlayTextColor,
-		customOverlayTextColor,
-		overlayBackgroundColor,
-		customOverlayBackgroundColor,
-		style,
-	} = context;
-
-	const colors = {};
-
-	if ( isSubMenu && !! customOverlayTextColor ) {
-		colors.customTextColor = customOverlayTextColor;
-	} else if ( isSubMenu && !! overlayTextColor ) {
-		colors.textColor = overlayTextColor;
-	} else if ( !! customTextColor ) {
-		colors.customTextColor = customTextColor;
-	} else if ( !! textColor ) {
-		colors.textColor = textColor;
-	} else if ( !! style?.color?.text ) {
-		colors.customTextColor = style.color.text;
-	}
-
-	if ( isSubMenu && !! customOverlayBackgroundColor ) {
-		colors.customBackgroundColor = customOverlayBackgroundColor;
-	} else if ( isSubMenu && !! overlayBackgroundColor ) {
-		colors.backgroundColor = overlayBackgroundColor;
-	} else if ( !! customBackgroundColor ) {
-		colors.customBackgroundColor = customBackgroundColor;
-	} else if ( !! backgroundColor ) {
-		colors.backgroundColor = backgroundColor;
-	} else if ( !! style?.color?.background ) {
-		colors.customTextColor = style.color.background;
-	}
-
-	return colors;
-}
 
 /**
  * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
@@ -275,16 +224,6 @@ export default function NavigationSubmenuEdit( {
 		}
 	}, [] );
 
-	// Store the colors from context as attributes for rendering.
-	useEffect( () => {
-		// This side-effect should not create an undo level as those should
-		// only be created via user interactions. Mark this change as
-		// not persistent to avoid undo level creation.
-		// See https://github.com/WordPress/gutenberg/issues/34564.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isTopLevelItem } );
-	}, [ isTopLevelItem ] );
-
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
 	 * when selecting a suggestion in the link popover, we force close on block unselection.
@@ -377,48 +316,27 @@ export default function NavigationSubmenuEdit( {
 		  )
 		: ALLOWED_BLOCKS;
 
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: classnames( 'wp-block-navigation__submenu-container', {
-				'is-parent-of-selected-block': isParentOfSelectedBlock,
-				'has-text-color': !! (
-					innerBlocksColors.textColor ||
-					innerBlocksColors.customTextColor
-				),
-				[ `has-${ innerBlocksColors.textColor }-color` ]:
-					!! innerBlocksColors.textColor,
-				'has-background': !! (
-					innerBlocksColors.backgroundColor ||
-					innerBlocksColors.customBackgroundColor
-				),
-				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]:
-					!! innerBlocksColors.backgroundColor,
-			} ),
-			style: {
-				color: innerBlocksColors.customTextColor,
-				backgroundColor: innerBlocksColors.customBackgroundColor,
-			},
-		},
-		{
-			allowedBlocks,
-			__experimentalDefaultBlock: DEFAULT_BLOCK,
-			__experimentalDirectInsert: true,
+	const navigationChildBlockProps =
+		getNavigationChildBlockProps( innerBlocksColors );
+	const innerBlocksProps = useInnerBlocksProps( navigationChildBlockProps, {
+		allowedBlocks,
+		__experimentalDefaultBlock: DEFAULT_BLOCK,
+		__experimentalDirectInsert: true,
 
-			// Ensure block toolbar is not too far removed from item
-			// being edited.
-			// see: https://github.com/WordPress/gutenberg/pull/34615.
-			__experimentalCaptureToolbars: true,
+		// Ensure block toolbar is not too far removed from item
+		// being edited.
+		// see: https://github.com/WordPress/gutenberg/pull/34615.
+		__experimentalCaptureToolbars: true,
 
-			renderAppender:
-				isSelected ||
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasChildren ) ||
-				// Show the appender while dragging to allow inserting element between item and the appender.
-				hasChildren
-					? InnerBlocks.ButtonBlockAppender
-					: false,
-		}
-	);
+		renderAppender:
+			isSelected ||
+			( isImmediateParentOfSelectedBlock &&
+				! selectedBlockHasChildren ) ||
+			// Show the appender while dragging to allow inserting element between item and the appender.
+			hasChildren
+				? InnerBlocks.ButtonBlockAppender
+				: false,
+	} );
 
 	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
 
@@ -430,6 +348,9 @@ export default function NavigationSubmenuEdit( {
 	useEffect( () => {
 		// If block becomes empty, transform to Navigation Link.
 		if ( ! hasChildren && prevHasChildren ) {
+			// This side-effect should not create an undo level as those should
+			// only be created via user interactions.
+			__unstableMarkNextChangeAsNotPersistent();
 			transformToLink();
 		}
 	}, [ hasChildren, prevHasChildren ] );
@@ -465,6 +386,7 @@ export default function NavigationSubmenuEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ label || '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
@@ -473,6 +395,7 @@ export default function NavigationSubmenuEdit( {
 						autoComplete="off"
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
 							setAttributes( { url: urlValue } );
@@ -494,6 +417,7 @@ export default function NavigationSubmenuEdit( {
 						) }
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
@@ -502,6 +426,7 @@ export default function NavigationSubmenuEdit( {
 						autoComplete="off"
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );

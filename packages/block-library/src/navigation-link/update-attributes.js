@@ -89,7 +89,7 @@ export const updateAttributes = (
 
 	setAttributes( {
 		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
-		...( newUrl && { url: encodeURI( safeDecodeURI( newUrl ) ) } ),
+		...{ url: newUrl ? encodeURI( safeDecodeURI( newUrl ) ) : newUrl },
 		...( label && { label } ),
 		...( undefined !== opensInNewTab && { opensInNewTab } ),
 		...( id && Number.isInteger( id ) && { id } ),

@@ -1416,9 +1416,19 @@ export function selection( state = {}, action ) {
 			}
 	}
 
+	const selectionStart = selectionHelper( state.selectionStart, action );
+	const selectionEnd = selectionHelper( state.selectionEnd, action );
+
+	if (
+		selectionStart === state.selectionStart &&
+		selectionEnd === state.selectionEnd
+	) {
+		return state;
+	}
+
 	return {
-		selectionStart: selectionHelper( state.selectionStart, action ),
-		selectionEnd: selectionHelper( state.selectionEnd, action ),
+		selectionStart,
+		selectionEnd,
 	};
 }
 
@@ -1751,45 +1761,6 @@ export function lastBlockAttributesChange( state = null, action ) {
 }
 
 /**
- * Reducer returning automatic change state.
- *
- * @param {?string} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function automaticChangeStatus( state, action ) {
-	switch ( action.type ) {
-		case 'MARK_AUTOMATIC_CHANGE':
-			return 'pending';
-		case 'MARK_AUTOMATIC_CHANGE_FINAL':
-			if ( state === 'pending' ) {
-				return 'final';
-			}
-
-			return;
-		case 'SELECTION_CHANGE':
-			// As long as the state is not final, ignore any selection changes.
-			if ( state !== 'final' ) {
-				return state;
-			}
-
-			return;
-		// Undoing an automatic change should still be possible after mouse
-		// move or after visibility change.
-		case 'SET_BLOCK_VISIBILITY':
-		case 'START_TYPING':
-		case 'STOP_TYPING':
-		case 'UPDATE_BLOCK_LIST_SETTINGS':
-			return state;
-	}
-
-	// TODO: This is a source of bug, as each time there's a change in timing,
-	// or a new action is added, this could break.
-	// Reset the state by default (for any action not handled).
-}
-
-/**
  * Reducer returning current highlighted block.
  *
  * @param {boolean} state  Current highlighted block.
@@ -1829,14 +1800,19 @@ export function highlightedBlock( state, action ) {
 export function lastBlockInserted( state = {}, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
+		case 'REPLACE_BLOCKS':
+		case 'REPLACE_INNER_BLOCKS':
 			if ( ! action.blocks.length ) {
 				return state;
 			}
 
-			const clientId = action.blocks[ 0 ].clientId;
+			const clientIds = action.blocks.map( ( block ) => {
+				return block.clientId;
+			} );
+
 			const source = action.meta?.source;
 
-			return { clientId, source };
+			return { clientIds, source };
 		case 'RESET_BLOCKS':
 			return {};
 	}
@@ -1858,7 +1834,7 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 	return state;
 }
 
-export default combineReducers( {
+const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
 	isBlockInterfaceHidden,
@@ -1876,9 +1852,63 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	editorMode,
 	hasBlockMovingClientId,
-	automaticChangeStatus,
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
 	blockVisibility,
 } );
+
+function withAutomaticChangeReset( reducer ) {
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
+
+		if ( ! state ) {
+			return nextState;
+		}
+
+		// Take over the last value without creating a new reference.
+		nextState.automaticChangeStatus = state.automaticChangeStatus;
+
+		if ( action.type === 'MARK_AUTOMATIC_CHANGE' ) {
+			return {
+				...nextState,
+				automaticChangeStatus: 'pending',
+			};
+		}
+
+		if (
+			action.type === 'MARK_AUTOMATIC_CHANGE_FINAL' &&
+			state.automaticChangeStatus === 'pending'
+		) {
+			return {
+				...nextState,
+				automaticChangeStatus: 'final',
+			};
+		}
+
+		// If there's a change that doesn't affect blocks or selection, maintain
+		// the current status.
+		if (
+			nextState.blocks === state.blocks &&
+			nextState.selection === state.selection
+		) {
+			return nextState;
+		}
+
+		// As long as the state is not final, ignore any selection changes.
+		if (
+			nextState.automaticChangeStatus !== 'final' &&
+			nextState.selection !== state.selection
+		) {
+			return nextState;
+		}
+
+		// Reset the status if blocks change or selection changes (when status is final).
+		return {
+			...nextState,
+			automaticChangeStatus: undefined,
+		};
+	};
+}
+
+export default withAutomaticChangeReset( combinedReducers );

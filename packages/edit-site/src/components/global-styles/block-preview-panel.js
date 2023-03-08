@@ -3,28 +3,46 @@
  */
 import { BlockPreview } from '@wordpress/block-editor';
 import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
-import { useResizeObserver } from '@wordpress/compose';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
 
-const BlockPreviewPanel = ( { name } ) => {
-	const [
-		containerResizeListener,
-		{ width: containerWidth, height: containerHeight },
-	] = useResizeObserver();
+const BlockPreviewPanel = ( { name, variation = '' } ) => {
 	const blockExample = getBlockType( name )?.example;
-	const blocks = blockExample && getBlockFromExample( name, blockExample );
-	const viewportWidth = blockExample?.viewportWidth || containerWidth;
-	const minHeight = containerHeight;
+	const blockExampleWithVariation = {
+		...blockExample,
+		attributes: {
+			...blockExample?.attributes,
+			className: variation,
+		},
+	};
+	const blocks =
+		blockExample &&
+		getBlockFromExample(
+			name,
+			variation ? blockExampleWithVariation : blockExample
+		);
+	const viewportWidth = blockExample?.viewportWidth || null;
+	const previewHeight = '150px';
 
 	return ! blockExample ? null : (
 		<Spacer marginX={ 4 } marginBottom={ 4 }>
-			<div className="edit-site-global-styles__block-preview-panel">
-				{ containerResizeListener }
-
+			<div
+				className="edit-site-global-styles__block-preview-panel"
+				style={ { maxHeight: previewHeight, boxSizing: 'initial' } }
+			>
 				<BlockPreview
-					viewportWidth={ viewportWidth }
-					__experimentalMinHeight={ minHeight }
 					blocks={ blocks }
+					viewportWidth={ viewportWidth }
+					minHeight={ previewHeight }
+					additionalStyles={ [
+						{
+							css: `
+								body{
+									min-height:${ previewHeight };
+									display:flex;align-items:center;justify-content:center;
+								}
+							`,
+						},
+					] }
 				/>
 			</div>
 		</Spacer>

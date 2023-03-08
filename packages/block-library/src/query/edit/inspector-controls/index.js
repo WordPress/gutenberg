@@ -132,6 +132,7 @@ export default function QueryInspectorControls( {
 					<PanelBody title={ __( 'Settings' ) }>
 						{ showInheritControl && (
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Inherit query from template' ) }
 								help={ __(
 									'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
@@ -144,6 +145,7 @@ export default function QueryInspectorControls( {
 						) }
 						{ showPostTypeControl && (
 							<SelectControl
+								__nextHasNoMarginBottom
 								options={ postTypesSelectOptions }
 								value={ postType }
 								label={ __( 'Post type' ) }
@@ -246,6 +248,7 @@ export default function QueryInspectorControls( {
 								onDeselect={ () => setQuerySearch( '' ) }
 							>
 								<TextControl
+									__nextHasNoMarginBottom
 									label={ __( 'Keyword' ) }
 									value={ querySearch }
 									onChange={ setQuerySearch }

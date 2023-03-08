@@ -87,7 +87,6 @@ WithNoExistingGradients.args = {
 export const MultipleOrigins = Template.bind( {} );
 MultipleOrigins.args = {
 	...Default.args,
-	__experimentalHasMultipleOrigins: true,
 	gradients: [
 		{ name: 'Origin 1', gradients: GRADIENTS },
 		{ name: 'Origin 2', gradients: GRADIENTS },

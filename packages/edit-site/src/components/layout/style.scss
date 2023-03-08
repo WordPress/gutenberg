@@ -1,83 +1,102 @@
 .edit-site-layout {
-	min-height: 100%;
+	height: 100%;
 	background: $gray-900;
 	color: $white;
 	display: flex;
 	flex-direction: column;
-	@include break-small {
-		display: grid;
-		grid-template-columns: 320px 1fr;
-		grid-template-rows: auto 1fr;
-		grid-template-areas:
-			"header canvas"
-			"sidebar canvas";
+}
 
-		&.is-full-canvas {
-			grid-template-areas:
-				"header header"
-				"canvas canvas";
+.edit-site-layout__hub {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: calc(100vw - #{$canvas-padding * 2});
+	height: $header-height;
+	z-index: z-index(".edit-site-layout__hub");
+
+	.edit-site-layout.is-full-canvas.is-edit-mode & {
+		width: auto;
+		padding-right: 0;
+	}
+
+	@include break-medium {
+		width: calc(#{$nav-sidebar-width} - #{$canvas-padding * 2});
+	}
+
+	.edit-site-layout.is-full-canvas & {
+		padding-right: $grid-unit-20;
+		border-radius: 0;
+		width: 100vw;
+		box-shadow: none;
+
+		@include break-medium {
+			width: auto;
+			padding-right: 0;
 		}
 	}
 }
 
 .edit-site-layout__header {
-	grid-area: header;
 	height: $header-height;
 	display: flex;
-}
-
-.edit-site-layout__logo {
-	align-items: center;
-	height: $header-height;
-	display: flex;
-	justify-content: space-between;
-
-	.components-button {
-		color: currentColor;
-	}
-}
-
-.edit-site-layout__edit-button {
-	background: $gray-800;
-	/* Overrides the color for all states of the button */
-	color: inherit !important;
-}
-
-.edit-site-layout__sidebar {
-	grid-area: sidebar;
-	z-index: 1;
-	overflow-y: auto;
-	max-height: calc(100vh - #{$header-height});
-	@include custom-scrollbars-on-hover;
-
-	// This is only necessary for the exit animation
-	.edit-site-layout.is-full-canvas & {
-		display: none;
-		@include break-small {
-			display: block;
-			grid-area: header;
-			position: absolute;
-			top: 60px;
-		}
-	}
-}
-
-.edit-site-layout__editor-header {
-	flex-grow: 1;
+	z-index: z-index(".edit-site-layout__header");
 
 	// This is only necessary for the exit animation
 	.edit-site-layout:not(.is-full-canvas) & {
 		position: fixed;
-		left: 60px;
+		width: 100vw;
+	}
+}
+
+.edit-site-layout__content {
+	height: 100%;
+	flex-grow: 1;
+	display: flex;
+}
+
+.edit-site-layout__sidebar {
+	z-index: z-index(".edit-site-layout__sidebar");
+	width: 100vw;
+
+	@include break-medium {
+		width: $nav-sidebar-width;
+	}
+
+	// This is only necessary for the exit animation
+	.edit-site-layout.is-full-canvas & {
+		position: fixed !important;
+		height: 100vh;
+		left: 0;
+		top: 0;
+	}
+
+	> div {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.resizable-editor__drag-handle {
 		right: 0;
 	}
 }
 
 .edit-site-layout__canvas-container {
-	grid-area: canvas;
 	position: relative;
 	flex-grow: 1;
-	z-index: 2;
+	z-index: z-index(".edit-site-layout__canvas-container");
+
+	&.is-resizing::after {
+		// This covers the whole content which ensures mouse up triggers
+		// even if the content is "inert".
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		content: "";
+		z-index: z-index(".edit-site-layout__canvas-container.is-resizing::after");
+	}
 }
 
 .edit-site-layout__canvas {
@@ -86,13 +105,14 @@
 	left: 0;
 	bottom: 0;
 	width: 100%;
-	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
 
 	& > div {
 		color: $gray-900;
 		background: $white;
+		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
 	}
-	@include break-small {
+
+	@include break-medium {
 		top: $canvas-padding;
 		bottom: $canvas-padding;
 		width: calc(100% - #{$canvas-padding});
@@ -112,7 +132,10 @@
 		top: 0;
 		bottom: 0;
 		width: 100%;
-		border-radius: 0;
+
+		& > div {
+			border-radius: 0;
+		}
 	}
 }
 
@@ -124,11 +147,14 @@
 
 .edit-site-layout__view-mode-toggle.components-button {
 	position: relative;
-	background: $gray-900;
 	color: $white;
-	height: calc(100% + #{$border-width});
-	border-radius: 0;
-	margin-bottom: -$border-width;
+	height: 100%;
+	width: 100%;
+	border-radius: $radius-block-ui;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 
 	&:hover,
 	&:active {
@@ -150,15 +176,6 @@
 		bottom: 9px;
 		left: 9px;
 		border-radius: $radius-block-ui + $border-width + $border-width;
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
-	}
-
-	// Hover color.
-	&:hover::before {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-700;
-	}
-
-	&.has-icon:hover::before {
 		box-shadow: none;
 	}
 
@@ -170,7 +187,36 @@
 	}
 
 	.edit-site-layout__view-mode-toggle-icon {
+		display: flex;
 		border-radius: $radius-block-ui;
-		object-fit: cover;
+	}
+}
+
+.edit-site-layout__actions {
+	z-index: z-index(".edit-site-layout__actions");
+	position: fixed !important; // Need to override the default relative positioning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	width: $sidebar-width;
+	color: $gray-900;
+	background: $white;
+
+	&:focus,
+	&:focus-within {
+		top: auto;
+		bottom: 0;
+	}
+
+	&.is-entity-save-view-open {
+		&:focus,
+		&:focus-within {
+			top: 0;
+		}
+	}
+
+	@include break-medium {
+		border-left: $border-width solid $gray-300;
 	}
 }

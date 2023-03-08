@@ -12,111 +12,25 @@ import {
 	forwardRef,
 	useMemo,
 	useReducer,
+	renderToString,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	useResizeObserver,
 	useMergeRefs,
 	useRefEffect,
+	useDisabled,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
-
-const BODY_CLASS_NAME = 'editor-styles-wrapper';
-const BLOCK_PREFIX = 'wp-block';
-
-/**
- * Clones stylesheets targetting the editor canvas to the given document. A
- * stylesheet is considered targetting the editor a canvas if it contains the
- * `editor-styles-wrapper`, `wp-block`, or `wp-block-*` class selectors.
- *
- * Ideally, this hook should be removed in the future and styles should be added
- * explicitly as editor styles.
- */
-function useStylesCompatibility() {
-	return useRefEffect( ( node ) => {
-		// Search the document for stylesheets targetting the editor canvas.
-		Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
-			try {
-				// May fail for external styles.
-				// eslint-disable-next-line no-unused-expressions
-				styleSheet.cssRules;
-			} catch ( e ) {
-				return;
-			}
-
-			const { ownerNode, cssRules } = styleSheet;
-
-			if ( ! cssRules ) {
-				return;
-			}
-
-			// Generally, ignore inline styles. We add inline styles belonging to a
-			// stylesheet later, which may or may not match the selectors.
-			if ( ownerNode.tagName !== 'LINK' ) {
-				return;
-			}
-
-			// Don't try to add the reset styles, which were removed as a dependency
-			// from `edit-blocks` for the iframe since we don't need to reset admin
-			// styles.
-			if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
-				return;
-			}
-
-			function matchFromRules( _cssRules ) {
-				return Array.from( _cssRules ).find(
-					( {
-						selectorText,
-						conditionText,
-						cssRules: __cssRules,
-					} ) => {
-						// If the rule is conditional then it will not have selector text.
-						// Recurse into child CSS ruleset to determine selector eligibility.
-						if ( conditionText ) {
-							return matchFromRules( __cssRules );
-						}
-
-						return (
-							selectorText &&
-							( selectorText.includes(
-								`.${ BODY_CLASS_NAME }`
-							) ||
-								selectorText.includes( `.${ BLOCK_PREFIX }` ) )
-						);
-					}
-				);
-			}
-
-			const isMatch = matchFromRules( cssRules );
-
-			if (
-				isMatch &&
-				! node.ownerDocument.getElementById( ownerNode.id )
-			) {
-				// Display warning once we have a way to add style dependencies to the editor.
-				// See: https://github.com/WordPress/gutenberg/pull/37466.
-				node.appendChild( ownerNode.cloneNode( true ) );
-
-				// Add inline styles belonging to the stylesheet.
-				const inlineCssId = ownerNode.id.replace(
-					'-css',
-					'-inline-css'
-				);
-				const inlineCssElement = document.getElementById( inlineCssId );
-
-				if ( inlineCssElement ) {
-					node.appendChild( inlineCssElement.cloneNode( true ) );
-				}
-			}
-		} );
-	}, [] );
-}
+import { useCompatibilityStyles } from './use-compatibility-styles';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Bubbles some event types (keydown, keypress, and dragover) to parent document
@@ -187,24 +101,32 @@ async function loadScript( head, { id, src } ) {
 	} );
 }
 
-function Iframe(
-	{
-		contentRef,
-		children,
-		head,
-		tabIndex = 0,
-		assets,
-		scale = 1,
-		frameSize = 0,
-		readonly,
-		...props
-	},
-	ref
-) {
+function Iframe( {
+	contentRef,
+	children,
+	head,
+	tabIndex = 0,
+	scale = 1,
+	frameSize = 0,
+	expand = false,
+	readonly,
+	forwardedRef: ref,
+	...props
+} ) {
+	const assets = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().__unstableResolvedAssets,
+		[]
+	);
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const styles = useParsedAssets( assets?.styles );
+	const styleIds = styles.map( ( style ) => style.id );
+	const compatStyles = useCompatibilityStyles();
+	const neededCompatStyles = compatStyles.filter(
+		( style ) => ! styleIds.includes( style.id )
+	);
 	const scripts = useParsedAssets( assets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -287,13 +209,18 @@ function Iframe(
 				forceRender();
 			} );
 	}, [] );
-	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
-	const styleCompatibilityRef = useStylesCompatibility();
+	const disabledRef = useDisabled( { isDisabled: ! readonly } );
+	const bodyRef = useMergeRefs( [
+		contentRef,
+		clearerRef,
+		writingFlowRef,
+		disabledRef,
+	] );
 
-	head = (
+	const styleAssets = (
 		<>
 			<style>{ 'html{height:auto!important;}body{margin:0}' }</style>
-			{ styles.map(
+			{ [ ...styles, ...neededCompatStyles ].map(
 				( { tagName, href, id, rel, media, textContent } ) => {
 					const TagName = tagName.toLowerCase();
 
@@ -310,64 +237,64 @@ function Iframe(
 					);
 				}
 			) }
-			{ head }
 		</>
 	);
+
+	// Correct doctype is required to enable rendering in standards
+	// mode. Also preload the styles to avoid a flash of unstyled
+	// content.
+	const srcDoc = useMemo( () => {
+		return '<!doctype html>' + renderToString( styleAssets );
+	}, [] );
+
+	// We need to counter the margin created by scaling the iframe. If the scale
+	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
+	// top or bottom margin is 0.55 / 2 ((1 - scale) / 2).
+	const marginFromScaling = ( contentHeight * ( 1 - scale ) ) / 2;
 
 	return (
 		<>
 			{ tabIndex >= 0 && before }
 			<iframe
 				{ ...props }
+				style={ {
+					...props.style,
+					height: expand ? contentHeight : props.style?.height,
+					marginTop: scale
+						? -marginFromScaling + frameSize
+						: props.style?.marginTop,
+					marginBottom: scale
+						? -marginFromScaling + frameSize
+						: props.style?.marginBottom,
+					transform: scale
+						? `scale( ${ scale } )`
+						: props.style?.transform,
+					transition: 'all .3s',
+				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
-				// Correct doctype is required to enable rendering in standards mode
-				srcDoc="<!doctype html>"
+				// Correct doctype is required to enable rendering in standards
+				// mode. Also preload the styles to avoid a flash of unstyled
+				// content.
+				srcDoc={ srcDoc }
 				title={ __( 'Editor canvas' ) }
 			>
 				{ iframeDocument &&
 					createPortal(
 						<>
 							<head ref={ headRef }>
+								{ styleAssets }
 								{ head }
-								<style>
-									{ `html { transition: background 5s; ${
-										frameSize
-											? 'background: #2f2f2f; transition: background 0s;'
-											: ''
-									} }` }
-								</style>
 							</head>
 							<body
 								ref={ bodyRef }
 								className={ classnames(
 									'block-editor-iframe__body',
-									BODY_CLASS_NAME,
+									'editor-styles-wrapper',
 									...bodyClasses
 								) }
-								style={ {
-									// This is the remaining percentage from the scaling down
-									// of the iframe body(`scale(0.45)`). We also need to subtract
-									// the body's bottom margin.
-									marginBottom: `-${
-										contentHeight * ( 1 - scale ) -
-										frameSize
-									}px`,
-									marginTop: frameSize,
-									transform: `scale( ${ scale } )`,
-								} }
-								inert={ readonly ? 'true' : undefined }
 							>
 								{ contentResizeListener }
-								{ /*
-								 * This is a wrapper for the extra styles and scripts
-								 * rendered imperatively by cloning the parent,
-								 * it's important that this div's content remains uncontrolled.
-								 */ }
-								<div
-									style={ { display: 'none' } }
-									ref={ styleCompatibilityRef }
-								/>
 								<StyleProvider document={ iframeDocument }>
 									{ children }
 								</StyleProvider>
@@ -381,4 +308,23 @@ function Iframe(
 	);
 }
 
-export default forwardRef( Iframe );
+function IframeIfReady( props, ref ) {
+	const isInitialised = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().__internalIsInitialized,
+		[]
+	);
+
+	// We shouldn't render the iframe until the editor settings are initialised.
+	// The initial settings are needed to get the styles for the srcDoc, which
+	// cannot be changed after the iframe is mounted. srcDoc is used to to set
+	// the initial iframe HTML, which is required to avoid a flash of unstyled
+	// content.
+	if ( ! isInitialised ) {
+		return null;
+	}
+
+	return <Iframe { ...props } forwardedRef={ ref } />;
+}
+
+export default forwardRef( IframeIfReady );

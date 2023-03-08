@@ -145,7 +145,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](/docs/reference-guides/filters/block-filters.md#block-styles) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/reference-guides/block-api/block-styles.md) for existing blocks.
 
 #### attributes (optional)
 
@@ -256,6 +256,18 @@ Setting `parent` lets a block require that it is only available when nested with
 ```js
 // Only allow this block when it is nested in a Columns block
 parent: [ 'core/columns' ],
+```
+
+#### ancestor (optional)
+
+-   **Type:** `Array`
+
+The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a 'Comment Content' block inside a 'Column' block, as long as 'Column' is somewhere within a 'Comment Template' block. In comparison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
+
+
+```js
+// Only allow this block when it is nested at any level in a Columns block.
+ancestor: [ 'core/columns' ],
 ```
 
 ## Block Collections

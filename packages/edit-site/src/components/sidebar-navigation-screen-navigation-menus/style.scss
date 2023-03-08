@@ -1,0 +1,67 @@
+.edit-site-sidebar-navigation-screen__description {
+	margin: 0 0 $grid-unit-40 $grid-unit-20;
+}
+
+.edit-site-sidebar-navigation-screen-navigation-menus__placeholder {
+	padding: $grid-unit-10;
+	margin: $grid-unit-10;
+	background-color: $gray-100;
+	animation: loadingpulse 1s linear infinite;
+	animation-delay: 0.5s; // avoid animating for fast network responses
+}
+
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.edit-site-sidebar-navigation-screen-navigation-menus__content {
+	.offcanvas-editor-list-view-leaf {
+		max-width: calc(100% - #{ $grid-unit-05 });
+		border-radius: $radius-block-ui;
+		&:hover,
+		&:focus,
+		&[aria-current] {
+			background: $gray-800;
+		}
+		.block-editor-list-view-block__menu {
+			margin-left: -$grid-unit-10;
+		}
+	}
+
+	.block-editor-list-view-leaf .block-editor-list-view-block__contents-cell {
+		width: 100%;
+	}
+
+	.block-editor-list-view-leaf .block-editor-list-view-block-contents {
+		white-space: normal;
+	}
+
+	.block-editor-list-view-block__title {
+		margin-top: 3px;
+	}
+
+	.block-editor-list-view-block__menu-cell {
+		padding-right: 0;
+	}
+
+	.components-button {
+		color: $gray-600;
+		&:hover,
+		&:focus,
+		&[aria-current] {
+			color: $white;
+		}
+	}
+}
+
+.edit-site-sidebar-navigation-screen-navigation-menus__content .popover-slot .wp-block-navigation-submenu {
+	display: none;
+}

@@ -31,6 +31,7 @@ export async function initializeEditor( props, { component } = {} ) {
 	const postType = 'post';
 
 	return waitForStoreResolvers( () => {
+		const { screenWidth = 320, ...rest } = props || {};
 		const editorElement = component
 			? createElement( component, { postType, postId } )
 			: internalInitializeEditor( uniqueId, postType, postId );
@@ -38,7 +39,7 @@ export async function initializeEditor( props, { component } = {} ) {
 		const screen = render(
 			cloneElement( editorElement, {
 				initialTitle: 'test',
-				...props,
+				...rest,
 			} )
 		);
 
@@ -47,7 +48,7 @@ export async function initializeEditor( props, { component } = {} ) {
 		fireEvent( screen.getByTestId( 'block-list-wrapper' ), 'layout', {
 			nativeEvent: {
 				layout: {
-					width: 100,
+					width: screenWidth,
 				},
 			},
 		} );

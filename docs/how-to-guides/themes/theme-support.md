@@ -136,16 +136,16 @@ The colors will be shown in order on the palette, and there's no limit to how ma
 Themes are responsible for creating the classes that apply the colors in different contexts. Core blocks use "color", "background-color", and "border-color" contexts. So to correctly apply "strong magenta" to all contexts of core blocks a theme should implement the classes itself. The class name is built appending 'has-', followed by the class name _using_ kebab case and ending with the context name.
 
 ```css
-.has-strong-magenta-background-color {
-	background-color: #a156b4;
-}
-
 .has-strong-magenta-color {
 	color: #a156b4;
 }
 
+.has-strong-magenta-background-color {
+	background-color: #a156b4;
+}
+
 .has-strong-magenta-border-color {
-	color: #a156b4;
+	border-color: #a156b4;
 }
 ```
 

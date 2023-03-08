@@ -22,23 +22,24 @@ function render_block_core_template_part( $attributes ) {
 	if (
 		isset( $attributes['slug'] ) &&
 		isset( $attributes['theme'] ) &&
-		wp_get_theme()->get_stylesheet() === $attributes['theme']
+		get_stylesheet() === $attributes['theme']
 	) {
 		$template_part_id    = $attributes['theme'] . '//' . $attributes['slug'];
 		$template_part_query = new WP_Query(
 			array(
-				'post_type'      => 'wp_template_part',
-				'post_status'    => 'publish',
-				'post_name__in'  => array( $attributes['slug'] ),
-				'tax_query'      => array(
+				'post_type'           => 'wp_template_part',
+				'post_status'         => 'publish',
+				'post_name__in'       => array( $attributes['slug'] ),
+				'tax_query'           => array(
 					array(
 						'taxonomy' => 'wp_theme',
 						'field'    => 'name',
 						'terms'    => $attributes['theme'],
 					),
 				),
-				'posts_per_page' => 1,
-				'no_found_rows'  => true,
+				'posts_per_page'      => 1,
+				'no_found_rows'       => true,
+				'lazy_load_term_meta' => false, // Do not lazy load term meta, as template parts only have one term.
 			)
 		);
 		$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
@@ -126,6 +127,21 @@ function render_block_core_template_part( $attributes ) {
 			'';
 	}
 
+	// Look up area definition.
+	$area_definition = null;
+	$defined_areas   = get_allowed_block_template_part_areas();
+	foreach ( $defined_areas as $defined_area ) {
+		if ( $defined_area['area'] === $area ) {
+			$area_definition = $defined_area;
+			break;
+		}
+	}
+
+	// If $area is not allowed, set it back to the uncategorized default.
+	if ( ! $area_definition ) {
+		$area = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+	}
+
 	// Run through the actions that are typically taken on the_content.
 	$seen_ids[ $template_part_id ] = true;
 	$content                       = do_blocks( $content );
@@ -133,7 +149,7 @@ function render_block_core_template_part( $attributes ) {
 	$content = wptexturize( $content );
 	$content = convert_smilies( $content );
 	$content = shortcode_unautop( $content );
-	$content = wp_filter_content_tags( $content );
+	$content = wp_filter_content_tags( $content, "template_part_{$area}" );
 	$content = do_shortcode( $content );
 
 	// Handle embeds for block template parts.
@@ -141,12 +157,9 @@ function render_block_core_template_part( $attributes ) {
 	$content = $wp_embed->autoembed( $content );
 
 	if ( empty( $attributes['tagName'] ) ) {
-		$defined_areas = get_allowed_block_template_part_areas();
-		$area_tag      = 'div';
-		foreach ( $defined_areas as $defined_area ) {
-			if ( $defined_area['area'] === $area && isset( $defined_area['area_tag'] ) ) {
-				$area_tag = $defined_area['area_tag'];
-			}
+		$area_tag = 'div';
+		if ( $area_definition && isset( $area_definition['area_tag'] ) ) {
+			$area_tag = $area_definition['area_tag'];
 		}
 		$html_tag = $area_tag;
 	} else {

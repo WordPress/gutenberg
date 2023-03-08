@@ -7,14 +7,23 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
+import { updateAttributes } from './update-attributes';
+import { LinkUI } from './link-ui';
+import { useInsertedBlock } from './use-inserted-block';
+
+const BLOCKS_WITH_LINK_UI_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
 
 const ListViewBlockContents = forwardRef(
 	(
@@ -33,18 +42,53 @@ const ListViewBlockContents = forwardRef(
 		ref
 	) => {
 		const { clientId } = block;
-
-		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
+		const [ isLinkUIOpen, setIsLinkUIOpen ] = useState();
+		const {
+			blockMovingClientId,
+			selectedBlockInBlockEditor,
+			lastInsertedBlockClientId,
+		} = useSelect(
 			( select ) => {
-				const { hasBlockMovingClientId, getSelectedBlockClientId } =
-					select( blockEditorStore );
+				const {
+					hasBlockMovingClientId,
+					getSelectedBlockClientId,
+					getLastInsertedBlocksClientIds,
+				} = unlock( select( blockEditorStore ) );
+				const lastInsertedBlocksClientIds =
+					getLastInsertedBlocksClientIds();
 				return {
 					blockMovingClientId: hasBlockMovingClientId(),
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
+					lastInsertedBlockClientId:
+						lastInsertedBlocksClientIds &&
+						lastInsertedBlocksClientIds[ 0 ],
 				};
 			},
 			[ clientId ]
 		);
+
+		const {
+			insertedBlockAttributes,
+			insertedBlockName,
+			setInsertedBlockAttributes,
+		} = useInsertedBlock( lastInsertedBlockClientId );
+
+		const hasExistingLinkValue = insertedBlockAttributes?.url;
+
+		useEffect( () => {
+			if (
+				clientId === lastInsertedBlockClientId &&
+				BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName ) &&
+				! hasExistingLinkValue // don't re-show the Link UI if the block already has a link value.
+			) {
+				setIsLinkUIOpen( true );
+			}
+		}, [
+			lastInsertedBlockClientId,
+			clientId,
+			insertedBlockName,
+			hasExistingLinkValue,
+		] );
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
@@ -62,26 +106,45 @@ const ListViewBlockContents = forwardRef(
 			: [ clientId ];
 
 		return (
-			<BlockDraggable clientIds={ draggableClientIds }>
-				{ ( { draggable, onDragStart, onDragEnd } ) => (
-					<ListViewBlockSelectButton
-						ref={ ref }
-						className={ className }
-						block={ block }
-						onClick={ onClick }
-						onToggleExpanded={ onToggleExpanded }
-						isSelected={ isSelected }
-						position={ position }
-						siblingBlockCount={ siblingBlockCount }
-						level={ level }
-						draggable={ draggable }
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
-						isExpanded={ isExpanded }
-						{ ...props }
+			<>
+				{ isLinkUIOpen && (
+					<LinkUI
+						clientId={ lastInsertedBlockClientId }
+						link={ insertedBlockAttributes }
+						onClose={ () => setIsLinkUIOpen( false ) }
+						hasCreateSuggestion={ false }
+						onChange={ ( updatedValue ) => {
+							updateAttributes(
+								updatedValue,
+								setInsertedBlockAttributes,
+								insertedBlockAttributes
+							);
+							setIsLinkUIOpen( false );
+						} }
+						onCancel={ () => setIsLinkUIOpen( false ) }
 					/>
 				) }
-			</BlockDraggable>
+				<BlockDraggable clientIds={ draggableClientIds }>
+					{ ( { draggable, onDragStart, onDragEnd } ) => (
+						<ListViewBlockSelectButton
+							ref={ ref }
+							className={ className }
+							block={ block }
+							onClick={ onClick }
+							onToggleExpanded={ onToggleExpanded }
+							isSelected={ isSelected }
+							position={ position }
+							siblingBlockCount={ siblingBlockCount }
+							level={ level }
+							draggable={ draggable }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
+							isExpanded={ isExpanded }
+							{ ...props }
+						/>
+					) }
+				</BlockDraggable>
+			</>
 		);
 	}
 );

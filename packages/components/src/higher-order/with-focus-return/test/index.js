@@ -84,9 +84,7 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should switch focus back when unmounted while having focus', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const { unmount } = render( <Composite />, {
 				container: document.body.appendChild(

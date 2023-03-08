@@ -29,11 +29,9 @@ const ALLOWED_BLOCKS = [
 
 const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
-};
-
-const LAYOUT = {
-	type: 'default',
-	alignments: [],
+	attributes: {
+		type: 'page',
+	},
 };
 
 export default function NavigationInnerBlocks( {
@@ -131,7 +129,6 @@ export default function NavigationInnerBlocks( {
 				parentOrChildHasSelection
 					? InnerBlocks.ButtonBlockAppender
 					: false,
-			__experimentalLayout: LAYOUT,
 			placeholder: showPlaceholder ? placeholder : undefined,
 		}
 	);
