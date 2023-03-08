@@ -45,6 +45,7 @@ export function serializeGradientOrientation(
 	orientation: gradientParser.GradientNode[ 'orientation' ]
 ) {
 	if (
+		// NTS: Because we're narrowing to `orientation.type !== 'angular'`, ruling out arrays should have no runtime impact
 		Array.isArray( orientation ) ||
 		! orientation ||
 		orientation.type !== 'angular'

@@ -137,7 +137,7 @@ function ControlPoints( {
 
 		const { initialPosition, index, significantMoveHappened } =
 			controlPointMoveState?.current ?? {};
-
+		// NTS: `getHorizontalRelativeGradientPosition` will return `undefined` if the `containerElement` arg is falsey.
 		if (
 			initialPosition === undefined ||
 			relativePosition === undefined ||
