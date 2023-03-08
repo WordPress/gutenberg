@@ -47,6 +47,10 @@
 	border-top: $border-width solid $gray-300;
 }
 
+.block-editor-block-inspector__tabs .components-tab-panel__tab-content {
+	margin-top: -$border-width;
+}
+
 .block-editor-block-inspector__tab-item {
 	flex: 1 1 0px;
 }
