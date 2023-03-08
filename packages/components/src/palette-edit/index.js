@@ -321,7 +321,7 @@ export default function PaletteEdit( {
 } ) {
 	const isGradient = !! gradients;
 	const elements = isGradient ? gradients : colors;
-	const [ isEditing, setIsEditing ] = useState( false );
+	const [ isEditing, setIsEditing ] = useState( true );
 	const [ editingElement, setEditingElement ] = useState( null );
 	const isAdding =
 		isEditing &&
