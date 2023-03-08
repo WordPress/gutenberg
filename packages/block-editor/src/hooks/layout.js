@@ -35,18 +35,22 @@ const layoutBlockSupportKey = '__experimentalLayout';
 /**
  * Generates the utility classnames for the given block's layout attributes.
  *
- * @param { Object } blockAttributes Block attributes.
- * @param { string } blockName       Block name.
+ * @param {Object} blockAttributes      Block attributes.
+ * @param {string} blockName            Block name.
+ * @param {Object} globalLayoutSettings Global layout settings.
  *
  * @return { Array } Array of CSS classname strings.
  */
-export function useLayoutClasses( blockAttributes = {}, blockName ) {
+export function useLayoutClasses(
+	blockAttributes = {},
+	blockName,
+	globalLayoutSettings
+) {
 	const rootPaddingAlignment = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalFeatures
 			?.useRootPaddingAwareAlignments;
 	}, [] );
-	const globalLayoutSettings = useSetting( 'layout' ) || {};
 
 	const { layout } = blockAttributes;
 
@@ -376,7 +380,11 @@ export const withLayoutStyles = createHigherOrderComponent(
 			layout?.inherit || layout?.contentSize || layout?.wideSize
 				? { ...layout, type: 'constrained' }
 				: layout || defaultBlockLayout || {};
-		const layoutClasses = useLayoutClasses( attributes, name );
+		const layoutClasses = useLayoutClasses(
+			attributes,
+			name,
+			defaultThemeLayout
+		);
 		// Higher specificity to override defaults from theme.json.
 		const selector = `.wp-container-${ id }.wp-container-${ id }`;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );

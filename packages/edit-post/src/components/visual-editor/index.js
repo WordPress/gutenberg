@@ -259,7 +259,8 @@ export default function VisualEditor( { styles } ) {
 
 	const postContentLayoutClasses = useLayoutClasses(
 		newestPostContentAttributes,
-		'core/post-content'
+		'core/post-content',
+		globalLayoutSettings
 	);
 
 	const blockListLayoutClass = classnames(
