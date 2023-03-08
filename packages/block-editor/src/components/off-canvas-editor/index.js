@@ -77,6 +77,7 @@ function OffCanvasEditor(
 		LeafMoreMenu,
 		description = __( 'Block navigation structure' ),
 		onSelect,
+		renderAdditionalBlockUI,
 	},
 	ref
 ) {
@@ -200,6 +201,7 @@ function OffCanvasEditor(
 			expand,
 			collapse,
 			LeafMoreMenu,
+			renderAdditionalBlockUI,
 		} ),
 		[
 			isMounted.current,
@@ -208,6 +210,7 @@ function OffCanvasEditor(
 			expand,
 			collapse,
 			LeafMoreMenu,
+			renderAdditionalBlockUI,
 		]
 	);
 
