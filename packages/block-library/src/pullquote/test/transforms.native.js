@@ -9,20 +9,16 @@ import {
 	getBlockTransformOptions,
 } from 'test/helpers';
 
-const block = 'Paragraph';
+const block = 'Pullquote';
 const initialHtml = `
-<!-- wp:paragraph -->
-<p>Example text</p>
-<!-- /wp:paragraph -->`;
+<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>One of the hardest things to do in technology is disrupt yourself.</p><cite>Matt Mullenweg</cite></blockquote></figure>
+<!-- /wp:pullquote -->`;
 
-// NOTE: Paragraph block can be transformed to Buttons block in web,
-// however this transform is not supported in the native version.
-const transformsWithInnerBlocks = [ 'List', 'Quote', 'Columns', 'Group' ];
+const transformsWithInnerBlocks = [ 'Quote', 'Columns', 'Group' ];
 const blockTransforms = [
+	'Paragraph',
 	'Heading',
-	'Preformatted',
-	'Pullquote',
-	'Verse',
 	...transformsWithInnerBlocks,
 ];
 

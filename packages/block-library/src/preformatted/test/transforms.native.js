@@ -9,22 +9,14 @@ import {
 	getBlockTransformOptions,
 } from 'test/helpers';
 
-const block = 'Paragraph';
+const block = 'Preformatted';
 const initialHtml = `
-<!-- wp:paragraph -->
-<p>Example text</p>
-<!-- /wp:paragraph -->`;
+<!-- wp:preformatted -->
+<pre class="wp-block-preformatted">Some <em>preformatted</em> text...<br>And more!</pre>
+<!-- /wp:preformatted -->`;
 
-// NOTE: Paragraph block can be transformed to Buttons block in web,
-// however this transform is not supported in the native version.
-const transformsWithInnerBlocks = [ 'List', 'Quote', 'Columns', 'Group' ];
-const blockTransforms = [
-	'Heading',
-	'Preformatted',
-	'Pullquote',
-	'Verse',
-	...transformsWithInnerBlocks,
-];
+const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
+const blockTransforms = [ 'Paragraph', 'Code', ...transformsWithInnerBlocks ];
 
 setupCoreBlocks();
 

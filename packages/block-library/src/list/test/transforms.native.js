@@ -9,20 +9,26 @@ import {
 	getBlockTransformOptions,
 } from 'test/helpers';
 
-const block = 'Paragraph';
+const block = 'List';
 const initialHtml = `
-<!-- wp:paragraph -->
-<p>Example text</p>
-<!-- /wp:paragraph -->`;
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>First Item</li>
+<!-- /wp:list-item -->
 
-// NOTE: Paragraph block can be transformed to Buttons block in web,
-// however this transform is not supported in the native version.
-const transformsWithInnerBlocks = [ 'List', 'Quote', 'Columns', 'Group' ];
+<!-- wp:list-item -->
+<li>Second Item</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Third Item</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`;
+
+const transformsWithInnerBlocks = [ 'Quote', 'Columns', 'Group' ];
 const blockTransforms = [
+	'Paragraph',
 	'Heading',
-	'Preformatted',
-	'Pullquote',
-	'Verse',
 	...transformsWithInnerBlocks,
 ];
 

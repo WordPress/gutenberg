@@ -9,22 +9,14 @@ import {
 	getBlockTransformOptions,
 } from 'test/helpers';
 
-const block = 'Paragraph';
+const block = 'Shortcode';
 const initialHtml = `
-<!-- wp:paragraph -->
-<p>Example text</p>
-<!-- /wp:paragraph -->`;
+<!-- wp:shortcode -->
+[youtube https://www.youtube.com/watch?v=ssfHW5lwFZg]
+<!-- /wp:shortcode -->`;
 
-// NOTE: Paragraph block can be transformed to Buttons block in web,
-// however this transform is not supported in the native version.
-const transformsWithInnerBlocks = [ 'List', 'Quote', 'Columns', 'Group' ];
-const blockTransforms = [
-	'Heading',
-	'Preformatted',
-	'Pullquote',
-	'Verse',
-	...transformsWithInnerBlocks,
-];
+const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
+const blockTransforms = [ ...transformsWithInnerBlocks ];
 
 setupCoreBlocks();
 

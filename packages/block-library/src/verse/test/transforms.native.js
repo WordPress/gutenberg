@@ -9,22 +9,14 @@ import {
 	getBlockTransformOptions,
 } from 'test/helpers';
 
-const block = 'Paragraph';
+const block = 'Verse';
 const initialHtml = `
-<!-- wp:paragraph -->
-<p>Example text</p>
-<!-- /wp:paragraph -->`;
+<!-- wp:verse {"textAlign":"center"} -->
+<pre class="wp-block-verse has-text-align-center">Come<br>Home.</pre>
+<!-- /wp:verse -->`;
 
-// NOTE: Paragraph block can be transformed to Buttons block in web,
-// however this transform is not supported in the native version.
-const transformsWithInnerBlocks = [ 'List', 'Quote', 'Columns', 'Group' ];
-const blockTransforms = [
-	'Heading',
-	'Preformatted',
-	'Pullquote',
-	'Verse',
-	...transformsWithInnerBlocks,
-];
+const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
+const blockTransforms = [ 'Paragraph', ...transformsWithInnerBlocks ];
 
 setupCoreBlocks();
 

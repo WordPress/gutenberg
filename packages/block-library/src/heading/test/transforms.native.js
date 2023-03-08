@@ -9,20 +9,16 @@ import {
 	getBlockTransformOptions,
 } from 'test/helpers';
 
-const block = 'Paragraph';
+const block = 'Heading';
 const initialHtml = `
-<!-- wp:paragraph -->
-<p>Example text</p>
-<!-- /wp:paragraph -->`;
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Example text</h2>
+<!-- /wp:heading -->`;
 
-// NOTE: Paragraph block can be transformed to Buttons block in web,
-// however this transform is not supported in the native version.
 const transformsWithInnerBlocks = [ 'List', 'Quote', 'Columns', 'Group' ];
 const blockTransforms = [
-	'Heading',
-	'Preformatted',
+	'Paragraph',
 	'Pullquote',
-	'Verse',
 	...transformsWithInnerBlocks,
 ];
 
