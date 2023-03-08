@@ -23,7 +23,12 @@ import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 
 const noop = () => {};
-const NAVIGATION_MENUS_QUERY = { per_page: -1, status: 'publish' };
+const NAVIGATION_MENUS_QUERY = {
+	per_page: 1,
+	status: 'publish',
+	order: 'desc',
+	orderby: 'date',
+};
 
 function SidebarNavigationScreenWrapper( { children, actions } ) {
 	return (
@@ -66,17 +71,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 			};
 		}, [] );
 
-	// Sort navigation menus by date.
-	const orderedNavigationMenus = useMemo(
-		() =>
-			navigationMenus?.sort( ( menuA, menuB ) => {
-				const menuADate = new Date( menuA.date );
-				const menuBDate = new Date( menuB.date );
-				return menuADate.getTime() > menuBDate.getTime();
-			} ),
-		[ navigationMenus ]
-	);
-	const firstNavigationMenu = orderedNavigationMenus?.[ 0 ]?.id;
+	const firstNavigationMenu = navigationMenus?.[ 0 ]?.id;
 	const blocks = useMemo( () => {
 		return [
 			createBlock( 'core/navigation', { ref: firstNavigationMenu } ),
