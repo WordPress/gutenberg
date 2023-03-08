@@ -12,7 +12,12 @@
  * @param array $preload_paths    Preload paths to be filtered.
  * @return array
  */
-function gutenberg_preload_navigation_posts( $preload_paths ) {
+function gutenberg_preload_navigation_posts( $preload_paths, $context ) {
+
+	// Limit to the Site Editor.
+	if ( ! empty( $context->name ) && 'core/edit-site' !== $context->name ) {
+		return $preload_paths;
+	}
 
 	$navigation_rest_route = rest_get_route_for_post_type_items(
 		'wp_navigation'
