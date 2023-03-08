@@ -22,7 +22,7 @@ import type {
 	CustomGradientBarReducerAction,
 	CustomGradientBarIdleState,
 } from '../types';
-import type { LegacyRef, MouseEventHandler } from 'react';
+import type { MouseEventHandler } from 'react';
 
 const customGradientBarReducer = (
 	state: CustomGradientBarReducerState,
@@ -89,8 +89,7 @@ export default function CustomGradientBar( {
 	disableAlpha = false,
 	__experimentalIsRenderedInSidebar,
 }: CustomGradientBarProps ) {
-	const gradientMarkersContainerDomRef: LegacyRef< HTMLDivElement > =
-		useRef( null );
+	const gradientMarkersContainerDomRef = useRef< HTMLDivElement >( null );
 
 	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
 		customGradientBarReducer,
