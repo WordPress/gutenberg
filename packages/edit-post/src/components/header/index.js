@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
@@ -10,6 +11,7 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import {
+	NavigableToolbar,
 	store as blockEditorStore,
 	BlockToolbar,
 } from '@wordpress/block-editor';
@@ -81,6 +83,8 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 	};
 
+	const blockToolbarAriaLabel = __( 'Block tools' );
+
 	return (
 		<div className="edit-post-header">
 			<MainDashboardButton.Slot>
@@ -111,9 +115,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 									left: firstParentClientId ? '60px' : '0',
 								} }
 							>
-								<BlockToolbar
-									hideDragHandle={ hasFixedToolbar }
-								/>
+								<NavigableToolbar
+									className="edit-post-header-toolbar"
+									aria-label={ blockToolbarAriaLabel }
+								>
+									<BlockToolbar
+										hideDragHandle={ hasFixedToolbar }
+									/>
+								</NavigableToolbar>
 							</div>
 						</MaybeHide>
 					</>
