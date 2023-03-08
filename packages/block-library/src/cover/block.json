@@ -109,6 +109,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"__experimentalLayout": {
+			"allowJustification": false
 		}
 	},
 	"editorStyle": "wp-block-cover-editor",
