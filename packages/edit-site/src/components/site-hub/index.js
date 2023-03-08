@@ -95,6 +95,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 						className="edit-site-layout__view-mode-toggle"
 					>
 						<motion.div
+							initial={ false }
 							animate={ {
 								scale: canvasMode === 'view' ? 0.5 : 1,
 							} }
