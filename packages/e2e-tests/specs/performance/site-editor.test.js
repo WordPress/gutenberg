@@ -157,9 +157,11 @@ describe( 'Site Editor Performance', () => {
 		await insertBlock( 'Paragraph' );
 
 		// Start tracing.
-		const traceFile = __dirname + '/trace.json';
+		const traceFilePath = join(
+			process.env.WP_ARTIFACTS_PATH + '/site-editor-loading.trace.json'
+		);
 		await page.tracing.start( {
-			path: traceFile,
+			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
@@ -169,7 +171,7 @@ describe( 'Site Editor Performance', () => {
 
 		// Stop tracing and save results.
 		await page.tracing.stop();
-		const traceResults = JSON.parse( readFile( traceFile ) );
+		const traceResults = JSON.parse( readFile( traceFilePath ) );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
 		for ( let i = 0; i < keyDownEvents.length; i++ ) {
@@ -179,7 +181,7 @@ describe( 'Site Editor Performance', () => {
 		}
 
 		// Delete the original trace file.
-		deleteFile( traceFile );
+		deleteFile( traceFilePath );
 
 		expect( true ).toBe( true );
 	} );
