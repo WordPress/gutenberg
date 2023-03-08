@@ -13,24 +13,26 @@ import { useNavigationContext } from '../context';
 import { MenuTitleSearchUI } from '../styles/navigation-styles';
 import { SEARCH_FOCUS_DELAY } from '../constants';
 
+import type { NavigationMenuTitleSearchProps } from '../types';
+
 function MenuTitleSearch( {
 	debouncedSpeak,
 	onCloseSearch,
 	onSearch,
 	search,
 	title,
-} ) {
+}: NavigationMenuTitleSearchProps ) {
 	const {
 		navigationTree: { items },
 	} = useNavigationContext();
 	const { menu } = useNavigationMenuContext();
-	const inputRef = useRef();
+	const inputRef = useRef< HTMLInputElement >( null );
 
 	// Wait for the slide-in animation to complete before autofocusing the input.
 	// This prevents scrolling to the input during the animation.
 	useEffect( () => {
 		const delayedFocus = setTimeout( () => {
-			inputRef.current.focus();
+			inputRef.current?.focus();
 		}, SEARCH_FOCUS_DELAY );
 
 		return () => {
@@ -57,16 +59,18 @@ function MenuTitleSearch( {
 	}, [ items, search ] );
 
 	const onClose = () => {
-		onSearch( '' );
+		onSearch?.( '' );
 		onCloseSearch();
 	};
 
-	function onKeyDown( event ) {
+	const onKeyDown: React.KeyboardEventHandler< HTMLInputElement > = (
+		event
+	) => {
 		if ( event.code === 'Escape' && ! event.defaultPrevented ) {
 			event.preventDefault();
 			onClose();
 		}
-	}
+	};
 
 	const inputId = `components-navigation__menu-title-search-${ menu }`;
 	const placeholder = sprintf(
@@ -81,7 +85,7 @@ function MenuTitleSearch( {
 				autoComplete="off"
 				className="components-navigation__menu-search-input"
 				id={ inputId }
-				onChange={ ( value ) => onSearch( value ) }
+				onChange={ ( value ) => onSearch?.( value ) }
 				onKeyDown={ onKeyDown }
 				placeholder={ placeholder }
 				onClose={ onClose }

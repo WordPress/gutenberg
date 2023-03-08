@@ -1,14 +1,27 @@
 /**
+ * External dependencies
+ */
+import type { ComponentStory } from '@storybook/react';
+
+/**
  * Internal dependencies
  */
-import Navigation from '../..';
-import NavigationItem from '../../item';
-import NavigationMenu from '../../menu';
+import { Navigation } from '../..';
+import { NavigationItem } from '../../item';
+import { NavigationMenu } from '../../menu';
 
-export function HideIfEmptyStory() {
+export const HideIfEmptyStory: ComponentStory< typeof Navigation > = ( {
+	className,
+	...props
+} ) => {
 	return (
 		<>
-			<Navigation className="navigation-story">
+			<Navigation
+				{ ...props }
+				className={ [ 'navigation-story', className ]
+					.filter( Boolean )
+					.join( ' ' ) }
+			>
 				<NavigationMenu title="Home" menu="root" isEmpty={ false }>
 					<NavigationItem
 						navigateToMenu="root-sub-1"
@@ -54,4 +67,4 @@ export function HideIfEmptyStory() {
 			</p>
 		</>
 	);
-}
+};

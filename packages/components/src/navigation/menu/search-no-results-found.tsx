@@ -9,7 +9,11 @@ import { __ } from '@wordpress/i18n';
 import { useNavigationContext } from '../context';
 import { ItemBaseUI, ItemUI } from '../styles/navigation-styles';
 
-export default function NavigationSearchNoResultsFound( { search } ) {
+import type { NavigationSearchNoResultsFoundProps } from '../types';
+
+export default function NavigationSearchNoResultsFound( {
+	search,
+}: NavigationSearchNoResultsFoundProps ) {
 	const {
 		navigationTree: { items },
 	} = useNavigationContext();

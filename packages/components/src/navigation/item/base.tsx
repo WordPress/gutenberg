@@ -15,9 +15,11 @@ import { useNavigationContext } from '../context';
 import { useNavigationTreeItem } from './use-navigation-tree-item';
 import { ItemBaseUI } from '../styles/navigation-styles';
 
+import type { NavigationItemBaseProps } from '../types';
+
 let uniqueId = 0;
 
-export default function NavigationItemBase( props ) {
+export default function NavigationItemBase( props: NavigationItemBaseProps ) {
 	// Also avoid to pass the `title` and `href` props to the ItemBaseUI styled component.
 	const { children, className, title, href, ...restProps } = props;
 

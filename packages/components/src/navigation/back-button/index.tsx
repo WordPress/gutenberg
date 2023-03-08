@@ -15,9 +15,17 @@ import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import { useNavigationContext } from '../context';
 import { MenuBackButtonUI } from '../styles/navigation-styles';
 
-function NavigationBackButton(
-	{ backButtonLabel, className, href, onClick, parentMenu },
-	ref
+import type { NavigationBackButtonProps } from '../types';
+
+function UnforwardedNavigationBackButton(
+	{
+		backButtonLabel,
+		className,
+		href,
+		onClick,
+		parentMenu,
+	}: NavigationBackButtonProps,
+	ref: React.ForwardedRef< HTMLAnchorElement | HTMLButtonElement >
 ) {
 	const { setActiveMenu, navigationTree } = useNavigationContext();
 
@@ -26,9 +34,12 @@ function NavigationBackButton(
 		className
 	);
 
-	const parentMenuTitle = navigationTree.getMenu( parentMenu )?.title;
+	const parentMenuTitle =
+		parentMenu !== undefined
+			? navigationTree.getMenu( parentMenu )?.title
+			: undefined;
 
-	const handleOnClick = ( event ) => {
+	const handleOnClick: React.MouseEventHandler< HTMLElement > = ( event ) => {
 		if ( typeof onClick === 'function' ) {
 			onClick( event );
 		}
@@ -52,4 +63,9 @@ function NavigationBackButton(
 		</MenuBackButtonUI>
 	);
 }
-export default forwardRef( NavigationBackButton );
+
+export const NavigationBackButton = forwardRef(
+	UnforwardedNavigationBackButton
+);
+
+export default NavigationBackButton;

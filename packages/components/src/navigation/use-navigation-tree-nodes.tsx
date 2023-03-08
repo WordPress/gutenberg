@@ -3,12 +3,16 @@
  */
 import { useState } from '@wordpress/element';
 
-export const useNavigationTreeNodes = () => {
-	const [ nodes, setNodes ] = useState( {} );
+export function useNavigationTreeNodes<
+	TNode extends { children?: React.ReactNode; [ key: string ]: unknown }
+>() {
+	const [ nodes, setNodes ] = useState<
+		Record< string, Omit< TNode, 'children' > >
+	>( {} );
 
-	const getNode = ( key ) => nodes[ key ];
+	const getNode = ( key: string ) => nodes[ key ];
 
-	const addNode = ( key, value ) => {
+	const addNode = ( key: string, value: TNode ) => {
 		const { children, ...newNode } = value;
 		return setNodes( ( original ) => ( {
 			...original,
@@ -16,7 +20,7 @@ export const useNavigationTreeNodes = () => {
 		} ) );
 	};
 
-	const removeNode = ( key ) => {
+	const removeNode = ( key: keyof typeof nodes ) => {
 		return setNodes( ( original ) => {
 			const { [ key ]: removedNode, ...remainingNodes } = original;
 			return remainingNodes;
@@ -24,4 +28,4 @@ export const useNavigationTreeNodes = () => {
 	};
 
 	return { nodes, getNode, addNode, removeNode };
-};
+}

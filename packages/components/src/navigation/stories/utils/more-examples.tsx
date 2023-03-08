@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
@@ -7,14 +12,17 @@ import { Icon, wordpress, home } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Navigation from '../..';
-import NavigationGroup from '../../group';
-import NavigationItem from '../../item';
-import NavigationMenu from '../../menu';
+import { Navigation } from '../..';
+import { NavigationGroup } from '../../group';
+import { NavigationItem } from '../../item';
+import { NavigationMenu } from '../../menu';
 
-export function MoreExamplesStory() {
+export const MoreExamplesStory: ComponentStory< typeof Navigation > = ( {
+	className,
+	...props
+} ) => {
 	const [ activeItem, setActiveItem ] = useState( 'child-1' );
-	const [ delayedBadge, setDelayedBadge ] = useState();
+	const [ delayedBadge, setDelayedBadge ] = useState< number | undefined >();
 	useEffect( () => {
 		const timeout = setTimeout( () => setDelayedBadge( 2 ), 1500 );
 		return () => clearTimeout( timeout );
@@ -24,7 +32,13 @@ export function MoreExamplesStory() {
 		useState( 1 );
 
 	return (
-		<Navigation activeItem={ activeItem } className="navigation-story">
+		<Navigation
+			{ ...props }
+			activeItem={ activeItem }
+			className={ [ 'navigation-story', className ]
+				.filter( Boolean )
+				.join( ' ' ) }
+		>
 			<NavigationMenu title="Home">
 				<NavigationGroup title="Items without Active State">
 					<NavigationItem item="item-1" title="Item 1" />
@@ -126,10 +140,14 @@ export function MoreExamplesStory() {
 				menu="custom-back-click-handler-prevented-menu"
 				title="Custom back button click handler prevented"
 				parentMenu="root"
-				onBackButtonClick={ ( event ) => {
-					event.preventDefault();
-					setBackButtonPreventedBadge( backButtonPreventedBadge + 1 );
-				} }
+				onBackButtonClick={
+					( ( event ) => {
+						event.preventDefault();
+						setBackButtonPreventedBadge(
+							backButtonPreventedBadge + 1
+						);
+					} ) as React.MouseEventHandler
+				}
 				backButtonLabel="Increment badge"
 			>
 				<NavigationItem
@@ -140,4 +158,4 @@ export function MoreExamplesStory() {
 			</NavigationMenu>
 		</Navigation>
 	);
-}
+};

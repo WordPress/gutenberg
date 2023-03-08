@@ -8,27 +8,30 @@ import { createContext, useContext } from '@wordpress/element';
  */
 import { ROOT_MENU } from './constants';
 
-const noop = () => {};
+import type { NavigationContext as NavigationContextType } from './types';
 
-export const NavigationContext = createContext( {
+const noop = () => {};
+const defaultIsEmpty = () => false;
+const defaultGetter = () => undefined;
+
+export const NavigationContext = createContext< NavigationContextType >( {
 	activeItem: undefined,
 	activeMenu: ROOT_MENU,
 	setActiveMenu: noop,
-	isMenuEmpty: noop,
 
 	navigationTree: {
 		items: {},
-		getItem: noop,
+		getItem: defaultGetter,
 		addItem: noop,
 		removeItem: noop,
 
 		menus: {},
-		getMenu: noop,
+		getMenu: defaultGetter,
 		addMenu: noop,
 		removeMenu: noop,
 		childMenu: {},
 		traverseMenu: noop,
-		isMenuEmpty: noop,
+		isMenuEmpty: defaultIsEmpty,
 	},
 } );
 export const useNavigationContext = () => useContext( NavigationContext );

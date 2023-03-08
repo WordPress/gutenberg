@@ -19,16 +19,18 @@ import {
 import { useNavigationMenuContext } from './context';
 import { SEARCH_FOCUS_DELAY } from '../constants';
 
+import type { NavigationMenuTitleProps } from '../types';
+
 export default function NavigationMenuTitle( {
 	hasSearch,
 	onSearch,
 	search,
 	title,
 	titleAction,
-} ) {
+}: NavigationMenuTitleProps ) {
 	const [ isSearching, setIsSearching ] = useState( false );
 	const { menu } = useNavigationMenuContext();
-	const searchButtonRef = useRef();
+	const searchButtonRef = useRef< HTMLElement >( null );
 
 	if ( ! title ) {
 		return null;
@@ -40,7 +42,7 @@ export default function NavigationMenuTitle( {
 		// Wait for the slide-in animation to complete before focusing the search button.
 		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
 		setTimeout( () => {
-			searchButtonRef.current.focus();
+			searchButtonRef.current?.focus();
 		}, SEARCH_FOCUS_DELAY );
 	};
 

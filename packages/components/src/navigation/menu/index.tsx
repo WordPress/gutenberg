@@ -21,7 +21,9 @@ import NavigationSearchNoResultsFound from './search-no-results-found';
 import { NavigableMenu } from '../../navigable-container';
 import { MenuUI } from '../styles/navigation-styles';
 
-export default function NavigationMenu( props ) {
+import type { NavigationMenuProps } from '../types';
+
+export function NavigationMenu( props: NavigationMenuProps ) {
 	const {
 		backButtonLabel,
 		children,
@@ -96,3 +98,5 @@ export default function NavigationMenu( props ) {
 		</NavigationMenuContext.Provider>
 	);
 }
+
+export default NavigationMenu;

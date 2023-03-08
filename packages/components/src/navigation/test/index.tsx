@@ -16,11 +16,19 @@ import Navigation from '..';
 import NavigationItem from '../item';
 import NavigationMenu from '../menu';
 
-const TestNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
+const TestNavigation = ( {
+	activeItem,
+	rootTitle,
+	showBadge,
+}: {
+	activeItem?: string;
+	rootTitle?: string;
+	showBadge?: boolean;
+} ) => (
 	<Navigation activeItem={ activeItem }>
 		<NavigationMenu title={ rootTitle }>
 			<NavigationItem
-				badge={ showBadge && 21 }
+				badge={ showBadge ? 21 : undefined }
 				item="item-1"
 				title="Item 1"
 			/>
@@ -55,9 +63,14 @@ const TestNavigationControlled = () => {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
-	const onMockLinkClick = ( event ) => {
+	const onMockLinkClick: React.MouseEventHandler< HTMLAnchorElement > = (
+		event
+	) => {
 		event.preventDefault();
-		const item = event.target.href.replace( 'https://example.com/', '' );
+		const item = ( event.target as HTMLAnchorElement ).href.replace(
+			'https://example.com/',
+			''
+		);
 		setActiveItem( item );
 	};
 

@@ -18,21 +18,70 @@ import { NavigationContext } from './context';
 import { NavigationUI } from './styles/navigation-styles';
 import { useCreateNavigationTree } from './use-create-navigation-tree';
 
+import type {
+	NavigationProps,
+	NavigationContext as NavigationContextType,
+} from './types';
+
 const noop = () => {};
 
-export default function Navigation( {
+/**
+ * Render a navigation list with optional groupings and hierarchy.
+ *
+ * @example
+ * ```jsx
+ * import {
+ *   __experimentalNavigation as Navigation,
+ *   __experimentalNavigationGroup as NavigationGroup,
+ *   __experimentalNavigationItem as NavigationItem,
+ *   __experimentalNavigationMenu as NavigationMenu,
+ * } from '@wordpress/components';
+ *
+ * const MyNavigation = () => (
+ *   <Navigation>
+ *     <NavigationMenu title="Home">
+ *       <NavigationGroup title="Group 1">
+ *         <NavigationItem item="item-1" title="Item 1" />
+ *         <NavigationItem item="item-2" title="Item 2" />
+ *       </NavigationGroup>
+ *       <NavigationGroup title="Group 2">
+ *         <NavigationItem
+ *           item="item-3"
+ *           navigateToMenu="category"
+ *           title="Category"
+ *         />
+ *       </NavigationGroup>
+ *     </NavigationMenu>
+ *
+ *     <NavigationMenu
+ *       backButtonLabel="Home"
+ *       menu="category"
+ *       parentMenu="root"
+ *       title="Category"
+ *     >
+ *       <NavigationItem badge="1" item="child-1" title="Child 1" />
+ *       <NavigationItem item="child-2" title="Child 2" />
+ *     </NavigationMenu>
+ *   </Navigation>
+ * );
+ * ```
+ */
+export function Navigation( {
 	activeItem,
 	activeMenu = ROOT_MENU,
 	children,
 	className,
 	onActivateMenu = noop,
-} ) {
+}: NavigationProps ) {
 	const [ menu, setMenu ] = useState( activeMenu );
-	const [ slideOrigin, setSlideOrigin ] = useState();
+	const [ slideOrigin, setSlideOrigin ] = useState< 'left' | 'right' >();
 	const navigationTree = useCreateNavigationTree();
 	const defaultSlideOrigin = isRTL() ? 'right' : 'left';
 
-	const setActiveMenu = ( menuId, slideInOrigin = defaultSlideOrigin ) => {
+	const setActiveMenu: NavigationContextType[ 'setActiveMenu' ] = (
+		menuId,
+		slideInOrigin = defaultSlideOrigin
+	) => {
 		if ( ! navigationTree.getMenu( menuId ) ) {
 			return;
 		}
@@ -76,9 +125,14 @@ export default function Navigation( {
 		<NavigationUI className={ classes }>
 			<div
 				key={ menu }
-				className={ classnames( {
-					[ animateClassName ]: isMounted.current && slideOrigin,
-				} ) }
+				className={
+					animateClassName
+						? classnames( {
+								[ animateClassName ]:
+									isMounted.current && slideOrigin,
+						  } )
+						: undefined
+				}
 			>
 				<NavigationContext.Provider value={ context }>
 					{ children }
@@ -87,3 +141,5 @@ export default function Navigation( {
 		</NavigationUI>
 	);
 }
+
+export default Navigation;
