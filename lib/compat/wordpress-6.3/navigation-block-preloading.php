@@ -16,9 +16,32 @@ function gutenberg_preload_navigation_permissions( $preload_paths, $context ) {
 	// Preload the OPTIONS request for all Navigation posts request.
 	$preload_paths[] = array( $navigation_rest_route, 'OPTIONS' );
 
-	// Preload the GET request for all Navigation posts request.
+	// Preload the GET request for all 'published' or 'draft' Navigation posts.
 	$preload_paths[] = array(
-		$navigation_rest_route . '?context=edit&per_page=100&status[0]=publish&status[1]=draft&_locale=user',
+		add_query_arg(
+			array(
+				'context'   => 'edit',
+				'per_page'  => '100',
+				'status[0]' => 'publish',
+				'status[1]' => 'draft',
+				'_locale'   => 'user',
+			),
+			$navigation_rest_route
+		),
+		'GET',
+	);
+
+	// Preload the GET request for 'published' Navigation posts only.
+	$preload_paths[] = array(
+		add_query_arg(
+			array(
+				'context'  => 'edit',
+				'per_page' => '100',
+				'status'   => 'publish',
+				'_locale'  => 'user',
+			),
+			$navigation_rest_route
+		),
 		'GET',
 	);
 
