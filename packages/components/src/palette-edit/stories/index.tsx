@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import type { FunctionComponent } from 'react';
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
@@ -13,12 +12,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import PaletteEdit from '..';
-import type {
-	Color,
-	Gradient,
-	PaletteEditColorsProps,
-	PaletteEditGradientsProps,
-} from '../types';
+import type { Color, Gradient } from '../types';
 
 const meta: ComponentMeta< typeof PaletteEdit > = {
 	title: 'Components/PaletteEdit',
@@ -31,24 +25,33 @@ const meta: ComponentMeta< typeof PaletteEdit > = {
 };
 export default meta;
 
-const ColorsTemplate: ComponentStory<
-	FunctionComponent< PaletteEditColorsProps >
-> = ( args ) => {
-	const { colors, onChange, ...props } = args;
-	const [ controlledColors, setControlledColors ] = useState( colors );
+const Template: ComponentStory< typeof PaletteEdit > = ( args ) => {
+	const { colors, gradients, onChange, ...props } = args;
+	const [ value, setValue ] = useState( gradients || colors );
 
 	return (
 		<PaletteEdit
-			colors={ controlledColors }
-			onChange={ ( newColors?: Color[] ) => {
-				setControlledColors( newColors );
-			} }
+			{ ...( gradients
+				? {
+						gradients: value as Gradient[],
+						onChange: ( newValue?: Gradient[] ) => {
+							setValue( newValue );
+							onChange( newValue );
+						},
+				  }
+				: {
+						colors: value as Color[],
+						onChange: ( newValue?: Color[] ) => {
+							setValue( newValue );
+							onChange( newValue );
+						},
+				  } ) }
 			{ ...props }
 		/>
 	);
 };
 
-export const Default = ColorsTemplate.bind( {} );
+export const Default = Template.bind( {} );
 Default.args = {
 	colors: [
 		{ color: '#1a4548', name: 'Primary', slug: 'primary' },
@@ -58,25 +61,7 @@ Default.args = {
 	emptyMessage: 'Colors are empty',
 };
 
-const GradientsTemplate: ComponentStory<
-	FunctionComponent< PaletteEditGradientsProps >
-> = ( args ) => {
-	const { gradients, onChange, ...props } = args;
-	const [ controlledGradients, setControlledGradients ] =
-		useState( gradients );
-
-	return (
-		<PaletteEdit
-			gradients={ controlledGradients }
-			onChange={ ( newGradients?: Gradient[] ) => {
-				setControlledGradients( newGradients );
-			} }
-			{ ...props }
-		/>
-	);
-};
-
-export const Gradients = GradientsTemplate.bind( {} );
+export const Gradients = Template.bind( {} );
 Gradients.args = {
 	gradients: [
 		{
