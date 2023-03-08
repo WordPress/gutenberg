@@ -699,4 +699,4 @@ class WP_Duotone {
 
 add_action( 'wp_loaded', array( 'WP_Duotone', 'gutenberg_save_duotone_presets' ), 10 );
 add_action( 'wp_loaded', array( 'WP_Duotone', 'gutenberg_save_duotone_block_names' ), 10 );
-add_filter( 'block_render', array( 'WP_Duotone', 'gutenberg_identify_used_duotone_blocks' ), 10, 2 );
+add_filter( 'render_block', array( 'WP_Duotone', 'gutenberg_identify_used_duotone_blocks' ), 10, 2 );
