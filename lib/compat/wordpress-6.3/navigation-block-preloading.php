@@ -22,9 +22,10 @@ function gutenberg_preload_navigation_permissions( $preload_paths, $context ) {
 			array(
 				'context'   => 'edit',
 				'per_page'  => '100',
+				'_locale'   => 'user',
+				// array indices are required to avoid query being encoded and not matching in cache.
 				'status[0]' => 'publish',
 				'status[1]' => 'draft',
-				'_locale'   => 'user',
 			),
 			$navigation_rest_route
 		),
