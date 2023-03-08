@@ -94,22 +94,13 @@ jobs:
               run: |
                   ./bin/plugin/cli.js perf $(echo $BRANCHES | tr ',' ' ') --tests-branch $GITHUB_SHA --wp-version "$WP_VERSION"
 
-            - name: Get commit timestamp
-              uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975 # v6.4.0
-              if: github.event_name == 'push'
-              id: commit-timestamp
-              with:
-                  github-token: ${{secrets.GITHUB_TOKEN}}
-                  script: |
-                      const commit_details = await github.rest.git.getCommit({owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha});
-                      return parseInt((new Date( commit_details.data.author.date ).getTime() / 1000).toFixed(0))
-
             - name: Publish performance results
               if: github.event_name == 'push'
               env:
-                  COMMITTED_AT: ${{ steps.commit-timestamp.outputs.result }}
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
-              run: ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 $COMMITTED_AT
+              run: |
+                  COMMITTED_AT=$(git show -s $GITHUB_SHA --format="%ct")
+                  ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 $COMMITTED_AT
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
               uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2

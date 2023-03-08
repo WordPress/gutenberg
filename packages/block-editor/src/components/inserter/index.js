@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { forwardRef, Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -76,7 +76,7 @@ const defaultRenderToggle = ( {
 	);
 };
 
-class Inserter extends Component {
+class PrivateInserter extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -150,6 +150,7 @@ class Inserter extends Component {
 			prioritizePatterns,
 			onSelectOrClose,
 			selectBlockOnInsert,
+			orderInitialBlockItems,
 		} = this.props;
 
 		if ( isQuick ) {
@@ -173,6 +174,7 @@ class Inserter extends Component {
 					isAppender={ isAppender }
 					prioritizePatterns={ prioritizePatterns }
 					selectBlockOnInsert={ selectBlockOnInsert }
+					orderInitialBlockItems={ orderInitialBlockItems }
 				/>
 			);
 		}
@@ -224,7 +226,7 @@ class Inserter extends Component {
 	}
 }
 
-export default compose( [
+export const ComposedPrivateInserter = compose( [
 	withSelect(
 		( select, { clientId, rootClientId, shouldDirectInsert = true } ) => {
 			const {
@@ -421,4 +423,16 @@ export default compose( [
 		( { hasItems, isAppender, rootClientId, clientId } ) =>
 			hasItems || ( ! isAppender && ! rootClientId && ! clientId )
 	),
-] )( Inserter );
+] )( PrivateInserter );
+
+const Inserter = forwardRef( ( props, ref ) => {
+	return (
+		<ComposedPrivateInserter
+			ref={ ref }
+			{ ...props }
+			orderInitialBlockItems={ undefined }
+		/>
+	);
+} );
+
+export default Inserter;

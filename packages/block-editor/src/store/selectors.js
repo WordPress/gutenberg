@@ -1199,7 +1199,7 @@ export function isBlockSelected( state, clientId ) {
  * @param {string}  clientId Block client ID.
  * @param {boolean} deep     Perform a deep check.
  *
- * @return {boolean} Whether the block as an inner block selected
+ * @return {boolean} Whether the block has an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 	return getBlockOrder( state, clientId ).some(
@@ -1207,6 +1207,23 @@ export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 			isBlockSelected( state, innerClientId ) ||
 			isBlockMultiSelected( state, innerClientId ) ||
 			( deep && hasSelectedInnerBlock( state, innerClientId, deep ) )
+	);
+}
+
+/**
+ * Returns true if one of the block's inner blocks is dragged.
+ *
+ * @param {Object}  state    Editor state.
+ * @param {string}  clientId Block client ID.
+ * @param {boolean} deep     Perform a deep check.
+ *
+ * @return {boolean} Whether the block has an inner block dragged
+ */
+export function hasDraggedInnerBlock( state, clientId, deep = false ) {
+	return getBlockOrder( state, clientId ).some(
+		( innerClientId ) =>
+			isBlockBeingDragged( state, innerClientId ) ||
+			( deep && hasDraggedInnerBlock( state, innerClientId, deep ) )
 	);
 }
 
