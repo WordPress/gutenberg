@@ -12,7 +12,6 @@ import {
 	useEffect,
 	useRef,
 	Platform,
-	useMemo,
 } from '@wordpress/element';
 import {
 	InspectorControls,
@@ -201,18 +200,11 @@ function Navigation( {
 	const isConvertingClassicMenu =
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
-	// Only autofallback to published menus.
-	const fallbackNavigationMenus = useMemo(
-		() =>
-			navigationMenus
-				?.filter( ( menu ) => menu.status === 'publish' )
-				?.sort( ( menuA, menuB ) => {
-					const menuADate = new Date( menuA.date );
-					const menuBDate = new Date( menuB.date );
-					return menuADate.getTime() < menuBDate.getTime();
-				} ),
-		[ navigationMenus ]
-	);
+	// Only auto-fallback to the latest published menu.
+	// The REST API already returns items sorted by publishing date.
+	const fallbackNavigationMenuId = navigationMenus?.find(
+		( menu ) => menu.status === 'publish'
+	)?.id;
 
 	const handleUpdateMenu = useCallback(
 		( menuId, options = { focusNavigationBlock: false } ) => {
@@ -237,7 +229,7 @@ function Navigation( {
 			hasUncontrolledInnerBlocks ||
 			isCreatingNavigationMenu ||
 			ref ||
-			! fallbackNavigationMenus?.length
+			! fallbackNavigationMenuId
 		) {
 			return;
 		}
@@ -250,12 +242,12 @@ function Navigation( {
 		 *  nor to be undoable, hence why it is marked as non persistent
 		 */
 		__unstableMarkNextChangeAsNotPersistent();
-		setRef( fallbackNavigationMenus[ 0 ].id );
+		setRef( fallbackNavigationMenuId );
 	}, [
 		ref,
 		setRef,
 		isCreatingNavigationMenu,
-		fallbackNavigationMenus,
+		fallbackNavigationMenuId,
 		hasUncontrolledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
@@ -277,7 +269,7 @@ function Navigation( {
 			! hasResolvedClassicMenus ||
 			! hasResolvedNavigationMenus ||
 			isConvertingClassicMenu ||
-			fallbackNavigationMenus?.length > 0 ||
+			fallbackNavigationMenuId ||
 			hasUnsavedBlocks ||
 			! classicMenus?.length
 		) {
@@ -317,7 +309,7 @@ function Navigation( {
 		classicMenus,
 		convertClassicMenu,
 		createNavigationMenu,
-		fallbackNavigationMenus?.length,
+		fallbackNavigationMenuId,
 		isConvertingClassicMenu,
 		ref,
 	] );
