@@ -1,13 +1,18 @@
 <?php
+/**
+ * Patches resources loaded by the block editor page
+ * to include Navigation posts.
+ *
+ * @package gutenberg
+ */
 
 /**
- * Adds the preload paths registered in Core (`edit-form-blocks.php`).
+ * Preloads requests needed for Navigation posts
  *
  * @param array                   $preload_paths    Preload paths to be filtered.
- * @param WP_Block_Editor_Context $context The current block editor context.
  * @return array
  */
-function gutenberg_preload_navigation_permissions( $preload_paths, $context ) {
+function gutenberg_preload_navigation_permissions( $preload_paths ) {
 
 	$navigation_rest_route = rest_get_route_for_post_type_items(
 		'wp_navigation'
