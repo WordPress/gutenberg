@@ -12,7 +12,12 @@
  * @param array $preload_paths    Preload paths to be filtered.
  * @return array
  */
-function gutenberg_preload_template_parts( $preload_paths ) {
+function gutenberg_preload_template_parts( $preload_paths, $context ) {
+
+	// Limit to the Site Editor.
+	if ( ! empty( $context->name ) && 'core/edit-site' !== $context->name ) {
+		return $preload_paths;
+	}
 
 	$theme_slug = wp_get_theme()->get_stylesheet();
 
