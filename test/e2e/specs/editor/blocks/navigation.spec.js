@@ -138,12 +138,14 @@ test.describe(
 			requestUtils,
 		} ) => {
 			await admin.createNewPost();
-
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
 					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
 			} );
+
+			// The two menus are created with the same timestamp, so we need to wait a bit to ensure the second one is created after the first one.
+			await editor.page.waitForTimeout( 2000 );
 
 			const latestMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 2',
@@ -152,13 +154,6 @@ test.describe(
 			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
-
-			// Check the block in the canvas.
-			await expect(
-				editor.canvas.locator(
-					`role=textbox[name="Navigation link text"i] >> text="My site link"`
-				)
-			).toBeVisible();
 
 			// Check the markup of the block is correct.
 			await editor.publishPost();
@@ -169,6 +164,13 @@ test.describe(
 				},
 			] );
 			await page.locator( 'role=button[name="Close panel"i]' ).click();
+
+			// Check the block in the canvas.
+			await expect(
+				editor.canvas.locator(
+					`role=textbox[name="Navigation link text"i] >> text="My site link"`
+				)
+			).toBeVisible();
 
 			// Check the block in the frontend.
 			await page.goto( '/' );
