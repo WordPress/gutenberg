@@ -322,8 +322,8 @@ export const withInspectorControls = createHigherOrderComponent(
 			blockName,
 			POSITION_SUPPORT_KEY
 		);
-		const isPositionDisabled = useIsPositionDisabled( props );
-		const showPositionControls = positionSupport && ! isPositionDisabled;
+		const showPositionControls =
+			positionSupport && ! useIsPositionDisabled( props );
 
 		return [
 			showPositionControls && (
@@ -349,9 +349,8 @@ export const withPositionStyles = createHigherOrderComponent(
 			name,
 			POSITION_SUPPORT_KEY
 		);
-		const isPositionDisabled = useIsPositionDisabled( props );
 		const allowPositionStyles =
-			hasPositionBlockSupport && ! isPositionDisabled;
+			hasPositionBlockSupport && ! useIsPositionDisabled( props );
 
 		const id = useInstanceId( BlockListBlock );
 		const element = useContext( BlockList.__unstableElementContext );
