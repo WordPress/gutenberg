@@ -5,7 +5,10 @@ import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { __unstableMotion as motion } from '@wordpress/components';
+import {
+	VisuallyHidden,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import {
 	store as blockEditorStore,
 	BlockToolbar,
@@ -22,6 +25,13 @@ import { default as DevicePreview } from '../device-preview';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import TemplateTitle from './template-title';
+
+function MaybeHide( { children, isHidden } ) {
+	if ( isHidden ) {
+		return <VisuallyHidden>{ children }</VisuallyHidden>;
+	}
+	return children;
+}
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const isLargeViewport = useViewportMatch( 'large' );
@@ -87,25 +97,25 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				className="edit-post-header__toolbar"
 			>
 				{ ! hasFixedToolbar && <HeaderToolbar /> }
-				{ ! hasSelectedBlocks && hasFixedToolbar && <HeaderToolbar /> }
-				{ hasSelectedBlocks && hasFixedToolbar && (
+				{ hasFixedToolbar && (
 					<>
-						<HeaderToolbar
-							showInserter={ true }
-							showTools={ false }
-							showListView={ false }
-							showUndoRedo={ false }
-						/>
-						<div
-							style={ {
-								display: 'flex',
-								width: '100%',
-								position: 'relative',
-								left: firstParentClientId ? '60px' : '0',
-							} }
-						>
-							<BlockToolbar hideDragHandle={ hasFixedToolbar } />
-						</div>
+						<MaybeHide isHidden={ hasSelectedBlocks }>
+							<HeaderToolbar />
+						</MaybeHide>
+						<MaybeHide isHidden={ ! hasSelectedBlocks }>
+							<div
+								style={ {
+									display: 'flex',
+									width: '100%',
+									position: 'relative',
+									left: firstParentClientId ? '60px' : '0',
+								} }
+							>
+								<BlockToolbar
+									hideDragHandle={ hasFixedToolbar }
+								/>
+							</div>
+						</MaybeHide>
 					</>
 				) }
 				<TemplateTitle />
