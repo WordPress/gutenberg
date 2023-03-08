@@ -8,10 +8,18 @@
 		display: inline-flex;
 		align-items: center;
 
+		img {
+			border-radius: $grid-unit-15;
+		}
+
+		svg {
+			fill: $gray-600;
+		}
+
 		&-icon {
 			width: 24px;
 			height: 24px;
-			margin-right: $grid-unit-05;
+			margin-right: $grid-unit-10;
 		}
 	}
 }
