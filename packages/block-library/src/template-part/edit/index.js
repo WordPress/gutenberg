@@ -158,25 +158,27 @@ export default function TemplatePartEdit( {
 				) }
 				{ canReplace && (
 					<BlockSettingsMenuControls>
-						{ () => (
-							<MenuItem
-								onClick={ () => {
-									setIsTemplatePartSelectionOpen( true );
-								} }
-							>
-								{ createInterpolateElement(
-									__( 'Replace <BlockTitle />' ),
-									{
-										BlockTitle: (
-											<BlockTitle
-												clientId={ clientId }
-												maximumLength={ 25 }
-											/>
-										),
-									}
-								) }
-							</MenuItem>
-						) }
+						{ ( { selectedClientIds } ) =>
+							selectedClientIds?.[ 0 ] === clientId && (
+								<MenuItem
+									onClick={ () => {
+										setIsTemplatePartSelectionOpen( true );
+									} }
+								>
+									{ createInterpolateElement(
+										__( 'Replace <BlockTitle />' ),
+										{
+											BlockTitle: (
+												<BlockTitle
+													clientId={ clientId }
+													maximumLength={ 25 }
+												/>
+											),
+										}
+									) }
+								</MenuItem>
+							)
+						}
 					</BlockSettingsMenuControls>
 				) }
 				{ isEntityAvailable && (
