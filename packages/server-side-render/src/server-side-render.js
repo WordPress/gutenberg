@@ -15,19 +15,25 @@ import { Placeholder, Spinner } from '@wordpress/components';
 import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
 
 export const KNOWN_ATTRIBUTES = new Set( [
+	'anchor',
 	'backgroundColor',
 	'borderColor',
+	'className',
 	'fontFamily',
 	'fontSize',
 	'gradient',
+	'layout',
+	'shadow',
 	'textColor',
-	'className',
 ] );
 
 export const KNOWN_STYLES = new Set( [
 	'border',
 	'color',
 	'elements',
+	'layout',
+	'position',
+	'shadow',
 	'spacing',
 	'typography',
 ] );
