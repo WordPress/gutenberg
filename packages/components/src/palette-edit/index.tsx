@@ -48,7 +48,6 @@ import type {
 	Gradient,
 	NameInputProps,
 	OptionProps,
-	PaletteEditGradientsProps,
 	PaletteEditListViewProps,
 	PaletteEditProps,
 	PaletteElement,
@@ -104,38 +103,6 @@ export function getNameForPosition(
 	);
 }
 
-function getIsColor( element: PaletteElement ): element is Color {
-	return 'color' in element;
-}
-
-function getIsGradient( element: PaletteElement ): element is Gradient {
-	return 'gradient' in element;
-}
-
-function isGradientPalette(
-	props: PaletteEditProps
-): props is PaletteEditGradientsProps {
-	return 'gradients' in props;
-}
-
-function getElements( props: PaletteEditProps ) {
-	const elements = isGradientPalette( props )
-		? props.gradients
-		: props.colors;
-	return elements ?? [];
-}
-
-function getValue( element: PaletteElement, isGradient?: boolean ) {
-	if ( isGradient && getIsGradient( element ) ) {
-		return element.gradient;
-	}
-	if ( getIsColor( element ) ) {
-		return element.color;
-	}
-
-	return '';
-}
-
 function ColorPickerPopover< T extends Color | Gradient >( {
 	isGradient,
 	element,
@@ -149,7 +116,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 			className="components-palette-edit__popover"
 			onClose={ onClose }
 		>
-			{ ! isGradient && getIsColor( element ) && (
+			{ ! isGradient && (
 				<ColorPicker
 					color={ element.color }
 					enableAlpha
@@ -161,7 +128,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 					} }
 				/>
 			) }
-			{ isGradient && getIsGradient( element ) && (
+			{ isGradient && (
 				<div className="components-palette-edit__popover-gradient-picker">
 					<CustomGradientPicker
 						__nextHasNoMargin
@@ -192,7 +159,7 @@ function Option< T extends Color | Gradient >( {
 	isGradient,
 }: OptionProps< T > ) {
 	const focusOutsideProps = useFocusOutside( onStopEditing );
-	const value = getValue( element, isGradient );
+	const value = isGradient ? element.gradient : element.color;
 
 	return (
 		<PaletteItem
@@ -259,13 +226,15 @@ function Option< T extends Color | Gradient >( {
 	);
 }
 
-function isTemporaryElement( slugPrefix: string, element: Color | Gradient ) {
+function isTemporaryElement(
+	slugPrefix: string,
+	{ slug, color, gradient }: Color | Gradient
+) {
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	return (
-		regex.test( element.slug ) &&
-		( ( getIsColor( element ) && element.color === DEFAULT_COLOR ) ||
-			( getIsGradient( element ) &&
-				element.gradient === DEFAULT_GRADIENT ) )
+		regex.test( slug ) &&
+		( ( !! color && color === DEFAULT_COLOR ) ||
+			( !! gradient && gradient === DEFAULT_GRADIENT ) )
 	);
 }
 
@@ -357,6 +326,8 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	);
 }
 
+const EMPTY_ARRAY: Color[] = [];
+
 /**
  * Allows editing a palette of colors or gradients.
  *
@@ -377,19 +348,19 @@ function PaletteEditListView< T extends Color | Gradient >( {
  * };
  * ```
  */
-export function PaletteEdit( props: PaletteEditProps ) {
-	const {
-		onChange,
-		paletteLabel,
-		paletteLabelHeadingLevel = 2,
-		emptyMessage,
-		canOnlyChangeValues,
-		canReset,
-		slugPrefix = '',
-	} = props;
-
-	const isGradient = isGradientPalette( props );
-	const elements = getElements( props );
+export function PaletteEdit( {
+	gradients,
+	colors = EMPTY_ARRAY,
+	onChange,
+	paletteLabel,
+	paletteLabelHeadingLevel = 2,
+	emptyMessage,
+	canOnlyChangeValues,
+	canReset,
+	slugPrefix = '',
+}: PaletteEditProps ) {
+	const isGradient = !! gradients;
+	const elements = isGradient ? gradients : colors;
 	const [ isEditing, setIsEditing ] = useState( false );
 	const [ editingElement, setEditingElement ] = useState<
 		number | null | undefined
@@ -397,7 +368,6 @@ export function PaletteEdit( props: PaletteEditProps ) {
 	const isAdding =
 		isEditing &&
 		!! editingElement &&
-		elements &&
 		elements[ editingElement ] &&
 		! elements[ editingElement ].slug;
 	const elementsLength = elements.length;
@@ -408,20 +378,13 @@ export function PaletteEdit( props: PaletteEditProps ) {
 			value?: PaletteElement[ keyof PaletteElement ],
 			newEditingElementIndex?: number
 		) => {
-			if ( undefined === newEditingElementIndex ) {
-				return;
-			}
-
-			const selectedElement = elements[ newEditingElementIndex ];
+			const selectedElement =
+				newEditingElementIndex === undefined
+					? undefined
+					: elements[ newEditingElementIndex ];
+			const key = isGradient ? 'gradient' : 'color';
 			// Ensures that the index returned matches a known element value.
-			if (
-				!! selectedElement &&
-				( ( getIsGradient( selectedElement ) &&
-					isGradient &&
-					selectedElement.gradient === value ) ||
-					( getIsColor( selectedElement ) &&
-						selectedElement.color === value ) )
-			) {
+			if ( !! selectedElement && selectedElement[ key ] === value ) {
 				setEditingElement( newEditingElementIndex );
 			} else {
 				setIsEditing( true );
@@ -464,9 +427,9 @@ export function PaletteEdit( props: PaletteEditProps ) {
 									slugPrefix
 								);
 
-								if ( isGradientPalette( props ) ) {
-									props.onChange( [
-										...( props.gradients ?? [] ),
+								if ( !! gradients ) {
+									onChange( [
+										...gradients,
 										{
 											gradient: DEFAULT_GRADIENT,
 											name: tempOptionName,
@@ -476,8 +439,8 @@ export function PaletteEdit( props: PaletteEditProps ) {
 										},
 									] );
 								} else {
-									props.onChange( [
-										...( props.colors ?? [] ),
+									onChange( [
+										...colors,
 										{
 											color: DEFAULT_COLOR,
 											name: tempOptionName,
@@ -617,14 +580,14 @@ export function PaletteEdit( props: PaletteEditProps ) {
 							// @ts-expect-error TODO: Remove when GradientPicker is typed.
 							<GradientPicker
 								__nextHasNoMargin
-								gradients={ props.gradients }
+								gradients={ gradients }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomGradients={ true }
 							/>
 						) : (
 							<ColorPalette
-								colors={ props.colors }
+								colors={ colors }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomColors={ true }

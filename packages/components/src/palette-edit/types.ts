@@ -12,12 +12,14 @@ export type Color = {
 	color: string;
 	name: string;
 	slug: string;
+	gradient?: never;
 };
 
 export type Gradient = {
 	gradient: string;
 	name: string;
 	slug: string;
+	color?: never;
 };
 
 export type PaletteElement = Color | Gradient;
@@ -62,26 +64,24 @@ type PaletteEditColors = {
 	/**
 	 * Runs on changing the value.
 	 */
-	onChange: ( newColors?: Color[] ) => void;
+	onChange: ( values?: Color[] ) => void;
+	gradients?: never;
 };
 
 type PaletteEditGradients = {
 	/**
 	 * The gradients in the palette.
 	 */
-	gradients?: Gradient[];
+	gradients: Gradient[];
 	/**
 	 * Runs on changing the value.
 	 */
-	onChange: ( newGradients?: Gradient[] ) => void;
+	onChange: ( values?: Gradient[] ) => void;
+	colors?: never;
 };
 
-export type PaletteEditColorsProps = BasePaletteEdit & PaletteEditColors;
-export type PaletteEditGradientsProps = BasePaletteEdit & PaletteEditGradients;
-
-export type PaletteEditProps =
-	| PaletteEditColorsProps
-	| PaletteEditGradientsProps;
+export type PaletteEditProps = BasePaletteEdit &
+	( PaletteEditColors | PaletteEditGradients );
 
 type EditingElement = number | null;
 export type SlugPrefix = string;
@@ -102,7 +102,7 @@ export type NameInputProps = {
 export type OptionProps< T extends Color | Gradient > = {
 	element: T;
 	onChange: ( newElement: T ) => void;
-	isGradient?: T extends Gradient ? true : false;
+	isGradient: T extends Gradient ? true : false;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	isEditing: boolean;
 	key: Key;
@@ -115,7 +115,7 @@ export type OptionProps< T extends Color | Gradient > = {
 export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	elements: T[];
 	onChange: ( newElements?: T[] ) => void;
-	isGradient?: T extends Gradient ? true : false;
+	isGradient: T extends Gradient ? true : false;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
