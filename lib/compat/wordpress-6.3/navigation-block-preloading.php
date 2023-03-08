@@ -9,39 +9,18 @@
  */
 function gutenberg_preload_navigation_permissions( $preload_paths, $context ) {
 
-    $preload_paths[] = array( rest_get_route_for_post_type_items( 'wp_navigation' ), 'OPTIONS' );
-
-	$preload_paths[] = rest_get_route_for_post_type_items( 'wp_navigation' );
-	// add /wp/v2/navigation?context=edit&per_page=-1&status%5B0%5D=publish&status%5B1%5D=draft to preload paths array
-	$preload_paths[] = array(
-		rest_get_route_for_post_type_items(
-			'wp_navigation',
-		),
-		array(
-			'context'  => 'edit',
-			'per_page' => '-1',
-			'status'   => array( 'publish, draft' ),
-		),
-
+	$navigation_rest_route = rest_get_route_for_post_type_items(
+		'wp_navigation'
 	);
 
-	// add /wp/v2/navigation?_locale=user&context=edit&per_page=100&status%5B0%5D=publish&status%5B1%5D=draft to preload paths array
+	// Preload the OPTIONS request for all Navigation posts request.
+	$preload_paths[] = array( $navigation_rest_route, 'OPTIONS' );
+
+	// Preload the GET request for all Navigation posts request.
 	$preload_paths[] = array(
-		rest_get_route_for_post_type_items(
-			'wp_navigation',
-		),
-		array(
-			'_locale'  => 'user',
-			'context'  => 'edit',
-			'per_page' => '100',
-			'status'   => array( 'publish, draft' ),
-		),
-
+		$navigation_rest_route . '?context=edit&per_page=100&status[0]=publish&status[1]=draft&_locale=user',
+		'GET',
 	);
-
-	echo '<pre>';
-	var_dump( $preload_paths );
-	echo '</pre>';
 
 	return $preload_paths;
 }
