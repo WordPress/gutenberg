@@ -606,6 +606,12 @@
 		"parent": "theme-json-reference"
 	},
 	{
+		"title": "Available Styles Options",
+		"slug": "styles-versions",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/styles-versions.md",
+		"parent": "theme-json-reference"
+	},
+	{
 		"title": "Component Reference",
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
