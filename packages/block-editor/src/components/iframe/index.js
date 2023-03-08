@@ -219,7 +219,7 @@ function Iframe( {
 				// to initialise.
 				forceRender();
 			} );
-	}, [ head, scripts ] );
+	}, [ head ] );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const wrapperRef = useMergeRefs( [
