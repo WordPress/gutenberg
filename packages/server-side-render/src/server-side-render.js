@@ -14,9 +14,6 @@ import { addQueryArgs } from '@wordpress/url';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
 
-const EMPTY_OBJECT = {};
-
-// TODO: Hook this up to the actual logic in removeBlockSupportAttributes
 export const KNOWN_ATTRIBUTES = new Set( [
 	'backgroundColor',
 	'borderColor',
@@ -27,7 +24,6 @@ export const KNOWN_ATTRIBUTES = new Set( [
 	'className',
 ] );
 
-// TODO: Hook this up to the actual logic in removeBlockSupportAttributes
 export const KNOWN_STYLES = new Set( [
 	'border',
 	'color',
@@ -45,19 +41,15 @@ export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 }
 
 export function removeBlockSupportAttributes( attributes ) {
-	const {
-		backgroundColor,
-		borderColor,
-		fontFamily,
-		fontSize,
-		gradient,
-		textColor,
-		className,
-		...restAttributes
-	} = attributes;
+	const restAttributes = { ...attributes };
+	for ( const attribute of KNOWN_ATTRIBUTES ) {
+		delete restAttributes[ attribute ];
+	}
 
-	const { border, color, elements, spacing, typography, ...restStyles } =
-		attributes?.style || EMPTY_OBJECT;
+	const restStyles = { ...attributes?.style };
+	for ( const style of KNOWN_STYLES ) {
+		delete restStyles[ style ];
+	}
 
 	return {
 		...restAttributes,
