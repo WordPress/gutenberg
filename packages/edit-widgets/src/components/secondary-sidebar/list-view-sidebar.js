@@ -1,15 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalListView as ListView } from '@wordpress/block-editor';
+import {
+	__experimentalListView as ListView,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import {
 	useFocusOnMount,
 	useFocusReturn,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -21,6 +25,14 @@ import { store as editWidgetsStore } from '../../store';
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editWidgetsStore );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { hasBlockSelection } = useSelect(
+		( select ) => ( {
+			hasBlockSelection:
+				!! select( blockEditorStore ).getBlockSelectionStart(),
+		} ),
+		[]
+	);
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the dropZoneElement updates.
@@ -31,6 +43,19 @@ export default function ListViewSidebar() {
 	const contentFocusReturnRef = useFocusReturn();
 
 	function closeOnEscape( event ) {
+		// If there is a block selection, then skip closing the list view
+		// and clear out the block selection instead.
+		if (
+			event.keyCode === ESCAPE &&
+			! event.defaultPrevented &&
+			hasBlockSelection
+		) {
+			event.preventDefault();
+			clearSelectedBlock();
+			speak( __( 'All blocks deselected.' ), 'assertive' );
+			return;
+		}
+
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
 			setIsListViewOpened( false );
