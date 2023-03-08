@@ -53,7 +53,7 @@ export type BasePaletteEdit = {
 	 *
 	 * @default ''
 	 */
-	slugPrefix?: SlugPrefix;
+	slugPrefix?: string;
 };
 
 type PaletteEditColors = {
@@ -84,7 +84,6 @@ export type PaletteEditProps = BasePaletteEdit &
 	( PaletteEditColors | PaletteEditGradients );
 
 type EditingElement = number | null;
-export type SlugPrefix = string;
 
 export type ColorPickerPopoverProps< T extends Color | Gradient > = {
 	element: T;
@@ -109,7 +108,7 @@ export type OptionProps< T extends Color | Gradient > = {
 	onRemove: MouseEventHandler< HTMLButtonElement >;
 	onStartEditing: () => void;
 	onStopEditing: () => void;
-	slugPrefix: SlugPrefix;
+	slugPrefix: string;
 };
 
 export type PaletteEditListViewProps< T extends Color | Gradient > = {
@@ -119,5 +118,5 @@ export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
-	slugPrefix: SlugPrefix;
+	slugPrefix: string;
 };

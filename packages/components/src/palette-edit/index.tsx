@@ -51,7 +51,6 @@ import type {
 	PaletteEditListViewProps,
 	PaletteEditProps,
 	PaletteElement,
-	SlugPrefix,
 } from './types';
 
 const DEFAULT_COLOR = '#000';
@@ -80,7 +79,7 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
  */
 export function getNameForPosition(
 	elements: PaletteElement[],
-	slugPrefix: SlugPrefix
+	slugPrefix: string
 ) {
 	const temporaryNameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	const position = elements.reduce( ( previousValue, currentValue ) => {
