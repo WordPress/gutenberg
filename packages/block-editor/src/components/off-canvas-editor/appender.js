@@ -105,7 +105,7 @@ export const Appender = forwardRef(
 					ref={ ref }
 					rootClientId={ clientId }
 					position="bottom right"
-					isAppender={ true }
+					isAppender
 					selectBlockOnInsert={ false }
 					shouldDirectInsert={ false }
 					__experimentalIsQuick

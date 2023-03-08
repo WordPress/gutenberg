@@ -69,6 +69,7 @@ const MainContent = ( {
 	return (
 		<OffCanvasEditor
 			blocks={ clientIdsTree }
+			parentClientId={ clientId }
 			isExpanded={ true }
 			LeafMoreMenu={ LeafMoreMenu }
 			description={ description }
