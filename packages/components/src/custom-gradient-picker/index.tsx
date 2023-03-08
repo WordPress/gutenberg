@@ -126,7 +126,28 @@ const GradientTypePicker = ( {
 	);
 };
 
-export default function CustomGradientPicker( {
+/**
+ * CustomGradientPicker is a React component that renders a UI for specifying
+ * linear or radial gradients. Radial gradients are displayed in the picker as
+ * a slice of the gradient from the center to the outside.
+ *
+ * ```jsx
+ * import { CustomGradientPicker } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyCustomGradientPicker = () => {
+ *   const [ gradient, setGradient ] = useState();
+ *
+ *   return (
+ *     <CustomGradientPicker
+ *			value={ gradient }
+ *			onChange={ setGradient }
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export function CustomGradientPicker( {
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMargin = false,
 	value,
@@ -212,3 +233,5 @@ export default function CustomGradientPicker( {
 		</VStack>
 	);
 }
+
+export default CustomGradientPicker;

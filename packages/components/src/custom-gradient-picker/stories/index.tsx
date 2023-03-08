@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,18 +10,22 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CustomGradientPicker from '..';
+import CustomGradientPicker from '../';
 
-export default {
+const meta: ComponentMeta< typeof CustomGradientPicker > = {
 	title: 'Components/CustomGradientPicker',
 	component: CustomGradientPicker,
-	argTypes: {
-		__nextHasNoMargin: { control: { type: 'boolean' } },
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-const CustomGradientPickerWithState = ( props ) => {
-	const [ gradient, setGradient ] = useState();
+const CustomGradientPickerWithState: ComponentStory<
+	typeof CustomGradientPicker
+> = ( props ) => {
+	const [ gradient, setGradient ] = useState< string | undefined >();
 	return (
 		<CustomGradientPicker
 			{ ...props }
