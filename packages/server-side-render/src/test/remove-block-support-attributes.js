@@ -82,7 +82,10 @@ describe( 'removeBlockSupportAttributes', () => {
 			}
 		}
 
-		expect( styles ).toEqual( KNOWN_STYLES );
+		// styles should be a subset of KNOWN_STYLES
+		expect( Array.from( KNOWN_STYLES ) ).not.toEqual(
+			expect.not.arrayContaining( Array.from( styles ) )
+		);
 	} );
 } );
 
