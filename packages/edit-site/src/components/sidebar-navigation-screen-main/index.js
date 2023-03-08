@@ -18,6 +18,8 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 
 export default function SidebarNavigationScreenMain() {
 	const hasNavigationMenus = useSelect( ( select ) => {
+		// The query needs to be the same as in the "SidebarNavigationScreenNavigationMenus" component,
+		// to avoid double network calls.
 		const navigationMenus = select( coreStore ).getEntityRecords(
 			'postType',
 			'wp_navigation',
