@@ -90,7 +90,6 @@ export default function Table( { templateType } ) {
 										postId: template.id,
 										postType: template.type,
 										canvas: 'edit',
-										fromTemplateList: true,
 									} }
 								>
 									{ decodeEntities(
