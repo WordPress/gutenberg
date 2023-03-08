@@ -75,7 +75,8 @@ describe( 'Settings sidebar', () => {
 
 			expect( templateCardBeforeNavigation ).toMatchObject( {
 				title: 'Index',
-				description: 'Displays posts.',
+				description:
+					'Used as a fallback template for all pages when a more specific template is not defined.',
 			} );
 			expect( templateCardAfterNavigation ).toMatchObject( {
 				title: 'Singular',

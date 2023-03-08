@@ -112,7 +112,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 		$default_template_types['index'] = array(
 			'title'       => _x( 'Index', 'Template name', 'gutenberg' ),
 			'description' => __(
-				'Used as a fallback template for all pages when a more-specific template is not defined.',
+				'Used as a fallback template for all pages when a more specific template is not defined.',
 				'gutenberg'
 			),
 		);
@@ -121,7 +121,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 		$default_template_types['home'] = array(
 			'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
 			'description' => __(
-				'Displays the latest posts for either the site homepage or a custom page defined under reading settings. If it exists, the Front Page template overrides this template when posts are shown on the front page.',
+				'Displays the latest posts as either the site homepage or a custom page defined under reading settings. If it exists, the Front Page template overrides this template when posts are shown on the front page.',
 				'gutenberg'
 			),
 		);
@@ -210,7 +210,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 	if ( isset( $default_template_types['attachment'] ) ) {
 		$default_template_types['attachment'] = array(
 			'title'       => _x( 'Media', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays when a visitor views the dedicated page that exists for any media attachment uploaded to a post.', 'gutenberg' ),
+			'description' => __( 'Displays when a visitor views the dedicated page that exists for any media attachment.', 'gutenberg' ),
 		);
 	}
 	if ( isset( $default_template_types['search'] ) ) {
