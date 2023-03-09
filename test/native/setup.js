@@ -119,8 +119,6 @@ jest.mock(
 		props.isVisible ? mockComponent( 'Modal' )( props ) : null
 );
 
-jest.mock( 'react-native-hr', () => () => 'Hr' );
-
 jest.mock( 'react-native-svg', () => {
 	const { forwardRef } = require( 'react' );
 	return {
