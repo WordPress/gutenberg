@@ -1,8 +1,8 @@
+import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -19,7 +19,7 @@ const config = {
 	wp_template_part: {
 		title: __( 'All template parts' ),
 		description: __(
-			'Create new template parts, or reset any customisations made to the template parts supplied by your theme.'
+			'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
 		),
 	},
 };
