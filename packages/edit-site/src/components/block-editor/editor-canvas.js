@@ -13,7 +13,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../experiments';
+import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 
 function EditorCanvas( { enableResizing, settings, children, ...props } ) {
@@ -44,7 +44,8 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 						// Forming a "block formatting context" to prevent margin collapsing.
 						// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
 						`.is-root-container { display: flow-root; }
-							body { position: relative; }`
+							body { position: relative;
+							${ canvasMode === 'view' ? 'cursor: pointer;' : '' }}}`
 					}</style>
 					{ enableResizing && (
 						<style>

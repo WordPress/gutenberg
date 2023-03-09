@@ -644,7 +644,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'.wp-block-group.is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }.wp-block-group.is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }.wp-block-group.is-layout-flex { gap: 12px; }'
+				'.wp-block-group-is-layout-flow.wp-block-group-is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }.wp-block-group-is-layout-flow.wp-block-group-is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }.wp-block-group-is-layout-flex.wp-block-group-is-layout-flex { gap: 12px; }'
 			);
 		} );
 

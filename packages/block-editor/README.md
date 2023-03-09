@@ -348,10 +348,6 @@ _Returns_
 
 Undocumented declaration.
 
-### experiments
-
-Experimental @wordpress/block-editor APIs.
-
 ### FontSizePicker
 
 _Related_
@@ -638,6 +634,10 @@ Undocumented declaration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
+
+### privateApis
+
+Private @wordpress/block-editor APIs.
 
 ### RichText
 

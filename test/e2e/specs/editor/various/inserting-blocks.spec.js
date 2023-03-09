@@ -289,6 +289,31 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( beforeContent );
 	} );
+
+	// A test for https://github.com/WordPress/gutenberg/issues/43090.
+	test( 'should close the inserter when clicking on the toggle button', async ( {
+		page,
+		editor,
+	} ) => {
+		const inserterButton = page.getByRole( 'button', {
+			name: 'Toggle block inserter',
+		} );
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+
+		await inserterButton.click();
+
+		await blockLibrary.getByRole( 'option', { name: 'Buttons' } ).click();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/buttons' } ] );
+
+		await inserterButton.click();
+
+		await expect( blockLibrary ).toBeHidden();
+	} );
 } );
 
 test.describe( 'insert media from inserter', () => {
@@ -303,7 +328,7 @@ test.describe( 'insert media from inserter', () => {
 		);
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
-		Promise.all( [
+		await Promise.all( [
 			requestUtils.deleteAllMedia(),
 			requestUtils.deleteAllPosts(),
 		] );

@@ -19,8 +19,8 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$post_ID = $block->context['postId'];
-	$title   = get_the_title();
+	$post  = get_post( $block->context['postId'] );
+	$title = get_the_title( $post );
 
 	if ( ! $title ) {
 		return '';
@@ -33,7 +33,7 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$rel   = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
-		$title = sprintf( '<a href="%1$s" target="%2$s" %3$s>%4$s</a>', get_the_permalink( $post_ID ), esc_attr( $attributes['linkTarget'] ), $rel, $title );
+		$title = sprintf( '<a href="%1$s" target="%2$s" %3$s>%4$s</a>', get_the_permalink( $post ), esc_attr( $attributes['linkTarget'] ), $rel, $title );
 	}
 
 	$classes = array();

@@ -73,7 +73,7 @@ const ListViewBlockContents = forwardRef(
 			setInsertedBlockAttributes,
 		} = useInsertedBlock( lastInsertedBlockClientId );
 
-		const hasExistingLinkValue = insertedBlockAttributes?.id;
+		const hasExistingLinkValue = insertedBlockAttributes?.url;
 
 		useEffect( () => {
 			if (
@@ -121,6 +121,7 @@ const ListViewBlockContents = forwardRef(
 							);
 							setIsLinkUIOpen( false );
 						} }
+						onCancel={ () => setIsLinkUIOpen( false ) }
 					/>
 				) }
 				<BlockDraggable clientIds={ draggableClientIds }>

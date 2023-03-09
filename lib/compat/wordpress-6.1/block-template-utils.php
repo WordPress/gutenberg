@@ -8,34 +8,6 @@
  */
 
 /**
- * Updates the list of default template types, containing their
- * localized titles and descriptions.
- *
- * We will only need to update `get_default_block_template_types` function.
- *
- * @param array $default_template_types The default template types.
- *
- * @return array The default template types.
- */
-function gutenberg_get_default_block_template_types( $default_template_types ) {
-	if ( isset( $default_template_types['single'] ) ) {
-		$default_template_types['single'] = array(
-			'title'       => _x( 'Single', 'Template name', 'gutenberg' ),
-			'description' => __( 'The default template for displaying any single post or attachment.', 'gutenberg' ),
-		);
-	}
-	if ( isset( $default_template_types['category'] ) ) {
-		$default_template_types['category'] = array(
-			'title'       => _x( 'Category', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays latest posts from a single post category.', 'gutenberg' ),
-		);
-	}
-	return $default_template_types;
-}
-add_filter( 'default_template_types', 'gutenberg_get_default_block_template_types', 10 );
-
-
-/**
  * Retrieves a list of unified template objects based on a query.
  *
  * @param array $query {
@@ -76,11 +48,12 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 
 	$post_type     = isset( $query['post_type'] ) ? $query['post_type'] : '';
 	$wp_query_args = array(
-		'post_status'    => array( 'auto-draft', 'draft', 'publish' ),
-		'post_type'      => $template_type,
-		'posts_per_page' => -1,
-		'no_found_rows'  => true,
-		'tax_query'      => array(
+		'post_status'         => array( 'auto-draft', 'draft', 'publish' ),
+		'post_type'           => $template_type,
+		'posts_per_page'      => -1,
+		'no_found_rows'       => true,
+		'lazy_load_term_meta' => false,  // Do not lazy load term meta, as template post types only have one term.
+		'tax_query'           => array(
 			array(
 				'taxonomy' => 'wp_theme',
 				'field'    => 'name',
@@ -147,7 +120,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 			}
 
 			$is_not_custom   = false === array_search(
-				wp_get_theme()->get_stylesheet() . '//' . $template_file['slug'],
+				get_stylesheet() . '//' . $template_file['slug'],
 				array_column( $query_result, 'id' ),
 				true
 			);

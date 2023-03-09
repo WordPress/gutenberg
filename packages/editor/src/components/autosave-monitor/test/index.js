@@ -8,10 +8,11 @@ import { render } from '@testing-library/react';
  */
 import { AutosaveMonitor } from '../';
 
+jest.useFakeTimers( { legacyFakeTimers: true } );
+
 describe( 'AutosaveMonitor', () => {
 	let setAutosaveTimerSpy;
 	beforeEach( () => {
-		jest.useFakeTimers( 'legacy' );
 		setAutosaveTimerSpy = jest.spyOn(
 			AutosaveMonitor.prototype,
 			'setAutosaveTimer'
@@ -19,9 +20,6 @@ describe( 'AutosaveMonitor', () => {
 	} );
 
 	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
-
 		setAutosaveTimerSpy.mockClear();
 	} );
 

@@ -18,9 +18,9 @@ test.describe( 'Style Book', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, siteEditor, styleBook, page } ) => {
+	test.beforeEach( async ( { admin, editor, styleBook, page } ) => {
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 		await styleBook.open();
 		await expect(
 			page.locator( 'role=region[name="Style Book"i]' )
@@ -59,37 +59,45 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 		await expect( page.locator( 'role=tab[name="Theme"i]' ) ).toBeVisible();
 
+		// Buttons to select block examples are rendered within the Style Book iframe.
+		const styleBookIframe = page.frameLocator(
+			'[name="style-book-canvas"]'
+		);
+
 		await expect(
-			page.locator(
-				'role=button[name="Open Headings styles in Styles panel"i]'
-			)
+			styleBookIframe.getByRole( 'button', {
+				name: 'Open Headings styles in Styles panel',
+			} )
 		).toBeVisible();
 		await expect(
-			page.locator(
-				'role=button[name="Open Paragraph styles in Styles panel"i]'
-			)
+			styleBookIframe.getByRole( 'button', {
+				name: 'Open Paragraph styles in Styles panel',
+			} )
 		).toBeVisible();
 
 		await page.click( 'role=tab[name="Media"i]' );
 
 		await expect(
-			page.locator(
-				'role=button[name="Open Image styles in Styles panel"i]'
-			)
+			styleBookIframe.getByRole( 'button', {
+				name: 'Open Image styles in Styles panel',
+			} )
 		).toBeVisible();
 		await expect(
-			page.locator(
-				'role=button[name="Open Gallery styles in Styles panel"i]'
-			)
+			styleBookIframe.getByRole( 'button', {
+				name: 'Open Gallery styles in Styles panel',
+			} )
 		).toBeVisible();
 	} );
 
 	test( 'should open correct Global Styles panel when example is clicked', async ( {
 		page,
 	} ) => {
-		await page.click(
-			'role=button[name="Open Headings styles in Styles panel"i]'
-		);
+		await page
+			.frameLocator( '[name="style-book-canvas"]' )
+			.getByRole( 'button', {
+				name: 'Open Headings styles in Styles panel',
+			} )
+			.click();
 
 		await expect(
 			page.locator(
@@ -98,31 +106,57 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should clear Global Styles navigator history when example is clicked', async ( {
+	test( 'should allow to return Global Styles root when example is clicked', async ( {
 		page,
 	} ) => {
 		await page.click( 'role=button[name="Blocks styles"]' );
 		await page.click( 'role=button[name="Heading block styles"]' );
 		await page.click( 'role=button[name="Typography styles"]' );
 
-		await page.click(
-			'role=button[name="Open Quote styles in Styles panel"i]'
-		);
+		await page
+			.frameLocator( '[name="style-book-canvas"]' )
+			.getByRole( 'button', {
+				name: 'Open Quote styles in Styles panel',
+			} )
+			.click();
 
+		await page.click( 'role=button[name="Navigate to the previous view"]' );
 		await page.click( 'role=button[name="Navigate to the previous view"]' );
 
 		await expect(
-			page.locator( 'role=button[name="Navigate to the previous view"]' )
-		).not.toBeVisible();
+			page.locator( 'role=button[name="Blocks styles"]' )
+		).toBeVisible();
 	} );
 
-	test( 'should disappear when closed', async ( { page } ) => {
-		await page.click(
-			'role=region[name="Style Book"i] >> role=button[name="Close Style Book"i]'
-		);
+	test( 'should disappear when closed via click event or Escape key', async ( {
+		page,
+	} ) => {
+		const styleBookRegion = page.getByRole( 'region', {
+			name: 'Style Book',
+		} );
+
+		// Close Style Book via click event.
+		await styleBookRegion
+			.getByRole( 'button', { name: 'Close Style Book' } )
+			.click();
 
 		await expect(
-			page.locator( 'role=region[name="Style Book"i]' )
+			styleBookRegion,
+			'should close when close button is clicked'
+		).not.toBeVisible();
+
+		// Open Style Book again.
+		await page.getByRole( 'button', { name: 'Style Book' } ).click();
+		await expect(
+			styleBookRegion,
+			'style book should be visible'
+		).toBeVisible();
+
+		// Close Style Book via Escape key.
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			styleBookRegion,
+			'should close when Escape key is pressed'
 		).not.toBeVisible();
 	} );
 } );
@@ -144,6 +178,6 @@ class StyleBook {
 	async open() {
 		await this.disableWelcomeGuide();
 		await this.page.click( 'role=button[name="Styles"i]' );
-		await this.page.click( 'role=button[name="Open Style Book"i]' );
+		await this.page.click( 'role=button[name="Style Book"i]' );
 	}
 }

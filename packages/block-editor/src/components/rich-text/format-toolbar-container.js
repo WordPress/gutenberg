@@ -19,11 +19,7 @@ import FormatToolbar from './format-toolbar';
 import NavigableToolbar from '../navigable-toolbar';
 import { store as blockEditorStore } from '../../store';
 
-function InlineSelectionToolbar( {
-	value,
-	editableContentElement,
-	activeFormats,
-} ) {
+function InlineSelectionToolbar( { editableContentElement, activeFormats } ) {
 	const lastFormat = activeFormats[ activeFormats.length - 1 ];
 	const lastFormatType = lastFormat?.type;
 	const settings = useSelect(
@@ -32,7 +28,6 @@ function InlineSelectionToolbar( {
 	);
 	const popoverAnchor = useAnchor( {
 		editableContentElement,
-		value,
 		settings,
 	} );
 
@@ -85,7 +80,6 @@ const FormatToolbarContainer = ( {
 		return (
 			<InlineSelectionToolbar
 				editableContentElement={ editableContentElement }
-				value={ value }
 				activeFormats={ activeFormats }
 			/>
 		);

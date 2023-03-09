@@ -20,6 +20,7 @@ const LinkControlSettings = ( { value, onChange = noop, settings } ) => {
 
 	const theSettings = settings.map( ( setting ) => (
 		<ToggleControl
+			__nextHasNoMarginBottom
 			className="block-editor-link-control__setting"
 			key={ setting.id }
 			label={ setting.title }

@@ -130,9 +130,7 @@ function UnforwardedNumberControl(
 			 * Handles drag to update events
 			 */
 			if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
-				// @ts-expect-error TODO: See if reducer actions can be typed better
 				const [ x, y ] = payload.delta;
-				// @ts-expect-error TODO: See if reducer actions can be typed better
 				const enableShift = payload.shiftKey && isShiftStepEnabled;
 				const modifier = enableShift
 					? ensureNumber( shiftStep ) * baseStep

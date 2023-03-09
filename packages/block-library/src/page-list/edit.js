@@ -23,27 +23,25 @@ import {
 	Notice,
 	ComboboxControl,
 	Button,
-	Modal,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useEffect } from '@wordpress/element';
+import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
+import {
+	convertDescription,
+	ConvertToLinksModal,
+} from './convert-to-links-modal';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
-
-const convertDescription = __(
-	'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking "Edit" below.'
-);
-
 function BlockContent( {
 	blockProps,
 	innerBlocksProps,
@@ -55,7 +53,9 @@ function BlockContent( {
 	if ( ! hasResolvedPages ) {
 		return (
 			<div { ...blockProps }>
-				<Spinner />
+				<div className="wp-block-page-list__loading-indicator-container">
+					<Spinner className="wp-block-page-list__loading-indicator" />
+				</div>
 			</div>
 		);
 	}
@@ -113,48 +113,6 @@ function BlockContent( {
 	}
 }
 
-function ConvertToLinksModal( { onClick, disabled } ) {
-	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
-	const closeModal = () => setOpen( false );
-
-	return (
-		<>
-			<BlockControls group="other">
-				<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
-					{ __( 'Edit' ) }
-				</ToolbarButton>
-			</BlockControls>
-			{ isOpen && (
-				<Modal
-					onRequestClose={ closeModal }
-					title={ __( 'Edit this menu' ) }
-					className={ 'wp-block-page-list-modal' }
-					aria={ {
-						describedby: 'wp-block-page-list-modal__description',
-					} }
-				>
-					<p id={ 'wp-block-page-list-modal__description' }>
-						{ convertDescription }
-					</p>
-					<div className="wp-block-page-list-modal-buttons">
-						<Button variant="tertiary" onClick={ closeModal }>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							disabled={ disabled }
-							onClick={ onClick }
-						>
-							{ __( 'Edit' ) }
-						</Button>
-					</div>
-				</Modal>
-			) }
-		</>
-	);
-}
-
 export default function PageListEdit( {
 	context,
 	clientId,
@@ -162,6 +120,9 @@ export default function PageListEdit( {
 	setAttributes,
 } ) {
 	const { parentPageID } = attributes;
+	const [ isOpen, setOpen ] = useState( false );
+	const openModal = useCallback( () => setOpen( true ), [] );
+	const closeModal = () => setOpen( false );
 
 	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
 		'postType',
@@ -181,11 +142,6 @@ export default function PageListEdit( {
 		'showSubmenuIcon' in context &&
 		pages?.length > 0 &&
 		pages?.length <= MAX_PAGE_COUNT;
-
-	const convertToNavigationLinks = useConvertToNavigationLinks( {
-		clientId,
-		pages,
-	} );
 
 	const pagesByParentId = useMemo( () => {
 		if ( pages === null ) {
@@ -212,6 +168,12 @@ export default function PageListEdit( {
 			return accumulator;
 		}, new Map() );
 	}, [ pages ] );
+
+	const convertToNavigationLinks = useConvertToNavigationLinks( {
+		clientId,
+		pages,
+		parentPageID,
+	} );
 
 	const blockProps = useBlockProps( {
 		className: classnames( 'wp-block-page-list', {
@@ -281,34 +243,69 @@ export default function PageListEdit( {
 		parentPageID,
 	] );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/page-list-item' ],
-		renderAppender: false,
-		__unstableDisableDropZone: true,
-		templateLock: 'all',
-		onInput: NOOP,
-		onChange: NOOP,
-		value: blockList,
-	} );
-
-	const { isNested } = useSelect(
+	const {
+		isNested,
+		hasSelectedChild,
+		parentBlock,
+		hasDraggedChild,
+		isChildOfNavigation,
+	} = useSelect(
 		( select ) => {
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
+			const {
+				getBlockParentsByBlockName,
+				hasSelectedInnerBlock,
+				getBlockRootClientId,
+				hasDraggedInnerBlock,
+			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
 				clientId,
 				'core/navigation-submenu',
 				true
 			);
+			const navigationBlockParents = getBlockParentsByBlockName(
+				clientId,
+				'core/navigation',
+				true
+			);
 			return {
 				isNested: blockParents.length > 0,
+				isChildOfNavigation: navigationBlockParents.length > 0,
+				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
+				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
+				parentBlock: getBlockRootClientId( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: [ 'core/page-list-item' ],
+		renderAppender: false,
+		__unstableDisableDropZone: true,
+		templateLock: isChildOfNavigation ? false : 'all',
+		onInput: NOOP,
+		onChange: NOOP,
+		value: blockList,
+	} );
+
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( hasSelectedChild || hasDraggedChild ) {
+			openModal();
+			selectBlock( parentBlock );
+		}
+	}, [
+		hasSelectedChild,
+		hasDraggedChild,
+		parentBlock,
+		selectBlock,
+		openModal,
+	] );
+
 	useEffect( () => {
 		setAttributes( { isNested } );
-	}, [ isNested ] );
+	}, [ isNested, setAttributes ] );
 
 	return (
 		<>
@@ -343,10 +340,23 @@ export default function PageListEdit( {
 				) }
 			</InspectorControls>
 			{ allowConvertToLinks && (
-				<ConvertToLinksModal
-					disabled={ ! hasResolvedPages }
-					onClick={ convertToNavigationLinks }
-				/>
+				<>
+					<BlockControls group="other">
+						<ToolbarButton
+							title={ __( 'Edit' ) }
+							onClick={ openModal }
+						>
+							{ __( 'Edit' ) }
+						</ToolbarButton>
+					</BlockControls>
+					{ isOpen && (
+						<ConvertToLinksModal
+							onClick={ convertToNavigationLinks }
+							onClose={ closeModal }
+							disabled={ ! hasResolvedPages }
+						/>
+					) }
+				</>
 			) }
 			<BlockContent
 				blockProps={ blockProps }

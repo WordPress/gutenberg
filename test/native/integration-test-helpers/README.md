@@ -18,6 +18,10 @@ Dismisses a modal.
 
 Gets a block from the root block list.
 
+### [`getBlockTransformOptions`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/get-block-transform-options.js)
+
+Get the block transform options of a block.
+
 ### [`getEditorHtml`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/get-editor-html.js)
 
 Gets the current HTML output of the editor.
@@ -29,6 +33,10 @@ Gets an inner block from another block.
 ### [`initializeEditor`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/initialize-editor.js)
 
 Initialize an editor for test assertions.
+
+### [`openBlockActionsMenu`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/open-block-actions-menu.js)
+
+Opens the block's actions menu of the current selected block.
 
 ### [`openBlockSettings`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/open-block-settings.js)
 
@@ -61,6 +69,10 @@ Sets up the media upload mock functions for testing.
 ### [`changeTextOfTextInput`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/text-input-change-text.js)
 
 Changes the text of a TextInput component.
+
+### [`transformBlock`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/transform-block.js)
+
+Transform the specified block to another block using the Block actions menu.
 
 ### [`triggerBlockListLayout`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/trigger-block-list-layout.js)
 

@@ -28,7 +28,7 @@ import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
 
-// Preffered order of pattern categories. Any other categories should
+// Preferred order of pattern categories. Any other categories should
 // be at the bottom without any re-ordering.
 const patternCategoriesOrder = [
 	'featured',
@@ -68,28 +68,14 @@ function usePatternsCategories( rootClientId ) {
 					pattern.categories?.includes( category.name )
 				)
 			)
-			.sort( ( { name: currentName }, { name: nextName } ) => {
-				// The pattern categories should be ordered as follows:
-				// 1. The categories from `patternCategoriesOrder` in that specific order should be at the top.
-				// 2. The rest categories should be at the bottom without any re-ordering.
-				if (
-					! [ currentName, nextName ].some( ( categoryName ) =>
-						patternCategoriesOrder.includes( categoryName )
-					)
-				) {
-					return 0;
-				}
-				if (
-					[ currentName, nextName ].every( ( categoryName ) =>
-						patternCategoriesOrder.includes( categoryName )
-					)
-				) {
-					return (
-						patternCategoriesOrder.indexOf( currentName ) -
-						patternCategoriesOrder.indexOf( nextName )
-					);
-				}
-				return patternCategoriesOrder.includes( currentName ) ? -1 : 1;
+			.sort( ( { name: aName }, { name: bName } ) => {
+				// Sort categories according to `patternCategoriesOrder`.
+				let aIndex = patternCategoriesOrder.indexOf( aName );
+				let bIndex = patternCategoriesOrder.indexOf( bName );
+				// All other categories should come after that.
+				if ( aIndex < 0 ) aIndex = patternCategoriesOrder.length;
+				if ( bIndex < 0 ) bIndex = patternCategoriesOrder.length;
+				return aIndex - bIndex;
 			} );
 
 		if (

@@ -348,7 +348,7 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 	$wp_insert_post_result = wp_insert_post(
 		array(
 			'post_content' => $classic_nav_menu_blocks,
-			'post_title'   => $classic_nav_menu->slug,
+			'post_title'   => $classic_nav_menu->name,
 			'post_name'    => $classic_nav_menu->slug,
 			'post_status'  => 'publish',
 			'post_type'    => 'wp_navigation',
@@ -373,12 +373,14 @@ function block_core_navigation_get_most_recently_published_navigation() {
 
 	// Default to the most recently created menu.
 	$parsed_args = array(
-		'post_type'      => 'wp_navigation',
-		'no_found_rows'  => true,
-		'order'          => 'DESC',
-		'orderby'        => 'date',
-		'post_status'    => 'publish',
-		'posts_per_page' => 1, // get only the most recent.
+		'post_type'              => 'wp_navigation',
+		'no_found_rows'          => true,
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => false,
+		'order'                  => 'DESC',
+		'orderby'                => 'date',
+		'post_status'            => 'publish',
+		'posts_per_page'         => 1, // get only the most recent.
 	);
 
 	$navigation_post = new WP_Query( $parsed_args );
@@ -451,7 +453,6 @@ function block_core_navigation_get_fallback_blocks() {
 	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
 
 	// Default to a list of Pages.
-
 	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
 	// If there are no navigation posts then try to find a classic menu
@@ -469,6 +470,10 @@ function block_core_navigation_get_fallback_blocks() {
 		// In this case default to the (Page List) fallback.
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 	}
+
+	// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
+	// In this case default empty blocks.
+	$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : array();
 
 	/**
 	 * Filters the fallback experience for the Navigation block.
@@ -529,7 +534,6 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
-
 	static $seen_menu_names = array();
 
 	// Flag used to indicate whether the rendered output is considered to be

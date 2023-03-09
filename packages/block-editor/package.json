@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "11.3.0",
+	"version": "11.5.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -45,7 +45,6 @@
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
-		"@wordpress/experiments": "file:../experiments",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
@@ -55,6 +54,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/shortcode": "file:../shortcode",
 		"@wordpress/style-engine": "file:../style-engine",
