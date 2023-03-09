@@ -281,7 +281,7 @@
 		"prelint:php": "wp-env run composer \"update --no-interaction\"",
 		"lint:php": "wp-env run composer run-script lint",
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
-		"native": "npm run --prefix packages/react-native-editor",
+		"native": "npm run --workspace=packages/react-native-editor",
 		"other:changelog": "node ./bin/plugin/cli.js changelog",
 		"other:check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"preother:check-local-changes": "npm run docs:build",
