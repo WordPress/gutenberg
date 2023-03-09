@@ -438,11 +438,11 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	// The block should have a duotone attribute or have duotone defined in its theme.json to be processed.
 	$has_duotone_attribute = isset( $block['attrs']['style']['color']['duotone'] );
-	$has_theme_json_duotone = array_key_exists( $block['blockName'], WP_Duotone::$duotone_block_names );
+	$has_global_styles_duotone = array_key_exists( $block['blockName'], WP_Duotone::$global_styles_block_names );
 	
 	if (
 		! $duotone_support ||
-		( ! $has_duotone_attribute && ! $has_theme_json_duotone )
+		( ! $has_duotone_attribute && ! $has_global_styles_duotone )
 	) {
 		return $block_content;
 	}
@@ -583,7 +583,7 @@ class WP_Duotone {
 	 * @since 6.3.0
 	 * @var array
 	 */
-	static $duotone_presets = array();
+	static $global_styles_presets = array();
 
 	/** 
 	 * An array of block names from global, theme, and custom styles that have duotone presets. We'll use this to quickly
@@ -596,7 +596,7 @@ class WP_Duotone {
 	 * 	]
 	 *
 	 */
-	static $duotone_block_names = array();
+	static $global_styles_block_names = array();
 	
 	/**
 	 * An array of Duotone SVG and CSS ouput needed for the frontend duotone rendering based on what is
@@ -618,7 +618,7 @@ class WP_Duotone {
 	 * @since 6.3.0
 	 * @var array
 	 */
-	static $duotone_output = array();
+	static $output_presets = array();
 
 
 
@@ -627,7 +627,7 @@ class WP_Duotone {
 	 * We only want to process this one time. On block render we'll access and output only the needed presets for that page.
 	 * 
 	 */
-	static function gutenberg_save_duotone_presets() {
+	static function save_presets() {
 		// Get the per block settings from the theme.json.
 		$tree = WP_Theme_JSON_Resolver::get_merged_data();
 		$settings = $tree->get_settings();
@@ -637,7 +637,7 @@ class WP_Duotone {
 		foreach( $presets_by_origin as $presets ) {
 			foreach( $presets as $preset ) {
 				// $flat_presets[ _wp_to_kebab_case( $preset['slug'] ) ] = $preset;
-				self::$duotone_presets[ _wp_to_kebab_case( $preset['slug'] ) ] = [
+				self::$global_styles_presets[ _wp_to_kebab_case( $preset['slug'] ) ] = [
 					'slug'	=> $preset[ 'slug' ],
 					'colors' => $preset[ 'colors' ],
 				];
@@ -645,7 +645,10 @@ class WP_Duotone {
 		}
 	}
 
-	static function gutenberg_save_duotone_block_names() {
+	/**
+	 * Scrape all block names from global styles and store in WP_Duotone::$global_styles_block_names
+	 */
+	static function save_global_style_block_names() {
 		// Get the per block settings from the theme.json.
 		$tree = WP_Theme_JSON_Resolver::get_merged_data();
 		$block_nodes = $tree->get_styles_block_nodes();
@@ -667,7 +670,7 @@ class WP_Duotone {
 			}
 
 			// If it has a duotone preset, save the block name and the preset slug.
-			self::$duotone_block_names[ $block_node[ 'name' ] ] = self::gutenberg_get_duotone_slug_from_preset_css_variable( $duotone_filter );
+			self::$global_styles_block_names[ $block_node[ 'name' ] ] = self::gutenberg_get_duotone_slug_from_preset_css_variable( $duotone_filter );
 		}
 	}
 
@@ -688,10 +691,10 @@ class WP_Duotone {
 	 */
 	static function gutenberg_identify_used_duotone_blocks( $block_content, $block ) {
 		// If the block name exists in our pre-defined list of block selectors that use duotone in theme.json (or related), add it to our list of duotone to output
-		if( array_key_exists( $block['blockName'], self::$duotone_block_names ) ) {
-			$preset_slug = self::$duotone_block_names[ $block['blockName'] ];
+		if( array_key_exists( $block['blockName'], self::$global_styles_block_names ) ) {
+			$preset_slug = self::$global_styles_block_names[ $block['blockName'] ];
 
-			self::$duotone_output[ $preset_slug ] = self::$duotone_presets[ $preset_slug ];
+			self::$output_presets[ $preset_slug ] = self::$global_styles_presets[ $preset_slug ];
 		}
 
 		return $block_content;
@@ -699,6 +702,5 @@ class WP_Duotone {
 }
 
 
-add_action( 'wp_loaded', array( 'WP_Duotone', 'gutenberg_save_duotone_presets' ), 10 );
-add_action( 'wp_loaded', array( 'WP_Duotone', 'gutenberg_save_duotone_block_names' ), 10 );
-add_filter( 'render_block', array( 'WP_Duotone', 'gutenberg_identify_used_duotone_blocks' ), 10, 2 );
+add_action( 'wp_loaded', array( 'WP_Duotone', 'save_presets' ), 10 );
+add_action( 'wp_loaded', array( 'WP_Duotone', 'save_global_style_block_names' ), 10 );
