@@ -19,6 +19,7 @@ import { store as blockEditorStore } from '../../store';
 import { updateAttributes } from './update-attributes';
 import { LinkUI } from './link-ui';
 import { useInsertedBlock } from './use-inserted-block';
+import { useListViewContext } from './context';
 
 const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
@@ -43,6 +44,7 @@ const ListViewBlockContents = forwardRef(
 	) => {
 		const { clientId } = block;
 		const [ isLinkUIOpen, setIsLinkUIOpen ] = useState();
+		const { enableDragAndDrop } = useListViewContext();
 		const {
 			blockMovingClientId,
 			selectedBlockInBlockEditor,
@@ -124,26 +126,44 @@ const ListViewBlockContents = forwardRef(
 						onCancel={ () => setIsLinkUIOpen( false ) }
 					/>
 				) }
-				<BlockDraggable clientIds={ draggableClientIds }>
-					{ ( { draggable, onDragStart, onDragEnd } ) => (
-						<ListViewBlockSelectButton
-							ref={ ref }
-							className={ className }
-							block={ block }
-							onClick={ onClick }
-							onToggleExpanded={ onToggleExpanded }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							draggable={ draggable }
-							onDragStart={ onDragStart }
-							onDragEnd={ onDragEnd }
-							isExpanded={ isExpanded }
-							{ ...props }
-						/>
-					) }
-				</BlockDraggable>
+				{ enableDragAndDrop && (
+					<BlockDraggable clientIds={ draggableClientIds }>
+						{ ( { draggable, onDragStart, onDragEnd } ) => (
+							<ListViewBlockSelectButton
+								ref={ ref }
+								className={ className }
+								block={ block }
+								onClick={ onClick }
+								onToggleExpanded={ onToggleExpanded }
+								isSelected={ isSelected }
+								position={ position }
+								siblingBlockCount={ siblingBlockCount }
+								level={ level }
+								draggable={ draggable }
+								onDragStart={ onDragStart }
+								onDragEnd={ onDragEnd }
+								isExpanded={ isExpanded }
+								{ ...props }
+							/>
+						) }
+					</BlockDraggable>
+				) }
+				{ ! enableDragAndDrop && (
+					<ListViewBlockSelectButton
+						ref={ ref }
+						className={ className }
+						block={ block }
+						onClick={ onClick }
+						onToggleExpanded={ onToggleExpanded }
+						isSelected={ isSelected }
+						position={ position }
+						siblingBlockCount={ siblingBlockCount }
+						level={ level }
+						isExpanded={ isExpanded }
+						draggable={ false }
+						{ ...props }
+					/>
+				) }
 			</>
 		);
 	}

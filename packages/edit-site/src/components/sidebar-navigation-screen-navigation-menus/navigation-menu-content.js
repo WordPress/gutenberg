@@ -20,10 +20,30 @@ import { NavigationMenuLoader } from './loader';
 export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 	const { clientIdsTree, isLoading } = useSelect(
 		( select ) => {
-			const { __unstableGetClientIdsTree, areInnerBlocksControlled } =
-				select( blockEditorStore );
+			const {
+				__unstableGetClientIdsTree,
+				areInnerBlocksControlled,
+				getBlocksByClientId,
+			} = select( blockEditorStore );
+
+			const filterLinksOnly = ( tree ) => {
+				if ( tree.innerBlocks && tree.innerBlocks.length > 0 ) {
+					tree.innerBlocks = filterLinksOnly( tree.innerBlocks );
+				}
+				tree = tree.filter( ( item ) => {
+					const block = getBlocksByClientId( item.clientId )[ 0 ];
+					return (
+						block.name === 'core/navigation-link' ||
+						block.name === 'core/navigation-submenu'
+					);
+				} );
+				return tree;
+			};
+			const _clientIdsTree = filterLinksOnly(
+				__unstableGetClientIdsTree( rootClientId )
+			);
 			return {
-				clientIdsTree: __unstableGetClientIdsTree( rootClientId ),
+				clientIdsTree: _clientIdsTree,
 
 				// This is a small hack to wait for the navigation block
 				// to actually load its inner blocks.
@@ -35,7 +55,7 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
+	const { OffCanvasEditor } = unlock( blockEditorPrivateApis );
 
 	const offCanvasOnselect = useCallback(
 		( block ) => {
@@ -64,8 +84,9 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 				<OffCanvasEditor
 					blocks={ clientIdsTree }
 					onSelect={ offCanvasOnselect }
-					LeafMoreMenu={ LeafMoreMenu }
+					LeafMoreMenu={ false }
 					showAppender={ false }
+					enableDragAndDrop={ false }
 				/>
 			) }
 			<div style={ { visibility: 'hidden' } }>

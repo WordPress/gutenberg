@@ -307,39 +307,40 @@ function ListViewBlock( {
 				</>
 			) }
 
-			{ showBlockActions && (
-				<>
-					<TreeGridCell
-						className={ listViewBlockSettingsClassName }
-						aria-selected={
-							!! isSelected || forceSelectionContentLock
-						}
-					>
-						{ ( { ref, tabIndex, onFocus } ) => (
-							<>
-								<MoreMenuComponent
-									clientIds={ dropdownClientIds }
-									block={ block }
-									clientId={ clientId }
-									icon={ moreVertical }
-									label={ settingsAriaLabel }
-									toggleProps={ {
-										ref,
-										className:
-											'block-editor-list-view-block__menu',
-										tabIndex,
-										onFocus,
-									} }
-									disableOpenOnArrowDown
-									__experimentalSelectBlock={
-										updateSelection
-									}
-								/>
-							</>
-						) }
-					</TreeGridCell>
-				</>
-			) }
+			{ showBlockActions ||
+				( MoreMenuComponent === false && (
+					<>
+						<TreeGridCell
+							className={ listViewBlockSettingsClassName }
+							aria-selected={
+								!! isSelected || forceSelectionContentLock
+							}
+						>
+							{ ( { ref, tabIndex, onFocus } ) => (
+								<>
+									<MoreMenuComponent
+										clientIds={ dropdownClientIds }
+										block={ block }
+										clientId={ clientId }
+										icon={ moreVertical }
+										label={ settingsAriaLabel }
+										toggleProps={ {
+											ref,
+											className:
+												'block-editor-list-view-block__menu',
+											tabIndex,
+											onFocus,
+										} }
+										disableOpenOnArrowDown
+										__experimentalSelectBlock={
+											updateSelection
+										}
+									/>
+								</>
+							) }
+						</TreeGridCell>
+					</>
+				) ) }
 		</ListViewLeaf>
 	);
 }

@@ -54,17 +54,18 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
 /**
  * Show a hierarchical list of blocks.
  *
- * @param {Object}  props                 Components props.
- * @param {string}  props.id              An HTML element id for the root element of ListView.
- * @param {string}  props.parentClientId  The client id of the parent block.
- * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {boolean} props.showBlockMovers Flag to enable block movers
- * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
- * @param {Object}  props.LeafMoreMenu    Optional more menu substitution.
- * @param {string}  props.description     Optional accessible description for the tree grid component.
- * @param {string}  props.onSelect        Optional callback to be invoked when a block is selected.
- * @param {string}  props.showAppender    Flag to show or hide the block appender.
- * @param {Object}  ref                   Forwarded ref
+ * @param {Object}  props                   Components props.
+ * @param {string}  props.id                An HTML element id for the root element of ListView.
+ * @param {string}  props.parentClientId    The client id of the parent block.
+ * @param {Array}   props.blocks            Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean} props.showBlockMovers   Flag to enable block movers
+ * @param {boolean} props.isExpanded        Flag to determine whether nested levels are expanded by default.
+ * @param {Object}  props.LeafMoreMenu      Optional more menu substitution.
+ * @param {boolean} props.enableDragAndDrop Flag to enable drag and drop.
+ * @param {string}  props.description       Optional accessible description for the tree grid component.
+ * @param {string}  props.onSelect          Optional callback to be invoked when a block is selected.
+ * @param {string}  props.showAppender      Flag to show or hide the block appender.
+ * @param {Object}  ref                     Forwarded ref
  */
 function OffCanvasEditor(
 	{
@@ -75,6 +76,7 @@ function OffCanvasEditor(
 		isExpanded = false,
 		showAppender = true,
 		LeafMoreMenu,
+		enableDragAndDrop = true,
 		description = __( 'Block navigation structure' ),
 		onSelect,
 	},
@@ -200,6 +202,7 @@ function OffCanvasEditor(
 			expand,
 			collapse,
 			LeafMoreMenu,
+			enableDragAndDrop,
 		} ),
 		[
 			isMounted.current,
