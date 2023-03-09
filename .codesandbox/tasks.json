@@ -1,0 +1,22 @@
+{
+	"setupTasks": [
+		"npm install",
+		"npm run build",
+		"node ./bin/prepare-codesandbox.js"
+	],
+	"tasks": {
+		"install-dependencies": {
+			"name": "Install Dependencies",
+			"command": "npm install"
+		},
+		"start-app": {
+			"name": "Start WordPress server",
+			"command": "npm run wp-env start",
+			"runAtStart": true,
+			"preview": {
+				"port": 8888,
+				"prLink": "direct"
+			}
+		}
+	}
+}
