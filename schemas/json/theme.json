@@ -267,6 +267,23 @@
 				}
 			}
 		},
+		"settingsPropertiesPosition": {
+			"type": "object",
+			"properties": {
+				"position": {
+					"description": "Settings related to position.",
+					"type": "object",
+					"properties": {
+						"sticky": {
+							"description": "Allow users to set sticky position.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsPropertiesSpacing": {
 			"type": "object",
 			"properties": {
@@ -627,6 +644,7 @@
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
 				{ "$ref": "#/definitions/settingsPropertiesShadow" },
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
+				{ "$ref": "#/definitions/settingsPropertiesPosition" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 				{ "$ref": "#/definitions/settingsPropertiesTypography" },
 				{ "$ref": "#/definitions/settingsPropertiesCustom" }
@@ -645,6 +663,7 @@
 						"shadow": {},
 						"color": {},
 						"layout": {},
+						"position": {},
 						"spacing": {},
 						"typography": {},
 						"custom": {}
