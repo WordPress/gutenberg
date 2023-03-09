@@ -238,7 +238,6 @@ export default function PostExcerptEditor( {
 						value={ excerptLength }
 						onChange={ ( value ) => {
 							setAttributes( { excerptLength: value } );
-							setExcerpt();
 						} }
 						min="10"
 						max="100"
