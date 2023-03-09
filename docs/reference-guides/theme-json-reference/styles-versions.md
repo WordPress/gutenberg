@@ -2,56 +2,259 @@
 
 New styles options are integrated into theme.json on a regular basis. Knowing the style options available through theme.json or the styles editor at any given time can be challenging. To clarify, the table below indicates the WordPress version when each theme.json styles option became available and when a corresponding control was added to the user interface to allow management of the style from the Styles editor.
 
-## Styles Keys
-
-| Key | theme.json Since| Style Editor Since |
-| --- | :---: | :---: |
-| `color.gradient`              | 5.8 | 5.9 |
-| `color.background`            | 5.8 | 5.9 |
-| `color.text`                  | 5.8 | 5.9 |
-| `border.color`                | 5.9 | 5.9 |
-| `border.width`                | 5.9 | 5.9 |
-| `border.style`                | 5.9 | 5.9 |
-| `border.radius`               | 5.8 | 5.9 |
-| `border.radius.topLeft`       | 5.9 | 5.9 |
-| `border.radius.topRight`      | 5.9 | 5.9 |
-| `border.radius.bottomLeft`    | 5.9 | 5.9 |
-| `border.radius.bottomRight`   | 5.9 | 5.9 |
-| `border.top.color`            | 6.1 | 6.1 |
-| `border.top.width`            | 6.1 | 6.1 |
-| `border.top.style`            | 6.1 | 6.1 |
-| `border.right.color`          | 6.1 | 6.1 |
-| `border.right.width`          | 6.1 | 6.1 |
-| `border.right.style`          | 6.1 | 6.1 |
-| `border.bottom.color`         | 6.1 | 6.1 |
-| `border.bottom.width`         | 6.1 | 6.1 |
-| `border.bottom.style`         | 6.1 | 6.1 |
-| `border.left.color`           | 6.1 | 6.1 |
-| `border.left.width`           | 6.1 | 6.1 |
-| `border.left.style`           | 6.1 | 6.1 |
-| `typography.fontFamily`       | 5.9 | 5.9 |
-| `typography.fontSize`         | 5.8 | 5.9 |
-| `typography.fontStyle`        | 5.9 | 5.9 |
-| `typography.fontWeight`       | 5.9 | 5.9 |
-| `typography.letterSpacing`    | 5.9 | 5.9 |
-| `typography.lineHeight`       | 5.8 | 5.9 |
-| `typography.textDecoration`   | 5.9 | 6.2 |
-| `typography.textTransform`    | 5.9 | 6.0 |
-| `spacing.padding`             | 5.9 | 5.9 |
-| `spacing.padding.top`         | 5.8 | 5.9 |
-| `spacing.padding.right`       | 5.8 | 5.9 |
-| `spacing.padding.left`        | 5.8 | 5.9 |
-| `spacing.padding.bottom`      | 5.8 | 5.9 |
-| `spacing.margin`              | 5.9 | 5.9 |
-| `spacing.margin.top`          | 5.8 | 5.9 |
-| `spacing.margin.right`        | 5.8 | 5.9 |
-| `spacing.margin.left`         | 5.8 | 5.9 |
-| `spacing.margin.bottom`       | 5.8 | 5.9 |
-| `spacing.blockGap`            | 5.9 | 5.9 |
-| `dimensions.minHeight`        | 6.2 | N/A |
-| `outline.color`               | 6.2 | N/A |
-| `outline.offset`              | 6.2 | N/A |
-| `outline.style`               | 6.2 | N/A |
-| `outline.width`               | 6.2 | N/A |
-| `filter.duotone`              | 5.9 | N/A |
-| `shadow`                      | 6.1 | 6.2 |
+<table>
+<thead>
+<tr>
+<th id="key">Key</th>
+<th id="theme.json_since" style="text-align:center;">theme.json Since</th>
+<th id="style_editor_since" style="text-align:center;">Style Editor Since</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>color.gradient</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>color.background</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>color.text</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>border.color</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>border.width</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>border.style</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>border.radius</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>border.radius.topLeft</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>border.radius.topRight</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>border.radius.bottomLeft</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>border.radius.bottomRight</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>border.top.color</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>border.top.width</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>border.top.style</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>border.right.color</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>border.right.width</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>border.right.style</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>border.bottom.color</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>border.bottom.width</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>border.bottom.style</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>border.left.color</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>border.left.width</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>border.left.style</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.1</td>
+</tr>
+<tr>
+<td><code>typography.fontFamily</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>typography.fontSize</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>typography.fontStyle</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>typography.fontWeight</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>typography.letterSpacing</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>typography.lineHeight</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>typography.textDecoration</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">6.2</td>
+</tr>
+<tr>
+<td><code>typography.textTransform</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">6.0</td>
+</tr>
+<tr>
+<td><code>spacing.padding</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>spacing.padding.top</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>spacing.padding.right</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>spacing.padding.left</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>spacing.padding.bottom</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>spacing.margin</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>spacing.margin.top</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>spacing.margin.right</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>spacing.margin.left</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>spacing.margin.bottom</code></td>
+<td style="text-align:center;">5.8</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>spacing.blockGap</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">5.9</td>
+</tr>
+<tr>
+<td><code>dimensions.minHeight</code></td>
+<td style="text-align:center;">6.2</td>
+<td style="text-align:center;">N/A</td>
+</tr>
+<tr>
+<td><code>outline.color</code></td>
+<td style="text-align:center;">6.2</td>
+<td style="text-align:center;">N/A</td>
+</tr>
+<tr>
+<td><code>outline.offset</code></td>
+<td style="text-align:center;">6.2</td>
+<td style="text-align:center;">N/A</td>
+</tr>
+<tr>
+<td><code>outline.style</code></td>
+<td style="text-align:center;">6.2</td>
+<td style="text-align:center;">N/A</td>
+</tr>
+<tr>
+<td><code>outline.width</code></td>
+<td style="text-align:center;">6.2</td>
+<td style="text-align:center;">N/A</td>
+</tr>
+<tr>
+<td><code>filter.duotone</code></td>
+<td style="text-align:center;">5.9</td>
+<td style="text-align:center;">N/A</td>
+</tr>
+<tr>
+<td><code>shadow</code></td>
+<td style="text-align:center;">6.1</td>
+<td style="text-align:center;">6.2</td>
+</tr>
+</tbody>
+</table>
