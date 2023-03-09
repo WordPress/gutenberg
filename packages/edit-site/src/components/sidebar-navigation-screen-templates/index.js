@@ -5,12 +5,15 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalUseNavigator as useNavigator,
+	__experimentalHStack as HStack,
+	FlexBlock,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useViewportMatch } from '@wordpress/compose';
+import { chevronRightSmall, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -113,10 +116,19 @@ export default function SidebarNavigationScreenTemplates() {
 									postId={ template.id }
 									key={ template.id }
 								>
-									{ decodeEntities(
-										template.title?.rendered ||
-											template.slug
-									) }
+									<HStack>
+										<FlexBlock>
+											{ decodeEntities(
+												template.title?.rendered ||
+													template.slug
+											) }
+										</FlexBlock>
+										<Icon
+											className="edit-site-sidebar-navigation-screen-templates__chevron"
+											icon={ chevronRightSmall }
+											size={ 24 }
+										/>
+									</HStack>
 								</TemplateItem>
 							) ) }
 							{ ! isMobileViewport && (
@@ -124,7 +136,19 @@ export default function SidebarNavigationScreenTemplates() {
 									className="edit-site-sidebar-navigation-screen-templates__see-all"
 									{ ...browseAllLink }
 									children={
-										config[ postType ].labels.manage
+										<HStack>
+											<FlexBlock>
+												{
+													config[ postType ].labels
+														.manage
+												}
+											</FlexBlock>
+											<Icon
+												className="edit-site-sidebar-navigation-screen-templates__chevron"
+												icon={ chevronRightSmall }
+												size={ 24 }
+											/>
+										</HStack>
 									}
 								/>
 							) }

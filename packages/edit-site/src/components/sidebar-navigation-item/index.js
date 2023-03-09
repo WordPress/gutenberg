@@ -11,7 +11,7 @@ import {
 	__experimentalHStack as HStack,
 	FlexBlock,
 } from '@wordpress/components';
-import { chevronRight, Icon } from '@wordpress/icons';
+import { chevronRightSmall, Icon } from '@wordpress/icons';
 
 export default function SidebarNavigationItem( {
 	className,
@@ -38,8 +38,8 @@ export default function SidebarNavigationItem( {
 					<FlexBlock>{ children }</FlexBlock>
 					{ withChevron && (
 						<Icon
-							style={ { fill: 'currentcolor' } }
-							icon={ chevronRight }
+							className="edit-site-sidebar-navigation-item__chevron"
+							icon={ chevronRightSmall }
 							size={ 24 }
 						/>
 					) }

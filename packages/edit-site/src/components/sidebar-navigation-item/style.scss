@@ -20,3 +20,7 @@
 	width: calc(100% - #{ $border-width-focus });
 	padding: $grid-unit-10;
 }
+
+.edit-site-sidebar-navigation-item__chevron {
+	fill: $gray-700;
+}
