@@ -232,6 +232,7 @@
 			}
 		},
 		"settingsPropertiesDimensions": {
+			"type": "object",
 			"properties": {
 				"dimensions": {
 					"description": "Settings related to dimensions.",
