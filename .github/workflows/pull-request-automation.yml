@@ -33,7 +33,7 @@ jobs:
 
             # Only run `npm ci` in the package folder and ignore postinstall scripts.
             - name: Install NPM dependencies
-              run: npm ci -w packages/project-management-automation --ignore-scripts
+              run: npm ci -w @wordpress/project-management-automation --ignore-scripts
 
             - uses: ./packages/project-management-automation
               with:
