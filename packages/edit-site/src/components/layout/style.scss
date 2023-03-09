@@ -4,15 +4,6 @@
 	color: $white;
 	display: flex;
 	flex-direction: column;
-
-	&:not(.is-edit-mode) {
-		// Ideally, this component shouldn't render in edit mode
-		// but it happens sporadically, this is a hack
-		// to prevent it from showing up in view mode.
-		.block-editor-block-list__insertion-point {
-			display: none;
-		}
-	}
 }
 
 .edit-site-layout__hub {
