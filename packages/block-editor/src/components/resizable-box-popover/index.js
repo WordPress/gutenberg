@@ -8,20 +8,20 @@ import { ResizableBox } from '@wordpress/components';
  */
 import BlockPopover from '../block-popover';
 
-export default function ResizableCoverPopover( {
+export default function ResizableBoxPopover( {
 	clientId,
-	__unstableRefreshSize,
+	resizableBoxProps,
 	...props
 } ) {
 	return (
 		<BlockPopover
 			clientId={ clientId }
 			__unstableCoverTarget
-			__unstableRefreshSize={ __unstableRefreshSize }
 			__unstablePopoverSlot="block-toolbar"
 			shift={ false }
+			{ ...props }
 		>
-			<ResizableBox { ...props } />
+			<ResizableBox { ...resizableBoxProps } />
 		</BlockPopover>
 	);
 }

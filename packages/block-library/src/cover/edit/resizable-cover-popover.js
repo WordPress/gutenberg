@@ -36,33 +36,36 @@ export default function ResizableCoverPopover( {
 		[ minHeight, height, width ]
 	);
 
+	const resizableBoxProps = {
+		className: classnames( className, { 'is-resizing': isResizing } ),
+		enable: RESIZABLE_BOX_ENABLE_OPTION,
+		onResizeStart: ( _event, _direction, elt ) => {
+			onResizeStart( elt.clientHeight );
+			onResize( elt.clientHeight );
+		},
+		onResize: ( _event, _direction, elt ) => {
+			onResize( elt.clientHeight );
+			if ( ! isResizing ) {
+				setIsResizing( true );
+			}
+		},
+		onResizeStop: ( _event, _direction, elt ) => {
+			onResizeStop( elt.clientHeight );
+			setIsResizing( false );
+		},
+		__experimentalShowTooltip: true,
+		__experimentalTooltipProps: {
+			axis: 'y',
+			position: 'bottom',
+			isVisible: isResizing,
+		},
+	};
+
 	return (
 		<ResizableBoxPopover
+			className="block-library-cover__resizable-box-popover"
 			__unstableRefreshSize={ dimensions }
-			className={ classnames( className, {
-				'is-resizing': isResizing,
-			} ) }
-			enable={ RESIZABLE_BOX_ENABLE_OPTION }
-			onResizeStart={ ( _event, _direction, elt ) => {
-				onResizeStart( elt.clientHeight );
-				onResize( elt.clientHeight );
-			} }
-			onResize={ ( _event, _direction, elt ) => {
-				onResize( elt.clientHeight );
-				if ( ! isResizing ) {
-					setIsResizing( true );
-				}
-			} }
-			onResizeStop={ ( _event, _direction, elt ) => {
-				onResizeStop( elt.clientHeight );
-				setIsResizing( false );
-			} }
-			__experimentalShowTooltip
-			__experimentalTooltipProps={ {
-				axis: 'y',
-				position: 'bottom',
-				isVisible: isResizing,
-			} }
+			resizableBoxProps={ resizableBoxProps }
 			{ ...props }
 		/>
 	);

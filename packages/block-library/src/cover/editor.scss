@@ -87,6 +87,19 @@
 	min-height: 50px;
 }
 
+// Prevent resizable box popover form preventing inner block selection.
+.components-popover.block-editor-block-popover.block-library-cover__resizable-box-popover {
+	// Additional specificity is required to overcome default block popover
+	// pointer events only for the intended wrappers. The default pointer events
+	// are still needed for the inner resize handles of the resizable box.
+	.components-popover__content > div,
+	.block-library-cover__resize-container {
+		// The inner drag handle will still have `pointer-events: all` allowing
+		// it to continue to be interacted with.
+		pointer-events: none;
+	}
+}
+
 // When uploading background images, show a transparent overlay.
 .wp-block-cover > .components-drop-zone .components-drop-zone__content {
 	opacity: 0.8 !important;
