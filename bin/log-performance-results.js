@@ -10,15 +10,15 @@ const [ token, branch, hash, baseHash, timestamp ] = process.argv.slice( 2 );
 
 const resultsFiles = [
 	{
-		file: 'post-editor-performance.results.json',
+		file: 'post-editor.results.json',
 		metricsPrefix: '',
 	},
 	{
-		file: 'front-end-block-theme-performance.results.json',
+		file: 'front-end-block-theme.results.json',
 		metricsPrefix: 'block-theme-',
 	},
 	{
-		file: 'front-end-classic-theme-performance.results.json',
+		file: 'front-end-classic-theme.results.json',
 		metricsPrefix: 'classic-theme-',
 	},
 ];
