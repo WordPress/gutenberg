@@ -66,7 +66,7 @@ export const getEntitiesInfo = ( entities ) => {
  * @param {string} path   Path to the object property.
  * @return {*} Value of the object property at the specified path.
  */
-const getValueFromObjectPath = ( object, path ) => {
+export const getValueFromObjectPath = ( object, path ) => {
 	const normalizedPath = path.split( '.' );
 	let value = object;
 	normalizedPath.forEach( ( fieldName ) => {
