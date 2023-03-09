@@ -1062,7 +1062,7 @@ class WP_Theme_JSON_Gutenberg {
 				}
 				$this->add_layout_styles_to_rules_store( $style_nodes[ $root_style_key ] );
 			}
-			$stylesheet .= $this->get_block_classes( $style_nodes );
+			$this->add_block_classes_to_rules_store( $style_nodes );
 		} elseif ( in_array( 'base-layout-styles', $types, true ) ) {
 			$root_selector    = static::ROOT_BLOCK_SELECTOR;
 			$columns_selector = '.wp-block-columns';
@@ -1215,17 +1215,39 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $style_nodes Nodes with styles.
 	 * @return string The new stylesheet.
 	 */
-	protected function get_block_classes( $style_nodes ) {
-		$block_rules = '';
-
+	protected function add_block_classes_to_rules_store( $style_nodes ) {
 		foreach ( $style_nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
 				continue;
 			}
-			$block_rules .= static::get_styles_for_block( $metadata );
+			static::add_styles_for_block_to_rules_store( $metadata );
 		}
+	}
 
-		return $block_rules;
+	/**
+	 * Converts each style section into a list of rulesets
+	 * containing the block styles to be appended to the stylesheet.
+	 *
+	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
+	 *
+	 * For each section this creates a new ruleset such as:
+	 *
+	 *   block-selector {
+	 *     style-property-one: value;
+	 *   }
+	 *
+	 * @since 5.8.0 As `get_block_styles()`.
+	 * @since 5.9.0 Renamed from `get_block_styles()` to `get_block_classes()`
+	 *              and no longer returns preset classes.
+	 *              Removed the `$setting_nodes` parameter.
+	 * @since 6.1.0 Moved most internal logic to `get_styles_for_block()`.
+	 *
+	 * @param array $style_nodes Nodes with styles.
+	 * @return string The new stylesheet.
+	 */
+	protected function get_block_classes( $style_nodes ) {
+		// @TODO: Deprecate.
+		return '';
 	}
 
 	/**
@@ -1500,6 +1522,20 @@ class WP_Theme_JSON_Gutenberg {
 		);
 
 		return $selector . '{' . $declaration_block . '}';
+	}
+
+	/**
+	 * Converts the named declarations array to a simpler property=>value array.
+	 *
+	 * @param array $declarations Named declarations.
+	 * @return array Property=>value declarations.
+	 */
+	protected static function to_simple_declarations( $declarations ) {
+		$simple_declarations = array();
+		foreach ( $declarations as $declaration ) {
+			$simple_declarations[ $declaration['name'] ] = $declaration['value'];
+		}
+		return $simple_declarations;
 	}
 
 	/**
@@ -2482,6 +2518,211 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $block_rules;
+	}
+
+	/**
+	 * Gets the CSS rules for a particular block from theme.json.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param array $block_metadata Metadata about the block to get styles for.
+	 */
+	public function add_styles_for_block_to_rules_store( $block_metadata ) {
+		$node             = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
+		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
+		$selector         = $block_metadata['selector'];
+		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
+
+		/*
+		 * Process style declarations for block support features the current
+		 * block contains selectors for. Values for a feature with a custom
+		 * selector are filtered from the theme.json node before it is
+		 * processed as normal.
+		*/
+		$feature_declarations = array();
+
+		if ( ! empty( $block_metadata['features'] ) ) {
+			foreach ( $block_metadata['features'] as $feature_name => $feature_selector ) {
+				if ( ! empty( $node[ $feature_name ] ) ) {
+					// Create temporary node containing only the feature data
+					// to leverage existing `compute_style_properties` function.
+					$feature = array( $feature_name => $node[ $feature_name ] );
+					// Generate the feature's declarations only.
+					$new_feature_declarations = static::compute_style_properties( $feature, $settings, null, $this->theme_json );
+
+					// Merge new declarations with any that already exist for
+					// the feature selector. This may occur when multiple block
+					// support features use the same custom selector.
+					if ( isset( $feature_declarations[ $feature_selector ] ) ) {
+						foreach ( $new_feature_declarations as $new_feature_declaration ) {
+							$feature_declarations[ $feature_selector ][] = $new_feature_declaration;
+						}
+					} else {
+						$feature_declarations[ $feature_selector ] = $new_feature_declarations;
+					}
+
+					// Remove the feature from the block's node now the
+					// styles will be included under the feature level selector.
+					unset( $node[ $feature_name ] );
+				}
+			}
+		}
+
+		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
+		$style_variation_declarations = array();
+		if ( ! empty( $block_metadata['variations'] ) ) {
+			foreach ( $block_metadata['variations'] as $style_variation ) {
+				$style_variation_node     = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
+				$style_variation_selector = $style_variation['selector'];
+
+				// If the block has feature selectors, generate the declarations for them within the current style variation.
+				if ( ! empty( $block_metadata['features'] ) ) {
+					$clean_style_variation_selector = trim( $style_variation_selector );
+					foreach ( $block_metadata['features'] as $feature_name => $feature_selector ) {
+						if ( empty( $style_variation_node[ $feature_name ] ) ) {
+							continue;
+						}
+						// If feature selector includes block classname, remove it but leave the whitespace in.
+						$shortened_feature_selector = str_replace( $block_metadata['selector'] . ' ', ' ', $feature_selector );
+						// Prepend the variation selector to the feature selector.
+						$split_feature_selectors    = explode( ',', $shortened_feature_selector );
+						$feature_selectors          = array_map(
+							static function( $split_feature_selector ) use ( $clean_style_variation_selector ) {
+								return $clean_style_variation_selector . $split_feature_selector;
+							},
+							$split_feature_selectors
+						);
+						$combined_feature_selectors = implode( ',', $feature_selectors );
+
+						// Compute declarations for the feature.
+						$new_feature_declarations = static::compute_style_properties( array( $feature_name => $style_variation_node[ $feature_name ] ), $settings, null, $this->theme_json );
+
+						/*
+						 * Merge new declarations with any that already exist for
+						 * the feature selector. This may occur when multiple block
+						 * support features use the same custom selector.
+						 */
+						if ( isset( $style_variation_declarations[ $combined_feature_selectors ] ) ) {
+							$style_variation_declarations[ $combined_feature_selectors ] = array_merge( $style_variation_declarations[ $combined_feature_selectors ], $new_feature_declarations );
+						} else {
+							$style_variation_declarations[ $combined_feature_selectors ] = $new_feature_declarations;
+						}
+
+						/*
+						 * Remove the feature from the variation's node now the
+						 * styles will be included under the feature level selector.
+						 */
+						unset( $style_variation_node[ $feature_name ] );
+					}
+				}
+				// Compute declarations for remaining styles not covered by feature level selectors.
+				$style_variation_declarations[ $style_variation_selector ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
+			}
+		}
+
+		/*
+		 * Get a reference to element name from path.
+		 * $block_metadata['path'] = array( 'styles','elements','link' );
+		 * Make sure that $block_metadata['path'] describes an element node, like [ 'styles', 'element', 'link' ].
+		 * Skip non-element paths like just ['styles'].
+		 */
+		$is_processing_element = in_array( 'elements', $block_metadata['path'], true );
+
+		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
+
+		$element_pseudo_allowed = array();
+
+		// TODO: Replace array_key_exists() with isset() check once WordPress drops
+		// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
+		if ( array_key_exists( $current_element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
+			$element_pseudo_allowed = static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ];
+		}
+
+		/*
+		 * Check for allowed pseudo classes (e.g. ":hover") from the $selector ("a:hover").
+		 * This also resets the array keys.
+		 */
+		$pseudo_matches = array_values(
+			array_filter(
+				$element_pseudo_allowed,
+				function( $pseudo_selector ) use ( $selector ) {
+					return str_contains( $selector, $pseudo_selector );
+				}
+			)
+		);
+
+		$pseudo_selector = isset( $pseudo_matches[0] ) ? $pseudo_matches[0] : null;
+
+		/*
+		 * If the current selector is a pseudo selector that's defined in the allow list for the current
+		 * element then compute the style properties for it.
+		 * Otherwise just compute the styles for the default selector as normal.
+		 */
+		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) &&
+			// TODO: Replace array_key_exists() with isset() check once WordPress drops
+			// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
+			array_key_exists( $current_element, static::VALID_ELEMENT_PSEUDO_SELECTORS )
+			&& in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true )
+		) {
+			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
+		} else {
+			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
+		}
+
+		/*
+		 * 1. Separate the declarations that use the general selector
+		 * from the ones using the duotone selector.
+		 */
+		$declarations_duotone = array();
+		foreach ( $declarations as $index => $declaration ) {
+			if ( 'filter' === $declaration['name'] ) {
+				/*
+				 * 'unset' filters happen when a filter is unset
+				 * in the site-editor UI. Because the 'unset' value
+				 * in the user origin overrides the value in the
+				 * theme origin, we can skip rendering anything
+				 * here as no filter needs to be applied anymore.
+				 * So only add declarations to with values other
+				 * than 'unset'.
+				 */
+				if ( 'unset' !== $declaration['value'] ) {
+					$declarations_duotone[] = $declaration;
+				}
+				unset( $declarations[ $index ] );
+			}
+		}
+
+		// Update declarations if there are separators with only background color defined.
+		if ( '.wp-block-separator' === $selector ) {
+			$declarations = static::update_separator_declarations( $declarations );
+		}
+
+		// 2. Generate and append the rules that use the general selector.
+		$this->rules_store->add_rule( $selector )->add_declarations( static::to_simple_declarations( $declarations ) );
+
+		// 3. Generate and append the rules that use the duotone selector.
+		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
+			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
+			$this->rules_store->add_rule( $selector_duotone )->add_declarations( static::to_simple_declarations( $declarations_duotone ) );
+		}
+
+		// 4. Generate Layout block gap styles.
+		if (
+			static::ROOT_BLOCK_SELECTOR !== $selector &&
+			! empty( $block_metadata['name'] )
+		) {
+			$this->add_layout_styles_to_rules_store( $block_metadata );
+		}
+
+		// 5. Generate and append the feature level rulesets.
+		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
+			$this->rules_store->add_rule( $feature_selector )->add_declarations( static::to_simple_declarations( $individual_feature_declarations ) );
+		}
+
+		// 6. Generate and append the style variation rulesets.
+		foreach ( $style_variation_declarations as $style_variation_selector => $individual_style_variation_declarations ) {
+			$this->rules_store->add_rule( $style_variation_selector )->add_declarations( static::to_simple_declarations( $individual_style_variation_declarations ) );
+		}
 	}
 
 	/**
