@@ -19,7 +19,6 @@ const AnimatedFlatList = Animated.createAnimatedComponent( FlatList );
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,
 	innerRef,
-	inputAccessoryViewHeight,
 	onScroll,
 	scrollEnabled,
 	shouldPreventAutomaticScroll,
@@ -35,8 +34,7 @@ export const KeyboardAwareFlatList = ( {
 
 	const latestContentOffsetY = useSharedValue( -1 );
 
-	const offsetExtraSpace = extraScrollHeight + inputAccessoryViewHeight;
-	const screenOffset = windowHeight - ( keyboardSpace + offsetExtraSpace );
+	const screenOffset = windowHeight - ( keyboardSpace + extraScrollHeight );
 
 	const scrollHandler = useAnimatedScrollHandler( {
 		onScroll: ( event ) => {
@@ -61,7 +59,7 @@ export const KeyboardAwareFlatList = ( {
 			showSubscription = Keyboard.addListener(
 				'keyboardDidShow',
 				( { endCoordinates } ) => {
-					if ( keyboardSpace === 0 && endCoordinates.height !== 0 ) {
+					if ( keyboardSpace !== endCoordinates.height ) {
 						setKeyboardSpace( endCoordinates.height );
 					}
 				}
@@ -163,6 +161,7 @@ export const KeyboardAwareFlatList = ( {
 			{ ...props }
 			automaticallyAdjustContentInsets={ false }
 			contentInset={ contentInset }
+			onContentSizeChange={ onScrollToInput }
 			onScroll={ scrollHandler }
 			ref={ getRef }
 			scrollEnabled={ scrollEnabled }
