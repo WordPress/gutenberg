@@ -44,6 +44,13 @@ export default function ListViewSidebar() {
 	const contentFocusReturnRef = useFocusReturn();
 
 	function closeOnEscape( event ) {
+		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+			event.preventDefault();
+			setIsListViewOpened( false );
+		}
+	}
+
+	function clearSelectionOnEscape( event ) {
 		// If there is a block selection, then skip closing the list view
 		// and clear out the block selection instead.
 		if (
@@ -55,12 +62,6 @@ export default function ListViewSidebar() {
 			event.preventDefault();
 			clearSelectedBlock();
 			speak( __( 'All blocks deselected.' ), 'assertive' );
-			return;
-		}
-
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
-			event.preventDefault();
-			setIsListViewOpened( false );
 		}
 	}
 
