@@ -1224,18 +1224,19 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string Layout styles for the block.
 	 */
 	protected function get_layout_styles( $block_metadata ) {
-		$block_rules = '';
-		$block_type  = null;
+		$block_type = null;
+
+		$global_styles_layout_rules_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'global-styles-layout' );
 
 		// Skip outputting layout styles if explicitly disabled.
 		if ( current_theme_supports( 'disable-layout-styles' ) ) {
-			return $block_rules;
+			return '';
 		}
 
 		if ( isset( $block_metadata['name'] ) ) {
 			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_metadata['name'] );
 			if ( ! block_has_support( $block_type, array( '__experimentalLayout' ), false ) ) {
-				return $block_rules;
+				return '';
 			}
 		}
 
@@ -1298,10 +1299,7 @@ class WP_Theme_JSON_Gutenberg {
 								foreach ( $spacing_rule['rules'] as $css_property => $css_value ) {
 									$current_css_value = is_string( $css_value ) ? $css_value : $block_gap_value;
 									if ( static::is_safe_css_declaration( $css_property, $current_css_value ) ) {
-										$declarations[] = array(
-											'name'  => $css_property,
-											'value' => $current_css_value,
-										);
+										$declarations[ $css_property ] = $current_css_value;
 									}
 								}
 
@@ -1323,7 +1321,9 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								}
-								$block_rules .= static::to_ruleset( $layout_selector, $declarations );
+								$global_styles_layout_rules_store
+									->add_rule( $layout_selector )
+									->add_declarations( $declarations );
 							}
 						}
 					}
@@ -1350,20 +1350,9 @@ class WP_Theme_JSON_Gutenberg {
 						is_string( $layout_definition['displayMode'] ) &&
 						in_array( $layout_definition['displayMode'], $valid_display_modes, true )
 					) {
-						$layout_selector = sprintf(
-							'%s .%s',
-							$selector,
-							$class_name
-						);
-						$block_rules    .= static::to_ruleset(
-							$layout_selector,
-							array(
-								array(
-									'name'  => 'display',
-									'value' => $layout_definition['displayMode'],
-								),
-							)
-						);
+						$global_styles_layout_rules_store
+							->add_rule( "{$selector} .{$class_name}" )
+							->add_declarations( array( 'display' => $layout_definition['displayMode'] ) );
 					}
 
 					foreach ( $base_style_rules as $base_style_rule ) {
@@ -1376,26 +1365,21 @@ class WP_Theme_JSON_Gutenberg {
 						) {
 							foreach ( $base_style_rule['rules'] as $css_property => $css_value ) {
 								if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
-									$declarations[] = array(
-										'name'  => $css_property,
-										'value' => $css_value,
-									);
+									$declarations[ $css_property ] = $css_value;
 								}
 							}
 
-							$layout_selector = sprintf(
-								'%s .%s%s',
-								$selector,
-								$class_name,
-								$base_style_rule['selector']
-							);
-							$block_rules    .= static::to_ruleset( $layout_selector, $declarations );
+							$global_styles_layout_rules_store
+								->add_rule( "{$selector} .{$class_name}{$base_style_rule['selector']}" )
+								->add_declarations( $declarations );
 						}
 					}
 				}
 			}
 		}
-		return $block_rules;
+		return ( new WP_Style_Engine_Processor() )
+			->add_store( $global_styles_layout_rules_store )
+			->get_css();
 	}
 
 	/**
