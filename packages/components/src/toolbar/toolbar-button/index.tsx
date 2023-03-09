@@ -51,6 +51,7 @@ function UnforwardedToolbarButton(
 						>
 					) => {
 						event.stopPropagation();
+						// TODO: Possible bug; maybe use onClick instead of props.onClick.
 						if ( props.onClick ) {
 							props.onClick( event );
 						}
