@@ -1193,25 +1193,11 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Converts each style section into a list of rulesets
-	 * containing the block styles to be appended to the stylesheet.
+	 * Add block classes to the $rules_store.
 	 *
-	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
-	 *
-	 * For each section this creates a new ruleset such as:
-	 *
-	 *   block-selector {
-	 *     style-property-one: value;
-	 *   }
-	 *
-	 * @since 5.8.0 As `get_block_styles()`.
-	 * @since 5.9.0 Renamed from `get_block_styles()` to `get_block_classes()`
-	 *              and no longer returns preset classes.
-	 *              Removed the `$setting_nodes` parameter.
-	 * @since 6.1.0 Moved most internal logic to `get_styles_for_block()`.
+	 * @since 6.3.0
 	 *
 	 * @param array $style_nodes Nodes with styles.
-	 * @return string The new stylesheet.
 	 */
 	protected function add_block_classes_to_rules_store( $style_nodes ) {
 		foreach ( $style_nodes as $metadata ) {
@@ -1252,6 +1238,19 @@ class WP_Theme_JSON_Gutenberg {
 	 * Gets the CSS layout rules for a particular block from theme.json layout definitions.
 	 *
 	 * @since 6.1.0
+	 *
+	 * @param array $block_metadata Metadata about the block to get styles for.
+	 * @return string Layout styles for the block.
+	 */
+	protected function get_layout_styles( $block_metadata ) {
+		// @TODO: Deprecate.
+		return '';
+	}
+
+	/**
+	 * Adds the CSS layout rules for a particular block from theme.json layout definitions.
+	 *
+	 * @since 6.3.0
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
 	 */
@@ -1444,29 +1443,9 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Creates new rulesets as classes for each preset value such as:
+	 * Adds new rulesets to the rules store for each preset value.
 	 *
-	 *   .has-value-color {
-	 *     color: value;
-	 *   }
-	 *
-	 *   .has-value-background-color {
-	 *     background-color: value;
-	 *   }
-	 *
-	 *   .has-value-font-size {
-	 *     font-size: value;
-	 *   }
-	 *
-	 *   .has-value-gradient-background {
-	 *     background: value;
-	 *   }
-	 *
-	 *   p.has-value-gradient-background {
-	 *     background: value;
-	 *   }
-	 *
-	 * @since 5.9.0
+	 * @since 6.3.0
 	 *
 	 * @param array $setting_nodes Nodes with settings.
 	 * @param array $origins       List of origins to process presets from.
@@ -1503,6 +1482,20 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$origins` parameter.
+	 *
+	 * @param array $nodes   Nodes with settings.
+	 * @param array $origins List of origins to process.
+	 * @return string The new stylesheet.
+	 */
+	protected function get_css_variables( $nodes, $origins ) {
+		// @TODO: Deprecate.
+		return '';
+	}
+
+	/**
+	 * Converts each styles section into a list of rulesets, and adds them to the rules store.
+	 *
+	 * @since 6.3.0 Added the `$origins` parameter.
 	 *
 	 * @param array $nodes   Nodes with settings.
 	 * @param array $origins List of origins to process.
@@ -1590,13 +1583,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * Given a settings array, returns the generated rulesets
 	 * for the preset classes.
 	 *
-	 * @since 5.8.0
-	 * @since 5.9.0 Added the `$origins` parameter.
+	 * @since 6.3.0
 	 *
 	 * @param array  $settings Settings to process.
 	 * @param string $selector Selector wrapping the classes.
 	 * @param array  $origins  List of origins to process.
-	 * @return string The result of processing the presets.
+	 * @return array The result of processing the presets.
 	 */
 	protected static function compute_preset_classes_declarations( $settings, $selector, $origins ) {
 		$declarations = array();
@@ -1606,7 +1598,6 @@ class WP_Theme_JSON_Gutenberg {
 			$selector = '';
 		}
 
-		$stylesheet   = '';
 		$declarations = array();
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 			$slugs = static::get_settings_slugs( $settings, $preset_metadata, $origins );
@@ -1623,7 +1614,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		return $stylesheet;
+		return $declarations;
 	}
 
 	/**
@@ -2567,9 +2558,9 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Gets the CSS rules for a particular block from theme.json.
+	 * Add the CSS rules for a particular block from theme.json to the $rules_store.
 	 *
-	 * @since 6.1.0
+	 * @since 6.3.0
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
 	 */
@@ -2782,14 +2773,14 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	public function get_root_layout_rules( $selector, $block_metadata ) {
 
-		// TODO: Deprecate.
+		// @TODO: Deprecate.
 		return '';
 	}
 
 	/**
-	 * Outputs the CSS for layout rules on the root.
+	 * Outputs the CSS declarations for layout rules on the root.
 	 *
-	 * @since 6.1.0
+	 * @since 6.3.0
 	 *
 	 * @param string $selector The root node selector.
 	 * @return array The additional rules declarations.
