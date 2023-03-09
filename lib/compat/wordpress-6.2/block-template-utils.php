@@ -231,7 +231,7 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 	if ( isset( $default_template_types['404'] ) ) {
 		$default_template_types['404'] = array(
 			'title'       => _x( '404', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays when a visitor views a non-existant page, such as a dead link or a mistyped URL.', 'gutenberg' ),
+			'description' => __( 'Displays when a visitor views a non-existent page, such as a dead link or a mistyped URL.', 'gutenberg' ),
 		);
 	}
 
