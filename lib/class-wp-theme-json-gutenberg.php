@@ -1056,7 +1056,11 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( in_array( 'styles', $types, true ) ) {
 			if ( false !== $root_style_key ) {
-				$stylesheet .= $this->get_root_layout_rules( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
+				$declarations = $this->get_root_layout_rules_declarations( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
+				foreach ( $declarations as $declaration_selector => $selector_declarations ) {
+					$this->rules_store->add_rule( $declaration_selector )->add_declarations( $selector_declarations );
+				}
+				$this->add_layout_styles_to_rules_store( $style_nodes[ $root_style_key ] );
 			}
 			$stylesheet .= $this->get_block_classes( $style_nodes );
 		} elseif ( in_array( 'base-layout-styles', $types, true ) ) {
@@ -1092,7 +1096,7 @@ class WP_Theme_JSON_Gutenberg {
 			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
 		}
 
-		return $stylesheet;
+		return ( new WP_Style_Engine_Processor() )->add_store( $this->rules_store )->get_css() . $stylesheet;
 	}
 
 	/**
@@ -2490,14 +2494,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The additional root rules CSS.
 	 */
 	public function get_root_layout_rules( $selector, $block_metadata ) {
-		$declarations = $this->get_root_layout_rules_declarations( $selector, $block_metadata );
-		foreach ( $declarations as $selector => $selector_declarations ) {
-			$this->rules_store->add_rule( $selector )->add_declarations( $selector_declarations );
-		}
-		$this->add_layout_styles_to_rules_store( $block_metadata );
-		return ( new WP_Style_Engine_Processor() )
-			->add_store( $this->rules_store )
-			->get_css();
+
+		// TODO: Deprecate.
+		return '';
 	}
 
 	/**
