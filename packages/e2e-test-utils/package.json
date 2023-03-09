@@ -38,7 +38,7 @@
 		"node-fetch": "^2.6.0"
 	},
 	"peerDependencies": {
-		"jest": ">=27",
+		"jest": ">=29",
 		"puppeteer-core": ">=11"
 	},
 	"publishConfig": {

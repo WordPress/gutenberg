@@ -48,7 +48,8 @@ const BlockSettingsMenuControlsSlot = ( {
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
-	const convertToGroupButtonProps = useConvertToGroupButtonProps();
+	const convertToGroupButtonProps =
+		useConvertToGroupButtonProps( selectedClientIds );
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 	const showConvertToGroupButton =
 		( isGroupable || isUngroupable ) && canRemove;

@@ -42,13 +42,11 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 		onSelect,
 		onReset,
 		reset,
-		value,
 		contentRef,
 	}: AutocompleterUIProps ) {
 		const [ items ] = useItems( filterValue );
 		const popoverAnchor = useAnchor( {
 			editableContentElement: contentRef.current,
-			value,
 		} );
 
 		const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );

@@ -94,7 +94,9 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 							<a
 								className="comment-reply-link"
 								href="#top"
-								aria-label="Reply to A WordPress Commenter"
+								aria-label={ __(
+									'Reply to A WordPress Commenter'
+								) }
 							>
 								{ __( 'Reply' ) }
 							</a>

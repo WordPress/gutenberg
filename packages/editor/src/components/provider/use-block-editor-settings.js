@@ -62,6 +62,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'locale',
 	'maxWidth',
 	'onUpdateDefaultBlockStyles',
+	'postContentAttributes',
 	'postsPerPage',
 	'readOnly',
 	'styles',

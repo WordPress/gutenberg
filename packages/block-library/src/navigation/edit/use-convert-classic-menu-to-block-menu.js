@@ -36,89 +36,88 @@ function useConvertClassicToBlockMenu( clientId ) {
 	const [ status, setStatus ] = useState( CLASSIC_MENU_CONVERSION_IDLE );
 	const [ error, setError ] = useState( null );
 
-	async function convertClassicMenuToBlockMenu(
-		menuId,
-		menuName,
-		postStatus = 'publish'
-	) {
-		let navigationMenu;
-		let classicMenuItems;
+	const convertClassicMenuToBlockMenu = useCallback(
+		async ( menuId, menuName, postStatus = 'publish' ) => {
+			let navigationMenu;
+			let classicMenuItems;
 
-		// 1. Fetch the classic Menu items.
-		try {
-			classicMenuItems = await registry
-				.resolveSelect( coreStore )
-				.getMenuItems( {
-					menus: menuId,
-					per_page: -1,
-					context: 'view',
-				} );
-		} catch ( err ) {
-			throw new Error(
-				sprintf(
-					// translators: %s: the name of a menu (e.g. Header navigation).
-					__( `Unable to fetch classic menu "%s" from API.` ),
-					menuName
-				),
-				{
-					cause: err,
-				}
-			);
-		}
+			// 1. Fetch the classic Menu items.
+			try {
+				classicMenuItems = await registry
+					.resolveSelect( coreStore )
+					.getMenuItems( {
+						menus: menuId,
+						per_page: -1,
+						context: 'view',
+					} );
+			} catch ( err ) {
+				throw new Error(
+					sprintf(
+						// translators: %s: the name of a menu (e.g. Header navigation).
+						__( `Unable to fetch classic menu "%s" from API.` ),
+						menuName
+					),
+					{
+						cause: err,
+					}
+				);
+			}
 
-		// Handle offline response which resolves to `null`.
-		if ( classicMenuItems === null ) {
-			throw new Error(
-				sprintf(
-					// translators: %s: the name of a menu (e.g. Header navigation).
-					__( `Unable to fetch classic menu "%s" from API.` ),
-					menuName
-				)
-			);
-		}
+			// Handle offline response which resolves to `null`.
+			if ( classicMenuItems === null ) {
+				throw new Error(
+					sprintf(
+						// translators: %s: the name of a menu (e.g. Header navigation).
+						__( `Unable to fetch classic menu "%s" from API.` ),
+						menuName
+					)
+				);
+			}
 
-		// 2. Convert the classic items into blocks.
-		const { innerBlocks } = menuItemsToBlocks( classicMenuItems );
+			// 2. Convert the classic items into blocks.
+			const { innerBlocks } = menuItemsToBlocks( classicMenuItems );
 
-		// 3. Create the `wp_navigation` Post with the blocks.
-		try {
-			navigationMenu = await createNavigationMenu(
-				menuName,
-				innerBlocks,
-				postStatus
-			);
+			// 3. Create the `wp_navigation` Post with the blocks.
+			try {
+				navigationMenu = await createNavigationMenu(
+					menuName,
+					innerBlocks,
+					postStatus
+				);
 
-			/**
-			 * Immediately trigger editEntityRecord to change the wp_navigation post status to 'publish'.
-			 * This status change causes the menu to be displayed on the front of the site and sets the post state to be "dirty".
-			 * The problem being solved is if saveEditedEntityRecord was used here, the menu would be updated on the frontend and the editor _automatically_,
-			 * without user interaction.
-			 * If the user abandons the site editor without saving, there would still be a wp_navigation post created as draft.
-			 */
-			await editEntityRecord(
-				'postType',
-				'wp_navigation',
-				navigationMenu.id,
-				{
-					status: postStatus,
-				},
-				{ throwOnError: true }
-			);
-		} catch ( err ) {
-			throw new Error(
-				sprintf(
-					// translators: %s: the name of a menu (e.g. Header navigation).
-					__( `Unable to create Navigation Menu "%s".` ),
-					menuName
-				),
-				{
-					cause: err,
-				}
-			);
-		}
+				/**
+				 * Immediately trigger editEntityRecord to change the wp_navigation post status to 'publish'.
+				 * This status change causes the menu to be displayed on the front of the site and sets the post state to be "dirty".
+				 * The problem being solved is if saveEditedEntityRecord was used here, the menu would be updated on the frontend and the editor _automatically_,
+				 * without user interaction.
+				 * If the user abandons the site editor without saving, there would still be a wp_navigation post created as draft.
+				 */
+				await editEntityRecord(
+					'postType',
+					'wp_navigation',
+					navigationMenu.id,
+					{
+						status: postStatus,
+					},
+					{ throwOnError: true }
+				);
+			} catch ( err ) {
+				throw new Error(
+					sprintf(
+						// translators: %s: the name of a menu (e.g. Header navigation).
+						__( `Unable to create Navigation Menu "%s".` ),
+						menuName
+					),
+					{
+						cause: err,
+					}
+				);
+			}
 
-		return navigationMenu;
-	}
+			return navigationMenu;
+		},
+		[ createNavigationMenu, editEntityRecord, registry ]
+	);
 
 	const convert = useCallback(
 		async ( menuId, menuName, postStatus ) => {

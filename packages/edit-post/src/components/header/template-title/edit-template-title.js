@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -61,14 +56,15 @@ export default function EditTemplateTitle() {
 					setForceEmpty( false );
 
 					const settings = getEditorSettings();
-					const newAvailableTemplates = mapValues(
-						settings.availableTemplates,
-						( existingTitle, id ) => {
-							if ( id !== template.slug ) {
-								return existingTitle;
+					const newAvailableTemplates = Object.fromEntries(
+						Object.entries( settings.availableTemplates ?? {} ).map(
+							( [ id, existingTitle ] ) => {
+								if ( id !== template.slug ) {
+									return existingTitle;
+								}
+								return newTitle;
 							}
-							return newTitle;
-						}
+						)
 					);
 					updateEditorSettings( {
 						...settings,

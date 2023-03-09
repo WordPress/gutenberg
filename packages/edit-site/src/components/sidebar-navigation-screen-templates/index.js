@@ -29,6 +29,9 @@ const config = {
 			loading: __( 'Loading templates' ),
 			notFound: __( 'No templates found' ),
 			manage: __( 'Manage all templates' ),
+			description: __(
+				'Express the layout of your site with templates.'
+			),
 		},
 	},
 	wp_template_part: {
@@ -37,6 +40,9 @@ const config = {
 			loading: __( 'Loading template parts' ),
 			notFound: __( 'No template parts found' ),
 			manage: __( 'Manage all template parts' ),
+			description: __(
+				'Template Parts are small pieces of a layout that can be reused across multiple templates and always appear the same way. Common template parts include the site header, footer, or sidebar.'
+			),
 		},
 	},
 };
@@ -80,6 +86,7 @@ export default function SidebarNavigationScreenTemplates() {
 		<SidebarNavigationScreen
 			isRoot={ isTemplatePartsMode }
 			title={ config[ postType ].labels.title }
+			description={ config[ postType ].labels.description }
 			actions={
 				canCreate && (
 					<AddNewTemplate
