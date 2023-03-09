@@ -11,6 +11,10 @@
 		},
 		"color": {
 			"background": true,
+			"gradient": true,
+			"heading": true,
+			"button": true,
+			"text": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
@@ -183,8 +187,7 @@
 					"slug": "vivid-purple",
 					"color": "#9b51e0"
 				}
-			],
-			"text": true
+			]
 		},
 		"shadow": {
 			"defaultPresets": true,

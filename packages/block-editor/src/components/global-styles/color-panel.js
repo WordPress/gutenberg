@@ -33,8 +33,16 @@ export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasLinkPanel = useHasLinkPanel( settings );
+	const hasHeadingPanel = useHasHeadingPanel( settings );
+	const hasButtonPanel = useHasHeadingPanel( settings );
 
-	return hasTextPanel || hasBackgroundPanel || hasLinkPanel;
+	return (
+		hasTextPanel ||
+		hasBackgroundPanel ||
+		hasLinkPanel ||
+		hasHeadingPanel ||
+		hasButtonPanel
+	);
 }
 
 export function useHasTextPanel( settings ) {
@@ -50,6 +58,30 @@ export function useHasLinkPanel( settings ) {
 	return (
 		settings?.color?.link &&
 		( colors?.length > 0 || settings?.color?.custom )
+	);
+}
+
+export function useHasHeadingPanel( settings ) {
+	const colors = useColorsPerOrigin( settings );
+	const gradients = useGradientsPerOrigin( settings );
+	return (
+		settings?.color?.heading &&
+		( colors?.length > 0 ||
+			settings?.color?.custom ||
+			gradients?.length > 0 ||
+			settings?.color?.customGradient )
+	);
+}
+
+export function useHasButtonPanel( settings ) {
+	const colors = useColorsPerOrigin( settings );
+	const gradients = useGradientsPerOrigin( settings );
+	return (
+		settings?.color?.button &&
+		( colors?.length > 0 ||
+			settings?.color?.custom ||
+			gradients?.length > 0 ||
+			settings?.color?.customGradient )
 	);
 }
 
@@ -92,6 +124,8 @@ const DEFAULT_CONTROLS = {
 	text: true,
 	background: true,
 	link: true,
+	heading: true,
+	button: true,
 };
 
 const popoverProps = {
@@ -244,6 +278,8 @@ export default function ColorPanel( {
 	const gradients = useGradientsPerOrigin( settings );
 	const areCustomSolidsEnabled = settings?.color?.custom;
 	const areCustomGradientsEnabled = settings?.color?.customGradient;
+	const hasSolidColors = colors.length > 0 || areCustomSolidsEnabled;
+	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 	const encodeColorValue = ( colorValue ) => {
@@ -320,7 +356,7 @@ export default function ColorPanel( {
 		} );
 	};
 
-	// LinkColor
+	// Links
 	const showLinkPanel = useHasLinkPanel( settings );
 	const linkColor = decodeValue(
 		inheritedValue?.elements?.link?.color?.text
@@ -341,7 +377,6 @@ export default function ColorPanel( {
 			},
 		} );
 	};
-
 	const hoverLinkColor = decodeValue(
 		inheritedValue?.elements?.link?.[ ':hover' ]?.color?.text
 	);
@@ -366,7 +401,6 @@ export default function ColorPanel( {
 			},
 		} );
 	};
-
 	const hasLink = () => !! userLinkColor || !! userHoverLinkColor;
 	const resetLink = () =>
 		onChange( {
@@ -390,6 +424,50 @@ export default function ColorPanel( {
 				},
 			},
 		} );
+
+	// Elements
+	const elements = [
+		{
+			name: 'h1',
+			label: __( 'H1' ),
+			showPanel: useHasHeadingPanel( settings ),
+		},
+		{
+			name: 'h2',
+			label: __( 'H2' ),
+			showPanel: useHasHeadingPanel( settings ),
+		},
+		{
+			name: 'h3',
+			label: __( 'H3' ),
+			showPanel: useHasHeadingPanel( settings ),
+		},
+		{
+			name: 'h4',
+			label: __( 'H4' ),
+			showPanel: useHasHeadingPanel( settings ),
+		},
+		{
+			name: 'h5',
+			label: __( 'H5' ),
+			showPanel: useHasHeadingPanel( settings ),
+		},
+		{
+			name: 'h6',
+			label: __( 'H6' ),
+			showPanel: useHasHeadingPanel( settings ),
+		},
+		{
+			name: 'button',
+			label: __( 'Button' ),
+			showPanel: useHasButtonPanel( settings ),
+		},
+		{
+			name: 'heading',
+			label: __( 'Heading' ),
+			showPanel: useHasHeadingPanel( settings ),
+		},
+	];
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -466,6 +544,134 @@ export default function ColorPanel( {
 			],
 		},
 	].filter( Boolean );
+
+	elements.forEach( ( { name, label, showPanel } ) => {
+		if ( ! showPanel ) return;
+
+		const elementBackgroundColor = decodeValue(
+			inheritedValue?.elements?.[ name ]?.color?.background
+		);
+		const elementGradient = decodeValue(
+			inheritedValue?.elements?.[ name ]?.color?.gradient
+		);
+		const elementTextColor = decodeValue(
+			inheritedValue?.elements?.[ name ]?.color?.text
+		);
+		const elementBackgroundUserColor = decodeValue(
+			value?.elements?.[ name ]?.color?.background
+		);
+		const elementGradientUserColor = decodeValue(
+			value?.elements?.[ name ]?.color?.gradient
+		);
+		const elementTextUserColor = decodeValue(
+			value?.elements?.[ name ]?.color?.text
+		);
+		const hasElement = () =>
+			elementTextUserColor ||
+			elementBackgroundUserColor ||
+			elementGradientUserColor;
+		const resetElement = () => {
+			onChange( {
+				...value,
+				elements: {
+					...value?.elements,
+					[ name ]: {
+						...value?.elements?.[ name ],
+						color: {
+							...value?.elements?.[ name ]?.color,
+							background: undefined,
+							gradient: undefined,
+							text: undefined,
+						},
+					},
+				},
+			} );
+		};
+
+		const setElementTextColor = ( newValue ) => {
+			onChange( {
+				...value,
+				elements: {
+					...value?.elements,
+					[ name ]: {
+						...value?.elements?.[ name ],
+						color: {
+							...value?.elements?.[ name ]?.color,
+							text: encodeColorValue( newValue ),
+						},
+					},
+				},
+			} );
+		};
+		const setElementBackgroundColor = ( newValue ) => {
+			onChange( {
+				...value,
+				elements: {
+					...value?.elements,
+					[ name ]: {
+						...value?.elements?.[ name ],
+						color: {
+							...value?.elements?.[ name ]?.color,
+							background: encodeColorValue( newValue ),
+							gradient: undefined,
+						},
+					},
+				},
+			} );
+		};
+		const setElementGradient = ( newValue ) => {
+			onChange( {
+				...value,
+				elements: {
+					...value?.elements,
+					[ name ]: {
+						...value?.elements?.[ name ],
+						color: {
+							...value?.elements?.[ name ]?.color,
+							gradient: encodeGradientValue( newValue ),
+							background: undefined,
+						},
+					},
+				},
+			} );
+		};
+
+		items.push( {
+			key: name,
+			label,
+			hasValue: hasElement,
+			resetValue: resetElement,
+			isShownByDefault: defaultControls[ name ],
+			indicators: [
+				elementTextColor,
+				elementBackgroundColor ?? elementGradient,
+			],
+			tabs: [
+				hasSolidColors && {
+					key: 'text',
+					label: __( 'Text' ),
+					inheritedValue: elementTextColor,
+					setValue: setElementTextColor,
+					userValue: elementTextUserColor,
+				},
+				hasSolidColors && {
+					key: 'background',
+					label: __( 'Background' ),
+					inheritedValue: elementBackgroundColor,
+					setValue: setElementBackgroundColor,
+					userValue: elementBackgroundUserColor,
+				},
+				hasGradientColors && {
+					key: 'gradient',
+					label: __( 'Gradient' ),
+					inheritedValue: elementGradient,
+					setValue: setElementGradient,
+					userValue: elementGradientUserColor,
+					isGradient: true,
+				},
+			].filter( Boolean ),
+		} );
+	} );
 
 	return (
 		<Wrapper

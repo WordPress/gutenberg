@@ -30,7 +30,6 @@ const VALID_SETTINGS = [
 	'border.width',
 	'shadow.presets',
 	'shadow.defaultPresets',
-	'color.background',
 	'color.custom',
 	'color.customDuotone',
 	'color.customGradient',
@@ -42,6 +41,10 @@ const VALID_SETTINGS = [
 	'color.link',
 	'color.palette',
 	'color.text',
+	'color.gradient',
+	'color.background',
+	'color.heading',
+	'color.button',
 	'custom',
 	'dimensions.minHeight',
 	'layout.contentSize',
@@ -251,33 +254,27 @@ export function useSettingsForBlockElement(
 			};
 		}
 
-		if ( ! supportedStyles.includes( 'color' ) ) {
-			updatedSettings.color = {
-				...updatedSettings.color,
-				text: false,
-			};
-		}
-
-		if ( ! supportedStyles.includes( 'backgroundColor' ) ) {
-			updatedSettings.color = {
-				...updatedSettings.color,
-				backgroundColor: false,
-			};
-		}
-
-		if ( ! supportedStyles.includes( 'background' ) ) {
-			updatedSettings.color = {
-				...updatedSettings.color,
-				gradient: false,
-			};
-		}
-
-		if ( ! supportedStyles.includes( 'linkColor' ) ) {
-			updatedSettings.color = {
-				...updatedSettings.color,
-				link: false,
-			};
-		}
+		updatedSettings.color = {
+			...updatedSettings.color,
+			text:
+				updatedSettings.color?.text &&
+				supportedStyles.includes( 'color' ),
+			background:
+				updatedSettings.color?.background &&
+				supportedStyles.includes( 'backgroundColor' ),
+			gradient:
+				updatedSettings.color?.gradient &&
+				supportedStyles.includes( 'background' ),
+			button:
+				updatedSettings.color?.button &&
+				supportedStyles.includes( 'buttonColor' ),
+			heading:
+				updatedSettings.color?.heading &&
+				supportedStyles.includes( 'headingColor' ),
+			link:
+				updatedSettings.color?.link &&
+				supportedStyles.includes( 'linkColor' ),
+		};
 
 		[
 			'lineHeight',
