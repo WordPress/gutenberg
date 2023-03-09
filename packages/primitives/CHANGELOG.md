@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 18 ([#48950](https://github.com/WordPress/gutenberg/pull/48950)).
+
 ## 3.26.0 (2023-03-01)
 
 ## 3.25.0 (2023-02-15)
