@@ -27,6 +27,8 @@
 	.components-panel__body {
 		border: none;
 		border-top: $border-width solid $gray-200;
+
+		// Ensures this PanelBody is treated like the ToolsPanel, removing double borders.
 		margin-top: -$border-width;
 	}
 
