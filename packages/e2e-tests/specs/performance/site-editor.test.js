@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { join } from 'path';
+import path from 'path';
 
 /**
  * WordPress dependencies
@@ -23,8 +23,8 @@ import {
 import {
 	readFile,
 	deleteFile,
-	getTestResultsFilename,
-	saveTestResultsFile,
+	saveResultsFile,
+	getTraceFilePath,
 	getTypingEventDurations,
 	getLoadingDurations,
 	sequence,
@@ -57,7 +57,7 @@ describe( 'Site Editor Performance', () => {
 		await deleteAllTemplates( 'wp_template_part' );
 
 		const html = readFile(
-			join( __dirname, '../../assets/large-post.html' )
+			path.join( __dirname, '../../assets/large-post.html' )
 		);
 
 		await createNewPost( { postType: 'page' } );
@@ -84,9 +84,7 @@ describe( 'Site Editor Performance', () => {
 	} );
 
 	afterAll( async () => {
-		const resultsFilename = getTestResultsFilename( __filename );
-		saveTestResultsFile( resultsFilename, results );
-
+		saveResultsFile( __filename, results );
 		await deleteAllTemplates( 'wp_template' );
 		await deleteAllTemplates( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
@@ -157,9 +155,7 @@ describe( 'Site Editor Performance', () => {
 		await insertBlock( 'Paragraph' );
 
 		// Start tracing.
-		const traceFilePath = join(
-			process.env.WP_ARTIFACTS_PATH + '/site-editor-loading.trace.json'
-		);
+		const traceFilePath = getTraceFilePath();
 		await page.tracing.start( {
 			path: traceFilePath,
 			screenshots: false,

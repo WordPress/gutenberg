@@ -6,7 +6,7 @@ import { activateTheme, createURL, logout } from '@wordpress/e2e-test-utils';
 /**
  * Internal dependencies
  */
-import { getTestResultsFilename, saveTestResultsFile } from './utils';
+import { saveResultsFile } from './utils';
 
 describe( 'Front End Performance', () => {
 	const results = {
@@ -21,8 +21,7 @@ describe( 'Front End Performance', () => {
 	} );
 
 	afterAll( async () => {
-		const resultsFilename = getTestResultsFilename( __filename );
-		saveTestResultsFile( resultsFilename, results );
+		saveResultsFile( __filename, results );
 	} );
 
 	it( 'Report TTFB, LCP, and LCP-TTFB', async () => {

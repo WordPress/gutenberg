@@ -16,16 +16,17 @@ export function deleteFile( filePath ) {
 	}
 }
 
-export function getTestResultsFilename( testFilename ) {
-	return (
-		process.env.RESULTS_FILENAME ||
-		path.basename( testFilename, '.js' ) + '.results.json'
-	);
+export function getTraceFilePath() {
+	return path.join( process.env.WP_ARTIFACTS_PATH, '/trace.json' );
 }
 
-export function saveTestResultsFile( filename, results ) {
+export function saveResultsFile( testFilename, results ) {
+	const resultsFilename =
+		process.env.RESULTS_FILENAME ||
+		path.basename( testFilename, '.js' ) + '.results.json';
+
 	return writeFileSync(
-		path.join( process.env.WP_ARTIFACTS_PATH, filename ),
+		path.join( process.env.WP_ARTIFACTS_PATH, resultsFilename ),
 		JSON.stringify( results, null, 2 )
 	);
 }
