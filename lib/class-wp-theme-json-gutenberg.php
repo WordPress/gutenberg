@@ -1051,7 +1051,7 @@ class WP_Theme_JSON_Gutenberg {
 		$stylesheet = '';
 
 		if ( in_array( 'variables', $types, true ) ) {
-			$stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
+			$this->add_css_variables_to_store( $setting_nodes, $origins );
 		}
 
 		if ( in_array( 'styles', $types, true ) ) {
@@ -1455,55 +1455,11 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array $nodes   Nodes with settings.
 	 * @param array $origins List of origins to process.
-	 * @return string The new stylesheet.
+	 * @return void
 	 */
-	protected function get_css_variables( $nodes, $origins ) {
-		$stylesheet = '';
+	protected function add_css_variables_to_store( $nodes, $origins ) {
 		foreach ( $nodes as $metadata ) {
-			if ( null === $metadata['selector'] ) {
-				continue;
-			}
-
-			$selector = $metadata['selector'];
-
-			$node                    = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$declarations            = static::compute_preset_vars( $node, $origins );
-			$theme_vars_declarations = static::compute_theme_vars( $node );
-			foreach ( $theme_vars_declarations as $theme_vars_declaration ) {
-				$declarations[] = $theme_vars_declaration;
-			}
-
-			$stylesheet .= static::to_ruleset( $selector, $declarations );
-		}
-
-		return $stylesheet;
-	}
-
-	/**
-	 * Converts each styles section into a list of rulesets
-	 * to be appended to the stylesheet.
-	 * These rulesets contain all the css variables (custom variables and preset variables).
-	 *
-	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
-	 *
-	 * For each section this creates a new ruleset such as:
-	 *
-	 *     block-selector {
-	 *       --wp--preset--category--slug: value;
-	 *       --wp--custom--variable: value;
-	 *     }
-	 *
-	 * @since 5.8.0
-	 * @since 5.9.0 Added the `$origins` parameter.
-	 *
-	 * @param array $nodes   Nodes with settings.
-	 * @param array $origins List of origins to process.
-	 * @return array The declarations array per selector.
-	 */
-	protected function get_css_variables_declarations( $nodes, $origins ) {
-		$declarations = array();
-
-		foreach ( $nodes as $metadata ) {
+			$declarations = array();
 			if ( null === $metadata['selector'] ) {
 				continue;
 			}
@@ -1513,15 +1469,14 @@ class WP_Theme_JSON_Gutenberg {
 			$node                 = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$presets_declarations = static::compute_preset_vars( $node, $origins );
 			foreach ( $presets_declarations as $preset_declaration ) {
-				$declarations[ $selector ][ $preset_declaration['name'] ] = $preset_declaration['value'];
+				$declarations[ $preset_declaration['name'] ] = $preset_declaration['value'];
 			}
 			$theme_vars_declarations = static::compute_theme_vars( $node );
 			foreach ( $theme_vars_declarations as $theme_declaration ) {
-				$declarations[ $selector ][ $theme_declaration['name'] ] = $theme_declaration['value'];
+				$declarations[ $theme_declaration['name'] ] = $theme_declaration['value'];
 			}
+			$this->rules_store->add_rule( $selector )->add_declarations( $declarations );
 		}
-
-		return $declarations;
 	}
 
 	/**
