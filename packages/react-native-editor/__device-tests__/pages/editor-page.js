@@ -439,6 +439,11 @@ class EditorPage {
 		);
 	}
 
+	static async isElementOutOfBounds( element, { width, height } = {} ) {
+		const { x, y } = await element.getLocation();
+		return x > width || y > height;
+	}
+
 	// Attempts to find the given block button in the block inserter control.
 	async findBlockButton( blockName ) {
 		await this.waitForInserter();
@@ -494,7 +499,10 @@ class EditorPage {
 		// We start dragging a bit above it to not trigger home button.
 		const height = size.height - 50;
 
-		while ( ! ( await blockButton.isDisplayed() ) ) {
+		while (
+			! ( await blockButton.isDisplayed() ) ||
+			( await EditorPage.isElementOutOfBounds( blockButton, { height } ) )
+		) {
 			await this.driver.execute( 'mobile: dragFromToForDuration', {
 				fromX: 50,
 				fromY: height,
