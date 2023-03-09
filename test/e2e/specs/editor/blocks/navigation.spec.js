@@ -141,16 +141,13 @@ test.describe(
 			await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 1',
 				content:
-					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+					'<!-- wp:navigation-link {"label":"Menu 1 Link","type":"custom","url":"http://localhost:8889/#menu-1-link","kind":"custom","isTopLevelLink":true} /-->',
 			} );
-
-			// The two menus are created with the same timestamp, so we need to wait a bit to ensure the second one is created after the first one.
-			await editor.page.waitForTimeout( 2000 );
 
 			const latestMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 2',
 				content:
-					'<!-- wp:navigation-link {"label":"My site link","type":"custom","url":"http://localhost:8889/#my-site-link","kind":"custom","isTopLevelLink":true} /-->',
+					'<!-- wp:navigation-link {"label":"Menu 2 Link","type":"custom","url":"http://localhost:8889/#menu-2-link","kind":"custom","isTopLevelLink":true} /-->',
 			} );
 
 			await editor.insertBlock( { name: 'core/navigation' } );
