@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
@@ -18,6 +18,7 @@ import {
 } from '@wordpress/block-editor';
 import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -38,6 +39,25 @@ export default function PostExcerptEditor( {
 		{ rendered: renderedExcerpt, protected: isProtected } = {},
 	] = useEntityProp( 'postType', postType, 'excerpt', postId );
 
+	// Check if the post type supports excerpts.
+	let postTypeSupportsExcerpts = useSelect( ( select ) =>
+		postType
+			? !! select( coreStore ).getPostType( postType )?.supports.excerpt
+			: false
+	);
+
+	/**
+	 * Add an exception for the page post type,
+	 * which is registered without support for the excerpt UI,
+	 * but supports saving the excerpt to the database.
+	 * See: https://core.trac.wordpress.org/browser/branches/6.1/src/wp-includes/post.php#L65
+	 * Without this exception, users that have excerpts saved to the database will
+	 * not be able to edit the excerpts.
+	 */
+	if ( postType === 'page' ) {
+		postTypeSupportsExcerpts = true;
+	}
+
 	/**
 	 * The excerpt is editable if:
 	 * - The user can edit the post
@@ -45,10 +65,7 @@ export default function PostExcerptEditor( {
 	 * - The post type supports excerpts
 	 */
 	const isEditable =
-		userCanEdit &&
-		! isDescendentOfQueryLoop &&
-		renderedExcerpt &&
-		rawExcerpt;
+		userCanEdit && ! isDescendentOfQueryLoop && postTypeSupportsExcerpts;
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
