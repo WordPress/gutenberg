@@ -150,12 +150,9 @@ export default function PostExcerptEditor( {
 	/**
 	 * The excerpt length setting needs to be applied to both
 	 * the raw and the rendered excerpt depending on which is being used.
-	 * If there is no excerpt the value is set to '' to make sure it is not undefined.
+	 * If there is no excerpt the value is set to '' to make sure it is not undefined (See line 89).
 	 */
-	let rawOrRenderedExcerpt = !! renderedExcerpt
-		? strippedRenderedExcerpt
-		: rawExcerpt || '';
-
+	let rawOrRenderedExcerpt = rawExcerpt.trim || strippedRenderedExcerpt;
 	rawOrRenderedExcerpt = rawOrRenderedExcerpt.trim();
 
 	let trimmedExcerpt = '';
