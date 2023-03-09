@@ -213,8 +213,7 @@ export class BlockList extends Component {
 		} = this.props;
 		const { parentScrollRef, onScroll } = extraProps;
 
-		const { blockToolbar, blockBorder, headerToolbar, floatingToolbar } =
-			styles;
+		const { blockToolbar, headerToolbar, floatingToolbar } = styles;
 
 		const containerStyle = {
 			flex: isRootList ? 1 : 0,
@@ -226,9 +225,9 @@ export class BlockList extends Component {
 		const isContentStretch = contentResizeMode === 'stretch';
 		const isMultiBlocks = blockClientIds.length > 1;
 		const { isWider } = alignmentHelpers;
-		const extraScrollHeight = blockToolbar.height + blockBorder.width;
-		const inputAccessoryViewHeight =
+		const extraScrollHeight =
 			headerToolbar.height +
+			blockToolbar.height +
 			( isFloatingToolbarVisible ? floatingToolbar.height : 0 );
 
 		return (
@@ -247,7 +246,6 @@ export class BlockList extends Component {
 						this.scrollViewInnerRef( parentScrollRef || ref );
 					} }
 					extraScrollHeight={ extraScrollHeight }
-					inputAccessoryViewHeight={ inputAccessoryViewHeight }
 					keyboardShouldPersistTaps="always"
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
@@ -372,6 +370,7 @@ export default compose( [
 		( select, { rootClientId, orientation, filterInnerBlocks } ) => {
 			const {
 				getBlockCount,
+				getBlockHierarchyRootClientId,
 				getBlockOrder,
 				getSelectedBlockClientId,
 				isBlockInsertionPointVisible,
@@ -392,10 +391,12 @@ export default compose( [
 			const isReadOnly = getSettings().readOnly;
 
 			const blockCount = getBlockCount();
-			const hasRootInnerBlocks = !! blockCount;
+			const rootBlockId = getBlockHierarchyRootClientId(
+				selectedBlockClientId
+			);
 
 			const isFloatingToolbarVisible =
-				!! selectedBlockClientId && hasRootInnerBlocks;
+				!! selectedBlockClientId && !! getBlockCount( rootBlockId );
 			const isRTL = getSettings().isRTL;
 
 			return {
