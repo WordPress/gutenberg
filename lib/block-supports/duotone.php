@@ -458,12 +458,24 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$is_custom = is_array( $duotone_attr );
 
 	// Generate the pieces needed for rendering a duotone to the page.
-	if ( $is_preset ) {
+	if ( $has_global_styles_duotone ) {
+		$slug = WP_Duotone::$global_styles_block_names[ $block['blockName'] ];
+
+		// Utilize existing preset CSS custom property.
+		$filter_property = "var(--wp--preset--duotone--$slug)";
+
+		WP_Duotone::$output_presets[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
+	} elseif ( $is_preset ) {
+
+		// TODO: Extract to set_output_preset( $filter_data );
 		// Extract the slug from the preset variable string.
 		$slug = str_replace( 'var:preset|duotone|', '', $duotone_attr );
 
 		// Utilize existing preset CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
+
+		WP_Duotone::$output_presets[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
+
 	} elseif ( $is_css ) {
 		// Build a unique slug for the filter based on the CSS value.
 		$slug = wp_unique_id( sanitize_key( $duotone_attr . '-' ) );
@@ -474,18 +486,14 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// Build a unique slug for the filter based on the array of colors.
 		$slug = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
 
-		// This has the same shape as a preset, so it can be used in place of a
-		// preset when getting the filter property and SVG filter.
 		$filter_data = array(
 			'slug'   => $slug,
 			'colors' => $duotone_attr,
 		);
-
 		// Build a customized CSS filter property for unique slug.
 		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
 
-		// SVG will be output on the page later.
-		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
+		WP_Duotone::$output_presets[ $slug ] = $filter_data;
 	}
 
 	// - Applied as a class attribute to the block wrapper.
@@ -495,6 +503,12 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// Build the CSS selectors to which the filter will be applied.
 	$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_support );
 
+	// We only want to add the selector if we have it in the output_presets already, essentially skipping 'unset'.
+	// TODO: Extract to set_output_preset( $filter_data );
+	if( array_key_exists( $slug, WP_Duotone::$output_presets ) ) {
+		WP_Duotone::$output_presets[ $slug ][ 'selector' ] = $selector;
+	}
+	
 	// Calling gutenberg_style_engine_get_stylesheet_from_css_rules ensures that
 	// the styles are rendered in an inline for block supports because we're
 	// using the `context` option to instruct it so.
@@ -515,33 +529,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			'context' => 'block-supports',
 		)
 	);
-
-	// If we needed to generate an SVG, output it on the page.
-	if ( isset( $filter_svg ) ) {
-		add_action(
-			'wp_footer',
-			static function () use ( $filter_svg, $selector ) {
-				echo $filter_svg;
-
-				/*
-				 * Safari renders elements incorrectly on first paint when the
-				 * SVG filter comes after the content that it is filtering, so
-				 * we force a repaint with a WebKit hack which solves the issue.
-				 */
-				global $is_safari;
-				if ( $is_safari ) {
-					/*
-					 * Simply accessing el.offsetHeight flushes layout and style
-					 * changes in WebKit without having to wait for setTimeout.
-					 */
-					printf(
-						'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
-						wp_json_encode( $selector )
-					);
-				}
-			}
-		);
-	}
+			
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	return preg_replace(
@@ -549,6 +537,50 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		'class="' . $filter_id . ' ',
 		$block_content,
 		1
+	);
+}
+
+
+add_action( 'wp_footer',
+	static function () {
+
+		foreach( WP_Duotone::$output_presets as $filter_data ) {
+
+			$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
+			// SVG will be output on the page later.
+			$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
+			
+			echo $filter_svg;
+
+
+			// This is for classic themes - in block themes, the CSS is added in the head via the value_func.
+			$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $filter_data[ 'slug'] );
+			wp_add_inline_style( 'core-block-supports', 'body{' . $duotone_preset_css_var . ' :' . $filter_property . ';}' );
+		
+
+			global $is_safari;
+			if( $is_safari ) {
+				duotone_safari_rerender_hack( $selector );
+			}
+		}
+	}
+);
+
+
+/**
+ * Safari renders elements incorrectly on first paint when the SVG filter comes after the content that it is filtering,
+ * so we force a repaint with a WebKit hack which solves the issue.
+ *
+ * @param string $selector The selector to apply the hack for.
+ */
+function duotone_safari_rerender_hack( $selector ) {
+	/*
+	 * Simply accessing el.offsetHeight flushes layout and style
+	 * changes in WebKit without having to wait for setTimeout.
+	 */
+	printf(
+		'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
+		wp_json_encode( $selector )
 	);
 }
 
