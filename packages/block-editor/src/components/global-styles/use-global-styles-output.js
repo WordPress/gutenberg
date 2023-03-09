@@ -484,10 +484,10 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `${ selector } .${ className }${
+										? `:where(${ selector } .${ className })${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }-${ className }${ selector }-${ className }${
+										: `${ selector }-${ className }${
 												spacingStyle?.selector || ''
 										  }`;
 							}
