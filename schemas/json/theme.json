@@ -642,6 +642,7 @@
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
+				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
 				{ "$ref": "#/definitions/settingsPropertiesShadow" },
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
 				{ "$ref": "#/definitions/settingsPropertiesPosition" },
@@ -660,10 +661,11 @@
 					"properties": {
 						"appearanceTools": {},
 						"border": {},
-						"shadow": {},
 						"color": {},
+						"dimensions": {},
 						"layout": {},
 						"position": {},
+						"shadow": {},
 						"spacing": {},
 						"typography": {},
 						"custom": {}
@@ -1277,6 +1279,23 @@
 					},
 					"additionalProperties": false
 				},
+				"dimensions": {
+					"description": "Dimensions styles",
+					"type": "object",
+					"properties": {
+						"minHeight": {
+							"description": "Sets the `min-height` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					}
+				},
 				"spacing": {
 					"description": "Spacing styles.",
 					"type": "object",
@@ -1592,6 +1611,7 @@
 					"properties": {
 						"border": {},
 						"color": {},
+						"dimensions": {},
 						"spacing": {},
 						"typography": {},
 						"filter": {},
@@ -1968,6 +1988,7 @@
 					"properties": {
 						"border": {},
 						"color": {},
+						"dimensions": {},
 						"spacing": {},
 						"typography": {},
 						"filter": {},
