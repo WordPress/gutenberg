@@ -1084,7 +1084,7 @@ class WP_Theme_JSON_Gutenberg {
 			);
 
 			foreach ( $base_styles_nodes as $base_style_node ) {
-				$stylesheet .= $this->get_layout_styles( $base_style_node );
+				$this->add_layout_styles_to_rules_store( $base_style_node );
 			}
 		}
 
@@ -1230,12 +1230,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
-	 * @return string Layout styles for the block.
 	 */
-	protected function get_layout_styles( $block_metadata ) {
+	protected function add_layout_styles_to_rules_store( $block_metadata ) {
 		$block_type = null;
-
-		$global_styles_layout_rules_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'global-styles-layout' );
 
 		// Skip outputting layout styles if explicitly disabled.
 		if ( current_theme_supports( 'disable-layout-styles' ) ) {
@@ -1330,7 +1327,7 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								}
-								$global_styles_layout_rules_store
+								$this->rules_store
 									->add_rule( $layout_selector )
 									->add_declarations( $declarations );
 							}
@@ -1359,7 +1356,7 @@ class WP_Theme_JSON_Gutenberg {
 						is_string( $layout_definition['displayMode'] ) &&
 						in_array( $layout_definition['displayMode'], $valid_display_modes, true )
 					) {
-						$global_styles_layout_rules_store
+						$this->rules_store
 							->add_rule( "{$selector} .{$class_name}" )
 							->add_declarations( array( 'display' => $layout_definition['displayMode'] ) );
 					}
@@ -1378,7 +1375,7 @@ class WP_Theme_JSON_Gutenberg {
 								}
 							}
 
-							$global_styles_layout_rules_store
+							$this->rules_store
 								->add_rule( "{$selector} .{$class_name}{$base_style_rule['selector']}" )
 								->add_declarations( $declarations );
 						}
@@ -1386,9 +1383,6 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
-		return ( new WP_Style_Engine_Processor() )
-			->add_store( $global_styles_layout_rules_store )
-			->get_css();
 	}
 
 	/**
@@ -2470,7 +2464,7 @@ class WP_Theme_JSON_Gutenberg {
 			static::ROOT_BLOCK_SELECTOR !== $selector &&
 			! empty( $block_metadata['name'] )
 		) {
-			$block_rules .= $this->get_layout_styles( $block_metadata );
+			$this->add_layout_styles_to_rules_store( $block_metadata );
 		}
 
 		// 5. Generate and append the feature level rulesets.
@@ -2500,11 +2494,10 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $declarations as $selector => $selector_declarations ) {
 			$this->rules_store->add_rule( $selector )->add_declarations( $selector_declarations );
 		}
-		$css = ( new WP_Style_Engine_Processor() )->add_store( $this->rules_store )->get_css();
-
-		$css .= $this->get_layout_styles( $block_metadata );
-
-		return $css;
+		$this->add_layout_styles_to_rules_store( $block_metadata );
+		return ( new WP_Style_Engine_Processor() )
+			->add_store( $this->rules_store )
+			->get_css();
 	}
 
 	/**
