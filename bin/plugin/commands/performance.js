@@ -390,25 +390,28 @@ async function runPerformanceTests( branches, options ) {
 		const rawResults = [];
 		// Alternate three times between branches.
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
+			log(
+				`    >> Suite: ${ testSuite } (round ${ i } of ${ TEST_ROUNDS })`
+			);
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
 				const runKey = `${ testSuite }_${ branch }_run-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
-				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
-				log( '        >> Starting the environment.' );
+				log( `        >> Branch: ${ branch }` );
+				log( '            >> Starting the environment.' );
 				await runShellScript(
 					`${ wpEnvPath } start`,
 					environmentDirectory
 				);
-				log( '        >> Running the test.' );
+				log( '            >> Running the test.' );
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
 					performanceTestDirectory,
 					runKey,
 					artifactsPath
 				);
-				log( '        >> Stopping the environment' );
+				log( '            >> Stopping the environment' );
 				await runShellScript(
 					`${ wpEnvPath } stop`,
 					environmentDirectory
