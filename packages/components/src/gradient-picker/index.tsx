@@ -119,7 +119,50 @@ function Component( props: PickerProps< any > ) {
 	return <SingleOrigin { ...props } />;
 }
 
-export default function GradientPicker( {
+/**
+ *  GradientPicker is a React component that renders a color gradient picker to
+ * define a multi step gradient. There's either a _linear_ or a _radial_ type
+ * available.
+ *
+ * ```jsx
+ *import { GradientPicker } from '@wordpress/components';
+ *import { useState } from '@wordpress/element';
+ *
+ *const myGradientPicker = () => {
+ *	const [ gradient, setGradient ] = useState( null );
+ *
+ *	return (
+ *		<GradientPicker
+ *			__nextHasNoMargin
+ *			value={ gradient }
+ *			onChange={ ( currentGradient ) => setGradient( currentGradient ) }
+ *			gradients={ [
+ *				{
+ *					name: 'JShine',
+ *					gradient:
+ *						'linear-gradient(135deg,#12c2e9 0%,#c471ed 50%,#f64f59 100%)',
+ *					slug: 'jshine',
+ *				},
+ *				{
+ *					name: 'Moonlit Asteroid',
+ *					gradient:
+ *						'linear-gradient(135deg,#0F2027 0%, #203A43 0%, #2c5364 100%)',
+ *					slug: 'moonlit-asteroid',
+ *				},
+ *				{
+ *					name: 'Rastafarie',
+ *					gradient:
+ *						'linear-gradient(135deg,#1E9600 0%, #FFF200 0%, #FF0000 100%)',
+ *					slug: 'rastafari',
+ *				},
+ *			] }
+ *		/>
+ *	);
+ *};
+ *```
+ *
+ */
+export function GradientPicker( {
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMargin = false,
 	className,
@@ -190,3 +233,5 @@ export default function GradientPicker( {
 		</Spacer>
 	);
 }
+
+export default GradientPicker;

@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,11 +10,15 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import GradientPicker from '../';
+import GradientPicker from '..';
 
-export default {
+const meta: ComponentMeta< typeof GradientPicker > = {
 	title: 'Components/GradientPicker',
 	component: GradientPicker,
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
+	},
 	argTypes: {
 		__nextHasNoMargin: { control: { type: 'boolean' } },
 		clearable: { control: { type: 'boolean' } },
@@ -18,6 +26,7 @@ export default {
 		onChange: { action: 'onChange' },
 	},
 };
+export default meta;
 
 const GRADIENTS = [
 	{
@@ -58,8 +67,11 @@ const GRADIENTS = [
 	},
 ];
 
-const Template = ( { onChange, ...props } ) => {
-	const [ gradient, setGradient ] = useState();
+const Template: ComponentStory< typeof GradientPicker > = ( {
+	onChange,
+	...props
+} ) => {
+	const [ gradient, setGradient ] = useState< string | undefined >();
 	return (
 		<GradientPicker
 			{ ...props }
