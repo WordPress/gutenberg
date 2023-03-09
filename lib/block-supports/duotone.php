@@ -436,11 +436,13 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
 	}
 
+	// The block should have a duotone attribute or have duotone defined in its theme.json to be processed.
 	$has_duotone_attribute = isset( $block['attrs']['style']['color']['duotone'] );
-
+	$has_theme_json_duotone = array_key_exists( $block['blockName'], WP_Duotone::$duotone_block_names );
+	
 	if (
 		! $duotone_support ||
-		! $has_duotone_attribute
+		( ! $has_duotone_attribute && ! $has_theme_json_duotone )
 	) {
 		return $block_content;
 	}
