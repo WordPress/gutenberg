@@ -60,7 +60,6 @@
 		"react-native-fast-image": "8.5.11",
 		"react-native-gesture-handler": "https://raw.githubusercontent.com/wordpress-mobile/react-native-gesture-handler/2.3.2-wp-2/react-native-gesture-handler-2.3.2-wp-2.tgz",
 		"react-native-get-random-values": "1.4.0",
-		"react-native-hr": "https://raw.githubusercontent.com/wordpress-mobile/react-native-hr/1.1.3-wp-1/react-native-hr-1.1.3.tgz",
 		"react-native-hsv-color-picker": "https://raw.githubusercontent.com/wordpress-mobile/react-native-hsv-color-picker/v1.0.1-wp-3/react-native-hsv-color-picker-1.0.1-wp-3.tgz",
 		"react-native-keyboard-aware-scroll-view": "https://raw.githubusercontent.com/wordpress-mobile/react-native-keyboard-aware-scroll-view/v0.8.8-wp-1/react-native-keyboard-aware-scroll-view-0.8.8-wp-1.tgz",
 		"react-native-linear-gradient": "https://raw.githubusercontent.com/wordpress-mobile/react-native-linear-gradient/v2.5.6-wp-3/react-native-linear-gradient-2.5.6-wp-3.tgz",
