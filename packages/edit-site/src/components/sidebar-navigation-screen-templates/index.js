@@ -101,7 +101,7 @@ export default function SidebarNavigationScreenTemplates() {
 				<>
 					{ isLoading && config[ postType ].labels.loading }
 					{ ! isLoading && (
-						<ItemGroup>
+						<ItemGroup className="edit-site-sidebar-navigation-screen-templates__templates-list">
 							{ ! templates?.length && (
 								<Item>
 									{ config[ postType ].labels.notFound }

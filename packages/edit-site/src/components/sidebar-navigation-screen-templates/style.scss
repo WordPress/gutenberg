@@ -1,4 +1,11 @@
-.edit-site-sidebar-navigation-screen-templates__see-all {
-	/* Overrides the margin that comes from the Item component */
-	margin-top: $grid-unit-20 !important;
+.edit-site-sidebar-navigation-screen-templates__templates-list {
+	div:last-child {
+		position: sticky;
+		bottom: 0;
+		margin-bottom: - $grid-unit-20;
+		padding: $grid-unit-20 0;
+		background-color: $gray-900;
+		margin-top: $grid-unit-20;
+		box-shadow: 0 -#{$grid-unit-10} $grid-unit-20 $gray-900;
+	}
 }
