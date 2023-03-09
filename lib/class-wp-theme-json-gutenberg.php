@@ -1007,6 +1007,34 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The resulting stylesheet.
 	 */
 	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null, $options = array() ) {
+		$this->add_stylesheet_to_rules_store( $types, $origins, $options );
+		return $this->get_styles_from_rules_store();
+	}
+
+	/**
+	 * Get the styles from the rules store.
+	 *
+	 * @since 6.3.0
+	 */
+	public function get_styles_from_rules_store() {
+		return ( new WP_Style_Engine_Processor() )->add_store( $this->rules_store )->get_css();
+	}
+
+	/**
+	 * Adds the styles that result of processing the theme.json structure this object represents.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param array $types   Types of styles to load. Will load all by default. It accepts:
+	 *                       - `variables`: only the CSS Custom Properties for presets & custom ones.
+	 *                       - `styles`: only the styles section in theme.json.
+	 *                       - `presets`: only the classes for the presets.
+	 * @param array $origins A list of origins to include. By default it includes VALID_ORIGINS.
+	 * @param array $options An array of options for now used for internal purposes only (may change without notice).
+	 *                       The options currently supported are 'scope' that makes sure all style are scoped to a given selector,
+	 *                       and root_selector which overwrites and forces a given selector to be used on the root node.
+	 */
+	public function add_stylesheet_to_rules_store( $types = array( 'variables', 'styles', 'presets' ), $origins = null, $options = array() ) {
 		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}
@@ -1090,8 +1118,6 @@ class WP_Theme_JSON_Gutenberg {
 		if ( in_array( 'presets', $types, true ) ) {
 			$this->add_preset_classes_to_rules_store( $setting_nodes, $origins );
 		}
-
-		return ( new WP_Style_Engine_Processor() )->add_store( $this->rules_store )->get_css();
 	}
 
 	/**
