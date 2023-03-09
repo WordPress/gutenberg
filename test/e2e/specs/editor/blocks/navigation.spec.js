@@ -165,7 +165,7 @@ test.describe(
 			// Check the block in the canvas.
 			await expect(
 				editor.canvas.locator(
-					`role=textbox[name="Navigation link text"i] >> text="My site link"`
+					`role=textbox[name="Navigation link text"i] >> text="Menu 2 Link"`
 				)
 			).toBeVisible();
 
@@ -173,7 +173,7 @@ test.describe(
 			await page.goto( '/' );
 			await expect(
 				page.locator(
-					`role=navigation >> role=link[name="My site link"i]`
+					`role=navigation >> role=link[name="Menu 2 Link"i]`
 				)
 			).toBeVisible();
 		} );
