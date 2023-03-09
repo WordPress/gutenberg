@@ -217,7 +217,7 @@ function Layout( { styles } ) {
 						}
 					/>
 				}
-				editorNotices={ ! isDistractionFree && <EditorNotices /> }
+				editorNotices={ <EditorNotices /> }
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
 					( ! isMobileViewport || sidebarIsOpened ) && (
