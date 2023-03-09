@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -57,7 +56,7 @@ const USERS_LIST_QUERY = {
 };
 
 function getFeaturedImageDetails( post, size ) {
-	const image = get( post, [ '_embedded', 'wp:featuredmedia', '0' ] );
+	const image = post._embedded?.[ 'wp:featuredmedia' ]?.[ '0' ];
 
 	return {
 		url:
@@ -116,16 +115,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			);
 
 			return {
-				defaultImageWidth: get(
-					settings.imageDimensions,
-					[ featuredImageSizeSlug, 'width' ],
-					0
-				),
-				defaultImageHeight: get(
-					settings.imageDimensions,
-					[ featuredImageSizeSlug, 'height' ],
-					0
-				),
+				defaultImageWidth:
+					settings.imageDimensions?.[ featuredImageSizeSlug ]
+						?.width ?? 0,
+				defaultImageHeight:
+					settings.imageDimensions?.[ featuredImageSizeSlug ]
+						?.height ?? 0,
 				imageSizes: settings.imageSizes,
 				latestPosts: getEntityRecords(
 					'postType',

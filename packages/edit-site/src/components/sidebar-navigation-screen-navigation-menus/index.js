@@ -5,10 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	BlockEditorProvider,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -17,13 +14,17 @@ import { createBlock } from '@wordpress/blocks';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useHistory } from '../routes';
 import NavigationMenuContent from './navigation-menu-content';
-import SidebarButton from '../sidebar-button';
 import { NavigationMenuLoader } from './loader';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 
 const noop = () => {};
-const NAVIGATION_MENUS_QUERY = { per_page: -1, status: 'publish' };
+const NAVIGATION_MENUS_QUERY = {
+	per_page: 1,
+	status: 'publish',
+	order: 'desc',
+	orderby: 'date',
+};
 
 function SidebarNavigationScreenWrapper( { children, actions } ) {
 	return (
@@ -37,11 +38,6 @@ function SidebarNavigationScreenWrapper( { children, actions } ) {
 		/>
 	);
 }
-
-const prioritizedInserterBlocks = [
-	'core/navigation-link/page',
-	'core/navigation-link',
-];
 
 export default function SidebarNavigationScreenNavigationMenus() {
 	const history = useHistory();
@@ -66,17 +62,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 			};
 		}, [] );
 
-	// Sort navigation menus by date.
-	const orderedNavigationMenus = useMemo(
-		() =>
-			navigationMenus?.sort( ( menuA, menuB ) => {
-				const menuADate = new Date( menuA.date );
-				const menuBDate = new Date( menuB.date );
-				return menuADate.getTime() > menuBDate.getTime();
-			} ),
-		[ navigationMenus ]
-	);
-	const firstNavigationMenu = orderedNavigationMenus?.[ 0 ]?.id;
+	const firstNavigationMenu = navigationMenus?.[ 0 ]?.id;
 	const blocks = useMemo( () => {
 		return [
 			createBlock( 'core/navigation', { ref: firstNavigationMenu } ),
@@ -109,18 +95,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		},
 		[ history ]
 	);
-	const orderInitialBlockItems = useCallback( ( items ) => {
-		items.sort( ( { id: aName }, { id: bName } ) => {
-			// Sort block items according to `prioritizedInserterBlocks`.
-			let aIndex = prioritizedInserterBlocks.indexOf( aName );
-			let bIndex = prioritizedInserterBlocks.indexOf( bName );
-			// All other block items should come after that.
-			if ( aIndex < 0 ) aIndex = prioritizedInserterBlocks.length;
-			if ( bIndex < 0 ) bIndex = prioritizedInserterBlocks.length;
-			return aIndex - bIndex;
-		} );
-		return items;
-	}, [] );
 
 	if ( hasResolvedNavigationMenus && ! hasNavigationMenus ) {
 		return (
@@ -137,7 +111,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 			</SidebarNavigationScreenWrapper>
 		);
 	}
-	const { PrivateInserter } = unlock( blockEditorPrivateApis );
+
 	return (
 		<BlockEditorProvider
 			settings={ storedSettings }
@@ -145,23 +119,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 			onChange={ noop }
 			onInput={ noop }
 		>
-			<SidebarNavigationScreenWrapper
-				actions={
-					<PrivateInserter
-						rootClientId={ blocks[ 0 ].clientId }
-						position="bottom right"
-						isAppender
-						selectBlockOnInsert={ false }
-						shouldDirectInsert={ false }
-						__experimentalIsQuick
-						toggleProps={ {
-							as: SidebarButton,
-							label: __( 'Add menu item' ),
-						} }
-						orderInitialBlockItems={ orderInitialBlockItems }
-					/>
-				}
-			>
+			<SidebarNavigationScreenWrapper>
 				<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
 					<NavigationMenuContent
 						rootClientId={ blocks[ 0 ].clientId }
