@@ -988,6 +988,7 @@ const blockNames = {
 	group: 'Group',
 	buttons: 'Buttons',
 	button: 'Button',
+	preformatted: 'Preformatted',
 };
 
 module.exports = { initializeEditorPage, blockNames };
