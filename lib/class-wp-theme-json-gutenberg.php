@@ -1048,8 +1048,6 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		$stylesheet = '';
-
 		if ( in_array( 'variables', $types, true ) ) {
 			$this->add_css_variables_to_store( $setting_nodes, $origins );
 		}
@@ -1093,10 +1091,10 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		if ( in_array( 'presets', $types, true ) ) {
-			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
+			$this->add_preset_classes_to_rules_store( $setting_nodes, $origins );
 		}
 
-		return ( new WP_Style_Engine_Processor() )->add_store( $this->rules_store )->get_css() . $stylesheet;
+		return ( new WP_Style_Engine_Processor() )->add_store( $this->rules_store )->get_css();
 	}
 
 	/**
@@ -1441,19 +1439,52 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The new stylesheet.
 	 */
 	protected function get_preset_classes( $setting_nodes, $origins ) {
-		$preset_rules = '';
+		// @TODO: Deprecate.
+		return '';
+	}
 
+	/**
+	 * Creates new rulesets as classes for each preset value such as:
+	 *
+	 *   .has-value-color {
+	 *     color: value;
+	 *   }
+	 *
+	 *   .has-value-background-color {
+	 *     background-color: value;
+	 *   }
+	 *
+	 *   .has-value-font-size {
+	 *     font-size: value;
+	 *   }
+	 *
+	 *   .has-value-gradient-background {
+	 *     background: value;
+	 *   }
+	 *
+	 *   p.has-value-gradient-background {
+	 *     background: value;
+	 *   }
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param array $setting_nodes Nodes with settings.
+	 * @param array $origins       List of origins to process presets from.
+	 */
+	protected function add_preset_classes_to_rules_store( $setting_nodes, $origins ) {
 		foreach ( $setting_nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
 				continue;
 			}
 
-			$selector      = $metadata['selector'];
-			$node          = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$preset_rules .= static::compute_preset_classes( $node, $selector, $origins );
-		}
+			$selector = $metadata['selector'];
+			$node     = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 
-		return $preset_rules;
+			$preset_classes_declarations = static::compute_preset_classes_declarations( $node, $selector, $origins );
+			foreach ( $preset_classes_declarations as $selector => $declarations ) {
+				$this->rules_store->add_rule( $selector )->add_declarations( $declarations );
+			}
+		}
 	}
 
 	/**
@@ -1551,28 +1582,43 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The result of processing the presets.
 	 */
 	protected static function compute_preset_classes( $settings, $selector, $origins ) {
+		// @TODO: Deprecate
+		return '';
+	}
+
+	/**
+	 * Given a settings array, returns the generated rulesets
+	 * for the preset classes.
+	 *
+	 * @since 5.8.0
+	 * @since 5.9.0 Added the `$origins` parameter.
+	 *
+	 * @param array  $settings Settings to process.
+	 * @param string $selector Selector wrapping the classes.
+	 * @param array  $origins  List of origins to process.
+	 * @return string The result of processing the presets.
+	 */
+	protected static function compute_preset_classes_declarations( $settings, $selector, $origins ) {
+		$declarations = array();
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
 			$selector = '';
 		}
 
-		$stylesheet = '';
+		$stylesheet   = '';
+		$declarations = array();
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 			$slugs = static::get_settings_slugs( $settings, $preset_metadata, $origins );
 			foreach ( $preset_metadata['classes'] as $class => $property ) {
 				foreach ( $slugs as $slug ) {
-					$css_var     = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
-					$class_name  = static::replace_slug_in_string( $class, $slug );
-					$stylesheet .= static::to_ruleset(
-						static::append_to_selector( $selector, $class_name ),
-						array(
-							array(
-								'name'  => $property,
-								'value' => 'var(' . $css_var . ') !important',
-							),
-						)
-					);
+					$css_var    = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
+					$class_name = static::replace_slug_in_string( $class, $slug );
+
+					$declaration_selector                  = static::append_to_selector( $selector, $class_name );
+					$declarations[ $declaration_selector ] = empty( $declarations[ $declaration_selector ] ) ? array() : $declarations[ $declaration_selector ];
+
+					$declarations[ $declaration_selector ][ $property ] = 'var(' . $css_var . ') !important';
 				}
 			}
 		}
