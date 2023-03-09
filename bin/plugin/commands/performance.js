@@ -389,9 +389,8 @@ async function runPerformanceTests( branches, options ) {
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
 		const rawResults = [];
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
-			log(
-				`    >> Suite: ${ testSuite } (round ${ i } of ${ TEST_ROUNDS })`
-			);
+			const roundInfo = `round ${ i + 1 } of ${ TEST_ROUNDS }`;
+			log( `    >> Suite: ${ testSuite } (${ roundInfo })` );
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
 				const runKey = `${ testSuite }_${ branch }_run-${ i }`;
