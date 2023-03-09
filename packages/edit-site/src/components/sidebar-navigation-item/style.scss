@@ -1,6 +1,7 @@
 .edit-site-sidebar-navigation-item.components-item {
 	color: $gray-600;
 	border-width: $border-width-tab;
+	margin: 0 2.5px; // This combines with the border above to create a 4px gap and ensure the text line up nicely with other side bar elements along the Y axis
 
 	&:hover,
 	&:focus,
