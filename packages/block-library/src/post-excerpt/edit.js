@@ -152,7 +152,7 @@ export default function PostExcerptEditor( {
 	 * the raw and the rendered excerpt depending on which is being used.
 	 * If there is no excerpt the value is set to '' to make sure it is not undefined (See line 89).
 	 */
-	let rawOrRenderedExcerpt = rawExcerpt.trim || strippedRenderedExcerpt;
+	let rawOrRenderedExcerpt = rawExcerpt || strippedRenderedExcerpt;
 	rawOrRenderedExcerpt = rawOrRenderedExcerpt.trim();
 
 	let trimmedExcerpt = '';
