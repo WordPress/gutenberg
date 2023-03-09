@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -57,7 +56,7 @@ const USERS_LIST_QUERY = {
 };
 
 function getFeaturedImageDetails( post, size ) {
-	const image = get( post, [ '_embedded', 'wp:featuredmedia', '0' ] );
+	const image = post._embedded?.[ 'wp:featuredmedia' ]?.[ '0' ];
 
 	return {
 		url:
@@ -116,16 +115,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			);
 
 			return {
-				defaultImageWidth: get(
-					settings.imageDimensions,
-					[ featuredImageSizeSlug, 'width' ],
-					0
-				),
-				defaultImageHeight: get(
-					settings.imageDimensions,
-					[ featuredImageSizeSlug, 'height' ],
-					0
-				),
+				defaultImageWidth:
+					settings.imageDimensions?.[ featuredImageSizeSlug ]
+						?.width ?? 0,
+				defaultImageHeight:
+					settings.imageDimensions?.[ featuredImageSizeSlug ]
+						?.height ?? 0,
 				imageSizes: settings.imageSizes,
 				latestPosts: getEntityRecords(
 					'postType',
@@ -247,6 +242,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 			<PanelBody title={ __( 'Post meta settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Display author name' ) }
 					checked={ displayAuthor }
 					onChange={ ( value ) =>
@@ -254,6 +250,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					}
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Display post date' ) }
 					checked={ displayPostDate }
 					onChange={ ( value ) =>
@@ -264,6 +261,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 			<PanelBody title={ __( 'Featured image settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Display featured image' ) }
 					checked={ displayFeaturedImage }
 					onChange={ ( value ) =>
@@ -315,6 +313,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							/>
 						</BaseControl>
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Add link to featured image' ) }
 							checked={ addLinkToFeaturedImage }
 							onChange={ ( value ) =>

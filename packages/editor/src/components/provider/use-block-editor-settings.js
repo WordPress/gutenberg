@@ -62,6 +62,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'locale',
 	'maxWidth',
 	'onUpdateDefaultBlockStyles',
+	'postContentAttributes',
 	'postsPerPage',
 	'readOnly',
 	'styles',
@@ -73,6 +74,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableHasCustomAppender',
 	'__unstableIsPreviewMode',
 	'__unstableResolvedAssets',
+	'__unstableIsBlockBasedTheme',
 ];
 
 /**

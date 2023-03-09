@@ -106,6 +106,7 @@ const restrictedImports = [
 			'mapKeys',
 			'maxBy',
 			'memoize',
+			'merge',
 			'negate',
 			'noop',
 			'nth',
@@ -349,7 +350,12 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
+			files: [
+				// Components package.
+				'packages/components/src/**/*.[tj]s?(x)',
+				// Navigation block.
+				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
+			],
 			excludedFiles: [ ...developmentFiles ],
 			rules: {
 				'react-hooks/exhaustive-deps': 'error',
@@ -388,10 +394,21 @@ module.exports = {
 				'test/e2e/**/*.[tj]s',
 				'packages/e2e-test-utils-playwright/**/*.[tj]s',
 			],
-			extends: [ 'plugin:eslint-plugin-playwright/playwright-test' ],
+			extends: [
+				'plugin:eslint-plugin-playwright/playwright-test',
+				'plugin:@typescript-eslint/base',
+			],
+			parserOptions: {
+				tsconfigRootDir: __dirname,
+				project: [
+					'./test/e2e/tsconfig.json',
+					'./packages/e2e-test-utils-playwright/tsconfig.json',
+				],
+			},
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
+				'playwright/no-page-pause': 'error',
 				'no-restricted-syntax': [
 					'error',
 					{
@@ -410,6 +427,9 @@ module.exports = {
 						message: 'Prefer page.locator instead.',
 					},
 				],
+				'@typescript-eslint/await-thenable': 'error',
+				'@typescript-eslint/no-floating-promises': 'error',
+				'@typescript-eslint/no-misused-promises': 'error',
 			},
 		},
 		{

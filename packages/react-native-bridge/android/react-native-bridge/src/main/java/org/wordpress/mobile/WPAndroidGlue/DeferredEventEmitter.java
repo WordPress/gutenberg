@@ -47,6 +47,8 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     private static final String MAP_KEY_MEDIA_FILE_STATE = "state";
     private static final String MAP_KEY_MEDIA_FILE_MEDIA_ACTION_PROGRESS = "progress";
     private static final String MAP_KEY_MEDIA_FILE_MEDIA_SERVER_ID = "mediaServerId";
+    private static final String MAP_KEY_MEDIA_FILE_METADATA = "metadata";
+
     private static final String MAP_KEY_UPDATE_CAPABILITIES = "updateCapabilities";
 
     private static final String MAP_KEY_REPLACE_BLOCK_HTML = "html";
@@ -99,15 +101,20 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     }
 
     private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress) {
-        setMediaFileUploadDataInJS(state, mediaId, mediaUrl, progress, MEDIA_SERVER_ID_UNKNOWN);
+        setMediaFileUploadDataInJS(state, mediaId, mediaUrl, progress, MEDIA_SERVER_ID_UNKNOWN, new WritableNativeMap());
     }
 
     private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress, int mediaServerId) {
+        setMediaFileUploadDataInJS(state, mediaId, mediaUrl, progress, mediaServerId, new WritableNativeMap());
+    }
+
+    private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress, int mediaServerId, WritableNativeMap metadata) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_MEDIA_FILE_STATE, state);
         writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUrl);
         writableMap.putDouble(MAP_KEY_MEDIA_FILE_MEDIA_ACTION_PROGRESS, progress);
+        writableMap.putMap(MAP_KEY_MEDIA_FILE_METADATA, metadata);
         if (mediaServerId != MEDIA_SERVER_ID_UNKNOWN) {
             writableMap.putInt(MAP_KEY_MEDIA_FILE_MEDIA_SERVER_ID, mediaServerId);
         }
@@ -161,8 +168,8 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     }
 
     @Override
-    public void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int mediaServerId) {
-        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId);
+    public void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int mediaServerId, WritableNativeMap metadata) {
+        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId, metadata);
     }
 
     @Override

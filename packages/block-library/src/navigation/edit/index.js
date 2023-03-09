@@ -7,11 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
+	useCallback,
 	useState,
 	useEffect,
 	useRef,
 	Platform,
-	useMemo,
 } from '@wordpress/element';
 import {
 	InspectorControls,
@@ -106,16 +106,20 @@ function Navigation( {
 
 	const ref = attributes.ref;
 
-	const setRef = ( postId ) => {
-		setAttributes( { ref: postId } );
-	};
+	const setRef = useCallback(
+		( postId ) => {
+			setAttributes( { ref: postId } );
+		},
+		[ setAttributes ]
+	);
 
 	const recursionId = `navigationMenu/${ ref }`;
 	const hasAlreadyRendered = useHasRecursion( recursionId );
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
-	const { menus: classicMenus } = useNavigationEntities();
+	const { menus: classicMenus, hasResolvedMenus: hasResolvedClassicMenus } =
+		useNavigationEntities();
 
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
@@ -147,34 +151,6 @@ function Navigation( {
 	const createUntitledEmptyNavigationMenu = () => {
 		createNavigationMenu( '' );
 	};
-
-	useEffect( () => {
-		hideNavigationMenuStatusNotice();
-
-		if ( isCreatingNavigationMenu ) {
-			speak( __( `Creating Navigation Menu.` ) );
-		}
-
-		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost.id, {
-				focusNavigationBlock: true,
-			} );
-
-			showNavigationMenuStatusNotice(
-				__( `Navigation Menu successfully created.` )
-			);
-		}
-
-		if ( createNavigationMenuIsError ) {
-			showNavigationMenuStatusNotice(
-				__( 'Failed to create Navigation Menu.' )
-			);
-		}
-	}, [
-		createNavigationMenuStatus,
-		createNavigationMenuError,
-		createNavigationMenuPost,
-	] );
 
 	const {
 		hasUncontrolledInnerBlocks,
@@ -224,17 +200,21 @@ function Navigation( {
 	const isConvertingClassicMenu =
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
-	// Only autofallback to published menus.
-	const fallbackNavigationMenus = useMemo(
-		() =>
-			navigationMenus
-				?.filter( ( menu ) => menu.status === 'publish' )
-				?.sort( ( menuA, menuB ) => {
-					const menuADate = new Date( menuA.date );
-					const menuBDate = new Date( menuB.date );
-					return menuADate.getTime() < menuBDate.getTime();
-				} ),
-		[ navigationMenus ]
+	// Only auto-fallback to the latest published menu.
+	// The REST API already returns items sorted by publishing date.
+	const fallbackNavigationMenuId = navigationMenus?.find(
+		( menu ) => menu.status === 'publish'
+	)?.id;
+
+	const handleUpdateMenu = useCallback(
+		( menuId, options = { focusNavigationBlock: false } ) => {
+			const { focusNavigationBlock } = options;
+			setRef( menuId );
+			if ( focusNavigationBlock ) {
+				selectBlock( clientId );
+			}
+		},
+		[ selectBlock, clientId, setRef ]
 	);
 
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
@@ -249,7 +229,7 @@ function Navigation( {
 			hasUncontrolledInnerBlocks ||
 			isCreatingNavigationMenu ||
 			ref ||
-			! fallbackNavigationMenus?.length
+			! fallbackNavigationMenuId
 		) {
 			return;
 		}
@@ -262,19 +242,35 @@ function Navigation( {
 		 *  nor to be undoable, hence why it is marked as non persistent
 		 */
 		__unstableMarkNextChangeAsNotPersistent();
-		setRef( fallbackNavigationMenus[ 0 ].id );
+		setRef( fallbackNavigationMenuId );
 	}, [
 		ref,
+		setRef,
 		isCreatingNavigationMenu,
-		fallbackNavigationMenus,
+		fallbackNavigationMenuId,
 		hasUncontrolledInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
 	] );
+
+	const isEntityAvailable =
+		! isNavigationMenuMissing && isNavigationMenuResolved;
+
+	// If the block has inner blocks, but no menu id, then these blocks are either:
+	// - inserted via a pattern.
+	// - inserted directly via Code View (or otherwise).
+	// - from an older version of navigation block added before the block used a wp_navigation entity.
+	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
+	// that automatically saves the menu as an entity when changes are made to the inner blocks.
+	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
 	useEffect( () => {
 		if (
+			ref ||
+			! hasResolvedClassicMenus ||
 			! hasResolvedNavigationMenus ||
 			isConvertingClassicMenu ||
-			fallbackNavigationMenus?.length > 0 ||
+			fallbackNavigationMenuId ||
+			hasUnsavedBlocks ||
 			! classicMenus?.length
 		) {
 			return;
@@ -306,7 +302,17 @@ function Navigation( {
 				'publish'
 			);
 		}
-	}, [ hasResolvedNavigationMenus ] );
+	}, [
+		hasResolvedClassicMenus,
+		hasResolvedNavigationMenus,
+		hasUnsavedBlocks,
+		classicMenus,
+		convertClassicMenu,
+		createNavigationMenu,
+		fallbackNavigationMenuId,
+		isConvertingClassicMenu,
+		ref,
+	] );
 
 	const navRef = useRef();
 
@@ -337,10 +343,13 @@ function Navigation( {
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceInnerBlocks( clientId, [ createBlock( 'core/page-list' ) ] );
 		}
-	}, [ clientId, isPlaceholder, ref ] );
-
-	const isEntityAvailable =
-		! isNavigationMenuMissing && isNavigationMenuResolved;
+	}, [
+		clientId,
+		isPlaceholder,
+		ref,
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceInnerBlocks,
+	] );
 
 	// "loading" state:
 	// - there is a menu creation process in progress.
@@ -393,17 +402,6 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const handleUpdateMenu = (
-		menuId,
-		options = { focusNavigationBlock: false }
-	) => {
-		const { focusNavigationBlock } = options;
-		setRef( menuId );
-		if ( focusNavigationBlock ) {
-			selectBlock( clientId );
-		}
-	};
-
 	const onSelectClassicMenu = async ( classicMenu ) => {
 		const navMenu = await convertClassicMenu(
 			classicMenu.id,
@@ -422,6 +420,40 @@ function Navigation( {
 	};
 
 	useEffect( () => {
+		hideNavigationMenuStatusNotice();
+
+		if ( isCreatingNavigationMenu ) {
+			speak( __( `Creating Navigation Menu.` ) );
+		}
+
+		if ( createNavigationMenuIsSuccess ) {
+			handleUpdateMenu( createNavigationMenuPost?.id, {
+				focusNavigationBlock: true,
+			} );
+
+			showNavigationMenuStatusNotice(
+				__( `Navigation Menu successfully created.` )
+			);
+		}
+
+		if ( createNavigationMenuIsError ) {
+			showNavigationMenuStatusNotice(
+				__( 'Failed to create Navigation Menu.' )
+			);
+		}
+	}, [
+		createNavigationMenuStatus,
+		createNavigationMenuError,
+		createNavigationMenuPost?.id,
+		createNavigationMenuIsError,
+		createNavigationMenuIsSuccess,
+		isCreatingNavigationMenu,
+		handleUpdateMenu,
+		hideNavigationMenuStatusNotice,
+		showNavigationMenuStatusNotice,
+	] );
+
+	useEffect( () => {
 		hideClassicMenuConversionNotice();
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING ) {
 			speak( __( 'Classic menu importing.' ) );
@@ -438,7 +470,12 @@ function Navigation( {
 				__( 'Classic menu import failed.' )
 			);
 		}
-	}, [ classicMenuConversionStatus, classicMenuConversionError ] );
+	}, [
+		classicMenuConversionStatus,
+		classicMenuConversionError,
+		hideClassicMenuConversionNotice,
+		showClassicMenuConversionNotice,
+	] );
 
 	// Spacer block needs orientation from context. This is a patch until
 	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
@@ -447,7 +484,11 @@ function Navigation( {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { orientation } );
 		}
-	}, [ orientation ] );
+	}, [
+		orientation,
+		__unstableMarkNextChangeAsNotPersistent,
+		setAttributes,
+	] );
 
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
@@ -477,7 +518,11 @@ function Navigation( {
 				setDetectedOverlayBackgroundColor
 			);
 		}
-	} );
+	}, [
+		enableContrastChecking,
+		overlayTextColor.color,
+		overlayBackgroundColor.color,
+	] );
 
 	useEffect( () => {
 		if ( ! isSelected && ! isInnerBlockSelected ) {
@@ -518,6 +563,9 @@ function Navigation( {
 		canUserCreateNavigationMenu,
 		hasResolvedCanUserCreateNavigationMenu,
 		ref,
+		hideNavigationMenuPermissionsNotice,
+		showNavigationMenuPermissionsNotice,
+		navMenuResolvedButMissing,
 	] );
 
 	const hasManagePermissions =
@@ -598,6 +646,7 @@ function Navigation( {
 							<>
 								<h3>{ __( 'Submenus' ) }</h3>
 								<ToggleControl
+									__nextHasNoMarginBottom
 									checked={ openSubmenusOnClick }
 									onChange={ ( value ) => {
 										setAttributes( {
@@ -611,6 +660,7 @@ function Navigation( {
 								/>
 
 								<ToggleControl
+									__nextHasNoMarginBottom
 									checked={ showSubmenuIcon }
 									onChange={ ( value ) => {
 										setAttributes( {
@@ -682,14 +732,6 @@ function Navigation( {
 		</>
 	);
 
-	// If the block has inner blocks, but no menu id, then these blocks are either:
-	// - inserted via a pattern.
-	// - inserted directly via Code View (or otherwise).
-	// - from an older version of navigation block added before the block used a wp_navigation entity.
-	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
-	// that automatically saves the menu as an entity when changes are made to the inner blocks.
-	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
-
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 
@@ -725,8 +767,6 @@ function Navigation( {
 					<UnsavedInnerBlocks
 						createNavigationMenu={ createNavigationMenu }
 						blocks={ uncontrolledInnerBlocks }
-						templateLock={ templateLock }
-						navigationMenus={ navigationMenus }
 						hasSelection={ isSelected || isInnerBlockSelected }
 					/>
 				</ResponsiveWrapper>
@@ -745,6 +785,7 @@ function Navigation( {
 						createNavigationMenuIsSuccess
 					}
 					createNavigationMenuIsError={ createNavigationMenuIsError }
+					currentMenuId={ ref }
 					isNavigationMenuMissing={ isNavigationMenuMissing }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
@@ -852,7 +893,9 @@ function Navigation( {
 
 				{ isLoading && (
 					<TagName { ...blockProps }>
-						<Spinner className="wp-block-navigation__loading-indicator" />
+						<div className="wp-block-navigation__loading-indicator-container">
+							<Spinner className="wp-block-navigation__loading-indicator" />
+						</div>
 					</TagName>
 				) }
 

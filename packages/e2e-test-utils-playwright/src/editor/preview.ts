@@ -11,9 +11,9 @@ import type { Editor } from './index';
 /**
  * Opens the preview page of an edited post.
  *
- * @param {Editor} this
+ * @param this
  *
- * @return {Promise<Page>} preview page.
+ * @return preview page.
  */
 export async function openPreviewPage( this: Editor ): Promise< Page > {
 	const editorTopBar = this.page.locator(

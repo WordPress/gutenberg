@@ -90,7 +90,7 @@ export default function useCreateNavigationMenu( clientId ) {
 					} );
 				} );
 		},
-		[ serialize, saveEntityRecord ]
+		[ saveEntityRecord, editEntityRecord, generateDefaultTitle ]
 	);
 
 	return {

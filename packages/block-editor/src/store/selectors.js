@@ -510,6 +510,10 @@ export const getBlockParents = createSelector(
 			parents.push( current );
 		}
 
+		if ( ! parents.length ) {
+			return EMPTY_ARRAY;
+		}
+
 		return ascending ? parents : parents.reverse();
 	},
 	( state ) => [ state.blocks.parents ]
@@ -1195,7 +1199,7 @@ export function isBlockSelected( state, clientId ) {
  * @param {string}  clientId Block client ID.
  * @param {boolean} deep     Perform a deep check.
  *
- * @return {boolean} Whether the block as an inner block selected
+ * @return {boolean} Whether the block has an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 	return getBlockOrder( state, clientId ).some(
@@ -1203,6 +1207,23 @@ export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 			isBlockSelected( state, innerClientId ) ||
 			isBlockMultiSelected( state, innerClientId ) ||
 			( deep && hasSelectedInnerBlock( state, innerClientId, deep ) )
+	);
+}
+
+/**
+ * Returns true if one of the block's inner blocks is dragged.
+ *
+ * @param {Object}  state    Editor state.
+ * @param {string}  clientId Block client ID.
+ * @param {boolean} deep     Perform a deep check.
+ *
+ * @return {boolean} Whether the block has an inner block dragged
+ */
+export function hasDraggedInnerBlock( state, clientId, deep = false ) {
+	return getBlockOrder( state, clientId ).some(
+		( innerClientId ) =>
+			isBlockBeingDragged( state, innerClientId ) ||
+			( deep && hasDraggedInnerBlock( state, innerClientId, deep ) )
 	);
 }
 
@@ -2757,7 +2778,10 @@ export const __unstableGetContentLockingParent = createSelector(
 		let result;
 		while ( state.blocks.parents.has( current ) ) {
 			current = state.blocks.parents.get( current );
-			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
+			if (
+				current &&
+				getTemplateLock( state, current ) === 'contentOnly'
+			) {
 				result = current;
 			}
 		}

@@ -269,22 +269,22 @@
 					"properties": {
 						"background": {
 							"type": "boolean",
-							"description": "This property adds UI controls which allow the user to apply a solid background color to a block.\n\nWhen color support is declared, this property is enabled by default (along with text), so simply setting color will enable background color.\n\nTo disable background support while keeping other color supports enabled, set to false.\n\nWhen the block declares support for color.background, the attributes definition is extended to include two new attributes: backgroundColor and style",
+							"description": "This property adds UI controls which allow the user to apply a solid background color to a block.\n\nWhen color support is declared, this property is enabled by default (along with text), so simply setting color will enable background color.\n\nTo disable background support while keeping other color supports enabled, set to false.\n\nWhen the block declares support for color.background, its attributes definition is extended to include two new attributes: backgroundColor and style",
 							"default": true
 						},
 						"gradients": {
 							"type": "boolean",
-							"description": "This property adds UI controls which allow the user to apply a gradient background to a block.\n\nGradient presets are sourced from editor-gradient-presets theme support.\n\nWhen the block declares support for color.gradient, the attributes definition is extended to include two new attributes: gradient and style",
+							"description": "This property adds UI controls which allow the user to apply a gradient background to a block.\n\nGradient presets are sourced from editor-gradient-presets theme support.\n\nWhen the block declares support for color.gradient, its attributes definition is extended to include two new attributes: gradient and style",
 							"default": false
 						},
 						"link": {
 							"type": "boolean",
-							"description": "This property adds block controls which allow the user to set link color in a block, link color is disabled by default.\n\nLink color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.link, the attributes definition is extended to include the style attribute",
+							"description": "This property adds block controls which allow the user to set link color in a block, link color is disabled by default.\n\nLink color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.link, its attributes definition is extended to include the style attribute",
 							"default": false
 						},
 						"text": {
 							"type": "boolean",
-							"description": "This property adds block controls which allow the user to set text color in a block.\n\nWhen color support is declared, this property is enabled by default (along with background), so simply setting color will enable text color.\n\nText color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.text, the attributes definition is extended to include two new attributes: textColor and style",
+							"description": "This property adds block controls which allow the user to set text color in a block.\n\nWhen color support is declared, this property is enabled by default (along with background), so simply setting color will enable text color.\n\nText color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.text, its attributes definition is extended to include two new attributes: textColor and style",
 							"default": true
 						},
 						"enableContrastChecker": {
@@ -304,6 +304,17 @@
 					"description": "When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to false.",
 					"default": true
 				},
+				"dimensions": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific dimensions property, its attributes definition is extended to include the style attribute.",
+					"properties": {
+						"minHeight": {
+							"type": "boolean",
+							"description": "Allow blocks to define a minimum height value.",
+							"default": false
+						}
+					}
+				},
 				"html": {
 					"type": "boolean",
 					"description": "By default, a block’s markup can be edited individually. To disable this behavior, set html to false.",
@@ -311,7 +322,7 @@
 				},
 				"inserter": {
 					"type": "boolean",
-					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programatically, set inserter to false.",
+					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set inserter to false.",
 					"default": true
 				},
 				"multiple": {
@@ -329,9 +340,20 @@
 					"description": "A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block 'Options' dropdown by default. To disable this behavior, set lock to false.",
 					"default": true
 				},
+				"position": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific position property, its attributes definition is extended to include the style attribute.",
+					"properties": {
+						"sticky": {
+							"type": "boolean",
+							"description": "Allow blocks to stick to their immediate parent when scrolling the page.",
+							"default": false
+						}
+					}
+				},
 				"spacing": {
 					"type": "object",
-					"description": "This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if the theme declares support.\n\nWhen the block declares support for a specific spacing property, the attributes definition is extended to include the style attribute.",
+					"description": "This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific spacing property, its attributes definition is extended to include the style attribute.",
 					"properties": {
 						"margin": {
 							"oneOf": [
@@ -389,16 +411,16 @@
 				},
 				"typography": {
 					"type": "object",
-					"description": "This value signals that a block supports some of the CSS style properties related to typography. When it does, the block editor will show UI controls for the user to set their values, if the theme declares support.\n\nWhen the block declares support for a specific typography property, the attributes definition is extended to include the style attribute.",
+					"description": "This value signals that a block supports some of the CSS style properties related to typography. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific typography property, its attributes definition is extended to include the style attribute.",
 					"properties": {
 						"fontSize": {
 							"type": "boolean",
-							"description": "This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.\n\nThe values shown in this control are the ones declared by the theme via the editor-font-sizes theme support, or the default ones if none is provided.\n\nWhen the block declares support for fontSize, the attributes definition is extended to include two new attributes: fontSize and style",
+							"description": "This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.\n\nThe values shown in this control are the ones declared by the theme via the editor-font-sizes theme support, or the default ones if none is provided.\n\nWhen the block declares support for fontSize, its attributes definition is extended to include two new attributes: fontSize and style",
 							"default": false
 						},
 						"lineHeight": {
 							"type": "boolean",
-							"description": "This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for lineHeight, the attributes definition is extended to include a new attribute style of object type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own style attribute with a default",
+							"description": "This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for lineHeight, its attributes definition is extended to include a new attribute style of object type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own style attribute with a default",
 							"default": false
 						}
 					}
@@ -438,7 +460,7 @@
 				},
 				"attributes": {
 					"type": "object",
-					"description": "Set the attribues for the block example"
+					"description": "Set the attributes for the block example"
 				},
 				"innerBlocks": {
 					"type": "array",

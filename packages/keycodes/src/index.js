@@ -42,7 +42,7 @@ import { isAppleOS } from './platform';
  *
  * @typedef {(character: string, isApple?: () => boolean) => T} WPKeyHandler
  */
-/** @typedef {(event: KeyboardEvent, character: string, isApple?: () => boolean) => boolean} WPEventKeyHandler */
+/** @typedef {(event: import('react').KeyboardEvent<HTMLElement> | KeyboardEvent, character: string, isApple?: () => boolean) => boolean} WPEventKeyHandler */
 
 /** @typedef {( isApple: () => boolean ) => WPModifierPart[]} WPModifier */
 
@@ -151,7 +151,7 @@ export { isAppleOS };
 /**
  * Map the values of an object with a specified callback and return the result object.
  *
- * @template T
+ * @template {{ [s: string]: any; } | ArrayLike<any>} T
  *
  * @param {T}                     object Object to map values of.
  * @param {( value: any ) => any} mapFn  Mapping function
@@ -346,7 +346,7 @@ export const shortcutAriaLabel = mapValues(
  * From a given KeyboardEvent, returns an array of active modifier constants for
  * the event.
  *
- * @param {KeyboardEvent} event Keyboard event.
+ * @param {import('react').KeyboardEvent<HTMLElement> | KeyboardEvent} event Keyboard event.
  *
  * @return {Array<WPModifierPart>} Active modifier constants.
  */
@@ -390,6 +390,14 @@ export const isKeyboardEvent = mapValues(
 		) => {
 			const mods = getModifiers( _isApple );
 			const eventMods = getEventModifiers( event );
+			/** @type {Record<string,string>} */
+			const replacementWithShiftKeyMap = {
+				Comma: ',',
+				Backslash: '\\',
+				// Windows returns `\` for both IntlRo and IntlYen.
+				IntlRo: '\\',
+				IntlYen: '\\',
+			};
 
 			const modsDiff = mods.filter(
 				( mod ) => ! eventMods.includes( mod )
@@ -412,16 +420,17 @@ export const isKeyboardEvent = mapValues(
 				key = String.fromCharCode( event.keyCode ).toLowerCase();
 			}
 
-			// Replace some characters to match the key indicated
-			// by the shortcut on Windows.
-			if ( ! _isApple() ) {
-				if (
-					event.shiftKey &&
-					character.length === 1 &&
-					event.code === 'Comma'
-				) {
-					key = ',';
-				}
+			// `event.key` returns the value of the key pressed, taking into the state of
+			// modifier keys such as `Shift`. If the shift key is pressed, a different
+			// value may be returned depending on the keyboard layout. It is necessary to
+			// convert to the physical key value that don't take into account keyboard
+			// layout or modifier key state.
+			if (
+				event.shiftKey &&
+				character.length === 1 &&
+				replacementWithShiftKeyMap[ event.code ]
+			) {
+				key = replacementWithShiftKeyMap[ event.code ];
 			}
 
 			// For backwards compatibility.

@@ -171,12 +171,14 @@ export default function CoverInspectorControls( {
 						{ isImageBackground && (
 							<>
 								<ToggleControl
+									__nextHasNoMarginBottom
 									label={ __( 'Fixed background' ) }
 									checked={ hasParallax }
 									onChange={ toggleParallax }
 								/>
 
 								<ToggleControl
+									__nextHasNoMarginBottom
 									label={ __( 'Repeated background' ) }
 									checked={ isRepeated }
 									onChange={ toggleIsRepeated }

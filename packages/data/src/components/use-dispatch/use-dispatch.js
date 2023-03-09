@@ -18,7 +18,7 @@ import useRegistry from '../registry-provider/use-registry';
  * Note: The component using this hook must be within the context of a
  * RegistryProvider.
  *
- * @template {undefined | string | StoreDescriptor<any>} [StoreNameOrDescriptor=undefined]
+ * @template {undefined | string | StoreDescriptor<any>} StoreNameOrDescriptor
  * @param {StoreNameOrDescriptor} [storeNameOrDescriptor] Optionally provide the name of the
  *                                                        store or its descriptor from which to
  *                                                        retrieve action creators. If not
