@@ -243,9 +243,7 @@ function Layout( { styles } ) {
 				notices={ <EditorSnackbars /> }
 				content={
 					<>
-						{ ( ! isDistractionFree || ! isLargeViewport ) && (
-							<EditorNotices />
-						) }
+						{ ! isDistractionFree && <EditorNotices /> }
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
 						) }
