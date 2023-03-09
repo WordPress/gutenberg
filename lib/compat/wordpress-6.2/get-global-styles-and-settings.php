@@ -159,6 +159,12 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		}
 		$tree->add_stylesheet_to_rules_store( $types, $origins );
 	}
+
+	$block_nodes = $tree->get_styles_block_nodes();
+	foreach ( $block_nodes as $metadata ) {
+		$tree->add_styles_for_block_to_rules_store( $metadata );
+	}
+
 	$stylesheet = $tree->get_styles_from_rules_store();
 	if ( $can_use_cached ) {
 		wp_cache_set( $cache_key, $stylesheet, $cache_group );
