@@ -197,6 +197,7 @@
 		"jest": "29.5.0",
 		"jest-jasmine2": "29.5.0",
 		"jest-junit": "13.0.0",
+		"jest-matchmedia-mock": "1.1.0",
 		"jest-message-util": "29.5.0",
 		"jest-watch-typeahead": "2.2.2",
 		"lerna": "5.5.2",
