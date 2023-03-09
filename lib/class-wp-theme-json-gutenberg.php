@@ -583,6 +583,14 @@ class WP_Theme_JSON_Gutenberg {
 	const LATEST_SCHEMA = 2;
 
 	/**
+	 * The style-engine global styles rules store.
+	 *
+	 * @since 6.3.0
+	 * @var WP_Style_Engine_CSS_Rules_Store
+	 */
+	private $rules_store;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 5.8.0
@@ -596,6 +604,7 @@ class WP_Theme_JSON_Gutenberg {
 			$origin = 'theme';
 		}
 
+		$this->rules_store   = WP_Style_Engine_CSS_Rules_Store::get_store( 'global-styles' );
 		$this->theme_json    = WP_Theme_JSON_Schema::migrate( $theme_json );
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
