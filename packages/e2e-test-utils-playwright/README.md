@@ -4,9 +4,9 @@ End-To-End (E2E) Playwright test utils for WordPress.
 
 _It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
 
-> ⚠️ **Prerelease Note**
->
-> This package is still under active development. Documentation might not be up-to-date, and the `v0.x` or `prerelease` version can introduce breaking changes without a detailed migration guide. Early adopters are encouraged to use a [lock file](https://docs.npmjs.com/cli/v9/configuring-npm/package-lock-json) to prevent unexpected breakages.
+<div class="callout callout-alert">
+This package is still under active development. "Prerelease" means that documentation might not be up-to-date, and the `v0.x` or `prerelease` version can introduce breaking changes without a detailed migration guide. Early adopters are encouraged to use a [lock file](https://docs.npmjs.com/cli/v9/configuring-npm/package-lock-json) to prevent unexpected breakages.
+</div>
 
 ## Installation
 
