@@ -388,7 +388,6 @@ async function runPerformanceTests( branches, options ) {
 		results[ testSuite ] = {};
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
 		const rawResults = [];
-		// Alternate three times between branches.
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
 			log(
 				`    >> Suite: ${ testSuite } (round ${ i } of ${ TEST_ROUNDS })`
