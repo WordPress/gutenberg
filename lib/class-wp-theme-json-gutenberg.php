@@ -2558,10 +2558,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0
 	 *
 	 * @param string $selector The root node selector.
-	 * @param array  $block_metadata The metadata for the root block.
 	 * @return array The additional rules declarations.
 	 */
-	public function get_root_layout_rules_declarations( $selector, $block_metadata ) {
+	public function get_root_layout_rules_declarations( $selector ) {
 		$declarations     = array();
 		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
