@@ -1054,10 +1054,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( in_array( 'styles', $types, true ) ) {
 			if ( false !== $root_style_key ) {
-				$declarations = $this->get_root_layout_rules_declarations( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
-				foreach ( $declarations as $declaration_selector => $selector_declarations ) {
-					$this->rules_store->add_rule( $declaration_selector )->add_declarations( $selector_declarations );
-				}
+				$this->add_root_layout_rules_declarations_to_rules_store( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
 				$this->add_layout_styles_to_rules_store( $style_nodes[ $root_style_key ] );
 			}
 			$this->add_block_classes_to_rules_store( $style_nodes );
@@ -2783,10 +2780,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.3.0
 	 *
 	 * @param string $selector The root node selector.
-	 * @return array The additional rules declarations.
 	 */
-	public function get_root_layout_rules_declarations( $selector ) {
-		$declarations     = array();
+	public function add_root_layout_rules_declarations_to_rules_store( $selector ) {
 		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 
@@ -2798,7 +2793,7 @@ class WP_Theme_JSON_Gutenberg {
 		* user-generated values take precedence in the CSS cascade.
 		* @link https://github.com/WordPress/gutenberg/issues/36147.
 		*/
-		$declarations['body'] = array( 'margin' => '0' );
+		$this->rules_store->add_rule( 'body' )->add_declarations( array( 'margin' => '0' ) );
 
 		/*
 		* If there are content and wide widths in theme.json, output them
@@ -2810,82 +2805,105 @@ class WP_Theme_JSON_Gutenberg {
 			$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
 			$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
 
-			$declarations['body']['--wp--style--global--content-size'] = $content_size;
-			$declarations['body']['--wp--style--global--wide-size']    = $wide_size;
+			$this->rules_store->add_rule( 'body' )->add_declarations(
+				array(
+					'--wp--style--global--content-size' => $content_size,
+					'--wp--style--global--wide-size'    => $wide_size,
+				)
+			);
 		}
 
 		if ( $use_root_padding ) {
 			// Top and bottom padding are applied to the outer block container.
-			$declarations['.wp-site-blocks'] = array(
-				'padding-top'    => 'var(--wp--style--root--padding-top)',
-				'padding-bottom' => 'var(--wp--style--root--padding-bottom)',
+			$this->rules_store->add_rule( '.wp-site-blocks' )->add_declarations(
+				array(
+					'padding-top'    => 'var(--wp--style--root--padding-top)',
+					'padding-bottom' => 'var(--wp--style--root--padding-bottom)',
+				)
 			);
 			// Right and left padding are applied to the first container with `.has-global-padding` class.
-			$declarations['.has-global-padding'] = array(
-				'padding-right' => 'var(--wp--style--root--padding-right)',
-				'padding-left'  => 'var(--wp--style--root--padding-left)',
+			$this->rules_store->add_rule( '.has-global-padding' )->add_declarations(
+				array(
+					'padding-right' => 'var(--wp--style--root--padding-right)',
+					'padding-left'  => 'var(--wp--style--root--padding-left)',
+				)
 			);
 			// Nested containers with `.has-global-padding` class do not get padding.
-			$declarations['.has-global-padding :where(.has-global-padding)'] = array(
-				'padding-right' => '0',
-				'padding-left'  => '0',
+			$this->rules_store->add_rule( '.has-global-padding :where(.has-global-padding)' )->add_declarations(
+				array(
+					'padding-right' => '0',
+					'padding-left'  => '0',
+				)
 			);
 			// Alignfull children of the container with left and right padding have negative margins so they can still be full width.
-			$declarations['.has-global-padding > .alignfull'] = array(
-				'margin-right' => 'calc(var(--wp--style--root--padding-right) * -1)',
-				'margin-left'  => 'calc(var(--wp--style--root--padding-left) * -1)',
+			$this->rules_store->add_rule( '.has-global-padding > .alignfull' )->add_declarations(
+				array(
+					'margin-right' => 'calc(var(--wp--style--root--padding-right) * -1)',
+					'margin-left'  => 'calc(var(--wp--style--root--padding-left) * -1)',
+				)
 			);
 			// The above rule is negated for alignfull children of nested containers.
-			$declarations['.has-global-padding :where(.has-global-padding) > .alignfull'] = array(
-				'margin-right' => '0',
-				'margin-left'  => '0',
+			$this->rules_store->add_rule( '.has-global-padding :where(.has-global-padding) > .alignfull' )->add_declarations(
+				array(
+					'margin-right' => '0',
+					'margin-left'  => '0',
+				)
 			);
 			// Some of the children of alignfull blocks without content width should also get padding: text blocks and non-alignfull container blocks.
-			$declarations['.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol)'] = array(
-				'padding-right' => 'var(--wp--style--root--padding-right)',
-				'padding-left'  => 'var(--wp--style--root--padding-left)',
+			$this->rules_store->add_rule( '.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol)' )->add_declarations(
+				array(
+					'padding-right' => 'var(--wp--style--root--padding-right)',
+					'padding-left'  => 'var(--wp--style--root--padding-left)',
+				)
 			);
 			// The above rule also has to be negated for blocks inside nested `.has-global-padding` blocks.
-			$declarations['.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol)'] = array(
-				'padding-right' => '0',
-				'padding-left'  => '0',
+			$this->rules_store->add_rule( '.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol)' )->add_declarations(
+				array(
+					'padding-right' => '0',
+					'padding-left'  => '0',
+				)
 			);
 		}
 
-		$declarations['.wp-site-blocks > .alignleft']   = array(
-			'float'        => 'left',
-			'margin-right' => '2em',
+		$this->rules_store->add_rule( '.wp-site-blocks > .alignleft' )->add_declarations(
+			array(
+				'float'        => 'left',
+				'margin-right' => '2em',
+			)
 		);
-		$declarations['.wp-site-blocks > .alignright']  = array(
-			'float'       => 'right',
-			'margin-left' => '2em',
+		$this->rules_store->add_rule( '.wp-site-blocks > .alignright' )->add_declarations(
+			array(
+				'float'       => 'right',
+				'margin-left' => '2em',
+			)
 		);
-		$declarations['.wp-site-blocks > .aligncenter'] = array(
-			'justify-content' => 'center',
-			'margin-left'     => 'auto',
-			'margin-right'    => 'auto',
+		$this->rules_store->add_rule( '.wp-site-blocks > .aligncenter' )->add_declarations(
+			array(
+				'justify-content' => 'center',
+				'margin-left'     => 'auto',
+				'margin-right'    => 'auto',
+			)
 		);
 
 		$block_gap_value       = _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' );
 		$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 		if ( $has_block_gap_support ) {
-			$block_gap_value                         = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
-			$declarations['.wp-site-blocks > *']     = array(
-				'margin-block-start' => '0',
-				'margin-block-end'   => '0',
+			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
+			$this->rules_store->add_rule( '.wp-site-blocks > *' )->add_declarations(
+				array(
+					'margin-block-start' => '0',
+					'margin-block-end'   => '0',
+				)
 			);
-			$declarations['.wp-site-blocks > * + *'] = array(
-				'margin-block-start' => $block_gap_value,
+			$this->rules_store->add_rule( '.wp-site-blocks > * + *' )->add_declarations(
+				array(
+					'margin-block-start' => $block_gap_value,
+				)
 			);
 
 			// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
-			if ( ! isset( $declarations[ $selector ] ) ) {
-				$declarations[ $selector ] = array();
-			}
-			$declarations[ $selector ]['--wp--style--block-gap'] = $block_gap_value;
+			$this->rules_store->add_rule( $selector )->add_declarations( array( '--wp--style--block-gap' => $block_gap_value ) );
 		}
-
-		return $declarations;
 	}
 
 	/**
