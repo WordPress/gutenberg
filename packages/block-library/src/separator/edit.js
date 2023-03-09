@@ -12,6 +12,7 @@ import {
 	getColorClassName,
 	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -51,6 +52,7 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 				{ ...useBlockProps( {
 					className,
 					style: hasCustomColor ? styles : undefined,
+					...( Platform.isNative && { color: styles.color } ),
 				} ) }
 			/>
 		</>

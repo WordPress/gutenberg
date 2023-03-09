@@ -5,7 +5,6 @@ export {
 	Polygon,
 	Rect,
 	G,
-	HorizontalRule,
 	BlockQuotation,
 } from '@wordpress/primitives';
 export { default as ColorIndicator } from './color-indicator';
@@ -116,6 +115,8 @@ export { setClipboard, getClipboard } from './mobile/clipboard';
 export { default as AudioPlayer } from './mobile/audio-player';
 export { default as Badge } from './mobile/badge';
 export { default as Gridicons } from './mobile/gridicons';
+export { default as HR } from './mobile/hr';
+export { HorizontalRule } from './mobile/hr/horizontal-rule';
 
 // Utils.
 export { colorsUtils } from './mobile/color-settings/utils';

@@ -1,0 +1,26 @@
+.hr__container {
+	flex: 1;
+	flex-direction: row;
+	align-items: center;
+}
+
+.hr__line {
+	flex: 1;
+	height: 2px;
+	background-color: $gray-lighten-20;
+}
+
+.hr__text {
+	text-align: center;
+	margin-left: 15px;
+	margin-right: 15px;
+}
+
+.horizontal-rule__line {
+	background-color: $gray-lighten-20;
+	height: 2;
+}
+
+.horizontal-rule__line--dark {
+	background-color: $gray-50;
+}

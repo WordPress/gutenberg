@@ -2,11 +2,11 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import Hr from 'react-native-hr';
 
 /**
  * WordPress dependencies
  */
+import { HR } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -42,7 +42,7 @@ export class MoreEdit extends Component {
 
 		return (
 			<View>
-				<Hr
+				<HR
 					text={ content }
 					marginLeft={ 0 }
 					marginRight={ 0 }

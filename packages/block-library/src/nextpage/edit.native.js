@@ -2,11 +2,11 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import Hr from 'react-native-hr';
 
 /**
  * WordPress dependencies
  */
+import { HR } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
@@ -44,7 +44,7 @@ export function NextPageEdit( {
 			accessibilityStates={ accessibilityState }
 			onAccessibilityTap={ onFocus }
 		>
-			<Hr
+			<HR
 				text={ customText }
 				marginLeft={ 0 }
 				marginRight={ 0 }
