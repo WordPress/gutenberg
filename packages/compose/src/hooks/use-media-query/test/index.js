@@ -9,19 +9,19 @@ import { render, act } from '@testing-library/react';
 import useMediaQuery from '../';
 
 describe( 'useMediaQuery', () => {
-	let addListener, removeListener;
+	let addEventListener, removeEventListener;
 
 	beforeAll( () => {
 		jest.spyOn( global, 'matchMedia' );
 
-		addListener = jest.fn();
-		removeListener = jest.fn();
+		addEventListener = jest.fn();
+		removeEventListener = jest.fn();
 	} );
 
 	afterEach( () => {
 		global.matchMedia.mockClear();
-		addListener.mockClear();
-		removeListener.mockClear();
+		addEventListener.mockClear();
+		removeEventListener.mockClear();
 	} );
 
 	afterAll( () => {
@@ -35,8 +35,8 @@ describe( 'useMediaQuery', () => {
 
 	it( 'should return true when query matches', async () => {
 		global.matchMedia.mockReturnValue( {
-			addListener,
-			removeListener,
+			addEventListener,
+			removeEventListener,
 			matches: true,
 		} );
 
@@ -48,30 +48,30 @@ describe( 'useMediaQuery', () => {
 
 		unmount();
 
-		expect( removeListener ).toHaveBeenCalled();
+		expect( removeEventListener ).toHaveBeenCalled();
 	} );
 
 	it( 'should correctly update the value when the query evaluation matches', async () => {
 		// First render.
 		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
+			addEventListener,
+			removeEventListener,
 			matches: true,
 		} );
 		// The query within useEffect.
 		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
+			addEventListener,
+			removeEventListener,
 			matches: true,
 		} );
 		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
+			addEventListener,
+			removeEventListener,
 			matches: true,
 		} );
 		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
+			addEventListener,
+			removeEventListener,
 			matches: false,
 		} );
 
@@ -83,21 +83,25 @@ describe( 'useMediaQuery', () => {
 
 		let updateMatchFunction;
 		await act( async () => {
-			updateMatchFunction = addListener.mock.calls[ 0 ][ 0 ];
+			updateMatchFunction = addEventListener.mock.calls[ 0 ][ 1 ];
 			updateMatchFunction();
 		} );
+
+		updateMatchFunction();
 
 		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 
 		unmount();
 
-		expect( removeListener ).toHaveBeenCalledWith( updateMatchFunction );
+		expect( removeEventListener ).toHaveBeenCalledWith(
+			updateMatchFunction
+		);
 	} );
 
 	it( 'should return false when the query does not matches', async () => {
 		global.matchMedia.mockReturnValue( {
-			addListener,
-			removeListener,
+			addEventListener,
+			removeEventListener,
 			matches: false,
 		} );
 
@@ -109,13 +113,13 @@ describe( 'useMediaQuery', () => {
 
 		unmount();
 
-		expect( removeListener ).toHaveBeenCalled();
+		expect( removeEventListener ).toHaveBeenCalled();
 	} );
 
 	it( 'should not call matchMedia if a query is not passed', async () => {
 		global.matchMedia.mockReturnValue( {
-			addListener,
-			removeListener,
+			addEventListener,
+			removeEventListener,
 			matches: false,
 		} );
 
@@ -130,7 +134,7 @@ describe( 'useMediaQuery', () => {
 
 		unmount();
 		expect( global.matchMedia ).not.toHaveBeenCalled();
-		expect( addListener ).not.toHaveBeenCalled();
-		expect( removeListener ).not.toHaveBeenCalled();
+		expect( addEventListener ).not.toHaveBeenCalled();
+		expect( removeEventListener ).not.toHaveBeenCalled();
 	} );
 } );
