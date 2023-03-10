@@ -453,8 +453,8 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
 	$duotone_attr = $block['attrs']['style']['color']['duotone'];
 
-	$is_preset = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === 0;
-	$is_css    = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === false;
+	$is_preset = is_string( $duotone_attr ) && WP_Duotone::is_preset( $duotone_attr );
+	$is_css    = is_string( $duotone_attr ) && ! $is_preset;
 	$is_custom = is_array( $duotone_attr );
 
 	// Generate the pieces needed for rendering a duotone to the page.
@@ -468,7 +468,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 		// TODO: Extract to set_output_preset( $filter_data );
 		// Extract the slug from the preset variable string.
-		$slug = str_replace( 'var:preset|duotone|', '', $duotone_attr );
+		$slug = WP_Duotone::gutenberg_get_slug_from_attr( $duotone_attr );
 
 		// Utilize existing preset CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
@@ -720,26 +720,38 @@ class WP_Duotone {
 			}
 
 			// Value looks like this: 'var(--wp--preset--duotone--blue-orange)' or 'var:preset|duotone|default-filter'
-			$duotone_filter_path = array_merge( $block_node['path'], array( 'filter', 'duotone' ) );
-			$duotone_filter = _wp_array_get( $theme_json, $duotone_filter_path, array() );
+			$duotone_attr_path = array_merge( $block_node['path'], array( 'filter', 'duotone' ) );
+			$duotone_attr = _wp_array_get( $theme_json, $duotone_attr_path, array() );
 			
-			if( empty( $duotone_filter ) ) {
+			if( empty( $duotone_attr ) ) {
 				continue;
 			}
 			// If it has a duotone filter preset, save the block name and the preset slug.
-			$slug = self::gutenberg_get_duotone_slug_from_inline_styles( $duotone_filter );
+			$slug = self::gutenberg_get_slug_from_attr( $duotone_attr );
 
-			if( $slug && $slug !== $duotone_filter) {
+			if( $slug && $slug !== $duotone_attr) {
 				self::$global_styles_block_names[ $block_node[ 'name' ] ] = $slug;
 			}
 		}
 	}
 
 	/**
-	 * Take a 
+	 * Take the inline CSS duotone variable from a block and return the slug. Handles styles slugs like:
+	 * var:preset|duotone|default-filter
+	 * var(--wp--preset--duotone--blue-orange)
+	 * 
+	 * @param string $duotone_attr The duotone attribute from a block.
+	 * @return string The slug of the duotone preset.
 	 */
-	static function gutenberg_get_duotone_slug_from_inline_styles( $css_variable ) {
-		return str_replace( [ 'var:preset|duotone|', 'var(--wp--preset--duotone--' ], '', $css_variable );
+	static function gutenberg_get_slug_from_attr( $duotone_attr ) {
+		return str_replace( [ 'var:preset|duotone|', 'var(--wp--preset--duotone--', ')' ], '', $duotone_attr );
+	}
+
+	/**
+	 * Check if we have a duotone preset string
+	 */
+	static function is_preset( $duotone_attr ) {
+		return strpos( $duotone_attr, 'var:preset|duotone|' ) === 0 || strpos( $duotone_attr, 'var(--wp--preset--duotone--' ) === 0;
 	}
 
 	/**
