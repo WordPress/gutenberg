@@ -48,7 +48,6 @@
 		"src/custom-gradient-picker",
 		"src/duotone-picker",
 		"src/gradient-picker",
-		"src/higher-order/with-filters",
 		"src/higher-order/with-focus-return",
 		"src/higher-order/with-notices",
 		"src/palette-edit"
