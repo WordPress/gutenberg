@@ -314,15 +314,39 @@ async function runPerformanceTests( branches, options ) {
 			buildPath
 		);
 
-		await runShellScript(
-			'cp ' +
-				path.resolve(
-					performanceTestDirectory,
-					'bin/plugin/utils/.wp-env.performance.json'
-				) +
-				' ' +
-				environmentDirectory +
-				'/.wp-env.json'
+		// Create the config file for the current env.
+		fs.writeFileSync(
+			environmentDirectory,
+			JSON.stringify(
+				{
+					core: 'WordPress/WordPress',
+					plugins: [ path.join( environmentDirectory, 'plugin' ) ],
+					themes: [
+						path.join(
+							performanceTestDirectory,
+							'test/emptytheme'
+						),
+					],
+					env: {
+						tests: {
+							mappings: {
+								'wp-content/mu-plugins': path.join(
+									performanceTestDirectory,
+									'packages/e2e-tests/mu-plugins'
+								),
+								'wp-content/plugins/gutenberg-test-plugins':
+									path.join(
+										performanceTestDirectory,
+										'packages/e2e-tests/plugins'
+									),
+							},
+						},
+					},
+				},
+				null,
+				2
+			),
+			'utf8'
 		);
 
 		if ( options.wpVersion ) {
