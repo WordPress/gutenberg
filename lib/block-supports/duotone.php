@@ -463,7 +463,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 		// Utilize existing preset CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
-		WP_Duotone::$output_presets[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
+		WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
 	} elseif ( $is_preset ) {
 
 		// TODO: Extract to set_output_preset( $filter_data );
@@ -473,7 +473,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// Utilize existing preset CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
 
-		WP_Duotone::$output_presets[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
+		WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
 
 	} elseif ( $is_css ) {
 		// Build a unique slug for the filter based on the CSS value.
@@ -492,7 +492,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// Build a customized CSS filter property for unique slug.
 		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
 
-		WP_Duotone::$output_presets[ $slug ] = $filter_data;
+		WP_Duotone::$output[ $slug ] = $filter_data;
 	}
 
 	// - Applied as a class attribute to the block wrapper.
@@ -502,10 +502,10 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// Build the CSS selectors to which the filter will be applied.
 	$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_support );
 
-	// We only want to add the selector if we have it in the output_presets already, essentially skipping 'unset'.
+	// We only want to add the selector if we have it in the output already, essentially skipping 'unset'.
 	// TODO: Extract to set_output_preset( $filter_data );
-	if( array_key_exists( $slug, WP_Duotone::$output_presets ) ) {
-		WP_Duotone::$output_presets[ $slug ][ 'selector' ] = $selector;
+	if( array_key_exists( $slug, WP_Duotone::$output ) ) {
+		WP_Duotone::$output[ $slug ][ 'selector' ] = $selector;
 	}
 	
 	// Calling gutenberg_style_engine_get_stylesheet_from_css_rules ensures that
@@ -543,7 +543,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 add_action( 'wp_footer',
 	static function () {
 
-		foreach( WP_Duotone::$output_presets as $filter_data ) {
+		foreach( WP_Duotone::$output as $filter_data ) {
 
 			$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
 			// SVG will be output on the page later.
@@ -571,13 +571,13 @@ add_action( 'wp_footer',
  */
 add_action( 'wp_enqueue_scripts', static function() {
 
-	if( empty( WP_Duotone::$output_presets ) ) {
+	if( empty( WP_Duotone::$output ) ) {
 		return;
 	}
 
 	$duotone_css_vars = '';
 
-	foreach ( WP_Duotone::$output_presets as $filter_data ) {
+	foreach ( WP_Duotone::$output as $filter_data ) {
 		if( ! array_key_exists( $filter_data['slug'], WP_Duotone::$global_styles_presets ) ) {
 			continue;
 		}
@@ -676,7 +676,7 @@ class WP_Duotone {
 	 * @since 6.3.0
 	 * @var array
 	 */
-	static $output_presets = array();
+	static $output = array();
 
 
 
@@ -763,7 +763,7 @@ class WP_Duotone {
 		if( array_key_exists( $block['blockName'], self::$global_styles_block_names ) ) {
 			$preset_slug = self::$global_styles_block_names[ $block['blockName'] ];
 
-			self::$output_presets[ $preset_slug ] = self::$global_styles_presets[ $preset_slug ];
+			self::$output[ $preset_slug ] = self::$global_styles_presets[ $preset_slug ];
 		}
 
 		return $block_content;
@@ -786,7 +786,7 @@ class WP_Duotone {
 }
 //
 function gutenberg_get_duotone_preset_value( $preset ) {
-	if( array_key_exists( $preset['slug'], WP_Duotone::$output_presets ) ) {
+	if( array_key_exists( $preset['slug'], WP_Duotone::$output ) ) {
 		// This is returning the --wp--preset--duotone--dark-grayscale: CSS VAR NAME; but not removing the full --wp--preset--duotone--dark-grayscale preset name
 		return gutenberg_get_duotone_filter_property( $preset );
 	}
