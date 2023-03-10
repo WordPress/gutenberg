@@ -13,7 +13,6 @@ import { createBlock } from '@wordpress/blocks';
 import { useCallback, useState } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,7 +20,7 @@ import { __ } from '@wordpress/i18n';
 import { unlock } from '../../private-apis';
 import { NavigationMenuLoader } from './loader';
 
-function renderAdditionalBlockUI( block, onClose ) {
+function CustomLinkAdditionalBlockUI( { block, onClose } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { label, url, opensInNewTab } = block.attributes;
 	const link = {
@@ -76,10 +75,16 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 				customLinkEditPopoverOpenId &&
 				block.clientId === customLinkEditPopoverOpenId
 			) {
-				return renderAdditionalBlockUI( block, () => {
-					setIsCustomLinkEditPopoverOpenId( false );
-				} );
+				return (
+					<CustomLinkAdditionalBlockUI
+						block={ block }
+						onClose={ () => {
+							setIsCustomLinkEditPopoverOpenId( false );
+						} }
+					/>
+				);
 			}
+			return null;
 		},
 		[ customLinkEditPopoverOpenId, setIsCustomLinkEditPopoverOpenId ]
 	);
