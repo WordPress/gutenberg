@@ -5,16 +5,20 @@ import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { TextControl, PanelBody, ToggleControl } from '@wordpress/components';
 
+/**
+ * Limit the value to the range of a 32-bit signed integer.
+ *
+ * @param {string} value
+ * @returns Number or undefined
+ */
 function limitIntegerValue( value ) {
-	const int = parseInt( value, 10 );
-	if ( isNaN( int ) ) {
+	const intValue = parseInt( value, 10 );
+	if ( isNaN( intValue ) ) {
 		return undefined;
 	}
-	const int32bit = Math.pow( 2, 31 );
-	return Math.min(
-		Math.max( parseInt( value, 10 ), -1 * ( int32bit - 1 ) ),
-		int32bit - 1
-	);
+	// Get the maximum absolute value of a 32-bit signed integer.
+	const limit32bit = Math.pow( 2, 31 ) - 1;
+	return Math.min( Math.max( intValue, -1 * limit32bit ), limit32bit );
 }
 
 const OrderedListSettings = ( { setAttributes, reversed, start } ) => (
