@@ -2435,46 +2435,17 @@ class WP_Theme_JSON_Gutenberg {
 
 		$block_rules = '';
 
-		do_action( 'theme_json_register_declarations', $declarations, $selector );
-
-		/*
-		 * 1. Separate the declarations that use the general selector
-		 * from the ones using the duotone selector.
-		 */
-		$declarations_duotone = array();
-		foreach ( $declarations as $index => $declaration ) {
-			if ( 'filter' === $declaration['name'] ) {
-				/*
-				 * 'unset' filters happen when a filter is unset
-				 * in the site-editor UI. Because the 'unset' value
-				 * in the user origin overrides the value in the
-				 * theme origin, we can skip rendering anything
-				 * here as no filter needs to be applied anymore.
-				 * So only add declarations to with values other
-				 * than 'unset'.
-				 */
-				if ( 'unset' !== $declaration['value'] ) {
-					$declarations_duotone[] = $declaration;
-				}
-				unset( $declarations[ $index ] );
-			}
-		}
+		$declarations = apply_filters( 'theme_json_register_declarations', $declarations, $selector );
 
 		// Update declarations if there are separators with only background color defined.
 		if ( '.wp-block-separator' === $selector ) {
 			$declarations = static::update_separator_declarations( $declarations );
 		}
 
-		// 2. Generate and append the rules that use the general selector.
+		// Generate and append the rules that use the general selector.
 		$block_rules .= static::to_ruleset( $selector, $declarations );
 
-		// 3. Generate and append the rules that use the duotone selector.
-		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
-			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
-			$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
-		}
-
-		// 4. Generate Layout block gap styles.
+		// Generate Layout block gap styles.
 		if (
 			static::ROOT_BLOCK_SELECTOR !== $selector &&
 			! empty( $block_metadata['name'] )
@@ -2482,12 +2453,12 @@ class WP_Theme_JSON_Gutenberg {
 			$block_rules .= $this->get_layout_styles( $block_metadata );
 		}
 
-		// 5. Generate and append the feature level rulesets.
+		// Generate and append the feature level rulesets.
 		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
 			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
 		}
 
-		// 6. Generate and append the style variation rulesets.
+		// Generate and append the style variation rulesets.
 		foreach ( $style_variation_declarations as $style_variation_selector => $individual_style_variation_declarations ) {
 			$block_rules .= static::to_ruleset( $style_variation_selector, $individual_style_variation_declarations );
 		}

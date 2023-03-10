@@ -447,52 +447,55 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	// Possible values for duotone attribute:
-	// 1. Array of colors - e.g. array('#000000', '#ffffff').
-	// 2. Variable for an existing Duotone preset - e.g. 'var:preset|duotone|green-blue'.
-	// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
-	$duotone_attr = $block['attrs']['style']['color']['duotone'];
-
-	$is_preset = is_string( $duotone_attr ) && WP_Duotone::is_preset( $duotone_attr );
-	$is_css    = is_string( $duotone_attr ) && ! $is_preset;
-	$is_custom = is_array( $duotone_attr );
-
 	// Generate the pieces needed for rendering a duotone to the page.
-	if ( $has_global_styles_duotone ) {
+	if( $has_duotone_attribute ) {
+
+		// Possible values for duotone attribute:
+		// 1. Array of colors - e.g. array('#000000', '#ffffff').
+		// 2. Variable for an existing Duotone preset - e.g. 'var:preset|duotone|green-blue' or 'var(--wp--preset--duotone--green-blue)''
+		// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
+
+		$duotone_attr = $block['attrs']['style']['color']['duotone'];
+		$is_preset = is_string( $duotone_attr ) && WP_Duotone::is_preset( $duotone_attr );
+		$is_css    = is_string( $duotone_attr ) && ! $is_preset;
+		$is_custom = is_array( $duotone_attr );
+
+		if ( $is_preset ) {
+
+			// TODO: Extract to set_output_preset( $filter_data );
+			// Extract the slug from the preset variable string.
+			$slug = WP_Duotone::gutenberg_get_slug_from_attr( $duotone_attr );
+
+			// Utilize existing preset CSS custom property.
+			$filter_property = "var(--wp--preset--duotone--$slug)";
+
+			WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
+
+		} elseif ( $is_css ) {
+			// Build a unique slug for the filter based on the CSS value.
+			$slug = wp_unique_id( sanitize_key( $duotone_attr . '-' ) );
+
+			// Pass through the CSS value.
+			$filter_property = $duotone_attr;
+		} elseif ( $is_custom ) {
+			// Build a unique slug for the filter based on the array of colors.
+			$slug = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
+
+			$filter_data = array(
+				'slug'   => $slug,
+				'colors' => $duotone_attr,
+			);
+			// Build a customized CSS filter property for unique slug.
+			$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
+
+			WP_Duotone::$output[ $slug ] = $filter_data;
+		}
+	} elseif ( $has_global_styles_duotone ) {
 		$slug = WP_Duotone::$global_styles_block_names[ $block['blockName'] ];
 
 		// Utilize existing preset CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
 		WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
-	} elseif ( $is_preset ) {
-
-		// TODO: Extract to set_output_preset( $filter_data );
-		// Extract the slug from the preset variable string.
-		$slug = WP_Duotone::gutenberg_get_slug_from_attr( $duotone_attr );
-
-		// Utilize existing preset CSS custom property.
-		$filter_property = "var(--wp--preset--duotone--$slug)";
-
-		WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
-
-	} elseif ( $is_css ) {
-		// Build a unique slug for the filter based on the CSS value.
-		$slug = wp_unique_id( sanitize_key( $duotone_attr . '-' ) );
-
-		// Pass through the CSS value.
-		$filter_property = $duotone_attr;
-	} elseif ( $is_custom ) {
-		// Build a unique slug for the filter based on the array of colors.
-		$slug = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
-
-		$filter_data = array(
-			'slug'   => $slug,
-			'colors' => $duotone_attr,
-		);
-		// Build a customized CSS filter property for unique slug.
-		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
-
-		WP_Duotone::$output[ $slug ] = $filter_data;
 	}
 
 	// - Applied as a class attribute to the block wrapper.
@@ -780,8 +783,11 @@ class WP_Duotone {
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
 				static::$global_styles_presets[] = $declarations[ $index ]['value'];
+				unset( $declarations[ $index ] );
 			}
 		}
+
+		return $declarations;
 	}
 }
 //
@@ -797,4 +803,4 @@ function gutenberg_get_duotone_preset_value( $preset ) {
 
 add_action( 'wp_loaded', array( 'WP_Duotone', 'save_global_styles_presets' ), 10 );
 add_action( 'wp_loaded', array( 'WP_Duotone', 'save_global_style_block_names' ), 10 );
-add_action( 'theme_json_register_declarations', array( 'WP_Duotone', 'duotone_declarations' ), 10, 2 );
+add_filter( 'theme_json_register_declarations', array( 'WP_Duotone', 'duotone_declarations' ), 10, 2 );
