@@ -89,7 +89,7 @@ export default function Layout() {
 	} );
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const canvasPadding = isMobileViewport ? 0 : 24;
+	const canvasPadding = isMobileViewport ? 0 : 16;
 	const showSidebar =
 		( isMobileViewport && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
