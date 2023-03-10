@@ -7,7 +7,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useMemo, useState } from '@wordpress/element';
-import { __experimentalResizableBoxPopover as ResizableBoxPopover } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../private-apis';
 
 const RESIZABLE_BOX_ENABLE_OPTION = {
 	top: false,
@@ -30,6 +35,7 @@ export default function ResizableCoverPopover( {
 	width,
 	...props
 } ) {
+	const { ResizableBoxPopover } = unlock( blockEditorPrivateApis );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const dimensions = useMemo(
 		() => ( { height, minHeight, width } ),
