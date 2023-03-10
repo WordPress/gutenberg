@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, WPComponent } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { addAction, applyFilters, removeAction } from '@wordpress/hooks';
 import { createHigherOrderComponent, debounce } from '@wordpress/compose';
 
@@ -52,7 +52,7 @@ export default function withFilters( hookName: string ) {
 		 * reuse this shared reference as an optimization to avoid excessive
 		 * calls to `applyFilters` when many instances exist.
 		 */
-		let FilteredComponent: WPComponent;
+		let FilteredComponent: React.ComponentType;
 
 		/**
 		 * Initializes the FilteredComponent variable once, if not already
@@ -63,7 +63,7 @@ export default function withFilters( hookName: string ) {
 				FilteredComponent = applyFilters(
 					hookName,
 					OriginalComponent
-				) as WPComponent;
+				) as React.ComponentType;
 			}
 		}
 
@@ -118,7 +118,7 @@ export default function withFilters( hookName: string ) {
 			FilteredComponent = applyFilters(
 				hookName,
 				OriginalComponent
-			) as WPComponent;
+			) as React.ComponentType;
 
 			// Force each instance to render.
 			FilteredComponentRenderer.instances.forEach( ( instance ) => {
