@@ -59,9 +59,7 @@ export const KeyboardAwareFlatList = ( {
 			showSubscription = Keyboard.addListener(
 				'keyboardDidShow',
 				( { endCoordinates } ) => {
-					if ( keyboardSpace !== endCoordinates.height ) {
-						setKeyboardSpace( endCoordinates.height );
-					}
+					setKeyboardSpace( endCoordinates.height );
 				}
 			);
 			hideSubscription = Keyboard.addListener( 'keyboardWillHide', () => {
@@ -76,13 +74,13 @@ export const KeyboardAwareFlatList = ( {
 			showSubscription?.remove();
 			hideSubscription?.remove();
 		};
-	}, [ scrollEnabled, keyboardSpace, isKeyboardVisible ] );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 
 	const onScrollToInput = useCallback( () => {
 		if (
 			! isEditingText.current ||
 			! scrollEnabled ||
-			! listRef.current ||
 			( isKeyboardVisible.current && keyboardSpace === 0 )
 		) {
 			return;
@@ -99,7 +97,11 @@ export const KeyboardAwareFlatList = ( {
 					latestContentOffsetY.value +
 					( textInputOffset - screenOffset );
 
-				if ( offset > 0 && textInputOffset > screenOffset ) {
+				if (
+					listRef.current &&
+					offset > 0 &&
+					textInputOffset > screenOffset
+				) {
 					listRef.current.scrollToOffset( {
 						x: 0,
 						offset,
@@ -108,7 +110,13 @@ export const KeyboardAwareFlatList = ( {
 				}
 			} );
 		}
-	}, [ scrollEnabled, screenOffset, keyboardSpace, latestContentOffsetY ] );
+	}, [
+		scrollEnabled,
+		isEditingText,
+		screenOffset,
+		keyboardSpace,
+		latestContentOffsetY,
+	] );
 
 	useEffect( () => {
 		if ( keyboardSpace !== 0 ) {
