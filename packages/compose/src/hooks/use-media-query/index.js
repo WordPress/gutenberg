@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useSyncExternalStore } from '@wordpress/element';
+import { useMemo, useSyncExternalStore } from '@wordpress/element';
 
 /**
  * A new MediaQueryList object for the media query
@@ -28,30 +28,33 @@ function getMediaQueryList( query ) {
  * @return {boolean} return value of the media query.
  */
 export default function useMediaQuery( query ) {
-	const subscribe = useCallback(
-		/** @type {(onStoreChange: () => void) => () => void} */
-		( onStoreChange ) => {
-			const mediaQueryList = getMediaQueryList( query );
-			if ( ! mediaQueryList ) {
-				return () => {};
-			}
+	const source = useMemo( () => {
+		const mediaQueryList = getMediaQueryList( query );
 
-			mediaQueryList.addEventListener( 'change', onStoreChange );
-			return () => {
-				mediaQueryList.removeEventListener( 'change', onStoreChange );
-			};
-		},
-		[ query ]
-	);
+		return {
+			/** @type {(onStoreChange: () => void) => () => void} */
+			subscribe: ( onStoreChange ) => {
+				if ( ! mediaQueryList ) {
+					return () => {};
+				}
 
-	const matches = useSyncExternalStore(
-		subscribe,
-		() => {
-			const mediaQueryList = getMediaQueryList( query );
-			return mediaQueryList?.matches ?? false;
-		},
+				mediaQueryList.addEventListener( 'change', onStoreChange );
+				return () => {
+					mediaQueryList.removeEventListener(
+						'change',
+						onStoreChange
+					);
+				};
+			},
+			getValue: () => {
+				return mediaQueryList?.matches ?? false;
+			},
+		};
+	}, [ query ] );
+
+	return useSyncExternalStore(
+		source.subscribe,
+		source.getValue,
 		() => false
 	);
-
-	return !! ( query && matches );
 }
