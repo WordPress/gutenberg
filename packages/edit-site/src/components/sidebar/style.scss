@@ -18,7 +18,7 @@
 	overflow-x: unset;
 }
 
-.edit-site-sidebar__content > div {
+.edit-site-sidebar__content > .components-navigator-screen {
 	// This matches the logo padding
-	padding: 0 $grid-unit-15;
+	padding: 0 $grid-unit-20;
 }
