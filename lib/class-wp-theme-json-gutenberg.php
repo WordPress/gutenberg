@@ -2730,7 +2730,7 @@ class WP_Theme_JSON_Gutenberg {
 					continue;
 				}
 				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
-					$filters .= apply_filters( 'theme_json_get_filter_svg', $duotone_preset );
+					$filters .= wp_get_duotone_filter_svg( $duotone_preset );
 				}
 			}
 		}

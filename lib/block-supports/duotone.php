@@ -463,7 +463,6 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 		// Utilize existing preset CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
-
 		WP_Duotone::$output_presets[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
 	} elseif ( $is_preset ) {
 
@@ -552,11 +551,12 @@ add_action( 'wp_footer',
 			
 			echo $filter_svg;
 
-
+			
 			// This is for classic themes - in block themes, the CSS is added in the head via the value_func.
-			$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $filter_data[ 'slug'] );
-			wp_add_inline_style( 'core-block-supports', 'body{' . $duotone_preset_css_var . ' :' . $filter_property . ';}' );
-		
+			if( ! wp_is_block_theme() ) {
+				$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $filter_data[ 'slug'] );
+				wp_add_inline_style( 'core-block-supports', 'body{' . $duotone_preset_css_var . ' :' . $filter_property . ';}' );
+			}
 
 			global $is_safari;
 			if( $is_safari ) {
@@ -566,6 +566,32 @@ add_action( 'wp_footer',
 	}
 );
 
+/**
+ * Appends the used duotone fitler CSS Vars to the inline global styles CSS
+ */
+add_action( 'wp_enqueue_scripts', static function() {
+
+	if( empty( WP_Duotone::$output_presets ) ) {
+		return;
+	}
+
+	$duotone_css_vars = '';
+
+	foreach ( WP_Duotone::$output_presets as $filter_data ) {
+		if( ! array_key_exists( $filter_data['slug'], WP_Duotone::$global_styles_presets ) ) {
+			continue;
+		}
+
+		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
+		
+		$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $filter_data[ 'slug'] );
+		$duotone_css_vars .= $duotone_preset_css_var . ': ' . $filter_property . ';';		
+	}
+
+	if( ! empty( $duotone_css_vars ) ) {
+		wp_add_inline_style( 'global-styles', 'body{' . $duotone_css_vars . '}' );
+	}
+}, 11 );
 
 /**
  * Safari renders elements incorrectly on first paint when the SVG filter comes after the content that it is filtering,
@@ -700,7 +726,6 @@ class WP_Duotone {
 			if( empty( $duotone_filter ) ) {
 				continue;
 			}
-
 			// If it has a duotone preset, save the block name and the preset slug.
 			self::$global_styles_block_names[ $block_node[ 'name' ] ] = self::gutenberg_get_duotone_slug_from_preset_css_variable( $duotone_filter );
 		}
@@ -746,37 +771,18 @@ class WP_Duotone {
 			}
 		}
 	}
-
-	/**
-	 * TODO: Outputs the duotone filter preset CSS like <style>body{--wp--preset--duotone--midnight:url('#wp-duotone-midnight');}</style>
-	 * Ideally this would be output in the header before core-block-supports-inline-css so that the CSS variable is defined before it is used
-	 * 
-	 * Filters the duotone SVG filters to only output the ones being used on the page.
-	 * 
-	 * @param array $duotone_preset
-	 * @return string
-	 */
-	public static function get_filter_svg( $duotone_preset ) {
-
-		$filters = '';
-		
-	
-		// Only output the preset if it's used by a block.
-		if ( array_key_exists( $duotone_preset[ 'slug' ], WP_Duotone::$output_presets ) ) {
-			// Get the CSS variable for the preset.
-			$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $duotone_preset['slug'] );
-			// Output the CSS for the preset.
-			// I think we should do this differently, but I'm not sure how.
-			$filters .= '<style>body{' . $duotone_preset_css_var . ':'. gutenberg_get_duotone_filter_property( $duotone_preset ) . ';}</style>';
-			$filters .= wp_get_duotone_filter_svg( $duotone_preset );
-		}
-
-		return $filters;
+}
+//
+function gutenberg_get_duotone_preset_value( $preset ) {
+	if( array_key_exists( $preset['slug'], WP_Duotone::$output_presets ) ) {
+		// This is returning the --wp--preset--duotone--dark-grayscale: CSS VAR NAME; but not removing the full --wp--preset--duotone--dark-grayscale preset name
+		return gutenberg_get_duotone_filter_property( $preset );
 	}
+
+	return '';
 }
 
 
 add_action( 'wp_loaded', array( 'WP_Duotone', 'save_global_styles_presets' ), 10 );
 add_action( 'wp_loaded', array( 'WP_Duotone', 'save_global_style_block_names' ), 10 );
 add_action( 'theme_json_register_declarations', array( 'WP_Duotone', 'duotone_declarations' ), 10, 2 );
-add_filter( 'theme_json_get_filter_svg', array( 'WP_Duotone', 'get_filter_svg' ), 10, 2 );
