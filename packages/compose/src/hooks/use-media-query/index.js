@@ -33,7 +33,7 @@ export default function useMediaQuery( query ) {
 
 		return {
 			/** @type {(onStoreChange: () => void) => () => void} */
-			subscribe: ( onStoreChange ) => {
+			subscribe( onStoreChange ) {
 				if ( ! mediaQueryList ) {
 					return () => {};
 				}
@@ -46,7 +46,7 @@ export default function useMediaQuery( query ) {
 					);
 				};
 			},
-			getValue: () => {
+			getValue() {
 				return mediaQueryList?.matches ?? false;
 			},
 		};
