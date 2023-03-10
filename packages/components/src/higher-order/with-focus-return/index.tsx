@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, WPComponent } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { createHigherOrderComponent, useFocusReturn } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
@@ -13,7 +13,7 @@ import deprecated from '@wordpress/deprecated';
  *
  * @return Whether object is component-like.
  */
-function isComponentLike( object: any ): object is WPComponent {
+function isComponentLike( object: any ): object is React.ComponentType {
 	return object instanceof Component || typeof object === 'function';
 }
 
@@ -39,7 +39,7 @@ export default createHigherOrderComponent(
 	( options: WPComponent | Record< string, unknown > ) => {
 		const HoC =
 			( { onFocusReturn }: Props = {} ) =>
-			( WrappedComponent: WPComponent ) => {
+			( WrappedComponent: React.ComponentType ) => {
 				const WithFocusReturn = (
 					props: Record< string, unknown >
 				) => {
