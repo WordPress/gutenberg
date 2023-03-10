@@ -34,7 +34,9 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 					const block = getBlocksByClientId( item.clientId )[ 0 ];
 					return (
 						block.name === 'core/navigation-link' ||
-						block.name === 'core/navigation-submenu'
+						block.name === 'core/navigation-submenu' ||
+						block.name === 'core/page-list' ||
+						block.name === 'core/page-list-item'
 					);
 				} );
 				return tree;
