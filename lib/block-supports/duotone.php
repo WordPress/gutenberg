@@ -719,27 +719,27 @@ class WP_Duotone {
 				continue;
 			}
 
-			// Value looks like this: 'var(--wp--preset--duotone--blue-orange)'
+			// Value looks like this: 'var(--wp--preset--duotone--blue-orange)' or 'var:preset|duotone|default-filter'
 			$duotone_filter_path = array_merge( $block_node['path'], array( 'filter', 'duotone' ) );
 			$duotone_filter = _wp_array_get( $theme_json, $duotone_filter_path, array() );
 			
 			if( empty( $duotone_filter ) ) {
 				continue;
 			}
-			// If it has a duotone preset, save the block name and the preset slug.
-			self::$global_styles_block_names[ $block_node[ 'name' ] ] = self::gutenberg_get_duotone_slug_from_preset_css_variable( $duotone_filter );
+			// If it has a duotone filter preset, save the block name and the preset slug.
+			$slug = self::gutenberg_get_duotone_slug_from_inline_styles( $duotone_filter );
+
+			if( $slug && $slug !== $duotone_filter) {
+				self::$global_styles_block_names[ $block_node[ 'name' ] ] = $slug;
+			}
 		}
 	}
 
-	static function gutenberg_get_duotone_slug_from_preset_css_variable( $css_variable ) {
-		if ( ! empty( $css_variable ) ) {
-			// Get the preset slug from the filter.
-			// TODO: Support var:preset|duotone|slug syntax.
-			preg_match('/var\(--wp--preset--duotone--(.*)\)/', $css_variable, $matches );
-			if ( $matches[1] ) {
-				return $matches[1];
-			}
-		}
+	/**
+	 * Take a 
+	 */
+	static function gutenberg_get_duotone_slug_from_inline_styles( $css_variable ) {
+		return str_replace( [ 'var:preset|duotone|', 'var(--wp--preset--duotone--' ], '', $css_variable );
 	}
 
 	/**
