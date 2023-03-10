@@ -2435,7 +2435,9 @@ class WP_Theme_JSON_Gutenberg {
 
 		$block_rules = '';
 
-		$declarations = apply_filters( 'theme_json_register_declarations', $declarations, $selector );
+		// TODO: See if we can refactor this out. We only want to scrape the duotone-specific theme json into duotone_declarations in declarations.
+		// Can we read the theme.json file and grab our duotone-specific declrations easily a different way?
+		$declarations = apply_filters( 'theme_json_styles_declarations', $declarations );
 
 		// Update declarations if there are separators with only background color defined.
 		if ( '.wp-block-separator' === $selector ) {

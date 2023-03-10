@@ -779,7 +779,7 @@ class WP_Duotone {
 	 *
 	 * @return array The block editor settings.
 	 */
-	public static function duotone_declarations( $declarations, $selector ) {
+	public static function duotone_declarations( $declarations ) {
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
 				static::$global_styles_presets[] = $declarations[ $index ]['value'];
@@ -803,4 +803,4 @@ function gutenberg_get_duotone_preset_value( $preset ) {
 
 add_action( 'wp_loaded', array( 'WP_Duotone', 'save_global_styles_presets' ), 10 );
 add_action( 'wp_loaded', array( 'WP_Duotone', 'save_global_style_block_names' ), 10 );
-add_filter( 'theme_json_register_declarations', array( 'WP_Duotone', 'duotone_declarations' ), 10, 2 );
+add_filter( 'theme_json_styles_declarations', array( 'WP_Duotone', 'duotone_declarations' ), 10, 1 );
