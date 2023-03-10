@@ -114,8 +114,13 @@ function ColorToolsPanel( {
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
+			className="color-block-support-panel"
+			__experimentalFirstVisibleItemClass="first"
+			__experimentalLastVisibleItemClass="last"
 		>
-			{ children }
+			<div className="color-block-support-panel__inner-wrapper">
+				{ children }
+			</div>
 		</ToolsPanel>
 	);
 }
@@ -194,7 +199,7 @@ function ColorPanelDropdown( {
 
 	return (
 		<ToolsPanelItem
-			className="block-editor-tools-panel-color-gradient-settings__item single-column"
+			className="block-editor-tools-panel-color-gradient-settings__item"
 			hasValue={ hasValue }
 			label={ label }
 			onDeselect={ resetValue }
