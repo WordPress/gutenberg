@@ -22,6 +22,7 @@ export default function SidebarNavigationScreen( {
 	title,
 	actions,
 	content,
+	description,
 } ) {
 	const { dashboardLink } = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -58,6 +59,11 @@ export default function SidebarNavigationScreen( {
 			</HStack>
 
 			<nav className="edit-site-sidebar-navigation-screen__content">
+				{ description && (
+					<p className="edit-site-sidebar-navigation-screen__description">
+						{ description }
+					</p>
+				) }
 				{ content }
 			</nav>
 		</VStack>

@@ -46,12 +46,9 @@
 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
 		"src/index.js",
 		"src/custom-gradient-picker",
-		"src/dimension-control",
 		"src/duotone-picker",
 		"src/gradient-picker",
-		"src/higher-order/with-filters",
 		"src/higher-order/with-notices",
-		"src/navigation",
 		"src/palette-edit"
 	]
 }

@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { Text } from '../../../text';
-import { COLORS } from '../../../utils';
+import { font, COLORS } from '../../../utils';
 
 export const Root = styled.div`
 	bottom: 0;
@@ -33,6 +33,7 @@ export const Tooltip = styled.div`
 	background: ${ COLORS.gray[ 900 ] };
 	border-radius: 2px;
 	box-sizing: border-box;
+	font-family: ${ font( 'default.fontFamily' ) };
 	font-size: 12px;
 	color: ${ COLORS.ui.textDark };
 	padding: 4px 8px;

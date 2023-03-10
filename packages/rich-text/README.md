@@ -485,7 +485,6 @@ _Parameters_
 
 -   _$1_ `Object`: Named parameters.
 -   _$1.editableContentElement_ `HTMLElement|null`: The element containing the editable content.
--   _$1.value_ `RichTextValue`: Value to check for selection.
 -   _$1.settings_ `RichTextFormatType`: The format type's settings.
 
 _Returns_
