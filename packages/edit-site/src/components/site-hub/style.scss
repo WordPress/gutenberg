@@ -10,8 +10,8 @@
 }
 
 .edit-site-site-hub__view-mode-toggle-container {
-	height: $header-height;
-	width: $header-height;
+	height: $header-height + 4px;
+	width: $header-height + 4px;
 	flex-shrink: 0;
 	background: $gray-900;
 }

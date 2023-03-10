@@ -11,7 +11,7 @@
 	top: 0;
 	left: 0;
 	width: calc(100vw - #{$canvas-padding * 2});
-	height: $header-height;
+	height: $header-height + 4px;
 	z-index: z-index(".edit-site-layout__hub");
 
 	.edit-site-layout.is-full-canvas.is-edit-mode & {
