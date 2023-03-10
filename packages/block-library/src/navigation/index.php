@@ -348,7 +348,7 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 	$wp_insert_post_result = wp_insert_post(
 		array(
 			'post_content' => $classic_nav_menu_blocks,
-			'post_title'   => $classic_nav_menu->slug,
+			'post_title'   => $classic_nav_menu->name,
 			'post_name'    => $classic_nav_menu->slug,
 			'post_status'  => 'publish',
 			'post_type'    => 'wp_navigation',
@@ -432,37 +432,6 @@ function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
 }
 
 /**
- * Create and returns a navigation menu containing a page-list as a fallback.
- *
- * @return array the newly created navigation menu.
- */
-function block_core_navigation_get_default_pages_fallback() {
-	$registry = WP_Block_Type_Registry::get_instance();
-
-	// If `core/page-list` is not registered then use empty blocks.
-	$default_blocks = $registry->is_registered( 'core/page-list' ) ? '<!-- wp:page-list /-->' : '';
-
-	// Create a new navigation menu from the fallback blocks.
-	$wp_insert_post_result = wp_insert_post(
-		array(
-			'post_content' => $default_blocks,
-			'post_title'   => 'Navigation', // TODO - use the template slug in future.
-			'post_name'    => 'Navigation', // TODO - use the template slug in future.
-			'post_status'  => 'publish',
-			'post_type'    => 'wp_navigation',
-		),
-		true // So that we can check whether the result is an error.
-	);
-
-	if ( is_wp_error( $wp_insert_post_result ) ) {
-		return;
-	}
-
-	// Fetch the most recently published navigation which will be the default one created above.
-	return block_core_navigation_get_most_recently_published_navigation();
-}
-
-/**
  * Retrieves the appropriate fallback to be used on the front of the
  * site when there is no menu assigned to the Nav block.
  *
@@ -472,7 +441,18 @@ function block_core_navigation_get_default_pages_fallback() {
  * @return array the array of blocks to be used as a fallback.
  */
 function block_core_navigation_get_fallback_blocks() {
-	// Get the most recently published Navigation post.
+	$page_list_fallback = array(
+		array(
+			'blockName' => 'core/page-list',
+		),
+	);
+
+	$registry = WP_Block_Type_Registry::get_instance();
+
+	// If `core/page-list` is not registered then return empty blocks.
+	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
+
+	// Default to a list of Pages.
 	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
 	// If there are no navigation posts then try to find a classic menu
@@ -481,15 +461,14 @@ function block_core_navigation_get_fallback_blocks() {
 		$navigation_post = block_core_navigation_maybe_use_classic_menu_fallback();
 	}
 
-	// If there are no navigation posts then default to a list of Pages.
-	if ( ! $navigation_post ) {
-		$navigation_post = block_core_navigation_get_default_pages_fallback();
-	}
-
-	// Use the first non-empty Navigation as fallback, there should always be one.
+	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
 		$parsed_blocks  = parse_blocks( $navigation_post->post_content );
 		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+
+		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
+		// In this case default to the (Page List) fallback.
+		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 	}
 
 	// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.

@@ -72,6 +72,11 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 			return false;
 		}
 
+		// Text columns is only available for blocks.
+		if ( support === 'textColumns' && ! name ) {
+			return false;
+		}
+
 		return true;
 	} );
 }

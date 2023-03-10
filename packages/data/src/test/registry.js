@@ -8,14 +8,7 @@ import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
 import coreDataStore from '../store';
 
-beforeEach( () => {
-	jest.useFakeTimers( 'legacy' );
-} );
-
-afterEach( () => {
-	jest.runOnlyPendingTimers();
-	jest.useRealTimers();
-} );
+jest.useFakeTimers( { legacyFakeTimers: true } );
 
 describe( 'createRegistry', () => {
 	let registry;

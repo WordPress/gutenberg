@@ -229,6 +229,7 @@ class WP_Theme_JSON_Gutenberg {
 		'border-left-width'                 => array( 'border', 'left', 'width' ),
 		'border-left-style'                 => array( 'border', 'left', 'style' ),
 		'color'                             => array( 'color', 'text' ),
+		'column-count'                      => array( 'typography', 'textColumns' ),
 		'font-family'                       => array( 'typography', 'fontFamily' ),
 		'font-size'                         => array( 'typography', 'fontSize' ),
 		'font-style'                        => array( 'typography', 'fontStyle' ),
@@ -396,6 +397,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontWeight'     => null,
 			'letterSpacing'  => null,
 			'lineHeight'     => null,
+			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
 		),
@@ -456,6 +458,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontWeight'     => null,
 			'letterSpacing'  => null,
 			'lineHeight'     => null,
+			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
 		),
@@ -797,7 +800,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The new selector.
 	 */
 	protected static function append_to_selector( $selector, $to_append, $position = 'right' ) {
-		if ( ! str_contains( ',', $selector ) ) {
+		if ( ! str_contains( $selector, ',' ) ) {
 			return 'right' === $position ? $selector . $to_append : $to_append . $selector;
 		}
 		$new_selectors = array();
@@ -1312,7 +1315,7 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								} else {
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%s .%s%s' : '%s.%s%s';
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%1$s .%2$s%3$s' : '%1$s-%2$s%1$s-%2$s%3$s';
 									$layout_selector = sprintf(
 										$format,
 										$selector,
