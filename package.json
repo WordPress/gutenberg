@@ -365,5 +365,10 @@
 			"                                                `---'"
 		],
 		"welcome-build-command": "npm run dev"
+	},
+	"overrides": {
+		"react-native@0.69.4": {
+			"react": "18.2.0"
+		}
 	}
 }
