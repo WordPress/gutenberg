@@ -466,7 +466,6 @@ export class FileEdit extends Component {
 										__unstableMobileNoFocusOnMount
 										onChange={ this.onChangeFileName }
 										placeholder={ __( 'File name' ) }
-										rootTagsToEliminate={ [ 'p' ] }
 										tagName="p"
 										underlineColorAndroid="transparent"
 										value={ fileName }
@@ -502,7 +501,6 @@ export class FileEdit extends Component {
 											<RichText
 												withoutInteractiveFormatting
 												__unstableMobileNoFocusOnMount
-												rootTagsToEliminate={ [ 'p' ] }
 												tagName="p"
 												textAlign="center"
 												minWidth={ minWidth }

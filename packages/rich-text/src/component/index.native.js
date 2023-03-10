@@ -274,28 +274,25 @@ export class RichText extends Component {
 	 */
 	removeRootTagsProduceByAztec( html ) {
 		let result = this.removeRootTag( this.props.tagName, html );
-		// Temporary workaround for https://github.com/WordPress/gutenberg/pull/13763
-		if ( this.props.rootTagsToEliminate ) {
-			this.props.rootTagsToEliminate.forEach( ( element ) => {
-				result = this.removeRootTag( element, result );
-			} );
-		}
 
 		if ( this.props.tagsToEliminate ) {
 			this.props.tagsToEliminate.forEach( ( element ) => {
 				result = this.removeTag( element, result );
 			} );
 		}
+
 		return result;
 	}
 
 	removeRootTag( tag, html ) {
 		const openingTagRegexp = RegExp( '^<' + tag + '[^>]*>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>$', 'gim' );
+
 		return html
 			.replace( openingTagRegexp, '' )
 			.replace( closingTagRegexp, '' );
 	}
+
 	removeTag( tag, html ) {
 		const openingTagRegexp = RegExp( '<' + tag + '>', 'gim' );
 		const closingTagRegexp = RegExp( '</' + tag + '>', 'gim' );
