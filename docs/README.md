@@ -6,9 +6,9 @@
 
 **Legend:**
 
-1. Block Inserter
-2. Block Editor Content Area
-3. Settings Sidebar
+1. Block inserter
+2. Block editor content area
+3. Settings sidebar
 
 Using a system of Blocks to compose and format content, the new block-based editor is designed to create rich, flexible layouts for websites and digital products. Content is created using blocks instead of freeform text with inserted media, embeds and Shortcodes (there's a Shortcode block, though).
 
@@ -18,9 +18,9 @@ The Editor offers rich new value to users by offering visual, drag-and-drop crea
 
 ## Quick links
 
-### Create pages and posts with the Block Editor
+### Create pages and posts with the block editor
 
-In the Block Editor Handbook, our tutorials will be development-focussed. However, it helps if you have some experience using the Block Editor the way an end-user would first. If you have no experience building with the Block Editor yet, we recommend you [learn to use the block editor](https://wordpress.org/support/article/wordpress-editor/) to create posts and pages.
+In the Block Editor Handbook, our tutorials will be development-focussed. However, it helps if you have some experience using the block editor the way an end-user would first. If you have no experience building with the block editor yet, we recommend you [learn to use the block editor](https://wordpress.org/support/article/wordpress-editor/) to create posts and pages.
 
 ### Create a Block Tutorial
 
