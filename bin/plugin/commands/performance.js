@@ -316,7 +316,7 @@ async function runPerformanceTests( branches, options ) {
 
 		// Create the config file for the current env.
 		fs.writeFileSync(
-			environmentDirectory,
+			path.join( environmentDirectory, '.wp-env.json' ),
 			JSON.stringify(
 				{
 					core: 'WordPress/WordPress',
