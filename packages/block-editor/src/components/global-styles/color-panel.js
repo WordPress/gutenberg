@@ -567,9 +567,11 @@ export default function ColorPanel( {
 			value?.elements?.[ name ]?.color?.text
 		);
 		const hasElement = () =>
-			elementTextUserColor ||
-			elementBackgroundUserColor ||
-			elementGradientUserColor;
+			!! (
+				elementTextUserColor ||
+				elementBackgroundUserColor ||
+				elementGradientUserColor
+			);
 		const resetElement = () => {
 			onChange( {
 				...value,
