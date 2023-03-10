@@ -99,7 +99,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	$excluded_terms = '';
 
 	// Get the term id of each excluded term.
-	if ( isset( $attributes['excludedTerms'] ) ) {
+	if ( isset( $attributes['excludedTerms'] ) && ! empty( $attributes['excludedTerms'] ) ) {
 		$excluded_terms = explode( ',', sanitize_text_field( $attributes['excludedTerms'] ) );
 		// Get the taxonomies of the current post type.
 		$taxonomies = get_object_taxonomies( get_post_type() );
