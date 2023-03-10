@@ -34,7 +34,7 @@ export default function SidebarNavigationScreen( {
 	return (
 		<VStack spacing={ 2 }>
 			<HStack
-				spacing={ 4 }
+				spacing={ 0 }
 				justify="flex-start"
 				className="edit-site-sidebar-navigation-screen__title-icon"
 			>
