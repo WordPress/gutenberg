@@ -29,7 +29,7 @@ export const PRESET_FONT_SIZES = {
 	caption: 10,
 	footnote: 11,
 	largeTitle: 28,
-	subheadline: 12,
+	subheadline: 16,
 	title: 20,
 };
 

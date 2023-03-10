@@ -5,6 +5,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
@@ -52,9 +53,15 @@ export default function SidebarNavigationScreen( {
 						label={ __( 'Dashboard' ) }
 					/>
 				) }
-				<h2 className="edit-site-sidebar-navigation-screen__title">
+				<Text
+					className="edit-site-sidebar-navigation-screen__title"
+					size="subheadline"
+					as="h2"
+					weight="600"
+					color="white"
+				>
 					{ title }
-				</h2>
+				</Text>
 				{ actions }
 			</HStack>
 

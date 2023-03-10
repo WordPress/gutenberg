@@ -29,17 +29,13 @@
 	position: sticky;
 	top: 0;
 	background: $gray-900;
-	padding-top: $grid-unit-60 + $header-height;
+	padding-top: $grid-unit-60 + $header-height + 4px;
 	box-shadow: 0 $grid-unit-10 $grid-unit-20 $gray-900;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
-	padding-right: $grid-unit-20;
 }
 
 .edit-site-sidebar-navigation-screen__title {
-	font-size: calc(1.56 * 13px);
-	line-height: normal;
-	font-weight: 500;
 	flex-grow: 1;
 	color: $white;
 	margin: 0;
