@@ -16,7 +16,6 @@ import {
 	Button,
 	TextControl,
 	ToolbarButton,
-	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -31,7 +30,7 @@ import {
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { upload, caption as captionIcon, pencil } from '@wordpress/icons';
+import { upload, caption as captionIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
@@ -69,7 +68,6 @@ export default function PostFeaturedImageEdit( {
 		rel,
 		linkTarget,
 		caption,
-		displayCaption,
 	} = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
@@ -79,7 +77,7 @@ export default function PostFeaturedImageEdit( {
 	);
 
 	const prevCaption = usePrevious( caption );
-	const [ showCaption, setShowCaption ] = useState( !! caption );
+	const [ showCaption, setShowCaption ] = useState( true );
 	// We need to show the caption when changes come from
 	// history navigation(undo/redo).
 	useEffect( () => {
@@ -123,65 +121,6 @@ export default function PostFeaturedImageEdit( {
 	const mediaLibraryCaption = !! media?.caption?.rendered
 		? media?.caption?.rendered
 		: '';
-
-	const captionControls = [
-		{
-			role: 'menuitemradio',
-			title: __( 'Media Library caption' ),
-			isActive: displayCaption === true,
-			icon: captionIcon,
-			label: !! displayCaption
-				? __( 'Hide Media Library caption' )
-				: __( 'Show Media library caption' ),
-			onClick: () => {
-				setAttributes( {
-					displayCaption: !! displayCaption ? false : true,
-					caption: undefined,
-				} );
-				if ( showCaption === true ) {
-					setShowCaption( ! showCaption );
-				}
-			},
-		},
-		{
-			role: 'menuitemradio',
-			title: __( 'Custom caption' ),
-			isActive: showCaption === true,
-			icon: pencil,
-			label: !! displayCaption
-				? __( 'Remove caption' )
-				: __( 'Add caption' ),
-			onClick: () => {
-				setAttributes( {
-					displayCaption: false,
-				} );
-				setShowCaption( ! showCaption );
-				if ( showCaption && caption ) {
-					setAttributes( { caption: undefined } );
-				}
-			},
-		},
-	];
-
-	const MediaLibraryCaptionControls = () => {
-		return (
-			<ToolbarButton
-				onClick={ () => {
-					setAttributes( {
-						displayCaption: !! displayCaption ? false : true,
-						caption: undefined,
-					} );
-				} }
-				icon={ captionIcon }
-				isPressed={ displayCaption }
-				label={
-					!! displayCaption
-						? __( 'Hide Media Library caption' )
-						: __( 'Show Media Library caption' )
-				}
-			/>
-		);
-	};
 
 	const imageSizes = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().imageSizes,
@@ -230,36 +169,34 @@ export default function PostFeaturedImageEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
+	// Displays the caption when it is not editable.
+	const DisplayFigCaption = () => (
+		<figcaption
+			className={ __experimentalGetElementClassName( 'caption' ) }
+			dangerouslySetInnerHTML={ {
+				__html: !! caption ? caption : mediaLibraryCaption,
+			} }
+		/>
+	);
+
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ mediaLibraryCaption && ! isDescendentOfQueryLoop && (
-					<ToolbarDropdownMenu
-						icon={ captionIcon }
-						label={ __( 'Caption' ) }
-						controls={ captionControls }
-					/>
-				) }
-				{ ! mediaLibraryCaption && ! isDescendentOfQueryLoop && (
-					<ToolbarButton
-						onClick={ () => {
-							setShowCaption( ! showCaption );
-							if ( showCaption && caption ) {
-								setAttributes( { caption: undefined } );
-							}
-						} }
-						icon={ captionIcon }
-						isPressed={ showCaption }
-						label={
-							showCaption
-								? __( 'Remove caption' )
-								: __( 'Add caption' )
+				<ToolbarButton
+					onClick={ () => {
+						setShowCaption( ! showCaption );
+						if ( showCaption && caption ) {
+							setAttributes( { caption: undefined } );
 						}
-					/>
-				) }
-				{ mediaLibraryCaption && isDescendentOfQueryLoop && (
-					<MediaLibraryCaptionControls />
-				) }
+					} }
+					icon={ captionIcon }
+					isPressed={ showCaption }
+					label={
+						showCaption
+							? __( 'Remove caption' )
+							: __( 'Add caption' )
+					}
+				/>
 			</BlockControls>
 			<DimensionControls
 				clientId={ clientId }
@@ -317,14 +254,15 @@ export default function PostFeaturedImageEdit( {
 		return (
 			<>
 				{ controls }
-				<div { ...blockProps }>
+				<figure { ...blockProps }>
 					{ placeholder() }
 					<Overlay
 						attributes={ attributes }
 						setAttributes={ setAttributes }
 						clientId={ clientId }
 					/>
-				</div>
+				</figure>
+				{ showCaption && <DisplayFigCaption /> }
 			</>
 		);
 	}
@@ -337,9 +275,6 @@ export default function PostFeaturedImageEdit( {
 	if ( ! featuredImage && ! postId ) {
 		return (
 			<>
-				<BlockControls group="block">
-					<MediaLibraryCaptionControls />
-				</BlockControls>
 				<DimensionControls
 					clientId={ clientId }
 					attributes={ attributes }
@@ -353,15 +288,7 @@ export default function PostFeaturedImageEdit( {
 						setAttributes={ setAttributes }
 						clientId={ clientId }
 					/>
-					{ displayCaption && (
-						<figcaption
-							className={ __experimentalGetElementClassName(
-								'caption'
-							) }
-						>
-							<p> { __( 'Placeholder caption' ) } </p>
-						</figcaption>
-					) }
+					{ showCaption && <DisplayFigCaption /> }
 				</figure>
 			</>
 		);
@@ -462,7 +389,7 @@ export default function PostFeaturedImageEdit( {
 					clientId={ clientId }
 				/>
 				{ showCaption &&
-					! displayCaption &&
+					! isDescendentOfQueryLoop &&
 					( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
@@ -472,7 +399,7 @@ export default function PostFeaturedImageEdit( {
 							aria-label={ __( 'Image caption text' ) }
 							ref={ captionRef }
 							placeholder={ __( 'Add caption' ) }
-							value={ caption }
+							value={ caption || mediaLibraryCaption }
 							onChange={ ( value ) =>
 								setAttributes( { caption: value } )
 							}
@@ -484,15 +411,8 @@ export default function PostFeaturedImageEdit( {
 							}
 						/>
 					) }
-				{ displayCaption && (
-					<figcaption
-						className={ __experimentalGetElementClassName(
-							'caption'
-						) }
-						dangerouslySetInnerHTML={ {
-							__html: mediaLibraryCaption,
-						} }
-					/>
+				{ showCaption && isDescendentOfQueryLoop && (
+					<DisplayFigCaption />
 				) }
 			</figure>
 		</>
