@@ -50,7 +50,7 @@ export default function useMediaQuery( query ) {
 			const mediaQueryList = getMediaQueryList( query );
 			return mediaQueryList?.matches ?? false;
 		},
-		() => undefined
+		() => false
 	);
 
 	return !! ( query && matches );
