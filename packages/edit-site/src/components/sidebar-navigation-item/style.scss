@@ -1,6 +1,7 @@
 .edit-site-sidebar-navigation-item.components-item {
 	color: $gray-600;
-	margin: 0 $grid-unit-05;
+	padding: $grid-unit-10 $grid-unit-20;
+	min-height: $grid-unit-50;
 
 	&:hover,
 	&:focus,
