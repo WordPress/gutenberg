@@ -69,7 +69,6 @@ function UnforwardedAnglePickerControl(
 			ref={ ref }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			className={ classes }
-			gap={ 4 }
 		>
 			<NumberControl
 				label={ label }
@@ -86,20 +85,17 @@ function UnforwardedAnglePickerControl(
 						<Spacer
 							as={ Text }
 							marginBottom={ 0 }
-							marginRight={ space( 3 ) }
+							marginRight={ space( 2 ) }
 							style={ {
 								color: COLORS.ui.theme,
 							} }
 						>
 							°
 						</Spacer>
-						<Spacer
-							as={ AngleCircle }
+						<AngleCircle
 							aria-hidden="true"
 							value={ value }
 							onChange={ onChange }
-							marginBottom={ 0 }
-							marginRight={ space( 1 ) }
 						/>
 					</>
 				}
