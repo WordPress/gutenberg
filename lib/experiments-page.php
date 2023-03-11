@@ -48,7 +48,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed. It requires the empty theme to be installed.)', 'gutenberg' ),
+			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
 			'id'    => 'gutenberg-zoomed-out-view',
 		)
 	);
@@ -72,7 +72,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test your site with a single theme and a setup flow to pick patterns & styles from other themes.', 'gutenberg' ),
+			'label' => __( 'Test your site with a single theme and a setup flow to pick patterns & styles from other themes. It requires the empty theme to be installed.', 'gutenberg' ),
 			'id'    => 'gutenberg-single-theme',
 		)
 	);
