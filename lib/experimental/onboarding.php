@@ -29,6 +29,11 @@ function wp_render_onboading_page() {
 		wp_die( __( 'The theme you are currently using is not compatible with the Site Editor.' ) );
 	}
 
+	// TODO
+	// So far, activate as soon as the user visited the page,
+	// though later this needs to be set up when the user has actually finished the onboarding.
+	add_option( 'single_theme_set_up', true );
+
 	wp_add_inline_script(
 		'wp-onboarding',
 		'wp.domReady( function() {
