@@ -1,0 +1,39 @@
+.onboarding-site-hub {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: $grid-unit-10;
+}
+
+.onboarding-site-hub__post-type {
+	opacity: 0.6;
+}
+
+.onboarding-site-hub__view-mode-toggle-container {
+	height: $header-height;
+	width: $header-height;
+	flex-shrink: 0;
+	background: $gray-900;
+}
+
+.onboarding-layout__view-mode-toggle-icon {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.onboarding-site-hub__text-content {
+	// Necessary for the ellipsis to work.
+	overflow: hidden;
+}
+
+.onboarding-site-hub__title {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.onboarding-site-hub__site-title {
+	margin-left: $grid-unit-05;
+}
