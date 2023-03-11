@@ -10,7 +10,9 @@
  * Add an onboarding page to the dashboard menu.
  */
 function add_onboarding_menu() {
-	add_dashboard_page( __( 'Onboarding', 'gutenberg' ), __( 'Onboarding', 'gutenberg' ), 'edit_theme_options', 'onboarding', 'wp_render_onboading_page' );
+	if ( wp_get_theme('emptytheme')->exists() ) {
+		add_dashboard_page( __( 'Onboarding', 'gutenberg' ), __( 'Onboarding', 'gutenberg' ), 'edit_theme_options', 'onboarding', 'wp_render_onboading_page' );
+	}
 }
 add_action( 'admin_menu', 'add_onboarding_menu' );
 
