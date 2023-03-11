@@ -88,7 +88,7 @@ function gutenberg_enable_experiments() {
 	if (
 		$gutenberg_experiments && array_key_exists( 'gutenberg-single-theme', $gutenberg_experiments ) &&
 		( $pagenow !== 'index.php' || ! isset( $_GET['page'] ) || 'onboarding' !== $_GET['page'] ) &&
-		! get_option( 'single_theme_set_up', false )
+		( ! isset( $_GET['onboarding_no_redirect'] ) )
 	) {
 		if ( wp_get_theme('emptytheme')->exists() ) {
 			switch_theme( 'emptytheme' );
