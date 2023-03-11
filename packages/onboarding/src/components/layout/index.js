@@ -29,15 +29,17 @@ export default function Layout() {
 				</VStack>
 				<FlexItem className="onboarding-layout__content" isBlock>
 					<div className="onboarding-layout__canvas">
-						<NavigatorScreen path="/">
-							<Main />
-						</NavigatorScreen>
-						<NavigatorScreen path="/site-details">
-							<SiteDetails />
-						</NavigatorScreen>
-						<NavigatorScreen path="/add-pages">
-							<AddPages />
-						</NavigatorScreen>
+						<div className="onboarding-layout__canvas-container">
+							<NavigatorScreen path="/">
+								<Main />
+							</NavigatorScreen>
+							<NavigatorScreen path="/site-details">
+								<SiteDetails />
+							</NavigatorScreen>
+							<NavigatorScreen path="/add-pages">
+								<AddPages />
+							</NavigatorScreen>
+						</div>
 					</div>
 				</FlexItem>
 			</Flex>

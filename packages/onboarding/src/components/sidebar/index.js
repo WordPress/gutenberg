@@ -14,7 +14,7 @@ import {
  */
 import Header from './header';
 
-const onboardingSteps = [
+export const onboardingSteps = [
 	{ label: __( 'Site details' ), path: '/site-details' },
 	{ label: __( 'Add pages' ), path: '/add-pages' },
 ];
