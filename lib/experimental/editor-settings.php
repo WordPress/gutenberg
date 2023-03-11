@@ -96,6 +96,12 @@ function gutenberg_enable_experiments() {
 			exit;
 		}
 	}
+	if (
+		! $gutenberg_experiments ||
+		( $gutenberg_experiments && ! array_key_exists( 'gutenberg-single-theme', $gutenberg_experiments ) )
+	) {
+		update_option( 'onboarding_complete', false );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
