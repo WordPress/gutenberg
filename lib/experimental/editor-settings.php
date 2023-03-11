@@ -101,8 +101,10 @@ function gutenberg_enable_experiments() {
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
 
 function gutenberg_onboarding_complete() {
-	if ( isset( $_GET['onboarding_complete'] ) ) {
+	if ( isset( $_GET['onboarding_reset'] ) ) {
+		update_option( 'onboarding_complete', false );
+	} else if ( isset( $_GET['onboarding_complete'] ) ) {
 		update_option( 'onboarding_complete', true );
 	}
 }
-add_action( 'admin_init', 'gutenberg_onboarding_complete' );
+add_action( 'admin_init', 'gutenberg_onboarding_complete', 9 );
