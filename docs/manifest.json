@@ -1722,6 +1722,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/onboarding",
+		"slug": "packages-onboarding",
+		"markdown_source": "../packages/onboarding/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",

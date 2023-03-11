@@ -437,6 +437,15 @@ function gutenberg_register_packages_styles( $styles ) {
 		array( 'wp-components' )
 	);
 	$styles->add_data( 'wp-widgets', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-onboarding',
+		gutenberg_url( 'build/onboarding/style.css' ),
+		array( 'wp-components' ),
+		$version
+	);
+	$styles->add_data( 'wp-onboarding', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
 

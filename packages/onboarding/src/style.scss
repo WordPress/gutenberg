@@ -1,0 +1,14 @@
+html.wp-toolbar {
+	padding: 0 !important;
+}
+
+#wpadminbar,
+#adminmenumain,
+#wpfooter {
+	display: none !important;
+}
+
+#wpcontent {
+	margin: 0 !important;
+	padding: 0 !important;
+}

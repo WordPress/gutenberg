@@ -111,6 +111,7 @@ require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
+require __DIR__ . '/experimental/onboarding.php';
 
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
