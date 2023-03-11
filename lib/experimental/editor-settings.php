@@ -88,7 +88,7 @@ function gutenberg_enable_experiments() {
 	if (
 		$gutenberg_experiments && array_key_exists( 'gutenberg-single-theme', $gutenberg_experiments ) &&
 		( $pagenow !== 'index.php' || ! isset( $_GET['page'] ) || 'onboarding' !== $_GET['page'] ) &&
-		( ! isset( $_GET['onboarding_no_redirect'] ) )
+		! get_option( 'onboarding_complete', false )
 	) {
 		if ( wp_get_theme('emptytheme')->exists() ) {
 			switch_theme( 'emptytheme' );
@@ -99,3 +99,10 @@ function gutenberg_enable_experiments() {
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
+
+function gutenberg_onboarding_complete() {
+	if ( isset( $_GET['onboarding_complete'] ) ) {
+		update_option( 'onboarding_complete', true );
+	}
+}
+add_action( 'admin_init', 'gutenberg_onboarding_complete' );
