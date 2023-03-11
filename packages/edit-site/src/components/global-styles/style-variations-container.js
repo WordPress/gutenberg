@@ -14,6 +14,7 @@ import { ENTER } from '@wordpress/keycodes';
 import { __experimentalGrid as Grid } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -121,13 +122,15 @@ export default function StyleVariationsContainer() {
 		];
 	}, [ variations ] );
 
+	const currentWithEmptyVariation = useAsyncList( withEmptyVariation );
+
 	return (
 		<>
 			<Grid
 				columns={ 2 }
 				className="edit-site-global-styles-style-variations-container"
 			>
-				{ withEmptyVariation?.map( ( variation, index ) => (
+				{ currentWithEmptyVariation?.map( ( variation, index ) => (
 					<Variation key={ index } variation={ variation } />
 				) ) }
 			</Grid>
