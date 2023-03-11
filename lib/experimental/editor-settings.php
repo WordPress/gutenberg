@@ -90,8 +90,11 @@ function gutenberg_enable_experiments() {
 		( $pagenow !== 'index.php' || ! isset( $_GET['page'] ) || 'onboarding' !== $_GET['page'] ) &&
 		! get_option( 'single_theme_set_up', false )
 	) {
-		wp_safe_redirect( 'index.php?page=onboarding' );
-		exit;
+		if ( wp_get_theme('emptytheme')->exists() ) {
+			switch_theme( 'emptytheme' );
+			wp_safe_redirect( 'index.php?page=onboarding' );
+			exit;
+		}
 	}
 }
 
