@@ -65,6 +65,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-single-theme',
+		__( 'Single Theme ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test your site with a single theme and a setup flow to pick patterns & styles from other themes.', 'gutenberg' ),
+			'id'    => 'gutenberg-single-theme',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

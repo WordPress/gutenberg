@@ -77,11 +77,21 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
  */
 function gutenberg_enable_experiments() {
 	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	global $pagenow;
+
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-zoomed-out-view', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableZoomedOutView = true', 'before' );
 	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-color-randomizer', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableColorRandomizer = true', 'before' );
+	}
+	if (
+		$gutenberg_experiments && array_key_exists( 'gutenberg-single-theme', $gutenberg_experiments ) &&
+		( $pagenow !== 'index.php' || ! isset( $_GET['page'] ) || 'onboarding' !== $_GET['page'] ) &&
+		! get_option( 'single_theme_set_up', false )
+	) {
+		wp_safe_redirect( 'index.php?page=onboarding' );
+		exit;
 	}
 }
 
