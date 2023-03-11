@@ -5,11 +5,17 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 /**
+ * WordPress dependencies
+ */
+import { isRTL } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { Flex } from '../../flex';
 import { COLORS } from '../../utils';
 import { space } from '../../ui/utils/space';
+import { Text } from '../../text';
 import CONFIG from '../../utils/config-values';
 
 import type { AnglePickerControlProps } from '../types';
@@ -74,4 +80,9 @@ export const CircleIndicator = styled.div`
 	position: absolute;
 	width: ${ LINE_WEIGHT }px;
 	height: calc( 50% + ${ LINE_WEIGHT / 2 }px );
+`;
+
+export const UnitText = styled( Text )`
+	color: ${ COLORS.ui.theme };
+	margin-right: ${ isRTL() ? space( 3 ) : space( 2 ) };
 `;

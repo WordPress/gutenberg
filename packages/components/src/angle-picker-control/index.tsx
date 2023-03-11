@@ -9,18 +9,14 @@ import classnames from 'classnames';
  */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { isRTL, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import NumberControl from '../number-control';
 import AngleCircle from './angle-circle';
-import { Root } from './styles/angle-picker-control-styles';
-import { space } from '../ui/utils/space';
-import { Text } from '../text';
-import { Spacer } from '../spacer';
-import { COLORS } from '../utils/colors-values';
+import { Root, UnitText } from './styles/angle-picker-control-styles';
 
 import type { WordPressComponentProps } from '../ui/context';
 import type { AnglePickerControlProps } from './types';
@@ -63,6 +59,11 @@ function UnforwardedAnglePickerControl(
 
 	const classes = classnames( 'components-angle-picker-control', className );
 
+	const unitText = <UnitText>°</UnitText>;
+	const [ prefixedUnitText, suffixedUnitText ] = isRTL()
+		? [ unitText, null ]
+		: [ null, unitText ];
+
 	return (
 		<Root
 			{ ...restProps }
@@ -80,18 +81,10 @@ function UnforwardedAnglePickerControl(
 				step="1"
 				value={ value }
 				spinControls="none"
+				prefix={ prefixedUnitText }
 				suffix={
 					<>
-						<Spacer
-							as={ Text }
-							marginBottom={ 0 }
-							marginRight={ space( 2 ) }
-							style={ {
-								color: COLORS.ui.theme,
-							} }
-						>
-							°
-						</Spacer>
+						{ suffixedUnitText }
 						<AngleCircle
 							aria-hidden="true"
 							value={ value }
