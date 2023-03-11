@@ -27,6 +27,7 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -137,6 +138,8 @@ function ScreenStyleVariations() {
 		];
 	}, [ variations ] );
 
+	const currentWithEmptyVariation = useAsyncList( withEmptyVariation );
+
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const shouldRevertInitialMode = useRef( null );
 	useEffect( () => {
@@ -175,9 +178,14 @@ function ScreenStyleVariations() {
 			<Card size="small" isBorderless>
 				<CardBody>
 					<Grid columns={ 2 }>
-						{ withEmptyVariation?.map( ( variation, index ) => (
-							<Variation key={ index } variation={ variation } />
-						) ) }
+						{ currentWithEmptyVariation?.map(
+							( variation, index ) => (
+								<Variation
+									key={ index }
+									variation={ variation }
+								/>
+							)
+						) }
 					</Grid>
 				</CardBody>
 			</Card>

@@ -696,36 +696,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array
 	 */
 	public static function get_style_variations() {
-		$variation_files    = array();
-		$variations         = array();
-		$base_directory     = get_stylesheet_directory() . '/styles';
-		$template_directory = get_template_directory() . '/styles';
-		if ( is_dir( $base_directory ) ) {
-			$variation_files = static::recursively_iterate_json( $base_directory );
-		}
-		if ( is_dir( $template_directory ) && $template_directory !== $base_directory ) {
-			$variation_files_parent = static::recursively_iterate_json( $template_directory );
-			// If the child and parent variation file basename are the same, only include the child theme's.
-			foreach ( $variation_files_parent as $parent_path => $parent ) {
-				foreach ( $variation_files as $child_path => $child ) {
-					if ( basename( $parent_path ) === basename( $child_path ) ) {
-						unset( $variation_files_parent[ $parent_path ] );
-					}
-				}
-			}
-			$variation_files = array_merge( $variation_files, $variation_files_parent );
-		}
-		ksort( $variation_files );
-		foreach ( $variation_files as $path => $file ) {
-			$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
-			if ( is_array( $decoded_file ) ) {
-				$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
-				$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
-				if ( empty( $variation['title'] ) ) {
-					$variation['title'] = basename( $path, '.json' );
-				}
-				$variations[] = $variation;
-			}
+		$variations = array();
+		$vars = json_decode( wp_remote_retrieve_body( wp_remote_get( 'https://raw.githubusercontent.com/ellatrix/block-themes-directory/main/variations-from-themes-offering-styles.json' ) ), true );
+		foreach ( $vars as $decoded_file ) {
+			$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
+			$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
+			$variations[] = $variation;
 		}
 		return $variations;
 	}
