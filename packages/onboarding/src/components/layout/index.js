@@ -16,16 +16,13 @@ import { Main, SiteDetails, AddPages } from '../navigation-screens';
 
 export default function Layout() {
 	return (
-		<NavigatorProvider
-			className="edit-site-sidebar__content"
-			initialPath="/"
-		>
-			<div className="onboarding-layout">
-				<Flex className="onboarding-layout__content">
-					<FlexItem>
-						<Sidebar />
-					</FlexItem>
-					<FlexItem isBlock>
+		<NavigatorProvider className="onboarding-layout" initialPath="/">
+			<Flex justify="flex-start" align="stretch">
+				<FlexItem className="onboarding-layout__sidebar">
+					<Sidebar />
+				</FlexItem>
+				<FlexItem className="onboarding-layout__content" isBlock>
+					<div className="onboarding-layout__canvas">
 						<NavigatorScreen path="/">
 							<Main />
 						</NavigatorScreen>
@@ -35,9 +32,9 @@ export default function Layout() {
 						<NavigatorScreen path="/add-pages">
 							<AddPages />
 						</NavigatorScreen>
-					</FlexItem>
-				</Flex>
-			</div>
+					</div>
+				</FlexItem>
+			</Flex>
 		</NavigatorProvider>
 	);
 }

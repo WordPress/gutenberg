@@ -1,0 +1,47 @@
+#wp-onboarding {
+	height: 100vh;
+}
+
+.onboarding-layout {
+	height: 100%;
+	background: $gray-900;
+	color: $white;
+
+	> div {
+		height: 100%;
+	}
+}
+
+.onboarding-layout__sidebar {
+	width: 100vw;
+	height: 100%;
+
+	@include break-medium {
+		width: $nav-sidebar-width;
+	}
+}
+
+.onboarding-layout__content {
+	position: relative;
+}
+
+.onboarding-layout__canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+
+	color: $gray-900;
+	background: $white;
+	box-shadow:
+		0 20px 25px -5px rgba(0, 0, 0, 0.8),
+		0 8px 10px -6px rgba(0, 0, 0, 0.8);
+
+	@include break-medium {
+		top: $canvas-padding;
+		bottom: $canvas-padding;
+		width: calc(100% - #{$canvas-padding});
+		border-radius: $radius-block-ui * 4;
+	}
+}
