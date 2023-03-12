@@ -47,7 +47,7 @@ function Sidebar( { step = 1 } ) {
 			<h1 className="onboarding-sidebar__title">
 				{ __( 'Bootstrap your site' ) }
 			</h1>
-			<p>{ __( 'Your website is three clicks a way' ) }</p>
+			<p>{ __( 'Your website is three clicks away' ) }</p>
 
 			<VStack className="onboarding-sidebar__steps">
 				<SidebarItem activeStep={ step } step={ 1 }>
