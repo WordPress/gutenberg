@@ -47,3 +47,23 @@ function wp_render_onboading_page() {
 	wp_enqueue_style( 'wp-onboarding' );
 
 }
+/**
+ * Remove themes from WP Admin menu
+ * and moves the site editor to the top level.
+ */
+function remove_themes_menu() {
+	remove_submenu_page( 'tools.php', 'theme-editor.php' );
+
+	add_menu_page(
+		'Designer',
+		'Designer',
+		'edit_themes',
+		'site-editor.php',
+		'',
+		'dashicons-welcome-widgets-menus',
+		60 
+	);
+	remove_menu_page('themes.php');
+	
+}
+add_action( 'admin_menu', 'remove_themes_menu', 999 );
