@@ -32,7 +32,7 @@ function compareVariations( a, b ) {
 	);
 }
 
-function Variation( { variation } ) {
+function Variation( { variation, onVariationClick } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo( () => {
@@ -48,6 +48,9 @@ function Variation( { variation } ) {
 	}, [ variation, base ] );
 
 	const selectVariation = () => {
+		if ( onVariationClick ) {
+			onVariationClick( variation );
+		}
 		setUserConfig( () => {
 			return {
 				settings: variation.settings,
@@ -97,15 +100,24 @@ function Variation( { variation } ) {
 	);
 }
 
-export default function StyleVariationsContainer() {
-	const { variations } = useSelect( ( select ) => {
-		return {
-			variations:
+export default function StyleVariationsContainer( {
+	variations,
+	gridColumns = 2,
+	onVariationClick,
+} ) {
+	const variationsInput = useSelect(
+		( select ) => {
+			if ( variations ) {
+				return variations;
+			}
+			return (
 				select(
 					coreStore
-				).__experimentalGetCurrentThemeGlobalStylesVariations() || [],
-		};
-	}, [] );
+				).__experimentalGetCurrentThemeGlobalStylesVariations() || []
+			);
+		},
+		[ variations ]
+	);
 
 	const withEmptyVariation = useMemo( () => {
 		return [
@@ -114,24 +126,28 @@ export default function StyleVariationsContainer() {
 				settings: {},
 				styles: {},
 			},
-			...variations.map( ( variation ) => ( {
+			...variationsInput.map( ( variation ) => ( {
 				...variation,
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
 			} ) ),
 		];
-	}, [ variations ] );
+	}, [ variationsInput ] );
 
 	const currentWithEmptyVariation = useAsyncList( withEmptyVariation );
 
 	return (
 		<>
 			<Grid
-				columns={ 2 }
+				columns={ gridColumns }
 				className="edit-site-global-styles-style-variations-container"
 			>
 				{ currentWithEmptyVariation?.map( ( variation, index ) => (
-					<Variation key={ index } variation={ variation } />
+					<Variation
+						key={ index }
+						variation={ variation }
+						onVariationClick={ onVariationClick }
+					/>
 				) ) }
 			</Grid>
 		</>
