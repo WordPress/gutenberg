@@ -15,7 +15,7 @@ import { useState } from '@wordpress/element';
  */
 import Sidebar from '../sidebar';
 import SiteHub from '../site-hub';
-import { SiteDetails, AddPages } from '../navigation-screens';
+import { SiteDetails, AddPages, ChooseStyles } from '../navigation-screens';
 
 export default function Layout() {
 	const [ theme, setTheme ] = useState();
@@ -39,6 +39,12 @@ export default function Layout() {
 								category={ category }
 								setCategory={ setCategory }
 								setTheme={ setTheme }
+							/>
+						</NavigatorScreen>
+						<NavigatorScreen path="/choose-styles">
+							<ChooseStyles
+								theme={ theme }
+								category={ category }
 							/>
 						</NavigatorScreen>
 						<NavigatorScreen path="/add-pages">

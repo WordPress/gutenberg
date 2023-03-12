@@ -12,6 +12,7 @@ import { Button, __experimentalVStack as VStack } from '@wordpress/components';
 
 export const onboardingSteps = [
 	{ label: __( 'Site details' ), path: '/site-details' },
+	{ label: __( 'Choose styles' ), path: '/choose-styles' },
 	{ label: __( 'Add pages' ), path: '/add-pages' },
 ];
 
