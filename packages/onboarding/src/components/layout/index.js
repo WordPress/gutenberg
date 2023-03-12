@@ -15,7 +15,7 @@ import { useState } from '@wordpress/element';
  */
 import Sidebar from '../sidebar';
 import SiteHub from '../site-hub';
-import { Main, SiteDetails, AddPages } from '../navigation-screens';
+import { SiteDetails, AddPages } from '../navigation-screens';
 
 export default function Layout() {
 	const [ theme, setTheme ] = useState();
@@ -34,9 +34,6 @@ export default function Layout() {
 				<FlexItem className="onboarding-layout__content" isBlock>
 					<div className="onboarding-layout__canvas">
 						<NavigatorScreen path="/">
-							<Main />
-						</NavigatorScreen>
-						<NavigatorScreen path="/site-details">
 							<SiteDetails
 								theme={ theme }
 								category={ category }
