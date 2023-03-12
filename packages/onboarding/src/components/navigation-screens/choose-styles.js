@@ -2,8 +2,15 @@
  * WordPress dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { StyleVariationsContainer } from '@wordpress/edit-site';
+import {
+	StyleVariationsContainer,
+	GlobalStylesProvider,
+} from '@wordpress/edit-site';
 
 export default function ChooseStyles() {
-	return <StyleVariationsContainer />;
+	return (
+		<GlobalStylesProvider>
+			<StyleVariationsContainer />
+		</GlobalStylesProvider>
+	);
 }

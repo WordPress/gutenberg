@@ -985,10 +985,10 @@ function updateConfigWithSeparator( config ) {
 				blocks: {
 					...config.styles.blocks,
 					'core/separator': {
-						...config.styles.blocks[ 'core/separator' ],
+						...config.styles.blocks?.[ 'core/separator' ],
 						color: {
-							...config.styles.blocks[ 'core/separator' ].color,
-							text: config.styles?.blocks[ 'core/separator' ]
+							...config.styles.blocks?.[ 'core/separator' ].color,
+							text: config.styles?.blocks?.[ 'core/separator' ]
 								.color.background,
 						},
 					},
