@@ -1,0 +1,30 @@
+.onboarding-theme-picker__item.onboarding-theme-picker__item {
+	height: auto;
+	position: relative;
+}
+
+.onboarding-theme-picker__item-img {
+	width: 100%;
+	border-radius: $radius-block-ui;
+	box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
+	&:hover {
+		box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+	}
+}
+
+.onboarding-theme-picker__item-title {
+	text-align: center;
+}
+
+.onboarding-theme-picker__item-indicator {
+	position: absolute;
+	top: $grid-unit-30;
+	right: $grid-unit-30;
+	width: $icon-size;
+	height: $icon-size;
+	border-radius: 50%;
+	background: $alert-green;
+	svg {
+		fill: $white;
+	}
+}

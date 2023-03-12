@@ -2,109 +2,88 @@
  * WordPress dependencies
  */
 import {
-	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalSpacer as Spacer,
 	__experimentalHeading as Heading,
 	__experimentalUseNavigator as useNavigator,
 	SelectControl,
 	Icon,
+	FlexItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { NavigationNextButton } from '../navigation-screens';
 import { onboardingSteps } from '../sidebar';
+import { ThemePicker } from '../theme-picker';
 
 const siteCategories = [
 	{ value: '', label: __( 'Select a category' ) },
+	{ value: 'blog', label: __( 'Blog' ) },
+	{ value: 'e-ecommerce', label: __( 'E-Commerce' ) },
+	{ value: 'education', label: __( 'Education' ) },
+	{ value: 'entertainment', label: __( 'Entertainment' ) },
+	{ value: 'holiday', label: __( 'Holiday' ) },
+	{ value: 'news', label: __( 'News' ) },
 	{ value: 'photography', label: __( 'Photography' ) },
-	{ value: 'fashion', label: __( 'Fashion' ) },
+	{ value: 'food-and-drink', label: __( 'Food & Drink' ) },
 	{
-		value: 'sports',
-		label: __( 'Sports' ),
+		value: 'portfolio',
+		label: __( 'Portfolio' ),
 	},
 ];
 
-export default function SiteDetails() {
+export default function SiteDetails( {
+	theme,
+	setTheme,
+	category,
+	setCategory,
+} ) {
 	const navigator = useNavigator();
-	const [ category, setCategory ] = useState( '' );
-	const { editEntityRecord, saveEditedEntityRecord } =
-		useDispatch( coreStore );
-	const title = useSelect( ( select ) => {
-		const { getEditedEntityRecord } = select( coreStore );
-		return getEditedEntityRecord( 'root', 'site' )?.title;
-	}, [] );
 	return (
-		<VStack className="" spacing={ 4 }>
-			<VStack alignment="center" spacing={ 4 }>
-				<Heading level={ 2 } size={ 28 }>
-					{ __( 'Welcome to your site!' ) }
-				</Heading>
-				<p>
-					{ __(
-						"Let's add some information that will help you get started!"
-					) }
-				</p>
-				<TextControl
-					label={ __( 'Add a title for your site' ) }
-					value={ title || '' }
-					onChange={ ( newTitle ) => {
-						editEntityRecord( 'root', 'site', undefined, {
-							title: newTitle,
-						} );
-					} }
-				/>
-			</VStack>
-			<Spacer />
-			<HStack alignment="center" align="baseline" spacing={ 10 }>
-				<VStack spacing={ 4 }>
-					<Heading level={ 2 } size={ 28 }>
+		<VStack spacing={ 8 } style={ { minHeight: '100%' } }>
+			<HStack spacing={ 4 } alignment="top">
+				<HStack alignment="left">
+					<Icon icon="clipboard" />
+					<Heading level={ 2 }>
 						{ __( "What's your website about?" ) }
 					</Heading>
-					<Icon icon="clipboard" size={ 96 } />
-				</VStack>
-				<VStack>
-					<p>
-						{ __(
-							"Choose a category that best describes your site's purpose."
-						) }
-					</p>
-					<SelectControl
-						__nextHasNoMarginBottom
-						options={ siteCategories }
-						value={ category }
-						label={ __( 'Search for a category' ) }
-						onChange={ ( newCategory ) =>
-							setCategory( newCategory.label )
-						}
-						help={ __(
-							'We will use this information to guide you towards the next steps.'
-						) }
-					/>
-					<NavigationNextButton
-						onClick={ () => {
-							const nextStep = onboardingSteps.findIndex(
-								( { path } ) => path === '/site-details'
-							);
-							if ( onboardingSteps[ nextStep + 1 ] ) {
-								navigator.goTo(
-									onboardingSteps[ nextStep + 1 ].path
-								);
-							}
-							saveEditedEntityRecord( 'root', 'site' );
-						} }
-					>
-						{ __( 'Next' ) }
-					</NavigationNextButton>
-				</VStack>
+				</HStack>
+
+				<SelectControl
+					__nextHasNoMarginBottom
+					options={ siteCategories }
+					value={ category }
+					label={ __( 'Search for a category' ) }
+					onChange={ ( newCategory ) => setCategory( newCategory ) }
+					help={ __(
+						'We will use this information to guide you towards the next steps.'
+					) }
+				/>
 			</HStack>
+			<FlexItem isBlock>
+				{ category && (
+					<ThemePicker
+						category={ category }
+						setTheme={ setTheme }
+						theme={ theme }
+					/>
+				) }
+			</FlexItem>
+			<NavigationNextButton
+				onClick={ () => {
+					const nextStep = onboardingSteps.findIndex(
+						( { path } ) => path === '/site-details'
+					);
+					if ( onboardingSteps[ nextStep + 1 ] ) {
+						navigator.goTo( onboardingSteps[ nextStep + 1 ].path );
+					}
+				} }
+			>
+				{ __( 'Next' ) }
+			</NavigationNextButton>
 		</VStack>
 	);
 }

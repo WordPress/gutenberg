@@ -8,6 +8,7 @@ import {
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,6 +18,9 @@ import SiteHub from '../site-hub';
 import { Main, SiteDetails, AddPages } from '../navigation-screens';
 
 export default function Layout() {
+	const [ theme, setTheme ] = useState();
+	const [ category, setCategory ] = useState();
+
 	return (
 		<NavigatorProvider className="onboarding-layout" initialPath="/">
 			<Flex justify="flex-start" align="stretch">
@@ -29,17 +33,20 @@ export default function Layout() {
 				</VStack>
 				<FlexItem className="onboarding-layout__content" isBlock>
 					<div className="onboarding-layout__canvas">
-						<div className="onboarding-layout__canvas-container">
-							<NavigatorScreen path="/">
-								<Main />
-							</NavigatorScreen>
-							<NavigatorScreen path="/site-details">
-								<SiteDetails />
-							</NavigatorScreen>
-							<NavigatorScreen path="/add-pages">
-								<AddPages />
-							</NavigatorScreen>
-						</div>
+						<NavigatorScreen path="/">
+							<Main />
+						</NavigatorScreen>
+						<NavigatorScreen path="/site-details">
+							<SiteDetails
+								theme={ theme }
+								category={ category }
+								setCategory={ setCategory }
+								setTheme={ setTheme }
+							/>
+						</NavigatorScreen>
+						<NavigatorScreen path="/add-pages">
+							<AddPages />
+						</NavigatorScreen>
 					</div>
 				</FlexItem>
 			</Flex>

@@ -1,5 +1,8 @@
 #wp-onboarding {
 	height: 100vh;
+	* {
+		box-sizing: border-box;
+	}
 }
 
 .onboarding-layout {
@@ -44,8 +47,9 @@
 		width: calc(100% - #{$canvas-padding});
 		border-radius: $radius-block-ui * 4;
 	}
-}
 
-.onboarding-layout__canvas-container {
-	padding: $grid-unit-30;
+	> div {
+		padding: $grid-unit-30;
+		height: 100%;
+	}
 }
