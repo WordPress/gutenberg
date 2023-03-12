@@ -1,0 +1,26 @@
+.onboarding-sidebar {
+	padding: $grid-unit-30;
+	width: 100%;
+}
+
+.onboarding-sidebar__title {
+	margin-bottom: $grid-unit-30;
+	color: inherit;
+}
+
+.onboarding-sidebar__steps {
+	margin-top: $grid-unit-80;
+}
+
+.onboarding-sidebar__item.components-button {
+	color: inherit;
+	padding: $grid-unit-20 0;
+	border-bottom: 1px solid $gray-700;
+	height: auto;
+
+	&[aria-disabled="true"],
+	&:disabled {
+		text-decoration: line-through;
+		opacity: 0.6;
+	}
+}
