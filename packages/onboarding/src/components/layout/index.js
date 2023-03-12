@@ -20,6 +20,10 @@ import { SiteDetails, AddPages, ChooseStyles } from '../navigation-screens';
 export default function Layout() {
 	const [ theme, setTheme ] = useState();
 	const [ category, setCategory ] = useState();
+	let step = 1;
+	if ( theme ) {
+		step = 2;
+	}
 
 	return (
 		<NavigatorProvider className="onboarding-layout" initialPath="/">
@@ -29,7 +33,7 @@ export default function Layout() {
 					alignment="topLeft"
 				>
 					<SiteHub />
-					<Sidebar />
+					<Sidebar step={ step } />
 				</VStack>
 				<FlexItem className="onboarding-layout__content" isBlock>
 					<div className="onboarding-layout__canvas">
