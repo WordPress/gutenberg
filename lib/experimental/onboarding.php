@@ -131,8 +131,23 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 		return new WP_Error( 'theme.json could not be encoded to JSON.');
 	}
 
+	global $wpdb;
+	/*
+	 * This code tries to save data in the database (theme.json, templates, and parts) in a single transaction.
+	 * If any of the steps fails, the transaction is rolled back and nothing is saved to the database.
+	 *
+	 * There is no need to disable autocommit mode, as per:
+	 * - mysql 5.7 https://dev.mysql.com/doc/refman/5.7/en/commit.html
+	 *   "To disable autocommit mode implicitly for a single series of statements, use the START TRANSACTION statement".
+	 * - mariadb (unknown version) https://mariadb.com/kb/en/start-transaction/
+	 *   TODO: CHECK THAT THE MARIADB VERSION 10.3 AND ABOVE MANAGES AUTOMATCALLY AUTOCOMMIT IN A TRANSACTION.
+	 *   "To disable autocommit mode for a single series of statements, use the START TRANSACTION statement."
+	 *
+	 */
+	$wpdb->query( 'START TRANSACTION' );
 	$post_id = wp_update_post( $user_cpt, true, false );
 	if ( is_wp_error( $post_id ) ) {
+		$wpdb->query( 'ROLLBACK' );
 		return $post_id;
 	}
 
@@ -142,11 +157,13 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 	$templates_dir = $unzip_dir . '/' . $theme_slug . '/templates';
 	// TODO: is there other templates directory to be checked?
 	if ( ! file_exists( $templates_dir ) ) {
+		$wpdb->query( 'ROLLBACK' );
 		return new WP_Error( 'Templates directory not found at ' . $templates_dir );
 	}
 
 	$template_files = glob( "$templates_dir/*.html" );
 	if ( false === $template_files ) {
+		$wpdb->query( 'ROLLBACK' );
 		return new WP_Error( 'No template files at ' . $templates_dir );
 	}
 
@@ -164,6 +181,7 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 		);
 		$result = wp_insert_post( $template_cpt, true );
 		if ( is_wp_error( $result ) ) {
+			$wpdb->query( 'ROLLBACK' );
 			return $result;
 		}
 	}
@@ -174,11 +192,13 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 	$parts_dir = $unzip_dir . '/' . $theme_slug . '/parts';
 	// TODO: is there other parts directory to be checked?
 	if ( ! file_exists( $parts_dir ) ) {
+		$wpdb->query( 'ROLLBACK' );
 		return new WP_Error( 'Parts directory not found at ' . $parts_dir );
 	}
 
 	$part_files = glob( "$parts_dir/*.html" );
 	if ( false === $part_files ) {
+		$wpdb->query( 'ROLLBACK' );
 		return new WP_Error( 'No part files at ' . $parts_dir );
 	}
 
@@ -197,16 +217,14 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 		);
 		$result = wp_insert_post( $part_cpt, true );
 		if ( is_wp_error( $result ) ) {
+			$wpdb->query( 'ROLLBACK' );
 			return $result;
 		}
 	}
 
 	// TODO: STARTER CONTENT.
 
-	// TODO: ERROR MANAGEMENT.
-	// It's probably best to save theme.json, templates, and parts to the database all in the same transaction.
-	// If one of them fails saving, rollback so none is saved.
-	// Avoid a partial save where some things succeded and others failed.
+	$wpdb->query( 'COMMIT' );
 
 	return true;
 }
