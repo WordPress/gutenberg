@@ -140,7 +140,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *                           Default 'default'.
 	 * @return array Returns the modified $theme_json_structure.
 	 */
-	protected static function translate( $theme_json, $domain = 'default' ) {
+	public static function translate( $theme_json, $domain = 'default' ) {
 		if ( null === static::$i18n_schema ) {
 			$i18n_schema         = wp_json_file_decode( __DIR__ . '/theme-i18n.json' );
 			static::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
