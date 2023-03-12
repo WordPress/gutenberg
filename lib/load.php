@@ -50,6 +50,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 6.3 compat.
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-pattern-directory-controller-6-3.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/class-themes-directory-templates.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-templates-controller-6-3.php';
 	require_once __DIR__ . '/compat/wordpress-6.3/rest-api.php';
 

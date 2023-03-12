@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -39,11 +39,15 @@ export default function useEditedEntityRecord( postType, postId ) {
 		[ postType, postId ]
 	);
 
+	const { editEntityRecord } = useDispatch( coreStore );
+
 	return {
 		isLoaded,
 		record,
 		getTitle: () => ( title ? decodeEntities( title ) : null ),
 		getDescription: () =>
 			description ? decodeEntities( description ) : null,
+		editRecord: ( edits ) =>
+			editEntityRecord( 'postType', postType, postId, edits ),
 	};
 }

@@ -11,6 +11,8 @@
 function gutenberg_register_rest_pattern_directory() {
 	$pattern_directory_controller = new Gutenberg_REST_Pattern_Directory_Controller_6_3();
 	$pattern_directory_controller->register_routes();
+	$theme_directory_templates = new Themes_Directory_Templates();
+	$theme_directory_templates->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
 
