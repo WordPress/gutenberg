@@ -6,11 +6,14 @@ import {
 	StyleVariationsContainer,
 	GlobalStylesProvider,
 } from '@wordpress/edit-site';
+import { BlockEditorProvider } from '@wordpress/block-editor';
 
 export default function ChooseStyles() {
 	return (
 		<GlobalStylesProvider>
-			<StyleVariationsContainer />
+			<BlockEditorProvider>
+				<StyleVariationsContainer />
+			</BlockEditorProvider>
 		</GlobalStylesProvider>
 	);
 }
