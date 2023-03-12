@@ -45,13 +45,13 @@ export default function Layout() {
 								setTheme={ setTheme }
 							/>
 						</NavigatorScreen>
-						<NavigatorScreen path="/choose-styles">
+						<NavigatorScreen path="/step/2">
 							<ChooseStyles
 								theme={ theme }
 								category={ category }
 							/>
 						</NavigatorScreen>
-						<NavigatorScreen path="/add-pages">
+						<NavigatorScreen path="/step/3">
 							<AddPages />
 						</NavigatorScreen>
 					</div>

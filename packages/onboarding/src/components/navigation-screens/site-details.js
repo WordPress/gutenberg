@@ -5,18 +5,14 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
-	__experimentalUseNavigator as useNavigator,
 	SelectControl,
 	Icon,
-	FlexItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { NavigationNextButton } from '../navigation-screens';
-import { onboardingSteps } from '../sidebar';
 import { ThemePicker } from '../theme-picker';
 
 const siteCategories = [
@@ -41,9 +37,8 @@ export default function SiteDetails( {
 	category,
 	setCategory,
 } ) {
-	const navigator = useNavigator();
 	return (
-		<VStack spacing={ 8 } style={ { minHeight: '100%' } }>
+		<VStack spacing={ 8 }>
 			<HStack spacing={ 4 } alignment="top">
 				<HStack alignment="left">
 					<Icon icon="clipboard" />
@@ -63,27 +58,13 @@ export default function SiteDetails( {
 					) }
 				/>
 			</HStack>
-			<FlexItem isBlock>
-				{ category && (
-					<ThemePicker
-						category={ category }
-						setTheme={ setTheme }
-						theme={ theme }
-					/>
-				) }
-			</FlexItem>
-			<NavigationNextButton
-				onClick={ () => {
-					const nextStep = onboardingSteps.findIndex(
-						( { path } ) => path === '/site-details'
-					);
-					if ( onboardingSteps[ nextStep + 1 ] ) {
-						navigator.goTo( onboardingSteps[ nextStep + 1 ].path );
-					}
-				} }
-			>
-				{ __( 'Next' ) }
-			</NavigationNextButton>
+			{ category && (
+				<ThemePicker
+					category={ category }
+					setTheme={ setTheme }
+					theme={ theme }
+				/>
+			) }
 		</VStack>
 	);
 }

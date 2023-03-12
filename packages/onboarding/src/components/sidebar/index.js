@@ -8,7 +8,12 @@ import classnames from 'classnames';
  */
 import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	Button,
+	__experimentalVStack as VStack,
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalUseNavigator as useNavigator,
+} from '@wordpress/components';
 
 export const onboardingSteps = [
 	{ label: __( 'Site details' ), path: '/site-details' },
@@ -32,6 +37,11 @@ function SidebarItem( { activeStep, step, children } ) {
 }
 
 function Sidebar( { step = 1 } ) {
+	const { location } = useNavigator();
+	const currentStep = location.path.startsWith( '/step/' )
+		? location.path.substr( 6 )
+		: 1;
+
 	return (
 		<div className="onboarding-sidebar">
 			<h1 className="onboarding-sidebar__title">
@@ -50,6 +60,15 @@ function Sidebar( { step = 1 } ) {
 					{ __( 'Launch' ) }
 				</SidebarItem>
 			</VStack>
+
+			<NavigatorButton
+				className="onboarding-sitebar__next-button"
+				variant="primary"
+				path={ `/step/${ currentStep + 1 }` }
+				disabled={ currentStep >= step }
+			>
+				{ __( 'Next' ) }
+			</NavigatorButton>
 		</div>
 	);
 }
