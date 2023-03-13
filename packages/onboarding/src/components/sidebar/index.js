@@ -69,9 +69,7 @@ function Sidebar( { step = 1 } ) {
 				path={ `/step/${ currentStep + 1 }` }
 				disabled={ currentStep >= step }
 			>
-				{ currentStep + 1 === finalStep
-					? __( 'Launch' )
-					: __( 'Next' ) }
+				{ currentStep + 1 >= finalStep ? __( 'Launch' ) : __( 'Next' ) }
 			</NavigatorButton>
 		</div>
 	);
