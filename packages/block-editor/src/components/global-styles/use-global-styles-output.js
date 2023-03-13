@@ -973,10 +973,10 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
  */
 function updateConfigWithSeparator( config ) {
 	const needsSeparatorStyleUpdate =
-		config.styles?.blocks[ 'core/separator' ] &&
-		config.styles?.blocks[ 'core/separator' ].color?.background &&
-		! config.styles?.blocks[ 'core/separator' ].color?.text &&
-		! config.styles?.blocks[ 'core/separator' ].border?.color;
+		config.styles?.blocks?.[ 'core/separator' ] &&
+		config.styles?.blocks?.[ 'core/separator' ].color?.background &&
+		! config.styles?.blocks?.[ 'core/separator' ].color?.text &&
+		! config.styles?.blocks?.[ 'core/separator' ].border?.color;
 	if ( needsSeparatorStyleUpdate ) {
 		return {
 			...config,
