@@ -4,11 +4,20 @@
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Button } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 export default function Launch( { theme, category, variation } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const globalStylesId = useSelect( ( select ) => {
+		return select( coreStore ).__experimentalGetCurrentGlobalStylesId();
+	}, [] );
 
 	useEffect( () => {
+		if ( ! globalStylesId ) {
+			return;
+		}
 		async function installThemeAndVariation() {
 			setIsLoading( true );
 			await apiFetch( {
@@ -17,10 +26,15 @@ export default function Launch( { theme, category, variation } ) {
 					theme,
 				method: 'POST',
 			} );
+			await saveEntityRecord( 'root', 'globalStyles', {
+				id: globalStylesId,
+				styles: variation.styles,
+				settings: variation.settings,
+			} );
 			setIsLoading( false );
 		}
 		installThemeAndVariation();
-	}, [ theme, variation ] );
+	}, [ globalStylesId, theme, variation, saveEntityRecord ] );
 
 	if ( isLoading ) {
 		return <p>Loading...</p>;
@@ -31,7 +45,7 @@ export default function Launch( { theme, category, variation } ) {
 			<p>Theme: { theme }</p>
 			<p>Category: { category }</p>
 			<p>Variation: { variation?.title }</p>
-			<Button variant="primary" href="/site-editor.php">
+			<Button variant="primary" href="site-editor.php">
 				Customize your site
 			</Button>
 		</div>
