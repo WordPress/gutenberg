@@ -81,7 +81,7 @@ add_action( 'admin_menu', 'remove_themes_menu', 999 );
  */
 function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templates', 'parts' ) ) {
 	$url      = "https://raw.githubusercontent.com/ellatrix/block-themes-directory/main/by-theme/${theme_slug}.json";
-	$response = json_decode( wp_remote_retrieve_body( wp_remote_get( $url ) ) );
+	$response = json_decode( wp_remote_retrieve_body( wp_remote_get( $url ) ), true );
 
 	global $wpdb;
 	/*
@@ -113,6 +113,7 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 			wp_delete_post( $existing_json->ID, true );
 		}
 
+		$wp_get_theme             = wp_get_theme();
 		$theme_json_data          = $response['theme.json'];
 		$theme_json_data          = WP_Theme_JSON_Resolver_Gutenberg::translate( $theme_json_data, $wp_get_theme->get( 'TextDomain' ) );
 		$theme_json               = new WP_Theme_JSON_Gutenberg( $theme_json_data, 'custom' );
@@ -144,17 +145,17 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 			wp_delete_post( $existing_template->ID, true );
 		}
 
-		foreach ( $response->templates as $template ) {
+		foreach ( $response['templates'] as $template ) {
 			 // TODO: preprocess (translate? escape? etc.)
-			$post_content = _inject_theme_attribute_in_block_template_content_override( $template->html );
+			$post_content = _inject_theme_attribute_in_block_template_content_override( $template['html'] );
 			if ( null === $post_content ) { // this contains a pattern
 				continue;
 			}
 			$template_cpt = array(
 				'post_type'    => 'wp_template',
 				'post_status'  => 'publish',
-				'post_title'   => $template->name,
-				'post_name'    => $template->name,
+				'post_title'   => $template['name'],
+				'post_name'    => $template['name'],
 				'post_content' => $post_content,
 				'post_author'  => get_current_user_id(), // TODO: is this the right user?
 				'tax_input'    => array(
@@ -184,17 +185,17 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 			wp_delete_post( $existing_part->ID, true );
 		}
 
-		foreach ( $response->parts as $part ) {
+		foreach ( $response['parts'] as $part ) {
 			// TODO: preprocess (translate? escape? etc.)
-			$post_content = _inject_theme_attribute_in_block_template_content_override( $part->html );
+			$post_content = _inject_theme_attribute_in_block_template_content_override( $part['html'] );
 			if ( null === $post_content ) {
 				continue;
 			}
 			$part_cpt = array(
 				'post_type'    => 'wp_template_part',
 				'post_status'  => 'publish',
-				'post_title'   => $part->name,
-				'post_name'    => $part->name,
+				'post_title'   => $part['name'],
+				'post_name'    => $part['name'],
 				'post_content' => $post_content,
 				'post_author'  => get_current_user_id(), // TODO: is this the right user?
 				'tax_input'    => array(
