@@ -60,7 +60,7 @@ class Gutenberg_Rest_Themes_Directory_Saving extends WP_REST_Controller {
 		return rest_ensure_response( true );
 	}
 
-	public function update_items_permission_check() {
+	public function update_items_permissions_check() {
 		return current_user_can( 'edit_theme_options' );
 	}
 
