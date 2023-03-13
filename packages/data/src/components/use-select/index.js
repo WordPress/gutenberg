@@ -145,6 +145,7 @@ function Store( registry, suspense ) {
 			if ( ! isShallowEqual( lastMapResult, mapResult ) ) {
 				lastMapResult = mapResult;
 			}
+			lastMapSelect = mapSelect;
 			lastMapResultValid = true;
 		}
 
@@ -165,7 +166,6 @@ function Store( registry, suspense ) {
 		updateValue();
 
 		lastIsAsync = isAsync;
-		lastMapSelect = mapSelect;
 
 		// Return a pair of functions that can be passed to `useSyncExternalStore`.
 		return { subscribe: subscriber.subscribe, getValue };
