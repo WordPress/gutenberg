@@ -180,12 +180,17 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 		}
 
 		foreach ( $template_files as $template_file ) {
+			 // TODO: preprocess (translate? escape? etc.)
+			$post_content = _inject_theme_attribute_in_block_template_content_override( file_get_contents( $template_file ) );
+			if ( null === $post_content ) { // this contains a pattern
+				continue;
+			}
 			$template_cpt = array(
 				'post_type'    => 'wp_template',
 				'post_status'  => 'publish',
 				'post_title'   => basename( $template_file, '.html' ),
 				'post_name'    => basename( $template_file, '.html' ),
-				'post_content' => _inject_theme_attribute_in_block_template_content_override( file_get_contents( $template_file ) ), // TODO: preprocess (translate? escape? etc.)
+				'post_content' => $post_content,
 				'post_author'  => get_current_user_id(), // TODO: is this the right user?
 				'tax_input'    => array(
 					'wp_theme' => array( 'emptytheme' ), // The base theme.
@@ -217,12 +222,17 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 		}
 
 		foreach ( $part_files as $part_file ) {
+			 // TODO: preprocess (translate? escape? etc.)
+			$post_content = _inject_theme_attribute_in_block_template_content_override(file_get_contents( $part_file ));
+			if ( null === $post_content ) {
+				continue;
+			}
 			$part_cpt = array(
 				'post_type'    => 'wp_template_part',
 				'post_status'  => 'publish',
 				'post_title'   => basename( $part_file, '.html' ),
 				'post_name'    => basename( $part_file, '.html' ),
-				'post_content' => _inject_theme_attribute_in_block_template_content_override(file_get_contents( $part_file )), // TODO: preprocess (translate? escape? etc.)
+				'post_content' => $post_content,
 				'post_author'  => get_current_user_id(), // TODO: is this the right user?
 				'tax_input'    => array(
 					'wp_theme'           => array( 'emptytheme' ), // The base theme.
