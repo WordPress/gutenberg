@@ -101,6 +101,8 @@ body.block-editor-page {
 
 .interface-interface-skeleton__header {
 	@supports (scrollbar-gutter: stable) {
+		// The scrollbar-gutter property ensures space is reserved for the scrollbar to appear,
+		// when scrollbars are set to be always visible. This ensure icons stay visually aligned.
 		scrollbar-gutter: stable;
 		overflow: hidden;
 	}
