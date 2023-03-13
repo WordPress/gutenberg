@@ -3,6 +3,7 @@
  */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { View } from '@wordpress/primitives';
 
 const TEMPLATE = [
 	[
@@ -22,7 +23,7 @@ function DetailsContentEdit() {
 		templateLock: false,
 	} );
 
-	return <div { ...innerBlocksProps }></div>;
+	return <View { ...innerBlocksProps }></View>;
 }
 
 export default DetailsContentEdit;
