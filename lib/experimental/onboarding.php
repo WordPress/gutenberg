@@ -146,7 +146,6 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 		}
 
 		foreach ( $response['templates'] as $template ) {
-			 // TODO: preprocess (translate? escape? etc.)
 			$post_content = _inject_theme_attribute_in_block_template_content_override( $template['html'] );
 			if ( null === $post_content ) { // this contains a pattern
 				continue;
@@ -157,9 +156,9 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 				'post_title'   => $template['name'],
 				'post_name'    => $template['name'],
 				'post_content' => $post_content,
-				'post_author'  => get_current_user_id(), // TODO: is this the right user?
+				'post_author'  => get_current_user_id(),
 				'tax_input'    => array(
-					'wp_theme' => array( 'emptytheme' ), // The base theme.
+					'wp_theme' => array( 'emptytheme' ),
 				),
 			);
 			$result       = wp_insert_post( $template_cpt, true );
@@ -185,8 +184,15 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 			wp_delete_post( $existing_part->ID, true );
 		}
 
+		$parts_meta = array();
+		foreach( $response['theme.json']['templateParts'] as $item ) {
+			$parts_meta[ $item['name'] ] = array(
+				'area'  => $item['area'],
+				'title' => $item['title'],
+			);
+		}
+
 		foreach ( $response['parts'] as $part ) {
-			// TODO: preprocess (translate? escape? etc.)
 			$post_content = _inject_theme_attribute_in_block_template_content_override( $part['html'] );
 			if ( null === $post_content ) {
 				continue;
@@ -194,13 +200,13 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 			$part_cpt = array(
 				'post_type'    => 'wp_template_part',
 				'post_status'  => 'publish',
-				'post_title'   => $part['name'],
+				'post_title'   => $parts_meta[ $part['name'] ]['title'],
 				'post_name'    => $part['name'],
 				'post_content' => $post_content,
-				'post_author'  => get_current_user_id(), // TODO: is this the right user?
+				'post_author'  => get_current_user_id(),
 				'tax_input'    => array(
-					'wp_theme'              => array( 'emptytheme' ), // The base theme.
-					'wp_template_part_area' => WP_TEMPLATE_PART_AREA_UNCATEGORIZED, // TODO: categorize.
+					'wp_theme'              => array( 'emptytheme' ),
+					'wp_template_part_area' => _filter_block_template_part_area( $parts_meta[ $part['name'] ]['area'] ),
 				),
 			);
 			$result   = wp_insert_post( $part_cpt, true );
