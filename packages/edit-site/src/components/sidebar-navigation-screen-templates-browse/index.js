@@ -19,7 +19,7 @@ const config = {
 	wp_template_part: {
 		title: __( 'All template parts' ),
 		description: __(
-			'Create new template parts, or reset any customisations made to the template parts supplied by your theme.'
+			'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
 		),
 	},
 };
