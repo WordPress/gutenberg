@@ -17,6 +17,12 @@
 	.edit-site-layout.is-full-canvas.is-edit-mode & {
 		width: auto;
 		padding-right: 0;
+		height: $header-height;
+
+		.edit-site-site-hub__view-mode-toggle-container {
+			height: $header-height;
+			width: $header-height;
+		}
 	}
 
 	@include break-medium {

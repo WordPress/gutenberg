@@ -4,6 +4,7 @@
 
 	.components-navigator-screen {
 		@include custom-scrollbars-on-hover;
+		scrollbar-gutter: auto;
 	}
 }
 
