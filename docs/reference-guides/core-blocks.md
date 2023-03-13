@@ -244,7 +244,7 @@ A block that displays a summary and shows or hides additional content. ([Source]
 
 ## Details Content
 
-The content inside the details is hidden until the details are expanded. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-content))
+Add content that may be shown or hidden via a Details block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-content))
 
 -	**Name:** core/details-content
 -	**Category:** text
@@ -253,7 +253,7 @@ The content inside the details is hidden until the details are expanded. ([Sourc
 
 ## Details Summary
 
-Clicking on the summary will show or hide the content inside the details. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-summary))
+Provide summary text used to toggle the display of content inside a Details block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-summary))
 
 -	**Name:** core/details-summary
 -	**Category:** text

@@ -6,7 +6,7 @@
 	"title": "Details Content",
 	"category": "text",
 	"parent": [ "core/details" ],
-	"description": "The content inside the details is hidden until the details are expanded.",
+	"description": "Add content that may be shown or hidden via a Details block.",
 	"textdomain": "default",
 	"supports": {
 		"align": false,

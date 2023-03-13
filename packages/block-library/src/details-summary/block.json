@@ -6,7 +6,7 @@
 	"title": "Details Summary",
 	"category": "text",
 	"parent": [ "core/details" ],
-	"description": "Clicking on the summary will show or hide the content inside the details.",
+	"description": "Provide summary text used to toggle the display of content inside a Details block.",
 	"textdomain": "default",
 	"attributes": {
 		"summary": {
