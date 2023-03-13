@@ -95,11 +95,11 @@ function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
 /**
  * Transform given preset tree into a set of preset class declarations.
  *
- * @param {string} blockSelector
- * @param {Object} blockPresets
+ * @param {?string} blockSelector
+ * @param {Object}  blockPresets
  * @return {string} CSS declarations for the preset classes.
  */
-function getPresetsClasses( blockSelector, blockPresets = {} ) {
+function getPresetsClasses( blockSelector = '*', blockPresets = {} ) {
 	return PRESET_METADATA.reduce(
 		( declarations, { path, cssVarInfix, classes } ) => {
 			if ( ! classes ) {
