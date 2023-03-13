@@ -28,6 +28,8 @@ export type BasePaletteEdit = {
 	/**
 	 * Whether the user can only change the color or gradient values.
 	 * If true, they cannot change names or delete values.
+	 *
+	 * @default false
 	 */
 	canOnlyChangeValues?: boolean;
 	/**
