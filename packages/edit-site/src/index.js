@@ -108,3 +108,4 @@ export { default as StyleVariationsContainer } from './components/global-styles/
 export { GlobalStylesProvider } from './components/global-styles/global-styles-provider';
 export { default as StyleBook } from './components/style-book';
 export { GlobalStylesRenderer } from './components/global-styles-renderer';
+export { store } from './store';
