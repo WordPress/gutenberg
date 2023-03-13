@@ -32,6 +32,8 @@ export type BasePaletteEdit = {
 	canOnlyChangeValues?: boolean;
 	/**
 	 * Whether the user can reset the editor.
+	 *
+	 * @default false
 	 */
 	canReset?: boolean;
 	/**
