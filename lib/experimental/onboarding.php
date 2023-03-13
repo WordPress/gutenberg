@@ -80,6 +80,10 @@ add_action( 'admin_menu', 'remove_themes_menu', 999 );
  * @return boolean|WP_Error True on success, WP_Error on failure.
  */
 function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templates', 'parts' ) ) {
+	if ( ! function_exists( 'themes_api' ) ) {
+		require_once( ABSPATH . 'wp-admin/includes/theme.php' );
+	}
+
 	/*
 	 * 1. Download ZIP.
 	 */
