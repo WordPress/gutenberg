@@ -99,12 +99,11 @@ const GradientTypePicker = ( {
 		);
 	};
 
-	const handleOnChange = ( next: string | string[] ) => {
-		const nextValue = Array.isArray( next ) ? next[ 0 ] : next;
-		if ( nextValue === 'linear-gradient' ) {
+	const handleOnChange = ( next: string ) => {
+		if ( next === 'linear-gradient' ) {
 			onSetLinearGradient();
 		}
-		if ( nextValue === 'radial-gradient' ) {
+		if ( next === 'radial-gradient' ) {
 			onSetRadialGradient();
 		}
 	};
