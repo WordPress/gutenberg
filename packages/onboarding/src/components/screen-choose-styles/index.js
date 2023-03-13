@@ -17,7 +17,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
-export default function ChooseStyles( { setVariation } ) {
+
+export default function ScreenChooseStyles( { setVariation } ) {
 	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 	const [ , onReset ] = useGlobalStylesReset();
 	useEffect( onReset, [ onReset ] );
@@ -26,9 +27,9 @@ export default function ChooseStyles( { setVariation } ) {
 			justify="flex-start"
 			align="stretch"
 			gap={ 8 }
-			className="onboarding-choose-styles"
+			className="onboarding-screen-choose-styles"
 		>
-			<FlexItem className="onboarding-styles-list-container">
+			<FlexItem className="onboarding-screen-choose-styles__variations">
 				<VStack>
 					<Heading level={ 2 }>{ __( 'Choose your style' ) }</Heading>
 					<p>
@@ -39,13 +40,12 @@ export default function ChooseStyles( { setVariation } ) {
 				</VStack>
 				<StyleVariationsContainer onSelect={ setVariation } />
 			</FlexItem>
-			<FlexItem isBlock className="onboarding-style-book">
+			<FlexItem
+				isBlock
+				className="onboarding-screen-choose-styles__stylebook"
+			>
 				<StyleBook.Slot>
-					{ ( [ styleBook ] ) => (
-						<div className="onboarding-style-book__container">
-							{ styleBook }
-						</div>
-					) }
+					{ ( [ styleBook ] ) => <div>{ styleBook }</div> }
 				</StyleBook.Slot>
 			</FlexItem>
 		</Flex>

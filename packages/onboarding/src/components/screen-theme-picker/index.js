@@ -31,7 +31,7 @@ const siteCategories = [
 	},
 ];
 
-export default function SiteDetails( {
+export default function ScreenThemePicker( {
 	theme,
 	setTheme,
 	category,

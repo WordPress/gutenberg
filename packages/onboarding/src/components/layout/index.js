@@ -23,8 +23,10 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
  */
 import Sidebar from '../sidebar';
 import SiteHub from '../site-hub';
-import { SiteDetails, ChooseStyles, Launch } from '../navigation-screens';
 import { useSelect } from '@wordpress/data';
+import ScreenChooseStyles from '../screen-choose-styles';
+import ScreenThemePicker from '../screen-theme-picker';
+import ScreenLaunch from '../screen-launch';
 
 export default function Layout() {
 	const settings = useSelect(
@@ -61,7 +63,7 @@ export default function Layout() {
 						>
 							<div className="onboarding-layout__canvas">
 								<NavigatorScreen path="/">
-									<SiteDetails
+									<ScreenThemePicker
 										theme={ theme }
 										category={ category }
 										setCategory={ setCategory }
@@ -70,7 +72,7 @@ export default function Layout() {
 								</NavigatorScreen>
 
 								<NavigatorScreen path="/step/2">
-									<ChooseStyles
+									<ScreenChooseStyles
 										theme={ theme }
 										category={ category }
 										variation={ variation }
@@ -82,7 +84,7 @@ export default function Layout() {
 									onSelect={ () => {} }
 								/>
 								<NavigatorScreen path="/step/3">
-									<Launch
+									<ScreenLaunch
 										theme={ theme }
 										category={ category }
 										variation={ variation }

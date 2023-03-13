@@ -7,7 +7,7 @@ import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
-export default function Launch( { theme, category, variation } ) {
+export default function ScreenLaunch( { theme, category, variation } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const globalStylesId = useSelect( ( select ) => {
@@ -37,7 +37,7 @@ export default function Launch( { theme, category, variation } ) {
 	}, [ globalStylesId, theme, variation, saveEntityRecord ] );
 
 	if ( isLoading ) {
-		return <p>Loading...</p>;
+		return <div>Launching...</div>;
 	}
 	return (
 		<div>
