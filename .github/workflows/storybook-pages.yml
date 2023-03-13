@@ -16,7 +16,7 @@ jobs:
               with:
                   ref: trunk
 
-            - name: Setup Node and install dependencies
+            - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
             - name: Build Storybook

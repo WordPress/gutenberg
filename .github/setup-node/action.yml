@@ -1,43 +1,35 @@
-name: 'Setup Node'
-description: 'Setup node and install dependencies with caching support'
+name: 'Setup Node.js and install npm dependencies'
+description: 'Configure Node.js and install npm dependencies while managing all aspects of caching.'
 inputs:
     node-version:
-        description: 'Optional node version to pass to setup-node'
+        description: 'Optional. The Node.js version to use. When not specified, the version specified in .nvmrc will be used.'
         required: false
         type: string
 
 runs:
     using: 'composite'
     steps:
-        - name: Use desired version of NodeJS from input
-          if: ${{ inputs.node-version != '' }}
-          uses: actions/setup-node@v3
+        - name: Use desired version of Node.js
+          uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
           with:
+              node-version-file: '.nvmrc'
               node-version: ${{ inputs.node-version }}
               cache: npm
 
-        - name: Use desired version of NodeJS from .nvmrc
-          if: ${{ inputs.node-version == '' }}
-          uses: actions/setup-node@v3
-          with:
-              node-version-file: '.nvmrc'
-              cache: npm
-
-        - name: Get node and npm version
-          id: node-npm-version
+        - name: Get Node.js and npm version
+          id: node-version
           run: |
               echo "NODE_VERSION=$(node -v)" >> $GITHUB_OUTPUT
-              echo "NPM_VERSION=$(npm -v)" >> $GITHUB_OUTPUT
           shell: bash
 
         - name: Cache node_modules
           id: cache-node_modules
-          uses: actions/cache@v3
+          uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
           with:
               path: '**/node_modules'
-              key: node_modules-${{ runner.os }}-${{ steps.node-npm-version.outputs.NODE_VERSION }}/${{ steps.node-npm-version.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
+              key: node_modules-${{ runner.os }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
 
-        - name: Npm install
+        - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
           run: npm ci
           shell: bash

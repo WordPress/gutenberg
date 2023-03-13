@@ -19,7 +19,7 @@ jobs:
               with:
                   ref: trunk
 
-            - name: Use desired version of NodeJS
+            - name: Use desired version of Node.js
               uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version: ${{ matrix.node }}

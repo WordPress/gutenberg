@@ -31,7 +31,7 @@ jobs:
                   distribution: 'temurin'
                   java-version: '11'
 
-            - name: Setup Node and install dependencies
+            - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
             - name: Gradle cache
