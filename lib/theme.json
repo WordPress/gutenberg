@@ -352,6 +352,21 @@
 							}
 						}
 					]
+				},
+				"grid": {
+					"name": "grid",
+					"slug": "grid",
+					"className": "is-layout-grid",
+					"displayMode": "grid",
+					"baseStyles": [],
+					"spacingStyles": [
+						{
+							"selector": "",
+							"rules": {
+								"gap": null
+							}
+						}
+					]
 				}
 			}
 		},
