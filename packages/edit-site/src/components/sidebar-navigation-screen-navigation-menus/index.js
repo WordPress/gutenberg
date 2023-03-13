@@ -2,9 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
@@ -14,26 +13,17 @@ import { createBlock } from '@wordpress/blocks';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useHistory } from '../routes';
 import NavigationMenuContent from './navigation-menu-content';
-import { NavigationMenuLoader } from './loader';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 
 const noop = () => {};
-const NAVIGATION_MENUS_QUERY = {
-	per_page: 1,
-	status: 'publish',
-	order: 'desc',
-	orderby: 'date',
-};
 
 function SidebarNavigationScreenWrapper( { children, actions } ) {
 	return (
 		<SidebarNavigationScreen
-			title={ __( 'Navigation' ) }
+			title={ __( 'Pages' ) }
 			actions={ actions }
-			description={ __(
-				'Browse your site, edit pages, and manage your primary navigation menu.'
-			) }
+			description={ __( 'Browse your site and edit pages.' ) }
 			content={ children }
 		/>
 	);
@@ -41,36 +31,14 @@ function SidebarNavigationScreenWrapper( { children, actions } ) {
 
 export default function SidebarNavigationScreenNavigationMenus() {
 	const history = useHistory();
-	const { navigationMenus, hasResolvedNavigationMenus, storedSettings } =
-		useSelect( ( select ) => {
-			const { getSettings } = unlock( select( editSiteStore ) );
-			const { getEntityRecords, hasFinishedResolution } =
-				select( coreStore );
+	const { storedSettings } = useSelect( ( select ) => {
+		const { getSettings } = unlock( select( editSiteStore ) );
+		return {
+			storedSettings: getSettings( false ),
+		};
+	}, [] );
 
-			const navigationMenusQuery = [
-				'postType',
-				'wp_navigation',
-				NAVIGATION_MENUS_QUERY,
-			];
-			return {
-				storedSettings: getSettings( false ),
-				navigationMenus: getEntityRecords( ...navigationMenusQuery ),
-				hasResolvedNavigationMenus: hasFinishedResolution(
-					'getEntityRecords',
-					navigationMenusQuery
-				),
-			};
-		}, [] );
-
-	const firstNavigationMenu = navigationMenus?.[ 0 ]?.id;
-	const blocks = useMemo( () => {
-		return [
-			createBlock( 'core/navigation', { ref: firstNavigationMenu } ),
-		];
-	}, [ firstNavigationMenu ] );
-
-	const isLoading = ! hasResolvedNavigationMenus;
-	const hasNavigationMenus = !! navigationMenus?.length;
+	const blocks = [ createBlock( 'core/page-list' ) ];
 
 	const onSelect = useCallback(
 		( selectedBlock ) => {
@@ -95,22 +63,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		},
 		[ history ]
 	);
-
-	if ( hasResolvedNavigationMenus && ! hasNavigationMenus ) {
-		return (
-			<SidebarNavigationScreenWrapper>
-				{ __( 'There are no Navigation Menus.' ) }
-			</SidebarNavigationScreenWrapper>
-		);
-	}
-
-	if ( ! hasResolvedNavigationMenus || isLoading ) {
-		return (
-			<SidebarNavigationScreenWrapper>
-				<NavigationMenuLoader />
-			</SidebarNavigationScreenWrapper>
-		);
-	}
 
 	return (
 		<BlockEditorProvider
