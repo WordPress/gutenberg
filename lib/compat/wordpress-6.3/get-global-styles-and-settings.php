@@ -33,7 +33,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			}
 
 			// Selectors API, not available, check for old experimental selector.
-			return _wp_array_get( $block_type->supports, array( 'filters', '__experimentalDuotone' ), null );
+			return _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null );
 		}
 
 		// Root Selector.

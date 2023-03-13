@@ -100,7 +100,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$selector = wp_get_block_css_selector( $block_type, 'color.duotone' );
+		$selector = wp_get_block_css_selector( $block_type, 'filters.duotone' );
 		$this->assertEquals( '.experimental-duotone', $selector );
 	}
 
@@ -111,7 +111,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 			null
 		);
 
-		$selector = wp_get_block_css_selector( $block_type, 'color.duotone' );
+		$selector = wp_get_block_css_selector( $block_type, 'filters.duotone' );
 		$this->assertEquals( null, $selector );
 	}
 
