@@ -496,9 +496,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	}
 
 	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
-		if ( !! tree.styles?.elements[ name ] ) {
+		if ( !! tree.styles?.elements?.[ name ] ) {
 			nodes.push( {
-				styles: tree.styles?.elements[ name ],
+				styles: tree.styles?.elements?.[ name ],
 				selector,
 			} );
 		}
