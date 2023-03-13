@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues } from 'lodash';
+import { mapValues } from 'lodash';
 
 const INHERITED_COLUMN_ATTRIBUTES = [ 'align' ];
 
@@ -55,13 +55,9 @@ export function getFirstRow( state ) {
  */
 export function getCellAttribute( state, cellLocation, attributeName ) {
 	const { sectionName, rowIndex, columnIndex } = cellLocation;
-	return get( state, [
-		sectionName,
-		rowIndex,
-		'cells',
-		columnIndex,
-		attributeName,
-	] );
+	return state[ sectionName ]?.[ rowIndex ]?.cells?.[ columnIndex ]?.[
+		attributeName
+	];
 }
 
 /**
@@ -158,9 +154,7 @@ export function isCellSelected( cellLocation, selection ) {
 export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 	const firstRow = getFirstRow( state );
 	const cellCount =
-		columnCount === undefined
-			? get( firstRow, [ 'cells', 'length' ] )
-			: columnCount;
+		columnCount === undefined ? firstRow?.cells?.length : columnCount;
 
 	// Bail early if the function cannot determine how many cells to add.
 	if ( ! cellCount ) {
@@ -173,11 +167,8 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 			{
 				cells: Array.from( { length: cellCount } ).map(
 					( _, index ) => {
-						const firstCellInColumn = get(
-							firstRow,
-							[ 'cells', index ],
-							{}
-						);
+						const firstCellInColumn =
+							firstRow?.cells?.[ index ] ?? {};
 
 						const inheritedAttributes = Object.fromEntries(
 							Object.entries( firstCellInColumn ).filter(
@@ -310,7 +301,7 @@ export function toggleSection( state, sectionName ) {
 	}
 
 	// Get the length of the first row of the body to use when creating the header.
-	const columnCount = get( state, [ 'body', 0, 'cells', 'length' ], 1 );
+	const columnCount = state.body?.[ 0 ]?.cells?.length ?? 1;
 
 	// Section doesn't exist, insert an empty row to create the section.
 	return insertRow( state, { sectionName, rowIndex: 0, columnCount } );

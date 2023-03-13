@@ -211,14 +211,6 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		return false;
 	}
 
-	if (
-		transform.usingMobileTransformations &&
-		isWildcardBlockTransform( transform ) &&
-		! isContainerGroupBlock( sourceBlock.name )
-	) {
-		return false;
-	}
-
 	return true;
 };
 

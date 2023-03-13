@@ -29,6 +29,9 @@ const ALLOWED_BLOCKS = [
 
 const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
+	attributes: {
+		type: 'page',
+	},
 };
 
 export default function NavigationInnerBlocks( {

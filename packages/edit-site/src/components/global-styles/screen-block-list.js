@@ -20,7 +20,6 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
 import { useHasVariationsPanel } from './variations-panel';
 import ScreenHeader from './header';
@@ -30,6 +29,7 @@ import { unlock } from '../../private-apis';
 const {
 	useHasDimensionsPanel,
 	useHasTypographyPanel,
+	useHasBorderPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
 } = unlock( blockEditorPrivateApis );
@@ -62,7 +62,7 @@ function BlockMenuItem( { block } ) {
 	const settings = useSettingsForBlockElement( rawSettings, block.name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( block.name );
-	const hasBorderPanel = useHasBorderPanel( block.name );
+	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
 	const hasVariationsPanel = useHasVariationsPanel( block.name );

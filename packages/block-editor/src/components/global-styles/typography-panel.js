@@ -3,6 +3,7 @@
  */
 import {
 	FontSizePicker,
+	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -20,6 +21,9 @@ import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import { getValueFromVariable } from './utils';
 
+const MIN_TEXT_COLUMNS = 1;
+const MAX_TEXT_COLUMNS = 6;
+
 export function useHasTypographyPanel( settings ) {
 	const hasFontFamily = useHasFontFamilyControl( settings );
 	const hasLineHeight = useHasLineHeightControl( settings );
@@ -27,6 +31,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasLetterSpacing = useHasLetterSpacingControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
+	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
 
 	return (
@@ -36,7 +41,8 @@ export function useHasTypographyPanel( settings ) {
 		hasLetterSpacing ||
 		hasTextTransform ||
 		hasFontSize ||
-		hasTextDecoration
+		hasTextDecoration ||
+		hasTextColumns
 	);
 }
 
@@ -93,6 +99,10 @@ function useHasTextDecorationControl( settings ) {
 	return settings?.typography?.textDecoration;
 }
 
+function useHasTextColumnsControl( settings ) {
+	return settings?.typography?.textColumns;
+}
+
 function TypographyToolsPanel( {
 	resetAllFilter,
 	onChange,
@@ -124,6 +134,7 @@ const DEFAULT_CONTROLS = {
 	letterSpacing: true,
 	textTransform: true,
 	textDecoration: true,
+	textColumns: true,
 };
 
 export default function TypographyPanel( {
@@ -245,6 +256,21 @@ export default function TypographyPanel( {
 	};
 	const hasLetterSpacing = () => !! value?.typography?.letterSpacing;
 	const resetLetterSpacing = () => setLetterSpacing( undefined );
+
+	// Text Columns
+	const hasTextColumnsControl = useHasTextColumnsControl( settings );
+	const textColumns = decodeValue( inheritedValue?.typography?.textColumns );
+	const setTextColumns = ( newValue ) => {
+		onChange( {
+			...value,
+			typography: {
+				...value?.typography,
+				textColumns: newValue,
+			},
+		} );
+	};
+	const hasTextColumns = () => !! value?.typography?.textColumns;
+	const resetTextColumns = () => setTextColumns( undefined );
 
 	// Text Transform
 	const hasTextTransformControl = useHasTextTransformControl( settings );
@@ -385,6 +411,27 @@ export default function TypographyPanel( {
 						onChange={ setLetterSpacing }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextColumnsControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Text columns' ) }
+					hasValue={ hasTextColumns }
+					onDeselect={ resetTextColumns }
+					isShownByDefault={ defaultControls.textColumns }
+					panelId={ panelId }
+				>
+					<NumberControl
+						label={ __( 'Text columns' ) }
+						max={ MAX_TEXT_COLUMNS }
+						min={ MIN_TEXT_COLUMNS }
+						onChange={ setTextColumns }
+						size="__unstable-large"
+						spinControls="custom"
+						value={ textColumns }
+						initialPosition={ 1 }
 					/>
 				</ToolsPanelItem>
 			) }
