@@ -6,6 +6,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { addQueryArgs } from '@wordpress/url';
 
 export default function ScreenLaunch( { theme, category, variation } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
@@ -45,7 +46,12 @@ export default function ScreenLaunch( { theme, category, variation } ) {
 			<p>Theme: { theme }</p>
 			<p>Category: { category }</p>
 			<p>Variation: { variation?.title }</p>
-			<Button variant="primary" href="/wp-admin/site-editor.php">
+			<Button
+				variant="primary"
+				href={ addQueryArgs( '/wp-admin/site-editor.php', {
+					onboarding_complete: true,
+				} ) }
+			>
 				Customize your site
 			</Button>
 		</div>

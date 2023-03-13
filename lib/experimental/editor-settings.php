@@ -111,7 +111,6 @@ function gutenberg_onboarding_complete() {
 		update_option( 'onboarding_complete', false );
 	} else if ( isset( $_GET['onboarding_complete'] ) ) {
 		update_option( 'onboarding_complete', true );
-		wp_safe_redirect( 'index.php' );
 	}
 }
 add_action( 'admin_init', 'gutenberg_onboarding_complete', 9 );
