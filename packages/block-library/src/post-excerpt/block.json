@@ -20,6 +20,9 @@
 		"excerptLength": {
 			"type": "number",
 			"default": 55
+		},
+		"previewPlaceholder": {
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],

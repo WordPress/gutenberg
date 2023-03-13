@@ -25,7 +25,13 @@ import { __, _x } from '@wordpress/i18n';
 import { useCanEditEntity } from '../utils/hooks';
 
 export default function PostExcerptEditor( {
-	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
+	attributes: {
+		textAlign,
+		moreText,
+		showMoreOnNewLine,
+		excerptLength,
+		previewPlaceholder,
+	},
 	setAttributes,
 	isSelected,
 	context: { postId, postType, queryId },
@@ -78,14 +84,11 @@ export default function PostExcerptEditor( {
 				</BlockControls>
 				<div { ...blockProps }>
 					<p>
-						{ __(
-							'This is the Post Excerpt block, it will display the excerpt from single posts.'
-						) }
-					</p>
-					<p>
-						{ __(
-							'If there are any Custom Post Types with support for excerpts, the Post Excerpt block can display the excerpts of those entries as well.'
-						) }
+						{ previewPlaceholder
+							? previewPlaceholder
+							: __(
+									'This is the Post Excerpt block, it will display the excerpt'
+							  ) }
 					</p>
 				</div>
 			</>
