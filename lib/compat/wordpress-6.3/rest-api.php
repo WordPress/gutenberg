@@ -13,7 +13,7 @@ function gutenberg_register_rest_pattern_directory() {
 	$pattern_directory_controller->register_routes();
 	$theme_directory_templates = new Themes_Directory_Templates();
 	$theme_directory_templates->register_routes();
-	$theme_directory_saving = new Theme_Directory_Saving();
+	$theme_directory_saving = new Gutenberg_Rest_Themes_Directory_Saving();
 	$theme_directory_saving->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
