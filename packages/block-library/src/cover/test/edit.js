@@ -8,12 +8,21 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { createRegistry, dispatch } from '@wordpress/data';
+import { SlotFillProvider } from '@wordpress/components';
 import {
 	registerBlockType,
 	unregisterBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	BlockTools,
+	WritingFlow,
+	ObserveTyping,
+	BlockEditorKeyboardShortcuts,
+	BlockControls,
+} from '@wordpress/block-editor';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -64,6 +73,20 @@ const defaultProps = {
 	context: {},
 };
 
+const Wrapper = ( { children } ) => (
+	<ShortcutProvider>
+		<SlotFillProvider>
+			<BlockTools>
+				<BlockEditorKeyboardShortcuts.Register />
+				<WritingFlow>
+					<ObserveTyping>{ children }</ObserveTyping>
+				</WritingFlow>
+				<BlockControls.Slot />
+			</BlockTools>
+		</SlotFillProvider>
+	</ShortcutProvider>
+);
+
 let block;
 beforeEach( () => {
 	createRegistry().registerStore( blockEditorStore, {
@@ -74,18 +97,25 @@ beforeEach( () => {
 	registerBlockType( 'core/cover', { ...metadata, ...settings } );
 	block = createBlock( 'core/cover', {} );
 	dispatch( blockEditorStore ).resetBlocks( [ block ] );
+	dispatch( blockEditorStore ).selectBlock( block.clientId );
 	setAttributes.mockClear();
 } );
 
 afterEach( () => {
 	unregisterBlockType( 'core/cover' );
+	dispatch( blockEditorStore ).removeBlock( block.clientId );
 } );
 
 describe( 'Cover edit', () => {
 	describe( 'Placeholder', () => {
 		test( 'shows placeholder if background image and color not set', () => {
 			setup(
-				<CoverEdit { ...defaultProps } clientId={ block.clientId } />
+				<Wrapper>
+					<CoverEdit
+						{ ...defaultProps }
+						clientId={ block.clientId }
+					/>
+				</Wrapper>
 			);
 			expect(
 				screen.getByRole( 'group', {
@@ -93,13 +123,16 @@ describe( 'Cover edit', () => {
 				} )
 			).toBeInTheDocument();
 		} );
+
 		test( 'does not show placeholder if color is set', () => {
 			setup(
-				<CoverEdit
-					{ ...defaultProps }
-					clientId={ block.clientId }
-					overlayColor={ { color: '#ffffff' } }
-				/>
+				<Wrapper>
+					<CoverEdit
+						{ ...defaultProps }
+						clientId={ block.clientId }
+						overlayColor={ { color: '#ffffff' } }
+					/>
+				</Wrapper>
 			);
 			expect(
 				screen.queryByRole( 'group', {
@@ -107,9 +140,15 @@ describe( 'Cover edit', () => {
 				} )
 			).not.toBeInTheDocument();
 		} );
+
 		test( 'sets overlay color when a color button is clicked', async () => {
 			const { user } = setup(
-				<CoverEdit { ...defaultProps } clientId={ block.clientId } />
+				<Wrapper>
+					<CoverEdit
+						{ ...defaultProps }
+						clientId={ block.clientId }
+					/>
+				</Wrapper>
 			);
 			await user.click(
 				screen.getByRole( 'button', {
