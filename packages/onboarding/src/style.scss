@@ -5,6 +5,11 @@
 @import "./components/site-icon/style.scss";
 @import "./components/theme-picker/style.scss";
 
+
+body.dashboard_page_onboarding {
+	@include wp-admin-reset( "#wp-onboarding" );
+}
+
 html.wp-toolbar {
 	padding: 0 !important;
 }
