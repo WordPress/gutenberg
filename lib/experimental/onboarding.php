@@ -79,7 +79,7 @@ add_action( 'admin_menu', 'remove_themes_menu', 999 );
  *
  * @return boolean|WP_Error True on success, WP_Error on failure.
  */
-function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templates', 'parts' ) ) {
+function gutenberg_save_theme_to_database_using_core_api( $theme_slug, $steps = array( 'templates', 'parts' ) ) {
 	if ( ! function_exists( 'themes_api' ) ) {
 		require_once( ABSPATH . 'wp-admin/includes/theme.php' );
 		require_once( ABSPATH . 'wp-admin/includes/file.php' );
@@ -236,7 +236,122 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 				'post_author'  => get_current_user_id(), // TODO: is this the right user?
 				'tax_input'    => array(
 					'wp_theme'           => array( 'emptytheme' ), // The base theme.
-					'template_part_area' => WP_TEMPLATE_PART_AREA_UNCATEGORIZED, // TODO: categorize.
+					'wp_template_part_area' => WP_TEMPLATE_PART_AREA_UNCATEGORIZED, // TODO: categorize.
+				),
+			);
+			$result   = wp_insert_post( $part_cpt, true );
+			if ( is_wp_error( $result ) ) {
+				$wpdb->query( 'ROLLBACK' );
+				return $result;
+			}
+		}
+	}
+
+	// TODO: STARTER CONTENT.
+
+	$wpdb->query( 'COMMIT' );
+
+	return true;
+}
+
+/**
+ * Given a theme slug, downloads the latest release,
+ * and saves its theme.json, templates, and parts to the database.
+ *
+ * @param string $theme_slug The slug of the theme to process.
+ * @param array  $steps      The steps to process. Valid values are 'templates', 'parts', and 'theme_json'.
+ *                           Defaults to templates and parts.
+ *
+ * @return boolean|WP_Error True on success, WP_Error on failure.
+ */
+function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templates', 'parts' ) ) {
+	$url      = "https://raw.githubusercontent.com/ellatrix/block-themes-directory/main/by-theme/${theme_slug}.json";
+	$response = json_decode( wp_remote_retrieve_body( wp_remote_get( $url ) ) );
+
+	global $wpdb;
+	/*
+	 * This code tries to save data in the database (theme.json, templates, and parts) in a single transaction.
+	 * If any of the steps fails, the transaction is rolled back and nothing is saved to the database.
+	 *
+	 * There is no need to disable autocommit mode, as per:
+	 * - mysql 5.7 https://dev.mysql.com/doc/refman/5.7/en/commit.html
+	 *   "To disable autocommit mode implicitly for a single series of statements, use the START TRANSACTION statement".
+	 * - mariadb (unknown version) https://mariadb.com/kb/en/start-transaction/
+	 *   TODO: CHECK THAT THE MARIADB VERSION 10.3 AND ABOVE MANAGES AUTOMATCALLY AUTOCOMMIT IN A TRANSACTION.
+	 *   "To disable autocommit mode for a single series of statements, use the START TRANSACTION statement."
+	 *
+	 */
+	$wpdb->query( 'START TRANSACTION' );
+
+	/*
+	 * 2. Save theme.json to database.
+	 */
+	if ( in_array( 'theme_json', $steps, true ) ) {
+		$theme_json_data          = $response['theme.json'];
+		$theme_json_data          = WP_Theme_JSON_Resolver_Gutenberg::translate( $theme_json_data, $wp_get_theme->get( 'TextDomain' ) );
+		$theme_json               = new WP_Theme_JSON_Gutenberg( $theme_json_data, 'custom' );
+		$user_cpt                 = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $wp_get_theme, true );
+		$user_cpt['post_content'] = wp_json_encode( $theme_json->get_raw_data() );
+		if ( false === $user_cpt['post_content'] ) {
+			return new WP_Error( 'theme.json could not be encoded to JSON.' );
+		}
+
+		$post_id = wp_update_post( $user_cpt, true, false );
+		if ( is_wp_error( $post_id ) ) {
+			$wpdb->query( 'ROLLBACK' );
+			return $post_id;
+		}
+	}
+
+	/*
+	 * 3. Save templates to the database.
+	 */
+	if ( in_array( 'templates', $steps, true ) ) {
+		foreach ( $response->templates as $template ) {
+			 // TODO: preprocess (translate? escape? etc.)
+			$post_content = _inject_theme_attribute_in_block_template_content_override( $template->html );
+			if ( null === $post_content ) { // this contains a pattern
+				continue;
+			}
+			$template_cpt = array(
+				'post_type'    => 'wp_template',
+				'post_status'  => 'publish',
+				'post_title'   => $template->name,
+				'post_name'    => $template->name,
+				'post_content' => $post_content,
+				'post_author'  => get_current_user_id(), // TODO: is this the right user?
+				'tax_input'    => array(
+					'wp_theme' => array( 'emptytheme' ), // The base theme.
+				),
+			);
+			$result       = wp_insert_post( $template_cpt, true );
+			if ( is_wp_error( $result ) ) {
+				$wpdb->query( 'ROLLBACK' );
+				return $result;
+			}
+		}
+	}
+
+	/*
+	 * 4. Save parts to the database.
+	 */
+	if ( in_array( 'parts', $steps, true ) ) {
+		foreach ( $response->parts as $part ) {
+			// TODO: preprocess (translate? escape? etc.)
+			$post_content = _inject_theme_attribute_in_block_template_content_override( $part->html );
+			if ( null === $post_content ) {
+				continue;
+			}
+			$part_cpt = array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => $part->name,
+				'post_name'    => $part->name,
+				'post_content' => $post_content,
+				'post_author'  => get_current_user_id(), // TODO: is this the right user?
+				'tax_input'    => array(
+					'wp_theme'           => array( 'emptytheme' ), // The base theme.
+					'wp_template_part_area' => WP_TEMPLATE_PART_AREA_UNCATEGORIZED, // TODO: categorize.
 				),
 			);
 			$result   = wp_insert_post( $part_cpt, true );
