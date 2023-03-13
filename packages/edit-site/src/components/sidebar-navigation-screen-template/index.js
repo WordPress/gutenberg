@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __experimentalBlockPatternList as BlockPatternList } from '@wordpress/block-editor';
 import { useAsyncList } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
+import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -18,7 +19,6 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
-import { parse } from '@wordpress/blocks';
 
 export default function SidebarNavigationScreenTemplate() {
 	const { params } = useNavigator();
@@ -83,6 +83,12 @@ export default function SidebarNavigationScreenTemplate() {
 					onClickPattern={ ( pattern ) => {
 						editRecord( {
 							blocks: pattern.blocks,
+							content: ( {
+								blocks: blocksForSerialization = [],
+							} ) =>
+								__unstableSerializeAndClean(
+									blocksForSerialization
+								),
 						} );
 					} }
 				/>
