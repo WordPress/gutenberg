@@ -31,6 +31,12 @@ describe( 'setNestedValue', () => {
 		expect( result ).toEqual( { x: [ { z: 123 } ] } );
 	} );
 
+	it( 'should also work with arrays', () => {
+		const result = setNestedValue( [], [ 0, 1, 2 ], 123 );
+
+		expect( result ).toEqual( [ [ , [ , , 123 ] ] ] );
+	} );
+
 	it( 'should keep remaining properties unaffected', () => {
 		const input = { x: { y: { z: 123, z1: 'z1' }, y1: 'y1' }, x1: 'x1' };
 		const result = setNestedValue( input, [ 'x', 'y', 'z' ], 456 );
@@ -47,5 +53,20 @@ describe( 'setNestedValue', () => {
 
 		expect( result ).toBe( input );
 		expect( result ).toEqual( { x: 'z' } );
+	} );
+
+	it.each( [
+		undefined,
+		null,
+		0,
+		5,
+		NaN,
+		Infinity,
+		'test',
+		false,
+		true,
+		Symbol( 'foo' ),
+	] )( 'should return the original input if it is %s', ( value ) => {
+		expect( setNestedValue( value, [ 'x' ], 123 ) ).toBe( value );
 	} );
 } );

@@ -15,6 +15,10 @@
  * @param {*}      value  Value to set.
  */
 export default function setNestedValue( object, path, value ) {
+	if ( ! object || typeof object !== 'object' ) {
+		return object;
+	}
+
 	path.reduce( ( acc, key, idx ) => {
 		if ( acc[ key ] === undefined ) {
 			if ( Number.isInteger( path[ idx + 1 ] ) ) {
