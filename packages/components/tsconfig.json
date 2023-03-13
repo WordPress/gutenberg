@@ -46,8 +46,6 @@
 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
 		"src/index.js",
 		"src/duotone-picker",
-		"src/higher-order/with-filters",
-		"src/higher-order/with-focus-return",
 		"src/higher-order/with-notices"
 	]
 }

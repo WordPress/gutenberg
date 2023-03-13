@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -260,8 +259,8 @@ function Placeholder( { clientId, name, setAttributes } ) {
 	return (
 		<div { ...blockProps }>
 			<__experimentalBlockVariationPicker
-				icon={ get( blockType, [ 'icon', 'src' ] ) }
-				label={ get( blockType, [ 'title' ] ) }
+				icon={ blockType?.icon?.src }
+				label={ blockType?.title }
 				variations={ variations }
 				onSelect={ ( nextVariation = defaultVariation ) => {
 					if ( nextVariation.attributes ) {
