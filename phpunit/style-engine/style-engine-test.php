@@ -676,4 +676,35 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$this->assertSame( '.gandalf{color:white;height:190px;border-style:dotted;padding:10px;margin-bottom:100px;}.dumbledore,.rincewind{color:grey;height:90px;border-style:dotted;}', $compiled_stylesheet );
 	}
+
+	/**
+	 * Tests returning a generated stylesheet from a set of duotone rules.
+	 *
+	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
+	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
+	 */
+	public function test_should_return_stylesheet_from_duotone_css_rules() {
+		$duotone_attr = array( '#FFFFFF', '#000000' );
+		$duotone_support = true;
+		list(
+			'selector' => $selector,
+			'filter_property' => $filter_property,
+		) = WP_Duotone::get_id_selector_property_and_maybe_svg( $duotone_attr, $duotone_support );
+
+		$css_rules = array(
+			array(
+				'selector'     => $selector,
+				'declarations' => array(
+					// !important is needed because these styles
+					// render before global styles,
+					// and they should be overriding the duotone
+					// filters set by global styles.
+					'filter' => $filter_property . ' !important',
+				),
+			),
+		);
+
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+		$this->assertSame( ".wp-duotone-ffffff-000000-1 1{filter:url('#wp-duotone-ffffff-000000-1') !important;}", $compiled_stylesheet );
+	}
 }
