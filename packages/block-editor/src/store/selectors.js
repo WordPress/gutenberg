@@ -2806,12 +2806,12 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 }
 
 export function __unstableIsWithinBlockOverlay( state, clientId ) {
-	let parent = state.blocks.parents[ clientId ];
+	let parent = state.blocks.parents.get( clientId );
 	while ( !! parent ) {
 		if ( __unstableHasActiveBlockOverlayActive( state, parent ) ) {
 			return true;
 		}
-		parent = state.blocks.parents[ parent ];
+		parent = state.blocks.parents.get( parent );
 	}
 	return false;
 }
