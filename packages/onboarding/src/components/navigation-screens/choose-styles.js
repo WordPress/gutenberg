@@ -9,7 +9,7 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 
-export default function ChooseStyles() {
+export default function ChooseStyles( { setVariation } ) {
 	return (
 		<Flex justify="flex-start" align="stretch" gap={ 8 }>
 			<FlexItem className="onboarding-style-book" isBlock>
@@ -24,7 +24,7 @@ export default function ChooseStyles() {
 				</VStack>
 			</FlexItem>
 			<FlexItem className="onboarding-styles-list-container">
-				<StyleVariationsContainer />
+				<StyleVariationsContainer onSelect={ setVariation } />
 			</FlexItem>
 		</Flex>
 	);

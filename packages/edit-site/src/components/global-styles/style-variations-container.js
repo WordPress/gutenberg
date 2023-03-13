@@ -32,7 +32,7 @@ function compareVariations( a, b ) {
 	);
 }
 
-function Variation( { variation, onVariationClick } ) {
+function Variation( { variation, onSelect } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo( () => {
@@ -48,8 +48,8 @@ function Variation( { variation, onVariationClick } ) {
 	}, [ variation, base ] );
 
 	const selectVariation = () => {
-		if ( onVariationClick ) {
-			onVariationClick( variation );
+		if ( onSelect ) {
+			onSelect( variation );
 		}
 		setUserConfig( () => {
 			return {
@@ -103,7 +103,7 @@ function Variation( { variation, onVariationClick } ) {
 export default function StyleVariationsContainer( {
 	variations,
 	gridColumns = 2,
-	onVariationClick,
+	onSelect,
 } ) {
 	const variationsInput = useSelect(
 		( select ) => {
@@ -146,7 +146,7 @@ export default function StyleVariationsContainer( {
 					<Variation
 						key={ index }
 						variation={ variation }
-						onVariationClick={ onVariationClick }
+						onSelect={ onSelect }
 					/>
 				) ) }
 			</Grid>

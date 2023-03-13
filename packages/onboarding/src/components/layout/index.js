@@ -18,14 +18,12 @@ import {
 } from '@wordpress/edit-site';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 
-// import { StyleBook } from '@wordpress/edit-site';
-
 /**
  * Internal dependencies
  */
 import Sidebar from '../sidebar';
 import SiteHub from '../site-hub';
-import { SiteDetails, AddPages, ChooseStyles } from '../navigation-screens';
+import { SiteDetails, ChooseStyles, Launch } from '../navigation-screens';
 import { useSelect } from '@wordpress/data';
 
 export default function Layout() {
@@ -35,9 +33,13 @@ export default function Layout() {
 	}, [] );
 	const [ theme, setTheme ] = useState();
 	const [ category, setCategory ] = useState();
+	const [ variation, setVariation ] = useState();
 	let step = 1;
 	if ( theme ) {
 		step = 2;
+	}
+	if ( variation ) {
+		step = 3;
 	}
 
 	return (
@@ -67,17 +69,22 @@ export default function Layout() {
 									<ChooseStyles
 										theme={ theme }
 										category={ category }
+										variation={ variation }
+										setVariation={ setVariation }
 									/>
 								</NavigatorScreen>
 								<StyleBook
 									isSelected={ () => {} }
 									onSelect={ () => {} }
-									// onClose={  }
 								/>
 							</BlockEditorProvider>
 						</GlobalStylesProvider>
 						<NavigatorScreen path="/step/3">
-							<AddPages />
+							<Launch
+								theme={ theme }
+								category={ category }
+								variation={ variation }
+							/>
 						</NavigatorScreen>
 					</div>
 				</FlexItem>

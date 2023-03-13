@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
-	Button,
 	__experimentalVStack as VStack,
 	__experimentalNavigatorButton as NavigatorButton,
 	__experimentalUseNavigator as useNavigator,
@@ -24,22 +23,25 @@ export const onboardingSteps = [
 function SidebarItem( { activeStep, step, children } ) {
 	const isAllowed = activeStep >= step;
 	return (
-		<Button
+		<NavigatorButton
 			disabled={ ! isAllowed }
 			className={ classnames( 'onboarding-sidebar__item', {
 				'is-allowed': isAllowed,
 				'is-active': activeStep === step,
 			} ) }
+			path={ step === 1 ? '/' : '/step/' + step }
 		>
 			{ children }
-		</Button>
+		</NavigatorButton>
 	);
 }
+
+const finalStep = 3;
 
 function Sidebar( { step = 1 } ) {
 	const { location } = useNavigator();
 	const currentStep = location.path.startsWith( '/step/' )
-		? location.path.substr( 6 )
+		? Number( location.path.substr( 6 ) )
 		: 1;
 
 	return (
@@ -65,9 +67,11 @@ function Sidebar( { step = 1 } ) {
 				className="onboarding-sitebar__next-button"
 				variant="primary"
 				path={ `/step/${ currentStep + 1 }` }
-				// disabled={ currentStep >= step }
+				disabled={ currentStep >= step }
 			>
-				{ __( 'Next' ) }
+				{ currentStep + 1 === finalStep
+					? __( 'Launch' )
+					: __( 'Next' ) }
 			</NavigatorButton>
 		</div>
 	);
