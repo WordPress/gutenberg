@@ -1,0 +1,22 @@
+pluginManagement {
+    gradle.ext.kotlinVersion = '1.5.32'
+
+    plugins {
+        id "com.android.library" version "7.2.1"
+        id "org.jetbrains.kotlin.android" version gradle.ext.kotlinVersion
+        id "com.automattic.android.publish-to-s3" version "0.7.0"
+    }
+    repositories {
+        maven {
+            url 'https://a8c-libs.s3.amazonaws.com/android'
+            content {
+                includeGroup "com.automattic.android"
+                includeGroup "com.automattic.android.publish-to-s3"
+            }
+        }
+        gradlePluginPortal()
+        google()
+    }
+}
+
+rootProject.name = '@wordpress_react-native-aztec'

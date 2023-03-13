@@ -1,0 +1,147 @@
+/**
+ * Appender
+ */
+
+.wp-block-navigation .block-list-appender {
+	position: relative;
+}
+
+/**
+ * Submenus.
+ */
+
+// Show submenus above the sibling inserter.
+.wp-block-navigation .has-child {
+	cursor: pointer;
+
+	.wp-block-navigation__submenu-container {
+		z-index: z-index(".has-child .wp-block-navigation__submenu-container");
+	}
+
+	&:hover {
+		.wp-block-navigation__submenu-container {
+			z-index: z-index(".has-child:hover .wp-block-navigation__submenu-container");
+		}
+	}
+
+	// Show on editor selected, even if on frontend it only stays open on focus-within.
+	&.is-selected,
+	&.has-child-selected {
+		> .wp-block-navigation__submenu-container {
+			// We use important here because if the parent block is selected and submenus are present, they should always be visible.
+			visibility: visible !important;
+			opacity: 1 !important;
+			min-width: 200px !important;
+			height: auto !important;
+			width: auto !important;
+			overflow: visible !important;
+		}
+	}
+}
+
+
+/**
+ * Navigation Items.
+ */
+
+.wp-block-navigation-item {
+	.wp-block-navigation-item__content {
+		cursor: text;
+	}
+
+	&.is-editing,
+	&.is-selected {
+		min-width: 20px;
+	}
+
+	.block-list-appender {
+		margin-top: $grid-unit-20;
+		// The right margin should be set to auto, so as to not shift layout in flex containers.
+		margin-right: auto;
+		margin-bottom: $grid-unit-20;
+		margin-left: $grid-unit-20;
+	}
+}
+
+.wp-block-navigation-link__invalid-item {
+	color: #000;
+}
+
+.wp-block-navigation-link__missing_text-tooltip {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+}
+/**
+ * Menu item setup state. Is shown when a menu item has no URL configured.
+ */
+
+.wp-block-navigation-link__placeholder {
+	position: relative;
+
+	// While in a placeholder state, hide any underlines the theme might add.
+	text-decoration: none !important;
+	box-shadow: none !important;
+	background-image: none !important;
+
+	// Draw a wavy underline.
+	.wp-block-navigation-link__placeholder-text span {
+		$blur: 10%;
+		$width: 6%;
+		$stop1: 30%;
+		$stop2: 64%;
+
+		--wp-underline-color: var(--wp-admin-theme-color);
+		.is-dark-theme & {
+			--wp-underline-color: #{ $dark-theme-focus };
+		}
+
+		background-image:
+			linear-gradient(45deg, transparent ($stop1 - $blur), var(--wp-underline-color) $stop1, var(--wp-underline-color) ($stop1 + $width), transparent ($stop1 + $width + $blur)),
+			linear-gradient(135deg, transparent ($stop2 - $blur), var(--wp-underline-color) $stop2, var(--wp-underline-color) ($stop2 + $width), transparent ($stop2 + $width + $blur));
+		background-position: 0 100%;
+		background-size: 6px 3px;
+		background-repeat: repeat-x;
+
+		// Since applied to a span, it doesn't change the footprint of the item,
+		// but it does vertically shift the underline to better align.
+		padding-bottom: 0.1em;
+	}
+
+	// This needs extra specificity.
+	&.wp-block-navigation-item__content {
+		cursor: pointer;
+	}
+}
+
+/**
+* Link Control Transforms
+*/
+
+.link-control-transform {
+	border-top: $border-width solid $gray-400;
+	padding: 0 $grid-unit-20 $grid-unit-10 $grid-unit-20;
+}
+
+.link-control-transform__subheading {
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: 500;
+	color: $gray-900;
+	margin-bottom: 1.5em;
+}
+
+.link-control-transform__items {
+	display: flex;
+	justify-content: space-between;
+}
+
+.link-control-transform__item {
+	flex-basis: 33%;
+	flex-direction: column;
+	gap: $grid-unit-10;
+	height: auto;
+}

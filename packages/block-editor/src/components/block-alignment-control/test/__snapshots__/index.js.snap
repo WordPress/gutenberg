@@ -1,0 +1,131 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BlockAlignmentUI should match snapshot when controls are hidden 1`] = `
+<div>
+  <div
+    class="components-dropdown components-dropdown-menu components-toolbar"
+    tabindex="-1"
+  >
+    <button
+      aria-expanded="false"
+      aria-haspopup="true"
+      aria-label="Align"
+      class="components-button components-dropdown-menu__toggle has-icon"
+      data-toolbar-item="true"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        height="24"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M4 9v6h14V9H4zm8-4.8H4v1.5h8V4.2zM4 19.8h8v-1.5H4v1.5z"
+        />
+      </svg>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = `
+<div>
+  <div
+    class="components-toolbar"
+    icon="[object Object]"
+    label="Align"
+  >
+    <div>
+      <button
+        aria-label="None"
+        aria-pressed="false"
+        class="components-button components-toolbar__control has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M5 15h14V9H5v6zm0 4.8h14v-1.5H5v1.5zM5 4.2v1.5h14V4.2H5z"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        aria-label="Align left"
+        aria-pressed="true"
+        class="components-button components-toolbar__control is-pressed has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 9v6h14V9H4zm8-4.8H4v1.5h8V4.2zM4 19.8h8v-1.5H4v1.5z"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        aria-label="Align center"
+        aria-pressed="false"
+        class="components-button components-toolbar__control has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7 9v6h10V9H7zM5 19.8h14v-1.5H5v1.5zM5 4.3v1.5h14V4.3H5z"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        aria-label="Align right"
+        aria-pressed="false"
+        class="components-button components-toolbar__control has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M6 15h14V9H6v6zm6-10.8v1.5h8V4.2h-8zm0 15.6h8v-1.5h-8v1.5z"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;

@@ -1,0 +1,24 @@
+.edit-site-sidebar__content {
+	flex-grow: 1;
+	overflow-y: auto;
+
+	.components-navigator-screen {
+		@include custom-scrollbars-on-hover;
+	}
+}
+
+.edit-site-sidebar__footer {
+	border-top: 1px solid $gray-800;
+	flex-shrink: 0;
+	margin: 0 $canvas-padding;
+	padding: $canvas-padding 0;
+}
+
+.edit-site-sidebar__content.edit-site-sidebar__content {
+	overflow-x: unset;
+}
+
+.edit-site-sidebar__content > div {
+	// This matches the logo padding
+	padding: 0 $grid-unit-15;
+}

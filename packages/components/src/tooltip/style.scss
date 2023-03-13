@@ -1,0 +1,40 @@
+.components-tooltip.components-popover {
+	z-index: z-index(".components-tooltip");
+
+	.components-popover__content {
+		min-width: min-content;
+	}
+}
+
+.components-tooltip .components-popover__content {
+	background: $components-color-foreground; // TODO: Discuss with designers.
+	border-radius: $radius-block-ui;
+	border-width: 0;
+	outline: none;
+	color: $components-color-foreground-inverted;
+	white-space: nowrap;
+	text-align: center;
+	line-height: 1.4;
+	font-size: 12px;
+	box-shadow: none;
+	padding: $grid-unit-05 $grid-unit-10;
+}
+
+.components-tooltip__shortcut {
+	display: inline-block;
+	margin-left: $grid-unit-10;
+}
+
+.disabled-element-wrapper {
+	position: relative;
+	.event-catcher {
+		z-index: z-index(".components-tooltip .event-catcher");
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+	}
+}

@@ -1,0 +1,2 @@
+# Intentionally empty, to avoid inheriting from `.gitignore`, since `parser.js`
+# and `parser.php` should be included with the npm distributable.

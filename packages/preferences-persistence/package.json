@@ -1,0 +1,36 @@
+{
+	"name": "@wordpress/preferences-persistence",
+	"version": "1.20.0",
+	"description": "Persistence utilities for `wordpress/preferences`.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"preferences",
+		"settings"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/preferences-persistence/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/preferences-persistence"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"sideEffects": false,
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/api-fetch": "file:../api-fetch"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

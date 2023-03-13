@@ -1,0 +1,51 @@
+.is-small-text {
+	font-size: 0.875em;
+}
+
+.is-regular-text {
+	font-size: 1em;
+}
+
+.is-large-text {
+	font-size: 2.25em;
+}
+
+.is-larger-text {
+	font-size: 3em;
+}
+
+// Don't show the drop cap when editing the paragraph's content. It causes a
+// number of bugs in combination with `contenteditable` fields. The caret
+// cannot be set around it, caret position calculation fails in Chrome, and
+// typing at the end of the paragraph doesn't work.
+.has-drop-cap:not(:focus)::first-letter {
+	float: left;
+	font-size: 8.4em;
+	line-height: 0.68;
+	font-weight: 100;
+	margin: 0.05em 0.1em 0 0;
+	text-transform: uppercase;
+	font-style: normal;
+}
+
+body.rtl .has-drop-cap:not(:focus)::first-letter {
+	float: initial;
+	margin-left: 0.1em;
+}
+
+// Prevent the dropcap from breaking out of the box when a background is applied.
+p.has-drop-cap.has-background {
+	overflow: hidden;
+}
+
+p.has-background {
+	padding: $block-bg-padding--v $block-bg-padding--h;
+}
+
+// Use :where to contain the specificity of this rule
+// so it's easily overrideable by any theme that targets
+// links using the a element.
+// For example, this is what global styles does.
+:where(p.has-text-color:not(.has-link-color)) a {
+	color: inherit;
+}

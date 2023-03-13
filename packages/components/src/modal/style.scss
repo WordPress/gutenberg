@@ -1,0 +1,140 @@
+// The scrim behind the modal window.
+.components-modal__screen-overlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba($black, 0.35);
+	z-index: z-index(".components-modal__screen-overlay");
+	display: flex;
+	// backdrop-filter: blur($grid-unit);
+	// This animates the appearance of the white background.
+	@include edit-post__fade-in-animation();
+}
+
+// The modal window element.
+.components-modal__frame {
+	// Use the entire viewport on smaller screens.
+	margin: 0;
+	width: 100%;
+	background: $white;
+	box-shadow: $shadow-modal;
+	border-radius: $radius-block-ui;
+	overflow: hidden;
+	// Have the content element fill the vertical space yet not overflow.
+	display: flex;
+
+	// Show a centered modal on bigger screens.
+	@include break-small() {
+		margin: auto;
+		width: auto;
+		min-width: $modal-min-width;
+		max-width: calc(100% - #{$grid-unit-20 * 2});
+		max-height: calc(100% - #{$header-height * 2});
+
+		// Animate the modal frame/contents appearing on the page.
+		animation: components-modal__appear-animation 0.1s ease-out;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
+
+		&.is-full-screen {
+			width: 90vw;
+			min-height: 90vh;
+		}
+	}
+
+	@include break-large() {
+		max-height: 70%;
+	}
+}
+
+@keyframes components-modal__appear-animation {
+	from {
+		transform: translateY($grid-unit-40);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+
+// Fix header to the top so it is always there to provide context to the modal
+// if the content needs to be scrolled (for example, on the keyboard shortcuts
+// modal screen).
+.components-modal__header {
+	box-sizing: border-box;
+	border-bottom: $border-width solid transparent;
+	padding: 0 $grid-unit-40;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	height: $header-height + $grid-unit-20;
+	width: 100%;
+	z-index: z-index(".components-modal__header");
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	.components-modal__header-heading {
+		font-size: 1.2rem;
+		font-weight: 600;
+	}
+
+	h1 {
+		line-height: 1;
+		margin: 0;
+	}
+
+	.components-button {
+		position: relative;
+		left: $grid-unit-10;
+	}
+
+	.components-modal__content.has-scrolled-content:not(.hide-header) & {
+		border-bottom-color: $gray-300;
+	}
+
+	& + p {
+		margin-top: 0;
+	}
+}
+
+.components-modal__header-heading-container {
+	align-items: center;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: left;
+}
+
+.components-modal__header-icon-container {
+	display: inline-block;
+
+	svg {
+		max-width: $button-size;
+		max-height: $button-size;
+		padding: $grid-unit-10;
+	}
+}
+
+// Modal contents.
+.components-modal__content {
+	flex: 1;
+	margin-top: $header-height + $grid-unit-20;
+	padding: 0 $grid-unit-40 $grid-unit-40;
+	overflow: auto;
+
+	&.hide-header {
+		margin-top: 0;
+		padding-top: $grid-unit-30;
+	}
+
+	&.is-scrollable:focus-visible {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+		outline-offset: -2px;
+	}
+}

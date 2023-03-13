@@ -1,0 +1,19 @@
+.edit-site-editor__toggle-save-panel {
+	box-sizing: border-box;
+	width: $sidebar-width;
+	background-color: $white;
+	border: 1px dotted $gray-300;
+	padding: $grid-unit-30;
+	display: flex;
+	justify-content: center;
+}
+
+// Adjust the position of the notices
+.edit-site .components-editor-notices__snackbar {
+	position: fixed;
+	right: 0;
+	bottom: 40px;
+	padding-left: 16px;
+	padding-right: 16px;
+}
+@include editor-left(".edit-site .components-editor-notices__snackbar")

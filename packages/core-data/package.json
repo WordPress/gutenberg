@@ -1,0 +1,58 @@
+{
+	"name": "@wordpress/core-data",
+	"version": "6.5.0",
+	"description": "Access to and manipulation of core WordPress entities.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"data",
+		"entities"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-data/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/core-data"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": [
+		"{src,build,build-module}/index.js"
+	],
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/url": "file:../url",
+		"change-case": "^4.1.2",
+		"equivalent-key-map": "^0.2.2",
+		"fast-deep-equal": "^3.1.3",
+		"lodash": "^4.17.21",
+		"memize": "^1.1.0",
+		"rememo": "^4.0.0",
+		"uuid": "^8.3.0"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

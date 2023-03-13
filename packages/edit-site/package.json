@@ -1,0 +1,76 @@
+{
+	"name": "@wordpress/edit-site",
+	"version": "5.5.0",
+	"description": "Edit Site Page module for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"editor",
+		"site"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/edit-site/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/edit-site"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/block-library": "file:../block-library",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/editor": "file:../editor",
+		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/interface": "file:../interface",
+		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
+		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/media-utils": "file:../media-utils",
+		"@wordpress/notices": "file:../notices",
+		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/reusable-blocks": "file:../reusable-blocks",
+		"@wordpress/style-engine": "file:../style-engine",
+		"@wordpress/url": "file:../url",
+		"@wordpress/viewport": "file:../viewport",
+		"@wordpress/widgets": "file:../widgets",
+		"classnames": "^2.3.1",
+		"colord": "^2.9.2",
+		"downloadjs": "^1.4.7",
+		"fast-deep-equal": "^3.1.3",
+		"history": "^5.1.0",
+		"lodash": "^4.17.21",
+		"memize": "^1.1.0",
+		"react-autosize-textarea": "^7.1.0",
+		"rememo": "^4.0.0"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

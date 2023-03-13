@@ -1,0 +1,27 @@
+.editor-post-visibility__fieldset {
+	.editor-post-visibility__radio[type="radio"] {
+		@include radio-control;
+		margin-top: 2px;
+	}
+
+	.editor-post-visibility__info {
+		color: $gray-700;
+		margin-left: $grid-unit-15 + $radio-input-size-sm;
+		margin-top: 0.5em;
+
+		@include break-small {
+			margin-left: $grid-unit-15 + $radio-input-size;
+		}
+	}
+
+	// Remove bottom margin on the last label only.
+	.editor-post-visibility__choice:last-child .editor-post-visibility__info {
+		margin-bottom: 0;
+	}
+
+	.editor-post-visibility__password .editor-post-visibility__password-input[type="text"] {
+		@include input-control;
+		margin-left: $grid-unit * 4;
+		width: calc(100% - #{$grid-unit * 4});
+	}
+}

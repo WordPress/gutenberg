@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/pullquote",
+		"isValid": true,
+		"attributes": {
+			"value": "Testing pullquote block...",
+			"citation": "...with a caption"
+		},
+		"innerBlocks": []
+	}
+]

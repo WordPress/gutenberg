@@ -1,0 +1,54 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"types": [
+			"gutenberg-env",
+			"gutenberg-test-env",
+			"dom-scroll-into-view",
+			"jest",
+			"@testing-library/jest-dom",
+			"snapshot-diff",
+			"@wordpress/jest-console"
+		],
+		// Some errors in Reakit types with TypeScript 4.3
+		// Remove the following line when they've been addressed.
+		"skipLibCheck": true,
+		"strictNullChecks": true
+	},
+	"references": [
+		{ "path": "../a11y" },
+		{ "path": "../compose" },
+		{ "path": "../date" },
+		{ "path": "../deprecated" },
+		{ "path": "../dom" },
+		{ "path": "../element" },
+		{ "path": "../escape-html" },
+		{ "path": "../hooks" },
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../keycodes" },
+		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
+		{ "path": "../react-i18n" },
+		{ "path": "../warning" }
+	],
+	"include": [ "src/**/*" ],
+	"exclude": [
+		"src/**/*.android.js",
+		"src/**/*.ios.js",
+		"src/**/*.native.js",
+		"src/**/react-native-*",
+		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+		"src/index.js",
+		"src/custom-gradient-picker",
+		"src/duotone-picker",
+		"src/gradient-picker",
+		"src/higher-order/with-notices",
+		"src/palette-edit"
+	]
+}

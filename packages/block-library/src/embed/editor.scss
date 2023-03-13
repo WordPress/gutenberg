@@ -1,0 +1,45 @@
+.wp-block-embed {
+	// Remove the left and right margin the figure is born with.
+	margin-left: 0;
+	margin-right: 0;
+
+	// Necessary because we use responsive trickery to set width/height,
+	// therefore the video doesn't intrinsically clear floats like an image does.
+	clear: both;
+
+	&.is-loading {
+		display: flex;
+		justify-content: center;
+	}
+
+	// Stops long URLs from breaking out of the no preview available screen
+	.components-placeholder__error {
+		word-break: break-word;
+	}
+
+	.components-placeholder__learn-more {
+		margin-top: 1em;
+	}
+}
+
+.block-library-embed__interactive-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	opacity: 0;
+}
+
+.wp-block[data-align="left"],
+.wp-block[data-align="right"] {
+	> .wp-block-embed {
+		max-width: 360px;
+		width: 100%;
+
+		// Unless these have a min-width, they collapse when floated.
+		.wp-block-embed__wrapper {
+			min-width: $break-zoomed-in;
+		}
+	}
+}

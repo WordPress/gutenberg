@@ -1,0 +1,145 @@
+plugins {
+    id "com.android.library"
+    id "org.jetbrains.kotlin.android"
+    id "maven-publish"
+    id "com.automattic.android.publish-to-s3"
+}
+
+// import the `readReactNativeVersion()` function
+apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
+apply from: '../extractPackageVersion.gradle'
+
+group='org.wordpress-mobile.gutenberg-mobile'
+
+def buildAssetsFolder = 'build/assets'
+
+android {
+    compileSdkVersion 31
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 31
+        buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            assets.srcDirs += buildAssetsFolder
+            assets.srcDirs += '../../../../../src/block-support'
+            // Despite being in a folder called "resources", the files in
+            // unsupported-block-editor are accessed as assets by their
+            // consumers: the WordPressEditor library.
+            assets.srcDirs += '../../../../../resources/unsupported-block-editor'
+        }
+    }
+}
+
+repositories {
+    maven { url "https://a8c-libs.s3.amazonaws.com/android" }
+    maven { url "https://jitpack.io" }
+    google()
+    mavenCentral {
+        // We don't want to fetch react-native from Maven Central as there are
+        // older versions over there.
+        content {
+            excludeGroup "com.facebook.react"
+        }
+    }
+}
+
+dependencies {
+    // For animated GIF support
+    implementation 'com.facebook.fresco:animated-gif:2.0.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation "org.wordpress:utils:2.3.0"
+
+    testImplementation "junit:junit:4.13"
+
+    def rnVersion = readReactNativeVersion('../../../../package.json', 'devDependencies')
+    println "react-native version for react-native-bridge: $rnVersion"
+    def packageJson = '../../../react-native-editor/package.json'
+
+    implementation "com.facebook.react:react-native:$rnVersion"
+    implementation "com.github.wordpress-mobile:react-native-video:${extractPackageVersion(packageJson, 'react-native-video', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-linear-gradient:${extractPackageVersion(packageJson, 'react-native-linear-gradient', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-slider:${extractPackageVersion(packageJson, '@react-native-community/slider', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-reanimated:${extractPackageVersion(packageJson, 'react-native-reanimated', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion(packageJson, 'react-native-prompt-android', 'dependencies')}"
+
+    implementation("com.github.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion(packageJson, 'react-native-gesture-handler', 'dependencies')}", {
+        // Remove Reanimated transitive dependency as it's already defined here
+        exclude group: 'com.github.wordpress-mobile', module: 'react-native-reanimated'
+    })
+
+    // Published by `wordpress-mobile/react-native-libraries-publisher`
+    // See the documentation for this value in `build.gradle.kts` of `wordpress-mobile/react-native-libraries-publisher`
+    def reactNativeLibrariesPublisherVersion = "v1"
+    def reactNativeLibrariesGroupId = "org.wordpress-mobile.react-native-libraries.$reactNativeLibrariesPublisherVersion"
+    implementation "$reactNativeLibrariesGroupId:react-native-get-random-values:${extractPackageVersion(packageJson, 'react-native-get-random-values', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-screens:${extractPackageVersion(packageJson, 'react-native-screens', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-svg:${extractPackageVersion(packageJson, 'react-native-svg', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-webview:${extractPackageVersion(packageJson, 'react-native-webview', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-masked-view:${extractPackageVersion(packageJson, '@react-native-masked-view/masked-view', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-fast-image:${extractPackageVersion(packageJson, 'react-native-fast-image', 'dependencies')}"
+
+    runtimeOnly("com.facebook.react:hermes-engine:$rnVersion", {
+        exclude group:'com.facebook.fbjni'
+    })
+
+    if (willPublishReactNativeBridgeBinary) {
+        implementation "org.wordpress-mobile.gutenberg-mobile:react-native-aztec:$reactNativeAztecVersion"
+   } else {
+        api project(':@wordpress_react-native-aztec')
+   }
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+            ReactNativeBridgePublication(MavenPublication) {
+                artifact bundleReleaseAar
+
+                groupId 'org.wordpress-mobile.gutenberg-mobile'
+                artifactId 'react-native-gutenberg-bridge'
+                artifact tasks.named("androidSourcesJar")
+                // version is set by 'publish-to-s3' plugin
+
+                addDependenciesToPom(pom)
+            }
+        }
+   }
+}
+
+def addDependenciesToPom(pom) {
+    pom.withXml {
+        def dependenciesNode = asNode().getAt('dependencies')[0] ?: asNode().appendNode('dependencies')
+
+        def addDependencies = { configuration, addExtraNode = {} ->
+            configuration.allDependencies
+                .findAll { it instanceof ExternalDependency && it.name != 'unspecified' }
+                .each {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                    addExtraNode(dependencyNode)
+                }
+        }
+
+        addDependencies(configurations.implementation)
+        addDependencies(configurations.runtimeOnly) { dependencyNode ->
+            dependencyNode.appendNode('scope', 'runtime')
+        }
+    }
+}

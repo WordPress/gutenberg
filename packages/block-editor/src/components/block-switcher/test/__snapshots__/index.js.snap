@@ -1,0 +1,114 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BlockSwitcherDropdownMenu should render disabled block switcher with multi block of different types when no transforms 1`] = `
+<div>
+  <div
+    class="components-toolbar"
+  >
+    <div>
+      <button
+        aria-label="Block Name"
+        class="components-button components-toolbar__control block-editor-block-switcher__no-switcher-icon has-icon"
+        data-toolbar-item="true"
+        disabled=""
+        type="button"
+      >
+        <span
+          class="block-editor-block-icon has-colors"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height="24"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.2 8v11c0 .7-.6 1.2-1.2 1.2H6v1.5h13c1.5 0 2.7-1.2 2.7-2.8V8zM18 16.4V4.6c0-.9-.7-1.6-1.6-1.6H4.6C3.7 3 3 3.7 3 4.6v11.8c0 .9.7 1.6 1.6 1.6h11.8c.9 0 1.6-.7 1.6-1.6zm-13.5 0V4.6c0-.1.1-.1.1-.1h11.8c.1 0 .1.1.1.1v11.8c0 .1-.1.1-.1.1H4.6l-.1-.1z"
+            />
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BlockSwitcherDropdownMenu should render enabled block switcher with multi block when transforms exist 1`] = `
+<div>
+  <div
+    class="components-toolbar"
+  >
+    <div
+      class="components-dropdown components-dropdown-menu block-editor-block-switcher"
+      tabindex="-1"
+    >
+      <button
+        aria-describedby="components-button__description-2"
+        aria-expanded="false"
+        aria-haspopup="true"
+        aria-label="Block Name"
+        class="components-button components-dropdown-menu__toggle has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <span
+          class="block-editor-block-icon block-editor-block-switcher__toggle has-colors"
+        />
+      </button>
+      <div
+        class="components-visually-hidden emotion-0 emotion-1"
+        data-wp-c16t="true"
+        data-wp-component="VisuallyHidden"
+        style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
+      >
+        <span
+          id="components-button__description-2"
+        >
+          Change type of 2 blocks
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`BlockSwitcherDropdownMenu should render switcher with blocks 1`] = `
+<div>
+  <div
+    class="components-toolbar"
+  >
+    <div
+      class="components-dropdown components-dropdown-menu block-editor-block-switcher"
+      tabindex="-1"
+    >
+      <button
+        aria-describedby="components-button__description-0"
+        aria-expanded="false"
+        aria-haspopup="true"
+        aria-label="Block Name"
+        class="components-button components-dropdown-menu__toggle has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <span
+          class="block-editor-block-icon block-editor-block-switcher__toggle has-colors"
+        />
+      </button>
+      <div
+        class="components-visually-hidden emotion-0 emotion-1"
+        data-wp-c16t="true"
+        data-wp-component="VisuallyHidden"
+        style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
+      >
+        <span
+          id="components-button__description-0"
+        >
+          Block Name: Change block type or style
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;

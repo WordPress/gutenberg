@@ -1,0 +1,48 @@
+{
+	"name": "@wordpress/format-library",
+	"version": "4.5.0",
+	"description": "Format library for the WordPress editor.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"formats"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/format-library/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/format-library"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/rich-text": "file:../rich-text",
+		"@wordpress/url": "file:../url"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

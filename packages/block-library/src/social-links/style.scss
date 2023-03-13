@@ -1,0 +1,144 @@
+.wp-block-social-links {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
+	padding-left: 0;
+	padding-right: 0;
+	// Some themes set text-indent on all <ul>
+	text-indent: 0;
+	// Some themes give all <ul> default margin instead of padding.
+	margin-left: 0;
+
+	// Unset background colors that can be inherited from Global Styles.
+	background: none;
+
+	// Some themes add underlines, false underlines (via shadows), and borders to <a>.
+	.wp-social-link a,
+	.wp-social-link a:hover {
+		text-decoration: none;
+		border-bottom: 0;
+		box-shadow: none;
+	}
+
+	.wp-social-link {
+		// By setting the font size, we can scale icons and paddings consistently based on that.
+		// This also allows themes to override this, if need be.
+		a {
+			padding: 0.25em;
+		}
+
+		svg {
+			width: 1em;
+			height: 1em;
+		}
+
+		span:not(.screen-reader-text) {
+			margin-left: 0.5em;
+			margin-right: 0.5em;
+			font-size: 0.65em;
+		}
+	}
+
+	// Icon sizes.
+	// Small.
+	&.has-small-icon-size {
+		font-size: 16px; // 16 makes for a quarter-padding that keeps the icon centered.
+	}
+
+	// Normal/default.
+	&,
+	&.has-normal-icon-size {
+		font-size: 24px;
+	}
+
+	// Large.
+	&.has-large-icon-size {
+		font-size: 36px;
+	}
+
+	// Huge.
+	&.has-huge-icon-size {
+		font-size: 48px;
+	}
+
+	// Center flex items. This has an equivalent in editor.scss.
+	// It also needs to override some of the default classes usually applied to the centering class.
+	// align left must not be set, because this is the default (flex-start).
+	&.aligncenter {
+		justify-content: center;
+		display: flex;
+	}
+	&.alignright {
+		justify-content: flex-end;
+	}
+}
+
+.wp-block-social-link {
+	display: block;
+	border-radius: 9999px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
+	transition: transform 0.1s ease;
+	@include reduce-motion("transition");
+
+	// Dimensions.
+	height: auto;
+
+	a {
+		align-items: center;
+		display: flex;
+		line-height: 0;
+		transition: transform 0.1s ease;
+	}
+
+	&:hover {
+		transform: scale(1.1);
+	}
+}
+
+// This needs specificity because themes usually override it with things like .widget-area a.
+.wp-block-social-links .wp-block-social-link .wp-block-social-link-anchor {
+	&,
+	&:hover,
+	&:active,
+	&:visited,
+	svg {
+		color: currentColor;
+		fill: currentColor;
+	}
+}
+
+// Provide colors for a range of icons.
+.wp-block-social-links:not(.is-style-logos-only) {
+	// Generic items such as mail, feed, etc.
+	@import "../social-link/socials-with-bg.scss";
+}
+
+// Treatment for logos only style.
+.wp-block-social-links.is-style-logos-only {
+	.wp-social-link {
+		background: none;
+
+		a {
+			padding: 0;
+		}
+
+		// Make these bigger.
+		svg {
+			width: 1.25em;
+			height: 1.25em;
+		}
+	}
+
+	@import "../social-link/socials-without-bg.scss";
+}
+
+// Treatment for pill shape style.
+.wp-block-social-links.is-style-pill-shape {
+	.wp-social-link {
+		width: auto;
+	}
+
+	.wp-social-link a {
+		padding-left: calc((2/3) * 1em);
+		padding-right: calc((2/3) * 1em);
+	}
+}

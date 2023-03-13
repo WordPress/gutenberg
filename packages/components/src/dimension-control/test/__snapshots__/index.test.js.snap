@@ -1,0 +1,1139 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DimensionControl rendering renders with custom sizes 1`] = `
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
+}
+
+.emotion-2 {
+  margin-bottom: calc(4px * 2);
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-5 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: normal;
+  -webkit-box-align: normal;
+  -ms-flex-align: normal;
+  align-items: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  gap: calc(4px * 2);
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  box-sizing: border-box;
+  position: relative;
+  border-radius: 2px;
+  padding-top: 0;
+}
+
+.emotion-5>* {
+  min-height: 0;
+}
+
+.emotion-8 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: block;
+  max-width: calc( 100% - 10px );
+}
+
+.emotion-11 {
+  color: #1e1e1e;
+  line-height: 1.2;
+  margin: 0;
+  font-size: calc((13 / 13) * 13px);
+  font-weight: normal;
+}
+
+.emotion-11.emotion-11.emotion-11 {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+  box-sizing: border-box;
+  display: block;
+  padding-top: 0;
+  padding-bottom: 0;
+  max-width: 100%;
+  z-index: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emotion-13 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  border-radius: inherit;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  position: relative;
+  background-color: #fff;
+  width: 100%;
+}
+
+.emotion-15.emotion-15.emotion-15 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background: transparent;
+  box-sizing: border-box;
+  border: none;
+  box-shadow: none!important;
+  color: #1e1e1e;
+  display: block;
+  font-family: inherit;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 16px;
+  height: 30px;
+  min-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 8px;
+  padding-right: 26px;
+  overflow: hidden;
+}
+
+@media ( min-width: 600px ) {
+  .emotion-15.emotion-15.emotion-15 {
+    font-size: 13px;
+  }
+}
+
+.emotion-17 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.emotion-20 {
+  margin-bottom: 0;
+  padding-right: calc(4px * 2);
+  position: absolute;
+  pointer-events: none;
+  right: 0;
+}
+
+.emotion-22 {
+  -webkit-margin-end: calc(4px * -1);
+  margin-inline-end: calc(4px * -1);
+  line-height: 0;
+}
+
+.emotion-24.emotion-24.emotion-24 {
+  box-sizing: border-box;
+  border-radius: inherit;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  border-color: #949494;
+  border-style: solid;
+  border-width: 1px;
+  padding-left: 2px;
+}
+
+<div>
+  <div
+    class="components-base-control emotion-0 emotion-1"
+  >
+    <div
+      class="components-base-control__field emotion-2 emotion-3"
+    >
+      <div
+        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        data-wp-c16t="true"
+        data-wp-component="Flex"
+      >
+        <div
+          class="components-flex-item emotion-7 emotion-8 emotion-6"
+          data-wp-c16t="true"
+          data-wp-component="FlexItem"
+        >
+          <label
+            class="components-truncate components-text components-input-control__label emotion-10 emotion-11 emotion-6"
+            data-wp-c16t="true"
+            data-wp-component="Text"
+            for="inspector-select-control-3"
+          >
+            Custom Dimension
+          </label>
+        </div>
+        <div
+          class="components-input-control__container emotion-13 emotion-14"
+        >
+          <select
+            class="components-select-control__input emotion-15 emotion-16"
+            id="inspector-select-control-3"
+          >
+            <option
+              value=""
+            >
+              Default
+            </option>
+            <option
+              value="mini"
+            >
+              Mini
+            </option>
+            <option
+              value="middle"
+            >
+              Middle
+            </option>
+            <option
+              value="giant"
+            >
+              Giant
+            </option>
+          </select>
+          <span
+            class="components-input-control__suffix emotion-17 emotion-18"
+          >
+            <div
+              class="components-spacer components-input-control-suffix-wrapper emotion-19 emotion-20 emotion-6"
+              data-wp-c16t="true"
+              data-wp-component="InputControlSuffixWrapper"
+            >
+              <div
+                class="emotion-22 emotion-23"
+              >
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </span>
+          <div
+            aria-hidden="true"
+            class="components-input-control__backdrop emotion-24 emotion-25"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`DimensionControl rendering renders with defaults 1`] = `
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
+}
+
+.emotion-2 {
+  margin-bottom: calc(4px * 2);
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-5 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: normal;
+  -webkit-box-align: normal;
+  -ms-flex-align: normal;
+  align-items: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  gap: calc(4px * 2);
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  box-sizing: border-box;
+  position: relative;
+  border-radius: 2px;
+  padding-top: 0;
+}
+
+.emotion-5>* {
+  min-height: 0;
+}
+
+.emotion-8 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: block;
+  max-width: calc( 100% - 10px );
+}
+
+.emotion-11 {
+  color: #1e1e1e;
+  line-height: 1.2;
+  margin: 0;
+  font-size: calc((13 / 13) * 13px);
+  font-weight: normal;
+}
+
+.emotion-11.emotion-11.emotion-11 {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+  box-sizing: border-box;
+  display: block;
+  padding-top: 0;
+  padding-bottom: 0;
+  max-width: 100%;
+  z-index: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emotion-13 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  border-radius: inherit;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  position: relative;
+  background-color: #fff;
+  width: 100%;
+}
+
+.emotion-15.emotion-15.emotion-15 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background: transparent;
+  box-sizing: border-box;
+  border: none;
+  box-shadow: none!important;
+  color: #1e1e1e;
+  display: block;
+  font-family: inherit;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 16px;
+  height: 30px;
+  min-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 8px;
+  padding-right: 26px;
+  overflow: hidden;
+}
+
+@media ( min-width: 600px ) {
+  .emotion-15.emotion-15.emotion-15 {
+    font-size: 13px;
+  }
+}
+
+.emotion-17 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.emotion-20 {
+  margin-bottom: 0;
+  padding-right: calc(4px * 2);
+  position: absolute;
+  pointer-events: none;
+  right: 0;
+}
+
+.emotion-22 {
+  -webkit-margin-end: calc(4px * -1);
+  margin-inline-end: calc(4px * -1);
+  line-height: 0;
+}
+
+.emotion-24.emotion-24.emotion-24 {
+  box-sizing: border-box;
+  border-radius: inherit;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  border-color: #949494;
+  border-style: solid;
+  border-width: 1px;
+  padding-left: 2px;
+}
+
+<div>
+  <div
+    class="components-base-control emotion-0 emotion-1"
+  >
+    <div
+      class="components-base-control__field emotion-2 emotion-3"
+    >
+      <div
+        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        data-wp-c16t="true"
+        data-wp-component="Flex"
+      >
+        <div
+          class="components-flex-item emotion-7 emotion-8 emotion-6"
+          data-wp-c16t="true"
+          data-wp-component="FlexItem"
+        >
+          <label
+            class="components-truncate components-text components-input-control__label emotion-10 emotion-11 emotion-6"
+            data-wp-c16t="true"
+            data-wp-component="Text"
+            for="inspector-select-control-0"
+          >
+            Padding
+          </label>
+        </div>
+        <div
+          class="components-input-control__container emotion-13 emotion-14"
+        >
+          <select
+            class="components-select-control__input emotion-15 emotion-16"
+            id="inspector-select-control-0"
+          >
+            <option
+              value=""
+            >
+              Default
+            </option>
+            <option
+              value="none"
+            >
+              None
+            </option>
+            <option
+              value="small"
+            >
+              Small
+            </option>
+            <option
+              value="medium"
+            >
+              Medium
+            </option>
+            <option
+              value="large"
+            >
+              Large
+            </option>
+            <option
+              value="xlarge"
+            >
+              Extra Large
+            </option>
+          </select>
+          <span
+            class="components-input-control__suffix emotion-17 emotion-18"
+          >
+            <div
+              class="components-spacer components-input-control-suffix-wrapper emotion-19 emotion-20 emotion-6"
+              data-wp-c16t="true"
+              data-wp-component="InputControlSuffixWrapper"
+            >
+              <div
+                class="emotion-22 emotion-23"
+              >
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </span>
+          <div
+            aria-hidden="true"
+            class="components-input-control__backdrop emotion-24 emotion-25"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`DimensionControl rendering renders with icon and custom icon label 1`] = `
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
+}
+
+.emotion-2 {
+  margin-bottom: calc(4px * 2);
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-5 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: normal;
+  -webkit-box-align: normal;
+  -ms-flex-align: normal;
+  align-items: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  gap: calc(4px * 2);
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  box-sizing: border-box;
+  position: relative;
+  border-radius: 2px;
+  padding-top: 0;
+}
+
+.emotion-5>* {
+  min-height: 0;
+}
+
+.emotion-8 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: block;
+  max-width: calc( 100% - 10px );
+}
+
+.emotion-11 {
+  color: #1e1e1e;
+  line-height: 1.2;
+  margin: 0;
+  font-size: calc((13 / 13) * 13px);
+  font-weight: normal;
+}
+
+.emotion-11.emotion-11.emotion-11 {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+  box-sizing: border-box;
+  display: block;
+  padding-top: 0;
+  padding-bottom: 0;
+  max-width: 100%;
+  z-index: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emotion-13 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  border-radius: inherit;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  position: relative;
+  background-color: #fff;
+  width: 100%;
+}
+
+.emotion-15.emotion-15.emotion-15 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background: transparent;
+  box-sizing: border-box;
+  border: none;
+  box-shadow: none!important;
+  color: #1e1e1e;
+  display: block;
+  font-family: inherit;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 16px;
+  height: 30px;
+  min-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 8px;
+  padding-right: 26px;
+  overflow: hidden;
+}
+
+@media ( min-width: 600px ) {
+  .emotion-15.emotion-15.emotion-15 {
+    font-size: 13px;
+  }
+}
+
+.emotion-17 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.emotion-20 {
+  margin-bottom: 0;
+  padding-right: calc(4px * 2);
+  position: absolute;
+  pointer-events: none;
+  right: 0;
+}
+
+.emotion-22 {
+  -webkit-margin-end: calc(4px * -1);
+  margin-inline-end: calc(4px * -1);
+  line-height: 0;
+}
+
+.emotion-24.emotion-24.emotion-24 {
+  box-sizing: border-box;
+  border-radius: inherit;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  border-color: #949494;
+  border-style: solid;
+  border-width: 1px;
+  padding-left: 2px;
+}
+
+<div>
+  <div
+    class="components-base-control emotion-0 emotion-1"
+  >
+    <div
+      class="components-base-control__field emotion-2 emotion-3"
+    >
+      <div
+        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        data-wp-c16t="true"
+        data-wp-component="Flex"
+      >
+        <div
+          class="components-flex-item emotion-7 emotion-8 emotion-6"
+          data-wp-c16t="true"
+          data-wp-component="FlexItem"
+        >
+          <label
+            class="components-truncate components-text components-input-control__label emotion-10 emotion-11 emotion-6"
+            data-wp-c16t="true"
+            data-wp-component="Text"
+            for="inspector-select-control-2"
+          >
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              height="24"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"
+              />
+            </svg>
+            Margin
+          </label>
+        </div>
+        <div
+          class="components-input-control__container emotion-13 emotion-14"
+        >
+          <select
+            class="components-select-control__input emotion-15 emotion-16"
+            id="inspector-select-control-2"
+          >
+            <option
+              value=""
+            >
+              Default
+            </option>
+            <option
+              value="none"
+            >
+              None
+            </option>
+            <option
+              value="small"
+            >
+              Small
+            </option>
+            <option
+              value="medium"
+            >
+              Medium
+            </option>
+            <option
+              value="large"
+            >
+              Large
+            </option>
+            <option
+              value="xlarge"
+            >
+              Extra Large
+            </option>
+          </select>
+          <span
+            class="components-input-control__suffix emotion-17 emotion-18"
+          >
+            <div
+              class="components-spacer components-input-control-suffix-wrapper emotion-19 emotion-20 emotion-6"
+              data-wp-c16t="true"
+              data-wp-component="InputControlSuffixWrapper"
+            >
+              <div
+                class="emotion-22 emotion-23"
+              >
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </span>
+          <div
+            aria-hidden="true"
+            class="components-input-control__backdrop emotion-24 emotion-25"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`DimensionControl rendering renders with icon and default icon label 1`] = `
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
+}
+
+.emotion-2 {
+  margin-bottom: calc(4px * 2);
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-5 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: normal;
+  -webkit-box-align: normal;
+  -ms-flex-align: normal;
+  align-items: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  gap: calc(4px * 2);
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  box-sizing: border-box;
+  position: relative;
+  border-radius: 2px;
+  padding-top: 0;
+}
+
+.emotion-5>* {
+  min-height: 0;
+}
+
+.emotion-8 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: block;
+  max-width: calc( 100% - 10px );
+}
+
+.emotion-11 {
+  color: #1e1e1e;
+  line-height: 1.2;
+  margin: 0;
+  font-size: calc((13 / 13) * 13px);
+  font-weight: normal;
+}
+
+.emotion-11.emotion-11.emotion-11 {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+  box-sizing: border-box;
+  display: block;
+  padding-top: 0;
+  padding-bottom: 0;
+  max-width: 100%;
+  z-index: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emotion-13 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  border-radius: inherit;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  position: relative;
+  background-color: #fff;
+  width: 100%;
+}
+
+.emotion-15.emotion-15.emotion-15 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background: transparent;
+  box-sizing: border-box;
+  border: none;
+  box-shadow: none!important;
+  color: #1e1e1e;
+  display: block;
+  font-family: inherit;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 16px;
+  height: 30px;
+  min-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 8px;
+  padding-right: 26px;
+  overflow: hidden;
+}
+
+@media ( min-width: 600px ) {
+  .emotion-15.emotion-15.emotion-15 {
+    font-size: 13px;
+  }
+}
+
+.emotion-17 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.emotion-20 {
+  margin-bottom: 0;
+  padding-right: calc(4px * 2);
+  position: absolute;
+  pointer-events: none;
+  right: 0;
+}
+
+.emotion-22 {
+  -webkit-margin-end: calc(4px * -1);
+  margin-inline-end: calc(4px * -1);
+  line-height: 0;
+}
+
+.emotion-24.emotion-24.emotion-24 {
+  box-sizing: border-box;
+  border-radius: inherit;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  border-color: #949494;
+  border-style: solid;
+  border-width: 1px;
+  padding-left: 2px;
+}
+
+<div>
+  <div
+    class="components-base-control emotion-0 emotion-1"
+  >
+    <div
+      class="components-base-control__field emotion-2 emotion-3"
+    >
+      <div
+        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        data-wp-c16t="true"
+        data-wp-component="Flex"
+      >
+        <div
+          class="components-flex-item emotion-7 emotion-8 emotion-6"
+          data-wp-c16t="true"
+          data-wp-component="FlexItem"
+        >
+          <label
+            class="components-truncate components-text components-input-control__label emotion-10 emotion-11 emotion-6"
+            data-wp-c16t="true"
+            data-wp-component="Text"
+            for="inspector-select-control-1"
+          >
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              height="24"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"
+              />
+            </svg>
+            Margin
+          </label>
+        </div>
+        <div
+          class="components-input-control__container emotion-13 emotion-14"
+        >
+          <select
+            class="components-select-control__input emotion-15 emotion-16"
+            id="inspector-select-control-1"
+          >
+            <option
+              value=""
+            >
+              Default
+            </option>
+            <option
+              value="none"
+            >
+              None
+            </option>
+            <option
+              value="small"
+            >
+              Small
+            </option>
+            <option
+              value="medium"
+            >
+              Medium
+            </option>
+            <option
+              value="large"
+            >
+              Large
+            </option>
+            <option
+              value="xlarge"
+            >
+              Extra Large
+            </option>
+          </select>
+          <span
+            class="components-input-control__suffix emotion-17 emotion-18"
+          >
+            <div
+              class="components-spacer components-input-control-suffix-wrapper emotion-19 emotion-20 emotion-6"
+              data-wp-c16t="true"
+              data-wp-component="InputControlSuffixWrapper"
+            >
+              <div
+                class="emotion-22 emotion-23"
+              >
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </span>
+          <div
+            aria-hidden="true"
+            class="components-input-control__backdrop emotion-24 emotion-25"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

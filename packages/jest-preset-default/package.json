@@ -1,0 +1,43 @@
+{
+	"name": "@wordpress/jest-preset-default",
+	"version": "10.9.0",
+	"description": "Default Jest preset for WordPress development.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"jest",
+		"preset",
+		"react"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/jest-preset-default/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/jest-preset-default"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=14"
+	},
+	"files": [
+		"scripts",
+		"index.js",
+		"jest-preset.js"
+	],
+	"main": "index.js",
+	"dependencies": {
+		"@wordpress/jest-console": "file:../jest-console",
+		"babel-jest": "^29.5.0"
+	},
+	"peerDependencies": {
+		"@babel/core": ">=7",
+		"jest": ">=29"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

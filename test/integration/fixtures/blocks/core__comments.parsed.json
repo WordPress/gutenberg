@@ -1,0 +1,180 @@
+[
+	{
+		"blockName": "core/comments",
+		"attrs": {
+			"className": "comments-post-extra"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/comments-title",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			},
+			{
+				"blockName": "core/comment-template",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/columns",
+						"attrs": {},
+						"innerBlocks": [
+							{
+								"blockName": "core/column",
+								"attrs": {
+									"width": "40px"
+								},
+								"innerBlocks": [
+									{
+										"blockName": "core/avatar",
+										"attrs": {
+											"size": 40,
+											"style": {
+												"border": {
+													"radius": "20px"
+												}
+											}
+										},
+										"innerBlocks": [],
+										"innerHTML": "",
+										"innerContent": []
+									}
+								],
+								"innerHTML": "\n    <div class=\"wp-block-column\" style=\"flex-basis:40px\"></div>\n    ",
+								"innerContent": [
+									"\n    <div class=\"wp-block-column\" style=\"flex-basis:40px\">",
+									null,
+									"</div>\n    "
+								]
+							},
+							{
+								"blockName": "core/column",
+								"attrs": {},
+								"innerBlocks": [
+									{
+										"blockName": "core/comment-author-name",
+										"attrs": {
+											"fontSize": "small"
+										},
+										"innerBlocks": [],
+										"innerHTML": "",
+										"innerContent": []
+									},
+									{
+										"blockName": "core/group",
+										"attrs": {
+											"style": {
+												"spacing": {
+													"margin": {
+														"top": "0px",
+														"bottom": "0px"
+													}
+												}
+											},
+											"layout": {
+												"type": "flex"
+											}
+										},
+										"innerBlocks": [
+											{
+												"blockName": "core/comment-date",
+												"attrs": {
+													"fontSize": "small"
+												},
+												"innerBlocks": [],
+												"innerHTML": "",
+												"innerContent": []
+											},
+											{
+												"blockName": "core/comment-edit-link",
+												"attrs": {
+													"fontSize": "small"
+												},
+												"innerBlocks": [],
+												"innerHTML": "",
+												"innerContent": []
+											}
+										],
+										"innerHTML": "\n    <div class=\"wp-block-group\" style=\"margin-top:0px;margin-bottom:0px\">\n    \n    </div>\n    ",
+										"innerContent": [
+											"\n    <div class=\"wp-block-group\" style=\"margin-top:0px;margin-bottom:0px\">",
+											null,
+											"\n    \n    ",
+											null,
+											"</div>\n    "
+										]
+									},
+									{
+										"blockName": "core/comment-content",
+										"attrs": {},
+										"innerBlocks": [],
+										"innerHTML": "",
+										"innerContent": []
+									},
+									{
+										"blockName": "core/comment-reply-link",
+										"attrs": {
+											"fontSize": "small"
+										},
+										"innerBlocks": [],
+										"innerHTML": "",
+										"innerContent": []
+									}
+								],
+								"innerHTML": "\n    <div class=\"wp-block-column\">\n    \n    \n    \n    \n    \n    </div>\n    ",
+								"innerContent": [
+									"\n    <div class=\"wp-block-column\">",
+									null,
+									"\n    \n    ",
+									null,
+									"\n    \n    ",
+									null,
+									"\n    \n    ",
+									null,
+									"</div>\n    "
+								]
+							}
+						],
+						"innerHTML": "\n    <div class=\"wp-block-columns\">\n    \n    </div>\n    ",
+						"innerContent": [
+							"\n    <div class=\"wp-block-columns\">",
+							null,
+							"\n    \n    ",
+							null,
+							"</div>\n    "
+						]
+					}
+				],
+				"innerHTML": "\n    \n    ",
+				"innerContent": [ "\n    ", null, "\n    " ]
+			},
+			{
+				"blockName": "core/comments-pagination",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			},
+			{
+				"blockName": "core/post-comments-form",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-comments comments-post-extra\">\n\n    \n    \n    \n    \n    </div>\n    ",
+		"innerContent": [
+			"\n<div class=\"wp-block-comments comments-post-extra\">",
+			null,
+			"\n\n    ",
+			null,
+			"\n    \n    ",
+			null,
+			"\n    \n    ",
+			null,
+			"</div>\n    "
+		]
+	}
+]

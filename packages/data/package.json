@@ -1,0 +1,53 @@
+{
+	"name": "@wordpress/data",
+	"version": "8.5.0",
+	"description": "Data module for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"data",
+		"redux"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/data/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/data"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/element": "file:../element",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/priority-queue": "file:../priority-queue",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/redux-routine": "file:../redux-routine",
+		"deepmerge": "^4.3.0",
+		"equivalent-key-map": "^0.2.2",
+		"is-plain-object": "^5.0.0",
+		"is-promise": "^4.0.0",
+		"redux": "^4.1.2",
+		"turbo-combine-reducers": "^1.0.2",
+		"use-memo-one": "^1.1.1"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

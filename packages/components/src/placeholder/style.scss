@@ -1,0 +1,243 @@
+// This needs specificity to override individual block styles.
+.components-placeholder.components-placeholder {
+	box-sizing: border-box;
+	position: relative;
+	padding: 1em;
+	min-height: 200px;
+	width: 100%;
+	text-align: left;
+	margin: 0;
+	color: $gray-900;
+
+	// Some editor styles unset this.
+	-moz-font-smoothing: subpixel-antialiased;
+	-webkit-font-smoothing: subpixel-antialiased;
+
+	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+	@supports (position: sticky) {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: flex-start;
+	}
+
+	// Block UI appearance.
+	border-radius: $radius-block-ui;
+	background-color: $white;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
+}
+
+.components-placeholder__error,
+.components-placeholder__instructions,
+.components-placeholder__label,
+.components-placeholder__fieldset {
+	font-family: $default-font;
+	font-size: $default-font-size;
+}
+
+.components-placeholder__label {
+	display: flex;
+	font-weight: 600;
+	margin-bottom: $grid-unit-20;
+	align-items: center;
+
+	> svg,
+	.dashicon,
+	.block-editor-block-icon {
+		margin-right: $grid-unit-15;
+		fill: currentColor;
+		// Optimizate for high contrast modes.
+		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
+		@media (forced-colors: active) {
+			fill: CanvasText;
+		}
+	}
+
+	// Don't take up space if the label is empty.
+	&:empty {
+		display: none;
+	}
+}
+
+.components-placeholder__fieldset,
+.components-placeholder__fieldset form {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	flex-wrap: wrap;
+
+	p {
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
+}
+
+// Overrides for browser and editor fieldset styles.
+.components-placeholder__fieldset.components-placeholder__fieldset {
+	border: none;
+	padding: 0;
+
+	.components-placeholder__instructions {
+		padding: 0;
+		font-weight: normal;
+		font-size: 1em;
+	}
+}
+
+.components-placeholder__fieldset.is-column-layout,
+.components-placeholder__fieldset.is-column-layout form {
+	flex-direction: column;
+}
+
+.components-placeholder__input[type="url"] {
+	@include input-control;
+	margin: 0 8px 0 0;
+	flex: 1 1 auto;
+}
+
+.components-placeholder__instructions {
+	margin-bottom: 1em;
+}
+
+.components-placeholder__error {
+	margin-top: 1em;
+	width: 100%;
+}
+
+.components-placeholder__fieldset .components-button {
+	margin-right: $grid-unit-15;
+	margin-bottom: $grid-unit-15; // If buttons wrap we need vertical space between.
+
+	&:last-child {
+		margin-bottom: 0;
+		margin-right: 0;
+	}
+}
+
+// Any `<Button />` component with `variant="link"` prop will need extra spacing if placed
+// immediately after a button which is *not* an `variant="link"` style button. This is because
+// `variant="link"` has no padding so we need to account for this to avoid the buttons butting
+// up against each other. If it's the last item we don't need a right margin.
+.components-placeholder__fieldset .components-button:not(.is-link) ~ .components-button.is-link {
+	margin-left: 10px; // equal to standard button inner padding
+	margin-right: 10px; // equal to standard button inner padding
+
+	&:last-child {
+		margin-right: 0;
+	}
+}
+
+// Element queries to show different layouts at various sizes.
+.components-placeholder {
+	// Medium and large sizes.
+	&.is-large {
+		.components-placeholder__label {
+			font-size: 18pt;
+			font-weight: normal;
+		}
+	}
+
+	// Medium and small sizes.
+	&.is-medium,
+	&.is-small {
+		.components-placeholder__instructions {
+			display: none;
+		}
+
+		.components-placeholder__fieldset,
+		.components-placeholder__fieldset form {
+			flex-direction: column;
+		}
+
+		.components-placeholder__fieldset .components-button {
+			margin-right: auto;
+		}
+	}
+
+	// Small sizes.
+	&.is-small {
+		.components-button {
+			padding: 0 $grid-unit-10 2px;
+		}
+	}
+}
+
+
+/**
+ * Dashed style placeholders
+ */
+
+// @todo
+// These styles are only applied after the has-illustration gets added.
+// This is mainly an issue in terms of Site Logo which has a brief flash of the square placeholder.
+.components-placeholder.has-illustration {
+	color: inherit;
+	display: flex;
+	box-shadow: none;
+	min-width: 100px;
+
+	// Blur the background so layered dashed placeholders are still visually separate.
+	// Make the background transparent to not interfere with the background overlay in placeholder-style() pseudo element
+	backdrop-filter: blur(100px);
+	background-color: transparent;
+
+	// This appears to fix an occasional Chrome bug where the blurred background would have an incorrect color.
+	backface-visibility: hidden;
+
+	// Invert the colors in themes deemed dark.
+	.is-dark-theme & {
+		background-color: rgba($black, 0.1);
+	}
+
+	.components-placeholder__fieldset {
+		width: auto;
+
+		// Unset intrinsic margins.
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	// Show placeholder buttons on block selection.
+	// Note that these can't be display: none; or visibility: hidden;, as that breaks the writing flow.
+	.components-placeholder__label,
+	.components-placeholder__instructions,
+	.components-button {
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+	}
+
+	.is-selected > & {
+		.components-placeholder__label,
+		.components-placeholder__instructions,
+		.components-button {
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
+
+	// By painting the borders here, we enable them to be replaced by the Border control.
+	@include placeholder-style();
+	overflow: hidden;
+}
+
+// Position the spinner.
+// @todo these rules should ideally live with the spinner component itself.
+.components-placeholder__preview {
+	display: flex;
+	justify-content: center;
+}
+
+.components-placeholder__illustration {
+	box-sizing: content-box;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 100%;
+	height: 100%;
+	stroke: currentColor;
+	opacity: 0.25;
+}

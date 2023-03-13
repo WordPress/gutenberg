@@ -1,0 +1,129 @@
+/**
+ * SCSS Variables.
+ *
+ * Please use variables from this sheet to ensure consistency across the UI.
+ * Don't add to this sheet unless you're pretty sure the value will be reused in many places.
+ * For example, don't add rules to this sheet that affect block visuals. It's purely for UI.
+ */
+
+@import "./colors";
+
+/**
+ * Fonts & basic variables.
+ */
+
+$default-font: -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif;
+$default-font-size: 13px;
+$default-line-height: 1.4;
+$editor-html-font: Menlo, Consolas, monaco, monospace;
+$editor-font-size: 16px;
+$default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks.
+$text-editor-font-size: 15px;
+$editor-line-height: 1.8;
+$mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in".
+
+
+/**
+ * Grid System.
+ * https://make.wordpress.org/design/2019/10/31/proposal-a-consistent-spacing-system-for-wordpress/
+ */
+
+$grid-unit: 8px;
+$grid-unit-05: 0.5 * $grid-unit;	// 4px
+$grid-unit-10: 1 * $grid-unit;		// 8px
+$grid-unit-15: 1.5 * $grid-unit;	// 12px
+$grid-unit-20: 2 * $grid-unit;		// 16px
+$grid-unit-30: 3 * $grid-unit;		// 24px
+$grid-unit-40: 4 * $grid-unit;		// 32px
+$grid-unit-50: 5 * $grid-unit;		// 40px
+$grid-unit-60: 6 * $grid-unit;		// 48px
+$grid-unit-70: 7 * $grid-unit;		// 56px
+$grid-unit-80: 8 * $grid-unit;		// 64px
+
+/**
+ * Dimensions.
+ */
+
+$icon-size: 24px;
+$button-size: 36px;
+$button-size-small: 24px;
+$header-height: 60px;
+$panel-header-height: $grid-unit-60;
+$nav-sidebar-width: 360px;
+$admin-bar-height: 32px;
+$admin-bar-height-big: 46px;
+$admin-sidebar-width: 160px;
+$admin-sidebar-width-big: 190px;
+$admin-sidebar-width-collapsed: 36px;
+$modal-min-width: 360px;
+$spinner-size: 16px;
+$canvas-padding: $grid-unit-30;
+
+
+/**
+ * Shadows.
+ */
+
+$shadow-popover: 0 0.7px 1px rgba($black, 0.1), 0 1.2px 1.7px -0.2px rgba($black, 0.1), 0 2.3px 3.3px -0.5px rgba($black, 0.1);
+$shadow-modal: 0 0.7px 1px rgba($black, 0.15), 0 2.7px 3.8px -0.2px rgba($black, 0.15), 0 5.5px 7.8px -0.3px rgba($black, 0.15), 0.1px 11.5px 16.4px -0.5px rgba($black, 0.15);
+
+/**
+ * Editor widths.
+ */
+
+$sidebar-width: 280px;
+$content-width: 840px;
+$wide-content-width: 1100px;
+$widget-area-width: 700px;
+
+
+/**
+ * Block & Editor UI.
+ */
+
+$block-toolbar-height: $grid-unit-60;
+$border-width: 1px;
+$border-width-focus: 2px; // This exists as a fallback, and is ideally overridden by var(--wp-admin-border-width-focus) unless in some SASS math cases.
+$border-width-tab: 1.5px;
+$helptext-font-size: 12px;
+$radius-round: 50%;
+$radius-block-ui: 2px;
+$radio-input-size: 20px;
+$radio-input-size-sm: 24px; // Width & height for small viewports.
+
+// Deprecated, please avoid using these.
+$block-padding: 14px; // Used to define space between block footprint and surrouding borders.
+
+
+/**
+ * Block paddings.
+ */
+
+// Padding for blocks with a background color (e.g. paragraph or group).
+$block-bg-padding--v: 1.25em;
+$block-bg-padding--h: 2.375em;
+
+
+/**
+ * React Native specific.
+ * These variables do not appear to be used anywhere else.
+ */
+
+// Dimensions.
+$mobile-header-toolbar-height: 44px;
+$mobile-header-toolbar-expanded-height: 52px;
+$mobile-floating-toolbar-height: 44px;
+$mobile-floating-toolbar-margin: 8px;
+$mobile-color-swatch: 48px;
+
+// Block UI.
+$mobile-block-toolbar-height: 44px;
+$dimmed-opacity: 1;
+$block-edge-to-content: 16px;
+$solid-border-space: 12px;
+$dashed-border-space: 6px;
+$block-selected-margin: 3px;
+$block-selected-border-width: 1px;
+$block-selected-padding: 0;
+$block-selected-child-margin: 5px;
+$block-selected-to-content: $block-edge-to-content - $block-selected-margin - $block-selected-border-width;

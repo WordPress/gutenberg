@@ -1,0 +1,31 @@
+[
+	{
+		"blockName": "core/cover",
+		"attrs": {
+			"url": "https://w.wiki/59Sd",
+			"id": 609,
+			"dimRatio": 50
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {
+					"align": "center",
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<p class=\"has-text-align-center has-large-font-size\"></p>\n\t",
+				"innerContent": [
+					"\n\t<p class=\"has-text-align-center has-large-font-size\"></p>\n\t"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-cover\"><span aria-hidden=\"true\" class=\"wp-block-cover__background has-background-dim\"></span><img class=\"wp-block-cover__image-background wp-image-609\" alt=\"\" src=\"https://w.wiki/59Sd\" data-object-fit=\"cover\"/><div class=\"wp-block-cover__inner-container\"></div></div>\n\t",
+		"innerContent": [
+			"\n<div class=\"wp-block-cover\"><span aria-hidden=\"true\" class=\"wp-block-cover__background has-background-dim\"></span><img class=\"wp-block-cover__image-background wp-image-609\" alt=\"\" src=\"https://w.wiki/59Sd\" data-object-fit=\"cover\"/><div class=\"wp-block-cover__inner-container\">",
+			null,
+			"</div></div>\n\t"
+		]
+	}
+]

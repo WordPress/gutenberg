@@ -1,0 +1,13 @@
+[data-type="core/shortcode"] {
+	.block-editor-plain-text {
+		max-height: 250px;
+	}
+
+	&.components-placeholder {
+		min-height: 0;
+	}
+}
+
+.blocks-shortcode__textarea {
+	@include input-control;
+}

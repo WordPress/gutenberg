@@ -1,0 +1,39 @@
+// Allow the position to be easily overridden to e.g. fixed.
+[role="region"] {
+	position: relative;
+}
+
+.is-focusing-regions {
+	[role="region"]:focus::after {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		content: "";
+		pointer-events: none;
+		outline: 4px solid $components-color-accent;
+		outline-offset: -4px;
+		z-index: z-index(".is-focusing-regions {region} :focus::after");
+	}
+
+	// Fixes for edge cases.
+	// Some of the regions are currently used for layout purposes as 'interface skeleton'
+	// items. When they're absolutely positioned or when they contain absolutely
+	// positioned elements, they may have no size therefore the focus style is not
+	// visible. For the future, it's important to take into consideration that
+	// the navigable regions should always have a computed size. For now, we can
+	// fix some edge cases but these CSS rules should be later removed in favor of
+	// a more abstracted approach to make the navigable regions focus style work
+	// regardles of the CSS used on other components.
+
+	// Header top bar when Distraction free mode is on.
+	&.is-distraction-free .interface-interface-skeleton__header .edit-post-header,
+	.interface-interface-skeleton__sidebar .edit-post-layout__toggle-sidebar-panel,
+	.interface-interface-skeleton__actions .edit-post-layout__toggle-publish-panel,
+	.interface-interface-skeleton__actions .edit-post-layout__toggle-entities-saved-states-panel,
+	.editor-post-publish-panel {
+		outline: 4px solid $components-color-accent;
+		outline-offset: -4px;
+	}
+}

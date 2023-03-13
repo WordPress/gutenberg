@@ -1,0 +1,43 @@
+{
+	"name": "@wordpress/list-reusable-blocks",
+	"version": "4.5.0",
+	"description": "Adding Export/Import support to the reusable blocks listing.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"templates",
+		"reusable blocks"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/list-reusable-blocks/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/list-reusable-blocks"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"change-case": "^4.1.2"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

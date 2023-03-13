@@ -1,0 +1,29 @@
+.components-picker__separator {
+	margin-top: $grid-unit-20 * 0.5;
+	margin-bottom: $grid-unit-20 * 0.5;
+	margin-left: -$grid-unit-20;
+	margin-right: -$grid-unit-20;
+	height: $border-width;
+	background-color: $light-gray-400;
+}
+
+.components-picker__separator--dark {
+	background-color: $gray-70;
+}
+
+.components-picker__button--disabled {
+	opacity: 0.3;
+}
+
+.components-picker__panel {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.components-picker__button-title {
+	color: $blue-50;
+}
+
+.components-picker__button-title--dark {
+	color: $blue-30;
+}

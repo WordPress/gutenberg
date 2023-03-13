@@ -1,0 +1,33 @@
+.wp-block-comment-template {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+	margin-bottom: 0;
+	max-width: 100%;
+	list-style: none;
+	padding: 0;
+
+	li {
+		clear: both;
+	}
+
+	ol {
+		margin-bottom: 0;
+		max-width: 100%;
+		list-style: none;
+		padding-left: 2rem;
+	}
+
+	&.alignleft {
+		float: left;
+	}
+
+	&.aligncenter {
+		margin-left: auto;
+		margin-right: auto;
+		width: fit-content;
+	}
+
+	&.alignright {
+		float: right;
+	}
+}

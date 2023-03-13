@@ -1,72 +1,64 @@
 # Gutenberg
-[![Build Status](https://img.shields.io/travis/WordPress/gutenberg/master.svg)](https://travis-ci.org/WordPress/gutenberg)
-[![Coverage](https://img.shields.io/codecov/c/github/WordPress/gutenberg/master.svg)](https://codecov.io/gh/WordPress/gutenberg)
 
-Printing since 1440.
+[![End-to-End Tests](https://github.com/WordPress/gutenberg/workflows/End-to-End%20Tests/badge.svg)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22End-to-End+Tests%22+branch%3Atrunk)
+[![Static Analysis (Linting, License, Type checks...)](<https://github.com/WordPress/gutenberg/workflows/Static%20Analysis%20(Linting,%20License,%20Type%20checks...)/badge.svg>)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22Static+Analysis+%28Linting%2C+License%2C+Type+checks...%29%22+branch%3Atrunk)
+[![Unit Tests](https://github.com/WordPress/gutenberg/workflows/Unit%20Tests/badge.svg)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22Unit+Tests%22+branch%3Atrunk)
+[![Create Block](https://github.com/WordPress/gutenberg/workflows/Create%20Block/badge.svg)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22Create+Block%22+branch%3Atrunk)
+[![React Native E2E Tests (iOS)](<https://github.com/WordPress/gutenberg/workflows/React%20Native%20E2E%20Tests%20(iOS)/badge.svg>)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22React+Native+E2E+Tests+%28iOS%29%22+branch%3Atrunk)
+[![React Native E2E Tests (Android)](<https://github.com/WordPress/gutenberg/workflows/React%20Native%20E2E%20Tests%20(Android)/badge.svg>)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22React+Native+E2E+Tests+%28Android%29%22+branch%3Atrunk)
 
-![Gutenberg editing](https://cldup.com/H0oKBfpidk.png)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org)
 
-This is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in core</a>. Gutenberg is the project name. If you want to use the latest release with your WordPress, <a href="https://wordpress.org/plugins/gutenberg/">download Gutenberg from the WordPress.org plugins repository</a>. Conversations and discussions take place in #core-editor on <a href="https://make.wordpress.org/chat/">the core WordPress Slack</a>.
+![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://user-images.githubusercontent.com/1204802/100067796-fc3e8700-2e36-11eb-993b-6b80b4310b87.png)
 
-Discover more about the project <a href="https://wordpress.org/gutenberg">here</a>.
+Welcome to the development hub for the WordPress Gutenberg project!
 
-Gutenberg is more than an editor. While the editor is the focus right now, the project will ultimately impact the entire publishing experience including customization (the next focus area).
+"Gutenberg" is a codename for a whole new paradigm in WordPress site building and publishing, that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. Right now, the project is in the second phase of a four-phase process that will touch every piece of WordPress -- Editing, **Customization** (which includes Full Site Editing, Block Patterns, Block Directory and Block based themes), Collaboration, and Multilingual -- and is focused on a new editing experience, the block editor.
 
-## Editing focus
+The block editor introduces a modular approach to pages and posts: each piece of content in the editor, from a paragraph to an image gallery to a headline, is its own block. And just like physical blocks, WordPress blocks can be added, arranged, and rearranged, allowing WordPress users to create media-rich pages in a visually intuitive way -- and without work-arounds like shortcodes or custom HTML.
 
-> The editor will create a new page- and post-building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery. — Matt Mullenweg
+The block editor first became available in December 2018, and we're still hard at work refining the experience, creating more and better blocks, and laying the groundwork for the next three phases of work. The Gutenberg plugin gives you the latest version of the block editor so you can join us in testing bleeding-edge features, start playing with blocks, and maybe get inspired to build your own.
 
-One thing that sets WordPress apart from other systems is that it allows you to create as rich a post layout as you can imagine -- but only if you know HTML and CSS and build your own custom theme. By thinking of the editor as a tool to let you write rich posts and create beautiful layouts, we can transform WordPress into something users _love_, as opposed something they pick it because it's what everyone else uses.
+Check out the [Ways to keep up with Gutenberg & Full Site Editing (FSE)](https://make.wordpress.org/core/2020/05/20/ways-to-keep-up-with-full-site-editing-fse/)
 
-Gutenberg looks at the editor as more than a content field, revisiting a layout that has been largely unchanged for almost a decade. This allows us to holistically design a modern editing experience and build a foundation for things to come.
+## Getting Started
 
-Here's why we're looking at the whole editing screen, as opposed to just the content field:
+Get hands on: check out the [block editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
 
-1. The block unifies multiple interfaces. If we add that on top of the existing interface, it would _add_ complexity, as opposed to removing it.
-2. By revisiting the interface, we can modernize the writing, editing, and publishing experience, with usability and simplicity in mind, benefitting both new and casual users.
-3. When singular block interface takes center stage, it demonstrates a clear path forward for developers to create premium blocks, superior to both shortcodes and widgets.
-4. Considering the whole interface lays a solid foundation for the next focus, full site customization.
-5. Looking at the full editor screen also gives us the opportunity to drastically modernize the foundation, and take steps towards a more fluid and JavaScript-powered future that fully leverages the WordPress REST API.
+### Using Gutenberg
 
-![Writing in Gutenberg 1.6](https://make.wordpress.org/core/files/2017/10/gutenberg-typing-1_6.gif)
+-   **Download:** To use the latest release of the Gutenberg plugin on your WordPress site: install from the plugins page in wp-admin, or [download from the WordPress.org plugins repository](https://wordpress.org/plugins/gutenberg/).
 
-## Blocks
+-   **User Documentation:** See the [WordPress Editor documentation](https://wordpress.org/support/article/wordpress-editor/) for detailed docs on using the editor as an author creating posts and pages.
 
-Blocks are the unifying evolution of what is now covered, in different ways, by shortcodes, embeds, widgets, post formats, custom post types, theme options, meta-boxes, and other formatting elements. They embrace the breadth of functionality WordPress is capable of, with the clarity of a consistent user experience.
+-   **User Support:** If you have run into an issue, you should check the [Support Forums first](https://wordpress.org/support/forums/). The forums are a great place to get help. If you have a bug to report, please [submit it to the Gutenberg repository](https://github.com/wordpress/gutenberg/issues). Please search prior to creating a new bug to confirm its not a duplicate.
 
-Imagine a custom “employee” block that a client can drag to an About page to automatically display a picture, name, and bio. A whole universe of plugins that all extend WordPress in the same way. Simplified menus and widgets. Users who can instantly understand and use WordPress  -- and 90% of plugins. This will allow you to easily compose beautiful posts like <a href="http://moc.co/sandbox/example-post/">this example</a>.
+### Developing for Gutenberg
 
-Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/faq.md">FAQ</a> for answers to the most common questions about the project.
+Extending and customizing is at the heart of the WordPress platform, this is no different for the Gutenberg project. The editor and future products can be extended by third-party developers using plugins.
 
-## Compatibility
+Review the [Create a Block tutorial](/docs/getting-started/create-block/README.md) for the fastest way to get started extending the block editor. See the [Developer Documentation](https://developer.wordpress.org/block-editor/#develop-for-the-block-editor) for extensive tutorials, documentation, and API references.
 
-Posts are backwards compatible, and shortcodes will still work. We are continuously exploring how highly-tailored meta boxes can be accommodated, and are looking at solutions ranging from a plugin to disable Gutenberg to automatically detecting whether to load Gutenberg or not. While we want to make sure the new editing experience from writing to publishing is user-friendly, we’re committed to finding a good solution for highly-tailored existing sites.
+### Contribute to Gutenberg
 
-## The stages of Gutenberg
+Gutenberg is an open-source project and welcomes all contributors from code to design, and from documentation to triage. The project is built by many contributors and volunteers and we'd love your help building it.
 
-Gutenberg has three planned stages. The first, aimed for inclusion in WordPress 5.0, focuses on the post editing experience and the implementation of blocks. This initial phase focuses on a content-first approach. The use of blocks, as detailed above, allows you to focus on how your content will look without the distraction of other configuration options. This ultimately will help all users present their content in a way that is engaging, direct, and visual.
+See the [Contributors Handbook](https://developer.wordpress.org/block-editor/contributors/) for all the details on how you can contribute. 
 
-These foundational elements will pave the way for stages two and three, planned for the next year, to go beyond the post into page templates and ultimately, full site customization.
+To get up and running quickly with **code contribution** see [Getting Started With Code Contribution](/docs/contributors/code/getting-started-with-code-contribution.md). Also check out the other resources available on the [Code Contributions](/docs/contributors/code/README.md) page.
 
-Gutenberg is a big change, and there will be ways to ensure that existing functionality (like shortcodes and meta-boxes) continue to work while allowing developers the time and paths to transition effectively. Ultimately, it will open new opportunities for plugin and theme developers to better serve users through a more engaging and visual experience that takes advantage of a toolset supported by core.
+In whichever way you wish to contribute please be sure to read the [Contributing Guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/CONTRIBUTING.md) first.
 
-## Get involved
+As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](https://github.com/WordPress/gutenberg/blob/HEAD/CODE_OF_CONDUCT.md).
 
-We’re calling this editor project "Gutenberg" because it's a big undertaking. We are working on it every day in GitHub, and we'd love your help building it. You’re also welcome to give feedback, the easiest is to join us in <a href="https://make.wordpress.org/chat/">our Slack channel</a>, `#core-editor`.
+## Get Involved
 
-## Contributors
+You can join us in the `#core-editor` channel in Slack, see the [WordPress Slack page](https://make.wordpress.org/chat/) for signup information; it is free to join.
 
-Gutenberg is built by many contributors and volunteers. Please see the full list in <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTORS.md">CONTRIBUTORS.md</a>.
+**Weekly meetings** The Editor Team meets weekly on Wednesdays at 14:00 UTC in Slack. If you can not join the meeting, [agenda](https://make.wordpress.org/core/tag/core-editor-agenda/) and [notes](https://make.wordpress.org/core/tag/core-editor-summary/) are posted to the [Make WordPress Blog](https://make.wordpress.org/core/).
 
-## How You Can Contribute
+## License
 
-Please see <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a>.
+WordPress is free software, and is released under the terms of the GNU General Public License version 2 or (at your option) any later version. See [LICENSE.md](LICENSE.md) for complete license.
 
-## Further Reading
-
-- <a href="http://matiasventura.com/post/gutenberg-or-the-ship-of-theseus/">Gutenberg, or the Ship of Theseus</a>, with examples of what Gutenberg might do in the future
-- <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">Editor Technical Overview</a>
-- <a href="https://wordpress.org/gutenberg/handbook/reference/design-principles/">Design Principles and block design best practices</a>
-- <a href="https://github.com/Automattic/wp-post-grammar">WP Post Grammar Parser</a>
-- <a href="https://make.wordpress.org/core/tag/gutenberg/">Development updates on make.wordpress.org</a>
-- <a href="https://wordpress.org/gutenberg/handbook/">Documentation: Creating Blocks, Reference, and Guidelines</a>
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

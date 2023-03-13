@@ -1,0 +1,239 @@
+/**
+ * Insertion Point.
+ */
+
+.block-editor-block-list__insertion-point {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.block-editor-block-list__insertion-point-indicator {
+	position: absolute;
+	background: var(--wp-admin-theme-color);
+	border-radius: 2px;
+	transform-origin: center;
+	opacity: 0;
+	will-change: transform, opacity;
+
+	.block-editor-block-list__insertion-point.is-vertical > & {
+		top: calc(50% - 2px);
+		height: 4px;
+		width: 100%;
+	}
+
+	.block-editor-block-list__insertion-point.is-horizontal > & {
+		top: 0;
+		bottom: 0;
+		left: calc(50% - 2px);
+		width: 4px;
+	}
+}
+
+// This is the clickable plus.
+.block-editor-block-list__insertion-point-inserter {
+	// Don't show on mobile.
+	display: none;
+	position: absolute;
+	will-change: transform;
+
+	@include break-mobile() {
+		display: flex;
+	}
+
+	justify-content: center;
+
+	top: calc(50% - #{$button-size-small * 0.5});
+	left: calc(50% - #{$button-size-small * 0.5});
+}
+
+.block-editor-block-list__block-side-inserter-popover .components-popover__content > div {
+	pointer-events: none;
+
+	> * {
+		pointer-events: all;
+	}
+}
+
+// Sibling inserter / "inbetweenserter".
+.block-editor-block-list__empty-block-inserter,
+.block-editor-block-list__insertion-point-inserter {
+	.block-editor-inserter__toggle.components-button.has-icon {
+		// Basic look
+		background: $gray-900;
+		border-radius: $radius-block-ui;
+		color: $white;
+		padding: 0;
+
+		// Special dimensions for this button.
+		min-width: $button-size-small;
+		height: $button-size-small;
+
+		&:hover {
+			color: $white;
+			background: var(--wp-admin-theme-color);
+		}
+	}
+}
+
+.block-editor-block-list__insertion-point-inserter .block-editor-inserter__toggle.components-button.has-icon {
+	background: var(--wp-admin-theme-color);
+	&:hover {
+		background: $gray-900;
+	}
+}
+
+/**
+ * Block Toolbar when contextual.
+ */
+
+.block-editor-block-contextual-toolbar {
+	// Block UI appearance.
+	display: inline-flex;
+	border: $border-width solid $gray-900;
+	border-radius: $radius-block-ui;
+	background-color: $white;
+
+	.block-editor-block-toolbar .components-toolbar-group,
+	.block-editor-block-toolbar .components-toolbar {
+		border-right-color: $gray-900;
+	}
+
+	&.is-fixed {
+		position: sticky;
+		top: 0;
+		width: 100%;
+		z-index: z-index(".block-editor-block-popover");
+		// Fill up when empty
+		min-height: $block-toolbar-height;
+		display: block;
+
+		border: none;
+		border-bottom: $border-width solid $gray-200;
+		border-radius: 0;
+
+		.block-editor-block-toolbar .components-toolbar-group,
+		.block-editor-block-toolbar .components-toolbar {
+			border-right-color: $gray-200;
+		}
+	}
+}
+
+/**
+ * Block Label for Navigation/Selection Mode
+ */
+
+.block-editor-block-list__block-selection-button {
+	display: inline-flex;
+	padding: 0 $grid-unit-15;
+	z-index: z-index(".block-editor-block-list__block-selection-button");
+
+	// Dark block UI appearance.
+	border-radius: $radius-block-ui;
+	background-color: $gray-900;
+
+	font-size: $default-font-size;
+	height: $block-toolbar-height;
+
+	.block-editor-block-list__block-selection-button__content {
+		margin: auto;
+		display: inline-flex;
+		align-items: center;
+
+		> .components-flex__item {
+			margin-right: $grid-unit-15 * 0.5;
+		}
+	}
+	.components-button.has-icon.block-selection-button_drag-handle {
+		cursor: grab;
+		padding: 0;
+		height: $grid-unit-30;
+		min-width: $grid-unit-30;
+		margin-left: -2px;
+
+		// Drag handle is smaller than the others.
+		svg {
+			min-width: 18px;
+			min-height: 18px;
+		}
+	}
+
+	.block-editor-block-icon {
+		font-size: $default-font-size;
+		color: $white;
+		height: $block-toolbar-height;
+	}
+
+	// The button here has a special style to appear as a toolbar.
+	.components-button {
+		min-width: $button-size;
+		color: $white;
+		height: $block-toolbar-height;
+
+		// When button is focused, it receives a box-shadow instead of the border.
+		&:focus {
+			box-shadow: none;
+			border: none;
+		}
+
+		&:active {
+			color: $white;
+		}
+
+		// Make sure the button has no hover style when it's disabled.
+		&[aria-disabled="true"]:hover {
+			color: $white;
+		}
+
+		display: flex;
+	}
+	.block-selection-button_select-button.components-button {
+		padding: 0;
+	}
+
+	.block-editor-block-mover {
+		background: unset;
+		border: none;
+	}
+}
+
+// Hide the popover block editor list while dragging.
+// Using a hacky animation to delay hiding the element.
+// It's needed because if we hide the element immediately upon dragging,
+// the dragging will end immediately since there are no elements to be dragged anymore.
+// Fortunately, we only have to keep it visible for a frame immediately after dragging,
+// after that, we can safely hide it altogether.
+@keyframes hide-during-dragging {
+	to {
+		position: fixed;
+		transform: translate(9999px, 9999px);
+	}
+}
+
+.components-popover.block-editor-block-list__block-popover {
+	// Position the block toolbar.
+	.block-editor-block-list__block-selection-button,
+	.block-editor-block-contextual-toolbar {
+		pointer-events: all;
+		margin-top: $grid-unit-15;
+		margin-bottom: $grid-unit-15;
+	}
+
+	// Hide the block toolbar if the insertion point is shown.
+	&.is-insertion-point-visible {
+		visibility: hidden;
+	}
+
+	.is-dragging-components-draggable & {
+		opacity: 0;
+		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
+		// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
+		animation: hide-during-dragging 1ms linear forwards;
+	}
+}
+
+.is-dragging-components-draggable .components-tooltip {
+	display: none;
+}

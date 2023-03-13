@@ -1,0 +1,201 @@
+.editor-post-publish-panel {
+	background: $white;
+}
+
+.editor-post-publish-panel__content {
+	// Ensure the post-publish panel accounts for the header and footer height.
+	min-height: calc(100% - #{$header-height + 84px});
+
+	.components-spinner {
+		display: block;
+		margin: 100px auto 0;
+	}
+}
+
+.editor-post-publish-panel__header {
+	background: $white;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+	height: $header-height + $border-width;
+	border-bottom: $border-width solid $gray-300;
+	display: flex;
+	align-items: center;
+	align-content: space-between;
+
+	.components-button {
+		width: 100%;
+		justify-content: center;
+	}
+
+	.has-icon {
+		margin-left: auto;
+		width: auto;
+	}
+}
+
+.components-site-card {
+	display: flex;
+	align-items: center;
+	margin: $grid-unit-20 0;
+}
+
+.components-site-icon {
+	border: none;
+	border-radius: $radius-block-ui;
+	margin-right: $grid-unit-15;
+
+	// Same size as in the Site menu.
+	height: 36px;
+	width: 36px;
+}
+
+.components-site-name {
+	display: block;
+	font-size: 14px;
+}
+
+.components-site-home {
+	display: block;
+	color: $gray-700;
+	font-size: $helptext-font-size;
+}
+
+.editor-post-publish-panel__header-publish-button,
+.editor-post-publish-panel__header-cancel-button {
+	flex: 1;
+
+	@include break-mobile() {
+		max-width: $admin-sidebar-width;
+	}
+}
+
+.editor-post-publish-panel__header-publish-button {
+	padding-right: $grid-unit-05;
+}
+
+.editor-post-publish-panel__header-cancel-button {
+	padding-left: $grid-unit-05;
+}
+
+.editor-post-publish-panel__header-published {
+	flex-grow: 1;
+}
+
+.editor-post-publish-panel__footer {
+	padding: 16px;
+}
+
+.components-button.editor-post-publish-panel__toggle.is-primary {
+	display: inline-flex;
+	align-items: center;
+
+	&.is-busy .dashicon {
+		display: none;
+	}
+
+	.dashicon {
+		margin-right: -4px;
+	}
+}
+
+.editor-post-publish-panel__link {
+	font-weight: 400;
+	padding-left: 4px;
+}
+
+.editor-post-publish-panel__prepublish {
+	padding: 16px;
+
+	strong {
+		color: $gray-900;
+	}
+
+	.components-panel__body {
+		background: $white;
+		margin-left: -16px;
+		margin-right: -16px;
+	}
+
+	.editor-post-visibility__dialog-legend {
+		display: none;
+	}
+}
+
+.post-publish-panel__postpublish .components-panel__body {
+	border-bottom: $border-width solid $gray-200;
+	border-top: none;
+}
+
+.post-publish-panel__postpublish-buttons {
+	display: flex;
+	align-content: space-between;
+	flex-wrap: wrap;
+	margin: -5px;
+
+	> * {
+		flex-grow: 1;
+		margin: 5px;
+	}
+
+	.components-button {
+		height: auto;
+		justify-content: center;
+		padding: 3px 10px 4px;
+		flex: 1;
+		line-height: 1.6;
+		text-align: center;
+		white-space: normal;
+	}
+
+	.components-clipboard-button {
+		width: 100%;
+	}
+}
+
+.post-publish-panel__postpublish-post-address-container {
+	display: flex;
+	align-items: flex-end;
+	margin-bottom: $grid-unit-20;
+
+	.post-publish-panel__postpublish-post-address {
+		flex: 1;
+	}
+
+	input[readonly] {
+		padding: 10px;
+		background: $gray-300;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}
+
+.post-publish-panel__postpublish-post-address__copy-button-wrap {
+	flex-shrink: 0;
+	margin-left: 8px; // margin left for copy button
+
+	// match copy button height to the address field height
+	.components-button {
+		height: 38px;
+	}
+}
+
+.post-publish-panel__postpublish-header {
+	font-weight: 500;
+}
+
+.post-publish-panel__postpublish-subheader {
+	margin: 0 0 $grid-unit-10;
+}
+
+.post-publish-panel__tip {
+	color: $alert-yellow;
+}
+
+@media screen and (max-width: 782px) {
+	.post-publish-panel__postpublish-post-address__button-wrap {
+		// match copy button height to the address field height in smaller screens
+		.components-button {
+			height: 40px;
+		}
+	}
+}

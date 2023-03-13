@@ -1,0 +1,17 @@
+services:
+  wordpress-develop:
+    volumes:
+      - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
+      - %PLUGIN_MOUNT_DIR%/packages/e2e-tests/plugins:/var/www/${LOCAL_DIR-src}/wp-content/plugins/gutenberg-test-plugins
+      - %PLUGIN_MOUNT_DIR%/packages/e2e-tests/mu-plugins:/var/www/${LOCAL_DIR-src}/wp-content/mu-plugins
+  php:
+    volumes:
+      - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
+      - %PLUGIN_MOUNT_DIR%/packages/e2e-tests/plugins:/var/www/${LOCAL_DIR-src}/wp-content/plugins/gutenberg-test-plugins
+      - %PLUGIN_MOUNT_DIR%/packages/e2e-tests/mu-plugins:/var/www/${LOCAL_DIR-src}/wp-content/mu-plugins
+  cli:
+    volumes:
+      - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%
+  phpunit:
+    volumes:
+      - %PLUGIN_MOUNT_DIR%:/var/www/${LOCAL_DIR-src}/wp-content/plugins/%PLUGIN_INSTALL_DIR%

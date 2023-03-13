@@ -1,0 +1,41 @@
+.components-color-palette__custom-color {
+	position: relative;
+	border: none;
+	background: none;
+	border-radius: $radius-block-ui;
+	height: $grid-unit-80;
+	padding: $grid-unit-15;
+	font-family: inherit;
+	width: 100%;
+	// The background image creates a checkerboard pattern. Ignore rtlcss to
+	// make it work both in LTR and RTL.
+	// See https://github.com/WordPress/gutenberg/pull/42510
+	/*rtl:begin:ignore*/
+	background-image:
+		repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200),
+		repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200);
+	background-position: 0 0, 24px 24px;
+	/*rtl:end:ignore*/
+	background-size: calc(2 * 24px) calc(2 * 24px);
+	box-sizing: border-box;
+	color: $white;
+	cursor: pointer;
+	box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
+	// Show a thin outline in Windows high contrast mode.
+	outline: 1px solid transparent;
+
+	&:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+		// Show a outline in Windows high contrast mode.
+		outline-width: 2px;
+	}
+}
+
+.components-color-palette__custom-color-name {
+	text-align: left;
+}
+
+.components-color-palette__custom-color-value {
+	margin-left: $grid-unit-20;
+	text-transform: uppercase;
+}

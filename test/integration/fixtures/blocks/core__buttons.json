@@ -1,0 +1,31 @@
+[
+	{
+		"name": "core/buttons",
+		"isValid": true,
+		"attributes": {
+			"align": "wide",
+			"layout": {
+				"type": "flex",
+				"justifyContent": "center"
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "core/button",
+				"isValid": true,
+				"attributes": {
+					"text": "My button 1"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/button",
+				"isValid": true,
+				"attributes": {
+					"text": "My button 2"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

@@ -1,0 +1,30 @@
+.wp-block-separator {
+	border-top: 1px solid currentColor;
+	border-bottom: 1px solid currentColor;
+	// Default, thin style, is stored in theme.scss so it can be opted out of
+
+	// Unset the left and right borders by default, otherwise some browsers will render them as "inset".
+	border-left: none;
+	border-right: none;
+
+	// Dots style
+	&.is-style-dots {
+		// Override any background themes often set on the hr tag for this style.
+		// also override the color set in the editor since it's intented for normal HR
+		background: none !important;
+		border: none;
+		text-align: center;
+		line-height: 1;
+		height: auto;
+
+		&::before {
+			content: "\00b7 \00b7 \00b7";
+			color: currentColor;
+			font-size: 1.5em;
+			letter-spacing: 2em;
+			/*rtl:ignore*/
+			padding-left: 2em;
+			font-family: serif;
+		}
+	}
+}

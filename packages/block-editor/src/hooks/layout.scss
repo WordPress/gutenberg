@@ -1,0 +1,41 @@
+.block-editor-hooks__layout-controls {
+	display: flex;
+	margin-bottom: $grid-unit-10;
+
+	.block-editor-hooks__layout-controls-unit {
+		display: flex;
+		margin-right: $grid-unit-30;
+
+		svg {
+			margin: auto 0 $grid-unit-05 $grid-unit-10;
+		}
+	}
+}
+
+.block-editor-block-inspector .block-editor-hooks__layout-controls-unit-input {
+	margin-bottom: 0;
+}
+
+.block-editor-hooks__layout-controls-reset {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: $grid-unit-30;
+}
+
+.block-editor-hooks__layout-controls-helptext {
+	color: $gray-700;
+	font-size: $helptext-font-size;
+	margin-bottom: $grid-unit-20;
+}
+
+.block-editor-hooks__flex-layout-justification-controls,
+.block-editor-hooks__flex-layout-orientation-controls {
+	margin-bottom: $grid-unit-15;
+	legend {
+		margin-bottom: $grid-unit-10;
+	}
+}
+
+.block-editor-hooks__toggle-control.block-editor-hooks__toggle-control {
+	margin-bottom: $grid-unit-20;
+}

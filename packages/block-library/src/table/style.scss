@@ -1,0 +1,199 @@
+.wp-block-table {
+	$subtle-light-gray: #f3f4f5;
+	$subtle-pale-green: #e9fbe5;
+	$subtle-pale-blue: #e7f5fe;
+	$subtle-pale-pink: #fcf0ef;
+
+	overflow-x: auto;
+
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	thead {
+		border-bottom: 3px solid;
+	}
+
+	tfoot {
+		border-top: 3px solid;
+	}
+
+	// Match default border style to default style in editor
+	td,
+	th {
+		border: $border-width solid;
+		padding: 0.5em;
+	}
+
+	// Fixed layout toggle
+	.has-fixed-layout {
+		table-layout: fixed;
+		width: 100%;
+
+		td,
+		th {
+			word-break: break-word;
+		}
+	}
+
+	&.alignleft,
+	&.aligncenter,
+	&.alignright {
+		// Override default display property for align styles.
+		// The table element needs to be kept as display table
+		// for table features to work reliably.
+		display: table;
+		// Table cannot be 100% width if it is aligned, so set
+		// width as auto.
+		width: auto;
+
+		td,
+		th {
+			word-break: break-word;
+		}
+	}
+
+	.has-subtle-light-gray-background-color {
+		background-color: $subtle-light-gray;
+	}
+
+	.has-subtle-pale-green-background-color {
+		background-color: $subtle-pale-green;
+	}
+
+	.has-subtle-pale-blue-background-color {
+		background-color: $subtle-pale-blue;
+	}
+
+	.has-subtle-pale-pink-background-color {
+		background-color: $subtle-pale-pink;
+	}
+
+	// "Stripes" style variation.
+	&.is-style-stripes {
+		border-spacing: 0;
+		border-collapse: inherit;
+		background-color: transparent;
+
+		tbody tr:nth-child(odd) {
+			background-color: $gray-100;
+		}
+
+		&.has-subtle-light-gray-background-color {
+			tbody tr:nth-child(odd) {
+				background-color: $subtle-light-gray;
+			}
+		}
+
+		&.has-subtle-pale-green-background-color {
+			tbody tr:nth-child(odd) {
+				background-color: $subtle-pale-green;
+			}
+		}
+
+		&.has-subtle-pale-blue-background-color {
+			tbody tr:nth-child(odd) {
+				background-color: $subtle-pale-blue;
+			}
+		}
+
+		&.has-subtle-pale-pink-background-color {
+			tbody tr:nth-child(odd) {
+				background-color: $subtle-pale-pink;
+			}
+		}
+
+		th,
+		td {
+			border-color: transparent;
+		}
+
+		border-bottom: 1px solid $gray-100;
+	}
+
+	// Border Styles
+	//
+	// Allow any custom border color, style or width selections to be inherited
+	// from the table element that receives the border support props.
+
+	.has-border-color {
+		> *,
+		tr,
+		th,
+		td {
+			border-color: inherit;
+		}
+	}
+
+	table[style*="border-top-color"] {
+		> *,
+		tr:first-child {
+			border-top-color: inherit;
+
+			th,
+			td {
+				border-top-color: inherit;
+			}
+		}
+
+		tr:not(:first-child) {
+			border-top-color: currentColor;
+		}
+	}
+	table[style*="border-right-color"] {
+		> *,
+		tr,
+		th,
+		td:last-child {
+			border-right-color: inherit;
+		}
+	}
+	table[style*="border-bottom-color"] {
+		> *,
+		tr:last-child {
+			border-bottom-color: inherit;
+
+			th,
+			td {
+				border-bottom-color: inherit;
+			}
+		}
+
+		// Border support classes and styles are applied on the table block
+		// itself. This means that without the rule below every table row would
+		// have a bottom border matching the color of the table's border.
+		// This style gives the best visual appearance and most expected result
+		// until we can control individual table rows or cells via inner blocks.
+		tr:not(:last-child) {
+			border-bottom-color: currentColor;
+		}
+	}
+	table[style*="border-left-color"] {
+		> *,
+		tr,
+		th,
+		td:first-child {
+			border-left-color: inherit;
+		}
+	}
+
+	table[style*="border-style"] {
+		> *,
+		tr,
+		th,
+		td {
+			border-style: inherit;
+		}
+	}
+
+	table[style*="border-width"] {
+		> *,
+		tr,
+		th,
+		td {
+			border-width: inherit;
+			border-style: inherit;
+		}
+	}
+}

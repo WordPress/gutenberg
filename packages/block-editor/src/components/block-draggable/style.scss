@@ -1,0 +1,46 @@
+.block-editor-block-draggable-chip-wrapper {
+	position: absolute;
+	// Offset position so that cursor is centered over the drag handle.
+	top: -#{$block-toolbar-height * 0.5};
+	left: 0;
+}
+
+.block-editor-block-draggable-chip {
+	background-color: $gray-900;
+	border-radius: $radius-block-ui;
+	box-shadow: 0 6px 8px rgba($black, 0.3);
+	color: $white;
+	cursor: grabbing;
+	display: inline-flex;
+	height: $block-toolbar-height;
+	padding: 0 ( $grid-unit-15 + $border-width );
+	user-select: none;
+
+	svg {
+		fill: currentColor;
+	}
+
+	.block-editor-block-draggable-chip__content {
+		margin: auto;
+		justify-content: flex-start;
+
+		> .components-flex__item {
+			margin-right: $grid-unit-15 * 0.5;
+
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+
+		// Drag handle is smaller than the others.
+		.block-editor-block-icon svg {
+			min-width: 18px;
+			min-height: 18px;
+		}
+	}
+
+	.components-flex__item {
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
+}

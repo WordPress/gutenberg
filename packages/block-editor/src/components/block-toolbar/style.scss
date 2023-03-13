@@ -1,0 +1,241 @@
+/**
+ * Block Toolbar
+ */
+
+.block-editor-block-toolbar {
+	display: flex;
+	flex-grow: 1;
+	width: 100%;
+	position: relative;
+
+	// Allow horizontal scrolling on mobile.
+	overflow-y: hidden;
+	overflow-x: auto;
+
+	// Animation
+	transition: border-color 0.1s linear, box-shadow 0.1s linear;
+	@include reduce-motion("transition");
+
+	@include break-small() {
+		overflow: inherit;
+	}
+
+	// Borders around toolbar segments.
+	.components-toolbar-group,
+	.components-toolbar {
+		background: none;
+		// IE11 has thick paddings without this.
+		line-height: 0;
+
+		// These margins make the buttons themselves overlap the chrome of the toolbar.
+		// This helps make them square, and maximize the hit area.
+		margin-top: -$border-width;
+		margin-bottom: -$border-width;
+
+		// The component is born with a border, but we only need some of them.
+		border: 0;
+
+		// Add a border after item groups to show as separator in the block toolbar.
+		border-right: $border-width solid $gray-300;
+	}
+
+	&.is-synced .block-editor-block-switcher .components-button .block-editor-block-icon {
+		color: var(--wp-block-synced-color);
+	}
+
+	&.is-synced .components-toolbar-button.block-editor-block-switcher__no-switcher-icon {
+		&:disabled .block-editor-block-icon.has-colors {
+			color: var(--wp-block-synced-color);
+		}
+	}
+
+	> :last-child,
+	> :last-child .components-toolbar-group,
+	> :last-child .components-toolbar {
+		border-right: none;
+	}
+}
+
+.block-editor-block-contextual-toolbar.has-parent:not(.is-fixed) {
+	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
+
+	.show-icon-labels & {
+		margin-left: 0;
+	}
+}
+
+.block-editor-block-parent-selector {
+	position: absolute;
+	top: -$border-width;
+	left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+	.show-icon-labels & {
+		position: relative;
+		left: auto;
+		top: auto;
+		margin-top: -$border-width;
+		margin-left: -$border-width;
+		margin-bottom: -$border-width;
+	}
+}
+
+// Block controls.
+.block-editor-block-toolbar__block-controls {
+	// Switcher.
+	.block-editor-block-switcher .components-dropdown-menu__toggle,
+	.block-editor-block-switcher__no-switcher-icon {
+		.block-editor-block-icon {
+			width: $button-size-small !important;
+			margin: 0 !important;
+		}
+	}
+
+	.block-editor-block-lock-toolbar {
+		margin-left: -$grid-unit-15 * 0.5 !important;
+	}
+
+	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+	// This is best fixed by making the mover control area a proper single toolbar group.
+	.components-toolbar-group {
+		padding: 0;
+	}
+}
+
+.block-editor-block-toolbar,
+.block-editor-rich-text__inline-format-toolbar-group {
+	// Override Toolbar buttons size.
+	.components-toolbar-group,
+	.components-toolbar {
+		display: flex;
+		flex-wrap: nowrap;
+	}
+}
+
+.block-editor-block-toolbar__slot {
+	// Required for IE11.
+	display: inline-block;
+	// Fix for toolbar button misalignment on IE11
+	line-height: 0;
+
+	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+	@supports (position: sticky) {
+		display: inline-flex;
+	}
+}
+
+.show-icon-labels {
+	.block-editor-block-toolbar {
+		.components-button.has-icon {
+			width: auto;
+
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+				font-size: $helptext-font-size;
+			}
+		}
+	}
+
+	// Padding overrides.
+
+	.components-accessible-toolbar .components-toolbar-group > div:first-child:last-child > .components-button.has-icon {
+		padding-left: 6px;
+		padding-right: 6px;
+	}
+
+	.block-editor-block-switcher .components-dropdown-menu__toggle,
+	.block-editor-block-switcher__no-switcher-icon {
+		.block-editor-block-icon {
+			width: 0 !important;
+			height: 0 !important;
+		}
+	}
+
+	// Parent selector overrides
+
+	.block-editor-block-parent-selector__button {
+		.block-editor-block-icon {
+			width: 0;
+		}
+	}
+
+	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+		width: auto;
+	}
+
+	// Mover overrides.
+	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+		border-left: 1px solid $gray-900;
+		margin-left: 6px;
+		margin-right: -6px;
+		white-space: nowrap;
+	}
+
+	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-toolbar__block-controls .block-editor-block-mover {
+		border-left-color: $gray-200;
+	}
+
+	.block-editor-block-mover-button {
+		// The specificity can be reduced once https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L34 is also dealt with.
+		padding-left: $grid-unit !important;
+		padding-right: $grid-unit !important;
+	}
+
+	.block-editor-block-mover__drag-handle.has-icon {
+		padding-left: 12px !important;
+		padding-right: 12px !important;
+	}
+
+	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container {
+		border-width: 0;
+	}
+
+	@include break-small() {
+		// Specificity override for https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L69
+		.is-up-button.is-up-button.is-up-button {
+			margin-right: 0;
+			border-radius: 0;
+			order: 1;
+		}
+
+		.block-editor-block-mover__move-button-container {
+			border-left: 1px solid $gray-900;
+
+			&::before {
+				content: "";
+				display: block;
+				height: 1px;
+				background: $gray-900;
+				order: 2;
+			}
+		}
+
+		.is-down-button.is-down-button.is-down-button {
+			order: 3;
+		}
+
+		.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container::before {
+			background: $gray-300;
+		}
+	}
+
+	.block-editor-block-contextual-toolbar .block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
+		width: auto;
+	}
+
+	// Mobile adjustments
+	.components-toolbar,
+	.components-toolbar-group {
+		flex-shrink: 1;
+	}
+
+	.block-editor-rich-text__inline-format-toolbar-group {
+		.components-button + .components-button {
+			margin-left: 6px;
+		}
+	}
+}

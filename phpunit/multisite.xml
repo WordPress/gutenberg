@@ -1,0 +1,24 @@
+<phpunit
+		bootstrap="./bootstrap.php"
+		backupGlobals="false"
+		colors="true"
+		convertErrorsToExceptions="true"
+		convertNoticesToExceptions="true"
+		convertWarningsToExceptions="true"
+		convertDeprecationsToExceptions="true"
+>
+	<php>
+		<env name="WP_MULTISITE" value="1" />
+		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
+	</php>
+	<testsuites>
+		<testsuite name="default">
+			<directory suffix="-test.php">./</directory>
+		</testsuite>
+	</testsuites>
+	<groups>
+		<exclude>
+			<group>ms-excluded</group>
+		</exclude>
+	</groups>
+</phpunit>

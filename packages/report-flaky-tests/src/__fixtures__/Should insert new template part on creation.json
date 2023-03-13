@@ -1,0 +1,57 @@
+{
+	"runner": "jest-circus",
+	"title": "Should insert new template part on creation",
+	"path": "specs/site-editor/template-part.test.js",
+	"results": [
+		{
+			"ancestorTitles": [
+				"Template Part",
+				"Template part block",
+				"Template part placeholder"
+			],
+			"duration": 6321,
+			"failureDetails": [
+				{
+					"matcherResult": {
+						"message": "expect(jest.fn()).not.toHaveErrored(expected)\n\nExpected mock function not to be called but it was called with:\n[\"TypeError: Cannot read properties of null (reading 'frameElement')\n    at Vo (http://localhost:8889/wp-content/plugins/gutenberg/build/block-editor/index.min.js?ver=dfd3a79ce1dc54c31b6ed591bcb0d55a:3:21925)\n    at ft (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:43451)\n    at Wt (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:50270)\n    at ts (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:112276)\n    at Fr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77758)\n    at Dr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77686)\n    at Rr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77549)\n    at Nr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:74544)\n    at http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:30170\n    at unstable_runWithPriority (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)\"]",
+						"pass": true
+					}
+				}
+			],
+			"failureMessages": [
+				"Error: expect(jest.fn()).not.toHaveErrored(expected)\n\nExpected mock function not to be called but it was called with:\n[\"TypeError: Cannot read properties of null (reading 'frameElement')\n    at Vo (http://localhost:8889/wp-content/plugins/gutenberg/build/block-editor/index.min.js?ver=dfd3a79ce1dc54c31b6ed591bcb0d55a:3:21925)\n    at ft (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:43451)\n    at Wt (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:50270)\n    at ts (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:112276)\n    at Fr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77758)\n    at Dr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77686)\n    at Rr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77549)\n    at Nr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:74544)\n    at http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:30170\n    at unstable_runWithPriority (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)\"]\n    at Object.assertExpectedCalls (/home/runner/work/gutenberg/gutenberg/packages/jest-console/build/@wordpress/jest-console/src/index.js:36:4)\n    at Promise.then.completed (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/utils.js:391:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/utils.js:316:10)\n    at _callCircusHook (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/run.js:181:40)\n    at runMicrotasks (<anonymous>)\n    at processTicksAndRejections (internal/process/task_queues.js:95:5)\n    at _runTest (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/run.js:158:5)\n    at _runTestsForDescribeBlock (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/run.js:66:9)\n    at _runTestsForDescribeBlock (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/run.js:60:9)"
+			],
+			"fullName": "Template Part Template part block Template part placeholder Should insert new template part on creation",
+			"invocations": 1,
+			"location": null,
+			"numPassingAsserts": 0,
+			"status": "failed",
+			"title": "Should insert new template part on creation"
+		},
+		{
+			"ancestorTitles": [
+				"Template Part",
+				"Template part block",
+				"Template part placeholder"
+			],
+			"duration": 6258,
+			"failureDetails": [
+				{
+					"matcherResult": {
+						"message": "expect(jest.fn()).not.toHaveErrored(expected)\n\nExpected mock function not to be called but it was called with:\n[\"TypeError: Cannot read properties of null (reading 'frameElement')\n    at Vo (http://localhost:8889/wp-content/plugins/gutenberg/build/block-editor/index.min.js?ver=dfd3a79ce1dc54c31b6ed591bcb0d55a:3:21925)\n    at ft (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:43451)\n    at Wt (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:50270)\n    at ts (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:112276)\n    at Fr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77758)\n    at Dr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77686)\n    at Rr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77549)\n    at Nr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:74544)\n    at http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:30170\n    at unstable_runWithPriority (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)\"]",
+						"pass": true
+					}
+				}
+			],
+			"failureMessages": [
+				"Error: expect(jest.fn()).not.toHaveErrored(expected)\n\nExpected mock function not to be called but it was called with:\n[\"TypeError: Cannot read properties of null (reading 'frameElement')\n    at Vo (http://localhost:8889/wp-content/plugins/gutenberg/build/block-editor/index.min.js?ver=dfd3a79ce1dc54c31b6ed591bcb0d55a:3:21925)\n    at ft (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:43451)\n    at Wt (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:50270)\n    at ts (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:112276)\n    at Fr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77758)\n    at Dr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77686)\n    at Rr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:77549)\n    at Nr (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:74544)\n    at http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react-dom.min.js?ver=6.1-alpha-53362:1:30170\n    at unstable_runWithPriority (http://localhost:8889/wp-content/plugins/gutenberg/build/vendors/react.min.js?ver=6.1-alpha-53362:1:7430)\"]\n    at Object.assertExpectedCalls (/home/runner/work/gutenberg/gutenberg/packages/jest-console/build/@wordpress/jest-console/src/index.js:36:4)\n    at Promise.then.completed (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/utils.js:391:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/utils.js:316:10)\n    at _callCircusHook (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/run.js:181:40)\n    at runMicrotasks (<anonymous>)\n    at processTicksAndRejections (internal/process/task_queues.js:95:5)\n    at _runTest (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/run.js:158:5)\n    at _runTestsForDescribeBlock (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/run.js:90:7)\n    at _runTestsForDescribeBlock (/home/runner/work/gutenberg/gutenberg/node_modules/jest-circus/build/run.js:60:9)"
+			],
+			"fullName": "Template Part Template part block Template part placeholder Should insert new template part on creation",
+			"invocations": 2,
+			"location": null,
+			"numPassingAsserts": 0,
+			"status": "failed",
+			"title": "Should insert new template part on creation"
+		}
+	]
+}

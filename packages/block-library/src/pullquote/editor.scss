@@ -1,0 +1,15 @@
+// .is-style-solid-color is deprecated.
+.wp-block-pullquote.is-style-solid-color {
+	& blockquote p {
+		font-size: 32px;
+	}
+
+	.wp-block-pullquote__citation {
+		text-transform: none;
+		font-style: normal;
+	}
+}
+
+.wp-block-pullquote .wp-block-pullquote__citation {
+	color: inherit;
+}

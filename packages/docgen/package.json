@@ -1,0 +1,41 @@
+{
+	"name": "@wordpress/docgen",
+	"version": "1.37.0",
+	"description": "Autogenerate public API documentation from exports and JSDoc comments.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"jsdoc",
+		"documentation"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/docgen/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/docgen"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"files": [
+		"bin",
+		"lib"
+	],
+	"bin": {
+		"docgen": "./bin/cli.js"
+	},
+	"dependencies": {
+		"@babel/core": "^7.16.0",
+		"comment-parser": "^1.1.1",
+		"mdast-util-inject": "1.1.0",
+		"optionator": "0.8.2",
+		"remark": "10.0.1",
+		"remark-parse": "6.0.3",
+		"unified": "7.1.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

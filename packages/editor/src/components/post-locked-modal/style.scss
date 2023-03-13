@@ -1,0 +1,19 @@
+.editor-post-locked-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+
+	.components-modal__content {
+		display: flex;
+	}
+}
+
+.editor-post-locked-modal__buttons {
+	margin-top: $grid-unit-30;
+}
+
+.editor-post-locked-modal__avatar {
+	border-radius: $radius-block-ui;
+	margin-top: $grid-unit-20;
+	margin-right: $grid-unit-30;
+}

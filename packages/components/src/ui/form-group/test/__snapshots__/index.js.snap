@@ -1,0 +1,121 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render alignLabel 1`] = `
+.emotion-0 {
+  width: 100%;
+}
+
+.emotion-2 {
+  display: inline-block;
+  line-height: calc(13px * 1.2);
+  margin: 0;
+  max-width: 100%;
+  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+  color: #1e1e1e;
+  line-height: 1.2;
+  margin: 0;
+  font-size: calc((13 / 13) * 13px);
+  font-weight: normal;
+  text-align: right;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.emotion-2:active {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+  .emotion-2>* {
+    position: relative;
+    top: 0.5px;
+  }
+}
+
+<div>
+  <div
+    class="components-form-group emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="FormGroup"
+  >
+    <label
+      class="components-truncate components-text components-control-label emotion-2 emotion-1"
+      data-wp-c16t="true"
+      data-wp-component="ControlLabel"
+      for="fname"
+    >
+      First name
+    </label>
+    <input
+      id="fname"
+      type="text"
+    />
+  </div>
+</div>
+`;
+
+exports[`props should render vertically 1`] = `
+.emotion-0 {
+  width: 100%;
+}
+
+.emotion-2 {
+  display: inline-block;
+  line-height: calc(13px * 1.2);
+  margin: 0;
+  max-width: 100%;
+  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+  color: #1e1e1e;
+  line-height: 1.2;
+  margin: 0;
+  font-size: calc((13 / 13) * 13px);
+  font-weight: normal;
+  text-align: left;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.emotion-2:active {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+  .emotion-2>* {
+    position: relative;
+    top: 0.5px;
+  }
+}
+
+<div>
+  <div
+    class="components-form-group emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="FormGroup"
+  >
+    <label
+      class="components-truncate components-text components-control-label emotion-2 emotion-1"
+      data-wp-c16t="true"
+      data-wp-component="ControlLabel"
+      for="fname"
+    >
+      First name
+    </label>
+    <input
+      id="fname"
+      type="text"
+    />
+  </div>
+</div>
+`;

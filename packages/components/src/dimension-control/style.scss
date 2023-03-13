@@ -1,0 +1,22 @@
+.block-editor-dimension-control {
+
+	.components-base-control__field {
+		display: flex;
+		align-items: center;
+	}
+
+	.components-base-control__label {
+		display: flex;
+		align-items: center;
+		margin-right: 1em;
+		margin-bottom: 0;
+
+		.dashicon {
+			margin-right: 0.5em;
+		}
+	}
+
+	&.is-manual .components-base-control__label {
+		width: 10em;
+	}
+}

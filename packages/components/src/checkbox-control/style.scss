@@ -1,0 +1,82 @@
+$checkbox-input-size: 20px;
+$checkbox-input-size-sm: 24px; // Width & height for small viewports.
+
+.components-checkbox-control__input[type="checkbox"] {
+	@include checkbox-control;
+	background: $white;
+	color: $gray-900;
+	clear: none;
+	cursor: pointer;
+	display: inline-block;
+	line-height: 0;
+	margin: 0 $grid-unit-05 0 0;
+	outline: 0;
+	padding: 0 !important;
+	text-align: center;
+	vertical-align: top;
+	width: $checkbox-input-size-sm;
+	height: $checkbox-input-size-sm;
+
+	@include break-small() {
+		height: $checkbox-input-size;
+		width: $checkbox-input-size;
+	}
+
+	appearance: none;
+	transition: 0.1s border-color ease-in-out;
+	@include reduce-motion("transition");
+
+	&:focus {
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) $components-color-accent;
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	&:checked,
+	&:indeterminate {
+		background: $components-color-accent;
+		border-color: $components-color-accent;
+
+		// Hide default checkbox styles in IE.
+		&::-ms-check {
+			opacity: 0;
+		}
+	}
+
+	&:checked::before {
+		content: none;
+	}
+}
+
+.components-checkbox-control__input-container {
+	position: relative;
+	display: inline-block;
+	margin-right: 12px;
+	vertical-align: middle;
+	width: $checkbox-input-size-sm;
+	height: $checkbox-input-size-sm;
+
+	@include break-small() {
+		width: $checkbox-input-size;
+		height: $checkbox-input-size;
+	}
+}
+
+svg.components-checkbox-control__checked,
+svg.components-checkbox-control__indeterminate {
+	fill: $white;
+	cursor: pointer;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: $button-size-small;
+	height: $button-size-small;
+
+	@include break-small() {
+		left: -2px;
+		top: -2px;
+	}
+	user-select: none;
+	pointer-events: none;
+}

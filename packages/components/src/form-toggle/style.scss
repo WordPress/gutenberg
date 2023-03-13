@@ -1,0 +1,91 @@
+$toggle-width: 36px;
+$toggle-height: 18px;
+$toggle-border-width: 1px;
+
+.components-form-toggle {
+	position: relative;
+	display: inline-block;
+
+	// Unchecked state.
+	.components-form-toggle__track {
+		content: "";
+		display: inline-block;
+		box-sizing: border-box;
+		vertical-align: top;
+		background-color: $white;
+		border: $toggle-border-width solid $gray-900;
+		width: $toggle-width;
+		height: $toggle-height;
+		border-radius: $toggle-height * 0.5;
+		transition: 0.2s background ease;
+		@include reduce-motion("transition");
+	}
+
+	.components-form-toggle__thumb {
+		display: block;
+		position: absolute;
+		box-sizing: border-box;
+		top: $toggle-border-width * 3;
+		left: $toggle-border-width * 3;
+		width: $toggle-height - ($toggle-border-width * 6);
+		height: $toggle-height - ($toggle-border-width * 6);
+		border-radius: 50%;
+		transition: 0.1s transform ease;
+		@include reduce-motion("transition");
+		background-color: $gray-900;
+		border: 5px solid $gray-900; // Has explicit border to act as a fill in Windows High Contrast Mode.
+	}
+
+	// Checked state.
+	&.is-checked .components-form-toggle__track {
+		background-color: $components-color-accent;
+		border: $toggle-border-width solid $components-color-accent;
+		border: #{ $toggle-height * 0.5 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
+	}
+
+	.components-form-toggle__input:focus + .components-form-toggle__track {
+		box-shadow: 0 0 0 2px $white, 0 0 0 (2px + $border-width-focus) $components-color-accent;
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+		outline-offset: 2px;
+	}
+
+	&.is-checked {
+		.components-form-toggle__thumb {
+			background-color: $white;
+			border-width: 0; // Zero out the border color to make the thumb invisible in Windows High Contrast Mode.
+			transform: translateX($toggle-width - ($toggle-border-width * 4) - ($toggle-height - ($toggle-border-width * 4)));
+		}
+	}
+
+	// Disabled state:
+	&.is-disabled,
+	.components-disabled & {
+		opacity: 0.3;
+	}
+}
+
+// This needs specificity to override inherited checkbox styles.
+.components-form-toggle input.components-form-toggle__input[type="checkbox"] {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	margin: 0;
+	padding: 0;
+	z-index: z-index(".components-form-toggle__input");
+
+	// This overrides a border style that is inherited from parent checkbox styles.
+	border: none;
+	&:checked {
+		background: none;
+	}
+
+	// Don't show custom checkbox checkmark.
+	&::before {
+		content: "";
+	}
+}

@@ -1,0 +1,15 @@
+@import "./components/import-dropdown/style.scss";
+@import "./components/import-form/style.scss";
+
+.list-reusable-blocks__container {
+	display: inline-flex;
+	align-items: center;
+	position: relative;
+	top: -3px;
+	// Todo: Make core button height and gutenberg button height equal.
+	.components-button {
+		height: 26px;
+	}
+}
+
+@include wordpress-admin-schemes();

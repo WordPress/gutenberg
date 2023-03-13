@@ -1,0 +1,60 @@
+.block-editor-block-inspector {
+	p:not(.components-base-control__help) {
+		margin-top: 0;
+	}
+
+	h2,
+	h3 {
+		font-size: $default-font-size;
+		color: $gray-900;
+		margin-bottom: 1.5em;
+	}
+
+	.components-base-control {
+		margin-bottom: #{ $grid-unit-30 };
+
+		&:last-child {
+			margin-bottom: $grid-unit-10;
+		}
+	}
+
+	// Reset unexpected margin-bottom from being applied to the `BaseControl`
+	// component of the `FocalPointPicker` component.
+	.components-focal-point-picker-control .components-base-control {
+		margin-bottom: 0;
+	}
+
+	.components-panel__body {
+		border: none;
+		border-top: $border-width solid $gray-200;
+
+		// Ensures this PanelBody is treated like the ToolsPanel, removing double borders.
+		margin-top: -$border-width;
+	}
+
+	.block-editor-block-card {
+		padding: $grid-unit-20;
+	}
+}
+
+.block-editor-block-inspector__no-blocks,
+.block-editor-block-inspector__no-block-tools {
+	display: block;
+	font-size: $default-font-size;
+	background: $white;
+	padding: ($grid-unit-20 * 2) $grid-unit-20;
+	text-align: center;
+}
+
+.block-editor-block-inspector__no-block-tools {
+	border-top: $border-width solid $gray-300;
+}
+
+.block-editor-block-inspector__tab-item {
+	flex: 1 1 0px;
+}
+
+.block-editor-block-inspector__block-buttons-container {
+	border-top: $border-width solid $gray-200;
+	padding: $grid-unit-20;
+}

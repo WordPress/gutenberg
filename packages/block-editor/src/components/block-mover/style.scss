@@ -1,0 +1,97 @@
+.block-editor-block-mover__move-button-container {
+	display: flex;
+	padding: 0;
+	border: none;
+
+	@include break-small() {
+		.block-editor-block-mover:not(.is-horizontal) & {
+			flex-direction: column;
+
+			> * {
+				height: $block-toolbar-height * 0.5;
+				width: 100%;
+				min-width: 0 !important; // overrides default button width.
+
+				// Focus style.
+				&::before {
+					height: calc(100% - 4px);
+				}
+			}
+
+			.block-editor-block-mover-button.is-up-button svg {
+				top: 5px;
+				flex-shrink: 0;
+			}
+
+			.block-editor-block-mover-button.is-down-button svg {
+				bottom: 5px;
+				flex-shrink: 0;
+			}
+		}
+
+		.block-editor-block-mover.is-horizontal & {
+			width: $block-toolbar-height;
+
+			> * {
+				width: $block-toolbar-height * 0.5;
+				min-width: 0 !important; // overrides default button width.
+				padding-left: 0 !important;
+				padding-right: 0 !important;
+				overflow: hidden;
+			}
+
+			.block-editor-block-mover-button.is-up-button svg {
+				left: 5px;
+			}
+
+			.block-editor-block-mover-button.is-down-button svg {
+				right: 5px;
+			}
+		}
+	}
+}
+
+.block-editor-block-mover__drag-handle {
+	@include break-small() {
+		width: $block-toolbar-height * 0.5;
+		min-width: 0 !important; // overrides default button width.
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+		overflow: hidden;
+	}
+}
+
+// Specificity is necessary to override block toolbar button styles.
+.components-button.block-editor-block-mover-button {
+	// Focus and toggle pseudo elements.
+	&::before {
+		content: "";
+		position: absolute;
+		display: block;
+		border-radius: $radius-block-ui;
+		height: $grid-unit-40;
+
+		// Position the focus rectangle.
+		left: $grid-unit-10;
+		right: $grid-unit-10;
+		z-index: -1;
+
+		// Animate in.
+		animation: components-button__appear-animation 0.1s ease;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
+	}
+
+	// Don't show the focus inherited by the Button component.
+	&:focus,
+	&:focus:enabled,
+	// Override focus styles from the block toolbar
+	&:focus::before {
+		box-shadow: none;
+		outline: none;
+	}
+
+	&:focus-visible::before {
+		@include block-toolbar-button-style__focus();
+	}
+}

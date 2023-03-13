@@ -1,0 +1,84 @@
+.wp-block-table {
+	// Remove default <figure> style.
+	margin: 0;
+
+	.wp-block[data-align="left"] > &,
+	.wp-block[data-align="right"] > &,
+	.wp-block[data-align="center"] > & {
+		// Stop table block from collapsing when tables are floated.
+		height: auto;
+
+		table {
+			// Ensure the table element is not full-width when aligned.
+			width: auto;
+		}
+
+		td,
+		th {
+			word-break: break-word;
+		}
+	}
+
+	.wp-block[data-align="center"] > & {
+		text-align: initial;
+
+		table {
+			margin: 0 auto;
+		}
+	}
+
+	td,
+	th {
+		border: $border-width solid;
+		padding: 0.5em;
+	}
+
+	td.is-selected,
+	th.is-selected {
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
+		border-style: double;
+	}
+
+	// This is only required in the editor to overcome the fact the editor
+	// rewrites border width styles into shorthand.
+	table.has-individual-borders {
+		> *,
+		tr,
+		th,
+		td {
+			border-width: $border-width;
+			border-style: solid;
+			border-color: currentColor;
+		}
+	}
+}
+
+.blocks-table__placeholder-form.blocks-table__placeholder-form {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+
+	> * {
+		margin-bottom: $grid-unit-10;
+	}
+
+	@include break-medium() {
+		flex-direction: row;
+		align-items: flex-end;
+
+		> * {
+			margin-bottom: 0;
+		}
+	}
+}
+
+.blocks-table__placeholder-input {
+	width: $grid-unit-10 * 14;
+	margin-right: $grid-unit-10;
+	margin-bottom: 0;
+
+	input {
+		height: $button-size;
+	}
+}

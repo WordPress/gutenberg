@@ -1,0 +1,713 @@
+$block-inserter-preview-height: 350px;
+$block-inserter-width: 350px;
+$block-inserter-tabs-height: 44px;
+
+.block-editor-inserter {
+	display: inline-block;
+	background: none;
+	border: none;
+	padding: 0;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: 0;
+
+	@include break-medium {
+		position: relative;
+	}
+}
+
+.block-editor-inserter__main-area {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	gap: $grid-unit-20;
+	&.show-as-tabs {
+		gap: 0;
+	}
+
+	@include break-medium {
+		width: $block-inserter-width;
+	}
+}
+
+.block-editor-inserter__popover.is-quick {
+	.components-popover__content {
+		border: none;
+		outline: none;
+		box-shadow: $shadow-popover;
+
+		.block-editor-inserter__quick-inserter > * {
+			border-left: $border-width solid $gray-400;
+			border-right: $border-width solid $gray-400;
+
+			&:first-child {
+				border-top: $border-width solid $gray-400;
+				border-radius: $radius-block-ui $radius-block-ui 0 0;
+			}
+
+			&:last-child {
+				border-bottom: $border-width solid $gray-400;
+				border-radius: 0 0 $radius-block-ui $radius-block-ui;
+			}
+
+			&.components-button {
+				border: $border-width solid $gray-900;
+			}
+		}
+	}
+}
+
+.block-editor-inserter__popover .block-editor-inserter__menu {
+	margin: -$grid-unit-15;
+
+	.block-editor-inserter__tabs .components-tab-panel__tabs {
+		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
+	}
+
+	.block-editor-inserter__main-area {
+		overflow: visible;
+		height: auto;
+	}
+
+	.block-editor-inserter__preview-container {
+		display: none;
+	}
+}
+
+.block-editor-inserter__toggle.components-button {
+	display: inline-flex;
+	align-items: center;
+	cursor: pointer;
+	border: none;
+	outline: none;
+	padding: 0;
+	transition: color 0.2s ease;
+	@include reduce-motion("transition");
+}
+
+.block-editor-inserter__menu {
+	height: 100%;
+	position: relative;
+	overflow: visible;
+}
+
+.block-editor-inserter__inline-elements {
+	margin-top: -1px;
+}
+
+.block-editor-inserter__menu.is-bottom::after {
+	border-bottom-color: $white;
+}
+
+.components-popover.block-editor-inserter__popover {
+	z-index: z-index(".components-popover.block-editor-inserter__popover");
+}
+
+.block-editor-inserter__search {
+	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
+
+	.components-search-control__icon {
+		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
+	}
+}
+
+.block-editor-inserter__tabs {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	.components-tab-panel__tabs {
+		border-bottom: $border-width solid $gray-300;
+
+		.components-tab-panel__tabs-item {
+			flex-grow: 1;
+			margin-bottom: -$border-width;
+			&[id$="reusable"] {
+				flex-grow: inherit;
+				// These are to align the `reusable` icon with the search icon.
+				padding-left: $grid-unit-20;
+				padding-right: $grid-unit-20;
+			}
+		}
+	}
+
+	.components-tab-panel__tab-content {
+		display: flex;
+		flex-grow: 1;
+		flex-direction: column;
+		overflow-y: auto;
+	}
+}
+
+.block-editor-inserter__no-tab-container {
+	overflow-y: auto;
+	flex-grow: 1;
+}
+
+.block-editor-inserter__panel-header {
+	display: inline-flex;
+	align-items: center;
+	padding: $grid-unit-20 $grid-unit-20 0;
+}
+
+.block-editor-inserter__panel-content {
+	padding: $grid-unit-20;
+}
+
+.block-editor-inserter__panel-title,
+.block-editor-inserter__panel-title button {
+	margin: 0 $grid-unit-15 0 0;
+	color: $gray-700;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 500;
+}
+
+.block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
+	height: 36px;
+	line-height: 36px;
+}
+
+.block-editor-inserter__panel-dropdown select {
+	border: none;
+}
+
+.block-editor-inserter__reusable-blocks-panel {
+	position: relative;
+	text-align: right;
+}
+
+.block-editor-inserter__manage-reusable-blocks-container {
+	margin: auto $grid-unit-20 $grid-unit-20;
+}
+
+.block-editor-inserter__manage-reusable-blocks {
+	justify-content: center;
+	width: 100%;
+}
+
+.block-editor-inserter__no-results {
+	padding: $grid-unit-40;
+	text-align: center;
+}
+
+.block-editor-inserter__no-results-icon {
+	fill: $gray-600;
+}
+
+.block-editor-inserter__child-blocks {
+	padding: 0 $grid-unit-20;
+}
+
+.block-editor-inserter__parent-block-header {
+	display: flex;
+	align-items: center;
+
+	h2 {
+		font-size: 13px;
+	}
+
+	.block-editor-block-icon {
+		margin-right: $grid-unit-10;
+	}
+}
+
+.block-editor-inserter__preview-container {
+	display: none;
+	width: 300px;
+	background: $white;
+	border-radius: $radius-block-ui;
+	border: $border-width solid $gray-300;
+	position: absolute;
+	top: $grid-unit-20;
+	left: calc(100% + #{$grid-unit-20});
+	max-height: calc(100% - #{$grid-unit-40});
+	overflow-y: hidden;
+
+	@include break-medium {
+		display: block;
+	}
+
+	.block-editor-block-card {
+		padding: $grid-unit-20;
+	}
+
+	.block-editor-block-card__title {
+		font-size: $default-font-size;
+	}
+}
+
+.block-editor-inserter__patterns-explore-button.components-button {
+	padding: $grid-unit-20;
+	justify-content: center;
+	margin-top: $grid-unit-20;
+	width: 100%;
+}
+
+.block-editor-inserter__patterns-selected-category.block-editor-inserter__patterns-selected-category {
+	color: var(--wp-admin-theme-color);
+	position: relative;
+
+	.components-flex-item {
+		filter: brightness(0.95);
+	}
+
+	svg {
+		fill: var(--wp-admin-theme-color);
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		border-radius: $radius-block-ui;
+		opacity: 0.04;
+		background: var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-inserter__block-patterns-tabs-container {
+	height: 100%;
+	nav {
+		height: 100%;
+	}
+}
+
+.block-editor-inserter__block-patterns-tabs {
+	display: flex;
+	flex-direction: column;
+	padding: $grid-unit-20;
+	overflow-y: auto;
+	height: 100%;
+	// Push the listitem wrapping the "explore" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
+}
+
+.block-editor-inserter__patterns-category-dialog {
+	background: $gray-100;
+	border-left: $border-width solid $gray-200;
+	border-right: $border-width solid $gray-200;
+	position: absolute;
+	padding: $grid-unit-40 $grid-unit-30;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	overflow-y: auto;
+	scrollbar-gutter: stable both-edges;
+
+	@include break-medium {
+		left: 100%;
+		display: block;
+		width: 300px;
+	}
+
+	.block-editor-block-patterns-list {
+		margin-top: $grid-unit-30;
+	}
+
+	.block-editor-block-preview__container {
+		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
+		&:hover {
+			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+		}
+	}
+}
+
+.block-editor-inserter__patterns-category-panel {
+	padding: 0 $grid-unit-20;
+
+	@include break-medium {
+		padding: 0;
+	}
+}
+
+.block-editor-inserter__preview-content {
+	min-height: $grid-unit-60 * 3;
+	background: $gray-100;
+	display: grid;
+	flex-grow: 1;
+	align-items: center;
+}
+
+.block-editor-inserter__preview-content-missing {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: $grid-unit-60 * 3;
+	color: $gray-700;
+	background: $gray-100;
+}
+
+.block-editor-inserter__tips {
+	border-top: $border-width solid $gray-300;
+	padding: $grid-unit-20;
+	flex-shrink: 0;
+	position: relative; // prevents overscroll when block library is open
+}
+
+.block-editor-inserter__quick-inserter {
+	width: 100%;
+
+	// Constrain to container. Avoids overflow bug on FF 79
+	// see https://github.com/WordPress/gutenberg/issues/24529.
+	max-width: 100%;
+
+	@include break-medium {
+		width: $block-inserter-width;
+	}
+}
+
+.block-editor-inserter__quick-inserter-results .block-editor-inserter__panel-header {
+	height: 0;
+	padding: 0;
+	float: left;
+}
+
+.block-editor-inserter__quick-inserter.has-search .block-editor-inserter__panel-content,
+.block-editor-inserter__quick-inserter.has-expand .block-editor-inserter__panel-content {
+	padding: $grid-unit-20;
+}
+
+.block-editor-inserter__quick-inserter-patterns {
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-gap: $grid-unit-10;
+		.block-editor-block-patterns-list__list-item {
+			margin-bottom: 0;
+		}
+		.block-editor-block-preview__container {
+			min-height: 100px;
+		}
+	}
+}
+
+.block-editor-inserter__quick-inserter-separator {
+	border-top: $border-width solid $gray-300;
+}
+
+.block-editor-inserter__popover.is-quick > .components-popover__content {
+	padding: 0;
+}
+
+.block-editor-inserter__quick-inserter-expand.components-button {
+	display: block;
+	background: $gray-900;
+	color: $white;
+	width: 100%;
+	height: ($button-size + $grid-unit-10);
+	border-radius: 0;
+
+	&:hover {
+		color: $white;
+	}
+
+	&:active {
+		color: $gray-400;
+	}
+
+	// Specificity is needed for the border color.
+	&.components-button:focus:not(:disabled) {
+		box-shadow: none;
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-block-patterns-explorer {
+	&__sidebar {
+		position: absolute;
+		top: $header-height + $grid-unit-20;
+		left: 0;
+		bottom: 0;
+		width: $sidebar-width;
+		padding: $grid-unit-30 $grid-unit-40 $grid-unit-40;
+		overflow-x: visible;
+		overflow-y: scroll;
+
+		&__categories-list__item {
+			display: block;
+			width: 100%;
+			height: 48px;
+			text-align: left;
+		}
+	}
+
+	&__search {
+		margin-bottom: $grid-unit-40;
+	}
+
+	&__search-results-count {
+		padding-bottom: $grid-unit-40;
+	}
+
+	&__list {
+		margin-left: $sidebar-width;
+		padding: $grid-unit-30 0 $grid-unit-40;
+	}
+
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-gap: $grid-unit-40;
+		grid-template-columns: repeat(1, 1fr);
+
+		@include break-xlarge() {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@include break-huge() {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		.block-editor-block-patterns-list__list-item {
+			min-height: 240px;
+		}
+
+		.block-editor-block-preview__container {
+			height: inherit;
+			min-height: 100px;
+			max-height: 800px;
+		}
+	}
+}
+
+.block-editor-inserter__patterns-category-panel-title {
+	font-size: calc(1.25 * 13px);
+}
+
+.block-editor-inserter__media-tabs-container {
+	height: 100%;
+
+	nav {
+		height: 100%;
+	}
+
+	.block-editor-inserter__media-library-button {
+		padding: $grid-unit-20;
+		justify-content: center;
+		margin-top: $grid-unit-20;
+		width: 100%;
+	}
+}
+
+.block-editor-inserter__media-tabs {
+	display: flex;
+	flex-direction: column;
+	padding: $grid-unit-20;
+	overflow-y: auto;
+	height: 100%;
+
+	// Push the listitem wrapping the "open media library" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
+
+	&__media-category {
+		&.is-selected {
+			color: var(--wp-admin-theme-color);
+			position: relative;
+
+			.components-flex-item {
+				filter: brightness(0.95);
+			}
+
+			svg {
+				fill: var(--wp-admin-theme-color);
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				border-radius: $radius-block-ui;
+				opacity: 0.04;
+				background: var(--wp-admin-theme-color);
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-dialog {
+	background: $gray-100;
+	border-left: $border-width solid $gray-200;
+	border-right: $border-width solid $gray-200;
+	position: absolute;
+	padding: $grid-unit-20 $grid-unit-30;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	overflow-y: auto;
+	scrollbar-gutter: stable both-edges;
+
+	@include break-medium {
+		left: 100%;
+		display: block;
+		width: 300px;
+	}
+
+	.block-editor-block-preview__container {
+		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
+		&:hover {
+			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+		}
+	}
+}
+
+.block-editor-inserter__media-panel {
+	min-height: 100%;
+	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
+
+	@include break-medium {
+		padding: 0;
+	}
+
+	.block-editor-inserter__media-panel-spinner {
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 1;
+	}
+
+	.block-editor-inserter__media-panel-search {
+		&.components-search-control {
+			input[type="search"].components-search-control__input {
+				background: $white;
+			}
+			button.components-button {
+				min-width: auto;
+				padding-left: $grid-unit-05 * 0.5;
+				padding-right: $grid-unit-05 * 0.5;
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-list {
+	margin-top: $grid-unit-20;
+	.block-editor-inserter__media-list__list-item {
+		position: relative;
+		cursor: pointer;
+		margin-bottom: $grid-unit-30;
+
+		&.is-placeholder {
+			min-height: 100px;
+		}
+
+		&[draggable="true"] .block-editor-block-preview__container {
+			cursor: grab;
+		}
+
+		&.is-hovered {
+			.block-editor-inserter__media-list__item-preview {
+				box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+			}
+
+			.block-editor-inserter__media-list__item-preview-options > button {
+				display: block;
+			}
+		}
+
+		.block-editor-inserter__media-list__item-preview-options {
+			position: absolute;
+			right: $grid-unit-10;
+			top: $grid-unit-10;
+
+			> button {
+				background: $white;
+				border-radius: $radius-block-ui;
+				display: none;
+
+				// These styles are important so as focus isn't lost
+				// when the button is focused and we hover away.
+				&.is-opened,
+				&:focus {
+					display: block;
+				}
+
+				&:hover {
+					box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+					// Windows High Contrast mode will show this outline, but not the box-shadow.
+					outline: 2px solid transparent;
+				}
+			}
+		}
+	}
+
+	.block-editor-inserter__media-list__item {
+		height: 100%;
+
+		.block-editor-inserter__media-list__item-preview {
+			display: flex;
+			align-items: center;
+			overflow: hidden;
+			border-radius: 2px;
+
+			> * {
+				margin: 0 auto;
+				max-width: 100%;
+			}
+
+			.block-editor-inserter__media-list__item-preview-spinner {
+				display: flex;
+				height: 100%;
+				width: 100%;
+				position: absolute;
+				justify-content: center;
+				background: rgba($white, 0.7);
+				align-items: center;
+				pointer-events: none;
+			}
+		}
+
+		&:focus .block-editor-inserter__media-list__item-preview {
+			box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+		}
+	}
+}
+
+.block-editor-inserter__media-list__item-preview-options__popover {
+	.components-menu-item__button .components-menu-item__item {
+		min-width: auto;
+	}
+}
+
+
+.block-editor-inserter__mobile-tab-navigation {
+	padding: $grid-unit-20;
+	height: 100%;
+
+	> * {
+		height: 100%;
+	}
+}
+
+
+.block-editor-inserter-media-tab-media-preview-inserter-external-image-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+
+	p {
+		margin: 0;
+	}
+}

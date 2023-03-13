@@ -1,0 +1,13 @@
+# Set the default behavior, in case people don't have `core.autocrlf` set.
+* text=auto
+
+# Windows bat files in mobile/android.
+*.bat -text
+
+# Denote all files that are truly binary and should not be modified.
+*.aar binary
+*.gif binary
+*.jar binary
+*.jpg binary
+*.png binary
+*.ttf binary

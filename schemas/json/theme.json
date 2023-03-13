@@ -1,0 +1,2154 @@
+{
+	"title": "JSON schema for WordPress block theme global settings and styles",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"definitions": {
+		"//": {
+			"explainer": "https://developer.wordpress.org/themes/advanced-topics/theme-json/",
+			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
+			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
+		},
+		"refComplete": {
+			"type": "object",
+			"properties": {
+				"ref": {
+					"description": "A reference to another property value. e.g. `styles.color.text`",
+					"type": "string"
+				}
+			}
+		},
+		"settingsPropertiesAppearanceTools": {
+			"type": "object",
+			"properties": {
+				"appearanceTools": {
+					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- dimensions: minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"type": "boolean",
+					"default": false
+				}
+			}
+		},
+		"settingsPropertiesUseRootPaddingAwareAlignments": {
+			"properties": {
+				"useRootPaddingAwareAlignments": {
+					"description": "_**Note:** Since WordPress 6.1._\n\nEnables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.\n\nPlease note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.",
+					"type": "boolean",
+					"default": false
+				}
+			}
+		},
+		"settingsPropertiesBorder": {
+			"type": "object",
+			"properties": {
+				"border": {
+					"description": "Settings related to borders.",
+					"type": "object",
+					"properties": {
+						"color": {
+							"description": "Allow users to set custom border colors.",
+							"type": "boolean",
+							"default": false
+						},
+						"radius": {
+							"description": "Allow users to set custom border radius.",
+							"type": "boolean",
+							"default": false
+						},
+						"style": {
+							"description": "Allow users to set custom border styles.",
+							"type": "boolean",
+							"default": false
+						},
+						"width": {
+							"description": "Allow users to set custom border widths.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesShadow": {
+			"type": "object",
+			"properties": {
+				"shadow": {
+					"description": "Settings related to shadows.",
+					"type": "object",
+					"properties": {
+						"presets": {
+							"description": "Shadow presets for the shadow picker.\nGenerates a single custom property (`--wp--preset--shadow--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the shadow preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the shadow preset.",
+										"type": "string"
+									},
+									"shadow": {
+										"description": "CSS box-shadow value",
+										"type": "string"
+									}
+								},
+								"required": [ "name", "slug", "shadow" ],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
+		"settingsPropertiesColor": {
+			"type": "object",
+			"properties": {
+				"color": {
+					"description": "Settings related to colors.",
+					"type": "object",
+					"properties": {
+						"background": {
+							"description": "Allow users to set background colors.",
+							"type": "boolean",
+							"default": true
+						},
+						"custom": {
+							"description": "Allow users to select custom colors.",
+							"type": "boolean",
+							"default": true
+						},
+						"customDuotone": {
+							"description": "Allow users to create custom duotone filters.",
+							"type": "boolean",
+							"default": true
+						},
+						"customGradient": {
+							"description": "Allow users to create custom gradients.",
+							"type": "boolean",
+							"default": true
+						},
+						"defaultDuotone": {
+							"description": "Allow users to choose filters from the default duotone filter presets.",
+							"type": "boolean",
+							"default": true
+						},
+						"defaultGradients": {
+							"description": "Allow users to choose colors from the default gradients.",
+							"type": "boolean",
+							"default": true
+						},
+						"defaultPalette": {
+							"description": "Allow users to choose colors from the default palette.",
+							"type": "boolean",
+							"default": true
+						},
+						"duotone": {
+							"description": "Duotone presets for the duotone picker.\nDoesn't generate classes or properties.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the duotone preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the duotone preset.",
+										"type": "string"
+									},
+									"colors": {
+										"description": "List of colors from dark to light.",
+										"type": "array",
+										"items": {
+											"description": "CSS hex or rgb string.",
+											"type": "string"
+										}
+									}
+								},
+								"required": [ "name", "slug", "colors" ],
+								"additionalProperties": false
+							}
+						},
+						"gradients": {
+							"description": "Gradient presets for the gradient picker.\nGenerates a single class (`.has-{slug}-background`) and custom property (`--wp--preset--gradient--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the gradient preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the gradient preset.",
+										"type": "string"
+									},
+									"gradient": {
+										"description": "CSS gradient string.",
+										"type": "string"
+									}
+								},
+								"required": [ "name", "slug", "gradient" ],
+								"additionalProperties": false
+							}
+						},
+						"link": {
+							"description": "Allow users to set link colors.",
+							"type": "boolean",
+							"default": false
+						},
+						"palette": {
+							"description": "Color palette presets for the color picker.\nGenerates three classes (`.has-{slug}-color`, `.has-{slug}-background-color`, and `.has-{slug}-border-color`) and a single custom property (`--wp--preset--color--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the color preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the color preset.",
+										"type": "string"
+									},
+									"color": {
+										"description": "CSS hex or rgb(a) string.",
+										"type": "string"
+									}
+								},
+								"required": [ "name", "slug", "color" ],
+								"additionalProperties": false
+							}
+						},
+						"text": {
+							"description": "Allow users to set text colors.",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesDimensions": {
+			"type": "object",
+			"properties": {
+				"dimensions": {
+					"description": "Settings related to dimensions.",
+					"type": "object",
+					"properties": {
+						"minHeight": {
+							"description": "Allow users to set custom minimum height.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesLayout": {
+			"type": "object",
+			"properties": {
+				"layout": {
+					"description": "Settings related to layout.",
+					"type": "object",
+					"properties": {
+						"contentSize": {
+							"description": "Sets the max-width of the content.",
+							"type": "string"
+						},
+						"wideSize": {
+							"description": "Sets the max-width of wide (`.alignwide`) content.",
+							"type": "string"
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesPosition": {
+			"type": "object",
+			"properties": {
+				"position": {
+					"description": "Settings related to position.",
+					"type": "object",
+					"properties": {
+						"sticky": {
+							"description": "Allow users to set sticky position.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesSpacing": {
+			"type": "object",
+			"properties": {
+				"spacing": {
+					"description": "Settings related to spacing.",
+					"type": "object",
+					"properties": {
+						"blockGap": {
+							"description": "Enables `--wp--style--block-gap` to be generated from styles.spacing.blockGap.\nA value of `null` instead of `false` further disables layout styles from being generated.",
+							"oneOf": [
+								{ "type": "boolean" },
+								{ "type": "null" }
+							],
+							"default": null
+						},
+						"margin": {
+							"description": "Allow users to set a custom margin.",
+							"type": "boolean",
+							"default": false
+						},
+						"padding": {
+							"description": "Allow users to set a custom padding.",
+							"type": "boolean",
+							"default": false
+						},
+						"units": {
+							"description": "List of units the user can use for spacing values.",
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"default": [ "px", "em", "rem", "vh", "vw", "%" ]
+						},
+						"customSpacingSize": {
+							"description": "Allow users to set custom space sizes.",
+							"type": "boolean",
+							"default": true
+						},
+						"spacingSizes": {
+							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--spacing--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the space size preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Unique identifier for the space size preset. For best cross theme compatibility these should be in the form '10','20','30','40','50','60', etc. with '50' representing the 'Medium' size step.",
+										"type": "string"
+									},
+									"size": {
+										"description": "CSS space-size value, including units.",
+										"type": "string"
+									}
+								},
+								"additionalProperties": false
+							}
+						},
+						"spacingScale": {
+							"description": "Settings to auto-generate space size presets for the space size selector.\nGenerates a custom property (--wp--preset--spacing--{slug}`) per preset value.",
+							"type": "object",
+							"properties": {
+								"operator": {
+									"description": "With + or * depending on whether scale is generated by increment or multiplier.",
+									"type": "string",
+									"enum": [ "+", "*" ],
+									"default": "*"
+								},
+								"increment": {
+									"description": "The amount to increment each step by.",
+									"type": "number",
+									"default": 1.5
+								},
+								"steps": {
+									"description": "Number of steps to generate in scale.",
+									"type": "integer",
+									"default": 7
+								},
+								"mediumStep": {
+									"description": "The value to medium setting in the scale.",
+									"type": "number",
+									"default": 1.5
+								},
+								"unit": {
+									"description": "Unit that the scale uses, eg. rem, em, px.",
+									"type": "string",
+									"enum": [
+										"px",
+										"em",
+										"rem",
+										"vh",
+										"vw",
+										"%"
+									],
+									"default": "rem"
+								}
+							},
+							"additionalProperties": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesTypography": {
+			"type": "object",
+			"properties": {
+				"typography": {
+					"description": "Settings related to typography.",
+					"type": "object",
+					"properties": {
+						"customFontSize": {
+							"description": "Allow users to set custom font sizes.",
+							"type": "boolean",
+							"default": true
+						},
+						"fontStyle": {
+							"description": "Allow users to set custom font styles.",
+							"type": "boolean",
+							"default": true
+						},
+						"fontWeight": {
+							"description": "Allow users to set custom font weights.",
+							"type": "boolean",
+							"default": true
+						},
+						"fluid": {
+							"description": "Enables fluid typography and allows users to set global fluid typography parameters.",
+							"oneOf": [
+								{
+									"type": "object",
+									"properties": {
+										"minFontSize": {
+											"description": "Allow users to set a global minimum font size boundary in px, rem or em. Custom font sizes below this value will not be clamped, and all calculated minimum font sizes will be, a at minimum, this value.",
+											"type": "string"
+										}
+									},
+									"additionalProperties": false
+								},
+								{
+									"type": "boolean"
+								}
+							],
+							"default": false
+						},
+						"letterSpacing": {
+							"description": "Allow users to set custom letter spacing.",
+							"type": "boolean",
+							"default": true
+						},
+						"lineHeight": {
+							"description": "Allow users to set custom line height.",
+							"type": "boolean",
+							"default": false
+						},
+						"textColumns": {
+							"description": "Allow users to set the number of text columns.",
+							"type": "boolean",
+							"default": false
+						},
+						"textDecoration": {
+							"description": "Allow users to set custom text decorations.",
+							"type": "boolean",
+							"default": true
+						},
+						"textTransform": {
+							"description": "Allow users to set custom text transforms.",
+							"type": "boolean",
+							"default": true
+						},
+						"dropCap": {
+							"description": "Enable drop cap.",
+							"type": "boolean",
+							"default": true
+						},
+						"fontSizes": {
+							"description": "Font size presets for the font size selector.\nGenerates a single class (`.has-{slug}-color`) and custom property (`--wp--preset--font-size--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the font size preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the font size preset.",
+										"type": "string"
+									},
+									"size": {
+										"description": "CSS font-size value, including units.",
+										"type": "string"
+									},
+									"fluid": {
+										"description": "Specifics the minimum and maximum font size value of a fluid font size. Set to `false` to bypass fluid calculations and use the static `size` value.",
+										"oneOf": [
+											{
+												"type": "object",
+												"properties": {
+													"min": {
+														"description": "A min font size for fluid font size calculations in px, rem or em.",
+														"type": "string"
+													},
+													"max": {
+														"description": "A max font size for fluid font size calculations in px, rem or em.",
+														"type": "string"
+													}
+												},
+												"additionalProperties": false
+											},
+											{
+												"type": "boolean"
+											}
+										]
+									}
+								},
+								"additionalProperties": false
+							}
+						},
+						"fontFamilies": {
+							"description": "Font family presets for the font family selector.\nGenerates a single custom property (`--wp--preset--font-family--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the font family preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the font family preset.",
+										"type": "string"
+									},
+									"fontFamily": {
+										"description": "CSS font-family value.",
+										"type": "string"
+									},
+									"fontFace": {
+										"description": "Array of font-face declarations.",
+										"type": "array",
+										"items": {
+											"type": "object",
+											"properties": {
+												"fontFamily": {
+													"description": "CSS font-family value.",
+													"type": "string",
+													"default": ""
+												},
+												"fontStyle": {
+													"description": "CSS font-style value.",
+													"type": "string",
+													"default": "normal"
+												},
+												"fontWeight": {
+													"description": "List of available font weights, separated by a space.",
+													"default": "400",
+													"oneOf": [
+														{
+															"type": "string"
+														},
+														{
+															"type": "integer"
+														}
+													]
+												},
+												"fontDisplay": {
+													"description": "CSS font-display value.",
+													"type": "string",
+													"default": "fallback",
+													"enum": [
+														"auto",
+														"block",
+														"fallback",
+														"swap",
+														"optional"
+													]
+												},
+												"src": {
+													"description": "Paths or URLs to the font files.",
+													"oneOf": [
+														{
+															"type": "string"
+														},
+														{
+															"type": "array",
+															"items": {
+																"type": "string"
+															}
+														}
+													],
+													"default": []
+												},
+												"fontStretch": {
+													"description": "CSS font-stretch value.",
+													"type": "string"
+												},
+												"ascentOverride": {
+													"description": "CSS ascent-override value.",
+													"type": "string"
+												},
+												"descentOverride": {
+													"description": "CSS descent-override value.",
+													"type": "string"
+												},
+												"fontVariant": {
+													"description": "CSS font-variant value.",
+													"type": "string"
+												},
+												"fontFeatureSettings": {
+													"description": "CSS font-feature-settings value.",
+													"type": "string"
+												},
+												"fontVariationSettings": {
+													"description": "CSS font-variation-settings value.",
+													"type": "string"
+												},
+												"lineGapOverride": {
+													"description": "CSS line-gap-override value.",
+													"type": "string"
+												},
+												"sizeAdjust": {
+													"description": "CSS size-adjust value.",
+													"type": "string"
+												},
+												"unicodeRange": {
+													"description": "CSS unicode-range value.",
+													"type": "string"
+												}
+											},
+											"required": [ "fontFamily", "src" ],
+											"additionalProperties": false
+										}
+									}
+								},
+								"additionalProperties": false
+							}
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesCustom": {
+			"type": "object",
+			"properties": {
+				"custom": {
+					"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.",
+					"$ref": "#/definitions/settingsCustomAdditionalProperties"
+				}
+			}
+		},
+		"settingsProperties": {
+			"allOf": [
+				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
+				{ "$ref": "#/definitions/settingsPropertiesBorder" },
+				{ "$ref": "#/definitions/settingsPropertiesColor" },
+				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
+				{ "$ref": "#/definitions/settingsPropertiesShadow" },
+				{ "$ref": "#/definitions/settingsPropertiesLayout" },
+				{ "$ref": "#/definitions/settingsPropertiesPosition" },
+				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
+				{ "$ref": "#/definitions/settingsPropertiesTypography" },
+				{ "$ref": "#/definitions/settingsPropertiesCustom" }
+			]
+		},
+		"settingsPropertiesComplete": {
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/settingsProperties"
+				},
+				{
+					"properties": {
+						"appearanceTools": {},
+						"border": {},
+						"color": {},
+						"dimensions": {},
+						"layout": {},
+						"position": {},
+						"shadow": {},
+						"spacing": {},
+						"typography": {},
+						"custom": {}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"settingsBlocksPropertiesComplete": {
+			"type": "object",
+			"properties": {
+				"core/archives": {
+					"type": "object",
+					"description": "Archive block. Display a monthly archive of your posts. This block has no block-level settings",
+					"additionalProperties": false
+				},
+				"core/audio": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/avatar": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/block": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/button": {
+					"type": "object",
+					"allOf": [
+						{
+							"$ref": "#/definitions/settingsPropertiesAppearanceTools"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"border": {
+									"description": "Settings related to borders.\nGutenberg plugin required.",
+									"type": "object",
+									"properties": {
+										"radius": {
+											"description": "Allow users to set custom border radius.\nGutenberg plugin required.",
+											"type": "boolean",
+											"default": false
+										}
+									}
+								}
+							}
+						},
+						{ "$ref": "#/definitions/settingsPropertiesColor" },
+						{ "$ref": "#/definitions/settingsPropertiesLayout" },
+						{ "$ref": "#/definitions/settingsPropertiesSpacing" },
+						{
+							"$ref": "#/definitions/settingsPropertiesTypography"
+						},
+						{ "$ref": "#/definitions/settingsPropertiesCustom" }
+					]
+				},
+				"core/buttons": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/calendar": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/categories": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/code": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/column": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/columns": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-author-name": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-content": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-date": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-edit-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-reply-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/cover": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/embed": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/file": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/freeform": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/gallery": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/group": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/heading": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/home-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/html": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/image": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/latest-comments": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/latest-posts": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/list": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/loginout": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/media-text": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/missing": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/more": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/navigation": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/navigation-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/nextpage": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/page-list": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/paragraph": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-author": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comments": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comments-count": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comments-form": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comments-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-content": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-date": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-excerpt": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-featured-image": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-navigation-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-template": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-terms": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-title": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/preformatted": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/pullquote": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-pagination": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-pagination-next": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-pagination-numbers": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-pagination-previous": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-title": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/quote": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/rss": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/search": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/separator": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/shortcode": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/site-logo": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/site-tagline": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/site-title": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/social-link": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/social-links": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/spacer": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/table": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/table-of-contents": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/tag-cloud": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/template-part": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/term-description": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/text-columns": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/verse": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/video": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/widget-area": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/legacy-widget": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/widget-group": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				}
+			},
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				}
+			},
+			"additionalProperties": false
+		},
+		"settingsCustomAdditionalProperties": {
+			"type": "object",
+			"additionalProperties": {
+				"oneOf": [
+					{
+						"type": "string"
+					},
+					{
+						"type": "number"
+					},
+					{
+						"$ref": "#/definitions/settingsCustomAdditionalProperties"
+					}
+				]
+			}
+		},
+		"stylesProperties": {
+			"type": "object",
+			"properties": {
+				"border": {
+					"description": "Border styles.",
+					"type": "object",
+					"properties": {
+						"color": {
+							"description": "Sets the `border-color` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"radius": {
+							"description": "Sets the `border-radius` CSS property.",
+							"anyOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								},
+								{
+									"type": "object",
+									"properties": {
+										"topLeft": {
+											"description": "Sets the `border-top-left-radius` CSS property.",
+											"oneOf": [
+												{
+													"type": "string"
+												},
+												{
+													"$ref": "#/definitions/refComplete"
+												}
+											]
+										},
+										"topRight": {
+											"description": "Sets the `border-top-right-radius` CSS property.",
+											"oneOf": [
+												{
+													"type": "string"
+												},
+												{
+													"$ref": "#/definitions/refComplete"
+												}
+											]
+										},
+										"bottomLeft": {
+											"description": "Sets the `border-bottom-left-radius` CSS property.",
+											"oneOf": [
+												{
+													"type": "string"
+												},
+												{
+													"$ref": "#/definitions/refComplete"
+												}
+											]
+										},
+										"bottomRight": {
+											"description": "Sets the `border-bottom-right-radius` CSS property.",
+											"oneOf": [
+												{
+													"type": "string"
+												},
+												{
+													"$ref": "#/definitions/refComplete"
+												}
+											]
+										}
+									}
+								}
+							]
+						},
+						"style": {
+							"description": "Sets the `border-style` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"width": {
+							"description": "Sets the `border-width` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"top": {
+							"type": "object",
+							"properties": {
+								"color": {
+									"description": "Sets the `border-top-color` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"style": {
+									"description": "Sets the `border-top-style` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"width": {
+									"description": "Sets the `border-top-width` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								}
+							},
+							"additionalProperties": false
+						},
+						"right": {
+							"type": "object",
+							"properties": {
+								"color": {
+									"description": "Sets the `border-right-color` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"style": {
+									"description": "Sets the `border-right-style` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"width": {
+									"description": "Sets the `border-right-width` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								}
+							},
+							"additionalProperties": false
+						},
+						"bottom": {
+							"type": "object",
+							"properties": {
+								"color": {
+									"description": "Sets the `border-bottom-color` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"style": {
+									"description": "Sets the `border-bottom-style` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"width": {
+									"description": "Sets the `border-bottom-width` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								}
+							},
+							"additionalProperties": false
+						},
+						"left": {
+							"type": "object",
+							"properties": {
+								"color": {
+									"description": "Sets the `border-left-color` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"style": {
+									"description": "Sets the `border-left-style` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"width": {
+									"description": "Sets the `border-left-width` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								}
+							},
+							"additionalProperties": false
+						}
+					},
+					"additionalProperties": false
+				},
+				"color": {
+					"description": "Color styles.",
+					"type": "object",
+					"properties": {
+						"background": {
+							"description": "Sets the `background-color` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"gradient": {
+							"description": "Sets the `background` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"text": {
+							"description": "Sets the `color` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					},
+					"additionalProperties": false
+				},
+				"dimensions": {
+					"description": "Dimensions styles",
+					"type": "object",
+					"properties": {
+						"minHeight": {
+							"description": "Sets the `min-height` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					}
+				},
+				"spacing": {
+					"description": "Spacing styles.",
+					"type": "object",
+					"properties": {
+						"blockGap": {
+							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"margin": {
+							"description": "Margin styles.",
+							"type": "object",
+							"properties": {
+								"top": {
+									"description": "Sets the `margin-top` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"right": {
+									"description": "Sets the `margin-right` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"bottom": {
+									"description": "Sets the `margin-bottom` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"left": {
+									"description": "Sets the `margin-left` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								}
+							},
+							"additionalProperties": false
+						},
+						"padding": {
+							"description": "Padding styles.",
+							"type": "object",
+							"properties": {
+								"top": {
+									"description": "Sets the `padding-top` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"right": {
+									"description": "Sets the `padding-right` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"bottom": {
+									"description": "Sets the `padding-bottom` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"left": {
+									"description": "Sets the `padding-left` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								}
+							},
+							"additionalProperties": false
+						}
+					},
+					"additionalProperties": false
+				},
+				"typography": {
+					"description": "Typography styles.",
+					"type": "object",
+					"properties": {
+						"fontFamily": {
+							"description": "Sets the `font-family` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"fontSize": {
+							"description": "Sets the `font-size` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"fontStyle": {
+							"description": "Sets the `font-style` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"fontWeight": {
+							"description": "Sets the `font-weight` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"letterSpacing": {
+							"description": "Sets the `letter-spacing` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"lineHeight": {
+							"description": "Sets the `line-height` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"textColumns": {
+							"description": "Sets the `column-count` CSS property.",
+							"type": "string"
+						},
+						"textDecoration": {
+							"description": "Sets the `text-decoration` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"textTransform": {
+							"description": "Sets the `text-transform` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					},
+					"additionalProperties": false
+				},
+				"filter": {
+					"description": "CSS and SVG filter styles.",
+					"type": "object",
+					"properties": {
+						"duotone": {
+							"description": "Sets the duotone filter.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					},
+					"additionalProperties": false
+				},
+				"shadow": {
+					"description": "Box shadow styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"$ref": "#/definitions/refComplete"
+						}
+					]
+				},
+				"outline": {
+					"description": "Outline styles.",
+					"type": "object",
+					"properties": {
+						"color": {
+							"description": "Sets the `outline-color` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"offset": {
+							"description": "Sets the `outline-offset` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"style": {
+							"description": "Sets the `outline-style` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"width": {
+							"description": "Sets the `outline-width` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					},
+					"additionalProperties": false
+				},
+				"css": {
+					"description": "Sets custom CSS to apply styling not covered by other theme.json properties.",
+					"type": "string"
+				}
+			}
+		},
+		"stylesPropertiesComplete": {
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/stylesProperties"
+				},
+				{
+					"properties": {
+						"border": {},
+						"color": {},
+						"dimensions": {},
+						"spacing": {},
+						"typography": {},
+						"filter": {},
+						"shadow": {},
+						"outline": {},
+						"css": {}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"stylesElementsPropertiesComplete": {
+			"type": "object",
+			"properties": {
+				"button": {
+					"type": "object",
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"properties": {
+								"border": {},
+								"color": {},
+								"filter": {},
+								"shadow": {},
+								"outline": {},
+								"spacing": {},
+								"typography": {},
+								"css": {},
+								":hover": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":focus": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":active": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":visited": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								}
+							},
+							"additionalProperties": false
+						}
+					]
+				},
+				"link": {
+					"type": "object",
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"properties": {
+								"border": {},
+								"color": {},
+								"spacing": {},
+								"typography": {},
+								":hover": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":focus": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":active": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":visited": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								}
+							},
+							"additionalProperties": false
+						}
+					]
+				},
+				"heading": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"h1": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"h2": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"h3": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"h4": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"h5": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"h6": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"caption": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"cite": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			},
+			"additionalProperties": false
+		},
+		"stylesBlocksPropertiesComplete": {
+			"type": "object",
+			"properties": {
+				"core/archives": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/audio": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/avatar": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/block": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/button": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/buttons": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/calendar": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/categories": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/code": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/column": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/columns": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-author-name": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-content": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-date": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-edit-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-reply-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/cover": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/embed": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/file": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/freeform": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/gallery": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/group": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/heading": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/home-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/html": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/image": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/latest-comments": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/latest-posts": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/list": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/loginout": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/media-text": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/missing": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/more": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/navigation": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/navigation-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/nextpage": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/page-list": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/paragraph": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-author": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comments": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comments-count": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comments-form": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comments-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-content": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-date": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-excerpt": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-featured-image": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-navigation-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-template": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-terms": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-title": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/preformatted": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/pullquote": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-pagination": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-pagination-next": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-pagination-numbers": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-pagination-previous": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-title": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/quote": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/rss": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/search": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/separator": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/shortcode": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/site-logo": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/site-tagline": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/site-title": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/social-link": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/social-links": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/spacer": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/table": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/table-of-contents": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/tag-cloud": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/template-part": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/term-description": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/text-columns": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/verse": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/video": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/widget-area": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/legacy-widget": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/widget-group": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				}
+			},
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				}
+			},
+			"additionalProperties": false
+		},
+		"stylesPropertiesAndElementsComplete": {
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/stylesProperties"
+				},
+				{
+					"properties": {
+						"border": {},
+						"color": {},
+						"dimensions": {},
+						"spacing": {},
+						"typography": {},
+						"filter": {},
+						"shadow": {},
+						"outline": {},
+						"css": {},
+						"elements": {
+							"$ref": "#/definitions/stylesElementsPropertiesComplete"
+						},
+						"variations": {
+							"$ref": "#/definitions/stylesVariationPropertiesComplete"
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"stylesVariationPropertiesComplete": {
+			"type": "object",
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*$": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		}
+	},
+	"type": "object",
+	"properties": {
+		"$schema": {
+			"description": "JSON schema URI for theme.json.",
+			"type": "string"
+		},
+		"version": {
+			"description": "Version of theme.json to use.",
+			"type": "integer",
+			"enum": [ 2 ]
+		},
+		"title": {
+			"type": "string",
+			"description": "Title of the global styles variation. If not defined, the file name will be used."
+		},
+		"settings": {
+			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/settingsProperties"
+				},
+				{
+					"properties": {
+						"appearanceTools": {},
+						"useRootPaddingAwareAlignments": {
+							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
+						},
+						"color": {},
+						"layout": {},
+						"spacing": {},
+						"typography": {},
+						"border": {},
+						"shadow": {},
+						"custom": {},
+						"blocks": {
+							"description": "Settings defined on a per-block basis.",
+							"$ref": "#/definitions/settingsBlocksPropertiesComplete"
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"styles": {
+			"description": "Organized way to set CSS properties. Styles in the top-level will be added in the `body` selector.",
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/stylesProperties"
+				},
+				{
+					"properties": {
+						"border": {},
+						"color": {},
+						"spacing": {},
+						"typography": {},
+						"filter": {},
+						"shadow": {},
+						"outline": {},
+						"css": {},
+						"elements": {
+							"description": "Styles defined on a per-element basis using the element's selector.",
+							"$ref": "#/definitions/stylesElementsPropertiesComplete"
+						},
+						"blocks": {
+							"description": "Styles defined on a per-block basis using the block's selector.",
+							"$ref": "#/definitions/stylesBlocksPropertiesComplete"
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"customTemplates": {
+			"description": "Additional metadata for custom templates defined in the templates folder.",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"description": "Filename, without extension, of the template in the templates folder.",
+						"type": "string"
+					},
+					"title": {
+						"description": "Title of the template, translatable.",
+						"type": "string"
+					},
+					"postTypes": {
+						"description": "List of post types that can use this custom template.",
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"default": [ "page" ]
+					}
+				},
+				"required": [ "name", "title" ],
+				"additionalProperties": false
+			}
+		},
+		"templateParts": {
+			"description": "Additional metadata for template parts defined in the parts folder.",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"description": "Filename, without extension, of the template in the parts folder.",
+						"type": "string"
+					},
+					"title": {
+						"description": "Title of the template, translatable.",
+						"type": "string"
+					},
+					"area": {
+						"description": "The area the template part is used for. Block variations for `header` and `footer` values exist and will be used when the area is set to one of those.",
+						"type": "string",
+						"default": "uncategorized"
+					}
+				},
+				"required": [ "name" ],
+				"additionalProperties": false
+			}
+		},
+		"patterns": {
+			"description": "An array of pattern slugs to be registered from the Pattern Directory.",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		}
+	},
+	"required": [ "version" ],
+	"additionalProperties": false
+}

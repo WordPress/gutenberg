@@ -1,0 +1,45 @@
+.wp-block-calendar {
+	text-align: center;
+
+	th,
+	td {
+		padding: 0.25em;
+		border: 1px solid;
+	}
+
+	th {
+		font-weight: 400;
+	}
+
+	caption {
+		background-color: inherit;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+
+		&:where(:not(.has-text-color)) {
+			color: #40464d;
+
+			// Keep the hard-coded border color for backward compatibility.
+			th,
+			td {
+				border-color: $gray-300;
+			}
+		}
+
+		&.has-background th {
+			background-color: inherit;
+		}
+
+		&.has-text-color th {
+			color: inherit;
+		}
+	}
+}
+
+// Keep the hard-coded header background color for backward compatibility.
+:where(.wp-block-calendar table:not(.has-background) th) {
+	background: $gray-300;
+}

@@ -1,0 +1,169 @@
+$resize-handler-size: 15px;
+$resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // Make the resize handle container larger so there's a larger grabbable area.
+
+// This is a wrapper of the actual visible handle (pseudo element). It is styled
+// to be much bigger than the visual part so it's easier to click and use.
+.components-resizable-box__handle {
+	display: none;
+	width: $resize-handler-container-size;
+	height: $resize-handler-container-size;
+
+	// Elevate the resize handle above the focus style.
+	z-index: z-index(".components-resizable-box__handle");
+
+	// Show the resize handle if set in props
+	.components-resizable-box__container.has-show-handle & {
+		display: block;
+	}
+}
+
+// Make the image inside the resize to get the full width
+.components-resizable-box__container > img {
+	width: inherit;
+}
+
+// This is the "visible" resize handle - the circle part
+.components-resizable-box__handle::after {
+	display: block;
+	content: "";
+	width: $resize-handler-size;
+	height: $resize-handler-size;
+	border-radius: 50%;
+	background: $white;
+	cursor: inherit;
+	position: absolute;
+	top: calc(50% - #{ceil($resize-handler-size * 0.5)});
+	right: calc(50% - #{ceil($resize-handler-size * 0.5)});
+
+	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+	// Only visible in Windows High Contrast mode.
+	outline: 2px solid transparent;
+}
+
+// This is the "visible" resize handle for side handles - the line
+.components-resizable-box__side-handle::before {
+	display: block;
+	border-radius: 2px;
+	content: "";
+	width: 3px;
+	height: 3px;
+	background: $components-color-accent;
+	cursor: inherit;
+	position: absolute;
+	top: calc(50% - 1px);
+	right: calc(50% - 1px);
+	transition: transform 0.1s ease-in;
+	@include reduce-motion("transition");
+	will-change: transform;
+	opacity: 0;
+}
+
+// Show corner handles on top of side handles so they can be used
+.components-resizable-box__side-handle {
+	z-index: z-index(".components-resizable-box__side-handle");
+}
+
+.components-resizable-box__corner-handle {
+	z-index: z-index(".components-resizable-box__corner-handle");
+}
+
+// Make horizontal side-handles full width
+.components-resizable-box__side-handle.components-resizable-box__handle-top,
+.components-resizable-box__side-handle.components-resizable-box__handle-bottom,
+.components-resizable-box__side-handle.components-resizable-box__handle-top::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-bottom::before {
+	width: 100%;
+	left: 0;
+	border-left: 0;
+	border-right: 0;
+}
+
+// Make vertical side-handles full height
+.components-resizable-box__side-handle.components-resizable-box__handle-left,
+.components-resizable-box__side-handle.components-resizable-box__handle-right,
+.components-resizable-box__side-handle.components-resizable-box__handle-left::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-right::before {
+	height: 100%;
+	top: 0;
+	border-top: 0;
+	border-bottom: 0;
+}
+
+// Reveal the side handle line when hovered or in use
+.components-resizable-box__side-handle.components-resizable-box__handle-top:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-bottom:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-top:active::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-bottom:active::before {
+	animation: components-resizable-box__top-bottom-animation 0.1s ease-out 0s;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+}
+
+.components-resizable-box__side-handle.components-resizable-box__handle-left:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-right:hover::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-left:active::before,
+.components-resizable-box__side-handle.components-resizable-box__handle-right:active::before {
+	animation: components-resizable-box__left-right-animation 0.1s ease-out 0s;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+}
+
+/* This CSS is shown only to Safari, which has a bug with table-caption making it jumpy.
+See https://bugs.webkit.org/show_bug.cgi?id=187903. */
+@media not all and (min-resolution: 0.001dpcm) {
+	@supports (-webkit-appearance:none) {
+		.components-resizable-box__side-handle.components-resizable-box__handle-top:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-bottom:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-top:active::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-bottom:active::before {
+			animation: none;
+		}
+
+		.components-resizable-box__side-handle.components-resizable-box__handle-left:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-right:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-left:active::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-right:active::before {
+			animation: none;
+		}
+	}
+}
+
+@keyframes components-resizable-box__top-bottom-animation {
+	from {
+		transform: scaleX(0);
+		opacity: 0;
+	}
+	to {
+		transform: scaleX(1);
+		opacity: 1;
+	}
+}
+
+@keyframes components-resizable-box__left-right-animation {
+	from {
+		transform: scaleY(0);
+		opacity: 0;
+	}
+	to {
+		transform: scaleY(1);
+		opacity: 1;
+	}
+}
+
+/*!rtl:begin:ignore*/
+.components-resizable-box__handle-right {
+	right: calc(#{$resize-handler-container-size * 0.5} * -1);
+}
+
+.components-resizable-box__handle-left {
+	left: calc(#{$resize-handler-container-size * 0.5} * -1);
+}
+
+.components-resizable-box__handle-top {
+	top: calc(#{$resize-handler-container-size * 0.5} * -1);
+}
+
+.components-resizable-box__handle-bottom {
+	bottom: calc(#{$resize-handler-container-size * 0.5} * -1);
+}
+/*!rtl:end:ignore*/

@@ -1,0 +1,43 @@
+ul.wp-block-rss { // The ul is needed for specificity to override the reset styles in the editor.
+	list-style: none;
+	padding: 0;
+
+	// This needs extra specificity due to the reset mixin on the parent: https://github.com/WordPress/gutenberg/blob/a250e9e5fe00dd5195624f96a3d924e7078951c3/packages/edit-post/src/style.scss#L54
+	&.wp-block-rss {
+		box-sizing: border-box;
+	}
+
+	&.alignleft {
+		/*rtl:ignore*/
+		margin-right: 2em;
+	}
+	&.alignright {
+		/*rtl:ignore*/
+		margin-left: 2em;
+	}
+	&.is-grid {
+		display: flex;
+		flex-wrap: wrap;
+		padding: 0;
+		list-style: none;
+
+		li {
+			margin: 0 1em 1em 0;
+			width: 100%;
+		}
+	}
+
+	@include break-small {
+		@for $i from 2 through 6 {
+			&.columns-#{ $i } li {
+				width: calc(( 100% / #{ $i } ) - 1em);
+			}
+		}
+	}
+}
+
+.wp-block-rss__item-publish-date,
+.wp-block-rss__item-author {
+	display: block;
+	font-size: 0.8125em;
+}

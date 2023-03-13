@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Missing block renders without crashing 1`] = `
+<View
+  accessibilityHint="Tap here to show help"
+  accessibilityLabel="Help button"
+  accessibilityRole="button"
+  accessibilityState={
+    {
+      "disabled": true,
+    }
+  }
+  accessible={true}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+>
+  <View
+    accessibilityHint="Tap here to show help"
+    accessibilityLabel="Help button"
+    accessibilityRole="button"
+    accessible={true}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+  >
+    <Svg
+      height={24}
+      label="Help icon"
+      style={{}}
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      Path
+    </Svg>
+  </View>
+  <Svg
+    color="white"
+    height={24}
+    style={{}}
+    viewBox="0 0 24 24"
+    width={24}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    Path
+  </Svg>
+  <Text>
+    missing/block/title
+  </Text>
+  <Text>
+    Unsupported
+  </Text>
+</View>
+`;

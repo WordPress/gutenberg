@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/verse",
+		"isValid": true,
+		"attributes": {
+			"content": "A <em>verse</em>…<br>And more!",
+			"textAlign": "left"
+		},
+		"innerBlocks": []
+	}
+]

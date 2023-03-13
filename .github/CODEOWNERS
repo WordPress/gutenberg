@@ -1,0 +1,145 @@
+# Documentation
+/docs                                           @ajitbohra @ryanwelcher @juanmaguitar @fabiankaegy
+
+# Schemas
+/schemas/json                                   @ajlende
+
+# Data
+/packages/api-fetch                             @nerrad @mmtr
+/packages/core-data                             @nerrad
+/packages/data                                  @nerrad
+/packages/redux-routine                         @nerrad
+/packages/data-controls                         @nerrad
+
+# Blocks
+/packages/block-library                         @ajitbohra
+/packages/block-library/src/gallery             @geriux
+/packages/block-library/src/navigation          @tellthemachines
+/packages/block-library/src/navigation-link     @tellthemachines
+/packages/block-library/src/navigation-submenu  @tellthemachines
+/packages/block-library/src/page-list           @tellthemachines
+/packages/block-library/src/comment-template    @michalczaplinski
+/packages/block-library/src/comments            @michalczaplinski
+/packages/block-library/src/table-of-contents   @ZebulanStanphill
+
+# Duotone
+/lib/block-supports/duotone.php                       @ajlende
+/packages/block-editor/src/components/duotone-control @ajlende
+/packages/block-editor/src/hooks/duotone.js           @ajlende
+/packages/components/src/duotone-picker               @ajlende
+
+# Editor
+/packages/annotations                           @atimmer
+/packages/autop
+/packages/block-editor                          @ellatrix
+/packages/block-serialization-spec-parser       @dmsnell
+/packages/block-serialization-default-parser    @dmsnell
+/packages/blocks
+/packages/edit-post
+/packages/editor
+/packages/editor/src/components/post-title @alexstine
+/packages/list-reusable-blocks
+/packages/shortcode
+/packages/block-directory
+/packages/interface
+/packages/media-utils
+/packages/server-side-render
+/packages/block-editor/src/components/link-control  @getdave
+
+# Widgets
+/packages/edit-widgets                          @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
+/packages/customize-widgets                     @noisysocks
+/packages/widgets                               @noisysocks
+
+# Full Site Editing
+/packages/edit-site
+
+# Tooling
+/bin                                            @ntwb @nerrad @ajitbohra
+/bin/api-docs                                   @ntwb @nerrad @ajitbohra
+/docs/tool                                      @ajitbohra
+/packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
+/packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
+/packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
+/packages/browserslist-config                   @ntwb @nerrad @ajitbohra
+/packages/create-block                          @gziolo @ryanwelcher
+/packages/create-block-tutorial-template        @gziolo @ryanwelcher
+/packages/dependency-extraction-webpack-plugin  @gziolo
+/packages/docgen
+/packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
+/packages/e2e-tests                             @ntwb @nerrad @ajitbohra
+/packages/e2e-test-utils-playwright             @kevin940726
+/packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
+/packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
+/packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
+/packages/jest-puppeteer-axe                    @gziolo @ntwb @nerrad @ajitbohra
+/packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
+/packages/postcss-themes                        @ntwb @nerrad @ajitbohra
+/packages/prettier-config                       @ntwb @gziolo
+/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
+/packages/stylelint-config                      @ntwb
+/test/e2e                                       @kevin940726
+
+# UI Components
+/packages/components                            @ajitbohra
+/packages/compose                               @ajitbohra
+/packages/element                               @ajitbohra
+/packages/notices                               @ajitbohra
+/packages/viewport                              @ajitbohra
+/packages/base-styles
+/packages/icons
+/packages/primitives
+
+# Utilities
+/packages/a11y
+/packages/blob
+/packages/date
+/packages/deprecated
+/packages/dom                                   @ellatrix
+/packages/dom-ready
+/packages/escape-html
+/packages/html-entities
+/packages/i18n                                  @swissspidy
+/packages/is-shallow-equal
+/packages/keyboard-shortcuts
+/packages/keycodes
+/packages/preferences                           @talldan
+/packages/priority-queue
+/packages/token-list
+/packages/url
+/packages/wordcount
+/packages/warning
+
+# Extensibility
+/packages/hooks                                 @adamsilverstein
+/packages/plugins                               @gziolo @adamsilverstein
+
+# Rich Text
+/packages/format-library                        @ellatrix @fluiddot @dcalhoun
+/packages/rich-text                             @ellatrix @fluiddot @dcalhoun
+/packages/block-editor/src/components/rich-text @ellatrix @fluiddot @dcalhoun
+
+# Project Management
+/.github
+/packages/project-management-automation
+/packages/report-flaky-tests                    @kevin940726
+
+# wp-env
+/packages/env                                   @noahtallen
+
+# PHP
+/lib                                            @spacedmonkey
+/lib/experimental/rest-api.php                  @timothybjacobs
+/lib/experimental/class-wp-rest-*               @timothybjacobs
+/lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey @geriux
+
+# Native
+/packages/components/src/mobile/global-styles-context                @geriux
+
+# Native (Unowned)
+*.native.js
+*.android.js
+*.ios.js
+*.native.scss
+*.android.scss
+*.ios.scss

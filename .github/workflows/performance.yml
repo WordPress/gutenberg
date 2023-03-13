@@ -1,0 +1,111 @@
+name: Performance Tests
+
+on:
+    pull_request:
+    release:
+        types: [published]
+    push:
+        branches: [trunk]
+    workflow_dispatch:
+        inputs:
+            branches:
+                description: 'branches or commits to compare (comma separated)'
+                required: true
+            wpversion:
+                description: 'The base WP version to use for the tests (latest or 6.0, 6.1...)'
+                required: false
+                default: 'latest'
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    performance:
+        name: Run performance tests
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
+
+        steps:
+            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Npm install
+              run: |
+                  npm ci
+
+            - name: Install specific versions of the themes used in tests
+              run: |
+                  npm run wp-env start
+                  npm run wp-env -- run tests-cli "wp theme update twentytwentyone --version=1.7"
+                  npm run wp-env -- run tests-cli "wp theme update twentytwentythree --version=1.0"
+                  npm run wp-env stop
+
+            - name: Compare performance with trunk
+              if: github.event_name == 'pull_request'
+              run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
+
+            - name: Store performance measurements
+              if: github.event_name == 'pull_request'
+              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              with:
+                  name: perf-test-results
+                  path: ./__test-results/*.json
+
+            - name: Compare performance with current WordPress Core and previous Gutenberg versions
+              if: github.event_name == 'release'
+              env:
+                  PLUGIN_VERSION: ${{ github.event.release.name }}
+              shell: bash
+              run: |
+                  IFS=. read -ra PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
+                  CURRENT_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
+                  PREVIOUS_VERSION_BASE_10=$((PLUGIN_VERSION_ARRAY[0] * 10 + PLUGIN_VERSION_ARRAY[1] - 1))
+                  PREVIOUS_RELEASE_BRANCH="release/$((PREVIOUS_VERSION_BASE_10 / 10)).$((PREVIOUS_VERSION_BASE_10 % 10))"
+                  WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
+                  IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
+                  WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
+                  ./bin/plugin/cli.js perf "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --wp-version "$WP_MAJOR"
+
+            - name: Compare performance with base branch
+              if: github.event_name == 'push'
+              # The base hash used here need to be a commit that is compatible with the current WP version
+              # The current one is debd225d007f4e441ceec80fbd6fa96653f94737 and it needs to be updated every WP major release.
+              # It is used as a base comparison point to avoid fluctuation in the performance metrics.
+              run: |
+                  WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
+                  IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
+                  WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
+                  ./bin/plugin/cli.js perf $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 --tests-branch $GITHUB_SHA --wp-version "$WP_MAJOR"
+
+            - name: Compare performance with custom branches
+              if: github.event_name == 'workflow_dispatch'
+              env:
+                  BRANCHES: ${{ github.event.inputs.branches }}
+                  WP_VERSION: ${{ github.event.inputs.wpversion }}
+              run: |
+                  ./bin/plugin/cli.js perf $(echo $BRANCHES | tr ',' ' ') --tests-branch $GITHUB_SHA --wp-version "$WP_VERSION"
+
+            - name: Publish performance results
+              if: github.event_name == 'push'
+              env:
+                  CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
+              run: |
+                  COMMITTED_AT=$(git show -s $GITHUB_SHA --format="%ct")
+                  ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 $COMMITTED_AT
+
+            - name: Archive debug artifacts (screenshots, HTML snapshots)
+              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+              if: always()
+              with:
+                  name: failures-artifacts
+                  path: ./__test-results/artifacts
+                  if-no-files-found: ignore

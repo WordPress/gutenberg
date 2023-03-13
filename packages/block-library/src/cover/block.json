@@ -1,0 +1,122 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "core/cover",
+	"title": "Cover",
+	"category": "media",
+	"description": "Add an image or video with a text overlay — great for headers.",
+	"textdomain": "default",
+	"attributes": {
+		"url": {
+			"type": "string"
+		},
+		"useFeaturedImage": {
+			"type": "boolean",
+			"default": false
+		},
+		"id": {
+			"type": "number"
+		},
+		"alt": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "img",
+			"attribute": "alt",
+			"default": ""
+		},
+		"hasParallax": {
+			"type": "boolean",
+			"default": false
+		},
+		"isRepeated": {
+			"type": "boolean",
+			"default": false
+		},
+		"dimRatio": {
+			"type": "number",
+			"default": 100
+		},
+		"overlayColor": {
+			"type": "string"
+		},
+		"customOverlayColor": {
+			"type": "string"
+		},
+		"backgroundType": {
+			"type": "string",
+			"default": "image"
+		},
+		"focalPoint": {
+			"type": "object"
+		},
+		"minHeight": {
+			"type": "number"
+		},
+		"minHeightUnit": {
+			"type": "string"
+		},
+		"gradient": {
+			"type": "string"
+		},
+		"customGradient": {
+			"type": "string"
+		},
+		"contentPosition": {
+			"type": "string"
+		},
+		"isDark": {
+			"type": "boolean",
+			"default": true
+		},
+		"allowedBlocks": {
+			"type": "array"
+		},
+		"templateLock": {
+			"type": [ "string", "boolean" ],
+			"enum": [ "all", "insert", "contentOnly", false ]
+		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		}
+	},
+	"usesContext": [ "postId", "postType" ],
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"html": false,
+		"spacing": {
+			"padding": true,
+			"margin": [ "top", "bottom" ],
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"padding": true,
+				"blockGap": true
+			}
+		},
+		"color": {
+			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
+			"text": true,
+			"background": false,
+			"__experimentalSkipSerialization": [ "gradients" ]
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"__experimentalLayout": {
+			"allowJustification": false
+		}
+	},
+	"editorStyle": "wp-block-cover-editor",
+	"style": "wp-block-cover"
+}

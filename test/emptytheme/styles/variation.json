@@ -1,0 +1,23 @@
+{
+	"version": 2,
+	"settings": {
+		"color": {
+			"palette": [
+				{
+					"slug": "foreground",
+					"color": "#3F67C6",
+					"name": "Foreground"
+				}
+			]
+		}
+	},
+	"styles": {
+		"blocks": {
+			"core/post-title": {
+				"typography": {
+					"fontWeight": "700"
+				}
+			}
+		}
+	}
+}

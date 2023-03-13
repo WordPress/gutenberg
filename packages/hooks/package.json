@@ -1,0 +1,34 @@
+{
+	"name": "@wordpress/hooks",
+	"version": "3.28.0",
+	"description": "WordPress hooks library.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"hooks"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/hooks/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/hooks"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"types": "build-types",
+	"dependencies": {
+		"@babel/runtime": "^7.16.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/loginout",
+		"isValid": true,
+		"attributes": {
+			"displayLoginAsForm": false,
+			"redirectToCurrent": true
+		},
+		"innerBlocks": []
+	}
+]

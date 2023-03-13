@@ -1,0 +1,28 @@
+.entities-saved-states__find-entity {
+	display: none;
+
+	@include break-medium() {
+		display: block;
+	}
+}
+.entities-saved-states__find-entity-small {
+	display: block;
+
+	@include break-medium() {
+		display: none;
+	}
+}
+
+.entities-saved-states__panel-header {
+	box-sizing: border-box;
+	background: $white;
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	height: $header-height;
+	border-bottom: $border-width solid $gray-300;
+}
+
+.entities-saved-states__text-prompt {
+	padding: $grid-unit-20;
+	padding-bottom: $grid-unit-05;
+}

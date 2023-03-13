@@ -1,0 +1,40 @@
+.editor-post-saved-state {
+	display: flex;
+	align-items: center;
+	width: $button-size - $grid-unit-10;
+	padding: #{ $grid-unit-05 * 3 } $grid-unit-05;
+	color: $gray-700;
+	overflow: hidden;
+	white-space: nowrap;
+
+	// The disabled version of the save state should be legible as an indicator.
+	&.is-saving[aria-disabled="true"],
+	&.is-saving[aria-disabled="true"]:hover,
+	&.is-saved[aria-disabled="true"],
+	&.is-saved[aria-disabled="true"]:hover {
+		background: transparent;
+		color: $gray-700;
+	}
+
+	svg {
+		display: inline-block;
+		flex: 0 0 auto;
+		fill: currentColor;
+		margin-right: $grid-unit-10;
+	}
+
+	@include break-small() {
+		width: auto;
+		padding: $grid-unit-10 #{ $grid-unit-05 * 3 };
+		text-indent: inherit;
+
+		svg {
+			margin-right: 0;
+		}
+	}
+}
+
+// Overwrite rules from Button component packages/components/src/button/style.scss
+.editor-post-save-draft.has-text.has-icon svg {
+	margin-right: 0;
+}

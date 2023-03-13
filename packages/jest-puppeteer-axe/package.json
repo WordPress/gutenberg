@@ -1,0 +1,49 @@
+{
+	"name": "@wordpress/jest-puppeteer-axe",
+	"version": "5.11.0",
+	"description": "Axe API integration with Jest and Puppeteer.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"jest",
+		"puppeteer",
+		"axe",
+		"accessibility"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/jest-puppeteer-axe/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/jest-puppeteer-axe"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=14"
+	},
+	"files": [
+		"build",
+		"build-module"
+	],
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"dependencies": {
+		"@axe-core/puppeteer": "^4.0.0",
+		"@babel/runtime": "^7.16.0"
+	},
+	"peerDependencies": {
+		"jest": ">=29",
+		"puppeteer": ">=11"
+	},
+	"peerDependenciesMeta": {
+		"puppeteer": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

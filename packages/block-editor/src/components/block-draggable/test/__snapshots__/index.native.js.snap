@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BlockDraggable moves blocks: Initial order 1`] = `
+"<!-- wp:paragraph -->
+<p>This is a paragraph.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:spacer -->
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:gallery {"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
+exports[`BlockDraggable moves blocks: Paragraph block moved from first to second position 1`] = `
+"<!-- wp:image {"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>This is a paragraph.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer -->
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:gallery {"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;
+
+exports[`BlockDraggable moves blocks: Spacer block moved from third to first position 1`] = `
+"<!-- wp:spacer -->
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:image {"sizeSlug":"large"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>This is a paragraph.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:gallery {"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->"
+`;

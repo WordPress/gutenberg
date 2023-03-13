@@ -1,0 +1,1 @@
+export const RemoveBrowserShortcuts = () => null;

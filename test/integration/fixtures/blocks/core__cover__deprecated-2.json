@@ -1,0 +1,28 @@
+[
+	{
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"id": 34,
+			"hasParallax": false,
+			"dimRatio": 50,
+			"backgroundType": "image",
+			"tagName": "div"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"align": "center",
+					"content": "<strong>Cover Block</strong>",
+					"dropCap": false,
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

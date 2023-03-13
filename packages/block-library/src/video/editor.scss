@@ -1,0 +1,107 @@
+// Provide special styling for the placeholder.
+// @todo: this particular minimal style of placeholder could be componentized further.
+.wp-block-video.wp-block-video {
+	// Show Placeholder style on-select.
+	&.is-selected .components-placeholder {
+		// Block UI appearance.
+		color: $gray-900;
+		background-color: $white;
+		box-shadow: inset 0 0 0 $border-width $gray-900;
+		border: none;
+
+		// @todo: this should eventually be overridden by a custom border-radius set in the inspector.
+		border-radius: $radius-block-ui;
+
+		> svg {
+			opacity: 0;
+		}
+
+		.components-placeholder__illustration {
+			display: none;
+		}
+
+		&::before {
+			opacity: 0;
+		}
+	}
+
+	// Remove the transition while we still have a legacy placeholder style.
+	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
+	// parent border that may get applied when you deselect.
+	.components-placeholder__label,
+	.components-placeholder__instructions,
+	.components-button {
+		transition: none;
+	}
+}
+
+.wp-block[data-align="center"] > .wp-block-video {
+	text-align: center;
+}
+
+.wp-block-video {
+	position: relative;
+
+	&.is-transient video {
+		opacity: 0.3;
+	}
+
+	// Shown while video is being uploaded
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
+	}
+}
+
+.editor-video-poster-control {
+	.components-base-control__label {
+		display: block;
+	}
+
+	.components-button {
+		margin-right: $grid-unit-10;
+	}
+}
+
+.block-library-video-tracks-editor {
+	z-index: z-index("{core/video track editor popover}");
+}
+
+.block-library-video-tracks-editor__track-list-track {
+	padding-left: $grid-unit-15;
+}
+
+.block-library-video-tracks-editor__single-track-editor-kind-select {
+	max-width: 240px;
+}
+
+.block-library-video-tracks-editor__single-track-editor-edit-track-label {
+	margin-top: $grid-unit-05;
+	color: $gray-700;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 500;
+	display: block;
+}
+
+.block-library-video-tracks-editor > .components-popover__content {
+	width: 360px;
+	padding: 0;
+}
+
+.block-library-video-tracks-editor__track-list,
+.block-library-video-tracks-editor__add-tracks-container {
+	.components-menu-group__label {
+		padding: 0;
+	}
+}
+
+.block-library-video-tracks-editor__single-track-editor,
+.block-library-video-tracks-editor__track-list,
+.block-library-video-tracks-editor__add-tracks-container {
+	padding: $grid-unit-15;
+}
+

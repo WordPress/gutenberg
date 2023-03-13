@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/home-link",
+		"isValid": true,
+		"attributes": {
+			"label": "Home"
+		},
+		"innerBlocks": []
+	}
+]

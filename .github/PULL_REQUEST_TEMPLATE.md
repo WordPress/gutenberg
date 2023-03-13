@@ -1,20 +1,22 @@
-## Description
-<!-- Please describe your changes -->
+<!-- Thanks for contributing to Gutenberg! Please follow the Gutenberg Contributing Guidelines:
+https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 
-## How Has This Been Tested?
-<!-- Please describe in detail how you tested your changes. -->
-<!-- Include details of your testing environment, tests ran to see how -->
-<!-- your change affects other areas of the code, etc. -->
+## What?
+<!-- In a few words, what is the PR actually doing? -->
 
-## Screenshots (jpeg or gifs if applicable):
+## Why?
+<!-- Why is this PR necessary? What problem is it solving? Reference any existing previous issue(s) or PR(s), but please add a short summary here, too -->
 
-## Types of changes
-<!-- What types of changes does your code introduce?  -->
-<!-- Bug fix (non-breaking change which fixes an issue) -->
-<!-- New feature (non-breaking change which adds functionality) -->
-<!-- Breaking change (fix or feature that would cause existing functionality to not work as expected) -->
+## How?
+<!-- How is your PR addressing the issue at hand? What are the implementation details? -->
 
-## Checklist:
-- [ ] My code is tested.
-- [ ] My code follows the WordPress code style.
-- [ ] My code has proper inline documentation.
+## Testing Instructions
+<!-- Please include step by step instructions on how to test this PR. -->
+<!-- 1. Open a Post or Page. -->
+<!-- 2. Insert a Heading Block. -->
+<!-- 3. etc. -->
+
+### Testing Instructions for Keyboard
+<!-- How can you test the changes by using the keyboard only? Please note, this is required for PRs that change the user interface (UI). This ensures the PR can be tested for any possible accessibility regressions. -->
+
+## Screenshots or screencast <!-- if applicable -->

@@ -1,0 +1,19 @@
+[
+	{
+		"name": "core/text-columns",
+		"isValid": true,
+		"attributes": {
+			"content": [
+				{
+					"children": "One"
+				},
+				{
+					"children": "Two"
+				}
+			],
+			"columns": 2,
+			"width": "center"
+		},
+		"innerBlocks": []
+	}
+]

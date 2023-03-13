@@ -1,0 +1,113 @@
+.wp-block-columns {
+	display: flex;
+	margin-bottom: 1.75em;
+	box-sizing: border-box;
+
+	// Responsiveness: Allow wrapping on mobile.
+	flex-wrap: wrap !important;
+
+	@include break-medium() {
+		flex-wrap: nowrap !important;
+	}
+
+	// Ensure full vertical column stretch when alignment is not set.
+	// This overrides the Layout block support's default align-items setting of `center`.
+	align-items: initial !important;
+
+	/**
+	* All Columns Alignment
+	*/
+	&.are-vertically-aligned-top {
+		align-items: flex-start;
+	}
+
+	&.are-vertically-aligned-center {
+		align-items: center;
+	}
+
+	&.are-vertically-aligned-bottom {
+		align-items: flex-end;
+	}
+
+	&:not(.is-not-stacked-on-mobile) > .wp-block-column {
+		@media (max-width: #{ ($break-medium - 1) }) {
+			// Responsiveness: Show at most one columns on mobile. This must be
+			// important since the Column assigns its own width as an inline style.
+			flex-basis: 100% !important;
+		}
+
+		// At large viewports, show all columns horizontally.
+		@include break-medium() {
+			// Available space should be divided equally amongst columns without an
+			// assigned width. This is achieved by assigning a flex basis that is
+			// consistent (equal), would not cause the sum total of column widths to
+			// exceed 100%, and which would cede to a column with an assigned width.
+			// The `flex-grow` allows columns to maximally and equally occupy space
+			// remaining after subtracting the space occupied by columns with
+			// explicit widths (if any exist).
+			flex-basis: 0;
+			flex-grow: 1;
+
+			// Columns with an explicitly-assigned width should maintain their
+			// `flex-basis` width and not grow.
+			&[style*="flex-basis"] {
+				flex-grow: 0;
+			}
+		}
+	}
+
+	&.is-not-stacked-on-mobile {
+		flex-wrap: nowrap !important;
+
+		> .wp-block-column {
+			// Available space should be divided equally amongst columns.
+			flex-basis: 0;
+
+			flex-grow: 1;
+			// Columns with an explicitly-assigned width should maintain their
+			// `flex-basis` width and not grow.
+			&[style*="flex-basis"] {
+				flex-grow: 0;
+			}
+		}
+	}
+}
+
+// Add low specificity default padding to columns blocks with backgrounds.
+:where(.wp-block-columns.has-background) {
+	// Matches paragraph block padding.
+	padding: $block-bg-padding--v $block-bg-padding--h;
+}
+
+
+.wp-block-column {
+	flex-grow: 1;
+
+	// Prevent the columns from growing wider than their distributed sizes.
+	min-width: 0;
+
+	// Prevent long unbroken words from overflowing.
+	word-break: break-word; // For back-compat.
+	overflow-wrap: break-word; // New standard.
+
+	/**
+	* Individual Column Alignment
+	*/
+	&.is-vertically-aligned-top {
+		align-self: flex-start;
+	}
+
+	&.is-vertically-aligned-center {
+		align-self: center;
+	}
+
+	&.is-vertically-aligned-bottom {
+		align-self: flex-end;
+	}
+
+	&.is-vertically-aligned-top,
+	&.is-vertically-aligned-center,
+	&.is-vertically-aligned-bottom {
+		width: 100%;
+	}
+}

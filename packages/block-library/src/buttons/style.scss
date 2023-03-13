@@ -1,0 +1,90 @@
+// This variable is repeated across Button, Buttons, and Buttons editor styles.
+$blocks-block__margin: 0.5em;
+
+.wp-block-buttons {
+
+	&.is-vertical {
+		flex-direction: column;
+		> .wp-block-button {
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	// Increased specificity to override blocks default margin.
+	> .wp-block-button {
+		display: inline-block;
+		margin: 0;
+	}
+
+	&.is-content-justification-left {
+		justify-content: flex-start;
+		&.is-vertical {
+			align-items: flex-start;
+		}
+	}
+
+	&.is-content-justification-center {
+		justify-content: center;
+		&.is-vertical {
+			align-items: center;
+		}
+	}
+
+	&.is-content-justification-right {
+		justify-content: flex-end;
+
+		&.is-vertical {
+			align-items: flex-end;
+		}
+	}
+
+	&.is-content-justification-space-between {
+		justify-content: space-between;
+	}
+
+	// Kept for backward compatibility.
+	&.aligncenter {
+		text-align: center;
+	}
+
+	// Back compat: Inner button blocks previously had their own alignment
+	// options. Forcing them to 100% width in the flex container replicates
+	// that these were block level elements that took up the full width.
+	//
+	// This back compat rule is ignored if the user decides to use the
+	// newer justification options on the button block, hence the :not.
+	//
+	// Disable the stylelint rule, otherwise this selector is ugly!
+	/* stylelint-disable indentation */
+	&:not(
+		.is-content-justification-space-between,
+		.is-content-justification-right,
+		.is-content-justification-left,
+		.is-content-justification-center
+	) .wp-block-button.aligncenter {
+	/* stylelint-enable indentation */
+		margin-left: auto;
+		margin-right: auto;
+		width: 100%;
+	}
+
+	&[style*="text-decoration"] {
+		.wp-block-button,
+		.wp-block-button__link {
+			text-decoration: inherit;
+		}
+	}
+
+	&.has-custom-font-size {
+		.wp-block-button__link {
+			font-size: inherit;
+		}
+	}
+}
+
+// Legacy buttons that did not come in a wrapping container.
+.wp-block-button.aligncenter {
+	text-align: center;
+}

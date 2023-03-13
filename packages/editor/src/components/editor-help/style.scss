@@ -1,0 +1,115 @@
+.button {
+	margin: $grid-unit-10 $grid-unit-05;
+	align-items: center;
+	justify-content: center;
+	border: $border-width solid $gray-300;
+}
+
+.buttonDark {
+	border-color: $gray-700;
+}
+
+.buttonText {
+	font-weight: 600;
+	font-size: 16px;
+	color: $light-primary;
+}
+
+.buttonTextDark {
+	color: $dark-primary;
+}
+
+.navigationContainer {
+	overflow: hidden;
+}
+
+.container {
+	height: 100%;
+}
+
+.contentContainer {
+	padding: 0;
+}
+
+.helpSectionTitleContainer {
+	margin-top: 24px;
+	margin-bottom: 16px;
+}
+
+.helpSectionTitle {
+	color: $light-primary;
+	font-weight: 600;
+	font-size: 16px;
+}
+
+.helpSectionTitleDark {
+	color: $dark-secondary;
+}
+
+.helpDetailContainer {
+	padding: 0 16px;
+}
+
+.helpDetailImage {
+	background-color: $gray-light;
+	margin-bottom: 16px;
+	width: 100%;
+}
+
+.helpDetailImageDark {
+	background-color: $gray-dark;
+}
+
+.helpDetailTitle,
+.helpDetailSectionHeading,
+.helpDetailBody {
+	margin-bottom: 16px;
+}
+
+.helpDetailTitle {
+	color: $light-primary;
+	font-weight: 600;
+	font-size: 28px;
+}
+
+.helpDetailTitleDark {
+	color: $dark-primary;
+}
+
+.helpDetailSectionHeading {
+	flex-direction: row;
+	align-items: center;
+}
+
+.helpDetailSectionHeadingText {
+	color: $light-primary;
+	font-weight: 700;
+	font-size: 16px;
+}
+
+.helpDetailSectionHeadingTextDark {
+	color: $dark-primary;
+}
+
+.helpDetailBody {
+	color: $light-secondary;
+	font-size: 16px;
+	line-height: 24px;
+}
+
+.helpDetailBodyDark {
+	color: $dark-secondary;
+}
+
+.helpDetailBadgeContainer {
+	padding: 2px 6px;
+	margin-right: 8px;
+	border-radius: 6px;
+	background-color: #c9356e;
+}
+
+.helpDetailBadgeText {
+	color: $white;
+	font-weight: 500;
+	font-size: 12px;
+}

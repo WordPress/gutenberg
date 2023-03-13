@@ -1,0 +1,265 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render color 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -11,11 +11,11 @@
+        class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
+        style="transform: scale(0.4444444444444444);"
+      >
+        <div
+          class="css-tada40-BarsView e1s9yo7h0"
+-         style="color: blue;"
++         style="color: rgb(30, 30, 30);"
+        >
+          <div
+            class="InnerBar1"
+          />
+          <div
+`;
+
+exports[`props should render correctly 1`] = `
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  pointer-events: none;
+  position: relative;
+}
+
+.emotion-2 {
+  height: 36px;
+  left: 0;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  transform-origin: top left;
+  width: 36px;
+}
+
+.emotion-4 {
+  color: currentColor;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  height: 54px;
+  left: 50%;
+  padding: 10px;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translate( -50%, -50% );
+  -moz-transform: translate( -50%, -50% );
+  -ms-transform: translate( -50%, -50% );
+  transform: translate( -50%, -50% );
+  width: 54px;
+}
+
+.emotion-4>div {
+  -webkit-animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
+  animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
+  background: currentColor;
+  border-radius: 50px;
+  height: 16%;
+  left: 49%;
+  opacity: 0;
+  position: absolute;
+  top: 43%;
+  width: 6%;
+}
+
+.emotion-4 .InnerBar1 {
+  -webkit-animation-delay: 0s;
+  animation-delay: 0s;
+  -webkit-transform: rotate( 0deg ) translate( 0, -130% );
+  -moz-transform: rotate( 0deg ) translate( 0, -130% );
+  -ms-transform: rotate( 0deg ) translate( 0, -130% );
+  transform: rotate( 0deg ) translate( 0, -130% );
+}
+
+.emotion-4 .InnerBar2 {
+  -webkit-animation-delay: -0.9167s;
+  animation-delay: -0.9167s;
+  -webkit-transform: rotate( 30deg ) translate( 0, -130% );
+  -moz-transform: rotate( 30deg ) translate( 0, -130% );
+  -ms-transform: rotate( 30deg ) translate( 0, -130% );
+  transform: rotate( 30deg ) translate( 0, -130% );
+}
+
+.emotion-4 .InnerBar3 {
+  -webkit-animation-delay: -0.833s;
+  animation-delay: -0.833s;
+  -webkit-transform: rotate( 60deg ) translate( 0, -130% );
+  -moz-transform: rotate( 60deg ) translate( 0, -130% );
+  -ms-transform: rotate( 60deg ) translate( 0, -130% );
+  transform: rotate( 60deg ) translate( 0, -130% );
+}
+
+.emotion-4 .InnerBar4 {
+  -webkit-animation-delay: -0.7497s;
+  animation-delay: -0.7497s;
+  -webkit-transform: rotate( 90deg ) translate( 0, -130% );
+  -moz-transform: rotate( 90deg ) translate( 0, -130% );
+  -ms-transform: rotate( 90deg ) translate( 0, -130% );
+  transform: rotate( 90deg ) translate( 0, -130% );
+}
+
+.emotion-4 .InnerBar5 {
+  -webkit-animation-delay: -0.667s;
+  animation-delay: -0.667s;
+  -webkit-transform: rotate( 120deg ) translate( 0, -130% );
+  -moz-transform: rotate( 120deg ) translate( 0, -130% );
+  -ms-transform: rotate( 120deg ) translate( 0, -130% );
+  transform: rotate( 120deg ) translate( 0, -130% );
+}
+
+.emotion-4 .InnerBar6 {
+  -webkit-animation-delay: -0.5837s;
+  animation-delay: -0.5837s;
+  -webkit-transform: rotate( 150deg ) translate( 0, -130% );
+  -moz-transform: rotate( 150deg ) translate( 0, -130% );
+  -ms-transform: rotate( 150deg ) translate( 0, -130% );
+  transform: rotate( 150deg ) translate( 0, -130% );
+}
+
+.emotion-4 .InnerBar7 {
+  -webkit-animation-delay: -0.5s;
+  animation-delay: -0.5s;
+  -webkit-transform: rotate( 180deg ) translate( 0, -130% );
+  -moz-transform: rotate( 180deg ) translate( 0, -130% );
+  -ms-transform: rotate( 180deg ) translate( 0, -130% );
+  transform: rotate( 180deg ) translate( 0, -130% );
+}
+
+.emotion-4 .InnerBar8 {
+  -webkit-animation-delay: -0.4167s;
+  animation-delay: -0.4167s;
+  -webkit-transform: rotate( 210deg ) translate( 0, -130% );
+  -moz-transform: rotate( 210deg ) translate( 0, -130% );
+  -ms-transform: rotate( 210deg ) translate( 0, -130% );
+  transform: rotate( 210deg ) translate( 0, -130% );
+}
+
+.emotion-4 .InnerBar9 {
+  -webkit-animation-delay: -0.333s;
+  animation-delay: -0.333s;
+  -webkit-transform: rotate( 240deg ) translate( 0, -130% );
+  -moz-transform: rotate( 240deg ) translate( 0, -130% );
+  -ms-transform: rotate( 240deg ) translate( 0, -130% );
+  transform: rotate( 240deg ) translate( 0, -130% );
+}
+
+.emotion-4 .InnerBar10 {
+  -webkit-animation-delay: -0.2497s;
+  animation-delay: -0.2497s;
+  -webkit-transform: rotate( 270deg ) translate( 0, -130% );
+  -moz-transform: rotate( 270deg ) translate( 0, -130% );
+  -ms-transform: rotate( 270deg ) translate( 0, -130% );
+  transform: rotate( 270deg ) translate( 0, -130% );
+}
+
+.emotion-4 .InnerBar11 {
+  -webkit-animation-delay: -0.167s;
+  animation-delay: -0.167s;
+  -webkit-transform: rotate( 300deg ) translate( 0, -130% );
+  -moz-transform: rotate( 300deg ) translate( 0, -130% );
+  -ms-transform: rotate( 300deg ) translate( 0, -130% );
+  transform: rotate( 300deg ) translate( 0, -130% );
+}
+
+.emotion-4 .InnerBar12 {
+  -webkit-animation-delay: -0.0833s;
+  animation-delay: -0.0833s;
+  -webkit-transform: rotate( 330deg ) translate( 0, -130% );
+  -moz-transform: rotate( 330deg ) translate( 0, -130% );
+  -ms-transform: rotate( 330deg ) translate( 0, -130% );
+  transform: rotate( 330deg ) translate( 0, -130% );
+}
+
+<div>
+  <div
+    aria-busy="true"
+    class="components-spinner emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="Spinner"
+    style="height: 16px; width: 16px;"
+  >
+    <div
+      aria-hidden="true"
+      class="emotion-2 emotion-3"
+      style="transform: scale(0.4444444444444444);"
+    >
+      <div
+        class="emotion-4 emotion-5"
+        style="color: rgb(30, 30, 30);"
+      >
+        <div
+          class="InnerBar1"
+        />
+        <div
+          class="InnerBar2"
+        />
+        <div
+          class="InnerBar3"
+        />
+        <div
+          class="InnerBar4"
+        />
+        <div
+          class="InnerBar5"
+        />
+        <div
+          class="InnerBar6"
+        />
+        <div
+          class="InnerBar7"
+        />
+        <div
+          class="InnerBar8"
+        />
+        <div
+          class="InnerBar9"
+        />
+        <div
+          class="InnerBar10"
+        />
+        <div
+          class="InnerBar11"
+        />
+        <div
+          class="InnerBar12"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`props should render size 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -2,16 +2,16 @@
+    <div
+      aria-busy="true"
+      class="components-spinner css-14ywscc-ContainerView e1s9yo7h2"
+      data-wp-c16t="true"
+      data-wp-component="Spinner"
+-     style="height: 31px; width: 31px;"
++     style="height: 16px; width: 16px;"
+    >
+      <div
+        aria-hidden="true"
+        class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
+-       style="transform: scale(0.8611111111111112);"
++       style="transform: scale(0.4444444444444444);"
+      >
+        <div
+          class="css-tada40-BarsView e1s9yo7h0"
+          style="color: rgb(30, 30, 30);"
+        >
+`;

@@ -5,10 +5,19 @@
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
+	convertDeprecationsToExceptions="true"
 	>
+	<php>
+		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
+	</php>
 	<testsuites>
-		<testsuite>
+		<testsuite name="default">
 			<directory suffix="-test.php">./phpunit/</directory>
 		</testsuite>
 	</testsuites>
+	<groups>
+		<exclude>
+			<group>ms-required</group>
+		</exclude>
+	</groups>
 </phpunit>

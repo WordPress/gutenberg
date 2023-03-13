@@ -1,0 +1,41 @@
+{
+	"name": "@wordpress/dependency-extraction-webpack-plugin",
+	"version": "4.11.0",
+	"description": "Extract WordPress script dependencies from webpack bundles.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"webpack",
+		"dependency"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-extraction-webpack-plugin/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/dependency-extraction-webpack-plugin"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=14"
+	},
+	"files": [
+		"lib",
+		"build-types"
+	],
+	"main": "lib/index.js",
+	"types": "lib/types.d.ts",
+	"dependencies": {
+		"json2php": "^0.0.7",
+		"webpack-sources": "^3.2.2"
+	},
+	"peerDependencies": {
+		"webpack": "^4.8.3 || ^5.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

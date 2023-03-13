@@ -1,0 +1,21 @@
+[
+	{
+		"name": "core/group",
+		"isValid": true,
+		"attributes": {
+			"textColor": "accent",
+			"tagName": "div"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "My paragraph",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
