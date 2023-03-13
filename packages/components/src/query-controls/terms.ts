@@ -8,7 +8,7 @@ import type {
 	TermsByParent,
 } from './types';
 
-const ensureParents = (
+const ensureParentsAreDefined = (
 	terms: TermWithParentAndChildren[]
 ): terms is ( TermWithParentAndChildren & { parent: number } )[] => {
 	return terms.every( ( term ) => term.parent !== null );
@@ -29,7 +29,11 @@ export function buildTermsTree( flatTerms: readonly ( Author | Category )[] ) {
 			id: String( term.id ),
 		} ) );
 
-	if ( ! ensureParents( flatTermsWithParentAndChildren ) ) {
+	// We use a custom type guard here to ensure that the parent property is
+	// defined on all terms. The type of the `parent` property is `number | null`
+	// and we need to ensure that it is `number`. This is because we use the
+	// `parent` property as a key in the `termsByParent` object.
+	if ( ! ensureParentsAreDefined( flatTermsWithParentAndChildren ) ) {
 		return flatTermsWithParentAndChildren;
 	}
 
