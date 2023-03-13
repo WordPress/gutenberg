@@ -950,7 +950,7 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should hide the suggestion list on blur and empty input', async () => {
+		it( 'should hide the suggestion list on an empty input', async () => {
 			const user = userEvent.setup();
 
 			const suggestions = [ 'One', 'Two', 'Three' ];
@@ -968,8 +968,6 @@ describe( 'FormTokenField', () => {
 			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
 
 			await user.clear( input );
-			// Clicking document.body to trigger a blur event on the input.
-			await user.click( document.body );
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 		} );
