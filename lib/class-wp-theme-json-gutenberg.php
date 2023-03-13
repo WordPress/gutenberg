@@ -2435,19 +2435,44 @@ class WP_Theme_JSON_Gutenberg {
 
 		$block_rules = '';
 
-		// TODO: See if we can refactor this out. We only want to scrape the duotone-specific theme json into duotone_declarations in declarations.
-		// Can we read the theme.json file and grab our duotone-specific declrations easily a different way?
-		$declarations = apply_filters( 'theme_json_styles_declarations', $declarations );
+		/*
+		 * 1. Separate the declarations that use the general selector
+		 * from the ones using the duotone selector.
+		 */
+		$declarations_duotone = array();
+		foreach ( $declarations as $index => $declaration ) {
+			if ( 'filter' === $declaration['name'] ) {
+				/*
+				 * 'unset' filters happen when a filter is unset
+				 * in the site-editor UI. Because the 'unset' value
+				 * in the user origin overrides the value in the
+				 * theme origin, we can skip rendering anything
+				 * here as no filter needs to be applied anymore.
+				 * So only add declarations to with values other
+				 * than 'unset'.
+				 */
+				if ( 'unset' !== $declaration['value'] ) {
+					$declarations_duotone[] = $declaration;
+				}
+				unset( $declarations[ $index ] );
+			}
+		}
 
 		// Update declarations if there are separators with only background color defined.
 		if ( '.wp-block-separator' === $selector ) {
 			$declarations = static::update_separator_declarations( $declarations );
 		}
 
-		// Generate and append the rules that use the general selector.
+		// 2. Generate and append the rules that use the general selector.
 		$block_rules .= static::to_ruleset( $selector, $declarations );
 
-		// Generate Layout block gap styles.
+		// 3. Generate and append the rules that use the duotone selector.
+		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
+			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
+			$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
+		}
+
+		// 4. Generate Layout block gap styles.
 		if (
 			static::ROOT_BLOCK_SELECTOR !== $selector &&
 			! empty( $block_metadata['name'] )
@@ -2455,12 +2480,12 @@ class WP_Theme_JSON_Gutenberg {
 			$block_rules .= $this->get_layout_styles( $block_metadata );
 		}
 
-		// Generate and append the feature level rulesets.
+		// 5. Generate and append the feature level rulesets.
 		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
 			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
 		}
 
-		// Generate and append the style variation rulesets.
+		// 6. Generate and append the style variation rulesets.
 		foreach ( $style_variation_declarations as $style_variation_selector => $individual_style_variation_declarations ) {
 			$block_rules .= static::to_ruleset( $style_variation_selector, $individual_style_variation_declarations );
 		}
