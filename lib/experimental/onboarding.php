@@ -186,6 +186,9 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 
 		$parts_meta = array();
 		foreach( $response['theme.json']['templateParts'] as $item ) {
+			if ( ! isset( $item['title'] ) ){
+				$item['title'] = $item['name'];
+			}
 			$parts_meta[ $item['name'] ] = array(
 				'area'  => $item['area'],
 				'title' => $item['title'],
