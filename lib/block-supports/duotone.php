@@ -690,14 +690,11 @@ class WP_Duotone {
 	 */
 	static function save_global_styles_presets() {
 		// Get the per block settings from the theme.json.
-		$tree = WP_Theme_JSON_Resolver::get_merged_data();
-		$settings = $tree->get_settings();
-		$presets_by_origin = _wp_array_get( $settings, array( 'color', 'duotone' ), array() );
-		$flat_presets = [];
-		// Flatten the array
+		$tree = gutenberg_get_global_settings();
+		$presets_by_origin = _wp_array_get( $tree, array( 'color', 'duotone' ), array() );
+		
 		foreach( $presets_by_origin as $presets ) {
 			foreach( $presets as $preset ) {
-				// $flat_presets[ _wp_to_kebab_case( $preset['slug'] ) ] = $preset;
 				self::$global_styles_presets[ _wp_to_kebab_case( $preset['slug'] ) ] = [
 					'slug'	=> $preset[ 'slug' ],
 					'colors' => $preset[ 'colors' ],
@@ -714,7 +711,7 @@ class WP_Duotone {
 		$tree = WP_Theme_JSON_Resolver::get_merged_data();
 		$block_nodes = $tree->get_styles_block_nodes();
 		$theme_json = $tree->get_raw_data();
-		
+
 
 		foreach( $block_nodes as $block_node ) {
 			// This block definition doesn't include any duotone settings. Skip it.
@@ -780,9 +777,9 @@ class WP_Duotone {
 	 * @return array The block editor settings.
 	 */
 	public static function duotone_declarations( $declarations ) {
+		// TODO: Revert theme_json_styles_declarations filter and file to original state, as we don't need to access it via filter. Let that be a separate PR.
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
-				static::$global_styles_presets[] = $declarations[ $index ]['value'];
 				unset( $declarations[ $index ] );
 			}
 		}
