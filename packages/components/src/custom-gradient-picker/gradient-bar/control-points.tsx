@@ -89,7 +89,7 @@ function GradientColorPickerDropdown( {
 	isRenderedInSidebar,
 	className,
 	...props
-}: WordPressComponentProps< CustomColorPickerDropdownProps, 'div', true > ) {
+}: CustomColorPickerDropdownProps ) {
 	// Open the popover below the gradient control/insertion point
 	const popoverProps: DropdownProps[ 'popoverProps' ] = useMemo(
 		() => ( {
