@@ -72,7 +72,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test your site with a single theme and a setup flow to pick patterns & styles from other themes. It requires the empty theme to be installed.', 'gutenberg' ),
+			'label' => __( 'Test your site with a single theme and a setup flow to pick patterns & styles from other themes. It requires the empty theme to be installed. All your existing templates and parts will be deleted.', 'gutenberg' ),
 			'id'    => 'gutenberg-single-theme',
 		)
 	);
