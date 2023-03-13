@@ -753,51 +753,7 @@ class WP_Duotone {
 	static function is_preset( $duotone_attr ) {
 		return strpos( $duotone_attr, 'var:preset|duotone|' ) === 0 || strpos( $duotone_attr, 'var(--wp--preset--duotone--' ) === 0;
 	}
-
-	/**
-	 * Get all possible duotone presets from global and theme styles. We only want to process this one time. On block render we'll access and output only the needed presets for that page.
-	 * 
-	 */
-	static function gutenberg_identify_used_duotone_blocks( $block_content, $block ) {
-		// If the block name exists in our pre-defined list of block selectors that use duotone in theme.json (or related), add it to our list of duotone to output
-		if( array_key_exists( $block['blockName'], self::$global_styles_block_names ) ) {
-			$preset_slug = self::$global_styles_block_names[ $block['blockName'] ];
-
-			self::$output[ $preset_slug ] = self::$global_styles_presets[ $preset_slug ];
-		}
-
-		return $block_content;
-	}
-
-	/**
-	 * Registers the duotone preset.
-	 *
-	 * @param array $settings The block editor settings.
-	 *
-	 * @return array The block editor settings.
-	 */
-	public static function duotone_declarations( $declarations ) {
-		// TODO: Revert theme_json_styles_declarations filter and file to original state, as we don't need to access it via filter. Let that be a separate PR.
-		foreach ( $declarations as $index => $declaration ) {
-			if ( 'filter' === $declaration['name'] ) {
-				unset( $declarations[ $index ] );
-			}
-		}
-
-		return $declarations;
-	}
 }
-//
-function gutenberg_get_duotone_preset_value( $preset ) {
-	if( array_key_exists( $preset['slug'], WP_Duotone::$output ) ) {
-		// This is returning the --wp--preset--duotone--dark-grayscale: CSS VAR NAME; but not removing the full --wp--preset--duotone--dark-grayscale preset name
-		return gutenberg_get_duotone_filter_property( $preset );
-	}
-
-	return '';
-}
-
 
 add_action( 'wp_loaded', array( 'WP_Duotone', 'save_global_styles_presets' ), 10 );
 add_action( 'wp_loaded', array( 'WP_Duotone', 'save_global_style_block_names' ), 10 );
-add_filter( 'theme_json_styles_declarations', array( 'WP_Duotone', 'duotone_declarations' ), 10, 1 );
