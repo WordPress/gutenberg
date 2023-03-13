@@ -102,6 +102,17 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 	 * 2. Save theme.json to database.
 	 */
 	if ( in_array( 'theme_json', $steps, true ) ) {
+		// Remove all existing wp_global_styles CPTs.
+		$existing_theme_jsons = get_posts(
+			array(
+				'post_type'   => 'wp_global_styles',
+				'numberposts' => -1,
+			)
+		);
+		foreach ( $existing_theme_jsons as $existing_json ) {
+			wp_delete_post( $existing_json->ID, true );
+		}
+
 		$theme_json_data          = $response['theme.json'];
 		$theme_json_data          = WP_Theme_JSON_Resolver_Gutenberg::translate( $theme_json_data, $wp_get_theme->get( 'TextDomain' ) );
 		$theme_json               = new WP_Theme_JSON_Gutenberg( $theme_json_data, 'custom' );
@@ -122,6 +133,17 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 	 * 3. Save templates to the database.
 	 */
 	if ( in_array( 'templates', $steps, true ) ) {
+		// Remove all existing wp_template CPTs.
+		$existing_templates = get_posts(
+			array(
+				'post_type'   => 'wp_template',
+				'numberposts' => -1,
+			)
+		);
+		foreach ( $existing_templates as $existing_template ) {
+			wp_delete_post( $existing_template->ID, true );
+		}
+
 		foreach ( $response->templates as $template ) {
 			 // TODO: preprocess (translate? escape? etc.)
 			$post_content = _inject_theme_attribute_in_block_template_content_override( $template->html );
@@ -151,6 +173,17 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 	 * 4. Save parts to the database.
 	 */
 	if ( in_array( 'parts', $steps, true ) ) {
+		// Remove all existing wp_template_part CPTs.
+		$existing_parts = get_posts(
+			array(
+				'post_type'   => 'wp_template_part',
+				'numberposts' => -1,
+			)
+		);
+		foreach ( $existing_parts as $existing_part ) {
+			wp_delete_post( $existing_part->ID, true );
+		}
+
 		foreach ( $response->parts as $part ) {
 			// TODO: preprocess (translate? escape? etc.)
 			$post_content = _inject_theme_attribute_in_block_template_content_override( $part->html );
@@ -165,7 +198,7 @@ function gutenberg_save_theme_to_database( $theme_slug, $steps = array( 'templat
 				'post_content' => $post_content,
 				'post_author'  => get_current_user_id(), // TODO: is this the right user?
 				'tax_input'    => array(
-					'wp_theme'           => array( 'emptytheme' ), // The base theme.
+					'wp_theme'              => array( 'emptytheme' ), // The base theme.
 					'wp_template_part_area' => WP_TEMPLATE_PART_AREA_UNCATEGORIZED, // TODO: categorize.
 				),
 			);
