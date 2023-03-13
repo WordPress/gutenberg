@@ -39,7 +39,7 @@ export default function ScreenChooseStyles( { setVariation } ) {
 	const [ , onReset ] = useGlobalStylesReset();
 	useEffect( onReset, [ onReset ] );
 	return (
-		<GlobalStylesProvider setting={ settings }>
+		<GlobalStylesProvider>
 			<GlobalStylesRenderer />
 			<BlockEditorProvider settings={ settings }>
 				<Flex
