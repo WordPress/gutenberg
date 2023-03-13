@@ -12,6 +12,9 @@ import {
 export default function ChooseStyles( { setVariation } ) {
 	return (
 		<Flex justify="flex-start" align="stretch" gap={ 8 }>
+			<FlexItem className="onboarding-styles-list-container">
+				<StyleVariationsContainer onSelect={ setVariation } />
+			</FlexItem>
 			<FlexItem className="onboarding-style-book" isBlock>
 				<VStack alignment="topLeft">
 					<StyleBook.Slot>
@@ -22,9 +25,6 @@ export default function ChooseStyles( { setVariation } ) {
 						) }
 					</StyleBook.Slot>
 				</VStack>
-			</FlexItem>
-			<FlexItem className="onboarding-styles-list-container">
-				<StyleVariationsContainer onSelect={ setVariation } />
 			</FlexItem>
 		</Flex>
 	);

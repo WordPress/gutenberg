@@ -27,10 +27,10 @@ import { SiteDetails, ChooseStyles, Launch } from '../navigation-screens';
 import { useSelect } from '@wordpress/data';
 
 export default function Layout() {
-	const settings = useSelect( ( select ) => {
-		const sets = select( editSiteStore ).getSettings();
-		return sets;
-	}, [] );
+	const settings = useSelect(
+		( select ) => select( editSiteStore ).getSettings(),
+		[]
+	);
 	const [ theme, setTheme ] = useState();
 	const [ category, setCategory ] = useState();
 	const [ variation, setVariation ] = useState();
@@ -52,19 +52,23 @@ export default function Layout() {
 					<SiteHub />
 					<Sidebar step={ step } />
 				</VStack>
-				<FlexItem className="onboarding-layout__content" isBlock>
-					<div className="onboarding-layout__canvas">
-						<NavigatorScreen path="/">
-							<SiteDetails
-								theme={ theme }
-								category={ category }
-								setCategory={ setCategory }
-								setTheme={ setTheme }
-							/>
-						</NavigatorScreen>
-						<GlobalStylesProvider>
-							<GlobalStylesRenderer />
-							<BlockEditorProvider settings={ settings }>
+				<GlobalStylesProvider setting={ settings }>
+					<GlobalStylesRenderer />
+					<BlockEditorProvider settings={ settings }>
+						<FlexItem
+							className="onboarding-layout__content"
+							isBlock
+						>
+							<div className="onboarding-layout__canvas">
+								<NavigatorScreen path="/">
+									<SiteDetails
+										theme={ theme }
+										category={ category }
+										setCategory={ setCategory }
+										setTheme={ setTheme }
+									/>
+								</NavigatorScreen>
+
 								<NavigatorScreen path="/step/2">
 									<ChooseStyles
 										theme={ theme }
@@ -77,17 +81,17 @@ export default function Layout() {
 									isSelected={ () => {} }
 									onSelect={ () => {} }
 								/>
-							</BlockEditorProvider>
-						</GlobalStylesProvider>
-						<NavigatorScreen path="/step/3">
-							<Launch
-								theme={ theme }
-								category={ category }
-								variation={ variation }
-							/>
-						</NavigatorScreen>
-					</div>
-				</FlexItem>
+								<NavigatorScreen path="/step/3">
+									<Launch
+										theme={ theme }
+										category={ category }
+										variation={ variation }
+									/>
+								</NavigatorScreen>
+							</div>
+						</FlexItem>
+					</BlockEditorProvider>
+				</GlobalStylesProvider>
 			</Flex>
 		</NavigatorProvider>
 	);
