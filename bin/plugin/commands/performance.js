@@ -188,7 +188,7 @@ async function runTestSuite(
 	runKey,
 	artifactsPath
 ) {
-	const resultsFilename = `${ runKey }.results.json`;
+	const resultsFilename = `${ runKey }.performance-results.json`;
 
 	await runShellScript(
 		`npm run test:performance -- ${ testSuite } --wordpress-artifacts-path=${ artifactsPath } --results-filename=${ resultsFilename }`,
@@ -498,7 +498,7 @@ async function runPerformanceTests( branches, options ) {
 		);
 		console.table( invertedResult );
 
-		const resultsFilename = testSuite + '.results.json';
+		const resultsFilename = testSuite + '.performance-results.json';
 		fs.writeFileSync(
 			path.join( artifactsPath, resultsFilename ),
 			JSON.stringify( results[ testSuite ], null, 2 )

@@ -23,7 +23,7 @@ export function getTraceFilePath() {
 export function saveResultsFile( testFilename, results ) {
 	const resultsFilename =
 		process.env.RESULTS_FILENAME ||
-		path.basename( testFilename, '.js' ) + '.results.json';
+		path.basename( testFilename, '.js' ) + '.performance-results.json';
 
 	return writeFileSync(
 		path.join( process.env.WP_ARTIFACTS_PATH, resultsFilename ),
