@@ -144,6 +144,10 @@ test.describe(
 					'<!-- wp:navigation-link {"label":"Menu 1 Link","type":"custom","url":"http://localhost:8889/#menu-1-link","kind":"custom","isTopLevelLink":true} /-->',
 			} );
 
+			//FIXME this is needed because if the two menus are created at the same time, the API will return them in the wrong order.
+			//https://core.trac.wordpress.org/ticket/57914
+			await editor.page.waitForTimeout( 1000 );
+
 			const latestMenu = await requestUtils.createNavigationMenu( {
 				title: 'Test Menu 2',
 				content:
