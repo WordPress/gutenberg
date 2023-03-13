@@ -6,15 +6,16 @@
  * @subpackage Administration
  */
 
+function is_onboarding_enabled_and_ready() {
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	return wp_get_theme( 'emptytheme' )->exists() && $gutenberg_experiments && array_key_exists( 'gutenberg-single-theme', $gutenberg_experiments );
+}
+
 /**
  * Add an onboarding page to the dashboard menu.
  */
 function add_onboarding_menu() {
-	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-	if (
-		wp_get_theme( 'emptytheme' )->exists() &&
-		$gutenberg_experiments && array_key_exists( 'gutenberg-single-theme', $gutenberg_experiments )
-	) {
+	if ( is_onboarding_enabled_and_ready() ) {
 		add_dashboard_page( __( 'Onboarding', 'gutenberg' ), __( 'Onboarding', 'gutenberg' ), 'edit_theme_options', 'onboarding', 'wp_render_onboading_page' );
 	}
 }
@@ -51,19 +52,20 @@ function wp_render_onboading_page() {
  * and moves the site editor to the top level.
  */
 function remove_themes_menu() {
-	remove_submenu_page( 'tools.php', 'theme-editor.php' );
+	if ( is_onboarding_enabled_and_ready() ) {
+		remove_submenu_page( 'tools.php', 'theme-editor.php' );
 
-	add_menu_page(
-		'Designer',
-		'Designer',
-		'edit_themes',
-		'site-editor.php',
-		'',
-		'dashicons-welcome-widgets-menus',
-		60
-	);
-	remove_menu_page( 'themes.php' );
-
+		add_menu_page(
+			'Designer',
+			'Designer',
+			'edit_themes',
+			'site-editor.php',
+			'',
+			'dashicons-welcome-widgets-menus',
+			60
+		);
+		remove_menu_page( 'themes.php' );
+	}
 }
 add_action( 'admin_menu', 'remove_themes_menu', 999 );
 
