@@ -697,10 +697,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	public static function get_style_variations() {
 		$variations = array();
-		$vars = json_decode( wp_remote_retrieve_body( wp_remote_get( 'https://raw.githubusercontent.com/ellatrix/block-themes-directory/main/variations-from-themes-offering-styles.json?' ) ), true );
+		$vars       = json_decode( wp_remote_retrieve_body( wp_remote_get( 'https://raw.githubusercontent.com/ellatrix/block-themes-directory/main/variations-from-themes-offering-styles.json?' ) ), true );
+		// Temp slice..
+		$vars = array_slice( $vars, 0, 51 );
 		foreach ( $vars as $decoded_file ) {
-			$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
-			$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
+			$translated   = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
+			$variation    = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
 			$variations[] = $variation;
 		}
 		return $variations;

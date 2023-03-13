@@ -442,7 +442,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-onboarding',
 		gutenberg_url( 'build/onboarding/style.css' ),
-		array( 'wp-components' ),
+		array( 'wp-components', 'wp-edit-site', 'wp-block-editor', 'wp-block-library' ),
 		$version
 	);
 	$styles->add_data( 'wp-onboarding', 'rtl', 'replace' );

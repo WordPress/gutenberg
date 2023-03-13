@@ -12,7 +12,7 @@
 function add_onboarding_menu() {
 	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
 	if (
-		wp_get_theme('emptytheme')->exists() &&
+		wp_get_theme( 'emptytheme' )->exists() &&
 		$gutenberg_experiments && array_key_exists( 'gutenberg-single-theme', $gutenberg_experiments )
 	) {
 		add_dashboard_page( __( 'Onboarding', 'gutenberg' ), __( 'Onboarding', 'gutenberg' ), 'edit_theme_options', 'onboarding', 'wp_render_onboading_page' );
@@ -41,12 +41,11 @@ function wp_render_onboading_page() {
 			wp.onboarding.initialize( "wp-onboarding" );
 		} );'
 	);
-	echo '<div id="wp-onboarding" class=""></div>';
-
+	echo '<div id="wp-onboarding"></div>';
 	wp_enqueue_script( 'wp-onboarding' );
 	wp_enqueue_style( 'wp-onboarding' );
-
 }
+
 /**
  * Remove themes from WP Admin menu
  * and moves the site editor to the top level.
@@ -61,10 +60,10 @@ function remove_themes_menu() {
 		'site-editor.php',
 		'',
 		'dashicons-welcome-widgets-menus',
-		60 
+		60
 	);
-	remove_menu_page('themes.php');
-	
+	remove_menu_page( 'themes.php' );
+
 }
 add_action( 'admin_menu', 'remove_themes_menu', 999 );
 
@@ -80,13 +79,13 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 	/*
 	 * 1. Download ZIP.
 	 */
-	$theme_info   = themes_api(
+	$theme_info = themes_api(
 		'theme_information',
 		array(
-			'slug' => $theme_slug,
+			'slug'   => $theme_slug,
 			'fields' => array(
 				'downloadlink' => true,
-			)
+			),
 		)
 	);
 	if ( is_wp_error( $theme_info ) ) {
@@ -117,10 +116,10 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 	}
 
 	// TODO: escape font-families
-	$wp_get_theme             = wp_get_theme();
-	$theme_json_data          = wp_json_file_decode( $theme_json_file, array( 'associative' => true ) );
+	$wp_get_theme    = wp_get_theme();
+	$theme_json_data = wp_json_file_decode( $theme_json_file, array( 'associative' => true ) );
 	if ( null === $theme_json_data ) {
-		return new WP_Error( 'theme.json at ' . $theme_json_file . ' does not exists or could not be decoded.');
+		return new WP_Error( 'theme.json at ' . $theme_json_file . ' does not exists or could not be decoded.' );
 	}
 
 	$theme_json_data          = WP_Theme_JSON_Resolver_Gutenberg::translate( $theme_json_data, $wp_get_theme->get( 'TextDomain' ) );
@@ -128,7 +127,7 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 	$user_cpt                 = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $wp_get_theme, true );
 	$user_cpt['post_content'] = wp_json_encode( $theme_json->get_raw_data() );
 	if ( false === $user_cpt['post_content'] ) {
-		return new WP_Error( 'theme.json could not be encoded to JSON.');
+		return new WP_Error( 'theme.json could not be encoded to JSON.' );
 	}
 
 	global $wpdb;
@@ -167,7 +166,7 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 		return new WP_Error( 'No template files at ' . $templates_dir );
 	}
 
-	foreach( $template_files as $template_file ) {
+	foreach ( $template_files as $template_file ) {
 		$template_cpt = array(
 			'post_type'    => 'wp_template',
 			'post_status'  => 'publish',
@@ -179,7 +178,7 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 				'wp_theme' => array( 'emptytheme' ), // The base theme.
 			),
 		);
-		$result = wp_insert_post( $template_cpt, true );
+		$result       = wp_insert_post( $template_cpt, true );
 		if ( is_wp_error( $result ) ) {
 			$wpdb->query( 'ROLLBACK' );
 			return $result;
@@ -202,7 +201,7 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 		return new WP_Error( 'No part files at ' . $parts_dir );
 	}
 
-	foreach( $part_files as $part_file ) {
+	foreach ( $part_files as $part_file ) {
 		$part_cpt = array(
 			'post_type'    => 'wp_template_part',
 			'post_status'  => 'publish',
@@ -215,7 +214,7 @@ function gutenberg_save_theme_to_database( $theme_slug ) {
 				'template_part_area' => WP_TEMPLATE_PART_AREA_UNCATEGORIZED, // TODO: categorize.
 			),
 		);
-		$result = wp_insert_post( $part_cpt, true );
+		$result   = wp_insert_post( $part_cpt, true );
 		if ( is_wp_error( $result ) ) {
 			$wpdb->query( 'ROLLBACK' );
 			return $result;

@@ -9,6 +9,16 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+// eslint-disable-next-line no-restricted-imports
+import {
+	GlobalStylesProvider,
+	StyleBook,
+	GlobalStylesRenderer,
+	store as editSiteStore,
+} from '@wordpress/edit-site';
+import { BlockEditorProvider } from '@wordpress/block-editor';
+
+// import { StyleBook } from '@wordpress/edit-site';
 
 /**
  * Internal dependencies
@@ -16,8 +26,13 @@ import { useState } from '@wordpress/element';
 import Sidebar from '../sidebar';
 import SiteHub from '../site-hub';
 import { SiteDetails, AddPages, ChooseStyles } from '../navigation-screens';
+import { useSelect } from '@wordpress/data';
 
 export default function Layout() {
+	const settings = useSelect( ( select ) => {
+		const sets = select( editSiteStore ).getSettings();
+		return sets;
+	}, [] );
 	const [ theme, setTheme ] = useState();
 	const [ category, setCategory ] = useState();
 	let step = 1;
@@ -45,12 +60,22 @@ export default function Layout() {
 								setTheme={ setTheme }
 							/>
 						</NavigatorScreen>
-						<NavigatorScreen path="/step/2">
-							<ChooseStyles
-								theme={ theme }
-								category={ category }
-							/>
-						</NavigatorScreen>
+						<GlobalStylesProvider>
+							<GlobalStylesRenderer />
+							<BlockEditorProvider settings={ settings }>
+								<NavigatorScreen path="/step/2">
+									<ChooseStyles
+										theme={ theme }
+										category={ category }
+									/>
+								</NavigatorScreen>
+								<StyleBook
+									isSelected={ () => {} }
+									onSelect={ () => {} }
+									// onClose={  }
+								/>
+							</BlockEditorProvider>
+						</GlobalStylesProvider>
 						<NavigatorScreen path="/step/3">
 							<AddPages />
 						</NavigatorScreen>

@@ -106,3 +106,5 @@ export { default as PluginSidebarMoreMenuItem } from './components/header-edit-m
 export { default as PluginMoreMenuItem } from './components/header-edit-mode/plugin-more-menu-item';
 export { default as StyleVariationsContainer } from './components/global-styles/style-variations-container';
 export { GlobalStylesProvider } from './components/global-styles/global-styles-provider';
+export { default as StyleBook } from './components/style-book';
+export { GlobalStylesRenderer } from './components/global-styles-renderer';

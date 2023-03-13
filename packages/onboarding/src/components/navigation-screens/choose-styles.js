@@ -2,18 +2,30 @@
  * WordPress dependencies
  */
 // eslint-disable-next-line no-restricted-imports
+import { StyleVariationsContainer, StyleBook } from '@wordpress/edit-site';
 import {
-	StyleVariationsContainer,
-	GlobalStylesProvider,
-} from '@wordpress/edit-site';
-import { BlockEditorProvider } from '@wordpress/block-editor';
+	__experimentalVStack as VStack,
+	Flex,
+	FlexItem,
+} from '@wordpress/components';
 
 export default function ChooseStyles() {
 	return (
-		<GlobalStylesProvider>
-			<BlockEditorProvider>
+		<Flex justify="flex-start" align="stretch" gap={ 8 }>
+			<FlexItem className="onboarding-style-book" isBlock>
+				<VStack alignment="topLeft">
+					<StyleBook.Slot>
+						{ ( [ styleBook ] ) => (
+							<div className="onboarding-style-book__container">
+								{ styleBook }
+							</div>
+						) }
+					</StyleBook.Slot>
+				</VStack>
+			</FlexItem>
+			<FlexItem className="onboarding-styles-list-container">
 				<StyleVariationsContainer />
-			</BlockEditorProvider>
-		</GlobalStylesProvider>
+			</FlexItem>
+		</Flex>
 	);
 }

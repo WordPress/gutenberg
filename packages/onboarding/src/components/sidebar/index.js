@@ -65,7 +65,7 @@ function Sidebar( { step = 1 } ) {
 				className="onboarding-sitebar__next-button"
 				variant="primary"
 				path={ `/step/${ currentStep + 1 }` }
-				disabled={ currentStep >= step }
+				// disabled={ currentStep >= step }
 			>
 				{ __( 'Next' ) }
 			</NavigatorButton>
