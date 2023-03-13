@@ -8,8 +8,17 @@ import {
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../private-apis';
 export default function ChooseStyles( { setVariation } ) {
+	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
+	const [ , onReset ] = useGlobalStylesReset();
+	useEffect( onReset, [ onReset ] );
 	return (
 		<Flex justify="flex-start" align="stretch" gap={ 8 }>
 			<FlexItem className="onboarding-styles-list-container">
