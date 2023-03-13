@@ -529,7 +529,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 						blockSelectors[ blockName ].fallbackGapValue,
 					hasLayoutSupport:
 						blockSelectors[ blockName ].hasLayoutSupport,
-					selector: blockSelectors[ blockName ].selector,
+					selector: blockSelectors[ blockName ]?.selector,
 					styles: blockStyles,
 					featureSelectors:
 						blockSelectors[ blockName ].featureSelectors,
@@ -547,7 +547,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 					) {
 						nodes.push( {
 							styles: value,
-							selector: blockSelectors[ blockName ].selector
+							selector: blockSelectors[ blockName ]?.selector
 								.split( ',' )
 								.map( ( sel ) => {
 									const elementSelectors =
@@ -606,7 +606,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 				nodes.push( {
 					presets: blockPresets,
 					custom: blockCustom,
-					selector: blockSelectors[ blockName ].selector,
+					selector: blockSelectors[ blockName ]?.selector,
 				} );
 			}
 		}
