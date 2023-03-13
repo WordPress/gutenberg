@@ -22,7 +22,12 @@ export default function ChooseStyles( { setVariation } ) {
 	const [ , onReset ] = useGlobalStylesReset();
 	useEffect( onReset, [ onReset ] );
 	return (
-		<Flex justify="flex-start" align="stretch" gap={ 8 }>
+		<Flex
+			justify="flex-start"
+			align="stretch"
+			gap={ 8 }
+			className="onboarding-choose-styles"
+		>
 			<FlexItem className="onboarding-styles-list-container">
 				<VStack>
 					<Heading level={ 2 }>{ __( 'Choose your style' ) }</Heading>
@@ -34,16 +39,14 @@ export default function ChooseStyles( { setVariation } ) {
 				</VStack>
 				<StyleVariationsContainer onSelect={ setVariation } />
 			</FlexItem>
-			<FlexItem isBlock>
-				<div className="onboarding-style-book">
-					<StyleBook.Slot>
-						{ ( [ styleBook ] ) => (
-							<div className="onboarding-style-book__container">
-								{ styleBook }
-							</div>
-						) }
-					</StyleBook.Slot>
-				</div>
+			<FlexItem isBlock className="onboarding-style-book">
+				<StyleBook.Slot>
+					{ ( [ styleBook ] ) => (
+						<div className="onboarding-style-book__container">
+							{ styleBook }
+						</div>
+					) }
+				</StyleBook.Slot>
 			</FlexItem>
 		</Flex>
 	);
