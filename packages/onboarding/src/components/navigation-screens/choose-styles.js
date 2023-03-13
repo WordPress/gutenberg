@@ -5,11 +5,13 @@
 import { StyleVariationsContainer, StyleBook } from '@wordpress/edit-site';
 import {
 	__experimentalVStack as VStack,
+	__experimentalHeading as Heading,
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,10 +24,18 @@ export default function ChooseStyles( { setVariation } ) {
 	return (
 		<Flex justify="flex-start" align="stretch" gap={ 8 }>
 			<FlexItem className="onboarding-styles-list-container">
+				<VStack>
+					<Heading level={ 2 }>{ __( 'Choose your style' ) }</Heading>
+					<p>
+						{ __(
+							"Your style will define how the rest of your website looks. Don't worry, you can change that later."
+						) }
+					</p>
+				</VStack>
 				<StyleVariationsContainer onSelect={ setVariation } />
 			</FlexItem>
-			<FlexItem className="onboarding-style-book" isBlock>
-				<VStack alignment="topLeft">
+			<FlexItem isBlock>
+				<div className="onboarding-style-book">
 					<StyleBook.Slot>
 						{ ( [ styleBook ] ) => (
 							<div className="onboarding-style-book__container">
@@ -33,7 +43,7 @@ export default function ChooseStyles( { setVariation } ) {
 							</div>
 						) }
 					</StyleBook.Slot>
-				</VStack>
+				</div>
 			</FlexItem>
 		</Flex>
 	);
