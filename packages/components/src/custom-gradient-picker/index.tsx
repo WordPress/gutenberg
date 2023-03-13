@@ -81,9 +81,9 @@ const GradientTypePicker = ( {
 		onChange(
 			serializeGradient( {
 				...gradientAST,
-				...( gradientAST.orientation
-					? {}
-					: { orientation: HORIZONTAL_GRADIENT_ORIENTATION } ),
+				orientation: gradientAST.orientation
+					? undefined
+					: HORIZONTAL_GRADIENT_ORIENTATION,
 				type: 'linear-gradient',
 			} as gradientParser.LinearGradientNode )
 		);
