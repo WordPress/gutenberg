@@ -103,7 +103,7 @@ export type ControlPointsProps = {
 	gradientPickerDomRef: React.RefObject< HTMLDivElement >;
 	ignoreMarkerPosition?: number;
 	value: ControlPoint[];
-	onChange: ( conrolPoints: ControlPoint[] ) => void;
+	onChange: ( controlPoints: ControlPoint[] ) => void;
 	onStartControlPointChange: () => void;
 	onStopControlPointChange: () => void;
 	__experimentalIsRenderedInSidebar: boolean;
