@@ -45,7 +45,7 @@ export default function ScreenLaunch( { theme, category, variation } ) {
 			<p>Theme: { theme }</p>
 			<p>Category: { category }</p>
 			<p>Variation: { variation?.title }</p>
-			<Button variant="primary" href="site-editor.php">
+			<Button variant="primary" href="/wp-admin/site-editor.php">
 				Customize your site
 			</Button>
 		</div>
