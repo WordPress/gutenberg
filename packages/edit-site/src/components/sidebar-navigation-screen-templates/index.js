@@ -34,6 +34,14 @@ const config = {
 			),
 		},
 	},
+	page: {
+		labels: {
+			title: __( 'Pages' ),
+			loading: __( 'Loading pages' ),
+			notFound: __( 'No pages found' ),
+			description: __( 'Browse and edit pages on your site' ),
+		},
+	},
 	wp_template_part: {
 		labels: {
 			title: __( 'Template parts' ),
@@ -59,6 +67,7 @@ export default function SidebarNavigationScreenTemplates() {
 	const {
 		params: { postType },
 	} = useNavigator();
+
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isTemplatePartsMode = useSelect( ( select ) => {
 		const settings = select( editSiteStore ).getSettings();
@@ -119,15 +128,16 @@ export default function SidebarNavigationScreenTemplates() {
 									) }
 								</TemplateItem>
 							) ) }
-							{ ! isMobileViewport && (
-								<SidebarNavigationItem
-									className="edit-site-sidebar-navigation-screen-templates__see-all"
-									{ ...browseAllLink }
-									children={
-										config[ postType ].labels.manage
-									}
-								/>
-							) }
+							{ ! isMobileViewport &&
+								config[ postType ].labels.manage && (
+									<SidebarNavigationItem
+										className="edit-site-sidebar-navigation-screen-templates__see-all"
+										{ ...browseAllLink }
+										children={
+											config[ postType ].labels.manage
+										}
+									/>
+								) }
 						</ItemGroup>
 					) }
 				</>

@@ -16,6 +16,11 @@ export function getPathFromURL( urlParams ) {
 	if ( urlParams?.postType && urlParams?.postId ) {
 		switch ( urlParams.postType ) {
 			case 'wp_template':
+			case 'page':
+				path = `/${ encodeURIComponent(
+					urlParams.postType
+				) }/${ encodeURIComponent( urlParams.postId ) }`;
+				break;
 			case 'wp_template_part':
 				path = `/${ encodeURIComponent(
 					urlParams.postType

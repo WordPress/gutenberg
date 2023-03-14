@@ -30,13 +30,10 @@ function SidebarScreens() {
 			<NavigatorScreen path="/">
 				<SidebarNavigationScreenMain />
 			</NavigatorScreen>
-			<NavigatorScreen path="/navigation">
-				<SidebarNavigationScreenNavigationMenus />
-			</NavigatorScreen>
-			<NavigatorScreen path="/navigation/:postType/:postId">
+			<NavigatorScreen path="/:postType(page)/:postId">
 				<SidebarNavigationScreenNavigationItem />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)">
+			<NavigatorScreen path="/:postType(wp_template|wp_template_part|page)">
 				<SidebarNavigationScreenTemplates />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
