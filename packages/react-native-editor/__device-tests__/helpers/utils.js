@@ -313,15 +313,21 @@ const clickElementOutsideOfTextInput = async ( driver, element ) => {
 };
 
 // Long press to activate context menu.
-const longPressMiddleOfElement = async ( driver, element ) => {
+const longPressMiddleOfElement = async (
+	driver,
+	element,
+	waitTime = 5000, // Setting to wait a bit longer because this is failing more frequently on the CI
+	customElementSize
+) => {
 	const location = await element.getLocation();
-	const size = await element.getSize();
+	const size = customElementSize || ( await element.getSize() );
 
 	const x = location.x + size.width / 2;
 	const y = location.y + size.height / 2;
+
 	const action = new wd.TouchAction( driver )
 		.longPress( { x, y } )
-		.wait( 5000 ) // Setting to wait a bit longer because this is failing more frequently on the CI
+		.wait( waitTime )
 		.release();
 	await action.perform();
 };
@@ -366,6 +372,19 @@ const tapPasteAboveElement = async ( driver, element ) => {
 		const pasteButtonLocator = '//XCUIElementTypeMenuItem[@name="Paste"]';
 		await clickIfClickable( driver, pasteButtonLocator );
 		await driver.sleep( 3000 ); // Wait for paste notification to disappear.
+	}
+};
+
+const selectTextFromElement = async ( driver, element ) => {
+	if ( isAndroid() ) {
+		await longPressMiddleOfElement( driver, element, 0 );
+	} else {
+		await doubleTap( driver, element );
+		await driver.waitForElementByXPath(
+			'//XCUIElementTypeMenuItem[@name="Copy"]',
+			wd.asserters.isDisplayed,
+			4000
+		);
 	}
 };
 
@@ -678,6 +697,7 @@ module.exports = {
 	longPressMiddleOfElement,
 	setClipboard,
 	setupDriver,
+	selectTextFromElement,
 	stopDriver,
 	swipeDown,
 	swipeFromTo,

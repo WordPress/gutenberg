@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import { View } from 'react-native';
 
 /**
@@ -32,12 +31,12 @@ import { pullLeft, pullRight, replace } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { WIDTH_CONSTRAINT_PERCENTAGE } from './constants';
 import MediaContainer from './media-container';
 import styles from './style.scss';
 
 const TEMPLATE = [ [ 'core/paragraph' ] ];
 // this limits the resize to a safe zone to avoid making broken layouts
-const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const BREAKPOINTS = {
 	mobile: 480,
 };
@@ -99,13 +98,8 @@ class MediaTextEdit extends Component {
 		if ( mediaType === 'image' && media.sizes ) {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src =
-				get( media, [ 'sizes', 'large', 'url' ] ) ||
-				get( media, [
-					'media_details',
-					'sizes',
-					'large',
-					'source_url',
-				] );
+				media.sizes.large?.url ||
+				media?.media_details?.sizes?.large?.source_url;
 		}
 
 		setAttributes( {

@@ -13,7 +13,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { LinkedButtonProps } from '../types';
 
 export function useBorderBoxControlLinkedButton(
-	props: WordPressComponentProps< LinkedButtonProps, 'div' >
+	props: WordPressComponentProps< LinkedButtonProps, 'button' >
 ) {
 	const {
 		className,

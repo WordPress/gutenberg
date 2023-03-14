@@ -28,6 +28,7 @@ const SetupContent = ( {
 	activeSlide,
 	patterns,
 	onBlockPatternSelect,
+	showTitles,
 } ) => {
 	const composite = useCompositeState();
 	const containerClass = 'block-editor-block-pattern-setup__container';
@@ -67,6 +68,7 @@ const SetupContent = ( {
 						pattern={ pattern }
 						onSelect={ onBlockPatternSelect }
 						composite={ composite }
+						showTitles={ showTitles }
 					/>
 				) ) }
 			</Composite>
@@ -74,7 +76,7 @@ const SetupContent = ( {
 	);
 };
 
-function BlockPattern( { pattern, onSelect, composite } ) {
+function BlockPattern( { pattern, onSelect, composite, showTitles } ) {
 	const baseClassName = 'block-editor-block-pattern-setup-list';
 	const { blocks, description, viewportWidth = 700 } = pattern;
 	const descriptionId = useInstanceId(
@@ -98,12 +100,17 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 					blocks={ blocks }
 					viewportWidth={ viewportWidth }
 				/>
+				{ showTitles && (
+					<div className={ `${ baseClassName }__item-title` }>
+						{ pattern.title }
+					</div>
+				) }
+				{ !! description && (
+					<VisuallyHidden id={ descriptionId }>
+						{ description }
+					</VisuallyHidden>
+				) }
 			</CompositeItem>
-			{ !! description && (
-				<VisuallyHidden id={ descriptionId }>
-					{ description }
-				</VisuallyHidden>
-			) }
 		</div>
 	);
 }
@@ -120,10 +127,7 @@ function BlockPatternSlide( { className, pattern, minHeight } ) {
 			aria-label={ title }
 			aria-describedby={ description ? descriptionId : undefined }
 		>
-			<BlockPreview
-				blocks={ blocks }
-				__experimentalMinHeight={ minHeight }
-			/>
+			<BlockPreview blocks={ blocks } minHeight={ minHeight } />
 			{ !! description && (
 				<VisuallyHidden id={ descriptionId }>
 					{ description }
@@ -139,6 +143,7 @@ const BlockPatternSetup = ( {
 	filterPatternsFn,
 	onBlockPatternSelect,
 	initialViewMode = VIEWMODES.carousel,
+	showTitles = false,
 } ) => {
 	const [ viewMode, setViewMode ] = useState( initialViewMode );
 	const [ activeSlide, setActiveSlide ] = useState( 0 );
@@ -165,6 +170,7 @@ const BlockPatternSetup = ( {
 					activeSlide={ activeSlide }
 					patterns={ patterns }
 					onBlockPatternSelect={ onPatternSelectCallback }
+					showTitles={ showTitles }
 				/>
 				<SetupToolbar
 					viewMode={ viewMode }

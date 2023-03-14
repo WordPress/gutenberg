@@ -1,16 +1,8 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	BlockSettingsMenuControls,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
 import { createBlock, serialize } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -24,12 +16,18 @@ import { symbolFilled } from '@wordpress/icons';
  */
 import CreateTemplatePartModal from '../create-template-part-modal';
 import { store as editSiteStore } from '../../store';
+import {
+	useExistingTemplateParts,
+	getUniqueTemplatePartTitle,
+	getCleanTemplatePartSlug,
+} from '../../utils/template-part-create';
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
+	const existingTemplateParts = useExistingTemplateParts();
 
 	const { canCreate } = useSelect( ( select ) => {
 		const { supportsTemplatePartsMode } =
@@ -44,17 +42,18 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	}
 
 	const onConvert = async ( { title, area } ) => {
-		// Currently template parts only allow latin chars.
-		// Fallback slug will receive suffix by default.
-		const cleanSlug =
-			kebabCase( title ).replace( /[^\w-]+/g, '' ) || 'wp-custom-part';
+		const uniqueTitle = getUniqueTemplatePartTitle(
+			title,
+			existingTemplateParts
+		);
+		const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
 
 		const templatePart = await saveEntityRecord(
 			'postType',
 			'wp_template_part',
 			{
 				slug: cleanSlug,
-				title,
+				title: uniqueTitle,
 				content: serialize( blocks ),
 				area,
 			}
@@ -76,18 +75,14 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 
 	return (
 		<>
-			<BlockSettingsMenuControls>
-				{ () => (
-					<MenuItem
-						icon={ symbolFilled }
-						onClick={ () => {
-							setIsModalOpen( true );
-						} }
-					>
-						{ __( 'Create Template part' ) }
-					</MenuItem>
-				) }
-			</BlockSettingsMenuControls>
+			<MenuItem
+				icon={ symbolFilled }
+				onClick={ () => {
+					setIsModalOpen( true );
+				} }
+			>
+				{ __( 'Create Template part' ) }
+			</MenuItem>
 			{ isModalOpen && (
 				<CreateTemplatePartModal
 					closeModal={ () => {

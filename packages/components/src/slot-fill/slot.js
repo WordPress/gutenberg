@@ -34,7 +34,7 @@ class SlotComponent extends Component {
 
 	componentDidMount() {
 		const { registerSlot } = this.props;
-
+		this.isUnmounted = false;
 		registerSlot( this.props.name, this );
 	}
 

@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 5.5.0 (2023-03-01)
+
+## 5.4.0 (2023-02-15)
+
+## 5.3.0 (2023-02-01)
+
+## 5.2.0 (2023-01-11)
+
+## 5.1.0 (2023-01-02)
+
+## 5.0.0 (2022-12-14)
+
 ### Breaking Changes
 
 -   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))

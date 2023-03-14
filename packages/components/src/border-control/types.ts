@@ -17,10 +17,7 @@ export type Border = {
 
 export type ColorProps = Pick<
 	ColorPaletteProps,
-	| 'colors'
-	| 'enableAlpha'
-	| '__experimentalHasMultipleOrigins'
-	| '__experimentalIsRenderedInSidebar'
+	'colors' | 'enableAlpha' | '__experimentalIsRenderedInSidebar'
 > & {
 	/**
 	 * This toggles the ability to choose custom colors.

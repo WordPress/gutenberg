@@ -123,6 +123,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		requiresOptOut: true,
 		useEngine: true,
 	},
+	columnCount: {
+		value: [ 'typography', 'textColumns' ],
+		support: [ 'typography', 'textColumns' ],
+		useEngine: true,
+	},
 	filter: {
 		value: [ 'filter', 'duotone' ],
 		support: [ 'color', '__experimentalDuotone' ],

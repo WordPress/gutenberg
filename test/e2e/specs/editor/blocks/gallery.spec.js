@@ -47,12 +47,12 @@ test.describe( 'Gallery', () => {
 	} ) => {
 		await admin.createNewPost();
 
-		await pageUtils.setClipboardData( {
+		pageUtils.setClipboardData( {
 			plainText: `[gallery ids="${ uploadedMedia.id }"]`,
 		} );
 
 		await page.click( 'role=button[name="Add default block"i]' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'primary+v' );
 
 		const img = page.locator(
 			'role=document[name="Block: Image"i] >> role=img'
@@ -136,12 +136,12 @@ test.describe( 'Gallery', () => {
 
 		await expect( gallery ).toBeVisible();
 		await editor.selectBlocks( gallery );
+		await editor.clickBlockToolbarButton( 'Add caption' );
 
 		const caption = gallery.locator(
 			'role=textbox[name="Gallery caption text"i]'
 		);
-		await expect( caption ).toBeVisible();
-		await caption.click();
+		await expect( caption ).toBeFocused();
 
 		await page.keyboard.type( galleryCaption );
 

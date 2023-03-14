@@ -28,8 +28,24 @@ import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
 
-function usePatternsCategories() {
-	const [ allPatterns, allCategories ] = usePatternsState();
+// Preferred order of pattern categories. Any other categories should
+// be at the bottom without any re-ordering.
+const patternCategoriesOrder = [
+	'featured',
+	'posts',
+	'text',
+	'gallery',
+	'call-to-action',
+	'banner',
+	'header',
+	'footer',
+];
+
+function usePatternsCategories( rootClientId ) {
+	const [ allPatterns, allCategories ] = usePatternsState(
+		undefined,
+		rootClientId
+	);
 
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
@@ -52,18 +68,14 @@ function usePatternsCategories() {
 					pattern.categories?.includes( category.name )
 				)
 			)
-			.sort( ( { name: currentName }, { name: nextName } ) => {
-				if (
-					! [ currentName, nextName ].some( ( categoryName ) =>
-						[ 'featured', 'text' ].includes( categoryName )
-					)
-				) {
-					return 0;
-				}
-				// Move `featured` category to the top and `text` to the bottom.
-				return currentName === 'featured' || nextName === 'text'
-					? -1
-					: 1;
+			.sort( ( { name: aName }, { name: bName } ) => {
+				// Sort categories according to `patternCategoriesOrder`.
+				let aIndex = patternCategoriesOrder.indexOf( aName );
+				let bIndex = patternCategoriesOrder.indexOf( bName );
+				// All other categories should come after that.
+				if ( aIndex < 0 ) aIndex = patternCategoriesOrder.length;
+				if ( bIndex < 0 ) bIndex = patternCategoriesOrder.length;
+				return aIndex - bIndex;
 			} );
 
 		if (
@@ -89,6 +101,7 @@ function usePatternsCategories() {
 export function BlockPatternsCategoryDialog( {
 	rootClientId,
 	onInsert,
+	onHover,
 	category,
 	showTitlesAsTooltip,
 } ) {
@@ -110,6 +123,7 @@ export function BlockPatternsCategoryDialog( {
 			<BlockPatternsCategoryPanel
 				rootClientId={ rootClientId }
 				onInsert={ onInsert }
+				onHover={ onHover }
 				category={ category }
 				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
@@ -120,6 +134,7 @@ export function BlockPatternsCategoryDialog( {
 export function BlockPatternsCategoryPanel( {
 	rootClientId,
 	onInsert,
+	onHover,
 	category,
 	showTitlesAsTooltip,
 } ) {
@@ -128,7 +143,7 @@ export function BlockPatternsCategoryPanel( {
 		rootClientId
 	);
 
-	const availableCategories = usePatternsCategories();
+	const availableCategories = usePatternsCategories( rootClientId );
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
@@ -153,6 +168,9 @@ export function BlockPatternsCategoryPanel( {
 
 	const currentShownPatterns = useAsyncList( currentCategoryPatterns );
 
+	// Hide block pattern preview on unmount.
+	useEffect( () => () => onHover( null ), [] );
+
 	if ( ! currentCategoryPatterns.length ) {
 		return null;
 	}
@@ -167,6 +185,7 @@ export function BlockPatternsCategoryPanel( {
 				shownPatterns={ currentShownPatterns }
 				blockPatterns={ currentCategoryPatterns }
 				onClickPattern={ onClick }
+				onHover={ onHover }
 				label={ category.label }
 				orientation="vertical"
 				category={ category.label }
@@ -184,7 +203,8 @@ function BlockPatternsTabs( {
 	rootClientId,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const categories = usePatternsCategories();
+	const categories = usePatternsCategories( rootClientId );
+	const initialCategory = selectedCategory || categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
 		<>
@@ -251,7 +271,7 @@ function BlockPatternsTabs( {
 			) }
 			{ showPatternsExplorer && (
 				<PatternsExplorerModal
-					initialCategory={ selectedCategory }
+					initialCategory={ initialCategory }
 					patternCategories={ categories }
 					onModalClose={ () => setShowPatternsExplorer( false ) }
 				/>

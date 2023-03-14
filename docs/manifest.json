@@ -606,6 +606,12 @@
 		"parent": "theme-json-reference"
 	},
 	{
+		"title": "Available Styles Options",
+		"slug": "styles-versions",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/styles-versions.md",
+		"parent": "theme-json-reference"
+	},
+	{
 		"title": "Component Reference",
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
@@ -639,12 +645,6 @@
 		"title": "BaseControl",
 		"slug": "base-control",
 		"markdown_source": "../packages/components/src/base-control/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "BaseField",
-		"slug": "base-field",
-		"markdown_source": "../packages/components/src/base-field/README.md",
 		"parent": "components"
 	},
 	{
@@ -717,6 +717,12 @@
 		"title": "CheckboxControl",
 		"slug": "checkbox-control",
 		"markdown_source": "../packages/components/src/checkbox-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CircularOptionPicker",
+		"slug": "circular-option-picker",
+		"markdown_source": "../packages/components/src/circular-option-picker/README.md",
 		"parent": "components"
 	},
 	{
@@ -1068,6 +1074,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigatorToParentButton",
+		"slug": "navigator-to-parent-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-to-parent-button/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Notice",
 		"slug": "notice",
 		"markdown_source": "../packages/components/src/notice/README.md",
@@ -1230,12 +1242,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "Theme",
-		"slug": "theme",
-		"markdown_source": "../packages/components/src/theme/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "ToggleControl",
 		"slug": "toggle-control",
 		"markdown_source": "../packages/components/src/toggle-control/README.md",
@@ -1268,31 +1274,31 @@
 	{
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
-		"markdown_source": "../packages/components/src/toolbar-button/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-button/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarDropdownMenu",
 		"slug": "toolbar-dropdown-menu",
-		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-dropdown-menu/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarGroup",
 		"slug": "toolbar-group",
-		"markdown_source": "../packages/components/src/toolbar-group/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-group/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarItem",
 		"slug": "toolbar-item",
-		"markdown_source": "../packages/components/src/toolbar-item/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-item/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "Toolbar",
 		"slug": "toolbar",
-		"markdown_source": "../packages/components/src/toolbar/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1500,12 +1506,6 @@
 		"parent": "packages-create-block"
 	},
 	{
-		"title": "@wordpress/custom-templated-path-webpack-plugin",
-		"slug": "packages-custom-templated-path-webpack-plugin",
-		"markdown_source": "../packages/custom-templated-path-webpack-plugin/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/customize-widgets",
 		"slug": "packages-customize-widgets",
 		"markdown_source": "../packages/customize-widgets/README.md",
@@ -1620,12 +1620,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/experiments",
-		"slug": "packages-experiments",
-		"markdown_source": "../packages/experiments/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",
@@ -1704,12 +1698,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/library-export-default-webpack-plugin",
-		"slug": "packages-library-export-default-webpack-plugin",
-		"markdown_source": "../packages/library-export-default-webpack-plugin/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "../packages/list-reusable-blocks/README.md",
@@ -1779,6 +1767,12 @@
 		"title": "@wordpress/priority-queue",
 		"slug": "packages-priority-queue",
 		"markdown_source": "../packages/priority-queue/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/private-apis",
+		"slug": "packages-private-apis",
+		"markdown_source": "../packages/private-apis/README.md",
 		"parent": "packages"
 	},
 	{
@@ -2122,6 +2116,24 @@
 		"slug": "testing-overview",
 		"markdown_source": "../docs/contributors/code/testing-overview.md",
 		"parent": "code"
+	},
+	{
+		"title": "End-to-End Testing",
+		"slug": "e2e",
+		"markdown_source": "../docs/contributors/code/e2e/README.md",
+		"parent": "testing-overview"
+	},
+	{
+		"title": "Migration guide",
+		"slug": "migration",
+		"markdown_source": "../docs/contributors/code/e2e/migration.md",
+		"parent": "e2e"
+	},
+	{
+		"title": "Overusing snapshots",
+		"slug": "overusing-snapshots",
+		"markdown_source": "../docs/contributors/code/e2e/overusing-snapshots.md",
+		"parent": "e2e"
 	},
 	{
 		"title": "Block Grammar",

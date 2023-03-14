@@ -20,13 +20,13 @@ jobs:
             matrix:
                 xcode: ['13.2.1']
                 device: ['iPhone 13']
-                native-test-name: [gutenberg-editor-initial-html]
+                native-test-name: [gutenberg-editor-rendering]
 
         steps:
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
@@ -37,7 +37,7 @@ jobs:
               run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
 
             - name: Restore build cache
-              uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # v3.0.11
+              uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
               with:
                   path: |
                       packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
@@ -45,7 +45,7 @@ jobs:
                   key: ${{ runner.os }}-ios-build-${{ matrix.xcode }}-${{ matrix.device }}-${{ hashFiles('ios-checksums.txt') }}
 
             - name: Restore pods cache
-              uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # v3.0.11
+              uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
               with:
                   path: |
                       packages/react-native-editor/ios/Pods
@@ -77,13 +77,13 @@ jobs:
                   rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
                   rm -rf packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/assets
 
-            - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+            - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               if: always()
               with:
                   name: ios-screen-recordings
                   path: packages/react-native-editor/ios-screen-recordings
 
-            - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+            - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               if: always()
               with:
                   name: appium-logs

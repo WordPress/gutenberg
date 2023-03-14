@@ -3,55 +3,62 @@
  */
 import {
 	__experimentalItemGroup as ItemGroup,
-	__experimentalHStack as HStack,
 	__experimentalNavigatorButton as NavigatorButton,
-	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbolFilled } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
+import { layout, symbolFilled, navigation } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import { useLocation } from '../routes';
-import { store as editSiteStore } from '../../store';
-import getIsListPage from '../../utils/get-is-list-page';
 
 export default function SidebarNavigationScreenMain() {
-	const { params } = useLocation();
-	const isListPage = getIsListPage( params );
-	const isEditorPage = ! isListPage;
-	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const hasNavigationMenus = useSelect( ( select ) => {
+		// The query needs to be the same as in the "SidebarNavigationScreenNavigationMenus" component,
+		// to avoid double network calls.
+		const navigationMenus = select( coreStore ).getEntityRecords(
+			'postType',
+			'wp_navigation',
+			{
+				per_page: 1,
+				status: 'publish',
+				order: 'desc',
+				orderby: 'date',
+			}
+		);
 
+		return navigationMenus?.length > 0;
+	} );
+
+	const showNavigationScreen = process.env.IS_GUTENBERG_PLUGIN
+		? hasNavigationMenus
+		: false;
 	return (
 		<SidebarNavigationScreen
-			path="/"
-			title={
-				<HStack justify="space-between" style={ { minHeight: 36 } }>
-					<div>{ __( 'Design' ) }</div>
-					{ ! isMobileViewport && isEditorPage && (
-						<Button
-							className="edit-site-layout__edit-button"
-							label={ __( 'Open the editor' ) }
-							onClick={ () => {
-								__unstableSetCanvasMode( 'edit' );
-							} }
-						>
-							{ __( 'Edit' ) }
-						</Button>
-					) }
-				</HStack>
-			}
+			isRoot
+			title={ __( 'Design' ) }
+			description={ __(
+				'Customize the appearance of your website using the block editor.'
+			) }
 			content={
 				<ItemGroup>
+					{ showNavigationScreen && (
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/navigation"
+							withChevron
+							icon={ navigation }
+						>
+							{ __( 'Navigation' ) }
+						</NavigatorButton>
+					) }
 					<NavigatorButton
 						as={ SidebarNavigationItem }
-						path="/templates"
+						path="/wp_template"
 						withChevron
 						icon={ layout }
 					>
@@ -59,7 +66,7 @@ export default function SidebarNavigationScreenMain() {
 					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
-						path="/template-parts"
+						path="/wp_template_part"
 						withChevron
 						icon={ symbolFilled }
 					>

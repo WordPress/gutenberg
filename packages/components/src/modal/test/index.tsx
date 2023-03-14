@@ -72,9 +72,7 @@ describe( 'Modal', () => {
 	} );
 
 	it( 'should call onRequestClose when the escape key is pressed', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onRequestClose = jest.fn();
 		render(
 			<Modal onRequestClose={ onRequestClose }>

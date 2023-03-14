@@ -13,7 +13,7 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.69.4)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - Gutenberg (1.86.0):
+  - Gutenberg (1.90.0):
     - React-Core (= 0.69.4)
     - React-CoreModules (= 0.69.4)
     - React-RCTImage (= 0.69.4)
@@ -331,7 +331,7 @@ PODS:
     - SDWebImageWebPCoder (~> 0.8.4)
   - RNGestureHandler (2.3.2-wp-2):
     - React-Core
-  - RNReanimated (2.9.1-wp-2):
+  - RNReanimated (2.9.1-wp-3):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
@@ -362,7 +362,7 @@ PODS:
     - React-Core
   - RNSVG (9.13.6):
     - React-Core
-  - RNTAztecView (1.86.0):
+  - RNTAztecView (1.90.0):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.8)
   - SDWebImage (5.11.1):
@@ -540,14 +540,14 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   BVLinearGradient: ace34fab72158c068ae989a0ebdbf86cb4ef0e49
-  DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
+  DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: c71b8c429a8af2aff1013934a7152e9d9d0c937d
   FBReactNativeSpec: 2ff441cbe6e58c1778d8a5cf3311831a6a8c0809
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
-  glog: 5337263514dd6f09803962437687240c5dc39aa4
-  Gutenberg: 943a12eae51ca3dcda2ef86b4efe4f4a23854763
+  glog: 3d02b25ca00c2d456734d0bcff864cbc62f6ae1a
+  Gutenberg: dbb0140a7159408f2cd8031d841c7adf98e1e9ca
   libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
-  RCT-Folly: a21c126816d8025b547704b777a2ba552f3d9fa9
+  RCT-Folly: b9d9fe1fc70114b751c076104e52f3b1b5e5a95a
   RCTRequired: bd9d2ab0fda10171fcbcf9ba61a7df4dc15a28f4
   RCTTypeSafety: e44e139bf6ec8042db396201834fc2372f6a21cd
   React: 482cd1ba23c471be1aed3800180be2427418d7be
@@ -585,10 +585,10 @@ SPEC CHECKSUMS:
   RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
   RNGestureHandler: 3e0ea0c115175e66680032904339696bab928ca3
-  RNReanimated: 8b189a09da0345d84b33b8cde57a57f8ed847352
+  RNReanimated: bea6acb5fdcbd8ca27641180579d09e3434f803c
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 36a7359c428dcb7c6bce1cc546fbfebe069809b0
-  RNTAztecView: 634d437faf2908196c7d1237c210936466d6a37d
+  RNTAztecView: 0ef32f75b63813ac5e7675696fa074d3062b8e91
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   WordPress-Aztec-iOS: 7d11d598f14c82c727c08b56bd35fbeb7dafb504

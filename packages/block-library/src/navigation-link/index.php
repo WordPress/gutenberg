@@ -9,17 +9,16 @@
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the navigation markup in the front-end.
  *
- * @param  array $context    Navigation block context.
- * @param  array $attributes Block attributes.
+ * @param  array $context     Navigation block context.
+ * @param  array $attributes  Block attributes.
+ * @param  bool  $is_sub_menu Whether the link is part of a sub-menu.
  * @return array Colors CSS classes and inline styles.
  */
-function block_core_navigation_link_build_css_colors( $context, $attributes ) {
+function block_core_navigation_link_build_css_colors( $context, $attributes, $is_sub_menu = false ) {
 	$colors = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
-
-	$is_sub_menu = isset( $attributes['isTopLevelLink'] ) ? ( ! $attributes['isTopLevelLink'] ) : false;
 
 	// Text color.
 	$named_text_color  = null;
@@ -121,6 +120,33 @@ function block_core_navigation_link_render_submenu_icon() {
 }
 
 /**
+ * Decodes a url if it's encoded, returning the same url if not.
+ *
+ * @param string $url The url to decode.
+ *
+ * @return string $url Returns the decoded url.
+ */
+function block_core_navigation_link_maybe_urldecode( $url ) {
+	$is_url_encoded = false;
+	$query          = parse_url( $url, PHP_URL_QUERY );
+	$query_params   = wp_parse_args( $query );
+
+	foreach ( $query_params as $query_param ) {
+		if ( rawurldecode( $query_param ) !== $query_param ) {
+			$is_url_encoded = true;
+			break;
+		}
+	}
+
+	if ( $is_url_encoded ) {
+		return rawurldecode( $url );
+	}
+
+	return $url;
+}
+
+
+/**
  * Renders the `core/navigation-link` block.
  *
  * @param array    $attributes The block attributes.
@@ -147,13 +173,11 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$colors          = block_core_navigation_link_build_css_colors( $block->context, $attributes );
 	$font_sizes      = block_core_navigation_link_build_css_font_sizes( $block->context );
 	$classes         = array_merge(
-		$colors['css_classes'],
 		$font_sizes['css_classes']
 	);
-	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
+	$style_attribute = $font_sizes['inline_styles'];
 
 	$css_classes = trim( implode( ' ', $classes ) );
 	$has_submenu = count( $block->inner_blocks ) > 0;
@@ -171,7 +195,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['url'] ) ) {
-		$html .= ' href="' . esc_url( $attributes['url'] ) . '"';
+		$html .= ' href="' . esc_url( block_core_navigation_link_maybe_urldecode( $attributes['url'] ) ) . '"';
 	}
 
 	if ( $is_active ) {
@@ -344,67 +368,3 @@ function register_block_core_navigation_link() {
 	);
 }
 add_action( 'init', 'register_block_core_navigation_link' );
-
-/**
- * Disables the display of block inspector tabs for the Navigation Link block.
- *
- * This is only a temporary measure until we have a TabPanel and mechanism that
- * will allow the Navigation Link to programmatically select a tab when edited
- * via a specific context.
- *
- * See:
- * - https://github.com/WordPress/gutenberg/issues/45951
- * - https://github.com/WordPress/gutenberg/pull/46321
- * - https://github.com/WordPress/gutenberg/pull/46271
- *
- * @param array $settings Default editor settings.
- * @return array Filtered editor settings.
- */
-function gutenberg_disable_tabs_for_navigation_link_block( $settings ) {
-	$current_tab_settings = _wp_array_get(
-		$settings,
-		array( '__experimentalBlockInspectorTabs' ),
-		array()
-	);
-
-	$settings['__experimentalBlockInspectorTabs'] = array_merge(
-		$current_tab_settings,
-		array( 'core/navigation-link' => false )
-	);
-
-	return $settings;
-}
-
-add_filter( 'block_editor_settings_all', 'gutenberg_disable_tabs_for_navigation_link_block' );
-
-/**
- * Enables animation of the block inspector for the Navigation Link block.
- *
- * See:
- * - https://github.com/WordPress/gutenberg/pull/46342
- * - https://github.com/WordPress/gutenberg/issues/45884
- *
- * @param array $settings Default editor settings.
- * @return array Filtered editor settings.
- */
-function gutenberg_enable_animation_for_navigation_link_inspector( $settings ) {
-	$current_animation_settings = _wp_array_get(
-		$settings,
-		array( '__experimentalBlockInspectorAnimation' ),
-		array()
-	);
-
-	$settings['__experimentalBlockInspectorAnimation'] = array_merge(
-		$current_animation_settings,
-		array(
-			'core/navigation-link' =>
-				array(
-					'enterDirection' => 'rightToLeft',
-				),
-		)
-	);
-
-	return $settings;
-}
-
-add_filter( 'block_editor_settings_all', 'gutenberg_enable_animation_for_navigation_link_inspector' );

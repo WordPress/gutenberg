@@ -162,7 +162,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 
 ### Build or add dependency
 
-In order to include the blockEditor as a dependancy, make sure to run the build step, or update the asset php file.
+In order to include the blockEditor as a dependency, make sure to run the build step, or update the asset php file.
 
 {% codetabs %}
 {% JSX %}
@@ -174,7 +174,7 @@ npm run build
 
 {% Plain %}
 
-Edit the asset file to include the block-editor dependancy for the scripts.
+Edit the asset file to include the block-editor dependency for the scripts.
 
 ```php
 <?php return

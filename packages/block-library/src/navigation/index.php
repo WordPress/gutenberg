@@ -65,58 +65,58 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 
 		return $menu_items_by_parent_id;
 	}
+}
 
-	/**
-	 * Turns menu item data into a nested array of parsed blocks
-	 *
-	 * @param array $menu_items               An array of menu items that represent
-	 *                                        an individual level of a menu.
-	 * @param array $menu_items_by_parent_id  An array keyed by the id of the
-	 *                                        parent menu where each element is an
-	 *                                        array of menu items that belong to
-	 *                                        that parent.
-	 * @return array An array of parsed block data.
-	 */
-	function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
-		if ( empty( $menu_items ) ) {
-			return array();
-		}
-
-		$blocks = array();
-
-		foreach ( $menu_items as $menu_item ) {
-			$class_name       = ! empty( $menu_item->classes ) ? implode( ' ', (array) $menu_item->classes ) : null;
-			$id               = ( null !== $menu_item->object_id && 'custom' !== $menu_item->object ) ? $menu_item->object_id : null;
-			$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
-			$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
-			$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
-
-			$block = array(
-				'blockName' => isset( $menu_items_by_parent_id[ $menu_item->ID ] ) ? 'core/navigation-submenu' : 'core/navigation-link',
-				'attrs'     => array(
-					'className'     => $class_name,
-					'description'   => $menu_item->description,
-					'id'            => $id,
-					'kind'          => $kind,
-					'label'         => $menu_item->title,
-					'opensInNewTab' => $opens_in_new_tab,
-					'rel'           => $rel,
-					'title'         => $menu_item->attr_title,
-					'type'          => $menu_item->object,
-					'url'           => $menu_item->url,
-				),
-			);
-
-			$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-				? block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
-				: array();
-			$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
-
-			$blocks[] = $block;
-		}
-
-		return $blocks;
+/**
+ * Turns menu item data into a nested array of parsed blocks
+ *
+ * @param array $menu_items               An array of menu items that represent
+ *                                        an individual level of a menu.
+ * @param array $menu_items_by_parent_id  An array keyed by the id of the
+ *                                        parent menu where each element is an
+ *                                        array of menu items that belong to
+ *                                        that parent.
+ * @return array An array of parsed block data.
+ */
+function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
+	if ( empty( $menu_items ) ) {
+		return array();
 	}
+
+	$blocks = array();
+
+	foreach ( $menu_items as $menu_item ) {
+		$class_name       = ! empty( $menu_item->classes ) ? implode( ' ', (array) $menu_item->classes ) : null;
+		$id               = ( null !== $menu_item->object_id && 'custom' !== $menu_item->object ) ? $menu_item->object_id : null;
+		$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
+		$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
+		$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
+
+		$block = array(
+			'blockName' => isset( $menu_items_by_parent_id[ $menu_item->ID ] ) ? 'core/navigation-submenu' : 'core/navigation-link',
+			'attrs'     => array(
+				'className'     => $class_name,
+				'description'   => $menu_item->description,
+				'id'            => $id,
+				'kind'          => $kind,
+				'label'         => $menu_item->title,
+				'opensInNewTab' => $opens_in_new_tab,
+				'rel'           => $rel,
+				'title'         => $menu_item->attr_title,
+				'type'          => $menu_item->object,
+				'url'           => $menu_item->url,
+			),
+		);
+
+		$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
+			? block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
+			: array();
+		$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
+
+		$blocks[] = $block;
+	}
+
+	return $blocks;
 }
 
 /**
@@ -348,7 +348,7 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 	$wp_insert_post_result = wp_insert_post(
 		array(
 			'post_content' => $classic_nav_menu_blocks,
-			'post_title'   => $classic_nav_menu->slug,
+			'post_title'   => $classic_nav_menu->name,
 			'post_name'    => $classic_nav_menu->slug,
 			'post_status'  => 'publish',
 			'post_type'    => 'wp_navigation',
@@ -373,12 +373,14 @@ function block_core_navigation_get_most_recently_published_navigation() {
 
 	// Default to the most recently created menu.
 	$parsed_args = array(
-		'post_type'      => 'wp_navigation',
-		'no_found_rows'  => true,
-		'order'          => 'DESC',
-		'orderby'        => 'date',
-		'post_status'    => 'publish',
-		'posts_per_page' => 1, // get only the most recent.
+		'post_type'              => 'wp_navigation',
+		'no_found_rows'          => true,
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => false,
+		'order'                  => 'DESC',
+		'orderby'                => 'date',
+		'post_status'            => 'publish',
+		'posts_per_page'         => 1, // get only the most recent.
 	);
 
 	$navigation_post = new WP_Query( $parsed_args );
@@ -411,6 +413,25 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 }
 
 /**
+ * Returns true if the navigation block contains a nested navigation block.
+ *
+ * @param WP_Block_List $inner_blocks Inner block instance to be normalized.
+ * @return bool true if the navigation block contains a nested navigation block.
+ */
+function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
+	foreach ( $inner_blocks as $block ) {
+		if ( 'core/navigation' === $block->name ) {
+			return true;
+		}
+		if ( $block->inner_blocks && block_core_navigation_block_contains_core_navigation( $block->inner_blocks ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
  * Retrieves the appropriate fallback to be used on the front of the
  * site when there is no menu assigned to the Nav block.
  *
@@ -432,7 +453,6 @@ function block_core_navigation_get_fallback_blocks() {
 	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
 
 	// Default to a list of Pages.
-
 	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
 	// If there are no navigation posts then try to find a classic menu
@@ -443,12 +463,17 @@ function block_core_navigation_get_fallback_blocks() {
 
 	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
-		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( parse_blocks( $navigation_post->post_content ) );
+		$parsed_blocks  = parse_blocks( $navigation_post->post_content );
+		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
 		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
 		// In this case default to the (Page List) fallback.
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 	}
+
+	// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
+	// In this case default empty blocks.
+	$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : array();
 
 	/**
 	 * Filters the fallback experience for the Navigation block.
@@ -509,9 +534,7 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
-
 	static $seen_menu_names = array();
-	static $seen_ref        = array();
 
 	// Flag used to indicate whether the rendered output is considered to be
 	// a fallback (i.e. the block has no menu associated with it).
@@ -582,11 +605,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Load inner blocks from the navigation post.
 	if ( array_key_exists( 'ref', $attributes ) ) {
-		if ( in_array( $attributes['ref'], $seen_ref, true ) ) {
-			return '';
-		}
-		$seen_ref[] = $attributes['ref'];
-
 		$navigation_post = get_post( $attributes['ref'] );
 		if ( ! isset( $navigation_post ) ) {
 			return '';
@@ -627,6 +645,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
+	}
+
+	if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
+		return '';
 	}
 
 	/**
@@ -856,35 +878,3 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 }
 
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
-
-/**
- * Enables animation of the block inspector for the Navigation block.
- *
- * See:
- * - https://github.com/WordPress/gutenberg/pull/46342
- * - https://github.com/WordPress/gutenberg/issues/45884
- *
- * @param array $settings Default editor settings.
- * @return array Filtered editor settings.
- */
-function gutenberg_enable_animation_for_navigation_inspector( $settings ) {
-	$current_animation_settings = _wp_array_get(
-		$settings,
-		array( '__experimentalBlockInspectorAnimation' ),
-		array()
-	);
-
-	$settings['__experimentalBlockInspectorAnimation'] = array_merge(
-		$current_animation_settings,
-		array(
-			'core/navigation' =>
-				array(
-					'enterDirection' => 'leftToRight',
-				),
-		)
-	);
-
-	return $settings;
-}
-
-add_filter( 'block_editor_settings_all', 'gutenberg_enable_animation_for_navigation_inspector' );

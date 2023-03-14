@@ -51,6 +51,7 @@ export default function PostURL( { onClose } ) {
 			<InspectorPopoverHeader title={ __( 'URL' ) } onClose={ onClose } />
 			{ isEditable && (
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Permalink' ) }
 					value={ forceEmptyField ? '' : postSlug }
 					autoComplete="off"

@@ -4,6 +4,7 @@
 
 import { toTree } from './to-tree';
 import { createElement } from './create-element';
+import { isRangeEqual } from './is-range-equal';
 
 /** @typedef {import('./create').RichTextValue} RichTextValue */
 
@@ -252,25 +253,6 @@ export function applyValue( future, current ) {
 	while ( current.childNodes[ i ] ) {
 		current.removeChild( current.childNodes[ i ] );
 	}
-}
-
-/**
- * Returns true if two ranges are equal, or false otherwise. Ranges are
- * considered equal if their start and end occur in the same container and
- * offset.
- *
- * @param {Range} a First range object to test.
- * @param {Range} b First range object to test.
- *
- * @return {boolean} Whether the two ranges are equal.
- */
-function isRangeEqual( a, b ) {
-	return (
-		a.startContainer === b.startContainer &&
-		a.startOffset === b.startOffset &&
-		a.endContainer === b.endContainer &&
-		a.endOffset === b.endOffset
-	);
 }
 
 export function applySelection( { startPath, endPath }, current ) {

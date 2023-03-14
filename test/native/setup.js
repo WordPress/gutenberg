@@ -122,8 +122,9 @@ jest.mock(
 jest.mock( 'react-native-hr', () => () => 'Hr' );
 
 jest.mock( 'react-native-svg', () => {
+	const { forwardRef } = require( 'react' );
 	return {
-		Svg: () => 'Svg',
+		Svg: forwardRef( mockComponent( 'Svg' ) ),
 		Path: () => 'Path',
 		Circle: () => 'Circle',
 		G: () => 'G',
@@ -131,6 +132,15 @@ jest.mock( 'react-native-svg', () => {
 		Rect: () => 'Rect',
 	};
 } );
+
+jest.mock(
+	'react-native-video',
+	() => {
+		const { forwardRef } = require( 'react' );
+		return forwardRef( mockComponent( 'ReactNativeVideo' ) );
+	},
+	{ virtual: true }
+);
 
 jest.mock( 'react-native-safe-area', () => {
 	const addEventListener = jest.fn();

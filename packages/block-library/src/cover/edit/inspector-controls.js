@@ -11,6 +11,7 @@ import {
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
+	SelectControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
@@ -102,6 +103,7 @@ export default function CoverInspectorControls( {
 		minHeight,
 		minHeightUnit,
 		alt,
+		tagName,
 	} = attributes;
 	const {
 		isVideoBackground,
@@ -140,6 +142,27 @@ export default function CoverInspectorControls( {
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
+	const htmlElementMessages = {
+		header: __(
+			'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
+		),
+		main: __(
+			'The <main> element should be used for the primary content of your document only. '
+		),
+		section: __(
+			"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
+		),
+		article: __(
+			'The <article> element should represent a self-contained, syndicatable portion of the document.'
+		),
+		aside: __(
+			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+		),
+		footer: __(
+			'The <footer> element should represent a footer for its nearest sectioning element (e.g.: <section>, <article>, <main> etc.).'
+		),
+	};
+
 	return (
 		<>
 			<InspectorControls>
@@ -148,12 +171,14 @@ export default function CoverInspectorControls( {
 						{ isImageBackground && (
 							<>
 								<ToggleControl
+									__nextHasNoMarginBottom
 									label={ __( 'Fixed background' ) }
 									checked={ hasParallax }
 									onChange={ toggleParallax }
 								/>
 
 								<ToggleControl
+									__nextHasNoMarginBottom
 									label={ __( 'Repeated background' ) }
 									checked={ isRepeated }
 									onChange={ toggleIsRepeated }
@@ -225,9 +250,8 @@ export default function CoverInspectorControls( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="color">
+			<InspectorControls group="color">
 				<ColorGradientSettingsDropdown
-					__experimentalHasMultipleOrigins
 					__experimentalIsRenderedInSidebar
 					settings={ [
 						{
@@ -282,7 +306,7 @@ export default function CoverInspectorControls( {
 					/>
 				</ToolsPanelItem>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="dimensions">
+			<InspectorControls group="dimensions">
 				<ToolsPanelItem
 					hasValue={ () => !! minHeight }
 					label={ __( 'Minimum height' ) }
@@ -312,6 +336,26 @@ export default function CoverInspectorControls( {
 						}
 					/>
 				</ToolsPanelItem>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<SelectControl
+					__nextHasNoMarginBottom
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<header>', value: 'header' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<article>', value: 'article' },
+						{ label: '<aside>', value: 'aside' },
+						{ label: '<footer>', value: 'footer' },
+					] }
+					value={ tagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					help={ htmlElementMessages[ tagName ] }
+				/>
 			</InspectorControls>
 		</>
 	);
