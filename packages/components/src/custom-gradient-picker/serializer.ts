@@ -67,7 +67,7 @@ export function serializeGradient( {
 			) => {
 				return colorStop?.length?.value === undefined
 					? 0
-					: parseInt( colorStop?.length?.value );
+					: parseInt( colorStop.length.value );
 			};
 
 			return (
