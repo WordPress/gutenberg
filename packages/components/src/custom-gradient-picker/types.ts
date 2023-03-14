@@ -48,6 +48,14 @@ export type GradientTypePickerProps = {
 
 export type ControlPoint = { color: string; position: number };
 
+// When dealing with unions of objects, using `Omit` to omit a prop will result
+// in a new type each prop is a union of the values for that prop from all of
+// the origional union members. This does not maintain the specific combinations
+// of props present in the original union.
+// To avoid this, the `DistributiveOmit` type will "distribute" the `Omit` across
+// the union. This removes the undesired prop from each member individually,
+// maintaining the relationships between the remaining props.
+// https://stackoverflow.com/questions/57103834/typescript-omit-a-property-from-all-interfaces-in-a-union-but-keep-the-union-s
 type DistributiveOmit< T, K extends keyof any > = T extends any
 	? Omit< T, K >
 	: never;
