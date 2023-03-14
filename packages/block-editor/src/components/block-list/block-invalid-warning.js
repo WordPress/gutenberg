@@ -19,19 +19,6 @@ const blockToBlocks = ( block ) =>
 		HTML: block.originalContent,
 	} );
 
-const recoverBlock = ( block ) =>
-	createBlock( block.name, block.attributes, block.innerBlocks );
-
-const blockToClassic = ( block ) =>
-	createBlock( 'core/freeform', {
-		content: block.originalContent,
-	} );
-
-const blockToHTML = ( block ) =>
-	createBlock( 'core/html', {
-		content: block.originalContent,
-	} );
-
 export default function BlockInvalidWarning( { clientId } ) {
 	const { block, canInsertHTMLBlock, canInsertClassicBlock } = useSelect(
 		( select ) => {
@@ -59,21 +46,33 @@ export default function BlockInvalidWarning( { clientId } ) {
 	const [ compare, setCompare ] = useState( false );
 	const onCompareClose = useCallback( () => setCompare( false ), [] );
 
-	const attemptBlockRecovery = useCallback( () => {
-		replaceBlock( block.clientId, recoverBlock( block ) );
-	}, [ block, replaceBlock ] );
-
-	const convertToClassic = useCallback( () => {
-		replaceBlock( block.clientId, blockToClassic( block ) );
-	}, [ block, replaceBlock ] );
-
-	const convertToHTML = useCallback(
-		() => replaceBlock( block.clientId, blockToHTML( block ) ),
-		[ block, replaceBlock ]
-	);
-
-	const convertToBlocks = useCallback(
-		() => replaceBlock( block.clientId, blockToBlocks( block ) ),
+	const convert = useMemo(
+		() => ( {
+			toClassic() {
+				const classicBlock = createBlock( 'core/freeform', {
+					content: block.originalContent,
+				} );
+				return replaceBlock( block.clientId, classicBlock );
+			},
+			toHTML() {
+				const htmlBlock = createBlock( 'core/html', {
+					content: block.originalContent,
+				} );
+				return replaceBlock( block.clientId, htmlBlock );
+			},
+			toBlocks() {
+				const newBlocks = blockToBlocks( block );
+				return replaceBlock( block.clientId, newBlocks );
+			},
+			toRecoveredBlock() {
+				const recoveredBlock = createBlock(
+					block.name,
+					block.attributes,
+					block.innerBlocks
+				);
+				return replaceBlock( block.clientId, recoveredBlock );
+			},
+		} ),
 		[ block, replaceBlock ]
 	);
 
@@ -87,19 +86,14 @@ export default function BlockInvalidWarning( { clientId } ) {
 				},
 				canInsertHTMLBlock && {
 					title: __( 'Convert to HTML' ),
-					onClick: convertToHTML,
+					onClick: convert.toHTML,
 				},
 				canInsertClassicBlock && {
 					title: __( 'Convert to Classic Block' ),
-					onClick: convertToClassic,
+					onClick: convert.toClassic,
 				},
 			].filter( Boolean ),
-		[
-			canInsertHTMLBlock,
-			convertToHTML,
-			canInsertClassicBlock,
-			convertToClassic,
-		]
+		[ canInsertHTMLBlock, canInsertClassicBlock, convert ]
 	);
 
 	return (
@@ -108,7 +102,7 @@ export default function BlockInvalidWarning( { clientId } ) {
 				actions={ [
 					<Button
 						key="recover"
-						onClick={ attemptBlockRecovery }
+						onClick={ convert.toRecoveredBlock }
 						variant="primary"
 					>
 						{ __( 'Attempt Block Recovery' ) }
@@ -129,8 +123,8 @@ export default function BlockInvalidWarning( { clientId } ) {
 				>
 					<BlockCompare
 						block={ block }
-						onKeep={ convertToHTML }
-						onConvert={ convertToBlocks }
+						onKeep={ convert.toHTML }
+						onConvert={ convert.toBlocks }
 						convertor={ blockToBlocks }
 						convertButtonText={ __( 'Convert to Blocks' ) }
 					/>
