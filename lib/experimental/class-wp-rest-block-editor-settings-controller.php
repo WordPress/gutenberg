@@ -115,7 +115,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'__unstableEnableFullSiteEditingBlocks'  => array(
-					'description' => __( 'Enables experimental Full Site Editing blocks', 'gutenberg' ),
+					'description' => __( 'Enables experimental Site Editor blocks', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
@@ -127,7 +127,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				),
 
 				'supportsTemplateMode'                   => array(
-					'description' => __( 'Returns if the current theme is full site editing-enabled or not.', 'gutenberg' ),
+					'description' => __( 'Indicates whether the current theme supports block-based templates.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
@@ -162,6 +162,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'context'     => array( 'mobile' ),
 				),
 
+				'__experimentalEnableListBlockV2'        => array(
+					'description' => __( 'Whether the V2 of the list block that uses inner blocks should be enabled.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'mobile' ),
+				),
+
 				'alignWide'                              => array(
 					'description' => __( 'Enable/Disable Wide/Full Alignments.', 'gutenberg' ),
 					'type'        => 'boolean',
@@ -186,6 +192,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
 
+				'blockInspectorTabs'                     => array(
+					'description' => __( 'Block inspector tab display overrides.', 'gutenberg' ),
+					'type'        => 'object',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+
 				'disableCustomColors'                    => array(
 					'description' => __( 'Disables custom colors.', 'gutenberg' ),
 					'type'        => 'boolean',
@@ -200,6 +212,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 
 				'disableCustomGradients'                 => array(
 					'description' => __( 'Disables custom font size.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+
+				'disableLayoutStyles'                    => array(
+					'description' => __( 'Disables output of layout styles.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
@@ -283,6 +301,11 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				'spacingScale'                           => array(
 					'description' => __( 'Active theme spacing scale.', 'gutenberg' ),
 					'type'        => 'array',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+				'disableCustomSpacingSizes'              => array(
+					'description' => __( 'Disables custom spacing sizes.', 'gutenberg' ),
+					'type'        => 'boolean',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
 			),

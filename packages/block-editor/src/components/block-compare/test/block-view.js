@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -12,7 +12,7 @@ const noop = () => {};
 
 describe( 'BlockView', () => {
 	test( 'should match snapshot', () => {
-		const wrapper = shallow(
+		const { container } = render(
 			<BlockView
 				title="title"
 				rawContent="raw"
@@ -23,6 +23,6 @@ describe( 'BlockView', () => {
 			/>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

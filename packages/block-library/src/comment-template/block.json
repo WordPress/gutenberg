@@ -9,9 +9,27 @@
 	"textdomain": "default",
 	"usesContext": [ "postId" ],
 	"supports": {
-		"reusable": false,
+		"align": true,
+		"anchor": true,
 		"html": false,
-		"align": true
+		"reusable": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
 	},
 	"style": "wp-block-comment-template"
 }

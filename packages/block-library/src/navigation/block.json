@@ -41,6 +41,10 @@
 			"type": "string",
 			"default": "mobile"
 		},
+		"icon": {
+			"type": "string",
+			"default": "handle"
+		},
 		"hasIcon": {
 			"type": "boolean",
 			"default": true
@@ -63,6 +67,10 @@
 		"maxNestingLevel": {
 			"type": "number",
 			"default": 5
+		},
+		"templateLock": {
+			"type": [ "string", "boolean" ],
+			"enum": [ "all", "insert", "contentOnly", false ]
 		}
 	},
 	"providesContext": {
@@ -94,6 +102,7 @@
 			"__experimentalFontWeight": true,
 			"__experimentalTextTransform": true,
 			"__experimentalFontFamily": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalSkipSerialization": [ "textDecoration" ],
 			"__experimentalDefaultControls": {
@@ -111,6 +120,7 @@
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"allowVerticalAlignment": false,
+			"allowSizingOnChildren": true,
 			"default": {
 				"type": "flex"
 			}

@@ -1,3 +1,44 @@
+// Provide special styling for the placeholder.
+// @todo: this particular minimal style of placeholder could be componentized further.
+.wp-block-image.wp-block-image {
+	// Show Placeholder style on-select.
+	&.is-selected .components-placeholder {
+		// Block UI appearance.
+		color: $gray-900;
+		background-color: $white;
+		box-shadow: inset 0 0 0 $border-width $gray-900;
+		border: none;
+
+		// Disable any duotone filter applied in the selected state.
+		filter: none;
+
+		// @todo: this should eventually be overridden by a custom border-radius set in the inspector.
+		border-radius: $radius-block-ui;
+
+		> svg {
+			opacity: 0;
+		}
+
+		.components-placeholder__illustration {
+			display: none;
+		}
+
+		&::before {
+			opacity: 0;
+		}
+	}
+
+	// Remove the transition while we still have a legacy placeholder style.
+	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
+	// parent border that may get applied when you deselect.
+	.components-placeholder__label,
+	.components-placeholder__instructions,
+	.components-button {
+		transition: none;
+	}
+}
+
+
 figure.wp-block-image:not(.wp-block) {
 	margin: 0;
 }
@@ -14,23 +55,21 @@ figure.wp-block-image:not(.wp-block) {
 		display: inline;
 	}
 
-	// Shown while image is being uploaded
+	// Shown while image is being uploaded.
 	.components-spinner {
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		margin-top: -9px;
-		margin-left: -9px;
-	}
-
-	&:not(.is-style-rounded) > div:not(.components-placeholder) {
-		border-radius: inherit;
+		transform: translate(-50%, -50%);
 	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
 .wp-block-image .components-resizable-box__container {
-	display: inline-block;
+	// Using "display: table" because:
+	// - it visually hides empty white space in between elements
+	// - it allows the element to be as wide as its contents (instead of 100% width, as it would be with `display: block`)
+	display: table;
 	img {
 		display: block;
 		width: inherit;
@@ -94,6 +133,16 @@ figure.wp-block-image:not(.wp-block) {
 	position: relative;
 	max-width: 100%;
 	width: 100%;
+	overflow: hidden;
+
+	// This removes the border from the img within the image cropper so it
+	// can be applied to the cropper itself. This then allows the image to be
+	// cropped within the visual border providing more accurate editing and
+	// smoother UX.
+	.reactEasyCrop_Container .reactEasyCrop_Image {
+		border: none;
+		border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
+	}
 }
 
 .wp-block-image__crop-icon {
@@ -112,17 +161,6 @@ figure.wp-block-image:not(.wp-block) {
 	.components-popover__content {
 		min-width: 260px;
 		overflow: visible !important;
-	}
-
-	.components-range-control {
-		flex: 1;
-	}
-
-	.components-base-control__field {
-		display: flex;
-		margin-bottom: 0;
-		flex-direction: column;
-		align-items: flex-start;
 	}
 }
 

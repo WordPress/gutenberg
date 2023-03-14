@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -21,22 +21,28 @@ jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => jest.fn() );
 describe( 'EditPostPreferencesModal', () => {
 	describe( 'should match snapshot when the modal is active', () => {
 		it( 'large viewports', () => {
-			useSelect.mockImplementation( () => true );
+			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => true );
-			const wrapper = shallow( <EditPostPreferencesModal /> );
-			expect( wrapper ).toMatchSnapshot();
+			render( <EditPostPreferencesModal /> );
+			expect(
+				screen.getByRole( 'dialog', { name: 'Preferences' } )
+			).toMatchSnapshot();
 		} );
 		it( 'small viewports', () => {
-			useSelect.mockImplementation( () => true );
+			useSelect.mockImplementation( () => [ true, true, false ] );
 			useViewportMatch.mockImplementation( () => false );
-			const wrapper = shallow( <EditPostPreferencesModal /> );
-			expect( wrapper ).toMatchSnapshot();
+			render( <EditPostPreferencesModal /> );
+			expect(
+				screen.getByRole( 'dialog', { name: 'Preferences' } )
+			).toMatchSnapshot();
 		} );
 	} );
 
 	it( 'should not render when the modal is not active', () => {
-		useSelect.mockImplementation( () => false );
-		const wrapper = shallow( <EditPostPreferencesModal /> );
-		expect( wrapper.isEmptyRender() ).toBe( true );
+		useSelect.mockImplementation( () => [ false, false, false ] );
+		render( <EditPostPreferencesModal /> );
+		expect(
+			screen.queryByRole( 'dialog', { name: 'Preferences' } )
+		).not.toBeInTheDocument();
 	} );
 } );

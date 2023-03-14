@@ -7,17 +7,14 @@ $z-layers: (
 	".block-editor-block-switcher__arrow": 1,
 	".block-editor-block-list__block {core/image aligned wide or fullwide}": 20,
 	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
-	".block-editor-block-list__layout .reusable-block-indicator": 1,
 	".block-editor-block-list__block-selection-button": 22,
 	".components-form-toggle__input": 1,
 	".edit-post-text-editor__toolbar": 1,
 	".edit-site-code-editor__toolbar": 1,
-	".edit-post-sidebar__panel-tab.is-active": 1,
 
 	// These next three share a stacking context
-	".block-editor-inserter__tabs .components-tab-panel__tab-content": 0, // lower scrolling content
-	".block-editor-inserter__tabs .components-tab-panel__tabs": 1, // higher sticky element
-	".block-editor-inserter__search": 1, // higher sticky element
+	".block-library-template-part__selection-search": 2, // higher sticky element
+	".block-library-query-pattern__selection-search": 2, // higher sticky element
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
@@ -34,7 +31,6 @@ $z-layers: (
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
 	".interface-interface-skeleton__content": 20,
-	".edit-site-header": 62,
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
@@ -81,7 +77,7 @@ $z-layers: (
 	".block-editor-block-contextual-toolbar": 61,
 
 	// Ensures content overlay appears higher than resize containers used for image/video/etc.
-	".block-editor-block-content-overlay__overlay": 10,
+	".block-editor-block-list__block.has-block-overlay": 10,
 
 	// Query block setup state.
 	".block-editor-block-pattern-setup .pattern-slide": 100,
@@ -92,35 +88,23 @@ $z-layers: (
 	// #wpadminbar { z-index: 99999 }
 	".interface-interface-skeleton__sidebar": 100000,
 	".edit-post-layout__toggle-sidebar-panel": 100000,
-	".edit-site-sidebar": 100000,
 	".edit-widgets-sidebar": 100000,
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
 	// For larger views, the wp-admin navbar dropdown should be at top of
 	// the Publish Post sidebar.
 	".edit-post-layout .edit-post-post-publish-panel {greater than small}": 99998,
 
-	".entities-saved-states__panel": 100001,
 	// For larger views, the wp-admin navbar dropdown should be on top of
 	// the multi-entity saving sidebar.
-	".entities-saved-states__panel {greater than small}": 99998,
 	".edit-site-editor__toggle-save-panel": 100000,
 
 	// Show sidebar in greater than small viewports above editor related elements
 	// but below #adminmenuback { z-index: 100 }
 	".interface-interface-skeleton__sidebar {greater than small}": 90,
-	".edit-site-sidebar {greater than small}": 90,
 	".edit-widgets-sidebar {greater than small}": 90,
 
 	// Show interface skeleton footer above interface skeleton drawer
 	".interface-interface-skeleton__footer": 90,
-
-	// Show the navigation toggle above the skeleton header
-	".edit-site-navigation-toggle": 31,
-	// Show the navigation link above the skeleton header
-	".edit-site-navigation-link": 31,
-
-	// Show the FSE template previews above the editor and any open block toolbars
-	".edit-site-navigation-panel__preview": 32,
 
 	// Above the block list and the header.
 	".block-editor-block-popover": 31,
@@ -139,6 +123,7 @@ $z-layers: (
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".edit-site-create-template-part-modal": 1000001,
 	".block-editor-block-lock-modal": 1000001,
+	".block-editor-template-part__selection-modal": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
 	// because it uses emotion and not sass. We need it to render on top its parent popover.
@@ -149,17 +134,17 @@ $z-layers: (
 	".components-popover.interface-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
 	".components-popover.block-editor-warning__dropdown": 99998,
-	".components-popover.edit-navigation-menu-actions__switcher-dropdown": 99998,
 
 	".components-autocomplete__results": 1000000,
 
 	".skip-to-selected-block": 100000,
 	".interface-interface-skeleton__actions": 100000,
+	".edit-site-layout__actions": 100000,
 
-	// Show NUX tips above popovers, wp-admin menus, submenus, and sidebar:
-	".nux-dot-tip": 1000001,
+	// The focus styles of the region navigation containers should be above their content.
+	".is-focusing-regions {region} :focus::after": 1000000,
 
-	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
+	// Show tooltips above wp-admin menus, submenus, and sidebar:
 	".components-tooltip": 1000002,
 
 	// Keep template popover underneath 'Create custom template' modal overlay.
@@ -184,13 +169,19 @@ $z-layers: (
 	".components-circular-option-picker__option.is-pressed": 1,
 	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
 	".components-circular-option-picker__option.is-pressed + svg": 2,
-	".edit-navigation-layout__overlay": 999,
 
 	// Appear under the customizer heading UI, but over anything else.
 	".customize-widgets__topbar": 8,
 
 	// Appear under the topbar.
 	".customize-widgets__block-toolbar": 7,
+
+	// Site editor layout
+	".edit-site-layout__hub": 3,
+	".edit-site-layout__header": 2,
+	".edit-site-layout__canvas-container": 2,
+	".edit-site-layout__sidebar": 1,
+	".edit-site-layout__canvas-container.is-resizing::after": 100,
 );
 
 @function z-index( $key ) {

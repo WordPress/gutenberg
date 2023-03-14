@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,20 +10,20 @@ import { PostPendingStatusCheck } from '../check';
 
 describe( 'PostPendingStatusCheck', () => {
 	it( "should not render anything if the user doesn't have the right capabilities", () => {
-		const wrapper = shallow(
+		render(
 			<PostPendingStatusCheck hasPublishAction={ false }>
 				status
 			</PostPendingStatusCheck>
 		);
-		expect( wrapper.type() ).toBe( null );
+		expect( screen.queryByText( 'status' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should render if the user has the correct capability', () => {
-		const wrapper = shallow(
+		render(
 			<PostPendingStatusCheck hasPublishAction={ true }>
 				status
 			</PostPendingStatusCheck>
 		);
-		expect( wrapper.type() ).not.toBe( null );
+		expect( screen.getByText( 'status' ) ).toBeVisible();
 	} );
 } );

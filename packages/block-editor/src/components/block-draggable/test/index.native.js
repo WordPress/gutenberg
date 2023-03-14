@@ -29,15 +29,6 @@ import {
 	getDraggableChip,
 } from './helpers';
 
-// Mock throttle to allow updating the dragging position on every "onDragOver" event.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
-	throttle: ( fn ) => {
-		fn.cancel = jest.fn();
-		return fn;
-	},
-} ) );
-
 beforeAll( () => {
 	// Register all core blocks
 	registerCoreBlocks();
@@ -102,11 +93,13 @@ describe( 'BlockDraggable', () => {
 			it( 'enables drag mode when unselected', async () =>
 				withReanimatedTimer( async () => {
 					const screen = await initializeWithBlocksLayouts( BLOCKS );
-					const { getByA11yLabel } = screen;
 
 					// Start dragging from block's content
+					const [ paragraphBlock ] = screen.getAllByLabelText(
+						/Paragraph Block\. Row 1/
+					);
 					fireLongPress(
-						getByA11yLabel( /Paragraph Block\. Row 1/ ),
+						paragraphBlock,
 						'draggable-trigger-content'
 					);
 					expect( getDraggableChip( screen ) ).toBeVisible();
@@ -121,12 +114,12 @@ describe( 'BlockDraggable', () => {
 			it( 'enables drag mode when selected', async () =>
 				withReanimatedTimer( async () => {
 					const screen = await initializeWithBlocksLayouts( BLOCKS );
-					const { getByA11yLabel } = screen;
+
 					const blockDraggableWrapper = getByGestureTestId(
 						'block-draggable-wrapper'
 					);
 
-					const paragraphBlock = getByA11yLabel(
+					const [ paragraphBlock ] = screen.getAllByLabelText(
 						/Paragraph Block\. Row 1/
 					);
 					fireEvent.press( paragraphBlock );
@@ -155,9 +148,8 @@ describe( 'BlockDraggable', () => {
 			it( 'does not enable drag mode when selected and editing text', async () =>
 				withReanimatedTimer( async () => {
 					const screen = await initializeWithBlocksLayouts( BLOCKS );
-					const { getByA11yLabel } = screen;
 
-					const paragraphBlock = getByA11yLabel(
+					const [ paragraphBlock ] = screen.getAllByLabelText(
 						/Paragraph Block\. Row 1/
 					);
 
@@ -187,13 +179,12 @@ describe( 'BlockDraggable', () => {
 			it( 'finishes editing text and enables drag mode when long-pressing over a different block', async () =>
 				withReanimatedTimer( async () => {
 					const screen = await initializeWithBlocksLayouts( BLOCKS );
-					const { getByA11yLabel } = screen;
 
-					const paragraphBlock = getByA11yLabel(
+					const [ paragraphBlock ] = screen.getAllByLabelText(
 						/Paragraph Block\. Row 1/
 					);
-					const spacerBlock =
-						getByA11yLabel( /Spacer Block\. Row 3/ );
+					const [ spacerBlock ] =
+						screen.getAllByLabelText( /Spacer Block\. Row 3/ );
 
 					// Select Paragraph block and start editing text
 					fireEvent.press( paragraphBlock );
@@ -217,12 +208,11 @@ describe( 'BlockDraggable', () => {
 			it( 'enables drag mode when unselected', async () =>
 				withReanimatedTimer( async () => {
 					const screen = await initializeWithBlocksLayouts( BLOCKS );
-					const { getAllByA11yLabel } = screen;
 
 					// We select the first Image block as the Gallery block
 					// also contains Image blocks.
-					const imageBlock =
-						getAllByA11yLabel( /Image Block\. Row 2/ )[ 0 ];
+					const [ imageBlock ] =
+						screen.getAllByLabelText( /Image Block\. Row 2/ );
 					// Start dragging from block's content
 					fireLongPress( imageBlock, 'draggable-trigger-content' );
 					expect( getDraggableChip( screen ) ).toBeVisible();
@@ -237,15 +227,14 @@ describe( 'BlockDraggable', () => {
 			it( 'enables drag mode when selected', async () =>
 				withReanimatedTimer( async () => {
 					const screen = await initializeWithBlocksLayouts( BLOCKS );
-					const { getAllByA11yLabel } = screen;
 					const blockDraggableWrapper = getByGestureTestId(
 						'block-draggable-wrapper'
 					);
 
 					// We select the first Image block as the Gallery block
 					// also contains Image blocks.
-					const imageBlock =
-						getAllByA11yLabel( /Image Block\. Row 2/ )[ 0 ];
+					const [ imageBlock ] =
+						screen.getAllByLabelText( /Image Block\. Row 2/ );
 					fireEvent.press( imageBlock );
 
 					// Start dragging from block's content
@@ -271,15 +260,15 @@ describe( 'BlockDraggable', () => {
 			it( 'enables drag mode when unselected', async () =>
 				withReanimatedTimer( async () => {
 					const screen = await initializeWithBlocksLayouts( BLOCKS );
-					const { getByA11yLabel } = screen;
 
 					// Start dragging from block's content, specifically the first
 					// trigger index, which corresponds to the Gallery block content.
-					fireLongPress(
-						getByA11yLabel( /Gallery Block\. Row 4/ ),
-						'draggable-trigger-content',
-						{ triggerIndex: 0 }
+					const [ galleryBlock ] = screen.getAllByLabelText(
+						/Gallery Block\. Row 4/
 					);
+					fireLongPress( galleryBlock, 'draggable-trigger-content', {
+						triggerIndex: 0,
+					} );
 					expect( getDraggableChip( screen ) ).toBeVisible();
 
 					// "firePanGesture" finishes the dragging gesture
@@ -292,12 +281,11 @@ describe( 'BlockDraggable', () => {
 			it( 'enables drag mode when selected', async () =>
 				withReanimatedTimer( async () => {
 					const screen = await initializeWithBlocksLayouts( BLOCKS );
-					const { getByA11yLabel } = screen;
 					const blockDraggableWrapper = getByGestureTestId(
 						'block-draggable-wrapper'
 					);
 
-					const galleryBlock = getByA11yLabel(
+					const [ galleryBlock ] = screen.getAllByLabelText(
 						/Gallery Block\. Row 4/
 					);
 					await waitForStoreResolvers( () =>
@@ -328,16 +316,15 @@ describe( 'BlockDraggable', () => {
 			it( 'enables drag mode when nested block is selected', async () =>
 				withReanimatedTimer( async () => {
 					const screen = await initializeWithBlocksLayouts( BLOCKS );
-					const { getByA11yLabel } = screen;
 					const blockDraggableWrapper = getByGestureTestId(
 						'block-draggable-wrapper'
 					);
 
-					const galleryBlock = getByA11yLabel(
+					const [ galleryBlock ] = screen.getAllByLabelText(
 						/Gallery Block\. Row 4/
 					);
-					const galleryItem =
-						within( galleryBlock ).getByA11yLabel(
+					const [ galleryItem ] =
+						within( galleryBlock ).getAllByLabelText(
 							/Image Block\. Row 2/
 						);
 					fireEvent.press( galleryBlock );
@@ -370,13 +357,11 @@ describe( 'BlockDraggable', () => {
 			it( 'enables drag mode when unselected', async () =>
 				withReanimatedTimer( async () => {
 					const screen = await initializeWithBlocksLayouts( BLOCKS );
-					const { getByA11yLabel } = screen;
 
 					// Start dragging from block's content
-					fireLongPress(
-						getByA11yLabel( /Spacer Block\. Row 3/ ),
-						'draggable-trigger-content'
-					);
+					const [ spacerBlock ] =
+						screen.getAllByLabelText( /Spacer Block\. Row 3/ );
+					fireLongPress( spacerBlock, 'draggable-trigger-content' );
 					expect( getDraggableChip( screen ) ).toBeVisible();
 
 					// "firePanGesture" finishes the dragging gesture
@@ -389,13 +374,12 @@ describe( 'BlockDraggable', () => {
 			it( 'enables drag mode when selected', async () =>
 				withReanimatedTimer( async () => {
 					const screen = await initializeWithBlocksLayouts( BLOCKS );
-					const { getByA11yLabel } = screen;
 					const blockDraggableWrapper = getByGestureTestId(
 						'block-draggable-wrapper'
 					);
 
-					const spacerBlock =
-						getByA11yLabel( /Spacer Block\. Row 3/ );
+					const [ spacerBlock ] =
+						screen.getAllByLabelText( /Spacer Block\. Row 3/ );
 					await waitForStoreResolvers( () =>
 						fireEvent.press( spacerBlock )
 					);
@@ -422,9 +406,7 @@ describe( 'BlockDraggable', () => {
 
 	it( 'moves blocks', async () =>
 		withReanimatedTimer( async () => {
-			const { getByA11yLabel } = await initializeWithBlocksLayouts(
-				BLOCKS
-			);
+			const screen = await initializeWithBlocksLayouts( BLOCKS );
 			const blockDraggableWrapper = getByGestureTestId(
 				'block-draggable-wrapper'
 			);
@@ -432,10 +414,10 @@ describe( 'BlockDraggable', () => {
 			expect( getEditorHtml() ).toMatchSnapshot( 'Initial order' );
 
 			// Move Paragraph block from first to second position
-			fireLongPress(
-				getByA11yLabel( /Paragraph Block\. Row 1/ ),
-				'draggable-trigger-content'
+			const [ paragraphBlock ] = screen.getAllByLabelText(
+				/Paragraph Block\. Row 1/
 			);
+			fireLongPress( paragraphBlock, 'draggable-trigger-content' );
 			firePanGesture( blockDraggableWrapper, [
 				{
 					id: TOUCH_EVENT_ID,
@@ -462,10 +444,9 @@ describe( 'BlockDraggable', () => {
 			);
 
 			// Move Spacer block from third to first position
-			fireLongPress(
-				getByA11yLabel( /Spacer Block\. Row 3/ ),
-				'draggable-trigger-content'
-			);
+			const [ spacerBlock ] =
+				screen.getAllByLabelText( /Spacer Block\. Row 3/ );
+			fireLongPress( spacerBlock, 'draggable-trigger-content' );
 			firePanGesture( blockDraggableWrapper, [
 				{
 					id: TOUCH_EVENT_ID,

@@ -1,22 +1,18 @@
 /**
  * External dependencies
  */
-import {
-	filter,
-	find,
-	get,
-	isEmpty,
-	map,
-	mapValues,
-	omit,
-	uniqBy,
-} from 'lodash';
+import { get, isEmpty, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { omit } from '../api/utils';
 
 /**
  * @typedef {Object} WPBlockCategory
@@ -49,6 +45,16 @@ function keyBlockTypesByName( types ) {
 		} ),
 		{}
 	);
+}
+
+// Filter items to ensure they're unique by their name.
+function getUniqueItemsByName( items ) {
+	return items.reduce( ( acc, currentItem ) => {
+		if ( ! acc.some( ( item ) => item.name === currentItem.name ) ) {
+			acc.push( currentItem );
+		}
+		return acc;
+	}, [] );
 }
 
 /**
@@ -99,7 +105,7 @@ export function blockTypes( state = {}, action ) {
 }
 
 /**
- * Reducer managing the block style variations.
+ * Reducer managing the block styles.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -113,40 +119,36 @@ export function blockStyles( state = {}, action ) {
 				...state,
 				...mapValues(
 					keyBlockTypesByName( action.blockTypes ),
-					( blockType ) => {
-						return uniqBy(
-							[
-								...get( blockType, [ 'styles' ], [] ).map(
-									( style ) => ( {
-										...style,
-										source: 'block',
-									} )
-								),
-								...get( state, [ blockType.name ], [] ).filter(
-									( { source } ) => 'block' !== source
-								),
-							],
-							( style ) => style.name
-						);
-					}
+					( blockType ) =>
+						getUniqueItemsByName( [
+							...get( blockType, [ 'styles' ], [] ).map(
+								( style ) => ( {
+									...style,
+									source: 'block',
+								} )
+							),
+							...get( state, [ blockType.name ], [] ).filter(
+								( { source } ) => 'block' !== source
+							),
+						] )
 				),
 			};
 		case 'ADD_BLOCK_STYLES':
 			return {
 				...state,
-				[ action.blockName ]: uniqBy(
-					[
-						...get( state, [ action.blockName ], [] ),
-						...action.styles,
-					],
-					( style ) => style.name
-				),
+				[ action.blockName ]: getUniqueItemsByName( [
+					...get( state, [ action.blockName ], [] ),
+					...action.styles,
+				] ),
 			};
 		case 'REMOVE_BLOCK_STYLES':
 			return {
 				...state,
-				[ action.blockName ]: filter(
-					get( state, [ action.blockName ], [] ),
+				[ action.blockName ]: get(
+					state,
+					[ action.blockName ],
+					[]
+				).filter(
 					( style ) => action.styleNames.indexOf( style.name ) === -1
 				),
 			};
@@ -171,39 +173,36 @@ export function blockVariations( state = {}, action ) {
 				...mapValues(
 					keyBlockTypesByName( action.blockTypes ),
 					( blockType ) => {
-						return uniqBy(
-							[
-								...get( blockType, [ 'variations' ], [] ).map(
-									( variation ) => ( {
-										...variation,
-										source: 'block',
-									} )
-								),
-								...get( state, [ blockType.name ], [] ).filter(
-									( { source } ) => 'block' !== source
-								),
-							],
-							( variation ) => variation.name
-						);
+						return getUniqueItemsByName( [
+							...get( blockType, [ 'variations' ], [] ).map(
+								( variation ) => ( {
+									...variation,
+									source: 'block',
+								} )
+							),
+							...get( state, [ blockType.name ], [] ).filter(
+								( { source } ) => 'block' !== source
+							),
+						] );
 					}
 				),
 			};
 		case 'ADD_BLOCK_VARIATIONS':
 			return {
 				...state,
-				[ action.blockName ]: uniqBy(
-					[
-						...get( state, [ action.blockName ], [] ),
-						...action.variations,
-					],
-					( variation ) => variation.name
-				),
+				[ action.blockName ]: getUniqueItemsByName( [
+					...get( state, [ action.blockName ], [] ),
+					...action.variations,
+				] ),
 			};
 		case 'REMOVE_BLOCK_VARIATIONS':
 			return {
 				...state,
-				[ action.blockName ]: filter(
-					get( state, [ action.blockName ], [] ),
+				[ action.blockName ]: get(
+					state,
+					[ action.blockName ],
+					[]
+				).filter(
 					( variation ) =>
 						action.variationNames.indexOf( variation.name ) === -1
 				),
@@ -266,9 +265,11 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 			if ( ! action.category || isEmpty( action.category ) ) {
 				return state;
 			}
-			const categoryToChange = find( state, [ 'slug', action.slug ] );
+			const categoryToChange = state.find(
+				( { slug } ) => slug === action.slug
+			);
 			if ( categoryToChange ) {
-				return map( state, ( category ) => {
+				return state.map( ( category ) => {
 					if ( category.slug === action.slug ) {
 						return {
 							...category,

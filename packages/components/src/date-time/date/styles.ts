@@ -2,27 +2,111 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
  */
 import Button from '../../button';
-import { COLORS } from '../../utils';
-import { VStack } from '../../v-stack';
+import { COLORS, CONFIG } from '../../utils';
+import { HStack } from '../../h-stack';
+import { Heading } from '../../heading';
+import { space } from '../../ui/utils/space';
 
-// Styles that overrides the calendar styling provided by react-dates go in
-// style.scss. Everything else goes here.
+export const Wrapper = styled.div`
+	box-sizing: border-box;
+`;
 
-export const Day = styled( VStack )< { hasEvents: boolean } >`
-	height: 100%;
+export const Navigator = styled( HStack )`
+	margin-bottom: ${ space( 4 ) };
+`;
+
+export const NavigatorHeading = styled( Heading )`
+	font-size: ${ CONFIG.fontSize };
+	font-weight: ${ CONFIG.fontWeight };
+
+	strong {
+		font-weight: ${ CONFIG.fontWeightHeading };
+	}
+`;
+
+export const Calendar = styled.div`
+	column-gap: ${ space( 2 ) };
+	display: grid;
+	grid-template-columns: 0.5fr repeat( 5, 1fr ) 0.5fr;
+	justify-items: center;
+	row-gap: ${ space( 2 ) };
+`;
+
+export const DayOfWeek = styled.div`
+	color: ${ COLORS.gray[ 700 ] };
+	font-size: ${ CONFIG.fontSize };
+	line-height: ${ CONFIG.fontLineHeightBase };
+
+	&:nth-of-type( 1 ) {
+		justify-self: start;
+	}
+
+	&:nth-of-type( 7 ) {
+		justify-self: end;
+	}
+`;
+
+export const DayButton = styled( Button, {
+	shouldForwardProp: ( prop: string ) =>
+		! [ 'column', 'isSelected', 'isToday', 'hasEvents' ].includes( prop ),
+} )< {
+	column: number;
+	isSelected: boolean;
+	isToday: boolean;
+	hasEvents: boolean;
+} >`
+	grid-column: ${ ( props ) => props.column };
 	position: relative;
+	justify-content: center;
+
+	${ ( props ) =>
+		props.column === 1 &&
+		`
+		justify-self: start;
+		` }
+
+	${ ( props ) =>
+		props.column === 7 &&
+		`
+		justify-self: end;
+		` }
+
+	${ ( props ) =>
+		props.disabled &&
+		`
+		pointer-events: none;
+		` }
+
+	&&& {
+		border-radius: 100%;
+		height: ${ space( 7 ) };
+		width: ${ space( 7 ) };
+
+		${ ( props ) =>
+			props.isSelected &&
+			`
+			background: ${ COLORS.ui.theme };
+			color: ${ COLORS.white };
+			` }
+
+		${ ( props ) =>
+			! props.isSelected &&
+			props.isToday &&
+			`
+			background: ${ COLORS.gray[ 200 ] };
+			` }
+	}
 
 	${ ( props ) =>
 		props.hasEvents &&
 		`
 		::before {
-			background: var(--wp-admin-theme-color);
+			background: ${ props.isSelected ? COLORS.white : COLORS.ui.theme };
 			border-radius: 2px;
 			bottom: 0;
 			content: " ";
@@ -31,25 +115,6 @@ export const Day = styled( VStack )< { hasEvents: boolean } >`
 			margin-left: -2px;
 			position: absolute;
 			width: 4px;
-
-			.CalendarDay__selected & {
-				background: ${ COLORS.white };
-			}
 		}
 		` }
-`;
-
-const baseNavButton = css`
-	position: absolute;
-	top: 15px;
-`;
-
-export const NavPrevButton = styled( Button )`
-	${ baseNavButton }
-	left: 0;
-`;
-
-export const NavNextButton = styled( Button )`
-	${ baseNavButton }
-	right: 0;
 `;

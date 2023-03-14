@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, kebabCase } from 'lodash';
 
 /**
  * Internal dependencies
@@ -22,10 +22,10 @@ import {
 /**
  * Returns a JSON representation of the generated CSS rules.
  *
- * @param  style   Style object.
- * @param  options Options object with settings to adjust how the styles are generated.
- * @param  path    An array of strings representing the path to the style value in the style object.
- * @param  ruleKey A CSS property key.
+ * @param style   Style object.
+ * @param options Options object with settings to adjust how the styles are generated.
+ * @param path    An array of strings representing the path to the style value in the style object.
+ * @param ruleKey A CSS property key.
  *
  * @return GeneratedCSSRule[] CSS rules.
  */
@@ -34,7 +34,7 @@ export function generateRule(
 	options: StyleOptions,
 	path: string[],
 	ruleKey: string
-) {
+): GeneratedCSSRule[] {
 	const styleValue: string | undefined = get( style, path );
 
 	return styleValue
@@ -107,7 +107,7 @@ export function generateBoxRules(
 /**
  * Returns a CSS var value from incoming style value following the pattern `var:description|context|slug`.
  *
- * @param  styleValue A raw style value.
+ * @param styleValue A raw style value.
  *
  * @return string A CSS var value.
  */
@@ -119,6 +119,7 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 		const variable = styleValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.map( ( presetVariable ) => kebabCase( presetVariable ) )
 			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
 		return `var(--wp--${ variable })`;
 	}
@@ -128,10 +129,23 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 /**
  * Capitalizes the first letter in a string.
  *
- * @param {string} str The string whose first letter the function will capitalize.
+ * @param string The string whose first letter the function will capitalize.
  *
- * @return string A CSS var value.
+ * @return String with the first letter capitalized.
  */
-export function upperFirst( [ firstLetter, ...rest ]: string ) {
+export function upperFirst( string: string ): string {
+	const [ firstLetter, ...rest ] = string;
 	return firstLetter.toUpperCase() + rest.join( '' );
+}
+
+/**
+ * Converts an array of strings into a camelCase string.
+ *
+ * @param strings The strings to join into a camelCase string.
+ *
+ * @return camelCase string.
+ */
+export function camelCaseJoin( strings: string[] ): string {
+	const [ firstItem, ...rest ] = strings;
+	return firstItem.toLowerCase() + rest.map( upperFirst ).join( '' );
 }

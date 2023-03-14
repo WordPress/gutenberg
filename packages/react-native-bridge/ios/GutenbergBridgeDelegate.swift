@@ -21,6 +21,7 @@ public enum Capabilities: String {
     case contactInfoBlock
     case layoutGridBlock
     case tiledGalleryBlock
+    case videoPressBlock
     case mediaFilesCollectionBlock
     case mentions
     case xposts
@@ -32,6 +33,9 @@ public enum Capabilities: String {
     case instagramEmbed
     case loomEmbed
     case smartframeEmbed
+    case shouldUseFastImage
+    case supportSection
+    case onlyCoreBlocks
 }
 
 /// Wrapper for single block data

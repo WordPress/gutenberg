@@ -4,7 +4,6 @@
 const inquirer = require( 'inquirer' );
 const checkSync = require( 'check-node-version' );
 const tools = require( 'check-node-version/tools' );
-const { forEach } = require( 'lodash' );
 const { promisify } = require( 'util' );
 
 /**
@@ -21,13 +20,15 @@ async function checkSystemRequirements( engines ) {
 		log.error( 'Minimum system requirements not met!' );
 		log.info( '' );
 
-		forEach( result.versions, ( { isSatisfied, wanted }, name ) => {
-			if ( ! isSatisfied ) {
-				log.error(
-					`Error: Wanted ${ name } version ${ wanted.raw } (${ wanted.range })`
-				);
+		Object.entries( result.versions ).forEach(
+			( [ name, { isSatisfied, wanted } ] ) => {
+				if ( ! isSatisfied ) {
+					log.error(
+						`Error: Wanted ${ name } version ${ wanted.raw } (${ wanted.range })`
+					);
+				}
 			}
-		} );
+		);
 
 		log.info( '' );
 		log.error( 'The program may not complete correctly if you continue.' );
@@ -46,13 +47,16 @@ async function checkSystemRequirements( engines ) {
 			log.error( 'Cancelled.' );
 			log.info( '' );
 
-			forEach( result.versions, ( { isSatisfied, wanted }, name ) => {
-				if ( ! isSatisfied ) {
-					log.info(
-						tools[ name ].getInstallInstructions( wanted.raw )
-					);
+			Object.entries( result.versions ).forEach(
+				( [ name, { isSatisfied, wanted } ] ) => {
+					if ( ! isSatisfied ) {
+						log.info(
+							tools[ name ].getInstallInstructions( wanted.raw )
+						);
+					}
 				}
-			} );
+			);
+
 			process.exit( 1 );
 		}
 	}

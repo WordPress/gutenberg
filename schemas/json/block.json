@@ -17,7 +17,7 @@
 		},
 		"apiVersion": {
 			"type": "integer",
-			"description": "The version of the Block API used by the block. The most recent version is 2 and it was introduced in WordPress 5.6.\n\n See the the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
+			"description": "The version of the Block API used by the block. The most recent version is 2 and it was introduced in WordPress 5.6.\n\n See the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
 			"default": 1,
 			"enum": [ 1, 2 ]
 		},
@@ -27,7 +27,7 @@
 			"description": "The name for a block is a unique string that identifies a block. Names have to be structured as `namespace/block-name`, where namespace is the name of your plugin or theme."
 		},
 		"__experimental": {
-			"description": "The name of the experiment this block is a part of, or boolean true if there there is no specific experiment name.",
+			"description": "The name of the experiment this block is a part of, or boolean true if there is no specific experiment name.",
 			"anyOf": [
 				{
 					"type": "string"
@@ -160,6 +160,7 @@
 								"attribute",
 								"text",
 								"html",
+								"raw",
 								"query",
 								"meta"
 							]
@@ -182,13 +183,20 @@
 						},
 						"meta": {
 							"type": "string",
-							"description": "Although attributes may be obtained from a post’s meta, meta attribute sources are considered deprecated; EntityProvider and related hook APIs should be used instead, as shown in the Create Meta Block how-to here:\n\nhttps://developer.wordpress.org/block-editor/how-to-guides/metabox/meta-block-3-add/"
+							"description": "Although attributes may be obtained from a post’s meta, meta attribute sources are considered deprecated; EntityProvider and related hook APIs should be used instead, as shown in the Create Meta Block how-to here:\n\nhttps://developer.wordpress.org/block-editor/how-to-guides/metabox/#step-2-add-meta-block"
 						},
 						"default": {
 							"description": "A block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
 						}
 					},
-					"required": [ "type" ]
+					"anyOf": [
+						{
+							"required": [ "type" ]
+						},
+						{
+							"required": [ "enum" ]
+						}
+					]
 				}
 			},
 			"additionalProperties": false
@@ -211,7 +219,7 @@
 		},
 		"supports": {
 			"type": "object",
-			"description": "It contains as set of options to control features used in the editor. See the the supports documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/ for more details.",
+			"description": "It contains as set of options to control features used in the editor. See the supports documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/ for more details.",
 			"properties": {
 				"anchor": {
 					"type": "boolean",
@@ -261,22 +269,27 @@
 					"properties": {
 						"background": {
 							"type": "boolean",
-							"description": "This property adds UI controls which allow the user to apply a solid background color to a block.\n\nWhen color support is declared, this property is enabled by default (along with text), so simply setting color will enable background color.\n\nTo disable background support while keeping other color supports enabled, set to false.\n\nWhen the block declares support for color.background, the attributes definition is extended to include two new attributes: backgroundColor and style",
+							"description": "This property adds UI controls which allow the user to apply a solid background color to a block.\n\nWhen color support is declared, this property is enabled by default (along with text), so simply setting color will enable background color.\n\nTo disable background support while keeping other color supports enabled, set to false.\n\nWhen the block declares support for color.background, its attributes definition is extended to include two new attributes: backgroundColor and style",
 							"default": true
 						},
 						"gradients": {
 							"type": "boolean",
-							"description": "This property adds UI controls which allow the user to apply a gradient background to a block.\n\nGradient presets are sourced from editor-gradient-presets theme support.\n\nWhen the block declares support for color.gradient, the attributes definition is extended to include two new attributes: gradient and style",
+							"description": "This property adds UI controls which allow the user to apply a gradient background to a block.\n\nGradient presets are sourced from editor-gradient-presets theme support.\n\nWhen the block declares support for color.gradient, its attributes definition is extended to include two new attributes: gradient and style",
 							"default": false
 						},
 						"link": {
 							"type": "boolean",
-							"description": "This property adds block controls which allow the user to set link color in a block, link color is disabled by default.\n\nLink color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.link, the attributes definition is extended to include two new attributes: linkColor and style",
+							"description": "This property adds block controls which allow the user to set link color in a block, link color is disabled by default.\n\nLink color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.link, its attributes definition is extended to include the style attribute",
 							"default": false
 						},
 						"text": {
 							"type": "boolean",
-							"description": "This property adds block controls which allow the user to set text color in a block.\n\nWhen color support is declared, this property is enabled by default (along with background), so simply setting color will enable text color.\n\nText color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.text, the attributes definition is extended to include two new attributes: textColor and style",
+							"description": "This property adds block controls which allow the user to set text color in a block.\n\nWhen color support is declared, this property is enabled by default (along with background), so simply setting color will enable text color.\n\nText color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.text, its attributes definition is extended to include two new attributes: textColor and style",
+							"default": true
+						},
+						"enableContrastChecker": {
+							"type": "boolean",
+							"description": "Determines whether the contrast checker widget displays in the block editor UI.\n\nThe contrast checker appears only if the block declares support for color. It tests the readability of color combinations and warns if there is a potential issue. The property is enabled by default.\n\nSet to `false` to explicitly disable.",
 							"default": true
 						}
 					}
@@ -291,6 +304,17 @@
 					"description": "When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to false.",
 					"default": true
 				},
+				"dimensions": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific dimensions property, its attributes definition is extended to include the style attribute.",
+					"properties": {
+						"minHeight": {
+							"type": "boolean",
+							"description": "Allow blocks to define a minimum height value.",
+							"default": false
+						}
+					}
+				},
 				"html": {
 					"type": "boolean",
 					"description": "By default, a block’s markup can be edited individually. To disable this behavior, set html to false.",
@@ -298,7 +322,7 @@
 				},
 				"inserter": {
 					"type": "boolean",
-					"description": "By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set inserter to false.",
+					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set inserter to false.",
 					"default": true
 				},
 				"multiple": {
@@ -316,9 +340,20 @@
 					"description": "A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block 'Options' dropdown by default. To disable this behavior, set lock to false.",
 					"default": true
 				},
+				"position": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific position property, its attributes definition is extended to include the style attribute.",
+					"properties": {
+						"sticky": {
+							"type": "boolean",
+							"description": "Allow blocks to stick to their immediate parent when scrolling the page.",
+							"default": false
+						}
+					}
+				},
 				"spacing": {
 					"type": "object",
-					"description": "This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if the theme declares support.\n\nWhen the block declares support for a specific spacing property, the attributes definition is extended to include the style attribute.",
+					"description": "This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific spacing property, its attributes definition is extended to include the style attribute.",
 					"properties": {
 						"margin": {
 							"oneOf": [
@@ -376,16 +411,16 @@
 				},
 				"typography": {
 					"type": "object",
-					"description": "This value signals that a block supports some of the CSS style properties related to typography. When it does, the block editor will show UI controls for the user to set their values, if the theme declares support.\n\nWhen the block declares support for a specific typography property, the attributes definition is extended to include the style attribute.",
+					"description": "This value signals that a block supports some of the CSS style properties related to typography. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific typography property, its attributes definition is extended to include the style attribute.",
 					"properties": {
 						"fontSize": {
 							"type": "boolean",
-							"description": "This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.\n\nThe values shown in this control are the ones declared by the theme via the editor-font-sizes theme support, or the default ones if none is provided.\n\nWhen the block declares support for fontSize, the attributes definition is extended to include two new attributes: fontSize and style",
+							"description": "This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.\n\nThe values shown in this control are the ones declared by the theme via the editor-font-sizes theme support, or the default ones if none is provided.\n\nWhen the block declares support for fontSize, its attributes definition is extended to include two new attributes: fontSize and style",
 							"default": false
 						},
 						"lineHeight": {
 							"type": "boolean",
-							"description": "This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for lineHeight, the attributes definition is extended to include a new attribute style of object type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own style attribute with a default",
+							"description": "This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for lineHeight, its attributes definition is extended to include a new attribute style of object type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own style attribute with a default",
 							"default": false
 						}
 					}
@@ -395,7 +430,7 @@
 		},
 		"styles": {
 			"type": "array",
-			"description": "Block styles can be used to provide alternative styles to block. It works by adding a class name to the block’s wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.\n\nPlugins and Themes can also register custom block style for existing blocks.\n\nhttps://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/#block-styles",
+			"description": "Block styles can be used to provide alternative styles to block. It works by adding a class name to the block’s wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.\n\nPlugins and Themes can also register custom block style for existing blocks.\n\nhttps://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles",
 			"items": {
 				"type": "object",
 				"properties": {
@@ -416,7 +451,7 @@
 		},
 		"example": {
 			"type": "object",
-			"description": "It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.\n\nSee the the example documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#example-optional for more details.",
+			"description": "It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.\n\nSee the example documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#example-optional for more details.",
 			"properties": {
 				"viewportWidth": {
 					"type": "number",
@@ -425,7 +460,7 @@
 				},
 				"attributes": {
 					"type": "object",
-					"description": "Set the attribues for the block example"
+					"description": "Set the attributes for the block example"
 				},
 				"innerBlocks": {
 					"type": "array",
@@ -434,12 +469,32 @@
 			}
 		},
 		"editorScript": {
-			"type": "string",
-			"description": "Block type editor script definition. It will only be enqueued in the context of the editor."
+			"description": "Block type editor script definition. It will only be enqueued in the context of the editor.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"script": {
-			"type": "string",
-			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site."
+			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"viewScript": {
 			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.",
@@ -482,6 +537,97 @@
 					}
 				}
 			]
+		},
+		"variations": {
+			"type": "array",
+			"description": "Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality.",
+			"items": {
+				"type": "object",
+				"required": [ "name", "title" ],
+				"additionalProperties": false,
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "The unique and machine-readable name."
+					},
+					"title": {
+						"type": "string",
+						"description": "A human-readable variation title."
+					},
+					"description": {
+						"type": "string",
+						"description": "A detailed variation description."
+					},
+					"category": {
+						"description": "A category classification, used in search interfaces to arrange block types by category.",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"enum": [
+									"text",
+									"media",
+									"design",
+									"widgets",
+									"theme",
+									"embed"
+								]
+							}
+						]
+					},
+					"icon": {
+						"description": "An icon helping to visualize the variation. It can have the same shape as the block type.",
+						"type": "string"
+					},
+					"isDefault": {
+						"type": "boolean",
+						"default": false,
+						"description": "Indicates whether the current variation is the default one."
+					},
+					"attributes": {
+						"type": "object",
+						"description": "Values that override block attributes."
+					},
+					"innerBlocks": {
+						"type": "array",
+						"items": {
+							"type": "array"
+						},
+						"description": "Initial configuration of nested blocks."
+					},
+					"example": {
+						"type": "object",
+						"description": "Example provides structured data for the block preview. You can set to undefined to disable the preview shown for the block type."
+					},
+					"scope": {
+						"type": "array",
+						"description": "The list of scopes where the variation is applicable.",
+						"items": {
+							"enum": [ "inserter", "block", "transform" ]
+						},
+						"default": [ "inserter", "block" ]
+					},
+					"keywords": {
+						"type": "array",
+						"description": "An array of terms (which can be translated) that help users discover the variation while searching.",
+						"items": {
+							"type": "string"
+						}
+					},
+					"isActive": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "The list of attributes that should be compared. Each attributes will be matched and the variation will be active if all of them are matching."
+					}
+				}
+			}
+		},
+		"render": {
+			"type": "string",
+			"description": "Template file loaded on the server when rendering a block."
 		}
 	},
 	"required": [ "name", "title" ],

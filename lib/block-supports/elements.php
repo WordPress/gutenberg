@@ -28,7 +28,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	}
 
 	$block_type                    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
+	$skip_link_color_serialization = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
 
 	if ( $skip_link_color_serialization ) {
 		return $block_content;
@@ -49,29 +49,14 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$class_name = gutenberg_get_elements_class_name( $block );
-
 	// Like the layout hook this assumes the hook only applies to blocks with a single wrapper.
-	// Retrieve the opening tag of the first HTML element.
-	$html_element_matches = array();
-	preg_match( '/<[^>]+>/', $block_content, $html_element_matches, PREG_OFFSET_CAPTURE );
-	$first_element = $html_element_matches[0][0];
-	// If the first HTML element has a class attribute just add the new class
-	// as we do on layout and duotone.
-	if ( strpos( $first_element, 'class="' ) !== false ) {
-		$content = preg_replace(
-			'/' . preg_quote( 'class="', '/' ) . '/',
-			'class="' . $class_name . ' ',
-			$block_content,
-			1
-		);
-	} else {
-		// If the first HTML element has no class attribute we should inject the attribute before the attribute at the end.
-		$first_element_offset = $html_element_matches[0][1];
-		$content              = substr_replace( $block_content, ' class="' . $class_name . '"', $first_element_offset + strlen( $first_element ) - 1, 0 );
+	// Add the class name to the first element, presuming it's the wrapper, if it exists.
+	$tags = new WP_HTML_Tag_Processor( $block_content );
+	if ( $tags->next_tag() ) {
+		$tags->add_class( gutenberg_get_elements_class_name( $block ) );
 	}
 
-	return $content;
+	return $tags->get_updated_html();
 }
 
 /**
@@ -92,11 +77,8 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 
 	/*
 	* For now we only care about link color.
-	* This code in the future when we have a public API
-	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
-	* and work for any element and style.
 	*/
-	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
+	$skip_link_color_serialization = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
 
 	if ( $skip_link_color_serialization ) {
 		return null;
@@ -104,18 +86,13 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	$class_name        = gutenberg_get_elements_class_name( $block );
 	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
-	if ( $link_block_styles ) {
-		$styles = gutenberg_style_engine_get_block_supports_styles(
-			$link_block_styles,
-			array(
-				'selector' => ".$class_name a",
-			)
-		);
-
-		if ( ! empty( $styles['css'] ) ) {
-			gutenberg_enqueue_block_support_styles( $styles['css'] );
-		}
-	}
+	gutenberg_style_engine_get_styles(
+		$link_block_styles,
+		array(
+			'selector' => ".$class_name a",
+			'context'  => 'block-supports',
+		)
+	);
 
 	return null;
 }

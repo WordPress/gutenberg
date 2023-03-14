@@ -5,13 +5,14 @@
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
+	convertDeprecationsToExceptions="true"
 	>
+	<php>
+		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
+	</php>
 	<testsuites>
 		<testsuite name="default">
 			<directory suffix="-test.php">./phpunit/</directory>
-		</testsuite>
-		<testsuite name="packages">
-			<directory suffix="-test.php">./packages/**/phpunit/</directory>
 		</testsuite>
 	</testsuites>
 	<groups>

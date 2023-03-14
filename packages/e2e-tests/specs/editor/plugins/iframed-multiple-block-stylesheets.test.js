@@ -6,9 +6,8 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	insertBlock,
-	openDocumentSettingsSidebar,
-	clickButton,
 	canvas,
+	createNewTemplate,
 } from '@wordpress/e2e-test-utils';
 
 async function getComputedStyle( context, property ) {
@@ -33,21 +32,13 @@ describe( 'iframed multiple block stylesheets', () => {
 		await deactivatePlugin( 'gutenberg-test-iframed-multiple-stylesheets' );
 	} );
 
-	it.skip( 'should load multiple block stylesheets in iframe', async () => {
+	it( 'should load multiple block stylesheets in iframe', async () => {
 		await insertBlock( 'Iframed Multiple Stylesheets' );
 
 		await page.waitForSelector(
 			'.wp-block-test-iframed-multiple-stylesheets'
 		);
-		await openDocumentSettingsSidebar();
-		await clickButton( 'Page' );
-		await clickButton( 'Template' );
-		await clickButton( 'New' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( 'Iframed Test' );
-		await clickButton( 'Create' );
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await createNewTemplate( 'Iframed Test' );
 
 		// Style loaded from the main stylesheet.
 		expect( await getComputedStyle( canvas(), 'border-style' ) ).toBe(

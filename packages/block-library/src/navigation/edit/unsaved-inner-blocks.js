@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useInnerBlocksProps } from '@wordpress/block-editor';
-import { Disabled, Spinner } from '@wordpress/components';
+import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
@@ -16,7 +11,7 @@ import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
-import useCreateNavigationMenu from './use-create-navigation-menu';
+import { areBlocksDirty } from './are-blocks-dirty';
 
 const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
@@ -42,11 +37,8 @@ const ALLOWED_BLOCKS = [
 ];
 
 export default function UnsavedInnerBlocks( {
-	blockProps,
 	blocks,
-	clientId,
-	hasSavedUnsavedInnerBlocks,
-	onSave,
+	createNavigationMenu,
 	hasSelection,
 } ) {
 	const originalBlocks = useRef();
@@ -59,11 +51,17 @@ export default function UnsavedInnerBlocks( {
 		}
 	}, [ blocks ] );
 
-	// If the current inner blocks object is different in any way
-	// from the original inner blocks from the post content then the
-	// user has made changes to the inner blocks. At this point the inner
-	// blocks can be considered "dirty".
-	const innerBlocksAreDirty = blocks !== originalBlocks.current;
+	// If the current inner blocks are different from the original inner blocks
+	// from the post content then the user has made changes to the inner blocks.
+	// At this point the inner blocks can be considered "dirty".
+	// Note: referential equality is not sufficient for comparison as the inner blocks
+	// of the page list are controlled and may be updated async due to syncing with
+	// entity records. As a result we need to perform a deep equality check skipping
+	// the page list's inner blocks.
+	const innerBlocksAreDirty = areBlocksDirty(
+		originalBlocks?.current,
+		blocks
+	);
 
 	const shouldDirectInsert = useMemo(
 		() =>
@@ -79,109 +77,98 @@ export default function UnsavedInnerBlocks( {
 	// The block will be disabled in a block preview, use this as a way of
 	// avoiding the side-effects of this component for block previews.
 	const isDisabled = useContext( Disabled.Context );
-	const savingLock = useRef( false );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: hasSelection ? undefined : false,
-		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: shouldDirectInsert,
-	} );
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-navigation__container',
+		},
+		{
+			renderAppender: hasSelection ? undefined : false,
+			allowedBlocks: ALLOWED_BLOCKS,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: shouldDirectInsert,
+		}
+	);
 
-	const { isSaving, draftNavigationMenus, hasResolvedDraftNavigationMenus } =
-		useSelect(
-			( select ) => {
-				if ( isDisabled ) {
-					return EMPTY_OBJECT;
-				}
+	const { isSaving, hasResolvedDraftNavigationMenus } = useSelect(
+		( select ) => {
+			if ( isDisabled ) {
+				return EMPTY_OBJECT;
+			}
 
-				const {
-					getEntityRecords,
-					hasFinishedResolution,
-					isSavingEntityRecord,
-				} = select( coreStore );
+			const {
+				getEntityRecords,
+				hasFinishedResolution,
+				isSavingEntityRecord,
+			} = select( coreStore );
 
-				return {
-					isSaving: isSavingEntityRecord(
-						'postType',
-						'wp_navigation'
-					),
-					draftNavigationMenus: getEntityRecords(
-						...DRAFT_MENU_PARAMS
-					),
-					hasResolvedDraftNavigationMenus: hasFinishedResolution(
-						'getEntityRecords',
-						DRAFT_MENU_PARAMS
-					),
-				};
-			},
-			[ isDisabled ]
-		);
+			return {
+				isSaving: isSavingEntityRecord( 'postType', 'wp_navigation' ),
+				draftNavigationMenus: getEntityRecords(
+					// This is needed so that hasResolvedDraftNavigationMenus gives the correct status.
+					...DRAFT_MENU_PARAMS
+				),
+				hasResolvedDraftNavigationMenus: hasFinishedResolution(
+					'getEntityRecords',
+					DRAFT_MENU_PARAMS
+				),
+			};
+		},
+		[ isDisabled ]
+	);
 
-	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
-
-	const { create: createNavigationMenu } =
-		useCreateNavigationMenu( clientId );
+	const { hasResolvedNavigationMenus } = useNavigationMenu();
 
 	// Automatically save the uncontrolled blocks.
-	useEffect( () => {
-		// The block will be disabled when used in a BlockPreview.
-		// In this case avoid automatic creation of a wp_navigation post.
-		// Otherwise the user will be spammed with lots of menus!
-		//
-		// Also ensure other navigation menus have loaded so an
-		// accurate name can be created.
-		//
-		// Don't try saving when another save is already
-		// in progress.
-		//
-		// And finally only create the menu when the block is selected,
-		// which is an indication they want to start editing.
-		if (
-			isDisabled ||
-			hasSavedUnsavedInnerBlocks ||
-			isSaving ||
-			savingLock.current ||
-			! hasResolvedDraftNavigationMenus ||
-			! hasResolvedNavigationMenus ||
-			! hasSelection ||
-			! innerBlocksAreDirty
-		) {
-			return;
-		}
+	useEffect(
+		() => {
+			// The block will be disabled when used in a BlockPreview.
+			// In this case avoid automatic creation of a wp_navigation post.
+			// Otherwise the user will be spammed with lots of menus!
+			//
+			// Also ensure other navigation menus have loaded so an
+			// accurate name can be created.
+			//
+			// Don't try saving when another save is already
+			// in progress.
+			//
+			// And finally only create the menu when the block is selected,
+			// which is an indication they want to start editing.
+			if (
+				isDisabled ||
+				isSaving ||
+				! hasResolvedDraftNavigationMenus ||
+				! hasResolvedNavigationMenus ||
+				! hasSelection ||
+				! innerBlocksAreDirty
+			) {
+				return;
+			}
 
-		savingLock.current = true;
-		createNavigationMenu( null, blocks ).then( ( menu ) => {
-			onSave( menu );
-			savingLock.current = false;
-		} );
-	}, [
-		isDisabled,
-		isSaving,
-		hasResolvedDraftNavigationMenus,
-		hasResolvedNavigationMenus,
-		draftNavigationMenus,
-		navigationMenus,
-		hasSelection,
-		createNavigationMenu,
-		blocks,
-	] );
+			createNavigationMenu( null, blocks );
+		},
+		/* The dependency "blocks" is intentionally omitted here.
+		 * This is because making blocks a dependency would cause
+		 * createNavigationMenu to run on every block change whereas
+		 * we only want it to run when the blocks are first detected
+		 * as dirty.
+		 * A better solution might be to add a hard saving lock using
+		 * a ref to avoid having to disbale theses eslint rules.
+		 */
+		/* eslint-disable react-hooks/exhaustive-deps */
+		[
+			createNavigationMenu,
+			isDisabled,
+			isSaving,
+			hasResolvedDraftNavigationMenus,
+			hasResolvedNavigationMenus,
+			innerBlocksAreDirty,
+			hasSelection,
+		]
+		/* eslint-enable react-hooks/exhaustive-deps */
+	);
 
 	const Wrapper = isSaving ? Disabled : 'div';
 
-	return (
-		<Wrapper className="wp-block-navigation__unsaved-changes">
-			<div
-				className={ classnames(
-					'wp-block-navigation__unsaved-changes-overlay',
-					{
-						'is-saving': isSaving,
-					}
-				) }
-			>
-				<div { ...innerBlocksProps } />
-			</div>
-			{ isSaving && <Spinner /> }
-		</Wrapper>
-	);
+	return <Wrapper { ...innerBlocksProps } />;
 }

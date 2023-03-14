@@ -1,15 +1,11 @@
 /**
- * External dependencies
- */
-import { omit, castArray } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
 import { validateBlock } from '../validation';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
+import { omit } from '../utils';
 
 /**
  * Function that takes no arguments and always returns false.
@@ -101,10 +97,15 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		// inner blocks.
 		const { migrate } = deprecatedBlockType;
 		if ( migrate ) {
+			let migrated = migrate( migratedAttributes, block.innerBlocks );
+			if ( ! Array.isArray( migrated ) ) {
+				migrated = [ migrated ];
+			}
+
 			[
 				migratedAttributes = parsedAttributes,
 				migratedInnerBlocks = block.innerBlocks,
-			] = castArray( migrate( migratedAttributes, block.innerBlocks ) );
+			] = migrated;
 		}
 
 		block = {

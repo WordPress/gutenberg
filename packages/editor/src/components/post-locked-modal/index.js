@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -164,7 +159,7 @@ export default function PostLockedModal() {
 		_wpnonce: postLockUtils.nonce,
 	} );
 	const allPostsUrl = addQueryArgs( 'edit.php', {
-		post_type: get( postType, [ 'slug' ] ),
+		post_type: postType?.slug,
 	} );
 	const allPostsLabel = __( 'Exit editor' );
 	return (
@@ -197,7 +192,7 @@ export default function PostLockedModal() {
 								? sprintf(
 										/* translators: %s: user's display name */
 										__(
-											'<strong>%s</strong> now has editing control of this posts (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+											'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
 										),
 										userDisplayName
 								  )

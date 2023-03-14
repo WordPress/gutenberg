@@ -164,13 +164,21 @@ Integrating an existing redux store with its own reducers, store enhancers and m
 _Example:_
 
 ```js
-import { mapValues } from 'lodash';
 import { register } from '@wordpress/data';
 import existingSelectors from './existing-app/selectors';
 import existingActions from './existing-app/actions';
 import createStore from './existing-app/store';
 
 const reduxStore = createStore();
+
+const mapValues = ( obj, callback ) =>
+	Object.entries( obj ).reduce(
+		( acc, [ key, value ] ) => ( {
+			...acc,
+			[ key ]: callback( value ),
+		} ),
+		{}
+	);
 
 const boundSelectors = mapValues(
 	existingSelectors,
@@ -341,6 +349,10 @@ const store = createReduxStore( 'my-shop', {
 } );
 register( store );
 ```
+
+_Type_
+
+-   `import('./types').combineReducers`
 
 _Parameters_
 
@@ -654,8 +666,11 @@ _Returns_
 ### subscribe
 
 Given a listener function, the function will be called any time the state value
-of one of the registered stores has changed. This function returns a `unsubscribe`
-function used to stop the subscription.
+of one of the registered stores has changed. If you specify the optional
+`storeNameOrDescriptor` parameter, the listener function will be called only
+on updates on that one specific registered store.
+
+This function returns an `unsubscribe` function used to stop the subscription.
 
 _Usage_
 
@@ -674,6 +689,7 @@ unsubscribe();
 _Parameters_
 
 -   _listener_ `Function`: Callback function.
+-   _storeNameOrDescriptor_ `string|StoreDescriptor?`: Optional store name.
 
 ### suspendSelect
 
@@ -745,11 +761,11 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `[string|StoreDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDescriptor_ `[StoreNameOrDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
--   `Function`: A custom react hook.
+-   `UseDispatchReturn<StoreNameOrDescriptor>`: A custom react hook.
 
 ### useRegistry
 

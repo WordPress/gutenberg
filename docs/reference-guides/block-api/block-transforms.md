@@ -244,12 +244,12 @@ schema = { span: { children: { '#text': {} } } }
 
 Suppose we want to match the following HTML snippet and turn it into some kind of custom post preview block.
 
- ```html
- <div data-post-id="13">
-     <h2>The Post Title</h2>
-     <p>Some <em>great</em> content.</p>
- </div>
- ```
+```html
+<div data-post-id="13">
+    <h2>The Post Title</h2>
+    <p>Some <em>great</em> content.</p>
+</div>
+```
 
 We want to tell the editor to allow the inner `h2` and `p` elements. We do this by supplying the following schema. In
 this example we're using the function form, which accepts an argument supplying `phrasingContentSchema` (as well as a
@@ -258,18 +258,18 @@ pre-defined to match HTML phrasing elements, such as `<strong>` and `<sup>` and 
 a `<RichText />` component is a good place to allow phrasing content otherwise we'll lose all text formatting on
 conversion.
 
- ```js
- schema = ({ phrasingContentSchema }) => {
-     div: {
-         required: true,
-         attributes: [ 'data-post-id' ],
-         children: {
-             h2: { children: phrasingContentSchema },
-             p: { children: phrasingContentSchema }
-         }
-     }
- }
- ```
+```js
+schema = ({ phrasingContentSchema }) => {
+    div: {
+        required: true,
+        attributes: [ 'data-post-id' ],
+        children: {
+            h2: { children: phrasingContentSchema },
+            p: { children: phrasingContentSchema }
+        }
+    }
+}
+```
 
 When we successfully match this content every HTML attribute will be stripped away except for `data-post-id` and if we
 have other arrangements of HTML inside of a given `div` then it won't match our transformer. Likewise we'd fail to match

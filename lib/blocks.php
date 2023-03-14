@@ -23,9 +23,9 @@ function gutenberg_reregister_core_block_types() {
 				'columns',
 				'comments',
 				'group',
-				'heading',
 				'html',
 				'list',
+				'list-item',
 				'media-text',
 				'missing',
 				'more',
@@ -63,10 +63,12 @@ function gutenberg_reregister_core_block_types() {
 				'comments-pagination-numbers.php'  => 'core/comments-pagination-numbers',
 				'comments-pagination-previous.php' => 'core/comments-pagination-previous',
 				'comments-title.php'               => 'core/comments-title',
+				'comments.php'                     => 'core/comments',
 				'file.php'                         => 'core/file',
 				'home-link.php'                    => 'core/home-link',
 				'image.php'                        => 'core/image',
 				'gallery.php'                      => 'core/gallery',
+				'heading.php'                      => 'core/heading',
 				'latest-comments.php'              => 'core/latest-comments',
 				'latest-posts.php'                 => 'core/latest-posts',
 				'loginout.php'                     => 'core/loginout',
@@ -79,7 +81,6 @@ function gutenberg_reregister_core_block_types() {
 				'post-author-name.php'             => 'core/post-author-name',
 				'post-author-biography.php'        => 'core/post-author-biography',
 				'post-comment.php'                 => 'core/post-comment',
-				'post-comments.php'                => 'core/post-comments',
 				'post-comments-count.php'          => 'core/post-comments-count',
 				'post-comments-form.php'           => 'core/post-comments-form',
 				'post-comments-link.php'           => 'core/post-comments-link',
@@ -89,6 +90,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-featured-image.php'          => 'core/post-featured-image',
 				'post-navigation-link.php'         => 'core/post-navigation-link',
 				'post-terms.php'                   => 'core/post-terms',
+				'post-time-to-read.php'            => 'core/post-time-to-read',
 				'post-title.php'                   => 'core/post-title',
 				'query.php'                        => 'core/query',
 				'post-template.php'                => 'core/post-template',
@@ -189,25 +191,26 @@ function gutenberg_register_core_block_assets( $block_name ) {
 
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
-	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
+	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
-	$style_path        = "build/block-library/blocks/$block_name/style.css";
-	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
+	$style_path      = "build/block-library/blocks/$block_name/";
+	$stylesheet_url  = gutenberg_url( $style_path . 'style.css' );
+	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl.css' : 'style.css' );
 
-	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+	if ( file_exists( $stylesheet_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}" );
 		wp_register_style(
 			"wp-block-{$block_name}",
-			gutenberg_url( $style_path ),
-			array( 'global-styles' ),
+			$stylesheet_url,
+			array(),
 			$default_version
 		);
 		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
 
 		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
-		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
+		wp_style_add_data( "wp-block-{$block_name}", 'path', $stylesheet_path );
 	} else {
-		wp_register_style( "wp-block-{$block_name}", false, array( 'global-styles' ) );
+		wp_register_style( "wp-block-{$block_name}", false, array() );
 	}
 
 	// If the current theme supports wp-block-styles, dequeue the full stylesheet
@@ -235,7 +238,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		// If the file exists, enqueue it.
 		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
 
-			if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+			if ( file_exists( $stylesheet_path ) ) {
 				// If there is a main stylesheet for this block, append the theme styles to main styles.
 				wp_add_inline_style(
 					"wp-block-{$block_name}",
@@ -246,7 +249,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 				wp_register_style(
 					"wp-block-{$block_name}",
 					gutenberg_url( $theme_style_path ),
-					array( 'global-styles' ),
+					array(),
 					$default_version
 				);
 				wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $theme_style_path );
@@ -254,6 +257,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		}
 	}
 
+	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(

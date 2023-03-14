@@ -119,8 +119,10 @@
 	.block-editor-block-switcher__preview {
 		width: 300px;
 		height: auto;
-		max-height: 500px;
-		padding: $grid-unit-20;
+		// Subtract margin from max-height.
+		max-height: calc(500px - #{$grid-unit-40});
+		margin: $grid-unit-20;
+		overflow: hidden;
 	}
 }
 

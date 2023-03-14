@@ -2,7 +2,69 @@
 
 ## Unreleased
 
+## 5.13.0 (2023-03-01)
+
+## 5.12.0 (2023-02-15)
+
+## 5.11.0 (2023-02-01)
+
+### Bug fix
+
+-   PHP 7.3 and 7.4 must use PHPUnit 9.
+
+### Enhancement
+
+-   It's now possible to run PHPUnit tests on PHP 8.1 and 8.2.
+
+## 5.10.0 (2023-01-11)
+
+## 5.9.0 (2023-01-02)
+
+## 5.8.0 (2022-12-14)
+
+## 5.7.0 (2022-11-16)
+
+## 5.6.0 (2022-11-02)
+
+## 5.5.0 (2022-10-19)
+
+## 5.4.0 (2022-10-05)
+
+## 5.3.0 (2022-09-21)
+
+## 5.2.0 (2022-08-16)
+
+### Enhancement
+-   Query parameters can now be used in .zip source URLs.
+
+## 5.1.1 (2022-08-16)
+
+### Bug Fix
+-   Fix a crash when "core" was set to `null` in a `.wp-env.json` file. We now use the latest stable WordPress version in that case. This also restores the previous behavior of `"core": null` in `.wp-env.override.json`, which was to use the latest stable WordPress version.
+
+## 5.1.0 (2022-08-10)
+
+### Enhancement
+-   Previously, wp-env used the WordPress version provided by Docker in the WordPress image for installations which don't specify a WordPress version. Now, wp-env will find the latest stable version on WordPress.org and check out the https://github.com/WordPress/WordPress repository at the tag matching that version. In most cases, this will match what Docker provides. The benefit is that wp-env (and WordPress.org) now controls the default WordPress version rather than Docker.
+
+### Bug Fix
+-   Downloading a default WordPress version also resolves a bug where the wrong WordPress test files were used if no core source was specified in wp-env.json. The current trunk test files were downloaded rather than the stable version. Now, the test files will match the default stable version.
+
+## 5.0.0 (2022-07-27)
+
+### Breaking Changes
+-   Removed the `WP_PHPUNIT__TESTS_CONFIG` environment variable from the `phpunit` container. **This removes automatic support for the `wp-phpunit/wp-phpunit` Composer package. To continue using the package, set the following two environment variables in your `phpunit.xml` file or similar: `WP_TESTS_DIR=""` and `WP_PHPUNIT__TESTS_CONFIG="/wordpress-phpunit/wp-tests-config.php"`.**
+-   Removed the generated `/var/www/html/phpunit-wp-config.php` file from the environment.
+
+### Enhancement
+-   Read WordPress' version and include the corresponding PHPUnit test files in the environment.
+-   Set the `WP_TESTS_DIR` environment variable in all containers to point at the PHPUnit test files.
+
+### Bug Fix
+-   Restrict `WP_TESTS_DOMAIN` constant to just hostname rather than an entire URL (e.g. it now excludes scheme, port, etc.) ([#41039](https://github.com/WordPress/gutenberg/pull/41039)).
+
 ## 4.8.0 (2022-06-01)
+
 ### Enhancement
 -   Removed the need for quotation marks when passing options to `wp-env run`.
 -   Setting a `config` key to `null` will prevent adding the constant to `wp-config.php` even if a default value is defined by `wp-env`.

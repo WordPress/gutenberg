@@ -1,6 +1,6 @@
-# Block Filters
+# Block Hooks
 
-To modify the behavior of existing blocks, WordPress exposes several APIs:
+To modify the behavior of existing blocks, WordPress exposes several APIs.
 
 ## Registration
 
@@ -92,23 +92,19 @@ _Example:_
 Wraps a cover block into an outer container.
 
 ```js
-function wrapCoverBlockInContainer(element, blockType, attributes) {
+function wrapCoverBlockInContainer( element, blockType, attributes ) {
 	// skip if element is undefined
-	if (!element) {
+	if ( ! element ) {
 		return;
 	}
 
 	// only apply to cover blocks
-	if ( (blockType.name !== 'core/cover') ) {
+	if ( blockType.name !== 'core/cover' ) {
 		return element;
 	}
 
 	// return the element wrapped in a div
-	return (
-		<div className="cover-block-wrapper">
-			{ element }
-		</div>
-	);
+	return <div className="cover-block-wrapper">{ element }</div>;
 }
 
 wp.hooks.addFilter(
@@ -183,19 +179,18 @@ _Example:_
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
-const { Fragment } = wp.element;
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody } = wp.components;
 
 const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		return (
-			<Fragment>
+			<>
 				<BlockEdit { ...props } />
 				<InspectorControls>
 					<PanelBody>My custom control</PanelBody>
 				</InspectorControls>
-			</Fragment>
+			</>
 		);
 	};
 }, 'withInspectorControl' );

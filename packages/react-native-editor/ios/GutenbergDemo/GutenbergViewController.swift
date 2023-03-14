@@ -306,6 +306,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
+    func gutenbergHostAppNamespace() -> String {
+        return "WordPress"
+    }
+
     func gutenbergFeaturedImageId() -> NSNumber? {
         return nil
     }
@@ -318,12 +322,14 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
             .tiledGalleryBlock: true,
+            .videoPressBlock: true,
             .isAudioBlockMediaUploadEnabled: true,
             .reusableBlock: false,
             .facebookEmbed: true,
             .instagramEmbed: true,
             .loomEmbed: true,
             .smartframeEmbed: true,
+            .supportSection: true
         ]
     }
 

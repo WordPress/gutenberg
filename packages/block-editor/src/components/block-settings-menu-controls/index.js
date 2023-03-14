@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { compact, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -25,21 +20,22 @@ import { store as blockEditorStore } from '../../store';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
-const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
+const BlockSettingsMenuControlsSlot = ( {
+	fillProps,
+	clientIds = null,
+	__unstableDisplayLocation,
+} ) => {
 	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
 		( select ) => {
 			const {
-				getBlocksByClientId,
+				getBlockNamesByClientId,
 				getSelectedBlockClientIds,
 				canRemoveBlocks,
 			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
-				selectedBlocks: map(
-					compact( getBlocksByClientId( ids ) ),
-					( block ) => block.name
-				),
+				selectedBlocks: getBlockNamesByClientId( ids ),
 				selectedClientIds: ids,
 				canRemove: canRemoveBlocks( ids ),
 			};
@@ -52,13 +48,21 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
-	const convertToGroupButtonProps = useConvertToGroupButtonProps();
+	const convertToGroupButtonProps =
+		useConvertToGroupButtonProps( selectedClientIds );
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
 	const showConvertToGroupButton =
 		( isGroupable || isUngroupable ) && canRemove;
 
 	return (
-		<Slot fillProps={ { ...fillProps, selectedBlocks, selectedClientIds } }>
+		<Slot
+			fillProps={ {
+				...fillProps,
+				__unstableDisplayLocation,
+				selectedBlocks,
+				selectedClientIds,
+			} }
+		>
 			{ ( fills ) => {
 				if (
 					! fills?.length > 0 &&

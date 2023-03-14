@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "9.4.0",
+	"version": "11.5.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -44,6 +44,7 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
+		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
@@ -52,6 +53,8 @@
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/shortcode": "file:../shortcode",
 		"@wordpress/style-engine": "file:../style-engine",
@@ -59,20 +62,23 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",
+		"change-case": "^4.1.2",
 		"classnames": "^2.3.1",
 		"colord": "^2.7.0",
 		"diff": "^4.0.2",
 		"dom-scroll-into-view": "^1.2.1",
+		"fast-deep-equal": "^3.1.3",
 		"inherits": "^2.0.3",
 		"lodash": "^4.17.21",
 		"react-autosize-textarea": "^7.1.0",
-		"react-easy-crop": "^3.0.0",
+		"react-easy-crop": "^4.5.1",
 		"rememo": "^4.0.0",
+		"remove-accents": "^0.4.2",
 		"traverse": "^0.6.6"
 	},
 	"peerDependencies": {
-		"react": "^17.0.0",
-		"react-dom": "^17.0.0"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

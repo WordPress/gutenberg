@@ -16,7 +16,7 @@ import { useBorderBoxControlLinkedButton } from './hook';
 import type { LinkedButtonProps } from '../types';
 
 const BorderBoxControlLinkedButton = (
-	props: WordPressComponentProps< LinkedButtonProps, 'div' >,
+	props: WordPressComponentProps< LinkedButtonProps, 'button' >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const { className, isLinked, ...buttonProps } =
@@ -28,10 +28,9 @@ const BorderBoxControlLinkedButton = (
 			<View className={ className }>
 				<Button
 					{ ...buttonProps }
-					variant={ isLinked ? 'primary' : 'secondary' }
 					isSmall
 					icon={ isLinked ? link : linkOff }
-					iconSize={ 16 }
+					iconSize={ 24 }
 					aria-label={ label }
 					ref={ forwardedRef }
 				/>

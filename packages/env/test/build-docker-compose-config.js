@@ -26,11 +26,13 @@ describe( 'buildDockerComposeConfig', () => {
 			],
 		};
 		const dockerConfig = buildDockerComposeConfig( {
+			workDirectoryPath: '/path',
 			env: { development: envConfig, tests: envConfig },
 		} );
 		const { volumes } = dockerConfig.services.wordpress;
 		expect( volumes ).toEqual( [
 			'wordpress:/var/www/html', // WordPress root.
+			'/path/WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit', // WordPress test library,
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins', // Mapped plugins root.
 			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name', // Mapped plugin.
 		] );
@@ -52,6 +54,7 @@ describe( 'buildDockerComposeConfig', () => {
 			],
 		};
 		const dockerConfig = buildDockerComposeConfig( {
+			workDirectoryPath: '/path',
 			env: { development: envConfig, tests: envConfig },
 		} );
 		const devVolumes = dockerConfig.services.wordpress.volumes;
@@ -62,13 +65,20 @@ describe( 'buildDockerComposeConfig', () => {
 		const testsCliVolumes = dockerConfig.services[ 'tests-cli' ].volumes;
 		expect( testsVolumes ).toEqual( testsCliVolumes );
 
-		const localSources = [
+		let localSources = [
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins',
+			'/path/WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
 			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name',
 			'/path/to/local/theme:/var/www/html/wp-content/themes/test-theme',
 		];
-
 		expect( devVolumes ).toEqual( expect.arrayContaining( localSources ) );
+
+		localSources = [
+			'/path/to/wp-plugins:/var/www/html/wp-content/plugins',
+			'/path/tests-WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
+			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name',
+			'/path/to/local/theme:/var/www/html/wp-content/themes/test-theme',
+		];
 		expect( testsVolumes ).toEqual(
 			expect.arrayContaining( localSources )
 		);
@@ -84,10 +94,12 @@ describe( 'buildDockerComposeConfig', () => {
 			},
 		};
 		const dockerConfig = buildDockerComposeConfig( {
+			workDirectoryPath: '/path',
 			env: { development: envConfig, tests: envConfig },
 		} );
 		const expectedVolumes = [
 			'tests-wordpress:/var/www/html',
+			'/path/tests-WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
 			'/path/to/wp-uploads:/var/www/html/wp-content/uploads',
 		];
 		expect( dockerConfig.services.phpunit.volumes ).toEqual(
@@ -105,10 +117,12 @@ describe( 'buildDockerComposeConfig', () => {
 			},
 		};
 		const dockerConfig = buildDockerComposeConfig( {
+			workDirectoryPath: '/path',
 			env: { development: envConfig, tests: CONFIG },
 		} );
 		const expectedVolumes = [
 			'tests-wordpress:/var/www/html',
+			'/path/tests-WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
 			'phpunit-uploads:/var/www/html/wp-content/uploads',
 		];
 		expect( dockerConfig.services.phpunit.volumes ).toEqual(
@@ -121,6 +135,7 @@ describe( 'buildDockerComposeConfig', () => {
 		// local filesystem, so a volume should be created to contain core
 		// sources.
 		const dockerConfig = buildDockerComposeConfig( {
+			workDirectoryPath: '/path',
 			env: { development: CONFIG, tests: CONFIG },
 		} );
 
@@ -140,6 +155,7 @@ describe( 'buildDockerComposeConfig', () => {
 		};
 
 		const dockerConfig = buildDockerComposeConfig( {
+			workDirectoryPath: '/path',
 			env: { development: envConfig, tests: envConfig },
 		} );
 

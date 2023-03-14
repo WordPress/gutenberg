@@ -98,3 +98,17 @@ body.block-editor-page {
 }
 
 @include wordpress-admin-schemes();
+
+// The edit-site package adds or removes the sidebar when it's opened or closed.
+// The edit-post package, however, always has the sidebar in the canvas.
+// These edit-post specific rules ensures there isn't a border on the right of
+// the canvas when a sidebar is visually closed.
+.interface-interface-skeleton__sidebar {
+	border-left: none;
+
+	.is-sidebar-opened & {
+		@include break-medium() {
+			border-left: $border-width solid $gray-200;
+		}
+	}
+}

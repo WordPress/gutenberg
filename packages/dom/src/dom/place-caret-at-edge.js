@@ -22,8 +22,14 @@ function getRange( container, isReverse, x ) {
 	const containerRect = container.getBoundingClientRect();
 	// When placing at the end (isReverse), find the closest range to the bottom
 	// right corner. When placing at the start, to the top left corner.
+	// Ensure x is defined and within the container's boundaries. When it's
+	// exactly at the boundary, it's not considered within the boundaries.
 	if ( x === undefined ) {
 		x = isReverse ? containerRect.right - 1 : containerRect.left + 1;
+	} else if ( x <= containerRect.left ) {
+		x = containerRect.left + 1;
+	} else if ( x >= containerRect.right ) {
+		x = containerRect.right - 1;
 	}
 	const y = isReverseDir ? containerRect.bottom - 1 : containerRect.top + 1;
 	return hiddenCaretRangeFromPoint( ownerDocument, x, y, container );

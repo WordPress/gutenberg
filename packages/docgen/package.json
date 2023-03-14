@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/docgen",
-	"version": "1.23.0",
+	"version": "1.37.0",
 	"description": "Autogenerate public API documentation from exports and JSDoc comments.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,7 +29,6 @@
 	"dependencies": {
 		"@babel/core": "^7.16.0",
 		"comment-parser": "^1.1.1",
-		"lodash": "^4.17.21",
 		"mdast-util-inject": "1.1.0",
 		"optionator": "0.8.2",
 		"remark": "10.0.1",

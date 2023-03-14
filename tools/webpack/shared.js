@@ -4,7 +4,6 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
-const { compact } = require( 'lodash' );
 const postcss = require( 'postcss' );
 
 /**
@@ -41,13 +40,13 @@ const baseConfig = {
 	},
 	mode,
 	module: {
-		rules: compact( [
+		rules: [
 			{
 				test: /\.js$/,
 				use: require.resolve( 'source-map-loader' ),
 				enforce: 'pre',
 			},
-		] ),
+		],
 	},
 	watchOptions: {
 		ignored: [
@@ -67,31 +66,32 @@ const plugins = [
 		// Inject the `IS_GUTENBERG_PLUGIN` global, used for feature flagging.
 		'process.env.IS_GUTENBERG_PLUGIN':
 			process.env.npm_package_config_IS_GUTENBERG_PLUGIN,
+		// Inject the `IS_WORDPRESS_CORE` global, used for feature flagging.
+		'process.env.IS_WORDPRESS_CORE':
+			process.env.npm_package_config_IS_WORDPRESS_CORE,
 	} ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];
 
 const stylesTransform = ( content ) => {
-	if ( mode === 'production' ) {
-		return postcss( [
-			require( 'cssnano' )( {
-				preset: [
-					'default',
-					{
-						discardComments: {
-							removeAll: true,
-						},
+	return postcss( [
+		require( 'cssnano' )( {
+			preset: [
+				'default',
+				{
+					discardComments: {
+						removeAll: true,
 					},
-				],
-			} ),
-		] )
-			.process( content, {
-				from: 'src/app.css',
-				to: 'dest/app.css',
-			} )
-			.then( ( result ) => result.css );
-	}
-	return content;
+					normalizeWhitespace: mode === 'production',
+				},
+			],
+		} ),
+	] )
+		.process( content, {
+			from: 'src/app.css',
+			to: 'dest/app.css',
+		} )
+		.then( ( result ) => result.css );
 };
 
 module.exports = {

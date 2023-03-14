@@ -37,7 +37,6 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 						__( 'Delete %s' ),
 						title
 					) }
-					closeLabel={ __( 'Cancel' ) }
 					onRequestClose={ () => setIsConfirmModalVisible( false ) }
 				>
 					<p>

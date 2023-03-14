@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+## 4.11.0 (2023-03-01)
+
+## 4.10.0 (2023-02-15)
+
+### Bug Fix
+
+-   The bundled `json2php` dependency has been upgraded from requiring `^0.0.5` to `^0.0.7` ([#47831](https://github.com/WordPress/gutenberg/pull/47831)).
+
+## 4.9.0 (2023-02-01)
+
+## 4.8.0 (2023-01-11)
+
+## 4.7.0 (2023-01-02)
+
+## 4.6.0 (2022-12-14)
+
+## 4.5.0 (2022-11-16)
+
+## 4.4.0 (2022-11-02)
+
+## 4.3.0 (2022-10-19)
+
+## 4.2.0 (2022-10-05)
+
+## 4.1.0 (2022-09-21)
+
+### New Features
+
+-   Include `@wordpress/style-engine` on the list of external dependencies to allow using `wp.styleEngine` global with WordPress 6.1 and beyond ([#43840](https://github.com/WordPress/gutenberg/pull/43840)).
+
+## 4.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+## 3.7.0 (2022-07-13)
+
 ### New Features
 
 -   Output asset files for shared chunks, too ([#41002](https://github.com/WordPress/gutenberg/pull/41002)).

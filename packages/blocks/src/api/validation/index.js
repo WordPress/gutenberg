@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import { xor, fromPairs, isEqual, includes } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -235,7 +235,7 @@ export class DecodeEntityParser {
 	 *
 	 * @param {string} entity Entity fragment discovered in HTML.
 	 *
-	 * @return {?string} Entity substitute value.
+	 * @return {string | undefined} Entity substitute value.
 	 */
 	parse( entity ) {
 		if ( isValidCharacterReference( entity ) ) {
@@ -289,7 +289,7 @@ export function getMeaningfulAttributePairs( token ) {
 		return (
 			value ||
 			key.indexOf( 'data-' ) === 0 ||
-			includes( MEANINGFUL_ATTRIBUTES, key )
+			MEANINGFUL_ATTRIBUTES.includes( key )
 		);
 	} );
 }
@@ -398,7 +398,7 @@ export function getStyleProperties( text ) {
 			return [ key.trim(), getNormalizedStyleValue( value.trim() ) ];
 		} );
 
-	return fromPairs( pairs );
+	return Object.fromEntries( pairs );
 }
 
 /**
@@ -410,16 +410,26 @@ export const isEqualAttributesOfName = {
 	class: ( actual, expected ) => {
 		// Class matches if members are the same, even if out of order or
 		// superfluous whitespace between.
-		return ! xor(
-			...[ actual, expected ].map( getTextPiecesSplitOnWhitespace )
-		).length;
+		const [ actualPieces, expectedPieces ] = [ actual, expected ].map(
+			getTextPiecesSplitOnWhitespace
+		);
+		const actualDiff = actualPieces.filter(
+			( c ) => ! expectedPieces.includes( c )
+		);
+		const expectedDiff = expectedPieces.filter(
+			( c ) => ! actualPieces.includes( c )
+		);
+
+		return actualDiff.length === 0 && expectedDiff.length === 0;
 	},
 	style: ( actual, expected ) => {
-		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
+		return fastDeepEqual(
+			...[ actual, expected ].map( getStyleProperties )
+		);
 	},
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.
-	...fromPairs(
+	...Object.fromEntries(
 		BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, () => true ] )
 	),
 };
@@ -538,7 +548,7 @@ export const isEqualTokensOfType = {
  *
  * @param {Object[]} tokens Set of tokens to search.
  *
- * @return {Object} Next non-whitespace token.
+ * @return {Object | undefined} Next non-whitespace token.
  */
 export function getNextNonWhitespaceToken( tokens ) {
 	let token;

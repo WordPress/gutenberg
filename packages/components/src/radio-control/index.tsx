@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import classnames from 'classnames';
 import type { ChangeEvent } from 'react';
 
@@ -16,6 +15,7 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../ui/context';
 import type { RadioControlProps } from './types';
+import { VStack } from '../v-stack';
 
 /**
  * Render a user interface to select the user type using radio inputs.
@@ -43,12 +43,7 @@ import type { RadioControlProps } from './types';
  * ```
  */
 export function RadioControl(
-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
-	// ref forwarding to RadioControl.
-	props: Omit<
-		WordPressComponentProps< RadioControlProps, 'input', false >,
-		'ref'
-	>
+	props: WordPressComponentProps< RadioControlProps, 'input', false >
 ) {
 	const {
 		label,
@@ -65,41 +60,44 @@ export function RadioControl(
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.value );
 
-	if ( isEmpty( options ) ) {
+	if ( ! options?.length ) {
 		return null;
 	}
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom
 			label={ label }
 			id={ id }
 			hideLabelFromVision={ hideLabelFromVision }
 			help={ help }
 			className={ classnames( className, 'components-radio-control' ) }
 		>
-			{ options.map( ( option, index ) => (
-				<div
-					key={ `${ id }-${ index }` }
-					className="components-radio-control__option"
-				>
-					<input
-						id={ `${ id }-${ index }` }
-						className="components-radio-control__input"
-						type="radio"
-						name={ id }
-						value={ option.value }
-						onChange={ onChangeValue }
-						checked={ option.value === selected }
-						aria-describedby={
-							!! help ? `${ id }__help` : undefined
-						}
-						{ ...additionalProps }
-					/>
-					<label htmlFor={ `${ id }-${ index }` }>
-						{ option.label }
-					</label>
-				</div>
-			) ) }
+			<VStack spacing={ 1 }>
+				{ options.map( ( option, index ) => (
+					<div
+						key={ `${ id }-${ index }` }
+						className="components-radio-control__option"
+					>
+						<input
+							id={ `${ id }-${ index }` }
+							className="components-radio-control__input"
+							type="radio"
+							name={ id }
+							value={ option.value }
+							onChange={ onChangeValue }
+							checked={ option.value === selected }
+							aria-describedby={
+								!! help ? `${ id }__help` : undefined
+							}
+							{ ...additionalProps }
+						/>
+						<label htmlFor={ `${ id }-${ index }` }>
+							{ option.label }
+						</label>
+					</div>
+				) ) }
+			</VStack>
 		</BaseControl>
 	);
 }

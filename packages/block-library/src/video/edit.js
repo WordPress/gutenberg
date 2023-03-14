@@ -13,7 +13,8 @@ import {
 	Disabled,
 	PanelBody,
 	Spinner,
-	withNotices,
+	Placeholder,
+	ToolbarButton,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -28,12 +29,13 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
-import { video as icon } from '@wordpress/icons';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { video as icon, caption as captionIcon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -43,23 +45,40 @@ import VideoCommonSettings from './edit-common-settings';
 import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 
+// Much of this description is duplicated from MediaPlaceholder.
+const placeholder = ( content ) => {
+	return (
+		<Placeholder
+			className="block-editor-media-placeholder"
+			withIllustration={ true }
+			icon={ icon }
+			label={ __( 'Video' ) }
+			instructions={ __(
+				'Upload a video file, pick one from your media library, or add one with a URL.'
+			) }
+		>
+			{ content }
+		</Placeholder>
+	);
+};
+
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function VideoEdit( {
 	isSelected,
-	noticeUI,
 	attributes,
 	className,
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
-	noticeOperations,
 } ) {
 	const instanceId = useInstanceId( VideoEdit );
 	const videoPlayer = useRef();
 	const posterImageButton = useRef();
 	const { id, caption, controls, poster, src, tracks } = attributes;
+	const prevCaption = usePrevious( caption );
+	const [ showCaption, setShowCaption ] = useState( !! caption );
 	const isTemporaryVideo = ! id && isBlobURL( src );
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -73,9 +92,7 @@ function VideoEdit( {
 				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ media ] ) => onSelectVideo( media ),
-					onError: ( message ) => {
-						noticeOperations.createErrorNotice( message );
-					},
+					onError: onUploadError,
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
@@ -89,6 +106,30 @@ function VideoEdit( {
 		}
 	}, [ poster ] );
 
+	// We need to show the caption when changes come from
+	// history navigation(undo/redo).
+	useEffect( () => {
+		if ( caption && ! prevCaption ) {
+			setShowCaption( true );
+		}
+	}, [ caption, prevCaption ] );
+
+	// Focus the caption when we click to add one.
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
+
+	useEffect( () => {
+		if ( ! isSelected && ! caption ) {
+			setShowCaption( false );
+		}
+	}, [ isSelected, caption ] );
+
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
 			// In this case there was an error
@@ -98,6 +139,7 @@ function VideoEdit( {
 				src: undefined,
 				id: undefined,
 				poster: undefined,
+				caption: undefined,
 			} );
 			return;
 		}
@@ -109,6 +151,7 @@ function VideoEdit( {
 			id: media.id,
 			poster:
 				media.image?.src !== media.icon ? media.image?.src : undefined,
+			caption: media.caption,
 		} );
 	}
 
@@ -118,7 +161,7 @@ function VideoEdit( {
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url: newSrc },
 			} );
-			if ( undefined !== embedBlock ) {
+			if ( undefined !== embedBlock && onReplace ) {
 				onReplace( embedBlock );
 				return;
 			}
@@ -126,9 +169,9 @@ function VideoEdit( {
 		}
 	}
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	const classes = classnames( className, {
@@ -149,8 +192,8 @@ function VideoEdit( {
 					accept="video/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
-					notices={ noticeUI }
 					onError={ onUploadError }
+					placeholder={ placeholder }
 				/>
 			</div>
 		);
@@ -172,6 +215,23 @@ function VideoEdit( {
 	return (
 		<>
 			<BlockControls group="block">
+				<ToolbarButton
+					onClick={ () => {
+						setShowCaption( ! showCaption );
+						if ( showCaption && caption ) {
+							setAttributes( { caption: undefined } );
+						}
+					} }
+					icon={ captionIcon }
+					isPressed={ showCaption }
+					label={
+						showCaption
+							? __( 'Remove caption' )
+							: __( 'Add caption' )
+					}
+				/>
+			</BlockControls>
+			<BlockControls>
 				<TracksEditor
 					tracks={ tracks }
 					onChange={ ( newTracks ) => {
@@ -264,29 +324,32 @@ function VideoEdit( {
 					</video>
 				</Disabled>
 				{ isTemporaryVideo && <Spinner /> }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						tagName="figcaption"
-						className={ __experimentalGetElementClassName(
-							'caption'
-						) }
-						aria-label={ __( 'Video caption text' ) }
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
-						onChange={ ( value ) =>
-							setAttributes( { caption: value } )
-						}
-						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
-						}
-					/>
-				) }
+				{ showCaption &&
+					( ! RichText.isEmpty( caption ) || isSelected ) && (
+						<RichText
+							identifier="caption"
+							tagName="figcaption"
+							className={ __experimentalGetElementClassName(
+								'caption'
+							) }
+							aria-label={ __( 'Video caption text' ) }
+							ref={ captionRef }
+							placeholder={ __( 'Add caption' ) }
+							value={ caption }
+							onChange={ ( value ) =>
+								setAttributes( { caption: value } )
+							}
+							inlineToolbar
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+							}
+						/>
+					) }
 			</figure>
 		</>
 	);
 }
 
-export default withNotices( VideoEdit );
+export default VideoEdit;

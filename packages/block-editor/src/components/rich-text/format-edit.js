@@ -6,10 +6,6 @@ import {
 	getActiveObject,
 	isCollapsed,
 } from '@wordpress/rich-text';
-/**
- * External dependencies
- */
-import { find } from 'lodash';
 
 export default function FormatEdit( {
 	formatTypes,
@@ -40,13 +36,13 @@ export default function FormatEdit( {
 		if ( name === 'core/link' && ! isCollapsed( value ) ) {
 			const formats = value.formats;
 
-			const linkFormatAtStart = find( formats[ value.start ], {
-				type: 'core/link',
-			} );
+			const linkFormatAtStart = formats[ value.start ]?.find(
+				( { type } ) => type === 'core/link'
+			);
 
-			const linkFormatAtEnd = find( formats[ value.end - 1 ], {
-				type: 'core/link',
-			} );
+			const linkFormatAtEnd = formats[ value.end - 1 ]?.find(
+				( { type } ) => type === 'core/link'
+			);
 
 			if (
 				! linkFormatAtStart ||

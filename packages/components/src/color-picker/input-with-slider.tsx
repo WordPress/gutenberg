@@ -25,6 +25,18 @@ export const InputWithSlider = ( {
 	onChange,
 	value,
 }: InputWithSliderProps ) => {
+	const onNumberControlChange = ( newValue?: number | string ) => {
+		if ( ! newValue ) {
+			onChange( 0 );
+			return;
+		}
+		if ( typeof newValue === 'string' ) {
+			onChange( parseInt( newValue, 10 ) );
+			return;
+		}
+		onChange( newValue );
+	};
+
 	return (
 		<HStack spacing={ 4 }>
 			<NumberControlWrapper
@@ -33,25 +45,29 @@ export const InputWithSlider = ( {
 				label={ label }
 				hideLabelFromVision
 				value={ value }
-				onChange={ onChange }
+				onChange={ onNumberControlChange }
 				prefix={
 					<Spacer
 						as={ Text }
-						paddingLeft={ space( 3.5 ) }
+						paddingLeft={ space( 4 ) }
 						color={ COLORS.ui.theme }
 						lineHeight={ 1 }
 					>
 						{ abbreviation }
 					</Spacer>
 				}
-				hideHTMLArrows
+				spinControls="none"
+				size="__unstable-large"
 			/>
 			<RangeControl
+				__nextHasNoMarginBottom
 				label={ label }
 				hideLabelFromVision
 				min={ min }
 				max={ max }
 				value={ value }
+				// @ts-expect-error
+				// See: https://github.com/WordPress/gutenberg/pull/40535#issuecomment-1172418185
 				onChange={ onChange }
 				withInputField={ false }
 			/>

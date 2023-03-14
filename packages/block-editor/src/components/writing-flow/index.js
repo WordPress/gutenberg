@@ -44,19 +44,21 @@ export function useWritingFlow() {
 			useArrowNav(),
 			useRefEffect(
 				( node ) => {
-					node.tabIndex = -1;
+					node.tabIndex = 0;
 					node.contentEditable = hasMultiSelection;
 
 					if ( ! hasMultiSelection ) {
 						return;
 					}
 
+					node.classList.add( 'has-multi-selection' );
 					node.setAttribute(
 						'aria-label',
 						__( 'Multiple selected blocks' )
 					);
 
 					return () => {
+						node.classList.remove( 'has-multi-selection' );
 						node.removeAttribute( 'aria-label' );
 					};
 				},

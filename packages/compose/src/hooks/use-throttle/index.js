@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { throttle } from 'lodash';
 import { useMemoOne } from 'use-memo-one';
 
 /**
@@ -10,7 +9,12 @@ import { useMemoOne } from 'use-memo-one';
 import { useEffect } from '@wordpress/element';
 
 /**
- * Throttles a function with Lodash's `throttle`. A new throttled function will
+ * Internal dependencies
+ */
+import { throttle } from '../../utils/throttle';
+
+/**
+ * Throttles a function similar to Lodash's `throttle`. A new throttled function will
  * be returned and any scheduled calls cancelled if any of the arguments change,
  * including the function to throttle, so please wrap functions created on
  * render in components in `useCallback`.
@@ -19,14 +23,14 @@ import { useEffect } from '@wordpress/element';
  *
  * @template {(...args: any[]) => void} TFunc
  *
- * @param {TFunc}                             fn        The function to throttle.
- * @param {number}                            [wait]    The number of milliseconds to throttle invocations to.
- * @param {import('lodash').ThrottleSettings} [options] The options object. See linked documentation for details.
- * @return {import('lodash').DebouncedFunc<TFunc>} Throttled function.
+ * @param {TFunc}                                          fn        The function to throttle.
+ * @param {number}                                         [wait]    The number of milliseconds to throttle invocations to.
+ * @param {import('../../utils/throttle').ThrottleOptions} [options] The options object. See linked documentation for details.
+ * @return {import('../../utils/debounce').DebouncedFunc<TFunc>} Throttled function.
  */
 export default function useThrottle( fn, wait, options ) {
 	const throttled = useMemoOne(
-		() => throttle( fn, wait, options ),
+		() => throttle( fn, wait ?? 0, options ),
 		[ fn, wait, options ]
 	);
 	useEffect( () => () => throttled.cancel(), [ throttled ] );

@@ -19,7 +19,7 @@
 const path = require( 'path' );
 const { writeFile, mkdir } = require( 'fs' ).promises;
 const filenamify = require( 'filenamify' );
-const NodeEnvironment = require( 'jest-environment-node' );
+const NodeEnvironment = require( 'jest-environment-node' ).default;
 const chalk = require( 'chalk' );
 
 /**
@@ -52,11 +52,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
 	// the setTimeout function, see https://github.com/facebook/jest/blob/v23.1.0/packages/jest-runtime/src/index.js#L823
 	setTimeout( timeout ) {
-		if ( this.global.jasmine ) {
-			this.global.jasmine.DEFAULT_TIMEOUT_INTERVAL = timeout;
-		} else {
-			this.global[ Symbol.for( 'TEST_TIMEOUT_SYMBOL' ) ] = timeout;
-		}
+		this.global[ Symbol.for( 'TEST_TIMEOUT_SYMBOL' ) ] = timeout;
 	}
 
 	async setup() {

@@ -64,6 +64,25 @@ To add a new document requires a working JavaScript development environment to b
 
 If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommitted local change that must be committed.
 
+### Documenting Packages
+
+Package documentation is generated automatically by the documentation tool by pulling the contents of the README.md file located in the root of the package. Sometimes however, it is preferable to split the contents of the README out into smaller, easier to read portions.
+
+This can be accomplished by creating a `docs` directory in the package and adding `toc.json` file that contains references other markdown files also contained in the `docs` directory. The `toc.json` file should contain an array of pages to be added as sub-pages of the main README file. The formatting follows the [`manifest.json`](https://github.com/WordPress/gutenberg/blob/HEAD/docs/manifest.json) file that is generated automatically.
+
+In order for these pages to be nested under the main package name, be sure to set the `parent` property correctly. See the example below that adds child pages to the [`@wordpress/create-block` section](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/).
+
+```json
+[
+	{
+		"title": "@wordpress/create-block External Template",
+		"slug": "packages-create-block-external-template",
+		"markdown_source": "../packages/create-block/docs/external-template.md",
+		"parent": "packages-create-block"
+	}
+]
+```
+
 ### Using links
 
 It's likely at some point you'll want to link to other internal documentation pages. It's worth emphasizing all documents can be browsed in different contexts:

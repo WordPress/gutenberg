@@ -4,20 +4,11 @@ $blocks-block__margin: 0.5em;
 // Prefer the link selector instead of the regular button classname
 // to support the previous markup in addition to the new one.
 .wp-block-button__link {
-	box-shadow: none;
 	cursor: pointer;
 	display: inline-block;
 	text-align: center;
-	text-decoration: none;
 	word-break: break-word; // overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
 	box-sizing: border-box;
-
-	&:hover,
-	&:focus,
-	&:active,
-	&:visited {
-		color: $white;
-	}
 
 	&.aligncenter {
 		text-align: center;
@@ -32,11 +23,19 @@ $blocks-block__margin: 0.5em;
 // These rules are set to zero specificity to keep the default styles for buttons.
 // They are needed for backwards compatibility.
 :where(.wp-block-button__link) {
+	// This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
+	box-shadow: none;
+	text-decoration: none;
+
 	// 100% causes an oval, but any explicit but really high value retains the pill shape.
 	border-radius: 9999px;
 
 	// The extra 2px are added to size solids the same as the outline versions.
 	padding: calc(0.667em + 2px) calc(1.333em + 2px);
+}
+
+.wp-block-button[style*="text-decoration"] .wp-block-button__link {
+	text-decoration: inherit;
 }
 
 // Increased specificity needed to override margins.
@@ -93,25 +92,63 @@ $blocks-block__margin: 0.5em;
 	border-radius: 0;
 }
 
-
 // the first selector is required for old buttons markup
 .wp-block-button.no-border-radius,
 .wp-block-button__link.no-border-radius {
 	border-radius: 0 !important;
 }
 
-.is-style-outline > :where(.wp-block-button__link),
-:where(.wp-block-button__link).is-style-outline {
+.wp-block-button.is-style-outline > .wp-block-button__link,
+.wp-block-button .wp-block-button__link.is-style-outline {
 	border: 2px solid currentColor;
 	padding: 0.667em 1.333em;
 }
 
-.is-style-outline > .wp-block-button__link:not(.has-text-color),
-.wp-block-button__link.is-style-outline:not(.has-text-color) {
+.wp-block-button.is-style-outline > .wp-block-button__link:not(.has-text-color),
+.wp-block-button .wp-block-button__link.is-style-outline:not(.has-text-color) {
 	color: currentColor;
 }
 
-.is-style-outline > .wp-block-button__link:not(.has-background),
-.wp-block-button__link.is-style-outline:not(.has-background) {
+.wp-block-button.is-style-outline > .wp-block-button__link:not(.has-background),
+.wp-block-button .wp-block-button__link.is-style-outline:not(.has-background) {
 	background-color: transparent;
+	// background-image is required to overwrite a gradient background
+	background-image: none;
+}
+
+.wp-block-button .wp-block-button__link {
+	// The following styles ensure a default border is applied when the user
+	// selects only a border color or style. This overcomes the zero border
+	// width applied by core's theme.json via the elements API.
+	&:where(.has-border-color) {
+		border-width: initial;
+	}
+	&:where([style*="border-top-color"]) {
+		border-top-width: initial;
+	}
+	&:where([style*="border-right-color"]) {
+		border-right-width: initial;
+	}
+	&:where([style*="border-bottom-color"]) {
+		border-bottom-width: initial;
+	}
+	&:where([style*="border-left-color"]) {
+		border-left-width: initial;
+	}
+
+	&:where([style*="border-style"]) {
+		border-width: initial;
+	}
+	&:where([style*="border-top-style"]) {
+		border-top-width: initial;
+	}
+	&:where([style*="border-right-style"]) {
+		border-right-width: initial;
+	}
+	&:where([style*="border-bottom-style"]) {
+		border-bottom-width: initial;
+	}
+	&:where([style*="border-left-style"]) {
+		border-left-width: initial;
+	}
 }

@@ -14,6 +14,8 @@ It is also possible to modify the behavior of existing blocks or even remove the
 
 Learn more in the [Block Filters](/docs/reference-guides/filters/block-filters.md) section.
 
+Specifically for `Query Loop` block, besides the available filters, there are more ways to extend it and create bespoke versions of it. Learn more in the [Extending the Query Loop block](/docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md) section.
+
 ## Extending the Editor UI
 
 Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
@@ -30,7 +32,7 @@ Porting PHP meta boxes to blocks or sidebar plugins is highly encouraged, learn 
 
 By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or rely on defaults.
 
-There are some advanced block features which require opt-in support in the theme. See [theme support](/docs/how-to-guides/themes/theme-support.md).
+There are some advanced block features which require opt-in support in the theme. See [theme support](/docs/how-to-guides/themes/theme-support.md) and [how to filter global styles](/docs/reference-guides/filters/global-styles-filters.md).
 
 ## Autocomplete
 

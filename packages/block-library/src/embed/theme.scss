@@ -1,3 +1,7 @@
 .wp-block-embed figcaption {
 	@include caption-style-theme();
 }
+
+.wp-block-embed {
+	margin: 0 0 1em 0;
+}

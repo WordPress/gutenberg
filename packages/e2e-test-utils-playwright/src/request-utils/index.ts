@@ -13,15 +13,23 @@ import { WP_ADMIN_USER, WP_BASE_URL } from '../config';
 import type { User } from './login';
 import { login } from './login';
 import { listMedia, uploadMedia, deleteMedia, deleteAllMedia } from './media';
+import { createUser, deleteAllUsers } from './users';
 import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
-import { deleteAllPosts } from './posts';
+import { createPost, deleteAllPosts } from './posts';
+import {
+	createClassicMenu,
+	createNavigationMenu,
+	deleteAllMenus,
+	getNavigationMenus,
+} from './menus';
+import { deleteAllPages, createPage } from './pages';
 import { resetPreferences } from './preferences';
-import { getCurrentUser } from './user';
+import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
 interface StorageState {
@@ -110,30 +118,76 @@ class RequestUtils {
 		this.baseURL = baseURL;
 	}
 
-	login = login.bind( this );
-	setupRest = setupRest.bind( this );
+	/** @borrows login as this.login */
+	login: typeof login = login.bind( this );
+	/** @borrows setupRest as this.setupRest */
+	setupRest: typeof setupRest = setupRest.bind( this );
 	// .bind() drops the generic types. Re-casting it to keep the type signature.
-	rest = rest.bind( this ) as typeof rest;
-	getMaxBatchSize = getMaxBatchSize.bind( this );
+	rest: typeof rest = rest.bind( this ) as typeof rest;
+	/** @borrows getMaxBatchSize as this.getMaxBatchSize */
+	getMaxBatchSize: typeof getMaxBatchSize = getMaxBatchSize.bind( this );
 	// .bind() drops the generic types. Re-casting it to keep the type signature.
-	batchRest = batchRest.bind( this ) as typeof batchRest;
-	getPluginsMap = getPluginsMap.bind( this );
-	activatePlugin = activatePlugin.bind( this );
-	deactivatePlugin = deactivatePlugin.bind( this );
-	activateTheme = activateTheme.bind( this );
-	deleteAllBlocks = deleteAllBlocks;
-	deleteAllPosts = deleteAllPosts.bind( this );
-	createComment = createComment.bind( this );
-	deleteAllComments = deleteAllComments.bind( this );
-	deleteAllWidgets = deleteAllWidgets.bind( this );
-	addWidgetBlock = addWidgetBlock.bind( this );
-	deleteAllTemplates = deleteAllTemplates.bind( this );
-	resetPreferences = resetPreferences.bind( this );
-	listMedia = listMedia.bind( this );
-	uploadMedia = uploadMedia.bind( this );
-	deleteMedia = deleteMedia.bind( this );
-	deleteAllMedia = deleteAllMedia.bind( this );
-	getCurrentUser = getCurrentUser.bind( this );
+	batchRest: typeof batchRest = batchRest.bind( this ) as typeof batchRest;
+	/** @borrows getPluginsMap as this.getPluginsMap */
+	getPluginsMap: typeof getPluginsMap = getPluginsMap.bind( this );
+	/** @borrows activatePlugin as this.activatePlugin */
+	activatePlugin: typeof activatePlugin = activatePlugin.bind( this );
+	/** @borrows deactivatePlugin as this.deactivatePlugin */
+	deactivatePlugin: typeof deactivatePlugin = deactivatePlugin.bind( this );
+	/** @borrows activateTheme as this.activateTheme */
+	activateTheme: typeof activateTheme = activateTheme.bind( this );
+	/** @borrows deleteAllBlocks as this.deleteAllBlocks */
+	deleteAllBlocks = deleteAllBlocks.bind( this );
+	/** @borrows createPost as this.createPost */
+	createPost: typeof createPost = createPost.bind( this );
+	/** @borrows deleteAllPosts as this.deleteAllPosts */
+	deleteAllPosts: typeof deleteAllPosts = deleteAllPosts.bind( this );
+	/** @borrows createClassicMenu as this.createClassicMenu */
+	createClassicMenu: typeof createClassicMenu =
+		createClassicMenu.bind( this );
+	/** @borrows createNavigationMenu as this.createNavigationMenu */
+	createNavigationMenu: typeof createNavigationMenu =
+		createNavigationMenu.bind( this );
+	/** @borrows deleteAllMenus as this.deleteAllMenus */
+	deleteAllMenus: typeof deleteAllMenus = deleteAllMenus.bind( this );
+	/** @borrows getNavigationMenus as this.getNavigationMenus */
+	getNavigationMenus: typeof getNavigationMenus =
+		getNavigationMenus.bind( this );
+	/** @borrows createComment as this.createComment */
+	createComment: typeof createComment = createComment.bind( this );
+	/** @borrows deleteAllComments as this.deleteAllComments */
+	deleteAllComments: typeof deleteAllComments =
+		deleteAllComments.bind( this );
+	/** @borrows deleteAllWidgets as this.deleteAllWidgets */
+	deleteAllWidgets: typeof deleteAllWidgets = deleteAllWidgets.bind( this );
+	/** @borrows addWidgetBlock as this.addWidgetBlock */
+	addWidgetBlock: typeof addWidgetBlock = addWidgetBlock.bind( this );
+	/** @borrows deleteAllTemplates as this.deleteAllTemplates */
+	deleteAllTemplates: typeof deleteAllTemplates =
+		deleteAllTemplates.bind( this );
+	/** @borrows resetPreferences as this.resetPreferences */
+	resetPreferences: typeof resetPreferences = resetPreferences.bind( this );
+	/** @borrows listMedia as this.listMedia */
+	listMedia: typeof listMedia = listMedia.bind( this );
+	/** @borrows uploadMedia as this.uploadMedia */
+	uploadMedia: typeof uploadMedia = uploadMedia.bind( this );
+	/** @borrows deleteMedia as this.deleteMedia */
+	deleteMedia: typeof deleteMedia = deleteMedia.bind( this );
+	/** @borrows deleteAllMedia as this.deleteAllMedia */
+	deleteAllMedia: typeof deleteAllMedia = deleteAllMedia.bind( this );
+	/** @borrows createUser as this.createUser */
+	createUser: typeof createUser = createUser.bind( this );
+	/** @borrows deleteAllUsers as this.deleteAllUsers */
+	deleteAllUsers: typeof deleteAllUsers = deleteAllUsers.bind( this );
+	/** @borrows getSiteSettings as this.getSiteSettings */
+	getSiteSettings: typeof getSiteSettings = getSiteSettings.bind( this );
+	/** @borrows updateSiteSettings as this.updateSiteSettings */
+	updateSiteSettings: typeof updateSiteSettings =
+		updateSiteSettings.bind( this );
+	/** @borrows deleteAllPages as this.deleteAllPages */
+	deleteAllPages: typeof deleteAllPages = deleteAllPages.bind( this );
+	/** @borrows createPage as this.createPage */
+	createPage: typeof createPage = createPage.bind( this );
 }
 
 export type { StorageState };

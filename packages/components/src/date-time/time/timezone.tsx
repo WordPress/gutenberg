@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalGetSettings as getDateSettings } from '@wordpress/date';
+import { getSettings as getDateSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies

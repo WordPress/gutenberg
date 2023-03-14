@@ -9,34 +9,42 @@
 	"keywords": [ "link" ],
 	"textdomain": "default",
 	"attributes": {
+		"textAlign": {
+			"type": "string"
+		},
 		"url": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "href"
+			"attribute": "href",
+			"__experimentalRole": "content"
 		},
 		"title": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "title"
+			"attribute": "title",
+			"__experimentalRole": "content"
 		},
 		"text": {
 			"type": "string",
 			"source": "html",
-			"selector": "a"
+			"selector": "a",
+			"__experimentalRole": "content"
 		},
 		"linkTarget": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "target"
+			"attribute": "target",
+			"__experimentalRole": "content"
 		},
 		"rel": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "rel"
+			"attribute": "rel",
+			"__experimentalRole": "content"
 		},
 		"placeholder": {
 			"type": "string"
@@ -56,7 +64,7 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true,
+		"align": false,
 		"alignWide": false,
 		"color": {
 			"__experimentalSkipSerialization": true,
@@ -68,13 +76,19 @@
 		},
 		"typography": {
 			"fontSize": true,
+			"lineHeight": true,
 			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
 		},
 		"reusable": false,
+		"shadow": true,
 		"spacing": {
 			"__experimentalSkipSerialization": true,
 			"padding": [ "horizontal", "vertical" ],
@@ -83,13 +97,19 @@
 			}
 		},
 		"__experimentalBorder": {
+			"color": true,
 			"radius": true,
+			"style": true,
+			"width": true,
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
-				"radius": true
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-button__link"
+		"__experimentalSelector": ".wp-block-button .wp-block-button__link"
 	},
 	"styles": [
 		{ "name": "fill", "label": "Fill", "isDefault": true },

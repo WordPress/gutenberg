@@ -1,61 +1,122 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-
-/**
- * WordPress dependencies
- */
-import { useSelect } from '@wordpress/data';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import BlockAlignmentUI from '../ui';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
-useSelect.mockImplementation( () => ( { wideControlsEnabled: false } ) );
-
 describe( 'BlockAlignmentUI', () => {
 	const alignment = 'left';
 	const onChange = jest.fn();
-
-	const wrapper = shallow(
-		<BlockAlignmentUI value={ alignment } onChange={ onChange } isToolbar />
-	);
-
-	const controls = wrapper.props().controls;
 
 	afterEach( () => {
 		onChange.mockClear();
 	} );
 
-	test( 'should match snapshot', () => {
-		expect( wrapper ).toMatchSnapshot();
+	test( 'should match snapshot when controls are hidden', () => {
+		const { container } = render(
+			<BlockAlignmentUI
+				value={ alignment }
+				onChange={ onChange }
+				isToolbar
+			/>
+		);
+
+		expect( container ).toMatchSnapshot();
 	} );
 
-	test( 'should call onChange with undefined, when the control is already active', () => {
-		const activeControl = controls.find(
-			( { title } ) => title === 'Align left'
+	test( 'should match snapshot when controls are visible', () => {
+		const { container } = render(
+			<BlockAlignmentUI
+				value={ alignment }
+				onChange={ onChange }
+				isToolbar
+				isCollapsed={ false }
+			/>
 		);
-		activeControl.onClick();
 
-		expect( activeControl.isActive ).toBe( true );
+		expect( container ).toMatchSnapshot();
+	} );
+
+	test( 'should expand controls when toggled', async () => {
+		const user = userEvent.setup();
+
+		const { unmount } = render(
+			<BlockAlignmentUI
+				value={ alignment }
+				onChange={ onChange }
+				isToolbar
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'menuitemradio', {
+				name: /^Align \w+$/,
+			} )
+		).not.toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Align',
+			} )
+		);
+
+		expect(
+			screen.getAllByRole( 'menuitemradio', {
+				name: /^Align \w+$/,
+			} )
+		).toHaveLength( 3 );
+
+		// Cancel running effects, like delayed dropdown menu popover positioning.
+		unmount();
+	} );
+
+	test( 'should call onChange with undefined, when the control is already active', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<BlockAlignmentUI
+				value={ alignment }
+				onChange={ onChange }
+				isToolbar
+				isCollapsed={ false }
+			/>
+		);
+
+		const activeControl = screen.getByRole( 'button', {
+			name: `Align ${ alignment }`,
+			pressed: true,
+		} );
+
+		await user.click( activeControl );
+
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( undefined );
 	} );
 
-	test( 'should call onChange with alignment value when the control is inactive', () => {
-		const inactiveCenterControl = controls.find(
-			( { title } ) => title === 'Align center'
-		);
-		inactiveCenterControl.onClick();
+	test( 'should call onChange with alignment value when the control is inactive', async () => {
+		const user = userEvent.setup();
 
-		expect( inactiveCenterControl.isActive ).toBe( false );
+		render(
+			<BlockAlignmentUI
+				value={ alignment }
+				onChange={ onChange }
+				isToolbar
+				isCollapsed={ false }
+			/>
+		);
+
+		const inactiveControl = screen.getByRole( 'button', {
+			name: 'Align center',
+			pressed: false,
+		} );
+
+		await user.click( inactiveControl );
+
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( 'center' );
 	} );

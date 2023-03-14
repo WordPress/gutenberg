@@ -19,6 +19,23 @@ jest.mock( 'fs', () => ( {
 	},
 } ) );
 
+// This mocks a small response with a format matching the stable-check API.
+// It makes getLatestWordPressVersion resolve to "100.0.0".
+jest.mock( 'got', () =>
+	jest.fn( ( url ) => ( {
+		json: () => {
+			if ( url === 'https://api.wordpress.org/core/stable-check/1.0/' ) {
+				return Promise.resolve( {
+					'1.0': 'insecure',
+					'99.1.1': 'outdated',
+					'100.0.0': 'latest',
+					'100.0.1': 'fancy',
+				} );
+			}
+		},
+	} ) )
+);
+
 jest.mock( '../detect-directory-type', () => jest.fn() );
 
 describe( 'readConfig', () => {
@@ -59,10 +76,29 @@ describe( 'readConfig', () => {
 			);
 			detectDirectoryType.mockImplementation( () => 'core' );
 			const config = await readConfig( '.wp-env.json' );
-			expect( config.env.development.coreSource ).not.toBeNull();
+			expect( config.env.development.coreSource.type ).toBe( 'local' );
 			expect( config.env.tests.coreSource ).not.toBeNull();
 			expect( config.env.development.pluginSources ).toHaveLength( 0 );
 			expect( config.env.development.themeSources ).toHaveLength( 0 );
+		} );
+
+		it( 'should use the most recent stable WordPress version for the default core source', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve( JSON.stringify( {} ) )
+			);
+			const config = await readConfig( '.wp-env.json' );
+
+			const expected = {
+				url: 'https://github.com/WordPress/WordPress.git',
+				type: 'git',
+				basename: 'WordPress',
+				ref: '100.0.0', // From the mock of https at the top of the file.
+			};
+
+			expect( config.env.development.coreSource ).toMatchObject(
+				expected
+			);
+			expect( config.env.tests.coreSource ).toMatchObject( expected );
 		} );
 
 		it( 'should infer a plugin config when ran from a plugin directory', async () => {
@@ -71,7 +107,7 @@ describe( 'readConfig', () => {
 			);
 			detectDirectoryType.mockImplementation( () => 'plugin' );
 			const config = await readConfig( '.wp-env.json' );
-			expect( config.env.development.coreSource ).toBeNull();
+			expect( config.env.development.coreSource.type ).toBe( 'git' );
 			expect( config.env.development.pluginSources ).toHaveLength( 1 );
 			expect( config.env.tests.pluginSources ).toHaveLength( 1 );
 			expect( config.env.development.themeSources ).toHaveLength( 0 );
@@ -83,8 +119,8 @@ describe( 'readConfig', () => {
 			);
 			detectDirectoryType.mockImplementation( () => 'theme' );
 			const config = await readConfig( '.wp-env.json' );
-			expect( config.env.development.coreSource ).toBeNull();
-			expect( config.env.tests.coreSource ).toBeNull();
+			expect( config.env.development.coreSource.type ).toBe( 'git' );
+			expect( config.env.tests.coreSource.type ).toBe( 'git' );
 			expect( config.env.development.themeSources ).toHaveLength( 1 );
 			expect( config.env.tests.themeSources ).toHaveLength( 1 );
 			expect( config.env.development.pluginSources ).toHaveLength( 0 );
@@ -197,6 +233,11 @@ describe( 'readConfig', () => {
 			// Remove generated values which are different on other machines.
 			delete config.dockerComposeConfigPath;
 			delete config.workDirectoryPath;
+
+			// This encodes both the version of WordPress (which can change frequently)
+			// as well as the wp-env directory which is unique on every machine.
+			delete config.env.development.coreSource;
+			delete config.env.tests.coreSource;
 			expect( config ).toMatchSnapshot();
 		} );
 	} );
@@ -265,17 +306,17 @@ describe( 'readConfig', () => {
 				pluginSources: [
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*relative$/ ),
+						path: expect.stringMatching( /^(\/|\\).*relative$/ ),
 						basename: 'relative',
 					},
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*parent$/ ),
+						path: expect.stringMatching( /^(\/|\\).*parent$/ ),
 						basename: 'parent',
 					},
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*home$/ ),
+						path: expect.stringMatching( /^(\/|\\).*home$/ ),
 						basename: 'home',
 					},
 				],
@@ -284,17 +325,17 @@ describe( 'readConfig', () => {
 				pluginSources: [
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*relative$/ ),
+						path: expect.stringMatching( /^(\/|\\).*relative$/ ),
 						basename: 'relative',
 					},
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*parent$/ ),
+						path: expect.stringMatching( /^(\/|\\).*parent$/ ),
 						basename: 'parent',
 					},
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*home$/ ),
+						path: expect.stringMatching( /^(\/|\\).*home$/ ),
 						basename: 'home',
 					},
 				],
@@ -324,28 +365,28 @@ describe( 'readConfig', () => {
 			expect( config.env.development.pluginSources ).toEqual( [
 				{
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*test1a$/ ),
+					path: expect.stringMatching( /^(\/|\\).*test1a$/ ),
 					basename: 'test1a',
 				},
 			] );
 			expect( config.env.development.themeSources ).toEqual( [
 				{
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*test2a$/ ),
+					path: expect.stringMatching( /^(\/|\\).*test2a$/ ),
 					basename: 'test2a',
 				},
 			] );
 			expect( config.env.tests.pluginSources ).toEqual( [
 				{
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*test1b$/ ),
+					path: expect.stringMatching( /^(\/|\\).*test1b$/ ),
 					basename: 'test1b',
 				},
 			] );
 			expect( config.env.tests.themeSources ).toEqual( [
 				{
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*test2b$/ ),
+					path: expect.stringMatching( /^(\/|\\).*test2b$/ ),
 					basename: 'test2b',
 				},
 			] );
@@ -359,18 +400,18 @@ describe( 'readConfig', () => {
 			expect( config.env.development ).toMatchObject( {
 				coreSource: {
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*relative$/ ),
+					path: expect.stringMatching( /^(\/|\\).*relative$/ ),
 					testsPath: expect.stringMatching(
-						/^(\/||\\).*tests-relative$/
+						/^(\/|\\).*tests-relative$/
 					),
 				},
 			} );
 			expect( config.env.tests ).toMatchObject( {
 				coreSource: {
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*relative$/ ),
+					path: expect.stringMatching( /^(\/|\\).*relative$/ ),
 					testsPath: expect.stringMatching(
-						/^(\/||\\).*tests-relative$/
+						/^(\/|\\).*tests-relative$/
 					),
 				},
 			} );
@@ -396,21 +437,21 @@ describe( 'readConfig', () => {
 						type: 'git',
 						url: 'https://github.com/WordPress/gutenberg.git',
 						ref: undefined,
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
 						type: 'git',
 						url: 'https://github.com/WordPress/gutenberg.git',
 						ref: 'trunk',
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
 						type: 'git',
 						url: 'https://github.com/WordPress/gutenberg.git',
 						ref: '5.0',
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
@@ -418,7 +459,7 @@ describe( 'readConfig', () => {
 						url: 'https://github.com/WordPress/theme-experiments.git',
 						ref: 'tt1-blocks@0.4.3',
 						path: expect.stringMatching(
-							/^(\/||\\).*theme-experiments(\/||\\)tt1-blocks$/
+							/^(\/|\\).*theme-experiments(\/|\\)tt1-blocks$/
 						),
 						basename: 'tt1-blocks',
 					},
@@ -447,20 +488,20 @@ describe( 'readConfig', () => {
 					{
 						type: 'zip',
 						url: 'https://downloads.wordpress.org/plugin/gutenberg.zip',
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
 						type: 'zip',
 						url: 'https://downloads.wordpress.org/plugin/gutenberg.8.1.0.zip',
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
 						type: 'zip',
 						url: 'https://downloads.wordpress.org/theme/twentytwenty.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*twentytwenty$/
+							/^(\/|\\).*twentytwenty$/
 						),
 						basename: 'twentytwenty',
 					},
@@ -468,7 +509,7 @@ describe( 'readConfig', () => {
 						type: 'zip',
 						url: 'https://downloads.wordpress.org/theme/twentytwenty.1.3.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*twentytwenty$/
+							/^(\/|\\).*twentytwenty$/
 						),
 						basename: 'twentytwenty',
 					},
@@ -485,6 +526,7 @@ describe( 'readConfig', () => {
 						plugins: [
 							'https://www.example.com/test/path/to/gutenberg.zip',
 							'https://www.example.com/test/path/to/gutenberg.8.1.0.zip',
+							'https://www.example.com/test/path/to/gutenberg.8.1.0.zip?auth=thisIsAString&token=secondString',
 							'https://www.example.com/test/path/to/twentytwenty.zip',
 							'https://www.example.com/test/path/to/twentytwenty.1.3.zip',
 							'https://example.com/twentytwenty.1.3.zip',
@@ -498,14 +540,22 @@ describe( 'readConfig', () => {
 					{
 						type: 'zip',
 						url: 'https://www.example.com/test/path/to/gutenberg.zip',
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
 						type: 'zip',
 						url: 'https://www.example.com/test/path/to/gutenberg.8.1.0.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*gutenberg.8.1.0$/
+							/^(\/|\\).*gutenberg.8.1.0$/
+						),
+						basename: 'gutenberg.8.1.0',
+					},
+					{
+						type: 'zip',
+						url: 'https://www.example.com/test/path/to/gutenberg.8.1.0.zip?auth=thisIsAString&token=secondString',
+						path: expect.stringMatching(
+							/^(\/|\\).*gutenberg.8.1.0$/
 						),
 						basename: 'gutenberg.8.1.0',
 					},
@@ -513,7 +563,7 @@ describe( 'readConfig', () => {
 						type: 'zip',
 						url: 'https://www.example.com/test/path/to/twentytwenty.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*twentytwenty$/
+							/^(\/|\\).*twentytwenty$/
 						),
 						basename: 'twentytwenty',
 					},
@@ -521,7 +571,7 @@ describe( 'readConfig', () => {
 						type: 'zip',
 						url: 'https://www.example.com/test/path/to/twentytwenty.1.3.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*twentytwenty.1.3$/
+							/^(\/|\\).*twentytwenty.1.3$/
 						),
 						basename: 'twentytwenty.1.3',
 					},
@@ -529,7 +579,7 @@ describe( 'readConfig', () => {
 						type: 'zip',
 						url: 'https://example.com/twentytwenty.1.3.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*twentytwenty.1.3$/
+							/^(\/|\\).*twentytwenty.1.3$/
 						),
 						basename: 'twentytwenty.1.3',
 					},
@@ -571,12 +621,12 @@ describe( 'readConfig', () => {
 			const matchObj = {
 				test: {
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*relative$/ ),
+					path: expect.stringMatching( /^(\/|\\).*relative$/ ),
 					basename: 'relative',
 				},
 				test2: {
 					type: 'git',
-					path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+					path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 					basename: 'gutenberg',
 				},
 			};
@@ -804,7 +854,7 @@ describe( 'readConfig', () => {
 					development: {
 						port: 1000,
 						config: {
-							WP_TESTS_DOMAIN: 'http://localhost:1000/',
+							WP_TESTS_DOMAIN: 'localhost',
 							WP_SITEURL: 'http://localhost:1000/',
 							WP_HOME: 'http://localhost:1000/',
 						},
@@ -812,7 +862,7 @@ describe( 'readConfig', () => {
 					tests: {
 						port: 2000,
 						config: {
-							WP_TESTS_DOMAIN: 'http://localhost:2000/',
+							WP_TESTS_DOMAIN: 'localhost',
 							WP_SITEURL: 'http://localhost:2000/',
 							WP_HOME: 'http://localhost:2000/',
 						},
@@ -840,7 +890,7 @@ describe( 'readConfig', () => {
 					development: {
 						port: 1000,
 						config: {
-							WP_TESTS_DOMAIN: 'http://localhost:1000/',
+							WP_TESTS_DOMAIN: 'localhost',
 							WP_SITEURL: 'http://localhost:1000/',
 							WP_HOME: 'http://localhost:3000/',
 						},
@@ -848,7 +898,7 @@ describe( 'readConfig', () => {
 					tests: {
 						port: 2000,
 						config: {
-							WP_TESTS_DOMAIN: 'http://localhost:2000/',
+							WP_TESTS_DOMAIN: 'localhost',
 							WP_SITEURL: 'http://localhost:2000/',
 							WP_HOME: 'http://localhost:3000/',
 						},
@@ -1103,7 +1153,7 @@ describe( 'readConfig', () => {
 				WP_PHP_BINARY: 'php',
 				WP_TESTS_EMAIL: 'admin@example.org',
 				WP_TESTS_TITLE: 'Test Blog',
-				WP_TESTS_DOMAIN: 'http://localhost:8889/',
+				WP_TESTS_DOMAIN: 'localhost',
 				WP_SITEURL: 'http://localhost:8889/',
 				WP_HOME: 'http://localhost:8889/',
 			} );
@@ -1117,7 +1167,7 @@ describe( 'readConfig', () => {
 				WP_PHP_BINARY: 'php',
 				WP_TESTS_EMAIL: 'admin@example.org',
 				WP_TESTS_TITLE: 'Test Blog',
-				WP_TESTS_DOMAIN: 'http://localhost:8888/',
+				WP_TESTS_DOMAIN: 'localhost',
 				WP_SITEURL: 'http://localhost:8888/',
 				WP_HOME: 'http://localhost:8888/',
 			} );

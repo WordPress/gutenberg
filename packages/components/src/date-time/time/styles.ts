@@ -17,7 +17,10 @@ import NumberControl from '../../number-control';
 import SelectControl from '../../select-control';
 import { Select } from '../../select-control/styles/select-control-styles';
 
-export const Wrapper = styled.div``;
+export const Wrapper = styled.div`
+	box-sizing: border-box;
+	font-size: ${ CONFIG.fontSize };
+`;
 
 export const Fieldset = styled.fieldset`
 	border: 0;
@@ -27,11 +30,6 @@ export const Fieldset = styled.fieldset`
 	&:last-child {
 		margin-bottom: 0;
 	}
-`;
-
-export const Legend = styled.legend`
-	margin-bottom: ${ space( 2 ) };
-	padding: 0;
 `;
 
 export const TimeWrapper = styled.div`

@@ -51,22 +51,35 @@ function block_core_gallery_render( $attributes, $content ) {
 	if ( is_array( $gap ) ) {
 		foreach ( $gap as $key => $value ) {
 			// Make sure $value is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
-			$value       = is_string( $value ) ? $value : '';
-			$gap[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+			$value = is_string( $value ) ? $value : '';
+			$value = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+
+			// Get spacing CSS variable from preset value if provided.
+			if ( is_string( $value ) && str_contains( $value, 'var:preset|spacing|' ) ) {
+				$index_to_splice = strrpos( $value, '|' ) + 1;
+				$slug            = _wp_to_kebab_case( substr( $value, $index_to_splice ) );
+				$value           = "var(--wp--preset--spacing--$slug)";
+			}
+
+			$gap[ $key ] = $value;
 		}
 	} else {
 		// Make sure $gap is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
 		$gap = is_string( $gap ) ? $gap : '';
 		$gap = $gap && preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
+
+		// Get spacing CSS variable from preset value if provided.
+		if ( is_string( $gap ) && str_contains( $gap, 'var:preset|spacing|' ) ) {
+			$index_to_splice = strrpos( $gap, '|' ) + 1;
+			$slug            = _wp_to_kebab_case( substr( $gap, $index_to_splice ) );
+			$gap             = "var(--wp--preset--spacing--$slug)";
+		}
 	}
 
-	$class   = wp_unique_id( 'wp-block-gallery-' );
-	$content = preg_replace(
-		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . $class . ' ',
-		$content,
-		1
-	);
+	$unique_gallery_classname = wp_unique_id( 'wp-block-gallery-' );
+	$processed_content        = new WP_HTML_Tag_Processor( $content );
+	$processed_content->next_tag();
+	$processed_content->add_class( $unique_gallery_classname );
 
 	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
 	// gap on the gallery.
@@ -80,11 +93,29 @@ function block_core_gallery_render( $attributes, $content ) {
 		$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 	}
 
-	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
-	$style = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_column . '; gap: ' . $gap_value . '}';
+	// The unstable gallery gap calculation requires a real value (such as `0px`) and not `0`.
+	if ( '0' === $gap_column ) {
+		$gap_column = '0px';
+	}
 
-	gutenberg_enqueue_block_support_styles( $style, 11 );
-	return $content;
+	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
+	$gallery_styles = array(
+		array(
+			'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
+			'declarations' => array(
+				'--wp--style--unstable-gallery-gap' => $gap_column,
+				'gap'                               => $gap_value,
+			),
+		),
+	);
+
+	wp_style_engine_get_stylesheet_from_css_rules(
+		$gallery_styles,
+		array(
+			'context' => 'block-supports',
+		)
+	);
+	return (string) $processed_content;
 }
 /**
  * Registers the `core/gallery` block on server.

@@ -20,9 +20,7 @@ import type { Widget } from './widget';
 import type { WidgetType } from './widget-type';
 import type { WpTemplate } from './wp-template';
 import type { WpTemplatePart } from './wp-template-part';
-import type { CoreEntities } from '../entities';
 
-export type { EntityType } from './entities';
 export type { BaseEntityRecords } from './base-entity-records';
 
 export type {
@@ -48,8 +46,6 @@ export type {
 	WpTemplatePart,
 };
 
-export type UpdatableEntityRecord = Updatable< EntityRecord< 'edit' > >;
-
 /**
  * An interface that may be extended to add types for new entities. Each entry
  * must be a union of entity definitions adhering to the EntityInterface type.
@@ -60,105 +56,52 @@ export type UpdatableEntityRecord = Updatable< EntityRecord< 'edit' > >;
  * import type { Context } from '@wordpress/core-data';
  * // ...
  *
- * interface Order {
+ * interface Client {
  *   id: number;
- *   clientId: number;
+ *   name: string;
  *   // ...
  * }
  *
- * type OrderEntity = {
- *   kind: 'myPlugin';
- *   name: 'order';
- *   recordType: Order;
+ * interface Order< C extends Context > {
+ *   id: number;
+ *   name: string;
+ *   // ...
  * }
  *
  * declare module '@wordpress/core-data' {
- *     export interface PerPackageEntities< C extends Context > {
- *         myPlugin: OrderEntity | ClientEntity
+ *     export interface PerPackageEntityRecords< C extends Context > {
+ *         myPlugin: Client | Order<C>>
  *     }
  * }
  *
- * const c = getEntityRecord( 'myPlugin', 'order', 15 );
+ * const c = getEntityRecord<Order>( 'myPlugin', 'order', 15 );
  * // c is of the type Order
  * ```
  */
-export interface PerPackageEntityConfig< C extends Context > {
-	core: CoreEntities< C >;
+export interface PerPackageEntityRecords< C extends Context > {
+	core:
+		| Attachment< C >
+		| Comment< C >
+		| MenuLocation< C >
+		| NavMenu< C >
+		| NavMenuItem< C >
+		| Page< C >
+		| Plugin< C >
+		| Post< C >
+		| Settings< C >
+		| Sidebar< C >
+		| Taxonomy< C >
+		| Theme< C >
+		| User< C >
+		| Type< C >
+		| Widget< C >
+		| WidgetType< C >
+		| WpTemplate< C >
+		| WpTemplatePart< C >;
 }
-
-/**
- * A union of all the registered entities.
- */
-type EntityConfig< C extends Context = any > =
-	PerPackageEntityConfig< C >[ keyof PerPackageEntityConfig< C > ];
 
 /**
  * A union of all known record types.
  */
-export type EntityRecord< C extends Context = any > =
-	EntityConfig< C >[ 'record' ];
-
-/**
- * An entity corresponding to a specified record type.
- */
-export type EntityConfigOf<
-	RecordOrKind extends EntityRecord | Kind,
-	N extends Name | undefined = undefined
-> = RecordOrKind extends EntityRecord
-	? Extract< EntityConfig, { record: RecordOrKind } >
-	: Extract< EntityConfig, { config: { kind: RecordOrKind; name: N } } >;
-
-/**
- * Name of the requested entity.
- */
-export type NameOf< R extends EntityRecord > =
-	EntityConfigOf< R >[ 'config' ][ 'name' ];
-
-/**
- * Kind of the requested entity.
- */
-export type KindOf< R extends EntityRecord > =
-	EntityConfigOf< R >[ 'config' ][ 'kind' ];
-
-/**
- * Primary key type of the requested entity, sourced from PerPackageEntities.
- *
- * For core entities, the key type is computed using the entity configuration in entities.js.
- */
-export type KeyOf<
-	RecordOrKind extends EntityRecord | Kind,
-	N extends Name | undefined = undefined,
-	E extends EntityConfig = EntityConfigOf< RecordOrKind, N >
-> = ( E[ 'key' ] extends keyof E[ 'record' ]
-	? E[ 'record' ][ E[ 'key' ] ]
-	: never ) &
-	( number | string );
-
-/**
- * Default context of the requested entity, sourced from PerPackageEntities.
- *
- * For core entities, the default context is extracted from the entity configuration
- * in entities.js.
- */
-export type DefaultContextOf<
-	RecordOrKind extends EntityRecord | Kind,
-	N extends Name | undefined = undefined
-> = EntityConfigOf< RecordOrKind, N >[ 'defaultContext' ];
-
-/**
- * An entity record type associated with specified kind and name, sourced from PerPackageEntities.
- */
-export type EntityRecordOf<
-	K extends Kind,
-	N extends Name,
-	C extends Context = DefaultContextOf< K, N >
-> = Extract< EntityConfig< C >, { config: { kind: K; name: N } } >[ 'record' ];
-
-/**
- * A union of all known entity kinds.
- */
-export type Kind = EntityConfig[ 'config' ][ 'kind' ];
-/**
- * A union of all known entity names.
- */
-export type Name = EntityConfig[ 'config' ][ 'name' ];
+export type EntityRecord< C extends Context = 'edit' > =
+	PerPackageEntityRecords< C >[ keyof PerPackageEntityRecords< C > ];

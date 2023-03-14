@@ -21,7 +21,7 @@ When writing tests consider the following:
 
 Tests for JavaScript use [Jest](https://jestjs.io/) as the test runner and its API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
 
-_It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) should be used for new tests instead, and over time old tests should be refactored to use RTL too (typically when working on code that touches an old test)._
+_It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) is now used for all existing and new tests instead._
 
 Assuming you've followed the [instructions](/docs/contributors/code/getting-started-with-code-contribution.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
@@ -29,11 +29,11 @@ Assuming you've followed the [instructions](/docs/contributors/code/getting-star
 npm test
 ```
 
-Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some JavaScript issues can be fixed automatically by running `npm run lint-js:fix`.
+Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some JavaScript issues can be fixed automatically by running `npm run lint:js:fix`.
 
 To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for additional information.
 
-To run unit tests only, without the linter, use `npm run test-unit` instead.
+To run unit tests only, without the linter, use `npm run test:unit` instead.
 
 ### Folder structure
 
@@ -304,13 +304,13 @@ However, if the change was intentional, follow these steps to update the snapsho
 
 ```sh
 # --testPathPattern is optional but will be much faster by only running matching tests
-npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
+npm run test:unit -- --updateSnapshot --testPathPattern path/to/tests
 
 # Update snapshot for e2e tests
-npm run test-e2e -- --updateSnapshot --testPathPattern path/to/e2e-tests
+npm run test:e2e -- --updateSnapshot --testPathPattern path/to/e2e-tests
 
 # Update snapshot for Playwright
-npm run test-e2e:playwright -- --update-snapshots path/to/spec
+npm run test:e2e:playwright -- --update-snapshots path/to/spec
 ```
 
 1. Review the diff and ensure the changes are expected and intentional.
@@ -367,13 +367,13 @@ describe( 'SolarSystem', () => {
 	test( 'should render', () => {
 		const { container } = render( <SolarSystem /> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should contain mars if planets is true', () => {
 		const { container } = render( <SolarSystem planets /> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 		expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
 	} );
 } );
@@ -386,12 +386,12 @@ Reducer tests are also a great fit for snapshots. They are often large, complex 
 You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. That can be done as follows:
 
 ```sh
-npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
+npm run test:unit -- --updateSnapshot --testPathPattern path/to/tests
 ```
 
 `--testPathPattern` is not required, but specifying a path will speed things up by running a subset of tests.
 
-It's a great idea to keep `npm run test-unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
+It's a great idea to keep `npm run test:unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
 
 #### Pain points
 
@@ -422,7 +422,7 @@ test( 'should contain mars if planets is true', () => {
 	const { container } = render( <SolarSystem planets /> );
 
 	// Snapshot will catch unintended changes
-	expect( container.firstChild ).toMatchSnapshot();
+	expect( container ).toMatchSnapshot();
 
 	// This is what we actually expect to find in our test
 	expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
@@ -447,8 +447,8 @@ Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the d
 test( 'should render margin', () => {
 	const { container: spacer } = render( <Spacer /> );
 	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
-	expect( spacerWithMargin.firstChild ).toMatchStyleDiffSnapshot(
-		spacer.firstChild
+	expect( spacerWithMargin ).toMatchStyleDiffSnapshot(
+		spacer
 	);
 } );
 ```
@@ -463,7 +463,7 @@ In that case, you might see test failures and `TypeError` reported by Jest in th
 
 ### Debugging Jest unit tests
 
-Running `npm run test-unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
+Running `npm run test:unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
 
 ## Native mobile testing
 
@@ -491,40 +491,40 @@ There is an ongoing effort to add integration tests to the native mobile project
 
 ## End-to-end Testing
 
-End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
+Most existing End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
-> There's a ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. See the [README](https://github.com/WordPress/gutenberg/tree/HEAD/test/e2e/README.md) of the new E2E tests for the updated guideline and best practices.
+There's an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. **It's recommended to write new e2e tests in Playwright whenever possible**. The sections below mostly apply to the old Jest + Puppeteer framework. See the dedicated [guide](/docs/contributors/code/e2e/README.md) if you're writing tests with Playwright.**
 
 ### Using wp-env
 
 If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the e2e tests locally using this command:
 
 ```bash
-npm run test-e2e
+npm run test:e2e
 ```
 
 or interactively
 
 ```bash
-npm run test-e2e:watch
+npm run test:e2e:watch
 ```
 
 Sometimes it's useful to observe the browser while running tests. Then, use this command:
 
 ```bash
-npm run test-e2e:watch -- --puppeteer-interactive
+npm run test:e2e:watch -- --puppeteer-interactive
 ```
 
 You can control the speed of execution with `--puppeteer-slowmo`:
 
 ```bash
-npm run test-e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
+npm run test:e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
 ```
 
 You can additionally have the devtools automatically open for interactive debugging in the browser:
 
 ```bash
-npm run test-e2e:watch -- --puppeteer-devtools
+npm run test:e2e:watch -- --puppeteer-devtools
 ```
 
 ### Using alternate environment
@@ -538,7 +538,7 @@ ln -s gutenberg/packages/e2e-tests/plugins/* .
 Then to run the tests, specify the base URL, username, and passwords for your site. For example, if your test site is at `http://wp.test`, use:
 
 ```bash
-WP_BASE_URL=http://wp.test npm run test-e2e -- --wordpress-username=admin --wordpress-password=password
+WP_BASE_URL=http://wp.test npm run test:e2e -- --wordpress-username=admin --wordpress-password=password
 ```
 
 ### Scenario Testing
@@ -546,7 +546,7 @@ WP_BASE_URL=http://wp.test npm run test-e2e -- --wordpress-username=admin --word
 If you find that end-to-end tests pass when run locally, but fail in GitHub Actions, you may be able to isolate a CPU- or network-bound race condition by simulating a slow CPU or network:
 
 ```
-THROTTLE_CPU=4 npm run test-e2e
+THROTTLE_CPU=4 npm run test:e2e
 ```
 
 `THROTTLE_CPU` is a slowdown factor (in this example, a 4x slowdown multiplier)
@@ -554,7 +554,7 @@ THROTTLE_CPU=4 npm run test-e2e
 See [Chrome docs: setCPUThrottlingRate](https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate)
 
 ```
-SLOW_NETWORK=true npm run test-e2e
+SLOW_NETWORK=true npm run test:e2e
 ```
 
 `SLOW_NETWORK` emulates a network speed equivalent to "Fast 3G" in the Chrome devtools.
@@ -562,7 +562,7 @@ SLOW_NETWORK=true npm run test-e2e
 See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions) and [NetworkManager.js](https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274)
 
 ```
-OFFLINE=true npm run test-e2e
+OFFLINE=true npm run test:e2e
 ```
 
 `OFFLINE` emulates network disconnection.
@@ -582,22 +582,22 @@ A test is considered to be **flaky** when it can pass and fail across multiple r
 Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the PHP tests locally using this command:
 
 ```bash
-npm run test-php
+npm run test:php
 ```
 
 To re-run tests automatically when files change (similar to Jest), run:
 
 ```
-npm run test-php:watch
+npm run test:php:watch
 ```
 
 _Note: The phpunit commands require `wp-env` to be running and composer dependencies to be installed. The package script will start wp-env for you if it is not already running._
 
 In other environments, run `composer run test` and `composer run test:watch`.
 
-Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test-php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint-php`.
+Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test:php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint:php`.
 
-To run unit tests only, without the linter, use `npm run test-unit-php` instead.
+To run unit tests only, without the linter, use `npm run test:unit:php` instead.
 
 [snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
 [update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
@@ -623,7 +623,7 @@ npm run wp-env start
 To run the tests run the following command:
 
 ```
-npm run test-performance
+npm run test:performance
 ```
 
 This gives you the result for the current branch/code on the running environment.

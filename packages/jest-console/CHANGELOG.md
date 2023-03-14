@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-  Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
+
+## 6.11.0 (2023-03-01)
+
+## 6.10.0 (2023-02-15)
+
+## 6.9.0 (2023-02-01)
+
+## 6.8.0 (2023-01-11)
+
+## 6.7.0 (2023-01-02)
+
+## 6.6.0 (2022-12-14)
+
+## 6.5.0 (2022-11-16)
+
+## 6.4.0 (2022-11-02)
+
+## 6.3.0 (2022-10-19)
+
+## 6.2.0 (2022-10-05)
+
+## 6.1.0 (2022-09-21)
+
+## 6.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
 ## 5.1.0 (2022-05-18)
 
 ### Enhancements

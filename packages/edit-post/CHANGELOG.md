@@ -2,6 +2,46 @@
 
 ## Unreleased
 
+## 7.5.0 (2023-03-01)
+
+## 7.4.0 (2023-02-15)
+
+## 7.3.0 (2023-02-01)
+
+## 7.2.0 (2023-01-11)
+
+## 7.1.0 (2023-01-02)
+
+## 7.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 6.19.0 (2022-11-16)
+
+### Enhancement
+
+-   ` BlockTypesChecklist`: Move BlockIcon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
+
+## 6.18.0 (2022-11-02)
+
+## 6.17.0 (2022-10-19)
+
+## 6.16.0 (2022-10-05)
+
+## 6.15.0 (2022-09-21)
+
+## 6.14.0 (2022-09-13)
+
+## 6.13.0 (2022-08-24)
+
+## 6.12.0 (2022-08-10)
+
+## 6.11.0 (2022-07-27)
+
+## 6.10.0 (2022-07-13)
+
 ## 6.9.0 (2022-06-29)
 
 ## 6.8.0 (2022-06-15)

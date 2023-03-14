@@ -8,15 +8,20 @@ import {
 	__experimentalUseDropZone as useDropZone,
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
+import { isUnmodifiedDefaultBlock as getIsUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import useOnBlockDrop from '../use-on-block-drop';
-import { getDistanceToNearestEdge } from '../../utils/math';
+import {
+	getDistanceToNearestEdge,
+	isPointContainedByRect,
+} from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
+/** @typedef {import('../use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
 /**
  * The orientation of a block list.
@@ -25,16 +30,31 @@ import { store as blockEditorStore } from '../../store';
  */
 
 /**
- * Given a list of block DOM elements finds the index that a block should be dropped
- * at.
+ * The insert position when dropping a block.
  *
- * @param {Element[]}              elements    Array of DOM elements that represent each block in a block list.
- * @param {WPPoint}                position    The position of the item being dragged.
- * @param {WPBlockListOrientation} orientation The orientation of a block list.
- *
- * @return {number|undefined} The block index that's closest to the drag position.
+ * @typedef {'before'|'after'} WPInsertPosition
  */
-export function getNearestBlockIndex( elements, position, orientation ) {
+
+/**
+ * @typedef {Object} WPBlockData
+ * @property {boolean}       isUnmodifiedDefaultBlock Is the block unmodified default block.
+ * @property {() => DOMRect} getBoundingClientRect    Get the bounding client rect of the block.
+ * @property {number}        blockIndex               The index of the block.
+ */
+
+/**
+ * Get the drop target position from a given drop point and the orientation.
+ *
+ * @param {WPBlockData[]}          blocksData  The block data list.
+ * @param {WPPoint}                position    The position of the item being dragged.
+ * @param {WPBlockListOrientation} orientation The orientation of the block list.
+ * @return {[number, WPDropOperation]} The drop target position.
+ */
+export function getDropTargetPosition(
+	blocksData,
+	position,
+	orientation = 'vertical'
+) {
 	const allowedEdges =
 		orientation === 'horizontal'
 			? [ 'left', 'right' ]
@@ -42,35 +62,67 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 
 	const isRightToLeft = isRTL();
 
-	let candidateIndex;
-	let candidateDistance;
+	let nearestIndex = 0;
+	let insertPosition = 'before';
+	let minDistance = Infinity;
 
-	elements.forEach( ( element, index ) => {
-		const rect = element.getBoundingClientRect();
-		const [ distance, edge ] = getDistanceToNearestEdge(
-			position,
-			rect,
-			allowedEdges
-		);
+	blocksData.forEach(
+		( { isUnmodifiedDefaultBlock, getBoundingClientRect, blockIndex } ) => {
+			const rect = getBoundingClientRect();
 
-		if ( candidateDistance === undefined || distance < candidateDistance ) {
-			// If the user is dropping to the trailing edge of the block
-			// add 1 to the index to represent dragging after.
-			// Take RTL languages into account where the left edge is
-			// the trailing edge.
-			const isTrailingEdge =
-				edge === 'bottom' ||
-				( ! isRightToLeft && edge === 'right' ) ||
-				( isRightToLeft && edge === 'left' );
-			const offset = isTrailingEdge ? 1 : 0;
+			let [ distance, edge ] = getDistanceToNearestEdge(
+				position,
+				rect,
+				allowedEdges
+			);
+			// Prioritize the element if the point is inside of an unmodified default block.
+			if (
+				isUnmodifiedDefaultBlock &&
+				isPointContainedByRect( position, rect )
+			) {
+				distance = 0;
+			}
 
-			// Update the currently known best candidate.
-			candidateDistance = distance;
-			candidateIndex = index + offset;
+			if ( distance < minDistance ) {
+				// Where the dropped block will be inserted on the nearest block.
+				insertPosition =
+					edge === 'bottom' ||
+					( ! isRightToLeft && edge === 'right' ) ||
+					( isRightToLeft && edge === 'left' )
+						? 'after'
+						: 'before';
+
+				// Update the currently known best candidate.
+				minDistance = distance;
+				nearestIndex = blockIndex;
+			}
 		}
-	} );
+	);
 
-	return candidateIndex;
+	const adjacentIndex =
+		nearestIndex + ( insertPosition === 'after' ? 1 : -1 );
+	const isNearestBlockUnmodifiedDefaultBlock =
+		!! blocksData[ nearestIndex ]?.isUnmodifiedDefaultBlock;
+	const isAdjacentBlockUnmodifiedDefaultBlock =
+		!! blocksData[ adjacentIndex ]?.isUnmodifiedDefaultBlock;
+
+	// If both blocks are not unmodified default blocks then just insert between them.
+	if (
+		! isNearestBlockUnmodifiedDefaultBlock &&
+		! isAdjacentBlockUnmodifiedDefaultBlock
+	) {
+		// If the user is dropping to the trailing edge of the block
+		// add 1 to the index to represent dragging after.
+		const insertionIndex =
+			insertPosition === 'after' ? nearestIndex + 1 : nearestIndex;
+		return [ insertionIndex, 'insert' ];
+	}
+
+	// Otherwise, replace the nearest unmodified default block.
+	return [
+		isNearestBlockUnmodifiedDefaultBlock ? nearestIndex : adjacentIndex,
+		'replace',
+	];
 }
 
 /**
@@ -90,60 +142,101 @@ export default function useBlockDropZone( {
 	// an empty string to represent top-level blocks.
 	rootClientId: targetRootClientId = '',
 } = {} ) {
-	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
+	const [ dropTarget, setDropTarget ] = useState( {
+		index: null,
+		operation: 'insert',
+	} );
 
-	const isLockedAll = useSelect(
+	const isDisabled = useSelect(
 		( select ) => {
-			const { getTemplateLock } = select( blockEditorStore );
-			return getTemplateLock( targetRootClientId ) === 'all';
+			const {
+				getTemplateLock,
+				__unstableIsWithinBlockOverlay,
+				__unstableHasActiveBlockOverlayActive,
+			} = select( blockEditorStore );
+			const templateLock = getTemplateLock( targetRootClientId );
+			return (
+				[ 'all', 'contentOnly' ].some(
+					( lock ) => lock === templateLock
+				) ||
+				__unstableHasActiveBlockOverlayActive( targetRootClientId ) ||
+				__unstableIsWithinBlockOverlay( targetRootClientId )
+			);
 		},
 		[ targetRootClientId ]
 	);
 
-	const { getBlockListSettings } = useSelect( blockEditorStore );
+	const { getBlockListSettings, getBlocks, getBlockIndex } =
+		useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
-	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
+	const onBlockDrop = useOnBlockDrop( targetRootClientId, dropTarget.index, {
+		operation: dropTarget.operation,
+	} );
 	const throttled = useThrottle(
-		useCallback( ( event, currentTarget ) => {
-			const blockElements = Array.from( currentTarget.children ).filter(
-				// Ensure the element is a block. It should have the `wp-block` class.
-				( element ) => element.classList.contains( 'wp-block' )
-			);
-			const targetIndex = getNearestBlockIndex(
-				blockElements,
-				{ x: event.clientX, y: event.clientY },
-				getBlockListSettings( targetRootClientId )?.orientation
-			);
+		useCallback(
+			( event, ownerDocument ) => {
+				const blocks = getBlocks( targetRootClientId );
 
-			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
+				// The block list is empty, don't show the insertion point but still allow dropping.
+				if ( blocks.length === 0 ) {
+					setDropTarget( {
+						index: 0,
+						operation: 'insert',
+					} );
+					return;
+				}
 
-			if ( targetIndex !== null ) {
-				showInsertionPoint( targetRootClientId, targetIndex );
-			}
-		}, [] ),
+				const blocksData = blocks.map( ( block ) => {
+					const clientId = block.clientId;
+
+					return {
+						isUnmodifiedDefaultBlock:
+							getIsUnmodifiedDefaultBlock( block ),
+						getBoundingClientRect: () =>
+							ownerDocument
+								.getElementById( `block-${ clientId }` )
+								.getBoundingClientRect(),
+						blockIndex: getBlockIndex( clientId ),
+					};
+				} );
+
+				const [ targetIndex, operation ] = getDropTargetPosition(
+					blocksData,
+					{ x: event.clientX, y: event.clientY },
+					getBlockListSettings( targetRootClientId )?.orientation
+				);
+
+				setDropTarget( {
+					index: targetIndex,
+					operation,
+				} );
+				showInsertionPoint( targetRootClientId, targetIndex, {
+					operation,
+				} );
+			},
+			[ targetRootClientId ]
+		),
 		200
 	);
 
 	return useDropZone( {
-		isDisabled: isLockedAll,
+		isDisabled,
 		onDrop: onBlockDrop,
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the thottled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
-			throttled( event, event.currentTarget );
+			throttled( event, event.currentTarget.ownerDocument );
 		},
 		onDragLeave() {
 			throttled.cancel();
 			hideInsertionPoint();
-			setTargetBlockIndex( null );
 		},
 		onDragEnd() {
 			throttled.cancel();
 			hideInsertionPoint();
-			setTargetBlockIndex( null );
 		},
 	} );
 }

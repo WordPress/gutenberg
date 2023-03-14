@@ -11,6 +11,92 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.90.0
+-   [*] Fix parsing of css units for null matched values [#48484]
+-   [*] Spacer block - Add initial support for spacing presets [#47258]
+-   [*] Support Visual Regression testing [#47845]
+-   [*] Add metadata parameter to media upload events [#48103]  
+
+## 1.89.1 
+-   [*] Fix inaccessible block settings within the unsupported block editor [#48435]
+
+## 1.89.0 
+* No User facing changes *
+
+## 1.88.0 
+-   [*] Bump Android `minSdkVersion` to 24 [#47604]
+-   [*] Update React Native Reanimated to 2.9.1-wp-3 [#47574]
+-   [*] Bump Aztec version to `1.6.3` [#47610]
+
+## 1.87.3
+-   [*] Fix insert blocks not handling raw string properly in unsupported block editor [#47472]
+
+## 1.87.2
+-   [*] Add boolean contentStyle and clientId check to Column Edit InnerBlocks [#47234]
+-   [*] Line-height and font-size regression fixes [#47284]
+
+## 1.87.1
+-   [**] Gallery block: Address styling regression, in which negative margin was added [#47086]
+-   [*] RichText - Parse CSS values and avoid setting undefined ones [#47080]
+
+## 1.87.0
+-   [*] Add capabilities to force only Core blocks and control Support section [#46215]
+
+## 1.86.1
+-   [*] Block Actions Menu - Fix block title regression and adds integration tests [#46699]
+
+## 1.86.0
+-   [**] Upgrade React Native to 0.69.4 [#43485]
+-   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
+
+## 1.85.1
+-   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
+
+## 1.85.0
+-   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
+
+## 1.84.1
+-   [**] Native inner blocks merge where appropriate [#45048]
+
+## 1.84.0
+-   [*] Upgrade compile and target sdk version to Android API 31 [#44610]
+-   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
+
+## 1.83.0
+* No User facing changes *
+
+## 1.82.1
+-   [**] List block v2: Fix issues splitting or merging paragraphs into the block [#43949]
+
+## 1.82.0
+-   [*] [iOS] Explicitly set tint color for action sheets to always be blue [#43759]
+
+## 1.81.2
+-   [**] List V2 - Prevent error when list is empty [#43861]
+
+## 1.81.1
+-   [*] List block v2: Fix text color inconsistencies with list items [#43244]
+-   [*] Use default placeholder text color for native List Item [#43353]
+-   [**] Add BlockListCompact [#43431]
+-   [*] Fix dynamic React Native version [#43058]
+-   [**] Disable FastImage on Android [#43322]
+
+## 1.81.0
+-   [***] List block V2 [#42702]
+
+## 1.80.1
+-   [*] Image - Workaround for Android and orientation changes [#42900]
+
+## 1.80.0
+-   [*] Add React Native FastImage [#42009]
+-   [*] Block inserter displays block collections [#42405]
+-   [*] Fix incorrect spacing within Image alt text footnote [#42504]
+-   [***] Gallery and Image block - Performance improvements [#42178]
+
+## 1.79.1
+-   [**] Fix a crash when scrolling posts containing Embed blocks (Android 12 only) [#42514]
+
+## 1.79.0
 -   [*] Add 'Insert from URL' option to Video block [#41493]
 -   [*] Image block copies the alt text from the media library when selecting an item [#41839]
 -   [*] Introduce "block recovery" option for invalid blocks [#41988]

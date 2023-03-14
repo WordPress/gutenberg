@@ -6,6 +6,7 @@ export {
 	Polygon,
 	Rect,
 	G,
+	Line,
 	HorizontalRule,
 	BlockQuotation,
 } from '@wordpress/primitives';
@@ -16,13 +17,13 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
-export { __unstableMotion } from './animation';
+export { __unstableMotion, __unstableAnimatePresence } from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
 	useAutocompleteProps as __unstableUseAutocompleteProps,
 } from './autocomplete';
-export { default as BaseControl } from './base-control';
+export { default as BaseControl, useBaseControlProps } from './base-control';
 export {
 	BorderBoxControl as __experimentalBorderBoxControl,
 	hasSplitBorders as __experimentalHasSplitBorders,
@@ -30,7 +31,10 @@ export {
 	isEmptyBorder as __experimentalIsEmptyBorder,
 } from './border-box-control';
 export { BorderControl as __experimentalBorderControl } from './border-control';
-export { default as __experimentalBoxControl } from './box-control';
+export {
+	default as __experimentalBoxControl,
+	applyValueToSides as __experimentalApplyValueToSides,
+} from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
 export {
@@ -55,7 +59,7 @@ export {
 	useCompositeState as __unstableUseCompositeState,
 } from './composite';
 export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
-export { default as CustomSelectControl } from './custom-select-control';
+export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
@@ -66,6 +70,7 @@ export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
+export { default as __experimentalDropdownContentWrapper } from './dropdown/dropdown-content-wrapper';
 export { default as DropdownMenu } from './dropdown-menu';
 export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
 export { Elevation as __experimentalElevation } from './elevation';
@@ -91,6 +96,8 @@ export {
 	Item as __experimentalItem,
 } from './item-group';
 export { default as __experimentalInputControl } from './input-control';
+export { default as __experimentalInputControlPrefixWrapper } from './input-control/input-prefix-wrapper';
+export { default as __experimentalInputControlSuffixWrapper } from './input-control/input-suffix-wrapper';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';
@@ -108,6 +115,7 @@ export {
 	NavigatorScreen as __experimentalNavigatorScreen,
 	NavigatorButton as __experimentalNavigatorButton,
 	NavigatorBackButton as __experimentalNavigatorBackButton,
+	NavigatorToParentButton as __experimentalNavigatorToParentButton,
 	useNavigator as __experimentalUseNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
@@ -120,7 +128,7 @@ export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
 export { default as QueryControls } from './query-controls';
-export { default as __experimentalRadio } from './radio';
+export { default as __experimentalRadio } from './radio-group/radio';
 export { default as __experimentalRadioGroup } from './radio-group';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
@@ -147,12 +155,14 @@ export {
 	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
 	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
 } from './toggle-group-control';
-export { default as Toolbar } from './toolbar';
-export { default as ToolbarButton } from './toolbar-button';
-export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
-export { default as __experimentalToolbarContext } from './toolbar-context';
-export { default as ToolbarGroup } from './toolbar-group';
-export { default as ToolbarItem } from './toolbar-item';
+export {
+	Toolbar,
+	ToolbarButton,
+	ToolbarContext as __experimentalToolbarContext,
+	ToolbarDropdownMenu,
+	ToolbarGroup,
+	ToolbarItem,
+} from './toolbar';
 export {
 	ToolsPanel as __experimentalToolsPanel,
 	ToolsPanelItem as __experimentalToolsPanelItem,
@@ -182,6 +192,7 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 	useSlot as __experimentalUseSlot,
+	useSlotFills as __experimentalUseSlotFills,
 } from './slot-fill';
 export { default as __experimentalStyleProvider } from './style-provider';
 export { ZStack as __experimentalZStack } from './z-stack';
@@ -201,3 +212,6 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+
+// Private APIs.
+export { privateApis } from './private-apis';

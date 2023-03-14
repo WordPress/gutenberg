@@ -21,13 +21,13 @@ export default function useCreateNavigationMenu( clientId ) {
 	const [ value, setValue ] = useState( null );
 	const [ error, setError ] = useState( null );
 
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord, editEntityRecord } = useDispatch( coreStore );
 	const generateDefaultTitle = useGenerateDefaultNavigationTitle( clientId );
 
 	// This callback uses data from the two placeholder steps and only creates
 	// a new navigation menu when the user completes the final step.
 	const create = useCallback(
-		async ( title = null, blocks = [] ) => {
+		async ( title = null, blocks = [], postStatus ) => {
 			// Guard against creating Navigations without a title.
 			// Note you can pass no title, but if one is passed it must be
 			// a string otherwise the title may end up being empty.
@@ -60,7 +60,7 @@ export default function useCreateNavigationMenu( clientId ) {
 			const record = {
 				title,
 				content: serialize( blocks ),
-				status: 'publish',
+				status: postStatus,
 			};
 
 			// Return affords ability to await on this function directly
@@ -68,6 +68,18 @@ export default function useCreateNavigationMenu( clientId ) {
 				.then( ( response ) => {
 					setValue( response );
 					setStatus( CREATE_NAVIGATION_MENU_SUCCESS );
+
+					// Set the status to publish so that the Navigation block
+					// shows up in the multi entity save flow.
+					if ( postStatus !== 'publish' ) {
+						editEntityRecord(
+							'postType',
+							'wp_navigation',
+							response.id,
+							{ status: 'publish' }
+						);
+					}
+
 					return response;
 				} )
 				.catch( ( err ) => {
@@ -78,7 +90,7 @@ export default function useCreateNavigationMenu( clientId ) {
 					} );
 				} );
 		},
-		[ serialize, saveEntityRecord ]
+		[ saveEntityRecord, editEntityRecord, generateDefaultTitle ]
 	);
 
 	return {
@@ -86,5 +98,9 @@ export default function useCreateNavigationMenu( clientId ) {
 		status,
 		value,
 		error,
+		isIdle: status === CREATE_NAVIGATION_MENU_IDLE,
+		isPending: status === CREATE_NAVIGATION_MENU_PENDING,
+		isSuccess: status === CREATE_NAVIGATION_MENU_SUCCESS,
+		isError: status === CREATE_NAVIGATION_MENU_ERROR,
 	};
 }

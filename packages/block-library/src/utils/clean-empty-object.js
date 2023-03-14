@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, isObject, mapValues, pickBy } from 'lodash';
-
-const identity = ( x ) => x;
+import { isEmpty, mapValues } from 'lodash';
 
 /**
  * Removed empty nodes from nested objects.
@@ -12,12 +10,17 @@ const identity = ( x ) => x;
  * @return {Object} Object cleaned from empty nodes.
  */
 const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) || Array.isArray( object ) ) {
+	if (
+		object === null ||
+		typeof object !== 'object' ||
+		Array.isArray( object )
+	) {
 		return object;
 	}
-	const cleanedNestedObjects = pickBy(
-		mapValues( object, cleanEmptyObject ),
-		identity
+	const cleanedNestedObjects = Object.fromEntries(
+		Object.entries( mapValues( object, cleanEmptyObject ) ).filter(
+			( [ , value ] ) => Boolean( value )
+		)
 	);
 	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
 };

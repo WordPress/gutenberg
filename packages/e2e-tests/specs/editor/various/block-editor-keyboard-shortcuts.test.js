@@ -50,9 +50,10 @@ describe( 'block editor keyboard shortcuts', () => {
 			it( 'should move the blocks up', async () => {
 				await createTestParagraphBlocks();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
-				await page.keyboard.down( 'Shift' );
-				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.up( 'Shift' );
+				await pressKeyWithModifier( 'shift', 'ArrowUp' );
+				await page.waitForSelector(
+					'[aria-label="Multiple selected blocks"]'
+				);
 				await moveUp();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 			} );
@@ -61,9 +62,10 @@ describe( 'block editor keyboard shortcuts', () => {
 				await createTestParagraphBlocks();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.down( 'Shift' );
-				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.up( 'Shift' );
+				await pressKeyWithModifier( 'shift', 'ArrowUp' );
+				await page.waitForSelector(
+					'[aria-label="Multiple selected blocks"]'
+				);
 				await moveDown();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 			} );
@@ -87,7 +89,7 @@ describe( 'block editor keyboard shortcuts', () => {
 		} );
 		it( 'should prevent deleting multiple selected blocks from inputs', async () => {
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Add to Reusable blocks' );
+			await clickMenuItem( 'Create Reusable block' );
 			const reusableBlockNameInputSelector =
 				'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
 			const nameInput = await page.waitForSelector(

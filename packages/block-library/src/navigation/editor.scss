@@ -32,13 +32,6 @@
  * Submenus.
  */
 
-// Ensure sub-menus stay open and visible when a nested block is selected.
-.wp-block-navigation__container.is-parent-of-selected-block {
-	visibility: visible;
-	opacity: 1;
-	overflow: visible;
-}
-
 // Low specificity default to ensure background color applies to submenus.
 .wp-block-navigation__container,
 .wp-block-navigation-item {
@@ -46,8 +39,7 @@
 }
 
 // Only show the flyout on hover if the parent menu item is selected.
-.wp-block-navigation:not(.is-selected):not(.has-child-selected)
-.has-child:hover {
+.wp-block-navigation:not(.is-selected):not(.has-child-selected) .has-child:hover {
 	> .wp-block-navigation__submenu-container {
 		opacity: 0;
 		visibility: hidden;
@@ -56,6 +48,7 @@
 
 // Styles for submenu flyout.
 .has-child {
+
 	&.is-selected,
 	&.has-child-selected {
 		> .wp-block-navigation__submenu-container {
@@ -83,8 +76,7 @@
 	flex-direction: column;
 }
 
-.is-dragging-components-draggable
-.wp-block-navigation-link > .wp-block-navigation__container {
+.is-dragging-components-draggable .wp-block-navigation-link > .wp-block-navigation__container {
 	// Set opacity to 1 to still be able to show the draggable chip.
 	opacity: 1;
 	visibility: hidden;
@@ -124,6 +116,7 @@
  */
 
 $colors-selector-size: 22px;
+
 .block-library-colors-selector {
 	width: auto;
 
@@ -158,7 +151,7 @@ $colors-selector-size: 22px;
 		min-width: $colors-selector-size;
 		height: $colors-selector-size;
 		min-height: $colors-selector-size;
-		line-height: ( $colors-selector-size - 2 );
+		line-height: ($colors-selector-size - 2);
 		padding: 2px;
 
 		> svg {
@@ -168,6 +161,7 @@ $colors-selector-size: 22px;
 
 		// Styling icon color.
 		&.has-text-color {
+
 			> svg,
 			> svg path {
 				color: inherit;
@@ -178,6 +172,7 @@ $colors-selector-size: 22px;
 
 // Colors Selector Popover.
 $color-control-label-height: 20px;
+
 .block-library-colors-selector__popover {
 	.color-palette-controller-container {
 		padding: 16px;
@@ -200,9 +195,9 @@ $color-control-label-height: 20px;
 
 // Override inner padding on default appender.
 // This should be a temporary fix, to be replaced by improvements to
-// the sibling inserter.
+// the sibling inserter. Or by the dropdown appender that is used in Group, instead of the "Button block appender".
 // See https://github.com/WordPress/gutenberg/issues/37572.
-.wp-block-navigation .block-editor-button-block-appender {
+.wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
 	background-color: $gray-900;
 	color: $white;
 
@@ -229,13 +224,16 @@ $color-control-label-height: 20px;
 	0% {
 		opacity: 1;
 	}
+
 	50% {
 		opacity: 0.5;
 	}
+
 	100% {
 		opacity: 1;
 	}
 }
+
 // Unstyle some inherited placeholder component styles.
 .components-placeholder.wp-block-navigation-placeholder {
 	outline: none;
@@ -261,10 +259,6 @@ $color-control-label-height: 20px;
 	}
 }
 
-.wp-block-navigation-placeholder .components-spinner {
-	margin-top: 0;
-}
-
 // Unselected state.
 .wp-block-navigation-placeholder__preview {
 	display: flex;
@@ -282,6 +276,7 @@ $color-control-label-height: 20px;
 	// against any background color.
 	color: currentColor;
 	background: transparent;
+
 	&::before {
 		content: "";
 		display: block;
@@ -290,9 +285,9 @@ $color-control-label-height: 20px;
 		right: 0;
 		bottom: 0;
 		left: 0;
-		border: $border-width dashed currentColor;
-		opacity: 0.4;
 		pointer-events: none;
+		border: $border-width dashed currentColor;
+		@include placeholder-style();
 
 		// Inherit border radius from style variations.
 		border-radius: inherit;
@@ -300,7 +295,6 @@ $color-control-label-height: 20px;
 
 	> svg {
 		fill: currentColor;
-		opacity: 0.4;
 	}
 }
 
@@ -350,6 +344,7 @@ $color-control-label-height: 20px;
 	// Hide the navigation indicator when in small contexts.
 	.is-small &,
 	.is-medium & {
+
 		.wp-block-navigation-placeholder__actions__indicator,
 		.wp-block-navigation-placeholder__actions__indicator + hr {
 			display: none;
@@ -439,15 +434,14 @@ $color-control-label-height: 20px;
 		}
 	}
 }
+
 // Emulate the fullscreen editing inside the editor.
 // Most of this can be removed when the iframe lands.
 
 // When not fullscreen.
 .wp-block-navigation__responsive-container.is-menu-open {
 	position: fixed;
-	top:
-		$admin-bar-height-big + $header-height + $block-toolbar-height +
-		$border-width;
+	top: $admin-bar-height-big + $header-height + $block-toolbar-height + $border-width;
 
 	@include break-medium() {
 		top: $admin-bar-height + $header-height + $border-width;
@@ -457,6 +451,7 @@ $color-control-label-height: 20px;
 	@include break-medium() {
 		left: $admin-sidebar-width-collapsed;
 	}
+
 	@include break-large() {
 		left: $admin-sidebar-width;
 	}
@@ -464,17 +459,13 @@ $color-control-label-height: 20px;
 
 .has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
 	@include break-medium() {
-		top:
-			$admin-bar-height + $header-height + $block-toolbar-height +
-			$border-width;
+		top: $admin-bar-height + $header-height + $block-toolbar-height + $border-width;
 	}
 }
 
 .is-mobile-preview .wp-block-navigation__responsive-container.is-menu-open,
 .is-tablet-preview .wp-block-navigation__responsive-container.is-menu-open {
-	top:
-		$admin-bar-height + $header-height + $block-toolbar-height +
-		$border-width;
+	top: $admin-bar-height + $header-height + $block-toolbar-height + $border-width;
 }
 
 .is-sidebar-opened .wp-block-navigation__responsive-container.is-menu-open {
@@ -485,9 +476,7 @@ $color-control-label-height: 20px;
 .is-fullscreen-mode {
 	.wp-block-navigation__responsive-container.is-menu-open {
 		left: 0; // Unset the value from non fullscreen mode.
-		top:
-			$admin-bar-height-big + $header-height + $block-toolbar-height +
-			$border-width;
+		top: $admin-bar-height-big + $header-height + $block-toolbar-height + $border-width;
 
 		@include break-medium() {
 			top: $header-height + $border-width;
@@ -507,8 +496,7 @@ $color-control-label-height: 20px;
 }
 
 // The iframe makes these rules a lot simpler.
-body.editor-styles-wrapper
-.wp-block-navigation__responsive-container.is-menu-open {
+body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-open {
 	top: 0;
 	right: 0;
 	bottom: 0;
@@ -520,6 +508,7 @@ body.editor-styles-wrapper
 // so focus is applied naturally on the block container.
 // It's important the right container has focus, otherwise you can't press
 // "Delete" to remove the block.
+.wp-block-navigation__responsive-container,
 .wp-block-navigation__responsive-close {
 	@include break-small() {
 		pointer-events: none;
@@ -544,6 +533,14 @@ body.editor-styles-wrapper
 	color: inherit;
 }
 
+.components-heading.wp-block-navigation-off-canvas-editor__title {
+	margin: 0;
+}
+
+.wp-block-navigation-off-canvas-editor__header {
+	margin-bottom: $grid-unit-10;
+}
+
 // Customize the mobile editing.
 // This can be revisited in the future, but for now, inherit design from the parent.
 .is-menu-open .wp-block-navigation__responsive-container-content * {
@@ -556,6 +553,7 @@ body.editor-styles-wrapper
 	0% {
 		opacity: 0;
 	}
+
 	100% {
 		opacity: 1;
 	}
@@ -563,37 +561,22 @@ body.editor-styles-wrapper
 
 // Space spinner to give it breathing
 // room when block is selected and has focus outline.
-.wp-block-navigation .components-spinner {
+.wp-block-navigation__loading-indicator-container {
 	padding: $grid-unit-10 $grid-unit-15;
 }
 
-.wp-block-navigation__unsaved-changes {
-	position: relative;
-
-	.components-spinner {
-		position: absolute;
-		top: calc(50% - #{$spinner-size} / 2);
-		left: calc(50% - #{$spinner-size} / 2);
-
-		// Delay showing the saving spinner until after 2 seconds.
-		// This should ensure it only shows for slow connections.
-		opacity: 0;
-		animation: 0.5s linear 2s normal forwards fadein;
-	}
+.wp-block-navigation .wp-block-navigation__uncontrolled-inner-blocks-loading-indicator {
+	margin-top: 0;
 }
 
 @keyframes fadeouthalf {
 	0% {
 		opacity: 1;
 	}
+
 	100% {
 		opacity: 0.5;
 	}
-}
-
-.wp-block-navigation__unsaved-changes-overlay.is-saving {
-	opacity: 1;
-	animation: 0.5s linear 2s normal forwards fadeouthalf;
 }
 
 .wp-block-navigation-delete-menu-button {
@@ -602,9 +585,17 @@ body.editor-styles-wrapper
 	margin-bottom: $grid-unit-20;
 }
 
+// increased specificity to override button variant
+// for the manage menus button in the advanced area
+// of the navigation block
+.components-button.is-link.wp-block-navigation-manage-menus-button {
+	margin-bottom: $grid-unit-20;
+}
+
 .wp-block-navigation__overlay-menu-preview {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	width: 100%;
 	background-color: $gray-100;
 	padding: 0 $grid-unit-30;
@@ -630,3 +621,39 @@ body.editor-styles-wrapper
 	display: none;
 }
 
+/**
+ * Navigation selector styles
+ */
+.wp-block-navigation__navigation-selector {
+	margin-bottom: $grid-unit-20;
+	width: 100%;
+}
+
+.wp-block-navigation__navigation-selector-button {
+	border: 1px solid;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.wp-block-navigation__navigation-selector-button__icon {
+	flex: 0 0 auto;
+}
+
+.wp-block-navigation__navigation-selector-button__label {
+	flex: 0 1 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wp-block-navigation__navigation-selector-button--createnew {
+	border: 1px solid;
+	margin-bottom: $grid-unit-20;
+	width: 100%;
+}
+
+// Buttons inside a disabled component get semitransparent when there's a clickthrough overlay.
+// Since this navigation button is content rather than UI, however, override that.
+.wp-block-navigation__responsive-container-open.components-button {
+	opacity: 1;
+}

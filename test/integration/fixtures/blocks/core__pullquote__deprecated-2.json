@@ -3,7 +3,7 @@
 		"name": "core/pullquote",
 		"isValid": true,
 		"attributes": {
-			"value": "<p>Testing deprecated pullquote block...</p>",
+			"value": "Testing deprecated pullquote block...",
 			"citation": "...with a caption"
 		},
 		"innerBlocks": []

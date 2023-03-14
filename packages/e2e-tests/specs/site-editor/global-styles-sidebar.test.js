@@ -5,6 +5,7 @@ import {
 	deleteAllTemplates,
 	activateTheme,
 	visitSiteEditor,
+	enterEditMode,
 	toggleGlobalStyles,
 	openGlobalStylesPanel,
 } from '@wordpress/e2e-test-utils';
@@ -26,6 +27,7 @@ describe( 'Global styles sidebar', () => {
 	} );
 	beforeEach( async () => {
 		await visitSiteEditor();
+		await enterEditMode();
 	} );
 	describe( 'blocks list', () => {
 		it( 'should filter results properly', async () => {
@@ -36,7 +38,8 @@ describe( 'Global styles sidebar', () => {
 			const results = await page.$$(
 				'.edit-site-block-types-item-list div[role="listitem"]'
 			);
-			expect( results.length ).toEqual( 1 );
+			// Matches both Heading and Table of Contents blocks. (The latter contains "heading" in its description.)
+			expect( results.length ).toEqual( 2 );
 		} );
 	} );
 } );

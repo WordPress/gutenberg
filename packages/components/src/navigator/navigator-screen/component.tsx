@@ -10,12 +10,14 @@ import { css } from '@emotion/react';
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
 import {
-	useReducedMotion,
-	useMergeRefs,
-	usePrevious,
-} from '@wordpress/compose';
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useId,
+} from '@wordpress/element';
+import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
 
@@ -44,18 +46,30 @@ type Props = Omit<
 	keyof MotionProps
 >;
 
-function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
+function UnconnectedNavigatorScreen(
+	props: Props,
+	forwardedRef: ForwardedRef< any >
+) {
+	const screenId = useId();
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
 	);
 
 	const prefersReducedMotion = useReducedMotion();
-	const { location } = useContext( NavigatorContext );
-	const isMatch = location.path === escapeAttribute( path );
+	const { location, match, addScreen, removeScreen } =
+		useContext( NavigatorContext );
+	const isMatch = match === screenId;
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
-	const previousLocation = usePrevious( location );
+	useEffect( () => {
+		const screen = {
+			id: screenId,
+			path: escapeAttribute( path ),
+		};
+		addScreen( screen );
+		return () => removeScreen( screen );
+	}, [ screenId, path, addScreen, removeScreen ] );
 
 	const cx = useCx();
 	const classes = useMemo(
@@ -72,6 +86,12 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 		[ className, cx ]
 	);
 
+	const locationRef = useRef( location );
+
+	useEffect( () => {
+		locationRef.current = location;
+	}, [ location ] );
+
 	// Focus restoration
 	const isInitialLocation = location.isInitial && ! location.isBack;
 	useEffect( () => {
@@ -79,7 +99,21 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 		// - if the current location is not the initial one (to avoid moving focus on page load)
 		// - when the screen becomes visible
 		// - if the wrapper ref has been assigned
-		if ( isInitialLocation || ! isMatch || ! wrapperRef.current ) {
+		// - if focus hasn't already been restored for the current location
+		if (
+			isInitialLocation ||
+			! isMatch ||
+			! wrapperRef.current ||
+			locationRef.current.hasRestoredFocus
+		) {
+			return;
+		}
+
+		const activeElement = wrapperRef.current.ownerDocument.activeElement;
+
+		// If an element is already focused within the wrapper do not focus the
+		// element. This prevents inputs or buttons from losing focus unnecessarily.
+		if ( wrapperRef.current.contains( activeElement ) ) {
 			return;
 		}
 
@@ -87,9 +121,9 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 
 		// When navigating back, if a selector is provided, use it to look for the
 		// target element (assumed to be a node inside the current NavigatorScreen)
-		if ( location.isBack && previousLocation?.focusTargetSelector ) {
+		if ( location.isBack && location?.focusTargetSelector ) {
 			elementToFocus = wrapperRef.current.querySelector(
-				previousLocation.focusTargetSelector
+				location.focusTargetSelector
 			);
 		}
 
@@ -99,12 +133,17 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 			const firstTabbable = (
 				focus.tabbable.find( wrapperRef.current ) as HTMLElement[]
 			 )[ 0 ];
-
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}
 
+		locationRef.current.hasRestoredFocus = true;
 		elementToFocus.focus();
-	}, [ isInitialLocation, isMatch ] );
+	}, [
+		isInitialLocation,
+		isMatch,
+		location.isBack,
+		location.focusTargetSelector,
+	] );
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 
@@ -205,9 +244,9 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
  * );
  * ```
  */
-const ConnectedNavigatorScreen = contextConnect(
-	NavigatorScreen,
+export const NavigatorScreen = contextConnect(
+	UnconnectedNavigatorScreen,
 	'NavigatorScreen'
 );
 
-export default ConnectedNavigatorScreen;
+export default NavigatorScreen;

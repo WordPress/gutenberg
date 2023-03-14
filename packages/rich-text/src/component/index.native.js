@@ -4,7 +4,6 @@
  * External dependencies
  */
 import { View, Platform, Dimensions } from 'react-native';
-import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
 import { colord } from 'colord';
 
@@ -18,7 +17,11 @@ import {
 } from '@wordpress/react-native-bridge';
 import { BlockFormatControls, getPxFromCssUnit } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import {
+	compose,
+	debounce,
+	withPreferredColorScheme,
+} from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -224,8 +227,10 @@ export class RichText extends Component {
 
 	onFormatChange( record ) {
 		const { start = 0, end = 0, activeFormats = [] } = record;
-		const changeHandlers = pickBy( this.props, ( v, key ) =>
-			key.startsWith( 'format_on_change_functions_' )
+		const changeHandlers = Object.fromEntries(
+			Object.entries( this.props ).filter( ( [ key ] ) =>
+				key.startsWith( 'format_on_change_functions_' )
+			)
 		);
 
 		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
@@ -367,6 +372,7 @@ export class RichText extends Component {
 		this.customEditableOnKeyDown?.( {
 			preventDefault: () => undefined,
 			...event,
+			key: RCTAztecView.KeyCodes[ event?.keyCode ],
 		} );
 
 		this.handleDelete( event );
@@ -926,6 +932,11 @@ export class RichText extends Component {
 
 		let newFontSize = DEFAULT_FONT_SIZE;
 
+		// Disables line-height rendering for pre elements until we fix some issues with AztecAndroid.
+		if ( tagName === 'pre' && ! this.isIOS ) {
+			return undefined;
+		}
+
 		// For block-based themes, get the default editor font size.
 		if ( baseGlobalStyles?.typography?.fontSize && tagName === 'p' ) {
 			newFontSize = baseGlobalStyles?.typography?.fontSize;
@@ -962,6 +973,11 @@ export class RichText extends Component {
 			baseGlobalStyles?.elements?.[ tagName ]?.typography?.lineHeight;
 		let newLineHeight;
 
+		// Disables line-height rendering for pre elements until we fix some issues with AztecAndroid.
+		if ( tagName === 'pre' && ! this.isIOS ) {
+			return undefined;
+		}
+
 		if ( ! this.getIsBlockBasedTheme() ) {
 			return;
 		}
@@ -994,6 +1010,11 @@ export class RichText extends Component {
 		// Check the final value is not over the minimum supported value.
 		if ( newLineHeight && newLineHeight < MIN_LINE_HEIGHT ) {
 			newLineHeight = MIN_LINE_HEIGHT;
+		}
+
+		// Until we parse CSS values correctly, avoid passing NaN values to Aztec
+		if ( isNaN( newLineHeight ) ) {
+			return undefined;
 		}
 
 		return newLineHeight;
@@ -1048,6 +1069,7 @@ export class RichText extends Component {
 			selectionStart,
 			selectionEnd,
 			disableSuggestions,
+			containerWidth,
 		} = this.props;
 		const { currentFontSize } = this.state;
 
@@ -1124,11 +1146,16 @@ export class RichText extends Component {
 			maxWidth && this.state.width && maxWidth - this.state.width < 10
 				? maxWidth
 				: this.state.width;
-		const containerStyles = style?.padding &&
-			style?.backgroundColor && {
-				padding: style.padding,
-				backgroundColor: style.backgroundColor,
-			};
+		const containerStyles = [
+			style?.padding &&
+				style?.backgroundColor && {
+					padding: style.padding,
+					backgroundColor: style.backgroundColor,
+				},
+			containerWidth && {
+				width: containerWidth,
+			},
+		];
 
 		const EditableView = ( props ) => {
 			this.customEditableOnKeyDown = props?.onKeyDown;
@@ -1272,10 +1299,7 @@ export default compose( [
 			select( 'core/block-editor' );
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
-		const parentBlockStyles = get( parentBlock, [
-			'attributes',
-			'childrenStyles',
-		] );
+		const parentBlockStyles = parentBlock?.attributes?.childrenStyles;
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
@@ -1286,10 +1310,9 @@ export default compose( [
 			: settings?.colors;
 
 		return {
-			areMentionsSupported:
-				getSettings( 'capabilities' ).mentions === true,
-			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
-			...{ parentBlockStyles },
+			areMentionsSupported: settings?.capabilities?.mentions === true,
+			areXPostsSupported: settings?.capabilities?.xposts === true,
+			parentBlockStyles,
 			baseGlobalStyles,
 			colorPalette,
 		};

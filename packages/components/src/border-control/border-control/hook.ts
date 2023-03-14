@@ -30,12 +30,16 @@ export function useBorderControl(
 ) {
 	const {
 		className,
+		colors = [],
 		isCompact,
 		onChange,
+		enableAlpha = true,
+		enableStyle = true,
 		shouldSanitizeBorder = true,
+		size = 'default',
 		value: border,
 		width,
-		__next36pxDefaultSize = false,
+		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
 
@@ -65,7 +69,6 @@ export function useBorderControl(
 			const [ parsedValue ] =
 				parseQuantityAndUnitFromRawValue( newWidth );
 			const hasZeroWidth = parsedValue === 0;
-
 			const updatedBorder = { ...border, width: newWidthValue };
 
 			// Setting the border width explicitly to zero will also set the
@@ -106,7 +109,7 @@ export function useBorderControl(
 	);
 
 	const onSliderChange = useCallback(
-		( value: string ) => {
+		( value?: number ) => {
 			onWidthChange( `${ value }${ widthUnit }` );
 		},
 		[ onWidthChange, widthUnit ]
@@ -118,18 +121,18 @@ export function useBorderControl(
 		return cx( styles.borderControl, className );
 	}, [ className, cx ] );
 
+	let wrapperWidth = width;
+	if ( isCompact ) {
+		// Widths below represent the minimum usable width for compact controls.
+		// Taller controls contain greater internal padding, thus greater width.
+		wrapperWidth = size === '__unstable-large' ? '116px' : '90px';
+	}
 	const innerWrapperClassName = useMemo( () => {
-		const wrapperWidth = isCompact ? '90px' : width;
-		const widthStyle =
-			!! wrapperWidth && styles.wrapperWidth( wrapperWidth );
-		const heightStyle = styles.wrapperHeight( __next36pxDefaultSize );
+		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
+		const heightStyle = styles.wrapperHeight( size );
 
 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
-	}, [ isCompact, width, cx, __next36pxDefaultSize ] );
-
-	const widthControlClassName = useMemo( () => {
-		return cx( styles.borderWidthControl() );
-	}, [ cx ] );
+	}, [ wrapperWidth, cx, size ] );
 
 	const sliderClassName = useMemo( () => {
 		return cx( styles.borderSlider() );
@@ -138,16 +141,20 @@ export function useBorderControl(
 	return {
 		...otherProps,
 		className: classes,
+		colors,
+		enableAlpha,
+		enableStyle,
 		innerWrapperClassName,
+		inputWidth: wrapperWidth,
 		onBorderChange,
 		onSliderChange,
 		onWidthChange,
 		previousStyleSelection: styleSelection,
 		sliderClassName,
 		value: border,
-		widthControlClassName,
 		widthUnit,
 		widthValue,
-		__next36pxDefaultSize,
+		size,
+		__experimentalIsRenderedInSidebar,
 	};
 }

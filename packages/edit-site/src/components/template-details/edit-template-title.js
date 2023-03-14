@@ -17,11 +17,16 @@ export default function EditTemplateTitle( { template } ) {
 
 	return (
 		<TextControl
+			__nextHasNoMarginBottom
 			label={ __( 'Title' ) }
 			value={ forceEmpty ? '' : title }
-			help={ __(
-				'Give the template a title that indicates its purpose, e.g. "Full Width".'
-			) }
+			help={
+				template.type !== 'wp_template_part'
+					? __(
+							'Give the template a title that indicates its purpose, e.g. "Full Width".'
+					  )
+					: null
+			}
 			onChange={ ( newTitle ) => {
 				if ( ! newTitle && ! forceEmpty ) {
 					setForceEmpty( true );

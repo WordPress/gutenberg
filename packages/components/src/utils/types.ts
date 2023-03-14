@@ -7,21 +7,6 @@ export type SizeRangeDefault =
 
 export type SizeRangeReduced = 'large' | 'medium' | 'small';
 
-export type FormElementProps< V > = {
-	/**
-	 * The default (initial) state to use if `value` is undefined.
-	 */
-	defaultValue?: V;
-	/**
-	 * Determines if element is disabled.
-	 */
-	disabled?: boolean;
-	/**
-	 * Label for the form element.
-	 */
-	label?: string;
-};
-
 export type PopperPlacement =
 	| 'auto'
 	| 'auto-start'

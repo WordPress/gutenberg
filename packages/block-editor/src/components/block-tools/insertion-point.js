@@ -17,10 +17,11 @@ import { useReducedMotion } from '@wordpress/compose';
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import BlockPopoverInbetween from '../block-popover/inbetween';
+import BlockDropZonePopover from '../block-popover/drop-zone';
 
 export const InsertionPointOpenRef = createContext();
 
-function InsertionPointPopover( {
+function InbetweenInsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
@@ -33,6 +34,8 @@ function InsertionPointPopover( {
 		nextClientId,
 		rootClientId,
 		isInserterShown,
+		isDistractionFree,
+		isNavigationMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockOrder,
@@ -41,6 +44,8 @@ function InsertionPointPopover( {
 			isBlockBeingDragged,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
+			getSettings,
+			isNavigationMode: _isNavigationMode,
 		} = select( blockEditorStore );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
@@ -60,6 +65,8 @@ function InsertionPointPopover( {
 			_nextClientId = getNextBlockClientId( _nextClientId );
 		}
 
+		const settings = getSettings();
+
 		return {
 			previousClientId: _previousClientId,
 			nextClientId: _nextClientId,
@@ -67,24 +74,17 @@ function InsertionPointPopover( {
 				getBlockListSettings( insertionPoint.rootClientId )
 					?.orientation || 'vertical',
 			rootClientId: insertionPoint.rootClientId,
+			isNavigationMode: _isNavigationMode(),
+			isDistractionFree: settings.isDistractionFree,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
 	}, [] );
-	const isVertical = orientation === 'vertical';
 
 	const disableMotion = useReducedMotion();
 
 	function onClick( event ) {
 		if ( event.target === ref.current && nextClientId ) {
 			selectBlock( nextClientId, -1 );
-		}
-	}
-
-	function onFocus( event ) {
-		// Only handle click on the wrapper specifically, and not an event
-		// bubbled from the inserter itself.
-		if ( event.target !== ref.current ) {
-			openRef.current = true;
 		}
 	}
 
@@ -96,66 +96,31 @@ function InsertionPointPopover( {
 		}
 	}
 
-	// Define animation variants for the line element.
-	const horizontalLine = {
-		start: {
-			width: 0,
-			top: '50%',
-			bottom: '50%',
-			x: 0,
-		},
-		rest: {
-			width: 4,
-			top: 0,
-			bottom: 0,
-			x: -2,
-		},
-		hover: {
-			width: 4,
-			top: 0,
-			bottom: 0,
-			x: -2,
-		},
-	};
-	const verticalLine = {
-		start: {
-			height: 0,
-			left: '50%',
-			right: '50%',
-			y: 0,
-		},
-		rest: {
-			height: 4,
-			left: 0,
-			right: 0,
-			y: -2,
-		},
-		hover: {
-			height: 4,
-			left: 0,
-			right: 0,
-			y: -2,
-		},
-	};
+	function onFocus( event ) {
+		// Only handle click on the wrapper specifically, and not an event
+		// bubbled from the inserter itself.
+		if ( event.target !== ref.current ) {
+			openRef.current = true;
+		}
+	}
+
 	const lineVariants = {
 		// Initial position starts from the center and invisible.
 		start: {
-			...( ! isVertical ? horizontalLine.start : verticalLine.start ),
 			opacity: 0,
+			scale: 0,
 		},
 		// The line expands to fill the container. If the inserter is visible it
 		// is delayed so it appears orchestrated.
 		rest: {
-			...( ! isVertical ? horizontalLine.rest : verticalLine.rest ),
 			opacity: 1,
-			borderRadius: '2px',
-			transition: { delay: isInserterShown ? 0.4 : 0 },
+			scale: 1,
+			transition: { delay: isInserterShown ? 0.5 : 0, type: 'tween' },
 		},
 		hover: {
-			...( ! isVertical ? horizontalLine.hover : verticalLine.hover ),
 			opacity: 1,
-			borderRadius: '2px',
-			transition: { delay: 0.4 },
+			scale: 1,
+			transition: { delay: 0.5, type: 'tween' },
 		},
 	};
 
@@ -165,9 +130,13 @@ function InsertionPointPopover( {
 		},
 		rest: {
 			scale: 1,
-			transition: { delay: 0.2 },
+			transition: { delay: 0.4, type: 'tween' },
 		},
 	};
+
+	if ( isDistractionFree && ! isNavigationMode ) {
+		return null;
+	}
 
 	const className = classnames(
 		'block-editor-block-list__insertion-point',
@@ -200,6 +169,7 @@ function InsertionPointPopover( {
 				<motion.div
 					variants={ lineVariants }
 					className="block-editor-block-list__insertion-point-indicator"
+					data-testid="block-list-insertion-point-indicator"
 				/>
 				{ isInserterShown && (
 					<motion.div
@@ -227,15 +197,31 @@ function InsertionPointPopover( {
 	);
 }
 
-export default function InsertionPoint( { children, ...props } ) {
-	const isVisible = useSelect( ( select ) => {
-		return select( blockEditorStore ).isBlockInsertionPointVisible();
+export default function InsertionPoint( props ) {
+	const { insertionPoint, isVisible } = useSelect( ( select ) => {
+		const { getBlockInsertionPoint, isBlockInsertionPointVisible } =
+			select( blockEditorStore );
+		return {
+			insertionPoint: getBlockInsertionPoint(),
+			isVisible: isBlockInsertionPointVisible(),
+		};
 	}, [] );
 
-	return (
-		<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-			{ isVisible && <InsertionPointPopover { ...props } /> }
-			{ children }
-		</InsertionPointOpenRef.Provider>
+	if ( ! isVisible ) {
+		return null;
+	}
+
+	/**
+	 * Render a popover that overlays the block when the desired operation is to replace it.
+	 * Otherwise, render a popover in between blocks for the indication of inserting between them.
+	 */
+	return insertionPoint.operation === 'replace' ? (
+		<BlockDropZonePopover
+			// Force remount to trigger the animation.
+			key={ `${ insertionPoint.rootClientId }-${ insertionPoint.index }` }
+			{ ...props }
+		/>
+	) : (
+		<InbetweenInsertionPointPopover { ...props } />
 	);
 }

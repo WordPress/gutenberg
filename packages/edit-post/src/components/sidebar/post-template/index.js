@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -12,9 +12,17 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import PostTemplateForm from './form';
+import { store as editPostStore } from '../../../store';
 
 export default function PostTemplate() {
-	const anchorRef = useRef();
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( { anchor: popoverAnchor, placement: 'bottom-end' } ),
+		[ popoverAnchor ]
+	);
 
 	const isVisible = useSelect( ( select ) => {
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
@@ -27,7 +35,11 @@ export default function PostTemplate() {
 		const hasTemplates =
 			!! settings.availableTemplates &&
 			Object.keys( settings.availableTemplates ).length > 0;
-		if ( ! hasTemplates && ! settings.supportsTemplateMode ) {
+		if ( hasTemplates ) {
+			return true;
+		}
+
+		if ( ! settings.supportsTemplateMode ) {
 			return false;
 		}
 
@@ -41,13 +53,13 @@ export default function PostTemplate() {
 	}
 
 	return (
-		<PanelRow className="edit-post-post-template" ref={ anchorRef }>
+		<PanelRow className="edit-post-post-template" ref={ setPopoverAnchor }>
 			<span>{ __( 'Template' ) }</span>
 			<Dropdown
-				popoverProps={ { anchorRef } }
-				position="bottom left"
+				popoverProps={ popoverProps }
 				className="edit-post-post-template__dropdown"
 				contentClassName="edit-post-post-template__dialog"
+				focusOnMount
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<PostTemplateToggle
 						isOpen={ isOpen }
@@ -67,16 +79,19 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 		const templateSlug =
 			select( editorStore ).getEditedPostAttribute( 'template' );
 
-		const settings = select( editorStore ).getEditorSettings();
-		if ( settings.availableTemplates[ templateSlug ] ) {
-			return settings.availableTemplates[ templateSlug ];
+		const { supportsTemplateMode, availableTemplates } =
+			select( editorStore ).getEditorSettings();
+		if ( ! supportsTemplateMode && availableTemplates[ templateSlug ] ) {
+			return availableTemplates[ templateSlug ];
 		}
-
-		const template = select( coreStore )
-			.getEntityRecords( 'postType', 'wp_template', { per_page: -1 } )
-			?.find( ( { slug } ) => slug === templateSlug );
-
-		return template?.title.rendered;
+		const template =
+			select( coreStore ).canUser( 'create', 'templates' ) &&
+			select( editPostStore ).getEditedPostTemplate();
+		return (
+			template?.title ||
+			template?.slug ||
+			availableTemplates?.[ templateSlug ]
+		);
 	}, [] );
 
 	return (

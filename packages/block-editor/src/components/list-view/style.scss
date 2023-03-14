@@ -19,6 +19,22 @@
 	&.is-selected td {
 		background: var(--wp-admin-theme-color);
 	}
+	&.is-selected.is-synced td {
+		background: var(--wp-block-synced-color);
+	}
+	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents {
+		&:hover,
+		&:focus,
+		.block-editor-block-icon {
+			color: var(--wp-block-synced-color);
+		}
+
+		&:focus::after {
+			box-shadow:
+				inset 0 0 0 1px $white,
+				0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
+		}
+	}
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
 		color: $white;
@@ -35,6 +51,13 @@
 			box-shadow:
 				inset 0 0 0 1px $white,
 				0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+	}
+	&.is-selected.is-synced .block-editor-list-view-block-contents:focus {
+		&::after {
+			box-shadow:
+				inset 0 0 0 1px $white,
+				0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
 		}
 	}
 	&.is-selected .block-editor-list-view-block__menu:focus {
@@ -58,11 +81,11 @@
 	&.is-last-selected td:last-child {
 		border-bottom-right-radius: $radius-block-ui;
 	}
-	&.is-branch-selected:not(.is-selected) {
-		// Lighten a CSS variable without introducing a new SASS variable
-		background:
-			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
-			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
+	&.is-branch-selected:not(.is-selected):not(.is-synced-branch) {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+	}
+	&.is-synced-branch.is-branch-selected {
+		background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 	}
 	&.is-branch-selected.is-first-selected td:first-child {
 		border-top-left-radius: $radius-block-ui;
@@ -97,9 +120,8 @@
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: ($grid-unit-15 * 0.5) $grid-unit-15 ($grid-unit-15 * 0.5) 0;
+		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
 		text-align: left;
-		color: $gray-900;
 		border-radius: $radius-block-ui;
 		position: relative;
 		white-space: nowrap;
@@ -142,6 +164,7 @@
 			}
 		}
 	}
+
 	// Fix focus styling width when one row has fewer cells.
 	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
 		right: 0;
@@ -163,9 +186,8 @@
 	}
 
 	.block-editor-block-icon {
-		align-self: flex-start;
 		margin-right: $grid-unit-10;
-		width: $icon-size;
+		flex: 0 0 $icon-size;
 	}
 
 	.block-editor-list-view-block__menu-cell,
@@ -183,15 +205,13 @@
 		@include reduce-motion("transition");
 
 		> * {
+			will-change: opacity;
 			opacity: 0;
 		}
 
 		// Show on hover, visible, and show above to keep the hit area size.
 		&:hover,
 		&.is-visible {
-			position: relative;
-			z-index: 1;
-
 			> * {
 				opacity: 1;
 				@include edit-post__fade-in-animation;
@@ -207,7 +227,7 @@
 	}
 
 	.block-editor-list-view-block__menu-cell {
-		padding-right: 5px;
+		padding-right: $grid-unit-05;
 
 		.components-button.has-icon {
 			height: 24px;
@@ -249,39 +269,12 @@
 			}
 		}
 
-		// Don't show the focus inherited by the Button component.
-		&:focus:enabled {
-			box-shadow: none;
-			outline: none;
-		}
-
-		// Focus style.
-		&:focus {
-			box-shadow: none;
-			outline: none;
-		}
-
-		&:focus::before {
-			@include block-toolbar-button-style__focus();
-		}
-
-		// Focus and toggle pseudo elements.
+		// Tweak size and position of focus ring.
 		&::before {
-			content: "";
-			position: absolute;
-			display: block;
-			border-radius: $radius-block-ui;
 			height: 16px;
 			min-width: 100%;
-
-			// Position the focus rectangle.
 			left: 0;
 			right: 0;
-
-			// Animate in.
-			animation: components-button__appear-animation 0.1s ease;
-			animation-fill-mode: forwards;
-			@include reduce-motion("animation");
 		}
 	}
 
@@ -297,15 +290,36 @@
 		}
 	}
 
+	.block-editor-list-view-block-select-button__label-wrapper {
+		min-width: 120px;
+	}
+
+	.block-editor-list-view-block-select-button__title {
+		flex: 1;
+		position: relative;
+
+		.components-truncate {
+			position: absolute;
+			width: 100%;
+			transform: translateY(-50%);
+		}
+	}
+
+	.block-editor-list-view-block-select-button__anchor-wrapper {
+		position: relative;
+		max-width: min(110px, 40%);
+		width: 100%;
+	}
+
 	.block-editor-list-view-block-select-button__anchor {
+		position: absolute;
+		right: 0;
+		transform: translateY(-50%);
 		background: rgba($black, 0.1);
 		border-radius: $radius-block-ui;
-		display: inline-block;
 		padding: 2px 6px;
-		margin: 0 $grid-unit-10;
-		max-width: 120px;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		max-width: 100%;
+		box-sizing: border-box;
 	}
 
 	&.is-selected .block-editor-list-view-block-select-button__anchor {
@@ -314,11 +328,6 @@
 
 	.block-editor-list-view-block-select-button__lock {
 		line-height: 0;
-		width: 24px;
-		min-width: 24px;
-		margin-left: auto;
-		padding: 0;
-		vertical-align: middle;
 	}
 }
 
@@ -393,14 +402,6 @@ $block-navigation-max-indent: 8;
 		background: var(--wp-admin-theme-color);
 		height: $border-width;
 	}
-}
-
-// Reset some popover defaults for the drop indicator.
-.block-editor-list-view-drop-indicator > .components-popover__content {
-	margin-left: 0;
-	border: none;
-	box-shadow: none;
-	outline: none;
 }
 
 .block-editor-list-view-placeholder {

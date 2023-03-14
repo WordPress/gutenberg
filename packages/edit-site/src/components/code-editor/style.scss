@@ -1,19 +1,18 @@
 .edit-site-code-editor {
 	position: relative;
 	width: 100%;
+	min-height: 100%;
 	background-color: $white;
-	flex-grow: 1;
 
 	&__body {
 		width: 100%;
-		padding: 0 $grid-unit-15 $grid-unit-15 $grid-unit-15;
+		padding: $grid-unit-15;
 		max-width: $break-xlarge;
 		margin-left: auto;
 		margin-right: auto;
 
 		@include break-large() {
-			padding: $grid-unit-20 $grid-unit-30 #{ $grid-unit-60 * 2 } $grid-unit-30;
-			padding: 0 $grid-unit-30 $grid-unit-30 $grid-unit-30;
+			padding: $grid-unit-30;
 		}
 	}
 

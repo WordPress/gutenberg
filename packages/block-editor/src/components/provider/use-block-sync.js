@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
@@ -152,7 +147,9 @@ export default function useBlockSync( {
 			// to allow that the consumer may apply modifications to reflect
 			// back on the editor.
 			if (
-				last( pendingChanges.current.outgoing ) === controlledBlocks
+				pendingChanges.current.outgoing[
+					pendingChanges.current.outgoing.length - 1
+				] === controlledBlocks
 			) {
 				pendingChanges.current.outgoing = [];
 			}
@@ -268,6 +265,9 @@ export default function useBlockSync( {
 			previousAreBlocksDifferent = areBlocksDifferent;
 		} );
 
-		return () => unsubscribe();
+		return () => {
+			subscribed.current = false;
+			unsubscribe();
+		};
 	}, [ registry, clientId ] );
 }

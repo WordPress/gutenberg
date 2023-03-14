@@ -116,7 +116,9 @@ function createStyleEntryTransform() {
 
 			packages.add( packageName );
 			const entries = await glob(
-				path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+				path
+					.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+					.replace( /\\/g, '/' )
 			);
 
 			// Account for the specific case where block styles in

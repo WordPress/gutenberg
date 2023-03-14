@@ -2,9 +2,54 @@
 
 ## Unreleased
 
+## 12.5.0 (2023-03-01)
+
+## 12.4.0 (2023-02-15)
+
+## 12.3.0 (2023-02-01)
+
+## 12.2.0 (2023-01-11)
+
+## 12.1.0 (2023-01-02)
+
+## 12.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 11.21.0 (2022-11-16)
+
+## 11.20.0 (2022-11-02)
+
+## 11.19.0 (2022-10-19)
+
+## 11.18.0 (2022-10-05)
+
 ### Deprecations
 
--   `withBlockContentContext` is no longer used by the block editor and therefore got deprecated ([#41395](https://github.com/WordPress/gutenberg/pull/3204139530)).
+-   Deprecate non-string descriptions ([#44455](https://github.com/WordPress/gutenberg/pull/44455)).
+
+## 11.17.0 (2022-09-21)
+
+- The block attribute sources `children` and `node` have been deprecated. Please use the `html` source instead. See https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/ and the core blocks for examples.
+## 11.16.0 (2022-09-13)
+
+## 11.15.0 (2022-08-24)
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 11.14.0 (2022-08-10)
+
+## 11.13.0 (2022-07-27)
+
+## 11.12.0 (2022-07-13)
+
+### Deprecations
+
+-   `withBlockContentContext` is no longer used by the block editor and therefore got deprecated ([#41395](https://github.com/WordPress/gutenberg/pull/41395)).
 
 ### New API
 

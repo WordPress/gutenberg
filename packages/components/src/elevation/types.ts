@@ -3,9 +3,10 @@
  */
 import type { CSSProperties } from 'react';
 
-export type Props = {
+export type ElevationProps = {
 	/**
-	 * Size of the shadow value when active (see the `value` and `isInteractive` props).
+	 * Size of the shadow value when active (see the `value` and `isInteractive`
+	 * props).
 	 */
 	active?: number;
 	/**
@@ -15,15 +16,18 @@ export type Props = {
 	 */
 	borderRadius?: CSSProperties[ 'borderRadius' ];
 	/**
-	 * Size of the shadow value when focused (see the `value` and `isInteractive` props).
+	 * Size of the shadow value when focused (see the `value` and
+	 * `isInteractive` props).
 	 */
 	focus?: number;
 	/**
-	 * Size of the shadow value when hovered  (see the `value` and `isInteractive` props).
+	 * Size of the shadow value when hovered (see the `value` and
+	 * `isInteractive` props).
 	 */
 	hover?: number;
 	/**
-	 * Determines if hover, active, and focus shadow values should be automatically calculated and rendered.
+	 * Determines if `hover`, `active`, and `focus` shadow values should be
+	 * automatically calculated and rendered.
 	 *
 	 * @default false
 	 */
@@ -35,20 +39,9 @@ export type Props = {
 	 */
 	offset?: number;
 	/**
-	 * Size of the shadow, based on the Style system's elevation system. The `value` determines the strength of the shadow, which sense of depth.
-	 * In the example below, `isInteractive` is activated to give a better sense of depth.
-	 *
-	 * @example
-	 * ```jsx
-	 * import { __experimentalElevation as Elevation } from '@wordpress/components';
-	 * 	* function Example() {
-	 * 	return (
-	 * 		<div>
-	 * 			<Elevation isInteractive value={ 200 } />
-	 * 		</div>
-	 * 	);
-	 * }
-	 * ```
+	 * Size of the shadow, based on the Style system's elevation system. The
+	 * `value` determines the strength of the shadow, which creates the sense of
+	 * depth.
 	 *
 	 * @default 0
 	 */

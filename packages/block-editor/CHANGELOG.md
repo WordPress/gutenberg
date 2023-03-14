@@ -2,6 +2,91 @@
 
 ## Unreleased
 
+## 11.5.0 (2023-03-01)
+
+### Bug Fix
+
+-   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).
+
+## 11.4.0 (2023-02-15)
+
+### Bug Fix
+
+-   `LinkControl`: fix scrollbar displayed on toggle link settings ([#47986](https://github.com/WordPress/gutenberg/pull/47986)).
+
+## 11.3.0 (2023-02-01)
+
+## 11.2.0 (2023-01-11)
+
+### Bug Fix
+
+-   `BlockInspector`: Fix browser warning error when block is not selected ([#46875](https://github.com/WordPress/gutenberg/pull/46875)).
+-   Move component styles needed for iframes to content styles ([#47103](https://github.com/WordPress/gutenberg/pull/47103)).
+-   Block Inserter: Correctly apply style to the default inserter ([#47166](https://github.com/WordPress/gutenberg/pull/47166)).
+-   List View: Fix crash when the first template-parts is deleted width del key ([#47227](https://github.com/WordPress/gutenberg/pull/47227)).
+
+## 11.1.0 (2023-01-02)
+
+## 11.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+### Enhancements
+
+-   `URLInput`: the `renderSuggestions` callback prop now receives `currentInputValue` as a new parameter ([45806](https://github.com/WordPress/gutenberg/pull/45806)).
+-   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
+-   `URLInput`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([46692](https://github.com/WordPress/gutenberg/pull/46692)).
+
+### Bug Fix
+
+-   `SpacingSizesControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#46530](https://github.com/WordPress/gutenberg/pull/46530)).
+-   `FocalPointPicker`:  Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
+
+## 10.5.0 (2022-11-16)
+
+### Enhancement
+
+-   `BlockLockModal`: Move Icon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
+-   Fluid typography: adjust font size min and max rules ([#45536](https://github.com/WordPress/gutenberg/pull/45536)).
+
+## 10.4.0 (2022-11-02)
+
+### Bug Fix
+
+-   `InserterListItem`: Fix dragging and dropping in Firefox. ([#44631](https://github.com/WordPress/gutenberg/pull/44631))
+
+## 10.3.0 (2022-10-19)
+
+### Bug Fix
+
+-   `FontSizePicker`: Update fluid utils so that only string, floats and integers are treated as valid font sizes for the purposes of fluid typography ([#44847](https://github.com/WordPress/gutenberg/pull/44847))
+-   `getTypographyClassesAndStyles()`: Ensure that font sizes are transformed into fluid values if fluid typography is activated ([#44852](https://github.com/WordPress/gutenberg/pull/44852))
+-   `BlockPopover`: Ensure that padding and margin visualizers display in correct position even when scrolling past block. ([#44998](https://github.com/WordPress/gutenberg/pull/44998))
+
+### New features
+
+-   You can now drop files/blocks/HTML on unmodified default blocks to transform them into corresponding blocks ([#44647](https://github.com/WordPress/gutenberg/pull/44647)).
+
+## 10.2.0 (2022-10-05)
+
+## 10.1.0 (2022-09-21)
+
+## 10.0.0 (2022-09-13)
+
+### Breaking change
+
+-   `FontSizePicker`: Deprecate bottom margin style. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43870](https://github.com/WordPress/gutenberg/pull/43870)).
+
+## 9.8.0 (2022-08-24)
+
+## 9.7.0 (2022-08-10)
+
+## 9.6.0 (2022-07-27)
+
+## 9.5.0 (2022-07-13)
+
 ## 9.4.0 (2022-06-29)
 
 ## 9.3.0 (2022-06-15)

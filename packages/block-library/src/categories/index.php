@@ -14,7 +14,7 @@
  */
 function render_block_core_categories( $attributes ) {
 	static $block_id = 0;
-	$block_id++;
+	++$block_id;
 
 	$args = array(
 		'echo'         => false,
@@ -76,7 +76,7 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 		var dropdown = document.getElementById( '<?php echo esc_js( $dropdown_id ); ?>' );
 		function onCatChange() {
 			if ( dropdown.options[ dropdown.selectedIndex ].value > 0 ) {
-				location.href = "<?php echo home_url(); ?>/?cat=" + dropdown.options[ dropdown.selectedIndex ].value;
+				location.href = "<?php echo esc_url( home_url() ); ?>/?cat=" + dropdown.options[ dropdown.selectedIndex ].value;
 			}
 		}
 		dropdown.onchange = onCatChange;

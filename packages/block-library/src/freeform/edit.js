@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -11,9 +6,10 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { debounce, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { ToolbarGroup } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
 
@@ -21,6 +17,7 @@ import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import ConvertToBlocksButton from './convert-to-blocks-button';
+import ModalEdit from './modal';
 
 const { wp } = window;
 
@@ -40,7 +37,38 @@ function isTmceEmpty( editor ) {
 	return /^\n?$/.test( body.innerText || body.textContent );
 }
 
-export default function ClassicEdit( {
+export default function FreeformEdit( props ) {
+	const { clientId } = props;
+	const canRemove = useSelect(
+		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+		[ clientId ]
+	);
+	const [ isIframed, setIsIframed ] = useState( false );
+	const ref = useRefEffect( ( element ) => {
+		setIsIframed( element.ownerDocument !== document );
+	}, [] );
+
+	return (
+		<>
+			{ canRemove && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ConvertToBlocksButton clientId={ clientId } />
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+			<div { ...useBlockProps( { ref } ) }>
+				{ isIframed ? (
+					<ModalEdit { ...props } />
+				) : (
+					<ClassicEdit { ...props } />
+				) }
+			</div>
+		</>
+	);
+}
+
+function ClassicEdit( {
 	clientId,
 	attributes: { content },
 	setAttributes,
@@ -225,26 +253,19 @@ export default function ClassicEdit( {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ConvertToBlocksButton clientId={ clientId } />
-				</ToolbarGroup>
-			</BlockControls>
-			<div { ...useBlockProps() }>
-				<div
-					key="toolbar"
-					id={ `toolbar-${ clientId }` }
-					className="block-library-classic__toolbar"
-					onClick={ focus }
-					data-placeholder={ __( 'Classic' ) }
-					onKeyDown={ onToolbarKeyDown }
-				/>
-				<div
-					key="editor"
-					id={ `editor-${ clientId }` }
-					className="wp-block-freeform block-library-rich-text__tinymce"
-				/>
-			</div>
+			<div
+				key="toolbar"
+				id={ `toolbar-${ clientId }` }
+				className="block-library-classic__toolbar"
+				onClick={ focus }
+				data-placeholder={ __( 'Classic' ) }
+				onKeyDown={ onToolbarKeyDown }
+			/>
+			<div
+				key="editor"
+				id={ `editor-${ clientId }` }
+				className="wp-block-freeform block-library-rich-text__tinymce"
+			/>
 		</>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */

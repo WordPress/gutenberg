@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -9,42 +10,51 @@ import { shallow } from 'enzyme';
 import { DefaultBlockAppender, ZWNBSP } from '../';
 
 describe( 'DefaultBlockAppender', () => {
-	const expectOnAppendCalled = ( onAppend ) => {
-		expect( onAppend ).toHaveBeenCalledTimes( 1 );
-		expect( onAppend ).toHaveBeenCalledWith();
-	};
-
 	it( 'should match snapshot', () => {
 		const onAppend = jest.fn();
-		const wrapper = shallow(
+
+		const { container } = render(
 			<DefaultBlockAppender onAppend={ onAppend } showPrompt />
 		);
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should append a default block when input focused', () => {
+	it( 'should append a default block when input focused', async () => {
+		const user = userEvent.setup();
 		const onAppend = jest.fn();
-		const wrapper = shallow(
+
+		const { container } = render(
 			<DefaultBlockAppender onAppend={ onAppend } showPrompt />
 		);
 
-		wrapper.find( 'p' ).simulate( 'click' );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Add default block' } )
+		);
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 
-		expectOnAppendCalled( onAppend );
+		// Called once for focusing and once for clicking.
+		expect( onAppend ).toHaveBeenCalledTimes( 2 );
+		expect( onAppend ).toHaveBeenCalledWith();
 	} );
 
-	it( 'should optionally show without prompt', () => {
+	it( 'should optionally show without prompt', async () => {
+		const user = userEvent.setup();
 		const onAppend = jest.fn();
-		const wrapper = shallow(
+
+		const { container } = render(
 			<DefaultBlockAppender onAppend={ onAppend } showPrompt={ false } />
 		);
-		const input = wrapper.find( 'p' );
 
-		expect( input.prop( 'children' ) ).toEqual( ZWNBSP );
+		const appender = screen.getByRole( 'button', {
+			name: 'Add default block',
+		} );
 
-		expect( wrapper ).toMatchSnapshot();
+		await user.click( appender );
+
+		expect( appender ).toContainHTML( ZWNBSP );
+
+		expect( container ).toMatchSnapshot();
 	} );
 } );

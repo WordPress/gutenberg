@@ -1,11 +1,9 @@
-// Give the featured image placeholder the appearance of a literal image placeholder.
-// @todo: this CSS is similar to that of the Site Logo. That makes it an opportunity
-// to create a new component for placeholders meant to inherit some theme styles.
-.wp-block-post-featured-image.wp-block-post-featured-image {
-	// Inherit border radius from style variations.
-	.components-placeholder,
-	.components-resizable-box__container {
-		border-radius: inherit;
+// Provide special styling for the placeholder.
+// @todo: this particular minimal style of placeholder could be componentized further.
+.wp-block-post-featured-image {
+	.block-editor-media-placeholder {
+		z-index: 1; // Need to put it above the overlay so the upload button works.
+		backdrop-filter: none; // Removes background blur so the overlay's actual color is visible.
 	}
 
 	// Style the placeholder.
@@ -13,7 +11,6 @@
 	.components-placeholder {
 		justify-content: center;
 		align-items: center;
-		box-shadow: none;
 		padding: 0;
 
 		// Hide the upload button, as it's also available in the media library.
@@ -21,32 +18,8 @@
 			display: none;
 		}
 
-		// Position the spinner.
-		.components-placeholder__preview {
-			position: absolute;
-			top: $grid-unit-05;
-			right: $grid-unit-05;
-			bottom: $grid-unit-05;
-			left: $grid-unit-05;
-			background: rgba($white, 0.8);
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-		// Draw the dashed outline.
-		// By setting the dashed border to currentColor, we ensure it's visible
-		// against any background color.
-		color: currentColor;
-		background: transparent;
-
 		// Style the upload button.
-		.components-placeholder__fieldset {
-			width: auto;
-		}
-
-		.components-button.components-button {
-			color: inherit;
+		.components-button {
 			padding: 0;
 			display: flex;
 			justify-content: center;
@@ -55,20 +28,62 @@
 			height: $grid-unit-60;
 			border-radius: 50%;
 			position: relative;
-			visibility: hidden;
-
-			// Animation.
-			background: transparent;
-			transition: all 0.1s linear;
-			@include reduce-motion("transition");
-		}
-
-		.components-button.components-button > svg {
+			background: var(--wp-admin-theme-color);
+			border-color: var(--wp-admin-theme-color);
+			border-style: solid;
 			color: $white;
+
+			> svg {
+				color: inherit;
+			}
 		}
 
 		// Show default placeholder height when not resized.
 		min-height: 200px;
+	}
+
+	// The following override the default placeholder styles that remove
+	// its border so that a user selection for border color or width displays
+	// a visual border. They also override the `img { border: none; }` applied
+	// by core.
+	.wp-block-post-featured-image__placeholder,
+	.components-placeholder,
+	img {
+		// The following is required to overcome WP Core applying styles that clear
+		// img borders with a higher specificity than those added by the border
+		// block support to provide a default border-style of solid when a border
+		// color or width has been set.
+		&:where(.has-border-color) {
+			border-style: solid;
+		}
+		&:where([style*="border-top-color"]) {
+			border-top-style: solid;
+		}
+		&:where([style*="border-right-color"]) {
+			border-right-style: solid;
+		}
+		&:where([style*="border-bottom-color"]) {
+			border-bottom-style: solid;
+		}
+		&:where([style*="border-left-color"]) {
+			border-left-style: solid;
+		}
+
+		&:where([style*="border-width"]) {
+			border-style: solid;
+		}
+		&:where([style*="border-top-width"]) {
+			border-top-style: solid;
+		}
+		&:where([style*="border-right-width"]) {
+			border-right-style: solid;
+		}
+		&:where([style*="border-bottom-width"]) {
+			border-bottom-style: solid;
+		}
+		&:where([style*="border-left-width"]) {
+			border-left-style: solid;
+		}
 	}
 
 	// Provide a minimum size for the placeholder when resized.
@@ -79,16 +94,6 @@
 		min-width: $grid-unit-60;
 		height: 100%;
 		width: 100%;
-	}
-
-	// Show upload button on block selection.
-	&.is-selected .components-button.components-button {
-		background: var(--wp-admin-theme-color);
-		border-color: var(--wp-admin-theme-color);
-		border-style: solid;
-		color: $white;
-		opacity: 1;
-		visibility: visible;
 	}
 }
 

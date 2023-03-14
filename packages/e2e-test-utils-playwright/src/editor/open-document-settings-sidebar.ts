@@ -2,23 +2,29 @@
  * Internal dependencies
  */
 import type { Editor } from './index';
-const { expect } = require( '../test' );
 
 /**
- * Clicks on the button in the header which opens Document Settings sidebar when it is closed.
+ * Clicks on the button in the header which opens Document Settings sidebar when
+ * it is closed.
  *
- * @param {Editor} this
+ * @param this
  */
 export async function openDocumentSettingsSidebar( this: Editor ) {
-	const editorSettings = this.page.locator(
-		'role=region[name="Editor settings"i]'
-	);
+	const toggleButton = this.page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', {
+			name: 'Settings',
+			disabled: false,
+		} );
 
-	if ( ! ( await editorSettings.isVisible() ) ) {
-		await this.page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Settings"i]'
-		);
+	const isClosed =
+		( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';
 
-		await expect( editorSettings ).toBeVisible();
+	if ( isClosed ) {
+		await toggleButton.click();
+		await this.page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Close settings' } )
+			.waitFor();
 	}
 }

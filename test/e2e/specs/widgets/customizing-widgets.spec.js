@@ -235,7 +235,7 @@ test.describe( 'Widgets Customizer', () => {
 			'sidebar-1'
 		);
 		await requestUtils.addWidgetBlock(
-			`<!-- wp:heading -->\n<h2>First Heading</h2>\n<!-- /wp:heading -->`,
+			`<!-- wp:heading -->\n<h2 class="wp-block-heading">First Heading</h2>\n<!-- /wp:heading -->`,
 			'sidebar-1'
 		);
 
@@ -262,6 +262,7 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( firstParagraphBlock ).toBeFocused();
 
 		// Expect to focus on a already focused widget.
+		await paragraphWidget.click(); // noop click on the widget text to unfocus the editor and hide toolbar
 		await editParagraphWidget.click();
 		await expect( firstParagraphBlock ).toBeFocused();
 
@@ -272,6 +273,8 @@ test.describe( 'Widgets Customizer', () => {
 		const editHeadingWidget = headingWidget.locator(
 			'role=button[name="Click to edit this widget."i]'
 		);
+
+		await headingWidget.click(); // noop click on the widget text to unfocus the editor and hide toolbar
 		await editHeadingWidget.click();
 
 		const headingBlock = page.locator(
@@ -339,6 +342,7 @@ test.describe( 'Widgets Customizer', () => {
 		editor,
 		page,
 		widgetsCustomizerPage,
+		pageUtils,
 	} ) => {
 		await widgetsCustomizerPage.visitCustomizerPage();
 		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
@@ -365,7 +369,7 @@ test.describe( 'Widgets Customizer', () => {
 		await titleInput.type( 'Hello Title' );
 
 		// Unfocus the current legacy widget.
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
 		const previewFrame = widgetsCustomizerPage.previewFrame;
 		const legacyWidgetPreviewFrame = page.frameLocator(
@@ -400,7 +404,7 @@ test.describe( 'Widgets Customizer', () => {
 
 		await titleInput.type( 'Hello again!' );
 		// Unfocus the current legacy widget.
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
 		// Expect the preview in block to show when unfocusing the legacy widget block.
 		await expect(
@@ -463,9 +467,9 @@ test.describe( 'Widgets Customizer', () => {
 		await page.keyboard.press( 'Escape' );
 		await expect(
 			page.locator(
-				'*[aria-live="polite"][aria-relevant="additions text"] >> text=/^You are currently in navigation mode./'
+				'css=.block-editor-block-list__layout.is-navigate-mode'
 			)
-		).toHaveCount( 1 );
+		).toBeVisible();
 		await expect( paragraphBlock ).toBeVisible();
 	} );
 
@@ -564,7 +568,7 @@ test.describe( 'Widgets Customizer', () => {
 		// (2) We should still be in the "Block Settings" area
 		await expect(
 			page.locator( 'role=button[name="Publish"i]' )
-		).not.toBeDisabled();
+		).toBeEnabled();
 
 		// This fails on 539cea09 and earlier; we get kicked back to the widgets area.
 		// We expect to stay in block settings.
@@ -573,6 +577,33 @@ test.describe( 'Widgets Customizer', () => {
 				'role=heading[name="Customizing ▸ Widgets ▸ Footer #1 Block Settings"i][level=3]'
 			)
 		).toBeVisible();
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/33832.
+	test( 'preserves content in the Custom HTML block', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		await widgetsCustomizerPage.addBlock( 'Custom HTML' );
+		const HTMLBlockTextarea = page.locator(
+			'role=document[name="Block: Custom HTML"i] >> role=textbox[name="HTML"i]'
+		);
+		await HTMLBlockTextarea.type( 'hello' );
+
+		// Click Publish
+		await Promise.all( [
+			page.waitForResponse( '/wp-admin/admin-ajax.php' ),
+			page.click( 'role=button[name="Publish"i]' ),
+		] );
+
+		// reload
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		await expect( HTMLBlockTextarea ).toHaveText( 'hello' );
 	} );
 } );
 

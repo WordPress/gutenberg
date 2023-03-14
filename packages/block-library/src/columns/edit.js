@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, times } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -61,10 +60,13 @@ function ColumnsEditContainer( {
 } ) {
 	const { isStackedOnMobile, verticalAlignment } = attributes;
 
-	const { count } = useSelect(
+	const { count, canInsertColumnBlock } = useSelect(
 		( select ) => {
 			return {
 				count: select( blockEditorStore ).getBlockCount( clientId ),
+				canInsertColumnBlock: select(
+					blockEditorStore
+				).canInsertBlockType( 'core/column', clientId ),
 			};
 		},
 		[ clientId ]
@@ -94,21 +96,32 @@ function ColumnsEditContainer( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
-					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ count }
-						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 1 }
-						max={ Math.max( 6, count ) }
-					/>
-					{ count > 6 && (
-						<Notice status="warning" isDismissible={ false }>
-							{ __(
-								'This column count exceeds the recommended amount and may cause visual breakage.'
+					{ canInsertColumnBlock && (
+						<>
+							<RangeControl
+								__nextHasNoMarginBottom
+								label={ __( 'Columns' ) }
+								value={ count }
+								onChange={ ( value ) =>
+									updateColumns( count, value )
+								}
+								min={ 1 }
+								max={ Math.max( 6, count ) }
+							/>
+							{ count > 6 && (
+								<Notice
+									status="warning"
+									isDismissible={ false }
+								>
+									{ __(
+										'This column count exceeds the recommended amount and may cause visual breakage.'
+									) }
+								</Notice>
 							) }
-						</Notice>
+						</>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Stack on mobile' ) }
 						checked={ isStackedOnMobile }
 						onChange={ () =>
@@ -183,7 +196,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 				innerBlocks = [
 					...getMappedColumnWidths( innerBlocks, widths ),
-					...times( newColumns - previousColumns, () => {
+					...Array.from( {
+						length: newColumns - previousColumns,
+					} ).map( () => {
 						return createBlock( 'core/column', {
 							width: `${ newColumnWidth }%`,
 						} );
@@ -192,7 +207,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 			} else if ( isAddingColumn ) {
 				innerBlocks = [
 					...innerBlocks,
-					...times( newColumns - previousColumns, () => {
+					...Array.from( {
+						length: newColumns - previousColumns,
+					} ).map( () => {
 						return createBlock( 'core/column' );
 					} ),
 				];
@@ -242,8 +259,8 @@ function Placeholder( { clientId, name, setAttributes } ) {
 	return (
 		<div { ...blockProps }>
 			<__experimentalBlockVariationPicker
-				icon={ get( blockType, [ 'icon', 'src' ] ) }
-				label={ get( blockType, [ 'title' ] ) }
+				icon={ blockType?.icon?.src }
+				label={ blockType?.title }
 				variations={ variations }
 				onSelect={ ( nextVariation = defaultVariation ) => {
 					if ( nextVariation.attributes ) {

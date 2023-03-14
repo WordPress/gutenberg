@@ -7,6 +7,7 @@ import {
 	initializeEditor,
 	getEditorHtml,
 	render,
+	waitFor,
 } from 'test/helpers';
 import { Image } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -38,16 +39,6 @@ subscribeMediaUpload.mockImplementation( ( callback ) => {
 } );
 sendMediaUpload.mockImplementation( ( payload ) => {
 	uploadCallBack( payload );
-} );
-
-/**
- * Immediately invoke delayed functions. A better alternative would be using
- * fake timers and test the delay itself. However, fake timers does not work
- * with our custom waitFor implementation.
- */
-jest.mock( 'lodash', () => {
-	const actual = jest.requireActual( 'lodash' );
-	return { ...actual, delay: ( cb ) => cb() };
 } );
 
 function mockGetMedia( media ) {
@@ -90,11 +81,12 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'Media File' ) );
 		fireEvent.press( screen.getByText( 'None' ) );
@@ -116,11 +108,12 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Media File' ) );
@@ -142,11 +135,12 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
@@ -156,7 +150,10 @@ describe( 'Image Block', () => {
 			screen.getByPlaceholderText( 'Search or type URL' ),
 			'wordpress.org'
 		);
-		fireEvent.press( screen.getByA11yLabel( 'Apply' ) );
+		fireEvent.press( screen.getByLabelText( 'Apply' ) );
+		await waitFor(
+			() => new Promise( ( resolve ) => setTimeout( resolve, 100 ) )
+		);
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
 <figure class="wp-block-image size-large is-style-default"><a href="http://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
@@ -175,14 +172,16 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Media File' ) );
+		await screen.findByText( 'Custom URL' );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
 		// Await asynchronous fetch of clipboard
 		await act( () => clipboardPromise );
@@ -190,8 +189,8 @@ describe( 'Image Block', () => {
 			screen.getByPlaceholderText( 'Search or type URL' ),
 			'wordpress.org'
 		);
-		fireEvent.press( screen.getByA11yLabel( 'Apply' ) );
-		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		fireEvent.press( screen.getByLabelText( 'Apply' ) );
+		fireEvent.press( await screen.findByText( 'Custom URL' ) );
 		// Await asynchronous fetch of clipboard
 		await act( () => clipboardPromise );
 		fireEvent.press( screen.getByText( 'Media File' ) );
@@ -215,15 +214,16 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
-			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
 		);
 		fireEvent.press( screen.getByText( 'Media File' ) );
 
-		expect( screen.queryByA11yLabel( /https:\/\/cldup\.com/ ) ).toBeNull();
+		expect( screen.queryByLabelText( /https:\/\/cldup\.com/ ) ).toBeNull();
 	} );
 
 	it( 'sets link target', async () => {
@@ -239,10 +239,10 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		const imageBlock = screen.getByA11yLabel( /Image Block/ );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
 
-		const settingsButton = screen.getByA11yLabel( 'Open Settings' );
+		const settingsButton = screen.getByLabelText( 'Open Settings' );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () => fireEvent.press( settingsButton ) );
@@ -270,10 +270,10 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		const imageBlock = screen.getByA11yLabel( /Image Block/ );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
 
-		const settingsButton = screen.getByA11yLabel( 'Open Settings' );
+		const settingsButton = screen.getByLabelText( 'Open Settings' );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () => fireEvent.press( settingsButton ) );

@@ -29,7 +29,7 @@ _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
 -   _dateValue_ `Moment | Date | string | undefined`: Date object or string, parsable by moment.js.
--   _timezone_ `string | undefined`: Timezone to output result in or a UTC offset. Defaults to timezone from site.
+-   _timezone_ `string | number | undefined`: Timezone to output result in or a UTC offset. Defaults to timezone from site.
 
 _Returns_
 
@@ -51,7 +51,7 @@ _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
 -   _dateValue_ `Moment | Date | string | undefined`: Date object or string, parsable by moment.js.
--   _timezone_ `string | boolean | undefined`: Timezone to output result in or a UTC offset. Defaults to timezone from site. Notice: `boolean` is effectively deprecated, but still supported for backward compatibility reasons.
+-   _timezone_ `string | number | boolean | undefined`: Timezone to output result in or a UTC offset. Defaults to timezone from site. Notice: `boolean` is effectively deprecated, but still supported for backward compatibility reasons.
 
 _Returns_
 
@@ -81,6 +81,14 @@ _Parameters_
 _Returns_
 
 -   `Date`: Date
+
+### getSettings
+
+Returns the currently defined date settings.
+
+_Returns_
+
+-   `DateSettings`: Settings, including locale data.
 
 ### gmdate
 

@@ -13,8 +13,10 @@ import {
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
+	useSetting,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -112,6 +114,11 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
+	const fluidTypographySettings = useSetting( 'typography.fluid' );
+	const typographyProps = useTypographyProps(
+		attributes,
+		fluidTypographySettings
+	);
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const isButtonPositionInside = 'button-inside' === buttonPosition;
@@ -208,11 +215,16 @@ export default function SearchEdit( {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = classnames(
 			'wp-block-search__input',
-			isButtonPositionInside ? undefined : borderProps.className
+			isButtonPositionInside ? undefined : borderProps.className,
+			typographyProps.className
 		);
-		const textFieldStyles = isButtonPositionInside
-			? { borderRadius }
-			: borderProps.style;
+		const textFieldStyles = {
+			...( isButtonPositionInside
+				? { borderRadius }
+				: borderProps.style ),
+			...typographyProps.style,
+			textDecoration: undefined,
+		};
 
 		return (
 			<input
@@ -239,12 +251,14 @@ export default function SearchEdit( {
 		const buttonClasses = classnames(
 			'wp-block-search__button',
 			colorProps.className,
+			typographyProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
 			__experimentalGetElementClassName( 'button' )
 		);
 		const buttonStyles = {
 			...colorProps.style,
+			...typographyProps.style,
 			...( isButtonPositionInside
 				? { borderRadius }
 				: borderProps.style ),
@@ -349,7 +363,7 @@ export default function SearchEdit( {
 									widthUnit: newUnit,
 								} );
 							} }
-							style={ { maxWidth: 80 } }
+							__unstableInputWidth={ '80px' }
 							value={ `${ width }${ widthUnit }` }
 							units={ units }
 						/>
@@ -443,7 +457,17 @@ export default function SearchEdit( {
 
 	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
+		style: {
+			...typographyProps.style,
+			// Input opts out of text decoration.
+			textDecoration: undefined,
+		},
 	} );
+
+	const labelClassnames = classnames(
+		'wp-block-search__label',
+		typographyProps.className
+	);
 
 	return (
 		<div { ...blockProps }>
@@ -451,12 +475,13 @@ export default function SearchEdit( {
 
 			{ showLabel && (
 				<RichText
-					className="wp-block-search__label"
+					className={ labelClassnames }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
 					withoutInteractiveFormatting
 					value={ label }
 					onChange={ ( html ) => setAttributes( { label: html } ) }
+					style={ typographyProps.style }
 				/>
 			) }
 

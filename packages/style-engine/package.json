@@ -1,13 +1,14 @@
 {
 	"name": "@wordpress/style-engine",
-	"version": "0.11.0",
-	"description": "WordPress Style engine.",
+	"version": "1.11.0",
+	"description": "A suite of parsers and compilers for WordPress styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
 		"gutenberg",
 		"styles",
+		"css",
 		"global styles"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/README.md",

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/notices",
-	"version": "3.12.0",
+	"version": "3.28.0",
 	"description": "State management for notices.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,9 +28,6 @@
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/data": "file:../data"
-	},
-	"peerDependencies": {
-		"react": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

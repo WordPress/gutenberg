@@ -5,7 +5,10 @@
 		"attributes": {
 			"tagName": "div",
 			"align": "full",
-			"backgroundColor": "secondary"
+			"backgroundColor": "secondary",
+			"layout": {
+				"type": "default"
+			}
 		},
 		"innerBlocks": [
 			{

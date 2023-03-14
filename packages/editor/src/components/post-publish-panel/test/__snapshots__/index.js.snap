@@ -1,197 +1,717 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PostPublishPanel should render the post-publish panel if the post is published 1`] = `
-<div
-  className="editor-post-publish-panel"
->
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-4 {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-bottom: calc(4px * 2);
+  padding: 0;
+}
+
+<div>
   <div
-    className="editor-post-publish-panel__header"
+    class="editor-post-publish-panel"
   >
-    <ForwardRef(Button)
-      icon={
-        <SVG
+    <div
+      class="editor-post-publish-panel__header"
+    >
+      <button
+        aria-label="Close panel"
+        class="components-button has-icon"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
           viewBox="0 0 24 24"
+          width="24"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <Path
+          <path
             d="M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z"
           />
-        </SVG>
-      }
-      label="Close panel"
-    />
-  </div>
-  <div
-    className="editor-post-publish-panel__content"
-  >
-    <WithSelect(PostPublishPanelPostpublish)
-      focusOnMount={true}
-    />
-  </div>
-  <div
-    className="editor-post-publish-panel__footer"
-  >
-    <CheckboxControl
-      label="Always show pre-publish checks."
-    />
+        </svg>
+      </button>
+    </div>
+    <div
+      class="editor-post-publish-panel__content"
+    >
+      <div
+        class="post-publish-panel__postpublish"
+      >
+        <div
+          class="components-panel__body post-publish-panel__postpublish-header is-opened"
+        >
+          <a
+            href="https://wordpress.local/sample-page/"
+          >
+            (no title)
+          </a>
+           
+          is now live.
+        </div>
+        <div
+          class="components-panel__body is-opened"
+        >
+          <p
+            class="post-publish-panel__postpublish-subheader"
+          >
+            <strong>
+              What’s next?
+            </strong>
+          </p>
+          <div
+            class="post-publish-panel__postpublish-post-address-container"
+          >
+            <div
+              class="components-base-control post-publish-panel__postpublish-post-address emotion-0 emotion-1"
+            >
+              <div
+                class="components-base-control__field emotion-2 emotion-3"
+              >
+                <label
+                  class="components-base-control__label emotion-4 emotion-5"
+                  for="inspector-text-control-0"
+                >
+                  post address
+                </label>
+                <input
+                  class="components-text-control__input"
+                  id="inspector-text-control-0"
+                  readonly=""
+                  type="text"
+                  value="https://wordpress.local/sample-page/"
+                />
+              </div>
+            </div>
+            <div
+              class="post-publish-panel__postpublish-post-address__copy-button-wrap"
+            >
+              <button
+                class="components-button is-secondary"
+                type="button"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+          <div
+            class="post-publish-panel__postpublish-buttons"
+          >
+            <a
+              class="components-button is-primary"
+              href="https://wordpress.local/sample-page/"
+            />
+            <a
+              class="components-button is-secondary"
+              href="post-new.php?"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="editor-post-publish-panel__footer"
+    >
+      <div
+        class="components-base-control components-checkbox-control emotion-0 emotion-1"
+      >
+        <div
+          class="components-base-control__field emotion-2 emotion-3"
+        >
+          <span
+            class="components-checkbox-control__input-container"
+          >
+            <input
+              class="components-checkbox-control__input"
+              id="inspector-checkbox-control-3"
+              type="checkbox"
+              value="1"
+            />
+          </span>
+          <label
+            class="components-checkbox-control__label"
+            for="inspector-checkbox-control-3"
+          >
+            Always show pre-publish checks.
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 `;
 
 exports[`PostPublishPanel should render the post-publish panel if the post is scheduled 1`] = `
-<div
-  className="editor-post-publish-panel"
->
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-4 {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-bottom: calc(4px * 2);
+  padding: 0;
+}
+
+<div>
   <div
-    className="editor-post-publish-panel__header"
+    class="editor-post-publish-panel"
   >
-    <ForwardRef(Button)
-      icon={
-        <SVG
+    <div
+      class="editor-post-publish-panel__header"
+    >
+      <button
+        aria-label="Close panel"
+        class="components-button has-icon"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
           viewBox="0 0 24 24"
+          width="24"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <Path
+          <path
             d="M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z"
           />
-        </SVG>
-      }
-      label="Close panel"
-    />
-  </div>
-  <div
-    className="editor-post-publish-panel__content"
-  >
-    <WithSelect(PostPublishPanelPostpublish)
-      focusOnMount={true}
-    />
-  </div>
-  <div
-    className="editor-post-publish-panel__footer"
-  >
-    <CheckboxControl
-      label="Always show pre-publish checks."
-    />
+        </svg>
+      </button>
+    </div>
+    <div
+      class="editor-post-publish-panel__content"
+    >
+      <div
+        class="post-publish-panel__postpublish"
+      >
+        <div
+          class="components-panel__body post-publish-panel__postpublish-header is-opened"
+        >
+          <a
+            href="https://wordpress.local/sample-page/"
+          >
+            (no title)
+          </a>
+           
+          is now live.
+        </div>
+        <div
+          class="components-panel__body is-opened"
+        >
+          <p
+            class="post-publish-panel__postpublish-subheader"
+          >
+            <strong>
+              What’s next?
+            </strong>
+          </p>
+          <div
+            class="post-publish-panel__postpublish-post-address-container"
+          >
+            <div
+              class="components-base-control post-publish-panel__postpublish-post-address emotion-0 emotion-1"
+            >
+              <div
+                class="components-base-control__field emotion-2 emotion-3"
+              >
+                <label
+                  class="components-base-control__label emotion-4 emotion-5"
+                  for="inspector-text-control-1"
+                >
+                  post address
+                </label>
+                <input
+                  class="components-text-control__input"
+                  id="inspector-text-control-1"
+                  readonly=""
+                  type="text"
+                  value="https://wordpress.local/sample-page/"
+                />
+              </div>
+            </div>
+            <div
+              class="post-publish-panel__postpublish-post-address__copy-button-wrap"
+            >
+              <button
+                class="components-button is-secondary"
+                type="button"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+          <div
+            class="post-publish-panel__postpublish-buttons"
+          >
+            <a
+              class="components-button is-primary"
+              href="https://wordpress.local/sample-page/"
+            />
+            <a
+              class="components-button is-secondary"
+              href="post-new.php?"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="editor-post-publish-panel__footer"
+    >
+      <div
+        class="components-base-control components-checkbox-control emotion-0 emotion-1"
+      >
+        <div
+          class="components-base-control__field emotion-2 emotion-3"
+        >
+          <span
+            class="components-checkbox-control__input-container"
+          >
+            <input
+              class="components-checkbox-control__input"
+              id="inspector-checkbox-control-4"
+              type="checkbox"
+              value="1"
+            />
+          </span>
+          <label
+            class="components-checkbox-control__label"
+            for="inspector-checkbox-control-4"
+          >
+            Always show pre-publish checks.
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 `;
 
 exports[`PostPublishPanel should render the pre-publish panel if post status is scheduled but date is before now 1`] = `
-<div
-  className="editor-post-publish-panel"
->
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+<div>
   <div
-    className="editor-post-publish-panel__header"
+    class="editor-post-publish-panel"
   >
     <div
-      className="editor-post-publish-panel__header-publish-button"
+      class="editor-post-publish-panel__header"
     >
-      <WithSelect(WithDispatch(PostPublishButton))
-        focusOnMount={true}
-        onSubmit={[Function]}
-      />
-    </div>
-    <div
-      className="editor-post-publish-panel__header-cancel-button"
-    >
-      <ForwardRef(Button)
-        variant="secondary"
+      <div
+        class="editor-post-publish-panel__header-publish-button"
       >
-        Cancel
-      </ForwardRef(Button)>
+        <button
+          aria-disabled="true"
+          class="components-button editor-post-publish-button editor-post-publish-button__button is-primary"
+          type="button"
+        >
+          Submit for Review
+        </button>
+      </div>
+      <div
+        class="editor-post-publish-panel__header-cancel-button"
+      >
+        <button
+          class="components-button is-secondary"
+          type="button"
+        >
+          Cancel
+        </button>
+      </div>
     </div>
-  </div>
-  <div
-    className="editor-post-publish-panel__content"
-  >
-    <PostPublishPanelPrepublish />
-  </div>
-  <div
-    className="editor-post-publish-panel__footer"
-  >
-    <CheckboxControl
-      label="Always show pre-publish checks."
-    />
+    <div
+      class="editor-post-publish-panel__content"
+    >
+      <div
+        class="editor-post-publish-panel__prepublish"
+      >
+        <div>
+          <strong>
+            Are you ready to submit for review?
+          </strong>
+        </div>
+        <p>
+          When you’re ready, submit your work for review, and an Editor will be able to approve it for you.
+        </p>
+        <div
+          class="components-site-card"
+        >
+          <svg
+            aria-hidden="true"
+            class="components-site-icon"
+            focusable="false"
+            height="36px"
+            viewBox="-2 -2 24 24"
+            width="36px"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20 10c0-5.51-4.49-10-10-10C4.48 0 0 4.49 0 10c0 5.52 4.48 10 10 10 5.51 0 10-4.48 10-10zM7.78 15.37L4.37 6.22c.55-.02 1.17-.08 1.17-.08.5-.06.44-1.13-.06-1.11 0 0-1.45.11-2.37.11-.18 0-.37 0-.58-.01C4.12 2.69 6.87 1.11 10 1.11c2.33 0 4.45.87 6.05 2.34-.68-.11-1.65.39-1.65 1.58 0 .74.45 1.36.9 2.1.35.61.55 1.36.55 2.46 0 1.49-1.4 5-1.4 5l-3.03-8.37c.54-.02.82-.17.82-.17.5-.05.44-1.25-.06-1.22 0 0-1.44.12-2.38.12-.87 0-2.33-.12-2.33-.12-.5-.03-.56 1.2-.06 1.22l.92.08 1.26 3.41zM17.41 10c.24-.64.74-1.87.43-4.25.7 1.29 1.05 2.71 1.05 4.25 0 3.29-1.73 6.24-4.4 7.78.97-2.59 1.94-5.2 2.92-7.78zM6.1 18.09C3.12 16.65 1.11 13.53 1.11 10c0-1.3.23-2.48.72-3.59C3.25 10.3 4.67 14.2 6.1 18.09zm4.03-6.63l2.58 6.98c-.86.29-1.76.45-2.71.45-.79 0-1.57-.11-2.29-.33.81-2.38 1.62-4.74 2.42-7.1z"
+            />
+          </svg>
+          <div
+            class="components-site-info"
+          >
+            <span
+              class="components-site-name"
+            >
+              (Untitled)
+            </span>
+            <span
+              class="components-site-home"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="editor-post-publish-panel__footer"
+    >
+      <div
+        class="components-base-control components-checkbox-control emotion-0 emotion-1"
+      >
+        <div
+          class="components-base-control__field emotion-2 emotion-3"
+        >
+          <span
+            class="components-checkbox-control__input-container"
+          >
+            <input
+              class="components-checkbox-control__input"
+              id="inspector-checkbox-control-1"
+              type="checkbox"
+              value="1"
+            />
+          </span>
+          <label
+            class="components-checkbox-control__label"
+            for="inspector-checkbox-control-1"
+          >
+            Always show pre-publish checks.
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 `;
 
 exports[`PostPublishPanel should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
-<div
-  className="editor-post-publish-panel"
->
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+<div>
   <div
-    className="editor-post-publish-panel__header"
+    class="editor-post-publish-panel"
   >
     <div
-      className="editor-post-publish-panel__header-publish-button"
+      class="editor-post-publish-panel__header"
     >
-      <WithSelect(WithDispatch(PostPublishButton))
-        focusOnMount={true}
-        onSubmit={[Function]}
-      />
-    </div>
-    <div
-      className="editor-post-publish-panel__header-cancel-button"
-    >
-      <ForwardRef(Button)
-        variant="secondary"
+      <div
+        class="editor-post-publish-panel__header-publish-button"
       >
-        Cancel
-      </ForwardRef(Button)>
+        <button
+          aria-disabled="true"
+          class="components-button editor-post-publish-button editor-post-publish-button__button is-primary"
+          type="button"
+        >
+          Submit for Review
+        </button>
+      </div>
+      <div
+        class="editor-post-publish-panel__header-cancel-button"
+      >
+        <button
+          class="components-button is-secondary"
+          type="button"
+        >
+          Cancel
+        </button>
+      </div>
     </div>
-  </div>
-  <div
-    className="editor-post-publish-panel__content"
-  >
-    <PostPublishPanelPrepublish />
-  </div>
-  <div
-    className="editor-post-publish-panel__footer"
-  >
-    <CheckboxControl
-      label="Always show pre-publish checks."
-    />
+    <div
+      class="editor-post-publish-panel__content"
+    >
+      <div
+        class="editor-post-publish-panel__prepublish"
+      >
+        <div>
+          <strong>
+            Are you ready to submit for review?
+          </strong>
+        </div>
+        <p>
+          When you’re ready, submit your work for review, and an Editor will be able to approve it for you.
+        </p>
+        <div
+          class="components-site-card"
+        >
+          <svg
+            aria-hidden="true"
+            class="components-site-icon"
+            focusable="false"
+            height="36px"
+            viewBox="-2 -2 24 24"
+            width="36px"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20 10c0-5.51-4.49-10-10-10C4.48 0 0 4.49 0 10c0 5.52 4.48 10 10 10 5.51 0 10-4.48 10-10zM7.78 15.37L4.37 6.22c.55-.02 1.17-.08 1.17-.08.5-.06.44-1.13-.06-1.11 0 0-1.45.11-2.37.11-.18 0-.37 0-.58-.01C4.12 2.69 6.87 1.11 10 1.11c2.33 0 4.45.87 6.05 2.34-.68-.11-1.65.39-1.65 1.58 0 .74.45 1.36.9 2.1.35.61.55 1.36.55 2.46 0 1.49-1.4 5-1.4 5l-3.03-8.37c.54-.02.82-.17.82-.17.5-.05.44-1.25-.06-1.22 0 0-1.44.12-2.38.12-.87 0-2.33-.12-2.33-.12-.5-.03-.56 1.2-.06 1.22l.92.08 1.26 3.41zM17.41 10c.24-.64.74-1.87.43-4.25.7 1.29 1.05 2.71 1.05 4.25 0 3.29-1.73 6.24-4.4 7.78.97-2.59 1.94-5.2 2.92-7.78zM6.1 18.09C3.12 16.65 1.11 13.53 1.11 10c0-1.3.23-2.48.72-3.59C3.25 10.3 4.67 14.2 6.1 18.09zm4.03-6.63l2.58 6.98c-.86.29-1.76.45-2.71.45-.79 0-1.57-.11-2.29-.33.81-2.38 1.62-4.74 2.42-7.1z"
+            />
+          </svg>
+          <div
+            class="components-site-info"
+          >
+            <span
+              class="components-site-name"
+            >
+              (Untitled)
+            </span>
+            <span
+              class="components-site-home"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="editor-post-publish-panel__footer"
+    >
+      <div
+        class="components-base-control components-checkbox-control emotion-0 emotion-1"
+      >
+        <div
+          class="components-base-control__field emotion-2 emotion-3"
+        >
+          <span
+            class="components-checkbox-control__input-container"
+          >
+            <input
+              class="components-checkbox-control__input"
+              id="inspector-checkbox-control-0"
+              type="checkbox"
+              value="1"
+            />
+          </span>
+          <label
+            class="components-checkbox-control__label"
+            for="inspector-checkbox-control-0"
+          >
+            Always show pre-publish checks.
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 `;
 
 exports[`PostPublishPanel should render the spinner if the post is being saved 1`] = `
-<div
-  className="editor-post-publish-panel"
->
+@keyframes animation-0 {
+  from {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  to {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+.emotion-0 {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  margin: 5px 11px 0;
+  position: relative;
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+  overflow: visible;
+}
+
+.emotion-2 {
+  fill: transparent;
+  stroke-width: 1.5px;
+  stroke: #ddd;
+}
+
+.emotion-4 {
+  fill: transparent;
+  stroke-width: 1.5px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  transform-origin: 50% 50%;
+  -webkit-animation: 1.4s linear infinite both animation-0;
+  animation: 1.4s linear infinite both animation-0;
+}
+
+.emotion-6 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-6 *,
+.emotion-6 *::before,
+.emotion-6 *::after {
+  box-sizing: inherit;
+}
+
+.components-panel__row .emotion-8 {
+  margin-bottom: inherit;
+}
+
+<div>
   <div
-    className="editor-post-publish-panel__header"
+    class="editor-post-publish-panel"
   >
     <div
-      className="editor-post-publish-panel__header-publish-button"
+      class="editor-post-publish-panel__header"
     >
-      <WithSelect(WithDispatch(PostPublishButton))
-        focusOnMount={true}
-        onSubmit={[Function]}
-      />
-    </div>
-    <div
-      className="editor-post-publish-panel__header-cancel-button"
-    >
-      <ForwardRef(Button)
-        variant="secondary"
+      <div
+        class="editor-post-publish-panel__header-publish-button"
       >
-        Cancel
-      </ForwardRef(Button)>
+        <button
+          aria-disabled="true"
+          class="components-button editor-post-publish-button editor-post-publish-button__button is-primary"
+          type="button"
+        >
+          Submit for Review
+        </button>
+      </div>
+      <div
+        class="editor-post-publish-panel__header-cancel-button"
+      >
+        <button
+          class="components-button is-secondary"
+          type="button"
+        >
+          Cancel
+        </button>
+      </div>
     </div>
-  </div>
-  <div
-    className="editor-post-publish-panel__content"
-  >
-    <ForwardRef(UnforwardedSpinner) />
-  </div>
-  <div
-    className="editor-post-publish-panel__footer"
-  >
-    <CheckboxControl
-      label="Always show pre-publish checks."
-    />
+    <div
+      class="editor-post-publish-panel__content"
+    >
+      <svg
+        class="components-spinner emotion-0 emotion-1"
+        focusable="false"
+        height="16"
+        role="presentation"
+        viewBox="0 0 100 100"
+        width="16"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle
+          class="emotion-2 emotion-3"
+          cx="50"
+          cy="50"
+          r="50"
+          vector-effect="non-scaling-stroke"
+        />
+        <path
+          class="emotion-4 emotion-5"
+          d="m 50 0 a 50 50 0 0 1 50 50"
+          vector-effect="non-scaling-stroke"
+        />
+      </svg>
+    </div>
+    <div
+      class="editor-post-publish-panel__footer"
+    >
+      <div
+        class="components-base-control components-checkbox-control emotion-6 emotion-7"
+      >
+        <div
+          class="components-base-control__field emotion-8 emotion-9"
+        >
+          <span
+            class="components-checkbox-control__input-container"
+          >
+            <input
+              class="components-checkbox-control__input"
+              id="inspector-checkbox-control-2"
+              type="checkbox"
+              value="1"
+            />
+          </span>
+          <label
+            class="components-checkbox-control__label"
+            for="inspector-checkbox-control-2"
+          >
+            Always show pre-publish checks.
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 `;

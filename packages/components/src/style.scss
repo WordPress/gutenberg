@@ -1,3 +1,7 @@
+// Variables
+@import "./utils/theme-variables.scss";
+
+// Components
 @import "./animate/style.scss";
 @import "./autocomplete/style.scss";
 @import "./button-group/style.scss";
@@ -11,14 +15,12 @@
 @import "./color-palette/style.scss";
 @import "./custom-gradient-picker/style.scss";
 @import "./custom-select-control/style.scss";
-@import "./date-time/style.scss";
 @import "./dimension-control/style.scss";
 @import "./draggable/style.scss";
 @import "./drop-zone/style.scss";
 @import "./dropdown/style.scss";
 @import "./dropdown-menu/style.scss";
 @import "./duotone-picker/style.scss";
-@import "./font-size-picker/style.scss";
 @import "./form-toggle/style.scss";
 @import "./form-token-field/style.scss";
 @import "./guide/style.scss";
@@ -39,12 +41,10 @@
 @import "./search-control/style.scss";
 @import "./select-control/style.scss";
 @import "./snackbar/style.scss";
-@import "./swatch/style.scss";
 @import "./tab-panel/style.scss";
 @import "./text-control/style.scss";
 @import "./tip/style.scss";
-@import "./toggle-control/style.scss";
-@import "./toolbar/style.scss";
-@import "./toolbar-button/style.scss";
-@import "./toolbar-group/style.scss";
+@import "./toolbar/toolbar/style.scss";
+@import "./toolbar/toolbar-button/style.scss";
+@import "./toolbar/toolbar-group/style.scss";
 @import "./tooltip/style.scss";

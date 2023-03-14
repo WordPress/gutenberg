@@ -1,21 +1,11 @@
 /**
- * External dependencies
- */
-
-import { JSDOM } from 'jsdom';
-
-/**
  * Internal dependencies
  */
-
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
 import { specWithRegistration } from './helpers';
-
-const { window } = new JSDOM();
-const { document } = window;
 
 function createNode( HTML ) {
 	const doc = document.implementation.createHTMLDocument( '' );

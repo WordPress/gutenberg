@@ -10,7 +10,7 @@ export interface User {
 
 async function login( this: RequestUtils, user: User = this.user ) {
 	// Login to admin using request context.
-	let response = await this.request.post( '/wp-login.php', {
+	let response = await this.request.post( 'wp-login.php', {
 		failOnStatusCode: true,
 		form: {
 			log: user.username,
@@ -21,7 +21,7 @@ async function login( this: RequestUtils, user: User = this.user ) {
 
 	// Get the nonce.
 	response = await this.request.get(
-		'/wp-admin/admin-ajax.php?action=rest-nonce',
+		'wp-admin/admin-ajax.php?action=rest-nonce',
 		{
 			failOnStatusCode: true,
 		}

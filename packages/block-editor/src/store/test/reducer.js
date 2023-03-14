@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -20,6 +19,7 @@ import {
 	hasSameKeys,
 	isUpdatingSameBlockAttribute,
 	blocks,
+	isBlockInterfaceHidden,
 	isTyping,
 	draggedBlocks,
 	selection,
@@ -210,38 +210,48 @@ describe( 'state', () => {
 			} );
 			it( 'can replace a child block', () => {
 				const existingState = deepFreeze( {
-					byClientId: {
-						chicken: {
-							clientId: 'chicken',
-							name: 'core/test-parent-block',
-							isValid: true,
-						},
-						'chicken-child': {
-							clientId: 'chicken-child',
-							name: 'core/test-child-block',
-							isValid: true,
-						},
-					},
-					attributes: {
-						chicken: {},
-						'chicken-child': {
-							attr: true,
-						},
-					},
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ 'chicken-child' ],
-						'chicken-child': [],
-					},
-					parents: {
-						chicken: '',
-						'chicken-child': 'chicken',
-					},
-					tree: {
-						'': {},
-						chicken: {},
-						'chicken-child': {},
-					},
+					byClientId: new Map(
+						Object.entries( {
+							chicken: {
+								clientId: 'chicken',
+								name: 'core/test-parent-block',
+								isValid: true,
+							},
+							'chicken-child': {
+								clientId: 'chicken-child',
+								name: 'core/test-child-block',
+								isValid: true,
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							'chicken-child': {
+								attr: true,
+							},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ 'chicken-child' ],
+							'chicken-child': [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							chicken: '',
+							'chicken-child': 'chicken',
+						} )
+					),
+					tree: new Map(
+						Object.entries( {
+							'': {},
+							chicken: {},
+							'chicken-child': {},
+						} )
+					),
 					controlledInnerBlocks: {},
 				} );
 
@@ -260,70 +270,88 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( omit( state, [ 'tree' ] ) ).toEqual( {
+				const { tree, ...restState } = state;
+				expect( restState ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
-					byClientId: {
-						chicken: {
-							clientId: 'chicken',
-							name: 'core/test-parent-block',
-							isValid: true,
-						},
-						[ newChildBlockId ]: {
-							clientId: newChildBlockId,
-							name: 'core/test-child-block',
-							isValid: true,
-						},
-					},
-					attributes: {
-						chicken: {},
-						[ newChildBlockId ]: {
-							attr: false,
-							attr2: 'perfect',
-						},
-					},
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ newChildBlockId ],
-						[ newChildBlockId ]: [],
-					},
-					parents: {
-						[ newChildBlockId ]: 'chicken',
-						chicken: '',
-					},
+					byClientId: new Map(
+						Object.entries( {
+							chicken: {
+								clientId: 'chicken',
+								name: 'core/test-parent-block',
+								isValid: true,
+							},
+							[ newChildBlockId ]: {
+								clientId: newChildBlockId,
+								name: 'core/test-child-block',
+								isValid: true,
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							[ newChildBlockId ]: {
+								attr: false,
+								attr2: 'perfect',
+							},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ newChildBlockId ],
+							[ newChildBlockId ]: [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							[ newChildBlockId ]: 'chicken',
+							chicken: '',
+						} )
+					),
 					controlledInnerBlocks: {},
-					visibility: {},
 				} );
-				expect( state.tree.chicken ).not.toBe(
-					existingState.tree.chicken
+				expect( state.tree.get( 'chicken' ) ).not.toBe(
+					existingState.tree.get( 'chicken' )
 				);
 			} );
 
 			it( 'can insert a child block', () => {
 				const existingState = deepFreeze( {
-					byClientId: {
-						chicken: {
-							clientId: 'chicken',
-							name: 'core/test-parent-block',
-							isValid: true,
-						},
-					},
-					attributes: {
-						chicken: {},
-					},
-					order: {
-						'': [ 'chicken' ],
-						chicken: [],
-					},
-					parents: {
-						chicken: '',
-					},
-					tree: {
-						'': {
-							innerBlocks: [],
-						},
-						chicken: {},
-					},
+					byClientId: new Map(
+						Object.entries( {
+							chicken: {
+								clientId: 'chicken',
+								name: 'core/test-parent-block',
+								isValid: true,
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							chicken: '',
+						} )
+					),
+					tree: new Map(
+						Object.entries( {
+							'': {
+								innerBlocks: [],
+							},
+							chicken: {},
+						} )
+					),
 					controlledInnerBlocks: {},
 				} );
 
@@ -342,50 +370,58 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( omit( state, [ 'tree' ] ) ).toEqual( {
+				const { tree, ...restState } = state;
+				expect( restState ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
-					byClientId: {
-						chicken: {
-							clientId: 'chicken',
-							name: 'core/test-parent-block',
-							isValid: true,
-						},
-						[ newChildBlockId ]: {
-							clientId: newChildBlockId,
-							name: 'core/test-child-block',
-							isValid: true,
-						},
-					},
-					attributes: {
-						chicken: {},
-						[ newChildBlockId ]: {
-							attr: false,
-							attr2: 'perfect',
-						},
-					},
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ newChildBlockId ],
-						[ newChildBlockId ]: [],
-					},
-					parents: {
-						[ newChildBlockId ]: 'chicken',
-						chicken: '',
-					},
+					byClientId: new Map(
+						Object.entries( {
+							chicken: {
+								clientId: 'chicken',
+								name: 'core/test-parent-block',
+								isValid: true,
+							},
+							[ newChildBlockId ]: {
+								clientId: newChildBlockId,
+								name: 'core/test-child-block',
+								isValid: true,
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							[ newChildBlockId ]: {
+								attr: false,
+								attr2: 'perfect',
+							},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ newChildBlockId ],
+							[ newChildBlockId ]: [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							[ newChildBlockId ]: 'chicken',
+							chicken: '',
+						} )
+					),
 					controlledInnerBlocks: {},
-					visibility: {},
 				} );
-				expect( state.tree.chicken ).not.toBe(
-					existingState.tree.chicken
+				expect( state.tree.get( 'chicken' ) ).not.toBe(
+					existingState.tree.get( 'chicken' )
 				);
-				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-					state.tree.chicken
+				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+					state.tree.get( 'chicken' )
 				);
-				expect( state.tree.chicken.innerBlocks[ 0 ] ).toBe(
-					state.tree[ newChildBlockId ]
+				expect( state.tree.get( 'chicken' ).innerBlocks[ 0 ] ).toBe(
+					state.tree.get( newChildBlockId )
 				);
-				expect( state.tree[ newChildBlockId ] ).toEqual( {
+				expect( state.tree.get( newChildBlockId ) ).toEqual( {
 					clientId: newChildBlockId,
 					innerBlocks: [],
 					isValid: true,
@@ -399,44 +435,52 @@ describe( 'state', () => {
 
 			it( 'can replace multiple child blocks', () => {
 				const existingState = deepFreeze( {
-					byClientId: {
-						chicken: {
-							clientId: 'chicken',
-							name: 'core/test-parent-block',
-							isValid: true,
-						},
-						'chicken-child': {
-							clientId: 'chicken-child',
-							name: 'core/test-child-block',
-							isValid: true,
-						},
-						'chicken-child-2': {
-							clientId: 'chicken-child',
-							name: 'core/test-child-block',
-							isValid: true,
-						},
-					},
-					attributes: {
-						chicken: {},
-						'chicken-child': {
-							attr: true,
-						},
-						'chicken-child-2': {
-							attr2: 'ok',
-						},
-					},
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ 'chicken-child', 'chicken-child-2' ],
-						'chicken-child': [],
-						'chicken-child-2': [],
-					},
-					parents: {
-						chicken: '',
-						'chicken-child': 'chicken',
-						'chicken-child-2': 'chicken',
-					},
-					tree: {},
+					byClientId: new Map(
+						Object.entries( {
+							chicken: {
+								clientId: 'chicken',
+								name: 'core/test-parent-block',
+								isValid: true,
+							},
+							'chicken-child': {
+								clientId: 'chicken-child',
+								name: 'core/test-child-block',
+								isValid: true,
+							},
+							'chicken-child-2': {
+								clientId: 'chicken-child',
+								name: 'core/test-child-block',
+								isValid: true,
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							'chicken-child': {
+								attr: true,
+							},
+							'chicken-child-2': {
+								attr2: 'ok',
+							},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ 'chicken-child', 'chicken-child-2' ],
+							'chicken-child': [],
+							'chicken-child-2': [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							chicken: '',
+							'chicken-child': 'chicken',
+							'chicken-child-2': 'chicken',
+						} )
+					),
+					tree: new Map(),
 					controlledInnerBlocks: {},
 				} );
 
@@ -466,79 +510,87 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( omit( state, [ 'tree' ] ) ).toEqual( {
+				const { tree, ...restState } = state;
+				expect( restState ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
-					byClientId: {
-						chicken: {
-							clientId: 'chicken',
-							name: 'core/test-parent-block',
-							isValid: true,
-						},
-						[ newChildBlockId1 ]: {
-							clientId: newChildBlockId1,
-							name: 'core/test-child-block',
-							isValid: true,
-						},
-						[ newChildBlockId2 ]: {
-							clientId: newChildBlockId2,
-							name: 'core/test-child-block',
-							isValid: true,
-						},
-						[ newChildBlockId3 ]: {
-							clientId: newChildBlockId3,
-							name: 'core/test-child-block',
-							isValid: true,
-						},
-					},
-					attributes: {
-						chicken: {},
-						[ newChildBlockId1 ]: {
-							attr: false,
-							attr2: 'perfect',
-						},
-						[ newChildBlockId2 ]: {
-							attr: true,
-							attr2: 'not-perfect',
-						},
-						[ newChildBlockId3 ]: {
-							attr2: 'hello',
-						},
-					},
-					order: {
-						'': [ 'chicken' ],
-						chicken: [
-							newChildBlockId1,
-							newChildBlockId2,
-							newChildBlockId3,
-						],
-						[ newChildBlockId1 ]: [],
-						[ newChildBlockId2 ]: [],
-						[ newChildBlockId3 ]: [],
-					},
-					parents: {
-						chicken: '',
-						[ newChildBlockId1 ]: 'chicken',
-						[ newChildBlockId2 ]: 'chicken',
-						[ newChildBlockId3 ]: 'chicken',
-					},
+					byClientId: new Map(
+						Object.entries( {
+							chicken: {
+								clientId: 'chicken',
+								name: 'core/test-parent-block',
+								isValid: true,
+							},
+							[ newChildBlockId1 ]: {
+								clientId: newChildBlockId1,
+								name: 'core/test-child-block',
+								isValid: true,
+							},
+							[ newChildBlockId2 ]: {
+								clientId: newChildBlockId2,
+								name: 'core/test-child-block',
+								isValid: true,
+							},
+							[ newChildBlockId3 ]: {
+								clientId: newChildBlockId3,
+								name: 'core/test-child-block',
+								isValid: true,
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							[ newChildBlockId1 ]: {
+								attr: false,
+								attr2: 'perfect',
+							},
+							[ newChildBlockId2 ]: {
+								attr: true,
+								attr2: 'not-perfect',
+							},
+							[ newChildBlockId3 ]: {
+								attr2: 'hello',
+							},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [
+								newChildBlockId1,
+								newChildBlockId2,
+								newChildBlockId3,
+							],
+							[ newChildBlockId1 ]: [],
+							[ newChildBlockId2 ]: [],
+							[ newChildBlockId3 ]: [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							chicken: '',
+							[ newChildBlockId1 ]: 'chicken',
+							[ newChildBlockId2 ]: 'chicken',
+							[ newChildBlockId3 ]: 'chicken',
+						} )
+					),
 					controlledInnerBlocks: {},
-					visibility: {},
 				} );
 
-				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-					state.tree.chicken
+				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+					state.tree.get( 'chicken' )
 				);
-				expect( state.tree.chicken.innerBlocks[ 0 ] ).toBe(
-					state.tree[ newChildBlockId1 ]
+				expect( state.tree.get( 'chicken' ).innerBlocks[ 0 ] ).toBe(
+					state.tree.get( newChildBlockId1 )
 				);
-				expect( state.tree.chicken.innerBlocks[ 1 ] ).toBe(
-					state.tree[ newChildBlockId2 ]
+				expect( state.tree.get( 'chicken' ).innerBlocks[ 1 ] ).toBe(
+					state.tree.get( newChildBlockId2 )
 				);
-				expect( state.tree.chicken.innerBlocks[ 2 ] ).toBe(
-					state.tree[ newChildBlockId3 ]
+				expect( state.tree.get( 'chicken' ).innerBlocks[ 2 ] ).toBe(
+					state.tree.get( newChildBlockId3 )
 				);
-				expect( state.tree[ newChildBlockId1 ] ).toEqual( {
+				expect( state.tree.get( newChildBlockId1 ) ).toEqual( {
 					innerBlocks: [],
 					clientId: newChildBlockId1,
 					name: 'core/test-child-block',
@@ -552,42 +604,52 @@ describe( 'state', () => {
 
 			it( 'can replace a child block that has other children', () => {
 				const existingState = deepFreeze( {
-					byClientId: {
-						chicken: {
-							clientId: 'chicken',
-							name: 'core/test-parent-block',
-							isValid: true,
-						},
-						'chicken-child': {
-							clientId: 'chicken-child',
-							name: 'core/test-child-block',
-							isValid: true,
-						},
-						'chicken-grand-child': {
-							clientId: 'chicken-child',
-							name: 'core/test-block',
-							isValid: true,
-						},
-					},
-					attributes: {
-						chicken: {},
-						'chicken-child': {},
-						'chicken-grand-child': {},
-					},
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ 'chicken-child' ],
-						'chicken-child': [ 'chicken-grand-child' ],
-						'chicken-grand-child': [],
-					},
-					parents: {
-						chicken: '',
-						'chicken-child': 'chicken',
-						'chicken-grand-child': 'chicken-child',
-					},
-					tree: {
-						chicken: {},
-					},
+					byClientId: new Map(
+						Object.entries( {
+							chicken: {
+								clientId: 'chicken',
+								name: 'core/test-parent-block',
+								isValid: true,
+							},
+							'chicken-child': {
+								clientId: 'chicken-child',
+								name: 'core/test-child-block',
+								isValid: true,
+							},
+							'chicken-grand-child': {
+								clientId: 'chicken-child',
+								name: 'core/test-block',
+								isValid: true,
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							'chicken-child': {},
+							'chicken-grand-child': {},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ 'chicken-child' ],
+							'chicken-child': [ 'chicken-grand-child' ],
+							'chicken-grand-child': [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							chicken: '',
+							'chicken-child': 'chicken',
+							'chicken-grand-child': 'chicken-child',
+						} )
+					),
+					tree: new Map(
+						Object.entries( {
+							chicken: {},
+						} )
+					),
 					controlledInnerBlocks: {},
 				} );
 
@@ -603,41 +665,49 @@ describe( 'state', () => {
 
 				const state = blocks( existingState, action );
 
-				expect( omit( state, [ 'tree' ] ) ).toEqual( {
+				const { tree, ...restState } = state;
+				expect( restState ).toEqual( {
 					isPersistentChange: true,
 					isIgnoredChange: false,
-					byClientId: {
-						chicken: {
-							clientId: 'chicken',
-							name: 'core/test-parent-block',
-							isValid: true,
-						},
-						[ newChildBlockId ]: {
-							clientId: newChildBlockId,
-							name: 'core/test-block',
-							isValid: true,
-						},
-					},
-					attributes: {
-						chicken: {},
-						[ newChildBlockId ]: {},
-					},
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ newChildBlockId ],
-						[ newChildBlockId ]: [],
-					},
-					parents: {
-						chicken: '',
-						[ newChildBlockId ]: 'chicken',
-					},
+					byClientId: new Map(
+						Object.entries( {
+							chicken: {
+								clientId: 'chicken',
+								name: 'core/test-parent-block',
+								isValid: true,
+							},
+							[ newChildBlockId ]: {
+								clientId: newChildBlockId,
+								name: 'core/test-block',
+								isValid: true,
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							[ newChildBlockId ]: {},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ newChildBlockId ],
+							[ newChildBlockId ]: [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							chicken: '',
+							[ newChildBlockId ]: 'chicken',
+						} )
+					),
 					controlledInnerBlocks: {},
-					visibility: {},
 				} );
 
 				// The block object of the parent should be updated.
-				expect( state.tree.chicken ).not.toBe(
-					existingState.tree.chicken
+				expect( state.tree.get( 'chicken' ) ).not.toBe(
+					existingState.tree.get( 'chicken' )
 				);
 			} );
 		} );
@@ -646,15 +716,14 @@ describe( 'state', () => {
 			const state = blocks( undefined, {} );
 
 			expect( state ).toEqual( {
-				byClientId: {},
-				attributes: {},
-				order: {},
-				parents: {},
+				byClientId: new Map(),
+				attributes: new Map(),
+				order: new Map(),
+				parents: new Map(),
 				isPersistentChange: true,
 				isIgnoredChange: false,
-				tree: {},
+				tree: new Map(),
 				controlledInnerBlocks: {},
-				visibility: {},
 			} );
 		} );
 
@@ -665,20 +734,20 @@ describe( 'state', () => {
 					blocks: [ { clientId: 'bananas', innerBlocks: [] } ],
 				} );
 
-				expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-				expect( Object.values( state.byClientId )[ 0 ].clientId ).toBe(
+				expect( state.byClientId.size ).toBe( 1 );
+				expect( state.byClientId.get( 'bananas' ).clientId ).toBe(
 					'bananas'
 				);
-				expect( state.order ).toEqual( {
+				expect( Object.fromEntries( state.order ) ).toEqual( {
 					'': [ 'bananas' ],
 					bananas: [],
 				} );
-				expect( state.tree.bananas ).toEqual( {
+				expect( state.tree.get( 'bananas' ) ).toEqual( {
 					clientId: 'bananas',
 					innerBlocks: [],
 				} );
-				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-					state.tree.bananas
+				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+					state.tree.get( 'bananas' )
 				);
 			} );
 		} );
@@ -697,8 +766,8 @@ describe( 'state', () => {
 				],
 			} );
 
-			expect( Object.keys( state.byClientId ) ).toHaveLength( 2 );
-			expect( state.order ).toEqual( {
+			expect( state.byClientId.size ).toBe( 2 );
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ 'bananas' ],
 				apples: [],
 				bananas: [ 'apples' ],
@@ -728,21 +797,21 @@ describe( 'state', () => {
 				],
 			} );
 
-			expect( Object.keys( state.byClientId ) ).toHaveLength( 2 );
-			expect( Object.values( state.byClientId )[ 1 ].clientId ).toBe(
-				'ribs'
-			);
-			expect( state.order ).toEqual( {
+			expect( state.byClientId.size ).toBe( 2 );
+			expect( state.byClientId.get( 'ribs' ).clientId ).toBe( 'ribs' );
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ 'chicken', 'ribs' ],
 				chicken: [],
 				ribs: [],
 			} );
 
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-				state.tree.chicken
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'chicken' )
 			);
-			expect( state.tree[ '' ].innerBlocks[ 1 ] ).toBe( state.tree.ribs );
-			expect( state.tree.chicken ).toEqual( {
+			expect( state.tree.get( '' ).innerBlocks[ 1 ] ).toBe(
+				state.tree.get( 'ribs' )
+			);
+			expect( state.tree.get( 'chicken' ) ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: {},
@@ -774,24 +843,22 @@ describe( 'state', () => {
 				],
 			} );
 
-			expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-			expect( Object.values( state.byClientId )[ 0 ].name ).toBe(
+			expect( state.byClientId.size ).toBe( 1 );
+			expect( state.byClientId.get( 'wings' ).name ).toBe(
 				'core/freeform'
 			);
-			expect( Object.values( state.byClientId )[ 0 ].clientId ).toBe(
-				'wings'
-			);
-			expect( state.order ).toEqual( {
+			expect( state.byClientId.get( 'wings' ).clientId ).toBe( 'wings' );
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ 'wings' ],
 				wings: [],
 			} );
-			expect( state.parents ).toEqual( {
+			expect( Object.fromEntries( state.parents ) ).toEqual( {
 				wings: '',
 			} );
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-				state.tree.wings
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'wings' )
 			);
-			expect( state.tree.wings ).toEqual( {
+			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
 				name: 'core/freeform',
 				innerBlocks: [],
@@ -816,8 +883,8 @@ describe( 'state', () => {
 				blocks: [],
 			} );
 
-			expect( Object.keys( state.byClientId ) ).toHaveLength( 0 );
-			expect( state.tree[ '' ].innerBlocks ).toHaveLength( 0 );
+			expect( state.byClientId.size ).toBe( 0 );
+			expect( state.tree.get( '' ).innerBlocks ).toHaveLength( 0 );
 		} );
 
 		it( 'should replace the block and remove references to its inner blocks', () => {
@@ -851,18 +918,18 @@ describe( 'state', () => {
 				],
 			} );
 
-			expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-			expect( state.order ).toEqual( {
+			expect( state.byClientId.size ).toBe( 1 );
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ 'wings' ],
 				wings: [],
 			} );
-			expect( state.parents ).toEqual( {
+			expect( Object.fromEntries( state.parents ) ).toEqual( {
 				wings: '',
 			} );
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-				state.tree.wings
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'wings' )
 			);
-			expect( state.tree.wings ).toEqual( {
+			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
 				name: 'core/freeform',
 				innerBlocks: [],
@@ -886,21 +953,21 @@ describe( 'state', () => {
 				blocks: [ replacementBlock ],
 			} );
 
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ replacementBlock.clientId ],
 				[ replacementBlock.clientId ]: [],
 			} );
 
-			expect( state.parents ).toEqual( {
+			expect( Object.fromEntries( state.parents ) ).toEqual( {
 				[ wrapperBlock.clientId ]: '',
 				[ replacementBlock.clientId ]: wrapperBlock.clientId,
 			} );
 
-			expect( state.tree[ wrapperBlock.clientId ].innerBlocks[ 0 ] ).toBe(
-				state.tree[ replacementBlock.clientId ]
-			);
-			expect( state.tree[ replacementBlock.clientId ] ).toEqual( {
+			expect(
+				state.tree.get( wrapperBlock.clientId ).innerBlocks[ 0 ]
+			).toBe( state.tree.get( replacementBlock.clientId ) );
+			expect( state.tree.get( replacementBlock.clientId ) ).toEqual( {
 				clientId: replacementBlock.clientId,
 				name: 'core/test-block',
 				innerBlocks: [],
@@ -933,22 +1000,22 @@ describe( 'state', () => {
 				],
 			} );
 
-			expect( Object.keys( replacedState.byClientId ) ).toHaveLength( 1 );
-			expect( Object.values( originalState.byClientId )[ 0 ].name ).toBe(
+			expect( replacedState.byClientId.size ).toBe( 1 );
+			expect( originalState.byClientId.get( 'chicken' ).name ).toBe(
 				'core/test-block'
 			);
-			expect( Object.values( replacedState.byClientId )[ 0 ].name ).toBe(
+			expect( replacedState.byClientId.get( 'chicken' ).name ).toBe(
 				'core/freeform'
 			);
-			expect(
-				Object.values( replacedState.byClientId )[ 0 ].clientId
-			).toBe( 'chicken' );
-			expect( replacedState.order ).toEqual( {
+			expect( replacedState.byClientId.get( 'chicken' ).clientId ).toBe(
+				'chicken'
+			);
+			expect( Object.fromEntries( replacedState.order ) ).toEqual( {
 				'': [ 'chicken' ],
 				chicken: [],
 			} );
-			expect( originalState.tree.chicken ).not.toBe(
-				replacedState.tree.chicken
+			expect( originalState.tree.get( 'chicken' ) ).not.toBe(
+				replacedState.tree.get( 'chicken' )
 			);
 
 			const nestedBlock = {
@@ -978,16 +1045,16 @@ describe( 'state', () => {
 				blocks: [ replacementNestedBlock ],
 			} );
 
-			expect( replacedNestedState.order ).toEqual( {
+			expect( Object.fromEntries( replacedNestedState.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ replacementNestedBlock.clientId ],
 				[ replacementNestedBlock.clientId ]: [],
 			} );
 
-			expect( originalNestedState.byClientId.chicken.name ).toBe(
+			expect( originalNestedState.byClientId.get( 'chicken' ).name ).toBe(
 				'core/test-block'
 			);
-			expect( replacedNestedState.byClientId.chicken.name ).toBe(
+			expect( replacedNestedState.byClientId.get( 'chicken' ).name ).toBe(
 				'core/freeform'
 			);
 		} );
@@ -1014,19 +1081,19 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( state.byClientId.chicken ).toEqual( {
+			expect( state.byClientId.get( 'chicken' ) ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				isValid: true,
 			} );
 
-			expect( state.attributes.chicken ).toEqual( {
+			expect( state.attributes.get( 'chicken' ) ).toEqual( {
 				content: 'ribs',
 			} );
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-				state.tree.chicken
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'chicken' )
 			);
-			expect( state.tree.chicken ).toEqual( {
+			expect( state.tree.get( 'chicken' ) ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				innerBlocks: [],
@@ -1059,20 +1126,20 @@ describe( 'state', () => {
 				updatedId: 3,
 			} );
 
-			expect( state.byClientId.chicken ).toEqual( {
+			expect( state.byClientId.get( 'chicken' ) ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/block',
 				isValid: false,
 			} );
 
-			expect( state.attributes.chicken ).toEqual( {
+			expect( state.attributes.get( 'chicken' ) ).toEqual( {
 				ref: 3,
 			} );
 
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-				state.tree.chicken
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'chicken' )
 			);
-			expect( state.tree.chicken ).toEqual( {
+			expect( state.tree.get( 'chicken' ) ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/block',
 				isValid: false,
@@ -1106,12 +1173,16 @@ describe( 'state', () => {
 				clientIds: [ 'ribs' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs', 'chicken' ] );
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe( state.tree.ribs );
-			expect( state.tree[ '' ].innerBlocks[ 1 ] ).toBe(
-				state.tree.chicken
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'ribs' )
 			);
-			expect( state.tree.chicken ).toBe( original.tree.chicken );
+			expect( state.tree.get( '' ).innerBlocks[ 1 ] ).toBe(
+				state.tree.get( 'chicken' )
+			);
+			expect( state.tree.get( 'chicken' ) ).toBe(
+				original.tree.get( 'chicken' )
+			);
 		} );
 
 		it( 'should move the nested block up', () => {
@@ -1131,7 +1202,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [
 					movedBlock.clientId,
@@ -1141,14 +1212,14 @@ describe( 'state', () => {
 				[ siblingBlock.clientId ]: [],
 			} );
 
-			expect( state.tree[ wrapperBlock.clientId ].innerBlocks[ 0 ] ).toBe(
-				state.tree[ movedBlock.clientId ]
-			);
-			expect( state.tree[ wrapperBlock.clientId ].innerBlocks[ 1 ] ).toBe(
-				state.tree[ siblingBlock.clientId ]
-			);
-			expect( state.tree[ movedBlock.clientId ] ).toBe(
-				original.tree[ movedBlock.clientId ]
+			expect(
+				state.tree.get( wrapperBlock.clientId ).innerBlocks[ 0 ]
+			).toBe( state.tree.get( movedBlock.clientId ) );
+			expect(
+				state.tree.get( wrapperBlock.clientId ).innerBlocks[ 1 ]
+			).toBe( state.tree.get( siblingBlock.clientId ) );
+			expect( state.tree.get( movedBlock.clientId ) ).toBe(
+				original.tree.get( movedBlock.clientId )
 			);
 		} );
 
@@ -1181,7 +1252,7 @@ describe( 'state', () => {
 				clientIds: [ 'ribs', 'veggies' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'ribs',
 				'veggies',
 				'chicken',
@@ -1207,7 +1278,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [
 					movedBlockA.clientId,
@@ -1269,7 +1340,7 @@ describe( 'state', () => {
 				clientIds: [ 'chicken' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs', 'chicken' ] );
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
 		} );
 
 		it( 'should move the nested block down', () => {
@@ -1289,7 +1360,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [
 					siblingBlock.clientId,
@@ -1329,7 +1400,7 @@ describe( 'state', () => {
 				clientIds: [ 'chicken', 'ribs' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'veggies',
 				'chicken',
 				'ribs',
@@ -1355,7 +1426,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [
 					siblingBlock.clientId,
@@ -1417,21 +1488,23 @@ describe( 'state', () => {
 				clientIds: [ 'chicken' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs' ] );
-			expect( state.order ).not.toHaveProperty( 'chicken' );
-			expect( state.parents ).toEqual( {
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs' ] );
+			expect( Object.fromEntries( state.order ) ).not.toHaveProperty(
+				'chicken'
+			);
+			expect( Object.fromEntries( state.parents ) ).toEqual( {
 				ribs: '',
 			} );
-			expect( state.byClientId ).toEqual( {
+			expect( Object.fromEntries( state.byClientId ) ).toEqual( {
 				ribs: {
 					clientId: 'ribs',
 					name: 'core/test-block',
 				},
 			} );
-			expect( state.attributes ).toEqual( {
+			expect( Object.fromEntries( state.attributes ) ).toEqual( {
 				ribs: {},
 			} );
-			expect( state.tree[ '' ].innerBlocks ).toHaveLength( 1 );
+			expect( state.tree.get( '' ).innerBlocks ).toHaveLength( 1 );
 		} );
 
 		it( 'should remove multiple blocks', () => {
@@ -1463,19 +1536,23 @@ describe( 'state', () => {
 				clientIds: [ 'chicken', 'veggies' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs' ] );
-			expect( state.order ).not.toHaveProperty( 'chicken' );
-			expect( state.order ).not.toHaveProperty( 'veggies' );
-			expect( state.parents ).toEqual( {
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs' ] );
+			expect( Object.fromEntries( state.order ) ).not.toHaveProperty(
+				'chicken'
+			);
+			expect( Object.fromEntries( state.order ) ).not.toHaveProperty(
+				'veggies'
+			);
+			expect( Object.fromEntries( state.parents ) ).toEqual( {
 				ribs: '',
 			} );
-			expect( state.byClientId ).toEqual( {
+			expect( Object.fromEntries( state.byClientId ) ).toEqual( {
 				ribs: {
 					clientId: 'ribs',
 					name: 'core/test-block',
 				},
 			} );
-			expect( state.attributes ).toEqual( {
+			expect( Object.fromEntries( state.attributes ) ).toEqual( {
 				ribs: {},
 			} );
 		} );
@@ -1497,11 +1574,11 @@ describe( 'state', () => {
 				clientIds: [ block.clientId ],
 			} );
 
-			expect( state.byClientId ).toEqual( {} );
-			expect( state.order ).toEqual( {
+			expect( state.byClientId ).toEqual( new Map() );
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [],
 			} );
-			expect( state.parents ).toEqual( {} );
+			expect( Object.fromEntries( state.parents ) ).toEqual( {} );
 		} );
 
 		it( 'should insert at the specified index', () => {
@@ -1535,8 +1612,8 @@ describe( 'state', () => {
 				],
 			} );
 
-			expect( Object.keys( state.byClientId ) ).toHaveLength( 3 );
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.byClientId.size ).toBe( 3 );
+			expect( state.order.get( '' ) ).toEqual( [
 				'kumquat',
 				'persimmon',
 				'loquat',
@@ -1573,7 +1650,7 @@ describe( 'state', () => {
 				index: 0,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'ribs',
 				'chicken',
 				'veggies',
@@ -1610,7 +1687,7 @@ describe( 'state', () => {
 				index: 2,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'chicken',
 				'veggies',
 				'ribs',
@@ -1647,7 +1724,7 @@ describe( 'state', () => {
 				index: 1,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'chicken',
 				'ribs',
 				'veggies',
@@ -1684,7 +1761,7 @@ describe( 'state', () => {
 				index: 0,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'ribs',
 				'veggies',
 				'chicken',
@@ -1723,8 +1800,11 @@ describe( 'state', () => {
 				index: 0,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'chicken' ] );
-			expect( state.order.chicken ).toEqual( [ 'ribs', 'veggies' ] );
+			expect( state.order.get( '' ) ).toEqual( [ 'chicken' ] );
+			expect( state.order.get( 'chicken' ) ).toEqual( [
+				'ribs',
+				'veggies',
+			] );
 		} );
 
 		describe( 'blocks', () => {
@@ -1796,7 +1876,42 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.attributes.kumquat.updated ).toBe( true );
+					expect( state.attributes.get( 'kumquat' ).updated ).toBe(
+						true
+					);
+				} );
+
+				it( 'should not updated equal attributes', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+					const updatedState = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.attributes.get( 'kumquat' ) ).toBe(
+						updatedState.attributes.get( 'kumquat' )
+					);
 				} );
 
 				it( 'should return with attribute block updates when attributes are unique by block', () => {
@@ -1821,7 +1936,9 @@ describe( 'state', () => {
 						uniqueByBlock: true,
 					} );
 
-					expect( state.attributes.kumquat.updated ).toBe( true );
+					expect( state.attributes.get( 'kumquat' ).updated ).toBe(
+						true
+					);
 				} );
 
 				it( 'should accumulate attribute block updates', () => {
@@ -1847,7 +1964,7 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.attributes.kumquat ).toEqual( {
+					expect( state.attributes.get( 'kumquat' ) ).toEqual( {
 						updated: true,
 						moreUpdated: true,
 					} );
@@ -1895,6 +2012,27 @@ describe( 'state', () => {
 					} );
 
 					expect( state.attributes ).toBe( state.attributes );
+				} );
+
+				it( 'should handle undefined attributes', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+					} );
+
+					expect( state.attributes.get( 'kumquat' ) ).toEqual( {} );
 				} );
 			} );
 
@@ -2091,105 +2229,115 @@ describe( 'state', () => {
 					expect( state.controlledInnerBlocks.chicken ).toBe( true );
 					// The previous content of the block should be removed
 					expect( state.byClientId.child ).toBeUndefined();
-					expect( state.tree.child ).toBeUndefined();
-					expect( state.tree.chicken.innerBlocks ).toEqual( [] );
+					expect( state.tree.get( 'child' ) ).toBeUndefined();
+					expect( state.tree.get( 'chicken' ).innerBlocks ).toEqual(
+						[]
+					);
 				} );
 				it( 'should preserve the controlled blocks in state and re-attach them in other pieces of state(order, tree, etc..), when we replace inner blocks', () => {
 					const initialState = {
-						byClientId: {
-							'group-id': {
-								clientId: 'group-id',
-								name: 'core/group',
-								isValid: true,
-							},
-							'reusable-id': {
-								clientId: 'reusable-id',
-								name: 'core/block',
-								isValid: true,
-							},
-							'paragraph-id': {
-								clientId: 'paragraph-id',
-								name: 'core/paragraph',
-								isValid: true,
-							},
-						},
-						order: {
-							'': [ 'group-id' ],
-							'group-id': [ 'reusable-id' ],
-							'reusable-id': [ 'paragraph-id' ],
-							'paragraph-id': [],
-						},
+						byClientId: new Map(
+							Object.entries( {
+								'group-id': {
+									clientId: 'group-id',
+									name: 'core/group',
+									isValid: true,
+								},
+								'reusable-id': {
+									clientId: 'reusable-id',
+									name: 'core/block',
+									isValid: true,
+								},
+								'paragraph-id': {
+									clientId: 'paragraph-id',
+									name: 'core/paragraph',
+									isValid: true,
+								},
+							} )
+						),
+						order: new Map(
+							Object.entries( {
+								'': [ 'group-id' ],
+								'group-id': [ 'reusable-id' ],
+								'reusable-id': [ 'paragraph-id' ],
+								'paragraph-id': [],
+							} )
+						),
 						controlledInnerBlocks: {
 							'reusable-id': true,
 						},
-						parents: {
-							'group-id': '',
-							'reusable-id': 'group-id',
-							'paragraph-id': 'reusable-id',
-						},
-						tree: {
-							'group-id': {
-								clientId: 'group-id',
-								name: 'core/group',
-								isValid: true,
-								innerBlocks: [
-									{
-										clientId: 'reusable-id',
-										name: 'core/block',
-										isValid: true,
-										attributes: {
-											ref: 687,
-										},
-										innerBlocks: [],
-									},
-								],
-							},
-							'reusable-id': {
-								clientId: 'reusable-id',
-								name: 'core/block',
-								isValid: true,
-								attributes: {
-									ref: 687,
-								},
-								innerBlocks: [],
-							},
-							'': {
-								innerBlocks: [
-									{
-										clientId: 'group-id',
-										name: 'core/group',
-										isValid: true,
-										innerBlocks: [
-											{
-												clientId: 'reusable-id',
-												name: 'core/block',
-												isValid: true,
-												attributes: {
-													ref: 687,
-												},
-												innerBlocks: [],
+						parents: new Map(
+							Object.entries( {
+								'group-id': '',
+								'reusable-id': 'group-id',
+								'paragraph-id': 'reusable-id',
+							} )
+						),
+						tree: new Map(
+							Object.entries( {
+								'group-id': {
+									clientId: 'group-id',
+									name: 'core/group',
+									isValid: true,
+									innerBlocks: [
+										{
+											clientId: 'reusable-id',
+											name: 'core/block',
+											isValid: true,
+											attributes: {
+												ref: 687,
 											},
-										],
+											innerBlocks: [],
+										},
+									],
+								},
+								'reusable-id': {
+									clientId: 'reusable-id',
+									name: 'core/block',
+									isValid: true,
+									attributes: {
+										ref: 687,
 									},
-								],
-							},
-							'paragraph-id': {
-								clientId: 'paragraph-id',
-								name: 'core/paragraph',
-								isValid: true,
-								innerBlocks: [],
-							},
-							'controlled||reusable-id': {
-								innerBlocks: [
-									{
-										clientId: 'paragraph-id',
-										name: 'core/paragraph',
-										isValid: true,
-										innerBlocks: [],
-									},
-								],
-							},
-						},
+									innerBlocks: [],
+								},
+								'': {
+									innerBlocks: [
+										{
+											clientId: 'group-id',
+											name: 'core/group',
+											isValid: true,
+											innerBlocks: [
+												{
+													clientId: 'reusable-id',
+													name: 'core/block',
+													isValid: true,
+													attributes: {
+														ref: 687,
+													},
+													innerBlocks: [],
+												},
+											],
+										},
+									],
+								},
+								'paragraph-id': {
+									clientId: 'paragraph-id',
+									name: 'core/paragraph',
+									isValid: true,
+									innerBlocks: [],
+								},
+								'controlled||reusable-id': {
+									innerBlocks: [
+										{
+											clientId: 'paragraph-id',
+											name: 'core/paragraph',
+											isValid: true,
+											innerBlocks: [],
+										},
+									],
+								},
+							} )
+						),
 					};
 					// We will dispatch an action that replaces the inner
 					// blocks with the same inner blocks, which contain
@@ -2211,11 +2359,15 @@ describe( 'state', () => {
 						updateSelection: false,
 					};
 					const state = blocks( initialState, action );
-					expect( state.order ).toEqual(
-						expect.objectContaining( initialState.order )
+					expect( Object.fromEntries( state.order ) ).toEqual(
+						expect.objectContaining(
+							Object.fromEntries( initialState.order )
+						)
 					);
-					expect( state.tree ).toEqual(
-						expect.objectContaining( initialState.tree )
+					expect( Object.fromEntries( state.tree ) ).toEqual(
+						expect.objectContaining(
+							Object.fromEntries( initialState.tree )
+						)
 					);
 				} );
 			} );
@@ -2252,6 +2404,24 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'isBlockInterfaceHidden()', () => {
+		it( 'should set the hide block interface flag to true', () => {
+			const state = isBlockInterfaceHidden( false, {
+				type: 'HIDE_BLOCK_INTERFACE',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should set the hide block interface flag to false', () => {
+			const state = isBlockInterfaceHidden( false, {
+				type: 'SHOW_BLOCK_INTERFACE',
+			} );
+
+			expect( state ).toBe( false );
 		} );
 	} );
 
@@ -3082,22 +3252,10 @@ describe( 'state', () => {
 				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
 			} );
 		} );
-
-		it( 'returns null on anything other than block attributes update', () => {
-			const original = deepFreeze( {
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
-			} );
-
-			const state = lastBlockAttributesChange( original, {
-				type: '__INERT__',
-			} );
-
-			expect( state ).toBe( null );
-		} );
 	} );
 
 	describe( 'lastBlockInserted', () => {
-		it( 'should return client id if last block inserted is called with action INSERT_BLOCKS', () => {
+		it( 'should contain client id if last block inserted is called with action INSERT_BLOCKS', () => {
 			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
 
 			const action = {
@@ -3114,7 +3272,7 @@ describe( 'state', () => {
 
 			const state = lastBlockInserted( {}, action );
 
-			expect( state.clientId ).toBe( expectedClientId );
+			expect( state.clientIds ).toContain( expectedClientId );
 		} );
 
 		it( 'should return inserter_menu source if last block inserted is called with action INSERT_BLOCKS', () => {
@@ -3139,7 +3297,7 @@ describe( 'state', () => {
 
 		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and block list is empty', () => {
 			const expectedState = {
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 			};
 
 			const action = {
@@ -3153,6 +3311,48 @@ describe( 'state', () => {
 			const state = lastBlockInserted( expectedState, action );
 
 			expect( state ).toEqual( expectedState );
+		} );
+
+		it( 'should return client ids of blocks when called with REPLACE_BLOCKS', () => {
+			const clientIdOne = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+			const clientIdTwo = '9db792c6-a25a-495d-adbd-97d56a4c4189';
+
+			const action = {
+				blocks: [
+					{
+						clientId: clientIdOne,
+					},
+					{
+						clientId: clientIdTwo,
+					},
+				],
+				type: 'REPLACE_BLOCKS',
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state.clientIds ).toEqual( [ clientIdOne, clientIdTwo ] );
+		} );
+
+		it( 'should return client ids of all blocks when inner blocks are replaced with REPLACE_INNER_BLOCKS', () => {
+			const clientIdOne = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+			const clientIdTwo = '9db792c6-a25a-495d-adbd-97d56a4c4189';
+
+			const action = {
+				blocks: [
+					{
+						clientId: clientIdOne,
+					},
+					{
+						clientId: clientIdTwo,
+					},
+				],
+				type: 'REPLACE_INNER_BLOCKS',
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state.clientIds ).toEqual( [ clientIdOne, clientIdTwo ] );
 		} );
 
 		it( 'should return empty state if last block inserted is called with action RESET_BLOCKS', () => {

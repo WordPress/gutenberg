@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 
-const { clearTimeout, setTimeout } = window;
 const noop = () => {};
 
 export type Axis = 'x' | 'y';
@@ -35,12 +34,12 @@ interface UseResizeLabelArgs {
  * Custom hook that manages resize listener events. It also provides a label
  * based on current resize width x height values.
  *
- * @param  props
- * @param  props.axis        Only shows the label corresponding to the axis.
- * @param  props.fadeTimeout Duration (ms) before deactivating the resize label.
- * @param  props.onResize    Callback when a resize occurs. Provides { width, height } callback.
- * @param  props.position    Adjusts label value.
- * @param  props.showPx      Whether to add `PX` to the label.
+ * @param props
+ * @param props.axis        Only shows the label corresponding to the axis.
+ * @param props.fadeTimeout Duration (ms) before deactivating the resize label.
+ * @param props.onResize    Callback when a resize occurs. Provides { width, height } callback.
+ * @param props.position    Adjusts label value.
+ * @param props.showPx      Whether to add `PX` to the label.
  *
  * @return Properties for hook.
  */
@@ -85,23 +84,23 @@ export function useResizeLabel( {
 	 */
 	const moveTimeoutRef = useRef< number >();
 
-	const unsetMoveXY = () => {
-		/*
-		 * If axis is controlled, we will avoid resetting the moveX and moveY values.
-		 * This will allow for the preferred axis values to persist in the label.
-		 */
-		if ( isAxisControlled ) return;
-		setMoveX( false );
-		setMoveY( false );
-	};
+	const debounceUnsetMoveXY = useCallback( () => {
+		const unsetMoveXY = () => {
+			/*
+			 * If axis is controlled, we will avoid resetting the moveX and moveY values.
+			 * This will allow for the preferred axis values to persist in the label.
+			 */
+			if ( isAxisControlled ) return;
+			setMoveX( false );
+			setMoveY( false );
+		};
 
-	const debounceUnsetMoveXY = () => {
 		if ( moveTimeoutRef.current ) {
-			clearTimeout( moveTimeoutRef.current );
+			window.clearTimeout( moveTimeoutRef.current );
 		}
 
-		moveTimeoutRef.current = setTimeout( unsetMoveXY, fadeTimeout );
-	};
+		moveTimeoutRef.current = window.setTimeout( unsetMoveXY, fadeTimeout );
+	}, [ fadeTimeout, isAxisControlled ] );
 
 	useEffect( () => {
 		/*
@@ -144,7 +143,7 @@ export function useResizeLabel( {
 
 		onResize( { width, height } );
 		debounceUnsetMoveXY();
-	}, [ width, height ] );
+	}, [ width, height, onResize, debounceUnsetMoveXY ] );
 
 	const label = getSizeLabel( {
 		axis,
@@ -175,14 +174,14 @@ interface GetSizeLabelArgs {
 /**
  * Gets the resize label based on width and height values (as well as recent changes).
  *
- * @param  props
- * @param  props.axis     Only shows the label corresponding to the axis.
- * @param  props.height   Height value.
- * @param  props.moveX    Recent width (x axis) changes.
- * @param  props.moveY    Recent width (y axis) changes.
- * @param  props.position Adjusts label value.
- * @param  props.showPx   Whether to add `PX` to the label.
- * @param  props.width    Width value.
+ * @param props
+ * @param props.axis     Only shows the label corresponding to the axis.
+ * @param props.height   Height value.
+ * @param props.moveX    Recent width (x axis) changes.
+ * @param props.moveY    Recent width (y axis) changes.
+ * @param props.position Adjusts label value.
+ * @param props.showPx   Whether to add `PX` to the label.
+ * @param props.width    Width value.
  *
  * @return The rendered label.
  */

@@ -17,14 +17,11 @@ function DownloadableBlocksNoResults() {
 			</div>
 			<div className="block-editor-inserter__tips">
 				<Tip>
-					<div>
-						<p>
-							{ __( 'Interested in creating your own block?' ) }
-						</p>
-						<ExternalLink href="https://developer.wordpress.org/block-editor/">
-							{ __( 'Get started here' ) }.
-						</ExternalLink>
-					</div>
+					{ __( 'Interested in creating your own block?' ) }
+					<br />
+					<ExternalLink href="https://developer.wordpress.org/block-editor/">
+						{ __( 'Get started here' ) }.
+					</ExternalLink>
 				</Tip>
 			</div>
 		</>

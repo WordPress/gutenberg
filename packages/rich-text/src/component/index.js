@@ -16,8 +16,8 @@ import { useBoundaryStyle } from './use-boundary-style';
 import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
-import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
+import { useSelectionChangeCompat } from './use-selection-change-compat';
 import { useDelete } from './use-delete';
 
 export function useRichText( {
@@ -233,11 +233,6 @@ export function useRichText( {
 			handleChange,
 			multilineTag,
 		} ),
-		useIndentListItemOnSpace( {
-			multilineTag,
-			createRecord,
-			handleChange,
-		} ),
 		useInputAndSelection( {
 			record,
 			applyRecord,
@@ -246,6 +241,7 @@ export function useRichText( {
 			isSelected,
 			onSelectionChange,
 		} ),
+		useSelectionChangeCompat(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;
@@ -254,6 +250,12 @@ export function useRichText( {
 
 	return {
 		value: record.current,
+		// A function to get the most recent value so event handlers in
+		// useRichText implementations have access to it. For example when
+		// listening to input events, we internally update the state, but this
+		// state is not yet available to the input event handler because React
+		// may re-render asynchronously.
+		getValue: () => record.current,
 		onChange: handleChange,
 		ref: mergedRefs,
 	};

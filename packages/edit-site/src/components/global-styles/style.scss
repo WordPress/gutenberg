@@ -11,7 +11,7 @@
 	display: block;
 }
 
-.edit-site-typography-panel__preview {
+.edit-site-typography-preview {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -19,9 +19,17 @@
 	margin-bottom: $grid-unit-20;
 	background: $gray-100;
 	border-radius: $radius-block-ui;
+	overflow: hidden;
 }
 
-.edit-site-global-styles-screen-typography {
+.edit-site-typography-panel__full-width-control {
+	grid-column: 1 / -1;
+	max-width: 100%;
+}
+
+.edit-site-global-styles-screen-heading-color,
+.edit-site-global-styles-screen-typography,
+.edit-site-global-styles-screen-css {
 	margin: $grid-unit-20;
 }
 
@@ -40,13 +48,23 @@
 
 	.component-color-indicator {
 		// Show a diagonal line (crossed out) for empty swatches.
-		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+		background: $white linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+		flex-shrink: 0;
 	}
 }
 
-.edit-site-global-styles-header__description,
-.edit-site-block-types-search {
+.edit-site-global-styles-header__description {
 	padding: 0 $grid-unit-20;
+}
+
+.edit-site-block-types-search {
+	margin-bottom: $grid-unit-10;
+	padding: 0 $grid-unit-20;
+}
+
+.edit-site-global-styles-header {
+	// Need to override the too specific bottom margin for complementary areas.
+	margin-bottom: 0 !important;
 }
 
 .edit-site-global-styles-subtitle {
@@ -66,19 +84,10 @@
 	margin: 0;
 }
 
-.edit-site-screen-color-palette-toggle.edit-site-screen-color-palette-toggle {
-	margin-right: $grid-unit-20;
-	margin-left: $grid-unit-20;
-	width: unset;
-	.components-toggle-group-control {
-		min-height: $grid-unit-40;
-	}
-}
-
 .edit-site-screen-text-color__control,
 .edit-site-screen-link-color__control,
 .edit-site-screen-button-color__control,
-.edit-site-screen-background-color__control {
+.edit-site-screen-background-color__control.has-no-tabs {
 	padding: $grid-unit-20;
 }
 
@@ -100,7 +109,7 @@
 	}
 
 	&:focus .edit-site-global-styles-variations_item-preview {
-		border: var(--wp-admin-theme-color) $border-width solid;
+		border: var(--wp-admin-theme-color) var(--wp-admin-border-width-focus) solid;
 	}
 }
 
@@ -111,4 +120,124 @@
 .edit-site-global-styles__color-indicator-wrapper {
 	// Match the height of the rest of the icons (24px).
 	height: $grid-unit * 3;
+	flex-shrink: 0;
+}
+
+.edit-site-global-styles__color-label {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.edit-site-global-styles__block-preview-panel {
+	position: relative;
+	width: 100%;
+	overflow: auto;
+	border: $gray-200 $border-width solid;
+	border-radius: $radius-block-ui;
+}
+
+.edit-site-global-styles-screen-css {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+
+	.components-v-stack {
+		flex: 1 1 auto;
+
+		.edit-site-global-styles__custom-css-input {
+			flex: 1 1 auto;
+			display: flex;
+			flex-direction: column;
+
+			.components-base-control__field {
+				flex: 1 1 auto;
+				display: flex;
+				flex-direction: column;
+
+				.components-textarea-control__input {
+					flex: 1 1 auto;
+				}
+			}
+		}
+	}
+}
+
+.edit-site-global-styles__custom-css-input textarea {
+	font-family: $editor_html_font;
+}
+
+.edit-site-global-styles__custom-css-validation-wrapper {
+	position: absolute;
+	bottom: $grid-unit-20;
+	right: $grid-unit * 3;
+}
+
+.edit-site-global-styles__custom-css-validation-icon {
+	fill: $alert-red;
+}
+
+.edit-site-global-styles__custom-css-theme-css {
+	width: 100%;
+	line-break: anywhere;
+	white-space: break-spaces;
+	max-height: 200px;
+	overflow-y: scroll;
+}
+
+.edit-site-global-styles-screen-css-help-link {
+	display: block;
+	margin-top: $grid-unit-10;
+}
+.edit-site-global-styles-screen-variations {
+	margin-top: $grid-unit-20;
+	border-top: 1px solid $gray-300;
+
+	& > * {
+		margin: $grid-unit-30 $grid-unit-20;
+	}
+}
+
+.edit-site-global-styles-sidebar__navigator-screen {
+	display: flex;
+	flex-direction: column;
+}
+
+.edit-site-global-styles__shadow-panel {
+	width: 230px;
+}
+
+.edit-site-global-styles__shadow-dropdown {
+	display: block;
+	padding: 0;
+
+	> button {
+		width: 100%;
+		padding: $grid-unit-10;
+
+		&.is-open {
+			background-color: $gray-100;
+		}
+	}
+}
+
+// wrapper to clip the shadow beyond 6px
+.edit-site-global-styles__shadow-indicator-wrapper {
+	padding: 6px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+// These styles are similar to the color palette.
+.edit-site-global-styles__shadow-indicator {
+	color: $gray-800;
+	border: $gray-200 $border-width solid;
+	border-radius: $radius-block-ui;
+	cursor: pointer;
+	padding: 0;
+
+	height: 24px;
+	width: 24px;
 }

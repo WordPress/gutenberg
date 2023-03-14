@@ -48,11 +48,6 @@
 	}
 }
 
-.components-form-token-field__label {
-	display: inline-block;
-	margin-bottom: $grid-unit-10;
-}
-
 .components-form-token-field__help {
 	font-size: $helptext-font-size;
 	font-style: normal;
@@ -93,7 +88,7 @@
 
 		.components-form-token-field__token-text {
 			background: transparent;
-			color: var(--wp-admin-theme-color);
+			color: $components-color-accent;
 		}
 
 		.components-form-token-field__remove-token {
@@ -174,7 +169,7 @@
 	transition: all 0.15s ease-in-out;
 	@include reduce-motion("transition");
 	list-style: none;
-	border-top: $border-width solid $gray-700;
+	border-top: $border-width solid $components-color-border;
 	margin: 0;
 	padding: 0;
 }
@@ -188,7 +183,7 @@
 	cursor: pointer;
 
 	&.is-selected {
-		background: var(--wp-admin-theme-color);
+		background: $components-color-accent;
 		color: $white;
 	}
 }

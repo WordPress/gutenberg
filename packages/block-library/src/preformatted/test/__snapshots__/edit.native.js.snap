@@ -3,25 +3,31 @@
 exports[`core/more/edit/native should match snapshot when content is empty 1`] = `
 <View
   style={
-    Array [
+    [
       undefined,
       undefined,
       undefined,
     ]
   }
 >
-  <View>
+  <View
+    style={
+      [
+        undefined,
+        undefined,
+      ]
+    }
+  >
     <TextInput
       accessibilityLabel="Text input. Empty"
-      activeFormats={Array []}
+      activeFormats={[]}
       blockType={
-        Object {
+        {
           "tag": "pre",
         }
       }
       disableEditingMenu={false}
       fontFamily="serif"
-      fontSize={16}
       isMultiline={false}
       maxImagesWidth={200}
       onBlur={[Function]}
@@ -33,7 +39,7 @@ exports[`core/more/edit/native should match snapshot when content is empty 1`] =
       onSelectionChange={[Function]}
       placeholder="Write preformatted text…"
       placeholderTextColor="gray"
-      triggerKeyCodes={Array []}
+      triggerKeyCodes={[]}
       value=""
     />
   </View>
@@ -43,25 +49,31 @@ exports[`core/more/edit/native should match snapshot when content is empty 1`] =
 exports[`core/more/edit/native should match snapshot when content is not empty 1`] = `
 <View
   style={
-    Array [
+    [
       undefined,
       undefined,
       undefined,
     ]
   }
 >
-  <View>
+  <View
+    style={
+      [
+        undefined,
+        undefined,
+      ]
+    }
+  >
     <TextInput
       accessibilityLabel="Text input. <pre>Hello World!</pre>"
-      activeFormats={Array []}
+      activeFormats={[]}
       blockType={
-        Object {
+        {
           "tag": "pre",
         }
       }
       disableEditingMenu={false}
       fontFamily="serif"
-      fontSize={16}
       isMultiline={false}
       maxImagesWidth={200}
       onBlur={[Function]}
@@ -73,7 +85,7 @@ exports[`core/more/edit/native should match snapshot when content is not empty 1
       onSelectionChange={[Function]}
       placeholder="Write preformatted text…"
       placeholderTextColor="gray"
-      triggerKeyCodes={Array []}
+      triggerKeyCodes={[]}
       value="<pre>Hello World!</pre>"
     />
   </View>

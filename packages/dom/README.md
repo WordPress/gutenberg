@@ -122,7 +122,8 @@ _Returns_
 
 ### getRectangleFromRange
 
-Get the rectangle of a given Range.
+Get the rectangle of a given Range. Returns `null` if no suitable rectangle
+can be found.
 
 _Parameters_
 
@@ -130,11 +131,12 @@ _Parameters_
 
 _Returns_
 
--   `DOMRect`: The rectangle.
+-   `DOMRect?`: The rectangle.
 
 ### getScrollContainer
 
-Given a DOM node, finds the closest scrollable container node.
+Given a DOM node, finds the closest scrollable container node or the node
+itself, if scrollable.
 
 _Parameters_
 

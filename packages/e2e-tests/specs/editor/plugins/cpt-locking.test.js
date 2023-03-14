@@ -49,12 +49,12 @@ describe( 'cpt locking', () => {
 
 	const shouldAllowBlocksToBeMoved = async () => {
 		await page.click(
-			'.block-editor-rich-text__editable[data-type="core/paragraph"]'
+			'div > .block-editor-rich-text__editable[data-type="core/paragraph"]'
 		);
 		expect( await page.$( 'button[aria-label="Move up"]' ) ).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
 		await page.type(
-			'.block-editor-rich-text__editable[data-type="core/paragraph"]',
+			'div > .block-editor-rich-text__editable[data-type="core/paragraph"]',
 			'p1'
 		);
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -119,22 +119,25 @@ describe( 'cpt locking', () => {
 			);
 		} );
 
-		it( 'can use the global inserter in inner blocks', async () => {
+		it( 'should not allow blocks to be inserted in inner blocks', async () => {
 			await page.click( 'button[aria-label="Two columns; equal split"]' );
-			await page.click(
-				'.wp-block-column .block-editor-button-block-appender'
+			await page.evaluate(
+				() => new Promise( window.requestIdleCallback )
 			);
-			await page.type( '.block-editor-inserter__search input', 'image' );
-			await pressKeyTimes( 'Tab', 2 );
-			await page.keyboard.press( 'Enter' );
-			await page.click( '.edit-post-header-toolbar__inserter-toggle' );
-			await page.type(
-				'.block-editor-inserter__search input',
-				'gallery'
-			);
-			await pressKeyTimes( 'Tab', 2 );
-			await page.keyboard.press( 'Enter' );
-			expect( await page.$( '.wp-block-gallery' ) ).not.toBeNull();
+			expect(
+				await page.$(
+					'.wp-block-column .block-editor-button-block-appender'
+				)
+			).toBeNull();
+
+			expect(
+				await page.evaluate( () => {
+					const inserter = document.querySelector(
+						'.edit-post-header [aria-label="Add block"], .edit-post-header [aria-label="Toggle block inserter"]'
+					);
+					return inserter.getAttribute( 'disabled' );
+				} )
+			).not.toBeNull();
 		} );
 	} );
 
@@ -193,7 +196,7 @@ describe( 'cpt locking', () => {
 
 		it( 'should allow blocks to be removed', async () => {
 			await page.type(
-				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
+				'div > .block-editor-rich-text__editable[data-type="core/paragraph"]',
 				'p1'
 			);
 			await clickBlockToolbarButton( 'Options' );

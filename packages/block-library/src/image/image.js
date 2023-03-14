@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, map, pick, includes } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,10 +28,16 @@ import {
 	store as blockEditorStore,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
-	__experimentalImageEditingProvider as ImageEditingProvider,
 	__experimentalGetElementClassName,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
+import {
+	useEffect,
+	useMemo,
+	useState,
+	useRef,
+	useCallback,
+} from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import {
@@ -39,7 +45,12 @@ import {
 	getDefaultBlockName,
 	switchToBlockType,
 } from '@wordpress/blocks';
-import { crop, overlayText, upload } from '@wordpress/icons';
+import {
+	crop,
+	overlayText,
+	upload,
+	caption as captionIcon,
+} from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -57,7 +68,20 @@ import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 
 export default function Image( {
 	temporaryURL,
-	attributes: {
+	attributes,
+	setAttributes,
+	isSelected,
+	insertBlocksAfter,
+	onReplace,
+	onSelectImage,
+	onSelectURL,
+	onUploadError,
+	containerRef,
+	context,
+	clientId,
+	isContentLocked,
+} ) {
+	const {
 		url = '',
 		alt,
 		caption,
@@ -72,21 +96,10 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
-	},
-	setAttributes,
-	isSelected,
-	insertBlocksAfter,
-	onReplace,
-	onSelectImage,
-	onSelectURL,
-	onUploadError,
-	containerRef,
-	context,
-	clientId,
-} ) {
+	} = attributes;
 	const imageRef = useRef();
-	const captionRef = useRef();
-	const prevUrl = usePrevious( url );
+	const prevCaption = usePrevious( caption );
+	const [ showCaption, setShowCaption ] = useState( !! caption );
 	const { allowResize = true } = context;
 	const { getBlock } = useSelect( blockEditorStore );
 
@@ -109,7 +122,7 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected ]
+		[ id, isSelected, clientId ]
 	);
 	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
 		useSelect(
@@ -121,15 +134,13 @@ export default function Image( {
 				} = select( blockEditorStore );
 
 				const rootClientId = getBlockRootClientId( clientId );
-				const settings = pick( getSettings(), [
-					'imageEditing',
-					'imageSizes',
-					'maxWidth',
-					'mediaUpload',
-				] );
+				const settings = getSettings();
 
 				return {
-					...settings,
+					imageEditing: settings.imageEditing,
+					imageSizes: settings.imageSizes,
+					maxWidth: settings.maxWidth,
+					mediaUpload: settings.mediaUpload,
 					canInsertCover: canInsertBlockType(
 						'core/cover',
 						rootClientId
@@ -142,7 +153,7 @@ export default function Image( {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const isWideAligned = includes( [ 'wide', 'full' ], align );
+	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const [
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
@@ -150,13 +161,15 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable = allowResize && ! ( isWideAligned && isLargeViewport );
-	const imageSizeOptions = map(
-		filter( imageSizes, ( { slug } ) =>
-			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
-		),
-		( { name, slug } ) => ( { value: slug, label: name } )
-	);
+	const isResizable =
+		allowResize &&
+		! isContentLocked &&
+		! ( isWideAligned && isLargeViewport );
+	const imageSizeOptions = imageSizes
+		.filter(
+			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
+		)
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -174,19 +187,27 @@ export default function Image( {
 			.catch( () => {} );
 	}, [ id, url, isSelected, externalBlob ] );
 
-	// Focus the caption after inserting an image from the placeholder. This is
-	// done to preserve the behaviour of focussing the first tabbable element
-	// when a block is mounted. Previously, the image block would remount when
-	// the placeholder is removed. Maybe this behaviour could be removed.
+	// We need to show the caption when changes come from
+	// history navigation(undo/redo).
 	useEffect( () => {
-		if ( url && ! prevUrl && isSelected ) {
-			captionRef.current.focus();
+		if ( caption && ! prevCaption ) {
+			setShowCaption( true );
 		}
-	}, [ url, prevUrl ] );
+	}, [ caption, prevCaption ] );
+
+	// Focus the caption when we click to add one.
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
 
 	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
-	// witdth and height is otherwise lost when switching between alignments.
+	// width and height is otherwise lost when switching between alignments.
 	// See: https://github.com/WordPress/gutenberg/pull/37210.
 	const { naturalWidth, naturalHeight } = useMemo( () => {
 		return {
@@ -238,12 +259,7 @@ export default function Image( {
 	}
 
 	function updateImage( newSizeSlug ) {
-		const newUrl = get( image, [
-			'media_details',
-			'sizes',
-			newSizeSlug,
-			'source_url',
-		] );
+		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
 		if ( ! newUrl ) {
 			return null;
 		}
@@ -291,8 +307,11 @@ export default function Image( {
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
+			if ( ! caption ) {
+				setShowCaption( false );
+			}
 		}
-	}, [ isSelected ] );
+	}, [ isSelected, caption ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
@@ -307,10 +326,29 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				<BlockAlignmentControl
-					value={ align }
-					onChange={ updateAlignment }
-				/>
+				{ ! isContentLocked && (
+					<BlockAlignmentControl
+						value={ align }
+						onChange={ updateAlignment }
+					/>
+				) }
+				{ ! isContentLocked && (
+					<ToolbarButton
+						onClick={ () => {
+							setShowCaption( ! showCaption );
+							if ( showCaption && caption ) {
+								setAttributes( { caption: undefined } );
+							}
+						} }
+						icon={ captionIcon }
+						isPressed={ showCaption }
+						label={
+							showCaption
+								? __( 'Remove caption' )
+								: __( 'Add caption' )
+						}
+					/>
+				) }
 				{ ! multiImageSelection && ! isEditingImage && (
 					<ImageURLInputUI
 						url={ href || '' }
@@ -362,6 +400,7 @@ export default function Image( {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ ! multiImageSelection && (
 						<TextareaControl
+							__nextHasNoMarginBottom
 							label={ __( 'Alt text (alternative text)' ) }
 							value={ alt }
 							onChange={ updateAlt }
@@ -392,8 +431,9 @@ export default function Image( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
@@ -429,6 +469,11 @@ export default function Image( {
 		defaultedAlt = __( 'This image has an empty alt attribute' );
 	}
 
+	const borderProps = useBorderProps( attributes );
+	const isRounded = attributes.className?.includes( 'is-style-rounded' );
+	const hasCustomBorder =
+		!! borderProps.className || ! isEmpty( borderProps.style );
+
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
 		// should direct focus to block.
@@ -445,6 +490,8 @@ export default function Image( {
 					} );
 				} }
 				ref={ imageRef }
+				className={ borderProps.className }
+				style={ borderProps.style }
 			/>
 			{ temporaryURL && <Spinner /> }
 		</>
@@ -466,12 +513,20 @@ export default function Image( {
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
+				id={ id }
 				url={ url }
 				width={ width }
 				height={ height }
 				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
+				onSaveImage={ ( imageAttributes ) =>
+					setAttributes( imageAttributes )
+				}
+				onFinishEditing={ () => {
+					setIsEditingImage( false );
+				} }
+				borderProps={ isRounded ? undefined : borderProps }
 			/>
 		);
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
@@ -530,7 +585,7 @@ export default function Image( {
 			<ResizableBox
 				size={ {
 					width: width ?? 'auto',
-					height: height ?? 'auto',
+					height: height && ! hasCustomBorder ? height : 'auto',
 				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
@@ -552,6 +607,7 @@ export default function Image( {
 						height: parseInt( currentHeight + delta.height, 10 ),
 					} );
 				} }
+				resizeRatio={ align === 'center' ? 2 : 1 }
 			>
 				{ img }
 			</ResizableBox>
@@ -559,41 +615,34 @@ export default function Image( {
 	}
 
 	return (
-		<ImageEditingProvider
-			id={ id }
-			url={ url }
-			naturalWidth={ naturalWidth }
-			naturalHeight={ naturalHeight }
-			clientWidth={ clientWidth }
-			onSaveImage={ ( imageAttributes ) =>
-				setAttributes( imageAttributes )
-			}
-			isEditing={ isEditingImage }
-			onFinishEditing={ () => setIsEditingImage( false ) }
-		>
+		<>
 			{ /* Hide controls during upload to avoid component remount,
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
 			{ img }
-			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-				<RichText
-					className={ __experimentalGetElementClassName( 'caption' ) }
-					ref={ captionRef }
-					tagName="figcaption"
-					aria-label={ __( 'Image caption text' ) }
-					placeholder={ __( 'Add caption' ) }
-					value={ caption }
-					onChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
-					inlineToolbar
-					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter(
-							createBlock( getDefaultBlockName() )
-						)
-					}
-				/>
-			) }
-		</ImageEditingProvider>
+			{ showCaption &&
+				( ! RichText.isEmpty( caption ) || isSelected ) && (
+					<RichText
+						identifier="caption"
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						ref={ captionRef }
+						tagName="figcaption"
+						aria-label={ __( 'Image caption text' ) }
+						placeholder={ __( 'Add caption' ) }
+						value={ caption }
+						onChange={ ( value ) =>
+							setAttributes( { caption: value } )
+						}
+						inlineToolbar
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+						}
+					/>
+				) }
+		</>
 	);
 }

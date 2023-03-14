@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -52,6 +51,20 @@ const migrateBorderRadius = ( attributes ) => {
 	};
 };
 
+function migrateAlign( attributes ) {
+	if ( ! attributes.align ) {
+		return attributes;
+	}
+	const { align, ...otherAttributes } = attributes;
+	return {
+		...otherAttributes,
+		className: classnames(
+			otherAttributes.className,
+			`align${ attributes.align }`
+		),
+	};
+}
+
 const migrateCustomColorsAndGradients = ( attributes ) => {
 	if (
 		! attributes.customTextColor &&
@@ -70,33 +83,33 @@ const migrateCustomColorsAndGradients = ( attributes ) => {
 	if ( attributes.customGradient ) {
 		style.color.gradient = attributes.customGradient;
 	}
+
+	const {
+		customTextColor,
+		customBackgroundColor,
+		customGradient,
+		...restAttributes
+	} = attributes;
+
 	return {
-		...omit( attributes, [
-			'customTextColor',
-			'customBackgroundColor',
-			'customGradient',
-		] ),
+		...restAttributes,
 		style,
 	};
 };
 
 const oldColorsMigration = ( attributes ) => {
-	return migrateCustomColorsAndGradients(
-		omit(
-			{
-				...attributes,
-				customTextColor:
-					attributes.textColor && '#' === attributes.textColor[ 0 ]
-						? attributes.textColor
-						: undefined,
-				customBackgroundColor:
-					attributes.color && '#' === attributes.color[ 0 ]
-						? attributes.color
-						: undefined,
-			},
-			[ 'color', 'textColor' ]
-		)
-	);
+	const { color, textColor, ...restAttributes } = {
+		...attributes,
+		customTextColor:
+			attributes.textColor && '#' === attributes.textColor[ 0 ]
+				? attributes.textColor
+				: undefined,
+		customBackgroundColor:
+			attributes.color && '#' === attributes.color[ 0 ]
+				? attributes.color
+				: undefined,
+	};
+	return migrateCustomColorsAndGradients( restAttributes );
 };
 
 const blockAttributes = {
@@ -781,10 +794,12 @@ const deprecated = [
 		isEligible: ( attributes ) =>
 			!! attributes.customTextColor ||
 			!! attributes.customBackgroundColor ||
-			!! attributes.customGradient,
+			!! attributes.customGradient ||
+			!! attributes.align,
 		migrate: compose(
 			migrateBorderRadius,
-			migrateCustomColorsAndGradients
+			migrateCustomColorsAndGradients,
+			migrateAlign
 		),
 		save( { attributes } ) {
 			const {

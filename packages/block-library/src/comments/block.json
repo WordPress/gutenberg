@@ -10,10 +10,15 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
+		},
+		"legacy": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
+		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,
@@ -23,7 +28,25 @@
 				"text": true,
 				"link": true
 			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		}
 	},
-	"editorStyle": "wp-block-comments-editor"
+	"editorStyle": "wp-block-comments-editor",
+	"usesContext": [ "postId", "postType" ]
 }

@@ -27,7 +27,6 @@ const noop = () => {};
 
 const {
 	clearSelectedBlock,
-	hideInsertionPoint,
 	insertBlock,
 	insertBlocks,
 	mergeBlocks,
@@ -610,14 +609,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'hideInsertionPoint', () => {
-		it( 'should return the HIDE_INSERTION_POINT action', () => {
-			expect( hideInsertionPoint() ).toEqual( {
-				type: 'HIDE_INSERTION_POINT',
-			} );
-		} );
-	} );
-
 	describe( 'removeBlocks', () => {
 		it( 'should dispatch REMOVE_BLOCKS action', () => {
 			const clientId = 'clientId';
@@ -634,7 +625,8 @@ describe( 'actions', () => {
 			removeBlocks( clientIds )( { select, dispatch } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
-				clientId
+				clientId,
+				true
 			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
@@ -743,7 +735,8 @@ describe( 'actions', () => {
 			removeBlock( clientId )( { select, dispatch } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
-				clientId
+				clientId,
+				true
 			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {

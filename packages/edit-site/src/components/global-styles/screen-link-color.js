@@ -2,50 +2,62 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalColorGradientControl as ColorGradientControl } from '@wordpress/block-editor';
+import {
+	__experimentalColorGradientControl as ColorGradientControl,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { TabPanel } from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import {
-	getSupportedGlobalStylesPanels,
-	useSetting,
-	useStyle,
-	useColorsPerOrigin,
-} from './hooks';
+import { useSupportedStyles, useColorsPerOrigin } from './hooks';
+import { unlock } from '../../private-apis';
 
-function ScreenLinkColor( { name } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useSetting( 'color.palette', name );
-	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
+function ScreenLinkColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const supports = useSupportedStyles( name );
+	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const colorsPerOrigin = useColorsPerOrigin( name );
-
-	const [ isLinkEnabled ] = useSetting( 'color.link', name );
+	const [ isLinkEnabled ] = useGlobalSetting( 'color.link', name );
 
 	const hasLinkColor =
 		supports.includes( 'linkColor' ) &&
 		isLinkEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
 	const pseudoStates = {
 		default: {
 			label: __( 'Default' ),
-			value: useStyle( 'elements.link.color.text', name )[ 0 ],
-			handler: useStyle( 'elements.link.color.text', name )[ 1 ],
-			userValue: useStyle(
-				'elements.link.color.text',
+			value: useGlobalStyle(
+				prefix + 'elements.link.color.text',
+				name
+			)[ 0 ],
+			handler: useGlobalStyle(
+				prefix + 'elements.link.color.text',
+				name
+			)[ 1 ],
+			userValue: useGlobalStyle(
+				prefix + 'elements.link.color.text',
 				name,
 				'user'
 			)[ 0 ],
 		},
 		hover: {
 			label: __( 'Hover' ),
-			value: useStyle( 'elements.link.:hover.color.text', name )[ 0 ],
-			handler: useStyle( 'elements.link.:hover.color.text', name )[ 1 ],
-			userValue: useStyle(
-				'elements.link.:hover.color.text',
+			value: useGlobalStyle(
+				prefix + 'elements.link.:hover.color.text',
+				name
+			)[ 0 ],
+			handler: useGlobalStyle(
+				prefix + 'elements.link.:hover.color.text',
+				name
+			)[ 1 ],
+			userValue: useGlobalStyle(
+				prefix + 'elements.link.:hover.color.text',
 				name,
 				'user'
 			)[ 0 ],
@@ -75,7 +87,7 @@ function ScreenLinkColor( { name } ) {
 				) }
 			/>
 
-			<TabPanel className="my-tab-panel" tabs={ tabs }>
+			<TabPanel tabs={ tabs }>
 				{ ( tab ) => {
 					const pseudoSelectorConfig =
 						pseudoStates[ tab.name ] ?? null;
@@ -90,7 +102,6 @@ function ScreenLinkColor( { name } ) {
 								className="edit-site-screen-link-color__control"
 								colors={ colorsPerOrigin }
 								disableCustomColors={ ! areCustomSolidsEnabled }
-								__experimentalHasMultipleOrigins
 								showTitle={ false }
 								enableAlpha
 								__experimentalIsRenderedInSidebar
@@ -100,6 +111,7 @@ function ScreenLinkColor( { name } ) {
 									pseudoSelectorConfig.value ===
 									pseudoSelectorConfig.userValue
 								}
+								headingLevel={ 3 }
 							/>
 						</>
 					);

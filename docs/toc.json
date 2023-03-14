@@ -71,6 +71,9 @@
 					},
 					{
 						"docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md": []
+					},
+					{
+						"docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md": []
 					}
 				]
 			},
@@ -133,6 +136,7 @@
 			},
 			{ "docs/how-to-guides/notices/README.md": [] },
 			{ "docs/how-to-guides/plugin-sidebar-0.md": [] },
+			{ "docs/how-to-guides/propagating-updates.md": [] },
 			{
 				"docs/how-to-guides/themes/README.md": [
 					{ "docs/how-to-guides/themes/block-theme-overview.md": [] },
@@ -197,6 +201,9 @@
 					{ "docs/reference-guides/filters/parser-filters.md": [] },
 					{
 						"docs/reference-guides/filters/autocomplete-filters.md": []
+					},
+					{
+						"docs/reference-guides/filters/global-styles-filters.md": []
 					}
 				]
 			},
@@ -240,6 +247,9 @@
 					},
 					{
 						"docs/reference-guides/theme-json-reference/theme-json-migrations.md": []
+					},
+					{
+						"docs/reference-guides/theme-json-reference/styles-versions.md": []
 					}
 				]
 			},
@@ -251,14 +261,33 @@
 					{
 						"docs/reference-guides/data/data-core-annotations.md": []
 					},
-					{ "docs/reference-guides/data/data-core-blocks.md": [] },
+					{
+						"docs/reference-guides/data/data-core-block-directory.md": []
+					},
 					{
 						"docs/reference-guides/data/data-core-block-editor.md": []
 					},
-					{ "docs/reference-guides/data/data-core-editor.md": [] },
+					{ "docs/reference-guides/data/data-core-blocks.md": [] },
+					{
+						"docs/reference-guides/data/data-core-customize-widgets.md": []
+					},
 					{ "docs/reference-guides/data/data-core-edit-post.md": [] },
+					{ "docs/reference-guides/data/data-core-edit-site.md": [] },
+					{
+						"docs/reference-guides/data/data-core-edit-widgets.md": []
+					},
+					{ "docs/reference-guides/data/data-core-editor.md": [] },
+					{
+						"docs/reference-guides/data/data-core-keyboard-shortcuts.md": []
+					},
 					{ "docs/reference-guides/data/data-core-notices.md": [] },
-					{ "docs/reference-guides/data/data-core-nux.md": [] },
+					{
+						"docs/reference-guides/data/data-core-preferences.md": []
+					},
+					{
+						"docs/reference-guides/data/data-core-reusable-blocks.md": []
+					},
+					{ "docs/reference-guides/data/data-core-rich-text.md": [] },
 					{ "docs/reference-guides/data/data-core-viewport.md": [] }
 				]
 			}
@@ -304,11 +333,30 @@
 					},
 					{ "docs/contributors/code/git-workflow.md": [] },
 					{ "docs/contributors/code/coding-guidelines.md": [] },
-					{ "docs/contributors/code/testing-overview.md": [] },
+					{
+						"docs/contributors/code/testing-overview.md": [
+							{
+								"docs/contributors/code/e2e/README.md": [
+									{
+										"docs/contributors/code/e2e/migration.md": []
+									},
+									{
+										"docs/contributors/code/e2e/overusing-snapshots.md": []
+									}
+								]
+							}
+						]
+					},
 					{ "docs/contributors/code/grammar.md": [] },
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
-					{ "docs/contributors/code/release.md": [] },
+					{
+						"docs/contributors/code/release.md": [
+							{
+								"docs/contributors/code/auto-cherry-picking.md": []
+							}
+						]
+					},
 					{
 						"docs/contributors/code/react-native/README.md": [
 							{

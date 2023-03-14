@@ -11,48 +11,22 @@ import {
 	SearchControl,
 	TextHighlight,
 	__experimentalText as Text,
-	__experimentalHeading as Heading,
+	__experimentalVStack as VStack,
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
+import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY = [];
-
-function selectSuggestion( suggestion, onSelect, entityForSuggestions ) {
-	const {
-		labels,
-		slug,
-		config: { templateSlug, templatePrefix },
-	} = entityForSuggestions;
-	const title = sprintf(
-		// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type or taxonomy and %2$s is the name of the post or term, e.g. "Post: Hello, WordPress", "Category: shoes"
-		__( '%1$s: %2$s' ),
-		labels.singular_name,
-		suggestion.name
-	);
-	let newTemplateSlug = `${ templateSlug || slug }-${ suggestion.slug }`;
-	if ( templatePrefix ) {
-		newTemplateSlug = templatePrefix + newTemplateSlug;
-	}
-	const newTemplate = {
-		title,
-		description: sprintf(
-			// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Post: Hello, WordPress"
-			__( 'Template for %1$s' ),
-			title
-		),
-		slug: newTemplateSlug,
-	};
-	onSelect( newTemplate );
-}
 
 function SuggestionListItem( {
 	suggestion,
@@ -70,11 +44,18 @@ function SuggestionListItem( {
 			{ ...composite }
 			className={ baseCssClass }
 			onClick={ () =>
-				selectSuggestion( suggestion, onSelect, entityForSuggestions )
+				onSelect(
+					entityForSuggestions.config.getSpecificTemplate(
+						suggestion
+					)
+				)
 			}
 		>
 			<span className={ `${ baseCssClass }__title` }>
-				<TextHighlight text={ suggestion.name } highlight={ search } />
+				<TextHighlight
+					text={ decodeEntities( suggestion.name ) }
+					highlight={ search }
+				/>
 			</span>
 			{ suggestion.link && (
 				<span className={ `${ baseCssClass }__info` }>
@@ -98,18 +79,16 @@ function useDebouncedInput() {
 }
 
 function useSearchSuggestions( entityForSuggestions, search ) {
-	const { config, postsToExclude } = entityForSuggestions;
+	const { config } = entityForSuggestions;
 	const query = useMemo(
 		() => ( {
 			order: 'asc',
-			_fields: 'id,name,title,slug,link',
 			context: 'view',
 			search,
-			orderBy: config.getOrderBy( { search } ),
-			exclude: postsToExclude,
 			per_page: search ? 20 : 10,
+			...config.queryArgs( search ),
 		} ),
-		[ search, config, postsToExclude ]
+		[ search, config ]
 	);
 	const { records: searchResults, hasResolved: searchHasResolved } =
 		useEntityRecords(
@@ -145,19 +124,27 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 		debouncedSearch
 	);
 	const { labels } = entityForSuggestions;
+	const [ showSearchControl, setShowSearchControl ] = useState( false );
+	if ( ! showSearchControl && suggestions?.length > 9 ) {
+		setShowSearchControl( true );
+	}
 	return (
 		<>
-			<SearchControl
-				onChange={ setSearch }
-				value={ search }
-				label={ labels.search_items }
-				placeholder={ labels.search_items }
-			/>
+			{ showSearchControl && (
+				<SearchControl
+					__nextHasNoMarginBottom
+					onChange={ setSearch }
+					value={ search }
+					label={ labels.search_items }
+					placeholder={ labels.search_items }
+				/>
+			) }
 			{ !! suggestions?.length && (
 				<Composite
 					{ ...composite }
 					role="listbox"
 					className="edit-site-custom-template-modal__suggestions_list"
+					aria-label={ __( 'Suggestions list' ) }
 				>
 					{ suggestions.map( ( suggestion ) => (
 						<SuggestionListItem
@@ -172,15 +159,23 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 				</Composite>
 			) }
 			{ debouncedSearch && ! suggestions?.length && (
-				<p className="edit-site-custom-template-modal__no-results">
+				<Text
+					as="p"
+					className="edit-site-custom-template-modal__no-results"
+				>
 					{ labels.not_found }
-				</p>
+				</Text>
 			) }
 		</>
 	);
 }
 
-function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
+function AddCustomTemplateModal( {
+	onClose,
+	onSelect,
+	entityForSuggestions,
+	isCreatingTemplate,
+} ) {
 	const [ showSearchEntities, setShowSearchEntities ] = useState(
 		entityForSuggestions.hasGeneralTemplate
 	);
@@ -193,16 +188,16 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 				entityForSuggestions.labels.singular_name
 			) }
 			className={ baseCssClass }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
+			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			{ ! showSearchEntities && (
-				<>
-					<p>
+				<VStack spacing={ 4 }>
+					<Text as="p">
 						{ __(
 							'Select whether to create a single template for all items or a specific one.'
 						) }
-					</p>
+					</Text>
 					<Flex
 						className={ `${ baseCssClass }__contents` }
 						gap="4"
@@ -210,15 +205,25 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 					>
 						<FlexItem
 							isBlock
+							as={ Button }
 							onClick={ () => {
-								const { slug, title, description } =
-									entityForSuggestions.template;
-								onSelect( { slug, title, description } );
+								const {
+									slug,
+									title,
+									description,
+									templatePrefix,
+								} = entityForSuggestions.template;
+								onSelect( {
+									slug,
+									title,
+									description,
+									templatePrefix,
+								} );
 							} }
 						>
-							<Heading level={ 5 }>
+							<Text as="span" weight={ 600 }>
 								{ entityForSuggestions.labels.all_items }
-							</Heading>
+							</Text>
 							<Text as="span">
 								{
 									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.
@@ -228,13 +233,14 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 						</FlexItem>
 						<FlexItem
 							isBlock
+							as={ Button }
 							onClick={ () => {
 								setShowSearchEntities( true );
 							} }
 						>
-							<Heading level={ 5 }>
+							<Text as="span" weight={ 600 }>
 								{ entityForSuggestions.labels.singular_name }
-							</Heading>
+							</Text>
 							<Text as="span">
 								{
 									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.
@@ -243,20 +249,20 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 							</Text>
 						</FlexItem>
 					</Flex>
-				</>
+				</VStack>
 			) }
 			{ showSearchEntities && (
-				<>
-					<p>
+				<VStack spacing={ 4 }>
+					<Text as="p">
 						{ __(
 							'This template will be used only for the specific item chosen.'
 						) }
-					</p>
+					</Text>
 					<SuggestionList
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
 					/>
-				</>
+				</VStack>
 			) }
 		</Modal>
 	);

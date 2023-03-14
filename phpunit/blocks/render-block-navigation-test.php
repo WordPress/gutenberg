@@ -21,7 +21,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		);
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array();
-		$block         = new WP_Block( $parsed_block, $context, $this->registry );
+		$block         = new WP_Block( $parsed_block, $context );
 
 		$post_ids = gutenberg_block_core_navigation_from_block_get_post_ids( $block );
 		$this->assertSameSets( array( 755 ), $post_ids );
@@ -46,7 +46,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		);
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array();
-		$block         = new WP_Block( $parsed_block, $context, $this->registry );
+		$block         = new WP_Block( $parsed_block, $context );
 
 		$post_ids = gutenberg_block_core_navigation_from_block_get_post_ids( $block );
 		$this->assertSameSets( array( 40, 60, 10, 20, 30 ), $post_ids );
@@ -59,11 +59,31 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$parsed_blocks = parse_blocks( '<!-- wp:navigation-submenu {"label":"Test","type":"post","id":789,"url":"http://localhost/blog/test-3","kind":"post-type","isTopLevelItem":true} -->\n<!-- wp:navigation-link {"label":"(no title)","type":"post","id":755,"url":"http://localhost/blog/755","kind":"post-type","isTopLevelLink":false} /-->\n<!-- /wp:navigation-submenu -->' );
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array();
-		$block         = new WP_Block( $parsed_block, $context, $this->registry );
+		$block         = new WP_Block( $parsed_block, $context );
 
 		$post_ids = gutenberg_block_core_navigation_from_block_get_post_ids( $block );
 		$this->assertSameSetsWithIndex( array( 755, 789 ), $post_ids );
 	}
 
+	/**
+	 * @covers :: gutengberg_block_core_navigation_block_contains_core_navigation
+	 */
+	public function test_gutenberg_block_core_navigation_block_contains_core_navigation() {
+		$parsed_blocks = parse_blocks( '<!-- wp:navigation /-->' );
+		$inner_blocks  = new WP_Block_List( $parsed_blocks );
+		$this->assertTrue( gutenberg_block_core_navigation_block_contains_core_navigation( $inner_blocks ) );
+	}
+
+	public function test_gutenberg_block_core_navigation_block_contains_core_navigation_deep() {
+		$parsed_blocks = parse_blocks( '<!-- wp:group --><!-- /wp:group --><!-- wp:group --><!-- wp:group --><!-- wp:navigation /--><!-- /wp:group --><!-- /wp:group -->' );
+		$inner_blocks  = new WP_Block_List( $parsed_blocks );
+		$this->assertTrue( gutenberg_block_core_navigation_block_contains_core_navigation( $inner_blocks ) );
+	}
+
+	public function test_gutenberg_block_core_navigation_block_contains_core_navigation_no_navigation() {
+		$parsed_blocks = parse_blocks( '<!-- wp:group --><!-- wp:group --><!-- /wp:group --><!-- /wp:group -->' );
+		$inner_blocks  = new WP_Block_List( $parsed_blocks );
+		$this->assertFalse( gutenberg_block_core_navigation_block_contains_core_navigation( $inner_blocks ) );
+	}
 
 }

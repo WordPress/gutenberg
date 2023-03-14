@@ -1,204 +1,71 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalBoxControl as BoxControl,
-	__experimentalUnitControl as UnitControl,
-	__experimentalUseCustomUnits as useCustomUnits,
-} from '@wordpress/components';
-import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import { unlock } from '../../private-apis';
 
-const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
+const {
+	useGlobalStyle,
+	useGlobalSetting,
+	useSettingsForBlockElement,
+	DimensionsPanel: StylesDimensionsPanel,
+} = unlock( blockEditorPrivateApis );
 
-export function useHasDimensionsPanel( name ) {
-	const hasPadding = useHasPadding( name );
-	const hasMargin = useHasMargin( name );
-	const hasGap = useHasGap( name );
-
-	return hasPadding || hasMargin || hasGap;
-}
-
-function useHasPadding( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.padding', name );
-
-	return settings && supports.includes( 'padding' );
-}
-
-function useHasMargin( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.margin', name );
-
-	return settings && supports.includes( 'margin' );
-}
-
-function useHasGap( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.blockGap', name );
-	// Do not show the gap control panel for block-level global styles
-	// as they do not work on the frontend.
-	// See: https://github.com/WordPress/gutenberg/pull/39845.
-	// We can revert this condition when they're working again.
-	return !! name
-		? false
-		: settings && supports.includes( '--wp--style--block-gap' );
-}
-
-function filterValuesBySides( values, sides ) {
-	if ( ! sides ) {
-		// If no custom side configuration all sides are opted into by default.
-		return values;
+export default function DimensionsPanel( { name, variation = '' } ) {
+	let prefixParts = [];
+	if ( variation ) {
+		prefixParts = [ 'variations', variation ].concat( prefixParts );
 	}
+	const prefix = prefixParts.join( '.' );
 
-	// Only include sides opted into within filtered values.
-	const filteredValues = {};
-	sides.forEach( ( side ) => {
-		if ( side === 'vertical' ) {
-			filteredValues.top = values.top;
-			filteredValues.bottom = values.bottom;
-		}
-		if ( side === 'horizontal' ) {
-			filteredValues.left = values.left;
-			filteredValues.right = values.right;
-		}
-		filteredValues[ side ] = values[ side ];
+	const [ style ] = useGlobalStyle( prefix, name, 'user', false );
+	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
+		shouldDecodeEncode: false,
 	} );
+	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
+	const settings = useSettingsForBlockElement( rawSettings, name );
 
-	return filteredValues;
-}
-
-function splitStyleValue( value ) {
-	// Check for shorthand value ( a string value ).
-	if ( value && typeof value === 'string' ) {
-		// Convert to value for individual sides for BoxControl.
+	// These intermediary objects are needed because the "layout" property is stored
+	// in settings rather than styles.
+	const inheritedStyleWithLayout = useMemo( () => {
 		return {
-			top: value,
-			right: value,
-			bottom: value,
-			left: value,
+			...inheritedStyle,
+			layout: settings.layout,
 		};
-	}
+	}, [ inheritedStyle, settings.layout ] );
 
-	return value;
-}
+	const styleWithLayout = useMemo( () => {
+		return {
+			...style,
+			layout: settings.layout,
+		};
+	}, [ style, settings.layout ] );
 
-export default function DimensionsPanel( { name } ) {
-	const showPaddingControl = useHasPadding( name );
-	const showMarginControl = useHasMargin( name );
-	const showGapControl = useHasGap( name );
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units', name )[ 0 ] || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vw',
-		],
-	} );
+	const onChange = ( newStyle ) => {
+		const updatedStyle = { ...newStyle };
+		delete updatedStyle.layout;
+		setStyle( updatedStyle );
 
-	const [ rawPadding, setRawPadding ] = useStyle( 'spacing.padding', name );
-	const paddingValues = splitStyleValue( rawPadding );
-	const paddingSides = useCustomSides( name, 'padding' );
-	const isAxialPadding =
-		paddingSides &&
-		paddingSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
-
-	const setPaddingValues = ( newPaddingValues ) => {
-		const padding = filterValuesBySides( newPaddingValues, paddingSides );
-		setRawPadding( padding );
-	};
-	const resetPaddingValue = () => setPaddingValues( {} );
-	const hasPaddingValue = () =>
-		!! paddingValues && Object.keys( paddingValues ).length;
-
-	const [ rawMargin, setRawMargin ] = useStyle( 'spacing.margin', name );
-	const marginValues = splitStyleValue( rawMargin );
-	const marginSides = useCustomSides( name, 'margin' );
-	const isAxialMargin =
-		marginSides &&
-		marginSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
-
-	const setMarginValues = ( newMarginValues ) => {
-		const margin = filterValuesBySides( newMarginValues, marginSides );
-		setRawMargin( margin );
-	};
-	const resetMarginValue = () => setMarginValues( {} );
-	const hasMarginValue = () =>
-		!! marginValues && Object.keys( marginValues ).length;
-
-	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
-	const resetGapValue = () => setGapValue( undefined );
-	const hasGapValue = () => !! gapValue;
-
-	const resetAll = () => {
-		resetPaddingValue();
-		resetMarginValue();
-		resetGapValue();
+		if ( newStyle.layout !== settings.layout ) {
+			setSettings( {
+				...rawSettings,
+				layout: newStyle.layout,
+			} );
+		}
 	};
 
 	return (
-		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
-			{ showPaddingControl && (
-				<ToolsPanelItem
-					hasValue={ hasPaddingValue }
-					label={ __( 'Padding' ) }
-					onDeselect={ resetPaddingValue }
-					isShownByDefault={ true }
-				>
-					<BoxControl
-						values={ paddingValues }
-						onChange={ setPaddingValues }
-						label={ __( 'Padding' ) }
-						sides={ paddingSides }
-						units={ units }
-						allowReset={ false }
-						splitOnAxis={ isAxialPadding }
-					/>
-				</ToolsPanelItem>
-			) }
-			{ showMarginControl && (
-				<ToolsPanelItem
-					hasValue={ hasMarginValue }
-					label={ __( 'Margin' ) }
-					onDeselect={ resetMarginValue }
-					isShownByDefault={ true }
-				>
-					<BoxControl
-						values={ marginValues }
-						onChange={ setMarginValues }
-						label={ __( 'Margin' ) }
-						sides={ marginSides }
-						units={ units }
-						allowReset={ false }
-						splitOnAxis={ isAxialMargin }
-					/>
-				</ToolsPanelItem>
-			) }
-			{ showGapControl && (
-				<ToolsPanelItem
-					hasValue={ hasGapValue }
-					label={ __( 'Block spacing' ) }
-					onDeselect={ resetGapValue }
-					isShownByDefault={ true }
-				>
-					<UnitControl
-						label={ __( 'Block spacing' ) }
-						__unstableInputWidth="80px"
-						min={ 0 }
-						onChange={ setGapValue }
-						units={ units }
-						value={ gapValue }
-					/>
-				</ToolsPanelItem>
-			) }
-		</ToolsPanel>
+		<StylesDimensionsPanel
+			inheritedValue={ inheritedStyleWithLayout }
+			value={ styleWithLayout }
+			onChange={ onChange }
+			settings={ settings }
+			includeLayoutControls
+		/>
 	);
 }

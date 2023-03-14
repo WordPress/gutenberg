@@ -8,8 +8,7 @@
 	background-color: rgba($black, 0.35);
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
-	backdrop-filter: blur($grid-unit);
-
+	// backdrop-filter: blur($grid-unit);
 	// This animates the appearance of the white background.
 	@include edit-post__fade-in-animation();
 }
@@ -31,8 +30,8 @@
 		margin: auto;
 		width: auto;
 		min-width: $modal-min-width;
-		max-width: calc(100% - #{ $grid-unit-20 * 2 });
-		max-height: calc(100% - #{ $header-height * 2 });
+		max-width: calc(100% - #{$grid-unit-20 * 2});
+		max-height: calc(100% - #{$header-height * 2});
 
 		// Animate the modal frame/contents appearing on the page.
 		animation: components-modal__appear-animation 0.1s ease-out;
@@ -95,6 +94,10 @@
 	.components-modal__content.has-scrolled-content:not(.hide-header) & {
 		border-bottom-color: $gray-300;
 	}
+
+	& + p {
+		margin-top: 0;
+	}
 }
 
 .components-modal__header-heading-container {
@@ -119,11 +122,19 @@
 .components-modal__content {
 	flex: 1;
 	margin-top: $header-height + $grid-unit-20;
-	padding: 0 $grid-unit-40 $grid-unit-30;
+	padding: 0 $grid-unit-40 $grid-unit-40;
 	overflow: auto;
 
 	&.hide-header {
 		margin-top: 0;
 		padding-top: $grid-unit-30;
+	}
+
+	&.is-scrollable:focus-visible {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+		outline-offset: -2px;
 	}
 }

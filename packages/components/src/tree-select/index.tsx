@@ -1,24 +1,24 @@
 /**
- * External dependencies
- */
-import { unescape as unescapeString, flatMap, compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+
 /**
  * Internal dependencies
  */
 import { SelectControl } from '../select-control';
-import type { TreeSelectProps, Tree, SelectOptions } from './types';
+import type { TreeSelectProps, Tree, Truthy } from './types';
 
-function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
-	return flatMap( tree, ( treeNode ) => [
+function getSelectOptions(
+	tree: Tree[],
+	level = 0
+): NonNullable< TreeSelectProps[ 'options' ] > {
+	return tree.flatMap( ( treeNode ) => [
 		{
 			value: treeNode.id,
 			label:
-				'\u00A0'.repeat( level * 3 ) + unescapeString( treeNode.name ),
+				'\u00A0'.repeat( level * 3 ) + decodeEntities( treeNode.name ),
 		},
 		...getSelectOptions( treeNode.children || [], level + 1 ),
 	] );
@@ -72,6 +72,7 @@ function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
  * }
  * ```
  */
+
 export function TreeSelect( {
 	label,
 	noOptionLabel,
@@ -81,10 +82,10 @@ export function TreeSelect( {
 	...props
 }: TreeSelectProps ) {
 	const options = useMemo( () => {
-		return compact( [
+		return [
 			noOptionLabel && { value: '', label: noOptionLabel },
 			...getSelectOptions( tree ),
-		] );
+		].filter( < T, >( option: T ): option is Truthy< T > => !! option );
 	}, [ noOptionLabel, tree ] );
 
 	return (

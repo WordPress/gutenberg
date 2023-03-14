@@ -17,6 +17,7 @@ const myGradientPicker = () => {
 
 	return (
 		<GradientPicker
+			__nextHasNoMargin
 			value={ gradient }
 			onChange={ ( currentGradient ) => setGradient( currentGradient ) }
 			gradients={ [
@@ -92,3 +93,19 @@ If true, the gradient picker will not be displayed and only defined gradients fr
 -   Type: `Boolean`
 -   Required: No
 -   Default: false
+
+### __nextHasNoMargin
+
+Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+### headingLevel
+
+The heading level.
+
+-   Type: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
+-   Required: No
+-   Default: `2`

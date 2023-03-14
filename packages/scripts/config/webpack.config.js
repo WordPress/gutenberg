@@ -25,7 +25,9 @@ const {
 	hasArgInCLI,
 	hasCssnanoConfig,
 	hasPostCSSConfig,
+	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
+	getRenderPropPaths,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -36,9 +38,8 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
-const copyWebpackPatterns = process.env.WP_COPY_PHP_FILES_TO_DIST
-	? '**/{block.json,*.php}'
-	: '**/block.json';
+// Get paths of the `render` props included in `block.json` files
+const renderPaths = getRenderPropPaths();
 
 const cssLoaders = [
 	{
@@ -108,7 +109,7 @@ const config = {
 			cacheGroups: {
 				style: {
 					type: 'css/mini-extract',
-					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
+					test: /[\\/]style(\.module)?\.(pc|sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
 					name( _, chunks, cacheGroupKey ) {
@@ -180,6 +181,10 @@ const config = {
 				use: cssLoaders,
 			},
 			{
+				test: /\.pcss$/,
+				use: cssLoaders,
+			},
+			{
 				test: /\.(sc|sa)ss$/,
 				use: [
 					...cssLoaders,
@@ -199,11 +204,11 @@ const config = {
 			},
 			{
 				test: /\.svg$/,
-				issuer: /\.(sc|sa|c)ss$/,
+				issuer: /\.(pc|sc|sa|c)ss$/,
 				type: 'asset/inline',
 			},
 			{
-				test: /\.(bmp|png|jpe?g|gif)$/i,
+				test: /\.(bmp|png|jpe?g|gif|webp)$/i,
 				type: 'asset/resource',
 				generator: {
 					filename: 'images/[name].[hash:8][ext]',
@@ -232,8 +237,8 @@ const config = {
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
-					from: copyWebpackPatterns,
-					context: process.env.WP_SRC_DIRECTORY,
+					from: '**/block.json',
+					context: getWordPressSrcDirectory(),
 					noErrorOnMissing: true,
 					transform( content, absoluteFrom ) {
 						const convertExtension = ( path ) => {
@@ -265,6 +270,17 @@ const config = {
 						return content;
 					},
 				},
+				{
+					from: '**/*.php',
+					context: getWordPressSrcDirectory(),
+					noErrorOnMissing: true,
+					filter: ( filepath ) => {
+						return (
+							process.env.WP_COPY_PHP_FILES_TO_DIST ||
+							renderPaths.includes( filepath )
+						);
+					},
+				},
 			],
 		} ),
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
@@ -284,16 +300,15 @@ const config = {
 	},
 };
 
+// WP_DEVTOOL global variable controls how source maps are generated.
+// See: https://webpack.js.org/configuration/devtool/#devtool.
+if ( process.env.WP_DEVTOOL ) {
+	config.devtool = process.env.WP_DEVTOOL;
+}
+
 if ( ! isProduction ) {
-	// WP_DEVTOOL global variable controls how source maps are generated.
-	// See: https://webpack.js.org/configuration/devtool/#devtool.
-	config.devtool = process.env.WP_DEVTOOL || 'source-map';
-	config.module.rules.unshift( {
-		test: /\.(j|t)sx?$/,
-		exclude: [ /node_modules/ ],
-		use: require.resolve( 'source-map-loader' ),
-		enforce: 'pre',
-	} );
+	// Set default sourcemap mode if it wasn't set by WP_DEVTOOL.
+	config.devtool = config.devtool || 'source-map';
 	config.devServer = {
 		devMiddleware: {
 			writeToDisk: true,
@@ -309,6 +324,16 @@ if ( ! isProduction ) {
 			},
 		},
 	};
+}
+
+// Add source-map-loader if devtool is set, whether in dev mode or not.
+if ( config.devtool ) {
+	config.module.rules.unshift( {
+		test: /\.(j|t)sx?$/,
+		exclude: [ /node_modules/ ],
+		use: require.resolve( 'source-map-loader' ),
+		enforce: 'pre',
+	} );
 }
 
 module.exports = config;

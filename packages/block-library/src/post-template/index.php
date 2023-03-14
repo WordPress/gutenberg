@@ -48,7 +48,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
 	if ( $use_global_query ) {
 		global $wp_query;
-		$query = $wp_query;
+		$query = clone $wp_query;
 	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );
 		$query      = new WP_Query( $query_args );
@@ -68,8 +68,11 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 			$classnames = "is-flex-container columns-{$block->context['displayLayout']['columns']}";
 		}
 	}
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classnames .= ' has-link-color';
+	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );
 
 	$content = '';
 	while ( $query->have_posts() ) {
@@ -99,9 +102,12 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$content     .= '<li class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
 	}
 
-	if ( ! $use_global_query ) {
-		wp_reset_postdata();
-	}
+	/*
+	 * Use this function to restore the context of the template tags
+	 * from a secondary query loop back to the main query loop.
+	 * Since we use two custom loops, it's safest to always restore.
+	*/
+	wp_reset_postdata();
 
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',

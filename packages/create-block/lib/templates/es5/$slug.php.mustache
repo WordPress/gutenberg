@@ -7,7 +7,7 @@
 {{#description}}
  * Description:       {{description}}
 {{/description}}
- * Requires at least: 5.7
+ * Requires at least: 6.1
  * Requires PHP:      7.0
  * Version:           {{version}}
 {{#author}}
@@ -70,7 +70,7 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	);
 
 	register_block_type(
-		'{{namespace}}/{{slug}}',
+		$dir,
 		array(
 			'editor_script' => '{{namespace}}-{{slug}}-block-editor',
 			'editor_style'  => '{{namespace}}-{{slug}}-block-editor',

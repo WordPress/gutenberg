@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { first, last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
@@ -13,7 +8,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
 function selector( select ) {
 	const {
@@ -44,10 +38,6 @@ export default function useMultiSelection() {
 		selectedBlockClientId,
 		isFullSelection,
 	} = useSelect( selector, [] );
-	const selectedRef = useBlockRef( selectedBlockClientId );
-	// These must be in the right DOM order.
-	const startRef = useBlockRef( first( multiSelectedBlockClientIds ) );
-	const endRef = useBlockRef( last( multiSelectedBlockClientIds ) );
 
 	/**
 	 * When the component updates, and there is multi selection, we need to
@@ -66,26 +56,6 @@ export default function useMultiSelection() {
 			}
 
 			if ( ! hasMultiSelection || isMultiSelecting ) {
-				if ( ! selectedBlockClientId || isMultiSelecting ) {
-					return;
-				}
-
-				const selection = defaultView.getSelection();
-
-				if ( selection.rangeCount && ! selection.isCollapsed ) {
-					const blockNode = selectedRef.current;
-					const { startContainer, endContainer } =
-						selection.getRangeAt( 0 );
-
-					if (
-						!! blockNode &&
-						( ! blockNode.contains( startContainer ) ||
-							! blockNode.contains( endContainer ) )
-					) {
-						selection.removeAllRanges();
-					}
-				}
-
 				return;
 			}
 
@@ -105,25 +75,11 @@ export default function useMultiSelection() {
 			// able to select across instances immediately.
 			node.contentEditable = true;
 
-			// For some browsers, like Safari, it is important that focus happens
-			// BEFORE selection.
+			// For some browsers, like Safari, it is important that focus
+			// happens BEFORE selection removal.
 			node.focus();
 
-			// The block refs might not be immediately available
-			// when dragging blocks into another block.
-			if ( ! startRef.current || ! endRef.current ) {
-				return;
-			}
-
-			const selection = defaultView.getSelection();
-			const range = ownerDocument.createRange();
-
-			// These must be in the right DOM order.
-			range.setStartBefore( startRef.current );
-			range.setEndAfter( endRef.current );
-
-			selection.removeAllRanges();
-			selection.addRange( range );
+			defaultView.getSelection().removeAllRanges();
 		},
 		[
 			hasMultiSelection,

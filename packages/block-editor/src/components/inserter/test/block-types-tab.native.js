@@ -18,6 +18,8 @@ jest.mock( '../hooks/use-clipboard-block' );
 jest.mock( '@wordpress/data/src/components/use-select' );
 
 const selectMock = {
+	getCategories: jest.fn().mockReturnValue( [] ),
+	getCollections: jest.fn().mockReturnValue( [] ),
 	getInserterItems: jest.fn().mockReturnValue( [] ),
 	canInsertBlockType: jest.fn(),
 	getBlockType: jest.fn(),

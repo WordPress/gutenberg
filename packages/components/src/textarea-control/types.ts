@@ -10,7 +10,7 @@ import type { BaseControlProps } from '../base-control/types';
 
 export type TextareaControlProps = Pick<
 	BaseControlProps,
-	'hideLabelFromVision' | 'help' | 'label'
+	'hideLabelFromVision' | 'help' | 'label' | '__nextHasNoMarginBottom'
 > & {
 	/**
 	 * A function that receives the new value of the textarea each time it

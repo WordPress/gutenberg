@@ -28,7 +28,7 @@ What follows is a set of questions that have come up from the last few years of 
 
 ### The Development Experience
 - [How do I make my own block?](#how-do-i-make-my-own-block)
-- [Does Gutenberg involve editing posts/pages in the front-end?](#does-gutenberg-involve-editing-postspages-in-the-front-end)
+- [Does Gutenberg involve editing posts/pages in the front-end?](#does-gutenberg-involve-editing-posts-pages-in-the-front-end)
 - [Given Gutenberg is built in JavaScript, how do old meta boxes (PHP) work?](#given-gutenberg-is-built-in-javascript-how-do-old-meta-boxes-php-work)
 - [How can plugins extend the Gutenberg UI?](#how-can-plugins-extend-the-gutenberg-ui)
 - [Are Custom Post Types still supported?](#are-custom-post-types-still-supported)
@@ -270,7 +270,7 @@ This is the canonical list of keyboard shortcuts:
 		</tr>
 		<tr>
 			<td>Remove multiple selected blocks.</td>
-			<td></td>
+			<td><kbd>del</kbd><kbd>backspace</kbd></td>
 			<td><kbd>del</kbd><kbd>backspace</kbd></td>
 		</tr>
 	</tbody>
@@ -408,9 +408,11 @@ _See:_ [Editor Styles](/docs/how-to-guides/themes/theme-support.md#editor-styles
 
 ## What browsers does Gutenberg support?
 
-Gutenberg works in modern browsers, and Internet Explorer 11.
+Gutenberg works in modern browsers.
 
-Our [list of supported browsers can be found in the Make WordPress handbook](https://make.wordpress.org/core/handbook/best-practices/browser-support/). By “modern browsers” we generally mean the _current and past two versions_ of each major browser.
+The [list of supported browsers can be found in the Make WordPress handbook](https://make.wordpress.org/core/handbook/best-practices/browser-support/). The term “modern browsers” generally refers to the _current and previous two versions_ of each major browser.
+
+Since WordPress 5.8, Gutenberg no longer supports any version of Internet Explorer. 
 
 ## Should I be concerned that Gutenberg will make my plugin obsolete?
 

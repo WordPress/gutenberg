@@ -11,6 +11,7 @@ import {
 	RichText,
 	useBlockProps,
 	__experimentalGetElementClassName,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -31,18 +32,26 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
+	const borderProps = getBorderClassesAndStyles( attributes );
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
+		'has-custom-border':
+			!! borderProps.className || ! isEmpty( borderProps.style ),
+	} );
+
+	const imageClasses = classnames( borderProps.className, {
+		[ `wp-image-${ id }` ]: !! id,
 	} );
 
 	const image = (
 		<img
 			src={ url }
 			alt={ alt }
-			className={ id ? `wp-image-${ id }` : null }
+			className={ imageClasses || undefined }
+			style={ borderProps.style }
 			width={ width }
 			height={ height }
 			title={ title }
