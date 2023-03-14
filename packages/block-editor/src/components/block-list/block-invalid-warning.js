@@ -23,6 +23,7 @@ export function BlockInvalidWarning( {
 	block,
 } ) {
 	const hasHTMLBlock = !! getBlockType( 'core/html' );
+	const hasClassicBlock = !! getBlockType( 'core/freeform' );
 	const [ compare, setCompare ] = useState( false );
 
 	const onCompare = useCallback( () => setCompare( true ), [] );
@@ -41,12 +42,18 @@ export function BlockInvalidWarning( {
 					title: __( 'Convert to HTML' ),
 					onClick: convertToHTML,
 				},
-				{
+				hasClassicBlock && {
 					title: __( 'Convert to Classic Block' ),
 					onClick: convertToClassic,
 				},
 			].filter( Boolean ),
-		[ onCompare, convertToHTML, convertToClassic ]
+		[
+			onCompare,
+			hasHTMLBlock,
+			convertToHTML,
+			hasClassicBlock,
+			convertToClassic,
+		]
 	);
 
 	return (
