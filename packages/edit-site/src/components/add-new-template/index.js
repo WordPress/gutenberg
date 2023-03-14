@@ -9,6 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import NewTemplate from './new-template';
 import NewTemplatePart from './new-template-part';
+import NewPage from './new-page';
 
 export default function AddNewTemplate( {
 	templateType = 'wp_template',
@@ -25,6 +26,8 @@ export default function AddNewTemplate( {
 
 	if ( templateType === 'wp_template' ) {
 		return <NewTemplate { ...props } postType={ postType } />;
+	} else if ( templateType === 'page' ) {
+		return <NewPage { ...props } postType={ postType } />;
 	} else if ( templateType === 'wp_template_part' ) {
 		return <NewTemplatePart { ...props } postType={ postType } />;
 	}
