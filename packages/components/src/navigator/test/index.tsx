@@ -717,4 +717,68 @@ describe( 'Navigator', () => {
 			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
 		} );
 	} );
+
+	describe( 'animation', () => {
+		it( 'should not animate the initial screen', async () => {
+			const onHomeAnimationStartSpy = jest.fn();
+
+			render(
+				<NavigatorProvider initialPath="/">
+					<NavigatorScreen
+						path="/"
+						onAnimationStart={ onHomeAnimationStartSpy }
+					>
+						<CustomNavigatorButton path="/child">
+							To child
+						</CustomNavigatorButton>
+					</NavigatorScreen>
+				</NavigatorProvider>
+			);
+
+			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should animate all other screens (including the initial screen when navigating back)', async () => {
+			const user = userEvent.setup();
+
+			const onHomeAnimationStartSpy = jest.fn();
+			const onChildAnimationStartSpy = jest.fn();
+
+			render(
+				<NavigatorProvider initialPath="/">
+					<NavigatorScreen
+						path="/"
+						onAnimationStart={ onHomeAnimationStartSpy }
+					>
+						<CustomNavigatorButton path="/child">
+							To child
+						</CustomNavigatorButton>
+					</NavigatorScreen>
+					<NavigatorScreen
+						path="/child"
+						onAnimationStart={ onChildAnimationStartSpy }
+					>
+						<CustomNavigatorBackButton>
+							Back to home
+						</CustomNavigatorBackButton>
+					</NavigatorScreen>
+				</NavigatorProvider>
+			);
+
+			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
+			expect( onChildAnimationStartSpy ).not.toHaveBeenCalled();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'To child' } )
+			);
+			expect( onChildAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Back to home' } )
+			);
+			expect( onChildAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onHomeAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
 } );
