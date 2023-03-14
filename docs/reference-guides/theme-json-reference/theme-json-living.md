@@ -106,6 +106,16 @@ Settings related to layout.
 
 ---
 
+### position
+
+Settings related to position.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| sticky | boolean | false |  |
+
+---
+
 ### spacing
 
 Settings related to spacing.
@@ -178,6 +188,16 @@ Color styles.
 | background | string, object |  |
 | gradient | string, object |  |
 | text | string, object |  |
+
+---
+
+### dimensions
+
+Dimensions styles
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| minHeight | string, object |  |
 
 ---
 

@@ -119,7 +119,7 @@ $ WP_ENV_PORT=3333 wp-env start
 
 Running `docker ps` and inspecting the `PORTS` column allows you to determine which port `wp-env` is currently using.
 
-You may also specify the port numbers in your `.wp-env.json` file, but the environment variables take precedent.
+You may also specify the port numbers in your `.wp-env.json` file, but the environment variables will take precedence.
 
 ### 3. Restart `wp-env` with updates
 

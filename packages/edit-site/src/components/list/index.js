@@ -19,8 +19,10 @@ import useTitle from '../routes/use-title';
 
 export default function List() {
 	const {
-		params: { postType: templateType },
+		params: { path },
 	} = useLocation();
+	const templateType =
+		path === '/wp_template/all' ? 'wp_template' : 'wp_template_part';
 
 	useRegisterShortcuts();
 

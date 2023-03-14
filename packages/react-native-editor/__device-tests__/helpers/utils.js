@@ -375,6 +375,19 @@ const tapPasteAboveElement = async ( driver, element ) => {
 	}
 };
 
+const selectTextFromElement = async ( driver, element ) => {
+	if ( isAndroid() ) {
+		await longPressMiddleOfElement( driver, element, 0 );
+	} else {
+		await doubleTap( driver, element );
+		await driver.waitForElementByXPath(
+			'//XCUIElementTypeMenuItem[@name="Copy"]',
+			wd.asserters.isDisplayed,
+			4000
+		);
+	}
+};
+
 // Starts from the middle of the screen or the element(if specified)
 // and swipes upwards.
 const swipeUp = async (
@@ -684,6 +697,7 @@ module.exports = {
 	longPressMiddleOfElement,
 	setClipboard,
 	setupDriver,
+	selectTextFromElement,
 	stopDriver,
 	swipeDown,
 	swipeFromTo,
