@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { memo, useMemo, useState } from '@wordpress/element';
+import { memo, useMemo, useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -70,6 +70,7 @@ function PostTemplateBlockPreview( {
 const MemoizedPostTemplateBlockPreview = memo( PostTemplateBlockPreview );
 
 export default function PostTemplateEdit( {
+	setAttributes,
 	clientId,
 	context: {
 		query: {
@@ -95,11 +96,24 @@ export default function PostTemplateEdit( {
 		} = {},
 		queryContext = [ { page: 1 } ],
 		templateSlug,
-		displayLayout: { type: layoutType = 'flex', columns = 1 } = {},
+		displayLayout: { type: layoutType = 'grid', columns = 1 } = {},
 		previewPostType,
 	},
 	__unstableLayoutClassNames,
 } ) {
+	const updatedLayoutType =
+		layoutType === 'list' || layoutType === 'default' ? 'default' : 'grid';
+
+	useEffect( () => {
+		setAttributes( {
+			layout: {
+				type: updatedLayoutType,
+				isResponsive: false,
+				numberOfColumns: columns,
+			},
+		} );
+	}, [ updatedLayoutType, columns, setAttributes ] );
+
 	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 	const { posts, blocks } = useSelect(
@@ -215,12 +229,9 @@ export default function PostTemplateEdit( {
 			} ) ),
 		[ posts ]
 	);
-	const hasLayoutFlex = layoutType === 'flex' && columns > 1;
+
 	const blockProps = useBlockProps( {
-		className: classnames( __unstableLayoutClassNames, {
-			'is-flex-container': hasLayoutFlex,
-			[ `columns-${ columns }` ]: hasLayoutFlex,
-		} ),
+		className: classnames( __unstableLayoutClassNames ),
 	} );
 
 	if ( ! posts ) {

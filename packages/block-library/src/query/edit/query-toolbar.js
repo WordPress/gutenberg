@@ -34,18 +34,22 @@ export default function QueryToolbar( {
 		{
 			icon: list,
 			title: __( 'List view' ),
-			onClick: () => setDisplayLayout( { type: 'list' } ),
-			isActive: displayLayout?.type === 'list',
+			onClick: () => setDisplayLayout( { type: 'default' } ),
+			isActive:
+				displayLayout?.type === 'default' ||
+				displayLayout?.type === 'list',
 		},
 		{
 			icon: grid,
 			title: __( 'Grid view' ),
 			onClick: () =>
 				setDisplayLayout( {
-					type: 'flex',
+					type: 'grid',
 					columns: displayLayout?.columns || 3,
 				} ),
-			isActive: displayLayout?.type === 'flex',
+			isActive:
+				displayLayout?.type === 'grid' ||
+				displayLayout?.type === 'flex',
 		},
 	];
 	return (
