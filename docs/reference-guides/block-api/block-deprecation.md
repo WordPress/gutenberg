@@ -1,5 +1,7 @@
 # Deprecation
 
+> This page provides a comprehensive guide to the principles and usage of the Deprecation API. Those seeking a more gentle introduction may find the [tutorial on block deprecation](https://developer.wordpress.org/news/2023/03/block-deprecation-a-tutorial/) to be useful. While the tutorial complements the content on this page it should not be used as a substitute for this page. The tutorial can be found on the [Developer Blog](https://developer.wordpress.org/news/).
+
 When updating static blocks markup and attributes, block authors need to consider existing posts using the old versions of their block. To provide a good upgrade path, you can choose one of the following strategies:
 
 -   Do not deprecate the block and create a new one (a different name)
