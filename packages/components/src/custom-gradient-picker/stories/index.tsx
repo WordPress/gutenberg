@@ -25,7 +25,7 @@ export default meta;
 const CustomGradientPickerWithState: ComponentStory<
 	typeof CustomGradientPicker
 > = ( props ) => {
-	const [ gradient, setGradient ] = useState< string | undefined >();
+	const [ gradient, setGradient ] = useState< string >();
 	return (
 		<CustomGradientPicker
 			{ ...props }
