@@ -2,12 +2,13 @@
  * WordPress dependencies
  */
 import { __, sprintf, _x } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
 import {
 	__experimentalUseNavigator as useNavigator,
 	Icon,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -24,7 +25,13 @@ function useTemplateTitleAndDescription( postType, postId ) {
 		postType,
 		postId
 	);
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme(),
+		[]
+	);
 	const addedBy = useAddedBy( postType, postId );
+	const isAddedByActiveTheme =
+		addedBy.type === 'theme' && record.theme === currentTheme?.stylesheet;
 	const title = getTitle();
 	let descriptionText = getDescription();
 
@@ -46,7 +53,7 @@ function useTemplateTitleAndDescription( postType, postId ) {
 		<>
 			{ descriptionText }
 
-			{ addedBy.text && (
+			{ addedBy.text && ! isAddedByActiveTheme && (
 				<span className="edit-site-sidebar-navigation-screen-template__added-by-description">
 					<span className="edit-site-sidebar-navigation-screen-template__added-by-description-author">
 						<span className="edit-site-sidebar-navigation-screen-template__added-by-description-author-icon">

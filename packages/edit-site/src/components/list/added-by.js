@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * External dependencies
  */
@@ -24,9 +25,11 @@ import { _x } from '@wordpress/i18n';
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
 
 /**
+ * @typedef {'theme'|'plugin'|'site'|'user'} AddedByType
  *
  * @typedef AddedByData
  * @type {Object}
+ * @property {AddedByType}  type         The type of the data.
  * @property {JSX.Element}  icon         The icon to display.
  * @property {string}       [imageUrl]   The optional image URL to display.
  * @property {string}       [text]       The text to display.
@@ -68,6 +71,7 @@ export function useAddedBy( postType, postId ) {
 							) ) )
 				) {
 					return {
+						type: 'theme',
 						icon: themeIcon,
 						text:
 							getTheme( template.theme )?.name?.rendered ||
@@ -79,6 +83,7 @@ export function useAddedBy( postType, postId ) {
 				// Added by plugin.
 				if ( template.has_theme_file && template.origin === 'plugin' ) {
 					return {
+						type: 'plugin',
 						icon: pluginIcon,
 						text:
 							getPlugin( template.theme )?.name || template.theme,
@@ -100,6 +105,7 @@ export function useAddedBy( postType, postId ) {
 						'__unstableBase'
 					);
 					return {
+						type: 'site',
 						icon: globeIcon,
 						imageUrl: siteData?.site_logo
 							? getMedia( siteData.site_logo )?.source_url
@@ -113,6 +119,7 @@ export function useAddedBy( postType, postId ) {
 			// Added by user.
 			const user = getUser( template.author );
 			return {
+				type: 'user',
 				icon: authorIcon,
 				imageUrl: user?.avatar_urls?.[ 48 ],
 				text: user?.nickname,
