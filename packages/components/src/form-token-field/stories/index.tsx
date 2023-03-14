@@ -123,3 +123,11 @@ WithCustomRenderItem.args = {
 		<div>{ `${ item } — a nice place to visit` }</div>
 	),
 };
+
+export const WithValidatedInput: ComponentStory< typeof FormTokenField > =
+	DefaultTemplate.bind( {} );
+WithValidatedInput.args = {
+	...Default.args,
+	__experimentalValidateInput: ( input: string ) =>
+		continents.includes( input ),
+};
