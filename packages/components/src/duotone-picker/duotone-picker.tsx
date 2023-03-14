@@ -19,6 +19,7 @@ import { VStack } from '../v-stack';
 import CustomDuotoneBar from './custom-duotone-bar';
 import { getDefaultColors, getGradientFromCSSColors } from './utils';
 import { Spacer } from '../spacer';
+import type { DuotonePickerProps } from './types';
 
 function DuotonePicker( {
 	clearable = true,
@@ -29,7 +30,7 @@ function DuotonePicker( {
 	disableCustomDuotone,
 	value,
 	onChange,
-} ) {
+}: DuotonePickerProps ) {
 	const [ defaultDark, defaultLight ] = useMemo(
 		() => getDefaultColors( colorPalette ),
 		[ colorPalette ]
@@ -125,6 +126,7 @@ function DuotonePicker( {
 									newColors.length >= 2
 										? newColors
 										: undefined;
+								// @ts-expect-error TODO: Investigate if this is actually a problem
 								onChange( newValue );
 							} }
 						/>

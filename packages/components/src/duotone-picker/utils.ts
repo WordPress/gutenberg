@@ -4,6 +4,11 @@
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
+/**
+ * Internal dependencies
+ */
+import type { DuotonePickerProps } from './types';
+
 extend( [ namesPlugin ] );
 
 /**
@@ -18,11 +23,13 @@ extend( [ namesPlugin ] );
 /**
  * Calculate the brightest and darkest values from a color palette.
  *
- * @param {Object[]} palette Color palette for the theme.
+ * @param palette Color palette for the theme.
  *
- * @return {string[]} Tuple of the darkest color and brightest color.
+ * @return Tuple of the darkest color and brightest color.
  */
-export function getDefaultColors( palette ) {
+export function getDefaultColors(
+	palette: DuotonePickerProps[ 'colorPalette' ]
+) {
 	// A default dark and light color are required.
 	if ( ! palette || palette.length < 2 ) return [ '#000', '#fff' ];
 
@@ -38,7 +45,10 @@ export function getDefaultColors( palette ) {
 					current.brightness >= max.brightness ? current : max,
 				];
 			},
-			[ { brightness: 1 }, { brightness: 0 } ]
+			[
+				{ brightness: 1, color: '' },
+				{ brightness: 0, color: '' },
+			]
 		)
 		.map( ( { color } ) => color );
 }
@@ -67,11 +77,11 @@ export function getGradientFromCSSColors(
 /**
  * Convert a color array to an array of color stops.
  *
- * @param {string[]} colors CSS colors array
+ * @param colors CSS colors array
  *
- * @return {Object[]} Color stop information.
+ * @return Color stop information.
  */
-export function getColorStopsFromColors( colors ) {
+export function getColorStopsFromColors( colors: string[] ) {
 	return colors.map( ( color, i ) => ( {
 		position: ( i * 100 ) / ( colors.length - 1 ),
 		color,
@@ -81,10 +91,12 @@ export function getColorStopsFromColors( colors ) {
 /**
  * Convert a color stop array to an array colors.
  *
- * @param {Object[]} colorStops Color stop information.
+ * @param colorStops Color stop information.
  *
- * @return {string[]} CSS colors array.
+ * @return CSS colors array.
  */
-export function getColorsFromColorStops( colorStops = [] ) {
+export function getColorsFromColorStops(
+	colorStops: { position: number; color: string }[] = []
+) {
 	return colorStops.map( ( { color } ) => color );
 }
