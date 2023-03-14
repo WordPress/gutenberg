@@ -441,6 +441,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$has_global_styles_duotone = array_key_exists( $block['blockName'], WP_Duotone::$global_styles_block_names );
 	
 	if (
+		empty( $block_content ) ||
 		! $duotone_support ||
 		( ! $has_duotone_attribute && ! $has_global_styles_duotone )
 	) {
