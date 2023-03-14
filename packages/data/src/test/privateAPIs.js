@@ -10,7 +10,7 @@ import { unlock } from '../private-apis';
  */
 
 beforeEach( () => {
-	jest.useFakeTimers( 'legacy' );
+	jest.useFakeTimers( { legacyFakeTimers: true } );
 } );
 
 afterEach( () => {

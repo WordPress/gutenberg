@@ -29,7 +29,6 @@ test.describe(
 		test( 'default to a list of pages if there are no menus', async ( {
 			admin,
 			editor,
-			requestUtils,
 		} ) => {
 			await admin.createNewPost();
 			await editor.insertBlock( { name: 'core/navigation' } );
@@ -48,14 +47,12 @@ test.describe(
 
 			// Check the markup of the block is correct.
 			await editor.publishPost();
-			const navigationMenus = await requestUtils.getNavigationMenus();
-			const latestNavigationMenu = navigationMenus[ 0 ];
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/navigation',
-					attributes: { ref: latestNavigationMenu.id },
-				},
-			] );
+			const content = await editor.getEditedPostContent();
+			expect( content ).toBe(
+				`<!-- wp:navigation -->
+<!-- wp:page-list /-->
+<!-- /wp:navigation -->`
+			);
 		} );
 
 		test( 'default to my only existing menu', async ( {
@@ -130,6 +127,57 @@ test.describe(
 			await expect(
 				page.locator(
 					`role=navigation >> role=link[name="Custom link"i]`
+				)
+			).toBeVisible();
+		} );
+
+		test( 'default to my most recently created menu', async ( {
+			admin,
+			page,
+			editor,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+			await requestUtils.createNavigationMenu( {
+				title: 'Test Menu 1',
+				content:
+					'<!-- wp:navigation-link {"label":"Menu 1 Link","type":"custom","url":"http://localhost:8889/#menu-1-link","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			//FIXME this is needed because if the two menus are created at the same time, the API will return them in the wrong order.
+			//https://core.trac.wordpress.org/ticket/57914
+			await editor.page.waitForTimeout( 1000 );
+
+			const latestMenu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu 2',
+				content:
+					'<!-- wp:navigation-link {"label":"Menu 2 Link","type":"custom","url":"http://localhost:8889/#menu-2-link","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			// Check the markup of the block is correct.
+			await editor.publishPost();
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/navigation',
+					attributes: { ref: latestMenu.id },
+				},
+			] );
+			await page.locator( 'role=button[name="Close panel"i]' ).click();
+
+			// Check the block in the canvas.
+			await expect(
+				editor.canvas.locator(
+					`role=textbox[name="Navigation link text"i] >> text="Menu 2 Link"`
+				)
+			).toBeVisible();
+
+			// Check the block in the frontend.
+			await page.goto( '/' );
+			await expect(
+				page.locator(
+					`role=navigation >> role=link[name="Menu 2 Link"i]`
 				)
 			).toBeVisible();
 		} );

@@ -1,7 +1,10 @@
 .edit-site-sidebar__content {
 	flex-grow: 1;
 	overflow-y: auto;
-	@include custom-scrollbars-on-hover;
+
+	.components-navigator-screen {
+		@include custom-scrollbars-on-hover;
+	}
 }
 
 .edit-site-sidebar__footer {

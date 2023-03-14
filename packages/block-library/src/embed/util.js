@@ -153,6 +153,21 @@ export const createUpgradedEmbedBlock = (
 };
 
 /**
+ * Determine if the block already has an aspect ratio class applied.
+ *
+ * @param {string} existingClassNames Existing block classes.
+ * @return {boolean} True or false if the classnames contain an aspect ratio class.
+ */
+export const hasAspectRatioClass = ( existingClassNames ) => {
+	if ( ! existingClassNames ) {
+		return false;
+	}
+	return ASPECT_RATIOS.some( ( { className } ) =>
+		existingClassNames.includes( className )
+	);
+};
+
+/**
  * Removes all previously set aspect ratio related classes and return the rest
  * existing class names.
  *
@@ -283,6 +298,13 @@ export const getAttributesFromPreview = memoize(
 			attributes.providerNameSlug = providerNameSlug;
 		}
 
+		// Aspect ratio classes are removed when the embed URL is updated.
+		// If the embed already has an aspect ratio class, that means the URL has not changed.
+		// Which also means no need to regenerate it with getClassNames.
+		if ( hasAspectRatioClass( currentClassNames ) ) {
+			return attributes;
+		}
+
 		attributes.className = getClassNames(
 			html,
 			currentClassNames,
@@ -296,27 +318,26 @@ export const getAttributesFromPreview = memoize(
 /**
  * Returns the attributes derived from the preview, merged with the current attributes.
  *
- * @param {Object}  currentAttributes       The current attributes of the block.
- * @param {Object}  preview                 The preview data.
- * @param {string}  title                   The block's title, e.g. Twitter.
- * @param {boolean} isResponsive            Boolean indicating if the block supports responsive content.
- * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
+ * @param {Object}  currentAttributes The current attributes of the block.
+ * @param {Object}  preview           The preview data.
+ * @param {string}  title             The block's title, e.g. Twitter.
+ * @param {boolean} isResponsive      Boolean indicating if the block supports responsive content.
  * @return {Object} Merged attributes.
  */
 export const getMergedAttributesWithPreview = (
 	currentAttributes,
 	preview,
 	title,
-	isResponsive,
-	ignorePreviousClassName = false
+	isResponsive
 ) => {
 	const { allowResponsive, className } = currentAttributes;
+
 	return {
 		...currentAttributes,
 		...getAttributesFromPreview(
 			preview,
 			title,
-			ignorePreviousClassName ? undefined : className,
+			className,
 			isResponsive,
 			allowResponsive
 		),

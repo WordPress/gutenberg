@@ -95,11 +95,11 @@ function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
 /**
  * Transform given preset tree into a set of preset class declarations.
  *
- * @param {string} blockSelector
- * @param {Object} blockPresets
+ * @param {?string} blockSelector
+ * @param {Object}  blockPresets
  * @return {string} CSS declarations for the preset classes.
  */
-function getPresetsClasses( blockSelector, blockPresets = {} ) {
+function getPresetsClasses( blockSelector = '*', blockPresets = {} ) {
 	return PRESET_METADATA.reduce(
 		( declarations, { path, cssVarInfix, classes } ) => {
 			if ( ! classes ) {
@@ -399,7 +399,7 @@ export function getLayoutStyles( {
 										? `${ selector } .${ className }${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }.${ className }${
+										: `${ selector }-${ className }${ selector }-${ className }${
 												spacingStyle?.selector || ''
 										  }`;
 							}
@@ -496,9 +496,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	}
 
 	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
-		if ( !! tree.styles?.elements[ name ] ) {
+		if ( !! tree.styles?.elements?.[ name ] ) {
 			nodes.push( {
-				styles: tree.styles?.elements[ name ],
+				styles: tree.styles?.elements?.[ name ],
 				selector,
 			} );
 		}
@@ -529,7 +529,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 						blockSelectors[ blockName ].fallbackGapValue,
 					hasLayoutSupport:
 						blockSelectors[ blockName ].hasLayoutSupport,
-					selector: blockSelectors[ blockName ].selector,
+					selector: blockSelectors[ blockName ]?.selector,
 					styles: blockStyles,
 					featureSelectors:
 						blockSelectors[ blockName ].featureSelectors,
@@ -547,7 +547,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 					) {
 						nodes.push( {
 							styles: value,
-							selector: blockSelectors[ blockName ].selector
+							selector: blockSelectors[ blockName ]?.selector
 								.split( ',' )
 								.map( ( sel ) => {
 									const elementSelectors =
@@ -606,7 +606,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 				nodes.push( {
 					presets: blockPresets,
 					custom: blockCustom,
-					selector: blockSelectors[ blockName ].selector,
+					selector: blockSelectors[ blockName ]?.selector,
 				} );
 			}
 		}

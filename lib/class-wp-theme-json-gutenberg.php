@@ -800,7 +800,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The new selector.
 	 */
 	protected static function append_to_selector( $selector, $to_append, $position = 'right' ) {
-		if ( ! str_contains( ',', $selector ) ) {
+		if ( ! str_contains( $selector, ',' ) ) {
 			return 'right' === $position ? $selector . $to_append : $to_append . $selector;
 		}
 		$new_selectors = array();
@@ -1315,7 +1315,7 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								} else {
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%s .%s%s' : '%s.%s%s';
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%1$s .%2$s%3$s' : '%1$s-%2$s%1$s-%2$s%3$s';
 									$layout_selector = sprintf(
 										$format,
 										$selector,

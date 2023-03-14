@@ -27,6 +27,10 @@ export type FontSizePickerProps = {
 		selectedItem?: FontSize
 	) => void;
 	/**
+	 * Available units for custom font size selection.
+	 */
+	units?: string[];
+	/**
 	 * The current font size value.
 	 */
 	value?: number | string;

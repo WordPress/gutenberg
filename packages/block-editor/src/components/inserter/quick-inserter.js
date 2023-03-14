@@ -32,6 +32,7 @@ export default function QuickInserter( {
 	isAppender,
 	prioritizePatterns,
 	selectBlockOnInsert,
+	orderInitialBlockItems,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
@@ -124,6 +125,7 @@ export default function QuickInserter( {
 					isDraggable={ false }
 					prioritizePatterns={ prioritizePatterns }
 					selectBlockOnInsert={ selectBlockOnInsert }
+					orderInitialBlockItems={ orderInitialBlockItems }
 				/>
 			</div>
 

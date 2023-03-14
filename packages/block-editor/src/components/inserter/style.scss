@@ -35,6 +35,7 @@ $block-inserter-tabs-height: 44px;
 	.components-popover__content {
 		border: none;
 		outline: none;
+		box-shadow: $shadow-popover;
 
 		.block-editor-inserter__quick-inserter > * {
 			border-left: $border-width solid $gray-400;
@@ -42,10 +43,12 @@ $block-inserter-tabs-height: 44px;
 
 			&:first-child {
 				border-top: $border-width solid $gray-400;
+				border-radius: $radius-block-ui $radius-block-ui 0 0;
 			}
 
 			&:last-child {
 				border-bottom: $border-width solid $gray-400;
+				border-radius: 0 0 $radius-block-ui $radius-block-ui;
 			}
 
 			&.components-button {

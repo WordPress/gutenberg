@@ -41,8 +41,16 @@ export default function useSyncPathWithURL() {
 	} = useNavigator();
 	const currentUrlParams = useRef( urlParams );
 	const currentPath = useRef( navigatorLocation.path );
+	const isMounting = useRef( true );
 
 	useEffect( () => {
+		// The navigatorParams are only initially filled properly when the
+		// navigator screens mount. so we ignore the first synchronisation.
+		if ( isMounting.current ) {
+			isMounting.current = false;
+			return;
+		}
+
 		function updateUrlParams( newUrlParams ) {
 			if (
 				Object.entries( newUrlParams ).every( ( [ key, value ] ) => {
@@ -65,17 +73,14 @@ export default function useSyncPathWithURL() {
 				postId: navigatorParams?.postId,
 				path: undefined,
 			} );
-		} else if ( navigatorParams?.postType && ! navigatorParams?.postId ) {
-			updateUrlParams( {
-				postType: navigatorParams?.postType,
-				path: navigatorLocation.path,
-				postId: undefined,
-			} );
 		} else {
 			updateUrlParams( {
 				postType: undefined,
 				postId: undefined,
-				path: navigatorLocation.path,
+				path:
+					navigatorLocation.path === '/'
+						? undefined
+						: navigatorLocation.path,
 			} );
 		}
 	}, [ navigatorLocation?.path, navigatorParams, history ] );

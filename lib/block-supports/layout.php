@@ -469,6 +469,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
+	// Add combined layout and block classname for global styles to hook onto.
+	$block_name    = explode( '/', $block['blockName'] );
+	$class_names[] = 'wp-block-' . end( $block_name ) . '-' . $layout_classname;
+
 	$content_with_outer_classnames = '';
 
 	if ( ! empty( $outer_class_names ) ) {
