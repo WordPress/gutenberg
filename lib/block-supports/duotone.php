@@ -469,7 +469,13 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			// Utilize existing preset CSS custom property.
 			$filter_property = "var(--wp--preset--duotone--$slug)";
 
+			if ( ! array_key_exists( $slug, WP_Duotone::$global_styles_presets ) ) {
+				// We have a preset slug, but the preset isn't defined in the array so we have no duotone to apply
+				return;
+			} 
+
 			WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
+			
 
 		} elseif ( $is_css ) {
 			// Build a unique slug for the filter based on the CSS value.
@@ -495,6 +501,12 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 		// Utilize existing preset CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
+
+		if ( ! array_key_exists( $slug, WP_Duotone::$global_styles_presets ) ) {
+			// We have a preset slug, but the preset isn't defined in the array so we have no duotone to apply
+			return;
+		} 
+		
 		WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
 	}
 
@@ -741,16 +753,21 @@ class WP_Duotone {
 	 * var(--wp--preset--duotone--blue-orange)
 	 * 
 	 * @param string $duotone_attr The duotone attribute from a block.
-	 * @return string The slug of the duotone preset.
+	 * @return string The slug of the duotone preset or an empty string if no slug is found.
 	 */
 	static function gutenberg_get_slug_from_attr( $duotone_attr ) {
-		return str_replace( [ 'var:preset|duotone|', 'var(--wp--preset--duotone--', ')' ], '', $duotone_attr );
+		// Uses Branch Reset Groups `(?|…)` to return one capture group
+		preg_match( '/(?|var:preset\|duotone\|(\S+)|var\(--wp--preset--duotone--(\S+)\))/', $duotone_attr, $matches );
+		
+		return ! empty( $matches[ 1 ] ) ? $matches[ 1 ] : '';
 	}
 
 	/**
 	 * Check if we have a duotone preset string
 	 */
 	static function is_preset( $duotone_attr ) {
+		// TODO: Should we also check if the array_key_exists in self::$global_styles_presets?
+		// Potential route — rename to is_preset_format and have another check if it's within the global styles presets.
 		return strpos( $duotone_attr, 'var:preset|duotone|' ) === 0 || strpos( $duotone_attr, 'var(--wp--preset--duotone--' ) === 0;
 	}
 }
