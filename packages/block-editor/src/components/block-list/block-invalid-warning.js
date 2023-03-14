@@ -4,9 +4,8 @@
 import { __, _x } from '@wordpress/i18n';
 import { Button, Modal } from '@wordpress/components';
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import { getBlockType, createBlock, rawHandler } from '@wordpress/blocks';
-import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { createBlock, rawHandler } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,43 +14,90 @@ import Warning from '../warning';
 import BlockCompare from '../block-compare';
 import { store as blockEditorStore } from '../../store';
 
-export function BlockInvalidWarning( {
-	convertToHTML,
-	convertToBlocks,
-	convertToClassic,
-	attemptBlockRecovery,
-	block,
-} ) {
-	const hasHTMLBlock = !! getBlockType( 'core/html' );
-	const hasClassicBlock = !! getBlockType( 'core/freeform' );
-	const [ compare, setCompare ] = useState( false );
+const blockToBlocks = ( block ) =>
+	rawHandler( {
+		HTML: block.originalContent,
+	} );
 
-	const onCompare = useCallback( () => setCompare( true ), [] );
+const recoverBlock = ( block ) =>
+	createBlock( block.name, block.attributes, block.innerBlocks );
+
+const blockToClassic = ( block ) =>
+	createBlock( 'core/freeform', {
+		content: block.originalContent,
+	} );
+
+const blockToHTML = ( block ) =>
+	createBlock( 'core/html', {
+		content: block.originalContent,
+	} );
+
+export default function BlockInvalidWarning( { clientId } ) {
+	const { block, canInsertHTMLBlock, canInsertClassicBlock } = useSelect(
+		( select ) => {
+			const { canInsertBlockType, getBlock, getBlockRootClientId } =
+				select( blockEditorStore );
+
+			const rootClientId = getBlockRootClientId( clientId );
+
+			return {
+				block: getBlock( clientId ),
+				canInsertHTMLBlock: canInsertBlockType(
+					'core/html',
+					rootClientId
+				),
+				canInsertClassicBlock: canInsertBlockType(
+					'core/freeform',
+					rootClientId
+				),
+			};
+		},
+		[ clientId ]
+	);
+	const { replaceBlock } = useDispatch( blockEditorStore );
+
+	const [ compare, setCompare ] = useState( false );
 	const onCompareClose = useCallback( () => setCompare( false ), [] );
 
-	// We memo the array here to prevent the children components from being updated unexpectedly.
-	const hiddenActions = useMemo(
+	const attemptBlockRecovery = useCallback( () => {
+		replaceBlock( block.clientId, recoverBlock( block ) );
+	}, [ block, replaceBlock ] );
+
+	const convertToClassic = useCallback( () => {
+		replaceBlock( block.clientId, blockToClassic( block ) );
+	}, [ block, replaceBlock ] );
+
+	const convertToHTML = useCallback(
+		() => replaceBlock( block.clientId, blockToHTML( block ) ),
+		[ block, replaceBlock ]
+	);
+
+	const convertToBlocks = useCallback(
+		() => replaceBlock( block.clientId, blockToBlocks( block ) ),
+		[ block, replaceBlock ]
+	);
+
+	const secondaryActions = useMemo(
 		() =>
 			[
 				{
 					// translators: Button to fix block content
 					title: _x( 'Resolve', 'imperative verb' ),
-					onClick: onCompare,
+					onClick: () => setCompare( true ),
 				},
-				hasHTMLBlock && {
+				canInsertHTMLBlock && {
 					title: __( 'Convert to HTML' ),
 					onClick: convertToHTML,
 				},
-				hasClassicBlock && {
+				canInsertClassicBlock && {
 					title: __( 'Convert to Classic Block' ),
 					onClick: convertToClassic,
 				},
 			].filter( Boolean ),
 		[
-			onCompare,
-			hasHTMLBlock,
+			canInsertHTMLBlock,
 			convertToHTML,
-			hasClassicBlock,
+			canInsertClassicBlock,
 			convertToClassic,
 		]
 	);
@@ -68,7 +114,7 @@ export function BlockInvalidWarning( {
 						{ __( 'Attempt Block Recovery' ) }
 					</Button>,
 				] }
-				secondaryActions={ hiddenActions }
+				secondaryActions={ secondaryActions }
 			>
 				{ __( 'This block contains unexpected or invalid content.' ) }
 			</Warning>
@@ -93,42 +139,3 @@ export function BlockInvalidWarning( {
 		</>
 	);
 }
-
-const blockToClassic = ( block ) =>
-	createBlock( 'core/freeform', {
-		content: block.originalContent,
-	} );
-const blockToHTML = ( block ) =>
-	createBlock( 'core/html', {
-		content: block.originalContent,
-	} );
-const blockToBlocks = ( block ) =>
-	rawHandler( {
-		HTML: block.originalContent,
-	} );
-const recoverBlock = ( { name, attributes, innerBlocks } ) =>
-	createBlock( name, attributes, innerBlocks );
-
-export default compose( [
-	withSelect( ( select, { clientId } ) => ( {
-		block: select( blockEditorStore ).getBlock( clientId ),
-	} ) ),
-	withDispatch( ( dispatch, { block } ) => {
-		const { replaceBlock } = dispatch( blockEditorStore );
-
-		return {
-			convertToClassic() {
-				replaceBlock( block.clientId, blockToClassic( block ) );
-			},
-			convertToHTML() {
-				replaceBlock( block.clientId, blockToHTML( block ) );
-			},
-			convertToBlocks() {
-				replaceBlock( block.clientId, blockToBlocks( block ) );
-			},
-			attemptBlockRecovery() {
-				replaceBlock( block.clientId, recoverBlock( block ) );
-			},
-		};
-	} ),
-] )( BlockInvalidWarning );
