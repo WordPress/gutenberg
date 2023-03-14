@@ -172,6 +172,8 @@ function UnconnectedNavigatorScreen(
 		},
 		x: 0,
 	};
+	// Disable the initial animation if the screen is the very first screen to be
+	// rendered within the current `NavigatorProvider`.
 	const initial =
 		location.isInitial && ! location.isBack
 			? false
