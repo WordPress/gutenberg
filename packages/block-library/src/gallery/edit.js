@@ -592,7 +592,7 @@ function GalleryEdit( props ) {
 							__nextHasNoMarginBottom
 							label={ __( 'Image size' ) }
 							help={ __(
-								'Select the size of the source image.'
+								'Select the size of the source images.'
 							) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
