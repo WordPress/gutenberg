@@ -469,11 +469,6 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			// Utilize existing preset CSS custom property.
 			$filter_property = "var(--wp--preset--duotone--$slug)";
 
-			if ( ! array_key_exists( $slug, WP_Duotone::$global_styles_presets ) ) {
-				// We have a preset slug, but the preset isn't defined in the array so we have no duotone to apply
-				return;
-			} 
-
 			WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
 			
 
@@ -501,11 +496,6 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 		// Utilize existing preset CSS custom property.
 		$filter_property = "var(--wp--preset--duotone--$slug)";
-
-		if ( ! array_key_exists( $slug, WP_Duotone::$global_styles_presets ) ) {
-			// We have a preset slug, but the preset isn't defined in the array so we have no duotone to apply
-			return;
-		} 
 		
 		WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
 	}
