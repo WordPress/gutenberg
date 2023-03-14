@@ -13,25 +13,53 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  * Internal dependencies
  */
 import NoticeList from '../../notice/list';
+import type { NoticeListProps } from '../../notice/types';
 
 /**
  * Override the default edit UI to include notices if supported.
  *
- * @param {WPComponent} OriginalComponent Original component.
+ * Wrapping the original component with `withNotices` encapsulates the component
+ * with the additional props `noticeOperations` and `noticeUI`.
  *
- * @return {WPComponent} Wrapped component.
+ * ```jsx
+ * import { withNotices, Button } from '@wordpress/components';
+ *
+ * const MyComponentWithNotices = withNotices(
+ * 	( { noticeOperations, noticeUI } ) => {
+ * 		const addError = () =>
+ * 			noticeOperations.createErrorNotice( 'Error message' );
+ * 		return (
+ * 			<div>
+ * 				{ noticeUI }
+ * 				<Button variant="secondary" onClick={ addError }>
+ * 					Add error
+ * 				</Button>
+ * 			</div>
+ * 		);
+ * 	}
+ * );
+ * ```
+ *
+ * @param OriginalComponent Original component.
+ *
+ * @return Wrapped component.
  */
 export default createHigherOrderComponent( ( OriginalComponent ) => {
-	function Component( props, ref ) {
-		const [ noticeList, setNoticeList ] = useState( [] );
+	function Component(
+		props: { [ key: string ]: any },
+		ref: React.ForwardedRef< any >
+	) {
+		const [ noticeList, setNoticeList ] = useState<
+			NoticeListProps[ 'notices' ]
+		>( [] );
 
 		const noticeOperations = useMemo( () => {
 			/**
 			 * Function passed down as a prop that adds a new notice.
 			 *
-			 * @param {Object} notice Notice to add.
+			 * @param notice Notice to add.
 			 */
-			const createNotice = ( notice ) => {
+			const createNotice = ( notice: typeof noticeList[ number ] ) => {
 				const noticeToAdd = notice.id
 					? notice
 					: { ...notice, id: uuid() };
@@ -44,9 +72,10 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 				/**
 				 * Function passed as a prop that adds a new error notice.
 				 *
-				 * @param {string} msg Error message of the notice.
+				 * @param msg Error message of the notice.
 				 */
-				createErrorNotice: ( msg ) => {
+				createErrorNotice: ( msg: string ) => {
+					// @ts-expect-error TODO: Missing `id`, potentially a bug
 					createNotice( {
 						status: 'error',
 						content: msg,
@@ -56,9 +85,9 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 				/**
 				 * Removes a notice by id.
 				 *
-				 * @param {string} id Id of the notice to remove.
+				 * @param id Id of the notice to remove.
 				 */
-				removeNotice: ( id ) => {
+				removeNotice: ( id: string ) => {
 					setNoticeList( ( current ) =>
 						current.filter( ( notice ) => notice.id !== id )
 					);
@@ -93,7 +122,8 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 		);
 	}
 
-	let isForwardRef;
+	let isForwardRef: boolean;
+	// @ts-expect-error - `render` will only be present when OriginalComponent was wrapped with forwardRef().
 	const { render } = OriginalComponent;
 	// Returns a forwardRef if OriginalComponent appears to be a forwardRef.
 	if ( typeof render === 'function' ) {
@@ -101,4 +131,4 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 		return forwardRef( Component );
 	}
 	return Component;
-} );
+}, 'withNotices' );
