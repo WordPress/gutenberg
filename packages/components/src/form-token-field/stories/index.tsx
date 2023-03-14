@@ -124,6 +124,11 @@ WithCustomRenderItem.args = {
 	),
 };
 
+/**
+ * Only values for which the `__experimentalValidateInput` function returns
+ * `true` will be tokenized. (This is still an experimental feature and is
+ * subject to change.)
+ */
 export const WithValidatedInput: ComponentStory< typeof FormTokenField > =
 	DefaultTemplate.bind( {} );
 WithValidatedInput.args = {
