@@ -358,7 +358,14 @@
 					"slug": "grid",
 					"className": "is-layout-grid",
 					"displayMode": "grid",
-					"baseStyles": [],
+					"baseStyles": [
+						{
+							"selector": " > *",
+							"rules": {
+								"margin": "0"
+							}
+						}
+					],
 					"spacingStyles": [
 						{
 							"selector": "",

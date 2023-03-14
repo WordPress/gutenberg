@@ -1341,7 +1341,8 @@ class WP_Theme_JSON_Gutenberg {
 				$base_style_rules = _wp_array_get( $layout_definition, array( 'baseStyles' ), array() );
 
 				if (
-					! empty( $class_name )
+					! empty( $class_name ) &&
+					is_array( $base_style_rules )
 				) {
 					// Output display mode. This requires special handling as `display` is not exposed in `safe_style_css_filter`.
 					if (

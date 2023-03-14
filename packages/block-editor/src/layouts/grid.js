@@ -126,6 +126,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 	return (
 		<UnitControl
 			size={ '__unstable-large' }
+			label={ __( 'Minimum column width ' ) }
 			onChange={ ( value ) => {
 				onChange( {
 					...layout,

@@ -281,8 +281,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
+		$is_responsive = array_key_exists( 'isResponsive', $layout ) ? $layout['isResponsive'] : true;
 
-		if ( $layout['isResponsive'] ) {
+		if ( $is_responsive ) {
 			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
 
 			$layout_styles[] = array(
