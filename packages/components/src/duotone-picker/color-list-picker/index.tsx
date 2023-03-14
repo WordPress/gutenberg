@@ -7,11 +7,11 @@ import { swatch } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Button from '../button';
-import ColorPalette from '../color-palette';
-import ColorIndicator from '../color-indicator';
-import Icon from '../icon';
-import { HStack } from '../h-stack';
+import Button from '../../button';
+import ColorPalette from '../../color-palette';
+import ColorIndicator from '../../color-indicator';
+import Icon from '../../icon';
+import { HStack } from '../../h-stack';
 import type { ColorListPickerProps, ColorOptionProps } from './types';
 
 function ColorOption( {

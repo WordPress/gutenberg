@@ -12,7 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ColorListPicker from '../color-list-picker';
+import ColorListPicker from './color-list-picker';
 import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
 
