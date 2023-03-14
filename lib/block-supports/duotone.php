@@ -763,12 +763,12 @@ class WP_Duotone {
 	}
 
 	/**
-	 * Check if we have a duotone preset string
+	 * Check if we have a valid duotone preset
 	 */
 	static function is_preset( $duotone_attr ) {
-		// TODO: Should we also check if the array_key_exists in self::$global_styles_presets?
-		// Potential route — rename to is_preset_format and have another check if it's within the global styles presets.
-		return strpos( $duotone_attr, 'var:preset|duotone|' ) === 0 || strpos( $duotone_attr, 'var(--wp--preset--duotone--' ) === 0;
+		$slug = WP_Duotone::gutenberg_get_slug_from_attr( $duotone_attr );
+
+		return array_key_exists( $slug, WP_Duotone::$global_styles_presets );
 	}
 }
 
