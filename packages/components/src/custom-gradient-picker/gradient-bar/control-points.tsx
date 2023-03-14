@@ -128,21 +128,20 @@ function ControlPoints( {
 	const controlPointMoveState = useRef< ControlPointMoveState >();
 
 	const onMouseMove = ( event: MouseEvent ) => {
-		const relativePosition = getHorizontalRelativeGradientPosition(
-			event.clientX,
-			gradientPickerDomRef.current
-		);
-
-		const { initialPosition, index, significantMoveHappened } =
-			controlPointMoveState?.current ?? {};
 		if (
 			controlPointMoveState.current === undefined ||
-			initialPosition === undefined ||
-			index === undefined ||
-			relativePosition === undefined
+			gradientPickerDomRef.current === null
 		) {
 			return;
 		}
+
+		const relativePosition = getHorizontalRelativeGradientPosition(
+			event.clientX,
+			gradientPickerDomRef.current
+		) as number;
+
+		const { initialPosition, index, significantMoveHappened } =
+			controlPointMoveState.current;
 
 		if (
 			! significantMoveHappened &&
