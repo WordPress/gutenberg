@@ -18,7 +18,7 @@ export type CustomGradientPickerProps = {
 	 *
 	 * @default 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'
 	 */
-	value?: string;
+	value?: string | null;
 	/**
 	 * The function called when a new gradient has been defined. It is passed to
 	 * the `currentGradient` as an arugment.

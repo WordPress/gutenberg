@@ -37,7 +37,7 @@ function hasUnsupportedLength( item: gradientParser.ColorStop ) {
 	return item.length === undefined || item.length.type !== '%';
 }
 
-export function getGradientAstWithDefault( value?: string ) {
+export function getGradientAstWithDefault( value?: string | null ) {
 	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
 	// More information of its structure available at https://www.npmjs.com/package/gradient-parser#ast.
 	let gradientAST: gradientParser.GradientNode;
