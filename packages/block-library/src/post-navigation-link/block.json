@@ -28,6 +28,10 @@
 		"arrow": {
 			"type": "string",
 			"default": "none"
+		},
+		"arrowOnly": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

@@ -564,7 +564,7 @@ Displays the next or previous post link that is adjacent to the current post. ([
 -	**Name:** core/post-navigation-link
 -	**Category:** theme
 -	**Supports:** anchor, color (background, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** arrow, label, linkLabel, showTitle, textAlign, type
+-	**Attributes:** arrow, arrowOnly, label, linkLabel, showTitle, textAlign, type
 
 ## Post Template
 

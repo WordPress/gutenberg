@@ -48,13 +48,13 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 
 	// If a custom label is provided, make this a link.
 	// `$label` is used to prepend the provided label, if we want to show the page title as well.
-	if ( isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ) {
+	if ( isset( $attributes['label'] ) && ! empty( $attributes['label'] ) && ! $attributes['arrowOnly'] ) {
 		$label = "{$attributes['label']}";
 		$link  = $label;
 	}
 
 	// If we want to also show the page title, make the page title a link and prepend the label.
-	if ( isset( $attributes['showTitle'] ) && $attributes['showTitle'] ) {
+	if ( isset( $attributes['showTitle'] ) && $attributes['showTitle'] && ! $attributes['arrowOnly'] ) {
 		/*
 		 * If the label link option is not enabled but there is a custom label,
 		 * display the custom label as text before the linked title.
@@ -83,14 +83,25 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		}
 	}
 
-	// Display arrows.
-	if ( isset( $attributes['arrow'] ) && ! empty( $attributes['arrow'] ) && 'none' !== $attributes['arrow'] ) {
+	// Display arrows outside the link.
+	if ( isset( $attributes['arrow'] ) && ! empty( $attributes['arrow'] ) && 'none' !== $attributes['arrow'] && ! $attributes['arrowOnly'] ) {
 		$arrow = $arrow_map[ $attributes['arrow'] ][ $navigation_type ];
 
 		if ( 'next' === $navigation_type ) {
 			$format = '%link <span class="wp-block-post-navigation-link__arrow-next is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>';
 		} else {
 			$format = '<span class="wp-block-post-navigation-link__arrow-previous is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span> %link';
+		}
+	}
+
+	// Display arrows but no text inside the link.
+	if ( isset( $attributes['arrowOnly'] ) && ! empty( $attributes['arrowOnly'] ) && 'none' !== $attributes['arrow'] ) {
+		$arrow = $arrow_map[ $attributes['arrow'] ][ $navigation_type ];
+
+		if ( 'next' === $navigation_type ) {
+			$link = '<span class="wp-block-post-navigation-link__arrow-next is-arrow-' . $attributes['arrow'] . '" aria-label="' . _x( 'Next', 'label for next post link' ) . '">' . $arrow . '</span>';
+		} else {
+			$link = '<span class="wp-block-post-navigation-link__arrow-previous is-arrow-' . $attributes['arrow'] . '" aria-label="' . _x( 'Previous', 'label for previous post link' ) . '">' . $arrow . '</span>';
 		}
 	}
 

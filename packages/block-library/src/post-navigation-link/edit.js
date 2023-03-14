@@ -22,7 +22,15 @@ import {
 import { __, _x } from '@wordpress/i18n';
 
 export default function PostNavigationLinkEdit( {
-	attributes: { type, label, showTitle, textAlign, linkLabel, arrow },
+	attributes: {
+		type,
+		label,
+		showTitle,
+		textAlign,
+		linkLabel,
+		arrow,
+		arrowOnly,
+	},
 	setAttributes,
 } ) {
 	const isNext = type === 'next';
@@ -61,6 +69,7 @@ export default function PostNavigationLinkEdit( {
 						onChange={ () =>
 							setAttributes( {
 								showTitle: ! showTitle,
+								arrowOnly: false,
 							} )
 						}
 					/>
@@ -112,6 +121,19 @@ export default function PostNavigationLinkEdit( {
 							) }
 						/>
 					</ToggleGroupControl>
+					{ arrow !== 'none' && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Display arrow without text' ) }
+							checked={ !! arrowOnly }
+							onChange={ () =>
+								setAttributes( {
+									arrowOnly: ! arrowOnly,
+									showTitle: false,
+								} )
+							}
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<BlockControls>
@@ -123,24 +145,38 @@ export default function PostNavigationLinkEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ ! isNext && displayArrow && (
+				{ ! isNext && displayArrow && arrowOnly && (
+					<a
+						href="#post-navigation-pseudo-link"
+						onClick={ ( event ) => event.preventDefault() }
+					>
+						<span
+							className={ `wp-block-post-navigation-link__arrow-previous is-arrow-${ arrow }` }
+						>
+							{ displayArrow }
+						</span>
+					</a>
+				) }
+				{ ! isNext && displayArrow && ! arrowOnly && (
 					<span
 						className={ `wp-block-post-navigation-link__arrow-previous is-arrow-${ arrow }` }
 					>
 						{ displayArrow }
 					</span>
 				) }
-				<RichText
-					tagName="a"
-					aria-label={ ariaLabel }
-					placeholder={ placeholder }
-					value={ label }
-					allowedFormats={ [ 'core/bold', 'core/italic' ] }
-					onChange={ ( newLabel ) =>
-						setAttributes( { label: newLabel } )
-					}
-				/>
-				{ showTitle && (
+				{ ! arrowOnly && (
+					<RichText
+						tagName="a"
+						aria-label={ ariaLabel }
+						placeholder={ placeholder }
+						value={ label }
+						allowedFormats={ [ 'core/bold', 'core/italic' ] }
+						onChange={ ( newLabel ) =>
+							setAttributes( { label: newLabel } )
+						}
+					/>
+				) }
+				{ showTitle && ! arrowOnly && (
 					<a
 						href="#post-navigation-pseudo-link"
 						onClick={ ( event ) => event.preventDefault() }
@@ -148,13 +184,25 @@ export default function PostNavigationLinkEdit( {
 						{ __( 'An example title' ) }
 					</a>
 				) }
-				{ isNext && displayArrow && (
+				{ isNext && displayArrow && ! arrowOnly && (
 					<span
 						className={ `wp-block-post-navigation-link__arrow-next is-arrow-${ arrow }` }
 						aria-hidden={ true }
 					>
 						{ displayArrow }
 					</span>
+				) }
+				{ isNext && displayArrow && arrowOnly && (
+					<a
+						href="#post-navigation-pseudo-link"
+						onClick={ ( event ) => event.preventDefault() }
+					>
+						<span
+							className={ `wp-block-post-navigation-link__arrow-next is-arrow-${ arrow }` }
+						>
+							{ displayArrow }
+						</span>
+					</a>
 				) }
 			</div>
 		</>
