@@ -18,10 +18,10 @@ function gutenberg_find_first_block( $block_name, $blocks ) {
 			return $block;
 		}
 		if ( ! empty( $block['innerBlocks'] ) ) {
-			$post_content = gutenberg_find_first_block( $block_name, $block['innerBlocks'] );
+			$found_block = gutenberg_find_first_block( $block_name, $block['innerBlocks'] );
 
-			if ( ! empty( $post_content ) ) {
-				return $post_content;
+			if ( ! empty( $found_block ) ) {
+				return $found_block;
 			}
 		}
 	}
