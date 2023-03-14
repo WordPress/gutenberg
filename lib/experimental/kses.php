@@ -98,7 +98,7 @@ add_filter( 'safecss_filter_attr_allow_css', 'allow_filter_in_styles', 10, 2 );
  */
 function allow_grid_functions_in_styles( $allow_css, $css_test_string ) {
 	if ( preg_match(
-		'/^grid-template-columns:\s*repeat\(auto-fill,[0-9,a-z\s\(\)]*\)$/',
+		'/^grid-template-columns:\s*repeat\([0-9,a-z-\s\(\)]*\)$/',
 		$css_test_string
 	) ) {
 		return true;

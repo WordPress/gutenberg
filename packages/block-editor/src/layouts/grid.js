@@ -6,6 +6,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	Flex,
 	FlexItem,
+	RangeControl,
+	ToggleControl,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 
@@ -23,15 +25,33 @@ export default {
 		layout = {},
 		onChange,
 	} ) {
+		const { isResponsive = true } = layout;
+
 		return (
 			<>
-				<Flex>
+				<Flex direction="column">
 					<FlexItem>
-						<GridLayoutMinimumWidthControl
+						<GridLayoutResponsiveControl
 							layout={ layout }
 							onChange={ onChange }
 						/>
 					</FlexItem>
+					{ isResponsive && (
+						<FlexItem>
+							<GridLayoutMinimumWidthControl
+								layout={ layout }
+								onChange={ onChange }
+							/>
+						</FlexItem>
+					) }
+					{ ! isResponsive && (
+						<FlexItem>
+							<GridLayoutColumnsControl
+								layout={ layout }
+								onChange={ onChange }
+							/>
+						</FlexItem>
+					) }
 				</Flex>
 			</>
 		);
@@ -47,7 +67,11 @@ export default {
 		hasBlockGapSupport,
 		layoutDefinitions,
 	} ) {
-		const { minimumColumnWidth = '12rem' } = layout;
+		const {
+			isResponsive = true,
+			minimumColumnWidth = '12rem',
+			numberOfColumns = 3,
+		} = layout;
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
@@ -60,9 +84,13 @@ export default {
 		let output = '';
 		const rules = [];
 
-		if ( minimumColumnWidth ) {
+		if ( isResponsive && minimumColumnWidth ) {
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(${ minimumColumnWidth }, 1fr))`
+			);
+		} else if ( numberOfColumns ) {
+			rules.push(
+				`grid-template-columns: repeat(${ numberOfColumns }, 1fr)`
 			);
 		}
 
@@ -105,6 +133,44 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				} );
 			} }
 			value={ minimumColumnWidth }
+		/>
+	);
+}
+
+// Enables setting number of grid columns
+function GridLayoutColumnsControl( { layout, onChange } ) {
+	const { numberOfColumns = 3 } = layout;
+
+	return (
+		<RangeControl
+			label={ __( 'Columns' ) }
+			value={ numberOfColumns }
+			onChange={ ( value ) => {
+				onChange( {
+					...layout,
+					numberOfColumns: value,
+				} );
+			} }
+			min={ 1 }
+			max={ 12 }
+		/>
+	);
+}
+
+// Toggle between responsive and fixed column grid.
+function GridLayoutResponsiveControl( { layout, onChange } ) {
+	const { isResponsive = true } = layout;
+
+	return (
+		<ToggleControl
+			label={ __( 'Responsive' ) }
+			checked={ isResponsive }
+			onChange={ () => {
+				onChange( {
+					...layout,
+					isResponsive: ! isResponsive,
+				} );
+			} }
 		/>
 	);
 }
