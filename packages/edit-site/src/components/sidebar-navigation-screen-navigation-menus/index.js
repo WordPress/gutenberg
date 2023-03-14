@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { BlockEditorProvider, Inserter } from '@wordpress/block-editor';
+import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -14,29 +14,27 @@ import { createBlock } from '@wordpress/blocks';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useHistory } from '../routes';
 import NavigationMenuContent from './navigation-menu-content';
-import SidebarButton from '../sidebar-button';
 import { NavigationMenuLoader } from './loader';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 
 const noop = () => {};
-const NAVIGATION_MENUS_QUERY = { per_page: -1, status: 'publish' };
+const NAVIGATION_MENUS_QUERY = {
+	per_page: 1,
+	status: 'publish',
+	order: 'desc',
+	orderby: 'date',
+};
 
 function SidebarNavigationScreenWrapper( { children, actions } ) {
 	return (
 		<SidebarNavigationScreen
 			title={ __( 'Navigation' ) }
 			actions={ actions }
-			content={
-				<>
-					<p className="edit-site-sidebar-navigation-screen-navigation-menus__description">
-						{ __(
-							'Browse your site, edit pages, and manage your primary navigation menu.'
-						) }
-					</p>
-					{ children }
-				</>
-			}
+			description={ __(
+				'Browse your site, edit pages, and manage your primary navigation menu.'
+			) }
+			content={ children }
 		/>
 	);
 }
@@ -64,17 +62,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 			};
 		}, [] );
 
-	// Sort navigation menus by date.
-	const orderedNavigationMenus = useMemo(
-		() =>
-			navigationMenus?.sort( ( menuA, menuB ) => {
-				const menuADate = new Date( menuA.date );
-				const menuBDate = new Date( menuB.date );
-				return menuADate.getTime() > menuBDate.getTime();
-			} ),
-		[ navigationMenus ]
-	);
-	const firstNavigationMenu = orderedNavigationMenus?.[ 0 ]?.id;
+	const firstNavigationMenu = navigationMenus?.[ 0 ]?.id;
 	const blocks = useMemo( () => {
 		return [
 			createBlock( 'core/navigation', { ref: firstNavigationMenu } ),
@@ -131,22 +119,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 			onChange={ noop }
 			onInput={ noop }
 		>
-			<SidebarNavigationScreenWrapper
-				actions={
-					<Inserter
-						rootClientId={ blocks[ 0 ].clientId }
-						position="bottom right"
-						isAppender
-						selectBlockOnInsert={ false }
-						shouldDirectInsert={ false }
-						__experimentalIsQuick
-						toggleProps={ {
-							as: SidebarButton,
-							label: __( 'Add menu item' ),
-						} }
-					/>
-				}
-			>
+			<SidebarNavigationScreenWrapper>
 				<div className="edit-site-sidebar-navigation-screen-navigation-menus__content">
 					<NavigationMenuContent
 						rootClientId={ blocks[ 0 ].clientId }

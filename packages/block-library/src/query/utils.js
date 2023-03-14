@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -63,6 +58,24 @@ export const getEntitiesInfo = ( entities ) => {
 };
 
 /**
+ * Helper util to return a value from a certain path of the object.
+ * Path is specified as a string of properties, separated by dots,
+ * for example: "parent.child".
+ *
+ * @param {Object} object Input object.
+ * @param {string} path   Path to the object property.
+ * @return {*} Value of the object property at the specified path.
+ */
+export const getValueFromObjectPath = ( object, path ) => {
+	const normalizedPath = path.split( '.' );
+	let value = object;
+	normalizedPath.forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
+
+/**
  * Helper util to map records to add a `name` prop from a
  * provided path, in order to handle all entities in the same
  * fashion(implementing`IHasNameAndId` interface).
@@ -74,7 +87,7 @@ export const getEntitiesInfo = ( entities ) => {
 export const mapToIHasNameAndId = ( entities, path ) => {
 	return ( entities || [] ).map( ( entity ) => ( {
 		...entity,
-		name: decodeEntities( get( entity, path ) ),
+		name: decodeEntities( getValueFromObjectPath( entity, path ) ),
 	} ) );
 };
 
