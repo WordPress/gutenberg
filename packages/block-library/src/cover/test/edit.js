@@ -1,47 +1,13 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
- * WordPress dependencies
- */
-import { createRegistry, dispatch } from '@wordpress/data';
-import { SlotFillProvider } from '@wordpress/components';
-import {
-	registerBlockType,
-	unregisterBlockType,
-	createBlock,
-} from '@wordpress/blocks';
-import {
-	store as blockEditorStore,
-	BlockTools,
-	WritingFlow,
-	ObserveTyping,
-	BlockEditorKeyboardShortcuts,
-	BlockControls,
-} from '@wordpress/block-editor';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
-
-/**
  * Internal dependencies
  */
-import * as selectors from '../../../../block-editor/src/store/selectors';
-import reducer from '../../../../block-editor/src/store/reducer';
-import * as actions from '../../../../block-editor/src/store/actions';
-
-jest.mock( '@wordpress/block-editor', () => ( {
-	...jest.requireActual( '@wordpress/block-editor' ),
-	useBlockProps: () => ( {} ),
-} ) );
-
-/**
- * Internal dependencies
- */
-import { CoverEdit } from '../edit';
-import settings from '../index';
-import metadata from '../block.json';
+import Editor from './mock-editor';
 
 function setup( jsx ) {
 	return {
@@ -49,74 +15,12 @@ function setup( jsx ) {
 		...render( jsx ),
 	};
 }
-const setAttributes = jest.fn();
-const setOverlayColor = jest.fn();
-const toggleSelection = jest.fn();
-
-const defaultAttributes = {
-	alt: '',
-	backgroundType: 'image',
-	dimRatio: 100,
-	hasParallax: false,
-	isDark: false,
-	isRepeated: false,
-	useFeaturedImage: false,
-};
-const defaultProps = {
-	attributes: defaultAttributes,
-	coverRef: undefined,
-	overlayColor: { color: undefined, class: undefined },
-	isSelected: true,
-	setAttributes,
-	setOverlayColor,
-	toggleSelection,
-	context: {},
-};
-
-const Wrapper = ( { children } ) => (
-	<ShortcutProvider>
-		<SlotFillProvider>
-			<BlockTools>
-				<BlockEditorKeyboardShortcuts.Register />
-				<WritingFlow>
-					<ObserveTyping>{ children }</ObserveTyping>
-				</WritingFlow>
-				<BlockControls.Slot />
-			</BlockTools>
-		</SlotFillProvider>
-	</ShortcutProvider>
-);
-
-let block;
-beforeEach( () => {
-	createRegistry().registerStore( blockEditorStore, {
-		actions,
-		selectors,
-		reducer,
-	} );
-	registerBlockType( 'core/cover', { ...metadata, ...settings } );
-	block = createBlock( 'core/cover', {} );
-	dispatch( blockEditorStore ).resetBlocks( [ block ] );
-	dispatch( blockEditorStore ).selectBlock( block.clientId );
-	setAttributes.mockClear();
-} );
-
-afterEach( () => {
-	unregisterBlockType( 'core/cover' );
-	dispatch( blockEditorStore ).removeBlock( block.clientId );
-} );
 
 describe( 'Cover edit', () => {
 	describe( 'Placeholder', () => {
-		test( 'shows placeholder if background image and color not set', () => {
-			setup(
-				<Wrapper>
-					<CoverEdit
-						{ ...defaultProps }
-						clientId={ block.clientId }
-					/>
-				</Wrapper>
-			);
+		test( 'shows placeholder if background image and color not set', async () => {
+			setup( <Editor testBlock={ { name: 'core/cover' } } /> );
+
 			expect(
 				screen.getByRole( 'group', {
 					name: 'To edit this block, you need permission to upload media.',
@@ -124,15 +28,14 @@ describe( 'Cover edit', () => {
 			).toBeInTheDocument();
 		} );
 
-		test( 'does not show placeholder if color is set', () => {
-			setup(
-				<Wrapper>
-					<CoverEdit
-						{ ...defaultProps }
-						clientId={ block.clientId }
-						overlayColor={ { color: '#ffffff' } }
-					/>
-				</Wrapper>
+		test( 'does not show placeholder if background color selected from placeholder', async () => {
+			const { user } = setup(
+				<Editor testBlock={ { name: 'core/cover' } } />
+			);
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Color: Black',
+				} )
 			);
 			expect(
 				screen.queryByRole( 'group', {
@@ -141,22 +44,87 @@ describe( 'Cover edit', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		test( 'sets overlay color when a color button is clicked', async () => {
+		test( 'shows block toolbar if selected block', async () => {
 			const { user } = setup(
-				<Wrapper>
-					<CoverEdit
-						{ ...defaultProps }
-						clientId={ block.clientId }
-					/>
-				</Wrapper>
+				<Editor testBlock={ { name: 'core/cover' } } />
 			);
 			await user.click(
 				screen.getByRole( 'button', {
 					name: 'Color: Black',
 				} )
 			);
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Select Cover',
+				} )
+			);
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Change content position',
+				} )
+			).toBeInTheDocument();
+		} );
 
-			expect( setOverlayColor ).toHaveBeenCalledWith( '#000000', 0 );
+		test( 'shows inspector panel if selected block', async () => {
+			const { user } = setup(
+				<Editor testBlock={ { name: 'core/cover' } } />
+			);
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Color: Black',
+				} )
+			);
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Select Cover',
+				} )
+			);
+
+			await user.click(
+				screen.getByRole( 'tab', {
+					name: 'Styles',
+				} )
+			);
+			expect( screen.getByText( 'Overlay' ) ).toBeInTheDocument();
+		} );
+
+		test( 'applies selected opacity to block', async () => {
+			const { user, container } = setup(
+				<Editor testBlock={ { name: 'core/cover' } } />
+			);
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Color: Black',
+				} )
+			);
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Select Cover',
+				} )
+			);
+			// eslint-disable-next-line testing-library/no-node-access
+			const overlay = container.getElementsByClassName(
+				'wp-block-cover__background'
+			);
+
+			expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
+
+			await user.click(
+				screen.getByRole( 'tab', {
+					name: 'Styles',
+				} )
+			);
+
+			fireEvent.change(
+				screen.getByRole( 'spinbutton', {
+					name: 'Overlay opacity',
+				} ),
+				{
+					target: { value: '40' },
+				}
+			);
+
+			expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-40' );
 		} );
 	} );
 } );
