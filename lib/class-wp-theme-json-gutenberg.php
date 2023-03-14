@@ -868,6 +868,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( null !== $duotone_selector ) {
 				static::$blocks_metadata[ $block_name ]['duotone'] = $duotone_selector;
 			}
+
 			// If the block has style variations, append their selectors to the block metadata.
 			if ( ! empty( $block_type->styles ) ) {
 				$style_selectors = array();
@@ -3449,6 +3450,17 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	protected static function get_block_selectors( $block_type, $root_selector ) {
 		if ( ! empty( $block_type->selectors ) ) {
+			$in_editor = false;
+
+			if ( function_exists( 'get_current_screen' ) ) {
+				$current_screen = get_current_screen();
+				$in_editor      = $current_screen && $current_screen->is_block_editor;
+			}
+
+			if ( $in_editor && ! empty( $block_type->editor_selectors ) ) {
+				return array_merge( $block_type->selectors, $block_type->editor_selectors );
+			}
+
 			return $block_type->selectors;
 		}
 

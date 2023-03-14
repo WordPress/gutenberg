@@ -4,7 +4,7 @@ Block Selectors is the API that allows blocks to customize the CSS selector used
 when their styles are generated.
 
 A block may customize its CSS selectors at three levels: root, feature, and
-subfeature.
+subfeature. Each may also be overridden with editor-only selectors.
 
 ## Root Selector
 
@@ -114,3 +114,32 @@ selector, `.my-custom-block-selector`.
 
 For a subfeature such as `typography.font-size`, it would fallback to its parent
 feature's selector given that is present, i.e. `.my-custom-block-selector > h2`.
+
+## Editor-only Selectors
+
+There are scenarios in which a block might need different markup within the
+editor compared to the frontend e.g. inline cropping of the Image block. Some
+generated styles may then need to be applied to different, or multiple,
+elements.
+
+Continuing with the Image cropping example, the image border styles need to also
+be applied to the cropping area. If the selector for the cropping area is added
+to the normal `selectors` config for the block, it would be output unnecessarily
+on the frontend.
+
+To avoid this, and include the selector for the editor only, the selectors for the border feature can be
+overridden via the `editorSelectors` config.
+
+### Example
+```json
+{
+	...
+	"selectors": {
+		"root": ".wp-block-image",
+		"border": ".wp-block-image img"
+	},
+	"editorSelectors": {
+		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area"
+	},
+}
+```
