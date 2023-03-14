@@ -38,17 +38,6 @@ jobs:
                   node-version-file: '.nvmrc'
                   cache: npm
 
-            - name: Npm install
-              run: |
-                  npm ci
-
-            - name: Install specific versions of the themes used in tests
-              run: |
-                  npm run wp-env start
-                  npm run wp-env -- run tests-cli "wp theme update twentytwentyone --version=1.7"
-                  npm run wp-env -- run tests-cli "wp theme update twentytwentythree --version=1.0"
-                  npm run wp-env stop
-
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
               run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
