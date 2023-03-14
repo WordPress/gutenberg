@@ -173,7 +173,7 @@ function ControlPoints( {
 	// Adding `cleanEventListeners` to the dependency array below requires the function itself to be wrapped in a `useCallback`
 	// This memoization would prevent the event listeners from being properly cleaned.
 	// Instead, we'll pass a ref to the function in our `useEffect` so `cleanEventListeners` itself is no longer a dependency.
-	const cleanEventListenersRef = useRef< ( () => void ) | undefined >();
+	const cleanEventListenersRef = useRef< () => void >();
 	cleanEventListenersRef.current = cleanEventListeners;
 
 	useEffect( () => {
