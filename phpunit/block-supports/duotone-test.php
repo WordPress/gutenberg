@@ -37,4 +37,24 @@ class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( $expected, gutenberg_render_duotone_support( $block_content, $block ) );
 	}
 
+	public function data_gutenberg_get_slug_from_attr() {
+		return array(
+			'pipe-slug'   => array( 'var:preset|duotone|blue-orange', 'blue-orange' ),
+			'css-var'   => array( 'var(--wp--preset--duotone--blue-orange)', 'blue-orange' ),
+			'css-var-weird-chars'   => array( 'var(--wp--preset--duotone--.)', '.' ),
+			'css-var-missing-end-parenthesis'   => array( 'var(--wp--preset--duotone--blue-orange', '' ),
+			'invalid'   => array( 'not a valid attribute', '' ),
+			'css-var-no-value'   => array( 'var(--wp--preset--duotone--)', '' ),
+			'pipe-slug-no-value'   => array( 'var:preset|duotone|', '' ),
+			'css-var-spaces'   => array( 'var(--wp--preset--duotone--    ', '' ),
+			'pipe-slug-spaces'   => array( 'var:preset|duotone|  ', '' ),
+		);
+	}
+
+	/**
+	 * @dataProvider data_gutenberg_get_slug_from_attr
+	 */
+	public function test_gutenberg_get_slug_from_attr( $data_attr, $expected ) {
+		$this->assertSame( $expected, WP_Duotone::gutenberg_get_slug_from_attr( $data_attr ) );
+	}
 }
