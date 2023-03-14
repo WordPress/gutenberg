@@ -23,6 +23,7 @@
 -   `navigateRegions` HOC: Convert to TypeScript ([#48632](https://github.com/WordPress/gutenberg/pull/48632)).
 -   `withSpokenMessages`: HOC: Convert to TypeScript ([#48163](https://github.com/WordPress/gutenberg/pull/48163)).
 -   `DuotonePicker`, `DuotoneSwatch`: Convert to TypeScript ([#49060](https://github.com/WordPress/gutenberg/pull/49060)).
+-   `ToolbarButton`: Convert to TypeScript ([#47750](https://github.com/WordPress/gutenberg/pull/47750)).
 -   `DimensionControl(Experimental)`: Convert to TypeScript ([#47351](https://github.com/WordPress/gutenberg/pull/47351)).
 -   `PaletteEdit`: Convert to TypeScript ([#47764](https://github.com/WordPress/gutenberg/pull/47764)).
 

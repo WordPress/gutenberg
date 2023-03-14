@@ -5,19 +5,6 @@ import { createRegistry } from '../registry';
 import createReduxStore from '../redux-store';
 import { unlock } from '../private-apis';
 
-/**
- * WordPress dependencies
- */
-
-beforeEach( () => {
-	jest.useFakeTimers( { legacyFakeTimers: true } );
-} );
-
-afterEach( () => {
-	jest.runOnlyPendingTimers();
-	jest.useRealTimers();
-} );
-
 describe( 'Private data APIs', () => {
 	let registry;
 

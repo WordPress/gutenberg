@@ -51,7 +51,19 @@ function Edit() {
 
 ## Props
 
-This component accepts [the same API of the Button](/packages/components/src/button/README.md#props) component.
+This component accepts [the same API of the Button](/packages/components/src/button/README.md#props) component in addition to:
+
+#### `containerClassName`: `string`
+
+An optional additional class name to apply to the button container.
+
+-   Required: No
+
+#### `subscript`: `string`
+
+An optional subscript for the button.
+
+-   Required: No
 
 ## Related components
 

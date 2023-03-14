@@ -58,7 +58,7 @@ Generic Playwright utilities for interacting with web pages.
 
 ```js
 const pageUtils = new PageUtils( { page } );
-await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+await pageUtils.pressKeys( 'primary+a' );
 ```
 
 ### RequestUtils
