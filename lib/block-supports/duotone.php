@@ -290,59 +290,6 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 	}
 }
 
-class WP_Duotone {
-	static function get_id_selector_property_and_maybe_svg( $duotone_attr, $duotone_support ) {
-		$is_preset = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === 0;
-		$is_css    = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === false;
-		$is_custom = is_array( $duotone_attr );
-		$filter_svg = null;
-		// Generate the pieces needed for rendering a duotone to the page.
-		if ( $is_preset ) {
-			// Extract the slug from the preset variable string.
-			$slug = str_replace( 'var:preset|duotone|', '', $duotone_attr );
-
-			// Utilize existing preset CSS custom property.
-			$filter_property = "var(--wp--preset--duotone--$slug)";
-		} elseif ( $is_css ) {
-			// Build a unique slug for the filter based on the CSS value.
-			$slug = wp_unique_id( sanitize_key( $duotone_attr . '-' ) );
-
-			// Pass through the CSS value.
-			$filter_property = $duotone_attr;
-		} elseif ( $is_custom ) {
-			// Build a unique slug for the filter based on the array of colors.
-			$slug = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
-
-			// This has the same shape as a preset, so it can be used in place of a
-			// preset when getting the filter property and SVG filter.
-			$filter_data = array(
-				'slug'   => $slug,
-				'colors' => $duotone_attr,
-			);
-
-			// Build a customized CSS filter property for unique slug.
-			$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
-
-			// SVG will be output on the page later.
-			$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
-		}
-
-		// - Applied as a class attribute to the block wrapper.
-		// - Used as a selector to apply the filter to the block.
-		$filter_id = gutenberg_get_duotone_filter_id( array( 'slug' => $slug ) );
-
-		// Build the CSS selectors to which the filter will be applied.
-		$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_support );
-
-		return array(
-			'filter_id' => $filter_id,
-			'selector' => $selector,
-			'filter_property' => $filter_property,
-			'filter_svg' => $filter_svg
-		);
-	}
-}
-
 /**
  * Returns the prefixed id for the duotone filter for use as a CSS id.
  *
@@ -504,13 +451,47 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
 	$duotone_attr = $block['attrs']['style']['color']['duotone'];
 
-	list(
-		'filter_id' => $filter_id,
-		'selector' => $selector,
-		'filter_property' => $filter_property,
-		'filter_svg' => $filter_svg
-	) = WP_Duotone::get_id_selector_property_and_maybe_svg( $duotone_attr, $duotone_support );
+	$is_preset = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === 0;
+	$is_css    = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === false;
+	$is_custom = is_array( $duotone_attr );
 
+	// Generate the pieces needed for rendering a duotone to the page.
+	if ( $is_preset ) {
+		// Extract the slug from the preset variable string.
+		$slug = str_replace( 'var:preset|duotone|', '', $duotone_attr );
+
+		// Utilize existing preset CSS custom property.
+		$filter_property = "var(--wp--preset--duotone--$slug)";
+	} elseif ( $is_css ) {
+		// Build a unique slug for the filter based on the CSS value.
+		$slug = wp_unique_id( sanitize_key( $duotone_attr . '-' ) );
+
+		// Pass through the CSS value.
+		$filter_property = $duotone_attr;
+	} elseif ( $is_custom ) {
+		// Build a unique slug for the filter based on the array of colors.
+		$slug = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
+
+		// This has the same shape as a preset, so it can be used in place of a
+		// preset when getting the filter property and SVG filter.
+		$filter_data = array(
+			'slug'   => $slug,
+			'colors' => $duotone_attr,
+		);
+
+		// Build a customized CSS filter property for unique slug.
+		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
+
+		// SVG will be output on the page later.
+		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
+	}
+
+	// - Applied as a class attribute to the block wrapper.
+	// - Used as a selector to apply the filter to the block.
+	$filter_id = gutenberg_get_duotone_filter_id( array( 'slug' => $slug ) );
+
+	// Build the CSS selectors to which the filter will be applied.
+	$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_support );
 
 	// Calling gutenberg_style_engine_get_stylesheet_from_css_rules ensures that
 	// the styles are rendered in an inline for block supports because we're
