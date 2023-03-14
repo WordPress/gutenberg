@@ -1,13 +1,14 @@
-// @ts-nocheck
-
 /**
  * External dependencies
  */
 import classnames from 'classnames';
+import type { ForwardedRef } from 'react';
+
 /**
  * WordPress dependencies
  */
 import { useContext, forwardRef } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -15,19 +16,22 @@ import Button from '../../button';
 import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import ToolbarButtonContainer from './toolbar-button-container';
+import type { ToolbarButtonProps } from './types';
+import type { WordPressComponentProps } from '../../ui/context';
+import type React from 'react';
 
-function ToolbarButton(
+function UnforwardedToolbarButton(
 	{
-		containerClassName,
-		className,
-		extraProps,
 		children,
-		title,
+		className,
+		containerClassName,
+		extraProps,
 		isActive,
 		isDisabled,
+		title,
 		...props
-	},
-	ref
+	}: WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
+	ref: ForwardedRef< any >
 ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
 
@@ -40,8 +44,14 @@ function ToolbarButton(
 					label={ title }
 					shortcut={ props.shortcut }
 					data-subscript={ props.subscript }
-					onClick={ ( event ) => {
+					onClick={ (
+						event: React.MouseEvent<
+							HTMLButtonElement & HTMLAnchorElement,
+							MouseEvent
+						>
+					) => {
 						event.stopPropagation();
+						// TODO: Possible bug; maybe use onClick instead of props.onClick.
 						if ( props.onClick ) {
 							props.onClick( event );
 						}
@@ -72,18 +82,43 @@ function ToolbarButton(
 			{ ...props }
 			ref={ ref }
 		>
-			{ ( toolbarItemProps ) => (
-				<Button
-					label={ title }
-					isPressed={ isActive }
-					disabled={ isDisabled }
-					{ ...toolbarItemProps }
-				>
-					{ children }
-				</Button>
-			) }
+			{
+				// @ts-expect-error
+				( toolbarItemProps ) => (
+					<Button
+						label={ title }
+						isPressed={ isActive }
+						disabled={ isDisabled }
+						{ ...toolbarItemProps }
+					>
+						{ children }
+					</Button>
+				)
+			}
 		</ToolbarItem>
 	);
 }
 
-export default forwardRef( ToolbarButton );
+/**
+ * ToolbarButton can be used to add actions to a toolbar, usually inside a Toolbar
+ * or ToolbarGroup when used to create general interfaces.
+ *
+ * ```jsx
+ * import { Toolbar, ToolbarButton } from '@wordpress/components';
+ * import { edit } from '@wordpress/icons';
+ *
+ * function MyToolbar() {
+ *   return (
+ *		<Toolbar label="Options">
+ *			<ToolbarButton
+ *				icon={ edit }
+ *				label="Edit"
+ *				onClick={ () => alert( 'Editing' ) }
+ *			/>
+ *		</Toolbar>
+ *   );
+ * }
+ * ```
+ */
+export const ToolbarButton = forwardRef( UnforwardedToolbarButton );
+export default ToolbarButton;

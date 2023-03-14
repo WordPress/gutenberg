@@ -31,11 +31,11 @@
 	"main": "index.js",
 	"dependencies": {
 		"@wordpress/jest-console": "file:../jest-console",
-		"babel-jest": "^27.4.5"
+		"babel-jest": "^29.5.0"
 	},
 	"peerDependencies": {
 		"@babel/core": ">=7",
-		"jest": ">=27"
+		"jest": ">=29"
 	},
 	"publishConfig": {
 		"access": "public"

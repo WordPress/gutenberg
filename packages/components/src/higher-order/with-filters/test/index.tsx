@@ -18,7 +18,11 @@ describe( 'withFilters', () => {
 	const MyComponent = () => <div>My component</div>;
 
 	afterEach( () => {
-		removeAllFilters( hookName );
+		removeAllFilters( hookName, 'test/enhanced-component-override' );
+		removeAllFilters( hookName, 'test/enhanced-component-compose' );
+		removeAllFilters( hookName, 'test/enhanced-component-spy' );
+		removeAllFilters( hookName, 'test/enhanced-component-spy-1' );
+		removeAllFilters( hookName, 'test/enhanced-component-spy-2' );
 	} );
 
 	it( 'should display original component when no filters applied', () => {
