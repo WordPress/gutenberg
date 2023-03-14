@@ -12,6 +12,7 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
+const path = require( 'path' );
 const jest = require( 'jest' );
 const { sync: spawn } = require( 'cross-spawn' );
 
@@ -81,6 +82,11 @@ Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
 		process.env[ envKey ] = getArgFromCLI( argName );
 	}
 } );
+
+// Set default artifacts path.
+if ( ! process.env.WP_ARTIFACTS_PATH ) {
+	process.env.WP_ARTIFACTS_PATH = path.resolve( process.cwd(), 'artifacts' );
+}
 
 const cleanUpPrefixes = [ '--puppeteer-', '--wordpress-' ];
 
