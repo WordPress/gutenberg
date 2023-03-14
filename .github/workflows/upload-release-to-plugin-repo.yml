@@ -12,8 +12,7 @@ jobs:
             latest_stable_tag: ${{ steps.get_latest_stable_tag.outputs.latest_stable_tag }}
 
         steps:
-            - uses: hmarr/debug-action@v2
-            - name: Get latest stable ta
+            - name: Get latest stable tag
               id: get_latest_stable_tag
               run: |
                   curl \
@@ -30,7 +29,6 @@ jobs:
             release_branch: ${{ steps.get_release_branch.outputs.release_branch }}
 
         steps:
-            - uses: hmarr/debug-action@v2
             - name: Compute release branch name
               id: get_release_branch
               env:
@@ -57,12 +55,11 @@ jobs:
                       label: release
 
         steps:
-            - uses: hmarr/debug-action@v2
             - name: Checkout code
               uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   ref: ${{ matrix.branch }}
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
 
             - name: Update the Changelog to include the release notes
               run: |
@@ -123,14 +120,13 @@ jobs:
             endsWith( github.ref, needs.compute-latest-stable.outputs.latest_stable_tag ) &&
             !github.event.release.prerelease && github.event.release.assets[0]
         env:
-            PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
+            PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
             VERSION: ${{ github.event.release.name }}
 
         steps:
-            - uses: hmarr/debug-action@v2
             - name: Check out Gutenberg trunk from WP.org plugin repo
               run: svn checkout "$PLUGIN_REPO_URL/trunk" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
@@ -188,15 +184,13 @@ jobs:
             !endsWith( github.ref, needs.compute-latest-stable.outputs.latest_stable_tag ) &&
             !github.event.release.prerelease && github.event.release.assets[0]
         env:
-            PLUGIN_REPO_URL: 'http://caffeine.ngrok.io/svn/gutenberg'
+            PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
             VERSION: ${{ github.event.release.name }}
 
         steps:
-            - uses: hmarr/debug-action@v2
-
             - name: Check out Gutenberg branches from WP.org plugin repo
               run: svn checkout "$PLUGIN_REPO_URL/branches" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
