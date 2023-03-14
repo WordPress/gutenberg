@@ -92,7 +92,8 @@ export default function Layout() {
 	const canvasPadding = isMobileViewport ? 0 : 24;
 	const showSidebar =
 		( isMobileViewport && ! isListPage ) ||
-		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
+		! isMobileViewport ||
+		! isEditorPage;
 	const showCanvas =
 		( isMobileViewport && isEditorPage && canvasMode === 'edit' ) ||
 		! isMobileViewport ||
@@ -182,15 +183,6 @@ export default function Layout() {
 						{ showSidebar && (
 							<ResizableBox
 								as={ motion.div }
-								initial={ {
-									opacity: 0,
-								} }
-								animate={ {
-									opacity: 1,
-								} }
-								exit={ {
-									opacity: 0,
-								} }
 								transition={ {
 									type: 'tween',
 									duration:
