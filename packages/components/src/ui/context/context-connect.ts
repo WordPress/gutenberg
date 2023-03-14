@@ -83,25 +83,19 @@ function _contextConnect<
 		warn( 'contextConnect: Please provide a namespace' );
 	}
 
-	// @ts-expect-error internal property
-	let mergedNamespace = WrappedComponent[ CONNECT_STATIC_NAMESPACE ] || [
-		namespace,
-	];
-
 	/**
 	 * Consolidate (merge) namespaces before attaching it to the WrappedComponent.
 	 */
-	if ( Array.isArray( namespace ) ) {
-		mergedNamespace = [ ...mergedNamespace, ...namespace ];
-	}
-	if ( typeof namespace === 'string' ) {
-		mergedNamespace = [ ...mergedNamespace, namespace ];
-	}
+	const mergedNamespace = new Set( [
+		// @ts-expect-error internal property
+		WrappedComponent[ CONNECT_STATIC_NAMESPACE ] ?? namespace,
+		namespace,
+	] );
 
 	// @ts-expect-error We can't rely on inferred types here because of the
 	// `as` prop polymorphism we're handling in https://github.com/WordPress/gutenberg/blob/9620bae6fef4fde7cc2b7833f416e240207cda29/packages/components/src/ui/context/wordpress-component.ts#L32-L33
 	return Object.assign( WrappedComponent, {
-		[ CONNECT_STATIC_NAMESPACE ]: [ ...new Set( mergedNamespace ) ],
+		[ CONNECT_STATIC_NAMESPACE ]: [ mergedNamespace ],
 		displayName: namespace,
 		selector: `.${ getStyledClassNameFromKey( namespace ) }`,
 	} );
