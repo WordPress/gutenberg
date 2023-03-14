@@ -19,10 +19,9 @@ const success = chalk.bold.green;
 
 class PerformanceReporter {
 	onTestResult( test ) {
-		const dirname = path.dirname( test.path );
 		const basename = path.basename( test.path, '.js' );
 		const filepath = path.join(
-			dirname,
+			process.env.WP_ARTIFACTS_PATH,
 			basename + '.performance-results.json'
 		);
 
