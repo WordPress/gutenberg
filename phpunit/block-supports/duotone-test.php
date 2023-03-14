@@ -57,4 +57,21 @@ class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
 	public function test_gutenberg_get_slug_from_attr( $data_attr, $expected ) {
 		$this->assertSame( $expected, WP_Duotone::gutenberg_get_slug_from_attr( $data_attr ) );
 	}
+
+	public function data_is_preset() {
+		return array(
+			'pipe-slug'   => array( 'var:preset|duotone|blue-orange', true ),
+			'css-var'   => array( 'var(--wp--preset--duotone--blue-orange)', true ),
+			'css-var-weird-chars'   => array( 'var(--wp--preset--duotone--.)', false ),
+			'css-var-missing-end-parenthesis'   => array( 'var(--wp--preset--duotone--blue-orange', false ),
+			'invalid'   => array( 'not a valid attribute', false ),
+		);
+	}
+
+	/**
+	 * @dataProvider data_is_preset
+	 */
+	public function test_is_preset( $data_attr, $expected ) {
+		$this->assertSame( $expected, WP_Duotone::is_preset( $data_attr ) );
+	}
 }
