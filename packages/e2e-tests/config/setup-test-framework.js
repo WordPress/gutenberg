@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import { toMatchInlineSnapshot, toMatchSnapshot } from 'jest-snapshot';
 
 /**
@@ -172,11 +171,7 @@ function observeConsoleLogging() {
 		// correctly. Instead, the logic here synchronously inspects the
 		// internal object shape of the JSHandle to find the error text. If it
 		// cannot be found, the default text value is used instead.
-		text = get(
-			message.args(),
-			[ 0, '_remoteObject', 'description' ],
-			text
-		);
+		text = message.args()[ 0 ]?._remoteObject?.description ?? text;
 
 		// Disable reason: We intentionally bubble up the console message
 		// which, unless the test explicitly anticipates the logging via
