@@ -581,7 +581,7 @@ add_action( 'wp_enqueue_scripts', static function() {
 	$duotone_css_vars = '';
 
 	foreach ( WP_Duotone::$output as $filter_data ) {
-		if( ! array_key_exists( $filter_data['slug'], WP_Duotone::$global_styles_presets ) ) {
+		if( ! array_key_exists( $filter_data[ 'slug' ], WP_Duotone::$global_styles_presets ) ) {
 			continue;
 		}
 
@@ -688,7 +688,7 @@ class WP_Duotone {
 	 * We only want to process this one time. On block render we'll access and output only the needed presets for that page.
 	 * 
 	 */
-	static function save_global_styles_presets() {
+	static function set_global_styles_presets() {
 		// Get the per block settings from the theme.json.
 		$tree = gutenberg_get_global_settings();
 		$presets_by_origin = _wp_array_get( $tree, array( 'color', 'duotone' ), array() );
@@ -706,7 +706,7 @@ class WP_Duotone {
 	/**
 	 * Scrape all block names from global styles and store in WP_Duotone::$global_styles_block_names
 	 */
-	static function save_global_style_block_names() {
+	static function set_global_style_block_names() {
 		// Get the per block settings from the theme.json.
 		$tree = WP_Theme_JSON_Resolver::get_merged_data();
 		$block_nodes = $tree->get_styles_block_nodes();
@@ -755,5 +755,5 @@ class WP_Duotone {
 	}
 }
 
-add_action( 'wp_loaded', array( 'WP_Duotone', 'save_global_styles_presets' ), 10 );
-add_action( 'wp_loaded', array( 'WP_Duotone', 'save_global_style_block_names' ), 10 );
+add_action( 'wp_loaded', array( 'WP_Duotone', 'set_global_styles_presets' ), 10 );
+add_action( 'wp_loaded', array( 'WP_Duotone', 'set_global_style_block_names' ), 10 );
