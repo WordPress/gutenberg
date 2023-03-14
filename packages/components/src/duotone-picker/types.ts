@@ -21,16 +21,20 @@ export type DuotonePickerProps = {
 	duotonePalette: DuotoneColor[];
 	/**
 	 * Whether custom colors should be disabled.
+	 *
+	 * @default false
 	 */
 	disableCustomColors?: boolean;
 	/**
 	 * Whether custom duotone values should be disabled.
+	 *
+	 * @default false
 	 */
 	disableCustomDuotone?: boolean;
 	/**
 	 * An array of colors for the duotone effect.
 	 */
-	value: string[] | 'unset';
+	value?: string[] | 'unset';
 	/**
 	 * Callback which is called when the duotone colors change.
 	 */
@@ -44,7 +48,7 @@ type Color = {
 };
 
 type DuotoneColor = {
-	colors: [ string, string ];
+	colors: string[];
 	name: string;
 	slug: string;
 };
@@ -53,5 +57,5 @@ export type DuotoneSwatchProps = {
 	/**
 	 * An array of colors to show or `null` to show the placeholder swatch icon.
 	 */
-	values?: [ string, string ] | null;
+	values?: string[] | null;
 };
