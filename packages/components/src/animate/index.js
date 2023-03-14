@@ -25,7 +25,7 @@ function getDefaultOrigin( type ) {
 /**
  * @param {GetAnimateOptions} options
  *
- * @return {string | void} ClassName that applies the animations
+ * @return {string | undefined} ClassName that applies the animations
  */
 export function getAnimateClassName( options ) {
 	if ( options.type === 'loading' ) {
@@ -48,6 +48,8 @@ export function getAnimateClassName( options ) {
 			'is-from-' + origin
 		);
 	}
+
+	return undefined;
 }
 
 // @ts-ignore Reason: Planned for deprecation

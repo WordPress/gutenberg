@@ -8,9 +8,12 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { SelectControl } from '../select-control';
-import type { TreeSelectProps, Tree, SelectOptions, Truthy } from './types';
+import type { TreeSelectProps, Tree, Truthy } from './types';
 
-function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
+function getSelectOptions(
+	tree: Tree[],
+	level = 0
+): NonNullable< TreeSelectProps[ 'options' ] > {
 	return tree.flatMap( ( treeNode ) => [
 		{
 			value: treeNode.id,

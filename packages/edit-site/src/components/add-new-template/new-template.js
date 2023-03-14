@@ -167,7 +167,7 @@ export default function NewTemplate( {
 	}
 
 	const customTemplateDescription = __(
-		'Custom templates can be applied to any post or page.'
+		'A custom template can be manually applied to any post or page.'
 	);
 
 	return (

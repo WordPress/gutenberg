@@ -232,6 +232,7 @@
 			}
 		},
 		"settingsPropertiesDimensions": {
+			"type": "object",
 			"properties": {
 				"dimensions": {
 					"description": "Settings related to dimensions.",
@@ -261,6 +262,23 @@
 						"wideSize": {
 							"description": "Sets the max-width of wide (`.alignwide`) content.",
 							"type": "string"
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesPosition": {
+			"type": "object",
+			"properties": {
+				"position": {
+					"description": "Settings related to position.",
+					"type": "object",
+					"properties": {
+						"sticky": {
+							"description": "Allow users to set sticky position.",
+							"type": "boolean",
+							"default": false
 						}
 					},
 					"additionalProperties": false
@@ -625,8 +643,10 @@
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
+				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
 				{ "$ref": "#/definitions/settingsPropertiesShadow" },
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
+				{ "$ref": "#/definitions/settingsPropertiesPosition" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 				{ "$ref": "#/definitions/settingsPropertiesTypography" },
 				{ "$ref": "#/definitions/settingsPropertiesCustom" }
@@ -642,9 +662,11 @@
 					"properties": {
 						"appearanceTools": {},
 						"border": {},
-						"shadow": {},
 						"color": {},
+						"dimensions": {},
 						"layout": {},
+						"position": {},
+						"shadow": {},
 						"spacing": {},
 						"typography": {},
 						"custom": {}
@@ -1258,6 +1280,23 @@
 					},
 					"additionalProperties": false
 				},
+				"dimensions": {
+					"description": "Dimensions styles",
+					"type": "object",
+					"properties": {
+						"minHeight": {
+							"description": "Sets the `min-height` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					}
+				},
 				"spacing": {
 					"description": "Spacing styles.",
 					"type": "object",
@@ -1573,6 +1612,7 @@
 					"properties": {
 						"border": {},
 						"color": {},
+						"dimensions": {},
 						"spacing": {},
 						"typography": {},
 						"filter": {},
@@ -1949,6 +1989,7 @@
 					"properties": {
 						"border": {},
 						"color": {},
+						"dimensions": {},
 						"spacing": {},
 						"typography": {},
 						"filter": {},

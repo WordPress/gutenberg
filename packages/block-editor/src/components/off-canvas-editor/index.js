@@ -56,6 +56,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  *
  * @param {Object}  props                 Components props.
  * @param {string}  props.id              An HTML element id for the root element of ListView.
+ * @param {string}  props.parentClientId  The client id of the parent block.
  * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {boolean} props.showBlockMovers Flag to enable block movers
  * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
@@ -68,6 +69,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
 function OffCanvasEditor(
 	{
 		id,
+		parentClientId,
 		blocks,
 		showBlockMovers = false,
 		isExpanded = false,
@@ -82,10 +84,9 @@ function OffCanvasEditor(
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
 		useListViewClientIds( blocks );
 
-	const { visibleBlockCount, shouldShowInnerBlocks, parentId } = useSelect(
+	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
 		( select ) => {
 			const {
-				getBlockRootClientId,
 				getGlobalBlockCount,
 				getClientIdsOfDescendants,
 				__unstableGetEditorMode,
@@ -97,10 +98,6 @@ function OffCanvasEditor(
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
 				shouldShowInnerBlocks: __unstableGetEditorMode() !== 'zoom-out',
-				parentId:
-					blocks.length > 0
-						? getBlockRootClientId( blocks[ 0 ].clientId )
-						: undefined,
 			};
 		},
 		[ draggedClientIds, blocks ]
@@ -234,7 +231,7 @@ function OffCanvasEditor(
 				>
 					<ListViewContext.Provider value={ contextValue }>
 						<ListViewBranch
-							parentId={ parentId }
+							parentId={ parentClientId }
 							blocks={ clientIdsTree }
 							selectBlock={ selectEditorBlock }
 							showBlockMovers={ showBlockMovers }
