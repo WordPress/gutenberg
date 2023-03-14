@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode, ForwardedRef, ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -22,27 +22,6 @@ import {
 	NavigatorToParentButton,
 	useNavigator,
 } from '..';
-
-jest.mock( 'framer-motion', () => {
-	const actual = jest.requireActual( 'framer-motion' );
-	return {
-		__esModule: true,
-		...actual,
-		AnimatePresence:
-			( { children }: { children?: ReactNode } ) =>
-			() =>
-				<div>{ children }</div>,
-		motion: {
-			...actual.motion,
-			div: require( 'react' ).forwardRef(
-				(
-					{ children }: { children?: ReactNode },
-					ref: ForwardedRef< HTMLDivElement >
-				) => <div ref={ ref }>{ children }</div>
-			),
-		},
-	};
-} );
 
 const INVALID_HTML_ATTRIBUTE = {
 	raw: ' "\'><=invalid_path',
