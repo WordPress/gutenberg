@@ -229,7 +229,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					displayPostContentRadio === 'excerpt' && (
 						<RangeControl
 							__nextHasNoMarginBottom
-							label={ __( 'Max number of words in excerpt' ) }
+							label={ __( 'Max number of words' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
 								setAttributes( { excerptLength: value } )
