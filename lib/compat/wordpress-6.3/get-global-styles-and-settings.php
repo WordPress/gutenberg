@@ -36,7 +36,10 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 		// Duotone (No fallback selectors for Duotone).
 		if ( 'filters.duotone' === $target || array( 'filters', 'duotone' ) === $target ) {
 			// Prefer editor selector if available.
-			$duotone_editor_selector = $use_editor_selectors && _wp_array_get( $block_type->editor_selectors, array( 'filters', 'duotone' ), null );
+			$duotone_editor_selector = $use_editor_selectors
+				? _wp_array_get( $block_type->editor_selectors, array( 'filters', 'duotone' ), null )
+				: null;
+
 			if ( $duotone_editor_selector ) {
 				return $duotone_editor_selector;
 			}
