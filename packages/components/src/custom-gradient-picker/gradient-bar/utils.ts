@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * Internal dependencies
  */
