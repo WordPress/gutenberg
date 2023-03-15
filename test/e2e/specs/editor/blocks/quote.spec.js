@@ -58,7 +58,7 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'test' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 'test'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 'test'.length } );
 		await page.keyboard.type( '> ' );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
@@ -305,7 +305,7 @@ test.describe( 'Quote', () => {
 <!-- /wp:quote -->`
 		);
 		// Move the cursor to the start of the first paragraph of the quoted block.
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 4 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
 		await page.keyboard.press( 'Backspace' );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:paragraph -->

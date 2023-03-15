@@ -591,6 +591,9 @@ function GalleryEdit( props ) {
 						<SelectControl
 							__nextHasNoMarginBottom
 							label={ __( 'Image size' ) }
+							help={ __(
+								'Select the size of the source images.'
+							) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }

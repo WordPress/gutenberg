@@ -79,7 +79,7 @@ test.describe( 'Font Size Picker', () => {
 <p class="wp-block-paragraph" style="font-size:23px">Paragraph reset - custom size</p>
 <!-- /wp:paragraph -->` );
 
-			await pageUtils.pressKeyTimes( 'Backspace', 2 );
+			await pageUtils.pressKeys( 'Backspace', { times: 2 } );
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->
 <p class="wp-block-paragraph">Paragraph reset - custom size</p>
@@ -161,7 +161,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click(
 				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
 			);
-			await pageUtils.pressKeyTimes( 'ArrowDown', 4 );
+			await pageUtils.pressKeys( 'ArrowDown', { times: 4 } );
 			await page.keyboard.press( 'Enter' );
 
 			await expect.poll( editor.getEditedPostContent )
@@ -183,7 +183,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click(
 				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
 			);
-			await pageUtils.pressKeyTimes( 'ArrowDown', 3 );
+			await pageUtils.pressKeys( 'ArrowDown', { times: 3 } );
 			await page.keyboard.press( 'Enter' );
 
 			await expect.poll( editor.getEditedPostContent )
@@ -214,7 +214,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click(
 				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
 			);
-			await pageUtils.pressKeyTimes( 'ArrowDown', 2 );
+			await pageUtils.pressKeys( 'ArrowDown', { times: 2 } );
 			await page.keyboard.press( 'Enter' );
 
 			await expect.poll( editor.getEditedPostContent )
@@ -226,7 +226,7 @@ test.describe( 'Font Size Picker', () => {
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
 			await page.click( 'role=spinbutton[name="Custom"i]' );
-			await pageUtils.pressKeyWithModifier( 'primary', 'A' );
+			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
 
 			await expect.poll( editor.getEditedPostContent )
@@ -305,7 +305,7 @@ test.describe( 'Font Size Picker', () => {
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
 			await page.click( 'role=spinbutton[name="Custom"i]' );
-			await pageUtils.pressKeyWithModifier( 'primary', 'A' );
+			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
 
 			await expect.poll( editor.getEditedPostContent )

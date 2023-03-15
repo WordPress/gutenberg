@@ -44,7 +44,7 @@ test.describe( 'autocomplete mentions', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'Stuck in the middle with you' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 'you'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 'you'.length } );
 		await page.keyboard.type( '@j' );
 		await expect(
 			page.locator( 'role=listbox >> role=option[name=/testuser/i]' )
