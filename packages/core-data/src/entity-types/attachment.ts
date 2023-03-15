@@ -14,6 +14,13 @@ import type {
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
+interface imageDetails {
+	width: number;
+	height: number;
+	file: string;
+	sizes?: Record< string, Omit< imageDetails, 'sizes' > & { source_url: string; mine_type: string; } >;
+}
+
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
 		export interface Attachment< C extends Context > {
@@ -124,7 +131,7 @@ declare module './base-entity-records' {
 			/**
 			 * Details about the media file, specific to its type.
 			 */
-			media_details: Record< string, string >;
+			media_details: imageDetails | Record< string, any >;
 			/**
 			 * The ID for the associated post of the attachment.
 			 */
