@@ -160,11 +160,12 @@ export function CustomGradientPicker( {
 	// Control points color option may be hex from presets, custom colors will be rgb.
 	// The position should always be a percentage.
 	const controlPoints = gradientAST.colorStops.map( ( colorStop ) => {
-		// Although it's already been checked by `hasUnsupportedLength` in `getGradientAstWithDefault`,
-		// TypeScript doesn't know that `colorStop.length` is not undefined here.
 		return {
 			color: getStopCssColor( colorStop ),
-			position: parseInt( colorStop.length!.value ),
+			// Although it's already been checked by `hasUnsupportedLength` in `getGradientAstWithDefault`,
+			// TypeScript doesn't know that `colorStop.length` is not undefined here.
+			// @ts-expect-error
+			position: parseInt( colorStop.length.value ),
 		};
 	} );
 
