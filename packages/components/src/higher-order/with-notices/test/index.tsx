@@ -24,25 +24,30 @@ import {
  * Internal dependencies
  */
 import withNotices from '..';
+import type { WithNoticeProps } from '../types';
 
 // Implementation detail of Notice component used to query the dismissal button.
 const stockDismissText = 'Dismiss this notice';
 
-function noticesFrom( list ) {
+function noticesFrom( list: string[] ) {
 	return list.map( ( item ) => ( { id: item, content: item } ) );
 }
 
-function isComponentLike( object ) {
+function isComponentLike( object: any ) {
 	return typeof object === 'function';
 }
 
-function isForwardRefLike( { render: renderMethod } ) {
+function isForwardRefLike( { render: renderMethod }: any ) {
 	return typeof renderMethod === 'function';
 }
 
 const content = 'Base content';
 
-const BaseComponent = ( { noticeOperations, noticeUI, notifications } ) => {
+const BaseComponent = ( {
+	noticeOperations,
+	noticeUI,
+	notifications,
+}: WithNoticeProps & { notifications: ReturnType< typeof noticesFrom > } ) => {
 	useEffect( () => {
 		if ( notifications ) {
 			notifications.forEach( ( item ) =>
@@ -78,8 +83,8 @@ describe( 'withNotices return type', () => {
 } );
 
 describe( 'withNotices operations', () => {
-	let handle;
-	const Handle = ( props ) => {
+	let handle: React.MutableRefObject< any >;
+	const Handle = ( props: any ) => {
 		handle = useRef();
 		return <TestNoticeOperations { ...props } ref={ handle } />;
 	};
