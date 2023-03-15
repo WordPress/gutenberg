@@ -15,17 +15,16 @@ import { __ } from '@wordpress/i18n';
  */
 import { unlock } from '../../private-apis';
 
-const { useConvertToGroupButtonProps } = unlock( blockEditorPrivateApis );
+const {
+	hasStickyPositionSupport,
+	useConvertToGroupButtonProps,
+	useIsPositionDisabled,
+} = unlock( blockEditorPrivateApis );
 
 export default function ConvertToStickyGroup( { selectedClientIds, onClose } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const {
-		clientIds,
-		isGroupable,
-		// isUngroupable,
-		blocksSelection,
-		groupingBlockName,
-	} = useConvertToGroupButtonProps( selectedClientIds );
+	const { clientIds, isGroupable, blocksSelection, groupingBlockName } =
+		useConvertToGroupButtonProps( selectedClientIds );
 
 	const { canRemove, hasParents } = useSelect(
 		( select ) => {
@@ -38,6 +37,11 @@ export default function ConvertToStickyGroup( { selectedClientIds, onClose } ) {
 		},
 		[ clientIds ]
 	);
+
+	const isPositionDisabled = useIsPositionDisabled( {
+		name: groupingBlockName,
+	} );
+	const isStickySupported = hasStickyPositionSupport( groupingBlockName );
 
 	const onConvertToGroup = () => {
 		const newBlocks = switchToBlockType(
@@ -62,14 +66,24 @@ export default function ConvertToStickyGroup( { selectedClientIds, onClose } ) {
 		}
 	};
 
-	// TODO: Add check that there is sticky support.
-	// TODO: Check that we are at the root of the document.
-
-	if ( ! isGroupable || ! canRemove || ! groupingBlockName || hasParents ) {
+	// For the button to be visible, the following conditions must be met:
+	// - The block is groupable.
+	// - The block can be removed.
+	// - A grouping block is available.
+	// - The block and theme both support sticky position.
+	// - The block has no parents, so is at the root of the template.
+	if (
+		! isGroupable ||
+		! canRemove ||
+		! groupingBlockName ||
+		! isStickySupported ||
+		hasParents ||
+		isPositionDisabled
+	) {
 		return null;
 	}
 
-	// Allow converting a single template part to standard blocks.
+	// Allow converting a single template part block to a group.
 	return (
 		<MenuItem
 			onClick={ () => {
