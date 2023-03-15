@@ -11,6 +11,7 @@ import {
 	Card,
 	CardDivider,
 	CardMedia,
+	createSlotFill,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
@@ -26,6 +27,23 @@ import { NavigationButtonAsItem } from './navigation-button';
 import ContextMenu from './context-menu';
 import StylesPreview from './preview';
 import { unlock } from '../../private-apis';
+
+const { Slot: GlobalStylesScreenRootSlot } = createSlotFill(
+	'GlobalStylesScreenRoot'
+);
+
+const ScreenRootSlot = () => (
+	<GlobalStylesScreenRootSlot>
+		{ ( fills ) =>
+			fills.map( ( fill ) => (
+				<>
+					<CardBody>{ fill }</CardBody>
+					<CardDivider />
+				</>
+			) )
+		}
+	</GlobalStylesScreenRootSlot>
+);
 
 function ScreenRoot() {
 	const { useGlobalStyle } = unlock( blockEditorPrivateApis );
@@ -52,6 +70,8 @@ function ScreenRoot() {
 
 	return (
 		<Card size="small" className="edit-site-global-styles-screen-root">
+			<ScreenRootSlot />
+
 			<CardBody>
 				<VStack spacing={ 4 }>
 					<Card>
