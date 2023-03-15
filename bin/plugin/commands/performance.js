@@ -337,6 +337,8 @@ async function runPerformanceTests( branches, options ) {
 							performanceTestDirectory,
 							'test/emptytheme'
 						),
+						'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
+						'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
 					],
 					env: {
 						tests: {
