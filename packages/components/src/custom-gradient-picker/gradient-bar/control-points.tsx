@@ -138,7 +138,7 @@ function ControlPoints( {
 		const relativePosition = getHorizontalRelativeGradientPosition(
 			event.clientX,
 			gradientPickerDomRef.current
-		) as number;
+		);
 
 		const { initialPosition, index, significantMoveHappened } =
 			controlPointMoveState.current;

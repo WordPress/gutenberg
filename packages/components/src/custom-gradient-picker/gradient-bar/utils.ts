@@ -167,11 +167,23 @@ export function updateControlPointColorByPosition(
 /**
  * Gets the horizontal coordinate when dragging a control point with the mouse.
  *
- * @param mouseXCoordinate Horizontal coordinate of the mouse position.
+ * @param mouseXcoordinate Horizontal coordinate of the mouse position.
  * @param containerElement Container for the gradient picker.
  *
  * @return Whole number percentage from the left.
  */
+export function getHorizontalRelativeGradientPosition(
+	mouseXcoordinate: number,
+	containerElement: HTMLDivElement
+): number;
+export function getHorizontalRelativeGradientPosition(
+	mouseXcoordinate: number,
+	containerElement: null
+): undefined;
+export function getHorizontalRelativeGradientPosition(
+	mouseXcoordinate: number,
+	containerElement: HTMLDivElement | null
+): number | undefined;
 export function getHorizontalRelativeGradientPosition(
 	mouseXCoordinate: number,
 	containerElement: HTMLDivElement | null
