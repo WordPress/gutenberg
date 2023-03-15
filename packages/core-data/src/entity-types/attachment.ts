@@ -18,7 +18,13 @@ interface imageDetails {
 	width: number;
 	height: number;
 	file: string;
-	sizes?: Record< string, Omit< imageDetails, 'sizes' > & { source_url: string; mine_type: string; } >;
+	sizes?: Record<
+		string,
+		Omit< imageDetails, 'sizes' > & {
+			source_url: string;
+			mine_type: string;
+		}
+	>;
 }
 
 declare module './base-entity-records' {
