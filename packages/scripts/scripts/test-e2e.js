@@ -66,15 +66,10 @@ if ( hasArgInCLI( '--puppeteer-devtools' ) ) {
 	process.env.PUPPETEER_DEVTOOLS = 'true';
 }
 
-if ( hasArgInCLI( '--results-filename' ) ) {
-	process.env.RESULTS_FILENAME = getArgFromCLI( '--results-filename' );
-}
-
 const configsMapping = {
 	WP_BASE_URL: '--wordpress-base-url',
 	WP_USERNAME: '--wordpress-username',
 	WP_PASSWORD: '--wordpress-password',
-	WP_ARTIFACTS_PATH: '--wordpress-artifacts-path',
 };
 
 Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
@@ -83,9 +78,12 @@ Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
 	}
 } );
 
-// Set default artifacts path.
+// Set the default artifacts path.
 if ( ! process.env.WP_ARTIFACTS_PATH ) {
-	process.env.WP_ARTIFACTS_PATH = path.resolve( process.cwd(), 'artifacts' );
+	process.env.WP_ARTIFACTS_PATH = path.resolve(
+		process.env.GITHUB_WORKSPACE || process.cwd(),
+		'artifacts'
+	);
 }
 
 const cleanUpPrefixes = [ '--puppeteer-', '--wordpress-' ];

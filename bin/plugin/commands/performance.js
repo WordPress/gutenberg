@@ -18,6 +18,9 @@ const {
 } = require( '../lib/utils' );
 const config = require( '../config' );
 
+const ARTIFACTS_PATH =
+	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
+
 /**
  * @typedef WPPerformanceCommandOptions
  *
@@ -189,26 +192,25 @@ function curateResults( testSuite, results ) {
  * @param {string} testSuite                Name of the tests set.
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
  * @param {string} runKey                   Unique identifier for the test run, e.g. `branch-name_post-editor_run-3`.
- * @param {string} artifactsPath            Path to save the test artifacts at.
  *
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
-async function runTestSuite(
-	testSuite,
-	performanceTestDirectory,
-	runKey,
-	artifactsPath
-) {
+async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 	const resultsFilename = `${ runKey }.performance-results.json`;
 
 	await runShellScript(
-		`npm run test:performance -- ${ testSuite } --wordpress-artifacts-path=${ artifactsPath } --results-filename=${ resultsFilename }`,
-		performanceTestDirectory
+		`npm run test:performance -- ${ testSuite }`,
+		performanceTestDirectory,
+		{
+			...process.env,
+			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
+			RESULTS_FILENAME: resultsFilename,
+		}
 	);
 
 	return curateResults(
 		testSuite,
-		await readJSONFile( path.join( artifactsPath, resultsFilename ) )
+		await readJSONFile( path.join( ARTIFACTS_PATH, resultsFilename ) )
 	);
 }
 
@@ -221,7 +223,6 @@ async function runTestSuite(
 async function runPerformanceTests( branches, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
 	const TEST_ROUNDS = options.rounds || 1;
-	const artifactsPath = process.env.WP_ARTIFACTS_PATH || '';
 
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
@@ -444,8 +445,7 @@ async function runPerformanceTests( branches, options ) {
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
 					performanceTestDirectory,
-					runKey,
-					artifactsPath
+					runKey
 				);
 				log( '            >> Stopping the environment' );
 				await runShellScript(
@@ -514,7 +514,7 @@ async function runPerformanceTests( branches, options ) {
 
 		const resultsFilename = testSuite + '.performance-results.json';
 		fs.writeFileSync(
-			path.join( artifactsPath, resultsFilename ),
+			path.join( ARTIFACTS_PATH, resultsFilename ),
 			JSON.stringify( results[ testSuite ], null, 2 )
 		);
 	}
