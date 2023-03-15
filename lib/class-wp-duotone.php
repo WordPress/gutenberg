@@ -154,8 +154,12 @@ class WP_Duotone {
 	 * @param string $slug The slug of the duotone preset.
 	 * @return string The CSS variable name.
 	 */
-	static function get_css_var( $slug ) {
+	static function get_css_custom_property_name( $slug ) {
 		return self::CSS_VAR_PREFIX . $slug;
+	}
+
+	static function get_css_var( $slug ) {
+		return 'var(' . self::get_css_custom_property_name( $slug ) . ')';
 	}
 
 	/**
@@ -166,9 +170,9 @@ class WP_Duotone {
 	 * @return string The CSS declaration.
 	 */
 	static function get_css_declaration( $filter_data ) {
-		$filter_property        = gutenberg_get_duotone_filter_property( $filter_data );
-		$duotone_preset_css_var = WP_Duotone::get_css_var( $filter_data['slug'] );
-		return $duotone_preset_css_var . ': ' . $filter_property . ';';
+		$declaration_value                = gutenberg_get_duotone_filter_property( $filter_data );
+		$duotone_preset_css_property_name = WP_Duotone::get_css_custom_property_name( $filter_data['slug'] );
+		return $duotone_preset_css_property_name . ': ' . $declaration_value . ';';
 	}
 
 }

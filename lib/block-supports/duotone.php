@@ -467,7 +467,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			$slug = WP_Duotone::gutenberg_get_slug_from_attr( $duotone_attr );
 
 			// Utilize existing preset CSS custom property.
-			$filter_property = "var(--wp--preset--duotone--$slug)";
+			$declaration_value = WP_Duotone::get_css_var( $slug );
 
 			WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
 
@@ -476,7 +476,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			$slug = wp_unique_id( sanitize_key( $duotone_attr . '-' ) );
 
 			// Pass through the CSS value.
-			$filter_property = $duotone_attr;
+			$declaration_value = $duotone_attr;
 		} elseif ( $is_custom ) {
 			// Build a unique slug for the filter based on the array of colors.
 			$slug = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
@@ -486,7 +486,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 				'colors' => $duotone_attr,
 			);
 			// Build a customized CSS filter property for unique slug.
-			$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
+			$declaration_value = gutenberg_get_duotone_filter_property( $filter_data );
 
 			WP_Duotone::$output[ $slug ] = $filter_data;
 		}
@@ -494,7 +494,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		$slug = WP_Duotone::$global_styles_block_names[ $block['blockName'] ];
 
 		// Utilize existing preset CSS custom property.
-		$filter_property = "var(--wp--preset--duotone--$slug)";
+		$declaration_value = WP_Duotone::get_css_var( $slug );
 
 		WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
 	}
@@ -523,7 +523,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 					// render before global styles,
 					// and they should be overriding the duotone
 					// filters set by global styles.
-					'filter' => $filter_property . ' !important',
+					'filter' => $declaration_value . ' !important',
 				),
 			),
 		),
@@ -553,7 +553,7 @@ add_action(
 
 			echo $filter_svg;
 
-			// This is for classic themes - in block themes, the CSS is added in the head via the value_func.
+			// This is for classic themes - in block themes, the CSS is added in the head via wp_add_inline_style in the wp_enqueue_scripts action.
 			if ( ! wp_is_block_theme() ) {
 				wp_add_inline_style( 'core-block-supports', 'body{' . WP_Duotone::get_css_declaration( $filter_data ) . '}' );
 			}
