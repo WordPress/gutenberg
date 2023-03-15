@@ -565,7 +565,7 @@ add_action(
 
 			global $is_safari;
 			if ( $is_safari ) {
-				duotone_safari_rerender_hack( $filter_data['selector'] );
+				WP_Duotone_Gutenberg::safari_rerender_hack( $filter_data['selector'] );
 			}
 		}
 	}
@@ -599,22 +599,6 @@ add_action(
 	11
 );
 
-/**
- * Safari renders elements incorrectly on first paint when the SVG filter comes after the content that it is filtering,
- * so we force a repaint with a WebKit hack which solves the issue.
- *
- * @param string $selector The selector to apply the hack for.
- */
-function duotone_safari_rerender_hack( $selector ) {
-	/*
-	 * Simply accessing el.offsetHeight flushes layout and style
-	 * changes in WebKit without having to wait for setTimeout.
-	 */
-	printf(
-		'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
-		wp_json_encode( $selector )
-	);
-}
 
 // Register the block support.
 WP_Block_Supports::get_instance()->register(

@@ -175,6 +175,24 @@ class WP_Duotone_Gutenberg {
 		return $duotone_preset_css_property_name . ': ' . $declaration_value . ';';
 	}
 
+	/**
+	 * Safari renders elements incorrectly on first paint when the SVG filter comes after the content that it is filtering,
+	 * so we force a repaint with a WebKit hack which solves the issue.
+	 *
+	 * @param string $selector The selector to apply the hack for.
+	 * @return string The <script> to rerender the image.
+	 */
+	static function safari_rerender_hack( $selector ) {
+		/*
+		* Simply accessing el.offsetHeight flushes layout and style
+		* changes in WebKit without having to wait for setTimeout.
+		*/
+		printf(
+			'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
+			wp_json_encode( $selector )
+		);
+	}
+
 }
 
 add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_styles_presets' ), 10 );
