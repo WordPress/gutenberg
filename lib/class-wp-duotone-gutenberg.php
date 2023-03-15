@@ -193,7 +193,30 @@ class WP_Duotone_Gutenberg {
 		);
 	}
 
+	/**
+	 * Outputs all necessary SVG for duotone filters, CSS for classic themes, and safari rerendering hack
+	 */
+	static function output_footer_assets() {
+		foreach ( WP_Duotone_Gutenberg::$output as $filter_data ) {
+
+			// SVG will be output on the page later.
+			$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
+
+			echo $filter_svg;
+
+			// This is for classic themes - in block themes, the CSS is added in the head via wp_add_inline_style in the wp_enqueue_scripts action.
+			if ( ! wp_is_block_theme() ) {
+				wp_add_inline_style( 'core-block-supports', 'body{' . WP_Duotone_Gutenberg::get_css_custom_property_declaration( $filter_data ) . '}' );
+			}
+
+			global $is_safari;
+			if ( $is_safari ) {
+				WP_Duotone_Gutenberg::safari_rerender_hack( $filter_data['selector'] );
+			}
+		}
+	}
 }
 
 add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_styles_presets' ), 10 );
 add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_style_block_names' ), 10 );
+add_action( 'wp_footer', array( 'WP_Duotone_Gutenberg', 'output_footer_assets' ), 10 );
