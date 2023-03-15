@@ -100,7 +100,6 @@ export default function ImageSizeControl( {
 												scaledWidth
 											)
 										}
-										size="__unstable-large"
 									>
 										{ scale }%
 									</Button>
