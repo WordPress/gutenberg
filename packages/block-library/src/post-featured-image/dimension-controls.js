@@ -97,10 +97,6 @@ const DimensionControls = ( {
 							value: '1',
 						},
 						{
-							label: __( '16:10' ),
-							value: '16/10',
-						},
-						{
 							label: __( '16:9' ),
 							value: '16/9',
 						},
@@ -111,10 +107,6 @@ const DimensionControls = ( {
 						{
 							label: __( '3:2' ),
 							value: '3/2',
-						},
-						{
-							label: __( '10:16' ),
-							value: '10/16',
 						},
 						{
 							label: __( '9:16' ),

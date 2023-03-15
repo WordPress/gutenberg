@@ -277,6 +277,21 @@ export default function Layout() {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<motion.div
+									whileHover={
+										isEditorPage && canvasMode === 'view'
+											? {
+													scale: 1.005,
+													transition: {
+														duration:
+															disableMotion ||
+															isResizing
+																? 0
+																: 0.5,
+														ease: 'easeOut',
+													},
+											  }
+											: {}
+									}
 									initial={ false }
 									layout="position"
 									className="edit-site-layout__canvas"

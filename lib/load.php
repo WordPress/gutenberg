@@ -106,6 +106,7 @@ require __DIR__ . '/compat/wordpress-6.3/html-api/class-gutenberg-html-tag-proce
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
+require __DIR__ . '/experimental/block-editor-settings.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';

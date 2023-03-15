@@ -733,7 +733,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
           class="emotion-2 components-navigator-screen"
           data-wp-c16t="true"
           data-wp-component="NavigatorScreen"
-          style="opacity: 0; transform: translateX(50px) translateZ(0);"
+          style="opacity: 1; transform: none;"
         >
           <div
             class="components-surface components-card emotion-3 emotion-1"

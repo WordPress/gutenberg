@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -61,10 +60,13 @@ function ColumnsEditContainer( {
 } ) {
 	const { isStackedOnMobile, verticalAlignment } = attributes;
 
-	const { count } = useSelect(
+	const { count, canInsertColumnBlock } = useSelect(
 		( select ) => {
 			return {
 				count: select( blockEditorStore ).getBlockCount( clientId ),
+				canInsertColumnBlock: select(
+					blockEditorStore
+				).canInsertBlockType( 'core/column', clientId ),
 			};
 		},
 		[ clientId ]
@@ -94,20 +96,29 @@ function ColumnsEditContainer( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
-					<RangeControl
-						__nextHasNoMarginBottom
-						label={ __( 'Columns' ) }
-						value={ count }
-						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 1 }
-						max={ Math.max( 6, count ) }
-					/>
-					{ count > 6 && (
-						<Notice status="warning" isDismissible={ false }>
-							{ __(
-								'This column count exceeds the recommended amount and may cause visual breakage.'
+					{ canInsertColumnBlock && (
+						<>
+							<RangeControl
+								__nextHasNoMarginBottom
+								label={ __( 'Columns' ) }
+								value={ count }
+								onChange={ ( value ) =>
+									updateColumns( count, value )
+								}
+								min={ 1 }
+								max={ Math.max( 6, count ) }
+							/>
+							{ count > 6 && (
+								<Notice
+									status="warning"
+									isDismissible={ false }
+								>
+									{ __(
+										'This column count exceeds the recommended amount and may cause visual breakage.'
+									) }
+								</Notice>
 							) }
-						</Notice>
+						</>
 					) }
 					<ToggleControl
 						__nextHasNoMarginBottom
@@ -248,8 +259,8 @@ function Placeholder( { clientId, name, setAttributes } ) {
 	return (
 		<div { ...blockProps }>
 			<__experimentalBlockVariationPicker
-				icon={ get( blockType, [ 'icon', 'src' ] ) }
-				label={ get( blockType, [ 'title' ] ) }
+				icon={ blockType?.icon?.src }
+				label={ blockType?.title }
 				variations={ variations }
 				onSelect={ ( nextVariation = defaultVariation ) => {
 					if ( nextVariation.attributes ) {
