@@ -26,6 +26,6 @@ exports[`Preformatted block transforms to Group block 1`] = `
 
 exports[`Preformatted block transforms to Paragraph block 1`] = `
 "<!-- wp:paragraph -->
-<p>Some <em>preformatted</em> text...<br />And more!</p>
+<p class="wp-block-paragraph">Some <em>preformatted</em> text...<br />And more!</p>
 <!-- /wp:paragraph -->"
 `;

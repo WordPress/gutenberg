@@ -13,7 +13,7 @@ exports[`Image block transformations to Columns block 1`] = `
 exports[`Image block transformations to Cover block 1`] = `
 "<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":1,"dimRatio":50,"style":{"color":{}}} -->
 <div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><img class="wp-block-cover__image-background wp-image-1" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","fontSize":"large"} -->
-<p class="has-text-align-center has-large-font-size">Mountain</p>
+<p class="wp-block-paragraph has-text-align-center has-large-font-size">Mountain</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
@@ -43,7 +43,7 @@ exports[`Image block transformations to Group block 1`] = `
 exports[`Image block transformations to Media & Text block 1`] = `
 "<!-- wp:media-text {"mediaId":1,"mediaType":"image"} -->
 <div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
 `;

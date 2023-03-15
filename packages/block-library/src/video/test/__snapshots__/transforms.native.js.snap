@@ -13,7 +13,7 @@ exports[`Video block transforms to Columns block 1`] = `
 exports[`Video block transforms to Cover block 1`] = `
 "<!-- wp:cover {"url":"https://i.cloudup.com/YtZFJbuQCE.mov","dimRatio":50,"backgroundType":"video"} -->
 <div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><video class="wp-block-cover__video-background intrinsic-ignore" autoplay muted loop playsinline src="https://i.cloudup.com/YtZFJbuQCE.mov" data-object-fit="cover"></video><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","fontSize":"large"} -->
-<p class="has-text-align-center has-large-font-size">Cloudup video</p>
+<p class="wp-block-paragraph has-text-align-center has-large-font-size">Cloudup video</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
 `;
@@ -35,7 +35,7 @@ exports[`Video block transforms to Group block 1`] = `
 exports[`Video block transforms to Media & Text block 1`] = `
 "<!-- wp:media-text {"mediaType":"video"} -->
 <div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video></figure><div class="wp-block-media-text__content"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->"
 `;
