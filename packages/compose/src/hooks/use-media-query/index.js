@@ -11,7 +11,7 @@ import { useMemo, useSyncExternalStore } from '@wordpress/element';
  */
 function getMediaQueryList( query ) {
 	if (
-		!! query &&
+		query &&
 		typeof window !== 'undefined' &&
 		typeof window.matchMedia === 'function'
 	) {

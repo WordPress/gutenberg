@@ -2,12 +2,7 @@
  * External dependencies
  */
 import { act, render } from '@testing-library/react';
-import {
-	matchMedia,
-	MediaQueryListEvent,
-	setMedia,
-	cleanup,
-} from 'mock-match-media';
+import { matchMedia, setMedia, cleanup } from 'mock-match-media';
 
 /**
  * Internal dependencies
@@ -22,7 +17,6 @@ const TestComponent = ( { query } ) => {
 describe( 'useMediaQuery', () => {
 	beforeAll( () => {
 		window.matchMedia = matchMedia;
-		window.MediaQueryListEvent = MediaQueryListEvent;
 	} );
 
 	beforeEach( () => {
