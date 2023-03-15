@@ -14,7 +14,7 @@ class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
 		);
 		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
 		$expected      = '<figure class="wp-duotone-blue-orange wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
-		$this->assertSame( $expected, gutenberg_render_duotone_support( $block_content, $block ) );
+		$this->assertSame( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block ) );
 	}
 
 	public function test_gutenberg_render_duotone_support_css() {
@@ -24,7 +24,7 @@ class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
 		);
 		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
 		$expected      = '/<figure class="wp-duotone-unset-\d+ wp-block-image size-full"><img src="\\/my-image.jpg" \\/><\\/figure>/';
-		$this->assertMatchesRegularExpression( $expected, gutenberg_render_duotone_support( $block_content, $block ) );
+		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block ) );
 	}
 
 	public function test_gutenberg_render_duotone_support_custom() {
@@ -34,7 +34,7 @@ class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
 		);
 		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
 		$expected      = '/<figure class="wp-duotone-ffffff-000000-\d+ wp-block-image size-full"><img src="\\/my-image.jpg" \\/><\\/figure>/';
-		$this->assertMatchesRegularExpression( $expected, gutenberg_render_duotone_support( $block_content, $block ) );
+		$this->assertMatchesRegularExpression( $expected, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block ) );
 	}
 
 	public function data_gutenberg_get_slug_from_attr() {
