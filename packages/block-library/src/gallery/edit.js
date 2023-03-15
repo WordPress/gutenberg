@@ -562,6 +562,7 @@ function GalleryEdit( props ) {
 							max={ Math.min( MAX_COLUMNS, images.length ) }
 							{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 							required
+							size="__unstable-large"
 						/>
 					) }
 					<ToggleControl
