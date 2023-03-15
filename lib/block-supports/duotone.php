@@ -542,6 +542,10 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 }
 
 
+
+/**
+ * Outputs all necessary SVG for duotone filters and CSS for classic themes.
+ */
 add_action(
 	'wp_footer',
 	static function () {
@@ -554,8 +558,9 @@ add_action(
 			echo $filter_svg;
 
 			// This is for classic themes - in block themes, the CSS is added in the head via wp_add_inline_style in the wp_enqueue_scripts action.
+
 			if ( ! wp_is_block_theme() ) {
-				wp_add_inline_style( 'core-block-supports', 'body{' . WP_Duotone::get_css_declaration( $filter_data ) . '}' );
+				wp_add_inline_style( 'core-block-supports', 'body{' . WP_Duotone::get_css_custom_property_declaration( $filter_data ) . '}' );
 			}
 
 			global $is_safari;
@@ -567,7 +572,7 @@ add_action(
 );
 
 /**
- * Appends the used duotone fitler CSS Vars to the inline global styles CSS
+ * Appends the used global style duotone filter CSS Vars to the inline global styles CSS
  */
 add_action(
 	'wp_enqueue_scripts',
@@ -584,7 +589,7 @@ add_action(
 				continue;
 			}
 
-			$duotone_css_vars .= WP_Duotone::get_css_declaration( $filter_data );
+			$duotone_css_vars .= WP_Duotone::get_css_custom_property_declaration( $filter_data );
 		}
 
 		if ( ! empty( $duotone_css_vars ) ) {

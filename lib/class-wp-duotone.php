@@ -169,7 +169,7 @@ class WP_Duotone {
 	 * @param array $filter_data The duotone data for presets and custom filters.
 	 * @return string The CSS declaration.
 	 */
-	static function get_css_declaration( $filter_data ) {
+	static function get_css_custom_property_declaration( $filter_data ) {
 		$declaration_value                = gutenberg_get_duotone_filter_property( $filter_data );
 		$duotone_preset_css_property_name = WP_Duotone::get_css_custom_property_name( $filter_data['slug'] );
 		return $duotone_preset_css_property_name . ': ' . $declaration_value . ';';
