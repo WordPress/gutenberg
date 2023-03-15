@@ -541,35 +541,6 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	);
 }
 
-/**
- * Appends the used global style duotone filter CSS Vars to the inline global styles CSS
- */
-add_action(
-	'wp_enqueue_scripts',
-	static function() {
-
-		if ( empty( WP_Duotone_Gutenberg::$output ) ) {
-			return;
-		}
-
-		$duotone_css_vars = '';
-
-		foreach ( WP_Duotone_Gutenberg::$output as $filter_data ) {
-			if ( ! array_key_exists( $filter_data['slug'], WP_Duotone_Gutenberg::$global_styles_presets ) ) {
-				continue;
-			}
-
-			$duotone_css_vars .= WP_Duotone_Gutenberg::get_css_custom_property_declaration( $filter_data );
-		}
-
-		if ( ! empty( $duotone_css_vars ) ) {
-			wp_add_inline_style( 'global-styles', 'body{' . $duotone_css_vars . '}' );
-		}
-	},
-	11
-);
-
-
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
 	'duotone',
