@@ -12,6 +12,7 @@ import { COLORS, reduceMotion, rtl } from '../../utils';
 import { space } from '../../ui/utils/space';
 
 import type {
+	InputNumberProps,
 	RangeMarkProps,
 	RailProps,
 	ThumbProps,
@@ -290,6 +291,23 @@ export const Tooltip = styled.span< TooltipProps >`
 	) }
 `;
 
+const inputNumberWidth = ( { size }: InputNumberProps ) => {
+	const sizes = {
+		default: space( 16 ),
+		'__unstable-large': space( 20 ),
+	};
+
+	if ( size === '__unstable-large' ) {
+		return css( {
+			width: `${ sizes[ '__unstable-large' ] } !important`,
+		} );
+	}
+
+	return css`
+		width: ${ sizes.default } !important;
+	`;
+};
+
 // @todo: Refactor RangeControl with latest HStack configuration
 // @wordpress/components/ui/hstack.
 export const InputNumber = styled( NumberControl )`
@@ -297,7 +315,7 @@ export const InputNumber = styled( NumberControl )`
 	font-size: 13px;
 	margin-bottom: 0 !important;
 	margin-top: 0;
-	width: ${ space( 16 ) } !important;
+	${ inputNumberWidth };
 
 	input[type='number']& {
 		${ rangeHeight };

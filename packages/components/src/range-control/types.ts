@@ -14,8 +14,6 @@ import type {
 import type { BaseControlProps } from '../base-control/types';
 import type { IconType } from '../icon';
 
-export type Size = 'default' | 'small' | '__unstable-large';
-
 export type NumericProps = {
 	/**
 	 * The minimum `value` allowed.
@@ -277,6 +275,12 @@ export type TooltipProps = {
 export type TrackProps = {
 	disabled: boolean;
 	trackColor: CSSProperties[ 'color' ];
+};
+
+export type Size = 'default' | '__unstable-large';
+
+export type InputNumberProps = {
+	size?: Size;
 };
 
 export type UseControlledRangeValueArgs = {
