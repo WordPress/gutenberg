@@ -92,7 +92,9 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         rnMediaList.add(image);
                         break;
                     case VIDEO:
-                        Media video = new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", "", "", emptyMetadata);
+                        WritableNativeMap metadata = new WritableNativeMap();
+                        metadata.putString("extraID", "AbCdE");
+                        Media video = new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", "", "", metadata);
                         rnMediaList.add(video);
                         break;
                     case ANY:
