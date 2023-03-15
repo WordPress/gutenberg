@@ -67,8 +67,14 @@ function detectSnapping( element, snapEdge, alignmentGuides, snapGap ) {
 	return candidateGuide;
 }
 
-export function useDetectSnapping( snapGap ) {
+export function useDetectSnapping( {
+	snapGap = 50,
+	dwellTime = 300,
+	throttle = 100,
+} = {} ) {
 	const alignmentGuides = useBlockAlignmentGuides();
+	const snappedAlignmentInfo = useRef();
+
 	return useThrottle( ( element, snapEdge ) => {
 		const snappedAlignment = detectSnapping(
 			element,
@@ -76,8 +82,34 @@ export function useDetectSnapping( snapGap ) {
 			alignmentGuides,
 			snapGap
 		);
-		const guide = alignmentGuides.get( snappedAlignment );
 
+		// Set snapped alignment info when the user first reaches a snap guide.
+		if (
+			snappedAlignment &&
+			( ! snappedAlignmentInfo.current ||
+				snappedAlignmentInfo.current.name !== snappedAlignment )
+		) {
+			snappedAlignmentInfo.current = {
+				timestamp: Date.now(),
+				name: snappedAlignment,
+			};
+		}
+
+		// Unset snapped alignment info when the user moves away from a snap guide.
+		if ( ! snappedAlignment && snappedAlignmentInfo.current ) {
+			snappedAlignmentInfo.current = null;
+			return null;
+		}
+
+		// If the user hasn't dwelt long enough on the alignment, return early.
+		if (
+			snappedAlignmentInfo.current &&
+			Date.now() - snappedAlignmentInfo.current.timestamp < dwellTime
+		) {
+			return null;
+		}
+
+		const guide = alignmentGuides.get( snappedAlignmentInfo.current?.name );
 		if ( ! guide ) {
 			return null;
 		}
@@ -86,5 +118,5 @@ export function useDetectSnapping( snapGap ) {
 			name: snappedAlignment,
 			rect: getScreenRect( guide ),
 		};
-	}, 100 );
+	}, throttle );
 }

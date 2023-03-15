@@ -22,8 +22,6 @@ import {
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const SNAP_GAP = 30;
-
 function getVisibleHandles( alignment ) {
 	if ( alignment === 'center' ) {
 		// When the image is centered, show both handles.
@@ -83,7 +81,7 @@ function ResizableAlignmentControls( {
 	size,
 } ) {
 	const resizableRef = useRef();
-	const detectSnapping = useDetectSnapping( SNAP_GAP );
+	const detectSnapping = useDetectSnapping();
 	const [ isAlignmentVisualizerVisible, setIsAlignmentVisualizerVisible ] =
 		useState( false );
 	const [ snappedAlignment, setSnappedAlignment ] = useState( null );
