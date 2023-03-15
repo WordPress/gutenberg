@@ -14,6 +14,8 @@ import type {
 import type { BaseControlProps } from '../base-control/types';
 import type { IconType } from '../icon';
 
+export type Size = 'default' | 'small' | '__unstable-large';
+
 export type NumericProps = {
 	/**
 	 * The minimum `value` allowed.
@@ -203,6 +205,12 @@ export type RangeControlProps = Pick<
 		 * @default 10
 		 */
 		shiftStep?: number;
+		/**
+		 * Adjusts the size of the input.
+		 *
+		 * @default 'default'
+		 */
+		size?: Size;
 		/**
 		 * Forcing the Tooltip UI to show or hide. This is overridden to `false`
 		 * when `step` is set to the special string value `any`.

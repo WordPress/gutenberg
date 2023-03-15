@@ -69,6 +69,7 @@ function UnforwardedRangeControl(
 		railColor,
 		renderTooltipContent = ( v ) => v,
 		resetFallbackValue,
+		size = 'default',
 		shiftStep = 10,
 		showTooltip: showTooltipProp,
 		step = 1,
@@ -305,6 +306,7 @@ function UnforwardedRangeControl(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
+						size={ size }
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }

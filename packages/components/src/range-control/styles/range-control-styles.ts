@@ -28,7 +28,7 @@ const thumbSize = 12;
 
 export const Root = styled.div`
 	-webkit-tap-highlight-color: transparent;
-	align-items: flex-start;
+	align-items: center;
 	display: flex;
 	justify-content: flex-start;
 	padding: 0;
@@ -295,6 +295,7 @@ export const Tooltip = styled.span< TooltipProps >`
 export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;
+	margin-bottom: 0 !important;
 	margin-top: 0;
 	width: ${ space( 16 ) } !important;
 
