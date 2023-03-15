@@ -13,7 +13,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  * Internal dependencies
  */
 import NoticeList from '../../notice/list';
-import type { NoticeListProps } from '../../notice/types';
+import type { WithNoticeProps } from './types';
 
 /**
  * Override the default edit UI to include notices if supported.
@@ -50,52 +50,34 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 		ref: React.ForwardedRef< any >
 	) {
 		const [ noticeList, setNoticeList ] = useState<
-			NoticeListProps[ 'notices' ]
+			WithNoticeProps[ 'noticeList' ]
 		>( [] );
 
-		const noticeOperations = useMemo( () => {
-			/**
-			 * Function passed down as a prop that adds a new notice.
-			 *
-			 * @param notice Notice to add.
-			 */
-			const createNotice = ( notice: typeof noticeList[ number ] ) => {
-				const noticeToAdd = notice.id
-					? notice
-					: { ...notice, id: uuid() };
-				setNoticeList( ( current ) => [ ...current, noticeToAdd ] );
-			};
+		const noticeOperations = useMemo<
+			WithNoticeProps[ 'noticeOperations' ]
+		>( () => {
+			const createNotice: WithNoticeProps[ 'noticeOperations' ][ 'createNotice' ] =
+				( notice ) => {
+					const noticeToAdd = notice.id
+						? notice
+						: { ...notice, id: uuid() };
+					setNoticeList( ( current ) => [ ...current, noticeToAdd ] );
+				};
 
 			return {
 				createNotice,
-
-				/**
-				 * Function passed as a prop that adds a new error notice.
-				 *
-				 * @param msg Error message of the notice.
-				 */
-				createErrorNotice: ( msg: string ) => {
+				createErrorNotice: ( msg ) => {
 					// @ts-expect-error TODO: Missing `id`, potentially a bug
 					createNotice( {
 						status: 'error',
 						content: msg,
 					} );
 				},
-
-				/**
-				 * Removes a notice by id.
-				 *
-				 * @param id Id of the notice to remove.
-				 */
-				removeNotice: ( id: string ) => {
+				removeNotice: ( id ) => {
 					setNoticeList( ( current ) =>
 						current.filter( ( notice ) => notice.id !== id )
 					);
 				},
-
-				/**
-				 * Removes all notices
-				 */
 				removeAllNotices: () => {
 					setNoticeList( [] );
 				},
