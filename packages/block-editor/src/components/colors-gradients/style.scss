@@ -79,14 +79,14 @@ $swatch-gap: 12px;
 
 	&.first {
 		margin-top: $grid-unit-30;
-		border-top-left-radius: 2px;
-		border-top-right-radius: 2px;
+		border-top-left-radius: $radius-block-ui;
+		border-top-right-radius: $radius-block-ui;
 		border-top: 1px solid $gray-300;
 	}
 
 	&.last {
-		border-bottom-left-radius: 2px;
-		border-bottom-right-radius: 2px;
+		border-bottom-left-radius: $radius-block-ui;
+		border-bottom-right-radius: $radius-block-ui;
 	}
 
 	> div,
