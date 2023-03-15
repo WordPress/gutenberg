@@ -21,7 +21,7 @@ export type CustomGradientPickerProps = {
 	value?: string | null;
 	/**
 	 * The function called when a new gradient has been defined. It is passed to
-	 * the `currentGradient` as an arugment.
+	 * the `currentGradient` as an argument.
 	 */
 	onChange: ( currentGradient?: string ) => void;
 	/**
@@ -50,7 +50,7 @@ export type ControlPoint = { color: string; position: number };
 
 // When dealing with unions of objects, using `Omit` or `Pick` will result
 // in a new type where each desired prop is a union of the values for that prop
-// from all of the origional union members. This does not maintain the specific
+// from all of the original union members. This does not maintain the specific
 // combinations of props present in the original union.
 // To avoid this, the `DistributiveOmit` and `DistributiveOmit` type will
 // "distribute" the `Omit`/`Pick` across the union. This allows the `Omit`/`Pick`
