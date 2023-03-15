@@ -59,7 +59,7 @@ export default function ConvertToStickyGroup( { selectedClientIds, onClose } ) {
 				...( newBlocks[ 0 ].attributes.style || {} ),
 				position: {
 					type: 'sticky',
-					top: '0',
+					top: '0px',
 				},
 			};
 			replaceBlocks( clientIds, newBlocks );
