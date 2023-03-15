@@ -1,72 +1,73 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
-import MatchMediaMock from 'jest-matchmedia-mock';
+import { act, render } from '@testing-library/react';
+import {
+	matchMedia,
+	MediaQueryListEvent,
+	setMedia,
+	cleanup,
+} from 'mock-match-media';
 
 /**
  * Internal dependencies
  */
 import useMediaQuery from '../';
 
-describe( 'useMediaQuery', () => {
-	let matchMedia;
+const TestComponent = ( { query } ) => {
+	const queryResult = useMediaQuery( query );
+	return `useMediaQuery: ${ queryResult }`;
+};
 
+describe( 'useMediaQuery', () => {
 	beforeAll( () => {
-		matchMedia = new MatchMediaMock();
+		window.matchMedia = matchMedia;
+		window.MediaQueryListEvent = MediaQueryListEvent;
+	} );
+
+	beforeEach( () => {
+		setMedia( {
+			width: '960px',
+		} );
 	} );
 
 	afterEach( () => {
-		matchMedia.clear();
+		cleanup();
 	} );
 
-	const TestComponent = ( { query } ) => {
-		const queryResult = useMediaQuery( query );
-		return `useMediaQuery: ${ queryResult }`;
-	};
-
 	it( 'should return true when query matches', async () => {
-		matchMedia.useMediaQuery( '(min-width: 782px)' );
-
-		const { container, unmount } = render(
+		const { container } = render(
 			<TestComponent query="(min-width: 782px)" />
 		);
 
 		expect( container ).toHaveTextContent( 'useMediaQuery: true' );
-
-		unmount();
-		expect( matchMedia.getListeners( '(min-width: 782px)' ).length ).toBe(
-			0
-		);
 	} );
 
 	it( 'should correctly update the value when the query evaluation matches', async () => {
-		const query = '(min-width: 782px)';
-		matchMedia.useMediaQuery( query );
-
 		const { container } = render(
 			<TestComponent query="(min-width: 782px)" />
 		);
 
 		expect( container ).toHaveTextContent( 'useMediaQuery: true' );
 
-		// @todo fix re-evaluataions case.
-		// expect( container ).toHaveTextContent( 'useMediaQuery: false' );
+		act( () => {
+			setMedia( {
+				width: '600px',
+			} );
+		} );
+
+		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 	} );
 
 	it( 'should return false when the query does not matches', async () => {
-		matchMedia.useMediaQuery( '(min-width: 600px)' );
-
 		const { container } = render(
-			<TestComponent query="(min-width: 782px)" />
+			<TestComponent query="(max-width: 782px)" />
 		);
 
 		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 	} );
 
-	it( 'should not call matchMedia if a query is not passed', async () => {
-		matchMedia.useMediaQuery( '(min-width: 600px)' );
-
+	it( 'should return false when a query is not passed', async () => {
 		const { container, rerender } = render( <TestComponent /> );
 
 		// Query will be case to a boolean to simplify the return type.
