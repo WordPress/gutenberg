@@ -15,16 +15,30 @@ import { Popover, SlotFillProvider } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import '@wordpress/format-library';
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	unregisterBlockType,
+	getBlockTypes,
+} from '@wordpress/blocks';
 
-registerCoreBlocks();
-
-export default function Editor( { testBlock } ) {
+export default function Editor( { testBlock, useCoreBlocks = true } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	useEffect( () => {
+		if ( useCoreBlocks ) {
+			registerCoreBlocks();
+		}
+		return () => {
+			if ( useCoreBlocks ) {
+				getBlockTypes().forEach( ( { name } ) =>
+					unregisterBlockType( name )
+				);
+			}
+		};
+	}, [ useCoreBlocks ] );
+
+	useEffect( () => {
 		const block = createBlock( testBlock.name, testBlock.attributes || {} );
-		block.isSelected = true;
 		updateBlocks( [ block ] );
 	}, [ testBlock.name, testBlock.attributes ] );
 

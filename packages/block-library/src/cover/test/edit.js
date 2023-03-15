@@ -7,13 +7,26 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import Editor from './mock-editor';
+import Editor from './integration-test-editor';
 
 function setup( jsx ) {
 	return {
 		user: userEvent.setup(),
 		...render( jsx ),
 	};
+}
+
+async function selectCoverBlock( user ) {
+	await user.click(
+		screen.getByRole( 'button', {
+			name: 'Color: Black',
+		} )
+	);
+	await user.click(
+		screen.getByRole( 'button', {
+			name: 'Select Cover',
+		} )
+	);
 }
 
 describe( 'Cover edit', () => {
@@ -48,16 +61,9 @@ describe( 'Cover edit', () => {
 			const { user } = setup(
 				<Editor testBlock={ { name: 'core/cover' } } />
 			);
-			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Color: Black',
-				} )
-			);
-			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Select Cover',
-				} )
-			);
+
+			await selectCoverBlock( user );
+
 			expect(
 				screen.getByRole( 'button', {
 					name: 'Change content position',
@@ -69,16 +75,8 @@ describe( 'Cover edit', () => {
 			const { user } = setup(
 				<Editor testBlock={ { name: 'core/cover' } } />
 			);
-			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Color: Black',
-				} )
-			);
-			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Select Cover',
-				} )
-			);
+
+			await selectCoverBlock( user );
 
 			await user.click(
 				screen.getByRole( 'tab', {
@@ -92,16 +90,9 @@ describe( 'Cover edit', () => {
 			const { user, container } = setup(
 				<Editor testBlock={ { name: 'core/cover' } } />
 			);
-			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Color: Black',
-				} )
-			);
-			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Select Cover',
-				} )
-			);
+
+			await selectCoverBlock( user );
+
 			// eslint-disable-next-line testing-library/no-node-access
 			const overlay = container.getElementsByClassName(
 				'wp-block-cover__background'
