@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 23.6.0 (2023-03-15)
+
 ### Enhancements
 
 -   `FontSizePicker`: Allow custom units for custom font size control ([#48468](https://github.com/WordPress/gutenberg/pull/48468)).
