@@ -3480,39 +3480,4 @@ class WP_Theme_JSON_Gutenberg {
 
 		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_sizes );
 	}
-
-	/**
-	 * Returns the CSS variable for a preset.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @param array  $path Path to the preset.
-	 * @param string $slug Slug of the preset.
-	 * @return string CSS variable.
-	 */
-	public static function get_preset_css_var( $path, $slug ) {
-		$duotone_preset_metadata = static::get_preset_metadata_from_path( $path );
-		return static::replace_slug_in_string( $duotone_preset_metadata['css_vars'], $slug );
-	}
-
-	/**
-	 * Returns the metadata for a preset.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @param array $path Path to the preset.
-	 * @return array Preset metadata.
-	 */
-	static function get_preset_metadata_from_path( $path ) {
-		$preset_metadata = array_filter(
-			static::PRESETS_METADATA,
-			function( $preset ) use ( &$path ) {
-				if ( $preset['path'] === $path ) {
-					return $preset;
-				}
-			}
-		);
-
-		return reset( $preset_metadata );
-	}
 }

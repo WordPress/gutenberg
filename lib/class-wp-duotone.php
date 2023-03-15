@@ -68,6 +68,9 @@ class WP_Duotone {
 	 */
 	static $output = array();
 
+
+	const CSS_VAR_PREFIX = '--wp--preset--duotone--';
+
 	/**
 	 * Get all possible duotone presets from global and theme styles and store as slug => [ colors array ]
 	 * We only want to process this one time. On block render we'll access and output only the needed presets for that page.
@@ -144,6 +147,30 @@ class WP_Duotone {
 
 		return array_key_exists( $slug, WP_Duotone::$global_styles_presets );
 	}
+
+	/**
+	 * Get the CSS variable name for a duotone preset.
+	 *
+	 * @param string $slug The slug of the duotone preset.
+	 * @return string The CSS variable name.
+	 */
+	static function get_css_var( $slug ) {
+		return self::CSS_VAR_PREFIX . $slug;
+	}
+
+	/**
+	 * Get the CSS declaration for a duotone preset.
+	 * Example: --wp--preset--duotone--blue-orange: url('#wp-duotone-blue-orange');
+	 *
+	 * @param array $filter_data The duotone data for presets and custom filters.
+	 * @return string The CSS declaration.
+	 */
+	static function get_css_declaration( $filter_data ) {
+		$filter_property        = gutenberg_get_duotone_filter_property( $filter_data );
+		$duotone_preset_css_var = WP_Duotone::get_css_var( $filter_data['slug'] );
+		return $duotone_preset_css_var . ': ' . $filter_property . ';';
+	}
+
 }
 
 add_action( 'wp_loaded', array( 'WP_Duotone', 'set_global_styles_presets' ), 10 );

@@ -548,7 +548,6 @@ add_action(
 
 		foreach ( WP_Duotone::$output as $filter_data ) {
 
-			$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
 			// SVG will be output on the page later.
 			$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
 
@@ -556,8 +555,7 @@ add_action(
 
 			// This is for classic themes - in block themes, the CSS is added in the head via the value_func.
 			if ( ! wp_is_block_theme() ) {
-				$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $filter_data['slug'] );
-				wp_add_inline_style( 'core-block-supports', 'body{' . $duotone_preset_css_var . ' :' . $filter_property . ';}' );
+				wp_add_inline_style( 'core-block-supports', 'body{' . WP_Duotone::get_css_declaration( $filter_data ) . '}' );
 			}
 
 			global $is_safari;
@@ -586,10 +584,7 @@ add_action(
 				continue;
 			}
 
-			$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
-
-			$duotone_preset_css_var = WP_Theme_JSON_Gutenberg::get_preset_css_var( array( 'color', 'duotone' ), $filter_data['slug'] );
-			$duotone_css_vars      .= $duotone_preset_css_var . ': ' . $filter_property . ';';
+			$duotone_css_vars .= WP_Duotone::get_css_declaration( $filter_data );
 		}
 
 		if ( ! empty( $duotone_css_vars ) ) {
