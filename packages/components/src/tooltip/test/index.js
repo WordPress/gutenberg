@@ -156,14 +156,16 @@ describe( 'Tooltip', () => {
 				screen.queryByText( 'tooltip text' )
 			).not.toBeInTheDocument();
 
-			const tooltip = await screen.findByText( 'tooltip text' );
-
-			expect( tooltip ).toBeVisible();
+			await waitFor( () =>
+				expect( screen.getByText( 'tooltip text' ) ).toBeVisible()
+			);
 
 			// Wait for the tooltip element to be positioned (aligned with the button)
 			await waitFor( () =>
 				expect(
-					getWrappingPopoverElement( tooltip )
+					getWrappingPopoverElement(
+						screen.getByText( 'tooltip text' )
+					)
 				).toBePositionedPopover()
 			);
 		} );
