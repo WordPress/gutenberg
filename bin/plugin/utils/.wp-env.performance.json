@@ -1,7 +1,11 @@
 {
 	"core": "WordPress/WordPress",
 	"plugins": [ "./plugin" ],
-	"themes": [ "../../tests/test/emptytheme" ],
+	"themes": [
+		"../../tests/test/emptytheme",
+		"https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip",
+		"https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip"
+	],
 	"env": {
 		"tests": {
 			"mappings": {
