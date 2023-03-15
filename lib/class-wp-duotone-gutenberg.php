@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Duotone class
+ * WP_Duotone_Gutenberg class
  *
  * @package gutenberg
  * @since 6.3.0
@@ -11,7 +11,7 @@
  *
  * @access public
  */
-class WP_Duotone {
+class WP_Duotone_Gutenberg {
 	/**
 	 * An array of Duotone presets from global, theme, and custom styles.
 	 *
@@ -91,7 +91,7 @@ class WP_Duotone {
 	}
 
 	/**
-	 * Scrape all block names from global styles and store in WP_Duotone::$global_styles_block_names
+	 * Scrape all block names from global styles and store in WP_Duotone_Gutenberg::$global_styles_block_names
 	 */
 	static function set_global_style_block_names() {
 		// Get the per block settings from the theme.json.
@@ -143,9 +143,9 @@ class WP_Duotone {
 	 * @return bool True if the duotone preset present and valid.
 	 */
 	static function is_preset( $duotone_attr ) {
-		$slug = WP_Duotone::gutenberg_get_slug_from_attr( $duotone_attr );
+		$slug = WP_Duotone_Gutenberg::gutenberg_get_slug_from_attr( $duotone_attr );
 
-		return array_key_exists( $slug, WP_Duotone::$global_styles_presets );
+		return array_key_exists( $slug, WP_Duotone_Gutenberg::$global_styles_presets );
 	}
 
 	/**
@@ -171,11 +171,11 @@ class WP_Duotone {
 	 */
 	static function get_css_custom_property_declaration( $filter_data ) {
 		$declaration_value                = gutenberg_get_duotone_filter_property( $filter_data );
-		$duotone_preset_css_property_name = WP_Duotone::get_css_custom_property_name( $filter_data['slug'] );
+		$duotone_preset_css_property_name = WP_Duotone_Gutenberg::get_css_custom_property_name( $filter_data['slug'] );
 		return $duotone_preset_css_property_name . ': ' . $declaration_value . ';';
 	}
 
 }
 
-add_action( 'wp_loaded', array( 'WP_Duotone', 'set_global_styles_presets' ), 10 );
-add_action( 'wp_loaded', array( 'WP_Duotone', 'set_global_style_block_names' ), 10 );
+add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_styles_presets' ), 10 );
+add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_style_block_names' ), 10 );

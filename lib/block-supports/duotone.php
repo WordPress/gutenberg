@@ -438,7 +438,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	// The block should have a duotone attribute or have duotone defined in its theme.json to be processed.
 	$has_duotone_attribute     = isset( $block['attrs']['style']['color']['duotone'] );
-	$has_global_styles_duotone = array_key_exists( $block['blockName'], WP_Duotone::$global_styles_block_names );
+	$has_global_styles_duotone = array_key_exists( $block['blockName'], WP_Duotone_Gutenberg::$global_styles_block_names );
 
 	if (
 		empty( $block_content ) ||
@@ -457,19 +457,19 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
 
 		$duotone_attr = $block['attrs']['style']['color']['duotone'];
-		$is_preset    = is_string( $duotone_attr ) && WP_Duotone::is_preset( $duotone_attr );
+		$is_preset    = is_string( $duotone_attr ) && WP_Duotone_Gutenberg::is_preset( $duotone_attr );
 		$is_css       = is_string( $duotone_attr ) && ! $is_preset;
 		$is_custom    = is_array( $duotone_attr );
 
 		if ( $is_preset ) {
 
 			// Extract the slug from the preset variable string.
-			$slug = WP_Duotone::gutenberg_get_slug_from_attr( $duotone_attr );
+			$slug = WP_Duotone_Gutenberg::gutenberg_get_slug_from_attr( $duotone_attr );
 
 			// Utilize existing preset CSS custom property.
-			$declaration_value = WP_Duotone::get_css_var( $slug );
+			$declaration_value = WP_Duotone_Gutenberg::get_css_var( $slug );
 
-			WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
+			WP_Duotone_Gutenberg::$output[ $slug ] = WP_Duotone_Gutenberg::$global_styles_presets[ $slug ];
 
 		} elseif ( $is_css ) {
 			// Build a unique slug for the filter based on the CSS value.
@@ -488,15 +488,15 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			// Build a customized CSS filter property for unique slug.
 			$declaration_value = gutenberg_get_duotone_filter_property( $filter_data );
 
-			WP_Duotone::$output[ $slug ] = $filter_data;
+			WP_Duotone_Gutenberg::$output[ $slug ] = $filter_data;
 		}
 	} elseif ( $has_global_styles_duotone ) {
-		$slug = WP_Duotone::$global_styles_block_names[ $block['blockName'] ];
+		$slug = WP_Duotone_Gutenberg::$global_styles_block_names[ $block['blockName'] ];
 
 		// Utilize existing preset CSS custom property.
-		$declaration_value = WP_Duotone::get_css_var( $slug );
+		$declaration_value = WP_Duotone_Gutenberg::get_css_var( $slug );
 
-		WP_Duotone::$output[ $slug ] = WP_Duotone::$global_styles_presets[ $slug ];
+		WP_Duotone_Gutenberg::$output[ $slug ] = WP_Duotone_Gutenberg::$global_styles_presets[ $slug ];
 	}
 
 	// - Applied as a class attribute to the block wrapper.
@@ -507,8 +507,8 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_support );
 
 	// We only want to add the selector if we have it in the output already, essentially skipping 'unset'.
-	if ( array_key_exists( $slug, WP_Duotone::$output ) ) {
-		WP_Duotone::$output[ $slug ]['selector'] = $selector;
+	if ( array_key_exists( $slug, WP_Duotone_Gutenberg::$output ) ) {
+		WP_Duotone_Gutenberg::$output[ $slug ]['selector'] = $selector;
 	}
 
 	// Calling gutenberg_style_engine_get_stylesheet_from_css_rules ensures that
@@ -550,7 +550,7 @@ add_action(
 	'wp_footer',
 	static function () {
 
-		foreach ( WP_Duotone::$output as $filter_data ) {
+		foreach ( WP_Duotone_Gutenberg::$output as $filter_data ) {
 
 			// SVG will be output on the page later.
 			$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
@@ -560,7 +560,7 @@ add_action(
 			// This is for classic themes - in block themes, the CSS is added in the head via wp_add_inline_style in the wp_enqueue_scripts action.
 
 			if ( ! wp_is_block_theme() ) {
-				wp_add_inline_style( 'core-block-supports', 'body{' . WP_Duotone::get_css_custom_property_declaration( $filter_data ) . '}' );
+				wp_add_inline_style( 'core-block-supports', 'body{' . WP_Duotone_Gutenberg::get_css_custom_property_declaration( $filter_data ) . '}' );
 			}
 
 			global $is_safari;
@@ -578,18 +578,18 @@ add_action(
 	'wp_enqueue_scripts',
 	static function() {
 
-		if ( empty( WP_Duotone::$output ) ) {
+		if ( empty( WP_Duotone_Gutenberg::$output ) ) {
 			return;
 		}
 
 		$duotone_css_vars = '';
 
-		foreach ( WP_Duotone::$output as $filter_data ) {
-			if ( ! array_key_exists( $filter_data['slug'], WP_Duotone::$global_styles_presets ) ) {
+		foreach ( WP_Duotone_Gutenberg::$output as $filter_data ) {
+			if ( ! array_key_exists( $filter_data['slug'], WP_Duotone_Gutenberg::$global_styles_presets ) ) {
 				continue;
 			}
 
-			$duotone_css_vars .= WP_Duotone::get_css_custom_property_declaration( $filter_data );
+			$duotone_css_vars .= WP_Duotone_Gutenberg::get_css_custom_property_declaration( $filter_data );
 		}
 
 		if ( ! empty( $duotone_css_vars ) ) {
