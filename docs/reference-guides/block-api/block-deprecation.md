@@ -45,11 +45,11 @@ Deprecations are defined on a block type as its `deprecated` property, an array 
 		- `Object | Array`: Either the updated block attributes or tuple array `[attributes, innerBlocks]`.
 -   `isEligible`: (Function, Optional). A function which returns `true` if the deprecation can handle the block migration even if the block is valid. It is particularly useful in cases where a block is technically valid even once deprecated, but still requires updates to its attributes or inner blocks. This function is **not** called when the results of all previous deprecations' save functions were invalid.
 	- _Parameters_
-		- `attributes`: The block attributes parsed directly from the saved markup without being passed through any further code.
+		- `attributes`: The raw block attributes as parsed from the serialized HTML, and before the block type code is applied.
 		- `innerBlocks`: The block's current inner blocks.
 		- `data`: An object containing properties representing the block node and its resulting block object.
-			- `data.blockNode`: The raw form of the block and the result of simply parsing the serialized HTML.
-			- `data.block`: The block object, which is the result of feeding the `blockNode` through the block type's code.
+			- `data.blockNode`: The raw form of the block as a result of parsing the serialized HTML.
+			- `data.block`: The block object, which is the result of applying the block type to the `blockNode`.
 	- _Return_
 		- `boolean`: Whether or not this otherwise valid block is eligible to be migrated by this deprecation.
 
