@@ -158,6 +158,12 @@ class WP_Duotone_Gutenberg {
 		return self::CSS_VAR_PREFIX . $slug;
 	}
 
+	/**
+	 * Get the CSS variable for a duotone preset.
+	 *
+	 * @param string $slug The slug of the duotone preset.
+	 * @return string The CSS variable.
+	 */
 	static function get_css_var( $slug ) {
 		return 'var(' . self::get_css_custom_property_name( $slug ) . ')';
 	}
@@ -180,7 +186,6 @@ class WP_Duotone_Gutenberg {
 	 * so we force a repaint with a WebKit hack which solves the issue.
 	 *
 	 * @param string $selector The selector to apply the hack for.
-	 * @return string The <script> to rerender the image.
 	 */
 	static function safari_rerender_hack( $selector ) {
 		/*
