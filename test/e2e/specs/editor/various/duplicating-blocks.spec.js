@@ -19,7 +19,7 @@ test.describe( 'Duplicating blocks', () => {
 		// Select the test we just typed
 		// This doesn't do anything but we previously had a duplicationi bug
 		// When the selection was not collapsed.
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		await editor.clickBlockToolbarButton( 'Options' );
 		await page.click( 'role=menuitem[name=/Duplicate/i]' );
@@ -46,10 +46,10 @@ test.describe( 'Duplicating blocks', () => {
 		// Select the test we just typed
 		// This doesn't do anything but we previously had a duplicationi bug
 		// When the selection was not collapsed.
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		// Duplicate using the keyboard shortccut.
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'd' );
+		await pageUtils.pressKeys( 'primaryShift+d' );
 
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:paragraph -->

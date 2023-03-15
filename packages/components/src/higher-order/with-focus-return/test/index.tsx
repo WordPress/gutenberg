@@ -12,9 +12,9 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import withFocusReturn from '../';
+import withFocusReturn from '..';
 
-class Test extends Component {
+class Test extends Component< { className: string; focusHistory: unknown } > {
 	render() {
 		const { className, focusHistory } = this.props;
 		return (

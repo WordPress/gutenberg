@@ -3,8 +3,6 @@
  */
 import { createRegistry, controls } from '..';
 
-jest.useRealTimers();
-
 describe( 'controls', () => {
 	// Create a registry with store to test select controls.
 	function createSelectTestRegistry() {

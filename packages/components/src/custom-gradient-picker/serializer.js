@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 export function serializeGradientColor( { type, value } ) {
 	if ( type === 'literal' ) {
 		return value;
