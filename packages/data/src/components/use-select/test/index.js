@@ -6,7 +6,7 @@ import { act, render, fireEvent, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { Component, useState, useReducer } from '@wordpress/element';
+import { useLayoutEffect, useState, useReducer } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -499,48 +499,25 @@ describe( 'useSelect', () => {
 			);
 		} );
 
-		it( 'captures state changes scheduled between render and effect', () => {
+		it( 'captures state changes scheduled between render and subscription', () => {
 			registry.registerStore( 'store-1', counterStore() );
 
-			class ChildComponent extends Component {
-				componentDidUpdate( prevProps ) {
-					if (
-						this.props.childShouldDispatch &&
-						this.props.childShouldDispatch !==
-							prevProps.childShouldDispatch
-					) {
-						registry.dispatch( 'store-1' ).inc();
-					}
-				}
-
-				render() {
-					return null;
-				}
-			}
-
-			const selectCount1AndDep = jest.fn( ( select ) => ( {
+			const selectCount1 = jest.fn( ( select ) => ( {
 				count1: select( 'store-1' ).get(),
 			} ) );
 
-			const TestComponent = () => {
-				const [ childShouldDispatch, setChildShouldDispatch ] =
-					useState( false );
-				const state = useSelect( selectCount1AndDep, [] );
+			const TestComponent = jest.fn( () => {
+				const { count1 } = useSelect( selectCount1, [] );
 
-				return (
-					<>
-						<div role="status">count1:{ state.count1 }</div>
-						<ChildComponent
-							childShouldDispatch={ childShouldDispatch }
-						/>
-						<button
-							onClick={ () => setChildShouldDispatch( true ) }
-						>
-							triggerChildDispatch
-						</button>
-					</>
-				);
-			};
+				// Increment the store value from 0 to 1 after render and before subscription
+				useLayoutEffect( () => {
+					if ( count1 === 0 ) {
+						registry.dispatch( 'store-1' ).inc();
+					}
+				}, [ count1 ] );
+
+				return <div role="status">count1:{ count1 }</div>;
+			} );
 
 			render(
 				<RegistryProvider value={ registry }>
@@ -548,9 +525,14 @@ describe( 'useSelect', () => {
 				</RegistryProvider>
 			);
 
-			fireEvent.click( screen.getByText( 'triggerChildDispatch' ) );
+			// One select on initial render, and one in `checkIfSnapshotChanged` after subscribing.
+			// There's a third selector call on the second render, but that one returns a memoized value.
+			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
 
-			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 3 );
+			// Initial render and second render after counter increment (which is expected to be detected).
+			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+
+			// Finally rendered with the incremented counter's value.
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count1:1'
 			);
