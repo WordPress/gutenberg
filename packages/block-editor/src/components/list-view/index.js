@@ -58,7 +58,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {boolean} props.showAppender    Flag to show or hide the block appender.
  * @param {Object}  ref                   Forwarded ref
  */
-function ListView(
+function ListViewComponent(
 	{
 		id,
 		blocks,
@@ -218,4 +218,8 @@ function ListView(
 		</AsyncModeProvider>
 	);
 }
-export default forwardRef( ListView );
+export const PrivateListView = forwardRef( ListViewComponent );
+
+export default forwardRef( ( props, ref ) => {
+	return <PrivateListView ref={ ref } { ...props } showAppender={ false } />;
+} );
