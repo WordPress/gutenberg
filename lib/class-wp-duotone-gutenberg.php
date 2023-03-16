@@ -47,8 +47,8 @@ class WP_Duotone_Gutenberg {
 	protected static $global_styles_block_names = array();
 
 	/**
-	 * An array of Duotone SVG and CSS ouput needed for the frontend duotone rendering based on what is
-	 * being ouptput on the page. Organized by a slug of the preset/color group and the information needed
+	 * An array of Duotone SVG and CSS output needed for the frontend duotone rendering based on what is
+	 * being output on the page. Organized by a slug of the preset/color group and the information needed
 	 * to generate the SVG and CSS at render.
 	 *
 	 * Example:
