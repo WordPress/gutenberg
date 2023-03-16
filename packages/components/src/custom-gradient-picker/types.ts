@@ -23,7 +23,7 @@ export type CustomGradientPickerProps = {
 	 * The function called when a new gradient has been defined. It is passed to
 	 * the `currentGradient` as an argument.
 	 */
-	onChange: ( currentGradient?: string ) => void;
+	onChange: ( currentGradient: string ) => void;
 	/**
 	 * Whether this is rendered in the sidebar.
 	 *
