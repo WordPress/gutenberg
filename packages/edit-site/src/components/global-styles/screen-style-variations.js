@@ -172,7 +172,11 @@ function ScreenStyleVariations() {
 				) }
 			/>
 
-			<Card size="small" isBorderless>
+			<Card
+				size="small"
+				isBorderless
+				className="edit-site-global-styles-screen-style-variations"
+			>
 				<CardBody>
 					<Grid columns={ 2 }>
 						{ withEmptyVariation?.map( ( variation, index ) => (

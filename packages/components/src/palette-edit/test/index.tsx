@@ -6,12 +6,13 @@ import { render, fireEvent, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import PaletteEdit, { getNameForPosition } from '../';
+import PaletteEdit, { getNameForPosition } from '..';
+import type { PaletteElement } from '../types';
 
 describe( 'getNameForPosition', () => {
 	test( 'should return 1 by default', () => {
 		const slugPrefix = 'test-';
-		const elements = [];
+		const elements: PaletteElement[] = [];
 
 		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
 			'Color 1'
@@ -23,6 +24,8 @@ describe( 'getNameForPosition', () => {
 		const elements = [
 			{
 				slug: 'test-color-1',
+				color: '#ffffff',
+				name: 'Test Color 1',
 			},
 		];
 
@@ -36,6 +39,8 @@ describe( 'getNameForPosition', () => {
 		const elements = [
 			{
 				slug: 'a-sweet-color-2',
+				color: '#ffffff',
+				name: 'Test Color 1',
 			},
 		];
 
@@ -49,15 +54,23 @@ describe( 'getNameForPosition', () => {
 		const elements = [
 			{
 				slug: 'test-color-1',
+				color: '#ffffff',
+				name: 'Test Color 1',
 			},
 			{
 				slug: 'test-color-2',
+				color: '#1a4548',
+				name: 'Test Color 2',
 			},
 			{
 				slug: 'test-color-150',
+				color: '#f6f6f6',
+				name: 'Test Color 150',
 			},
 			{
 				slug: 'a-sweet-color-100',
+				color: '#ffe2c7',
+				name: 'A Sweet Color 100',
 			},
 		];
 
@@ -69,7 +82,6 @@ describe( 'getNameForPosition', () => {
 
 describe( 'PaletteEdit', () => {
 	const defaultProps = {
-		gradients: false,
 		colors: [ { color: '#ffffff', name: 'Base', slug: 'base' } ],
 		onChange: jest.fn(),
 		paletteLabel: 'Test label',

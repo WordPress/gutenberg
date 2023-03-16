@@ -1,10 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { __, sprintf, _x } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
+import {
+	__experimentalUseNavigator as useNavigator,
+	Icon,
+} from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -14,23 +18,30 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
+import { useAddedBy } from '../list/added-by';
 
-export default function SidebarNavigationScreenTemplate() {
-	const { params } = useNavigator();
-	const { postType, postId } = params;
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+function useTemplateTitleAndDescription( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
 		postType,
 		postId
 	);
-	let description = getDescription();
-	if ( ! description ) {
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme(),
+		[]
+	);
+	const addedBy = useAddedBy( postType, postId );
+	const isAddedByActiveTheme =
+		addedBy.type === 'theme' && record.theme === currentTheme?.stylesheet;
+	const title = getTitle();
+	let descriptionText = getDescription();
+
+	if ( ! descriptionText && addedBy.text ) {
 		if ( record.type === 'wp_template' && record.is_custom ) {
-			description = __(
+			descriptionText = __(
 				'This is a custom template that can be applied manually to any Post or Page.'
 			);
 		} else if ( record.type === 'wp_template_part' ) {
-			description = sprintf(
+			descriptionText = sprintf(
 				// translators: %s: template part title e.g: "Header".
 				__( 'This is your %s template part.' ),
 				getTitle()
@@ -38,9 +49,55 @@ export default function SidebarNavigationScreenTemplate() {
 		}
 	}
 
+	const description = (
+		<>
+			{ descriptionText }
+
+			{ addedBy.text && ! isAddedByActiveTheme && (
+				<span className="edit-site-sidebar-navigation-screen-template__added-by-description">
+					<span className="edit-site-sidebar-navigation-screen-template__added-by-description-author">
+						<span className="edit-site-sidebar-navigation-screen-template__added-by-description-author-icon">
+							{ addedBy.imageUrl ? (
+								<img
+									src={ addedBy.imageUrl }
+									alt=""
+									width="24"
+									height="24"
+								/>
+							) : (
+								<Icon icon={ addedBy.icon } />
+							) }
+						</span>
+						{ addedBy.text }
+					</span>
+
+					{ addedBy.isCustomized && (
+						<span className="edit-site-sidebar-navigation-screen-template__added-by-description-customized">
+							{ postType === 'wp_template'
+								? _x( '(Customized)', 'template' )
+								: _x( '(Customized)', 'template part' ) }
+						</span>
+					) }
+				</span>
+			) }
+		</>
+	);
+
+	return { title, description };
+}
+
+export default function SidebarNavigationScreenTemplate() {
+	const { params } = useNavigator();
+	const { postType, postId } = params;
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { title, description } = useTemplateTitleAndDescription(
+		postType,
+		postId
+	);
+
 	return (
 		<SidebarNavigationScreen
-			title={ getTitle() }
+			title={ title }
 			actions={
 				<SidebarButton
 					onClick={ () => setCanvasMode( 'edit' ) }

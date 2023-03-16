@@ -76,10 +76,18 @@ export default function useBlockSync( {
 		resetBlocks,
 		resetSelection,
 		replaceInnerBlocks,
+		selectBlock,
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
-	const { getBlockName, getBlocks } = registry.select( blockEditorStore );
+	const {
+		hasSelectedBlock,
+		getBlockName,
+		getBlocks,
+		getSelectionStart,
+		getSelectionEnd,
+		getBlock,
+	} = registry.select( blockEditorStore );
 	const isControlled = useSelect(
 		( select ) => {
 			return (
@@ -159,6 +167,9 @@ export default function useBlockSync( {
 			// bound sync, unset the outbound value to avoid considering it in
 			// subsequent renders.
 			pendingChanges.current.outgoing = [];
+			const hadSelecton = hasSelectedBlock();
+			const selectionAnchor = getSelectionStart();
+			const selectionFocus = getSelectionEnd();
 			setControlledBlocks();
 
 			if ( controlledSelection ) {
@@ -167,6 +178,15 @@ export default function useBlockSync( {
 					controlledSelection.selectionEnd,
 					controlledSelection.initialPosition
 				);
+			} else {
+				const selectionStillExists = getBlock(
+					selectionAnchor.clientId
+				);
+				if ( hadSelecton && ! selectionStillExists ) {
+					selectBlock( clientId );
+				} else {
+					resetSelection( selectionAnchor, selectionFocus );
+				}
 			}
 		}
 	}, [ controlledBlocks, clientId ] );
@@ -182,8 +202,6 @@ export default function useBlockSync( {
 
 	useEffect( () => {
 		const {
-			getSelectionStart,
-			getSelectionEnd,
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
@@ -220,7 +238,6 @@ export default function useBlockSync( {
 			const newBlocks = getBlocks( clientId );
 			const areBlocksDifferent = newBlocks !== blocks;
 			blocks = newBlocks;
-
 			if (
 				areBlocksDifferent &&
 				( pendingChanges.current.incoming ||
