@@ -6,6 +6,10 @@
 
 -   `CustomGradientPicker`: Convert to TypeScript ([#48929](https://github.com/WordPress/gutenberg/pull/48929)).
 
+### Enhancements
+
+-   `CustomGradientPicker`: improve initial state UI ([#49146](https://github.com/WordPress/gutenberg/pull/49146)).
+
 ## 23.6.0 (2023-03-15)
 
 ### Enhancements
