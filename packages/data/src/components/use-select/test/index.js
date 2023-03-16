@@ -538,6 +538,68 @@ describe( 'useSelect', () => {
 			);
 		} );
 
+		it( 'captures state changes scheduled between render and effect after selector change', () => {
+			registry.registerStore( 'names', {
+				reducer: ( state = {}, action ) => {
+					if ( action.type === 'SET_NAME' ) {
+						return {
+							...state,
+							[ action.id ]: action.name,
+						};
+					}
+					return state;
+				},
+				actions: {
+					setName: ( id, name ) => ( { type: 'SET_NAME', id, name } ),
+				},
+				selectors: {
+					getName: ( state, id ) => state[ id ] ?? 'null',
+				},
+			} );
+
+			const renderedItems = [];
+
+			function TestComponent() {
+				const [ blockId, setBlockId ] = useState( 1 );
+
+				const name = useSelect(
+					( select ) => select( 'names' ).getName( blockId ),
+					[ blockId ]
+				);
+
+				// Change name of block 2. The store listener will still use the old selector
+				// for block 1, because a new one will be stored by an effect a moment later,
+				// but we're testing that it still won't miss the update, because one more check
+				// will happen in that effect.
+				useLayoutEffect( () => {
+					if ( blockId === 2 ) {
+						registry.dispatch( 'names' ).setName( 2, 'new2' );
+					}
+				}, [ blockId ] );
+
+				renderedItems.push( name );
+
+				return (
+					<button onClick={ () => setBlockId( 2 ) }>
+						change-block
+					</button>
+				);
+			}
+
+			render(
+				<RegistryProvider value={ registry }>
+					<TestComponent />
+				</RegistryProvider>
+			);
+			expect( renderedItems ).toEqual( [ 'null' ] );
+
+			fireEvent.click( screen.getByRole( 'button' ) );
+			// After click, there are two new renders:
+			// 1. With of block 2, after state update of `blockId` from 1 to 2
+			// 2. After dispatching an action to change 2's name to `new2`
+			expect( renderedItems ).toEqual( [ 'null', 'null', 'new2' ] );
+		} );
+
 		it( 'handles registry selectors', () => {
 			const getCount1And2 = createRegistrySelector(
 				( select ) => ( state ) => ( {
