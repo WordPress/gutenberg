@@ -2,7 +2,7 @@
  * External dependencies
  */
 
-import { FlatList, Keyboard, useWindowDimensions } from 'react-native';
+import { ScrollView, FlatList } from 'react-native';
 import Animated, {
 	useAnimatedScrollHandler,
 	useSharedValue,
@@ -11,10 +11,16 @@ import Animated, {
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import RCTAztecView from '@wordpress/react-native-aztec';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 
-const AnimatedFlatList = Animated.createAnimatedComponent( FlatList );
+/**
+ * Internal dependencies
+ */
+import useTextInputOffset from './use-text-input-offset';
+import useKeyboardOffset from './use-keyboard-offset';
+import useScrollToTextInput from './use-scroll-to-text-input';
+
+const AnimatedScrollView = Animated.createAnimatedComponent( ScrollView );
 
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,
@@ -24,17 +30,25 @@ export const KeyboardAwareFlatList = ( {
 	shouldPreventAutomaticScroll,
 	...props
 } ) => {
-	const [ keyboardSpace, setKeyboardSpace ] = useState( 0 );
-	const { height: windowHeight } = useWindowDimensions();
-
 	const listRef = useRef();
-	const isEditingText = useRef( RCTAztecView.InputState.isFocused() );
-	const isKeyboardVisible = useRef( false );
-	const currentCaretYCoordinate = useRef( null );
-
+	const scrollViewMeasurements = useRef();
 	const latestContentOffsetY = useSharedValue( -1 );
 
-	const screenOffset = windowHeight - ( keyboardSpace + extraScrollHeight );
+	const [ isKeyboardVisible, keyboardOffset ] =
+		useKeyboardOffset( scrollEnabled );
+
+	const [ textInputOffset ] = useTextInputOffset( scrollEnabled );
+
+	const [ scrollToTextInputOffset ] = useScrollToTextInput(
+		extraScrollHeight,
+		isKeyboardVisible,
+		keyboardOffset,
+		latestContentOffsetY,
+		listRef,
+		scrollEnabled,
+		scrollViewMeasurements,
+		textInputOffset
+	);
 
 	const scrollHandler = useAnimatedScrollHandler( {
 		onScroll: ( event ) => {
@@ -45,114 +59,36 @@ export const KeyboardAwareFlatList = ( {
 	} );
 
 	useEffect( () => {
-		let willShowSubscription;
-		let showSubscription;
-		let hideSubscription;
-
-		if ( scrollEnabled ) {
-			willShowSubscription = Keyboard.addListener(
-				'keyboardWillShow',
-				() => {
-					isKeyboardVisible.current = true;
-				}
-			);
-			showSubscription = Keyboard.addListener(
-				'keyboardDidShow',
-				( { endCoordinates } ) => {
-					setKeyboardSpace( endCoordinates.height );
-				}
-			);
-			hideSubscription = Keyboard.addListener( 'keyboardWillHide', () => {
-				if ( ! RCTAztecView.InputState.isFocused() ) {
-					setKeyboardSpace( 0 );
-				}
-				isKeyboardVisible.current = false;
-			} );
-		}
-		return () => {
-			willShowSubscription?.remove();
-			showSubscription?.remove();
-			hideSubscription?.remove();
-		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
-
-	const onScrollToInput = useCallback( () => {
+		// If the Keyboard is visible it also checks that the keyboard's offset
+		// is not 0 since the value is updated when the Keyboard is fully visible.
 		if (
-			! isEditingText.current ||
-			! scrollEnabled ||
-			( isKeyboardVisible.current && keyboardSpace === 0 )
+			( isKeyboardVisible && keyboardOffset !== 0 ) ||
+			textInputOffset
 		) {
-			return;
-		}
-
-		const textInput = RCTAztecView.InputState.getCurrentFocusedElement();
-		if ( textInput ) {
-			textInput.measureInWindow( ( _x, y, _width, height ) => {
-				const caretYPosition =
-					currentCaretYCoordinate.current || height;
-				const textInputOffset = y + caretYPosition;
-
-				const offset =
-					latestContentOffsetY.value +
-					( textInputOffset - screenOffset );
-
-				if (
-					listRef.current &&
-					offset > 0 &&
-					textInputOffset > screenOffset
-				) {
-					listRef.current.scrollToOffset( {
-						x: 0,
-						offset,
-						animated: true,
-					} );
-				}
-			} );
+			scrollToTextInputOffset();
 		}
 	}, [
-		scrollEnabled,
-		isEditingText,
-		screenOffset,
-		keyboardSpace,
-		latestContentOffsetY,
+		isKeyboardVisible,
+		keyboardOffset,
+		textInputOffset,
+		scrollToTextInputOffset,
 	] );
 
-	useEffect( () => {
-		if ( keyboardSpace !== 0 ) {
-			onScrollToInput();
+	const measureScrollView = useCallback( () => {
+		if ( listRef.current && ! scrollViewMeasurements.current ) {
+			const scrollRef = listRef.current.getNativeScrollRef();
+
+			scrollRef.measureInWindow( ( _x, y, _width, height ) => {
+				scrollViewMeasurements.current = { y, height };
+			} );
 		}
-	}, [ keyboardSpace, onScrollToInput ] );
+	}, [] );
 
-	const onCaretChange = useCallback(
-		( { caretY } ) => {
-			const isFocused =
-				!! RCTAztecView.InputState.getCurrentFocusedElement();
-			isEditingText.current = isFocused;
-
-			if ( ! isFocused ) {
-				return;
-			}
-
-			currentCaretYCoordinate.current = caretY;
-			onScrollToInput();
-		},
-		[ onScrollToInput ]
-	);
-
-	useEffect( () => {
-		if ( scrollEnabled ) {
-			RCTAztecView.InputState.addCaretChangeListener( onCaretChange );
-		}
-
-		return () => {
-			if ( scrollEnabled ) {
-				RCTAztecView.InputState.removeCaretChangeListener(
-					onCaretChange
-				);
-			}
-		};
-	}, [ scrollEnabled, onCaretChange ] );
+	const onContentSizeChange = useCallback( () => {
+		// Measures the ScrollView to get the Y coordinate and height values.
+		measureScrollView();
+		scrollToTextInputOffset();
+	}, [ scrollToTextInputOffset, measureScrollView ] );
 
 	const getRef = useCallback(
 		( ref ) => {
@@ -162,18 +98,23 @@ export const KeyboardAwareFlatList = ( {
 		[ innerRef ]
 	);
 
-	const contentInset = { bottom: keyboardSpace };
+	// Adds content insets when the keyboard is opened to have
+	// extra padding at the bottom.
+	const contentInset = { bottom: keyboardOffset };
 
 	return (
-		<AnimatedFlatList
-			{ ...props }
+		<AnimatedScrollView
 			automaticallyAdjustContentInsets={ false }
 			contentInset={ contentInset }
-			onContentSizeChange={ onScrollToInput }
+			keyboardShouldPersistTaps="handled"
+			onContentSizeChange={ onContentSizeChange }
 			onScroll={ scrollHandler }
 			ref={ getRef }
 			scrollEnabled={ scrollEnabled }
-		/>
+			scrollEventThrottle={ 16 }
+		>
+			<FlatList { ...props } />
+		</AnimatedScrollView>
 	);
 };
 
