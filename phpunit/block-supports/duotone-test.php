@@ -41,7 +41,7 @@ class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
 		return array(
 			'pipe-slug'                       => array( 'var:preset|duotone|blue-orange', 'blue-orange' ),
 			'css-var'                         => array( 'var(--wp--preset--duotone--blue-orange)', 'blue-orange' ),
-			'css-var-weird-chars'             => array( 'var(--wp--preset--duotone--.)', '.' ),
+			'css-var-invalid-slug-chars'      => array( 'var(--wp--preset--duotone--.)', '.' ),
 			'css-var-missing-end-parenthesis' => array( 'var(--wp--preset--duotone--blue-orange', '' ),
 			'invalid'                         => array( 'not a valid attribute', '' ),
 			'css-var-no-value'                => array( 'var(--wp--preset--duotone--)', '' ),
@@ -62,7 +62,7 @@ class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
 		return array(
 			'pipe-slug'                       => array( 'var:preset|duotone|blue-orange', true ),
 			'css-var'                         => array( 'var(--wp--preset--duotone--blue-orange)', true ),
-			'css-var-weird-chars'             => array( 'var(--wp--preset--duotone--.)', false ),
+			'css-var-invalid-slug-chars'      => array( 'var(--wp--preset--duotone--.)', false ),
 			'css-var-missing-end-parenthesis' => array( 'var(--wp--preset--duotone--blue-orange', false ),
 			'invalid'                         => array( 'not a valid attribute', false ),
 		);
