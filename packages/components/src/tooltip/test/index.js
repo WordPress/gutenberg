@@ -59,7 +59,7 @@ describe( 'Tooltip', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should render the tooltip when focusing anchor via tab', async () => {
+		it( 'should render the tooltip when focusing the tooltip trigger via tab', async () => {
 			const user = userEvent.setup();
 
 			render(
@@ -88,7 +88,7 @@ describe( 'Tooltip', () => {
 			);
 		} );
 
-		it( 'should render the tooltip when anchor is hovered', async () => {
+		it( 'should render the tooltip when the tooltip trigger is hovered', async () => {
 			const user = userEvent.setup();
 
 			render(
@@ -227,7 +227,7 @@ describe( 'Tooltip', () => {
 			expect( buttonRect ).toEqual( eventCatcherRect );
 		} );
 
-		it( 'should not show tooltip if the mouse leaves the anchor before the tooltip has shown', async () => {
+		it( 'should not show tooltip if the mouse leaves the tooltip trigger before set delay', async () => {
 			const user = userEvent.setup();
 			const onMouseEnterMock = jest.fn();
 			const onMouseLeaveMock = jest.fn();
@@ -268,7 +268,7 @@ describe( 'Tooltip', () => {
 				screen.queryByText( 'tooltip text' )
 			).not.toBeInTheDocument();
 
-			// Hover the other button, meaning that the mouse will leave the tooltip anchor
+			// Hover the other button, meaning that the mouse will leave the tooltip trigger
 			await user.hover(
 				screen.getByRole( 'button', {
 					name: 'Hover me instead!',
@@ -287,7 +287,7 @@ describe( 'Tooltip', () => {
 				setTimeout( resolve, TOOLTIP_DELAY )
 			);
 
-			// Tooltip won't show, since the mouse has left the anchor
+			// Tooltip won't show, since the mouse has left the tooltip trigger
 			expect(
 				screen.queryByText( 'tooltip text' )
 			).not.toBeInTheDocument();
