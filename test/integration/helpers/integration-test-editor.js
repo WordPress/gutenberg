@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
@@ -44,11 +44,7 @@ export function createTestBlock( name, attributes ) {
 import { waitForStoreResolvers } from './wait-for-store-resolvers';
 
 export function Editor( { testBlocks, settings = {} } ) {
-	const [ blocks, updateBlocks ] = useState( [] );
-
-	useEffect( () => {
-		updateBlocks( testBlocks );
-	}, [ testBlocks ] );
+	const [ blocks, updateBlocks ] = useState( testBlocks );
 
 	return (
 		<ShortcutProvider>
