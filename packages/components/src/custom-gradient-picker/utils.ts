@@ -25,7 +25,7 @@ export function getLinearGradientRepresentation(
 		type: 'linear-gradient',
 		orientation: HORIZONTAL_GRADIENT_ORIENTATION,
 		colorStops: gradientAST.colorStops,
-	} as gradientParser.LinearGradientNode );
+	} );
 }
 
 function hasUnsupportedLength( item: gradientParser.ColorStop ) {
