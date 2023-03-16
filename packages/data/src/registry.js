@@ -215,6 +215,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @param {Object} store Store instance object (getSelectors, getActions, subscribe).
 	 */
 	function registerStoreInstance( name, store ) {
+		if ( stores[ name ] ) {
+			throw new Error( 'duplicate store oh no' );
+		}
+
 		if ( typeof store.getSelectors !== 'function' ) {
 			throw new TypeError( 'store.getSelectors must be a function' );
 		}
