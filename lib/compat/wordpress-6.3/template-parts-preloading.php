@@ -10,7 +10,8 @@
  * Preloads requests needed for common Template Part posts
  *
  * @param array $preload_paths    Preload paths to be filtered.
- * @return array
+ * @param array $context          Context for the preload paths.
+ * @return array    the preload paths.
  */
 function gutenberg_preload_template_parts( $preload_paths, $context ) {
 
@@ -33,8 +34,6 @@ function gutenberg_preload_template_parts( $preload_paths, $context ) {
 	$template_parts_rest_route = rest_get_route_for_post_type_items(
 		'wp_template_part'
 	);
-
-	$standard_template_parts = array( 'header', 'footer' );
 
 	foreach ( $theme_json_template_part_slugs as $template_part_slug ) {
 		$preload_paths[] = array(
