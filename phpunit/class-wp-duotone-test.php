@@ -55,7 +55,11 @@ class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
 	 * @dataProvider data_gutenberg_get_slug_from_attr
 	 */
 	public function test_gutenberg_get_slug_from_attr( $data_attr, $expected ) {
-		$this->assertSame( $expected, WP_Duotone_Gutenberg::gutenberg_get_slug_from_attr( $data_attr ) );
+
+		$reflection = new ReflectionMethod( 'WP_Duotone_Gutenberg', 'gutenberg_get_slug_from_attr' );
+		$reflection->setAccessible( true );
+
+		$this->assertSame( $expected, $reflection->invoke( null, $data_attr ) );
 	}
 
 	public function data_is_preset() {
@@ -72,6 +76,9 @@ class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
 	 * @dataProvider data_is_preset
 	 */
 	public function test_is_preset( $data_attr, $expected ) {
-		$this->assertSame( $expected, WP_Duotone_Gutenberg::is_preset( $data_attr ) );
+		$reflection = new ReflectionMethod( 'WP_Duotone_Gutenberg', 'is_preset' );
+		$reflection->setAccessible( true );
+
+		$this->assertSame( $expected, $reflection->invoke( null, $data_attr ) );
 	}
 }
