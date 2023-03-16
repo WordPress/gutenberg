@@ -144,8 +144,8 @@ class WP_Theme_JSON_Gutenberg {
 			'path'              => array( 'color', 'duotone' ),
 			'prevent_override'  => array( 'color', 'defaultDuotone' ),
 			'use_default_names' => false,
-			'value_func'        => null, // Don't output CSS Custom Properties for duotone.
-			'css_vars'          => '--wp--preset--duotone--$slug',
+			'value_func'        => null, // CSS Custom Properties for duotone are handled by block supports in class-wp-duotone-gutenberg.php.
+			'css_vars'          => null,
 			'classes'           => array(),
 			'properties'        => array( 'filter' ),
 		),
