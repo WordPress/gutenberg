@@ -41,11 +41,9 @@ function ScreenColorElement( { name, element, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
 	const supports = useSupportedStyles( name );
 	const colorsPerOrigin = useColorsPerOrigin( name );
+	const [ isTextEnabled ] = useGlobalSetting( 'color.text', name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
-	const [ isBackgroundEnabled ] = useGlobalSetting(
-		'color.background',
-		name
-	);
+	let [ isBackgroundEnabled ] = useGlobalSetting( 'color.background', name );
 
 	let textColorElementSelector = 'elements.' + element + '.color.text';
 	const backgroundColorElementSelector =
@@ -54,7 +52,12 @@ function ScreenColorElement( { name, element, variation = '' } ) {
 	let hasElementColor = false;
 
 	if ( element === 'text' ) {
+		isBackgroundEnabled = false;
 		textColorElementSelector = 'color.text';
+		hasElementColor =
+			supports.includes( 'color' ) &&
+			isTextEnabled &&
+			( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 	} else if ( element === 'button' ) {
 		hasElementColor =
 			supports.includes( 'buttonColor' ) &&
@@ -109,23 +112,26 @@ function ScreenColorElement( { name, element, variation = '' } ) {
 				clearable={ elementTextColor === userElementTextColor }
 				headingLevel={ 4 }
 			/>
+			{ isBackgroundEnabled && (
+				<>
+					<h3 className="edit-site-global-styles-section-title">
+						{ __( 'Background color' ) }
+					</h3>
 
-			<h3 className="edit-site-global-styles-section-title">
-				{ __( 'Background color' ) }
-			</h3>
-
-			<ColorGradientControl
-				className="edit-site-screen-element-color__control"
-				colors={ colorsPerOrigin }
-				disableCustomColors={ ! areCustomSolidsEnabled }
-				showTitle={ false }
-				enableAlpha
-				__experimentalIsRenderedInSidebar
-				colorValue={ elementBgColor }
-				onColorChange={ setElementBgColor }
-				clearable={ elementBgColor === userElementBgColor }
-				headingLevel={ 4 }
-			/>
+					<ColorGradientControl
+						className="edit-site-screen-element-color__control"
+						colors={ colorsPerOrigin }
+						disableCustomColors={ ! areCustomSolidsEnabled }
+						showTitle={ false }
+						enableAlpha
+						__experimentalIsRenderedInSidebar
+						colorValue={ elementBgColor }
+						onColorChange={ setElementBgColor }
+						clearable={ elementBgColor === userElementBgColor }
+						headingLevel={ 4 }
+					/>
+				</>
+			) }
 		</>
 	);
 }

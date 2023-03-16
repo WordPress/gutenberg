@@ -28,7 +28,6 @@ import ScreenFilters from './screen-filters';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackgroundColor from './screen-background-color';
-import ScreenTextColor from './screen-text-color';
 import ScreenLinkColor from './screen-link-color';
 import ScreenHeadingColor from './screen-heading-color';
 import ScreenColorElement from './screen-color-element';
@@ -211,7 +210,11 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/text' }>
-				<ScreenTextColor name={ name } variation={ variation } />
+				<ScreenColorElement
+					name={ name }
+					variation={ variation }
+					element="text"
+				/>
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/link' }>
