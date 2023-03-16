@@ -41,20 +41,47 @@ describe( 'Cover edit', () => {
 			).toBeInTheDocument();
 		} );
 
-		test( 'does not show placeholder if background color selected from placeholder', async () => {
-			const { user } = setup(
+		test( 'can set overlay color using color picker on block placeholder', async () => {
+			const { user, container } = setup(
 				<Editor testBlock={ { name: 'core/cover' } } />
 			);
-			await user.click(
-				screen.getByRole( 'button', {
-					name: 'Color: Black',
-				} )
-			);
+			const colorPicker = screen.getByRole( 'button', {
+				name: 'Color: Black',
+			} );
+			await user.click( colorPicker );
+			const color = colorPicker.style.backgroundColor;
 			expect(
 				screen.queryByRole( 'group', {
 					name: 'To edit this block, you need permission to upload media.',
 				} )
 			).not.toBeInTheDocument();
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const overlay = container.getElementsByClassName(
+				'wp-block-cover__background'
+			);
+			expect( overlay[ 0 ] ).toHaveStyle(
+				`background-color: ${ color }`
+			);
+		} );
+
+		test( 'can have the title edited', async () => {
+			const { user } = setup(
+				<Editor testBlock={ { name: 'core/cover' } } />
+			);
+
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Color: Black',
+				} )
+			);
+
+			const title = screen.getByLabelText( 'Empty block;', {
+				exact: false,
+			} );
+			await user.click( title );
+			await user.keyboard( 'abc' );
+			expect( title ).toHaveTextContent( 'abc' );
 		} );
 
 		test( 'shows block toolbar if selected block', async () => {
