@@ -246,7 +246,7 @@
 
 .maybeHide:focus-within {
 	position: relative;
-	top: 0;
+	top: math.div($grid-unit, 2) + 2;
 }
 
 .edit-post-header .edit-post-header-block-toolbar {
