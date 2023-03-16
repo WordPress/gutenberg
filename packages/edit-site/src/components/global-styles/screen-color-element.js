@@ -49,7 +49,9 @@ function ScreenColorElement( { name, element, variation = '' } ) {
 	const backgroundColorElementSelector =
 		'elements.' + element + '.color.background';
 
-	let hasElementColor = false;
+	let hasElementColor =
+		supports.includes( 'buttonColor' ) &&
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
 	if ( element === 'text' ) {
 		isBackgroundEnabled = false;

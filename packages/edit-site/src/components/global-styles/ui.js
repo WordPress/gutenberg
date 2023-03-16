@@ -184,6 +184,12 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/typography/caption' }
+			>
+				<ScreenTypographyElement name={ name } element="caption" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/typography/button' }
 			>
 				<ScreenTypographyElement name={ name } element="button" />
@@ -234,6 +240,16 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 					name={ name }
 					variation={ variation }
 					element="button"
+				/>
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/colors/caption' }
+			>
+				<ScreenColorElement
+					name={ name }
+					variation={ variation }
+					element="caption"
 				/>
 			</GlobalStylesNavigationScreen>
 
