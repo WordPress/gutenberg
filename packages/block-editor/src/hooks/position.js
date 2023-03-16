@@ -105,6 +105,26 @@ export function getPositionCSS( { selector, style } ) {
 }
 
 /**
+ * Get the display label for a block's position type.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {string} The position type label.
+ */
+export function getPositionTypeLabel( attributes ) {
+	const positionType = attributes.style?.position?.type;
+
+	if ( positionType === 'sticky' ) {
+		return __( 'Sticky' );
+	}
+
+	if ( positionType === 'fixed' ) {
+		return __( 'Fixed' );
+	}
+
+	return null;
+}
+
+/**
  * Determines if there is sticky position support.
  *
  * @param {string|Object} blockType Block name or Block Type object.

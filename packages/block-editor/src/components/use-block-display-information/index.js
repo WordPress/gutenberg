@@ -12,6 +12,7 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { getPositionTypeLabel } from '../../hooks/position';
 
 /** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
 
@@ -57,12 +58,14 @@ export default function useBlockDisplayInformation( clientId ) {
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isSynced =
 				isReusableBlock( blockType ) || isTemplatePart( blockType );
+			const positionLabel = getPositionTypeLabel( attributes );
 			const blockTypeInfo = {
 				isSynced,
 				title: blockType.title,
 				icon: blockType.icon,
 				description: blockType.description,
 				anchor: attributes?.anchor,
+				positionLabel,
 			};
 			if ( ! match ) return blockTypeInfo;
 
@@ -72,6 +75,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				icon: match.icon || blockType.icon,
 				description: match.description || blockType.description,
 				anchor: attributes?.anchor,
+				positionLabel,
 			};
 		},
 		[ clientId ]

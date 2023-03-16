@@ -16,6 +16,7 @@ import { Icon, lockSmall as lock } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -60,6 +61,14 @@ function ListViewBlockSelectButton(
 	} = useSelect( blockEditorStore );
 	const { removeBlocks } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
+	const displayTitle = blockInformation?.positionLabel
+		? sprintf(
+				// translators: 1: Title of block (i.e. Group, Heading, etc), 2: Position of selected block, e.g. "Sticky" or "Fixed".
+				__( '%1$s (%2$s)' ),
+				blockTitle,
+				blockInformation.positionLabel
+		  )
+		: blockTitle;
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -154,7 +163,9 @@ function ListViewBlockSelectButton(
 					spacing={ 1 }
 				>
 					<span className="block-editor-list-view-block-select-button__title">
-						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
+						<Truncate ellipsizeMode="auto">
+							{ displayTitle }
+						</Truncate>
 					</span>
 					{ blockInformation?.anchor && (
 						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
