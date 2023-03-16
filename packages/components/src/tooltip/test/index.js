@@ -14,6 +14,7 @@ import Button from '../../button';
  * WordPress dependencies
  */
 import { TOOLTIP_DELAY } from '../index.js';
+import { shortcutAriaLabel } from '@wordpress/keycodes';
 
 const props = {
 	text: 'tooltip text',
@@ -318,8 +319,8 @@ describe( 'Tooltip', () => {
 				<Tooltip
 					{ ...props }
 					shortcut={ {
-						display: 'shortcut text',
-						ariaLabel: 'shortcut label',
+						display: '⇧⌘,',
+						ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
 					} }
 				>
 					<Button>Hover Me!</Button>
@@ -331,15 +332,18 @@ describe( 'Tooltip', () => {
 			);
 
 			await waitFor( () =>
-				expect( screen.getByText( 'shortcut text' ) ).toBeVisible()
+				expect( screen.getByText( '⇧⌘,' ) ).toBeVisible()
+			);
+
+			expect( screen.getByText( '⇧⌘,' ) ).toHaveAttribute(
+				'aria-label',
+				'Control + Shift + Comma'
 			);
 
 			// Wait for the tooltip element to be positioned (aligned with the button)
 			await waitFor( () =>
 				expect(
-					getWrappingPopoverElement(
-						screen.getByText( 'shortcut text' )
-					)
+					getWrappingPopoverElement( screen.getByText( '⇧⌘,' ) )
 				).toBePositionedPopover()
 			);
 		} );
