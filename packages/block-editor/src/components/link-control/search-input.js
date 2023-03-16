@@ -5,7 +5,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, debounce } from '@wordpress/compose';
 import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -14,8 +14,10 @@ import { __ } from '@wordpress/i18n';
  */
 import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
+import LinkControlSearchItem from './search-item';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
+import { ComboboxControl } from '@wordpress/components';
 
 // Must be a function as otherwise URLInput will default
 // to the fetchLinkSuggestions passed in block editor settings
@@ -50,10 +52,13 @@ const LinkControlSearchInput = forwardRef(
 		},
 		ref
 	) => {
+		console.log( { value } );
+		const [ searchResults, setSearcResults ] = useState( [] );
+
 		const genericSearchHandler = useSearchHandler(
 			suggestionsQuery,
 			allowDirectEntry,
-			withCreateSuggestion,
+			false,
 			withURLSuggestion
 		);
 
@@ -123,9 +128,33 @@ const LinkControlSearchInput = forwardRef(
 			'has-no-label': ! useLabel,
 		} );
 
+		const debouncedSearchHandler = debounce( async ( nextInputVal ) => {
+			if ( nextInputVal?.length < 2 ) {
+				return;
+			}
+
+			let searchHandlerResult = await searchHandler( nextInputVal, {
+				isInitialSuggestions: false,
+			} );
+
+			if ( ! searchHandlerResult?.length ) {
+				return;
+			}
+
+			searchHandlerResult = searchHandlerResult.map( ( result ) => {
+				return {
+					...result,
+					label: result?.title,
+					value: result?.url,
+				};
+			} );
+
+			setSearcResults( searchHandlerResult );
+		}, 200 );
+
 		return (
 			<div className="block-editor-link-control__search-input-container">
-				<URLInput
+				{ /* <URLInput
 					__nextHasNoMarginBottom
 					label={ useLabel ? 'URL' : undefined }
 					className={ inputClasses }
@@ -154,6 +183,17 @@ const LinkControlSearchInput = forwardRef(
 						}
 					} }
 					ref={ ref }
+				/> */ }
+				<ComboboxControl
+					label={ useLabel ? 'URL' : undefined }
+					className={ inputClasses }
+					value={ value }
+					options={ searchResults }
+					onChange={ onInputChange }
+					onFilterValueChange={ debouncedSearchHandler }
+					__experimentalRenderItem={ ( { item } ) => {
+						return <LinkControlSearchItem suggestion={ item } />;
+					} }
 				/>
 				{ children }
 			</div>
