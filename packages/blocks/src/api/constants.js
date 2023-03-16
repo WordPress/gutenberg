@@ -144,6 +144,14 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'elements', 'button', 'color', 'background' ],
 		support: [ 'color', 'button' ],
 	},
+	headingColor: {
+		value: [ 'elements', 'heading', 'color', 'text' ],
+		support: [ 'color', 'heading' ],
+	},
+	headingBackgroundColor: {
+		value: [ 'elements', 'heading', 'color', 'background' ],
+		support: [ 'color', 'heading' ],
+	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
 		support: [ 'typography', '__experimentalFontFamily' ],
