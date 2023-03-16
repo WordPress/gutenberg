@@ -1,11 +1,11 @@
-.edit-post-header-toolbar {
+.edit-post-header-document-toolbar {
 	display: inline-flex;
 	flex-grow: 1;
 	align-items: center;
 	border: none;
 
 	// Hide all action buttons except the inserter on mobile.
-	.edit-post-header-toolbar__left > .components-button {
+	.edit-post-header-document-toolbar__left > .components-button {
 		display: none;
 
 		@include break-small() {
@@ -13,7 +13,7 @@
 		}
 	}
 
-	.edit-post-header-toolbar__left > .edit-post-header-toolbar__inserter-toggle {
+	.edit-post-header-document-toolbar__left > .edit-post-header-toolbar__inserter-toggle {
 		display: inline-flex;
 
 		svg {
@@ -39,8 +39,8 @@
 
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles
-	.edit-post-header-toolbar__left > .components-button.has-icon,
-	.edit-post-header-toolbar__left > .components-dropdown > .components-button.has-icon {
+	.edit-post-header-document-toolbar__left > .components-button.has-icon,
+	.edit-post-header-document-toolbar__left > .components-dropdown > .components-button.has-icon {
 		height: $button-size;
 		min-width: $button-size;
 		padding: 6px;
@@ -64,21 +64,21 @@
 .edit-post-header.has-reduced-ui {
 	@include break-small () {
 		// Apply transition to every button but the first one.
-		.edit-post-header-toolbar__left > * + .components-button,
-		.edit-post-header-toolbar__left > * + .components-dropdown > [aria-expanded="false"] {
+		.edit-post-header-document-toolbar__left > * + .components-button,
+		.edit-post-header-document-toolbar__left > * + .components-dropdown > [aria-expanded="false"] {
 			transition: opacity 0.1s linear;
 			@include reduce-motion("transition");
 		}
 
 		// Zero out opacity unless hovered.
-		&:not(:hover) .edit-post-header-toolbar__left > * + .components-button,
-		&:not(:hover) .edit-post-header-toolbar__left > * + .components-dropdown > [aria-expanded="false"] {
+		&:not(:hover) .edit-post-header-document-toolbar__left > * + .components-button,
+		&:not(:hover) .edit-post-header-document-toolbar__left > * + .components-dropdown > [aria-expanded="false"] {
 			opacity: 0;
 		}
 	}
 }
 
-.edit-post-header-toolbar__left {
+.edit-post-header-document-toolbar__left {
 	display: inline-flex;
 	align-items: center;
 	padding-left: $grid-unit-10;
@@ -92,7 +92,7 @@
 	}
 }
 
-.edit-post-header-toolbar .edit-post-header-toolbar__left > .edit-post-header-toolbar__inserter-toggle.has-icon {
+.edit-post-header-document-toolbar .edit-post-header-document-toolbar__left > .edit-post-header-document-toolbar__inserter-toggle.has-icon {
 	margin-right: $grid-unit-10;
 	// Special dimensions for this button.
 	min-width: 32px;
@@ -107,6 +107,6 @@
 	}
 }
 
-.show-icon-labels .edit-post-header-toolbar__left > * + * {
+.show-icon-labels .edit-post-header-document-toolbar__left > * + * {
 	margin-left: $grid-unit-10;
 }
