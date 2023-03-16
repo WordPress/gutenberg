@@ -1,7 +1,17 @@
 /**
+ * External dependencies
+ */
+import memize from 'memize';
+
+/**
  * WordPress dependencies
  */
-import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
+import {
+	useRef,
+	useMemo,
+	useLayoutEffect,
+	useReducer,
+} from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 
@@ -133,64 +143,73 @@ export function useRichText( {
 	 *
 	 * @param {Object} newRecord The record to sync and apply.
 	 */
-	function handleChange( newRecord ) {
-		record.current = newRecord;
-		applyRecord( newRecord );
+	const handleChange = useMemo(
+		() =>
+			memize( ( newRecord ) => {
+				record.current = newRecord;
+				applyRecord( newRecord );
 
-		if ( disableFormats ) {
-			_value.current = newRecord.text;
-		} else {
-			_value.current = toHTMLString( {
-				value: __unstableBeforeSerialize
-					? {
-							...newRecord,
-							formats: __unstableBeforeSerialize( newRecord ),
-					  }
-					: newRecord,
-				multilineTag,
-				preserveWhiteSpace,
-			} );
-		}
+				if ( disableFormats ) {
+					_value.current = newRecord.text;
+				} else {
+					_value.current = toHTMLString( {
+						value: __unstableBeforeSerialize
+							? {
+									...newRecord,
+									formats:
+										__unstableBeforeSerialize( newRecord ),
+							  }
+							: newRecord,
+						multilineTag,
+						preserveWhiteSpace,
+					} );
+				}
 
-		const { start, end, formats, text } = newRecord;
+				const { start, end, formats, text } = newRecord;
 
-		// Selection must be updated first, so it is recorded in history when
-		// the content change happens.
-		// We batch both calls to only attempt to rerender once.
-		registry.batch( () => {
-			onSelectionChange( start, end );
-			onChange( _value.current, {
-				__unstableFormats: formats,
-				__unstableText: text,
-			} );
-		} );
-		forceRender();
-	}
+				// Selection must be updated first, so it is recorded in history when
+				// the content change happens.
+				// We batch both calls to only attempt to rerender once.
+				registry.batch( () => {
+					onSelectionChange( start, end );
+					onChange( _value.current, {
+						__unstableFormats: formats,
+						__unstableText: text,
+					} );
+				} );
+				forceRender();
+			} ),
+		[]
+	);
 
-	function handleChangesUponInit( newRecord ) {
-		record.current = newRecord;
+	const handleChangesUponInit = useMemo(
+		() =>
+			memize( ( newRecord ) => {
+				record.current = newRecord;
 
-		_value.current = toHTMLString( {
-			value: __unstableBeforeSerialize
-				? {
-						...newRecord,
-						formats: __unstableBeforeSerialize( newRecord ),
-				  }
-				: newRecord,
-			multilineTag,
-			preserveWhiteSpace,
-		} );
+				_value.current = toHTMLString( {
+					value: __unstableBeforeSerialize
+						? {
+								...newRecord,
+								formats: __unstableBeforeSerialize( newRecord ),
+						  }
+						: newRecord,
+					multilineTag,
+					preserveWhiteSpace,
+				} );
 
-		const { formats, text } = newRecord;
+				const { formats, text } = newRecord;
 
-		registry.batch( () => {
-			onChange( _value.current, {
-				__unstableFormats: formats,
-				__unstableText: text,
-			} );
-		} );
-		forceRender();
-	}
+				registry.batch( () => {
+					onChange( _value.current, {
+						__unstableFormats: formats,
+						__unstableText: text,
+					} );
+				} );
+				forceRender();
+			} ),
+		[]
+	);
 
 	function applyFromProps() {
 		setRecordFromProps();
