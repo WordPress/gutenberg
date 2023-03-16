@@ -45,6 +45,7 @@ describe( 'Cover block', () => {
 	afterAll( () => {
 		unRegisterAllBlocks();
 	} );
+
 	describe( 'Editor canvas', () => {
 		test( 'shows placeholder if background image and color not set', async () => {
 			await setup( { name: 'core/cover' } );
@@ -95,6 +96,7 @@ describe( 'Cover block', () => {
 			expect( title ).toHaveTextContent( 'abc' );
 		} );
 	} );
+
 	describe( 'Block toolbar', () => {
 		test( 'shows block toolbar if selected block', async () => {
 			await setup( { name: 'core/cover' } );
@@ -108,6 +110,7 @@ describe( 'Cover block', () => {
 			).toBeInTheDocument();
 		} );
 	} );
+
 	describe( 'Inspector controls', () => {
 		describe( 'Media settings', () => {
 			test( 'does not display media settings panel if url is not set', async () => {
@@ -135,34 +138,183 @@ describe( 'Cover block', () => {
 			} );
 		} );
 
-		test( 'applies selected opacity to block', async () => {
-			const { container } = await setup( { name: 'core/cover' } );
-
-			await createAndSelectCoverBlock();
-
-			// eslint-disable-next-line testing-library/no-node-access
-			const overlay = container.getElementsByClassName(
-				'wp-block-cover__background'
+		test( 'sets hasParallax attribute to true if fixed background toggled', async () => {
+			await setup( {
+				name: 'core/cover',
+				attributes: {
+					url: 'http://localhost/my-image.jpg',
+				},
+			} );
+			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
+				'has-parallax'
 			);
+			await selectCoverBlock();
+			await userEvent.click(
+				screen.getByLabelText( 'Fixed background' )
+			);
+			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
+				'has-parallax'
+			);
+		} );
 
-			expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
+		test( 'sets isRepeated attribute to true if repeated background toggled', async () => {
+			await setup( {
+				name: 'core/cover',
+				attributes: {
+					url: 'http://localhost/my-image.jpg',
+				},
+			} );
+			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
+				'is-repeated'
+			);
+			await selectCoverBlock();
+			await userEvent.click(
+				screen.getByLabelText( 'Repeated background' )
+			);
+			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
+				'is-repeated'
+			);
+		} );
+
+		test( 'sets left focalPoint attribute when focal point values changed', async () => {
+			const { container } = await setup( {
+				name: 'core/cover',
+				attributes: {
+					url: 'http://localhost/my-image.jpg',
+				},
+			} );
+
+			await selectCoverBlock();
+			await userEvent.clear( screen.getByLabelText( 'Left' ) );
+			await userEvent.type( screen.getByLabelText( 'Left' ), '100' );
+			// eslint-disable-next-line testing-library/no-node-access
+			const image = container.getElementsByClassName(
+				'wp-block-cover__image-background'
+			);
+			expect( image[ 0 ] ).toHaveStyle( 'object-position: 100% 50%;' );
+		} );
+
+		test( 'sets alt attribute if text entered in alt text box', async () => {
+			await setup( {
+				name: 'core/cover',
+				attributes: {
+					url: 'http://localhost/my-image.jpg',
+				},
+			} );
+
+			await selectCoverBlock();
+			await userEvent.type(
+				screen.getByLabelText( 'Alt text (alternative text)' ),
+				'Me'
+			);
+			expect( screen.getByAltText( 'Me' ) ).toBeInTheDocument();
+		} );
+
+		test( 'clears media  when clear media button clicked', async () => {
+			const { container } = await setup( {
+				name: 'core/cover',
+				attributes: {
+					url: 'http://localhost/my-image.jpg',
+				},
+			} );
+
+			await selectCoverBlock();
+			// eslint-disable-next-line testing-library/no-node-access
+			const img = container.getElementsByClassName(
+				'wp-block-cover__image-background'
+			)[ 0 ];
+			expect( img ).toBeInTheDocument();
 
 			await userEvent.click(
-				screen.getByRole( 'tab', {
-					name: 'Styles',
+				screen.getByRole( 'button', {
+					name: 'Clear Media',
 				} )
 			);
 
-			fireEvent.change(
-				screen.getByRole( 'spinbutton', {
-					name: 'Overlay opacity',
-				} ),
-				{
-					target: { value: '40' },
-				}
-			);
+			expect( img ).not.toBeInTheDocument();
+		} );
 
-			expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-40' );
+		describe( 'Color panel', () => {
+			test( 'applies selected opacity to block when number control value changed', async () => {
+				const { container } = await setup( { name: 'core/cover' } );
+
+				await createAndSelectCoverBlock();
+
+				// eslint-disable-next-line testing-library/no-node-access
+				const overlay = container.getElementsByClassName(
+					'wp-block-cover__background'
+				);
+
+				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
+
+				await userEvent.click(
+					screen.getByRole( 'tab', {
+						name: 'Styles',
+					} )
+				);
+
+				fireEvent.change(
+					screen.getByRole( 'spinbutton', {
+						name: 'Overlay opacity',
+					} ),
+					{
+						target: { value: '40' },
+					}
+				);
+
+				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-40' );
+			} );
+
+			test( 'applies selected opacity to block when slider moved', async () => {
+				const { container } = await setup( { name: 'core/cover' } );
+
+				await createAndSelectCoverBlock();
+
+				// eslint-disable-next-line testing-library/no-node-access
+				const overlay = container.getElementsByClassName(
+					'wp-block-cover__background'
+				);
+
+				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
+
+				await userEvent.click(
+					screen.getByRole( 'tab', {
+						name: 'Styles',
+					} )
+				);
+
+				fireEvent.change(
+					screen.getByRole( 'slider', {
+						name: 'Overlay opacity',
+					} ),
+					{ target: { value: 30 } }
+				);
+
+				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-30' );
+			} );
+		} );
+
+		describe( 'Dimensions panel', () => {
+			test( 'sets minHeight attribute when number control value changed', async () => {
+				await setup( { name: 'core/cover' } );
+				await createAndSelectCoverBlock();
+				await userEvent.click(
+					screen.getByRole( 'tab', {
+						name: 'Styles',
+					} )
+				);
+				await userEvent.clear(
+					screen.getByLabelText( 'Minimum height of cover' )
+				);
+				await userEvent.type(
+					screen.getByLabelText( 'Minimum height of cover' ),
+					'300'
+				);
+
+				expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveStyle(
+					'min-height: 300px;'
+				);
+			} );
 		} );
 	} );
 } );

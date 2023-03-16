@@ -43,7 +43,7 @@ export function createTestBlock( name, attributes ) {
  */
 import { waitForStoreResolvers } from './wait-for-store-resolvers';
 
-export function Editor( { testBlocks } ) {
+export function Editor( { testBlocks, settings = {} } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	useEffect( () => {
@@ -57,6 +57,7 @@ export function Editor( { testBlocks } ) {
 					value={ blocks }
 					onInput={ updateBlocks }
 					onChange={ updateBlocks }
+					settings={ settings }
 				>
 					<BlockInspector />
 					<BlockTools>
