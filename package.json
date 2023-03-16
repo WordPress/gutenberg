@@ -206,6 +206,7 @@
 		"metro-react-native-babel-preset": "0.70.3",
 		"metro-react-native-babel-transformer": "0.70.3",
 		"mkdirp": "0.5.1",
+		"mock-match-media": "0.4.2",
 		"nock": "12.0.3",
 		"node-fetch": "2.6.1",
 		"node-watch": "0.7.0",
