@@ -58,7 +58,7 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 } ) {
-	const { isStackedOnMobile, verticalAlignment } = attributes;
+	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
 
 	const { count, canInsertColumnBlock } = useSelect(
 		( select ) => {
@@ -84,6 +84,7 @@ function ColumnsEditContainer( {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
 		renderAppender: false,
+		templateLock,
 	} );
 
 	return (
