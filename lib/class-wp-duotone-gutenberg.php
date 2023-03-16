@@ -74,7 +74,7 @@ class WP_Duotone_Gutenberg {
 	 * Get all possible duotone presets from global and theme styles and store as slug => [ colors array ]
 	 * We only want to process this one time. On block render we'll access and output only the needed presets for that page.
 	 */
-	static function set_global_styles_presets() {
+	public static function set_global_styles_presets() {
 		// Get the per block settings from the theme.json.
 		$tree              = gutenberg_get_global_settings();
 		$presets_by_origin = _wp_array_get( $tree, array( 'color', 'duotone' ), array() );
@@ -92,7 +92,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Scrape all block names from global styles and store in self::$global_styles_block_names
 	 */
-	static function set_global_style_block_names() {
+	public static function set_global_style_block_names() {
 		// Get the per block settings from the theme.json.
 		$tree        = WP_Theme_JSON_Resolver::get_merged_data();
 		$block_nodes = $tree->get_styles_block_nodes();
@@ -128,7 +128,7 @@ class WP_Duotone_Gutenberg {
 	 * @param string $duotone_attr The duotone attribute from a block.
 	 * @return string The slug of the duotone preset or an empty string if no slug is found.
 	 */
-	static function gutenberg_get_slug_from_attr( $duotone_attr ) {
+	private static function gutenberg_get_slug_from_attr( $duotone_attr ) {
 		// Uses Branch Reset Groups `(?|…)` to return one capture group.
 		preg_match( '/(?|var:preset\|duotone\|(\S+)|var\(--wp--preset--duotone--(\S+)\))/', $duotone_attr, $matches );
 
@@ -141,7 +141,7 @@ class WP_Duotone_Gutenberg {
 	 * @param string $duotone_attr The duotone attribute from a block.
 	 * @return bool True if the duotone preset present and valid.
 	 */
-	static function is_preset( $duotone_attr ) {
+	private static function is_preset( $duotone_attr ) {
 		$slug = self::gutenberg_get_slug_from_attr( $duotone_attr );
 
 		return array_key_exists( $slug, self::$global_styles_presets );
@@ -153,7 +153,7 @@ class WP_Duotone_Gutenberg {
 	 * @param string $slug The slug of the duotone preset.
 	 * @return string The CSS variable name.
 	 */
-	static function get_css_custom_property_name( $slug ) {
+	private static function get_css_custom_property_name( $slug ) {
 		return self::CSS_VAR_PREFIX . $slug;
 	}
 
@@ -163,7 +163,7 @@ class WP_Duotone_Gutenberg {
 	 * @param string $slug The slug of the duotone preset.
 	 * @return string The CSS variable.
 	 */
-	static function get_css_var( $slug ) {
+	private static function get_css_var( $slug ) {
 		return 'var(' . self::get_css_custom_property_name( $slug ) . ')';
 	}
 
@@ -174,7 +174,7 @@ class WP_Duotone_Gutenberg {
 	 * @param array $filter_data The duotone data for presets and custom filters.
 	 * @return string The CSS declaration.
 	 */
-	static function get_css_custom_property_declaration( $filter_data ) {
+	private static function get_css_custom_property_declaration( $filter_data ) {
 		$declaration_value                = gutenberg_get_duotone_filter_property( $filter_data );
 		$duotone_preset_css_property_name = self::get_css_custom_property_name( $filter_data['slug'] );
 		return $duotone_preset_css_property_name . ': ' . $declaration_value . ';';
@@ -186,7 +186,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @param string $selector The selector to apply the hack for.
 	 */
-	static function safari_rerender_hack( $selector ) {
+	private static function safari_rerender_hack( $selector ) {
 		/*
 		* Simply accessing el.offsetHeight flushes layout and style
 		* changes in WebKit without having to wait for setTimeout.
@@ -200,7 +200,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Outputs all necessary SVG for duotone filters, CSS for classic themes, and safari rerendering hack
 	 */
-	static function output_footer_assets() {
+	public static function output_footer_assets() {
 		foreach ( self::$output as $filter_data ) {
 
 			// SVG will be output on the page later.
@@ -223,7 +223,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Appends the used global style duotone filter CSS Vars to the inline global styles CSS
 	 */
-	static function output_global_styles() {
+	public static function output_global_styles() {
 
 		if ( empty( self::$output ) ) {
 			return;
@@ -251,7 +251,7 @@ class WP_Duotone_Gutenberg {
 	 * @param  array  $block         Block object.
 	 * @return string                Filtered block content.
 	 */
-	static function render_duotone_support( $block_content, $block ) {
+	public static function render_duotone_support( $block_content, $block ) {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 
 		$duotone_support = false;
