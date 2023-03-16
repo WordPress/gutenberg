@@ -120,6 +120,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 	const classes = classnames( 'block-editor-block-toolbar', {
 		'is-showing-movers': shouldShowMovers,
 		'is-synced': isSynced,
+		'is-fixed': hasFixedToolbar,
 	} );
 
 	return (
