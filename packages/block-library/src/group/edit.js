@@ -89,7 +89,7 @@ function GroupEdit( {
 		[ clientId ]
 	);
 
-	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const { tagName: TagName = 'div', templateLock, allowedBlocks, layout = {} } = attributes;
 
 	// Layout settings.
 	const defaultLayout = useSetting( 'layout' ) || {};
@@ -114,6 +114,7 @@ function GroupEdit( {
 			: { className: 'wp-block-group__inner-container' },
 		{
 			templateLock,
+			allowedBlocks,
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
