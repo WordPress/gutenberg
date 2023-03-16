@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -98,16 +98,49 @@ describe( 'Cover block', () => {
 	} );
 
 	describe( 'Block toolbar', () => {
-		test( 'shows block toolbar if selected block', async () => {
+		test( 'full height toggle sets minHeight attributes to 100vh when clicked', async () => {
 			await setup( { name: 'core/cover' } );
-
 			await createAndSelectCoverBlock();
 
-			expect(
-				screen.getByRole( 'button', {
-					name: 'Change content position',
-				} )
-			).toBeInTheDocument();
+			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveStyle(
+				' min-height: 100vh;'
+			);
+
+			await userEvent.click(
+				screen.getByLabelText( 'Toggle full height' )
+			);
+
+			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveStyle(
+				' min-height: 100vh;'
+			);
+		} );
+
+		test( 'content position button sets content position', async () => {
+			await setup( { name: 'core/cover' } );
+			await createAndSelectCoverBlock();
+
+			await userEvent.click(
+				screen.getByLabelText( 'Change content position' )
+			);
+
+			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
+				'has-custom-content-position'
+			);
+
+			await act( async () =>
+				within( screen.getByRole( 'grid' ) )
+					.getByRole( 'gridcell', {
+						name: 'top left',
+					} )
+					.focus()
+			);
+
+			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
+				'has-custom-content-position'
+			);
+			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
+				'is-position-top-left'
+			);
 		} );
 	} );
 
