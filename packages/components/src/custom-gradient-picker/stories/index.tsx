@@ -16,6 +16,7 @@ const meta: ComponentMeta< typeof CustomGradientPicker > = {
 	title: 'Components/CustomGradientPicker',
 	component: CustomGradientPicker,
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},
@@ -24,13 +25,16 @@ export default meta;
 
 const CustomGradientPickerWithState: ComponentStory<
 	typeof CustomGradientPicker
-> = ( props ) => {
+> = ( { onChange, ...props } ) => {
 	const [ gradient, setGradient ] = useState< string >();
 	return (
 		<CustomGradientPicker
 			{ ...props }
 			value={ gradient }
-			onChange={ setGradient }
+			onChange={ ( newGradient ) => {
+				setGradient( newGradient );
+				onChange( newGradient );
+			} }
 		/>
 	);
 };
