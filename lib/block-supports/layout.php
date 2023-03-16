@@ -281,24 +281,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
-		$is_responsive = array_key_exists( 'isResponsive', $layout ) ? $layout['isResponsive'] : true;
-
-		if ( $is_responsive ) {
 			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
 
 			$layout_styles[] = array(
 				'selector'     => $selector,
 				'declarations' => array( 'grid-template-columns' => 'repeat(auto-fill, minmax(' . $minimum_column_width . ', 1fr))' ),
 			);
-
-		} else {
-			$number_of_columns = ! empty( $layout['numberOfColumns'] ) ? $layout['numberOfColumns'] : 3;
-
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array( 'grid-template-columns' => 'repeat(' . $number_of_columns . ', 1fr)' ),
-			);
-		}
 
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
 			$combined_gap_value = '';
