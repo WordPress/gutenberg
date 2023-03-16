@@ -19,7 +19,16 @@ function gutenberg_preload_template_parts( $preload_paths, $context ) {
 		return $preload_paths;
 	}
 
-	$theme_slug = wp_get_theme()->get_stylesheet();
+	// Get any template parts defined in theme.json.
+	$theme_json_template_parts = WP_Theme_JSON_Resolver::get_merged_data()->get_template_parts();
+
+	if ( ! is_array( $theme_json_template_parts ) ) {
+		return $preload_paths;
+	}
+
+	$theme_json_template_part_slugs = array_keys( $theme_json_template_parts );
+
+	$theme_slug = get_stylesheet();
 
 	$template_parts_rest_route = rest_get_route_for_post_type_items(
 		'wp_template_part'
@@ -27,9 +36,9 @@ function gutenberg_preload_template_parts( $preload_paths, $context ) {
 
 	$standard_template_parts = array( 'header', 'footer' );
 
-	foreach ( $standard_template_parts as $template_part ) {
+	foreach ( $theme_json_template_part_slugs as $template_part_slug ) {
 		$preload_paths[] = array(
-			$template_parts_rest_route . "/$theme_slug//$template_part?context=edit",
+			$template_parts_rest_route . "/$theme_slug//$template_part_slug?context=edit",
 			'GET',
 		);
 	}
