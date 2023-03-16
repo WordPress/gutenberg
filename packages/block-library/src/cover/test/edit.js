@@ -1,38 +1,34 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
-import Editor from './integration-test-editor';
+import { initializeEditor } from '../../../../../test/integration/helpers/integration-test-editor';
 
-function setup( jsx ) {
-	return {
-		user: userEvent.setup(),
-		...render( jsx ),
-	};
+async function setup( testBlock ) {
+	return initializeEditor( { testBlock } );
 }
 
-async function selectCoverBlock( user ) {
-	await user.click(
+async function selectCoverBlock() {
+	await userEvent.click(
 		screen.getByRole( 'button', {
 			name: 'Color: Black',
 		} )
 	);
-	await user.click(
+	await userEvent.click(
 		screen.getByRole( 'button', {
 			name: 'Select Cover',
 		} )
 	);
 }
-
-describe( 'Cover edit', () => {
-	describe( 'Placeholder', () => {
+describe( 'Cover block', () => {
+	describe( 'Editor canvas', () => {
 		test( 'shows placeholder if background image and color not set', async () => {
-			setup( <Editor testBlock={ { name: 'core/cover' } } /> );
+			await setup( { name: 'core/cover' } );
 
 			expect(
 				screen.getByRole( 'group', {
@@ -42,13 +38,11 @@ describe( 'Cover edit', () => {
 		} );
 
 		test( 'can set overlay color using color picker on block placeholder', async () => {
-			const { user, container } = setup(
-				<Editor testBlock={ { name: 'core/cover' } } />
-			);
+			const { container } = await setup( { name: 'core/cover' } );
 			const colorPicker = screen.getByRole( 'button', {
 				name: 'Color: Black',
 			} );
-			await user.click( colorPicker );
+			await userEvent.click( colorPicker );
 			const color = colorPicker.style.backgroundColor;
 			expect(
 				screen.queryByRole( 'group', {
@@ -66,11 +60,9 @@ describe( 'Cover edit', () => {
 		} );
 
 		test( 'can have the title edited', async () => {
-			const { user } = setup(
-				<Editor testBlock={ { name: 'core/cover' } } />
-			);
+			await setup( { name: 'core/cover' } );
 
-			await user.click(
+			await userEvent.click(
 				screen.getByRole( 'button', {
 					name: 'Color: Black',
 				} )
@@ -79,17 +71,16 @@ describe( 'Cover edit', () => {
 			const title = screen.getByLabelText( 'Empty block;', {
 				exact: false,
 			} );
-			await user.click( title );
-			await user.keyboard( 'abc' );
+			await userEvent.click( title );
+			await userEvent.keyboard( 'abc' );
 			expect( title ).toHaveTextContent( 'abc' );
 		} );
-
+	} );
+	describe( 'Block toolbar', () => {
 		test( 'shows block toolbar if selected block', async () => {
-			const { user } = setup(
-				<Editor testBlock={ { name: 'core/cover' } } />
-			);
+			await setup( { name: 'core/cover' } );
 
-			await selectCoverBlock( user );
+			await selectCoverBlock();
 
 			expect(
 				screen.getByRole( 'button', {
@@ -97,28 +88,40 @@ describe( 'Cover edit', () => {
 				} )
 			).toBeInTheDocument();
 		} );
+	} );
+	describe( 'Inspector controls', () => {
+		describe( 'Media settings', () => {
+			test( 'does not display media settings panel if url is not set', async () => {
+				await setup( { name: 'core/cover' } );
+				expect(
+					screen.queryByRole( 'button', {
+						name: 'Media settings',
+					} )
+				).not.toBeInTheDocument();
+			} );
+			test( 'displays media settings panel if url is set', async () => {
+				await setup( {
+					name: 'core/cover',
+					attributes: {
+						url: 'http://localhost/my-image.jpg',
+					},
+				} );
 
-		test( 'shows inspector panel if selected block', async () => {
-			const { user } = setup(
-				<Editor testBlock={ { name: 'core/cover' } } />
-			);
-
-			await selectCoverBlock( user );
-
-			await user.click(
-				screen.getByRole( 'tab', {
-					name: 'Styles',
-				} )
-			);
-			expect( screen.getByText( 'Overlay' ) ).toBeInTheDocument();
+				await userEvent.click(
+					screen.getByLabelText( 'Block: Cover' )
+				);
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Media settings',
+					} )
+				).toBeInTheDocument();
+			} );
 		} );
 
 		test( 'applies selected opacity to block', async () => {
-			const { user, container } = setup(
-				<Editor testBlock={ { name: 'core/cover' } } />
-			);
+			const { container } = await setup( { name: 'core/cover' } );
 
-			await selectCoverBlock( user );
+			await selectCoverBlock();
 
 			// eslint-disable-next-line testing-library/no-node-access
 			const overlay = container.getElementsByClassName(
@@ -127,7 +130,7 @@ describe( 'Cover edit', () => {
 
 			expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
 
-			await user.click(
+			await userEvent.click(
 				screen.getByRole( 'tab', {
 					name: 'Styles',
 				} )

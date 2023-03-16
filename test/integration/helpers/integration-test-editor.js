@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { render } from '@testing-library/react';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
@@ -21,7 +26,12 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 
-export default function Editor( { testBlock, useCoreBlocks = true } ) {
+/**
+ * Internal dependencies
+ */
+import { waitForStoreResolvers } from './wait-for-store-resolvers';
+
+export function Editor( { testBlock, useCoreBlocks = true } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	useEffect( () => {
@@ -63,4 +73,10 @@ export default function Editor( { testBlock, useCoreBlocks = true } ) {
 			</SlotFillProvider>
 		</ShortcutProvider>
 	);
+}
+
+export async function initializeEditor( props ) {
+	return waitForStoreResolvers( () => {
+		return render( <Editor { ...props } /> );
+	} );
 }
