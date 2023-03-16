@@ -4,17 +4,12 @@
 		"isValid": true,
 		"attributes": {
 			"align": "wide",
-			"mediaAlt": "My alt text",
+			"mediaAlt": "",
 			"mediaPosition": "left",
 			"mediaType": "image",
 			"mediaWidth": 50,
 			"isStackedOnMobile": true,
-			"mediaUrl": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
-			"imageFill": true,
-			"focalPoint": {
-				"x": 0.84,
-				"y": 0.84
-			}
+			"mediaUrl": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k="
 		},
 		"innerBlocks": [
 			{
