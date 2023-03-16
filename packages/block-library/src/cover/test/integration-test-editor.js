@@ -29,11 +29,9 @@ export default function Editor( { testBlock, useCoreBlocks = true } ) {
 			registerCoreBlocks();
 		}
 		return () => {
-			if ( useCoreBlocks ) {
-				getBlockTypes().forEach( ( { name } ) =>
-					unregisterBlockType( name )
-				);
-			}
+			getBlockTypes().forEach( ( { name } ) =>
+				unregisterBlockType( name )
+			);
 		};
 	}, [ useCoreBlocks ] );
 
@@ -43,33 +41,26 @@ export default function Editor( { testBlock, useCoreBlocks = true } ) {
 	}, [ testBlock.name, testBlock.attributes ] );
 
 	return (
-		<div className="integration-test-editor">
-			<ShortcutProvider>
-				<SlotFillProvider>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ updateBlocks }
-						onChange={ updateBlocks }
-					>
-						<div className="integration-test-editor__sidebar">
-							<BlockInspector />
-						</div>
-						<div className="integration-test-editor__content">
-							<BlockTools>
-								<div className="editor-styles-wrapper">
-									<BlockEditorKeyboardShortcuts.Register />
-									<WritingFlow>
-										<ObserveTyping>
-											<BlockList />
-										</ObserveTyping>
-									</WritingFlow>
-								</div>
-							</BlockTools>
-						</div>
-						<Popover.Slot />
-					</BlockEditorProvider>
-				</SlotFillProvider>
-			</ShortcutProvider>
-		</div>
+		<ShortcutProvider>
+			<SlotFillProvider>
+				<BlockEditorProvider
+					value={ blocks }
+					onInput={ updateBlocks }
+					onChange={ updateBlocks }
+				>
+					<BlockInspector />
+					<BlockTools>
+						<BlockEditorKeyboardShortcuts.Register />
+						<WritingFlow>
+							<ObserveTyping>
+								<BlockList />
+							</ObserveTyping>
+						</WritingFlow>
+					</BlockTools>
+
+					<Popover.Slot />
+				</BlockEditorProvider>
+			</SlotFillProvider>
+		</ShortcutProvider>
 	);
 }
