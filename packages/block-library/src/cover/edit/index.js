@@ -149,10 +149,10 @@ function CoverEdit( {
 	const [ resizeListener, { height, width } ] = useResizeObserver();
 	const resizableBoxDimensions = useMemo( () => {
 		return {
-			height: minHeight ? parseFloat( minHeight ) : 'auto',
+			height: minHeightUnit === 'px' ? minHeight : 'auto',
 			width: 'auto',
 		};
-	}, [ minHeight ] );
+	}, [ minHeight, minHeightUnit ] );
 
 	const minHeightWithUnit =
 		minHeight && minHeightUnit
@@ -258,7 +258,7 @@ function CoverEdit( {
 		className: 'block-library-cover__resize-container',
 		clientId,
 		height,
-		minHeight: parseFloat( minHeight ),
+		minHeight: minHeightWithUnit,
 		onResizeStart: () => {
 			setAttributes( { minHeightUnit: 'px' } );
 			toggleSelection( false );
