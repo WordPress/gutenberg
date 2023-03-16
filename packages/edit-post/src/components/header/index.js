@@ -6,10 +6,7 @@ import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	VisuallyHidden,
-	__unstableMotion as motion,
-} from '@wordpress/components';
+import { __unstableMotion as motion } from '@wordpress/components';
 import {
 	NavigableToolbar,
 	store as blockEditorStore,
@@ -30,7 +27,7 @@ import TemplateTitle from './template-title';
 
 function MaybeHide( { children, isHidden } ) {
 	if ( isHidden ) {
-		return <VisuallyHidden>{ children }</VisuallyHidden>;
+		return <div className="maybeHide">{ children }</div>;
 	}
 	return children;
 }
