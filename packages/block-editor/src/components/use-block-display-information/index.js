@@ -7,12 +7,12 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { getPositionTypeLabel } from '../../hooks/position';
 
 /** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
 
@@ -27,6 +27,26 @@ import { getPositionTypeLabel } from '../../hooks/position';
  * @property {string}  description A detailed block type description.
  * @property {string}  anchor      HTML anchor.
  */
+
+/**
+ * Get the display label for a block's position type.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {string} The position type label.
+ */
+function getPositionTypeLabel( attributes ) {
+	const positionType = attributes.style?.position?.type;
+
+	if ( positionType === 'sticky' ) {
+		return __( 'Sticky' );
+	}
+
+	if ( positionType === 'fixed' ) {
+		return __( 'Fixed' );
+	}
+
+	return null;
+}
 
 /**
  * Hook used to try to find a matching block variation and return
