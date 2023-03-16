@@ -24,6 +24,7 @@ import { default as DevicePreview } from '../device-preview';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import TemplateTitle from './template-title';
+import InserterButton from './inserter-button';
 
 function MaybeHide( { children, isHidden } ) {
 	if ( isHidden ) {
@@ -39,20 +40,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isPublishSidebarOpened,
 		isSaving,
 		hasFixedToolbar,
-		firstParentClientId,
 		hasSelectedBlocks,
 		showIconLabels,
 		isDistractionFreeMode,
 	} = useSelect( ( select ) => {
-		const { getSettings, getBlockParents, getSelectedBlockClientIds } =
+		const { getSettings, getSelectedBlockClientIds } =
 			select( blockEditorStore );
 		const settings = getSettings();
 		const _selectedBlockClientIds = getSelectedBlockClientIds();
-		const parents =
-			_selectedBlockClientIds?.length === 1
-				? getBlockParents( _selectedBlockClientIds[ 0 ] )
-				: [];
-		const hasParent = parents.length > 0;
 		return {
 			hasSelectedBlocks: !! _selectedBlockClientIds.length,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -64,7 +59,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			isDistractionFreeMode:
 				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 			hasFixedToolbar: settings.hasFixedToolbar,
-			firstParentClientId: hasParent,
 		};
 	} );
 
@@ -104,23 +98,15 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							<HeaderToolbar />
 						</MaybeHide>
 						<MaybeHide isHidden={ ! hasSelectedBlocks }>
-							<div
-								style={ {
-									display: 'flex',
-									width: '100%',
-									position: 'relative',
-									left: firstParentClientId ? '60px' : '0',
-								} }
+							<NavigableToolbar
+								className="edit-post-header-block-toolbar"
+								aria-label={ blockToolbarAriaLabel }
 							>
-								<NavigableToolbar
-									className="edit-post-header-toolbar"
-									aria-label={ blockToolbarAriaLabel }
-								>
-									<BlockToolbar
-										hideDragHandle={ hasFixedToolbar }
-									/>
-								</NavigableToolbar>
-							</div>
+								<InserterButton />
+								<BlockToolbar
+									hideDragHandle={ hasFixedToolbar }
+								/>
+							</NavigableToolbar>
 						</MaybeHide>
 					</>
 				) }

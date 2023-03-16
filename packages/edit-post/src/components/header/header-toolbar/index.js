@@ -3,59 +3,33 @@
  */
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, _x } from '@wordpress/i18n';
-import {
-	NavigableToolbar,
-	ToolSelector,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import {
-	EditorHistoryRedo,
-	EditorHistoryUndo,
-	store as editorStore,
-} from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
+import { NavigableToolbar, ToolSelector } from '@wordpress/block-editor';
+import { EditorHistoryRedo, EditorHistoryUndo } from '@wordpress/editor';
 import { Button, ToolbarItem } from '@wordpress/components';
-import { listView, plus } from '@wordpress/icons';
-import { useRef, useCallback } from '@wordpress/element';
+import { listView } from '@wordpress/icons';
+import { useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
-
-const preventDefault = ( event ) => {
-	event.preventDefault();
-};
+import InserterButton from '../inserter-button';
 
 function HeaderToolbar() {
-	const inserterButton = useRef();
-	const { setIsInserterOpened, setIsListViewOpened } =
-		useDispatch( editPostStore );
+	const { setIsListViewOpened } = useDispatch( editPostStore );
 	const {
-		isInserterEnabled,
-		isInserterOpened,
 		isTextModeEnabled,
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
 	} = useSelect( ( select ) => {
-		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
-			select( blockEditorStore );
-		const { getEditorSettings } = select( editorStore );
 		const { getEditorMode, isFeatureActive, isListViewOpened } =
 			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		return {
-			// This setting (richEditingEnabled) should not live in the block editor's setting.
-			isInserterEnabled:
-				getEditorMode() === 'visual' &&
-				getEditorSettings().richEditingEnabled &&
-				hasInserterItems(
-					getBlockRootClientId( getBlockSelectionEnd() )
-				),
-			isInserterOpened: select( editPostStore ).isInserterOpened(),
 			isTextModeEnabled: getEditorMode() === 'text',
 			showIconLabels: isFeatureActive( 'showIconLabels' ),
 			isListViewOpen: isListViewOpened(),
@@ -91,44 +65,14 @@ function HeaderToolbar() {
 			/>
 		</>
 	);
-	const toggleInserter = useCallback( () => {
-		if ( isInserterOpened ) {
-			// Focusing the inserter button should close the inserter popover.
-			// However, there are some cases it won't close when the focus is lost.
-			// See https://github.com/WordPress/gutenberg/issues/43090 for more details.
-			inserterButton.current.focus();
-			setIsInserterOpened( false );
-		} else {
-			setIsInserterOpened( true );
-		}
-	}, [ isInserterOpened, setIsInserterOpened ] );
-
-	/* translators: button label text should, if possible, be under 16 characters. */
-	const longLabel = _x(
-		'Toggle block inserter',
-		'Generic label for block inserter button'
-	);
-	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
 
 	return (
 		<NavigableToolbar
-			className="edit-post-header-toolbar"
+			className="edit-post-header-document-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<div className="edit-post-header-toolbar__left">
-				<ToolbarItem
-					ref={ inserterButton }
-					as={ Button }
-					className="edit-post-header-toolbar__inserter-toggle"
-					variant="primary"
-					isPressed={ isInserterOpened }
-					onMouseDown={ preventDefault }
-					onClick={ toggleInserter }
-					disabled={ ! isInserterEnabled }
-					icon={ plus }
-					label={ showIconLabels ? shortLabel : longLabel }
-					showTooltip={ ! showIconLabels }
-				/>
+			<div className="edit-post-header-document-toolbar__left">
+				<InserterButton />
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
 						{ isLargeViewport && (
