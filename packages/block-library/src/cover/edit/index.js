@@ -119,7 +119,7 @@ export function CoverEdit( {
 	const url = useFeaturedImage
 		? mediaUrl
 		: // Ensure the url is not malformed due to sanitization through `wp_kses`.
-		  attributes.url?.replaceAll( '&amp;', '&' );
+		  attributes?.url?.replaceAll( '&amp;', '&' );
 	const backgroundType = useFeaturedImage
 		? IMAGE_BACKGROUND_TYPE
 		: attributes.backgroundType;
