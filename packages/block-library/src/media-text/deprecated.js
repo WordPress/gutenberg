@@ -348,11 +348,11 @@ const v6 = {
 	migrate: migrateDefaultAlign,
 	isEligible( attributes, innerBlocks, { block } ) {
 		const { attributes: finalizedAttributes } = block;
-		// When the align attribute is switched to default to none, valid
-		// block markup wouldn't contain any alignment CSS class. Unfortunately,
-		// this deprecation's version of the block won't be invalidated due to
-		// the alignwide class still being in the markup. That is because the
-		// custom CSS classname support picks it up and adds it to the className
+		// When the align attribute defaults to none, valid block markup should
+		// not contain any alignment CSS class. Unfortunately, this
+		// deprecation's version of the block won't be invalidated due to the
+		// alignwide class still being in the markup. That is because the custom
+		// CSS classname support picks it up and adds it to the className
 		// attribute. At the time of parsing, the className attribute won't
 		// contain the alignwide class, hence the need to check the finalized
 		// block attributes.
