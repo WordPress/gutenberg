@@ -73,7 +73,7 @@ export type CustomGradientBarProps = {
 	onChange: ( newControlPoints: ControlPoint[] ) => void;
 	disableInserter?: boolean;
 	disableAlpha?: boolean;
-	__experimentalIsRenderedInSidebar: boolean;
+	__experimentalIsRenderedInSidebar?: boolean;
 };
 
 export type CustomGradientBarIdleState = { id: 'IDLE' };

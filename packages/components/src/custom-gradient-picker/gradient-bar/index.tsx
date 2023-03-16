@@ -85,7 +85,7 @@ export default function CustomGradientBar( {
 	onChange,
 	disableInserter = false,
 	disableAlpha = false,
-	__experimentalIsRenderedInSidebar,
+	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientBarProps ) {
 	const gradientMarkersContainerDomRef = useRef< HTMLDivElement >( null );
 
