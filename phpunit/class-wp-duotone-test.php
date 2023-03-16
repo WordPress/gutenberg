@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Test the block duotone support.
+ * Test the block WP_Duotone_Gutenberg class.
  *
  * @package Gutenberg
  */
 
-class WP_Block_Supports_Duotone_Test extends WP_UnitTestCase {
+class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 	public function test_gutenberg_render_duotone_support_preset() {
 		$block         = array(
 			'blockName' => 'core/image',
