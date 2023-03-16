@@ -29,7 +29,7 @@ class WP_Duotone_Gutenberg {
 	 * @since 6.3.0
 	 * @var array
 	 */
-	protected static $global_styles_presets = array();
+	private static $global_styles_presets = array();
 
 	/**
 	 * An array of block names from global, theme, and custom styles that have duotone presets. We'll use this to quickly
@@ -44,7 +44,7 @@ class WP_Duotone_Gutenberg {
 	 * @since 6.3.0
 	 * @var array
 	 */
-	protected static $global_styles_block_names = array();
+	private static $global_styles_block_names = array();
 
 	/**
 	 * An array of Duotone SVG and CSS output needed for the frontend duotone rendering based on what is
@@ -66,7 +66,7 @@ class WP_Duotone_Gutenberg {
 	 * @since 6.3.0
 	 * @var array
 	 */
-	protected static $output = array();
+	private static $output = array();
 
 	const CSS_VAR_PREFIX = '--wp--preset--duotone--';
 
