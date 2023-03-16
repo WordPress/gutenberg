@@ -68,7 +68,6 @@ class WP_Duotone_Gutenberg {
 	 */
 	protected static $output = array();
 
-
 	const CSS_VAR_PREFIX = '--wp--preset--duotone--';
 
 	/**

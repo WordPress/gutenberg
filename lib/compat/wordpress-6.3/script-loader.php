@@ -6,8 +6,8 @@
  */
 
 /**
- * Removes duotone SVG filter presets from all being output.
- * WP_Duotone_Gutenberg now handles only outputting the duotone SVG filters necessary
+ * Removes the actions that output all duotone SVG filter presets.
+ * WP_Duotone_Gutenberg now handles which SVG filters should be output
  * depending on the block content.
  */
 remove_action( 'wp_body_open', 'wp_global_styles_render_svg_filters' );
