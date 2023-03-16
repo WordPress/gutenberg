@@ -32,6 +32,7 @@ export default function ResizableCoverPopover( {
 	onResize,
 	onResizeStart,
 	onResizeStop,
+	showHandle,
 	width,
 	...props
 } ) {
@@ -59,6 +60,7 @@ export default function ResizableCoverPopover( {
 			onResizeStop( elt.clientHeight );
 			setIsResizing( false );
 		},
+		showHandle,
 		__experimentalShowTooltip: true,
 		__experimentalTooltipProps: {
 			axis: 'y',
