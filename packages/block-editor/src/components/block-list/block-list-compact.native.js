@@ -8,6 +8,7 @@ import { View } from 'react-native';
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,22 +29,28 @@ function BlockListCompact( props ) {
 		marginVertical = styles.defaultBlock.marginTop,
 		rootClientId,
 	} = props;
-	const { blockClientIds } = useSelect(
-		( select ) => {
-			const { getBlockOrder } = select( blockEditorStore );
-			const blockOrder = getBlockOrder( rootClientId );
 
-			return {
-				blockClientIds: blockOrder,
-			};
-		},
-		[ rootClientId ]
+	const { blockClientIds } = useSelect(
+		useMemo(
+			( select ) => {
+				const { getBlockOrder } = select( blockEditorStore );
+				const blockOrder = getBlockOrder( rootClientId );
+
+				return {
+					blockClientIds: blockOrder,
+				};
+			},
+			[ rootClientId ]
+		)
 	);
 
-	const containerStyle = {
-		marginVertical: -marginVertical,
-		marginHorizontal: -marginHorizontal,
-	};
+	const containerStyle = useMemo(
+		() => ( {
+			marginVertical: -marginVertical,
+			marginHorizontal: -marginHorizontal,
+		} ),
+		[ marginHorizontal, marginVertical ]
+	);
 
 	return (
 		<View style={ containerStyle } testID="block-list-wrapper">
