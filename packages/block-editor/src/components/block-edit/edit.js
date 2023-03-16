@@ -31,7 +31,6 @@ const DEFAULT_BLOCK_CONTEXT = {};
 
 export const Edit = ( props ) => {
 	const { attributes = {}, name } = props;
-	console.log( 'Attributes in Block Edit: ', attributes );
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
 

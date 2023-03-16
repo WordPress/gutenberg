@@ -80,7 +80,6 @@ export function CoverEdit( {
 	toggleSelection,
 	context: { postId, postType },
 } ) {
-	console.log( 'Attributes in Cover Edit: ', attributes );
 	const {
 		contentPosition,
 		id,
