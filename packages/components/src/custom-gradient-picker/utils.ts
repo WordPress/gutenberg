@@ -23,10 +23,7 @@ export function getLinearGradientRepresentation(
 ) {
 	return serializeGradient( {
 		type: 'linear-gradient',
-		orientation: {
-			...HORIZONTAL_GRADIENT_ORIENTATION,
-			value: `${ HORIZONTAL_GRADIENT_ORIENTATION.value }`,
-		},
+		orientation: HORIZONTAL_GRADIENT_ORIENTATION,
 		colorStops: gradientAST.colorStops,
 	} as gradientParser.LinearGradientNode );
 }
