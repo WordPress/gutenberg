@@ -38,7 +38,7 @@ function gutenberg_preload_template_parts( $preload_paths, $context ) {
 
 	foreach ( $theme_json_template_part_slugs as $template_part_slug ) {
 		$preload_paths[] = array(
-			$template_parts_rest_route . "/$theme_slug//$template_part_slug?context=edit",
+			$template_parts_rest_route . '/' . $theme_slug . '//' . $template_part_slug . '?context=edit',
 			'GET',
 		);
 	}
