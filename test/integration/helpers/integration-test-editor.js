@@ -26,29 +26,29 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 
+export function registerAllCoreBlocks() {
+	registerCoreBlocks();
+}
+
+export function unRegisterAllBlocks() {
+	getBlockTypes().forEach( ( { name } ) => unregisterBlockType( name ) );
+}
+
+export function createTestBlock( name, attributes ) {
+	return createBlock( name, attributes || {} );
+}
+
 /**
  * Internal dependencies
  */
 import { waitForStoreResolvers } from './wait-for-store-resolvers';
 
-export function Editor( { testBlock, useCoreBlocks = true } ) {
+export function Editor( { testBlocks } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	useEffect( () => {
-		if ( useCoreBlocks ) {
-			registerCoreBlocks();
-		}
-		return () => {
-			getBlockTypes().forEach( ( { name } ) =>
-				unregisterBlockType( name )
-			);
-		};
-	}, [ useCoreBlocks ] );
-
-	useEffect( () => {
-		const block = createBlock( testBlock.name, testBlock.attributes || {} );
-		updateBlocks( [ block ] );
-	}, [ testBlock.name, testBlock.attributes ] );
+		updateBlocks( testBlocks );
+	}, [ testBlocks ] );
 
 	return (
 		<ShortcutProvider>

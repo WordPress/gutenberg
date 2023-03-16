@@ -7,13 +7,21 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import { initializeEditor } from '../../../../../test/integration/helpers/integration-test-editor';
+import {
+	initializeEditor,
+	registerAllCoreBlocks,
+	unRegisterAllBlocks,
+	createTestBlock,
+} from 'test/integration/helpers/integration-test-editor';
 
 async function setup( testBlock ) {
-	return initializeEditor( { testBlock } );
+	const testBlocks = [
+		createTestBlock( testBlock.name, testBlock.attributes ),
+	];
+	return initializeEditor( { testBlocks } );
 }
 
-async function selectCoverBlock() {
+async function createAndSelectCoverBlock() {
 	await userEvent.click(
 		screen.getByRole( 'button', {
 			name: 'Color: Black',
@@ -25,7 +33,18 @@ async function selectCoverBlock() {
 		} )
 	);
 }
+
+async function selectCoverBlock() {
+	await userEvent.click( screen.getByLabelText( 'Block: Cover' ) );
+}
+
 describe( 'Cover block', () => {
+	beforeAll( () => {
+		registerAllCoreBlocks();
+	} );
+	afterAll( () => {
+		unRegisterAllBlocks();
+	} );
 	describe( 'Editor canvas', () => {
 		test( 'shows placeholder if background image and color not set', async () => {
 			await setup( { name: 'core/cover' } );
@@ -80,7 +99,7 @@ describe( 'Cover block', () => {
 		test( 'shows block toolbar if selected block', async () => {
 			await setup( { name: 'core/cover' } );
 
-			await selectCoverBlock();
+			await createAndSelectCoverBlock();
 
 			expect(
 				screen.getByRole( 'button', {
@@ -107,9 +126,7 @@ describe( 'Cover block', () => {
 					},
 				} );
 
-				await userEvent.click(
-					screen.getByLabelText( 'Block: Cover' )
-				);
+				await selectCoverBlock();
 				expect(
 					screen.getByRole( 'button', {
 						name: 'Media settings',
@@ -121,7 +138,7 @@ describe( 'Cover block', () => {
 		test( 'applies selected opacity to block', async () => {
 			const { container } = await setup( { name: 'core/cover' } );
 
-			await selectCoverBlock();
+			await createAndSelectCoverBlock();
 
 			// eslint-disable-next-line testing-library/no-node-access
 			const overlay = container.getElementsByClassName(
