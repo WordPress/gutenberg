@@ -203,8 +203,8 @@ describe( 'Tooltip', () => {
 
 		it( 'should not emit events back to children when they are disabled', async () => {
 			const user = userEvent.setup();
-
 			const onClickMock = jest.fn();
+
 			const { container } = render(
 				<Tooltip { ...props }>
 					<Button disabled onClick={ onClickMock }>
@@ -213,10 +213,18 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
+			// Note: this is testing for implementation details,
+			// but couldn't find a better way.
+			const buttonRect = screen
+				.getByRole( 'button', { name: 'Click me' } )
+				.getBoundingClientRect();
 			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 			const eventCatcher = container.querySelector( '.event-catcher' );
 			await user.click( eventCatcher );
 			expect( onClickMock ).not.toHaveBeenCalled();
+
+			const eventCatcherRect = eventCatcher.getBoundingClientRect();
+			expect( buttonRect ).toEqual( eventCatcherRect );
 		} );
 
 		it( 'should not show tooltip if the mouse leaves the anchor before the tooltip has shown', async () => {
