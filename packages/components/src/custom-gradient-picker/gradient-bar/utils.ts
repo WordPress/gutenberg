@@ -29,7 +29,7 @@ export function isOverlapping(
 	value: ControlPoint[],
 	initialIndex: number,
 	newPosition: number,
-	minDistance = MINIMUM_DISTANCE_BETWEEN_POINTS
+	minDistance: number = MINIMUM_DISTANCE_BETWEEN_POINTS
 ) {
 	const initialPosition = value[ initialIndex ].position;
 	const minPosition = Math.min( initialPosition, newPosition );
