@@ -71,8 +71,9 @@ function selectNavigationMenus( select ) {
 	const args = [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: [ 'publish', 'draft' ] },
+		{ per_page: -1, status: 'publish,draft' },
 	];
+
 	return {
 		navigationMenus: getEntityRecords( ...args ),
 		isResolvingNavigationMenus: isResolving( 'getEntityRecords', args ),
