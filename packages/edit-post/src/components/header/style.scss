@@ -238,3 +238,13 @@
 		z-index: 35;
 	}
 }
+
+.maybeHide {
+	position: fixed;
+	top: -9999px;
+}
+
+.maybeHide:focus-within {
+	position: relative;
+	top: 0;
+}
