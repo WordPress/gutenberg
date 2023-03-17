@@ -334,9 +334,10 @@ class WP_Duotone_Gutenberg {
 			self::$output[ $slug ]['selector'] = $selector;
 		}
 
-		// Calling gutenberg_style_engine_get_stylesheet_from_css_rules ensures that
-		// the styles are rendered in an inline for block supports because we're
-		// using the `context` option to instruct it so.
+		// Pass styles to the block-supports stylesheet via the style engine.
+		// This ensures that Duotone styles are included in a single stylesheet,
+		// avoiding multiple style tags or multiple stylesheets being output to
+		// the site frontend.
 		gutenberg_style_engine_get_stylesheet_from_css_rules(
 			array(
 				array(
