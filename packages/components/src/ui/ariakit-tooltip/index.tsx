@@ -4,6 +4,11 @@
 import { Tooltip, TooltipAnchor, useTooltipState } from 'ariakit/tooltip';
 
 /**
+ * WordPress dependencies
+ */
+import { Children } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import Shortcut from '../../shortcut';
@@ -23,8 +28,19 @@ function UnforwardedToolTip(
 		timeout: delay,
 	} );
 
-	const cx = useCx();
+	const isOnlyChild = () => {
+		if ( Children.toArray( children?.props?.children ).length === 1 ) {
+			return children;
+		}
+		if ( 'development' === process.env.NODE_ENV ) {
+			// eslint-disable-next-line no-console
+			return console.error(
+				'ToolTip should be called with only a single child element.'
+			);
+		}
+	};
 
+	const cx = useCx();
 	const ToolTipClassName = cx( styles.ToolTip );
 	const ToolTipAnchorClassName = cx( styles.ToolTipAnchor );
 	const ShortcutClassName = cx( styles.Shortcut );
@@ -38,7 +54,7 @@ function UnforwardedToolTip(
 			>
 				{ children }
 			</TooltipAnchor>
-			{ ( text || shortcut ) && (
+			{ ( text || shortcut ) && isOnlyChild() && (
 				<Tooltip className={ ToolTipClassName } state={ tooltipState }>
 					{ text }
 					{ shortcut && (
