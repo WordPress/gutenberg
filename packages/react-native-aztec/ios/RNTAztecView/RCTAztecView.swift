@@ -361,6 +361,7 @@ class RCTAztecView: Aztec.TextView {
         let objectPlaceholder = "\u{FFFC}"
         let dictationText = dictationResult.reduce("") { $0 + $1.text }
         isInsertingDictationResult = false
+        self.text = self.text?.replacingOccurrences(of: objectPlaceholder, with: dictationText)
     }
 
     // MARK: - Custom Edit Intercepts
