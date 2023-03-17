@@ -83,6 +83,7 @@
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount",
+		"cmdk": "0.2.0",
 		"wicg-inert": "3.1.2"
 	},
 	"devDependencies": {
