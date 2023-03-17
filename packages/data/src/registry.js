@@ -211,13 +211,17 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a store instance.
 	 *
-	 * @param {string} name  Store registry name.
-	 * @param {Object} store Store instance object (getSelectors, getActions, subscribe).
+	 * @param {string}   name        Store registry name.
+	 * @param {Function} createStore Function that creates a store object (getSelectors, getActions, subscribe).
 	 */
-	function registerStoreInstance( name, store ) {
+	function registerStoreInstance( name, createStore ) {
 		if ( stores[ name ] ) {
-			throw new Error( 'duplicate store oh no' );
+			// eslint-disable-next-line no-console
+			console.error( 'Store "' + name + '" is already registered.' );
+			return stores[ name ];
 		}
+
+		const store = createStore();
 
 		if ( typeof store.getSelectors !== 'function' ) {
 			throw new TypeError( 'store.getSelectors must be a function' );
@@ -266,6 +270,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 				// ignore it.
 			}
 		}
+
+		return store;
 	}
 
 	/**
@@ -274,7 +280,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @param {StoreDescriptor} store Store descriptor.
 	 */
 	function register( store ) {
-		registerStoreInstance( store.name, store.instantiate( registry ) );
+		registerStoreInstance( store.name, () =>
+			store.instantiate( registry )
+		);
 	}
 
 	function registerGenericStore( name, store ) {
@@ -282,7 +290,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			since: '5.9',
 			alternative: 'wp.data.register( storeDescriptor )',
 		} );
-		registerStoreInstance( name, store );
+		registerStoreInstance( name, () => store );
 	}
 
 	/**
@@ -298,10 +306,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const store = createReduxStore( storeName, options ).instantiate(
-			registry
+		const store = registerStoreInstance( storeName, () =>
+			createReduxStore( storeName, options ).instantiate( registry )
 		);
-		registerStoreInstance( storeName, store );
+
 		return store.store;
 	}
 
