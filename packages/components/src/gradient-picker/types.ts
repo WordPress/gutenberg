@@ -4,7 +4,7 @@
 import type { HeadingSize } from '../heading/types';
 
 export type GradientObject = {
-	gradient: string; //TODO: can this be typed more narrowly?
+	gradient: string;
 	name: string;
 	slug: string;
 };
@@ -54,8 +54,10 @@ export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	 * there are multiple sets (or 'origins') of gradients, you can pass an
 	 * array of objects each with a `name` and a `gradients` array which will
 	 * in turn contain the predefined gradient objects.
+	 *
+	 * @default []
 	 */
-	gradients: GradientsProp;
+	gradients?: GradientsProp;
 	/**
 	 * Start opting in to the new margin-free styles that will become the default
 	 * in a future version, currently scheduled to be WordPress 6.4. (The prop

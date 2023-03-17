@@ -42,7 +42,7 @@ function SingleOrigin( {
 	actions,
 }: PickerProps< GradientObject > ) {
 	const gradientOptions = useMemo( () => {
-		return gradients?.map( ( { gradient, name }, index ) => (
+		return gradients.map( ( { gradient, name }, index ) => (
 			<CircularOptionPicker.Option
 				key={ gradient }
 				value={ gradient }
@@ -88,7 +88,7 @@ function MultipleOrigin( {
 }: PickerProps< OriginObject > ) {
 	return (
 		<VStack spacing={ 3 } className={ className }>
-			{ gradients?.map( ( { name, gradients: gradientSet }, index ) => {
+			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
 				return (
 					<VStack spacing={ 2 } key={ index }>
 						<ColorHeading level={ headingLevel }>
@@ -101,7 +101,7 @@ function MultipleOrigin( {
 								onChange( gradient, index )
 							}
 							value={ value }
-							{ ...( gradients?.length === index + 1
+							{ ...( gradients.length === index + 1
 								? { actions }
 								: {} ) }
 						/>
@@ -166,7 +166,7 @@ export function GradientPicker( {
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMargin = false,
 	className,
-	gradients,
+	gradients = [],
 	onChange,
 	value,
 	clearable = true,
@@ -189,7 +189,7 @@ export function GradientPicker( {
 
 	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
 		? {
-				marginTop: ! gradients?.length ? 3 : undefined,
+				marginTop: ! gradients.length ? 3 : undefined,
 				marginBottom: ! clearable ? 6 : 0,
 		  }
 		: {};
@@ -197,7 +197,7 @@ export function GradientPicker( {
 	return (
 		// Outmost Spacer wrapper can be removed when deprecation period is over
 		<Spacer marginBottom={ 0 } { ...deprecatedMarginSpacerProps }>
-			<VStack spacing={ gradients?.length ? 4 : 0 }>
+			<VStack spacing={ gradients.length ? 4 : 0 }>
 				{ ! disableCustomGradients && (
 					<CustomGradientPicker
 						__nextHasNoMargin
@@ -208,7 +208,7 @@ export function GradientPicker( {
 						onChange={ onChange }
 					/>
 				) }
-				{ ( gradients?.length || clearable ) && (
+				{ ( gradients.length || clearable ) && (
 					<Component
 						className={ className }
 						//TODO: Note: I think `clearable` should be removed here. It's not used by either `SingleOrigin` or `MultipleOrigin`, and appears to have been accidentally passed down in https://github.com/WordPress/gutenberg/pull/35970 along with the rest of `GradientPicker`'s props.

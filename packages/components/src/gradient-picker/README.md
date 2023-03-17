@@ -73,6 +73,7 @@ The function called when a new gradient has been defined. It is passed the `curr
 An array of objects of predefined gradients which show up as `CircularOptionPicker` above the gradient selector.
 
 -   Required: No
+-   Default: `[]`
     // NTS: I think `gradients` should be required. It can be an empty array, but if it's omitted the component breaks. Maybe we default to empty?
 
 ### `clearable`: `boolean`
