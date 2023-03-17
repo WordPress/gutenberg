@@ -15,10 +15,8 @@ import {
 } from 'test/integration/helpers/integration-test-editor';
 
 async function setup( testBlock ) {
-	const testBlocks = [
-		createTestBlock( testBlock.name, testBlock.attributes ),
-	];
-	return initializeEditor( { testBlocks } );
+	const block = await createTestBlock( testBlock.name, testBlock.attributes );
+	return initializeEditor( { testBlocks: [ block ] } );
 }
 
 async function createAndSelectCoverBlock() {
