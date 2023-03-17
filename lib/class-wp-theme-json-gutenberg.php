@@ -1278,7 +1278,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
 	 */
-	protected function add_layout_styles_to_rules_store( $block_metadata ) {
+	public function add_layout_styles_to_rules_store( $block_metadata ) {
 		$block_type = null;
 
 		// Skip outputting layout styles if explicitly disabled.
