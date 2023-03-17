@@ -20,6 +20,10 @@ export const ToolTip = css`
 	z-index: 1000002;
 `;
 
+export const ToolTipAnchor = css`
+	display: inline-block;
+`;
+
 export const Shortcut = css`
 	margin-left: ${ space( 2 ) };
 `;

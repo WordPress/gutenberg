@@ -26,11 +26,16 @@ function UnforwardedToolTip(
 	const cx = useCx();
 
 	const ToolTipClassName = cx( styles.ToolTip );
+	const ToolTipAnchorClassName = cx( styles.ToolTipAnchor );
 	const ShortcutClassName = cx( styles.Shortcut );
 
 	return (
 		<>
-			<TooltipAnchor state={ tooltipState } ref={ forwardedRef }>
+			<TooltipAnchor
+				className={ ToolTipAnchorClassName }
+				ref={ forwardedRef }
+				state={ tooltipState }
+			>
 				{ children }
 			</TooltipAnchor>
 			{ ( text || shortcut ) && (
