@@ -100,13 +100,7 @@ class RCTAztecView: Aztec.TextView {
     /// the dictation engine refreshes the TextView with an empty string when the dictation finishes.
     /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
     /// on `textViewDidChange` and `textViewDidChangeSelection`
-    private var isInsertingDictationResult: Bool = {
-        if #available(iOS 16, *) {
-            return true;
-        } else {
-            return false;
-        }
-    }()
+    private var isInsertingDictationResult = false
     
     // MARK: - Font
 
@@ -365,11 +359,12 @@ class RCTAztecView: Aztec.TextView {
 
     public override func insertDictationResult(_ dictationResult: [UIDictationPhrase]) {
         let dictationText = dictationResult.reduce("") { $0 + $1.text }
+        isInsertingDictationResult = false
+        
         if #available(iOS 16, *) {
             insertText(dictationText)
         } else {
             let objectPlaceholder = "\u{FFFC}"
-            isInsertingDictationResult = false
             self.text = self.text?.replacingOccurrences(of: objectPlaceholder, with: dictationText)
         }
     }
