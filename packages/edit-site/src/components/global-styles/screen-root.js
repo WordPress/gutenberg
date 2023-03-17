@@ -17,6 +17,7 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { Fragment } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -35,11 +36,11 @@ const { Slot: GlobalStylesScreenRootSlot } = createSlotFill(
 const ScreenRootSlot = () => (
 	<GlobalStylesScreenRootSlot>
 		{ ( fills ) =>
-			fills.map( ( fill ) => (
-				<>
+			fills.map( ( fill, index ) => (
+				<Fragment key={ index }>
 					<CardBody>{ fill }</CardBody>
 					<CardDivider />
-				</>
+				</Fragment>
 			) )
 		}
 	</GlobalStylesScreenRootSlot>
