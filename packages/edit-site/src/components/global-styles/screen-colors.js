@@ -177,7 +177,7 @@ function CaptionColorItem( { name, parentMenu, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
 	const urlPrefix = variation ? `/variations/${ variation }` : '';
 	const supports = useSupportedStyles( name );
-	const hasSupport = supports.includes( 'headingColor' );
+	const hasSupport = supports.includes( 'captionColor' );
 	const [ color ] = useGlobalStyle(
 		prefix + 'elements.caption.color.text',
 		name
