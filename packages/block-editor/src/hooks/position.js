@@ -59,7 +59,7 @@ const STICKY_OPTION = {
 const FIXED_OPTION = {
 	key: 'fixed',
 	value: 'fixed',
-	name: _x( 'Fixed', 'CSS value' ),
+	name: _x( 'Fixed', 'Name for the value of the CSS position property' ),
 	className: OPTION_CLASSNAME,
 	__experimentalHint: __(
 		'The block will not move when the page is scrolled.'
