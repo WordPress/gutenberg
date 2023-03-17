@@ -96,14 +96,14 @@ export default function CustomGradientBar( {
 	const onMouseEnterAndMove: MouseEventHandler< HTMLDivElement > = (
 		event
 	) => {
+		if ( ! gradientMarkersContainerDomRef.current ) {
+			return;
+		}
+
 		const insertPosition = getHorizontalRelativeGradientPosition(
 			event.clientX,
 			gradientMarkersContainerDomRef.current
 		);
-
-		if ( insertPosition === undefined ) {
-			return;
-		}
 
 		// If the insert point is close to an existing control point don't show it.
 		if (

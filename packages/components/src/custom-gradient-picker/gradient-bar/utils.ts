@@ -179,10 +179,6 @@ export function getHorizontalRelativeGradientPosition(
 	containerElement: null
 ): undefined;
 export function getHorizontalRelativeGradientPosition(
-	mouseXcoordinate: number,
-	containerElement: HTMLDivElement | null
-): number | undefined;
-export function getHorizontalRelativeGradientPosition(
 	mouseXCoordinate: number,
 	containerElement: HTMLDivElement | null
 ) {
