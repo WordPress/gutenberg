@@ -24,7 +24,6 @@ import { forwardRef } from '@wordpress/element';
 import { store as editSiteStore } from '../../store';
 import SiteIcon from '../site-icon';
 import { unlock } from '../../private-apis';
-import CommandCenter from '../command-center';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
@@ -101,7 +100,6 @@ const SiteHub = forwardRef( ( props, ref ) => {
 						{ siteTitle }
 					</div>
 				) }
-				<CommandCenter />
 			</HStack>
 		</motion.div>
 	);

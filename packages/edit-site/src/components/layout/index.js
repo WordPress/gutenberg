@@ -42,6 +42,7 @@ import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
+import CommandCenter from '../command-center';
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
@@ -123,6 +124,7 @@ export default function Layout() {
 
 	return (
 		<>
+			<CommandCenter />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
 			{ fullResizer }

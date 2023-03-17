@@ -22,6 +22,7 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"dependencies": {
+		"@radix-ui/react-popover": "1.0.5",
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
 		"@wordpress/api-fetch": "file:packages/api-fetch",
