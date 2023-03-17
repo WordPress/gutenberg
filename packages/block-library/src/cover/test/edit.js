@@ -154,118 +154,118 @@ describe( 'Cover block', () => {
 					} )
 				).not.toBeInTheDocument();
 			} );
-			// test( 'displays media settings panel if url is set', async () => {
-			// 	await setup( {
-			// 		name: 'core/cover',
-			// 		attributes: {
-			// 			url: 'http://localhost/my-image.jpg',
-			// 		},
-			// 	} );
+			test( 'displays media settings panel if url is set', async () => {
+				await setup( {
+					name: 'core/cover',
+					attributes: {
+						url: 'http://localhost/my-image.jpg',
+					},
+				} );
 
-			// 	await selectCoverBlock();
-			// 	expect(
-			// 		screen.getByRole( 'button', {
-			// 			name: 'Media settings',
-			// 		} )
-			// 	).toBeInTheDocument();
-			// } );
+				await selectCoverBlock();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Media settings',
+					} )
+				).toBeInTheDocument();
+			} );
 		} );
 
-		// test( 'sets hasParallax attribute to true if fixed background toggled', async () => {
-		// 	await setup( {
-		// 		name: 'core/cover',
-		// 		attributes: {
-		// 			url: 'http://localhost/my-image.jpg',
-		// 		},
-		// 	} );
-		// 	expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
-		// 		'has-parallax'
-		// 	);
-		// 	await selectCoverBlock();
-		// 	await userEvent.click(
-		// 		screen.getByLabelText( 'Fixed background' )
-		// 	);
-		// 	expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
-		// 		'has-parallax'
-		// 	);
-		// } );
+		test( 'sets hasParallax attribute to true if fixed background toggled', async () => {
+			await setup( {
+				name: 'core/cover',
+				attributes: {
+					url: 'http://localhost/my-image.jpg',
+				},
+			} );
+			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
+				'has-parallax'
+			);
+			await selectCoverBlock();
+			await userEvent.click(
+				screen.getByLabelText( 'Fixed background' )
+			);
+			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
+				'has-parallax'
+			);
+		} );
 
-		// test( 'sets isRepeated attribute to true if repeated background toggled', async () => {
-		// 	await setup( {
-		// 		name: 'core/cover',
-		// 		attributes: {
-		// 			url: 'http://localhost/my-image.jpg',
-		// 		},
-		// 	} );
-		// 	expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
-		// 		'is-repeated'
-		// 	);
-		// 	await selectCoverBlock();
-		// 	await userEvent.click(
-		// 		screen.getByLabelText( 'Repeated background' )
-		// 	);
-		// 	expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
-		// 		'is-repeated'
-		// 	);
-		// } );
+		test( 'sets isRepeated attribute to true if repeated background toggled', async () => {
+			await setup( {
+				name: 'core/cover',
+				attributes: {
+					url: 'http://localhost/my-image.jpg',
+				},
+			} );
+			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
+				'is-repeated'
+			);
+			await selectCoverBlock();
+			await userEvent.click(
+				screen.getByLabelText( 'Repeated background' )
+			);
+			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
+				'is-repeated'
+			);
+		} );
 
-		// test( 'sets left focalPoint attribute when focal point values changed', async () => {
-		// 	const { container } = await setup( {
-		// 		name: 'core/cover',
-		// 		attributes: {
-		// 			url: 'http://localhost/my-image.jpg',
-		// 		},
-		// 	} );
+		test( 'sets left focalPoint attribute when focal point values changed', async () => {
+			const { container } = await setup( {
+				name: 'core/cover',
+				attributes: {
+					url: 'http://localhost/my-image.jpg',
+				},
+			} );
 
-		// 	await selectCoverBlock();
-		// 	await userEvent.clear( screen.getByLabelText( 'Left' ) );
-		// 	await userEvent.type( screen.getByLabelText( 'Left' ), '100' );
-		// 	// eslint-disable-next-line testing-library/no-node-access
-		// 	const image = container.getElementsByClassName(
-		// 		'wp-block-cover__image-background'
-		// 	);
-		// 	expect( image[ 0 ] ).toHaveStyle( 'object-position: 100% 50%;' );
-		// } );
+			await selectCoverBlock();
+			await userEvent.clear( screen.getByLabelText( 'Left' ) );
+			await userEvent.type( screen.getByLabelText( 'Left' ), '100' );
+			// eslint-disable-next-line testing-library/no-node-access
+			const image = container.getElementsByClassName(
+				'wp-block-cover__image-background'
+			);
+			expect( image[ 0 ] ).toHaveStyle( 'object-position: 100% 50%;' );
+		} );
 
-		// test( 'sets alt attribute if text entered in alt text box', async () => {
-		// 	await setup( {
-		// 		name: 'core/cover',
-		// 		attributes: {
-		// 			url: 'http://localhost/my-image.jpg',
-		// 		},
-		// 	} );
+		test( 'sets alt attribute if text entered in alt text box', async () => {
+			await setup( {
+				name: 'core/cover',
+				attributes: {
+					url: 'http://localhost/my-image.jpg',
+				},
+			} );
 
-		// 	await selectCoverBlock();
-		// 	await userEvent.type(
-		// 		screen.getByLabelText( 'Alt text (alternative text)' ),
-		// 		'Me'
-		// 	);
-		// 	expect( screen.getByAltText( 'Me' ) ).toBeInTheDocument();
-		// } );
+			await selectCoverBlock();
+			await userEvent.type(
+				screen.getByLabelText( 'Alt text (alternative text)' ),
+				'Me'
+			);
+			expect( screen.getByAltText( 'Me' ) ).toBeInTheDocument();
+		} );
 
-		// test( 'clears media  when clear media button clicked', async () => {
-		// 	const { container } = await setup( {
-		// 		name: 'core/cover',
-		// 		attributes: {
-		// 			url: 'http://localhost/my-image.jpg',
-		// 		},
-		// 	} );
+		test( 'clears media  when clear media button clicked', async () => {
+			const { container } = await setup( {
+				name: 'core/cover',
+				attributes: {
+					url: 'http://localhost/my-image.jpg',
+				},
+			} );
 
-		// 	await selectCoverBlock();
-		// 	// eslint-disable-next-line testing-library/no-node-access
-		// 	const img = container.getElementsByClassName(
-		// 		'wp-block-cover__image-background'
-		// 	)[ 0 ];
-		// 	expect( img ).toBeInTheDocument();
+			await selectCoverBlock();
+			// eslint-disable-next-line testing-library/no-node-access
+			const img = container.getElementsByClassName(
+				'wp-block-cover__image-background'
+			)[ 0 ];
+			expect( img ).toBeInTheDocument();
 
-		// 	await userEvent.click(
-		// 		screen.getByRole( 'button', {
-		// 			name: 'Clear Media',
-		// 		} )
-		// 	);
+			await userEvent.click(
+				screen.getByRole( 'button', {
+					name: 'Clear Media',
+				} )
+			);
 
-		// 	expect( img ).not.toBeInTheDocument();
-		// } );
+			expect( img ).not.toBeInTheDocument();
+		} );
 
 		describe( 'Color panel', () => {
 			test( 'applies selected opacity to block when number control value changed', async () => {
