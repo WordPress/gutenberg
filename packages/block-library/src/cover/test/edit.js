@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	screen,
-	fireEvent,
-	act,
-	within,
-	waitFor,
-} from '@testing-library/react';
+import { screen, fireEvent, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -158,17 +152,14 @@ describe( 'Cover block', () => {
 					} )
 				).not.toBeInTheDocument();
 			} );
-			test.only( 'displays media settings panel if url is set', async () => {
-				await act( async () => {
-					await waitFor( () =>
-						setup( {
-							name: 'core/cover',
-							attributes: {
-								url: 'http://localhost/my-image.jpg',
-							},
-						} )
-					);
+			test( 'displays media settings panel if url is set', async () => {
+				await setup( {
+					name: 'core/cover',
+					attributes: {
+						url: 'http://localhost/my-image.jpg',
+					},
 				} );
+
 				await selectCoverBlock();
 				expect(
 					screen.getByRole( 'button', {
