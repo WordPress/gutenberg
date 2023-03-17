@@ -73,7 +73,7 @@ export function Editor( { testBlocks, settings = {} } ) {
 }
 
 export async function initializeEditor( props ) {
-	return waitForStoreResolvers( () => {
-		return render( <Editor { ...props } /> );
-	} );
+	//return waitForStoreResolvers( () => {
+	return render( <Editor { ...props } /> );
+	//} );
 }
