@@ -7,6 +7,14 @@
  */
 
 class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
+	/**
+	 * Cleans up CSS added to block-supports from duotone styles. We neeed to do this
+	 * in order to avoid impacting other tests.
+	 */
+	public static function wpTearDownAfterClass() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+	}
+
 	public function test_gutenberg_render_duotone_support_preset() {
 		$block         = array(
 			'blockName' => 'core/image',
