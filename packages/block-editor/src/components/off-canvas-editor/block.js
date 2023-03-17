@@ -54,6 +54,7 @@ function ListViewBlock( {
 	isExpanded,
 	selectedClientIds,
 	preventAnnouncement,
+	onSelect,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -265,6 +266,7 @@ function ListViewBlock( {
 							isExpanded={ isExpanded }
 							selectedClientIds={ selectedClientIds }
 							preventAnnouncement={ preventAnnouncement }
+							onSelect={ onSelect }
 						/>
 						<div
 							className="block-editor-list-view-block-select-button__description"

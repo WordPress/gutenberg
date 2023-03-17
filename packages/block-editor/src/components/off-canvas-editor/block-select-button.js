@@ -11,7 +11,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useEffect, useState } from '@wordpress/element';
 import { Icon, lockSmall as lock } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { sprintf, __ } from '@wordpress/i18n';
@@ -36,6 +36,7 @@ function ListViewBlockSelectButton(
 		onDragStart,
 		onDragEnd,
 		draggable,
+		onSelect,
 	},
 	ref
 ) {
@@ -46,6 +47,7 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
+	const [ editAriaLabel, setEditAriaLabel ] = useState( __( 'Edit' ) );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -62,22 +64,37 @@ function ListViewBlockSelectButton(
 		}
 	}
 
-	let editAriaLabel = blockInformation
-		? sprintf(
-				// translators: %s: The title of the block.
-				__( 'Edit %s block' ),
-				blockInformation.title
-		  )
-		: __( 'Edit' );
+	useEffect( () => {
+		if ( blockInformation ) {
+			setEditAriaLabel(
+				sprintf(
+					// translators: %s: The title of the block.
+					__( 'Edit %s block' ),
+					blockInformation?.title
+				)
+			);
+		}
 
-	editAriaLabel =
-		block.attributes?.id && block.attributes?.label
-			? sprintf(
-					// translators: %s: The title of the page.
-					__( 'View %s' ),
-					block.attributes?.label
-			  )
-			: editAriaLabel;
+		if ( block.attributes?.id && block.attributes?.label ) {
+			if ( onSelect ) {
+				setEditAriaLabel(
+					sprintf(
+						// translators: %s: The title of the page.
+						__( 'View %s' ),
+						block.attributes?.label
+					)
+				);
+			} else {
+				setEditAriaLabel(
+					sprintf(
+						// translators: %s: The title of the page.
+						__( 'Edit %s' ),
+						block.attributes?.label
+					)
+				);
+			}
+		}
+	}, [ onSelect ] );
 
 	return (
 		<>
