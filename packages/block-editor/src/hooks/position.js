@@ -49,7 +49,7 @@ const DEFAULT_OPTION = {
 const STICKY_OPTION = {
 	key: 'sticky',
 	value: 'sticky',
-	name: _x( 'Sticky', 'CSS value' ),
+	name: _x( 'Sticky', 'Name for the value of the CSS position property' ),
 	className: OPTION_CLASSNAME,
 	__experimentalHint: __(
 		'The block will stick to the top of the window instead of scrolling.'
