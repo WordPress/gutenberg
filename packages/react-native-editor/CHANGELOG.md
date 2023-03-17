@@ -13,7 +13,6 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.91.0
 -   [*] Allow new block transformations for most blocks. [#48792]
--   [**] [iOS] Fix dictation regression. [#49056]
 
 ## 1.90.0
 -   [*] Fix parsing of css units for null matched values [#48484]
