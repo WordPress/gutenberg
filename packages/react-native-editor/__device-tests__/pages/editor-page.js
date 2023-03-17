@@ -385,29 +385,37 @@ class EditorPage {
 		return await this.driver.elementsByAccessibilityId( 'Document tools' );
 	}
 
-	async addNewBlock( blockName, relativePosition ) {
-		const addButton = await this.getAddBlockButton();
+	async addNewBlock(
+		blockName,
+		{ relativePosition = false, skipInserterOpen = false } = {}
+	) {
+		if ( ! skipInserterOpen ) {
+			const addButton = await this.getAddBlockButton();
 
-		if ( relativePosition === 'before' ) {
-			// On Android it doesn't get the right size of the button
-			const customElementSize = {
-				width: 43,
-				height: 43,
-			};
+			if ( relativePosition === 'before' ) {
+				// On Android it doesn't get the right size of the button
+				const customElementSize = {
+					width: 43,
+					height: 43,
+				};
 
-			await longPressMiddleOfElement(
-				this.driver,
-				addButton,
-				8000,
-				customElementSize
-			);
-			const addBlockBeforeButtonLocator = isAndroid()
-				? '//android.widget.Button[@content-desc="Add Block Before"]'
-				: '//XCUIElementTypeButton[@name="Add Block Before"]';
+				await longPressMiddleOfElement(
+					this.driver,
+					addButton,
+					8000,
+					customElementSize
+				);
+				const addBlockBeforeButtonLocator = isAndroid()
+					? '//android.widget.Button[@content-desc="Add Block Before"]'
+					: '//XCUIElementTypeButton[@name="Add Block Before"]';
 
-			await clickIfClickable( this.driver, addBlockBeforeButtonLocator );
-		} else {
-			await addButton.click();
+				await clickIfClickable(
+					this.driver,
+					addBlockBeforeButtonLocator
+				);
+			} else {
+				await addButton.click();
+			}
 		}
 
 		// Click on block of choice.
