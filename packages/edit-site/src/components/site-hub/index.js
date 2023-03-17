@@ -118,14 +118,15 @@ const SiteHub = forwardRef( ( props, ref ) => {
 				<AnimatePresence>
 					{ showLabels && (
 						<motion.div
+							initial={ false }
+							layout
 							animate={ {
 								opacity: canvasMode === 'view' ? 1 : 0,
 							} }
 							exit={ {
 								opacity: 0,
 							} }
-							layout
-							class="edit-site-site-hub__site-title"
+							className="edit-site-site-hub__site-title"
 						>
 							{ decodeEntities( siteTitle ) }
 						</motion.div>
