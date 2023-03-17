@@ -19,3 +19,7 @@ export const ToolTip = css`
 	padding: ${ space( 1 ) } ${ space( 2 ) };
 	z-index: 1000002;
 `;
+
+export const Shortcut = css`
+	margin-left: ${ space( 2 ) };
+`;

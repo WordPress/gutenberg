@@ -4,6 +4,11 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
+ * WordPress dependencies
+ */
+import { shortcutAriaLabel } from '@wordpress/keycodes';
+
+/**
  * Internal dependencies
  */
 import ToolTip from '..';
@@ -47,4 +52,19 @@ Default.args = {
 	children: <Button variant="primary">It&apos;s me, hi.</Button>,
 	placement: 'bottom-start',
 	text: 'Hi!',
+};
+
+export const KeyboardShortcut = Template.bind( {} );
+KeyboardShortcut.args = {
+	children: (
+		<div>
+			<Button variant="secondary">I&apos;m the problem.</Button>
+		</div>
+	),
+	shortcut: {
+		display: '⇧⌘,',
+		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
+	},
+	placement: 'bottom-start',
+	text: '',
 };

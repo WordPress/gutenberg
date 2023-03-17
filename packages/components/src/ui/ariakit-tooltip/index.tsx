@@ -6,6 +6,7 @@ import { Tooltip, TooltipAnchor, useTooltipState } from 'ariakit/tooltip';
 /**
  * Internal dependencies
  */
+import Shortcut from '../../shortcut';
 import type { ToolTipProps } from './types';
 import * as styles from './styles';
 import { contextConnect } from '../context';
@@ -15,24 +16,32 @@ function UnforwardedToolTip(
 	props: ToolTipProps,
 	forwardedRef: React.ForwardedRef< any >
 ) {
-	const { children, placement, text, timeout } = props;
+	const { children, delay, placement, shortcut, text } = props;
 
 	const tooltipState = useTooltipState( {
 		placement,
-		timeout,
+		timeout: delay,
 	} );
 
 	const cx = useCx();
+
 	const ToolTipClassName = cx( styles.ToolTip );
+	const ShortcutClassName = cx( styles.Shortcut );
 
 	return (
 		<>
 			<TooltipAnchor state={ tooltipState } ref={ forwardedRef }>
 				{ children }
 			</TooltipAnchor>
-			{ text && (
+			{ ( text || shortcut ) && (
 				<Tooltip className={ ToolTipClassName } state={ tooltipState }>
 					{ text }
+					{ shortcut && (
+						<Shortcut
+							className={ text ? ShortcutClassName : '' }
+							shortcut={ shortcut }
+						/>
+					) }
 				</Tooltip>
 			) }
 		</>
