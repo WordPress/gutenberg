@@ -29,7 +29,7 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 	},
 	"usesContext": [ "groupId" ],
 	"editorSelectors": {
-		"root": ".editor-styles-wrapper wp-block-my-plugin-notice"
+		"root": ".editor-styles-wrapper .wp-block-my-plugin-notice"
 	},
 	"selectors": {
 		"root": ".wp-block-my-plugin-notice"
