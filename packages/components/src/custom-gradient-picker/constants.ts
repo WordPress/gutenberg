@@ -10,8 +10,8 @@ export const DEFAULT_LINEAR_GRADIENT_ANGLE = 180;
 
 export const HORIZONTAL_GRADIENT_ORIENTATION = {
 	type: 'angular',
-	value: 90,
-};
+	value: '90',
+} as const;
 
 export const GRADIENT_OPTIONS = [
 	{ value: 'linear-gradient', label: __( 'Linear' ) },

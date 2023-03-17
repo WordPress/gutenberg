@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * External dependencies
  */
@@ -16,8 +14,18 @@ import { useRef, useReducer } from '@wordpress/element';
 import ControlPoints from './control-points';
 import { getHorizontalRelativeGradientPosition } from './utils';
 import { MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT } from './constants';
+import type {
+	CustomGradientBarProps,
+	CustomGradientBarReducerState,
+	CustomGradientBarReducerAction,
+	CustomGradientBarIdleState,
+} from '../types';
+import type { MouseEventHandler } from 'react';
 
-function customGradientBarReducer( state, action ) {
+const customGradientBarReducer = (
+	state: CustomGradientBarReducerState,
+	action: CustomGradientBarReducerAction
+): CustomGradientBarReducerState => {
 	switch ( action.type ) {
 		case 'MOVE_INSERTER':
 			if ( state.id === 'IDLE' || state.id === 'MOVING_INSERTER' ) {
@@ -65,8 +73,10 @@ function customGradientBarReducer( state, action ) {
 			break;
 	}
 	return state;
-}
-const customGradientBarReducerInitialState = { id: 'IDLE' };
+};
+const customGradientBarReducerInitialState: CustomGradientBarIdleState = {
+	id: 'IDLE',
+};
 
 export default function CustomGradientBar( {
 	background,
@@ -75,15 +85,21 @@ export default function CustomGradientBar( {
 	onChange,
 	disableInserter = false,
 	disableAlpha = false,
-	__experimentalIsRenderedInSidebar,
-} ) {
-	const gradientMarkersContainerDomRef = useRef();
+	__experimentalIsRenderedInSidebar = false,
+}: CustomGradientBarProps ) {
+	const gradientMarkersContainerDomRef = useRef< HTMLDivElement >( null );
 
 	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
 		customGradientBarReducer,
 		customGradientBarReducerInitialState
 	);
-	const onMouseEnterAndMove = ( event ) => {
+	const onMouseEnterAndMove: MouseEventHandler< HTMLDivElement > = (
+		event
+	) => {
+		if ( ! gradientMarkersContainerDomRef.current ) {
+			return;
+		}
+
 		const insertPosition = getHorizontalRelativeGradientPosition(
 			event.clientX,
 			gradientMarkersContainerDomRef.current
