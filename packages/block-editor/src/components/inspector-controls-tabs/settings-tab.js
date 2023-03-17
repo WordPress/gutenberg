@@ -6,10 +6,10 @@ import PositionControls from './position-controls-panel';
 import { default as InspectorControls } from '../inspector-controls';
 import SettingsTabHint from './settings-tab-hint';
 
-const SettingsTab = ( { showAdvancedControls = false } ) => (
+const SettingsTab = ( { clientId, showAdvancedControls = false } ) => (
 	<>
 		<InspectorControls.Slot />
-		<PositionControls />
+		<PositionControls clientId={ clientId } />
 		{ showAdvancedControls && (
 			<div>
 				<AdvancedControls />

@@ -37,7 +37,10 @@ export default function InspectorControlsTabs( {
 			{ ( tab ) => {
 				if ( tab.name === TAB_SETTINGS.name ) {
 					return (
-						<SettingsTab showAdvancedControls={ !! blockName } />
+						<SettingsTab
+							clientId={ clientId }
+							showAdvancedControls={ !! blockName }
+						/>
 					);
 				}
 

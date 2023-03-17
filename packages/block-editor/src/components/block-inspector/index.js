@@ -371,7 +371,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						label={ __( 'Border' ) }
 					/>
 					<InspectorControls.Slot group="styles" />
-					<PositionControls />
+					<PositionControls clientId={ clientId } />
 					<div>
 						<AdvancedControls />
 					</div>
