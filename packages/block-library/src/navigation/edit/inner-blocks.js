@@ -25,6 +25,7 @@ const ALLOWED_BLOCKS = [
 	'core/site-title',
 	'core/site-logo',
 	'core/navigation-submenu',
+	'core/loginout',
 ];
 
 const DEFAULT_BLOCK = {
