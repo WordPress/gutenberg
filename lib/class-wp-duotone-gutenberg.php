@@ -245,7 +245,7 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
-	 * Render out the duotone stylesheet and SVG.
+	 * Render out the duotone CSS styles and SVG.
 	 *
 	 * @param  string $block_content Rendered block content.
 	 * @param  array  $block         Block object.
