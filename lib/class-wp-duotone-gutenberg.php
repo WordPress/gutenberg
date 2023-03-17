@@ -71,7 +71,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Prefix used for generating and referencing duotone CSS custom properties.
 	 */
-	private const CSS_VAR_PREFIX = '--wp--preset--duotone--';
+	const CSS_VAR_PREFIX = '--wp--preset--duotone--';
 
 	/**
 	 * Get all possible duotone presets from global and theme styles and store as slug => [ colors array ]
