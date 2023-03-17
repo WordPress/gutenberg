@@ -595,16 +595,17 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 *
-	 * @param array  $theme_json A structure that follows the theme.json schema.
-	 * @param string $origin     Optional. What source of data this object represents.
-	 *                           One of 'default', 'theme', or 'custom'. Default 'theme'.
+	 * @param array  $theme_json  A structure that follows the theme.json schema.
+	 * @param string $origin      Optional. What source of data this object represents.
+	 *                            One of 'default', 'theme', or 'custom'. Default 'theme'.
+	 * @param string $rules_store Optional. The name of the CSS rules-store to use.
 	 */
-	public function __construct( $theme_json = array(), $origin = 'theme' ) {
+	public function __construct( $theme_json = array(), $origin = 'theme', $rules_store = 'global-styles' ) {
 		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
 			$origin = 'theme';
 		}
 
-		$this->rules_store   = WP_Style_Engine_CSS_Rules_Store::get_store( 'global-styles' );
+		$this->rules_store   = WP_Style_Engine_CSS_Rules_Store::get_store( $rules_store );
 		$this->theme_json    = WP_Theme_JSON_Schema::migrate( $theme_json );
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
