@@ -421,13 +421,13 @@ function gutenberg_register_duotone_support( $block_type ) {
 	}
 }
 
-/**	
- * Render out the duotone stylesheet and SVG.	
- *	
- * @param  string $block_content Rendered block content.	
- * @param  array  $block         Block object.	
+/**
+ * Render out the duotone stylesheet and SVG.
+ *
+ * @param  string $block_content Rendered block content.
+ * @param  array  $block         Block object.
  * @deprecated    6.3.0          Use WP_Duotone_Gutenberg::render_duotone_support() instead.
- * @return string                Filtered block content.	
+ * @return string                Filtered block content.
  */
 function gutenberg_render_duotone_support( $block_content, $block ) {
 	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Duotone_Gutenberg::render_duotone_support' );
