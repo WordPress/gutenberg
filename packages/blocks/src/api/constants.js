@@ -136,6 +136,14 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'elements', 'link', 'color', 'text' ],
 		support: [ 'color', 'link' ],
 	},
+	captionColor: {
+		value: [ 'elements', 'caption', 'color', 'text' ],
+		support: [ 'color', 'caption' ],
+	},
+	captionBackgroundColor: {
+		value: [ 'elements', 'caption', 'color', 'background' ],
+		support: [ 'color', 'caption' ],
+	},
 	buttonColor: {
 		value: [ 'elements', 'button', 'color', 'text' ],
 		support: [ 'color', 'button' ],
