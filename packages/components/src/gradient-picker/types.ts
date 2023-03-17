@@ -18,7 +18,7 @@ type GradientPickerBaseProps = {
 	className?: string;
 	/**
 	 * The function called when a new gradient has been defined. It is passed to
-	 * the `currentGradient` as an arugment.
+	 * the `currentGradient` as an argument.
 	 */
 	onChange: ( currentGradient: string | undefined ) => void;
 	/**
@@ -53,7 +53,7 @@ export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	 * `CircularOptionPicker` above the gradient selector. Alternatively, if
 	 * there are multiple sets (or 'origins') of gradients, you can pass an
 	 * array of objects each with a `name` and a `gradients` array which will
-	 * in turn contain the predifined gradient objects.
+	 * in turn contain the predefined gradient objects.
 	 */
 	gradients: GradientsProp;
 	/**
@@ -65,7 +65,7 @@ export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	 */
 	__nextHasNoMargin?: boolean;
 	/**
-	 * If true, the gradient pickerwill not be displayed and only defined
+	 * If true, the gradient picker will not be displayed and only defined
 	 * gradients from `gradients` will be shown.
 	 *
 	 * @default false

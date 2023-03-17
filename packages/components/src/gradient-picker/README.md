@@ -49,71 +49,62 @@ const myGradientPicker = () => {
 
 The component accepts the following props:
 
-### className
+### `className`: `string`
 
 The class name added to the wrapper.
 
--   Type: `string`
 -   Required: No
 
-### value
+### `value`: `string`
 
 The current value of the gradient. Pass a css gradient like `linear-gradient(90deg, rgb(6, 147, 227) 0%, rgb(155, 81, 224) 100%)`. Optionally pass in a `null` value to specify no gradient is currently selected.
 
--   Type: `string`
 -   Required: No
 -   Default: `linear-gradient(90deg, rgb(6, 147, 227) 0%, rgb(155, 81, 224) 100%)`
 
-### onChange
+### `onChange`: `( currentGradient: string | undefined ) => void`
 
 The function called when a new gradient has been defined. It is passed the `currentGradient` as an argument.
 
--   Type: `Function`
 -   Required: Yes
 
-### gradients
+### `gradients`: `GradientsProp[]`
 
 An array of objects of predefined gradients which show up as `CircularOptionPicker` above the gradient selector.
 
--   Type: `array`
 -   Required: No
-// NTS: I think `gradients` should be required. It can be an empty array, but if it's omitted the component breaks. Maybe we default to empty?
+    // NTS: I think `gradients` should be required. It can be an empty array, but if it's omitted the component breaks. Maybe we default to empty?
 
-### clearable
+### `clearable`: `boolean`
 
 Whether the palette should have a clearing button or not.
 
--   Type: `Boolean`
 -   Required: No
 -   Default: true
 
-### clearGradient
+### `clearGradient`: `( currentGradient: string ) => void`
 
 Called when a new gradient has been defined. It is passed the `currentGradient` as an argument.
 
--   Type: `Function`
 -   Required: No
 
-### disableCustomGradients
+### `disableCustomGradients`: `boolean`
 
 If true, the gradient picker will not be displayed and only defined gradients from `gradients` are available.
 
--   Type: `Boolean`
 -   Required: No
 -   Default: false
 
-### __nextHasNoMargin
+### `__nextHasNoMargin`: `boolean`
 
 Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
 
--   Type: `Boolean`
 -   Required: No
 -   Default: `false`
 
-### headingLevel
+### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
 
 The heading level.
 
--   Type: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
 -   Required: No
 -   Default: `2`
