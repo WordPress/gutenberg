@@ -29,7 +29,6 @@ import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
 	HORIZONTAL_GRADIENT_ORIENTATION,
 	GRADIENT_OPTIONS,
-	DEFAULT_GRADIENT,
 } from './constants';
 import {
 	AccessoryWrapper,
@@ -148,13 +147,13 @@ export function CustomGradientPicker( {
 	onChange,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientPickerProps ) {
-	const { gradientAST, gradientAstValue } =
-		getGradientAstWithDefault( value );
+	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
+
 	// On radial gradients the bar should display a linear gradient.
 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
 	// On liner gradients the bar represents the color stops from left to right independently of the angle.
 	const background = getLinearGradientRepresentation( gradientAST );
-	const hasGradient = gradientAstValue !== DEFAULT_GRADIENT;
+
 	// Control points color option may be hex from presets, custom colors will be rgb.
 	// The position should always be a percentage.
 	const controlPoints = gradientAST.colorStops.map( ( colorStop ) => {

@@ -35,17 +35,22 @@ function hasUnsupportedLength( item: gradientParser.ColorStop ) {
 export function getGradientAstWithDefault( value?: string | null ) {
 	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
 	// More information of its structure available at https://www.npmjs.com/package/gradient-parser#ast.
-	let gradientAST: gradientParser.GradientNode;
-	let gradientAstValue: string | undefined;
+	let gradientAST: gradientParser.GradientNode | undefined;
+	let hasGradient = !! value;
 
 	const valueToParse = value ?? DEFAULT_GRADIENT;
 
 	try {
 		gradientAST = gradientParser.parse( valueToParse )[ 0 ];
-		gradientAstValue = valueToParse;
 	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'wp.components.CustomGradientPicker failed to parse the gradient with error',
+			error
+		);
+
 		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
-		gradientAstValue = DEFAULT_GRADIENT;
+		hasGradient = false;
 	}
 
 	if (
@@ -69,10 +74,9 @@ export function getGradientAstWithDefault( value?: string | null ) {
 				type: '%',
 			};
 		} );
-		gradientAstValue = serializeGradient( gradientAST );
 	}
 
-	return { gradientAST, gradientAstValue };
+	return { gradientAST, hasGradient };
 }
 
 export function getGradientAstWithControlPoints(
