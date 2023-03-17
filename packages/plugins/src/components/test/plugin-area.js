@@ -67,7 +67,7 @@ describe( 'PluginArea', () => {
 		expect( container ).toHaveTextContent( 'plugin: bar.' );
 	} );
 
-	test( 'rerenders when new plugin is unregistered', () => {
+	test( 'rerenders when a plugin is unregistered', () => {
 		registerPlugin( 'one', {
 			render: () => <TestComponent content="one" />,
 			icon: 'smiley',
