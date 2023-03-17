@@ -60,7 +60,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-			'default'
+			'default',
+			md5( json_encode( $layout_definitions ) )
 		);
 
 		// Results also include root site blocks styles.
