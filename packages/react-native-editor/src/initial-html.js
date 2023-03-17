@@ -152,7 +152,7 @@ export const mediaBlocks = `<!-- wp:image -->
 
 <!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":890,"dimRatio":20,"overlayColor":"luminous-vivid-orange","focalPoint":{"x":"0.63","y":"0.83"},"minHeight":219} -->
 <div class="wp-block-cover" style="min-height:219px"><span aria-hidden="true" class="wp-block-cover__background has-luminous-vivid-orange-background-color has-background-dim-20 has-background-dim"></span><img class="wp-block-cover__image-background wp-image-890" alt="" src="https://cldup.com/cXyG__fTLN.jpg" style="object-position:63% 83%" data-object-fit="cover" data-object-position="63% 83%"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
-<p class="has-text-align-center has-text-color has-very-light-gray-color has-large-font-size">Cool cover</p>
+<p class="wp-block-paragraph has-text-align-center has-text-color has-very-light-gray-color has-large-font-size">Cool cover</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
 `;
