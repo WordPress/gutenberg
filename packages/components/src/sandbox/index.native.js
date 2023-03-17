@@ -230,14 +230,6 @@ function Sandbox( {
 					className={ type }
 				>
 					<div dangerouslySetInnerHTML={ { __html: html } } />
-					{ customJS && (
-						<script
-							type="text/javascript"
-							dangerouslySetInnerHTML={ {
-								__html: customJS,
-							} }
-						/>
-					) }
 					{ scripts.map( ( src ) => (
 						<script key={ src } src={ src } />
 					) ) }
@@ -322,7 +314,7 @@ function Sandbox( {
 				sandboxStyles[ 'sandbox-webview__container' ],
 				containerStyle,
 			] }
-			injectedJavaScript={ observeAndResizeJS }
+			injectedJavaScript={ customJS || observeAndResizeJS }
 			key={ key }
 			ref={ ref }
 			source={ { baseUrl: providerUrl, html: contentHtml } }
