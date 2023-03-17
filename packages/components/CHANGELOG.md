@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `CustomGradientPicker`: Convert to TypeScript ([#48929](https://github.com/WordPress/gutenberg/pull/48929)).
+
 ## 23.6.0 (2023-03-15)
 
 ### Enhancements
@@ -12,8 +16,8 @@
 
 ### Bug Fix
 
--  `ResponsiveWrapper`: use `aspect-ratio` CSS prop, add support for `SVG` elements ([#48573](https://github.com/WordPress/gutenberg/pull/48573).
--  `ResizeTooltip`: Use `default.fontFamily` on tooltip ([#48805](https://github.com/WordPress/gutenberg/pull/48805).
+-   `ResponsiveWrapper`: use `aspect-ratio` CSS prop, add support for `SVG` elements ([#48573](https://github.com/WordPress/gutenberg/pull/48573).
+-   `ResizeTooltip`: Use `default.fontFamily` on tooltip ([#48805](https://github.com/WordPress/gutenberg/pull/48805).
 
 ### Internal
 
@@ -37,7 +41,7 @@
 
 ### Enhancements
 
--  `ToolsPanel`: Separate reset all filter registration from items registration and support global resets ([#48123](https://github.com/WordPress/gutenberg/pull/48123)).
+-   `ToolsPanel`: Separate reset all filter registration from items registration and support global resets ([#48123](https://github.com/WordPress/gutenberg/pull/48123)).
 
 ### Internal
 
