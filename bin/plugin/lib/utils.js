@@ -33,6 +33,7 @@ function runShellScript( script, cwd, env = {} ) {
 					NO_CHECKS: 'true',
 					PATH: process.env.PATH,
 					HOME: process.env.HOME,
+					USER: process.env.USER,
 					...env,
 				},
 			},

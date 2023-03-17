@@ -241,3 +241,13 @@
 	height: 24px;
 	width: 24px;
 }
+
+.edit-site-global-styles-screen-root.edit-site-global-styles-screen-root,
+.edit-site-global-styles-screen-style-variations.edit-site-global-styles-screen-style-variations {
+	background: unset;
+	color: inherit;
+}
+
+.edit-site-global-styles-sidebar__panel .block-editor-block-icon svg {
+	fill: currentColor;
+}
