@@ -23,7 +23,6 @@ import type {
 	GradientObject,
 } from './types';
 
-// NTS: This typeguard needed some adjustment. With GradientPicker, the prop is *always* `gradients` and never `gradient`, but the shape of the object changes.
 // For Single Origin Gradients, the `gradients` property
 // is an array of Gradient objects.
 // For Multiple Origin Gradients, the `gradients` property is an array of
@@ -211,7 +210,6 @@ export function GradientPicker( {
 				{ ( gradients.length || clearable ) && (
 					<Component
 						className={ className }
-						//TODO: Note: I think `clearable` should be removed here. It's not used by either `SingleOrigin` or `MultipleOrigin`, and appears to have been accidentally passed down in https://github.com/WordPress/gutenberg/pull/35970 along with the rest of `GradientPicker`'s props.
 						clearGradient={ clearGradient }
 						gradients={ gradients }
 						onChange={ onChange }
