@@ -31,13 +31,15 @@ jobs:
 
         steps:
             - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+              with:
+                  fetch-depth: 3
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
+              run: ./bin/plugin/cli.js perf trunk trunk trunk trunk trunk --tests-branch $GITHUB_SHA --rounds 3
 
             - name: Store performance measurements
               if: github.event_name == 'pull_request'
