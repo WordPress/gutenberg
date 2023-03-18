@@ -27,6 +27,7 @@ import {
 	StyledHelp,
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
+import { Spacer } from '../spacer';
 
 const identity = ( value: string ) => value;
 
@@ -729,6 +730,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					/>
 				) }
 			</div>
+			<Spacer marginBottom={ ! __nextHasNoMarginBottom ? 2 : 0 } />
 			{ __experimentalShowHowTo && (
 				<StyledHelp
 					id={ `components-form-token-suggestions-howto-${ instanceId }` }
