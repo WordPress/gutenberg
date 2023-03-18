@@ -1,4 +1,5 @@
 export { default as createInterpolateElement } from './create-interpolate-element';
+export { registerDirective } from './directives';
 export * from './react';
 export * from './react-platform';
 export * from './utils';

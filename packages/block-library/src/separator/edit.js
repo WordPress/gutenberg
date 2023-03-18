@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { HorizontalRule } from '@wordpress/components';
 import {
-	BlockRoot,
 	getColorClassName,
 	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
@@ -46,8 +45,8 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 	};
 
 	return (
-		<BlockRoot
-			as={ HorizontalRule }
+		<HorizontalRule
+			data-wp-block-root
 			className={ className }
 			style={ hasCustomColor ? styles : undefined }
 		/>

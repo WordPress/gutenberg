@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import './directives';
 import './hooks';
 export {
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,

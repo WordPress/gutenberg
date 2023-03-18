@@ -21,9 +21,3 @@ export const directives = new Map();
 export function registerDirective( name, handler ) {
 	directives.set( DIRECTIVE_PREFIX + name, handler );
 }
-
-registerDirective( 'debug', function ( type, originalProps, ...children ) {
-	const key = DIRECTIVE_PREFIX + 'debug';
-	const { [ key ]: value, ...props } = originalProps;
-	return [ type, props, ...children ];
-} );
