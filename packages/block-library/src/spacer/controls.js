@@ -37,6 +37,11 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 		defaultValues: { px: 100, em: 10, rem: 10, vw: 10, vh: 25 },
 	} );
 
+	// Finds the step for the current value’s unit for use as the min value.
+	const min =
+		units.find( ( { value: unit } ) => value.endsWith( unit ) )?.step ??
+		MIN_SPACER_SIZE;
+
 	const handleOnChange = ( unprocessedValue ) => {
 		onChange( unprocessedValue );
 	};
@@ -54,7 +59,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 			label={ label }
 			id={ inputId }
 			isResetValueOnUnitChange
-			min={ MIN_SPACER_SIZE }
+			min={ min }
 			onChange={ handleOnChange }
 			__unstableInputWidth={ '80px' }
 			value={ computedValue }
