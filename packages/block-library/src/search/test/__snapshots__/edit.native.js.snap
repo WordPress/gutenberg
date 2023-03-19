@@ -314,7 +314,17 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         ]
       }
     >
-      Svg
+      <Svg
+        fill="gray"
+        height={24}
+        onLayout={[Function]}
+        style={{}}
+        viewBox="0 0 24 24"
+        width={24}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        Path
+      </Svg>
     </View>
   </View>
 </View>

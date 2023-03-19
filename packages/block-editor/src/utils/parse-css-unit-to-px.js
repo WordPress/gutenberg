@@ -124,19 +124,24 @@ function evalMathExpression( cssUnit ) {
 	// The following regex matches numbers that have a following unit
 	// E.g. 5.25rem, 1vw
 	const cssUnitsBits = cssUnit.match( /\d+\.?\d*[a-zA-Z]+|\.\d+[a-zA-Z]+/g );
-	for ( const unit of cssUnitsBits ) {
-		// Standardize the unit to px and extract the value.
-		const parsedUnit = parseUnit( getPxFromCssUnit( unit ) );
-		if ( ! parseFloat( parsedUnit.value ) ) {
-			errorFound = true;
-			// End early since we are dealing with a null value.
-			break;
+	if ( cssUnitsBits ) {
+		for ( const unit of cssUnitsBits ) {
+			// Standardize the unit to px and extract the value.
+			const parsedUnit = parseUnit( getPxFromCssUnit( unit ) );
+			if ( ! parseFloat( parsedUnit.value ) ) {
+				errorFound = true;
+				// End early since we are dealing with a null value.
+				break;
+			}
+			cssUnit = cssUnit.replace( unit, parsedUnit.value );
 		}
-		cssUnit = cssUnit.replace( unit, parsedUnit.value );
+	} else {
+		errorFound = true;
 	}
 
 	// For mixed math expressions wrapped within CSS expressions
-	if ( ! errorFound && cssUnit.match( /(max|min|clamp)/g ) ) {
+	const expressionsMatches = cssUnit.match( /(max|min|clamp)/g );
+	if ( ! errorFound && expressionsMatches ) {
 		const values = cssUnit.split( ',' );
 		for ( const currentValue of values ) {
 			// Check for nested calc() and remove them to calculate the value.

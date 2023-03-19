@@ -110,6 +110,7 @@ function ParagraphBlock( {
 						panelId={ clientId }
 					>
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Drop cap' ) }
 							checked={ !! dropCap }
 							onChange={ () =>

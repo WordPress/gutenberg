@@ -31,19 +31,14 @@ jobs:
                   distribution: 'temurin'
                   java-version: '11'
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
-
-            - run: npm ci
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
             - name: Gradle cache
-              uses: gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef # v2.3.3
+              uses: gradle/gradle-build-action@6095a76664413da4c8c134ee32e8a8ae900f0f1f # v2.4.0
 
             - name: AVD cache
-              uses: actions/cache@6998d139ddd3e68c71e9e398d8e40b71a2f39812 # v3.2.5
+              uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
               id: avd-cache
               with:
                   path: |

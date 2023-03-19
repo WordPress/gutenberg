@@ -302,23 +302,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 }
 
 /**
- * Gets classname from last tag in a string of HTML.
- *
- * @param string $html markup to be processed.
- * @return string String of inner wrapper classnames.
- */
-function gutenberg_get_classnames_from_last_tag( $html ) {
-	$tags            = new WP_HTML_Tag_Processor( $html );
-	$last_classnames = '';
-
-	while ( $tags->next_tag() ) {
-		$last_classnames = $tags->get_attribute( 'class' );
-	}
-
-	return (string) $last_classnames;
-}
-
-/**
  * Renders the layout config to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
@@ -486,6 +469,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
+	// Add combined layout and block classname for global styles to hook onto.
+	$block_name    = explode( '/', $block['blockName'] );
+	$class_names[] = 'wp-block-' . end( $block_name ) . '-' . $layout_classname;
+
 	$content_with_outer_classnames = '';
 
 	if ( ! empty( $outer_class_names ) ) {
@@ -502,7 +489,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	* The first chunk of innerContent contains the block markup up until the inner blocks start.
 	* We want to target the opening tag of the inner blocks wrapper, which is the last tag in that chunk.
 	*/
-	$inner_content_classnames = isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) ? gutenberg_get_classnames_from_last_tag( $block['innerContent'][0] ) : '';
+	$inner_content_classnames = '';
+
+	if ( isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) && count( $block['innerContent'] ) > 1 ) {
+		$tags            = new WP_HTML_Tag_Processor( $block['innerContent'][0] );
+		$last_classnames = '';
+		while ( $tags->next_tag() ) {
+			$last_classnames = $tags->get_attribute( 'class' );
+		}
+
+		$inner_content_classnames = (string) $last_classnames;
+	}
 
 	$content = $content_with_outer_classnames ? new WP_HTML_Tag_Processor( $content_with_outer_classnames ) : new WP_HTML_Tag_Processor( $block_content );
 

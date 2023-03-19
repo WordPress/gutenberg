@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "23.4.0",
+	"version": "23.6.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -37,7 +37,7 @@
 		"@emotion/styled": "^11.6.0",
 		"@emotion/utils": "^1.0.0",
 		"@floating-ui/react-dom": "1.0.0",
-		"@use-gesture/react": "^10.2.6",
+		"@use-gesture/react": "^10.2.24",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/date": "file:../date",

@@ -32,22 +32,8 @@ jobs:
         steps:
             - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
-
-            - name: Npm install
-              run: |
-                  npm ci
-
-            - name: Install specific versions of the themes used in tests
-              run: |
-                  npm run wp-env start
-                  npm run wp-env -- run tests-cli "wp theme update twentytwentyone --version=1.7"
-                  npm run wp-env -- run tests-cli "wp theme update twentytwentythree --version=1.0"
-                  npm run wp-env stop
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
@@ -86,15 +72,6 @@ jobs:
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
                   ./bin/plugin/cli.js perf $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 --tests-branch $GITHUB_SHA --wp-version "$WP_MAJOR"
 
-            - uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975 # v6.4.0
-              if: github.event_name == 'push'
-              id: commit-timestamp
-              with:
-                  github-token: ${{secrets.GITHUB_TOKEN}}
-                  script: |
-                      const commit_details = await github.rest.git.getCommit({owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha});
-                      return parseInt((new Date( commit_details.data.author.date ).getTime() / 1000).toFixed(0))
-
             - name: Compare performance with custom branches
               if: github.event_name == 'workflow_dispatch'
               env:
@@ -106,6 +83,15 @@ jobs:
             - name: Publish performance results
               if: github.event_name == 'push'
               env:
-                  COMMITTED_AT: ${{ steps.commit-timestamp.outputs.result }}
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
-              run: ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 $COMMITTED_AT
+              run: |
+                  COMMITTED_AT=$(git show -s $GITHUB_SHA --format="%ct")
+                  ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 $COMMITTED_AT
+
+            - name: Archive debug artifacts (screenshots, HTML snapshots)
+              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+              if: always()
+              with:
+                  name: failures-artifacts
+                  path: ./__test-results/artifacts
+                  if-no-files-found: ignore
