@@ -25,6 +25,9 @@ Check out the [Ways to keep up with Gutenberg & Full Site Editing (FSE)](https:/
 
 Get hands on: check out the [block editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
 
+### Guiding Principles
+[The Guiding principles document](/docs/explanations/principles.md) highlights a few principles that are shaping the overall project and impact various development and design decisions.
+
 ### Using Gutenberg
 
 -   **Download:** To use the latest release of the Gutenberg plugin on your WordPress site: install from the plugins page in wp-admin, or [download from the WordPress.org plugins repository](https://wordpress.org/plugins/gutenberg/).
