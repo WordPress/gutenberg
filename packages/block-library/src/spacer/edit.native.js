@@ -20,7 +20,8 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Controls, { DEFAULT_VALUES } from './controls';
+import { DEFAULT_VALUES } from './constants';
+import Controls from './controls';
 import styles from './editor.native.scss';
 
 const DEFAULT_FONT_SIZE = 16;

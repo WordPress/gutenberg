@@ -1,23 +1,15 @@
 /**
  * WordPress dependencies
  */
-import {
-	PanelBody,
-	UnitControl,
-	getValueAndUnit,
-	__experimentalUseCustomUnits as useCustomUnits,
-} from '@wordpress/components';
+import { PanelBody, UnitControl, getValueAndUnit } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { useSetting } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { MIN_SPACER_SIZE } from './constants';
+import { useSpacerSettings } from './constants';
 import styles from './style.scss';
-
-export const DEFAULT_VALUES = { px: 100, em: 10, rem: 10, vw: 10, vh: 25 };
 
 function Controls( {
 	attributes,
@@ -59,23 +51,14 @@ function Controls( {
 		[ height, width ]
 	);
 
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'px',
-			'em',
-			'rem',
-			'vw',
-			'vh',
-		],
-		defaultValues: DEFAULT_VALUES,
-	} );
+	const { units, min } = useSpacerSettings( value );
 
 	return (
 		<>
 			<PanelBody title={ __( 'Dimensions' ) }>
 				<UnitControl
 					label={ label }
-					min={ MIN_SPACER_SIZE }
+					min={ min }
 					value={ value }
 					onChange={ handleChange }
 					onUnitChange={ handleUnitChange }
