@@ -9,17 +9,15 @@ const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 export const DEFAULT_VALUES = { px: 100, em: 10, rem: 10, vw: 10, vh: 25 };
 
 /**
- * @param {string}           value   Current value
- * @param {string|string[]=} exclude Unit(s) to exclude
+ * @param {string} value Current value
  */
-export const useSpacerSettings = ( value, exclude ) => {
-	let availableUnitSettings = useSetting( 'spacing.units' ) || undefined;
-	if ( exclude && availableUnitSettings )
-		availableUnitSettings = availableUnitSettings.filter(
-			Array.isArray( exclude )
-				? ( availableUnit ) => ! exclude.includes( availableUnit )
-				: ( availableUnit ) => availableUnit !== exclude
-		);
+export const useSpacerSettings = ( value ) => {
+	const availableUnitSettings = ( useSetting( 'spacing.units' ) || undefined )
+		// In most contexts the spacer size cannot meaningfully be set to a
+		// percentage, since this is relative to the parent container. This
+		// unit is disabled from the UI.
+		?.filter( ( availableUnit ) => availableUnit !== '%' );
+
 	/** @type {import('@wordpress/components/src/unit-control/types').WPUnitControlUnit[]} */
 	const units = useCustomUnits( {
 		availableUnits: availableUnitSettings || DEFAULT_UNITS,
