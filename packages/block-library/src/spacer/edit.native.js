@@ -20,7 +20,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { DEFAULT_VALUES } from './constants';
+import { DEFAULT_VALUES } from './shared';
 import Controls from './controls';
 import styles from './editor.native.scss';
 

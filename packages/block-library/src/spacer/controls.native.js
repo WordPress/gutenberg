@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useSpacerSettings } from './constants';
+import { useSpacerSettings } from './shared';
 import styles from './style.scss';
 
 function Controls( {

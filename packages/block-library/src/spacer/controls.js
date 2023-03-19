@@ -13,7 +13,7 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { useSpacerSettings } from './constants';
+import { useSpacerSettings } from './shared';
 
 function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
