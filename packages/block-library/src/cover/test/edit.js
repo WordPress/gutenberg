@@ -12,6 +12,7 @@ import {
 	registerAllCoreBlocks,
 	unRegisterAllBlocks,
 	createTestBlock,
+	selectBlock,
 } from 'test/integration/helpers/integration-test-editor';
 
 async function setup( testBlock ) {
@@ -19,7 +20,7 @@ async function setup( testBlock ) {
 	return initializeEditor( { testBlocks: [ block ] } );
 }
 
-async function createAndSelectCoverBlock() {
+async function createAndselectBlock() {
 	await userEvent.click(
 		screen.getByRole( 'button', {
 			name: 'Color: Black',
@@ -30,10 +31,6 @@ async function createAndSelectCoverBlock() {
 			name: 'Select Cover',
 		} )
 	);
-}
-
-async function selectCoverBlock() {
-	await userEvent.click( screen.getByLabelText( 'Block: Cover' ) );
 }
 
 describe( 'Cover block', () => {
@@ -98,7 +95,7 @@ describe( 'Cover block', () => {
 	describe( 'Block toolbar', () => {
 		test( 'full height toggle sets minHeight attributes to 100vh when clicked', async () => {
 			await setup( { name: 'core/cover' } );
-			await createAndSelectCoverBlock();
+			await createAndselectBlock();
 
 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveStyle(
 				' min-height: 100vh;'
@@ -115,7 +112,7 @@ describe( 'Cover block', () => {
 
 		test( 'content position button sets content position', async () => {
 			await setup( { name: 'core/cover' } );
-			await createAndSelectCoverBlock();
+			await createAndselectBlock();
 
 			await userEvent.click(
 				screen.getByLabelText( 'Change content position' )
@@ -160,7 +157,7 @@ describe( 'Cover block', () => {
 					},
 				} );
 
-				await selectCoverBlock();
+				await selectBlock( 'Block: Cover', screen );
 				expect(
 					screen.getByRole( 'button', {
 						name: 'Media settings',
@@ -179,7 +176,7 @@ describe( 'Cover block', () => {
 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
 				'has-parallax'
 			);
-			await selectCoverBlock();
+			await selectBlock( 'Block: Cover', screen );
 			await userEvent.click(
 				screen.getByLabelText( 'Fixed background' )
 			);
@@ -198,7 +195,7 @@ describe( 'Cover block', () => {
 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
 				'is-repeated'
 			);
-			await selectCoverBlock();
+			await selectBlock( 'Block: Cover', screen );
 			await userEvent.click(
 				screen.getByLabelText( 'Repeated background' )
 			);
@@ -215,7 +212,7 @@ describe( 'Cover block', () => {
 				},
 			} );
 
-			await selectCoverBlock();
+			await selectBlock( 'Block: Cover', screen );
 			await userEvent.clear( screen.getByLabelText( 'Left' ) );
 			await userEvent.type( screen.getByLabelText( 'Left' ), '100' );
 			// eslint-disable-next-line testing-library/no-node-access
@@ -233,7 +230,7 @@ describe( 'Cover block', () => {
 				},
 			} );
 
-			await selectCoverBlock();
+			await selectBlock( 'Block: Cover', screen );
 			await userEvent.type(
 				screen.getByLabelText( 'Alt text (alternative text)' ),
 				'Me'
@@ -249,7 +246,7 @@ describe( 'Cover block', () => {
 				},
 			} );
 
-			await selectCoverBlock();
+			await selectBlock( 'Block: Cover', screen );
 			// eslint-disable-next-line testing-library/no-node-access
 			const img = container.getElementsByClassName(
 				'wp-block-cover__image-background'
@@ -269,7 +266,7 @@ describe( 'Cover block', () => {
 			test( 'applies selected opacity to block when number control value changed', async () => {
 				const { container } = await setup( { name: 'core/cover' } );
 
-				await createAndSelectCoverBlock();
+				await createAndselectBlock();
 
 				// eslint-disable-next-line testing-library/no-node-access
 				const overlay = container.getElementsByClassName(
@@ -299,7 +296,7 @@ describe( 'Cover block', () => {
 			test( 'applies selected opacity to block when slider moved', async () => {
 				const { container } = await setup( { name: 'core/cover' } );
 
-				await createAndSelectCoverBlock();
+				await createAndselectBlock();
 
 				// eslint-disable-next-line testing-library/no-node-access
 				const overlay = container.getElementsByClassName(
@@ -328,7 +325,7 @@ describe( 'Cover block', () => {
 		describe( 'Dimensions panel', () => {
 			test( 'sets minHeight attribute when number control value changed', async () => {
 				await setup( { name: 'core/cover' } );
-				await createAndSelectCoverBlock();
+				await createAndselectBlock();
 				await userEvent.click(
 					screen.getByRole( 'tab', {
 						name: 'Styles',

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -50,8 +51,12 @@ export function unRegisterAllBlocks() {
 	getBlockTypes().forEach( ( { name } ) => unregisterBlockType( name ) );
 }
 
-export function createTestBlock( name, attributes ) {
-	return createBlock( name, attributes || {} );
+export async function selectBlock( name, screen ) {
+	await userEvent.click( screen.getByLabelText( name ) );
+}
+
+export function createTestBlock( name, attributes = {}, innerBlocks = [] ) {
+	return createBlock( name, attributes, innerBlocks );
 }
 
 /**
