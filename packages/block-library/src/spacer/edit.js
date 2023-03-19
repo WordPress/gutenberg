@@ -15,7 +15,6 @@ import { View } from '@wordpress/primitives';
  * Internal dependencies
  */
 import SpacerControls from './controls';
-import { MIN_SPACER_SIZE } from './constants';
 
 const ResizableSpacer = ( {
 	orientation,
@@ -39,6 +38,10 @@ const ResizableSpacer = ( {
 
 	return (
 		<ResizableBox
+			// Unlike the input control in the inspector that has a per unit minumum value,
+			// here it should always be one because it adjusts by whole pixels.
+			minWidth={ 1 }
+			minHeight={ 1 }
 			className={ classnames( 'block-library-spacer__resize-container', {
 				'resize-horizontal': orientation === 'horizontal',
 				'is-resizing': isResizing,
@@ -117,7 +120,6 @@ const SpacerEdit = ( {
 		if ( blockOrientation === 'horizontal' ) {
 			return (
 				<ResizableSpacer
-					minWidth={ MIN_SPACER_SIZE }
 					enable={ {
 						top: false,
 						right: true,
@@ -142,7 +144,6 @@ const SpacerEdit = ( {
 		return (
 			<>
 				<ResizableSpacer
-					minHeight={ MIN_SPACER_SIZE }
 					enable={ {
 						top: false,
 						right: false,
