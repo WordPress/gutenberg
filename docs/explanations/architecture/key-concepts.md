@@ -26,6 +26,8 @@ Blocks can be static or dynamic. Static blocks contain rendered content and an o
 
 Each block contains Attributes or configuration settings, which can be sourced from raw HTML in the content via meta or other customizable origins.
 
+More on [Data format and data flow](/docs/explanations/architecture/data-flow.md).
+
 ### Transformations
 
 Blocks have the ability to be transformed into other block types. This allows basic operations like converting a paragraph into a heading, but also more intricate ones like multiple images becoming a gallery. Transformations work for single blocks and for multi-block selections. Internal block variations are also possible transformation targets.
@@ -51,11 +53,13 @@ In technical details, reusable blocks are stored as a hidden post type (`wp_bloc
 
 A [block pattern](/docs/reference-guides/block-api/block-patterns.md) is a group of blocks that have been combined together creating a design pattern. These design patterns provide a starting point for building more advanced pages and layouts quickly. A block pattern can be as small as a single block or as large as a full page of content. Unlike reusable blocks, once a pattern is inserted it doesn't remain in sync with the original content as the blocks contained are meant to be edited and customized by the user. Underneath the surface, patterns are just regular blocks composed together. Themes can register patterns to offer users quick starting points with a design language familiar to that theme's aesthetics.
 
-## Templates (in progress)
+## Templates
 
 While the post editor concentrates on the content of a post, the [template](/docs/reference-guides/block-api/block-templates.md) editor allows declaring and editing an entire site using blocks, from header to footer. To support these efforts there's a collection of blocks that interact with different parts of a site (like the site title, description, logo, navigation, etc) as well as semantic areas like header, sidebar, and footer. Templates are broken down between templates (that describe a full page) and template parts (that describe reusable areas within a template). These templates and template parts can be composed together and registered by a theme. They are also entirely editable by users using the block editor. Customized templates are saved in a `wp_template` post type. Block templates include both static pages and dynamic ones, like archives, singular, home, 404, etc.
 
 Note: custom post types can also be initialized with a starting `post_content` template that should not be confused with the theme template system described above.
+
+More on [Site editing templates](/docs/explanations/architecture/full-site-editing-templates.md).
 
 ## Global Styles
 
