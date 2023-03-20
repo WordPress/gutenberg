@@ -360,11 +360,11 @@ class WP_Duotone_Gutenberg {
 		);
 
 		// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
-		return preg_replace(
-			'/' . preg_quote( 'class="', '/' ) . '/',
-			'class="' . $filter_id . ' ',
-			$block_content,
-			1
-		);
+		$tags = new WP_HTML_Tag_Processor( $block_content );
+		if ( $tags->next_tag() ) {
+			$tags->add_class( $filter_id );
+		}
+
+		return $tags->get_updated_html();
 	}
 }
