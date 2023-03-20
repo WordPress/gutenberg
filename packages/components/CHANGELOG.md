@@ -13,7 +13,7 @@
 
 ### Bug Fix
 
--  `InputControl`: Fix misaligned textarea input control ([#49116](https://github.com/WordPress/gutenberg/pull/49116).
+-  `InputControl`: Fix misaligned textarea input control ([#49116](https://github.com/WordPress/gutenberg/pull/49116)).
 
 ## 23.6.0 (2023-03-15)
 
