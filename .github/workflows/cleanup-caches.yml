@@ -1,0 +1,45 @@
+##
+# Clean up cache keys that are no longer needed.
+##
+name: Cache Garbage Collection
+
+on:
+  pull_request:
+    types: [ closed ]
+
+
+jobs:
+  # Delete cache keys scoped to pull requests.
+  #
+  # When a cache is created by a workflow run triggered on a pull request, the cache is created
+  # for the merge ref (refs/pull/.../merge). Because of this, the cache will have a limited scope
+  # and can only be restored by re-runs of the pull request.
+  #
+  # This performs garbage collection on cache keys associated with a closed PR.
+  pr-garbage-collection:
+    name: Delete PR specific cache keys
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Find and delete PR specific cache keys
+        uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975 # v6.4.0
+        with:
+          retries: 2
+          retry-exempt-status-codes: 418
+          script: |
+            const action_caches = await github..rest.actions.getActionsCacheList({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+
+            // Find the caches related to this pull request.
+            for ( let i = 0; i < action_caches.data.actions_caches.length; i++ ) {
+              if ( '${{ github.ref }}' == action_caches.data.actions_caches[ i ].ref ) {
+                github.rest.actions.deleteActionsCacheById({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo
+                  cache_id: action_caches.data.actions_caches[ i ].id,
+                });
+              }
+            }
