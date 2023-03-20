@@ -11,6 +11,10 @@
 -   `CustomGradientPicker`: improve initial state UI ([#49146](https://github.com/WordPress/gutenberg/pull/49146)).
 -	`AnglePickerControl`: Style to better fit in narrow contexts and improve RTL layout ([#49046](https://github.com/WordPress/gutenberg/pull/49046)).
 
+### Bug Fix
+
+-  `InputControl`: Fix misaligned textarea input control ([#49116](https://github.com/WordPress/gutenberg/pull/49116)).
+
 ## 23.6.0 (2023-03-15)
 
 ### Enhancements
