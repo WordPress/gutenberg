@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `registry.register` function will no longer register a store if another instance is registered with the same name.
+
 ## 8.6.0 (2023-03-15)
 
 ## 8.5.0 (2023-03-01)
