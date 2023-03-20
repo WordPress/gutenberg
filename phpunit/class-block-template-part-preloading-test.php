@@ -28,6 +28,8 @@ class Block_Template_Part_Preloading_Test extends WP_UnitTestCase {
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
 
+		// This Theme contains known template parts which we assert against in the tests.
+		// See phpunit/data/themedir1/block-theme-child-with-template-parts/theme.json.
 		switch_theme( self::$theme_slug );
 	}
 
@@ -62,7 +64,25 @@ class Block_Template_Part_Preloading_Test extends WP_UnitTestCase {
 			'wp_template_part'
 		);
 
-		$this->assertEquals( $template_parts_rest_route . '/' . self::$theme_slug . '//' . 'header' . '?context=edit', $preload_paths[0][0], 'Preloading URL for "header" template part was incorrect.' );
-		$this->assertEquals( $template_parts_rest_route . '/' . self::$theme_slug . '//' . 'footer' . '?context=edit', $preload_paths[1][0], 'Preloading URL for "footer" template part was incorrect.' );
+		$expected_template_part_slugs = array(
+			'header',
+			'header-large',
+		);
+
+		$paths = array_map(
+			function( $path ) {
+				return $path[0];
+			},
+			$preload_paths
+		);
+
+		// loop over $paths and assert $expected_template_part_slugs are in $paths.
+		foreach ( $expected_template_part_slugs as $expected_template_part_slug ) {
+			$this->assertContains( $template_parts_rest_route . '/' . self::$theme_slug . '//' . $expected_template_part_slug . '?context=edit', $paths, 'Preloading URL for "' . $expected_template_part_slug . '" template part was incorrect.' );
+		}
+
+		// assert that $paths does not contain a "footer" template part.
+		$this->assertNotContains( $template_parts_rest_route . '/' . self::$theme_slug . '//' . 'footer' . '?context=edit', $paths, '"footer" template part which is not in the "header" area was incorrectly loaded.' );
+
 	}
 }

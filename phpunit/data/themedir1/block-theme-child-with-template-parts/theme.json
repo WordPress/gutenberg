@@ -7,6 +7,11 @@
 			"area": "header"
 		},
 		{
+			"name": "header-large",
+			"title": "Large Header",
+			"area": "header"
+		},
+		{
 			"name": "footer",
 			"title": "Footer",
 			"area": "footer"

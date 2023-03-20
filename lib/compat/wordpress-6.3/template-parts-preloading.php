@@ -7,7 +7,7 @@
  */
 
 /**
- * Preloads requests needed for common Template Part posts
+ * Preloads requests needed for common Template Part posts.
  *
  * @param array $preload_paths    Preload paths to be filtered.
  * @param array $context          Context for the preload paths.
@@ -27,7 +27,17 @@ function gutenberg_preload_template_parts( $preload_paths, $context ) {
 		return $preload_paths;
 	}
 
-	$theme_json_template_part_slugs = array_keys( $theme_json_template_parts );
+	// Only preload template parts that are in the "header" area.
+	$theme_json_template_part_slugs = array_filter(
+		array_keys( $theme_json_template_parts ),
+		function( $slug ) use ( $theme_json_template_parts ) {
+			return ! isset( $theme_json_template_parts[ $slug ]['area'] ) || 'header' === $theme_json_template_parts[ $slug ]['area'];
+		}
+	);
+
+	if ( empty( $theme_json_template_part_slugs ) ) {
+		return $preload_paths;
+	}
 
 	$theme_slug = get_stylesheet();
 
