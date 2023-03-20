@@ -15,7 +15,7 @@
  */
 function gutenberg_preload_template_parts( $preload_paths, $context ) {
 
-	$template_part_preloading_limit = apply_filters( 'gutenberg_template_part_preloading_limit', 10 );
+	$template_part_preloading_limit = apply_filters( 'gutenberg_template_part_preloading_limit', 3 );
 
 	// Limit to the Site Editor.
 	if ( ! empty( $context->name ) && 'core/edit-site' !== $context->name ) {
