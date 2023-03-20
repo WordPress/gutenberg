@@ -5,8 +5,6 @@ name: Cache Garbage Collection
 
 on:
   pull_request:
-    types: [ closed ]
-
 
 jobs:
   # Delete cache keys scoped to pull requests.
