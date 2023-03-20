@@ -1654,6 +1654,12 @@
 								},
 								":visited": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":link": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":any-link": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
 							"additionalProperties": false
@@ -1682,6 +1688,12 @@
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
 								":visited": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":link": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":any-link": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
