@@ -160,6 +160,7 @@ function DuotonePicker( {
 										? newColors
 										: undefined;
 								// @ts-expect-error TODO: Investigate if this is actually a problem
+								// See also https://github.com/WordPress/gutenberg/pull/49060#discussion_r1136951035
 								onChange( newValue );
 							} }
 						/>
