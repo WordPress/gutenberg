@@ -899,7 +899,12 @@ class WP_Theme_JSON_Gutenberg {
 						$element_selector = array( $el_selector );
 						break;
 					}
-					$element_selector[] = static::append_to_selector( $el_selector, $selector . ' ', 'left' );
+
+					if ( 'core/heading' === $block_name && in_array( $el_name, array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ), true ) ) {
+						$element_selector[] = static::append_to_selector( $el_selector, $selector, 'right' );
+					} else {
+						$element_selector[] = static::append_to_selector( $el_selector, $selector . ' ', 'left' );
+					}
 				}
 				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = implode( ',', $element_selector );
 			}
