@@ -75,7 +75,8 @@ function ColorListPicker( {
 					disableCustomColors={ disableCustomColors }
 					enableAlpha={ enableAlpha }
 					onChange={ ( newColor ) => {
-						const newColors = value.slice();
+						const newColors: ( string | undefined )[] =
+							value.slice();
 						newColors[ index ] = newColor;
 						onChange( newColors );
 					} }

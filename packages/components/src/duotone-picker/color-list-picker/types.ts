@@ -21,7 +21,7 @@ export type ColorListPickerProps = {
 	/**
 	 * An array containing the currently selected colors.
 	 */
-	value?: Array< string | undefined >;
+	value?: Array< string >;
 	/**
 	 * Controls whether the custom color picker is displayed.
 	 */
