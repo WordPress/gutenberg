@@ -65,6 +65,8 @@ function ScreenColorElement( { name, element, variation = '' } ) {
 			supports.includes( 'buttonColor' ) &&
 			isBackgroundEnabled &&
 			( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
+	} else if ( element === 'caption' ) {
+		isBackgroundEnabled = false;
 	}
 
 	const [ elementTextColor, setElementTextColor ] = useGlobalStyle(

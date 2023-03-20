@@ -182,10 +182,6 @@ function CaptionColorItem( { name, parentMenu, variation = '' } ) {
 		prefix + 'elements.caption.color.text',
 		name
 	);
-	const [ bgColor ] = useGlobalStyle(
-		prefix + 'elements.caption.color.background',
-		name
-	);
 
 	if ( ! hasSupport ) {
 		return null;
@@ -198,9 +194,6 @@ function CaptionColorItem( { name, parentMenu, variation = '' } ) {
 		>
 			<HStack justify="flex-start">
 				<ZStack isLayered={ false } offset={ -8 }>
-					<ColorIndicatorWrapper expanded={ false }>
-						<ColorIndicator colorValue={ bgColor } />
-					</ColorIndicatorWrapper>
 					<ColorIndicatorWrapper expanded={ false }>
 						<ColorIndicator colorValue={ color } />
 					</ColorIndicatorWrapper>
