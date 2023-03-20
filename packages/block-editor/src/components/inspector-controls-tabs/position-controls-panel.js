@@ -16,18 +16,22 @@ import { default as InspectorControls } from '../inspector-controls';
 import { store as blockEditorStore } from '../../store';
 
 const PositionControlsPanel = () => {
-	const { blockAttributes } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientIds } =
+	// Determine whether the panel should be expanded.
+	const { initialOpen } = useSelect( ( select ) => {
+		const { getBlocksByClientId, getSelectedBlockClientIds } =
 			select( blockEditorStore );
+
+		// If any selected block has a position set, open the panel by default.
+		// The first block's value will still be used within the control though.
 		const clientIds = getSelectedBlockClientIds();
+		const multiSelectedBlocks = getBlocksByClientId( clientIds );
+
 		return {
-			blockAttributes: getBlockAttributes( clientIds[ 0 ] ),
+			initialOpen: multiSelectedBlocks.some(
+				( { attributes } ) => !! attributes?.style?.position?.type
+			),
 		};
 	}, [] );
-
-	// If a position type is set, open the panel by default.
-	// In a multi-selection, use the first block's attributes for the check.
-	const initialOpen = !! blockAttributes?.style?.position?.type;
 
 	return (
 		<PanelBody
