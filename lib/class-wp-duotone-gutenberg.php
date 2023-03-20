@@ -187,16 +187,32 @@ class WP_Duotone_Gutenberg {
 	 * Safari renders elements incorrectly on first paint when the SVG filter comes after the content that it is filtering,
 	 * so we force a repaint with a WebKit hack which solves the issue.
 	 *
-	 * @param string $selector The selector to apply the hack for.
+	 * @param string $selectors The CSS selectors to apply the hack for.
 	 */
-	private static function safari_rerender_hack( $selector ) {
+	private static function safari_rerender_hack( $selectors ) {
 		/*
-		* Simply accessing el.offsetHeight flushes layout and style
+		* Accessing el.offsetHeight flushes layout and style
 		* changes in WebKit without having to wait for setTimeout.
 		*/
 		printf(
-			'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
-			wp_json_encode( $selector )
+			'<script>
+				(
+					function() {
+						%s.forEach( selector => { 
+							document.querySelectorAll( selector ).forEach( function( el ) {
+								if( ! el ) {
+									return;
+								}
+								var display = el.style.display;
+								el.style.display = "none";
+								el.offsetHeight;
+								el.style.display = display;
+							} );
+						} );
+					}
+				)();
+			</script>',
+			wp_json_encode( $selectors )
 		);
 	}
 
@@ -204,6 +220,9 @@ class WP_Duotone_Gutenberg {
 	 * Outputs all necessary SVG for duotone filters, CSS for classic themes, and safari rerendering hack
 	 */
 	public static function output_footer_assets() {
+
+		$selectors = array();
+
 		foreach ( self::$output as $filter_data ) {
 
 			// SVG will be output on the page later.
@@ -216,10 +235,12 @@ class WP_Duotone_Gutenberg {
 				wp_add_inline_style( 'core-block-supports', 'body{' . self::get_css_custom_property_declaration( $filter_data ) . '}' );
 			}
 
-			global $is_safari;
-			if ( $is_safari ) {
-				self::safari_rerender_hack( $filter_data['selector'] );
-			}
+			$selectors[] = $filter_data['selector'];
+		}
+
+		global $is_safari;
+		if ( $is_safari && ! empty( $selectors ) ) {
+			self::safari_rerender_hack( $selectors );
 		}
 	}
 
