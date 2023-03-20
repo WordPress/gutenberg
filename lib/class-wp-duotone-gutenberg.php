@@ -97,7 +97,7 @@ class WP_Duotone_Gutenberg {
 	 */
 	public static function set_global_style_block_names() {
 		// Get the per block settings from the theme.json.
-		$tree        = WP_Theme_JSON_Resolver::get_merged_data();
+		$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 		$block_nodes = $tree->get_styles_block_nodes();
 		$theme_json  = $tree->get_raw_data();
 
