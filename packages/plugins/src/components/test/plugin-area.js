@@ -91,7 +91,7 @@ describe( 'PluginArea', () => {
 	} );
 
 	test.failing(
-		'does not rerender when plugin is added to a different scope',
+		'does not rerender when a plugin is added to a different scope',
 		() => {
 			const ComponentSpy = jest.fn( ( { content } ) => {
 				return `plugin: ${ content }.`;
