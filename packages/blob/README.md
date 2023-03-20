@@ -60,7 +60,7 @@ Check whether a url is a blob url.
 
 _Parameters_
 
--   _url_ `string`: The URL.
+-   _url_ `string|undefined`: The URL.
 
 _Returns_
 
