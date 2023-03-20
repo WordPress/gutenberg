@@ -15,13 +15,14 @@ describe( 'useConstrainedTabbing', () => {
 		return (
 			<div ref={ constrainedTabbingRef } data-testid="test-component">
 				<button type="button">Button 1</button>
-				<div data-testid="test-component" tabIndex={ -1 } />
+				<div data-testid="test-focusable-element" tabIndex={ -1 } />
 				<button type="button">Button 2</button>
 				<button
 					type="button"
 					onClick={ () => {
-						const placeholder =
-							screen.getByTestId( 'test-component' );
+						const placeholder = screen.getByTestId(
+							'test-focusable-element'
+						);
 						placeholder.focus();
 					} }
 				>
