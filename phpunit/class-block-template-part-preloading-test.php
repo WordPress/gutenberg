@@ -85,4 +85,36 @@ class Block_Template_Part_Preloading_Test extends WP_UnitTestCase {
 		$this->assertNotContains( $template_parts_rest_route . '/' . self::$theme_slug . '//' . 'footer' . '?context=edit', $paths, '"footer" template part which is not in the "header" area was incorrectly loaded.' );
 
 	}
+
+	public function test_should_limit_preloaded_paths_to_gutenberg_template_part_preloading_limit() {
+		$context       = new stdClass();
+		$context->name = 'core/edit-site';
+
+		// Set the limit to 1.
+		add_filter(
+			'gutenberg_template_part_preloading_limit',
+			function() {
+				return 1;
+			}
+		);
+
+		$preload_paths = gutenberg_preload_template_parts( array(), $context );
+
+		$template_parts_rest_route = rest_get_route_for_post_type_items(
+			'wp_template_part'
+		);
+
+		$expected_template_part_slug = 'header';
+
+		$paths = array_map(
+			function( $path ) {
+				return $path[0];
+			},
+			$preload_paths
+		);
+
+		$this->assertContains( $template_parts_rest_route . '/' . self::$theme_slug . '//' . $expected_template_part_slug . '?context=edit', $paths, 'Preloading URL for "' . $expected_template_part_slug . '" template part was incorrect.' );
+
+		$this->assertCount( 1, $preload_paths, 'Preloading paths count beyond set limit.' );
+	}
 }

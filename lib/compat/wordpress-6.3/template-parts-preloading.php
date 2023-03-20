@@ -15,6 +15,8 @@
  */
 function gutenberg_preload_template_parts( $preload_paths, $context ) {
 
+	$template_part_preloading_limit = apply_filters( 'gutenberg_template_part_preloading_limit', 10 );
+
 	// Limit to the Site Editor.
 	if ( ! empty( $context->name ) && 'core/edit-site' !== $context->name ) {
 		return $preload_paths;
@@ -44,6 +46,9 @@ function gutenberg_preload_template_parts( $preload_paths, $context ) {
 	$template_parts_rest_route = rest_get_route_for_post_type_items(
 		'wp_template_part'
 	);
+
+	// Limit the length of theme_json_template_part_slugs to $template_part_preloading_limit
+	$theme_json_template_part_slugs = array_slice( $theme_json_template_part_slugs, 0, $template_part_preloading_limit );
 
 	foreach ( $theme_json_template_part_slugs as $template_part_slug ) {
 		$preload_paths[] = array(
