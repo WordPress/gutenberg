@@ -36,8 +36,8 @@ jobs:
               if ( '${{ github.ref }}' == action_caches.data.actions_caches[ i ].ref ) {
                 github.rest.actions.deleteActionsCacheById({
                   owner: context.repo.owner,
-                  repo: context.repo.repo
-                  cache_id: action_caches.data.actions_caches[ i ].id,
+                  repo: context.repo.repo,
+                  cache_id: action_caches.data.actions_caches[ i ].id
                 });
               }
             }
