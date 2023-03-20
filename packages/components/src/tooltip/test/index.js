@@ -9,11 +9,11 @@ import userEvent from '@testing-library/user-event';
  */
 import Tooltip from '../';
 import Button from '../../button';
+import { TOOLTIP_DELAY } from '../index.js';
 
 /**
  * WordPress dependencies
  */
-import { TOOLTIP_DELAY } from '../index.js';
 import { shortcutAriaLabel } from '@wordpress/keycodes';
 
 const props = {
