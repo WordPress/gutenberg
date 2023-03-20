@@ -47,7 +47,7 @@ describe( 'PluginArea', () => {
 		expect( container ).toHaveTextContent( 'plugin: scoped.' );
 	} );
 
-	test( 'rerenders when new plugin is registered', () => {
+	test( 'rerenders when a new plugin is registered', () => {
 		registerPlugin( 'foo', {
 			render: () => <TestComponent content="foo" />,
 			icon: 'smiley',
