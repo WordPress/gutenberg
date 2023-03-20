@@ -32,22 +32,8 @@ jobs:
         steps:
             - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
-
-            - name: Npm install
-              run: |
-                  npm ci
-
-            - name: Install specific versions of the themes used in tests
-              run: |
-                  npm run wp-env start
-                  npm run wp-env -- run tests-cli "wp theme update twentytwentyone --version=1.7"
-                  npm run wp-env -- run tests-cli "wp theme update twentytwentythree --version=1.0"
-                  npm run wp-env stop
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'

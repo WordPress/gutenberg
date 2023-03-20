@@ -44,7 +44,6 @@
 		"src/**/react-native-*",
 		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
-		"src/index.js",
-		"src/higher-order/with-notices"
+		"src/index.js"
 	]
 }

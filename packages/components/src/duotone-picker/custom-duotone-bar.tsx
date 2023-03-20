@@ -23,13 +23,11 @@ export default function CustomDuotoneBar( {
 	const background = getGradientFromCSSColors( values );
 	const controlPoints = getColorStopsFromColors( values );
 	return (
-		// @ts-expect-error Resolve after CustomGradientBar is migrated to TypeScript
 		<CustomGradientBar
 			disableInserter
 			background={ background }
 			hasGradient={ hasGradient }
 			value={ controlPoints }
-			// @ts-expect-error Resolve after CustomGradientBar is migrated to TypeScript
 			onChange={ ( newColorStops ) => {
 				const newValue = getColorsFromColorStops( newColorStops );
 				onChange( newValue );

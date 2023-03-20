@@ -45,6 +45,7 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'elements.button.color.background': 'color',
 	'elements.button.typography.fontFamily': 'font-family',
 	'elements.button.typography.fontSize': 'font-size',
+	'elements.caption.color.text': 'color',
 	'elements.heading.color': 'color',
 	'elements.heading.color.background': 'color',
 	'elements.heading.typography.fontFamily': 'font-family',

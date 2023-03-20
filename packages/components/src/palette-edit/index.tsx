@@ -133,7 +133,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 						__nextHasNoMargin
 						__experimentalIsRenderedInSidebar
 						value={ element.gradient }
-						onChange={ ( newGradient: Gradient[ 'gradient' ] ) => {
+						onChange={ ( newGradient ) => {
 							onChange( {
 								...element,
 								gradient: newGradient,

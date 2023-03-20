@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * External dependencies
  */
@@ -16,10 +14,13 @@ import {
 	DIRECTIONAL_ORIENTATION_ANGLE_MAP,
 } from './constants';
 import { serializeGradient } from './serializer';
+import type { ControlPoint } from './types';
 
 extend( [ namesPlugin ] );
 
-export function getLinearGradientRepresentation( gradientAST ) {
+export function getLinearGradientRepresentation(
+	gradientAST: gradientParser.GradientNode
+) {
 	return serializeGradient( {
 		type: 'linear-gradient',
 		orientation: HORIZONTAL_GRADIENT_ORIENTATION,
@@ -27,29 +28,41 @@ export function getLinearGradientRepresentation( gradientAST ) {
 	} );
 }
 
-function hasUnsupportedLength( item ) {
+function hasUnsupportedLength( item: gradientParser.ColorStop ) {
 	return item.length === undefined || item.length.type !== '%';
 }
 
-export function getGradientAstWithDefault( value ) {
+export function getGradientAstWithDefault( value?: string | null ) {
 	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
 	// More information of its structure available at https://www.npmjs.com/package/gradient-parser#ast.
-	let gradientAST;
+	let gradientAST: gradientParser.GradientNode | undefined;
+	let hasGradient = !! value;
+
+	const valueToParse = value ?? DEFAULT_GRADIENT;
 
 	try {
-		gradientAST = gradientParser.parse( value )[ 0 ];
-		gradientAST.value = value;
+		gradientAST = gradientParser.parse( valueToParse )[ 0 ];
 	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'wp.components.CustomGradientPicker failed to parse the gradient with error',
+			error
+		);
+
 		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
-		gradientAST.value = DEFAULT_GRADIENT;
+		hasGradient = false;
 	}
 
-	if ( gradientAST.orientation?.type === 'directional' ) {
-		gradientAST.orientation.type = 'angular';
-		gradientAST.orientation.value =
-			DIRECTIONAL_ORIENTATION_ANGLE_MAP[
+	if (
+		! Array.isArray( gradientAST.orientation ) &&
+		gradientAST.orientation?.type === 'directional'
+	) {
+		gradientAST.orientation = {
+			type: 'angular',
+			value: DIRECTIONAL_ORIENTATION_ANGLE_MAP[
 				gradientAST.orientation.value
-			].toString();
+			].toString(),
+		};
 	}
 
 	if ( gradientAST.colorStops.some( hasUnsupportedLength ) ) {
@@ -57,19 +70,18 @@ export function getGradientAstWithDefault( value ) {
 		const step = 100 / ( colorStops.length - 1 );
 		colorStops.forEach( ( stop, index ) => {
 			stop.length = {
-				value: step * index,
+				value: `${ step * index }`,
 				type: '%',
 			};
 		} );
-		gradientAST.value = serializeGradient( gradientAST );
 	}
 
-	return gradientAST;
+	return { gradientAST, hasGradient };
 }
 
 export function getGradientAstWithControlPoints(
-	gradientAST,
-	newControlPoints
+	gradientAST: gradientParser.GradientNode,
+	newControlPoints: ControlPoint[]
 ) {
 	return {
 		...gradientAST,
@@ -81,13 +93,16 @@ export function getGradientAstWithControlPoints(
 					value: position?.toString(),
 				},
 				type: a < 1 ? 'rgba' : 'rgb',
-				value: a < 1 ? [ r, g, b, a ] : [ r, g, b ],
+				value:
+					a < 1
+						? [ `${ r }`, `${ g }`, `${ b }`, `${ a }` ]
+						: [ `${ r }`, `${ g }`, `${ b }` ],
 			};
 		} ),
-	};
+	} as gradientParser.GradientNode;
 }
 
-export function getStopCssColor( colorStop ) {
+export function getStopCssColor( colorStop: gradientParser.ColorStop ) {
 	switch ( colorStop.type ) {
 		case 'hex':
 			return `#${ colorStop.value }`;

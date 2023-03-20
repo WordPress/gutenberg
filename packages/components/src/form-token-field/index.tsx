@@ -153,7 +153,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function onBlur() {
-		if ( inputHasValidValue() ) {
+		if (
+			inputHasValidValue() &&
+			__experimentalValidateInput( incompleteTokenValue )
+		) {
 			setIsActive( false );
 		} else {
 			// Reset to initial state

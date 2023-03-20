@@ -4,10 +4,14 @@
 import { render, screen } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { Path, SVG } from '@wordpress/primitives';
+
+/**
  * Internal dependencies
  */
-import Icon from '../';
-import { Path, SVG } from '../../';
+import Icon from '..';
 
 describe( 'Icon', () => {
 	const testId = 'icon';
