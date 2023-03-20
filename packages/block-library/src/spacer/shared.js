@@ -9,9 +9,9 @@ const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 export const DEFAULT_VALUES = { px: 100, em: 10, rem: 10, vw: 10, vh: 25 };
 
 /**
- * @param {string} value Current value
+ * @param {string} unit Current unit
  */
-export const useSpacerSettings = ( value ) => {
+export const useSpacerSettings = ( unit ) => {
 	const availableUnitSettings = ( useSetting( 'spacing.units' ) || undefined )
 		// In most contexts the spacer size cannot meaningfully be set to a
 		// percentage, since this is relative to the parent container. This
@@ -26,8 +26,7 @@ export const useSpacerSettings = ( value ) => {
 
 	// Finds the step for the current value’s unit for use as the min value.
 	const min =
-		units.find( ( { value: unit } ) => value.endsWith( unit ) )?.step ??
-		MIN_SPACER_SIZE;
+		units.find( ( { value } ) => value === unit )?.step ?? MIN_SPACER_SIZE;
 
 	return { units, min };
 };

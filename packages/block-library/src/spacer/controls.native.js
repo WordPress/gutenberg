@@ -51,7 +51,7 @@ function Controls( {
 		[ height, width ]
 	);
 
-	const { units, min } = useSpacerSettings( value );
+	const { units, min } = useSpacerSettings( currentUnit );
 
 	return (
 		<>

@@ -18,8 +18,6 @@ import { useSpacerSettings } from './shared';
 function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
 
-	const { units, min } = useSpacerSettings( value );
-
 	const handleOnChange = ( unprocessedValue ) => {
 		onChange( unprocessedValue );
 	};
@@ -32,6 +30,8 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 		isResizing ? 'px' : parsedUnit,
 	].join( '' );
 
+	const { units, min } = useSpacerSettings( parsedUnit );
+
 	return (
 		<UnitControl
 			label={ label }
@@ -39,6 +39,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 			isResetValueOnUnitChange
 			min={ min }
 			onChange={ handleOnChange }
+			on
 			__unstableInputWidth={ '80px' }
 			value={ computedValue }
 			units={ units }
