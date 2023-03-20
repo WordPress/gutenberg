@@ -62,6 +62,15 @@
 		}
 	}
 
+	.page-name {
+		margin: 16px 16px 0;
+		display: inline-block;
+		padding: 4px 8px;
+		color: $gray-700;
+		border-radius: 2px;
+		background-color: $gray-100;
+	}
+
 	[cmdk-item] {
 		content-visibility: auto;
 

@@ -149,6 +149,17 @@ function KeyboardShortcutsRegister() {
 				},
 			} );
 		} );
+
+		// Command center
+		registerShortcut( {
+			name: 'core/command-center',
+			category: 'global',
+			description: __( 'Open the command center' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'k',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;

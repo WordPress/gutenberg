@@ -1,5 +1,12 @@
+/**
+ * External dependencies
+ */
 import React from 'react';
 import { Command } from 'cmdk';
+
+/**
+ * WordPress dependencies
+ */
 import { useState } from '@wordpress/element';
 import { Button, Modal } from '@wordpress/components';
 import {
@@ -9,16 +16,30 @@ import {
 	page as pageIcon,
 	post as postIcon,
 	plus as plusIcon,
+	styles as stylesIcon,
+	close as closeIcon,
+	settings as settingsIcon,
+	commentAuthorAvatar as aiIcon,
 } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useLink } from '../routes/link';
-import { useHistory } from '../routes';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as editSiteStore } from '../../store';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as interfaceStore } from '@wordpress/interface';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
+
+/**
+ * Internal dependencies
+ */
+import { useHistory } from '../routes';
 import { unlock } from '../../private-apis';
+import { STORE_NAME } from '../../store/constants';
+import { store as editSiteStore } from '../../store';
 
 const CommandMenu = () => {
 	const history = useHistory();
@@ -29,11 +50,24 @@ const CommandMenu = () => {
 	const page = pages[ pages.length - 1 ];
 
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { removeBlock, insertBlocks } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const { setTemplate, setCanvasMode } = unlock(
 		useDispatch( editSiteStore )
 	);
+
+	const selectedBlock = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSelectedBlock();
+	}, [] );
+
+	React.useEffect( () => {
+		if ( selectedBlock ) {
+			setPages( [ 'block' ] );
+		}
+	}, [ selectedBlock ] );
+
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	// get pages
 	const { records: pageRecords, isResolving: isLoadingPages } =
@@ -100,22 +134,24 @@ const CommandMenu = () => {
 		}
 	};
 
-	// Toggle the menu when ⌘K is pressed
-	React.useEffect( () => {
-		const down = ( e ) => {
-			if ( e.key === 'k' && e.metaKey ) {
-				setOpen( ( open ) => ! open );
-			}
-		};
+	useShortcut( 'core/command-center', ( event ) => {
+		setSearch( '' );
+		setOpen( ( open ) => ! open );
+	} );
 
-		document.addEventListener( 'keydown', down );
-		return () => document.removeEventListener( 'keydown', down );
-	}, [] );
+	const handleStyleSelect = () => {
+		setOpen( false );
+		setCanvasMode( 'edit' );
+		enableComplementaryArea( STORE_NAME, 'edit-site/global-styles' );
+	};
 
 	return open ? (
 		<Modal className="cmd-modal" onRequestClose={ () => setOpen( false ) }>
 			<div className="wordpress">
 				<Command label="Global Command Menu">
+					{ page === 'block' && (
+						<div className="page-name">{ selectedBlock.name }</div>
+					) }
 					<div className="cmd-header">
 						{ pages.length > 0 && (
 							<Button onClick={ () => setPages( [] ) }>
@@ -133,6 +169,21 @@ const CommandMenu = () => {
 						<Command.Empty>No results found.</Command.Empty>
 						{ ! page && (
 							<>
+								<Command.Item
+									onSelect={ () =>
+										setPages( [ ...pages, 'ai' ] )
+									}
+								>
+									<Icon icon={ aiIcon } size={ 24 } />
+									Ask WordPress AI
+									<div cmdk-linear-shortcuts="">
+										{ [ 'p' ].map( ( key ) => {
+											return (
+												<kbd key={ key }>{ key }</kbd>
+											);
+										} ) }
+									</div>
+								</Command.Item>
 								<Command.Item
 									onSelect={ () =>
 										setPages( [ ...pages, 'pages' ] )
@@ -193,12 +244,35 @@ const CommandMenu = () => {
 										} ) }
 									</div>
 								</Command.Item>
+								<Command.Item onSelect={ handleStyleSelect }>
+									<Icon icon={ stylesIcon } size={ 24 } />
+									Style your site
+								</Command.Item>
+							</>
+						) }
+
+						{ page === 'block' && (
+							<>
 								<Command.Item
-									onSelect={ () =>
-										setPages( [ ...pages, 'teams' ] )
-									}
+									onSelect={ () => {
+										setOpen( false );
+										enableComplementaryArea(
+											STORE_NAME,
+											'edit-site/block-inspector'
+										);
+									} }
 								>
-									Join a team…
+									<Icon icon={ settingsIcon } size={ 24 } />
+									Change block settings
+								</Command.Item>
+								<Command.Item
+									onSelect={ () => {
+										setOpen( false );
+										removeBlock( selectedBlock.clientId );
+									} }
+								>
+									<Icon icon={ closeIcon } size={ 24 } />
+									Delete block
 								</Command.Item>
 							</>
 						) }
@@ -238,11 +312,15 @@ const CommandMenu = () => {
 								) ) }
 							</>
 						) }
-
-						{ page === 'teams' && (
+						{ page === 'ai' && (
 							<>
-								<Command.Item>Team 1</Command.Item>
-								<Command.Item>Team 2</Command.Item>
+								<Command.Item
+									onSelect={ () =>
+										insertBlocks( [ 'core/paragraph' ] )
+									}
+								>
+									Insert a paragraph
+								</Command.Item>
 							</>
 						) }
 					</Command.List>
