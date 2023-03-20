@@ -11,6 +11,8 @@ import PluginArea from '../plugin-area';
 
 describe( 'PluginArea', () => {
 	afterEach( () => {
+		// Unmount components before unregistering the plugins.
+		// RTL uses top-level `afterEach` for cleanup, executed after this teardown.
 		cleanup();
 		getPlugins().forEach( ( plugin ) => {
 			unregisterPlugin( plugin.name );
