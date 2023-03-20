@@ -15,7 +15,7 @@ export type ToolbarItemProps = {
 	as?: ElementType;
 
 	/**
-	 *
+	 * Props to be passed.
 	 */
 	props?: any;
 };
