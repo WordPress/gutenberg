@@ -13,20 +13,19 @@ import { ColorPicker } from '..';
  * on several elements and we'd end up encoding assumptions about order when
  * trying to select the appropriate element. We might as well just use the class name
  * on the container which will be more durable if, for example, the order changes.
- *
- * @param {HTMLElement} container
- * @return {HTMLElement} The saturation element
  */
-function getSaturation( container ) {
+function getSaturation( container: HTMLElement ) {
 	return container.querySelector(
 		'.react-colorful__saturation .react-colorful__interactive'
 	);
 }
 
+type PageXPageY = { pageX: number; pageY: number };
+
 // Fix to pass `pageX` and `pageY`
 // See https://github.com/testing-library/react-testing-library/issues/268
-class FakeMouseEvent extends window.MouseEvent {
-	constructor( type, values = {} ) {
+class FakeMouseEvent extends MouseEvent {
+	constructor( type: MouseEvent[ 'type' ], values: PageXPageY ) {
 		super( type, { buttons: 1, bubbles: true, ...values } );
 
 		Object.assign( this, {
@@ -36,7 +35,11 @@ class FakeMouseEvent extends window.MouseEvent {
 	}
 }
 
-function moveReactColorfulSlider( sliderElement, from, to ) {
+function moveReactColorfulSlider(
+	sliderElement: Element,
+	from: PageXPageY,
+	to: PageXPageY
+) {
 	fireEvent( sliderElement, new FakeMouseEvent( 'mousedown', from ) );
 	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
 }
