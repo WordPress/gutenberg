@@ -86,6 +86,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				description: blockType.description,
 				anchor: attributes?.anchor,
 				positionLabel,
+				positionType: attributes.style?.position?.type,
 			};
 			if ( ! match ) return blockTypeInfo;
 
@@ -96,6 +97,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				description: match.description || blockType.description,
 				anchor: attributes?.anchor,
 				positionLabel,
+				positionType: attributes.style?.position?.type,
 			};
 		},
 		[ clientId ]

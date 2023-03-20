@@ -16,7 +16,6 @@ import { Icon, lockSmall as lock } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -61,14 +60,7 @@ function ListViewBlockSelectButton(
 	} = useSelect( blockEditorStore );
 	const { removeBlocks } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
-	const displayTitle = blockInformation?.positionLabel
-		? sprintf(
-				// translators: 1: Title of block (i.e. Group, Heading, etc), 2: Position of selected block, e.g. "Sticky" or "Fixed".
-				__( '%1$s (%2$s)' ),
-				blockTitle,
-				blockInformation.positionLabel
-		  )
-		: blockTitle;
+	const isSticky = blockInformation?.positionType === 'sticky';
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -151,11 +143,16 @@ function ListViewBlockSelectButton(
 				aria-expanded={ isExpanded }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
-				<BlockIcon
-					icon={ blockInformation?.icon }
-					showColors
-					context="list-view"
-				/>
+				<div className="block-editor-list-view-block-select-button__icon-wrapper">
+					<BlockIcon
+						icon={ blockInformation?.icon }
+						showColors
+						context="list-view"
+					/>
+					{ isSticky && (
+						<div className="block-editor-list-view-block-select-button__sticky-indicator" />
+					) }
+				</div>
 				<HStack
 					alignment="center"
 					className="block-editor-list-view-block-select-button__label-wrapper"
@@ -163,9 +160,7 @@ function ListViewBlockSelectButton(
 					spacing={ 1 }
 				>
 					<span className="block-editor-list-view-block-select-button__title">
-						<Truncate ellipsizeMode="auto">
-							{ displayTitle }
-						</Truncate>
+						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 					</span>
 					{ blockInformation?.anchor && (
 						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
