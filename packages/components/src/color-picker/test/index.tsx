@@ -9,9 +9,9 @@ import { render, fireEvent, waitFor } from '@testing-library/react';
 import { ColorPicker } from '..';
 
 /**
- * Ordinarily we'd try to select the compnoent by role but the silder role appears
+ * Ordinarily we'd try to select the component by role but the slider role appears
  * on several elements and we'd end up encoding assumptions about order when
- * trying to select the appropriate element. We might as well just use the classname
+ * trying to select the appropriate element. We might as well just use the class name
  * on the container which will be more durable if, for example, the order changes.
  *
  * @param {HTMLElement} container
