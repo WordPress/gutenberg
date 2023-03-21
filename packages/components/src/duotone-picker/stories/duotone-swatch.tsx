@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * Internal dependencies
  */
-import { DuotoneSwatch } from '../';
+import { DuotoneSwatch } from '..';
 
-export default {
+const meta: ComponentMeta< typeof DuotoneSwatch > = {
 	title: 'Components/DuotoneSwatch',
 	component: DuotoneSwatch,
 	parameters: {
@@ -11,8 +16,9 @@ export default {
 		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-const Template = ( args ) => {
+const Template: ComponentStory< typeof DuotoneSwatch > = ( args ) => {
 	return <DuotoneSwatch { ...args } />;
 };
 

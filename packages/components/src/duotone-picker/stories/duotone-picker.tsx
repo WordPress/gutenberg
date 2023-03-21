@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,23 +11,22 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { DuotonePicker } from '../';
+import { DuotonePicker } from '..';
+import type { DuotonePickerProps } from '../types';
 
-export default {
+const meta: ComponentMeta< typeof DuotonePicker > = {
 	title: 'Components/DuotonePicker',
 	component: DuotonePicker,
 	argTypes: {
-		clearable: { control: { type: 'boolean' } },
-		disableCustomColors: { control: { type: 'boolean' } },
-		disableCustomDuotone: { control: { type: 'boolean' } },
 		onChange: { action: 'onChange' },
-		unsetable: { control: { type: 'boolean' } },
+		value: { control: { type: null } },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
 const DUOTONE_PALETTE = [
 	{
@@ -44,8 +48,11 @@ const COLOR_PALETTE = [
 	{ color: '#8c00b7', name: 'Purple', slug: 'purple' },
 ];
 
-const Template = ( { onChange, ...args } ) => {
-	const [ value, setValue ] = useState();
+const Template: ComponentStory< typeof DuotonePicker > = ( {
+	onChange,
+	...args
+} ) => {
+	const [ value, setValue ] = useState< DuotonePickerProps[ 'value' ] >();
 
 	return (
 		<DuotonePicker

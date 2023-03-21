@@ -9,8 +9,9 @@ import { swatch } from '@wordpress/icons';
 import ColorIndicator from '../color-indicator';
 import Icon from '../icon';
 import { getGradientFromCSSColors } from './utils';
+import type { DuotoneSwatchProps } from './types';
 
-function DuotoneSwatch( { values } ) {
+function DuotoneSwatch( { values }: DuotoneSwatchProps ) {
 	return values ? (
 		<ColorIndicator
 			colorValue={ getGradientFromCSSColors( values, '135deg' ) }

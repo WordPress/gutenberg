@@ -12,14 +12,48 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ColorListPicker from '../color-list-picker';
+import ColorListPicker from './color-list-picker';
 import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
 
 import CustomDuotoneBar from './custom-duotone-bar';
 import { getDefaultColors, getGradientFromCSSColors } from './utils';
 import { Spacer } from '../spacer';
+import type { DuotonePickerProps } from './types';
 
+/**
+ * ```jsx
+ * import { DuotonePicker, DuotoneSwatch } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const DUOTONE_PALETTE = [
+ * 	{ colors: [ '#8c00b7', '#fcff41' ], name: 'Purple and yellow', slug: 'purple-yellow' },
+ * 	{ colors: [ '#000097', '#ff4747' ], name: 'Blue and red', slug: 'blue-red' },
+ * ];
+ *
+ * const COLOR_PALETTE = [
+ * 	{ color: '#ff4747', name: 'Red', slug: 'red' },
+ * 	{ color: '#fcff41', name: 'Yellow', slug: 'yellow' },
+ * 	{ color: '#000097', name: 'Blue', slug: 'blue' },
+ * 	{ color: '#8c00b7', name: 'Purple', slug: 'purple' },
+ * ];
+ *
+ * const Example = () => {
+ * 	const [ duotone, setDuotone ] = useState( [ '#000000', '#ffffff' ] );
+ * 	return (
+ * 		<>
+ * 			<DuotonePicker
+ * 				duotonePalette={ DUOTONE_PALETTE }
+ * 				colorPalette={ COLOR_PALETTE }
+ * 				value={ duotone }
+ * 				onChange={ setDuotone }
+ * 			/>
+ * 			<DuotoneSwatch values={ duotone } />
+ * 		</>
+ * 	);
+ * };
+ * ```
+ */
 function DuotonePicker( {
 	clearable = true,
 	unsetable = true,
@@ -29,7 +63,7 @@ function DuotonePicker( {
 	disableCustomDuotone,
 	value,
 	onChange,
-} ) {
+}: DuotonePickerProps ) {
 	const [ defaultDark, defaultLight ] = useMemo(
 		() => getDefaultColors( colorPalette ),
 		[ colorPalette ]
@@ -125,6 +159,9 @@ function DuotonePicker( {
 									newColors.length >= 2
 										? newColors
 										: undefined;
+								// @ts-expect-error TODO: The color arrays for a DuotonePicker should be a tuple of two colors,
+								// but it's currently typed as a string[].
+								// See also https://github.com/WordPress/gutenberg/pull/49060#discussion_r1136951035
 								onChange( newValue );
 							} }
 						/>
