@@ -45,11 +45,25 @@ export function getAnimateClassName( options: GetAnimateOptions ) {
 
 	return undefined;
 }
-export default function Animate( {
-	type,
-	options = {},
-	children,
-}: AnimateProps ) {
+
+/**
+ * Simple interface to introduce animations to components.
+ *
+ * ```jsx
+ * import { Animate, Notice } from '@wordpress/components';
+ *
+ * const MyAnimatedNotice = () => (
+ * 	<Animate type="slide-in" options={ { origin: 'top' } }>
+ * 		{ ( { className } ) => (
+ * 			<Notice className={ className } status="success">
+ * 				<p>Animation finished.</p>
+ * 			</Notice>
+ * 		) }
+ * 	</Animate>
+ * );
+ * ```
+ */
+export function Animate( { type, options = {}, children }: AnimateProps ) {
 	return children( {
 		className: getAnimateClassName( {
 			type,
@@ -57,3 +71,5 @@ export default function Animate( {
 		} as GetAnimateOptions ),
 	} );
 }
+
+export default Animate;
