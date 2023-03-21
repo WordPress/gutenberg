@@ -68,7 +68,7 @@ export default {
 
 		if ( minimumColumnWidth ) {
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(${ minimumColumnWidth }, 1fr))`
+				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`
 			);
 		}
 
