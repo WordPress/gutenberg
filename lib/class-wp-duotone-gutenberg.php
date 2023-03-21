@@ -328,7 +328,7 @@ class WP_Duotone_Gutenberg {
 						// render before global styles,
 						// and they should be overriding the duotone
 						// filters set by global styles.
-						'filter' => $declaration_value . ' !important',
+						'filter' => $declaration_value,
 					),
 				),
 			),
