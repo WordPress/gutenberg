@@ -28,8 +28,8 @@ import type {
 // For Multiple Origin Gradients, the `gradients` property is an array of
 // objects, each with a `name` property and an internal `gradients` property,
 // which is the array of Gradient objects.
-const isMultipleOrigin = ( arr: GradientsProp ): arr is OriginObject[] => {
-	return ( arr as any[] ).every( ( obj ) => 'gradients' in obj );
+const isMultipleOrigin = ( arr: any[] ): arr is OriginObject[] => {
+	return arr.every( ( obj ) => 'gradients' in obj );
 };
 
 function SingleOrigin( {
