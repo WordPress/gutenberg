@@ -38,7 +38,7 @@ describe( 'RichText Performance', () => {
 			fireEvent( richTextInput, 'focus' );
 		};
 
-		await measurePerformance( <RichText onChange={ jest.fn() } />, {
+		await measurePerformance( <RichText onFocus={ jest.fn() } />, {
 			scenario,
 		} );
 	} );
@@ -50,7 +50,37 @@ describe( 'RichText Performance', () => {
 			fireEvent( richTextInput, 'focus' );
 		};
 
-		await measurePerformance( <RichText onChange={ jest.fn() } />, {
+		await measurePerformance( <RichText onBlur={ jest.fn() } />, {
+			scenario,
+		} );
+	} );
+
+	it( 'should call onSelectionChange when the selection in the TextInput component changes', async () => {
+		const scenario = async () => {
+			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
+
+			const selection = { start: 2, end: 4 };
+			fireEvent( richTextInput, 'selectionChange', {
+				nativeEvent: { selection },
+			} );
+		};
+
+		await measurePerformance(
+			<RichText onSelectionChange={ jest.fn() } />,
+			{
+				scenario,
+			}
+		);
+	} );
+
+	it( 'should call onKeyPress when a key is pressed while the TextInput component is focused', async () => {
+		const scenario = async () => {
+			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
+
+			fireEvent.changeText( richTextInput, 'abc' );
+		};
+
+		await measurePerformance( <RichText onKeyPress={ jest.fn() } />, {
 			scenario,
 		} );
 	} );
