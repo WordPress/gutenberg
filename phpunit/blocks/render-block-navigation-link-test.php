@@ -9,9 +9,10 @@
 /**
  * Tests for various cases in Navigation Link rendering
  */
-class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
+class Render_Block_Navigation_Link_Test extends WP_UnitTestCase {
 	private static $category;
 	private static $page;
+	private static $private_page;
 	private static $draft;
 	private static $custom_draft;
 	private static $custom_post;
@@ -25,7 +26,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public static function wpSetUpBeforeClass() {
 
-		self::$draft   = self::factory()->post->create_and_get(
+		self::$draft = self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'page',
 				'post_status'  => 'draft',
@@ -35,7 +36,21 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 				'post_excerpt' => 'Ceiling Cat',
 			)
 		);
+
 		self::$pages[] = self::$draft;
+
+		self::$private_page = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'private',
+				'post_name'    => 'privatepost',
+				'post_title'   => 'Private Post',
+				'post_content' => 'Private Post content',
+				'post_excerpt' => 'Excerpt from Private Post',
+			)
+		);
+
+		self::$pages[] = self::$private_page;
 
 		self::$custom_draft = self::factory()->post->create_and_get(
 			array(
@@ -130,6 +145,38 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			) !== false
 		);
 	}
+
+	public function test_returns_link_when_post_is_private() {
+		$page_id = self::$private_page->ID;
+
+		$parsed_blocks = parse_blocks(
+			"<!-- wp:navigation-link {\"label\":\"Private Page Label\",\"type\":\"page\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
+		);
+		$this->assertEquals( 1, count( $parsed_blocks ) );
+
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+
+		$actual = gutenberg_render_block_core_navigation_link(
+			$navigation_link_block->attributes,
+			array(),
+			$navigation_link_block
+		);
+
+		$this->assertNotEmpty( $actual, 'Expected the link to be rendered.' );
+
+		$this->assertStringContainsString(
+			'Private Page Label',
+			$actual,
+			'Expected the link to be rendered with the correct label.'
+		);
+
+		$this->assertStringContainsString(
+			'href="http://localhost:8888/?page_id=' . $page_id . '"',
+			$actual,
+			'Expected the link to be rendered with the correct URL.'
+		);
+	}
+
 
 	public function test_returns_empty_when_label_is_missing() {
 		$page_id = self::$page->ID;
