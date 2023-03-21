@@ -90,7 +90,7 @@ export const Appender = forwardRef(
 					} }
 				/>
 				<div
-					className="offcanvas-editor-appender__description"
+					className="list-view-editor-appender__description"
 					id={ descriptionId }
 				>
 					{ description }
