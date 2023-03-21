@@ -160,7 +160,6 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
 	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
 
-
 	// Don't render the block's subtree if it is a draft or if the ID does not exist.
 	if ( $is_post_type && $navigation_link_has_id ) {
 
