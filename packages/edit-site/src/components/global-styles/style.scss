@@ -50,6 +50,11 @@
 		background: $white linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 		flex-shrink: 0;
 	}
+
+	.color-block-support-panel {
+		padding-left: 0;
+		padding-right: 0;
+	}
 }
 
 .edit-site-global-styles-header__description {
