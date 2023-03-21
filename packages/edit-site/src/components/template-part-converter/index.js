@@ -12,6 +12,7 @@ import {
  */
 import ConvertToRegularBlocks from './convert-to-regular';
 import ConvertToTemplatePart from './convert-to-template-part';
+import { default as ConvertToStickyGroup } from './convert-to-sticky-group';
 
 export default function TemplatePartConverter() {
 	return (
@@ -36,10 +37,16 @@ function TemplatePartConverterMenuItem( { clientIds, onClose } ) {
 	// Allow converting a single template part to standard blocks.
 	if ( blocks.length === 1 && blocks[ 0 ]?.name === 'core/template-part' ) {
 		return (
-			<ConvertToRegularBlocks
-				clientId={ clientIds[ 0 ] }
-				onClose={ onClose }
-			/>
+			<>
+				<ConvertToRegularBlocks
+					clientId={ clientIds[ 0 ] }
+					onClose={ onClose }
+				/>
+				<ConvertToStickyGroup
+					selectedClientIds={ clientIds }
+					onClose={ onClose }
+				/>
+			</>
 		);
 	}
 	return <ConvertToTemplatePart clientIds={ clientIds } blocks={ blocks } />;

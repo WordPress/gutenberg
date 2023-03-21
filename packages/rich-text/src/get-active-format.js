@@ -19,7 +19,7 @@ import { getActiveFormats } from './get-active-formats';
  *                                    type, or undefined.
  */
 export function getActiveFormat( value, formatType ) {
-	return getActiveFormats( value )?.find(
+	return getActiveFormats( value ).find(
 		( { type } ) => type === formatType
 	);
 }
