@@ -62,7 +62,7 @@ export const Appender = forwardRef(
 			return null;
 		}
 
-		const descriptionId = `list-view-editor-appender__${ instanceId }`;
+		const descriptionId = `list-view-appender__${ instanceId }`;
 		const description = sprintf(
 			/* translators: 1: The name of the block. 2: The numerical position of the block. 3: The level of nesting for the block. */
 			__( 'Append to %1$s block at position %2$d, Level %3$d' ),
@@ -72,7 +72,7 @@ export const Appender = forwardRef(
 		);
 
 		return (
-			<div className="list-view-editor-appender">
+			<div className="list-view-appender">
 				<Inserter
 					ref={ ref }
 					rootClientId={ clientId }
@@ -90,7 +90,7 @@ export const Appender = forwardRef(
 					} }
 				/>
 				<div
-					className="list-view-editor-appender__description"
+					className="list-view-appender__description"
 					id={ descriptionId }
 				>
 					{ description }
