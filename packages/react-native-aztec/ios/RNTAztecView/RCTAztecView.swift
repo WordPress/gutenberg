@@ -479,6 +479,7 @@ class RCTAztecView: Aztec.TextView {
             if !(caretEndRect.isInfinite || caretEndRect.isNull) {
                 result["selectionEndCaretX"] = caretEndRect.origin.x
                 result["selectionEndCaretY"] = caretEndRect.origin.y
+                result["selectionEndCaretHeight"] = caretEndRect.size.height
             }
         }
 
