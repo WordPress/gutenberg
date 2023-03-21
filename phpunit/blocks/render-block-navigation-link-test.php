@@ -17,14 +17,12 @@ class Render_Block_Navigation_Link_Test extends WP_UnitTestCase {
 	private static $custom_draft;
 	private static $custom_post;
 
-	private static $pages;
-	private static $terms;
 	/**
 	 * @var array|null
 	 */
 	private $original_block_supports;
 
-	public static function wpSetUpBeforeClass() {
+	public static function set_up_before_class() {
 
 		self::$draft = self::factory()->post->create_and_get(
 			array(
@@ -37,8 +35,6 @@ class Render_Block_Navigation_Link_Test extends WP_UnitTestCase {
 			)
 		);
 
-		self::$pages[] = self::$draft;
-
 		self::$private_page = self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'page',
@@ -50,8 +46,6 @@ class Render_Block_Navigation_Link_Test extends WP_UnitTestCase {
 			)
 		);
 
-		self::$pages[] = self::$private_page;
-
 		self::$custom_draft = self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'cats',
@@ -62,7 +56,6 @@ class Render_Block_Navigation_Link_Test extends WP_UnitTestCase {
 				'post_excerpt' => 'Metal Cat',
 			)
 		);
-		self::$pages[]      = self::$custom_draft;
 
 		self::$custom_post = self::factory()->post->create_and_get(
 			array(
@@ -74,9 +67,8 @@ class Render_Block_Navigation_Link_Test extends WP_UnitTestCase {
 				'post_excerpt' => 'Metal Dog',
 			)
 		);
-		self::$pages[]     = self::$custom_post;
 
-		self::$page    = self::factory()->post->create_and_get(
+		self::$page = self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'page',
 				'post_status'  => 'publish',
@@ -86,7 +78,6 @@ class Render_Block_Navigation_Link_Test extends WP_UnitTestCase {
 				'post_excerpt' => 'Tabby cat',
 			)
 		);
-		self::$pages[] = self::$page;
 
 		self::$category = self::factory()->category->create_and_get(
 			array(
@@ -96,17 +87,6 @@ class Render_Block_Navigation_Link_Test extends WP_UnitTestCase {
 				'description' => 'Cats Category',
 			)
 		);
-
-		self::$terms[] = self::$category;
-	}
-
-	public static function wpTearDownAfterClass() {
-		foreach ( self::$pages as $page_to_delete ) {
-			wp_delete_post( $page_to_delete->ID );
-		}
-		foreach ( self::$terms as $term_to_delete ) {
-			wp_delete_term( $term_to_delete->term_id, $term_to_delete->taxonomy );
-		}
 	}
 
 	public function set_up() {
