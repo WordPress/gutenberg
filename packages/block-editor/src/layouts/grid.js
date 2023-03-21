@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 
 import {
+	BaseControl,
 	Flex,
 	FlexItem,
 	RangeControl,
@@ -135,31 +136,35 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 	};
 
 	return (
-		<Flex>
-			<FlexItem isBlock>
-				<UnitControl
-					label={ __( 'Minimum column width' ) }
-					size={ '__unstable-large' }
-					onChange={ ( newValue ) => {
-						onChange( {
-							...layout,
-							minimumColumnWidth: newValue,
-						} );
-					} }
-					onUnitChange={ handleUnitChange }
-					value={ value }
-					min={ 0 }
-				/>
-			</FlexItem>
-			<FlexItem isBlock>
-				<RangeControl
-					onChange={ handleSliderChange }
-					value={ quantity }
-					min={ 0 }
-					max={ RANGE_CONTROL_MAX_VALUES[ unit ] || 600 }
-					withInputField={ false }
-				/>
-			</FlexItem>
-		</Flex>
+		<fieldset>
+			<BaseControl.VisualLabel as="legend">
+				{ __( 'Minimum column width' ) }
+			</BaseControl.VisualLabel>
+			<Flex>
+				<FlexItem isBlock>
+					<UnitControl
+						size={ '__unstable-large' }
+						onChange={ ( newValue ) => {
+							onChange( {
+								...layout,
+								minimumColumnWidth: newValue,
+							} );
+						} }
+						onUnitChange={ handleUnitChange }
+						value={ value }
+						min={ 0 }
+					/>
+				</FlexItem>
+				<FlexItem isBlock>
+					<RangeControl
+						onChange={ handleSliderChange }
+						value={ quantity }
+						min={ 0 }
+						max={ RANGE_CONTROL_MAX_VALUES[ unit ] || 600 }
+						withInputField={ false }
+					/>
+				</FlexItem>
+			</Flex>
+		</fieldset>
 	);
 }
