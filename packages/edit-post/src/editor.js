@@ -160,10 +160,12 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				presetStyles.push( style );
 			}
 		} );
+
 		const defaultEditorStyles = [
 			...settings.defaultEditorStyles,
 			...presetStyles,
 		];
+
 		return hasThemeStyles && themeStyles.length
 			? settings.styles
 			: defaultEditorStyles;
@@ -186,7 +188,10 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				>
 					<ErrorBoundary>
 						<EditorInitialization postId={ postId } />
-						<Layout styles={ styles } />
+						<Layout
+							styles={ styles }
+							filters={ settings.filters }
+						/>
 					</ErrorBoundary>
 					<PostLockedModal />
 				</ExperimentalEditorProvider>

@@ -83,6 +83,7 @@ function gutenberg_get_block_editor_settings_experimental( $settings ) {
 		}
 	}
 
+	$settings['filters'] = WP_Duotone_Gutenberg::get_footer_assets();
 	return $settings;
 }
 

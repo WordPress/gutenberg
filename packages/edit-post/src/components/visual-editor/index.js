@@ -31,7 +31,7 @@ import {
 	__experimentaluseLayoutStyles as useLayoutStyles,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
-import { Button, __unstableMotion as motion } from '@wordpress/components';
+import { Button, __unstableMotion as motion, SVG } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
@@ -46,9 +46,15 @@ import { store as editPostStore } from '../../store';
 
 const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
 
-function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
+function MaybeIframe( {
+	children,
+	contentRef,
+	shouldIframe,
+	styles,
+	style,
+	filters,
+} ) {
 	const ref = useMouseMoveTypingReset();
-
 	if ( ! shouldIframe ) {
 		return (
 			<>
@@ -74,6 +80,7 @@ function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 			name="editor-canvas"
 		>
 			{ children }
+			<SVG dangerouslySetInnerHTML={ { __html: filters } } />
 		</Iframe>
 	);
 }
@@ -104,7 +111,7 @@ function getPostContentAttributes( blocks ) {
 	}
 }
 
-export default function VisualEditor( { styles } ) {
+export default function VisualEditor( { styles, filters } ) {
 	const {
 		deviceType,
 		isWelcomeGuideVisible,
@@ -364,6 +371,7 @@ export default function VisualEditor( { styles } ) {
 						}
 						contentRef={ contentRef }
 						styles={ styles }
+						filters={ filters }
 					>
 						{ themeSupportsLayout &&
 							! themeHasDisabledLayoutStyles &&

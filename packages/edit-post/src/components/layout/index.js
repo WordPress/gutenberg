@@ -63,7 +63,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Layout( { styles } ) {
+function Layout( { styles, filters } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const isLargeViewport = useViewportMatch( 'large' );
@@ -248,7 +248,10 @@ function Layout( { styles } ) {
 							<TextEditor />
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
-							<VisualEditor styles={ styles } />
+							<VisualEditor
+								styles={ styles }
+								filters={ filters }
+							/>
 						) }
 						{ ! isDistractionFree && ! isTemplateMode && (
 							<div className="edit-post-layout__metaboxes">
