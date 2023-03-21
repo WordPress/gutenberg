@@ -100,6 +100,10 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
+	/**
+	 * @group submenu-color-inheritance
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
 	public function test_should_apply_preset_colors_inherited_from_parent_block_via_context() {
 		$page_id = self::$page->ID;
 
@@ -132,6 +136,10 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @group submenu-color-inheritance
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
 	public function test_should_apply_custom_colors_inherited_from_parent_block_via_context() {
 		$page_id = self::$page->ID;
 
@@ -162,5 +170,47 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 			),
 			'Submenu block colors inherited from context not applied correctly'
 		);
+	}
+
+	/**
+	 * @group submenu-color-inheritance
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_should_not_apply_custom_colors_if_missing_from_context() {
+		$page_id = self::$page->ID;
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation-submenu {"label":"Submenu Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} -->
+            <!-- wp:navigation-link {"label":"Submenu Item Link Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} /-->
+        <!-- /wp:navigation-submenu -->'
+		);
+
+		$this->assertEquals( 1, count( $parsed_blocks ), 'Submenu block not parsable.' );
+
+		$block = $parsed_blocks[0];
+
+		// Intentionally empty - no colors.
+		$context = array();
+
+		$navigation_link_block = new WP_Block( $block, $context );
+
+		$actual = gutenberg_render_block_core_navigation_submenu(
+			$navigation_link_block->attributes,
+			array(),
+			$navigation_link_block
+		);
+
+		$this->assertStringContainsString(
+			'<ul class="wp-block-navigation__submenu-container">',
+			$actual,
+			'Submenu block should not apply colors if missing from context'
+		);
+
+		$this->assertStringNotContainsString(
+			$actual,
+			'has-text-color has-background',
+			'Submenu block should not apply "has-*" color classes if missing from context'
+		);
+
 	}
 }
