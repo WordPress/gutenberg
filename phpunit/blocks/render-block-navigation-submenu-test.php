@@ -85,8 +85,6 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 		self::$terms[] = self::$category;
 	}
 
-
-
 	public function set_up() {
 		parent::set_up();
 
@@ -102,181 +100,35 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
-	public function test_returns_link_when_post_is_published() {
+	public function test_should_apply_colors_inherited_from_parent_block_via_context() {
 		$page_id = self::$page->ID;
 
 		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-submenu {\"label\":\"Sample Page\",\"type\":\"page\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
+			'<!-- wp:navigation-submenu {"label":"Submenu Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} -->
+            <!-- wp:navigation-link {"label":"Submenu Item Link Label","type":"page","id":46,"url":"http://localhost:8888/?page_id=46","kind":"post-type"} /-->
+        <!-- /wp:navigation-submenu -->'
 		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
 
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-		$this->assertEquals(
-			true,
-			strpos(
-				gutenberg_render_block_core_navigation_link(
-					$navigation_link_block->attributes,
-					array(),
-					$navigation_link_block
-				),
-				'Sample Page'
-			) !== false
+		$this->assertEquals( 1, count( $parsed_blocks ), 'Submenu block not parsable.' );
+
+		$block = $parsed_blocks[0];
+
+		// Colors inherited from parent Navigation block.
+		$context = array(
+			'overlayTextColor'       => 'purple',
+			'overlayBackgroundColor' => 'yellow',
 		);
-	}
 
-	public function test_returns_empty_when_label_is_missing() {
-		$page_id = self::$page->ID;
+		$navigation_link_block = new WP_Block( $block, $context );
 
-		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-submenu {\"type\":\"page\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
-		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
-
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-		$this->assertEquals(
-			'',
-			gutenberg_render_block_core_navigation_link(
+		$this->assertStringContainsString(
+			'<ul class="wp-block-navigation__submenu-container has-text-color has-' . $context['overlayTextColor'] . '-color has-background has-' . $context['overlayBackgroundColor'] . '-background-color"></ul>',
+			gutenberg_render_block_core_navigation_submenu(
 				$navigation_link_block->attributes,
 				array(),
 				$navigation_link_block
-			)
-		);
-	}
-
-	public function test_returns_empty_when_draft() {
-		$page_id = self::$draft->ID;
-
-		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-submenu {\"label\":\"Draft Page\",\"type\":\"page\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
-		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
-
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-
-		$this->assertEquals(
-			'',
-			gutenberg_render_block_core_navigation_link(
-				$navigation_link_block->attributes,
-				array(),
-				$navigation_link_block
-			)
-		);
-	}
-
-	public function test_returns_link_for_category() {
-		$category_id = self::$category->term_id;
-
-		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-submenu {\"label\":\"Cats\",\"type\":\"category\",\"id\":{$category_id},\"url\":\"http://localhost:8888/?cat={$category_id}\"} /-->"
-		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
-
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-		$this->assertEquals(
-			true,
-			strpos(
-				gutenberg_render_block_core_navigation_link(
-					$navigation_link_block->attributes,
-					array(),
-					$navigation_link_block
-				),
-				'Cats'
-			) !== false
-		);
-	}
-
-	public function test_returns_link_for_plain_link() {
-		$parsed_blocks = parse_blocks(
-			'<!-- wp:navigation-submenu {"label":"My Website","url":"https://example.com"} /-->'
-		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
-
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-		$this->assertEquals(
-			true,
-			strpos(
-				gutenberg_render_block_core_navigation_link(
-					$navigation_link_block->attributes,
-					array(),
-					$navigation_link_block
-				),
-				'My Website'
-			) !== false
-		);
-	}
-
-	public function test_returns_link_for_decoded_link() {
-
-		$urls_before_render = array(
-			'https://example.com/?id=10&data=lzB%252Fzd%252FZA%253D%253D',
-			'https://example.com/?id=10&data=lzB%2Fzd%FZA%3D%3D',
-			'https://example.com/?id=10&data=1234',
-		);
-
-		$urls_after_render = array(
-			'https://example.com/?id=10&#038;data=lzB%2Fzd%2FZA%3D%3D',
-			'https://example.com/?id=10&#038;data=lzB%2Fzd%FZA%3D%3D',
-			'https://example.com/?id=10&#038;data=1234',
-		);
-
-		foreach ( $urls_before_render as $idx => $link ) {
-				$parsed_blocks = parse_blocks( '<!-- wp:navigation-submenu {"label":"test label", "url": "' . $link . '"} /-->' );
-			$this->assertEquals( 1, count( $parsed_blocks ) );
-				$block             = $parsed_blocks[0];
-			$navigation_link_block = new WP_Block( $block, array() );
-				$this->assertEquals(
-					true,
-					strpos(
-						gutenberg_render_block_core_navigation_link(
-							$navigation_link_block->attributes,
-							array(),
-							$navigation_link_block
-						),
-						$urls_after_render[ $idx ]
-					) !== false
-				);
-		};
-	}
-
-	public function test_returns_empty_when_custom_post_type_draft() {
-		$page_id = self::$custom_draft->ID;
-
-		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-submenu {\"label\":\"Draft Custom Post Type\",\"type\":\"cats\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
-		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
-
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-
-		$this->assertEquals(
-			'',
-			gutenberg_render_block_core_navigation_link(
-				$navigation_link_block->attributes,
-				array(),
-				$navigation_link_block
-			)
-		);
-	}
-
-	public function test_returns_link_when_custom_post_is_published() {
-		$page_id = self::$custom_post->ID;
-
-		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-submenu {\"label\":\"Metal Dogs\",\"type\":\"dogs\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
-		);
-		$this->assertEquals( 1, count( $parsed_blocks ) );
-
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
-		$this->assertEquals(
-			true,
-			strpos(
-				gutenberg_render_block_core_navigation_link(
-					$navigation_link_block->attributes,
-					array(),
-					$navigation_link_block
-				),
-				'Metal Dogs'
-			) !== false
+			),
+			'Submenu block colors inherited from context not applied correctly'
 		);
 	}
 }
