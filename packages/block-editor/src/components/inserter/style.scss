@@ -33,8 +33,6 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__popover.is-quick {
 	.components-popover__content {
-		border: none;
-		outline: none;
 		box-shadow: $shadow-popover;
 
 		.block-editor-inserter__quick-inserter > * {
