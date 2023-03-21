@@ -15,6 +15,7 @@ export const ROOT_BLOCK_SUPPORTS = [
 	'background',
 	'backgroundColor',
 	'color',
+	'filter',
 	'linkColor',
 	'captionColor',
 	'buttonColor',
