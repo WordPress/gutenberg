@@ -22,6 +22,7 @@ import { __ } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { CommandMenu } from '@wordpress/commands';
 
 /**
  * Internal dependencies
@@ -123,6 +124,7 @@ export default function Layout() {
 
 	return (
 		<>
+			<CommandMenu />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
 			{ fullResizer }
