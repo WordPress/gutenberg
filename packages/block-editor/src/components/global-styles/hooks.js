@@ -45,6 +45,7 @@ const VALID_SETTINGS = [
 	'color.background',
 	'color.heading',
 	'color.button',
+	'color.caption',
 	'custom',
 	'dimensions.minHeight',
 	'layout.contentSize',
@@ -274,6 +275,9 @@ export function useSettingsForBlockElement(
 			link:
 				updatedSettings.color?.link &&
 				supportedStyles.includes( 'linkColor' ),
+			caption:
+				updatedSettings.color?.caption &&
+				supportedStyles.includes( 'captionColor' ),
 		};
 
 		[

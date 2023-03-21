@@ -15,6 +15,7 @@
 			"heading": true,
 			"button": true,
 			"text": true,
+			"caption": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,

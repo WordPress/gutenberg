@@ -35,13 +35,15 @@ export function useHasColorPanel( settings ) {
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
 	const hasButtonPanel = useHasHeadingPanel( settings );
+	const hasCaptionPanel = useHasCaptionPanel( settings );
 
 	return (
 		hasTextPanel ||
 		hasBackgroundPanel ||
 		hasLinkPanel ||
 		hasHeadingPanel ||
-		hasButtonPanel
+		hasButtonPanel ||
+		hasCaptionPanel
 	);
 }
 
@@ -57,6 +59,14 @@ export function useHasLinkPanel( settings ) {
 	const colors = useColorsPerOrigin( settings );
 	return (
 		settings?.color?.link &&
+		( colors?.length > 0 || settings?.color?.custom )
+	);
+}
+
+export function useHasCaptionPanel( settings ) {
+	const colors = useColorsPerOrigin( settings );
+	return (
+		settings?.color?.caption &&
 		( colors?.length > 0 || settings?.color?.custom )
 	);
 }
@@ -131,6 +141,7 @@ const DEFAULT_CONTROLS = {
 	link: true,
 	heading: true,
 	button: true,
+	caption: true,
 };
 
 const popoverProps = {
@@ -472,6 +483,11 @@ export default function ColorPanel( {
 			label: __( 'Heading' ),
 			showPanel: useHasHeadingPanel( settings ),
 		},
+		{
+			name: 'caption',
+			label: __( 'Caption' ),
+			showPanel: useHasCaptionPanel( settings ),
+		},
 	];
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
@@ -642,6 +658,8 @@ export default function ColorPanel( {
 				},
 			} );
 		};
+		const supportsTextColor = true;
+		const supportsBackground = name !== 'caption';
 
 		items.push( {
 			key: name,
@@ -649,33 +667,43 @@ export default function ColorPanel( {
 			hasValue: hasElement,
 			resetValue: resetElement,
 			isShownByDefault: defaultControls[ name ],
-			indicators: [
-				elementTextColor,
-				elementBackgroundColor ?? elementGradient,
-			],
+			indicators:
+				supportsTextColor && supportsBackground
+					? [
+							elementTextColor,
+							elementBackgroundColor ?? elementGradient,
+					  ]
+					: [
+							supportsTextColor
+								? elementTextColor
+								: elementBackgroundColor ?? elementGradient,
+					  ],
 			tabs: [
-				hasSolidColors && {
-					key: 'text',
-					label: __( 'Text' ),
-					inheritedValue: elementTextColor,
-					setValue: setElementTextColor,
-					userValue: elementTextUserColor,
-				},
-				hasSolidColors && {
-					key: 'background',
-					label: __( 'Background' ),
-					inheritedValue: elementBackgroundColor,
-					setValue: setElementBackgroundColor,
-					userValue: elementBackgroundUserColor,
-				},
-				hasGradientColors && {
-					key: 'gradient',
-					label: __( 'Gradient' ),
-					inheritedValue: elementGradient,
-					setValue: setElementGradient,
-					userValue: elementGradientUserColor,
-					isGradient: true,
-				},
+				hasSolidColors &&
+					supportsTextColor && {
+						key: 'text',
+						label: __( 'Text' ),
+						inheritedValue: elementTextColor,
+						setValue: setElementTextColor,
+						userValue: elementTextUserColor,
+					},
+				hasSolidColors &&
+					supportsBackground && {
+						key: 'background',
+						label: __( 'Background' ),
+						inheritedValue: elementBackgroundColor,
+						setValue: setElementBackgroundColor,
+						userValue: elementBackgroundUserColor,
+					},
+				hasGradientColors &&
+					supportsBackground && {
+						key: 'gradient',
+						label: __( 'Gradient' ),
+						inheritedValue: elementGradient,
+						setValue: setElementGradient,
+						userValue: elementGradientUserColor,
+						isGradient: true,
+					},
 			].filter( Boolean ),
 		} );
 	} );
