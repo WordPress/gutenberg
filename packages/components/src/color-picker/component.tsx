@@ -32,17 +32,9 @@ import { ColorInput } from './color-input';
 import { Picker } from './picker';
 import { useControlledValue } from '../utils/hooks';
 
-import type { ColorType } from './types';
+import type { ColorPickerProps, ColorType } from './types';
 
 extend( [ namesPlugin ] );
-
-export interface ColorPickerProps {
-	enableAlpha?: boolean;
-	color?: string;
-	onChange?: ( color: string ) => void;
-	defaultValue?: string;
-	copyFormat?: ColorType;
-}
 
 const options = [
 	{ label: 'RGB', value: 'rgb' as const },
