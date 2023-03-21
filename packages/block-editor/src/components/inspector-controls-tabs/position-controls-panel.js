@@ -6,7 +6,7 @@ import {
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useLayoutEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -29,7 +29,7 @@ const PositionControlsPanel = () => {
 		};
 	}, [] );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		// If any selected block has a position set, open the panel by default.
 		// The first block's value will still be used within the control though.
 		if ( initialOpen === undefined ) {
