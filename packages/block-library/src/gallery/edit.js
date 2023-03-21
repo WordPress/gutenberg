@@ -562,6 +562,7 @@ function GalleryEdit( props ) {
 							max={ Math.min( MAX_COLUMNS, images.length ) }
 							{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 							required
+							size="__unstable-large"
 						/>
 					) }
 					<ToggleControl
@@ -578,6 +579,7 @@ function GalleryEdit( props ) {
 						onChange={ setLinkTo }
 						options={ linkOptions }
 						hideCancelButton={ true }
+						size="__unstable-large"
 					/>
 					{ hasLinkTo && (
 						<ToggleControl
@@ -598,6 +600,7 @@ function GalleryEdit( props ) {
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
 							hideCancelButton={ true }
+							size="__unstable-large"
 						/>
 					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (

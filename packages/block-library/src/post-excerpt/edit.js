@@ -156,7 +156,10 @@ export default function PostExcerptEditor( {
 			.split( '', excerptLength + numberOfSpaces )
 			.join( '' );
 	} else if ( wordCountType === 'characters_including_spaces' ) {
-		trimmedExcerpt = rawOrRenderedExcerpt.trim().split( '', excerptLength );
+		trimmedExcerpt = rawOrRenderedExcerpt
+			.trim()
+			.split( '', excerptLength )
+			.join( '' );
 	}
 
 	trimmedExcerpt = trimmedExcerpt + '...';

@@ -71,7 +71,7 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
     }
 
     /// Called when Gutenberg Web editor is loaded in the web view.
-    /// If overriden, is required to call super.onGutenbergReady()
+    /// If overridden, is required to call super.onGutenbergReady()
     open func onGutenbergReady() {
         onGutenbergReadyScripts().forEach(evaluateJavascript)
         evaluateJavascript(jsInjection.preventAutosavesScript)
