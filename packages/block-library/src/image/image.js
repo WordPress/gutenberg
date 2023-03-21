@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, isEmpty, map, pick } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,7 +28,6 @@ import {
 	store as blockEditorStore,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
-	__experimentalImageEditingProvider as ImageEditingProvider,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
@@ -125,33 +124,30 @@ export default function Image( {
 		},
 		[ id, isSelected, clientId ]
 	);
-	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					getSettings,
-					canInsertBlockType,
-				} = select( blockEditorStore );
+	const { canInsertCover, imageEditing, imageSizes, mediaUpload } = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getSettings, canInsertBlockType } =
+				select( blockEditorStore );
 
-				const rootClientId = getBlockRootClientId( clientId );
-				const settings = pick( getSettings(), [
-					'imageEditing',
-					'imageSizes',
-					'maxWidth',
-					'mediaUpload',
-				] );
+			const rootClientId = getBlockRootClientId( clientId );
+			const settings = Object.fromEntries(
+				Object.entries( getSettings() ).filter( ( [ key ] ) =>
+					[ 'imageEditing', 'imageSizes', 'mediaUpload' ].includes(
+						key
+					)
+				)
+			);
 
-				return {
-					...settings,
-					canInsertCover: canInsertBlockType(
-						'core/cover',
-						rootClientId
-					),
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				...settings,
+				canInsertCover: canInsertBlockType(
+					'core/cover',
+					rootClientId
+				),
+			};
+		},
+		[ clientId ]
+	);
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
@@ -168,12 +164,11 @@ export default function Image( {
 		allowResize &&
 		! isContentLocked &&
 		! ( isWideAligned && isLargeViewport );
-	const imageSizeOptions = map(
-		filter( imageSizes, ( { slug } ) =>
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
-		),
-		( { name, slug } ) => ( { value: slug, label: name } )
-	);
+		)
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -409,6 +404,7 @@ export default function Image( {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ ! multiImageSelection && (
 						<TextareaControl
+							__nextHasNoMarginBottom
 							label={ __( 'Alt text (alternative text)' ) }
 							value={ alt }
 							onChange={ updateAlt }
@@ -441,6 +437,7 @@ export default function Image( {
 			</InspectorControls>
 			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
@@ -520,13 +517,20 @@ export default function Image( {
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
-				borderProps={ isRounded ? undefined : borderProps }
+				id={ id }
 				url={ url }
 				width={ width }
 				height={ height }
 				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
+				onSaveImage={ ( imageAttributes ) =>
+					setAttributes( imageAttributes )
+				}
+				onFinishEditing={ () => {
+					setIsEditingImage( false );
+				} }
+				borderProps={ isRounded ? undefined : borderProps }
 			/>
 		);
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
@@ -544,13 +548,9 @@ export default function Image( {
 		// With the current implementation of ResizableBox, an image needs an
 		// explicit pixel value for the max-width. In absence of being able to
 		// set the content-width, this max-width is currently dictated by the
-		// vanilla editor style. The following variable adds a buffer to this
-		// vanilla style, so 3rd party themes have some wiggleroom. This does,
-		// in most cases, allow you to scale the image beyond the width of the
-		// main column, though not infinitely.
-		// @todo It would be good to revisit this once a content-width variable
-		// becomes available.
-		const maxWidthBuffer = maxWidth * 2.5;
+		// vanilla editor style. We'll use the clientWidth here, to prevent the width
+		// of the image growing larger than the width of the block column.
+		const maxWidthBuffer = clientWidth;
 
 		let showRightHandle = false;
 		let showLeftHandle = false;
@@ -607,6 +607,7 @@ export default function Image( {
 						height: parseInt( currentHeight + delta.height, 10 ),
 					} );
 				} }
+				resizeRatio={ align === 'center' ? 2 : 1 }
 			>
 				{ img }
 			</ResizableBox>
@@ -614,18 +615,7 @@ export default function Image( {
 	}
 
 	return (
-		<ImageEditingProvider
-			id={ id }
-			url={ url }
-			naturalWidth={ naturalWidth }
-			naturalHeight={ naturalHeight }
-			clientWidth={ clientWidth }
-			onSaveImage={ ( imageAttributes ) =>
-				setAttributes( imageAttributes )
-			}
-			isEditing={ isEditingImage }
-			onFinishEditing={ () => setIsEditingImage( false ) }
-		>
+		<>
 			{ /* Hide controls during upload to avoid component remount,
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
@@ -633,6 +623,7 @@ export default function Image( {
 			{ showCaption &&
 				( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
+						identifier="caption"
 						className={ __experimentalGetElementClassName(
 							'caption'
 						) }
@@ -652,6 +643,6 @@ export default function Image( {
 						}
 					/>
 				) }
-		</ImageEditingProvider>
+		</>
 	);
 }

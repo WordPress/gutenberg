@@ -51,7 +51,7 @@ function ToolSelector( props, ref ) {
 					label={ __( 'Tools' ) }
 				/>
 			) }
-			position="bottom right"
+			popoverProps={ { placement: 'bottom-start' } }
 			renderContent={ () => (
 				<>
 					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>

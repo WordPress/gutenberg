@@ -14,6 +14,8 @@ import { Component } from '@wordpress/element';
  */
 import withFocusOutside from '../';
 
+jest.useFakeTimers();
+
 let onFocusOutside;
 
 describe( 'withFocusOutside', () => {

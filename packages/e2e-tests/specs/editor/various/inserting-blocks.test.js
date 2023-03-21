@@ -318,7 +318,7 @@ describe( 'Inserting blocks', () => {
 		);
 		await browseAll.click();
 		const availableBlocks = await page.$$(
-			'.block-editor-block-types-list__list-item'
+			'.edit-post-editor__inserter-panel .block-editor-block-types-list__list-item'
 		);
 		expect( availableBlocks ).toHaveLength( 1 );
 	} );

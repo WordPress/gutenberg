@@ -150,12 +150,10 @@ function TreeGrid(
 							event.preventDefault();
 							return;
 						}
-						// If a row is focused, and it is expanded, focuses the rightmost cell in the row.
+						// If a row is focused, and it is expanded, focuses the next cell in the row.
 						const focusableItems = getRowFocusables( activeRow );
 						if ( focusableItems.length > 0 ) {
-							focusableItems[
-								focusableItems.length - 1
-							]?.focus();
+							focusableItems[ nextIndex ]?.focus();
 						}
 					}
 					// Prevent key use for anything else. For example, Voiceover

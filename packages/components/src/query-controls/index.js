@@ -35,6 +35,7 @@ export default function QueryControls( {
 	return [
 		onOrderChange && onOrderByChange && (
 			<SelectControl
+				__nextHasNoMarginBottom
 				key="query-controls-order-select"
 				label={ __( 'Order by' ) }
 				value={ `${ orderBy }/${ order }` }
@@ -107,6 +108,7 @@ export default function QueryControls( {
 		),
 		onNumberOfItemsChange && (
 			<RangeControl
+				__nextHasNoMarginBottom
 				key="query-controls-range-control"
 				label={ __( 'Number of items' ) }
 				value={ numberOfItems }

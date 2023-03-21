@@ -56,86 +56,36 @@ function gutenberg_add_global_styles_for_blocks() {
 }
 
 /**
- * Returns the stylesheet resulting of merging core, theme, and user data.
+ * Repeated logic from `get_default_block_editor_settings` function. When implemented into core,
+ * remove logic from `get_default_block_editor_settings` and simple call this function instead.
  *
- * @param array $types Types of styles to load. Optional.
- *                     It accepts 'variables', 'styles', 'presets' as values.
- *                     If empty, it'll load all for themes with theme.json support
- *                     and only [ 'variables', 'presets' ] for themes without theme.json support.
- *
- * @return string Stylesheet.
+ * @return array
  */
-function gutenberg_get_global_stylesheet( $types = array() ) {
-	// Return cached value if it can be used and exists.
-	// It's cached by theme to make sure that theme switching clears the cache.
-	$can_use_cached = (
-		( empty( $types ) ) &&
-		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
-		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
-		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
-		! is_admin()
+function gutenberg_get_legacy_theme_supports_for_theme_json() {
+	$theme_settings = array(
+		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
+		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
+		'disableCustomGradients' => get_theme_support( 'disable-custom-gradients' ),
+		'enableCustomLineHeight' => get_theme_support( 'custom-line-height' ),
+		'enableCustomSpacing'    => get_theme_support( 'custom-spacing' ),
+		'enableCustomUnits'      => get_theme_support( 'custom-units' ),
 	);
-	$transient_name = 'gutenberg_global_styles_' . get_stylesheet();
-	if ( $can_use_cached ) {
-		$cached = get_transient( $transient_name );
-		if ( $cached ) {
-			return $cached;
-		}
-	}
-	$tree                = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
-	$supports_theme_json = wp_theme_has_theme_json();
-	if ( empty( $types ) && ! $supports_theme_json ) {
-		$types = array( 'variables', 'presets', 'base-layout-styles' );
-	} elseif ( empty( $types ) ) {
-		$types = array( 'variables', 'styles', 'presets' );
+
+	// Theme settings.
+	$color_palette = current( (array) get_theme_support( 'editor-color-palette' ) );
+	if ( false !== $color_palette ) {
+		$theme_settings['colors'] = $color_palette;
 	}
 
-	/*
-	 * If variables are part of the stylesheet,
-	 * we add them.
-	 *
-	 * This is so themes without a theme.json still work as before 5.9:
-	 * they can override the default presets.
-	 * See https://core.trac.wordpress.org/ticket/54782
-	 */
-	$styles_variables = '';
-	if ( in_array( 'variables', $types, true ) ) {
-		/*
-		 * We only use the default, theme, and custom origins.
-		 * This is because styles for blocks origin are added
-		 * at a later phase (render cycle) so we only render the ones in use.
-		 * @see wp_add_global_styles_for_blocks
-		 */
-		$origins          = array( 'default', 'theme', 'custom' );
-		$styles_variables = $tree->get_stylesheet( array( 'variables' ), $origins );
-		$types            = array_diff( $types, array( 'variables' ) );
+	$font_sizes = current( (array) get_theme_support( 'editor-font-sizes' ) );
+	if ( false !== $font_sizes ) {
+		$theme_settings['fontSizes'] = $font_sizes;
 	}
 
-	/*
-	 * For the remaining types (presets, styles), we do consider origins:
-	 *
-	 * - themes without theme.json: only the classes for the presets defined by core
-	 * - themes with theme.json: the presets and styles classes, both from core and the theme
-	 */
-	$styles_rest = '';
-	if ( ! empty( $types ) ) {
-		/*
-		 * We only use the default, theme, and custom origins.
-		 * This is because styles for blocks origin are added
-		 * at a later phase (render cycle) so we only render the ones in use.
-		 * @see wp_add_global_styles_for_blocks
-		 */
-		$origins = array( 'default', 'theme', 'custom' );
-		if ( ! $supports_theme_json ) {
-			$origins = array( 'default' );
-		}
-		$styles_rest = $tree->get_stylesheet( $types, $origins );
+	$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );
+	if ( false !== $gradient_presets ) {
+		$theme_settings['gradients'] = $gradient_presets;
 	}
-	$stylesheet = $styles_variables . $styles_rest;
-	if ( $can_use_cached ) {
-		// Cache for a minute.
-		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
-		set_transient( $transient_name, $stylesheet, MINUTE_IN_SECONDS );
-	}
-	return $stylesheet;
+
+	return $theme_settings;
 }

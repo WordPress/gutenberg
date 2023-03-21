@@ -5,7 +5,11 @@ import {
 	useMergeRefs,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
-import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
+import {
+	__experimentalTreeGrid as TreeGrid,
+	__experimentalTreeGridRow as TreeGridRow,
+	__experimentalTreeGridCell as TreeGridCell,
+} from '@wordpress/components';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import {
 	useCallback,
@@ -55,7 +59,8 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {Array}   props.blocks              Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {boolean} props.showBlockMovers     Flag to enable block movers
  * @param {boolean} props.isExpanded          Flag to determine whether nested levels are expanded by default.
- * @param {boolean} props.selectBlockInCanvas Flag to determine whether the list view should be a block selection mechanism,.
+ * @param {boolean} props.selectBlockInCanvas Flag to determine whether the list view should be a block selection mechanism.
+ * @param {Object}  props.LeafMoreMenu        Optional more menu substitution.
  * @param {Object}  ref                       Forwarded ref
  */
 function __ExperimentalOffCanvasEditor(
@@ -65,6 +70,7 @@ function __ExperimentalOffCanvasEditor(
 		showBlockMovers = false,
 		isExpanded = false,
 		selectBlockInCanvas = true,
+		LeafMoreMenu,
 	},
 	ref
 ) {
@@ -104,9 +110,9 @@ function __ExperimentalOffCanvasEditor(
 		setExpandedState,
 	} );
 	const selectEditorBlock = useCallback(
-		( event, clientId ) => {
-			updateBlockSelection( event, clientId );
-			setSelectedTreeId( clientId );
+		( event, blockClientId ) => {
+			updateBlockSelection( event, blockClientId );
+			setSelectedTreeId( blockClientId );
 		},
 		[ setSelectedTreeId, updateBlockSelection ]
 	);
@@ -128,20 +134,26 @@ function __ExperimentalOffCanvasEditor(
 	);
 
 	const expand = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( blockClientId ) => {
+			if ( ! blockClientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
+			setExpandedState( {
+				type: 'expand',
+				clientIds: [ blockClientId ],
+			} );
 		},
 		[ setExpandedState ]
 	);
 	const collapse = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( blockClientId ) => {
+			if ( ! blockClientId ) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientIds: [ clientId ] } );
+			setExpandedState( {
+				type: 'collapse',
+				clientIds: [ blockClientId ],
+			} );
 		},
 		[ setExpandedState ]
 	);
@@ -177,8 +189,16 @@ function __ExperimentalOffCanvasEditor(
 			expandedState,
 			expand,
 			collapse,
+			LeafMoreMenu,
 		} ),
-		[ isMounted.current, draggedClientIds, expandedState, expand, collapse ]
+		[
+			isMounted.current,
+			draggedClientIds,
+			expandedState,
+			expand,
+			collapse,
+			LeafMoreMenu,
+		]
 	);
 
 	return (
@@ -187,30 +207,49 @@ function __ExperimentalOffCanvasEditor(
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
 			/>
-			<TreeGrid
-				id={ id }
-				className="block-editor-list-view-tree"
-				aria-label={ __( 'Block navigation structure' ) }
-				ref={ treeGridRef }
-				onCollapseRow={ collapseRow }
-				onExpandRow={ expandRow }
-				onFocusRow={ focusRow }
-				applicationAriaLabel={ __( 'Block navigation structure' ) }
-			>
-				<ListViewContext.Provider value={ contextValue }>
-					<ListViewBranch
-						blocks={ clientIdsTree }
-						selectBlock={ selectEditorBlock }
-						showBlockMovers={ showBlockMovers }
-						fixedListWindow={ fixedListWindow }
-						selectedClientIds={ selectedClientIds }
-						isExpanded={ isExpanded }
-						shouldShowInnerBlocks={ shouldShowInnerBlocks }
-						selectBlockInCanvas={ selectBlockInCanvas }
-					/>
-				</ListViewContext.Provider>
-			</TreeGrid>
+			<div className="offcanvas-editor-list-view-tree-wrapper">
+				<TreeGrid
+					id={ id }
+					className="block-editor-list-view-tree"
+					aria-label={ __( 'Block navigation structure' ) }
+					ref={ treeGridRef }
+					onCollapseRow={ collapseRow }
+					onExpandRow={ expandRow }
+					onFocusRow={ focusRow }
+					applicationAriaLabel={ __( 'Block navigation structure' ) }
+				>
+					<ListViewContext.Provider value={ contextValue }>
+						<ListViewBranch
+							blocks={ clientIdsTree }
+							selectBlock={ selectEditorBlock }
+							showBlockMovers={ showBlockMovers }
+							fixedListWindow={ fixedListWindow }
+							selectedClientIds={ selectedClientIds }
+							isExpanded={ isExpanded }
+							shouldShowInnerBlocks={ shouldShowInnerBlocks }
+							selectBlockInCanvas={ selectBlockInCanvas }
+						/>
+						<TreeGridRow
+							level={ 1 }
+							setSize={ 1 }
+							positionInSet={ 1 }
+							isExpanded={ true }
+						>
+							{ ! clientIdsTree.length && (
+								<TreeGridCell withoutGridItem>
+									<div className="offcanvas-editor-list-view-is-empty">
+										{ __(
+											'Your menu is currently empty. Add your first menu item to get started.'
+										) }
+									</div>
+								</TreeGridCell>
+							) }
+						</TreeGridRow>
+					</ListViewContext.Provider>
+				</TreeGrid>
+			</div>
 		</AsyncModeProvider>
 	);
 }
+
 export default forwardRef( __ExperimentalOffCanvasEditor );

@@ -37,7 +37,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
-  height: 100%;
   box-sizing: border-box;
   position: relative;
   border-radius: 2px;
@@ -175,7 +174,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #757575;
+  border-color: #949494;
   border-style: solid;
   border-width: 1px;
   padding-left: 2px;
@@ -309,7 +308,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
-  height: 100%;
   box-sizing: border-box;
   position: relative;
   border-radius: 2px;
@@ -447,7 +445,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #757575;
+  border-color: #949494;
   border-style: solid;
   border-width: 1px;
   padding-left: 2px;
@@ -591,7 +589,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
-  height: 100%;
   box-sizing: border-box;
   position: relative;
   border-radius: 2px;
@@ -729,7 +726,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #757575;
+  border-color: #949494;
   border-style: solid;
   border-width: 1px;
   padding-left: 2px;
@@ -885,7 +882,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
-  height: 100%;
   box-sizing: border-box;
   position: relative;
   border-radius: 2px;
@@ -1023,7 +1019,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #757575;
+  border-color: #949494;
   border-style: solid;
   border-width: 1px;
   padding-left: 2px;

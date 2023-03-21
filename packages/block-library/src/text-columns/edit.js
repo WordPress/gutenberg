@@ -39,6 +39,7 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>

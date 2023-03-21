@@ -17,13 +17,13 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
-export { __unstableMotion } from './animation';
+export { __unstableMotion, __unstableAnimatePresence } from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
 	useAutocompleteProps as __unstableUseAutocompleteProps,
 } from './autocomplete';
-export { default as BaseControl } from './base-control';
+export { default as BaseControl, useBaseControlProps } from './base-control';
 export {
 	BorderBoxControl as __experimentalBorderBoxControl,
 	hasSplitBorders as __experimentalHasSplitBorders,
@@ -148,7 +148,6 @@ export { Text as __experimentalText } from './text';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as TextHighlight } from './text-highlight';
-export { default as __experimentalTheme } from './theme';
 export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export {
@@ -156,12 +155,14 @@ export {
 	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
 	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
 } from './toggle-group-control';
-export { default as Toolbar } from './toolbar';
-export { default as ToolbarButton } from './toolbar-button';
-export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
-export { default as __experimentalToolbarContext } from './toolbar-context';
-export { default as ToolbarGroup } from './toolbar-group';
-export { default as ToolbarItem } from './toolbar-item';
+export {
+	Toolbar,
+	ToolbarButton,
+	ToolbarContext as __experimentalToolbarContext,
+	ToolbarDropdownMenu,
+	ToolbarGroup,
+	ToolbarItem,
+} from './toolbar';
 export {
 	ToolsPanel as __experimentalToolsPanel,
 	ToolsPanelItem as __experimentalToolsPanelItem,

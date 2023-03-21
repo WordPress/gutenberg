@@ -2,48 +2,52 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalColorGradientControl as ColorGradientControl } from '@wordpress/block-editor';
+import {
+	__experimentalColorGradientControl as ColorGradientControl,
+	experiments as blockEditorExperiments,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import {
-	getSupportedGlobalStylesPanels,
-	useSetting,
-	useStyle,
-	useColorsPerOrigin,
-} from './hooks';
+import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
+import { unlock } from '../../experiments';
 
-function ScreenButtonColor( { name } ) {
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
+
+function ScreenButtonColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useSetting( 'color.palette', name );
-	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
+	const [ solids ] = useGlobalSetting( 'color.palette', name );
+	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 
 	const colorsPerOrigin = useColorsPerOrigin( name );
 
-	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
+	const [ isBackgroundEnabled ] = useGlobalSetting(
+		'color.background',
+		name
+	);
 
 	const hasButtonColor =
 		supports.includes( 'buttonColor' ) &&
 		isBackgroundEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled );
 
-	const [ buttonTextColor, setButtonTextColor ] = useStyle(
-		'elements.button.color.text',
+	const [ buttonTextColor, setButtonTextColor ] = useGlobalStyle(
+		variationPath + 'elements.button.color.text',
 		name
 	);
-	const [ userButtonTextColor ] = useStyle(
+	const [ userButtonTextColor ] = useGlobalStyle(
 		'elements.button.color.text',
 		name,
 		'user'
 	);
 
-	const [ buttonBgColor, setButtonBgColor ] = useStyle(
+	const [ buttonBgColor, setButtonBgColor ] = useGlobalStyle(
 		'elements.button.color.background',
 		name
 	);
-	const [ userButtonBgColor ] = useStyle(
+	const [ userButtonBgColor ] = useGlobalStyle(
 		'elements.button.color.background',
 		name,
 		'user'
@@ -70,7 +74,6 @@ function ScreenButtonColor( { name } ) {
 				className="edit-site-screen-button-color__control"
 				colors={ colorsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
-				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar
@@ -87,7 +90,6 @@ function ScreenButtonColor( { name } ) {
 				className="edit-site-screen-button-color__control"
 				colors={ colorsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
-				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar

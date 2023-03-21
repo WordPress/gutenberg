@@ -141,6 +141,7 @@ export default function TemplatePartEdit( {
 					isEntityAvailable={ isEntityAvailable }
 					templatePartId={ templatePartId }
 					defaultWrapper={ areaObject.tagName }
+					hasInnerBlocks={ innerBlocks.length > 0 }
 				/>
 				{ isPlaceholder && (
 					<TagName { ...blockProps }>

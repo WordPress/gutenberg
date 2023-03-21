@@ -33,6 +33,8 @@ public enum Capabilities: String {
     case loomEmbed
     case smartframeEmbed
     case shouldUseFastImage
+    case supportSection
+    case onlyCoreBlocks
 }
 
 /// Wrapper for single block data

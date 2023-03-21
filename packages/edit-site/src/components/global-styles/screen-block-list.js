@@ -21,6 +21,7 @@ import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
+import { useHasVariationsPanel } from './variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
 
@@ -53,8 +54,12 @@ function BlockMenuItem( { block } ) {
 	const hasBorderPanel = useHasBorderPanel( block.name );
 	const hasDimensionsPanel = useHasDimensionsPanel( block.name );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
+	const hasVariationsPanel = useHasVariationsPanel( block.name );
 	const hasBlockMenuItem =
-		hasTypographyPanel || hasColorPanel || hasLayoutPanel;
+		hasTypographyPanel ||
+		hasColorPanel ||
+		hasLayoutPanel ||
+		hasVariationsPanel;
 
 	if ( ! hasBlockMenuItem ) {
 		return null;
@@ -68,7 +73,7 @@ function BlockMenuItem( { block } ) {
 
 	return (
 		<NavigationButtonAsItem
-			path={ '/blocks/' + block.name }
+			path={ '/blocks/' + encodeURIComponent( block.name ) }
 			aria-label={ navigationButtonLabel }
 		>
 			<HStack justify="flex-start">
@@ -129,6 +134,7 @@ function ScreenBlockList() {
 				) }
 			/>
 			<SearchControl
+				__nextHasNoMarginBottom
 				className="edit-site-block-types-search"
 				onChange={ setFilterValue }
 				value={ filterValue }

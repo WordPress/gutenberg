@@ -76,24 +76,23 @@
 }
 
 .edit-post-editor__list-view-overview {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-10;
+	border-bottom: $border-width solid $gray-300;
+	padding: $grid-unit-20;
+
 	& > div > span:first-child {
 		// Width of the text information fields.
 		width: 90px;
 		display: inline-block;
 	}
-	border-top: $border-width solid $gray-300;
-	width: calc(100% - #{ $grid-unit-40 });
-	padding: $grid-unit-20;
-	& > div {
-		padding: 0 0 $grid-unit-10;
-		& > span {
-			font-size: $helptext-font-size;
-			line-height: $default-line-height;
-			color: $gray-700;
-		}
+
+	& > div > span {
+		font-size: $helptext-font-size;
+		line-height: $default-line-height;
+		color: $gray-700;
 	}
-	// Height of the overview container.
-	height: 72px;
 }
 
 .edit-post-editor__list-view-container {

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { createBlobURL } from '@wordpress/blob';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 
 export function getPasteEventData( { clipboardData } ) {
@@ -25,21 +24,16 @@ export function getPasteEventData( { clipboardData } ) {
 		}
 	}
 
-	const files = getFilesFromDataTransfer( clipboardData ).filter(
-		( { type } ) => /^image\/(?:jpe?g|png|gif|webp)$/.test( type )
-	);
+	const files = getFilesFromDataTransfer( clipboardData );
 
 	if (
 		files.length &&
 		! shouldDismissPastedFiles( files, html, plainText )
 	) {
-		html = files
-			.map( ( file ) => `<img src="${ createBlobURL( file ) }">` )
-			.join( '' );
-		plainText = '';
+		return { files };
 	}
 
-	return { html, plainText };
+	return { html, plainText, files: [] };
 }
 
 /**

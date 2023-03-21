@@ -52,6 +52,7 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-zoomed-out-view',
 		)
 	);
+
 	add_settings_field(
 		'gutenberg-off-canvas-navigation-editor',
 		__( 'Off canvas navigation editor ', 'gutenberg' ),
@@ -63,6 +64,7 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-off-canvas-navigation-editor',
 		)
 	);
+
 	add_settings_field(
 		'gutenberg-color-randomizer',
 		__( 'Color randomizer ', 'gutenberg' ),
@@ -112,22 +114,3 @@ function gutenberg_display_experiment_section() {
 
 	<?php
 }
-
-/**
- * Extends default editor settings with experiments settings.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_experiments_editor_settings( $settings ) {
-	// The refactored gallery currently can't be run on sites with use_balanceTags option set.
-	// This bypass needs to remain in place until this is resolved and a patch released.
-	// https://core.trac.wordpress.org/ticket/54130.
-	$experiments_settings = array(
-		'__unstableGalleryWithImageBlocks' => (int) get_option( 'use_balanceTags' ) !== 1 || is_wp_version_compatible( '5.9' ),
-	);
-	return array_merge( $settings, $experiments_settings );
-}
-
-add_filter( 'block_editor_settings_all', 'gutenberg_experiments_editor_settings' );

@@ -33,11 +33,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		siteEditor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await siteEditor.enterEditMode();
 
 		await siteEditorStyleVariations.browseStyles();
 
@@ -68,11 +70,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		siteEditor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await siteEditor.enterEditMode();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click(
@@ -107,11 +111,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		siteEditor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await siteEditor.enterEditMode();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
 		await page.click(
@@ -152,11 +158,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		siteEditor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await siteEditor.enterEditMode();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click(
@@ -182,11 +190,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		siteEditor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await siteEditor.enterEditMode();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
 

@@ -257,10 +257,32 @@ function block_core_navigation_get_classic_menu_fallback() {
 	$classic_nav_menus = wp_get_nav_menus();
 
 	// If menus exist.
-	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) && count( $classic_nav_menus ) === 1 ) {
-		// Use the first classic menu only. Handles simple use case where user has a single
-		// classic menu and switches to a block theme. In future this maybe expanded to
-		// determine the most appropriate classic menu to be used based on location.
+	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) ) {
+		// Handles simple use case where user has a classic menu and switches to a block theme.
+
+		// Returns the menu assigned to location `primary`.
+		$locations = get_nav_menu_locations();
+		if ( isset( $locations['primary'] ) ) {
+			$primary_menu = wp_get_nav_menu_object( $locations['primary'] );
+			if ( $primary_menu ) {
+				return $primary_menu;
+			}
+		}
+
+		// Returns a menu if `primary` is its slug.
+		foreach ( $classic_nav_menus as $classic_nav_menu ) {
+			if ( 'primary' === $classic_nav_menu->slug ) {
+				return $classic_nav_menu;
+			}
+		}
+
+		// Otherwise return the most recently created classic menu.
+		usort(
+			$classic_nav_menus,
+			function( $a, $b ) {
+				return $b->term_id - $a->term_id;
+			}
+		);
 		return $classic_nav_menus[0];
 	}
 }
@@ -489,6 +511,7 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
 function render_block_core_navigation( $attributes, $content, $block ) {
 
 	static $seen_menu_names = array();
+	static $seen_ref        = array();
 
 	// Flag used to indicate whether the rendered output is considered to be
 	// a fallback (i.e. the block has no menu associated with it).
@@ -559,6 +582,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Load inner blocks from the navigation post.
 	if ( array_key_exists( 'ref', $attributes ) ) {
+		if ( in_array( $attributes['ref'], $seen_ref, true ) ) {
+			return '';
+		}
+		$seen_ref[] = $attributes['ref'];
+
 		$navigation_post = get_post( $attributes['ref'] );
 		if ( ! isset( $navigation_post ) ) {
 			return '';
@@ -651,22 +679,41 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		_prime_post_caches( $post_ids, false, false );
 	}
 
+	$list_item_nav_blocks = array(
+		'core/navigation-link',
+		'core/home-link',
+		'core/site-title',
+		'core/site-logo',
+		'core/navigation-submenu',
+	);
+
+	$needs_list_item_wrapper = array(
+		'core/site-title',
+		'core/site-logo',
+	);
+
 	$inner_blocks_html = '';
 	$is_list_open      = false;
 	foreach ( $inner_blocks as $inner_block ) {
-		if ( ( 'core/navigation-link' === $inner_block->name || 'core/home-link' === $inner_block->name || 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name || 'core/navigation-submenu' === $inner_block->name ) && ! $is_list_open ) {
+		$is_list_item = in_array( $inner_block->name, $list_item_nav_blocks, true );
+
+		if ( $is_list_item && ! $is_list_open ) {
 			$is_list_open       = true;
 			$inner_blocks_html .= '<ul class="wp-block-navigation__container">';
 		}
-		if ( 'core/navigation-link' !== $inner_block->name && 'core/home-link' !== $inner_block->name && 'core/site-title' !== $inner_block->name && 'core/site-logo' !== $inner_block->name && 'core/navigation-submenu' !== $inner_block->name && $is_list_open ) {
+
+		if ( ! $is_list_item && $is_list_open ) {
 			$is_list_open       = false;
 			$inner_blocks_html .= '</ul>';
 		}
+
 		$inner_block_content = $inner_block->render();
-		if ( 'core/site-title' === $inner_block->name || ( 'core/site-logo' === $inner_block->name && $inner_block_content ) ) {
-			$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
-		} else {
-			$inner_blocks_html .= $inner_block_content;
+		if ( ! empty( $inner_block_content ) ) {
+			if ( in_array( $inner_block->name, $needs_list_item_wrapper, true ) ) {
+				$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
+			} else {
+				$inner_blocks_html .= $inner_block_content;
+			}
 		}
 	}
 
@@ -809,3 +856,35 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 }
 
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
+
+/**
+ * Enables animation of the block inspector for the Navigation block.
+ *
+ * See:
+ * - https://github.com/WordPress/gutenberg/pull/46342
+ * - https://github.com/WordPress/gutenberg/issues/45884
+ *
+ * @param array $settings Default editor settings.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_enable_animation_for_navigation_inspector( $settings ) {
+	$current_animation_settings = _wp_array_get(
+		$settings,
+		array( '__experimentalBlockInspectorAnimation' ),
+		array()
+	);
+
+	$settings['__experimentalBlockInspectorAnimation'] = array_merge(
+		$current_animation_settings,
+		array(
+			'core/navigation' =>
+				array(
+					'enterDirection' => 'leftToRight',
+				),
+		)
+	);
+
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_enable_animation_for_navigation_inspector' );

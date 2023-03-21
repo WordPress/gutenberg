@@ -8,8 +8,7 @@
  * @return {import('react-test-renderer').ReactTestInstance} Block instance.
  */
 export const getBlock = ( screen, blockName, { rowIndex = 1 } = {} ) => {
-	const { getByLabelText } = screen;
-	return getByLabelText(
+	return screen.getAllByLabelText(
 		new RegExp( `${ blockName } Block\\. Row ${ rowIndex }` )
-	);
+	)[ 0 ];
 };

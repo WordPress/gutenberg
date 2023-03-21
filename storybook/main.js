@@ -18,16 +18,17 @@ module.exports = {
 			options: { configureJSX: true },
 		},
 		'@storybook/addon-controls',
-		'@storybook/addon-knobs', // Deprecated, new stories should use addon-controls.
-		'@storybook/addon-storysource',
 		'@storybook/addon-viewport',
 		'@storybook/addon-a11y',
 		'@storybook/addon-toolbars',
 		'@storybook/addon-actions',
+		'storybook-source-link',
 	],
+	framework: '@storybook/react',
 	features: {
 		babelModeV7: true,
 		emotionAlias: false,
+		storyStoreV7: true,
 	},
 	// Workaround:
 	// https://github.com/storybookjs/storybook/issues/12270

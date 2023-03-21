@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
-import { keyboardReturn } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -93,6 +92,7 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {boolean=}                   withCreateSuggestion       Whether to allow creation of link value from suggestion.
  * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
  * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
+ * @property {boolean=}                   hasTextControl             Whether to add a text field to the UI to update the value.title.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
  * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
  */
@@ -112,6 +112,7 @@ function LinkControl( {
 	settings = DEFAULT_LINK_SETTINGS,
 	onChange = noop,
 	onRemove,
+	onCancel,
 	noDirectEntry = false,
 	showSuggestions = true,
 	showInitialSuggestions,
@@ -189,6 +190,8 @@ function LinkControl( {
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
 
+	const hasLinkValue = value?.url?.trim()?.length > 0;
+
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
@@ -234,6 +237,29 @@ function LinkControl( {
 		}
 	};
 
+	const resetInternalValues = () => {
+		setInternalUrlInputValue( value?.url );
+		setInternalTextInputValue( value?.title );
+	};
+
+	const handleCancel = ( event ) => {
+		event.preventDefault();
+		event.stopPropagation();
+
+		// Ensure that any unsubmitted input changes are reset.
+		resetInternalValues();
+
+		if ( hasLinkValue ) {
+			// If there is a link then exist editing mode and show preview.
+			stopEditing();
+		} else {
+			// If there is no link value, then remove the link entirely.
+			onRemove?.();
+		}
+
+		onCancel?.();
+	};
+
 	const currentUrlInputValue = propInputValue || internalUrlInputValue;
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
@@ -246,8 +272,9 @@ function LinkControl( {
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
-	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
+	const showTextControl = hasLinkValue && hasTextControl;
 
+	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
 	return (
 		<div
 			tabIndex={ -1 }
@@ -260,7 +287,7 @@ function LinkControl( {
 				</div>
 			) }
 
-			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
+			{ isEditing && (
 				<>
 					<div
 						className={ classnames( {
@@ -270,6 +297,7 @@ function LinkControl( {
 					>
 						{ showTextControl && (
 							<TextControl
+								__nextHasNoMarginBottom
 								ref={ textInputRef }
 								className="block-editor-link-control__field block-editor-link-control__text-content"
 								label="Text"
@@ -297,17 +325,7 @@ function LinkControl( {
 								createSuggestionButtonText
 							}
 							useLabel={ showTextControl }
-						>
-							<div className="block-editor-link-control__search-actions">
-								<Button
-									onClick={ handleSubmit }
-									label={ __( 'Submit' ) }
-									icon={ keyboardReturn }
-									className="block-editor-link-control__search-submit"
-									disabled={ currentInputIsEmpty } // Disallow submitting empty values.
-								/>
-							</div>
-						</LinkControlSearchInput>
+						/>
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -332,15 +350,34 @@ function LinkControl( {
 				/>
 			) }
 
-			{ showSettingsDrawer && (
-				<div className="block-editor-link-control__tools">
-					<LinkControlSettingsDrawer
-						value={ value }
-						settings={ settings }
-						onChange={ onChange }
-					/>
-				</div>
-			) }
+			<div className="block-editor-link-control__drawer">
+				{ showSettingsDrawer && (
+					<div className="block-editor-link-control__tools">
+						<LinkControlSettingsDrawer
+							value={ value }
+							settings={ settings }
+							onChange={ onChange }
+						/>
+					</div>
+				) }
+
+				{ isEditing && (
+					<div className="block-editor-link-control__search-actions">
+						<Button
+							variant="primary"
+							onClick={ handleSubmit }
+							className="xblock-editor-link-control__search-submit"
+							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+						>
+							{ __( 'Apply' ) }
+						</Button>
+						<Button variant="tertiary" onClick={ handleCancel }>
+							{ __( 'Cancel' ) }
+						</Button>
+					</div>
+				) }
+			</div>
+
 			{ renderControlBottom && renderControlBottom() }
 		</div>
 	);

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Platform, useMemo } from '@wordpress/element';
@@ -18,8 +13,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+
+const EMPTY_BLOCKS_LIST = [];
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -55,7 +53,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						'wp_block',
 						{ per_page: -1 }
 				  )
-				: [], // Reusable blocks are fetched in the native version of this hook.
+				: EMPTY_BLOCKS_LIST, // Reusable blocks are fetched in the native version of this hook.
 			hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 			userCanCreatePages: canUser( 'create', 'pages' ),
 			pageOnFront: siteSettings?.page_on_front,
@@ -133,56 +131,63 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 
 	return useMemo(
 		() => ( {
-			...pick( settings, [
-				'__experimentalBlockDirectory',
-				'__experimentalDiscussionSettings',
-				'__experimentalFeatures',
-				'__experimentalPreferredStyleVariations',
-				'__experimentalSetIsInserterOpened',
-				'__unstableGalleryWithImageBlocks',
-				'alignWide',
-				'allowedBlockTypes',
-				'bodyPlaceholder',
-				'canLockBlocks',
-				'codeEditingEnabled',
-				'colors',
-				'disableCustomColors',
-				'disableCustomFontSizes',
-				'disableCustomSpacingSizes',
-				'disableCustomGradients',
-				'disableLayoutStyles',
-				'enableCustomLineHeight',
-				'enableCustomSpacing',
-				'enableCustomUnits',
-				'focusMode',
-				'fontSizes',
-				'gradients',
-				'generateAnchors',
-				'hasFixedToolbar',
-				'isDistractionFree',
-				'hasInlineToolbar',
-				'imageDefaultSize',
-				'imageDimensions',
-				'imageEditing',
-				'imageSizes',
-				'isRTL',
-				'keepCaretInsideBlock',
-				'maxWidth',
-				'onUpdateDefaultBlockStyles',
-				'styles',
-				'template',
-				'templateLock',
-				'titlePlaceholder',
-				'supportsLayout',
-				'widgetTypesToHideFromLegacyWidgetBlock',
-				'__unstableResolvedAssets',
-			] ),
+			...Object.fromEntries(
+				Object.entries( settings ).filter( ( [ key ] ) =>
+					[
+						'__experimentalBlockDirectory',
+						'__experimentalDiscussionSettings',
+						'__experimentalFeatures',
+						'__experimentalPreferredStyleVariations',
+						'__experimentalSetIsInserterOpened',
+						'__unstableGalleryWithImageBlocks',
+						'alignWide',
+						'allowedBlockTypes',
+						'blockInspectorTabs',
+						'allowedMimeTypes',
+						'bodyPlaceholder',
+						'canLockBlocks',
+						'codeEditingEnabled',
+						'colors',
+						'disableCustomColors',
+						'disableCustomFontSizes',
+						'disableCustomSpacingSizes',
+						'disableCustomGradients',
+						'disableLayoutStyles',
+						'enableCustomLineHeight',
+						'enableCustomSpacing',
+						'enableCustomUnits',
+						'focusMode',
+						'fontSizes',
+						'gradients',
+						'generateAnchors',
+						'hasFixedToolbar',
+						'isDistractionFree',
+						'hasInlineToolbar',
+						'imageDefaultSize',
+						'imageDimensions',
+						'imageEditing',
+						'imageSizes',
+						'isRTL',
+						'keepCaretInsideBlock',
+						'maxWidth',
+						'onUpdateDefaultBlockStyles',
+						'styles',
+						'template',
+						'templateLock',
+						'titlePlaceholder',
+						'supportsLayout',
+						'widgetTypesToHideFromLegacyWidgetBlock',
+						'__unstableResolvedAssets',
+					].includes( key )
+				)
+			),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
+			__unstableInserterMediaCategories: inserterMediaCategories,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,

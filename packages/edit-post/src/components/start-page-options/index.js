@@ -23,15 +23,11 @@ function useStartPatterns() {
 	// the current post type is part of the postTypes declared.
 	const { blockPatternsWithPostContentBlockType, postType } = useSelect(
 		( select ) => {
-			const { __experimentalGetPatternsByBlockTypes } =
-				select( blockEditorStore );
+			const { getPatternsByBlockTypes } = select( blockEditorStore );
 			const { getCurrentPostType } = select( editorStore );
 			return {
-				// get pa
 				blockPatternsWithPostContentBlockType:
-					__experimentalGetPatternsByBlockTypes(
-						'core/post-content'
-					),
+					getPatternsByBlockTypes( 'core/post-content' ),
 				postType: getCurrentPostType(),
 			};
 		},

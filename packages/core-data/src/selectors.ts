@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { set, map, find, get, filter } from 'lodash';
+import { set, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -147,9 +147,9 @@ export function getCurrentUser( state: State ): ET.User< 'edit' > {
  */
 export const getUserQueryResults = createSelector(
 	( state: State, queryID: string ): ET.User< 'edit' >[] => {
-		const queryResults = state.users.queries[ queryID ];
+		const queryResults = state.users.queries[ queryID ] ?? [];
 
-		return map( queryResults, ( id ) => state.users.byId[ id ] );
+		return queryResults.map( ( id ) => state.users.byId[ id ] );
 	},
 	( state: State, queryID: string ) => [
 		state.users.queries[ queryID ],
@@ -183,7 +183,7 @@ export function getEntitiesByKind( state: State, kind: string ): Array< any > {
  * @return Array of entities with config matching kind.
  */
 export function getEntitiesConfig( state: State, kind: string ): Array< any > {
-	return filter( state.entities.config, { kind } );
+	return state.entities.config.filter( ( entity ) => entity.kind === kind );
 }
 
 /**
@@ -218,7 +218,9 @@ export function getEntityConfig(
 	kind: string,
 	name: string
 ): any {
-	return find( state.entities.config, { kind, name } );
+	return state.entities.config?.find(
+		( config ) => config.kind === kind && config.name === name
+	);
 }
 
 /**
@@ -1129,7 +1131,10 @@ export function getAutosave< EntityRecord extends ET.EntityRecord< any > >(
 	}
 
 	const autosaves = state.autosaves[ postId ];
-	return find( autosaves, { author: authorId } ) as EntityRecord | undefined;
+
+	return autosaves?.find(
+		( autosave: any ) => autosave.author === authorId
+	) as EntityRecord | undefined;
 }
 
 /**

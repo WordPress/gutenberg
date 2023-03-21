@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -32,6 +32,16 @@ function TestWrapper() {
 	);
 }
 
+/**
+ * Returns the first found popover element up the DOM tree.
+ *
+ * @param {HTMLElement} element Element to start with.
+ * @return {HTMLElement|null} Popover element, or `null` if not found.
+ */
+function getWrappingPopoverElement( element ) {
+	return element.closest( '.components-popover' );
+}
+
 describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
 		render( <TestWrapper /> );
@@ -45,9 +55,7 @@ describe( 'General media replace flow', () => {
 	} );
 
 	it( 'renders replace menu', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -57,17 +65,19 @@ describe( 'General media replace flow', () => {
 				name: 'Replace',
 			} )
 		);
-
 		const uploadMenu = screen.getByRole( 'menu' );
 
-		expect( uploadMenu ).toBeInTheDocument();
-		expect( uploadMenu ).not.toBeVisible();
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement( uploadMenu )
+			).toBePositionedPopover()
+		);
+
+		await waitFor( () => expect( uploadMenu ).toBeVisible() );
 	} );
 
 	it( 'displays media URL', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -78,17 +88,19 @@ describe( 'General media replace flow', () => {
 			} )
 		);
 
-		expect(
-			screen.getByRole( 'link', {
-				name: 'example.media (opens in a new tab)',
-			} )
-		).toHaveAttribute( 'href', 'https://example.media' );
+		const link = screen.getByRole( 'link', {
+			name: 'example.media (opens in a new tab)',
+		} );
+
+		await waitFor( () =>
+			expect( getWrappingPopoverElement( link ) ).toBePositionedPopover()
+		);
+
+		expect( link ).toHaveAttribute( 'href', 'https://example.media' );
 	} );
 
 	it( 'edits media URL', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -97,6 +109,16 @@ describe( 'General media replace flow', () => {
 				expanded: false,
 				name: 'Replace',
 			} )
+		);
+
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement(
+					screen.getByRole( 'link', {
+						name: 'example.media (opens in a new tab)',
+					} )
+				)
+			).toBePositionedPopover()
 		);
 
 		await user.click(
@@ -115,7 +137,7 @@ describe( 'General media replace flow', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Submit',
+				name: 'Apply',
 			} )
 		);
 

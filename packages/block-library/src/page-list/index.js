@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { pages as icon } from '@wordpress/icons';
+import { pages, update } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,7 +15,13 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon,
+	icon: ( { context } ) => {
+		if ( context === 'list-view' ) {
+			return update;
+		}
+
+		return pages;
+	},
 	example: {},
 	edit,
 };

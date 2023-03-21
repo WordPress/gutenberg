@@ -121,7 +121,15 @@ function ComboboxControl( {
 	const onKeyDown = ( event ) => {
 		let preventDefault = false;
 
-		if ( event.defaultPrevented ) {
+		if (
+			event.defaultPrevented ||
+			// Ignore keydowns from IMEs
+			event.nativeEvent.isComposing ||
+			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+			// is `isComposing=false`, even though it's technically still part of the composition.
+			// These can only be detected by keyCode.
+			event.keyCode === 229
+		) {
 			return;
 		}
 

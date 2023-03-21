@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "12.21.0",
+	"version": "13.2.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -68,8 +68,8 @@
 		"remove-accents": "^0.4.2"
 	},
 	"peerDependencies": {
-		"react": "^17.0.0",
-		"react-dom": "^17.0.0"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

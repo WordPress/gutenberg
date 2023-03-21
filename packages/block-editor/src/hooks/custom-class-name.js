@@ -61,6 +61,7 @@ export const withInspectorControl = createHigherOrderComponent(
 						<BlockEdit { ...props } />
 						<InspectorControls __experimentalGroup="advanced">
 							<TextControl
+								__nextHasNoMarginBottom
 								autoComplete="off"
 								label={ __( 'Additional CSS class(es)' ) }
 								value={ props.attributes.className || '' }

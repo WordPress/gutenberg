@@ -12,22 +12,42 @@ import {
 	link,
 	more,
 	paragraph,
+	arrowUp,
+	arrowDown,
+	arrowLeft,
+	arrowRight,
+	chevronDown,
 } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import Toolbar from '../';
 import {
-	SVG,
-	Path,
+	Toolbar,
 	ToolbarButton,
 	ToolbarGroup,
 	ToolbarItem,
-	DropdownMenu,
-} from '../../';
+	ToolbarDropdownMenu,
+} from '..';
+import { SVG, Path, DropdownMenu } from '../../';
 
-export default { title: 'Components/Toolbar', component: Toolbar };
+export default {
+	title: 'Components/Toolbar',
+	component: Toolbar,
+	subcomponents: {
+		ToolbarButton,
+		ToolbarGroup,
+		ToolbarItem,
+		ToolbarDropdownMenu,
+	},
+	argTypes: {
+		children: { control: { type: null } },
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
+	},
+};
 
 function InlineImageIcon() {
 	return (
@@ -37,13 +57,20 @@ function InlineImageIcon() {
 	);
 }
 
-/* eslint-disable no-restricted-syntax */
-export const _default = () => {
-	return (
-		// id is required for server side rendering
-		<Toolbar label="Options" id="options-toolbar">
+const Template = ( props ) => (
+	<div style={ { height: 280 } }>
+		<Toolbar { ...props } />
+	</div>
+);
+
+export const Default = Template.bind( {} );
+Default.args = {
+	label: 'Options',
+	id: 'options-toolbar',
+	children: (
+		<>
 			<ToolbarGroup>
-				<ToolbarButton icon={ paragraph } label="Paragraph" />
+				<ToolbarButton icon={ paragraph } text="Paragraph" />
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
@@ -105,72 +132,41 @@ export const _default = () => {
 					{ icon: alignRight, title: 'Align right' },
 				] }
 			/>
-		</Toolbar>
-	);
+			<ToolbarDropdownMenu
+				icon={ chevronDown }
+				label="Select a direction"
+				controls={ [
+					{
+						title: 'Up',
+						icon: arrowUp,
+					},
+					{
+						title: 'Right',
+						icon: arrowRight,
+					},
+					{
+						title: 'Down',
+						icon: arrowDown,
+					},
+					{
+						title: 'Left',
+						icon: arrowLeft,
+					},
+				] }
+			/>
+		</>
+	),
 };
 
-export const withoutGroup = () => {
-	return (
-		// id is required for server side rendering
-		<Toolbar label="Options" id="options-toolbar-without-group">
+export const WithoutGroup = Template.bind( {} );
+WithoutGroup.args = {
+	label: 'Options',
+	id: 'options-toolbar-without-group',
+	children: (
+		<>
 			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
 			<ToolbarButton icon={ formatItalic } label="Italic" />
 			<ToolbarButton icon={ link } label="Link" />
-		</Toolbar>
-	);
-};
-/* eslint-enable no-restricted-syntax */
-
-export const toolbars = () => {
-	return (
-		<div>
-			<div style={ { padding: '20px' } }>
-				<h2>Icon-only Toolbar</h2>
-				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
-					<ToolbarButton
-						icon={ formatItalic }
-						title="Italic"
-						isActive
-					/>
-					<ToolbarButton icon={ link } title="Link" />
-				</Toolbar>
-			</div>
-
-			<div style={ { padding: '20px' } }>
-				<h2>Text-only Toolbar</h2>
-				<Toolbar>
-					<ToolbarButton>Bold Format</ToolbarButton>
-					<ToolbarButton isActive>Italic Format</ToolbarButton>
-					<ToolbarButton>Link Format</ToolbarButton>
-				</Toolbar>
-			</div>
-
-			<div style={ { padding: '20px' } }>
-				<h2>Text and Icon Toolbar</h2>
-				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
-					<ToolbarButton isActive>Bold Format</ToolbarButton>
-					<ToolbarButton icon={ formatItalic } title="Italic" />
-					<ToolbarButton>Italic Format</ToolbarButton>
-					<ToolbarButton icon={ link } title="Link" />
-					<ToolbarButton>Link Format</ToolbarButton>
-				</Toolbar>
-			</div>
-
-			<div style={ { padding: '20px' } }>
-				<h2>Single Icon Button Toolbar</h2>
-				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
-				</Toolbar>
-			</div>
-
-			<div style={ { padding: '20px' } }>
-				<h2>Single Text Button toolbar</h2>
-				<Toolbar>
-					<ToolbarButton>Bold Toolbar</ToolbarButton>
-				</Toolbar>
-			</div>
-		</div>
-	);
+		</>
+	),
 };

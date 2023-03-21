@@ -38,13 +38,13 @@ const sizeOptions = [
 
 const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 	return (
-		<Fragment>
+		<>
 			<SelectControl label={ labelComponent } options={ sizeOptions } />
 			<p id={ device.id }>
 				{ device.label } is used here for testing purposes to ensure we
 				have access to details about the device.
 			</p>
-		</Fragment>
+		</>
 	);
 };
 
@@ -244,9 +244,7 @@ describe( 'Default and Responsive modes', () => {
 	} );
 
 	it( 'should switch between default and responsive modes when interacting with toggle control', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const ResponsiveBlockControlConsumer = () => {
 			const [ isResponsive, setIsResponsive ] = useState( false );
 

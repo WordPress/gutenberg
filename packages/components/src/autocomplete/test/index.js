@@ -17,9 +17,7 @@ import { getAutoCompleterUI } from '../autocompleter-ui';
 describe( 'AutocompleterUI', () => {
 	describe( 'click outside behavior', () => {
 		it( 'should call reset function when a click on another element occurs', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const resetSpy = jest.fn();
 

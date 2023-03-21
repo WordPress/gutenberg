@@ -35,6 +35,7 @@ const AvatarInspectorControls = ( {
 	<InspectorControls>
 		<PanelBody title={ __( 'Settings' ) }>
 			<RangeControl
+				__nextHasNoMarginBottom
 				label={ __( 'Image size' ) }
 				onChange={ ( newSize ) =>
 					setAttributes( {

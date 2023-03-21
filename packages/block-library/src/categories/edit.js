@@ -63,7 +63,7 @@ export default function CategoriesEdit( {
 		const parentId = showHierarchy ? 0 : null;
 		const categoriesList = getCategoriesList( parentId );
 		return categoriesList.map( ( category ) =>
-			renderCategoryListItem( category, 0 )
+			renderCategoryListItem( category )
 		);
 	};
 

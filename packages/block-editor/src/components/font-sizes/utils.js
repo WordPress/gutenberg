@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, kebabCase } from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  *  Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
@@ -20,7 +20,9 @@ export const getFontSize = (
 	customFontSizeAttribute
 ) => {
 	if ( fontSizeAttribute ) {
-		const fontSizeObject = find( fontSizes, { slug: fontSizeAttribute } );
+		const fontSizeObject = fontSizes?.find(
+			( { slug } ) => slug === fontSizeAttribute
+		);
 		if ( fontSizeObject ) {
 			return fontSizeObject;
 		}
@@ -39,7 +41,7 @@ export const getFontSize = (
  * @return {Object} Font size object.
  */
 export function getFontSizeObjectByValue( fontSizes, value ) {
-	const fontSizeObject = find( fontSizes, { size: value } );
+	const fontSizeObject = fontSizes?.find( ( { size } ) => size === value );
 	if ( fontSizeObject ) {
 		return fontSizeObject;
 	}

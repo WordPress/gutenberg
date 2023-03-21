@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find, pickBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createHigherOrderComponent, compose } from '@wordpress/compose';
@@ -107,9 +102,9 @@ export default ( ...fontSizeNames ) => {
 						customFontSizeAttributeName
 					) {
 						return ( fontSizeValue ) => {
-							const fontSizeObject = find( this.props.fontSizes, {
-								size: Number( fontSizeValue ),
-							} );
+							const fontSizeObject = this.props.fontSizes?.find(
+								( { size } ) => size === Number( fontSizeValue )
+							);
 							this.props.setAttributes( {
 								[ fontSizeAttributeName ]:
 									fontSizeObject && fontSizeObject.slug
@@ -160,35 +155,40 @@ export default ( ...fontSizeNames ) => {
 						}
 
 						const newState = Object.entries(
-							pickBy(
-								fontSizeAttributeNames,
-								didAttributesChange
+							fontSizeAttributeNames
+						)
+							.filter( ( [ key, value ] ) =>
+								didAttributesChange( value, key )
 							)
-						).reduce(
-							(
-								newStateAccumulator,
-								[
-									fontSizeAttributeName,
-									customFontSizeAttributeName,
-								]
-							) => {
-								const fontSizeAttributeValue =
-									attributes[ fontSizeAttributeName ];
-								const fontSizeObject = getFontSize(
-									fontSizes,
-									fontSizeAttributeValue,
-									attributes[ customFontSizeAttributeName ]
-								);
-								newStateAccumulator[ fontSizeAttributeName ] = {
-									...fontSizeObject,
-									class: getFontSizeClass(
-										fontSizeAttributeValue
-									),
-								};
-								return newStateAccumulator;
-							},
-							{}
-						);
+							.reduce(
+								(
+									newStateAccumulator,
+									[
+										fontSizeAttributeName,
+										customFontSizeAttributeName,
+									]
+								) => {
+									const fontSizeAttributeValue =
+										attributes[ fontSizeAttributeName ];
+									const fontSizeObject = getFontSize(
+										fontSizes,
+										fontSizeAttributeValue,
+										attributes[
+											customFontSizeAttributeName
+										]
+									);
+									newStateAccumulator[
+										fontSizeAttributeName
+									] = {
+										...fontSizeObject,
+										class: getFontSizeClass(
+											fontSizeAttributeValue
+										),
+									};
+									return newStateAccumulator;
+								},
+								{}
+							);
 
 						return {
 							...previousState,

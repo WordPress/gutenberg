@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,9 @@ export default ( mapNodeToProps ) =>
 						this.props
 					);
 
-					if ( ! isEqual( newFallbackStyles, fallbackStyles ) ) {
+					if (
+						! fastDeepEqual( newFallbackStyles, fallbackStyles )
+					) {
 						this.setState( {
 							fallbackStyles: newFallbackStyles,
 							grabStylesCompleted:

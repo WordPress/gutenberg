@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, unescape as unescapeString } from 'lodash';
+import { get, unescape as unescapeString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -95,7 +95,7 @@ export function sortBySelected( termsTree, terms ) {
  * @return {Object} Term object.
  */
 export function findTerm( terms, parent, name ) {
-	return find( terms, ( term ) => {
+	return terms.find( ( term ) => {
 		return (
 			( ( ! term.parent && ! parent ) ||
 				parseInt( term.parent ) === parseInt( parent ) ) &&

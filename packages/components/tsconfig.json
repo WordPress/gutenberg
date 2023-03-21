@@ -37,14 +37,12 @@
 		"src/**/*.ios.js",
 		"src/**/*.native.js",
 		"src/**/react-native-*",
-		"src/**/stories/**.js", // only exclude js files, tsx files should be checked
-		"src/**/test/**.js", // only exclude js files, ts{x} files should be checked
+		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
 		"src/index.js",
-		"src/alignment-matrix-control",
 		"src/angle-picker-control",
 		"src/autocomplete",
 		"src/box-control",
-		"src/color-list-picker",
 		"src/combobox-control",
 		"src/custom-gradient-picker",
 		"src/dimension-control",
@@ -63,14 +61,7 @@
 		"src/palette-edit",
 		"src/panel",
 		"src/query-controls",
-		"src/responsive-wrapper",
-		"src/sandbox",
 		"src/toolbar",
-		"src/toolbar-button",
-		"src/toolbar-context",
-		"src/toolbar-dropdown-menu",
-		"src/toolbar-group",
-		"src/toolbar-item",
 		"src/tree-grid"
 	]
 }

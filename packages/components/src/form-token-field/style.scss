@@ -169,7 +169,7 @@
 	transition: all 0.15s ease-in-out;
 	@include reduce-motion("transition");
 	list-style: none;
-	border-top: $border-width solid $gray-700;
+	border-top: $border-width solid $components-color-border;
 	margin: 0;
 	padding: 0;
 }

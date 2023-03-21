@@ -11,6 +11,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import useBlockEditorSettings from './use-block-editor-settings.js';
 import { store as editorStore } from '../../store';
 
+const EMPTY_BLOCKS_LIST = [];
+
 function useNativeBlockEditorSettings( settings, hasTemplate ) {
 	const capabilities = settings.capabilities ?? {};
 	const editorSettings = useBlockEditorSettings( settings, hasTemplate );
@@ -27,7 +29,7 @@ function useNativeBlockEditorSettings( settings, hasTemplate ) {
 							// Related issue: https://github.com/wordpress-mobile/gutenberg-mobile/issues/2661
 							{ per_page: 100 }
 					  )
-					: [],
+					: EMPTY_BLOCKS_LIST,
 				isTitleSelected: select( editorStore ).isPostTitleSelected(),
 			};
 		},

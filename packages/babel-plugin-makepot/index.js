@@ -33,7 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const { pick, isEqual, merge, isEmpty } = require( 'lodash' );
+const { merge, isEmpty } = require( 'lodash' );
 const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -182,10 +182,7 @@ function isValidTranslationKey( key ) {
  * @return {boolean} Whether valid translation keys match.
  */
 function isSameTranslation( a, b ) {
-	return isEqual(
-		pick( a, VALID_TRANSLATION_KEYS ),
-		pick( b, VALID_TRANSLATION_KEYS )
-	);
+	return VALID_TRANSLATION_KEYS.every( ( key ) => a[ key ] === b[ key ] );
 }
 
 /**

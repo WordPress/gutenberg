@@ -15,6 +15,7 @@ import type { useDrag } from '@use-gesture/react';
 import type { StateReducer } from './reducer/state';
 import type { WordPressComponentProps } from '../ui/context';
 import type { FlexProps } from '../flex/types';
+import type { BaseControlProps } from '../base-control/types';
 
 export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
 
@@ -171,6 +172,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 
 export interface InputControlProps
 	extends Omit< InputBaseProps, 'children' | 'isFocused' | keyof FlexProps >,
+		Pick< BaseControlProps, 'help' >,
 		/**
 		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the
 		 * `HTMLInputAttributes` and clashes with the one from `InputBaseProps`. So we have to omit it from

@@ -180,6 +180,8 @@ export default function NavigationInspector() {
 			) }
 			{ hasResolvedNavigationMenus && hasMoreThanOneNavigationMenu && (
 				<SelectControl
+					__nextHasNoMarginBottom
+					className="edit-site-navigation-inspector__select-menu"
 					aria-controls={
 						// aria-controls should only apply when referenced element is in DOM
 						hasLoadedInnerBlocks ? navMenuListId : undefined

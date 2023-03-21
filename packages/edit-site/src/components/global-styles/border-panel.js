@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalBorderRadiusControl as BorderRadiusControl } from '@wordpress/block-editor';
+import {
+	__experimentalBorderRadiusControl as BorderRadiusControl,
+	experiments as blockEditorExperiments,
+} from '@wordpress/block-editor';
 import {
 	__experimentalBorderBoxControl as BorderBoxControl,
 	__experimentalHasSplitBorders as hasSplitBorders,
@@ -15,12 +18,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	getSupportedGlobalStylesPanels,
-	useColorsPerOrigin,
-	useSetting,
-	useStyle,
-} from './hooks';
+import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 export function useHasBorderPanel( name ) {
 	const controls = [
@@ -36,7 +37,7 @@ export function useHasBorderPanel( name ) {
 function useHasBorderColorControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.color', name )[ 0 ] &&
+		useGlobalSetting( 'border.color', name )[ 0 ] &&
 		supports.includes( 'borderColor' )
 	);
 }
@@ -44,7 +45,7 @@ function useHasBorderColorControl( name ) {
 function useHasBorderRadiusControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.radius', name )[ 0 ] &&
+		useGlobalSetting( 'border.radius', name )[ 0 ] &&
 		supports.includes( 'borderRadius' )
 	);
 }
@@ -52,7 +53,7 @@ function useHasBorderRadiusControl( name ) {
 function useHasBorderStyleControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.style', name )[ 0 ] &&
+		useGlobalSetting( 'border.style', name )[ 0 ] &&
 		supports.includes( 'borderStyle' )
 	);
 }
@@ -60,7 +61,7 @@ function useHasBorderStyleControl( name ) {
 function useHasBorderWidthControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'border.width', name )[ 0 ] &&
+		useGlobalSetting( 'border.width', name )[ 0 ] &&
 		supports.includes( 'borderWidth' )
 	);
 }
@@ -94,11 +95,18 @@ function applyAllFallbackStyles( border ) {
 	return applyFallbackStyle( border );
 }
 
-export default function BorderPanel( { name } ) {
+export default function BorderPanel( { name, variationPath = '' } ) {
 	// To better reflect if the user has customized a value we need to
 	// ensure the style value being checked is from the `user` origin.
-	const [ userBorderStyles ] = useStyle( 'border', name, 'user' );
-	const [ border, setBorder ] = useStyle( 'border', name );
+	const [ userBorderStyles ] = useGlobalStyle(
+		`${ variationPath }border`,
+		name,
+		'user'
+	);
+	const [ border, setBorder ] = useGlobalStyle(
+		`${ variationPath }border`,
+		name
+	);
 	const colors = useColorsPerOrigin( name );
 
 	const showBorderColor = useHasBorderColorControl( name );
@@ -107,8 +115,8 @@ export default function BorderPanel( { name } ) {
 
 	// Border radius.
 	const showBorderRadius = useHasBorderRadiusControl( name );
-	const [ borderRadiusValues, setBorderRadius ] = useStyle(
-		'border.radius',
+	const [ borderRadiusValues, setBorderRadius ] = useGlobalStyle(
+		`${ variationPath }border.radius`,
 		name
 	);
 	const hasBorderRadius = () => {
@@ -184,7 +192,6 @@ export default function BorderPanel( { name } ) {
 						popoverOffset={ 40 }
 						popoverPlacement="left-start"
 						value={ border }
-						__experimentalHasMultipleOrigins={ true }
 						__experimentalIsRenderedInSidebar={ true }
 						size={ '__unstable-large' }
 					/>

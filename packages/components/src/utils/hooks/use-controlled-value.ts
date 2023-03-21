@@ -22,7 +22,7 @@ export function useControlledValue< T >( {
 	defaultValue,
 	onChange,
 	value: valueProp,
-}: Props< T > ): [ T | undefined, ( value: T ) => void ] {
+}: Props< T > ) {
 	const hasValue = typeof valueProp !== 'undefined';
 	const initialValue = hasValue ? valueProp : defaultValue;
 	const [ state, setState ] = useState( initialValue );
@@ -40,5 +40,5 @@ export function useControlledValue< T >( {
 		setValue = setState;
 	}
 
-	return [ value, setValue ];
+	return [ value, setValue as typeof setState ] as const;
 }

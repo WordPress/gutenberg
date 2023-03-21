@@ -1,0 +1,18 @@
+{
+	"version": 2,
+	"settings": {
+		"blocks": {
+			"core/paragraph": {
+				"color": {
+					"palette": [
+						{
+							"slug": "dark",
+							"name": "Dark",
+							"color": "#010101"
+						}
+					]
+				}
+			}
+		}
+	}
+}

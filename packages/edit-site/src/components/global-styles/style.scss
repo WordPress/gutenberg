@@ -1,3 +1,6 @@
+// Variables
+$block-preview-height: 150px;
+
 .edit-site-global-styles-preview {
 	display: flex;
 	align-items: center;
@@ -28,7 +31,8 @@
 }
 
 .edit-site-global-styles-screen-heading-color,
-.edit-site-global-styles-screen-typography {
+.edit-site-global-styles-screen-typography,
+.edit-site-global-styles-screen-css {
 	margin: $grid-unit-20;
 }
 
@@ -52,8 +56,12 @@
 	}
 }
 
-.edit-site-global-styles-header__description,
+.edit-site-global-styles-header__description {
+	padding: 0 $grid-unit-20;
+}
+
 .edit-site-block-types-search {
+	margin-bottom: $grid-unit-10;
 	padding: 0 $grid-unit-20;
 }
 
@@ -76,7 +84,8 @@
 
 .edit-site-screen-text-color__control,
 .edit-site-screen-link-color__control,
-.edit-site-screen-button-color__control {
+.edit-site-screen-button-color__control,
+.edit-site-screen-background-color__control.has-no-tabs {
 	padding: $grid-unit-20;
 }
 
@@ -116,4 +125,34 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.edit-site-global-styles__block-preview-panel {
+	position: relative;
+	width: 100%;
+	height: $block-preview-height + 2 * $border-width;
+	overflow: auto;
+	border: $gray-200 $border-width solid;
+	border-radius: $radius-block-ui;
+}
+
+.edit-site-global-styles__custom-css-input textarea {
+	font-family: $editor_html_font;
+}
+
+.edit-site-global-styles__custom-css-theme-css {
+	width: 100%;
+	line-break: anywhere;
+	white-space: break-spaces;
+	max-height: 200px;
+	overflow-y: scroll;
+}
+
+.edit-site-global-styles-screen-variations {
+	margin-top: $grid-unit-20;
+	border-top: 1px solid $gray-300;
+
+	& > * {
+		margin: $grid-unit-30 $grid-unit-20;
+	}
 }

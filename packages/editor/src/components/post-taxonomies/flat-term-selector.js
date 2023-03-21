@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get } from 'lodash';
+import { get } from 'lodash';
 import escapeHtml from 'escape-html';
 
 /**
@@ -50,7 +50,7 @@ const isSameTermName = ( termA, termB ) =>
 const termNamesToIds = ( names, terms ) => {
 	return names.map(
 		( termName ) =>
-			find( terms, ( term ) => isSameTermName( term.name, termName ) ).id
+			terms.find( ( term ) => isSameTermName( term.name, termName ) ).id
 	);
 };
 
@@ -203,7 +203,7 @@ export function FlatTermSelector( { slug } ) {
 
 		const newTermNames = uniqueTerms.filter(
 			( termName ) =>
-				! find( availableTerms, ( term ) =>
+				! availableTerms.find( ( term ) =>
 					isSameTermName( term.name, termName )
 				)
 		);

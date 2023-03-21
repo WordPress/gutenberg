@@ -69,7 +69,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 
 Note: On macOS, the required developer tools are not installed by default, if not already installed you may be prompted to download the install.
 
-<img src="https://developer.wordpress.org/files/2020/07/git-install-prompt.png" alt="Mac git command requies command line developer tools" width="400" height="195"/>
+<img src="https://developer.wordpress.org/files/2020/07/git-install-prompt.png" alt="Mac git command requires command line developer tools" width="400" height="195"/>
 
 After installing nvm, you need to use it to install Node.js, to install v14, run:
 

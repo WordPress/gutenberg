@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -96,7 +91,7 @@ export function getSpacingPresetCssVar( value ) {
  *
  * @param {string} value Value to extract slug from.
  *
- * @return {number} The int value of the slug from given spacing preset.
+ * @return {string|undefined} The int value of the slug from given spacing preset.
  */
 export function getSpacingPresetSlug( value ) {
 	if ( ! value ) {
@@ -211,5 +206,5 @@ export function isValuesDefined( values ) {
 	if ( values === undefined || values === null ) {
 		return false;
 	}
-	return ! isEmpty( Object.values( values ).filter( ( value ) => !! value ) );
+	return Object.values( values ).filter( ( value ) => !! value ).length > 0;
 }
