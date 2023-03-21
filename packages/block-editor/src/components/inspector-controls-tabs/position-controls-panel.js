@@ -6,6 +6,7 @@ import {
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -16,22 +17,29 @@ import { default as InspectorControls } from '../inspector-controls';
 import { store as blockEditorStore } from '../../store';
 
 const PositionControlsPanel = () => {
+	const [ initialOpen, setInitialOpen ] = useState();
+
 	// Determine whether the panel should be expanded.
-	const { initialOpen } = useSelect( ( select ) => {
+	const { multiSelectedBlocks } = useSelect( ( select ) => {
 		const { getBlocksByClientId, getSelectedBlockClientIds } =
 			select( blockEditorStore );
-
-		// If any selected block has a position set, open the panel by default.
-		// The first block's value will still be used within the control though.
 		const clientIds = getSelectedBlockClientIds();
-		const multiSelectedBlocks = getBlocksByClientId( clientIds );
-
 		return {
-			initialOpen: multiSelectedBlocks.some(
-				( { attributes } ) => !! attributes?.style?.position?.type
-			),
+			multiSelectedBlocks: getBlocksByClientId( clientIds ),
 		};
 	}, [] );
+
+	useEffect( () => {
+		// If any selected block has a position set, open the panel by default.
+		// The first block's value will still be used within the control though.
+		if ( initialOpen === undefined ) {
+			setInitialOpen(
+				multiSelectedBlocks.some(
+					( { attributes } ) => !! attributes?.style?.position?.type
+				)
+			);
+		}
+	}, [ initialOpen, multiSelectedBlocks, setInitialOpen ] );
 
 	return (
 		<PanelBody
