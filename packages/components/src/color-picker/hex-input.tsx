@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { colord, Colord } from 'colord';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
