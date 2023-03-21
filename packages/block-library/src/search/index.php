@@ -66,18 +66,14 @@ function render_block_core_search( $attributes ) {
 
 	if ( $show_input ) {
 		$input_classes = array( 'wp-block-search__input' );
-		if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
+		if ( $is_button_inside ) {
 			$input_classes[] = $border_color_classes;
 		}
 		if ( ! empty( $typography_classes ) ) {
 			$input_classes[] = $typography_classes;
 		}
 		$input_markup = sprintf(
-<<<<<<< HEAD
 			'<input type="search" id="%s" class="wp-block-search__input %s" name="s" value="%s" %s required />',
-=======
-			'<input type="search" id="%s" class="%s" name="s" value="%s" placeholder="%s" %s required />',
->>>>>>> trunk
 			$input_id,
 			esc_attr( implode( ' ', $input_classes ) ),
 			get_search_query(),
