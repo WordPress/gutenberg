@@ -517,6 +517,18 @@ _Returns_
 
 -   `string`: returns the cssUnit value in a simple px format.
 
+### getSpacingPresetCssVar
+
+Converts a spacing preset into a custom value.
+
+_Parameters_
+
+-   _value_ `string`: Value to convert.
+
+_Returns_
+
+-   `string | undefined`: CSS var string for given spacing preset value.
+
 ### getTypographyClassesAndStyles
 
 Provides the CSS class names and inline styles for a block's typography support
@@ -549,17 +561,6 @@ _Parameters_
 _Returns_
 
 -   `WPComponent`: The component to be rendered.
-### getSpacingPresetCssVar
-
-Converts a spacing preset into a custom value.
-
-_Parameters_
-
--   _value_ `string`: Value to convert.
-
-_Returns_
-
--   `string`: CSS var string for given spacing preset value.
 
 ### InnerBlocks
 
