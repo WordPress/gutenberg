@@ -70,7 +70,7 @@ The function called when a new gradient has been defined. It is passed the `curr
 
 ### `gradients`: `GradientsProp[]`
 
-An array of objects of predefined gradients which show up as `CircularOptionPicker` above the gradient selector.
+An array of objects of predefined gradients displayed above the gradient selector.
 
 -   Required: No
 -   Default: `[]`

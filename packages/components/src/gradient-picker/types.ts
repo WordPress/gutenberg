@@ -49,11 +49,10 @@ type GradientPickerBaseProps = {
 
 export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	/**
-	 * An array of objects as predefined gradients which show up as
-	 * `CircularOptionPicker` above the gradient selector. Alternatively, if
-	 * there are multiple sets (or 'origins') of gradients, you can pass an
-	 * array of objects each with a `name` and a `gradients` array which will
-	 * in turn contain the predefined gradient objects.
+	 * An array of objects as predefined gradients displayed above the gradient
+	 * selector. Alternatively, if there are multiple sets (or 'origins') of
+	 * gradients, you can pass an array of objects each with a `name` and a
+	 * `gradients` array which will in turn contain the predefined gradient objects.
 	 *
 	 * @default []
 	 */
