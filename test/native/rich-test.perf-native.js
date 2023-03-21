@@ -30,4 +30,28 @@ describe( 'RichText Performance', () => {
 			scenario,
 		} );
 	} );
+
+	it( 'should call onFocus when the TextInput component gains focus', async () => {
+		const scenario = async () => {
+			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
+
+			fireEvent( richTextInput, 'focus' );
+		};
+
+		await measurePerformance( <RichText onChange={ jest.fn() } />, {
+			scenario,
+		} );
+	} );
+
+	it( 'should call onBlue when the TextInput component is blurred', async () => {
+		const scenario = async () => {
+			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
+
+			fireEvent( richTextInput, 'focus' );
+		};
+
+		await measurePerformance( <RichText onChange={ jest.fn() } />, {
+			scenario,
+		} );
+	} );
 } );
