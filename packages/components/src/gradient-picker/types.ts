@@ -40,7 +40,8 @@ type GradientPickerBaseProps = {
 	 */
 	clearGradient?: ( currentGradient: string ) => void;
 	/**
-	 * The heading level.
+	 * The heading level. Only applies in cases where gradients are provided
+	 * from multiple origins (e.g. when gradients from core AND the current theme).
 	 *
 	 * @default 2
 	 */

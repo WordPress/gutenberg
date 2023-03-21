@@ -104,7 +104,7 @@ Start opting into the new margin-free styles that will become the default in a f
 
 ### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
 
-The heading level.
+The heading level. Only applies in cases where gradients are provided from multiple origins (e.g. when gradients from core AND the current theme).
 
 -   Required: No
 -   Default: `2`
