@@ -201,7 +201,10 @@ class AztecView extends Component {
 			this.selectionEndCaretY !== event.nativeEvent.selectionEndCaretY
 		) {
 			const caretY = event.nativeEvent.selectionEndCaretY;
-			AztecInputState.setCurrentCaretYCoordinate( caretY );
+			AztecInputState.setCurrentCaretData( {
+				caretY,
+				caretHeight: event.nativeEvent?.selectionEndCaretHeight,
+			} );
 			this.selectionEndCaretY = caretY;
 		}
 	}

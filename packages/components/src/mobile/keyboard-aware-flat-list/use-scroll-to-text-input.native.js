@@ -3,12 +3,13 @@
  */
 
 import { useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
+
+const DEFAULT_FONT_SIZE = 16;
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 /** @typedef {import('react-native-reanimated').SharedValue} SharedValue */
@@ -17,55 +18,62 @@ import { useCallback } from '@wordpress/element';
  * depending on where the caret is placed taking into
  * account the Keyboard and the Header.
  *
- * @param {number}      extraScrollHeight      Extra space to not overlap the content.
- * @param {boolean}     isKeyboardVisible      Whether the Keyboard is visible or not.
- * @param {number}      keyboardOffset         Keyboard space offset.
- * @param {SharedValue} latestContentOffsetY   Current offset position of the ScrollView.
- * @param {RefObject}   listRef                ScrollView reference.
- * @param {boolean}     scrollEnabled          Whether the scroll is enabled or not.
- * @param {RefObject}   scrollViewMeasurements ScrollView component's measurements.
- * @param {number}      textInputOffset        Currently focused TextInput offset.
+ * @param {Object}      currentCaretData  Current caret's data.
+ * @param {number}      extraScrollHeight Extra space to not overlap the content.
+ * @param {boolean}     isKeyboardVisible Whether the Keyboard is visible or not.
+ * @param {number}      keyboardOffset    Keyboard space offset.
+ * @param {boolean}     scrollEnabled     Whether the scroll is enabled or not.
+ * @param {RefObject}   scrollViewRef     ScrollView reference.
+ * @param {SharedValue} scrollViewYOffset Current offset position of the ScrollView.
+ * @param {number}      textInputOffset   Currently focused TextInput offset.
  * @return {Function[]} Function to scroll to the current TextInput's offset.
  */
 export default function useScrollToTextInput(
+	currentCaretData,
 	extraScrollHeight,
 	isKeyboardVisible,
 	keyboardOffset,
-	latestContentOffsetY,
-	listRef,
 	scrollEnabled,
-	scrollViewMeasurements,
+	scrollViewRef,
+	scrollViewYOffset,
 	textInputOffset
 ) {
 	const { height: windowHeight } = useWindowDimensions();
-	const { top, bottom } = useSafeAreaInsets();
+	const { caretHeight = DEFAULT_FONT_SIZE } = currentCaretData ?? {};
 	const availableScreenOffset = Math.round(
-		windowHeight - ( top + bottom ) - ( keyboardOffset + extraScrollHeight )
+		windowHeight - ( keyboardOffset + extraScrollHeight )
 	);
+	const extraPadding = caretHeight * 2;
 
 	const shouldScrollUp = useCallback( () => {
-		return (
-			listRef.current &&
-			textInputOffset < scrollViewMeasurements.current.y
-		);
-	}, [ listRef, scrollViewMeasurements, textInputOffset ] );
+		const offset = textInputOffset - caretHeight;
+		return offset < scrollViewYOffset.value;
+	}, [ caretHeight, scrollViewYOffset, textInputOffset ] );
 
 	const shouldScrollDown = useCallback( () => {
-		return listRef.current && textInputOffset >= availableScreenOffset;
-	}, [ listRef, textInputOffset, availableScreenOffset ] );
+		const offset =
+			scrollViewYOffset.value + availableScreenOffset - extraPadding;
+		return textInputOffset > offset;
+	}, [
+		availableScreenOffset,
+		extraPadding,
+		scrollViewYOffset,
+		textInputOffset,
+	] );
 
 	const scrollToTextInputOffset = useCallback( () => {
 		if (
+			! scrollViewRef.current ||
 			! scrollEnabled ||
-			! scrollViewMeasurements.current ||
 			( isKeyboardVisible && keyboardOffset === 0 )
 		) {
 			return;
 		}
 
 		if ( shouldScrollUp() ) {
-			listRef.current.scrollTo( {
-				y: latestContentOffsetY.value - textInputOffset,
+			const scrollUpOffset = scrollViewYOffset.value - extraPadding;
+			scrollViewRef.current.scrollTo( {
+				y: scrollUpOffset,
 				animated: true,
 			} );
 			return;
@@ -73,21 +81,24 @@ export default function useScrollToTextInput(
 
 		if ( shouldScrollDown() ) {
 			const scrollDownOffset =
-				latestContentOffsetY.value +
-				( textInputOffset - availableScreenOffset );
-			listRef.current.scrollTo( {
+				textInputOffset +
+				extraScrollHeight -
+				availableScreenOffset +
+				extraPadding;
+			scrollViewRef.current.scrollTo( {
 				y: scrollDownOffset,
 				animated: true,
 			} );
 		}
 	}, [
 		availableScreenOffset,
+		extraPadding,
+		extraScrollHeight,
 		isKeyboardVisible,
 		keyboardOffset,
-		latestContentOffsetY,
-		listRef,
 		scrollEnabled,
-		scrollViewMeasurements,
+		scrollViewRef,
+		scrollViewYOffset,
 		shouldScrollDown,
 		shouldScrollUp,
 		textInputOffset,

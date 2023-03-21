@@ -19,6 +19,7 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
 import useTextInputOffset from './use-text-input-offset';
 import useKeyboardOffset from './use-keyboard-offset';
 import useScrollToTextInput from './use-scroll-to-text-input';
+import useTextInputCaretPosition from './use-text-input-caret-position';
 
 const AnimatedScrollView = Animated.createAnimatedComponent( ScrollView );
 
@@ -30,30 +31,34 @@ export const KeyboardAwareFlatList = ( {
 	shouldPreventAutomaticScroll,
 	...props
 } ) => {
-	const listRef = useRef();
-	const scrollViewMeasurements = useRef();
-	const latestContentOffsetY = useSharedValue( -1 );
+	const scrollViewRef = useRef();
+	const scrollViewYOffset = useSharedValue( -1 );
 
 	const [ isKeyboardVisible, keyboardOffset ] =
 		useKeyboardOffset( scrollEnabled );
 
-	const [ textInputOffset ] = useTextInputOffset( scrollEnabled );
+	const [ currentCaretData ] = useTextInputCaretPosition( scrollEnabled );
+	const [ textInputOffset ] = useTextInputOffset(
+		currentCaretData,
+		scrollEnabled,
+		scrollViewRef
+	);
 
 	const [ scrollToTextInputOffset ] = useScrollToTextInput(
+		currentCaretData,
 		extraScrollHeight,
 		isKeyboardVisible,
 		keyboardOffset,
-		latestContentOffsetY,
-		listRef,
 		scrollEnabled,
-		scrollViewMeasurements,
+		scrollViewRef,
+		scrollViewYOffset,
 		textInputOffset
 	);
 
 	const scrollHandler = useAnimatedScrollHandler( {
 		onScroll: ( event ) => {
 			const { contentOffset } = event;
-			latestContentOffsetY.value = contentOffset.y;
+			scrollViewYOffset.value = contentOffset.y;
 			onScroll( event );
 		},
 	} );
@@ -74,25 +79,9 @@ export const KeyboardAwareFlatList = ( {
 		scrollToTextInputOffset,
 	] );
 
-	const measureScrollView = useCallback( () => {
-		if ( listRef.current && ! scrollViewMeasurements.current ) {
-			const scrollRef = listRef.current.getNativeScrollRef();
-
-			scrollRef.measureInWindow( ( _x, y, _width, height ) => {
-				scrollViewMeasurements.current = { y, height };
-			} );
-		}
-	}, [] );
-
-	const onContentSizeChange = useCallback( () => {
-		// Measures the ScrollView to get the Y coordinate and height values.
-		measureScrollView();
-		scrollToTextInputOffset();
-	}, [ scrollToTextInputOffset, measureScrollView ] );
-
 	const getRef = useCallback(
 		( ref ) => {
-			listRef.current = ref;
+			scrollViewRef.current = ref;
 			innerRef( ref );
 		},
 		[ innerRef ]
@@ -107,7 +96,6 @@ export const KeyboardAwareFlatList = ( {
 			automaticallyAdjustContentInsets={ false }
 			contentInset={ contentInset }
 			keyboardShouldPersistTaps="handled"
-			onContentSizeChange={ onContentSizeChange }
 			onScroll={ scrollHandler }
 			ref={ getRef }
 			scrollEnabled={ scrollEnabled }

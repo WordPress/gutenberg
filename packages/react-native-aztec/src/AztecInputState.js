@@ -9,7 +9,7 @@ const focusChangeListeners = [];
 const caretChangeListeners = [];
 
 let currentFocusedElement = null;
-let currentCaretYCoordinate = null;
+let currentCaretData = null;
 
 /**
  * Adds a listener that will be called in the following cases:
@@ -76,7 +76,7 @@ export const removeCaretChangeListener = ( listener ) => {
  */
 const notifyCaretChangeListeners = () => {
 	caretChangeListeners.forEach( ( listener ) => {
-		listener( { caretY: getCurrentCaretYCoordinate() } );
+		listener( getCurrentCaretData() );
 	} );
 };
 
@@ -133,7 +133,7 @@ export const focus = ( element ) => {
  */
 export const blur = ( element ) => {
 	TextInputState.blurTextInput( element );
-	setCurrentCaretYCoordinate( null );
+	setCurrentCaretData( null );
 	notifyInputChange();
 };
 
@@ -147,22 +147,22 @@ export const blurCurrentFocusedElement = () => {
 };
 
 /**
- * Sets the current focused element caret's Y coordinate.
+ * Sets the current focused element caret's data.
  *
- * @param {?number} yCoordinate Caret's Y coordinate.
+ * @param {Object} caret Caret's data.
  */
-export const setCurrentCaretYCoordinate = ( yCoordinate ) => {
+export const setCurrentCaretData = ( caret ) => {
 	if ( isFocused() ) {
-		currentCaretYCoordinate = yCoordinate;
+		currentCaretData = caret;
 		notifyCaretChangeListeners();
 	}
 };
 
 /**
- * Get the current focused element caret's Y coordinate.
+ * Get the current focused element caret's data.
  *
- * @return {?number} Current caret's Y Coordinate.
+ * @return {Object} Current caret's data.
  */
-export const getCurrentCaretYCoordinate = () => {
-	return currentCaretYCoordinate;
+export const getCurrentCaretData = () => {
+	return currentCaretData;
 };

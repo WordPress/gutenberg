@@ -8,13 +8,13 @@ import { useCallback, useEffect, useState } from '@wordpress/element';
  * Hook that listens to caret changes from AztecView TextInputs.
  *
  * @param {boolean} scrollEnabled Whether the scroll is enabled or not.
- * @return {[number]} Current caret's Y coordinate position.
+ * @return {[number]} Current caret's data.
  */
 export default function useTextInputCaretPosition( scrollEnabled ) {
-	const [ currentCaretYPosition, setCurrentCaretYPosition ] = useState();
+	const [ currentCaretData, setCurrentCaretData ] = useState();
 
-	const onCaretChange = useCallback( ( { caretY } ) => {
-		setCurrentCaretYPosition( caretY );
+	const onCaretChange = useCallback( ( caret ) => {
+		setCurrentCaretData( caret );
 	}, [] );
 
 	useEffect( () => {
@@ -32,5 +32,5 @@ export default function useTextInputCaretPosition( scrollEnabled ) {
 			}
 		};
 	}, [ scrollEnabled, onCaretChange ] );
-	return [ currentCaretYPosition ];
+	return [ currentCaretData ];
 }
