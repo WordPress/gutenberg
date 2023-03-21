@@ -145,6 +145,25 @@ const CommandMenu = () => {
 		enableComplementaryArea( STORE_NAME, 'edit-site/global-styles' );
 	};
 
+	const commandPlaceholder =
+		page === 'ai'
+			? 'Ask WordPress AI anything...'
+			: 'Type a command or search...';
+
+	const commands = [
+		{
+			command: () => {
+				insertBlocks( [ 'core/paragraph' ] );
+			},
+			label: 'Add a paragraph',
+			matchers: [ 'add a paragraph', 'insert a paragraph' ],
+		},
+	];
+
+	const matchedCommands = commands.filter( ( command ) =>
+		command.matchers.includes( search )
+	);
+
 	return open ? (
 		<Modal className="cmd-modal" onRequestClose={ () => setOpen( false ) }>
 			<div className="wordpress">
@@ -162,7 +181,7 @@ const CommandMenu = () => {
 							autoFocus
 							value={ search }
 							onValueChange={ setSearch }
-							placeholder="Type a command or search..."
+							placeholder={ commandPlaceholder }
 						/>
 					</div>
 					<Command.List>
@@ -314,13 +333,14 @@ const CommandMenu = () => {
 						) }
 						{ page === 'ai' && (
 							<>
-								<Command.Item
-									onSelect={ () =>
-										insertBlocks( [ 'core/paragraph' ] )
-									}
-								>
-									Insert a paragraph
-								</Command.Item>
+								{ matchedCommands.map( ( command, index ) => (
+									<Command.Item
+										key={ index }
+										onSelect={ command.command }
+									>
+										{ command.label }
+									</Command.Item>
+								) ) }
 							</>
 						) }
 					</Command.List>
