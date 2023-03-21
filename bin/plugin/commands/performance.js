@@ -238,6 +238,10 @@ async function runPerformanceTests( branches, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
 	const TEST_ROUNDS = options.rounds || 1;
 
+	if ( runningInCI ) {
+		process.env.TERM = 'xterm-color';
+	}
+
 	log(
 		formats.title( '\n💃 Performance Tests 🕺\n' ),
 		'\nWelcome! This tool runs the performance tests on multiple branches and displays a comparison table.\n' +
