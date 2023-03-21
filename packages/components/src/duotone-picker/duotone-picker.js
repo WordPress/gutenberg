@@ -42,6 +42,7 @@ function DuotonePicker( {
 			key="unset"
 			value="unset"
 			isSelected={ isUnset }
+			aria-label={ __( 'Unset' ) }
 			tooltipText={ __( 'Unset' ) }
 			className="components-duotone-picker__color-indicator"
 			onClick={ () => {
