@@ -160,12 +160,10 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				presetStyles.push( style );
 			}
 		} );
-
 		const defaultEditorStyles = [
 			...settings.defaultEditorStyles,
 			...presetStyles,
 		];
-
 		return hasThemeStyles && themeStyles.length
 			? settings.styles
 			: defaultEditorStyles;
