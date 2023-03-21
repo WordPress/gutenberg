@@ -72,7 +72,7 @@ export const Appender = forwardRef(
 		);
 
 		return (
-			<div className="offcanvas-editor-appender">
+			<div className="list-view-editor-appender">
 				<Inserter
 					ref={ ref }
 					rootClientId={ clientId }
