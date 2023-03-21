@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 // Need to mock the BlockControls wrapper as this requires a slot to run
 // so can't be easily unit tested.
@@ -50,9 +51,12 @@ describe( 'Cover block controls', () => {
 				} )
 			).toBeInTheDocument();
 		} );
-		test( 'sets minHeight attributes to 100vh when clicked', () => {
+		test( 'sets minHeight attributes to 100vh when clicked', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			render( <CoverBlockControls { ...defaultProps } /> );
-			fireEvent.click( screen.getByLabelText( 'Toggle full height' ) );
+			await user.click( screen.getByLabelText( 'Toggle full height' ) );
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				minHeight: 100,
 				minHeightUnit: 'vh',

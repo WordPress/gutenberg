@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -92,9 +93,11 @@ describe( 'Slot', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
+	it( 'calls the functions passed as the Slot’s fillProps in the Fill', async () => {
 		const onClose = jest.fn();
-
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		render(
 			<Provider>
 				<Slot name="chicken" fillProps={ { onClose } } />
@@ -108,7 +111,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		fireEvent.click( screen.getByText( 'Click me' ) );
+		await user.click( screen.getByText( 'Click me' ) );
 
 		expect( onClose ).toHaveBeenCalledTimes( 1 );
 	} );
@@ -149,7 +152,10 @@ describe( 'Slot', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should re-render Slot when not bubbling virtually', () => {
+	it( 'should re-render Slot when not bubbling virtually', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		const { container } = render(
 			<Provider>
 				<div>
@@ -161,7 +167,7 @@ describe( 'Slot', () => {
 
 		expect( container ).toMatchSnapshot();
 
-		fireEvent.click( screen.getByRole( 'button' ) );
+		await user.click( screen.getByRole( 'button' ) );
 
 		expect( container ).toMatchSnapshot();
 	} );
