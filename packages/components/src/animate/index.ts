@@ -4,30 +4,24 @@
 import classnames from 'classnames';
 
 /**
- * @typedef {'top' | 'top left' | 'top right' | 'middle' | 'middle left' | 'middle right' | 'bottom' | 'bottom left' | 'bottom right'} AppearOrigin
- * @typedef {'left' | 'right'} SlideInOrigin
- * @typedef {{ type: 'appear'; origin?: AppearOrigin }} AppearOptions
- * @typedef {{ type: 'slide-in'; origin?: SlideInOrigin }} SlideInOptions
- * @typedef {{ type: 'loading' }} LoadingOptions
- * @typedef {AppearOptions | SlideInOptions | LoadingOptions} GetAnimateOptions
+ * Internal dependencies
  */
+import type { AnimateProps, GetAnimateOptions } from './types';
 
-/* eslint-disable jsdoc/valid-types */
 /**
- * @param {GetAnimateOptions['type']} type The animation type
- * @return {'top' | 'left'} Default origin
+ * @param type The animation type
+ * @return Default origin
  */
-function getDefaultOrigin( type ) {
+function getDefaultOrigin( type?: GetAnimateOptions[ 'type' ] ) {
 	return type === 'appear' ? 'top' : 'left';
 }
-/* eslint-enable jsdoc/valid-types */
 
 /**
- * @param {GetAnimateOptions} options
+ * @param options
  *
- * @return {string | undefined} ClassName that applies the animations
+ * @return ClassName that applies the animations
  */
-export function getAnimateClassName( options ) {
+export function getAnimateClassName( options: GetAnimateOptions ) {
 	if ( options.type === 'loading' ) {
 		return classnames( 'components-animate__loading' );
 	}
@@ -51,10 +45,15 @@ export function getAnimateClassName( options ) {
 
 	return undefined;
 }
-
-// @ts-ignore Reason: Planned for deprecation
-export default function Animate( { type, options = {}, children } ) {
+export default function Animate( {
+	type,
+	options = {},
+	children,
+}: AnimateProps ) {
 	return children( {
-		className: getAnimateClassName( { type, ...options } ),
+		className: getAnimateClassName( {
+			type,
+			...options,
+		} as GetAnimateOptions ),
 	} );
 }

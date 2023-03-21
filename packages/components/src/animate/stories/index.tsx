@@ -1,8 +1,10 @@
 /**
  * Internal dependencies
  */
-import Animate from '../';
+import Animate from '..';
 import Notice from '../../notice';
+
+import type { AppearOptions } from '../types';
 
 export default { title: 'Components/Animate', component: Animate };
 
@@ -17,7 +19,7 @@ export const _default = () => (
 );
 
 // Unexported helper for different origins.
-const Appear = ( { origin } ) => (
+const Appear = ( { origin }: { origin: AppearOptions[ 'origin' ] } ) => (
 	<Animate type="appear" options={ { origin } }>
 		{ ( { className } ) => (
 			<Notice className={ className } status="success">
