@@ -15,6 +15,7 @@
 ### Bug Fix
 
 -  `InputControl`: Fix misaligned textarea input control ([#49116](https://github.com/WordPress/gutenberg/pull/49116)).
+-  `ToolsPanel`: Ensure consistency in menu item order ([#49222](https://github.com/WordPress/gutenberg/pull/49222)).
 
 ## 23.6.0 (2023-03-15)
 
