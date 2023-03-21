@@ -16,52 +16,14 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 	private static $custom_draft;
 	private static $custom_post;
 
-	private static $pages;
-	private static $terms;
+
 	/**
 	 * @var array|null
 	 */
 	private $original_block_supports;
 
 	public static function set_up_before_class() {
-
-		self::$draft   = self::factory()->post->create_and_get(
-			array(
-				'post_type'    => 'page',
-				'post_status'  => 'draft',
-				'post_name'    => 'ceilingcat',
-				'post_title'   => 'Ceiling Cat',
-				'post_content' => 'Ceiling Cat content',
-				'post_excerpt' => 'Ceiling Cat',
-			)
-		);
-		self::$pages[] = self::$draft;
-
-		self::$custom_draft = self::factory()->post->create_and_get(
-			array(
-				'post_type'    => 'cats',
-				'post_status'  => 'draft',
-				'post_name'    => 'metalcat',
-				'post_title'   => 'Metal Cat',
-				'post_content' => 'Metal Cat content',
-				'post_excerpt' => 'Metal Cat',
-			)
-		);
-		self::$pages[]      = self::$custom_draft;
-
-		self::$custom_post = self::factory()->post->create_and_get(
-			array(
-				'post_type'    => 'dogs',
-				'post_status'  => 'publish',
-				'post_name'    => 'metaldog',
-				'post_title'   => 'Metal Dog',
-				'post_content' => 'Metal Dog content',
-				'post_excerpt' => 'Metal Dog',
-			)
-		);
-		self::$pages[]     = self::$custom_post;
-
-		self::$page    = self::factory()->post->create_and_get(
+		self::$page = self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'page',
 				'post_status'  => 'publish',
@@ -71,18 +33,6 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 				'post_excerpt' => 'Tabby cat',
 			)
 		);
-		self::$pages[] = self::$page;
-
-		self::$category = self::factory()->category->create_and_get(
-			array(
-				'taxonomy'    => 'category',
-				'name'        => 'cats',
-				'slug'        => 'cats',
-				'description' => 'Cats Category',
-			)
-		);
-
-		self::$terms[] = self::$category;
 	}
 
 	public function set_up() {
