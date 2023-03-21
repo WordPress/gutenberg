@@ -549,6 +549,17 @@ _Parameters_
 _Returns_
 
 -   `WPComponent`: The component to be rendered.
+### getSpacingPresetCssVar
+
+Converts a spacing preset into a custom value.
+
+_Parameters_
+
+-   _value_ `string`: Value to convert.
+
+_Returns_
+
+-   `string`: CSS var string for given spacing preset value.
 
 ### InnerBlocks
 
@@ -569,6 +580,18 @@ Undocumented declaration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
+
+### isValueSpacingPreset
+
+Checks is given value is a spacing preset.
+
+_Parameters_
+
+-   _value_ `string`: Value to check
+
+_Returns_
+
+-   `boolean`: Return true if value is string in format var:preset|spacing|.
 
 ### JustifyContentControl
 
