@@ -159,7 +159,8 @@ function DuotonePicker( {
 									newColors.length >= 2
 										? newColors
 										: undefined;
-								// @ts-expect-error TODO: Investigate if this is actually a problem
+								// @ts-expect-error TODO: The color arrays for a DuotonePicker should be a tuple of two colors,
+								// but it's currently typed as a string[].
 								// See also https://github.com/WordPress/gutenberg/pull/49060#discussion_r1136951035
 								onChange( newValue );
 							} }
