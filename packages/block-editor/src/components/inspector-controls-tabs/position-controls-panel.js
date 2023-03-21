@@ -45,7 +45,7 @@ const PositionControlsPanel = () => {
 		<PanelBody
 			className="block-editor-block-inspector__position"
 			title={ __( 'Position' ) }
-			initialOpen={ initialOpen }
+			initialOpen={ initialOpen ?? false }
 		>
 			<InspectorControls.Slot group="position" />
 		</PanelBody>
