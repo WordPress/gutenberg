@@ -194,11 +194,11 @@ class WP_Duotone_Gutenberg {
 		* Accessing el.offsetHeight flushes layout and style
 		* changes in WebKit without having to wait for setTimeout.
 		*/
-		printf(
+		$script_tag = sprintf(
 			'<script>
 				(
 					function() {
-						%s.forEach( selector => { 
+						%s.forEach( selector => {
 							document.querySelectorAll( selector ).forEach( function( el ) {
 								if( ! el ) {
 									return;
@@ -214,6 +214,9 @@ class WP_Duotone_Gutenberg {
 			</script>',
 			wp_json_encode( $selectors )
 		);
+
+		// Strip whitespace.
+		echo preg_replace( '/\s+/', '', $script_tag );
 	}
 
 	/**
