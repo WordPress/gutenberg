@@ -1,14 +1,17 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-
 /**
  * Internal dependencies
  */
 import { ColorPicker } from '..';
 
-export default {
+const meta: ComponentMeta< typeof ColorPicker > = {
 	component: ColorPicker,
 	title: 'Components/ColorPicker',
 	argTypes: {
@@ -22,9 +25,13 @@ export default {
 		onChange: { action: 'onChange' },
 	},
 };
+export default meta;
 
-const Template = ( { onChange, ...props } ) => {
-	const [ color, setColor ] = useState();
+const Template: ComponentStory< typeof ColorPicker > = ( {
+	onChange,
+	...props
+} ) => {
+	const [ color, setColor ] = useState< string | undefined >();
 
 	return (
 		<ColorPicker
