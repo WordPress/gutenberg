@@ -18,12 +18,10 @@ const meta: ComponentMeta< typeof GradientPicker > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
+		actions: { argTypesRegex: '^on.*' },
 	},
 	argTypes: {
-		__nextHasNoMargin: { control: { type: 'boolean' } },
-		clearable: { control: { type: 'boolean' } },
-		disableCustomGradients: { control: { type: 'boolean' } },
-		onChange: { action: 'onChange' },
+		value: { control: { type: null } },
 	},
 };
 export default meta;
