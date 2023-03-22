@@ -408,6 +408,22 @@ describe( 'typography utils', () => {
 				expected:
 					'clamp(64px, 4rem + ((1vw - 7.68px) * 16.346), 200px)',
 			},
+
+			{
+				message:
+					'should not use ceiling for minimum font size when custom min font size is set',
+				preset: {
+					size: '200px',
+					fluid: {
+						min: '100px',
+					},
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(100px, 6.25rem + ((1vw - 7.68px) * 12.019), 200px)',
+			},
 		].forEach( ( { message, preset, typographySettings, expected } ) => {
 			it( `${ message }`, () => {
 				expect(
