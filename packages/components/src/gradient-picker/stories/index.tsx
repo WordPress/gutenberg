@@ -69,7 +69,8 @@ const Template: ComponentStory< typeof GradientPicker > = ( {
 	onChange,
 	...props
 } ) => {
-	const [ gradient, setGradient ] = useState< string | undefined >();
+	const [ gradient, setGradient ] =
+		useState< typeof props[ 'value' ] >( null );
 	return (
 		<GradientPicker
 			{ ...props }
