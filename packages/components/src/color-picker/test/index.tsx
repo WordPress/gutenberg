@@ -85,10 +85,14 @@ describe( 'ColorPicker', () => {
 
 			const saturation = getSaturation( container );
 
+			if ( saturation === null ) {
+				throw new Error( 'The saturation slider could not be found' );
+			}
+
 			expect( saturation ).toBeInTheDocument();
 
 			moveReactColorfulSlider(
-				saturation!,
+				saturation,
 				{ pageX: 0, pageY: 0 },
 				{ pageX: 10, pageY: 10 }
 			);
@@ -113,10 +117,14 @@ describe( 'ColorPicker', () => {
 
 		const saturation = getSaturation( container );
 
+		if ( saturation === null ) {
+			throw new Error( 'The saturation slider could not be found' );
+		}
+
 		expect( saturation ).toBeInTheDocument();
 
 		moveReactColorfulSlider(
-			saturation!,
+			saturation,
 			{ pageX: 0, pageY: 0 },
 			{ pageX: 10, pageY: 10 }
 		);
@@ -148,10 +156,14 @@ describe( 'ColorPicker', () => {
 
 		const saturation = getSaturation( container );
 
+		if ( saturation === null ) {
+			throw new Error( 'The saturation slider could not be found' );
+		}
+
 		expect( saturation ).toBeInTheDocument();
 
 		moveReactColorfulSlider(
-			saturation!,
+			saturation,
 			{ pageX: 0, pageY: 0 },
 			{ pageX: 10, pageY: 10 }
 		);
