@@ -85,7 +85,7 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		$wp_insert_post_result = wp_insert_post(
 			array(
 				'post_content' => $default_blocks,
-				'post_title'   => _x( 'Navigation', 'Title of a Navigation menu' ),
+				'post_title'   => _x( 'Navigation', 'Title of a Navigation menu', 'gutenberg' ),
 				'post_name'    => 'navigation',
 				'post_status'  => 'publish',
 				'post_type'    => 'wp_navigation',
