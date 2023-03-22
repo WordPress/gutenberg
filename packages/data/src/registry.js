@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
@@ -14,6 +9,7 @@ import deprecated from '@wordpress/deprecated';
 import createReduxStore from './redux-store';
 import coreDataStore from './store';
 import { createEmitter } from './utils/emitter';
+import { lock, unlock } from './private-apis';
 
 /** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
@@ -197,23 +193,36 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	// Deprecated
 	// TODO: Remove this after `use()` is removed.
 	function withPlugins( attributes ) {
-		return mapValues( attributes, ( attribute, key ) => {
-			if ( typeof attribute !== 'function' ) {
-				return attribute;
-			}
-			return function () {
-				return registry[ key ].apply( null, arguments );
-			};
-		} );
+		return Object.fromEntries(
+			Object.entries( attributes ).map( ( [ key, attribute ] ) => {
+				if ( typeof attribute !== 'function' ) {
+					return [ key, attribute ];
+				}
+				return [
+					key,
+					function () {
+						return registry[ key ].apply( null, arguments );
+					},
+				];
+			} )
+		);
 	}
 
 	/**
 	 * Registers a store instance.
 	 *
-	 * @param {string} name  Store registry name.
-	 * @param {Object} store Store instance object (getSelectors, getActions, subscribe).
+	 * @param {string}   name        Store registry name.
+	 * @param {Function} createStore Function that creates a store object (getSelectors, getActions, subscribe).
 	 */
-	function registerStoreInstance( name, store ) {
+	function registerStoreInstance( name, createStore ) {
+		if ( stores[ name ] ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Store "' + name + '" is already registered.' );
+			return stores[ name ];
+		}
+
+		const store = createStore();
+
 		if ( typeof store.getSelectors !== 'function' ) {
 			throw new TypeError( 'store.getSelectors must be a function' );
 		}
@@ -245,6 +254,24 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		};
 		stores[ name ] = store;
 		store.subscribe( globalListener );
+
+		// Copy private actions and selectors from the parent store.
+		if ( parent ) {
+			try {
+				unlock( store.store ).registerPrivateActions(
+					unlock( parent ).privateActionsOf( name )
+				);
+				unlock( store.store ).registerPrivateSelectors(
+					unlock( parent ).privateSelectorsOf( name )
+				);
+			} catch ( e ) {
+				// unlock() throws if store.store was not locked.
+				// The error indicates there's nothing to do here so let's
+				// ignore it.
+			}
+		}
+
+		return store;
 	}
 
 	/**
@@ -253,7 +280,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @param {StoreDescriptor} store Store descriptor.
 	 */
 	function register( store ) {
-		registerStoreInstance( store.name, store.instantiate( registry ) );
+		registerStoreInstance( store.name, () =>
+			store.instantiate( registry )
+		);
 	}
 
 	function registerGenericStore( name, store ) {
@@ -261,7 +290,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			since: '5.9',
 			alternative: 'wp.data.register( storeDescriptor )',
 		} );
-		registerStoreInstance( name, store );
+		registerStoreInstance( name, () => store );
 	}
 
 	/**
@@ -277,10 +306,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const store = createReduxStore( storeName, options ).instantiate(
-			registry
+		const store = registerStoreInstance( storeName, () =>
+			createReduxStore( storeName, options ).instantiate( registry )
 		);
-		registerStoreInstance( storeName, store );
+
 		return store.store;
 	}
 
@@ -334,5 +363,24 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		parent.subscribe( globalListener );
 	}
 
-	return withPlugins( registry );
+	const registryWithPlugins = withPlugins( registry );
+	lock( registryWithPlugins, {
+		privateActionsOf: ( name ) => {
+			try {
+				return unlock( stores[ name ].store ).privateActions;
+			} catch ( e ) {
+				// unlock() throws an error the store was not locked – this means
+				// there no private actions are available
+				return {};
+			}
+		},
+		privateSelectorsOf: ( name ) => {
+			try {
+				return unlock( stores[ name ].store ).privateSelectors;
+			} catch ( e ) {
+				return {};
+			}
+		},
+	} );
+	return registryWithPlugins;
 }

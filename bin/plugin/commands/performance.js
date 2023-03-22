@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { mapValues, kebabCase } = require( 'lodash' );
+const { mapValues } = require( 'lodash' );
 const SimpleGit = require( 'simple-git' );
 
 /**
@@ -30,52 +30,69 @@ const config = require( '../config' );
 /**
  * @typedef WPRawPerformanceResults
  *
- * @property {number[]} serverResponse       Represents the time the server takes to respond.
- * @property {number[]} firstPaint           Represents the time when the user agent first rendered after navigation.
- * @property {number[]} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
- * @property {number[]} loaded               Represents the time when the load event of the current document is completed.
- * @property {number[]} firstContentfulPaint Represents the time when the browser first renders any text or media.
- * @property {number[]} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number[]} type                 Average type time.
- * @property {number[]} typeContainer        Average type time within a container.
- * @property {number[]} focus                Average block selection time.
- * @property {number[]} inserterOpen         Average time to open global inserter.
- * @property {number[]} inserterSearch       Average time to search the inserter.
- * @property {number[]} inserterHover        Average time to move mouse between two block item in the inserter.
- * @property {number[]} listViewOpen         Average time to open listView
+ * @property {number[]} timeToFirstByte        Represents the time since the browser started the request until it received a response.
+ * @property {number[]} largestContentfulPaint Represents the time when the main content of the page has likely loaded.
+ * @property {number[]} lcpMinusTtfb           Represents the difference between LCP and TTFB.
+ * @property {number[]} serverResponse         Represents the time the server takes to respond.
+ * @property {number[]} firstPaint             Represents the time when the user agent first rendered after navigation.
+ * @property {number[]} domContentLoaded       Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number[]} loaded                 Represents the time when the load event of the current document is completed.
+ * @property {number[]} firstContentfulPaint   Represents the time when the browser first renders any text or media.
+ * @property {number[]} firstBlock             Represents the time when Puppeteer first sees a block selector in the DOM.
+ * @property {number[]} type                   Average type time.
+ * @property {number[]} typeContainer          Average type time within a container.
+ * @property {number[]} focus                  Average block selection time.
+ * @property {number[]} inserterOpen           Average time to open global inserter.
+ * @property {number[]} inserterSearch         Average time to search the inserter.
+ * @property {number[]} inserterHover          Average time to move mouse between two block item in the inserter.
+ * @property {number[]} listViewOpen           Average time to open listView
  */
 
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number=} serverResponse       Represents the time the server takes to respond.
- * @property {number=} firstPaint           Represents the time when the user agent first rendered after navigation.
- * @property {number=} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
- * @property {number=} loaded               Represents the time when the load event of the current document is completed.
- * @property {number=} firstContentfulPaint Represents the time when the browser first renders any text or media.
- * @property {number=} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number=} type                 Average type time.
- * @property {number=} minType              Minimum type time.
- * @property {number=} maxType              Maximum type time.
- * @property {number=} typeContainer        Average type time within a container.
- * @property {number=} minTypeContainer     Minimum type time within a container.
- * @property {number=} maxTypeContainer     Maximum type time within a container.
- * @property {number=} focus                Average block selection time.
- * @property {number=} minFocus             Min block selection time.
- * @property {number=} maxFocus             Max block selection time.
- * @property {number=} inserterOpen         Average time to open global inserter.
- * @property {number=} minInserterOpen      Min time to open global inserter.
- * @property {number=} maxInserterOpen      Max time to open global inserter.
- * @property {number=} inserterSearch       Average time to open global inserter.
- * @property {number=} minInserterSearch    Min time to open global inserter.
- * @property {number=} maxInserterSearch    Max time to open global inserter.
- * @property {number=} inserterHover        Average time to move mouse between two block item in the inserter.
- * @property {number=} minInserterHover     Min time to move mouse between two block item in the inserter.
- * @property {number=} maxInserterHover     Max time to move mouse between two block item in the inserter.
- * @property {number=} listViewOpen         Average time to open list view.
- * @property {number=} minListViewOpen      Min time to open list view.
- * @property {number=} maxListViewOpen      Max time to open list view.
+ * @property {number=} timeToFirstByte        Represents the time since the browser started the request until it received a response.
+ * @property {number=} largestContentfulPaint Represents the time when the main content of the page has likely loaded.
+ * @property {number=} lcpMinusTtfb           Represents the difference between LCP and TTFB.
+ * @property {number=} serverResponse         Represents the time the server takes to respond.
+ * @property {number=} firstPaint             Represents the time when the user agent first rendered after navigation.
+ * @property {number=} domContentLoaded       Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number=} loaded                 Represents the time when the load event of the current document is completed.
+ * @property {number=} firstContentfulPaint   Represents the time when the browser first renders any text or media.
+ * @property {number=} firstBlock             Represents the time when Puppeteer first sees a block selector in the DOM.
+ * @property {number=} type                   Average type time.
+ * @property {number=} minType                Minimum type time.
+ * @property {number=} maxType                Maximum type time.
+ * @property {number=} typeContainer          Average type time within a container.
+ * @property {number=} minTypeContainer       Minimum type time within a container.
+ * @property {number=} maxTypeContainer       Maximum type time within a container.
+ * @property {number=} focus                  Average block selection time.
+ * @property {number=} minFocus               Min block selection time.
+ * @property {number=} maxFocus               Max block selection time.
+ * @property {number=} inserterOpen           Average time to open global inserter.
+ * @property {number=} minInserterOpen        Min time to open global inserter.
+ * @property {number=} maxInserterOpen        Max time to open global inserter.
+ * @property {number=} inserterSearch         Average time to open global inserter.
+ * @property {number=} minInserterSearch      Min time to open global inserter.
+ * @property {number=} maxInserterSearch      Max time to open global inserter.
+ * @property {number=} inserterHover          Average time to move mouse between two block item in the inserter.
+ * @property {number=} minInserterHover       Min time to move mouse between two block item in the inserter.
+ * @property {number=} maxInserterHover       Max time to move mouse between two block item in the inserter.
+ * @property {number=} listViewOpen           Average time to open list view.
+ * @property {number=} minListViewOpen        Min time to open list view.
+ * @property {number=} maxListViewOpen        Max time to open list view.
  */
+
+/**
+ * Sanitizes branch name to be used in a path or a filename.
+ *
+ * @param {string} branch
+ *
+ * @return {string} Sanitized branch name.
+ */
+function sanitizeBranchName( branch ) {
+	return branch.replace( /[^a-zA-Z0-9-]/g, '-' );
+}
 
 /**
  * Computes the average number from an array numbers.
@@ -118,11 +135,23 @@ function formatTime( number ) {
 /**
  * Curate the raw performance results.
  *
+ * @param {string}                  testSuite
  * @param {WPRawPerformanceResults} results
  *
  * @return {WPPerformanceResults} Curated Performance results.
  */
-function curateResults( results ) {
+function curateResults( testSuite, results ) {
+	if (
+		testSuite === 'front-end-classic-theme' ||
+		testSuite === 'front-end-block-theme'
+	) {
+		return {
+			timeToFirstByte: median( results.timeToFirstByte ),
+			largestContentfulPaint: median( results.largestContentfulPaint ),
+			lcpMinusTtfb: median( results.lcpMinusTtfb ),
+		};
+	}
+
 	return {
 		serverResponse: average( results.serverResponse ),
 		firstPaint: average( results.firstPaint ),
@@ -159,21 +188,43 @@ function curateResults( results ) {
  *
  * @param {string} testSuite                Name of the tests set.
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
+ * @param {string} runKey                   Unique identifier for the test run, e.g. `branch-name_post-editor_run-3`.
  *
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
-async function runTestSuite( testSuite, performanceTestDirectory ) {
-	await runShellScript(
-		`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
-		performanceTestDirectory
+async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
+	try {
+		await runShellScript(
+			`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
+			performanceTestDirectory
+		);
+	} catch ( error ) {
+		fs.mkdirSync( './__test-results/artifacts', { recursive: true } );
+		const artifactsFolder = path.join(
+			performanceTestDirectory,
+			'artifacts/'
+		);
+		await runShellScript(
+			'cp -Rv ' + artifactsFolder + ' ' + './__test-results/artifacts/'
+		);
+
+		throw error;
+	}
+
+	const resultsFile = path.join(
+		performanceTestDirectory,
+		`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
 	);
+	fs.mkdirSync( './__test-results', { recursive: true } );
+	fs.copyFileSync( resultsFile, `./__test-results/${ runKey }.results.json` );
 	const rawResults = await readJSONFile(
 		path.join(
 			performanceTestDirectory,
 			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
 		)
 	);
-	return curateResults( rawResults );
+
+	return curateResults( testSuite, rawResults );
 }
 
 /**
@@ -259,8 +310,8 @@ async function runPerformanceTests( branches, options ) {
 	const branchDirectories = {};
 	for ( const branch of branches ) {
 		log( `    >> Branch: ${ branch }` );
-		const environmentDirectory =
-			rootDirectory + '/envs/' + kebabCase( branch );
+		const sanitizedBranch = sanitizeBranchName( branch );
+		const environmentDirectory = rootDirectory + '/envs/' + sanitizedBranch;
 		// @ts-ignore
 		branchDirectories[ branch ] = environmentDirectory;
 		const buildPath = `${ environmentDirectory }/plugin`;
@@ -280,13 +331,13 @@ async function runPerformanceTests( branches, options ) {
 			log( `        >> Fetching the ${ fancyBranch } branch` );
 			// @ts-ignore
 			await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
-
-			log( `        >> Building the ${ fancyBranch } branch` );
-			await runShellScript(
-				'npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
-				buildPath
-			);
 		}
+
+		log( `        >> Building the ${ fancyBranch } branch` );
+		await runShellScript(
+			'npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
+			buildPath
+		);
 
 		await runShellScript(
 			'cp ' +
@@ -344,7 +395,12 @@ async function runPerformanceTests( branches, options ) {
 	// 4- Running the tests.
 	log( '\n>> Running the tests' );
 
-	const testSuites = [ 'post-editor', 'site-editor' ];
+	const testSuites = [
+		'post-editor',
+		'site-editor',
+		'front-end-classic-theme',
+		'front-end-block-theme',
+	];
 
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
 	const results = {};
@@ -356,6 +412,8 @@ async function runPerformanceTests( branches, options ) {
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
+				const sanitizedBranch = sanitizeBranchName( branch );
+				const runKey = `${ sanitizedBranch }_${ testSuite }_run-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
 				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
@@ -367,7 +425,8 @@ async function runPerformanceTests( branches, options ) {
 				log( '        >> Running the test.' );
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
-					performanceTestDirectory
+					performanceTestDirectory,
+					runKey
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(
@@ -379,78 +438,25 @@ async function runPerformanceTests( branches, options ) {
 
 		// Computing medians.
 		for ( const branch of branches ) {
-			const medians = mapValues(
-				{
-					serverResponse: rawResults.map(
-						( r ) => r[ branch ].serverResponse
-					),
-					firstPaint: rawResults.map(
-						( r ) => r[ branch ].firstPaint
-					),
-					domContentLoaded: rawResults.map(
-						( r ) => r[ branch ].domContentLoaded
-					),
-					loaded: rawResults.map( ( r ) => r[ branch ].loaded ),
-					firstContentfulPaint: rawResults.map(
-						( r ) => r[ branch ].firstContentfulPaint
-					),
-					firstBlock: rawResults.map(
-						( r ) => r[ branch ].firstBlock
-					),
-					type: rawResults.map( ( r ) => r[ branch ].type ),
-					minType: rawResults.map( ( r ) => r[ branch ].minType ),
-					maxType: rawResults.map( ( r ) => r[ branch ].maxType ),
-					typeContainer: rawResults.map(
-						( r ) => r[ branch ].typeContainer
-					),
-					minTypeContainer: rawResults.map(
-						( r ) => r[ branch ].minTypeContainer
-					),
-					maxTypeContainer: rawResults.map(
-						( r ) => r[ branch ].maxTypeContainer
-					),
-					focus: rawResults.map( ( r ) => r[ branch ].focus ),
-					minFocus: rawResults.map( ( r ) => r[ branch ].minFocus ),
-					maxFocus: rawResults.map( ( r ) => r[ branch ].maxFocus ),
-					inserterOpen: rawResults.map(
-						( r ) => r[ branch ].inserterOpen
-					),
-					minInserterOpen: rawResults.map(
-						( r ) => r[ branch ].minInserterOpen
-					),
-					maxInserterOpen: rawResults.map(
-						( r ) => r[ branch ].maxInserterOpen
-					),
-					inserterSearch: rawResults.map(
-						( r ) => r[ branch ].inserterSearch
-					),
-					minInserterSearch: rawResults.map(
-						( r ) => r[ branch ].minInserterSearch
-					),
-					maxInserterSearch: rawResults.map(
-						( r ) => r[ branch ].maxInserterSearch
-					),
-					inserterHover: rawResults.map(
-						( r ) => r[ branch ].inserterHover
-					),
-					minInserterHover: rawResults.map(
-						( r ) => r[ branch ].minInserterHover
-					),
-					maxInserterHover: rawResults.map(
-						( r ) => r[ branch ].maxInserterHover
-					),
-					listViewOpen: rawResults.map(
-						( r ) => r[ branch ].listViewOpen
-					),
-					minListViewOpen: rawResults.map(
-						( r ) => r[ branch ].minListViewOpen
-					),
-					maxListViewOpen: rawResults.map(
-						( r ) => r[ branch ].maxListViewOpen
-					),
-				},
-				median
-			);
+			/**
+			 * @type {string[]}
+			 */
+			let dataPointsForTestSuite = [];
+			if ( rawResults.length > 0 ) {
+				dataPointsForTestSuite = Object.keys(
+					rawResults[ 0 ][ branch ]
+				);
+			}
+
+			const resultsByDataPoint = {};
+			dataPointsForTestSuite.forEach( ( dataPoint ) => {
+				// @ts-ignore
+				resultsByDataPoint[ dataPoint ] = rawResults.map(
+					// @ts-ignore
+					( r ) => r[ branch ][ dataPoint ]
+				);
+			} );
+			const medians = mapValues( resultsByDataPoint, median );
 
 			// Format results as times.
 			results[ testSuite ][ branch ] = mapValues( medians, formatTime );

@@ -50,7 +50,8 @@ const deprecated = [
 				default: 'div',
 			},
 			templateLock: {
-				type: 'string',
+				type: [ 'string', 'boolean' ],
+				enum: [ 'all', 'insert', false ],
 			},
 		},
 		supports: {
@@ -108,7 +109,9 @@ const deprecated = [
 			);
 		},
 		isEligible: ( { layout } ) =>
-			! layout || layout.inherit || layout.contentSize,
+			! layout ||
+			layout.inherit ||
+			( layout.contentSize && layout.type !== 'constrained' ),
 		migrate: ( attributes ) => {
 			const { layout = null } = attributes;
 			if ( ! layout ) {
@@ -133,7 +136,8 @@ const deprecated = [
 				default: 'div',
 			},
 			templateLock: {
-				type: 'string',
+				type: [ 'string', 'boolean' ],
+				enum: [ 'all', 'insert', false ],
 			},
 		},
 		supports: {

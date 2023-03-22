@@ -527,6 +527,10 @@ _Returns_
 
 -   `Promise`: Promise resolving with a boolean indicating if the focused block is the default block.
 
+### isListViewOpen
+
+Undocumented declaration.
+
 ### isOfflineMode
 
 Undocumented declaration.
@@ -551,6 +555,10 @@ _Parameters_
 
 -   _username_ `?string`: String to be used as user credential.
 -   _password_ `?string`: String to be used as user credential.
+
+### logout
+
+Performs log out.
 
 ### mockOrTransform
 

@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+import { compose, usePrevious } from '@wordpress/compose';
 import {
 	BaseControl,
 	PanelBody,
@@ -14,6 +14,7 @@ import {
 	ToggleControl,
 	RangeControl,
 	Spinner,
+	ToolbarButton,
 } from '@wordpress/components';
 import {
 	store as blockEditorStore,
@@ -24,7 +25,13 @@ import {
 	BlockControls,
 	MediaReplaceFlow,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useMemo } from '@wordpress/element';
+import {
+	Platform,
+	useCallback,
+	useEffect,
+	useState,
+	useMemo,
+} from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -32,6 +39,7 @@ import { View } from '@wordpress/primitives';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
+import { caption as captionIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -65,7 +73,6 @@ const linkOptions = [
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const allowedBlocks = [ 'core/image' ];
-const LAYOUT = { type: 'default', alignments: [] };
 
 const PLACEHOLDER_TEXT = Platform.isNative
 	? __( 'ADD MEDIA' )
@@ -83,9 +90,37 @@ function GalleryEdit( props ) {
 		clientId,
 		isSelected,
 		insertBlocksAfter,
+		isContentLocked,
 	} = props;
 
-	const { columns, imageCrop, linkTarget, linkTo, sizeSlug } = attributes;
+	const { columns, imageCrop, linkTarget, linkTo, sizeSlug, caption } =
+		attributes;
+	const [ showCaption, setShowCaption ] = useState( !! caption );
+	const prevCaption = usePrevious( caption );
+
+	// We need to show the caption when changes come from
+	// history navigation(undo/redo).
+	useEffect( () => {
+		if ( caption && ! prevCaption ) {
+			setShowCaption( true );
+		}
+	}, [ caption, prevCaption ] );
+
+	useEffect( () => {
+		if ( ! isSelected && ! caption ) {
+			setShowCaption( false );
+		}
+	}, [ isSelected, caption ] );
+
+	// Focus the caption when we click to add one.
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -495,7 +530,6 @@ function GalleryEdit( props ) {
 		allowedBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
-		__experimentalLayout: LAYOUT,
 		...nativeInnerBlockProps,
 	} );
 
@@ -528,9 +562,11 @@ function GalleryEdit( props ) {
 							max={ Math.min( MAX_COLUMNS, images.length ) }
 							{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 							required
+							size="__unstable-large"
 						/>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Crop images' ) }
 						checked={ !! imageCrop }
 						onChange={ toggleImageCrop }
@@ -543,9 +579,11 @@ function GalleryEdit( props ) {
 						onChange={ setLinkTo }
 						options={ linkOptions }
 						hideCancelButton={ true }
+						size="__unstable-large"
 					/>
 					{ hasLinkTo && (
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							checked={ linkTarget === '_blank' }
 							onChange={ toggleOpenInNewTab }
@@ -555,10 +593,14 @@ function GalleryEdit( props ) {
 						<SelectControl
 							__nextHasNoMarginBottom
 							label={ __( 'Image size' ) }
+							help={ __(
+								'Select the size of the source images.'
+							) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
 							hideCancelButton={ true }
+							size="__unstable-large"
 						/>
 					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
@@ -574,6 +616,25 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			<BlockControls group="block">
+				{ ! isContentLocked && (
+					<ToolbarButton
+						onClick={ () => {
+							setShowCaption( ! showCaption );
+							if ( showCaption && caption ) {
+								setAttributes( { caption: undefined } );
+							}
+						} }
+						icon={ captionIcon }
+						isPressed={ showCaption }
+						label={
+							showCaption
+								? __( 'Remove caption' )
+								: __( 'Add caption' )
+						}
+					/>
+				) }
+			</BlockControls>
 			<BlockControls group="other">
 				<MediaReplaceFlow
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -596,6 +657,8 @@ function GalleryEdit( props ) {
 			) }
 			<Gallery
 				{ ...props }
+				showCaption={ showCaption }
+				ref={ Platform.isWeb ? captionRef : undefined }
 				images={ images }
 				mediaPlaceholder={
 					! hasImages || Platform.isNative

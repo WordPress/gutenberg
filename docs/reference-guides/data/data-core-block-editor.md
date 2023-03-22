@@ -86,7 +86,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the given block is allowed to be moved.
+-   `boolean | undefined`: Whether the given block is allowed to be moved.
 
 ### canMoveBlocks
 
@@ -305,6 +305,20 @@ _Parameters_
 _Returns_
 
 -   `string`: Block name.
+
+### getBlockNamesByClientId
+
+Given an array of block client IDs, returns the corresponding array of block
+names.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientIds_ `string[]`: Client IDs for which block names are to be returned.
+
+_Returns_
+
+-   `string[]`: Block names.
 
 ### getBlockOrder
 
@@ -568,18 +582,6 @@ _Properties_
 -   _keywords_ `string[]`: Keywords that can be searched to find this item.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
-
-### getLastInsertedBlocksClientIds
-
-Gets the client ids of the last inserted blocks.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `Array|undefined`: Client Ids of the last inserted block(s).
 
 ### getLastMultiSelectedBlockClientId
 
@@ -858,6 +860,20 @@ _Returns_
 
 -   `string`: Client Id of moving block.
 
+### hasDraggedInnerBlock
+
+Returns true if one of the block's inner blocks is dragged.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block client ID.
+-   _deep_ `boolean`: Perform a deep check.
+
+_Returns_
+
+-   `boolean`: Whether the block has an inner block dragged
+
 ### hasInserterItems
 
 Determines whether there are items to show in the inserter.
@@ -907,7 +923,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the block as an inner block selected
+-   `boolean`: Whether the block has an inner block selected
 
 ### isAncestorBeingDragged
 
@@ -1380,7 +1396,7 @@ the set of specified client IDs are to be removed.
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Client IDs of blocks to remove.
--   _selectPrevious_ `boolean`: True if the previous block should be selected when a block is removed.
+-   _selectPrevious_ `boolean`: True if the previous block or the immediate parent (if no previous block exists) should be selected when a block is removed.
 
 ### replaceBlock
 
@@ -1494,11 +1510,13 @@ _Parameters_
 ### selectPreviousBlock
 
 Yields action objects used in signalling that the block preceding the given
-clientId should be selected.
+clientId (or optionally, its first parent from bottom to top)
+should be selected.
 
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+-   _fallbackToParent_ `boolean`: If true, select the first parent if there is no previous block.
 
 ### setBlockMovingClientId
 

@@ -1,17 +1,20 @@
 .edit-site-sidebar-navigation-item.components-item {
 	color: $gray-600;
-	border-width: $border-width-tab;
+	margin: 0 $grid-unit-05;
 
 	&:hover,
-	&:focus {
+	&:focus,
+	&[aria-current] {
 		color: $white;
 		background: $gray-800;
-		border-width: $border-width-tab;
 	}
 
 	&[aria-current] {
-		color: $white;
 		background: var(--wp-admin-theme-color);
-		border-width: $border-width-tab;
 	}
+}
+
+.edit-site-sidebar-navigation-screen__content .block-editor-list-view-block-select-button {
+	cursor: grab;
+	padding: $grid-unit-10;
 }

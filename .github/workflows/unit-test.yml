@@ -31,21 +31,18 @@ jobs:
                 node: ['14']
 
         steps:
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
               with:
                   node-version: ${{ matrix.node }}
-                  cache: npm
 
-            - name: Npm install and build
+            - name: Npm build
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
-              run: |
-                  npm ci
-                  npx lerna run build
+              run: npx lerna run build
 
             - name: Running the tests
               run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
@@ -77,13 +74,10 @@ jobs:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
 
         steps:
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-            - name: Set up Node.js
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
             ##
             # This allows Composer dependencies to be installed using a single step.
@@ -93,7 +87,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@8e2ac35f639d3e794c1da1f28999385ab6fdf0fc # v2.23.0
+              uses: shivammathur/setup-php@d30ad8b1843ace22e6698ab99bbafaa747b6bd0d # v2.24.0
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -116,10 +110,8 @@ jobs:
               with:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
-            - name: Install npm dependencies
-              run: |
-                  npm ci
-                  npm run build
+            - name: Npm build
+              run: npm run build
 
             - name: Docker debug information
               run: |
@@ -166,10 +158,10 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@8e2ac35f639d3e794c1da1f28999385ab6fdf0fc # v2.23.0
+              uses: shivammathur/setup-php@d30ad8b1843ace22e6698ab99bbafaa747b6bd0d # v2.24.0
               with:
                   php-version: '7.4'
                   coverage: none
@@ -182,7 +174,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # v3.0.11
+              uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -233,21 +225,16 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
+            - name: Npm build
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
-              run: |
-                  npm ci
-                  npx lerna run build
+              run: npx lerna run build
 
             - name: Running the tests
               run: npm run native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"

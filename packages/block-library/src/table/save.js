@@ -44,7 +44,14 @@ export default function save( { attributes } ) {
 					<tr key={ rowIndex }>
 						{ cells.map(
 							(
-								{ content, tag, scope, align, colspan },
+								{
+									content,
+									tag,
+									scope,
+									align,
+									colspan,
+									rowspan,
+								},
 								cellIndex
 							) => {
 								const cellClasses = classnames( {
@@ -66,6 +73,7 @@ export default function save( { attributes } ) {
 											tag === 'th' ? scope : undefined
 										}
 										colSpan={ colspan }
+										rowSpan={ rowspan }
 									/>
 								);
 							}

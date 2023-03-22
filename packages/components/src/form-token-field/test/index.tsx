@@ -1,3 +1,5 @@
+/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expectTokensToBeInTheDocument", "expectTokensNotToBeInTheDocument", "expectVisibleSuggestionsToBe", "expectEscapedProperly"] }] */
+
 /**
  * External dependencies
  */
@@ -81,6 +83,17 @@ const expectTokensNotToBeInTheDocument = ( tokensText: string[] ) => {
 	tokensText.forEach( ( tokenText ) =>
 		expect( screen.queryByText( tokenText ) ).not.toBeInTheDocument()
 	);
+};
+
+const expectEscapedProperly = ( tokenHtml: string ) => {
+	screen.getByText( ( _, node: Element | null ) => {
+		if ( node === null ) {
+			return false;
+		}
+
+		// This is hacky, but it's a way we can check exactly the output HTML
+		return node.innerHTML === tokenHtml;
+	} );
 };
 
 const expectVisibleSuggestionsToBe = (
@@ -937,6 +950,86 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );
 
+		it( 'should hide the suggestion list on an empty input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'on' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.clear( input );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should hide the suggestion list on blur and invalid input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render(
+				<FormTokenFieldWithState
+					suggestions={ suggestions }
+					__experimentalValidateInput={ ( token ) =>
+						suggestions.includes( token )
+					}
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'on' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.click( document.body );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not hide the suggestion list on blur and valid input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render(
+				<FormTokenFieldWithState
+					suggestions={ suggestions }
+					__experimentalValidateInput={ ( token ) =>
+						suggestions.includes( token )
+					}
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'One' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.click( document.body );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+		} );
+
 		it( 'matches the search text with the suggestions in a case-insensitive way', async () => {
 			const user = userEvent.setup();
 
@@ -1233,13 +1326,29 @@ describe( 'FormTokenField', () => {
 			expect( screen.getByTitle( 'España' ) ).toBeVisible();
 		} );
 
-		it( 'should be still used to filter out duplicate suggestions', () => {
+		it( 'should be still used to filter out duplicate suggestions', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<FormTokenFieldWithState
 					__experimentalExpandOnFocus
-					initialValue={ [ { value: 'France' }, { value: 'Spain' } ] }
+					initialValue={ [
+						{ value: 'Slovenia' },
+						{ value: 'Spain' },
+					] }
+					suggestions={ [ 'Slovenia', 'Slovakia', 'Sweden' ] }
 				/>
 			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Typing `slov` will match both `Slovenia` and `Slovakia`.
+			await user.type( input, 'slov' );
+
+			// However, `Slovenia` is already selected.
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Slovakia',
+			] );
 		} );
 	} );
 
@@ -1516,15 +1625,7 @@ describe( 'FormTokenField', () => {
 				'a&nbsp;&nbsp;&nbsp;b',
 				'i&nbsp;&lt;3&nbsp;tags',
 				'1&amp;2&amp;3&amp;4',
-			].forEach( ( tokenHtml ) => {
-				screen.getByText( ( _, node: Element | null ) => {
-					if ( node === null ) {
-						return false;
-					}
-
-					return node.innerHTML === tokenHtml;
-				} );
-			} );
+			].forEach( ( tokenHtml ) => expectEscapedProperly( tokenHtml ) );
 		} );
 
 		it( 'should allow to pass a function that renders tokens with special characters correctly', async () => {
@@ -1546,15 +1647,7 @@ describe( 'FormTokenField', () => {
 				'a&nbsp;&nbsp;&nbsp;b',
 				'i&nbsp;&lt;3&nbsp;tags',
 				'1&amp;2&amp;3&amp;4',
-			].forEach( ( tokenHtml ) => {
-				screen.getByText( ( _, node: Element | null ) => {
-					if ( node === null ) {
-						return false;
-					}
-
-					return node.innerHTML === tokenHtml;
-				} );
-			} );
+			].forEach( ( tokenHtml ) => expectEscapedProperly( tokenHtml ) );
 		} );
 	} );
 

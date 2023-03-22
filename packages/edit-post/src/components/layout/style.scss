@@ -95,3 +95,7 @@
 		bottom: 0;
 	}
 }
+
+.edit-post-layout .entities-saved-states__panel-header {
+	height: $header-height + $border-width;
+}

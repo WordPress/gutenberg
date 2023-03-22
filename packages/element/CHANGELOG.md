@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 5.6.0 (2023-03-15)
+
+## 5.5.0 (2023-03-01)
+
+### New Features
+
+-   Started exporting the `flushSync` function from `react-dom`
+
+## 5.4.0 (2023-02-15)
+
+## 5.3.0 (2023-02-01)
+
 ## 5.2.0 (2023-01-11)
 
 ## 5.1.0 (2023-01-02)

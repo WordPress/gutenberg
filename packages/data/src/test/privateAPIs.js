@@ -3,20 +3,7 @@
  */
 import { createRegistry } from '../registry';
 import createReduxStore from '../redux-store';
-import { unlock } from '../experiments';
-
-/**
- * WordPress dependencies
- */
-
-beforeEach( () => {
-	jest.useFakeTimers( 'legacy' );
-} );
-
-afterEach( () => {
-	jest.runOnlyPendingTimers();
-	jest.useRealTimers();
-} );
+import { unlock } from '../private-apis';
 
 describe( 'Private data APIs', () => {
 	let registry;
@@ -38,32 +25,34 @@ describe( 'Private data APIs', () => {
 	function setPublicPrice( price ) {
 		return { type: 'SET_PUBLIC_PRICE', price };
 	}
-	function createStore() {
-		const groceryStore = createReduxStore( 'grocer', {
-			selectors: {
-				getPublicPrice,
-				getState: ( state ) => state,
-			},
-			actions: { setPublicPrice },
-			reducer: ( state, action ) => {
-				if ( action?.type === 'SET_PRIVATE_PRICE' ) {
-					return {
-						...state,
-						secretDiscount: action?.price,
-					};
-				} else if ( action?.type === 'SET_PUBLIC_PRICE' ) {
-					return {
-						...state,
-						price: action?.price,
-					};
-				}
+	const storeName = 'grocer';
+	const storeDescriptor = {
+		selectors: {
+			getPublicPrice,
+			getState: ( state ) => state,
+		},
+		actions: { setPublicPrice },
+		reducer: ( state, action ) => {
+			if ( action?.type === 'SET_PRIVATE_PRICE' ) {
 				return {
-					price: 1000,
-					secretDiscount: 800,
-					...( state || {} ),
+					...state,
+					secretDiscount: action?.price,
 				};
-			},
-		} );
+			} else if ( action?.type === 'SET_PUBLIC_PRICE' ) {
+				return {
+					...state,
+					price: action?.price,
+				};
+			}
+			return {
+				price: 1000,
+				secretDiscount: 800,
+				...( state || {} ),
+			};
+		},
+	};
+	function createStore() {
+		const groceryStore = createReduxStore( storeName, storeDescriptor );
 		registry.register( groceryStore );
 		return groceryStore;
 	}
@@ -125,6 +114,55 @@ describe( 'Private data APIs', () => {
 
 			const unlockedSelectors = unlock( registry.select( groceryStore ) );
 			expect( unlockedSelectors.getPublicPrice() ).toEqual( 1000 );
+		} );
+
+		it( 'should support registerStore', () => {
+			const groceryStore = registry.registerStore(
+				storeName,
+				storeDescriptor
+			);
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+
+			const privateSelectors = unlock( registry.select( storeName ) );
+			expect( privateSelectors.getSecretDiscount() ).toEqual( 800 );
+		} );
+
+		it( 'should support mixing createReduxStore and registerStore', () => {
+			createReduxStore( storeName, storeDescriptor );
+			const groceryStore2 = registry.registerStore(
+				storeName,
+				storeDescriptor
+			);
+			unlock( groceryStore2 ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+
+			const privateSelectors = unlock( registry.select( storeName ) );
+			expect( privateSelectors.getSecretDiscount() ).toEqual( 800 );
+		} );
+
+		it( 'should support sub registries', () => {
+			const groceryStore = registry.registerStore(
+				storeName,
+				storeDescriptor
+			);
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+			const subRegistry = createRegistry( {}, registry );
+			subRegistry.registerStore( storeName, storeDescriptor );
+
+			const parentPrivateSelectors = unlock(
+				registry.select( storeName )
+			);
+			expect( parentPrivateSelectors.getSecretDiscount() ).toEqual( 800 );
+
+			const subPrivateSelectors = unlock(
+				subRegistry.select( storeName )
+			);
+			expect( subPrivateSelectors.getSecretDiscount() ).toEqual( 800 );
 		} );
 	} );
 
@@ -223,6 +261,53 @@ describe( 'Private data APIs', () => {
 			expect(
 				unlock( registry.select( groceryStore ) ).getSecretDiscount()
 			).toEqual( 100 );
+		} );
+
+		it( 'should support registerStore', () => {
+			const groceryStore = registry.registerStore(
+				storeName,
+				storeDescriptor
+			);
+			unlock( groceryStore ).registerPrivateActions( {
+				setSecretDiscount,
+			} );
+			const privateActions = unlock( registry.dispatch( storeName ) );
+			privateActions.setSecretDiscount( 400 );
+			expect(
+				registry.select( storeName ).getState().secretDiscount
+			).toEqual( 400 );
+		} );
+
+		it( 'should support sub registries', () => {
+			const groceryStore = createStore();
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+			unlock( groceryStore ).registerPrivateActions( {
+				setSecretDiscount,
+			} );
+			const subRegistry = createRegistry( {}, registry );
+			subRegistry.registerStore( storeName, storeDescriptor );
+
+			const parentPrivateActions = unlock(
+				registry.dispatch( storeName )
+			);
+			const parentPrivateSelectors = unlock(
+				registry.select( storeName )
+			);
+
+			const subPrivateActions = unlock(
+				subRegistry.dispatch( storeName )
+			);
+			const subPrivateSelectors = unlock(
+				subRegistry.select( storeName )
+			);
+
+			parentPrivateActions.setSecretDiscount( 400 );
+			subPrivateActions.setSecretDiscount( 478 );
+
+			expect( parentPrivateSelectors.getSecretDiscount() ).toEqual( 400 );
+			expect( subPrivateSelectors.getSecretDiscount() ).toEqual( 478 );
 		} );
 	} );
 } );

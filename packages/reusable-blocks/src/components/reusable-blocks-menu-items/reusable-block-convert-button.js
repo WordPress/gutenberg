@@ -120,7 +120,6 @@ export default function ReusableBlockConvertButton( {
 					{ isModalOpen && (
 						<Modal
 							title={ __( 'Create Reusable block' ) }
-							closeLabel={ __( 'Close' ) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );

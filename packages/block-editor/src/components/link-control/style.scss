@@ -22,6 +22,20 @@ $preview-image-height: 140px;
 		width: 90vw;
 		max-width: $modal-min-width;
 	}
+
+	.show-icon-labels & {
+		.components-button.has-icon {
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			// Uses ::before as ::after is already used for active tab styling.
+			&::before {
+				content: attr(aria-label);
+			}
+		}
+	}
 }
 
 // Provides positioning context for reset button. Without this then when an
@@ -72,19 +86,15 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__search-error {
-	margin: -$grid-unit-20*0.5 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
+	margin: -$grid-unit-20 * 0.5 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
 }
 
 .block-editor-link-control__search-actions {
 	display: flex;
 	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
 	justify-content: flex-start;
-	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
 	gap: $grid-unit-10;
-}
-
-.components-button .block-editor-link-control__search-submit .has-icon {
-	margin: -1px;
+	order: 20;
 }
 
 .block-editor-link-control__search-results-wrapper {
@@ -103,7 +113,7 @@ $preview-image-height: 140px;
 	}
 
 	&::before {
-		height: $grid-unit-20*0.5;
+		height: $grid-unit-20 * 0.5;
 		top: 0;
 		bottom: auto;
 	}
@@ -123,7 +133,7 @@ $preview-image-height: 140px;
 
 .block-editor-link-control__search-results {
 	margin: 0;
-	padding: $grid-unit-20*0.5 $grid-unit-20 $grid-unit-20*0.5;
+	padding: $grid-unit-20 * 0.5 $grid-unit-20 $grid-unit-20 * 0.5;
 	max-height: 200px;
 	overflow-y: auto; // allow results list to scroll
 
@@ -223,7 +233,6 @@ $preview-image-height: 140px;
 		width: 32px;
 		max-height: 32px;
 	}
-
 
 	.block-editor-link-control__search-item-info,
 	.block-editor-link-control__search-item-title {
@@ -344,16 +353,13 @@ $preview-image-height: 140px;
 	width: 100%;
 }
 
-
 .block-editor-link-control__search-item.is-fetching {
-
 	.block-editor-link-control__search-item-description {
 		&::before,
 		&::after {
 			animation: loadingpulse 1s linear infinite;
 			animation-delay: 0.5s; // avoid animating for fast network responses
 		}
-
 	}
 
 	.block-editor-link-control__search-item-image {
@@ -403,7 +409,7 @@ $preview-image-height: 140px;
 	&::before {
 		content: "";
 		position: absolute;
-		top: -#{$block-selected-child-margin*2};
+		top: -#{$block-selected-child-margin * 2};
 		left: 0;
 		display: block;
 		width: 100%;
@@ -427,12 +433,49 @@ $preview-image-height: 140px;
 	padding: 10px;
 }
 
+.block-editor-link-control__drawer {
+	display: flex; // allow for ordering.
+	order: 30;
+	flex-direction: column;
+	flex-basis: 100%; // occupy full width.
+}
+
+// Inner div required to avoid padding/margin
+// causing janky animation.
+.block-editor-link-control__drawer-inner {
+	display: flex; // allow for ordering.
+	flex-direction: column;
+	flex-basis: 100%; // occupy full width.
+	margin-top: $grid-unit-20;
+	padding-top: $grid-unit-20;
+	position: relative;
+
+	&::after {
+		content: "";
+		display: block;
+		height: 1px;
+		background-color: $gray-300;
+		position: absolute;
+		left: -$grid-unit-20;
+		right: -$grid-unit-20;
+		top: 0;
+	}
+}
+
 .block-editor-link-control__tools {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	border-top: $border-width solid $gray-300;
+	justify-content: space-between;
 	margin: 0;
 	padding: $grid-unit-20;
+
+	// To hide the horizontal scrollbar on toggle.
+	// Margin and padding are needed to prevent cutoff of the toggle button focus outline.
+	// See: https://github.com/WordPress/gutenberg/pull/47986
+	margin-top: calc(var(--wp-admin-border-width-focus) * -1);
+	padding-top: var(--wp-admin-border-width-focus);
+	overflow: hidden;
 }
 
 .block-editor-link-control__unlink {
@@ -444,11 +487,6 @@ $preview-image-height: 140px;
 	flex: 1;
 	margin: 0;
 
-
-	:last-child {
-		margin-bottom: 0;
-	}
-
 	.is-alternate & {
 		border-top: $border-width solid $gray-900;
 	}
@@ -457,7 +495,7 @@ $preview-image-height: 140px;
 .block-editor-link-control__setting {
 	margin-bottom: $grid-unit-20;
 
-	:last-child {
+	&.block-editor-link-control__setting:last-child {
 		margin-bottom: 0;
 	}
 }

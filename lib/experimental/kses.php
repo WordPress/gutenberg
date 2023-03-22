@@ -65,3 +65,25 @@ function gutenberg_override_core_kses_init_filters() {
 // The 'kses_init_filters' is usually initialized with default priority. Use higher priority to override.
 add_action( 'init', 'gutenberg_override_core_kses_init_filters', 20 );
 add_action( 'set_current_user', 'gutenberg_override_core_kses_init_filters' );
+
+/**
+ * See https://github.com/WordPress/wordpress-develop/pull/4108
+ *
+ * Mark CSS safe if it contains a "filter: url('#wp-duotone-...')" rule.
+ *
+ * This function should not be backported to core.
+ *
+ * @param bool   $allow_css Whether the CSS is allowed.
+ * @param string $css_test_string The CSS to test.
+ */
+function allow_filter_in_styles( $allow_css, $css_test_string ) {
+	if ( preg_match(
+		"/^filter:\s*url\('#wp-duotone-[-a-zA-Z0-9]+'\) !important$/",
+		$css_test_string
+	) ) {
+		return true;
+	}
+	return $allow_css;
+}
+
+add_filter( 'safecss_filter_attr_allow_css', 'allow_filter_in_styles', 10, 2 );

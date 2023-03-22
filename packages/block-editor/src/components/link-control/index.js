@@ -6,13 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	ButtonGroup,
-	Spinner,
-	Notice,
-	TextControl,
-} from '@wordpress/components';
+import { Button, Spinner, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -142,6 +136,8 @@ function LinkControl( {
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
 
+	const [ settingsOpen, setSettingsOpen ] = useState( false );
+
 	const [ internalUrlInputValue, setInternalUrlInputValue ] =
 		useInternalInputValue( value?.url || '' );
 
@@ -207,6 +203,7 @@ function LinkControl( {
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
+		setSettingsOpen( false );
 		setIsEditingLink( false );
 	};
 
@@ -273,12 +270,14 @@ function LinkControl( {
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
-	const showSettingsDrawer = !! settings?.length;
+	const showSettings = !! settings?.length;
 
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
 	const showTextControl = hasLinkValue && hasTextControl;
+
+	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
 
 	return (
 		<div
@@ -292,7 +291,7 @@ function LinkControl( {
 				</div>
 			) }
 
-			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
+			{ isEditing && (
 				<>
 					<div
 						className={ classnames( {
@@ -300,18 +299,6 @@ function LinkControl( {
 							'has-text-control': showTextControl,
 						} ) }
 					>
-						{ showTextControl && (
-							<TextControl
-								__nextHasNoMarginBottom
-								ref={ textInputRef }
-								className="block-editor-link-control__field block-editor-link-control__text-content"
-								label="Text"
-								value={ internalTextInputValue }
-								onChange={ setInternalTextInputValue }
-								onKeyDown={ handleSubmitWithEnter }
-							/>
-						) }
-
 						<LinkControlSearchInput
 							currentLink={ value }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
@@ -341,19 +328,6 @@ function LinkControl( {
 							{ errorMessage }
 						</Notice>
 					) }
-					<ButtonGroup className="block-editor-link-control__search-actions">
-						<Button
-							variant="primary"
-							onClick={ handleSubmit }
-							className="xblock-editor-link-control__search-submit"
-							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
-						>
-							{ __( 'Apply' ) }
-						</Button>
-						<Button variant="secondary" onClick={ handleCancel }>
-							{ __( 'Cancel' ) }
-						</Button>
-					</ButtonGroup>
 				</>
 			) }
 
@@ -368,15 +342,42 @@ function LinkControl( {
 				/>
 			) }
 
-			{ showSettingsDrawer && (
+			{ isEditing && (
 				<div className="block-editor-link-control__tools">
-					<LinkControlSettingsDrawer
-						value={ value }
-						settings={ settings }
-						onChange={ onChange }
-					/>
+					{ ( showSettings || showTextControl ) && (
+						<LinkControlSettingsDrawer
+							settingsOpen={ settingsOpen }
+							setSettingsOpen={ setSettingsOpen }
+							showTextControl={ showTextControl }
+							showSettings={ showSettings }
+							textInputRef={ textInputRef }
+							internalTextInputValue={ internalTextInputValue }
+							setInternalTextInputValue={
+								setInternalTextInputValue
+							}
+							handleSubmitWithEnter={ handleSubmitWithEnter }
+							value={ value }
+							settings={ settings }
+							onChange={ onChange }
+						/>
+					) }
+
+					<div className="block-editor-link-control__search-actions">
+						<Button
+							variant="primary"
+							onClick={ handleSubmit }
+							className="block-editor-link-control__search-submit"
+							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+						>
+							{ __( 'Apply' ) }
+						</Button>
+						<Button variant="tertiary" onClick={ handleCancel }>
+							{ __( 'Cancel' ) }
+						</Button>
+					</div>
 				</div>
 			) }
+
 			{ renderControlBottom && renderControlBottom() }
 		</div>
 	);

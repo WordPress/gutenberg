@@ -38,11 +38,9 @@ Let's render a customized greeting into an empty element:
 		);
 	}
 
-	wp.element.createRoot(document.getElementById( 'greeting' ))
-		.render(
-			wp.element.createElement( Greeting, { toWhom: 'World' } )
-		)
-	);
+	wp.element
+		.createRoot( document.getElementById( 'greeting' ) )
+		.render( wp.element.createElement( Greeting, { toWhom: 'World' } ) );
 </script>
 ```
 
@@ -170,7 +168,7 @@ You would have something like this as the conversionMap value:
 _Parameters_
 
 -   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Object`: The map used to convert the string to a react element.
+-   _conversionMap_ `Record<string, WPElement>`: The map used to convert the string to a react element.
 
 _Returns_
 
@@ -214,6 +212,14 @@ Finds the dom node of a React component.
 _Parameters_
 
 -   _component_ `import('./react').WPComponent`: Component's instance.
+
+### flushSync
+
+Forces React to flush any updates inside the provided callback synchronously.
+
+_Parameters_
+
+-   _callback_ `Function`: Callback to run synchronously.
 
 ### forwardRef
 

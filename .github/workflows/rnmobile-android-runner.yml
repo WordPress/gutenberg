@@ -18,32 +18,27 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                native-test-name: [gutenberg-editor-initial-html]
+                native-test-name: [gutenberg-editor-rendering]
                 api-level: [29]
 
         steps:
             - name: checkout
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
             - name: Use desired version of Java
-              uses: actions/setup-java@1df8dbefe2a8cbc99770194893dd902763bee34b # v3.9.0
+              uses: actions/setup-java@3f07048e3d294f56e9b90ac5ea2c6f74e9ad0f98 # v3.10.0
               with:
                   distribution: 'temurin'
                   java-version: '11'
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
-
-            - run: npm ci
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
             - name: Gradle cache
-              uses: gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef # v2.3.3
+              uses: gradle/gradle-build-action@6095a76664413da4c8c134ee32e8a8ae900f0f1f # v2.4.0
 
             - name: AVD cache
-              uses: actions/cache@4723a57e26efda3a62cbde1812113b730952852d # v3.2.2
+              uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
               id: avd-cache
               with:
                   path: |
@@ -74,13 +69,13 @@ jobs:
                   profile: Nexus 6
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
-            - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+            - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               if: always()
               with:
                   name: android-screen-recordings
                   path: packages/react-native-editor/android-screen-recordings
 
-            - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+            - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               if: always()
               with:
                   name: appium-logs

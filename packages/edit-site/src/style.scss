@@ -1,5 +1,6 @@
 @import "../../interface/src/style.scss";
 
+@import "./components/add-new-template/style.scss";
 @import "./components/block-editor/style.scss";
 @import "./components/canvas-spinner/style.scss";
 @import "./components/code-editor/style.scss";
@@ -7,23 +8,27 @@
 @import "./components/header-edit-mode/style.scss";
 @import "./components/header-edit-mode/document-actions/style.scss";
 @import "./components/list/style.scss";
-@import "./components/add-new-template/style.scss";
 @import "./components/sidebar-edit-mode/style.scss";
 @import "./components/sidebar-edit-mode/settings-header/style.scss";
-@import "./components/sidebar-edit-mode/navigation-menu-sidebar/style.scss";
 @import "./components/sidebar-edit-mode/template-card/style.scss";
 @import "./components/editor/style.scss";
 @import "./components/template-details/style.scss";
 @import "./components/create-template-part-modal/style.scss";
 @import "./components/secondary-sidebar/style.scss";
 @import "./components/welcome-guide/style.scss";
+@import "./components/start-template-options/style.scss";
 @import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/layout/style.scss";
+@import "./components/save-hub/style.scss";
+@import "./components/save-panel/style.scss";
 @import "./components/sidebar/style.scss";
+@import "./components/sidebar-button/style.scss";
 @import "./components/sidebar-navigation-item/style.scss";
 @import "./components/sidebar-navigation-screen/style.scss";
+@import "./components/sidebar-navigation-screen-template/style.scss";
 @import "./components/sidebar-navigation-screen-templates/style.scss";
 @import "./components/site-hub/style.scss";
+@import "./components/sidebar-navigation-screen-navigation-menus/style.scss";
 @import "./components/site-icon/style.scss";
 @import "./components/style-book/style.scss";
 @import "./hooks/push-changes-to-global-styles/style.scss";

@@ -105,27 +105,23 @@ class Tests_Fonts_WpRegisterFonts extends WP_Fonts_TestCase {
 	/**
 	 * @dataProvider data_deprecated_structure
 	 *
+	 * @expectedDeprecated WP_Webfonts::migrate_deprecated_structure
+	 *
 	 * @param array $fonts Fonts to test.
 	 */
 	public function test_should_throw_deprecation_with_deprecated_structure( array $fonts ) {
-		$this->expectDeprecation();
-		$this->expectDeprecationMessage(
-			'A deprecated fonts array structure passed to wp_register_fonts(). ' .
-			'Variations must be grouped and keyed by their font family.'
-		);
-
 		wp_register_fonts( $fonts );
 	}
 
 	/**
 	 * @dataProvider data_deprecated_structure
 	 *
+	 * @expectedDeprecated WP_Webfonts::migrate_deprecated_structure
+	 *
 	 * @param array $fonts    Fonts to test.
 	 * @param array $expected Expected results.
 	 */
 	public function test_should_register_with_deprecated_structure( array $fonts, array $expected ) {
-		$this->suppress_deprecations();
-
 		$actual = wp_register_fonts( $fonts );
 		$this->assertSame( $expected['wp_register_fonts'], $actual, 'Font family handle(s) should be returned' );
 		$this->assertSame( $expected['get_registered'], $this->get_registered_handles(), 'Fonts should match registered queue' );
@@ -236,12 +232,12 @@ class Tests_Fonts_WpRegisterFonts extends WP_Fonts_TestCase {
 	/**
 	 * @dataProvider data_invalid_font_family
 	 *
+	 * @expectedDeprecated WP_Webfonts::migrate_deprecated_structure
+	 *
 	 * @param array  $fonts            Fonts to test.
 	 * @param string $expected_message Expected notice message.
 	 */
 	public function test_should_not_register_with_undefined_font_family( array $fonts, $expected_message ) {
-		$this->suppress_deprecations();
-
 		$this->expectNotice();
 		$this->expectNoticeMessage( $expected_message );
 

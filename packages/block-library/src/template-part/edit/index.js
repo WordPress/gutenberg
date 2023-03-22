@@ -202,7 +202,6 @@ export default function TemplatePartEdit( {
 						__( 'Choose a %s' ),
 						areaObject.label.toLowerCase()
 					) }
-					closeLabel={ __( 'Cancel' ) }
 					onRequestClose={ () =>
 						setIsTemplatePartSelectionOpen( false )
 					}
