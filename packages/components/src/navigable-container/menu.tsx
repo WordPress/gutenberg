@@ -1,22 +1,21 @@
-// @ts-nocheck
-
 /**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, KeyboardEvent } from 'react';
 
 /**
  * Internal dependencies
  */
+import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import NavigableContainer from './container';
-import type { NavigableContainerProps } from './types';
+import type { MenuProps } from './types';
 
 export function NavigableMenu(
-	{ role = 'menu', orientation = 'vertical', ...rest }: NavigableContainerProps,
+	{ role = 'menu', orientation = 'vertical', ...rest }: WordPressComponentProps< MenuProps, 'div', false >,
 	ref: ForwardedRef< any >
 ) {
-	const eventToOffset = ( evt ) => {
+	const eventToOffset = ( evt: KeyboardEvent< HTMLDivElement > ) => {
 		const { code } = evt;
 
 		let next = [ 'ArrowDown' ];

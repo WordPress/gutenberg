@@ -3,7 +3,7 @@
  */
 import { KeyboardEvent, ReactNode } from 'react';
 
-export type NavigableContainerProps = {
+type BaseProps = {
 	/**
 	 * The component children.
 	 */
@@ -14,10 +14,6 @@ export type NavigableContainerProps = {
 	 * @default true
 	 */
 	cycle: boolean;
-	/**
-	 * Gets an offset, given an event.
-	 */
-	eventToOffset: ( event: KeyboardEvent< HTMLDivElement > ) => -1 | 1 | 0;
 	/**
 	 * A callback invoked when the menu navigates to one of its children passing the index and child as an argument
 	 */
@@ -31,3 +27,12 @@ export type NavigableContainerProps = {
 	 */
 	orientation: string;
 }
+
+export type MenuProps = BaseProps;
+
+export type NavigableContainerProps = BaseProps & {
+	/**
+	 * Gets an offset, given an event.
+	 */
+	eventToOffset: ( event: KeyboardEvent< HTMLDivElement > ) => -1 | 1 | 0;
+};

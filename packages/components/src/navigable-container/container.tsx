@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ForwardedRef, KeyboardEvent } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { Component, forwardRef } from '@wordpress/element';
@@ -24,7 +29,7 @@ function cycleValue( value, total, offset ) {
 	return nextValue;
 }
 
-class NavigableContainer extends Component< WordPressComponentProps< NavigableContainerProps, 'div', false > > {
+class NavigableContainer extends Component< WordPressComponentProps< NavigableContainerProps & { forwardedRef: ForwardedRef< any > }, 'div', false > > {
 	constructor() {
 		super( ...arguments );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -79,7 +84,7 @@ class NavigableContainer extends Component< WordPressComponentProps< NavigableCo
 		}
 	}
 
-	onKeyDown( event ) {
+	onKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
 		if ( this.props.onKeyDown ) {
 			this.props.onKeyDown( event );
 		}
