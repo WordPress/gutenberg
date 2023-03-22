@@ -12,12 +12,20 @@
 class WP_Rest_Customizer_Nonces extends WP_REST_Controller {
 
 	/**
-	 * Constructor.
+	 * The namespace of this controller's route.
+	 *
+	 * @since 4.7.0
+	 * @var string
 	 */
-	public function __construct() {
-		$this->namespace = '__experimental';
-		$this->rest_base = 'customizer-nonces';
-	}
+	protected $namespace = '__experimental';
+
+	/**
+	 * The base of this controller's route.
+	 *
+	 * @since 4.7.0
+	 * @var string
+	 */
+	protected $rest_base = 'customizer-nonces';
 
 	/**
 	 * Registers the necessary REST API routes.
