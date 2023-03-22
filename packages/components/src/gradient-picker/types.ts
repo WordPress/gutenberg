@@ -36,7 +36,8 @@ type GradientPickerBaseProps = {
 	clearable?: boolean;
 	/**
 	 * The heading level. Only applies in cases where gradients are provided
-	 * from multiple origins (e.g. when gradients from core AND the current theme).
+	 * from multiple origins (ie. when the array passed as the `gradients` prop
+	 * contains two or more items).
 	 *
 	 * @default 2
 	 */
