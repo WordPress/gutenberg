@@ -517,6 +517,14 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		)
 	);
 
+	// Sets a ceiling for the minimum font size.
+	$minimum_font_size_ceiling = gutenberg_get_typography_value_and_unit(
+		'64px',
+		array(
+			'coerce_to' => $preferred_size['unit'],
+		)
+	);
+
 	// Don't enforce minimum font size if a font size has explicitly set a min and max value.
 	if ( ! empty( $minimum_font_size_limit ) && ( ! $minimum_font_size_raw && ! $maximum_font_size_raw ) ) {
 		/*
@@ -549,6 +557,12 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		 */
 		$minimum_font_size_factor     = min( max( 1 - 0.075 * log( $preferred_font_size_in_px, 2 ), $default_minimum_font_size_factor_min ), $default_minimum_font_size_factor_max );
 		$calculated_minimum_font_size = round( $preferred_size['value'] * $minimum_font_size_factor, 3 );
+
+		// Ensure calculated minimum font size is not greater than the ceiling.
+		// This is to prevent the font size from being too large in smaller viewports.
+		if ( $calculated_minimum_font_size > $minimum_font_size_ceiling['value'] ) {
+			$calculated_minimum_font_size = $minimum_font_size_ceiling['value'];
+		}
 
 		// Only use calculated min font size if it's > $minimum_font_size_limit value.
 		if ( ! empty( $minimum_font_size_limit ) && $calculated_minimum_font_size <= $minimum_font_size_limit['value'] ) {
