@@ -444,6 +444,21 @@ export default function ColorPanel( {
 	// Elements
 	const elements = [
 		{
+			name: 'caption',
+			label: __( 'Captions' ),
+			showPanel: useHasCaptionPanel( settings ),
+		},
+		{
+			name: 'button',
+			label: __( 'Button' ),
+			showPanel: useHasButtonPanel( settings ),
+		},
+		{
+			name: 'heading',
+			label: __( 'Heading' ),
+			showPanel: useHasHeadingPanel( settings ),
+		},
+		{
 			name: 'h1',
 			label: __( 'H1' ),
 			showPanel: useHasHeadingPanel( settings ),
@@ -472,21 +487,6 @@ export default function ColorPanel( {
 			name: 'h6',
 			label: __( 'H6' ),
 			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'button',
-			label: __( 'Button' ),
-			showPanel: useHasButtonPanel( settings ),
-		},
-		{
-			name: 'heading',
-			label: __( 'Heading' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'caption',
-			label: __( 'Caption' ),
-			showPanel: useHasCaptionPanel( settings ),
 		},
 	];
 
