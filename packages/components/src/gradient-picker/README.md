@@ -82,12 +82,6 @@ Whether the palette should have a clearing button or not.
 -   Required: No
 -   Default: true
 
-### `clearGradient`: `( currentGradient: string ) => void`
-
-Called when a new gradient has been defined. It is passed the `currentGradient` as an argument.
-
--   Required: No
-
 ### `disableCustomGradients`: `boolean`
 
 If true, the gradient picker will not be displayed and only defined gradients from `gradients` are available.

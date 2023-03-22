@@ -35,11 +35,6 @@ type GradientPickerBaseProps = {
 	 */
 	clearable?: boolean;
 	/**
-	 * Called when a new gradient has been defined. It is passed the
-	 * `currentGradient` as an argument.
-	 */
-	clearGradient?: ( currentGradient: string ) => void;
-	/**
 	 * The heading level. Only applies in cases where gradients are provided
 	 * from multiple origins (e.g. when gradients from core AND the current theme).
 	 *
@@ -83,6 +78,7 @@ export type GradientPickerComponentProps = GradientPickerBaseProps & {
 
 export type PickerProps< TOriginType extends GradientObject | OriginObject > =
 	GradientPickerBaseProps & {
+		clearGradient: () => void;
 		onChange: (
 			currentGradient: string | undefined,
 			index: number

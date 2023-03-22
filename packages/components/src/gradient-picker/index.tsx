@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * WordPress dependencies
  */
@@ -16,7 +14,6 @@ import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
 import { Spacer } from '../spacer';
 import type {
-	GradientsProp,
 	GradientPickerComponentProps,
 	PickerProps,
 	OriginObject,
