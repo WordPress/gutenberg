@@ -590,7 +590,7 @@ Show minutes required to finish reading the post. ([Source](https://github.com/W
 
 -	**Name:** core/post-time-to-read
 -	**Category:** theme
--	**Supports:** ~~html~~, ~~multiple~~
+-	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~multiple~~
 -	**Attributes:** textAlign
 
 ## Post Title
