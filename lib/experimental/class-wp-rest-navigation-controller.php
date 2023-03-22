@@ -52,17 +52,17 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		}
 
 		// Get the most recently published Navigation post.
-		$navigation_post = block_core_navigation_get_most_recently_published_navigation();
+		$navigation_post = gutenberg_block_core_navigation_get_most_recently_published_navigation();
 
 		// If there are no navigation posts then try to find a classic menu
 		// and convert it into a block based navigation menu.
 		if ( ! $navigation_post ) {
-			$navigation_post = block_core_navigation_maybe_use_classic_menu_fallback();
+			$navigation_post = gutenberg_block_core_navigation_maybe_use_classic_menu_fallback();
 		}
 
 		// If there are no navigation posts then default to a list of Pages.
 		if ( ! $navigation_post ) {
-			$navigation_post = $this->create_default_fallback();
+			$navigation_post = static::create_default_fallback();
 		}
 
 		// If we could not create a fallback then return an error indicating thus.
@@ -75,7 +75,7 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		return get_post( $navigation_post );
 	}
 
-	private function create_default_fallback() {
+	private static function create_default_fallback() {
 		$registry = WP_Block_Type_Registry::get_instance();
 
 		// If `core/page-list` is not registered then use empty blocks.
