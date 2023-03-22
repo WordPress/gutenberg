@@ -268,6 +268,7 @@ function LayoutPanel( {
 							layoutBlockSupport={ layoutBlockSupport }
 						/>
 					) }
+					<InspectorControls.Slot __experimentalGroup="layout" />
 				</PanelBody>
 			</InspectorControls>
 			{ ! inherit && ! isContentLocked && layoutType && (
