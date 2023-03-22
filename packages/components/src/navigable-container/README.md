@@ -10,26 +10,24 @@
 
 These are the props that `NavigableMenu` and `TabbableContainer`. Any props which are specific to one class are labelled appropriately.
 
-### onNavigate
+### `onNavigate`: `( index: number, focusable: Element ) => void`
 
 A callback invoked when the menu navigates to one of its children passing the index and child as an argument
 
--   Type: `Function`
 -   Required: No
 
-### cycle
+### `cycle`: `boolean`
 
 A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa.
 
--   Type: `Boolean`
 -   Required: No
 -   default: true
 
-### orientation (NavigableMenu only)
+### `orientation`: `string`
 
+(NavigableMenu only)
 The orientation of the menu. It could be "vertical", "horizontal" or "both"
 
--   Type: `String`
 -   Required: No
 -   Default: `"vertical"`
 

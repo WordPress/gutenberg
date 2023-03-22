@@ -4,15 +4,17 @@
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
  */
 import NavigableContainer from './container';
+import type { NavigableContainerProps } from './types';
 
 export function NavigableMenu(
-	{ role = 'menu', orientation = 'vertical', ...rest },
-	ref
+	{ role = 'menu', orientation = 'vertical', ...rest }: NavigableContainerProps,
+	ref: ForwardedRef< any >
 ) {
 	const eventToOffset = ( evt ) => {
 		const { code } = evt;

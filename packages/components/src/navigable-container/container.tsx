@@ -1,9 +1,14 @@
-// @ts-nocheck
 /**
  * WordPress dependencies
  */
 import { Component, forwardRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
+
+/**
+ * Internal dependencies
+ */
+import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { NavigableContainerProps } from './types';
 
 const noop = () => {};
 const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
@@ -19,7 +24,7 @@ function cycleValue( value, total, offset ) {
 	return nextValue;
 }
 
-class NavigableContainer extends Component {
+class NavigableContainer extends Component< WordPressComponentProps< NavigableContainerProps, 'div', false > > {
 	constructor() {
 		super( ...arguments );
 		this.onKeyDown = this.onKeyDown.bind( this );
