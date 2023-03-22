@@ -572,7 +572,6 @@ export function PaletteEdit( {
 					) }
 					{ ! isEditing &&
 						( isGradient ? (
-							// @ts-expect-error TODO: Remove when GradientPicker is typed.
 							<GradientPicker
 								__nextHasNoMargin
 								gradients={ gradients }

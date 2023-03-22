@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * WordPress dependencies
  */
@@ -15,13 +13,21 @@ import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
 import { Spacer } from '../spacer';
+import type {
+	GradientPickerComponentProps,
+	PickerProps,
+	OriginObject,
+	GradientObject,
+} from './types';
 
 // The Multiple Origin Gradients have a `gradients` property (an array of
 // gradient objects), while Single Origin ones have a `gradient` property.
-const isMultipleOriginObject = ( obj ) =>
+const isMultipleOriginObject = (
+	obj: Record< string, any >
+): obj is OriginObject =>
 	Array.isArray( obj.gradients ) && ! ( 'gradient' in obj );
 
-const isMultipleOriginArray = ( arr ) => {
+const isMultipleOriginArray = ( arr: any[] ): arr is OriginObject[] => {
 	return (
 		arr.length > 0 &&
 		arr.every( ( gradientObj ) => isMultipleOriginObject( gradientObj ) )
@@ -35,7 +41,7 @@ function SingleOrigin( {
 	onChange,
 	value,
 	actions,
-} ) {
+}: PickerProps< GradientObject > ) {
 	const gradientOptions = useMemo( () => {
 		return gradients.map( ( { gradient, name }, index ) => (
 			<CircularOptionPicker.Option
@@ -80,7 +86,7 @@ function MultipleOrigin( {
 	value,
 	actions,
 	headingLevel,
-} ) {
+}: PickerProps< OriginObject > ) {
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
@@ -107,25 +113,72 @@ function MultipleOrigin( {
 	);
 }
 
-export default function GradientPicker( {
+function Component( props: PickerProps< any > ) {
+	if ( isMultipleOriginArray( props.gradients ) ) {
+		return <MultipleOrigin { ...props } />;
+	}
+	return <SingleOrigin { ...props } />;
+}
+
+/**
+ *  GradientPicker is a React component that renders a color gradient picker to
+ * define a multi step gradient. There's either a _linear_ or a _radial_ type
+ * available.
+ *
+ * ```jsx
+ *import { GradientPicker } from '@wordpress/components';
+ *import { useState } from '@wordpress/element';
+ *
+ *const myGradientPicker = () => {
+ *	const [ gradient, setGradient ] = useState( null );
+ *
+ *	return (
+ *		<GradientPicker
+ *			__nextHasNoMargin
+ *			value={ gradient }
+ *			onChange={ ( currentGradient ) => setGradient( currentGradient ) }
+ *			gradients={ [
+ *				{
+ *					name: 'JShine',
+ *					gradient:
+ *						'linear-gradient(135deg,#12c2e9 0%,#c471ed 50%,#f64f59 100%)',
+ *					slug: 'jshine',
+ *				},
+ *				{
+ *					name: 'Moonlit Asteroid',
+ *					gradient:
+ *						'linear-gradient(135deg,#0F2027 0%, #203A43 0%, #2c5364 100%)',
+ *					slug: 'moonlit-asteroid',
+ *				},
+ *				{
+ *					name: 'Rastafarie',
+ *					gradient:
+ *						'linear-gradient(135deg,#1E9600 0%, #FFF200 0%, #FF0000 100%)',
+ *					slug: 'rastafari',
+ *				},
+ *			] }
+ *		/>
+ *	);
+ *};
+ *```
+ *
+ */
+export function GradientPicker( {
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMargin = false,
 	className,
-	gradients,
+	gradients = [],
 	onChange,
 	value,
 	clearable = true,
 	disableCustomGradients = false,
 	__experimentalIsRenderedInSidebar,
 	headingLevel = 2,
-} ) {
+}: GradientPickerComponentProps ) {
 	const clearGradient = useCallback(
 		() => onChange( undefined ),
 		[ onChange ]
 	);
-	const Component = isMultipleOriginArray( gradients )
-		? MultipleOrigin
-		: SingleOrigin;
 
 	if ( ! __nextHasNoMargin ) {
 		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
@@ -137,7 +190,7 @@ export default function GradientPicker( {
 
 	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
 		? {
-				marginTop: ! gradients?.length ? 3 : undefined,
+				marginTop: ! gradients.length ? 3 : undefined,
 				marginBottom: ! clearable ? 6 : 0,
 		  }
 		: {};
@@ -145,7 +198,7 @@ export default function GradientPicker( {
 	return (
 		// Outmost Spacer wrapper can be removed when deprecation period is over
 		<Spacer marginBottom={ 0 } { ...deprecatedMarginSpacerProps }>
-			<VStack spacing={ gradients?.length ? 4 : 0 }>
+			<VStack spacing={ gradients.length ? 4 : 0 }>
 				{ ! disableCustomGradients && (
 					<CustomGradientPicker
 						__nextHasNoMargin
@@ -156,10 +209,9 @@ export default function GradientPicker( {
 						onChange={ onChange }
 					/>
 				) }
-				{ ( gradients?.length || clearable ) && (
+				{ ( gradients.length || clearable ) && (
 					<Component
 						className={ className }
-						clearable={ clearable }
 						clearGradient={ clearGradient }
 						gradients={ gradients }
 						onChange={ onChange }
@@ -181,3 +233,5 @@ export default function GradientPicker( {
 		</Spacer>
 	);
 }
+
+export default GradientPicker;
