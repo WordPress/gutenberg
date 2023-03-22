@@ -138,6 +138,7 @@ if ( ! class_exists( 'WP_Fonts' ) ) {
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/class-wp-duotone-gutenberg.php';
+// require __DIR__ . '/class-wp-navigation-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
