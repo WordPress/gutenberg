@@ -80,6 +80,18 @@ export async function createNavigationMenu(
 export async function deleteAllMenus( this: RequestUtils ) {
 	const navMenus = await this.rest< NavigationMenu[] >( {
 		path: `/wp/v2/navigation/`,
+		data: {
+			status: [
+				'publish',
+				'pending',
+				'draft',
+				'auto-draft',
+				'future',
+				'private',
+				'inherit',
+				'trash',
+			],
+		},
 	} );
 
 	if ( navMenus.length ) {
@@ -93,6 +105,18 @@ export async function deleteAllMenus( this: RequestUtils ) {
 
 	const classicMenus = await this.rest< NavigationMenu[] >( {
 		path: `/wp/v2/menus/`,
+		data: {
+			status: [
+				'publish',
+				'pending',
+				'draft',
+				'auto-draft',
+				'future',
+				'private',
+				'inherit',
+				'trash',
+			],
+		},
 	} );
 
 	if ( classicMenus.length ) {
@@ -108,15 +132,18 @@ export async function deleteAllMenus( this: RequestUtils ) {
 /**
  * Get latest navigation menus
  *
+ * @param  args
+ * @param  args.status
  * @return {string} Menu content.
  */
-export async function getNavigationMenus( this: RequestUtils ) {
+export async function getNavigationMenus(
+	this: RequestUtils,
+	args: { status: 'publish' }
+) {
 	const navigationMenus = await this.rest< NavigationMenu[] >( {
 		method: 'GET',
 		path: `/wp/v2/navigation/`,
-		data: {
-			status: 'publish',
-		},
+		data: args,
 	} );
 	return navigationMenus;
 }
