@@ -115,13 +115,13 @@ class WP_Duotone_Gutenberg {
 				continue;
 			}
 			// If it has a duotone filter preset, save the block name and the preset slug.
-			if(is_string($duotone_attr)){
+			if ( is_string( $duotone_attr ) ) {
 				$slug = self::gutenberg_get_slug_from_attr( $duotone_attr );
-			//If the block has custom colors, we generate a slug for it and save it.
+				// If the block has custom colors, we generate a slug for it and save it.
 			} else {
-				$slug = self::custom_unique_slug($duotone_attr);
-				self::$global_styles_presets[$slug]['slug'] = $slug;
-				self::$global_styles_presets[$slug]['colors'] = $duotone_attr;
+				$slug = self::custom_unique_slug( $duotone_attr );
+				self::$global_styles_presets[ $slug ]['slug']   = $slug;
+				self::$global_styles_presets[ $slug ]['colors'] = $duotone_attr;
 			}
 
 			if ( $slug && $slug !== $duotone_attr ) {
@@ -254,8 +254,13 @@ class WP_Duotone_Gutenberg {
 		}
 	}
 
-	public static function custom_unique_slug($duotone_attr){
-		// Build a unique slug for the filter based on the array of colors.
+	/**
+	 * Generate a unique slug for the filter based on the array of colors.
+	 *
+	 * @param string $duotone_attr The duotone attribute from a block.
+	 * @return string A unique string that defines the custom filter.
+	 */
+	public static function custom_unique_slug( $duotone_attr ) {
 		return wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
 	}
 
@@ -316,9 +321,9 @@ class WP_Duotone_Gutenberg {
 				// Pass through the CSS value.
 				$declaration_value = $duotone_attr;
 			} elseif ( $is_custom ) {
-				
-				$slug = self::custom_unique_slug($duotone_attr);
-				
+
+				$slug = self::custom_unique_slug( $duotone_attr );
+
 				$filter_data = array(
 					'slug'   => $slug,
 					'colors' => $duotone_attr,
