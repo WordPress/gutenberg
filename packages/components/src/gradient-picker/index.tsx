@@ -23,13 +23,18 @@ import type {
 	GradientObject,
 } from './types';
 
-// For Single Origin Gradients, the `gradients` property
-// is an array of Gradient objects.
-// For Multiple Origin Gradients, the `gradients` property is an array of
-// objects, each with a `name` property and an internal `gradients` property,
-// which is the array of Gradient objects.
-const isMultipleOrigin = ( arr: any[] ): arr is OriginObject[] => {
-	return arr.every( ( obj ) => 'gradients' in obj );
+// The Multiple Origin Gradients have a `gradients` property (an array of
+// gradient objects), while Single Origin ones have a `gradient` property.
+const isMultipleOriginObject = (
+	obj: Record< string, any >
+): obj is OriginObject =>
+	Array.isArray( obj.gradients ) && ! ( 'gradient' in obj );
+
+const isMultipleOriginArray = ( arr: any[] ): arr is OriginObject[] => {
+	return (
+		arr.length > 0 &&
+		arr.every( ( gradientObj ) => isMultipleOriginObject( gradientObj ) )
+	);
 };
 
 function SingleOrigin( {
@@ -112,7 +117,7 @@ function MultipleOrigin( {
 }
 
 function Component( props: PickerProps< any > ) {
-	if ( isMultipleOrigin( props.gradients ) ) {
+	if ( isMultipleOriginArray( props.gradients ) ) {
 		return <MultipleOrigin { ...props } />;
 	}
 	return <SingleOrigin { ...props } />;
