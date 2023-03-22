@@ -94,7 +94,9 @@
 		grid-column: 1;
 	}
 
-	.components-range-control {
+	.components-base-control.components-range-control {
+		margin-bottom: $grid-unit-20;
+		margin-top: 0;
 		height: 40px;
 		/* Vertically center the RangeControl until it has true 40px height. */
 		display: flex;
