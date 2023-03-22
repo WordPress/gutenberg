@@ -201,12 +201,20 @@ class WP_Duotone_Gutenberg {
 		}
 	}
 
+	/**
+	 * Adds the duotone SVGs and CSS custom properties to the editor settings so
+	 * they can be pulled in by the EditorStyles component in JS and rendered in
+	 * the post editor.
+	 *
+	 * @param array $settings The block editor settings from the `block_editor_settings_all` filter.
+	 * @return array The editor settings with duotone SVGs and CSS custom properties.
+	 */
 	public static function add_editor_settings( $settings ) {
-		$assets = '';
-		$presets	= 'body{';
+		$assets  = '';
+		$presets = 'body{';
 		foreach ( self::$output as $filter_data ) {
-			$assets .= gutenberg_get_duotone_filter_svg( $filter_data );
-			$presets    .= self::get_css_custom_property_declaration( $filter_data );
+			$assets  .= gutenberg_get_duotone_filter_svg( $filter_data );
+			$presets .= self::get_css_custom_property_declaration( $filter_data );
 		}
 		$presets .= '}';
 
