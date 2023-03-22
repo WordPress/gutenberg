@@ -202,6 +202,7 @@ export { default as rotateRight } from './library/rotate-right';
 export { default as rss } from './library/rss';
 export { default as search } from './library/search';
 export { default as seen } from './library/seen';
+export { default as unseen } from './library/unseen';
 export { default as separator } from './library/separator';
 export { default as settings } from './library/settings';
 export { default as shadow } from './library/shadow';
