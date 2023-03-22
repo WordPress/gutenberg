@@ -218,6 +218,10 @@ class WP_Duotone_Gutenberg {
 		}
 		$presets .= '}';
 
+		if ( ! isset( $settings['styles'] ) ) {
+			$settings['styles'] = array();
+		}
+
 		$settings['styles'][] = array(
 			'assets'         => $assets,
 			'__unstableType' => 'svgs',
