@@ -134,7 +134,7 @@ function ListViewBlock( {
 		  )
 		: __( 'Options' );
 
-	const { isTreeGridMounted, expand, collapse, MoreMenuComponent } =
+	const { isTreeGridMounted, expand, collapse, BlockSettingsMenu } =
 		useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
@@ -321,29 +321,27 @@ function ListViewBlock( {
 				</>
 			) }
 
-			{ showBlockActions && (
+			{ showBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected || forceSelectionContentLock }
 				>
-					{ MoreMenuComponent &&
-						( ( { ref, tabIndex, onFocus } ) => (
-							<MoreMenuComponent
-								clientIds={ dropdownClientIds }
-								block={ block }
-								icon={ moreVertical }
-								label={ settingsAriaLabel }
-								toggleProps={ {
-									ref,
-									className:
-										'block-editor-list-view-block__menu',
-									tabIndex,
-									onFocus,
-								} }
-								disableOpenOnArrowDown
-								__experimentalSelectBlock={ updateSelection }
-							/>
-						) ) }
+					{ ( { ref, tabIndex, onFocus } ) => (
+						<BlockSettingsMenu
+							clientIds={ dropdownClientIds }
+							block={ block }
+							icon={ moreVertical }
+							label={ settingsAriaLabel }
+							toggleProps={ {
+								ref,
+								className: 'block-editor-list-view-block__menu',
+								tabIndex,
+								onFocus,
+							} }
+							disableOpenOnArrowDown
+							__experimentalSelectBlock={ updateSelection }
+						/>
+					) }
 				</TreeGridCell>
 			) }
 		</ListViewLeaf>

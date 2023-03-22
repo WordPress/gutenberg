@@ -28,6 +28,7 @@ import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
+import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -50,14 +51,14 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
 /**
  * Show a hierarchical list of blocks.
  *
- * @param {Object}  props                 Components props.
- * @param {string}  props.id              An HTML element id for the root element of ListView.
- * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {boolean} props.showBlockMovers Flag to enable block movers
- * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
- * @param {boolean} props.showAppender    Flag to show or hide the block appender.
- * @param {Object}  props.MoreMenuComponent Optional more menu substitution.
- * @param {Object}  ref                   Forwarded ref
+ * @param {Object}   props                   Components props.
+ * @param {string}   props.id                An HTML element id for the root element of ListView.
+ * @param {Array}    props.blocks            Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean}  props.showBlockMovers   Flag to enable block movers
+ * @param {boolean}  props.isExpanded        Flag to determine whether nested levels are expanded by default.
+ * @param {boolean}  props.showAppender      Flag to show or hide the block appender.
+ * @param {Function} props.blockSettingsMenu Optional more menu substitution.
+ * @param {Object}   ref                     Forwarded ref
  */
 function ListViewComponent(
 	{
@@ -66,7 +67,7 @@ function ListViewComponent(
 		showBlockMovers = false,
 		isExpanded = false,
 		showAppender = false,
-		MoreMenuComponent,
+		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
 	},
 	ref
 ) {
@@ -179,7 +180,7 @@ function ListViewComponent(
 			expandedState,
 			expand,
 			collapse,
-			MoreMenuComponent,
+			BlockSettingsMenu,
 		} ),
 		[
 			isMounted.current,
@@ -187,7 +188,7 @@ function ListViewComponent(
 			expandedState,
 			expand,
 			collapse,
-			MoreMenuComponent,
+			BlockSettingsMenu,
 		]
 	);
 
