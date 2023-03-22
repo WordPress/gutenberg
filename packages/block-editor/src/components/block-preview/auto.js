@@ -12,7 +12,6 @@ import { Disabled } from '@wordpress/components';
 import BlockList from '../block-list';
 import Iframe from '../iframe';
 import EditorStyles from '../editor-styles';
-import { __unstablePresetDuotoneFilter as PresetDuotoneFilter } from '../../components/duotone';
 import { store } from '../../store';
 
 // This is used to avoid rendering the block list if the sizes change.
@@ -32,11 +31,10 @@ function ScaledBlockPreview( {
 
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
-	const { styles, duotone } = useSelect( ( select ) => {
+	const { styles } = useSelect( ( select ) => {
 		const settings = select( store ).getSettings();
 		return {
 			styles: settings.styles,
-			duotone: settings.__experimentalFeatures?.color?.duotone,
 		};
 	}, [] );
 
@@ -56,10 +54,6 @@ function ScaledBlockPreview( {
 		return styles;
 	}, [ styles, additionalStyles ] );
 
-	const svgFilters = useMemo( () => {
-		return [ ...( duotone?.default ?? [] ), ...( duotone?.theme ?? [] ) ];
-	}, [ duotone ] );
-
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
@@ -76,7 +70,6 @@ function ScaledBlockPreview( {
 			} }
 		>
 			<Iframe
-				head={ <EditorStyles styles={ editorStyles } /> }
 				contentRef={ useRefEffect( ( bodyElement ) => {
 					const {
 						ownerDocument: { documentElement },
@@ -108,16 +101,8 @@ function ScaledBlockPreview( {
 							: minHeight,
 				} }
 			>
+				<EditorStyles styles={ editorStyles } />
 				{ contentResizeListener }
-				{
-					/* Filters need to be rendered before children to avoid Safari rendering issues. */
-					svgFilters.map( ( preset ) => (
-						<PresetDuotoneFilter
-							preset={ preset }
-							key={ preset.slug }
-						/>
-					) )
-				}
 				<MemoizedBlockList renderAppender={ false } />
 			</Iframe>
 		</Disabled>
