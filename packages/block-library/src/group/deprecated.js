@@ -136,7 +136,8 @@ const deprecated = [
 				default: 'div',
 			},
 			templateLock: {
-				type: 'string',
+				type: [ 'string', 'boolean' ],
+				enum: [ 'all', 'insert', false ],
 			},
 		},
 		supports: {
