@@ -21,7 +21,7 @@ class WP_Navigation_Gutenberg {
 		}
 
 		// Get the most recently published Navigation post.
-		$navigation_post = gutenberg_block_core_navigation_get_most_recently_published_navigation();
+		$navigation_post = static::get_most_recently_published_navigation();
 
 		// If there are no navigation posts then try to find a classic menu
 		// and convert it into a block based navigation menu.
@@ -44,7 +44,37 @@ class WP_Navigation_Gutenberg {
 		return get_post( $navigation_post );
 	}
 
-    private static function create_default_fallback() {
+
+
+	/**
+	 * Finds the most recently published `wp_navigation` Post.
+	 *
+	 * @return WP_Post|null the first non-empty Navigation or null.
+	 */
+	public static function get_most_recently_published_navigation() {
+
+		// Default to the most recently created menu.
+		$parsed_args = array(
+			'post_type'              => 'wp_navigation',
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'order'                  => 'DESC',
+			'orderby'                => 'date',
+			'post_status'            => 'publish',
+			'posts_per_page'         => 1, // get only the most recent.
+		);
+
+		$navigation_post = new WP_Query( $parsed_args );
+
+		if ( count( $navigation_post->posts ) > 0 ) {
+			return $navigation_post->posts[0];
+		}
+
+		return null;
+	}
+
+	private static function create_default_fallback() {
 		$registry = WP_Block_Type_Registry::get_instance();
 
 		// If `core/page-list` is not registered then use empty blocks.
