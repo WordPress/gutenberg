@@ -15,11 +15,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	useContextSystem,
-	contextConnect,
-	WordPressComponentProps,
-} from '../ui/context';
+import { useContextSystem, contextConnect } from '../ui/context';
 import {
 	ColorfulWrapper,
 	SelectControl,
@@ -43,7 +39,7 @@ const options = [
 ];
 
 const ColorPicker = (
-	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
+	props: ColorPickerProps,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {
