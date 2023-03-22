@@ -27,6 +27,11 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import { waitForStoreResolvers } from './wait-for-store-resolvers';
+
 // Polyfill for String.prototype.replaceAll until CI is runnig Node 15 or higher.
 if ( ! String.prototype.replaceAll ) {
 	String.prototype.replaceAll = function ( str, newStr ) {
@@ -43,26 +48,42 @@ if ( ! String.prototype.replaceAll ) {
 	};
 }
 
+/**
+ * For registering all the core blocks if needed as part of test setup.
+ */
 export function registerAllCoreBlocks() {
 	registerCoreBlocks();
 }
 
+/**
+ * Unregisters all blocks if needed as part of test cleanup.
+ */
 export function unRegisterAllBlocks() {
 	getBlockTypes().forEach( ( { name } ) => unregisterBlockType( name ) );
 }
 
+/**
+ * Selects the block to be test by the aria-label on block wrapper, eg. "Block: Cover".
+ *
+ * @param {string}                                  name
+ * @param {import('@testing-library/react').Screen} screen
+ */
 export async function selectBlock( name, screen ) {
 	await userEvent.click( screen.getByLabelText( name ) );
 }
 
+/**
+ * Creates the block to be tested.
+ *
+ * @param {string} name        Block name.
+ * @param {Object} attributes  Block attributes.
+ * @param {?Array} innerBlocks Nested blocks.
+ *
+ * @return {Object} Block object.
+ */
 export function createTestBlock( name, attributes = {}, innerBlocks = [] ) {
 	return createBlock( name, attributes, innerBlocks );
 }
-
-/**
- * Internal dependencies
- */
-import { waitForStoreResolvers } from './wait-for-store-resolvers';
 
 export function Editor( { testBlocks, settings = {} } ) {
 	const [ blocks, updateBlocks ] = useState( testBlocks );
