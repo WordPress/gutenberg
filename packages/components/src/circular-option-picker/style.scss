@@ -17,7 +17,7 @@ $color-palette-circle-spacing: 12px;
 		flex-wrap: wrap;
 		gap: $color-palette-circle-spacing;
 		position: relative;
-		z-index: 1;
+		z-index: z-index(".components-circular-option-picker__swatches");
 	}
 
 	// Make sure that the .components-circular-option-picker__swatches element
@@ -25,7 +25,7 @@ $color-palette-circle-spacing: 12px;
 	// that the tooltip rendered when hovering an `Option` always appears on top.
 	> *:not(.components-circular-option-picker__swatches) {
 		position: relative;
-		z-index: 0;
+		z-index: z-index("> *:not(.components-circular-option-picker__swatches)");
 	}
 }
 
