@@ -60,7 +60,7 @@ export default function ListViewSidebar() {
 					focusOnMountRef,
 				] ) }
 			>
-				<PrivateListView showAppender={ true } />
+				<PrivateListView />
 			</div>
 		</div>
 	);
