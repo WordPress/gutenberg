@@ -37,8 +37,6 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	typography: 'typography',
 };
 
-const customFilters = [];
-
 function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
@@ -273,7 +271,6 @@ export function getStylesDeclarations(
 					declarations.push(
 						`${ cssProperty }: url('#wp-duotone-${ slug }')`
 					);
-					customFilters.push( [ blockStyles.filter.duotone, slug ] );
 				} else {
 					declarations.push(
 						`${ cssProperty }: ${ compileStyleValue(
@@ -916,14 +913,37 @@ export const toStyles = (
 	return ruleset;
 };
 
-export function customSvgFilters( filters ) {
-	return filters.flatMap( ( filter ) => (
-		<DuotoneFilter
-			key={ filter[ 1 ] }
-			id={ `wp-duotone-${ filter[ 1 ] }` }
-			colors={ filter[ 0 ] }
-		/>
-	) );
+export function customSvgFilters( tree, blockSelectors ) {
+	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
+	/*
+			selector,
+			duotoneSelector,
+			styles,
+			fallbackGapValue,
+			hasLayoutSupport,
+			featureSelectors,
+			styleVariationSelectors,
+			*/
+	const aux = nodesWithStyles.flatMap( ( { styles, duotoneSelector } ) => {
+		if ( duotoneSelector ) {
+			if ( Array.isArray( styles.filter.duotone ) ) {
+				let slug = styles.filter.duotone.map( ( x ) =>
+					cleanForSlug( x ).replaceAll( '-', '' )
+				);
+				slug = slug.join( '-' );
+				return (
+					<DuotoneFilter
+						key={ slug }
+						id={ `wp-duotone-${ slug }` }
+						colors={ styles.filter.duotone }
+					/>
+				);
+			}
+			return [];
+		}
+		return [];
+	} );
+	return aux;
 }
 
 export function toSvgFilters( tree, blockSelectors ) {
@@ -1077,7 +1097,7 @@ export function useGlobalStylesOutput() {
 		);
 
 		const presetSvgs = toSvgFilters( mergedConfig, blockSelectors );
-		const customSvgs = customSvgFilters( customFilters );
+		const customSvgs = customSvgFilters( mergedConfig, blockSelectors );
 
 		const stylesheets = [
 			{
