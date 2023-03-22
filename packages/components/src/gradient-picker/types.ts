@@ -27,7 +27,7 @@ type GradientPickerBaseProps = {
 	 *
 	 * @default 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'
 	 */
-	value?: GradientObject[ 'gradient' ];
+	value?: GradientObject[ 'gradient' ] | null;
 	/**
 	 * Whether the palette should have a clearing button or not.
 	 *
