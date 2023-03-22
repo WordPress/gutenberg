@@ -186,10 +186,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				>
 					<ErrorBoundary>
 						<EditorInitialization postId={ postId } />
-						<Layout
-							styles={ styles }
-							filters={ settings.filters }
-						/>
+						<Layout styles={ styles } />
 					</ErrorBoundary>
 					<PostLockedModal />
 				</ExperimentalEditorProvider>

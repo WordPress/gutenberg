@@ -187,27 +187,35 @@ class WP_Duotone_Gutenberg {
 	 * Outputs all necessary SVG for duotone filters, CSS for classic themes.
 	 */
 	public static function output_footer_assets() {
-		echo self::get_footer_assets();
-	}
-
-	/**
-	 * Outputs all necessary SVG for duotone filters, CSS for classic themes, and safari rerendering hack
-	 */
-	public static function get_footer_assets() {
-		$assets = '';
 		foreach ( self::$output as $filter_data ) {
 
 			// SVG will be output on the page later.
-			$assets .= gutenberg_get_duotone_filter_svg( $filter_data );
+			$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
+
+			echo $filter_svg;
 
 			// This is for classic themes - in block themes, the CSS is added in the head via wp_add_inline_style in the wp_enqueue_scripts action.
 			if ( ! wp_is_block_theme() ) {
 				wp_add_inline_style( 'core-block-supports', 'body{' . self::get_css_custom_property_declaration( $filter_data ) . '}' );
 			}
 		}
-		return $assets;
 	}
 
+	public static function add_editor_settings( $settings ) {
+		$assets = '';
+		foreach ( self::$output as $filter_data ) {
+			$assets .= gutenberg_get_duotone_filter_svg( $filter_data );
+		}
+
+		$settings['styles'][] = array(
+			'assets'         => $assets,
+			'__unstableType' => 'svgs',
+			// TODO: Figure out what isGlobalStyles should be set to.
+			'isGlobalStyles' => true,
+		);
+
+		return $settings;
+	}
 
 	/**
 	 * Appends the used global style duotone filter CSS Vars to the inline global styles CSS

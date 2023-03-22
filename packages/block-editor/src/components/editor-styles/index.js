@@ -68,7 +68,21 @@ function useDarkThemeBodyClassName( styles ) {
 
 export default function EditorStyles( { styles } ) {
 	const transformedStyles = useMemo(
-		() => transformStyles( styles, EDITOR_STYLES_SELECTOR ),
+		() =>
+			transformStyles(
+				// Assume that non-SVG styles are CSS that can be transformed.
+				styles.filter( ( style ) => style.__unstableType !== 'svgs' ),
+				EDITOR_STYLES_SELECTOR
+			),
+		[ styles ]
+	);
+
+	const transformedSvgs = useMemo(
+		() =>
+			styles
+				.filter( ( style ) => style.__unstableType == 'svgs' )
+				.map( ( style ) => style.assets )
+				.join( '' ),
 		[ styles ]
 	);
 
@@ -80,6 +94,15 @@ export default function EditorStyles( { styles } ) {
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 0 0"
+				width="0"
+				height="0"
+				focusable="false"
+				role="none"
+				dangerouslySetInnerHTML={ { __html: transformedSvgs } }
+			/>
 		</>
 	);
 }
