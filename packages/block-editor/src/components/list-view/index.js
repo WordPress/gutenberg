@@ -232,5 +232,12 @@ function ListViewComponent(
 export const PrivateListView = forwardRef( ListViewComponent );
 
 export default forwardRef( ( props, ref ) => {
-	return <PrivateListView ref={ ref } { ...props } showAppender={ false } />;
+	return (
+		<PrivateListView
+			ref={ ref }
+			{ ...props }
+			showAppender={ false }
+			blockSettingsMenu={ BlockSettingsDropdown }
+		/>
+	);
 } );
