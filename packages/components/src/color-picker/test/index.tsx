@@ -25,12 +25,12 @@ type PageXPageY = { pageX: number; pageY: number };
 // Fix to pass `pageX` and `pageY`
 // See https://github.com/testing-library/react-testing-library/issues/268
 class FakeMouseEvent extends MouseEvent {
-	constructor( type: MouseEvent[ 'type' ], values: PageXPageY ) {
+	constructor( type: MouseEvent[ 'type' ], values: PageXPageY | {} = {} ) {
 		super( type, { buttons: 1, bubbles: true, ...values } );
 
 		Object.assign( this, {
-			pageX: values.pageX || 0,
-			pageY: values.pageY || 0,
+			pageX: 'pageX' in values ? values.pageX : 0,
+			pageY: 'pageY' in values ? values.pageY : 0,
 		} );
 	}
 }
