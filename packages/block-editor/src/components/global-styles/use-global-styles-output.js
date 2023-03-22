@@ -271,7 +271,7 @@ export function getStylesDeclarations(
 					);
 					slug = slug.join( '-' );
 					declarations.push(
-						`${ cssProperty }: url('#wp-duotone-${ slug } !important')`
+						`${ cssProperty }: url('#wp-duotone-${ slug }')`
 					);
 					customFilters.push( [ blockStyles.filter.duotone, slug ] );
 				} else {
