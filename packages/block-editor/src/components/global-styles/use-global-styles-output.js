@@ -264,10 +264,7 @@ export function getStylesDeclarations(
 
 				//The duotone filter is not one of the presets so we need to build the svg and the filter ID
 				if ( Array.isArray( blockStyles.filter?.duotone ) ) {
-					let slug = blockStyles.filter.duotone.map( ( x ) =>
-						cleanForSlug( x ).replaceAll( '-', '' )
-					);
-					slug = slug.join( '-' );
+					const slug = duotoneSlug( blockStyles.filter.duotone );
 					declarations.push(
 						`${ cssProperty }: url('#wp-duotone-${ slug }')`
 					);
@@ -913,6 +910,12 @@ export const toStyles = (
 	return ruleset;
 };
 
+function duotoneSlug( colors ) {
+	return colors
+		.map( ( x ) => cleanForSlug( x ).replaceAll( '-', '' ) )
+		.join( '-' );
+}
+
 export function customSvgFilters( tree, blockSelectors ) {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 
@@ -922,10 +925,7 @@ export function customSvgFilters( tree, blockSelectors ) {
 				duotoneSelector && Array.isArray( styles.filter?.duotone )
 		)
 		.flatMap( ( node ) => {
-			let slug = node.styles.filter.duotone.map( ( x ) =>
-				cleanForSlug( x ).replaceAll( '-', '' )
-			);
-			slug = slug.join( '-' );
+			const slug = duotoneSlug( node.styles.filter.duotone );
 			return (
 				<DuotoneFilter
 					key={ slug }
