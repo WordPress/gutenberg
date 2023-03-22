@@ -29,6 +29,7 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentaluseLayoutClasses as useLayoutClasses,
 	__experimentaluseLayoutStyles as useLayoutStyles,
+	privateApis as blockEditorPrivateApis
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
@@ -43,6 +44,9 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../private-apis';
+
+const { useGlobalStylesOutput } = unlock( blockEditorPrivateApis );
 
 const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
 
@@ -104,7 +108,8 @@ function getPostContentAttributes( blocks ) {
 	}
 }
 
-export default function VisualEditor( { styles } ) {
+export default function VisualEditor( ) {
+	let [ styles, settings, svgFilters ] = useGlobalStylesOutput();
 	const {
 		deviceType,
 		isWelcomeGuideVisible,
@@ -365,6 +370,7 @@ export default function VisualEditor( { styles } ) {
 						contentRef={ contentRef }
 						styles={ styles }
 					>
+						{ svgFilters }
 						{ themeSupportsLayout &&
 							! themeHasDisabledLayoutStyles &&
 							! isTemplateMode && (
