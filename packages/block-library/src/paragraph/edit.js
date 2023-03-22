@@ -99,7 +99,7 @@ function ParagraphBlock( {
 				/>
 			</BlockControls>
 			{ isDropCapFeatureEnabled && (
-				<InspectorControls __experimentalGroup="typography">
+				<InspectorControls group="typography">
 					<ToolsPanelItem
 						hasValue={ () => !! dropCap }
 						label={ __( 'Drop cap' ) }

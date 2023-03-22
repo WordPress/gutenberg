@@ -12,6 +12,7 @@ import './style';
 import './settings';
 import './color';
 import './duotone';
+import './font-family';
 import './font-size';
 import './border';
 import './position';

@@ -173,22 +173,19 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	const availableTabs = useInspectorControlsTabs( blockType?.name );
 	const showTabs = availableTabs?.length > 1;
 
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-
 	const blockInspectorAnimationSettings = useSelect(
 		( select ) => {
-			if ( isOffCanvasNavigationEditorEnabled && blockType ) {
+			if ( blockType ) {
 				const globalBlockInspectorAnimationSettings =
 					select( blockEditorStore ).getSettings()
-						.__experimentalBlockInspectorAnimation;
+						.blockInspectorAnimation;
 				return globalBlockInspectorAnimationSettings?.[
 					blockType.name
 				];
 			}
 			return null;
 		},
-		[ selectedBlockClientId, isOffCanvasNavigationEditorEnabled, blockType ]
+		[ selectedBlockClientId, blockType ]
 	);
 
 	if ( count > 1 ) {
@@ -201,22 +198,23 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 					<>
 						<InspectorControls.Slot />
 						<InspectorControls.Slot
-							__experimentalGroup="color"
+							group="color"
 							label={ __( 'Color' ) }
 							className="color-block-support-panel__inner-wrapper"
 						/>
 						<InspectorControls.Slot
-							__experimentalGroup="typography"
+							group="typography"
 							label={ __( 'Typography' ) }
 						/>
 						<InspectorControls.Slot
-							__experimentalGroup="dimensions"
+							group="dimensions"
 							label={ __( 'Dimensions' ) }
 						/>
 						<InspectorControls.Slot
-							__experimentalGroup="border"
+							group="border"
 							label={ __( 'Border' ) }
 						/>
+						<InspectorControls.Slot group="styles" />
 					</>
 				) }
 			</div>
@@ -254,10 +252,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 
 	return (
 		<BlockInspectorSingleBlockWrapper
-			animate={
-				isOffCanvasNavigationEditorEnabled &&
-				blockInspectorAnimationSettings
-			}
+			animate={ blockInspectorAnimationSettings }
 			wrapper={ ( children ) => (
 				<AnimatedContainer
 					blockInspectorAnimationSettings={
@@ -362,22 +357,23 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					) }
 					<InspectorControls.Slot />
 					<InspectorControls.Slot
-						__experimentalGroup="color"
+						group="color"
 						label={ __( 'Color' ) }
 						className="color-block-support-panel__inner-wrapper"
 					/>
 					<InspectorControls.Slot
-						__experimentalGroup="typography"
+						group="typography"
 						label={ __( 'Typography' ) }
 					/>
 					<InspectorControls.Slot
-						__experimentalGroup="dimensions"
+						group="dimensions"
 						label={ __( 'Dimensions' ) }
 					/>
 					<InspectorControls.Slot
-						__experimentalGroup="border"
+						group="border"
 						label={ __( 'Border' ) }
 					/>
+					<InspectorControls.Slot group="styles" />
 					<PositionControls />
 					<div>
 						<AdvancedControls />

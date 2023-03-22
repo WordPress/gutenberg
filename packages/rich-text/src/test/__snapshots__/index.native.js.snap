@@ -27,7 +27,6 @@ exports[`<RichText/> Font Size should update the font size when style prop with 
     fontFamily="serif"
     fontSize={12}
     isMultiline={false}
-    lineHeight={1}
     maxImagesWidth={200}
     onBlur={[Function]}
     onChange={[Function]}
@@ -64,7 +63,6 @@ exports[`<RichText/> Font Size should update the font size with decimals when st
     fontFamily="serif"
     fontSize={13}
     isMultiline={false}
-    lineHeight={1}
     maxImagesWidth={200}
     onBlur={[Function]}
     onChange={[Function]}

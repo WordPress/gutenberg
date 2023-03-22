@@ -50,6 +50,7 @@ const restrictedImports = [
 			'castArray',
 			'chunk',
 			'clamp',
+			'clone',
 			'cloneDeep',
 			'compact',
 			'concat',
@@ -101,6 +102,7 @@ const restrictedImports = [
 			'keys',
 			'last',
 			'lowerCase',
+			'map',
 			'mapKeys',
 			'maxBy',
 			'memoize',
@@ -121,6 +123,7 @@ const restrictedImports = [
 			'reject',
 			'repeat',
 			'reverse',
+			'setWith',
 			'size',
 			'snakeCase',
 			'some',
@@ -137,6 +140,7 @@ const restrictedImports = [
 			'toString',
 			'trim',
 			'truncate',
+			'unescape',
 			'unionBy',
 			'uniq',
 			'uniqBy',
@@ -185,11 +189,6 @@ const restrictedImports = [
 		name: '@wordpress/edit-widgets',
 		message:
 			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
-	},
-	{
-		name: '@wordpress/edit-navigation',
-		message:
-			"edit-navigation is a WordPress top level package that shouldn't be imported into other packages",
 	},
 ];
 
@@ -393,6 +392,7 @@ module.exports = {
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
+				'playwright/no-page-pause': 'error',
 				'no-restricted-syntax': [
 					'error',
 					{

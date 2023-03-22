@@ -9,12 +9,15 @@ import { mergeWith, isEmpty, mapValues } from 'lodash';
 import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { GlobalStylesContext } from './context';
 import CanvasSpinner from '../canvas-spinner';
+import { unlock } from '../../private-apis';
+
+const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
 function mergeTreesCustomizer( _, srcValue ) {
 	// We only pass as arrays the presets,

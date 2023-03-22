@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, unescape as unescapeString } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,11 +14,13 @@ import {
 	TextControl,
 	TreeSelect,
 	withFilters,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -364,7 +366,7 @@ export function HierarchicalTermSelector( { slug } ) {
 							const termId = parseInt( term.id, 10 );
 							onChange( termId );
 						} }
-						label={ unescapeString( term.name ) }
+						label={ decodeEntities( term.name ) }
 					/>
 					{ !! term.children.length && (
 						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
@@ -415,6 +417,7 @@ export function HierarchicalTermSelector( { slug } ) {
 		<>
 			{ showFilter && (
 				<TextControl
+					__nextHasNoMarginBottom
 					className="editor-post-taxonomies__hierarchical-terms-filter"
 					label={ filterLabel }
 					value={ filterValue }
@@ -443,22 +446,25 @@ export function HierarchicalTermSelector( { slug } ) {
 			) }
 			{ showForm && (
 				<form onSubmit={ onAddTerm }>
-					<TextControl
-						className="editor-post-taxonomies__hierarchical-terms-input"
-						label={ newTermLabel }
-						value={ formName }
-						onChange={ onChangeFormName }
-						required
-					/>
-					{ !! availableTerms.length && (
-						<TreeSelect
-							label={ parentSelectLabel }
-							noOptionLabel={ noParentOption }
-							onChange={ onChangeFormParent }
-							selectedId={ formParent }
-							tree={ availableTermsTree }
+					<VStack>
+						<TextControl
+							__nextHasNoMarginBottom
+							className="editor-post-taxonomies__hierarchical-terms-input"
+							label={ newTermLabel }
+							value={ formName }
+							onChange={ onChangeFormName }
+							required
 						/>
-					) }
+						{ !! availableTerms.length && (
+							<TreeSelect
+								label={ parentSelectLabel }
+								noOptionLabel={ noParentOption }
+								onChange={ onChangeFormParent }
+								selectedId={ formParent }
+								tree={ availableTermsTree }
+							/>
+						) }
+					</VStack>
 					<Button
 						variant="secondary"
 						type="submit"

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { createStore, applyMiddleware } from 'redux';
-import { get, mapValues } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
 import EquivalentKeyMap from 'equivalent-key-map';
 
@@ -16,7 +15,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { builtinControls } from '../controls';
-import { lock } from '../experiments';
+import { lock } from '../private-apis';
 import promise from '../promise-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import createThunkMiddleware from './thunk-middleware';
@@ -27,11 +26,12 @@ import * as metadataActions from './metadata/actions';
 /** @typedef {import('../types').DataRegistry} DataRegistry */
 /**
  * @typedef {import('../types').StoreDescriptor<C>} StoreDescriptor
- * @template C
+ * @template {import('../types').AnyConfig} C
  */
 /**
  * @typedef {import('../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
- * @template State,Actions,Selectors
+ * @template State,Selectors
+ * @template {Record<string,import('../../types').ActionCreator>} Actions
  */
 
 const trimUndefinedValues = ( array ) => {
@@ -43,6 +43,23 @@ const trimUndefinedValues = ( array ) => {
 	}
 	return result;
 };
+
+/**
+ * Creates a new object with the same keys, but with `callback()` called as
+ * a transformer function on each of the values.
+ *
+ * @param {Object}   obj      The object to transform.
+ * @param {Function} callback The function to transform each object value.
+ * @return {Array} Transformed object.
+ */
+const mapValues = ( obj, callback ) =>
+	Object.entries( obj ?? {} ).reduce(
+		( acc, [ key, value ] ) => ( {
+			...acc,
+			[ key ]: callback( value, key ),
+		} ),
+		{}
+	);
 
 // Convert Map objects to plain objects
 const mapToObject = ( key, state ) => {
@@ -100,7 +117,8 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @template State,Actions,Selectors
+ * @template State,Selectors
+ * @template {Record<string,import('../../types').ActionCreator>} Actions
  * @param {string}                                    key     Unique namespace identifier.
  * @param {ReduxStoreConfig<State,Actions,Selectors>} options Registered store options, with properties
  *                                                            describing reducer, actions, selectors,
@@ -111,6 +129,16 @@ function createResolversCache() {
 export default function createReduxStore( key, options ) {
 	const privateActions = {};
 	const privateSelectors = {};
+	const privateRegistrationFunctions = {
+		privateActions,
+		registerPrivateActions: ( actions ) => {
+			Object.assign( privateActions, actions );
+		},
+		privateSelectors,
+		registerPrivateSelectors: ( selectors ) => {
+			Object.assign( privateSelectors, selectors );
+		},
+	};
 	const storeDescriptor = {
 		name: key,
 		instantiate: ( registry ) => {
@@ -141,6 +169,9 @@ export default function createReduxStore( key, options ) {
 				registry,
 				thunkArgs
 			);
+			// Expose the private registration functions on the store
+			// so they can be copied to a sub registry in registry.js.
+			lock( store, privateRegistrationFunctions );
 			const resolversCache = createResolversCache();
 
 			let resolvers;
@@ -260,14 +291,10 @@ export default function createReduxStore( key, options ) {
 		},
 	};
 
-	lock( storeDescriptor, {
-		registerPrivateActions: ( actions ) => {
-			Object.assign( privateActions, actions );
-		},
-		registerPrivateSelectors: ( selectors ) => {
-			Object.assign( privateSelectors, selectors );
-		},
-	} );
+	// Expose the private registration functions on the store
+	// descriptor. That's a natural choice since that's where the
+	// public actions and selectors are stored .
+	lock( storeDescriptor, privateRegistrationFunctions );
 
 	return storeDescriptor;
 }
@@ -597,7 +624,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
  * @param {Array}  args         Selector Arguments.
  */
 async function fulfillResolver( store, resolvers, selectorName, ...args ) {
-	const resolver = get( resolvers, [ selectorName ] );
+	const resolver = resolvers[ selectorName ];
 	if ( ! resolver ) {
 		return;
 	}

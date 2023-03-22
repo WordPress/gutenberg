@@ -2,38 +2,34 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalColorGradientControl as ColorGradientControl } from '@wordpress/block-editor';
+import {
+	__experimentalColorGradientControl as ColorGradientControl,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import {
-	getSupportedGlobalStylesPanels,
-	useSetting,
-	useStyle,
-	useColorsPerOrigin,
-} from './hooks';
+import { useSupportedStyles, useColorsPerOrigin } from './hooks';
+import { unlock } from '../../private-apis';
 
-function ScreenTextColor( { name, variationPath = '' } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useSetting( 'color.palette', name );
-	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
-	const [ isTextEnabled ] = useSetting( 'color.text', name );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
+function ScreenTextColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const supports = useSupportedStyles( name );
+	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
+	const [ isTextEnabled ] = useGlobalSetting( 'color.text', name );
 	const colorsPerOrigin = useColorsPerOrigin( name );
 
 	const hasTextColor =
 		supports.includes( 'color' ) &&
 		isTextEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
-	const [ color, setColor ] = useStyle( variationPath + 'color.text', name );
-	const [ userColor ] = useStyle(
-		variationPath + 'color.text',
-		name,
-		'user'
-	);
+	const [ color, setColor ] = useGlobalStyle( prefix + 'color.text', name );
+	const [ userColor ] = useGlobalStyle( prefix + 'color.text', name, 'user' );
 
 	if ( ! hasTextColor ) {
 		return null;
@@ -57,6 +53,7 @@ function ScreenTextColor( { name, variationPath = '' } ) {
 				colorValue={ color }
 				onColorChange={ setColor }
 				clearable={ color === userColor }
+				headingLevel={ 3 }
 			/>
 		</>
 	);

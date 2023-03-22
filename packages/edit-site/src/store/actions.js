@@ -526,31 +526,7 @@ export const switchEditorMode =
 
 		if ( mode === 'visual' ) {
 			speak( __( 'Visual editor selected' ), 'assertive' );
-		} else if ( mode === 'mosaic' ) {
-			speak( __( 'Mosaic view selected' ), 'assertive' );
-		}
-	};
-
-/**
- * Action that switches the canvas mode.
- *
- * @param {?string} mode Canvas mode.
- */
-export const __unstableSetCanvasMode =
-	( mode ) =>
-	( { registry, dispatch } ) => {
-		registry.dispatch( blockEditorStore ).__unstableSetEditorMode( 'edit' );
-		dispatch( {
-			type: 'SET_CANVAS_MODE',
-			mode,
-		} );
-		// Check if the block list view should be open by default.
-		if (
-			mode === 'edit' &&
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-site', 'showListViewByDefault' )
-		) {
-			dispatch.setIsListViewOpened( true );
+		} else if ( mode === 'text' ) {
+			speak( __( 'Code editor selected' ), 'assertive' );
 		}
 	};

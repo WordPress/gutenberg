@@ -98,6 +98,8 @@ export const combineReducers = turboCombineReducers;
  * ```
  *
  * @return {Object} Object containing the store's selectors.
+ *
+ * @type {(storeNameOrDescriptor: StoreDescriptor|string) => Object}
  */
 export const select = defaultRegistry.select;
 
@@ -154,6 +156,8 @@ export const suspendSelect = defaultRegistry.suspendSelect;
  * dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
  * ```
  * @return {Object} Object containing the action creators.
+ *
+ * @type {(storeNameOrDescriptor: StoreDescriptor|string) => Object}
  */
 export const dispatch = defaultRegistry.dispatch;
 
