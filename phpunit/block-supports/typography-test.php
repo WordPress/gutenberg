@@ -578,6 +578,17 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'should_use_fluid_typography' => true,
 				'expected_output'             => 'clamp(100px, 6.25rem + ((1vw - 3.2px) * 7.813), 200px)',
 			),
+
+			'should not use ceiling for minimum font size when custom min font size is set' => array(
+				'font_size'                   => array(
+					'size'  => '200px',
+					'fluid' => array(
+						'min' => '100px',
+					),
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(100px, 6.25rem + ((1vw - 7.68px) * 12.019), 200px)',
+			),
 		);
 	}
 
