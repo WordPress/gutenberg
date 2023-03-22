@@ -81,7 +81,7 @@ export default function EditorStyles( { styles } ) {
 	const transformedSvgs = useMemo(
 		() =>
 			styles
-				.filter( ( style ) => style.__unstableType == 'svgs' )
+				.filter( ( style ) => style.__unstableType === 'svgs' )
 				.map( ( style ) => style.assets )
 				.join( '' ),
 		[ styles ]
