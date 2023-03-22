@@ -915,35 +915,25 @@ export const toStyles = (
 
 export function customSvgFilters( tree, blockSelectors ) {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
-	/*
-			selector,
-			duotoneSelector,
-			styles,
-			fallbackGapValue,
-			hasLayoutSupport,
-			featureSelectors,
-			styleVariationSelectors,
-			*/
-	const aux = nodesWithStyles.flatMap( ( { styles, duotoneSelector } ) => {
-		if ( duotoneSelector ) {
-			if ( Array.isArray( styles.filter.duotone ) ) {
-				let slug = styles.filter.duotone.map( ( x ) =>
-					cleanForSlug( x ).replaceAll( '-', '' )
-				);
-				slug = slug.join( '-' );
-				return (
-					<DuotoneFilter
-						key={ slug }
-						id={ `wp-duotone-${ slug }` }
-						colors={ styles.filter.duotone }
-					/>
-				);
-			}
-			return [];
-		}
-		return [];
-	} );
-	return aux;
+
+	return nodesWithStyles
+		.filter(
+			( { styles, duotoneSelector } ) =>
+				duotoneSelector && Array.isArray( styles.filter?.duotone )
+		)
+		.flatMap( ( node ) => {
+			let slug = node.styles.filter.duotone.map( ( x ) =>
+				cleanForSlug( x ).replaceAll( '-', '' )
+			);
+			slug = slug.join( '-' );
+			return (
+				<DuotoneFilter
+					key={ slug }
+					id={ `wp-duotone-${ slug }` }
+					colors={ node.styles.filter.duotone }
+				/>
+			);
+		} );
 }
 
 export function toSvgFilters( tree, blockSelectors ) {
