@@ -93,7 +93,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			}
 		}
 
-		//$settings['styles'] = array_merge( $new_global_styles, $styles_without_existing_global_styles );
+		$settings['styles'] = array_merge( $new_global_styles, $styles_without_existing_global_styles );
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
