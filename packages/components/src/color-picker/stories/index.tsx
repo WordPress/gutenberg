@@ -38,7 +38,7 @@ const Template: ComponentStory< typeof ColorPicker > = ( {
 			{ ...props }
 			color={ color }
 			onChange={ ( ...changeArgs ) => {
-				onChange( ...changeArgs );
+				onChange?.( ...changeArgs );
 				setColor( ...changeArgs );
 			} }
 		/>

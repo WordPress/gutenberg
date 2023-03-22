@@ -114,4 +114,5 @@ export interface LegacyProps {
 	 * @deprecated
 	 */
 	disableAlpha: boolean;
+	onChange?: never;
 }
