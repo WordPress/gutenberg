@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The bundled `wp-prettier` dependency has been upgraded from `2.6.2` to `2.8.5`.
+
 ## 26.0.0 (2023-03-15)
 
 ### Breaking Changes
