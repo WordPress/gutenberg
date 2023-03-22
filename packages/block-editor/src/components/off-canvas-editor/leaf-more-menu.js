@@ -88,8 +88,7 @@ function AddSubmenuItem( { block, onClose } ) {
 }
 
 export default function LeafMoreMenu( props ) {
-	const { block } = props;
-	const { clientId } = block;
+	const { clientId, block } = props;
 
 	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
 		useDispatch( blockEditorStore );
