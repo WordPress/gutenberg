@@ -80,6 +80,14 @@ export function getComputedFluidTypographyValue( {
 			}
 		);
 
+		// Sets a ceiling for the minimum font size.
+		const minimumFontSizeCeilingParsed = getTypographyValueAndUnit(
+			'64px',
+			{
+				coerceTo: fontSizeParsed.unit,
+			}
+		);
+
 		// Don't enforce minimum font size if a font size has explicitly set a min and max value.
 		if (
 			!! minimumFontSizeLimitParsed?.value &&
@@ -106,10 +114,18 @@ export function getComputedFluidTypographyValue( {
 		 * the given font size multiplied by the min font size scale factor.
 		 */
 		if ( ! minimumFontSize ) {
-			const calculatedMinimumFontSize = roundToPrecision(
+			let calculatedMinimumFontSize = roundToPrecision(
 				fontSizeParsed.value * minimumFontSizeFactor,
 				3
 			);
+
+			// Ensure calculated minimum font size is not greater than the ceiling.
+			// This is to prevent the font size from being too large in smaller viewports.
+			if (
+				calculatedMinimumFontSize > minimumFontSizeCeilingParsed.value
+			) {
+				calculatedMinimumFontSize = minimumFontSizeCeilingParsed.value;
+			}
 
 			// Only use calculated min font size if it's > $minimum_font_size_limit value.
 			if (
