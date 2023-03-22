@@ -107,13 +107,13 @@ describe( 'typography utils', () => {
 			{
 				message: 'should return clamp value for floats',
 				preset: {
-					size: '100.175px',
+					size: '70.175px',
 				},
 				typographySettings: {
 					fluid: true,
 				},
 				expected:
-					'clamp(75.131px, 4.696rem + ((1vw - 7.68px) * 3.01), 100.175px)',
+					'clamp(52.631px, 3.289rem + ((1vw - 7.68px) * 2.109), 70.175px)',
 			},
 
 			{
@@ -133,14 +133,14 @@ describe( 'typography utils', () => {
 			{
 				message: 'should coerce float to `px` and returns clamp value',
 				preset: {
-					size: 100.23,
+					size: 70.175,
 					fluid: true,
 				},
 				typographySettings: {
 					fluid: true,
 				},
 				expected:
-					'clamp(75.173px, 4.698rem + ((1vw - 7.68px) * 3.012), 100.23px)',
+					'clamp(52.631px, 3.289rem + ((1vw - 7.68px) * 2.109), 70.175px)',
 			},
 
 			{
@@ -381,6 +381,32 @@ describe( 'typography utils', () => {
 					},
 				},
 				expected: '15px',
+			},
+
+			{
+				message:
+					'should use ceiling of 4rem for minimum font size when custom min font size is not set',
+				preset: {
+					size: '12rem',
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(4rem, 4rem + ((1vw - 0.48rem) * 15.385), 12rem)',
+			},
+
+			{
+				message:
+					'should use ceiling of 64px for minimum font size when custom min font size is not set',
+				preset: {
+					size: '200px',
+				},
+				typographySettings: {
+					fluid: true,
+				},
+				expected:
+					'clamp(64px, 4rem + ((1vw - 7.68px) * 16.346), 200px)',
 			},
 		].forEach( ( { message, preset, typographySettings, expected } ) => {
 			it( `${ message }`, () => {

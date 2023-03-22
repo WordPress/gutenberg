@@ -392,10 +392,10 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 
 			'returns clamp value for floats'             => array(
 				'font_size'                   => array(
-					'size' => '100.175px',
+					'size' => '70.175px',
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(75.131px, 4.696rem + ((1vw - 7.68px) * 3.01), 100.175px)',
+				'expected_output'             => 'clamp(52.631px, 3.289rem + ((1vw - 7.68px) * 2.109), 70.175px)',
 			),
 
 			'coerces integer to `px` and returns clamp value' => array(
@@ -408,10 +408,10 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 
 			'coerces float to `px` and returns clamp value' => array(
 				'font_size'                   => array(
-					'size' => 100.23,
+					'size' => 70.175,
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(75.173px, 4.698rem + ((1vw - 7.68px) * 3.012), 100.23px)',
+				'expected_output'             => 'clamp(52.631px, 3.289rem + ((1vw - 7.68px) * 2.109), 70.175px)',
 			),
 
 			'returns clamp value when `fluid` is empty array' => array(
@@ -550,6 +550,22 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				),
 				'should_use_fluid_typography' => true,
 				'expected_output'             => 'clamp(30px, 1.875rem + ((1vw - 7.68px) * 1), 30px)',
+			),
+
+			'should use ceiling of 4rem for minimum font size when custom min font size is not set' => array(
+				'font_size'                   => array(
+					'size'  => '12rem',
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(4rem, 4rem + ((1vw - 0.48rem) * 15.385), 12rem)',
+			),
+
+			'should use ceiling of 64px for minimum font size when custom min font size is not set' => array(
+				'font_size'                   => array(
+					'size'  => '200px',
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(64px, 4rem + ((1vw - 7.68px) * 16.346), 200px)',
 			),
 		);
 	}
