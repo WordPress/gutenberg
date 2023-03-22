@@ -36,7 +36,9 @@ describe( 'ToolTip', () => {
 
 		await user.tab();
 
-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should not render the tooltip if there is no focus', () => {
@@ -45,7 +47,10 @@ describe( 'ToolTip', () => {
 		expect(
 			screen.getByRole( 'button', { name: /Button/i } )
 		).toBeVisible();
-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeVisible();
+
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should render the tooltip when focusing on the tooltip anchor via tab', async () => {
@@ -61,8 +66,16 @@ describe( 'ToolTip', () => {
 		).toHaveFocus();
 
 		await waitFor( () =>
-			expect( screen.getByText( 'tooltip text' ) ).toBeVisible()
+			expect(
+				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
+			).toBeVisible()
 		);
+
+		await user.tab();
+
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 
 		// Wait for the tooltip element to be positioned (aligned with the button)
 		// await waitFor( () =>
@@ -82,7 +95,9 @@ describe( 'ToolTip', () => {
 		await user.hover( button );
 
 		await waitFor( () =>
-			expect( screen.getByText( 'tooltip text' ) ).toBeVisible()
+			expect(
+				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
+			).toBeVisible()
 		);
 
 		// Wait for the tooltip element to be positioned (aligned with the button)
@@ -94,7 +109,9 @@ describe( 'ToolTip', () => {
 
 		await user.unhover( button );
 
-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeVisible();
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should not show tooltip on focus as result of mouse click', async () => {
@@ -104,7 +121,9 @@ describe( 'ToolTip', () => {
 
 		await user.click( screen.getByRole( 'button', { name: /Button/i } ) );
 
-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeVisible();
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should respect custom delay prop when showing tooltip', async () => {
@@ -117,11 +136,21 @@ describe( 'ToolTip', () => {
 
 		await user.hover( button );
 
-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeVisible();
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 
 		await waitFor( () =>
-			expect( screen.getByText( 'tooltip text' ) ).toBeVisible()
+			expect(
+				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
+			).toBeVisible()
 		);
+
+		await user.unhover( button );
+
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 
 		// Wait for the tooltip element to be positioned (aligned with the button)
 		// await waitFor( () =>
@@ -148,8 +177,16 @@ describe( 'ToolTip', () => {
 		await user.hover( button );
 
 		await waitFor( () =>
-			expect( screen.getByText( 'tooltip text' ) ).toBeVisible()
+			expect(
+				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
+			).toBeVisible()
 		);
+
+		await user.unhover( button );
+
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 
 		// Wait for the tooltip element to be positioned (aligned with the button)
 		// await waitFor( () =>
@@ -186,7 +223,9 @@ describe( 'ToolTip', () => {
 		);
 
 		// ToolTip hasn't appeared yet
-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeVisible();
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
 
 		// Advance time by MOUSE_LEAVE_DELAY time
@@ -194,7 +233,9 @@ describe( 'ToolTip', () => {
 			setTimeout( resolve, MOUSE_LEAVE_DELAY )
 		);
 
-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeVisible();
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 
 		// Hover the other button, meaning that the mouse will leave the tooltip anchor
 		await user.hover(
@@ -204,7 +245,9 @@ describe( 'ToolTip', () => {
 		);
 
 		// ToolTip still hasn't appeared yet
-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeVisible();
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
 		expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
 
@@ -214,7 +257,9 @@ describe( 'ToolTip', () => {
 		);
 
 		// ToolTip won't show, since the mouse has left the tooltip anchor
-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeVisible();
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should render the shortcut display text when a string is passed as the shortcut', async () => {
@@ -222,11 +267,19 @@ describe( 'ToolTip', () => {
 
 		render( <ToolTip { ...props } shortcut="shortcut text" /> );
 
-		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
+		const button = screen.getByRole( 'button', { name: /Button/i } );
+
+		await user.hover( button );
 
 		await waitFor( () =>
 			expect( screen.getByText( 'shortcut text' ) ).toBeVisible()
 		);
+
+		await user.unhover( button );
+
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 
 		// Wait for the tooltip element to be positioned (aligned with the button)
 		// await waitFor( () =>
@@ -249,7 +302,9 @@ describe( 'ToolTip', () => {
 			/>
 		);
 
-		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
+		const button = screen.getByRole( 'button', { name: /Button/i } );
+
+		await user.hover( button );
 
 		await waitFor( () =>
 			expect( screen.getByText( '⇧⌘,' ) ).toBeVisible()
@@ -259,6 +314,12 @@ describe( 'ToolTip', () => {
 			'aria-label',
 			'Control + Shift + Comma'
 		);
+
+		await user.unhover( button );
+
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 
 		// Wait for the tooltip element to be positioned (aligned with the button)
 		// await waitFor( () =>
