@@ -24,51 +24,41 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$this->assertArrayHasKey( '/wp/v2/navigation/fallbacks', $routes );
 	}
 
-	public function test_get_fallbacks() {
+	public function test_it_should_create_default_fallback_when_there_are_no_other_fallbacks() {
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		/**
-			{
-		"ID": 65,
-		"post_author": "1",
-		"post_date": "2023-03-21 15:26:23",
-		"post_date_gmt": "2023-03-21 15:26:23",
-		"post_content": "<!-- wp:navigation-link {\"label\":\"Sample Page\",\"type\":\"page\",\"id\":2,\"url\":\"http://localhost:8888/sample-page/\",\"kind\":\"post-type\"} /-->\n\n<!-- wp:navigation-submenu {\"label\":\"Sample Page\",\"type\":\"page\",\"id\":2,\"url\":\"http://localhost:8888/sample-page/\",\"kind\":\"post-type\"} -->\n<!-- wp:navigation-link {\"label\":\"Duotone\",\"type\":\"post\",\"id\":46,\"url\":\"http://localhost:8888/46-2/\",\"kind\":\"post-type\"} /-->\n<!-- /wp:navigation-submenu -->",
-		"post_title": "Header navigation",
-		"post_excerpt": "",
-		"post_status": "publish",
-		"comment_status": "closed",
-		"ping_status": "closed",
-		"post_password": "",
-		"post_name": "header-navigation",
-		"to_ping": "",
-		"pinged": "",
-		"post_modified": "2023-03-21 15:26:52",
-		"post_modified_gmt": "2023-03-21 15:26:52",
-		"post_content_filtered": "",
-		"post_parent": 0,
-		"guid": "http://localhost:8888/?p=65",
-		"menu_order": 0,
-		"post_type": "wp_navigation",
-		"post_mime_type": "",
-		"comment_count": "0",
-		"filter": "raw"
-	}
- */
-
-
 		$this->assertEquals( 200, $response->get_status() );
+
         $this->assertInstanceOf( 'WP_Post', $data );
 
-        // assert $data has a post_type property of `wp_navigation`
-        $this->assertEquals( 'wp_navigation', $data->post_type );
+		$this->assertEquals( 'wp_navigation', $data->post_type, 'Post type should be `wp_navigation`' );
 
-		// echo "<pre>";
-        // var_dump($data);
-        // echo "</pre>";
+		$this->assertEquals( 'Navigation', $data->post_title, 'Post title should be the default title' );
 
+		$this->assertEquals( 'navigation', $data->post_name, 'Post name should be the default slug' );
+
+		$navs_in_db = $this->get_navigations_in_database();
+
+		$this->assertCount( 1, $navs_in_db, 'The fallback Navigation post should be the only one in the database.' );
+	}
+
+
+
+
+	private function get_navigations_in_database() {
+		$navs_in_db = new WP_Query(
+			array(
+				'post_type'      => 'wp_navigation',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+			)
+		);
+
+		return $navs_in_db->posts ? $navs_in_db->posts : array();
 	}
 
 	/**
