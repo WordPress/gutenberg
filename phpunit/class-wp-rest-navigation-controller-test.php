@@ -24,7 +24,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$this->assertArrayHasKey( '/wp/v2/navigation/fallbacks', $routes );
 	}
 
-	public function test_it_should_create_and_return_a_default_fallback_navigation_menu_in_absence_of_other_fallbacks() {
+	public function test_should_return_a_default_fallback_navigation_menu_in_absence_of_other_fallbacks() {
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -44,7 +44,32 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$this->assertCount( 1, $navs_in_db, 'The fallback Navigation post should be the only one in the database.' );
 	}
 
-	public function test_it_should_return_the_most_recently_created_navigation_menu_if_one_exists() {
+	public function test_should_manage_concurrent_requests() {
+		$request_one   = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallbacks' );
+		$request_two   = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallbacks' );
+		$request_three = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallbacks' );
+
+		// Fire off multiple requests.
+		rest_get_server()->dispatch( $request_one );
+		rest_get_server()->dispatch( $request_two );
+
+		// Assert on the final request.
+		$response = rest_get_server()->dispatch( $request_three );
+
+		$data = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$this->assertInstanceOf( 'WP_Post', $data );
+
+		$this->assertEquals( 'Navigation', $data->post_title, 'Post title should be the default title' );
+
+		$navs_in_db = $this->get_navigations_in_database();
+
+		$this->assertCount( 1, $navs_in_db, 'The fallback Navigation post should be the only one in the database.' );
+	}
+
+	public function test_should_return_the_most_recently_created_navigation_menu_if_one_exists() {
 
 		// Pre-add a Navigation Menu to simulate when a user already has a menu.
 		self::factory()->post->create_and_get(
@@ -81,6 +106,47 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$navs_in_db = $this->get_navigations_in_database();
 		$this->assertCount( 2, $navs_in_db, 'Only the existing Navigation menus should be present in the database.' );
 	}
+
+	public function test_should_return_fallback_navigation_from_existing_classic_menu() {
+		$menu_id = wp_create_nav_menu( 'Existing Classic Menu' );
+
+		wp_update_nav_menu_item(
+			$menu_id,
+			0,
+			array(
+				'menu-item-title'  => 'Classic Menu Item 1',
+				'menu-item-url'    => '/classic-menu-item-1',
+				'menu-item-status' => 'publish',
+			)
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallbacks' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$this->assertInstanceOf( 'WP_Post', $data );
+
+		$this->assertEquals( 'Existing Classic Menu', $data->post_title, 'Post title should be the same as the classic menu.' );
+
+		// Assert that the fallback contains a navigation-link block.
+		$this->assertStringContainsString( '<!-- wp:navigation-link', $data->post_content, 'The fallback Navigation Menu should contain a `core/navigation-link` block.' );
+
+		// Assert that fallback post_content contains the expected menu item title.
+		$this->assertStringContainsString( '"label":"Classic Menu Item 1"', $data->post_content, 'The fallback Navigation Menu should contain menu item with a label matching the title of the menu item from the Classic Menu.' );
+
+		// Assert that fallback post_content contains the expected menu item url.
+		$this->assertStringContainsString( '"url":"/classic-menu-item-1"', $data->post_content, 'The fallback Navigation Menu should contain menu item with a url matching the slug of the menu item from the Classic Menu.' );
+
+		// Check that only a single Navigation fallback was created.
+		$navs_in_db = $this->get_navigations_in_database();
+		$this->assertCount( 1, $navs_in_db, 'A single Navigation menu should be present in the database.' );
+
+	}
+
+
+
 
 
 
