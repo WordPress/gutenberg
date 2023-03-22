@@ -53,6 +53,11 @@ function DuotonePanel( { name } ) {
 		defaultSetting: 'color.defaultPalette',
 	} );
 
+	const disableCustomColors = ! useSetting( 'color.custom' );
+	const disableCustomDuotone =
+		! useSetting( 'color.customDuotone' ) ||
+		( colorPalette?.length === 0 && disableCustomColors );
+
 	if ( duotonePalette?.length === 0 ) {
 		return null;
 	}
@@ -68,8 +73,8 @@ function DuotonePanel( { name } ) {
 					<DuotonePicker
 						colorPalette={ colorPalette }
 						duotonePalette={ duotonePalette }
-						disableCustomColors={ true }
-						disableCustomDuotone={ true }
+						disableCustomColors={ disableCustomColors }
+						disableCustomDuotone={ disableCustomDuotone }
 						value={ themeDuotone }
 						onChange={ setThemeDuotone }
 					/>

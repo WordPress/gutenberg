@@ -15,6 +15,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
+import { cleanForSlug } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -23,7 +24,7 @@ import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
-import { PresetDuotoneFilter } from '../duotone/components';
+import { PresetDuotoneFilter, DuotoneFilter } from '../duotone/components';
 import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
 
@@ -35,6 +36,8 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	spacing: 'spacing',
 	typography: 'typography',
 };
+
+const customFilters = [];
 
 function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
@@ -260,11 +263,24 @@ export function getStylesDeclarations(
 				const cssProperty = key.startsWith( '--' )
 					? key
 					: kebabCase( key );
-				declarations.push(
-					`${ cssProperty }: ${ compileStyleValue(
-						get( blockStyles, pathToValue )
-					) }`
-				);
+
+				//The duotone filter is not one of the presets so we need to build the svg and the filter ID
+				if ( Array.isArray( blockStyles.filter?.duotone ) ) {
+					let slug = blockStyles.filter.duotone.map( ( x ) =>
+						cleanForSlug( x ).replaceAll( '-', '' )
+					);
+					slug = slug.join( '-' );
+					declarations.push(
+						`${ cssProperty }: url('#wp-duotone-${ slug } !important')`
+					);
+					customFilters.push( [ blockStyles.filter.duotone, slug ] );
+				} else {
+					declarations.push(
+						`${ cssProperty }: ${ compileStyleValue(
+							get( blockStyles, pathToValue )
+						) }`
+					);
+				}
 			}
 
 			return declarations;
@@ -900,6 +916,16 @@ export const toStyles = (
 	return ruleset;
 };
 
+export function customSvgFilters( filters ) {
+	return filters.flatMap( ( filter ) => (
+		<DuotoneFilter
+			key={ filter[ 1 ] }
+			id={ `wp-duotone-${ filter[ 1 ] }` }
+			colors={ filter[ 0 ] }
+		/>
+	) );
+}
+
 export function toSvgFilters( tree, blockSelectors ) {
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 	return nodesWithSettings.flatMap( ( { presets } ) => {
@@ -1050,7 +1076,9 @@ export function useGlobalStylesOutput() {
 			disableLayoutStyles
 		);
 
-		const filters = toSvgFilters( mergedConfig, blockSelectors );
+		const presetSvgs = toSvgFilters( mergedConfig, blockSelectors );
+		const customSvgs = customSvgFilters( customFilters );
+
 		const stylesheets = [
 			{
 				css: customProperties,
@@ -1083,7 +1111,11 @@ export function useGlobalStylesOutput() {
 			}
 		} );
 
-		return [ stylesheets, mergedConfig.settings, filters ];
+		return [
+			stylesheets,
+			mergedConfig.settings,
+			[ ...presetSvgs, ...customSvgs ],
+		];
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
