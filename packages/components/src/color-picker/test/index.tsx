@@ -28,9 +28,13 @@ class FakeMouseEvent extends MouseEvent {
 	constructor( type: MouseEvent[ 'type' ], values: PageXPageY | {} = {} ) {
 		super( type, { buttons: 1, bubbles: true, ...values } );
 
+		const parseXYValue = ( value: number ) => {
+			return value ?? 0;
+		};
+
 		Object.assign( this, {
-			pageX: 'pageX' in values ? values.pageX : 0,
-			pageY: 'pageY' in values ? values.pageY : 0,
+			pageX: 'pageX' in values ? parseXYValue( values.pageX ) : 0,
+			pageY: 'pageY' in values ? parseXYValue( values.pageY ) : 0,
 		} );
 	}
 }
