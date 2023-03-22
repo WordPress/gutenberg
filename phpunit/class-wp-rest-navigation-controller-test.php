@@ -35,7 +35,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 		$this->assertEquals( 'wp_navigation', $data->post_type, 'Post type should be `wp_navigation`' );
 
-		$this->assertEquals( 'Navigation', $data->post_title, 'Post title should be the default title' );
+		$this->assertEquals( 'Navigation', $data->post_title, 'Fallback menu title should be the default title' );
 
 		$this->assertEquals( 'navigation', $data->post_name, 'Post name should be the default slug' );
 
@@ -62,16 +62,15 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 		$this->assertInstanceOf( 'WP_Post', $data );
 
-		$this->assertEquals( 'Navigation', $data->post_title, 'Post title should be the default title' );
+		$this->assertEquals( 'Navigation', $data->post_title, 'Fallback menu title should be the default title' );
 
 		$navs_in_db = $this->get_navigations_in_database();
 
 		$this->assertCount( 1, $navs_in_db, 'The fallback Navigation post should be the only one in the database.' );
 	}
 
-	public function test_should_return_the_most_recently_created_navigation_menu_if_one_exists() {
+	public function test_should_return_the_most_recently_created_navigation_menu() {
 
-		// Pre-add a Navigation Menu to simulate when a user already has a menu.
 		self::factory()->post->create_and_get(
 			array(
 				'post_type'    => 'wp_navigation',
@@ -96,7 +95,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 		$this->assertInstanceOf( 'WP_Post', $data );
 
-		$this->assertEquals( $most_recently_published_nav->post_title, $data->post_title, 'Post title should be the same as the most recently created menu.' );
+		$this->assertEquals( $most_recently_published_nav->post_title, $data->post_title, 'Fallback menu title should be the same as the most recently created menu.' );
 
 		$this->assertEquals( $most_recently_published_nav->post_name, $data->post_name, 'Post name should be the same as the most recently created menu.' );
 
@@ -128,7 +127,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 		$this->assertInstanceOf( 'WP_Post', $data );
 
-		$this->assertEquals( 'Existing Classic Menu', $data->post_title, 'Post title should be the same as the classic menu.' );
+		$this->assertEquals( 'Existing Classic Menu', $data->post_title, 'Fallback menu title should be the same as the classic menu.' );
 
 		// Assert that the fallback contains a navigation-link block.
 		$this->assertStringContainsString( '<!-- wp:navigation-link', $data->post_content, 'The fallback Navigation Menu should contain a `core/navigation-link` block.' );
@@ -142,6 +141,48 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		// Check that only a single Navigation fallback was created.
 		$navs_in_db = $this->get_navigations_in_database();
 		$this->assertCount( 1, $navs_in_db, 'A single Navigation menu should be present in the database.' );
+
+	}
+
+	public function test_should_not_create_fallback_from_classic_menu_if_a_navigation_menu_already_exists() {
+		$menu_id = wp_create_nav_menu( 'Existing Classic Menu' );
+
+		wp_update_nav_menu_item(
+			$menu_id,
+			0,
+			array(
+				'menu-item-title'  => 'Classic Menu Item 1',
+				'menu-item-url'    => '/classic-menu-item-1',
+				'menu-item-status' => 'publish',
+			)
+		);
+
+		$existing_navigation_menu = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => 'Existing Navigation Menu 1',
+				'post_content' => '<!-- wp:page-list /-->',
+			)
+		);
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallbacks' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$data = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$this->assertInstanceOf( 'WP_Post', $data );
+
+		$this->assertEquals( $existing_navigation_menu->post_title, $data->post_title, 'Fallback menu title should be the same as the existing Navigation menu.' );
+
+		$this->assertNotEquals( 'Existing Classic Menu', $data->post_title, 'Fallback menu title should not be the same as the Classic Menu.' );
+
+		// Check that only a single Navigation fallback was created.
+		$navs_in_db = $this->get_navigations_in_database();
+
+		$this->assertCount( 1, $navs_in_db, 'Only the existing Navigation menus should be present in the database.' );
 
 	}
 
