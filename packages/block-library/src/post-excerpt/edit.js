@@ -184,7 +184,7 @@ export default function PostExcerptEditor( {
 		trimmedExcerpt = rawOrRenderedExcerpt.split( '', excerptLength );
 	}
 
-	const isTrimmed = trimmedExcerpt !== rawOrRenderedExcerpt ? true : false;
+	const isTrimmed = trimmedExcerpt !== rawOrRenderedExcerpt;
 
 	const excerptContent = isEditable ? (
 		<RichText
