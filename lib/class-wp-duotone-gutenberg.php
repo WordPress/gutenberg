@@ -212,7 +212,7 @@ class WP_Duotone_Gutenberg {
 	public static function add_editor_settings( $settings ) {
 		$assets  = '';
 		$presets = 'body{';
-		foreach ( self::$output as $filter_data ) {
+		foreach ( self::$global_styles_presets as $filter_data ) {
 			$assets  .= gutenberg_get_duotone_filter_svg( $filter_data );
 			$presets .= self::get_css_custom_property_declaration( $filter_data );
 		}
