@@ -24,14 +24,14 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$this->assertArrayHasKey( '/wp/v2/navigation/fallbacks', $routes );
 	}
 
-	public function test_it_should_create_default_fallback_when_there_are_no_other_fallbacks() {
+	public function test_it_should_create_and_return_a_default_fallback_navigation_menu_in_absence_of_other_fallbacks() {
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->assertEquals( 200, $response->get_status() );
 
-        $this->assertInstanceOf( 'WP_Post', $data );
+		$this->assertInstanceOf( 'WP_Post', $data );
 
 		$this->assertEquals( 'wp_navigation', $data->post_type, 'Post type should be `wp_navigation`' );
 
@@ -42,6 +42,44 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$navs_in_db = $this->get_navigations_in_database();
 
 		$this->assertCount( 1, $navs_in_db, 'The fallback Navigation post should be the only one in the database.' );
+	}
+
+	public function test_it_should_return_the_most_recently_created_navigation_menu_if_one_exists() {
+
+		// Pre-add a Navigation Menu to simulate when a user already has a menu.
+		self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => 'Existing Navigation Menu 1',
+				'post_content' => '<!-- wp:page-list /-->',
+			)
+		);
+
+		$most_recently_published_nav = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => 'Existing Navigation Menu 2',
+				'post_content' => '<!-- wp:navigation-link {"label":"Hello world","type":"post","id":1,"url":"/hello-world","kind":"post-type"} /-->',
+			)
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallbacks' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$this->assertInstanceOf( 'WP_Post', $data );
+
+		$this->assertEquals( $most_recently_published_nav->post_title, $data->post_title, 'Post title should be the same as the most recently created menu.' );
+
+		$this->assertEquals( $most_recently_published_nav->post_name, $data->post_name, 'Post name should be the same as the most recently created menu.' );
+
+		$this->assertEquals( $most_recently_published_nav->post_content, $data->post_content, 'Post content should be the same as the most recently created menu.' );
+
+		// Check that no new Navigation menu was created.
+		$navs_in_db = $this->get_navigations_in_database();
+		$this->assertCount( 2, $navs_in_db, 'Only the existing Navigation menus should be present in the database.' );
 	}
 
 
