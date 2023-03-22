@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { KeyboardEvent, ForwardedRef } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
@@ -7,9 +12,14 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import NavigableContainer from './container';
+import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { NavigableContainerProps } from './types';
 
-export function TabbableContainer( { eventToOffset, ...props }, ref ) {
-	const innerEventToOffset = ( evt ) => {
+export function TabbableContainer(
+	{ eventToOffset, ...props }:  WordPressComponentProps< NavigableContainerProps, 'div', false >,
+	ref: ForwardedRef< any >
+) {
+	const innerEventToOffset = ( evt: KeyboardEvent< HTMLDivElement > ) => {
 		const { code, shiftKey } = evt;
 		if ( 'Tab' === code ) {
 			return shiftKey ? -1 : 1;

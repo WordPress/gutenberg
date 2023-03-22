@@ -1,7 +1,7 @@
 /**
  * External depndencies
  */
-import { KeyboardEvent, ReactNode } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 
 type BaseProps = {
 	/**
