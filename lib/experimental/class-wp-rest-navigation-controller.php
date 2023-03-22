@@ -9,7 +9,7 @@
 /**
  * Base Templates REST API Controller.
  */
-class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
+class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 
 	/**
 	 * Registers the controllers routes.
@@ -46,7 +46,9 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 	}
 
 	private function block_core_navigation_create_fallback() {
+
 		$should_skip = apply_filters( 'block_core_navigation_skip_fallback', false );
+
 		if ( $should_skip ) {
 			return;
 		}
@@ -62,7 +64,14 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 
 		// If there are no navigation posts then default to a list of Pages.
 		if ( ! $navigation_post ) {
-			$navigation_post = block_core_navigation_get_default_fallback();
+			// $navigation_post = block_core_navigation_get_default_fallback();
+			$navigation_post = new WP_Post(
+				(object) array(
+					'post_title'   => 'Default Fallback',
+					'post_content' => 'Default Fallback',
+					'post_type'    => `wp_navigation`,
+				)
+			);
 		}
 
 		return $navigation_post;

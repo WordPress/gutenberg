@@ -106,7 +106,7 @@ function gutenberg_update_navigation_rest_controller( $args, $post_type ) {
 	if ( in_array( $post_type, array( 'wp_navigation' ), true ) ) {
 		// Original set in
 		// https://github.com/WordPress/wordpress-develop/blob/6cbed78c94b9d8c6a9b4c8b472b88ee0cd56528c/src/wp-includes/post.php#L528.
-		$args['rest_controller_class'] = 'Gutenberg_REST_Navigation_Controller';
+		$args['rest_controller_class'] = 'WP_REST_Navigation_Controller';
 	}
 	return $args;
 }
