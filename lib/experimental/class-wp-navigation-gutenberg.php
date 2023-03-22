@@ -14,35 +14,38 @@
 class WP_Navigation_Gutenberg {
 
 	public static function get_fallback_menu() {
-		$should_skip = apply_filters( 'block_core_navigation_skip_fallback', false );
 
-		if ( $should_skip ) {
-			return array();
-		}
-
+		// 1.
 		// Get the most recently published Navigation post.
 		$navigation_post = static::get_most_recently_published_navigation();
 
+		if ( $navigation_post ) {
+			return $navigation_post;
+		}
+
+		// 2.
 		// If there are no navigation posts then try to find a classic menu
 		// and convert it into a block based navigation menu.
-		if ( ! $navigation_post ) {
-			$navigation_post = static::maybe_use_classic_menu_fallback();
+		$navigation_post = static::maybe_use_classic_menu_fallback();
+
+		if ( $navigation_post ) {
+			return $navigation_post;
 		}
 
+		// 3.
 		// If there are no navigation posts then default to a list of Pages.
-		if ( ! $navigation_post ) {
-			$navigation_post = static::create_default_fallback();
+		$navigation_post = static::create_default_fallback();
+
+		if ( ! is_wp_error( $navigation_post ) ) {
+			// Fetch the Post by ID
+			return get_post( $navigation_post );
 		}
 
-		// If we could not create a fallback then return an error indicating thus.
+		// If a fallback could not be found/created then return an error.
 		// TODO: include data on the reason for failure in this error.
-		if ( is_wp_error( $navigation_post ) ) {
-			return new WP_Error( 'no_fallback', __( 'Could not create a fallback navigation menu.' ) );
-		}
-
-		// We have to fetch the Post by ID
-		return get_post( $navigation_post );
+		return new WP_Error( 'no_fallback', __( 'Could not create a fallback navigation menu.' ) );
 	}
+
 
 
 
