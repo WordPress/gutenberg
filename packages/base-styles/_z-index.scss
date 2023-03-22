@@ -170,6 +170,11 @@ $z-layers: (
 	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
 	".components-circular-option-picker__option.is-pressed + svg": 2,
 
+	// The following two indexes are needed so that the swatches (and their tooltips)
+	// always render on top of the rest of the component's UI.
+	".components-circular-option-picker__swatches": 1,
+	"> *:not(.components-circular-option-picker__swatches)": 0,
+
 	// Appear under the customizer heading UI, but over anything else.
 	".customize-widgets__topbar": 8,
 

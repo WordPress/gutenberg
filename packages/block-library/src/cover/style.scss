@@ -106,15 +106,9 @@
 	.wp-block-cover__inner-container {
 		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
-		color: $white;
+		color: inherit;
 		// Reset the fixed LTR direction at the root of the block in RTL languages.
 		/*rtl:raw: direction: rtl; */
-	}
-
-	&.is-light {
-		.wp-block-cover__inner-container {
-			color: $black;
-		}
 	}
 
 	p,
@@ -284,4 +278,19 @@ section.wp-block-cover-image > h2,
 	max-width: $content-width;
 	padding: 0.44em;
 	text-align: center;
+}
+
+// If Cover block's text color has not been set adjust default color
+// based on if overlay is light or not. The following styles leverage
+// `:where` to allow for generic global styles that have a low specificity to
+// still take precedence.
+
+:where(.wp-block-cover:not(.has-text-color)),
+:where(.wp-block-cover-image:not(.has-text-color)) {
+	color: $white;
+}
+
+:where(.wp-block-cover.is-light:not(.has-text-color)),
+:where(.wp-block-cover-image.is-light:not(.has-text-color)) {
+	color: $black;
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, kebabCase } from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * Internal dependencies
@@ -36,7 +36,20 @@ export function compileCSS( style: Style, options: StyleOptions = {} ): string {
 		return inlineRules.join( ' ' );
 	}
 
-	const groupedRules = groupBy( rules, 'selector' );
+	const groupedRules = rules.reduce(
+		( acc: Record< string, GeneratedCSSRule[] >, rule ) => {
+			const { selector } = rule;
+			if ( ! selector ) {
+				return acc;
+			}
+			if ( ! acc[ selector ] ) {
+				acc[ selector ] = [];
+			}
+			acc[ selector ].push( rule );
+			return acc;
+		},
+		{}
+	);
 	const selectorRules = Object.keys( groupedRules ).reduce(
 		( acc: string[], subSelector: string ) => {
 			acc.push(

@@ -168,7 +168,7 @@ jobs:
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
 
-            - name: Use desired version of NodeJS
+            - name: Use desired version of Node.js
               uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: '.nvmrc'
@@ -326,7 +326,7 @@ jobs:
                   git config user.name "Gutenberg Repository Automation"
                   git config user.email gutenberg@wordpress.org
 
-            - name: Setup Node (for CLI)
+            - name: Setup Node.js
               uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: 'main/.nvmrc'

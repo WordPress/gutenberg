@@ -43,6 +43,7 @@ export default function ImageSizeControl( {
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
 					help={ imageSizeHelp }
+					size="__unstable-large"
 				/>
 			) }
 			{ isResizable && (
@@ -58,6 +59,7 @@ export default function ImageSizeControl( {
 							onChange={ ( value ) =>
 								updateDimension( 'width', value )
 							}
+							size="__unstable-large"
 						/>
 						<NumberControl
 							className="block-editor-image-size-control__height"
@@ -67,6 +69,7 @@ export default function ImageSizeControl( {
 							onChange={ ( value ) =>
 								updateDimension( 'height', value )
 							}
+							size="__unstable-large"
 						/>
 					</HStack>
 					<HStack>

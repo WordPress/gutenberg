@@ -133,7 +133,7 @@ function gutenberg_template_parts_screen_init( $hook ) {
 		}
 	}
 
-	$active_global_styles_id = WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
+	$active_global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
 	$active_theme            = get_stylesheet();
 	$preload_paths           = array(
 		array( '/wp/v2/media', 'OPTIONS' ),

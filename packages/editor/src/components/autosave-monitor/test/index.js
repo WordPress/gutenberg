@@ -8,7 +8,9 @@ import { render } from '@testing-library/react';
  */
 import { AutosaveMonitor } from '../';
 
-jest.useFakeTimers( { legacyFakeTimers: true } );
+jest.useFakeTimers();
+jest.spyOn( global, 'clearTimeout' );
+jest.spyOn( global, 'setTimeout' );
 
 describe( 'AutosaveMonitor', () => {
 	let setAutosaveTimerSpy;
