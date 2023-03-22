@@ -8,6 +8,7 @@ import a11yPlugin from 'colord/plugins/a11y';
 /**
  * WordPress dependencies
  */
+import { SVG } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 
 /**
@@ -94,13 +95,18 @@ export default function EditorStyles( { styles } ) {
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }
-			<svg
+			<SVG
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 0 0"
 				width="0"
 				height="0"
-				focusable="false"
 				role="none"
+				style={ {
+					visibility: 'hidden',
+					position: 'absolute',
+					left: '-9999px',
+					overflow: 'hidden',
+				} }
 				dangerouslySetInnerHTML={ { __html: transformedSvgs } }
 			/>
 		</>
