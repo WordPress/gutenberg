@@ -70,7 +70,7 @@ const Template: ComponentStory< typeof GradientPicker > = ( {
 	...props
 } ) => {
 	const [ gradient, setGradient ] =
-		useState< typeof props[ 'value' ] >( null );
+		useState< ( typeof props )[ 'value' ] >( null );
 	return (
 		<GradientPicker
 			{ ...props }
