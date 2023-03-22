@@ -90,7 +90,7 @@ export default {
 		return output;
 	},
 	getOrientation() {
-		return null;
+		return 'horizontal';
 	},
 	getAlignments() {
 		return [];
