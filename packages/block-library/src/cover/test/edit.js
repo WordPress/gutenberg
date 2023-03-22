@@ -93,7 +93,7 @@ describe( 'Cover block', () => {
 	} );
 
 	describe( 'Block toolbar', () => {
-		test( 'full height toggle sets minHeight attributes to 100vh when clicked', async () => {
+		test( 'full height toggle sets minHeight style attribute to 100vh when clicked', async () => {
 			await setup( { name: 'core/cover' } );
 			await createAndselectBlock();
 
@@ -205,7 +205,7 @@ describe( 'Cover block', () => {
 		} );
 
 		test( 'sets left focalPoint attribute when focal point values changed', async () => {
-			const { container } = await setup( {
+			await setup( {
 				name: 'core/cover',
 				attributes: {
 					url: 'http://localhost/my-image.jpg',
@@ -215,11 +215,12 @@ describe( 'Cover block', () => {
 			await selectBlock( 'Block: Cover', screen );
 			await userEvent.clear( screen.getByLabelText( 'Left' ) );
 			await userEvent.type( screen.getByLabelText( 'Left' ), '100' );
-			// eslint-disable-next-line testing-library/no-node-access
-			const image = container.getElementsByClassName(
-				'wp-block-cover__image-background'
-			);
-			expect( image[ 0 ] ).toHaveStyle( 'object-position: 100% 50%;' );
+
+			expect(
+				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
+					'img'
+				)
+			).toHaveStyle( 'object-position: 100% 50%;' );
 		} );
 
 		test( 'sets alt attribute if text entered in alt text box', async () => {

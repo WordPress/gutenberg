@@ -70,7 +70,7 @@ function getInnerBlocksTemplate( attributes ) {
  */
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 
-export function CoverEdit( {
+function CoverEdit( {
 	attributes,
 	clientId,
 	isSelected,
