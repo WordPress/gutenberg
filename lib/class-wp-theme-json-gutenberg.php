@@ -583,19 +583,29 @@ class WP_Theme_JSON_Gutenberg {
 	const LATEST_SCHEMA = 2;
 
 	/**
+	 * The style-engine global styles rules store.
+	 *
+	 * @since 6.3.0
+	 * @var WP_Style_Engine_CSS_Rules_Store
+	 */
+	private $rules_store;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 5.8.0
 	 *
-	 * @param array  $theme_json A structure that follows the theme.json schema.
-	 * @param string $origin     Optional. What source of data this object represents.
-	 *                           One of 'default', 'theme', or 'custom'. Default 'theme'.
+	 * @param array  $theme_json  A structure that follows the theme.json schema.
+	 * @param string $origin      Optional. What source of data this object represents.
+	 *                            One of 'default', 'theme', or 'custom'. Default 'theme'.
+	 * @param string $rules_store Optional. The name of the CSS rules-store to use.
 	 */
-	public function __construct( $theme_json = array(), $origin = 'theme' ) {
+	public function __construct( $theme_json = array(), $origin = 'theme', $rules_store = 'global-styles' ) {
 		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
 			$origin = 'theme';
 		}
 
+		$this->rules_store   = WP_Style_Engine_CSS_Rules_Store::get_store( $rules_store );
 		$this->theme_json    = WP_Theme_JSON_Schema::migrate( $theme_json );
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
@@ -998,6 +1008,34 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The resulting stylesheet.
 	 */
 	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null, $options = array() ) {
+		$this->add_stylesheet_to_rules_store( $types, $origins, $options );
+		return $this->get_styles_from_rules_store();
+	}
+
+	/**
+	 * Get the styles from the rules store.
+	 *
+	 * @since 6.3.0
+	 */
+	public function get_styles_from_rules_store() {
+		return ( new WP_Style_Engine_Processor() )->add_store( $this->rules_store )->get_css();
+	}
+
+	/**
+	 * Adds the styles that result of processing the theme.json structure this object represents.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param array $types   Types of styles to load. Will load all by default. It accepts:
+	 *                       - `variables`: only the CSS Custom Properties for presets & custom ones.
+	 *                       - `styles`: only the styles section in theme.json.
+	 *                       - `presets`: only the classes for the presets.
+	 * @param array $origins A list of origins to include. By default it includes VALID_ORIGINS.
+	 * @param array $options An array of options for now used for internal purposes only (may change without notice).
+	 *                       The options currently supported are 'scope' that makes sure all style are scoped to a given selector,
+	 *                       and root_selector which overwrites and forces a given selector to be used on the root node.
+	 */
+	public function add_stylesheet_to_rules_store( $types = array( 'variables', 'styles', 'presets' ), $origins = null, $options = array() ) {
 		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}
@@ -1039,17 +1077,16 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		$stylesheet = '';
-
 		if ( in_array( 'variables', $types, true ) ) {
-			$stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
+			$this->add_css_variables_to_store( $setting_nodes, $origins );
 		}
 
 		if ( in_array( 'styles', $types, true ) ) {
 			if ( false !== $root_style_key ) {
-				$stylesheet .= $this->get_root_layout_rules( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
+				$this->add_root_layout_rules_declarations_to_rules_store( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
+				$this->add_layout_styles_to_rules_store( $style_nodes[ $root_style_key ] );
 			}
-			$stylesheet .= $this->get_block_classes( $style_nodes );
+			$this->add_block_classes_to_rules_store( $style_nodes );
 		} elseif ( in_array( 'base-layout-styles', $types, true ) ) {
 			$root_selector    = static::ROOT_BLOCK_SELECTOR;
 			$columns_selector = '.wp-block-columns';
@@ -1075,15 +1112,13 @@ class WP_Theme_JSON_Gutenberg {
 			);
 
 			foreach ( $base_styles_nodes as $base_style_node ) {
-				$stylesheet .= $this->get_layout_styles( $base_style_node );
+				$this->add_layout_styles_to_rules_store( $base_style_node );
 			}
 		}
 
 		if ( in_array( 'presets', $types, true ) ) {
-			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
+			$this->add_preset_classes_to_rules_store( $setting_nodes, $origins );
 		}
-
-		return $stylesheet;
 	}
 
 	/**
@@ -1182,6 +1217,22 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Add block classes to the $rules_store.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param array $style_nodes Nodes with styles.
+	 */
+	protected function add_block_classes_to_rules_store( $style_nodes ) {
+		foreach ( $style_nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
+				continue;
+			}
+			static::add_styles_for_block_to_rules_store( $metadata );
+		}
+	}
+
+	/**
 	 * Converts each style section into a list of rulesets
 	 * containing the block styles to be appended to the stylesheet.
 	 *
@@ -1203,16 +1254,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The new stylesheet.
 	 */
 	protected function get_block_classes( $style_nodes ) {
-		$block_rules = '';
-
-		foreach ( $style_nodes as $metadata ) {
-			if ( null === $metadata['selector'] ) {
-				continue;
-			}
-			$block_rules .= static::get_styles_for_block( $metadata );
-		}
-
-		return $block_rules;
+		// @TODO: Deprecate.
+		return '';
 	}
 
 	/**
@@ -1224,18 +1267,29 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string Layout styles for the block.
 	 */
 	protected function get_layout_styles( $block_metadata ) {
-		$block_rules = '';
-		$block_type  = null;
+		// @TODO: Deprecate.
+		return '';
+	}
+
+	/**
+	 * Adds the CSS layout rules for a particular block from theme.json layout definitions.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param array $block_metadata Metadata about the block to get styles for.
+	 */
+	public function add_layout_styles_to_rules_store( $block_metadata ) {
+		$block_type = null;
 
 		// Skip outputting layout styles if explicitly disabled.
 		if ( current_theme_supports( 'disable-layout-styles' ) ) {
-			return $block_rules;
+			return '';
 		}
 
 		if ( isset( $block_metadata['name'] ) ) {
 			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_metadata['name'] );
 			if ( ! block_has_support( $block_type, array( '__experimentalLayout' ), false ) ) {
-				return $block_rules;
+				return '';
 			}
 		}
 
@@ -1298,10 +1352,7 @@ class WP_Theme_JSON_Gutenberg {
 								foreach ( $spacing_rule['rules'] as $css_property => $css_value ) {
 									$current_css_value = is_string( $css_value ) ? $css_value : $block_gap_value;
 									if ( static::is_safe_css_declaration( $css_property, $current_css_value ) ) {
-										$declarations[] = array(
-											'name'  => $css_property,
-											'value' => $current_css_value,
-										);
+										$declarations[ $css_property ] = $current_css_value;
 									}
 								}
 
@@ -1323,7 +1374,9 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								}
-								$block_rules .= static::to_ruleset( $layout_selector, $declarations );
+								$this->rules_store
+									->add_rule( $layout_selector )
+									->add_declarations( $declarations );
 							}
 						}
 					}
@@ -1350,20 +1403,9 @@ class WP_Theme_JSON_Gutenberg {
 						is_string( $layout_definition['displayMode'] ) &&
 						in_array( $layout_definition['displayMode'], $valid_display_modes, true )
 					) {
-						$layout_selector = sprintf(
-							'%s .%s',
-							$selector,
-							$class_name
-						);
-						$block_rules    .= static::to_ruleset(
-							$layout_selector,
-							array(
-								array(
-									'name'  => 'display',
-									'value' => $layout_definition['displayMode'],
-								),
-							)
-						);
+						$this->rules_store
+							->add_rule( "{$selector} .{$class_name}" )
+							->add_declarations( array( 'display' => $layout_definition['displayMode'] ) );
 					}
 
 					foreach ( $base_style_rules as $base_style_rule ) {
@@ -1376,26 +1418,18 @@ class WP_Theme_JSON_Gutenberg {
 						) {
 							foreach ( $base_style_rule['rules'] as $css_property => $css_value ) {
 								if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
-									$declarations[] = array(
-										'name'  => $css_property,
-										'value' => $css_value,
-									);
+									$declarations[ $css_property ] = $css_value;
 								}
 							}
 
-							$layout_selector = sprintf(
-								'%s .%s%s',
-								$selector,
-								$class_name,
-								$base_style_rule['selector']
-							);
-							$block_rules    .= static::to_ruleset( $layout_selector, $declarations );
+							$this->rules_store
+								->add_rule( "{$selector} .{$class_name}{$base_style_rule['selector']}" )
+								->add_declarations( $declarations );
 						}
 					}
 				}
 			}
 		}
-		return $block_rules;
 	}
 
 	/**
@@ -1428,19 +1462,32 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The new stylesheet.
 	 */
 	protected function get_preset_classes( $setting_nodes, $origins ) {
-		$preset_rules = '';
+		// @TODO: Deprecate.
+		return '';
+	}
 
+	/**
+	 * Adds new rulesets to the rules store for each preset value.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param array $setting_nodes Nodes with settings.
+	 * @param array $origins       List of origins to process presets from.
+	 */
+	protected function add_preset_classes_to_rules_store( $setting_nodes, $origins ) {
 		foreach ( $setting_nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
 				continue;
 			}
 
-			$selector      = $metadata['selector'];
-			$node          = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$preset_rules .= static::compute_preset_classes( $node, $selector, $origins );
-		}
+			$selector = $metadata['selector'];
+			$node     = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 
-		return $preset_rules;
+			$preset_classes_declarations = static::compute_preset_classes_declarations( $node, $selector, $origins );
+			foreach ( $preset_classes_declarations as $selector => $declarations ) {
+				$this->rules_store->add_rule( $selector )->add_declarations( $declarations );
+			}
+		}
 	}
 
 	/**
@@ -1465,25 +1512,39 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The new stylesheet.
 	 */
 	protected function get_css_variables( $nodes, $origins ) {
-		$stylesheet = '';
+		// @TODO: Deprecate.
+		return '';
+	}
+
+	/**
+	 * Converts each styles section into a list of rulesets, and adds them to the rules store.
+	 *
+	 * @since 6.3.0 Added the `$origins` parameter.
+	 *
+	 * @param array $nodes   Nodes with settings.
+	 * @param array $origins List of origins to process.
+	 * @return void
+	 */
+	protected function add_css_variables_to_store( $nodes, $origins ) {
 		foreach ( $nodes as $metadata ) {
+			$declarations = array();
 			if ( null === $metadata['selector'] ) {
 				continue;
 			}
 
 			$selector = $metadata['selector'];
 
-			$node                    = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$declarations            = static::compute_preset_vars( $node, $origins );
-			$theme_vars_declarations = static::compute_theme_vars( $node );
-			foreach ( $theme_vars_declarations as $theme_vars_declaration ) {
-				$declarations[] = $theme_vars_declaration;
+			$node                 = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$presets_declarations = static::compute_preset_vars( $node, $origins );
+			foreach ( $presets_declarations as $preset_declaration ) {
+				$declarations[ $preset_declaration['name'] ] = $preset_declaration['value'];
 			}
-
-			$stylesheet .= static::to_ruleset( $selector, $declarations );
+			$theme_vars_declarations = static::compute_theme_vars( $node );
+			foreach ( $theme_vars_declarations as $theme_declaration ) {
+				$declarations[ $theme_declaration['name'] ] = $theme_declaration['value'];
+			}
+			$this->rules_store->add_rule( $selector )->add_declarations( $declarations );
 		}
-
-		return $stylesheet;
 	}
 
 	/**
@@ -1512,6 +1573,20 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Converts the named declarations array to a simpler property=>value array.
+	 *
+	 * @param array $declarations Named declarations.
+	 * @return array Property=>value declarations.
+	 */
+	protected static function to_simple_declarations( $declarations ) {
+		$simple_declarations = array();
+		foreach ( $declarations as $declaration ) {
+			$simple_declarations[ $declaration['name'] ] = $declaration['value'];
+		}
+		return $simple_declarations;
+	}
+
+	/**
 	 * Given a settings array, returns the generated rulesets
 	 * for the preset classes.
 	 *
@@ -1524,33 +1599,46 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The result of processing the presets.
 	 */
 	protected static function compute_preset_classes( $settings, $selector, $origins ) {
+		// @TODO: Deprecate
+		return '';
+	}
+
+	/**
+	 * Given a settings array, returns the generated rulesets
+	 * for the preset classes.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param array  $settings Settings to process.
+	 * @param string $selector Selector wrapping the classes.
+	 * @param array  $origins  List of origins to process.
+	 * @return array The result of processing the presets.
+	 */
+	protected static function compute_preset_classes_declarations( $settings, $selector, $origins ) {
+		$declarations = array();
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
 			$selector = '';
 		}
 
-		$stylesheet = '';
+		$declarations = array();
 		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
 			$slugs = static::get_settings_slugs( $settings, $preset_metadata, $origins );
 			foreach ( $preset_metadata['classes'] as $class => $property ) {
 				foreach ( $slugs as $slug ) {
-					$css_var     = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
-					$class_name  = static::replace_slug_in_string( $class, $slug );
-					$stylesheet .= static::to_ruleset(
-						static::append_to_selector( $selector, $class_name ),
-						array(
-							array(
-								'name'  => $property,
-								'value' => 'var(' . $css_var . ') !important',
-							),
-						)
-					);
+					$css_var    = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
+					$class_name = static::replace_slug_in_string( $class, $slug );
+
+					$declaration_selector                  = static::append_to_selector( $selector, $class_name );
+					$declarations[ $declaration_selector ] = empty( $declarations[ $declaration_selector ] ) ? array() : $declarations[ $declaration_selector ];
+
+					$declarations[ $declaration_selector ][ $property ] = 'var(' . $css_var . ') !important';
 				}
 			}
 		}
 
-		return $stylesheet;
+		return $declarations;
 	}
 
 	/**
@@ -2477,7 +2565,7 @@ class WP_Theme_JSON_Gutenberg {
 			static::ROOT_BLOCK_SELECTOR !== $selector &&
 			! empty( $block_metadata['name'] )
 		) {
-			$block_rules .= $this->get_layout_styles( $block_metadata );
+			$this->add_layout_styles_to_rules_store( $block_metadata );
 		}
 
 		// 5. Generate and append the feature level rulesets.
@@ -2494,6 +2582,211 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Add the CSS rules for a particular block from theme.json to the $rules_store.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param array $block_metadata Metadata about the block to get styles for.
+	 */
+	public function add_styles_for_block_to_rules_store( $block_metadata ) {
+		$node             = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
+		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
+		$selector         = $block_metadata['selector'];
+		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
+
+		/*
+		 * Process style declarations for block support features the current
+		 * block contains selectors for. Values for a feature with a custom
+		 * selector are filtered from the theme.json node before it is
+		 * processed as normal.
+		*/
+		$feature_declarations = array();
+
+		if ( ! empty( $block_metadata['features'] ) ) {
+			foreach ( $block_metadata['features'] as $feature_name => $feature_selector ) {
+				if ( ! empty( $node[ $feature_name ] ) ) {
+					// Create temporary node containing only the feature data
+					// to leverage existing `compute_style_properties` function.
+					$feature = array( $feature_name => $node[ $feature_name ] );
+					// Generate the feature's declarations only.
+					$new_feature_declarations = static::compute_style_properties( $feature, $settings, null, $this->theme_json );
+
+					// Merge new declarations with any that already exist for
+					// the feature selector. This may occur when multiple block
+					// support features use the same custom selector.
+					if ( isset( $feature_declarations[ $feature_selector ] ) ) {
+						foreach ( $new_feature_declarations as $new_feature_declaration ) {
+							$feature_declarations[ $feature_selector ][] = $new_feature_declaration;
+						}
+					} else {
+						$feature_declarations[ $feature_selector ] = $new_feature_declarations;
+					}
+
+					// Remove the feature from the block's node now the
+					// styles will be included under the feature level selector.
+					unset( $node[ $feature_name ] );
+				}
+			}
+		}
+
+		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
+		$style_variation_declarations = array();
+		if ( ! empty( $block_metadata['variations'] ) ) {
+			foreach ( $block_metadata['variations'] as $style_variation ) {
+				$style_variation_node     = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
+				$style_variation_selector = $style_variation['selector'];
+
+				// If the block has feature selectors, generate the declarations for them within the current style variation.
+				if ( ! empty( $block_metadata['features'] ) ) {
+					$clean_style_variation_selector = trim( $style_variation_selector );
+					foreach ( $block_metadata['features'] as $feature_name => $feature_selector ) {
+						if ( empty( $style_variation_node[ $feature_name ] ) ) {
+							continue;
+						}
+						// If feature selector includes block classname, remove it but leave the whitespace in.
+						$shortened_feature_selector = str_replace( $block_metadata['selector'] . ' ', ' ', $feature_selector );
+						// Prepend the variation selector to the feature selector.
+						$split_feature_selectors    = explode( ',', $shortened_feature_selector );
+						$feature_selectors          = array_map(
+							static function( $split_feature_selector ) use ( $clean_style_variation_selector ) {
+								return $clean_style_variation_selector . $split_feature_selector;
+							},
+							$split_feature_selectors
+						);
+						$combined_feature_selectors = implode( ',', $feature_selectors );
+
+						// Compute declarations for the feature.
+						$new_feature_declarations = static::compute_style_properties( array( $feature_name => $style_variation_node[ $feature_name ] ), $settings, null, $this->theme_json );
+
+						/*
+						 * Merge new declarations with any that already exist for
+						 * the feature selector. This may occur when multiple block
+						 * support features use the same custom selector.
+						 */
+						if ( isset( $style_variation_declarations[ $combined_feature_selectors ] ) ) {
+							$style_variation_declarations[ $combined_feature_selectors ] = array_merge( $style_variation_declarations[ $combined_feature_selectors ], $new_feature_declarations );
+						} else {
+							$style_variation_declarations[ $combined_feature_selectors ] = $new_feature_declarations;
+						}
+
+						/*
+						 * Remove the feature from the variation's node now the
+						 * styles will be included under the feature level selector.
+						 */
+						unset( $style_variation_node[ $feature_name ] );
+					}
+				}
+				// Compute declarations for remaining styles not covered by feature level selectors.
+				$style_variation_declarations[ $style_variation_selector ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
+			}
+		}
+
+		/*
+		 * Get a reference to element name from path.
+		 * $block_metadata['path'] = array( 'styles','elements','link' );
+		 * Make sure that $block_metadata['path'] describes an element node, like [ 'styles', 'element', 'link' ].
+		 * Skip non-element paths like just ['styles'].
+		 */
+		$is_processing_element = in_array( 'elements', $block_metadata['path'], true );
+
+		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
+
+		$element_pseudo_allowed = array();
+
+		// TODO: Replace array_key_exists() with isset() check once WordPress drops
+		// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
+		if ( array_key_exists( $current_element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
+			$element_pseudo_allowed = static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ];
+		}
+
+		/*
+		 * Check for allowed pseudo classes (e.g. ":hover") from the $selector ("a:hover").
+		 * This also resets the array keys.
+		 */
+		$pseudo_matches = array_values(
+			array_filter(
+				$element_pseudo_allowed,
+				function( $pseudo_selector ) use ( $selector ) {
+					return str_contains( $selector, $pseudo_selector );
+				}
+			)
+		);
+
+		$pseudo_selector = isset( $pseudo_matches[0] ) ? $pseudo_matches[0] : null;
+
+		/*
+		 * If the current selector is a pseudo selector that's defined in the allow list for the current
+		 * element then compute the style properties for it.
+		 * Otherwise just compute the styles for the default selector as normal.
+		 */
+		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) &&
+			// TODO: Replace array_key_exists() with isset() check once WordPress drops
+			// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
+			array_key_exists( $current_element, static::VALID_ELEMENT_PSEUDO_SELECTORS )
+			&& in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true )
+		) {
+			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
+		} else {
+			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
+		}
+
+		/*
+		 * 1. Separate the declarations that use the general selector
+		 * from the ones using the duotone selector.
+		 */
+		$declarations_duotone = array();
+		foreach ( $declarations as $index => $declaration ) {
+			if ( 'filter' === $declaration['name'] ) {
+				/*
+				 * 'unset' filters happen when a filter is unset
+				 * in the site-editor UI. Because the 'unset' value
+				 * in the user origin overrides the value in the
+				 * theme origin, we can skip rendering anything
+				 * here as no filter needs to be applied anymore.
+				 * So only add declarations to with values other
+				 * than 'unset'.
+				 */
+				if ( 'unset' !== $declaration['value'] ) {
+					$declarations_duotone[] = $declaration;
+				}
+				unset( $declarations[ $index ] );
+			}
+		}
+
+		// Update declarations if there are separators with only background color defined.
+		if ( '.wp-block-separator' === $selector ) {
+			$declarations = static::update_separator_declarations( $declarations );
+		}
+
+		// 2. Generate and append the rules that use the general selector.
+		$this->rules_store->add_rule( $selector )->add_declarations( static::to_simple_declarations( $declarations ) );
+
+		// 3. Generate and append the rules that use the duotone selector.
+		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
+			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
+			$this->rules_store->add_rule( $selector_duotone )->add_declarations( static::to_simple_declarations( $declarations_duotone ) );
+		}
+
+		// 4. Generate Layout block gap styles.
+		if (
+			static::ROOT_BLOCK_SELECTOR !== $selector &&
+			! empty( $block_metadata['name'] )
+		) {
+			$this->add_layout_styles_to_rules_store( $block_metadata );
+		}
+
+		// 5. Generate and append the feature level rulesets.
+		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
+			$this->rules_store->add_rule( $feature_selector )->add_declarations( static::to_simple_declarations( $individual_feature_declarations ) );
+		}
+
+		// 6. Generate and append the style variation rulesets.
+		foreach ( $style_variation_declarations as $style_variation_selector => $individual_style_variation_declarations ) {
+			$this->rules_store->add_rule( $style_variation_selector )->add_declarations( static::to_simple_declarations( $individual_style_variation_declarations ) );
+		}
+	}
+
+	/**
 	 * Outputs the CSS for layout rules on the root.
 	 *
 	 * @since 6.1.0
@@ -2503,7 +2796,19 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The additional root rules CSS.
 	 */
 	public function get_root_layout_rules( $selector, $block_metadata ) {
-		$css              = '';
+
+		// @TODO: Deprecate.
+		return '';
+	}
+
+	/**
+	 * Outputs the CSS declarations for layout rules on the root.
+	 *
+	 * @since 6.3.0
+	 *
+	 * @param string $selector The root node selector.
+	 */
+	public function add_root_layout_rules_declarations_to_rules_store( $selector ) {
 		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 
@@ -2515,7 +2820,7 @@ class WP_Theme_JSON_Gutenberg {
 		* user-generated values take precedence in the CSS cascade.
 		* @link https://github.com/WordPress/gutenberg/issues/36147.
 		*/
-		$css .= 'body { margin: 0;';
+		$this->rules_store->add_rule( 'body' )->add_declarations( array( 'margin' => '0' ) );
 
 		/*
 		* If there are content and wide widths in theme.json, output them
@@ -2526,46 +2831,106 @@ class WP_Theme_JSON_Gutenberg {
 			$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
 			$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
 			$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
-			$css         .= '--wp--style--global--content-size: ' . $content_size . ';';
-			$css         .= '--wp--style--global--wide-size: ' . $wide_size . ';';
-		}
 
-		$css .= '}';
+			$this->rules_store->add_rule( 'body' )->add_declarations(
+				array(
+					'--wp--style--global--content-size' => $content_size,
+					'--wp--style--global--wide-size'    => $wide_size,
+				)
+			);
+		}
 
 		if ( $use_root_padding ) {
 			// Top and bottom padding are applied to the outer block container.
-			$css .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
+			$this->rules_store->add_rule( '.wp-site-blocks' )->add_declarations(
+				array(
+					'padding-top'    => 'var(--wp--style--root--padding-top)',
+					'padding-bottom' => 'var(--wp--style--root--padding-bottom)',
+				)
+			);
 			// Right and left padding are applied to the first container with `.has-global-padding` class.
-			$css .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+			$this->rules_store->add_rule( '.has-global-padding' )->add_declarations(
+				array(
+					'padding-right' => 'var(--wp--style--root--padding-right)',
+					'padding-left'  => 'var(--wp--style--root--padding-left)',
+				)
+			);
 			// Nested containers with `.has-global-padding` class do not get padding.
-			$css .= '.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }';
+			$this->rules_store->add_rule( '.has-global-padding :where(.has-global-padding)' )->add_declarations(
+				array(
+					'padding-right' => '0',
+					'padding-left'  => '0',
+				)
+			);
 			// Alignfull children of the container with left and right padding have negative margins so they can still be full width.
-			$css .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
+			$this->rules_store->add_rule( '.has-global-padding > .alignfull' )->add_declarations(
+				array(
+					'margin-right' => 'calc(var(--wp--style--root--padding-right) * -1)',
+					'margin-left'  => 'calc(var(--wp--style--root--padding-left) * -1)',
+				)
+			);
 			// The above rule is negated for alignfull children of nested containers.
-			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }';
+			$this->rules_store->add_rule( '.has-global-padding :where(.has-global-padding) > .alignfull' )->add_declarations(
+				array(
+					'margin-right' => '0',
+					'margin-left'  => '0',
+				)
+			);
 			// Some of the children of alignfull blocks without content width should also get padding: text blocks and non-alignfull container blocks.
-			$css .= '.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+			$this->rules_store->add_rule( '.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol)' )->add_declarations(
+				array(
+					'padding-right' => 'var(--wp--style--root--padding-right)',
+					'padding-left'  => 'var(--wp--style--root--padding-left)',
+				)
+			);
 			// The above rule also has to be negated for blocks inside nested `.has-global-padding` blocks.
-			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }';
+			$this->rules_store->add_rule( '.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol)' )->add_declarations(
+				array(
+					'padding-right' => '0',
+					'padding-left'  => '0',
+				)
+			);
 		}
 
-		$css .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
-		$css .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
-		$css .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$this->rules_store->add_rule( '.wp-site-blocks > .alignleft' )->add_declarations(
+			array(
+				'float'        => 'left',
+				'margin-right' => '2em',
+			)
+		);
+		$this->rules_store->add_rule( '.wp-site-blocks > .alignright' )->add_declarations(
+			array(
+				'float'       => 'right',
+				'margin-left' => '2em',
+			)
+		);
+		$this->rules_store->add_rule( '.wp-site-blocks > .aligncenter' )->add_declarations(
+			array(
+				'justify-content' => 'center',
+				'margin-left'     => 'auto',
+				'margin-right'    => 'auto',
+			)
+		);
 
 		$block_gap_value       = _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' );
 		$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 		if ( $has_block_gap_support ) {
 			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
-			$css            .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
-			$css            .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
+			$this->rules_store->add_rule( '.wp-site-blocks > *' )->add_declarations(
+				array(
+					'margin-block-start' => '0',
+					'margin-block-end'   => '0',
+				)
+			);
+			$this->rules_store->add_rule( '.wp-site-blocks > * + *' )->add_declarations(
+				array(
+					'margin-block-start' => $block_gap_value,
+				)
+			);
 
 			// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
-			$css .= "$selector { --wp--style--block-gap: $block_gap_value; }";
+			$this->rules_store->add_rule( $selector )->add_declarations( array( '--wp--style--block-gap' => $block_gap_value ) );
 		}
-		$css .= $this->get_layout_styles( $block_metadata );
-
-		return $css;
 	}
 
 	/**

@@ -157,6 +157,11 @@ class WP_Style_Engine_CSS_Declarations {
 				"{$property}:{$spacer}{$value}" : '';
 		}
 
+		// Allow `display` property to be used.
+		if ( 'display' === $property && '' !== $filtered_value ) {
+			return "display:{$spacer}{$filtered_value}";
+		}
+
 		if ( '' !== $filtered_value ) {
 			return safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
 		}

@@ -68,9 +68,6 @@ function gutenberg_enqueue_global_styles() {
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $stylesheet );
 	wp_enqueue_style( 'global-styles' );
-
-	// add each block as an inline css.
-	gutenberg_add_global_styles_for_blocks();
 }
 
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );

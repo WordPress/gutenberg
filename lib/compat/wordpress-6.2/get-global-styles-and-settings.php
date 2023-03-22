@@ -128,7 +128,6 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	 * they can override the default presets.
 	 * See https://core.trac.wordpress.org/ticket/54782
 	 */
-	$styles_variables = '';
 	if ( in_array( 'variables', $types, true ) ) {
 		/*
 		 * We only use the default, theme, and custom origins.
@@ -136,9 +135,9 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		 * at a later phase (render cycle) so we only render the ones in use.
 		 * @see wp_add_global_styles_for_blocks
 		 */
-		$origins          = array( 'default', 'theme', 'custom' );
-		$styles_variables = $tree->get_stylesheet( array( 'variables' ), $origins );
-		$types            = array_diff( $types, array( 'variables' ) );
+		$origins = array( 'default', 'theme', 'custom' );
+		$tree->add_stylesheet_to_rules_store( array( 'variables' ), $origins );
+		$types = array_diff( $types, array( 'variables' ) );
 	}
 
 	/*
@@ -147,7 +146,6 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	 * - themes without theme.json: only the classes for the presets defined by core
 	 * - themes with theme.json: the presets and styles classes, both from core and the theme
 	 */
-	$styles_rest = '';
 	if ( ! empty( $types ) ) {
 		/*
 		 * We only use the default, theme, and custom origins.
@@ -159,9 +157,15 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		if ( ! $supports_theme_json ) {
 			$origins = array( 'default' );
 		}
-		$styles_rest = $tree->get_stylesheet( $types, $origins );
+		$tree->add_stylesheet_to_rules_store( $types, $origins );
 	}
-	$stylesheet = $styles_variables . $styles_rest;
+
+	$block_nodes = $tree->get_styles_block_nodes();
+	foreach ( $block_nodes as $metadata ) {
+		$tree->add_styles_for_block_to_rules_store( $metadata );
+	}
+
+	$stylesheet = $tree->get_styles_from_rules_store();
 	if ( $can_use_cached ) {
 		wp_cache_set( $cache_key, $stylesheet, $cache_group );
 	}

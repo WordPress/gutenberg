@@ -103,10 +103,8 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	);
 	$theme_json_object = new WP_Theme_JSON_Gutenberg( $theme_json_shape );
 
-	$styles = '';
-
 	// include preset css variables declaration on the stylesheet.
-	$styles .= $theme_json_object->get_stylesheet(
+	$theme_json_object->add_stylesheet_to_rules_store(
 		array( 'variables' ),
 		null,
 		array(
@@ -116,7 +114,7 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	);
 
 	// include preset css classes on the the stylesheet.
-	$styles .= $theme_json_object->get_stylesheet(
+	$theme_json_object->add_stylesheet_to_rules_store(
 		array( 'presets' ),
 		null,
 		array(
@@ -124,10 +122,6 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 			'scope'         => $class_name,
 		)
 	);
-
-	if ( ! empty( $styles ) ) {
-		gutenberg_enqueue_block_support_styles( $styles );
-	}
 
 	return null;
 }
