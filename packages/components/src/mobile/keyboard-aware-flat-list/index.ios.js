@@ -38,22 +38,45 @@ export const KeyboardAwareFlatList = ( {
 		useKeyboardOffset( scrollEnabled );
 
 	const [ currentCaretData ] = useTextInputCaretPosition( scrollEnabled );
-	const [ textInputOffset ] = useTextInputOffset(
-		currentCaretData,
+
+	const [ getTextInputOffset ] = useTextInputOffset(
 		scrollEnabled,
 		scrollViewRef
 	);
 
 	const [ scrollToTextInputOffset ] = useScrollToTextInput(
-		currentCaretData,
 		extraScrollHeight,
-		isKeyboardVisible,
 		keyboardOffset,
 		scrollEnabled,
 		scrollViewRef,
-		scrollViewYOffset,
-		textInputOffset
+		scrollViewYOffset
 	);
+
+	const onScrollToTextInput = useCallback(
+		async ( caret ) => {
+			const textInputOffset = await getTextInputOffset( caret );
+
+			if ( textInputOffset !== null || textInputOffset !== null ) {
+				scrollToTextInputOffset( caret, textInputOffset );
+			}
+		},
+		[ getTextInputOffset, scrollToTextInputOffset ]
+	);
+
+	useEffect( () => {
+		const caretY = currentCaretData?.caretY;
+		if (
+			( isKeyboardVisible && keyboardOffset !== 0 && caretY !== null ) ||
+			caretY !== null
+		) {
+			onScrollToTextInput( currentCaretData );
+		}
+	}, [
+		currentCaretData,
+		isKeyboardVisible,
+		keyboardOffset,
+		onScrollToTextInput,
+	] );
 
 	const scrollHandler = useAnimatedScrollHandler( {
 		onScroll: ( event ) => {
@@ -63,21 +86,9 @@ export const KeyboardAwareFlatList = ( {
 		},
 	} );
 
-	useEffect( () => {
-		// If the Keyboard is visible it also checks that the keyboard's offset
-		// is not 0 since the value is updated when the Keyboard is fully visible.
-		if (
-			( isKeyboardVisible && keyboardOffset !== 0 ) ||
-			textInputOffset
-		) {
-			scrollToTextInputOffset();
-		}
-	}, [
-		isKeyboardVisible,
-		keyboardOffset,
-		textInputOffset,
-		scrollToTextInputOffset,
-	] );
+	const onContentSizeChange = useCallback( () => {
+		onScrollToTextInput( currentCaretData );
+	}, [ onScrollToTextInput, currentCaretData ] );
 
 	const getRef = useCallback(
 		( ref ) => {
@@ -96,6 +107,7 @@ export const KeyboardAwareFlatList = ( {
 			automaticallyAdjustContentInsets={ false }
 			contentInset={ contentInset }
 			keyboardShouldPersistTaps="handled"
+			onContentSizeChange={ onContentSizeChange }
 			onScroll={ scrollHandler }
 			ref={ getRef }
 			scrollEnabled={ scrollEnabled }
