@@ -554,7 +554,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 
 			'should use ceiling of 4rem for minimum font size when custom min font size is not set' => array(
 				'font_size'                   => array(
-					'size'  => '12rem',
+					'size' => '12rem',
 				),
 				'should_use_fluid_typography' => true,
 				'expected_output'             => 'clamp(4rem, 4rem + ((1vw - 0.48rem) * 15.385), 12rem)',
@@ -562,7 +562,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 
 			'should use ceiling of 64px for minimum font size when custom min font size is not set' => array(
 				'font_size'                   => array(
-					'size'  => '200px',
+					'size' => '200px',
 				),
 				'should_use_fluid_typography' => true,
 				'expected_output'             => 'clamp(64px, 4rem + ((1vw - 7.68px) * 16.346), 200px)',
