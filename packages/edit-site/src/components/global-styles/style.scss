@@ -45,12 +45,6 @@
 .edit-site-global-styles-screen-colors {
 	margin: $grid-unit-20;
 
-	.component-color-indicator {
-		// Show a diagonal line (crossed out) for empty swatches.
-		background: $white linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
-		flex-shrink: 0;
-	}
-
 	.color-block-support-panel {
 		padding-left: 0;
 		padding-right: 0;
