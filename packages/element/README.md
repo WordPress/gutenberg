@@ -25,7 +25,9 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Usage
 
-Let's render a customized greeting into an empty element:
+Let's render a customized greeting into an empty element. 
+
+**Note:** `createRoot` is not introduced until React 18, which will be bundled with WordPress 6.2. Therefore it may be necessary to mount your component depending on which version of WordPress (and therefore React) you are currently using. This is possible by checking for an undefined import and falling back to the React 17 method of mounting an app using `render`.
 
 ```html
 <div id="greeting"></div>
@@ -38,9 +40,14 @@ Let's render a customized greeting into an empty element:
 		);
 	}
 
-	wp.element
-		.createRoot( document.getElementById( 'greeting' ) )
-		.render( wp.element.createElement( Greeting, { toWhom: 'World' } ) );
+	if ( wp.element.createRoot ) {
+		wp.element
+			.createRoot( document.getElementById( 'greeting' ) )
+			.render( wp.element.createElement( Greeting, { toWhom: 'World' } ) );
+	} else {
+		wp.element
+		.render( wp.element.createElement( Greeting, { toWhom: 'World' } ), document.getElementById( 'greeting' ) );
+	}
 </script>
 ```
 
@@ -199,6 +206,8 @@ _Returns_
 
 ### createRoot
 
+_Since: WordPress 6.2_
+
 Creates a new React root for the target DOM node.
 
 _Related_
@@ -335,6 +344,8 @@ _Returns_
 ### render
 
 Renders a given element into the target DOM node.
+
+_Deprecated: WordPress 6.2_
 
 _Parameters_
 
