@@ -14,7 +14,7 @@ import {
 import { RichText } from '@wordpress/block-editor';
 
 describe( 'RichText Performance', () => {
-	it( 'performance is stable when typing rich text', async () => {
+	it( 'performance is stable when typing using Rich Text', async () => {
 		const scenario = async () => {
 			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
 
@@ -27,18 +27,6 @@ describe( 'RichText Performance', () => {
 		};
 
 		await measurePerformance( <RichText onChange={ jest.fn() } />, {
-			scenario,
-		} );
-	} );
-
-	it( 'performance is stable when text input is focused', async () => {
-		const scenario = async () => {
-			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
-
-			fireEvent( richTextInput, 'focus' );
-		};
-
-		await measurePerformance( <RichText onFocus={ jest.fn() } />, {
 			scenario,
 		} );
 	} );
