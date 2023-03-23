@@ -14,7 +14,7 @@ import {
 import { RichText } from '@wordpress/block-editor';
 
 describe( 'RichText Performance', () => {
-	it( 'should have stable performance when typing rich text', async () => {
+	it( 'performance is stable when typing rich text', async () => {
 		const scenario = async () => {
 			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
 
@@ -31,7 +31,7 @@ describe( 'RichText Performance', () => {
 		} );
 	} );
 
-	it( 'should have stable performance when text input is focused', async () => {
+	it( 'performance is stable when text input is focused', async () => {
 		const scenario = async () => {
 			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
 
@@ -43,7 +43,7 @@ describe( 'RichText Performance', () => {
 		} );
 	} );
 
-	it( 'should have stable performance when text input is blurred', async () => {
+	it( 'performance is stable when text input is blurred', async () => {
 		const scenario = async () => {
 			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
 
@@ -55,7 +55,7 @@ describe( 'RichText Performance', () => {
 		} );
 	} );
 
-	it( 'should have stable performance when text is selected', async () => {
+	it( 'performance is stable when text is selected', async () => {
 		const scenario = async () => {
 			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
 
