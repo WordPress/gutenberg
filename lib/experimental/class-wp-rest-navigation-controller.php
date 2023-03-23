@@ -6,7 +6,7 @@
  * @subpackage REST_API
  */
 
-require __DIR__ . '/class-wp-navigation-gutenberg.php';
+require __DIR__ . '/class-wp-navigation-fallbacks-gutenberg.php';
 
 
 /**
