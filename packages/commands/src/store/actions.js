@@ -7,7 +7,21 @@
  *
  * @property {string}   name     Command name.
  * @property {string}   label    Command label.
+ * @property {string=}  page     Command page.
  * @property {Function} callback Command callback.
+ */
+
+/**
+ * @typedef {(search: string) => WPCommandConfig[]} WPCommandLoaderHook hoo
+ */
+
+/**
+ * Command loader config.
+ *
+ * @typedef {Object} WPCommandLoaderConfig
+ *
+ * @property {string=}             page Command loader page.
+ * @property {WPCommandLoaderHook} hook Command loader hook.
  */
 
 /**
@@ -17,12 +31,13 @@
  *
  * @return {Object} action.
  */
-export function registerCommand( { name, label, callback } ) {
+export function registerCommand( { name, label, callback, page = null } ) {
 	return {
 		type: 'REGISTER_COMMAND',
 		name,
 		label,
 		callback,
+		page,
 	};
 }
 
@@ -37,5 +52,34 @@ export function unregisterCommand( name ) {
 	return {
 		type: 'UNREGISTER_COMMAND',
 		name,
+	};
+}
+
+/**
+ * Register command loader.
+ *
+ * @param {WPCommandLoaderConfig} config Command loader config.
+ *
+ * @return {Object} action.
+ */
+export function registerCommandLoader( { page, hook } ) {
+	return {
+		type: 'REGISTER_COMMAND_LOADER',
+		page,
+		hook,
+	};
+}
+
+/**
+ * Unregister command loader hook.
+ *
+ * @param {string} page Command loader page.
+ *
+ * @return {Object} action.
+ */
+export function unregisterCommandLoader( page ) {
+	return {
+		type: 'UNREGISTER_COMMAND_LOADER',
+		page,
 	};
 }

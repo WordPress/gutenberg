@@ -12,21 +12,30 @@ import { store as commandsStore } from '../store';
 /**
  * Attach a command to the Global command menu.
  *
- * @param {string}   name     Command name.
- * @param {string}   label    Command label.
- * @param {Function} callback Command callback.
+ * @param {import('../store/actions').WPCommandConfig} command command config.
  */
-export default function useCommand( name, label, callback ) {
+export default function useCommand( command ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
-	const currentCallback = useRef( callback );
+	const currentCallback = useRef( command.callback );
 	useEffect( () => {
-		currentCallback.current = callback;
-	}, [ callback ] );
+		currentCallback.current = command.callback;
+	}, [ command.callback ] );
 
 	useEffect( () => {
-		registerCommand( { name, label, callback: currentCallback.current } );
+		registerCommand( {
+			name: command.name,
+			page: command.page,
+			label: command.label,
+			callback: currentCallback.current,
+		} );
 		return () => {
-			unregisterCommand( name );
+			unregisterCommand( command.name );
 		};
-	}, [ name, label, registerCommand, unregisterCommand ] );
+	}, [
+		command.name,
+		command.label,
+		command.page,
+		registerCommand,
+		unregisterCommand,
+	] );
 }
