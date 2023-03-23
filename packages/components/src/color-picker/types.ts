@@ -39,9 +39,9 @@ export type ColorPickerProps = WordPressComponentProps<
 		 */
 		color?: string;
 		/**
-		 * Fired when the color changes. Always passes a hex8 color string.
+		 * Fired when the color changes. Always passes a hex or hex8 color string.
 		 */
-		onChange?: ( hex8Color: string ) => void;
+		onChange?: ( color: string ) => void;
 		/**
 		 * An optional default value to use for the color picker.
 		 */

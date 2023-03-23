@@ -31,7 +31,7 @@ The current color value to display in the picker. Must be a hex or hex8 string.
 
 ### `onChange`: `(hex8Color: string) => void`
 
-Fired when the color changes. Always passes a hex8 color string.
+Fired when the color changes. Always passes a hex or hex8 color string.
 
 - Required: No
 
