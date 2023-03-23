@@ -9,7 +9,7 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { SVG } from '@wordpress/components';
-import { useCallback, useMemo, useRef, createPortal } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -68,8 +68,6 @@ function useDarkThemeBodyClassName( styles ) {
 }
 
 export default function EditorStyles( { styles } ) {
-	const ownerDocumentHeadRef = useRef( null );
-
 	const transformedStyles = useMemo(
 		() =>
 			transformStyles(
@@ -89,28 +87,14 @@ export default function EditorStyles( { styles } ) {
 		[ styles ]
 	);
 
-	const setDarkThemeBodyClassName = useDarkThemeBodyClassName( styles );
-
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
-			<style
-				ref={ ( node ) => {
-					ownerDocumentHeadRef.current = node?.ownerDocument.head;
-					setDarkThemeBodyClassName( node );
-				} }
-			/>
-			{ ownerDocumentHeadRef.current &&
-				transformedSvgs.length &&
-				createPortal(
-					<>
-						{ transformedStyles.map( ( css, index ) => (
-							<style key={ index }>{ css }</style>
-						) ) }
-					</>,
-					ownerDocumentHeadRef.current
-				) }
+			<style ref={ useDarkThemeBodyClassName( styles ) } />
+			{ transformedStyles.map( ( css, index ) => (
+				<style key={ index }>{ css }</style>
+			) ) }
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 0 0"
