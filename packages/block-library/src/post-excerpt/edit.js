@@ -41,24 +41,25 @@ export default function PostExcerptEditor( {
 		{ rendered: renderedExcerpt, protected: isProtected } = {},
 	] = useEntityProp( 'postType', postType, 'excerpt', postId );
 
-	// Check if the post type supports excerpts.
-	let postTypeSupportsExcerpts = useSelect( ( select ) =>
-		postType
-			? !! select( coreStore ).getPostType( postType )?.supports.excerpt
-			: false
-	);
-
 	/**
-	 * Add an exception for the page post type,
+	 * Check if the post type supports excerpts.
+	 * Add an exception and return early for the "page" post type,
 	 * which is registered without support for the excerpt UI,
 	 * but supports saving the excerpt to the database.
 	 * See: https://core.trac.wordpress.org/browser/branches/6.1/src/wp-includes/post.php#L65
 	 * Without this exception, users that have excerpts saved to the database will
 	 * not be able to edit the excerpts.
 	 */
-	if ( postType === 'page' ) {
-		postTypeSupportsExcerpts = true;
-	}
+	const postTypeSupportsExcerpts = useSelect(
+		( select ) => {
+			if ( postType === 'page' ) {
+				return true;
+			}
+			return !! select( coreStore ).getPostType( postType )?.supports
+				.excerpt;
+		},
+		[ postType ]
+	);
 
 	/**
 	 * The excerpt is editable if:
@@ -95,6 +96,7 @@ export default function PostExcerptEditor( {
 		);
 		return document.body.textContent || document.body.innerText || '';
 	}, [ renderedExcerpt ] );
+
 	if ( ! postType || ! postId ) {
 		return (
 			<>
@@ -152,10 +154,10 @@ export default function PostExcerptEditor( {
 	/**
 	 * The excerpt length setting needs to be applied to both
 	 * the raw and the rendered excerpt depending on which is being used.
-	 * If there is no excerpt the value is set to '' to make sure it is not undefined (See line 89).
 	 */
-	let rawOrRenderedExcerpt = rawExcerpt || strippedRenderedExcerpt;
-	rawOrRenderedExcerpt = rawOrRenderedExcerpt.trim();
+	const rawOrRenderedExcerpt = (
+		rawExcerpt || strippedRenderedExcerpt
+	).trim();
 
 	let trimmedExcerpt = '';
 	if ( wordCountType === 'words' ) {
