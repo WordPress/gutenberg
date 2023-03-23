@@ -65,12 +65,14 @@ export default function Layout() {
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
-	const { canvasMode, previousShortcut, nextShortcut } = useSelect(
+	const { canvasMode, previousShortcut, nextShortcut, editFocus } = useSelect(
 		( select ) => {
 			const { getAllShortcutKeyCombinations } = select(
 				keyboardShortcutsStore
 			);
-			const { getCanvasMode } = unlock( select( editSiteStore ) );
+			const { getCanvasMode, getEditFocus } = unlock(
+				select( editSiteStore )
+			);
 			return {
 				canvasMode: getCanvasMode(),
 				previousShortcut: getAllShortcutKeyCombinations(
@@ -79,6 +81,7 @@ export default function Layout() {
 				nextShortcut: getAllShortcutKeyCombinations(
 					'core/edit-site/next-region'
 				),
+				editFocus: getEditFocus(),
 			};
 		},
 		[]
@@ -135,6 +138,8 @@ export default function Layout() {
 					{
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': canvasMode === 'edit',
+						'is-post-edit-focus': editFocus === 'post',
+						'is-template-edit-focus': editFocus === 'template',
 					}
 				) }
 			>
