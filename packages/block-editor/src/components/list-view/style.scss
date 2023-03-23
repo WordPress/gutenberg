@@ -303,17 +303,16 @@
 		position: relative;
 	}
 
-	&.is-selected .block-editor-list-view-block-select-button__sticky-indicator {
-		border-top: 1px solid $white;
-	}
-
 	.block-editor-list-view-block-select-button__sticky-indicator {
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 24px;
 		height: 24px;
-		border-top: 1px solid $gray-600;
+	}
+
+	&:not(.is-selected):not(:hover) .block-editor-list-view-block-select-button__sticky-indicator {
+		color: $gray-400;
 	}
 
 	.block-editor-list-view-block-select-button__label-wrapper {

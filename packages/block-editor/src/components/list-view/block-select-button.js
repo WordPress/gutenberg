@@ -13,7 +13,11 @@ import {
 	Tooltip,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock } from '@wordpress/icons';
+import {
+	Icon,
+	lockSmall as lock,
+	positionSticky as positionStickyIcon,
+} from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -162,7 +166,9 @@ function ListViewBlockSelectButton(
 								context="list-view"
 							/>
 							{ isSticky && (
-								<div className="block-editor-list-view-block-select-button__sticky-indicator" />
+								<div className="block-editor-list-view-block-select-button__sticky-indicator">
+									<Icon icon={ positionStickyIcon } />
+								</div>
 							) }
 						</div>
 					</Tooltip>
