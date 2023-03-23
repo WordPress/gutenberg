@@ -3,8 +3,6 @@ export {
 	useGlobalSetting,
 	useGlobalStyle,
 	useSettingsForBlockElement,
-	useColorsPerOrigin,
-	useGradientsPerOrigin,
 } from './hooks';
 export { useGlobalStylesOutput } from './use-global-styles-output';
 export { GlobalStylesContext } from './context';
