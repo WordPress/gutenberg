@@ -14,7 +14,7 @@ import {
 import { RichText } from '@wordpress/block-editor';
 
 describe( 'RichText Performance', () => {
-	it( 'performance is stable', async () => {
+	it( 'should have stable performance when typing rich text', async () => {
 		const scenario = async () => {
 			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
 
@@ -31,7 +31,7 @@ describe( 'RichText Performance', () => {
 		} );
 	} );
 
-	it( 'should call onFocus when the TextInput component gains focus', async () => {
+	it( 'should have stable performance when text input is focused', async () => {
 		const scenario = async () => {
 			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
 
@@ -43,11 +43,11 @@ describe( 'RichText Performance', () => {
 		} );
 	} );
 
-	it( 'should call onBlue when the TextInput component is blurred', async () => {
+	it( 'should have stable performance when text input is blurred', async () => {
 		const scenario = async () => {
 			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
 
-			fireEvent( richTextInput, 'focus' );
+			fireEvent( richTextInput, 'blur' );
 		};
 
 		await measurePerformance( <RichText onBlur={ jest.fn() } />, {
@@ -55,13 +55,13 @@ describe( 'RichText Performance', () => {
 		} );
 	} );
 
-	it( 'should call onSelectionChange when the selection in the TextInput component changes', async () => {
+	it( 'should have stable performance when text is selected', async () => {
 		const scenario = async () => {
 			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
 
 			const selection = { start: 2, end: 4 };
-			fireEvent( richTextInput, 'selectionChange', {
-				nativeEvent: { selection },
+			fireEvent( richTextInput, 'selectionChange', 2, 4, 'Hello', {
+				nativeEvent: { selection, text: 'Hello' },
 			} );
 		};
 
@@ -71,17 +71,5 @@ describe( 'RichText Performance', () => {
 				scenario,
 			}
 		);
-	} );
-
-	it( 'should call onKeyPress when a key is pressed while the TextInput component is focused', async () => {
-		const scenario = async () => {
-			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
-
-			fireEvent.changeText( richTextInput, 'abc' );
-		};
-
-		await measurePerformance( <RichText onKeyPress={ jest.fn() } />, {
-			scenario,
-		} );
 	} );
 } );
