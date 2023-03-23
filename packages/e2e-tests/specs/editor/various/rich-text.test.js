@@ -579,19 +579,17 @@ describe( 'RichText', () => {
 		await switchEditorModeTo( 'Visual' );
 
 		// Confirm editor markup has been properly converted
-		const [
-			editorPresetColorText,
-			editorCustomColorText,
-		] = await page.evaluate( () =>
-			Array.from(
-				document.querySelectorAll(
-					'p[aria-label="Paragraph block"] > *'
-				)
-			).map( ( el ) => ( {
-				tag: el.localName,
-				style: el.getAttribute( 'style' ),
-			} ) )
-		);
+		const [ editorPresetColorText, editorCustomColorText ] =
+			await page.evaluate( () =>
+				Array.from(
+					document.querySelectorAll(
+						'p[aria-label="Paragraph block"] > *'
+					)
+				).map( ( el ) => ( {
+					tag: el.localName,
+					style: el.getAttribute( 'style' ),
+				} ) )
+			);
 
 		expect( editorPresetColorText.tag ).toEqual( 'mark' );
 		expect( editorPresetColorText.style ).toEqual(
@@ -609,23 +607,21 @@ describe( 'RichText', () => {
 		);
 		await Promise.all( [
 			page.waitForNavigation(),
-			viewPostLinks[ 0 ].click()
+			viewPostLinks[ 0 ].click(),
 		] );
 
 		await page.waitForSelector( '.entry-content' );
 
 		// Confirm front end markup has been properly converted
-		const [
-			frontendPresetColorText,
-			frontendCustomColorText,
-		] = await page.evaluate( () =>
-			Array.from(
-				document.querySelectorAll( '.entry-content p  > *' )
-			).map( ( el ) => ( {
-				tag: el.localName,
-				style: el.getAttribute( 'style' ),
-			} ) )
-		);
+		const [ frontendPresetColorText, frontendCustomColorText ] =
+			await page.evaluate( () =>
+				Array.from(
+					document.querySelectorAll( '.entry-content p  > *' )
+				).map( ( el ) => ( {
+					tag: el.localName,
+					style: el.getAttribute( 'style' ),
+				} ) )
+			);
 
 		expect( frontendPresetColorText.tag ).toEqual( 'mark' );
 		expect( frontendPresetColorText.style ).toEqual(
