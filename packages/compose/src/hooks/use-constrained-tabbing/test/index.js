@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -32,8 +32,53 @@ describe( 'useConstrainedTabbing', () => {
 		);
 	}
 
-	it( 'should constrain tabbing when tabbing forwards', async () => {
-		const user = userEvent.setup( { delay: 100 } );
+	it( 'should allow native tab behavior after focus is programmatically set on elements with negative tabindex', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<div>
+				<button type="button">Focusable element before</button>
+				<ConstrainedTabbingComponent />
+				<button type="button">Focusable element after</button>
+			</div>
+		);
+
+		const focusableBefore = screen.getByRole( 'button', {
+			name: 'Focusable element before',
+		} );
+		const button1 = screen.getByRole( 'button', {
+			name: 'Button 1',
+		} );
+		const button2 = screen.getByRole( 'button', {
+			name: 'Button 2',
+		} );
+		const button3 = screen.getByRole( 'button', {
+			name: 'Button 3',
+		} );
+		const focusableDiv = screen.getByTestId( 'test-focusable-element' );
+
+		await user.tab();
+		expect( focusableBefore ).toHaveFocus();
+
+		await user.tab();
+		expect( button1 ).toHaveFocus();
+
+		await user.tab();
+		expect( button2 ).toHaveFocus();
+
+		await user.tab();
+		expect( button3 ).toHaveFocus();
+
+		await button3.click();
+
+		expect( focusableDiv ).toHaveFocus();
+
+		await user.tab();
+		expect( button2 ).toHaveFocus();
+	} );
+
+	it( 'should prepend and focus the trap element when tabbing forwards', async () => {
+		const user = userEvent.setup();
 
 		render(
 			<div>
@@ -56,34 +101,110 @@ describe( 'useConstrainedTabbing', () => {
 			name: 'Button 3',
 		} );
 
-		await user.keyboard( '{Tab}' );
+		await user.tab();
 		expect( focusableBefore ).toHaveFocus();
 
-		await user.keyboard( '{Tab}' );
+		await user.tab();
 		expect( button1 ).toHaveFocus();
 
-		await user.keyboard( '{Tab}' );
+		await user.tab();
 		expect( button2 ).toHaveFocus();
 
-		await user.keyboard( '{Tab}' );
+		await user.tab();
 		expect( button3 ).toHaveFocus();
 
-		// Looks like the React Testing Library didn't implement event.keycode.
-		// Also, we can't use user.Tab() and the like, as the trap element is
-		// injected in the DOM while the Tab key is being pressed.
-		fireEvent.keyDown( button3, { code: 'Tab' } );
-
 		const component = screen.getByTestId( 'test-component' );
+
+		// Looks like the React Testing Library didn't implement event.keycode.
+		// Note: Using await user.tab() would make the test fail.
+		fireEvent.keyDown( component, { code: 'Tab' } );
+
 		// eslint-disable-next-line testing-library/no-node-access
 		const trap = component.firstChild;
 
-		await waitFor( () =>
-			expect( trap.outerHTML ).toEqual( '<div tabindex="-1"></div>' )
+		expect( trap.outerHTML ).toEqual( '<div tabindex="-1"></div>' );
+		expect( trap ).toHaveFocus();
+	} );
+
+	it( 'should constrain tabbing when tabbing forwards using await user.tab', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<div>
+				<button type="button">Focusable element before</button>
+				<ConstrainedTabbingComponent />
+				<button type="button">Focusable element after</button>
+			</div>
 		);
 
-		expect( trap ).toHaveFocus();
+		const focusableBefore = screen.getByRole( 'button', {
+			name: 'Focusable element before',
+		} );
+		const button1 = screen.getByRole( 'button', {
+			name: 'Button 1',
+		} );
+		const button2 = screen.getByRole( 'button', {
+			name: 'Button 2',
+		} );
+		const button3 = screen.getByRole( 'button', {
+			name: 'Button 3',
+		} );
 
-		// At this point, the trap element should be blurred.
-		// Then, the focused element should be Button 1.
+		await user.tab();
+		expect( focusableBefore ).toHaveFocus();
+
+		await user.tab();
+		expect( button1 ).toHaveFocus();
+
+		await user.tab();
+		expect( button2 ).toHaveFocus();
+
+		await user.tab();
+		expect( button3 ).toHaveFocus();
+
+		// Fails. Focus goes to `<button type="button">Focusable element after</button>`
+		await user.tab();
+		expect( button1 ).toHaveFocus();
+	} );
+
+	it( 'should constrain tabbing when tabbing forwards using user.tab with no await', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<div>
+				<button type="button">Focusable element before</button>
+				<ConstrainedTabbingComponent />
+				<button type="button">Focusable element after</button>
+			</div>
+		);
+
+		const focusableBefore = screen.getByRole( 'button', {
+			name: 'Focusable element before',
+		} );
+		const button1 = screen.getByRole( 'button', {
+			name: 'Button 1',
+		} );
+		const button2 = screen.getByRole( 'button', {
+			name: 'Button 2',
+		} );
+		const button3 = screen.getByRole( 'button', {
+			name: 'Button 3',
+		} );
+
+		await user.tab();
+		expect( focusableBefore ).toHaveFocus();
+
+		await user.tab();
+		expect( button1 ).toHaveFocus();
+
+		await user.tab();
+		expect( button2 ).toHaveFocus();
+
+		await user.tab();
+		expect( button3 ).toHaveFocus();
+
+		// Fails. Focus is still on `<button type="button">Button 3</button>`
+		user.tab();
+		expect( button1 ).toHaveFocus();
 	} );
 } );
