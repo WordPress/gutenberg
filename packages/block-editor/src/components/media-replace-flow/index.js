@@ -215,7 +215,7 @@ const MediaReplaceFlow = ( {
 								'block-editor-media-flow__url-input',
 								{
 									'has-siblings':
-										! canUpload && ! onToggleFeaturedImage,
+										canUpload || onToggleFeaturedImage,
 								}
 							) }
 						>
