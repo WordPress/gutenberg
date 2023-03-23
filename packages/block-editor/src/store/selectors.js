@@ -1662,42 +1662,50 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  *
  * @return {boolean} Whether the given block is allowed to be removed.
  */
-export function canRemoveBlock( state, clientId, rootClientId = null ) {
-	// HACK: belongs in edit-site. need to make canRemoveBlock filterable.
-	const POST_CONTENT_BLOCK_NAMES = [
-		'core/post-featured-image',
-		'core/post-title',
-		'core/post-content',
-	];
-	if (
-		// we're focused on editing a post; and
-		window.wp.data.select( 'core/edit-site' ).getEditFocus() === 'post' &&
-		// the block is not a descendant of a post content block
-		getBlockNamesByClientId(
-			state,
-			getBlockParents( state, clientId )
-		).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) )
-	) {
-		return false;
-	}
+export const canRemoveBlock = createSelector(
+	( state, clientId, rootClientId = null ) => {
+		// HACK: belongs in edit-site. need to make canRemoveBlock filterable.
+		const POST_CONTENT_BLOCK_NAMES = [
+			'core/post-featured-image',
+			'core/post-title',
+			'core/post-content',
+		];
+		if (
+			// we're focused on editing a post; and
+			window.wp.data.select( 'core/edit-site' ).getEditFocus() ===
+				'post' &&
+			// the block is not a descendant of a post content block
+			getBlockNamesByClientId(
+				state,
+				getBlockParents( state, clientId )
+			).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) )
+		) {
+			return false;
+		}
 
-	const attributes = getBlockAttributes( state, clientId );
+		const attributes = getBlockAttributes( state, clientId );
 
-	// attributes can be null if the block is already deleted.
-	if ( attributes === null ) {
-		return true;
-	}
+		// attributes can be null if the block is already deleted.
+		if ( attributes === null ) {
+			return true;
+		}
 
-	const { lock } = attributes;
-	const parentIsLocked = !! getTemplateLock( state, rootClientId );
-	// If we don't have a lock on the blockType level, we defer to the parent templateLock.
-	if ( lock === undefined || lock?.remove === undefined ) {
-		return ! parentIsLocked;
-	}
+		const { lock } = attributes;
+		const parentIsLocked = !! getTemplateLock( state, rootClientId );
+		// If we don't have a lock on the blockType level, we defer to the parent templateLock.
+		if ( lock === undefined || lock?.remove === undefined ) {
+			return ! parentIsLocked;
+		}
 
-	// When remove is true, it means we cannot remove it.
-	return ! lock?.remove;
-}
+		// When remove is true, it means we cannot remove it.
+		return ! lock?.remove;
+	},
+	( state ) => [
+		window.wp.data.select( 'core/edit-site' ).getEditFocus(),
+		state.blocks.parents,
+		state.blocks.byClientId,
+	]
+);
 
 /**
  * Determines if the given blocks are allowed to be removed.
@@ -1723,40 +1731,48 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
  *
  * @return {boolean | undefined} Whether the given block is allowed to be moved.
  */
-export function canMoveBlock( state, clientId, rootClientId = null ) {
-	// HACK: belongs in edit-site. need to make canMoveBlock filterable.
-	const POST_CONTENT_BLOCK_NAMES = [
-		'core/post-featured-image',
-		'core/post-title',
-		'core/post-content',
-	];
-	if (
-		// we're focused on editing a post; and
-		window.wp.data.select( 'core/edit-site' ).getEditFocus() === 'post' &&
-		// the block is not a descendant of a post content block
-		getBlockNamesByClientId(
-			state,
-			getBlockParents( state, clientId )
-		).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) )
-	) {
-		return false;
-	}
+export const canMoveBlock = createSelector(
+	( state, clientId, rootClientId = null ) => {
+		// HACK: belongs in edit-site. need to make canMoveBlock filterable.
+		const POST_CONTENT_BLOCK_NAMES = [
+			'core/post-featured-image',
+			'core/post-title',
+			'core/post-content',
+		];
+		if (
+			// we're focused on editing a post; and
+			window.wp.data.select( 'core/edit-site' ).getEditFocus() ===
+				'post' &&
+			// the block is not a descendant of a post content block
+			getBlockNamesByClientId(
+				state,
+				getBlockParents( state, clientId )
+			).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) )
+		) {
+			return false;
+		}
 
-	const attributes = getBlockAttributes( state, clientId );
-	if ( attributes === null ) {
-		return;
-	}
+		const attributes = getBlockAttributes( state, clientId );
+		if ( attributes === null ) {
+			return;
+		}
 
-	const { lock } = attributes;
-	const parentIsLocked = getTemplateLock( state, rootClientId ) === 'all';
-	// If we don't have a lock on the blockType level, we defer to the parent templateLock.
-	if ( lock === undefined || lock?.move === undefined ) {
-		return ! parentIsLocked;
-	}
+		const { lock } = attributes;
+		const parentIsLocked = getTemplateLock( state, rootClientId ) === 'all';
+		// If we don't have a lock on the blockType level, we defer to the parent templateLock.
+		if ( lock === undefined || lock?.move === undefined ) {
+			return ! parentIsLocked;
+		}
 
-	// When move is true, it means we cannot move it.
-	return ! lock?.move;
-}
+		// When move is true, it means we cannot move it.
+		return ! lock?.move;
+	},
+	( state ) => [
+		window.wp.data.select( 'core/edit-site' ).getEditFocus(),
+		state.blocks.parents,
+		state.blocks.byClientId,
+	]
+);
 
 /**
  * Determines if the given blocks are allowed to be moved.
@@ -1781,44 +1797,54 @@ export function canMoveBlocks( state, clientIds, rootClientId = null ) {
  *
  * @return {boolean} Whether the given block is allowed to be edited.
  */
-export function canEditBlock( state, clientId ) {
-	// HACK: belongs in edit-site. need to make canEditBlock filterable.
-	const POST_CONTENT_BLOCK_NAMES = [
-		'core/post-featured-image',
-		'core/post-title',
-		'core/post-content',
-	];
-	if (
-		// we're focused on editing a post; and
-		window.wp.data.select( 'core/edit-site' ).getEditFocus() === 'post' &&
-		// the block is not a post content block; and
-		! POST_CONTENT_BLOCK_NAMES.includes(
-			getBlockName( state, clientId )
-		) &&
-		// the block is not a descendant of a post content block; and
-		getBlockNamesByClientId(
-			state,
-			getBlockParents( state, clientId )
-		).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) ) &&
-		// the block is not an ancestor of a post content block
-		getBlockNamesByClientId(
-			state,
-			getClientIdsOfDescendants( state, [ clientId ] )
-		).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) )
-	) {
-		return false;
-	}
+export const canEditBlock = createSelector(
+	( state, clientId ) => {
+		// HACK: belongs in edit-site. need to make canEditBlock filterable.
+		const POST_CONTENT_BLOCK_NAMES = [
+			'core/post-featured-image',
+			'core/post-title',
+			'core/post-content',
+		];
+		if (
+			// we're focused on editing a post; and
+			window.wp.data.select( 'core/edit-site' ).getEditFocus() ===
+				'post' &&
+			// the block is not a post content block; and
+			! POST_CONTENT_BLOCK_NAMES.includes(
+				getBlockName( state, clientId )
+			) &&
+			// the block is not a descendant of a post content block; and
+			getBlockNamesByClientId(
+				state,
+				getBlockParents( state, clientId )
+			).every(
+				( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name )
+			) &&
+			// the block is not an ancestor of a post content block
+			getBlockNamesByClientId(
+				state,
+				getClientIdsOfDescendants( state, [ clientId ] )
+			).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) )
+		) {
+			return false;
+		}
 
-	const attributes = getBlockAttributes( state, clientId );
-	if ( attributes === null ) {
-		return true;
-	}
+		const attributes = getBlockAttributes( state, clientId );
+		if ( attributes === null ) {
+			return true;
+		}
 
-	const { lock } = attributes;
+		const { lock } = attributes;
 
-	// When the edit is true, we cannot edit the block.
-	return ! lock?.edit;
-}
+		// When the edit is true, we cannot edit the block.
+		return ! lock?.edit;
+	},
+	( state ) => [
+		window.wp.data.select( 'core/edit-site' ).getEditFocus(),
+		state.blocks.parents,
+		state.blocks.byClientId,
+	]
+);
 
 /**
  * Determines if the given block type can be locked/unlocked by a user.
