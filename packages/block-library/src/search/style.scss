@@ -1,5 +1,8 @@
+$button-spacing-x: $grid-unit-10 + math.div($grid-unit-05, 2); // 10px
+$button-spacing-y: math.div($grid-unit-15, 2); // 6px
+
 .wp-block-search__button {
-	margin-left: 0.625em;
+	margin-left: $button-spacing-x;
 	word-break: normal;
 
 	&.has-icon {
@@ -7,8 +10,8 @@
 	}
 
 	svg {
-		min-width: 1.5em;
-		min-height: 1.5em;
+		min-width: $grid-unit-30;
+		min-height: $grid-unit-30;
 		fill: currentColor;
 		vertical-align: text-bottom;
 	}
@@ -17,8 +20,8 @@
 // These rules are set to zero specificity to keep the default styles for search buttons.
 // They are needed for backwards compatibility.
 :where(.wp-block-search__button) {
-	border: 1px solid #ccc;
-	padding: 0.375em 0.625em;
+	border: 1px solid $gray-400;
+	padding: $button-spacing-y $button-spacing-x;
 }
 
 .wp-block-search__inside-wrapper {
@@ -33,12 +36,12 @@
 }
 
 .wp-block-search__input {
-	padding: 8px;
+	padding: $grid-unit-10;
 	flex-grow: 1;
 	margin-left: 0;
 	margin-right: 0;
-	min-width: 3em;
-	border: 1px solid #949494;
+	min-width: 3rem;
+	border: 1px solid $gray-600;
 	// !important used to forcibly prevent undesired application of
 	// text-decoration styles on the input field.
 	text-decoration: unset !important;
@@ -52,13 +55,14 @@
 
 // We are lowering the specificity so that the button element can override the rule for the button inside the search block.
 :where(.wp-block-search__button-inside .wp-block-search__inside-wrapper) {
-	padding: 4px;
-	border: 1px solid #949494;
+	padding: $grid-unit-05;
+	border: 1px solid $gray-600;
+	box-sizing: border-box;
 
 	.wp-block-search__input {
 		border-radius: 0;
 		border: none;
-		padding: 0 0 0 0.25em;
+		padding: 0 $grid-unit-05;
 
 		&:focus {
 			outline: none;
@@ -67,7 +71,7 @@
 
 	// For lower specificity.
 	:where(.wp-block-search__button) {
-		padding: 0.125em 0.5em;
+		padding: $grid-unit-05 $grid-unit-10;
 	}
 }
 

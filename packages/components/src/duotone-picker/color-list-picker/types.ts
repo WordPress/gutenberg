@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react';
 
 export type ColorListPickerProps = {
 	/**
-	 * A list of predifened colors. Each color is an object with a `name` and a
+	 * A list of predefined colors. Each color is an object with a `name` and a
 	 * `color` value.
 	 * The `name` is a string used to identify the color in the UI.
 	 * The `color` is a valid CSS color string.
@@ -21,7 +21,7 @@ export type ColorListPickerProps = {
 	/**
 	 * An array containing the currently selected colors.
 	 */
-	value?: Array< string | undefined >;
+	value?: Array< string >;
 	/**
 	 * Controls whether the custom color picker is displayed.
 	 */

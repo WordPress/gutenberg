@@ -363,53 +363,46 @@ test.describe( 'splitting and merging blocks', () => {
 		);
 	} );
 
-	test.describe(
-		'test restore selection when merge produces more than one block',
-		() => {
-			test( 'on forward delete', async ( {
-				editor,
-				page,
-				pageUtils,
-			} ) => {
-				await editor.insertBlock( { name: 'core/paragraph' } );
-				await page.keyboard.type( 'hi' );
-				await editor.insertBlock( { name: 'core/list' } );
-				await page.keyboard.type( 'item 1' );
-				await page.keyboard.press( 'Enter' );
-				await page.keyboard.type( 'item 2' );
-				await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
-				await page.keyboard.press( 'Delete' );
+	test.describe( 'test restore selection when merge produces more than one block', () => {
+		test( 'on forward delete', async ( { editor, page, pageUtils } ) => {
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.type( 'hi' );
+			await editor.insertBlock( { name: 'core/list' } );
+			await page.keyboard.type( 'item 1' );
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'item 2' );
+			await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
+			await page.keyboard.press( 'Delete' );
 
-				expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-				await page.keyboard.press( 'Delete' );
-				// Carret should be in the first block and at the proper position.
-				await page.keyboard.type( '-' );
+			await page.keyboard.press( 'Delete' );
+			// Carret should be in the first block and at the proper position.
+			await page.keyboard.type( '-' );
 
-				// Check the content.
-				expect( await editor.getEditedPostContent() ).toMatchSnapshot();
-			} );
+			// Check the content.
+			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		} );
 
-			test( 'on backspace', async ( { editor, page, pageUtils } ) => {
-				await editor.insertBlock( { name: 'core/paragraph' } );
-				await page.keyboard.type( 'hi' );
-				await editor.insertBlock( { name: 'core/list' } );
-				await page.keyboard.type( 'item 1' );
-				await page.keyboard.press( 'Enter' );
-				await page.keyboard.type( 'item 2' );
-				await page.keyboard.press( 'ArrowUp' );
-				await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
-				await page.keyboard.press( 'Backspace' );
+		test( 'on backspace', async ( { editor, page, pageUtils } ) => {
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.type( 'hi' );
+			await editor.insertBlock( { name: 'core/list' } );
+			await page.keyboard.type( 'item 1' );
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'item 2' );
+			await page.keyboard.press( 'ArrowUp' );
+			await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
+			await page.keyboard.press( 'Backspace' );
 
-				expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-				await page.keyboard.press( 'Backspace' );
-				// Carret should be in the first block and at the proper position.
-				await page.keyboard.type( '-' );
+			await page.keyboard.press( 'Backspace' );
+			// Carret should be in the first block and at the proper position.
+			await page.keyboard.type( '-' );
 
-				// Check the content.
-				expect( await editor.getEditedPostContent() ).toMatchSnapshot();
-			} );
-		}
-	);
+			// Check the content.
+			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		} );
+	} );
 } );

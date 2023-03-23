@@ -184,24 +184,7 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
-	 * Safari renders elements incorrectly on first paint when the SVG filter comes after the content that it is filtering,
-	 * so we force a repaint with a WebKit hack which solves the issue.
-	 *
-	 * @param string $selector The selector to apply the hack for.
-	 */
-	private static function safari_rerender_hack( $selector ) {
-		/*
-		* Simply accessing el.offsetHeight flushes layout and style
-		* changes in WebKit without having to wait for setTimeout.
-		*/
-		printf(
-			'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
-			wp_json_encode( $selector )
-		);
-	}
-
-	/**
-	 * Outputs all necessary SVG for duotone filters, CSS for classic themes, and safari rerendering hack
+	 * Outputs all necessary SVG for duotone filters, CSS for classic themes.
 	 */
 	public static function output_footer_assets() {
 		foreach ( self::$output as $filter_data ) {
@@ -214,11 +197,6 @@ class WP_Duotone_Gutenberg {
 			// This is for classic themes - in block themes, the CSS is added in the head via wp_add_inline_style in the wp_enqueue_scripts action.
 			if ( ! wp_is_block_theme() ) {
 				wp_add_inline_style( 'core-block-supports', 'body{' . self::get_css_custom_property_declaration( $filter_data ) . '}' );
-			}
-
-			global $is_safari;
-			if ( $is_safari ) {
-				self::safari_rerender_hack( $filter_data['selector'] );
 			}
 		}
 	}
@@ -360,11 +338,11 @@ class WP_Duotone_Gutenberg {
 		);
 
 		// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
-		return preg_replace(
-			'/' . preg_quote( 'class="', '/' ) . '/',
-			'class="' . $filter_id . ' ',
-			$block_content,
-			1
-		);
+		$tags = new WP_HTML_Tag_Processor( $block_content );
+		if ( $tags->next_tag() ) {
+			$tags->add_class( $filter_id );
+		}
+
+		return $tags->get_updated_html();
 	}
 }

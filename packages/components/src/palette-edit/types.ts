@@ -16,7 +16,7 @@ export type Color = {
 };
 
 export type Gradient = {
-	gradient?: string;
+	gradient: string;
 	name: string;
 	slug: string;
 	color?: never;
