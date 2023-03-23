@@ -25,6 +25,8 @@ import { useSelect } from '@wordpress/data';
  */
 import { useCanEditEntity } from '../utils/hooks';
 
+const ELLIPSIS = '…';
+
 export default function PostExcerptEditor( {
 	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
 	setAttributes,
@@ -182,7 +184,6 @@ export default function PostExcerptEditor( {
 			.join( '' );
 	} else if ( wordCountType === 'characters_including_spaces' ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.trim()
 			.split( '', excerptLength )
 			.join( '' );
 	}
@@ -198,7 +199,7 @@ export default function PostExcerptEditor( {
 					? rawOrRenderedExcerpt
 					: ( ! isTrimmed
 							? rawOrRenderedExcerpt
-							: trimmedExcerpt + '…' ) ||
+							: trimmedExcerpt + ELLIPSIS ) ||
 					  __( 'No post excerpt found' )
 			}
 			onChange={ setExcerpt }
@@ -208,7 +209,7 @@ export default function PostExcerptEditor( {
 		<p className={ excerptClassName }>
 			{ ! isTrimmed
 				? rawOrRenderedExcerpt || __( 'No post excerpt found' )
-				: trimmedExcerpt + '…' }
+				: trimmedExcerpt + ELLIPSIS }
 		</p>
 	);
 	return (
