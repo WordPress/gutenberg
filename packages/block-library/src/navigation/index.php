@@ -321,17 +321,14 @@ function block_core_navigation_get_fallback_blocks() {
 	// If `core/page-list` is not registered then return empty blocks.
 	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
 
-	// Default to a list of Pages.
-	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
-	// If there are no navigation posts then try to find a classic menu
-	// and convert it into a block based navigation menu.
-	if ( ! $navigation_post ) {
-		$navigation_post = block_core_navigation_maybe_use_classic_menu_fallback();
-	}
+
+	$navigation_post = WP_Navigation_Gutenberg::get_fallback_menu();
+
+
 
 	// Use the first non-empty Navigation as fallback if available.
-	if ( $navigation_post ) {
+	if ( $navigation_post && ! is_wp_error( $navigation_post ) ) {
 		$parsed_blocks  = parse_blocks( $navigation_post->post_content );
 		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
