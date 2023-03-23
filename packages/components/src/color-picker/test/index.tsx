@@ -142,13 +142,7 @@ describe( 'ColorPicker', () => {
 
 	it( 'should fire onChange with the HSL value', async () => {
 		const onChange = jest.fn();
-		const color = {
-			h: 125,
-			s: 0.2,
-			l: 0.5,
-			// Add alpha to prove it's ignored.
-			a: 0.5,
-		};
+		const color = 'hsla(125, 20%, 50%, 0.5)';
 
 		const { container } = render(
 			<ColorPicker
