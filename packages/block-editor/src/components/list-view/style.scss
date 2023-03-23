@@ -309,10 +309,11 @@
 		left: 0;
 		width: 24px;
 		height: 24px;
+		color: $gray-400;
 	}
 
-	&:not(.is-selected):not(:hover) .block-editor-list-view-block-select-button__sticky-indicator {
-		color: $gray-400;
+	&.is-selected .block-editor-list-view-block-select-button__sticky-indicator {
+		color: $white;
 	}
 
 	.block-editor-list-view-block-select-button__label-wrapper {
