@@ -16,6 +16,7 @@ builder( {
 		// @see https://github.com/WordPress/gutenberg/pull/31279
 		'es.promise',
 		// This is an IE-only feature which we don't use, and don't want to polyfill.
+		// @see https://github.com/WordPress/gutenberg/pull/49234
 		'web.immediate',
 	],
 	targets: require( '@wordpress/browserslist-config' ),

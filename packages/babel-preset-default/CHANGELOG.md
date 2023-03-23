@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+### Enhancement
+
 -   Exclude IE-only `setImmediate`/`clearImmediate` from list of polyfills.
 
 ## 7.13.0 (2023-03-15)
