@@ -11,7 +11,12 @@ import {
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import {
+	BottomSheetSettings,
+	BlockEdit,
+	RichText,
+} from '@wordpress/block-editor';
+import { SlotFillProvider } from '@wordpress/components';
 
 describe( 'RichText Performance', () => {
 	it( 'performance is stable when typing rich text', async () => {
@@ -26,7 +31,19 @@ describe( 'RichText Performance', () => {
 			);
 		};
 
-		await measurePerformance( <RichText onChange={ jest.fn() } />, {
+		const EditorTree = ( props ) => (
+			<SlotFillProvider>
+				<BlockEdit
+					isSelected
+					name={ 'editor' }
+					clientId={ 0 }
+					{ ...props }
+				/>
+				<BottomSheetSettings isVisible />
+			</SlotFillProvider>
+		);
+
+		await measurePerformance( EditorTree, {
 			scenario,
 		} );
 	} );
