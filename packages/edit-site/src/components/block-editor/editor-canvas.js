@@ -17,7 +17,7 @@ import { unlock } from '../../private-apis';
 import { store as editSiteStore } from '../../store';
 
 function EditorCanvas( { enableResizing, settings, children, ...props } ) {
-	const { canvasMode, deviceType, isZoomOutMode } = useSelect(
+	const { canvasMode, deviceType, isZoomOutMode, editFocus } = useSelect(
 		( select ) => ( {
 			deviceType:
 				select( editSiteStore ).__experimentalGetPreviewDeviceType(),
@@ -25,6 +25,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 				select( blockEditorStore ).__unstableGetEditorMode() ===
 				'zoom-out',
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+			editFocus: unlock( select( editSiteStore ) ).getEditFocus(),
 		} ),
 		[]
 	);
@@ -40,6 +41,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			style={ enableResizing ? {} : deviceStyles }
 			ref={ mouseMoveTypingRef }
 			name="editor-canvas"
+			editFocus={ editFocus }
 			className="edit-site-visual-editor__editor-canvas"
 			{ ...props }
 			role={ canvasMode === 'view' ? 'button' : undefined }

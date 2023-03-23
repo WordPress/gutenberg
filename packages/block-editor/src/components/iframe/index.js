@@ -110,6 +110,7 @@ function Iframe( {
 	frameSize = 0,
 	expand = false,
 	readonly,
+	editFocus = 'template',
 	forwardedRef: ref,
 	...props
 } ) {
@@ -291,6 +292,9 @@ function Iframe( {
 								className={ classnames(
 									'block-editor-iframe__body',
 									'editor-styles-wrapper',
+									editFocus === 'template'
+										? 'is-template-edit-focus'
+										: 'is-post-edit-focus',
 									...bodyClasses
 								) }
 							>
