@@ -340,7 +340,7 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
  */
 function block_core_navigation_maybe_use_classic_menu_fallback() {
 
-	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallbacks_Gutenberg::maybe_use_classic_menu_fallback' );
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallbacks_Gutenberg::create_classic_menu_fallback' );
 
 	// See if we have a classic menu.
 	$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();

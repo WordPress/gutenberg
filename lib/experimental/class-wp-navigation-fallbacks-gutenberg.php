@@ -31,17 +31,18 @@ class WP_Navigation_Fallbacks_Gutenberg {
 		// 2.
 		// If there are no navigation posts then try to find a classic menu
 		// and convert it into a block based navigation menu.
-		$navigation_post = static::maybe_use_classic_menu_fallback();
+		$navigation_post = static::create_classic_menu_fallback();
 
-		if ( $navigation_post ) {
-			return $navigation_post;
+		if ( $navigation_post && ! is_wp_error( $navigation_post ) ) {
+			// Fetch the newly created Navigation post.
+			return static::get_most_recently_published_navigation();
 		}
 
 		// 3.
 		// If there are no navigation posts then default to a list of Pages.
 		$navigation_post = static::create_default_fallback();
 
-		if ( ! is_wp_error( $navigation_post ) ) {
+		if ( $navigation_post && ! is_wp_error( $navigation_post ) ) {
 			// Fetch the newly created Navigation post.
 			return static::get_most_recently_published_navigation();
 		}
@@ -82,23 +83,23 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	}
 
 	/**
-	 * If there's a the classic menu then use it as a fallback.
+	 * Creates a Navigation Menu post from a Classic Menu.
 	 *
-	 * @return array the normalized parsed blocks.
+	 * @return int|WP_Error The post ID of the default fallback menu or a WP_Error object.
 	 */
-	public static function maybe_use_classic_menu_fallback() {
+	public static function create_classic_menu_fallback() {
 		// See if we have a classic menu.
 		$classic_nav_menu = static::get_classic_menu_fallback();
 
 		if ( ! $classic_nav_menu ) {
-			return;
+			return new WP_Error( 'no_classic_menus', 'No Classic Menus found.' );
 		}
 
 		// If we have a classic menu then convert it to blocks.
 		$classic_nav_menu_blocks = static::get_classic_menu_fallback_blocks( $classic_nav_menu );
 
 		if ( empty( $classic_nav_menu_blocks ) ) {
-			return;
+			return new WP_Error( 'cannot_convert_classic', 'Unable to convert Classic Menu to blocks.' );
 		}
 
 		// Create a new navigation menu from the classic menu.
@@ -113,12 +114,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 			true // So that we can check whether the result is an error.
 		);
 
-		if ( is_wp_error( $wp_insert_post_result ) ) {
-			return;
-		}
-
-		// Fetch the most recently published navigation which will be the classic one created above.
-		return static::get_most_recently_published_navigation();
+		return $wp_insert_post_result;
 	}
 
 	/**
@@ -251,13 +247,18 @@ class WP_Navigation_Fallbacks_Gutenberg {
 
 
 
+	/**
+	 * Creates a default Navigation Menu fallback.
+	 *
+	 * @return int|WP_Error The post ID of the default fallback menu or a WP_Error object.
+	 */
 	private static function create_default_fallback() {
 		$registry = WP_Block_Type_Registry::get_instance();
 
 		// If `core/page-list` is not registered then use empty blocks.
 		$default_blocks = $registry->is_registered( 'core/page-list' ) ? '<!-- wp:page-list /-->' : '';
-		// Create a new navigation menu from the fallback blocks.
 
+		// Create a new navigation menu from the fallback blocks.
 		$wp_insert_post_result = wp_insert_post(
 			array(
 				'post_content' => $default_blocks,
