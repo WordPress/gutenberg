@@ -73,9 +73,11 @@ export default {
 		}
 
 		if ( rules.length ) {
-			output = `${ appendSelectors( selector ) } {
-				${ rules.join( '; ' ) };
-			}`;
+			// Reason to disable: the extra line breaks added by prettier mess with the unit tests.
+			// eslint-disable-next-line prettier/prettier
+			output = `${ appendSelectors( selector ) } { ${ rules.join(
+				'; '
+			) }; }`;
 		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
