@@ -71,7 +71,7 @@ export default function EditorStyles( { styles } ) {
 	const transformedStyles = useMemo(
 		() =>
 			transformStyles(
-				styles.filter( ( style ) => style?.css?.length ),
+				styles.filter( ( style ) => style?.css ),
 				EDITOR_STYLES_SELECTOR
 			),
 		[ styles ]
