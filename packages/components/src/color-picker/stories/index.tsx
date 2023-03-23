@@ -20,9 +20,30 @@ const meta: ComponentMeta< typeof ColorPicker > = {
 			control: { type: 'select' },
 			options: [ 'rgb', 'hsl', 'hex', undefined ],
 		},
+		onChangeComplete: {
+			table: {
+				disable: true,
+			},
+		},
+		oldHue: {
+			table: {
+				disable: true,
+			},
+		},
+		disableAlpha: {
+			table: {
+				disable: true,
+			},
+		},
 		// We can't use a `on*` regex because this component will switch to
 		// legacy mode when an onChangeComplete prop is passed.
 		onChange: { action: 'onChange' },
+	},
+	parameters: {
+		controls: {
+			expanded: true,
+		},
+		docs: { source: { state: 'open' } },
 	},
 };
 export default meta;
