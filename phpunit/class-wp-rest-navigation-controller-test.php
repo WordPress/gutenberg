@@ -13,12 +13,12 @@
 class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	protected static $admin_user;
-	protected static $subscriber_user;
+	protected static $editor_user;
 
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$admin_user = $factory->user->create( array( 'role' => 'administrator' ) );
 
-		self::$subscriber_user = $factory->user->create( array( 'role' => 'subscriber' ) );
+		self::$editor_user = $factory->user->create( array( 'role' => 'editor' ) );
 	}
 
 	public function set_up() {
@@ -41,7 +41,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 	public function test_should_not_return_menus_for_users_without_permissions() {
 
-		wp_set_current_user( self::$subscriber_user );
+		wp_set_current_user( self::$editor_user );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallbacks' );
 		$response = rest_get_server()->dispatch( $request );
