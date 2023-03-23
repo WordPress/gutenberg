@@ -41,7 +41,6 @@ const VALID_SETTINGS = [
 	'color.link',
 	'color.palette',
 	'color.text',
-	'color.gradient',
 	'color.background',
 	'color.heading',
 	'color.button',
@@ -262,10 +261,8 @@ export function useSettingsForBlockElement(
 				supportedStyles.includes( 'color' ),
 			background:
 				updatedSettings.color?.background &&
-				supportedStyles.includes( 'backgroundColor' ),
-			gradient:
-				updatedSettings.color?.gradient &&
-				supportedStyles.includes( 'background' ),
+				( supportedStyles.includes( 'background' ) ||
+					supportedStyles.includes( 'backgroundColor' ) ),
 			button:
 				updatedSettings.color?.button &&
 				supportedStyles.includes( 'buttonColor' ),
@@ -279,6 +276,12 @@ export function useSettingsForBlockElement(
 				updatedSettings.color?.caption &&
 				supportedStyles.includes( 'captionColor' ),
 		};
+
+		// Some blocks can enable background colors but disable gradients.
+		if ( ! supportedStyles.includes( 'background' ) ) {
+			updatedSettings.color.gradients = [];
+			updatedSettings.color.customGradient = false;
+		}
 
 		[
 			'lineHeight',

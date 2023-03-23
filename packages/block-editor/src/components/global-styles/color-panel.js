@@ -99,10 +99,11 @@ export function useHasBackgroundPanel( settings ) {
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
 	return (
-		( settings?.color?.background &&
-			( colors?.length > 0 || settings?.color?.custom ) ) ||
-		( settings?.color?.gradient &&
-			( gradients?.length > 0 || settings?.color?.customGradient ) )
+		settings?.color?.background &&
+		( colors?.length > 0 ||
+			settings?.color?.custom ||
+			gradients?.length > 0 ||
+			settings?.color?.customGradient )
 	);
 }
 
