@@ -29,26 +29,26 @@ Let's render a customized greeting into an empty element.
 
 **Note:** `createRoot` was introduced with React 18, which will be bundled with WordPress 6.2. Therefore it may be necessary to mount your component depending on which version of WordPress (and therefore React) you are currently using. This is possible by checking for an undefined import and falling back to the React 17 method of mounting an app using `render`.
 
+Assuming the following root element is present in the page:
+
 ```html
 <div id="greeting"></div>
-<script>
-	function Greeting( props ) {
-		return wp.element.createElement(
-			'span',
-			null,
-			'Hello ' + props.toWhom + '!'
-		);
-	}
+```
 
-	if ( wp.element.createRoot ) {
-		wp.element
-			.createRoot( document.getElementById( 'greeting' ) )
-			.render( wp.element.createElement( Greeting, { toWhom: 'World' } ) );
-	} else {
-		wp.element
-		.render( wp.element.createElement( Greeting, { toWhom: 'World' } ), document.getElementById( 'greeting' ) );
-	}
-</script>
+We can mount our app:
+
+```js
+import { createRoot, render, createElement } from '@wordpress/element';
+
+function Greeting( props ) {
+	return createElement( 'span', null, 'Hello ' + props.toWhom + '!' );
+}
+
+if ( createRoot ) {
+	createRoot( document.getElementById( 'greeting' ) ).render( createElement( Greeting, { toWhom: 'World' } ) );
+} else {
+	render( createElement( Greeting, { toWhom: 'World' } ), document.getElementById( 'greeting' ) );
+}
 ```
 
 Refer to the [official React Quick Start guide](https://reactjs.org/docs/hello-world.html) for a more thorough walkthrough, in most cases substituting `React` and `ReactDOM` with `wp.element` in code examples.
