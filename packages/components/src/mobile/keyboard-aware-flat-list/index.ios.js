@@ -56,7 +56,7 @@ export const KeyboardAwareFlatList = ( {
 		async ( caret ) => {
 			const textInputOffset = await getTextInputOffset( caret );
 
-			if ( textInputOffset !== null || textInputOffset !== null ) {
+			if ( textInputOffset !== null ) {
 				scrollToTextInputOffset( caret, textInputOffset );
 			}
 		},
@@ -64,9 +64,14 @@ export const KeyboardAwareFlatList = ( {
 	);
 
 	useEffect( () => {
+		// Waits for the Keyboard to be visible and the Keyboard offset to be set.
+		const awaitKeyboardOffsetIfVisible =
+			isKeyboardVisible && keyboardOffset !== 0;
 		const caretY = currentCaretData?.caretY;
+
 		if (
-			( isKeyboardVisible && keyboardOffset !== 0 && caretY !== null ) ||
+			// We need to check for cases when the Keyboard is visible or not.
+			( awaitKeyboardOffsetIfVisible && caretY !== null ) ||
 			caretY !== null
 		) {
 			onScrollToTextInput( currentCaretData );
