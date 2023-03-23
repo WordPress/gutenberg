@@ -8,7 +8,7 @@ public struct MediaInfo: Encodable {
     public let metadata: Encodable
 
     private enum CodingKeys: String, CodingKey {
-        case id, url, type, title, caption, alt, metadata
+        case id, url, type, title, caption, alt
     }
 
     public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil, alt: String? = nil, metadata: Encodable? = nil) {
