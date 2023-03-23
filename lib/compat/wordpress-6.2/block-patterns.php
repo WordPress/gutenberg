@@ -433,7 +433,7 @@ function gutenberg_register_remote_theme_patterns() {
 		return;
 	}
 
-	$pattern_settings = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_patterns();
+	$pattern_settings = gutenberg_get_remote_theme_patterns();
 	if ( empty( $pattern_settings ) ) {
 		return;
 	}
