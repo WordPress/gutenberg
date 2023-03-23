@@ -14,6 +14,8 @@ require __DIR__ . '/class-wp-navigation-gutenberg.php';
  */
 class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 
+
+
 	/**
 	 * Registers the controllers routes.
 	 *
@@ -41,11 +43,44 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 	}
 
 	public function get_fallbacks_permissions_check( $request ) {
-		return true;
+
+		$post_type = get_post_type_object( $this->post_type );
+
+		if ( ! current_user_can( $post_type->cap->create_posts ) ) {
+			return new WP_Error(
+				'rest_cannot_create',
+				__( 'Sorry, you are not allowed to create Navigation Menus as this user.' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return $this->check_has_read_only_access( $request );
 	}
 
 	public function get_fallbacks() {
 		// Todo - see if we can inject this dependency.
 		return WP_Navigation_Gutenberg::get_fallback_menu();
+	}
+
+	protected function check_has_read_only_access( $request ) {
+		if ( current_user_can( 'edit_theme_options' ) ) {
+			return true;
+		}
+
+		if ( current_user_can( 'edit_posts' ) ) {
+			return true;
+		}
+
+		$post_type = get_post_type_object( $this->post_type );
+
+		if ( 'edit' === $request['context'] && ! current_user_can( $post_type->cap->edit_posts ) ) {
+			return new WP_Error(
+				'rest_forbidden_context',
+				__( 'Sorry, you are not allowed to edit Navigation Menus as this user..' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return true;
 	}
 }

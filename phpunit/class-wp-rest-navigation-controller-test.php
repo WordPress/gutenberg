@@ -12,6 +12,21 @@
  */
 class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
+	protected static $admin_user;
+	protected static $subscriber_user;
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$admin_user = $factory->user->create( array( 'role' => 'administrator' ) );
+
+		self::$subscriber_user = $factory->user->create( array( 'role' => 'subscriber' ) );
+	}
+
+	public function set_up() {
+		parent::set_up();
+
+		wp_set_current_user( self::$admin_user );
+	}
+
 	/**
 	 * @covers WP_REST_Navigation_Controller::register_routes
 	 *
@@ -22,6 +37,22 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey( '/wp/v2/navigation/fallbacks', $routes );
+	}
+
+	public function test_should_not_return_menus_for_users_without_permissions() {
+
+		wp_set_current_user( self::$subscriber_user );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallbacks' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( 403, $response->get_status() );
+
+		$this->assertEquals( 'rest_cannot_create', $data['code'] );
+
+		$this->assertEquals( 'Sorry, you are not allowed to create Navigation Menus as this user.', $data['message'] );
+
 	}
 
 	public function test_should_return_a_default_fallback_navigation_menu_in_absence_of_other_fallbacks() {
