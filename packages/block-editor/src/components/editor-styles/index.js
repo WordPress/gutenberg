@@ -71,8 +71,7 @@ export default function EditorStyles( { styles } ) {
 	const transformedStyles = useMemo(
 		() =>
 			transformStyles(
-				// Assume that non-SVG styles are CSS that can be transformed.
-				styles.filter( ( style ) => style.__unstableType !== 'svgs' ),
+				styles.filter( ( style ) => style?.css?.length ),
 				EDITOR_STYLES_SELECTOR
 			),
 		[ styles ]
