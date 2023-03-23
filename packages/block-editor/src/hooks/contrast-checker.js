@@ -19,6 +19,9 @@ export default function BlockColorContrastChecker( { clientId } ) {
 	const [ detectedLinkColor, setDetectedLinkColor ] = useState();
 	const ref = useBlockRef( clientId );
 
+	// There are so many things that can change the color of a block
+	// So we perform this check on every render.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => {
 		if ( ! ref.current ) {
 			return;
@@ -45,7 +48,7 @@ export default function BlockColorContrastChecker( { clientId } ) {
 		}
 
 		setDetectedBackgroundColor( backgroundColor );
-	}, [ ref ] );
+	} );
 
 	return (
 		<ContrastChecker
