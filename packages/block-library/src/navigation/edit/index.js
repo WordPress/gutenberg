@@ -229,7 +229,7 @@ function Navigation( {
 			return;
 		}
 
-		apiFetch( { path: '/wp/v2/navigation/fallbacks' } )
+		apiFetch( { path: '/wp/v2/navigation/fallback' } )
 			.then( ( fallbackNavigationMenu ) => {
 				if ( ! fallbackNavigationMenu?.ID ) {
 					showNavigationMenuStatusNotice(

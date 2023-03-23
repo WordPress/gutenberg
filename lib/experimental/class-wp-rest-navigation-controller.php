@@ -28,7 +28,7 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		// Lists a single nav item based on the given id or slug.
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/fallbacks',
+			'/' . $this->rest_base . '/fallback',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
