@@ -46,6 +46,7 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 
 		$post_type = get_post_type_object( $this->post_type );
 
+		// Getting fallbacks also requires creating `wp_navigation` posts.
 		if ( ! current_user_can( $post_type->cap->create_posts ) ) {
 			return new WP_Error(
 				'rest_cannot_create',
@@ -54,7 +55,8 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 			);
 		}
 
-		return $this->check_has_read_only_access( $request );
+		// Gettting fallbacks requires reading `wp_navigation` posts.
+		return $this->check_has_read_only_access( $request, $post_type );
 	}
 
 	public function get_fallbacks() {
@@ -62,7 +64,7 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		return WP_Navigation_Gutenberg::get_fallback_menu();
 	}
 
-	protected function check_has_read_only_access( $request ) {
+	protected function check_has_read_only_access( $request, $post_type ) {
 		if ( current_user_can( 'edit_theme_options' ) ) {
 			return true;
 		}
@@ -70,8 +72,6 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		if ( current_user_can( 'edit_posts' ) ) {
 			return true;
 		}
-
-		$post_type = get_post_type_object( $this->post_type );
 
 		if ( 'edit' === $request['context'] && ! current_user_can( $post_type->cap->edit_posts ) ) {
 			return new WP_Error(
