@@ -16,7 +16,6 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	/**
 	 * The namespace of this controller's route.
 	 *
-	 * @since 6.3.0
 	 * @var string
 	 */
 	protected $namespace = 'wp-block-editor/v1';
@@ -24,7 +23,6 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	/**
 	 * The base of this controller's route.
 	 *
-	 * @since 6.3.0
 	 * @var string
 	 */
 	protected $rest_base = 'settings';

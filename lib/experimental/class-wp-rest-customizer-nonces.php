@@ -14,7 +14,6 @@ class WP_Rest_Customizer_Nonces extends WP_REST_Controller {
 	/**
 	 * The namespace of this controller's route.
 	 *
-	 * @since 6.3.0
 	 * @var string
 	 */
 	protected $namespace = '__experimental';
@@ -22,7 +21,6 @@ class WP_Rest_Customizer_Nonces extends WP_REST_Controller {
 	/**
 	 * The base of this controller's route.
 	 *
-	 * @since 6.3.0
 	 * @var string
 	 */
 	protected $rest_base = 'customizer-nonces';
