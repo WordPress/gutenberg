@@ -204,7 +204,7 @@ const DimensionControls = ( {
 			{ !! imageSizeOptions.length && (
 				<ToolsPanelItem
 					hasValue={ () => !! sizeSlug }
-					label={ __( 'Image size' ) }
+					label={ __( 'Resolution' ) }
 					onDeselect={ () =>
 						setAttributes( { sizeSlug: undefined } )
 					}
@@ -216,7 +216,7 @@ const DimensionControls = ( {
 				>
 					<SelectControl
 						__nextHasNoMarginBottom
-						label={ __( 'Image size' ) }
+						label={ __( 'Resolution' ) }
 						value={ sizeSlug || DEFAULT_SIZE }
 						options={ imageSizeOptions }
 						onChange={ ( nextSizeSlug ) =>

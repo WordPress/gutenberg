@@ -289,6 +289,9 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							imageWidth={ defaultImageWidth }
 							imageHeight={ defaultImageHeight }
 							imageSizeOptions={ imageSizeOptions }
+							imageSizeHelp={ __(
+								'Select the size of the source image.'
+							) }
 							onChangeImage={ ( value ) =>
 								setAttributes( {
 									featuredImageSizeSlug: value,

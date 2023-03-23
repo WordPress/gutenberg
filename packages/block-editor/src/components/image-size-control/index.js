@@ -38,7 +38,7 @@ export default function ImageSizeControl( {
 			{ imageSizeOptions && imageSizeOptions.length > 0 && (
 				<SelectControl
 					__nextHasNoMarginBottom
-					label={ __( 'Image size' ) }
+					label={ __( 'Resolution' ) }
 					value={ slug }
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
