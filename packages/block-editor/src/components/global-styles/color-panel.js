@@ -494,6 +494,22 @@ export default function ColorPanel( {
 		return {
 			...previousValue,
 			color: undefined,
+			elements: {
+				...previousValue?.elements,
+				link: {
+					...previousValue?.elements?.link,
+					color: undefined,
+				},
+				...elements.reduce( ( acc, element ) => {
+					return {
+						...acc,
+						[ element.name ]: {
+							...previousValue?.elements?.[ element.name ],
+							color: undefined,
+						},
+					};
+				}, {} ),
+			},
 		};
 	}, [] );
 
