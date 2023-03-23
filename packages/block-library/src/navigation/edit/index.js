@@ -233,7 +233,7 @@ function Navigation( {
 			.then( ( fallbackNavigationMenu ) => {
 				if ( ! fallbackNavigationMenu?.ID ) {
 					showNavigationMenuStatusNotice(
-						__( 'Unable to create Navigation Menu.' )
+						__( 'Unable to fetch a fallback Navigation Menu.' )
 					);
 					return;
 				}
@@ -250,7 +250,7 @@ function Navigation( {
 			} )
 			.catch( () => {
 				showNavigationMenuStatusNotice(
-					__( 'Failed to create Navigation Menu.' )
+					__( 'Unable to fetch a fallback Navigation Menu.' )
 				);
 			} );
 	}, [
