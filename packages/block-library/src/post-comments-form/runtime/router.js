@@ -158,8 +158,6 @@ export const init = async () => {
 		document.body
 	);
 
-	console.log( 'init' );
-
 	const body = toVdom( document.body );
 	hydrate( body, rootFragment );
 
