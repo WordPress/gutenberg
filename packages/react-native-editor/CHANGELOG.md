@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.91.0
+-   [*] Allow new block transformations for most blocks. [#48792]
+
 ## 1.90.0
 -   [*] Fix parsing of css units for null matched values [#48484]
 -   [*] Spacer block - Add initial support for spacing presets [#47258]

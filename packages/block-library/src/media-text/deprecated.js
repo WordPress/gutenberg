@@ -13,6 +13,7 @@ import {
 	useInnerBlocksProps,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,6 +26,19 @@ const v1ToV5ImageFillStyles = ( url, focalPoint ) => {
 				backgroundImage: `url(${ url })`,
 				backgroundPosition: focalPoint
 					? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
+					: `50% 50%`,
+		  }
+		: {};
+};
+
+const v6ImageFillStyles = ( url, focalPoint ) => {
+	return url
+		? {
+				backgroundImage: `url(${ url })`,
+				backgroundPosition: focalPoint
+					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
+							focalPoint.y * 100
+					  ) }%`
 					: `50% 50%`,
 		  }
 		: {};
@@ -46,6 +60,20 @@ const migrateCustomColors = ( attributes ) => {
 	return {
 		...restAttributes,
 		style,
+	};
+};
+
+// After align attribute's default was updated this function explicitly sets
+// the align value for deprecated blocks to the `wide` value which was default
+// for their versions of this block.
+const migrateDefaultAlign = ( attributes ) => {
+	if ( attributes.align ) {
+		return attributes;
+	}
+
+	return {
+		...attributes,
+		align: 'wide',
 	};
 };
 
@@ -133,6 +161,40 @@ const v4ToV5BlockAttributes = {
 	},
 };
 
+const v6Attributes = {
+	...v4ToV5BlockAttributes,
+	mediaAlt: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure img',
+		attribute: 'alt',
+		default: '',
+		__experimentalRole: 'content',
+	},
+	mediaId: {
+		type: 'number',
+		__experimentalRole: 'content',
+	},
+	mediaUrl: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure video,figure img',
+		attribute: 'src',
+		__experimentalRole: 'content',
+	},
+	href: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure a',
+		attribute: 'href',
+		__experimentalRole: 'content',
+	},
+	mediaType: {
+		type: 'string',
+		__experimentalRole: 'content',
+	},
+};
+
 const v4ToV5Supports = {
 	anchor: true,
 	align: [ 'wide', 'full' ],
@@ -143,6 +205,166 @@ const v4ToV5Supports = {
 	},
 };
 
+const v6Supports = {
+	...v4ToV5Supports,
+	color: {
+		gradients: true,
+		link: true,
+		__experimentalDefaultControls: {
+			background: true,
+			text: true,
+		},
+	},
+	spacing: {
+		margin: true,
+		padding: true,
+	},
+	typography: {
+		fontSize: true,
+		lineHeight: true,
+		__experimentalFontFamily: true,
+		__experimentalFontWeight: true,
+		__experimentalFontStyle: true,
+		__experimentalTextTransform: true,
+		__experimentalTextDecoration: true,
+		__experimentalLetterSpacing: true,
+		__experimentalDefaultControls: {
+			fontSize: true,
+		},
+	},
+};
+
+// Version with wide as the default alignment.
+// See: https://github.com/WordPress/gutenberg/pull/48404
+const v6 = {
+	attributes: v6Attributes,
+	supports: v6Supports,
+	save( { attributes } ) {
+		const {
+			isStackedOnMobile,
+			mediaAlt,
+			mediaPosition,
+			mediaType,
+			mediaUrl,
+			mediaWidth,
+			mediaId,
+			verticalAlignment,
+			imageFill,
+			focalPoint,
+			linkClass,
+			href,
+			linkTarget,
+			rel,
+		} = attributes;
+		const mediaSizeSlug =
+			attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
+		const newRel = isEmpty( rel ) ? undefined : rel;
+
+		const imageClasses = classnames( {
+			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
+			[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
+		} );
+
+		let image = (
+			<img
+				src={ mediaUrl }
+				alt={ mediaAlt }
+				className={ imageClasses || null }
+			/>
+		);
+
+		if ( href ) {
+			image = (
+				<a
+					className={ linkClass }
+					href={ href }
+					target={ linkTarget }
+					rel={ newRel }
+				>
+					{ image }
+				</a>
+			);
+		}
+
+		const mediaTypeRenders = {
+			image: () => image,
+			video: () => <video controls src={ mediaUrl } />,
+		};
+		const className = classnames( {
+			'has-media-on-the-right': 'right' === mediaPosition,
+			'is-stacked-on-mobile': isStackedOnMobile,
+			[ `is-vertically-aligned-${ verticalAlignment }` ]:
+				verticalAlignment,
+			'is-image-fill': imageFill,
+		} );
+		const backgroundStyles = imageFill
+			? v6ImageFillStyles( mediaUrl, focalPoint )
+			: {};
+
+		let gridTemplateColumns;
+		if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
+			gridTemplateColumns =
+				'right' === mediaPosition
+					? `auto ${ mediaWidth }%`
+					: `${ mediaWidth }% auto`;
+		}
+		const style = {
+			gridTemplateColumns,
+		};
+
+		if ( 'right' === mediaPosition ) {
+			return (
+				<div { ...useBlockProps.save( { className, style } ) }>
+					<div
+						{ ...useInnerBlocksProps.save( {
+							className: 'wp-block-media-text__content',
+						} ) }
+					/>
+					<figure
+						className="wp-block-media-text__media"
+						style={ backgroundStyles }
+					>
+						{ ( mediaTypeRenders[ mediaType ] || noop )() }
+					</figure>
+				</div>
+			);
+		}
+		return (
+			<div { ...useBlockProps.save( { className, style } ) }>
+				<figure
+					className="wp-block-media-text__media"
+					style={ backgroundStyles }
+				>
+					{ ( mediaTypeRenders[ mediaType ] || noop )() }
+				</figure>
+				<div
+					{ ...useInnerBlocksProps.save( {
+						className: 'wp-block-media-text__content',
+					} ) }
+				/>
+			</div>
+		);
+	},
+	migrate: migrateDefaultAlign,
+	isEligible( attributes, innerBlocks, { block } ) {
+		const { attributes: finalizedAttributes } = block;
+		// When the align attribute defaults to none, valid block markup should
+		// not contain any alignment CSS class. Unfortunately, this
+		// deprecation's version of the block won't be invalidated due to the
+		// alignwide class still being in the markup. That is because the custom
+		// CSS classname support picks it up and adds it to the className
+		// attribute. At the time of parsing, the className attribute won't
+		// contain the alignwide class, hence the need to check the finalized
+		// block attributes.
+		return (
+			attributes.align === undefined &&
+			!! finalizedAttributes.className?.includes( 'alignwide' )
+		);
+	},
+};
+
+// Version with non-rounded background position attribute for focal point.
+// See: https://github.com/WordPress/gutenberg/pull/33915
 const v5 = {
 	attributes: v4ToV5BlockAttributes,
 	supports: v4ToV5Supports,
@@ -252,9 +474,11 @@ const v5 = {
 			</div>
 		);
 	},
+	migrate: migrateDefaultAlign,
 };
 
 // Version with CSS grid
+// See: https://github.com/WordPress/gutenberg/pull/40806
 const v4 = {
 	attributes: v4ToV5BlockAttributes,
 	supports: v4ToV5Supports,
@@ -348,8 +572,11 @@ const v4 = {
 			</div>
 		);
 	},
+	migrate: migrateDefaultAlign,
 };
 
+// Version with ad-hoc color attributes
+// See: https://github.com/WordPress/gutenberg/pull/21169
 const v3 = {
 	attributes: {
 		...baseAttributes,
@@ -399,7 +626,7 @@ const v3 = {
 			type: 'object',
 		},
 	},
-	migrate: migrateCustomColors,
+	migrate: compose( migrateCustomColors, migrateDefaultAlign ),
 	save( { attributes } ) {
 		const {
 			backgroundColor,
@@ -496,6 +723,8 @@ const v3 = {
 	},
 };
 
+// Version with stack on mobile off by default
+// See: https://github.com/WordPress/gutenberg/pull/14364
 const v2 = {
 	attributes: {
 		...baseAttributes,
@@ -521,7 +750,7 @@ const v2 = {
 			type: 'object',
 		},
 	},
-	migrate: migrateCustomColors,
+	migrate: compose( migrateCustomColors, migrateDefaultAlign ),
 	save( { attributes } ) {
 		const {
 			backgroundColor,
@@ -596,6 +825,8 @@ const v2 = {
 	},
 };
 
+// Version without the wp-image-#### class on image
+// See: https://github.com/WordPress/gutenberg/pull/11922
 const v1 = {
 	attributes: {
 		...baseAttributes,
@@ -612,6 +843,7 @@ const v1 = {
 			attribute: 'src',
 		},
 	},
+	migrate: migrateDefaultAlign,
 	save( { attributes } ) {
 		const {
 			backgroundColor,
@@ -663,4 +895,4 @@ const v1 = {
 	},
 };
 
-export default [ v5, v4, v3, v2, v1 ];
+export default [ v6, v5, v4, v3, v2, v1 ];

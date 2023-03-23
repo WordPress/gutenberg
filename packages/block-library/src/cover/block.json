@@ -96,8 +96,9 @@
 		},
 		"color": {
 			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
-			"text": false,
-			"background": false
+			"text": true,
+			"background": false,
+			"__experimentalSkipSerialization": [ "gradients" ]
 		},
 		"typography": {
 			"fontSize": true,
