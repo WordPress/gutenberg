@@ -26,10 +26,29 @@ export type LegacyAdapterProps = Parameters< typeof useDeprecatedProps >[ 0 ];
 
 export type ColorPickerProps = WordPressComponentProps<
 	{
+		/**
+		 * When `true` the color picker will display the alpha channel both in
+		 * the bottom inputs as well as in the color picker itself.
+		 *
+		 * @default false
+		 */
 		enableAlpha?: boolean;
+		/**
+		 * The current color value to display in the picker.
+		 * Must be a hex or hex8 string.
+		 */
 		color?: string;
-		onChange?: ( color: string ) => void;
+		/**
+		 * Fired when the color changes. Always passes a hex8 color string.
+		 */
+		onChange?: ( hex8Color: string ) => void;
+		/**
+		 * An optional default value to use for the color picker.
+		 */
 		defaultValue?: string;
+		/**
+		 * The format to copy when clicking the displayed color format.
+		 */
 		copyFormat?: ColorType;
 	},
 	'div',

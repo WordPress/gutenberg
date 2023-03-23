@@ -37,7 +37,7 @@ Fired when the color changes. Always passes a hex8 color string.
 
 ### `enableAlpha`: `boolean`
 
-Defaults to `false`. When `true` the color picker will display the alpha channel both in the bottom inputs as well as in the color picker itself.
+When `true` the color picker will display the alpha channel both in the bottom inputs as well as in the color picker itself.
 
 - Required: No
 - Default: `false`
