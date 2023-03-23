@@ -47,9 +47,14 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	$form = str_replace( 'class="comment-respond"', $wrapper_attributes, $form );
 
 	// Enqueue the comment-reply script.
-	wp_enqueue_script( 'comment-reply' );
+	// wp_enqueue_script( 'comment-reply' );
 
-	return $form;
+	$tags = new WP_HTML_Tag_Processor( $form );
+
+	$tags->next_tag( array( 'tag_name' => 'FORM', 'id' => 'commentform' ) );
+	$tags->set_attribute( 'data-wp-on.submit', 'actions.core.commentsFormSubmission' );
+
+	return $tags->get_updated_html();
 }
 
 /**

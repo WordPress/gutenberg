@@ -13,6 +13,7 @@
 	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
+		"interactivity": true,
 		"anchor": true,
 		"html": false,
 		"color": {
@@ -44,5 +45,6 @@
 		"wp-block-post-comments-form",
 		"wp-block-buttons",
 		"wp-block-button"
-	]
+	],
+	"viewScript": [ "file:./view.min.js" ]
 }
