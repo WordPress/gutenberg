@@ -61,7 +61,7 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 
 	public function get_fallbacks() {
 		// Todo - see if we can inject this dependency.
-		return WP_Navigation_Gutenberg::get_fallback_menu();
+		return WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 	}
 
 	protected function check_has_read_only_access( $request, $post_type ) {

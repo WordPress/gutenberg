@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Navigation_Gutenberg class
+ * WP_Navigation_Fallbacks_Gutenberg class
  *
  * @package gutenberg
  * @since 6.3.0
@@ -11,7 +11,7 @@
  *
  * @access public
  */
-class WP_Navigation_Gutenberg {
+class WP_Navigation_Fallbacks_Gutenberg {
 
 	public static function get_fallback_menu() {
 

@@ -1,22 +1,22 @@
 <?php
 /**
- * Tests WP_Navigation_Gutenberg
+ * Tests WP_Navigation_Fallbacks_Gutenberg
  *
  * @package WordPress
  */
 
 /**
- * Tests for the WP_Navigation_Gutenberg class.
+ * Tests for the WP_Navigation_Fallbacks_Gutenberg class.
  */
-class WP_Navigation_Gutenberg_Test extends WP_UnitTestCase {
+class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 
 	public function test_it_exists() {
-		$this->assertTrue( class_exists( 'WP_Navigation_Gutenberg' ) );
+		$this->assertTrue( class_exists( 'WP_Navigation_Fallbacks_Gutenberg' ) );
 	}
 
 	public function test_should_return_a_default_fallback_navigation_menu_in_absence_of_other_fallbacks() {
 
-		$data = WP_Navigation_Gutenberg::get_fallback_menu();
+		$data = WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 
 		$this->assertInstanceOf( 'WP_Post', $data );
 
