@@ -42,8 +42,8 @@ class WP_Navigation_Fallbacks_Gutenberg {
 		$navigation_post = static::create_default_fallback();
 
 		if ( ! is_wp_error( $navigation_post ) ) {
-			// Fetch the Post by ID
-			return get_post( $navigation_post );
+			// Fetch the newly created Navigation post.
+			return static::get_most_recently_published_navigation();
 		}
 
 		// It was not possible to create a fallback.
