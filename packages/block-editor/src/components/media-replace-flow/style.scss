@@ -16,6 +16,11 @@
 	margin-left: -$grid-unit-10;
 	padding: $grid-unit-20;
 
+	&.has-siblings {
+		border-top: none;
+		margin-top: 0;
+	}
+
 	.block-editor-media-replace-flow__image-url-label {
 		display: block;
 		top: $grid-unit-20;
