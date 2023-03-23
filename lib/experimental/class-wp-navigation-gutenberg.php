@@ -7,7 +7,7 @@
  */
 
 /**
- * Manages which duotone filters need to be output on the page.
+ * Manages Fallback behavior for Navigation menus.
  *
  * @access public
  */
