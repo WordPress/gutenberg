@@ -1557,17 +1557,19 @@ const canInsertBlockTypeUnmemoized = (
 	if (
 		// we're focused on editing a post; and
 		window.wp.data.select( 'core/edit-site' ).getEditFocus() === 'post' &&
-		// there is a parent block; and
-		rootClientId &&
-		// the parent block is not a post content block; and
-		! POST_CONTENT_BLOCK_NAMES.includes(
-			getBlockName( state, rootClientId )
-		) &&
-		// the parent block is not a descendant of a post content block
-		getBlockNamesByClientId(
-			state,
-			getBlockParents( state, rootClientId )
-		).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) )
+		// this is the top level; or
+		( ! rootClientId ||
+			// the parent block is not a post content block; and
+			( ! POST_CONTENT_BLOCK_NAMES.includes(
+				getBlockName( state, rootClientId )
+			) &&
+				// the parent block is not a descendant of a post content block
+				getBlockNamesByClientId(
+					state,
+					getBlockParents( state, rootClientId )
+				).every(
+					( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name )
+				) ) )
 	) {
 		return false;
 	}
