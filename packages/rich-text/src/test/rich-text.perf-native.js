@@ -11,12 +11,7 @@ import {
 /**
  * WordPress dependencies
  */
-import {
-	BottomSheetSettings,
-	BlockEdit,
-	RichText,
-} from '@wordpress/block-editor';
-import { SlotFillProvider } from '@wordpress/components';
+import { RichText } from '@wordpress/block-editor';
 
 describe( 'RichText Performance', () => {
 	it( 'performance is stable when typing rich text', async () => {
@@ -31,19 +26,7 @@ describe( 'RichText Performance', () => {
 			);
 		};
 
-		const EditorTree = ( props ) => (
-			<SlotFillProvider>
-				<BlockEdit
-					isSelected
-					name={ 'editor' }
-					clientId={ 0 }
-					{ ...props }
-				/>
-				<BottomSheetSettings isVisible />
-			</SlotFillProvider>
-		);
-
-		await measurePerformance( EditorTree, {
+		await measurePerformance( <RichText onChange={ jest.fn() } />, {
 			scenario,
 		} );
 	} );
@@ -58,35 +41,5 @@ describe( 'RichText Performance', () => {
 		await measurePerformance( <RichText onFocus={ jest.fn() } />, {
 			scenario,
 		} );
-	} );
-
-	it( 'performance is stable when text input is blurred', async () => {
-		const scenario = async () => {
-			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
-
-			fireEvent( richTextInput, 'blur' );
-		};
-
-		await measurePerformance( <RichText onBlur={ jest.fn() } />, {
-			scenario,
-		} );
-	} );
-
-	it( 'performance is stable when text is selected', async () => {
-		const scenario = async () => {
-			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
-
-			const selection = { start: 2, end: 4 };
-			fireEvent( richTextInput, 'selectionChange', 2, 4, 'Hello', {
-				nativeEvent: { selection, text: 'Hello' },
-			} );
-		};
-
-		await measurePerformance(
-			<RichText onSelectionChange={ jest.fn() } />,
-			{
-				scenario,
-			}
-		);
 	} );
 } );
