@@ -72,6 +72,10 @@ _Returns_
 
 -   `TemplateType?`: Template type.
 
+### getEditFocus
+
+Undocumented declaration.
+
 ### getEditorMode
 
 Returns the current editing mode.
@@ -249,6 +253,10 @@ _Parameters_
 _Returns_
 
 -   `number`: The resolved template ID for the page route.
+
+### setEditFocus
+
+Undocumented declaration.
 
 ### setHomeTemplateId
 

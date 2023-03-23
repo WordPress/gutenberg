@@ -67,6 +67,7 @@ export default function Editor() {
 		isInserterOpen,
 		isListViewOpen,
 		showIconLabels,
+		editFocus,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -74,6 +75,7 @@ export default function Editor() {
 			getCanvasMode,
 			isInserterOpened,
 			isListViewOpened,
+			getEditFocus,
 		} = unlock( select( editSiteStore ) );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
@@ -94,6 +96,7 @@ export default function Editor() {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			editFocus: getEditFocus(),
 		};
 	}, [] );
 	const { setEditedPostContext } = useDispatch( editSiteStore );
@@ -125,6 +128,13 @@ export default function Editor() {
 		} ),
 		[ context, setEditedPostContext ]
 	);
+	// TODO: can I move some of this logic to the selector?
+	const filteredBlockContext = useMemo( () => {
+		const { postType, postId, ...nonPostFields } = blockContext;
+		return postId && editFocus === 'template'
+			? nonPostFields
+			: blockContext;
+	}, [ blockContext, editFocus ] );
 
 	let title;
 	if ( hasLoadedPost ) {
@@ -157,7 +167,7 @@ export default function Editor() {
 					type={ editedPostType }
 					id={ editedPostId }
 				>
-					<BlockContextProvider value={ blockContext }>
+					<BlockContextProvider value={ filteredBlockContext }>
 						<SidebarComplementaryAreaFills />
 						{ isEditMode && <StartTemplateOptions /> }
 						<InterfaceSkeleton

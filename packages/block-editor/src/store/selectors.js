@@ -1663,6 +1663,24 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean} Whether the given block is allowed to be removed.
  */
 export function canRemoveBlock( state, clientId, rootClientId = null ) {
+	// HACK: belongs in edit-site. need to make canRemoveBlock filterable.
+	const POST_CONTENT_BLOCK_NAMES = [
+		'core/post-featured-image',
+		'core/post-title',
+		'core/post-content',
+	];
+	if (
+		// we're focused on editing a post; and
+		window.wp.data.select( 'core/edit-site' ).getEditFocus() === 'post' &&
+		// the block is not a descendant of a post content block
+		getBlockNamesByClientId(
+			state,
+			getBlockParents( state, clientId )
+		).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) )
+	) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 
 	// attributes can be null if the block is already deleted.
@@ -1706,6 +1724,24 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean | undefined} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId, rootClientId = null ) {
+	// HACK: belongs in edit-site. need to make canMoveBlock filterable.
+	const POST_CONTENT_BLOCK_NAMES = [
+		'core/post-featured-image',
+		'core/post-title',
+		'core/post-content',
+	];
+	if (
+		// we're focused on editing a post; and
+		window.wp.data.select( 'core/edit-site' ).getEditFocus() === 'post' &&
+		// the block is not a descendant of a post content block
+		getBlockNamesByClientId(
+			state,
+			getBlockParents( state, clientId )
+		).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) )
+	) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return;
@@ -1746,6 +1782,33 @@ export function canMoveBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean} Whether the given block is allowed to be edited.
  */
 export function canEditBlock( state, clientId ) {
+	// HACK: belongs in edit-site. need to make canEditBlock filterable.
+	const POST_CONTENT_BLOCK_NAMES = [
+		'core/post-featured-image',
+		'core/post-title',
+		'core/post-content',
+	];
+	if (
+		// we're focused on editing a post; and
+		window.wp.data.select( 'core/edit-site' ).getEditFocus() === 'post' &&
+		// the block is not a post content block; and
+		! POST_CONTENT_BLOCK_NAMES.includes(
+			getBlockName( state, clientId )
+		) &&
+		// the block is not a descendant of a post content block; and
+		getBlockNamesByClientId(
+			state,
+			getBlockParents( state, clientId )
+		).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) ) &&
+		// the block is not an ancestor of a post content block
+		getBlockNamesByClientId(
+			state,
+			getClientIdsOfDescendants( state, [ clientId ] )
+		).every( ( name ) => ! POST_CONTENT_BLOCK_NAMES.includes( name ) )
+	) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;

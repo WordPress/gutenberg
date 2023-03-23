@@ -140,6 +140,15 @@ function canvasMode( state = 'init', action ) {
 	return state;
 }
 
+function editFocus( state = 'post', action ) {
+	switch ( action.type ) {
+		case 'SET_EDIT_FOCUS':
+			return action.focus;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	deviceType,
 	settings,
@@ -148,4 +157,5 @@ export default combineReducers( {
 	listViewPanel,
 	saveViewPanel,
 	canvasMode,
+	editFocus,
 } );

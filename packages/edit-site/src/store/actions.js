@@ -530,3 +530,10 @@ export const switchEditorMode =
 			speak( __( 'Code editor selected' ), 'assertive' );
 		}
 	};
+
+export function setEditFocus( focus ) {
+	return {
+		type: 'SET_EDIT_FOCUS',
+		focus,
+	};
+}

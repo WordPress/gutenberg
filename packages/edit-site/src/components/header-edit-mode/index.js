@@ -39,6 +39,7 @@ import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
 import { useHasStyleBook } from '../style-book';
+import EditFocusSwitcher from './edit-focus-switcher';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -56,6 +57,7 @@ export default function HeaderEditMode() {
 		blockEditorMode,
 		homeUrl,
 		showIconLabels,
+		hasPostContext,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -63,6 +65,7 @@ export default function HeaderEditMode() {
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
+			getEditedPostContext,
 		} = select( editSiteStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
@@ -88,6 +91,7 @@ export default function HeaderEditMode() {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			hasPostContext: !! getEditedPostContext()?.postId,
 		};
 	}, [] );
 
@@ -223,7 +227,9 @@ export default function HeaderEditMode() {
 			) }
 
 			<div className="edit-site-header-edit-mode__center">
-				{ hasStyleBook ? __( 'Style Book' ) : <DocumentActions /> }
+				{ hasStyleBook && __( 'Style Book' ) }
+				{ ! hasStyleBook && hasPostContext && <EditFocusSwitcher /> }
+				{ ! hasStyleBook && ! hasPostContext && <DocumentActions /> }
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">

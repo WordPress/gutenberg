@@ -320,3 +320,7 @@ export function isNavigationOpened() {
 		version: '6.4',
 	} );
 }
+
+export function getEditFocus( state ) {
+	return state.editedPost.context?.postId ? state.editFocus : null;
+}
