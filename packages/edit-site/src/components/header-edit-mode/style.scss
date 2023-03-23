@@ -24,7 +24,6 @@ $header-toolbar-min-width: 335px;
 
 	.edit-site-header-edit-mode__center {
 		display: flex;
-		align-items: center;
 		height: 100%;
 		flex-grow: 1;
 		justify-content: center;
@@ -34,6 +33,17 @@ $header-toolbar-min-width: 335px;
 		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 		min-width: 0;
 	}
+
+	.components-tab-panel__tabs {
+		height: 100%;
+	}
+
+	.components-tab-panel__tabs-item {
+		text-transform: capitalize;
+		height: 100%;
+	}
+
+
 }
 
 .edit-site-header-edit-mode__toolbar {

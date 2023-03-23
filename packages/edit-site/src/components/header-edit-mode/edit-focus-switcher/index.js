@@ -19,8 +19,7 @@ export default function EditFocusSwitcher() {
 	);
 	const { hasResolved: hasPostResolved, editedRecord: post } =
 		useEntityRecord( 'postType', postType, postId );
-	const { isLoaded: isTemplateLoaded, getTitle: getTemplateTitle } =
-		useEditedEntityRecord();
+	const { isLoaded: isTemplateLoaded } = useEditedEntityRecord();
 
 	const { setEditFocus } = useDispatch( editSiteStore );
 
@@ -33,11 +32,11 @@ export default function EditFocusSwitcher() {
 			tabs={ [
 				{
 					name: 'post',
-					title: post.title,
+					title: post.type,
 				},
 				{
 					name: 'template',
-					title: getTemplateTitle(),
+					title: 'template',
 				},
 			] }
 			onSelect={ setEditFocus }
