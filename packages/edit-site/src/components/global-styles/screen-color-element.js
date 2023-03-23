@@ -19,19 +19,19 @@ const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 const elements = {
 	text: {
 		description: __(
-			'Set the default color used for text accross the site.'
+			'Set the default color used for text across the site.'
 		),
 		title: __( 'Text' ),
 	},
 	caption: {
 		description: __(
-			'Set the default color used for captions accross the site.'
+			'Set the default color used for captions across the site.'
 		),
 		title: __( 'Captions' ),
 	},
 	button: {
 		description: __(
-			'Set the default color used for buttons accross the site.'
+			'Set the default color used for buttons across the site.'
 		),
 		title: __( 'Buttons' ),
 	},
