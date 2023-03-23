@@ -13,6 +13,11 @@
  */
 class WP_Navigation_Fallbacks_Gutenberg {
 
+	/**
+	 * Gets (and/or creates) an appropriate fallback Navigation Menu.
+	 *
+	 * @return WP_Post|null the fallback Navigation Post or null.
+	 */
 	public static function get_fallback_menu() {
 
 		// 1.
@@ -41,9 +46,8 @@ class WP_Navigation_Fallbacks_Gutenberg {
 			return get_post( $navigation_post );
 		}
 
-		// If a fallback could not be found/created then return an error.
-		// TODO: include data on the reason for failure in this error.
-		return new WP_Error( 'no_fallback', __( 'Could not create a fallback navigation menu.' ) );
+		// It was not possible to create a fallback.
+		return null;
 	}
 
 
