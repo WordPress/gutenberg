@@ -1,36 +1,38 @@
-addEventListener( 'DOMContentLoaded', () => {
-	const { store, navigate } = window.__experimentalInteractivity;
+/**
+ * Internal dependencies
+ */
+import './runtime/init.js';
+import { store, navigate } from './runtime';
 
-	store( {
-		actions: {
-			core: {
-				commentsFormSubmission: async ( { event } ) => {
-					event.preventDefault();
+store( {
+	actions: {
+		core: {
+			commentsFormSubmission: async ( { event } ) => {
+				event.preventDefault();
 
-					const formData = new FormData( event.target );
+				const formData = new FormData( event.target );
 
-					const res = await fetch(
-						'http://localhost:8888/wp-comments-post.php',
-						{
-							method: 'POST',
-							body: formData,
-						}
-					);
+				const res = await fetch(
+					'http://localhost:8888/wp-comments-post.php',
+					{
+						method: 'POST',
+						body: formData,
+					}
+				);
 
-					const html = await res.text();
+				const html = await res.text();
 
-					// We need to do something like this.
-					// navigate( res.url, {
-					// 	force: true,
-					// 	replace: true,
-					// 	htmlString: html,
-					// } );
+				// We need to do something like this.
+				// navigate( res.url, {
+				// 	force: true,
+				// 	replace: true,
+				// 	htmlString: html,
+				// } );
 
-					event.target.reset();
+				event.target.reset();
 
-					debugger;
-				},
+				debugger;
 			},
 		},
-	} );
+	},
 } );

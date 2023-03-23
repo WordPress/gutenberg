@@ -27,7 +27,7 @@
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"{src,build,build-module}/*/init.js"
+		"{src,build,build-module}/**/init.js"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
