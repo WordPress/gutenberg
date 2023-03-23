@@ -9,6 +9,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,6 +32,29 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const deviceStyles = useResizeCanvas( deviceType );
 	const mouseMoveTypingRef = useMouseMoveTypingReset();
+
+	const editorStyles = useMemo( () => {
+		if ( settings.styles ) {
+			return [
+				...settings.styles,
+				{
+					css:
+						// Forming a "block formatting context" to prevent margin collapsing.
+						// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+						`.is-root-container{display:flow-root;${
+							// Some themes will have `min-height: 100vh` for the root container,
+							// which isn't a requirement in auto resize mode.
+							enableResizing ? 'min-height:0!important;' : ''
+						}}body{position:relative; ${
+							canvasMode === 'view' ? 'cursor: pointer;' : ''
+						}}}`,
+				},
+			];
+		}
+
+		return settings.styles;
+	}, [ settings.styles ] );
+
 	return (
 		<Iframe
 			expand={ isZoomOutMode }
@@ -49,18 +73,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			}
 			readonly={ canvasMode === 'view' }
 		>
-			<EditorStyles styles={ settings.styles } />
-			<style>{
-				// Forming a "block formatting context" to prevent margin collapsing.
-				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-				`.is-root-container{display:flow-root;${
-					// Some themes will have `min-height: 100vh` for the root container,
-					// which isn't a requirement in auto resize mode.
-					enableResizing ? 'min-height:0!important;' : ''
-				}}body{position:relative; ${
-					canvasMode === 'view' ? 'cursor: pointer;' : ''
-				}}}`
-			}</style>
+			<EditorStyles styles={ editorStyles } />
 			{ children }
 		</Iframe>
 	);
