@@ -140,7 +140,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 			<BaseControl.VisualLabel as="legend">
 				{ __( 'Minimum column width' ) }
 			</BaseControl.VisualLabel>
-			<Flex>
+			<Flex gap={ 4 }>
 				<FlexItem isBlock>
 					<UnitControl
 						size={ '__unstable-large' }
