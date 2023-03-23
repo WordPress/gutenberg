@@ -23,6 +23,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { pasteHandler } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -166,6 +167,25 @@ export function ImageEdit( {
 			url: undefined,
 		} );
 		setTemporaryURL( undefined );
+	}
+
+	// TODO: If this would be the way to go, we need to handle similarly audio and video.
+	function onHTMLDrop( HTML ) {
+		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
+		if (
+			Array.isArray( blocks ) &&
+			blocks.length === 1 &&
+			blocks[ 0 ].name === 'core/image'
+		) {
+			setAttributes( {
+				url: undefined,
+				alt: undefined,
+				id: undefined,
+				title: undefined,
+				caption: undefined,
+				...blocks[ 0 ].attributes,
+			} );
+		}
 	}
 
 	function onSelectImage( media ) {
@@ -377,6 +397,7 @@ export function ImageEdit( {
 				onSelect={ onSelectImage }
 				onSelectURL={ onSelectURL }
 				onError={ onUploadError }
+				onHTMLDrop={ onHTMLDrop }
 				placeholder={ placeholder }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }

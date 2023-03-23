@@ -101,7 +101,9 @@ export function Draggable( {
 
 		event.dataTransfer.setData(
 			transferDataType,
-			JSON.stringify( transferData )
+			typeof transferData === 'string'
+				? transferData
+				: JSON.stringify( transferData )
 		);
 
 		const cloneWrapper = ownerDocument.createElement( 'div' );

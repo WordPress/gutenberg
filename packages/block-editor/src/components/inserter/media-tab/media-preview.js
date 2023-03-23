@@ -17,11 +17,12 @@ import {
 	Flex,
 	FlexItem,
 	Button,
+	Draggable,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useCallback, useState } from '@wordpress/element';
-import { cloneBlock } from '@wordpress/blocks';
+import { cloneBlock, serialize } from '@wordpress/blocks';
 import { moreVertical, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -30,7 +31,7 @@ import { isBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import InserterDraggableBlocks from '../../inserter-draggable-blocks';
+import BlockDraggableChip from '../../block-draggable/draggable-chip';
 import { getBlockAndPreviewFromMedia } from './utils';
 import { store as blockEditorStore } from '../../../store';
 
@@ -203,8 +204,14 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
 	return (
 		<>
-			<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
-				{ ( { draggable, onDragStart, onDragEnd } ) => (
+			<Draggable
+				__experimentalTransferDataType="text/html"
+				transferData={ serialize( block ) }
+				__experimentalDragComponent={
+					<BlockDraggableChip count={ 1 } />
+				}
+			>
+				{ ( { onDraggableStart, onDraggableEnd } ) => (
 					<div
 						className={ classnames(
 							'block-editor-inserter__media-list__list-item',
@@ -212,9 +219,9 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 								'is-hovered': isHovered,
 							}
 						) }
-						draggable={ draggable }
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
+						draggable={ true }
+						onDragStart={ onDraggableStart }
+						onDragEnd={ onDraggableEnd }
 					>
 						<Tooltip text={ truncatedTitle || title }>
 							{ /* Adding `is-hovered` class to the wrapper element is needed
@@ -250,7 +257,7 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 						</Tooltip>
 					</div>
 				) }
-			</InserterDraggableBlocks>
+			</Draggable>
 			{ showExternalUploadModal && (
 				<InsertExternalImageModal
 					onClose={ () => setShowExternalUploadModal( false ) }
