@@ -224,6 +224,7 @@ class WP_Duotone_Gutenberg {
 
 		$settings['styles'][] = array(
 			'assets'         => $duotone_svgs,
+			// The 'svgs' type is new in 6.3 and requires the corresponding JS changes in the EditorStyles component to work.
 			'__unstableType' => 'svgs',
 			'isGlobalStyles' => false,
 		);
