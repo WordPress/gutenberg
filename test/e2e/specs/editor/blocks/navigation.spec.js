@@ -256,7 +256,6 @@ test.describe( 'As a user I want to create submenus using the navigation block',
 			)
 		).toBeVisible();
 
-		// Select the site title block.
 		const navigationBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Navigation',
 		} );
@@ -267,7 +266,7 @@ test.describe( 'As a user I want to create submenus using the navigation block',
 		} );
 		await expect( submenuBlock1 ).toBeVisible();
 
-		// select the child link
+		// select the child link via keyboard
 		await pageUtils.pressKeys( 'ArrowDown' );
 		await pageUtils.pressKeys( 'ArrowDown' );
 		await pageUtils.pressKeys( 'ArrowDown' );
