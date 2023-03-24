@@ -89,7 +89,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 		$classic_nav_menu_blocks = $menu_converter->convert();
 
 		if ( empty( $classic_nav_menu_blocks ) ) {
-			return new WP_Error( 'cannot_convert_classic', 'Unable to convert Classic Menu to blocks.' );
+			return new WP_Error( 'cannot_convert_classic_menu', 'Unable to convert Classic Menu to blocks.' );
 		}
 
 		// Create a new navigation menu from the classic menu.
