@@ -15,6 +15,20 @@ export type ToolTipProps = Pick< TooltipStateProps, 'placement' > & {
 	 */
 	delay?: number;
 	/**
+	 * Where the tooltip should be positioned relative to its parent.
+	 *
+	 * @default
+	 */
+	placement?: any; //Placement | undefinded;
+	/**
+	 * _Note: this prop is deprecated. Please use the `placement` prop instead._
+	 *
+	 * Legacy way of specifying the tooltip's position relative to its parent.
+	 *
+	 * @default top center
+	 */
+	position?: string;
+	/**
 	 * Option for adding accessible keyboard shortcuts.
 	 */
 	shortcut?: string | { display: string; ariaLabel: string };

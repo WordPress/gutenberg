@@ -7,12 +7,15 @@ import { Tooltip, TooltipAnchor, useTooltipState } from 'ariakit/tooltip';
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import Shortcut from '../../shortcut';
+import { TOOLTIP_DELAY } from '../../tooltip/';
 import type { ToolTipProps } from './types';
+import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from '../../popover/utils';
 import * as styles from './styles';
 import { contextConnectWithoutRef } from '../context/context-connect';
 import { useCx } from '../../utils/hooks/use-cx';
@@ -22,12 +25,37 @@ function AriaToolTip( props: ToolTipProps ) {
 		children,
 		delay = TOOLTIP_DELAY,
 		placement,
+		position,
 		shortcut,
 		text,
 	} = props;
 
+
+	const DEFAULT_PLACEMENT = 'bottom';
+
+	// Compute tooltip's placement:
+	// - give priority to `placement` prop, if defined
+	// - otherwise, compute it from the legacy `position` prop (if defined)
+	// - finally, fallback to the DEFAULT_PLACEMENT.
+	let computedPlacement;
+	if ( placement !== undefined ) {
+		computedPlacement = placement;
+	} else if ( position !== undefined ) {
+		computedPlacement =
+			// @ts-expect-error
+			__experimentalPopoverLegacyPositionToPlacement( position );
+	}
+	computedPlacement = computedPlacement || DEFAULT_PLACEMENT;
+
+	if ( position !== undefined ) {
+		deprecated( '`position` prop in wp.components.tooltip', {
+			since: '6.3',
+			alternative: '`placement` prop',
+		} );
+	}
+
 	const tooltipState = useTooltipState( {
-		placement,
+		placement: computedPlacement,
 		timeout: delay,
 	} );
 
