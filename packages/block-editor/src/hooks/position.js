@@ -25,6 +25,7 @@ import {
 } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+
 /**
  * Internal dependencies
  */
