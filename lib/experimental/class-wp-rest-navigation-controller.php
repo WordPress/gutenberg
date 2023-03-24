@@ -14,8 +14,6 @@ require __DIR__ . '/class-wp-navigation-fallbacks-gutenberg.php';
  */
 class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 
-
-
 	/**
 	 * Registers the controllers routes.
 	 *
@@ -42,6 +40,12 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		);
 	}
 
+	/**
+	 * Checks if a given request has access to read fallbacks.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
 	public function get_fallbacks_permissions_check( $request ) {
 
 		$post_type = get_post_type_object( $this->post_type );
@@ -59,11 +63,23 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 		return $this->check_has_read_only_access( $request, $post_type );
 	}
 
+	/**
+	 * Gets the most appropriate fallback Navigation Menu.
+	 *
+	 * @return WP_Post|null the fallback Navigation Post or null.
+	 */
 	public function get_fallbacks() {
 		// Todo - see if we can inject this dependency.
 		return WP_Navigation_Fallbacks_Gutenberg::get_fallback_menu();
 	}
 
+	/**
+	 * Checks whether the current user has read only access to the post type.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @param WP_Post_Type    $post_type Post type object.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
 	protected function check_has_read_only_access( $request, $post_type ) {
 		if ( current_user_can( 'edit_theme_options' ) ) {
 			return true;
