@@ -1070,6 +1070,7 @@ export function useGlobalStylesOutput() {
 			},
 			{
 				assets: svgs,
+				__unstableType: 'svg',
 				isGlobalStyles: true,
 			},
 		];
