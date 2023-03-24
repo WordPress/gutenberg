@@ -6,15 +6,16 @@ import { Tooltip, TooltipAnchor, useTooltipState } from 'ariakit/tooltip';
 /**
  * WordPress dependencies
  */
-import { Children } from '@wordpress/element';
+import { cloneElement, isValidElement } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import Shortcut from '../../shortcut';
 import { TOOLTIP_DELAY } from '../../tooltip/';
 import type { ToolTipProps } from './types';
+import Shortcut from '../../shortcut';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from '../../popover/utils';
 import * as styles from './styles';
 import { contextConnectWithoutRef } from '../context/context-connect';
@@ -30,6 +31,8 @@ function AriaToolTip( props: ToolTipProps ) {
 		text,
 	} = props;
 
+	const baseId = useInstanceId( ToolTip, 'tooltip' );
+	const describedById = text || shortcut ? baseId : undefined;
 
 	const DEFAULT_PLACEMENT = 'bottom';
 
@@ -59,33 +62,26 @@ function AriaToolTip( props: ToolTipProps ) {
 		timeout: delay,
 	} );
 
-	const isOnlyChild = () => {
-		if ( Children.toArray( children?.props?.children ).length === 1 ) {
-			return children;
-		}
-		if ( 'development' === process.env.NODE_ENV ) {
-			// eslint-disable-next-line no-console
-			return console.error(
-				'ToolTip should be called with only a single child element.'
-			);
-		}
-	};
-
 	const cx = useCx();
 	const ToolTipClassName = cx( styles.ToolTip );
-	const ToolTipAnchorClassName = cx( styles.ToolTipAnchor );
 	const ShortcutClassName = cx( styles.Shortcut );
 
 	return (
 		<>
-			<TooltipAnchor
-				className={ ToolTipAnchorClassName }
-				state={ tooltipState }
-			>
-				{ children }
+			<TooltipAnchor described state={ tooltipState }>
+				{ isValidElement( children )
+					? ( childProps ) =>
+							cloneElement( children, {
+								...childProps,
+							} )
+					: children }
 			</TooltipAnchor>
-			{ ( text || shortcut ) && isOnlyChild() && (
-				<Tooltip className={ ToolTipClassName } state={ tooltipState }>
+			{ ( text || shortcut ) && (
+				<Tooltip
+					className={ ToolTipClassName }
+					id={ describedById }
+					state={ tooltipState }
+				>
 					{ text }
 					{ shortcut && (
 						<Shortcut

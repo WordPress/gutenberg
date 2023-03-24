@@ -7,7 +7,7 @@ export type ToolTipProps = Pick< TooltipStateProps, 'placement' > & {
 	/**
 	 * The anchor for the tooltip. Accepts only one child element.
 	 */
-	children: React.ReactElement;
+	children: React.ReactElement | string;
 	/**
 	 * The amount of time in milliseconds to wait before showing the tooltip.
 	 *
@@ -33,7 +33,7 @@ export type ToolTipProps = Pick< TooltipStateProps, 'placement' > & {
 	 */
 	shortcut?: string | { display: string; ariaLabel: string };
 	/**
-	 * The text shown in the tooltip.
+	 * The text shown in the tooltip when anchor element is focused or hovered.
 	 */
 	text?: string;
 };

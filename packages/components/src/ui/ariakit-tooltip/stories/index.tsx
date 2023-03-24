@@ -11,7 +11,7 @@ import { shortcutAriaLabel } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import ToolTip from '..';
+import { ToolTip } from '..';
 import Button from '../../../button';
 
 const meta: ComponentMeta< typeof ToolTip > = {
@@ -52,6 +52,7 @@ const meta: ComponentMeta< typeof ToolTip > = {
 				],
 			},
 		},
+		shortcut: { control: { type: 'text' } },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -66,22 +67,15 @@ const Template: ComponentStory< typeof ToolTip > = ( props ) => (
 
 export const Default: ComponentStory< typeof ToolTip > = Template.bind( {} );
 Default.args = {
-	children: <Button variant="primary">It&apos;s me, hi.</Button>,
-	placement: 'bottom-start',
+	children: <Button variant="primary">It&apos;s me.</Button>,
 	text: 'Hi!',
 };
 
 export const KeyboardShortcut = Template.bind( {} );
 KeyboardShortcut.args = {
-	children: (
-		<div>
-			<Button variant="secondary">I&apos;m the problem.</Button>
-		</div>
-	),
+	children: <div>Keyboard shortcut</div>,
 	shortcut: {
 		display: '⇧⌘,',
 		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
 	},
-	placement: 'bottom-start',
-	text: '',
 };
