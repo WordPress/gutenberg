@@ -3,69 +3,6 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'As a keyboatd user, I expect focus to not be lost', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'emptytheme' );
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await requestUtils.deleteAllTemplates( 'wp_template_part' );
-	} );
-
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await requestUtils.deleteAllTemplates( 'wp_template_part' );
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
-	test( 'Keeps focus in place on undo in template parts', async ( {
-		admin,
-		editor,
-		page,
-		pageUtils,
-	} ) => {
-		await admin.visitSiteEditor( {
-			postId: 'emptytheme//header',
-			postType: 'wp_template_part',
-		} );
-		await editor.canvas.click( 'body' );
-
-		// Select the site title block.
-		const siteTitle = editor.canvas.getByRole( 'document', {
-			name: 'Site title',
-		} );
-		await editor.selectBlocks( siteTitle );
-
-		await pageUtils.pressKeys( 'access+z' );
-
-		// Insert a group block
-		await editor.insertBlock( {
-			name: 'core/group',
-			innerBlocks: [ { name: 'core/site-title' } ],
-		} );
-
-		// Select the site title block.
-		const siteTitleInGroup = editor.canvas.getByRole( 'document', {
-			name: 'Site title',
-		} );
-		await editor.selectBlocks( siteTitleInGroup );
-
-		// Change heading level.
-		await editor.clickBlockToolbarButton( 'Change heading level' );
-		const Heading3Button = page.locator(
-			'role=menuitemradio[name="Heading 3"i]'
-		);
-		await Heading3Button.click();
-
-		await pageUtils.pressKeys( 'primary+z' );
-
-		await expect(
-			page.locator( 'role=button[name="Change heading level"i]' )
-		).toBeFocused();
-	} );
-} );
-
 test.describe( 'Template Part Operations', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
@@ -418,5 +355,51 @@ test.describe( 'Template Part Operations', () => {
 		await expect(
 			page.getByRole( 'combobox', { name: 'Import widget area' } )
 		).not.toBeVisible();
+	} );
+
+	test( 'Keeps focus in place on undo in template parts', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//header',
+			postType: 'wp_template_part',
+		} );
+		await editor.canvas.click( 'body' );
+
+		// Select the site title block.
+		const siteTitle = editor.canvas.getByRole( 'document', {
+			name: 'Site title',
+		} );
+		await editor.selectBlocks( siteTitle );
+
+		await pageUtils.pressKeys( 'access+z' );
+
+		// Insert a group block
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [ { name: 'core/site-title' } ],
+		} );
+
+		// Select the site title block.
+		const siteTitleInGroup = editor.canvas.getByRole( 'document', {
+			name: 'Site title',
+		} );
+		await editor.selectBlocks( siteTitleInGroup );
+
+		// Change heading level.
+		await editor.clickBlockToolbarButton( 'Change heading level' );
+		const Heading3Button = page.locator(
+			'role=menuitemradio[name="Heading 3"i]'
+		);
+		await Heading3Button.click();
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect(
+			page.locator( 'role=button[name="Change heading level"i]' )
+		).toBeFocused();
 	} );
 } );
