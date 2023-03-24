@@ -13,21 +13,26 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useContext,
+	useEffect,
 	useMemo,
+	useRef,
+	useState,
 	createPortal,
 	Platform,
 } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-
+import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
 import BlockList from '../components/block-list';
+import BlockPopover from '../components/block-popover';
 import useSetting from '../components/use-setting';
 import InspectorControls from '../components/inspector-controls';
+import useBlockDisplayInformation from '../components/use-block-display-information';
 import { cleanEmptyObject } from './utils';
 import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
@@ -203,6 +208,71 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
 	return ! hasPositionSupport( blockName ) || isDisabled;
 }
 
+function useVisualizer() {
+	const [ property, setProperty ] = useState( false );
+	const { hideBlockInterface, showBlockInterface } = unlock(
+		useDispatch( blockEditorStore )
+	);
+	useEffect( () => {
+		if ( ! property ) {
+			showBlockInterface();
+		} else {
+			hideBlockInterface();
+		}
+	}, [ property, showBlockInterface, hideBlockInterface ] );
+
+	return [ property, setProperty ];
+}
+
+export function PositionVisualizer( { clientId, attributes, forceShow } ) {
+	const positionType = attributes?.style?.position?.type;
+
+	const [ isActive, setIsActive ] = useState( false );
+	const valueRef = useRef( positionType );
+	const timeoutRef = useRef();
+
+	const clearTimer = () => {
+		if ( timeoutRef.current ) {
+			window.clearTimeout( timeoutRef.current );
+		}
+	};
+
+	useEffect( () => {
+		if (
+			! isShallowEqual( positionType, valueRef.current ) &&
+			! forceShow
+		) {
+			setIsActive( true );
+			valueRef.current = positionType;
+
+			timeoutRef.current = setTimeout( () => {
+				setIsActive( false );
+			}, 400 );
+		}
+
+		return () => {
+			setIsActive( false );
+			clearTimer();
+		};
+	}, [ positionType, forceShow ] );
+
+	if ( ! isActive && ! forceShow ) {
+		return null;
+	}
+
+	return (
+		<BlockPopover
+			clientId={ clientId }
+			__unstableCoverTarget
+			__unstableRefreshSize={ positionType }
+			__unstablePopoverSlot="block-toolbar"
+			shift={ false }
+		>
+			<div className="block-editor__sticky-position-visualizer" />
+		</BlockPopover>
+	);
+}
+
 /*
  * Position controls rendered in an inspector control panel.
  *
@@ -222,32 +292,39 @@ export function PositionPanel( props ) {
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
 
-	const { hasParents } = useSelect(
+	const { firstParentClientId } = useSelect(
 		( select ) => {
 			const { getBlockParents } = select( blockEditorStore );
 			const parents = getBlockParents( clientId );
-			return {
-				hasParents: parents.length,
-			};
+			return { firstParentClientId: parents[ parents.length - 1 ] };
 		},
 		[ clientId ]
 	);
+
+	const blockInformation = useBlockDisplayInformation( firstParentClientId );
+	const stickyHelpText =
+		allowSticky && value === 'sticky' && blockInformation
+			? sprintf(
+					/* translators: %s: the name of the parent block. */
+					__(
+						'The block will stick to the scrollable area of the parent %s block.'
+					),
+					blockInformation.title
+			  )
+			: null;
 
 	const options = useMemo( () => {
 		const availableOptions = [ DEFAULT_OPTION ];
 		// Only display sticky option if the block has no parents (is at the root of the document),
 		// or if the block already has a sticky position value set.
-		if (
-			( allowSticky && ! hasParents ) ||
-			value === STICKY_OPTION.value
-		) {
+		if ( allowSticky || value === STICKY_OPTION.value ) {
 			availableOptions.push( STICKY_OPTION );
 		}
 		if ( allowFixed || value === FIXED_OPTION.value ) {
 			availableOptions.push( FIXED_OPTION );
 		}
 		return availableOptions;
-	}, [ allowFixed, allowSticky, hasParents, value ] );
+	}, [ allowFixed, allowSticky, value ] );
 
 	const onChangeType = ( next ) => {
 		// For now, use a hard-coded `0px` value for the position.
@@ -272,6 +349,17 @@ export function PositionPanel( props ) {
 		} );
 	};
 
+	const [ isPositionVisualizerActive, setIsPositionVisualizerActive ] =
+		useVisualizer();
+
+	const onMouseOverPosition = () => {
+		setIsPositionVisualizerActive( true );
+	};
+
+	const onMouseLeaveControls = () => {
+		setIsPositionVisualizerActive( false );
+	};
+
 	const selectedOption = value
 		? options.find( ( option ) => option.value === value ) || DEFAULT_OPTION
 		: DEFAULT_OPTION;
@@ -281,6 +369,13 @@ export function PositionPanel( props ) {
 		web:
 			options.length > 1 ? (
 				<InspectorControls group="position">
+					{ firstParentClientId && value === 'sticky' ? (
+						<PositionVisualizer
+							forceShow={ isPositionVisualizerActive }
+							{ ...props }
+							clientId={ firstParentClientId }
+						/>
+					) : null }
 					<BaseControl className="block-editor-hooks__position-selection">
 						<CustomSelectControl
 							__nextUnconstrainedWidth
@@ -299,9 +394,17 @@ export function PositionPanel( props ) {
 							onChange={ ( { selectedItem } ) => {
 								onChangeType( selectedItem.value );
 							} }
+							onFocus={ onMouseOverPosition }
+							onBlur={ onMouseLeaveControls }
+							onMouseOver={ onMouseOverPosition }
 							size={ '__unstable-large' }
 						/>
 					</BaseControl>
+					{ stickyHelpText && (
+						<p className="block-editor-hooks__position-helptext">
+							{ stickyHelpText }
+						</p>
+					) }
 				</InspectorControls>
 			) : null,
 		native: null,
