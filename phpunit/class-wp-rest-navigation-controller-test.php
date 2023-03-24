@@ -200,7 +200,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 	}
 
-	public function test_should_prioritise_classic_menu_in_primary_location() {
+	public function test_should_prioritise_fallback_to_classic_menu_in_primary_location() {
 		$pl_menu_id = wp_create_nav_menu( 'Classic Menu in Primary Location' );
 
 		wp_update_nav_menu_item(
@@ -242,7 +242,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$this->assertEquals( 'Classic Menu in Primary Location', $data->post_title, 'Fallback menu title should match the menu in the "primary" location.' );
 	}
 
-	public function test_should_prioritise_classic_menu_with_primary_slug() {
+	public function test_should_fallback_to_classic_menu_with_primary_slug() {
 
 		// Creates a classic menu with the slug "primary".
 		$primary_menu_id = wp_create_nav_menu( 'Primary' );
@@ -279,6 +279,45 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$this->assertInstanceOf( 'WP_Post', $data );
 
 		$this->assertEquals( 'Primary', $data->post_title, 'Fallback menu title should match the menu with the slug "primary".' );
+	}
+
+	public function test_should_fallback_to_most_recently_created_classic_menu() {
+
+		// Creates a classic menu with the slug "primary".
+		$primary_menu_id = wp_create_nav_menu( 'Older Classic Menu' );
+
+		wp_update_nav_menu_item(
+			$primary_menu_id,
+			0,
+			array(
+				'menu-item-title'  => 'Classic Menu Item',
+				'menu-item-url'    => '/classic-menu-item',
+				'menu-item-status' => 'publish',
+			)
+		);
+
+		$most_recent_menu_id = wp_create_nav_menu( 'Most Recent Classic Menu' );
+
+		wp_update_nav_menu_item(
+			$most_recent_menu_id,
+			0,
+			array(
+				'menu-item-title'  => 'Another Classic Menu Item',
+				'menu-item-url'    => '/another-classic-menu-item',
+				'menu-item-status' => 'publish',
+			)
+		);
+
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$this->assertInstanceOf( 'WP_Post', $data );
+
+		$this->assertEquals( 'Most Recent Classic Menu', $data->post_title, 'Fallback menu title should match the menu that was created most recently.' );
 	}
 
 	public function test_should_not_create_fallback_from_classic_menu_if_a_navigation_menu_already_exists() {
