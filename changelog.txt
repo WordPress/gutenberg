@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 15.4.0-rc.1 =
+= 15.4.0 =
 
 ## Changelog
 
@@ -25,9 +25,9 @@
 #### Block Library
 
 - Open convert to links modal on select of a page item. ([48723](https://github.com/WordPress/gutenberg/pull/48723))
-- Query Block: Add tests for `getValueFromObjectPath()` util. ([48956](https://github.com/WordPress/gutenberg/pull/48956))
 - Post Featured Image: Remove 16:10. ([48969](https://github.com/WordPress/gutenberg/pull/48969))
 - Cover: Add constrained/flow layout. ([45326](https://github.com/WordPress/gutenberg/pull/45326))
+- Cover: Add text color block support. ([41572](https://github.com/WordPress/gutenberg/pull/41572))
 
 #### Components
 
@@ -39,7 +39,6 @@
 #### Design Tools
 
 - Block Supports: Add text columns (column count) to typography block supports. ([33587](https://github.com/WordPress/gutenberg/pull/33587))
-- Cover: Add text color block support. ([41572](https://github.com/WordPress/gutenberg/pull/41572))
 
 #### Global Styles
 
@@ -88,7 +87,7 @@
 - Revert: Navigation: Always create a fallback menu. ([48602](https://github.com/WordPress/gutenberg/pull/48602))
 - Tweak Latest Posts block PanelBody labels. ([49079](https://github.com/WordPress/gutenberg/pull/49079))
 - Tweak label for Latest Posts excerpt control. ([49077](https://github.com/WordPress/gutenberg/pull/49077))
-- [Page list Block] Show untitled pages on page list on the editor. ([48772](https://github.com/WordPress/gutenberg/pull/48772))
+- Page List Block: Show untitled pages on page list on the editor. ([48772](https://github.com/WordPress/gutenberg/pull/48772))
 
 #### Site Editor
 
@@ -301,6 +300,7 @@
 - Navigation block end-to-end tests: Default to my most recently created menu. ([48132](https://github.com/WordPress/gutenberg/pull/48132))
 - Upgrade Jest from 27 to 29.5.0. ([47388](https://github.com/WordPress/gutenberg/pull/47388))
 - Duotone: Style Engine: Add unit test and associated refactoring. ([49033](https://github.com/WordPress/gutenberg/pull/49033))
+- Query Block: Add tests for `getValueFromObjectPath()` util. ([48956](https://github.com/WordPress/gutenberg/pull/48956))
 
 ## First time contributors
 
@@ -5477,7 +5477,7 @@ The following contributors merged PRs in this release:
 - Docs: Fix required status of `onSelectUrl` prop of `MediaReplaceFlow` component. ([44025](https://github.com/WordPress/gutenberg/pull/44025))
 - Document new global styles filters. ([44111](https://github.com/WordPress/gutenberg/pull/44111))
 - Document template_lock=noContent for Custom Post Types. ([43977](https://github.com/WordPress/gutenberg/pull/43977))
-- InnerBlocks: document that `templateLock:NoContent` cannot be overriden by children. ([43825](https://github.com/WordPress/gutenberg/pull/43825))
+- InnerBlocks: document that `templateLock:NoContent` cannot be overridden by children. ([43825](https://github.com/WordPress/gutenberg/pull/43825))
 - Theme.json: Add default values for settings.spacing.spacingScale. ([43860](https://github.com/WordPress/gutenberg/pull/43860))
 - Theme.json: Fix schema for useRootPaddingAwareAlignments. ([43628](https://github.com/WordPress/gutenberg/pull/43628))
 - Typography block supports: Call tear_down in tests and format PHP doc blocks. ([43968](https://github.com/WordPress/gutenberg/pull/43968))

@@ -133,7 +133,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 						__nextHasNoMargin
 						__experimentalIsRenderedInSidebar
 						value={ element.gradient }
-						onChange={ ( newGradient: Gradient[ 'gradient' ] ) => {
+						onChange={ ( newGradient ) => {
 							onChange( {
 								...element,
 								gradient: newGradient,
@@ -532,7 +532,7 @@ export function PaletteEdit( {
 			{ hasElements && (
 				<>
 					{ isEditing && (
-						<PaletteEditListView< typeof elements[ number ] >
+						<PaletteEditListView< ( typeof elements )[ number ] >
 							canOnlyChangeValues={ canOnlyChangeValues }
 							elements={ elements }
 							// @ts-expect-error TODO: Don't know how to resolve
@@ -548,13 +548,13 @@ export function PaletteEdit( {
 							isGradient={ isGradient }
 							onClose={ () => setEditingElement( null ) }
 							onChange={ (
-								newElement: typeof elements[ number ]
+								newElement: ( typeof elements )[ number ]
 							) => {
 								debounceOnChange(
 									// @ts-expect-error TODO: Don't know how to resolve
 									elements.map(
 										(
-											currentElement: typeof elements[ number ],
+											currentElement: ( typeof elements )[ number ],
 											currentIndex: number
 										) => {
 											if (
@@ -572,7 +572,6 @@ export function PaletteEdit( {
 					) }
 					{ ! isEditing &&
 						( isGradient ? (
-							// @ts-expect-error TODO: Remove when GradientPicker is typed.
 							<GradientPicker
 								__nextHasNoMargin
 								gradients={ gradients }

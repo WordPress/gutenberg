@@ -481,40 +481,49 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'register', () => {
+		const store = createReduxStore( 'demo', {
+			reducer( state = 'OK', action ) {
+				if ( action.type === 'UPDATE' ) {
+					return 'UPDATED';
+				}
+				return state;
+			},
+			actions: {
+				update: () => ( { type: 'UPDATE' } ),
+			},
+			selectors: {
+				getValue: ( state ) => state,
+			},
+		} );
+
 		it( 'should work with the store descriptor as param for select', () => {
-			const store = createReduxStore( 'demo', {
-				reducer: ( state = 'OK' ) => state,
-				selectors: {
-					getValue: ( state ) => state,
-				},
-			} );
 			registry.register( store );
 
 			expect( registry.select( store ).getValue() ).toBe( 'OK' );
 		} );
 
 		it( 'should work with the store descriptor as param for dispatch', async () => {
-			const store = createReduxStore( 'demo', {
-				reducer( state = 'OK', action ) {
-					if ( action.type === 'UPDATE' ) {
-						return 'UPDATED';
-					}
-					return state;
-				},
-				actions: {
-					update() {
-						return { type: 'UPDATE' };
-					},
-				},
-				selectors: {
-					getValue: ( state ) => state,
-				},
-			} );
 			registry.register( store );
 
 			expect( registry.select( store ).getValue() ).toBe( 'OK' );
 			await registry.dispatch( store ).update();
 			expect( registry.select( store ).getValue() ).toBe( 'UPDATED' );
+		} );
+
+		it( 'should keep the existing store instance on duplicate registration', async () => {
+			registry.register( store );
+
+			await registry.dispatch( store ).update();
+			expect( registry.select( store ).getValue() ).toBe( 'UPDATED' );
+
+			registry.register( store );
+
+			// check that the state hasn't been reset back to `OK`, as a re-registration would do
+			expect( registry.select( store ).getValue() ).toBe( 'UPDATED' );
+
+			expect( console ).toHaveErroredWith(
+				'Store "demo" is already registered.'
+			);
 		} );
 	} );
 
