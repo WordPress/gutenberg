@@ -13,6 +13,7 @@ export type MatchParams = Record< string, string | string[] >;
 type NavigateOptions = {
 	focusTargetSelector?: string;
 	isBack?: boolean;
+	skipFocus?: boolean;
 };
 
 export type NavigatorLocation = NavigateOptions & {

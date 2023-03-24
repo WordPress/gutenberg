@@ -100,11 +100,13 @@ function UnconnectedNavigatorScreen(
 		// - when the screen becomes visible
 		// - if the wrapper ref has been assigned
 		// - if focus hasn't already been restored for the current location
+		// - if the `skipFocus` option is set to `true`. This is useful when we trigger the navigation outside of NavigatorScreen.
 		if (
 			isInitialLocation ||
 			! isMatch ||
 			! wrapperRef.current ||
-			locationRef.current.hasRestoredFocus
+			locationRef.current.hasRestoredFocus ||
+			location.skipFocus
 		) {
 			return;
 		}
@@ -143,6 +145,7 @@ function UnconnectedNavigatorScreen(
 		isMatch,
 		location.isBack,
 		location.focusTargetSelector,
+		location.skipFocus,
 	] );
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
