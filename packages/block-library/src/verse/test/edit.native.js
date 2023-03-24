@@ -6,6 +6,8 @@ import {
 	getEditorHtml,
 	initializeEditor,
 	getBlock,
+	changeAndSelectTextOfRichText,
+	fireEvent,
 } from 'test/helpers';
 
 /**
@@ -13,6 +15,7 @@ import {
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import { ENTER } from '@wordpress/keycodes';
 
 beforeAll( () => {
 	// Register all core blocks
@@ -50,5 +53,33 @@ describe( 'Verse block', () => {
 		const verseBlock = await getBlock( screen, 'Verse' );
 		expect( verseBlock ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should produce expected markup for multiline text', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+
+		// Act
+		await addBlock( screen, 'Verse' );
+		const verseTextInput = await screen.findByPlaceholderText(
+			'Write verse…'
+		);
+		const string = 'A great statement.';
+		changeAndSelectTextOfRichText( verseTextInput, string, {
+			selectionStart: string.length,
+			selectionEnd: string.length,
+		} );
+		fireEvent( verseTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:verse -->
+		<pre class="wp-block-verse">A great statement.<br></pre>
+		<!-- /wp:verse -->"
+	` );
 	} );
 } );
