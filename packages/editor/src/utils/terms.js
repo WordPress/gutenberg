@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { groupBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { decodeEntities } from '@wordpress/html-entities';
@@ -24,10 +19,25 @@ export function buildTermsTree( flatTerms ) {
 		};
 	} );
 
-	const termsByParent = groupBy( flatTermsWithParentAndChildren, 'parent' );
-	if ( termsByParent.null && termsByParent.null.length ) {
+	// All terms should have a `parent` because we're about to index them by it.
+	if (
+		flatTermsWithParentAndChildren.some( ( { parent } ) => parent === null )
+	) {
 		return flatTermsWithParentAndChildren;
 	}
+
+	const termsByParent = flatTermsWithParentAndChildren.reduce(
+		( acc, term ) => {
+			const { parent } = term;
+			if ( ! acc[ parent ] ) {
+				acc[ parent ] = [];
+			}
+			acc[ parent ].push( term );
+			return acc;
+		},
+		{}
+	);
+
 	const fillWithChildren = ( terms ) => {
 		return terms.map( ( term ) => {
 			const children = termsByParent[ term.id ];

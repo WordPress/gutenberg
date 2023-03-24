@@ -19,8 +19,6 @@ import {
 } from '../../..';
 import useSelect from '..';
 
-jest.useRealTimers();
-
 describe( 'useSelect', () => {
 	let registry;
 	beforeEach( () => {

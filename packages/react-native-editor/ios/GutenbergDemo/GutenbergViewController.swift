@@ -97,7 +97,8 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
                     callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video"),
                               MediaInfo(id: 4, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video")])
                 } else {
-                    callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video", caption: "Cloudup")])
+                    let metadata = ["extraID": "AbCdE"]
+                    callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video", caption: "Cloudup", metadata: metadata)])
                 }
             case .other, .any:
                  callback([MediaInfo(id: 3, url: "https://wordpress.org/latest.zip", type: "zip", caption: "WordPress latest version", title: "WordPress.zip")])

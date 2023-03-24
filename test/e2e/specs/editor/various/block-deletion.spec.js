@@ -138,7 +138,7 @@ test.describe( 'Block deletion', () => {
 		).toBeFocused();
 
 		// Remove the current paragraph via dedicated keyboard shortcut.
-		await pageUtils.pressKeyWithModifier( 'access', 'z' );
+		await pageUtils.pressKeys( 'access+z' );
 
 		// Ensure the last block was removed.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -274,7 +274,7 @@ test.describe( 'Block deletion', () => {
 		).toBeFocused();
 
 		// Select the last two paragraphs.
-		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await expect
 			.poll( () =>
 				page.evaluate( () =>
