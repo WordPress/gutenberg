@@ -1,0 +1,25 @@
+.edit-site-sidebar-navigation-screen-template__added-by-description {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: $grid-unit-30;
+
+	&-author {
+		display: inline-flex;
+		align-items: center;
+
+		img {
+			border-radius: $grid-unit-15;
+		}
+
+		svg {
+			fill: $gray-600;
+		}
+
+		&-icon {
+			width: 24px;
+			height: 24px;
+			margin-right: $grid-unit-10;
+		}
+	}
+}

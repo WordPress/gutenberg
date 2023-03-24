@@ -6,6 +6,30 @@
  */
 
 /**
+ * Finds the first occurrence of a specific block in an array of blocks.
+ *
+ * @param string $block_name Name of the block to find.
+ * @param array  $blocks     Array of blocks.
+ * @return array Found block, or empty array if none found.
+ */
+function gutenberg_find_first_block( $block_name, $blocks ) {
+	foreach ( $blocks as $block ) {
+		if ( $block_name === $block['blockName'] ) {
+			return $block;
+		}
+		if ( ! empty( $block['innerBlocks'] ) ) {
+			$found_block = gutenberg_find_first_block( $block_name, $block['innerBlocks'] );
+
+			if ( ! empty( $found_block ) ) {
+				return $found_block;
+			}
+		}
+	}
+
+	return array();
+}
+
+/**
  * Adds styles and __experimentalFeatures to the block editor settings.
  *
  * @param array $settings Existing block editor settings.
@@ -50,31 +74,9 @@ function gutenberg_get_block_editor_settings_experimental( $settings ) {
 
 	$current_template = gutenberg_get_block_templates( array( 'slug__in' => array( $template_slug ) ) );
 
-	/**
-	 * Finds Post Content in an array of blocks
-	 *
-	 * @param array $blocks Array of blocks.
-	 *
-	 * @return array Post Content block.
-	 */
-	function get_post_content_block( $blocks ) {
-		foreach ( $blocks as $block ) {
-			if ( 'core/post-content' === $block['blockName'] ) {
-				return $block;
-			}
-			if ( ! empty( $block['innerBlocks'] ) ) {
-				$post_content = get_post_content_block( $block['innerBlocks'] );
-
-				if ( ! empty( $post_content ) ) {
-					return $post_content;
-				}
-			}
-		}
-	}
-
 	if ( ! empty( $current_template ) ) {
 		$template_blocks    = parse_blocks( $current_template[0]->content );
-		$post_content_block = get_post_content_block( $template_blocks );
+		$post_content_block = gutenberg_find_first_block( 'core/post-content', $template_blocks );
 
 		if ( ! empty( $post_content_block['attrs'] ) ) {
 			$settings['postContentAttributes'] = $post_content_block['attrs'];
