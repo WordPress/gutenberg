@@ -53,15 +53,13 @@ export default function useTemplateEditNotification() {
 		if ( isPostEditFocus && isTemplateBlockSelected ) {
 			createNotice(
 				'info',
-				__(
-					'This block is part of the page’s template. Switch to the Template focus to edit it.'
-				),
+				__( 'Edit your template to edit this block' ),
 				{
 					isDismissible: true,
 					type: 'snackbar',
 					actions: [
 						{
-							label: __( 'Switch to Template focus' ),
+							label: __( 'Edit template' ),
 							onClick() {
 								setEditFocus( 'template' );
 							},
