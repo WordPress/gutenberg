@@ -9,29 +9,24 @@ import { renderHook } from '@testing-library/react-native';
  */
 import useScrollToTextInput from '../use-scroll-to-text-input';
 
-const mockUseWindowDimensions = jest.fn();
-jest.mock( 'react-native/Libraries/Utilities/useWindowDimensions', () => ( {
-	default: mockUseWindowDimensions,
-} ) );
-
 describe( 'useScrollToTextInput', () => {
-	it( 'scrolls up to the TextInput offset when the caret is at the top of the screen', () => {
+	it( 'scrolls up to the current TextInput offset', () => {
 		// Arrange
 		const currentCaretData = { caretHeight: 10 };
 		const extraScrollHeight = 50;
 		const keyboardOffset = 100;
 		const scrollEnabled = true;
 		const scrollViewRef = { current: { scrollTo: jest.fn() } };
+		const scrollViewMeasurements = { current: { height: 600 } };
 		const scrollViewYOffset = { value: 150 };
 		const textInputOffset = 50;
-		const windowHeight = 600;
-		mockUseWindowDimensions.mockReturnValue( { height: windowHeight } );
 
 		const { result } = renderHook( () =>
 			useScrollToTextInput(
 				extraScrollHeight,
 				keyboardOffset,
 				scrollEnabled,
+				scrollViewMeasurements,
 				scrollViewRef,
 				scrollViewYOffset
 			)
@@ -42,28 +37,28 @@ describe( 'useScrollToTextInput', () => {
 
 		// Assert
 		expect( scrollViewRef.current.scrollTo ).toHaveBeenCalledWith( {
-			y: scrollViewYOffset.value - currentCaretData.caretHeight * 2,
+			y: textInputOffset,
 			animated: true,
 		} );
 	} );
 
-	it( 'scrolls down to the TextInput offset when the caret is at the bottom of the screen', () => {
+	it( 'scrolls down to the current TextInput offset', () => {
 		// Arrange
 		const currentCaretData = { caretHeight: 10 };
 		const extraScrollHeight = 50;
 		const keyboardOffset = 100;
 		const scrollEnabled = true;
 		const scrollViewRef = { current: { scrollTo: jest.fn() } };
-		const scrollViewYOffset = { value: 0 };
-		const textInputOffset = 550;
-		const windowHeight = 600;
-		mockUseWindowDimensions.mockReturnValue( { height: windowHeight } );
+		const scrollViewMeasurements = { current: { height: 600 } };
+		const scrollViewYOffset = { value: 250 };
+		const textInputOffset = 750;
 
 		const { result } = renderHook( () =>
 			useScrollToTextInput(
 				extraScrollHeight,
 				keyboardOffset,
 				scrollEnabled,
+				scrollViewMeasurements,
 				scrollViewRef,
 				scrollViewYOffset
 			)
@@ -74,10 +69,11 @@ describe( 'useScrollToTextInput', () => {
 
 		// Assert
 		const expectedYOffset =
-			textInputOffset +
-			extraScrollHeight -
-			( windowHeight - ( keyboardOffset + extraScrollHeight ) ) +
-			currentCaretData.caretHeight * 2;
+			textInputOffset -
+			( scrollViewMeasurements.current.height -
+				( keyboardOffset +
+					extraScrollHeight +
+					currentCaretData.caretHeight ) );
 		expect( scrollViewRef.current.scrollTo ).toHaveBeenCalledWith( {
 			y: expectedYOffset,
 			animated: true,
@@ -91,16 +87,16 @@ describe( 'useScrollToTextInput', () => {
 		const keyboardOffset = 100;
 		const scrollEnabled = true;
 		const scrollViewRef = { current: null };
+		const scrollViewMeasurements = { current: { height: 600 } };
 		const scrollViewYOffset = { value: 0 };
 		const textInputOffset = 50;
-		const windowHeight = 600;
-		mockUseWindowDimensions.mockReturnValue( { height: windowHeight } );
 
 		const { result } = renderHook( () =>
 			useScrollToTextInput(
 				extraScrollHeight,
 				keyboardOffset,
 				scrollEnabled,
+				scrollViewMeasurements,
 				scrollViewRef,
 				scrollViewYOffset
 			)
@@ -120,16 +116,16 @@ describe( 'useScrollToTextInput', () => {
 		const keyboardOffset = 100;
 		const scrollEnabled = false;
 		const scrollViewRef = { current: { scrollTo: jest.fn() } };
+		const scrollViewMeasurements = { current: { height: 600 } };
 		const scrollViewYOffset = { value: 0 };
 		const textInputOffset = 50;
-		const windowHeight = 600;
-		mockUseWindowDimensions.mockReturnValue( { height: windowHeight } );
 
 		const { result } = renderHook( () =>
 			useScrollToTextInput(
 				extraScrollHeight,
 				keyboardOffset,
 				scrollEnabled,
+				scrollViewMeasurements,
 				scrollViewRef,
 				scrollViewYOffset
 			)

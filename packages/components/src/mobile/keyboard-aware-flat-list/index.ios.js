@@ -2,7 +2,7 @@
  * External dependencies
  */
 
-import { ScrollView, FlatList } from 'react-native';
+import { ScrollView, FlatList, useWindowDimensions } from 'react-native';
 import Animated, {
 	useAnimatedScrollHandler,
 	useSharedValue,
@@ -12,6 +12,7 @@ import Animated, {
  * WordPress dependencies
  */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useThrottle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -32,7 +33,11 @@ export const KeyboardAwareFlatList = ( {
 	...props
 } ) => {
 	const scrollViewRef = useRef();
+	const scrollViewMeasurements = useRef();
 	const scrollViewYOffset = useSharedValue( -1 );
+
+	const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+	const isLandscape = windowWidth >= windowHeight;
 
 	const [ isKeyboardVisible, keyboardOffset ] =
 		useKeyboardOffset( scrollEnabled );
@@ -48,40 +53,50 @@ export const KeyboardAwareFlatList = ( {
 		extraScrollHeight,
 		keyboardOffset,
 		scrollEnabled,
+		scrollViewMeasurements,
 		scrollViewRef,
 		scrollViewYOffset
 	);
 
-	const onScrollToTextInput = useCallback(
-		async ( caret ) => {
-			const textInputOffset = await getTextInputOffset( caret );
+	const onScrollToTextInput = useThrottle(
+		useCallback(
+			async ( caret ) => {
+				const textInputOffset = await getTextInputOffset( caret );
+				const isKeyboardVisibleWithOffset =
+					isKeyboardVisible && keyboardOffset !== 0;
+				const hasTextInputOffset = textInputOffset !== null;
 
-			if ( textInputOffset !== null ) {
-				scrollToTextInputOffset( caret, textInputOffset );
-			}
-		},
-		[ getTextInputOffset, scrollToTextInputOffset ]
+				if (
+					( isKeyboardVisibleWithOffset && hasTextInputOffset ) ||
+					( ! isKeyboardVisible && hasTextInputOffset )
+				) {
+					scrollToTextInputOffset( caret, textInputOffset );
+				}
+			},
+			[
+				getTextInputOffset,
+				isKeyboardVisible,
+				keyboardOffset,
+				scrollToTextInputOffset,
+			]
+		),
+		200,
+		{ leading: false }
 	);
 
 	useEffect( () => {
-		// Waits for the Keyboard to be visible and the Keyboard offset to be set.
-		const awaitKeyboardOffsetIfVisible =
-			isKeyboardVisible && keyboardOffset !== 0;
-		const caretY = currentCaretData?.caretY;
+		onScrollToTextInput( currentCaretData );
+	}, [ currentCaretData, onScrollToTextInput ] );
 
-		if (
-			// We need to check for cases when the Keyboard is visible or not.
-			( awaitKeyboardOffsetIfVisible && caretY !== null ) ||
-			caretY !== null
-		) {
-			onScrollToTextInput( currentCaretData );
+	// When the orientation changes, the ScrollView measurements
+	// need to be re-calculated.
+	useEffect( () => {
+		// Only re-caculate them if there's an existing value
+		// as it should be set when the ScrollView content changes.
+		if ( scrollViewMeasurements.current ) {
+			measureScrollView();
 		}
-	}, [
-		currentCaretData,
-		isKeyboardVisible,
-		keyboardOffset,
-		onScrollToTextInput,
-	] );
+	}, [ isLandscape, measureScrollView ] );
 
 	const scrollHandler = useAnimatedScrollHandler( {
 		onScroll: ( event ) => {
@@ -91,9 +106,24 @@ export const KeyboardAwareFlatList = ( {
 		},
 	} );
 
+	const measureScrollView = useCallback( () => {
+		if ( scrollViewRef.current ) {
+			const scrollRef = scrollViewRef.current.getNativeScrollRef();
+
+			scrollRef.measureInWindow( ( _x, y, width, height ) => {
+				scrollViewMeasurements.current = { y, width, height };
+			} );
+		}
+	}, [] );
+
 	const onContentSizeChange = useCallback( () => {
 		onScrollToTextInput( currentCaretData );
-	}, [ onScrollToTextInput, currentCaretData ] );
+
+		// Sets the first values when the content size changes.
+		if ( ! scrollViewMeasurements.current ) {
+			measureScrollView();
+		}
+	}, [ measureScrollView, onScrollToTextInput, currentCaretData ] );
 
 	const getRef = useCallback(
 		( ref ) => {
