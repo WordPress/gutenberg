@@ -33,7 +33,10 @@ const PatternEdit = ( { attributes, clientId } ) => {
 			// inner blocks but doesn't have blockSettings in the state.
 			window.queueMicrotask( () => {
 				__unstableMarkNextChangeAsNotPersistent();
-				replaceBlocks( clientId, selectedPattern.blocks );
+				replaceBlocks( clientId, selectedPattern.blocks, undefined, 0, {
+					// TODO: think of something better
+					skipChecks: true,
+				} );
 			} );
 		}
 	}, [ clientId, selectedPattern?.blocks ] );
