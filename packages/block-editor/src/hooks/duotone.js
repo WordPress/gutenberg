@@ -8,7 +8,11 @@ import namesPlugin from 'colord/plugins/names';
 /**
  * WordPress dependencies
  */
-import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockSupport,
+	getBlockType,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useContext, createPortal } from '@wordpress/element';
@@ -269,10 +273,9 @@ function BlockDuotoneStyles( { name, duotoneStyle, id } ) {
 		colors = getColorsFromDuotonePreset( colors, duotonePalette );
 	}
 
-	const duotoneSupportSelectors = getBlockSupport(
-		name,
-		'color.__experimentalDuotone'
-	);
+	const duotoneSupportSelectors =
+		getBlockType( name ).selectors?.filters?.duotone ||
+		getBlockSupport( name, 'color.__experimentalDuotone' );
 
 	// Extra .editor-styles-wrapper specificity is needed in the editor
 	// since we're not using inline styles to apply the filter. We need to

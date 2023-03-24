@@ -235,9 +235,11 @@ class WP_Duotone_Gutenberg {
 	public static function render_duotone_support( $block_content, $block ) {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 
-		$duotone_support = false;
-		if ( $block_type && property_exists( $block_type, 'supports' ) ) {
-			$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+		$duotone_support  = false;
+		$duotone_selector = null;
+		if ( $block_type ) {
+			$duotone_selector = wp_get_block_css_selector( $block_type, 'filters.duotone' );
+			$duotone_support  = (bool) $duotone_selector;
 		}
 
 		// The block should have a duotone attribute or have duotone defined in its theme.json to be processed.
@@ -308,7 +310,7 @@ class WP_Duotone_Gutenberg {
 		$filter_id = gutenberg_get_duotone_filter_id( array( 'slug' => $slug ) );
 
 		// Build the CSS selectors to which the filter will be applied.
-		$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_support );
+		$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_selector );
 
 		// We only want to add the selector if we have it in the output already, essentially skipping 'unset'.
 		if ( array_key_exists( $slug, self::$output ) ) {

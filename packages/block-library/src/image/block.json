@@ -85,7 +85,7 @@
 	"supports": {
 		"anchor": true,
 		"color": {
-			"__experimentalDuotone": "img, .components-placeholder",
+			"__experimentalDuotone": true,
 			"text": false,
 			"background": false
 		},
@@ -102,7 +102,10 @@
 		}
 	},
 	"selectors": {
-		"border": ".wp-block-image img"
+		"border": ".wp-block-image img",
+		"filters": {
+			"duotone": "img, .components-placeholder"
+		}
 	},
 	"editorSelectors": {
 		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area"
