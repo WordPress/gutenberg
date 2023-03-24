@@ -3,6 +3,7 @@ const stories = [
 	'../packages/block-editor/src/**/stories/*.@(js|tsx|mdx)',
 	'../packages/components/src/**/stories/*.@(js|tsx|mdx)',
 	'../packages/icons/src/**/stories/*.@(js|tsx|mdx)',
+	'../packages/edit-site/src/**/stories/*.@(js|tsx|mdx)',
 ].filter( Boolean );
 
 module.exports = {
