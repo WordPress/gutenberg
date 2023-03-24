@@ -23,7 +23,7 @@ import PreformattedEdit from '../edit';
 
 setupCoreBlocks();
 
-describe( 'core/more/edit/native', () => {
+describe( 'Preformatted', () => {
 	it( 'renders without crashing', () => {
 		const screen = render(
 			<PreformattedEdit
