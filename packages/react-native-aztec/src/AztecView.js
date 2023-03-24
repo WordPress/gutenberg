@@ -197,8 +197,12 @@ class AztecView extends Component {
 			onSelectionChange( selectionStart, selectionEnd, text, event );
 		}
 
+		this.updateCaretData( event );
+	}
+
+	updateCaretData( event ) {
 		if (
-			this.selectionEndCaretY !== event.nativeEvent.selectionEndCaretY
+			this.selectionEndCaretY !== event?.nativeEvent?.selectionEndCaretY
 		) {
 			const caretY = event.nativeEvent.selectionEndCaretY;
 			AztecInputState.setCurrentCaretData( {
@@ -235,6 +239,8 @@ class AztecView extends Component {
 		// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
 		// For iOS, this is necessary to let the system know when Aztec was focused programatically.
 		if ( Platform.OS === 'ios' ) {
+			this.updateCaretData( event );
+
 			this._onPress( event );
 		}
 	}

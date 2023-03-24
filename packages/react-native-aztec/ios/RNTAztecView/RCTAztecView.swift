@@ -793,7 +793,8 @@ extension RCTAztecView: UITextViewDelegate {
 
     override func becomeFirstResponder() -> Bool {
         if !isFirstResponder && canBecomeFirstResponder {
-            onFocus?([:])
+            let caretData = packCaretDataForRN()
+            onFocus?(caretData)
         }
         return super.becomeFirstResponder()
     }
