@@ -67,7 +67,11 @@ export default function EditFocusSwitcher() {
 				{ post.type }
 			</Button>
 			<Button
-				className={ editFocus === 'template' ? 'is-active' : '' }
+				className={
+					editFocus === 'template'
+						? 'template-tab is-active'
+						: 'template-tab'
+				}
 				onClick={ () => setEditFocus( 'template' ) }
 			>
 				Template

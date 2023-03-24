@@ -41,6 +41,7 @@ $header-toolbar-min-width: 335px;
 			position: relative;
 			text-transform: capitalize;
 			border-radius: 0;
+			color: $gray-700;
 			&:focus {
 				outline: none;
 				box-shadow: none;
@@ -57,7 +58,16 @@ $header-toolbar-min-width: 335px;
 				border-radius: 0;
 				transition: all 0.1s linear;
 			}
+			&.template-tab {
+				&.is-active {
+					color: var(--wp-block-synced-color);
+				}
+				&::after {
+					background: var(--wp-components-color-accent, var(--wp-block-synced-color, #007cba));
+				}
+			}
 			&.is-active {
+				color: $gray-900;
 				&::after {
 					height: calc(1 * var(--wp-admin-border-width-focus));
 					outline: 2px solid transparent;
