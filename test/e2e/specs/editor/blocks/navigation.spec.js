@@ -175,6 +175,113 @@ test.describe( 'As a user I want the navigation block to fallback to the best po
 	} );
 } );
 
+test.describe( 'As a user I want to create submenus using the navigation block', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		//TT3 is preferable to emptytheme because it already has the navigation block on its templates.
+		await requestUtils.activateTheme( 'twentytwentythree' );
+	} );
+
+	test.beforeEach( async ( { requestUtils } ) => {
+		await Promise.all( [ requestUtils.deleteAllMenus() ] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllMenus(),
+			requestUtils.activateTheme( 'twentytwentyone' ),
+		] );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( 'create a submenu', async ( {
+		admin,
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content: '',
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		const navBlockInserter = editor.canvas.getByRole( 'button', {
+			name: 'Add block',
+		} );
+		await navBlockInserter.click();
+
+		await page.keyboard.type( 'https://example.com' );
+		await page.keyboard.press( 'Enter' );
+
+		const addSubmenuButton = page.getByRole( 'button', {
+			name: 'Add submenu',
+		} );
+		await addSubmenuButton.click();
+
+		await editor.publishPost();
+
+		await page.locator( 'role=button[name="Close panel"i]' ).click();
+
+		await page.goto( '/' );
+		await expect(
+			page.locator(
+				`role=navigation >> role=button[name="example.com submenu "i]`
+			)
+		).toBeVisible();
+	} );
+
+	test( 'submenu converts to link automatically', async ( {
+		admin,
+		pageUtils,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content:
+				'<!-- wp:navigation-submenu {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} --><!-- wp:navigation-link {"label":"WordPress Child","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /--><!-- /wp:navigation-submenu -->',
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		await expect(
+			editor.canvas.locator(
+				`role=textbox[name="Navigation link text"i] >> text="WordPress"`
+			)
+		).toBeVisible();
+
+		// Select the site title block.
+		const navigationBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+		await editor.selectBlocks( navigationBlock );
+
+		const submenuBlock1 = editor.canvas.getByRole( 'document', {
+			name: 'Block: Submenu',
+		} );
+		await expect( submenuBlock1 ).toBeVisible();
+
+		// select the child link
+		await pageUtils.pressKeys( 'ArrowDown' );
+		await pageUtils.pressKeys( 'ArrowDown' );
+		await pageUtils.pressKeys( 'ArrowDown' );
+
+		// remove the child link
+		await pageUtils.pressKeys( 'access+z' );
+
+		const submenuBlock2 = editor.canvas.getByRole( 'document', {
+			name: 'Block: Submenu',
+		} );
+		await expect( submenuBlock2 ).toBeHidden();
+	} );
+} );
+
 test.describe( 'Navigation block', () => {
 	test.describe( 'As a user I want to see a warning if the menu referenced by a navigation block is not available', () => {
 		test.beforeEach( async ( { admin } ) => {
