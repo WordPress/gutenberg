@@ -211,15 +211,32 @@ function RichTextWrapper(
 			);
 	}
 
+	const useDebouncedCallback = ( func, wait ) => {
+		const timeout = useRef();
+
+		return useCallback(
+			( ...args ) => {
+				const later = () => {
+					clearTimeout( timeout.current );
+					func( ...args );
+				};
+
+				clearTimeout( timeout.current );
+				timeout.current = setTimeout( later, wait );
+			},
+			[ func, wait ]
+		);
+	};
+
 	const onSelectionChange = useCallback(
-		( selectionChangeStart, selectionChangeEnd ) => {
+		useDebouncedCallback( ( selectionChangeStart, selectionChangeEnd ) => {
 			selectionChange(
 				clientId,
 				identifier,
 				selectionChangeStart,
 				selectionChangeEnd
 			);
-		},
+		}, 300 ),
 		[ clientId, identifier ]
 	);
 
