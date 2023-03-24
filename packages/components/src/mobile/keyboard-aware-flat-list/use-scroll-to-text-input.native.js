@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+/**
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
@@ -28,6 +33,9 @@ export default function useScrollToTextInput(
 	scrollViewRef,
 	scrollViewYOffset
 ) {
+	const { top, bottom } = useSafeAreaInsets();
+	const insets = top + bottom;
+
 	const scrollToTextInputOffset = useCallback(
 		( caret, textInputOffset ) => {
 			const { caretHeight = DEFAULT_FONT_SIZE } = caret ?? {};
@@ -39,13 +47,13 @@ export default function useScrollToTextInput(
 			) {
 				return;
 			}
-			const availableScreenSpace =
-				scrollViewMeasurements.current.height -
-				( keyboardOffset + extraScrollHeight + caretHeight );
-			const maxOffset = scrollViewYOffset.value + availableScreenSpace;
+			const currentScrollViewYOffset = Math.max(
+				0,
+				scrollViewYOffset.value
+			);
 
 			// Scroll up.
-			if ( textInputOffset < scrollViewYOffset.value ) {
+			if ( textInputOffset < currentScrollViewYOffset ) {
 				scrollViewRef.current.scrollTo( {
 					y: textInputOffset,
 					animated: true,
@@ -53,8 +61,21 @@ export default function useScrollToTextInput(
 				return;
 			}
 
+			const availableScreenSpace = Math.abs(
+				Math.floor(
+					scrollViewMeasurements.current.height -
+						( keyboardOffset + extraScrollHeight + caretHeight )
+				)
+			);
+			const maxOffset = Math.floor(
+				currentScrollViewYOffset + availableScreenSpace
+			);
+
+			const isAtTheTop =
+				textInputOffset < scrollViewMeasurements.current.y + insets;
+
 			// Scroll down.
-			if ( textInputOffset > maxOffset ) {
+			if ( textInputOffset > maxOffset && ! isAtTheTop ) {
 				scrollViewRef.current.scrollTo( {
 					y: textInputOffset - availableScreenSpace,
 					animated: true,
@@ -63,11 +84,12 @@ export default function useScrollToTextInput(
 		},
 		[
 			extraScrollHeight,
+			insets,
 			keyboardOffset,
 			scrollEnabled,
 			scrollViewMeasurements,
 			scrollViewRef,
-			scrollViewYOffset.value,
+			scrollViewYOffset,
 		]
 	);
 
