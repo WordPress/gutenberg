@@ -482,7 +482,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 
 	// Defaults.
 	$default_maximum_viewport_width   = '1600px';
-	$default_minimum_viewport_width   = '768px';
+	$default_minimum_viewport_width   = '320px';
 	$default_minimum_font_size_factor = 0.75;
 	$default_scale_factor             = 1;
 	$has_min_font_size                = isset( $fluid_settings['minFontSize'] ) && ! empty( gutenberg_get_typography_value_and_unit( $fluid_settings['minFontSize'] ) );
