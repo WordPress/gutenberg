@@ -18,7 +18,7 @@ import type { NavigableContainerProps } from './types';
 const noop = () => {};
 const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
 
-function cycleValue( value, total, offset ) {
+function cycleValue( value: number, total: number, offset: number ) {
 	const nextValue = value + offset;
 	if ( nextValue < 0 ) {
 		return total + nextValue;
@@ -30,6 +30,8 @@ function cycleValue( value, total, offset ) {
 }
 
 class NavigableContainer extends Component< WordPressComponentProps< NavigableContainerProps & { forwardedRef: ForwardedRef< any > }, 'div', false > > {
+	container?: ForwardedRef<any>;
+
 	constructor() {
 		super( ...arguments );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -40,6 +42,10 @@ class NavigableContainer extends Component< WordPressComponentProps< NavigableCo
 	}
 
 	componentDidMount() {
+		if ( ! this.container ) {
+			return;
+		}
+
 		// We use DOM event listeners instead of React event listeners
 		// because we want to catch events from the underlying DOM tree
 		// The React Tree can be different from the DOM tree when using
@@ -54,7 +60,7 @@ class NavigableContainer extends Component< WordPressComponentProps< NavigableCo
 		this.container.removeEventListener( 'focus', this.onFocus );
 	}
 
-	bindContainer( ref ) {
+	bindContainer( ref: ForwardedRef< any > ) {
 		const { forwardedRef } = this.props;
 		this.container = ref;
 

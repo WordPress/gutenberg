@@ -35,4 +35,10 @@ export type NavigableContainerProps = BaseProps & {
 	 * Gets an offset, given an event.
 	 */
 	eventToOffset: ( event: KeyboardEvent< HTMLDivElement > ) => -1 | 1 | 0;
+	/**
+	 * Whether to only consider browser tab stops.
+	 *
+	 * @default false
+	 */
+	onlyBrowserTabstops: boolean;
 };
