@@ -37,6 +37,7 @@ import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../private-apis';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import useTemplateEditNotification from '../use-template-edit-notification';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -153,6 +154,8 @@ export default function Editor() {
 	// Only announce the title once the editor is ready to prevent "Replace"
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
+
+	useTemplateEditNotification();
 
 	if ( ! hasLoadedPost ) {
 		return <CanvasSpinner />;
