@@ -1656,8 +1656,10 @@ const canInsertBlockTypeUnmemoized = (
 export const canInsertBlockType = createSelector(
 	canInsertBlockTypeUnmemoized,
 	( state, blockName, rootClientId ) => [
+		window.wp.data.select( 'core/edit-site' ).getEditFocus(),
+		state.blocks.parents,
+		state.blocks.byClientId,
 		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 	]
