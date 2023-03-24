@@ -29,6 +29,7 @@ export const KeyboardAwareFlatList = ( {
 	innerRef,
 	onScroll,
 	scrollEnabled,
+	scrollViewStyle,
 	shouldPreventAutomaticScroll,
 	...props
 } ) => {
@@ -137,6 +138,8 @@ export const KeyboardAwareFlatList = ( {
 	// extra padding at the bottom.
 	const contentInset = { bottom: keyboardOffset };
 
+	const style = [ { flex: 1 }, scrollViewStyle ];
+
 	return (
 		<AnimatedScrollView
 			automaticallyAdjustContentInsets={ false }
@@ -147,6 +150,7 @@ export const KeyboardAwareFlatList = ( {
 			ref={ getRef }
 			scrollEnabled={ scrollEnabled }
 			scrollEventThrottle={ 16 }
+			style={ style }
 		>
 			<FlatList { ...props } />
 		</AnimatedScrollView>

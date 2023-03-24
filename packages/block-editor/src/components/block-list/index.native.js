@@ -230,6 +230,11 @@ export class BlockList extends Component {
 			blockToolbar.height +
 			( isFloatingToolbarVisible ? floatingToolbar.height : 0 );
 
+		const scrollViewStyle = [
+			{ flex: isRootList ? 1 : 0 },
+			! isRootList && styles.overflowVisible,
+		];
+
 		return (
 			<View
 				style={ containerStyle }
@@ -247,6 +252,7 @@ export class BlockList extends Component {
 					} }
 					extraScrollHeight={ extraScrollHeight }
 					keyboardShouldPersistTaps="always"
+					scrollViewStyle={ scrollViewStyle }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
 					contentContainerStyle={ [
