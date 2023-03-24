@@ -1,3 +1,8 @@
+---
+name: Gutenberg Release
+about: A checklist for the Gutenberg plugin release process
+---
+
 This issue is to provide visibility on the progress of the release process of Gutenberg VERSION_NUMBER and to centralize any conversations about it. The ultimate goal of this issue is to keep the reference of the steps, resources, work, and conversations about this release so it can be helpful for the next contributors releasing a new Gutenberg version.
 
 -   Gutenberg version to release: VERSION_NUMBER ([milestone](ADD_LINK))
