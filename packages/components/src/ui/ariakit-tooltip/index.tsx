@@ -14,14 +14,17 @@ import { Children } from '@wordpress/element';
 import Shortcut from '../../shortcut';
 import type { ToolTipProps } from './types';
 import * as styles from './styles';
-import { contextConnect } from '../context';
+import { contextConnectWithoutRef } from '../context/context-connect';
 import { useCx } from '../../utils/hooks/use-cx';
 
-function UnforwardedToolTip(
-	props: ToolTipProps,
-	forwardedRef: React.ForwardedRef< any >
-) {
-	const { children, delay, placement, shortcut, text } = props;
+function AriaToolTip( props: ToolTipProps ) {
+	const {
+		children,
+		delay = TOOLTIP_DELAY,
+		placement,
+		shortcut,
+		text,
+	} = props;
 
 	const tooltipState = useTooltipState( {
 		placement,
@@ -49,7 +52,6 @@ function UnforwardedToolTip(
 		<>
 			<TooltipAnchor
 				className={ ToolTipAnchorClassName }
-				ref={ forwardedRef }
 				state={ tooltipState }
 			>
 				{ children }
@@ -69,6 +71,4 @@ function UnforwardedToolTip(
 	);
 }
 
-export const ToolTip = contextConnect( UnforwardedToolTip, 'ToolTip' );
-
-export default ToolTip;
+export const ToolTip = contextConnectWithoutRef( AriaToolTip, 'ToolTip' );
