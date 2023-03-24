@@ -47,7 +47,7 @@ class WP_Menu_Conversion_Gutenberg {
 		unset( $menu_items );
 		// END: Code that already exists in wp_nav_menu().
 
-		$menu_items_by_parent_id = $this->key_by_parent_id( $menu_items_by_order_id );
+		$menu_items_by_parent_id = $this->group_by_parent_id( $menu_items_by_order_id );
 
 		$inner_blocks = $this->to_blocks(
 			isset( $menu_items_by_parent_id[0] )
@@ -76,12 +76,12 @@ class WP_Menu_Conversion_Gutenberg {
 	}
 
 	/**
-	 * Returns an array of menu items keyed by the id of the parent menu item.
+	 * Returns an array of menu items grouped by the id of the parent menu item.
 	 *
 	 * @param array $menu_items An array of menu items.
 	 * @return array
 	 */
-	private function key_by_parent_id( $menu_items ) {
+	private function group_by_parent_id( $menu_items ) {
 		$menu_items_by_parent_id = array();
 
 		foreach ( $menu_items as $menu_item ) {
