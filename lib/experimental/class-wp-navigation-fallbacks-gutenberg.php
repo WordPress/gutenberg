@@ -157,6 +157,12 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	}
 
 
+	/**
+	 * Sorts the classic menus and returns the most recently created one.
+	 *
+	 * @param WP_Term[] $classic_nav_menus Array of classic nav menu term objects.
+	 * @return WP_Term The most recently created classic nav menu.
+	 */
 	private static function get_most_recently_created_nav_menu( $classic_nav_menus ) {
 		usort(
 			$classic_nav_menus,
@@ -168,6 +174,12 @@ class WP_Navigation_Fallbacks_Gutenberg {
 		return $classic_nav_menus[0];
 	}
 
+	/**
+	 * Returns the classic menu with the slug `primary` if it exists.
+	 *
+	 * @param WP_Term[] $classic_nav_menus Array of classic nav menu term objects.
+	 * @return WP_Term|null The classic nav menu with the slug `primary` or null.
+	 */
 	private static function get_nav_menu_with_primary_slug( $classic_nav_menus ) {
 		foreach ( $classic_nav_menus as $classic_nav_menu ) {
 			if ( 'primary' === $classic_nav_menu->slug ) {
@@ -179,6 +191,12 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	}
 
 
+	/**
+	 * Gets the classic menu assigned to the `primary` navigation menu location
+	 * if it exists.
+	 *
+	 * @return WP_Term|null The classic nav menu assigned to the `primary` location or null.
+	 */
 	private static function get_nav_menu_at_primary_location() {
 		$locations = get_nav_menu_locations();
 
