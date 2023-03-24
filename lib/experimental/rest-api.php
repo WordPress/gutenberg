@@ -102,6 +102,14 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 }
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
 
+/**
+ * Updates the REST API controller for the navigation post type.
+ * This is a temporary fix until we can patch the registration of this in Core.
+ *
+ * @param array  $args Array of arguments for registering a post type.
+ * @param string $post_type Post type key.
+ * @return array Array of arguments for registering a post type.
+ */
 function gutenberg_update_navigation_rest_controller( $args, $post_type ) {
 	if ( in_array( $post_type, array( 'wp_navigation' ), true ) ) {
 		// Original set in

@@ -223,10 +223,9 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 			)
 		);
 
-		// Update theme mod
-		$locations = get_nav_menu_locations();
+		$locations            = get_nav_menu_locations();
 		$locations['primary'] = $pl_menu_id;
-		$locations['header'] = $another_menu_id;
+		$locations['header']  = $another_menu_id;
 		set_theme_mod( 'nav_menu_locations', $locations );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
@@ -267,7 +266,6 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 			)
 		);
 
-
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -305,7 +303,6 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 				'menu-item-status' => 'publish',
 			)
 		);
-
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
 		$response = rest_get_server()->dispatch( $request );
