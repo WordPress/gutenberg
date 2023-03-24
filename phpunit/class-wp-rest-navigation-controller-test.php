@@ -52,7 +52,6 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$this->assertEquals( 'rest_cannot_create', $data['code'] );
 
 		$this->assertEquals( 'Sorry, you are not allowed to create Navigation Menus as this user.', $data['message'] );
-
 	}
 
 	public function test_should_return_a_default_fallback_navigation_menu_in_absence_of_other_fallbacks() {
@@ -97,8 +96,6 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 		register_block_type( 'core/page-list', $original_page_list_block );
 	}
-
-
 
 	public function test_should_manage_concurrent_requests() {
 		$request_one   = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
@@ -159,6 +156,7 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 		// Check that no new Navigation menu was created.
 		$navs_in_db = $this->get_navigations_in_database();
+
 		$this->assertCount( 2, $navs_in_db, 'Only the existing Navigation menus should be present in the database.' );
 	}
 
@@ -361,12 +359,6 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$this->assertCount( 1, $navs_in_db, 'Only the existing Navigation menus should be present in the database.' );
 
 	}
-
-
-
-
-
-
 
 	private function get_navigations_in_database() {
 		$navs_in_db = new WP_Query(
