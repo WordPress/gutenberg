@@ -189,6 +189,8 @@ This is the general data flow:
 
 ![Data flow of Global Styles](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/global-styles-input-output.png)
 
+TODO: Note on the diagram: Should be supplemented here: Top line "INPUT" → theme's theme.json → Below that box should be another box entitled "sub-theme's theme.json (optional) to show the full possible inheritance. I think that is how it works to my knowledge.
+
 The process of generating the stylesheet has, in essence, three steps:
 
 1. Gather data: the `theme.json` file [bundled with WordPress](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/theme.json), the `theme.json` file of the active theme if it exists, and the user's styles provided via the global styles UI in the site editor.
