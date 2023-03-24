@@ -15,8 +15,9 @@ import { __ } from '@wordpress/i18n';
  */
 import { store as commandsStore } from '../store';
 
-function CommandsPerPage( { navigateToPage, loader, commands } ) {
-	const { isLoading, loaderCommands } = loader();
+function CommandsPerPage( { search, navigateToPage, loader, commands } ) {
+	const { isLoading, commands: loaderCommands = [] } =
+		loader( { search } ) ?? {};
 	const allCommands = [ ...commands, ...loaderCommands ];
 
 	return (
@@ -29,12 +30,11 @@ function CommandsPerPage( { navigateToPage, loader, commands } ) {
 				<Command.Loading>{ __( 'Hang on…' ) }</Command.Loading>
 			) }
 
-			<Command.Item>Apple</Command.Item>
 			{ allCommands.map( ( command ) => (
 				<Command.Item
 					key={ command.name }
 					value={ command.name }
-					onClick={ () => command.callback( { navigateToPage } ) }
+					onSelect={ () => command.callback( { navigateToPage } ) }
 				>
 					{ command.label }
 				</Command.Item>
@@ -44,16 +44,17 @@ function CommandsPerPage( { navigateToPage, loader, commands } ) {
 }
 
 export function CommandMenu() {
+	const [ search, setSearch ] = useState( '' );
 	const [ open, setOpen ] = useState( false );
 	const [ pages, setPages ] = useState( [] );
 	const navigateToPage = ( newPage ) => setPages( [ ...pages, newPage ] );
 	const currentPage = pages.length ? pages[ pages.length - 1 ] : null;
 	const { commands, loader } = useSelect(
 		( select ) => {
-			const { getCommands, getLoader } = select( commandsStore );
+			const { getCommands, getCommandLoader } = select( commandsStore );
 			return {
 				commands: getCommands( currentPage ),
-				loader: getLoader( currentPage ),
+				loader: getCommandLoader( currentPage ),
 			};
 		},
 		[ currentPage ]
@@ -91,12 +92,13 @@ export function CommandMenu() {
 			onOpenChange={ setOpen }
 			label={ __( 'Global Command Menu' ) }
 		>
-			<Command.Input />
+			<Command.Input value={ search } onValueChange={ setSearch } />
 			<CommandsPerPage
 				key={ key }
 				navigateToPage={ navigateToPage }
 				loader={ currentLoader.current }
 				commands={ commands }
+				search={ search }
 			/>
 		</Command.Dialog>
 	);
