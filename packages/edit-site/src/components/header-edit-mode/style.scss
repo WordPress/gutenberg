@@ -34,16 +34,38 @@ $header-toolbar-min-width: 335px;
 		min-width: 0;
 	}
 
-	.components-tab-panel__tabs {
-		height: 100%;
+	// controlled "tabs" for switching modes
+	.edit-focus-switcher {
+		button {
+			height: 100%;
+			position: relative;
+			text-transform: capitalize;
+			border-radius: 0;
+			&:focus {
+				outline: none;
+				box-shadow: none;
+			}
+			&::after {
+				content: "";
+				position: absolute;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				pointer-events: none;
+				background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+				height: calc(0 * var(--wp-admin-border-width-focus));
+				border-radius: 0;
+				transition: all 0.1s linear;
+			}
+			&.is-active {
+				&::after {
+					height: calc(1 * var(--wp-admin-border-width-focus));
+					outline: 2px solid transparent;
+					outline-offset: -1px;
+				}
+			}
+		}
 	}
-
-	.components-tab-panel__tabs-item {
-		text-transform: capitalize;
-		height: 100%;
-	}
-
-
 }
 
 .edit-site-header-edit-mode__toolbar {

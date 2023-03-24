@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { TabPanel } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityRecord } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -59,23 +59,19 @@ export default function EditFocusSwitcher() {
 	}
 
 	return (
-		<TabPanel
-			activeClass="is-active"
-			tabs={ [
-				{
-					name: 'post',
-					title: post.type,
-					className: editFocus === 'post' ? 'is-active' : '',
-				},
-				{
-					name: 'template',
-					title: 'template',
-					className: editFocus === 'template' ? 'is-active' : '',
-				},
-			] }
-			onSelect={ setEditFocus }
-		>
-			{ () => {} }
-		</TabPanel>
+		<div className="edit-focus-switcher">
+			<Button
+				className={ editFocus === 'post' ? 'is-active' : '' }
+				onClick={ () => setEditFocus( 'post' ) }
+			>
+				{ post.type }
+			</Button>
+			<Button
+				className={ editFocus === 'template' ? 'is-active' : '' }
+				onClick={ () => setEditFocus( 'template' ) }
+			>
+				Template
+			</Button>
+		</div>
 	);
 }
