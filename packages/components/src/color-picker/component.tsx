@@ -38,7 +38,7 @@ const options = [
 	{ label: 'Hex', value: 'hex' as const },
 ];
 
-const ColorPicker = (
+const UnconnectedColorPicker = (
 	props: ColorPickerProps,
 	forwardedRef: ForwardedRef< any >
 ) => {
@@ -112,6 +112,9 @@ const ColorPicker = (
 	);
 };
 
-const ConnectedColorPicker = contextConnect( ColorPicker, 'ColorPicker' );
+export const ColorPicker = contextConnect(
+	UnconnectedColorPicker,
+	'ColorPicker'
+);
 
-export default ConnectedColorPicker;
+export default ColorPicker;

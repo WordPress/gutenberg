@@ -2,44 +2,26 @@
  * External dependencies
  */
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
-import { ColorPicker } from '..';
+import { ColorPicker } from '../component';
 
 const meta: ComponentMeta< typeof ColorPicker > = {
 	component: ColorPicker,
 	title: 'Components/ColorPicker',
 	argTypes: {
+		as: { control: { type: null } },
 		color: { control: { type: null } },
-		copyFormat: {
-			control: { type: 'select' },
-			options: [ 'rgb', 'hsl', 'hex', undefined ],
-		},
-		onChangeComplete: {
-			table: {
-				disable: true,
-			},
-		},
-		oldHue: {
-			table: {
-				disable: true,
-			},
-		},
-		disableAlpha: {
-			table: {
-				disable: true,
-			},
-		},
-		// We can't use a `on*` regex because this component will switch to
-		// legacy mode when an onChangeComplete prop is passed.
-		onChange: { action: 'onChange' },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},
