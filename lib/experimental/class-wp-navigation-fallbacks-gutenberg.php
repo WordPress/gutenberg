@@ -6,6 +6,9 @@
  * @since 6.3.0
  */
 
+
+require __DIR__ . '/class-wp-menu-conversion-gutenberg.php';
+
 /**
  * Manages Fallback behavior for Navigation menus.
  *
@@ -95,8 +98,11 @@ class WP_Navigation_Fallbacks_Gutenberg {
 			return new WP_Error( 'no_classic_menus', 'No Classic Menus found.' );
 		}
 
+		// Todo: inject as dependency.
+		$menu_converter = new WP_Menu_Conversion_Gutenberg( $classic_nav_menu );
+
 		// If we have a classic menu then convert it to blocks.
-		$classic_nav_menu_blocks = static::get_classic_menu_fallback_blocks( $classic_nav_menu );
+		$classic_nav_menu_blocks = $menu_converter->convert();
 
 		if ( empty( $classic_nav_menu_blocks ) ) {
 			return new WP_Error( 'cannot_convert_classic', 'Unable to convert Classic Menu to blocks.' );
@@ -118,134 +124,48 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	}
 
 	/**
-	 * Get the classic navigation menu to use as a fallback.
+	 * Determine the most appropriate classic navigation menu to use as a fallback.
 	 *
 	 * @return object WP_Term The classic navigation.
 	 */
 	public static function get_classic_menu_fallback() {
 		$classic_nav_menus = wp_get_nav_menus();
 
-		// If menus exist.
-		if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) ) {
-			// Handles simple use case where user has a classic menu and switches to a block theme.
+		if ( ! $classic_nav_menus || is_wp_error( $classic_nav_menus ) ) {
+			return null;
+		}
 
-			// Returns the menu assigned to location `primary`.
-			$locations = get_nav_menu_locations();
-			if ( isset( $locations['primary'] ) ) {
-				$primary_menu = wp_get_nav_menu_object( $locations['primary'] );
-				if ( $primary_menu ) {
-					return $primary_menu;
-				}
+		// 1.
+		// Attempt to use the menu assigned to location `primary`.
+		$locations = get_nav_menu_locations();
+
+		if ( isset( $locations['primary'] ) ) {
+			$primary_menu = wp_get_nav_menu_object( $locations['primary'] );
+
+			if ( $primary_menu ) {
+				return $primary_menu;
 			}
+		}
 
-			// Returns a menu if `primary` is its slug.
-			foreach ( $classic_nav_menus as $classic_nav_menu ) {
-				if ( 'primary' === $classic_nav_menu->slug ) {
-					return $classic_nav_menu;
-				}
+		// 2.
+		// Use the menu with `primary` as its slug.
+		foreach ( $classic_nav_menus as $classic_nav_menu ) {
+			if ( 'primary' === $classic_nav_menu->slug ) {
+				return $classic_nav_menu;
 			}
-
-			// Otherwise return the most recently created classic menu.
-			usort(
-				$classic_nav_menus,
-				function( $a, $b ) {
-					return $b->term_id - $a->term_id;
-				}
-			);
-			return $classic_nav_menus[0];
-		}
-	}
-
-	/**
-	 * Converts a classic navigation to blocks.
-	 *
-	 * @param  object $classic_nav_menu WP_Term The classic navigation object to convert.
-	 * @return array the normalized parsed blocks.
-	 */
-	public static function get_classic_menu_fallback_blocks( $classic_nav_menu ) {
-		// BEGIN: Code that already exists in wp_nav_menu().
-		$menu_items = wp_get_nav_menu_items( $classic_nav_menu->term_id, array( 'update_post_term_cache' => false ) );
-
-		// Set up the $menu_item variables.
-		_wp_menu_item_classes_by_context( $menu_items );
-
-		$sorted_menu_items = array();
-		foreach ( (array) $menu_items as $menu_item ) {
-			$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
 		}
 
-		unset( $menu_items, $menu_item );
-
-		// END: Code that already exists in wp_nav_menu().
-
-		$menu_items_by_parent_id = array();
-		foreach ( $sorted_menu_items as $menu_item ) {
-			$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
-		}
-
-		$inner_blocks = static::parse_blocks_from_menu_items(
-			isset( $menu_items_by_parent_id[0] )
-			? $menu_items_by_parent_id[0]
-			: array(),
-			$menu_items_by_parent_id
+		// 3.
+		// Otherwise use the most recently created classic menu.
+		usort(
+			$classic_nav_menus,
+			function( $a, $b ) {
+				return $b->term_id - $a->term_id;
+			}
 		);
 
-		return serialize_blocks( $inner_blocks );
+		return $classic_nav_menus[0];
 	}
-
-	/**
-	 * Turns menu item data into a nested array of parsed blocks
-	 *
-	 * @param array $menu_items               An array of menu items that represent
-	 *                                        an individual level of a menu.
-	 * @param array $menu_items_by_parent_id  An array keyed by the id of the
-	 *                                        parent menu where each element is an
-	 *                                        array of menu items that belong to
-	 *                                        that parent.
-	 * @return array An array of parsed block data.
-	 */
-	public static function parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
-		if ( empty( $menu_items ) ) {
-			return array();
-		}
-
-		$blocks = array();
-
-		foreach ( $menu_items as $menu_item ) {
-			$class_name       = ! empty( $menu_item->classes ) ? implode( ' ', (array) $menu_item->classes ) : null;
-			$id               = ( null !== $menu_item->object_id && 'custom' !== $menu_item->object ) ? $menu_item->object_id : null;
-			$opens_in_new_tab = null !== $menu_item->target && '_blank' === $menu_item->target;
-			$rel              = ( null !== $menu_item->xfn && '' !== $menu_item->xfn ) ? $menu_item->xfn : null;
-			$kind             = null !== $menu_item->type ? str_replace( '_', '-', $menu_item->type ) : 'custom';
-
-			$block = array(
-				'blockName' => isset( $menu_items_by_parent_id[ $menu_item->ID ] ) ? 'core/navigation-submenu' : 'core/navigation-link',
-				'attrs'     => array(
-					'className'     => $class_name,
-					'description'   => $menu_item->description,
-					'id'            => $id,
-					'kind'          => $kind,
-					'label'         => $menu_item->title,
-					'opensInNewTab' => $opens_in_new_tab,
-					'rel'           => $rel,
-					'title'         => $menu_item->attr_title,
-					'type'          => $menu_item->object,
-					'url'           => $menu_item->url,
-				),
-			);
-
-			$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-			? static::parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
-			: array();
-			$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
-
-			$blocks[] = $block;
-		}
-
-		return $blocks;
-	}
-
-
 
 	/**
 	 * Creates a default Navigation Menu fallback.
