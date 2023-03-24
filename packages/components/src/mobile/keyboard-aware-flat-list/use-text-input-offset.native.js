@@ -26,11 +26,9 @@ export default function useTextInputOffset( scrollEnabled, scrollViewRef ) {
 						scrollViewRef.current,
 						( _x, y, _width, height ) => {
 							const caretYOffset =
-								// For cases where the caretY value is -1 or null
+								// For cases where the caretY value is -1
 								// we use the y + height value.
-								caretY !== null &&
-								caretY >= 0 &&
-								caretY < height
+								caretY >= 0 && caretY < height
 									? y + caretY
 									: y + height;
 							resolve( Math.round( Math.abs( caretYOffset ) ) );
