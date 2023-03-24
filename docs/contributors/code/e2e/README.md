@@ -114,3 +114,45 @@ test.describe( 'Grouping tests (@webkit, -chromium)', () => {
 	} );
 } );
 ```
+
+## Local configuration of Playwright
+
+Sometimes the deafults that Gutenberg offers for Playwright configuration need to be changed. While most configuration can be overriden by passing arguments to the test runner command line, we may want to make permanent confguration changes, such as setting the test to always run with `headless` mode set to `false` and you own custom slow motion value.
+
+To do this one can create a file named `playwright.config.override.ts` file in the `/test/e2e/` folder. In this new file we need to import the exiting configuration, then use the new values on top to override the defaults.
+
+For example:
+
+```ts
+/**
+ * External dependencies
+ */
+import { defineConfig } from '@playwright/test';
+/**
+ * Internal dependencies
+ */
+import base from './playwright.config.ts';
+
+const config = defineConfig( {
+	...base,
+	use: {
+		...base.use,
+		headless: true,
+		launchOptions: {
+			//slowMo: 500,
+		},
+		trace: 'off',
+		screenshot: 'off',
+		video: 'off',
+	},
+} );
+
+export default config;
+
+```
+
+After making this file you can now run your tests passing the new configuration file with the `--config` argument:
+
+```bash
+npm run test:e2e:playwright -- --config=test/e2e/playwright.override.config.ts
+```
