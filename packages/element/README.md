@@ -44,10 +44,13 @@ function Greeting( props ) {
 	return createElement( 'span', null, 'Hello ' + props.toWhom + '!' );
 }
 
+const domElement = document.getElementById( 'greeting' );
+const uiElement  = createElement( Greeting, { toWhom: 'World' } );
+
 if ( createRoot ) {
-	createRoot( document.getElementById( 'greeting' ) ).render( createElement( Greeting, { toWhom: 'World' } ) );
+  createRoot( domElement ).render( uiElement );
 } else {
-	render( createElement( Greeting, { toWhom: 'World' } ), document.getElementById( 'greeting' ) );
+  render( uiElement, domElement );
 }
 ```
 
