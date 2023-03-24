@@ -137,6 +137,49 @@ class WP_Navigation_Fallbacks_Gutenberg {
 
 		// 1.
 		// Attempt to use the menu assigned to location `primary`.
+		$nav_menu = static::get_nav_menu_at_primary_location();
+
+		if ( $nav_menu ) {
+			return $nav_menu;
+		}
+
+		// 2.
+		// Use the menu with `primary` as its slug.
+		$nav_menu = static::get_nav_menu_with_primary_slug( $classic_nav_menus );
+
+		if ( $nav_menu ) {
+			return $nav_menu;
+		}
+
+		// 3.
+		// Otherwise use the most recently created classic menu.
+		return static::get_most_recently_created_nav_menu( $classic_nav_menus );
+	}
+
+
+	private static function get_most_recently_created_nav_menu( $classic_nav_menus ) {
+		usort(
+			$classic_nav_menus,
+			function( $a, $b ) {
+				return $b->term_id - $a->term_id;
+			}
+		);
+
+		return $classic_nav_menus[0];
+	}
+
+	private static function get_nav_menu_with_primary_slug( $classic_nav_menus ) {
+		foreach ( $classic_nav_menus as $classic_nav_menu ) {
+			if ( 'primary' === $classic_nav_menu->slug ) {
+				return $classic_nav_menu;
+			}
+		}
+
+		return null;
+	}
+
+
+	private static function get_nav_menu_at_primary_location() {
 		$locations = get_nav_menu_locations();
 
 		if ( isset( $locations['primary'] ) ) {
@@ -147,24 +190,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 			}
 		}
 
-		// 2.
-		// Use the menu with `primary` as its slug.
-		foreach ( $classic_nav_menus as $classic_nav_menu ) {
-			if ( 'primary' === $classic_nav_menu->slug ) {
-				return $classic_nav_menu;
-			}
-		}
-
-		// 3.
-		// Otherwise use the most recently created classic menu.
-		usort(
-			$classic_nav_menus,
-			function( $a, $b ) {
-				return $b->term_id - $a->term_id;
-			}
-		);
-
-		return $classic_nav_menus[0];
+		return null;
 	}
 
 	/**
