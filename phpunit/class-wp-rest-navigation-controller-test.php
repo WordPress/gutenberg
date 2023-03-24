@@ -200,6 +200,48 @@ class WP_REST_Navigation_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 	}
 
+	public function test_should_prioritise_classic_menu_in_primary_location() {
+		$pl_menu_id = wp_create_nav_menu( 'Classic Menu in Primary Location' );
+
+		wp_update_nav_menu_item(
+			$pl_menu_id,
+			0,
+			array(
+				'menu-item-title'  => 'PL Classic Menu Item',
+				'menu-item-url'    => '/pl-classic-menu-item',
+				'menu-item-status' => 'publish',
+			)
+		);
+
+		$another_menu_id = wp_create_nav_menu( 'Another Classic Menu' );
+
+		wp_update_nav_menu_item(
+			$another_menu_id,
+			0,
+			array(
+				'menu-item-title'  => 'Another Classic Menu Item',
+				'menu-item-url'    => '/another-classic-menu-item',
+				'menu-item-status' => 'publish',
+			)
+		);
+
+		// Update theme mod
+		$locations = get_nav_menu_locations();
+		$locations['primary'] = $pl_menu_id;
+		$locations['header'] = $another_menu_id;
+		set_theme_mod( 'nav_menu_locations', $locations );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/navigation/fallback' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$this->assertInstanceOf( 'WP_Post', $data );
+
+		$this->assertEquals( 'Classic Menu in Primary Location', $data->post_title, 'Fallback menu title should match the menu in the "primary" location.' );
+	}
+
 	public function test_should_not_create_fallback_from_classic_menu_if_a_navigation_menu_already_exists() {
 		$menu_id = wp_create_nav_menu( 'Existing Classic Menu' );
 
