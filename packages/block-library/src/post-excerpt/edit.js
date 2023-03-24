@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
@@ -18,11 +18,14 @@ import {
 } from '@wordpress/block-editor';
 import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useCanEditEntity } from '../utils/hooks';
+
+const ELLIPSIS = '…';
 
 export default function PostExcerptEditor( {
 	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
@@ -32,13 +35,41 @@ export default function PostExcerptEditor( {
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
-	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
-
 	const [
 		rawExcerpt,
 		setExcerpt,
 		{ rendered: renderedExcerpt, protected: isProtected } = {},
 	] = useEntityProp( 'postType', postType, 'excerpt', postId );
+
+	/**
+	 * Check if the post type supports excerpts.
+	 * Add an exception and return early for the "page" post type,
+	 * which is registered without support for the excerpt UI,
+	 * but supports saving the excerpt to the database.
+	 * See: https://core.trac.wordpress.org/browser/branches/6.1/src/wp-includes/post.php#L65
+	 * Without this exception, users that have excerpts saved to the database will
+	 * not be able to edit the excerpts.
+	 */
+	const postTypeSupportsExcerpts = useSelect(
+		( select ) => {
+			if ( postType === 'page' ) {
+				return true;
+			}
+			return !! select( coreStore ).getPostType( postType )?.supports
+				.excerpt;
+		},
+		[ postType ]
+	);
+
+	/**
+	 * The excerpt is editable if:
+	 * - The user can edit the post
+	 * - It is not a descendent of a Query Loop block
+	 * - The post type supports excerpts
+	 */
+	const isEditable =
+		userCanEdit && ! isDescendentOfQueryLoop && postTypeSupportsExcerpts;
+
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -65,6 +96,7 @@ export default function PostExcerptEditor( {
 		);
 		return document.body.textContent || document.body.innerText || '';
 	}, [ renderedExcerpt ] );
+
 	if ( ! postType || ! postId ) {
 		return (
 			<>
@@ -123,14 +155,13 @@ export default function PostExcerptEditor( {
 	 * The excerpt length setting needs to be applied to both
 	 * the raw and the rendered excerpt depending on which is being used.
 	 */
-	const rawOrRenderedExcerpt = !! renderedExcerpt
-		? strippedRenderedExcerpt
-		: rawExcerpt;
+	const rawOrRenderedExcerpt = (
+		rawExcerpt || strippedRenderedExcerpt
+	).trim();
 
 	let trimmedExcerpt = '';
 	if ( wordCountType === 'words' ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.trim()
 			.split( ' ', excerptLength )
 			.join( ' ' );
 	} else if ( wordCountType === 'characters_excluding_spaces' ) {
@@ -143,7 +174,6 @@ export default function PostExcerptEditor( {
 		 * so that the spaces are excluded from the word count.
 		 */
 		const excerptWithSpaces = rawOrRenderedExcerpt
-			.trim()
 			.split( '', excerptLength )
 			.join( '' );
 
@@ -152,17 +182,15 @@ export default function PostExcerptEditor( {
 			excerptWithSpaces.replaceAll( ' ', '' ).length;
 
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.trim()
 			.split( '', excerptLength + numberOfSpaces )
 			.join( '' );
 	} else if ( wordCountType === 'characters_including_spaces' ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.trim()
 			.split( '', excerptLength )
 			.join( '' );
 	}
 
-	trimmedExcerpt = trimmedExcerpt + '...';
+	const isTrimmed = trimmedExcerpt !== rawOrRenderedExcerpt;
 
 	const excerptContent = isEditable ? (
 		<RichText
@@ -171,7 +199,9 @@ export default function PostExcerptEditor( {
 			value={
 				isSelected
 					? rawOrRenderedExcerpt
-					: ( trimmedExcerpt !== '...' ? trimmedExcerpt : '' ) ||
+					: ( ! isTrimmed
+							? rawOrRenderedExcerpt
+							: trimmedExcerpt + ELLIPSIS ) ||
 					  __( 'No post excerpt found' )
 			}
 			onChange={ setExcerpt }
@@ -179,9 +209,9 @@ export default function PostExcerptEditor( {
 		/>
 	) : (
 		<p className={ excerptClassName }>
-			{ trimmedExcerpt !== '...'
-				? trimmedExcerpt
-				: __( 'No post excerpt found' ) }
+			{ ! isTrimmed
+				? rawOrRenderedExcerpt || __( 'No post excerpt found' )
+				: trimmedExcerpt + ELLIPSIS }
 		</p>
 	);
 	return (
@@ -211,7 +241,6 @@ export default function PostExcerptEditor( {
 						value={ excerptLength }
 						onChange={ ( value ) => {
 							setAttributes( { excerptLength: value } );
-							setExcerpt();
 						} }
 						min="10"
 						max="100"
