@@ -500,6 +500,9 @@ export default function ColorPanel( {
 				link: {
 					...previousValue?.elements?.link,
 					color: undefined,
+					':hover': {
+						color: undefined,
+					},
 				},
 				...elements.reduce( ( acc, element ) => {
 					return {
