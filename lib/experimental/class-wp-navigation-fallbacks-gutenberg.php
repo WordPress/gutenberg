@@ -23,11 +23,11 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	 */
 	public static function get_fallback_menu() {
 
-		$fallback_sequence = [
+		$fallback_sequence = array(
 			'get_most_recently_published_navigation',
 			'create_classic_menu_fallback',
 			'create_default_fallback',
-		];
+		);
 
 		// go through each of the fallbacks and return the first one that works.
 		foreach ( $fallback_sequence as $fallback ) {
