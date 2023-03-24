@@ -9,6 +9,7 @@ coverage
 *-performance-results.json
 .phpunit.result.cache
 
+
 # Directories/files that may appear in your environment
 *.log
 yarn.lock
@@ -36,6 +37,7 @@ test/native/junit.xml
 
 # Local overrides
 .wp-env.override.json
+playwright.config.override.ts
 phpcs.xml
 phpunit.xml
 phpunit-watcher.yml
