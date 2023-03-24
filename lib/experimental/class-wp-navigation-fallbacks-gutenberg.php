@@ -23,39 +23,23 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	 */
 	public static function get_fallback_menu() {
 
-		// 1.
-		// Get the most recently published Navigation post.
-		$navigation_post = static::get_most_recently_published_navigation();
+		$fallback_sequence = [
+			'get_most_recently_published_navigation',
+			'create_classic_menu_fallback',
+			'create_default_fallback',
+		];
 
-		if ( $navigation_post ) {
-			return $navigation_post;
+		// go through each of the fallbacks and return the first one that works.
+		foreach ( $fallback_sequence as $fallback ) {
+			$navigation_post = static::$fallback();
+
+			if ( $navigation_post && ! is_wp_error( $navigation_post ) ) {
+				return $navigation_post instanceof WP_Post ? $navigation_post : static::get_most_recently_published_navigation();
+			}
 		}
 
-		// 2.
-		// If there are no navigation posts then try to find a classic menu
-		// and convert it into a block based navigation menu.
-		$navigation_post = static::create_classic_menu_fallback();
-
-		if ( $navigation_post && ! is_wp_error( $navigation_post ) ) {
-			// Fetch the newly created Navigation post.
-			return static::get_most_recently_published_navigation();
-		}
-
-		// 3.
-		// If there are no navigation posts then default to a list of Pages.
-		$navigation_post = static::create_default_fallback();
-
-		if ( $navigation_post && ! is_wp_error( $navigation_post ) ) {
-			// Fetch the newly created Navigation post.
-			return static::get_most_recently_published_navigation();
-		}
-
-		// It was not possible to create a fallback.
 		return null;
 	}
-
-
-
 
 	/**
 	 * Finds the most recently published `wp_navigation` Post.
