@@ -17,6 +17,7 @@ function getComputedStyle( node ) {
 }
 
 export default function ColorPanel( {
+	isSelected,
 	enableAlpha = false,
 	settings,
 	clientId,
@@ -29,25 +30,24 @@ export default function ColorPanel( {
 	const definedColors = settings.filter( ( setting ) => setting?.colorValue );
 
 	useEffect( () => {
+		// If contrast checking is disabled, don't do anything.
 		if ( ! enableContrastChecking ) {
 			return;
 		}
-		if ( ! definedColors.length ) {
-			if ( detectedBackgroundColor ) {
-				setDetectedBackgroundColor();
-			}
-			if ( detectedColor ) {
-				setDetectedColor();
-			}
-			if ( detectedLinkColor ) {
-				setDetectedColor();
-			}
+
+		if ( definedColors.length === 0 ) {
+			setDetectedBackgroundColor( undefined );
+			setDetectedLinkColor( undefined );
+			setDetectedColor( undefined );
 			return;
 		}
 
 		if ( ! ref.current ) {
 			return;
 		}
+
+		// Try to detect the colors for the text, link and background based on the
+		// current ref.
 		setDetectedColor( getComputedStyle( ref.current ).color );
 
 		const firstLinkElement = ref.current?.querySelector( 'a' );
@@ -58,6 +58,9 @@ export default function ColorPanel( {
 		let backgroundColorNode = ref.current;
 		let backgroundColor =
 			getComputedStyle( backgroundColorNode ).backgroundColor;
+
+		// If the current node has a transparent background color, we need to
+		// find the first parent node with a non-transparent background color.
 		while (
 			backgroundColor === 'rgba(0, 0, 0, 0)' &&
 			backgroundColorNode.parentNode &&
@@ -70,7 +73,38 @@ export default function ColorPanel( {
 		}
 
 		setDetectedBackgroundColor( backgroundColor );
-	} );
+
+		// If colors are defined, overwrite detected colors with the defined colors.
+		if ( definedColors.length ) {
+			definedColors.forEach( ( color ) => {
+				if ( ! color.colorValue ) {
+					return;
+				}
+
+				if ( 'Background' === color.label ) {
+					setDetectedBackgroundColor( color.colorValue );
+				}
+
+				if ( 'Text' === color.label ) {
+					setDetectedColor( color.colorValue );
+				}
+
+				if ( 'Link' === color.label ) {
+					setDetectedLinkColor( color.colorValue );
+				}
+			} );
+		}
+	}, [
+		enableContrastChecking,
+		definedColors,
+		ref,
+		detectedBackgroundColor,
+		detectedColor,
+		enableAlpha,
+		detectedLinkColor,
+		clientId,
+		isSelected,
+	] );
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
