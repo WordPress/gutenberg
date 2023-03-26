@@ -168,7 +168,7 @@ _Parameters_
 -   _options.type_ `[string]`: Type of notice, one of `default`, or `snackbar`.
 -   _options.speak_ `[boolean]`: Whether the notice content should be announced to screen readers.
 -   _options.actions_ `[Array<WPNoticeAction>]`: User actions to be presented with notice.
--   _options.icon_ `[string]`: An icon displayed with the notice. Only used when type is set to `snackbar`.
+-   _options.icon_ `JSX.Element`: An icon displayed with the notice. Only used when type is set to `snackbar`.
 -   _options.explicitDismiss_ `[boolean]`: Whether the notice includes an explicit dismiss button and can't be dismissed by clicking the body of the notice. Only applies when type is set to `snackbar`.
 -   _options.onDismiss_ `[Function]`: Called when the notice is dismissed.
 
