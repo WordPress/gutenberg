@@ -95,11 +95,18 @@ export function Editor( { testBlocks, settings = {} } ) {
 	);
 }
 
-export async function initializeEditor( {
-	useCoreBlocks = true,
+/**
+ * Registers the core block, creates the test block instances, and then instantiates the Editor.
+ *
+ * @param {Object | Array} testBlocks    Block or array of block settings for blocks to be tested.
+ * @param {boolean}        useCoreBlocks Defaults to true. If false, core blocks will not be registered.
+ * @param {Object}         settings      Any additional editor settings to be passed to the editor.
+ */
+export async function initializeEditor(
 	testBlocks,
-	...props
-} ) {
+	useCoreBlocks = true,
+	settings
+) {
 	if ( useCoreBlocks ) {
 		registerCoreBlocks();
 	}
@@ -112,6 +119,8 @@ export async function initializeEditor( {
 		)
 	);
 	return waitForStoreResolvers( () => {
-		return render( <Editor testBlocks={ newBlocks } { ...props } /> );
+		return render(
+			<Editor testBlocks={ newBlocks } settings={ settings } />
+		);
 	} );
 }

@@ -14,7 +14,7 @@ import {
 
 async function setup( attributes ) {
 	const testBlock = { name: 'core/cover', attributes };
-	return initializeEditor( { testBlocks: testBlock } );
+	return initializeEditor( testBlock );
 }
 
 async function createAndselectBlock() {
