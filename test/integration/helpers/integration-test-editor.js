@@ -58,33 +58,16 @@ export async function selectBlock( name, screen ) {
 	await userEvent.click( screen.getByLabelText( name ) );
 }
 
-export function Editor( { testBlocks, settings = {}, useCoreBlocks = true } ) {
+export function Editor( { testBlocks, settings = {} } ) {
 	const [ currentBlocks, updateBlocks ] = useState( testBlocks );
 
 	useEffect( () => {
-		if ( useCoreBlocks ) {
-			registerCoreBlocks();
-		}
 		return () => {
 			getBlockTypes().forEach( ( { name } ) =>
 				unregisterBlockType( name )
 			);
 		};
-	}, [ useCoreBlocks ] );
-
-	useEffect( () => {
-		const blocks = Array.isArray( testBlocks )
-			? testBlocks
-			: [ testBlocks ];
-		const newBlocks = blocks.map( ( testBlock ) =>
-			createBlock(
-				testBlock.name,
-				testBlock.attributes,
-				testBlock.innerBlocks
-			)
-		);
-		updateBlocks( newBlocks );
-	}, [ testBlocks ] );
+	}, [] );
 
 	return (
 		<ShortcutProvider>
@@ -112,8 +95,23 @@ export function Editor( { testBlocks, settings = {}, useCoreBlocks = true } ) {
 	);
 }
 
-export async function initializeEditor( props ) {
+export async function initializeEditor( {
+	useCoreBlocks = true,
+	testBlocks,
+	...props
+} ) {
+	if ( useCoreBlocks ) {
+		registerCoreBlocks();
+	}
+	const blocks = Array.isArray( testBlocks ) ? testBlocks : [ testBlocks ];
+	const newBlocks = blocks.map( ( testBlock ) =>
+		createBlock(
+			testBlock.name,
+			testBlock.attributes,
+			testBlock.innerBlocks
+		)
+	);
 	return waitForStoreResolvers( () => {
-		return render( <Editor { ...props } /> );
+		return render( <Editor testBlocks={ newBlocks } { ...props } /> );
 	} );
 }
