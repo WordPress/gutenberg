@@ -49,7 +49,7 @@ if ( ! String.prototype.replaceAll ) {
 }
 
 /**
- * Selects the block to be test by the aria-label on block wrapper, eg. "Block: Cover".
+ * Selects the block to be tested by the aria-label on the block wrapper, eg. "Block: Cover".
  *
  * @param {string}                                  name
  * @param {import('@testing-library/react').Screen} screen
