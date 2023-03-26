@@ -27,7 +27,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 Let's render a customized greeting into an empty element. 
 
-**Note:** `createRoot` was introduced with React 18, which will be bundled with WordPress 6.2. Therefore it may be necessary to mount your component depending on which version of WordPress (and therefore React) you are currently using. This is possible by checking for an undefined import and falling back to the React 17 method of mounting an app using `render`.
+**Note:** `createRoot` was introduced with React 18, which is bundled with WordPress 6.2. Therefore it may be necessary to mount your component depending on which version of WordPress (and therefore React) you are currently using. This is possible by checking for an undefined import and falling back to the React 17 method of mounting an app using `render`.
 
 Assuming the following root element is present in the page:
 
