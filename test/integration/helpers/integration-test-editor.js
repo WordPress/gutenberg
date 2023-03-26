@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
@@ -49,20 +49,6 @@ if ( ! String.prototype.replaceAll ) {
 }
 
 /**
- * For registering all the core blocks if needed as part of test setup.
- */
-export function registerAllCoreBlocks() {
-	registerCoreBlocks();
-}
-
-/**
- * Unregisters all blocks if needed as part of test cleanup.
- */
-export function unRegisterAllBlocks() {
-	getBlockTypes().forEach( ( { name } ) => unregisterBlockType( name ) );
-}
-
-/**
  * Selects the block to be test by the aria-label on block wrapper, eg. "Block: Cover".
  *
  * @param {string}                                  name
@@ -72,27 +58,39 @@ export async function selectBlock( name, screen ) {
 	await userEvent.click( screen.getByLabelText( name ) );
 }
 
-/**
- * Creates the block to be tested.
- *
- * @param {string} name        Block name.
- * @param {Object} attributes  Block attributes.
- * @param {?Array} innerBlocks Nested blocks.
- *
- * @return {Object} Block object.
- */
-export function createTestBlock( name, attributes = {}, innerBlocks = [] ) {
-	return createBlock( name, attributes, innerBlocks );
-}
+export function Editor( { testBlocks, settings = {}, useCoreBlocks = true } ) {
+	const [ currentBlocks, updateBlocks ] = useState( testBlocks );
 
-export function Editor( { testBlocks, settings = {} } ) {
-	const [ blocks, updateBlocks ] = useState( testBlocks );
+	useEffect( () => {
+		if ( useCoreBlocks ) {
+			registerCoreBlocks();
+		}
+		return () => {
+			getBlockTypes().forEach( ( { name } ) =>
+				unregisterBlockType( name )
+			);
+		};
+	}, [ useCoreBlocks ] );
+
+	useEffect( () => {
+		const blocks = Array.isArray( testBlocks )
+			? testBlocks
+			: [ testBlocks ];
+		const newBlocks = blocks.map( ( testBlock ) =>
+			createBlock(
+				testBlock.name,
+				testBlock.attributes,
+				testBlock.innerBlocks
+			)
+		);
+		updateBlocks( newBlocks );
+	}, [ testBlocks ] );
 
 	return (
 		<ShortcutProvider>
 			<SlotFillProvider>
 				<BlockEditorProvider
-					value={ blocks }
+					value={ currentBlocks }
 					onInput={ updateBlocks }
 					onChange={ updateBlocks }
 					settings={ settings }

@@ -9,15 +9,12 @@ import userEvent from '@testing-library/user-event';
  */
 import {
 	initializeEditor,
-	registerAllCoreBlocks,
-	unRegisterAllBlocks,
-	createTestBlock,
 	selectBlock,
 } from 'test/integration/helpers/integration-test-editor';
 
-async function setup( testBlock ) {
-	const block = await createTestBlock( testBlock.name, testBlock.attributes );
-	return initializeEditor( { testBlocks: [ block ] } );
+async function setup( attributes ) {
+	const testBlock = { name: 'core/cover', attributes };
+	return initializeEditor( { testBlocks: testBlock } );
 }
 
 async function createAndselectBlock() {
@@ -34,16 +31,9 @@ async function createAndselectBlock() {
 }
 
 describe( 'Cover block', () => {
-	beforeAll( () => {
-		registerAllCoreBlocks();
-	} );
-	afterAll( () => {
-		unRegisterAllBlocks();
-	} );
-
 	describe( 'Editor canvas', () => {
 		test( 'shows placeholder if background image and color not set', async () => {
-			await setup( { name: 'core/cover' } );
+			await setup();
 
 			expect(
 				screen.getByRole( 'group', {
@@ -53,7 +43,7 @@ describe( 'Cover block', () => {
 		} );
 
 		test( 'can set overlay color using color picker on block placeholder', async () => {
-			const { container } = await setup( { name: 'core/cover' } );
+			const { container } = await setup();
 			const colorPicker = screen.getByRole( 'button', {
 				name: 'Color: Black',
 			} );
@@ -75,7 +65,7 @@ describe( 'Cover block', () => {
 		} );
 
 		test( 'can have the title edited', async () => {
-			await setup( { name: 'core/cover' } );
+			await setup();
 
 			await userEvent.click(
 				screen.getByRole( 'button', {
@@ -94,7 +84,7 @@ describe( 'Cover block', () => {
 
 	describe( 'Block toolbar', () => {
 		test( 'full height toggle sets minHeight style attribute to 100vh when clicked', async () => {
-			await setup( { name: 'core/cover' } );
+			await setup();
 			await createAndselectBlock();
 
 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveStyle(
@@ -111,7 +101,7 @@ describe( 'Cover block', () => {
 		} );
 
 		test( 'content position button sets content position', async () => {
-			await setup( { name: 'core/cover' } );
+			await setup();
 			await createAndselectBlock();
 
 			await userEvent.click(
@@ -142,7 +132,7 @@ describe( 'Cover block', () => {
 	describe( 'Inspector controls', () => {
 		describe( 'Media settings', () => {
 			test( 'does not display media settings panel if url is not set', async () => {
-				await setup( { name: 'core/cover' } );
+				await setup();
 				expect(
 					screen.queryByRole( 'button', {
 						name: 'Media settings',
@@ -151,10 +141,7 @@ describe( 'Cover block', () => {
 			} );
 			test( 'displays media settings panel if url is set', async () => {
 				await setup( {
-					name: 'core/cover',
-					attributes: {
-						url: 'http://localhost/my-image.jpg',
-					},
+					url: 'http://localhost/my-image.jpg',
 				} );
 
 				await selectBlock( 'Block: Cover', screen );
@@ -168,10 +155,7 @@ describe( 'Cover block', () => {
 
 		test( 'sets hasParallax attribute to true if fixed background toggled', async () => {
 			await setup( {
-				name: 'core/cover',
-				attributes: {
-					url: 'http://localhost/my-image.jpg',
-				},
+				url: 'http://localhost/my-image.jpg',
 			} );
 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
 				'has-parallax'
@@ -187,10 +171,7 @@ describe( 'Cover block', () => {
 
 		test( 'sets isRepeated attribute to true if repeated background toggled', async () => {
 			await setup( {
-				name: 'core/cover',
-				attributes: {
-					url: 'http://localhost/my-image.jpg',
-				},
+				url: 'http://localhost/my-image.jpg',
 			} );
 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
 				'is-repeated'
@@ -206,10 +187,7 @@ describe( 'Cover block', () => {
 
 		test( 'sets left focalPoint attribute when focal point values changed', async () => {
 			await setup( {
-				name: 'core/cover',
-				attributes: {
-					url: 'http://localhost/my-image.jpg',
-				},
+				url: 'http://localhost/my-image.jpg',
 			} );
 
 			await selectBlock( 'Block: Cover', screen );
@@ -225,10 +203,7 @@ describe( 'Cover block', () => {
 
 		test( 'sets alt attribute if text entered in alt text box', async () => {
 			await setup( {
-				name: 'core/cover',
-				attributes: {
-					url: 'http://localhost/my-image.jpg',
-				},
+				url: 'http://localhost/my-image.jpg',
 			} );
 
 			await selectBlock( 'Block: Cover', screen );
@@ -241,10 +216,7 @@ describe( 'Cover block', () => {
 
 		test( 'clears media  when clear media button clicked', async () => {
 			const { container } = await setup( {
-				name: 'core/cover',
-				attributes: {
-					url: 'http://localhost/my-image.jpg',
-				},
+				url: 'http://localhost/my-image.jpg',
 			} );
 
 			await selectBlock( 'Block: Cover', screen );
@@ -265,7 +237,7 @@ describe( 'Cover block', () => {
 
 		describe( 'Color panel', () => {
 			test( 'applies selected opacity to block when number control value changed', async () => {
-				const { container } = await setup( { name: 'core/cover' } );
+				const { container } = await setup();
 
 				await createAndselectBlock();
 
@@ -295,7 +267,7 @@ describe( 'Cover block', () => {
 			} );
 
 			test( 'applies selected opacity to block when slider moved', async () => {
-				const { container } = await setup( { name: 'core/cover' } );
+				const { container } = await setup();
 
 				await createAndselectBlock();
 
@@ -325,7 +297,7 @@ describe( 'Cover block', () => {
 
 		describe( 'Dimensions panel', () => {
 			test( 'sets minHeight attribute when number control value changed', async () => {
-				await setup( { name: 'core/cover' } );
+				await setup();
 				await createAndselectBlock();
 				await userEvent.click(
 					screen.getByRole( 'tab', {
