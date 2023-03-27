@@ -43,7 +43,7 @@ import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
-import { useNavigationCommands } from '../../hooks/commands/use-navigation-commands';
+import { useCommands } from '../../hooks/commands';
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
@@ -62,7 +62,7 @@ export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
 	useSyncCanvasModeWithURL();
-	useNavigationCommands();
+	useCommands();
 
 	const hubRef = useRef();
 	const { params } = useLocation();
