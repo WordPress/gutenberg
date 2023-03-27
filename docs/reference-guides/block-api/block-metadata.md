@@ -28,12 +28,6 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 		"my-plugin/message": "message"
 	},
 	"usesContext": [ "groupId" ],
-	"editorSelectors": {
-		"root": ".editor-styles-wrapper .wp-block-my-plugin-notice"
-	},
-	"selectors": {
-		"root": ".wp-block-my-plugin-notice"
-	},
 	"supports": {
 		"align": true
 	},
@@ -382,71 +376,6 @@ See [the block context documentation](/docs/reference-guides/block-api/block-con
 ```json
 {
 	"usesContext": [ "message" ]
-}
-```
-
-### Editor Selectors
-
--   Type: `object`
--   Optional
--   Localized: No
--   Property: `editorSelectors`
--   Default: `{}`
--   Since: `WordPress 6.3.0`
-
-Any editor specific custom CSS selectors, keyed by `root`, feature, or
-sub-feature, to be used when generating block styles for theme.json
-(global styles) stylesheets in the editor.
-
-Editor only selectors override those defined within the `selectors` property.
-
-See the [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
-
-```json
-{
-	"editorSelectors": {
-		"root": ".my-custom-block-selector",
-		"color": {
-			"text": ".my-custom-block-selector p"
-		},
-		"typography": {
-			"root": ".my-custom-block-selector > h2",
-			"text-decoration": ".my-custom-block-selector > h2 span"
-		}
-	}
-}
-```
-
-### Selectors
-
--   Type: `object`
--   Optional
--   Localized: No
--   Property: `selectors`
--   Default: `{}`
--   Since: `WordPress 6.3.0`
-
-Any custom CSS selectors, keyed by `root`, feature, or sub-feature, to be used
-when generating block styles for theme.json (global styles) stylesheets.
-Providing custom selectors allows more fine grained control over which styles
-apply to what block elements, e.g. applying typography styles only to an inner
-heading while colors are still applied on the outer block wrapper etc.
-
-
-See the [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
-
-```json
-{
-	"selectors": {
-		"root": ".my-custom-block-selector",
-		"color": {
-			"text": ".my-custom-block-selector p"
-		},
-		"typography": {
-			"root": ".my-custom-block-selector > h2",
-			"text-decoration": ".my-custom-block-selector > h2 span"
-		}
-	}
 }
 ```
 

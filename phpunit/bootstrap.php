@@ -134,46 +134,6 @@ function gutenberg_register_test_block_for_feature_selectors() {
 			),
 		)
 	);
-
-	WP_Block_Type_Registry::get_instance()->register(
-		'my/block-with-selectors',
-		array(
-			'api_version' => 2,
-			'attributes'  => array(
-				'textColor' => array(
-					'type' => 'string',
-				),
-				'style'     => array(
-					'type' => 'object',
-				),
-			),
-			'supports'    => array(
-				'__experimentalBorder' => array(
-					'radius' => true,
-				),
-				'color'                => array(
-					'background' => true,
-					'text'       => true,
-				),
-				'spacing'              => array(
-					'padding' => true,
-				),
-				'typography'           => array(
-					'fontSize' => true,
-				),
-			),
-			'selectors'   => array(
-				'root'       => '.custom-root-selector',
-				'border'     => array(
-					'root' => '.custom-root-selector img',
-				),
-				'color'      => array(
-					'text' => '.custom-root-selector > figcaption',
-				),
-				'typography' => '.custom-root-selector > figcaption',
-			),
-		)
-	);
 }
 tests_add_filter( 'init', 'gutenberg_register_test_block_for_feature_selectors' );
 

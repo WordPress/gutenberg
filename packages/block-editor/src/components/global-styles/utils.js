@@ -365,7 +365,7 @@ export function getValueFromVariable( features, blockName, variable ) {
  */
 export function scopeSelector( scope, selector ) {
 	const scopes = scope.split( ',' );
-	const selectors = selector.split( ',' );
+	const selectors = selector && selector.split( ',' );
 
 	const selectorsScoped = [];
 	scopes.forEach( ( outer ) => {
