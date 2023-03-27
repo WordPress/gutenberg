@@ -135,7 +135,7 @@ export default function NewTemplate( {
 				sprintf(
 					// translators: %s: Title of the created template e.g: "Category".
 					__( '"%s" successfully created.' ),
-					title
+					newTemplate.title?.rendered || title
 				),
 				{
 					type: 'snackbar',
