@@ -44,31 +44,15 @@ const EMPTY_OBJECT = {};
 function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
-		allowedBlocks,
-		__experimentalDefaultBlock,
-		__experimentalDirectInsert,
 		template,
 		templateLock,
 		wrapperRef,
 		templateInsertUpdatesSelection,
-		__experimentalCaptureToolbars: captureToolbars,
 		__experimentalAppenderTagName,
 		renderAppender,
-		orientation,
 		placeholder,
 		layout,
 	} = props;
-
-	useNestedSettingsUpdate(
-		clientId,
-		allowedBlocks,
-		__experimentalDefaultBlock,
-		__experimentalDirectInsert,
-		templateLock,
-		captureToolbars,
-		orientation,
-		layout
-	);
 
 	useInnerBlockTemplateSync(
 		clientId,
@@ -216,6 +200,27 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		layout,
 		...options,
 	};
+
+	const {
+		allowedBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
+		templateLock,
+		__experimentalCaptureToolbars: captureToolbars,
+		orientation,
+	} = innerBlocksProps;
+
+	useNestedSettingsUpdate(
+		clientId,
+		allowedBlocks,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
+		templateLock,
+		captureToolbars,
+		orientation,
+		layout
+	);
+
 	const InnerBlocks =
 		innerBlocksProps.value && innerBlocksProps.onChange
 			? ControlledInnerBlocks
