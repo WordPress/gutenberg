@@ -44,7 +44,7 @@ const variations = [
 	},
 ];
 
-if ( window.__experimentalEnableGroupGridVariation ) {
+if ( window?.__experimentalEnableGroupGridVariation ) {
 	variations.push( {
 		name: 'group-grid',
 		title: __( 'Grid' ),
