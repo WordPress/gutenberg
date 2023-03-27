@@ -131,6 +131,7 @@ function GroupEdit( {
 		{
 			templateLock,
 			renderAppender,
+			__unstableDisableLayoutClassNames: ! layoutSupportEnabled,
 		}
 	);
 
