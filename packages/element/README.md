@@ -48,9 +48,9 @@ const domElement = document.getElementById( 'greeting' );
 const uiElement  = createElement( Greeting, { toWhom: 'World' } );
 
 if ( createRoot ) {
-    createRoot( domElement ).render( uiElement );
+	createRoot( domElement ).render( uiElement );
 } else {
-    render( uiElement, domElement );
+	render( uiElement, domElement );
 }
 ```
 
