@@ -9,18 +9,19 @@ test.describe( 'Site editor url navigation', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activateTheme( 'twentytwentyone' ),
-			// Fallback clean-up in case of failure.
-			requestUtils.deleteAllPosts(),
-			requestUtils.deleteAllTemplates( 'wp_template' ),
-			requestUtils.deleteAllTemplates( 'wp_template_part' ),
-		] );
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.describe(
 		'Redirection after template and template part creation',
 		() => {
+			test.afterEach( async ( { requestUtils } ) => {
+				await Promise.all( [
+					requestUtils.deleteAllPosts(),
+					requestUtils.deleteAllTemplates( 'wp_template' ),
+					requestUtils.deleteAllTemplates( 'wp_template_part' ),
+				] );
+			} );
 			test( 'Redirection after template creation', async ( {
 				admin,
 				page,
@@ -47,7 +48,7 @@ test.describe( 'Site editor url navigation', () => {
 				await page.click( 'role=button[name="Add New Template"i]' );
 				await page
 					.getByRole( 'menuitem', {
-						name: /Single item: Post./i,
+						name: /Single item: Post/,
 					} )
 					.click();
 				await page
@@ -57,15 +58,10 @@ test.describe( 'Site editor url navigation', () => {
 				await expect( page ).toHaveURL(
 					'/wp-admin/site-editor.php?postId=emptytheme%2F%2Fsingle-post-demo&postType=wp_template&canvas=edit'
 				);
-				await Promise.all( [
-					requestUtils.deleteAllPosts(),
-					requestUtils.deleteAllTemplates( 'wp_template' ),
-				] );
 			} );
 			test( 'Redirection after template part creation', async ( {
 				admin,
 				page,
-				requestUtils,
 			} ) => {
 				await admin.visitSiteEditor();
 				await page.click( 'role=button[name="Template Parts"i]' );
@@ -79,7 +75,6 @@ test.describe( 'Site editor url navigation', () => {
 				await expect( page ).toHaveURL(
 					'/wp-admin/site-editor.php?postId=emptytheme%2F%2Fdemo&postType=wp_template_part&canvas=edit'
 				);
-				await requestUtils.deleteAllTemplates( 'wp_template_part' );
 			} );
 		}
 	);
