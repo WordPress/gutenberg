@@ -13,6 +13,7 @@ import {
 	setupCoreBlocks,
 	within,
 } from 'test/helpers';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies
@@ -337,5 +338,47 @@ describe( 'Paragraph block', () => {
 	` );
 
 		jest.useRealTimers();
+	} );
+
+	it( 'should link text with clipboard contents', async () => {
+		// Arrange
+		Clipboard.getString.mockResolvedValue( 'https://wordpress.org' );
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const [ paragraphBlock ] = screen.getAllByLabelText(
+			/Paragraph Block\. Row 1/
+		);
+
+		// Act
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		changeAndSelectTextOfRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{
+				selectionStart: 2,
+				selectionEnd: 7,
+			}
+		);
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://github.com/react-navigation/react-navigation/issues/9701
+		await act( () => fireEvent.press( screen.getByLabelText( 'Link' ) ) );
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://github.com/react-navigation/react-navigation/issues/9701
+		await act( () =>
+			fireEvent.press(
+				screen.getByLabelText( 'Link to, Search or type URL' )
+			)
+		);
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <a href="https://wordpress.org">quick</a> brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		Clipboard.getString.mockReset();
 	} );
 } );
