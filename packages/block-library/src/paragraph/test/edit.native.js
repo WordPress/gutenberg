@@ -249,6 +249,48 @@ describe( 'Paragraph block', () => {
 	` );
 	} );
 
+	it( 'should link text without selection', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		const [ paragraphBlock ] = screen.getAllByLabelText(
+			/Paragraph Block\. Row 1/
+		);
+
+		// Act
+		fireEvent.press( paragraphBlock );
+		fireEvent.press( screen.getByLabelText( 'Link' ) );
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://github.com/react-navigation/react-navigation/issues/9701
+		await act( () =>
+			fireEvent.press(
+				screen.getByLabelText( 'Link to, Search or type URL' )
+			)
+		);
+		fireEvent.changeText(
+			screen.getByPlaceholderText( 'Search or type URL' ),
+			'wordpress.org'
+		);
+		fireEvent.changeText(
+			screen.getByPlaceholderText( 'Add link text' ),
+			'WordPress'
+		);
+		jest.useFakeTimers();
+		fireEvent.press( screen.getByLabelText( 'Apply' ) );
+		// Await link picker navigation delay
+		act( () => jest.runOnlyPendingTimers() );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p><a href="http://wordpress.org">WordPress</a></p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		jest.useRealTimers();
+	} );
+
 	it( 'should link text with selection', async () => {
 		// Arrange
 		const screen = await initializeEditor();
