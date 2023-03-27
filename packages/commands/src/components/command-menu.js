@@ -9,6 +9,7 @@ import { Command } from 'cmdk';
 import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Modal } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -86,20 +87,35 @@ export function CommandMenu() {
 		return () => document.removeEventListener( 'keydown', down );
 	}, [] );
 
+	if ( ! open ) {
+		return false;
+	}
+
 	return (
-		<Command.Dialog
-			open={ open }
-			onOpenChange={ setOpen }
-			label={ __( 'Global Command Menu' ) }
+		<Modal
+			className="commands-command-menu"
+			onRequestClose={ () => setOpen( false ) }
+			__experimentalHideHeader
+			focusOnMount="firstElement"
 		>
-			<Command.Input value={ search } onValueChange={ setSearch } />
-			<CommandsPerPage
-				key={ key }
-				navigateToPage={ navigateToPage }
-				loader={ currentLoader.current }
-				commands={ commands }
-				search={ search }
-			/>
-		</Command.Dialog>
+			<div className="commands-command-menu__container">
+				<Command label={ __( 'Global Command Menu' ) }>
+					<div className="commands-command-menu__header">
+						<Command.Input
+							value={ search }
+							onValueChange={ setSearch }
+							placeholder={ __( 'Ask anything' ) }
+						/>
+					</div>
+					<CommandsPerPage
+						key={ key }
+						navigateToPage={ navigateToPage }
+						loader={ currentLoader.current }
+						commands={ commands }
+						search={ search }
+					/>
+				</Command>
+			</div>
+		</Modal>
 	);
 }

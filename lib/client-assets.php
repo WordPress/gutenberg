@@ -389,7 +389,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-commands',
 		gutenberg_url( 'build/commands/style.css' ),
-		array(),
+		array( 'wp-components' ),
 		$version
 	);
 	$styles->add_data( 'wp-commands', 'rtl', 'replace' );
