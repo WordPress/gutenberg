@@ -48,7 +48,7 @@ test.describe( 'Site editor url navigation', () => {
 				await page.click( 'role=button[name="Add New Template"i]' );
 				await page
 					.getByRole( 'menuitem', {
-						name: /Single item: Post/,
+						name: 'Single item: Post',
 					} )
 					.click();
 				await page
