@@ -2,6 +2,7 @@
  * External dependencies
  */
 import {
+	act,
 	addBlock,
 	changeTextOfRichText,
 	changeAndSelectTextOfRichText,
@@ -246,5 +247,53 @@ describe( 'Paragraph block', () => {
 		<p class="has-text-align-center">ps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
+	} );
+
+	it( 'should link text with selection', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		const [ paragraphBlock ] = screen.getAllByLabelText(
+			/Paragraph Block\. Row 1/
+		);
+
+		// Act
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		changeAndSelectTextOfRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{
+				selectionStart: 2,
+				selectionEnd: 7,
+			}
+		);
+		fireEvent.press( screen.getByLabelText( 'Link' ) );
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://github.com/react-navigation/react-navigation/issues/9701
+		await act( () =>
+			fireEvent.press(
+				screen.getByLabelText( 'Link to, Search or type URL' )
+			)
+		);
+		fireEvent.changeText(
+			screen.getByPlaceholderText( 'Search or type URL' ),
+			'wordpress.org'
+		);
+		jest.useFakeTimers();
+		fireEvent.press( screen.getByLabelText( 'Apply' ) );
+		// Await link picker navigation delay
+		act( () => jest.runOnlyPendingTimers() );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <a href="http://wordpress.org">quick</a> brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		jest.useRealTimers();
 	} );
 } );
