@@ -8,8 +8,8 @@ import { fireEvent, measurePerformance, screen } from 'test/helpers';
  */
 import Paragraph from '../../edit';
 
-describe( 'RichText Performance', () => {
-	it( 'performance is stable when typing text using the Paragraph block', async () => {
+describe( 'Paragraph', () => {
+	it( 'performance is stable when typing text', async () => {
 		const scenario = async () => {
 			const paragraph = screen.getByPlaceholderText( 'Start writing…' );
 
