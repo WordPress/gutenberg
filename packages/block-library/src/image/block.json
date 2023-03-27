@@ -93,7 +93,6 @@
 			"color": true,
 			"radius": true,
 			"width": true,
-			"__experimentalSelector": "img, .wp-block-image__crop-area",
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": true,
@@ -101,6 +100,12 @@
 				"width": true
 			}
 		}
+	},
+	"selectors": {
+		"border": ".wp-block-image img"
+	},
+	"editorSelectors": {
+		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area"
 	},
 	"styles": [
 		{

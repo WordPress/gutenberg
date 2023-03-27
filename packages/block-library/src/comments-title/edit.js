@@ -110,6 +110,7 @@ export default function Edit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Show post title' ) }
 					checked={ showPostTitle }
 					onChange={ ( value ) =>
@@ -117,6 +118,7 @@ export default function Edit( {
 					}
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Show comments count' ) }
 					checked={ showCommentsCount }
 					onChange={ ( value ) =>

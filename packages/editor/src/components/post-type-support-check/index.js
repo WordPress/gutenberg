@@ -27,7 +27,7 @@ export function PostTypeSupportCheck( { postType, children, supportKeys } ) {
 	if ( postType ) {
 		isSupported = (
 			Array.isArray( supportKeys ) ? supportKeys : [ supportKeys ]
-		 ).some( ( key ) => !! postType.supports[ key ] );
+		).some( ( key ) => !! postType.supports[ key ] );
 	}
 
 	if ( ! isSupported ) {

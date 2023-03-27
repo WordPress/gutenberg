@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { mapValues, kebabCase } = require( 'lodash' );
+const { mapValues } = require( 'lodash' );
 const SimpleGit = require( 'simple-git' );
 
 /**
@@ -82,6 +82,17 @@ const config = require( '../config' );
  * @property {number=} minListViewOpen        Min time to open list view.
  * @property {number=} maxListViewOpen        Max time to open list view.
  */
+
+/**
+ * Sanitizes branch name to be used in a path or a filename.
+ *
+ * @param {string} branch
+ *
+ * @return {string} Sanitized branch name.
+ */
+function sanitizeBranchName( branch ) {
+	return branch.replace( /[^a-zA-Z0-9-]/g, '-' );
+}
 
 /**
  * Computes the average number from an array numbers.
@@ -182,10 +193,24 @@ function curateResults( testSuite, results ) {
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
 async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
-	await runShellScript(
-		`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
-		performanceTestDirectory
-	);
+	try {
+		await runShellScript(
+			`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
+			performanceTestDirectory
+		);
+	} catch ( error ) {
+		fs.mkdirSync( './__test-results/artifacts', { recursive: true } );
+		const artifactsFolder = path.join(
+			performanceTestDirectory,
+			'artifacts/'
+		);
+		await runShellScript(
+			'cp -Rv ' + artifactsFolder + ' ' + './__test-results/artifacts/'
+		);
+
+		throw error;
+	}
+
 	const resultsFile = path.join(
 		performanceTestDirectory,
 		`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
@@ -198,6 +223,7 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
 		)
 	);
+
 	return curateResults( testSuite, rawResults );
 }
 
@@ -284,8 +310,8 @@ async function runPerformanceTests( branches, options ) {
 	const branchDirectories = {};
 	for ( const branch of branches ) {
 		log( `    >> Branch: ${ branch }` );
-		const environmentDirectory =
-			rootDirectory + '/envs/' + kebabCase( branch );
+		const sanitizedBranch = sanitizeBranchName( branch );
+		const environmentDirectory = rootDirectory + '/envs/' + sanitizedBranch;
 		// @ts-ignore
 		branchDirectories[ branch ] = environmentDirectory;
 		const buildPath = `${ environmentDirectory }/plugin`;
@@ -386,7 +412,8 @@ async function runPerformanceTests( branches, options ) {
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
-				const runKey = `${ branch }_${ testSuite }_run-${ i }`;
+				const sanitizedBranch = sanitizeBranchName( branch );
+				const runKey = `${ sanitizedBranch }_${ testSuite }_run-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
 				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );

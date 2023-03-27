@@ -73,20 +73,20 @@ $swatch-gap: 12px;
 	max-width: 100%;
 
 	// Border styles.
-	border-left: 1px solid rgba(0, 0, 0, 0.1);
-	border-right: 1px solid rgba(0, 0, 0, 0.1);
-	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	border-left: 1px solid $gray-300;
+	border-right: 1px solid $gray-300;
+	border-bottom: 1px solid $gray-300;
 
 	&.first {
 		margin-top: $grid-unit-30;
-		border-top-left-radius: 2px;
-		border-top-right-radius: 2px;
-		border-top: 1px solid rgba(0, 0, 0, 0.1);
+		border-top-left-radius: $radius-block-ui;
+		border-top-right-radius: $radius-block-ui;
+		border-top: 1px solid $gray-300;
 	}
 
 	&.last {
-		border-bottom-left-radius: 2px;
-		border-bottom-right-radius: 2px;
+		border-bottom-left-radius: $radius-block-ui;
+		border-bottom-right-radius: $radius-block-ui;
 	}
 
 	> div,

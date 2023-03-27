@@ -12,6 +12,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 				typography: {
 					letterSpacing: '22px',
 					fontSize: '2rem',
+					textColumns: 3,
 					textTransform: 'uppercase',
 				},
 			},
@@ -19,6 +20,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 		expect( getTypographyClassesAndStyles( attributes ) ).toEqual( {
 			className: 'has-tofu-font-family has-large-font-size',
 			style: {
+				columnCount: 3,
 				letterSpacing: '22px',
 				fontSize: '2rem',
 				textTransform: 'uppercase',

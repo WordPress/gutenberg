@@ -366,7 +366,7 @@ function LinkControl( {
 						<Button
 							variant="primary"
 							onClick={ handleSubmit }
-							className="xblock-editor-link-control__search-submit"
+							className="block-editor-link-control__search-submit"
 							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
 						>
 							{ __( 'Apply' ) }

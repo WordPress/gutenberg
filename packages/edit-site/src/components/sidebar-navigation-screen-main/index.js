@@ -17,23 +17,36 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 
 export default function SidebarNavigationScreenMain() {
-	const { navigationMenus } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( coreStore );
-		return {
-			navigationMenus: getEntityRecords( 'postType', 'wp_navigation', {
-				per_page: -1,
+	const hasNavigationMenus = useSelect( ( select ) => {
+		// The query needs to be the same as in the "SidebarNavigationScreenNavigationMenus" component,
+		// to avoid double network calls.
+		const navigationMenus = select( coreStore ).getEntityRecords(
+			'postType',
+			'wp_navigation',
+			{
+				per_page: 1,
 				status: 'publish',
-			} ),
-		};
+				order: 'desc',
+				orderby: 'date',
+			}
+		);
+
+		return navigationMenus?.length > 0;
 	} );
 
+	const showNavigationScreen = process.env.IS_GUTENBERG_PLUGIN
+		? hasNavigationMenus
+		: false;
 	return (
 		<SidebarNavigationScreen
 			isRoot
 			title={ __( 'Design' ) }
+			description={ __(
+				'Customize the appearance of your website using the block editor.'
+			) }
 			content={
 				<ItemGroup>
-					{ !! navigationMenus && navigationMenus.length > 0 && (
+					{ showNavigationScreen && (
 						<NavigatorButton
 							as={ SidebarNavigationItem }
 							path="/navigation"

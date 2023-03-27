@@ -59,7 +59,7 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 
 -	**Name:** core/buttons
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, spacing (blockGap, margin), typography (fontSize, lineHeight)
+-	**Supports:** align (full, wide), anchor, spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** 
 
 ## Calendar
@@ -105,7 +105,7 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 -	**Name:** core/columns
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isStackedOnMobile, verticalAlignment
+-	**Attributes:** isStackedOnMobile, templateLock, verticalAlignment
 
 ## Comment Author Avatar (deprecated)
 
@@ -230,7 +230,7 @@ Add an image or video with a text overlay — great for headers. ([Source](https
 
 -	**Name:** core/cover
 -	**Category:** media
--	**Supports:** align, anchor, color (~~background~~, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, color (text, ~~background~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, minHeight, minHeightUnit, overlayColor, tagName, templateLock, url, useFeaturedImage
 
 ## Embed
@@ -584,6 +584,15 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** prefix, separator, suffix, term, textAlign
 
+## Time To Read
+
+Show minutes required to finish reading the post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
+
+-	**Name:** core/post-time-to-read
+-	**Category:** theme
+-	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~multiple~~
+-	**Attributes:** textAlign
+
 ## Post Title
 
 Displays the title of a post, page, or any other content-type. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-title))
@@ -744,7 +753,7 @@ Describe in a few words what the site is about. The tagline can be used in searc
 -	**Name:** core/site-tagline
 -	**Category:** theme
 -	**Supports:** align (full, wide), anchor, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** placeholder, textAlign
+-	**Attributes:** textAlign
 
 ## Site Title
 

@@ -45,7 +45,6 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 	const [ width, setWidth ] = useState( style?.replace( /\D/g, '' ) );
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
-		value,
 		settings: image,
 	} );
 
