@@ -385,4 +385,34 @@ describe( 'Paragraph block', () => {
 
 		Clipboard.getString.mockReset();
 	} );
+
+	it( 'should not remove leading or trailing whitespace when formatting', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const [ paragraphBlock ] = screen.getAllByLabelText(
+			/Paragraph Block\. Row 1/
+		);
+
+		// Act
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		changeAndSelectTextOfRichText(
+			paragraphTextInput,
+			'     some text      ',
+			{
+				selectionStart: 5,
+				selectionEnd: 14,
+			}
+		);
+		fireEvent.press( screen.getByLabelText( 'Italic' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>     <em>some text</em>      </p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
 } );
