@@ -1258,6 +1258,39 @@ test.describe( 'Multi-block selection', () => {
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2 ] );
 	} );
+
+	test( 'should be able to expand "full" block selection', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '1' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '2' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: '3' },
+				},
+				{
+					name: 'core/list-item',
+					attributes: { content: '4' },
+				},
+			],
+		} );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 4 } );
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [] );
+	} );
 } );
 
 class MultiBlockSelectionUtils {

@@ -958,11 +958,15 @@ export function __unstableIsSelectionCollapsed( state ) {
 	);
 }
 
+export function __unstableIsBlockMergeable( state, clientId ) {
+	const blockName = getBlockName( state, clientId );
+	const blockType = getBlockType( blockName );
+	return !! blockType.merge;
+}
+
 export function __unstableSelectionHasUnmergeableBlock( state ) {
 	return getSelectedBlockClientIds( state ).some( ( clientId ) => {
-		const blockName = getBlockName( state, clientId );
-		const blockType = getBlockType( blockName );
-		return ! blockType.merge;
+		return ! __unstableIsBlockMergeable( state, clientId );
 	} );
 }
 
