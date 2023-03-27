@@ -358,6 +358,9 @@ class WP_Theme_JSON_Gutenberg {
 			'duotone'          => null,
 			'gradients'        => null,
 			'link'             => null,
+			'heading'          => null,
+			'button'           => null,
+			'caption'          => null,
 			'palette'          => null,
 			'text'             => null,
 		),
@@ -559,6 +562,9 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'border', 'style' ),
 		array( 'border', 'width' ),
 		array( 'color', 'link' ),
+		array( 'color', 'heading' ),
+		array( 'color', 'button' ),
+		array( 'color', 'caption' ),
 		array( 'dimensions', 'minHeight' ),
 		// BEGIN EXPERIMENTAL.
 		// Allow `position.fixed` to be opted-in by default.
