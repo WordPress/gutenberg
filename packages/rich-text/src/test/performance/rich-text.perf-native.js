@@ -9,11 +9,15 @@ import {
 } from 'test/helpers';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import RichText from '../../component/index.native';
 
 describe( 'RichText Performance', () => {
+	const onCreateUndoLevel = jest.fn();
+	const onChange = jest.fn();
+	const onSelectionChange = jest.fn();
+
 	it( 'performance is stable when typing using Rich Text', async () => {
 		const scenario = async () => {
 			const richTextInput = screen.getByLabelText( 'Text input. Empty' );
@@ -26,8 +30,15 @@ describe( 'RichText Performance', () => {
 			);
 		};
 
-		await measurePerformance( <RichText onChange={ jest.fn() } />, {
-			scenario,
-		} );
+		await measurePerformance(
+			<RichText
+				onChange={ onChange }
+				onCreateUndoLevel={ onCreateUndoLevel }
+				onSelectionChange={ onSelectionChange }
+			/>,
+			{
+				scenario,
+			}
+		);
 	} );
 } );
