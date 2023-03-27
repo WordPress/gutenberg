@@ -9,7 +9,7 @@ import { fireEvent, measurePerformance, screen } from 'test/helpers';
 /**
  * Internal dependencies
  */
-import Paragraph from '../edit';
+import Paragraph from '../../edit';
 
 describe( 'RichText Performance', () => {
 	it( 'performance is stable when typing text using the Paragraph block', async () => {
