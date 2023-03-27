@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { immutableSet } from '../utils';
+import { immutableSet } from '../object';
 
 describe( 'immutableSet', () => {
 	describe( 'handling falsy values properly', () => {
