@@ -34,10 +34,10 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 		}
 
 		// Duotone (No fallback selectors for Duotone).
-		if ( 'filters.duotone' === $target || array( 'filters', 'duotone' ) === $target ) {
+		if ( 'filter.duotone' === $target || array( 'filter', 'duotone' ) === $target ) {
 			// Prefer editor selector if available.
 			$duotone_editor_selector = $use_editor_selectors
-				? _wp_array_get( $block_type->editor_selectors, array( 'filters', 'duotone' ), null )
+				? _wp_array_get( $block_type->editor_selectors, array( 'filter', 'duotone' ), null )
 				: null;
 
 			if ( $duotone_editor_selector ) {
@@ -46,7 +46,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 
 			// If selectors API in use, only use it's value or null.
 			if ( $has_selectors ) {
-				return _wp_array_get( $block_type->selectors, array( 'filters', 'duotone' ), null );
+				return _wp_array_get( $block_type->selectors, array( 'filter', 'duotone' ), null );
 			}
 
 			// Selectors API, not available, check for old experimental selector.
