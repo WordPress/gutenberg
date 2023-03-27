@@ -118,7 +118,7 @@ function GroupEdit( {
 		// state so that blocks can dragged onto the placeholder area
 		// from both the list view and in the editor canvas.
 		renderAppender = false;
-	} else if ( ! hasInnerBlocks && ! showPlaceholder ) {
+	} else if ( ! hasInnerBlocks ) {
 		// When there is no placeholder, but the block is also empty,
 		// use the larger button appender.
 		renderAppender = InnerBlocks.ButtonBlockAppender;
