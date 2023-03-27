@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalListView as ListView } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import {
 	useFocusOnMount,
@@ -18,6 +18,7 @@ import { ESCAPE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../private-apis';
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
@@ -33,7 +34,7 @@ export default function ListViewSidebar() {
 
 	const instanceId = useInstanceId( ListViewSidebar );
 	const labelId = `edit-site-editor__list-view-panel-label-${ instanceId }`;
-
+	const { PrivateListView } = unlock( blockEditorPrivateApis );
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
@@ -59,7 +60,7 @@ export default function ListViewSidebar() {
 					focusOnMountRef,
 				] ) }
 			>
-				<ListView />
+				<PrivateListView />
 			</div>
 		</div>
 	);

@@ -81,8 +81,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * - prevent_override => Disables override of default presets by theme presets.
 	 *                       The relationship between whether to override the defaults
 	 *                       and whether the defaults are enabled is inverse:
-	 *                         - If defaults are enabled  => theme presets should not be overriden
-	 *                         - If defaults are disabled => theme presets should be overriden
+	 *                         - If defaults are enabled  => theme presets should not be overridden
+	 *                         - If defaults are disabled => theme presets should be overridden
 	 *                       For example, a theme sets defaultPalette to false,
 	 *                       making the default palette hidden from the user.
 	 *                       In that case, we want all the theme presets to be present,
@@ -144,8 +144,8 @@ class WP_Theme_JSON_Gutenberg {
 			'path'              => array( 'color', 'duotone' ),
 			'prevent_override'  => array( 'color', 'defaultDuotone' ),
 			'use_default_names' => false,
-			'value_func'        => 'gutenberg_get_duotone_filter_property',
-			'css_vars'          => '--wp--preset--duotone--$slug',
+			'value_func'        => null, // CSS Custom Properties for duotone are handled by block supports in class-wp-duotone-gutenberg.php.
+			'css_vars'          => null,
 			'classes'           => array(),
 			'properties'        => array( 'filter' ),
 		),
@@ -229,6 +229,7 @@ class WP_Theme_JSON_Gutenberg {
 		'border-left-width'                 => array( 'border', 'left', 'width' ),
 		'border-left-style'                 => array( 'border', 'left', 'style' ),
 		'color'                             => array( 'color', 'text' ),
+		'column-count'                      => array( 'typography', 'textColumns' ),
 		'font-family'                       => array( 'typography', 'fontFamily' ),
 		'font-size'                         => array( 'typography', 'fontSize' ),
 		'font-style'                        => array( 'typography', 'fontStyle' ),
@@ -396,6 +397,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontWeight'     => null,
 			'letterSpacing'  => null,
 			'lineHeight'     => null,
+			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
 		),
@@ -456,6 +458,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontWeight'     => null,
 			'letterSpacing'  => null,
 			'lineHeight'     => null,
+			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
 		),
@@ -465,18 +468,20 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Defines which pseudo selectors are enabled for which elements.
 	 *
-	 * The order of the selectors should be: visited, hover, focus, active.
-	 * This is to ensure that 'visited' has the lowest specificity
-	 * and the other selectors can always overwrite it.
+	 * The order of the selectors should be: link, any-link, visited, hover, focus, active.
+	 * This is to ensure the user action (hover, focus and active) styles have a higher
+	 * specificity than the visited styles, which in turn have a higher specificity than
+	 * the unvisited styles.
 	 *
 	 * See https://core.trac.wordpress.org/ticket/56928.
 	 * Note: this will affect both top-level and block-level elements.
 	 *
 	 * @since 6.1.0
+	 * @since 6.2.0 Added support for `:link` and `:any-link`.
 	 */
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
-		'link'   => array( ':visited', ':hover', ':focus', ':active' ),
-		'button' => array( ':visited', ':hover', ':focus', ':active' ),
+		'link'   => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':active' ),
+		'button' => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':active' ),
 	);
 
 	/**
@@ -545,7 +550,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Options that settings.appearanceTools enables.
 	 *
 	 * @since 6.0.0
-	 * @since 6.2.0 Added `position.fixed` and `position.sticky`.
+	 * @since 6.2.0 Added `dimensions.minHeight` and `position.sticky`.
 	 * @var array
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
@@ -555,7 +560,12 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'border', 'width' ),
 		array( 'color', 'link' ),
 		array( 'dimensions', 'minHeight' ),
+		// BEGIN EXPERIMENTAL.
+		// Allow `position.fixed` to be opted-in by default.
+		// Sticky position support was backported to WordPress 6.2 in https://core.trac.wordpress.org/ticket/57618.
+		// While `fixed` was included as a valid setting, exposing it by default is still experimental.
 		array( 'position', 'fixed' ),
+		// END EXPERIMENTAL.
 		array( 'position', 'sticky' ),
 		array( 'spacing', 'blockGap' ),
 		array( 'spacing', 'margin' ),
@@ -790,7 +800,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The new selector.
 	 */
 	protected static function append_to_selector( $selector, $to_append, $position = 'right' ) {
-		if ( ! str_contains( ',', $selector ) ) {
+		if ( ! str_contains( $selector, ',' ) ) {
 			return 'right' === $position ? $selector . $to_append : $to_append . $selector;
 		}
 		$new_selectors = array();
@@ -843,56 +853,22 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		foreach ( $blocks as $block_name => $block_type ) {
-			if (
-				isset( $block_type->supports['__experimentalSelector'] ) &&
-				is_string( $block_type->supports['__experimentalSelector'] )
-			) {
-				static::$blocks_metadata[ $block_name ]['selector'] = $block_type->supports['__experimentalSelector'];
-			} else {
-				static::$blocks_metadata[ $block_name ]['selector'] = '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) );
+			$root_selector = wp_get_block_css_selector( $block_type );
+
+			static::$blocks_metadata[ $block_name ]['selector']  = $root_selector;
+			static::$blocks_metadata[ $block_name ]['selectors'] = static::get_block_selectors( $block_type, $root_selector );
+
+			$elements = static::get_block_element_selectors( $root_selector );
+			if ( ! empty( $elements ) ) {
+				static::$blocks_metadata[ $block_name ]['elements'] = $elements;
 			}
 
-			if (
-				isset( $block_type->supports['color']['__experimentalDuotone'] ) &&
-				is_string( $block_type->supports['color']['__experimentalDuotone'] )
-			) {
-				static::$blocks_metadata[ $block_name ]['duotone'] = $block_type->supports['color']['__experimentalDuotone'];
+			// The block may or may not have a duotone selector.
+			$duotone_selector = wp_get_block_css_selector( $block_type, 'filters.duotone' );
+			if ( null !== $duotone_selector ) {
+				static::$blocks_metadata[ $block_name ]['duotone'] = $duotone_selector;
 			}
 
-			// Generate block support feature level selectors if opted into
-			// for the current block.
-			$features = array();
-			foreach ( static::BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS as $key => $feature ) {
-				if (
-					isset( $block_type->supports[ $key ]['__experimentalSelector'] ) &&
-					$block_type->supports[ $key ]['__experimentalSelector']
-				) {
-					$features[ $feature ] = static::scope_selector(
-						static::$blocks_metadata[ $block_name ]['selector'],
-						$block_type->supports[ $key ]['__experimentalSelector']
-					);
-				}
-			}
-
-			if ( ! empty( $features ) ) {
-				static::$blocks_metadata[ $block_name ]['features'] = $features;
-			}
-
-			// Assign defaults, then overwrite those that the block sets by itself.
-			// If the block selector is compounded, will append the element to each
-			// individual block selector.
-			$block_selectors = explode( ',', static::$blocks_metadata[ $block_name ]['selector'] );
-			foreach ( static::ELEMENTS as $el_name => $el_selector ) {
-				$element_selector = array();
-				foreach ( $block_selectors as $selector ) {
-					if ( $selector === $el_selector ) {
-						$element_selector = array( $el_selector );
-						break;
-					}
-					$element_selector[] = static::append_to_selector( $el_selector, $selector . ' ', 'left' );
-				}
-				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = implode( ',', $element_selector );
-			}
 			// If the block has style variations, append their selectors to the block metadata.
 			if ( ! empty( $block_type->styles ) ) {
 				$style_selectors = array();
@@ -1305,7 +1281,7 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								} else {
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%s .%s%s' : '%s.%s%s';
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%1$s .%2$s%3$s' : '%1$s-%2$s%1$s-%2$s%3$s';
 									$layout_selector = sprintf(
 										$format,
 										$selector,
@@ -1332,7 +1308,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				if (
 					! empty( $class_name ) &&
-					! empty( $base_style_rules )
+					is_array( $base_style_rules )
 				) {
 					// Output display mode. This requires special handling as `display` is not exposed in `safe_style_css_filter`.
 					if (
@@ -2222,8 +2198,8 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			$feature_selectors = null;
-			if ( isset( $selectors[ $name ]['features'] ) ) {
-				$feature_selectors = $selectors[ $name ]['features'];
+			if ( isset( $selectors[ $name ]['selectors'] ) ) {
+				$feature_selectors = $selectors[ $name ]['selectors'];
 			}
 
 			$variation_selectors = array();
@@ -2240,8 +2216,8 @@ class WP_Theme_JSON_Gutenberg {
 				'name'       => $name,
 				'path'       => array( 'styles', 'blocks', $name ),
 				'selector'   => $selector,
+				'selectors'  => $feature_selectors,
 				'duotone'    => $duotone_selector,
-				'features'   => $feature_selectors,
 				'variations' => $variation_selectors,
 			);
 
@@ -2287,40 +2263,7 @@ class WP_Theme_JSON_Gutenberg {
 		$selector         = $block_metadata['selector'];
 		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
 
-		/*
-		 * Process style declarations for block support features the current
-		 * block contains selectors for. Values for a feature with a custom
-		 * selector are filtered from the theme.json node before it is
-		 * processed as normal.
-		*/
-		$feature_declarations = array();
-
-		if ( ! empty( $block_metadata['features'] ) ) {
-			foreach ( $block_metadata['features'] as $feature_name => $feature_selector ) {
-				if ( ! empty( $node[ $feature_name ] ) ) {
-					// Create temporary node containing only the feature data
-					// to leverage existing `compute_style_properties` function.
-					$feature = array( $feature_name => $node[ $feature_name ] );
-					// Generate the feature's declarations only.
-					$new_feature_declarations = static::compute_style_properties( $feature, $settings, null, $this->theme_json );
-
-					// Merge new declarations with any that already exist for
-					// the feature selector. This may occur when multiple block
-					// support features use the same custom selector.
-					if ( isset( $feature_declarations[ $feature_selector ] ) ) {
-						foreach ( $new_feature_declarations as $new_feature_declaration ) {
-							$feature_declarations[ $feature_selector ][] = $new_feature_declaration;
-						}
-					} else {
-						$feature_declarations[ $feature_selector ] = $new_feature_declarations;
-					}
-
-					// Remove the feature from the block's node now the
-					// styles will be included under the feature level selector.
-					unset( $node[ $feature_name ] );
-				}
-			}
-		}
+		$feature_declarations = static::get_feature_declarations_for_block( $block_metadata, $node, $settings, $this->theme_json );
 
 		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
 		$style_variation_declarations = array();
@@ -3010,18 +2953,9 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $paths ) {
-			foreach ( $paths as $path ) {
-				$value = _wp_array_get( $input, $path, array() );
-				if (
-					isset( $value ) &&
-					! is_array( $value ) &&
-					static::is_safe_css_declaration( $property, $value )
-				) {
-					_wp_array_set( $output, $path, $value );
-				}
-			}
-		}
+		// Ensure indirect properties not included in any `PRESETS_METADATA` value are allowed.
+		static::remove_indirect_properties( $input, $output );
+
 		return $output;
 	}
 
@@ -3053,18 +2987,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// Ensure indirect properties not handled by `compute_style_properties` are allowed.
-		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $paths ) {
-			foreach ( $paths as $path ) {
-				$value = _wp_array_get( $input, $path, array() );
-				if (
-					isset( $value ) &&
-					! is_array( $value ) &&
-					static::is_safe_css_declaration( $property, $value )
-				) {
-					_wp_array_set( $output, $path, $value );
-				}
-			}
-		}
+		static::remove_indirect_properties( $input, $output );
 
 		return $output;
 	}
@@ -3082,6 +3005,29 @@ class WP_Theme_JSON_Gutenberg {
 		$style_to_validate = $property_name . ': ' . $property_value;
 		$filtered          = esc_html( safecss_filter_attr( $style_to_validate ) );
 		return ! empty( trim( $filtered ) );
+	}
+
+	/**
+	 * Removes indirect properties from the given input node and
+	 * sets in the given output node.
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param array $input  Node to process.
+	 * @param array $output The processed node. Passed by reference.
+	 */
+	private static function remove_indirect_properties( $input, &$output ) {
+		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $paths ) {
+			foreach ( $paths as $path ) {
+				$value = _wp_array_get( $input, $path );
+				if (
+					is_string( $value ) &&
+					static::is_safe_css_declaration( $property, $value )
+				) {
+					_wp_array_set( $output, $path, $value );
+				}
+			}
+		}
 	}
 
 	/**
@@ -3466,5 +3412,190 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_sizes );
+	}
+
+	/**
+	 * Generates the root selector for a block.
+	 *
+	 * @param object $block_type The block type.
+	 * @return string
+	 */
+	protected static function get_root_block_selector( $block_type ) {
+		// Prefer the selectors API if available.
+		if ( isset( $block_type->selectors ) &&
+			isset( $block_type->selectors['root'] )
+		) {
+			return $block_type->selectors['root'];
+		}
+
+		// Use the old experimental selector supports property if set.
+		if ( isset( $block_type->supports['__experimentalSelector'] ) &&
+			is_string( $block_type->supports['__experimentalSelector'] ) ) {
+			return $block_type->supports['__experimentalSelector'];
+		}
+
+		// Generate default block class selector.
+		$block_name = str_replace( '/', '-', str_replace( 'core/', '', $block_type->name ) );
+
+		return ".wp-block-{$block_name}";
+	}
+
+	/**
+	 * Returns the selectors metadata for a block.
+	 *
+	 * @param object $block_type    The block type.
+	 * @param string $root_selector The block's root selector.
+	 *
+	 * @return object The custom selectors set by the block.
+	 */
+	protected static function get_block_selectors( $block_type, $root_selector ) {
+		if ( ! empty( $block_type->selectors ) ) {
+			$in_editor = false;
+
+			if ( function_exists( 'get_current_screen' ) ) {
+				$current_screen = get_current_screen();
+				$in_editor      = $current_screen && $current_screen->is_block_editor;
+			}
+
+			if ( $in_editor && ! empty( $block_type->editor_selectors ) ) {
+				return array_merge( $block_type->selectors, $block_type->editor_selectors );
+			}
+
+			return $block_type->selectors;
+		}
+
+		$selectors = array( 'root' => $root_selector );
+		foreach ( static::BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS as $key => $feature ) {
+			$feature_selector = wp_get_block_css_selector( $block_type, $key );
+			if ( null !== $feature_selector ) {
+				$selectors[ $feature ] = array( 'root' => $feature_selector );
+			}
+		}
+
+		return $selectors;
+	}
+
+	/**
+	 * Generates all the element selectors for a block.
+	 *
+	 * @param string $root_selector The block's root CSS selector.
+	 * @return array The block's element selectors.
+	 */
+	protected static function get_block_element_selectors( $root_selector ) {
+		// Assign defaults, then override those that the block sets by itself.
+		// If the block selector is compounded, will append the element to each
+		// individual block selector.
+		$block_selectors   = explode( ',', $root_selector );
+		$element_selectors = array();
+
+		foreach ( static::ELEMENTS as $el_name => $el_selector ) {
+			$element_selector = array();
+			foreach ( $block_selectors as $selector ) {
+				if ( $selector === $el_selector ) {
+					$element_selector = array( $el_selector );
+					break;
+				}
+				$element_selector[] = static::append_to_selector( $el_selector, $selector . ' ', 'left' );
+			}
+			$element_selectors[ $el_name ] = implode( ',', $element_selector );
+		}
+
+		return $element_selectors;
+	}
+
+
+	/**
+	 * Generates style declarations for the block's features e.g. color, border,
+	 * typography etc, that have custom selectors in their block metadata.
+	 *
+	 * @param object $block_metadata The block's metadata containing selectors for
+	 * features.
+	 * @param object $block_node The merged theme.json node for the block.
+	 * @param object $settings The theme.json settings for the node.
+	 * @param object $theme_json The current theme.json config.
+	 *
+	 * @return array The style declarations for the block's features with custom
+	 * selectors.
+	 */
+	protected static function get_feature_declarations_for_block( $block_metadata, &$block_node, $settings, $theme_json ) {
+		$declarations = array();
+
+		if ( ! isset( $block_metadata['selectors'] ) ) {
+			return $declarations;
+		}
+
+		foreach ( $block_metadata['selectors'] as $feature => $feature_selectors ) {
+			// Skip if this is the block's root selector or the block doesn't
+			// have any styles for the feature.
+			if ( 'root' === $feature || empty( $block_node[ $feature ] ) ) {
+				continue;
+			}
+
+			if ( is_array( $feature_selectors ) ) {
+				foreach ( $feature_selectors as $subfeature => $subfeature_selector ) {
+					if ( 'root' === $subfeature || empty( $block_node[ $feature ][ $subfeature ] ) ) {
+						continue;
+					}
+
+					// Create temporary node containing only the subfeature data
+					// to leverage existing `compute_style_properties` function.
+					$subfeature_node = array(
+						$feature => array(
+							$subfeature => $block_node[ $feature ][ $subfeature ],
+						),
+					);
+
+					// Generate style declarations.
+					$new_declarations = static::compute_style_properties( $subfeature_node, $settings, null, $theme_json );
+
+					// Merge subfeature declarations into feature declarations.
+					if ( isset( $declarations[ $subfeature_selector ] ) ) {
+						foreach ( $new_declarations as $new_declaration ) {
+							$declarations[ $subfeature_selector ][] = $new_declaration;
+						}
+					} else {
+						$declarations[ $subfeature_selector ] = $new_declarations;
+					}
+
+					// Remove the subfeature from the block's node now its
+					// styles will be included under its own selector not the
+					// block's.
+					unset( $block_node[ $feature ][ $subfeature ] );
+				}
+			}
+
+			// Now subfeatures have been processed and removed we can process
+			// feature root selector or simple string selector.
+			if (
+				is_string( $feature_selectors ) ||
+				( isset( $feature_selectors['root'] ) && $feature_selectors['root'] )
+			) {
+				$feature_selector = is_string( $feature_selectors ) ? $feature_selectors : $feature_selectors['root'];
+
+				// Create temporary node containing only the feature data
+				// to leverage existing `compute_style_properties` function.
+				$feature_node = array( $feature => $block_node[ $feature ] );
+
+				// Generate the style declarations.
+				$new_declarations = static::compute_style_properties( $feature_node, $settings, null, $theme_json );
+
+				// Merge new declarations with any that already exist for
+				// the feature selector. This may occur when multiple block
+				// support features use the same custom selector.
+				if ( isset( $declarations[ $feature_selector ] ) ) {
+					foreach ( $new_declarations as $new_declaration ) {
+						$declarations[ $feature_selector ][] = $new_declaration;
+					}
+				} else {
+					$declarations[ $feature_selector ] = $new_declarations;
+				}
+
+				// Remove the feature from the block's node now its styles
+				// will be included under its own selector not the block's.
+				unset( $block_node[ $feature ] );
+			}
+		}
+
+		return $declarations;
 	}
 }

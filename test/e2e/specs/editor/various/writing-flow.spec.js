@@ -122,13 +122,13 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( 'Third' );
 
 		// Navigate to second paragraph.
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 6 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
 
 		// Bold second paragraph text.
 		await page.keyboard.down( 'Shift' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 6 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
 		await page.keyboard.up( 'Shift' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 
 		// Arrow left from selected bold should collapse to before the inline
 		// boundary. Arrow once more to traverse into first paragraph.
@@ -138,18 +138,18 @@ test.describe( 'Writing Flow', () => {
 
 		// Arrow right from end of first should traverse to second, *BEFORE*
 		// the bolded text. Another press should move within inline boundary.
-		await pageUtils.pressKeyTimes( 'ArrowRight', 2 );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 		await page.keyboard.type( 'Inside' );
 
 		// Arrow left from end of beginning of inline boundary should move to
 		// the outside of the inline boundary.
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 6 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
 		await page.keyboard.press( 'ArrowLeft' ); // Separate for emphasis.
 		await page.keyboard.type( 'Before' );
 
 		// Likewise, test at the end of the inline boundary for same effect.
 		await page.keyboard.press( 'ArrowRight' ); // Move inside
-		await pageUtils.pressKeyTimes( 'ArrowRight', 12 );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 12 } );
 		await page.keyboard.type( 'Inside' );
 		await page.keyboard.press( 'ArrowRight' );
 
@@ -176,18 +176,18 @@ test.describe( 'Writing Flow', () => {
 		pageUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '1 2' );
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'i' );
+		await pageUtils.pressKeys( 'primary+i' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'i' );
+		await pageUtils.pressKeys( 'primary+i' );
 		await page.keyboard.press( 'ArrowLeft' );
 
 		await expect.poll( editor.getEditedPostContent )
@@ -228,7 +228,7 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
 <p>a<br></p>
@@ -242,7 +242,7 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( 'b' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
@@ -258,7 +258,7 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
 <p>a<br>b</p>
@@ -273,7 +273,7 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
 <p><br>a</p>
@@ -286,7 +286,7 @@ test.describe( 'Writing Flow', () => {
 		pageUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
 <p><br></p>
@@ -327,7 +327,7 @@ test.describe( 'Writing Flow', () => {
 		).toHaveClass( /is-selected/ );
 
 		// Should remain in title upon modifier + ArrowDown:
-		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowDown' );
+		await pageUtils.pressKeys( 'primary+ArrowDown' );
 		await expect(
 			page.locator( 'role=document[name="Block: Shortcode"i]' )
 		).toHaveClass( /is-selected/ );
@@ -346,7 +346,7 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1 2 3' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', ' 3'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: ' 3'.length } );
 		await page.keyboard.press( 'Backspace' );
 
 		await expect.poll( editor.getEditedPostContent )
@@ -369,11 +369,10 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'alpha beta gamma' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', ' gamma'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: ' gamma'.length } );
 
-		await pageUtils.pressKeyWithModifier(
-			process.platform === 'darwin' ? 'alt' : 'primary',
-			'Backspace'
+		await pageUtils.pressKeys(
+			`${ process.platform === 'darwin' ? 'Alt' : 'primary' }+Backspace`
 		);
 
 		await expect.poll( editor.getEditedPostContent )
@@ -396,9 +395,9 @@ test.describe( 'Writing Flow', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'alpha beta gamma' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', ' gamma'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: ' gamma'.length } );
 		await page.keyboard.down( 'Shift' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 'beta'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 'beta'.length } );
 		await page.keyboard.up( 'Shift' );
 
 		await page.keyboard.press( 'Backspace' );
@@ -422,7 +421,7 @@ test.describe( 'Writing Flow', () => {
 		pageUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyTimes( 'Enter', 10 );
+		await pageUtils.pressKeys( 'Enter', { times: 10 } );
 
 		// Check that none of the paragraph blocks have <br> in them.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -486,10 +485,10 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '><<' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( '<<<' );
 		await page.keyboard.down( 'Shift' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', '<<\n<<<'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: '<<\n<<<'.length } );
 		await page.keyboard.up( 'Shift' );
 		await page.keyboard.press( 'Backspace' );
 
@@ -578,8 +577,8 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3' );
-		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
-		await pageUtils.pressKeyTimes( 'Delete', 2 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
+		await pageUtils.pressKeys( 'Delete', { times: 2 } );
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
 <p>1</p>
@@ -629,7 +628,7 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -675,10 +674,10 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( 'cd' );
 
 		// Selects part of the first list item, although invisible.
-		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		// Extends selection into the first paragraph
-		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// Mixed selection, so all content will be removed.
@@ -731,6 +730,7 @@ test.describe( 'Writing Flow', () => {
 	test( 'should not have a dead zone above an aligned block', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
@@ -745,7 +745,7 @@ test.describe( 'Writing Flow', () => {
 		await wideButton.click();
 
 		// Focus the block content
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
 		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );
@@ -791,13 +791,14 @@ test.describe( 'Writing Flow', () => {
 	test( 'should only consider the content as one tab stop', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/table' );
 		await page.keyboard.press( 'Enter' );
 		// Tab to the "Create table" button.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 		// Create the table.
 		await page.keyboard.press( 'Space' );
 		await expect(
@@ -881,12 +882,12 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.type( 'second' );
 
 		// Multi select both paragraphs.
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 2 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 		await page.keyboard.down( 'Shift' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 2 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.up( 'Shift' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
@@ -989,7 +990,7 @@ test.describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pageUtils.pressKeyWithModifier( 'alt', 'ArrowUp' );
+		await pageUtils.pressKeys( 'alt+ArrowUp' );
 		await page.keyboard.type( '.' );
 
 		// Expect the "." to be added at the start of the paragraph

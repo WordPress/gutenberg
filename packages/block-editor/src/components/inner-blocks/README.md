@@ -130,7 +130,7 @@ _Options:_
 -   `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
 -   `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
 
-If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used. Note that `contentOnly` can't be overriden: it's present, the `templateLock` value of any children is ignored.
+If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used. Note that `contentOnly` can't be overridden: it's present, the `templateLock` value of any children is ignored.
 
 If the block is a top level block: the locking of the Custom Post Type is used.
 

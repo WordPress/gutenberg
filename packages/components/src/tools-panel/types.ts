@@ -187,4 +187,5 @@ export type ToolsPanelMenuItemsConfig = {
 	panelItems: ToolsPanelItem[];
 	shouldReset: boolean;
 	currentMenuItems?: ToolsPanelMenuItems;
+	menuItemOrder: string[];
 };

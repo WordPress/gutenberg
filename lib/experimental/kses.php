@@ -78,7 +78,7 @@ add_action( 'set_current_user', 'gutenberg_override_core_kses_init_filters' );
  */
 function allow_filter_in_styles( $allow_css, $css_test_string ) {
 	if ( preg_match(
-		"/^filter: url\('#wp-duotone-[-a-zA-Z0-9]+'\) \!important$/",
+		"/^filter:\s*url\('#wp-duotone-[-a-zA-Z0-9]+'\) !important$/",
 		$css_test_string
 	) ) {
 		return true;
@@ -87,3 +87,22 @@ function allow_filter_in_styles( $allow_css, $css_test_string ) {
 }
 
 add_filter( 'safecss_filter_attr_allow_css', 'allow_filter_in_styles', 10, 2 );
+
+/**
+ * Mark CSS safe if it contains grid functions
+ *
+ * This function should not be backported to core.
+ *
+ * @param bool   $allow_css Whether the CSS is allowed.
+ * @param string $css_test_string The CSS to test.
+ */
+function allow_grid_functions_in_styles( $allow_css, $css_test_string ) {
+	if ( preg_match(
+		'/^grid-template-columns:\s*repeat\([0-9,a-z-\s\(\)]*\)$/',
+		$css_test_string
+	) ) {
+		return true;
+	}
+	return $allow_css;
+}
+add_filter( 'safecss_filter_attr_allow_css', 'allow_grid_functions_in_styles', 10, 2 );

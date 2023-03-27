@@ -65,6 +65,7 @@ const VALID_SETTINGS = [
 	'typography.fontWeight',
 	'typography.letterSpacing',
 	'typography.lineHeight',
+	'typography.textColumns',
 	'typography.textDecoration',
 	'typography.textTransform',
 ];
@@ -178,7 +179,7 @@ export function useGlobalStyle(
 	switch ( source ) {
 		case 'all':
 			rawResult =
-				// The stlyes.css path is allowed to be empty, so don't revert to base if undefined.
+				// The styles.css path is allowed to be empty, so don't revert to base if undefined.
 				finalPath === 'styles.css'
 					? get( userConfig, finalPath )
 					: get( mergedConfig, finalPath );
@@ -265,6 +266,16 @@ export function useSettingsForBlockElement(
 				};
 			}
 		} );
+
+		// The column-count style is named text column to reduce confusion with
+		// the columns block and manage expectations from the support.
+		// See: https://github.com/WordPress/gutenberg/pull/33587
+		if ( ! supportedStyles.includes( 'columnCount' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				textColumns: false,
+			};
+		}
 
 		[ 'contentSize', 'wideSize' ].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {

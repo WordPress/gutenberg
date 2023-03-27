@@ -15,8 +15,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import * as actions from '../actions';
 import { store as editorStore } from '..';
 
-jest.useRealTimers();
-
 const postId = 44;
 
 const postTypeConfig = {

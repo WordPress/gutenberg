@@ -141,10 +141,11 @@ export type AutocompleterUIProps = {
 	 * A function that defines the behavior of the completer when it is reset
 	 */
 	reset: ( event: Event ) => void;
+	// This is optional because it's still needed for mobile/native.
 	/**
 	 * The rich text value object the autocompleter is being applied to.
 	 */
-	value: RichTextValue;
+	value?: RichTextValue;
 	/**
 	 * A ref containing the editable element that will serve as the anchor for
 	 * `Autocomplete`'s `Popover`.

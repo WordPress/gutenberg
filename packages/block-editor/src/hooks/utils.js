@@ -202,6 +202,7 @@ export function useBlockSettings( name, parentLayout ) {
 	const fontStyle = useSetting( 'typography.fontStyle' );
 	const fontWeight = useSetting( 'typography.fontWeight' );
 	const lineHeight = useSetting( 'typography.lineHeight' );
+	const textColumns = useSetting( 'typography.textColumns' );
 	const textDecoration = useSetting( 'typography.textDecoration' );
 	const textTransform = useSetting( 'typography.textTransform' );
 	const letterSpacing = useSetting( 'typography.letterSpacing' );
@@ -244,6 +245,7 @@ export function useBlockSettings( name, parentLayout ) {
 				fontStyle,
 				fontWeight,
 				lineHeight,
+				textColumns,
 				textDecoration,
 				textTransform,
 				letterSpacing,
@@ -276,6 +278,7 @@ export function useBlockSettings( name, parentLayout ) {
 		fontStyle,
 		fontWeight,
 		lineHeight,
+		textColumns,
 		textDecoration,
 		textTransform,
 		letterSpacing,
