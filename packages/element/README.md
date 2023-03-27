@@ -178,7 +178,7 @@ You would have something like this as the conversionMap value:
 _Parameters_
 
 -   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Object`: The map used to convert the string to a react element.
+-   _conversionMap_ `Record<string, WPElement>`: The map used to convert the string to a react element.
 
 _Returns_
 
