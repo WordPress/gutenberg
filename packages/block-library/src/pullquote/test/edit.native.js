@@ -48,7 +48,7 @@ describe( 'Pullquote', () => {
 			keyCode: ENTER,
 		} );
 
-		// TODO: Determine a way to type after pressing ENTER within the Pullquote block.
+		// TODO: Determine a way to type after pressing ENTER within the block.
 
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );

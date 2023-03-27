@@ -75,6 +75,8 @@ describe( 'Verse block', () => {
 			keyCode: ENTER,
 		} );
 
+		// TODO: Determine a way to type after pressing ENTER within the block.
+
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:verse -->
