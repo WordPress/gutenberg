@@ -11,9 +11,7 @@
 		},
 		"color": {
 			"background": true,
-			"heading": true,
 			"button": true,
-			"text": true,
 			"caption": true,
 			"custom": true,
 			"customDuotone": true,
@@ -125,6 +123,7 @@
 					"slug": "midnight"
 				}
 			],
+			"heading": true,
 			"link": false,
 			"palette": [
 				{
@@ -187,7 +186,8 @@
 					"slug": "vivid-purple",
 					"color": "#9b51e0"
 				}
-			]
+			],
+			"text": true
 		},
 		"shadow": {
 			"defaultPresets": true,
