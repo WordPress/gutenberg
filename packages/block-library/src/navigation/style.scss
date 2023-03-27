@@ -729,4 +729,5 @@ button.wp-block-navigation-item__content {
 // Prevent scrolling of the parent content when the modal is open.
 html.has-modal-open {
 	overflow: hidden;
+	position: fixed;
 }
