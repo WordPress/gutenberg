@@ -12,6 +12,7 @@ import {
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { View } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -108,16 +109,28 @@ function GroupEdit( {
 		usedLayoutType: usedLayout?.type,
 		hasInnerBlocks,
 	} );
+
+	// Default to the regular appender being rendered.
+	let renderAppender;
+	if ( showPlaceholder ) {
+		// In the placeholder state, ensure the appender is not rendered.
+		// This is needed because `...innerBlocksProps` is used in the placeholder
+		// state so that blocks can dragged onto the placeholder area
+		// from both the list view and in the editor canvas.
+		renderAppender = false;
+	} else if ( ! hasInnerBlocks ) {
+		// When there is no placeholder, but the block is also empty,
+		// use the larger button appender.
+		renderAppender = InnerBlocks.ButtonBlockAppender;
+	}
+
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
 			? blockProps
 			: { className: 'wp-block-group__inner-container' },
 		{
 			templateLock,
-			renderAppender: hasInnerBlocks
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
-			__unstableDisableLayoutClassNames: ! layoutSupportEnabled,
+			renderAppender,
 		}
 	);
 
@@ -138,11 +151,14 @@ function GroupEdit( {
 				}
 			/>
 			{ showPlaceholder && (
-				<GroupPlaceHolder
-					clientId={ clientId }
-					name={ name }
-					onSelect={ selectVariation }
-				/>
+				<View { ...innerBlocksProps }>
+					{ innerBlocksProps.children }
+					<GroupPlaceHolder
+						clientId={ clientId }
+						name={ name }
+						onSelect={ selectVariation }
+					/>
+				</View>
 			) }
 			{ layoutSupportEnabled && ! showPlaceholder && (
 				<TagName { ...innerBlocksProps } />
