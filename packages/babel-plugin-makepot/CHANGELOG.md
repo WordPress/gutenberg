@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 5.13.0 (2023-03-15)
+
+## 5.12.0 (2023-03-01)
+
 ### Internal
 
 -   Lodash: Refactor away from `_.merge()` and remove Lodash dependency ([#48239](https://github.com/WordPress/gutenberg/pull/48239)).

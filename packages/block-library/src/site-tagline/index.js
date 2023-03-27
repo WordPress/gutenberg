@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
@@ -18,11 +13,6 @@ export { metadata, name };
 export const settings = {
 	icon,
 	edit,
-	example: {
-		attributes: {
-			placeholder: __( 'A site tagline.' ),
-		},
-	},
 	deprecated,
 };
 

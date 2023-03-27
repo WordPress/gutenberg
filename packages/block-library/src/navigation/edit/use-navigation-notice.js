@@ -23,7 +23,7 @@ function useNavigationNotice( { name, message = '' } = {} ) {
 				type: 'snackbar',
 			} );
 		},
-		[ noticeRef, createWarningNotice ]
+		[ noticeRef, createWarningNotice, message, name ]
 	);
 
 	const hideNotice = useCallback( () => {

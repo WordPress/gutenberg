@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -65,8 +65,8 @@ export const pickRelevantMediaFiles = ( image, size ) => {
 	);
 
 	imageProps.url =
-		get( image, [ 'sizes', size, 'url' ] ) ||
-		get( image, [ 'media_details', 'sizes', size, 'source_url' ] ) ||
+		image?.sizes?.[ size ]?.url ||
+		image?.media_details?.sizes?.[ size ]?.source_url ||
 		image.url;
 	return imageProps;
 };
@@ -192,7 +192,7 @@ export function ImageEdit( {
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
+		if ( captionRef.current && ! mediaAttributes.caption ) {
 			const { caption: omittedCaption, ...restMediaAttributes } =
 				mediaAttributes;
 			mediaAttributes = restMediaAttributes;
@@ -211,7 +211,7 @@ export function ImageEdit( {
 					: 'full',
 			};
 		} else {
-			// Keep the same url when selecting the same file, so "Image Size"
+			// Keep the same url when selecting the same file, so "Resolution"
 			// option is not changed.
 			additionalAttributes = { url };
 		}

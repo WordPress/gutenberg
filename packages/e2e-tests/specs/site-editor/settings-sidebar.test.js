@@ -75,11 +75,13 @@ describe( 'Settings sidebar', () => {
 
 			expect( templateCardBeforeNavigation ).toMatchObject( {
 				title: 'Index',
-				description: 'Displays posts.',
+				description:
+					'Used as a fallback template for all pages when a more specific template is not defined.',
 			} );
 			expect( templateCardAfterNavigation ).toMatchObject( {
 				title: 'Singular',
-				description: 'Displays a single post or page.',
+				description:
+					'Displays any single entry, such as a post or a page. This template will serve as a fallback when a more specific template (e.g., Single Post, Page, or Attachment) cannot be found.',
 			} );
 		} );
 	} );

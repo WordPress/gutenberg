@@ -1,18 +1,13 @@
 /**
  * External dependencies
  */
-import { colord, Colord } from 'colord';
+import { colord } from 'colord';
 
 /**
  * Internal dependencies
  */
 import { InputWithSlider } from './input-with-slider';
-
-interface RgbInputProps {
-	color: Colord;
-	onChange: ( nextColor: Colord ) => void;
-	enableAlpha: boolean;
-}
+import type { RgbInputProps } from './types';
 
 export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 	const { r, g, b, a } = color.toRgb();

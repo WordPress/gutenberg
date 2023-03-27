@@ -173,6 +173,37 @@ function HeadingColorItem( { name, parentMenu, variation = '' } ) {
 	);
 }
 
+function CaptionColorItem( { name, parentMenu, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const urlPrefix = variation ? `/variations/${ variation }` : '';
+	const supports = useSupportedStyles( name );
+	const hasSupport = supports.includes( 'captionColor' );
+	const [ color ] = useGlobalStyle(
+		prefix + 'elements.caption.color.text',
+		name
+	);
+
+	if ( ! hasSupport ) {
+		return null;
+	}
+
+	return (
+		<NavigationButtonAsItem
+			path={ parentMenu + urlPrefix + '/colors/caption' }
+			aria-label={ __( 'Colors caption styles' ) }
+		>
+			<HStack justify="flex-start">
+				<ZStack isLayered={ false } offset={ -8 }>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ color } />
+					</ColorIndicatorWrapper>
+				</ZStack>
+				<FlexItem>{ __( 'Captions' ) }</FlexItem>
+			</HStack>
+		</NavigationButtonAsItem>
+	);
+}
+
 function ButtonColorItem( { name, parentMenu, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
 	const urlPrefix = variation ? `/variations/${ variation }` : '';
@@ -249,6 +280,10 @@ function ScreenColors( { name, variation = '' } ) {
 								name={ name }
 								parentMenu={ parentMenu }
 								variation={ variation }
+							/>
+							<CaptionColorItem
+								name={ name }
+								parentMenu={ parentMenu }
 							/>
 							<HeadingColorItem
 								name={ name }

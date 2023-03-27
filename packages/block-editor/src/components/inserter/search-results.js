@@ -46,6 +46,7 @@ function InserterSearchResults( {
 	shouldFocusBlock = true,
 	prioritizePatterns,
 	selectBlockOnInsert,
+	orderInitialBlockItems,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -88,8 +89,12 @@ function InserterSearchResults( {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
+		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
+		if ( ! filterValue && orderInitialBlockItems ) {
+			orderedItems = orderInitialBlockItems( orderedItems );
+		}
 		const results = searchBlockItems(
-			orderBy( blockTypes, 'frecency', 'desc' ),
+			orderedItems,
 			blockTypeCategories,
 			blockTypeCollections,
 			filterValue
@@ -104,6 +109,7 @@ function InserterSearchResults( {
 		blockTypeCategories,
 		blockTypeCollections,
 		maxBlockTypes,
+		orderInitialBlockItems,
 	] );
 
 	// Announce search results on change.

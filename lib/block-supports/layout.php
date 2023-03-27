@@ -280,6 +280,37 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				);
 			}
 		}
+	} elseif ( 'grid' === $layout_type ) {
+		$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
+
+		$layout_styles[] = array(
+			'selector'     => $selector,
+			'declarations' => array( 'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))' ),
+		);
+
+		if ( $has_block_gap_support && isset( $gap_value ) ) {
+			$combined_gap_value = '';
+			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
+
+			foreach ( $gap_sides as $gap_side ) {
+				$process_value = is_string( $gap_value ) ? $gap_value : _wp_array_get( $gap_value, array( $gap_side ), $fallback_gap_value );
+				// Get spacing CSS variable from preset value if provided.
+				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
+					$index_to_splice = strrpos( $process_value, '|' ) + 1;
+					$slug            = _wp_to_kebab_case( substr( $process_value, $index_to_splice ) );
+					$process_value   = "var(--wp--preset--spacing--$slug)";
+				}
+				$combined_gap_value .= "$process_value ";
+			}
+			$gap_value = trim( $combined_gap_value );
+
+			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'gap' => $gap_value ),
+				);
+			}
+		}
 	}
 
 	if ( ! empty( $layout_styles ) ) {
@@ -299,23 +330,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 	}
 
 	return '';
-}
-
-/**
- * Gets classname from last tag in a string of HTML.
- *
- * @param string $html markup to be processed.
- * @return string String of inner wrapper classnames.
- */
-function gutenberg_get_classnames_from_last_tag( $html ) {
-	$tags            = new WP_HTML_Tag_Processor( $html );
-	$last_classnames = '';
-
-	while ( $tags->next_tag() ) {
-		$last_classnames = $tags->get_attribute( 'class' );
-	}
-
-	return (string) $last_classnames;
 }
 
 /**
@@ -486,6 +500,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
+	// Add combined layout and block classname for global styles to hook onto.
+	$block_name    = explode( '/', $block['blockName'] );
+	$class_names[] = 'wp-block-' . end( $block_name ) . '-' . $layout_classname;
+
 	$content_with_outer_classnames = '';
 
 	if ( ! empty( $outer_class_names ) ) {
@@ -502,7 +520,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	* The first chunk of innerContent contains the block markup up until the inner blocks start.
 	* We want to target the opening tag of the inner blocks wrapper, which is the last tag in that chunk.
 	*/
-	$inner_content_classnames = isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) ? gutenberg_get_classnames_from_last_tag( $block['innerContent'][0] ) : '';
+	$inner_content_classnames = '';
+
+	if ( isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) && count( $block['innerContent'] ) > 1 ) {
+		$tags            = new WP_HTML_Tag_Processor( $block['innerContent'][0] );
+		$last_classnames = '';
+		while ( $tags->next_tag() ) {
+			$last_classnames = $tags->get_attribute( 'class' );
+		}
+
+		$inner_content_classnames = (string) $last_classnames;
+	}
 
 	$content = $content_with_outer_classnames ? new WP_HTML_Tag_Processor( $content_with_outer_classnames ) : new WP_HTML_Tag_Processor( $block_content );
 

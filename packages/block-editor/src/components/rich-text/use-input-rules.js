@@ -29,7 +29,7 @@ function findSelection( blocks ) {
 			blocks[ i ].attributes[ attributeKey ] = blocks[ i ].attributes[
 				attributeKey
 			].replace( START_OF_SELECTED_AREA, '' );
-			return blocks[ i ].clientId;
+			return [ blocks[ i ].clientId, attributeKey, 0, 0 ];
 		}
 
 		const nestedSelection = findSelection( blocks[ i ].innerBlocks );
@@ -38,6 +38,8 @@ function findSelection( blocks ) {
 			return nestedSelection;
 		}
 	}
+
+	return [];
 }
 
 export function useInputRules( props ) {
@@ -86,9 +88,11 @@ export function useInputRules( props ) {
 			} );
 			const block = transformation.transform( content );
 
-			selectionChange( findSelection( [ block ] ) );
+			selectionChange( ...findSelection( [ block ] ) );
 			onReplace( [ block ] );
 			__unstableMarkAutomaticChange();
+
+			return true;
 		}
 
 		function onInput( event ) {
@@ -106,7 +110,7 @@ export function useInputRules( props ) {
 			}
 
 			if ( __unstableAllowPrefixTransformations && inputRule ) {
-				inputRule();
+				if ( inputRule() ) return;
 			}
 
 			const value = getValue();

@@ -123,6 +123,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		requiresOptOut: true,
 		useEngine: true,
 	},
+	columnCount: {
+		value: [ 'typography', 'textColumns' ],
+		support: [ 'typography', 'textColumns' ],
+		useEngine: true,
+	},
 	filter: {
 		value: [ 'filter', 'duotone' ],
 		support: [ 'color', '__experimentalDuotone' ],
@@ -130,6 +135,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	linkColor: {
 		value: [ 'elements', 'link', 'color', 'text' ],
 		support: [ 'color', 'link' ],
+	},
+	captionColor: {
+		value: [ 'elements', 'caption', 'color', 'text' ],
+		support: [ 'color', 'caption' ],
 	},
 	buttonColor: {
 		value: [ 'elements', 'button', 'color', 'text' ],

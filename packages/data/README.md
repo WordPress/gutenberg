@@ -508,10 +508,6 @@ import { store as myCustomStore } from 'my-custom-store';
 dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 ```
 
-_Type_
-
--   `(storeNameOrDescriptor: StoreDescriptor|string) => Object`
-
 _Parameters_
 
 -   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
@@ -658,10 +654,6 @@ import { store as myCustomStore } from 'my-custom-store';
 
 select( myCustomStore ).getPrice( 'hammer' );
 ```
-
-_Type_
-
--   `(storeNameOrDescriptor: StoreDescriptor|string) => Object`
 
 _Parameters_
 

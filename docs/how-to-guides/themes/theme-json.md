@@ -289,6 +289,7 @@ The settings section has the following structure:
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true
 		},
@@ -321,6 +322,7 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 - border: color, radius, style, width
 - color: link
 - dimensions: minHeight
+- position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
 
@@ -824,6 +826,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"fontWeight": "value",
 			"letterSpacing": "value",
 			"lineHeight": "value",
+			"textColumns": "value",
 			"textDecoration": "value",
 			"textTransform": "value"
 		},
@@ -1064,7 +1067,7 @@ h3 {
 
 ##### Element pseudo selectors
 
-Pseudo selectors `:hover`, `:focus`, `:visited` are supported by Gutenberg.
+Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
 
 ```json
 "elements": {

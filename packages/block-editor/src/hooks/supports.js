@@ -22,6 +22,11 @@ const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
 /**
  * Key within block settings' supports array indicating support for text
+ * columns e.g. settings found in `block.json`.
+ */
+const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
+/**
+ * Key within block settings' supports array indicating support for text
  * decorations e.g. settings found in `block.json`.
  */
 const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
@@ -42,6 +47,7 @@ const TYPOGRAPHY_SUPPORT_KEYS = [
 	FONT_STYLE_SUPPORT_KEY,
 	FONT_WEIGHT_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
+	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,

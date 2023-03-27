@@ -6,8 +6,9 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useMemo, useSyncExternalStore } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -16,9 +17,14 @@ import { PluginContextProvider } from '../plugin-context';
 import { PluginErrorBoundary } from '../plugin-error-boundary';
 import { getPlugins } from '../../api';
 
+const getPluginContext = memoize( ( icon, name ) => ( { icon, name } ) );
+
 /**
  * A component that renders all plugin fills in a hidden div.
  *
+ * @param {Object}             props
+ * @param {string|undefined}   props.scope
+ * @param {Function|undefined} props.onError
  * @example
  * ```js
  * // Using ES5 syntax
@@ -50,80 +56,61 @@ import { getPlugins } from '../../api';
  *
  * @return {WPComponent} The component to be rendered.
  */
-class PluginArea extends Component {
-	constructor() {
-		super( ...arguments );
+function PluginArea( { scope, onError } ) {
+	const store = useMemo( () => {
+		let lastValue;
 
-		this.setPlugins = this.setPlugins.bind( this );
-		this.memoizedContext = memoize( ( name, icon ) => {
-			return {
-				name,
-				icon,
-			};
-		} );
-		this.state = this.getCurrentPluginsState();
-	}
-
-	getCurrentPluginsState() {
 		return {
-			plugins: getPlugins( this.props.scope ).map(
-				( { icon, name, render } ) => {
-					return {
-						Plugin: render,
-						context: this.memoizedContext( name, icon ),
-					};
+			subscribe( listener ) {
+				addAction(
+					'plugins.pluginRegistered',
+					'core/plugins/plugin-area/plugins-registered',
+					listener
+				);
+				addAction(
+					'plugins.pluginUnregistered',
+					'core/plugins/plugin-area/plugins-unregistered',
+					listener
+				);
+				return () => {
+					removeAction(
+						'plugins.pluginRegistered',
+						'core/plugins/plugin-area/plugins-registered'
+					);
+					removeAction(
+						'plugins.pluginUnregistered',
+						'core/plugins/plugin-area/plugins-unregistered'
+					);
+				};
+			},
+			getValue() {
+				const nextValue = getPlugins( scope );
+
+				if ( ! isShallowEqual( lastValue, nextValue ) ) {
+					lastValue = nextValue;
 				}
-			),
+
+				return lastValue;
+			},
 		};
-	}
+	}, [ scope ] );
 
-	componentDidMount() {
-		addAction(
-			'plugins.pluginRegistered',
-			'core/plugins/plugin-area/plugins-registered',
-			this.setPlugins
-		);
-		addAction(
-			'plugins.pluginUnregistered',
-			'core/plugins/plugin-area/plugins-unregistered',
-			this.setPlugins
-		);
-	}
+	const plugins = useSyncExternalStore( store.subscribe, store.getValue );
 
-	componentWillUnmount() {
-		removeAction(
-			'plugins.pluginRegistered',
-			'core/plugins/plugin-area/plugins-registered'
-		);
-		removeAction(
-			'plugins.pluginUnregistered',
-			'core/plugins/plugin-area/plugins-unregistered'
-		);
-	}
-
-	setPlugins() {
-		this.setState( this.getCurrentPluginsState );
-	}
-
-	render() {
-		return (
-			<div style={ { display: 'none' } }>
-				{ this.state.plugins.map( ( { context, Plugin } ) => (
-					<PluginContextProvider
-						key={ context.name }
-						value={ context }
-					>
-						<PluginErrorBoundary
-							name={ context.name }
-							onError={ this.props.onError }
-						>
-							<Plugin />
-						</PluginErrorBoundary>
-					</PluginContextProvider>
-				) ) }
-			</div>
-		);
-	}
+	return (
+		<div style={ { display: 'none' } }>
+			{ plugins.map( ( { icon, name, render: Plugin } ) => (
+				<PluginContextProvider
+					key={ name }
+					value={ getPluginContext( icon, name ) }
+				>
+					<PluginErrorBoundary name={ name } onError={ onError }>
+						<Plugin />
+					</PluginErrorBoundary>
+				</PluginContextProvider>
+			) ) }
+		</div>
+	);
 }
 
 export default PluginArea;

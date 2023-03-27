@@ -169,6 +169,25 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 				serverSideBlockDefinitions[ blockName ].ancestor =
 					definitions[ blockName ].ancestor;
 			}
+			// The `selectors` and `editorSelectors` props are not yet included
+			// in the server provided definitions. Polyfill it as well. This can
+			// be removed when the minimum supported WordPress is >= 6.3.
+			if (
+				serverSideBlockDefinitions[ blockName ].editorSelectors ===
+					undefined &&
+				definitions[ blockName ].editorSelectors
+			) {
+				serverSideBlockDefinitions[ blockName ].editorSelectors =
+					definitions[ blockName ].editorSelectors;
+			}
+			if (
+				serverSideBlockDefinitions[ blockName ].selectors ===
+					undefined &&
+				definitions[ blockName ].selectors
+			) {
+				serverSideBlockDefinitions[ blockName ].selectors =
+					definitions[ blockName ].selectors;
+			}
 			continue;
 		}
 
@@ -203,6 +222,8 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'attributes',
 		'providesContext',
 		'usesContext',
+		'selectors',
+		'editorSelectors',
 		'supports',
 		'styles',
 		'example',
@@ -290,6 +311,8 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		attributes: {},
 		providesContext: {},
 		usesContext: [],
+		selectors: {},
+		editorSelectors: {},
 		supports: {},
 		styles: [],
 		variations: [],

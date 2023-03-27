@@ -60,6 +60,7 @@ Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
+| defaultPresets | boolean | true |  |
 | presets | array |  | name, shadow, slug |
 
 ---
@@ -106,6 +107,16 @@ Settings related to layout.
 
 ---
 
+### position
+
+Settings related to position.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| sticky | boolean | false |  |
+
+---
+
 ### spacing
 
 Settings related to spacing.
@@ -134,6 +145,7 @@ Settings related to typography.
 | fluid | undefined | false |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
+| textColumns | boolean | false |  |
 | textDecoration | boolean | true |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
@@ -180,6 +192,16 @@ Color styles.
 
 ---
 
+### dimensions
+
+Dimensions styles
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| minHeight | string, object |  |
+
+---
+
 ### spacing
 
 Spacing styles.
@@ -204,6 +226,7 @@ Typography styles.
 | fontWeight | string, object |  |
 | letterSpacing | string, object |  |
 | lineHeight | string, object |  |
+| textColumns | string |  |
 | textDecoration | string, object |  |
 | textTransform | string, object |  |
 

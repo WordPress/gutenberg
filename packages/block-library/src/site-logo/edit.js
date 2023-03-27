@@ -305,6 +305,7 @@ const SiteLogo = ( {
 						disabled={ ! isResizable }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link image to home' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
@@ -312,6 +313,7 @@ const SiteLogo = ( {
 					{ isLink && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -325,6 +327,7 @@ const SiteLogo = ( {
 					{ canUserEdit && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Use as site icon' ) }
 								onChange={ ( value ) => {
 									setAttributes( { shouldSyncIcon: value } );
