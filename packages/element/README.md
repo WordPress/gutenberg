@@ -178,7 +178,7 @@ You would have something like this as the conversionMap value:
 _Parameters_
 
 -   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Record<string, WPElement>`: The map used to convert the string to a react element.
+-   _conversionMap_ `Object`: The map used to convert the string to a react element.
 
 _Returns_
 
@@ -209,13 +209,15 @@ _Returns_
 
 ### createRoot
 
-_Since: WordPress 6.2_
-
 Creates a new React root for the target DOM node.
 
 _Related_
 
--   <https://reactjs.org/docs/react-dom-client.html#createroot>
+-   <https://react.dev/reference/react-dom/client/createRoot>
+
+_Changelog_
+
+`6.2.0` Introduced in WordPress core.
 
 ### findDOMNode
 
@@ -254,12 +256,13 @@ A component which renders its children without any wrapping element.
 
 ### hydrate
 
+> **Deprecated** since WordPress 6.2.0. Use `hydrateRoot` instead.
+
 Hydrates a given element into the target DOM node.
 
-_Parameters_
+_Related_
 
--   _element_ `import('./react').WPElement`: Element to hydrate.
--   _target_ `HTMLElement`: DOM node into which element should be hydrated.
+-   <https://react.dev/reference/react-dom/hydrate>
 
 ### hydrateRoot
 
@@ -267,7 +270,11 @@ Creates a new React root for the target DOM node and hydrates it with a pre-gene
 
 _Related_
 
--   <https://reactjs.org/docs/react-dom-client.html#hydrateroot>
+-   <https://react.dev/reference/react-dom/client/hydrateRoot>
+
+_Changelog_
+
+`6.2.0` Introduced in WordPress core.
 
 ### isEmptyElement
 
@@ -346,14 +353,13 @@ _Returns_
 
 ### render
 
+> **Deprecated** since WordPress 6.2.0. Use `createRoot` instead.
+
 Renders a given element into the target DOM node.
 
-_Deprecated: WordPress 6.2_
+_Related_
 
-_Parameters_
-
--   _element_ `import('./react').WPElement`: Element to render.
--   _target_ `HTMLElement`: DOM node into which element should be rendered.
+-   <https://react.dev/reference/react-dom/render>
 
 ### renderToString
 
@@ -400,11 +406,13 @@ _Returns_
 
 ### unmountComponentAtNode
 
+> **Deprecated** since WordPress 6.2.0. Use `root.unmount()` instead.
+
 Removes any mounted element from the target DOM node.
 
-_Parameters_
+_Related_
 
--   _target_ `Element`: DOM node in which element is to be removed
+-   <https://react.dev/reference/react-dom/unmountComponentAtNode>
 
 ### useCallback
 
