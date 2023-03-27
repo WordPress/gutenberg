@@ -14,6 +14,11 @@ import {
 } from 'test/helpers';
 
 /**
+ * WordPress dependencies
+ */
+import { ENTER } from '@wordpress/keycodes';
+
+/**
  * Internal dependencies
  */
 import Paragraph from '../edit';
@@ -201,6 +206,44 @@ describe( 'Paragraph block', () => {
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph {"align":"right"} -->
 		<p class="has-text-align-right">A quick brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
+
+	it( 'should preserve alignment when split', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		const [ paragraphBlock ] = screen.getAllByLabelText(
+			/Paragraph Block\. Row 1/
+		);
+
+		// Act
+		fireEvent.press( paragraphBlock );
+		fireEvent.press( screen.getByLabelText( 'Align text' ) );
+		fireEvent.press( screen.getByLabelText( 'Align text center' ) );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		const string = 'A quick brown fox jumps over the lazy dog.';
+		changeAndSelectTextOfRichText( paragraphTextInput, string, {
+			selectionStart: string.length / 2,
+			selectionEnd: string.length / 2,
+		} );
+		fireEvent( paragraphTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph {"align":"center"} -->
+		<p class="has-text-align-center">A quick brown fox jum</p>
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph {"align":"center"} -->
+		<p class="has-text-align-center">ps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
