@@ -98,7 +98,8 @@ function GroupEdit( {
 		? { ...defaultLayout, ...layout, type: 'default' }
 		: { ...defaultLayout, ...layout };
 	const { type = 'default' } = usedLayout;
-	const layoutSupportEnabled = themeSupportsLayout || type === 'flex';
+	const layoutSupportEnabled =
+		themeSupportsLayout || type === 'flex' || type === 'grid';
 
 	// Hooks.
 	const blockProps = useBlockProps( {
