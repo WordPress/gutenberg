@@ -4,9 +4,6 @@
 import { fireEvent, measurePerformance, screen } from 'test/helpers';
 
 /**
- * WordPress dependencies
- */
-/**
  * Internal dependencies
  */
 import Paragraph from '../../edit';
