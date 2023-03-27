@@ -261,7 +261,9 @@ describe( 'Paragraph block', () => {
 
 		// Act
 		fireEvent.press( paragraphBlock );
-		fireEvent.press( screen.getByLabelText( 'Link' ) );
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://github.com/react-navigation/react-navigation/issues/9701
+		await act( () => fireEvent.press( screen.getByLabelText( 'Link' ) ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
@@ -313,7 +315,9 @@ describe( 'Paragraph block', () => {
 				selectionEnd: 7,
 			}
 		);
-		fireEvent.press( screen.getByLabelText( 'Link' ) );
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://github.com/react-navigation/react-navigation/issues/9701
+		await act( () => fireEvent.press( screen.getByLabelText( 'Link' ) ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
