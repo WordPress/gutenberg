@@ -679,6 +679,8 @@ export default function ColorPanel( {
 			} );
 		};
 		const supportsTextColor = true;
+		// Background color is not supported for `caption`
+		// as there isn't yet a way to set padding for the element.
 		const supportsBackground = name !== 'caption';
 
 		items.push( {
@@ -691,12 +693,12 @@ export default function ColorPanel( {
 				supportsTextColor && supportsBackground
 					? [
 							elementTextColor,
-							elementBackgroundColor ?? elementGradient,
+							elementGradient ?? elementBackgroundColor,
 					  ]
 					: [
 							supportsTextColor
 								? elementTextColor
-								: elementBackgroundColor ?? elementGradient,
+								: elementGradient ?? elementBackgroundColor,
 					  ],
 			tabs: [
 				hasSolidColors &&
