@@ -55,6 +55,7 @@ export { hydrate };
 /**
  * Creates a new React root for the target DOM node.
  *
+ * 6.2.0 Introduced in WordPress core.
  * @see https://reactjs.org/docs/react-dom-client.html#createroot
  */
 export { createRoot };
@@ -62,6 +63,7 @@ export { createRoot };
 /**
  * Creates a new React root for the target DOM node and hydrates it with a pre-generated markup.
  *
+ * 6.2.0 Introduced in WordPress core.
  * @see https://reactjs.org/docs/react-dom-client.html#hydrateroot
  */
 export { hydrateRoot };
