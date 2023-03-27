@@ -375,27 +375,29 @@ test.describe( 'Template Part', () => {
 		} );
 		await editor.selectBlocks( siteTitle );
 
+		// Remove the default site title block.
 		await pageUtils.pressKeys( 'access+z' );
 
-		// Insert a group block
+		// Insert a group block with a Site Title block inside.
 		await editor.insertBlock( {
 			name: 'core/group',
 			innerBlocks: [ { name: 'core/site-title' } ],
 		} );
 
-		// Select the site title block.
+		// Select the Site Title block inside the group.
 		const siteTitleInGroup = editor.canvas.getByRole( 'document', {
 			name: 'Site title',
 		} );
 		await editor.selectBlocks( siteTitleInGroup );
 
-		// Change heading level.
+		// Change heading level of the Site Title block.
 		await editor.clickBlockToolbarButton( 'Change heading level' );
-		const Heading3Button = page.locator(
-			'role=menuitemradio[name="Heading 3"i]'
-		);
+		const Heading3Button = page.getByRole( 'menuitemradio', {
+			name: 'Heading 3',
+		} );
 		await Heading3Button.click();
 
+		// Undo the change.
 		await pageUtils.pressKeys( 'primary+z' );
 
 		await expect(
