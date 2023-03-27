@@ -52,9 +52,9 @@ test.describe( 'Site editor url navigation', () => {
 					} )
 					.click();
 				await page
-					.getByRole( 'button', { name: /For a specific item/i } )
+					.getByRole( 'button', { name: 'For a specific item' } )
 					.click();
-				await page.getByRole( 'option', { name: /Demo/i } ).click();
+				await page.getByRole( 'option', { name: 'Demo' } ).click();
 				await expect( page ).toHaveURL(
 					'/wp-admin/site-editor.php?postId=emptytheme%2F%2Fsingle-post-demo&postType=wp_template&canvas=edit'
 				);
