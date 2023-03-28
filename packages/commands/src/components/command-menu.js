@@ -9,7 +9,8 @@ import { Command } from 'cmdk';
 import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Modal } from '@wordpress/components';
+import { Modal, Button } from '@wordpress/components';
+import { Icon, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -60,6 +61,8 @@ export function CommandMenu() {
 		},
 		[ currentPage ]
 	);
+	const goBack = () =>
+		setPages( ( currentPages ) => currentPages.slice( 0, -1 ) );
 
 	// loader is actually a custom hook
 	// so to avoid breaking the rules of hooks
@@ -87,6 +90,12 @@ export function CommandMenu() {
 		return () => document.removeEventListener( 'keydown', down );
 	}, [] );
 
+	useEffect( () => {
+		if ( ! open ) {
+			setPages( [] );
+		}
+	}, [ open ] );
+
 	if ( ! open ) {
 		return false;
 	}
@@ -96,15 +105,30 @@ export function CommandMenu() {
 			className="commands-command-menu"
 			onRequestClose={ () => setOpen( false ) }
 			__experimentalHideHeader
-			focusOnMount="firstElement"
 		>
 			<div className="commands-command-menu__container">
 				<Command label={ __( 'Global Command Menu' ) }>
 					<div className="commands-command-menu__header">
+						{ pages.length > 0 && (
+							<Button onClick={ goBack }>
+								<Icon icon={ chevronLeft } size={ 24 } />
+							</Button>
+						) }
 						<Command.Input
+							// The input should be focused when the modal is opened.
+							// eslint-disable-next-line jsx-a11y/no-autofocus
+							autoFocus
 							value={ search }
 							onValueChange={ setSearch }
 							placeholder={ __( 'Ask anything' ) }
+							onKeyDown={ ( event ) => {
+								if (
+									event.key === 'Backspace' &&
+									search === ''
+								) {
+									goBack();
+								}
+							} }
 						/>
 					</div>
 					<CommandsPerPage
