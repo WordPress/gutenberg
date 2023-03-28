@@ -6,7 +6,7 @@ import {
 	useEffect,
 	useLayoutEffect,
 	useMemo,
-	useReducer,
+	useState,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -39,24 +39,24 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 	} ) => {
-		const [ loadedBlocks, setBlockLoaded ] = useReducer(
-			( alreadyLoadedBlocks, blockType ) => [
-				...alreadyLoadedBlocks,
-				blockType,
-			],
-			[]
-		);
+		const [ blocksLoaded, setBlocksLoaded ] = useState( false );
 		const asyncBlocks = getAsyncBlocks();
 
 		useEffect( () => {
+			const blockPromises = [];
 			asyncBlocks.forEach( ( blockGroup ) => {
-				blockGroup.forEach( async ( blockType ) => {
-					if ( loadedBlocks.includes( blockType ) ) {
-						return;
-					}
-					await asyncLoadBlock( blockType );
-					setBlockLoaded( blockType );
+				blockGroup.forEach( ( blockType ) => {
+					blockPromises.push(
+						new Promise( async ( resolve ) => {
+							await asyncLoadBlock( blockType );
+							resolve();
+						} )
+					);
 				} );
+			} );
+
+			Promise.allSettled( blockPromises ).then( () => {
+				setBlocksLoaded( true );
 			} );
 		}, [] );
 
@@ -86,7 +86,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			'postType',
 			type,
 			{ id },
-			loadedBlocks
+			blocksLoaded
 		);
 		const blockEditorSettings = useBlockEditorSettings(
 			editorSettings,
