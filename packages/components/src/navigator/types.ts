@@ -10,7 +10,7 @@ import type { ButtonAsButtonProps } from '../button/types';
 
 export type MatchParams = Record< string, string | string[] >;
 
-type NavigateOptions = {
+export type NavigateOptions = {
 	focusTargetSelector?: string;
 	isBack?: boolean;
 	skipFocus?: boolean;
