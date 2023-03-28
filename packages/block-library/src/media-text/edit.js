@@ -292,7 +292,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					imageSizeOptions={ imageSizeOptions }
 					isResizable={ false }
 					imageSizeHelp={ __(
-						'Select image resolution to load. This does not affect visual size.'
+						'Select the size of the source image.'
 					) }
 				/>
 			) }

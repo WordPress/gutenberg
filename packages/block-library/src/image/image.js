@@ -435,7 +435,7 @@ export default function Image( {
 						imageWidth={ naturalWidth }
 						imageHeight={ naturalHeight }
 						imageSizeHelp={ __(
-							'Select image resolution to load. This does not affect visual size.'
+							'Select the size of the source image.'
 						) }
 					/>
 				</PanelBody>
