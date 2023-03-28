@@ -27,7 +27,7 @@ module.exports = {
 	setupFiles: [ '<rootDir>/setup.js' ],
 	setupFilesAfterEnv: [ '<rootDir>/setup-after-env.js' ],
 	testMatch: [
-		'<rootDir>/../../**/test/!(helper)*.native.[jt]s?(x)',
+		'<rootDir>/../../**/test/**/!(helper)*.native.[jt]s?(x)',
 		'<rootDir>/../../packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
 	],
 	testPathIgnorePatterns: [ '/node_modules/', '/__device-tests__/' ],
