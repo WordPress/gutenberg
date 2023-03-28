@@ -27,6 +27,31 @@ import PostURL from '../post-url';
  */
 const PANEL_NAME = 'post-status';
 
+const FirstSideFill = () => (
+	<PluginPostStatusInfo priority={ 1 } className="first">
+		{ 'One' }
+	</PluginPostStatusInfo>
+);
+
+const SecondSideFill = () => (
+	<PluginPostStatusInfo priority={ 2 } className="second">
+		{ 'Two' }
+	</PluginPostStatusInfo>
+);
+
+const ThirdSideFill = () => (
+	<PluginPostStatusInfo priority={ 3 } className="third">
+		{ 'Three' }
+	</PluginPostStatusInfo>
+);
+
+const FourthSideFill = () => (
+	<PluginPostStatusInfo priority={ 4 } className="fourth">
+		{ 'Four' }
+	</PluginPostStatusInfo>
+);
+
+
 function PostStatus( { isOpened, onTogglePanel } ) {
 	return (
 		<PanelBody
@@ -35,6 +60,10 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
+			<ThirdSideFill />
+			<FirstSideFill />
+			<SecondSideFill />
+			<FourthSideFill />
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
