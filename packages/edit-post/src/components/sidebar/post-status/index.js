@@ -17,7 +17,9 @@ import PostAuthor from '../post-author';
 import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
-import PluginPostStatusInfo from '../plugin-post-status-info';
+import PluginPostStatusInfo, {
+	Fill as PluginPostStatusFill,
+} from '../plugin-post-status-info';
 import { store as editPostStore } from '../../../store';
 import PostTemplate from '../post-template';
 import PostURL from '../post-url';
@@ -27,30 +29,28 @@ import PostURL from '../post-url';
  */
 const PANEL_NAME = 'post-status';
 
-const FirstSideFill = () => (
-	<PluginPostStatusInfo priority={ 1 } className="first">
-		{ 'One' }
-	</PluginPostStatusInfo>
-);
-
-const SecondSideFill = () => (
-	<PluginPostStatusInfo priority={ 2 } className="second">
-		{ 'Two' }
-	</PluginPostStatusInfo>
-);
-
-const ThirdSideFill = () => (
-	<PluginPostStatusInfo priority={ 3 } className="third">
-		{ 'Three' }
-	</PluginPostStatusInfo>
-);
-
-const FourthSideFill = () => (
-	<PluginPostStatusInfo priority={ 4 } className="fourth">
-		{ 'Four' }
-	</PluginPostStatusInfo>
-);
-
+const PostStatusTrashFill = () => {
+	return (
+		<PluginPostStatusFill priority={ 99 }>
+			<PostTrash />
+		</PluginPostStatusFill>
+	);
+};
+const PostStatusInfoFill = () => {
+	return (
+		<PluginPostStatusFill priority={ 2 }>
+			<PostVisibility />
+			<PostSchedule />
+			<PostTemplate />
+			<PostURL />
+			<PostSticky />
+			<PostPendingStatus />
+			<PostFormat />
+			<PostSlug />
+			<PostAuthor />
+		</PluginPostStatusFill>
+	);
+};
 
 function PostStatus( { isOpened, onTogglePanel } ) {
 	return (
@@ -60,27 +60,9 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
-			<ThirdSideFill />
-			<FirstSideFill />
-			<SecondSideFill />
-			<FourthSideFill />
-			<PluginPostStatusInfo.Slot>
-				{ ( fills ) => (
-					<>
-						<PostVisibility />
-						<PostSchedule />
-						<PostTemplate />
-						<PostURL />
-						<PostSticky />
-						<PostPendingStatus />
-						<PostFormat />
-						<PostSlug />
-						<PostAuthor />
-						{ fills }
-						<PostTrash />
-					</>
-				) }
-			</PluginPostStatusInfo.Slot>
+			<PostStatusInfoFill />
+			<PostStatusTrashFill />
+			<PluginPostStatusInfo.Slot />
 		</PanelBody>
 	);
 }
