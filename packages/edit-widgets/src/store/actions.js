@@ -235,9 +235,9 @@ export const saveWidgetArea =
 			const widget = preservedRecords[ i ];
 			const { block, position } = batchMeta[ i ];
 
-			// Set __internalWidgetId on the block. This will be persisted to the
-			// store when we dispatch receiveEntityRecords( post ) below.
-			post.blocks[ position ].attributes.__internalWidgetId = widget.id;
+			// Set widget ID on the block. This will be persisted to the store
+			// when we dispatch receiveEntityRecords( post ) below.
+			post.blocks[ position ].meta.widgetId = widget.id;
 
 			const error = registry
 				.select( coreStore )
