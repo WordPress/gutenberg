@@ -83,6 +83,7 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
+	meta,
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
@@ -402,18 +403,34 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const onSelectClassicMenu = async ( classicMenu ) => {
-		const navMenu = await convertClassicMenu(
-			classicMenu.id,
-			classicMenu.name,
-			'draft'
-		);
-		if ( navMenu ) {
-			handleUpdateMenu( navMenu.id, {
-				focusNavigationBlock: true,
-			} );
+	const onSelectClassicMenu = useCallback(
+		async ( classicMenu ) => {
+			const navMenu = await convertClassicMenu(
+				classicMenu.id,
+				classicMenu.name,
+				'draft'
+			);
+			if ( navMenu ) {
+				handleUpdateMenu( navMenu.id, {
+					focusNavigationBlock: true,
+				} );
+			}
+		},
+		[ convertClassicMenu, handleUpdateMenu ]
+	);
+
+	// Convert the classic menu provided by the Legacy Widget block transform if
+	// it exists.
+	useEffect( () => {
+		if ( meta.menuId ) {
+			const classicMenu = classicMenus?.find(
+				( menu ) => menu.id === meta.menuId
+			);
+			if ( classicMenu ) {
+				onSelectClassicMenu( classicMenu );
+			}
 		}
-	};
+	}, [ meta.menuId, classicMenus, onSelectClassicMenu ] );
 
 	const onSelectNavigationMenu = ( menuId ) => {
 		handleUpdateMenu( menuId );
