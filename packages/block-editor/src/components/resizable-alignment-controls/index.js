@@ -47,7 +47,7 @@ function getVisibleHandles( alignment ) {
 }
 
 /**
- * A component that composes together the `ResizebleBox` and `BlockAlignmentVisualizer`
+ * A component that composes `ResizableBox` and `BlockAlignmentVisualizer`
  * and configures snapping to block alignments.
  *
  * @param {Object}                       props
