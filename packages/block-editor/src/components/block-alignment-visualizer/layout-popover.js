@@ -61,8 +61,8 @@ export default function LayoutPopover( {
 					return new defaultView.DOMRect(
 						layoutRect.x,
 						focusedBlockRect.y,
-						layoutRect.width,
-						focusedBlockRect.height
+						Math.floor( layoutRect.width ) - 1,
+						Math.floor( focusedBlockRect.height )
 					);
 				},
 			} );
@@ -79,8 +79,8 @@ export default function LayoutPopover( {
 			// );
 			setCoverElementStyle( {
 				position: 'absolute',
-				width: resolvedLayoutElement.offsetWidth,
-				height: focusedBlockElement.offsetHeight,
+				width: Math.floor( resolvedLayoutElement.offsetWidth ) - 1,
+				height: Math.floor( focusedBlockElement.offsetHeight ),
 				// paddingLeft,
 				// paddingRight,
 			} );
