@@ -215,24 +215,27 @@ describe( 'Cover block', () => {
 		} );
 
 		test( 'clears media  when clear media button clicked', async () => {
-			const { container } = await setup( {
+			await setup( {
 				url: 'http://localhost/my-image.jpg',
 			} );
 
 			await selectBlock( 'Block: Cover' );
-			// eslint-disable-next-line testing-library/no-node-access
-			const img = container.getElementsByClassName(
-				'wp-block-cover__image-background'
-			)[ 0 ];
-			expect( img ).toBeInTheDocument();
+			expect(
+				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
+					'img'
+				)
+			).toBeInTheDocument();
 
 			await userEvent.click(
 				screen.getByRole( 'button', {
 					name: 'Clear Media',
 				} )
 			);
-
-			expect( img ).not.toBeInTheDocument();
+			expect(
+				within( screen.queryByLabelText( 'Block: Cover' ) ).queryByRole(
+					'img'
+				)
+			).not.toBeInTheDocument();
 		} );
 
 		describe( 'Color panel', () => {
