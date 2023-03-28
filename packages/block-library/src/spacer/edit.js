@@ -103,7 +103,7 @@ const SpacerEdit = ( {
 	const { height, width, style: blockStyle = {} } = attributes;
 
 	const { layout = {} } = blockStyle;
-	const { selfStretch } = layout;
+	const { selfStretch, flexSize } = layout;
 
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );
@@ -155,6 +155,8 @@ const SpacerEdit = ( {
 	const getHeightForVerticalBlocks = () => {
 		if ( isFlexLayout && selfStretch === 'fit' ) {
 			return undefined;
+		} else if ( isFlexLayout && flexSize ) {
+			return temporaryHeight || flexSize;
 		}
 		return temporaryHeight || getSpacingPresetCssVar( height ) || undefined;
 	};
@@ -162,6 +164,8 @@ const SpacerEdit = ( {
 	const getWidthForHorizontalBlocks = () => {
 		if ( isFlexLayout && selfStretch === 'fit' ) {
 			return undefined;
+		} else if ( isFlexLayout && flexSize ) {
+			return temporaryWidth || flexSize;
 		}
 		return temporaryWidth || getSpacingPresetCssVar( width ) || undefined;
 	};
