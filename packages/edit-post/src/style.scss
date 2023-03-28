@@ -99,7 +99,7 @@ body.block-editor-page {
 
 @include wordpress-admin-schemes();
 
-.interface-interface-skeleton__header {
+.interface-interface-skeleton__header .edit-post-header {
 	@supports (scrollbar-gutter: stable) {
 		// The scrollbar-gutter property ensures space is reserved for the scrollbar to appear,
 		// when scrollbars are set to be always visible. This ensure icons stay visually aligned.

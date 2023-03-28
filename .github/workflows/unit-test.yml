@@ -31,7 +31,7 @@ jobs:
                 node: ['14']
 
         steps:
-            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -74,7 +74,7 @@ jobs:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
 
         steps:
-            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -158,7 +158,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+              uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
 
             - name: Set up PHP
               uses: shivammathur/setup-php@d30ad8b1843ace22e6698ab99bbafaa747b6bd0d # v2.24.0
@@ -225,7 +225,7 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node

@@ -468,12 +468,13 @@ extension MediaInfo {
     func encodeForJS() -> [String: Any] {
         guard
             let data = try? JSONEncoder().encode(self),
-            let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else
+            var jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else
         {
             assertionFailure("Encoding of MediaInfo failed")
             return [String: Any]()
         }
 
+        jsonObject["metadata"] = self.metadata
         return jsonObject
     }
 }

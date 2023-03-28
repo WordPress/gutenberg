@@ -92,30 +92,26 @@ describe( 'PluginArea', () => {
 		expect( container ).toHaveTextContent( 'plugin: two.' );
 	} );
 
-	test.failing(
-		'does not rerender when a plugin is added to a different scope',
-		() => {
-			const ComponentSpy = jest.fn( ( { content } ) => {
-				return `plugin: ${ content }.`;
-			} );
+	test( 'does not rerender when a plugin is added to a different scope', () => {
+		const ComponentSpy = jest.fn( ( { content } ) => {
+			return `plugin: ${ content }.`;
+		} );
 
-			registerPlugin( 'scoped', {
-				render: () => <ComponentSpy content="scoped" />,
+		registerPlugin( 'scoped', {
+			render: () => <ComponentSpy content="scoped" />,
+			icon: 'smiley',
+			scope: 'my-app',
+		} );
+
+		render( <PluginArea scope="my-app" /> );
+
+		act( () => {
+			registerPlugin( 'unscoped', {
+				render: () => <TestComponent content="unscoped" />,
 				icon: 'smiley',
-				scope: 'my-app',
 			} );
+		} );
 
-			render( <PluginArea scope="my-app" /> );
-
-			act( () => {
-				registerPlugin( 'unscoped', {
-					render: () => <TestComponent content="unscoped" />,
-					icon: 'smiley',
-				} );
-			} );
-
-			// Any store update triggers setState and causes PluginArea to rerender.
-			expect( ComponentSpy ).toHaveBeenCalledTimes( 1 );
-		}
-	);
+		expect( ComponentSpy ).toHaveBeenCalledTimes( 1 );
+	} );
 } );

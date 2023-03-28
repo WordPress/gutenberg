@@ -11,7 +11,6 @@ const {
 	doubleTap,
 	isAndroid,
 	isEditorVisible,
-	longPressMiddleOfElement,
 	setClipboard,
 	setupDriver,
 	stopDriver,
@@ -390,28 +389,9 @@ class EditorPage {
 		return await this.driver.elementsByAccessibilityId( 'Document tools' );
 	}
 
-	async addNewBlock( blockName, relativePosition ) {
-		const addButton = await this.getAddBlockButton();
-
-		if ( relativePosition === 'before' ) {
-			// On Android it doesn't get the right size of the button
-			const customElementSize = {
-				width: 43,
-				height: 43,
-			};
-
-			await longPressMiddleOfElement(
-				this.driver,
-				addButton,
-				8000,
-				customElementSize
-			);
-			const addBlockBeforeButtonLocator = isAndroid()
-				? '//android.widget.Button[@content-desc="Add Block Before"]'
-				: '//XCUIElementTypeButton[@name="Add Block Before"]';
-
-			await clickIfClickable( this.driver, addBlockBeforeButtonLocator );
-		} else {
+	async addNewBlock( blockName, { skipInserterOpen = false } = {} ) {
+		if ( ! skipInserterOpen ) {
+			const addButton = await this.getAddBlockButton();
 			await addButton.click();
 		}
 
@@ -442,6 +422,11 @@ class EditorPage {
 			inserterElement,
 			4000
 		);
+	}
+
+	static async isElementOutOfBounds( element, { width, height } = {} ) {
+		const { x, y } = await element.getLocation();
+		return x > width || y > height;
 	}
 
 	// Attempts to find the given block button in the block inserter control.
@@ -499,7 +484,10 @@ class EditorPage {
 		// We start dragging a bit above it to not trigger home button.
 		const height = size.height - 50;
 
-		while ( ! ( await blockButton.isDisplayed() ) ) {
+		while (
+			! ( await blockButton.isDisplayed() ) ||
+			( await EditorPage.isElementOutOfBounds( blockButton, { height } ) )
+		) {
 			await this.driver.execute( 'mobile: dragFromToForDuration', {
 				fromX: 50,
 				fromY: height,
@@ -985,6 +973,7 @@ const blockNames = {
 	group: 'Group',
 	buttons: 'Buttons',
 	button: 'Button',
+	preformatted: 'Preformatted',
 };
 
 module.exports = { initializeEditorPage, blockNames };

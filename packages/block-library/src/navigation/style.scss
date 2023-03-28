@@ -689,10 +689,12 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-close {
 	width: 100%;
 
-	// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
-	max-width: var(--wp--style--global--wide-size, 100%);
-	margin-left: auto;
-	margin-right: auto;
+	.has-modal-open & {
+		// Try to inherit wide-width when defined, so the X can align to a top-right aligned menu.
+		max-width: var(--wp--style--global--wide-size, 100%);
+		margin-left: auto;
+		margin-right: auto;
+	}
 
 	// This element is not keyboard accessible, and is focusable only using the mouse.
 	// It is part of the MicroModal library that adds a scrim outside of a modal dialog that is not fullscreen,

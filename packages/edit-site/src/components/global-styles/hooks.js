@@ -7,8 +7,6 @@ import a11yPlugin from 'colord/plugins/a11y';
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -18,85 +16,10 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../private-apis';
 import { useSelect } from '@wordpress/data';
 
-const { useGlobalSetting, useColorsPerOrigin: useColorsPerOriginFromSettings } =
-	unlock( blockEditorPrivateApis );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );
-
-export function useColorsPerOrigin( name ) {
-	const [ customColors ] = useGlobalSetting( 'color.palette.custom', name );
-	const [ themeColors ] = useGlobalSetting( 'color.palette.theme', name );
-	const [ defaultColors ] = useGlobalSetting( 'color.palette.default', name );
-	const [ shouldDisplayDefaultColors ] = useGlobalSetting(
-		'color.defaultPalette'
-	);
-
-	return useColorsPerOriginFromSettings( {
-		color: {
-			palette: {
-				custom: customColors,
-				theme: themeColors,
-				default: defaultColors,
-			},
-			defaultPalette: shouldDisplayDefaultColors,
-		},
-	} );
-}
-
-export function useGradientsPerOrigin( name ) {
-	const [ customGradients ] = useGlobalSetting(
-		'color.gradients.custom',
-		name
-	);
-	const [ themeGradients ] = useGlobalSetting(
-		'color.gradients.theme',
-		name
-	);
-	const [ defaultGradients ] = useGlobalSetting(
-		'color.gradients.default',
-		name
-	);
-	const [ shouldDisplayDefaultGradients ] = useGlobalSetting(
-		'color.defaultGradients'
-	);
-
-	return useMemo( () => {
-		const result = [];
-		if ( themeGradients && themeGradients.length ) {
-			result.push( {
-				name: _x(
-					'Theme',
-					'Indicates this palette comes from the theme.'
-				),
-				gradients: themeGradients,
-			} );
-		}
-		if (
-			shouldDisplayDefaultGradients &&
-			defaultGradients &&
-			defaultGradients.length
-		) {
-			result.push( {
-				name: _x(
-					'Default',
-					'Indicates this palette comes from WordPress.'
-				),
-				gradients: defaultGradients,
-			} );
-		}
-		if ( customGradients && customGradients.length ) {
-			result.push( {
-				name: _x(
-					'Custom',
-					'Indicates this palette is created by the user.'
-				),
-				gradients: customGradients,
-			} );
-		}
-		return result;
-	}, [ customGradients, themeGradients, defaultGradients ] );
-}
 
 export function useColorRandomizer( name ) {
 	const [ themeColors, setThemeColors ] = useGlobalSetting(

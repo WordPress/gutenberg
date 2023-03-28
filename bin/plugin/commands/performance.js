@@ -18,6 +18,9 @@ const {
 } = require( '../lib/utils' );
 const config = require( '../config' );
 
+const ARTIFACTS_PATH =
+	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
+
 /**
  * @typedef WPPerformanceCommandOptions
  *
@@ -193,38 +196,22 @@ function curateResults( testSuite, results ) {
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
 async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
-	try {
-		await runShellScript(
-			`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
-			performanceTestDirectory
-		);
-	} catch ( error ) {
-		fs.mkdirSync( './__test-results/artifacts', { recursive: true } );
-		const artifactsFolder = path.join(
-			performanceTestDirectory,
-			'artifacts/'
-		);
-		await runShellScript(
-			'cp -Rv ' + artifactsFolder + ' ' + './__test-results/artifacts/'
-		);
+	const resultsFilename = `${ runKey }.performance-results.json`;
 
-		throw error;
-	}
-
-	const resultsFile = path.join(
+	await runShellScript(
+		`npm run test:performance -- ${ testSuite }`,
 		performanceTestDirectory,
-		`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
-	);
-	fs.mkdirSync( './__test-results', { recursive: true } );
-	fs.copyFileSync( resultsFile, `./__test-results/${ runKey }.results.json` );
-	const rawResults = await readJSONFile(
-		path.join(
-			performanceTestDirectory,
-			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
-		)
+		{
+			...process.env,
+			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
+			RESULTS_FILENAME: resultsFilename,
+		}
 	);
 
-	return curateResults( testSuite, rawResults );
+	return curateResults(
+		testSuite,
+		await readJSONFile( path.join( ARTIFACTS_PATH, resultsFilename ) )
+	);
 }
 
 /**
@@ -339,15 +326,41 @@ async function runPerformanceTests( branches, options ) {
 			buildPath
 		);
 
-		await runShellScript(
-			'cp ' +
-				path.resolve(
-					performanceTestDirectory,
-					'bin/plugin/utils/.wp-env.performance.json'
-				) +
-				' ' +
-				environmentDirectory +
-				'/.wp-env.json'
+		// Create the config file for the current env.
+		fs.writeFileSync(
+			path.join( environmentDirectory, '.wp-env.json' ),
+			JSON.stringify(
+				{
+					core: 'WordPress/WordPress',
+					plugins: [ path.join( environmentDirectory, 'plugin' ) ],
+					themes: [
+						path.join(
+							performanceTestDirectory,
+							'test/emptytheme'
+						),
+						'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
+						'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
+					],
+					env: {
+						tests: {
+							mappings: {
+								'wp-content/mu-plugins': path.join(
+									performanceTestDirectory,
+									'packages/e2e-tests/mu-plugins'
+								),
+								'wp-content/plugins/gutenberg-test-plugins':
+									path.join(
+										performanceTestDirectory,
+										'packages/e2e-tests/plugins'
+									),
+							},
+						},
+					},
+				},
+				null,
+				2
+			),
+			'utf8'
 		);
 
 		if ( options.wpVersion ) {
@@ -404,33 +417,39 @@ async function runPerformanceTests( branches, options ) {
 
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
 	const results = {};
+	const wpEnvPath = path.join(
+		performanceTestDirectory,
+		'node_modules/.bin/wp-env'
+	);
+
 	for ( const testSuite of testSuites ) {
 		results[ testSuite ] = {};
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
 		const rawResults = [];
-		// Alternate three times between branches.
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
+			const roundInfo = `round ${ i + 1 } of ${ TEST_ROUNDS }`;
+			log( `    >> Suite: ${ testSuite } (${ roundInfo })` );
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
 				const sanitizedBranch = sanitizeBranchName( branch );
-				const runKey = `${ sanitizedBranch }_${ testSuite }_run-${ i }`;
+				const runKey = `${ testSuite }_${ sanitizedBranch }_run-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
-				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
-				log( '        >> Starting the environment.' );
+				log( `        >> Branch: ${ branch }` );
+				log( '            >> Starting the environment.' );
 				await runShellScript(
-					'../../tests/node_modules/.bin/wp-env start',
+					`${ wpEnvPath } start`,
 					environmentDirectory
 				);
-				log( '        >> Running the test.' );
+				log( '            >> Running the test.' );
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
 					performanceTestDirectory,
 					runKey
 				);
-				log( '        >> Stopping the environment' );
+				log( '            >> Stopping the environment' );
 				await runShellScript(
-					'../../tests/node_modules/.bin/wp-env stop',
+					`${ wpEnvPath } stop`,
 					environmentDirectory
 				);
 			}
@@ -493,9 +512,9 @@ async function runPerformanceTests( branches, options ) {
 		);
 		console.table( invertedResult );
 
-		const resultsFilename = testSuite + '-performance-results.json';
+		const resultsFilename = testSuite + '.performance-results.json';
 		fs.writeFileSync(
-			path.resolve( __dirname, '../../../', resultsFilename ),
+			path.join( ARTIFACTS_PATH, resultsFilename ),
 			JSON.stringify( results[ testSuite ], null, 2 )
 		);
 	}

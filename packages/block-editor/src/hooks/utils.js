@@ -222,6 +222,14 @@ export function useBlockSettings( name, parentLayout ) {
 	const themeColors = useSetting( 'color.palette.theme' );
 	const defaultColors = useSetting( 'color.palette.default' );
 	const defaultPalette = useSetting( 'color.defaultPalette' );
+	const userGradientPalette = useSetting( 'color.gradients.custom' );
+	const themeGradientPalette = useSetting( 'color.gradients.theme' );
+	const defaultGradientPalette = useSetting( 'color.gradients.default' );
+	const defaultGradients = useSetting( 'color.defaultGradients' );
+	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
+	const isBackgroundEnabled = useSetting( 'color.background' );
+	const isLinkEnabled = useSetting( 'color.link' );
+	const isTextEnabled = useSetting( 'color.text' );
 
 	const rawSettings = useMemo( () => {
 		return {
@@ -231,8 +239,18 @@ export function useBlockSettings( name, parentLayout ) {
 					theme: themeColors,
 					default: defaultColors,
 				},
+				gradients: {
+					custom: userGradientPalette,
+					theme: themeGradientPalette,
+					default: defaultGradientPalette,
+				},
+				defaultGradients,
 				defaultPalette,
 				custom: customColorsEnabled,
+				customGradient: areCustomGradientsEnabled,
+				background: isBackgroundEnabled,
+				link: isLinkEnabled,
+				text: isTextEnabled,
 			},
 			typography: {
 				fontFamilies: {
@@ -299,6 +317,14 @@ export function useBlockSettings( name, parentLayout ) {
 		themeColors,
 		defaultColors,
 		defaultPalette,
+		userGradientPalette,
+		themeGradientPalette,
+		defaultGradientPalette,
+		defaultGradients,
+		areCustomGradientsEnabled,
+		isBackgroundEnabled,
+		isLinkEnabled,
+		isTextEnabled,
 	] );
 
 	return useSettingsForBlockElement( rawSettings, name );

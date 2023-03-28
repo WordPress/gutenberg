@@ -592,7 +592,7 @@ function GalleryEdit( props ) {
 					{ imageSizeOptions?.length > 0 && (
 						<SelectControl
 							__nextHasNoMarginBottom
-							label={ __( 'Image size' ) }
+							label={ __( 'Resolution' ) }
 							help={ __(
 								'Select the size of the source images.'
 							) }
@@ -606,7 +606,7 @@ function GalleryEdit( props ) {
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
-								{ __( 'Image size' ) }
+								{ __( 'Resolution' ) }
 							</BaseControl.VisualLabel>
 							<View className={ 'gallery-image-sizes__loading' }>
 								<Spinner />
