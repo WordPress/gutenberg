@@ -67,6 +67,7 @@ export default function BlockAlignmentVisualizer( {
 					contentSize={ layout.contentSize }
 					wideSize={ layout.wideSize }
 					justification={ layout.justifyContent }
+					highlightedAlignment={ highlightedAlignment }
 				/>
 				<Guides
 					alignments={ availableAlignments }

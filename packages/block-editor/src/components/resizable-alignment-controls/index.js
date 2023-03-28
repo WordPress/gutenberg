@@ -126,7 +126,7 @@ function ResizableAlignmentControls( {
 							layoutClientId={ rootClientId }
 							focusedClientId={ clientId }
 							allowedAlignments={ allowedAlignments }
-							highlightedAlignment={ snappedAlignment }
+							highlightedAlignment={ snappedAlignment?.name }
 						/>
 					</motion.div>
 				) }

@@ -4,19 +4,33 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { Fragment } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+const ALIGNMENT_LABELS = {
+	content: __( 'Content width' ),
+	wide: __( 'Wide width' ),
+	full: __( 'Full width' ),
+};
+
+/**
  * Renders a visualization of block alignments.
  *
  * @param {Object}                  props
- * @param {string}                  props.contentSize   The CSS value for content size (e.g. 600px).
- * @param {string}                  props.wideSize      The CSS value for wide size (e.g. 80%).
- * @param {'none'|'wide'|'full'[]}  props.alignments    An array of the alignments to render.
- * @param {'left'|'right'|'center'} props.justification The justification.
+ * @param {string}                  props.contentSize          The CSS value for content size (e.g. 600px).
+ * @param {string}                  props.wideSize             The CSS value for wide size (e.g. 80%).
+ * @param {'none'|'wide'|'full'[]}  props.alignments           An array of the alignments to render.
+ * @param {'left'|'right'|'center'} props.justification        The justification.
+ * @param {string}                  props.highlightedAlignment The name of the highlighted alignment.
  */
 export default function Visualization( {
 	contentSize,
 	wideSize,
 	alignments,
 	justification,
+	highlightedAlignment,
 } ) {
 	return (
 		<>
@@ -45,9 +59,31 @@ export default function Visualization( {
 					}
 
 					.block-editor-alignment-visualizer__visualization-segment {
-						background: #3d5af2;
-						opacity: 0.2;
+						position: relative;
+						background: rgba(61, 90, 242, 0.2);
 						border-radius: 2px;
+					}
+
+					.block-editor-alignment-visualizer__visualization-segment-label {
+						position: absolute;
+						top: -32px;
+						right: 0px;
+						background: rgba( 0, 0, 0, 0.8 );
+						border-radius: 2px;
+						color: white;
+						font-size: 12px;
+						min-width: 32px;
+						opacity: 0;
+						padding: 4px 8px;
+						pointer-events: none;
+						text-align: center;
+						transition: opacity 120ms ease;
+						user-select: none;
+						line-height: 1.4;
+					}
+
+					.block-editor-alignment-visualizer__visualization-segment-label.is-highlighted {
+						opacity: 1;
 					}
 
 					/* Hide wide width alignments when the container is smaller than wide size */
@@ -116,7 +152,10 @@ export default function Visualization( {
 									/>
 								)
 						) }
-					<VisualizationSegment alignment="content" />
+					<VisualizationSegment
+						alignment="content"
+						isHighlighted={ highlightedAlignment === 'none' }
+					/>
 					{ alignments.map(
 						( { name } ) =>
 							( name === 'full' || name === 'wide' ) && (
@@ -124,6 +163,9 @@ export default function Visualization( {
 									key={ `${ name }-right` }
 									alignment={ name }
 									side="right"
+									isHighlighted={
+										highlightedAlignment === name
+									}
 								/>
 							)
 					) }
@@ -133,7 +175,9 @@ export default function Visualization( {
 	);
 }
 
-function VisualizationSegment( { side, alignment } ) {
+function VisualizationSegment( { side, alignment, isHighlighted } ) {
+	const label = ALIGNMENT_LABELS[ alignment ];
+
 	return (
 		<div
 			className={ classnames(
@@ -141,6 +185,19 @@ function VisualizationSegment( { side, alignment } ) {
 				`${ alignment }-width`,
 				{ [ `${ side }-side` ]: side }
 			) }
-		/>
+		>
+			{ !! label && (
+				<div
+					className={ classnames(
+						'block-editor-alignment-visualizer__visualization-segment-label',
+						{
+							'is-highlighted': isHighlighted,
+						}
+					) }
+				>
+					{ label }
+				</div>
+			) }
+		</div>
 	);
 }
