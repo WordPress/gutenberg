@@ -58,9 +58,9 @@ describe( 'Verse block', () => {
 	it( 'should produce expected markup for multiline text', async () => {
 		// Arrange
 		const screen = await initializeEditor();
+		await addBlock( screen, 'Verse' );
 
 		// Act
-		await addBlock( screen, 'Verse' );
 		const verseTextInput = await screen.findByPlaceholderText(
 			'Write verse…'
 		);

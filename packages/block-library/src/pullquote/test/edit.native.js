@@ -3,6 +3,7 @@
  */
 import {
 	addBlock,
+	getBlock,
 	initializeEditor,
 	setupCoreBlocks,
 	getEditorHtml,
@@ -24,16 +25,13 @@ describe( 'Pullquote', () => {
 		// Arrange
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Pullquote' );
-
-		const [ pullquoteBlock ] = screen.getAllByLabelText(
-			/Pullquote Block\. Row 1/
-		);
 		// Await inner blocks to be rendered
 		const citationBlock = await waitFor( () =>
 			screen.getByPlaceholderText( 'Add citation' )
 		);
 
 		// Act
+		const pullquoteBlock = getBlock( screen, 'Pullquote' );
 		fireEvent.press( pullquoteBlock );
 		const pullquoteTextInput =
 			within( pullquoteBlock ).getByPlaceholderText( 'Add quote' );

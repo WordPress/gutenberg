@@ -4,6 +4,7 @@
 import {
 	act,
 	addBlock,
+	getBlock,
 	changeTextOfRichText,
 	changeAndSelectTextOfRichText,
 	fireEvent,
@@ -49,11 +50,8 @@ describe( 'Paragraph block', () => {
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
 
-		const [ paragraphBlock ] = screen.getAllByLabelText(
-			/Paragraph Block\. Row 1/
-		);
-
 		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
@@ -77,11 +75,8 @@ describe( 'Paragraph block', () => {
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
 
-		const [ paragraphBlock ] = screen.getAllByLabelText(
-			/Paragraph Block\. Row 1/
-		);
-
 		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
@@ -105,11 +100,8 @@ describe( 'Paragraph block', () => {
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
 
-		const [ paragraphBlock ] = screen.getAllByLabelText(
-			/Paragraph Block\. Row 1/
-		);
-
 		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
@@ -133,11 +125,8 @@ describe( 'Paragraph block', () => {
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
 
-		const [ paragraphBlock ] = screen.getAllByLabelText(
-			/Paragraph Block\. Row 1/
-		);
-
 		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
@@ -161,11 +150,8 @@ describe( 'Paragraph block', () => {
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
 
-		const [ paragraphBlock ] = screen.getAllByLabelText(
-			/Paragraph Block\. Row 1/
-		);
-
 		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
@@ -189,11 +175,8 @@ describe( 'Paragraph block', () => {
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
 
-		const [ paragraphBlock ] = screen.getAllByLabelText(
-			/Paragraph Block\. Row 1/
-		);
-
 		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
@@ -217,11 +200,8 @@ describe( 'Paragraph block', () => {
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
 
-		const [ paragraphBlock ] = screen.getAllByLabelText(
-			/Paragraph Block\. Row 1/
-		);
-
 		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 		fireEvent.press( screen.getByLabelText( 'Align text' ) );
 		fireEvent.press( screen.getByLabelText( 'Align text center' ) );
@@ -255,11 +235,8 @@ describe( 'Paragraph block', () => {
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
 
-		const [ paragraphBlock ] = screen.getAllByLabelText(
-			/Paragraph Block\. Row 1/
-		);
-
 		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
@@ -299,11 +276,8 @@ describe( 'Paragraph block', () => {
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
 
-		const [ paragraphBlock ] = screen.getAllByLabelText(
-			/Paragraph Block\. Row 1/
-		);
-
 		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
@@ -349,11 +323,9 @@ describe( 'Paragraph block', () => {
 		Clipboard.getString.mockResolvedValue( 'https://wordpress.org' );
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
-		const [ paragraphBlock ] = screen.getAllByLabelText(
-			/Paragraph Block\. Row 1/
-		);
 
 		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
@@ -390,11 +362,9 @@ describe( 'Paragraph block', () => {
 		// Arrange
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Paragraph' );
-		const [ paragraphBlock ] = screen.getAllByLabelText(
-			/Paragraph Block\. Row 1/
-		);
 
 		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );

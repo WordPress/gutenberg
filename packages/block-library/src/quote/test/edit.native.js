@@ -3,6 +3,7 @@
  */
 import {
 	addBlock,
+	getBlock,
 	initializeEditor,
 	setupCoreBlocks,
 	getEditorHtml,
@@ -24,10 +25,7 @@ describe( 'Quote', () => {
 		// Arrange
 		const screen = await initializeEditor();
 		await addBlock( screen, 'Quote' );
-
-		const [ quoteBlock ] =
-			screen.getAllByLabelText( /Quote Block\. Row 1/ );
-
+		const quoteBlock = getBlock( screen, 'Quote' );
 		// A layout event must be explicitly dispatched in BlockList component,
 		// otherwise the inner blocks are not rendered.
 		fireEvent(
