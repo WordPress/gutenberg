@@ -25,10 +25,8 @@ const transforms = {
 
 					// File will be uploaded in componentDidMount()
 					blocks.push(
-						createBlock( 'core/file', {
-							href: blobURL,
-							fileName: file.name,
-							textLinkHref: blobURL,
+						createBlock( 'core/file', {}, [], {
+							blobURL,
 						} )
 					);
 				} );
