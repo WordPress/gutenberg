@@ -57,6 +57,15 @@ supports: {
 }
 ```
 
+If this property is set to `true` or `html`, the id attribute of the root element of the saved markup are referenced. If this property is set to `delimiter`, the attribute is saved as a comment delimiter. This value should be used for dynamic blocks that don't save markup.
+
+```js
+// Declare support for anchor links.
+supports: {
+	anchor: 'delimiter'
+}
+```
+
 ## align
 
 -   Type: `boolean` or `array`

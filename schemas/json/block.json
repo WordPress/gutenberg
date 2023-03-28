@@ -222,9 +222,17 @@
 			"description": "It contains as set of options to control features used in the editor. See the supports documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/ for more details.",
 			"properties": {
 				"anchor": {
-					"type": "boolean",
-					"description": "Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.",
-					"default": false
+					"description": "Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link. If this property is set to `true` or `html`, the id attribute of the root element of the saved markup are referenced. If this property is set to `delimiter`, the attribute is saved as a comment delimiter.",
+					"default": false,
+					"oneOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "string",
+							"enum": [ "html", "delimiter" ]
+						}
+					]
 				},
 				"align": {
 					"default": false,
