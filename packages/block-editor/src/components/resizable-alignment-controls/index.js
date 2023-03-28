@@ -81,6 +81,7 @@ function ResizableAlignmentControls( {
 	size,
 } ) {
 	const resizableRef = useRef();
+	const aspect = useRef( size.height / size.width );
 	const detectSnapping = useDetectSnapping();
 	const [ isAlignmentVisualizerVisible, setIsAlignmentVisualizerVisible ] =
 		useState( false );
@@ -95,20 +96,40 @@ function ResizableAlignmentControls( {
 		[ clientId ]
 	);
 
+	// Compute the styles of the content when snapped or unsnapped.
 	const contentStyle = useMemo( () => {
 		if ( ! snappedAlignment ) {
 			// By default the content takes up the full width of the resizable box.
 			return { width: '100%' };
 		}
 
-		const contentRect = getScreenRect( resizableRef.current );
+		// Calculate the positioning of the snapped image.
+		const resizableRect = getScreenRect( resizableRef.current );
+		const alignmentRect = snappedAlignment.rect;
+		return {
+			position: 'absolute',
+			left: alignmentRect.left - resizableRect.left,
+			top: alignmentRect.top - resizableRect.top,
+			width: alignmentRect.width,
+		};
+	}, [ snappedAlignment ] );
+
+	// Because the `contentStyle` is absolutely positioned when snapping occurs
+	// the block won't have the correct height. A separate div is used to provide
+	// the correct height, calculated here.
+	const heightStyle = useMemo( () => {
+		if ( ! snappedAlignment ) {
+			// This is a bit hacky, but using `float: left` ensures the element
+			// isn't part of the layout but still gives a height to the
+			// container.
+			return { float: 'left', height: 'inherit' };
+		}
+
 		const alignmentRect = snappedAlignment.rect;
 
 		return {
-			position: 'absolute',
-			left: alignmentRect.left - contentRect.left,
-			top: alignmentRect.top - contentRect.top,
-			width: alignmentRect.width,
+			float: 'left',
+			height: alignmentRect.width * aspect.current,
 		};
 	}, [ snappedAlignment ] );
 
@@ -180,6 +201,11 @@ function ResizableAlignmentControls( {
 				} }
 				resizeRatio={ currentAlignment === 'center' ? 2 : 1 }
 			>
+				<motion.div
+					layout
+					style={ heightStyle }
+					transition={ { duration: 0.2 } }
+				/>
 				<motion.div
 					layout
 					style={ contentStyle }
