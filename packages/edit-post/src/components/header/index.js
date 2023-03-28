@@ -3,15 +3,21 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
+import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { __unstableMotion as motion } from '@wordpress/components';
+import {
+	__unstableMotion as motion,
+	Button,
+	ToolbarItem,
+} from '@wordpress/components';
 import {
 	NavigableToolbar,
 	store as blockEditorStore,
 	BlockToolbar,
 } from '@wordpress/block-editor';
+import { tool, arrowDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -33,6 +39,30 @@ function MaybeHide( { children, isHidden } ) {
 	return children;
 }
 
+function ShowDocumentToolbarButton( { onClick } ) {
+	return (
+		<ToolbarItem
+			as={ Button }
+			className="edit-post-header-toolbar__document-tools-toggle"
+			variant="primary"
+			icon={ tool }
+			onClick={ onClick }
+		/>
+	);
+}
+
+function ShowBlockToolbarButton( { onClick } ) {
+	return (
+		<ToolbarItem
+			as={ Button }
+			className="edit-post-header-toolbar__block-tools-toggle"
+			variant="primary"
+			icon={ arrowDown }
+			onClick={ onClick }
+		/>
+	);
+}
+
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const isLargeViewport = useViewportMatch( 'large' );
 	const {
@@ -43,9 +73,13 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		hasSelectedBlocks,
 		showIconLabels,
 		isDistractionFreeMode,
+		isNavigationMode,
 	} = useSelect( ( select ) => {
-		const { getSettings, getSelectedBlockClientIds } =
-			select( blockEditorStore );
+		const {
+			getSettings,
+			getSelectedBlockClientIds,
+			isNavigationMode: _isNavigationMode,
+		} = select( blockEditorStore );
 		const settings = getSettings();
 		const _selectedBlockClientIds = getSelectedBlockClientIds();
 		return {
@@ -59,10 +93,25 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			isDistractionFreeMode:
 				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 			hasFixedToolbar: settings.hasFixedToolbar,
+			isNavigationMode: _isNavigationMode(),
 		};
 	} );
 
+	const {} = useSelect( blockEditorStore );
+
 	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
+
+	const [ headerToolbar, setHeaderToolbar ] = useState( 'document' );
+
+	useEffect( () => {
+		if ( isNavigationMode ) {
+			setHeaderToolbar( 'document' );
+		} else if ( hasSelectedBlocks ) {
+			setHeaderToolbar( 'block' );
+		} else {
+			setHeaderToolbar( 'document' );
+		}
+	}, [ hasSelectedBlocks, isNavigationMode ] );
 
 	const slideY = {
 		hidden: isDistractionFree ? { y: '-50' } : { y: 0 },
@@ -91,18 +140,34 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__toolbar"
 			>
-				{ ! hasFixedToolbar && <HeaderToolbar /> }
-				{ hasFixedToolbar && (
+				{ ( ! hasFixedToolbar || isNavigationMode ) && (
+					<HeaderToolbar />
+				) }
+				{ hasFixedToolbar && ! isNavigationMode && (
 					<>
-						<MaybeHide isHidden={ hasSelectedBlocks }>
-							<HeaderToolbar />
+						<MaybeHide isHidden={ headerToolbar === 'block' }>
+							<HeaderToolbar
+								hasSelectedBlocks={ hasSelectedBlocks }
+								BlockToolbarToggle={ () => (
+									<ShowBlockToolbarButton
+										onClick={ () =>
+											setHeaderToolbar( 'block' )
+										}
+									/>
+								) }
+							/>
 						</MaybeHide>
-						<MaybeHide isHidden={ ! hasSelectedBlocks }>
+						<MaybeHide isHidden={ headerToolbar === 'document' }>
 							<NavigableToolbar
 								className="edit-post-header-block-toolbar"
 								aria-label={ blockToolbarAriaLabel }
 							>
 								<InserterButton />
+								<ShowDocumentToolbarButton
+									onClick={ () =>
+										setHeaderToolbar( 'document' )
+									}
+								/>
 								<BlockToolbar
 									hideDragHandle={ hasFixedToolbar }
 								/>
