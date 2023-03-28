@@ -4,6 +4,7 @@ export {
 	useGlobalStyle,
 	useSettingsForBlockElement,
 } from './hooks';
+export { getBlockCSSSelector } from './get-block-css-selector';
 export { useGlobalStylesOutput } from './use-global-styles-output';
 export { GlobalStylesContext } from './context';
 export {
