@@ -12,7 +12,7 @@ const SUPPORTED_ENDPOINTS = {
 		/wp\/v2\/search\?.*/i,
 		/oembed\/1\.0\/proxy\?.*/i,
 	],
-	POST: [],
+	POST: [ /wpcom\/v2\/(media)\/.*/i ],
 };
 
 // [ONLY ON ANDROID] The requests made to these endpoints won't be cached.
