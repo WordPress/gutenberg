@@ -71,6 +71,10 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
+		},
+		"_classicMenuId": {
+			"type": "number",
+			"internal": true
 		}
 	},
 	"providesContext": {

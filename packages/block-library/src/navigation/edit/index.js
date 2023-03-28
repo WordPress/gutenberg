@@ -102,6 +102,7 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
+		_classicMenuId: classicMenuId,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -402,18 +403,34 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const onSelectClassicMenu = async ( classicMenu ) => {
-		const navMenu = await convertClassicMenu(
-			classicMenu.id,
-			classicMenu.name,
-			'draft'
-		);
-		if ( navMenu ) {
-			handleUpdateMenu( navMenu.id, {
-				focusNavigationBlock: true,
-			} );
+	const onSelectClassicMenu = useCallback(
+		async ( classicMenu ) => {
+			const navMenu = await convertClassicMenu(
+				classicMenu.id,
+				classicMenu.name,
+				'draft'
+			);
+			if ( navMenu ) {
+				handleUpdateMenu( navMenu.id, {
+					focusNavigationBlock: true,
+				} );
+			}
+		},
+		[ convertClassicMenu, handleUpdateMenu ]
+	);
+
+	// Convert the classic menu provided by the Legacy Widget block transform if
+	// it exists.
+	useEffect( () => {
+		if ( classicMenuId ) {
+			const classicMenu = classicMenus?.find(
+				( menu ) => menu.id === classicMenuId
+			);
+			if ( classicMenu ) {
+				onSelectClassicMenu( classicMenu );
+			}
 		}
-	};
+	}, [ classicMenuId, classicMenus, onSelectClassicMenu ] );
 
 	const onSelectNavigationMenu = ( menuId ) => {
 		handleUpdateMenu( menuId );
