@@ -276,7 +276,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					help={
 						<>
 							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-								{ __( 'Describe the purpose of the image' ) }
+								{ __( 'Describe the purpose of the image.' ) }
 							</ExternalLink>
 							<br />
 							{ __( 'Leave empty if decorative.' ) }

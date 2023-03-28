@@ -215,7 +215,7 @@ export default function CoverInspectorControls( {
 										<>
 											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 												{ __(
-													'Describe the purpose of the image'
+													'Describe the purpose of the image.'
 												) }
 											</ExternalLink>
 											<br />
