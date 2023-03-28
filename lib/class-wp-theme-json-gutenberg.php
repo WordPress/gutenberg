@@ -2275,51 +2275,33 @@ class WP_Theme_JSON_Gutenberg {
 		$style_variation_declarations = array();
 		if ( ! empty( $block_metadata['variations'] ) ) {
 			foreach ( $block_metadata['variations'] as $style_variation ) {
-				$style_variation_node     = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
-				$style_variation_selector = $style_variation['selector'];
+				$style_variation_node           = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
+				$clean_style_variation_selector = trim( $style_variation['selector'] );
 
-				// If the block has feature selectors, generate the declarations for them within the current style variation.
-				if ( ! empty( $block_metadata['features'] ) ) {
-					$clean_style_variation_selector = trim( $style_variation_selector );
-					foreach ( $block_metadata['features'] as $feature_name => $feature_selector ) {
-						if ( empty( $style_variation_node[ $feature_name ] ) ) {
-							continue;
-						}
-						// If feature selector includes block classname, remove it but leave the whitespace in.
-						$shortened_feature_selector = str_replace( $block_metadata['selector'] . ' ', ' ', $feature_selector );
-						// Prepend the variation selector to the feature selector.
-						$split_feature_selectors    = explode( ',', $shortened_feature_selector );
-						$feature_selectors          = array_map(
-							static function( $split_feature_selector ) use ( $clean_style_variation_selector ) {
-								return $clean_style_variation_selector . $split_feature_selector;
-							},
-							$split_feature_selectors
-						);
-						$combined_feature_selectors = implode( ',', $feature_selectors );
+				// Generate any feature/subfeature style declarations for the current style variation.
+				$variation_declarations = static::get_feature_declarations_for_node( $block_metadata, $style_variation_node, $settings, $this->theme_json );
 
-						// Compute declarations for the feature.
-						$new_feature_declarations = static::compute_style_properties( array( $feature_name => $style_variation_node[ $feature_name ] ), $settings, null, $this->theme_json );
+				// Combine selectors with style variation's selector and add to overall style variation declarations.
+				foreach ( $variation_declarations as $current_selector => $new_declarations ) {
+					// If current selector includes block classname, remove it but leave the whitespace in.
+					$shortened_selector = str_replace( $block_metadata['selector'] . ' ', ' ', $current_selector );
 
-						/*
-						 * Merge new declarations with any that already exist for
-						 * the feature selector. This may occur when multiple block
-						 * support features use the same custom selector.
-						 */
-						if ( isset( $style_variation_declarations[ $combined_feature_selectors ] ) ) {
-							$style_variation_declarations[ $combined_feature_selectors ] = array_merge( $style_variation_declarations[ $combined_feature_selectors ], $new_feature_declarations );
-						} else {
-							$style_variation_declarations[ $combined_feature_selectors ] = $new_feature_declarations;
-						}
+					// Prepend the variation selector to the current selector.
+					$split_selectors    = explode( ',', $shortened_selector );
+					$updated_selectors  = array_map(
+						static function( $split_selector ) use ( $clean_style_variation_selector ) {
+							return $clean_style_variation_selector . $split_selector;
+						},
+						$split_selectors
+					);
+					$combined_selectors = implode( ',', $updated_selectors );
 
-						/*
-						 * Remove the feature from the variation's node now the
-						 * styles will be included under the feature level selector.
-						 */
-						unset( $style_variation_node[ $feature_name ] );
-					}
+					// Add the new declarations to the overall results under the modified selector.
+					$style_variation_declarations[ $combined_selectors ] = $new_declarations;
 				}
+
 				// Compute declarations for remaining styles not covered by feature level selectors.
-				$style_variation_declarations[ $style_variation_selector ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
+				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
 			}
 		}
 
