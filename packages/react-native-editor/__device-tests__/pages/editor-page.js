@@ -11,7 +11,6 @@ const {
 	doubleTap,
 	isAndroid,
 	isEditorVisible,
-	longPressMiddleOfElement,
 	setClipboard,
 	setupDriver,
 	stopDriver,
@@ -25,10 +24,27 @@ const {
 	clickIfClickable,
 } = require( '../helpers/utils' );
 
+const ADD_BLOCK_ID = isAndroid()
+	? 'Add block, Double tap to add a block'
+	: 'Add block';
+
 const initializeEditorPage = async () => {
 	const driver = await setupDriver();
 	await isEditorVisible( driver );
-	return new EditorPage( driver );
+	const initialValues = await setupInitialValues( driver );
+	return new EditorPage( driver, initialValues );
+};
+
+// Stores initial values from the editor for different helpers.
+const setupInitialValues = async ( driver ) => {
+	const initialValues = {};
+	const addButton = await driver.elementsByAccessibilityId( ADD_BLOCK_ID );
+
+	if ( addButton.length !== 0 ) {
+		initialValues.addButtonLocation = await addButton[ 0 ].getLocation();
+	}
+
+	return initialValues;
 };
 
 class EditorPage {
@@ -39,10 +55,11 @@ class EditorPage {
 	verseBlockName = 'Verse';
 	orderedListButtonName = 'Ordered';
 
-	constructor( driver ) {
+	constructor( driver, initialValues ) {
 		this.driver = driver;
 		this.accessibilityIdKey = 'name';
 		this.accessibilityIdXPathAttrib = 'name';
+		this.initialValues = initialValues;
 
 		if ( isAndroid() ) {
 			this.accessibilityIdXPathAttrib = 'content-desc';
@@ -52,6 +69,13 @@ class EditorPage {
 
 	async getBlockList() {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
+	}
+
+	async getAddBlockButton( options = { timeout: 3000 } ) {
+		return await this.waitForElementToBeDisplayedById(
+			ADD_BLOCK_ID,
+			options.timeout
+		);
 	}
 
 	// ===============================
@@ -180,12 +204,11 @@ class EditorPage {
 			titleElement
 		);
 
-		if (
-			( elements.length === 0 || ! elements[ 0 ].isDisplayed() ) &&
-			options.autoscroll
-		) {
-			await swipeDown( this.driver );
-			return this.getTitleElement( options );
+		if ( elements.length === 0 || ! elements[ 0 ].isDisplayed() ) {
+			if ( options.autoscroll ) {
+				await swipeDown( this.driver );
+			}
+			return await this.getTitleElement( options );
 		}
 		return elements[ 0 ];
 	}
@@ -261,18 +284,52 @@ class EditorPage {
 	}
 
 	async dismissKeyboard() {
+		const orientation = await this.driver.getOrientation();
 		const keyboardShown = await this.driver.isKeyboardShown();
 		if ( ! keyboardShown ) {
 			return;
 		}
-		if ( isAndroid() ) {
+
+		// On Android with the landspace orientation set, we use the
+		// driver functionality to hide the keyboard.
+		if ( isAndroid() && orientation === 'LANDSCAPE' ) {
 			return await this.driver.hideDeviceKeyboard();
 		}
 
-		await clickIfClickable(
-			this.driver,
-			'//XCUIElementTypeButton[@name="Hide keyboard"]'
-		);
+		const hideKeyboardButton = isAndroid()
+			? await this.waitForElementToBeDisplayedById(
+					'Hide keyboard, Tap to hide the keyboard'
+			  )
+			: await this.waitForElementToBeDisplayedByXPath(
+					'//XCUIElementTypeButton[@name="Hide keyboard"]'
+			  );
+
+		await hideKeyboardButton.click();
+		await this.waitForKeyboardToBeHidden();
+	}
+
+	// Takes the add block button as reference for the keyboard to be
+	// fully hidden.
+	async waitForKeyboardToBeHidden() {
+		const { addButtonLocation } = this.initialValues;
+		const addButton = await this.getAddBlockButton();
+		const location = await addButton.getLocation();
+		let YLocation = addButtonLocation?.y;
+		const currentOrientation = await this.driver.getOrientation();
+		const isLandscape = currentOrientation === 'LANDSCAPE';
+
+		if ( isLandscape ) {
+			const windowSize = await this.driver.getWindowSize();
+			const safeAreaOffset = 32;
+			YLocation = Math.floor(
+				( windowSize.height * YLocation ) / windowSize.width -
+					safeAreaOffset
+			);
+		}
+
+		if ( location.y < YLocation ) {
+			await this.waitForKeyboardToBeHidden();
+		}
 	}
 
 	async dismissAndroidClipboardSmartSuggestion() {
@@ -323,34 +380,13 @@ class EditorPage {
 	// Block toolbar functions
 	// =========================
 
-	async addNewBlock( blockName, relativePosition ) {
-		const addBlockElement = isAndroid()
-			? 'Add block, Double tap to add a block'
-			: 'Add block';
-		const addButton = await this.waitForElementToBeDisplayedById(
-			addBlockElement,
-			3000
-		);
+	async getToolbar() {
+		return await this.driver.elementsByAccessibilityId( 'Document tools' );
+	}
 
-		if ( relativePosition === 'before' ) {
-			// On Android it doesn't get the right size of the button
-			const customElementSize = {
-				width: 43,
-				height: 43,
-			};
-
-			await longPressMiddleOfElement(
-				this.driver,
-				addButton,
-				8000,
-				customElementSize
-			);
-			const addBlockBeforeButtonLocator = isAndroid()
-				? '//android.widget.Button[@content-desc="Add Block Before"]'
-				: '//XCUIElementTypeButton[@name="Add Block Before"]';
-
-			await clickIfClickable( this.driver, addBlockBeforeButtonLocator );
-		} else {
+	async addNewBlock( blockName, { skipInserterOpen = false } = {} ) {
+		if ( ! skipInserterOpen ) {
+			const addButton = await this.getAddBlockButton();
 			await addButton.click();
 		}
 
@@ -381,6 +417,11 @@ class EditorPage {
 			inserterElement,
 			4000
 		);
+	}
+
+	static async isElementOutOfBounds( element, { width, height } = {} ) {
+		const { x, y } = await element.getLocation();
+		return x > width || y > height;
 	}
 
 	// Attempts to find the given block button in the block inserter control.
@@ -438,7 +479,10 @@ class EditorPage {
 		// We start dragging a bit above it to not trigger home button.
 		const height = size.height - 50;
 
-		while ( ! ( await blockButton.isDisplayed() ) ) {
+		while (
+			! ( await blockButton.isDisplayed() ) ||
+			( await EditorPage.isElementOutOfBounds( blockButton, { height } ) )
+		) {
 			await this.driver.execute( 'mobile: dragFromToForDuration', {
 				fromX: 50,
 				fromY: height,
@@ -532,6 +576,28 @@ class EditorPage {
 		);
 
 		await removeActionButton.click();
+	}
+
+	// =========================
+	// Formatting toolbar functions
+	// =========================
+
+	async toggleFormatting( formatting ) {
+		const identifier = isAndroid()
+			? `//android.widget.Button[@content-desc="${ formatting }"]/android.view.ViewGroup`
+			: `//XCUIElementTypeButton[@name="${ formatting }"]`;
+		const toggleElement = await this.waitForElementToBeDisplayedByXPath(
+			identifier
+		);
+		return await toggleElement.click();
+	}
+
+	async openLinkToSettings() {
+		const element = await this.waitForElementToBeDisplayedById(
+			'Link to, Search or type URL'
+		);
+
+		await element.click();
 	}
 
 	// =========================
@@ -842,14 +908,41 @@ class EditorPage {
 		return await waitForVisible( this.driver, blockLocator );
 	}
 
+	// =========================
+	// Button Block functions
+	// =========================
+
+	async getButtonBlockTextInputAtPosition( position = 1 ) {
+		const blockLocator = isAndroid()
+			? `//android.view.ViewGroup[@content-desc="Button Block. Row ${ position }"]/android.view.ViewGroup[2]/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText`
+			: `//XCUIElementTypeButton[contains(@name, "Button Block. Row ${ position }")]//XCUIElementTypeTextView`;
+
+		return await this.waitForElementToBeDisplayedByXPath( blockLocator );
+	}
+
+	async addButtonWithInlineAppender( position = 1 ) {
+		const appenderButton = isAndroid()
+			? await this.waitForElementToBeDisplayedByXPath(
+					`//android.view.ViewGroup[@content-desc="block-list"]/android.view.ViewGroup[${ position }]/android.widget.Button`
+			  )
+			: await this.waitForElementToBeDisplayedById( 'appender-button' );
+		await appenderButton.click();
+	}
+
 	async waitForElementToBeDisplayedById( id, timeout = 2000 ) {
-		await this.driver.waitForElementByAccessibilityId(
+		return await this.driver.waitForElementByAccessibilityId(
 			id,
 			wd.asserters.isDisplayed,
 			timeout
 		);
+	}
 
-		return await this.driver.elementByAccessibilityId( id );
+	async waitForElementToBeDisplayedByXPath( id, timeout = 2000 ) {
+		return await this.driver.waitForElementByXPath(
+			id,
+			wd.asserters.isDisplayed,
+			timeout
+		);
 	}
 }
 
@@ -873,6 +966,9 @@ const blockNames = {
 	verse: 'Verse',
 	shortcode: 'Shortcode',
 	group: 'Group',
+	buttons: 'Buttons',
+	button: 'Button',
+	preformatted: 'Preformatted',
 };
 
 module.exports = { initializeEditorPage, blockNames };

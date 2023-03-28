@@ -11,6 +11,8 @@
 		},
 		"color": {
 			"background": true,
+			"button": true,
+			"caption": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
@@ -121,6 +123,7 @@
 					"slug": "midnight"
 				}
 			],
+			"heading": true,
 			"link": false,
 			"palette": [
 				{
@@ -352,6 +355,28 @@
 							}
 						}
 					]
+				},
+				"grid": {
+					"name": "grid",
+					"slug": "grid",
+					"className": "is-layout-grid",
+					"displayMode": "grid",
+					"baseStyles": [
+						{
+							"selector": " > *",
+							"rules": {
+								"margin": "0"
+							}
+						}
+					],
+					"spacingStyles": [
+						{
+							"selector": "",
+							"rules": {
+								"gap": null
+							}
+						}
+					]
 				}
 			}
 		},
@@ -398,6 +423,7 @@
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true
 		},

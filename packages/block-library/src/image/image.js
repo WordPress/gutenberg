@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -166,16 +166,22 @@ export default function Image( {
 		! isContentLocked &&
 		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = imageSizes
-		.filter( ( { slug } ) =>
-			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
+		.filter(
+			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
 		)
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+	const canUploadMedia = !! mediaUpload;
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
 	// we can enable a button in the toolbar to upload the image.
 	useEffect( () => {
-		if ( ! isExternalImage( id, url ) || ! isSelected || externalBlob ) {
+		if (
+			! isExternalImage( id, url ) ||
+			! isSelected ||
+			! canUploadMedia ||
+			externalBlob
+		) {
 			return;
 		}
 
@@ -185,7 +191,7 @@ export default function Image( {
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
 			.catch( () => {} );
-	}, [ id, url, isSelected, externalBlob ] );
+	}, [ id, url, isSelected, externalBlob, canUploadMedia ] );
 
 	// We need to show the caption when changes come from
 	// history navigation(undo/redo).
@@ -259,12 +265,7 @@ export default function Image( {
 	}
 
 	function updateImage( newSizeSlug ) {
-		const newUrl = get( image, [
-			'media_details',
-			'sizes',
-			newSizeSlug,
-			'source_url',
-		] );
+		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
 		if ( ! newUrl ) {
 			return null;
 		}

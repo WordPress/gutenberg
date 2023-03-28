@@ -37,14 +37,17 @@ describe( 'Duotone utilities', () => {
 
 		it( 'should return undefined if a non-existent preset is provided', () => {
 			expect(
-				getColorsFromDuotonePreset( 'does-not-exist', duotonePalette )
+				getColorsFromDuotonePreset(
+					`var:preset|duotone|does-not-exist`,
+					duotonePalette
+				)
 			).toBeUndefined();
 		} );
 
 		it( 'should return the colors from the preset if found', () => {
 			expect(
 				getColorsFromDuotonePreset(
-					duotonePalette[ 2 ].slug,
+					`var:preset|duotone|${ duotonePalette[ 2 ].slug }`,
 					duotonePalette
 				)
 			).toEqual( duotonePalette[ 2 ].colors );
@@ -93,7 +96,7 @@ describe( 'Duotone utilities', () => {
 					duotonePalette[ 2 ].colors,
 					duotonePalette
 				)
-			).toEqual( duotonePalette[ 2 ].slug );
+			).toEqual( `var:preset|duotone|${ duotonePalette[ 2 ].slug }` );
 		} );
 	} );
 } );

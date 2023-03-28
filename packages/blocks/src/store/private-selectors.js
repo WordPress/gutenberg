@@ -15,7 +15,9 @@ const ROOT_BLOCK_SUPPORTS = [
 	'backgroundColor',
 	'color',
 	'linkColor',
+	'captionColor',
 	'buttonColor',
+	'headingColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
@@ -69,6 +71,11 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 				element
 			)
 		) {
+			return false;
+		}
+
+		// Text columns is only available for blocks.
+		if ( support === 'textColumns' && ! name ) {
 			return false;
 		}
 

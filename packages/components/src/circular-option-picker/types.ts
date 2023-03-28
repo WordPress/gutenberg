@@ -57,7 +57,7 @@ export type OptionProps = Omit<
 > & {
 	className?: string;
 	tooltipText?: string;
-	isSelected: boolean;
+	isSelected?: boolean;
 	// `icon` is explicitly defined as 'check' by CircleOptionPicker.Option
 	// and is not intended to be overridden.
 	// `size` relies on the `Icon` component's default size of `24` to fit

@@ -131,7 +131,7 @@ const getOpenverseCaption = ( item ) => {
 			  )
 			: sprintf(
 					// translators: %1s: Link attributes for a given Openverse media work; %2s: Works's licence e.g: "CC0 1.0".
-					_x( '<a %1$s>Work</a>/ %3$s', 'caption' ),
+					_x( '<a %1$s>Work</a>/ %2$s', 'caption' ),
 					getExternalLinkAttributes( foreignLandingUrl ),
 					licenseUrl
 						? getExternalLink(

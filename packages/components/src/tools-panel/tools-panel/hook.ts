@@ -30,7 +30,9 @@ const generateMenuItems = ( {
 	panelItems,
 	shouldReset,
 	currentMenuItems,
+	menuItemOrder,
 }: ToolsPanelMenuItemsConfig ) => {
+	const newMenuItems: ToolsPanelMenuItems = { default: {}, optional: {} };
 	const menuItems: ToolsPanelMenuItems = { default: {}, optional: {} };
 
 	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
@@ -42,7 +44,31 @@ const generateMenuItems = ( {
 		const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
 		const value = existingItemValue ? existingItemValue : hasValue();
 
-		menuItems[ group ][ label ] = shouldReset ? false : value;
+		newMenuItems[ group ][ label ] = shouldReset ? false : value;
+	} );
+
+	// Loop the known, previously registered items first to maintain menu order.
+	menuItemOrder.forEach( ( key ) => {
+		if ( newMenuItems.default.hasOwnProperty( key ) ) {
+			menuItems.default[ key ] = newMenuItems.default[ key ];
+		}
+
+		if ( newMenuItems.optional.hasOwnProperty( key ) ) {
+			menuItems.optional[ key ] = newMenuItems.optional[ key ];
+		}
+	} );
+
+	// Loop newMenuItems object adding any that aren't in the known items order.
+	Object.keys( newMenuItems.default ).forEach( ( key ) => {
+		if ( ! menuItems.default.hasOwnProperty( key ) ) {
+			menuItems.default[ key ] = newMenuItems.default[ key ];
+		}
+	} );
+
+	Object.keys( newMenuItems.optional ).forEach( ( key ) => {
+		if ( ! menuItems.optional.hasOwnProperty( key ) ) {
+			menuItems.optional[ key ] = newMenuItems.optional[ key ];
+		}
 	} );
 
 	return menuItems;
@@ -82,12 +108,14 @@ export function useToolsPanel(
 
 	// Allow panel items to register themselves.
 	const [ panelItems, setPanelItems ] = useState< ToolsPanelItem[] >( [] );
+	const [ menuItemOrder, setMenuItemOrder ] = useState< string[] >( [] );
 	const [ resetAllFilters, setResetAllFilters ] = useState<
 		ResetAllFilter[]
 	>( [] );
 
 	const registerPanelItem = useCallback(
 		( item: ToolsPanelItem ) => {
+			// Add item to panel items.
 			setPanelItems( ( items ) => {
 				const newItems = [ ...items ];
 				// If an item with this label has already been registered, remove it
@@ -101,8 +129,18 @@ export function useToolsPanel(
 				}
 				return [ ...newItems, item ];
 			} );
+
+			// Track the initial order of item registration. This is used for
+			// maintaining menu item order later.
+			setMenuItemOrder( ( items ) => {
+				if ( items.includes( item.label ) ) {
+					return items;
+				}
+
+				return [ ...items, item.label ];
+			} );
 		},
-		[ setPanelItems ]
+		[ setPanelItems, setMenuItemOrder ]
 	);
 
 	// Panels need to deregister on unmount to avoid orphans in menu state.
@@ -160,10 +198,11 @@ export function useToolsPanel(
 				panelItems,
 				shouldReset: false,
 				currentMenuItems: prevState,
+				menuItemOrder,
 			} );
 			return items;
 		} );
-	}, [ panelItems, setMenuItems ] );
+	}, [ panelItems, setMenuItems, menuItemOrder ] );
 
 	// Force a menu item to be checked.
 	// This is intended for use with default panel items. They are displayed
@@ -267,10 +306,11 @@ export function useToolsPanel(
 		// Turn off display of all non-default items.
 		const resetMenuItems = generateMenuItems( {
 			panelItems,
+			menuItemOrder,
 			shouldReset: true,
 		} );
 		setMenuItems( resetMenuItems );
-	}, [ panelItems, resetAllFilters, resetAll, setMenuItems ] );
+	}, [ panelItems, resetAllFilters, resetAll, setMenuItems, menuItemOrder ] );
 
 	// Assist ItemGroup styling when there are potentially hidden placeholder
 	// items by identifying first & last items that are toggled on for display.

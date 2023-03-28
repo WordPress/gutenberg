@@ -12,7 +12,7 @@ const testData = require( './__device-tests__/helpers/test-data' );
  * External dependencies
  */
 // eslint-disable-next-line import/no-extraneous-dependencies
-const JSDOMEnvironment = require( 'jest-environment-jsdom' );
+const JSDOMEnvironment = require( 'jest-environment-jsdom' ).default;
 
 class CustomEnvironment extends JSDOMEnvironment {
 	async setup() {
