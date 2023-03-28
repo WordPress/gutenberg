@@ -106,27 +106,27 @@ const fetchAssets = async ( document ) => {
 };
 
 // Fetch a new page and convert it to a static virtual DOM.
-const fetchPage = async ( url ) => {
-	const html = await window.fetch( url ).then( ( r ) => r.text() );
+const fetchPage = async ( url, options = {} ) => {
+	const html =
+		options.html || ( await window.fetch( url ).then( ( r ) => r.text() ) );
 	const dom = new window.DOMParser().parseFromString( html, 'text/html' );
-	if ( ! canDoClientSideNavigation( dom.head ) ) return false;
 	const head = await fetchAssets( dom );
 	return { head, body: toVdom( dom.body ) };
 };
 
 // Prefetch a page. We store the promise to avoid triggering a second fetch for
 // a page if a fetching has already started.
-export const prefetch = ( url ) => {
+export const prefetch = ( url, options = {} ) => {
 	url = cleanUrl( url );
-	if ( ! pages.has( url ) ) {
-		pages.set( url, fetchPage( url ) );
+	if ( options.force || ! pages.has( url ) ) {
+		pages.set( url, fetchPage( url, options ) );
 	}
 };
 
 // Navigate to a new page.
-export const navigate = async ( href ) => {
+export const navigate = async ( href, options = {} ) => {
 	const url = cleanUrl( href );
-	prefetch( url );
+	prefetch( url, options );
 	const page = await pages.get( url );
 	if ( page ) {
 		document.head.replaceChildren( ...page.head );

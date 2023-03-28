@@ -5,10 +5,17 @@ import './runtime/init.js';
 import { store, navigate } from './runtime';
 
 store( {
+	state: {
+		core: {
+			commentsFormError: '',
+		},
+	},
 	actions: {
 		core: {
-			commentsFormSubmission: async ( { event } ) => {
+			commentsFormSubmission: async ( { event, state } ) => {
 				event.preventDefault();
+
+				state.core.commentsFormError = '';
 
 				const formData = new FormData( event.target );
 
@@ -22,16 +29,21 @@ store( {
 
 				const html = await res.text();
 
-				// We need to do something like this.
-				// navigate( res.url, {
-				// 	force: true,
-				// 	replace: true,
-				// 	htmlString: html,
-				// } );
+				if ( res.status !== 200 ) {
+					const dom = new window.DOMParser().parseFromString(
+						html,
+						'text/html'
+					);
+					state.core.commentsFormError =
+						dom.querySelector( 'p' ).innerHTML;
+				} else {
+					navigate( res.url, {
+						html,
+						force: true,
+					} );
 
-				event.target.reset();
-
-				debugger;
+					event.target.reset();
+				}
 			},
 		},
 	},

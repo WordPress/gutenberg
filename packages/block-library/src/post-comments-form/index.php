@@ -45,6 +45,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	// to the block is carried along when the comment form is moved to the location
 	// of the 'Reply' link that the user clicked by Core's `comment-reply.js` script.
 	$form = str_replace( 'class="comment-respond"', $wrapper_attributes, $form );
+	$form = str_replace( '</form>', '<div style="color: red;" data-wp-text="state.core.commentsFormError"></div></form>', $form );
 
 	// Enqueue the comment-reply script.
 	// wp_enqueue_script( 'comment-reply' );
