@@ -220,8 +220,9 @@ export default function CoverInspectorControls( {
 													'Describe the purpose of the image'
 												) }
 											</ExternalLink>
+											<br />
 											{ __(
-												'Leave empty if the image is purely decorative.'
+												'Leave empty if decorative.'
 											) }
 										</>
 									}
