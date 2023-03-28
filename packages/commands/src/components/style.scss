@@ -144,4 +144,19 @@
 		white-space: pre-wrap;
 		color: $gray-800;
 	}
+
+	[cmdk-list-sizer] {
+		position: relative;
+	}
+
+	[cmdk-loading] {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 150px;
+	}
 }

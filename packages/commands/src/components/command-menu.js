@@ -9,7 +9,7 @@ import { Command } from 'cmdk';
 import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Modal, Button } from '@wordpress/components';
+import { Modal, Button, Spinner } from '@wordpress/components';
 import { Icon, chevronLeft } from '@wordpress/icons';
 
 /**
@@ -23,25 +23,30 @@ function CommandsPerPage( { search, navigateToPage, loader, commands } ) {
 	const allCommands = [ ...commands, ...loaderCommands ];
 
 	return (
-		<Command.List>
-			{ ! isLoading && ! allCommands?.length && (
-				<Command.Empty>{ __( 'No results found.' ) }</Command.Empty>
-			) }
+		<>
+			<Command.List>
+				{ isLoading && (
+					<Command.Loading>
+						<Spinner />
+					</Command.Loading>
+				) }
+				{ ! isLoading && ! allCommands?.length && (
+					<Command.Empty>{ __( 'No results found.' ) }</Command.Empty>
+				) }
 
-			{ isLoading && (
-				<Command.Loading>{ __( 'Hang on…' ) }</Command.Loading>
-			) }
-
-			{ allCommands.map( ( command ) => (
-				<Command.Item
-					key={ command.name }
-					value={ command.name }
-					onSelect={ () => command.callback( { navigateToPage } ) }
-				>
-					{ command.label }
-				</Command.Item>
-			) ) }
-		</Command.List>
+				{ allCommands.map( ( command ) => (
+					<Command.Item
+						key={ command.name }
+						value={ command.name }
+						onSelect={ () =>
+							command.callback( { navigateToPage } )
+						}
+					>
+						{ command.label }
+					</Command.Item>
+				) ) }
+			</Command.List>
+		</>
 	);
 }
 
