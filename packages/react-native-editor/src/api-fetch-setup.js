@@ -4,13 +4,16 @@
 import { fetchRequest, postRequest } from '@wordpress/react-native-bridge';
 import apiFetch from '@wordpress/api-fetch';
 
-// Please add only wp.org API paths here!
-const SUPPORTED_ENDPOINTS = [
-	/wp\/v2\/(media|categories|blocks|themes)\/?\d*?.*/i,
-	/wp\/v2\/search\?.*/i,
-	/oembed\/1\.0\/proxy\?.*/i,
-];
 const SUPPORTED_METHODS = [ 'GET', 'POST' ];
+// Please add only wp.org API paths here!
+const SUPPORTED_ENDPOINTS = {
+	GET: [
+		/wp\/v2\/(media|categories|blocks|themes)\/?\d*?.*/i,
+		/wp\/v2\/search\?.*/i,
+		/oembed\/1\.0\/proxy\?.*/i,
+	],
+	POST: [],
+};
 
 // [ONLY ON ANDROID] The requests made to these endpoints won't be cached.
 const DISABLED_CACHING_ENDPOINTS = [ /wp\/v2\/(blocks)\/?\d*?.*/i ];
@@ -23,12 +26,14 @@ const fetchHandler = (
 	retries = 20,
 	retryCount = 1
 ) => {
-	if ( ! isPathSupported( path ) ) {
-		return Promise.reject( `Unsupported path: ${ path }` );
-	}
-
 	if ( ! isMethodSupported( method ) ) {
 		return Promise.reject( `Unsupported method: ${ method }` );
+	}
+
+	if ( ! isPathSupported( path, method ) ) {
+		return Promise.reject(
+			`Unsupported path for method ${ method }: ${ path }`
+		);
 	}
 
 	let responsePromise;
@@ -62,11 +67,11 @@ const fetchHandler = (
 	} );
 };
 
-export const isPathSupported = ( path ) =>
-	SUPPORTED_ENDPOINTS.some( ( pattern ) => pattern.test( path ) );
-
 export const isMethodSupported = ( method ) =>
 	SUPPORTED_METHODS.includes( method );
+
+export const isPathSupported = ( path, method ) =>
+	SUPPORTED_ENDPOINTS[ method ].some( ( pattern ) => pattern.test( path ) );
 
 export const shouldEnableCaching = ( path ) =>
 	! DISABLED_CACHING_ENDPOINTS.some( ( pattern ) => pattern.test( path ) );

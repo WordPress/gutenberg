@@ -3,20 +3,24 @@
  */
 import { isPathSupported, shouldEnableCaching } from '../api-fetch-setup';
 
-const supportedPaths = [
-	'wp/v2/media/54?context=edit&_locale=user',
-	'wp/v2/media/5?context=edit',
-	'wp/v2/media/54/',
-	'wp/v2/media/',
-	'wp/v2/media?context=edit&_locale=user',
-	'wp/v2/categories/',
-	'wp/v2/blocks/28?_locale=user',
-	'/wp/v2/blocks?per_page=100&context=edit&_locale=user',
-];
+const supportedPaths = {
+	GET: [
+		'wp/v2/media/54?context=edit&_locale=user',
+		'wp/v2/media/5?context=edit',
+		'wp/v2/media/54/',
+		'wp/v2/media/',
+		'wp/v2/media?context=edit&_locale=user',
+		'wp/v2/categories/',
+		'wp/v2/blocks/28?_locale=user',
+		'/wp/v2/blocks?per_page=100&context=edit&_locale=user',
+	],
+};
 
-const unsupportedPaths = [
-	'wp/v1/media/', // Made up example.
-];
+const unsupportedPaths = {
+	GET: [
+		'wp/v1/media/', // Made up example.
+	],
+};
 
 const enabledCachingPaths = [
 	'wp/v2/media/54?context=edit&_locale=user',
@@ -33,15 +37,17 @@ const disabledCachingPaths = [
 ];
 
 describe( 'isPathSupported', () => {
-	supportedPaths.forEach( ( path ) => {
-		it( `supports ${ path }`, () => {
-			expect( isPathSupported( path ) ).toBe( true );
+	describe( 'GET requests', () => {
+		supportedPaths.GET.forEach( ( path ) => {
+			it( `supports ${ path }`, () => {
+				expect( isPathSupported( path, 'GET' ) ).toBe( true );
+			} );
 		} );
-	} );
 
-	unsupportedPaths.forEach( ( path ) => {
-		it( `does not support ${ path }`, () => {
-			expect( isPathSupported( path ) ).toBe( false );
+		unsupportedPaths.GET.forEach( ( path ) => {
+			it( `does not support ${ path }`, () => {
+				expect( isPathSupported( path, 'GET' ) ).toBe( false );
+			} );
 		} );
 	} );
 } );
