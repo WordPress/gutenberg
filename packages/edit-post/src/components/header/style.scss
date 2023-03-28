@@ -249,6 +249,10 @@
 	top: math.div($grid-unit, 2) + 2;
 }
 
+.maybeHide:focus-within + .edit-post-header-block-toolbar > .edit-post-header-toolbar__inserter-toggle {
+	display: none;
+}
+
 .edit-post-header .edit-post-header-block-toolbar {
 	display: inline-flex;
 	flex-grow: 1;
