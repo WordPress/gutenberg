@@ -11,8 +11,8 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_anchor_support( $block_type ) {
-	$has_anchor_support = _wp_array_get( $block_type->supports, array( 'anchor' ), true );
-	if ( ! $has_anchor_support ) {
+	$anchor_support = _wp_array_get( $block_type->supports, array( 'anchor' ), true );
+	if ( ! $anchor_support ) {
 		return;
 	}
 
@@ -20,7 +20,16 @@ function gutenberg_register_anchor_support( $block_type ) {
 		$block_type->attributes = array();
 	}
 
-	if ( ! array_key_exists( 'anchor', $block_type->attributes ) ) {
+	if ( true === $anchor_support || 'html' === $anchor_support ) {
+		$block_type->attributes['anchor'] = array(
+			'type'      => 'string',
+			'source'    => 'attribute',
+			'attribute' => 'id',
+			'selector'  => '*',
+		);
+	}
+
+	if ( 'delimiter' === $anchor_support ) {
 		$block_type->attributes['anchor'] = array(
 			'type' => 'string',
 		);
