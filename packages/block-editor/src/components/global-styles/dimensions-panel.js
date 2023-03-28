@@ -189,6 +189,7 @@ const DEFAULT_CONTROLS = {
 	margin: true,
 	blockGap: true,
 	minHeight: true,
+	childLayout: true,
 };
 
 export default function DimensionsPanel( {
@@ -612,7 +613,11 @@ export default function DimensionsPanel( {
 					hasValue={ hasChildLayoutValue }
 					label={ childLayoutOrientationLabel }
 					onDeselect={ resetChildLayoutValue }
-					isShownByDefault={ defaultControls.childLayout }
+					isShownByDefault={
+						typeof defaultControls.childLayout === 'boolean'
+							? defaultControls.childLayout
+							: DEFAULT_CONTROLS.childLayout
+					}
 					panelId={ panelId }
 				>
 					<ChildLayoutControl
