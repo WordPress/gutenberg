@@ -79,7 +79,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 					return $feature_selector;
 				}
 
-				// Check if feature selector set via shorthand.
+				// Check if feature selector is set via shorthand.
 				$feature_selector = _wp_array_get( $block_type->selectors, $target, null );
 
 				return is_string( $feature_selector ) ? $feature_selector : $fallback_selector;

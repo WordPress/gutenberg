@@ -2269,7 +2269,7 @@ class WP_Theme_JSON_Gutenberg {
 		$selector         = $block_metadata['selector'];
 		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
 
-		$feature_declarations = static::get_feature_declarations_for_block( $block_metadata, $node, $settings, $this->theme_json );
+		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node, $settings, $this->theme_json );
 
 		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
 		$style_variation_declarations = array();
@@ -3498,37 +3498,36 @@ class WP_Theme_JSON_Gutenberg {
 		return $element_selectors;
 	}
 
-
 	/**
-	 * Generates style declarations for the block's features e.g. color, border,
-	 * typography etc, that have custom selectors in their block metadata.
+	 * Generates style declarations for a node's features e.g. color, border,
+	 * typography etc, that have custom selectors in their related block's
+	 * metadata.
 	 *
-	 * @param object $block_metadata The block's metadata containing selectors for
-	 * features.
-	 * @param object $block_node The merged theme.json node for the block.
+	 * @param object $metadata The related block metadata containing selectors.
+	 * @param object $node     A merged theme.json node for block or variation.
 	 * @param object $settings The theme.json settings for the node.
 	 * @param object $theme_json The current theme.json config.
 	 *
-	 * @return array The style declarations for the block's features with custom
+	 * @return array The style declarations for the node's features with custom
 	 * selectors.
 	 */
-	protected static function get_feature_declarations_for_block( $block_metadata, &$block_node, $settings, $theme_json ) {
+	protected static function get_feature_declarations_for_node( $metadata, &$node, $settings, $theme_json ) {
 		$declarations = array();
 
-		if ( ! isset( $block_metadata['selectors'] ) ) {
+		if ( ! isset( $metadata['selectors'] ) ) {
 			return $declarations;
 		}
 
-		foreach ( $block_metadata['selectors'] as $feature => $feature_selectors ) {
+		foreach ( $metadata['selectors'] as $feature => $feature_selectors ) {
 			// Skip if this is the block's root selector or the block doesn't
 			// have any styles for the feature.
-			if ( 'root' === $feature || empty( $block_node[ $feature ] ) ) {
+			if ( 'root' === $feature || empty( $node[ $feature ] ) ) {
 				continue;
 			}
 
 			if ( is_array( $feature_selectors ) ) {
 				foreach ( $feature_selectors as $subfeature => $subfeature_selector ) {
-					if ( 'root' === $subfeature || empty( $block_node[ $feature ][ $subfeature ] ) ) {
+					if ( 'root' === $subfeature || empty( $node[ $feature ][ $subfeature ] ) ) {
 						continue;
 					}
 
@@ -3536,7 +3535,7 @@ class WP_Theme_JSON_Gutenberg {
 					// to leverage existing `compute_style_properties` function.
 					$subfeature_node = array(
 						$feature => array(
-							$subfeature => $block_node[ $feature ][ $subfeature ],
+							$subfeature => $node[ $feature ][ $subfeature ],
 						),
 					);
 
@@ -3555,7 +3554,7 @@ class WP_Theme_JSON_Gutenberg {
 					// Remove the subfeature from the block's node now its
 					// styles will be included under its own selector not the
 					// block's.
-					unset( $block_node[ $feature ][ $subfeature ] );
+					unset( $node[ $feature ][ $subfeature ] );
 				}
 			}
 
@@ -3569,7 +3568,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				// Create temporary node containing only the feature data
 				// to leverage existing `compute_style_properties` function.
-				$feature_node = array( $feature => $block_node[ $feature ] );
+				$feature_node = array( $feature => $node[ $feature ] );
 
 				// Generate the style declarations.
 				$new_declarations = static::compute_style_properties( $feature_node, $settings, null, $theme_json );
@@ -3587,7 +3586,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				// Remove the feature from the block's node now its styles
 				// will be included under its own selector not the block's.
-				unset( $block_node[ $feature ] );
+				unset( $node[ $feature ] );
 			}
 		}
 
