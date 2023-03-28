@@ -21,7 +21,12 @@ export default function useTextInputOffset( scrollEnabled, scrollViewRef ) {
 				RCTAztecView.InputState.getCurrentFocusedElement();
 
 			return new Promise( ( resolve ) => {
-				if ( scrollViewRef.current && textInput && scrollEnabled ) {
+				if (
+					scrollViewRef.current &&
+					textInput &&
+					scrollEnabled &&
+					caretY !== null
+				) {
 					textInput.measureLayout(
 						scrollViewRef.current,
 						( _x, y, _width, height ) => {
