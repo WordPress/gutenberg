@@ -21,12 +21,7 @@ describe( 'Paragraph', () => {
 		};
 
 		await measurePerformance(
-			<Paragraph
-				attributes={ {} }
-				setAttributes={ jest.fn() }
-				onChange={ jest.fn() }
-				insertBlocksAfter={ jest.fn() }
-			/>,
+			<Paragraph attributes={ {} } setAttributes={ jest.fn() } />,
 			{
 				scenario,
 			}
