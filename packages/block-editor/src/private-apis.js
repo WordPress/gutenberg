@@ -7,7 +7,7 @@ import { lock } from './lock-unlock';
 import OffCanvasEditor from './components/off-canvas-editor';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
-import { PrivateListView } from './components/list-view';
+import PrivateListView from './components/list-view/private-list-view';
 import BlockInfo from './components/block-info-slot-fill';
 import { useShouldContextualToolbarShow } from './utils/use-should-contextual-toolbar-show';
 import { cleanEmptyObject } from './hooks/utils';

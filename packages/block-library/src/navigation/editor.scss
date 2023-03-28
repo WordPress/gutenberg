@@ -657,3 +657,9 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 .wp-block-navigation__responsive-container-open.components-button {
 	opacity: 1;
 }
+
+.wp-block-navigation__menu-inspector-controls {
+	overflow-x: auto;
+
+	@include custom-scrollbars-on-hover(transparent, $gray-600);
+}
