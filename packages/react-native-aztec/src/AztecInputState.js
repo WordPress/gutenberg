@@ -72,7 +72,7 @@ export const removeCaretChangeListener = ( listener ) => {
 };
 
 /**
- *	Notifies listeners about caret changes in focused Aztec view.
+ * Notifies listeners about caret changes in focused Aztec view.
  */
 const notifyCaretChangeListeners = () => {
 	caretChangeListeners.forEach( ( listener ) => {
