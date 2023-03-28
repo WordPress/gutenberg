@@ -5,6 +5,7 @@ import {
 	addBlock,
 	getBlock,
 	changeTextOfRichText,
+	changeAndSelectTextOfRichText,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
@@ -109,6 +110,67 @@ describe( 'Editor History', () => {
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
 		<p>A quick brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
+
+	it( 'should remove and add text formatting', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		changeAndSelectTextOfRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{ selectionStart: 2, selectionEnd: 7 }
+		);
+		// Artifical delay to create two history entries for typing and bolding.
+		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+		fireEvent.press( screen.getByLabelText( 'Bold' ) );
+		fireEvent.press( screen.getByLabelText( 'Italic' ) );
+
+		// TODO: Determine a way to type multiple times within a given block.
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <strong><em>quick</em></strong> brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		// Act
+		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <strong>quick</strong> brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		// Act
+		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A quick brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		// Act
+		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A <strong><em>quick</em></strong> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
