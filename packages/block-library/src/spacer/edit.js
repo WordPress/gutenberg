@@ -6,10 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useBlockProps, getSpacingPresetCssVar } from '@wordpress/block-editor';
+import {
+	useBlockProps,
+	getSpacingPresetCssVar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { View } from '@wordpress/primitives';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -79,7 +84,12 @@ const SpacerEdit = ( {
 	toggleSelection,
 	context,
 	__unstableParentLayout: parentLayout,
+	className,
 } ) => {
+	const disableCustomSpacingSizes = useSelect( ( select ) => {
+		const editorSettings = select( blockEditorStore ).getSettings();
+		return editorSettings?.disableCustomSpacingSizes;
+	} );
 	const { orientation } = context;
 	const { orientation: parentOrientation, type } = parentLayout || {};
 	// If the spacer is inside a flex container, it should either inherit the orientation
@@ -191,7 +201,14 @@ const SpacerEdit = ( {
 
 	return (
 		<>
-			<View { ...useBlockProps( { style } ) }>
+			<View
+				{ ...useBlockProps( {
+					style,
+					className: classnames( className, {
+						'custom-sizes-disabled': disableCustomSpacingSizes,
+					} ),
+				} ) }
+			>
 				{ resizableBoxWithOrientation( inheritedOrientation ) }
 			</View>
 			<SpacerControls
