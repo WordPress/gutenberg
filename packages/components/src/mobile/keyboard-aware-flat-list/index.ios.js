@@ -30,7 +30,6 @@ export const KeyboardAwareFlatList = ( {
 	onScroll,
 	scrollEnabled,
 	scrollViewStyle,
-	shouldPreventAutomaticScroll,
 	...props
 } ) => {
 	const scrollViewRef = useRef();
