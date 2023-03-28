@@ -48,7 +48,12 @@ export default function useKeyboardOffset( scrollEnabled ) {
 				}
 				setIsKeyboardVisible( false );
 			} );
+		} else {
+			willShowSubscription?.remove();
+			showSubscription?.remove();
+			hideSubscription?.remove();
 		}
+
 		return () => {
 			willShowSubscription?.remove();
 			showSubscription?.remove();

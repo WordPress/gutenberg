@@ -66,4 +66,67 @@ describe( 'useKeyboardOffset', () => {
 		expect( isKeyboardVisible ).toBe( false );
 		expect( keyboardOffset ).toBe( 0 );
 	} );
+
+	it( 'removes all keyboard listeners when scrollEnabled changes to false', () => {
+		// Arrange
+		const { result, rerender } = renderHook(
+			( { scrollEnabled } ) => useKeyboardOffset( scrollEnabled ),
+			{
+				initialProps: { scrollEnabled: true },
+			}
+		);
+		const [ isKeyboardVisible, keyboardOffset ] = result.current;
+
+		// Act
+		rerender( { scrollEnabled: false } );
+
+		// Assert
+		expect( isKeyboardVisible ).toBe( false );
+		expect( keyboardOffset ).toBe( 0 );
+		expect(
+			RCTDeviceEventEmitter.listenerCount( 'keyboardWillShow' )
+		).toBe( 0 );
+		expect( RCTDeviceEventEmitter.listenerCount( 'keyboardDidShow' ) ).toBe(
+			0
+		);
+		expect(
+			RCTDeviceEventEmitter.listenerCount( 'keyboardWillHide' )
+		).toBe( 0 );
+	} );
+
+	it( 'adds all keyboard listeners when scrollEnabled changes to true', () => {
+		// Arrange
+		const { result, rerender } = renderHook(
+			( { scrollEnabled } ) => useKeyboardOffset( scrollEnabled ),
+			{
+				initialProps: { scrollEnabled: false },
+			}
+		);
+		// Act
+		act( () => {
+			rerender( { scrollEnabled: true } );
+		} );
+
+		act( () => {
+			RCTDeviceEventEmitter.emit( 'keyboardWillShow' );
+			RCTDeviceEventEmitter.emit( 'keyboardDidShow', {
+				endCoordinates: { height: 250 },
+			} );
+		} );
+
+		const [ isKeyboardVisible, keyboardOffset ] = result.current;
+
+		// Assert
+		expect( isKeyboardVisible ).toBe( true );
+		expect( keyboardOffset ).toBe( 250 );
+		expect(
+			RCTDeviceEventEmitter.listenerCount( 'keyboardWillShow' )
+		).toBe( 1 );
+		expect( RCTDeviceEventEmitter.listenerCount( 'keyboardDidShow' ) ).toBe(
+			1
+		);
+		expect(
+			RCTDeviceEventEmitter.listenerCount( 'keyboardWillHide' )
+		).toBe( 1 );
+	} );
 } );
