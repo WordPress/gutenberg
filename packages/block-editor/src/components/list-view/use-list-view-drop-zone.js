@@ -151,7 +151,8 @@ function getListViewDropTarget( blocksData, position ) {
 	if (
 		isDraggingBelow &&
 		candidateBlockData.canInsertDraggedBlocksAsChild &&
-		( candidateBlockData.innerBlockCount > 0 ||
+		( ( candidateBlockData.innerBlockCount > 0 &&
+			candidateBlockData.isExpanded ) ||
 			isNestingGesture( position, candidateRect ) )
 	) {
 		return {
@@ -208,10 +209,12 @@ export default function useListViewDropZone() {
 
 				const blocksData = blockElements.map( ( blockElement ) => {
 					const clientId = blockElement.dataset.block;
+					const isExpanded = blockElement.dataset.expanded === 'true';
 					const rootClientId = getBlockRootClientId( clientId );
 
 					return {
 						clientId,
+						isExpanded,
 						rootClientId,
 						blockIndex: getBlockIndex( clientId ),
 						element: blockElement,
