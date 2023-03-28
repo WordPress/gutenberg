@@ -11,12 +11,19 @@ import { createPortal, useLayoutEffect, useRef } from '@wordpress/element';
 import SlotFillContext from './context';
 import useSlot from './use-slot';
 
-function FillComponent( { name, children, registerFill, unregisterFill } ) {
+function FillComponent( {
+	name,
+	children,
+	priority,
+	registerFill,
+	unregisterFill,
+} ) {
 	const slot = useSlot( name );
 
 	const ref = useRef( {
 		name,
 		children,
+		priority,
 	} );
 
 	useLayoutEffect( () => {
