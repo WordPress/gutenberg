@@ -9,7 +9,7 @@
 	"textdomain": "default",
 	"usesContext": [ "queryId", "query" ],
 	"supports": {
-		"anchor": true,
+		"anchor": "delimiter",
 		"align": true,
 		"reusable": false,
 		"html": false,

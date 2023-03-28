@@ -13,7 +13,7 @@
 	},
 	"usesContext": [ "postType", "postId" ],
 	"supports": {
-		"anchor": true,
+		"anchor": "delimiter",
 		"spacing": {
 			"margin": true,
 			"padding": true

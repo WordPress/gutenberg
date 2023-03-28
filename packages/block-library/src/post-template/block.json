@@ -19,7 +19,7 @@
 		"reusable": false,
 		"html": false,
 		"align": true,
-		"anchor": true,
+		"anchor": "delimiter",
 		"__experimentalLayout": {
 			"allowEditing": false
 		},

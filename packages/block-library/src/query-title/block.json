@@ -27,7 +27,7 @@
 		}
 	},
 	"supports": {
-		"anchor": true,
+		"anchor": "delimiter",
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {

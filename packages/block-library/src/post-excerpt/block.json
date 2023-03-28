@@ -24,7 +24,7 @@
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
-		"anchor": true,
+		"anchor": "delimiter",
 		"html": false,
 		"color": {
 			"gradients": true,

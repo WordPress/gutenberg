@@ -18,7 +18,7 @@
 	},
 	"usesContext": [ "commentId" ],
 	"supports": {
-		"anchor": true,
+		"anchor": "delimiter",
 		"html": false,
 		"color": {
 			"gradients": true,

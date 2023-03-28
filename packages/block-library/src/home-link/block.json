@@ -22,7 +22,7 @@
 		"style"
 	],
 	"supports": {
-		"anchor": true,
+		"anchor": "delimiter",
 		"reusable": false,
 		"html": false,
 		"typography": {

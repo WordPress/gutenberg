@@ -31,7 +31,7 @@
 	},
 	"supports": {
 		"html": false,
-		"anchor": true,
+		"anchor": "delimiter",
 		"align": true,
 		"alignWide": false,
 		"color": {

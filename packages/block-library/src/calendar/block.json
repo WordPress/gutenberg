@@ -17,7 +17,7 @@
 	},
 	"supports": {
 		"align": true,
-		"anchor": true,
+		"anchor": "delimiter",
 		"color": {
 			"link": true,
 			"__experimentalSkipSerialization": [ "text", "background" ],

@@ -49,7 +49,7 @@
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
-		"anchor": true,
+		"anchor": "delimiter",
 		"html": false,
 		"__experimentalLayout": true
 	},

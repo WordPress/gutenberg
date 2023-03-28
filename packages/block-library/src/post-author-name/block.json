@@ -21,7 +21,7 @@
 	},
 	"usesContext": [ "postType", "postId" ],
 	"supports": {
-		"anchor": true,
+		"anchor": "delimiter",
 		"html": false,
 		"spacing": {
 			"margin": true,

@@ -46,7 +46,7 @@
 	},
 	"supports": {
 		"align": [ "left", "center", "right" ],
-		"anchor": true,
+		"anchor": "delimiter",
 		"color": {
 			"gradients": true,
 			"__experimentalSkipSerialization": true,

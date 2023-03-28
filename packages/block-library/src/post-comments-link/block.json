@@ -14,7 +14,7 @@
 		}
 	},
 	"supports": {
-		"anchor": true,
+		"anchor": "delimiter",
 		"html": false,
 		"color": {
 			"link": true,

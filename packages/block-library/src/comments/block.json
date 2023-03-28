@@ -18,7 +18,7 @@
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
-		"anchor": true,
+		"anchor": "delimiter",
 		"html": false,
 		"color": {
 			"gradients": true,

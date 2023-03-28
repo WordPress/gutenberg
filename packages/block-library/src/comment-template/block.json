@@ -10,7 +10,7 @@
 	"usesContext": [ "postId" ],
 	"supports": {
 		"align": true,
-		"anchor": true,
+		"anchor": "delimiter",
 		"html": false,
 		"reusable": false,
 		"spacing": {

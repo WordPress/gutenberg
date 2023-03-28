@@ -8,7 +8,7 @@
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
-		"anchor": true,
+		"anchor": "delimiter",
 		"align": [ "wide", "full" ],
 		"html": false,
 		"__experimentalLayout": true,
