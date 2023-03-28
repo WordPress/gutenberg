@@ -1067,6 +1067,22 @@ export function useGlobalStylesOutput() {
 			},
 		];
 
+		// Loop through the elements to check if there are custom CSS values.
+		// If there are, push the selector together with
+		// the CSS value to the 'stylesheets' array.
+		Object.entries( ELEMENTS ).forEach( ( element ) => {
+			const [ name, elementsSelector ] = element;
+			if ( mergedConfig.styles.elements[ name ]?.css ) {
+				stylesheets.push( {
+					css: processCSSNesting(
+						mergedConfig.styles.elements[ name ]?.css,
+						elementsSelector
+					),
+					isGlobalStyles: true,
+				} );
+			}
+		} );
+
 		// Loop through the blocks to check if there are custom CSS values.
 		// If there are, get the block selector and push the selector together with
 		// the CSS value to the 'stylesheets' array.
@@ -1079,6 +1095,26 @@ export function useGlobalStylesOutput() {
 						selector
 					),
 					isGlobalStyles: true,
+				} );
+			}
+
+			/* CSS for block style variations */
+			if ( mergedConfig.styles.blocks[ blockType.name ]?.variations ) {
+				Object.entries(
+					mergedConfig.styles.blocks[ blockType.name ]?.variations
+				).forEach( ( variation ) => {
+					if ( variation[ 1 ].css ) {
+						const variationSelector =
+							blockSelectors[ blockType.name ]
+								.styleVariationSelectors[ variation[ 0 ] ];
+						stylesheets.push( {
+							css: processCSSNesting(
+								variation[ 1 ].css,
+								variationSelector
+							),
+							isGlobalStyles: true,
+						} );
+					}
 				} );
 			}
 		} );

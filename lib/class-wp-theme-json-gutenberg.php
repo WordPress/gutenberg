@@ -1091,6 +1091,17 @@ class WP_Theme_JSON_Gutenberg {
 		// Add the global styles root CSS.
 		$stylesheet = _wp_array_get( $this->theme_json, array( 'styles', 'css' ), '' );
 
+		// Add the global styles element CSS.
+		if ( isset( $this->theme_json['styles']['elements'] ) ) {
+			foreach ( $this->theme_json['styles']['elements'] as $element => $node ) {
+				$custom_element_css = _wp_array_get( $this->theme_json, array( 'styles', 'elements', $element, 'css' ) );
+				if ( $custom_element_css ) {
+					$selector    = static::ELEMENTS[ $element ];
+					$stylesheet .= $this->process_blocks_custom_css( $custom_element_css, $selector );
+				}
+			}
+		}
+
 		// Add the global styles block CSS.
 		if ( isset( $this->theme_json['styles']['blocks'] ) ) {
 			foreach ( $this->theme_json['styles']['blocks'] as $name => $node ) {
@@ -1098,6 +1109,15 @@ class WP_Theme_JSON_Gutenberg {
 				if ( $custom_block_css ) {
 					$selector    = static::$blocks_metadata[ $name ]['selector'];
 					$stylesheet .= $this->process_blocks_custom_css( $custom_block_css, $selector );
+				}
+				if ( isset( $this->theme_json['styles']['blocks'][ $name ]['variations'] ) ) {
+					foreach ( $this->theme_json['styles']['blocks'][ $name ]['variations'] as $variation_name => $node ) {
+						$custom_variation_css = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'variations', $variation_name, 'css' ) );
+						if ( $custom_variation_css ) {
+							$selector    = static::$blocks_metadata[ $name ]['styleVariations'][ $variation_name ];
+							$stylesheet .= $this->process_blocks_custom_css( $custom_variation_css, $selector );
+						}
+					}
 				}
 			}
 		}
