@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -51,10 +51,9 @@ if ( ! String.prototype.replaceAll ) {
 /**
  * Selects the block to be tested by the aria-label on the block wrapper, eg. "Block: Cover".
  *
- * @param {string}                                  name
- * @param {import('@testing-library/react').Screen} screen
+ * @param {string} name
  */
-export async function selectBlock( name, screen ) {
+export async function selectBlock( name ) {
 	await userEvent.click( screen.getByLabelText( name ) );
 }
 

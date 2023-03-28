@@ -17,7 +17,7 @@ async function setup( attributes ) {
 	return initializeEditor( testBlock );
 }
 
-async function createAndselectBlock() {
+async function createAndSelectBlock() {
 	await userEvent.click(
 		screen.getByRole( 'button', {
 			name: 'Color: Black',
@@ -85,10 +85,10 @@ describe( 'Cover block', () => {
 	describe( 'Block toolbar', () => {
 		test( 'full height toggle sets minHeight style attribute to 100vh when clicked', async () => {
 			await setup();
-			await createAndselectBlock();
+			await createAndSelectBlock();
 
 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveStyle(
-				' min-height: 100vh;'
+				'min-height: 100vh;'
 			);
 
 			await userEvent.click(
@@ -96,13 +96,13 @@ describe( 'Cover block', () => {
 			);
 
 			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveStyle(
-				' min-height: 100vh;'
+				'min-height: 100vh;'
 			);
 		} );
 
 		test( 'content position button sets content position', async () => {
 			await setup();
-			await createAndselectBlock();
+			await createAndSelectBlock();
 
 			await userEvent.click(
 				screen.getByLabelText( 'Change content position' )
@@ -144,7 +144,7 @@ describe( 'Cover block', () => {
 					url: 'http://localhost/my-image.jpg',
 				} );
 
-				await selectBlock( 'Block: Cover', screen );
+				await selectBlock( 'Block: Cover' );
 				expect(
 					screen.getByRole( 'button', {
 						name: 'Media settings',
@@ -160,7 +160,7 @@ describe( 'Cover block', () => {
 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
 				'has-parallax'
 			);
-			await selectBlock( 'Block: Cover', screen );
+			await selectBlock( 'Block: Cover' );
 			await userEvent.click(
 				screen.getByLabelText( 'Fixed background' )
 			);
@@ -176,7 +176,7 @@ describe( 'Cover block', () => {
 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
 				'is-repeated'
 			);
-			await selectBlock( 'Block: Cover', screen );
+			await selectBlock( 'Block: Cover' );
 			await userEvent.click(
 				screen.getByLabelText( 'Repeated background' )
 			);
@@ -190,7 +190,7 @@ describe( 'Cover block', () => {
 				url: 'http://localhost/my-image.jpg',
 			} );
 
-			await selectBlock( 'Block: Cover', screen );
+			await selectBlock( 'Block: Cover' );
 			await userEvent.clear( screen.getByLabelText( 'Left' ) );
 			await userEvent.type( screen.getByLabelText( 'Left' ), '100' );
 
@@ -206,7 +206,7 @@ describe( 'Cover block', () => {
 				url: 'http://localhost/my-image.jpg',
 			} );
 
-			await selectBlock( 'Block: Cover', screen );
+			await selectBlock( 'Block: Cover' );
 			await userEvent.type(
 				screen.getByLabelText( 'Alt text (alternative text)' ),
 				'Me'
@@ -219,7 +219,7 @@ describe( 'Cover block', () => {
 				url: 'http://localhost/my-image.jpg',
 			} );
 
-			await selectBlock( 'Block: Cover', screen );
+			await selectBlock( 'Block: Cover' );
 			// eslint-disable-next-line testing-library/no-node-access
 			const img = container.getElementsByClassName(
 				'wp-block-cover__image-background'
@@ -239,7 +239,7 @@ describe( 'Cover block', () => {
 			test( 'applies selected opacity to block when number control value changed', async () => {
 				const { container } = await setup();
 
-				await createAndselectBlock();
+				await createAndSelectBlock();
 
 				// eslint-disable-next-line testing-library/no-node-access
 				const overlay = container.getElementsByClassName(
@@ -269,7 +269,7 @@ describe( 'Cover block', () => {
 			test( 'applies selected opacity to block when slider moved', async () => {
 				const { container } = await setup();
 
-				await createAndselectBlock();
+				await createAndSelectBlock();
 
 				// eslint-disable-next-line testing-library/no-node-access
 				const overlay = container.getElementsByClassName(
@@ -298,7 +298,7 @@ describe( 'Cover block', () => {
 		describe( 'Dimensions panel', () => {
 			test( 'sets minHeight attribute when number control value changed', async () => {
 				await setup();
-				await createAndselectBlock();
+				await createAndSelectBlock();
 				await userEvent.click(
 					screen.getByRole( 'tab', {
 						name: 'Styles',
