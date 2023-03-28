@@ -730,7 +730,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					/>
 				) }
 			</div>
-			<Spacer marginBottom={ ! __nextHasNoMarginBottom ? 2 : 0 } />
+			{ ! __nextHasNoMarginBottom && <Spacer marginBottom={ 2 } /> }
 			{ __experimentalShowHowTo && (
 				<StyledHelp
 					id={ `components-form-token-suggestions-howto-${ instanceId }` }
