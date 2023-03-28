@@ -43,9 +43,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 				blockNames.paragraph
 			);
-			if ( isAndroid() ) {
-				await paragraphBlockElement.click();
-			}
+			await paragraphBlockElement.click();
 			await editorPage.removeBlock();
 		}
 	} );
@@ -87,9 +85,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 				blockNames.paragraph
 			);
-			if ( isAndroid() ) {
-				await paragraphBlockElement.click();
-			}
+			await paragraphBlockElement.click();
 			await editorPage.removeBlock();
 		}
 	} );

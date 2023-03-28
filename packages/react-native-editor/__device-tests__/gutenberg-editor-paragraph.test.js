@@ -88,9 +88,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		for ( let i = 3; i > 0; i-- ) {
 			const paragraphBlockElement =
 				await editorPage.getTextBlockAtPosition( blockNames.paragraph );
-			if ( isAndroid() ) {
-				await paragraphBlockElement.click();
-			}
+			await paragraphBlockElement.click();
 			await editorPage.removeBlock();
 		}
 	} );
