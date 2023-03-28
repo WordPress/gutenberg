@@ -407,7 +407,7 @@ export default function Image( {
 					{ ! multiImageSelection && (
 						<TextareaControl
 							__nextHasNoMarginBottom
-							label={ __( 'Alt text (alternative text)' ) }
+							label={ __( 'Alternative text' ) }
 							value={ alt }
 							onChange={ updateAlt }
 							help={

@@ -270,7 +270,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			{ mediaType === 'image' && (
 				<TextareaControl
 					__nextHasNoMarginBottom
-					label={ __( 'Alt text (alternative text)' ) }
+					label={ __( 'Alternative text' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={

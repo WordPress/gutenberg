@@ -206,9 +206,7 @@ export default function CoverInspectorControls( {
 							isImgElement && (
 								<TextareaControl
 									__nextHasNoMarginBottom
-									label={ __(
-										'Alt text (alternative text)'
-									) }
+									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>
 										setAttributes( { alt: newAlt } )
