@@ -102,9 +102,6 @@
 		}
 	},
 	"selectors": {
-		"border": ".wp-block-image img"
-	},
-	"editorSelectors": {
 		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area"
 	},
 	"styles": [
