@@ -48,17 +48,20 @@ const expanded = ( state, action ) => {
 
 export const BLOCK_LIST_ITEM_HEIGHT = 36;
 
+/** @typedef {import('react').ComponentType} ComponentType */
+/** @typedef {import('react').Ref<HTMLElement>} Ref */
+
 /**
  * Show a hierarchical list of blocks.
  *
- * @param {Object}   props                   Components props.
- * @param {string}   props.id                An HTML element id for the root element of ListView.
- * @param {Array}    props.blocks            Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {boolean}  props.showBlockMovers   Flag to enable block movers
- * @param {boolean}  props.isExpanded        Flag to determine whether nested levels are expanded by default.
- * @param {boolean}  props.showAppender      Flag to show or hide the block appender.
- * @param {Function} props.blockSettingsMenu Optional more menu substitution.
- * @param {Object}   ref                     Forwarded ref
+ * @param {Object}         props                   Components props.
+ * @param {string}         props.id                An HTML element id for the root element of ListView.
+ * @param {Array}          props.blocks            Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {?boolean}       props.showBlockMovers   Flag to enable block movers. Defaults to `false`.
+ * @param {?boolean}       props.isExpanded        Flag to determine whether nested levels are expanded by default. Defaults to `false`.
+ * @param {?boolean}       props.showAppender      Flag to show or hide the block appender. Defaults to `false`.
+ * @param {?ComponentType} props.blockSettingsMenu Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
+ * @param {Ref}            ref                     Forwarded ref
  */
 function ListViewComponent(
 	{
