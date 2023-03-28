@@ -13,11 +13,13 @@ import {
 	ToolbarItem,
 } from '@wordpress/components';
 import {
+	BlockIcon,
 	NavigableToolbar,
 	store as blockEditorStore,
 	BlockToolbar,
+	useBlockDisplayInformation,
 } from '@wordpress/block-editor';
-import { tool, arrowDown } from '@wordpress/icons';
+import { tool } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -51,13 +53,13 @@ function ShowDocumentToolbarButton( { onClick } ) {
 	);
 }
 
-function ShowBlockToolbarButton( { onClick } ) {
+function ShowBlockToolbarButton( { onClick, icon } ) {
 	return (
 		<ToolbarItem
 			as={ Button }
 			className="edit-post-header-toolbar__block-tools-toggle"
 			variant="primary"
-			icon={ arrowDown }
+			icon={ <BlockIcon icon={ icon } /> }
 			onClick={ onClick }
 		/>
 	);
@@ -74,10 +76,12 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		showIconLabels,
 		isDistractionFreeMode,
 		isNavigationMode,
+		selectedBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
 			getSelectedBlockClientIds,
+			getSelectedBlockClientId,
 			isNavigationMode: _isNavigationMode,
 		} = select( blockEditorStore );
 		const settings = getSettings();
@@ -94,14 +98,17 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 			hasFixedToolbar: settings.hasFixedToolbar,
 			isNavigationMode: _isNavigationMode(),
+			selectedBlockClientId: getSelectedBlockClientId(),
 		};
 	} );
-
-	const {} = useSelect( blockEditorStore );
 
 	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
 
 	const [ headerToolbar, setHeaderToolbar ] = useState( 'document' );
+
+	const blockInformation = useBlockDisplayInformation(
+		selectedBlockClientId
+	);
 
 	useEffect( () => {
 		if ( isNavigationMode ) {
@@ -153,6 +160,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 										onClick={ () =>
 											setHeaderToolbar( 'block' )
 										}
+										icon={ blockInformation.icon }
 									/>
 								) }
 							/>
