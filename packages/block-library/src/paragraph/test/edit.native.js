@@ -238,11 +238,9 @@ describe( 'Paragraph block', () => {
 		// Act
 		const paragraphBlock = getBlock( screen, 'Paragraph' );
 		fireEvent.press( paragraphBlock );
-		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://github.com/react-navigation/react-navigation/issues/9701
+		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
 		await act( () => fireEvent.press( screen.getByLabelText( 'Link' ) ) );
-		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://github.com/react-navigation/react-navigation/issues/9701
+		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
 		await act( () =>
 			fireEvent.press(
 				screen.getByLabelText( 'Link to, Search or type URL' )
@@ -289,11 +287,9 @@ describe( 'Paragraph block', () => {
 				selectionEnd: 7,
 			}
 		);
-		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://github.com/react-navigation/react-navigation/issues/9701
+		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
 		await act( () => fireEvent.press( screen.getByLabelText( 'Link' ) ) );
-		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://github.com/react-navigation/react-navigation/issues/9701
+		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
 		await act( () =>
 			fireEvent.press(
 				screen.getByLabelText( 'Link to, Search or type URL' )
@@ -337,11 +333,9 @@ describe( 'Paragraph block', () => {
 				selectionEnd: 7,
 			}
 		);
-		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://github.com/react-navigation/react-navigation/issues/9701
+		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
 		await act( () => fireEvent.press( screen.getByLabelText( 'Link' ) ) );
-		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://github.com/react-navigation/react-navigation/issues/9701
+		// Await React Navigation: https://github.com/WordPress/gutenberg/issues/35685#issuecomment-961919931
 		await act( () =>
 			fireEvent.press(
 				screen.getByLabelText( 'Link to, Search or type URL' )
