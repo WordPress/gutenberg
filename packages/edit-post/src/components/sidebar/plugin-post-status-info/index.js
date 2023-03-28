@@ -17,6 +17,7 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * @param {Object}    props             Component properties.
  * @param {string}    [props.className] An optional class name added to the row.
  * @param {WPElement} props.children    Children to be rendered.
+ * @param {number}    props.priority    An optional priority value for the row Fill order. Default is 10.
  *
  * @example
  * ```js
@@ -52,8 +53,8 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  *
  * @return {WPComponent} The component to be rendered.
  */
-const PluginPostStatusInfo = ( { children, className } ) => (
-	<Fill>
+const PluginPostStatusInfo = ( { children, className, priority = 10 } ) => (
+	<Fill priority={ priority }>
 		<PanelRow className={ className }>{ children }</PanelRow>
 	</Fill>
 );
