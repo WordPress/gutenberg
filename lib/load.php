@@ -93,6 +93,9 @@ require __DIR__ . '/compat/wordpress-6.2/theme.php';
 require __DIR__ . '/compat/wordpress-6.2/widgets.php';
 require __DIR__ . '/compat/wordpress-6.2/menu.php';
 
+// WordPress 6.3 compat.
+require __DIR__ . '/compat/wordpress-6.3/get-global-styles-and-settings.php';
+
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-attribute-token.php';
 	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-span.php';
@@ -102,6 +105,8 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 
 // WordPress 6.3 compat.
 require __DIR__ . '/compat/wordpress-6.3/html-api/class-gutenberg-html-tag-processor-6-3.php';
+require __DIR__ . '/compat/wordpress-6.3/script-loader.php';
+require __DIR__ . '/compat/wordpress-6.3/blocks.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
@@ -131,6 +136,7 @@ if ( ! class_exists( 'WP_Fonts' ) ) {
 // Plugin specific code.
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
+require __DIR__ . '/class-wp-duotone-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';

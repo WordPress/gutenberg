@@ -31,6 +31,8 @@ const VALID_SETTINGS = [
 	'shadow.presets',
 	'shadow.defaultPresets',
 	'color.background',
+	'color.button',
+	'color.caption',
 	'color.custom',
 	'color.customDuotone',
 	'color.customGradient',
@@ -39,6 +41,7 @@ const VALID_SETTINGS = [
 	'color.defaultPalette',
 	'color.duotone',
 	'color.gradients',
+	'color.heading',
 	'color.link',
 	'color.palette',
 	'color.text',
@@ -251,6 +254,35 @@ export function useSettingsForBlockElement(
 			};
 		}
 
+		updatedSettings.color = {
+			...updatedSettings.color,
+			text:
+				updatedSettings.color?.text &&
+				supportedStyles.includes( 'color' ),
+			background:
+				updatedSettings.color?.background &&
+				( supportedStyles.includes( 'background' ) ||
+					supportedStyles.includes( 'backgroundColor' ) ),
+			button:
+				updatedSettings.color?.button &&
+				supportedStyles.includes( 'buttonColor' ),
+			heading:
+				updatedSettings.color?.heading &&
+				supportedStyles.includes( 'headingColor' ),
+			link:
+				updatedSettings.color?.link &&
+				supportedStyles.includes( 'linkColor' ),
+			caption:
+				updatedSettings.color?.caption &&
+				supportedStyles.includes( 'captionColor' ),
+		};
+
+		// Some blocks can enable background colors but disable gradients.
+		if ( ! supportedStyles.includes( 'background' ) ) {
+			updatedSettings.color.gradients = [];
+			updatedSettings.color.customGradient = false;
+		}
+
 		[
 			'lineHeight',
 			'fontStyle',
@@ -377,5 +409,53 @@ export function useColorsPerOrigin( settings ) {
 		themeColors,
 		defaultColors,
 		shouldDisplayDefaultColors,
+	] );
+}
+
+export function useGradientsPerOrigin( settings ) {
+	const customGradients = settings?.color?.gradients?.custom;
+	const themeGradients = settings?.color?.gradients?.theme;
+	const defaultGradients = settings?.color?.gradients?.default;
+	const shouldDisplayDefaultGradients = settings?.color?.defaultGradients;
+
+	return useMemo( () => {
+		const result = [];
+		if ( themeGradients && themeGradients.length ) {
+			result.push( {
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
+				gradients: themeGradients,
+			} );
+		}
+		if (
+			shouldDisplayDefaultGradients &&
+			defaultGradients &&
+			defaultGradients.length
+		) {
+			result.push( {
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
+				gradients: defaultGradients,
+			} );
+		}
+		if ( customGradients && customGradients.length ) {
+			result.push( {
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
+				gradients: customGradients,
+			} );
+		}
+		return result;
+	}, [
+		customGradients,
+		themeGradients,
+		defaultGradients,
+		shouldDisplayDefaultGradients,
 	] );
 }

@@ -87,7 +87,6 @@
 		"showSubmenuIcon": "showSubmenuIcon",
 		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
-		"orientation": "orientation",
 		"maxNestingLevel": "maxNestingLevel"
 	},
 	"supports": {

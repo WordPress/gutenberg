@@ -332,7 +332,7 @@ export default function VisualEditor( { styles } ) {
 			<motion.div
 				className="edit-post-visual-editor__content-area"
 				animate={ {
-					padding: isTemplateMode ? '48px 48px 0' : '0',
+					padding: isTemplateMode ? '48px 48px 0' : 0,
 				} }
 				ref={ blockSelectionClearerRef }
 			>
