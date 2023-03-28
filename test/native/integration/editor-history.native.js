@@ -3,10 +3,13 @@
  */
 import {
 	addBlock,
+	getBlock,
+	changeTextOfRichText,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
 	setupCoreBlocks,
+	within,
 } from 'test/helpers';
 
 setupCoreBlocks();
@@ -61,6 +64,51 @@ describe( 'Editor History', () => {
 
 		<!-- wp:paragraph -->
 		<p></p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
+
+	it( 'should remove and add text', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		changeTextOfRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+
+		// TODO: Determine a way to type multiple times within a given block.
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A quick brown fox jumps over the lazy dog.</p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		// Act
+		fireEvent.press( screen.getByLabelText( 'Undo' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
+	` );
+
+		// Act
+		fireEvent.press( screen.getByLabelText( 'Redo' ) );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );
