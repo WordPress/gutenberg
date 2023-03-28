@@ -291,7 +291,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					slug={ mediaSizeSlug }
 					imageSizeOptions={ imageSizeOptions }
 					isResizable={ false }
-					imageSizeHelp={ __( 'Select which image size to load.' ) }
+					imageSizeHelp={ __(
+						'Select the size of the source image.'
+					) }
 				/>
 			) }
 			{ mediaUrl && (
