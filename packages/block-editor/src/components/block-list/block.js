@@ -96,6 +96,7 @@ function BlockListBlock( {
 	onInsertBlocksAfter,
 	onMerge,
 	toggleSelection,
+	meta,
 } ) {
 	const {
 		themeSupportsLayout,
@@ -155,6 +156,7 @@ function BlockListBlock( {
 			__unstableParentLayout={
 				Object.keys( parentLayout ).length ? parentLayout : undefined
 			}
+			meta={ meta }
 		/>
 	);
 
@@ -283,7 +285,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	// This function should never be called when a block is not present in
 	// the state. It happens now because the order in withSelect rendering
 	// is not correct.
-	const { name, attributes, isValid } = block || {};
+	const { name, attributes, isValid, meta } = block || {};
 
 	// Do not add new properties here, use `useSelect` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
@@ -302,6 +304,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		attributes,
 		isValid,
 		isSelected,
+		meta,
 	};
 } );
 

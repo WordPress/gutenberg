@@ -205,8 +205,9 @@ Returns a block object given its type and attributes.
 _Parameters_
 
 -   _name_ `string`: Block name.
--   _attributes_ `Object`: Block attributes.
--   _innerBlocks_ `?Array`: Nested blocks.
+-   _attributes_ `[Object]`: Block attributes.
+-   _innerBlocks_ `[Array]`: Nested blocks.
+-   _meta_ `[Object]`: Block metadata.
 
 _Returns_
 

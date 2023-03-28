@@ -24,13 +24,20 @@ import {
 /**
  * Returns a block object given its type and attributes.
  *
- * @param {string} name        Block name.
- * @param {Object} attributes  Block attributes.
- * @param {?Array} innerBlocks Nested blocks.
+ * @param {string} name          Block name.
+ * @param {Object} [attributes]  Block attributes.
+ * @param {Array}  [innerBlocks] Nested blocks.
+ * @param {Object} [meta]        Block metadata.
  *
  * @return {Object} Block object.
+ *
  */
-export function createBlock( name, attributes = {}, innerBlocks = [] ) {
+export function createBlock(
+	name,
+	attributes = {},
+	innerBlocks = [],
+	meta = {}
+) {
 	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
 		name,
 		attributes
@@ -46,6 +53,7 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 		isValid: true,
 		attributes: sanitizedAttributes,
 		innerBlocks,
+		meta,
 	};
 }
 
