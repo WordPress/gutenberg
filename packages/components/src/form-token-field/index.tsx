@@ -7,7 +7,6 @@ import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
@@ -74,14 +73,6 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalAutoSelectFirstMatch = false,
 		__nextHasNoMarginBottom = false,
 	} = props;
-
-	if ( ! __nextHasNoMarginBottom ) {
-		deprecated( 'Bottom margin styles for wp.components.FormTokenField', {
-			since: '6.3',
-			version: '6.5',
-			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
-		} );
-	}
 
 	const instanceId = useInstanceId( FormTokenField );
 
