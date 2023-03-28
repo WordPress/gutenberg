@@ -9,6 +9,8 @@ import { applyFilters } from '@wordpress/hooks';
 import '../anchor';
 import { immutableSet } from '../utils';
 
+const noop = () => {};
+
 describe( 'immutableSet', () => {
 	describe( 'handling falsy values properly', () => {
 		it( 'should create a new object if `undefined` is passed', () => {
@@ -114,6 +116,7 @@ describe( 'immutableSet', () => {
 
 describe( 'anchor', () => {
 	const blockSettings = {
+		save: noop,
 		category: 'text',
 		title: 'block title',
 	};
@@ -130,48 +133,47 @@ describe( 'anchor', () => {
 			expect( settings.attributes ).toBe( undefined );
 		} );
 
-		it( 'should assign a new anchor attribute depending on the value of the save property', () => {
-			const saveDefinitions = [
-				// The anchor attribute should be stored as a comment delimiter.
-				{
-					value: null,
-					schema: {
-						type: 'string',
-					},
-				},
-				{
-					value: () => null,
-					schema: {
-						type: 'string',
-					},
-				},
-				{
-					value: undefined,
-					schema: {
-						type: 'string',
-					},
-				},
-				// The anchor attributes should be saved as part of the markup.
-				{
-					value: () => <div className="default" />,
-					schema: {
-						attribute: 'id',
-						selector: '*',
-						source: 'attribute',
-						type: 'string',
-					},
-				},
-			];
-
-			saveDefinitions.forEach( ( { value, schema } ) => {
+		[ false, 'incorrect' ].forEach( ( value ) => {
+			it( `should do nothing if value is ${ value }`, () => {
 				const settings = registerBlockType( {
 					...blockSettings,
-					save: value,
 					supports: {
-						anchor: true,
+						anchor: value,
 					},
 				} );
-				expect( settings.attributes.anchor ).toEqual( schema );
+
+				expect( settings.attributes ).toBe( undefined );
+			} );
+		} );
+
+		[ true, 'html' ].forEach( ( value ) => {
+			it( `should assign a new anchor attribute referencing html if value is ${ value }`, () => {
+				const settings = registerBlockType( {
+					...blockSettings,
+					supports: {
+						anchor: value,
+					},
+				} );
+
+				expect( settings.attributes.anchor ).toEqual( {
+					attribute: 'id',
+					selector: '*',
+					source: 'attribute',
+					type: 'string',
+				} );
+			} );
+		} );
+
+		it( 'should assign a new anchor attribute referencing comment delimiter if value is delimiter', () => {
+			const settings = registerBlockType( {
+				...blockSettings,
+				supports: {
+					anchor: `delimiter`,
+				},
+			} );
+
+			expect( settings.attributes.anchor ).toEqual( {
+				type: 'string',
 			} );
 		} );
 

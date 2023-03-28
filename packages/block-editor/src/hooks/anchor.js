@@ -20,11 +20,15 @@ import { InspectorControls } from '../components';
  */
 const ANCHOR_REGEX = /[\s#]/g;
 
-const ANCHOR_SCHEMA = {
+const ANCHOR_SCHEMA_HTML = {
 	type: 'string',
 	source: 'attribute',
 	attribute: 'id',
 	selector: '*',
+};
+
+const ANCHOR_SCHEMA_DELIMITER = {
+	type: 'string',
 };
 
 /**
@@ -42,10 +46,16 @@ export function addAttribute( settings ) {
 	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
 		// Gracefully handle if settings.attributes is undefined.
-		settings.attributes = {
-			...settings.attributes,
-			anchor: ANCHOR_SCHEMA,
-		};
+		const { anchor } = settings.supports;
+		if ( [ true, 'html', 'delimiter' ].includes( anchor ) ) {
+			settings.attributes = {
+				...settings.attributes,
+				anchor:
+					anchor === 'delimiter'
+						? ANCHOR_SCHEMA_DELIMITER
+						: ANCHOR_SCHEMA_HTML,
+			};
+		}
 	}
 
 	return settings;
