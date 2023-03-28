@@ -253,6 +253,24 @@
 	display: none;
 }
 
+.edit-post-header .edit-post-header-block-toolbar > button.components-button.edit-post-header-toolbar__document-tools-toggle.is-primary.has-icon {
+	height: $button-size;
+	min-width: $button-size;
+	padding: 6px;
+	background-color: #fff;
+	color: #000;
+	margin-left: $grid-unit-20;
+}
+
+.edit-post-header .edit-post-header-document-toolbar > .edit-post-header-document-toolbar__left button.components-button.edit-post-header-toolbar__block-tools-toggle.is-primary.has-icon {
+	height: $button-size;
+	min-width: $button-size;
+	padding: 6px;
+	background-color: #fff;
+	color: #000;
+	margin-left: $grid-unit-30;
+}
+
 .edit-post-header .edit-post-header-block-toolbar {
 	display: inline-flex;
 	flex-grow: 1;

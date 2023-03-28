@@ -17,7 +17,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editPostStore } from '../../../store';
 import InserterButton from '../inserter-button';
 
-function HeaderToolbar() {
+function HeaderToolbar( { BlockToolbarToggle, hasSelectedBlocks } ) {
 	const { setIsListViewOpened } = useDispatch( editPostStore );
 	const {
 		isTextModeEnabled,
@@ -96,6 +96,7 @@ function HeaderToolbar() {
 							variant={ showIconLabels ? 'tertiary' : undefined }
 						/>
 						{ overflowItems }
+						{ hasSelectedBlocks && <BlockToolbarToggle /> }
 					</>
 				) }
 			</div>
