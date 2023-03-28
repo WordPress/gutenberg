@@ -870,7 +870,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			// The block may or may not have a duotone selector.
-			$duotone_selector = wp_get_block_css_selector( $block_type, 'filters.duotone' );
+			$duotone_selector = wp_get_block_css_selector( $block_type, 'filter.duotone' );
 			if ( null !== $duotone_selector ) {
 				static::$blocks_metadata[ $block_name ]['duotone'] = $duotone_selector;
 			}
