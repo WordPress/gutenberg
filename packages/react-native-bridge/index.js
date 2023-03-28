@@ -297,7 +297,7 @@ export function fetchRequest( path, enableCaching = true ) {
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
 }
 
-export function postRequest( path, data ) {
+export function postRequest( path, data = {} ) {
 	if ( isAndroid ) {
 		return RNReactNativeGutenbergBridge.postRequest( path, data );
 	}
