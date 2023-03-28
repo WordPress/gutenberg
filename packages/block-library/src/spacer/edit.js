@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, getSpacingPresetCssVar } from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { View } from '@wordpress/primitives';
@@ -114,10 +114,12 @@ const SpacerEdit = ( {
 		height:
 			inheritedOrientation === 'horizontal'
 				? 24
-				: temporaryHeight || height || undefined,
+				: temporaryHeight ||
+				  getSpacingPresetCssVar( height ) ||
+				  undefined,
 		width:
 			inheritedOrientation === 'horizontal'
-				? temporaryWidth || width || undefined
+				? temporaryWidth || getSpacingPresetCssVar( width ) || undefined
 				: undefined,
 		// In vertical flex containers, the spacer shrinks to nothing without a minimum width.
 		minWidth:
