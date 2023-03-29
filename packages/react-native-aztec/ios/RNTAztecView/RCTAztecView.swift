@@ -362,6 +362,14 @@ class RCTAztecView: Aztec.TextView {
         let dictationText = dictationResult.reduce("") { $0 + $1.text }
         isInsertingDictationResult = false
         self.text = self.text?.replacingOccurrences(of: objectPlaceholder, with: dictationText)
+
+        /// iOS 16‌ included significant changes to the way dictation works.
+        /// These changes led to an issue with content loss in Gutenberg, due to empty string propagation.
+        /// See: https://github.com/wordpress-mobile/gutenberg-mobile/issues/5165
+        /// The following workaround calls insertText() whenever dictation is active, to prevent empty strings being propagated.
+        if #available(iOS 16, *) {
+            insertText(dictationText)
+        }
     }
 
     // MARK: - Custom Edit Intercepts
