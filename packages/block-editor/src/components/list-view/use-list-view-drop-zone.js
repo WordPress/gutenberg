@@ -146,8 +146,10 @@ function getListViewDropTarget( blocksData, position ) {
 
 	// If the user is dragging towards the bottom of the block check whether
 	// they might be trying to nest the block as a child.
-	// If the block already has inner blocks, this should always be treated
+	// If the block already has inner blocks, and is expanded, this should be treated
 	// as nesting since the next block in the tree will be the first child.
+	// However, if the block is collapsed, dragging beneath the block should
+	// still be allowed, as the next visible block in the tree will be a sibling.
 	if (
 		isDraggingBelow &&
 		candidateBlockData.canInsertDraggedBlocksAsChild &&
