@@ -431,7 +431,7 @@ describe( 'List view editing', () => {
 		).toBeVisible();
 	} );
 
-	test.only( `can add new menu items`, async ( {
+	test( `can add new menu items`, async ( {
 		admin,
 		page,
 		editor,
@@ -513,9 +513,10 @@ describe( 'List view editing', () => {
 			.locator( '.block-editor-link-control__search-item-title' ) // this is the only way to get the label text without the URL.
 			.innerText();
 
+		// Create the link.
 		await firstResult.click();
 
-		// check the new menu item was inserted at the end of the existing menu.
+		// Check the new menu item was inserted at the end of the existing menu.
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
@@ -526,5 +527,86 @@ describe( 'List view editing', () => {
 				} )
 				.getByText( firstResultText )
 		).toBeVisible();
+	} );
+
+	test( `can remove menu items`, async ( {
+		admin,
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
+			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
+				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
+			<!-- /wp:navigation-submenu -->`,
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const listViewTab = page.getByRole( 'tab', {
+			name: 'List View',
+		} );
+
+		await listViewTab.click();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+
+		// click on options menu for the first menu item and select remove.
+		const firstMenuItem = listView
+			.getByRole( 'gridcell', {
+				name: 'Page Link link',
+			} )
+			.filter( {
+				hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+			} );
+
+		// Focus the node to reveal the "3 dots" options menu button.
+		const firstMenuItemAnchor = listView.getByRole( 'link', {
+			name: 'Top Level Item 1',
+			includeHidden: true,
+		} );
+		await firstMenuItemAnchor.focus();
+
+		// The options menu button is a sibling of the menu item gridcell.
+		const firstItemOptions = firstMenuItem
+			.locator( '..' ) // parent selector.
+			.getByRole( 'button', {
+				name: 'Options for Page Link block',
+			} );
+
+		// Open the options menu.
+		await firstItemOptions.click();
+
+		// usage of `page` is required because the options menu is rendered into a slot
+		// outside of the treegrid.
+		const removeBlockOption = page
+			.getByRole( 'menu', {
+				name: 'Options for Page Link block',
+			} )
+			.getByRole( 'menuitem', {
+				name: 'Remove Top Level Item 1',
+			} );
+
+		await removeBlockOption.click();
+
+		// Check the menu item was removed.
+		await expect(
+			listView
+				.getByRole( 'gridcell', {
+					name: 'Page Link link',
+				} )
+				.filter( {
+					hasText: 'Block 1 of 1, Level 1', // proxy for filtering by description.
+				} )
+				.getByText( 'Top Level Item 1' )
+		).not.toBeVisible();
 	} );
 } );
