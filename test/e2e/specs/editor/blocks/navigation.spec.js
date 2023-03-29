@@ -320,7 +320,7 @@ describe( 'Navigation block', () => {
 	} );
 } );
 
-describe.only( 'List view editing', () => {
+describe( 'List view editing', () => {
 	test( 'it should show a list view in the inspector controls', async ( {
 		admin,
 		page,
@@ -431,7 +431,7 @@ describe.only( 'List view editing', () => {
 		).toBeVisible();
 	} );
 
-	test( `can add new menu items`, async ( {
+	test.only( `can add new menu items`, async ( {
 		admin,
 		page,
 		editor,
@@ -482,25 +482,21 @@ describe.only( 'List view editing', () => {
 
 		await expect( blockResults ).toBeVisible();
 
-		const pageLinkBlock = blockResults.getByRole( 'option', {
-			name: 'Page Link',
-		} );
+		const blockResultOptions = blockResults.getByRole( 'option' );
 
-		await expect( pageLinkBlock ).toBeVisible();
+		// Expect to see the Page Link and Custom Link blocks as the nth(0) and nth(1) results.
+		// This is important for usability as the Page Link block is the most likely to be used.
+		await expect( blockResultOptions.nth( 0 ) ).toHaveText( 'Page Link' );
+		await expect( blockResultOptions.nth( 1 ) ).toHaveText( 'Custom Link' );
 
-		const customLinkBlock = blockResults.getByRole( 'option', {
-			name: 'Custom Link',
-		} );
+		// Select the Page Link option.
+		const pageLinkResult = blockResultOptions.nth( 0 );
+		await pageLinkResult.click();
 
-		await expect( customLinkBlock ).toBeVisible();
-
-		await pageLinkBlock.click();
-
-		// Expect to see the Link creation UI.
+		// Expect to see the Link creation UI be focused.
 		const linkUIInput = page.getByRole( 'combobox', {
 			name: 'URL',
 		} );
-
 		await expect( linkUIInput ).toBeFocused();
 
 		const linkUIResults = page.getByRole( 'listbox', {
