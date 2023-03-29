@@ -71,7 +71,7 @@
 		padding: 6px;
 		background-color: #fff;
 		color: #000;
-		margin-left: $grid-unit-30;
+		border-left: 1px solid #ddd;
 
 		&:hover {
 			color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
@@ -85,6 +85,8 @@
 	align-items: center;
 	border: none;
 	padding-left: 24px; //compensates for the edit-post-header-document-toolbar__left left padding
+	height: 32px;
+	overflow: hidden; //limits the height of the separators
 
 	> .edit-post-header-toolbar__inserter-toggle {
 		display: inline-flex;
@@ -107,6 +109,7 @@
 		padding: 6px;
 		background-color: #fff;
 		color: #000;
+		border-right: 1px solid #ddd;
 
 		&:hover {
 			color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
