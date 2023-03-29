@@ -91,12 +91,6 @@ describe( 'useScrollToTextInput', () => {
 		const scrollViewYOffset = { value: 0 };
 		const textInputOffset = 50;
 
-		// Mock scrollTo method
-		const scrollTo = jest.fn();
-		if ( scrollViewRef.current ) {
-			scrollViewRef.current.scrollTo = scrollTo;
-		}
-
 		const { result } = renderHook( () =>
 			useScrollToTextInput(
 				extraScrollHeight,
@@ -113,7 +107,6 @@ describe( 'useScrollToTextInput', () => {
 
 		// Assert
 		expect( scrollViewRef.current ).toBeNull();
-		expect( scrollTo ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does not scroll when the scroll is not enabled', () => {
