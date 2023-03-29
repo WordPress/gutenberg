@@ -47,18 +47,21 @@ function render_block_core_cover( $attributes, $content ) {
 		}
 		$current_featured_image = get_the_post_thumbnail_url();
 
-		$styles = 'background-image:url(' . esc_url( $current_featured_image ) . '); ';
+		$processor = new WP_HTML_Tag_Processor( $content );
+		$processor->next_tag();
+
+		$styles         = $processor->get_attribute( 'style' );
+		$merged_styles  = ! empty( $styles ) ? $styles . ';' : '';
+		$merged_styles .= 'background-image:url(' . esc_url( $current_featured_image ) . ');';
 
 		if ( isset( $attributes['minHeight'] ) ) {
 			$height_unit = empty( $attributes['minHeightUnit'] ) ? 'px' : $attributes['minHeightUnit'];
-			$height      = " min-height:{$attributes['minHeight']}{$height_unit}";
+			$height      = " min-height:{$attributes['minHeight']}{$height_unit};";
 
-			$styles .= $height;
+			$merged_styles .= $height;
 		}
 
-		$processor = new WP_HTML_Tag_Processor( $content );
-		$processor->next_tag();
-		$processor->set_attribute( 'style', $styles );
+		$processor->set_attribute( 'style', $merged_styles );
 		$content = $processor->get_updated_html();
 	}
 
