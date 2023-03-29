@@ -12,6 +12,10 @@ import { useLocation, useHistory } from '../routes';
 export function getPathFromURL( urlParams ) {
 	let path = urlParams?.path ?? '/';
 
+	if ( path === '/page' && urlParams?.postType && urlParams?.postId ) {
+		return path;
+	}
+
 	// Compute the navigator path based on the URL params.
 	if ( urlParams?.postType && urlParams?.postId ) {
 		switch ( urlParams.postType ) {

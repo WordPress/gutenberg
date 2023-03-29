@@ -12,11 +12,11 @@ import {
  */
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
+import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
 import useSyncPathWithURL, {
 	getPathFromURL,
 } from '../sync-state-with-url/use-sync-path-with-url';
-import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
 import SidebarNavigationScreenNavigationItem from '../sidebar-navigation-screen-navigation-item';
@@ -29,6 +29,9 @@ function SidebarScreens() {
 		<>
 			<NavigatorScreen path="/">
 				<SidebarNavigationScreenMain />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(page)">
+				<SidebarNavigationScreenPages />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(page)/:postId">
 				<SidebarNavigationScreenNavigationItem />

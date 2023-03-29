@@ -1,11 +1,11 @@
 .edit-site-sidebar-navigation-item.components-item {
-	color: $gray-600;
-	margin: 0 $grid-unit-05;
+	color: $gray-200;
+	font-weight: 500;
 
 	&:hover,
 	&:focus,
 	&[aria-current] {
-		color: $white;
+		color: $gray-100;
 		background: $gray-800;
 	}
 
@@ -14,7 +14,13 @@
 	}
 }
 
-.edit-site-sidebar-navigation-screen__content .block-editor-list-view-block-select-button {
-	cursor: grab;
-	padding: $grid-unit-10;
+.edit-site-sidebar-navigation-screen__content {
+	.components-item-group {
+		margin: 0 -$grid-unit-15;
+	}
+
+	.block-editor-list-view-block-select-button {
+		cursor: grab;
+		padding: $grid-unit-10 $grid-unit-15;
+	}
 }
