@@ -607,4 +607,86 @@ test.describe( 'List view editing', () => {
 				.getByText( 'Top Level Item 1' )
 		).not.toBeVisible();
 	} );
+
+	test( `can edit menu items`, async ( {
+		admin,
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
+			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
+				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
+			<!-- /wp:navigation-submenu -->`,
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const listViewTab = page.getByRole( 'tab', {
+			name: 'List View',
+		} );
+
+		await listViewTab.click();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+
+		// Click on the first menu item to open its settings.
+		const firstMenuItemAnchor = listView.getByRole( 'link', {
+			name: 'Top Level Item 1',
+			includeHidden: true,
+		} );
+		await firstMenuItemAnchor.click();
+
+		// Get the settings panel.
+		const blockSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		await expect( blockSettings ).toBeVisible();
+
+		await expect(
+			blockSettings.getByRole( 'heading', {
+				name: 'Page Link',
+			} )
+		).toBeVisible();
+
+		await expect(
+			blockSettings.getByRole( 'tab', {
+				name: 'Settings',
+				selected: true,
+			} )
+		).toBeVisible();
+
+		await expect(
+			blockSettings
+				.getByRole( 'tabpanel', {
+					name: 'Settings',
+				} )
+				.getByRole( 'heading', {
+					name: 'Link Settings',
+				} )
+		).toBeVisible();
+
+		// Click the back button to go back to the Nav block.
+		await blockSettings
+			.getByRole( 'button', {
+				name: 'Go to parent Navigation block',
+			} )
+			.click();
+
+		// Check we're back on the Nav block list view.
+		const listViewPanel = page.getByRole( 'tabpanel', {
+			name: 'List View',
+		} );
+
+		await expect( listViewPanel ).toBeVisible();
+	} );
 } );
