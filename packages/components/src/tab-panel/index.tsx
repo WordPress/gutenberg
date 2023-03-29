@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useLayoutEffect,
+	useCallback,
+} from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -104,7 +109,7 @@ export function TabPanel( {
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
 	// Handle selecting the initial tab.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		// If there's a selected tab, don't override it.
 		if ( selectedTab ) {
 			return;

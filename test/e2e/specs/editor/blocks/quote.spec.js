@@ -58,7 +58,7 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'test' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 'test'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 'test'.length } );
 		await page.keyboard.type( '> ' );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
@@ -305,7 +305,7 @@ test.describe( 'Quote', () => {
 <!-- /wp:quote -->`
 		);
 		// Move the cursor to the start of the first paragraph of the quoted block.
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 4 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
 		await page.keyboard.press( 'Backspace' );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:paragraph -->
@@ -316,5 +316,23 @@ test.describe( 'Quote', () => {
 <blockquote class="wp-block-quote"><cite>2</cite></blockquote>
 <!-- /wp:quote -->`
 		);
+	} );
+
+	test( `shouldn't crash selecting content + cite and pressing backspace.`, async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/quote' } );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '2' );
+		await pageUtils.pressKeys( 'Shift+ArrowUp' );
+		let error;
+		page.on( 'console', ( msg ) => {
+			if ( msg.type() === 'error' ) error = msg.text();
+		} );
+		await page.keyboard.press( 'Backspace' );
+		expect( error ).toBeUndefined();
 	} );
 } );

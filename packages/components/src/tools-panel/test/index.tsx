@@ -954,6 +954,92 @@ describe( 'ToolsPanel', () => {
 			expect( items[ 1 ] ).toHaveTextContent( 'Item 2' );
 		} );
 
+		it( 'should maintain menu item order', async () => {
+			const InconsistentItems = () => (
+				<ToolsPanelItems>
+					<ToolsPanelItem
+						label="Item 1"
+						hasValue={ () => false }
+						isShownByDefault
+					>
+						<div>Item 1</div>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label="Item 2"
+						hasValue={ () => false }
+						isShownByDefault
+					>
+						<div>Item 2</div>
+					</ToolsPanelItem>
+				</ToolsPanelItems>
+			);
+
+			const { rerender } = render(
+				<SlotFillProvider>
+					<InconsistentItems key="order-test-step-1" />
+					<ToolsPanelItems>
+						<ToolsPanelItem
+							label="Item 3"
+							hasValue={ () => false }
+							isShownByDefault
+						>
+							<div>Item 3</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanel { ...defaultProps }>
+						<Slot />
+					</ToolsPanel>
+				</SlotFillProvider>
+			);
+
+			// Open dropdown menu.
+			const user = userEvent.setup();
+			let menuButton = getMenuButton();
+			await user.click( menuButton );
+
+			// Confirm all the existing menu items are present and in the
+			// expected order.
+			let menuItems = await screen.findAllByRole( 'menuitemcheckbox' );
+
+			expect( menuItems.length ).toEqual( 3 );
+			expect( menuItems[ 0 ] ).toHaveTextContent( 'Item 1' );
+			expect( menuItems[ 1 ] ).toHaveTextContent( 'Item 2' );
+			expect( menuItems[ 2 ] ).toHaveTextContent( 'Item 3' );
+
+			// Close the dropdown menu.
+			await user.click( menuButton );
+
+			rerender(
+				<SlotFillProvider>
+					<InconsistentItems key="order-test-step-2" />
+					<ToolsPanelItems>
+						<ToolsPanelItem
+							label="Item 3"
+							hasValue={ () => false }
+							isShownByDefault
+						>
+							<div>Item 3</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanel { ...defaultProps }>
+						<Slot />
+					</ToolsPanel>
+				</SlotFillProvider>
+			);
+
+			// Reopen dropdown menu.
+			menuButton = getMenuButton();
+			await user.click( menuButton );
+
+			// Confirm the menu item order has been maintained.
+			menuItems = await screen.findAllByRole( 'menuitemcheckbox' );
+
+			expect( menuItems.length ).toEqual( 3 );
+			expect( menuItems[ 0 ] ).toHaveTextContent( 'Item 1' );
+			expect( menuItems[ 1 ] ).toHaveTextContent( 'Item 2' );
+			expect( menuItems[ 2 ] ).toHaveTextContent( 'Item 3' );
+		} );
+
 		it( 'should not trigger callback when fill has not updated yet when panel has', () => {
 			// Fill provided controls can update independently to the panel.
 			// A `panelId` prop was added to both panels and items

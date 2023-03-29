@@ -105,7 +105,6 @@ export function DimensionsPanel( props ) {
 			<StylesDimensionsPanel
 				as={ DimensionsInspectorControl }
 				panelId={ clientId }
-				name={ name }
 				settings={ settings }
 				value={ value }
 				onChange={ onChange }
