@@ -3403,32 +3403,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Generates the root selector for a block.
-	 *
-	 * @param object $block_type The block type.
-	 * @return string
-	 */
-	protected static function get_root_block_selector( $block_type ) {
-		// Prefer the selectors API if available.
-		if ( isset( $block_type->selectors ) &&
-			isset( $block_type->selectors['root'] )
-		) {
-			return $block_type->selectors['root'];
-		}
-
-		// Use the old experimental selector supports property if set.
-		if ( isset( $block_type->supports['__experimentalSelector'] ) &&
-			is_string( $block_type->supports['__experimentalSelector'] ) ) {
-			return $block_type->supports['__experimentalSelector'];
-		}
-
-		// Generate default block class selector.
-		$block_name = str_replace( '/', '-', str_replace( 'core/', '', $block_type->name ) );
-
-		return ".wp-block-{$block_name}";
-	}
-
-	/**
 	 * Returns the selectors metadata for a block.
 	 *
 	 * @param object $block_type    The block type.
