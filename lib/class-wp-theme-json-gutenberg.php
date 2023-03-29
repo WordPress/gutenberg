@@ -2269,7 +2269,7 @@ class WP_Theme_JSON_Gutenberg {
 		$selector         = $block_metadata['selector'];
 		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
 
-		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node, $settings, $this->theme_json );
+		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node );
 
 		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
 		$style_variation_declarations = array();
@@ -2279,7 +2279,7 @@ class WP_Theme_JSON_Gutenberg {
 				$clean_style_variation_selector = trim( $style_variation['selector'] );
 
 				// Generate any feature/subfeature style declarations for the current style variation.
-				$variation_declarations = static::get_feature_declarations_for_node( $block_metadata, $style_variation_node, $settings, $this->theme_json );
+				$variation_declarations = static::get_feature_declarations_for_node( $block_metadata, $style_variation_node );
 
 				// Combine selectors with style variation's selector and add to overall style variation declarations.
 				foreach ( $variation_declarations as $current_selector => $new_declarations ) {
@@ -3461,18 +3461,18 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param object $metadata The related block metadata containing selectors.
 	 * @param object $node     A merged theme.json node for block or variation.
-	 * @param object $settings The theme.json settings for the node.
-	 * @param object $theme_json The current theme.json config.
 	 *
 	 * @return array The style declarations for the node's features with custom
 	 * selectors.
 	 */
-	protected static function get_feature_declarations_for_node( $metadata, &$node, $settings, $theme_json ) {
+	protected function get_feature_declarations_for_node( $metadata, &$node ) {
 		$declarations = array();
 
 		if ( ! isset( $metadata['selectors'] ) ) {
 			return $declarations;
 		}
+
+		$settings = _wp_array_get( $this->theme_json, array( 'settings' ) );
 
 		foreach ( $metadata['selectors'] as $feature => $feature_selectors ) {
 			// Skip if this is the block's root selector or the block doesn't
@@ -3496,7 +3496,7 @@ class WP_Theme_JSON_Gutenberg {
 					);
 
 					// Generate style declarations.
-					$new_declarations = static::compute_style_properties( $subfeature_node, $settings, null, $theme_json );
+					$new_declarations = static::compute_style_properties( $subfeature_node, $settings, null, $this->theme_json );
 
 					// Merge subfeature declarations into feature declarations.
 					if ( isset( $declarations[ $subfeature_selector ] ) ) {
@@ -3527,7 +3527,7 @@ class WP_Theme_JSON_Gutenberg {
 				$feature_node = array( $feature => $node[ $feature ] );
 
 				// Generate the style declarations.
-				$new_declarations = static::compute_style_properties( $feature_node, $settings, null, $theme_json );
+				$new_declarations = static::compute_style_properties( $feature_node, $settings, null, $this->theme_json );
 
 				// Merge new declarations with any that already exist for
 				// the feature selector. This may occur when multiple block
