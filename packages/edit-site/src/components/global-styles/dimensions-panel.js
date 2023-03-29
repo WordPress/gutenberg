@@ -26,19 +26,13 @@ const DEFAULT_CONTROLS = {
 	childLayout: false,
 };
 
-export default function DimensionsPanel( { name, variation = '' } ) {
-	let prefixParts = [];
-	if ( variation ) {
-		prefixParts = [ 'variations', variation ].concat( prefixParts );
-	}
-	const prefix = prefixParts.join( '.' );
-
-	const [ style ] = useGlobalStyle( prefix, name, 'user', false );
-	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
+export default function DimensionsPanel() {
+	const [ style ] = useGlobalStyle( '', undefined, 'user', false );
+	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
 		shouldDecodeEncode: false,
 	} );
-	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
-	const settings = useSettingsForBlockElement( rawSettings, name );
+	const [ rawSettings, setSettings ] = useGlobalSetting( '' );
+	const settings = useSettingsForBlockElement( rawSettings );
 
 	// These intermediary objects are needed because the "layout" property is stored
 	// in settings rather than styles.
