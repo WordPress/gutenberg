@@ -6,45 +6,23 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ColorGradientSettingsDropdown from '../components/colors-gradients/dropdown';
 import ContrastChecker from '../components/contrast-checker';
-import InspectorControls from '../components/inspector-controls';
-import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
 
-export default function ColorPanel( {
-	enableAlpha = false,
-	settings,
-	clientId,
-	enableContrastChecking = true,
-} ) {
+export default function BlockColorContrastChecker( { clientId } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 	const [ detectedLinkColor, setDetectedLinkColor ] = useState();
 	const ref = useBlockRef( clientId );
-	const definedColors = settings.filter( ( setting ) => setting?.colorValue );
 
+	// There are so many things that can change the color of a block
+	// So we perform this check on every render.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => {
-		if ( ! enableContrastChecking ) {
-			return;
-		}
-		if ( ! definedColors.length ) {
-			if ( detectedBackgroundColor ) {
-				setDetectedBackgroundColor();
-			}
-			if ( detectedColor ) {
-				setDetectedColor();
-			}
-			if ( detectedLinkColor ) {
-				setDetectedColor();
-			}
-			return;
-		}
-
 		if ( ! ref.current ) {
 			return;
 		}
@@ -72,26 +50,12 @@ export default function ColorPanel( {
 		setDetectedBackgroundColor( backgroundColor );
 	} );
 
-	const colorGradientSettings = useMultipleOriginColorsAndGradients();
-
 	return (
-		<InspectorControls group="color">
-			<ColorGradientSettingsDropdown
-				enableAlpha={ enableAlpha }
-				panelId={ clientId }
-				settings={ settings }
-				__experimentalIsItemGroup={ false }
-				__experimentalIsRenderedInSidebar
-				{ ...colorGradientSettings }
-			/>
-			{ enableContrastChecking && (
-				<ContrastChecker
-					backgroundColor={ detectedBackgroundColor }
-					textColor={ detectedColor }
-					enableAlphaChecker={ enableAlpha }
-					linkColor={ detectedLinkColor }
-				/>
-			) }
-		</InspectorControls>
+		<ContrastChecker
+			backgroundColor={ detectedBackgroundColor }
+			textColor={ detectedColor }
+			enableAlphaChecker
+			linkColor={ detectedLinkColor }
+		/>
 	);
 }

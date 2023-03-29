@@ -447,6 +447,9 @@ export default function Image( {
 						isResizable={ isResizable }
 						imageWidth={ naturalWidth }
 						imageHeight={ naturalHeight }
+						imageSizeHelp={ __(
+							'Select the size of the source image.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>

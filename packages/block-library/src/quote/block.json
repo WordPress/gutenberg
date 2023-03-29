@@ -29,6 +29,7 @@
 	},
 	"supports": {
 		"anchor": true,
+		"html": false,
 		"__experimentalOnEnter": true,
 		"typography": {
 			"fontSize": true,

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { basename, join } from 'path';
-import { writeFileSync } from 'fs';
+import path from 'path';
 
 /**
  * WordPress dependencies
@@ -24,6 +23,8 @@ import {
 import {
 	readFile,
 	deleteFile,
+	saveResultsFile,
+	getTraceFilePath,
 	getTypingEventDurations,
 	getClickEventDurations,
 	getHoverEventDurations,
@@ -78,16 +79,13 @@ describe( 'Post Editor Performance', () => {
 		inserterHover: [],
 		inserterSearch: [],
 	};
-	const traceFile = __dirname + '/trace.json';
+	const traceFilePath = getTraceFilePath();
+
 	let traceResults;
 
 	afterAll( async () => {
-		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
-		writeFileSync(
-			join( __dirname, resultsFilename ),
-			JSON.stringify( results, null, 2 )
-		);
-		deleteFile( traceFile );
+		saveResultsFile( __filename, results );
+		deleteFile( traceFilePath );
 	} );
 
 	beforeEach( async () => {
@@ -103,7 +101,7 @@ describe( 'Post Editor Performance', () => {
 
 	it( 'Loading', async () => {
 		await loadHtmlIntoTheBlockEditor(
-			readFile( join( __dirname, '../../assets/large-post.html' ) )
+			readFile( path.join( __dirname, '../../assets/large-post.html' ) )
 		);
 		await saveDraft();
 		const draftURL = await page.url();
@@ -148,12 +146,12 @@ describe( 'Post Editor Performance', () => {
 
 	it( 'Typing', async () => {
 		await loadHtmlIntoTheBlockEditor(
-			readFile( join( __dirname, '../../assets/large-post.html' ) )
+			readFile( path.join( __dirname, '../../assets/large-post.html' ) )
 		);
 		await insertBlock( 'Paragraph' );
 		let i = 20;
 		await page.tracing.start( {
-			path: traceFile,
+			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
@@ -166,7 +164,7 @@ describe( 'Post Editor Performance', () => {
 			await page.keyboard.type( 'x' );
 		}
 		await page.tracing.stop();
-		traceResults = JSON.parse( readFile( traceFile ) );
+		traceResults = JSON.parse( readFile( traceFilePath ) );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
 		if (
@@ -186,7 +184,7 @@ describe( 'Post Editor Performance', () => {
 	it( 'Typing within containers', async () => {
 		await loadHtmlIntoTheBlockEditor(
 			readFile(
-				join(
+				path.join(
 					__dirname,
 					'../../assets/small-post-with-containers.html'
 				)
@@ -202,7 +200,7 @@ describe( 'Post Editor Performance', () => {
 
 		let i = 10;
 		await page.tracing.start( {
-			path: traceFile,
+			path: traceFilePath,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
@@ -216,7 +214,7 @@ describe( 'Post Editor Performance', () => {
 		// eslint-disable-next-line no-restricted-syntax
 		await page.waitForTimeout( 500 );
 		await page.tracing.stop();
-		traceResults = JSON.parse( readFile( traceFile ) );
+		traceResults = JSON.parse( readFile( traceFilePath ) );
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 			getTypingEventDurations( traceResults );
 		if (
@@ -242,13 +240,13 @@ describe( 'Post Editor Performance', () => {
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 1000 );
 			await page.tracing.start( {
-				path: traceFile,
+				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 			await paragraphs[ j ].click();
 			await page.tracing.stop();
-			traceResults = JSON.parse( readFile( traceFile ) );
+			traceResults = JSON.parse( readFile( traceFilePath ) );
 			const allDurations = getSelectionEventDurations( traceResults );
 			results.focus.push(
 				allDurations.reduce( ( acc, eventDurations ) => {
@@ -262,13 +260,13 @@ describe( 'Post Editor Performance', () => {
 		await load1000Paragraphs();
 		for ( let j = 0; j < 10; j++ ) {
 			await page.tracing.start( {
-				path: traceFile,
+				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 			await openListView();
 			await page.tracing.stop();
-			traceResults = JSON.parse( readFile( traceFile ) );
+			traceResults = JSON.parse( readFile( traceFilePath ) );
 			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
 			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
 				results.listViewOpen.push( mouseClickEvents[ k ] );
@@ -281,13 +279,13 @@ describe( 'Post Editor Performance', () => {
 		await load1000Paragraphs();
 		for ( let j = 0; j < 10; j++ ) {
 			await page.tracing.start( {
-				path: traceFile,
+				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 			await openGlobalBlockInserter();
 			await page.tracing.stop();
-			traceResults = JSON.parse( readFile( traceFile ) );
+			traceResults = JSON.parse( readFile( traceFilePath ) );
 			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
 			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
 				results.inserterOpen.push( mouseClickEvents[ k ] );
@@ -304,13 +302,13 @@ describe( 'Post Editor Performance', () => {
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 500 );
 			await page.tracing.start( {
-				path: traceFile,
+				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
 			await page.keyboard.type( 'p' );
 			await page.tracing.stop();
-			traceResults = JSON.parse( readFile( traceFile ) );
+			traceResults = JSON.parse( readFile( traceFilePath ) );
 			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
 				getTypingEventDurations( traceResults );
 			if (
@@ -343,7 +341,7 @@ describe( 'Post Editor Performance', () => {
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 200 );
 			await page.tracing.start( {
-				path: traceFile,
+				path: traceFilePath,
 				screenshots: false,
 				categories: [ 'devtools.timeline' ],
 			} );
@@ -351,7 +349,7 @@ describe( 'Post Editor Performance', () => {
 			await page.hover( headingBlockItem );
 			await page.tracing.stop();
 
-			traceResults = JSON.parse( readFile( traceFile ) );
+			traceResults = JSON.parse( readFile( traceFilePath ) );
 			const [ mouseOverEvents, mouseOutEvents ] =
 				getHoverEventDurations( traceResults );
 			for ( let k = 0; k < mouseOverEvents.length; k++ ) {
