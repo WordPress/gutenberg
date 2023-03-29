@@ -207,7 +207,7 @@ _Parameters_
 -   _name_ `string`: Block name.
 -   _attributes_ `[Object]`: Block attributes.
 -   _innerBlocks_ `[Array]`: Nested blocks.
--   _meta_ `[Object]`: Block metadata.
+-   _params_ `[Object]`: Block params.
 
 _Returns_
 

@@ -59,7 +59,13 @@ function ClipboardToolbarButton( { text, disabled } ) {
 	);
 }
 
-function FileEdit( { attributes, isSelected, setAttributes, clientId, meta } ) {
+function FileEdit( {
+	attributes,
+	isSelected,
+	setAttributes,
+	clientId,
+	params,
+} ) {
 	const {
 		id,
 		fileId,
@@ -73,7 +79,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId, meta } ) {
 		previewHeight,
 	} = attributes;
 
-	const { blobURL } = meta;
+	const { blobURL } = params;
 
 	const { media, mediaUpload } = useSelect(
 		( select ) => ( {

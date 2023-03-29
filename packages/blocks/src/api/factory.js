@@ -27,7 +27,7 @@ import {
  * @param {string} name          Block name.
  * @param {Object} [attributes]  Block attributes.
  * @param {Array}  [innerBlocks] Nested blocks.
- * @param {Object} [meta]        Block metadata.
+ * @param {Object} [params]      Block params.
  *
  * @return {Object} Block object.
  *
@@ -36,7 +36,7 @@ export function createBlock(
 	name,
 	attributes = {},
 	innerBlocks = [],
-	meta = {}
+	params = {}
 ) {
 	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
 		name,
@@ -53,7 +53,7 @@ export function createBlock(
 		isValid: true,
 		attributes: sanitizedAttributes,
 		innerBlocks,
-		meta,
+		params,
 	};
 }
 

@@ -83,7 +83,7 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
-	meta,
+	params,
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
@@ -422,15 +422,15 @@ function Navigation( {
 	// Convert the classic menu provided by the Legacy Widget block transform if
 	// it exists.
 	useEffect( () => {
-		if ( meta.menuId ) {
+		if ( params.menuId ) {
 			const classicMenu = classicMenus?.find(
-				( menu ) => menu.id === meta.menuId
+				( menu ) => menu.id === params.menuId
 			);
 			if ( classicMenu ) {
 				onSelectClassicMenu( classicMenu );
 			}
 		}
-	}, [ meta.menuId, classicMenus, onSelectClassicMenu ] );
+	}, [ params.menuId, classicMenus, onSelectClassicMenu ] );
 
 	const onSelectNavigationMenu = ( menuId ) => {
 		handleUpdateMenu( menuId );

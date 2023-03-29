@@ -7,7 +7,7 @@
  * @return {string} The internal widget id.
  */
 export function getWidgetIdFromBlock( block ) {
-	return block.meta.widgetId;
+	return block.params.widgetId;
 }
 
 /**
@@ -20,8 +20,8 @@ export function getWidgetIdFromBlock( block ) {
 export function addWidgetIdToBlock( block, widgetId ) {
 	return {
 		...block,
-		meta: {
-			...block.meta,
+		params: {
+			...block.params,
 			widgetId,
 		},
 	};
