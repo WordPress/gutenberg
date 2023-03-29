@@ -10,12 +10,6 @@ import { useContext, useEffect, useState } from '@wordpress/element';
 import { BlockList } from '../';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
-function getComputedCSS( element, property ) {
-	return element.ownerDocument.defaultView
-		.getComputedStyle( element )
-		.getPropertyValue( property );
-}
-
 export default function LayoutPopover( {
 	className,
 	coverClassName,
@@ -67,22 +61,10 @@ export default function LayoutPopover( {
 				},
 			} );
 
-			// The cover element is an inner element within the popover. It has the width of the layout
-			// and height of the focused block, and also matches any padding of the layout.
-			// const paddingLeft = getComputedCSS(
-			// 	resolvedLayoutElement,
-			// 	'padding-left'
-			// );
-			// const paddingRight = getComputedCSS(
-			// 	resolvedLayoutElement,
-			// 	'padding-right'
-			// );
 			setCoverElementStyle( {
 				position: 'absolute',
 				width: Math.floor( resolvedLayoutElement.offsetWidth ) - 1,
 				height: Math.floor( focusedBlockElement.offsetHeight ),
-				// paddingLeft,
-				// paddingRight,
 			} );
 		};
 
