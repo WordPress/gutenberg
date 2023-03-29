@@ -6,8 +6,6 @@ import {
 	Modal,
 	Button,
 	ExternalLink,
-	Flex,
-	FlexItem,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -245,24 +243,19 @@ export default function PostLockedModal() {
 						</>
 					) }
 
-					<Flex
+					<HStack
 						className="editor-post-locked-modal__buttons"
 						justify="flex-end"
-						expanded={ false }
 					>
 						{ ! isTakeover && (
-							<FlexItem>
-								<Button variant="tertiary" href={ unlockUrl }>
-									{ __( 'Take over' ) }
-								</Button>
-							</FlexItem>
-						) }
-						<FlexItem>
-							<Button variant="primary" href={ allPostsUrl }>
-								{ allPostsLabel }
+							<Button variant="tertiary" href={ unlockUrl }>
+								{ __( 'Take over' ) }
 							</Button>
-						</FlexItem>
-					</Flex>
+						) }
+						<Button variant="primary" href={ allPostsUrl }>
+							{ allPostsLabel }
+						</Button>
+					</HStack>
 				</div>
 			</HStack>
 		</Modal>
