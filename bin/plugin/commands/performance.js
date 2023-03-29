@@ -231,16 +231,8 @@ async function copy( from, to, options ) {
  * @param {WPPerformanceCommandOptions} options  Command options.
  */
 async function runPerformanceTests( branches, options ) {
-	if ( branches.length < 2 ) {
-		throw new Error( 'Need 2 or more branches' );
-	}
-
 	const runningInCI = !! process.env.CI || !! options.ci;
 	const TEST_ROUNDS = options.rounds || 1;
-
-	if ( runningInCI ) {
-		process.env.TERM = 'xterm-color';
-	}
 
 	log(
 		formats.title( '\n💃 Performance Tests 🕺\n' ),
@@ -252,7 +244,6 @@ async function runPerformanceTests( branches, options ) {
 	// if ( ! runningInCI ) {
 	// 	await askForConfirmation( 'Ready to go? ' );
 	// }
-
 	const rootDir = path.join( os.tmpdir(), 'wp-gutenberg-performance-tests' );
 	// await exec( `rm -rf ${ rootDir }` );
 	if ( ! fs.existsSync( rootDir ) ) {
@@ -260,7 +251,43 @@ async function runPerformanceTests( branches, options ) {
 		fs.mkdirSync( rootDir );
 	}
 
-	console.time( 'Total time' );
+	const testRunnerDir = process.cwd(); // path.join( rootDir, 'test-runner' );
+
+	let wpVersion = null;
+	if ( options.wpVersion ) {
+		const zipVersion = options.wpVersion.replace( /^(\d+\.\d+).0/, '$1' );
+		wpVersion = `https://wordpress.org/wordpress-${ zipVersion }.zip`;
+	}
+
+	if ( wpVersion === null ) {
+		log( '>> Using the latest stable WordPress version' );
+	} else {
+		log( `>> Using WordPress version ${ wpVersion }` );
+	}
+
+	const baseWPEnvConfig = {
+		core: wpVersion,
+		plugins: [], // Replace with target Gutenberg build.
+		themes: [
+			path.join( testRunnerDir, 'test/emptytheme' ),
+			'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
+			'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
+		],
+		env: {
+			tests: {
+				mappings: {
+					'wp-content/mu-plugins': path.join(
+						testRunnerDir,
+						'packages/e2e-tests/mu-plugins'
+					),
+					'wp-content/plugins/gutenberg-test-plugins': path.join(
+						testRunnerDir,
+						'packages/e2e-tests/plugins'
+					),
+				},
+			},
+		},
+	};
 
 	const chalks = [
 		formats.title.magenta,
@@ -269,19 +296,11 @@ async function runPerformanceTests( branches, options ) {
 		formats.title.yellow,
 	];
 
-	const buildPromises = branches.map( ( branch ) => {
-		let resolve;
-		let reject;
-		const promise = new Promise( ( _resolve, _reject ) => {
-			resolve = _resolve;
-			reject = _reject;
-		} );
+	branches.unshift( 'cwd' );
 
-		return { branch, promise, resolve, reject };
-	} );
+	console.time( 'Setup duration' );
 
 	await Promise.all( [
-		// Can we just symlink TR branch if same as env branch?
 		( async function () {
 			const testRunnerBranch = options.testsBranch || branches[ 0 ];
 
@@ -293,65 +312,57 @@ async function runPerformanceTests( branches, options ) {
 					) } (test runner): ${ msg }`
 				);
 
-			const testRunnerDir = path.join( rootDir, 'test-runner' );
-			if ( ! fs.existsSync( testRunnerDir ) ) {
-				l( `Creating directory` );
-				fs.mkdirSync( testRunnerDir );
-			}
-
-			// @ts-ignore
-			const git = simpleGit( testRunnerDir );
-			const isRepo = await git.checkIsRepo();
-			if ( ! isRepo ) {
-				l( 'Initializing repository' );
-				await git.init().addRemote( 'origin', config.gitRepositoryURL );
-			}
-
-			let targetSHA;
-			let currentSHA;
-
-			try {
-				// Try getting SHA if passing a branch name, e.g. "trunk".
-				targetSHA = await git.revparse(
-					`origin/${ testRunnerBranch }`
-				);
-			} catch {
-				// Assume the branch is a SHA if the above doesn't exist.
-				targetSHA = testRunnerBranch;
-			}
-
-			try {
-				currentSHA = await git.revparse( 'HEAD' );
-			} catch {
-				// noop
-			}
-
-			if ( currentSHA && currentSHA === targetSHA ) {
-				l( 'Re-using the current build' );
-				// } else if ( branches.includes( testRunnerBranch ) ) {
-				// 	const branchIndex = branches.indexOf( testRunnerBranch );
-				// 	await buildPromises[ branchIndex ].promise;
-				// 	l( 'Copying from the env build' );
-				// 	await copy(
-				// 		path.join(
-				// 			rootDir,
-				// 			`test-env-${ branchIndex }`,
-				// 			'plugin/'
-				// 		),
-				// 		testRunnerDir,
-				// 		'-R'
-				// 	);
+			if ( testRunnerBranch === 'cwd' ) {
+				l( 'Using current working directory for running tests' );
 			} else {
-				l( 'Fetching' );
-				await git
-					.fetch( 'origin', testRunnerBranch, { '--depth': 1 } )
-					.checkout( testRunnerBranch );
+				if ( ! fs.existsSync( testRunnerDir ) ) {
+					l( `Creating directory` );
+					fs.mkdirSync( testRunnerDir );
+				}
 
-				l( 'Installing dependencies' );
-				await exec( 'npm ci', testRunnerDir );
+				// @ts-ignore
+				const git = simpleGit( testRunnerDir );
+				const isRepo = await git.checkIsRepo();
+				if ( ! isRepo ) {
+					l( 'Initializing repository' );
+					await git
+						.init()
+						.addRemote( 'origin', config.gitRepositoryURL );
+				}
 
-				l( 'Building' );
-				await exec( 'node ./bin/packages/build.js', testRunnerDir );
+				let targetSHA;
+				let currentSHA;
+
+				try {
+					// Try getting SHA if passing a branch name, e.g. "trunk".
+					targetSHA = await git.revparse(
+						`origin/${ testRunnerBranch }`
+					);
+				} catch {
+					// Assume the branch is a SHA if the above doesn't exist.
+					targetSHA = testRunnerBranch;
+				}
+
+				try {
+					currentSHA = await git.revparse( 'HEAD' );
+				} catch {
+					// noop
+				}
+
+				if ( currentSHA && currentSHA === targetSHA ) {
+					l( 'Using the current build' );
+				} else {
+					l( 'Fetching' );
+					await git
+						.fetch( 'origin', testRunnerBranch, { '--depth': 1 } )
+						.checkout( testRunnerBranch );
+
+					l( 'Installing dependencies' );
+					await exec( 'npm ci', testRunnerDir );
+
+					l( 'Building' );
+					await exec( 'node ./bin/packages/build.js', testRunnerDir );
+				}
 			}
 
 			l( 'Ready! 🥳' );
@@ -362,290 +373,219 @@ async function runPerformanceTests( branches, options ) {
 				log( `>> ${ chalks[ i + 1 ]( branch ) }: ${ msg }` );
 
 			const envDir = path.join( rootDir, `test-env-${ i }` );
-			const buildDir = path.join( envDir, 'plugin' );
-
-			if ( ! fs.existsSync( buildDir ) ) {
-				l( 'Creating directory' );
-				fs.mkdirSync( buildDir, { recursive: true } );
+			if ( ! fs.existsSync( envDir ) ) {
+				l( 'Creating environment directory' );
+				fs.mkdirSync( envDir );
 			}
 
-			// @ts-ignore
-			const git = simpleGit( buildDir );
-			const isRepo = await git.checkIsRepo();
-			if ( ! isRepo ) {
-				l( 'Initializing repository' );
-				await git.init().addRemote( 'origin', config.gitRepositoryURL );
-			}
+			const buildDir =
+				branch === 'cwd'
+					? process.cwd()
+					: path.join( envDir, 'plugin' );
 
-			let targetSHA;
-			let currentSHA;
-
-			try {
-				// Try getting SHA if passing a branch name, e.g. "trunk".
-				targetSHA = await git.revparse( `origin/${ branch }` );
-			} catch {
-				// Assume the branch is a SHA if the above doesn't exist.
-				targetSHA = branch;
-			}
-
-			try {
-				currentSHA = await git.revparse( 'HEAD' );
-			} catch {
-				// noop
-			}
-
-			if ( currentSHA && currentSHA === targetSHA ) {
-				l( 'Re-using the current build' );
-			} else {
-				l( 'Fetching' );
-				await git
-					.fetch( 'origin', branch, { '--depth': 1 } )
-					.checkout( branch );
-
-				l( 'Installing dependencies' );
-				await exec( 'npm ci', buildDir );
-
+			if ( buildDir === testRunnerDir ) {
 				l( 'Building the plugin' );
 				await exec(
 					'npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
 					buildDir
 				);
+
+				l( 'Writing the wp-env config' );
+				fs.writeFileSync(
+					path.join( envDir, '.wp-env.json' ),
+					JSON.stringify(
+						{
+							...baseWPEnvConfig,
+							plugins: [ buildDir ],
+						},
+						null,
+						2
+					),
+					'utf8'
+				);
+			} else {
+				if ( ! fs.existsSync( buildDir ) ) {
+					l( 'Creating build directory' );
+					fs.mkdirSync( buildDir );
+				}
+
+				// @ts-ignore
+				const git = simpleGit( buildDir );
+				const isRepo = await git.checkIsRepo();
+				if ( ! isRepo ) {
+					l( 'Initializing repository' );
+					await git
+						.init()
+						.addRemote( 'origin', config.gitRepositoryURL );
+				}
+
+				let targetSHA;
+				let currentSHA;
+
+				try {
+					// Try getting SHA if passing a branch name, e.g. "trunk".
+					targetSHA = await git.revparse( `origin/${ branch }` );
+				} catch {
+					// Assume the branch is a SHA if the above doesn't exist.
+					targetSHA = branch;
+				}
+
+				try {
+					currentSHA = await git.revparse( 'HEAD' );
+				} catch {
+					// noop
+				}
+
+				if ( currentSHA && currentSHA === targetSHA ) {
+					l( 'Re-using the current build' );
+				} else {
+					l( 'Fetching' );
+					await git
+						.fetch( 'origin', branch, { '--depth': 1 } )
+						.checkout( branch );
+
+					l( 'Installing dependencies' );
+					await exec( 'npm ci', buildDir );
+
+					l( 'Building the plugin' );
+					await exec(
+						'npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
+						buildDir
+					);
+
+					l( 'Writing the wp-env config' );
+
+					fs.writeFileSync(
+						path.join( envDir, '.wp-env.json' ),
+						JSON.stringify(
+							{
+								...baseWPEnvConfig,
+								plugins: [ buildDir ],
+							},
+							null,
+							2
+						),
+						'utf8'
+					);
+				}
 			}
 
 			l( 'Ready! 🥳' );
-
-			// @ts-ignore
-			buildPromises[ i ].resolve();
 		} ),
 	] );
 
-	// const testRunnerBranch = options.testsBranch || branches[ 0 ];
-	// const testRunnerDir = path.join( rootDir, 'test-runner' );
-	// if ( ! fs.existsSync( testRunnerDir ) ) {
-	// 	log( `Creating test runner dir: ${ testRunnerDir }` );
-	// 	fs.mkdirSync( testRunnerDir );
-	// }
+	console.timeEnd( 'Setup duration' );
 
-	// if ( branches.includes( testRunnerBranch ) ) {
-	// 	const sourceDir = path.join(rootDir, )
-	// 	await copy( path.join( buildDir, '/' ), testRunnerDir, '-R' );
-	// }
+	const testSuites = [
+		'post-editor',
+		'site-editor',
+		'front-end-classic-theme',
+		'front-end-block-theme',
+	];
 
-	console.timeEnd( 'Total time' );
+	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
+	const results = {};
+	const wpEnvPath = path.join( testRunnerDir, 'node_modules/.bin/wp-env' );
 
-	// 	const fancyBranch = formats.success( branch );
+	log( '\n>> Running the tests!\n' );
+	console.time( 'Test duration' );
 
-	// 	if ( branch === options.testsBranch ) {
-	// 		log(
-	// 			`        >> Re-using the testing branch for ${ fancyBranch }`
-	// 		);
-	// 		await runShellScript(
-	// 			`cp -R ${ performanceTestDirectory } ${ buildPath }`
-	// 		);
-	// 	} else {
-	// 		log( `        >> Fetching the ${ fancyBranch } branch` );
-	// 		// @ts-ignore
-	// 		await simpleGit( buildPath ).reset( 'hard' ).checkout( branch );
-	// 	}
+	for ( const testSuite of testSuites ) {
+		results[ testSuite ] = {};
+		/** @type {Array<Record<string, WPPerformanceResults>>} */
+		const rawResults = [];
+		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
+			const roundInfo = `round ${ i + 1 } of ${ TEST_ROUNDS }`;
+			log( `>> Suite: ${ testSuite } (${ roundInfo })` );
+			rawResults[ i ] = {};
+			for ( const branch of branches ) {
+				const sanitizedBranch = sanitizeBranchName( branch );
+				const runKey = `${ testSuite }_${ sanitizedBranch }_run-${ i }`;
+				// @ts-ignore
+				const envDir = path.join(
+					rootDir,
+					`test-env-${ branches.indexOf( branch ) }`
+				);
 
-	// 	log( `        >> Building the ${ fancyBranch } branch` );
-	// 	await runShellScript(
-	// 		'npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
-	// 		buildPath
-	// 	);
+				log( `  >> Branch: ${ branch }` );
+				log( '    >> Starting the environment.' );
+				await exec( `${ wpEnvPath } start`, envDir );
+				log( '    >> Running the test.' );
+				rawResults[ i ][ branch ] = await runTestSuite(
+					testSuite,
+					testRunnerDir,
+					runKey
+				);
+				log( '    >> Stopping the environment' );
+				await exec( `${ wpEnvPath } stop`, envDir );
+			}
+		}
 
-	// 	// Create the config file for the current env.
-	// 	fs.writeFileSync(
-	// 		path.join( environmentDirectory, '.wp-env.json' ),
-	// 		JSON.stringify(
-	// 			{
-	// 				core: 'WordPress/WordPress',
-	// 				plugins: [ path.join( environmentDirectory, 'plugin' ) ],
-	// 				themes: [
-	// 					path.join(
-	// 						performanceTestDirectory,
-	// 						'test/emptytheme'
-	// 					),
-	// 					'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
-	// 					'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
-	// 				],
-	// 				env: {
-	// 					tests: {
-	// 						mappings: {
-	// 							'wp-content/mu-plugins': path.join(
-	// 								performanceTestDirectory,
-	// 								'packages/e2e-tests/mu-plugins'
-	// 							),
-	// 							'wp-content/plugins/gutenberg-test-plugins':
-	// 								path.join(
-	// 									performanceTestDirectory,
-	// 									'packages/e2e-tests/plugins'
-	// 								),
-	// 						},
-	// 					},
-	// 				},
-	// 			},
-	// 			null,
-	// 			2
-	// 		),
-	// 		'utf8'
-	// 	);
+		console.timeEnd( 'Test duration' );
 
-	// 	if ( options.wpVersion ) {
-	// 		// In order to match the topology of ZIP files at wp.org, remap .0
-	// 		// patch versions to major versions:
-	// 		//
-	// 		//     5.7   -> 5.7   (unchanged)
-	// 		//     5.7.0 -> 5.7   (changed)
-	// 		//     5.7.2 -> 5.7.2 (unchanged)
-	// 		const zipVersion = options.wpVersion.replace(
-	// 			/^(\d+\.\d+).0/,
-	// 			'$1'
-	// 		);
-	// 		const zipUrl = `https://wordpress.org/wordpress-${ zipVersion }.zip`;
-	// 		log( `        Using WordPress version ${ zipVersion }` );
+		// Computing medians.
+		for ( const branch of branches ) {
+			/**
+			 * @type {string[]}
+			 */
+			let dataPointsForTestSuite = [];
+			if ( rawResults.length > 0 ) {
+				dataPointsForTestSuite = Object.keys(
+					rawResults[ 0 ][ branch ]
+				);
+			}
 
-	// 		// Patch the environment's .wp-env.json config to use the specified WP
-	// 		// version:
-	// 		//
-	// 		//     {
-	// 		//         "core": "https://wordpress.org/wordpress-$VERSION.zip",
-	// 		//         ...
-	// 		//     }
-	// 		const confPath = `${ environmentDirectory }/.wp-env.json`;
-	// 		const conf = { ...readJSONFile( confPath ), core: zipUrl };
-	// 		await fs.writeFileSync(
-	// 			confPath,
-	// 			JSON.stringify( conf, null, 2 ),
-	// 			'utf8'
-	// 		);
-	// 	}
-	// }
+			const resultsByDataPoint = {};
+			dataPointsForTestSuite.forEach( ( dataPoint ) => {
+				// @ts-ignore
+				resultsByDataPoint[ dataPoint ] = rawResults.map(
+					// @ts-ignore
+					( r ) => r[ branch ][ dataPoint ]
+				);
+			} );
+			const medians = mapValues( resultsByDataPoint, median );
 
-	// // 3- Printing the used folders.
-	// log(
-	// 	'\n>> Perf Tests Directory : ' +
-	// 		formats.success( performanceTestDirectory )
-	// );
-	// for ( const branch of branches ) {
-	// 	// @ts-ignore
-	// 	const envPath = formats.success( branchDirectories[ branch ] );
-	// 	log( `>> Environment Directory (${ branch }) : ${ envPath }` );
-	// }
+			// Format results as times.
+			results[ testSuite ][ branch ] = mapValues( medians, formatTime );
+		}
+	}
 
-	// // 4- Running the tests.
-	// log( '\n>> Running the tests' );
+	// 5- Formatting the results.
+	log( '\n>> 🎉 Results.\n' );
 
-	// const testSuites = [
-	// 	'post-editor',
-	// 	'site-editor',
-	// 	'front-end-classic-theme',
-	// 	'front-end-block-theme',
-	// ];
+	log(
+		'\nPlease note that client side metrics EXCLUDE the server response time.\n'
+	);
 
-	// /** @type {Record<string,Record<string, WPPerformanceResults>>} */
-	// const results = {};
-	// const wpEnvPath = path.join(
-	// 	performanceTestDirectory,
-	// 	'node_modules/.bin/wp-env'
-	// );
+	for ( const testSuite of testSuites ) {
+		log( `\n>> ${ testSuite }\n` );
 
-	// for ( const testSuite of testSuites ) {
-	// 	results[ testSuite ] = {};
-	// 	/** @type {Array<Record<string, WPPerformanceResults>>} */
-	// 	const rawResults = [];
-	// 	for ( let i = 0; i < TEST_ROUNDS; i++ ) {
-	// 		const roundInfo = `round ${ i + 1 } of ${ TEST_ROUNDS }`;
-	// 		log( `    >> Suite: ${ testSuite } (${ roundInfo })` );
-	// 		rawResults[ i ] = {};
-	// 		for ( const branch of branches ) {
-	// 			const sanitizedBranch = sanitizeBranchName( branch );
-	// 			const runKey = `${ testSuite }_${ sanitizedBranch }_run-${ i }`;
-	// 			// @ts-ignore
-	// 			const environmentDirectory = branchDirectories[ branch ];
-	// 			log( `        >> Branch: ${ branch }` );
-	// 			log( '            >> Starting the environment.' );
-	// 			await runShellScript(
-	// 				`${ wpEnvPath } start`,
-	// 				environmentDirectory
-	// 			);
-	// 			log( '            >> Running the test.' );
-	// 			rawResults[ i ][ branch ] = await runTestSuite(
-	// 				testSuite,
-	// 				performanceTestDirectory,
-	// 				runKey
-	// 			);
-	// 			log( '            >> Stopping the environment' );
-	// 			await runShellScript(
-	// 				`${ wpEnvPath } stop`,
-	// 				environmentDirectory
-	// 			);
-	// 		}
-	// 	}
+		/** @type {Record<string, Record<string, string>>} */
+		const invertedResult = {};
+		Object.entries( results[ testSuite ] ).reduce(
+			( acc, [ key, val ] ) => {
+				for ( const entry of Object.keys( val ) ) {
+					// @ts-ignore
+					if ( ! acc[ entry ] && isFinite( val[ entry ] ) )
+						acc[ entry ] = {};
+					// @ts-ignore
+					if ( isFinite( val[ entry ] ) ) {
+						// @ts-ignore
+						acc[ entry ][ key ] = val[ entry ] + ' ms';
+					}
+				}
+				return acc;
+			},
+			invertedResult
+		);
+		console.table( invertedResult );
 
-	// 	// Computing medians.
-	// 	for ( const branch of branches ) {
-	// 		/**
-	// 		 * @type {string[]}
-	// 		 */
-	// 		let dataPointsForTestSuite = [];
-	// 		if ( rawResults.length > 0 ) {
-	// 			dataPointsForTestSuite = Object.keys(
-	// 				rawResults[ 0 ][ branch ]
-	// 			);
-	// 		}
-
-	// 		const resultsByDataPoint = {};
-	// 		dataPointsForTestSuite.forEach( ( dataPoint ) => {
-	// 			// @ts-ignore
-	// 			resultsByDataPoint[ dataPoint ] = rawResults.map(
-	// 				// @ts-ignore
-	// 				( r ) => r[ branch ][ dataPoint ]
-	// 			);
-	// 		} );
-	// 		const medians = mapValues( resultsByDataPoint, median );
-
-	// 		// Format results as times.
-	// 		results[ testSuite ][ branch ] = mapValues( medians, formatTime );
-	// 	}
-	// }
-
-	// // 5- Formatting the results.
-	// log( '\n>> 🎉 Results.\n' );
-
-	// log(
-	// 	'\nPlease note that client side metrics EXCLUDE the server response time.\n'
-	// );
-
-	// for ( const testSuite of testSuites ) {
-	// 	log( `\n>> ${ testSuite }\n` );
-
-	// 	/** @type {Record<string, Record<string, string>>} */
-	// 	const invertedResult = {};
-	// 	Object.entries( results[ testSuite ] ).reduce(
-	// 		( acc, [ key, val ] ) => {
-	// 			for ( const entry of Object.keys( val ) ) {
-	// 				// @ts-ignore
-	// 				if ( ! acc[ entry ] && isFinite( val[ entry ] ) )
-	// 					acc[ entry ] = {};
-	// 				// @ts-ignore
-	// 				if ( isFinite( val[ entry ] ) ) {
-	// 					// @ts-ignore
-	// 					acc[ entry ][ key ] = val[ entry ] + ' ms';
-	// 				}
-	// 			}
-	// 			return acc;
-	// 		},
-	// 		invertedResult
-	// 	);
-	// 	console.table( invertedResult );
-
-	// 	const resultsFilename = testSuite + '.performance-results.json';
-	// 	fs.writeFileSync(
-	// 		path.join( ARTIFACTS_PATH, resultsFilename ),
-	// 		JSON.stringify( results[ testSuite ], null, 2 )
-	// 	);
-	// }
+		const resultsFilename = testSuite + '.performance-results.json';
+		fs.writeFileSync(
+			path.join( ARTIFACTS_PATH, resultsFilename ),
+			JSON.stringify( results[ testSuite ], null, 2 )
+		);
+	}
 }
 
 module.exports = {
