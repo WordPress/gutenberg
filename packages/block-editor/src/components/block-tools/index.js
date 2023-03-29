@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
@@ -15,6 +16,7 @@ import {
 } from './insertion-point';
 import SelectedBlockPopover from './selected-block-popover';
 import { store as blockEditorStore } from '../../store';
+import BlockContextualToolbar from './block-contextual-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 
@@ -43,6 +45,7 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const { isZoomOutMode, isTyping } = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
@@ -122,6 +125,9 @@ export default function BlockTools( {
 					<InsertionPoint
 						__unstableContentRef={ __unstableContentRef }
 					/>
+				) }
+				{ ! isLargeViewport && ! isZoomOutMode && (
+					<BlockContextualToolbar isFixed />
 				) }
 				{ /* Even if the toolbar is fixed, the block popover is still
 					needed for navigation and zoom-out mode. */ }

@@ -19,7 +19,7 @@ import {
 	BlockToolbar,
 	useBlockDisplayInformation,
 } from '@wordpress/block-editor';
-import { tool } from '@wordpress/icons';
+import { levelUp } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -47,7 +47,7 @@ function ShowDocumentToolbarButton( { onClick } ) {
 			as={ Button }
 			className="edit-post-header-toolbar__document-tools-toggle"
 			variant="primary"
-			icon={ tool }
+			icon={ levelUp }
 			onClick={ onClick }
 		/>
 	);
@@ -67,6 +67,8 @@ function ShowBlockToolbarButton( { onClick, icon } ) {
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const isLargeViewport = useViewportMatch( 'large' );
+	const isMobileViewPort = useViewportMatch( 'medium', '<' );
+	const isDesktopViewport = useViewportMatch( 'medium', '>=' );
 	const {
 		hasActiveMetaboxes,
 		isPublishSidebarOpened,
@@ -147,42 +149,46 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__toolbar"
 			>
-				{ ( ! hasFixedToolbar || isNavigationMode ) && (
-					<HeaderToolbar />
-				) }
-				{ hasFixedToolbar && ! isNavigationMode && (
-					<>
-						<MaybeHide isHidden={ headerToolbar === 'block' }>
-							<HeaderToolbar
-								hasSelectedBlocks={ hasSelectedBlocks }
-								BlockToolbarToggle={ () => (
-									<ShowBlockToolbarButton
-										onClick={ () =>
-											setHeaderToolbar( 'block' )
-										}
-										icon={ blockInformation.icon }
-									/>
-								) }
-							/>
-						</MaybeHide>
-						<MaybeHide isHidden={ headerToolbar === 'document' }>
-							<NavigableToolbar
-								className="edit-post-header-block-toolbar"
-								aria-label={ blockToolbarAriaLabel }
+				{ ( ! hasFixedToolbar ||
+					isNavigationMode ||
+					isMobileViewPort ) && <HeaderToolbar /> }
+				{ hasFixedToolbar &&
+					! isNavigationMode &&
+					isDesktopViewport && (
+						<>
+							<MaybeHide isHidden={ headerToolbar === 'block' }>
+								<HeaderToolbar
+									hasSelectedBlocks={ hasSelectedBlocks }
+									BlockToolbarToggle={ () => (
+										<ShowBlockToolbarButton
+											onClick={ () =>
+												setHeaderToolbar( 'block' )
+											}
+											icon={ blockInformation.icon }
+										/>
+									) }
+								/>
+							</MaybeHide>
+							<MaybeHide
+								isHidden={ headerToolbar === 'document' }
 							>
-								<InserterButton />
-								<ShowDocumentToolbarButton
-									onClick={ () =>
-										setHeaderToolbar( 'document' )
-									}
-								/>
-								<BlockToolbar
-									hideDragHandle={ hasFixedToolbar }
-								/>
-							</NavigableToolbar>
-						</MaybeHide>
-					</>
-				) }
+								<NavigableToolbar
+									className="edit-post-header-block-toolbar"
+									aria-label={ blockToolbarAriaLabel }
+								>
+									<InserterButton />
+									<ShowDocumentToolbarButton
+										onClick={ () =>
+											setHeaderToolbar( 'document' )
+										}
+									/>
+									<BlockToolbar
+										hideDragHandle={ hasFixedToolbar }
+									/>
+								</NavigableToolbar>
+							</MaybeHide>
+						</>
+					) }
 				<TemplateTitle />
 			</motion.div>
 			<motion.div

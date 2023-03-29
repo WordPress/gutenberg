@@ -24,7 +24,7 @@
 		border: 0;
 		&::after {
 			content: "\00B7";
-			font-size: 40px;
+			font-size: 36px;
 			position: absolute;
 			left: $grid-unit-40 + $grid-unit-15;
 			bottom: math.div($grid-unit, 2);
