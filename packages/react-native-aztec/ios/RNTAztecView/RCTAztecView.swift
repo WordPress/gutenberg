@@ -234,7 +234,10 @@ class RCTAztecView: Aztec.TextView {
         previousContentSize = newSize
 
         let body = packForRN(newSize, withName: "contentSize")
-        onContentSizeChange(body)
+        let caretData = packCaretDataForRN()
+        var result = body
+        result.merge(caretData) { (_, new) in new }
+        onContentSizeChange(result)
     }
 
     // MARK: - Paste handling

@@ -79,6 +79,8 @@ class AztecView extends Component {
 	}
 
 	_onContentSizeChange( event ) {
+		this.updateCaretData( event );
+
 		if ( ! this.props.onContentSizeChange ) {
 			return;
 		}
@@ -202,6 +204,7 @@ class AztecView extends Component {
 
 	updateCaretData( event ) {
 		if (
+			this.isFocused() &&
 			this.selectionEndCaretY !== event?.nativeEvent?.selectionEndCaretY
 		) {
 			const caretY = event.nativeEvent.selectionEndCaretY;
