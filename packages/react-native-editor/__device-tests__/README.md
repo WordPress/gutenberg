@@ -18,7 +18,11 @@ SauceLabs is a cloud hosting platform that provides access to a variety of simul
 
 **Android:** If you have completed the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide you should already have Android Studio installed and the Android SDK installed. You'll also need to have the [Android Emulator](https://developer.android.com/studio/run/emulator) installed and set up. The emulator needs to be running prior to running the tests.
 
-TBA
+### Physical Devices
+
+**iOS:** Currently unsupported.
+
+**Android:** Connect your device to your computer via USB and [enable USB debugging](https://developer.android.com/studio/debug/dev-options).
 
 ## Running the tests locally
 
