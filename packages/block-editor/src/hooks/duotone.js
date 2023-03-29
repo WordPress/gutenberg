@@ -223,37 +223,6 @@ const withDuotoneControls = createHigherOrderComponent(
 	'withDuotoneControls'
 );
 
-/**
- * Function that scopes a selector with another one. This works a bit like
- * SCSS nesting except the `&` operator isn't supported.
- *
- * @example
- * ```js
- * const scope = '.a, .b .c';
- * const selector = '> .x, .y';
- * const merged = scopeSelector( scope, selector );
- * // merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
- * ```
- *
- * @param {string} scope    Selector to scope to.
- * @param {string} selector Original selector.
- *
- * @return {string} Scoped selector.
- */
-function scopeSelector( scope, selector ) {
-	const scopes = scope.split( ',' );
-	const selectors = selector.split( ',' );
-
-	const selectorsScoped = [];
-	scopes.forEach( ( outer ) => {
-		selectors.forEach( ( inner ) => {
-			selectorsScoped.push( `${ outer.trim() } ${ inner.trim() }` );
-		} );
-	} );
-
-	return selectorsScoped.join( ', ' );
-}
-
 function BlockDuotoneStyles( { name, duotoneStyle, id } ) {
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -282,10 +251,29 @@ function BlockDuotoneStyles( { name, duotoneStyle, id } ) {
 	// Extra .editor-styles-wrapper specificity is needed in the editor
 	// since we're not using inline styles to apply the filter. We need to
 	// override duotone applied by global styles and theme.json.
-	const selectorsGroup = scopeSelector(
-		`.editor-styles-wrapper .${ id }`,
-		duotoneSupportSelectors
-	);
+
+	// This is a JavaScript implementation of the PHP function in lib/class-wp-duotone-gutenberg.php
+	const scopes = ( '.' + id ).split( ',' );
+	const selectors = duotoneSupportSelectors.split( ',' );
+
+	const selectorsScoped = [];
+	scopes.forEach( ( outer ) => {
+		selectors.forEach( ( inner ) => {
+			outer = outer.trim();
+			inner = inner.trim();
+			if ( outer && inner ) {
+				// unlike scopeSelector this concatenates the selectors without a space.
+				selectorsScoped.push(
+					'.editor-styles-wrapper ' + outer + '' + inner
+				);
+			} else if ( outer ) {
+				selectorsScoped.push( '.editor-styles-wrapper ' + inner );
+			} else if ( inner ) {
+				selectorsScoped.push( '.editor-styles-wrapper ' + outer );
+			}
+		} );
+	} );
+	const selectorsGroup = selectorsScoped.join( ',' );
 
 	return createPortal(
 		<InlineDuotone
