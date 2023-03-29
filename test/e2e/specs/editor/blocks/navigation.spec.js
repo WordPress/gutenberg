@@ -398,24 +398,30 @@ describe( 'List view editing', () => {
 
 		// Check the structure of the individual menu items matches the one that was created.
 		await expect(
-			listView.getByRole( 'gridcell' ).filter( {
-				hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
-				has: page.getByText( 'Top Level Item 1' ), // find the hidden anchor with the label of the Nav item.
-			} )
+			listView
+				.getByRole( 'gridcell' )
+				.filter( {
+					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+				} )
+				.getByText( 'Top Level Item 1' )
 		).toBeVisible();
 
 		await expect(
-			listView.getByRole( 'gridcell' ).filter( {
-				hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
-				has: page.getByText( 'Top Level Item 2' ), // find the hidden anchor with the label of the Nav item.
-			} )
+			listView
+				.getByRole( 'gridcell' )
+				.filter( {
+					hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
+				} )
+				.getByText( 'Top Level Item 2' )
 		).toBeVisible();
 
 		await expect(
-			listView.getByRole( 'gridcell' ).filter( {
-				hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
-				has: page.getByText( 'Test Submenu Item' ), // find the hidden anchor with the label of the Nav item.
-			} )
+			listView
+				.getByRole( 'gridcell' )
+				.filter( {
+					hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
+				} )
+				.getByText( 'Test Submenu Item' )
 		).toBeVisible();
 	} );
 } );
