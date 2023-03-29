@@ -40,14 +40,14 @@
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles
 	.edit-post-header-document-toolbar__left > .components-button.has-icon:first-child {
-		margin-right: 10px;
+		margin-right: $grid-unit-10;
 	}
 
 	.edit-post-header-document-toolbar__left > .components-button.has-icon,
 	.edit-post-header-document-toolbar__left > .components-dropdown > .components-button.has-icon {
-		height: 32px;
-		min-width: 32px;
-		margin-right: 4px;
+		height: $grid-unit-40;
+		min-width: $grid-unit-40;
+		margin-right: $grid-unit-05;
 		padding: 0;
 		width: 32px;
 
@@ -68,10 +68,11 @@
 	& > .edit-post-header-document-toolbar__left button.components-button.edit-post-header-toolbar__block-tools-toggle.is-primary.has-icon {
 		height: $button-size;
 		min-width: $button-size;
-		padding: 6px;
 		background-color: #fff;
 		color: #000;
+		margin-left: $grid-unit-10;
 		border-left: 1px solid #ddd;
+		padding-left: $grid-unit-15;
 
 		&:hover {
 			color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
