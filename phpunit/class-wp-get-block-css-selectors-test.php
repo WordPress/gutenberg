@@ -101,7 +101,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 		);
 
 		$selector = wp_get_block_css_selector( $block_type, 'filter.duotone' );
-		$this->assertEquals( '.experimental-duotone', $selector );
+		$this->assertEquals( '.wp-block-test-experimental-duotone-selector .experimental-duotone', $selector );
 	}
 
 	public function test_no_duotone_selector_set() {
@@ -113,6 +113,28 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 
 		$selector = wp_get_block_css_selector( $block_type, 'filter.duotone' );
 		$this->assertEquals( null, $selector );
+	}
+
+	public function test_fallback_duotone_selector() {
+		$block_type = self::register_test_block(
+			'test/fallback-duotone-selector',
+			array( 'root' => '.fallback-root-selector' ),
+			null
+		);
+
+		$selector = wp_get_block_css_selector( $block_type, 'filter.duotone', true );
+		$this->assertEquals( '.fallback-root-selector', $selector );
+	}
+
+	public function test_fallback_duotone_selector_to_generated_class() {
+		$block_type = self::register_test_block(
+			'test/fallback-duotone-selector',
+			array(),
+			null
+		);
+
+		$selector = wp_get_block_css_selector( $block_type, 'filter.duotone', true );
+		$this->assertEquals( '.wp-block-test-fallback-duotone-selector', $selector );
 	}
 
 	public function test_get_feature_selector_via_selectors_api() {

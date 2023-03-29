@@ -32,6 +32,7 @@ import {
 	__unstableDuotoneStylesheet as DuotoneStylesheet,
 	__unstableDuotoneUnsetStylesheet as DuotoneUnsetStylesheet,
 } from '../components/duotone';
+import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 import { store as blockEditorStore } from '../store';
 
 const EMPTY_ARRAY = [];
@@ -273,9 +274,10 @@ function BlockDuotoneStyles( { name, duotoneStyle, id } ) {
 		colors = getColorsFromDuotonePreset( colors, duotonePalette );
 	}
 
-	const duotoneSupportSelectors =
-		getBlockType( name ).selectors?.filter?.duotone ||
-		getBlockSupport( name, 'color.__experimentalDuotone' );
+	const duotoneSupportSelectors = getBlockCSSSelector(
+		getBlockType( name ),
+		'filter.duotone'
+	);
 
 	// Extra .editor-styles-wrapper specificity is needed in the editor
 	// since we're not using inline styles to apply the filter. We need to

@@ -34,21 +34,7 @@ export function getBlockCSSSelector(
 	const hasSelectors = ! isEmpty( selectors );
 	const path = Array.isArray( target ) ? target.join( '.' ) : target;
 
-	// Duotone ( no fallback selectors for Duotone ).
-	if ( path === 'filter.duotone' ) {
-		// If selectors API in use, only use its value or null.
-		if ( hasSelectors ) {
-			return get( selectors, path, null );
-		}
-
-		// Selectors API, not available, check for old experimental selector.
-		return get( supports, 'color.__experimentalDuotone', null );
-	}
-
-	// Root selector.
-
-	// Calculated before returning as it can be used as a fallback for feature
-	// selectors later on.
+	// Root selector ( can be used as fallback ).
 	let rootSelector = null;
 
 	if ( hasSelectors && selectors.root ) {
@@ -68,14 +54,36 @@ export function getBlockCSSSelector(
 		return rootSelector;
 	}
 
+	const fallbackSelector = fallback ? rootSelector : null;
+
+	// Duotone ( may fallback to root selector ).
+	if ( path === 'filter.duotone' ) {
+		// If selectors API in use, only use its value, fallback, or null.
+		if ( hasSelectors ) {
+			return get( selectors, path, fallbackSelector );
+		}
+
+		// Selectors API, not available, check for old experimental selector.
+		const duotoneSelector = get(
+			supports,
+			'color.__experimentalDuotone',
+			null
+		);
+
+		// If nothing to work with, provide fallback selector if available.
+		if ( ! duotoneSelector ) {
+			return fallbackSelector;
+		}
+
+		return scopeSelector( rootSelector, duotoneSelector );
+	}
+
 	// If target is not `root` or `duotone` we have a feature or subfeature
 	// as the target. If the target is a string convert to an array.
 	const pathArray = Array.isArray( target ) ? target : target.split( '.' );
 
 	// Feature selectors ( may fallback to root selector );
 	if ( pathArray.length === 1 ) {
-		const fallbackSelector = fallback ? rootSelector : null;
-
 		// Prefer the selectors API if available.
 		if ( hasSelectors ) {
 			// Get selector from either `feature.root` or shorthand path.

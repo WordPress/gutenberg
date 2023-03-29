@@ -19,7 +19,7 @@ import { getCSSRules } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
+import { PRESET_METADATA, ROOT_BLOCK_SELECTOR } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
 import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
@@ -859,10 +859,9 @@ export const toStyles = (
 				if ( duotoneDeclarations.length > 0 ) {
 					ruleset =
 						ruleset +
-						`${ scopeSelector(
-							selector,
-							duotoneSelector
-						) }{${ duotoneDeclarations.join( ';' ) };}`;
+						`${ duotoneSelector }{${ duotoneDeclarations.join(
+							';'
+						) };}`;
 				}
 			}
 

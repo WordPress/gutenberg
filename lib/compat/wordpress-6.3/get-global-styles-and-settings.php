@@ -25,21 +25,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 
 		$has_selectors = ! empty( $block_type->selectors );
 
-		// Duotone (No fallback selectors for Duotone).
-		if ( 'filter.duotone' === $target || array( 'filter', 'duotone' ) === $target ) {
-			// If selectors API in use, only use it's value or null.
-			if ( $has_selectors ) {
-				return _wp_array_get( $block_type->selectors, array( 'filter', 'duotone' ), null );
-			}
-
-			// Selectors API, not available, check for old experimental selector.
-			return _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null );
-		}
-
-		// Root Selector.
-
-		// Calculated before returning as it can be used as fallback for
-		// feature selectors later on.
+		// Root Selector ( can be used as a fallback ).
 		$root_selector = null;
 
 		if ( $has_selectors && isset( $block_type->selectors['root'] ) ) {
@@ -59,16 +45,58 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			return $root_selector;
 		}
 
+		$fallback_selector = $fallback ? $root_selector : null;
+
+		// Helper to scope old experimental selectors.
+		$scope_selector = function( $scope, $selector ) {
+			$scopes    = explode( ',', $scope );
+			$selectors = explode( ',', $selector );
+
+			$selectors_scoped = array();
+			foreach ( $scopes as $outer ) {
+				foreach ( $selectors as $inner ) {
+					$outer = trim( $outer );
+					$inner = trim( $inner );
+					if ( ! empty( $outer ) && ! empty( $inner ) ) {
+						$selectors_scoped[] = $outer . ' ' . $inner;
+					} elseif ( empty( $outer ) ) {
+						$selectors_scoped[] = $inner;
+					} elseif ( empty( $inner ) ) {
+						$selectors_scoped[] = $outer;
+					}
+				}
+			}
+
+			return implode( ', ', $selectors_scoped );
+		};
+
+		// Duotone ( may fallback to root selector ).
+		if ( 'filter.duotone' === $target || array( 'filter', 'duotone' ) === $target ) {
+			// If selectors API in use, only use it's value, fallback, or null.
+			if ( $has_selectors ) {
+				return _wp_array_get( $block_type->selectors, array( 'filter', 'duotone' ), $fallback_selector );
+			}
+
+			// Selectors API, not available, check for old experimental selector.
+			$duotone_selector = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null );
+
+			// Nothing to work with, provide fallback or null.
+			if ( null === $duotone_selector ) {
+				return $fallback_selector;
+			}
+
+			// Scope the duotone selector by the block's root selector.
+			return $scope_selector( $root_selector, $duotone_selector );
+		}
+
 		// If target is not `root` or `duotone` we have a feature or subfeature
 		// as the target. If the target is a string convert to an array.
 		if ( is_string( $target ) ) {
 			$target = explode( '.', $target );
 		}
 
-		// Feature Selectors ( May fallback to root selector ).
+		// Feature Selectors ( may fallback to root selector ).
 		if ( 1 === count( $target ) ) {
-			$fallback_selector = $fallback ? $root_selector : null;
-
 			// Prefer the selectors API if available.
 			if ( $has_selectors ) {
 				// Look for selector under `feature.root`.
@@ -95,25 +123,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			}
 
 			// Scope the feature selector by the block's root selector.
-			$scopes    = explode( ',', $root_selector );
-			$selectors = explode( ',', $feature_selector );
-
-			$selectors_scoped = array();
-			foreach ( $scopes as $outer ) {
-				foreach ( $selectors as $inner ) {
-					$outer = trim( $outer );
-					$inner = trim( $inner );
-					if ( ! empty( $outer ) && ! empty( $inner ) ) {
-						$selectors_scoped[] = $outer . ' ' . $inner;
-					} elseif ( empty( $outer ) ) {
-						$selectors_scoped[] = $inner;
-					} elseif ( empty( $inner ) ) {
-						$selectors_scoped[] = $outer;
-					}
-				}
-			}
-
-			return implode( ', ', $selectors_scoped );
+			return $scope_selector( $root_selector, $feature_selector );
 		}
 
 		// Subfeature selector
