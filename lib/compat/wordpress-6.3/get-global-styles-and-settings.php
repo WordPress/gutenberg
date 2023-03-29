@@ -47,29 +47,6 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 
 		$fallback_selector = $fallback ? $root_selector : null;
 
-		// Helper to scope old experimental selectors.
-		$scope_selector = function( $scope, $selector ) {
-			$scopes    = explode( ',', $scope );
-			$selectors = explode( ',', $selector );
-
-			$selectors_scoped = array();
-			foreach ( $scopes as $outer ) {
-				foreach ( $selectors as $inner ) {
-					$outer = trim( $outer );
-					$inner = trim( $inner );
-					if ( ! empty( $outer ) && ! empty( $inner ) ) {
-						$selectors_scoped[] = $outer . ' ' . $inner;
-					} elseif ( empty( $outer ) ) {
-						$selectors_scoped[] = $inner;
-					} elseif ( empty( $inner ) ) {
-						$selectors_scoped[] = $outer;
-					}
-				}
-			}
-
-			return implode( ', ', $selectors_scoped );
-		};
-
 		// Duotone ( may fallback to root selector ).
 		if ( 'filter.duotone' === $target || array( 'filter', 'duotone' ) === $target ) {
 			// If selectors API in use, only use it's value, fallback, or null.
@@ -86,7 +63,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			}
 
 			// Scope the duotone selector by the block's root selector.
-			return $scope_selector( $root_selector, $duotone_selector );
+			return WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_selector );
 		}
 
 		// If target is not `root` or `duotone` we have a feature or subfeature
@@ -123,7 +100,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			}
 
 			// Scope the feature selector by the block's root selector.
-			return $scope_selector( $root_selector, $feature_selector );
+			return WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $feature_selector );
 		}
 
 		// Subfeature selector
