@@ -13,7 +13,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useContext, useMemo } from '@wordpress/element';
+import { renderToString, useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 
 /**
@@ -145,13 +145,16 @@ function getPresetsSvgFilters( blockPresets = {} ) {
 		return [ 'default', 'theme' ]
 			.filter( ( origin ) => presetByOrigin[ origin ] )
 			.flatMap( ( origin ) =>
-				presetByOrigin[ origin ].map( ( preset ) => (
-					<PresetDuotoneFilter
-						preset={ preset }
-						key={ preset.slug }
-					/>
-				) )
-			);
+				presetByOrigin[ origin ].map( ( preset ) =>
+					renderToString(
+						<PresetDuotoneFilter
+							preset={ preset }
+							key={ preset.slug }
+						/>
+					)
+				)
+			)
+			.join( '' );
 	} );
 }
 
@@ -1124,9 +1127,9 @@ export function useGlobalStylesOutput() {
 			hasFallbackGapSupport,
 			disableLayoutStyles
 		);
+		const svgs = toSvgFilters( mergedConfig, blockSelectors );
 
-		const filters = toSvgFilters( mergedConfig, blockSelectors );
-		const stylesheets = [
+		const styles = [
 			{
 				css: customProperties,
 				isGlobalStyles: true,
@@ -1140,6 +1143,11 @@ export function useGlobalStylesOutput() {
 				css: mergedConfig.styles.css ?? '',
 				isGlobalStyles: true,
 			},
+			{
+				assets: svgs,
+				__unstableType: 'svg',
+				isGlobalStyles: true,
+			},
 		];
 
 		// Loop through the blocks to check if there are custom CSS values.
@@ -1148,7 +1156,7 @@ export function useGlobalStylesOutput() {
 		getBlockTypes().forEach( ( blockType ) => {
 			if ( mergedConfig.styles.blocks[ blockType.name ]?.css ) {
 				const selector = blockSelectors[ blockType.name ].selector;
-				stylesheets.push( {
+				styles.push( {
 					css: processCSSNesting(
 						mergedConfig.styles.blocks[ blockType.name ]?.css,
 						selector
@@ -1158,7 +1166,7 @@ export function useGlobalStylesOutput() {
 			}
 		} );
 
-		return [ stylesheets, mergedConfig.settings, filters ];
+		return [ styles, mergedConfig.settings ];
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
