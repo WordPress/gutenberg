@@ -8,7 +8,7 @@ SauceLabs is a cloud hosting platform that provides access to a variety of simul
 
 ## Getting set up to run the tests
 
-### Emulators && Simulators
+### Emulators & Simulators
 
 > **Note**
 >
