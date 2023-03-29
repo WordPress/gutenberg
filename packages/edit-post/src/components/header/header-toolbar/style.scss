@@ -41,9 +41,11 @@
 	// here to the original button styles
 	.edit-post-header-document-toolbar__left > .components-button.has-icon,
 	.edit-post-header-document-toolbar__left > .components-dropdown > .components-button.has-icon {
-		height: $button-size;
-		min-width: $button-size;
-		padding: 6px;
+		height: 32px;
+		margin-right: 10px;
+		min-width: 32px;
+		padding: 0;
+		width: 32px;
 
 		&.is-pressed {
 			background: $gray-900;
@@ -58,6 +60,84 @@
 			display: none;
 		}
 	}
+
+	& > .edit-post-header-document-toolbar__left button.components-button.edit-post-header-toolbar__block-tools-toggle.is-primary.has-icon {
+		height: $button-size;
+		min-width: $button-size;
+		padding: 6px;
+		background-color: #fff;
+		color: #000;
+		margin-left: $grid-unit-30;
+
+		&:hover {
+			color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		}
+	}
+}
+
+.edit-post-header-block-toolbar {
+	display: inline-flex;
+	flex-grow: 1;
+	align-items: center;
+	border: none;
+	padding-left: 24px; //compensates for the edit-post-header-document-toolbar__left left padding
+
+	> .edit-post-header-toolbar__inserter-toggle {
+		display: inline-flex;
+
+		svg {
+			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+			@include reduce-motion("transition");
+		}
+
+		&.is-pressed {
+			svg {
+				transform: rotate(45deg);
+			}
+		}
+	}
+
+	& > button.components-button.edit-post-header-toolbar__document-tools-toggle.is-primary.has-icon {
+		height: $button-size;
+		min-width: $button-size;
+		padding: 6px;
+		background-color: #fff;
+		color: #000;
+
+		&:hover {
+			color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		}
+	}
+
+	// The Toolbar component adds different styles to buttons, so we reset them
+	// here to the original button styles
+	& > button.components-button.edit-post-header-toolbar__inserter-toggle.is-primary.has-icon {
+		height: 32px;
+		margin-right: 8px;
+		min-width: 32px;
+		padding: 0;
+		width: 32px;
+
+		&.is-pressed {
+			background: $gray-900;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
+			outline: 1px solid transparent;
+		}
+
+		&::before {
+			display: none;
+		}
+
+		.show-icon-labels & {
+			width: auto;
+			height: 36px;
+			padding: 0 $grid-unit-10;
+		}
+	}
+
 }
 
 // Reduced UI.
