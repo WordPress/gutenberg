@@ -53,10 +53,22 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			$target = explode( '.', $target );
 		}
 
-		// Backwards compatibility for supports.__experimentalDuotone selectors when filter.duotone isn't set.
+		// Backwards compatibility for supports.__experimentalDuotone selectors.
 		if ( array( 'filter', 'duotone' ) === $target && null === _wp_array_get( $block_type->selectors, $target ) ) {
 			$duotone_selector = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ) );
-			return null === $duotone_selector ? null : WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_selector );
+
+			// String color.__experimentalDuotone values need to be scoped to the root selector.
+			if ( is_string( $duotone_selector ) ) {
+				return WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_selector );
+			}
+
+			// When color.__experimentalDuotone is true, the root selector should be used.
+			if ( true === $duotone_selector ) {
+				return $root_selector;
+			}
+
+			// Experimental duotone support is not enabled.
+			return null;
 		}
 
 		// Feature Selectors ( may fallback to root selector ).

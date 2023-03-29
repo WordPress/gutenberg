@@ -56,26 +56,22 @@ export function getBlockCSSSelector(
 
 	const fallbackSelector = fallback ? rootSelector : null;
 
-	// Duotone ( may fallback to root selector ).
-	if ( path === 'filter.duotone' ) {
-		// If selectors API in use, only use its value, fallback, or null.
-		if ( hasSelectors ) {
-			return get( selectors, path, fallbackSelector );
+	// Backwards compatibility for supports.__experimentalDuotone selectors.
+	if ( path === 'filter.duotone' && ! get( selectors, path ) ) {
+		const duotoneSelector = get( supports, 'color.__experimentalDuotone' );
+
+		// String color.__experimentalDuotone values need to be scoped to the root selector.
+		if ( typeof duotoneSelector === 'string' ) {
+			return scopeSelector( rootSelector, duotoneSelector );
 		}
 
-		// Selectors API, not available, check for old experimental selector.
-		const duotoneSelector = get(
-			supports,
-			'color.__experimentalDuotone',
-			null
-		);
-
-		// If nothing to work with, provide fallback selector if available.
-		if ( ! duotoneSelector ) {
-			return fallbackSelector;
+		// When color.__experimentalDuotone is true, the root selector should be used.
+		if ( duotoneSelector === true ) {
+			return rootSelector;
 		}
 
-		return scopeSelector( rootSelector, duotoneSelector );
+		// Experimental duotone support is not enabled.
+		return null;
 	}
 
 	// If target is not `root` or `duotone` we have a feature or subfeature
