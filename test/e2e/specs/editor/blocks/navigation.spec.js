@@ -366,7 +366,7 @@ describe( 'List view editing', () => {
 		).toBeVisible();
 	} );
 
-	test.only( `list view should correctly reflect navigation items' structure`, async ( {
+	test( `list view should correctly reflect navigation items' structure`, async ( {
 		admin,
 		page,
 		editor,
@@ -422,6 +422,107 @@ describe( 'List view editing', () => {
 					hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
 				} )
 				.getByText( 'Test Submenu Item' )
+		).toBeVisible();
+	} );
+
+	test.only( `can add new menu items`, async ( {
+		admin,
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
+			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
+				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
+			<!-- /wp:navigation-submenu -->`,
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const listViewTab = page.getByRole( 'tab', {
+			name: 'List View',
+		} );
+
+		await listViewTab.click();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+
+		const appender = listView.getByRole( 'button', {
+			name: 'Add block',
+		} );
+
+		await expect( appender ).toBeVisible();
+
+		await appender.click();
+
+		// Expect to see the block inserter.
+		await expect(
+			page.getByRole( 'searchbox', {
+				name: 'Search for blocks and patterns',
+			} )
+		).toBeFocused();
+
+		const blockResults = page.getByRole( 'listbox', {
+			name: 'Blocks',
+		} );
+
+		await expect( blockResults ).toBeVisible();
+
+		const pageLinkBlock = blockResults.getByRole( 'option', {
+			name: 'Page Link',
+		} );
+
+		await expect( pageLinkBlock ).toBeVisible();
+
+		const customLinkBlock = blockResults.getByRole( 'option', {
+			name: 'Custom Link',
+		} );
+
+		await expect( customLinkBlock ).toBeVisible();
+
+		await pageLinkBlock.click();
+
+		// Expect to see the Link creation UI.
+		const linkUIInput = page.getByRole( 'combobox', {
+			name: 'URL',
+		} );
+
+		await expect( linkUIInput ).toBeFocused();
+
+		const linkUIResults = page.getByRole( 'listbox', {
+			name: 'Recently updated',
+		} );
+
+		await expect( linkUIResults ).toBeVisible();
+
+		// click on the first result
+		const firstResult = linkUIResults.getByRole( 'option' ).nth( 0 );
+
+		// Grab the text from the first result so we can check it was inserted.
+		const firstResultText = await firstResult
+			.locator( '.block-editor-link-control__search-item-title' ) // this is the only way to get the label text without the URL.
+			.innerText();
+
+		await firstResult.click();
+
+		// check the new menu item was inserted at the end of the existing menu.
+		await expect(
+			listView
+				.getByRole( 'gridcell', {
+					name: 'Page Link link',
+				} )
+				.filter( {
+					hasText: 'Block 3 of 3, Level 1', // proxy for filtering by description.
+				} )
+				.getByText( firstResultText )
 		).toBeVisible();
 	} );
 } );
