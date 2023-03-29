@@ -26,16 +26,15 @@
 		width: fit-content;
 		display: flex;
 		align-items: center;
-		margin: 16px 16px 0;
+		margin: $grid-unit-20 $grid-unit-20 0;
 	}
 
 	[cmdk-linear-shortcuts] {
 		display: flex;
 		margin-left: auto;
-		gap: 8px;
+		gap: $grid-unit-10;
 
 		kbd {
-			font-size: 13px;
 			color: $gray-800;
 		}
 	}
@@ -43,12 +42,10 @@
 	[cmdk-input] {
 		border: none;
 		width: 100%;
-		font-size: 18px;
-		padding: 20px;
+		padding: $grid-unit-15 $grid-unit-20;
 		outline: none;
 		color: $gray-900;
 		border-radius: 0;
-		caret-color: #6e5ed2;
 		margin: 0;
 
 		&::placeholder {
@@ -64,12 +61,11 @@
 		content-visibility: auto;
 
 		cursor: pointer;
-		height: 48px;
-		font-size: 14px;
+		height: $grid-unit-60;
 		display: flex;
 		align-items: center;
-		gap: 12px;
-		padding: 0 16px;
+		gap: $grid-unit-15;
+		padding: 0 $grid-unit-20;
 		color: $gray-900;
 		user-select: none;
 		will-change: background, color;
@@ -82,16 +78,6 @@
 
 			svg {
 				color: $gray-900;
-			}
-
-			&::after {
-				content: "";
-				position: absolute;
-				left: 0;
-				z-index: 123;
-				width: 3px;
-				height: 100%;
-				background: #5f6ad2;
 			}
 		}
 
@@ -106,13 +92,13 @@
 		}
 
 		& + [cmdk-item] {
-			margin-top: 4px;
+			margin-top: $grid-unit-05;
 		}
 
 		svg,
 		.dashicon {
-			width: 16px;
-			height: 16px;
+			width: $grid-unit-20;
+			height: $grid-unit-20;
 			color: $gray-800;
 		}
 	}
@@ -128,19 +114,17 @@
 
 	[cmdk-group-heading] {
 		user-select: none;
-		font-size: 12px;
 		color: $gray-800;
-		padding: 16px;
+		padding: $grid-unit-20;
 		display: flex;
 		align-items: center;
 	}
 
 	[cmdk-empty] {
-		font-size: 14px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		height: 64px;
+		height: $grid-unit-80;
 		white-space: pre-wrap;
 		color: $gray-800;
 	}
