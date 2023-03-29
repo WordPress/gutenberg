@@ -71,7 +71,7 @@
 		"inherits": "^2.0.3",
 		"lodash": "^4.17.21",
 		"react-easy-crop": "^4.5.1",
-		"react-textarea-autosize": "^8.4.0",
+		"react-textarea-autosize": "^8.4.1",
 		"rememo": "^4.0.0",
 		"remove-accents": "^0.4.2",
 		"traverse": "^0.6.6"
