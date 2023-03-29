@@ -246,9 +246,15 @@
 
 .maybeHide:focus-within {
 	position: relative;
-	top: math.div($grid-unit, 2) + 2;
+	top: 0;
 }
 
+.maybeHide:focus-within > .edit-post-header-document-toolbar .edit-post-header-document-toolbar__left > .components-button.edit-post-header-toolbar__block-tools-toggle,
+.maybeHide:focus-within + .edit-post-header-block-toolbar > .edit-post-header-toolbar__document-tools-toggle,
 .maybeHide:focus-within + .edit-post-header-block-toolbar > .edit-post-header-toolbar__inserter-toggle {
 	display: none;
+}
+
+.maybeHide:focus-within + .edit-post-header-block-toolbar {
+	padding-left: 0;
 }
