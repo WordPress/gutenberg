@@ -298,11 +298,7 @@ export function fetchRequest( path, enableCaching = true ) {
 }
 
 export function postRequest( path, data = {} ) {
-	if ( isAndroid ) {
-		return RNReactNativeGutenbergBridge.postRequest( path, data );
-	}
-	// eslint-disable-next-line no-console
-	console.error( 'POST requests are not supported yet on iOS.' );
+	return RNReactNativeGutenbergBridge.postRequest( path, data );
 }
 
 export function showUserSuggestions() {
