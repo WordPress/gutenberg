@@ -197,8 +197,7 @@ export const getAsyncBlocks = () => [
 ];
 
 export const asyncLoadBlock = async ( blockType ) => {
-	const { init } = await import( './' + blockType + '/index.js' );
-	init();
+	await import( './' + blockType + '/init.js' );
 };
 
 /**
