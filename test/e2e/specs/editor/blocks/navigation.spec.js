@@ -689,4 +689,108 @@ test.describe( 'List view editing', () => {
 
 		await expect( listViewPanel ).toBeVisible();
 	} );
+
+	test( `can add submenus`, async ( {
+		admin,
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
+			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
+				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
+			<!-- /wp:navigation-submenu -->`,
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const listViewTab = page.getByRole( 'tab', {
+			name: 'List View',
+		} );
+
+		await listViewTab.click();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+
+		// click on options menu for the first menu item and select remove.
+		const firstMenuItem = listView
+			.getByRole( 'gridcell', {
+				name: 'Page Link link',
+			} )
+			.filter( {
+				hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+			} );
+
+		// Focus the node to reveal the "3 dots" options menu button.
+		const firstMenuItemAnchor = listView.getByRole( 'link', {
+			name: 'Top Level Item 1',
+			includeHidden: true,
+		} );
+		await firstMenuItemAnchor.focus();
+
+		// The options menu button is a sibling of the menu item gridcell.
+		const firstItemOptions = firstMenuItem
+			.locator( '..' ) // parent selector.
+			.getByRole( 'button', {
+				name: 'Options for Page Link block',
+			} );
+
+		// Open the options menu.
+		await firstItemOptions.click();
+
+		// Add the submenu.
+		// usage of `page` is required because the options menu is rendered into a slot
+		// outside of the treegrid.
+		const addSubmenuOption = page
+			.getByRole( 'menu', {
+				name: 'Options for Page Link block',
+			} )
+			.getByRole( 'menuitem', {
+				name: 'Add submenu link',
+			} );
+
+		await addSubmenuOption.click();
+
+		const linkUIInput = page.getByRole( 'combobox', {
+			name: 'URL',
+		} );
+		await expect( linkUIInput ).toBeFocused();
+
+		await page.keyboard.type( 'https://wordpress.org/' );
+
+		await page.keyboard.press( 'Enter' );
+
+		// Check the new item was inserted in the correct place.
+		await expect(
+			listView
+				.getByRole( 'gridcell', {
+					name: 'Custom Link link',
+				} )
+				.filter( {
+					hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
+				} )
+				.getByText( 'wordpress.org' )
+		).toBeVisible();
+
+		// Check that the original item is still there but that it is now
+		// a submenu item.
+		await expect(
+			listView
+				.getByRole( 'gridcell', {
+					name: 'Submenu link',
+				} )
+				.filter( {
+					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+				} )
+				.getByText( 'Top Level Item 1' )
+		).toBeVisible();
+	} );
 } );
