@@ -169,10 +169,8 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 									) }
 								/>
 							</MaybeHide>
-							{ hasSelectedBlocks && (
-								<MaybeHide
-									isHidden={ headerToolbar === 'document' }
-								>
+							{ hasSelectedBlocks &&
+								headerToolbar === 'block' && (
 									<NavigableToolbar
 										className="edit-post-header-block-toolbar"
 										aria-label={ blockToolbarAriaLabel }
@@ -187,8 +185,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 											hideDragHandle={ hasFixedToolbar }
 										/>
 									</NavigableToolbar>
-								</MaybeHide>
-							) }
+								) }
 						</>
 					) }
 				<TemplateTitle />
