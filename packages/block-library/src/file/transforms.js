@@ -7,6 +7,11 @@ import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { getFilename } from '@wordpress/url';
 
+/**
+ * Internal dependencies
+ */
+import { blobURLs } from './blob-urls';
+
 const transforms = {
 	from: [
 		{
@@ -22,15 +27,9 @@ const transforms = {
 
 				files.forEach( ( file ) => {
 					const blobURL = createBlobURL( file );
-
-					// File will be uploaded in componentDidMount()
-					blocks.push(
-						createBlock( 'core/file', {
-							href: blobURL,
-							fileName: file.name,
-							textLinkHref: blobURL,
-						} )
-					);
+					const block = createBlock( 'core/file' );
+					blobURLs.set( block.clientId, blobURL );
+					blocks.push( block );
 				} );
 
 				return blocks;
