@@ -3,7 +3,9 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'As a user I want the navigation block to fallback to the best possible default', () => {
+const { describe } = test;
+
+describe( 'As a user I want the navigation block to fallback to the best possible default', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		//TT3 is preferable to emptytheme because it already has the navigation block on its templates.
 		await requestUtils.activateTheme( 'twentytwentythree' );
@@ -175,7 +177,7 @@ test.describe( 'As a user I want the navigation block to fallback to the best po
 	} );
 } );
 
-test.describe( 'As a user I want to create submenus using the navigation block', () => {
+describe( 'As a user I want to create submenus using the navigation block', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		//TT3 is preferable to emptytheme because it already has the navigation block on its templates.
 		await requestUtils.activateTheme( 'twentytwentythree' );
@@ -281,8 +283,8 @@ test.describe( 'As a user I want to create submenus using the navigation block',
 	} );
 } );
 
-test.describe( 'Navigation block', () => {
-	test.describe( 'As a user I want to see a warning if the menu referenced by a navigation block is not available', () => {
+describe( 'Navigation block', () => {
+	describe( 'As a user I want to see a warning if the menu referenced by a navigation block is not available', () => {
 		test.beforeEach( async ( { admin } ) => {
 			await admin.createNewPost();
 		} );
@@ -315,5 +317,50 @@ test.describe( 'Navigation block', () => {
 				);
 			await expect( warningMessage ).toBeVisible();
 		} );
+	} );
+} );
+
+describe.only( 'List view editing', () => {
+	test( 'it should show a list view in the inspector controls', async ( {
+		admin,
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content:
+				'<!-- wp:navigation-submenu {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} --><!-- wp:navigation-link {"label":"WordPress Child","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /--><!-- /wp:navigation-submenu -->',
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const listViewTab = page.getByRole( 'tab', {
+			name: 'List View',
+		} );
+
+		await listViewTab.click();
+
+		const listViewPanel = page.getByRole( 'tabpanel', {
+			name: 'List View',
+		} );
+
+		await expect( listViewPanel ).toBeVisible();
+
+		await expect(
+			listViewPanel.getByRole( 'heading', {
+				name: 'Menu',
+			} )
+		).toBeVisible();
+
+		await expect(
+			listViewPanel.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+				description: 'Structure for navigation menu: Test Menu',
+			} )
+		).toBeVisible();
 	} );
 } );
