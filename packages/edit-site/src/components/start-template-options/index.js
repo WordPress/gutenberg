@@ -4,7 +4,10 @@
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect, useMemo } from '@wordpress/element';
-import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
+import {
+	__experimentalBlockPatternsList as BlockPatternsList,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useAsyncList } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -35,15 +38,40 @@ function useFallbackTemplateContent( slug, isCustom = false ) {
 
 const START_BLANK_TITLE = __( 'Start blank' );
 
-function PatternSelection( { fallbackContent, onChoosePattern, postType } ) {
-	const [ , , onChange ] = useEntityBlockEditor( 'postType', postType );
-	const blockPatterns = useMemo(
-		() => [
+function useStartPatterns( fallbackContent ) {
+	const { slug, patterns } = useSelect( ( select ) => {
+		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
+		const { getEntityRecord } = select( coreStore );
+		const postId = getEditedPostId();
+		const postType = getEditedPostType();
+		const record = getEntityRecord( 'postType', postType, postId );
+		const { getSettings } = select( blockEditorStore );
+		return {
+			slug: record.slug,
+			patterns: getSettings().__experimentalBlockPatterns,
+		};
+	}, [] );
+
+	return useMemo( () => {
+		// filter patterns that are supposed to be used in the current template being edited.
+		return [
 			{
 				name: 'fallback',
 				blocks: parse( fallbackContent ),
 				title: __( 'Fallback content' ),
 			},
+			...patterns
+				.filter( ( pattern ) => {
+					return (
+						Array.isArray( pattern.templateTypes ) &&
+						pattern.templateTypes.some( ( templateType ) =>
+							slug.startsWith( templateType )
+						)
+					);
+				} )
+				.map( ( pattern ) => {
+					return { ...pattern, blocks: parse( pattern.content ) };
+				} ),
 			{
 				name: 'start-blank',
 				blocks: parse(
@@ -51,9 +79,13 @@ function PatternSelection( { fallbackContent, onChoosePattern, postType } ) {
 				),
 				title: START_BLANK_TITLE,
 			},
-		],
-		[ fallbackContent ]
-	);
+		];
+	}, [ fallbackContent, slug, patterns ] );
+}
+
+function PatternSelection( { fallbackContent, onChoosePattern, postType } ) {
+	const [ , , onChange ] = useEntityBlockEditor( 'postType', postType );
+	const blockPatterns = useStartPatterns( fallbackContent );
 	const shownBlockPatterns = useAsyncList( blockPatterns );
 
 	return (

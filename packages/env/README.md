@@ -456,7 +456,7 @@ $ wp-env install-path
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
 
-`.wp-env.json` supports six fields for options applicable to both the tests and development instances.
+`.wp-env.json` supports fields for options applicable to both the tests and development instances.
 
 | Field          | Type           | Default                                | Description                                                                                                                      |
 | -------------- | -------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -465,6 +465,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"plugins"`    | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
 | `"themes"`     | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
 | `"port"`       | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
+| `"testsPort"`       | `integer`      | `8889` | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.       |
 | `"config"`     | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`   | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
 

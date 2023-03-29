@@ -67,12 +67,12 @@ function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 
 	return (
 		<Iframe
-			head={ <EditorStyles styles={ styles } /> }
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
 			name="editor-canvas"
 		>
+			<EditorStyles styles={ styles } />
 			{ children }
 		</Iframe>
 	);

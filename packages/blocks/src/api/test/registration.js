@@ -134,6 +134,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -280,6 +281,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -316,6 +318,7 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],
@@ -348,6 +351,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -382,6 +386,7 @@ describe( 'blocks', () => {
 				},
 				usesContext: [ 'textColor' ],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -418,6 +423,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -454,6 +460,43 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
+				supports: {},
+				styles: [],
+				variations: [],
+			} );
+		} );
+
+		// This can be removed once polyfill adding selectors has been removed.
+		it( 'should apply selectors on the client when not set on the server', () => {
+			const blockName = 'core/test-block-with-selectors';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					category: 'widgets',
+				},
+			} );
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					selectors: { root: '.wp-block-custom-selector' },
+					category: 'ignored',
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				category: 'widgets',
+				icon: { src: BLOCK_ICON_DEFAULT },
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				keywords: [],
+				selectors: { root: '.wp-block-custom-selector' },
 				supports: {},
 				styles: [],
 				variations: [],
@@ -522,6 +565,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -553,6 +597,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -598,6 +643,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -657,6 +703,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -683,6 +730,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -769,6 +817,7 @@ describe( 'blocks', () => {
 										providesContext: {},
 										usesContext: [],
 										keywords: [],
+										selectors: {},
 										supports: {},
 										styles: [],
 										variations: [],
@@ -908,6 +957,7 @@ describe( 'blocks', () => {
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [
@@ -974,6 +1024,7 @@ describe( 'blocks', () => {
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
+				selectors: {},
 				supports: {},
 				styles: [
 					{
@@ -1039,6 +1090,7 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],
@@ -1056,6 +1108,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -1135,6 +1188,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -1160,6 +1214,7 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
@@ -1192,6 +1247,7 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],
@@ -1207,6 +1263,7 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],

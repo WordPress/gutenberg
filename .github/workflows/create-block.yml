@@ -20,20 +20,17 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: [14]
+                node: ['14']
                 os: [macos-latest, ubuntu-latest, windows-latest]
 
         steps:
-            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
               with:
                   node-version: ${{ matrix.node }}
-                  cache: npm
 
-            - name: npm install, build, format and lint
+            - name: Create block
               shell: bash
-              run: |
-                  npm ci
-                  bash ./bin/test-create-block.sh
+              run: bash ./bin/test-create-block.sh

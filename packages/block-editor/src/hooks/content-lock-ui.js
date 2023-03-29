@@ -104,9 +104,13 @@ export const withBlockControls = createHigherOrderComponent(
 			return <BlockEdit { ...props } />;
 		}
 
+		const showStopEditingAsBlocks = isEditingAsBlocks && ! isContentLocked;
+		const showStartEditingAsBlocks =
+			! isEditingAsBlocks && isContentLocked && props.isSelected;
+
 		return (
 			<>
-				{ isEditingAsBlocks && ! isContentLocked && (
+				{ showStopEditingAsBlocks && (
 					<>
 						<StopEditingAsBlocksOnOutsideSelect
 							clientId={ props.clientId }
@@ -123,7 +127,7 @@ export const withBlockControls = createHigherOrderComponent(
 						</BlockControls>
 					</>
 				) }
-				{ ! isEditingAsBlocks && isContentLocked && props.isSelected && (
+				{ showStartEditingAsBlocks && (
 					<BlockSettingsMenuControls>
 						{ ( { onClose } ) => (
 							<MenuItem

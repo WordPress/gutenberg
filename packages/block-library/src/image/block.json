@@ -85,7 +85,7 @@
 	"supports": {
 		"anchor": true,
 		"color": {
-			"__experimentalDuotone": "img, .components-placeholder",
+			"__experimentalDuotone": true,
 			"text": false,
 			"background": false
 		},
@@ -93,13 +93,18 @@
 			"color": true,
 			"radius": true,
 			"width": true,
-			"__experimentalSelector": "img, .wp-block-image__crop-area",
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": true,
 				"radius": true,
 				"width": true
 			}
+		}
+	},
+	"selectors": {
+		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area",
+		"filter": {
+			"duotone": "img, .components-placeholder"
 		}
 	},
 	"styles": [

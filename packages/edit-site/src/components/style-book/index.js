@@ -247,25 +247,19 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 					{ ( tab ) => (
 						<Iframe
 							className="edit-site-style-book__iframe"
-							head={
-								<>
-									<EditorStyles styles={ settings.styles } />
-									<style>
-										{
-											// Forming a "block formatting context" to prevent margin collapsing.
-											// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-											`.is-root-container { display: flow-root; }
-											body { position: relative; padding: 32px !important; }` +
-												STYLE_BOOK_IFRAME_STYLES
-										}
-									</style>
-								</>
-							}
 							name="style-book-canvas"
 							tabIndex={ 0 }
 						>
-							{ /* Filters need to be rendered before children to avoid Safari rendering issues. */ }
-							{ settings.svgFilters }
+							<EditorStyles styles={ settings.styles } />
+							<style>
+								{
+									// Forming a "block formatting context" to prevent margin collapsing.
+									// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+									`.is-root-container { display: flow-root; }
+											body { position: relative; padding: 32px !important; }` +
+										STYLE_BOOK_IFRAME_STYLES
+								}
+							</style>
 							<Examples
 								className={ classnames(
 									'edit-site-style-book__examples',
