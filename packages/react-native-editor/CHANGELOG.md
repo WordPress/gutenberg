@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+- [*] Support POST requests [#49371]
 
 ## 1.91.0
 -   [*] Allow new block transformations for most blocks. [#48792]
