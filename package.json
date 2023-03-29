@@ -87,6 +87,7 @@
 		"wicg-inert": "3.1.2"
 	},
 	"devDependencies": {
+		"@radix-ui/react-dropdown-menu": "2.0.4",
 		"@actions/core": "1.9.1",
 		"@actions/github": "5.0.0",
 		"@babel/core": "7.16.0",

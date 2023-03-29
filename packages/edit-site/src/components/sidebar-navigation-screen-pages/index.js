@@ -78,21 +78,26 @@ export default function SidebarNavigationScreenPages() {
 		return !! settings.supportsTemplatePartsMode;
 	}, [] );
 
-	const [ filters, setFilters ] = useState( { status: 'publish,draft' } );
+	const [ filters, setFilters ] = useState( {
+		status: 'publish,draft',
+		order: 'desc',
+		orderby: 'date',
+	} );
 
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
 		postType,
 		{
-			per_page: -1,
-			order: 'asc',
-			orderby: 'date',
+			context: 'view',
+			per_page: 30,
 			...filters,
+		},
+		{
+			enabled: true,
 		}
 	);
 
 	const sortedTemplates = templates ? [ ...templates ] : [];
-	sortedTemplates.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
 
 	const canCreate = ! isMobileViewport && ! isTemplatePartsMode;
 
@@ -109,7 +114,7 @@ export default function SidebarNavigationScreenPages() {
 		<SidebarNavigationScreen
 			isRoot={ isTemplatePartsMode }
 			title={ config[ postType ].labels.title }
-			description={ config[ postType ].labels.description }
+			// description={ config[ postType ].labels.description }
 			actions={
 				canCreate && (
 					<AddNewTemplate
