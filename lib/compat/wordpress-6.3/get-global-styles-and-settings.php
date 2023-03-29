@@ -47,29 +47,16 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 
 		$fallback_selector = $fallback ? $root_selector : null;
 
-		// Duotone ( may fallback to root selector ).
-		if ( 'filter.duotone' === $target || array( 'filter', 'duotone' ) === $target ) {
-			// If selectors API in use, only use it's value, fallback, or null.
-			if ( $has_selectors ) {
-				return _wp_array_get( $block_type->selectors, array( 'filter', 'duotone' ), $fallback_selector );
-			}
-
-			// Selectors API, not available, check for old experimental selector.
-			$duotone_selector = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null );
-
-			// Nothing to work with, provide fallback or null.
-			if ( null === $duotone_selector ) {
-				return $fallback_selector;
-			}
-
-			// Scope the duotone selector by the block's root selector.
-			return WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_selector );
-		}
-
-		// If target is not `root` or `duotone` we have a feature or subfeature
-		// as the target. If the target is a string convert to an array.
+		// If target is not `root` we have a feature or subfeature as the target.
+		// If the target is a string convert to an array.
 		if ( is_string( $target ) ) {
 			$target = explode( '.', $target );
+		}
+
+		// Backwards compatibility for supports.__experimentalDuotone selectors when filter.duotone isn't set.
+		if ( array( 'filter', 'duotone' ) === $target && null === _wp_array_get( $block_type->selectors, $target ) ) {
+			$duotone_selector = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ) );
+			return null === $duotone_selector ? null : WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_selector );
 		}
 
 		// Feature Selectors ( may fallback to root selector ).
