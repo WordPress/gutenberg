@@ -54,13 +54,6 @@ function render_block_core_cover( $attributes, $content ) {
 		$merged_styles  = ! empty( $styles ) ? $styles . ';' : '';
 		$merged_styles .= 'background-image:url(' . esc_url( $current_featured_image ) . ');';
 
-		if ( isset( $attributes['minHeight'] ) ) {
-			$height_unit = empty( $attributes['minHeightUnit'] ) ? 'px' : $attributes['minHeightUnit'];
-			$height      = " min-height:{$attributes['minHeight']}{$height_unit};";
-
-			$merged_styles .= $height;
-		}
-
 		$processor->set_attribute( 'style', $merged_styles );
 		$content = $processor->get_updated_html();
 	}
