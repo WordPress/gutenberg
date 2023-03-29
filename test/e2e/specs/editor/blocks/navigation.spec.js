@@ -3,9 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-const { describe } = test;
-
-describe( 'As a user I want the navigation block to fallback to the best possible default', () => {
+test.describe( 'As a user I want the navigation block to fallback to the best possible default', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		//TT3 is preferable to emptytheme because it already has the navigation block on its templates.
 		await requestUtils.activateTheme( 'twentytwentythree' );
@@ -177,7 +175,7 @@ describe( 'As a user I want the navigation block to fallback to the best possibl
 	} );
 } );
 
-describe( 'As a user I want to create submenus using the navigation block', () => {
+test.describe( 'As a user I want to create submenus using the navigation block', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		//TT3 is preferable to emptytheme because it already has the navigation block on its templates.
 		await requestUtils.activateTheme( 'twentytwentythree' );
@@ -283,8 +281,8 @@ describe( 'As a user I want to create submenus using the navigation block', () =
 	} );
 } );
 
-describe( 'Navigation block', () => {
-	describe( 'As a user I want to see a warning if the menu referenced by a navigation block is not available', () => {
+test.describe( 'Navigation block', () => {
+	test.describe( 'As a user I want to see a warning if the menu referenced by a navigation block is not available', () => {
 		test.beforeEach( async ( { admin } ) => {
 			await admin.createNewPost();
 		} );
@@ -320,7 +318,7 @@ describe( 'Navigation block', () => {
 	} );
 } );
 
-describe( 'List view editing', () => {
+test.describe( 'List view editing', () => {
 	test( 'it should show a list view in the inspector controls', async ( {
 		admin,
 		page,
