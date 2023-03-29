@@ -56,12 +56,14 @@ export function CommandMenu() {
 	const [ pages, setPages ] = useState( [] );
 	const navigateToPage = ( newPage ) => setPages( [ ...pages, newPage ] );
 	const currentPage = pages.length ? pages[ pages.length - 1 ] : null;
-	const { commands, loader } = useSelect(
+	const { commands, loader, placeholder } = useSelect(
 		( select ) => {
-			const { getCommands, getCommandLoader } = select( commandsStore );
+			const { getCommands, getCommandLoader, getPagePlaceholder } =
+				select( commandsStore );
 			return {
 				commands: getCommands( currentPage ),
 				loader: getCommandLoader( currentPage ),
+				placeholder: getPagePlaceholder( currentPage ),
 			};
 		},
 		[ currentPage ]
@@ -125,7 +127,7 @@ export function CommandMenu() {
 							autoFocus
 							value={ search }
 							onValueChange={ setSearch }
-							placeholder={ __( 'Ask anything' ) }
+							placeholder={ placeholder ?? __( 'Ask anything' ) }
 							onKeyDown={ ( event ) => {
 								if (
 									event.key === 'Backspace' &&

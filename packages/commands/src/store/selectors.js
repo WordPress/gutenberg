@@ -14,3 +14,7 @@ export const getCommandLoader = createSelector(
 	( state, page ) => state.commandLoaders[ page ] ?? noop,
 	( state, page ) => [ state.commandLoaders[ page ] ]
 );
+
+export function getPagePlaceholder( state, page ) {
+	return state.placeholders[ page ];
+}

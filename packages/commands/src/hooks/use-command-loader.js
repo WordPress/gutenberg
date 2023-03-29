@@ -14,16 +14,23 @@ import { store as commandsStore } from '../store';
  *
  * @param {import('../store/actions').WPCommandLoaderConfig} loader command loader config.
  */
-export default function useCommandLoader( { page, hook } ) {
+export default function useCommandLoader( { page, hook, placeholder } ) {
 	const { registerCommandLoader, unregisterCommandLoader } =
 		useDispatch( commandsStore );
 	useEffect( () => {
 		registerCommandLoader( {
 			page,
 			hook,
+			placeholder,
 		} );
 		return () => {
 			unregisterCommandLoader( page );
 		};
-	}, [ page, hook, registerCommandLoader, unregisterCommandLoader ] );
+	}, [
+		page,
+		hook,
+		placeholder,
+		registerCommandLoader,
+		unregisterCommandLoader,
+	] );
 }

@@ -20,8 +20,9 @@
  *
  * @typedef {Object} WPCommandLoaderConfig
  *
- * @property {string=}             page Command loader page.
- * @property {WPCommandLoaderHook} hook Command loader hook.
+ * @property {string=}             page        Command loader page.
+ * @property {string=}             placeholder Command page placeholder.
+ * @property {WPCommandLoaderHook} hook        Command loader hook.
  */
 
 /**
@@ -62,11 +63,12 @@ export function unregisterCommand( name ) {
  *
  * @return {Object} action.
  */
-export function registerCommandLoader( { page, hook } ) {
+export function registerCommandLoader( { page, hook, placeholder } ) {
 	return {
 		type: 'REGISTER_COMMAND_LOADER',
 		page,
 		hook,
+		placeholder,
 	};
 }
 

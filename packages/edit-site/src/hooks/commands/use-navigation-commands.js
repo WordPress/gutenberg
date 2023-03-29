@@ -66,5 +66,6 @@ export function useNavigationCommands() {
 	useCommandLoader( {
 		page: 'core/edit-site/navigate',
 		hook: useNavigationCommandLoader,
+		placeholder: __( 'Search for a page…' ),
 	} );
 }
