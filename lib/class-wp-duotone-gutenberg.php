@@ -349,7 +349,26 @@ class WP_Duotone_Gutenberg {
 		$filter_id = gutenberg_get_duotone_filter_id( array( 'slug' => $slug ) );
 
 		// Build the CSS selectors to which the filter will be applied.
-		$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_selector );
+		$scopes    = explode( ',', '.' . $filter_id );
+		$selectors = explode( ',', $duotone_selector );
+
+		$selectors_scoped = array();
+		foreach ( $scopes as $outer ) {
+			foreach ( $selectors as $inner ) {
+				$outer = trim( $outer );
+				$inner = trim( $inner );
+				if ( ! empty( $outer ) && ! empty( $inner ) ) {
+					// unlike WP_Theme_JSON_Gutenberg::scope_selector
+					// this concatenates the selectors without a space.
+					$selectors_scoped[] = $outer . '' . $inner;
+				} elseif ( empty( $outer ) ) {
+					$selectors_scoped[] = $inner;
+				} elseif ( empty( $inner ) ) {
+					$selectors_scoped[] = $outer;
+				}
+			}
+		}
+		$selector = implode( ', ', $selectors_scoped );
 
 		// We only want to add the selector if we have it in the output already, essentially skipping 'unset'.
 		if ( array_key_exists( $slug, self::$output ) ) {
