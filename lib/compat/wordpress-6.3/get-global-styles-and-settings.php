@@ -43,7 +43,6 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			$root_selector = ".wp-block-{$block_name}";
 		}
 
-
 		// Duotone (No fallback selectors for Duotone).
 		if ( 'filter.duotone' === $target || array( 'filter', 'duotone' ) === $target ) {
 			// If selectors API in use, only use it's value or null.
