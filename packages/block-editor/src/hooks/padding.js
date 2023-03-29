@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useRef,
-	useEffect,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -25,46 +20,21 @@ export function PaddingVisualizer( { clientId, attributes, forceShow } ) {
 	const blockElement = useBlockElement( clientId );
 	const [ style, setStyle ] = useState();
 
-	useLayoutEffect( () => {
+	const padding = attributes?.style?.spacing?.padding;
+
+	useEffect( () => {
 		if ( ! blockElement ) {
 			return;
 		}
 
-		let resizeObserver;
-		const blockView = blockElement?.ownerDocument?.defaultView;
+		setStyle( {
+			borderTopWidth: getComputedCSS( blockElement, 'padding-top' ),
+			borderRightWidth: getComputedCSS( blockElement, 'padding-right' ),
+			borderBottomWidth: getComputedCSS( blockElement, 'padding-bottom' ),
+			borderLeftWidth: getComputedCSS( blockElement, 'padding-left' ),
+		} );
+	}, [ blockElement, padding ] );
 
-		if ( blockView.ResizeObserver ) {
-			resizeObserver = new blockView.ResizeObserver( () => {
-				setStyle( {
-					borderTopWidth: getComputedCSS(
-						blockElement,
-						'padding-top'
-					),
-					borderRightWidth: getComputedCSS(
-						blockElement,
-						'padding-right'
-					),
-					borderBottomWidth: getComputedCSS(
-						blockElement,
-						'padding-bottom'
-					),
-					borderLeftWidth: getComputedCSS(
-						blockElement,
-						'padding-left'
-					),
-				} );
-			} );
-			resizeObserver.observe( blockElement );
-		}
-
-		return () => {
-			if ( resizeObserver ) {
-				resizeObserver.disconnect();
-			}
-		};
-	}, [ blockElement ] );
-
-	const padding = attributes?.style?.spacing?.padding;
 	const [ isActive, setIsActive ] = useState( false );
 	const valueRef = useRef( padding );
 	const timeoutRef = useRef();
