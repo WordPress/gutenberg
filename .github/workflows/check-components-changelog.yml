@@ -1,0 +1,25 @@
+name: Verify @wordpress/components CHANGELOG update
+
+on:
+    pull_request:
+        types: [opened, synchronize]
+        paths:
+            - 'packages/components/**'
+            - '!packages/components/**/stories/**'
+            - '!packages/components/src**/test/**'
+jobs:
+    check:
+        name: Check CHANGELOG diff
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+            - name: Fetch origin/trunk
+              run: git fetch --quiet origin trunk
+            - name: Run git diff
+              run: |
+                  changelog_path="packages/components/CHANGELOG.md"
+                  if git diff --quiet origin/trunk HEAD -- "$changelog_path"; then
+                    echo "Please add a CHANGELOG entry to $changelog_path"
+                    exit 1
+                  fi
