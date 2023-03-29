@@ -104,7 +104,7 @@
 	"selectors": {
 		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area",
 		"filter": {
-			"duotone": "img, .components-placeholder"
+			"duotone": ".wp-block-image img, .wp-block-image .components-placeholder"
 		}
 	},
 	"styles": [
