@@ -320,7 +320,7 @@ describe( 'Navigation block', () => {
 	} );
 } );
 
-describe.only( 'List view editing', () => {
+describe( 'List view editing', () => {
 	test( 'it should show a list view in the inspector controls', async ( {
 		admin,
 		page,
@@ -330,8 +330,10 @@ describe.only( 'List view editing', () => {
 		await admin.createNewPost();
 		await requestUtils.createNavigationMenu( {
 			title: 'Test Menu',
-			content:
-				'<!-- wp:navigation-submenu {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} --><!-- wp:navigation-link {"label":"WordPress Child","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /--><!-- /wp:navigation-submenu -->',
+			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
+			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
+				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
+			<!-- /wp:navigation-submenu -->`,
 		} );
 
 		await editor.insertBlock( { name: 'core/navigation' } );
@@ -360,6 +362,59 @@ describe.only( 'List view editing', () => {
 			listViewPanel.getByRole( 'treegrid', {
 				name: 'Block navigation structure',
 				description: 'Structure for navigation menu: Test Menu',
+			} )
+		).toBeVisible();
+	} );
+
+	test.only( `list view should correctly reflect navigation items' structure`, async ( {
+		admin,
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
+			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
+				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
+			<!-- /wp:navigation-submenu -->`,
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const listViewTab = page.getByRole( 'tab', {
+			name: 'List View',
+		} );
+
+		await listViewTab.click();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+
+		// Check the structure of the individual menu items matches the one that was created.
+		await expect(
+			listView.getByRole( 'gridcell' ).filter( {
+				hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+				has: page.getByText( 'Top Level Item 1' ), // find the hidden anchor with the label of the Nav item.
+			} )
+		).toBeVisible();
+
+		await expect(
+			listView.getByRole( 'gridcell' ).filter( {
+				hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
+				has: page.getByText( 'Top Level Item 2' ), // find the hidden anchor with the label of the Nav item.
+			} )
+		).toBeVisible();
+
+		await expect(
+			listView.getByRole( 'gridcell' ).filter( {
+				hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
+				has: page.getByText( 'Test Submenu Item' ), // find the hidden anchor with the label of the Nav item.
 			} )
 		).toBeVisible();
 	} );
