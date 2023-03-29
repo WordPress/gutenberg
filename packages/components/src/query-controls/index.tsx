@@ -143,6 +143,7 @@ export function QueryControls( {
 					props.categorySuggestions &&
 					props.onCategoryChange && (
 						<FormTokenField
+							__nextHasNoMarginBottom
 							key="query-controls-categories-select"
 							label={ __( 'Categories' ) }
 							value={
