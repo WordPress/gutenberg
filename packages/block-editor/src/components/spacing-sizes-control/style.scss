@@ -2,7 +2,7 @@
 	display: grid;
 	grid-template-columns: auto 1fr auto;
 	align-items: center;
-	grid-template-rows: 16px auto;
+	grid-template-rows: $grid-unit-30 auto;
 }
 
 .component-spacing-sizes-control {
