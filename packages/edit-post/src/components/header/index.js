@@ -169,24 +169,26 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 									) }
 								/>
 							</MaybeHide>
-							<MaybeHide
-								isHidden={ headerToolbar === 'document' }
-							>
-								<NavigableToolbar
-									className="edit-post-header-block-toolbar"
-									aria-label={ blockToolbarAriaLabel }
+							{ hasSelectedBlocks && (
+								<MaybeHide
+									isHidden={ headerToolbar === 'document' }
 								>
-									<InserterButton />
-									<ShowDocumentToolbarButton
-										onClick={ () =>
-											setHeaderToolbar( 'document' )
-										}
-									/>
-									<BlockToolbar
-										hideDragHandle={ hasFixedToolbar }
-									/>
-								</NavigableToolbar>
-							</MaybeHide>
+									<NavigableToolbar
+										className="edit-post-header-block-toolbar"
+										aria-label={ blockToolbarAriaLabel }
+									>
+										<InserterButton />
+										<ShowDocumentToolbarButton
+											onClick={ () =>
+												setHeaderToolbar( 'document' )
+											}
+										/>
+										<BlockToolbar
+											hideDragHandle={ hasFixedToolbar }
+										/>
+									</NavigableToolbar>
+								</MaybeHide>
+							) }
 						</>
 					) }
 				<TemplateTitle />
