@@ -320,7 +320,7 @@ describe( 'Navigation block', () => {
 	} );
 } );
 
-describe( 'List view editing', () => {
+describe.only( 'List view editing', () => {
 	test( 'it should show a list view in the inspector controls', async ( {
 		admin,
 		page,
@@ -399,7 +399,9 @@ describe( 'List view editing', () => {
 		// Check the structure of the individual menu items matches the one that was created.
 		await expect(
 			listView
-				.getByRole( 'gridcell' )
+				.getByRole( 'gridcell', {
+					name: 'Page Link link',
+				} )
 				.filter( {
 					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
 				} )
@@ -408,7 +410,9 @@ describe( 'List view editing', () => {
 
 		await expect(
 			listView
-				.getByRole( 'gridcell' )
+				.getByRole( 'gridcell', {
+					name: 'Submenu link',
+				} )
 				.filter( {
 					hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
 				} )
@@ -417,7 +421,9 @@ describe( 'List view editing', () => {
 
 		await expect(
 			listView
-				.getByRole( 'gridcell' )
+				.getByRole( 'gridcell', {
+					name: 'Page Link link',
+				} )
 				.filter( {
 					hasText: 'Block 1 of 1, Level 2', // proxy for filtering by description.
 				} )
@@ -425,7 +431,7 @@ describe( 'List view editing', () => {
 		).toBeVisible();
 	} );
 
-	test.only( `can add new menu items`, async ( {
+	test( `can add new menu items`, async ( {
 		admin,
 		page,
 		editor,
