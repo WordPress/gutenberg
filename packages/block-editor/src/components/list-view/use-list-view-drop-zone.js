@@ -158,6 +158,7 @@ function getListViewDropTarget( blocksData, position ) {
 			rootClientId: candidateBlockData.clientId,
 			blockIndex: 0,
 			dropPosition: 'inside',
+			targetRect: candidateRect,
 		};
 	}
 
@@ -173,6 +174,7 @@ function getListViewDropTarget( blocksData, position ) {
 		clientId: candidateBlockData.clientId,
 		blockIndex: candidateBlockData.blockIndex + offset,
 		dropPosition: candidateEdge,
+		targetRect: candidateRect,
 	};
 }
 
@@ -190,17 +192,22 @@ export default function useListViewDropZone() {
 		canInsertBlocks,
 	} = useSelect( blockEditorStore );
 	const [ target, setTarget ] = useState();
+	const [ source, setSource ] = useState();
 	const { rootClientId: targetRootClientId, blockIndex: targetBlockIndex } =
 		target || {};
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 
 	const draggedBlockClientIds = getDraggedBlockClientIds();
+
 	const throttled = useThrottle(
 		useCallback(
 			( event, currentTarget ) => {
 				const position = { x: event.clientX, y: event.clientY };
 				const isBlockDrag = !! draggedBlockClientIds?.length;
+				const sourceRootClientId = getBlockRootClientId(
+					draggedBlockClientIds?.[ 0 ]
+				);
 
 				const blockElements = Array.from(
 					currentTarget.querySelectorAll( '[data-block]' )
@@ -236,10 +243,60 @@ export default function useListViewDropZone() {
 				if ( newTarget ) {
 					setTarget( newTarget );
 				}
+
+				if ( ! source ) {
+					setSource( {
+						srcClientIds: draggedBlockClientIds,
+						srcRootClientId: sourceRootClientId,
+					} );
+				}
 			},
-			[ draggedBlockClientIds ]
+			[
+				canInsertBlocks,
+				draggedBlockClientIds,
+				getBlockCount,
+				getBlockIndex,
+				getBlockRootClientId,
+				source,
+			]
 		),
 		200
+	);
+
+	const handleDropOutsideListView = useCallback(
+		( event ) => {
+			const { clientX } = event;
+			const { x: targetX, width } = target?.targetRect || {};
+
+			// If the mouse is outside the horizontal area of the list view
+			// determined by the rect representing the last block that was
+			// hovered, return early. This ensure the drop is only
+			// triggered when the user is dragging to the top or bottom of
+			// the list view.
+			if ( clientX < targetX || clientX > targetX + width ) {
+				return;
+			}
+
+			// Note: this is currently only handling moving blocks.
+			// We might need to (somehow) check that we're not attempting to insert here.
+			const transferData = {
+				type: 'block',
+				srcClientIds: source?.srcClientIds || [],
+				srcRootClientId: source?.srcRootClientId,
+			};
+
+			// Construct a fake event for the drop handler.
+			// This is needed because the `dragEnd` event doesn't contain the required data.
+			const constructedEvent = {};
+			constructedEvent.dataTransfer = new window.DataTransfer();
+			constructedEvent.dataTransfer.setData(
+				'wp-blocks',
+				JSON.stringify( transferData )
+			);
+
+			onBlockDrop( constructedEvent );
+		},
+		[ onBlockDrop, source, target ]
 	);
 
 	const ref = useDropZone( {
@@ -250,8 +307,20 @@ export default function useListViewDropZone() {
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
 			throttled( event, event.currentTarget );
 		},
-		onDragEnd() {
+		onDragEnd( event ) {
+			if (
+				event.dataTransfer?.dropEffect &&
+				event.dataTransfer.dropEffect !== 'none'
+			) {
+				// If the drop effect is not none, then the drop was not cancelled.
+				// Determine whether or not to allow a drop to occur.
+				// This allows for a fuzzier drop target at the beginning and
+				// end of the block list.
+				handleDropOutsideListView( event );
+			}
+
 			throttled.cancel();
+			setSource( null );
 			setTarget( null );
 		},
 	} );
