@@ -39,11 +39,15 @@
 
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles
+	.edit-post-header-document-toolbar__left > .components-button.has-icon:first-child {
+		margin-right: 10px;
+	}
+
 	.edit-post-header-document-toolbar__left > .components-button.has-icon,
 	.edit-post-header-document-toolbar__left > .components-dropdown > .components-button.has-icon {
 		height: 32px;
-		margin-right: 10px;
 		min-width: 32px;
+		margin-right: 4px;
 		padding: 0;
 		width: 32px;
 
