@@ -25,17 +25,6 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 
 		$has_selectors = ! empty( $block_type->selectors );
 
-		// Duotone (No fallback selectors for Duotone).
-		if ( 'filter.duotone' === $target || array( 'filter', 'duotone' ) === $target ) {
-			// If selectors API in use, only use it's value or null.
-			if ( $has_selectors ) {
-				return _wp_array_get( $block_type->selectors, array( 'filter', 'duotone' ), null );
-			}
-
-			// Selectors API, not available, check for old experimental selector.
-			return _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null );
-		}
-
 		// Root Selector.
 
 		// Calculated before returning as it can be used as fallback for
@@ -52,6 +41,40 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			// If no root selector found, generate default block class selector.
 			$block_name    = str_replace( '/', '-', str_replace( 'core/', '', $block_type->name ) );
 			$root_selector = ".wp-block-{$block_name}";
+		}
+
+
+		// Duotone (No fallback selectors for Duotone).
+		if ( 'filter.duotone' === $target || array( 'filter', 'duotone' ) === $target ) {
+			// If selectors API in use, only use it's value or null.
+			if ( $has_selectors ) {
+				return _wp_array_get( $block_type->selectors, array( 'filter', 'duotone' ), null );
+			}
+
+			// Selectors API, not available, check for old experimental selector.
+			// The old API didn't have the whole selector, just parts of it,
+			// so we need to add the root here for backwards compatibility.
+			$partial_duotone_selector = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null );
+
+			$root_selectors    = explode( ',', $root_selector );
+			$duotone_selectors = explode( ',', $partial_duotone_selector );
+
+			$duotone_selector = array();
+			foreach ( $root_selectors as $outer ) {
+				foreach ( $duotone_selectors as $inner ) {
+					$outer = trim( $outer );
+					$inner = trim( $inner );
+					if ( ! empty( $outer ) && ! empty( $inner ) ) {
+						$duotone_selector[] = $outer . ' ' . $inner;
+					} elseif ( empty( $outer ) ) {
+						$duotone_selector[] = $inner;
+					} elseif ( empty( $inner ) ) {
+						$duotone_selector[] = $outer;
+					}
+				}
+			}
+
+			return implode( ', ', $duotone_selector );
 		}
 
 		// Return selector if it's the root target we are looking for.
