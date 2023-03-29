@@ -85,7 +85,6 @@
 	"supports": {
 		"anchor": true,
 		"color": {
-			"__experimentalDuotone": true,
 			"text": false,
 			"background": false
 		},
