@@ -91,6 +91,7 @@ export const KeyboardAwareFlatList = ( {
 	// When the orientation changes, the ScrollView measurements
 	// need to be re-calculated.
 	useEffect( () => {
+		scrollViewMeasurements.current = null;
 		// Only re-caculate them if there's an existing value
 		// as it should be set when the ScrollView content changes.
 		if ( scrollViewMeasurements.current ) {
