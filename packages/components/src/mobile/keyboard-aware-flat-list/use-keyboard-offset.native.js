@@ -7,7 +7,6 @@ import { Keyboard } from 'react-native';
 /**
  * WordPress dependencies
  */
-import RCTAztecView from '@wordpress/react-native-aztec';
 import { useEffect, useState } from '@wordpress/element';
 
 /**
@@ -40,12 +39,7 @@ export default function useKeyboardOffset( scrollEnabled ) {
 				}
 			);
 			hideSubscription = Keyboard.addListener( 'keyboardWillHide', () => {
-				// Changing focus between TextInputs triggers this listener as the
-				// Keyboard gets dimissed and then shows up again, so it's needed to
-				// avoid setting the keyboard offset to 0 unless there's no focused input.
-				if ( ! RCTAztecView.InputState.isFocused() ) {
-					setKeyboardOffset( 0 );
-				}
+				setKeyboardOffset( 0 );
 				setIsKeyboardVisible( false );
 			} );
 		} else {
