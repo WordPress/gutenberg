@@ -139,7 +139,6 @@ supports: {
 -   Default value: null
 -   Subproperties:
     -   `background`: type `boolean`, default value `true`
-    -   `__experimentalDuotone`: type `string`, default value undefined
     -   `gradients`: type `boolean`, default value `false`
     -   `link`: type `boolean`, default value `false`
     -   `text`: type `boolean`, default value `true`
