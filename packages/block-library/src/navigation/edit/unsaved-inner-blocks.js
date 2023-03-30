@@ -120,53 +120,41 @@ export default function UnsavedInnerBlocks( {
 	const { hasResolvedNavigationMenus } = useNavigationMenu();
 
 	// Automatically save the uncontrolled blocks.
-	useEffect(
-		() => {
-			// The block will be disabled when used in a BlockPreview.
-			// In this case avoid automatic creation of a wp_navigation post.
-			// Otherwise the user will be spammed with lots of menus!
-			//
-			// Also ensure other navigation menus have loaded so an
-			// accurate name can be created.
-			//
-			// Don't try saving when another save is already
-			// in progress.
-			//
-			// And finally only create the menu when the block is selected,
-			// which is an indication they want to start editing.
-			if (
-				isDisabled ||
-				isSaving ||
-				! hasResolvedDraftNavigationMenus ||
-				! hasResolvedNavigationMenus ||
-				! hasSelection ||
-				! innerBlocksAreDirty
-			) {
-				return;
-			}
+	useEffect( () => {
+		// The block will be disabled when used in a BlockPreview.
+		// In this case avoid automatic creation of a wp_navigation post.
+		// Otherwise the user will be spammed with lots of menus!
+		//
+		// Also ensure other navigation menus have loaded so an
+		// accurate name can be created.
+		//
+		// Don't try saving when another save is already
+		// in progress.
+		//
+		// And finally only create the menu when the block is selected,
+		// which is an indication they want to start editing.
+		if (
+			isDisabled ||
+			isSaving ||
+			! hasResolvedDraftNavigationMenus ||
+			! hasResolvedNavigationMenus ||
+			! hasSelection ||
+			! innerBlocksAreDirty
+		) {
+			return;
+		}
 
-			createNavigationMenu( null, blocks );
-		},
-		/* The dependency "blocks" is intentionally omitted here.
-		 * This is because making blocks a dependency would cause
-		 * createNavigationMenu to run on every block change whereas
-		 * we only want it to run when the blocks are first detected
-		 * as dirty.
-		 * A better solution might be to add a hard saving lock using
-		 * a ref to avoid having to disbale theses eslint rules.
-		 */
-		/* eslint-disable react-hooks/exhaustive-deps */
-		[
-			createNavigationMenu,
-			isDisabled,
-			isSaving,
-			hasResolvedDraftNavigationMenus,
-			hasResolvedNavigationMenus,
-			innerBlocksAreDirty,
-			hasSelection,
-		]
-		/* eslint-enable react-hooks/exhaustive-deps */
-	);
+		createNavigationMenu( null, blocks );
+	}, [
+		blocks,
+		createNavigationMenu,
+		isDisabled,
+		isSaving,
+		hasResolvedDraftNavigationMenus,
+		hasResolvedNavigationMenus,
+		innerBlocksAreDirty,
+		hasSelection,
+	] );
 
 	const Wrapper = isSaving ? Disabled : 'div';
 
