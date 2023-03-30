@@ -85,9 +85,11 @@
 	"supports": {
 		"anchor": true,
 		"color": {
-			"__experimentalDuotone": true,
 			"text": false,
 			"background": false
+		},
+		"filter": {
+			"duotone": true
 		},
 		"__experimentalBorder": {
 			"color": true,

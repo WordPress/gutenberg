@@ -871,6 +871,14 @@ class WP_Theme_JSON_Gutenberg {
 
 			// The block may or may not have a duotone selector.
 			$duotone_selector = wp_get_block_css_selector( $block_type, 'filter.duotone' );
+
+			// Keep backwards compatibility for support.color.__experimentalDuotone.
+			if ( null === $duotone_selector ) {
+				$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+				$root_selector = wp_get_block_css_selector( $block_type, 'root' );
+				$duotone_selector = WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_support );
+			}
+
 			if ( null !== $duotone_selector ) {
 				static::$blocks_metadata[ $block_name ]['duotone'] = $duotone_selector;
 			}

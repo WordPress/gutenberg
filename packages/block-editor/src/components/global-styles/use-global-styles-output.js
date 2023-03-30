@@ -9,6 +9,7 @@ import { get, isEmpty, kebabCase, set } from 'lodash';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
+	getBlockSupport,
 	getBlockTypes,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -19,7 +20,7 @@ import { getCSSRules } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import { PRESET_METADATA, ROOT_BLOCK_SELECTOR } from './utils';
+import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
 import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
@@ -1002,10 +1003,23 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
 		const selector = getBlockCSSSelector( blockType, 'root' );
-		const duotoneSelector = getBlockCSSSelector(
+		let duotoneSelector = getBlockCSSSelector(
 			blockType,
 			'filter.duotone'
 		);
+
+		// Keep backwards compatibility for support.color.__experimentalDuotone.
+		if ( ! duotoneSelector ) {
+			const rootSelector = getBlockCSSSelector( blockType, 'root' );
+			const duotoneSupport = getBlockSupport(
+				blockType,
+				'color.__experimentalDuotone',
+				false
+			);
+			duotoneSelector =
+				duotoneSupport && scopeSelector( rootSelector, duotoneSupport );
+		}
+
 		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
