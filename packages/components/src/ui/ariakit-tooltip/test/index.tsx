@@ -24,18 +24,18 @@ const props = {
 
 describe( 'ToolTip', () => {
 	it( 'should not render the tooltip if multiple children are passed', async () => {
-		const user = userEvent.setup();
+		expect( () =>
+			render(
+				// expected error since Tooltip cannot have more than one child element
+				// @ts-expect-error
+				<ToolTip { ...props }>
+					<Button>This is a button</Button>
+					<Button>This is another button</Button>
+				</ToolTip>
+			)
+		).toThrow();
 
-		render(
-			// @ts-expect-error
-			<ToolTip { ...props }>
-				<Button>Button 1</Button>
-				<Button>Button 2</Button>
-			</ToolTip>
-		);
-
-		await user.tab();
-
+		expect( console ).toHaveErrored();
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
@@ -225,7 +225,7 @@ describe( 'ToolTip', () => {
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
-		//expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
 
 		// Advance time by MOUSE_LEAVE_DELAY time
 		await new Promise( ( resolve ) =>
@@ -247,8 +247,8 @@ describe( 'ToolTip', () => {
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
-		//expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
-		//expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
+		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+		expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
 
 		// Advance time again, so that we reach the full TOOLTIP_DELAY time
 		await new Promise( ( resolve ) =>

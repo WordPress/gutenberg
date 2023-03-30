@@ -2,11 +2,11 @@
  * External dependencies
  */
 import { Tooltip, TooltipAnchor, useTooltipState } from 'ariakit/tooltip';
+import { Slot } from '@radix-ui/react-slot';
 
 /**
  * WordPress dependencies
  */
-import { cloneElement, isValidElement } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
@@ -16,7 +16,7 @@ import deprecated from '@wordpress/deprecated';
 import { TOOLTIP_DELAY } from '../../tooltip/';
 import type { ToolTipProps } from './types';
 import Shortcut from '../../shortcut';
-import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from '../../popover/utils';
+import { positionToPlacement } from '../../popover/utils';
 import * as styles from './styles';
 import { contextConnectWithoutRef } from '../context/context-connect';
 import { useCx } from '../../utils/hooks/use-cx';
@@ -44,9 +44,7 @@ function AriaToolTip( props: ToolTipProps ) {
 	if ( placement !== undefined ) {
 		computedPlacement = placement;
 	} else if ( position !== undefined ) {
-		computedPlacement =
-			// @ts-expect-error
-			__experimentalPopoverLegacyPositionToPlacement( position );
+		computedPlacement = positionToPlacement( position );
 	}
 	computedPlacement = computedPlacement || DEFAULT_PLACEMENT;
 
@@ -68,13 +66,8 @@ function AriaToolTip( props: ToolTipProps ) {
 
 	return (
 		<>
-			<TooltipAnchor described state={ tooltipState }>
-				{ isValidElement( children )
-					? ( childProps ) =>
-							cloneElement( children, {
-								...childProps,
-							} )
-					: children }
+			<TooltipAnchor as={ Slot } described state={ tooltipState }>
+				{ children }
 			</TooltipAnchor>
 			{ ( text || shortcut ) && (
 				<Tooltip

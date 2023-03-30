@@ -7,7 +7,7 @@ export type ToolTipProps = Pick< TooltipStateProps, 'placement' > & {
 	/**
 	 * The anchor for the tooltip. Accepts only one child element.
 	 */
-	children: React.ReactElement | string;
+	children: JSX.Element;
 	/**
 	 * The amount of time in milliseconds to wait before showing the tooltip.
 	 *
