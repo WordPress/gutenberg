@@ -381,18 +381,15 @@ async function runPerformanceTests( refs, options ) {
 					await git
 						.fetch( 'origin', ref, { '--depth': 1 } ) // --no-tags?
 						.checkout( ref );
+
+					l( 'Installing dependencies' );
+					await exec( 'npm ci', buildDir );
 				}
 			}
 
 			if ( doBuild ) {
-				l( 'Installing dependencies' );
-				await exec( 'npm ci', buildDir );
-
 				l( 'Building the plugin' );
-				await exec(
-					'npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
-					buildDir
-				);
+				await exec( 'npm run build', buildDir );
 			}
 
 			if ( fs.existsSync( path.join( envDir, '.wp-env.json' ) ) ) {
