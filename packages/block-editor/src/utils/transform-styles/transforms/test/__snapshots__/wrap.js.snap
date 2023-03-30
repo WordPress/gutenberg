@@ -2,10 +2,11 @@
 
 exports[`CSS selector wrap should ignore font-face selectors 1`] = `"@font-face {font-family: myFirstFont; src: url(sansation_light.woff);}"`;
 
-exports[`CSS selector wrap should ignore keyframes 1`] =
-`"@keyframes edit-post__fade-in-animation {
-   from {opacity: 0;} `+`
- }`;
+exports[`CSS selector wrap should ignore keyframes 1`] = `
+"@keyframes edit-post__fade-in-animation { 
+  from {opacity: 0;} 
+}"
+`;
 
 exports[`CSS selector wrap should ignore selectors 1`] = `".my-namespace h1, body {color: red;}"`;
 
