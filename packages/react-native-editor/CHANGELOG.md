@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.92.0
+* No User facing changes *
+
 ## 1.91.0
 -   [*] Allow new block transformations for most blocks. [#48792]
 
