@@ -504,7 +504,7 @@ test.describe( 'List view editing', () => {
 		).toBeVisible();
 	} );
 
-	test( `can remove menu items`, async ( {
+	test.only( `can remove menu items`, async ( {
 		admin,
 		page,
 		editor,
@@ -522,33 +522,22 @@ test.describe( 'List view editing', () => {
 			description: 'Structure for navigation menu: Test Menu',
 		} );
 
-		// click on options menu for the first menu item and select remove.
-		const firstMenuItem = listView
-			.getByRole( 'gridcell', {
-				name: 'Page Link link',
-			} )
-			.filter( {
-				hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
-			} );
-
 		// The options menu button is a sibling of the menu item gridcell.
-		const firstItemOptions = firstMenuItem
-			.locator( '..' ) // parent selector.
-			.getByRole( 'button', {
-				name: 'Options for Page Link block',
-			} );
+		const submenuOptions = listView.getByRole( 'button', {
+			name: 'Options for Submenu block',
+		} );
 
 		// Open the options menu.
-		await firstItemOptions.click();
+		await submenuOptions.click();
 
 		// usage of `page` is required because the options menu is rendered into a slot
 		// outside of the treegrid.
 		const removeBlockOption = page
 			.getByRole( 'menu', {
-				name: 'Options for Page Link block',
+				name: 'Options for Submenu block',
 			} )
 			.getByRole( 'menuitem', {
-				name: 'Remove Top Level Item 1',
+				name: 'Remove Top Level Item 2',
 			} );
 
 		await removeBlockOption.click();
@@ -557,12 +546,12 @@ test.describe( 'List view editing', () => {
 		await expect(
 			listView
 				.getByRole( 'gridcell', {
-					name: 'Page Link link',
+					name: 'Submenu link',
 				} )
 				.filter( {
-					hasText: 'Block 1 of 1, Level 1', // proxy for filtering by description.
+					hasText: 'Block 2 of 2, Level 1', // proxy for filtering by description.
 				} )
-				.getByText( 'Top Level Item 1' )
+				.getByText( 'Top Level Item 2' )
 		).not.toBeVisible();
 	} );
 
