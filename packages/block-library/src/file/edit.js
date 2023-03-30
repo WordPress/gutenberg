@@ -23,7 +23,7 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
@@ -71,7 +71,9 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		downloadButtonText,
 		displayPreview,
 		previewHeight,
+		_blobURL: blobURL,
 	} = attributes;
+
 	const { media, mediaUpload } = useSelect(
 		( select ) => ( {
 			media:
@@ -87,21 +89,31 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
+	const [ isUploadingBlob, setIsUploadingBlob ] = useState( false );
+
 	useEffect( () => {
 		// Upload a file drag-and-dropped into the editor.
-		if ( isBlobURL( href ) ) {
-			const file = getBlobByURL( href );
+		const file = getBlobByURL( blobURL );
+		if ( file ) {
+			setIsUploadingBlob( true );
 
 			mediaUpload( {
 				filesList: [ file ],
-				onFileChange: ( [ newMedia ] ) => onSelectFile( newMedia ),
-				onError: onUploadError,
+				onFileChange: ( [ newMedia ] ) => {
+					onSelectFile( newMedia, { isPersistent: false } );
+					setIsUploadingBlob( false );
+				},
+				onError: ( message ) => {
+					onUploadError( message, { isPersistent: false } );
+					setIsUploadingBlob( false );
+				},
 			} );
 
-			revokeBlobURL( href );
+			revokeBlobURL( blobURL );
 		}
 
 		if ( downloadButtonText === undefined ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			changeDownloadButtonText( _x( 'Download', 'button label' ) );
 		}
 	}, [] );
@@ -114,9 +126,12 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		}
 	}, [ href, fileId, clientId ] );
 
-	function onSelectFile( newMedia ) {
-		if ( newMedia && newMedia.url ) {
+	function onSelectFile( newMedia, { isPersistent = true } = {} ) {
+		if ( newMedia && newMedia.url && ! isBlobURL( newMedia.url ) ) {
 			const isPdf = newMedia.url.endsWith( '.pdf' );
+			if ( ! isPersistent ) {
+				__unstableMarkNextChangeAsNotPersistent();
+			}
 			setAttributes( {
 				href: newMedia.url,
 				fileName: newMedia.title,
@@ -178,9 +193,9 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	const blockProps = useBlockProps( {
 		className: classnames(
-			isBlobURL( href ) && getAnimateClassName( { type: 'loading' } ),
+			isUploadingBlob && getAnimateClassName( { type: 'loading' } ),
 			{
-				'is-transient': isBlobURL( href ),
+				'is-transient': isUploadingBlob,
 			}
 		),
 	} );
@@ -232,7 +247,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 				/>
 				<ClipboardToolbarButton
 					text={ href }
-					disabled={ isBlobURL( href ) }
+					disabled={ isUploadingBlob }
 				/>
 			</BlockControls>
 			<div { ...blockProps }>

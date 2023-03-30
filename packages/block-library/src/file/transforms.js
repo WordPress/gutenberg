@@ -21,14 +21,10 @@ const transforms = {
 				const blocks = [];
 
 				files.forEach( ( file ) => {
-					const blobURL = createBlobURL( file );
-
-					// File will be uploaded in componentDidMount()
 					blocks.push(
 						createBlock( 'core/file', {
-							href: blobURL,
-							fileName: file.name,
-							textLinkHref: blobURL,
+							// File will be uploaded when block mounts.
+							_blobURL: createBlobURL( file ),
 						} )
 					);
 				} );

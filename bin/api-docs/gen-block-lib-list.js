@@ -73,6 +73,7 @@ function getTruthyKeys( obj ) {
 
 	return Object.keys( obj )
 		.filter( ( key ) => ! key.startsWith( '__exp' ) )
+		.filter( ( key ) => ! obj[ key ].internal )
 		.map( ( key ) => ( obj[ key ] ? key : `~~${ key }~~` ) );
 }
 
