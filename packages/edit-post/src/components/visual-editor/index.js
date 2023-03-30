@@ -160,15 +160,21 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const { themeHasDisabledLayoutStyles, themeSupportsLayout, isFocusMode } =
-		useSelect( ( select ) => {
-			const _settings = select( blockEditorStore ).getSettings();
-			return {
-				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
-				themeSupportsLayout: _settings.supportsLayout,
-				isFocusMode: _settings.focusMode,
-			};
-		}, [] );
+	const {
+		hasRootPaddingAwareAlignments,
+		isFocusMode,
+		themeHasDisabledLayoutStyles,
+		themeSupportsLayout,
+	} = useSelect( ( select ) => {
+		const _settings = select( blockEditorStore ).getSettings();
+		return {
+			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
+			themeSupportsLayout: _settings.supportsLayout,
+			isFocusMode: _settings.focusMode,
+			hasRootPaddingAwareAlignments:
+				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
+		};
+	}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
@@ -393,6 +399,8 @@ export default function VisualEditor( { styles } ) {
 									'edit-post-visual-editor__post-title-wrapper',
 									{
 										'is-focus-mode': isFocusMode,
+										'has-global-padding':
+											hasRootPaddingAwareAlignments,
 									},
 									'is-layout-flow'
 								) }
