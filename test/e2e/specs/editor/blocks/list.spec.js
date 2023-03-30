@@ -40,7 +40,7 @@ test.describe( 'List (@firefox)', () => {
 		// Create a list with the slash block shortcut.
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'test' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 4 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
 		await page.keyboard.type( '* ' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -75,7 +75,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '1. ' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
@@ -261,7 +261,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'one' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( 'two' );
 		await editor.transformBlockTo( 'core/list' );
 
@@ -285,7 +285,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'one' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( '...' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
@@ -336,7 +336,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'two' );
-		await pageUtils.pressKeyTimes( 'ArrowUp', 4 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 4 } );
 		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -396,7 +396,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 
 		await page.keyboard.type( 'two' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 'two'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 'two'.length } );
 		await page.keyboard.press( 'Backspace' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -465,7 +465,7 @@ test.describe( 'List (@firefox)', () => {
 
 		// Should merge lists into one.
 		await page.keyboard.press( 'ArrowDown' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 'two'.length );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 'two'.length } );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -759,7 +759,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await pageUtils.pressKeyTimes( 'ArrowUp', 3 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
 		await editor.clickBlockToolbarButton( 'Outdent' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -786,7 +786,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -809,7 +809,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'c' );
 		await page.keyboard.press( 'ArrowUp' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -950,7 +950,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' a' );
-		await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
+		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 		await page.keyboard.press( 'Enter' );
 		// The caret should land in the second item.
 		await page.keyboard.type( '2' );
@@ -981,7 +981,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Space' );
+		await pageUtils.pressKeys( 'shift+Space' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -1166,17 +1166,17 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		// Open code editor
-		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
+		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Paste empty list block
 		pageUtils.setClipboardData( {
 			plainText:
 				'<!-- wp:list -->\n<ul><li></li></ul>\n<!-- /wp:list -->',
 		} );
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'primary+v' );
 
 		// Go back to normal editor
-		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
+		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Verify no WSOD and content is proper.
 		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->

@@ -139,7 +139,7 @@ export default function PostFeaturedImageEdit( {
 				imageSizeOptions={ imageSizeOptions }
 			/>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={

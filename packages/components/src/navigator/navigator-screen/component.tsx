@@ -172,13 +172,19 @@ function UnconnectedNavigatorScreen(
 		},
 		x: 0,
 	};
-	const initial = {
-		opacity: 0,
-		x:
-			( isRTL() && location.isBack ) || ( ! isRTL() && ! location.isBack )
-				? 50
-				: -50,
-	};
+	// Disable the initial animation if the screen is the very first screen to be
+	// rendered within the current `NavigatorProvider`.
+	const initial =
+		location.isInitial && ! location.isBack
+			? false
+			: {
+					opacity: 0,
+					x:
+						( isRTL() && location.isBack ) ||
+						( ! isRTL() && ! location.isBack )
+							? 50
+							: -50,
+			  };
 	const exit = {
 		delay: animationExitDelay,
 		opacity: 0,

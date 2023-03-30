@@ -3,8 +3,8 @@ export {
 	useGlobalSetting,
 	useGlobalStyle,
 	useSettingsForBlockElement,
-	useColorsPerOrigin,
 } from './hooks';
+export { getBlockCSSSelector } from './get-block-css-selector';
 export { useGlobalStylesOutput } from './use-global-styles-output';
 export { GlobalStylesContext } from './context';
 export {
@@ -16,3 +16,4 @@ export {
 	useHasDimensionsPanel,
 } from './dimensions-panel';
 export { default as BorderPanel, useHasBorderPanel } from './border-panel';
+export { default as ColorPanel, useHasColorPanel } from './color-panel';

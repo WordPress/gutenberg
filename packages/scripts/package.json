@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "25.5.1",
+	"version": "26.1.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -73,7 +73,7 @@
 		"npm-packlist": "^3.0.0",
 		"postcss": "^8.4.5",
 		"postcss-loader": "^6.2.1",
-		"prettier": "npm:wp-prettier@2.6.2",
+		"prettier": "npm:wp-prettier@2.8.5",
 		"puppeteer-core": "^13.2.0",
 		"react-refresh": "^0.10.0",
 		"read-pkg-up": "^7.0.1",

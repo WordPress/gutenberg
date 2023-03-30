@@ -27,70 +27,65 @@ test.afterAll( async ( { requestUtils } ) => {
 	] );
 } );
 
-test.describe(
-	'Clicking "Switch to draft" on a published/scheduled post/page',
-	() => {
-		[ 'schedule', 'publish' ].forEach( ( postStatus ) => {
-			[ 'large', 'small' ].forEach( ( viewport ) => {
-				[ 'post', 'page' ].forEach( ( postType ) => {
-					test( `should switch a ${ postStatus }-ed ${ postType } to draft in a ${ viewport } viewport`, async ( {
-						page,
-						switchToDraftUtils,
-						pageUtils,
-					} ) => {
-						await pageUtils.setBrowserViewport( viewport );
+test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', () => {
+	[ 'schedule', 'publish' ].forEach( ( postStatus ) => {
+		[ 'large', 'small' ].forEach( ( viewport ) => {
+			[ 'post', 'page' ].forEach( ( postType ) => {
+				test( `should switch a ${ postStatus }-ed ${ postType } to draft in a ${ viewport } viewport`, async ( {
+					page,
+					switchToDraftUtils,
+					pageUtils,
+				} ) => {
+					await pageUtils.setBrowserViewport( viewport );
 
-						await switchToDraftUtils.createTestPost(
-							postType,
-							viewport,
-							postStatus === 'schedule'
+					await switchToDraftUtils.createTestPost(
+						postType,
+						viewport,
+						postStatus === 'schedule'
+					);
+
+					await switchToDraftUtils.switchToDraftButton.click();
+
+					await page
+						.getByRole( 'dialog' )
+						.getByRole( 'button', { name: 'Cancel' } )
+						.click();
+
+					await expect
+						.poll(
+							switchToDraftUtils.getPostStatus,
+							`should leave a ${ postStatus }-ed ${ postType } ${ postStatus }-ed if canceled`
+						)
+						.toBe(
+							postStatus === 'schedule' ? 'future' : postStatus
 						);
 
-						await switchToDraftUtils.switchToDraftButton.click();
+					await switchToDraftUtils.switchToDraftButton.click();
 
-						await page
-							.getByRole( 'dialog' )
-							.getByRole( 'button', { name: 'Cancel' } )
-							.click();
+					await page
+						.getByRole( 'dialog' )
+						.getByRole( 'button', { name: 'OK' } )
+						.click();
 
-						await expect
-							.poll(
-								switchToDraftUtils.getPostStatus,
-								`should leave a ${ postStatus }-ed ${ postType } ${ postStatus }-ed if canceled`
-							)
-							.toBe(
-								postStatus === 'schedule'
-									? 'future'
-									: postStatus
-							);
-
-						await switchToDraftUtils.switchToDraftButton.click();
-
-						await page
-							.getByRole( 'dialog' )
-							.getByRole( 'button', { name: 'OK' } )
-							.click();
-
-						await expect(
-							page.getByRole( 'button', {
-								name: 'Dismiss this notice',
-							} )
-						).toHaveText( `${ postType } reverted to draft.`, {
-							ignoreCase: true,
-						} );
-
-						await expect
-							.poll(
-								switchToDraftUtils.getPostStatus,
-								`should revert a ${ postStatus }-ed ${ postType } to a draft if confirmed`
-							)
-							.toBe( 'draft' );
+					await expect(
+						page.getByRole( 'button', {
+							name: 'Dismiss this notice',
+						} )
+					).toHaveText( `${ postType } reverted to draft.`, {
+						ignoreCase: true,
 					} );
+
+					await expect
+						.poll(
+							switchToDraftUtils.getPostStatus,
+							`should revert a ${ postStatus }-ed ${ postType } to a draft if confirmed`
+						)
+						.toBe( 'draft' );
 				} );
 			} );
 		} );
-	}
-);
+	} );
+} );
 
 class SwitchToDraftUtils {
 	/** @type {Page} */

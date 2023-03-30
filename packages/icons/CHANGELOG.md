@@ -4,7 +4,9 @@
 
 ### New features
 
--   Add new `details` icon. ([#45055](https://github.com/WordPress/gutenberg/pull/45055))
+## 9.21.0 (2023-03-29)
+
+## 9.20.0 (2023-03-15)
 
 ## 9.19.0 (2023-03-01)
 

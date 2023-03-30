@@ -34,6 +34,9 @@ export default function SidebarNavigationScreenMain() {
 		return navigationMenus?.length > 0;
 	} );
 
+	const showNavigationScreen = process.env.IS_GUTENBERG_PLUGIN
+		? hasNavigationMenus
+		: false;
 	return (
 		<SidebarNavigationScreen
 			isRoot
@@ -43,7 +46,7 @@ export default function SidebarNavigationScreenMain() {
 			) }
 			content={
 				<ItemGroup>
-					{ hasNavigationMenus && (
+					{ showNavigationScreen && (
 						<NavigatorButton
 							as={ SidebarNavigationItem }
 							path="/navigation"
