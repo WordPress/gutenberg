@@ -201,10 +201,8 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	 * @return int|WP_Error The post ID of the default fallback menu or a WP_Error object.
 	 */
 	private static function create_default_fallback() {
-		$registry = WP_Block_Type_Registry::get_instance();
 
-		// If `core/page-list` is not registered then use empty blocks.
-		$default_blocks = $registry->is_registered( 'core/page-list' ) ? '<!-- wp:page-list /-->' : '';
+		$default_blocks = static::get_default_fallback_blocks();
 
 		// Create a new navigation menu from the fallback blocks.
 		$wp_insert_post_result = wp_insert_post(
@@ -219,5 +217,17 @@ class WP_Navigation_Fallbacks_Gutenberg {
 		);
 
 		return $wp_insert_post_result;
+	}
+
+	/**
+	 * Gets the rendered markup for the default fallback blocks.
+	 *
+	 * @return string default blocks markup to use a the fallback.
+	 */
+	private static function get_default_fallback_blocks() {
+		$registry = WP_Block_Type_Registry::get_instance();
+
+		// If `core/page-list` is not registered then use empty blocks.
+		return $registry->is_registered( 'core/page-list' ) ? '<!-- wp:page-list /-->' : '';
 	}
 }
