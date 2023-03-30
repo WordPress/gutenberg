@@ -308,42 +308,61 @@ const withDuotoneStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const id = useInstanceId( BlockListBlock );
 
-		const { selector, support } = useMemo( () => {
+		/**
+		 * experimental true
+		 * experimental string
+		 *
+		 * no selector
+		 * filter selector
+		 * filter.root selector
+		 * filter.duotone selector
+		 */
+
+		const selector = useMemo( () => {
 			const blockType = getBlockType( props.name );
-			let duotoneSupport = false;
-			let duotoneSelector = null;
 
 			if ( blockType ) {
-				duotoneSupport = getBlockSupport(
+				// Backwards compatibility for color.__experimentalDuotone. This will
+				// have priority over filter.duotone support. Unfortunately we can't
+				// prefer filter.duotone because it gets set when __experimentalDuotone
+				// is set via a block_type_metadata_settings hook. It shouldn't be too
+				// much of a problem because I would expect consumers to not use both
+				// at the same time.
+				const experimentalDuotone = getBlockSupport(
+					blockType,
+					'color.__experimentalDuotone',
+					false
+				);
+				if ( experimentalDuotone ) {
+					const rootSelector = getBlockCSSSelector( blockType );
+					return typeof experimentalDuotone === 'string'
+						? scopeSelector( rootSelector, experimentalDuotone )
+						: rootSelector;
+				}
+
+				// Support flag `filter.duotone` will be populated from the previous
+				// `color.__experimentalDuotone` support via block_type_metadata_settings filter.
+				const duotoneSupport = getBlockSupport(
 					blockType,
 					'filter.duotone',
 					false
 				);
-				duotoneSelector = getBlockCSSSelector(
-					blockType,
-					'filter.duotone',
-					{ fallback: true }
-				);
-				if ( ! duotoneSelector || ! duotoneSupport ) {
-					const rootSelector = getBlockCSSSelector( blockType );
-					duotoneSupport = getBlockSupport(
-						blockType,
-						'color.__experimentalDuotone',
-						false
-					);
-					duotoneSelector =
-						duotoneSupport &&
-						scopeSelector( rootSelector, duotoneSupport );
+				if ( ! duotoneSupport ) {
+					return null;
 				}
+
+				// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
+				return getBlockCSSSelector( blockType, 'filter.duotone', {
+					fallback: true,
+				} );
 			}
-			return { selector: duotoneSelector, support: duotoneSupport };
 		}, [ props.name ] );
 
 		const attribute = props?.attributes?.style?.color?.duotone;
 
 		const filterClass = `wp-duotone-${ id }`;
 
-		const shouldRender = support && selector && attribute;
+		const shouldRender = selector && attribute;
 
 		const className = shouldRender
 			? classnames( props?.className, filterClass )
