@@ -14,17 +14,12 @@ import { store as coreDataStore } from '@wordpress/core-data';
 
 function SiteIcon( { className } ) {
 	const { isRequestingSite, siteIconUrl } = useSelect( ( select ) => {
-		const { getEntityRecord, isResolving } = select( coreDataStore );
-		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+		const { getEntityRecord } = select( coreDataStore );
+		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
 
 		return {
-			isRequestingSite: isResolving( 'core', 'getEntityRecord', [
-				'root',
-				'__unstableBase',
-				undefined,
-			] ),
-			siteIconUrl: siteData.site_icon_url,
+			isRequestingSite: ! siteData,
+			siteIconUrl: siteData?.site_icon_url,
 		};
 	}, [] );
 
