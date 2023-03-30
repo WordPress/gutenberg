@@ -349,6 +349,11 @@ function RichTextWrapper(
 		);
 	}
 
+	const __unstableAfterParse = ( v ) =>
+		addEditorOnlyFormats( parseShortcodes( v ) );
+	const __unstableBeforeSerialize = ( v ) =>
+		removeEditorOnlyFormats( serializeShortcodes( v ) );
+
 	const {
 		value,
 		getValue,
@@ -372,10 +377,8 @@ function RichTextWrapper(
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
 		__unstableDependencies: [ ...dependencies, tagName ],
-		__unstableAfterParse: ( v ) =>
-			addEditorOnlyFormats( parseShortcodes( v ) ),
-		__unstableBeforeSerialize: ( v ) =>
-			removeEditorOnlyFormats( serializeShortcodes( v ) ),
+		__unstableAfterParse,
+		__unstableBeforeSerialize,
 		__unstableAddInvisibleFormats: addInvisibleFormats,
 	} );
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
@@ -469,7 +472,7 @@ function RichTextWrapper(
 						onRemove,
 					} ),
 					useEnter( {
-						removeEditorOnlyFormats,
+						__unstableBeforeSerialize,
 						value,
 						onReplace,
 						onSplit,
