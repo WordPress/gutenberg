@@ -1,0 +1,71 @@
+name: JavaScript Tests
+
+# Since Unit Tests are required to pass for each PR,
+# we cannot disable them for documentation-only changes.
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/**'
+            - 'wp/**'
+    # Allow manually triggering the workflow.
+    workflow_dispatch:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    unit-js:
+        name: Jest Tests
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        strategy:
+            fail-fast: false
+            matrix:
+                node: ['14']
+
+        steps:
+            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: ${{ matrix.node }}
+
+            - name: Npm build
+              # It's not necessary to run the full build, since Jest can interpret
+              # source files with `babel-jest`. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npx lerna run build
+
+            - name: Running the tests
+              run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+
+            - name: Running the date tests
+              run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+
+    mobile-unit-js:
+        name: Mobile
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Npm build
+              # It's not necessary to run the full build, since Jest can interpret
+              # source files with `babel-jest`. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npx lerna run build
+
+            - name: Running the tests
+              run: npm run native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"

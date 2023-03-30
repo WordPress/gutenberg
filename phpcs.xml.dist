@@ -3,9 +3,6 @@
 	<description>Sniffs for WordPress plugins, with minor modifications for Gutenberg</description>
 
 	<config name="testVersion" value="5.6-"/>
-	<rule ref="PHPCompatibilityWP">
-		<include-pattern>*\.php$</include-pattern>
-	</rule>
 
 	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
@@ -42,6 +39,22 @@
 	<file>./packages</file>
 	<file>./phpunit</file>
 	<file>./post-content.php</file>
+
+	<!-- Enforce no parenthesis for language constructs, and only one space immediately after.
+		 Including this rule is temporary until it is moved from the WordPress-Extra ruleset to
+		 the WordPress-Core ruleset upstream.
+	-->
+	<rule ref="PEAR.Files.IncludingFile.BracketsNotRequired">
+		<type>warning</type>
+	</rule>
+	<rule ref="PEAR.Files.IncludingFile.UseRequire">
+		<type>warning</type>
+	</rule>
+	<rule ref="PEAR.Files.IncludingFile.UseRequireOnce">
+		<type>warning</type>
+	</rule>
+	<!-- Omit parenthesis for include/require statements -->
+	<rule ref="Squiz.WhiteSpace.LanguageConstructSpacing"/>
 
 	<!-- Exclude generated files -->
 	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>

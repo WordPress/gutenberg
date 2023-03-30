@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<ruleset name="WordPress PHP Compatibility for Gutenberg Plugin">
+	<description>Apply PHP compatibility checks to all Gutenberg files</description>
+
+	<rule ref="PHPCompatibilityWP">
+		<include-pattern>*\.php$</include-pattern>
+	</rule>
+
+	<!-- WordPress Core currently supports PHP 5.6+. -->
+	<config name="testVersion" value="5.6-"/>
+
+	<!-- Only scan PHP files. -->
+	<arg name="extensions" value="php"/>
+
+	<!-- Whenever possible, cache the scan results and re-use those for unchanged files on the next scan. -->
+	<arg name="cache" value=".cache/phpcompat.json"/>
+
+	<file>./bin</file>
+	<file>./gutenberg.php</file>
+	<file>./lib</file>
+	<file>./packages</file>
+	<file>./phpunit</file>
+	<file>./post-content.php</file>
+
+	<!-- Set the memory limit to 256M.
+		 For most standard PHP configurations, this means the memory limit will temporarily be raised.
+		 Ref: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Advanced-Usage#specifying-phpini-settings
+	-->
+	<ini name="memory_limit" value="256M"/>
+
+	<!-- Strip the filepaths down to the relevant bit. -->
+	<arg name="basepath" value="./"/>
+
+	<!-- Check up to 20 files simultaneously. -->
+	<arg name="parallel" value="20"/>
+
+	<!-- Show sniff codes in all reports. -->
+	<arg value="ps"/>
+
+</ruleset>
