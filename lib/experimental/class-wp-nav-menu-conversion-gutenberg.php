@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Menu_Conversion_Gutenberg class
+ * WP_Nav_Menu_Conversion class
  *
  * @package gutenberg
  * @since 6.3.0
@@ -11,7 +11,7 @@
  *
  * @access public
  */
-class WP_Menu_Conversion_Gutenberg {
+class WP_Nav_Menu_Conversion {
 
 	/**
 	 * The Menu term object of the menu to convert.
