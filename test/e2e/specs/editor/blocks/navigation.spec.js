@@ -504,7 +504,7 @@ test.describe( 'List view editing', () => {
 		).toBeVisible();
 	} );
 
-	test.only( `can remove menu items`, async ( {
+	test( `can remove menu items`, async ( {
 		admin,
 		page,
 		editor,
@@ -554,7 +554,7 @@ test.describe( 'List view editing', () => {
 		).not.toBeVisible();
 	} );
 
-	test.only( `can edit menu items`, async ( {
+	test( `can edit menu items`, async ( {
 		admin,
 		page,
 		editor,
