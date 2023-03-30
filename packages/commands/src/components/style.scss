@@ -79,7 +79,7 @@
 		content-visibility: auto;
 		border-radius: $radius-block-ui;
 		cursor: pointer;
-		height: $grid-unit-60;
+		height: $grid-unit-50;
 		display: flex;
 		align-items: center;
 		gap: $grid-unit-15;
@@ -135,7 +135,7 @@
 	[cmdk-group-heading] {
 		user-select: none;
 		color: $gray-700;
-		padding: $grid-unit-20;
+		padding: $grid-unit-20 $grid-unit-20 $grid-unit-10;
 		display: flex;
 		align-items: center;
 		font-size: 12px;
