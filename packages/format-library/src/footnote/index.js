@@ -4,14 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { formatListNumbered, keyboardReturn } from '@wordpress/icons';
-import {
-	Popover,
-	Button,
-	TextControl,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { formatListNumbered } from '@wordpress/icons';
+import { Popover, TextControl } from '@wordpress/components';
 
 const name = 'core/footnote';
 const title = __( 'Footnote' );
@@ -67,7 +61,6 @@ export const footnote = {
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 	const { 'data-shortcode-content': shortcodeContent } =
 		activeObjectAttributes;
-	const [ note, setNote ] = useState( shortcodeContent );
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 		settings: footnote,
@@ -76,20 +69,22 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 	return (
 		<Popover
 			placement="bottom"
-			focusOnMount={ false }
+			focusOnMount={ true }
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__image-popover"
 		>
-			<form
-				className="block-editor-format-toolbar__image-container-content"
-				onSubmit={ ( event ) => {
+			<TextControl
+				className="block-editor-format-toolbar__image-container-value"
+				label={ __( 'Note' ) }
+				value={ shortcodeContent }
+				onChange={ ( newNote ) => {
 					const newReplacements = value.replacements.slice();
 
 					newReplacements[ value.start ] = {
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
-							'data-shortcode-content': note,
+							'data-shortcode-content': newNote,
 						},
 					};
 
@@ -97,25 +92,8 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						...value,
 						replacements: newReplacements,
 					} );
-
-					event.preventDefault();
 				} }
-			>
-				<HStack alignment="bottom" spacing="0">
-					<TextControl
-						className="block-editor-format-toolbar__image-container-value"
-						label={ __( 'Note' ) }
-						value={ note }
-						onChange={ ( newNote ) => setNote( newNote ) }
-					/>
-					<Button
-						className="block-editor-format-toolbar__image-container-button"
-						icon={ keyboardReturn }
-						label={ __( 'Apply' ) }
-						type="submit"
-					/>
-				</HStack>
-			</form>
+			/>
 		</Popover>
 	);
 }
