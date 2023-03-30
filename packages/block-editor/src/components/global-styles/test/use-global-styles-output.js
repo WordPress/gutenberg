@@ -713,7 +713,7 @@ describe( 'global styles renderer', () => {
 				'core/image': {
 					name: imageBlock.name,
 					selector: imageSupports.__experimentalSelector,
-					duotoneSelector: imageSupports.color.__experimentalDuotone,
+					duotoneSelector: '.my-image img',
 					fallbackGapValue: undefined,
 					featureSelectors: {
 						root: '.my-image',
