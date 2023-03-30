@@ -266,15 +266,15 @@ async function runPerformanceTests( refs, options ) {
 		fs.mkdirSync( rootDir );
 	}
 
-	let wpVersion = null; // Default to the latest stable core version.
+	let wpZipURL;
 	if ( options.wpVersion ) {
 		const zipVersion = options.wpVersion.replace( /^(\d+\.\d+).0/, '$1' );
-		wpVersion = `https://wordpress.org/wordpress-${ zipVersion }.zip`;
+		wpZipURL = `https://wordpress.org/wordpress-${ zipVersion }.zip`;
 	}
 
 	const baseWPEnvConfig = {
-		core: wpVersion,
-		plugins: [], // Replace with target Gutenberg build.
+		core: wpZipURL ?? null, // Default to the latest stable core version.
+		plugins: [], // To be replaced with the target Gutenberg build path.
 		themes: [
 			path.join( cwd, 'test/emptytheme' ),
 			'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
@@ -431,10 +431,10 @@ async function runPerformanceTests( refs, options ) {
 
 	log( '\n>> Running the tests\n' );
 
-	if ( wpVersion === null ) {
-		log( '  >> Using the latest stable WordPress version' );
+	if ( options.wpVersion ) {
+		log( `  >> Using WordPress v${ options.wpVersion }` );
 	} else {
-		log( `  >> Using WordPress version ${ wpVersion }` );
+		log( '  >> Using the latest stable WordPress version' );
 	}
 
 	for ( const testSuite of testSuites ) {
