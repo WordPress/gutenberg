@@ -12,52 +12,77 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { useHistory } from '../../components/routes';
 
-function useNavigationCommandLoader( { search } ) {
-	const history = useHistory();
-	const { pages, isLoading } = useSelect(
-		( select ) => {
-			const { getEntityRecords } = select( coreStore );
-			const query = {
-				search,
-				per_page: 20,
-				orderby: 'date',
-			};
-			return {
-				pages: getEntityRecords( 'postType', 'page', query ),
-				isLoading: ! select( coreStore ).hasFinishedResolution(
-					'getEntityRecords',
-					[ 'postType', 'page', query ]
-				),
-			};
-		},
-		[ search ]
-	);
+const getNavigationCommandLoaderPerPostType = ( postType ) =>
+	function useNavigationCommandLoader( { search } ) {
+		const history = useHistory();
+		const { records, isLoading } = useSelect(
+			( select ) => {
+				const { getEntityRecords } = select( coreStore );
+				const query = {
+					search,
+					per_page: 20,
+					orderby: 'date',
+				};
+				return {
+					records: getEntityRecords( 'postType', postType, query ),
+					isLoading: ! select( coreStore ).hasFinishedResolution(
+						'getEntityRecords',
+						[ 'postType', postType, query ]
+					),
+				};
+			},
+			[ search ]
+		);
 
-	const commands = useMemo( () => {
-		return ( pages ?? [] ).map( ( page ) => {
-			return {
-				name: page.title?.rendered + ' ' + page.id,
-				label: page.title?.rendered,
-				callback: () => {
-					history.push( {
-						postType: 'page',
-						postId: page.id,
-					} );
-				},
-			};
-		} );
-	}, [ pages, history ] );
+		const commands = useMemo( () => {
+			return ( records ?? [] ).map( ( record ) => {
+				return {
+					name: record.title?.rendered + ' ' + record.id,
+					label: record.title?.rendered,
+					callback: () => {
+						history.push( {
+							postType,
+							postId: record.id,
+						} );
+					},
+				};
+			} );
+		}, [ records, history ] );
 
-	return {
-		commands,
-		isLoading,
+		return {
+			commands,
+			isLoading,
+		};
 	};
-}
+
+const usePageNavigationCommandLoader =
+	getNavigationCommandLoaderPerPostType( 'page' );
+const usePostNavigationCommandLoader =
+	getNavigationCommandLoaderPerPostType( 'post' );
+const useTemplateNavigationCommandLoader =
+	getNavigationCommandLoaderPerPostType( 'wp_template' );
+const useTemplatePartNavigationCommandLoader =
+	getNavigationCommandLoaderPerPostType( 'wp_template_part' );
 
 export function useNavigationCommands() {
 	useCommandLoader( {
-		name: 'core/edit-site/navigate',
+		name: 'core/edit-site/navigate-pages',
 		group: __( 'Pages' ),
-		hook: useNavigationCommandLoader,
+		hook: usePageNavigationCommandLoader,
+	} );
+	useCommandLoader( {
+		name: 'core/edit-site/navigate-posts',
+		group: __( 'Posts' ),
+		hook: usePostNavigationCommandLoader,
+	} );
+	useCommandLoader( {
+		name: 'core/edit-site/navigate-templates',
+		group: __( 'Templates' ),
+		hook: useTemplateNavigationCommandLoader,
+	} );
+	useCommandLoader( {
+		name: 'core/edit-site/navigate-template-parts',
+		group: __( 'Template Parts' ),
+		hook: useTemplatePartNavigationCommandLoader,
 	} );
 }
