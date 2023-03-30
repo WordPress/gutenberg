@@ -20,13 +20,13 @@ class WP_Navigation_Fallbacks_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertInstanceOf( 'WP_Post', $data );
 
-		$this->assertEquals( 'wp_navigation', $data->post_type, 'Fallback menu type should be `wp_navigation`' );
+		$this->assertSame( 'wp_navigation', $data->post_type, 'Fallback menu type should be `wp_navigation`' );
 
-		$this->assertEquals( 'Navigation', $data->post_title, 'Fallback menu title should be the default fallback title' );
+		$this->assertSame( 'Navigation', $data->post_title, 'Fallback menu title should be the default fallback title' );
 
-		$this->assertEquals( 'navigation', $data->post_name, 'Fallback menu slug (post_name) should be the default slug' );
+		$this->assertSame( 'navigation', $data->post_name, 'Fallback menu slug (post_name) should be the default slug' );
 
-		$this->assertEquals( '<!-- wp:page-list /-->', $data->post_content );
+		$this->assertSame( '<!-- wp:page-list /-->', $data->post_content );
 
 		$navs_in_db = $this->get_navigations_in_database();
 
