@@ -299,7 +299,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const id = useInstanceId( BlockListBlock );
 
-		const { duotoneSelector, duotoneSupport } = useMemo( () => {
+		const { selector, support } = useMemo( () => {
 			const blockType = getBlockType( props.name );
 			let duotoneSupport = false;
 			let duotoneSelector = null;
@@ -330,15 +330,14 @@ const withDuotoneStyles = createHigherOrderComponent(
 						scopeSelector( rootSelector, duotoneSupport );
 				}
 			}
-			return { duotoneSelector, duotoneSupport };
+			return { selector: duotoneSelector, support: duotoneSupport };
 		}, [ props.name ] );
 
-		const duotoneAttribute = props?.attributes?.style?.color?.duotone;
+		const attribute = props?.attributes?.style?.color?.duotone;
 
 		const filterClass = `wp-duotone-${ id }`;
 
-		const shouldRender =
-			duotoneSupport && duotoneSelector && duotoneAttribute;
+		const shouldRender = support && selector && attribute;
 
 		const className = shouldRender
 			? classnames( props?.className, filterClass )
@@ -353,8 +352,8 @@ const withDuotoneStyles = createHigherOrderComponent(
 				{ shouldRender && (
 					<DuotoneStyles
 						id={ filterClass }
-						selector={ duotoneSelector }
-						attribute={ duotoneAttribute }
+						selector={ selector }
+						attribute={ attribute }
 					/>
 				) }
 				<BlockListBlock { ...props } className={ className } />

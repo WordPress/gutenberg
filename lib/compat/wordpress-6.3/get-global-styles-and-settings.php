@@ -25,7 +25,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 
 		$has_selectors = ! empty( $block_type->selectors );
 
-		// Root Selector ( May be used as a fallback ).
+		// Root Selector.
 
 		// Calculated before returning as it can be used as fallback for
 		// feature selectors later on.

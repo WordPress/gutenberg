@@ -34,7 +34,8 @@ export function getBlockCSSSelector(
 	const hasSelectors = ! isEmpty( selectors );
 	const path = Array.isArray( target ) ? target.join( '.' ) : target;
 
-	// Root selector ( may be used as fallback ).
+	// Root selector.
+
 	// Calculated before returning as it can be used as a fallback for feature
 	// selectors later on.
 	let rootSelector = null;
