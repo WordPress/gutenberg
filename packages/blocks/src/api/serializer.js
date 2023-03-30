@@ -225,6 +225,11 @@ export function getCommentAttributes( blockType, attributes ) {
 				return accumulator;
 			}
 
+			// Ignore internal attributes.
+			if ( attributeSchema.internal ) {
+				return accumulator;
+			}
+
 			// Ignore default value.
 			if (
 				'default' in attributeSchema &&

@@ -261,6 +261,10 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 
 	return Object.entries( blockType.attributes ).reduce(
 		( accumulator, [ key, schema ] ) => {
+			if ( schema.internal ) {
+				return accumulator;
+			}
+
 			const value = attributes[ key ];
 
 			if ( undefined !== value ) {

@@ -315,22 +315,48 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 		__unstableMarkLastChangeAsPersistent,
 		moveBlocksToPosition,
 		removeBlock,
+		__unstableMarkNextChangeAsNotPersistent,
 	} = dispatch( blockEditorStore );
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
-		setAttributes( newAttributes ) {
+		setAttributes( attributes ) {
 			const { getMultiSelectedBlockClientIds } =
 				registry.select( blockEditorStore );
 			const multiSelectedBlockClientIds =
 				getMultiSelectedBlockClientIds();
-			const { clientId } = ownProps;
+			const { clientId, name } = ownProps;
 			const clientIds = multiSelectedBlockClientIds.length
 				? multiSelectedBlockClientIds
 				: [ clientId ];
 
-			updateBlockAttributes( clientIds, newAttributes );
+			const blockType = getBlockType( name );
+
+			const internalKeys = new Set();
+			for ( const key in blockType.attributes ) {
+				if ( blockType.attributes[ key ].internal ) {
+					internalKeys.add( key );
+				}
+			}
+
+			const internalAttributes = {};
+			const nonInternalAttributes = {};
+			for ( const key in attributes ) {
+				if ( internalKeys.has( key ) ) {
+					internalAttributes[ key ] = attributes[ key ];
+				} else {
+					nonInternalAttributes[ key ] = attributes[ key ];
+				}
+			}
+
+			if ( Object.keys( internalAttributes ).length ) {
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes( clientId, internalAttributes );
+			}
+			if ( Object.keys( nonInternalAttributes ).length ) {
+				updateBlockAttributes( clientIds, nonInternalAttributes );
+			}
 		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;
