@@ -632,69 +632,85 @@ add_filter(
 
 // We'd like to do some custom handling without attribute parsing.
 // To do: maybe only add this shortcode for the_content filter?
-add_shortcode( '#', function( $attr, $content, $tag ) {
-	return $content;
-} );
+add_shortcode(
+	'#',
+	function( $attr, $content ) {
+		return $content;
+	}
+);
 
 $GLOBALS['notes'] = array();
 
-add_filter( 'do_shortcode_tag' , function( $output, $tag, $attr, $m ) {
-	if ( $tag !== '#' ) {
-		return $output;
-	}
+add_filter(
+	'do_shortcode_tag',
+	function( $output, $tag, $attr, $m ) {
+		if ( $tag !== '#' ) {
+			return $output;
+		}
 
-	// $m is the match:
-	// $m[0] is the full match.
-	// $m[1] is to check shortcode escaping.
-	// $m[2] is the shortcode name.
-	// $m[3] is the contents within the shortcode after the name. This includes
-	// the space between the name and the contents.
-	$note = $m[3];
-	$id = md5( $m[3] );
+		// $m is the match:
+		// $m[0] is the full match.
+		// $m[1] is to check shortcode escaping.
+		// $m[2] is the shortcode name.
+		// $m[3] is the contents within the shortcode after the name. This includes
+		// the space between the name and the contents.
+		$note = $m[3];
+		$id   = md5( $m[3] );
 
-	if ( isset( $GLOBALS['notes'][ $id ] ) ) {
-		$GLOBALS['notes'][ $id ][ 'count' ] += 1;
-	} else {
-		$GLOBALS['notes'][ $id ] = array( 'note' => $note, 'count' => 1 );
-	}
+		if ( isset( $GLOBALS['notes'][ $id ] ) ) {
+			$GLOBALS['notes'][$id]['count'] += 1;
+		} else {
+			$GLOBALS['notes'][$id] = array( 'note' => $note, 'count' => 1 );
+		}
 
-	// List starts at 1. If the note already exists, use the existing index.
-	$index = 1 + array_search( $id, array_keys( $GLOBALS['notes'] ) );
-	$count = $GLOBALS['notes'][ $id ][ 'count' ];
+		// List starts at 1. If the note already exists, use the existing index.
+		$index = 1 + array_search( $id, array_keys( $GLOBALS['notes'] ), true );
+		$count = $GLOBALS['notes'][$id]['count'];
 
-	return (
-		'<sup><a class="note-link" href="#' . $id . '" id="' . $id . '-link-' . $count . '">[' . $index . ']</a></sup>'
-	);
-}, 10, 4 );
+		return (
+			'<sup><a class="note-link" href="#' . $id . '" id="' . $id . '-link-' . $count . '">[' . $index . ']</a></sup>'
+		);
+	},
+	10,
+	4
+);
 
 $shortcodes_priority = 10;
 
 // To do: make it work with pagination, excerpt.
-add_filter( 'the_content', function( $content ) {
-	$notes = $GLOBALS['notes'];
+add_filter(
+	'the_content',
+	function( $content ) {
+		$notes = $GLOBALS['notes'];
 
-	if ( empty( $notes ) ) {
-		return $content;
-	}
-
-	$list = '<ol>';
-
-	foreach ( $notes as $id => $info ) {
-		$note = $info['note'];
-		$count = $info['count'];
-		$list .= '<li id="' . $id . '">';
-		$list .= $note;
-		$label = $count > 1 ? __( 'Back to content (%s)', 'gutenberg' ) : __( 'Back to content', 'gutenberg' );
-		$links = '';
-		while ($count) {
-			$links = '<a href="#' . $id . '-link-' . $count . '" aria-label="' . sprintf( $label, $count ) . '">↩︎</a>' . $links;
-			$count--;
+		if ( empty( $notes ) ) {
+			return $content;
 		}
-		$list .= $links;
-		$list .= '</li>';
-	}
 
-	$list .= '</ol>';
+		$list = '<ol>';
 
-	return $content . $list;
-}, $shortcodes_priority + 1, 1 );
+		foreach ( $notes as $id => $info ) {
+			$note  = $info['note'];
+			$count = $info['count'];
+			$list .= '<li id="' . $id . '">';
+			$list .= $note;
+			$label = $count > 1 ?
+				/* translators: %s: footnote occurrence */
+				__( 'Back to content (%s)', 'gutenberg' ) :
+				__( 'Back to content', 'gutenberg' );
+			$links = '';
+			while ($count) {
+				$links = '<a href="#' . $id . '-link-' . $count . '" aria-label="' . sprintf( $label, $count ) . '">↩︎</a>' . $links;
+				$count--;
+			}
+			$list .= $links;
+			$list .= '</li>';
+		}
+
+		$list .= '</ol>';
+
+		return $content . $list;
+	},
+	$shortcodes_priority + 1,
+	1
+);
