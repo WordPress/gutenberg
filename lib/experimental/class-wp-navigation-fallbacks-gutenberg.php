@@ -76,7 +76,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	 */
 	public static function create_classic_menu_fallback() {
 		// See if we have a classic menu.
-		$classic_nav_menu = static::get_classic_menu_fallback();
+		$classic_nav_menu = static::get_fallback_classic_menu();
 
 		if ( ! $classic_nav_menu ) {
 			return new WP_Error( 'no_classic_menus', 'No Classic Menus found.' );
@@ -112,7 +112,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 	 *
 	 * @return object WP_Term The classic navigation.
 	 */
-	public static function get_classic_menu_fallback() {
+	public static function get_fallback_classic_menu() {
 		$classic_nav_menus = wp_get_nav_menus();
 
 		if ( ! $classic_nav_menus || is_wp_error( $classic_nav_menus ) ) {
