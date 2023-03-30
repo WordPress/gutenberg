@@ -24,21 +24,33 @@ const props = {
 
 describe( 'ToolTip', () => {
 	it( 'should not render the tooltip if multiple children are passed', async () => {
-		expect( () =>
+		const user = userEvent.setup();
+		// mock expected console error
+		const err = jest
+			.spyOn( console, 'error' )
+			.mockImplementation( () => {} );
+
+		expect( () => {
 			render(
-				// expected error since Tooltip cannot have more than one child element
+				// expected TS error since Tooltip cannot have more than one child element
 				// @ts-expect-error
 				<ToolTip { ...props }>
 					<Button>This is a button</Button>
 					<Button>This is another button</Button>
 				</ToolTip>
-			)
-		).toThrow();
+			);
+		} ).toThrow();
 
 		expect( console ).toHaveErrored();
+		expect( err ).toHaveBeenCalled();
+
+		await user.tab();
+
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
+
+		err.mockReset();
 	} );
 
 	it( 'should not render the tooltip if there is no focus', () => {
@@ -75,13 +87,6 @@ describe( 'ToolTip', () => {
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
-
-		// Wait for the tooltip element to be positioned (aligned with the button)
-		// await waitFor( () =>
-		// 	expect(
-		// 		getWrappingPopoverElement( screen.getByText( 'tooltip text' ) )
-		// 	).toBePositionedPopover()
-		// );
 	} );
 
 	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
@@ -98,13 +103,6 @@ describe( 'ToolTip', () => {
 				screen.getByRole( 'tooltip', { name: /tooltip text/i } )
 			).toBeVisible()
 		);
-
-		// Wait for the tooltip element to be positioned (aligned with the button)
-		// await waitFor( () =>
-		// 	expect(
-		// 		getWrappingPopoverElement( screen.getByText( 'tooltip text' ) )
-		// 	).toBePositionedPopover()
-		// );
 
 		await user.unhover( button );
 
@@ -150,16 +148,9 @@ describe( 'ToolTip', () => {
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
-
-		// Wait for the tooltip element to be positioned (aligned with the button)
-		// await waitFor( () =>
-		// 	expect(
-		// 		getWrappingPopoverElement( screen.getByText( 'tooltip text' ) )
-		// 	).toBePositionedPopover()
-		// );
 	} );
 
-	it( 'should show tooltip when an element is aria-disabled', async () => {
+	it( 'should show tooltip when an element is disabled', async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -171,7 +162,7 @@ describe( 'ToolTip', () => {
 		const button = screen.getByRole( 'button', { name: /Button/i } );
 
 		expect( button ).toBeVisible();
-		//expect( button ).toBeDisabled();
+		expect( button ).toHaveAttribute( 'aria-disabled' );
 
 		await user.hover( button );
 
@@ -186,13 +177,6 @@ describe( 'ToolTip', () => {
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
-
-		// Wait for the tooltip element to be positioned (aligned with the button)
-		// await waitFor( () =>
-		// 	expect(
-		// 		getWrappingPopoverElement( screen.getByText( 'tooltip text' ) )
-		// 	).toBePositionedPopover()
-		// );
 	} );
 
 	it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
@@ -279,13 +263,6 @@ describe( 'ToolTip', () => {
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
-
-		// Wait for the tooltip element to be positioned (aligned with the button)
-		// await waitFor( () =>
-		// 	expect(
-		// 		getWrappingPopoverElement( screen.getByText( 'shortcut text' ) )
-		// 	).toBePositionedPopover()
-		// );
 	} );
 
 	it( 'should render the keyboard shortcut display text and aria-label when an object is passed as the shortcut', async () => {
@@ -319,12 +296,5 @@ describe( 'ToolTip', () => {
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
-
-		// Wait for the tooltip element to be positioned (aligned with the button)
-		// await waitFor( () =>
-		// 	expect(
-		// 		getWrappingPopoverElement( screen.getByText( 'shortcut text' ) )
-		// 	).toBePositionedPopover()
-		// );
 	} );
 } );

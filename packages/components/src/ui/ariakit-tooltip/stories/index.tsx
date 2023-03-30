@@ -73,7 +73,7 @@ Default.args = {
 
 export const KeyboardShortcut = Template.bind( {} );
 KeyboardShortcut.args = {
-	children: <div>Keyboard shortcut</div>,
+	children: <button>Keyboard shortcut</button>,
 	shortcut: {
 		display: '⇧⌘,',
 		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),

@@ -2,12 +2,17 @@
  * External dependencies
  */
 import type { TooltipStateProps } from 'ariakit/tooltip';
+/**
+ * Internal dependencies
+ */
+import type { PopoverProps } from '../../popover/types';
+import type { ShortcutProps } from '../shortcut';
 
-export type ToolTipProps = Pick< TooltipStateProps, 'placement' > & {
+export type ToolTipProps = {
 	/**
 	 * The anchor for the tooltip. Accepts only one child element.
 	 */
-	children: JSX.Element;
+	children: React.ReactElement | string;
 	/**
 	 * The amount of time in milliseconds to wait before showing the tooltip.
 	 *
@@ -17,21 +22,21 @@ export type ToolTipProps = Pick< TooltipStateProps, 'placement' > & {
 	/**
 	 * Where the tooltip should be positioned relative to its parent.
 	 *
-	 * @default
+	 * @default bottom
 	 */
-	placement?: any; //Placement | undefinded;
+	placement?: TooltipStateProps[ 'placement' ];
 	/**
 	 * _Note: this prop is deprecated. Please use the `placement` prop instead._
 	 *
 	 * Legacy way of specifying the tooltip's position relative to its parent.
 	 *
-	 * @default top center
+	 * @deprecated
 	 */
-	position?: string;
+	position?: PopoverProps[ 'position' ];
 	/**
 	 * Option for adding accessible keyboard shortcuts.
 	 */
-	shortcut?: string | { display: string; ariaLabel: string };
+	shortcut?: ShortcutProps[ 'shortcut' ];
 	/**
 	 * The text shown in the tooltip when anchor element is focused or hovered.
 	 */
