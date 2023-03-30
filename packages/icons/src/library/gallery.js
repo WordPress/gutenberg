@@ -12,5 +12,4 @@ export const gallery = (
 		/>
 	</SVG>
 );
-
 export default gallery;
