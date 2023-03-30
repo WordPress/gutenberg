@@ -228,6 +228,11 @@ When the block declares support for `color.background`, the attributes definitio
   }
   ```
 
+### color.__experimentalDuotone
+
+_**Note:** Deprecated since WordPress 6.3._
+
+This property has been replaced by [`filter.duotone`](#filter-duotone). 
 
 ### color.gradients
 
