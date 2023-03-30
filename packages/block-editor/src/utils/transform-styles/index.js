@@ -27,7 +27,7 @@ const transformStyles = ( styles, wrapperClassName = '' ) => {
 			transforms.push( urlRewrite( baseURL ) );
 		}
 		if ( transforms.length ) {
-			return traverse( styles, compose( transforms ) );
+			return traverse( css, compose( transforms ) );
 		}
 
 		return css;
