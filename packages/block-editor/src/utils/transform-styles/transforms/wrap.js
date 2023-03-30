@@ -7,36 +7,33 @@ import CSSwhat from 'css-what';
  * Internal dependencies
  */
 import {
-	createWrapperSelectorAst,
 	cssSelectorAstInArray,
+	createWrapperSelectorAst,
 } from '../parse/ast.js';
 
-function recursivelyWrapRules(
-	cssRules,
-	wrapperSelectorAst,
-	ignoreSelectorsAsts
-) {
-	for ( const cssRule of cssRules ) {
-		if ( cssRule.cssRules ) {
-			recursivelyWrapRules(
-				cssRule.cssRules,
-				wrapperSelectorAst,
-				ignoreSelectorsAsts
-			);
-		}
-
-		if ( ! cssRule.selectorText ) {
-			continue;
-		}
-		wrapRule( cssRule, wrapperSelectorAst, ignoreSelectorsAsts );
+/**
+ * Creates a callback to modify selectors so they only apply within a certain
+ * namespace.
+ *
+ * @param {string}   namespace Namespace to prefix selectors with.
+ * @param {string[]} ignore    Selectors to not prefix.
+ *
+ * @return {(cssstyleSheet: CSSStyleSheet) => Object} Callback to wrap selectors.
+ */
+const wrap = ( namespace, ignore ) => ( cssRule ) => {
+	if ( ! cssRule.selectorText ) {
+		return cssRule;
 	}
-}
 
-function wrapRule( cssRule, wrapperSelectorAst, ignoreSelectorsAsts ) {
+	const wrapperSelectorAst = createWrapperSelectorAst( namespace ); // (double-nested)
+	const ignoreSelectorsAsts = ignore.map( ( ignoredSelector ) =>
+		CSSwhat.parse( ignoredSelector )
+	);
+
 	const cssSelectorsAst = CSSwhat.parse( cssRule.selectorText );
 
-	// exclude ignored selectors
-	// @TODO
+	/* if(firstCssSelector.type === 'attribute' ||
+		  firstCssSelector.name === 'class'     ||) */
 
 	// all selectors (`,`)
 	const newCssSelectorsAst = [];
@@ -57,28 +54,6 @@ function wrapRule( cssRule, wrapperSelectorAst, ignoreSelectorsAsts ) {
 
 	const newCssSelectorStr = CSSwhat.stringify( newCssSelectorsAst );
 	cssRule.selectorText = newCssSelectorStr;
-}
-
-/**
- * Creates a callback to modify selectors so they only apply within a certain
- * namespace.
- *
- * @param {string}   namespace Namespace to prefix selectors with.
- * @param {string[]} ignore    Selectors to not prefix.
- *
- * @return {(cssstyleSheet: CSSStyleSheet) => Object} Callback to wrap selectors.
- */
-const wrap =
-	( namespace, ignore = [] ) =>
-	( cssstyleSheet ) => {
-		const wrapperSelectorAst = createWrapperSelectorAst( namespace ); // (double-nested selector AST)
-		const ignoreSelectorsAsts = ignore.map( createWrapperSelectorAst );
-
-		recursivelyWrapRules(
-			cssstyleSheet.cssRules,
-			wrapperSelectorAst,
-			ignoreSelectorsAsts
-		);
-	};
+};
 
 export default wrap;

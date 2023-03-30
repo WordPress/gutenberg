@@ -17,4 +17,14 @@ function createWrapperSelectorAst( wrapperSelectorCss ) {
 	return wrapperSelectorAst;
 }
 
-export { cssSelectorAstInArray, createWrapperSelectorAst };
+function recurseCssRules( cssRule, callback ) {
+	if ( ! cssRule.cssRules ) {
+		return;
+	}
+	for ( const subCssRule of cssRule.cssRules ) {
+		callback( subCssRule );
+		recurseCssRules( subCssRule, callback );
+	}
+}
+
+export { cssSelectorAstInArray, createWrapperSelectorAst, recurseCssRules };
