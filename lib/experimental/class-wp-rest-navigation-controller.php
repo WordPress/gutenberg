@@ -59,7 +59,7 @@ class WP_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 			);
 		}
 
-		// Gettting fallbacks requires reading `wp_navigation` posts.
+		// Getting fallbacks requires reading `wp_navigation` posts.
 		return $this->check_has_read_only_access( $request, $post_type );
 	}
 
