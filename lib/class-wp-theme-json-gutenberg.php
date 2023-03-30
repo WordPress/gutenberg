@@ -874,9 +874,12 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Keep backwards compatibility for support.color.__experimentalDuotone.
 			if ( null === $duotone_selector ) {
-				$duotone_support  = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
-				$root_selector    = wp_get_block_css_selector( $block_type, 'root' );
-				$duotone_selector = WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_support );
+				$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null );
+
+				if ( $duotone_support ) {
+					$root_selector    = wp_get_block_css_selector( $block_type );
+					$duotone_selector = WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_support );
+				}
 			}
 
 			if ( null !== $duotone_selector ) {

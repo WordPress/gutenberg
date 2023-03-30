@@ -278,13 +278,15 @@ class WP_Duotone_Gutenberg {
 		$duotone_selector = null;
 
 		if ( $block_type && property_exists( $block_type, 'supports' ) ) {
+			// Support flag `filter.duotone` will be populated from the previous
+			// `color.__experimentalDuotone` support via block_type_metadata_settings filter.
 			$duotone_support  = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), false );
-			$duotone_selector = wp_get_block_css_selector( $block_type, array( 'filter', 'duotone' ), true );
+			$duotone_selector = wp_get_block_css_selector( $block_type, array( 'filter', 'duotone' ) );
 
 			// Keep backwards compatibility for support.color.__experimentalDuotone.
-			if ( ! $duotone_support || ! $duotone_selector ) {
+			if ( $duotone_support && ! $duotone_selector ) {
 				$duotone_support  = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
-				$root_selector    = wp_get_block_css_selector( $block_type, 'root' );
+				$root_selector    = wp_get_block_css_selector( $block_type );
 				$duotone_selector = WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_support );
 			}
 		}

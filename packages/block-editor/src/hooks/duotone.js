@@ -168,7 +168,9 @@ function DuotonePanel( { attributes, setAttributes } ) {
  * @return {Object} Filtered block settings.
  */
 function addDuotoneAttributes( settings ) {
-	if ( ! hasBlockSupport( settings, 'color.__experimentalDuotone' ) ) {
+	// Previous `color.__experimentalDuotone` support flag is migrated via
+	// block_type_metadata_settings filter in `lib/block-supports/duotone.php`.
+	if ( ! hasBlockSupport( settings, 'filter.duotone' ) ) {
 		return settings;
 	}
 
@@ -195,10 +197,13 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		// Previous `color.__experimentalDuotone` support flag is migrated via
+		// block_type_metadata_settings filter in `lib/block-supports/duotone.php`.
 		const hasDuotoneSupport = hasBlockSupport(
 			props.name,
-			'color.__experimentalDuotone'
+			'filter.duotone'
 		);
+
 		const isContentLocked = useSelect(
 			( select ) => {
 				return select(
@@ -319,10 +324,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 					{ fallback: true }
 				);
 				if ( ! duotoneSelector || ! duotoneSupport ) {
-					const rootSelector = getBlockCSSSelector(
-						blockType,
-						'root'
-					);
+					const rootSelector = getBlockCSSSelector( blockType );
 					duotoneSupport = getBlockSupport(
 						blockType,
 						'color.__experimentalDuotone',

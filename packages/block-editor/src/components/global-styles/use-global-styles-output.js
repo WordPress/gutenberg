@@ -1002,7 +1002,7 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
-		const selector = getBlockCSSSelector( blockType, 'root' );
+		const selector = getBlockCSSSelector( blockType );
 		let duotoneSelector = getBlockCSSSelector(
 			blockType,
 			'filter.duotone'
@@ -1010,7 +1010,7 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 
 		// Keep backwards compatibility for support.color.__experimentalDuotone.
 		if ( ! duotoneSelector ) {
-			const rootSelector = getBlockCSSSelector( blockType, 'root' );
+			const rootSelector = getBlockCSSSelector( blockType );
 			const duotoneSupport = getBlockSupport(
 				blockType,
 				'color.__experimentalDuotone',
