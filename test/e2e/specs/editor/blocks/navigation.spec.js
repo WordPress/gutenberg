@@ -319,6 +319,14 @@ test.describe( 'Navigation block', () => {
 } );
 
 test.describe( 'List view editing', () => {
+	const navMenuBlocksFixture = {
+		title: 'Test Menu',
+		content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
+			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
+				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
+			<!-- /wp:navigation-submenu -->`,
+	};
+
 	test( 'show a list view in the inspector controls', async ( {
 		admin,
 		page,
@@ -326,13 +334,7 @@ test.describe( 'List view editing', () => {
 		requestUtils,
 	} ) => {
 		await admin.createNewPost();
-		await requestUtils.createNavigationMenu( {
-			title: 'Test Menu',
-			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
-			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
-				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
-			<!-- /wp:navigation-submenu -->`,
-		} );
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		await editor.insertBlock( { name: 'core/navigation' } );
 
@@ -371,13 +373,7 @@ test.describe( 'List view editing', () => {
 		requestUtils,
 	} ) => {
 		await admin.createNewPost();
-		await requestUtils.createNavigationMenu( {
-			title: 'Test Menu',
-			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
-			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
-				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
-			<!-- /wp:navigation-submenu -->`,
-		} );
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		await editor.insertBlock( { name: 'core/navigation' } );
 
@@ -430,13 +426,7 @@ test.describe( 'List view editing', () => {
 		requestUtils,
 	} ) => {
 		await admin.createNewPost();
-		await requestUtils.createNavigationMenu( {
-			title: 'Test Menu',
-			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
-			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
-				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
-			<!-- /wp:navigation-submenu -->`,
-		} );
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		await editor.insertBlock( { name: 'core/navigation' } );
 
@@ -522,13 +512,7 @@ test.describe( 'List view editing', () => {
 		requestUtils,
 	} ) => {
 		await admin.createNewPost();
-		await requestUtils.createNavigationMenu( {
-			title: 'Test Menu',
-			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
-			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
-				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
-			<!-- /wp:navigation-submenu -->`,
-		} );
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		await editor.insertBlock( { name: 'core/navigation' } );
 
@@ -597,13 +581,7 @@ test.describe( 'List view editing', () => {
 		requestUtils,
 	} ) => {
 		await admin.createNewPost();
-		await requestUtils.createNavigationMenu( {
-			title: 'Test Menu',
-			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
-			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
-				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
-			<!-- /wp:navigation-submenu -->`,
-		} );
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		await editor.insertBlock( { name: 'core/navigation' } );
 
@@ -673,13 +651,7 @@ test.describe( 'List view editing', () => {
 		requestUtils,
 	} ) => {
 		await admin.createNewPost();
-		await requestUtils.createNavigationMenu( {
-			title: 'Test Menu',
-			content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
-			<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} -->
-				<!-- wp:navigation-link {"label":"Test Submenu Item","type":"page","id":270,"url":"http://localhost:8888/et-aspernatur-recusandae-non-sint/","kind":"post-type"} /-->
-			<!-- /wp:navigation-submenu -->`,
-		} );
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
 		await editor.insertBlock( { name: 'core/navigation' } );
 
