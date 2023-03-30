@@ -312,9 +312,11 @@ async function runPerformanceTests( refs, options ) {
 
 	log( '\n>> Setting up the environment\n' );
 
+	const testRefs = [ currentRef, ...refs ];
+
 	// Run plugin builds in parallel.
 	await Promise.all(
-		[ currentRef, ...refs ].map( async ( ref, i ) => {
+		testRefs.map( async ( ref, i ) => {
 			// @ts-ignore
 			const l = ( msg ) => log( `>> ${ CHALKS[ i ]( ref ) }: ${ msg }` );
 
@@ -443,13 +445,13 @@ async function runPerformanceTests( refs, options ) {
 
 			log( `\n>> Suite: ${ CHALKS[ 2 ]( testSuite ) } (${ roundInfo })` );
 
-			for ( const ref of refs ) {
+			for ( const ref of testRefs ) {
 				const sanitizedBranch = sanitizeBranchName( ref );
 				const runKey = `${ testSuite }_${ sanitizedBranch }_run-${ i }`;
 				// @ts-ignore
 				const envDir = path.join(
 					rootDir,
-					`test-env-${ refs.indexOf( ref ) }`
+					`test-env-${ testRefs.indexOf( ref ) }`
 				);
 
 				log( `  >> ref: ${ CHALKS[ 3 ]( ref ) }` );
@@ -467,7 +469,7 @@ async function runPerformanceTests( refs, options ) {
 		}
 
 		// Computing medians.
-		for ( const ref of refs ) {
+		for ( const ref of testRefs ) {
 			/**
 			 * @type {string[]}
 			 */
@@ -493,6 +495,8 @@ async function runPerformanceTests( refs, options ) {
 
 	log( '' );
 	console.timeEnd( 'Tests duration' );
+
+	// TODO: Clean up the env
 
 	// Formatting the results.
 	log( '\n>> 🎉 Results.\n' );
