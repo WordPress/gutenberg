@@ -24,7 +24,7 @@ function SiteIcon( { className } ) {
 	}, [] );
 
 	if ( isRequestingSite && ! siteIconUrl ) {
-		return null;
+		return <div className="edit-site-site-icon__image" />;
 	}
 
 	const icon = siteIconUrl ? (
