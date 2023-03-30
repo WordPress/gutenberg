@@ -522,7 +522,6 @@ test.describe( 'List view editing', () => {
 			description: 'Structure for navigation menu: Test Menu',
 		} );
 
-		// The options menu button is a sibling of the menu item gridcell.
 		const submenuOptions = listView.getByRole( 'button', {
 			name: 'Options for Submenu block',
 		} );
