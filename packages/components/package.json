@@ -28,6 +28,7 @@
 		"build-style/**",
 		"src/**/*.scss"
 	],
+	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@emotion/cache": "^11.7.1",
