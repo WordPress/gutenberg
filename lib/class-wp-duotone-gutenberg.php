@@ -266,9 +266,9 @@ class WP_Duotone_Gutenberg {
 
 	/**
 	 * Get the CSS selector for a block type.
-	 * 
+	 *
 	 * @param string $block_name The block name.
-	 * 
+	 *
 	 * @return string The CSS selector or null if there is no support.
 	 */
 	private static function get_selector( $block_name ) {
