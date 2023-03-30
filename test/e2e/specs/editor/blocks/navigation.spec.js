@@ -338,11 +338,11 @@ test.describe( 'List view editing', () => {
 
 		await editor.openDocumentSettingsSidebar();
 
-		const listViewTab = page.getByRole( 'tab', {
-			name: 'List View',
-		} );
-
-		await listViewTab.click();
+		await expect(
+			page.getByRole( 'tab', {
+				name: 'List View',
+			} )
+		).toBeVisible();
 
 		const listViewPanel = page.getByRole( 'tabpanel', {
 			name: 'List View',
@@ -382,12 +382,6 @@ test.describe( 'List view editing', () => {
 		await editor.insertBlock( { name: 'core/navigation' } );
 
 		await editor.openDocumentSettingsSidebar();
-
-		const listViewTab = page.getByRole( 'tab', {
-			name: 'List View',
-		} );
-
-		await listViewTab.click();
 
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
@@ -447,12 +441,6 @@ test.describe( 'List view editing', () => {
 		await editor.insertBlock( { name: 'core/navigation' } );
 
 		await editor.openDocumentSettingsSidebar();
-
-		const listViewTab = page.getByRole( 'tab', {
-			name: 'List View',
-		} );
-
-		await listViewTab.click();
 
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
@@ -546,12 +534,6 @@ test.describe( 'List view editing', () => {
 
 		await editor.openDocumentSettingsSidebar();
 
-		const listViewTab = page.getByRole( 'tab', {
-			name: 'List View',
-		} );
-
-		await listViewTab.click();
-
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 			description: 'Structure for navigation menu: Test Menu',
@@ -626,12 +608,6 @@ test.describe( 'List view editing', () => {
 		await editor.insertBlock( { name: 'core/navigation' } );
 
 		await editor.openDocumentSettingsSidebar();
-
-		const listViewTab = page.getByRole( 'tab', {
-			name: 'List View',
-		} );
-
-		await listViewTab.click();
 
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
@@ -708,12 +684,6 @@ test.describe( 'List view editing', () => {
 		await editor.insertBlock( { name: 'core/navigation' } );
 
 		await editor.openDocumentSettingsSidebar();
-
-		const listViewTab = page.getByRole( 'tab', {
-			name: 'List View',
-		} );
-
-		await listViewTab.click();
 
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
