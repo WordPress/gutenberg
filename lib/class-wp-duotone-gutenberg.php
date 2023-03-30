@@ -419,4 +419,23 @@ class WP_Duotone_Gutenberg {
 
 		return $tags->get_updated_html();
 	}
+
+	/**
+	 * Migrate the old experimental duotone support flag to its stabilized location
+	 * under `supports.filter.duotone` and sets.
+	 *
+	 * @param array $settings Current block type settings.
+	 * @param array $metadata Block metadata as read in via block.json.
+	 *
+	 * @return array Filtered block type settings.
+	 */
+	public static function migrate_experimental_duotone_support_flag( $settings, $metadata ) {
+		$duotone_support = _wp_array_get( $metadata, array( 'supports', 'color', '__experimentalDuotone' ), null );
+
+		if ( ! isset( $settings['supports']['filter']['duotone'] ) && null !== $duotone_support ) {
+			_wp_array_set( $settings, array( 'supports', 'filter', 'duotone' ), (bool) $duotone_support );
+		}
+
+		return $settings;
+	}
 }

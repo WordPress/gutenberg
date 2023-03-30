@@ -436,25 +436,6 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	return WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block );
 }
 
-/**
- * Migrate the old experimental duotone support flag to its stabilized location
- * under `supports.filter.duotone` and sets.
- *
- * @param array $settings Current block type settings.
- * @param array $metadata Block metadata as read in via block.json.
- *
- * @return array Filtered block type settings.
- */
-function gutenberg_migrate_experimental_duotone_support_flag( $settings, $metadata ) {
-	$duotone_support = _wp_array_get( $metadata, array( 'supports', 'color', '__experimentalDuotone' ), null );
-
-	if ( ! isset( $settings['supports']['filter']['duotone'] ) && null !== $duotone_support ) {
-		_wp_array_set( $settings, array( 'supports', 'filter', 'duotone' ), (bool) $duotone_support );
-	}
-
-	return $settings;
-}
-
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
 	'duotone',
@@ -471,4 +452,4 @@ add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_suppo
 add_action( 'wp_enqueue_scripts', array( 'WP_Duotone_Gutenberg', 'output_global_styles' ), 11 );
 add_action( 'wp_footer', array( 'WP_Duotone_Gutenberg', 'output_footer_assets' ), 10 );
 add_filter( 'block_editor_settings_all', array( 'WP_Duotone_Gutenberg', 'add_editor_settings' ), 10 );
-add_filter( 'block_type_metadata_settings', 'gutenberg_migrate_experimental_duotone_support_flag', 10, 2 );
+add_filter( 'block_type_metadata_settings', array( 'WP_Duotone_Gutenberg', 'migrate_experimental_duotone_support_flag' ), 10, 2 );
