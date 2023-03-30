@@ -4,11 +4,8 @@
 import CSSValueParser from 'postcss-value-parser';
 
 const rewrite = ( rootUrl ) => ( cssRule ) => {
-	if (
-		! cssRule.style ||
-		typeof cssRule.style !== 'object' ||
-		cssRule.style.length === 0
-	) {
+	// eslint-disable-next-line no-undef
+	if ( cssRule instanceof CSSStyleRule || ! cssRule.style ) {
 		return cssRule;
 	}
 
