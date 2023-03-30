@@ -19,6 +19,7 @@ import { store as blockEditorStore } from '../../store';
 import { updateAttributes } from './update-attributes';
 import { LinkUI } from './link-ui';
 import { useInsertedBlock } from './use-inserted-block';
+import { useListViewContext } from './context';
 
 const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
@@ -90,6 +91,8 @@ const ListViewBlockContents = forwardRef(
 			hasExistingLinkValue,
 		] );
 
+		const { renderAdditionalBlockUI } = useListViewContext();
+
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
 
@@ -107,6 +110,7 @@ const ListViewBlockContents = forwardRef(
 
 		return (
 			<>
+				{ renderAdditionalBlockUI && renderAdditionalBlockUI( block ) }
 				{ isLinkUIOpen && (
 					<LinkUI
 						clientId={ lastInsertedBlockClientId }
