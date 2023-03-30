@@ -364,7 +364,9 @@ class WP_Duotone_Gutenberg {
 
 		$selectors_scoped = array();
 		foreach ( $selectors as $selector_part ) {
-			// The selector part should always begin with the block's class, so we can safely just prepend the filter id class.
+			// Assuming the selector part is a subclass selector (not a tag name)
+			// so we can prepend the filter id class. If we want to support elements
+			// such as `img` or namespaces, we'll need to add a case for that here.
 			$selectors_scoped[] = '.' . $filter_id . trim( $selector_part );
 		}
 
