@@ -275,9 +275,11 @@ function DuotoneStyles( {
 
 	const selector = selectorsScoped.join( ', ' );
 
+	const isValidFilter = Array.isArray( colors ) || colors === 'unset';
+
 	return (
 		element &&
-		Array.isArray( colors ) &&
+		isValidFilter &&
 		createPortal(
 			<InlineDuotone
 				selector={ selector }
