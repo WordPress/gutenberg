@@ -32,7 +32,7 @@ class WP_Nav_Menu_Conversion {
 	/**
 	 * Converts a Classic Menu to blocks.
 	 *
-	 * @return array the serialized and normalized parsed blocks.
+	 * @return string the serialized and normalized parsed blocks.
 	 */
 	public function convert() {
 		// BEGIN: Code that already exists in wp_nav_menu().
