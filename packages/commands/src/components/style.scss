@@ -122,7 +122,7 @@
 		}
 	}
 
-	[cmdk-list] {
+	[cmdk-root] > [cmdk-list] {
 		min-height: 300px;
 		max-height: 400px;
 		overflow: auto;
@@ -134,10 +134,11 @@
 
 	[cmdk-group-heading] {
 		user-select: none;
-		color: $gray-800;
+		color: $gray-700;
 		padding: $grid-unit-20;
 		display: flex;
 		align-items: center;
+		font-size: 12px;
 	}
 
 	[cmdk-empty] {
@@ -151,16 +152,5 @@
 
 	[cmdk-list-sizer] {
 		position: relative;
-	}
-
-	[cmdk-loading] {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 150px;
 	}
 }

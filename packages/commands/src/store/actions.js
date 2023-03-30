@@ -7,7 +7,7 @@
  *
  * @property {string}   name     Command name.
  * @property {string}   label    Command label.
- * @property {string=}  page     Command page.
+ * @property {string=}  group    Command group.
  * @property {Function} callback Command callback.
  */
 
@@ -20,9 +20,9 @@
  *
  * @typedef {Object} WPCommandLoaderConfig
  *
- * @property {string=}             page        Command loader page.
- * @property {string=}             placeholder Command page placeholder.
- * @property {WPCommandLoaderHook} hook        Command loader hook.
+ * @property {string}              name  Command loader name.
+ * @property {string=}             group Command loader group.
+ * @property {WPCommandLoaderHook} hook  Command loader hook.
  */
 
 /**
@@ -32,27 +32,29 @@
  *
  * @return {Object} action.
  */
-export function registerCommand( { name, label, callback, page = null } ) {
+export function registerCommand( { name, label, callback, group = '' } ) {
 	return {
 		type: 'REGISTER_COMMAND',
 		name,
 		label,
 		callback,
-		page,
+		group,
 	};
 }
 
 /**
  * Returns an action object used to unregister a command.
  *
- * @param {string} name Command name.
+ * @param {string} name  Command name.
+ * @param {string} group Command group.
  *
  * @return {Object} action.
  */
-export function unregisterCommand( name ) {
+export function unregisterCommand( name, group ) {
 	return {
 		type: 'UNREGISTER_COMMAND',
 		name,
+		group,
 	};
 }
 
@@ -63,25 +65,27 @@ export function unregisterCommand( name ) {
  *
  * @return {Object} action.
  */
-export function registerCommandLoader( { page, hook, placeholder } ) {
+export function registerCommandLoader( { name, group = '', hook } ) {
 	return {
 		type: 'REGISTER_COMMAND_LOADER',
-		page,
+		name,
+		group,
 		hook,
-		placeholder,
 	};
 }
 
 /**
  * Unregister command loader hook.
  *
- * @param {string} page Command loader page.
+ * @param {string} name  Command loader name.
+ * @param {string} group Command loader group.
  *
  * @return {Object} action.
  */
-export function unregisterCommandLoader( page ) {
+export function unregisterCommandLoader( name, group ) {
 	return {
 		type: 'UNREGISTER_COMMAND_LOADER',
-		page,
+		name,
+		group,
 	};
 }

@@ -16,22 +16,22 @@ function commands( state = {}, action ) {
 		case 'REGISTER_COMMAND':
 			return {
 				...state,
-				[ action.page ]: {
-					...state[ action.page ],
+				[ action.group ]: {
+					...state[ action.group ],
 					[ action.name ]: {
 						name: action.name,
 						label: action.label,
-						page: action.page,
+						group: action.group,
 						callback: action.callback,
 					},
 				},
 			};
 		case 'UNREGISTER_COMMAND': {
 			const { [ action.name ]: _, ...remainingState } =
-				state?.[ action.page ];
+				state?.[ action.group ];
 			return {
 				...state,
-				[ action.page ]: remainingState,
+				[ action.group ]: remainingState,
 			};
 		}
 	}
@@ -52,31 +52,13 @@ function commandLoaders( state = {}, action ) {
 		case 'REGISTER_COMMAND_LOADER':
 			return {
 				...state,
-				[ action.page ]: action.hook,
-			};
-		case 'UNREGISTER_COMMAND_LOADER': {
-			const { [ action.page ]: _, ...remainingState } = state;
-			return remainingState;
-		}
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the page placeholders
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-function placeholders( state = {}, action ) {
-	switch ( action.type ) {
-		case 'REGISTER_COMMAND_LOADER':
-			return {
-				...state,
-				[ action.page ]: action.placeholder,
+				[ action.group ]: {
+					...state[ action.group ],
+					[ action.name ]: {
+						name: action.name,
+						hook: action.hook,
+					},
+				},
 			};
 		case 'UNREGISTER_COMMAND_LOADER': {
 			const { [ action.page ]: _, ...remainingState } = state;
@@ -90,7 +72,6 @@ function placeholders( state = {}, action ) {
 const reducer = combineReducers( {
 	commands,
 	commandLoaders,
-	placeholders,
 } );
 
 export default reducer;

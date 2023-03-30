@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCommand, useCommandLoader } from '@wordpress/commands';
+import { useCommandLoader } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -55,17 +55,9 @@ function useNavigationCommandLoader( { search } ) {
 }
 
 export function useNavigationCommands() {
-	useCommand( {
-		name: 'core/edit-site/navigate',
-		label: __( 'Navigate to a page' ),
-		callback: ( { navigateToPage } ) => {
-			navigateToPage( 'core/edit-site/navigate' );
-		},
-	} );
-
 	useCommandLoader( {
-		page: 'core/edit-site/navigate',
+		name: 'core/edit-site/navigate',
+		group: __( 'Pages' ),
 		hook: useNavigationCommandLoader,
-		placeholder: __( 'Search for a page…' ),
 	} );
 }

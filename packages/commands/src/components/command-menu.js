@@ -9,38 +9,31 @@ import { Command } from 'cmdk';
 import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Modal, Button, Spinner } from '@wordpress/components';
-import { Icon, chevronLeft } from '@wordpress/icons';
+import { Modal } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { store as commandsStore } from '../store';
 
-function CommandsPerPage( { search, navigateToPage, loader, commands } ) {
-	const { isLoading, commands: loaderCommands = [] } =
-		loader( { search } ) ?? {};
-	const allCommands = [ ...commands, ...loaderCommands ];
+function CommandMenuLoader( { search, hook } ) {
+	const { isLoading, commands = [] } = hook( { search } ) ?? {};
 
 	return (
 		<>
 			<Command.List>
 				{ isLoading && (
-					<Command.Loading>
-						<Spinner />
-					</Command.Loading>
+					<Command.Loading>{ __( 'Searching…' ) }</Command.Loading>
 				) }
-				{ ! isLoading && ! allCommands?.length && (
+				{ ! isLoading && ! commands?.length && (
 					<Command.Empty>{ __( 'No results found.' ) }</Command.Empty>
 				) }
 
-				{ allCommands.map( ( command ) => (
+				{ commands.map( ( command ) => (
 					<Command.Item
 						key={ command.name }
 						value={ command.name }
-						onSelect={ () =>
-							command.callback( { navigateToPage } )
-						}
+						onSelect={ () => command.callback() }
 					>
 						{ command.label }
 					</Command.Item>
@@ -50,40 +43,73 @@ function CommandsPerPage( { search, navigateToPage, loader, commands } ) {
 	);
 }
 
-export function CommandMenu() {
-	const [ search, setSearch ] = useState( '' );
-	const [ open, setOpen ] = useState( false );
-	const [ pages, setPages ] = useState( [] );
-	const navigateToPage = ( newPage ) => setPages( [ ...pages, newPage ] );
-	const currentPage = pages.length ? pages[ pages.length - 1 ] : null;
-	const { commands, loader, placeholder } = useSelect(
-		( select ) => {
-			const { getCommands, getCommandLoader, getPagePlaceholder } =
-				select( commandsStore );
-			return {
-				commands: getCommands( currentPage ),
-				loader: getCommandLoader( currentPage ),
-				placeholder: getPagePlaceholder( currentPage ),
-			};
-		},
-		[ currentPage ]
-	);
-	const goBack = () =>
-		setPages( ( currentPages ) => currentPages.slice( 0, -1 ) );
-
+export function CommandMenuLoaderWrapper( { hook, search } ) {
 	// loader is actually a custom hook
 	// so to avoid breaking the rules of hooks
 	// the CommandsPerPage component need to be
 	// remounted on each loader change
 	// We use the key state to make sure we do that properly.
-	const currentLoader = useRef( loader );
+	const currentLoader = useRef( hook );
 	const [ key, setKey ] = useState( 0 );
 	useEffect( () => {
-		if ( currentLoader.current !== loader ) {
-			currentLoader.current = loader;
+		if ( currentLoader.current !== hook ) {
+			currentLoader.current = hook;
 			setKey( ( prevKey ) => prevKey + 1 );
 		}
-	}, [ loader ] );
+	}, [ hook ] );
+
+	return (
+		<CommandMenuLoader
+			key={ key }
+			hook={ currentLoader.current }
+			search={ search }
+		/>
+	);
+}
+
+export function CommandMenuGroup( { group, search } ) {
+	const { commands, loaders } = useSelect(
+		( select ) => {
+			const { getCommands, getCommandLoaders } = select( commandsStore );
+			return {
+				commands: getCommands( group ),
+				loaders: getCommandLoaders( group ),
+			};
+		},
+		[ group ]
+	);
+
+	return (
+		<Command.Group heading={ group }>
+			{ commands.map( ( command ) => (
+				<Command.Item
+					key={ command.name }
+					value={ command.name }
+					onSelect={ () => command.callback() }
+				>
+					{ command.label }
+				</Command.Item>
+			) ) }
+			{ loaders.map( ( loader ) => (
+				<CommandMenuLoaderWrapper
+					key={ loader.name }
+					hook={ loader.hook }
+					search={ search }
+				/>
+			) ) }
+		</Command.Group>
+	);
+}
+
+export function CommandMenu() {
+	const [ search, setSearch ] = useState( '' );
+	const [ open, setOpen ] = useState( false );
+	const { groups } = useSelect( ( select ) => {
+		const { getGroups } = select( commandsStore );
+		return {
+			groups: getGroups(),
+		};
+	}, [] );
 
 	// Toggle the menu when ⌘K is pressed
 	useEffect( () => {
@@ -96,12 +122,6 @@ export function CommandMenu() {
 		document.addEventListener( 'keydown', down );
 		return () => document.removeEventListener( 'keydown', down );
 	}, [] );
-
-	useEffect( () => {
-		if ( ! open ) {
-			setPages( [] );
-		}
-	}, [ open ] );
 
 	if ( ! open ) {
 		return false;
@@ -116,35 +136,24 @@ export function CommandMenu() {
 			<div className="commands-command-menu__container">
 				<Command label={ __( 'Global Command Menu' ) }>
 					<div className="commands-command-menu__header">
-						{ pages.length > 0 && (
-							<Button onClick={ goBack }>
-								<Icon icon={ chevronLeft } size={ 24 } />
-							</Button>
-						) }
 						<Command.Input
 							// The input should be focused when the modal is opened.
 							// eslint-disable-next-line jsx-a11y/no-autofocus
 							autoFocus
 							value={ search }
 							onValueChange={ setSearch }
-							placeholder={ placeholder ?? __( 'Ask anything' ) }
-							onKeyDown={ ( event ) => {
-								if (
-									event.key === 'Backspace' &&
-									search === ''
-								) {
-									goBack();
-								}
-							} }
+							placeholder={ __( 'Ask anything' ) }
 						/>
 					</div>
-					<CommandsPerPage
-						key={ key }
-						navigateToPage={ navigateToPage }
-						loader={ currentLoader.current }
-						commands={ commands }
-						search={ search }
-					/>
+					<Command.List>
+						{ groups.map( ( group ) => (
+							<CommandMenuGroup
+								key={ group }
+								group={ group }
+								search={ search }
+							/>
+						) ) }
+					</Command.List>
 				</Command>
 			</div>
 		</Modal>
