@@ -531,13 +531,6 @@ test.describe( 'List view editing', () => {
 				hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
 			} );
 
-		// Focus the node to reveal the "3 dots" options menu button.
-		const firstMenuItemAnchor = listView.getByRole( 'link', {
-			name: 'Top Level Item 1',
-			includeHidden: true,
-		} );
-		await firstMenuItemAnchor.focus();
-
 		// The options menu button is a sibling of the menu item gridcell.
 		const firstItemOptions = firstMenuItem
 			.locator( '..' ) // parent selector.
@@ -670,13 +663,6 @@ test.describe( 'List view editing', () => {
 			.filter( {
 				hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
 			} );
-
-		// Focus the node to reveal the "3 dots" options menu button.
-		const firstMenuItemAnchor = listView.getByRole( 'link', {
-			name: 'Top Level Item 1',
-			includeHidden: true,
-		} );
-		await firstMenuItemAnchor.focus();
 
 		// The options menu button is a sibling of the menu item gridcell.
 		const firstItemOptions = firstMenuItem
