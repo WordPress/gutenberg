@@ -257,11 +257,12 @@ async function runPerformanceTests( refs, options ) {
 			'Make sure these ports are not used before continuing.\n'
 	);
 
+	log( '\n>> Setting up the environment\n' );
 	console.time( 'Setup duration' );
 
 	const rootDir = path.join( os.tmpdir(), 'wp-gutenberg-performance-tests' );
 	if ( ! fs.existsSync( rootDir ) ) {
-		log( `>> Creating root dir: ${ rootDir }\n` );
+		log( `  >> Creating root dir: ${ rootDir }` );
 		fs.mkdirSync( rootDir );
 	}
 
@@ -298,6 +299,7 @@ async function runPerformanceTests( refs, options ) {
 	let buildCurrentBranch = true;
 
 	if ( ! runningInCI ) {
+		// When running locally it might not make sense to rebuild the local branch
 		const { confirmation } = await inquirer.prompt( [
 			{
 				type: 'confirm',
@@ -310,15 +312,16 @@ async function runPerformanceTests( refs, options ) {
 		buildCurrentBranch = confirmation;
 	}
 
-	log( '\n>> Setting up the environment\n' );
-
+	log( '  >> Building given refs:' );
+	// TODO: If ref matches "release/*", use the zipped plugin URL.
 	const testRefs = [ currentRef, ...refs ];
 
 	// Run plugin builds in parallel.
 	await Promise.all(
 		testRefs.map( async ( ref, i ) => {
 			// @ts-ignore
-			const l = ( msg ) => log( `>> ${ CHALKS[ i ]( ref ) }: ${ msg }` );
+			const l = ( msg ) =>
+				log( `    >> ${ CHALKS[ i ]( ref ) }: ${ msg }` );
 
 			const envDir = path.join( rootDir, `test-env-${ i }` );
 			if ( ! fs.existsSync( envDir ) ) {
@@ -327,7 +330,7 @@ async function runPerformanceTests( refs, options ) {
 			}
 
 			let buildDir;
-			let doBuild = true;
+			let doBuild = false;
 
 			if ( i === 0 ) {
 				buildDir = cwd;
@@ -355,7 +358,7 @@ async function runPerformanceTests( refs, options ) {
 
 				try {
 					// Try getting SHA if passing a ref name, e.g. "trunk".
-					await git.fetch( 'origin', ref, { '--depth': 1 } );
+					await git.fetch( 'origin', ref, { '--depth': 1 } ); // --no-tags?
 					targetSHA = await git.revparse( `origin/${ ref }` );
 				} catch {
 					// Assume the ref is a SHA if the above doesn't exist.
@@ -368,13 +371,15 @@ async function runPerformanceTests( refs, options ) {
 					// noop
 				}
 
+				// If the latest remote SHA is same as the current local SHA
+				// assume there is a build and it's up-to-date.
 				if ( currentSHA && currentSHA === targetSHA ) {
 					l( 'Re-using the current build' );
 					doBuild = false;
 				} else {
 					l( 'Fetching' );
 					await git
-						.fetch( 'origin', ref, { '--depth': 1 } ) // --no-tags
+						.fetch( 'origin', ref, { '--depth': 1 } ) // --no-tags?
 						.checkout( ref );
 				}
 			}
@@ -427,12 +432,12 @@ async function runPerformanceTests( refs, options ) {
 	const results = {};
 	const wpEnvPath = path.join( cwd, 'node_modules/.bin/wp-env' );
 
-	log( '\n>> Running the tests!\n' );
+	log( '\n>> Running the tests\n' );
 
 	if ( wpVersion === null ) {
-		log( '>> Using the latest stable WordPress version' );
+		log( '  >> Using the latest stable WordPress version' );
 	} else {
-		log( `>> Using WordPress version ${ wpVersion }` );
+		log( `  >> Using WordPress version ${ wpVersion }` );
 	}
 
 	for ( const testSuite of testSuites ) {
@@ -443,7 +448,9 @@ async function runPerformanceTests( refs, options ) {
 			const roundInfo = `round ${ i + 1 } of ${ testRounds }`;
 			rawResults[ i ] = {};
 
-			log( `\n>> Suite: ${ CHALKS[ 2 ]( testSuite ) } (${ roundInfo })` );
+			log(
+				`\n  >> Suite: ${ CHALKS[ 2 ]( testSuite ) } (${ roundInfo })`
+			);
 
 			for ( const ref of testRefs ) {
 				const sanitizedBranch = sanitizeBranchName( ref );
@@ -454,16 +461,16 @@ async function runPerformanceTests( refs, options ) {
 					`test-env-${ testRefs.indexOf( ref ) }`
 				);
 
-				log( `  >> ref: ${ CHALKS[ 3 ]( ref ) }` );
-				log( '    >> Starting the environment.' );
+				log( `    >> Ref: ${ CHALKS[ 3 ]( ref ) }` );
+				log( '      >> Starting the environment.' );
 				await exec( `${ wpEnvPath } start`, envDir );
-				log( '    >> Running the test.' );
+				log( '      >> Running the test.' );
 				rawResults[ i ][ ref ] = await runTestSuite(
 					testSuite,
 					cwd,
 					runKey
 				);
-				log( '    >> Stopping the environment' );
+				log( '      >> Stopping the environment' );
 				await exec( `${ wpEnvPath } stop`, envDir );
 			}
 		}
