@@ -35,7 +35,6 @@ class WP_Nav_Menu_Conversion {
 	 * @return string the serialized and normalized parsed blocks.
 	 */
 	public function convert() {
-		// BEGIN: Code that already exists in wp_nav_menu().
 		$menu_items = wp_get_nav_menu_items( $this->menu->term_id, array( 'update_post_term_cache' => false ) );
 
 		// Set up the $menu_item variables.
@@ -45,7 +44,6 @@ class WP_Nav_Menu_Conversion {
 		$menu_items_by_order_id = $this->key_by_order_id( $menu_items );
 
 		unset( $menu_items );
-		// END: Code that already exists in wp_nav_menu().
 
 		$menu_items_by_parent_id = $this->group_by_parent_id( $menu_items_by_order_id );
 
