@@ -469,6 +469,23 @@ This value signals that a block supports some of the properties related to filte
 This property adds UI controls which allow the user to apply a duotone filter to
 a block or part of a block.
 
+```js
+supports: {
+    filter: {
+        // Enable duotone support
+        duotone: true
+    }
+},
+selectors: {
+    filter: {
+        // Apply the filter to img elements inside the image block
+        duotone: '.wp-block-image img'
+    }
+}
+```
+
+The filter can be applied to an element inside the block by setting the `selectors.filter.duotone` selector.
+
 Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
 
 When the block declares support for `filter.duotone`, the attributes definition is extended to include the attribute `style`:
