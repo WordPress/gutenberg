@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import CSSwhat from 'css-what';
+import * as CSSwhat from 'css-what';
 
 function cssSelectorAstInArray( objNeedle, arr ) {
 	return arr.some(

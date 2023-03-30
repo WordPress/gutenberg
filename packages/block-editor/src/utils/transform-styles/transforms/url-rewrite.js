@@ -4,7 +4,11 @@
 import CSSValueParser from 'postcss-value-parser';
 
 const rewrite = ( rootUrl ) => ( cssRule ) => {
-	if ( ! cssRule.style || cssRule.style.length === 0 ) {
+	if (
+		! cssRule.style ||
+		typeof cssRule.style !== 'object' ||
+		cssRule.style.length === 0
+	) {
 		return cssRule;
 	}
 
