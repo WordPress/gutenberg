@@ -319,7 +319,7 @@ test.describe( 'Navigation block', () => {
 } );
 
 test.describe( 'List view editing', () => {
-	test( 'it should show a list view in the inspector controls', async ( {
+	test( 'show a list view in the inspector controls', async ( {
 		admin,
 		page,
 		editor,
