@@ -21,9 +21,12 @@ import {
 	__unstableUseRichText as useRichText,
 	__unstableCreateElement,
 	removeFormat,
+	insertObject,
+	insert,
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { Popover } from '@wordpress/components';
+import { regexp } from '@wordpress/shortcode';
 
 /**
  * Internal dependencies
@@ -246,11 +249,80 @@ function RichTextWrapper(
 		allowedFormats: adjustedAllowedFormats,
 	} );
 
+	function parseShortcodes( value ) {
+		if ( value.text.indexOf( '[' ) === -1 ) {
+			return value;
+		}
+
+		formatTypes.forEach( ( { shortcode, name } ) => {
+			if ( ! shortcode ) return;
+
+			const exp = regexp( shortcode );
+
+			let match;
+
+			while ( ( match = exp.exec( value.text ) ) !== null ) {
+				// If we matched an escaped shortcode, try again.
+				if ( '[' === match[ 1 ] && ']' === match[ 7 ] ) {
+					continue;
+				}
+
+				value = insertObject(
+					value,
+					{
+						type: name,
+						attributes: {
+							contenteditable: 'false',
+							'data-shortcode-content': match[ 3 ].trim(),
+						},
+					},
+					match.index,
+					match.index + match[ 0 ].length
+				);
+			}
+		} );
+
+		return value;
+	}
+
+	function serializeShortcodes( value ) {
+		let index;
+		let fromIndex = 0;
+
+		while ( ( index = value.text.indexOf( '\ufffc', fromIndex ) ) !== -1 ) {
+			const object = value.replacements[ index ];
+
+			fromIndex = index + 1;
+
+			const formatType = formatTypes.find(
+				( type ) => type.name === object.type
+			);
+
+			if ( formatType.shortcode ) {
+				const { 'data-shortcode-content': content } = object.attributes;
+
+				value = insert(
+					value,
+					`[${ formatType.shortcode }${
+						content ? ' ' + content : ''
+					}]`,
+					index,
+					index + 1
+				);
+			}
+		}
+
+		return value;
+	}
+
 	function addEditorOnlyFormats( value ) {
-		return valueHandlers.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
+		return {
+			...value,
+			formats: valueHandlers.reduce(
+				( accumulator, fn ) => fn( accumulator, value.text ),
+				value.formats
+			),
+		};
 	}
 
 	function removeEditorOnlyFormats( value ) {
@@ -266,7 +338,7 @@ function RichTextWrapper(
 			}
 		} );
 
-		return value.formats;
+		return value;
 	}
 
 	function addInvisibleFormats( value ) {
@@ -299,8 +371,10 @@ function RichTextWrapper(
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
 		__unstableDependencies: [ ...dependencies, tagName ],
-		__unstableAfterParse: addEditorOnlyFormats,
-		__unstableBeforeSerialize: removeEditorOnlyFormats,
+		__unstableAfterParse: ( v ) =>
+			addEditorOnlyFormats( parseShortcodes( v ) ),
+		__unstableBeforeSerialize: ( v ) =>
+			removeEditorOnlyFormats( serializeShortcodes( v ) ),
 		__unstableAddInvisibleFormats: addInvisibleFormats,
 	} );
 	const autocompleteProps = useBlockEditorAutocompleteProps( {

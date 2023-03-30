@@ -727,7 +727,7 @@ add_filter( 'the_content', function( $content ) {
 
 	// To do: move to a proper stylesheet.
 	// To do: need to add a post class instead of using .entry-content.
-	$style = '<style>.entry-content{counter-reset:footnotes}.note-link{counter-increment:footnotes}.note-link::after{content:"["counter(footnotes)"]";}</style>';
+	$style = '<style>.entry-content{counter-reset:footnotes}.note-link{counter-increment:footnotes}.note-link::after{content:"["counter(footnotes)"]";vertical-align:super;font-size:smaller;}</style>';
 
 	return $content . $list . $style;
 } );
