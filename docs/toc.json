@@ -179,6 +179,9 @@
 					{
 						"docs/reference-guides/block-api/block-registration.md": []
 					},
+					{
+						"docs/reference-guides/block-api/block-selectors.md": []
+					},
 					{ "docs/reference-guides/block-api/block-styles.md": [] },
 					{ "docs/reference-guides/block-api/block-supports.md": [] },
 					{
