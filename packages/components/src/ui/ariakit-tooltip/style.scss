@@ -1,0 +1,14 @@
+.components-ariakit-tooltip {
+	background: $components-color-foreground; // TODO: Discuss with designers.
+	color: $components-color-foreground-inverted;
+	text-align: center;
+	line-height: 1.4;
+	font-size: 12px;
+	padding: $grid-unit-05 $grid-unit-10;
+	z-index: z-index(".components-tooltip");
+}
+
+.components-ariakit-shortcut {
+	margin-left: $grid-unit-10;
+}
+

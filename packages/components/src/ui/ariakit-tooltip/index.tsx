@@ -17,9 +17,7 @@ import { TOOLTIP_DELAY } from '../../tooltip/';
 import type { ToolTipProps } from './types';
 import Shortcut from '../../shortcut';
 import { positionToPlacement } from '../../popover/utils';
-import * as styles from './styles';
 import { contextConnectWithoutRef } from '../context/context-connect';
-import { useCx } from '../../utils/hooks/use-cx';
 
 function AriaToolTip( props: ToolTipProps ) {
 	const {
@@ -60,10 +58,6 @@ function AriaToolTip( props: ToolTipProps ) {
 		timeout: delay,
 	} );
 
-	const cx = useCx();
-	const ToolTipClassName = cx( styles.ToolTip );
-	const ShortcutClassName = cx( styles.Shortcut );
-
 	return (
 		<>
 			<TooltipAnchor as={ Slot } described state={ tooltipState }>
@@ -71,14 +65,16 @@ function AriaToolTip( props: ToolTipProps ) {
 			</TooltipAnchor>
 			{ ( text || shortcut ) && (
 				<Tooltip
-					className={ ToolTipClassName }
+					className="components-ariakit-tooltip"
 					id={ describedById }
 					state={ tooltipState }
 				>
 					{ text }
 					{ shortcut && (
 						<Shortcut
-							className={ text ? ShortcutClassName : '' }
+							className={
+								text ? 'components-ariakit-shortcut' : ''
+							}
 							shortcut={ shortcut }
 						/>
 					) }
