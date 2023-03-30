@@ -327,6 +327,12 @@ test.describe( 'List view editing', () => {
 			<!-- /wp:navigation-submenu -->`,
 	};
 
+	test.use( {
+		linkControl: async ( { page }, use ) => {
+			await use( new LinkControl( { page } ) );
+		},
+	} );
+
 	test( 'show a list view in the inspector controls', async ( {
 		admin,
 		page,
@@ -424,6 +430,7 @@ test.describe( 'List view editing', () => {
 		page,
 		editor,
 		requestUtils,
+		linkControl,
 	} ) => {
 		await admin.createNewPost();
 		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
@@ -470,19 +477,11 @@ test.describe( 'List view editing', () => {
 		await pageLinkResult.click();
 
 		// Expect to see the Link creation UI be focused.
-		const linkUIInput = page.getByRole( 'combobox', {
-			name: 'URL',
-		} );
+		const linkUIInput = linkControl.getSearchInput();
+
 		await expect( linkUIInput ).toBeFocused();
 
-		const linkUIResults = page.getByRole( 'listbox', {
-			name: 'Recently updated',
-		} );
-
-		await expect( linkUIResults ).toBeVisible();
-
-		// click on the first result
-		const firstResult = linkUIResults.getByRole( 'option' ).nth( 0 );
+		const firstResult = await linkControl.getNthSearchResult( 0 );
 
 		// Grab the text from the first result so we can check it was inserted.
 		const firstResultText = await firstResult
@@ -649,6 +648,7 @@ test.describe( 'List view editing', () => {
 		page,
 		editor,
 		requestUtils,
+		linkControl,
 	} ) => {
 		await admin.createNewPost();
 		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
@@ -701,12 +701,7 @@ test.describe( 'List view editing', () => {
 
 		await addSubmenuOption.click();
 
-		const linkUIInput = page.getByRole( 'combobox', {
-			name: 'URL',
-		} );
-		await expect( linkUIInput ).toBeFocused();
-
-		await page.keyboard.type( 'https://wordpress.org/' );
+		await linkControl.searchFor( 'https://wordpress.org' );
 
 		await page.keyboard.press( 'Enter' );
 
@@ -736,3 +731,44 @@ test.describe( 'List view editing', () => {
 		).toBeVisible();
 	} );
 } );
+
+class LinkControl {
+	constructor( { page } ) {
+		this.page = page;
+	}
+
+	getSearchInput() {
+		return this.page.getByRole( 'combobox', {
+			name: 'URL',
+		} );
+	}
+
+	async getSearchResults() {
+		const searchInput = this.getSearchInput();
+
+		const resultsRef = await searchInput.getAttribute( 'aria-owns' );
+
+		const linkUIResults = this.page.locator( `#${ resultsRef }` );
+
+		await expect( linkUIResults ).toBeVisible();
+
+		return linkUIResults.getByRole( 'option' );
+	}
+
+	async getNthSearchResult( index = 0 ) {
+		const results = await this.getSearchResults();
+		return results.nth( index );
+	}
+
+	async searchFor( searchTerm = 'https://wordpress.org' ) {
+		const input = this.getSearchInput();
+
+		await expect( input ).toBeFocused();
+
+		await this.page.keyboard.type( searchTerm );
+
+		await expect( input ).toHaveValue( searchTerm );
+
+		return input;
+	}
+}
