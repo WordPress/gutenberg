@@ -277,6 +277,7 @@ function DuotoneStyles( {
 
 	return (
 		element &&
+		Array.isArray( colors ) &&
 		createPortal(
 			<InlineDuotone
 				selector={ selector }
