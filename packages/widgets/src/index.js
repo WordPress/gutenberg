@@ -8,6 +8,7 @@ import { registerBlockType } from '@wordpress/blocks';
  */
 import * as legacyWidget from './blocks/legacy-widget';
 import * as widgetGroup from './blocks/widget-group';
+import './hooks';
 
 export * from './components';
 export * from './utils';

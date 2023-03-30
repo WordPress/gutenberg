@@ -4,15 +4,15 @@
  * Get the internal widget id from block.
  *
  * @typedef  {Object} Attributes
- * @property {string}     __internalWidgetId The internal widget id.
+ * @property {string}     _widgetId  The internal widget id.
  * @typedef  {Object} Block
- * @property {Attributes} attributes         The attributes of the block.
+ * @property {Attributes} attributes The attributes of the block.
  *
- * @param    {Block}      block              The block.
+ * @param    {Block}      block      The block.
  * @return {string} The internal widget id.
  */
 export function getWidgetIdFromBlock( block ) {
-	return block.attributes.__internalWidgetId;
+	return block.attributes._widgetId;
 }
 
 /**
@@ -27,7 +27,7 @@ export function addWidgetIdToBlock( block, widgetId ) {
 		...block,
 		attributes: {
 			...( block.attributes || {} ),
-			__internalWidgetId: widgetId,
+			_widgetId: widgetId,
 		},
 	};
 }
