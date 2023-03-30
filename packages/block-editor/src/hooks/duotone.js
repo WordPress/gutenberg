@@ -308,16 +308,6 @@ const withDuotoneStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const id = useInstanceId( BlockListBlock );
 
-		/**
-		 * experimental true
-		 * experimental string
-		 *
-		 * no selector
-		 * filter selector
-		 * filter.root selector
-		 * filter.duotone selector
-		 */
-
 		const selector = useMemo( () => {
 			const blockType = getBlockType( props.name );
 
