@@ -484,9 +484,9 @@ test.describe( 'List view editing', () => {
 		const firstResult = await linkControl.getNthSearchResult( 0 );
 
 		// Grab the text from the first result so we can check it was inserted.
-		const firstResultText = await firstResult
-			.locator( '.block-editor-link-control__search-item-title' ) // this is the only way to get the label text without the URL.
-			.innerText();
+		const firstResultText = await linkControl.getSearchResultText(
+			firstResult
+		);
 
 		// Create the link.
 		await firstResult.click();
@@ -770,5 +770,13 @@ class LinkControl {
 		await expect( input ).toHaveValue( searchTerm );
 
 		return input;
+	}
+
+	async getSearchResultText( result ) {
+		await expect( result ).toBeVisible();
+
+		return result
+			.locator( '.block-editor-link-control__search-item-title' ) // this is the only way to get the label text without the URL.
+			.innerText();
 	}
 }
