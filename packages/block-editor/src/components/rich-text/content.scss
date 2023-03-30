@@ -1,5 +1,7 @@
 // Should be in theme compatibility file.
-.editor-styles-wrapper { counter-reset:footnotes }
+.editor-styles-wrapper {
+	counter-reset: footnotes;
+}
 
 .rich-text {
 	[data-rich-text-placeholder] {
@@ -23,9 +25,11 @@
 	}
 
 	// Should be in theme compatibility file.
-	.note-link { counter-increment:footnotes }
+	.note-link {
+		counter-increment: footnotes;
+	}
 	.note-link::after {
-		content: "[" counter( footnotes ) "]";
+		content: "[" counter(footnotes) "]";
 		vertical-align: super;
 		font-size: smaller;
 	}
