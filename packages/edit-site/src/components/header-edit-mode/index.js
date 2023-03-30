@@ -6,19 +6,28 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef } from '@wordpress/element';
+import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import {
+	BlockIcon,
+	BlockToolbar,
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
 	NavigableToolbar,
 	store as blockEditorStore,
+	useBlockDisplayInformation,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
-import { listView, plus, external, chevronUpDown } from '@wordpress/icons';
+import {
+	listView,
+	plus,
+	external,
+	chevronUpDown,
+	levelUp,
+} from '@wordpress/icons';
 import {
 	Button,
 	ToolbarItem,
@@ -39,10 +48,42 @@ import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
 import { useHasStyleBook } from '../style-book';
+import InserterButton from './inserter-button';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
 };
+
+function MaybeHide( { children, isHidden } ) {
+	if ( isHidden ) {
+		return <div className="maybeHide">{ children }</div>;
+	}
+	return children;
+}
+
+function ShowDocumentToolbarButton( { onClick } ) {
+	return (
+		<ToolbarItem
+			as={ Button }
+			className="edit-site-header-toolbar__document-tools-toggle"
+			variant="primary"
+			icon={ levelUp }
+			onClick={ onClick }
+		/>
+	);
+}
+
+function ShowBlockToolbarButton( { onClick, icon } ) {
+	return (
+		<ToolbarItem
+			as={ Button }
+			className="edit-site-header-toolbar__block-tools-toggle"
+			variant="primary"
+			icon={ <BlockIcon icon={ icon } /> }
+			onClick={ onClick }
+		/>
+	);
+}
 
 export default function HeaderEditMode() {
 	const inserterButton = useRef();
@@ -91,6 +132,32 @@ export default function HeaderEditMode() {
 		};
 	}, [] );
 
+	const isMobileViewPort = useViewportMatch( 'medium', '<' );
+	const isDesktopViewport = useViewportMatch( 'medium', '>=' );
+	const {
+		hasFixedToolbar,
+		hasSelectedBlocks,
+		isNavigationMode,
+		selectedBlockClientId,
+	} = useSelect( ( select ) => {
+		const {
+			getSettings,
+			getSelectedBlockClientIds,
+			getSelectedBlockClientId,
+			isNavigationMode: _isNavigationMode,
+		} = select( blockEditorStore );
+		const settings = getSettings();
+		const _selectedBlockClientIds = getSelectedBlockClientIds();
+		return {
+			hasSelectedBlocks: !! _selectedBlockClientIds.length,
+			hasFixedToolbar: settings.hasFixedToolbar,
+			isNavigationMode: _isNavigationMode(),
+			selectedBlockClientId: getSelectedBlockClientId(),
+		};
+	} );
+
+	const [ headerToolbar, setHeaderToolbar ] = useState( 'document' );
+
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
@@ -132,100 +199,154 @@ export default function HeaderEditMode() {
 		window?.__experimentalEnableZoomedOutView && isVisualMode;
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
 
+	const blockToolbarAriaLabel = __( 'Block tools' );
+
+	const blockInformation = useBlockDisplayInformation(
+		selectedBlockClientId
+	);
+
+	useEffect( () => {
+		if ( isNavigationMode ) {
+			setHeaderToolbar( 'document' );
+		} else if ( hasSelectedBlocks ) {
+			setHeaderToolbar( 'block' );
+		} else {
+			setHeaderToolbar( 'document' );
+		}
+	}, [ hasSelectedBlocks, isNavigationMode ] );
+
+	const HeaderToolbar = ( { BlockToolbarToggle, areSelectedBlocks } ) => {
+		return (
+			<NavigableToolbar
+				className="edit-site-header-edit-mode__start"
+				aria-label={ __( 'Document tools' ) }
+			>
+				<div className="edit-site-header-edit-mode__toolbar">
+					<ToolbarItem
+						ref={ inserterButton }
+						as={ Button }
+						className="edit-site-header-edit-mode__inserter-toggle"
+						variant="primary"
+						isPressed={ isInserterOpen }
+						onMouseDown={ preventDefault }
+						onClick={ toggleInserter }
+						disabled={ ! isVisualMode }
+						icon={ plus }
+						label={ showIconLabels ? shortLabel : longLabel }
+						showTooltip={ ! showIconLabels }
+					/>
+					{ isLargeViewport && (
+						<>
+							<ToolbarItem
+								as={ ToolSelector }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+								disabled={ ! isVisualMode }
+							/>
+							<ToolbarItem
+								as={ UndoButton }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+							/>
+							<ToolbarItem
+								as={ RedoButton }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+							/>
+							<ToolbarItem
+								as={ Button }
+								className="edit-site-header-edit-mode__list-view-toggle"
+								disabled={ ! isVisualMode || isZoomedOutView }
+								icon={ listView }
+								isPressed={ isListViewOpen }
+								/* translators: button label text should, if possible, be under 16 characters. */
+								label={ __( 'List View' ) }
+								onClick={ toggleListView }
+								shortcut={ listViewShortcut }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+							/>
+							{ isZoomedOutViewExperimentEnabled && (
+								<ToolbarItem
+									as={ Button }
+									className="edit-site-header-edit-mode__zoom-out-view-toggle"
+									icon={ chevronUpDown }
+									isPressed={ isZoomedOutView }
+									/* translators: button label text should, if possible, be under 16 characters. */
+									label={ __( 'Zoom-out View' ) }
+									onClick={ () => {
+										setPreviewDeviceType( 'desktop' );
+										__unstableSetEditorMode(
+											isZoomedOutView
+												? 'edit'
+												: 'zoom-out'
+										);
+									} }
+								/>
+							) }
+							{ areSelectedBlocks && <BlockToolbarToggle /> }
+						</>
+					) }
+				</div>
+			</NavigableToolbar>
+		);
+	};
+
 	return (
 		<div
 			className={ classnames( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
-			{ ! hasStyleBook && (
-				<NavigableToolbar
-					className="edit-site-header-edit-mode__start"
-					aria-label={ __( 'Document tools' ) }
-				>
-					<div className="edit-site-header-edit-mode__toolbar">
-						<ToolbarItem
-							ref={ inserterButton }
-							as={ Button }
-							className="edit-site-header-edit-mode__inserter-toggle"
-							variant="primary"
-							isPressed={ isInserterOpen }
-							onMouseDown={ preventDefault }
-							onClick={ toggleInserter }
-							disabled={ ! isVisualMode }
-							icon={ plus }
-							label={ showIconLabels ? shortLabel : longLabel }
-							showTooltip={ ! showIconLabels }
-						/>
-						{ isLargeViewport && (
-							<>
-								<ToolbarItem
-									as={ ToolSelector }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-									disabled={ ! isVisualMode }
-								/>
-								<ToolbarItem
-									as={ UndoButton }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-								/>
-								<ToolbarItem
-									as={ RedoButton }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-								/>
-								<ToolbarItem
-									as={ Button }
-									className="edit-site-header-edit-mode__list-view-toggle"
-									disabled={
-										! isVisualMode || isZoomedOutView
-									}
-									icon={ listView }
-									isPressed={ isListViewOpen }
-									/* translators: button label text should, if possible, be under 16 characters. */
-									label={ __( 'List View' ) }
-									onClick={ toggleListView }
-									shortcut={ listViewShortcut }
-									showTooltip={ ! showIconLabels }
-									variant={
-										showIconLabels ? 'tertiary' : undefined
-									}
-								/>
-								{ isZoomedOutViewExperimentEnabled && (
-									<ToolbarItem
-										as={ Button }
-										className="edit-site-header-edit-mode__zoom-out-view-toggle"
-										icon={ chevronUpDown }
-										isPressed={ isZoomedOutView }
-										/* translators: button label text should, if possible, be under 16 characters. */
-										label={ __( 'Zoom-out View' ) }
-										onClick={ () => {
-											setPreviewDeviceType( 'desktop' );
-											__unstableSetEditorMode(
-												isZoomedOutView
-													? 'edit'
-													: 'zoom-out'
-											);
-										} }
+			{ ( ! hasFixedToolbar || isNavigationMode || isMobileViewPort ) &&
+				! hasStyleBook && <HeaderToolbar /> }
+			{ hasFixedToolbar &&
+				! hasStyleBook &&
+				! isNavigationMode &&
+				isDesktopViewport && (
+					<>
+						<MaybeHide isHidden={ headerToolbar === 'block' }>
+							<HeaderToolbar
+								areSelectedBlocks={ hasSelectedBlocks }
+								BlockToolbarToggle={ () => (
+									<ShowBlockToolbarButton
+										onClick={ () =>
+											setHeaderToolbar( 'block' )
+										}
+										icon={ blockInformation.icon }
 									/>
 								) }
-							</>
+							/>
+						</MaybeHide>
+						{ hasSelectedBlocks && headerToolbar === 'block' && (
+							<NavigableToolbar
+								className="edit-site-header-block-toolbar"
+								aria-label={ blockToolbarAriaLabel }
+							>
+								<InserterButton />
+								<ShowDocumentToolbarButton
+									onClick={ () =>
+										setHeaderToolbar( 'document' )
+									}
+								/>
+								<BlockToolbar
+									hideDragHandle={ hasFixedToolbar }
+								/>
+							</NavigableToolbar>
 						) }
-					</div>
-				</NavigableToolbar>
-			) }
-
+					</>
+				) }
 			<div className="edit-site-header-edit-mode__center">
 				{ hasStyleBook ? __( 'Style Book' ) : <DocumentActions /> }
 			</div>
-
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
 					{ ! isFocusMode && ! hasStyleBook && (
