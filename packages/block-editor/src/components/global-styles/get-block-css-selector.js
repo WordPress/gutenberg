@@ -34,7 +34,9 @@ export function getBlockCSSSelector(
 	const hasSelectors = ! isEmpty( selectors );
 	const path = Array.isArray( target ) ? target.join( '.' ) : target;
 
-	// Root selector ( can be used as fallback ).
+	// Root selector ( may be used as fallback ).
+	// Calculated before returning as it can be used as a fallback for feature
+	// selectors later on.
 	let rootSelector = null;
 
 	if ( hasSelectors && selectors.root ) {
@@ -54,32 +56,14 @@ export function getBlockCSSSelector(
 		return rootSelector;
 	}
 
-	const fallbackSelector = fallback ? rootSelector : null;
-
-	// Backwards compatibility for supports.__experimentalDuotone selectors.
-	if ( path === 'filter.duotone' && ! get( selectors, path ) ) {
-		const duotoneSelector = get( supports, 'color.__experimentalDuotone' );
-
-		// String color.__experimentalDuotone values need to be scoped to the root selector.
-		if ( typeof duotoneSelector === 'string' ) {
-			return scopeSelector( rootSelector, duotoneSelector );
-		}
-
-		// When color.__experimentalDuotone is true, the root selector should be used.
-		if ( duotoneSelector === true ) {
-			return rootSelector;
-		}
-
-		// Experimental duotone support is not enabled.
-		return null;
-	}
-
 	// If target is not `root` or `duotone` we have a feature or subfeature
 	// as the target. If the target is a string convert to an array.
 	const pathArray = Array.isArray( target ) ? target : target.split( '.' );
 
 	// Feature selectors ( may fallback to root selector );
 	if ( pathArray.length === 1 ) {
+		const fallbackSelector = fallback ? rootSelector : null;
+
 		// Prefer the selectors API if available.
 		if ( hasSelectors ) {
 			// Get selector from either `feature.root` or shorthand path.
