@@ -1,139 +1,59 @@
 /**
- * Return `true` if the given path is http/https.
- *
- * @param {string} filePath path
- *
- * @return {boolean} is remote path.
+ * External dependencies
  */
-function isRemotePath( filePath ) {
-	return /^(?:https?:)?\/\//.test( filePath );
-}
+import CSSValueParser from 'postcss-value-parser';
 
-/**
- * Return `true` if the given filePath is an absolute url.
- *
- * @param {string} filePath path
- *
- * @return {boolean} is absolute path.
- */
-function isAbsolutePath( filePath ) {
-	return /^\/(?!\/)/.test( filePath );
-}
-
-/**
- * Whether or not the url should be inluded.
- *
- * @param {Object} meta url meta info
- *
- * @return {boolean} is valid.
- */
-function isValidURL( meta ) {
-	// Ignore hashes or data uris.
-	if (
-		meta.value.indexOf( 'data:' ) === 0 ||
-		meta.value.indexOf( '#' ) === 0
-	) {
-		return false;
-	}
-
-	if ( isAbsolutePath( meta.value ) ) {
-		return false;
-	}
-
-	// Do not handle the http/https urls if `includeRemote` is false.
-	if ( isRemotePath( meta.value ) ) {
-		return false;
-	}
-
-	return true;
-}
-
-/**
- * Get the absolute path of the url, relative to the basePath
- *
- * @param {string} str     the url
- * @param {string} baseURL base URL
- *
- * @return {string} the full path to the file
- */
-function getResourcePath( str, baseURL ) {
-	return new URL( str, baseURL ).toString();
-}
-
-/**
- * Process the single `url()` pattern
- *
- * @param {string} baseURL the base URL for relative URLs.
- *
- * @return {Promise} the Promise.
- */
-function processURL( baseURL ) {
-	return ( meta ) => ( {
-		...meta,
-		newUrl:
-			'url(' +
-			meta.before +
-			meta.quote +
-			getResourcePath( meta.value, baseURL ) +
-			meta.quote +
-			meta.after +
-			')',
-	} );
-}
-
-/**
- * Get all `url()`s, and return the meta info
- *
- * @param {string} value decl.value.
- *
- * @return {Array} the urls.
- */
-function getURLs( value ) {
-	const reg = /url\((\s*)(['"]?)(.+?)\2(\s*)\)/g;
-	let match;
-	const URLs = [];
-
-	while ( ( match = reg.exec( value ) ) !== null ) {
-		const meta = {
-			source: match[ 0 ],
-			before: match[ 1 ],
-			quote: match[ 2 ],
-			value: match[ 3 ],
-			after: match[ 4 ],
-		};
-		if ( isValidURL( meta ) ) {
-			URLs.push( meta );
+function recursivelyRewriteUrls( cssRules, rootURL ) {
+	for ( const cssRule of cssRules ) {
+		if ( cssRule.cssRules ) {
+			recursivelyRewriteUrls( cssRule.cssRules, rootURL );
 		}
+
+		if ( ! cssRule.style || cssRule.style.length === 0 ) {
+			continue;
+		}
+		rewriteUrls( cssRule.style, rootURL );
 	}
-	return URLs;
 }
 
-/**
- * Replace the raw value's `url()` segment to the new value
- *
- * @param {string} raw  the raw value.
- * @param {Array}  URLs the URLs to replace.
- *
- * @return {string} the new value.
- */
-function replaceURLs( raw, URLs ) {
-	URLs.forEach( ( item ) => {
-		raw = raw.replace( item.source, item.newUrl );
+function rewriteUrls( style, rootURL ) {
+	for ( const propertyName of style ) {
+		const propertyValue = style[ propertyName ];
+		style[ propertyName ] = rewriteUrlInValue( propertyValue, rootURL );
+	}
+}
+
+function rewriteUrlInValue( value, rootURL ) {
+	const parsedValue = CSSValueParser( value );
+
+	let valueChanged = false;
+	parsedValue.walk( ( node ) => {
+		if ( node.type === 'function' && node.value === 'url' ) {
+			const urlVal = node.nodes[ 0 ].value;
+
+			// bases relative URLs with rootURL
+			const basedUrl = new URL( urlVal, rootURL );
+
+			// skip host-relative, already normalized URLs (e.g. `/images/image.jpg`, without `..`s)
+			if ( basedUrl.pathname === urlVal ) {
+				return false; // skip this value
+			}
+
+			node.nodes[ 0 ].value = basedUrl.toString();
+			valueChanged = true;
+
+			return false; // do not walk deeper
+		}
 	} );
 
-	return raw;
+	if ( valueChanged ) {
+		return CSSValueParser.stringify( parsedValue );
+	}
+	return value;
 }
 
-const rewrite = ( rootURL ) => ( node ) => {
-	if ( node.type === 'declaration' ) {
-		const updatedURLs = getURLs( node.value ).map( processURL( rootURL ) );
-		return {
-			...node,
-			value: replaceURLs( node.value, updatedURLs ),
-		};
-	}
-
-	return node;
+const rewrite = ( rootURL ) => ( cssstyleSheet ) => {
+	recursivelyRewriteUrls( cssstyleSheet.cssRules, rootURL );
 };
 
 export default rewrite;

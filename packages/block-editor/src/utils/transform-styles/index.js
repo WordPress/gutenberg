@@ -1,14 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+//import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import traverse from './traverse';
+//import traverse from './traverse';
 import urlRewrite from './transforms/url-rewrite';
 import wrap from './transforms/wrap';
+
+import { createStyleElem, textFromStyleSheet } from './parse/stylesheets';
 
 /**
  * Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
@@ -27,9 +29,17 @@ const transformStyles = ( styles, wrapperClassName = '' ) => {
 			transforms.push( urlRewrite( baseURL ) );
 		}
 		if ( transforms.length ) {
-			return traverse( css, compose( transforms ) );
-		}
+			//return traverse( css, compose( transforms ) );
 
+			const styleEl = createStyleElem( css );
+			const cssstyleSheet = styleEl.sheet;
+
+			transforms.forEach( ( fn ) => fn( cssstyleSheet ) );
+
+			const cssOut = textFromStyleSheet( cssstyleSheet );
+			styleEl.remove(); // clean up
+			return cssOut;
+		}
 		return css;
 	} );
 };

@@ -1,7 +1,63 @@
 /**
- * @constant string IS_ROOT_TAG Regex to check if the selector is a root tag selector.
+ * External dependencies
  */
-const IS_ROOT_TAG = /^(body|html|:root).*$/;
+import CSSwhat from 'css-what';
+
+/**
+ * Internal dependencies
+ */
+import {
+	createWrapperSelectorAst,
+	cssSelectorAstInArray,
+} from '../parse/ast.js';
+
+function recursivelyWrapRules(
+	cssRules,
+	wrapperSelectorAst,
+	ignoreSelectorsAsts
+) {
+	for ( const cssRule of cssRules ) {
+		if ( cssRule.cssRules ) {
+			recursivelyWrapRules(
+				cssRule.cssRules,
+				wrapperSelectorAst,
+				ignoreSelectorsAsts
+			);
+		}
+
+		if ( ! cssRule.selectorText ) {
+			continue;
+		}
+		wrapRule( cssRule, wrapperSelectorAst, ignoreSelectorsAsts );
+	}
+}
+
+function wrapRule( cssRule, wrapperSelectorAst, ignoreSelectorsAsts ) {
+	const cssSelectorsAst = CSSwhat.parse( cssRule.selectorText );
+
+	// exclude ignored selectors
+	// @TODO
+
+	// all selectors (`,`)
+	const newCssSelectorsAst = [];
+	for ( const cssSelectorAst of cssSelectorsAst ) {
+		const cssSelectorIgnored = cssSelectorAstInArray(
+			cssSelectorAst,
+			ignoreSelectorsAsts
+		);
+		if ( cssSelectorIgnored ) {
+			continue;
+		}
+
+		const newWrapperSelectorAst = Array.from( wrapperSelectorAst ); // copy
+		const newCssSelectorAst =
+			newWrapperSelectorAst[ 0 ].concat( cssSelectorAst ); // prepend
+		newCssSelectorsAst.push( newCssSelectorAst );
+	}
+
+	const newCssSelectorStr = CSSwhat.stringify( newCssSelectorsAst );
+	cssRule.selectorText = newCssSelectorStr;
+}
 
 /**
  * Creates a callback to modify selectors so they only apply within a certain
@@ -10,42 +66,19 @@ const IS_ROOT_TAG = /^(body|html|:root).*$/;
  * @param {string}   namespace Namespace to prefix selectors with.
  * @param {string[]} ignore    Selectors to not prefix.
  *
- * @return {(node: Object) => Object} Callback to wrap selectors.
+ * @return {(cssstyleSheet: CSSStyleSheet) => Object} Callback to wrap selectors.
  */
 const wrap =
 	( namespace, ignore = [] ) =>
-	( node ) => {
-		/**
-		 * Updates selector if necessary.
-		 *
-		 * @param {string} selector Selector to modify.
-		 *
-		 * @return {string} Updated selector.
-		 */
-		const updateSelector = ( selector ) => {
-			if ( ignore.includes( selector.trim() ) ) {
-				return selector;
-			}
+	( cssstyleSheet ) => {
+		const wrapperSelectorAst = createWrapperSelectorAst( namespace ); // (double-nested selector AST)
+		const ignoreSelectorsAsts = ignore.map( createWrapperSelectorAst );
 
-			// Anything other than a root tag is always prefixed.
-			{
-				if ( ! selector.match( IS_ROOT_TAG ) ) {
-					return namespace + ' ' + selector;
-				}
-			}
-
-			// HTML and Body elements cannot be contained within our container so lets extract their styles.
-			return selector.replace( /^(body|html|:root)/, namespace );
-		};
-
-		if ( node.type === 'rule' ) {
-			return {
-				...node,
-				selectors: node.selectors.map( updateSelector ),
-			};
-		}
-
-		return node;
+		recursivelyWrapRules(
+			cssstyleSheet.cssRules,
+			wrapperSelectorAst,
+			ignoreSelectorsAsts
+		);
 	};
 
 export default wrap;

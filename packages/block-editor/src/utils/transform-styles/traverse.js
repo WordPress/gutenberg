@@ -1,16 +1,21 @@
 /**
  * External dependencies
  */
-import traverse from 'traverse';
+//import traverse from 'traverse';
 
 /**
  * Internal dependencies
+ *
+ * @param css
+ * @param callback
  */
-import { parse, stringify } from './ast';
-
+//import { parse, stringify } from './ast';
+/*
 function traverseCSS( css, callback ) {
 	try {
-		const parsed = parse( css );
+		//const parsed = parse( css );
+		const styleEl = createStyleElem( css );
+		const sheet = styleEl.sheet;
 
 		const updated = traverse.map( parsed, function ( node ) {
 			if ( ! node ) {
@@ -20,7 +25,8 @@ function traverseCSS( css, callback ) {
 			return this.update( updatedNode );
 		} );
 
-		return stringify( updated );
+		const cssOut = textFromStyleSheet( sheet );
+		styleEl.remove(); // clean up
 	} catch ( err ) {
 		// eslint-disable-next-line no-console
 		console.warn( 'Error while traversing the CSS: ' + err );
@@ -30,3 +36,4 @@ function traverseCSS( css, callback ) {
 }
 
 export default traverseCSS;
+*/
