@@ -5,15 +5,23 @@ import CSSValueParser from 'postcss-value-parser';
 
 const rewrite = ( rootUrl ) => ( cssRule ) => {
 	// eslint-disable-next-line no-undef
-	if ( cssRule instanceof CSSStyleRule || ! cssRule.style ) {
+	if ( ! ( cssRule instanceof CSSStyleRule ) || ! cssRule.style ) {
 		return cssRule;
 	}
 
-	for ( const propertyName of cssRule.style ) {
-		const propertyValue = cssRule.style[ propertyName ];
-		cssRule.style[ propertyName ] = rewriteUrlsInValue(
-			propertyValue,
-			rootUrl
+	for ( let i = 0; i < cssRule.style.length; i++ ) {
+		const propertyName = cssRule.style[ i ];
+
+		const propertyValue = cssRule.style.getPropertyValue( propertyName );
+		const propertyPriority =
+			cssRule.style.getPropertyPriority( propertyName );
+
+		const newPropertyValue = rewriteUrlsInValue( propertyValue, rootUrl );
+
+		cssRule.style.setProperty(
+			propertyName,
+			newPropertyValue,
+			propertyPriority
 		);
 	}
 	return cssRule;
