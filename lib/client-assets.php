@@ -563,5 +563,5 @@ remove_action( 'wp_enqueue_scripts', 'wp_enqueue_stored_styles' );
 remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 
 // Enqueue stored styles.
-add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles', 99 );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
