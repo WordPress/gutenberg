@@ -631,103 +631,70 @@ add_filter(
 
 
 // We'd like to do some custom handling without attribute parsing.
-// add_shortcode( '#', function( $attr, $content, $tag ) {
-// 	return $content;
-// } );
+// To do: maybe only add this shortcode for the_content filter?
+add_shortcode( '#', function( $attr, $content, $tag ) {
+	return $content;
+} );
 
-// add_filter( 'do_shortcode_tag' , function( $output, $tag, $attr, $m ) {
-// 	if ( $tag !== '#' ) {
-// 		return $output;
-// 	}
+$GLOBALS['notes'] = array();
 
-// 	// $m is the match:
-// 	// $m[0] is the full match.
-// 	// $m[1] is to check shortcode escaping.
-// 	// $m[2] is the shortcode name.
-// 	// $m[3] is the contents within the shortcode after the name. This includes
-// 	// the space between the name and the contents.
-// 	// $m[5] is the contents between the opening and closing shortcode tags (if
-// 	// any).
-// 	$note = $m[3];
-// 	$content = isset( $m[5] ) ? $m[5] : '';
+add_filter( 'do_shortcode_tag' , function( $output, $tag, $attr, $m ) {
+	if ( $tag !== '#' ) {
+		return $output;
+	}
 
-// 	// To do: find the most accessible markup.
-// 	return (
-// 		'<span data-core-footnote tabindex="0">' .
-// 			$content .
-// 		'</span>' .
-// 		'<span role="note">' .
-// 			$note .
-// 		'</span>' .
-// 		// To do: move to a proper stylesheet.
-// 		// The numbering is just a stylistic choice, it could also just be an
-// 		// asterisk or something else. We're not creating a numbered list so it
-// 		// doesn't matter.
-// 		'<style>
-// 			body {
-// 				counter-reset: footnotes;
-// 			}
-// 			[data-core-footnote] {
-// 				counter-increment: footnotes;
-// 			}
-// 			[data-core-footnote]::after,
-// 			[data-core-footnote] + span::before {
-// 				content: "[" counter(footnotes) "]";
-// 				vertical-align: super;
-// 				font-size: smaller;
-// 			}
-// 			[data-core-footnote]:focus {
-// 				outline: 1px dotted black;
-// 			}
-// 			[data-core-footnote] + span {
-// 				display: none;
-// 			}
-// 			[data-core-footnote]:focus + span {
-// 				display: block;
-// 				position: fixed;
-// 				bottom: 0;
-// 				padding: 10px;
-// 				border-top: 1px solid black;
-// 				background: white;
-// 			}
-// 			[data-core-footnote]:focus,
-// 			[data-core-footnote]:focus + span::before {
-// 				background: yellow;
-// 			}
-// 		</style>'
-// 	);
-// }, 10, 4 );
+	// $m is the match:
+	// $m[0] is the full match.
+	// $m[1] is to check shortcode escaping.
+	// $m[2] is the shortcode name.
+	// $m[3] is the contents within the shortcode after the name. This includes
+	// the space between the name and the contents.
+	$note = $m[3];
+	$id = md5( $m[3] );
+
+	if ( isset( $GLOBALS['notes'][ $id ] ) ) {
+		$GLOBALS['notes'][ $id ][ 'count' ] += 1;
+	} else {
+		$GLOBALS['notes'][ $id ] = array( 'note' => $note, 'count' => 1 );
+	}
+
+	// List starts at 1. If the note already exists, use the existing index.
+	$index = 1 + array_search( $id, array_keys( $GLOBALS['notes'] ) );
+	$count = $GLOBALS['notes'][ $id ][ 'count' ];
+
+	return (
+		'<sup><a class="note-link" href="#' . $id . '" id="' . $id . '-link-' . $count . '">[' . $index . ']</a></sup>'
+	);
+}, 10, 4 );
+
+$shortcodes_priority = 10;
 
 // To do: make it work with pagination, excerpt.
 add_filter( 'the_content', function( $content ) {
-	if ( strpos( $content, '[#' ) === false ) {
+	$notes = $GLOBALS['notes'];
+
+	if ( empty( $notes ) ) {
 		return $content;
 	}
 
-	$notes = array();
-
-	$content = preg_replace_callback( '/\[#\s([^\]]+)\]/', function( $matches ) use ( &$notes ) {
-		$notes[] = $matches[1];
-		$id = md5( $matches[1] );
-		return '<a class="note-link" href="#' . $id . '" id="' . $id . '-link"></a>';
-	}, $content );
-
 	$list = '<ol>';
 
-	foreach ( $notes as $note ) {
-		$id = md5( $note );
-
+	foreach ( $notes as $id => $info ) {
+		$note = $info['note'];
+		$count = $info['count'];
 		$list .= '<li id="' . $id . '">';
-		$list .= '<a id="' . $id . '" href="#' . $id . '-link" aria-label="' . __( 'Back to content', 'gutenberg' ) . '">↑</a>';
-		$list .= ' ' . $note;
+		$list .= $note;
+		$label = $count > 1 ? __( 'Back to content (%s)', 'gutenberg' ) : __( 'Back to content', 'gutenberg' );
+		$links = '';
+		while ($count) {
+			$links = '<a href="#' . $id . '-link-' . $count . '" aria-label="' . sprintf( $label, $count ) . '">↩︎</a>' . $links;
+			$count--;
+		}
+		$list .= $links;
 		$list .= '</li>';
 	}
 
 	$list .= '</ol>';
 
-	// To do: move to a proper stylesheet.
-	// To do: need to add a post class instead of using .entry-content.
-	$style = '<style>.entry-content{counter-reset:footnotes}.note-link{counter-increment:footnotes}.note-link::after{content:"["counter(footnotes)"]";vertical-align:super;font-size:smaller;}</style>';
-
-	return $content . $list . $style;
-} );
+	return $content . $list;
+}, $shortcodes_priority + 1, 1 );
