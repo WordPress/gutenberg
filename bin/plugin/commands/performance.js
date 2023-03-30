@@ -330,7 +330,7 @@ async function runPerformanceTests( refs, options ) {
 			}
 
 			let buildDir;
-			let doBuild = false;
+			let doBuild = true;
 
 			if ( i === 0 ) {
 				buildDir = cwd;
