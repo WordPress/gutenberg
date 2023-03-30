@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.1.0 (2023-03-29)
+
 ## 7.0.0 (2023-03-15)
 
 ### Breaking Changes

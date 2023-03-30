@@ -248,6 +248,7 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
+			data-expanded={ canExpand ? isExpanded : undefined }
 			isExpanded={ canExpand ? isExpanded : undefined }
 			aria-selected={ !! isSelected || forceSelectionContentLock }
 			ref={ rowRef }

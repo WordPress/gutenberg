@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.1.0 (2023-03-29)
+
 ## 6.0.0 (2023-03-15)
 
 ### Breaking Changes

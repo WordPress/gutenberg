@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "23.6.0",
+	"version": "23.7.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,6 +28,7 @@
 		"build-style/**",
 		"src/**/*.scss"
 	],
+	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@emotion/cache": "^11.7.1",
