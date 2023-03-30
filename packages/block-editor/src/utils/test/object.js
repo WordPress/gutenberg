@@ -84,6 +84,44 @@ describe( 'immutableSet', () => {
 				} );
 			} );
 		} );
+
+		describe( 'for nested falsey values', () => {
+			it( 'overwrites undefined values', () => {
+				const result = immutableSet( { test: undefined }, 'test', 1 );
+
+				expect( result ).toEqual( { test: 1 } );
+			} );
+
+			it( 'overwrites null values', () => {
+				const result = immutableSet( { test: null }, 'test', 1 );
+
+				expect( result ).toEqual( { test: 1 } );
+			} );
+
+			it( 'overwrites false values', () => {
+				const result = immutableSet( { test: false }, 'test', 1 );
+
+				expect( result ).toEqual( { test: 1 } );
+			} );
+
+			it( 'overwrites `0` values', () => {
+				const result = immutableSet( { test: 0 }, 'test', 1 );
+
+				expect( result ).toEqual( { test: 1 } );
+			} );
+
+			it( 'overwrites empty string values', () => {
+				const result = immutableSet( { test: '' }, 'test', 1 );
+
+				expect( result ).toEqual( { test: 1 } );
+			} );
+
+			it( 'overwrites NaN values', () => {
+				const result = immutableSet( { test: NaN }, 'test', 1 );
+
+				expect( result ).toEqual( { test: 1 } );
+			} );
+		} );
 	} );
 
 	describe( 'does not mutate the original object', () => {
