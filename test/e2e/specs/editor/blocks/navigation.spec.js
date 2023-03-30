@@ -554,7 +554,7 @@ test.describe( 'List view editing', () => {
 		).not.toBeVisible();
 	} );
 
-	test( `can edit menu items`, async ( {
+	test.only( `can edit menu items`, async ( {
 		admin,
 		page,
 		editor,
@@ -609,6 +609,16 @@ test.describe( 'List view editing', () => {
 				} )
 		).toBeVisible();
 
+		const labelInput = blockSettings.getByRole( 'textbox', {
+			name: 'Label',
+		} );
+
+		await expect( labelInput ).toHaveValue( 'Top Level Item 1' );
+
+		await labelInput.focus();
+
+		await page.keyboard.type( 'Changed label' );
+
 		// Click the back button to go back to the Nav block.
 		await blockSettings
 			.getByRole( 'button', {
@@ -622,6 +632,18 @@ test.describe( 'List view editing', () => {
 		} );
 
 		await expect( listViewPanel ).toBeVisible();
+
+		// Check the label was updated.
+		await expect(
+			listViewPanel
+				.getByRole( 'gridcell', {
+					name: 'Page Link link',
+				} )
+				.filter( {
+					hasText: 'Block 1 of 2, Level 1', // proxy for filtering by description.
+				} )
+				.getByText( 'Changed label' ) // new label text
+		).toBeVisible();
 	} );
 
 	test( `can add submenus`, async ( {
