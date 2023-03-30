@@ -55,6 +55,7 @@ import * as html from './html';
 import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
+import * as legacyWidget from './legacy-widget';
 import * as list from './list';
 import * as listItem from './list-item';
 import * as logInOut from './loginout';
@@ -152,6 +153,7 @@ const getAllBlocks = () =>
 		html,
 		latestComments,
 		latestPosts,
+		...( window.wp && window.wp.widgets ? [ legacyWidget ] : [] ), // Only add the legacy widget block in widget screens.
 		mediaText,
 		missing,
 		more,

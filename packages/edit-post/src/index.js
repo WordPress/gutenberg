@@ -5,16 +5,14 @@ import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
+	__experimentalGetCoreBlocks,
 } from '@wordpress/block-library';
 import deprecated from '@wordpress/deprecated';
 import { createRoot } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import {
-	registerLegacyWidgetBlock,
-	registerWidgetGroupBlock,
-} from '@wordpress/widgets';
+import { registerWidgetGroupBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -23,6 +21,34 @@ import './hooks';
 import './plugins';
 import Editor from './editor';
 import { store as editPostStore } from './store';
+
+function registerBlocks( settings ) {
+	const coreBlocksByName = __experimentalGetCoreBlocks().reduce(
+		( acc, block ) => {
+			acc[ block.name ] = block;
+			return acc;
+		},
+		{}
+	);
+
+	coreBlocksByName[ 'core/legacy-widget' ] = {
+		...coreBlocksByName[ 'core/legacy-widget' ],
+		supports: {
+			...coreBlocksByName[ 'core/legacy-widget' ].supports,
+			inserter: false,
+		},
+	};
+
+	registerCoreBlocks( Object.values( coreBlocksByName ) );
+
+	registerWidgetGroupBlock( { inserter: false } );
+
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
+		} );
+	}
+}
 
 /**
  * Initializes and returns an instance of Editor.
@@ -69,14 +95,7 @@ export function initializeEditor(
 		dispatch( editPostStore ).setIsListViewOpened( true );
 	}
 
-	registerCoreBlocks();
-	registerLegacyWidgetBlock( { inserter: false } );
-	registerWidgetGroupBlock( { inserter: false } );
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
-			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
-		} );
-	}
+	registerBlocks( settings );
 
 	/*
 	 * Prevent adding template part in the post editor.

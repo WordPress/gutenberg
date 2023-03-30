@@ -332,6 +332,15 @@ Display a list of your most recent posts. ([Source](https://github.com/WordPress
 -	**Supports:** align, anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** addLinkToFeaturedImage, categories, columns, displayAuthor, displayFeaturedImage, displayPostContent, displayPostContentRadio, displayPostDate, excerptLength, featuredImageAlign, featuredImageSizeHeight, featuredImageSizeSlug, featuredImageSizeWidth, order, orderBy, postLayout, postsToShow, selectedAuthor
 
+## Legacy Widget
+
+Display a legacy widget. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/legacy-widget))
+
+-	**Name:** core/legacy-widget
+-	**Category:** widgets
+-	**Supports:** ~~customClassName~~, ~~html~~, ~~reusable~~
+-	**Attributes:** id, idBase, instance
+
 ## List
 
 Create a bulleted or numbered list. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list))

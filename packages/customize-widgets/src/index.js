@@ -8,7 +8,6 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import {
-	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
@@ -60,7 +59,6 @@ export function initialize( editorName, blockEditorSettings ) {
 		);
 	} );
 	registerCoreBlocks( coreBlocks );
-	registerLegacyWidgetBlock();
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,

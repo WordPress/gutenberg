@@ -17,10 +17,7 @@ import {
 import { store as editorStore } from '@wordpress/editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import {
-	registerLegacyWidgetBlock,
-	registerWidgetGroupBlock,
-} from '@wordpress/widgets';
+import { registerWidgetGroupBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -28,6 +25,39 @@ import {
 import './hooks';
 import { store as editSiteStore } from './store';
 import App from './components/app';
+
+function registerBlocks() {
+	const coreBlocksByName = __experimentalGetCoreBlocks().reduce(
+		( acc, block ) => {
+			acc[ block.name ] = block;
+			return acc;
+		},
+		{}
+	);
+
+	delete coreBlocksByName[ 'core/freeform' ];
+
+	coreBlocksByName[ 'core/legacy-widget' ] = {
+		...coreBlocksByName[ 'core/legacy-widget' ],
+		metadata: {
+			...coreBlocksByName[ 'core/legacy-widget' ].metadata,
+			supports: {
+				...coreBlocksByName[ 'core/legacy-widget' ].metadata.supports,
+				inserter: false,
+			},
+		},
+	};
+
+	registerCoreBlocks( Object.values( coreBlocksByName ) );
+
+	registerWidgetGroupBlock( { inserter: false } );
+
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableFSEBlocks: true,
+		} );
+	}
+}
 
 /**
  * Initializes the site editor screen.
@@ -44,18 +74,10 @@ export function initializeEditor( id, settings ) {
 	settings.__experimentalFetchRichUrlData = fetchUrlData;
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
-	const coreBlocks = __experimentalGetCoreBlocks().filter(
-		( { name } ) => name !== 'core/freeform'
-	);
-	registerCoreBlocks( coreBlocks );
+
+	registerBlocks();
+
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
-	registerLegacyWidgetBlock( { inserter: false } );
-	registerWidgetGroupBlock( { inserter: false } );
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
-			enableFSEBlocks: true,
-		} );
-	}
 
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.

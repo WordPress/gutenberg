@@ -68,6 +68,7 @@ import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
+import { classicMenuIds } from '../classic-menu-ids';
 
 function Navigation( {
 	attributes,
@@ -402,18 +403,35 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const onSelectClassicMenu = async ( classicMenu ) => {
-		const navMenu = await convertClassicMenu(
-			classicMenu.id,
-			classicMenu.name,
-			'draft'
-		);
-		if ( navMenu ) {
-			handleUpdateMenu( navMenu.id, {
-				focusNavigationBlock: true,
-			} );
+	const onSelectClassicMenu = useCallback(
+		async ( classicMenu ) => {
+			const navMenu = await convertClassicMenu(
+				classicMenu.id,
+				classicMenu.name,
+				'draft'
+			);
+			if ( navMenu ) {
+				handleUpdateMenu( navMenu.id, {
+					focusNavigationBlock: true,
+				} );
+			}
+		},
+		[ convertClassicMenu, handleUpdateMenu ]
+	);
+
+	// Convert the classic menu provided by the Legacy Widget block transform if
+	// it exists.
+	useEffect( () => {
+		if ( classicMenuIds.has( clientId ) ) {
+			const menuId = classicMenuIds.get( clientId );
+			const classicMenu = classicMenus?.find(
+				( menu ) => menu.id === menuId
+			);
+			if ( classicMenu ) {
+				onSelectClassicMenu( classicMenu );
+			}
 		}
-	};
+	}, [ clientId, classicMenus, onSelectClassicMenu ] );
 
 	const onSelectNavigationMenu = ( menuId ) => {
 		handleUpdateMenu( menuId );
