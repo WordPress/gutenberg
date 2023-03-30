@@ -8,15 +8,21 @@ SauceLabs is a cloud hosting platform that provides access to a variety of simul
 
 ## Getting set up to run the tests
 
-### Emulators && Simulators
+### Emulators & Simulators
 
-iOS: Once you've already set up XCode and the simulators you should be good to go to run the tests on an iOS simulator.
+> **Note**
+>
+> Visual regression tests that rely upon screenshots require specific devices and OS versions for Android and iOS, respectively, otherwise the tests will fail due to subtle OS differences. To run or update visual regression tests, install the emulators/simulators listed in the test suite [configuration files](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/__device-tests__/helpers/caps.js#L30-L31).
 
-Android: You'll need to have created the emulator images and fired up the desired emulator before running the tests against an Android emulator.
+**iOS:** If you have completed the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide you should already have XCode installed and the simulators set up.
 
-### Real Devices
+**Android:** If you have completed the [React Native Getting Started](https://reactnative.dev/docs/environment-setup) guide you should already have Android Studio installed and the Android SDK installed. You'll also need to have the [Android Emulator](https://developer.android.com/studio/run/emulator) installed and set up. The emulator needs to be running prior to running the tests.
 
-TBA
+### Physical Devices
+
+**iOS:** Currently unsupported.
+
+**Android:** Connect your device to your computer via USB and [enable USB debugging](https://developer.android.com/studio/debug/dev-options).
 
 ## Running the tests locally
 

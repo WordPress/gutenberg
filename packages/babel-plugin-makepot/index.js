@@ -342,7 +342,7 @@ module.exports = () => {
 								if (
 									isSameTranslation(
 										translation,
-										memo[ msgctxt ][ msgid ]
+										memo[ msgctxt ][ msgid ] ?? {}
 									)
 								) {
 									translation.comments.reference = [

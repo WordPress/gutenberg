@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -9,7 +10,8 @@ import { render, fireEvent, screen } from '@testing-library/react';
 import CustomSelectControl from '..';
 
 describe( 'CustomSelectControl', () => {
-	it( 'Captures the keypress event and does not let it propagate', () => {
+	it( 'Captures the keypress event and does not let it propagate', async () => {
+		const user = userEvent.setup();
 		const onKeyDown = jest.fn();
 		const options = [
 			{
@@ -39,10 +41,10 @@ describe( 'CustomSelectControl', () => {
 			</div>
 		);
 		const toggleButton = screen.getByRole( 'button' );
-		fireEvent.click( toggleButton );
+		await user.click( toggleButton );
 
 		const customSelect = screen.getByRole( 'listbox' );
-		fireEvent.keyDown( customSelect );
+		await user.type( customSelect, '{enter}' );
 
 		expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
 	} );
