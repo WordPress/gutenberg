@@ -142,7 +142,9 @@ export function CommandMenu() {
 							autoFocus
 							value={ search }
 							onValueChange={ setSearch }
-							placeholder={ __( 'Ask anything' ) }
+							placeholder={ __(
+								'Search for content and templates, or try commands like "Create…"'
+							) }
 						/>
 					</div>
 					<Command.List>
