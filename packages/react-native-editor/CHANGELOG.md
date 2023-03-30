@@ -11,7 +11,6 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
-## 1.92.0
 -   [**] [iOS] Fix dictation regression, in which typing/dictating at the same time caused content loss. [#49452]
 
 ## 1.91.0
