@@ -635,6 +635,10 @@ define( 'GUTENBERG_FOOTNOTES_KEY', 'GUTENBERG_FOOTNOTES_KEY' );
 /**
  * Footnotes shortcode handling: we'd like custom handling without attribut
  * parsing, so just return the content.
+ * 
+ * @param array $attr Shortcode attributes.
+ * @param string $content Shortcode content.
+ * @return string Shortcode content.
  */
 function gutenberg_footnotes_add_shortcode( $attr, $content ) {
 	return $content;
@@ -643,6 +647,12 @@ function gutenberg_footnotes_add_shortcode( $attr, $content ) {
 /**
  * Custom shortcode handlering without attribut parsing. Replaces the shortcode
  * with a link and accumulates the footnote in a global array.
+ * 
+ * @param string $output Shortcode output.
+ * @param string $tag Shortcode tag.
+ * @param array $attr Shortcode attributes.
+ * @param array $m Shortcode match array.
+ * @return string Footnote link.
  */
 function gutenberg_footnotes_do_shortcode_tag( $output, $tag, $attr, $m ) {
 	if ( '#' !== $tag ) {
@@ -688,6 +698,9 @@ add_filter( 'do_shortcode_tag', 'gutenberg_footnotes_do_shortcode_tag', 10, 4 );
 
 /**
  * Add footnotes to the end of the content.
+ * 
+ * @param string $content Content.
+ * @return string Content with footnotes.
  */
 function gutenberg_footnotes_the_content_after( $content ) {
 	if ( ! isset( $GLOBALS[ GUTENBERG_FOOTNOTES_KEY ] ) ) {
@@ -728,6 +741,9 @@ function gutenberg_footnotes_the_content_after( $content ) {
 
 /**
  * Create the global array to accumulate footnotes.
+ * 
+ * @param string $content Content.
+ * @return string Content.
  */
 function gutenberg_footnotes_the_content_before( $content ) {
 	$GLOBALS[ GUTENBERG_FOOTNOTES_KEY ] = array();
