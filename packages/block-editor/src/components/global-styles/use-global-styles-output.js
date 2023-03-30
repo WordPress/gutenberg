@@ -853,7 +853,7 @@ export const toStyles = (
 				delete styles.filter;
 			}
 
-			// Process duotone styles (they use color.__experimentalDuotone selector).
+			// Process duotone styles.
 			if ( duotoneSelector ) {
 				const duotoneDeclarations =
 					getStylesDeclarations( duotoneStyles );
