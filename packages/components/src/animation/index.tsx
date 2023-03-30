@@ -10,4 +10,5 @@
 export {
 	motion as __unstableMotion,
 	AnimatePresence as __unstableAnimatePresence,
+	useAnimation as __unstableUseAnimation,
 } from 'framer-motion';

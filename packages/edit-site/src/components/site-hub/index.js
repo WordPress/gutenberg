@@ -11,14 +11,15 @@ import {
 	Button,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
+	__unstableUseAnimation as useAnimation,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { forwardRef } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
+import { forwardRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,12 +31,8 @@ import { unlock } from '../../private-apis';
 const HUB_ANIMATION_DURATION = 0.3;
 
 const SiteHub = forwardRef( ( props, ref ) => {
-<<<<<<< HEAD
-	const { canvasMode, dashboardLink } = useSelect( ( select ) => {
-=======
 	const { canvasMode } = useSelect( ( select ) => {
 		select( editSiteStore ).getEditedPostType();
->>>>>>> 2bbc911b4d (Add animation to the site icon element in the header.)
 		const { getCanvasMode, getSettings } = unlock(
 			select( editSiteStore )
 		);
@@ -62,13 +59,19 @@ const SiteHub = forwardRef( ( props, ref ) => {
 		[]
 	);
 
+	const controls = useAnimation();
+
+	useEffect( () => {
+		controls.set( { layout: true } );
+	}, [] );
+
 	return (
 		<motion.div
 			ref={ ref }
 			{ ...props }
 			className={ classnames( 'edit-site-site-hub', props.className ) }
 			initial={ false }
-			layout
+			animate={ controls }
 			transition={ {
 				type: 'tween',
 				duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
@@ -83,6 +86,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 				<motion.div
 					className="edit-site-site-hub__view-mode-toggle-container"
 					layout
+					animate={ controls }
 					transition={ {
 						type: 'tween',
 						duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
@@ -116,8 +120,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 
 				<AnimatePresence>
 					<motion.div
-						initial={ false }
-						layout
+						layout={ canvasMode === 'edit' }
 						animate={ {
 							opacity: canvasMode === 'view' ? 1 : 0,
 						} }
@@ -129,6 +132,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 							type: 'tween',
 							duration: disableMotion ? 0 : 0.2,
 							ease: 'easeOut',
+							delay: canvasMode === 'view' ? 0.1 : 0,
 						} }
 					>
 						{ decodeEntities( siteTitle ) }
