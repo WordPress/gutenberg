@@ -9,34 +9,37 @@ import { render, fireEvent, waitFor } from '@testing-library/react';
 import { ColorPicker } from '..';
 
 /**
- * Ordinarily we'd try to select the compnoent by role but the silder role appears
+ * Ordinarily we'd try to select the component by role but the slider role appears
  * on several elements and we'd end up encoding assumptions about order when
- * trying to select the appropriate element. We might as well just use the classname
+ * trying to select the appropriate element. We might as well just use the class name
  * on the container which will be more durable if, for example, the order changes.
- *
- * @param {HTMLElement} container
- * @return {HTMLElement} The saturation element
  */
-function getSaturation( container ) {
+function getSaturation( container: HTMLElement ) {
 	return container.querySelector(
 		'.react-colorful__saturation .react-colorful__interactive'
 	);
 }
 
+type PageXPageY = { pageX: number; pageY: number };
+
 // Fix to pass `pageX` and `pageY`
 // See https://github.com/testing-library/react-testing-library/issues/268
-class FakeMouseEvent extends window.MouseEvent {
-	constructor( type, values = {} ) {
+class FakeMouseEvent extends MouseEvent {
+	constructor( type: MouseEvent[ 'type' ], values?: PageXPageY ) {
 		super( type, { buttons: 1, bubbles: true, ...values } );
 
 		Object.assign( this, {
-			pageX: values.pageX || 0,
-			pageY: values.pageY || 0,
+			pageX: values?.pageX ?? 0,
+			pageY: values?.pageY ?? 0,
 		} );
 	}
 }
 
-function moveReactColorfulSlider( sliderElement, from, to ) {
+function moveReactColorfulSlider(
+	sliderElement: Element,
+	from: PageXPageY,
+	to: PageXPageY
+) {
 	fireEvent( sliderElement, new FakeMouseEvent( 'mousedown', from ) );
 	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
 }
@@ -81,6 +84,13 @@ describe( 'ColorPicker', () => {
 			);
 
 			const saturation = getSaturation( container );
+
+			if ( saturation === null ) {
+				throw new Error( 'The saturation slider could not be found' );
+			}
+
+			expect( saturation ).toBeInTheDocument();
+
 			moveReactColorfulSlider(
 				saturation,
 				{ pageX: 0, pageY: 0 },
@@ -106,6 +116,13 @@ describe( 'ColorPicker', () => {
 		);
 
 		const saturation = getSaturation( container );
+
+		if ( saturation === null ) {
+			throw new Error( 'The saturation slider could not be found' );
+		}
+
+		expect( saturation ).toBeInTheDocument();
+
 		moveReactColorfulSlider(
 			saturation,
 			{ pageX: 0, pageY: 0 },
@@ -121,13 +138,7 @@ describe( 'ColorPicker', () => {
 
 	it( 'should fire onChange with the HSL value', async () => {
 		const onChange = jest.fn();
-		const color = {
-			h: 125,
-			s: 0.2,
-			l: 0.5,
-			// Add alpha to prove it's ignored.
-			a: 0.5,
-		};
+		const color = 'hsla(125, 20%, 50%, 0.5)';
 
 		const { container } = render(
 			<ColorPicker
@@ -138,6 +149,13 @@ describe( 'ColorPicker', () => {
 		);
 
 		const saturation = getSaturation( container );
+
+		if ( saturation === null ) {
+			throw new Error( 'The saturation slider could not be found' );
+		}
+
+		expect( saturation ).toBeInTheDocument();
+
 		moveReactColorfulSlider(
 			saturation,
 			{ pageX: 0, pageY: 0 },

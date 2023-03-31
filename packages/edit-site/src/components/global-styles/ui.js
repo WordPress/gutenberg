@@ -27,10 +27,6 @@ import ScreenTypographyElement from './screen-typography-element';
 import ScreenFilters from './screen-filters';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
-import ScreenBackgroundColor from './screen-background-color';
-import ScreenLinkColor from './screen-link-color';
-import ScreenHeadingColor from './screen-heading-color';
-import ScreenColorElement from './screen-color-element';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import { ScreenVariation } from './screen-variations';
@@ -205,52 +201,8 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 				<ScreenColorPalette name={ name } />
 			</GlobalStylesNavigationScreen>
 
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/colors/background' }
-			>
-				<ScreenBackgroundColor name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
 			<GlobalStylesNavigationScreen path={ parentMenu + '/filters' }>
 				<ScreenFilters name={ name } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/text' }>
-				<ScreenColorElement
-					name={ name }
-					variation={ variation }
-					element="text"
-				/>
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/link' }>
-				<ScreenLinkColor name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/colors/heading' }
-			>
-				<ScreenHeadingColor name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/colors/button' }
-			>
-				<ScreenColorElement
-					name={ name }
-					variation={ variation }
-					element="button"
-				/>
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/colors/caption' }
-			>
-				<ScreenColorElement
-					name={ name }
-					variation={ variation }
-					element="caption"
-				/>
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>

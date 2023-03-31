@@ -206,9 +206,7 @@ export default function CoverInspectorControls( {
 							isImgElement && (
 								<TextareaControl
 									__nextHasNoMarginBottom
-									label={ __(
-										'Alt text (alternative text)'
-									) }
+									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>
 										setAttributes( { alt: newAlt } )
@@ -217,11 +215,12 @@ export default function CoverInspectorControls( {
 										<>
 											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 												{ __(
-													'Describe the purpose of the image'
+													'Describe the purpose of the image.'
 												) }
 											</ExternalLink>
+											<br />
 											{ __(
-												'Leave empty if the image is purely decorative.'
+												'Leave empty if decorative.'
 											) }
 										</>
 									}

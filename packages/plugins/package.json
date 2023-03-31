@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "5.6.0",
+	"version": "5.7.0",
 	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,6 +30,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"memize": "^1.1.0"
 	},
 	"peerDependencies": {

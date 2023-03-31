@@ -20,7 +20,6 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { useHasColorPanel } from './color-utils';
 import { useHasVariationsPanel } from './variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
@@ -32,6 +31,7 @@ const {
 	useHasBorderPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
+	useHasColorPanel,
 } = unlock( blockEditorPrivateApis );
 
 function useSortedBlockTypes() {
@@ -61,7 +61,7 @@ function BlockMenuItem( { block } ) {
 	const [ rawSettings ] = useGlobalSetting( '', block.name );
 	const settings = useSettingsForBlockElement( rawSettings, block.name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
-	const hasColorPanel = useHasColorPanel( block.name );
+	const hasColorPanel = useHasColorPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;

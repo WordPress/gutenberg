@@ -27,7 +27,6 @@
 	max-width: 100%;
 }
 
-.edit-site-global-styles-screen-heading-color,
 .edit-site-global-styles-screen-typography,
 .edit-site-global-styles-screen-css {
 	margin: $grid-unit-20;
@@ -46,10 +45,10 @@
 .edit-site-global-styles-screen-colors {
 	margin: $grid-unit-20;
 
-	.component-color-indicator {
-		// Show a diagonal line (crossed out) for empty swatches.
-		background: $white linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
-		flex-shrink: 0;
+	.color-block-support-panel {
+		padding-left: 0;
+		padding-right: 0;
+		border-top: none;
 	}
 }
 
@@ -84,14 +83,6 @@
 	margin: 0;
 }
 
-.edit-site-screen-element-color__control,
-.edit-site-screen-text-color__control,
-.edit-site-screen-link-color__control,
-.edit-site-screen-button-color__control,
-.edit-site-screen-background-color__control.has-no-tabs {
-	padding: $grid-unit-20;
-}
-
 .edit-site-global-styles-variations_item {
 	box-sizing: border-box;
 
@@ -122,12 +113,6 @@
 	// Match the height of the rest of the icons (24px).
 	height: $grid-unit * 3;
 	flex-shrink: 0;
-}
-
-.edit-site-global-styles__color-label {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
 }
 
 .edit-site-global-styles__block-preview-panel {
