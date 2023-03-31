@@ -57,7 +57,7 @@ export default function SidebarNavigationScreen( {
 					className="edit-site-sidebar-navigation-screen__title"
 					color={ 'white' }
 					level={ 2 }
-					size={ 16 }
+					size={ 20 }
 				>
 					{ title }
 				</Heading>
