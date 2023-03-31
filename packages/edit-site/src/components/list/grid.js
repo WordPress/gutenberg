@@ -5,7 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	VisuallyHidden,
+	Button,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 } from '@wordpress/components';
@@ -15,7 +15,6 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import Link from '../routes/link';
-import Actions from './actions';
 import AddedBy from './added-by';
 import { useHistory } from '../routes';
 
@@ -23,33 +22,30 @@ const config = {
 	wp_template: {
 		fields: [
 			{
+				label: __( 'Image' ),
+				value: 'featured_media',
+				type: 'image',
+			},
+			{
 				label: __( 'Title' ),
 				value: 'title',
 				type: 'title',
 				fallback: 'slug',
-			},
-			{
-				label: __( 'Description' ),
-				value: 'description',
-				type: 'text',
-			},
-			{
-				label: __( 'Added by' ),
-				type: 'addedBy',
 			},
 		],
 	},
 	wp_template_part: {
 		fields: [
 			{
+				label: __( 'Image' ),
+				value: 'featured_media',
+				type: 'image',
+			},
+			{
 				label: __( 'Title' ),
 				value: 'title',
 				fallback: 'slug',
 				type: 'title',
-			},
-			{
-				label: __( 'Added by' ),
-				type: 'addedBy',
 			},
 		],
 	},
@@ -66,20 +62,11 @@ const config = {
 				fallback: 'slug',
 				type: 'title',
 			},
-			{
-				label: __( 'Slug' ),
-				value: 'slug',
-				type: 'text',
-			},
-			{
-				label: __( 'Added by' ),
-				type: 'addedBy',
-			},
 		],
 	},
 };
 
-export default function Table( { templateType, filters = {} } ) {
+export default function Grid( { templateType, filters = {} } ) {
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
 		templateType,
@@ -125,61 +112,25 @@ export default function Table( { templateType, filters = {} } ) {
 	return (
 		// These explicit aria roles are needed for Safari.
 		// See https://developer.mozilla.org/en-US/docs/Web/CSS/display#tables
-		<table
-			className="edit-site-list-table"
-			role="table"
-			table-layout="auto"
-			border-collapse="collapse"
-		>
-			<thead>
-				<tr className="edit-site-list-table-head" role="row">
+		<div className="edit-site-list-grid">
+			{ sortedTemplates.map( ( template ) => (
+				<Button
+					key={ template.id }
+					className="edit-site-list-grid__item"
+					onClick={ () => handleRowClick( template ) }
+				>
 					{ config[ templateType ].fields.map( ( field ) => (
-						<th
+						<FieldValue
 							key={ field.value }
-							className="edit-site-list-table-column"
-							role="columnheader"
-						>
-							{ field.label }
-						</th>
+							template={ template }
+							type={ field.type }
+							value={ field.value }
+							fallback={ field.fallback }
+						/>
 					) ) }
-					<th
-						className="edit-site-list-table-column"
-						role="columnheader"
-					>
-						<VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>
-					</th>
-				</tr>
-			</thead>
-
-			<tbody>
-				{ sortedTemplates.map( ( template ) => (
-					<tr
-						key={ template.id }
-						className="edit-site-list-table-row"
-						role="row"
-						onClick={ () => handleRowClick( template ) }
-					>
-						{ config[ templateType ].fields.map( ( field ) => (
-							<td
-								className="edit-site-list-table-column"
-								role="cell"
-								key={ field.value }
-							>
-								<FieldValue
-									template={ template }
-									type={ field.type }
-									value={ field.value }
-									fallback={ field.fallback }
-								/>
-							</td>
-						) ) }
-						<td className="edit-site-list-table-column" role="cell">
-							<Actions template={ template } />
-						</td>
-					</tr>
-				) ) }
-			</tbody>
-		</table>
+				</Button>
+			) ) }
+		</div>
 	);
 }
 
@@ -217,8 +168,8 @@ const FieldValue = ( { template, type, value, fallback } ) => {
 					style={ {
 						borderRadius: 2,
 						backgroundColor: 'rgba(255,255,255,.05)',
-						width: 64,
-						height: 48,
+						width: '100%',
+						height: 300,
 					} }
 				/>
 			);

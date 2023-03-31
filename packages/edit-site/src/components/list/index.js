@@ -3,10 +3,7 @@
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { InterfaceSkeleton } from '@wordpress/interface';
-import { __, sprintf } from '@wordpress/i18n';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { EditorSnackbars } from '@wordpress/editor';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,11 +13,15 @@ import Header from './header';
 import Table from './table';
 import { useLocation } from '../routes';
 import useTitle from '../routes/use-title';
+import ViewBar from './view-bar';
+import Grid from './grid';
 
 export default function List() {
 	const {
 		params: { path, ...filters },
 	} = useLocation();
+
+	const [ viewType, setViewType ] = useState( 'list' );
 
 	let templateType = 'wp_template';
 
@@ -38,17 +39,6 @@ export default function List() {
 
 	useRegisterShortcuts();
 
-	const { previousShortcut, nextShortcut } = useSelect( ( select ) => {
-		return {
-			previousShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-site/previous-region' ),
-			nextShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
-		};
-	}, [] );
-
 	const postType = useSelect(
 		( select ) => select( coreStore ).getPostType( templateType ),
 		[ templateType ]
@@ -56,37 +46,15 @@ export default function List() {
 
 	useTitle( postType?.labels?.name );
 
-	// `postType` could load in asynchronously. Only provide the detailed region labels if
-	// the postType has loaded, otherwise `InterfaceSkeleton` will fallback to the defaults.
-	const itemsListLabel = postType?.labels?.items_list;
-	const detailedRegionLabels = postType
-		? {
-				header: sprintf(
-					// translators: %s - the name of the page, 'Header' as in the header area of that page.
-					__( '%s - Header' ),
-					itemsListLabel
-				),
-				body: sprintf(
-					// translators: %s - the name of the page, 'Content' as in the content area of that page.
-					__( '%s - Content' ),
-					itemsListLabel
-				),
-		  }
-		: undefined;
-
 	return (
-		<InterfaceSkeleton
-			className="edit-site-list"
-			labels={ detailedRegionLabels }
-			header={ <Header templateType={ templateType } /> }
-			notices={ <EditorSnackbars /> }
-			content={
+		<div className="edit-site-layout__content-area">
+			<Header templateType={ templateType } />
+			<ViewBar onViewChange={ setViewType } viewType={ viewType } />
+			{ viewType === 'list' ? (
 				<Table templateType={ templateType } filters={ filters } />
-			}
-			shortcuts={ {
-				previous: previousShortcut,
-				next: nextShortcut,
-			} }
-		/>
+			) : (
+				<Grid templateType={ templateType } filters={ filters } />
+			) }
+		</div>
 	);
 }
