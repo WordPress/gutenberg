@@ -39,8 +39,7 @@ export const KeyboardAwareFlatList = ( {
 	const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 	const isLandscape = windowWidth >= windowHeight;
 
-	const [ isKeyboardVisible, keyboardOffset ] =
-		useKeyboardOffset( scrollEnabled );
+	const [ keyboardOffset ] = useKeyboardOffset( scrollEnabled );
 
 	const [ currentCaretData ] = useTextInputCaretPosition( scrollEnabled );
 
@@ -62,23 +61,13 @@ export const KeyboardAwareFlatList = ( {
 		useCallback(
 			async ( caret ) => {
 				const textInputOffset = await getTextInputOffset( caret );
-				const isKeyboardVisibleWithOffset =
-					isKeyboardVisible && keyboardOffset !== 0;
 				const hasTextInputOffset = textInputOffset !== null;
 
-				if (
-					( isKeyboardVisibleWithOffset && hasTextInputOffset ) ||
-					( ! isKeyboardVisible && hasTextInputOffset )
-				) {
+				if ( hasTextInputOffset ) {
 					scrollToTextInputOffset( caret, textInputOffset );
 				}
 			},
-			[
-				getTextInputOffset,
-				isKeyboardVisible,
-				keyboardOffset,
-				scrollToTextInputOffset,
-			]
+			[ getTextInputOffset, scrollToTextInputOffset ]
 		),
 		200,
 		{ leading: false }
@@ -92,12 +81,7 @@ export const KeyboardAwareFlatList = ( {
 	// need to be re-calculated.
 	useEffect( () => {
 		scrollViewMeasurements.current = null;
-		// Only re-caculate them if there's an existing value
-		// as it should be set when the ScrollView content changes.
-		if ( scrollViewMeasurements.current ) {
-			measureScrollView();
-		}
-	}, [ isLandscape, measureScrollView ] );
+	}, [ isLandscape ] );
 
 	const scrollHandler = useAnimatedScrollHandler( {
 		onScroll: ( event ) => {
