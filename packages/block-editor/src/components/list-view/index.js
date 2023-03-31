@@ -73,7 +73,7 @@ function ListViewComponent(
 		isExpanded = false,
 		showAppender = false,
 		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
-		rootClientId = null,
+		rootClientId,
 	},
 	ref
 ) {
