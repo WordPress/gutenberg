@@ -149,9 +149,10 @@
 .edit-site-layout__view-mode-toggle.components-button {
 	position: relative;
 	color: $white;
-	height: 100%;
-	width: 100%;
-	border-radius: $radius-block-ui;
+	border-radius: 0;
+	height: $header-height;
+	width: $header-height;
+	overflow: hidden;
 	padding: 0;
 	display: flex;
 	align-items: center;
