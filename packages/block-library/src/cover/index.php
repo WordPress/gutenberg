@@ -46,6 +46,9 @@ function render_block_core_cover( $attributes, $content ) {
 			update_post_thumbnail_cache();
 		}
 		$current_featured_image = get_the_post_thumbnail_url();
+		if ( ! $current_featured_image ) {
+			return $content;
+		}
 
 		$processor = new WP_HTML_Tag_Processor( $content );
 		$processor->next_tag();

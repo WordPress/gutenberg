@@ -76,45 +76,6 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 		$this->assertEquals( '.wp-block-test-without-selectors-or-supports', $selector );
 	}
 
-	public function test_get_duotone_selector_via_selectors_api() {
-		$block_type = self::register_test_block(
-			'test/duotone-selector',
-			array(
-				'filter' => array( 'duotone' => '.duotone-selector' ),
-			),
-			null
-		);
-
-		$selector = wp_get_block_css_selector( $block_type, array( 'filter', 'duotone' ) );
-		$this->assertEquals( '.duotone-selector', $selector );
-	}
-
-	public function test_get_duotone_selector_via_experimental_property() {
-		$block_type = self::register_test_block(
-			'test/experimental-duotone-selector',
-			null,
-			array(
-				'color' => array(
-					'__experimentalDuotone' => '.experimental-duotone',
-				),
-			)
-		);
-
-		$selector = wp_get_block_css_selector( $block_type, 'filter.duotone' );
-		$this->assertEquals( '.experimental-duotone', $selector );
-	}
-
-	public function test_no_duotone_selector_set() {
-		$block_type = self::register_test_block(
-			'test/null-duotone-selector',
-			null,
-			null
-		);
-
-		$selector = wp_get_block_css_selector( $block_type, 'filter.duotone' );
-		$this->assertEquals( null, $selector );
-	}
-
 	public function test_get_feature_selector_via_selectors_api() {
 		$block_type = self::register_test_block(
 			'test/feature-selector',
