@@ -312,12 +312,22 @@ const withDuotoneStyles = createHigherOrderComponent(
 			const blockType = getBlockType( props.name );
 
 			if ( blockType ) {
-				// Backwards compatibility for color.__experimentalDuotone. This will
-				// have priority over filter.duotone support. Unfortunately we can't
-				// prefer filter.duotone because it gets set when __experimentalDuotone
-				// is set via a block_type_metadata_settings hook. It shouldn't be too
-				// much of a problem because I would expect consumers to not use both
-				// at the same time.
+				// Backwards compatibility for `supports.color.__experimentalDuotone`
+				// is provided via the `block_type_metadata_settings` filter. If
+				// `supports.filter.duotone` has not been set and the
+				// experimental property has been, the experimental property
+				// value is copied into `supports.filter.duotone`.
+				const duotoneSupport = getBlockSupport(
+					blockType,
+					'filter.duotone',
+					false
+				);
+				if ( ! duotoneSupport ) {
+					return null;
+				}
+
+				// If the experimental duotone support was set, that value is
+				// to be treated as a selector and requires scoping.
 				const experimentalDuotone = getBlockSupport(
 					blockType,
 					'color.__experimentalDuotone',
@@ -328,17 +338,6 @@ const withDuotoneStyles = createHigherOrderComponent(
 					return typeof experimentalDuotone === 'string'
 						? scopeSelector( rootSelector, experimentalDuotone )
 						: rootSelector;
-				}
-
-				// Support flag `filter.duotone` will be populated from the previous
-				// `color.__experimentalDuotone` support via block_type_metadata_settings filter.
-				const duotoneSupport = getBlockSupport(
-					blockType,
-					'filter.duotone',
-					false
-				);
-				if ( ! duotoneSupport ) {
-					return null;
 				}
 
 				// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
