@@ -67,6 +67,21 @@ function isNestingGesture( point, rect ) {
 	return point.x > blockCenterX;
 }
 
+/**
+ * Determines whether the user is positioning the dragged block so as to move
+ * up one level in the block hierarchy.
+ *
+ * Presently this is determined by whether the cursor is within the left 1/4 side
+ * of the block.
+ *
+ * @param {WPPoint} point The point representing the cursor position when dragging.
+ * @param {DOMRect} rect  The rectangle.
+ */
+function isUpGesture( point, rect ) {
+	const blockQuarterX = rect.left + rect.width / 4;
+	return point.x < blockQuarterX;
+}
+
 // Block navigation is always a vertical list, so only allow dropping
 // to the above or below a block.
 const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
@@ -146,6 +161,24 @@ export function getListViewDropTarget( blocksData, position ) {
 	const isDraggingBelow = candidateEdge === 'bottom';
 
 	// If the user is dragging towards the bottom of the block check whether
+	// they might be trying to move the block up one level.
+	// For this to be true, the block must be the last child of its parent,
+	// and the block must be able to be inserted as a sibling of the block's parent.
+	if (
+		isDraggingBelow &&
+		candidateBlockData.isLastChildOfRoot &&
+		candidateBlockData.canInsertDraggedBlocksIntoParent &&
+		isUpGesture( position, candidateRect )
+	) {
+		return {
+			rootClientId: candidateBlockData.parentOfRootClientId,
+			clientId: candidateBlockData.clientId, // This is used as the target for the drop indicator.
+			blockIndex: candidateBlockData.parentBlockIndex + 1,
+			dropPosition: candidateEdge,
+		};
+	}
+
+	// If the user is dragging towards the bottom of the block check whether
 	// they might be trying to nest the block as a child.
 	// If the block already has inner blocks, and is expanded, this should be treated
 	// as nesting since the next block in the tree will be the first child.
@@ -190,6 +223,7 @@ export default function useListViewDropZone() {
 		getBlockRootClientId,
 		getBlockIndex,
 		getBlockCount,
+		getBlocks,
 		getDraggedBlockClientIds,
 		canInsertBlocks,
 	} = useSelect( blockEditorStore );
@@ -214,12 +248,23 @@ export default function useListViewDropZone() {
 					const clientId = blockElement.dataset.block;
 					const isExpanded = blockElement.dataset.expanded === 'true';
 					const rootClientId = getBlockRootClientId( clientId );
+					const parentOfRootClientId =
+						getBlockRootClientId( rootClientId );
+					const childrenOfRootClientId = getBlocks( rootClientId );
+					const isLastChildOfRoot =
+						childrenOfRootClientId.length > 0 &&
+						childrenOfRootClientId[
+							childrenOfRootClientId.length - 1
+						]?.clientId === clientId;
 
 					return {
 						clientId,
 						isExpanded,
+						isLastChildOfRoot,
+						parentOfRootClientId,
 						rootClientId,
 						blockIndex: getBlockIndex( clientId ),
+						parentBlockIndex: getBlockIndex( rootClientId ),
 						element: blockElement,
 						isDraggedBlock: isBlockDrag
 							? draggedBlockClientIds.includes( clientId )
@@ -231,6 +276,13 @@ export default function useListViewDropZone() {
 									rootClientId
 							  )
 							: true,
+						canInsertDraggedBlocksIntoParent:
+							isBlockDrag && parentOfRootClientId
+								? canInsertBlocks(
+										draggedBlockClientIds,
+										parentOfRootClientId
+								  )
+								: false,
 						canInsertDraggedBlocksAsChild: isBlockDrag
 							? canInsertBlocks( draggedBlockClientIds, clientId )
 							: true,
