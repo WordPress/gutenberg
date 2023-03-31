@@ -7,7 +7,7 @@ import { Command } from 'cmdk';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Modal } from '@wordpress/components';
 
@@ -16,17 +16,17 @@ import { Modal } from '@wordpress/components';
  */
 import { store as commandsStore } from '../store';
 
-function CommandMenuLoader( { search, hook } ) {
+function CommandMenuLoader( { name, search, hook, setLoader } ) {
 	const { isLoading, commands = [] } = hook( { search } ) ?? {};
+	useEffect( () => {
+		setLoader( name, isLoading );
+	}, [ setLoader, name, isLoading ] );
 
 	return (
 		<>
 			<Command.List>
 				{ isLoading && (
 					<Command.Loading>{ __( 'Searching…' ) }</Command.Loading>
-				) }
-				{ ! isLoading && ! commands?.length && (
-					<Command.Empty>{ __( 'No results found.' ) }</Command.Empty>
 				) }
 
 				{ commands.map( ( command ) => (
@@ -43,7 +43,7 @@ function CommandMenuLoader( { search, hook } ) {
 	);
 }
 
-export function CommandMenuLoaderWrapper( { hook, search } ) {
+export function CommandMenuLoaderWrapper( { hook, search, setLoader } ) {
 	// loader is actually a custom hook
 	// so to avoid breaking the rules of hooks
 	// the CommandsPerPage component need to be
@@ -63,11 +63,12 @@ export function CommandMenuLoaderWrapper( { hook, search } ) {
 			key={ key }
 			hook={ currentLoader.current }
 			search={ search }
+			setLoader={ setLoader }
 		/>
 	);
 }
 
-export function CommandMenuGroup( { group, search } ) {
+export function CommandMenuGroup( { group, search, setLoader } ) {
 	const { commands, loaders } = useSelect(
 		( select ) => {
 			const { getCommands, getCommandLoaders } = select( commandsStore );
@@ -95,6 +96,7 @@ export function CommandMenuGroup( { group, search } ) {
 					key={ loader.name }
 					hook={ loader.hook }
 					search={ search }
+					setLoader={ setLoader }
 				/>
 			) ) }
 		</Command.Group>
@@ -110,6 +112,7 @@ export function CommandMenu() {
 			groups: getGroups(),
 		};
 	}, [] );
+	const [ loaders, setLoaders ] = useState( {} );
 
 	// Toggle the menu when ⌘K is pressed
 	useEffect( () => {
@@ -123,9 +126,19 @@ export function CommandMenu() {
 		return () => document.removeEventListener( 'keydown', down );
 	}, [] );
 
+	const setLoader = useCallback(
+		( name, value ) =>
+			setLoaders( ( current ) => ( {
+				...current,
+				[ name ]: value,
+			} ) ),
+		[]
+	);
+
 	if ( ! open ) {
 		return false;
 	}
+	const isLoading = Object.values( loaders ).some( Boolean );
 
 	return (
 		<Modal
@@ -148,11 +161,17 @@ export function CommandMenu() {
 						/>
 					</div>
 					<Command.List>
+						{ ! isLoading && (
+							<Command.Empty>
+								{ __( 'No results found.' ) }
+							</Command.Empty>
+						) }
 						{ groups.map( ( group ) => (
 							<CommandMenuGroup
 								key={ group }
 								group={ group }
 								search={ search }
+								setLoader={ setLoader }
 							/>
 						) ) }
 					</Command.List>
