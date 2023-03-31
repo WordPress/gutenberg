@@ -2235,6 +2235,48 @@ describe( 'Controlling link title text', () => {
 			screen.queryByRole( 'textbox', { name: 'Text' } )
 		).not.toBeInTheDocument();
 	} );
+
+	it( 'should reset state on value change', async () => {
+		const user = userEvent.setup();
+		const textValue = 'My new text value';
+		const mockOnChange = jest.fn();
+
+		const { rerender } = render(
+			<LinkControl
+				value={ selectedLink }
+				forceIsEditingLink
+				hasTextControl
+				onChange={ mockOnChange }
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		const textInput = screen.queryByRole( 'textbox', { name: 'Text' } );
+
+		expect( textInput ).toBeVisible();
+
+		await user.clear( textInput );
+		await user.keyboard( textValue );
+
+		// Was originall title: 'Hello Page', but we've changed it.
+		rerender(
+			<LinkControl
+				value={ {
+					...selectedLink,
+					title: 'Something else',
+				} }
+				forceIsEditingLink
+				hasTextControl
+				onChange={ mockOnChange }
+			/>
+		);
+
+		// The text input should not be showing as the form is submitted.
+		expect( screen.queryByRole( 'textbox', { name: 'Text' } ) ).toHaveValue(
+			'Something else'
+		);
+	} );
 } );
 
 async function toggleSettingsDrawer( user ) {
