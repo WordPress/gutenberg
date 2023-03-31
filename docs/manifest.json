@@ -606,6 +606,12 @@
 		"parent": "theme-json-reference"
 	},
 	{
+		"title": "Available Styles Options",
+		"slug": "styles-versions",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/styles-versions.md",
+		"parent": "theme-json-reference"
+	},
+	{
 		"title": "Component Reference",
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
@@ -2022,7 +2028,7 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "Full Site Editing Templates",
+		"title": "Site Editing Templates",
 		"slug": "full-site-editing-templates",
 		"markdown_source": "../docs/explanations/architecture/full-site-editing-templates.md",
 		"parent": "architecture"

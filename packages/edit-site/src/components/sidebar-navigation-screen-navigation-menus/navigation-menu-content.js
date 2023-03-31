@@ -6,16 +6,47 @@ import {
 	store as blockEditorStore,
 	BlockList,
 	BlockTools,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
+import { Popover } from '@wordpress/components';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
 import { NavigationMenuLoader } from './loader';
+
+function CustomLinkAdditionalBlockUI( { block, onClose } ) {
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { label, url, opensInNewTab } = block.attributes;
+	const link = {
+		url,
+		opensInNewTab,
+		title: label && stripHTML( label ),
+	};
+	return (
+		<Popover placement="bottom" shift onClose={ onClose }>
+			<LinkControl
+				hasTextControl
+				hasRichPreviews
+				value={ link }
+				onChange={ ( updatedValue ) => {
+					updateBlockAttributes( block.clientId, {
+						label: updatedValue.title,
+						url: updatedValue.url,
+						opensInNewTab: updatedValue.opensInNewTab,
+					} );
+					onClose();
+				} }
+				onCancel={ onClose }
+			/>
+		</Popover>
+	);
+}
 
 export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 	const { clientIdsTree, isLoading } = useSelect(
@@ -35,6 +66,29 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
+	const [ customLinkEditPopoverOpenId, setIsCustomLinkEditPopoverOpenId ] =
+		useState( false );
+
+	const renderAdditionalBlockUICallback = useCallback(
+		( block ) => {
+			if (
+				customLinkEditPopoverOpenId &&
+				block.clientId === customLinkEditPopoverOpenId
+			) {
+				return (
+					<CustomLinkAdditionalBlockUI
+						block={ block }
+						onClose={ () => {
+							setIsCustomLinkEditPopoverOpenId( false );
+						} }
+					/>
+				);
+			}
+			return null;
+		},
+		[ customLinkEditPopoverOpenId, setIsCustomLinkEditPopoverOpenId ]
+	);
+
 	const { OffCanvasEditor, LeafMoreMenu } = unlock( blockEditorPrivateApis );
 
 	const offCanvasOnselect = useCallback(
@@ -48,11 +102,22 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 					block.clientId,
 					createBlock( 'core/navigation-link', block.attributes )
 				);
+			} else if (
+				block.name === 'core/navigation-link' &&
+				block.attributes.kind === 'custom' &&
+				block.attributes.url
+			) {
+				setIsCustomLinkEditPopoverOpenId( block.clientId );
 			} else {
 				onSelect( block );
 			}
 		},
-		[ onSelect, __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
+		[
+			onSelect,
+			__unstableMarkNextChangeAsNotPersistent,
+			replaceBlock,
+			setIsCustomLinkEditPopoverOpenId,
+		]
 	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
@@ -66,6 +131,7 @@ export default function NavigationMenuContent( { rootClientId, onSelect } ) {
 					onSelect={ offCanvasOnselect }
 					LeafMoreMenu={ LeafMoreMenu }
 					showAppender={ false }
+					renderAdditionalBlockUI={ renderAdditionalBlockUICallback }
 				/>
 			) }
 			<div style={ { visibility: 'hidden' } }>

@@ -95,7 +95,11 @@ const SiteHub = forwardRef( ( props, ref ) => {
 					</Button>
 				</motion.div>
 
-				{ showLabels && <div>{ siteTitle }</div> }
+				{ showLabels && (
+					<div className="edit-site-site-hub__site-title">
+						{ siteTitle }
+					</div>
+				) }
 			</HStack>
 		</motion.div>
 	);

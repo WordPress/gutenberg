@@ -11,7 +11,7 @@
 
 .edit-site-site-hub__view-mode-toggle-container {
 	height: $header-height;
-	width: $header-height + 4px;
+	width: $header-height;
 	flex-shrink: 0;
 	background: $gray-900;
 }
@@ -25,4 +25,8 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
+}
+
+.edit-site-site-hub__site-title {
+	margin-left: $grid-unit-05;
 }

@@ -8,34 +8,6 @@
  */
 
 /**
- * Updates the list of default template types, containing their
- * localized titles and descriptions.
- *
- * We will only need to update `get_default_block_template_types` function.
- *
- * @param array $default_template_types The default template types.
- *
- * @return array The default template types.
- */
-function gutenberg_get_default_block_template_types( $default_template_types ) {
-	if ( isset( $default_template_types['single'] ) ) {
-		$default_template_types['single'] = array(
-			'title'       => _x( 'Single', 'Template name', 'gutenberg' ),
-			'description' => __( 'The default template for displaying any single post or attachment.', 'gutenberg' ),
-		);
-	}
-	if ( isset( $default_template_types['category'] ) ) {
-		$default_template_types['category'] = array(
-			'title'       => _x( 'Category', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays latest posts from a single post category.', 'gutenberg' ),
-		);
-	}
-	return $default_template_types;
-}
-add_filter( 'default_template_types', 'gutenberg_get_default_block_template_types', 10 );
-
-
-/**
  * Retrieves a list of unified template objects based on a query.
  *
  * @param array $query {

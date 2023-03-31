@@ -85,21 +85,28 @@
 	"supports": {
 		"anchor": true,
 		"color": {
-			"__experimentalDuotone": "img, .components-placeholder",
 			"text": false,
 			"background": false
+		},
+		"filter": {
+			"duotone": true
 		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
 			"width": true,
-			"__experimentalSelector": "img, .wp-block-image__crop-area",
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": true,
 				"radius": true,
 				"width": true
 			}
+		}
+	},
+	"selectors": {
+		"border": ".wp-block-image img, .wp-block-image .wp-block-image__crop-area",
+		"filter": {
+			"duotone": ".wp-block-image img, .wp-block-image .components-placeholder"
 		}
 	},
 	"styles": [

@@ -247,6 +247,9 @@
 					},
 					{
 						"docs/reference-guides/theme-json-reference/theme-json-migrations.md": []
+					},
+					{
+						"docs/reference-guides/theme-json-reference/styles-versions.md": []
 					}
 				]
 			},

@@ -32,7 +32,7 @@ import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
-import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
+
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../private-apis';
@@ -157,70 +157,66 @@ export default function Editor() {
 					type={ editedPostType }
 					id={ editedPostId }
 				>
-					<GlobalStylesProvider>
-						<BlockContextProvider value={ blockContext }>
-							<SidebarComplementaryAreaFills />
-							{ isEditMode && <StartTemplateOptions /> }
-							<InterfaceSkeleton
-								enableRegionNavigation={ false }
-								className={
-									showIconLabels && 'show-icon-labels'
-								}
-								notices={ isEditMode && <EditorSnackbars /> }
-								content={
-									<>
-										<GlobalStylesRenderer />
-										{ isEditMode && <EditorNotices /> }
-										{ showVisualEditor && editedPost && (
-											<BlockEditor />
-										) }
-										{ editorMode === 'text' &&
-											editedPost &&
-											isEditMode && <CodeEditor /> }
-										{ hasLoadedPost && ! editedPost && (
-											<Notice
-												status="warning"
-												isDismissible={ false }
-											>
-												{ __(
-													"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-												) }
-											</Notice>
-										) }
-										{ isEditMode && (
-											<KeyboardShortcutsEditMode />
-										) }
-									</>
-								}
-								secondarySidebar={
-									isEditMode &&
-									( ( shouldShowInserter && (
-										<InserterSidebar />
-									) ) ||
-										( shouldShowListView && (
-											<ListViewSidebar />
-										) ) )
-								}
-								sidebar={
-									isEditMode &&
-									isRightSidebarOpen && (
-										<ComplementaryArea.Slot scope="core/edit-site" />
-									)
-								}
-								footer={
-									showBlockBreakcrumb && (
-										<BlockBreadcrumb
-											rootLabelText={ __( 'Template' ) }
-										/>
-									)
-								}
-								labels={ {
-									...interfaceLabels,
-									secondarySidebar: secondarySidebarLabel,
-								} }
-							/>
-						</BlockContextProvider>
-					</GlobalStylesProvider>
+					<BlockContextProvider value={ blockContext }>
+						<SidebarComplementaryAreaFills />
+						{ isEditMode && <StartTemplateOptions /> }
+						<InterfaceSkeleton
+							enableRegionNavigation={ false }
+							className={ showIconLabels && 'show-icon-labels' }
+							notices={ isEditMode && <EditorSnackbars /> }
+							content={
+								<>
+									<GlobalStylesRenderer />
+									{ isEditMode && <EditorNotices /> }
+									{ showVisualEditor && editedPost && (
+										<BlockEditor />
+									) }
+									{ editorMode === 'text' &&
+										editedPost &&
+										isEditMode && <CodeEditor /> }
+									{ hasLoadedPost && ! editedPost && (
+										<Notice
+											status="warning"
+											isDismissible={ false }
+										>
+											{ __(
+												"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+											) }
+										</Notice>
+									) }
+									{ isEditMode && (
+										<KeyboardShortcutsEditMode />
+									) }
+								</>
+							}
+							secondarySidebar={
+								isEditMode &&
+								( ( shouldShowInserter && (
+									<InserterSidebar />
+								) ) ||
+									( shouldShowListView && (
+										<ListViewSidebar />
+									) ) )
+							}
+							sidebar={
+								isEditMode &&
+								isRightSidebarOpen && (
+									<ComplementaryArea.Slot scope="core/edit-site" />
+								)
+							}
+							footer={
+								showBlockBreakcrumb && (
+									<BlockBreadcrumb
+										rootLabelText={ __( 'Template' ) }
+									/>
+								)
+							}
+							labels={ {
+								...interfaceLabels,
+								secondarySidebar: secondarySidebarLabel,
+							} }
+						/>
+					</BlockContextProvider>
 				</EntityProvider>
 			</EntityProvider>
 		</>

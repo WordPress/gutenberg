@@ -375,6 +375,19 @@ const tapPasteAboveElement = async ( driver, element ) => {
 	}
 };
 
+const selectTextFromElement = async ( driver, element ) => {
+	if ( isAndroid() ) {
+		await longPressMiddleOfElement( driver, element, 0 );
+	} else {
+		await doubleTap( driver, element );
+		await driver.waitForElementByXPath(
+			'//XCUIElementTypeMenuItem[@name="Copy"]',
+			wd.asserters.isDisplayed,
+			4000
+		);
+	}
+};
+
 // Starts from the middle of the screen or the element(if specified)
 // and swipes upwards.
 const swipeUp = async (
@@ -499,6 +512,26 @@ const toggleOrientation = async ( driver ) => {
 	} else {
 		await driver.setOrientation( 'LANDSCAPE' );
 	}
+};
+
+/**
+ * Toggle the device dark mode.
+ *
+ * @param {Object}  driver   Driver
+ * @param {boolean} darkMode Whether to enable dark mode or not
+ */
+const toggleDarkMode = ( driver, darkMode = true ) => {
+	if ( isAndroid() ) {
+		return driver.execute( 'mobile: shell', [
+			{
+				command: `cmd uimode night  ${ darkMode ? 'yes' : 'no' }`,
+			},
+		] );
+	}
+
+	return driver.execute( 'mobile: setAppearance', {
+		style: darkMode ? 'dark' : 'light',
+	} );
 };
 
 const isEditorVisible = async ( driver ) => {
@@ -684,6 +717,7 @@ module.exports = {
 	longPressMiddleOfElement,
 	setClipboard,
 	setupDriver,
+	selectTextFromElement,
 	stopDriver,
 	swipeDown,
 	swipeFromTo,
@@ -692,6 +726,7 @@ module.exports = {
 	tapPasteAboveElement,
 	tapSelectAllAboveElement,
 	timer,
+	toggleDarkMode,
 	toggleHtmlMode,
 	toggleOrientation,
 	typeString,

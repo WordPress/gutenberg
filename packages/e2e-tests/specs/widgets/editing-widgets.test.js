@@ -24,7 +24,6 @@ import {
  */
 // eslint-disable-next-line no-restricted-imports
 import { find, findAll } from 'puppeteer-testing-library';
-import { groupBy, mapValues } from 'lodash';
 
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
@@ -945,13 +944,20 @@ async function saveWidgets() {
 async function getSerializedWidgetAreas() {
 	const widgets = await rest( { path: '/wp/v2/widgets' } );
 
-	const serializedWidgetAreas = mapValues(
-		groupBy( widgets, 'sidebar' ),
-		( sidebarWidgets ) =>
-			sidebarWidgets
-				.map( ( widget ) => widget.rendered )
-				.filter( Boolean )
-				.join( '\n' )
+	const serializedWidgetAreas = widgets.reduce(
+		( acc, { sidebar, rendered } ) => {
+			const currentWidgets = acc[ sidebar ] || '';
+			let newWidgets = Boolean( rendered ) ? rendered : '';
+			if ( currentWidgets.length && newWidgets.length ) {
+				newWidgets = '\n' + newWidgets;
+			}
+
+			return {
+				...acc,
+				[ sidebar ]: currentWidgets + newWidgets,
+			};
+		},
+		{}
 	);
 
 	return serializedWidgetAreas;

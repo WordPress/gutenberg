@@ -23,7 +23,7 @@ test.describe( 'Using Format API', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'First paragraph' );
-		await pageUtils.pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await editor.clickBlockToolbarButton( 'More' );
 
 		// Used a regex to tackle the  in name of menuitem.(Custom Link).

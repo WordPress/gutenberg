@@ -60,6 +60,7 @@ Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
+| defaultPresets | boolean | true |  |
 | presets | array |  | name, shadow, slug |
 
 ---
@@ -103,6 +104,16 @@ Settings related to layout.
 | ---       | ---    | ---    |---   |
 | contentSize | string |  |  |
 | wideSize | string |  |  |
+
+---
+
+### position
+
+Settings related to position.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| sticky | boolean | false |  |
 
 ---
 
@@ -178,6 +189,16 @@ Color styles.
 | background | string, object |  |
 | gradient | string, object |  |
 | text | string, object |  |
+
+---
+
+### dimensions
+
+Dimensions styles
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| minHeight | string, object |  |
 
 ---
 

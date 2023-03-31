@@ -78,8 +78,16 @@ const SpacerEdit = ( {
 	setAttributes,
 	toggleSelection,
 	context,
+	__unstableParentLayout: parentLayout,
 } ) => {
 	const { orientation } = context;
+	const { orientation: parentOrientation, type } = parentLayout || {};
+	// If the spacer is inside a flex container, it should either inherit the orientation
+	// of the parent or use the flex default orientation.
+	const inheritedOrientation =
+		! parentOrientation && type === 'flex'
+			? 'horizontal'
+			: parentOrientation || orientation;
 	const { height, width } = attributes;
 
 	const [ isResizing, setIsResizing ] = useState( false );
@@ -104,12 +112,17 @@ const SpacerEdit = ( {
 
 	const style = {
 		height:
-			orientation === 'horizontal'
+			inheritedOrientation === 'horizontal'
 				? 24
 				: temporaryHeight || height || undefined,
 		width:
-			orientation === 'horizontal'
+			inheritedOrientation === 'horizontal'
 				? temporaryWidth || width || undefined
+				: undefined,
+		// In vertical flex containers, the spacer shrinks to nothing without a minimum width.
+		minWidth:
+			inheritedOrientation === 'vertical' && type === 'flex'
+				? 48
 				: undefined,
 	};
 
@@ -166,7 +179,7 @@ const SpacerEdit = ( {
 	};
 
 	useEffect( () => {
-		if ( orientation === 'horizontal' && ! width ) {
+		if ( inheritedOrientation === 'horizontal' && ! width ) {
 			setAttributes( {
 				height: '0px',
 				width: '72px',
@@ -177,13 +190,13 @@ const SpacerEdit = ( {
 	return (
 		<>
 			<View { ...useBlockProps( { style } ) }>
-				{ resizableBoxWithOrientation( orientation ) }
+				{ resizableBoxWithOrientation( inheritedOrientation ) }
 			</View>
 			<SpacerControls
 				setAttributes={ setAttributes }
 				height={ temporaryHeight || height }
 				width={ temporaryWidth || width }
-				orientation={ orientation }
+				orientation={ inheritedOrientation }
 				isResizing={ isResizing }
 			/>
 		</>

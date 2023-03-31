@@ -29,6 +29,10 @@ const elements = {
 		description: __( 'Manage the fonts and typography used on headings.' ),
 		title: __( 'Headings' ),
 	},
+	caption: {
+		description: __( 'Manage the fonts and typography used on captions.' ),
+		title: __( 'Captions' ),
+	},
 	button: {
 		description: __( 'Manage the fonts and typography used on buttons.' ),
 		title: __( 'Buttons' ),

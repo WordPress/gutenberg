@@ -51,6 +51,12 @@
 	li:only-child {
 		width: 100%;
 	}
+
+	&.components-panel__header.edit-post-sidebar__panel-tabs {
+		.components-button.has-icon {
+			display: flex;
+		}
+	}
 }
 
 .edit-post-editor__list-view-panel-content,

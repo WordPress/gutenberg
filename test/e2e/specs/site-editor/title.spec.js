@@ -15,14 +15,13 @@ test.describe( 'Site editor title', () => {
 	test( 'displays the selected template name in the title for the index template', async ( {
 		admin,
 		page,
-		editor,
 	} ) => {
 		// Navigate to a template.
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.click( 'body' );
 		const title = page.locator(
 			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
 		);
@@ -33,14 +32,13 @@ test.describe( 'Site editor title', () => {
 	test( 'displays the selected template name in the title for the header template', async ( {
 		admin,
 		page,
-		editor,
 	} ) => {
 		// Navigate to a template part.
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.click( 'body' );
 		const title = page.locator(
 			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
 		);
@@ -51,13 +49,12 @@ test.describe( 'Site editor title', () => {
 	test( "displays the selected template part's name in the secondary title when a template part is selected from List View", async ( {
 		admin,
 		page,
-		editor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.click( 'body' );
 		// Select the header template part via list view.
 		await page.click( 'role=button[name="List View"i]' );
 		const listView = page.locator(

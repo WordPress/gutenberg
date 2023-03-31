@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useViewportMatch, compose } from '@wordpress/compose';
@@ -83,11 +78,10 @@ export function PostPublishButtonOrToggle( {
 
 export default compose(
 	withSelect( ( select ) => ( {
-		hasPublishAction: get(
-			select( editorStore ).getCurrentPost(),
-			[ '_links', 'wp:action-publish' ],
-			false
-		),
+		hasPublishAction:
+			select( editorStore ).getCurrentPost()?._links?.[
+				'wp:action-publish'
+			] ?? false,
 		isBeingScheduled: select( editorStore ).isEditedPostBeingScheduled(),
 		isPending: select( editorStore ).isCurrentPostPending(),
 		isPublished: select( editorStore ).isCurrentPostPublished(),

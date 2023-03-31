@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode, ForwardedRef, ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -22,27 +22,6 @@ import {
 	NavigatorToParentButton,
 	useNavigator,
 } from '..';
-
-jest.mock( 'framer-motion', () => {
-	const actual = jest.requireActual( 'framer-motion' );
-	return {
-		__esModule: true,
-		...actual,
-		AnimatePresence:
-			( { children }: { children?: ReactNode } ) =>
-			() =>
-				<div>{ children }</div>,
-		motion: {
-			...actual.motion,
-			div: require( 'react' ).forwardRef(
-				(
-					{ children }: { children?: ReactNode },
-					ref: ForwardedRef< HTMLDivElement >
-				) => <div ref={ ref }>{ children }</div>
-			),
-		},
-	};
-} );
 
 const INVALID_HTML_ATTRIBUTE = {
 	raw: ' "\'><=invalid_path',
@@ -736,6 +715,70 @@ describe( 'Navigator', () => {
 			// Navigate back to home screen.
 			await user.click( getNavigationButton( 'back' ) );
 			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
+		} );
+	} );
+
+	describe( 'animation', () => {
+		it( 'should not animate the initial screen', async () => {
+			const onHomeAnimationStartSpy = jest.fn();
+
+			render(
+				<NavigatorProvider initialPath="/">
+					<NavigatorScreen
+						path="/"
+						onAnimationStart={ onHomeAnimationStartSpy }
+					>
+						<CustomNavigatorButton path="/child">
+							To child
+						</CustomNavigatorButton>
+					</NavigatorScreen>
+				</NavigatorProvider>
+			);
+
+			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should animate all other screens (including the initial screen when navigating back)', async () => {
+			const user = userEvent.setup();
+
+			const onHomeAnimationStartSpy = jest.fn();
+			const onChildAnimationStartSpy = jest.fn();
+
+			render(
+				<NavigatorProvider initialPath="/">
+					<NavigatorScreen
+						path="/"
+						onAnimationStart={ onHomeAnimationStartSpy }
+					>
+						<CustomNavigatorButton path="/child">
+							To child
+						</CustomNavigatorButton>
+					</NavigatorScreen>
+					<NavigatorScreen
+						path="/child"
+						onAnimationStart={ onChildAnimationStartSpy }
+					>
+						<CustomNavigatorBackButton>
+							Back to home
+						</CustomNavigatorBackButton>
+					</NavigatorScreen>
+				</NavigatorProvider>
+			);
+
+			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
+			expect( onChildAnimationStartSpy ).not.toHaveBeenCalled();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'To child' } )
+			);
+			expect( onChildAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Back to home' } )
+			);
+			expect( onChildAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onHomeAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );

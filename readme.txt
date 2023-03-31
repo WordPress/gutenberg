@@ -47,6 +47,12 @@ The best place to report bugs, feature suggestions, or any other feedback is at 
 
 While we try to triage issues reported here on the plugin forum, you’ll get a faster response (and reduce duplication of effort) by keeping feedback centralized in GitHub.
 
+= Where can I report security bugs? =
+
+The Gutenberg team and WordPress community take security bugs seriously. We appreciate your efforts to responsibly disclose your findings, and will make every effort to acknowledge your contributions.
+
+To report a security issue, please visit the [WordPress HackerOne](https://hackerone.com/wordpress) program.
+
 = Do I have to use the Gutenberg plugin to get access to these features? =
 
 Not necessarily. Each version of WordPress after 5.0 has included features from the Gutenberg plugin, which are known collectively as the <a href="https://wordpress.org/support/article/wordpress-editor/">WordPress Editor</a>. You are likely already benefitting from stable features!

@@ -38,8 +38,6 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 	};
 } );
 
-jest.useRealTimers();
-
 describe( 'PostTextEditor', () => {
 	beforeEach( () => {
 		useSelect.mockImplementation( () => 'Hello World' );

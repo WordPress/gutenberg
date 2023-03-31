@@ -5,6 +5,7 @@ export {
 } from './advance-animation';
 export { dismissModal } from './dismiss-modal';
 export { getBlock } from './get-block';
+export { getBlockTransformOptions } from './get-block-transform-options';
 export { getEditorHtml } from './get-editor-html';
 export { getInnerBlock } from './get-inner-block';
 export { initializeEditor } from './initialize-editor';
@@ -17,6 +18,7 @@ export { setupCoreBlocks } from './setup-core-blocks';
 export { setupMediaPicker } from './setup-media-picker';
 export { setupMediaUpload } from './setup-media-upload';
 export { changeTextOfTextInput } from './text-input-change-text';
+export { transformBlock } from './transform-block';
 export { triggerBlockListLayout } from './trigger-block-list-layout';
 export { waitForModalVisible } from './wait-for-modal-visible';
 export { waitForStoreResolvers } from './wait-for-store-resolvers';

@@ -89,6 +89,7 @@ export default function Table( { templateType } ) {
 									params={ {
 										postId: template.id,
 										postType: template.type,
+										canvas: 'edit',
 									} }
 								>
 									{ decodeEntities(
@@ -101,10 +102,12 @@ export default function Table( { templateType } ) {
 						</td>
 
 						<td className="edit-site-list-table-column" role="cell">
-							<AddedBy
-								templateType={ templateType }
-								template={ template }
-							/>
+							{ template ? (
+								<AddedBy
+									postType={ template.type }
+									postId={ template.id }
+								/>
+							) : null }
 						</td>
 						<td className="edit-site-list-table-column" role="cell">
 							<Actions template={ template } />

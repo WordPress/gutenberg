@@ -280,13 +280,14 @@ export default function Layout() {
 									whileHover={
 										isEditorPage && canvasMode === 'view'
 											? {
-													scale: 1.01,
+													scale: 1.005,
 													transition: {
 														duration:
 															disableMotion ||
 															isResizing
 																? 0
-																: 0.2,
+																: 0.5,
+														ease: 'easeOut',
 													},
 											  }
 											: {}
