@@ -16,7 +16,7 @@ import { Modal } from '@wordpress/components';
  */
 import { store as commandsStore } from '../store';
 
-function CommandMenuLoader( { name, search, hook, setLoader } ) {
+function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 	const { isLoading, commands = [] } = hook( { search } ) ?? {};
 	useEffect( () => {
 		setLoader( name, isLoading );
@@ -33,7 +33,7 @@ function CommandMenuLoader( { name, search, hook, setLoader } ) {
 					<Command.Item
 						key={ command.name }
 						value={ command.name }
-						onSelect={ () => command.callback() }
+						onSelect={ () => command.callback( { close } ) }
 					>
 						{ command.label }
 					</Command.Item>
@@ -43,7 +43,7 @@ function CommandMenuLoader( { name, search, hook, setLoader } ) {
 	);
 }
 
-export function CommandMenuLoaderWrapper( { hook, search, setLoader } ) {
+export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 	// loader is actually a custom hook
 	// so to avoid breaking the rules of hooks
 	// the CommandsPerPage component need to be
@@ -64,11 +64,12 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader } ) {
 			hook={ currentLoader.current }
 			search={ search }
 			setLoader={ setLoader }
+			close={ close }
 		/>
 	);
 }
 
-export function CommandMenuGroup( { group, search, setLoader } ) {
+export function CommandMenuGroup( { group, search, setLoader, close } ) {
 	const { commands, loaders } = useSelect(
 		( select ) => {
 			const { getCommands, getCommandLoaders } = select( commandsStore );
@@ -86,7 +87,7 @@ export function CommandMenuGroup( { group, search, setLoader } ) {
 				<Command.Item
 					key={ command.name }
 					value={ command.name }
-					onSelect={ () => command.callback() }
+					onSelect={ () => command.callback( { close } ) }
 				>
 					{ command.label }
 				</Command.Item>
@@ -97,6 +98,7 @@ export function CommandMenuGroup( { group, search, setLoader } ) {
 					hook={ loader.hook }
 					search={ search }
 					setLoader={ setLoader }
+					close={ close }
 				/>
 			) ) }
 		</Command.Group>
@@ -134,6 +136,7 @@ export function CommandMenu() {
 			} ) ),
 		[]
 	);
+	const close = () => setOpen( false );
 
 	if ( ! open ) {
 		return false;
@@ -143,7 +146,7 @@ export function CommandMenu() {
 	return (
 		<Modal
 			className="commands-command-menu"
-			onRequestClose={ () => setOpen( false ) }
+			onRequestClose={ close }
 			__experimentalHideHeader
 		>
 			<div className="commands-command-menu__container">
@@ -172,6 +175,7 @@ export function CommandMenu() {
 								group={ group }
 								search={ search }
 								setLoader={ setLoader }
+								close={ close }
 							/>
 						) ) }
 					</Command.List>

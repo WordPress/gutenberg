@@ -14,36 +14,42 @@ import { useHistory } from '../../components/routes';
 
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
-		const history = useHistory();
-		const { records, isLoading } = useSelect(
-			( select ) => {
-				const { getEntityRecords } = select( coreStore );
-				const query = {
-					search,
-					per_page: 20,
-					orderby: 'date',
-				};
-				return {
-					records: getEntityRecords( 'postType', postType, query ),
-					isLoading: ! select( coreStore ).hasFinishedResolution(
-						'getEntityRecords',
-						[ 'postType', postType, query ]
-					),
-				};
-			},
-			[ search ]
+		const supportsSearch = ! [ 'wp_template', 'wp_template_part' ].includes(
+			postType
 		);
+		const deps = supportsSearch ? [ search ] : [];
+		const history = useHistory();
+		const { records, isLoading } = useSelect( ( select ) => {
+			const { getEntityRecords } = select( coreStore );
+			const query = supportsSearch
+				? {
+						search,
+						per_page: 20,
+						orderby: 'date',
+				  }
+				: {
+						per_page: -1,
+				  };
+			return {
+				records: getEntityRecords( 'postType', postType, query ),
+				isLoading: ! select( coreStore ).hasFinishedResolution(
+					'getEntityRecords',
+					[ 'postType', postType, query ]
+				),
+			};
+		}, deps );
 
 		const commands = useMemo( () => {
 			return ( records ?? [] ).map( ( record ) => {
 				return {
 					name: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered,
-					callback: () => {
+					callback: ( { close } ) => {
 						history.push( {
 							postType,
 							postId: record.id,
 						} );
+						close();
 					},
 				};
 			} );
