@@ -405,7 +405,9 @@ function gutenberg_get_duotone_filter_svg( $preset ) {
 function gutenberg_register_duotone_support( $block_type ) {
 	$has_duotone_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+		// Previous `color.__experimentalDuotone` support flag is migrated
+		// to `filter.duotone` via `block_type_metadata_settings` filter.
+		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), null );
 	}
 
 	if ( $has_duotone_support ) {
@@ -426,128 +428,12 @@ function gutenberg_register_duotone_support( $block_type ) {
  *
  * @param  string $block_content Rendered block content.
  * @param  array  $block         Block object.
+ * @deprecated    6.3.0          Use WP_Duotone_Gutenberg::render_duotone_support() instead.
  * @return string                Filtered block content.
  */
 function gutenberg_render_duotone_support( $block_content, $block ) {
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-
-	$duotone_support = false;
-	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
-		$duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
-	}
-
-	$has_duotone_attribute = isset( $block['attrs']['style']['color']['duotone'] );
-
-	if (
-		! $duotone_support ||
-		! $has_duotone_attribute
-	) {
-		return $block_content;
-	}
-
-	// Possible values for duotone attribute:
-	// 1. Array of colors - e.g. array('#000000', '#ffffff').
-	// 2. Variable for an existing Duotone preset - e.g. 'var:preset|duotone|green-blue'.
-	// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
-	$duotone_attr = $block['attrs']['style']['color']['duotone'];
-
-	$is_preset = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === 0;
-	$is_css    = is_string( $duotone_attr ) && strpos( $duotone_attr, 'var:preset|duotone|' ) === false;
-	$is_custom = is_array( $duotone_attr );
-
-	// Generate the pieces needed for rendering a duotone to the page.
-	if ( $is_preset ) {
-		// Extract the slug from the preset variable string.
-		$slug = str_replace( 'var:preset|duotone|', '', $duotone_attr );
-
-		// Utilize existing preset CSS custom property.
-		$filter_property = "var(--wp--preset--duotone--$slug)";
-	} elseif ( $is_css ) {
-		// Build a unique slug for the filter based on the CSS value.
-		$slug = wp_unique_id( sanitize_key( $duotone_attr . '-' ) );
-
-		// Pass through the CSS value.
-		$filter_property = $duotone_attr;
-	} elseif ( $is_custom ) {
-		// Build a unique slug for the filter based on the array of colors.
-		$slug = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) );
-
-		// This has the same shape as a preset, so it can be used in place of a
-		// preset when getting the filter property and SVG filter.
-		$filter_data = array(
-			'slug'   => $slug,
-			'colors' => $duotone_attr,
-		);
-
-		// Build a customized CSS filter property for unique slug.
-		$filter_property = gutenberg_get_duotone_filter_property( $filter_data );
-
-		// SVG will be output on the page later.
-		$filter_svg = gutenberg_get_duotone_filter_svg( $filter_data );
-	}
-
-	// - Applied as a class attribute to the block wrapper.
-	// - Used as a selector to apply the filter to the block.
-	$filter_id = gutenberg_get_duotone_filter_id( array( 'slug' => $slug ) );
-
-	// Build the CSS selectors to which the filter will be applied.
-	$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_support );
-
-	// Calling gutenberg_style_engine_get_stylesheet_from_css_rules ensures that
-	// the styles are rendered in an inline for block supports because we're
-	// using the `context` option to instruct it so.
-	gutenberg_style_engine_get_stylesheet_from_css_rules(
-		array(
-			array(
-				'selector'     => $selector,
-				'declarations' => array(
-					// !important is needed because these styles
-					// render before global styles,
-					// and they should be overriding the duotone
-					// filters set by global styles.
-					'filter' => $filter_property . ' !important',
-				),
-			),
-		),
-		array(
-			'context' => 'block-supports',
-		)
-	);
-
-	// If we needed to generate an SVG, output it on the page.
-	if ( isset( $filter_svg ) ) {
-		add_action(
-			'wp_footer',
-			static function () use ( $filter_svg, $selector ) {
-				echo $filter_svg;
-
-				/*
-				 * Safari renders elements incorrectly on first paint when the
-				 * SVG filter comes after the content that it is filtering, so
-				 * we force a repaint with a WebKit hack which solves the issue.
-				 */
-				global $is_safari;
-				if ( $is_safari ) {
-					/*
-					 * Simply accessing el.offsetHeight flushes layout and style
-					 * changes in WebKit without having to wait for setTimeout.
-					 */
-					printf(
-						'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
-						wp_json_encode( $selector )
-					);
-				}
-			}
-		);
-	}
-
-	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
-	return preg_replace(
-		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . $filter_id . ' ',
-		$block_content,
-		1
-	);
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Duotone_Gutenberg::render_duotone_support' );
+	return WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block );
 }
 
 // Register the block support.
@@ -558,6 +444,12 @@ WP_Block_Supports::get_instance()->register(
 	)
 );
 
+add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_styles_presets' ), 10 );
+add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_style_block_names' ), 10 );
 // Remove WordPress core filter to avoid rendering duplicate support elements.
 remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
-add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );
+add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 2 );
+add_action( 'wp_enqueue_scripts', array( 'WP_Duotone_Gutenberg', 'output_global_styles' ), 11 );
+add_action( 'wp_footer', array( 'WP_Duotone_Gutenberg', 'output_footer_assets' ), 10 );
+add_filter( 'block_editor_settings_all', array( 'WP_Duotone_Gutenberg', 'add_editor_settings' ), 10 );
+add_filter( 'block_type_metadata_settings', array( 'WP_Duotone_Gutenberg', 'migrate_experimental_duotone_support_flag' ), 10, 2 );

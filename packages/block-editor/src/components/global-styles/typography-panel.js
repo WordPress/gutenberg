@@ -20,6 +20,7 @@ import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import { getValueFromVariable } from './utils';
+import { immutableSet } from '../../utils/object';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -161,15 +162,13 @@ export default function TypographyPanel( {
 		const slug = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
-		onChange( {
-			...value,
-			typography: {
-				...value?.typography,
-				fontFamily: slug
-					? `var:preset|font-family|${ slug }`
-					: newValue,
-			},
-		} );
+		onChange(
+			immutableSet(
+				value,
+				[ 'typography', 'fontFamily' ],
+				slug ? `var:preset|font-family|${ slug }` : newValue
+			)
+		);
 	};
 	const hasFontFamily = () => !! value?.typography?.fontFamily;
 	const resetFontFamily = () => setFontFamily( undefined );
@@ -188,13 +187,9 @@ export default function TypographyPanel( {
 			? `var:preset|font-size|${ metadata?.slug }`
 			: newValue;
 
-		onChange( {
-			...value,
-			typography: {
-				...value?.typography,
-				fontSize: actualValue,
-			},
-		} );
+		onChange(
+			immutableSet( value, [ 'typography', 'fontSize' ], actualValue )
+		);
 	};
 	const hasFontSize = () => !! value?.typography?.fontSize;
 	const resetFontSize = () => setFontSize( undefined );
@@ -229,13 +224,9 @@ export default function TypographyPanel( {
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
 	const lineHeight = decodeValue( inheritedValue?.typography?.lineHeight );
 	const setLineHeight = ( newValue ) => {
-		onChange( {
-			...value,
-			typography: {
-				...value?.typography,
-				lineHeight: newValue,
-			},
-		} );
+		onChange(
+			immutableSet( value, [ 'typography', 'lineHeight' ], newValue )
+		);
 	};
 	const hasLineHeight = () => !! value?.typography?.lineHeight;
 	const resetLineHeight = () => setLineHeight( undefined );
@@ -246,13 +237,9 @@ export default function TypographyPanel( {
 		inheritedValue?.typography?.letterSpacing
 	);
 	const setLetterSpacing = ( newValue ) => {
-		onChange( {
-			...value,
-			typography: {
-				...value?.typography,
-				letterSpacing: newValue,
-			},
-		} );
+		onChange(
+			immutableSet( value, [ 'typography', 'letterSpacing' ], newValue )
+		);
 	};
 	const hasLetterSpacing = () => !! value?.typography?.letterSpacing;
 	const resetLetterSpacing = () => setLetterSpacing( undefined );
@@ -261,13 +248,9 @@ export default function TypographyPanel( {
 	const hasTextColumnsControl = useHasTextColumnsControl( settings );
 	const textColumns = decodeValue( inheritedValue?.typography?.textColumns );
 	const setTextColumns = ( newValue ) => {
-		onChange( {
-			...value,
-			typography: {
-				...value?.typography,
-				textColumns: newValue,
-			},
-		} );
+		onChange(
+			immutableSet( value, [ 'typography', 'textColumns' ], newValue )
+		);
 	};
 	const hasTextColumns = () => !! value?.typography?.textColumns;
 	const resetTextColumns = () => setTextColumns( undefined );
@@ -278,13 +261,9 @@ export default function TypographyPanel( {
 		inheritedValue?.typography?.textTransform
 	);
 	const setTextTransform = ( newValue ) => {
-		onChange( {
-			...value,
-			typography: {
-				...value?.typography,
-				textTransform: newValue,
-			},
-		} );
+		onChange(
+			immutableSet( value, [ 'typography', 'textTransform' ], newValue )
+		);
 	};
 	const hasTextTransform = () => !! value?.typography?.textTransform;
 	const resetTextTransform = () => setTextTransform( undefined );
@@ -295,13 +274,9 @@ export default function TypographyPanel( {
 		inheritedValue?.typography?.textDecoration
 	);
 	const setTextDecoration = ( newValue ) => {
-		onChange( {
-			...value,
-			typography: {
-				...value?.typography,
-				textDecoration: newValue,
-			},
-		} );
+		onChange(
+			immutableSet( value, [ 'typography', 'textDecoration' ], newValue )
+		);
 	};
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
 	const resetTextDecoration = () => setTextDecoration( undefined );

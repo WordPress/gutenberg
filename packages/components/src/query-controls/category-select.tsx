@@ -36,6 +36,7 @@ export default function CategorySelect( {
 					: undefined
 			}
 			{ ...props }
+			__nextHasNoMarginBottom
 		/>
 	);
 }

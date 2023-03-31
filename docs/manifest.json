@@ -2028,7 +2028,7 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "Full Site Editing Templates",
+		"title": "Site Editing Templates",
 		"slug": "full-site-editing-templates",
 		"markdown_source": "../docs/explanations/architecture/full-site-editing-templates.md",
 		"parent": "architecture"

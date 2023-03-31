@@ -514,6 +514,26 @@ const toggleOrientation = async ( driver ) => {
 	}
 };
 
+/**
+ * Toggle the device dark mode.
+ *
+ * @param {Object}  driver   Driver
+ * @param {boolean} darkMode Whether to enable dark mode or not
+ */
+const toggleDarkMode = ( driver, darkMode = true ) => {
+	if ( isAndroid() ) {
+		return driver.execute( 'mobile: shell', [
+			{
+				command: `cmd uimode night  ${ darkMode ? 'yes' : 'no' }`,
+			},
+		] );
+	}
+
+	return driver.execute( 'mobile: setAppearance', {
+		style: darkMode ? 'dark' : 'light',
+	} );
+};
+
 const isEditorVisible = async ( driver ) => {
 	const postTitleLocator = isAndroid()
 		? `//android.widget.EditText[contains(@content-desc, "Post title")]`
@@ -706,6 +726,7 @@ module.exports = {
 	tapPasteAboveElement,
 	tapSelectAllAboveElement,
 	timer,
+	toggleDarkMode,
 	toggleHtmlMode,
 	toggleOrientation,
 	typeString,

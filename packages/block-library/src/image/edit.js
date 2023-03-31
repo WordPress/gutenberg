@@ -211,7 +211,7 @@ export function ImageEdit( {
 					: 'full',
 			};
 		} else {
-			// Keep the same url when selecting the same file, so "Image Size"
+			// Keep the same url when selecting the same file, so "Resolution"
 			// option is not changed.
 			additionalAttributes = { url };
 		}

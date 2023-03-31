@@ -163,7 +163,6 @@ export function BorderPanel( props ) {
 		<StylesBorderPanel
 			as={ BordersInspectorControl }
 			panelId={ clientId }
-			name={ name }
 			settings={ settings }
 			value={ value }
 			onChange={ onChange }

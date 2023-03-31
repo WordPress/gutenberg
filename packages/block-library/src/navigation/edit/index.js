@@ -477,19 +477,6 @@ function Navigation( {
 		showClassicMenuConversionNotice,
 	] );
 
-	// Spacer block needs orientation from context. This is a patch until
-	// https://github.com/WordPress/gutenberg/issues/36197 is addressed.
-	useEffect( () => {
-		if ( orientation ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { orientation } );
-		}
-	}, [
-		orientation,
-		__unstableMarkNextChangeAsNotPersistent,
-		setAttributes,
-	] );
-
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
 			return;

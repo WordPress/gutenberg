@@ -317,4 +317,22 @@ test.describe( 'Quote', () => {
 <!-- /wp:quote -->`
 		);
 	} );
+
+	test( `shouldn't crash selecting content + cite and pressing backspace.`, async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/quote' } );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '2' );
+		await pageUtils.pressKeys( 'Shift+ArrowUp' );
+		let error;
+		page.on( 'console', ( msg ) => {
+			if ( msg.type() === 'error' ) error = msg.text();
+		} );
+		await page.keyboard.press( 'Backspace' );
+		expect( error ).toBeUndefined();
+	} );
 } );
