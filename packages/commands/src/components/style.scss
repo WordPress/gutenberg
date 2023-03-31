@@ -135,10 +135,16 @@
 	[cmdk-group-heading] {
 		user-select: none;
 		color: $gray-700;
-		padding: $grid-unit-20 $grid-unit-20 $grid-unit-10;
+		padding: $grid-unit-30 $grid-unit-20 $grid-unit-20;
 		display: flex;
 		align-items: center;
-		font-size: 12px;
+		font-size: 11px;
+		text-transform: uppercase;
+		font-weight: 500;
+		position: sticky;
+		top: 0;
+		background: $white;
+		z-index: 1;
 	}
 
 	[cmdk-empty] {
