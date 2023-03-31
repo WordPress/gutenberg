@@ -83,7 +83,7 @@ class WP_Navigation_Fallbacks_Gutenberg {
 		}
 
 		// Todo: inject as dependency.
-		$menu_converter = new WP_Nav_Menu_Conversion( $classic_nav_menu );
+		$menu_converter = new WP_Nav_Menu_Conversion_Gutenberg( $classic_nav_menu );
 
 		// If we have a classic menu then convert it to blocks.
 		$classic_nav_menu_blocks = $menu_converter->convert();
