@@ -7,52 +7,48 @@ import { Keyboard } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useCallback, useState } from '@wordpress/element';
 
 /**
  * Hook that adds Keyboard listeners to get the offset space
  * when the keyboard is opened, taking into account focused AztecViews.
  *
  * @param {boolean} scrollEnabled Whether the scroll is enabled or not.
- * @return {[boolean, number]} Keyboard visibility state and Keyboard offset.
+ * @return {[number]} Keyboard offset.
  */
 export default function useKeyboardOffset( scrollEnabled ) {
 	const [ keyboardOffset, setKeyboardOffset ] = useState( 0 );
-	const [ isKeyboardVisible, setIsKeyboardVisible ] = useState( false );
+
+	const onKeyboardDidShow = useCallback( ( { endCoordinates } ) => {
+		setKeyboardOffset( endCoordinates.height );
+	}, [] );
+
+	const onKeyboardDidHide = useCallback( () => {
+		setKeyboardOffset( 0 );
+	}, [] );
 
 	useEffect( () => {
-		let willShowSubscription;
 		let showSubscription;
 		let hideSubscription;
 
 		if ( scrollEnabled ) {
-			willShowSubscription = Keyboard.addListener(
-				'keyboardWillShow',
-				() => {
-					setIsKeyboardVisible( true );
-				}
-			);
 			showSubscription = Keyboard.addListener(
 				'keyboardDidShow',
-				( { endCoordinates } ) => {
-					setKeyboardOffset( endCoordinates.height );
-				}
+				onKeyboardDidShow
 			);
-			hideSubscription = Keyboard.addListener( 'keyboardWillHide', () => {
-				setKeyboardOffset( 0 );
-				setIsKeyboardVisible( false );
-			} );
+			hideSubscription = Keyboard.addListener(
+				'keyboardDidHide',
+				onKeyboardDidHide
+			);
 		} else {
-			willShowSubscription?.remove();
 			showSubscription?.remove();
 			hideSubscription?.remove();
 		}
 
 		return () => {
-			willShowSubscription?.remove();
 			showSubscription?.remove();
 			hideSubscription?.remove();
 		};
-	}, [ scrollEnabled ] );
-	return [ isKeyboardVisible, keyboardOffset ];
+	}, [ scrollEnabled, onKeyboardDidShow, onKeyboardDidHide ] );
+	return [ keyboardOffset ];
 }
