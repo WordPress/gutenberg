@@ -630,74 +630,6 @@ add_filter(
 );
 
 
-define( 'GUTENBERG_FOOTNOTES_KEY', 'GUTENBERG_FOOTNOTES_KEY' );
-
-/**
- * Footnotes shortcode handling: we'd like custom handling without attribut
- * parsing, so just return the content.
- *
- * @param array  $attr Shortcode attributes.
- * @param string $content Shortcode content.
- *
- * @return string Shortcode content.
- */
-function gutenberg_footnotes_add_shortcode( $attr, $content ) {
-	return $content;
-}
-
-/**
- * Custom shortcode handlering without attribut parsing. Replaces the shortcode
- * with a link and accumulates the footnote in a global array.
- *
- * @param string $output Shortcode output.
- * @param string $tag Shortcode tag.
- * @param array  $attr Shortcode attributes.
- * @param array  $m Shortcode match array.
- *
- * @return string Footnote link.
- */
-function gutenberg_footnotes_do_shortcode_tag( $output, $tag, $attr, $m ) {
-	if ( '#' !== $tag ) {
-		return $output;
-	}
-
-	if ( ! isset( $GLOBALS[ GUTENBERG_FOOTNOTES_KEY ] ) ) {
-		return $output;
-	}
-
-	$notes = &$GLOBALS[ GUTENBERG_FOOTNOTES_KEY ];
-
-	// $m is the match:
-	// $m[0] is the full match.
-	// $m[1] is to check shortcode escaping.
-	// $m[2] is the shortcode name.
-	// $m[3] is the contents within the shortcode after the name. This includes
-	// the space between the name and the contents.
-	$note = $m[3];
-	$id   = md5( $m[3] );
-
-	if ( isset( $notes[ $id ] ) ) {
-		$notes[ $id ]['count'] += 1;
-	} else {
-		$notes[ $id ] = array(
-			'note'  => $note,
-			'count' => 1,
-		);
-	}
-
-	// List starts at 1. If the note already exists, use the existing index.
-	$index = 1 + array_search( $id, array_keys( $notes ), true );
-	$count = $notes[ $id ]['count'];
-
-	return (
-		'<sup><a class="note-link" href="#' . $id . '" id="' . $id . '-link-' . $count . '">[' . $index . ']</a></sup>'
-	);
-}
-
-// To do: maybe only add this shortcode for the_content filter?
-add_shortcode( '#', 'gutenberg_footnotes_add_shortcode' );
-add_filter( 'do_shortcode_tag', 'gutenberg_footnotes_do_shortcode_tag', 10, 4 );
-
 /**
  * Add footnotes to the end of the content.
  *
@@ -705,13 +637,40 @@ add_filter( 'do_shortcode_tag', 'gutenberg_footnotes_do_shortcode_tag', 10, 4 );
  *
  * @return string Content with footnotes.
  */
-function gutenberg_footnotes_the_content_after( $content ) {
-	if ( ! isset( $GLOBALS[ GUTENBERG_FOOTNOTES_KEY ] ) ) {
+function gutenberg_footnotes_the_content( $content ) {
+	if ( ! strpos( $content, '<data' ) ) {
 		return $content;
 	}
 
-	$notes = $GLOBALS[ GUTENBERG_FOOTNOTES_KEY ];
-	unset( $GLOBALS[ GUTENBERG_FOOTNOTES_KEY ] );
+	$notes = array();
+
+	// To be replaced later with a dynamic data API:
+	// replaceDataByType( 'core/footnote', ( attributes ) => <sup>...</sup> );
+	$content = preg_replace_callback(
+		'/<data value=\"core\/footnote\">\[(.*?)\]<\/data>/',
+		function( $matches ) use ( &$notes ) {
+			$note = $matches[1];
+			$id = md5( $note );
+
+			if ( isset( $notes[ $id ] ) ) {
+				$notes[ $id ]['count'] += 1;
+			} else {
+				$notes[ $id ] = array(
+					'note'  => $note,
+					'count' => 1,
+				);
+			}
+
+			// List starts at 1. If the note already exists, use the existing index.
+			$index = 1 + array_search( $id, array_keys( $notes ), true );
+			$count = $notes[ $id ]['count'];
+
+			return (
+				'<sup><a class="note-link" href="#' . $id . '" id="' . $id . '-link-' . $count . '">[' . $index . ']</a></sup>'
+			);
+		},
+		$content
+	);
 
 	if ( empty( $notes ) ) {
 		return $content;
@@ -733,7 +692,7 @@ function gutenberg_footnotes_the_content_after( $content ) {
 			$links = '<a href="#' . $id . '-link-' . $count . '" aria-label="' . sprintf( $label, $count ) . '">↩︎</a>' . $links;
 			$count--;
 		}
-		$list .= $links;
+		$list .= ' ' . $links;
 		$list .= '</li>';
 	}
 
@@ -742,20 +701,5 @@ function gutenberg_footnotes_the_content_after( $content ) {
 	return $content . $list;
 }
 
-/**
- * Create the global array to accumulate footnotes.
- *
- * @param string $content Content.
- *
- * @return string Content.
- */
-function gutenberg_footnotes_the_content_before( $content ) {
-	$GLOBALS[ GUTENBERG_FOOTNOTES_KEY ] = array();
-	return $content;
-}
-
-$shortcodes_priority = 10;
-
 // To do: make it work with pagination, excerpt.
-add_filter( 'the_content', 'gutenberg_footnotes_the_content_before', $shortcodes_priority - 1 );
-add_filter( 'the_content', 'gutenberg_footnotes_the_content_after', $shortcodes_priority + 1 );
+add_filter( 'the_content', 'gutenberg_footnotes_the_content' );
