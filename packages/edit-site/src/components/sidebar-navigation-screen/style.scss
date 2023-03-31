@@ -38,8 +38,5 @@
 
 .edit-site-sidebar-navigation-screen__title {
 	flex-grow: 1;
-	margin: 0;
-	text-overflow: ellipsis;
-	overflow: hidden;
-	white-space: nowrap;
+	padding: $grid-unit-10 0 0 0;
 }
