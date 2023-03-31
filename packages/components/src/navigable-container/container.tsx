@@ -12,7 +12,6 @@ import { focus } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { NavigableContainerProps } from './types';
 
 const noop = () => {};
@@ -29,11 +28,13 @@ function cycleValue( value: number, total: number, offset: number ) {
 	return nextValue;
 }
 
-class NavigableContainer extends Component< WordPressComponentProps< NavigableContainerProps & { forwardedRef: ForwardedRef< any > }, 'div', false > > {
-	container?: ForwardedRef<any>;
 
-	constructor() {
-		super( ...arguments );
+
+class NavigableContainer extends Component< NavigableContainerProps > {
+	container?: ForwardedRef< HTMLDivElement >;
+
+	constructor( args: NavigableContainerProps ) {
+		super( args );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 
@@ -56,11 +57,15 @@ class NavigableContainer extends Component< WordPressComponentProps< NavigableCo
 	}
 
 	componentWillUnmount() {
+		if ( ! this.container ) {
+			return;
+		}
+
 		this.container.removeEventListener( 'keydown', this.onKeyDown );
 		this.container.removeEventListener( 'focus', this.onFocus );
 	}
 
-	bindContainer( ref: ForwardedRef< any > ) {
+	bindContainer( ref: ForwardedRef< HTMLDivElement > ) {
 		const { forwardedRef } = this.props;
 		this.container = ref;
 
@@ -83,7 +88,10 @@ class NavigableContainer extends Component< WordPressComponentProps< NavigableCo
 		return null;
 	}
 
-	getFocusableIndex( focusables, target ) {
+	getFocusableIndex(
+		focusables: HTMLElement[],
+		target: HTMLElement,
+	) {
 		const directIndex = focusables.indexOf( target );
 		if ( directIndex !== -1 ) {
 			return directIndex;
@@ -168,7 +176,10 @@ class NavigableContainer extends Component< WordPressComponentProps< NavigableCo
 	}
 }
 
-const forwardedNavigableContainer = ( props, ref ) => {
+const forwardedNavigableContainer = (
+	props: NavigableContainerProps,
+	ref: ForwardedRef< HTMLDivElement >
+) => {
 	return <NavigableContainer { ...props } forwardedRef={ ref } />;
 };
 forwardedNavigableContainer.displayName = 'NavigableContainer';
