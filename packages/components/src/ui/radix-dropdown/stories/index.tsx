@@ -7,26 +7,26 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import * as DropdownMenu from '../';
+import { DropdownMenu, DropdownMenuItem } from '../';
 import { useCx } from '../../../utils/hooks/use-cx';
 
 // TODO: replace with wordpress/icons
 import {
 	HamburgerMenuIcon,
-	DotFilledIcon,
-	CheckIcon,
-	ChevronRightIcon,
+	// DotFilledIcon,
+	// CheckIcon,
+	// ChevronRightIcon,
 } from '@radix-ui/react-icons';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+// import { useState } from '@wordpress/element';
 
-const meta: ComponentMeta< typeof DropdownMenu.Root > = {
+const meta: ComponentMeta< typeof DropdownMenu > = {
 	title: 'Components/RadixDropdown',
-	component: DropdownMenu.Root,
-	// subcomponents: { DropdownMenu. },
+	component: DropdownMenu,
+	subcomponents: { DropdownMenuItem },
 	argTypes: {
 		// focusOnMount: {
 		// 	options: [ 'firstElement', true, false ],
@@ -82,120 +82,106 @@ const rightSlot = css`
 `;
 
 export const DropdownMenuDemo = () => {
-	const [ bookmarksChecked, setBookmarksChecked ] = useState( true );
-	const [ urlsChecked, setUrlsChecked ] = useState( false );
-	const [ person, setPerson ] = useState( 'pedro' );
+	// const [ bookmarksChecked, setBookmarksChecked ] = useState( true );
+	// const [ urlsChecked, setUrlsChecked ] = useState( false );
+	// const [ person, setPerson ] = useState( 'pedro' );
 
 	const cx = useCx();
 
 	const rightSlotClassName = cx( rightSlot );
 
 	return (
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild>
+		<DropdownMenu
+			trigger={
 				<button
 					className={ cx( iconButton ) }
 					aria-label="Customise options"
 				>
 					<HamburgerMenuIcon />
 				</button>
-			</DropdownMenu.Trigger>
+			}
+			contentProps={ { sideOffset: 5 } }
+		>
+			<DropdownMenuItem>
+				New Tab <div className={ rightSlotClassName }>⌘+T</div>
+			</DropdownMenuItem>
+			<DropdownMenuItem>
+				New Window <div className={ rightSlotClassName }>⌘+N</div>
+			</DropdownMenuItem>
+			<DropdownMenuItem disabled>
+				New Private Window{ ' ' }
+				<div className={ rightSlotClassName }>⇧+⌘+N</div>
+			</DropdownMenuItem>
 
-			<DropdownMenu.Portal>
-				<DropdownMenu.Content sideOffset={ 5 }>
-					<DropdownMenu.Item>
-						New Tab <div className={ rightSlotClassName }>⌘+T</div>
-					</DropdownMenu.Item>
-					<DropdownMenu.Item>
-						New Window{ ' ' }
-						<div className={ rightSlotClassName }>⌘+N</div>
-					</DropdownMenu.Item>
-					<DropdownMenu.Item disabled>
-						New Private Window{ ' ' }
-						<div className={ rightSlotClassName }>⇧+⌘+N</div>
-					</DropdownMenu.Item>
-					<DropdownMenu.Sub>
-						<DropdownMenu.SubTrigger>
-							More Tools
-							<div className={ rightSlotClassName }>
-								<ChevronRightIcon />
-							</div>
-						</DropdownMenu.SubTrigger>
-						<DropdownMenu.Portal>
-							<DropdownMenu.SubContent
-								sideOffset={ 2 }
-								alignOffset={ -5 }
-							>
-								<DropdownMenu.Item>
-									Save Page As…{ ' ' }
-									<div className={ rightSlotClassName }>
-										⌘+S
-									</div>
-								</DropdownMenu.Item>
-								<DropdownMenu.Item>
-									Create Shortcut…
-								</DropdownMenu.Item>
-								<DropdownMenu.Item>
-									Name Window…
-								</DropdownMenu.Item>
-								<DropdownMenu.Separator />
-								<DropdownMenu.Item>
-									Developer Tools
-								</DropdownMenu.Item>
-							</DropdownMenu.SubContent>
-						</DropdownMenu.Portal>
-					</DropdownMenu.Sub>
-
-					<DropdownMenu.Separator />
-
-					<DropdownMenu.CheckboxItem
-						checked={ bookmarksChecked }
-						onCheckedChange={ setBookmarksChecked }
+			{ /* <DropdownMenu.Sub>
+				<DropdownMenu.SubTrigger>
+					More Tools
+					<div className={ rightSlotClassName }>
+						<ChevronRightIcon />
+					</div>
+				</DropdownMenu.SubTrigger>
+				<DropdownMenu.Portal>
+					<DropdownMenu.SubContent
+						sideOffset={ 2 }
+						alignOffset={ -5 }
 					>
-						<DropdownMenu.ItemIndicator>
-							<CheckIcon />
-						</DropdownMenu.ItemIndicator>
-						Show Bookmarks{ ' ' }
-						<div className={ rightSlotClassName }>⌘+B</div>
-					</DropdownMenu.CheckboxItem>
-					<DropdownMenu.CheckboxItem
-						className="DropdownMenuCheckboxItem"
-						checked={ urlsChecked }
-						onCheckedChange={ setUrlsChecked }
-					>
-						<DropdownMenu.ItemIndicator>
-							<CheckIcon />
-						</DropdownMenu.ItemIndicator>
-						Show Full URLs
-					</DropdownMenu.CheckboxItem>
+						<DropdownMenu.Item>
+							Save Page As…{ ' ' }
+							<div className={ rightSlotClassName }>⌘+S</div>
+						</DropdownMenu.Item>
+						<DropdownMenu.Item>Create Shortcut…</DropdownMenu.Item>
+						<DropdownMenu.Item>Name Window…</DropdownMenu.Item>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item>Developer Tools</DropdownMenu.Item>
+					</DropdownMenu.SubContent>
+				</DropdownMenu.Portal>
+			</DropdownMenu.Sub>
 
-					<DropdownMenu.Separator />
+			<DropdownMenu.Separator />
 
-					<DropdownMenu.Label>People</DropdownMenu.Label>
-					<DropdownMenu.RadioGroup
-						value={ person }
-						onValueChange={ setPerson }
-					>
-						<DropdownMenu.RadioItem value="pedro">
-							<DropdownMenu.ItemIndicator>
-								<DotFilledIcon />
-							</DropdownMenu.ItemIndicator>
-							Pedro Duarte
-						</DropdownMenu.RadioItem>
-						<DropdownMenu.RadioItem
-							className="DropdownMenuRadioItem"
-							value="colm"
-						>
-							<DropdownMenu.ItemIndicator>
-								<DotFilledIcon />
-							</DropdownMenu.ItemIndicator>
-							Colm Tuite
-						</DropdownMenu.RadioItem>
-					</DropdownMenu.RadioGroup>
+			<DropdownMenu.CheckboxItem
+				checked={ bookmarksChecked }
+				onCheckedChange={ setBookmarksChecked }
+			>
+				<DropdownMenu.ItemIndicator>
+					<CheckIcon />
+				</DropdownMenu.ItemIndicator>
+				Show Bookmarks <div className={ rightSlotClassName }>⌘+B</div>
+			</DropdownMenu.CheckboxItem>
+			<DropdownMenu.CheckboxItem
+				className="DropdownMenuCheckboxItem"
+				checked={ urlsChecked }
+				onCheckedChange={ setUrlsChecked }
+			>
+				<DropdownMenu.ItemIndicator>
+					<CheckIcon />
+				</DropdownMenu.ItemIndicator>
+				Show Full URLs
+			</DropdownMenu.CheckboxItem>
 
-					<DropdownMenu.Arrow />
-				</DropdownMenu.Content>
-			</DropdownMenu.Portal>
-		</DropdownMenu.Root>
+			<DropdownMenu.Separator />
+
+			<DropdownMenu.Label>People</DropdownMenu.Label>
+			<DropdownMenu.RadioGroup
+				value={ person }
+				onValueChange={ setPerson }
+			>
+				<DropdownMenu.RadioItem value="pedro">
+					<DropdownMenu.ItemIndicator>
+						<DotFilledIcon />
+					</DropdownMenu.ItemIndicator>
+					Pedro Duarte
+				</DropdownMenu.RadioItem>
+				<DropdownMenu.RadioItem
+					className="DropdownMenuRadioItem"
+					value="colm"
+				>
+					<DropdownMenu.ItemIndicator>
+						<DotFilledIcon />
+					</DropdownMenu.ItemIndicator>
+					Colm Tuite
+				</DropdownMenu.RadioItem>
+			</DropdownMenu.RadioGroup> */ }
+		</DropdownMenu>
 	);
 };
