@@ -152,7 +152,7 @@ export const blurCurrentFocusedElement = () => {
  * @param {Object} caret Caret's data.
  */
 export const setCurrentCaretData = ( caret ) => {
-	if ( isFocused() ) {
+	if ( isFocused() && caret ) {
 		currentCaretData = caret;
 		notifyCaretChangeListeners();
 	}
