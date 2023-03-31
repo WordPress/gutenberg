@@ -10,6 +10,8 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import { store as editSiteStore } from '../../store';
+import { unlock } from '../../private-apis';
 import { useHistory } from '../../components/routes';
 
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
@@ -19,7 +21,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 		);
 		const deps = supportsSearch ? [ search ] : [];
 		const history = useHistory();
-		const { records, isLoading } = useSelect( ( select ) => {
+		const { canvasMode, records, isLoading } = useSelect( ( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const query = supportsSearch
 				? {
@@ -36,6 +38,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					'getEntityRecords',
 					[ 'postType', postType, query ]
 				),
+				canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			};
 		}, deps );
 
@@ -48,6 +51,8 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 						history.push( {
 							postType,
 							postId: record.id,
+							canvas:
+								canvasMode === 'edit' ? canvasMode : undefined,
 						} );
 						close();
 					},
