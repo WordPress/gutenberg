@@ -22,6 +22,10 @@ const config = {
 			'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
 		),
 	},
+	page: {
+		title: __( 'All pages' ),
+		description: __( 'Manage your pages in bulk.' ),
+	},
 };
 
 export default function SidebarNavigationScreenTemplatesBrowse() {

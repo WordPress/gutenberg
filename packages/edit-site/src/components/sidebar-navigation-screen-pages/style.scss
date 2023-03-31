@@ -23,9 +23,14 @@
 			visibility: visible;
 		}
 	}
+	.edit-site-sidebar-navigation-item__icon {
+		fill: currentColor;
+		color: $gray-600;
+	}
 	.edit-site-sidebar-navigation-item__status {
-		width: 8px;
-		height: 8px;
+		width: 6px;
+		margin: 0 9px;
+		height: 6px;
 		border-radius: 50%;
 		background-color: #f0c33c;
 		&.publish {

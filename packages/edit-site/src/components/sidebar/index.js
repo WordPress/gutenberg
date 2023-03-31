@@ -33,17 +33,17 @@ function SidebarScreens() {
 			<NavigatorScreen path="/:postType(page)">
 				<SidebarNavigationScreenPages />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(page)/:postId">
-				<SidebarNavigationScreenNavigationItem />
-			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part|page)">
 				<SidebarNavigationScreenTemplates />
 			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
+			<NavigatorScreen path="/:postType(wp_template|wp_template_part|page)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/:postId">
 				<SidebarNavigationScreenTemplate />
+			</NavigatorScreen>
+			<NavigatorScreen path="/:postType(page)/:postId">
+				<SidebarNavigationScreenNavigationItem />
 			</NavigatorScreen>
 		</>
 	);

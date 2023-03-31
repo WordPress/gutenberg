@@ -11,15 +11,14 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	FlexBlock,
-	Button,
 } from '@wordpress/components';
-import { info } from '@wordpress/icons';
+import { Icon, page as pageIcon } from '@wordpress/icons';
 
 export default function SidebarNavigationItemPage( {
 	className,
 	children,
-	onInfoClick,
-	previewLinkInfo,
+	onHover,
+	linkInfo,
 	status,
 	modified,
 	...props
@@ -30,26 +29,23 @@ export default function SidebarNavigationItemPage( {
 				'edit-site-sidebar-navigation-item edit-site-sidebar-navigation-item-page',
 				className
 			) }
-			{ ...previewLinkInfo }
+			{ ...linkInfo }
 			{ ...props }
+			onMouseEnter={ onHover }
 		>
-			<HStack justify="flex-start" spacing={ 3 }>
-				<div
-					className={ `edit-site-sidebar-navigation-item__status ${ status }` }
-				></div>
+			<HStack justify="flex-start" spacing={ 2 }>
+				<Icon
+					className="edit-site-sidebar-navigation-item__icon"
+					icon={ pageIcon }
+				/>
 				<FlexBlock>
 					<VStack spacing={ 1 }>
 						<FlexBlock>{ children }</FlexBlock>
-						<p className="edit-site-sidebar-navigation-item__text">
-							Updated { getRelativeTimeString( modified ) }
-						</p>
 					</VStack>
 				</FlexBlock>
-				<Button
-					icon={ info }
-					onClick={ onInfoClick }
-					label="view page information"
-				/>
+				<div
+					className={ `edit-site-sidebar-navigation-item__status ${ status }` }
+				></div>
 			</HStack>
 		</Item>
 	);

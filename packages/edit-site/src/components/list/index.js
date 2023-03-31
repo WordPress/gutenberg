@@ -21,8 +21,20 @@ export default function List() {
 	const {
 		params: { path },
 	} = useLocation();
-	const templateType =
-		path === '/wp_template/all' ? 'wp_template' : 'wp_template_part';
+
+	let templateType = 'wp_template';
+
+	switch ( path ) {
+		case '/wp_template_part/all':
+			templateType = 'wp_template_part';
+			break;
+		case '/wp_template/all':
+			templateType = 'wp_template';
+			break;
+		case '/page/all':
+			templateType = 'page';
+			break;
+	}
 
 	useRegisterShortcuts();
 

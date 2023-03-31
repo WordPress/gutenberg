@@ -22,6 +22,15 @@
 	}
 }
 
+.edit-site-sidebar-navigation-screen__section-heading {
+	color: $gray-600;
+	font-size: 11px;
+	font-weight: 500;
+	margin-bottom: 1em;
+	margin-top: 2em;
+	text-transform: uppercase;
+}
+
 .edit-site-sidebar-navigation-screen-navigation-menus__content {
 	.offcanvas-editor-list-view-leaf {
 		max-width: calc(100% - #{ $grid-unit-05 });

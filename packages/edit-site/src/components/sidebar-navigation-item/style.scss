@@ -12,6 +12,9 @@
 	&[aria-current] {
 		background: var(--wp-admin-theme-color);
 	}
+	svg {
+		color: $gray-600;
+	}
 }
 
 .edit-site-sidebar-navigation-screen__content {
