@@ -89,7 +89,6 @@ export default function Layout() {
 	} );
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const canvasPadding = isMobileViewport ? 0 : 24;
 	const showSidebar =
 		( isMobileViewport && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
@@ -97,22 +96,14 @@ export default function Layout() {
 		( isMobileViewport && isEditorPage && canvasMode === 'edit' ) ||
 		! isMobileViewport ||
 		! isEditorPage;
-	const showFrame =
-		( ! isEditorPage && ! isMobileViewport ) ||
-		( ! isMobileViewport && isEditorPage && canvasMode === 'view' );
 	const isFullCanvas =
 		( isMobileViewport && isListPage ) ||
 		( isEditorPage && canvasMode === 'edit' );
-	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer, fullSize ] = useResizeObserver();
 	const [ forcedWidth, setForcedWidth ] = useState( null );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingEnabled = ! isMobileViewport && canvasMode === 'view';
 	const defaultSidebarWidth = isMobileViewport ? '100vw' : 360;
-	let canvasWidth = isResizing ? '100%' : fullSize.width;
-	if ( showFrame && ! isResizing ) {
-		canvasWidth = canvasSize.width - canvasPadding;
-	}
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -148,34 +139,6 @@ export default function Layout() {
 								: undefined,
 					} }
 				/>
-
-				<AnimatePresence initial={ false }>
-					{ isEditorPage && canvasMode === 'edit' && (
-						<NavigableRegion
-							className="edit-site-layout__header"
-							ariaLabel={ __( 'Editor top bar' ) }
-							as={ motion.div }
-							animate={ {
-								y: 0,
-							} }
-							initial={ {
-								y: '-100%',
-							} }
-							exit={ {
-								y: '-100%',
-							} }
-							transition={ {
-								type: 'tween',
-								duration: disableMotion
-									? 0
-									: ANIMATION_DURATION,
-								ease: 'easeOut',
-							} }
-						>
-							{ canvasMode === 'edit' && <Header /> }
-						</NavigableRegion>
-					) }
-				</AnimatePresence>
 
 				<div className="edit-site-layout__content">
 					<AnimatePresence initial={ false }>
@@ -258,80 +221,34 @@ export default function Layout() {
 							</ResizableBox>
 						) }
 					</AnimatePresence>
-
 					<SavePanel />
-
 					{ showCanvas && (
-						<div
-							className={ classnames(
-								'edit-site-layout__canvas-container',
-								{
-									'is-resizing': isResizing,
-								}
-							) }
-							style={ {
-								paddingTop: showFrame ? canvasPadding : 0,
-								paddingBottom: showFrame ? canvasPadding : 0,
-							} }
-						>
-							{ canvasResizer }
-							{ !! canvasSize.width && (
-								<motion.div
-									whileHover={
-										isEditorPage && canvasMode === 'view'
-											? {
-													scale: 1.005,
-													transition: {
-														duration:
-															disableMotion ||
-															isResizing
-																? 0
-																: 0.5,
-														ease: 'easeOut',
-													},
-											  }
-											: {}
-									}
-									initial={ false }
-									layout="position"
-									className="edit-site-layout__canvas"
-									transition={ {
-										type: 'tween',
-										duration:
-											disableMotion || isResizing
-												? 0
-												: ANIMATION_DURATION,
-										ease: 'easeOut',
-									} }
-								>
-									<motion.div
-										style={ {
-											position: 'absolute',
-											top: 0,
-											left: 0,
-											bottom: 0,
-										} }
-										initial={ false }
-										animate={ {
-											width: canvasWidth,
-										} }
-										transition={ {
-											type: 'tween',
-											duration:
-												disableMotion || isResizing
-													? 0
-													: ANIMATION_DURATION,
-											ease: 'easeOut',
-										} }
-									>
-										<ErrorBoundary>
-											{ isEditorPage && <Editor /> }
-											{ isListPage && <ListPage /> }
-										</ErrorBoundary>
-									</motion.div>
-								</motion.div>
-							) }
-						</div>
+						<ErrorBoundary>
+							<motion.div
+								layout
+								// drag={ isListPage || canvasMode !== 'edit' }
+								// dragMomentum={ false }
+								className={ classnames( 'the-frame', {
+									edit: canvasMode === 'edit',
+									secondary: isListPage,
+								} ) }
+							>
+								<AnimatePresence initial={ false }>
+									{ isEditorPage && canvasMode === 'edit' && (
+										<NavigableRegion
+											className="edit-site-layout__header"
+											ariaLabel={ __( 'Editor top bar' ) }
+										>
+											{ canvasMode === 'edit' && (
+												<Header />
+											) }
+										</NavigableRegion>
+									) }
+								</AnimatePresence>
+								<Editor secondary={ isListPage } />
+							</motion.div>
+							{ isListPage && <ListPage /> }
+						</ErrorBoundary>
 					) }
 				</div>
 			</div>

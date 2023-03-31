@@ -7,7 +7,7 @@ import {
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	SearchControl,
 } from '@wordpress/components';
-import { grid, category } from '@wordpress/icons';
+import { list, category } from '@wordpress/icons';
 
 export default function ViewBar( { viewType, onViewChange } ) {
 	return (
@@ -20,7 +20,7 @@ export default function ViewBar( { viewType, onViewChange } ) {
 				onChange={ onViewChange }
 			>
 				<ToggleGroupControlOptionIcon
-					icon={ grid }
+					icon={ list }
 					className="edit-site-sidebar-navigation-filter__option"
 					value="list"
 					label="List"

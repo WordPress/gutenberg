@@ -220,3 +220,40 @@
 		border-left: $border-width solid $gray-300;
 	}
 }
+
+
+// me stuff
+
+.the-frame {
+	position: relative;
+	flex: 1 1 auto;
+	margin: 16px;
+	border-radius: 8px;
+	overflow: hidden;
+	z-index: 2;
+	&.edit {
+		margin: 0;
+		border-radius: 0;
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+	}
+	&.secondary:not(.edit) {
+		position: absolute;
+		width: 328px;
+		height: 250px;
+		left: 16px;
+		bottom: 16px;
+		margin: 0;
+		z-index: 2;
+		// .interface-interface-skeleton {
+		// 	pointer-events: none;
+		// }
+	}
+	.interface-interface-skeleton {
+		position: static;
+		height: 100%;
+	}
+}

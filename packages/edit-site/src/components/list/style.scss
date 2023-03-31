@@ -48,10 +48,11 @@
 }
 
 .edit-site-list-table {
-	min-width: 100%;
 	margin: 0 auto;
 	overflow: hidden;
 	border-spacing: 0;
+	table-layout: auto;
+	width: 100%;
 	.components-text {
 		color: $gray-600;
 	}
