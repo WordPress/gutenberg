@@ -187,6 +187,8 @@ $z-layers: (
 	".edit-site-layout__canvas-container": 2,
 	".edit-site-layout__sidebar": 1,
 	".edit-site-layout__canvas-container.is-resizing::after": 100,
+	// Title needs to appear above other UI the section content.
+	".edit-site-sidebar-navigation-screen__title-icon": 1,
 );
 
 @function z-index( $key ) {
