@@ -17,12 +17,45 @@ import PostAuthor from '../post-author';
 import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
-import PluginPostStatusInfo, {
-	Fill as PluginPostStatusFill,
+import {
+	Slot as PluginPostStatusInfoSlot,
+	Fill as PluginPostStatusInfoFill,
 } from '../plugin-post-status-info';
 import { store as editPostStore } from '../../../store';
 import PostTemplate from '../post-template';
 import PostURL from '../post-url';
+
+function One() {
+	return (
+		<PluginPostStatusInfoFill priority={ 1 }>
+			<div>One</div>
+		</PluginPostStatusInfoFill>
+	);
+}
+
+function Two() {
+	return (
+		<PluginPostStatusInfoFill priority={ 2 }>
+			<div>Two</div>
+		</PluginPostStatusInfoFill>
+	);
+}
+
+function Three() {
+	return (
+		<PluginPostStatusInfoFill priority={ 3 }>
+			<div>Three</div>
+		</PluginPostStatusInfoFill>
+	);
+}
+
+function Four() {
+	return (
+		<PluginPostStatusInfoFill priority={ 4 }>
+			<div>Four</div>
+		</PluginPostStatusInfoFill>
+	);
+}
 
 /**
  * Module Constants
@@ -31,14 +64,14 @@ const PANEL_NAME = 'post-status';
 
 const PostStatusTrashFill = () => {
 	return (
-		<PluginPostStatusFill priority={ 99 }>
+		<PluginPostStatusInfoFill priority={ 99 }>
 			<PostTrash />
-		</PluginPostStatusFill>
+		</PluginPostStatusInfoFill>
 	);
 };
 const PostStatusInfoFill = () => {
 	return (
-		<PluginPostStatusFill priority={ 2 }>
+		<PluginPostStatusInfoFill priority={ 2 }>
 			<PostVisibility />
 			<PostSchedule />
 			<PostTemplate />
@@ -48,7 +81,7 @@ const PostStatusInfoFill = () => {
 			<PostFormat />
 			<PostSlug />
 			<PostAuthor />
-		</PluginPostStatusFill>
+		</PluginPostStatusInfoFill>
 	);
 };
 
@@ -60,9 +93,13 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
-			<PostStatusInfoFill />
+			<Four />
+			<One />
+			<Two />
+			<Three />
 			<PostStatusTrashFill />
-			<PluginPostStatusInfo.Slot />
+			<PostStatusInfoFill />
+			<PluginPostStatusInfoSlot bubblesVirtually />
 		</PanelBody>
 	);
 }
