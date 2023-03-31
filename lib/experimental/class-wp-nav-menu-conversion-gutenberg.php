@@ -41,11 +41,7 @@ class WP_Nav_Menu_Conversion {
 		// Adds the class property classes for the current context, if applicable.
 		_wp_menu_item_classes_by_context( $menu_items );
 
-		$menu_items_by_order_id = $this->key_by_order_id( $menu_items );
-
-		unset( $menu_items );
-
-		$menu_items_by_parent_id = $this->group_by_parent_id( $menu_items_by_order_id );
+		$menu_items_by_parent_id = $this->group_by_parent_id( $menu_items );
 
 		$inner_blocks = $this->to_blocks(
 			isset( $menu_items_by_parent_id[0] )
@@ -64,6 +60,7 @@ class WP_Nav_Menu_Conversion {
 	 * @return array
 	 */
 	private function key_by_order_id( $menu_items ) {
+		return (array) $menu_items;
 		$sorted_menu_items = array();
 
 		foreach ( (array) $menu_items as $menu_item ) {
