@@ -181,7 +181,7 @@ function build_template_part_block_area_variations() {
 	foreach ( $defined_areas as $area ) {
 		if ( 'uncategorized' !== $area['area'] ) {
 			$variations[] = array(
-				'name'        => $area['area'],
+				'name'        => 'area_' . $area['area'],
 				'title'       => $area['label'],
 				'description' => $area['description'],
 				'attributes'  => array(
@@ -223,7 +223,7 @@ function build_template_part_block_instance_variations() {
 
 	foreach ( $template_parts as $template_part ) {
 		$variations[] = array(
-			'name'        => sanitize_title( $template_part->slug ),
+			'name'        => 'instance_' . sanitize_title( $template_part->slug ),
 			'title'       => $template_part->title,
 			// If there's no description for the template part don't show the
 			// block description. This is a bit hacky, but prevent the fallback
