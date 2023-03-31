@@ -400,9 +400,9 @@ $block-navigation-max-indent: 8;
 
 	.block-editor-list-view-drop-indicator__line {
 		background: var(--wp-admin-theme-color);
-		height: 4px;
+		height: 6px;
 		border: 1px solid $white;
-		border-radius: 2px;
+		border-radius: 4px;
 	}
 }
 
