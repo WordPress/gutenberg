@@ -9,7 +9,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
-export default function useListViewClientIds( blocks, rootClientId ) {
+export default function useListViewClientIds( { blocks, rootClientId } ) {
 	return useSelect(
 		( select ) => {
 			const {

@@ -7,6 +7,7 @@ import {
 } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import {
 	useCallback,
 	useEffect,
@@ -56,7 +57,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  *
  * @param {Object}         props                   Components props.
  * @param {string}         props.id                An HTML element id for the root element of ListView.
- * @param {Array}          props.blocks            Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {Array}          props.blocks            _deprecated_ Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {?boolean}       props.showBlockMovers   Flag to enable block movers. Defaults to `false`.
  * @param {?boolean}       props.isExpanded        Flag to determine whether nested levels are expanded by default. Defaults to `false`.
  * @param {?boolean}       props.showAppender      Flag to show or hide the block appender. Defaults to `false`.
@@ -76,8 +77,16 @@ function ListViewComponent(
 	},
 	ref
 ) {
+	// This can be removed once we no longer need to support the blocks prop.
+	if ( blocks ) {
+		deprecated( '`blocks` property in `ListViewComponent`', {
+			since: '6.3',
+			alternative: '`rootClientId` property',
+		} );
+	}
+
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
-		useListViewClientIds( blocks, rootClientId );
+		useListViewClientIds( { blocks, rootClientId } );
 
 	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
 		( select ) => {
