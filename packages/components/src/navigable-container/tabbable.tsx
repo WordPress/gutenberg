@@ -39,6 +39,8 @@ export function TabbableContainer(
 		if ( eventToOffset ) {
 			return eventToOffset( evt );
 		}
+
+		return 0;
 	};
 
 	return (

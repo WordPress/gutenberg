@@ -26,11 +26,6 @@ export function NavigableMenu(
 			previous = [ 'ArrowLeft' ];
 		}
 
-		if ( orientation === 'both' ) {
-			next = [ 'ArrowRight', 'ArrowDown' ];
-			previous = [ 'ArrowLeft', 'ArrowUp' ];
-		}
-
 		if ( next.includes( code ) ) {
 			return 1;
 		} else if ( previous.includes( code ) ) {
@@ -45,6 +40,8 @@ export function NavigableMenu(
 			// in an offset.
 			return 0;
 		}
+
+		return 0;
 	};
 
 	return (
@@ -53,7 +50,7 @@ export function NavigableMenu(
 			stopNavigationEvents
 			onlyBrowserTabstops={ false }
 			role={ role }
-			aria-orientation={ role === 'presentation' ? null : orientation }
+			aria-orientation={ role === 'presentation' ? undefined : orientation }
 			eventToOffset={ eventToOffset }
 			{ ...rest }
 		/>

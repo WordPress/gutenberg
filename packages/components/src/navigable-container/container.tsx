@@ -17,7 +17,7 @@ import type { NavigableContainerProps } from './types';
 const noop = () => {};
 const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
 
-function cycleValue( value: number, total: number, offset: number ) {
+function cycleValue( value: number | undefined, total: number, offset: number ) {
 	const nextValue = value + offset;
 	if ( nextValue < 0 ) {
 		return total + nextValue;
@@ -82,7 +82,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		const focusables = finder.find( this.container );
 
 		const index = this.getFocusableIndex( focusables, target );
-		if ( index > -1 && target ) {
+		if ( index !== undefined && index > -1 && target ) {
 			return { index, target, focusables };
 		}
 		return null;
@@ -149,7 +149,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		const { index, focusables } = context;
 		const nextIndex = cycle
 			? cycleValue( index, focusables.length, offset )
-			: index + offset;
+			: index ?? 0 + offset;
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 			focusables[ nextIndex ].focus();
 			onNavigate( nextIndex, focusables[ nextIndex ] );

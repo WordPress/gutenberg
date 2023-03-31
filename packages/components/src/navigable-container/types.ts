@@ -27,12 +27,12 @@ type BaseProps = {
 
 export type MenuProps = BaseProps & {
 	/**
-	 * The orientation of the menu. It could be "vertical", "horizontal" or "both"
+	 * The orientation of the menu. It could be 'vertical' or 'horizontal'.
 	 * (NavigableMenu only)
 	 *
 	 * @default 'vertical'
 	 */
-	orientation: string;
+	orientation: 'vertical' | 'horizontal';
 };
 
 type UnforwardedNavigableContainerProps = BaseProps & {
@@ -54,5 +54,5 @@ type UnforwardedNavigableContainerProps = BaseProps & {
 	stopNavigationEvents: boolean;
 };
 
-export type NavigableContainerProps = WordPressComponentProps< UnforwardedNavigableContainerProps & { forwardedRef: ForwardedRef< any > }, 'div', false >;
+export type NavigableContainerProps = WordPressComponentProps< UnforwardedNavigableContainerProps & { forwardedRef?: ForwardedRef< any > }, 'div', false >;
 export type TabbableContainerProps = Omit< NavigableContainerProps, 'onlyBrowserTabstops' | 'stopNavigationEvents' >;
