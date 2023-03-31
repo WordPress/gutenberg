@@ -9,6 +9,7 @@ import { get, isEmpty, kebabCase, set } from 'lodash';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
+	getBlockSupport,
 	getBlockTypes,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -852,17 +853,16 @@ export const toStyles = (
 				delete styles.filter;
 			}
 
-			// Process duotone styles (they use color.__experimentalDuotone selector).
+			// Process duotone styles.
 			if ( duotoneSelector ) {
 				const duotoneDeclarations =
 					getStylesDeclarations( duotoneStyles );
 				if ( duotoneDeclarations.length > 0 ) {
 					ruleset =
 						ruleset +
-						`${ scopeSelector(
-							selector,
-							duotoneSelector
-						) }{${ duotoneDeclarations.join( ';' ) };}`;
+						`${ duotoneSelector }{${ duotoneDeclarations.join(
+							';'
+						) };}`;
 				}
 			}
 
@@ -1002,11 +1002,24 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
-		const selector = getBlockCSSSelector( blockType, 'root' );
-		const duotoneSelector = getBlockCSSSelector(
+		const selector = getBlockCSSSelector( blockType );
+		let duotoneSelector = getBlockCSSSelector(
 			blockType,
 			'filter.duotone'
 		);
+
+		// Keep backwards compatibility for support.color.__experimentalDuotone.
+		if ( ! duotoneSelector ) {
+			const rootSelector = getBlockCSSSelector( blockType );
+			const duotoneSupport = getBlockSupport(
+				blockType,
+				'color.__experimentalDuotone',
+				false
+			);
+			duotoneSelector =
+				duotoneSupport && scopeSelector( rootSelector, duotoneSupport );
+		}
+
 		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;

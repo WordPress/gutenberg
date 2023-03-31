@@ -265,6 +265,42 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Get the CSS selector for a block type.
+	 *
+	 * @param string $block_name The block name.
+	 *
+	 * @return string The CSS selector or null if there is no support.
+	 */
+	private static function get_selector( $block_name ) {
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+
+		if ( $block_type && property_exists( $block_type, 'supports' ) ) {
+			// Backwards compatibility with `supports.color.__experimentalDuotone`
+			// is provided via the `block_type_metadata_settings` filter. If
+			// `supports.filter.duotone` has not been set and the experimental
+			// property has been, the experimental property value is copied into
+			// `supports.filter.duotone`.
+			$duotone_support = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), false );
+			if ( ! $duotone_support ) {
+				return null;
+			}
+
+			// If the experimental duotone support was set, that value is to be
+			// treated as a selector and requires scoping.
+			$experimental_duotone = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+			if ( $experimental_duotone ) {
+				$root_selector = wp_get_block_css_selector( $block_type );
+				return is_string( $experimental_duotone )
+					? WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $experimental_duotone )
+					: $root_selector;
+			}
+
+			// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
+			return wp_get_block_css_selector( $block_type, array( 'filter', 'duotone' ), true );
+		}
+	}
+
+	/**
 	 * Render out the duotone CSS styles and SVG.
 	 *
 	 * @param  string $block_content Rendered block content.
@@ -272,14 +308,7 @@ class WP_Duotone_Gutenberg {
 	 * @return string                Filtered block content.
 	 */
 	public static function render_duotone_support( $block_content, $block ) {
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-
-		$duotone_support  = false;
-		$duotone_selector = null;
-		if ( $block_type ) {
-			$duotone_selector = wp_get_block_css_selector( $block_type, 'filter.duotone' );
-			$duotone_support  = (bool) $duotone_selector;
-		}
+		$duotone_selector = self::get_selector( $block['blockName'] );
 
 		// The block should have a duotone attribute or have duotone defined in its theme.json to be processed.
 		$has_duotone_attribute     = isset( $block['attrs']['style']['color']['duotone'] );
@@ -287,7 +316,7 @@ class WP_Duotone_Gutenberg {
 
 		if (
 			empty( $block_content ) ||
-			! $duotone_support ||
+			! $duotone_selector ||
 			( ! $has_duotone_attribute && ! $has_global_styles_duotone )
 		) {
 			return $block_content;
@@ -349,7 +378,17 @@ class WP_Duotone_Gutenberg {
 		$filter_id = gutenberg_get_duotone_filter_id( array( 'slug' => $slug ) );
 
 		// Build the CSS selectors to which the filter will be applied.
-		$selector = WP_Theme_JSON_Gutenberg::scope_selector( '.' . $filter_id, $duotone_selector );
+		$selectors = explode( ',', $duotone_selector );
+
+		$selectors_scoped = array();
+		foreach ( $selectors as $selector_part ) {
+			// Assuming the selector part is a subclass selector (not a tag name)
+			// so we can prepend the filter id class. If we want to support elements
+			// such as `img` or namespaces, we'll need to add a case for that here.
+			$selectors_scoped[] = '.' . $filter_id . trim( $selector_part );
+		}
+
+		$selector = implode( ', ', $selectors_scoped );
 
 		// We only want to add the selector if we have it in the output already, essentially skipping 'unset'.
 		if ( array_key_exists( $slug, self::$output ) ) {
@@ -385,5 +424,24 @@ class WP_Duotone_Gutenberg {
 		}
 
 		return $tags->get_updated_html();
+	}
+
+	/**
+	 * Migrate the old experimental duotone support flag to its stabilized location
+	 * under `supports.filter.duotone` and sets.
+	 *
+	 * @param array $settings Current block type settings.
+	 * @param array $metadata Block metadata as read in via block.json.
+	 *
+	 * @return array Filtered block type settings.
+	 */
+	public static function migrate_experimental_duotone_support_flag( $settings, $metadata ) {
+		$duotone_support = _wp_array_get( $metadata, array( 'supports', 'color', '__experimentalDuotone' ), null );
+
+		if ( ! isset( $settings['supports']['filter']['duotone'] ) && null !== $duotone_support ) {
+			_wp_array_set( $settings, array( 'supports', 'filter', 'duotone' ), (bool) $duotone_support );
+		}
+
+		return $settings;
 	}
 }
