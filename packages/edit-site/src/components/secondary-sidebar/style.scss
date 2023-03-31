@@ -8,7 +8,7 @@
 .edit-site-editor__list-view-panel {
 	// Same width as the Inserter.
 	// @see packages/block-editor/src/components/inserter/style.scss
-	min-width: 350px;
+	width: 350px;
 }
 
 .edit-site-editor__inserter-panel-header {
@@ -44,4 +44,6 @@
 .edit-site-editor__list-view-panel-content {
 	overflow-y: auto;
 	padding: $grid-unit-10;
+
+	@include custom-scrollbars-on-hover;
 }
