@@ -19,7 +19,7 @@ import useTitle from '../routes/use-title';
 
 export default function List() {
 	const {
-		params: { path },
+		params: { path, ...filters },
 	} = useLocation();
 
 	let templateType = 'wp_template';
@@ -80,7 +80,9 @@ export default function List() {
 			labels={ detailedRegionLabels }
 			header={ <Header templateType={ templateType } /> }
 			notices={ <EditorSnackbars /> }
-			content={ <Table templateType={ templateType } /> }
+			content={
+				<Table templateType={ templateType } filters={ filters } />
+			}
 			shortcuts={ {
 				previous: previousShortcut,
 				next: nextShortcut,

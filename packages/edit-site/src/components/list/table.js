@@ -17,12 +17,13 @@ import Link from '../routes/link';
 import Actions from './actions';
 import AddedBy from './added-by';
 
-export default function Table( { templateType } ) {
+export default function Table( { templateType, filters = {} } ) {
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
 		templateType,
 		{
 			per_page: -1,
+			...filters,
 		}
 	);
 	const postType = useSelect(
