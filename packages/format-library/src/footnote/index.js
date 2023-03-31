@@ -13,9 +13,8 @@ const title = __( 'Footnote' );
 export const footnote = {
 	name,
 	title,
-	tagName: 'a',
-	className: 'note-link',
-	shortcode: '#',
+	tagName: 'data',
+	className: null,
 	edit( {
 		isObjectActive,
 		value,
@@ -28,9 +27,9 @@ export const footnote = {
 			const newValue = insertObject( value, {
 				type: name,
 				attributes: {
-					contenteditable: 'false',
-					'data-shortcode-content': '',
+					innerHtml: '',
 				},
+				tagName: 'data',
 			} );
 			newValue.start = newValue.end - 1;
 			onChange( newValue );
@@ -59,12 +58,13 @@ export const footnote = {
 };
 
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
-	const { 'data-shortcode-content': shortcodeContent } =
-		activeObjectAttributes;
+	const { innerHtml } = activeObjectAttributes;
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 		settings: footnote,
 	} );
+
+	const note = innerHtml.replace( /^\[/, '' ).replace( /\]$/, '' );
 
 	return (
 		<Popover
@@ -76,15 +76,16 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 			<TextControl
 				className="block-editor-format-toolbar__image-container-value"
 				label={ __( 'Note' ) }
-				value={ shortcodeContent }
+				value={ note }
 				onChange={ ( newNote ) => {
 					const newReplacements = value.replacements.slice();
 
 					newReplacements[ value.start ] = {
+						tagName: 'data',
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
-							'data-shortcode-content': newNote,
+							innerHtml: '[' + newNote + ']',
 						},
 					};
 

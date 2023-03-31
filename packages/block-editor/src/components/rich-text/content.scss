@@ -25,10 +25,10 @@
 	}
 
 	// Should be in theme compatibility file.
-	.note-link {
+	data[value="core/footnote"] {
 		counter-increment: footnotes;
 	}
-	.note-link::after {
+	data[value="core/footnote"]::after {
 		content: "[" counter(footnotes) "]";
 		vertical-align: super;
 		font-size: smaller;

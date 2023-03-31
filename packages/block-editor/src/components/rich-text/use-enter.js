@@ -33,7 +33,7 @@ export function useEnter( props ) {
 			}
 
 			const {
-				__unstableBeforeSerialize,
+				removeEditorOnlyFormats,
 				value,
 				onReplace,
 				onSplit,
@@ -46,7 +46,8 @@ export function useEnter( props ) {
 
 			event.preventDefault();
 
-			const _value = __unstableBeforeSerialize( value );
+			const _value = { ...value };
+			_value.formats = removeEditorOnlyFormats( value );
 			const canSplit = onReplace && onSplit;
 
 			if ( onReplace ) {
