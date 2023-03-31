@@ -39,9 +39,9 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 		// renderToggle: { control: { type: null } },
 	},
 	parameters: {
-		controls: {
-			expanded: true,
-		},
+		actions: { argTypesRegex: '^on.*' },
+		controls: { expanded: true },
+		docs: { source: { state: 'open', excludeDecorators: true } },
 	},
 };
 export default meta;
