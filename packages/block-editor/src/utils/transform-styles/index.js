@@ -1,14 +1,9 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import traverse from './traverse';
-import urlRewrite from './transforms/url-rewrite';
-import wrap from './transforms/wrap';
+import postcss from 'postcss';
+import wrap from 'postcss-editor-styles';
+import rebaseUrl from 'postcss-urlrebase';
 
 /**
  * Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
@@ -19,18 +14,10 @@ import wrap from './transforms/wrap';
  */
 const transformStyles = ( styles, wrapperClassName = '' ) => {
 	return Object.values( styles ?? [] ).map( ( { css, baseURL } ) => {
-		const transforms = [];
-		if ( wrapperClassName ) {
-			transforms.push( wrap( wrapperClassName ) );
-		}
-		if ( baseURL ) {
-			transforms.push( urlRewrite( baseURL ) );
-		}
-		if ( transforms.length ) {
-			return traverse( css, compose( transforms ) );
-		}
-
-		return css;
+		return postcss( [
+			wrap( { scopeTo: wrapperClassName } ),
+			rebaseUrl( { rootUrl: baseURL } ),
+		] ).process( css, {} );
 	} );
 };
 
