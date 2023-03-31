@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 11.7.0 (2023-03-29)
+
+-   `ImageSizeControl`: Update image size label ([#49112](https://github.com/WordPress/gutenberg/pull/49112)).
+
 ## 11.6.0 (2023-03-15)
 
 ## 11.5.0 (2023-03-01)

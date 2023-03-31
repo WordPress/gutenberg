@@ -294,7 +294,7 @@ export const showBlockTypes =
 			( type ) =>
 				! (
 					Array.isArray( blockNames ) ? blockNames : [ blockNames ]
-				 ).includes( type )
+				).includes( type )
 		);
 
 		registry

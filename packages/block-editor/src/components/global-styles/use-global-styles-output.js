@@ -9,17 +9,19 @@ import { get, isEmpty, kebabCase, set } from 'lodash';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
+	getBlockSupport,
 	getBlockTypes,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useContext, useMemo } from '@wordpress/element';
+import { renderToString, useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
  */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
+import { getBlockCSSSelector } from './get-block-css-selector';
 import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
@@ -144,13 +146,16 @@ function getPresetsSvgFilters( blockPresets = {} ) {
 		return [ 'default', 'theme' ]
 			.filter( ( origin ) => presetByOrigin[ origin ] )
 			.flatMap( ( origin ) =>
-				presetByOrigin[ origin ].map( ( preset ) => (
-					<PresetDuotoneFilter
-						preset={ preset }
-						key={ preset.slug }
-					/>
-				) )
-			);
+				presetByOrigin[ origin ].map( ( preset ) =>
+					renderToString(
+						<PresetDuotoneFilter
+							preset={ preset }
+							key={ preset.slug }
+						/>
+					)
+				)
+			)
+			.join( '' );
 	} );
 }
 
@@ -192,6 +197,89 @@ function concatFeatureVariationSelectorString(
 	} );
 	return combinedSelectors.join( ', ' );
 }
+
+/**
+ * Generate style declarations for a block's custom feature and subfeature
+ * selectors.
+ *
+ * NOTE: The passed `styles` object will be mutated by this function.
+ *
+ * @param {Object} selectors Custom selectors object for a block.
+ * @param {Object} styles    A block's styles object.
+ *
+ * @return {Object} Style declarations.
+ */
+const getFeatureDeclarations = ( selectors, styles ) => {
+	const declarations = {};
+
+	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
+		// We're only processing features/subfeatures that have styles.
+		if ( feature === 'root' || ! styles?.[ feature ] ) {
+			return;
+		}
+
+		const isShorthand = typeof selector === 'string';
+
+		// If we have a selector object instead of shorthand process it.
+		if ( ! isShorthand ) {
+			Object.entries( selector ).forEach(
+				( [ subfeature, subfeatureSelector ] ) => {
+					// Don't process root feature selector yet or any
+					// subfeature that doesn't have a style.
+					if (
+						subfeature === 'root' ||
+						! styles?.[ feature ][ subfeature ]
+					) {
+						return;
+					}
+
+					// Create a temporary styles object and build
+					// declarations for subfeature.
+					const subfeatureStyles = {
+						[ feature ]: {
+							[ subfeature ]: styles[ feature ][ subfeature ],
+						},
+					};
+					const newDeclarations =
+						getStylesDeclarations( subfeatureStyles );
+
+					// Merge new declarations in with any others that
+					// share the same selector.
+					declarations[ subfeatureSelector ] = [
+						...( declarations[ subfeatureSelector ] || [] ),
+						...newDeclarations,
+					];
+
+					// Remove the subfeature's style now it will be
+					// included under its own selector not the block's.
+					delete styles[ feature ][ subfeature ];
+				}
+			);
+		}
+
+		// Now subfeatures have been processed and removed, we can
+		// process root, or shorthand, feature selectors.
+		if ( isShorthand || selector.root ) {
+			const featureSelector = isShorthand ? selector : selector.root;
+
+			// Create temporary style object and build declarations for feature.
+			const featureStyles = { [ feature ]: styles[ feature ] };
+			const newDeclarations = getStylesDeclarations( featureStyles );
+
+			// Merge new declarations with any others that share the selector.
+			declarations[ featureSelector ] = [
+				...( declarations[ featureSelector ] || [] ),
+				...newDeclarations,
+			];
+
+			// Remove the feature from the block's styles now as it will be
+			// included under its own selector not the block's.
+			delete styles[ feature ];
+		}
+	} );
+
+	return declarations;
+};
 
 /**
  * Transform given style tree into a set of style declarations.
@@ -692,23 +780,16 @@ export const toStyles = (
 			// Process styles for block support features with custom feature level
 			// CSS selectors set.
 			if ( featureSelectors ) {
-				Object.entries( featureSelectors ).forEach(
-					( [ featureName, featureSelector ] ) => {
-						if ( styles?.[ featureName ] ) {
-							const featureStyles = {
-								[ featureName ]: styles[ featureName ],
-							};
-							const featureDeclarations =
-								getStylesDeclarations( featureStyles );
-							delete styles[ featureName ];
+				const featureDeclarations = getFeatureDeclarations(
+					featureSelectors,
+					styles
+				);
 
-							if ( !! featureDeclarations.length ) {
-								ruleset =
-									ruleset +
-									`${ featureSelector }{${ featureDeclarations.join(
-										';'
-									) } }`;
-							}
+				Object.entries( featureDeclarations ).forEach(
+					( [ cssSelector, declarations ] ) => {
+						if ( !! declarations.length ) {
+							const rules = declarations.join( ';' );
+							ruleset = ruleset + `${ cssSelector }{${ rules }}`;
 						}
 					}
 				);
@@ -720,43 +801,32 @@ export const toStyles = (
 						if ( styles?.variations?.[ styleVariationName ] ) {
 							// If the block uses any custom selectors for block support, add those first.
 							if ( featureSelectors ) {
-								Object.entries( featureSelectors ).forEach(
-									( [ featureName, featureSelector ] ) => {
-										if (
-											styles?.variations?.[
-												styleVariationName
-											]?.[ featureName ]
-										) {
-											const featureStyles = {
-												[ featureName ]:
-													styles.variations[
-														styleVariationName
-													][ featureName ],
-											};
-											const featureDeclarations =
-												getStylesDeclarations(
-													featureStyles
-												);
-											delete styles.variations[
-												styleVariationName
-											][ featureName ];
+								const featureDeclarations =
+									getFeatureDeclarations(
+										featureSelectors,
+										styles?.variations?.[
+											styleVariationName
+										]
+									);
 
-											if (
-												!! featureDeclarations.length
-											) {
-												ruleset =
-													ruleset +
-													`${ concatFeatureVariationSelectorString(
-														featureSelector,
-														styleVariationSelector
-													) }{${ featureDeclarations.join(
-														';'
-													) } }`;
-											}
+								Object.entries( featureDeclarations ).forEach(
+									( [ baseSelector, declarations ] ) => {
+										if ( !! declarations.length ) {
+											const cssSelector =
+												concatFeatureVariationSelectorString(
+													baseSelector,
+													styleVariationSelector
+												);
+											const rules =
+												declarations.join( ';' );
+											ruleset =
+												ruleset +
+												`${ cssSelector }{${ rules }}`;
 										}
 									}
 								);
 							}
+
 							// Otherwise add regular selectors.
 							const styleVariationDeclarations =
 								getStylesDeclarations(
@@ -783,17 +853,16 @@ export const toStyles = (
 				delete styles.filter;
 			}
 
-			// Process duotone styles (they use color.__experimentalDuotone selector).
+			// Process duotone styles.
 			if ( duotoneSelector ) {
 				const duotoneDeclarations =
 					getStylesDeclarations( duotoneStyles );
 				if ( duotoneDeclarations.length > 0 ) {
 					ruleset =
 						ruleset +
-						`${ scopeSelector(
-							selector,
-							duotoneSelector
-						) }{${ duotoneDeclarations.join( ';' ) };}`;
+						`${ duotoneSelector }{${ duotoneDeclarations.join(
+							';'
+						) };}`;
 				}
 			}
 
@@ -907,15 +976,50 @@ export function toSvgFilters( tree, blockSelectors ) {
 	} );
 }
 
+const getSelectorsConfig = ( blockType, rootSelector ) => {
+	if ( ! isEmpty( blockType?.selectors ) ) {
+		return blockType.selectors;
+	}
+
+	const config = { root: rootSelector };
+	Object.entries( BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS ).forEach(
+		( [ featureKey, featureName ] ) => {
+			const featureSelector = getBlockCSSSelector(
+				blockType,
+				featureKey
+			);
+
+			if ( featureSelector ) {
+				config[ featureName ] = featureSelector;
+			}
+		}
+	);
+
+	return config;
+};
+
 export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
-		const selector =
-			blockType?.supports?.__experimentalSelector ??
-			'.wp-block-' + name.replace( 'core/', '' ).replace( '/', '-' );
-		const duotoneSelector =
-			blockType?.supports?.color?.__experimentalDuotone ?? null;
+		const selector = getBlockCSSSelector( blockType );
+		let duotoneSelector = getBlockCSSSelector(
+			blockType,
+			'filter.duotone'
+		);
+
+		// Keep backwards compatibility for support.color.__experimentalDuotone.
+		if ( ! duotoneSelector ) {
+			const rootSelector = getBlockCSSSelector( blockType );
+			const duotoneSupport = getBlockSupport(
+				blockType,
+				'color.__experimentalDuotone',
+				false
+			);
+			duotoneSelector =
+				duotoneSupport && scopeSelector( rootSelector, duotoneSupport );
+		}
+
 		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
@@ -930,20 +1034,7 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 			} );
 		}
 		// For each block support feature add any custom selectors.
-		const featureSelectors = {};
-		Object.entries( BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS ).forEach(
-			( [ featureKey, featureName ] ) => {
-				const featureSelector =
-					blockType?.supports?.[ featureKey ]?.__experimentalSelector;
-
-				if ( featureSelector ) {
-					featureSelectors[ featureName ] = scopeSelector(
-						selector,
-						featureSelector
-					);
-				}
-			}
-		);
+		const featureSelectors = getSelectorsConfig( blockType, selector );
 
 		result[ name ] = {
 			duotoneSelector,
@@ -1049,9 +1140,9 @@ export function useGlobalStylesOutput() {
 			hasFallbackGapSupport,
 			disableLayoutStyles
 		);
+		const svgs = toSvgFilters( mergedConfig, blockSelectors );
 
-		const filters = toSvgFilters( mergedConfig, blockSelectors );
-		const stylesheets = [
+		const styles = [
 			{
 				css: customProperties,
 				isGlobalStyles: true,
@@ -1065,6 +1156,11 @@ export function useGlobalStylesOutput() {
 				css: mergedConfig.styles.css ?? '',
 				isGlobalStyles: true,
 			},
+			{
+				assets: svgs,
+				__unstableType: 'svg',
+				isGlobalStyles: true,
+			},
 		];
 
 		// Loop through the blocks to check if there are custom CSS values.
@@ -1073,7 +1169,7 @@ export function useGlobalStylesOutput() {
 		getBlockTypes().forEach( ( blockType ) => {
 			if ( mergedConfig.styles.blocks[ blockType.name ]?.css ) {
 				const selector = blockSelectors[ blockType.name ].selector;
-				stylesheets.push( {
+				styles.push( {
 					css: processCSSNesting(
 						mergedConfig.styles.blocks[ blockType.name ]?.css,
 						selector
@@ -1083,7 +1179,7 @@ export function useGlobalStylesOutput() {
 			}
 		} );
 
-		return [ stylesheets, mergedConfig.settings, filters ];
+		return [ styles, mergedConfig.settings ];
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,

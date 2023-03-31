@@ -10,6 +10,7 @@
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
+		"html": false,
 		"__experimentalExposeControlsToChildren": true,
 		"spacing": {
 			"blockGap": true,

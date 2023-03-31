@@ -803,7 +803,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * bootstrap. After a core block adopts feature level selectors we could
 	 * remove that filter and instead use the core block for the following test.
 	 */
-	public function test_get_stylesheet_with_block_support_feature_level_selectors() {
+	public function test_get_stylesheet_with_deprecated_feature_level_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -850,6 +850,68 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles   = 'body{--wp--preset--color--green: green;}body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 		$block_styles  = '.wp-block-test, .wp-block-test__wrapper{color: green;}.wp-block-test .inner, .wp-block-test__wrapper .inner{border-radius: 9999px;padding: 20px;}.wp-block-test .sub-heading, .wp-block-test__wrapper .sub-heading{font-size: 3em;}';
+		$preset_styles = '.has-green-color{color: var(--wp--preset--color--green) !important;}.has-green-background-color{background-color: var(--wp--preset--color--green) !important;}.has-green-border-color{border-color: var(--wp--preset--color--green) !important;}';
+		$expected      = $base_styles . $block_styles . $preset_styles;
+
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+	}
+
+	/**
+	 * This test relies on a block having already been registered prior to
+	 * theme.json generating block metadata. Until a core block adopts the
+	 * new selectors API, we need to register a test block.
+	 * This is achieved via `tests_add_filter()` in Gutenberg's phpunit
+	 * bootstrap. After a core block adopts feature level selectors we could
+	 * remove that filter and instead use the core block for the following test.
+	 */
+	public function test_get_stylesheet_with_block_json_selectors() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'border'     => array(
+						'radius' => true,
+					),
+					'color'      => array(
+						'custom'  => false,
+						'palette' => array(
+							array(
+								'slug'  => 'green',
+								'color' => 'green',
+							),
+						),
+					),
+					'spacing'    => array(
+						'padding' => true,
+					),
+					'typography' => array(
+						'fontSize' => true,
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'my/block-with-selectors' => array(
+							'border'     => array(
+								'radius' => '9999px',
+							),
+							'color'      => array(
+								'background' => 'grey',
+								'text'       => 'navy',
+							),
+							'spacing'    => array(
+								'padding' => '20px',
+							),
+							'typography' => array(
+								'fontSize' => '3em',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$base_styles   = 'body{--wp--preset--color--green: green;}body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$block_styles  = '.custom-root-selector{background-color: grey;padding: 20px;}.custom-root-selector img{border-radius: 9999px;}.custom-root-selector > figcaption{color: navy;font-size: 3em;}';
 		$preset_styles = '.has-green-color{color: var(--wp--preset--color--green) !important;}.has-green-background-color{background-color: var(--wp--preset--color--green) !important;}.has-green-border-color{border-color: var(--wp--preset--color--green) !important;}';
 		$expected      = $base_styles . $block_styles . $preset_styles;
 
@@ -1865,7 +1927,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
 		$this->assertEquals( $expected, $stylesheet );
 
-		// If background, text, and border-color are defined, include everything, CSS specifity will decide which to apply.
+		// If background, text, and border-color are defined, include everything, CSS specificity will decide which to apply.
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -1889,7 +1951,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
 		$this->assertEquals( $expected, $stylesheet );
 
-		// If background and border color are defined, include everything, CSS specifity will decide which to apply.
+		// If background and border color are defined, include everything, CSS specificity will decide which to apply.
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,

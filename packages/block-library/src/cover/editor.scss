@@ -7,23 +7,22 @@
 	// Override default cover styles
 	// because we're not ready yet to show the cover block.
 	&.is-placeholder {
-		min-height: auto !important;
 		padding: 0 !important;
+		display: flex;
+		align-items: stretch;
+		overflow: visible;
+		min-height: 240px;
 
-		// Resizable placeholder for placeholder.
-		.block-library-cover__resize-container {
-			display: none;
-		}
 		.components-placeholder {
 			&.is-large {
-				min-height: 240px;
 				justify-content: flex-start;
 				z-index: z-index(".wp-block-cover.is-placeholder .components-placeholder.is-large");
-				+ .block-library-cover__resize-container {
-					min-height: 240px;
-					display: block;
-				}
 			}
+		}
+
+		// Allow focus outline/box-shadow to align with block's min height.
+		&:focus::after {
+			min-height: auto;
 		}
 	}
 
@@ -88,9 +87,17 @@
 	min-height: 50px;
 }
 
-.block-library-cover__resize-container:not(.is-resizing) {
-	// Important is used to have higher specificity than the inline style set by re-resizable library.
-	height: auto !important;
+// Prevent resizable box popover form preventing inner block selection.
+.components-popover.block-editor-block-popover.block-library-cover__resizable-box-popover {
+	// Additional specificity is required to overcome default block popover
+	// pointer events only for the intended wrappers. The default pointer events
+	// are still needed for the inner resize handles of the resizable box.
+	.components-popover__content > div,
+	.block-library-cover__resize-container {
+		// The inner drag handle will still have `pointer-events: all` allowing
+		// it to continue to be interacted with.
+		pointer-events: none;
+	}
 }
 
 // When uploading background images, show a transparent overlay.
