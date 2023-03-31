@@ -67,6 +67,7 @@ export default function Editor() {
 		isInserterOpen,
 		isListViewOpen,
 		showIconLabels,
+		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -94,6 +95,9 @@ export default function Editor() {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			showBlockBreadcrumbs: select( editSiteStore ).isFeatureActive(
+				'showBlockBreadcrumbs'
+			),
 		};
 	}, [] );
 	const { setEditedPostContext } = useDispatch( editSiteStore );
@@ -101,8 +105,11 @@ export default function Editor() {
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
-	const showBlockBreakcrumb =
-		isEditMode && showVisualEditor && blockEditorMode !== 'zoom-out';
+	const shouldShowBlockBreakcrumbs =
+		showBlockBreadcrumbs &&
+		isEditMode &&
+		showVisualEditor &&
+		blockEditorMode !== 'zoom-out';
 	const shouldShowInserter = isEditMode && showVisualEditor && isInserterOpen;
 	const shouldShowListView = isEditMode && showVisualEditor && isListViewOpen;
 	const secondarySidebarLabel = isListViewOpen
@@ -205,7 +212,7 @@ export default function Editor() {
 								)
 							}
 							footer={
-								showBlockBreakcrumb && (
+								shouldShowBlockBreakcrumbs && (
 									<BlockBreadcrumb
 										rootLabelText={ __( 'Template' ) }
 									/>
