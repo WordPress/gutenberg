@@ -34,7 +34,7 @@ const baseConfig = {
 						reserved: [ '__', '_n', '_nx', '_x' ],
 					},
 				},
-				extractComments: false,
+				extractComments: true,
 			} ),
 		],
 	},
