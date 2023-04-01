@@ -39,7 +39,7 @@ export function TabbableContainer(
 			return eventToOffset( evt );
 		}
 
-		return 0;
+		return undefined;
 	};
 
 	return (
