@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef, KeyboardEvent, ReactNode } from 'react';
+import type { ForwardedRef, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -39,13 +39,17 @@ type UnforwardedNavigableContainerProps = BaseProps & {
 	/**
 	 * Gets an offset, given an event.
 	 */
-	eventToOffset: ( event: KeyboardEvent< HTMLDivElement > ) => -1 | 1 | 0 | undefined;
+	eventToOffset: ( event: KeyboardEvent ) => -1 | 1 | 0 | undefined;
 	/**
 	 * Whether to only consider browser tab stops.
 	 *
 	 * @default false
 	 */
 	onlyBrowserTabstops: boolean;
+	/**
+	 * Handler for the keydown event.
+	 */
+	onKeyDown: ( event: KeyboardEvent ) => void;
 	/**
 	 * Whether to stop navigation events.
 	 *

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef, KeyboardEvent } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ const noop = () => {};
 const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
 
 function cycleValue( value: number | undefined, total: number, offset: number ) {
-	const nextValue = value + offset;
+	const nextValue = value ?? 0 + offset;
 	if ( nextValue < 0 ) {
 		return total + nextValue;
 	} else if ( nextValue >= total ) {
@@ -28,10 +28,8 @@ function cycleValue( value: number | undefined, total: number, offset: number ) 
 	return nextValue;
 }
 
-
-
 class NavigableContainer extends Component< NavigableContainerProps > {
-	container?: ForwardedRef< HTMLDivElement >;
+	container?: HTMLDivElement;
 
 	constructor( args: NavigableContainerProps ) {
 		super( args );
@@ -53,7 +51,6 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		// portals. Block Toolbars for instance are rendered in a separate
 		// React Trees.
 		this.container.addEventListener( 'keydown', this.onKeyDown );
-		this.container.addEventListener( 'focus', this.onFocus );
 	}
 
 	componentWillUnmount() {
@@ -62,10 +59,9 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		}
 
 		this.container.removeEventListener( 'keydown', this.onKeyDown );
-		this.container.removeEventListener( 'focus', this.onFocus );
 	}
 
-	bindContainer( ref: ForwardedRef< HTMLDivElement > ) {
+	bindContainer( ref: HTMLDivElement ) {
 		const { forwardedRef } = this.props;
 		this.container = ref;
 
@@ -76,7 +72,11 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		}
 	}
 
-	getFocusableContext( target ) {
+	getFocusableContext( target: HTMLElement ) {
+		if ( ! this.container ) {
+			return null;
+		}
+
 		const { onlyBrowserTabstops } = this.props;
 		const finder = onlyBrowserTabstops ? focus.tabbable : focus.focusable;
 		const focusables = finder.find( this.container );
@@ -89,8 +89,8 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 	}
 
 	getFocusableIndex(
-		focusables: HTMLElement[],
-		target: HTMLElement,
+		focusables: Element[],
+		target: Element,
 	) {
 		const directIndex = focusables.indexOf( target );
 		if ( directIndex !== -1 ) {
@@ -98,7 +98,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		}
 	}
 
-	onKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
+	onKeyDown( event: KeyboardEvent ) {
 		if ( this.props.onKeyDown ) {
 			this.props.onKeyDown( event );
 		}
