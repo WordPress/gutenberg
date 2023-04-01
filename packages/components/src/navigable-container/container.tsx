@@ -17,8 +17,8 @@ import type { NavigableContainerProps } from './types';
 const noop = () => {};
 const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
 
-function cycleValue( value: number | undefined, total: number, offset: number ) {
-	const nextValue = value ?? 0 + offset;
+function cycleValue( value: number, total: number, offset: number ) {
+	const nextValue = value + offset;
 	if ( nextValue < 0 ) {
 		return total + nextValue;
 	} else if ( nextValue >= total ) {
@@ -82,7 +82,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		const focusables = finder.find( this.container );
 
 		const index = this.getFocusableIndex( focusables, target );
-		if ( index !== undefined && index > -1 && target ) {
+		if ( index > -1 && target ) {
 			return { index, target, focusables };
 		}
 		return null;
@@ -92,10 +92,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		focusables: Element[],
 		target: Element,
 	) {
-		const directIndex = focusables.indexOf( target );
-		return directIndex !== -1
-			? directIndex
-			: undefined;
+		return focusables.indexOf( target );
 	}
 
 	onKeyDown( event: KeyboardEvent ) {
@@ -179,7 +176,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 
 const forwardedNavigableContainer = (
 	props: NavigableContainerProps,
-	ref: ForwardedRef< any >
+	ref: ForwardedRef< HTMLDivElement >
 ) => {
 	return <NavigableContainer { ...props } forwardedRef={ ref } />;
 };
