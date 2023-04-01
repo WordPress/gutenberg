@@ -24,6 +24,13 @@ Gets an offset, given an event.
 
 -   Required: No
 
+### `forwardedRef`: `ForwardedRef< any >`
+
+(TabbableContainer only)
+The forwarded ref.
+
+-   Required: No
+
 ### `onKeydown`: `( event: KeyboardEvent ) => void`
 
 A callback invoked on the keydown event.

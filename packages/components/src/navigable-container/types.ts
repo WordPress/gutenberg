@@ -56,6 +56,19 @@ export type NavigableContainerProps = WordPressComponentProps<
 	false
 >;
 
+export type NavigableMenuProps = WordPressComponentProps<
+	BaseProps & {
+		/**
+		 * The orientation of the menu.
+		 *
+		 * @default 'vertical'
+		 */
+		orientation?: 'vertical' | 'horizontal' | 'both';
+	},
+	'div',
+	false
+>;
+
 export type TabbableContainerProps = WordPressComponentProps<
 	BaseProps & {
 		/**
@@ -66,19 +79,6 @@ export type TabbableContainerProps = WordPressComponentProps<
 		 * The forwarded ref.
 		 */
 		forwardedRef?: ForwardedRef< any >;
-	},
-	'div',
-	false
->;
-
-export type NavigableMenuProps = WordPressComponentProps<
-	BaseProps & {
-		/**
-		 * The orientation of the menu.
-		 *
-		 * @default 'vertical'
-		 */
-		orientation?: 'vertical' | 'horizontal' | 'both';
 	},
 	'div',
 	false
