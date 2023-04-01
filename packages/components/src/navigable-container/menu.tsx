@@ -11,10 +11,10 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import NavigableContainer from './container';
+import UnforwardedNavigableContainer from './container';
 import type { NavigableMenuProps } from './types';
 
-export function NavigableMenu(
+export function UnforwardedNavigableMenu(
 	{ role = 'menu', orientation = 'vertical', ...rest }: NavigableMenuProps,
 	ref: ForwardedRef< any >
 ) {
@@ -53,7 +53,7 @@ export function NavigableMenu(
 	};
 
 	return (
-		<NavigableContainer
+		<UnforwardedNavigableContainer
 			ref={ ref }
 			stopNavigationEvents
 			onlyBrowserTabstops={ false }
@@ -69,4 +69,31 @@ export function NavigableMenu(
 	);
 }
 
-export default forwardRef( NavigableMenu );
+/**
+ * A container for a navigable menu.
+ *
+ *  ```jsx
+ *  import {
+ *    NavigableMenu,
+ *    Button,
+ *  } from '@wordpress/components';
+ *
+ *  function onNavigate( index, target ) {
+ *    console.log( `Navigates to ${ index }`, target );
+ *  }
+ *
+ *  const MyNavigableContainer = () => (
+ *    <div>
+ *      <span>Navigable Menu:</span>
+ *      <NavigableMenu onNavigate={ onNavigate } orientation="horizontal">
+ *        <Button variant="secondary">Item 1</Button>
+ *        <Button variant="secondary">Item 2</Button>
+ *        <Button variant="secondary">Item 3</Button>
+ *      </NavigableMenu>
+ *    </div>
+ *  );
+ *  ```
+ */
+export const NavigableMenu = forwardRef( UnforwardedNavigableMenu );
+
+export default NavigableMenu;

@@ -2,7 +2,7 @@
 
 `NavigableContainer` is a React component to render a container navigable using the keyboard. Only things that are focusable can be navigated to. It will currently always be a `div`.
 
-`NavigableContainer` is exported as two classes: `NavigableMenu` and `TabbableContainer`. `NavigableContainer` itself is **not** exported. `NavigableMenu` and `TabbableContainer` have the props listed below. Any other props will be passed through to the `div`.
+`NavigableContainer` is exported as two components: `NavigableMenu` and `TabbableContainer`. `NavigableContainer` itself is **not** exported. `NavigableMenu` and `TabbableContainer` have the props listed below. Any other props will be passed through to the `div`.
 
 ---
 
@@ -17,15 +17,15 @@ A boolean which tells the component whether or not to cycle from the end back to
 -   Required: No
 -   default: `true`
 
-### `onNavigate`: `( index: number, focusable: HTMLElement ) => void`
-
-A callback invoked when the menu navigates to one of its children passing the index and child as an argument
-
--   Required: No
-
 ### `onKeydown`: `( event: KeyboardEvent ) => void`
 
 A callback invoked on the keydown event.
+
+-   Required: No
+
+### `onNavigate`: `( index: number, focusable: HTMLElement ) => void`
+
+A callback invoked when the menu navigates to one of its children passing the index and child as an argument
 
 -   Required: No
 
