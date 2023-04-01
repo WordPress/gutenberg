@@ -11,8 +11,8 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import NavigableContainer from './container';
+import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { MenuProps } from './types';
 
 export function NavigableMenu(

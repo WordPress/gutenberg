@@ -43,7 +43,7 @@ type UnforwardedNavigableContainerProps = BaseProps & {
 	/**
 	 * Gets an offset, given an event.
 	 */
-	eventToOffset: ( event: KeyboardEvent ) => -1 | 1 | 0 | undefined;
+	eventToOffset: ( event: KeyboardEvent ) => -1 | 0 | 1;
 	/**
 	 * Whether to only consider browser tab stops.
 	 *

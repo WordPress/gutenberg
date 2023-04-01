@@ -147,7 +147,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		const { index, focusables } = context;
 		const nextIndex = cycle
 			? cycleValue( index, focusables.length, offset )
-			: index ?? 0 + offset;
+			: index + offset;
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 			( focusables[ nextIndex ] as HTMLElement ).focus();
 			onNavigate( nextIndex, focusables[ nextIndex ] );
