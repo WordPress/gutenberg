@@ -17,6 +17,13 @@ A boolean which tells the component whether or not to cycle from the end back to
 -   Required: No
 -   default: `true`
 
+### `eventToOffset`: `( event: KeyboardEvent ) => -1 | 0 | 1 | undefined`
+
+(TabbableContainer only)
+Gets an offset, given an event.
+
+-   Required: No
+
 ### `onKeydown`: `( event: KeyboardEvent ) => void`
 
 A callback invoked on the keydown event.
