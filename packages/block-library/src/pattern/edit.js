@@ -6,6 +6,7 @@ import { useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	useBlockProps,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 const PatternEdit = ( { attributes, clientId } ) => {
@@ -17,6 +18,11 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		[ attributes.slug ]
 	);
 
+	const props = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( props );
+
+	const isSection = attributes.type === 'section';
+
 	const { replaceBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -25,7 +31,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	// This change won't be saved.
 	// It will continue to pull from the pattern file unless changes are made to its respective template part.
 	useEffect( () => {
-		if ( selectedPattern?.blocks ) {
+		if ( ! isSection && selectedPattern?.blocks ) {
 			// We batch updates to block list settings to avoid triggering cascading renders
 			// for each container block included in a tree and optimize initial render.
 			// Since the above uses microtasks, we need to use a microtask here as well,
@@ -36,11 +42,9 @@ const PatternEdit = ( { attributes, clientId } ) => {
 				replaceBlocks( clientId, selectedPattern.blocks );
 			} );
 		}
-	}, [ clientId, selectedPattern?.blocks ] );
+	}, [ clientId, selectedPattern?.blocks, isSection ] );
 
-	const props = useBlockProps();
-
-	return <div { ...props } />;
+	return <div { ...( isSection ? innerBlocksProps : props ) } />;
 };
 
 export default PatternEdit;
