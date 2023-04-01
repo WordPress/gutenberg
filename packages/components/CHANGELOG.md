@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `NavigableContainer`: Convert to TypeScript ([#49377](https://github.com/WordPress/gutenberg/pull/49377)).
+
 ## 23.9.0 (2023-04-26)
 
 ### Internal
