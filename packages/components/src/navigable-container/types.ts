@@ -59,4 +59,4 @@ type UnforwardedNavigableContainerProps = BaseProps & {
 };
 
 export type NavigableContainerProps = WordPressComponentProps< UnforwardedNavigableContainerProps & { forwardedRef?: ForwardedRef< any > }, 'div', false >;
-export type TabbableContainerProps = Omit< NavigableContainerProps, 'onlyBrowserTabstops' | 'stopNavigationEvents' >;
+export type TabbableContainerProps = WordPressComponentProps< Omit< NavigableContainerProps, 'onlyBrowserTabstops' | 'stopNavigationEvents' >, 'div', false >;

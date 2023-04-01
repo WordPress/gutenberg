@@ -12,11 +12,10 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import NavigableContainer from './container';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { TabbableContainerProps } from './types';
 
 export function TabbableContainer(
-	{ eventToOffset, ...props }:  WordPressComponentProps< TabbableContainerProps, 'div', false >,
+	{ eventToOffset, ...props }: TabbableContainerProps,
 	ref: ForwardedRef< any >
 ) {
 	const innerEventToOffset = ( evt: KeyboardEvent ) => {
