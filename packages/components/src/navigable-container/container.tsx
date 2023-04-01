@@ -137,7 +137,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 
 		const context = getFocusableContext(
 			// @ts-expect-error TODO: Don't know how to resolve
-			event.currentTarget?.ownerDocument.activeElement
+			event.currentTarget.ownerDocument.activeElement
 		);
 		if ( ! context ) {
 			return;
