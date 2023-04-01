@@ -18,11 +18,11 @@ type BaseProps = {
 	 *
 	 * @default true
 	 */
-	cycle: boolean;
+	cycle?: boolean;
 	/**
 	 * A callback invoked when the menu navigates to one of its children passing the index and child as an argument
 	 */
-	onNavigate: ( index: number, focusable: Element ) => void;
+	onNavigate?: ( index: number, focusable: Element ) => void;
 }
 
 export type MenuProps = BaseProps & {
@@ -32,7 +32,7 @@ export type MenuProps = BaseProps & {
 	 *
 	 * @default 'vertical'
 	 */
-	orientation: 'vertical' | 'horizontal';
+	orientation?: 'vertical' | 'horizontal';
 };
 
 type UnforwardedNavigableContainerProps = BaseProps & {
