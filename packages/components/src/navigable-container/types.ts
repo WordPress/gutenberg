@@ -20,13 +20,13 @@ type BaseProps = {
 	 */
 	cycle?: boolean;
 	/**
-	 * A callback invoked when the menu navigates to one of its children passing the index and child as an argument
-	 */
-	onNavigate?: ( index: number, focusable: HTMLElement ) => void;
-	/**
 	 * A callback invoked on the keydown event.
 	 */
 	onKeyDown?: ( event: KeyboardEvent ) => void;
+	/**
+	 * A callback invoked when the menu navigates to one of its children passing the index and child as an argument
+	 */
+	onNavigate?: ( index: number, focusable: HTMLElement ) => void;
 };
 
 export type NavigableContainerProps = WordPressComponentProps<
@@ -57,10 +57,16 @@ export type NavigableContainerProps = WordPressComponentProps<
 >;
 
 export type TabbableContainerProps = WordPressComponentProps<
-	Omit<
-		NavigableContainerProps,
-		'onlyBrowserTabstops' | 'stopNavigationEvents'
-	>,
+	BaseProps & {
+		/**
+		 * Gets an offset, given an event.
+		 */
+		eventToOffset: ( event: KeyboardEvent ) => -1 | 0 | 1 | undefined;
+		/**
+		 * The forwarded ref.
+		 */
+		forwardedRef?: ForwardedRef< any >;
+	},
 	'div',
 	false
 >;
