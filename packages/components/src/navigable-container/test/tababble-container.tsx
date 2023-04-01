@@ -8,8 +8,9 @@ import userEvent from '@testing-library/user-event';
  * Internal dependencies
  */
 import { TabbableContainer } from '../tabbable';
+import type { TabbableContainerProps } from '../types';
 
-const TabbableContainerTestCase = ( props ) => (
+const TabbableContainerTestCase = ( props: TabbableContainerProps ) => (
 	<TabbableContainer { ...props }>
 		<button>Item 1</button>
 		<span>
@@ -32,11 +33,14 @@ const getTabbableContainerTabbables = () => [
 
 const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
 
+const stubEventToOffset = ( _event: KeyboardEvent ) => undefined;
+
 describe( 'TabbableContainer', () => {
 	beforeAll( () => {
 		// Mocking `getClientRects()` is necessary to pass a check performed by
 		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
 		// from the `@wordpress/dom` package.
+		// @ts-expect-error TODO: Don't know how to resolve
 		window.HTMLElement.prototype.getClientRects = function () {
 			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
 		};
@@ -51,7 +55,12 @@ describe( 'TabbableContainer', () => {
 
 		const onNavigateSpy = jest.fn();
 
-		render( <TabbableContainerTestCase onNavigate={ onNavigateSpy } /> );
+		render(
+			<TabbableContainerTestCase
+				onNavigate={ onNavigateSpy }
+				eventToOffset={ stubEventToOffset }
+			/>
+		);
 
 		const tabbables = getTabbableContainerTabbables();
 
@@ -81,7 +90,10 @@ describe( 'TabbableContainer', () => {
 		const onNavigateSpy = jest.fn();
 
 		const { rerender } = render(
-			<TabbableContainerTestCase onNavigate={ onNavigateSpy } />
+			<TabbableContainerTestCase
+				onNavigate={ onNavigateSpy }
+				eventToOffset={ stubEventToOffset }
+			/>
 		);
 
 		const tabbables = getTabbableContainerTabbables();
@@ -111,6 +123,7 @@ describe( 'TabbableContainer', () => {
 			<TabbableContainerTestCase
 				onNavigate={ onNavigateSpy }
 				cycle={ false }
+				eventToOffset={ stubEventToOffset }
 			/>
 		);
 
@@ -143,7 +156,9 @@ describe( 'TabbableContainer', () => {
 			// Disable reason: this is only for test purposes.
 			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 			<div onKeyDown={ externalWrapperOnKeyDownSpy }>
-				<TabbableContainerTestCase />
+				<TabbableContainerTestCase
+					eventToOffset={ stubEventToOffset }
+				/>
 			</div>
 		);
 

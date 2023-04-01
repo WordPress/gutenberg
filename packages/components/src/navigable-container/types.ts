@@ -12,7 +12,7 @@ type BaseProps = {
 	/**
 	 * The component children.
 	 */
-	children: ReactNode;
+	children?: ReactNode;
 	/**
 	 * A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa.
 	 *
@@ -29,15 +29,19 @@ type BaseProps = {
 	onKeyDown?: ( event: KeyboardEvent ) => void;
 };
 
-export type MenuProps = BaseProps & {
-	/**
-	 * The orientation of the menu. It could be 'vertical' or 'horizontal'.
-	 * (NavigableMenu only)
-	 *
-	 * @default 'vertical'
-	 */
-	orientation?: 'vertical' | 'horizontal';
-};
+export type NavigableMenuProps = WordPressComponentProps<
+	BaseProps & {
+		/**
+		 * The orientation of the menu. It could be 'vertical' or 'horizontal'.
+		 * (NavigableMenu only)
+		 *
+		 * @default 'vertical'
+		 */
+		orientation?: 'vertical' | 'horizontal';
+	},
+	'div',
+	false
+>;
 
 type UnforwardedNavigableContainerProps = BaseProps & {
 	/**

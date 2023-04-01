@@ -8,8 +8,9 @@ import userEvent from '@testing-library/user-event';
  * Internal dependencies
  */
 import { NavigableMenu } from '../menu';
+import type { NavigableMenuProps } from '../types';
 
-const NavigableMenuTestCase = ( props ) => (
+const NavigableMenuTestCase = ( props: NavigableMenuProps ) => (
 	<NavigableMenu { ...props }>
 		<button>Item 1</button>
 		<span>
@@ -34,6 +35,7 @@ describe( 'NavigableMenu', () => {
 		// Mocking `getClientRects()` is necessary to pass a check performed by
 		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
 		// from the `@wordpress/dom` package.
+		// @ts-expect-error TODO: Don't know how to resolve
 		window.HTMLElement.prototype.getClientRects = function () {
 			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
 		};

@@ -12,11 +12,10 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import NavigableContainer from './container';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
-import type { MenuProps } from './types';
+import type { NavigableMenuProps } from './types';
 
 export function NavigableMenu(
-	{ role = 'menu', orientation = 'vertical', ...rest }: WordPressComponentProps< MenuProps, 'div', false >,
+	{ role = 'menu', orientation = 'vertical', ...rest }: NavigableMenuProps,
 	ref: ForwardedRef< any >
 ) {
 	const eventToOffset = ( evt: KeyboardEvent ) => {
@@ -54,7 +53,9 @@ export function NavigableMenu(
 			stopNavigationEvents
 			onlyBrowserTabstops={ false }
 			role={ role }
-			aria-orientation={ role === 'presentation' ? undefined : orientation }
+			aria-orientation={
+				role === 'presentation' ? undefined : orientation
+			}
 			eventToOffset={ eventToOffset }
 			{ ...rest }
 		/>
