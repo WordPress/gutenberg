@@ -72,7 +72,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		}
 	}
 
-	getFocusableContext( target: HTMLElement ) {
+	getFocusableContext( target: Element ) {
 		if ( ! this.container ) {
 			return null;
 		}
@@ -135,10 +135,12 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 			return;
 		}
 
-		const context = getFocusableContext(
-			// @ts-expect-error TODO: Don't know how to resolve
-			event.currentTarget.ownerDocument.activeElement
-		);
+		const { activeElement } = ( event.target as HTMLElement ).ownerDocument;
+		if ( ! activeElement ) {
+			return;
+		}
+
+		const context = getFocusableContext( activeElement );
 		if ( ! context ) {
 			return;
 		}
