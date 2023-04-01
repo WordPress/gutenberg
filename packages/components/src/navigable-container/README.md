@@ -41,7 +41,7 @@ The orientation of the menu. It could be "vertical", "horizontal", or "both".
 
 ### NavigableMenu
 
-A NavigableMenu allows movement up and down (or left and right) the component via the arrow keys. The `tab` key is not handled. The `orientation` prop is used to determine whether the arrow keys used are vertical or horizontal.
+A NavigableMenu allows movement up and down (or left and right) the component via the arrow keys. The `tab` key is not handled. The `orientation` prop is used to determine whether the arrow keys used are vertical, horizontal, or both.
 
 The `NavigableMenu` by default has a `menu` role and therefore, in order to function as expected, the component expects its children elements to have one of the following roles: `'menuitem' | 'menuitemradio' | 'menuitemcheckbox'`.
 
