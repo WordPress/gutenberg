@@ -29,6 +29,11 @@ export function NavigableMenu(
 			previous = [ 'ArrowLeft' ];
 		}
 
+		if ( orientation === 'both' ) {
+			next = [ 'ArrowRight', 'ArrowDown' ];
+			previous = [ 'ArrowLeft', 'ArrowUp' ];
+		}
+
 		if ( next.includes( code ) ) {
 			return 1;
 		} else if ( previous.includes( code ) ) {
@@ -54,7 +59,9 @@ export function NavigableMenu(
 			onlyBrowserTabstops={ false }
 			role={ role }
 			aria-orientation={
-				role === 'presentation' ? undefined : orientation
+				role === 'presentation'
+					? undefined
+					: ( orientation as 'vertical' | 'horizontal' )
 			}
 			eventToOffset={ eventToOffset }
 			{ ...rest }

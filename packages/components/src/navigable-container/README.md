@@ -29,10 +29,10 @@ A callback invoked on the keydown event.
 
 -   Required: No
 
-### `orientation`: `'vertical' | 'horizontal'`
+### `orientation`: `'vertical' | 'horizontal' | 'both'`
 
 (NavigableMenu only)
-The orientation of the menu. It could be "vertical" or "horizontal".
+The orientation of the menu. It could be "vertical", "horizontal", or "both".
 
 -   Required: No
 -   Default: `"vertical"`

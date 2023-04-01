@@ -68,11 +68,11 @@ export type TabbableContainerProps = WordPressComponentProps<
 export type NavigableMenuProps = WordPressComponentProps<
 	BaseProps & {
 		/**
-		 * The orientation of the menu. It could be 'vertical' or 'horizontal'.
+		 * The orientation of the menu.
 		 *
 		 * @default 'vertical'
 		 */
-		orientation?: 'vertical' | 'horizontal';
+		orientation?: 'vertical' | 'horizontal' | 'both';
 	},
 	'div',
 	false
