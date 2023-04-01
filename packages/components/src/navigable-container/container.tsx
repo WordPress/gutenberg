@@ -122,9 +122,9 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 			// from scrolling. The preventDefault also prevents Voiceover from
 			// 'handling' the event, as voiceover will try to use arrow keys
 			// for highlighting text.
-			const targetRole = event.target.getAttribute( 'role' );
+			const targetRole = ( event.target as HTMLDivElement ).getAttribute( 'role' );
 			const targetHasMenuItemRole =
-				MENU_ITEM_ROLES.includes( targetRole );
+				targetRole && MENU_ITEM_ROLES.includes( targetRole );
 
 			// `preventDefault()` on tab to avoid having the browser move the focus
 			// after this component has already moved it.
@@ -140,7 +140,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		}
 
 		const context = getFocusableContext(
-			event.target.ownerDocument.activeElement
+			event.currentTarget?.ownerDocument.activeElement
 		);
 		if ( ! context ) {
 			return;
@@ -151,7 +151,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 			? cycleValue( index, focusables.length, offset )
 			: index ?? 0 + offset;
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
-			focusables[ nextIndex ].focus();
+			( focusables[ nextIndex ] as HTMLElement ).focus();
 			onNavigate( nextIndex, focusables[ nextIndex ] );
 		}
 	}
