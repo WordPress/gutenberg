@@ -22,12 +22,12 @@ type BaseProps = {
 	/**
 	 * A callback invoked when the menu navigates to one of its children passing the index and child as an argument
 	 */
-	onNavigate?: ( index: number, focusable: Element ) => void;
+	onNavigate?: ( index: number, focusable: HTMLElement ) => void;
 	/**
 	 * Handler for the keydown event.
 	 */
 	onKeyDown?: ( event: KeyboardEvent ) => void;
-}
+};
 
 export type MenuProps = BaseProps & {
 	/**
@@ -58,5 +58,16 @@ type UnforwardedNavigableContainerProps = BaseProps & {
 	stopNavigationEvents: boolean;
 };
 
-export type NavigableContainerProps = WordPressComponentProps< UnforwardedNavigableContainerProps & { forwardedRef?: ForwardedRef< any > }, 'div', false >;
-export type TabbableContainerProps = WordPressComponentProps< Omit< NavigableContainerProps, 'onlyBrowserTabstops' | 'stopNavigationEvents' >, 'div', false >;
+export type NavigableContainerProps = WordPressComponentProps<
+	UnforwardedNavigableContainerProps & { forwardedRef?: ForwardedRef< any > },
+	'div',
+	false
+>;
+export type TabbableContainerProps = WordPressComponentProps<
+	Omit<
+		NavigableContainerProps,
+		'onlyBrowserTabstops' | 'stopNavigationEvents'
+	>,
+	'div',
+	false
+>;

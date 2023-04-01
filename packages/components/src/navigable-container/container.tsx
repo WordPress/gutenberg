@@ -79,7 +79,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 
 		const { onlyBrowserTabstops } = this.props;
 		const finder = onlyBrowserTabstops ? focus.tabbable : focus.focusable;
-		const focusables = finder.find( this.container );
+		const focusables = finder.find( this.container ) as HTMLElement[];
 
 		const index = this.getFocusableIndex( focusables, target );
 		if ( index > -1 && target ) {
@@ -88,10 +88,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		return null;
 	}
 
-	getFocusableIndex(
-		focusables: Element[],
-		target: Element,
-	) {
+	getFocusableIndex( focusables: Element[], target: Element ) {
 		return focusables.indexOf( target );
 	}
 
@@ -119,7 +116,9 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 			// from scrolling. The preventDefault also prevents Voiceover from
 			// 'handling' the event, as voiceover will try to use arrow keys
 			// for highlighting text.
-			const targetRole = ( event.target as HTMLDivElement ).getAttribute( 'role' );
+			const targetRole = ( event.target as HTMLDivElement ).getAttribute(
+				'role'
+			);
 			const targetHasMenuItemRole =
 				targetRole && MENU_ITEM_ROLES.includes( targetRole );
 
@@ -149,7 +148,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 			? cycleValue( index, focusables.length, offset )
 			: index + offset;
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
-			( focusables[ nextIndex ] as HTMLElement ).focus();
+			focusables[ nextIndex ].focus();
 			onNavigate( nextIndex, focusables[ nextIndex ] );
 		}
 	}
