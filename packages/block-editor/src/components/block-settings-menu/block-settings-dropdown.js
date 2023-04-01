@@ -167,6 +167,9 @@ export function BlockSettingsDropdown( {
 		]
 	);
 
+	const removeBlockLabel =
+		count === 1 ? __( 'Delete' ) : __( 'Delete blocks' );
+
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.
 	const selectParentButtonRef = useRef();
@@ -334,7 +337,7 @@ export function BlockSettingsDropdown( {
 										) }
 										shortcut={ shortcuts.remove }
 									>
-										{ __( 'Delete' ) }
+										{ removeBlockLabel }
 									</MenuItem>
 								</MenuGroup>
 							) }
