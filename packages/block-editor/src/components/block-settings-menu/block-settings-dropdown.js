@@ -29,7 +29,6 @@ import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useShowMoversGestures } from '../block-toolbar/utils';
 
 const noop = () => {};
@@ -138,11 +137,6 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
-	const blockTitle = useBlockDisplayTitle( {
-		clientId: firstBlockClientId,
-		maximumLength: 25,
-	} );
-
 	const updateSelectionAfterRemove = useCallback(
 		__experimentalSelectBlock
 			? () => {
@@ -172,13 +166,6 @@ export function BlockSettingsDropdown( {
 			selectedBlockClientIds,
 		]
 	);
-
-	const label = sprintf(
-		/* translators: %s: block name */
-		__( 'Remove %s' ),
-		blockTitle
-	);
-	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
 
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.
@@ -347,7 +334,7 @@ export function BlockSettingsDropdown( {
 										) }
 										shortcut={ shortcuts.remove }
 									>
-										{ removeBlockLabel }
+										{ __( 'Delete' ) }
 									</MenuItem>
 								</MenuGroup>
 							) }
