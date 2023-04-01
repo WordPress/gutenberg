@@ -24,54 +24,56 @@ type BaseProps = {
 	 */
 	onNavigate?: ( index: number, focusable: HTMLElement ) => void;
 	/**
-	 * Handler for the keydown event.
+	 * A callback invoked on the keydown event.
 	 */
 	onKeyDown?: ( event: KeyboardEvent ) => void;
 };
 
-export type NavigableMenuProps = WordPressComponentProps<
+export type NavigableContainerProps = WordPressComponentProps<
 	BaseProps & {
 		/**
-		 * The orientation of the menu. It could be 'vertical' or 'horizontal'.
-		 * (NavigableMenu only)
-		 *
-		 * @default 'vertical'
+		 * Gets an offset, given an event.
 		 */
-		orientation?: 'vertical' | 'horizontal';
+		eventToOffset: ( event: KeyboardEvent ) => -1 | 0 | 1 | undefined;
+		/**
+		 * The forwarded ref.
+		 */
+		forwardedRef?: ForwardedRef< any >;
+		/**
+		 * Whether to only consider browser tab stops.
+		 *
+		 * @default false
+		 */
+		onlyBrowserTabstops: boolean;
+		/**
+		 * Whether to stop navigation events.
+		 *
+		 * @default false
+		 */
+		stopNavigationEvents: boolean;
 	},
 	'div',
 	false
 >;
 
-type UnforwardedNavigableContainerProps = BaseProps & {
-	/**
-	 * Gets an offset, given an event.
-	 */
-	eventToOffset: ( event: KeyboardEvent ) => -1 | 0 | 1 | undefined;
-	/**
-	 * Whether to only consider browser tab stops.
-	 *
-	 * @default false
-	 */
-	onlyBrowserTabstops: boolean;
-	/**
-	 * Whether to stop navigation events.
-	 *
-	 * @default false
-	 */
-	stopNavigationEvents: boolean;
-};
-
-export type NavigableContainerProps = WordPressComponentProps<
-	UnforwardedNavigableContainerProps & { forwardedRef?: ForwardedRef< any > },
-	'div',
-	false
->;
 export type TabbableContainerProps = WordPressComponentProps<
 	Omit<
 		NavigableContainerProps,
 		'onlyBrowserTabstops' | 'stopNavigationEvents'
 	>,
+	'div',
+	false
+>;
+
+export type NavigableMenuProps = WordPressComponentProps<
+	BaseProps & {
+		/**
+		 * The orientation of the menu. It could be 'vertical' or 'horizontal'.
+		 *
+		 * @default 'vertical'
+		 */
+		orientation?: 'vertical' | 'horizontal';
+	},
 	'div',
 	false
 >;
