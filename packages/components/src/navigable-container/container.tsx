@@ -93,9 +93,9 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		target: Element,
 	) {
 		const directIndex = focusables.indexOf( target );
-		if ( directIndex !== -1 ) {
-			return directIndex;
-		}
+		return directIndex !== -1
+			? directIndex
+			: undefined;
 	}
 
 	onKeyDown( event: KeyboardEvent ) {
@@ -140,6 +140,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 		}
 
 		const context = getFocusableContext(
+			// @ts-expect-error TODO: Don't know how to resolve
 			event.currentTarget?.ownerDocument.activeElement
 		);
 		if ( ! context ) {
@@ -178,7 +179,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 
 const forwardedNavigableContainer = (
 	props: NavigableContainerProps,
-	ref: ForwardedRef< HTMLDivElement >
+	ref: ForwardedRef< any >
 ) => {
 	return <NavigableContainer { ...props } forwardedRef={ ref } />;
 };

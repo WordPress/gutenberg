@@ -23,6 +23,10 @@ type BaseProps = {
 	 * A callback invoked when the menu navigates to one of its children passing the index and child as an argument
 	 */
 	onNavigate?: ( index: number, focusable: Element ) => void;
+	/**
+	 * Handler for the keydown event.
+	 */
+	onKeyDown?: ( event: KeyboardEvent ) => void;
 }
 
 export type MenuProps = BaseProps & {
@@ -46,10 +50,6 @@ type UnforwardedNavigableContainerProps = BaseProps & {
 	 * @default false
 	 */
 	onlyBrowserTabstops: boolean;
-	/**
-	 * Handler for the keydown event.
-	 */
-	onKeyDown: ( event: KeyboardEvent ) => void;
 	/**
 	 * Whether to stop navigation events.
 	 *
