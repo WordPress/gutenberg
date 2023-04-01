@@ -70,7 +70,7 @@ function ColumnsEditContainer( {
 			} = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			// Get the index of the last column for which removal is prevented.
+			// Get the indexes of columns for which removal is prevented.
 			const preventRemovalBlockIndexes = innerBlocks.reduce(
 				( acc, block, index ) => {
 					if ( ! canRemoveBlock( block.clientId ) ) {
