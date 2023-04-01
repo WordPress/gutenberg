@@ -12,7 +12,7 @@ test.describe( 'Columns', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
-	test.skip( 'restricts all blocks inside the columns block', async ( {
+	test( 'restricts all blocks inside the columns block', async ( {
 		page,
 		editor,
 	} ) => {
