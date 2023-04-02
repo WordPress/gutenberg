@@ -75,10 +75,6 @@ export type TabbableContainerProps = WordPressComponentProps<
 		 * Gets an offset, given an event.
 		 */
 		eventToOffset?: ( event: KeyboardEvent ) => -1 | 0 | 1 | undefined;
-		/**
-		 * The forwarded ref.
-		 */
-		forwardedRef?: ForwardedRef< any >;
 	},
 	'div',
 	false

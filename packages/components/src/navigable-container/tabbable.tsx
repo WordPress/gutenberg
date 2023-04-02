@@ -11,7 +11,7 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import UnforwardedNavigableContainer from './container';
+import NavigableContainer from './container';
 import type { TabbableContainerProps } from './types';
 
 export function UnforwardedTabbableContainer(
@@ -43,7 +43,7 @@ export function UnforwardedTabbableContainer(
 	};
 
 	return (
-		<UnforwardedNavigableContainer
+		<NavigableContainer
 			ref={ ref }
 			stopNavigationEvents
 			onlyBrowserTabstops
