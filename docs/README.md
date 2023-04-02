@@ -20,7 +20,7 @@ The Editor offers rich new value to users by offering visual, drag-and-drop crea
 
 ### Create pages and posts with the block editor
 
-In the Block Editor Handbook, our tutorials will be development-focussed. However, it helps if you have some experience using the block editor the way an end-user would first. If you have no experience building with the block editor yet, we recommend you [learn to use the block editor](https://wordpress.org/support/article/wordpress-editor/) to create posts and pages.
+In the Block Editor Handbook, our tutorials will be development-focussed. However, it helps if you have some experience using the block editor the way an end-user would first. If you have no experience building with the block editor yet, we recommend you [learn to use the block editor](https://wordpress.org/documentation/article/wordpress-block-editor/) to create posts and pages.
 
 ### Create a Block Tutorial
 
