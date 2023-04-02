@@ -119,7 +119,7 @@ export default function WelcomeGuideStyles() {
 								) }
 								<ExternalLink
 									href={ __(
-										'https://wordpress.org/documentation/article/block-based-widgets-editor/'
+										'https://wordpress.org/documentation/article/styles-overview/'
 									) }
 								>
 									{ __(
