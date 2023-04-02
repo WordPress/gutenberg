@@ -3,11 +3,18 @@
 	padding: 0;
 	width: 100%;
 	max-width: 680px;
+	position: relative;
+	top: 15%;
 
 	.components-modal__content {
 		margin: 0;
 		padding: 0;
 	}
+}
+
+.commands-command-menu__overlay {
+	display: block;
+	align-items: start;
 }
 
 .commands-command-menu__header {

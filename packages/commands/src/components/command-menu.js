@@ -146,6 +146,7 @@ export function CommandMenu() {
 	return (
 		<Modal
 			className="commands-command-menu"
+			overlayClassName="commands-command-menu__overlay"
 			onRequestClose={ close }
 			__experimentalHideHeader
 		>
