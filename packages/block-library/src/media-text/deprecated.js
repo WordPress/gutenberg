@@ -105,12 +105,16 @@ const baseAttributes = {
 	},
 	isStackedOnMobile: {
 		type: 'boolean',
-		default: true,
+		default: false,
 	},
 };
 
 const v4ToV5BlockAttributes = {
 	...baseAttributes,
+	isStackedOnMobile: {
+		type: 'boolean',
+		default: true,
+	},
 	mediaUrl: {
 		type: 'string',
 		source: 'attribute',
@@ -580,6 +584,10 @@ const v4 = {
 const v3 = {
 	attributes: {
 		...baseAttributes,
+		isStackedOnMobile: {
+			type: 'boolean',
+			default: true,
+		},
 		backgroundColor: {
 			type: 'string',
 		},
