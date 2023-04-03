@@ -8,6 +8,7 @@ gutenberg.zip
 coverage
 *-performance-results.json
 .phpunit.result.cache
+.reassure
 
 # Directories/files that may appear in your environment
 *.log

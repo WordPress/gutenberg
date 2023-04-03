@@ -97,3 +97,11 @@ jobs:
                   name: failures-artifacts
                   path: ${{ env.WP_ARTIFACTS_PATH }}
                   if-no-files-found: ignore
+
+            - name: Run mobile performance tests
+              run: ./gutenberg/bin/reassure-tests.sh
+
+            - name: Report mobile performance results
+              run: yarn danger ci
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
