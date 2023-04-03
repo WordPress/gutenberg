@@ -26,7 +26,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 			const query = supportsSearch
 				? {
 						search,
-						per_page: 20,
+						per_page: 10,
 						orderby: 'date',
 				  }
 				: {
@@ -43,7 +43,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 		}, deps );
 
 		const commands = useMemo( () => {
-			return ( records ?? [] ).map( ( record ) => {
+			return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
 				return {
 					name: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered,
@@ -58,7 +58,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					},
 				};
 			} );
-		}, [ records, history ] );
+		}, [ records, history, canvasMode ] );
 
 		return {
 			commands,
