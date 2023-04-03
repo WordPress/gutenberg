@@ -201,18 +201,23 @@ function ResizableAlignmentControls( {
 				} }
 				resizeRatio={ currentAlignment === 'center' ? 2 : 1 }
 			>
-				<motion.div
-					layout
-					style={ heightStyle }
-					transition={ { duration: 0.2 } }
-				/>
-				<motion.div
-					layout
-					style={ contentStyle }
-					transition={ { duration: 0.2 } }
-				>
-					{ children }
-				</motion.div>
+				{ isAlignmentVisualizerVisible && (
+					<>
+						<motion.div
+							layout
+							style={ heightStyle }
+							transition={ { duration: 0.2 } }
+						/>
+						<motion.div
+							layout
+							style={ contentStyle }
+							transition={ { duration: 0.2 } }
+						>
+							{ children }
+						</motion.div>
+					</>
+				) }
+				{ ! isAlignmentVisualizerVisible && children }
 			</ResizableBox>
 		</>
 	);
