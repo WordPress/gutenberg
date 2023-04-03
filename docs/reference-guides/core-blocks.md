@@ -311,7 +311,7 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 
 -	**Name:** core/image
 -	**Category:** media
--	**Supports:** anchor, color (~~background~~, ~~text~~)
+-	**Supports:** anchor, color (~~background~~, ~~text~~), filter (duotone)
 -	**Attributes:** align, alt, caption, height, href, id, linkClass, linkDestination, linkTarget, rel, sizeSlug, title, url, width
 
 ## Latest Comments
@@ -572,7 +572,7 @@ Contains the block elements used to render a post, like the title, date, feature
 
 -	**Name:** core/post-template
 -	**Category:** theme
--	**Supports:** align, anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Post Terms
@@ -590,7 +590,7 @@ Show minutes required to finish reading the post. ([Source](https://github.com/W
 
 -	**Name:** core/post-time-to-read
 -	**Category:** theme
--	**Supports:** typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Post Title
@@ -689,7 +689,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** core/quote
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, link, text), typography (fontSize, lineHeight)
+-	**Supports:** anchor, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** align, citation, value
 
 ## Read More

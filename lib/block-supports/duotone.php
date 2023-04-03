@@ -405,7 +405,9 @@ function gutenberg_get_duotone_filter_svg( $preset ) {
 function gutenberg_register_duotone_support( $block_type ) {
 	$has_duotone_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+		// Previous `color.__experimentalDuotone` support flag is migrated
+		// to `filter.duotone` via `block_type_metadata_settings` filter.
+		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), null );
 	}
 
 	if ( $has_duotone_support ) {
@@ -449,3 +451,5 @@ remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
 add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 2 );
 add_action( 'wp_enqueue_scripts', array( 'WP_Duotone_Gutenberg', 'output_global_styles' ), 11 );
 add_action( 'wp_footer', array( 'WP_Duotone_Gutenberg', 'output_footer_assets' ), 10 );
+add_filter( 'block_editor_settings_all', array( 'WP_Duotone_Gutenberg', 'add_editor_settings' ), 10 );
+add_filter( 'block_type_metadata_settings', array( 'WP_Duotone_Gutenberg', 'migrate_experimental_duotone_support_flag' ), 10, 2 );
