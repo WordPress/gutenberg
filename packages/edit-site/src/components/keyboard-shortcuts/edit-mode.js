@@ -14,6 +14,10 @@ import { createBlock } from '@wordpress/blocks';
 import { store as editSiteStore } from '../../store';
 import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 import { STORE_NAME } from '../../store/constants';
+/**
+ * External dependencies
+ */
+import { unlock } from '../../private-apis';
 
 function KeyboardShortcutsEditMode() {
 	const { getEditorMode } = useSelect( editSiteStore );
@@ -34,7 +38,9 @@ function KeyboardShortcutsEditMode() {
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { hideBlockInterface, showBlockInterface, replaceBlocks } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
 		useSelect( blockEditorStore );
 
@@ -91,6 +97,30 @@ function KeyboardShortcutsEditMode() {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
 		}
 	} );
+
+	useShortcut( 'core/edit-site/toggle-block-settings-sidebar', ( event ) => {
+		// This shortcut has no known clashes, but use preventDefault to prevent any
+		// obscure shortcuts from triggering.
+		event.preventDefault();
+
+		if ( isBlockInspectorOpen ) {
+			disableComplementaryArea( STORE_NAME );
+		} else {
+			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+		}
+	} );
+
+	useShortcut(
+		'core/edit-site/peek',
+		() => {
+			hideBlockInterface();
+		},
+		{
+			onKeyUp() {
+				showBlockInterface();
+			},
+		}
+	);
 
 	useShortcut( 'core/edit-site/toggle-mode', () => {
 		switchEditorMode( getEditorMode() === 'visual' ? 'text' : 'visual' );

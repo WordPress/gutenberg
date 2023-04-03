@@ -15,28 +15,45 @@ import { context } from '../context';
  * @param {string}   name               Shortcut name.
  * @param {Function} callback           Shortcut callback.
  * @param {Object}   options            Shortcut options.
- * @param {boolean}  options.isDisabled Whether to disable to shortut.
+ * @param {boolean}  options.isDisabled Whether to disable to shortcut.
+ * @param {Function} options.onKeyUp    An event handler triggered when the shortcut key is released.
  */
-export default function useShortcut( name, callback, { isDisabled } = {} ) {
+export default function useShortcut(
+	name,
+	callback,
+	{ isDisabled, onKeyUp } = {}
+) {
 	const shortcuts = useContext( context );
 	const isMatch = useShortcutEventMatch();
-	const callbackRef = useRef();
-	callbackRef.current = callback;
+	const shortcutWasDown = useRef();
+	const onKeyDownRef = useRef();
+	const onKeyUpRef = useRef();
+	onKeyDownRef.current = callback;
+	onKeyDownRef.current = onKeyUp;
 
 	useEffect( () => {
 		if ( isDisabled ) {
 			return;
 		}
 
-		function _callback( event ) {
-			if ( isMatch( name, event ) ) {
-				callbackRef.current( event );
-			}
-		}
+		const shortcut = {
+			onKeyDown( event ) {
+				if ( isMatch( name, event ) ) {
+					shortcutWasDown.current = name;
+					onKeyDownRef.current( event );
+				}
+			},
+			onKeyUp( event ) {
+				if ( onKeyUpRef.current && shortcutWasDown.current === name ) {
+					onKeyUpRef.current( event );
+				}
+				shortcutWasDown.current = undefined;
+			},
+		};
 
-		shortcuts.current.add( _callback );
+		shortcuts.current.add( shortcut );
 		return () => {
-			shortcuts.current.delete( _callback );
+			shortcuts.current.delete( shortcut );
 		};
 	}, [ name, isDisabled ] );
 }

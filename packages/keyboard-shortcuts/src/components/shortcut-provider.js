@@ -24,14 +24,22 @@ export function ShortcutProvider( props ) {
 		if ( props.onKeyDown ) props.onKeyDown( event );
 
 		for ( const keyboardShortcut of keyboardShortcuts.current ) {
-			keyboardShortcut( event );
+			keyboardShortcut.onKeyDown( event );
+		}
+	}
+
+	function onKeyUp( event ) {
+		if ( props.onKeyUp ) props.onKeyUp( event );
+
+		for ( const keyboardShortcut of keyboardShortcuts.current ) {
+			keyboardShortcut?.onKeyDown( event );
 		}
 	}
 
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<Provider value={ keyboardShortcuts }>
-			<div { ...props } onKeyDown={ onKeyDown } />
+			<div { ...props } onKeyDown={ onKeyDown } onKeyUp={ onKeyUp } />
 		</Provider>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
