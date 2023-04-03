@@ -32,6 +32,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/private-apis": "file:../private-apis",
 		"cmdk": "^0.2.0",
 		"rememo": "^4.0.0"
 	},

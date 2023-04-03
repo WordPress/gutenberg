@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCommandLoader } from '@wordpress/commands';
+import { privateApis } from '@wordpress/commands';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
@@ -12,6 +12,8 @@ import { useMemo } from '@wordpress/element';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
+
+const { useCommandLoader } = unlock( privateApis );
 
 const getWPAdminCreateCommandLoader = ( postType ) =>
 	function useCreateCommandLoader( { search } ) {

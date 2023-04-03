@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCommandLoader } from '@wordpress/commands';
+import { privateApis } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -13,6 +13,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
 import { useHistory } from '../../components/routes';
+
+const { useCommandLoader } = unlock( privateApis );
 
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
