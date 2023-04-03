@@ -77,7 +77,7 @@ const setupDriver = async () => {
 		try {
 			appiumProcess = await AppiumLocal.start( localAppiumPort );
 		} catch ( err ) {
-			// Ignore error here, Appium is probably already running (Appium desktop has its own server for instance)
+			// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
 			// eslint-disable-next-line no-console
 			await console.log(
 				'Could not start Appium server',
