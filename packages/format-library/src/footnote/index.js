@@ -15,6 +15,9 @@ export const footnote = {
 	title,
 	tagName: 'data',
 	className: null,
+	attributes: {
+		note: ( element ) => element.replace( /^\[/, '' ).replace( /\]$/, '' ),
+	},
 	render() {
 		return (
 			<sup>
@@ -23,6 +26,9 @@ export const footnote = {
 				</a>
 			</sup>
 		);
+	},
+	save( { attributes: { note } } ) {
+		return `[${ note }]`;
 	},
 	edit( {
 		isObjectActive,
@@ -67,13 +73,11 @@ export const footnote = {
 };
 
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
-	const { innerHtml } = activeObjectAttributes;
+	const { note } = activeObjectAttributes;
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 		settings: footnote,
 	} );
-
-	const note = innerHtml.replace( /^\[/, '' ).replace( /\]$/, '' );
 
 	return (
 		<Popover
