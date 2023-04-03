@@ -161,13 +161,7 @@ export function CommandMenu() {
 			__experimentalHideHeader
 		>
 			<div className="commands-command-menu__container">
-				<Command
-					label={ __( 'Global Command Menu' ) }
-					filter={ ( value, s ) => {
-						if ( value.includes( s ) ) return 1;
-						return 0;
-					} }
-				>
+				<Command label={ __( 'Global Command Menu' ) }>
 					<div className="commands-command-menu__header">
 						<Command.Input
 							// The input should be focused when the modal is opened.
