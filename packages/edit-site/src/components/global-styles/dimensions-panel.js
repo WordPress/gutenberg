@@ -16,6 +16,16 @@ const {
 	DimensionsPanel: StylesDimensionsPanel,
 } = unlock( blockEditorPrivateApis );
 
+const DEFAULT_CONTROLS = {
+	contentSize: true,
+	wideSize: true,
+	padding: true,
+	margin: true,
+	blockGap: true,
+	minHeight: true,
+	childLayout: false,
+};
+
 export default function DimensionsPanel( { name, variation = '' } ) {
 	let prefixParts = [];
 	if ( variation ) {
@@ -66,6 +76,7 @@ export default function DimensionsPanel( { name, variation = '' } ) {
 			onChange={ onChange }
 			settings={ settings }
 			includeLayoutControls
+			defaultControls={ DEFAULT_CONTROLS }
 		/>
 	);
 }

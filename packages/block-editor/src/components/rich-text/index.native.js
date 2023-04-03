@@ -96,7 +96,6 @@ function RichTextWrapper(
 		textAlign,
 		selectionColor,
 		tagsToEliminate,
-		rootTagsToEliminate,
 		disableEditingMenu,
 		fontSize,
 		fontFamily,
@@ -627,7 +626,6 @@ function RichTextWrapper(
 			textAlign={ textAlign }
 			selectionColor={ selectionColor }
 			tagsToEliminate={ tagsToEliminate }
-			rootTagsToEliminate={ rootTagsToEliminate }
 			disableEditingMenu={ disableEditingMenu }
 			fontSize={ fontSize }
 			fontFamily={ fontFamily }

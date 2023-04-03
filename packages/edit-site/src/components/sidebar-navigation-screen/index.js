@@ -5,6 +5,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
@@ -35,7 +36,7 @@ export default function SidebarNavigationScreen( {
 		<VStack spacing={ 2 }>
 			<HStack
 				spacing={ 4 }
-				justify="flex-start"
+				alignment="flex-start"
 				className="edit-site-sidebar-navigation-screen__title-icon"
 			>
 				{ ! isRoot ? (
@@ -52,9 +53,14 @@ export default function SidebarNavigationScreen( {
 						label={ __( 'Dashboard' ) }
 					/>
 				) }
-				<h2 className="edit-site-sidebar-navigation-screen__title">
+				<Heading
+					className="edit-site-sidebar-navigation-screen__title"
+					color={ 'white' }
+					level={ 2 }
+					size={ 20 }
+				>
 					{ title }
-				</h2>
+				</Heading>
 				{ actions }
 			</HStack>
 
