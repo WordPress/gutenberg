@@ -576,8 +576,6 @@ export default function Image( {
 				className={ borderProps.className }
 				style={ {
 					...borderProps.style,
-					width: 'inherit',
-					height: 'auto',
 				} }
 			/>
 		);

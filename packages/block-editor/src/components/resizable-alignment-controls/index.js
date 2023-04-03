@@ -100,7 +100,7 @@ function ResizableAlignmentControls( {
 	const contentStyle = useMemo( () => {
 		if ( ! snappedAlignment ) {
 			// By default the content takes up the full width of the resizable box.
-			return { width: '100%' };
+			return { width: 'inherit' };
 		}
 
 		// Calculate the positioning of the snapped image.
