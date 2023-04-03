@@ -15,6 +15,9 @@
  */
 function render_block_core_image( $attributes, $content ) {
 	$processor = new WP_HTML_Tag_Processor( $content );
+	$processor->next_tag( 'figure' );
+	$processor->set_attribute( 'data-wp-context', '{ "core": { "isZoomed": false } }' );
+
 	$processor->next_tag( 'img' );
 
 	if ( $processor->get_attribute( 'src' ) === null ) {
@@ -29,7 +32,11 @@ function render_block_core_image( $attributes, $content ) {
 		$processor->set_attribute( 'data-id', $attributes['data-id'] );
 		$content = $processor->get_updated_html();
 	}
-	return $content;
+	$processor->set_attribute( 'data-wp-on.click', 'actions.core.imageZoom');
+	$processor->set_attribute( 'data-wp-class.isZoomed', 'context.core.isZoomed');
+	$content = $processor->get_updated_html();
+
+	return $content . '<div data-wp-portal="body" data-wp-class.overlay="state.core.isZoomed"><div></div></div>';
 }
 
 

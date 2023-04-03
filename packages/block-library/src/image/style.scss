@@ -4,6 +4,12 @@
 		max-width: 100%;
 		vertical-align: bottom;
 		box-sizing: border-box;
+
+		&.iszoomed {
+			z-index: 200000;
+			position: absolute;
+			width: 100vw;
+		}
 	}
 
 	// The following style maintains border radius application for deprecated
@@ -150,4 +156,18 @@
 
 .wp-block-image figure {
 	margin: 0;
+}
+
+.overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	background: rgba(255, 255, 255, .95);
+	z-index: 100000;
+	overflow: hidden;
+
+	div {
+		width: 100vw;
+		height: 100vh;
+	}
 }
