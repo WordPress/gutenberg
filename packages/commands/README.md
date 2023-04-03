@@ -1,4 +1,4 @@
-# Keyboard Shortcuts
+# Commands
 
 Commands is a generic package that allows registering and modifying commands to be displayed using the commands menu (Also called cmd+k).
 
