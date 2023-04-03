@@ -561,25 +561,6 @@ export default function Image( {
 		// becomes available.
 		const maxWidthBuffer = maxWidth * 2.5;
 
-		const imgInner = (
-			<img
-				src={ temporaryURL || url }
-				alt={ defaultedAlt }
-				onError={ () => onImageError() }
-				onLoad={ ( event ) => {
-					setLoadedNaturalSize( {
-						loadedNaturalWidth: event.target?.naturalWidth,
-						loadedNaturalHeight: event.target?.naturalHeight,
-					} );
-				} }
-				ref={ imageRef }
-				className={ borderProps.className }
-				style={ {
-					...borderProps.style,
-				} }
-			/>
-		);
-
 		img = (
 			<ResizableAlignmentControls
 				allowedAlignments={ [ 'none', 'wide', 'full' ] }
@@ -609,7 +590,7 @@ export default function Image( {
 					height: height && ! hasCustomBorder ? height : 'auto',
 				} }
 			>
-				{ imgInner }
+				{ img }
 			</ResizableAlignmentControls>
 		);
 	}
