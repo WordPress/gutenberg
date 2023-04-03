@@ -28,14 +28,14 @@ const AnimatedScrollView = Animated.createAnimatedComponent( ScrollView );
  * React component that provides a FlatList that is aware of the keyboard state and can scroll
  * to the currently focused TextInput.
  *
- * @param {Object}   props                              - Component props.
- * @param {number}   props.extraScrollHeight            - Extra scroll height for the content.
- * @param {Function} props.innerRef                     - Function to pass the ScrollView ref to the parent component.
- * @param {Function} props.onScroll                     - Function to be called when the list is scrolled.
- * @param {boolean}  props.scrollEnabled                - Whether the list can be scrolled.
- * @param {Object}   props.scrollViewStyle              - Additional style for the ScrollView component.
- * @param {boolean}  props.shouldPreventAutomaticScroll - Whether to prevent scrolling when there's a Keyboard offset set.
- * @param {Object}   props...                           - Other props to pass to the FlatList component.
+ * @param {Object}   props                              Component props.
+ * @param {number}   props.extraScrollHeight            Extra scroll height for the content.
+ * @param {Function} props.innerRef                     Function to pass the ScrollView ref to the parent component.
+ * @param {Function} props.onScroll                     Function to be called when the list is scrolled.
+ * @param {boolean}  props.scrollEnabled                Whether the list can be scrolled.
+ * @param {Object}   props.scrollViewStyle              Additional style for the ScrollView component.
+ * @param {boolean}  props.shouldPreventAutomaticScroll Whether to prevent scrolling when there's a Keyboard offset set.
+ * @param {Object}   props...                           Other props to pass to the FlatList component.
  * @return {WPComponent} KeyboardAwareFlatList component.
  */
 export const KeyboardAwareFlatList = ( {
