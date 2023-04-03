@@ -18,7 +18,7 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -264,20 +264,36 @@ function GlobalStylesStyleBook( { onClose } ) {
 
 function GlobalStylesBlockLink() {
 	const navigator = useNavigator();
-	const selectedBlockName = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockName } =
-			select( blockEditorStore );
-		return getBlockName( getSelectedBlockClientId() );
-	}, [] );
+	const isMounted = useRef();
+	const { selectedBlockName, selectedBlockClientId } = useSelect(
+		( select ) => {
+			const { getSelectedBlockClientId, getBlockName } =
+				select( blockEditorStore );
+			const clientId = getSelectedBlockClientId();
+			return {
+				selectedBlockName: getBlockName( clientId ),
+				selectedBlockClientId: clientId,
+			};
+		},
+		[]
+	);
 	const blockHasGlobalStyles = useBlockHasGlobalStyles( selectedBlockName );
 	useEffect( () => {
-		if ( ! selectedBlockName || ! blockHasGlobalStyles ) {
+		// Avoid navigating to the block screen on mount.
+		if ( ! isMounted.current ) {
+			isMounted.current = true;
 			return;
 		}
-		navigator.goTo( '/blocks/' + encodeURIComponent( selectedBlockName ), {
-			skipFocus: true,
-		} );
-	}, [ selectedBlockName, blockHasGlobalStyles ] );
+		if ( ! selectedBlockClientId || ! blockHasGlobalStyles ) {
+			return;
+		}
+		const path = '/blocks/' + encodeURIComponent( selectedBlockName );
+		// Avoid navigating to the same path. This can happen when selecting
+		// a new block of the same type.
+		if ( path !== navigator.location.path ) {
+			navigator.goTo( path, { skipFocus: true } );
+		}
+	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
 }
 
 function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
