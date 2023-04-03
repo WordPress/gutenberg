@@ -79,7 +79,7 @@ function ListViewComponent(
 ) {
 	// This can be removed once we no longer need to support the blocks prop.
 	if ( blocks ) {
-		deprecated( '`blocks` property in `ListViewComponent`', {
+		deprecated( '`blocks` property in `wp.blockEditor.__experimentalListView`', {
 			since: '6.3',
 			alternative: '`rootClientId` property',
 		} );
