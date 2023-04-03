@@ -1,8 +1,3 @@
-// Should be in theme compatibility file.
-.editor-styles-wrapper {
-	counter-reset: footnotes;
-}
-
 .rich-text {
 	[data-rich-text-placeholder] {
 		pointer-events: none;
@@ -22,16 +17,6 @@
 		[data-rich-text-format-boundary] {
 			border-radius: 2px;
 		}
-	}
-
-	// Should be in theme compatibility file.
-	data[value="core/footnote"] {
-		counter-increment: footnotes;
-	}
-	data[value="core/footnote"]::after {
-		content: "[" counter(footnotes) "]";
-		vertical-align: super;
-		font-size: smaller;
 	}
 }
 

@@ -1,0 +1,12 @@
+.editor-styles-wrapper {
+	counter-reset: footnotes;
+}
+
+.note-link {
+	counter-increment: footnotes;
+	pointer-events: none;
+}
+
+.note-link::after {
+	content: "[" counter(footnotes) "]";
+}
