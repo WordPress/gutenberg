@@ -39,12 +39,8 @@
 }
 
 .edit-site-sidebar-navigation-screen__title {
-	font-size: calc(1.56 * 13px);
-	line-height: normal;
-	font-weight: 500;
 	flex-grow: 1;
-	color: $white;
-	margin: 0;
+	padding: $grid-unit-15 * 0.5 0 0 0;
 }
 
 .edit-site-sidebar-navigation-screen__content .edit-site-global-styles-style-variations-container {
