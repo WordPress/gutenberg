@@ -15,6 +15,8 @@ import { keyboard } from './keyboard';
 import { unknown } from './unknown';
 import { currentYear } from './current-year';
 import { footnote } from './footnote';
+import { postDate } from './post-date';
+import { time } from './time';
 
 export default [
 	bold,
@@ -31,4 +33,6 @@ export default [
 	unknown,
 	currentYear,
 	footnote,
+	postDate,
+	time,
 ];
