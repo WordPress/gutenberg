@@ -86,7 +86,7 @@
 	}
 
 	// Block focus.
-	.block-editor-block-list__block:not([contenteditable]):focus {
+	.block-editor-block-list__block:not([contenteditable]):not(.hide-block-border):focus {
 		outline: none;
 
 		// We're using a pseudo element to overflow placeholder borders
