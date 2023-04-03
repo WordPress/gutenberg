@@ -948,7 +948,7 @@ export const toStyles = (
 			getGapCSSValue( tree?.styles?.spacing?.blockGap ) || '0.5em';
 		ruleset =
 			ruleset +
-			`:where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; }`;
+			`:where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
 		ruleset =
 			ruleset +
 			':where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }';
