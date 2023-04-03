@@ -133,6 +133,8 @@ _Returns_
 
 ### isFeatureActive
 
+> **Deprecated**
+
 Returns whether the given feature is enabled or not.
 
 _Parameters_
