@@ -9,7 +9,7 @@ import { Command } from 'cmdk';
 import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Modal } from '@wordpress/components';
+import { Modal, TextHighlight } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -35,7 +35,12 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 						value={ command.label ?? command.name }
 						onSelect={ () => command.callback( { close } ) }
 					>
-						{ command.label }
+						<span className="commands-command-menu__item">
+							<TextHighlight
+								text={ command.label }
+								highlight={ search }
+							/>
+						</span>
 					</Command.Item>
 				) ) }
 			</Command.List>
@@ -89,7 +94,12 @@ export function CommandMenuGroup( { group, search, setLoader, close } ) {
 					value={ command.label ?? command.name }
 					onSelect={ () => command.callback( { close } ) }
 				>
-					{ command.label }
+					<span className="commands-command-menu__item">
+						<TextHighlight
+							text={ command.label }
+							highlight={ search }
+						/>
+					</span>
 				</Command.Item>
 			) ) }
 			{ loaders.map( ( loader ) => (
