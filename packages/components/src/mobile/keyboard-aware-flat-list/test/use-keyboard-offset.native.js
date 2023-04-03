@@ -10,6 +10,8 @@ import RCTDeviceEventEmitter from 'react-native/Libraries/EventEmitter/RCTDevice
  */
 import useKeyboardOffset from '../use-keyboard-offset';
 
+jest.useFakeTimers();
+
 describe( 'useKeyboardOffset', () => {
 	beforeEach( () => {
 		Keyboard.removeAllListeners( 'keyboardDidShow' );
@@ -43,7 +45,10 @@ describe( 'useKeyboardOffset', () => {
 
 	it( 'updates keyboard visibility and offset when the keyboard is hidden', () => {
 		// Arrange
-		const { result } = renderHook( () => useKeyboardOffset( true ) );
+		const shouldPreventAutomaticScroll = jest.fn().mockReturnValue( false );
+		const { result } = renderHook( () =>
+			useKeyboardOffset( true, shouldPreventAutomaticScroll )
+		);
 
 		// Act
 		act( () => {
@@ -54,6 +59,7 @@ describe( 'useKeyboardOffset', () => {
 
 		act( () => {
 			RCTDeviceEventEmitter.emit( 'keyboardDidHide' );
+			jest.runAllTimers();
 		} );
 
 		// Assert
@@ -113,5 +119,106 @@ describe( 'useKeyboardOffset', () => {
 		expect( RCTDeviceEventEmitter.listenerCount( 'keyboardDidHide' ) ).toBe(
 			1
 		);
+	} );
+
+	it( 'sets keyboard offset to 0 when keyboard is hidden and shouldPreventAutomaticScroll is false', () => {
+		// Arrange
+		const shouldPreventAutomaticScroll = jest.fn().mockReturnValue( false );
+		const { result } = renderHook( () =>
+			useKeyboardOffset( true, shouldPreventAutomaticScroll )
+		);
+
+		// Act
+		act( () => {
+			RCTDeviceEventEmitter.emit( 'keyboardDidShow', {
+				endCoordinates: { height: 250 },
+			} );
+		} );
+		act( () => {
+			RCTDeviceEventEmitter.emit( 'keyboardDidHide' );
+			jest.runAllTimers();
+		} );
+
+		// Assert
+		expect( result.current[ 0 ] ).toBe( 0 );
+	} );
+
+	it( 'does not set keyboard offset to 0 when keyboard is hidden and shouldPreventAutomaticScroll is true', () => {
+		// Arrange
+		const shouldPreventAutomaticScroll = jest.fn().mockReturnValue( true );
+		const { result } = renderHook( () =>
+			useKeyboardOffset( true, shouldPreventAutomaticScroll )
+		);
+
+		// Act
+		act( () => {
+			RCTDeviceEventEmitter.emit( 'keyboardDidShow', {
+				endCoordinates: { height: 250 },
+			} );
+		} );
+		act( () => {
+			RCTDeviceEventEmitter.emit( 'keyboardDidHide' );
+			jest.runAllTimers();
+		} );
+
+		// Assert
+		expect( result.current[ 0 ] ).toBe( 250 );
+	} );
+
+	it( 'handles updates to shouldPreventAutomaticScroll', () => {
+		// Arrange
+		const preventScrollTrue = jest.fn( () => true );
+		const preventScrollFalse = jest.fn( () => false );
+
+		// Act
+		const { result, rerender } = renderHook(
+			( { shouldPreventAutomaticScroll } ) =>
+				useKeyboardOffset( true, shouldPreventAutomaticScroll ),
+			{
+				initialProps: {
+					shouldPreventAutomaticScroll: preventScrollFalse,
+				},
+			}
+		);
+
+		// Assert
+		expect( result.current[ 0 ] ).toBe( 0 );
+
+		// Act
+		act( () => {
+			RCTDeviceEventEmitter.emit( 'keyboardDidShow', {
+				endCoordinates: { height: 250 },
+			} );
+		} );
+
+		// Assert
+		expect( result.current[ 0 ] ).toBe( 250 );
+
+		// Act
+		act( () => {
+			rerender( { shouldPreventAutomaticScroll: preventScrollTrue } );
+		} );
+
+		act( () => {
+			RCTDeviceEventEmitter.emit( 'keyboardDidHide' );
+			jest.runAllTimers();
+		} );
+
+		// Assert
+		expect( result.current[ 0 ] ).toBe( 250 );
+
+		// Act
+		act( () => {
+			rerender( { shouldPreventAutomaticScroll: preventScrollFalse } );
+		} );
+
+		act( () => {
+			RCTDeviceEventEmitter.emit( 'keyboardDidShow', {
+				endCoordinates: { height: 250 },
+			} );
+		} );
+
+		// Assert
+		expect( result.current[ 0 ] ).toBe( 250 );
 	} );
 } );
