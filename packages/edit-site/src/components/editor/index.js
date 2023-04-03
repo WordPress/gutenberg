@@ -95,7 +95,8 @@ export default function Editor() {
 				'core/edit-site',
 				'showIconLabels'
 			),
-			showBlockBreadcrumbs: select( editSiteStore ).isFeatureActive(
+			showBlockBreadcrumbs: select( preferencesStore ).get(
+				'core/edit-site',
 				'showBlockBreadcrumbs'
 			),
 		};
