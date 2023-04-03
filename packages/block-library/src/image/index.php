@@ -16,7 +16,8 @@
 function render_block_core_image( $attributes, $content ) {
 	$processor = new WP_HTML_Tag_Processor( $content );
 	$processor->next_tag( 'figure' );
-	$processor->set_attribute( 'data-wp-context', '{ "core": { "isZoomed": false } }' );
+	$processor->set_attribute( 'data-wp-class.isZoomed', 'context.core.isZoomed');
+	$processor->set_attribute( 'data-wp-init', 'actions.core.closeZoomOnEsc');
 
 	$processor->next_tag( 'img' );
 
@@ -33,10 +34,17 @@ function render_block_core_image( $attributes, $content ) {
 		$content = $processor->get_updated_html();
 	}
 	$processor->set_attribute( 'data-wp-on.click', 'actions.core.imageZoom');
-	$processor->set_attribute( 'data-wp-class.isZoomed', 'context.core.isZoomed');
+
 	$content = $processor->get_updated_html();
 
-	return $content . '<div data-wp-portal="body" data-wp-class.overlay="state.core.isZoomed"><div></div></div>';
+	return <<<HTML
+		<div data-wp-context='{ "core": { "isZoomed": false } }'>
+			$content
+			<div data-wp-portal="body" data-wp-class.overlay="context.core.isZoomed">
+				<div data-wp-on.click="actions.core.closeZoom"></div>
+			</div>
+		</div>
+	HTML;
 }
 
 

@@ -72,10 +72,27 @@ export default () => {
 				portal: { default: portal },
 			},
 			props: { children },
+			context: inherited,
 		} ) => {
-			return <Portal into={ portal }>{ children }</Portal>;
+			const { Provider } = inherited;
+			const inheritedValue = useContext( inherited );
+			return (
+				<Portal into={ portal }>
+					<Provider value={ inheritedValue }>{ children }</Provider>
+				</Portal>
+			);
 		}
 	);
+
+	// data-wp-init.[name]
+	directive( 'init', ( { directives: { init }, context, evaluate } ) => {
+		const contextValue = useContext( context );
+		Object.values( init ).forEach( ( path ) => {
+			useEffect( () => {
+				evaluate( path, { context: contextValue } );
+			}, [] );
+		} );
+	} );
 
 	// data-wp-effect.[name]
 	directive( 'effect', ( { directives: { effect }, context, evaluate } ) => {
