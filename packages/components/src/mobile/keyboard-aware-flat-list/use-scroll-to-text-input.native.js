@@ -39,10 +39,10 @@ export default function useScrollToTextInput(
 	/**
 	 * Function to scroll to the current TextInput's offset.
 	 *
-	 * @param {Object} caret             - The caret position data of the currently focused TextInput.
-	 * @param {number} caret.caretHeight - The height of the caret.
-	 * @param {number} textInputOffset   - The offset calculated with the caret's Y coordinate + the
-	 *                                   - TextInput's Y coord or height value.
+	 * @param {Object} caret             The caret position data of the currently focused TextInput.
+	 * @param {number} caret.caretHeight The height of the caret.
+	 * @param {number} textInputOffset   The offset calculated with the caret's Y coordinate + the
+	 *                                   TextInput's Y coord or height value.
 	 */
 	const scrollToTextInputOffset = useCallback(
 		( caret, textInputOffset ) => {
