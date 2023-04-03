@@ -1,9 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useCommand } from '@wordpress/commands';
-import { __ } from '@wordpress/i18n';
+import { useCommandLoader } from '@wordpress/commands';
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { addQueryArgs } from '@wordpress/url';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,26 +13,64 @@ import { useSelect } from '@wordpress/data';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../private-apis';
 
+const getWPAdminCreateCommandLoader = ( postType ) =>
+	function useCreateCommandLoader( { search } ) {
+		let label;
+		if ( postType === 'post' ) {
+			label = __( 'Create a new post' );
+		} else if ( postType === 'page' ) {
+			label = __( 'Create a new page' );
+		} else {
+			throw 'unsupported post type ' + postType;
+		}
+		const hasRecordTitle =
+			!! search && ! label.toLowerCase().includes( search.toLowerCase() );
+		if ( postType === 'post' && hasRecordTitle ) {
+			/* translators: %s: Post title placeholder */
+			label = sprintf( __( 'Create a new post "%s"' ), search );
+		} else if ( postType === 'page' && hasRecordTitle ) {
+			/* translators: %s: Page title placeholder */
+			label = sprintf( __( 'Create a new page "%s"' ), search );
+		}
+
+		const newPostLink = useSelect( ( select ) => {
+			select( editSiteStore ).getEditedPostType();
+			const { getSettings } = unlock( select( editSiteStore ) );
+			return getSettings().newPostLink ?? 'post-new.php';
+		}, [] );
+
+		const commands = useMemo(
+			() => [
+				{
+					name: 'core/wp-admin/create-' + postType,
+					label,
+					callback: () => {
+						document.location.href = addQueryArgs( newPostLink, {
+							post_type: postType,
+							post_title: hasRecordTitle ? search : undefined,
+						} );
+					},
+				},
+			],
+			[ newPostLink, hasRecordTitle, search, label ]
+		);
+
+		return {
+			isLoading: false,
+			commands,
+		};
+	};
+
+const useCreatePostLoader = getWPAdminCreateCommandLoader( 'post' );
+const useCreatePageLoader = getWPAdminCreateCommandLoader( 'page' );
+
 export function useWPAdminCommands() {
-	const newPostLink = useSelect( ( select ) => {
-		select( editSiteStore ).getEditedPostType();
-		const { getSettings } = unlock( select( editSiteStore ) );
-		return getSettings().newPostLink ?? 'post-new.php';
-	}, [] );
-
-	useCommand( {
-		name: 'core/wp-admin/create-post',
-		label: __( 'Create a new post' ),
-		callback: () => {
-			document.location.href = newPostLink;
-		},
+	useCommandLoader( {
+		name: 'core/wp-admin/create-post-loader',
+		hook: useCreatePostLoader,
 	} );
-
-	useCommand( {
-		name: 'core/wp-admin/create-page',
-		label: __( 'Create a new page' ),
-		callback: () => {
-			document.location.href = newPostLink + '?post_type=page';
-		},
+	useCommandLoader( {
+		name: 'core/wp-admin/create-page-loader',
+		hook: useCreatePageLoader,
 	} );
 }

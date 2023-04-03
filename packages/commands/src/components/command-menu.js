@@ -32,7 +32,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 				{ commands.map( ( command ) => (
 					<Command.Item
 						key={ command.name }
-						value={ command.name }
+						value={ command.label ?? command.name }
 						onSelect={ () => command.callback( { close } ) }
 					>
 						{ command.label }
@@ -86,7 +86,7 @@ export function CommandMenuGroup( { group, search, setLoader, close } ) {
 			{ commands.map( ( command ) => (
 				<Command.Item
 					key={ command.name }
-					value={ command.name }
+					value={ command.label ?? command.name }
 					onSelect={ () => command.callback( { close } ) }
 				>
 					{ command.label }
@@ -151,7 +151,13 @@ export function CommandMenu() {
 			__experimentalHideHeader
 		>
 			<div className="commands-command-menu__container">
-				<Command label={ __( 'Global Command Menu' ) }>
+				<Command
+					label={ __( 'Global Command Menu' ) }
+					filter={ ( value, s ) => {
+						if ( value.includes( s ) ) return 1;
+						return 0;
+					} }
+				>
 					<div className="commands-command-menu__header">
 						<Command.Input
 							// The input should be focused when the modal is opened.
