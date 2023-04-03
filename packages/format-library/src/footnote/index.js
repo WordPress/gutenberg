@@ -15,6 +15,15 @@ export const footnote = {
 	title,
 	tagName: 'data',
 	className: null,
+	render() {
+		return (
+			<sup>
+				<a className="note-link" href="#placeholder">
+					{ '' }
+				</a>
+			</sup>
+		);
+	},
 	edit( {
 		isObjectActive,
 		value,
