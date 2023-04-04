@@ -19,11 +19,23 @@ import { forwardRef } from '@wordpress/element';
 import * as DropdownMenuStyled from './styles';
 import type { DropdownMenuProps, DropdownSubMenuProps } from './types';
 
-// Observations:
-// - is it enough to have only one forwarded ref? If we have only one, should it be to the root, or to the content?
-// - Should we be consistent in using the same value for the `asChild` prop on both trigger and content?
+// Observations / Questions:
+// - is it enough on the larger components to have only one forwarded ref?
+//   If we have only one, should it be to the "root", the "trigger", or the "content"?
+// - Should we be consistent in using the same value for the `asChild` prop on:
+//   - trigger
+//   - content
+//   - sub trigger
+//   - sub content
 // - Should we allow customizing the `asChild` prop on trigger and content?
-// - Should we explicitly Pick<> every prop ?
+// - Props & customisability:
+//   - Which props should we expose?
+//   - Should props be "namespaced" for each subcomponent?
+//   - We should probably explicitly `Pick<>` every prop that we want to expose
+// - Subtrigger arrow:
+//   - Should it always be there (ie. an internal implementation)?
+//   - Should we just expect that the the consumers handle it themselves?
+//   - Should we expose it as a separate component that consumers could use?
 export const DropdownMenu = forwardRef(
 	(
 		{
