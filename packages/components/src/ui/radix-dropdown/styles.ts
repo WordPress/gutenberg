@@ -51,6 +51,7 @@ const slideLeftAndFade = keyframes( {
 const baseContent = css`
 	min-width: 220px;
 	background-color: ${ COLORS.ui.background };
+	border: 1px solid ${ COLORS.ui.border };
 	border-radius: 6px;
 	padding: 5px;
 	box-shadow: 0px 10px 38px -10px rgba( 22, 23, 24, 0.35 ),
@@ -161,4 +162,11 @@ export const ItemPrefixWrapper = styled.span`
 
 export const Arrow = styled( DropdownMenu.Arrow )`
 	fill: ${ COLORS.ui.background };
+
+	/* The following styles aim at adding a border to the arrow*/
+	stroke: ${ COLORS.ui.border };
+	stroke-dasharray: 36 28;
+	stroke-dashoffset: 34;
+	stroke-linejoin: round;
+	stroke-width: 2.5;
 `;
