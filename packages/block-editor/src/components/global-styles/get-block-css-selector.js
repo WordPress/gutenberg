@@ -34,17 +34,6 @@ export function getBlockCSSSelector(
 	const hasSelectors = ! isEmpty( selectors );
 	const path = Array.isArray( target ) ? target.join( '.' ) : target;
 
-	// Duotone ( no fallback selectors for Duotone ).
-	if ( path === 'filter.duotone' ) {
-		// If selectors API in use, only use its value or null.
-		if ( hasSelectors ) {
-			return get( selectors, path, null );
-		}
-
-		// Selectors API, not available, check for old experimental selector.
-		return get( supports, 'color.__experimentalDuotone', null );
-	}
-
 	// Root selector.
 
 	// Calculated before returning as it can be used as a fallback for feature

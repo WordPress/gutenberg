@@ -338,7 +338,7 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 
 -	**Name:** core/image
 -	**Category:** media
--	**Supports:** anchor, color (~~background~~, ~~text~~)
+-	**Supports:** anchor, color (~~background~~, ~~text~~), filter (duotone)
 -	**Attributes:** align, alt, caption, height, href, id, linkClass, linkDestination, linkTarget, rel, sizeSlug, title, url, width
 
 ## Latest Comments
@@ -617,7 +617,7 @@ Show minutes required to finish reading the post. ([Source](https://github.com/W
 
 -	**Name:** core/post-time-to-read
 -	**Category:** theme
--	**Supports:** spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Post Title

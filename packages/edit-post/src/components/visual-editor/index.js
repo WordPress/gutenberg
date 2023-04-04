@@ -401,8 +401,7 @@ export default function VisualEditor( { styles } ) {
 										'is-focus-mode': isFocusMode,
 										'has-global-padding':
 											hasRootPaddingAwareAlignments,
-									},
-									'is-layout-flow'
+									}
 								) }
 								contentEditable={ false }
 							>

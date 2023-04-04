@@ -6,7 +6,7 @@ import {
 	__experimentalNavigatorButton as NavigatorButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbolFilled, navigation } from '@wordpress/icons';
+import { layout, symbolFilled, navigation, styles } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -56,6 +56,14 @@ export default function SidebarNavigationScreenMain() {
 							{ __( 'Navigation' ) }
 						</NavigatorButton>
 					) }
+					<NavigatorButton
+						as={ SidebarNavigationItem }
+						path="/wp_global_styles"
+						withChevron
+						icon={ styles }
+					>
+						{ __( 'Styles' ) }
+					</NavigatorButton>
 					<NavigatorButton
 						as={ SidebarNavigationItem }
 						path="/wp_template"
