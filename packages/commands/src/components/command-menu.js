@@ -126,16 +126,17 @@ export function CommandMenu() {
 	}, [] );
 	const [ loaders, setLoaders ] = useState( {} );
 
-	// Toggle the menu when ⌘K is pressed
+	// Toggle the menu when Meta-K is pressed
 	useEffect( () => {
-		const down = ( e ) => {
+		const toggleOnMetaK = ( e ) => {
 			if ( e.key === 'k' && e.metaKey ) {
 				setOpen( ( prevOpen ) => ! prevOpen );
+				e.preventDefault();
 			}
 		};
 
-		document.addEventListener( 'keydown', down );
-		return () => document.removeEventListener( 'keydown', down );
+		document.addEventListener( 'keydown', toggleOnMetaK );
+		return () => document.removeEventListener( 'keydown', toggleOnMetaK );
 	}, [] );
 
 	const setLoader = useCallback(
