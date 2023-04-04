@@ -90,6 +90,11 @@ function ResizableAlignmentControls( {
 		useDispatch( blockEditorStore )
 	);
 
+	const isSnappingExperimentEnabled =
+		window.__experimentalEnableImageBlockAlignmentSnapping;
+	const showAlignmentVisualizer =
+		isSnappingExperimentEnabled && isAlignmentVisualizerVisible;
+
 	const rootClientId = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlockRootClientId( clientId ),
@@ -136,7 +141,7 @@ function ResizableAlignmentControls( {
 	return (
 		<>
 			<AnimatePresence>
-				{ isAlignmentVisualizerVisible && (
+				{ showAlignmentVisualizer && (
 					<motion.div
 						initial={ { opacity: 0 } }
 						animate={ { opacity: 1 } }
@@ -171,22 +176,25 @@ function ResizableAlignmentControls( {
 					hideBlockInterface();
 
 					if (
-						resizeDirection === 'right' ||
-						resizeDirection === 'left'
+						isSnappingExperimentEnabled &&
+						( resizeDirection === 'right' ||
+							resizeDirection === 'left' )
 					) {
 						setIsAlignmentVisualizerVisible( true );
 					}
 				} }
 				onResize={ ( event, resizeDirection, resizableElement ) => {
-					// Detect if snapping is happening.
-					const newSnappedAlignment = detectSnapping(
-						resizableElement,
-						resizeDirection
-					);
-					if (
-						newSnappedAlignment?.name !== snappedAlignment?.name
-					) {
-						setSnappedAlignment( newSnappedAlignment );
+					if ( showAlignmentVisualizer ) {
+						// Detect if snapping is happening.
+						const newSnappedAlignment = detectSnapping(
+							resizableElement,
+							resizeDirection
+						);
+						if (
+							newSnappedAlignment?.name !== snappedAlignment?.name
+						) {
+							setSnappedAlignment( newSnappedAlignment );
+						}
 					}
 				} }
 				onResizeStop={ ( ...resizeArgs ) => {
@@ -195,13 +203,15 @@ function ResizableAlignmentControls( {
 					} else {
 						onResizeStop( ...resizeArgs );
 					}
-					setIsAlignmentVisualizerVisible( false );
+					if ( isSnappingExperimentEnabled ) {
+						setIsAlignmentVisualizerVisible( false );
+					}
 					showBlockInterface();
 					setSnappedAlignment( null );
 				} }
 				resizeRatio={ currentAlignment === 'center' ? 2 : 1 }
 			>
-				{ isAlignmentVisualizerVisible && (
+				{ showAlignmentVisualizer && (
 					<>
 						<motion.div
 							layout
@@ -217,7 +227,7 @@ function ResizableAlignmentControls( {
 						</motion.div>
 					</>
 				) }
-				{ ! isAlignmentVisualizerVisible && children }
+				{ ! showAlignmentVisualizer && children }
 			</ResizableBox>
 		</>
 	);
