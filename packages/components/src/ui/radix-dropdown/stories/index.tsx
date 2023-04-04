@@ -24,7 +24,7 @@ import { useCx } from '../../../utils/hooks/use-cx';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { chevronRightSmall, menu } from '@wordpress/icons';
+import { chevronRightSmall, menu, wordpress } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -112,7 +112,7 @@ export const DropdownMenuDemo = () => {
 			contentProps={ { sideOffset: 5 } }
 		>
 			<DropdownMenuGroup>
-				<DropdownMenuItem>
+				<DropdownMenuItem icon={ wordpress }>
 					New Tab <div className={ rightSlotClassName }>⌘+T</div>
 				</DropdownMenuItem>
 				<DropdownMenuItem>
