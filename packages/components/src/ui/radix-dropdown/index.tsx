@@ -15,7 +15,11 @@ import { check, lineSolid } from '@wordpress/icons';
  */
 import Icon from '../../icon';
 import * as DropdownMenuStyled from './styles';
-import type { DropdownMenuProps, DropdownSubMenuProps } from './types';
+import type {
+	DropdownMenuProps,
+	DropdownSubMenuProps,
+	DropdownItemProps,
+} from './types';
 
 // Observations / Questions:
 // - is it enough on the larger components to have only one forwarded ref?
@@ -34,6 +38,10 @@ import type { DropdownMenuProps, DropdownSubMenuProps } from './types';
 //   - Should it always be there (ie. an internal implementation)?
 //   - Should we just expect that the the consumers handle it themselves?
 //   - Should we expose it as a separate component that consumers could use?
+// - DropdowmMenuItem icon prop:
+//   - added to mirror previous menu item component
+//   - should we expect consumers to provide this directly with children?
+//   - should we expose prefix / suffix to help?
 export const DropdownMenu = forwardRef(
 	(
 		{
@@ -96,9 +104,25 @@ export const DropdownSubMenu = forwardRef(
 );
 
 export const DropdownMenuLabel = DropdownMenuStyled.Label;
-export const DropdownMenuItem = DropdownMenuStyled.Item;
 export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
+export const DropdownMenuItem = forwardRef(
+	(
+		{ children, icon, ...props }: DropdownItemProps,
+		forwardedRef: React.ForwardedRef< any >
+	) => {
+		return (
+			<DropdownMenuStyled.Item { ...props } ref={ forwardedRef }>
+				{ children }
+				{ icon && (
+					<DropdownMenuStyled.ItemPrefixWrapper>
+						<Icon icon={ icon } size={ 18 } />
+					</DropdownMenuStyled.ItemPrefixWrapper>
+				) }
+			</DropdownMenuStyled.Item>
+		);
+	}
+);
 export const DropdownMenuCheckboxItem = forwardRef(
 	(
 		{

@@ -105,6 +105,15 @@ const baseItem = css`
 	}
 `;
 
+const itemPrefix = css`
+	position: absolute;
+	left: 0;
+	width: 25px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+`;
+
 export const Content = styled( DropdownMenu.Content )`
 	${ baseContent }
 `;
@@ -144,12 +153,11 @@ export const Separator = styled( DropdownMenu.Separator )`
 `;
 
 export const ItemIndicator = styled( DropdownMenu.ItemIndicator )`
-	position: absolute;
-	left: 0;
-	width: 25px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
+	${ itemPrefix }
+`;
+
+export const ItemPrefixWrapper = styled.span`
+	${ itemPrefix }
 `;
 
 export const Arrow = styled( DropdownMenu.Arrow )`

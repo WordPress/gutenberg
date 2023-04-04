@@ -3,6 +3,11 @@
  */
 import type * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 
+/**
+ * Internal dependencies
+ */
+import type { IconType } from '../../icon';
+
 export type DropdownMenuProps = {
 	/**
 	 * The props passed to the dropdown's root element
@@ -45,4 +50,8 @@ export type DropdownSubMenuProps = {
 	>;
 	trigger: React.ReactNode;
 	children: React.ReactNode;
+};
+
+export type DropdownItemProps = DropdownMenuPrimitive.DropdownMenuItemProps & {
+	icon?: IconType;
 };
