@@ -22,7 +22,7 @@ import {
 	MediaUploadCheck,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { upload, video } from '@wordpress/icons';
+import { upload, media } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
@@ -251,7 +251,7 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 									allowedTypes={ ALLOWED_TYPES }
 									render={ ( { open } ) => (
 										<MenuItem
-											icon={ video }
+											icon={ media }
 											onClick={ open }
 										>
 											{ __( 'Open Media Library' ) }

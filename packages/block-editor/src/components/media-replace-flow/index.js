@@ -23,7 +23,7 @@ import { DOWN } from '@wordpress/keycodes';
 import {
 	postFeaturedImage,
 	upload,
-	video as mediaIcon,
+	media as mediaIcon,
 } from '@wordpress/icons';
 import { compose } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
