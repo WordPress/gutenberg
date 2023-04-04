@@ -7,21 +7,26 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { DropdownMenu, DropdownMenuItem } from '../';
+import {
+	DropdownMenu,
+	DropdownMenuItem,
+	DropdownSubMenu,
+	DropdownMenuSeparator,
+	DropdownMenuCheckboxItem,
+	DropdownMenuGroup,
+	DropdownMenuLabel,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+} from '../';
 import { useCx } from '../../../utils/hooks/use-cx';
 
 // TODO: replace with wordpress/icons
-import {
-	HamburgerMenuIcon,
-	// DotFilledIcon,
-	// CheckIcon,
-	// ChevronRightIcon,
-} from '@radix-ui/react-icons';
+import { HamburgerMenuIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 
 /**
  * WordPress dependencies
  */
-// import { useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 const meta: ComponentMeta< typeof DropdownMenu > = {
 	title: 'Components/RadixDropdown',
@@ -83,9 +88,9 @@ const rightSlot = css`
 `;
 
 export const DropdownMenuDemo = () => {
-	// const [ bookmarksChecked, setBookmarksChecked ] = useState( true );
-	// const [ urlsChecked, setUrlsChecked ] = useState( false );
-	// const [ person, setPerson ] = useState( 'pedro' );
+	const [ bookmarksChecked, setBookmarksChecked ] = useState( true );
+	const [ urlsChecked, setUrlsChecked ] = useState( false );
+	const [ person, setPerson ] = useState( 'pedro' );
 
 	const cx = useCx();
 
@@ -114,75 +119,62 @@ export const DropdownMenuDemo = () => {
 				<div className={ rightSlotClassName }>⇧+⌘+N</div>
 			</DropdownMenuItem>
 
-			{ /* <DropdownMenu.Sub>
-				<DropdownMenu.SubTrigger>
-					More Tools
-					<div className={ rightSlotClassName }>
-						<ChevronRightIcon />
-					</div>
-				</DropdownMenu.SubTrigger>
-				<DropdownMenu.Portal>
-					<DropdownMenu.SubContent
-						sideOffset={ 2 }
-						alignOffset={ -5 }
-					>
-						<DropdownMenu.Item>
-							Save Page As…{ ' ' }
-							<div className={ rightSlotClassName }>⌘+S</div>
-						</DropdownMenu.Item>
-						<DropdownMenu.Item>Create Shortcut…</DropdownMenu.Item>
-						<DropdownMenu.Item>Name Window…</DropdownMenu.Item>
-						<DropdownMenu.Separator />
-						<DropdownMenu.Item>Developer Tools</DropdownMenu.Item>
-					</DropdownMenu.SubContent>
-				</DropdownMenu.Portal>
-			</DropdownMenu.Sub>
+			<DropdownSubMenu
+				trigger={
+					<>
+						More Tools
+						<div className={ rightSlotClassName }>
+							<ChevronRightIcon />
+						</div>
+					</>
+				}
+				subContentProps={ {
+					sideOffset: 2,
+				} }
+			>
+				<DropdownMenuItem>
+					Save Page As…{ ' ' }
+					<div className={ rightSlotClassName }>⌘+S</div>
+				</DropdownMenuItem>
+				<DropdownMenuItem>Create Shortcut…</DropdownMenuItem>
+				<DropdownMenuItem>Name Window…</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem>Developer Tools</DropdownMenuItem>
+			</DropdownSubMenu>
 
-			<DropdownMenu.Separator />
+			<DropdownMenuSeparator />
 
-			<DropdownMenu.CheckboxItem
+			<DropdownMenuCheckboxItem
 				checked={ bookmarksChecked }
 				onCheckedChange={ setBookmarksChecked }
 			>
-				<DropdownMenu.ItemIndicator>
-					<CheckIcon />
-				</DropdownMenu.ItemIndicator>
 				Show Bookmarks <div className={ rightSlotClassName }>⌘+B</div>
-			</DropdownMenu.CheckboxItem>
-			<DropdownMenu.CheckboxItem
-				className="DropdownMenuCheckboxItem"
+			</DropdownMenuCheckboxItem>
+
+			<DropdownMenuCheckboxItem
 				checked={ urlsChecked }
 				onCheckedChange={ setUrlsChecked }
 			>
-				<DropdownMenu.ItemIndicator>
-					<CheckIcon />
-				</DropdownMenu.ItemIndicator>
 				Show Full URLs
-			</DropdownMenu.CheckboxItem>
+			</DropdownMenuCheckboxItem>
 
-			<DropdownMenu.Separator />
+			<DropdownMenuSeparator />
 
-			<DropdownMenu.Label>People</DropdownMenu.Label>
-			<DropdownMenu.RadioGroup
+			<DropdownMenuLabel>People</DropdownMenuLabel>
+			<DropdownMenuRadioGroup
 				value={ person }
 				onValueChange={ setPerson }
 			>
-				<DropdownMenu.RadioItem value="pedro">
-					<DropdownMenu.ItemIndicator>
-						<DotFilledIcon />
-					</DropdownMenu.ItemIndicator>
+				<DropdownMenuRadioItem value="pedro">
 					Pedro Duarte
-				</DropdownMenu.RadioItem>
-				<DropdownMenu.RadioItem
+				</DropdownMenuRadioItem>
+				<DropdownMenuRadioItem
 					className="DropdownMenuRadioItem"
 					value="colm"
 				>
-					<DropdownMenu.ItemIndicator>
-						<DotFilledIcon />
-					</DropdownMenu.ItemIndicator>
 					Colm Tuite
-				</DropdownMenu.RadioItem>
-			</DropdownMenu.RadioGroup> */ }
+				</DropdownMenuRadioItem>
+			</DropdownMenuRadioGroup>
 		</DropdownMenu>
 	);
 };
