@@ -26,7 +26,13 @@ import type { DropdownMenuProps, DropdownSubMenuProps } from './types';
 // - Should we explicitly Pick<> every prop ?
 export const DropdownMenu = forwardRef(
 	(
-		{ children, rootProps, contentProps, trigger }: DropdownMenuProps,
+		{
+			children,
+			rootProps,
+			portalProps,
+			contentProps,
+			trigger,
+		}: DropdownMenuProps,
 		forwardedRef: React.ForwardedRef< any >
 	) => {
 		return (
@@ -34,7 +40,7 @@ export const DropdownMenu = forwardRef(
 				<DropdownMenuPrimitive.Trigger asChild>
 					{ trigger }
 				</DropdownMenuPrimitive.Trigger>
-				<DropdownMenuPrimitive.Portal>
+				<DropdownMenuPrimitive.Portal { ...portalProps }>
 					<DropdownMenuStyled.Content
 						{ ...contentProps }
 						ref={ forwardedRef }
