@@ -13,7 +13,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import {
-	Arrow,
+import type { DropdownMenuProps, DropdownSubMenuProps } from './types';
 	CheckboxItem,
 	Content,
 	Item,
@@ -26,27 +26,6 @@ import {
 	// SubTrigger,
 } from './styles';
 
-type DropdownMenuProps = {
-	/**
-	 * The props passed to the dropdown's root element
-	 */
-	rootProps?: Omit< DropdownMenuPrimitive.DropdownMenuProps, 'children' >;
-	/**
-	 * The props passed to the dropdown's content
-	 */
-	contentProps?: Omit<
-		DropdownMenuPrimitive.DropdownMenuContentProps,
-		'children'
-	>;
-	/**
-	 * The contents rendered inside the trigger
-	 */
-	trigger: React.ReactNode;
-	/**
-	 * The contents of the dropdown
-	 */
-	children: React.ReactNode;
-};
 
 // Observations:
 // - is it enough to have only one forwarded ref? If we have only one, should it be to the root, or to the content?
