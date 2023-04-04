@@ -218,17 +218,17 @@ Called when then selection of the native component changed.
 
 ### iOS
 
-On iOS we use a native view called RCTAztecView that inherits an Aztec TextView class.
-RCTAztecView adds the following custom behaviours to the TextView class:
+On iOS we use a native view called `RCTAztecView` that inherits an Aztec `TextView` class.
+`RCTAztecView` adds the following custom behaviours to the `TextView` class:
 
--   Overlays a UILabel to display placeholder text
+-   Overlays a `UILabel` to display placeholder text
 -   Overrides the `onPaste` method to intercept paste actions and send them to the JS implementation
 -   Overrides the `insertText` and `deleteBackward` methods in order to detect the following keypresses:
     -   delete/backspace to allow handling of custom merge actions
     -   enter/new lines to allow handling of custom split actions
-    -   detection any of triggerKeyCodes
--   Sets the `characterToReplaceLastEmptyLine` property in the HTMLConverter to be zero width space character to avoid the insertion of a newline at the end of the text blocks
--   Disables the `shouldCollapseSpaces` flag in the HTMLConverter in order to maintain all spaces inserted by the user
+    -   detection any of `triggerKeyCodes`
+-   Sets the `characterToReplaceLastEmptyLine` property in the `HTMLConverter` to be zero width space character to avoid the insertion of a newline at the end of the text blocks
+-   Disables the `shouldCollapseSpaces` flag in the `HTMLConverter` in order to maintain all spaces inserted by the user
 
 ### Android
 
