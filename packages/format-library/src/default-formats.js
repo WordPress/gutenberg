@@ -16,7 +16,7 @@ import { unknown } from './unknown';
 import { currentYear } from './current-year';
 import { footnote } from './footnote';
 import { postDate } from './post-date';
-import { time } from './time';
+import { currentYear } from './current-year';
 
 export default [
 	bold,
@@ -34,5 +34,5 @@ export default [
 	currentYear,
 	footnote,
 	postDate,
-	time,
+	currentYear,
 ];

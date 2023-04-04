@@ -78,18 +78,11 @@ export function registerFormatType( name, settings ) {
 		return;
 	}
 
-<<<<<<< HEAD
 	if ( settings.tagName !== 'data' ) {
 		if ( settings.className === null ) {
 			const formatTypeForBareElement = select(
 				richTextStore
 			).getFormatTypeForBareElement( settings.tagName );
-=======
-	if ( settings.className === null && settings.tagName !== 'data' ) {
-		const formatTypeForBareElement = select(
-			richTextStore
-		).getFormatTypeForBareElement( settings.tagName );
->>>>>>> 405bbbda44 (wip)
 
 			if (
 				formatTypeForBareElement &&

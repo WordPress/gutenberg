@@ -19,7 +19,6 @@ export const postDate = {
 	name,
 	title,
 	tagName: 'data',
-	className: null,
 	render: function Render() {
 		const displayType = 'date';
 		const format = '';
@@ -54,7 +53,6 @@ export const postDate = {
 		function onClick() {
 			const newValue = insertObject( value, {
 				type: name,
-				tagName: 'data',
 			} );
 			newValue.start = newValue.end - 1;
 			onChange( newValue );
@@ -62,12 +60,14 @@ export const postDate = {
 		}
 
 		return (
-			<RichTextToolbarButton
-				icon={ formatListNumbered }
-				title={ title }
-				onClick={ onClick }
-				isActive={ isObjectActive }
-			/>
+			<>
+				<RichTextToolbarButton
+					icon={ formatListNumbered }
+					title={ title }
+					onClick={ onClick }
+					isActive={ isObjectActive }
+				/>
+			</>
 		);
 	},
 };
