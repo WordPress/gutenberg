@@ -61,13 +61,19 @@ function append( element, child ) {
 		child = element.ownerDocument.createTextNode( child );
 	}
 
-	const { type, attributes } = child;
+	const { type, attributes, dataset } = child;
 
 	if ( type ) {
 		child = element.ownerDocument.createElement( type );
 
 		for ( const key in attributes ) {
 			child.setAttribute( key, attributes[ key ] );
+		}
+
+		for ( const key in dataset ) {
+			if ( dataset[ key ] ) {
+				child.dataset[ key ] = dataset[ key ];
+			}
 		}
 	}
 
@@ -240,7 +246,10 @@ export function applyValue( future, current ) {
 					}
 				}
 
-				applyValue( futureChild, currentChild );
+				if ( currentChild.nodeName !== 'DATA' ) {
+					applyValue( futureChild, currentChild );
+				}
+
 				future.removeChild( futureChild );
 			}
 		} else {

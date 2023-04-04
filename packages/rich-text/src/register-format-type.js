@@ -62,7 +62,8 @@ export function registerFormatType( name, settings ) {
 	if (
 		( typeof settings.className !== 'string' ||
 			settings.className === '' ) &&
-		settings.className !== null
+		settings.className !== null &&
+		settings.tagName !== 'data'
 	) {
 		window.console.error(
 			'Format class names must be a string, or null to handle bare elements.'
@@ -77,30 +78,32 @@ export function registerFormatType( name, settings ) {
 		return;
 	}
 
-	if ( settings.className === null ) {
-		const formatTypeForBareElement = select(
-			richTextStore
-		).getFormatTypeForBareElement( settings.tagName );
+	if ( settings.tagName !== 'data' ) {
+		if ( settings.className === null ) {
+			const formatTypeForBareElement = select(
+				richTextStore
+			).getFormatTypeForBareElement( settings.tagName );
 
-		if (
-			formatTypeForBareElement &&
-			formatTypeForBareElement.name !== 'core/unknown'
-		) {
-			window.console.error(
-				`Format "${ formatTypeForBareElement.name }" is already registered to handle bare tag name "${ settings.tagName }".`
-			);
-			return;
-		}
-	} else {
-		const formatTypeForClassName = select(
-			richTextStore
-		).getFormatTypeForClassName( settings.className );
+			if (
+				formatTypeForBareElement &&
+				formatTypeForBareElement.name !== 'core/unknown'
+			) {
+				window.console.error(
+					`Format "${ formatTypeForBareElement.name }" is already registered to handle bare tag name "${ settings.tagName }".`
+				);
+				return;
+			}
+		} else {
+			const formatTypeForClassName = select(
+				richTextStore
+			).getFormatTypeForClassName( settings.className );
 
-		if ( formatTypeForClassName ) {
-			window.console.error(
-				`Format "${ formatTypeForClassName.name }" is already registered to handle class name "${ settings.className }".`
-			);
-			return;
+			if ( formatTypeForClassName ) {
+				window.console.error(
+					`Format "${ formatTypeForClassName.name }" is already registered to handle class name "${ settings.className }".`
+				);
+				return;
+			}
 		}
 	}
 

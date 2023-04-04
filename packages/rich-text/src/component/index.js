@@ -19,6 +19,7 @@ import { useSelectObject } from './use-select-object';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useSelectionChangeCompat } from './use-selection-change-compat';
 import { useDelete } from './use-delete';
+import { getFormatType } from '../get-format-type';
 
 export function useRichText( {
 	value = '',
@@ -70,11 +71,21 @@ export function useRichText( {
 			__unstableDomOnly: domOnly,
 			placeholder,
 		} );
+
+		Array.from( ref.current.querySelectorAll( 'data' ) )
+			.filter( ( node ) => !! getFormatType( node.value ) )
+			.forEach( ( node, i ) => {
+				if ( replacementRefs.current[ i ] !== node ) {
+					replacementRefs.current[ i ] = node;
+					forceRender();
+				}
+			} );
 	}
 
 	// Internal values are updated synchronously, unlike props and state.
 	const _value = useRef( value );
 	const record = useRef();
+	const replacementRefs = useRef( [] );
 
 	function setRecordFromProps() {
 		_value.current = value;
@@ -258,6 +269,7 @@ export function useRichText( {
 		getValue: () => record.current,
 		onChange: handleChange,
 		ref: mergedRefs,
+		replacementRefs: replacementRefs.current,
 	};
 }
 

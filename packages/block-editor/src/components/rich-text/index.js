@@ -12,6 +12,7 @@ import {
 	useCallback,
 	forwardRef,
 	createContext,
+	createPortal,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { children as childrenSource } from '@wordpress/blocks';
@@ -281,6 +282,7 @@ function RichTextWrapper(
 		getValue,
 		onChange,
 		ref: richTextRef,
+		replacementRefs,
 	} = useRichText( {
 		value: adjustedValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
@@ -414,6 +416,15 @@ function RichTextWrapper(
 					'rich-text'
 				) }
 			/>
+			{ replacementRefs.map( ( ref ) => {
+				const { render: Render } = formatTypes.find(
+					( { name } ) => name === ref.value
+				);
+				return (
+					ref &&
+					createPortal( <Render attributes={ ref.dataset } />, ref )
+				);
+			} ) }
 		</>
 	);
 }

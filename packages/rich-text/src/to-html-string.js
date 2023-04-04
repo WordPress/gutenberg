@@ -91,16 +91,31 @@ function remove( object ) {
 	return object;
 }
 
-function createElementHTML( { type, attributes, object, children } ) {
+function createElementHTML( { type, attributes, dataset, object, children } ) {
 	let attributeString = '';
 
 	for ( const key in attributes ) {
+		if ( ! attributes[ key ] ) continue;
 		if ( ! isValidAttributeName( key ) ) {
 			continue;
 		}
 
 		attributeString += ` ${ key }="${ escapeAttribute(
 			attributes[ key ]
+		) }"`;
+	}
+
+	for ( const key in dataset ) {
+		if ( ! dataset[ key ] ) continue;
+
+		const htmlKey = key.replace( /[A-Z]/g, '-$&' ).toLowerCase();
+
+		if ( ! isValidAttributeName( htmlKey ) ) {
+			continue;
+		}
+
+		attributeString += ` data-${ htmlKey }="${ escapeAttribute(
+			dataset[ key ]
 		) }"`;
 	}
 
