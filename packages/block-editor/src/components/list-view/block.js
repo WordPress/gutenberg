@@ -13,7 +13,13 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useCallback, memo } from '@wordpress/element';
+import {
+	useState,
+	useRef,
+	useEffect,
+	useCallback,
+	memo,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
@@ -120,7 +126,8 @@ function ListViewBlock( {
 		  )
 		: __( 'Options' );
 
-	const { expand, collapse, BlockSettingsMenu } = useListViewContext();
+	const { isTreeGridMounted, expand, collapse, BlockSettingsMenu } =
+		useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -133,6 +140,15 @@ function ListViewBlock( {
 		'block-editor-list-view-block__menu-cell',
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
+
+	// If ListView has experimental features related to the Persistent List View,
+	// only focus the selected list item on mount; otherwise the list would always
+	// try to steal the focus from the editor canvas.
+	useEffect( () => {
+		if ( ! isTreeGridMounted && isSelected ) {
+			cellRef.current.focus();
+		}
+	}, [] );
 
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
