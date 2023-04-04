@@ -6,46 +6,43 @@ import { css, keyframes } from '@emotion/react';
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
-const slideDownAndFade = keyframes`
-	from {
-		opacity: 0;
-		transform: translateY(-2px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-`;
-const slideLeftAndFade = keyframes`
-	from {
-		opacity: 0;
-		transform: translateX(2px);
-	}
-	to {
-		opacity: 1;
-		transform: translateX(0);
-	}
-`;
-const slideUpAndFade = keyframes`
-	from {
-		opacity: 0;
-		transform: translateY(2px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-`;
-const slideRightAndFade = keyframes`
-	from {
-		opacity: 0;
-		transform: translateX(-2px);
-	}
-	to {
-		opacity: 1;
-		transform: translateX(0);
-	}
-`;
+const ANIMATION_PARAMS = {
+	SLIDE_AMOUNT: '2px',
+	DURATION: '400ms',
+	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
+};
+
+const slideUpAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateY(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateY(0)' },
+} );
+
+const slideRightAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateX(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateX(0)' },
+} );
+
+const slideDownAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateY(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateY(0)' },
+} );
+
+const slideLeftAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateX(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateX(0)' },
+} );
 
 const baseContent = css`
 	min-width: 220px;
@@ -54,8 +51,8 @@ const baseContent = css`
 	padding: 5px;
 	box-shadow: 0px 10px 38px -10px rgba( 22, 23, 24, 0.35 ),
 		0px 10px 20px -15px rgba( 22, 23, 24, 0.2 );
-	animation-duration: 400ms;
-	animation-timing-function: cubic-bezier( 0.16, 1, 0.3, 1 );
+	animation-duration: ${ ANIMATION_PARAMS.DURATION };
+	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
 	will-change: transform, opacity;
 
 	&[data-side='top'] {
