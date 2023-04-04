@@ -54,6 +54,37 @@ export const DropdownMenu = forwardRef(
 	}
 );
 
+export const DropdownSubMenu = forwardRef(
+	(
+		{
+			children,
+			subProps,
+			subContentProps,
+			portalProps,
+			trigger,
+			triggerProps,
+		}: DropdownSubMenuProps,
+		forwardedRef: React.ForwardedRef< any >
+	) => {
+		return (
+			<DropdownMenuPrimitive.Sub { ...subProps }>
+				<DropdownMenuStyled.SubTrigger { ...triggerProps }>
+					{ trigger }
+					{ /* Arrow? */ }
+				</DropdownMenuStyled.SubTrigger>
+				<DropdownMenuPrimitive.Portal { ...portalProps }>
+					<DropdownMenuStyled.SubContent
+						{ ...subContentProps }
+						ref={ forwardedRef }
+					>
+						{ children }
+					</DropdownMenuStyled.SubContent>
+				</DropdownMenuPrimitive.Portal>
+			</DropdownMenuPrimitive.Sub>
+		);
+	}
+);
+
 export const DropdownMenuLabel = DropdownMenuStyled.Label;
 export const DropdownMenuItem = DropdownMenuStyled.Item;
 export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
