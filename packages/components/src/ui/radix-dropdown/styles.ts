@@ -78,7 +78,7 @@ const baseContent = css`
 const baseItem = css`
 	font-size: 13px;
 	line-height: 1;
-	color: hsl( 250, 95%, 76.8% ); // violet11
+	color: hsl( 250, 43%, 48% ); // violet11
 	border-radius: 3px;
 	display: flex;
 	align-items: center;
@@ -90,13 +90,13 @@ const baseItem = css`
 	outline: none;
 
 	&[data-disabled] {
-		color: hsl( 247, 4.8%, 32.5% ); // mauve8
+		color: hsl( 255, 3.7%, 78.8% ); // mauve8
 		pointer-events: none;
 	}
 
 	&[data-highlighted] {
 		background-color: hsl( 252, 56%, 57.5% ); // violet9
-		color: hsl( 250, 20%, 10.2% ); // violet1
+		color: hsl( 255, 65%, 99.4% ); // violet1
 	}
 `;
 
@@ -126,8 +126,8 @@ export const SubTrigger = styled( DropdownMenu.SubTrigger )`
 	${ baseItem }
 
 	&[data-state='open'] {
-		background-color: hsl( 252, 40.1%, 22.5% ); // violet4
-		color: hsl( 250, 95%, 76.8% ); // violet11
+		background-color: hsl( 252, 91.5%, 95.5% ); // violet4
+		color: hsl( 250, 43%, 48% ); // violet11
 	}
 `;
 
@@ -135,12 +135,12 @@ export const Label = styled( DropdownMenu.Label )`
 	padding-left: 25px;
 	font-size: 12px;
 	line-height: 25px;
-	color: hsl( 253, 4%, 63.7% ); // mauve11
+	color: hsl( 252, 4%, 44.8% ); // mauve11
 `;
 
 export const Separator = styled( DropdownMenu.Separator )`
 	height: 1px;
-	background-color: hsl(251, 44.3%, 31.1%) // violet6;
+	background-color: hsl( 252, 77.8%, 89.4% ); // violet6
 	margin: 5px;
 `;
 
