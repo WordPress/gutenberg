@@ -16,6 +16,7 @@ import { Icon, filter } from '@wordpress/icons';
 function DuotoneControl( {
 	colorPalette,
 	duotonePalette,
+	duotonePaletteByOrigin,
 	disableCustomColors,
 	disableCustomDuotone,
 	value,
@@ -67,6 +68,7 @@ function DuotoneControl( {
 					<DuotonePicker
 						colorPalette={ colorPalette }
 						duotonePalette={ duotonePalette }
+						duotonePaletteByOrigin={ duotonePaletteByOrigin }
 						disableCustomColors={ disableCustomColors }
 						disableCustomDuotone={ disableCustomDuotone }
 						value={ value }

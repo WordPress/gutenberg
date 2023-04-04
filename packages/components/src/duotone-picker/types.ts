@@ -20,6 +20,10 @@ export type DuotonePickerProps = {
 	 */
 	duotonePalette: DuotoneColor[];
 	/**
+	 * Array of duotone presets of the form `{ colors: [ '#000000', '#ffffff' ], name: 'Grayscale', slug: 'grayscale' } grouped by origin`.
+	 */
+	duotonePaletteByOrigin?: duotonePaletteByOrigin;
+	/**
 	 * Whether custom colors should be disabled.
 	 *
 	 * @default false
@@ -47,6 +51,12 @@ type Color = {
 	slug: string;
 };
 
+type duotonePaletteByOrigin = {
+	theme: DuotoneColor[];
+	user: DuotoneColor[];
+	default: DuotoneColor[];
+};
+
 type DuotoneColor = {
 	colors: string[];
 	name: string;
@@ -58,4 +68,10 @@ export type DuotoneSwatchProps = {
 	 * An array of colors to show or `null` to show the placeholder swatch icon.
 	 */
 	values?: string[] | null;
+};
+
+export type SinglePaletteProps = DuotonePickerProps & {
+	defaultDark: string;
+	defaultLight: string;
+	unsetOption: any;
 };

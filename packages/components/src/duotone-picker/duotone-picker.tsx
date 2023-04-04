@@ -12,6 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+//import { ColorHeading } from '../color-palette/styles';
 import ColorListPicker from './color-list-picker';
 import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
@@ -19,71 +20,22 @@ import { VStack } from '../v-stack';
 import CustomDuotoneBar from './custom-duotone-bar';
 import { getDefaultColors, getGradientFromCSSColors } from './utils';
 import { Spacer } from '../spacer';
-import type { DuotonePickerProps } from './types';
+import type { DuotonePickerProps, SinglePaletteProps } from './types';
 
-/**
- * ```jsx
- * import { DuotonePicker, DuotoneSwatch } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
- *
- * const DUOTONE_PALETTE = [
- * 	{ colors: [ '#8c00b7', '#fcff41' ], name: 'Purple and yellow', slug: 'purple-yellow' },
- * 	{ colors: [ '#000097', '#ff4747' ], name: 'Blue and red', slug: 'blue-red' },
- * ];
- *
- * const COLOR_PALETTE = [
- * 	{ color: '#ff4747', name: 'Red', slug: 'red' },
- * 	{ color: '#fcff41', name: 'Yellow', slug: 'yellow' },
- * 	{ color: '#000097', name: 'Blue', slug: 'blue' },
- * 	{ color: '#8c00b7', name: 'Purple', slug: 'purple' },
- * ];
- *
- * const Example = () => {
- * 	const [ duotone, setDuotone ] = useState( [ '#000000', '#ffffff' ] );
- * 	return (
- * 		<>
- * 			<DuotonePicker
- * 				duotonePalette={ DUOTONE_PALETTE }
- * 				colorPalette={ COLOR_PALETTE }
- * 				value={ duotone }
- * 				onChange={ setDuotone }
- * 			/>
- * 			<DuotoneSwatch values={ duotone } />
- * 		</>
- * 	);
- * };
- * ```
- */
-function DuotonePicker( {
-	clearable = true,
-	unsetable = true,
+function SinglePalette( {
+	defaultDark,
+	defaultLight,
+	clearable,
+	unsetable,
 	colorPalette,
 	duotonePalette,
 	disableCustomColors,
 	disableCustomDuotone,
 	value,
+	unsetOption,
 	onChange,
-}: DuotonePickerProps ) {
-	const [ defaultDark, defaultLight ] = useMemo(
-		() => getDefaultColors( colorPalette ),
-		[ colorPalette ]
-	);
-
-	const isUnset = value === 'unset';
-
-	const unsetOption = (
-		<CircularOptionPicker.Option
-			key="unset"
-			value="unset"
-			isSelected={ isUnset }
-			tooltipText={ __( 'Unset' ) }
-			className="components-duotone-picker__color-indicator"
-			onClick={ () => {
-				onChange( isUnset ? undefined : 'unset' );
-			} }
-		/>
-	);
-
+}: SinglePaletteProps ) {
+	const colorValue = value && value !== 'unset' ? value : undefined;
 	const options = duotonePalette.map( ( { colors, slug, name } ) => {
 		const style = {
 			background: getGradientFromCSSColors( colors, '135deg' ),
@@ -137,7 +89,7 @@ function DuotonePicker( {
 				<VStack spacing={ 3 }>
 					{ ! disableCustomColors && ! disableCustomDuotone && (
 						<CustomDuotoneBar
-							value={ isUnset ? undefined : value }
+							value={ colorValue }
 							onChange={ onChange }
 						/>
 					) }
@@ -145,7 +97,7 @@ function DuotonePicker( {
 						<ColorListPicker
 							labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
 							colors={ colorPalette }
-							value={ isUnset ? undefined : value }
+							value={ colorValue }
 							disableCustomColors={ disableCustomColors }
 							enableAlpha
 							onChange={ ( newColors ) => {
@@ -169,6 +121,101 @@ function DuotonePicker( {
 				</VStack>
 			</Spacer>
 		</CircularOptionPicker>
+	);
+}
+
+/**
+ * ```jsx
+ * import { DuotonePicker, DuotoneSwatch } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const DUOTONE_PALETTE = [
+ * 	{ colors: [ '#8c00b7', '#fcff41' ], name: 'Purple and yellow', slug: 'purple-yellow' },
+ * 	{ colors: [ '#000097', '#ff4747' ], name: 'Blue and red', slug: 'blue-red' },
+ * ];
+ *
+ * const COLOR_PALETTE = [
+ * 	{ color: '#ff4747', name: 'Red', slug: 'red' },
+ * 	{ color: '#fcff41', name: 'Yellow', slug: 'yellow' },
+ * 	{ color: '#000097', name: 'Blue', slug: 'blue' },
+ * 	{ color: '#8c00b7', name: 'Purple', slug: 'purple' },
+ * ];
+ *
+ * const Example = () => {
+ * 	const [ duotone, setDuotone ] = useState( [ '#000000', '#ffffff' ] );
+ * 	return (
+ * 		<>
+ * 			<DuotonePicker
+ * 				duotonePalette={ DUOTONE_PALETTE }
+ * 				colorPalette={ COLOR_PALETTE }
+ * 				value={ duotone }
+ * 				onChange={ setDuotone }
+ * 			/>
+ * 			<DuotoneSwatch values={ duotone } />
+ * 		</>
+ * 	);
+ * };
+ * ```
+ */
+function DuotonePicker( {
+	clearable = true,
+	unsetable = true,
+	colorPalette,
+	duotonePalette,
+	duotonePaletteByOrigin,
+	disableCustomColors,
+	disableCustomDuotone,
+	value,
+	onChange,
+}: DuotonePickerProps ) {
+	const [ defaultDark, defaultLight ] = useMemo(
+		() => getDefaultColors( colorPalette ),
+		[ colorPalette ]
+	);
+
+	const isUnset = value === 'unset';
+
+	const unsetOption = (
+		<CircularOptionPicker.Option
+			key="unset"
+			value="unset"
+			isSelected={ isUnset }
+			tooltipText={ __( 'Unset' ) }
+			className="components-duotone-picker__color-indicator"
+			onClick={ () => {
+				onChange( isUnset ? undefined : 'unset' );
+			} }
+		/>
+	);
+
+	const paletteCommonProps = {
+		defaultDark,
+		defaultLight,
+		clearable,
+		unsetable,
+		colorPalette,
+		duotonePalette,
+		disableCustomColors,
+		disableCustomDuotone,
+		value,
+		unsetOption,
+		onChange,
+	};
+
+	return (
+		<>
+			{ duotonePaletteByOrigin ? (
+				<SinglePalette
+					{ ...paletteCommonProps }
+					duotonePalette={ duotonePaletteByOrigin.theme }
+				/>
+			) : (
+				<SinglePalette
+					{ ...paletteCommonProps }
+					duotonePalette={ duotonePalette }
+				/>
+			) }
+		</>
 	);
 }
 

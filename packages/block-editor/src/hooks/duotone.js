@@ -72,6 +72,7 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 		useSetting( `${ presetSetting }.theme` ) || EMPTY_ARRAY;
 	const defaultPresets =
 		useSetting( `${ presetSetting }.default` ) || EMPTY_ARRAY;
+
 	return useMemo(
 		() => [
 			...userPresets,
@@ -80,6 +81,24 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 		],
 		[ disableDefault, userPresets, themePresets, defaultPresets ]
 	);
+}
+
+function useGroupedPresets( { presetSetting, defaultSetting } ) {
+	const disableDefault = ! useSetting( defaultSetting );
+	const userPresets =
+		useSetting( `${ presetSetting }.custom` ) || EMPTY_ARRAY;
+	const themePresets =
+		useSetting( `${ presetSetting }.theme` ) || EMPTY_ARRAY;
+	const defaultPresets =
+		useSetting( `${ presetSetting }.default` ) || EMPTY_ARRAY;
+
+	return useMemo( () => {
+		return {
+			user: userPresets,
+			theme: themePresets,
+			default: disableDefault ? EMPTY_ARRAY : defaultPresets,
+		};
+	}, [ disableDefault, userPresets, themePresets, defaultPresets ] );
 }
 
 export function getColorsFromDuotonePreset( duotone, duotonePalette ) {
@@ -112,6 +131,10 @@ function DuotonePanel( { attributes, setAttributes } ) {
 	const duotoneStyle = style?.color?.duotone;
 
 	const duotonePalette = useMultiOriginPresets( {
+		presetSetting: 'color.duotone',
+		defaultSetting: 'color.defaultDuotone',
+	} );
+	const duotonePaletteByOrigin = useGroupedPresets( {
 		presetSetting: 'color.duotone',
 		defaultSetting: 'color.defaultDuotone',
 	} );
@@ -163,7 +186,7 @@ function DuotonePanel( { attributes, setAttributes } ) {
 			</InspectorControls>
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<DuotoneControl
-					duotonePalette={ duotonePalette }
+					duotonePaletteByOrigin={ duotonePaletteByOrigin }
 					colorPalette={ colorPalette }
 					disableCustomDuotone={ true }
 					disableCustomColors={ true }
