@@ -3,8 +3,12 @@
  */
 import styled from '@emotion/styled';
 import { css, keyframes } from '@emotion/react';
-
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+
+/**
+ * Internal dependencies
+ */
+import { COLORS } from '../../utils';
 
 const ANIMATION_PARAMS = {
 	SLIDE_AMOUNT: '2px',
@@ -46,7 +50,7 @@ const slideLeftAndFade = keyframes( {
 
 const baseContent = css`
 	min-width: 220px;
-	background-color: white;
+	background-color: ${ COLORS.ui.background };
 	border-radius: 6px;
 	padding: 5px;
 	box-shadow: 0px 10px 38px -10px rgba( 22, 23, 24, 0.35 ),
@@ -76,7 +80,7 @@ const baseItem = css`
 	all: unset;
 	font-size: 13px;
 	line-height: 1;
-	color: hsl( 250, 43%, 48% ); // violet11
+	color: ${ COLORS.gray[ 900 ] };
 	border-radius: 3px;
 	display: flex;
 	align-items: center;
@@ -88,13 +92,12 @@ const baseItem = css`
 	outline: none;
 
 	&[data-disabled] {
-		color: hsl( 255, 3.7%, 78.8% ); // mauve8
+		color: ${ COLORS.ui.textDisabled };
 		pointer-events: none;
 	}
 
 	&[data-highlighted] {
-		background-color: hsl( 252, 56%, 57.5% ); // violet9
-		color: hsl( 255, 65%, 99.4% ); // violet1
+		color: ${ COLORS.ui.theme };
 	}
 
 	svg {
@@ -129,8 +132,7 @@ export const RadioItem = styled( DropdownMenu.RadioItem )`
 `;
 export const SubTrigger = styled( DropdownMenu.SubTrigger )`
 	&[data-state='open'] {
-		background-color: hsl( 252, 91.5%, 95.5% ); // violet4
-		color: hsl( 250, 43%, 48% ); // violet11
+		color: ${ COLORS.ui.theme };
 	}
 
 	${ baseItem }
@@ -140,12 +142,12 @@ export const Label = styled( DropdownMenu.Label )`
 	padding-left: 25px;
 	font-size: 12px;
 	line-height: 25px;
-	color: hsl( 252, 4%, 44.8% ); // mauve11
+	color: ${ COLORS.ui.textDisabled };
 `;
 
 export const Separator = styled( DropdownMenu.Separator )`
 	height: 1px;
-	background-color: hsl( 252, 77.8%, 89.4% ); // violet6
+	background-color: ${ COLORS.ui.borderDisabled };
 	margin: 5px;
 `;
 
@@ -158,5 +160,5 @@ export const ItemPrefixWrapper = styled.span`
 `;
 
 export const Arrow = styled( DropdownMenu.Arrow )`
-	fill: white;
+	fill: ${ COLORS.ui.background };
 `;

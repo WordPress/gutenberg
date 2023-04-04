@@ -7,6 +7,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
+import { COLORS } from '../../../utils';
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -63,31 +64,27 @@ const iconButton = css`
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	color: hsl( 250, 43%, 48% ); // violet11
+	color: ${ COLORS.gray[ 900 ] };
 	background-color: white;
-	box-shadow: 0 2px 10px hsla( 0, 0%, 0%, 0.141 ); //blackA7
+	box-shadow: 0 2px 10px hsla( 0, 0%, 0%, 0.141 );
 
-	&:hover {
-		background-color: hsl( 252, 96.9%, 97.4% ); // violet3
+	&:hover,
+	&:focus {
+		color: ${ COLORS.ui.theme };
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 2px black;
+		box-shadow: 0 0 0 2px ${ COLORS.ui.theme };
+	}
+
+	svg {
+		fill: currentColor;
 	}
 `;
 
 const rightSlot = css`
 	margin-left: auto;
-	padding-left: 20px;
-	color: hsl( 252, 4%, 44.8% ); // mauve11
-
-	[data-highlighted] > & {
-		color: white;
-	}
-
-	[data-disabled] & {
-		color: hsl( 255, 3.7%, 78.8% ); // mauve8
-	}
+	padding-left: 24px;
 `;
 
 export const DropdownMenuDemo = () => {
