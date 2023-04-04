@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   `DropZone`: Smooth animation ([#49517](https://github.com/WordPress/gutenberg/pull/49517)).
+
 ## 23.7.0 (2023-03-29)
 
 -   `ImageSizeControl`: Remove the "Image Dimensions" label ([#49414](https://github.com/WordPress/gutenberg/pull/49414)).
