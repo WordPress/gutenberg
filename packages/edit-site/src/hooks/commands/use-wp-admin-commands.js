@@ -36,7 +36,6 @@ const getWPAdminCreateCommandLoader = ( postType ) =>
 		}
 
 		const newPostLink = useSelect( ( select ) => {
-			select( editSiteStore ).getEditedPostType();
 			const { getSettings } = unlock( select( editSiteStore ) );
 			return getSettings().newPostLink ?? 'post-new.php';
 		}, [] );
