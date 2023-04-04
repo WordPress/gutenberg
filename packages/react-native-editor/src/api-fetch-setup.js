@@ -3,6 +3,7 @@
  */
 import { fetchRequest, postRequest } from '@wordpress/react-native-bridge';
 import apiFetch from '@wordpress/api-fetch';
+import { applyFilters } from '@wordpress/hooks';
 
 const SUPPORTED_METHODS = [ 'GET', 'POST' ];
 // Please add only wp.org API paths here!
@@ -70,8 +71,15 @@ const fetchHandler = (
 export const isMethodSupported = ( method ) =>
 	SUPPORTED_METHODS.includes( method );
 
-export const isPathSupported = ( path, method ) =>
-	SUPPORTED_ENDPOINTS[ method ].some( ( pattern ) => pattern.test( path ) );
+export const isPathSupported = ( path, method ) => {
+	const supportedEndpoints = applyFilters(
+		'native.supported_endpoints',
+		SUPPORTED_ENDPOINTS
+	);
+	return supportedEndpoints[ method ].some( ( pattern ) =>
+		pattern.test( path )
+	);
+};
 
 export const shouldEnableCaching = ( path ) =>
 	! DISABLED_CACHING_ENDPOINTS.some( ( pattern ) => pattern.test( path ) );

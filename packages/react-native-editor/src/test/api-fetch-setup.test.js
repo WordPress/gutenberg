@@ -1,4 +1,8 @@
 /**
+ * WordPress dependencies
+ */
+import { addFilter } from '@wordpress/hooks';
+/**
  * Internal dependencies
  */
 import { isPathSupported, shouldEnableCaching } from '../api-fetch-setup';
@@ -16,10 +20,10 @@ const supportedPaths = {
 	],
 };
 
+// Made up examples.
 const unsupportedPaths = {
-	GET: [
-		'wp/v1/media/', // Made up example.
-	],
+	GET: [ 'wp/v1/media/' ],
+	POST: [ 'wp/v2/categories' ],
 };
 
 const enabledCachingPaths = [
@@ -49,6 +53,31 @@ describe( 'isPathSupported', () => {
 				expect( isPathSupported( path, 'GET' ) ).toBe( false );
 			} );
 		} );
+	} );
+
+	describe( 'POST requests', () => {
+		unsupportedPaths.POST.forEach( ( path ) => {
+			it( `does not support ${ path }`, () => {
+				expect( isPathSupported( path, 'POST' ) ).toBe( false );
+			} );
+		} );
+	} );
+
+	it( 'checks supported endpoints provided by WP hook', () => {
+		addFilter(
+			'native.supported_endpoints',
+			'gutenberg-mobile',
+			( endpoints ) => {
+				return {
+					GET: [ ...endpoints.GET, /test\/get-endpoint/i ],
+					POST: [ ...endpoints.POST, /test\/post-endpoint/i ],
+				};
+			}
+		);
+		expect( isPathSupported( 'test/get-endpoint', 'GET' ) ).toBe( true );
+		expect( isPathSupported( 'test/post-endpoint', 'POST' ) ).toBe( true );
+		expect( isPathSupported( 'test/bad-endpoint', 'GET' ) ).toBe( false );
+		expect( isPathSupported( 'test/bad-endpoint', 'POST' ) ).toBe( false );
 	} );
 } );
 
