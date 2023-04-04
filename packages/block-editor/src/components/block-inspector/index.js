@@ -37,6 +37,7 @@ import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-c
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
+import CreateNewPostLink from '../create-new-post-link';
 
 function useContentBlocks( blockTypes, block ) {
 	const contentBlocksObjectAux = useMemo( () => {
@@ -326,6 +327,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
 			<BlockVariationTransforms blockClientId={ clientId } />
+			{ blockName === 'core/query' && <CreateNewPostLink /> }
 			{ showTabs && (
 				<InspectorControlsTabs
 					hasBlockStyles={ hasBlockStyles }

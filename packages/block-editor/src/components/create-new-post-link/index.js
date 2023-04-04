@@ -4,14 +4,24 @@
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
+import { useSelect } from '@wordpress/data';
 
-const CreateNewPostLink = ( {
-	attributes: { query: { postType } = {} } = {},
-} ) => {
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+const CreateNewPostLink = () => {
+	const postType = useSelect( ( select ) => {
+		const { getSelectedBlock } = select( blockEditorStore );
+		return getSelectedBlock()?.attributes?.query?.postType;
+	} );
+
 	if ( ! postType ) return null;
 	const newPostUrl = addQueryArgs( 'post-new.php', {
 		post_type: postType,
 	} );
+
 	return (
 		<div className="wp-block-query__create-new-link">
 			{ createInterpolateElement(
