@@ -26,6 +26,7 @@ import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import BlockVariationTransforms from '../block-variation-transforms';
+import BlockCardControls from '../block-card-controls';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
@@ -115,6 +116,7 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
 			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
+			<BlockCardControls.Slot />
 			<VStack
 				spacing={ 1 }
 				padding={ 4 }
@@ -326,6 +328,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
 			<BlockVariationTransforms blockClientId={ clientId } />
+			<BlockCardControls.Slot />
 			{ showTabs && (
 				<InspectorControlsTabs
 					hasBlockStyles={ hasBlockStyles }
