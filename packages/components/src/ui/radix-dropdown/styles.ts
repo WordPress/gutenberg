@@ -149,8 +149,8 @@ export const RadioItem = styled( DropdownMenu.RadioItem )`
 	${ itemLeftSpace }
 `;
 export const SubTrigger = styled( DropdownMenu.SubTrigger )`
-	&[data-state='open'] {
-		color: ${ COLORS.ui.theme };
+	&[data-state='open']:not( [data-highlighted] ) {
+		background-color: ${ COLORS.ui.backgroundDisabled };
 	}
 
 	${ baseItem }
