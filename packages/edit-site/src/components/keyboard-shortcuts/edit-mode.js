@@ -112,7 +112,10 @@ function KeyboardShortcutsEditMode() {
 
 	useShortcut(
 		'core/edit-site/peek',
-		() => {
+		( event ) => {
+			if ( event.target.closest( '.block-editor-block-toolbar' ) ) {
+				return;
+			}
 			hideBlockInterface();
 		},
 		{
