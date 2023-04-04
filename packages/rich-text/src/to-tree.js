@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { renderToString } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 
@@ -291,7 +296,11 @@ export function toTree( {
 		}
 
 		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			if ( ! isEditableTree && replacements[ i ]?.type === 'script' ) {
+			const replacement = replacements[ i ];
+			if ( ! replacement ) continue;
+			const { type, attributes } = replacement;
+			const formatType = getFormatType( type );
+			if ( ! isEditableTree && type === 'script' ) {
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {
@@ -301,14 +310,37 @@ export function toTree( {
 				);
 				append( pointer, {
 					html: decodeURIComponent(
-						replacements[ i ].attributes[ 'data-rich-text-script' ]
+						attributes[ 'data-rich-text-script' ]
 					),
 				} );
+			} else if ( formatType?.tagName === 'data' ) {
+				const clonedAttributes = { ...attributes };
+				let html;
+
+				if ( ! isEditableTree && formatType.saveFallback ) {
+					html = renderToString(
+						formatType.saveFallback( { attributes } )
+					);
+					for ( const key in formatType.attributes ) {
+						delete clonedAttributes[ key ];
+					}
+				}
+
+				pointer = append( getParent( pointer ), {
+					type: 'data',
+					attributes: {
+						contenteditable: isEditableTree ? 'false' : undefined,
+						value: type,
+					},
+					dataset: clonedAttributes,
+				} );
+
+				if ( html ) append( pointer, { html } );
 			} else {
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {
-						...replacements[ i ],
+						...replacement,
 						object: true,
 						isEditableTree,
 					} )

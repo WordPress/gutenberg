@@ -574,3 +574,57 @@ remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
 // Enqueue stored styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
+
+/**
+ * Given a string of HTML, replaces all matching <data> tags with the result of
+ * the callback function.
+ *
+ * @param string   $content  The HTML content.
+ * @param string   $type     The type of data.
+ * @param callable $callback The callback function, called with the data
+ *                           attributes and fallback content.
+ * 
+ * @return string The HTML content with the <data> tags replaced.
+ */
+function replaceDataByType( $content, $type, $callback ) {
+	if ( ! strpos( $content, '<data' ) ) {
+		return $content;
+	}
+
+	return preg_replace_callback(
+		'/<data ([^>]+)>(.*?)<\/data>/',
+		function( $matches ) use ( $type, $callback ) {
+			// shortcode_parse_atts works on HTML attributes too.
+			$attrs = shortcode_parse_atts( $matches[1] );
+			$fallback = $matches[2];
+
+			if ( ! isset( $attrs['value'] ) || $attrs['value'] !== $type ) {
+				return $matches[0];
+			}
+
+			$data = array();
+
+			foreach ( $attrs as $key => $value ) {
+				if ( strpos( $key, 'data-' ) === 0 ) {
+					$data[ substr( $key, 5 ) ] = $value;
+				}
+			}
+
+			return $callback( $data, $fallback );
+		},
+		$content
+	);
+}
+
+add_filter(
+	'render_block',
+	function( $block_content ) {
+		return replaceDataByType(
+			$block_content,
+			'core/current-year',
+			function() {
+				return '<time datetime=' . date( 'Y' ) . '>' . date( 'Y' ) . '</time>';
+			}
+		);
+	}
+);

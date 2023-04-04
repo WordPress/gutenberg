@@ -426,6 +426,35 @@ function createFromElement( {
 			continue;
 		}
 
+		dataFormat: if ( tagName === 'data' ) {
+			const { value: type, dataset } = node;
+			const formatType = select( richTextStore ).getFormatType( type );
+			if ( ! formatType ) break dataFormat;
+			const clonedDataset = { ...dataset };
+			const { attributes } = formatType;
+
+			for ( const key in attributes ) {
+				if ( clonedDataset[ key ] === undefined ) {
+					clonedDataset[ key ] = attributes[ key ]( node );
+				}
+			}
+
+			const value = {
+				formats: [ , ],
+				replacements: [
+					{
+						type,
+						attributes: clonedDataset,
+						tagName,
+					},
+				],
+				text: OBJECT_REPLACEMENT_CHARACTER,
+			};
+			accumulateSelection( accumulator, node, range, value );
+			mergePair( accumulator, value );
+			continue;
+		}
+
 		if ( tagName === 'br' ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			mergePair( accumulator, create( { text: '\n' } ) );
