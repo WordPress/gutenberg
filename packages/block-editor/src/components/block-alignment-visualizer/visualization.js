@@ -73,6 +73,7 @@ export default function Visualization( {
 						color: white;
 						font-size: 12px;
 						min-width: 32px;
+						width: max-content;
 						opacity: 0;
 						padding: 4px 8px;
 						pointer-events: none;
