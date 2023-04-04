@@ -37,12 +37,6 @@ export type PopoverProps = {
 	 */
 	__unstableSlotName?: string;
 	/**
-	 * Should the popover render inline (not in a slot).
-	 *
-	 * @default false
-	 */
-	__unstableInline?: boolean;
-	/**
 	 * The element that should be used by the popover as its anchor. It can either
 	 * be an `Element` or, alternatively, a `VirtualElement` — ie. an object with
 	 * the `getBoundingClientRect()` and the `ownerDocument` properties defined.

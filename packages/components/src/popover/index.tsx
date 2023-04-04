@@ -180,7 +180,6 @@ const UnforwardedPopover = (
 		expandOnMobile,
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
-		__unstableInline = false,
 		flip = true,
 		resize = true,
 		shift = false,
@@ -565,14 +564,12 @@ const UnforwardedPopover = (
 		</AnimatedWrapper>
 	);
 
-	if ( ! __unstableInline ) {
-		if ( slot.ref ) {
-			content = <Fill name={ slotName }>{ content }</Fill>;
-		}
+	if ( slot.ref ) {
+		content = <Fill name={ slotName }>{ content }</Fill>;
+	}
 
-		if ( anchorRef || anchorRect || anchor ) {
-			return content;
-		}
+	if ( anchorRef || anchorRect || anchor ) {
+		return content;
 	}
 
 	return <span ref={ anchorRefFallback }>{ content }</span>;
