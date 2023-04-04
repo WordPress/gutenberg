@@ -35,7 +35,7 @@ export default function useKeyboardOffset(
 		clearTimeout( timeoutRef.current );
 		timeoutRef.current = setTimeout( () => {
 			setKeyboardOffset( 0 );
-		}, 500 );
+		}, 200 );
 	}, [ shouldPreventAutomaticScroll ] );
 
 	const onKeyboardDidShow = useCallback( ( { endCoordinates } ) => {
@@ -43,11 +43,20 @@ export default function useKeyboardOffset(
 		setKeyboardOffset( endCoordinates.height );
 	}, [] );
 
+	const onKeyboardWillShow = useCallback( () => {
+		clearTimeout( timeoutRef.current );
+	}, [] );
+
 	useEffect( () => {
+		let willShowSubscription;
 		let showSubscription;
 		let hideSubscription;
 
 		if ( scrollEnabled ) {
+			willShowSubscription = Keyboard.addListener(
+				'keyboardWillShow',
+				onKeyboardWillShow
+			);
 			showSubscription = Keyboard.addListener(
 				'keyboardDidShow',
 				onKeyboardDidShow
@@ -57,15 +66,22 @@ export default function useKeyboardOffset(
 				onKeyboardDidHide
 			);
 		} else {
+			willShowSubscription?.remove();
 			showSubscription?.remove();
 			hideSubscription?.remove();
 		}
 
 		return () => {
 			clearTimeout( timeoutRef.current );
+			willShowSubscription?.remove();
 			showSubscription?.remove();
 			hideSubscription?.remove();
 		};
-	}, [ scrollEnabled, onKeyboardDidShow, onKeyboardDidHide ] );
+	}, [
+		onKeyboardDidHide,
+		onKeyboardDidShow,
+		onKeyboardWillShow,
+		scrollEnabled,
+	] );
 	return [ keyboardOffset ];
 }
