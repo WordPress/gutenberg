@@ -15,7 +15,7 @@
 	z-index: z-index(".edit-site-layout__hub");
 
 	.edit-site-layout.is-full-canvas.is-edit-mode & {
-		width: auto;
+		width: $grid-unit-80;
 		padding-right: 0;
 	}
 

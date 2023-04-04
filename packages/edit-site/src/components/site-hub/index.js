@@ -100,10 +100,10 @@ const SiteHub = forwardRef( ( props, ref ) => {
 						<motion.div
 							initial={ false }
 							animate={ {
-								scale: canvasMode === 'view' ? 0.5 : 1,
+								scale: canvasMode === 'view' ? 0.5 : 1.04,
 							} }
 							whileHover={ {
-								scale: canvasMode === 'view' ? 0.5 : 1.04,
+								scale: canvasMode === 'view' ? 0.5 : 1,
 							} }
 							transition={ {
 								type: 'tween',

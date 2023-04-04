@@ -10,7 +10,7 @@
 }
 
 .edit-site-site-hub__view-mode-toggle-container {
-	height: $header-height;
+	height: calc(#{$header-height} - 1px);
 	width: $header-height;
 	flex-shrink: 0;
 	background: $gray-900;
