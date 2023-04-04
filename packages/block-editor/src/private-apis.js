@@ -4,6 +4,7 @@
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
+import BlockCardControls from './components/block-card-controls';
 import OffCanvasEditor from './components/off-canvas-editor';
 import LeafMoreMenu from './components/off-canvas-editor/leaf-more-menu';
 import ResizableBoxPopover from './components/resizable-box-popover';
@@ -22,4 +23,5 @@ lock( privateApis, {
 	PrivateInserter,
 	PrivateListView,
 	ResizableBoxPopover,
+	BlockCardControls,
 } );
