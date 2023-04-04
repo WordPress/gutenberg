@@ -20,13 +20,16 @@ import {
 } from '../';
 import { useCx } from '../../../utils/hooks/use-cx';
 
-// TODO: replace with wordpress/icons
-import { HamburgerMenuIcon, ChevronRightIcon } from '@radix-ui/react-icons';
-
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { chevronRightSmall, menu } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import Icon from '../../../icon';
 
 const meta: ComponentMeta< typeof DropdownMenu > = {
 	title: 'Components/RadixDropdown',
@@ -103,7 +106,7 @@ export const DropdownMenuDemo = () => {
 					className={ cx( iconButton ) }
 					aria-label="Customise options"
 				>
-					<HamburgerMenuIcon />
+					<Icon icon={ menu } size={ 20 } />
 				</button>
 			}
 			contentProps={ { sideOffset: 5 } }
@@ -125,7 +128,7 @@ export const DropdownMenuDemo = () => {
 						<>
 							More Tools
 							<div className={ rightSlotClassName }>
-								<ChevronRightIcon />
+								<Icon icon={ chevronRightSmall } size={ 28 } />
 							</div>
 						</>
 					}

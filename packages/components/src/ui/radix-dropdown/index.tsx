@@ -2,20 +2,18 @@
  * External dependencies
  */
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import {
-	CheckIcon,
-	DotFilledIcon,
-	DividerHorizontalIcon,
-} from '@radix-ui/react-icons';
 
 /**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { SVG, Circle } from '@wordpress/primitives';
+import { check, lineSolid } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import Icon from '../../icon';
 import * as DropdownMenuStyled from './styles';
 import type { DropdownMenuProps, DropdownSubMenuProps } from './types';
 
@@ -114,9 +112,11 @@ export const DropdownMenuCheckboxItem = forwardRef(
 				{ children }
 				<DropdownMenuStyled.ItemIndicator>
 					{ props.checked === 'indeterminate' && (
-						<DividerHorizontalIcon />
+						<Icon icon={ lineSolid } size={ 20 } />
 					) }
-					{ props.checked === true && <CheckIcon /> }
+					{ props.checked === true && (
+						<Icon icon={ check } size={ 20 } />
+					) }
 				</DropdownMenuStyled.ItemIndicator>
 			</DropdownMenuStyled.CheckboxItem>
 		);
@@ -124,6 +124,12 @@ export const DropdownMenuCheckboxItem = forwardRef(
 );
 
 export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
+
+const radioDot = (
+	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+		<Circle cx={ 12 } cy={ 12 } r={ 3 } fill="currentColor"></Circle>
+	</SVG>
+);
 
 export const DropdownMenuRadioItem = forwardRef(
 	(
@@ -137,7 +143,7 @@ export const DropdownMenuRadioItem = forwardRef(
 			<DropdownMenuStyled.RadioItem { ...props } ref={ forwardedRef }>
 				{ children }
 				<DropdownMenuStyled.ItemIndicator>
-					<DotFilledIcon />
+					<Icon icon={ radioDot } size={ 20 } />
 				</DropdownMenuStyled.ItemIndicator>
 			</DropdownMenuStyled.RadioItem>
 		);
