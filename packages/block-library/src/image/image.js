@@ -29,7 +29,7 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
-	__experimentalResizableAlignmentControls as ResizableAlignmentControls,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	useEffect,
@@ -60,6 +60,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import { isExternalImage } from './edit';
+import { unlock } from '../private-apis';
 
 /**
  * Module constants
@@ -81,6 +82,7 @@ export default function Image( {
 	clientId,
 	isContentLocked,
 } ) {
+	const { ResizableAlignmentControls } = unlock( blockEditorPrivateApis );
 	const {
 		url = '',
 		alt,
