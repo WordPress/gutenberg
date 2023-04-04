@@ -2,7 +2,11 @@
  * External dependencies
  */
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { CheckIcon, DividerHorizontalIcon } from '@radix-ui/react-icons';
+import {
+	CheckIcon,
+	DotFilledIcon,
+	DividerHorizontalIcon,
+} from '@radix-ui/react-icons';
 
 /**
  * WordPress dependencies
@@ -84,7 +88,7 @@ export const DropdownMenuRadioItem = forwardRef(
 			<DropdownMenuStyled.RadioItem { ...props } ref={ forwardedRef }>
 				{ children }
 				<DropdownMenuStyled.ItemIndicator>
-					<CheckIcon />
+					<DotFilledIcon />
 				</DropdownMenuStyled.ItemIndicator>
 			</DropdownMenuStyled.RadioItem>
 		);
