@@ -473,7 +473,7 @@ function block_core_navigation_get_fallback_blocks() {
 
 	// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
 	// In this case default empty blocks.
-	$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : array();
+	$fallback_blocks = ! empty( $fallback_blocks ) ? $fallback_blocks : array();
 
 	/**
 	 * Filters the fallback experience for the Navigation block.
