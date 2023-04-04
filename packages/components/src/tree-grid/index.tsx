@@ -91,8 +91,7 @@ function UnforwardedTreeGrid(
 			const canExpandCollapse = 0 === currentColumnIndex;
 			const cannotFocusNextColumn =
 				canExpandCollapse &&
-				( activeRow.getAttribute( 'data-expanded' ) === 'false' ||
-					activeRow.getAttribute( 'aria-expanded' ) === 'false' ) &&
+				activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
 				keyCode === RIGHT;
 
 			if ( ( [ LEFT, RIGHT ] as number[] ).includes( keyCode ) ) {
@@ -113,8 +112,6 @@ function UnforwardedTreeGrid(
 						// Left:
 						// If a row is focused, and it is expanded, collapses the current row.
 						if (
-							activeRow.getAttribute( 'data-expanded' ) ===
-								'true' ||
 							activeRow.getAttribute( 'aria-expanded' ) === 'true'
 						) {
 							onCollapseRow( activeRow );
@@ -154,10 +151,8 @@ function UnforwardedTreeGrid(
 						// Right:
 						// If a row is focused, and it is collapsed, expands the current row.
 						if (
-							activeRow.getAttribute( 'data-expanded' ) ===
-								'false' ||
 							activeRow.getAttribute( 'aria-expanded' ) ===
-								'false'
+							'false'
 						) {
 							onExpandRow( activeRow );
 							event.preventDefault();

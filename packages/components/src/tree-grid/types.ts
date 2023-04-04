@@ -24,10 +24,6 @@ export type TreeGridRowProps = {
 	 * it has no other built-in behavior.
 	 */
 	isExpanded?: boolean;
-	/**
-	 * An optional value that designates whether a row should have aria-expanded attribute or if this should be managed in the parent component.
-	 */
-	disableAriaExpanded?: boolean;
 };
 
 type RovingTabIndexItemPassThruProps = {

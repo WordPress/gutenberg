@@ -16,7 +16,6 @@ function UnforwardedTreeGridRow(
 		positionInSet,
 		setSize,
 		isExpanded,
-		disableAriaExpanded,
 		...props
 	}: WordPressComponentProps< TreeGridRowProps, 'tr', false >,
 	ref: React.ForwardedRef< HTMLTableRowElement >
@@ -29,7 +28,7 @@ function UnforwardedTreeGridRow(
 			aria-level={ level }
 			aria-posinset={ positionInSet }
 			aria-setsize={ setSize }
-			aria-expanded={ disableAriaExpanded ? undefined : isExpanded }
+			aria-expanded={ isExpanded }
 		>
 			{ children }
 		</tr>
