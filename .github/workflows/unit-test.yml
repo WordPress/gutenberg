@@ -98,7 +98,9 @@ jobs:
                 wordpress: [''] # Latest WordPress version.
                 include:
                     # Test with the previous WP version.
+                    - php: '5.6'
                     - php: '7.4'
+                    - php: '8.2'
                       wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
 
         env:
