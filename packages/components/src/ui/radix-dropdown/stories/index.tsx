@@ -13,7 +13,7 @@ import {
 	DropdownSubMenu,
 	DropdownMenuSeparator,
 	DropdownMenuCheckboxItem,
-	// DropdownMenuGroup,
+	DropdownMenuGroup,
 	DropdownMenuLabel,
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
@@ -108,63 +108,68 @@ export const DropdownMenuDemo = () => {
 			}
 			contentProps={ { sideOffset: 5 } }
 		>
-			<DropdownMenuItem>
-				New Tab <div className={ rightSlotClassName }>⌘+T</div>
-			</DropdownMenuItem>
-			<DropdownMenuItem>
-				New Window <div className={ rightSlotClassName }>⌘+N</div>
-			</DropdownMenuItem>
-			<DropdownMenuItem disabled>
-				New Private Window{ ' ' }
-				<div className={ rightSlotClassName }>⇧+⌘+N</div>
-			</DropdownMenuItem>
-
-			<DropdownSubMenu
-				trigger={
-					<>
-						More Tools
-						<div className={ rightSlotClassName }>
-							<ChevronRightIcon />
-						</div>
-					</>
-				}
-				subContentProps={ {
-					sideOffset: 2,
-				} }
-			>
+			<DropdownMenuGroup>
 				<DropdownMenuItem>
-					Save Page As…{ ' ' }
-					<div className={ rightSlotClassName }>⌘+S</div>
+					New Tab <div className={ rightSlotClassName }>⌘+T</div>
 				</DropdownMenuItem>
-				<DropdownMenuItem>Create Shortcut…</DropdownMenuItem>
-				<DropdownMenuItem>Name Window…</DropdownMenuItem>
+				<DropdownMenuItem>
+					New Window <div className={ rightSlotClassName }>⌘+N</div>
+				</DropdownMenuItem>
+				<DropdownMenuItem disabled>
+					New Private Window{ ' ' }
+					<div className={ rightSlotClassName }>⇧+⌘+N</div>
+				</DropdownMenuItem>
+
+				<DropdownSubMenu
+					trigger={
+						<>
+							More Tools
+							<div className={ rightSlotClassName }>
+								<ChevronRightIcon />
+							</div>
+						</>
+					}
+					subContentProps={ {
+						sideOffset: 2,
+					} }
+				>
+					<DropdownMenuItem>
+						Save Page As…{ ' ' }
+						<div className={ rightSlotClassName }>⌘+S</div>
+					</DropdownMenuItem>
+					<DropdownMenuItem>Create Shortcut…</DropdownMenuItem>
+					<DropdownMenuItem>Name Window…</DropdownMenuItem>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem>Developer Tools</DropdownMenuItem>
+				</DropdownSubMenu>
+
 				<DropdownMenuSeparator />
-				<DropdownMenuItem>Developer Tools</DropdownMenuItem>
-			</DropdownSubMenu>
+			</DropdownMenuGroup>
 
-			<DropdownMenuSeparator />
+			<DropdownMenuGroup>
+				<DropdownMenuCheckboxItem
+					checked={ bookmarksChecked }
+					onCheckedChange={ setBookmarksChecked }
+				>
+					Show Bookmarks{ ' ' }
+					<div className={ rightSlotClassName }>⌘+B</div>
+				</DropdownMenuCheckboxItem>
 
-			<DropdownMenuCheckboxItem
-				checked={ bookmarksChecked }
-				onCheckedChange={ setBookmarksChecked }
-			>
-				Show Bookmarks <div className={ rightSlotClassName }>⌘+B</div>
-			</DropdownMenuCheckboxItem>
+				<DropdownMenuCheckboxItem
+					checked={ urlsChecked }
+					onCheckedChange={ setUrlsChecked }
+				>
+					Show Full URLs
+				</DropdownMenuCheckboxItem>
 
-			<DropdownMenuCheckboxItem
-				checked={ urlsChecked }
-				onCheckedChange={ setUrlsChecked }
-			>
-				Show Full URLs
-			</DropdownMenuCheckboxItem>
+				<DropdownMenuSeparator />
+			</DropdownMenuGroup>
 
-			<DropdownMenuSeparator />
-
-			<DropdownMenuLabel>People</DropdownMenuLabel>
 			<DropdownMenuRadioGroup
 				value={ person }
 				onValueChange={ setPerson }
 			>
+				<DropdownMenuLabel>People</DropdownMenuLabel>
 				<DropdownMenuRadioItem value="pedro">
 					Pedro Duarte
 				</DropdownMenuRadioItem>
