@@ -77,7 +77,7 @@ function KeyboardShortcutsRegister() {
 			name: 'core/edit-site/peek',
 			category: 'global',
 			description: __(
-				'Hold down to hide the block toolbar and see blocks more clearly'
+				'Hold to hide the block toolbar and see blocks more clearly.'
 			),
 			keyCombination: {
 				modifier: 'alt',
