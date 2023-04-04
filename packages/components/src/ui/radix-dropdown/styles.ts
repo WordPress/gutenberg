@@ -9,6 +9,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
  * Internal dependencies
  */
 import { COLORS } from '../../utils';
+import { space } from '../utils/space';
 
 const ANIMATION_PARAMS = {
 	SLIDE_AMOUNT: '2px',
@@ -53,7 +54,7 @@ const baseContent = css`
 	background-color: ${ COLORS.ui.background };
 	border: 1px solid ${ COLORS.ui.border };
 	border-radius: 6px;
-	padding: 5px;
+	padding: ${ space( 2 ) };
 	box-shadow: 0px 10px 38px -10px rgba( 22, 23, 24, 0.35 ),
 		0px 10px 20px -15px rgba( 22, 23, 24, 0.2 );
 	animation-duration: ${ ANIMATION_PARAMS.DURATION };
@@ -85,10 +86,9 @@ const baseItem = css`
 	border-radius: 3px;
 	display: flex;
 	align-items: center;
-	height: 25px;
-	padding: 0 5px;
+	height: ${ space( 9 ) };
+	padding: 0 ${ space( 2 ) };
 	position: relative;
-	padding-left: 25px;
 	user-select: none;
 	outline: none;
 
@@ -106,10 +106,14 @@ const baseItem = css`
 	}
 `;
 
+const itemLeftSpace = css`
+	padding-left: ${ space( 8 ) };
+`;
+
 const itemPrefix = css`
 	position: absolute;
 	left: 0;
-	width: 25px;
+	width: ${ space( 8 ) };
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -124,12 +128,19 @@ export const SubContent = styled( DropdownMenu.SubContent )`
 
 export const Item = styled( DropdownMenu.Item )`
 	${ baseItem }
+
+	/* Should the standard item have larger left padding ? */
+	${ itemLeftSpace }
 `;
 export const CheckboxItem = styled( DropdownMenu.CheckboxItem )`
 	${ baseItem }
+
+	${ itemLeftSpace }
 `;
 export const RadioItem = styled( DropdownMenu.RadioItem )`
 	${ baseItem }
+
+	${ itemLeftSpace }
 `;
 export const SubTrigger = styled( DropdownMenu.SubTrigger )`
 	&[data-state='open'] {
@@ -137,19 +148,22 @@ export const SubTrigger = styled( DropdownMenu.SubTrigger )`
 	}
 
 	${ baseItem }
+
+	/* Should the standard item have larger left padding ? */
+	${ itemLeftSpace }
 `;
 
 export const Label = styled( DropdownMenu.Label )`
-	padding-left: 25px;
+	${ itemLeftSpace }
 	font-size: 12px;
-	line-height: 25px;
+	line-height: ${ space( 7 ) };
 	color: ${ COLORS.ui.textDisabled };
 `;
 
 export const Separator = styled( DropdownMenu.Separator )`
 	height: 1px;
 	background-color: ${ COLORS.ui.borderDisabled };
-	margin: 5px;
+	margin: ${ space( 2 ) };
 `;
 
 export const ItemIndicator = styled( DropdownMenu.ItemIndicator )`
