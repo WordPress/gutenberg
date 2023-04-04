@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useCallback } from '@wordpress/element';
+import { useCallback, forwardRef } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-/**
- * WordPress dependencies
- */
 import { Button, ToolbarItem } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -20,8 +17,7 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-export default function InserterButton() {
-	const inserterButton = useRef();
+function InserterButton( {}, inserterButton ) {
 	const { setIsInserterOpened } = useDispatch( editPostStore );
 	const { isInserterEnabled, isInserterOpened, showIconLabels } = useSelect(
 		( select ) => {
@@ -83,3 +79,5 @@ export default function InserterButton() {
 		/>
 	);
 }
+
+export default forwardRef( InserterButton );

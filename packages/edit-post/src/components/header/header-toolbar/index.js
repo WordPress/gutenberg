@@ -8,7 +8,7 @@ import { NavigableToolbar, ToolSelector } from '@wordpress/block-editor';
 import { EditorHistoryRedo, EditorHistoryUndo } from '@wordpress/editor';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { listView } from '@wordpress/icons';
-import { useCallback } from '@wordpress/element';
+import { useCallback, forwardRef } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
@@ -17,7 +17,10 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editPostStore } from '../../../store';
 import InserterButton from '../inserter-button';
 
-function HeaderToolbar( { BlockToolbarToggle, hasSelectedBlocks } ) {
+function HeaderToolbar(
+	{ BlockToolbarToggle, hasSelectedBlocks },
+	inserterButtonRef
+) {
 	const { setIsListViewOpened } = useDispatch( editPostStore );
 	const {
 		isTextModeEnabled,
@@ -72,7 +75,7 @@ function HeaderToolbar( { BlockToolbarToggle, hasSelectedBlocks } ) {
 			aria-label={ toolbarAriaLabel }
 		>
 			<div className="edit-post-header-document-toolbar__left">
-				<InserterButton />
+				<InserterButton ref={ inserterButtonRef } />
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
 						{ isLargeViewport && (
@@ -104,4 +107,4 @@ function HeaderToolbar( { BlockToolbarToggle, hasSelectedBlocks } ) {
 	);
 }
 
-export default HeaderToolbar;
+export default forwardRef( HeaderToolbar );

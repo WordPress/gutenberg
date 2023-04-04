@@ -81,13 +81,15 @@
 }
 
 .edit-post-header-block-toolbar {
+	position: absolute;
+	left: $grid-unit-70 + $grid-unit-05;
 	display: inline-flex;
 	flex-grow: 1;
 	align-items: center;
 	border: none;
 	padding-left: 24px; //compensates for the edit-post-header-document-toolbar__left left padding
-	height: 32px;
-	overflow: hidden; //limits the height of the separators
+	// height: 32px;
+	// overflow: hidden; //limits the height of the separators
 
 	> .edit-post-header-toolbar__inserter-toggle {
 		display: inline-flex;

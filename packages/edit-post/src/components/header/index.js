@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
@@ -34,9 +34,13 @@ import { store as editPostStore } from '../../store';
 import TemplateTitle from './template-title';
 import InserterButton from './inserter-button';
 
-function MaybeHide( { children, isHidden } ) {
+function MaybeHide( { children, isHidden, onFocus } ) {
 	if ( isHidden ) {
-		return <div className="maybeHide">{ children }</div>;
+		return (
+			<div onFocus={ onFocus } className="maybeHide">
+				{ children }
+			</div>
+		);
 	}
 	return children;
 }
@@ -108,9 +112,25 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	const [ headerToolbar, setHeaderToolbar ] = useState( 'document' );
 
+	const documentToolsInserterButton = useRef();
+	const blockToolsInserterButton = useRef();
+
 	const blockInformation = useBlockDisplayInformation(
 		selectedBlockClientId
 	);
+
+	useEffect( () => {
+		if (
+			headerToolbar === 'document' &&
+			documentToolsInserterButton.current
+		) {
+			documentToolsInserterButton.current.focus();
+		}
+
+		if ( headerToolbar === 'block' && blockToolsInserterButton.current ) {
+			blockToolsInserterButton.current.focus();
+		}
+	}, [ headerToolbar ] );
 
 	useEffect( () => {
 		if ( isNavigationMode ) {
@@ -155,38 +175,23 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				{ hasFixedToolbar &&
 					! isNavigationMode &&
 					isDesktopViewport && (
-						<>
-							<MaybeHide isHidden={ headerToolbar === 'block' }>
-								<HeaderToolbar
-									hasSelectedBlocks={ hasSelectedBlocks }
-									BlockToolbarToggle={ () => (
-										<ShowBlockToolbarButton
-											onClick={ () =>
-												setHeaderToolbar( 'block' )
-											}
-											icon={ blockInformation.icon }
-										/>
-									) }
-								/>
-							</MaybeHide>
-							{ hasSelectedBlocks &&
-								headerToolbar === 'block' && (
-									<NavigableToolbar
-										className="edit-post-header-block-toolbar"
-										aria-label={ blockToolbarAriaLabel }
-									>
-										<InserterButton />
-										<ShowDocumentToolbarButton
-											onClick={ () =>
-												setHeaderToolbar( 'document' )
-											}
-										/>
-										<BlockToolbar
-											hideDragHandle={ hasFixedToolbar }
-										/>
-									</NavigableToolbar>
+						<MaybeHide
+							isHidden={ headerToolbar === 'block' }
+							onFocus={ () => setHeaderToolbar( 'document' ) }
+						>
+							<HeaderToolbar
+								ref={ documentToolsInserterButton }
+								hasSelectedBlocks={ hasSelectedBlocks }
+								BlockToolbarToggle={ () => (
+									<ShowBlockToolbarButton
+										onClick={ () =>
+											setHeaderToolbar( 'block' )
+										}
+										icon={ blockInformation.icon }
+									/>
 								) }
-						</>
+							/>
+						</MaybeHide>
 					) }
 				<TemplateTitle />
 			</motion.div>
@@ -229,6 +234,21 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					<MoreMenu showIconLabels={ showIconLabels } />
 				) }
 			</motion.div>
+			<MaybeHide
+				isHidden={ headerToolbar === 'document' }
+				onFocus={ () => setHeaderToolbar( 'block' ) }
+			>
+				<NavigableToolbar
+					className="edit-post-header-block-toolbar"
+					aria-label={ blockToolbarAriaLabel }
+				>
+					<InserterButton ref={ blockToolsInserterButton } />
+					<ShowDocumentToolbarButton
+						onClick={ () => setHeaderToolbar( 'document' ) }
+					/>
+					<BlockToolbar hideDragHandle={ hasFixedToolbar } />
+				</NavigableToolbar>
+			</MaybeHide>
 		</div>
 	);
 }
