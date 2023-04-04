@@ -99,6 +99,10 @@ const baseItem = css`
 		background-color: hsl( 252, 56%, 57.5% ); // violet9
 		color: hsl( 255, 65%, 99.4% ); // violet1
 	}
+
+	svg {
+		fill: currentColor;
+	}
 `;
 
 export const Content = styled( DropdownMenu.Content )`
