@@ -151,7 +151,7 @@ This is the canonical list of keyboard shortcuts:
 			<td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>Z</kbd></td>
 		</tr>
 		<tr>
-			<td>Show or hide the settings sidebar.</td>
+			<td>Show or hide the Settings.</td>
 			<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>,</kbd></td>
 			<td><kbd>⇧</kbd><kbd>⌘</kbd><kbd>,</kbd></td>
 		</tr>

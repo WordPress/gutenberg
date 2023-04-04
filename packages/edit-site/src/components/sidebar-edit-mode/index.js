@@ -69,7 +69,7 @@ export function SidebarComplementaryAreaFills() {
 				identifier={ sidebarName }
 				title={ __( 'Settings' ) }
 				icon={ isRTL() ? drawerLeft : drawerRight }
-				closeLabel={ __( 'Close settings' ) }
+				closeLabel={ __( 'Close Settings' ) }
 				header={ <SettingsHeader sidebarName={ sidebarName } /> }
 				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
 			>

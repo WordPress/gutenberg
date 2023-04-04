@@ -61,7 +61,7 @@ test.describe( 'Site editor title', () => {
 			'role=treegrid[name="Block navigation structure"i]'
 		);
 		await listView.locator( 'role=gridcell >> text="header"' ).click();
-		await page.click( 'role=button[name="Close List View Sidebar"i]' );
+		await page.click( 'role=button[name="Close"i]' );
 
 		// Evaluate the document settings secondary title.
 		const secondaryTitle = page.locator(
