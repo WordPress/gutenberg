@@ -80,7 +80,7 @@ function KeyboardShortcutsRegister() {
 				'Hold down to hide the block toolbar and see blocks more clearly'
 			),
 			keyCombination: {
-				modifier: 'ctrlShift',
+				modifier: 'alt',
 			},
 		} );
 
