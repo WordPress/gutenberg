@@ -134,6 +134,7 @@ export const DropdownMenuDemo = () => {
 					}
 					subContentProps={ {
 						sideOffset: 2,
+						alignOffset: -5,
 					} }
 				>
 					<DropdownMenuItem>
