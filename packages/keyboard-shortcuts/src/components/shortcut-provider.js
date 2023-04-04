@@ -32,7 +32,7 @@ export function ShortcutProvider( props ) {
 		if ( props.onKeyUp ) props.onKeyUp( event );
 
 		for ( const keyboardShortcut of keyboardShortcuts.current ) {
-			keyboardShortcut?.onKeyDown( event );
+			keyboardShortcut.onKeyUp( event );
 		}
 	}
 

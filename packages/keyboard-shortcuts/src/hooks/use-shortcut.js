@@ -29,7 +29,7 @@ export default function useShortcut(
 	const onKeyDownRef = useRef();
 	const onKeyUpRef = useRef();
 	onKeyDownRef.current = callback;
-	onKeyDownRef.current = onKeyUp;
+	onKeyUpRef.current = onKeyUp;
 
 	useEffect( () => {
 		if ( isDisabled ) {
