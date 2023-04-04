@@ -54,12 +54,12 @@ const iconButton = css`
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	color: hsl( 250, 95%, 76.8% ); // violet11
+	color: hsl( 250, 43%, 48% ); // violet11
 	background-color: white;
 	box-shadow: 0 2px 10px hsla( 0, 0%, 0%, 0.141 ); //blackA7
 
 	&:hover {
-		background-color: hsl( 253, 37%, 18.4% ); // violet3
+		background-color: hsl( 252, 96.9%, 97.4% ); // violet3
 	}
 
 	&:focus {
@@ -70,14 +70,14 @@ const iconButton = css`
 const rightSlot = css`
 	margin-left: auto;
 	padding-left: 20px;
-	color: hsl( 253, 4%, 63.7% ); // mauve11
+	color: hsl( 252, 4%, 44.8% ); // mauve11
 
 	[data-highlighted] > & {
 		color: white;
 	}
 
 	[data-disabled] & {
-		color: hsl( 253, 4%, 63.7% ); // mauve8
+		color: hsl( 255, 3.7%, 78.8% ); // mauve8
 	}
 `;
 
