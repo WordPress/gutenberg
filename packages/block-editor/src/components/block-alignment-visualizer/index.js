@@ -52,11 +52,11 @@ export default function BlockAlignmentVisualizer( {
 	}
 
 	return (
-		<Underlay
-			className="block-editor-alignment-visualizer"
-			focusedClientId={ focusedClientId }
-		>
-			<ShadowDOMContainer>
+		<ShadowDOMContainer>
+			<Underlay
+				className="block-editor-alignment-visualizer"
+				focusedClientId={ focusedClientId }
+			>
 				<Visualization
 					alignments={ availableAlignments }
 					contentSize={ layout.contentSize }
@@ -70,7 +70,7 @@ export default function BlockAlignmentVisualizer( {
 					wideSize={ layout.wideSize }
 					justification={ layout.justifyContent }
 				/>
-			</ShadowDOMContainer>
-		</Underlay>
+			</Underlay>
+		</ShadowDOMContainer>
 	);
 }
