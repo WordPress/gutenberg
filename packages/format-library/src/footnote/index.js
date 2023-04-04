@@ -14,9 +14,9 @@ export const footnote = {
 	name,
 	title,
 	tagName: 'data',
-	className: null,
 	attributes: {
-		note: ( element ) => element.replace( /^\[/, '' ).replace( /\]$/, '' ),
+		note: ( element ) =>
+			element.innerHTML.replace( /^\[/, '' ).replace( /\]$/, '' ),
 	},
 	render() {
 		return (
@@ -27,7 +27,7 @@ export const footnote = {
 			</sup>
 		);
 	},
-	save( { attributes: { note } } ) {
+	saveFallback( { attributes: { note } } ) {
 		return `[${ note }]`;
 	},
 	edit( {
@@ -42,9 +42,8 @@ export const footnote = {
 			const newValue = insertObject( value, {
 				type: name,
 				attributes: {
-					innerHtml: '',
+					note: '',
 				},
-				tagName: 'data',
 			} );
 			newValue.start = newValue.end - 1;
 			onChange( newValue );
@@ -98,7 +97,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
-							innerHtml: '[' + newNote + ']',
+							note: newNote,
 						},
 					};
 
