@@ -49,10 +49,10 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 }
 
 export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
-	// loader is actually a custom hook
+	// The "hook" prop is actually a custom React hook
 	// so to avoid breaking the rules of hooks
-	// the CommandsPerPage component need to be
-	// remounted on each loader change
+	// the CommandMenuLoaderWrapper component need to be
+	// remounted on each hook prop change
 	// We use the key state to make sure we do that properly.
 	const currentLoader = useRef( hook );
 	const [ key, setKey ] = useState( 0 );
