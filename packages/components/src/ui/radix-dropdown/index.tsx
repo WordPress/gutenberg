@@ -12,20 +12,8 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
+import * as DropdownMenuStyled from './styles';
 import type { DropdownMenuProps, DropdownSubMenuProps } from './types';
-	CheckboxItem,
-	Content,
-	Item,
-	ItemIndicator,
-	Label,
-	RadioItem,
-	Root,
-	Separator,
-	// SubContent,
-	// SubTrigger,
-} from './styles';
-
 
 // Observations:
 // - is it enough to have only one forwarded ref? If we have only one, should it be to the root, or to the content?
@@ -38,23 +26,26 @@ export const DropdownMenu = forwardRef(
 		forwardedRef: React.ForwardedRef< any >
 	) => {
 		return (
-			<Root { ...rootProps }>
+			<DropdownMenuPrimitive.Root { ...rootProps }>
 				<DropdownMenuPrimitive.Trigger asChild>
 					{ trigger }
 				</DropdownMenuPrimitive.Trigger>
 				<DropdownMenuPrimitive.Portal>
-					<Content { ...contentProps } ref={ forwardedRef }>
+					<DropdownMenuStyled.Content
+						{ ...contentProps }
+						ref={ forwardedRef }
+					>
 						{ children }
-						<Arrow />
-					</Content>
+						<DropdownMenuStyled.Arrow />
+					</DropdownMenuStyled.Content>
 				</DropdownMenuPrimitive.Portal>
-			</Root>
+			</DropdownMenuPrimitive.Root>
 		);
 	}
 );
 
-export const DropdownMenuLabel = Label;
-export const DropdownMenuItem = Item;
+export const DropdownMenuLabel = DropdownMenuStyled.Label;
+export const DropdownMenuItem = DropdownMenuStyled.Item;
 export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
 export const DropdownMenuCheckboxItem = forwardRef(
@@ -66,15 +57,15 @@ export const DropdownMenuCheckboxItem = forwardRef(
 		forwardedRef: React.ForwardedRef< any >
 	) => {
 		return (
-			<CheckboxItem { ...props } ref={ forwardedRef }>
+			<DropdownMenuStyled.CheckboxItem { ...props } ref={ forwardedRef }>
 				{ children }
-				<ItemIndicator>
+				<DropdownMenuStyled.ItemIndicator>
 					{ props.checked === 'indeterminate' && (
 						<DividerHorizontalIcon />
 					) }
 					{ props.checked === true && <CheckIcon /> }
-				</ItemIndicator>
-			</CheckboxItem>
+				</DropdownMenuStyled.ItemIndicator>
+			</DropdownMenuStyled.CheckboxItem>
 		);
 	}
 );
@@ -90,14 +81,14 @@ export const DropdownMenuRadioItem = forwardRef(
 		forwardedRef: React.ForwardedRef< any >
 	) => {
 		return (
-			<RadioItem { ...props } ref={ forwardedRef }>
+			<DropdownMenuStyled.RadioItem { ...props } ref={ forwardedRef }>
 				{ children }
-				<ItemIndicator>
+				<DropdownMenuStyled.ItemIndicator>
 					<CheckIcon />
-				</ItemIndicator>
-			</RadioItem>
+				</DropdownMenuStyled.ItemIndicator>
+			</DropdownMenuStyled.RadioItem>
 		);
 	}
 );
 
-export const DropdownMenuSeparator = Separator;
+export const DropdownMenuSeparator = DropdownMenuStyled.Separator;
