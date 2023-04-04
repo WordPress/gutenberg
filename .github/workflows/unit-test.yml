@@ -99,7 +99,9 @@ jobs:
                 include:
                     # Test with the previous WP version.
                     - php: '5.6'
+                      wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
                     - php: '7.4'
+                      wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
                     - php: '8.2'
                       wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
 
