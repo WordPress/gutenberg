@@ -16,6 +16,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import CreateNewPostLink from '../create-new-post-link';
 import { store as blockEditorStore } from '../../store';
 
 function BlockCard( { title, icon, description, blockType, className } ) {
@@ -27,46 +28,66 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 		( { title, icon, description } = blockType );
 	}
 
-	const { parentNavBlockClientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-			select( blockEditorStore );
+	const { parentNavBlockClientId, queryBlockAttributes } = useSelect(
+		( select ) => {
+			const {
+				getSelectedBlockClientId,
+				getSelectedBlock,
+				getBlockParentsByBlockName,
+			} = select( blockEditorStore );
 
-		const _selectedBlockClientId = getSelectedBlockClientId();
+			const _selectedBlockClientId = getSelectedBlockClientId();
+			const selectedBlock = getSelectedBlock();
 
-		return {
-			parentNavBlockClientId: getBlockParentsByBlockName(
-				_selectedBlockClientId,
-				'core/navigation',
-				true
-			)[ 0 ],
-		};
-	}, [] );
+			return {
+				parentNavBlockClientId: getBlockParentsByBlockName(
+					_selectedBlockClientId,
+					'core/navigation',
+					true
+				)[ 0 ],
+				queryBlockAttributes:
+					selectedBlock.name === 'core/query'
+						? selectedBlock.attributes
+						: undefined,
+			};
+		},
+		[]
+	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	return (
-		<div className={ classnames( 'block-editor-block-card', className ) }>
-			{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
-				<Button
-					onClick={ () => selectBlock( parentNavBlockClientId ) }
-					label={ __( 'Go to parent Navigation block' ) }
-					style={
-						// TODO: This style override is also used in ToolsPanelHeader.
-						// It should be supported out-of-the-box by Button.
-						{ minWidth: 24, padding: 0 }
-					}
-					icon={ isRTL() ? chevronRight : chevronLeft }
-					isSmall
-				/>
-			) }
-			<BlockIcon icon={ icon } showColors />
-			<div className="block-editor-block-card__content">
-				<h2 className="block-editor-block-card__title">{ title }</h2>
-				<span className="block-editor-block-card__description">
-					{ description }
-				</span>
+		<>
+			<div
+				className={ classnames( 'block-editor-block-card', className ) }
+			>
+				{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
+					<Button
+						onClick={ () => selectBlock( parentNavBlockClientId ) }
+						label={ __( 'Go to parent Navigation block' ) }
+						style={
+							// TODO: This style override is also used in ToolsPanelHeader.
+							// It should be supported out-of-the-box by Button.
+							{ minWidth: 24, padding: 0 }
+						}
+						icon={ isRTL() ? chevronRight : chevronLeft }
+						isSmall
+					/>
+				) }
+				<BlockIcon icon={ icon } showColors />
+				<div className="block-editor-block-card__content">
+					<h2 className="block-editor-block-card__title">
+						{ title }
+					</h2>
+					<span className="block-editor-block-card__description">
+						{ description }
+					</span>
+				</div>
 			</div>
-		</div>
+			{ !! queryBlockAttributes && (
+				<CreateNewPostLink attributes={ queryBlockAttributes } />
+			) }
+		</>
 	);
 }
 
