@@ -158,6 +158,9 @@
 	// Parent selector overrides
 
 	.block-editor-block-parent-selector__button {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+
 		.block-editor-block-icon {
 			width: 0;
 		}
