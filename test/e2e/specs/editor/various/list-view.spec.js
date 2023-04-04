@@ -474,9 +474,11 @@ test.describe( 'List View', () => {
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
-			editor.canvas.getByRole( 'button', {
-				name: 'Close Document Overview Sidebar',
-			} )
+			editor.canvas
+				.getByRole( 'region', { name: 'Document Overview' } )
+				.getByRole( 'button', {
+					name: 'Close',
+				} )
 		).toBeFocused();
 
 		// Close List View and ensure it's closed.
