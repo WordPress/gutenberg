@@ -6,7 +6,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { getScreenRect } from '@wordpress/dom';
 import { useMemo, useRef, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
@@ -95,12 +95,6 @@ function ResizableAlignmentControls( {
 	const showAlignmentVisualizer =
 		isSnappingExperimentEnabled && isAlignmentVisualizerVisible;
 
-	const rootClientId = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockRootClientId( clientId ),
-		[ clientId ]
-	);
-
 	// Compute the styles of the content when snapped or unsnapped.
 	const contentStyle = useMemo( () => {
 		if ( ! snappedAlignment ) {
@@ -149,7 +143,6 @@ function ResizableAlignmentControls( {
 						transition={ { duration: 0.15 } }
 					>
 						<BlockAlignmentVisualizer
-							layoutClientId={ rootClientId }
 							focusedClientId={ clientId }
 							allowedAlignments={ allowedAlignments }
 							highlightedAlignment={ snappedAlignment?.name }
