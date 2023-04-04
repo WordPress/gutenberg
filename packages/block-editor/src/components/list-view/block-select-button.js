@@ -35,8 +35,8 @@ function ListViewBlockSelectButton(
 		onDragStart,
 		onDragEnd,
 		draggable,
+		isExpanded,
 		ariaLabel,
-		ariaExpanded,
 		ariaDescribedBy,
 	},
 	ref
@@ -80,8 +80,8 @@ function ListViewBlockSelectButton(
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
 				aria-label={ ariaLabel }
-				aria-expanded={ ariaExpanded }
 				aria-describedby={ ariaDescribedBy }
+				aria-expanded={ isExpanded }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
