@@ -20,6 +20,7 @@ For an example of a component that follows these requirements, take a look at [`
 - [README example](#README-example)
 - [Folder structure](#folder-structure)
 - [TypeScript migration guide](#refactoring-a-component-to-typescript)
+- [Using Radix UI primitives](#using-radix-ui-primitives)
 
 ## Compatibility
 
@@ -575,3 +576,12 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 11. Convert unit tests.
 	1. Rename test file extensions from `.js` to `.tsx`.
 	2. Fix all TypeScript errors.
+
+## Using Radix UI primitives
+
+Useful links:
+
+- [online docs](https://www.radix-ui.com/docs/primitives/overview/introduction)
+- [repo](https://github.com/radix-ui/primitives) — useful for:
+    - inspecting source code
+    - running storybook examples (`yarn install && yarn dev`)
