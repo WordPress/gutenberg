@@ -61,8 +61,12 @@ function commandLoaders( state = {}, action ) {
 				},
 			};
 		case 'UNREGISTER_COMMAND_LOADER': {
-			const { [ action.page ]: _, ...remainingState } = state;
-			return remainingState;
+			const { [ action.name ]: _, ...remainingState } =
+				state?.[ action.group ];
+			return {
+				...state,
+				[ action.group ]: remainingState,
+			};
 		}
 	}
 
