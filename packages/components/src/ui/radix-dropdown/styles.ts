@@ -8,7 +8,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 /**
  * Internal dependencies
  */
-import { COLORS } from '../../utils';
+import { COLORS, font } from '../../utils';
 import { space } from '../utils/space';
 
 const ANIMATION_PARAMS = {
@@ -80,7 +80,9 @@ const baseContent = css`
 
 const baseItem = css`
 	all: unset;
-	font-size: 13px;
+	font-size: ${ font( 'default.fontSize' ) };
+	font-family: inherit;
+	font-weight: normal;
 	line-height: 1;
 	color: ${ COLORS.gray[ 900 ] };
 	border-radius: 3px;
@@ -155,7 +157,7 @@ export const SubTrigger = styled( DropdownMenu.SubTrigger )`
 
 export const Label = styled( DropdownMenu.Label )`
 	${ itemLeftSpace }
-	font-size: 12px;
+	font-size: ${ font( 'helpText.fontSize' ) };
 	line-height: ${ space( 7 ) };
 	color: ${ COLORS.ui.textDisabled };
 `;
