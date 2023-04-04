@@ -638,18 +638,12 @@ add_filter(
  * @return string Content with footnotes.
  */
 function gutenberg_footnotes_the_content( $content ) {
-	if ( ! strpos( $content, '<data' ) ) {
-		return $content;
-	}
-
 	$notes = array();
-
-	// To be replaced later with a dynamic data API:
-	// replaceDataByType( 'core/footnote', ( attributes ) => <sup>...</sup> );
-	$content = preg_replace_callback(
-		'/<data value=\"core\/footnote\">\[(.*?)\]<\/data>/',
-		function( $matches ) use ( &$notes ) {
-			$note = $matches[1];
+	$content = replaceDataByType(
+		$content,
+		'core/footnote',
+		function( $attributes, $note ) use ( &$notes ) {
+			$note = substr( $note, 1, -1 );
 			$id = md5( $note );
 
 			if ( isset( $notes[ $id ] ) ) {
@@ -668,8 +662,7 @@ function gutenberg_footnotes_the_content( $content ) {
 			return (
 				'<sup><a class="note-link" href="#' . $id . '" id="' . $id . '-link-' . $count . '">[' . $index . ']</a></sup>'
 			);
-		},
-		$content
+		}
 	);
 
 	if ( empty( $notes ) ) {
