@@ -147,7 +147,10 @@ export function CommandMenu() {
 			} ) ),
 		[]
 	);
-	const close = () => setOpen( false );
+	const close = () => {
+		setSearch( '' );
+		setOpen( false );
+	};
 
 	if ( ! open ) {
 		return false;

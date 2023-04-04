@@ -27,9 +27,9 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 			const { getEntityRecords } = select( coreStore );
 			const query = supportsSearch
 				? {
-						search,
+						search: !! search ? search : undefined,
 						per_page: 10,
-						orderby: 'date',
+						orderby: search ? 'relevance' : 'date',
 				  }
 				: {
 						per_page: -1,
