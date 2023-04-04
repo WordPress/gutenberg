@@ -51,7 +51,6 @@ const ListViewLeaf = forwardRef(
 				level={ level }
 				positionInSet={ position }
 				setSize={ rowCount }
-				disableAriaExpanded={ true }
 				{ ...props }
 			>
 				{ children }
