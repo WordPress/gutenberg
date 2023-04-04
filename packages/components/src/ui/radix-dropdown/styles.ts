@@ -76,6 +76,7 @@ const baseContent = css`
 `;
 
 const baseItem = css`
+	all: unset;
 	font-size: 13px;
 	line-height: 1;
 	color: hsl( 250, 43%, 48% ); // violet11
@@ -100,12 +101,6 @@ const baseItem = css`
 	}
 `;
 
-export const Root = styled( DropdownMenu.Root )`
-	button {
-		all: unset;
-	}
-`;
-
 export const Content = styled( DropdownMenu.Content )`
 	${ baseContent }
 `;
@@ -123,12 +118,12 @@ export const RadioItem = styled( DropdownMenu.RadioItem )`
 	${ baseItem }
 `;
 export const SubTrigger = styled( DropdownMenu.SubTrigger )`
-	${ baseItem }
-
 	&[data-state='open'] {
 		background-color: hsl( 252, 91.5%, 95.5% ); // violet4
 		color: hsl( 250, 43%, 48% ); // violet11
 	}
+
+	${ baseItem }
 `;
 
 export const Label = styled( DropdownMenu.Label )`

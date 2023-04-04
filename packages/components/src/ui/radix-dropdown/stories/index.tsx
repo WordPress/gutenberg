@@ -47,6 +47,7 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
 export default meta;
 
 const iconButton = css`
+	all: unset;
 	font-family: inherit;
 	border-radius: 100%;
 	height: 35px;
