@@ -103,6 +103,10 @@ const baseItem = css`
 		color: ${ COLORS.ui.theme };
 	}
 
+	&[data-highlighted]:focus-visible {
+		outline: 1px solid ${ COLORS.ui.theme };
+	}
+
 	svg {
 		fill: currentColor;
 	}
