@@ -360,6 +360,10 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
+		updatedSettings.shadow = supportedStyles.includes( 'shadow' )
+			? updatedSettings.shadow
+			: false;
+
 		return updatedSettings;
 	}, [ parentSettings, supportedStyles, supports ] );
 }
