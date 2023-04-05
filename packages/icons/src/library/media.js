@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { SVG, Path } from '@wordpress/primitives';
-// comment
+
 const media = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 		<Path d="m7 6.5 4 2.5-4 2.5z" />
