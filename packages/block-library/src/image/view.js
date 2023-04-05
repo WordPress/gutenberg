@@ -27,7 +27,6 @@ store( {
 				}
 			},
 			closeZoom: ( { context } ) => {
-				console.log( 'closing zoom' );
 				context.core.isZoomed = false;
 			},
 			closeZoomOnEsc: ( { context } ) => {
