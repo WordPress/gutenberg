@@ -53,7 +53,11 @@ export default function ListViewDropIndicator( {
 			'.block-editor-block-icon'
 		);
 		const rootBlockIconRect = rootBlockIconElement.getBoundingClientRect();
-		return rootBlockIconRect.right - targetElementRect.left;
+		return (
+			rootBlockIconRect.right -
+			targetElementRect.left -
+			rootBlockIconRect.width / 2 // Reduce the indentation by half the icon width.
+		);
 	}, [ rootBlockElement, targetElement ] );
 
 	const style = useMemo( () => {
