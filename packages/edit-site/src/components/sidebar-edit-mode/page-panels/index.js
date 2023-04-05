@@ -50,7 +50,12 @@ export default function PagePanels() {
 			blockContext: getEditedPostContext(),
 		};
 	}, [] );
-	const { postType, postId, ...filteredBlockContext } = blockContext;
+	const { postType, postId, ...nonPostFields } = blockContext;
+	const previewBlockContext = {
+		...nonPostFields,
+		postType: null,
+		postId: null,
+	};
 	const { hasResolved: hasPostResolved, editedRecord: post } =
 		useEntityRecord( 'postType', postType, postId );
 	const {
@@ -126,8 +131,7 @@ export default function PagePanels() {
 							overflow: 'hidden',
 						} }
 					>
-						{ /* TODO: not sure why this doesn't work. it should stop the preview from showing page content */ }
-						<BlockContextProvider value={ filteredBlockContext }>
+						<BlockContextProvider value={ previewBlockContext }>
 							<BlockPreview
 								viewportWidth={ 1024 }
 								blocks={ template.blocks }
