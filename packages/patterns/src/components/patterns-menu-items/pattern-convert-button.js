@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	BlockSettingsMenuControls,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { serialize } from '@wordpress/blocks';
+import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
 import {
 	MenuItem,
@@ -21,6 +17,11 @@ import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
+ * Internal dependencies
+ */
+import { store } from '../../store';
+
+/**
  * Menu control to convert block(s) to patterns.
  *
  * @param {Object}   props           Component props.
@@ -31,23 +32,8 @@ export default function PatternConvertButton( { clientIds } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 
-	const convertBlocksToPattern =
-		( clientIDs, _title ) =>
-		async ( { registry } ) => {
-			const pattern = {
-				title: _title || __( 'Untitled Pattern' ),
-				content: serialize(
-					registry
-						.select( blockEditorStore )
-						.getBlocksByClientId( clientIDs )
-				),
-				status: 'publish',
-			};
-
-			await registry
-				.dispatch( 'core' )
-				.saveEntityRecord( 'postType', 'wp_block_pattern', pattern );
-		};
+	const { __experimentalConvertBlocksToPattern: convertBlocksToPattern } =
+		useDispatch( store );
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
