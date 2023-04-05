@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Actions __experimentalConvertBlocksToPattern should convert a static block into a reusable block 1`] = `
+[
+  {
+    "attributes": {
+      "ref": "new-id",
+    },
+    "innerBlocks": [],
+    "isValid": true,
+    "name": "core/block",
+  },
+]
+`;

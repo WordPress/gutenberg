@@ -444,6 +444,15 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	gutenberg_override_style(
 		$styles,
+		'wp-patterns',
+		gutenberg_url( 'build/patterns/style.css' ),
+		array( 'wp-components' ),
+		$version
+	);
+	$styles->add_data( 'wp-patterns', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
 		'wp-widgets',
 		gutenberg_url( 'build/widgets/style.css' ),
 		array( 'wp-components' )

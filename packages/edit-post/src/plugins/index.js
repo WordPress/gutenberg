@@ -30,6 +30,14 @@ registerPlugin( 'edit-post', {
 							>
 								{ __( 'Manage Reusable blocks' ) }
 							</MenuItem>
+							<MenuItem
+								role="menuitem"
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_block_pattern',
+								} ) }
+							>
+								{ __( 'Manage Patterns' ) }
+							</MenuItem>
 							<KeyboardShortcutsHelpMenuItem
 								onSelect={ onClose }
 							/>

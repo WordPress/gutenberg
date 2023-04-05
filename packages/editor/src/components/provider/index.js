@@ -11,6 +11,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { PatternsMenuItems } from '@wordpress/patterns';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -131,6 +132,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						>
 							{ children }
 							<ReusableBlocksMenuItems />
+							<PatternsMenuItems />
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>

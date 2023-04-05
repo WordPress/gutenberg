@@ -25,6 +25,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { PatternsMenuItems } from '@wordpress/patterns';
 
 /**
  * Internal dependencies
@@ -213,6 +214,7 @@ export default function BlockEditor() {
 				}
 			</EditorCanvasContainer.Slot>
 			<ReusableBlocksMenuItems />
+			<PatternsMenuItems />
 		</ExperimentalBlockEditorProvider>
 	);
 }
