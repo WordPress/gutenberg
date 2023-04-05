@@ -143,7 +143,7 @@ test.describe( 'List View', () => {
 
 		// Remove the Paragraph block via its options menu in List View.
 		await listView
-			.getByRole( 'button', { name: 'Options for Paragraph block' } )
+			.getByRole( 'button', { name: 'Options for Paragraph' } )
 			.click();
 		await page
 			.getByRole( 'menuitem', { name: /Remove Paragraph/i } )
@@ -194,7 +194,7 @@ test.describe( 'List View', () => {
 
 		// Remove the Image block via its options menu in List View.
 		await listView
-			.getByRole( 'button', { name: 'Options for Image block' } )
+			.getByRole( 'button', { name: 'Options for Image' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: /Remove Image/i } ).click();
 
@@ -247,7 +247,7 @@ test.describe( 'List View', () => {
 
 		// Remove both blocks.
 		await listView
-			.getByRole( 'button', { name: 'Options for Image block' } )
+			.getByRole( 'button', { name: 'Options for Image' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: /Remove blocks/i } ).click();
 
@@ -379,13 +379,13 @@ test.describe( 'List View', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Home' );
 		await expect(
-			listView.getByRole( 'button', { name: 'Options for Image block' } )
+			listView.getByRole( 'button', { name: 'Options for Image' } )
 		).toBeFocused();
 
 		// Navigate the right column to group block options button.
 		await page.keyboard.press( 'End' );
 		await expect(
-			listView.getByRole( 'button', { name: 'Options for Group block' } )
+			listView.getByRole( 'button', { name: 'Options for Group' } )
 		).toBeFocused();
 	} );
 
