@@ -93,7 +93,7 @@
 	&.is-branch-selected.is-first-selected td:last-child {
 		border-top-right-radius: $radius-block-ui;
 	}
-	&[aria-expanded="false"] {
+	&[data-expanded="false"] {
 		&.is-branch-selected.is-first-selected td:first-child {
 			border-top-left-radius: $radius-block-ui;
 		}
@@ -380,7 +380,7 @@ $block-navigation-max-indent: 8;
 }
 
 // Point downwards when open.
-.block-editor-list-view-leaf[aria-expanded="true"] .block-editor-list-view__expander svg {
+.block-editor-list-view-leaf[data-expanded="true"] .block-editor-list-view__expander svg {
 	visibility: visible;
 	transition: transform 0.2s ease;
 	transform: rotate(90deg);
@@ -388,7 +388,7 @@ $block-navigation-max-indent: 8;
 }
 
 // Point rightwards when closed
-.block-editor-list-view-leaf[aria-expanded="false"] .block-editor-list-view__expander svg {
+.block-editor-list-view-leaf[data-expanded="false"] .block-editor-list-view__expander svg {
 	visibility: visible;
 	transform: rotate(0deg);
 	transition: transform 0.2s ease;
