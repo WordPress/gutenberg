@@ -52,6 +52,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
