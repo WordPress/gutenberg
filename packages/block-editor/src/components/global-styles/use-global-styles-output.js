@@ -728,6 +728,9 @@ export const toStyles = (
 	hasFallbackGapSupport,
 	disableLayoutStyles = false
 ) => {
+	// Clone the tree to avoid mutating the original object.
+	tree = JSON.parse( JSON.stringify( tree ) );
+
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
@@ -780,6 +783,7 @@ export const toStyles = (
 			// Process styles for block support features with custom feature level
 			// CSS selectors set.
 			if ( featureSelectors ) {
+				// Mutates the passed styles object.
 				const featureDeclarations = getFeatureDeclarations(
 					featureSelectors,
 					styles
