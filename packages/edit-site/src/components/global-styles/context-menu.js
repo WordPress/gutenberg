@@ -57,12 +57,12 @@ function ContextMenu( { name, parentMenu = '' } ) {
 	const hasVariationsPanel = useHasVariationsPanel( name, parentMenu );
 
 	const { canEditCSS } = useSelect( ( select ) => {
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+		const { getEntityRecord, __experimentalGetCurrentGlobalStyles } =
 			select( coreStore );
 
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+		const currentGlobalStyles = __experimentalGetCurrentGlobalStyles();
+		const globalStyles = currentGlobalStyles?.id
+			? getEntityRecord( 'root', 'globalStyles', currentGlobalStyles?.id )
 			: undefined;
 
 		return {

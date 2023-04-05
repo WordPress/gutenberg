@@ -27,10 +27,9 @@ import { NavigationButtonAsItem } from './navigation-button';
 import ContextMenu from './context-menu';
 import StylesPreview from './preview';
 import { unlock } from '../../private-apis';
-// @TODO does this exist?
-import { GlobalStylesContext } from './context';
 import { MINIMUM_REVISION_COUNT } from './screen-revisions';
 
+const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 function ScreenRoot() {
 	const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 	const [ customCSS ] = useGlobalStyle( 'css' );
@@ -39,13 +38,13 @@ function ScreenRoot() {
 	const { variations, canEditCSS } = useSelect( ( select ) => {
 		const {
 			getEntityRecord,
-			__experimentalGetCurrentGlobalStylesId,
+			__experimentalGetCurrentGlobalStyles,
 			__experimentalGetCurrentThemeGlobalStylesVariations,
 		} = select( coreStore );
 
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+		const currentGlobalStyles = __experimentalGetCurrentGlobalStyles();
+		const globalStyles = currentGlobalStyles?.id
+			? getEntityRecord( 'root', 'globalStyles', currentGlobalStyles?.id )
 			: undefined;
 
 		return {
@@ -150,34 +149,6 @@ function ScreenRoot() {
 					</CardBody>
 				</>
 			) }
-
-			<CardDivider />
-
-			<CardBody>
-				<Spacer
-					as="p"
-					paddingTop={ 2 }
-					paddingX="13px"
-					marginBottom={ 4 }
-				>
-					{ __(
-						"View the last ten revisions to your site's styles."
-					) }
-				</Spacer>
-				<ItemGroup>
-					<NavigationButtonAsItem
-						path="/revisions"
-						aria-label={ __( 'Styles revisions' ) }
-					>
-						<HStack justify="space-between">
-							<FlexItem>{ __( 'Revisions' ) }</FlexItem>
-							<IconWithCurrentColor
-								icon={ isRTL() ? chevronLeft : chevronRight }
-							/>
-						</HStack>
-					</NavigationButtonAsItem>
-				</ItemGroup>
-			</CardBody>
 
 			{ revisionsCount >= MINIMUM_REVISION_COUNT ? (
 				<>
