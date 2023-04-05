@@ -14,6 +14,7 @@ import {
 	useRef,
 	useState,
 	useEffect,
+	forwardRef,
 } from '@wordpress/element';
 import { usePreferredColorScheme } from '@wordpress/compose';
 
@@ -171,20 +172,22 @@ const style = `
 
 const EMPTY_ARRAY = [];
 
-function Sandbox( {
-	containerStyle,
-	customJS,
-	html = '',
-	lang = 'en',
-	providerUrl = '',
-	scripts = EMPTY_ARRAY,
-	styles = EMPTY_ARRAY,
-	title = '',
-	type,
-	url,
-} ) {
+const Sandbox = forwardRef( function Sandbox(
+	{
+		containerStyle,
+		customJS,
+		html = '',
+		lang = 'en',
+		providerUrl = '',
+		scripts = EMPTY_ARRAY,
+		styles = EMPTY_ARRAY,
+		title = '',
+		type,
+		url,
+	},
+	ref
+) {
 	const colorScheme = usePreferredColorScheme();
-	const ref = useRef();
 	const [ height, setHeight ] = useState( 0 );
 	const [ contentHtml, setContentHtml ] = useState( getHtmlDoc() );
 
@@ -333,7 +336,7 @@ function Sandbox( {
 			showsVerticalScrollIndicator={ false }
 		/>
 	);
-}
+} );
 
 const workaroundStyles = StyleSheet.create( {
 	webView: {
