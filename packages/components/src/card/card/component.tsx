@@ -94,7 +94,6 @@ function UnconnectedCard(
  *
  * function Example() {
  *   return (
- *
  *     <Card>
  *       <CardHeader>
  *         <Heading size={ 4 }>Card Title</Heading>
