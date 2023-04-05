@@ -18,3 +18,4 @@ export {
 export { default as BorderPanel, useHasBorderPanel } from './border-panel';
 export { default as ColorPanel, useHasColorPanel } from './color-panel';
 export { default as EffectsPanel, useHasEffectsPanel } from './effects-panel';
+export { default as FiltersPanel, useHasFiltersPanel } from './filters-panel';

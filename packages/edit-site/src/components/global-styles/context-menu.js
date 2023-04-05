@@ -27,7 +27,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { useHasFilterPanel } from './filter-utils';
 import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
 import { IconWithCurrentColor } from './icon-with-current-color';
@@ -40,6 +39,7 @@ const {
 	useHasBorderPanel,
 	useHasColorPanel,
 	useHasEffectsPanel,
+	useHasFiltersPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
 } = unlock( blockEditorPrivateApis );
@@ -51,7 +51,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 	const hasColorPanel = useHasColorPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasEffectsPanel = useHasEffectsPanel( settings );
-	const hasFilterPanel = useHasFilterPanel( name );
+	const hasFilterPanel = useHasFiltersPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasDimensionsPanel;
 	const hasVariationsPanel = useHasVariationsPanel( name, parentMenu );
