@@ -3,6 +3,7 @@
 ## Unreleased
 
 -   `DropZone`: Smooth animation ([#49517](https://github.com/WordPress/gutenberg/pull/49517)).
+-   Making CI checks happy again
 
 ## 23.7.0 (2023-03-29)
 
