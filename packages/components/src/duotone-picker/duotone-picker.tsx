@@ -12,7 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-//import { ColorHeading } from '../color-palette/styles';
+import { ColorHeading } from '../color-palette/styles';
 import ColorListPicker from './color-list-picker';
 import CircularOptionPicker from '../circular-option-picker';
 import { VStack } from '../v-stack';
@@ -20,23 +20,15 @@ import { VStack } from '../v-stack';
 import CustomDuotoneBar from './custom-duotone-bar';
 import { getDefaultColors, getGradientFromCSSColors } from './utils';
 import { Spacer } from '../spacer';
-import type { DuotonePickerProps, SinglePaletteProps } from './types';
+import type {
+	DuotonePickerProps,
+	SinglePaletteProps,
+	MultiplePalettesProps,
+	paletteOptionsProps,
+} from './types';
 
-function SinglePalette( {
-	defaultDark,
-	defaultLight,
-	clearable,
-	unsetable,
-	colorPalette,
-	duotonePalette,
-	disableCustomColors,
-	disableCustomDuotone,
-	value,
-	unsetOption,
-	onChange,
-}: SinglePaletteProps ) {
-	const colorValue = value && value !== 'unset' ? value : undefined;
-	const options = duotonePalette.map( ( { colors, slug, name } ) => {
+function paletteOptions( { palette, value, onChange }: paletteOptionsProps ) {
+	return palette.map( ( { colors, slug, name } ) => {
 		const style = {
 			background: getGradientFromCSSColors( colors, '135deg' ),
 			color: 'transparent',
@@ -70,6 +62,27 @@ function SinglePalette( {
 				} }
 			/>
 		);
+	} );
+}
+
+function SinglePalette( {
+	defaultDark,
+	defaultLight,
+	clearable,
+	unsetable,
+	colorPalette,
+	duotonePalette,
+	disableCustomColors,
+	disableCustomDuotone,
+	value,
+	unsetOption,
+	onChange,
+}: SinglePaletteProps ) {
+	const colorValue = value && value !== 'unset' ? value : undefined;
+	const options = paletteOptions( {
+		palette: duotonePalette,
+		value,
+		onChange,
 	} );
 
 	return (
@@ -121,6 +134,60 @@ function SinglePalette( {
 				</VStack>
 			</Spacer>
 		</CircularOptionPicker>
+	);
+}
+
+function MultiplePalettes( {
+	defaultDark,
+	defaultLight,
+	unsetable,
+	colorPalette,
+	duotonePaletteByOrigin,
+	disableCustomColors,
+	disableCustomDuotone,
+	value,
+	unsetOption,
+	onChange,
+}: MultiplePalettesProps ) {
+	if ( ! duotonePaletteByOrigin ) {
+		return null;
+	}
+
+	const paletteProps = {
+		defaultDark,
+		defaultLight,
+		clearable: false,
+		unsetable,
+		colorPalette,
+		disableCustomColors,
+		disableCustomDuotone,
+		value,
+		unsetOption,
+		onChange,
+	};
+
+	return (
+		<>
+			{ duotonePaletteByOrigin
+				.filter( ( { palettes } ) => palettes.length > 0 )
+				.map( ( { name, palettes }, index, array ) => {
+					if ( index > 0 ) {
+						paletteProps.unsetable = false;
+					}
+					if ( index === array.length - 1 ) {
+						paletteProps.clearable = true;
+					}
+					return (
+						<VStack spacing={ 2 } key={ index }>
+							<ColorHeading level={ 3 }>{ name }</ColorHeading>
+							<SinglePalette
+								{ ...paletteProps }
+								duotonePalette={ palettes }
+							/>
+						</VStack>
+					);
+				} ) }
+		</>
 	);
 }
 
@@ -191,10 +258,8 @@ function DuotonePicker( {
 	const paletteCommonProps = {
 		defaultDark,
 		defaultLight,
-		clearable,
 		unsetable,
 		colorPalette,
-		duotonePalette,
 		disableCustomColors,
 		disableCustomDuotone,
 		value,
@@ -205,13 +270,16 @@ function DuotonePicker( {
 	return (
 		<>
 			{ duotonePaletteByOrigin ? (
-				<SinglePalette
-					{ ...paletteCommonProps }
-					duotonePalette={ duotonePaletteByOrigin.theme }
-				/>
+				<>
+					<MultiplePalettes
+						{ ...paletteCommonProps }
+						duotonePaletteByOrigin={ duotonePaletteByOrigin }
+					/>
+				</>
 			) : (
 				<SinglePalette
 					{ ...paletteCommonProps }
+					clearable={ clearable }
 					duotonePalette={ duotonePalette }
 				/>
 			) }

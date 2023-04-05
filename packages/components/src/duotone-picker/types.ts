@@ -51,11 +51,10 @@ type Color = {
 	slug: string;
 };
 
-type duotonePaletteByOrigin = {
-	theme: DuotoneColor[];
-	user: DuotoneColor[];
-	default: DuotoneColor[];
-};
+type duotonePaletteByOrigin = Array< {
+	name: string;
+	palettes: DuotoneColor[];
+} >;
 
 type DuotoneColor = {
 	colors: string[];
@@ -70,8 +69,35 @@ export type DuotoneSwatchProps = {
 	values?: string[] | null;
 };
 
-export type SinglePaletteProps = DuotonePickerProps & {
+export type SinglePaletteProps = {
 	defaultDark: string;
 	defaultLight: string;
-	unsetOption: any;
+	unsetable?: boolean;
+	colorPalette: Color[];
+	disableCustomColors?: boolean;
+	disableCustomDuotone?: boolean;
+	value?: string[] | 'unset';
+	unsetOption: React.ReactElement;
+	onChange: ( value: DuotonePickerProps[ 'value' ] | undefined ) => void;
+	clearable?: boolean;
+	duotonePalette: DuotoneColor[];
+};
+
+export type MultiplePalettesProps = {
+	defaultDark: string;
+	defaultLight: string;
+	unsetable?: boolean;
+	colorPalette: Color[];
+	disableCustomColors?: boolean;
+	disableCustomDuotone?: boolean;
+	value?: string[] | 'unset';
+	unsetOption: React.ReactElement;
+	onChange: ( value: DuotonePickerProps[ 'value' ] | undefined ) => void;
+	duotonePaletteByOrigin: duotonePaletteByOrigin;
+};
+
+export type paletteOptionsProps = {
+	palette: DuotoneColor[];
+	value?: string[] | 'unset';
+	onChange: ( value: DuotonePickerProps[ 'value' ] | undefined ) => void;
 };

@@ -93,11 +93,20 @@ function useGroupedPresets( { presetSetting, defaultSetting } ) {
 		useSetting( `${ presetSetting }.default` ) || EMPTY_ARRAY;
 
 	return useMemo( () => {
-		return {
-			user: userPresets,
-			theme: themePresets,
-			default: disableDefault ? EMPTY_ARRAY : defaultPresets,
-		};
+		return [
+			{
+				name: 'User',
+				palettes: userPresets,
+			},
+			{
+				name: 'Theme',
+				palettes: themePresets,
+			},
+			{
+				name: 'Default',
+				palettes: disableDefault ? EMPTY_ARRAY : defaultPresets,
+			},
+		];
 	}, [ disableDefault, userPresets, themePresets, defaultPresets ] );
 }
 
@@ -162,7 +171,7 @@ function DuotonePanel( { attributes, setAttributes } ) {
 				__experimentalShareWithChildBlocks
 			>
 				<DuotoneControl
-					duotonePalette={ duotonePalette }
+					duotonePaletteByOrigin={ duotonePaletteByOrigin }
 					colorPalette={ colorPalette }
 					disableCustomDuotone={ disableCustomDuotone }
 					disableCustomColors={ disableCustomColors }
@@ -186,7 +195,7 @@ function DuotonePanel( { attributes, setAttributes } ) {
 			</InspectorControls>
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<DuotoneControl
-					duotonePaletteByOrigin={ duotonePaletteByOrigin }
+					duotonePalette={ duotonePalette }
 					colorPalette={ colorPalette }
 					disableCustomDuotone={ true }
 					disableCustomColors={ true }
