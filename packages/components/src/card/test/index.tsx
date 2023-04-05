@@ -17,7 +17,7 @@ import {
 
 describe( 'Card', () => {
 	describe( 'Card component', () => {
-		it( 'should render correctly', () => {
+		it( 'should render wonderfully', () => {
 			const { container } = render(
 				<Card>
 					<CardHeader>Card Header</CardHeader>

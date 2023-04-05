@@ -43,7 +43,7 @@ export default meta;
 const Template: ComponentStory< typeof Card > = ( args ) => (
 	<Card { ...args }>
 		<CardHeader>
-			<Heading>Ciao</Heading>
+			<Heading>CardHeader</Heading>
 		</CardHeader>
 		<CardBody>
 			<Text>CardBody</Text>
