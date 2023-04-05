@@ -91,6 +91,7 @@ function BlockListBlock( {
 	onInsertBlocksAfter,
 	onMerge,
 	toggleSelection,
+	updateLayoutType,
 } ) {
 	const {
 		themeSupportsLayout,
@@ -138,6 +139,7 @@ function BlockListBlock( {
 			__unstableParentLayout={
 				Object.keys( parentLayout ).length ? parentLayout : undefined
 			}
+			updateParentLayoutType={ updateLayoutType }
 		/>
 	);
 

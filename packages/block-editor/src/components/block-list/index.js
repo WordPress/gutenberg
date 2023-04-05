@@ -140,6 +140,7 @@ function Items( {
 	renderAppender,
 	__experimentalAppenderTagName,
 	layout = defaultLayout,
+	updateLayoutType,
 } ) {
 	const { order, selectedBlocks, visibleBlocks } = useSelect(
 		( select ) => {
@@ -172,6 +173,7 @@ function Items( {
 					<BlockListBlock
 						rootClientId={ rootClientId }
 						clientId={ clientId }
+						updateLayoutType={ updateLayoutType }
 					/>
 				</AsyncModeProvider>
 			) ) }

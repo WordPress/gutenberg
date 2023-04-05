@@ -72,6 +72,7 @@ export function DimensionsPanel( props ) {
 		attributes,
 		setAttributes,
 		__unstableParentLayout,
+		updateParentLayoutType,
 	} = props;
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const isEnabled = useHasDimensionsPanel( settings );
@@ -110,6 +111,7 @@ export function DimensionsPanel( props ) {
 				onChange={ onChange }
 				defaultControls={ defaultControls }
 				onVisualize={ setVisualizedProperty }
+				updateParentLayoutType={ updateParentLayoutType }
 			/>
 			{ !! settings?.spacing?.padding && (
 				<PaddingVisualizer

@@ -11,7 +11,7 @@ const variations = [
 		description: __( 'Gather blocks in a container.' ),
 		attributes: { layout: { type: 'constrained' } },
 		isDefault: true,
-		scope: [ 'block', 'inserter', 'transform' ],
+		scope: [ 'block', 'inserter' ],
 		isActive: ( blockAttributes ) =>
 			! blockAttributes.layout ||
 			! blockAttributes.layout?.type ||
@@ -24,7 +24,7 @@ const variations = [
 		title: _x( 'Row', 'single horizontal line' ),
 		description: __( 'Arrange blocks horizontally.' ),
 		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
-		scope: [ 'block', 'inserter', 'transform' ],
+		scope: [ 'block', 'inserter' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes.layout?.type === 'flex' &&
 			( ! blockAttributes.layout?.orientation ||
@@ -36,7 +36,7 @@ const variations = [
 		title: __( 'Stack' ),
 		description: __( 'Arrange blocks vertically.' ),
 		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
-		scope: [ 'block', 'inserter', 'transform' ],
+		scope: [ 'block', 'inserter' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes.layout?.type === 'flex' &&
 			blockAttributes.layout?.orientation === 'vertical',
@@ -50,7 +50,7 @@ if ( window?.__experimentalEnableGroupGridVariation ) {
 		title: __( 'Grid' ),
 		description: __( 'Arrange blocks in a grid.' ),
 		attributes: { layout: { type: 'grid' } },
-		scope: [ 'block', 'inserter', 'transform' ],
+		scope: [ 'block', 'inserter' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes.layout?.type === 'grid',
 		icon: grid,

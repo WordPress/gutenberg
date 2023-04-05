@@ -14,10 +14,11 @@ import {
 	// Button,
 	// ButtonGroup,
 	CustomSelectControl,
-	// Flex,
-	// FlexItem,
+	Flex,
+	FlexItem,
 	// ToggleControl,
 	PanelBody,
+	RangeControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
@@ -182,6 +183,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		type = 'default',
 		contentSize = null,
 		orientation = 'horizontal',
+		flexWrap = 'nowrap',
 	} = usedLayout;
 	/**
 	 * `themeSupportsLayout` is only relevant to the `default/flow` or
@@ -261,6 +263,27 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const onChangeLayout = ( newLayout ) =>
 		setAttributes( { layout: newLayout } );
 
+	const onChangeGap = ( newGap ) => {
+		setAttributes( {
+			style: {
+				...style,
+				spacing: {
+					...style?.spacing,
+					blockGap: newGap,
+				},
+			},
+		} );
+	};
+
+	const onChangeWrap = ( newWrap ) => {
+		setAttributes( {
+			layout: {
+				...usedLayout,
+				flexWrap: newWrap,
+			},
+		} );
+	};
+
 	const innerWidthOptions = [
 		{
 			key: 'fill',
@@ -274,34 +297,34 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 			key: 'theme',
 			name: __( 'Theme' ),
 		},
-		// {
-		// 	key: 'custom',
-		// 	name: __( 'Custom' ),
-		// },
+		{
+			key: 'custom',
+			name: __( 'Custom' ),
+		},
 	];
 
-	// const alignmentOptions = [
-	// 	{
-	// 		key: 'flex-start',
-	// 		name: __( 'Top' ),
-	// 	},
-	// 	{
-	// 		key: 'center',
-	// 		name: __( 'Middle' ),
-	// 	},
-	// 	{
-	// 		key: 'flex-end',
-	// 		name: __( 'Bottom' ),
-	// 	},
-	// 	{
-	// 		key: 'space-between',
-	// 		name: __( 'Space Between' ),
-	// 	},
-	// 	{
-	// 		key: 'stretch',
-	// 		name: __( 'Stretch' ),
-	// 	},
-	// ];
+	const alignmentOptions = [
+		{
+			key: 'flex-start',
+			name: __( 'Top' ),
+		},
+		{
+			key: 'center',
+			name: __( 'Middle' ),
+		},
+		{
+			key: 'flex-end',
+			name: __( 'Bottom' ),
+		},
+		{
+			key: 'space-between',
+			name: __( 'Space Between' ),
+		},
+		{
+			key: 'stretch',
+			name: __( 'Stretch' ),
+		},
+	];
 
 	return (
 		<>
@@ -380,14 +403,22 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 							label={ __( 'Grid' ) }
 						/>
 					</ToggleGroupControl>
-
-					<CustomSelectControl
-						__nextUnconstrainedWidth
-						label="Inner block width"
-						options={ innerWidthOptions }
-						onChange={ onChangeInnerWidth }
+					{ layoutType && layoutType.name === 'grid' && (
+						<layoutType.inspectorControls
+							layout={ usedLayout }
+							onChange={ onChangeLayout }
+							layoutBlockSupport={ layoutBlockSupport }
+						/>
+					) }
+					<RangeControl
+						label={ __( 'Gap' ) }
+						onChange={ onChangeGap }
+						value={ style?.spacing?.blockGap }
+						min={ 0 }
+						max={ 100 }
+						withInputField={ false }
 					/>
-					{ /* <p>Align</p>
+					<p>ALIGN</p>
 					<Flex>
 						<FlexItem>
 							<CustomSelectControl
@@ -419,9 +450,37 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 								}
 							/>
 						</FlexItem>
-					</Flex> */ }
-
-					{ layoutType &&
+					</Flex>
+					<div style={ { marginTop: '24px' } }>
+						<CustomSelectControl
+							__nextUnconstrainedWidth
+							label="Inner block width"
+							options={ innerWidthOptions }
+							onChange={ onChangeInnerWidth }
+						/>
+					</div>
+					<div style={ { marginTop: '24px' } }>
+						<ToggleGroupControl
+							__nextHasNoMarginBottom
+							size={ '__unstable-large' }
+							label={ __( 'Wrap' ) }
+							value={ flexWrap }
+							onChange={ onChangeWrap }
+							isBlock={ true }
+						>
+							<ToggleGroupControlOption
+								key={ 'wrap' }
+								value="wrap"
+								label={ __( 'Yes' ) }
+							/>
+							<ToggleGroupControlOption
+								key={ 'nowrap' }
+								value="nowrap"
+								label={ __( 'No' ) }
+							/>
+						</ToggleGroupControl>
+					</div>
+					{ /* { layoutType &&
 						layoutType.name !== 'default' &&
 						layoutType.name !== 'constrained' && (
 							<layoutType.inspectorControls
@@ -429,7 +488,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 								onChange={ onChangeLayout }
 								layoutBlockSupport={ layoutBlockSupport }
 							/>
-						) }
+						) } */ }
 					{ constrainedType && displayControlsForLegacyLayouts && (
 						<constrainedType.inspectorControls
 							layout={ usedLayout }
@@ -449,7 +508,6 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		</>
 	);
 }
-
 // function LayoutTypeSwitcher( { type, onChange } ) {
 // 	return (
 // 		<ButtonGroup>

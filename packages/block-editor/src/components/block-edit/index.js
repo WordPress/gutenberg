@@ -26,17 +26,23 @@ export default function BlockEdit( props ) {
 		isSelected,
 		clientId,
 		attributes = {},
+		setAttributes,
 		__unstableLayoutClassNames,
 	} = props;
+
 	const { layout = null } = attributes;
 	const layoutSupport =
 		hasBlockSupport( name, 'layout', false ) ||
 		hasBlockSupport( name, '__experimentalLayout', false );
+	const updateLayoutType = ( newLayout ) => {
+		setAttributes( { layout: { ...layout, type: newLayout } } );
+	};
 	const context = {
 		name,
 		isSelected,
 		clientId,
 		layout: layoutSupport ? layout : null,
+		updateLayoutType,
 		__unstableLayoutClassNames,
 	};
 	return (

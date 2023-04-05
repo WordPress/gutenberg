@@ -26,17 +26,18 @@ function helpText( selfStretch, parentLayout ) {
 /**
  * Form to edit the child layout value.
  *
- * @param {Object}   props              Props.
- * @param {Object}   props.value        The child layout value.
- * @param {Function} props.onChange     Function to update the child layout value.
- * @param {Object}   props.parentLayout The parent layout value.
- *
+ * @param {Object}   props                        Props.
+ * @param {Object}   props.value                  The child layout value.
+ * @param {Function} props.onChange               Function to update the child layout value.
+ * @param {Object}   props.parentLayout           The parent layout value.
+ * @param {Function} props.updateParentLayoutType Function to update the parent layout type.
  * @return {WPElement} child layout edit element.
  */
 export default function ChildLayoutControl( {
 	value: childLayout = {},
 	onChange,
 	parentLayout,
+	updateParentLayoutType,
 } ) {
 	const { selfStretch, flexSize } = childLayout;
 
@@ -59,6 +60,9 @@ export default function ChildLayoutControl( {
 				help={ helpText( selfStretch, parentLayout ) }
 				onChange={ ( value ) => {
 					const newFlexSize = value !== 'fixed' ? null : flexSize;
+					if ( value === 'fill' ) {
+						updateParentLayoutType( 'flex' );
+					}
 					onChange( {
 						...childLayout,
 						selfStretch: value,

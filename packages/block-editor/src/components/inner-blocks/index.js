@@ -60,6 +60,7 @@ function UncontrolledInnerBlocks( props ) {
 		orientation,
 		placeholder,
 		layout,
+		updateLayoutType,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -125,6 +126,7 @@ function UncontrolledInnerBlocks( props ) {
 				layout={ memoedLayout }
 				wrapperRef={ wrapperRef }
 				placeholder={ placeholder }
+				updateLayoutType={ updateLayoutType }
 			/>
 		</BlockContextProvider>
 	);
@@ -175,6 +177,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		clientId,
 		layout = null,
 		__unstableLayoutClassNames: layoutClassNames = '',
+		updateLayoutType,
 	} = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
@@ -222,6 +225,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const innerBlocksProps = {
 		__experimentalCaptureToolbars,
 		layout,
+		updateLayoutType,
 		...options,
 	};
 	const InnerBlocks =
