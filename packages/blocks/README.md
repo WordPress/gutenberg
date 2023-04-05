@@ -742,7 +742,7 @@ Registers a new block provided a unique name and an object defining its
 behavior. Once registered, the block is made available as an option to any
 editor interface where blocks are implemented.
 
-For more in-depth information on registering a custom block see the [Create a block tutorial](docs/how-to-guides/block-tutorial/README.md)
+For more in-depth information on registering a custom block see the [Create a block tutorial](/docs/getting-started/create-block/README.md)
 
 _Usage_
 
