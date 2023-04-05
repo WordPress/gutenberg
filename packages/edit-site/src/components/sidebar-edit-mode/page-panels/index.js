@@ -8,18 +8,18 @@ import {
 	__experimentalHStack as HStack,
 	Button,
 } from '@wordpress/components';
-import {
-	page as pageIcon,
-	title as titleIcon,
-	postExcerpt as postExcerptIcon,
-	postContent as postContentIcon,
-	postFeaturedImage as postFeaturedImageIcon,
-} from '@wordpress/icons';
+import { page as pageIcon } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityRecord } from '@wordpress/core-data';
 import { humanTimeDiff } from '@wordpress/date';
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockContextProvider, BlockPreview } from '@wordpress/block-editor';
+import {
+	BlockContextProvider,
+	BlockPreview,
+	store as blockEditorStore,
+	BlockIcon,
+} from '@wordpress/block-editor';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -27,11 +27,29 @@ import { BlockContextProvider, BlockPreview } from '@wordpress/block-editor';
 import { store as editSiteStore } from '../../../store';
 import useEditedEntityRecord from '../../use-edited-entity-record';
 
+const POST_CONTENT_BLOCK_NAMES = [
+	'core/post-featured-image',
+	'core/post-title',
+	'core/post-content',
+];
+
 export default function PagePanels() {
-	const blockContext = useSelect(
-		( select ) => select( editSiteStore ).getEditedPostContext(),
-		[]
-	);
+	const { postBlocks, blockContext } = useSelect( ( select ) => {
+		const { getClientIdsWithDescendants, getBlockName } =
+			select( blockEditorStore );
+		const { getEditedPostContext } = select( editSiteStore );
+		return {
+			postBlocks: getClientIdsWithDescendants()
+				.map( ( clientId ) => ( {
+					clientId,
+					blockName: getBlockName( clientId ),
+				} ) )
+				.filter( ( { blockName } ) =>
+					POST_CONTENT_BLOCK_NAMES.includes( blockName )
+				),
+			blockContext: getEditedPostContext(),
+		};
+	}, [] );
 	const { postType, postId, ...filteredBlockContext } = blockContext;
 	const { hasResolved: hasPostResolved, editedRecord: post } =
 		useEntityRecord( 'postType', postType, postId );
@@ -42,11 +60,13 @@ export default function PagePanels() {
 	} = useEditedEntityRecord();
 
 	const { setEditFocus } = useDispatch( editSiteStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 
 	if ( ! hasPostResolved && ! isTemplateLoaded ) {
 		return;
 	}
 
+	// TODO: split this up into multiple components
 	return (
 		<>
 			<PanelBody>
@@ -76,13 +96,18 @@ export default function PagePanels() {
 			</PanelBody>
 			<PanelBody title={ __( 'Content' ) }>
 				<VStack>
-					{ /* TODO: make this dynamic */ }
-					<Button icon={ titleIcon }>Page Title</Button>
-					<Button icon={ postExcerptIcon }>Page Excerpt</Button>
-					<Button icon={ postContentIcon }>Page Content</Button>
-					<Button icon={ postFeaturedImageIcon }>
-						Featured Image
-					</Button>
+					{ postBlocks.map( ( { clientId, blockName } ) => {
+						const blockType = getBlockType( blockName );
+						return (
+							<Button
+								key={ clientId }
+								icon={ <BlockIcon icon={ blockType.icon } /> }
+								onClick={ () => selectBlock( clientId ) }
+							>
+								{ blockType.title }
+							</Button>
+						);
+					} ) }
 				</VStack>
 			</PanelBody>
 			<PanelBody title={ __( 'Template' ) }>
