@@ -103,7 +103,6 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 			</ol>
 			{ canReset && (
 				<Button
-					isSecondary
 					onClick={ onReset }
 					className="edit-site-global-styles-screen-revisions__reset"
 				>
