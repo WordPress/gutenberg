@@ -5,7 +5,7 @@ on:
         types: [opened, synchronize]
         paths:
             - 'packages/components/**'
-            - '!packages/components/**/stories/**'
+            - '!packages/components/src/**/stories/**'
             - '!packages/components/src**/test/**'
 jobs:
     check:
