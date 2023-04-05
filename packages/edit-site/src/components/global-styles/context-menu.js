@@ -32,7 +32,6 @@ import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { ScreenVariations } from './screen-variations';
-import { useHasShadowControl } from './shadow-panel';
 import { unlock } from '../../private-apis';
 
 const {
@@ -40,6 +39,7 @@ const {
 	useHasTypographyPanel,
 	useHasBorderPanel,
 	useHasColorPanel,
+	useHasEffectsPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
 } = unlock( blockEditorPrivateApis );
@@ -50,7 +50,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
-	const hasEffectsPanel = useHasShadowControl( name );
+	const hasEffectsPanel = useHasEffectsPanel( settings );
 	const hasFilterPanel = useHasFilterPanel( name );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasDimensionsPanel;
@@ -109,9 +109,9 @@ function ContextMenu( { name, parentMenu = '' } ) {
 					<NavigationButtonAsItem
 						icon={ shadow }
 						path={ parentMenu + '/effects' }
-						aria-label={ __( 'Shadow' ) }
+						aria-label={ __( 'Effects' ) }
 					>
-						{ __( 'Shadow' ) }
+						{ __( 'Effects' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasFilterPanel && (
