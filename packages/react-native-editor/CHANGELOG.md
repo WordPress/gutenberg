@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+- [*] Support POST requests [#49371]
 
 ## 1.92.0
 * No User facing changes *

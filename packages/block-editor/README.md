@@ -517,6 +517,18 @@ _Returns_
 
 -   `string`: returns the cssUnit value in a simple px format.
 
+### getSpacingPresetCssVar
+
+Converts a spacing preset into a custom value.
+
+_Parameters_
+
+-   _value_ `string`: Value to convert.
+
+_Returns_
+
+-   `string | undefined`: CSS var string for given spacing preset value.
+
 ### getTypographyClassesAndStyles
 
 Provides the CSS class names and inline styles for a block's typography support
@@ -569,6 +581,18 @@ Undocumented declaration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
+
+### isValueSpacingPreset
+
+Checks is given value is a spacing preset.
+
+_Parameters_
+
+-   _value_ `string`: Value to check
+
+_Returns_
+
+-   `boolean`: Return true if value is string in format var:preset|spacing|.
 
 ### JustifyContentControl
 
