@@ -89,7 +89,7 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle = blockInformation?.title || __( 'Untitled Block' );
+	const blockTitle = blockInformation?.title || __( 'Untitled' );
 	const blockName = useSelect(
 		( select ) => select( blockEditorStore ).getBlockName( clientId ),
 		[ clientId ]
@@ -121,7 +121,7 @@ function ListViewBlock( {
 
 	const settingsAriaLabel = sprintf(
 		// translators: %s: The title of the block.
-		__( 'Options for %s block' ),
+		__( 'Options for %s' ),
 		blockTitle
 	);
 
