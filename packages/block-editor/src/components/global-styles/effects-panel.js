@@ -65,7 +65,7 @@ const DEFAULT_CONTROLS = {
 	shadow: true,
 };
 
-export default function TypographyPanel( {
+export default function EffectsPanel( {
 	as: Wrapper = EffectsToolsPanel,
 	value,
 	onChange,
