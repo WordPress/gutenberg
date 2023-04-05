@@ -1226,7 +1226,7 @@ export function __experimentalGetCurrentThemeGlobalStylesVariations(
 /**
  * Returns the revisions of the current global styles theme.
  *
- * @param  state Data state.
+ * @param state Data state.
  *
  * @return The current global styles.
  */
