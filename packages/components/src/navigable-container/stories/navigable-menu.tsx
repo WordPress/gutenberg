@@ -13,9 +13,6 @@ const meta: ComponentMeta< typeof NavigableMenu > = {
 	component: NavigableMenu,
 	argTypes: {
 		children: { type: undefined },
-		cycle: {
-			type: 'boolean',
-		},
 		onNavigate: { action: 'onNavigate' },
 		orientation: {
 			options: [ 'horizontal', 'vertical' ],
