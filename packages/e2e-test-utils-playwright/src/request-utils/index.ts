@@ -141,7 +141,8 @@ class RequestUtils {
 	/** @borrows activateTheme as this.activateTheme */
 	activateTheme: typeof activateTheme = activateTheme.bind( this );
 	/** @borrows getCurrentThemeGlobalStylesPostId as this.getCurrentThemeGlobalStylesPostId */
-	getCurrentThemeGlobalStylesPostId: typeof getCurrentThemeGlobalStylesPostId = getCurrentThemeGlobalStylesPostId.bind( this );
+	getCurrentThemeGlobalStylesPostId: typeof getCurrentThemeGlobalStylesPostId =
+		getCurrentThemeGlobalStylesPostId.bind( this );
 	/** @borrows deleteAllBlocks as this.deleteAllBlocks */
 	deleteAllBlocks = deleteAllBlocks.bind( this );
 	/** @borrows createPost as this.createPost */
@@ -149,7 +150,8 @@ class RequestUtils {
 	/** @borrows deleteAllPosts as this.deleteAllPosts */
 	deleteAllPosts: typeof deleteAllPosts = deleteAllPosts.bind( this );
 	/** @borrows getThemeGlobalStylesRevisions as this.getThemeGlobalStylesRevisions */
-	getThemeGlobalStylesRevisions: typeof getThemeGlobalStylesRevisions = getThemeGlobalStylesRevisions.bind( this );
+	getThemeGlobalStylesRevisions: typeof getThemeGlobalStylesRevisions =
+		getThemeGlobalStylesRevisions.bind( this );
 	/** @borrows createClassicMenu as this.createClassicMenu */
 	createClassicMenu: typeof createClassicMenu =
 		createClassicMenu.bind( this );
