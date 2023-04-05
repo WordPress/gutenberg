@@ -50,8 +50,34 @@ jobs:
             - name: Running the date tests
               run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
+    compute-previous-wordpress-version:
+        name: Compute previous WordPress version
+        runs-on: ubuntu-latest
+        outputs:
+            previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
+
+        steps:
+            - name: Get previous WordPress version
+              id: get-previous-wordpress-version
+              run: |
+                  curl \
+                    -H "Accept: application/json" \
+                    -o versions.json \
+                    "http://api.wordpress.org/core/stable-check/1.0/"
+                  LATEST_WP_VERSION=$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json)
+                  IFS='.' read LATEST_WP_MAJOR LATEST_WP_MINOR LATEST_WP_PATCH <<< "${LATEST_WP_VERSION}"
+                  if [[ ${LATEST_WP_MINOR} == "0" ]]; then
+                    PREVIOUS_WP_SERIES="$((LATEST_WP_MAJOR - 1)).9"
+                  else
+                    PREVIOUS_WP_SERIES="${LATEST_WP_MAJOR}.$((LATEST_WP_MINOR - 1))"
+                  fi
+                  PREVIOUS_WP_VERSION=$(jq --raw-output --arg series "${PREVIOUS_WP_SERIES}" 'with_entries(select(.key|startswith($series)))|keys[-1]' versions.json)
+                  echo "previous-wordpress-version=${PREVIOUS_WP_VERSION}" >> $GITHUB_OUTPUT
+                  rm versions.json
+
     test-php:
-        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ubuntu-latest
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on ubuntu-latest
+        needs: compute-previous-wordpress-version
         runs-on: ubuntu-latest
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -69,9 +95,19 @@ jobs:
                     - '8.1'
                     - '8.2'
                 multisite: [false, true]
+                wordpress: [''] # Latest WordPress version.
+                include:
+                    # Test with the previous WP version.
+                    - php: '5.6'
+                      wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
+                    - php: '7.4'
+                      wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
+                    - php: '8.2'
+                      wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
+            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
 
         steps:
             - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
