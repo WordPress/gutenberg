@@ -70,12 +70,7 @@ export type NavigableMenuProps = WordPressComponentProps<
 >;
 
 export type TabbableContainerProps = WordPressComponentProps<
-	BaseProps & {
-		/**
-		 * Gets an offset, given an event.
-		 */
-		eventToOffset?: ( event: KeyboardEvent ) => -1 | 0 | 1 | undefined;
-	},
+	BaseProps & Partial< Pick< NavigableContainerProps, 'eventToOffset' > >,
 	'div',
 	false
 >;
