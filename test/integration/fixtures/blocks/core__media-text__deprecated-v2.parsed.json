@@ -3,7 +3,7 @@
 		"blockName": "core/media-text",
 		"attrs": {
 			"mediaType": "image",
-			"isStackOnMobile": false
+			"isStackOnMobile": true
 		},
 		"innerBlocks": [
 			{
