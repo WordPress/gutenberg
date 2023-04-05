@@ -99,7 +99,6 @@ const observeAndResizeJS = `
 		// get an DOM mutations for that, so do the resize when the window is resized, too.
 		window.addEventListener( 'resize', sendResize, true );
 		window.addEventListener( 'orientationchange', sendResize, true );
-		widow.addEventListener( 'click', sendResize, true );
 	})();
 `;
 
