@@ -89,6 +89,7 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const blockTitle = blockInformation?.title || __( 'Untitled Block' );
 	const blockName = useSelect(
 		( select ) => select( blockEditorStore ).getBlockName( clientId ),
 		[ clientId ]
@@ -114,17 +115,15 @@ function ListViewBlock( {
 		? sprintf(
 				// translators: %s: The title of the block. This string indicates a link to select the locked block.
 				__( '%s (locked)' ),
-				blockInformation.title
+				blockTitle
 		  )
-		: blockInformation.title;
+		: blockTitle;
 
-	const settingsAriaLabel = blockInformation
-		? sprintf(
-				// translators: %s: The title of the block.
-				__( 'Options for %s block' ),
-				blockInformation.title
-		  )
-		: __( 'Options' );
+	const settingsAriaLabel = sprintf(
+		// translators: %s: The title of the block.
+		__( 'Options for %s block' ),
+		blockTitle
+	);
 
 	const { isTreeGridMounted, expand, collapse, BlockSettingsMenu } =
 		useListViewContext();
