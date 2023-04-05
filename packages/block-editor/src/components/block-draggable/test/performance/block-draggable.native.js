@@ -20,7 +20,7 @@ describe( 'Block Draggable Performance', () => {
 		const scenario = async () => {
 			const draggable = screen.getByTestId( 'draggable-test' );
 
-			fireLongPress( draggable, 'draggable-test' );
+			fireLongPress( draggable, 'draggable-test-child-view' );
 		};
 
 		await measurePerformance(
@@ -34,7 +34,7 @@ describe( 'Block Draggable Performance', () => {
 					testID="draggable-test"
 				>
 					{ () => (
-						<View>
+						<View testID="draggable-test-child-view">
 							<Text>Block Draggable</Text>
 						</View>
 					) }
