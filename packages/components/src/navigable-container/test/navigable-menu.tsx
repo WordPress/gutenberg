@@ -35,7 +35,7 @@ describe( 'NavigableMenu', () => {
 		// Mocking `getClientRects()` is necessary to pass a check performed by
 		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
 		// from the `@wordpress/dom` package.
-		// @ts-expect-error TODO: Don't know how to resolve
+		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
 		window.HTMLElement.prototype.getClientRects = function () {
 			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
 		};
