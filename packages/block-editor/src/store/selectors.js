@@ -1556,7 +1556,7 @@ const canInsertBlockTypeUnmemoized = (
 	];
 	if (
 		// we're focused on editing a post; and
-		window.wp.data.select( 'core/edit-site' ).getEditFocus() === 'post' &&
+		window.wp.data.select( 'core/edit-site' )?.getEditFocus() === 'post' &&
 		// this is the top level; or
 		( ! rootClientId ||
 			// the parent block is not a post content block; and
@@ -1656,7 +1656,7 @@ const canInsertBlockTypeUnmemoized = (
 export const canInsertBlockType = createSelector(
 	canInsertBlockTypeUnmemoized,
 	( state, blockName, rootClientId ) => [
-		window.wp.data.select( 'core/edit-site' ).getEditFocus(),
+		window.wp.data.select( 'core/edit-site' )?.getEditFocus(),
 		state.blocks.parents,
 		state.blocks.byClientId,
 		state.blockListSettings[ rootClientId ],
@@ -1700,7 +1700,7 @@ export const canRemoveBlock = createSelector(
 		];
 		if (
 			// we're focused on editing a post; and
-			window.wp.data.select( 'core/edit-site' ).getEditFocus() ===
+			window.wp.data.select( 'core/edit-site' )?.getEditFocus() ===
 				'post' &&
 			// the block is not a descendant of a post content block
 			getBlockNamesByClientId(
@@ -1729,7 +1729,7 @@ export const canRemoveBlock = createSelector(
 		return ! lock?.remove;
 	},
 	( state ) => [
-		window.wp.data.select( 'core/edit-site' ).getEditFocus(),
+		window.wp.data.select( 'core/edit-site' )?.getEditFocus(),
 		state.blocks.parents,
 		state.blocks.byClientId,
 	]
@@ -1769,7 +1769,7 @@ export const canMoveBlock = createSelector(
 		];
 		if (
 			// we're focused on editing a post; and
-			window.wp.data.select( 'core/edit-site' ).getEditFocus() ===
+			window.wp.data.select( 'core/edit-site' )?.getEditFocus() ===
 				'post' &&
 			// the block is not a descendant of a post content block
 			getBlockNamesByClientId(
@@ -1796,7 +1796,7 @@ export const canMoveBlock = createSelector(
 		return ! lock?.move;
 	},
 	( state ) => [
-		window.wp.data.select( 'core/edit-site' ).getEditFocus(),
+		window.wp.data.select( 'core/edit-site' )?.getEditFocus(),
 		state.blocks.parents,
 		state.blocks.byClientId,
 	]
@@ -1835,7 +1835,7 @@ export const canEditBlock = createSelector(
 		];
 		if (
 			// we're focused on editing a post; and
-			window.wp.data.select( 'core/edit-site' ).getEditFocus() ===
+			window.wp.data.select( 'core/edit-site' )?.getEditFocus() ===
 				'post' &&
 			// the block is not a post content block; and
 			! POST_CONTENT_BLOCK_NAMES.includes(
@@ -1868,7 +1868,7 @@ export const canEditBlock = createSelector(
 		return ! lock?.edit;
 	},
 	( state ) => [
-		window.wp.data.select( 'core/edit-site' ).getEditFocus(),
+		window.wp.data.select( 'core/edit-site' )?.getEditFocus(),
 		state.blocks.parents,
 		state.blocks.byClientId,
 	]
