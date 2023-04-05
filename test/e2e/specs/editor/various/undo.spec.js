@@ -92,7 +92,7 @@ test.describe( 'undo', () => {
 <!-- /wp:paragraph -->`
 		);
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		const before = await editor.getEditedPostContent();
 		expect( before ).toBe(
@@ -108,7 +108,7 @@ test.describe( 'undo', () => {
 			endOffset: 'before pause'.length,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -118,7 +118,7 @@ test.describe( 'undo', () => {
 			endOffset: 0,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'z' );
+		await pageUtils.pressKeys( 'primaryShift+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( before );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -128,7 +128,7 @@ test.describe( 'undo', () => {
 			endOffset: 'before pause'.length,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'z' );
+		await pageUtils.pressKeys( 'primaryShift+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( after );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -148,7 +148,7 @@ test.describe( 'undo', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 
 		await page.keyboard.type( 'before keyboard ' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( 'after keyboard' );
 
 		const after = await editor.getEditedPostContent();
@@ -159,7 +159,7 @@ test.describe( 'undo', () => {
 <!-- /wp:paragraph -->`
 		);
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		const before = await editor.getEditedPostContent();
 
@@ -175,7 +175,7 @@ test.describe( 'undo', () => {
 			endOffset: 'before keyboard '.length,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -185,7 +185,7 @@ test.describe( 'undo', () => {
 			endOffset: 0,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'z' );
+		await pageUtils.pressKeys( 'primaryShift+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( before );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -195,7 +195,7 @@ test.describe( 'undo', () => {
 			endOffset: 'before keyboard '.length,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'z' );
+		await pageUtils.pressKeys( 'primaryShift+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( after );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -217,9 +217,9 @@ test.describe( 'undo', () => {
 		).toBeVisible();
 		await page.reload();
 		await page.click( '[data-type="core/paragraph"]' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+b' );
+		await pageUtils.pressKeys( 'primary+z' );
 		const visibleResult = await page.evaluate(
 			() => document.activeElement.innerHTML
 		);
@@ -256,7 +256,7 @@ test.describe( 'undo', () => {
 
 		const thirdText = await editor.getEditedPostContent();
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' ); // Undo 3rd paragraph text.
+		await pageUtils.pressKeys( 'primary+z' ); // Undo 3rd paragraph text.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( thirdBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -266,7 +266,7 @@ test.describe( 'undo', () => {
 			endOffset: 0,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' ); // Undo 3rd block.
+		await pageUtils.pressKeys( 'primary+z' ); // Undo 3rd block.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( secondText );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -276,7 +276,7 @@ test.describe( 'undo', () => {
 			endOffset: 'is'.length,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' ); // Undo 2nd paragraph text.
+		await pageUtils.pressKeys( 'primary+z' ); // Undo 2nd paragraph text.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( secondBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -286,7 +286,7 @@ test.describe( 'undo', () => {
 			endOffset: 0,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' ); // Undo 2nd block.
+		await pageUtils.pressKeys( 'primary+z' ); // Undo 2nd block.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( firstText );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -296,7 +296,7 @@ test.describe( 'undo', () => {
 			endOffset: 'This'.length,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' ); // Undo 1st paragraph text.
+		await pageUtils.pressKeys( 'primary+z' ); // Undo 1st paragraph text.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( firstBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -306,7 +306,7 @@ test.describe( 'undo', () => {
 			endOffset: 0,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' ); // Undo 1st block.
+		await pageUtils.pressKeys( 'primary+z' ); // Undo 1st block.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect.poll( undoUtils.getSelection ).toEqual( {} );
@@ -315,7 +315,7 @@ test.describe( 'undo', () => {
 			page.locator( 'role=button[name="Undo"]' )
 		).toBeDisabled();
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 1st block.
+		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 1st block.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( firstBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -329,7 +329,7 @@ test.describe( 'undo', () => {
 			page.locator( 'role=button[name="Undo"]' )
 		).toBeEnabled();
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 1st paragraph text.
+		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 1st paragraph text.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( firstText );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -339,7 +339,7 @@ test.describe( 'undo', () => {
 			endOffset: 'This'.length,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 2nd block.
+		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 2nd block.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( secondBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -349,7 +349,7 @@ test.describe( 'undo', () => {
 			endOffset: 0,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 2nd paragraph text.
+		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 2nd paragraph text.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( secondText );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -359,7 +359,7 @@ test.describe( 'undo', () => {
 			endOffset: 'is'.length,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 3rd block.
+		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 3rd block.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( thirdBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -369,7 +369,7 @@ test.describe( 'undo', () => {
 			endOffset: 0,
 		} );
 
-		await pageUtils.pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 3rd paragraph text.
+		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 3rd paragraph text.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( thirdText );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
@@ -410,7 +410,7 @@ test.describe( 'undo', () => {
 		// creation of an explicit undo persistence level.
 		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		// Assert against the _visible_ content. Since editor state with the
 		// regression present was accurate, it would produce the correct
@@ -435,7 +435,7 @@ test.describe( 'undo', () => {
 				'role=button[name="Dismiss this notice"i] >> text=Draft saved'
 			)
 		).toBeVisible();
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
@@ -448,7 +448,7 @@ test.describe( 'undo', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '1' );
 		await editor.publishPost();
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
@@ -482,7 +482,7 @@ test.describe( 'undo', () => {
 			page.locator( 'role=button[name="Undo"]' )
 		).toBeEnabled();
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		// Expect "1".
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -504,7 +504,7 @@ test.describe( 'undo', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( text );
 		await editor.publishPost();
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await page.click( '.editor-history__redo[aria-disabled="false"]' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
