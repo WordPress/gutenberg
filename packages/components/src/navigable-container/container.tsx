@@ -120,7 +120,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 				'role'
 			);
 			const targetHasMenuItemRole =
-				targetRole && MENU_ITEM_ROLES.includes( targetRole );
+				!! targetRole && MENU_ITEM_ROLES.includes( targetRole );
 
 			// `preventDefault()` on tab to avoid having the browser move the focus
 			// after this component has already moved it.
