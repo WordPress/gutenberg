@@ -27,7 +27,7 @@ import { BlockContextProvider, BlockPreview } from '@wordpress/block-editor';
 import { store as editSiteStore } from '../../../store';
 import useEditedEntityRecord from '../../use-edited-entity-record';
 
-export default function PageCard() {
+export default function PagePanels() {
 	const blockContext = useSelect(
 		( select ) => select( editSiteStore ).getEditedPostContext(),
 		[]

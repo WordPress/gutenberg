@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import { PanelBody, createSlotFill } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { useEffect, Fragment } from '@wordpress/element';
@@ -19,7 +19,7 @@ import SettingsHeader from './settings-header';
 import TemplateCard from './template-card';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 import { store as editSiteStore } from '../../store';
-import PageCard from './page-card';
+import PagePanels from './page-panels';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
@@ -78,7 +78,13 @@ export function SidebarComplementaryAreaFills() {
 				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
 			>
 				{ sidebarName === SIDEBAR_TEMPLATE &&
-					( isPostEditFocus ? <PageCard /> : <TemplateCard /> ) }
+					( isPostEditFocus ? (
+						<PagePanels />
+					) : (
+						<PanelBody>
+							<TemplateCard />
+						</PanelBody>
+					) ) }
 				{ sidebarName === SIDEBAR_BLOCK && (
 					<InspectorSlot bubblesVirtually />
 				) }

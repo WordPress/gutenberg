@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { PanelBody, PanelRow, Icon } from '@wordpress/components';
+import { PanelRow, Icon } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -40,7 +40,7 @@ export default function TemplateCard() {
 	}
 
 	return (
-		<PanelBody>
+		<>
 			<div className="edit-site-template-card">
 				<Icon className="edit-site-template-card__icon" icon={ icon } />
 				<div className="edit-site-template-card__content">
@@ -62,6 +62,6 @@ export default function TemplateCard() {
 			>
 				<LastRevision />
 			</PanelRow>
-		</PanelBody>
+		</>
 	);
 }
