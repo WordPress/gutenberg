@@ -14,9 +14,9 @@ function UnconnectedCardDivider(
 	props: WordPressComponentProps< DividerProps, 'hr', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const dividerProps = useCardDivider( props );
+	const restProps = useCardDivider( props );
 
-	return <Divider { ...dividerProps } ref={ forwardedRef } />;
+	return <Divider { ...restProps } ref={ forwardedRef } />;
 }
 
 /**
