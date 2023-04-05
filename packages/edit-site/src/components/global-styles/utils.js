@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal/es6';
+
+/**
  *
  * @param {string} variation The variation name.
  *
