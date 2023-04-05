@@ -33,7 +33,7 @@ describe( 'RichText Performance', () => {
 		await measurePerformance(
 			<RichText
 				onChange={ onChange }
-				onCreateUndoLevel={ onCreateUndoLevel }
+				__unstableOnCreateUndoLevel={ onCreateUndoLevel }
 				onSelectionChange={ onSelectionChange }
 			/>,
 			{
