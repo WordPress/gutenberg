@@ -1,11 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	__experimentalHStack as HStack,
+	Icon,
+	__experimentalSpacer as Spacer,
+	Flex,
+	FlexItem,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityRecord } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
+import {
+	page as pageIcon,
+	chevronRight as chevronRightIcon,
+	sidebar as sidebarIcon,
+} from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -58,24 +71,40 @@ export default function EditFocusSwitcher() {
 		return;
 	}
 
-	return (
-		<div className="edit-focus-switcher">
+	return editFocus === 'post' ? (
+		<HStack expanded={ false } spacing={ 2 }>
+			<Icon icon={ pageIcon } />
+			<div>{ post.title }</div>
+		</HStack>
+	) : (
+		<Flex expanded={ false } gap={ 1 }>
 			<Button
-				className={ editFocus === 'post' ? 'is-active' : '' }
+				icon={ pageIcon }
+				style={ { color: '#757575' } }
 				onClick={ () => setEditFocus( 'post' ) }
 			>
-				{ post.type }
+				{ post.title }
 			</Button>
-			<Button
-				className={
-					editFocus === 'template'
-						? 'template-tab is-active'
-						: 'template-tab'
-				}
-				onClick={ () => setEditFocus( 'template' ) }
-			>
-				Template
-			</Button>
-		</div>
+			<Icon
+				icon={ chevronRightIcon }
+				size={ 16 }
+				style={ { fill: '#757575' } }
+			/>
+			<FlexItem>
+				<Spacer padding={ 2 } marginBottom={ 0 }>
+					<HStack
+						expanded={ false }
+						spacing={ 2 }
+						style={ { color: 'rgb(114, 47, 166)' } }
+					>
+						<Icon
+							icon={ sidebarIcon }
+							style={ { fill: 'rgb(114, 47, 166)' } }
+						/>
+						<div>{ __( 'Template' ) }</div>
+					</HStack>
+				</Spacer>
+			</FlexItem>
+		</Flex>
 	);
 }
