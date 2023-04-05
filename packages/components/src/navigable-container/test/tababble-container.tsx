@@ -33,8 +33,6 @@ const getTabbableContainerTabbables = () => [
 
 const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
 
-const stubEventToOffset = ( _event: KeyboardEvent ) => undefined;
-
 describe( 'TabbableContainer', () => {
 	beforeAll( () => {
 		// Mocking `getClientRects()` is necessary to pass a check performed by
@@ -55,12 +53,7 @@ describe( 'TabbableContainer', () => {
 
 		const onNavigateSpy = jest.fn();
 
-		render(
-			<TabbableContainerTestCase
-				onNavigate={ onNavigateSpy }
-				eventToOffset={ stubEventToOffset }
-			/>
-		);
+		render( <TabbableContainerTestCase onNavigate={ onNavigateSpy } /> );
 
 		const tabbables = getTabbableContainerTabbables();
 
@@ -90,10 +83,7 @@ describe( 'TabbableContainer', () => {
 		const onNavigateSpy = jest.fn();
 
 		const { rerender } = render(
-			<TabbableContainerTestCase
-				onNavigate={ onNavigateSpy }
-				eventToOffset={ stubEventToOffset }
-			/>
+			<TabbableContainerTestCase onNavigate={ onNavigateSpy } />
 		);
 
 		const tabbables = getTabbableContainerTabbables();
@@ -123,7 +113,6 @@ describe( 'TabbableContainer', () => {
 			<TabbableContainerTestCase
 				onNavigate={ onNavigateSpy }
 				cycle={ false }
-				eventToOffset={ stubEventToOffset }
 			/>
 		);
 
@@ -156,9 +145,7 @@ describe( 'TabbableContainer', () => {
 			// Disable reason: this is only for test purposes.
 			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 			<div onKeyDown={ externalWrapperOnKeyDownSpy }>
-				<TabbableContainerTestCase
-					eventToOffset={ stubEventToOffset }
-				/>
+				<TabbableContainerTestCase />
 			</div>
 		);
 
