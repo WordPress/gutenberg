@@ -35,6 +35,7 @@ export default function BorderPanel( { name, variation = '' } ) {
 			value={ style }
 			onChange={ setStyle }
 			settings={ settings }
+			forceSplitBorders
 		/>
 	);
 }
