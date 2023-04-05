@@ -108,6 +108,8 @@
 		"test": "cross-env NODE_ENV=test jest --verbose --config ../../test/native/jest.config.js",
 		"test:debug": "cross-env NODE_ENV=test node --inspect-brk ../../node_modules/.bin/jest --runInBand --verbose --config ../../test/native/jest.config.js",
 		"test:update": "npm run test -- --updateSnapshot",
+		"test:perf": "cross-env NODE_ENV=test TEST_RUNNER_PATH=../../node_modules/.bin/jest TEST_RUNNER_ARGS='--runInBand --testMatch \"**/performance/*.native.[jt]s?(x)\" --verbose --config ../../test/native/jest.config.js' reassure",
+		"test:perf:baseline": "cross-env NODE_ENV=test TEST_RUNNER_PATH=../../node_modules/.bin/jest TEST_RUNNER_ARGS='--runInBand --testMatch \"**/performance/*.native.[jt]s?(x)\" --verbose --config ../../test/native/jest.config.js' reassure --baseline",
 		"device-tests": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --no-cache --maxWorkers=3 --testPathIgnorePatterns='canary|gutenberg-editor-rendering' --verbose --config ./jest_ui.config.js",
 		"device-tests-canary": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --no-cache --maxWorkers=2 --testPathPattern=@canary --verbose --config ./jest_ui.config.js",
 		"device-tests:local": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --verbose --forceExit --config ./jest_ui.config.js",

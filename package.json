@@ -223,6 +223,7 @@
 		"react-native-url-polyfill": "1.1.2",
 		"react-refresh": "0.10.0",
 		"react-test-renderer": "18.2.0",
+		"reassure": "0.7.1",
 		"redux": "4.1.2",
 		"resize-observer-polyfill": "1.5.1",
 		"rimraf": "3.0.2",
