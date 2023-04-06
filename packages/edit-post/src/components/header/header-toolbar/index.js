@@ -39,14 +39,25 @@ function HeaderToolbar() {
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
+		useKeyboardFocusShortcut,
 	} = useSelect( ( select ) => {
-		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
-			select( blockEditorStore );
+		const {
+			hasInserterItems,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+			getSelectedBlockClientIds,
+			__unstableGetEditorMode,
+		} = select( blockEditorStore );
 		const { getEditorSettings } = select( editorStore );
 		const { getEditorMode, isFeatureActive, isListViewOpened } =
 			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		const _selectedBlockClientIds = getSelectedBlockClientIds();
+
 		return {
+			useKeyboardFocusShortcut:
+				_selectedBlockClientIds.length === 0 ||
+				__unstableGetEditorMode() !== 'edit',
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
 				getEditorMode() === 'visual' &&
@@ -64,8 +75,6 @@ function HeaderToolbar() {
 		};
 	}, [] );
 
-	// TODO: Determine if there is a block toolbar active, as we need to change the shortcut behavior if it is
-	const isBlockToolbarActive = true;
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
 
@@ -116,7 +125,7 @@ function HeaderToolbar() {
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
-			useKeyboardFocusShortcut={ ! isBlockToolbarActive }
+			useKeyboardFocusShortcut={ useKeyboardFocusShortcut }
 		>
 			<div className="edit-post-header-toolbar__left">
 				<ToolbarItem
