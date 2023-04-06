@@ -12,7 +12,7 @@ const meta: ComponentMeta< typeof NavigableMenu > = {
 	title: 'Components/NavigableMenu',
 	component: NavigableMenu,
 	argTypes: {
-		children: { type: undefined },
+		children: { control: { type: null } },
 		onNavigate: { action: 'onNavigate' },
 		orientation: {
 			options: [ 'horizontal', 'vertical' ],
