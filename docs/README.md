@@ -22,7 +22,7 @@ A block is a discrete element such as a Paragraph, a Heading, a Media element, o
 
 The block editor is designed with progressive enhancement in mind, meaning that it is backward compatible with all legacy content. Blocks also offer enhanced editing and format controls.
 
-The block editor not only enhances the editing experience by offering visual drag-and-drop content creation tools. It is also a powerful developer platform with a rich feature-set of APIs that allow it to be manipulated and extended in a multitude of different ways.
+Not only does the block editor enhance the editing experience by offering visual drag-and-drop content creation tools, it is also a powerful developer platform with a rich feature-set of APIs that allow it to be manipulated and extended in a multitude of different ways.
 
 ### The Gutenberg project
 
@@ -34,7 +34,7 @@ The four phases are:
 
 1. Editing, 
 2. Customization (which includes Full Site Editing, Block Patterns, Block Directory and Block based themes), 
-3. Collaboration, and 
+3. Collaboration,
 4. Multilingual.
 
 ### Navigating this handbook
