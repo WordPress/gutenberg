@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, mapValues } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * Removed empty nodes from nested objects.
@@ -18,8 +18,8 @@ const cleanEmptyObject = ( object ) => {
 		return object;
 	}
 	const cleanedNestedObjects = Object.fromEntries(
-		Object.entries( mapValues( object, cleanEmptyObject ) ).filter(
-			( [ , value ] ) => Boolean( value )
+		Object.entries( object ).filter( ( [ , value ] ) =>
+			Boolean( cleanEmptyObject( value ) )
 		)
 	);
 	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
