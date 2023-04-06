@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import {
 	useFocusOnMount,
@@ -12,7 +9,7 @@ import {
 	useInstanceId,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -38,10 +35,6 @@ export default function ListViewSidebar() {
 	const instanceId = useInstanceId( ListViewSidebar );
 	const labelId = `edit-site-editor__list-view-panel-label-${ instanceId }`;
 	const { PrivateListView } = unlock( blockEditorPrivateApis );
-	const clientIdsTree = useSelect( ( select ) => {
-		const { __unstableGetClientIdsTree } = select( blockEditorStore );
-		return __unstableGetClientIdsTree();
-	} );
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
@@ -67,11 +60,7 @@ export default function ListViewSidebar() {
 					focusOnMountRef,
 				] ) }
 			>
-				<PrivateListView
-					rootClientId={
-						clientIdsTree[ 0 ].innerBlocks[ 0 ].clientId
-					}
-				/>
+				<PrivateListView />
 			</div>
 		</div>
 	);
