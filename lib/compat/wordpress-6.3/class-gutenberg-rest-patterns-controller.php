@@ -1,18 +1,14 @@
 <?php
 /**
- * Reusable blocks REST API: WP_REST_Blocks_Controller class
+ * User-created patterns REST API: Gutenberg_REST_Patterns_Controller class
  *
- * @package WordPress
- * @subpackage REST_API
- * @since 5.0.0
+ * @package Gutenberg
  */
 
 /**
  * Controller which provides a REST endpoint for the editor to read, create,
- * edit and delete reusable blocks. Blocks are stored as posts with the wp_block
+ * edit and delete patterns. Patterns are stored as posts with the wp_block_pattern
  * post type.
- *
- * @since 5.0.0
  *
  * @see WP_REST_Posts_Controller
  * @see WP_REST_Controller
@@ -20,12 +16,10 @@
 class Gutenberg_REST_Patterns_Controller extends WP_REST_Posts_Controller {
 
 	/**
-	 * Checks if a block can be read.
+	 * Checks if a pattern can be read.
 	 *
-	 * @since 5.0.0
-	 *
-	 * @param WP_Post $post Post object that backs the block.
-	 * @return bool Whether the block can be read.
+	 * @param WP_Post $post Post object that backs the pattern.
+	 * @return bool Whether the pattern can be read.
 	 */
 	public function check_read_permission( $post ) {
 		// By default the read_post capability is mapped to edit_posts.
@@ -39,8 +33,6 @@ class Gutenberg_REST_Patterns_Controller extends WP_REST_Posts_Controller {
 	/**
 	 * Filters a response based on the context defined in the schema.
 	 *
-	 * @since 5.0.0
-	 *
 	 * @param array  $data    Response data to filter.
 	 * @param string $context Context defined in the schema.
 	 * @return array Filtered response.
@@ -50,8 +42,8 @@ class Gutenberg_REST_Patterns_Controller extends WP_REST_Posts_Controller {
 
 		/*
 		 * Remove `title.rendered` and `content.rendered` from the response. It
-		 * doesn't make sense for a reusable block to have rendered content on its
-		 * own, since rendering a block requires it to be inside a post or a page.
+		 * doesn't make sense for a pattern to have rendered content on its
+		 * own, since rendering a pattern requires it to be inside a post or a page.
 		 */
 		unset( $data['title']['rendered'] );
 		unset( $data['content']['rendered'] );
@@ -60,9 +52,7 @@ class Gutenberg_REST_Patterns_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Retrieves the block's schema, conforming to JSON Schema.
-	 *
-	 * @since 5.0.0
+	 * Retrieves the pattern's schema, conforming to JSON Schema.
 	 *
 	 * @return array Item schema data.
 	 */
@@ -72,7 +62,7 @@ class Gutenberg_REST_Patterns_Controller extends WP_REST_Posts_Controller {
 
 		/*
 		 * Allow all contexts to access `title.raw` and `content.raw`. Clients always
-		 * need the raw markup of a reusable block to do anything useful, e.g. parse
+		 * need the raw markup of a pattern to do anything useful, e.g. parse
 		 * it or display it in an editor.
 		 */
 		$schema['properties']['title']['properties']['raw']['context']   = array( 'view', 'edit' );
@@ -80,8 +70,8 @@ class Gutenberg_REST_Patterns_Controller extends WP_REST_Posts_Controller {
 
 		/*
 		 * Remove `title.rendered` and `content.rendered` from the schema. It doesn’t
-		 * make sense for a reusable block to have rendered content on its own, since
-		 * rendering a block requires it to be inside a post or a page.
+		 * make sense for a pattern to have rendered content on its own, since
+		 * rendering a pattern requires it to be inside a post or a page.
 		 */
 		unset( $schema['properties']['title']['properties']['rendered'] );
 		unset( $schema['properties']['content']['properties']['rendered'] );

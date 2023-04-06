@@ -1,23 +1,14 @@
 <?php
 /**
- * Core Post API
+ * Handles user-created block patterns.
  *
- * @package WordPress
- * @subpackage Post
+ * @package gutenberg
  */
-
-//
-// Post Type registration.
-//
 
 /**
- * Creates the initial post types when 'init' action is fired.
- *
- * See {@see 'init'}.
- *
- * @since 2.9.0
+ * Creates the `wp_block_pattern` post type.
  */
-function gutenberg_create_initial_post_types() {
+function gutenberg_create_wp_block_pattern_post_type() {
 	register_post_type(
 		'wp_block_pattern',
 		array(
@@ -42,10 +33,10 @@ function gutenberg_create_initial_post_types() {
 				'item_scheduled'           => __( 'Pattern scheduled.' ),
 				'item_updated'             => __( 'Pattern updated.' ),
 			),
-			'public'                => true,
+			'public'                => false,
 			'_builtin'              => true, /* internal use only. don't use this when registering your own post type. */
 			'show_ui'               => true,
-			'show_in_menu'          => true,
+			'show_in_menu'          => false,
 			'rewrite'               => false,
 			'show_in_rest'          => true,
 			'rest_base'             => 'patterns',
@@ -71,7 +62,7 @@ function gutenberg_create_initial_post_types() {
 		)
 	);
 }
-add_action( 'init', 'gutenberg_create_initial_post_types' );
+add_action( 'init', 'gutenberg_create_wp_block_pattern_post_type' );
 
 /**
  * Registers user-created block patterns.
@@ -86,10 +77,12 @@ function gutenberg_register_user_block_patterns() {
 		)
 	);
 
+	// Bail if there are no posts.
 	if ( empty( $posts ) ) {
 		return;
 	}
 
+	// Register the user category.
 	register_block_pattern_category(
 		'user',
 		array(
