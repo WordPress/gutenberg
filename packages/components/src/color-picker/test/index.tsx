@@ -20,6 +20,17 @@ function getSaturation( container: HTMLElement ) {
 	);
 }
 
+function getFormatSelector( container: HTMLElement ) {
+	return container.querySelector( '.components-select-control__input' );
+}
+
+function getInputByClass(
+	container: HTMLElement,
+	className: string
+): HTMLInputElement | null {
+	return container.querySelector( className );
+}
+
 type PageXPageY = { pageX: number; pageY: number };
 
 // Fix to pass `pageX` and `pageY`
