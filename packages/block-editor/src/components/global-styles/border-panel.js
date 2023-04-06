@@ -190,12 +190,14 @@ export default function BorderPanel( {
 
 		if ( hasSplitBorders( updatedBorder ) ) {
 			[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
-				updatedBorder[ side ] = {
-					...updatedBorder[ side ],
-					color: encodeColorValue( updatedBorder[ side ]?.color ),
-				};
+				if ( updatedBorder[ side ] ) {
+					updatedBorder[ side ] = {
+						...updatedBorder[ side ],
+						color: encodeColorValue( updatedBorder[ side ]?.color ),
+					};
+				}
 			} );
-		} else {
+		} else if ( updatedBorder ) {
 			updatedBorder.color = encodeColorValue( updatedBorder.color );
 		}
 
