@@ -13,10 +13,10 @@ export { default as isShallowEqualArrays } from './arrays';
 
 /**
  * Returns true if the two arrays or objects are shallow equal, or false
- * otherwise.
+ * otherwise. Also handles primitives and falsey values, just in case.
  *
- * @param {any[]|ComparableObject} a First object or array to compare.
- * @param {any[]|ComparableObject} b Second object or array to compare.
+ * @param {any} a First object or array to compare.
+ * @param {any} b Second object or array to compare.
  *
  * @return {boolean} Whether the two values are shallow equal.
  */
