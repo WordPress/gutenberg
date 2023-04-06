@@ -121,6 +121,8 @@ There are two important API types in the Gutenberg codebase:
 * **Experimental APIs** – they are public APIs that are only shipped in Gutenberg and not merged into WordPress core. Their existence is either pending future revision or provides an immediate means to an end.
 * **Private APIs** – they are used internally in the Gutenberg Plugin, are shipped in WordPress Core, but they cannot be accessed by WordPress extenders. Private APIs can be freely changed and removed without affecting existing WordPress websites.
 
+#### Experimental APIs are useful for incubating new features before releasing them
+
 _To External Consumers:_
 
 **There is no support commitment for experimental APIs.** They can and will be removed or changed without advance warning, including as part of a minor or patch release. As an external consumer, you should avoid these APIs.
@@ -128,8 +130,6 @@ _To External Consumers:_
 _To Project Contributors:_
 
 An experimental API is named as such to communicate instability of a function whose interface is not yet finalized. Aside from references within the code, these APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
-
-#### Experimental APIs are useful for incubating new features before releasing them
 
 An experimental function or object should be:
 
