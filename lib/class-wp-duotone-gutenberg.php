@@ -2,6 +2,32 @@
 /**
  * WP_Duotone_Gutenberg class
  *
+ * Parts of this source were derived and modified from colord,
+ * released under the MIT license.
+ *
+ * https://github.com/omgovich/colord
+ *
+ * Copyright (c) 2020 Vlad Shilov omgovich@ya.ru
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  * @package gutenberg
  * @since 6.3.0
  */
@@ -72,6 +98,321 @@ class WP_Duotone_Gutenberg {
 	 * Prefix used for generating and referencing duotone CSS custom properties.
 	 */
 	const CSS_VAR_PREFIX = '--wp--preset--duotone--';
+
+	/**
+	 * Direct port of colord's clamp function. Using min/max instead of
+	 * nested ternaries.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L23
+	 *
+	 * @param float $number The number to clamp.
+	 * @param float $min   The minimum value.
+	 * @param float $max   The maximum value.
+	 * @return float The clamped value.
+	 */
+	private static function colord_clamp( $number, $min = 0, $max = 1 ) {
+		return $number > $max ? $max : ( $number > $min ? $number : $min );
+	}
+
+	/**
+	 * Direct port of colord's clampHue function.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L32
+	 *
+	 * @param float $degrees The hue to clamp.
+	 * @return float The clamped hue.
+	 */
+	private static function colord_clamp_hue( $degrees ) {
+		$degrees = is_finite( $degrees ) ? $degrees % 360 : 0;
+		return $degrees > 0 ? $degrees : $degrees + 360;
+	}
+
+	/**
+	 * Direct port of colord's parseHue function.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L40
+	 *
+	 * @param float  $value The hue value to parse.
+	 * @param string $unit  The unit of the hue value.
+	 * @return float The parsed hue value.
+	 */
+	private static function colord_parse_hue( $value, $unit = 'deg' ) {
+		$angle_units = array(
+			'grad' => 360 / 400,
+			'turn' => 360,
+			'rad'  => 360 / ( M_PI * 2 ),
+		);
+
+		$factor = $angle_units[ $unit ];
+		if ( ! $factor ) {
+			$factor = 1;
+		}
+
+		return (float) $value * $factor;
+	}
+
+	/**
+	 * Direct port of colord's parseHex function.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hex.ts#L8
+	 *
+	 * @param string $hex The hex string to parse.
+	 * @return array|null An array of RGBA values or null if the hex string is invalid.
+	 */
+	private static function colord_parse_hex( $hex ) {
+		$is_match = preg_match(
+			'/^#([0-9a-f]{3,8})$/i',
+			$hex,
+			$hex_match
+		);
+
+		if ( ! $is_match ) {
+			return null;
+		}
+
+		$hex = $hex_match[1];
+
+		if ( 4 >= strlen( $hex ) ) {
+			return array(
+				'r' => (int) base_convert( $hex[0] . $hex[0], 16, 10 ),
+				'g' => (int) base_convert( $hex[1] . $hex[1], 16, 10 ),
+				'b' => (int) base_convert( $hex[2] . $hex[2], 16, 10 ),
+				'a' => 4 === strlen( $hex ) ? round( base_convert( $hex[3] . $hex[3], 16, 10 ) / 255, 2 ) : 1,
+			);
+		}
+
+		if ( 6 === strlen( $hex ) || 8 === strlen( $hex ) ) {
+			return array(
+				'r' => (int) base_convert( substr( $hex, 0, 2 ), 16, 10 ),
+				'g' => (int) base_convert( substr( $hex, 2, 2 ), 16, 10 ),
+				'b' => (int) base_convert( substr( $hex, 4, 2 ), 16, 10 ),
+				'a' => 8 === strlen( $hex ) ? round( (int) base_convert( substr( $hex, 6, 2 ), 16, 10 ) / 255, 2 ) : 1,
+			);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Direct port of colord's clampRgba function.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/rgb.ts#L5
+	 *
+	 * @param array $rgba The RGBA array to clamp.
+	 * @return array The clamped RGBA array.
+	 */
+	private static function colord_clamp_rgba( $rgba ) {
+		$rgba['r'] = self::colord_clamp( $rgba['r'], 0, 255 );
+		$rgba['g'] = self::colord_clamp( $rgba['g'], 0, 255 );
+		$rgba['b'] = self::colord_clamp( $rgba['b'], 0, 255 );
+		$rgba['a'] = self::colord_clamp( $rgba['a'] );
+
+		return $rgba;
+	}
+
+	/**
+	 * Direct port of colord's parseRgbaString function.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/rgbString.ts#L18
+	 *
+	 * @param string $input The RGBA string to parse.
+	 * @return array|null An array of RGBA values or null if the RGB string is invalid.
+	 */
+	private static function colord_parse_rgba_string( $input ) {
+		// Functional syntax.
+		$is_match = preg_match(
+			'/^rgba?\(\s*([+-]?\d*\.?\d+)(%)?\s*,\s*([+-]?\d*\.?\d+)(%)?\s*,\s*([+-]?\d*\.?\d+)(%)?\s*(?:,\s*([+-]?\d*\.?\d+)(%)?\s*)?\)$/i',
+			$input,
+			$match
+		);
+
+		if ( ! $is_match ) {
+			// Whitespace syntax.
+			$is_match = preg_match(
+				'/^rgba?\(\s*([+-]?\d*\.?\d+)(%)?\s+([+-]?\d*\.?\d+)(%)?\s+([+-]?\d*\.?\d+)(%)?\s*(?:\/\s*([+-]?\d*\.?\d+)(%)?\s*)?\)$/i',
+				$input,
+				$match
+			);
+		}
+
+		if ( ! $is_match ) {
+			return null;
+		}
+
+		// For some reason, preg_match doesn't include empty matches at the end
+		// of the array, so we add them manually to make things easier later.
+		for ( $i = 1; $i <= 8; $i++ ) {
+			if ( ! isset( $match[ $i ] ) ) {
+				$match[ $i ] = '';
+			}
+		}
+
+		if ( $match[2] !== $match[4] || $match[4] !== $match[6] ) {
+			return null;
+		}
+
+		return self::colord_clamp_rgba(
+			array(
+				'r' => (float) $match[1] / ( $match[2] ? 100 / 255 : 1 ),
+				'g' => (float) $match[3] / ( $match[4] ? 100 / 255 : 1 ),
+				'b' => (float) $match[5] / ( $match[6] ? 100 / 255 : 1 ),
+				'a' => '' === $match[7] ? 1 : (float) $match[7] / ( $match[8] ? 100 : 1 ),
+			)
+		);
+	}
+
+	/**
+	 * Direct port of colord's clampHsla function.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L6
+	 *
+	 * @param array $hsla The HSLA array to clamp.
+	 * @return array The clamped HSLA array.
+	 */
+	private static function colord_clamp_hsla( $hsla ) {
+		$hsla['h'] = self::colord_clamp_hue( $hsla['h'] );
+		$hsla['s'] = self::colord_clamp( $hsla['s'], 0, 100 );
+		$hsla['l'] = self::colord_clamp( $hsla['l'], 0, 100 );
+		$hsla['a'] = self::colord_clamp( $hsla['a'] );
+
+		return $hsla;
+	}
+
+	/**
+	 * Direct port of colord's hsvaToRgba function.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsv.ts#L52
+	 *
+	 * @param array $hsva The HSVA array to convert.
+	 * @return array The RGBA array.
+	 */
+	private static function colord_hsva_to_rgba( $hsva ) {
+		$h = ( $hsva['h'] / 360 ) * 6;
+		$s = $hsva['s'] / 100;
+		$v = $hsva['v'] / 100;
+		$a = $hsva['a'];
+
+		$hh     = floor( $h );
+		$b      = $v * ( 1 - $s );
+		$c      = $v * ( 1 - ( $h - $hh ) * $s );
+		$d      = $v * ( 1 - ( 1 - $h + $hh ) * $s );
+		$module = $hh % 6;
+
+		return array(
+			'r' => array( $v, $c, $b, $b, $d, $v )[ $module ] * 255,
+			'g' => array( $d, $v, $v, $c, $b, $b )[ $module ] * 255,
+			'b' => array( $b, $b, $d, $v, $v, $c )[ $module ] * 255,
+			'a' => $a,
+		);
+	}
+
+	/**
+	 * Direct port of colord's hslaToHsva function.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L33
+	 *
+	 * @param array $hsla The HSLA array to convert.
+	 * @return array The HSVA array.
+	 */
+	private static function colord_hsla_to_hsva( $hsla ) {
+		$h = $hsla['h'];
+		$s = $hsla['s'];
+		$l = $hsla['l'];
+		$a = $hsla['a'];
+
+		$s *= ( $l < 50 ? $l : 100 - $l ) / 100;
+
+		return array(
+			'h' => $h,
+			's' => $s > 0 ? ( ( 2 * $s ) / ( $l + $s ) ) * 100 : 0,
+			'v' => $l + $s,
+			'a' => $a,
+		);
+	}
+
+	/**
+	 * Direct port of colord's hslaToRgba function.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L55
+	 *
+	 * @param array $hsla The HSLA array to convert.
+	 * @return array The RGBA array.
+	 */
+	private static function colord_hsla_to_rgba( $hsla ) {
+		return self::colord_hsva_to_rgba( self::colord_hsla_to_hsva( $hsla ) );
+	}
+
+	/**
+	 * Direct port of colord's parseHslaString function.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hslString.ts#L17
+	 *
+	 * @param string $input The HSLA string to parse.
+	 * @return array|null An array of RGBA values or null if the RGB string is invalid.
+	 */
+	private static function colord_parse_hsla_string( $input ) {
+		// Functional syntax.
+		$is_match = preg_match(
+			'/^hsla?\(\s*([+-]?\d*\.?\d+)(deg|rad|grad|turn)?\s*,\s*([+-]?\d*\.?\d+)%\s*,\s*([+-]?\d*\.?\d+)%\s*(?:,\s*([+-]?\d*\.?\d+)(%)?\s*)?\)$/i',
+			$input,
+			$match
+		);
+
+		if ( ! $is_match ) {
+			// Whitespace syntax.
+			$is_match = preg_match(
+				'/^hsla?\(\s*([+-]?\d*\.?\d+)(deg|rad|grad|turn)?\s+([+-]?\d*\.?\d+)%\s+([+-]?\d*\.?\d+)%\s*(?:\/\s*([+-]?\d*\.?\d+)(%)?\s*)?\)$/i',
+				$input,
+				$match
+			);
+		}
+
+		if ( ! $is_match ) {
+			return null;
+		}
+
+		// For some reason, preg_match doesn't include empty matches at the end
+		// of the array, so we add them manually to make things easier later.
+		for ( $i = 1; $i <= 6; $i++ ) {
+			if ( ! isset( $match[ $i ] ) ) {
+				$match[ $i ] = '';
+			}
+		}
+
+		$hsla = self::colord_clamp_hsla(
+			array(
+				'h' => self::colord_parse_hue( $match[1], $match[2] ),
+				's' => (float) $match[3],
+				'l' => (float) $match[4],
+				'a' => '' === $match[5] ? 1 : (float) $match[5] / ( $match[6] ? 100 : 1 ),
+			)
+		);
+
+		return self::colord_hsla_to_rgba( $hsla );
+	}
+
+	/**
+	 * Direct port of colord's parse function simplified for our use case. This
+	 * version only supports string parsing and only returns RGBA values.
+	 *
+	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/parse.ts#L37
+	 *
+	 * @param string $input The string to parse.
+	 * @return array|null An array of RGBA values or null if the string is invalid.
+	 */
+	private static function colord_parse( $input ) {
+		$result = self::colord_parse_hex( $input );
+
+		if ( ! $result ) {
+			$result = self::colord_parse_rgba_string( $input );
+		}
+
+		if ( ! $result ) {
+			$result = self::colord_parse_hsla_string( $input );
+		}
+
+		return $result;
+	}
 
 	/**
 	 * Get all possible duotone presets from global and theme styles and store as slug => [ colors array ]
