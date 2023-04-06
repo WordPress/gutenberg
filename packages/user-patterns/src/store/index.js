@@ -10,7 +10,7 @@ import * as actions from './actions';
 import reducer from './reducer';
 import * as selectors from './selectors';
 
-const STORE_NAME = 'core/patterns';
+const STORE_NAME = 'core/user-patterns';
 
 /**
  * Store definition for the reusable blocks namespace.

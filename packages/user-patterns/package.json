@@ -1,5 +1,5 @@
 {
-	"name": "@wordpress/patterns",
+	"name": "@wordpress/user-patterns",
 	"version": "4.7.0",
 	"description": "Patterns utilities.",
 	"author": "The WordPress Contributors",
@@ -9,11 +9,11 @@
 		"gutenberg",
 		"patterns"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/patterns/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/user-patterns/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/patterns"
+		"directory": "packages/user-patterns"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"

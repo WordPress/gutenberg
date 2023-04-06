@@ -25,7 +25,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
-import { PatternsMenuItems } from '@wordpress/patterns';
+import { PatternsMenuItems } from '@wordpress/user-patterns';
 
 /**
  * Internal dependencies
