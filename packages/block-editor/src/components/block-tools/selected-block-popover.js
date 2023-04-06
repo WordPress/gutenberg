@@ -85,7 +85,6 @@ function SelectedBlockPopover( {
 		},
 		[ clientId ]
 	);
-
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isToolbarForced = useRef( false );
 	const { stopTyping } = useDispatch( blockEditorStore );
