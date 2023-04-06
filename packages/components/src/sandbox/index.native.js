@@ -333,6 +333,7 @@ const Sandbox = forwardRef( function Sandbox(
 			setBuiltInZoomControls={ false }
 			showsHorizontalScrollIndicator={ false }
 			showsVerticalScrollIndicator={ false }
+			mediaPlaybackRequiresUserAction={ false }
 		/>
 	);
 } );
