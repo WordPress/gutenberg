@@ -1884,6 +1884,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/user-patterns",
+		"slug": "packages-user-patterns",
+		"markdown_source": "../packages/user-patterns/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/viewport",
 		"slug": "packages-viewport",
 		"markdown_source": "../packages/viewport/README.md",
