@@ -16,9 +16,9 @@ test.describe( 'Push to Global Styles button', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, siteEditor } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+		await editor.canvas.click( 'body' );
 	} );
 
 	test( 'should apply Heading block styles to all Heading blocks', async ( {

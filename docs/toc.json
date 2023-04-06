@@ -247,6 +247,9 @@
 					},
 					{
 						"docs/reference-guides/theme-json-reference/theme-json-migrations.md": []
+					},
+					{
+						"docs/reference-guides/theme-json-reference/styles-versions.md": []
 					}
 				]
 			},
@@ -330,7 +333,20 @@
 					},
 					{ "docs/contributors/code/git-workflow.md": [] },
 					{ "docs/contributors/code/coding-guidelines.md": [] },
-					{ "docs/contributors/code/testing-overview.md": [] },
+					{
+						"docs/contributors/code/testing-overview.md": [
+							{
+								"docs/contributors/code/e2e/README.md": [
+									{
+										"docs/contributors/code/e2e/migration.md": []
+									},
+									{
+										"docs/contributors/code/e2e/overusing-snapshots.md": []
+									}
+								]
+							}
+						]
+					},
 					{ "docs/contributors/code/grammar.md": [] },
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },

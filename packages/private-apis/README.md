@@ -58,17 +58,17 @@ Use `lock()` and `unlock()` to privately distribute the `__experimental` APIs ac
 // In packages/package1/index.js:
 import { lock } from './private-apis';
 
-export const experiments = {};
+export const privateApis = {};
 /* Attach private data to the exported object */
-lock( experiments, {
+lock( privateApis, {
 	__experimentalFunction: function () {},
 } );
 
 // In packages/package2/index.js:
-import { experiments } from '@wordpress/package1';
+import { privateApis } from '@wordpress/package1';
 import { unlock } from './private-apis';
 
-const { __experimentalFunction } = unlock( experiments );
+const { __experimentalFunction } = unlock( privateApis );
 ```
 
 ## Shipping experimental APIs

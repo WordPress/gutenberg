@@ -14,6 +14,7 @@ import { PluginArea } from '@wordpress/plugins';
  */
 import { Routes } from '../routes';
 import Layout from '../layout';
+import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 
 export default function App() {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -33,12 +34,14 @@ export default function App() {
 	return (
 		<ShortcutProvider style={ { height: '100%' } }>
 			<SlotFillProvider>
-				<Popover.Slot />
-				<UnsavedChangesWarning />
-				<Routes>
-					<Layout />
-					<PluginArea onError={ onPluginAreaError } />
-				</Routes>
+				<GlobalStylesProvider>
+					<Popover.Slot />
+					<UnsavedChangesWarning />
+					<Routes>
+						<Layout />
+						<PluginArea onError={ onPluginAreaError } />
+					</Routes>
+				</GlobalStylesProvider>
 			</SlotFillProvider>
 		</ShortcutProvider>
 	);

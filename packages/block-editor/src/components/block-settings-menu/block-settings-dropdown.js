@@ -147,7 +147,9 @@ export function BlockSettingsDropdown( {
 		__experimentalSelectBlock
 			? () => {
 					const blockToSelect =
-						previousBlockClientId || nextBlockClientId;
+						previousBlockClientId ||
+						nextBlockClientId ||
+						firstParentClientId;
 
 					if (
 						blockToSelect &&
@@ -166,6 +168,7 @@ export function BlockSettingsDropdown( {
 			__experimentalSelectBlock,
 			previousBlockClientId,
 			nextBlockClientId,
+			firstParentClientId,
 			selectedBlockClientIds,
 		]
 	);

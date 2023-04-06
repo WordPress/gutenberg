@@ -12,6 +12,7 @@ import {
 import {
 	typography,
 	border,
+	filter,
 	shadow,
 	color,
 	layout,
@@ -21,32 +22,37 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useHasBorderPanel } from './border-panel';
-import { useHasColorPanel } from './color-utils';
-import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { ScreenVariations } from './screen-variations';
-import { useHasShadowControl } from './shadow-panel';
 import { unlock } from '../../private-apis';
 
-const { useHasTypographyPanel, useGlobalSetting } = unlock(
-	blockEditorExperiments
-);
+const {
+	useHasDimensionsPanel,
+	useHasTypographyPanel,
+	useHasBorderPanel,
+	useHasColorPanel,
+	useHasEffectsPanel,
+	useHasFiltersPanel,
+	useGlobalSetting,
+	useSettingsForBlockElement,
+} = unlock( blockEditorPrivateApis );
 
 function ContextMenu( { name, parentMenu = '' } ) {
-	const [ settings ] = useGlobalSetting( '', name );
-	const hasTypographyPanel = useHasTypographyPanel( name, null, settings );
-	const hasColorPanel = useHasColorPanel( name );
-	const hasBorderPanel = useHasBorderPanel( name );
-	const hasEffectsPanel = useHasShadowControl( name );
-	const hasDimensionsPanel = useHasDimensionsPanel( name );
+	const [ rawSettings ] = useGlobalSetting( '', name );
+	const settings = useSettingsForBlockElement( rawSettings, name );
+	const hasTypographyPanel = useHasTypographyPanel( settings );
+	const hasColorPanel = useHasColorPanel( settings );
+	const hasBorderPanel = useHasBorderPanel( settings );
+	const hasEffectsPanel = useHasEffectsPanel( settings );
+	const hasFilterPanel = useHasFiltersPanel( settings );
+	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasDimensionsPanel;
 	const hasVariationsPanel = useHasVariationsPanel( name, parentMenu );
 
@@ -103,9 +109,18 @@ function ContextMenu( { name, parentMenu = '' } ) {
 					<NavigationButtonAsItem
 						icon={ shadow }
 						path={ parentMenu + '/effects' }
-						aria-label={ __( 'Shadow' ) }
+						aria-label={ __( 'Effects' ) }
 					>
-						{ __( 'Shadow' ) }
+						{ __( 'Effects' ) }
+					</NavigationButtonAsItem>
+				) }
+				{ hasFilterPanel && (
+					<NavigationButtonAsItem
+						icon={ filter }
+						path={ parentMenu + '/filters' }
+						aria-label={ __( 'Filters styles' ) }
+					>
+						{ __( 'Filters' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasLayoutPanel && (

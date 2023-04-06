@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
@@ -14,7 +9,8 @@ import {
 	TextControl,
 	TreeSelect,
 	withFilters,
-	__experimentalVStack as VStack,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
@@ -180,27 +176,18 @@ export function HierarchicalTermSelector( { slug } ) {
 			const { getTaxonomy, getEntityRecords, isResolving } =
 				select( coreStore );
 			const _taxonomy = getTaxonomy( slug );
+			const post = getCurrentPost();
 
 			return {
 				hasCreateAction: _taxonomy
-					? get(
-							getCurrentPost(),
-							[
-								'_links',
-								'wp:action-create-' + _taxonomy.rest_base,
-							],
-							false
-					  )
+					? post._links?.[
+							'wp:action-create-' + _taxonomy.rest_base
+					  ] ?? false
 					: false,
 				hasAssignAction: _taxonomy
-					? get(
-							getCurrentPost(),
-							[
-								'_links',
-								'wp:action-assign-' + _taxonomy.rest_base,
-							],
-							false
-					  )
+					? post._links?.[
+							'wp:action-assign-' + _taxonomy.rest_base
+					  ] ?? false
 					: false,
 				terms: _taxonomy
 					? getEditedPostAttribute( _taxonomy.rest_base )
@@ -308,14 +295,12 @@ export function HierarchicalTermSelector( { slug } ) {
 			parent: formParent ? formParent : undefined,
 		} );
 
+		const defaultName =
+			slug === 'category' ? __( 'Category' ) : __( 'Term' );
 		const termAddedMessage = sprintf(
 			/* translators: %s: taxonomy name */
 			_x( '%s added', 'term' ),
-			get(
-				taxonomy,
-				[ 'labels', 'singular_name' ],
-				slug === 'category' ? __( 'Category' ) : __( 'Term' )
-			)
+			taxonomy?.labels?.singular_name ?? defaultName
 		);
 		speak( termAddedMessage, 'assertive' );
 		setAdding( false );
@@ -383,11 +368,9 @@ export function HierarchicalTermSelector( { slug } ) {
 		fallbackIsCategory,
 		fallbackIsNotCategory
 	) =>
-		get(
-			taxonomy,
-			[ 'labels', labelProperty ],
-			slug === 'category' ? fallbackIsCategory : fallbackIsNotCategory
-		);
+		taxonomy?.labels?.[ labelProperty ] ??
+		( slug === 'category' ? fallbackIsCategory : fallbackIsNotCategory );
+
 	const newTermButtonLabel = labelWithFallback(
 		'add_new_item',
 		__( 'Add new category' ),
@@ -405,20 +388,15 @@ export function HierarchicalTermSelector( { slug } ) {
 	);
 	const noParentOption = `— ${ parentSelectLabel } —`;
 	const newTermSubmitLabel = newTermButtonLabel;
-	const filterLabel = get(
-		taxonomy,
-		[ 'labels', 'search_items' ],
-		__( 'Search Terms' )
-	);
-	const groupLabel = get( taxonomy, [ 'name' ], __( 'Terms' ) );
+	const filterLabel = taxonomy?.labels?.search_items ?? __( 'Search Terms' );
+	const groupLabel = taxonomy?.name ?? __( 'Terms' );
 	const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
 
 	return (
-		<>
+		<Flex direction="column" gap="4">
 			{ showFilter && (
 				<TextControl
 					__nextHasNoMarginBottom
-					className="editor-post-taxonomies__hierarchical-terms-filter"
 					label={ filterLabel }
 					value={ filterValue }
 					onChange={ setFilter }
@@ -435,18 +413,20 @@ export function HierarchicalTermSelector( { slug } ) {
 				) }
 			</div>
 			{ ! loading && hasCreateAction && (
-				<Button
-					onClick={ onToggleForm }
-					className="editor-post-taxonomies__hierarchical-terms-add"
-					aria-expanded={ showForm }
-					variant="link"
-				>
-					{ newTermButtonLabel }
-				</Button>
+				<FlexItem>
+					<Button
+						onClick={ onToggleForm }
+						className="editor-post-taxonomies__hierarchical-terms-add"
+						aria-expanded={ showForm }
+						variant="link"
+					>
+						{ newTermButtonLabel }
+					</Button>
+				</FlexItem>
 			) }
 			{ showForm && (
 				<form onSubmit={ onAddTerm }>
-					<VStack>
+					<Flex direction="column" gap="4">
 						<TextControl
 							__nextHasNoMarginBottom
 							className="editor-post-taxonomies__hierarchical-terms-input"
@@ -457,6 +437,7 @@ export function HierarchicalTermSelector( { slug } ) {
 						/>
 						{ !! availableTerms.length && (
 							<TreeSelect
+								__nextHasNoMarginBottom
 								label={ parentSelectLabel }
 								noOptionLabel={ noParentOption }
 								onChange={ onChangeFormParent }
@@ -464,17 +445,19 @@ export function HierarchicalTermSelector( { slug } ) {
 								tree={ availableTermsTree }
 							/>
 						) }
-					</VStack>
-					<Button
-						variant="secondary"
-						type="submit"
-						className="editor-post-taxonomies__hierarchical-terms-submit"
-					>
-						{ newTermSubmitLabel }
-					</Button>
+						<FlexItem>
+							<Button
+								variant="secondary"
+								type="submit"
+								className="editor-post-taxonomies__hierarchical-terms-submit"
+							>
+								{ newTermSubmitLabel }
+							</Button>
+						</FlexItem>
+					</Flex>
 				</form>
 			) }
-		</>
+		</Flex>
 	);
 }
 

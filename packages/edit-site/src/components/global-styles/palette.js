@@ -13,7 +13,7 @@ import {
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { shuffle } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -24,7 +24,7 @@ import { useColorRandomizer } from './hooks';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 import { unlock } from '../../private-apis';
 
-const { useGlobalSetting } = unlock( blockEditorExperiments );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 const EMPTY_COLORS = [];
 

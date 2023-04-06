@@ -8,7 +8,7 @@ import {
 	__experimentalHStack as HStack,
 	FlexItem,
 } from '@wordpress/components';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -21,7 +21,7 @@ import BlockPreviewPanel from './block-preview-panel';
 import { getVariationClassName } from './utils';
 import { unlock } from '../../private-apis';
 
-const { useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 function Item( { name, parentMenu, element, label } ) {
 	const hasSupport = ! name;
@@ -128,6 +128,12 @@ function ScreenTypography( { name, variation = '' } ) {
 								parentMenu={ parentMenu }
 								element="heading"
 								label={ __( 'Headings' ) }
+							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="caption"
+								label={ __( 'Captions' ) }
 							/>
 							<Item
 								name={ name }

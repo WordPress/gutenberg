@@ -6,14 +6,14 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
 
-const { useGlobalSetting } = unlock( blockEditorExperiments );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 export default function ColorPalettePanel( { name } ) {
 	const [ themeColors, setThemeColors ] = useGlobalSetting(

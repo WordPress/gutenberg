@@ -8,6 +8,7 @@ const config: PlaywrightTestConfig = {
 	reporter: [
 		[ 'html', { open: 'on-failure', outputFolder: 'test-results/report' } ],
 	],
+	fullyParallel: true,
 };
 
 export default config;

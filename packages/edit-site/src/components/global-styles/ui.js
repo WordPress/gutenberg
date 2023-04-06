@@ -10,27 +10,30 @@ import {
 } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import ScreenRoot from './screen-root';
-import ScreenBlockList from './screen-block-list';
+import {
+	useBlockHasGlobalStyles,
+	default as ScreenBlockList,
+} from './screen-block-list';
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
+import ScreenFilters from './screen-filters';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
-import ScreenBackgroundColor from './screen-background-color';
-import ScreenTextColor from './screen-text-color';
-import ScreenLinkColor from './screen-link-color';
-import ScreenHeadingColor from './screen-heading-color';
-import ScreenButtonColor from './screen-button-color';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import { ScreenVariation } from './screen-variations';
@@ -60,7 +63,7 @@ function GlobalStylesActionMenu() {
 				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
 		};
 	}, [] );
-	const { useGlobalStylesReset } = unlock( blockEditorExperiments );
+	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { goTo } = useNavigator();
 	const loadCustomCSS = () => goTo( '/css' );
@@ -68,7 +71,7 @@ function GlobalStylesActionMenu() {
 		<GlobalStylesMenuFill>
 			<DropdownMenu
 				icon={ moreVertical }
-				label={ __( 'More Styles actions' ) }
+				label={ __( 'Styles actions' ) }
 				controls={ [
 					{
 						title: __( 'Reset to defaults' ),
@@ -184,6 +187,12 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/typography/caption' }
+			>
+				<ScreenTypographyElement name={ name } element="caption" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/typography/button' }
 			>
 				<ScreenTypographyElement name={ name } element="button" />
@@ -199,30 +208,8 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 				<ScreenColorPalette name={ name } />
 			</GlobalStylesNavigationScreen>
 
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/colors/background' }
-			>
-				<ScreenBackgroundColor name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/text' }>
-				<ScreenTextColor name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/link' }>
-				<ScreenLinkColor name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/colors/heading' }
-			>
-				<ScreenHeadingColor name={ name } variation={ variation } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen
-				path={ parentMenu + '/colors/button' }
-			>
-				<ScreenButtonColor name={ name } variation={ variation } />
+			<GlobalStylesNavigationScreen path={ parentMenu + '/filters' }>
+				<ScreenFilters name={ name } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>
@@ -267,17 +254,46 @@ function GlobalStylesStyleBook( { onClose } ) {
 				)
 			}
 			onSelect={ ( blockName ) => {
-				// Clear navigator history by going back to the root.
-				const depth = path.match( /\//g ).length;
-				for ( let i = 0; i < depth; i++ ) {
-					navigator.goBack();
-				}
 				// Now go to the selected block.
 				navigator.goTo( '/blocks/' + encodeURIComponent( blockName ) );
 			} }
 			onClose={ onClose }
 		/>
 	);
+}
+
+function GlobalStylesBlockLink() {
+	const navigator = useNavigator();
+	const isMounted = useRef();
+	const { selectedBlockName, selectedBlockClientId } = useSelect(
+		( select ) => {
+			const { getSelectedBlockClientId, getBlockName } =
+				select( blockEditorStore );
+			const clientId = getSelectedBlockClientId();
+			return {
+				selectedBlockName: getBlockName( clientId ),
+				selectedBlockClientId: clientId,
+			};
+		},
+		[]
+	);
+	const blockHasGlobalStyles = useBlockHasGlobalStyles( selectedBlockName );
+	useEffect( () => {
+		// Avoid navigating to the block screen on mount.
+		if ( ! isMounted.current ) {
+			isMounted.current = true;
+			return;
+		}
+		if ( ! selectedBlockClientId || ! blockHasGlobalStyles ) {
+			return;
+		}
+		const path = '/blocks/' + encodeURIComponent( selectedBlockName );
+		// Avoid navigating to the same path. This can happen when selecting
+		// a new block of the same type.
+		if ( path !== navigator.location.path ) {
+			navigator.goTo( path, { skipFocus: true } );
+		}
+	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
 }
 
 function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
@@ -332,6 +348,7 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 			) }
 
 			<GlobalStylesActionMenu />
+			<GlobalStylesBlockLink />
 		</NavigatorProvider>
 	);
 }

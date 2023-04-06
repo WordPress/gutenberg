@@ -59,7 +59,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$request->set_param( 'is_custom', false );
 		$request->set_param( 'template_prefix', 'tag' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertSame( 'tag', $response->get_data()['slug'], 'Should fallback to `index.html`.' );
+		$this->assertSame( 'index', $response->get_data()['slug'], 'Should fallback to `index.html`.' );
 	}
 
 	public function test_context_param() {

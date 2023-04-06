@@ -7,7 +7,7 @@ import {
 	ErrorBoundary,
 	PostLockedModal,
 	store as editorStore,
-	experiments as editorExperiments,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
@@ -23,7 +23,7 @@ import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './private-apis';
 
-const { ExperimentalEditorProvider } = unlock( editorExperiments );
+const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	const {
@@ -139,6 +139,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	}, [
 		settings,
 		hasFixedToolbar,
+		hasInlineToolbar,
 		focusMode,
 		isDistractionFree,
 		hiddenBlockTypes,

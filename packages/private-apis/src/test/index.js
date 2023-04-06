@@ -3,16 +3,16 @@
  */
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '../';
 import {
-	resetRegisteredExperiments,
+	resetRegisteredPrivateApis,
 	resetAllowedCoreModules,
 	allowCoreModule,
 } from '../implementation';
 
 beforeEach( () => {
-	resetRegisteredExperiments();
+	resetRegisteredPrivateApis();
 	resetAllowedCoreModules();
-	allowCoreModule( '@experiments/test' );
-	allowCoreModule( '@experiments/test-consumer' );
+	allowCoreModule( '@privateApis/test' );
+	allowCoreModule( '@privateApis/test-consumer' );
 } );
 
 const requiredConsent =
@@ -23,7 +23,7 @@ describe( '__dangerousOptInToUnstableAPIsOnlyForCoreModules', () => {
 		expect( () => {
 			__dangerousOptInToUnstableAPIsOnlyForCoreModules(
 				'',
-				'@experiments/test'
+				'@privateApis/test'
 			);
 		} ).toThrow( /without confirming you know the consequences/ );
 	} );
@@ -41,18 +41,18 @@ describe( '__dangerousOptInToUnstableAPIsOnlyForCoreModules', () => {
 		expect( () => {
 			__dangerousOptInToUnstableAPIsOnlyForCoreModules(
 				requiredConsent,
-				'@experiments/test'
+				'@privateApis/test'
 			);
 			__dangerousOptInToUnstableAPIsOnlyForCoreModules(
 				requiredConsent,
-				'@experiments/test'
+				'@privateApis/test'
 			);
 		} ).toThrow( /is already registered/ );
 	} );
 	it( 'Should grant access to unstable APIs when passed both a consent string and a previously unregistered package name', () => {
 		const unstableAPIs = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 			requiredConsent,
-			'@experiments/test'
+			'@privateApis/test'
 		);
 		expect( unstableAPIs.lock ).toEqual( expect.any( Function ) );
 		expect( unstableAPIs.unlock ).toEqual( expect.any( Function ) );
@@ -62,14 +62,14 @@ describe( '__dangerousOptInToUnstableAPIsOnlyForCoreModules', () => {
 describe( 'lock(), unlock()', () => {
 	let lock, unlock;
 	beforeEach( () => {
-		// This would live in @experiments/test:
-		// Opt-in to experimental APIs
-		const experimentsAPI = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+		// This would live in @privateApis/test:
+		// Opt-in to private APIs
+		const privateApisAPI = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 			requiredConsent,
-			'@experiments/test'
+			'@privateApis/test'
 		);
-		lock = experimentsAPI.lock;
-		unlock = experimentsAPI.unlock;
+		lock = privateApisAPI.lock;
+		unlock = privateApisAPI.unlock;
 	} );
 
 	it( 'Should lock and unlock objects "inside" other objects', () => {
@@ -120,95 +120,95 @@ describe( 'lock(), unlock()', () => {
 		lock( object, privateData );
 
 		// This would live in @wordpress/core-data:
-		// Register the experimental APIs
-		const coreDataExperiments =
+		// Register the private APIs
+		const coreDataPrivateApis =
 			__dangerousOptInToUnstableAPIsOnlyForCoreModules(
 				requiredConsent,
-				'@experiments/test-consumer'
+				'@privateApis/test-consumer'
 			);
 
-		// Get the experimental APIs registered by @experiments/test
-		expect( coreDataExperiments.unlock( object ).secret ).toBe( 'sh' );
+		// Get the private APIs registered by @privateApis/test
+		expect( coreDataPrivateApis.unlock( object ).secret ).toBe( 'sh' );
 	} );
 } );
 
 describe( 'Specific use-cases of sharing private APIs', () => {
 	let lock, unlock;
 	beforeEach( () => {
-		// This would live in @experiments/test:
-		// Opt-in to experimental APIs
-		const experimentsAPI = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+		// This would live in @privateApis/test:
+		// Opt-in to private APIs
+		const privateApisAPI = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 			requiredConsent,
-			'@experiments/test'
+			'@privateApis/test'
 		);
-		lock = experimentsAPI.lock;
-		unlock = experimentsAPI.unlock;
+		lock = privateApisAPI.lock;
+		unlock = privateApisAPI.unlock;
 	} );
 
-	it( 'Should enable privately exporting experimental functions', () => {
+	it( 'Should enable privately exporting private functions', () => {
 		/**
-		 * Problem: The private __experimentalFunction should not be publicly
+		 * Problem: The private __privateFunction should not be publicly
 		 * exposed to the consumers of package1.
 		 */
-		function __experimentalFunction() {}
+		function __privateFunction() {}
 		/**
 		 * Solution: Privately lock it inside a publicly exported object.
 		 *
 		 * In `package1/index.js` we'd say:
 		 *
 		 * ```js
-		 * export const experiments = {};
-		 * lock(experiments, {
-		 *     __experimentalFunction
+		 * export const privateApis = {};
+		 * lock(privateApis, {
+		 *     __privateFunction
 		 * });
 		 * ```
 		 *
 		 * Let's simulate in the test code:
 		 */
-		const experiments = {};
+		const privateApis = {};
 		const package1Exports = {
-			experiments,
+			privateApis,
 		};
-		lock( experiments, { __experimentalFunction } );
+		lock( privateApis, { __privateFunction } );
 
 		/**
 		 * Then, in the consumer package we'd say:
 		 *
 		 * ```js
-		 * import { experiments } from 'package1';
-		 * const { __experimentalFunction } = unlock( experiments );
+		 * import { privateApis } from 'package1';
+		 * const { __privateFunction } = unlock( privateApis );
 		 * ```
 		 *
 		 * Let's simulate that, too:
 		 */
 		const unlockedFunction = unlock(
-			package1Exports.experiments
-		).__experimentalFunction;
-		expect( unlockedFunction ).toBe( __experimentalFunction );
+			package1Exports.privateApis
+		).__privateFunction;
+		expect( unlockedFunction ).toBe( __privateFunction );
 	} );
 
-	it( 'Should enable exporting functions with private experimental arguments', () => {
+	it( 'Should enable exporting functions with private private arguments', () => {
 		/**
-		 * The publicly exported function does not have any experimental
+		 * The publicly exported function does not have any private
 		 * arguments.
 		 *
 		 * @param {any} data The data to log
 		 */
 		function logData( data ) {
-			// Internally, it calls the experimental version of the function
-			// with fixed default values for the experimental arguments.
-			__experimentalLogData( data, 'plain' );
+			// Internally, it calls the private version of the function
+			// with fixed default values for the private arguments.
+			__privateLogData( data, 'plain' );
 		}
 		/**
-		 * The private experimental function is not publicly exported. Instead, it's
+		 * The private private function is not publicly exported. Instead, it's
 		 * "locked" inside of the public logData function. It can be unlocked by any
 		 * participant of the private importing system.
 		 *
-		 * @param {any}    data                 The data to log
-		 * @param {string} __experimentalFormat The logging format to use.
+		 * @param {any}    data            The data to log
+		 * @param {string} __privateFormat The logging format to use.
 		 */
-		function __experimentalLogData( data, __experimentalFormat ) {
-			if ( __experimentalFormat === 'table' ) {
+		function __privateLogData( data, __privateFormat ) {
+			if ( __privateFormat === 'table' ) {
 				// eslint-disable-next-line no-console
 				console.table( data );
 			} else {
@@ -216,12 +216,12 @@ describe( 'Specific use-cases of sharing private APIs', () => {
 				console.log( data );
 			}
 		}
-		lock( logData, __experimentalLogData );
+		lock( logData, __privateLogData );
 		/**
 		 * In package/log-data.js:
 		 *
 		 * ```js
-		 * lock( logData, __experimentalLogData );
+		 * lock( logData, __privateLogData );
 		 * export logData;
 		 * ```
 		 *
@@ -232,43 +232,40 @@ describe( 'Specific use-cases of sharing private APIs', () => {
 		 * ```
 		 *
 		 * And that's it! The public function is publicly exported, and the
-		 * experimental function is available via unlock( logData ):
+		 * private function is available via unlock( logData ):
 		 *
 		 * ```js
 		 * import { logData } from 'package1';
 		 * const experimenalLogData = unlock( logData );
 		 * ```
 		 */
-		expect( unlock( logData ) ).toBe( __experimentalLogData );
+		expect( unlock( logData ) ).toBe( __privateLogData );
 	} );
 
-	it( 'Should enable exporting React Components with private experimental properties', () => {
+	it( 'Should enable exporting React Components with private private properties', () => {
 		// eslint-disable-next-line jsdoc/require-param
 		/**
-		 * The publicly exported component does not have any experimental
+		 * The publicly exported component does not have any private
 		 * properties.
 		 */
 		function DataTable( { data } ) {
-			// Internally, it calls the experimental version of the function
-			// with fixed default values for the experimental arguments.
+			// Internally, it calls the private version of the function
+			// with fixed default values for the private arguments.
 			return (
-				<ExperimentalDataTable
+				<PrivateDataTable
 					data={ data }
-					__experimentalFancyFormatting={ false }
+					__privateFancyFormatting={ false }
 				/>
 			);
 		}
 		// eslint-disable-next-line jsdoc/require-param
 		/**
-		 * The private experimental component is not publicly exported. Instead, it's
+		 * The private private component is not publicly exported. Instead, it's
 		 * "locked" inside of the public logData function. It can be unlocked by any
 		 * participant of the private importing system.
 		 */
-		function ExperimentalDataTable( {
-			data,
-			__experimentalFancyFormatting,
-		} ) {
-			const className = __experimentalFancyFormatting
+		function PrivateDataTable( { data, __privateFancyFormatting } ) {
+			const className = __privateFancyFormatting
 				? 'savage-css'
 				: 'regular-css';
 			return (
@@ -283,12 +280,12 @@ describe( 'Specific use-cases of sharing private APIs', () => {
 				</table>
 			);
 		}
-		lock( DataTable, ExperimentalDataTable );
+		lock( DataTable, PrivateDataTable );
 		/**
 		 * In package/data-table.js:
 		 *
 		 * ```js
-		 * lock( DataTable, ExperimentalDataTable );
+		 * lock( DataTable, PrivateDataTable );
 		 * export DataTable;
 		 * ```
 		 *
@@ -299,13 +296,13 @@ describe( 'Specific use-cases of sharing private APIs', () => {
 		 * ```
 		 *
 		 * And that's it! The public function is publicly exported, and the
-		 * experimental function is available via unlock( logData ):
+		 * private function is available via unlock( logData ):
 		 *
 		 * ```js
 		 * import { DataTable } from 'package1';
-		 * const ExperimentalDataTable = unlock( DataTable );
+		 * const PrivateDataTable = unlock( DataTable );
 		 * ```
 		 */
-		expect( unlock( DataTable ) ).toBe( ExperimentalDataTable );
+		expect( unlock( DataTable ) ).toBe( PrivateDataTable );
 	} );
 } );

@@ -15,6 +15,7 @@ import {
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
+	NavigatorToParentButton,
 	useNavigator,
 } from '..';
 
@@ -232,3 +233,136 @@ function ProductDetails() {
 		</Card>
 	);
 }
+
+const NestedNavigatorTemplate: ComponentStory< typeof NavigatorProvider > = ( {
+	style,
+	...props
+} ) => (
+	<NavigatorProvider
+		style={ { ...style, height: '100vh', maxHeight: '450px' } }
+		{ ...props }
+	>
+		<NavigatorScreen path="/">
+			<Card>
+				<CardBody>
+					<NavigatorButton variant="secondary" path="/child1">
+						Go to first child.
+					</NavigatorButton>
+					<NavigatorButton variant="secondary" path="/child2">
+						Go to second child.
+					</NavigatorButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+		<NavigatorScreen path="/child1">
+			<Card>
+				<CardBody>
+					This is the first child
+					<NavigatorToParentButton variant="secondary">
+						Go back to parent
+					</NavigatorToParentButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+		<NavigatorScreen path="/child2">
+			<Card>
+				<CardBody>
+					This is the second child
+					<NavigatorToParentButton variant="secondary">
+						Go back to parent
+					</NavigatorToParentButton>
+					<NavigatorButton
+						variant="secondary"
+						path="/child2/grandchild"
+					>
+						Go to grand child.
+					</NavigatorButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+		<NavigatorScreen path="/child2/grandchild">
+			<Card>
+				<CardBody>
+					This is the grand child
+					<NavigatorToParentButton variant="secondary">
+						Go back to parent
+					</NavigatorToParentButton>
+				</CardBody>
+			</Card>
+		</NavigatorScreen>
+	</NavigatorProvider>
+);
+
+export const NestedNavigator: ComponentStory< typeof NavigatorProvider > =
+	NestedNavigatorTemplate.bind( {} );
+NestedNavigator.args = {
+	initialPath: '/child2/grandchild',
+};
+
+const NavigatorButtonWithSkipFocus = ( {
+	path,
+	onClick,
+	...props
+}: React.ComponentProps< typeof NavigatorButton > ) => {
+	const { goTo } = useNavigator();
+
+	return (
+		<Button
+			{ ...props }
+			onClick={ ( e: React.MouseEvent< HTMLButtonElement > ) => {
+				goTo( path, { skipFocus: true } );
+				onClick?.( e );
+			} }
+		/>
+	);
+};
+
+export const SkipFocus: ComponentStory< typeof NavigatorProvider > = (
+	args
+) => {
+	return <NavigatorProvider { ...args } />;
+};
+SkipFocus.args = {
+	initialPath: '/',
+	children: (
+		<>
+			<div
+				style={ {
+					height: 250,
+					border: '1px solid black',
+				} }
+			>
+				<NavigatorScreen
+					path="/"
+					style={ {
+						height: '100%',
+					} }
+				>
+					<h1>Home screen</h1>
+					<NavigatorButton variant="secondary" path="/child">
+						Go to child screen.
+					</NavigatorButton>
+				</NavigatorScreen>
+				<NavigatorScreen
+					path="/child"
+					style={ {
+						height: '100%',
+					} }
+				>
+					<h2>Child screen</h2>
+					<NavigatorToParentButton variant="secondary">
+						Go to parent screen.
+					</NavigatorToParentButton>
+				</NavigatorScreen>
+			</div>
+
+			<NavigatorButtonWithSkipFocus
+				variant="secondary"
+				path="/child"
+				style={ { margin: '1rem 2rem' } }
+			>
+				Go to child screen, but keep focus on this button
+			</NavigatorButtonWithSkipFocus>
+		</>
+	),
+};

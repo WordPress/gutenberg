@@ -47,12 +47,12 @@ test.describe( 'Gallery', () => {
 	} ) => {
 		await admin.createNewPost();
 
-		await pageUtils.setClipboardData( {
+		pageUtils.setClipboardData( {
 			plainText: `[gallery ids="${ uploadedMedia.id }"]`,
 		} );
 
 		await page.click( 'role=button[name="Add default block"i]' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await pageUtils.pressKeys( 'primary+v' );
 
 		const img = page.locator(
 			'role=document[name="Block: Image"i] >> role=img'

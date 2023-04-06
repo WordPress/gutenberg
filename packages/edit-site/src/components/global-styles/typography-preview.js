@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../private-apis';
 
-const { useGlobalStyle } = unlock( blockEditorExperiments );
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 export default function TypographyPreview( { name, element, headingLevel } ) {
 	let prefix = '';

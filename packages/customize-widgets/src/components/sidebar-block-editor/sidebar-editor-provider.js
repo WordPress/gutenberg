@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import useBlocksFocusControl from '../focus-control/use-blocks-focus-control';
 
 import { unlock } from '../../private-apis';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorExperiments );
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 export default function SidebarEditorProvider( {
 	sidebar,

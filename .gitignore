@@ -8,6 +8,7 @@ gutenberg.zip
 coverage
 *-performance-results.json
 .phpunit.result.cache
+.reassure
 
 # Directories/files that may appear in your environment
 *.log
@@ -42,3 +43,4 @@ phpunit-watcher.yml
 .tool-versions
 test/storybook-playwright/test-results
 test/storybook-playwright/specs/__snapshots__
+test/storybook-playwright/specs/*-snapshots/**

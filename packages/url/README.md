@@ -481,6 +481,26 @@ _Returns_
 
 -   `string`: The updated URL.
 
+### prependHTTPS
+
+Prepends "https\://" to a url, if it looks like something that is meant to be a TLD.
+
+Note: this will not replace "http\://" with "<https://">.
+
+_Usage_
+
+```js
+const actualURL = prependHTTPS( 'wordpress.org' ); // https://wordpress.org
+```
+
+_Parameters_
+
+-   _url_ `string`: The URL to test.
+
+_Returns_
+
+-   `string`: The updated URL.
+
 ### removeQueryArgs
 
 Removes arguments from the query string of the url

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 14.3.0 (2023-03-29)
+
+## 14.2.0 (2023-03-15)
+
+## 14.1.0 (2023-03-01)
+
+## 14.0.0 (2023-02-15)
+
 ### Breaking Changes
 
 -   Increase the severity of the rule `jsdoc/check-line-alignment` from `warn` to `error`. ([#47878](https://github.com/WordPress/gutenberg/pull/47878)).

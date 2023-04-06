@@ -48,6 +48,7 @@ export default function Edit( {
 					}
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Link to comment' ) }
 					onChange={ () => setAttributes( { isLink: ! isLink } ) }
 					checked={ isLink }

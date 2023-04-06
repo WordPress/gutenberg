@@ -16,30 +16,35 @@
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "href"
+			"attribute": "href",
+			"__experimentalRole": "content"
 		},
 		"title": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "title"
+			"attribute": "title",
+			"__experimentalRole": "content"
 		},
 		"text": {
 			"type": "string",
 			"source": "html",
-			"selector": "a"
+			"selector": "a",
+			"__experimentalRole": "content"
 		},
 		"linkTarget": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "target"
+			"attribute": "target",
+			"__experimentalRole": "content"
 		},
 		"rel": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "rel"
+			"attribute": "rel",
+			"__experimentalRole": "content"
 		},
 		"placeholder": {
 			"type": "string"

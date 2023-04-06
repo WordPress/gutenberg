@@ -6,11 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import {
 	BaseControl,
-	experiments as componentsExperiments,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -32,7 +32,7 @@ import { cleanEmptyObject } from './utils';
 import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
 
-const { CustomSelectControl } = unlock( componentsExperiments );
+const { CustomSelectControl } = unlock( componentsPrivateApis );
 
 const POSITION_SUPPORT_KEY = 'position';
 
@@ -49,7 +49,7 @@ const DEFAULT_OPTION = {
 const STICKY_OPTION = {
 	key: 'sticky',
 	value: 'sticky',
-	name: __( 'Sticky' ),
+	name: _x( 'Sticky', 'Name for the value of the CSS position property' ),
 	className: OPTION_CLASSNAME,
 	__experimentalHint: __(
 		'The block will stick to the top of the window instead of scrolling.'
@@ -59,7 +59,7 @@ const STICKY_OPTION = {
 const FIXED_OPTION = {
 	key: 'fixed',
 	value: 'fixed',
-	name: __( 'Fixed' ),
+	name: _x( 'Fixed', 'Name for the value of the CSS position property' ),
 	className: OPTION_CLASSNAME,
 	__experimentalHint: __(
 		'The block will not move when the page is scrolled.'

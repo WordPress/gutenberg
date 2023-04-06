@@ -10,13 +10,14 @@ import type { ButtonAsButtonProps } from '../button/types';
 
 export type MatchParams = Record< string, string | string[] >;
 
-type NavigateOptions = {
+export type NavigateOptions = {
 	focusTargetSelector?: string;
+	isBack?: boolean;
+	skipFocus?: boolean;
 };
 
 export type NavigatorLocation = NavigateOptions & {
 	isInitial?: boolean;
-	isBack?: boolean;
 	path?: string;
 	hasRestoredFocus?: boolean;
 };
@@ -27,6 +28,7 @@ export type Navigator = {
 	params: MatchParams;
 	goTo: ( path: string, options?: NavigateOptions ) => void;
 	goBack: () => void;
+	goToParent: () => void;
 };
 
 export type NavigatorContext = Navigator & {
@@ -58,6 +60,17 @@ export type NavigatorScreenProps = {
 };
 
 export type NavigatorBackButtonProps = ButtonAsButtonProps;
+
+export type NavigatorBackButtonHookProps = NavigatorBackButtonProps & {
+	/**
+	 * Whether we should navigate to the parent screen.
+	 *
+	 * @default 'false'
+	 */
+	goToParent?: boolean;
+};
+
+export type NavigatorToParentButtonProps = NavigatorBackButtonProps;
 
 export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	/**

@@ -12,7 +12,7 @@ import { useSelect } from '@wordpress/data';
 import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
 import {
 	BlockIcon,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
@@ -20,17 +20,19 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { useHasBorderPanel } from './border-panel';
-import { useHasColorPanel } from './color-utils';
-import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasVariationsPanel } from './variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
 import { unlock } from '../../private-apis';
 
-const { useHasTypographyPanel, useGlobalSetting } = unlock(
-	blockEditorExperiments
-);
+const {
+	useHasDimensionsPanel,
+	useHasTypographyPanel,
+	useHasBorderPanel,
+	useGlobalSetting,
+	useSettingsForBlockElement,
+	useHasColorPanel,
+} = unlock( blockEditorPrivateApis );
 
 function useSortedBlockTypes() {
 	const blockItems = useSelect(
@@ -55,24 +57,25 @@ function useSortedBlockTypes() {
 	return [ ...coreItems, ...nonCoreItems ];
 }
 
-function BlockMenuItem( { block } ) {
-	const [ settings ] = useGlobalSetting( '', block.name );
-	const hasTypographyPanel = useHasTypographyPanel(
-		block.name,
-		null,
-		settings
-	);
-	const hasColorPanel = useHasColorPanel( block.name );
-	const hasBorderPanel = useHasBorderPanel( block.name );
-	const hasDimensionsPanel = useHasDimensionsPanel( block.name );
+export function useBlockHasGlobalStyles( blockName ) {
+	const [ rawSettings ] = useGlobalSetting( '', blockName );
+	const settings = useSettingsForBlockElement( rawSettings, blockName );
+	const hasTypographyPanel = useHasTypographyPanel( settings );
+	const hasColorPanel = useHasColorPanel( settings );
+	const hasBorderPanel = useHasBorderPanel( settings );
+	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
-	const hasVariationsPanel = useHasVariationsPanel( block.name );
-	const hasBlockMenuItem =
+	const hasVariationsPanel = useHasVariationsPanel( blockName );
+	const hasGlobalStyles =
 		hasTypographyPanel ||
 		hasColorPanel ||
 		hasLayoutPanel ||
 		hasVariationsPanel;
+	return hasGlobalStyles;
+}
 
+function BlockMenuItem( { block } ) {
+	const hasBlockMenuItem = useBlockHasGlobalStyles( block.name );
 	if ( ! hasBlockMenuItem ) {
 		return null;
 	}

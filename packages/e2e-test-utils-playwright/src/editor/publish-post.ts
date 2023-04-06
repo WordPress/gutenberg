@@ -7,7 +7,7 @@ import type { Editor } from './index';
  * Publishes the post, resolving once the request is complete (once a notice
  * is displayed).
  *
- * @param {Editor} this
+ * @param this
  */
 export async function publishPost( this: Editor ) {
 	await this.page.click( 'role=button[name="Publish"i]' );
@@ -28,9 +28,10 @@ export async function publishPost( this: Editor ) {
 		'role=region[name="Editor publish"i] >> role=button[name="Publish"i]'
 	);
 
-	const urlString = await this.page.inputValue(
-		'role=textbox[name="Post address"i]'
-	);
+	const urlString = await this.page
+		.getByRole( 'region', { name: 'Editor publish' } )
+		.getByRole( 'textbox', { name: 'address' } )
+		.inputValue();
 	const url = new URL( urlString );
 	const postId = url.searchParams.get( 'p' );
 

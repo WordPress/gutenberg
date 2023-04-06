@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -11,8 +11,9 @@ import { unlock } from '../../private-apis';
 const {
 	useGlobalStyle,
 	useGlobalSetting,
+	useSettingsForBlockElement,
 	TypographyPanel: StylesTypographyPanel,
-} = unlock( blockEditorExperiments );
+} = unlock( blockEditorPrivateApis );
 
 export default function TypographyPanel( {
 	name,
@@ -35,12 +36,16 @@ export default function TypographyPanel( {
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
 		shouldDecodeEncode: false,
 	} );
-	const [ settings ] = useGlobalSetting( '', name );
+	const [ rawSettings ] = useGlobalSetting( '', name );
+	const usedElement = element === 'heading' ? headingLevel : element;
+	const settings = useSettingsForBlockElement(
+		rawSettings,
+		name,
+		usedElement
+	);
 
 	return (
 		<StylesTypographyPanel
-			name={ name }
-			element={ element === 'heading' ? headingLevel : element }
 			inheritedValue={ inheritedStyle }
 			value={ style }
 			onChange={ setStyle }

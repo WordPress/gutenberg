@@ -18,6 +18,7 @@ import {
 	category,
 	file,
 } from '@wordpress/icons';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 const ICONS_MAP = {
 	post: postList,
@@ -72,7 +73,8 @@ export const LinkControlSearchItem = ( {
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
 					<TextHighlight
-						text={ suggestion.title }
+						// The component expects a plain text string.
+						text={ stripHTML( suggestion.title ) }
 						highlight={ searchTerm }
 					/>
 				</span>

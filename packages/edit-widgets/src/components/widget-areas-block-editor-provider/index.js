@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
 import {
 	BlockEditorKeyboardShortcuts,
 	CopyHandler,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
@@ -29,7 +29,7 @@ import { store as editWidgetsStore } from '../../store';
 import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
 import { unlock } from '../../private-apis';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorExperiments );
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,

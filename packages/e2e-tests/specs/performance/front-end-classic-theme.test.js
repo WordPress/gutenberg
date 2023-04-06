@@ -1,18 +1,18 @@
 /**
- * External dependencies
- */
-import { basename, join } from 'path';
-import { writeFileSync } from 'fs';
-
-/**
  * WordPress dependencies
  */
 import { activateTheme, createURL, logout } from '@wordpress/e2e-test-utils';
+
+/**
+ * Internal dependencies
+ */
+import { saveResultsFile } from './utils';
 
 describe( 'Front End Performance', () => {
 	const results = {
 		timeToFirstByte: [],
 		largestContentfulPaint: [],
+		lcpMinusTtfb: [],
 	};
 
 	beforeAll( async () => {
@@ -21,31 +21,10 @@ describe( 'Front End Performance', () => {
 	} );
 
 	afterAll( async () => {
-		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
-		writeFileSync(
-			join( __dirname, resultsFilename ),
-			JSON.stringify( results, null, 2 )
-		);
+		saveResultsFile( __filename, results );
 	} );
 
-	it( 'Time To First Byte (TTFB)', async () => {
-		// We derive the 75th percentile of the TTFB based on these results.
-		// By running it 16 times, the percentile value would be (75/100)*16=12,
-		// meaning that we discard the worst 4 values.
-		let i = 16;
-		while ( i-- ) {
-			await page.goto( createURL( '/' ) );
-			const navigationTimingJson = await page.evaluate( () =>
-				JSON.stringify( performance.getEntriesByType( 'navigation' ) )
-			);
-			const [ navigationTiming ] = JSON.parse( navigationTimingJson );
-			results.timeToFirstByte.push(
-				navigationTiming.responseStart - navigationTiming.startTime
-			);
-		}
-	} );
-
-	it( 'Largest Contentful Paint (LCP)', async () => {
+	it( 'Report TTFB, LCP, and LCP-TTFB', async () => {
 		// Based on https://addyosmani.com/blog/puppeteer-recipes/#performance-observer-lcp
 		function calcLCP() {
 			// By using -1 we know when it didn't record any event.
@@ -73,9 +52,6 @@ describe( 'Front End Performance', () => {
 			} );
 		}
 
-		// We derive the 75th percentile of the TTFB based on these results.
-		// By running it 16 times, the percentile value would be (75/100)*16=12,
-		// meaning that we discard the worst 4 values.
 		let i = 16;
 		while ( i-- ) {
 			await page.evaluateOnNewDocument( calcLCP );
@@ -84,10 +60,18 @@ describe( 'Front End Performance', () => {
 			// https://pptr.dev/api/puppeteer.page.goto#remarks
 			await page.goto( createURL( '/' ), { waitUntil: 'networkidle0' } );
 
-			const lcp = await page.evaluate(
-				() => window.largestContentfulPaint
-			);
+			const { lcp, ttfb } = await page.evaluate( () => {
+				const [ { responseStart, startTime } ] =
+					performance.getEntriesByType( 'navigation' );
+				return {
+					lcp: window.largestContentfulPaint,
+					ttfb: responseStart - startTime,
+				};
+			} );
+
 			results.largestContentfulPaint.push( lcp );
+			results.timeToFirstByte.push( ttfb );
+			results.lcpMinusTtfb.push( lcp - ttfb );
 		}
 	} );
 } );

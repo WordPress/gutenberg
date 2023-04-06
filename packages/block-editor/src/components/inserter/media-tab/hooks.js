@@ -98,13 +98,6 @@ function useInserterMediaCategories() {
 			) {
 				return false;
 			}
-			// When a category has set `isExternalResource` to `true`, we
-			// don't need to check for allowed mime types, as they are used
-			// for restricting uploads for this media type and not for
-			// inserting media from external sources.
-			if ( category.isExternalResource ) {
-				return true;
-			}
 			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
 				mimeType.startsWith( `${ category.mediaType }/` )
 			);
@@ -156,7 +149,15 @@ export function useMediaCategories( rootClientId ) {
 						if ( category.isExternalResource ) {
 							return [ category.name, true ];
 						}
-						const results = await category.fetch( { per_page: 1 } );
+						let results = [];
+						try {
+							results = await category.fetch( {
+								per_page: 1,
+							} );
+						} catch ( e ) {
+							// If the request fails, we shallow the error and just don't show
+							// the category, in order to not break the media tab.
+						}
 						return [ category.name, !! results.length ];
 					} )
 				)

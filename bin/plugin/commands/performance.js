@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { mapValues, kebabCase } = require( 'lodash' );
+const { mapValues } = require( 'lodash' );
 const SimpleGit = require( 'simple-git' );
 
 /**
@@ -17,6 +17,9 @@ const {
 	getRandomTemporaryPath,
 } = require( '../lib/utils' );
 const config = require( '../config' );
+
+const ARTIFACTS_PATH =
+	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
 
 /**
  * @typedef WPPerformanceCommandOptions
@@ -32,6 +35,7 @@ const config = require( '../config' );
  *
  * @property {number[]} timeToFirstByte        Represents the time since the browser started the request until it received a response.
  * @property {number[]} largestContentfulPaint Represents the time when the main content of the page has likely loaded.
+ * @property {number[]} lcpMinusTtfb           Represents the difference between LCP and TTFB.
  * @property {number[]} serverResponse         Represents the time the server takes to respond.
  * @property {number[]} firstPaint             Represents the time when the user agent first rendered after navigation.
  * @property {number[]} domContentLoaded       Represents the time immediately after the document's DOMContentLoaded event completes.
@@ -50,38 +54,48 @@ const config = require( '../config' );
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number=} timeToFirstByteMedian        Represents the time since the browser started the request until it received a response (median).
- * @property {number=} timeToFirstByteP75           Represents the time since the browser started the request until it received a response (75th percentile).
- * @property {number=} largestContentfulPaintMedian Represents the time when the main content of the page has likely loaded (median).
- * @property {number=} largestContentfulPaintP75    Represents the time when the main content of the page has likely loaded (75th percentile).
- * @property {number=} serverResponse               Represents the time the server takes to respond.
- * @property {number=} firstPaint                   Represents the time when the user agent first rendered after navigation.
- * @property {number=} domContentLoaded             Represents the time immediately after the document's DOMContentLoaded event completes.
- * @property {number=} loaded                       Represents the time when the load event of the current document is completed.
- * @property {number=} firstContentfulPaint         Represents the time when the browser first renders any text or media.
- * @property {number=} firstBlock                   Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number=} type                         Average type time.
- * @property {number=} minType                      Minimum type time.
- * @property {number=} maxType                      Maximum type time.
- * @property {number=} typeContainer                Average type time within a container.
- * @property {number=} minTypeContainer             Minimum type time within a container.
- * @property {number=} maxTypeContainer             Maximum type time within a container.
- * @property {number=} focus                        Average block selection time.
- * @property {number=} minFocus                     Min block selection time.
- * @property {number=} maxFocus                     Max block selection time.
- * @property {number=} inserterOpen                 Average time to open global inserter.
- * @property {number=} minInserterOpen              Min time to open global inserter.
- * @property {number=} maxInserterOpen              Max time to open global inserter.
- * @property {number=} inserterSearch               Average time to open global inserter.
- * @property {number=} minInserterSearch            Min time to open global inserter.
- * @property {number=} maxInserterSearch            Max time to open global inserter.
- * @property {number=} inserterHover                Average time to move mouse between two block item in the inserter.
- * @property {number=} minInserterHover             Min time to move mouse between two block item in the inserter.
- * @property {number=} maxInserterHover             Max time to move mouse between two block item in the inserter.
- * @property {number=} listViewOpen                 Average time to open list view.
- * @property {number=} minListViewOpen              Min time to open list view.
- * @property {number=} maxListViewOpen              Max time to open list view.
+ * @property {number=} timeToFirstByte        Represents the time since the browser started the request until it received a response.
+ * @property {number=} largestContentfulPaint Represents the time when the main content of the page has likely loaded.
+ * @property {number=} lcpMinusTtfb           Represents the difference between LCP and TTFB.
+ * @property {number=} serverResponse         Represents the time the server takes to respond.
+ * @property {number=} firstPaint             Represents the time when the user agent first rendered after navigation.
+ * @property {number=} domContentLoaded       Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number=} loaded                 Represents the time when the load event of the current document is completed.
+ * @property {number=} firstContentfulPaint   Represents the time when the browser first renders any text or media.
+ * @property {number=} firstBlock             Represents the time when Puppeteer first sees a block selector in the DOM.
+ * @property {number=} type                   Average type time.
+ * @property {number=} minType                Minimum type time.
+ * @property {number=} maxType                Maximum type time.
+ * @property {number=} typeContainer          Average type time within a container.
+ * @property {number=} minTypeContainer       Minimum type time within a container.
+ * @property {number=} maxTypeContainer       Maximum type time within a container.
+ * @property {number=} focus                  Average block selection time.
+ * @property {number=} minFocus               Min block selection time.
+ * @property {number=} maxFocus               Max block selection time.
+ * @property {number=} inserterOpen           Average time to open global inserter.
+ * @property {number=} minInserterOpen        Min time to open global inserter.
+ * @property {number=} maxInserterOpen        Max time to open global inserter.
+ * @property {number=} inserterSearch         Average time to open global inserter.
+ * @property {number=} minInserterSearch      Min time to open global inserter.
+ * @property {number=} maxInserterSearch      Max time to open global inserter.
+ * @property {number=} inserterHover          Average time to move mouse between two block item in the inserter.
+ * @property {number=} minInserterHover       Min time to move mouse between two block item in the inserter.
+ * @property {number=} maxInserterHover       Max time to move mouse between two block item in the inserter.
+ * @property {number=} listViewOpen           Average time to open list view.
+ * @property {number=} minListViewOpen        Min time to open list view.
+ * @property {number=} maxListViewOpen        Max time to open list view.
  */
+
+/**
+ * Sanitizes branch name to be used in a path or a filename.
+ *
+ * @param {string} branch
+ *
+ * @return {string} Sanitized branch name.
+ */
+function sanitizeBranchName( branch ) {
+	return branch.replace( /[^a-zA-Z0-9-]/g, '-' );
+}
 
 /**
  * Computes the average number from an array numbers.
@@ -110,19 +124,6 @@ function median( array ) {
 }
 
 /**
- * Computes the 75th percentile from an array of numbers.
- *
- * @param {number[]} array
- *
- * @return {number} 75th percentile of the given dataset.
- */
-function percentile75( array ) {
-	const ascending = array.sort( ( a, b ) => a - b );
-	const position = Math.floor( ( 75 / 100 ) * array.length );
-	return ascending[ position ];
-}
-
-/**
  * Rounds and format a time passed in milliseconds.
  *
  * @param {number} number
@@ -148,14 +149,9 @@ function curateResults( testSuite, results ) {
 		testSuite === 'front-end-block-theme'
 	) {
 		return {
-			timeToFirstByteMedian: median( results.timeToFirstByte ),
-			timeToFirstByteP75: percentile75( results.timeToFirstByte ),
-			largestContentfulPaintMedian: median(
-				results.largestContentfulPaint
-			),
-			largestContentfulPaintP75: percentile75(
-				results.largestContentfulPaint
-			),
+			timeToFirstByte: median( results.timeToFirstByte ),
+			largestContentfulPaint: median( results.largestContentfulPaint ),
+			lcpMinusTtfb: median( results.lcpMinusTtfb ),
 		};
 	}
 
@@ -200,23 +196,22 @@ function curateResults( testSuite, results ) {
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
 async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
+	const resultsFilename = `${ runKey }.performance-results.json`;
+
 	await runShellScript(
-		`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
-		performanceTestDirectory
-	);
-	const resultsFile = path.join(
+		`npm run test:performance -- ${ testSuite }`,
 		performanceTestDirectory,
-		`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
+		{
+			...process.env,
+			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
+			RESULTS_FILENAME: resultsFilename,
+		}
 	);
-	fs.mkdirSync( './__test-results', { recursive: true } );
-	fs.copyFileSync( resultsFile, `./__test-results/${ runKey }.results.json` );
-	const rawResults = await readJSONFile(
-		path.join(
-			performanceTestDirectory,
-			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
-		)
+
+	return curateResults(
+		testSuite,
+		await readJSONFile( path.join( ARTIFACTS_PATH, resultsFilename ) )
 	);
-	return curateResults( testSuite, rawResults );
 }
 
 /**
@@ -302,8 +297,8 @@ async function runPerformanceTests( branches, options ) {
 	const branchDirectories = {};
 	for ( const branch of branches ) {
 		log( `    >> Branch: ${ branch }` );
-		const environmentDirectory =
-			rootDirectory + '/envs/' + kebabCase( branch );
+		const sanitizedBranch = sanitizeBranchName( branch );
+		const environmentDirectory = rootDirectory + '/envs/' + sanitizedBranch;
 		// @ts-ignore
 		branchDirectories[ branch ] = environmentDirectory;
 		const buildPath = `${ environmentDirectory }/plugin`;
@@ -323,23 +318,49 @@ async function runPerformanceTests( branches, options ) {
 			log( `        >> Fetching the ${ fancyBranch } branch` );
 			// @ts-ignore
 			await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
-
-			log( `        >> Building the ${ fancyBranch } branch` );
-			await runShellScript(
-				'npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
-				buildPath
-			);
 		}
 
+		log( `        >> Building the ${ fancyBranch } branch` );
 		await runShellScript(
-			'cp ' +
-				path.resolve(
-					performanceTestDirectory,
-					'bin/plugin/utils/.wp-env.performance.json'
-				) +
-				' ' +
-				environmentDirectory +
-				'/.wp-env.json'
+			'npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
+			buildPath
+		);
+
+		// Create the config file for the current env.
+		fs.writeFileSync(
+			path.join( environmentDirectory, '.wp-env.json' ),
+			JSON.stringify(
+				{
+					core: 'WordPress/WordPress',
+					plugins: [ path.join( environmentDirectory, 'plugin' ) ],
+					themes: [
+						path.join(
+							performanceTestDirectory,
+							'test/emptytheme'
+						),
+						'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
+						'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
+					],
+					env: {
+						tests: {
+							mappings: {
+								'wp-content/mu-plugins': path.join(
+									performanceTestDirectory,
+									'packages/e2e-tests/mu-plugins'
+								),
+								'wp-content/plugins/gutenberg-test-plugins':
+									path.join(
+										performanceTestDirectory,
+										'packages/e2e-tests/plugins'
+									),
+							},
+						},
+					},
+				},
+				null,
+				2
+			),
+			'utf8'
 		);
 
 		if ( options.wpVersion ) {
@@ -396,32 +417,39 @@ async function runPerformanceTests( branches, options ) {
 
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
 	const results = {};
+	const wpEnvPath = path.join(
+		performanceTestDirectory,
+		'node_modules/.bin/wp-env'
+	);
+
 	for ( const testSuite of testSuites ) {
 		results[ testSuite ] = {};
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
 		const rawResults = [];
-		// Alternate three times between branches.
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
+			const roundInfo = `round ${ i + 1 } of ${ TEST_ROUNDS }`;
+			log( `    >> Suite: ${ testSuite } (${ roundInfo })` );
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
-				const runKey = `${ branch }_${ testSuite }_run-${ i }`;
+				const sanitizedBranch = sanitizeBranchName( branch );
+				const runKey = `${ testSuite }_${ sanitizedBranch }_run-${ i }`;
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
-				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
-				log( '        >> Starting the environment.' );
+				log( `        >> Branch: ${ branch }` );
+				log( '            >> Starting the environment.' );
 				await runShellScript(
-					'../../tests/node_modules/.bin/wp-env start',
+					`${ wpEnvPath } start`,
 					environmentDirectory
 				);
-				log( '        >> Running the test.' );
+				log( '            >> Running the test.' );
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
 					performanceTestDirectory,
 					runKey
 				);
-				log( '        >> Stopping the environment' );
+				log( '            >> Stopping the environment' );
 				await runShellScript(
-					'../../tests/node_modules/.bin/wp-env stop',
+					`${ wpEnvPath } stop`,
 					environmentDirectory
 				);
 			}
@@ -484,9 +512,9 @@ async function runPerformanceTests( branches, options ) {
 		);
 		console.table( invertedResult );
 
-		const resultsFilename = testSuite + '-performance-results.json';
+		const resultsFilename = testSuite + '.performance-results.json';
 		fs.writeFileSync(
-			path.resolve( __dirname, '../../../', resultsFilename ),
+			path.join( ARTIFACTS_PATH, resultsFilename ),
 			JSON.stringify( results[ testSuite ], null, 2 )
 		);
 	}

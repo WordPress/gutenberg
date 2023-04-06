@@ -11,7 +11,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import {
 	InspectorAdvancedControls,
 	store as blockEditorStore,
-	experiments as blockEditorExperiments,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -29,7 +29,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../private-apis';
 
-const { GlobalStylesContext } = unlock( blockEditorExperiments );
+const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
 // TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
 // removed by moving PushChangesToGlobalStylesControl to
@@ -45,6 +45,7 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'elements.button.color.background': 'color',
 	'elements.button.typography.fontFamily': 'font-family',
 	'elements.button.typography.fontSize': 'font-size',
+	'elements.caption.color.text': 'color',
 	'elements.heading.color': 'color',
 	'elements.heading.color.background': 'color',
 	'elements.heading.typography.fontFamily': 'font-family',

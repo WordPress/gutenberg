@@ -44,6 +44,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editPostStore } from '../../store';
 
+const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
+
 function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
@@ -65,12 +67,12 @@ function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 
 	return (
 		<Iframe
-			head={ <EditorStyles styles={ styles } /> }
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
 			name="editor-canvas"
 		>
+			<EditorStyles styles={ styles } />
 			{ children }
 		</Iframe>
 	);
@@ -78,19 +80,20 @@ function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 
 /**
  * Given an array of nested blocks, find the first Post Content
- * block inside it, recursing through any nesting levels.
+ * block inside it, recursing through any nesting levels,
+ * and return its attributes.
  *
  * @param {Array} blocks A list of blocks.
  *
  * @return {Object | undefined} The Post Content block.
  */
-function findPostContent( blocks ) {
+function getPostContentAttributes( blocks ) {
 	for ( let i = 0; i < blocks.length; i++ ) {
 		if ( blocks[ i ].name === 'core/post-content' ) {
-			return blocks[ i ];
+			return blocks[ i ].attributes;
 		}
 		if ( blocks[ i ].innerBlocks.length ) {
-			const nestedPostContent = findPostContent(
+			const nestedPostContent = getPostContentAttributes(
 				blocks[ i ].innerBlocks
 			);
 
@@ -106,6 +109,7 @@ export default function VisualEditor( { styles } ) {
 		deviceType,
 		isWelcomeGuideVisible,
 		isTemplateMode,
+		postContentAttributes,
 		editedPostTemplate = {},
 		wrapperBlockName,
 		wrapperUniqueId,
@@ -114,8 +118,8 @@ export default function VisualEditor( { styles } ) {
 		const {
 			isFeatureActive,
 			isEditingTemplate,
-			__experimentalGetPreviewDeviceType,
 			getEditedPostTemplate,
+			__experimentalGetPreviewDeviceType,
 		} = select( editPostStore );
 		const { getCurrentPostId, getCurrentPostType, getEditorSettings } =
 			select( editorStore );
@@ -139,8 +143,9 @@ export default function VisualEditor( { styles } ) {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			isTemplateMode: _isTemplateMode,
+			postContentAttributes: getEditorSettings().postContentAttributes,
 			// Post template fetch returns a 404 on classic themes, which
-			// messes with e2e tests, so we check it's a block theme first.
+			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
 				supportsTemplateMode && canEditTemplate
 					? getEditedPostTemplate()
@@ -155,15 +160,21 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const { themeHasDisabledLayoutStyles, themeSupportsLayout, isFocusMode } =
-		useSelect( ( select ) => {
-			const _settings = select( blockEditorStore ).getSettings();
-			return {
-				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
-				themeSupportsLayout: _settings.supportsLayout,
-				isFocusMode: _settings.focusMode,
-			};
-		}, [] );
+	const {
+		hasRootPaddingAwareAlignments,
+		isFocusMode,
+		themeHasDisabledLayoutStyles,
+		themeSupportsLayout,
+	} = useSelect( ( select ) => {
+		const _settings = select( blockEditorStore ).getSettings();
+		return {
+			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
+			themeSupportsLayout: _settings.supportsLayout,
+			isFocusMode: _settings.focusMode,
+			hasRootPaddingAwareAlignments:
+				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
+		};
+	}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
@@ -228,10 +239,13 @@ export default function VisualEditor( { styles } ) {
 		return { type: 'default' };
 	}, [ isTemplateMode, themeSupportsLayout, globalLayoutSettings ] );
 
-	const postContentBlock = useMemo( () => {
+	const newestPostContentAttributes = useMemo( () => {
+		if ( ! editedPostTemplate?.content && ! editedPostTemplate?.blocks ) {
+			return postContentAttributes;
+		}
 		// When in template editing mode, we can access the blocks directly.
 		if ( editedPostTemplate?.blocks ) {
-			return findPostContent( editedPostTemplate?.blocks );
+			return getPostContentAttributes( editedPostTemplate?.blocks );
 		}
 		// If there are no blocks, we have to parse the content string.
 		// Best double-check it's a string otherwise the parse function gets unhappy.
@@ -240,10 +254,19 @@ export default function VisualEditor( { styles } ) {
 				? editedPostTemplate?.content
 				: '';
 
-		return findPostContent( parse( parseableContent ) ) || {};
-	}, [ editedPostTemplate?.content, editedPostTemplate?.blocks ] );
+		return getPostContentAttributes( parse( parseableContent ) ) || {};
+	}, [
+		editedPostTemplate?.content,
+		editedPostTemplate?.blocks,
+		postContentAttributes,
+	] );
 
-	const postContentLayoutClasses = useLayoutClasses( postContentBlock );
+	const layout = newestPostContentAttributes?.layout || {};
+
+	const postContentLayoutClasses = useLayoutClasses(
+		newestPostContentAttributes,
+		'core/post-content'
+	);
 
 	const blockListLayoutClass = classnames(
 		{
@@ -253,11 +276,10 @@ export default function VisualEditor( { styles } ) {
 	);
 
 	const postContentLayoutStyles = useLayoutStyles(
-		postContentBlock,
+		newestPostContentAttributes,
+		'core/post-content',
 		'.block-editor-block-list__layout.is-root-container'
 	);
-
-	const layout = postContentBlock?.attributes?.layout || {};
 
 	// Update type for blocks using legacy layouts.
 	const postContentLayout = useMemo( () => {
@@ -278,7 +300,7 @@ export default function VisualEditor( { styles } ) {
 
 	// If there is a Post Content block we use its layout for the block list;
 	// if not, this must be a classic theme, in which case we use the fallback layout.
-	const blockListLayout = postContentBlock
+	const blockListLayout = postContentAttributes
 		? postContentLayout
 		: fallbackLayout;
 
@@ -316,7 +338,7 @@ export default function VisualEditor( { styles } ) {
 			<motion.div
 				className="edit-post-visual-editor__content-area"
 				animate={ {
-					padding: isTemplateMode ? '48px 48px 0' : '0',
+					padding: isTemplateMode ? '48px 48px 0' : 0,
 				} }
 				ref={ blockSelectionClearerRef }
 			>
@@ -339,7 +361,9 @@ export default function VisualEditor( { styles } ) {
 				>
 					<MaybeIframe
 						shouldIframe={
-							( isBlockBasedTheme && ! hasMetaBoxes ) ||
+							( isGutenbergPlugin &&
+								isBlockBasedTheme &&
+								! hasMetaBoxes ) ||
 							isTemplateMode ||
 							deviceType === 'Tablet' ||
 							deviceType === 'Mobile'
@@ -372,15 +396,12 @@ export default function VisualEditor( { styles } ) {
 						{ ! isTemplateMode && (
 							<div
 								className={ classnames(
-									// This wrapper div should have the same
-									// classes as the block list beneath.
-									'is-root-container',
-									'block-editor-block-list__layout',
 									'edit-post-visual-editor__post-title-wrapper',
 									{
 										'is-focus-mode': isFocusMode,
-									},
-									blockListLayoutClass
+										'has-global-padding':
+											hasRootPaddingAwareAlignments,
+									}
 								) }
 								contentEditable={ false }
 							>

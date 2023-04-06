@@ -6,10 +6,10 @@ import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 
 /**
- * Experimental @wordpress/block-editor APIs.
+ * Private @wordpress/block-editor APIs.
  */
-export const experiments = {};
-lock( experiments, {
+export const privateApis = {};
+lock( privateApis, {
 	...globalStyles,
 	ExperimentalBlockEditorProvider,
 } );

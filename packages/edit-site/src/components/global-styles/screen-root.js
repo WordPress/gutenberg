@@ -16,7 +16,7 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -28,7 +28,7 @@ import StylesPreview from './preview';
 import { unlock } from '../../private-apis';
 
 function ScreenRoot() {
-	const { useGlobalStyle } = unlock( blockEditorExperiments );
+	const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 	const [ customCSS ] = useGlobalStyle( 'css' );
 
 	const { variations, canEditCSS } = useSelect( ( select ) => {
@@ -51,7 +51,7 @@ function ScreenRoot() {
 	}, [] );
 
 	return (
-		<Card size="small">
+		<Card size="small" className="edit-site-global-styles-screen-root">
 			<CardBody>
 				<VStack spacing={ 4 }>
 					<Card>
