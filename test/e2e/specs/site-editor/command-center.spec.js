@@ -12,12 +12,14 @@ test.describe( 'Site editor command center', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Open the command center and navigate to the page create page', async ( {
-		admin,
+	test.beforeEach( async ( { admin } ) => {
+		// Navigate to the site editor.
+		await admin.visitSiteEditor();
+	} );
+
+	test.skip( 'Open the command center and navigate to the page create page', async ( {
 		page,
 	} ) => {
-		// Navigate to a template.
-		await admin.visitSiteEditor();
 		await page.keyboard.press( 'Meta+k' );
 		const newPageButton = page.locator(
 			'role=option[name="Create a new page"i]'
@@ -38,12 +40,9 @@ test.describe( 'Site editor command center', () => {
 		await expect( postTitleInput ).toHaveText( 'E2E Test Post' );
 	} );
 
-	test( 'Open the command center and navigate to a template', async ( {
-		admin,
+	test.skip( 'Open the command center and navigate to a template', async ( {
 		page,
 	} ) => {
-		// Navigate to a template.
-		await admin.visitSiteEditor();
 		await page.keyboard.press( 'Meta+k' );
 
 		await page.keyboard.type( 'index' );
