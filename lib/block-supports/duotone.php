@@ -321,80 +321,14 @@ function gutenberg_get_duotone_filter_property( $preset ) {
 /**
  * Returns the duotone filter SVG string for the preset.
  *
+ * @deprecated 6.3.0
+ *
  * @param  array $preset Duotone preset value as seen in theme.json.
  * @return string        Duotone SVG filter.
  */
 function gutenberg_get_duotone_filter_svg( $preset ) {
-	$filter_id = gutenberg_get_duotone_filter_id( $preset );
-
-	$duotone_values = array(
-		'r' => array(),
-		'g' => array(),
-		'b' => array(),
-		'a' => array(),
-	);
-
-	if ( ! isset( $preset['colors'] ) || ! is_array( $preset['colors'] ) ) {
-		$preset['colors'] = array();
-	}
-
-	foreach ( $preset['colors'] as $color_str ) {
-		$color = gutenberg_tinycolor_string_to_rgb( $color_str );
-
-		$duotone_values['r'][] = $color['r'] / 255;
-		$duotone_values['g'][] = $color['g'] / 255;
-		$duotone_values['b'][] = $color['b'] / 255;
-		$duotone_values['a'][] = $color['a'];
-	}
-
-	ob_start();
-
-	?>
-
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 0 0"
-		width="0"
-		height="0"
-		focusable="false"
-		role="none"
-		style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"
-	>
-		<defs>
-			<filter id="<?php echo esc_attr( $filter_id ); ?>">
-				<feColorMatrix
-					color-interpolation-filters="sRGB"
-					type="matrix"
-					values="
-						.299 .587 .114 0 0
-						.299 .587 .114 0 0
-						.299 .587 .114 0 0
-						.299 .587 .114 0 0
-					"
-				/>
-				<feComponentTransfer color-interpolation-filters="sRGB" >
-					<feFuncR type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['r'] ) ); ?>" />
-					<feFuncG type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['g'] ) ); ?>" />
-					<feFuncB type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['b'] ) ); ?>" />
-					<feFuncA type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['a'] ) ); ?>" />
-				</feComponentTransfer>
-				<feComposite in2="SourceGraphic" operator="in" />
-			</filter>
-		</defs>
-	</svg>
-
-	<?php
-
-	$svg = ob_get_clean();
-
-	if ( ! SCRIPT_DEBUG ) {
-		// Clean up the whitespace.
-		$svg = preg_replace( "/[\r\n\t ]+/", ' ', $svg );
-		$svg = str_replace( '> <', '><', $svg );
-		$svg = trim( $svg );
-	}
-
-	return $svg;
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+	return WP_Duotone_Gutenberg::get_filter_svg_from_preset( $preset );
 }
 
 /**
