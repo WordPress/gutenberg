@@ -330,9 +330,9 @@ export default function VisualEditor( { styles } ) {
 
 	// Add some styles for alignwide/alignfull Post Content and its children.
 	const alignCSS = `.is-root-container.alignwide { max-width: var(--wp--style--global--wide-size); margin-left: auto; margin-right: auto;}
-		.is-root-container.alignwide > :not(.alignleft):not(.alignright) { max-width: var(--wp--style--global--wide-size);}
+		.is-root-container.alignwide:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: var(--wp--style--global--wide-size);}
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
-		.is-root-container.alignfull > :not(.alignleft):not(.alignright) { max-width: none;}`;
+		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
 	return (
 		<BlockTools
