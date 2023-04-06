@@ -11,12 +11,10 @@ import PatternConvertButton from './pattern-convert-button';
 
 function PatternsMenuItems( { clientIds, rootClientId } ) {
 	return (
-		<>
-			<PatternConvertButton
-				clientIds={ clientIds }
-				rootClientId={ rootClientId }
-			/>
-		</>
+		<PatternConvertButton
+			clientIds={ clientIds }
+			rootClientId={ rootClientId }
+		/>
 	);
 }
 
