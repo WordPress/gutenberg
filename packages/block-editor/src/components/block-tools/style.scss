@@ -136,15 +136,19 @@
 			border-bottom: none;
 		}
 
-		&.is-fixed .block-editor-block-parent-selector .block-editor-block-parent-selector__button {
-			border: 0;
-			&::after {
-				content: "\00B7";
-				font-size: 16px;
-				line-height: $grid-unit-40 + $grid-unit-10;
-				position: absolute;
-				left: $grid-unit-40 + $grid-unit-15 + 2px;
-				bottom: $grid-unit-05;
+		&.is-fixed .block-editor-block-parent-selector {
+			.block-editor-block-parent-selector__button {
+				position: relative;
+				top: -1px;
+				border: 0;
+				&::after {
+					content: "\00B7";
+					font-size: 16px;
+					line-height: $grid-unit-40 + $grid-unit-10;
+					position: absolute;
+					left: $grid-unit-40 + $grid-unit-15 + 2px;
+					bottom: $grid-unit-05;
+				}
 			}
 		}
 
