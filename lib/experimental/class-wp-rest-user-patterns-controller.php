@@ -1,6 +1,6 @@
 <?php
 /**
- * User-created patterns REST API: Gutenberg_REST_Patterns_Controller class
+ * User-created patterns REST API: WP_REST_User_Patterns_Controller class
  *
  * @package Gutenberg
  */
@@ -13,7 +13,7 @@
  * @see WP_REST_Posts_Controller
  * @see WP_REST_Controller
  */
-class Gutenberg_REST_Patterns_Controller extends WP_REST_Posts_Controller {
+class WP_REST_User_Patterns_Controller extends WP_REST_Posts_Controller {
 
 	/**
 	 * Checks if a pattern can be read.

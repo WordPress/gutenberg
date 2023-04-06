@@ -40,7 +40,7 @@ function gutenberg_create_wp_block_pattern_post_type() {
 			'rewrite'               => false,
 			'show_in_rest'          => true,
 			'rest_base'             => 'patterns',
-			'rest_controller_class' => 'Gutenberg_REST_Patterns_Controller',
+			'rest_controller_class' => 'WP_REST_User_Patterns_Controller',
 			'capability_type'       => 'block',
 			'capabilities'          => array(
 				// You need to be able to edit posts, in order to read blocks in their raw form.
