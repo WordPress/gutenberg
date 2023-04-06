@@ -13,6 +13,7 @@ const InserterDraggableBlocks = ( {
 	icon,
 	children,
 	isPattern,
+	...props
 } ) => {
 	const transferData = {
 		type: 'inserter',
@@ -30,6 +31,7 @@ const InserterDraggableBlocks = ( {
 					isPattern={ isPattern }
 				/>
 			}
+			{ ...props }
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {

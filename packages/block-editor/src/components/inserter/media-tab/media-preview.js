@@ -21,7 +21,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useCallback, useState } from '@wordpress/element';
-import { cloneBlock } from '@wordpress/blocks';
+import { cloneBlock, serialize } from '@wordpress/blocks';
 import { moreVertical, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -203,7 +203,18 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
 	return (
 		<>
-			<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
+			<InserterDraggableBlocks
+				isEnabled={ true }
+				blocks={ [ block ] }
+				onDragStart={ ( event ) => {
+					// Also set the serialized block as the HTML data for the drag event,
+					// so that it can be parsed by the media placeholder.
+					event.dataTransfer.setData(
+						'text/html',
+						serialize( [ block ] )
+					);
+				} }
+			>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<div
 						className={ classnames(

@@ -23,6 +23,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { pasteHandler } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -140,7 +141,10 @@ export function ImageEdit( {
 		[]
 	);
 
-	const { createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
+	const { __unstableMarkNextChangeAsNotPersistent, selectBlock } =
+		useDispatch( blockEditorStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 		setAttributes( {
@@ -349,6 +353,80 @@ export function ImageEdit( {
 		);
 	};
 
+	async function onHTMLDrop( HTML ) {
+		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
+
+		if ( ! blocks || blocks.length !== 1 ) {
+			return;
+		}
+
+		const [ block ] = blocks;
+
+		if ( ! block || block.name !== 'core/image' ) {
+			return;
+		}
+
+		// Optimistic update to replace the current image.
+		setAttributes( {
+			url: undefined,
+			alt: undefined,
+			id: undefined,
+			title: undefined,
+			caption: undefined,
+			...block.attributes,
+		} );
+
+		// Media item already exists in the library.
+		if ( !! block.attributes.id ) {
+			selectBlock( clientId );
+			return;
+		}
+
+		// Media item doesn't exist in the library, upload it so that it
+		// can be served within the same origin.
+		try {
+			// Media item does not exist in library, so try to upload it.
+			// Fist fetch the image data. This may fail if the image host
+			// doesn't allow CORS with the domain.
+			// If this happens, we insert the image block using the external
+			// URL and let the user know about the possible implications.
+			const response = await window.fetch( block.attributes.url );
+			const blob = await response.blob();
+
+			mediaUpload( {
+				filesList: [ blob ],
+				additionalData: {
+					title: block.attributes.title,
+					alt_text: block.attributes.alt,
+					caption: block.attributes.caption,
+				},
+				onFileChange( [ img ] ) {
+					if ( isBlobURL( img.url ) ) {
+						return;
+					}
+
+					__unstableMarkNextChangeAsNotPersistent();
+					setAttributes( {
+						id: img.id,
+						url: img.url,
+					} );
+					createSuccessNotice(
+						__( 'Image uploaded to the media library.' ),
+						{ type: 'snackbar' }
+					);
+				},
+				allowedTypes: ALLOWED_MEDIA_TYPES,
+				onError( message ) {
+					createErrorNotice( message, { type: 'snackbar' } );
+				},
+			} );
+		} catch ( err ) {
+			// TODO: Ignore cross-origin image errors for now.
+		} finally {
+			selectBlock( clientId );
+		}
+	}
+
 	return (
 		<figure { ...blockProps }>
 			{ ( temporaryURL || url ) && (
@@ -381,6 +459,7 @@ export function ImageEdit( {
 				onSelect={ onSelectImage }
 				onSelectURL={ onSelectURL }
 				onError={ onUploadError }
+				onHTMLDrop={ onHTMLDrop }
 				placeholder={ placeholder }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
