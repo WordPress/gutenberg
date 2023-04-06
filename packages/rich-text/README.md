@@ -124,9 +124,7 @@ Given that the selection has no "range" (i.e. there is no difference between `st
 
 ### applyFormat
 
-Apply a format object to a Rich Text value from the given `startIndex` to the
-given `endIndex`. Indices are retrieved from the selection if none are
-provided.
+Apply a format object to a Rich Text value from the given `startIndex` to the given `endIndex`. Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
@@ -141,8 +139,7 @@ _Returns_
 
 ### concat
 
-Combine all Rich Text values into one. This is similar to
-`String.prototype.concat`.
+Combine all Rich Text values into one. This is similar to `String.prototype.concat`.
 
 _Parameters_
 
@@ -154,15 +151,9 @@ _Returns_
 
 ### create
 
-Create a RichText value from an `Element` tree (DOM), an HTML string or a
-plain text string, with optionally a `Range` object to set the selection. If
-called without any input, an empty value will be created. If
-`multilineTag` is provided, any content of direct children whose type matches
-`multilineTag` will be separated by two newlines. The optional functions can
-be used to filter out content.
+Create a RichText value from an `Element` tree (DOM), an HTML string or a plain text string, with optionally a `Range` object to set the selection. If called without any input, an empty value will be created. If `multilineTag` is provided, any content of direct children whose type matches `multilineTag` will be separated by two newlines. The optional functions can be used to filter out content.
 
-A value will have the following shape, which you are strongly encouraged not
-to modify without the use of helper functions:
+A value will have the following shape, which you are strongly encouraged not to modify without the use of helper functions:
 
 ```js
 {
@@ -174,12 +165,7 @@ to modify without the use of helper functions:
 }
 ```
 
-As you can see, text and formatting are separated. `text` holds the text,
-including any replacement characters for objects and lines. `formats`,
-`objects` and `lines` are all sparse arrays of the same length as `text`. It
-holds information about the formatting at the relevant text indices. Finally
-`start` and `end` state which text indices are selected. They are only
-provided if a `Range` was given.
+As you can see, text and formatting are separated. `text` holds the text, including any replacement characters for objects and lines. `formats`, `objects` and `lines` are all sparse arrays of the same length as `text`. It holds information about the formatting at the relevant text indices. Finally `start` and `end` state which text indices are selected. They are only provided if a `Range` was given.
 
 _Parameters_
 
@@ -199,10 +185,7 @@ _Returns_
 
 ### getActiveFormat
 
-Gets the format object by type at the start of the selection. This can be
-used to get e.g. the URL of a link format at the current selection, but also
-to check if a format is active at the selection. Returns undefined if there
-is no format at the selection.
+Gets the format object by type at the start of the selection. This can be used to get e.g. the URL of a link format at the current selection, but also to check if a format is active at the selection. Returns undefined if there is no format at the selection.
 
 _Parameters_
 
@@ -240,8 +223,7 @@ _Returns_
 
 ### getTextContent
 
-Get the textual content of a Rich Text value. This is similar to
-`Element.textContent`.
+Get the textual content of a Rich Text value. This is similar to `Element.textContent`.
 
 _Parameters_
 
@@ -253,10 +235,7 @@ _Returns_
 
 ### insert
 
-Insert a Rich Text value, an HTML string, or a plain text string, into a
-Rich Text value at the given `startIndex`. Any content between `startIndex`
-and `endIndex` will be removed. Indices are retrieved from the selection if
-none are provided.
+Insert a Rich Text value, an HTML string, or a plain text string, into a Rich Text value at the given `startIndex`. Any content between `startIndex` and `endIndex` will be removed. Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
@@ -271,9 +250,7 @@ _Returns_
 
 ### insertObject
 
-Insert a format as an object into a Rich Text value at the given
-`startIndex`. Any content between `startIndex` and `endIndex` will be
-removed. Indices are retrieved from the selection if none are provided.
+Insert a format as an object into a Rich Text value at the given `startIndex`. Any content between `startIndex` and `endIndex` will be removed. Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
@@ -288,10 +265,7 @@ _Returns_
 
 ### isCollapsed
 
-Check if the selection of a Rich Text value is collapsed or not. Collapsed
-means that no characters are selected, but there is a caret present. If there
-is no selection, `undefined` will be returned. This is similar to
-`window.getSelection().isCollapsed()`.
+Check if the selection of a Rich Text value is collapsed or not. Collapsed means that no characters are selected, but there is a caret present. If there is no selection, `undefined` will be returned. This is similar to `window.getSelection().isCollapsed()`.
 
 _Parameters_
 
@@ -303,8 +277,7 @@ _Returns_
 
 ### isEmpty
 
-Check if a Rich Text value is Empty, meaning it contains no text or any
-objects (such as images).
+Check if a Rich Text value is Empty, meaning it contains no text or any objects (such as images).
 
 _Parameters_
 
@@ -316,9 +289,7 @@ _Returns_
 
 ### join
 
-Combine an array of Rich Text values into one, optionally separated by
-`separator`, which can be a Rich Text value, HTML string, or plain text
-string. This is similar to `Array.prototype.join`.
+Combine an array of Rich Text values into one, optionally separated by `separator`, which can be a Rich Text value, HTML string, or plain text string. This is similar to `Array.prototype.join`.
 
 _Parameters_
 
@@ -331,8 +302,7 @@ _Returns_
 
 ### registerFormatType
 
-Registers a new format provided a unique name and an object defining its
-behavior.
+Registers a new format provided a unique name and an object defining its behavior.
 
 _Parameters_
 
@@ -345,8 +315,7 @@ _Returns_
 
 ### remove
 
-Remove content from a Rich Text value between the given `startIndex` and
-`endIndex`. Indices are retrieved from the selection if none are provided.
+Remove content from a Rich Text value between the given `startIndex` and `endIndex`. Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
@@ -360,9 +329,7 @@ _Returns_
 
 ### removeFormat
 
-Remove any format object from a Rich Text value by type from the given
-`startIndex` to the given `endIndex`. Indices are retrieved from the
-selection if none are provided.
+Remove any format object from a Rich Text value by type from the given `startIndex` to the given `endIndex`. Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
@@ -377,8 +344,7 @@ _Returns_
 
 ### replace
 
-Search a Rich Text value and replace the match(es) with `replacement`. This
-is similar to `String.prototype.replace`.
+Search a Rich Text value and replace the match(es) with `replacement`. This is similar to `String.prototype.replace`.
 
 _Parameters_
 
@@ -392,9 +358,7 @@ _Returns_
 
 ### slice
 
-Slice a Rich Text value from `startIndex` to `endIndex`. Indices are
-retrieved from the selection if none are provided. This is similar to
-`String.prototype.slice`.
+Slice a Rich Text value from `startIndex` to `endIndex`. Indices are retrieved from the selection if none are provided. This is similar to `String.prototype.slice`.
 
 _Parameters_
 
@@ -408,9 +372,7 @@ _Returns_
 
 ### split
 
-Split a Rich Text value in two at the given `startIndex` and `endIndex`, or
-split at the given separator. This is similar to `String.prototype.split`.
-Indices are retrieved from the selection if none are provided.
+Split a Rich Text value in two at the given `startIndex` and `endIndex`, or split at the given separator. This is similar to `String.prototype.split`. Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
@@ -448,8 +410,7 @@ _Returns_
 
 ### toHTMLString
 
-Create an HTML string from a Rich Text value. If a `multilineTag` is
-provided, text separated by a line separator will be wrapped in it.
+Create an HTML string from a Rich Text value. If a `multilineTag` is provided, text separated by a line separator will be wrapped in it.
 
 _Parameters_
 
@@ -476,10 +437,7 @@ _Returns_
 
 ### useAnchor
 
-This hook, to be used in a format type's Edit component, returns the active
-element that is formatted, or a virtual element for the selection range if
-no format is active. The returned value is meant to be used for positioning
-UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
+This hook, to be used in a format type's Edit component, returns the active element that is formatted, or a virtual element for the selection range if no format is active. The returned value is meant to be used for positioning UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
 
 _Parameters_
 
@@ -493,10 +451,7 @@ _Returns_
 
 ### useAnchorRef
 
-This hook, to be used in a format type's Edit component, returns the active
-element that is formatted, or the selection range if no format is active.
-The returned value is meant to be used for positioning UI, e.g. by passing it
-to the `Popover` component.
+This hook, to be used in a format type's Edit component, returns the active element that is formatted, or the selection range if no format is active. The returned value is meant to be used for positioning UI, e.g. by passing it to the `Popover` component.
 
 _Parameters_
 

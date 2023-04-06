@@ -8,11 +8,9 @@ Namespace: `core`.
 
 ### canUser
 
-Returns whether the current user can perform the given action on the given
-REST resource.
+Returns whether the current user can perform the given action on the given REST resource.
 
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
+Calling this may trigger an OPTIONS request to the REST API via the `canUser()` resolver.
 
 <https://developer.wordpress.org/rest-api/reference/>
 
@@ -31,8 +29,7 @@ _Returns_
 
 Returns whether the current user can edit the given entity.
 
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
+Calling this may trigger an OPTIONS request to the REST API via the `canUser()` resolver.
 
 <https://developer.wordpress.org/rest-api/reference/>
 
@@ -81,8 +78,7 @@ _Returns_
 
 Returns the latest autosaves for the post.
 
-May return multiple autosaves since the backend stores one autosave per
-author for each post.
+May return multiple autosaves since the backend stores one autosave per author for each post.
 
 _Parameters_
 
@@ -230,9 +226,7 @@ _Returns_
 
 ### getEntityRecord
 
-Returns the Entity's record object by key. Returns `null` if the value is not
-yet received, undefined if the value entity is known to not exist, or the
-entity object if it exists and is received.
+Returns the Entity's record object by key. Returns `null` if the value is not yet received, undefined if the value entity is known to not exist, or the entity object if it exists and is received.
 
 _Parameters_
 
@@ -265,9 +259,7 @@ _Returns_
 
 Returns the specified entity record's non transient edits.
 
-Transient edits don't create an undo level, and
-are not considered for change detection.
-They are defined in the entity's config.
+Transient edits don't create an undo level, and are not considered for change detection. They are defined in the entity's config.
 
 _Parameters_
 
@@ -327,8 +319,7 @@ _Returns_
 
 ### getRawEntityRecord
 
-Returns the entity's record object by key,
-with its attributes mapped to their raw values.
+Returns the entity's record object by key, with its attributes mapped to their raw values.
 
 _Parameters_
 
@@ -343,8 +334,7 @@ _Returns_
 
 ### getRedoEdit
 
-Returns the next edit from the current undo offset
-for the entity records edits history, if any.
+Returns the next edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
 
@@ -356,9 +346,7 @@ _Returns_
 
 ### getReferenceByDistinctEdits
 
-Returns a new reference when edited values have changed. This is useful in
-inferring where an edit has been made between states by comparison of the
-return values using strict equality.
+Returns a new reference when edited values have changed. This is useful in inferring where an edit has been made between states by comparison of the return values using strict equality.
 
 _Usage_
 
@@ -389,8 +377,7 @@ _Returns_
 
 ### getUndoEdit
 
-Returns the previous edit from the current undo offset
-for the entity records edits history, if any.
+Returns the previous edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
 
@@ -415,8 +402,7 @@ _Returns_
 
 ### hasEditsForEntityRecord
 
-Returns true if the specified entity record has edits,
-and false otherwise.
+Returns true if the specified entity record has edits, and false otherwise.
 
 _Parameters_
 
@@ -431,8 +417,7 @@ _Returns_
 
 ### hasEntityRecords
 
-Returns true if records have been received for the given set of parameters,
-or false otherwise.
+Returns true if records have been received for the given set of parameters, or false otherwise.
 
 _Parameters_
 
@@ -461,8 +446,7 @@ _Returns_
 
 ### hasRedo
 
-Returns true if there is a next edit from the current undo offset
-for the entity records edits history, and false otherwise.
+Returns true if there is a next edit from the current undo offset for the entity records edits history, and false otherwise.
 
 _Parameters_
 
@@ -474,8 +458,7 @@ _Returns_
 
 ### hasUndo
 
-Returns true if there is a previous edit from the current undo offset
-for the entity records edits history, and false otherwise.
+Returns true if there is a previous edit from the current undo offset for the entity records edits history, and false otherwise.
 
 _Parameters_
 
@@ -519,9 +502,7 @@ _Returns_
 
 Determines if the returned preview is an oEmbed link fallback.
 
-WordPress can be configured to return a simple link to a URL if it is not embeddable.
-We need to be able to determine if a URL is embeddable or not, based on what we
-get back from the oEmbed preview API.
+WordPress can be configured to return a simple link to a URL if it is not embeddable. We need to be able to determine if a URL is embeddable or not, based on what we get back from the oEmbed preview API.
 
 _Parameters_
 
@@ -534,8 +515,7 @@ _Returns_
 
 ### isRequestingEmbedPreview
 
-Returns true if a request is in progress for embed preview data, or false
-otherwise.
+Returns true if a request is in progress for embed preview data, or false otherwise.
 
 _Parameters_
 
@@ -595,8 +575,7 @@ _Parameters_
 
 ### editEntityRecord
 
-Returns an action object that triggers an
-edit to an entity record.
+Returns an action object that triggers an edit to an entity record.
 
 _Parameters_
 
@@ -654,8 +633,7 @@ _Returns_
 
 ### redo
 
-Action triggered to redo the last undoed
-edit to an entity record, if any.
+Action triggered to redo the last undoed edit to an entity record, if any.
 
 ### saveEditedEntityRecord
 
@@ -684,7 +662,6 @@ _Parameters_
 
 ### undo
 
-Action triggered to undo the last edit to
-an entity record, if any.
+Action triggered to undo the last edit to an entity record, if any.
 
 <!-- END TOKEN(Autogenerated actions|../../../packages/core-data/src/actions.js) -->

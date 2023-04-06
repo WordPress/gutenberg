@@ -233,8 +233,7 @@ Undocumented declaration.
 
 ### BlockTitle
 
-Renders the block's configured title as a string, or empty if the title
-cannot be determined.
+Renders the block's configured title as a string, or empty if the title cannot be determined.
 
 _Usage_
 
@@ -264,9 +263,7 @@ _Related_
 
 ### BlockTools
 
-Renders block tools (the block toolbar, select/navigation mode toolbar, the
-insertion point and a slot for the inline rich text toolbar). Must be wrapped
-around the block content and editor styles wrapper or iframe.
+Renders block tools (the block toolbar, select/navigation mode toolbar, the insertion point and a slot for the inline rich text toolbar). Must be wrapped around the block content and editor styles wrapper or iframe.
 
 _Parameters_
 
@@ -320,8 +317,7 @@ _Related_
 
 ### createCustomColorsHOC
 
-A higher-order component factory for creating a 'withCustomColors' HOC, which handles color logic
-for class generation color value, retrieval and color attribute setting.
+A higher-order component factory for creating a 'withCustomColors' HOC, which handles color logic for class generation color value, retrieval and color attribute setting.
 
 Use this higher-order component to work with a custom set of colors.
 
@@ -373,8 +369,7 @@ _Returns_
 
 ### getColorObjectByAttributeValues
 
-Provided an array of color objects as set by the theme or by the editor defaults,
-and the values of the defined color or custom color returns a color object describing the color.
+Provided an array of color objects as set by the theme or by the editor defaults, and the values of the defined color or custom color returns a color object describing the color.
 
 _Parameters_
 
@@ -401,12 +396,9 @@ _Returns_
 
 ### getComputedFluidTypographyValue
 
-Computes a fluid font-size value that uses clamp(). A minimum and maximum
-font size OR a single font size can be specified.
+Computes a fluid font-size value that uses clamp(). A minimum and maximum font size OR a single font size can be specified.
 
-If a single font size is specified, it is scaled up and down by
-minimumFontSizeFactor and maximumFontSizeFactor to arrive at the minimum and
-maximum sizes.
+If a single font size is specified, it is scaled up and down by minimumFontSizeFactor and maximumFontSizeFactor to arrive at the minimum and maximum sizes.
 
 _Usage_
 
@@ -440,8 +432,7 @@ _Returns_
 
 ### getFontSize
 
-Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
-If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
+Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values. If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
 
 _Parameters_
 
@@ -531,8 +522,7 @@ _Returns_
 
 ### getTypographyClassesAndStyles
 
-Provides the CSS class names and inline styles for a block's typography support
-attributes.
+Provides the CSS class names and inline styles for a block's typography support attributes.
 
 _Parameters_
 
@@ -640,8 +630,7 @@ _Related_
 
 > **Deprecated**
 
-Scrolls the multi block selection end into view if not in view already. This
-is important to do after selection by keyboard.
+Scrolls the multi block selection end into view if not in view already. This is important to do after selection by keyboard.
 
 ### NavigableToolbar
 
@@ -755,9 +744,7 @@ _Returns_
 
 ### Typewriter
 
-Ensures that the text selection keeps the same vertical distance from the
-viewport during keyboard events within this component. The vertical distance
-can vary. It is the last clicked or scrolled to position.
+Ensures that the text selection keeps the same vertical distance from the viewport during keyboard events within this component. The vertical distance can vary. It is the last clicked or scrolled to position.
 
 ### URLInput
 
@@ -779,15 +766,9 @@ _Related_
 
 ### useBlockDisplayInformation
 
-Hook used to try to find a matching block variation and return
-the appropriate information for display reasons. In order to
-to try to find a match we need to things:
-1\. Block's client id to extract it's current attributes.
-2\. A block variation should have set `isActive` prop to a proper function.
+Hook used to try to find a matching block variation and return the appropriate information for display reasons. In order to to try to find a match we need to things: 1. Block's client id to extract it's current attributes. 2. A block variation should have set `isActive` prop to a proper function.
 
-If for any reason a block variation match cannot be found,
-the returned information come from the Block Type.
-If no blockType is found with the provided clientId, returns null.
+If for any reason a block variation match cannot be found, the returned information come from the Block Type. If no blockType is found with the provided clientId, returns null.
 
 _Parameters_
 
@@ -799,10 +780,7 @@ _Returns_
 
 ### useBlockEditContext
 
-The `useBlockEditContext` hook provides information about the block this hook is being used in.
-It returns an object with the `name`, `isSelected` state, and the `clientId` of the block.
-It is useful if you want to create custom hooks that need access to the current blocks clientId
-but don't want to rely on the data getting passed in as a parameter.
+The `useBlockEditContext` hook provides information about the block this hook is being used in. It returns an object with the `name`, `isSelected` state, and the `clientId` of the block. It is useful if you want to create custom hooks that need access to the current blocks clientId but don't want to rely on the data getting passed in as a parameter.
 
 _Returns_
 
@@ -810,13 +788,7 @@ _Returns_
 
 ### useBlockProps
 
-This hook is used to lightly mark an element as a block element. The element
-should be the outermost element of a block. Call this hook and pass the
-returned props to the element to mark as a block. If you define a ref for the
-element, it is important to pass the ref to this hook, which the hook in turn
-will pass to the component through the props it returns. Optionally, you can
-also pass any other props through this hook, and they will be merged and
-returned.
+This hook is used to lightly mark an element as a block element. The element should be the outermost element of a block. Call this hook and pass the returned props to the element to mark as a block. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.
 
 _Parameters_
 
@@ -842,13 +814,7 @@ _Returns_
 
 ### useInnerBlocksProps
 
-This hook is used to lightly mark an element as an inner blocks wrapper
-element. Call this hook and pass the returned props to the element to mark as
-an inner blocks wrapper, automatically rendering inner blocks as children. If
-you define a ref for the element, it is important to pass the ref to this
-hook, which the hook in turn will pass to the component through the props it
-returns. Optionally, you can also pass any other props through this hook, and
-they will be merged and returned.
+This hook is used to lightly mark an element as an inner blocks wrapper element. Call this hook and pass the returned props to the element to mark as an inner blocks wrapper, automatically rendering inner blocks as children. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.
 
 _Related_
 
@@ -863,8 +829,7 @@ _Parameters_
 
 Hook that retrieves the given setting for the block instance in use.
 
-It looks up the settings first in the block instance hierarchy.
-If none is found, it'll look it up in the block editor store.
+It looks up the settings first in the block instance hierarchy. If none is found, it'll look it up in the block editor store.
 
 _Usage_
 
@@ -915,8 +880,7 @@ _Returns_
 
 ### withFontSizes
 
-Higher-order component, which handles font size logic for class generation,
-font size value retrieval, and font size change handling.
+Higher-order component, which handles font size logic for class generation, font size value retrieval, and font size change handling.
 
 _Parameters_
 
@@ -928,8 +892,7 @@ _Returns_
 
 ### WritingFlow
 
-Handles selection and navigation across blocks. This component should be
-wrapped around BlockList.
+Handles selection and navigation across blocks. This component should be wrapped around BlockList.
 
 _Parameters_
 

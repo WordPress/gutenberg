@@ -139,8 +139,7 @@ _Returns_
 
 ### createElement
 
-Returns a new element of given type. Type can be either a string tag name or
-another function which itself returns an element.
+Returns a new element of given type. Type can be either a string tag name or another function which itself returns an element.
 
 _Parameters_
 
@@ -154,9 +153,7 @@ _Returns_
 
 ### createInterpolateElement
 
-This function creates an interpolated element from a passed in string with
-specific tags matching how the string should be converted to an element via
-the conversion map value.
+This function creates an interpolated element from a passed in string with specific tags matching how the string should be converted to an element via the conversion map value.
 
 _Usage_
 
@@ -199,9 +196,7 @@ _Parameters_
 
 ### createRef
 
-Returns an object tracking a reference to a rendered element via its
-`current` property as either a DOMElement or Element, dependent upon the
-type of element rendered with the ref attribute.
+Returns an object tracking a reference to a rendered element via its `current` property as either a DOMElement or Element, dependent upon the type of element rendered with the ref attribute.
 
 _Returns_
 
@@ -237,10 +232,7 @@ _Parameters_
 
 ### forwardRef
 
-Component enhancer used to enable passing a ref to its wrapped component.
-Pass a function argument which receives `props` and `ref` as its arguments,
-returning an element using the forwarded ref. The return value is a new
-component which forwards its ref.
+Component enhancer used to enable passing a ref to its wrapped component. Pass a function argument which receives `props` and `ref` as its arguments, returning an element using the forwarded ref. The return value is a new component which forwards its ref.
 
 _Parameters_
 
@@ -314,8 +306,7 @@ _Related_
 
 ### Platform
 
-Component used to detect the current Platform being used.
-Use Platform.OS === 'web' to detect if running on web enviroment.
+Component used to detect the current Platform being used. Use Platform.OS === 'web' to detect if running on web enviroment.
 
 This is the same concept as the React Native implementation.
 
@@ -338,10 +329,7 @@ const placeholderLabel = Platform.select( {
 
 ### RawHTML
 
-Component used as equivalent of Fragment with unescaped HTML, in cases where
-it is desirable to render dangerous HTML without needing a wrapper element.
-To preserve additional props, a `div` wrapper _will_ be created if any props
-aside from `children` are passed.
+Component used as equivalent of Fragment with unescaped HTML, in cases where it is desirable to render dangerous HTML without needing a wrapper element. To preserve additional props, a `div` wrapper _will_ be created if any props aside from `children` are passed.
 
 _Parameters_
 
