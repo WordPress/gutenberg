@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/user-patterns",
-	"version": "4.7.0",
+	"version": "1.0.0",
 	"description": "Patterns utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
