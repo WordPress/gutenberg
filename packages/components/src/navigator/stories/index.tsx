@@ -298,3 +298,71 @@ export const NestedNavigator: ComponentStory< typeof NavigatorProvider > =
 NestedNavigator.args = {
 	initialPath: '/child2/grandchild',
 };
+
+const NavigatorButtonWithSkipFocus = ( {
+	path,
+	onClick,
+	...props
+}: React.ComponentProps< typeof NavigatorButton > ) => {
+	const { goTo } = useNavigator();
+
+	return (
+		<Button
+			{ ...props }
+			onClick={ ( e: React.MouseEvent< HTMLButtonElement > ) => {
+				goTo( path, { skipFocus: true } );
+				onClick?.( e );
+			} }
+		/>
+	);
+};
+
+export const SkipFocus: ComponentStory< typeof NavigatorProvider > = (
+	args
+) => {
+	return <NavigatorProvider { ...args } />;
+};
+SkipFocus.args = {
+	initialPath: '/',
+	children: (
+		<>
+			<div
+				style={ {
+					height: 250,
+					border: '1px solid black',
+				} }
+			>
+				<NavigatorScreen
+					path="/"
+					style={ {
+						height: '100%',
+					} }
+				>
+					<h1>Home screen</h1>
+					<NavigatorButton variant="secondary" path="/child">
+						Go to child screen.
+					</NavigatorButton>
+				</NavigatorScreen>
+				<NavigatorScreen
+					path="/child"
+					style={ {
+						height: '100%',
+					} }
+				>
+					<h2>Child screen</h2>
+					<NavigatorToParentButton variant="secondary">
+						Go to parent screen.
+					</NavigatorToParentButton>
+				</NavigatorScreen>
+			</div>
+
+			<NavigatorButtonWithSkipFocus
+				variant="secondary"
+				path="/child"
+				style={ { margin: '1rem 2rem' } }
+			>
+				Go to child screen, but keep focus on this button
+			</NavigatorButtonWithSkipFocus>
+		</>
+	),
+};
