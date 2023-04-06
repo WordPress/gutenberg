@@ -26,12 +26,6 @@
 		width: 100%;
 		aspect-ratio: 3/4;
 
-		// Avoid to override the BlockPatternList component
-		// default hover and focus styles.
-		&:not(:focus):not(:hover) {
-			box-shadow: 0 0 0 1px $gray-300;
-		}
-
 		.block-editor-block-preview__container {
 			height: 100%;
 		}
@@ -43,6 +37,14 @@
 
 		.block-editor-block-patterns-list__item-title {
 			display: none;
+		}
+	}
+
+	.block-editor-block-patterns-list__item {
+		// Avoid to override the BlockPatternList component
+		// default hover and focus styles.
+		&:not(:focus):not(:hover) .block-editor-block-preview__container {
+			box-shadow: 0 0 0 1px $gray-300;
 		}
 	}
 
