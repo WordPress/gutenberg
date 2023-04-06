@@ -134,6 +134,25 @@
 			width: initial;
 			// remove the border
 			border-bottom: none;
+			// has to be flex for collapse button to fit
+			display: flex;
+
+			&.is-collapsed {
+				left: $grid-unit-10 * 35;
+			}
+
+			& > button.components-button.has-icon {
+
+				&.block-editor-block-toolbar__collapse-fixed-toolbar {
+					// Add a border as separator in the block toolbar.
+					border-right: $border-width solid $gray-300;
+				}
+
+				&.block-editor-block-toolbar__expand-fixed-toolbar {
+					// Add a border as separator in the block toolbar.
+					border-left: $border-width solid $gray-300;
+				}
+			}
 		}
 
 		&.is-fixed .block-editor-block-parent-selector {
