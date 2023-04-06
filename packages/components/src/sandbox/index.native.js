@@ -15,6 +15,7 @@ import {
 	useState,
 	useEffect,
 	forwardRef,
+	useCallback,
 } from '@wordpress/element';
 import { usePreferredColorScheme } from '@wordpress/compose';
 
@@ -183,6 +184,7 @@ const Sandbox = forwardRef( function Sandbox(
 		title = '',
 		type,
 		url,
+		onWindowEvents = {},
 	},
 	ref
 ) {
@@ -241,6 +243,21 @@ const Sandbox = forwardRef( function Sandbox(
 		return '<!DOCTYPE html>' + renderToString( htmlDoc );
 	}
 
+	const getInjectedJavaScript = useCallback( () => {
+		// Allow parent to override the resize observers with prop.customJS (legacy support)
+		let injectedJS = customJS || observeAndResizeJS;
+
+		// Add any event listeners that were passed in.
+		Object.keys( onWindowEvents ).forEach( ( eventType ) => {
+			injectedJS += `
+				window.addEventListener( '${ eventType }', function( event ) {
+					window.ReactNativeWebView.postMessage( JSON.stringify( { type: '${ eventType }', ...event.data } ) );
+				});`;
+		} );
+
+		return injectedJS;
+	}, [ customJS, onWindowEvents ] );
+
 	function updateContentHtml( forceRerender = false ) {
 		const newContentHtml = getHtmlDoc();
 
@@ -255,25 +272,6 @@ const Sandbox = forwardRef( function Sandbox(
 		}
 	}
 
-	function checkMessageForResize( event ) {
-		// Attempt to parse the message data as JSON if passed as string.
-		let data = event.nativeEvent.data || {};
-
-		if ( 'string' === typeof data ) {
-			try {
-				data = JSON.parse( data );
-			} catch ( e ) {}
-		}
-
-		// Update the state only if the message is formatted as we expect,
-		// i.e. as an object with a 'resize' action.
-		if ( 'resize' !== data.action ) {
-			return;
-		}
-
-		setHeight( data.height );
-	}
-
 	function getSizeStyle() {
 		const contentHeight = Math.ceil( height );
 
@@ -283,6 +281,31 @@ const Sandbox = forwardRef( function Sandbox(
 	function onChangeDimensions( dimensions ) {
 		setIsLandscape( dimensions.window.width >= dimensions.window.height );
 	}
+
+	const onMessage = useCallback(
+		( message ) => {
+			let data = message?.nativeEvent?.data;
+
+			try {
+				data = JSON.parse( data );
+			} catch ( e ) {
+				return;
+			}
+
+			// check for resize event
+			if ( 'resize' === data?.action ) {
+				setHeight( data.height );
+			}
+
+			// Forward the event to parent event listeners
+			Object.keys( onWindowEvents ).forEach( ( eventType ) => {
+				if ( data?.type === eventType ) {
+					onWindowEvents[ eventType ]( data );
+				}
+			} );
+		},
+		[ onWindowEvents ]
+	);
 
 	useEffect( () => {
 		const dimensionsChangeSubscription = Dimensions.addEventListener(
@@ -316,7 +339,7 @@ const Sandbox = forwardRef( function Sandbox(
 				sandboxStyles[ 'sandbox-webview__container' ],
 				containerStyle,
 			] }
-			injectedJavaScript={ customJS || observeAndResizeJS }
+			injectedJavaScript={ getInjectedJavaScript() }
 			key={ key }
 			ref={ ref }
 			source={ { baseUrl: providerUrl, html: contentHtml } }
@@ -328,7 +351,7 @@ const Sandbox = forwardRef( function Sandbox(
 				getSizeStyle(),
 				Platform.isAndroid && workaroundStyles.webView,
 			] }
-			onMessage={ checkMessageForResize }
+			onMessage={ onMessage }
 			scrollEnabled={ false }
 			setBuiltInZoomControls={ false }
 			showsHorizontalScrollIndicator={ false }
