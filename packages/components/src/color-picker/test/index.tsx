@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { screen, render, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -220,5 +220,53 @@ describe( 'ColorPicker', () => {
 
 		expect( onChange ).toHaveBeenCalledTimes( 3 );
 		expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
+	} );
+	describe.each( [
+		[ 'red', 0, '#7dffff' ],
+		[ 'green', 1, '#ff7dff' ],
+		[ 'blue', 2, '#ffff7d' ],
+	] )( 'RGB inputs', ( colorInput, inputIndex, expected ) => {
+		it( `should fire onChange with the correct value when the ${ colorInput } value is updated`, async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			const color = '#fff';
+
+			const { container } = render(
+				<ColorPicker
+					onChange={ onChange }
+					color={ color }
+					enableAlpha={ false }
+				/>
+			);
+
+			const formatSelector = getFormatSelector( container );
+
+			if ( formatSelector === null ) {
+				throw new Error(
+					'The color format selector could not be found'
+				);
+			}
+
+			expect( formatSelector ).toBeInTheDocument();
+
+			await user.selectOptions( formatSelector, 'rgb' );
+
+			const inputElement =
+				screen.getAllByRole( 'spinbutton' )[ inputIndex ];
+
+			if ( inputElement === null ) {
+				throw new Error(
+					`The ${ colorInput } input could not be found`
+				);
+			}
+
+			expect( inputElement ).toBeInTheDocument();
+
+			await user.clear( inputElement );
+			await user.type( inputElement, '125' );
+
+			expect( onChange ).toHaveBeenCalledTimes( 4 );
+			expect( onChange ).toHaveBeenLastCalledWith( expected );
+		} );
 	} );
 } );
