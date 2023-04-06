@@ -105,7 +105,7 @@
 	// so the fixed toolbar can be positioned on top of it
 	// but only on desktop
 	@include break-medium() {
-		.interface-interface-skeleton__header {
+		.interface-interface-skeleton__header:not(:focus-within) {
 			z-index: 19;
 		}
 	}
