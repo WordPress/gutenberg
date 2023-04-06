@@ -48,7 +48,9 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 			return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
 				return {
 					name: record.title?.rendered + ' ' + record.id,
-					label: record.title?.rendered,
+					label: record.title?.rendered
+						? record.title?.rendered
+						: __( '(no title)' ),
 					callback: ( { close } ) => {
 						history.push( {
 							postType,

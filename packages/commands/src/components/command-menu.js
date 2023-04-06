@@ -32,7 +32,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 				{ commands.map( ( command ) => (
 					<Command.Item
 						key={ command.name }
-						value={ command.label ?? command.name }
+						value={ command.name }
 						onSelect={ () => command.callback( { close } ) }
 					>
 						<span className="commands-command-menu__item">
@@ -91,7 +91,7 @@ export function CommandMenuGroup( { group, search, setLoader, close } ) {
 			{ commands.map( ( command ) => (
 				<Command.Item
 					key={ command.name }
-					value={ command.label ?? command.name }
+					value={ command.name }
 					onSelect={ () => command.callback( { close } ) }
 				>
 					<span className="commands-command-menu__item">
