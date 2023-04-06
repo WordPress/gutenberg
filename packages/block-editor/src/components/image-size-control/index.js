@@ -55,12 +55,7 @@ export default function ImageSizeControl( {
 							value={ currentWidth }
 							min={ 1 }
 							onChange={ ( value ) =>
-								updateDimension(
-									'width',
-									value !== undefined
-										? Number( value )
-										: value
-								)
+								updateDimension( 'width', value )
 							}
 							size="__unstable-large"
 						/>
@@ -70,12 +65,7 @@ export default function ImageSizeControl( {
 							value={ currentHeight }
 							min={ 1 }
 							onChange={ ( value ) =>
-								updateDimension(
-									'height',
-									value !== undefined
-										? Number( value )
-										: value
-								)
+								updateDimension( 'height', value )
 							}
 							size="__unstable-large"
 						/>
