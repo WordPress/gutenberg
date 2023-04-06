@@ -111,7 +111,6 @@ export default function BorderPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	forceSplitBorders = false,
 } ) {
 	const colors = useColorsPerOrigin( settings );
 	const decodeValue = ( rawValue ) =>
@@ -187,35 +186,7 @@ export default function BorderPanel( {
 	const onBorderChange = ( newBorder ) => {
 		// Ensure we have a visible border style when a border width or
 		// color is being selected.
-		const newBorderWithStyle = applyAllFallbackStyles( newBorder );
-		let updatedBorder = newBorderWithStyle;
-
-		if ( forceSplitBorders ) {
-			// As Global Styles can't conditionally generate styles based on if
-			// other style properties have been set, we need to force split
-			// border definitions for user set global border styles. Border
-			// radius is derived from the same property i.e. `border.radius` if
-			// it is a string that is used. The longhand border radii styles are
-			// only generated if that property is an object.
-			//
-			// For borders (color, style, and width) those are all properties on
-			// the `border` style property. This means if the theme.json defined
-			// split borders and the user condenses them into a flat border or
-			// vice-versa we'd get both sets of styles which would conflict.
-			updatedBorder = ! hasSplitBorders( newBorderWithStyle )
-				? {
-						top: newBorderWithStyle,
-						right: newBorderWithStyle,
-						bottom: newBorderWithStyle,
-						left: newBorderWithStyle,
-				  }
-				: {
-						color: null,
-						style: null,
-						width: null,
-						...newBorderWithStyle,
-				  };
-		}
+		const updatedBorder = applyAllFallbackStyles( newBorder );
 
 		if ( hasSplitBorders( updatedBorder ) ) {
 			[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
