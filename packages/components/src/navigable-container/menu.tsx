@@ -59,9 +59,10 @@ export function UnforwardedNavigableMenu(
 			onlyBrowserTabstops={ false }
 			role={ role }
 			aria-orientation={
-				role === 'presentation'
-					? undefined
-					: ( orientation as 'vertical' | 'horizontal' )
+				role === 'presentation' &&
+				( orientation === 'vertical' || orientation === 'horizontal' )
+					? orientation
+					: undefined
 			}
 			eventToOffset={ eventToOffset }
 			{ ...rest }
