@@ -11,11 +11,15 @@
  *
  * @see https://github.com/bgrins/TinyColor
  *
+ * @deprecated 6.3.0
+ *
  * @param  mixed $n   Number of unknown type.
  * @param  int   $max Upper value of the range to bound to.
  * @return float      Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound01( $n, $max ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	if ( 'string' === gettype( $n ) && str_contains( $n, '.' ) && 1 === (float) $n ) {
 		$n = '100%';
 	}
@@ -42,10 +46,14 @@ function gutenberg_tinycolor_bound01( $n, $max ) {
  *
  * @see https://github.com/bgrins/TinyColor
  *
+ * @deprecated 6.3.0
+ *
  * @param  mixed $n   Number of unknown type.
  * @return float      Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound_alpha( $n ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	if ( is_numeric( $n ) ) {
 		$n = (float) $n;
 		if ( $n >= 0 && $n <= 1 ) {
@@ -60,10 +68,14 @@ function gutenberg_tinycolor_bound_alpha( $n ) {
  *
  * @see https://github.com/bgrins/TinyColor
  *
+ * @deprecated 6.3.0
+ *
  * @param  array $rgb_color RGB object.
  * @return array            Rounded and converted RGB object.
  */
 function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	return array(
 		'r' => gutenberg_tinycolor_bound01( $rgb_color['r'], 255 ) * 255,
 		'g' => gutenberg_tinycolor_bound01( $rgb_color['g'], 255 ) * 255,
@@ -76,12 +88,16 @@ function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
  *
  * @see https://github.com/bgrins/TinyColor
  *
+ * @deprecated 6.3.0
+ *
  * @param  float $p first component.
  * @param  float $q second component.
  * @param  float $t third component.
  * @return float    R, G, or B component.
  */
 function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	if ( $t < 0 ) {
 		++$t;
 	}
@@ -105,10 +121,14 @@ function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
  *
  * @see https://github.com/bgrins/TinyColor
  *
+ * @deprecated 6.3.0
+ *
  * @param  array $hsl_color HSL object.
  * @return array            Rounded and converted RGB object.
  */
 function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	$h = gutenberg_tinycolor_bound01( $hsl_color['h'], 360 );
 	$s = gutenberg_tinycolor_bound01( $hsl_color['s'], 100 );
 	$l = gutenberg_tinycolor_bound01( $hsl_color['l'], 100 );
@@ -140,10 +160,14 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
  * @see https://github.com/bgrins/TinyColor
  * @see https://github.com/casesandberg/react-color/
  *
+ * @deprecated 6.3.0
+ *
  * @param  string $color_str CSS color string.
  * @return array             RGB object.
  */
 function gutenberg_tinycolor_string_to_rgb( $color_str ) {
+	_deprecated_function( __FUNCTION__, '6.3.0' );
+
 	$color_str = strtolower( trim( $color_str ) );
 
 	$css_integer = '[-\\+]?\\d+%?';
