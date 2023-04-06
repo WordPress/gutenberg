@@ -72,3 +72,43 @@ function gutenberg_create_initial_post_types() {
 	);
 }
 add_action( 'init', 'gutenberg_create_initial_post_types' );
+
+/**
+ * Registers user-created block patterns.
+ */
+function gutenberg_register_user_block_patterns() {
+	// Get posts from the wp_block_pattern post type.
+	$posts = get_posts(
+		array(
+			'post_type'      => 'wp_block_pattern',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+		)
+	);
+
+	if ( empty( $posts ) ) {
+		return;
+	}
+
+	register_block_pattern_category(
+		'user',
+		array(
+			'label'       => _x( 'User patterns', 'Block pattern category' ),
+			'description' => __( 'Patterns that were created by users on this site.' ),
+		)
+	);
+
+	// Register each post as a block pattern.
+	foreach ( $posts as $post ) {
+		register_block_pattern(
+			'wp-block-pattern/' . $post->post_name,
+			array(
+				'title'       => $post->post_title,
+				'description' => $post->post_excerpt,
+				'content'     => $post->post_content,
+				'categories'  => array( 'user' ),
+			)
+		);
+	}
+}
+add_action( 'init', 'gutenberg_register_user_block_patterns' );
