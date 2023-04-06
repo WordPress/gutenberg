@@ -48,7 +48,6 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/patterns": "file:../pattern",
 		"@wordpress/react-native-aztec": "file:../react-native-aztec",
 		"@wordpress/react-native-bridge": "file:../react-native-bridge",
 		"core-js": "^3.19.1",

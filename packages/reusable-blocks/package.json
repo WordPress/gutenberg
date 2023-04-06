@@ -37,7 +37,6 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
-		"@wordpress/patterns": "file:../pattern",
 		"@wordpress/url": "file:../url"
 	},
 	"peerDependencies": {
