@@ -938,7 +938,6 @@ class WP_Duotone_Gutenberg {
 		}
 
 		$filter_id = self::get_filter_id_from_preset( $preset );
-
 		return 'url(#' . $filter_id . ')';
 	}
 }
