@@ -68,8 +68,8 @@ export default function Layout() {
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
-	const { canvasMode, previousShortcut, nextShortcut } = useSelect(
-		( select ) => {
+	const { hasFixedToolbar, canvasMode, previousShortcut, nextShortcut } =
+		useSelect( ( select ) => {
 			const { getAllShortcutKeyCombinations } = select(
 				keyboardShortcutsStore
 			);
@@ -82,10 +82,10 @@ export default function Layout() {
 				nextShortcut: getAllShortcutKeyCombinations(
 					'core/edit-site/next-region'
 				),
+				hasFixedToolbar:
+					select( editSiteStore ).isFeatureActive( 'fixedToolbar' ),
 			};
-		},
-		[]
-	);
+		}, [] );
 	const navigateRegionsProps = useNavigateRegions( {
 		previous: previousShortcut,
 		next: nextShortcut,
@@ -139,6 +139,7 @@ export default function Layout() {
 					{
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': canvasMode === 'edit',
+						'has-fixed-toolbar': hasFixedToolbar,
 					}
 				) }
 			>

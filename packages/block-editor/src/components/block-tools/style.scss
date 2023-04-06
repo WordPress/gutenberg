@@ -123,11 +123,12 @@
 	// on top of interface header
 	@include break-medium() {
 		&.is-fixed {
+
 			// position on top of interface header
 			position: fixed;
-			top: $grid-unit;
+			top: $grid-unit-50 - 2;
 			// leave room for block inserter
-			left: $grid-unit-80 + $grid-unit-70;
+			left: $grid-unit-80 + $grid-unit-40;
 			// Don't fill up when empty
 			min-height: initial;
 			// Don't fill the whole header, minimize area
@@ -138,7 +139,16 @@
 			display: flex;
 
 			&.is-collapsed {
-				left: $grid-unit-10 * 35;
+				left: $grid-unit-10 * 32;
+			}
+
+			.is-fullscreen-mode & {
+				top: $grid-unit - 2;
+				// leave room for block inserter
+				left: $grid-unit-80 + $grid-unit-70;
+				&.is-collapsed {
+					left: $grid-unit-10 * 35;
+				}
 			}
 
 			& > button.components-button.has-icon {
