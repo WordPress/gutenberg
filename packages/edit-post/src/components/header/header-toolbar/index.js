@@ -98,7 +98,6 @@ function HeaderToolbar() {
 			),
 		};
 	}, [] );
-
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
 
