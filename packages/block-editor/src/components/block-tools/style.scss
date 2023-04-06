@@ -119,7 +119,8 @@
 		}
 	}
 
-	// on mobile viewports the toolbar is fixed below header
+	// on desktop viewports the toolbar is fixed
+	// on top of interface header
 	@include break-medium() {
 		&.is-fixed {
 			// position on top of interface header
@@ -133,6 +134,33 @@
 			width: initial;
 			// remove the border
 			border-bottom: none;
+		}
+
+		&.is-fixed .block-editor-block-parent-selector .block-editor-block-parent-selector__button {
+			border: 0;
+			&::after {
+				content: "\00B7";
+				font-size: 16px;
+				line-height: $grid-unit-40 + $grid-unit-10;
+				position: absolute;
+				left: $grid-unit-40 + $grid-unit-15 + 2px;
+				bottom: $grid-unit-05;
+			}
+		}
+
+		&:not(.is-fixed) .block-editor-block-parent-selector {
+			position: absolute;
+			top: -$border-width;
+			left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+			.show-icon-labels & {
+				position: relative;
+				left: auto;
+				top: auto;
+				margin-top: -$border-width;
+				margin-left: -$border-width;
+				margin-bottom: -$border-width;
+			}
 		}
 	}
 

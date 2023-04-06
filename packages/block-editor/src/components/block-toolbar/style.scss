@@ -64,21 +64,6 @@
 	}
 }
 
-.block-editor-block-parent-selector {
-	position: absolute;
-	top: -$border-width;
-	left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
-
-	.show-icon-labels & {
-		position: relative;
-		left: auto;
-		top: auto;
-		margin-top: -$border-width;
-		margin-left: -$border-width;
-		margin-bottom: -$border-width;
-	}
-}
-
 // Block controls.
 .block-editor-block-toolbar__block-controls {
 	// Switcher.
