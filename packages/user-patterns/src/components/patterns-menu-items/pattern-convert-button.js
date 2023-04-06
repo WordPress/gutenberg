@@ -28,7 +28,7 @@ import { store } from '../../store';
  * @param {string[]} props.clientIds Client ids of selected blocks.
  * @return {import('@wordpress/element').WPComponent} The menu control or null.
  */
-export default function PatternConvertButton( { clientIds } ) {
+export default function UserPatternConvertButton( { clientIds } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 
@@ -72,7 +72,7 @@ export default function PatternConvertButton( { clientIds } ) {
 								setIsModalOpen( false );
 								setTitle( '' );
 							} }
-							overlayClassName="patterns-menu-items__convert-modal"
+							overlayClassName="user-patterns-menu-items__convert-modal"
 						>
 							<form
 								onSubmit={ ( event ) => {

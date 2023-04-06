@@ -1,1 +1,1 @@
-export { default as PatternsMenuItems } from './patterns-menu-items';
+export { default as UserPatternsMenuItems } from './patterns-menu-items';

@@ -7,11 +7,11 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import PatternConvertButton from './pattern-convert-button';
+import UserPatternConvertButton from './pattern-convert-button';
 
-function PatternsMenuItems( { clientIds, rootClientId } ) {
+function UserPatternsMenuItems( { clientIds, rootClientId } ) {
 	return (
-		<PatternConvertButton
+		<UserPatternConvertButton
 			clientIds={ clientIds }
 			rootClientId={ rootClientId }
 		/>
@@ -23,4 +23,4 @@ export default withSelect( ( select ) => {
 	return {
 		clientIds: getSelectedBlockClientIds(),
 	};
-} )( PatternsMenuItems );
+} )( UserPatternsMenuItems );
