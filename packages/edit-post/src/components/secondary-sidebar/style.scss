@@ -62,8 +62,7 @@
 .edit-post-editor__list-view-panel-content,
 .edit-post-editor__list-view-container > .document-outline,
 .edit-post-editor__list-view-empty-headings {
-	overflow-x: hidden;
-	overflow-y: auto;
+	overflow: auto;
 	height: 100%;
 	// The table cells use an extra pixels of space left and right. We compensate for that here.
 	padding: $grid-unit-10 ($grid-unit-10 - $border-width - $border-width);
