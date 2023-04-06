@@ -104,11 +104,10 @@
 	&.is-fixed {
 		position: sticky;
 		top: 0;
-		width: 100%;
+		left: 0;
 		z-index: z-index(".block-editor-block-popover");
-		// Fill up when empty
-		min-height: $block-toolbar-height;
 		display: block;
+		width: 100%;
 
 		border: none;
 		border-bottom: $border-width solid $gray-200;
@@ -119,6 +118,25 @@
 			border-right-color: $gray-200;
 		}
 	}
+
+	// on mobile viewports the toolbar is fixed below header
+	@include break-medium() {
+		&.is-fixed {
+			// position on top of interface header
+			position: fixed;
+			top: $grid-unit;
+			// leave room for block inserter
+			left: $grid-unit-80 + $grid-unit-70;
+			// Don't fill up when empty
+			min-height: initial;
+			// Don't fill the whole header, minimize area
+			width: initial;
+			// remove the border
+			border-bottom: none;
+		}
+	}
+
+
 }
 
 /**

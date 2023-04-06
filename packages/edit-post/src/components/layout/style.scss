@@ -99,3 +99,15 @@
 .edit-post-layout .entities-saved-states__panel-header {
 	height: $header-height + $border-width;
 }
+
+.edit-post-layout.has-fixed-toolbar {
+	// making the header be lower than the content
+	// so the fixed toolbar can be positioned on top of it
+	// but only on desktop
+	@include break-medium() {
+		.interface-interface-skeleton__header {
+			z-index: 19;
+		}
+	}
+
+}
