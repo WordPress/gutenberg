@@ -269,4 +269,52 @@ describe( 'ColorPicker', () => {
 			expect( onChange ).toHaveBeenLastCalledWith( expected );
 		} );
 	} );
+	describe.each( [
+		[ 'hue', 0, '#aad52a' ],
+		[ 'saturation', 1, '#20dfdf' ],
+		[ 'lightness', 2, '#95eaea' ],
+	] )( 'HSL inputs', ( colorInput, inputIndex, expected ) => {
+		it( `should fire onChange with the correct value when the ${ colorInput } value is updated`, async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			const color = '#2ad5d5';
+
+			const { container } = render(
+				<ColorPicker
+					onChange={ onChange }
+					color={ color }
+					enableAlpha={ false }
+				/>
+			);
+
+			const formatSelector = getFormatSelector( container );
+
+			if ( formatSelector === null ) {
+				throw new Error(
+					'The color format selector could not be found'
+				);
+			}
+
+			expect( formatSelector ).toBeInTheDocument();
+
+			await user.selectOptions( formatSelector, 'hsl' );
+
+			const inputElement =
+				screen.getAllByRole( 'spinbutton' )[ inputIndex ];
+
+			if ( inputElement === null ) {
+				throw new Error(
+					`The ${ colorInput } input could not be found`
+				);
+			}
+
+			expect( inputElement ).toBeInTheDocument();
+
+			await user.clear( inputElement );
+			await user.type( inputElement, '75' );
+
+			expect( onChange ).toHaveBeenCalledTimes( 3 );
+			expect( onChange ).toHaveBeenLastCalledWith( expected );
+		} );
+	} );
 } );
