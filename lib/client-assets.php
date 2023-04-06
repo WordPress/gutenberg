@@ -277,7 +277,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-reusable-blocks', 'wp-patterns' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-reusable-blocks', 'wp-user-patterns' ),
 		$version
 	);
 	$styles->add_data( 'wp-editor', 'rtl', 'replace' );
@@ -327,7 +327,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-reset-editor-styles',
 		'wp-block-library',
 		'wp-reusable-blocks',
-		'wp-patterns',
+		'wp-user-patterns',
 		// Until #37466, we can't specifically add them as editor styles yet,
 		// so we must hard-code it here as a dependency.
 		'wp-block-editor-content',
@@ -445,12 +445,12 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	gutenberg_override_style(
 		$styles,
-		'wp-patterns',
+		'wp-user-patterns',
 		gutenberg_url( 'build/user-patterns/style.css' ),
 		array( 'wp-components' ),
 		$version
 	);
-	$styles->add_data( 'wp-patterns', 'rtl', 'replace' );
+	$styles->add_data( 'wp-user-patterns', 'rtl', 'replace' );
 
 	gutenberg_override_style(
 		$styles,
