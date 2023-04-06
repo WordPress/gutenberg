@@ -153,6 +153,8 @@
 
 			& > button.components-button.has-icon {
 
+				border-radius: 0;
+
 				&.block-editor-block-toolbar__collapse-fixed-toolbar {
 					// Add a border as separator in the block toolbar.
 					border-right: $border-width solid $gray-300;
