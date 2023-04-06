@@ -731,6 +731,32 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Registers the style and colors block attributes for block types that support it.
+	 *
+	 * @param WP_Block_Type $block_type Block Type.
+	 */
+	public static function register_duotone_support( $block_type ) {
+		$has_duotone_support = false;
+		if ( property_exists( $block_type, 'supports' ) ) {
+			// Previous `color.__experimentalDuotone` support flag is migrated
+			// to `filter.duotone` via `block_type_metadata_settings` filter.
+			$has_duotone_support = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), null );
+		}
+
+		if ( $has_duotone_support ) {
+			if ( ! $block_type->attributes ) {
+				$block_type->attributes = array();
+			}
+
+			if ( ! array_key_exists( 'style', $block_type->attributes ) ) {
+				$block_type->attributes['style'] = array(
+					'type' => 'object',
+				);
+			}
+		}
+	}
+
+	/**
 	 * Render out the duotone CSS styles and SVG.
 	 *
 	 * @param  string $block_content Rendered block content.

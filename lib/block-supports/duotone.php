@@ -359,27 +359,13 @@ function gutenberg_get_duotone_filter_svg( $preset ) {
 /**
  * Registers the style and colors block attributes for block types that support it.
  *
+ * @deprecated 6.3.0 Use WP_Duotone_Gutenberg::register_duotone_support() instead.
+ *
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_duotone_support( $block_type ) {
-	$has_duotone_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		// Previous `color.__experimentalDuotone` support flag is migrated
-		// to `filter.duotone` via `block_type_metadata_settings` filter.
-		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), null );
-	}
-
-	if ( $has_duotone_support ) {
-		if ( ! $block_type->attributes ) {
-			$block_type->attributes = array();
-		}
-
-		if ( ! array_key_exists( 'style', $block_type->attributes ) ) {
-			$block_type->attributes['style'] = array(
-				'type' => 'object',
-			);
-		}
-	}
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Duotone_Gutenberg::register_duotone_support' );
+	return WP_Duotone_Gutenberg::register_duotone_support( $block_type );
 }
 
 /**
@@ -399,7 +385,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 WP_Block_Supports::get_instance()->register(
 	'duotone',
 	array(
-		'register_attribute' => 'gutenberg_register_duotone_support',
+		'register_attribute' => array( 'WP_Duotone_Gutenberg', 'register_duotone_support' ),
 	)
 );
 
