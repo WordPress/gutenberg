@@ -46,7 +46,6 @@ function HeaderToolbar() {
 		const { getEditorMode, isFeatureActive, isListViewOpened } =
 			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-
 		return {
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
@@ -64,6 +63,9 @@ function HeaderToolbar() {
 			),
 		};
 	}, [] );
+
+	// TODO: Determine if there is a block toolbar active, as we need to change the shortcut behavior if it is
+	const isBlockToolbarActive = true;
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
 
@@ -114,6 +116,7 @@ function HeaderToolbar() {
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
+			useKeyboardFocusShortcut={ ! isBlockToolbarActive }
 		>
 			<div className="edit-post-header-toolbar__left">
 				<ToolbarItem
