@@ -59,7 +59,7 @@ export function UnforwardedNavigableMenu(
 			onlyBrowserTabstops={ false }
 			role={ role }
 			aria-orientation={
-				role === 'presentation' &&
+				role !== 'presentation' &&
 				( orientation === 'vertical' || orientation === 'horizontal' )
 					? orientation
 					: undefined
