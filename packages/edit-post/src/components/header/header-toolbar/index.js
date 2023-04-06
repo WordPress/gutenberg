@@ -18,6 +18,7 @@ import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -43,21 +44,44 @@ function HeaderToolbar() {
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
+			getBlock,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
-			getSelectedBlockClientIds,
+			getSelectedBlockClientId,
+			getFirstMultiSelectedBlockClientId,
+			getSettings,
 			__unstableGetEditorMode,
 		} = select( blockEditorStore );
 		const { getEditorSettings } = select( editorStore );
 		const { getEditorMode, isFeatureActive, isListViewOpened } =
 			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const _selectedBlockClientIds = getSelectedBlockClientIds();
+		const editorMode = __unstableGetEditorMode();
+		const isDistractionFree = getSettings().isDistractionFree;
+		const hasFixedToolbar = getSettings().hasFixedToolbar;
+
+		let isUnmodifiedDefaultBlockSelected = false;
+		// Check if we have an empty block selected
+		// If the first block in a multi selection is empty, there isn't a toolbar to show
+		const selectedBlockId =
+			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
+		if ( selectedBlockId ) {
+			const { name, attributes = {} } = getBlock( selectedBlockId ) || {};
+			isUnmodifiedDefaultBlockSelected =
+				name && isUnmodifiedDefaultBlock( { name, attributes } );
+		}
+
+		const maybeBlockToolbarShowing =
+			( hasFixedToolbar && selectedBlockId ) ||
+			( ! hasFixedToolbar && ! isUnmodifiedDefaultBlockSelected );
+
+		const shouldUseKeyboardFocusShortcut =
+			isDistractionFree ||
+			! maybeBlockToolbarShowing ||
+			( ! hasFixedToolbar && editorMode !== 'edit' );
 
 		return {
-			useKeyboardFocusShortcut:
-				_selectedBlockClientIds.length === 0 ||
-				__unstableGetEditorMode() !== 'edit',
+			useKeyboardFocusShortcut: shouldUseKeyboardFocusShortcut,
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
 				getEditorMode() === 'visual' &&
