@@ -15,13 +15,13 @@ import { unlock } from '../../private-apis';
 
 const { useCommandLoader } = unlock( privateApis );
 
-const getWPAdminCreateCommandLoader = ( postType ) =>
-	function useCreateCommandLoader( { search } ) {
+const getWPAdminAddCommandLoader = ( postType ) =>
+	function useAddCommandLoader( { search } ) {
 		let label;
 		if ( postType === 'post' ) {
-			label = __( 'Create a new post' );
+			label = __( 'Add a new post' );
 		} else if ( postType === 'page' ) {
-			label = __( 'Create a new page' );
+			label = __( 'Add a new page' );
 		} else {
 			throw 'unsupported post type ' + postType;
 		}
@@ -29,10 +29,10 @@ const getWPAdminCreateCommandLoader = ( postType ) =>
 			!! search && ! label.toLowerCase().includes( search.toLowerCase() );
 		if ( postType === 'post' && hasRecordTitle ) {
 			/* translators: %s: Post title placeholder */
-			label = sprintf( __( 'Create a new post "%s"' ), search );
+			label = sprintf( __( 'Add a new post "%s"' ), search );
 		} else if ( postType === 'page' && hasRecordTitle ) {
 			/* translators: %s: Page title placeholder */
-			label = sprintf( __( 'Create a new page "%s"' ), search );
+			label = sprintf( __( 'Add a new page "%s"' ), search );
 		}
 
 		const newPostLink = useSelect( ( select ) => {
@@ -43,7 +43,7 @@ const getWPAdminCreateCommandLoader = ( postType ) =>
 		const commands = useMemo(
 			() => [
 				{
-					name: 'core/wp-admin/create-' + postType,
+					name: 'core/wp-admin/add-' + postType,
 					label,
 					callback: () => {
 						document.location.href = addQueryArgs( newPostLink, {
@@ -62,16 +62,16 @@ const getWPAdminCreateCommandLoader = ( postType ) =>
 		};
 	};
 
-const useCreatePostLoader = getWPAdminCreateCommandLoader( 'post' );
-const useCreatePageLoader = getWPAdminCreateCommandLoader( 'page' );
+const useAddPostLoader = getWPAdminAddCommandLoader( 'post' );
+const useAddPageLoader = getWPAdminAddCommandLoader( 'page' );
 
 export function useWPAdminCommands() {
 	useCommandLoader( {
-		name: 'core/wp-admin/create-post-loader',
-		hook: useCreatePostLoader,
+		name: 'core/wp-admin/add-post-loader',
+		hook: useAddPostLoader,
 	} );
 	useCommandLoader( {
-		name: 'core/wp-admin/create-page-loader',
-		hook: useCreatePageLoader,
+		name: 'core/wp-admin/add-page-loader',
+		hook: useAddPageLoader,
 	} );
 }

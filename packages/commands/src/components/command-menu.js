@@ -174,7 +174,7 @@ export function CommandMenu() {
 							value={ search }
 							onValueChange={ setSearch }
 							placeholder={ __(
-								'Search for content and templates, or try commands like "Create…"'
+								'Search for content and templates, or try commands like "Add…"'
 							) }
 						/>
 					</div>
