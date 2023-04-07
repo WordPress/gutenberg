@@ -104,13 +104,80 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			).toBeFocused();
 		} );
 
-		test( 'should focus the top level toolbar from titlek', async ( {
+		test( 'should focus the top level toolbar from title', async ( {
 			page,
 			pageUtils,
 		} ) => {
 			// Use select mode
 			await page.keyboard.press( 'Escape' );
 
+			// Focus the block toolbar.
+			await pageUtils.pressKeys( 'alt+F10' );
+
+			// The first top level toolbar button should be focused.
+			await expect(
+				page.getByRole( 'button', { name: 'Toggle block inserter' } )
+			).toBeFocused();
+		} );
+	} );
+
+	test.describe( 'In Top Toolbar mode:', () => {
+		test.beforeEach(
+			async (
+				{
+					// editor,
+					// page,
+					// pageUtils,
+				}
+			) => {
+				// Select the Options pane
+				// Switch to Top Toolbar Mode
+				// Return to editor pane
+			}
+		);
+
+		test.skip( 'should focus the block toolbar from paragraph block', async ( {
+			page,
+			pageUtils,
+		} ) => {
+			// Focus the block toolbar.
+			await pageUtils.pressKeys( 'alt+F10' );
+
+			// The block toolbar should be focused.
+			await expect(
+				page.getByRole( 'button', { name: 'Paragraph' } )
+			).toBeFocused();
+
+			// The document toolbar popup should not be visible
+			await expect(
+				page.locator( 'text=Toggle block inserter' )
+			).not.toBeVisible();
+		} );
+
+		test.skip( 'should focus the block toolbar from empty block in select mode', async ( {
+			page,
+			pageUtils,
+		} ) => {
+			//
+
+			// Focus the block toolbar.
+			await pageUtils.pressKeys( 'alt+F10' );
+
+			// The block toolbar should be focused.
+			await expect(
+				page.getByRole( 'button', { name: 'Paragraph' } )
+			).toBeFocused();
+
+			// The document toolbar popup should not be visible
+			await expect(
+				page.locator( 'text=Toggle block inserter' )
+			).not.toBeVisible();
+		} );
+
+		test.skip( 'should focus the document toolbar from title in select mode', async ( {
+			page,
+			pageUtils,
+		} ) => {
 			// Focus the block toolbar.
 			await pageUtils.pressKeys( 'alt+F10' );
 
