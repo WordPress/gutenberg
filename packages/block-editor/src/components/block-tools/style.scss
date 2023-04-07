@@ -158,11 +158,15 @@
 				&.block-editor-block-toolbar__collapse-fixed-toolbar {
 					// Add a border as separator in the block toolbar.
 					border-right: $border-width solid $gray-300;
+					padding-right: 6px;
+					padding-left: 6px;
 				}
 
 				&.block-editor-block-toolbar__expand-fixed-toolbar {
 					// Add a border as separator in the block toolbar.
 					border-left: $border-width solid $gray-300;
+					padding-right: 6px;
+					padding-left: 6px;
 				}
 			}
 		}
@@ -172,6 +176,8 @@
 				position: relative;
 				top: -1px;
 				border: 0;
+				padding-right: 6px;
+				padding-left: 6px;
 				&::after {
 					content: "\00B7";
 					font-size: 16px;
