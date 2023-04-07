@@ -421,6 +421,7 @@ class WP_Fonts extends WP_Dependencies {
 
 			// Exceptions.
 			'provider',
+			'tech', // Will be combined with `src` internally.
 		);
 
 		foreach ( $variation as $prop => $value ) {

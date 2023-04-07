@@ -177,6 +177,12 @@ class WP_Fonts_Provider_Local extends WP_Fonts_Provider {
 				continue;
 			}
 
+			// Skip "tech" since it's for internal API use,
+			// and not a valid CSS property.
+			if ( 'tech' === $key ) {
+				continue;
+			}
+
 			// Compile the "src" parameter.
 			if ( 'src' === $key ) {
 				$value = $this->compile_src( $value );
@@ -212,9 +218,17 @@ class WP_Fonts_Provider_Local extends WP_Fonts_Provider {
 				$item['url'] = wp_make_link_relative( $item['url'] );
 			}
 
-			$src .= ( 'data' === $item['format'] )
-				? ", url({$item['url']})"
-				: ", url('{$item['url']}') format('{$item['format']}')";
+			if ( 'data' === $item['format'] ) {
+				$src .= ", url({$item['url']})";
+			} elseif ( ! empty( $item['tech'] ) ) {
+				if ( 'variations' === $item['tech'] ) {
+					$src .= ", url('{$item['url']}') format('{$item['format']}-variations')";
+				} else {
+					$src .= ", url('{$item['url']}') format('{$item['format']}') tech({$item['tech']})";
+				}
+			} else {
+				$src .= ", url('{$item['url']}') format('{$item['format']}')";
+			}
 		}
 
 		$src = ltrim( $src, ', ' );
