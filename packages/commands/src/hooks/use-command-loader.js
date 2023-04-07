@@ -14,7 +14,13 @@ import { store as commandsStore } from '../store';
  *
  * @param {import('../store/actions').WPCommandLoaderConfig} loader command loader config.
  */
-export default function useCommandLoader( { name, group, hook } ) {
+export default function useCommandLoader( {
+	name,
+	group,
+	hook,
+	isNested,
+	placeholder,
+} ) {
 	const { registerCommandLoader, unregisterCommandLoader } =
 		useDispatch( commandsStore );
 	useEffect( () => {
@@ -22,9 +28,19 @@ export default function useCommandLoader( { name, group, hook } ) {
 			name,
 			group,
 			hook,
+			isNested,
+			placeholder,
 		} );
 		return () => {
 			unregisterCommandLoader( name, group );
 		};
-	}, [ name, group, hook, registerCommandLoader, unregisterCommandLoader ] );
+	}, [
+		name,
+		group,
+		hook,
+		isNested,
+		placeholder,
+		registerCommandLoader,
+		unregisterCommandLoader,
+	] );
 }

@@ -57,6 +57,9 @@ function commandLoaders( state = {}, action ) {
 					[ action.name ]: {
 						name: action.name,
 						hook: action.hook,
+						group: action.group,
+						isNested: action.isNested,
+						placeholder: action.placeholder,
 					},
 				},
 			};

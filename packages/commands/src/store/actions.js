@@ -20,9 +20,11 @@
  *
  * @typedef {Object} WPCommandLoaderConfig
  *
- * @property {string}              name  Command loader name.
- * @property {string=}             group Command loader group.
- * @property {WPCommandLoaderHook} hook  Command loader hook.
+ * @property {string}              name        Command loader name.
+ * @property {string=}             group       Command loader group.
+ * @property {WPCommandLoaderHook} hook        Command loader hook.
+ * @property {boolean=}            isNested    Whether the command loader is nested.
+ * @property {string=}             placeholder Command loader placeholder.
  */
 
 /**
@@ -65,12 +67,20 @@ export function unregisterCommand( name, group ) {
  *
  * @return {Object} action.
  */
-export function registerCommandLoader( { name, group = '', hook } ) {
+export function registerCommandLoader( {
+	name,
+	group = '',
+	hook,
+	isNested = false,
+	placeholder,
+} ) {
 	return {
 		type: 'REGISTER_COMMAND_LOADER',
 		name,
 		group,
 		hook,
+		isNested,
+		placeholder,
 	};
 }
 

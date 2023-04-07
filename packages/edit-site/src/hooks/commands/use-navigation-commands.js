@@ -84,20 +84,28 @@ export function useNavigationCommands() {
 		name: 'core/edit-site/navigate-pages',
 		group: __( 'Pages' ),
 		hook: usePageNavigationCommandLoader,
+		isNested: true,
+		placeholder: __( 'Search pages…' ),
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-posts',
 		group: __( 'Posts' ),
 		hook: usePostNavigationCommandLoader,
+		isNested: true,
+		placeholder: __( 'Search posts…' ),
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-templates',
 		group: __( 'Templates' ),
 		hook: useTemplateNavigationCommandLoader,
+		isNested: true,
+		placeholder: __( 'Search templates…' ),
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-template-parts',
 		group: __( 'Template Parts' ),
 		hook: useTemplatePartNavigationCommandLoader,
+		isNested: true,
+		placeholder: __( 'Search template parts…' ),
 	} );
 }

@@ -27,3 +27,16 @@ export const getCommandLoaders = createSelector(
 	( state, group ) => Object.values( state.commandLoaders[ group ] ?? {} ),
 	( state, group ) => [ state.commandLoaders[ group ] ]
 );
+
+export function getCommandLoader( state, loaderName ) {
+	const group = Object.keys( state.commandLoaders ).find(
+		( currentGroup ) =>
+			!! state.commandLoaders[ currentGroup ][ loaderName ]
+	);
+
+	if ( ! group ) {
+		return null;
+	}
+
+	return state.commandLoaders[ group ][ loaderName ];
+}
