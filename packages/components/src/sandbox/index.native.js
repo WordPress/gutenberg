@@ -300,7 +300,15 @@ const Sandbox = forwardRef( function Sandbox(
 			// Forward the event to parent event listeners
 			Object.keys( onWindowEvents ).forEach( ( eventType ) => {
 				if ( data?.type === eventType ) {
-					onWindowEvents[ eventType ]( data );
+					try {
+						onWindowEvents[ eventType ]( data );
+					} catch ( e ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`Error handling event ${ eventType }`,
+							e
+						);
+					}
 				}
 			} );
 		},
