@@ -25,6 +25,21 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 		).toBeFocused();
 	} );
 
+	test( 'should focus the top level toolbar when on an empty block', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		// Move from title into an empty block
+		await page.keyboard.press( 'Enter' );
+		// Focus the top level toolbar.
+		await pageUtils.pressKeys( 'alt+F10' );
+
+		// The first top level toolbar button should be focused.
+		await expect(
+			page.getByRole( 'button', { name: 'Toggle block inserter' } )
+		).toBeFocused();
+	} );
+
 	test( 'should focus the block toolbar when a block is selected', async ( {
 		editor,
 		page,
