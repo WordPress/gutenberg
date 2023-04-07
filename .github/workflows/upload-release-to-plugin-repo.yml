@@ -175,8 +175,8 @@ jobs:
                   svn commit -m "Releasing version $VERSION" \
                    --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
-    upload-branch:
-        name: Publish as branch (and tag)
+    upload-tag:
+        name: Publish as tag
         runs-on: ubuntu-latest
         environment: wp.org plugin
         needs: [compute-latest-stable, update-changelog]
@@ -191,8 +191,8 @@ jobs:
             VERSION: ${{ github.event.release.name }}
 
         steps:
-            - name: Check out Gutenberg branches from WP.org plugin repo
-              run: svn checkout "$PLUGIN_REPO_URL/branches" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+            - name: Check out Gutenberg tags from WP.org plugin repo
+              run: svn checkout "$PLUGIN_REPO_URL/tags" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
             - name: Download and unzip Gutenberg plugin asset into trunk folder
               env:
@@ -200,31 +200,25 @@ jobs:
               run: |
                   # do the magic here
                   curl -L -o gutenberg.zip $PLUGIN_URL
-                  unzip gutenberg.zip -d branches/$VERSION
+                  unzip gutenberg.zip -d tags/$VERSION
                   rm gutenberg.zip
 
             - name: Replace the stable tag placeholder with the existing stable tag on the SVN repository
               env:
                   STABLE_TAG_PLACEHOLDER: 'Stable tag: V\.V\.V'
               run: |
-                  sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./branches/$VERSION/readme.txt
+                  sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./tags/$VERSION/readme.txt
 
             - name: Download Changelog Artifact
               uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
                   name: changelog trunk
-                  path: branches/${{ github.event.release.name }}
+                  path: tags/${{ github.event.release.name }}
 
             - name: Commit the content changes
-              working-directory: ./branches
+              working-directory: ./tags
               run: |
                   svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
                   svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
                   svn commit -m "Committing version $VERSION" \
-                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
-
-            - name: Create the SVN tag
-              working-directory: ./branches
-              run: |
-                  svn copy "$PLUGIN_REPO_URL/branches/$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Tagging version $VERSION" \
                    --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
