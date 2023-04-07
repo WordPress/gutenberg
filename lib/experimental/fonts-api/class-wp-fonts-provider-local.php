@@ -221,11 +221,9 @@ class WP_Fonts_Provider_Local extends WP_Fonts_Provider {
 			if ( 'data' === $item['format'] ) {
 				$src .= ", url({$item['url']})";
 			} elseif ( ! empty( $item['tech'] ) ) {
-				if ( 'variations' === $item['tech'] ) {
-					$src .= ", url('{$item['url']}') format('{$item['format']}-variations')";
-				} else {
-					$src .= ", url('{$item['url']}') format('{$item['format']}') tech({$item['tech']})";
-				}
+				$src .= ( 'variations' === $item['tech'] )
+					? ", url('{$item['url']}') format('{$item['format']}-variations')"
+					: ", url('{$item['url']}') format('{$item['format']}') tech({$item['tech']})";
 			} else {
 				$src .= ", url('{$item['url']}') format('{$item['format']}')";
 			}
