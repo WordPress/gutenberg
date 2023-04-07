@@ -23,6 +23,7 @@ import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { CommandMenu } from '@wordpress/commands';
+import { store as prefferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -83,7 +84,7 @@ export default function Layout() {
 					'core/edit-site/next-region'
 				),
 				hasFixedToolbar:
-					select( editSiteStore ).isFeatureActive( 'fixedToolbar' ),
+					select( prefferencesStore ).get( 'fixedToolbar' ),
 			};
 		}, [] );
 	const navigateRegionsProps = useNavigateRegions( {
