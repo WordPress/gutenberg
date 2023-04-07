@@ -130,7 +130,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-sidebar',
 			category: 'global',
-			description: __( 'Show or hide the Settings.' ),
+			description: __( 'Show or hide the Settings sidebar.' ),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: ',',

@@ -66,7 +66,7 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/edit-site/toggle-block-settings-sidebar',
 			category: 'global',
-			description: __( 'Show or hide the Settings.' ),
+			description: __( 'Show or hide the Settings sidebar.' ),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: ',',
