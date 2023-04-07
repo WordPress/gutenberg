@@ -84,14 +84,6 @@ function ScreenBlock( { name, variation } ) {
 		<>
 			<ScreenHeader title={ blockType.title } />
 			<BlockPreviewPanel name={ name } variation={ variation } />
-			{ hasTypographyPanel && (
-				<StylesTypographyPanel
-					inheritedValue={ inheritedStyle }
-					value={ style }
-					onChange={ setStyle }
-					settings={ settings }
-				/>
-			) }
 			{ hasColorPanel && (
 				<StylesColorPanel
 					inheritedValue={ inheritedStyle }
@@ -100,8 +92,8 @@ function ScreenBlock( { name, variation } ) {
 					settings={ settings }
 				/>
 			) }
-			{ hasBorderPanel && (
-				<StylesBorderPanel
+			{ hasTypographyPanel && (
+				<StylesTypographyPanel
 					inheritedValue={ inheritedStyle }
 					value={ style }
 					onChange={ setStyle }
@@ -115,6 +107,14 @@ function ScreenBlock( { name, variation } ) {
 					onChange={ onChangeDimensions }
 					settings={ settings }
 					includeLayoutControls
+				/>
+			) }
+			{ hasBorderPanel && (
+				<StylesBorderPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					onChange={ setStyle }
+					settings={ settings }
 				/>
 			) }
 			{ hasEffectsPanel && (
