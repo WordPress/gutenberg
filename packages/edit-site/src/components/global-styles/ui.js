@@ -31,7 +31,6 @@ import {
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
-import ScreenFilters from './screen-filters';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenLayout from './screen-layout';
@@ -40,7 +39,6 @@ import { ScreenVariation } from './screen-variations';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
 import { unlock } from '../../private-apis';
-import ScreenEffects from './screen-effects';
 import { store as editSiteStore } from '../../store';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
@@ -214,14 +212,6 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 				path={ parentMenu + '/colors/palette' }
 			>
 				<ScreenColorPalette name={ name } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/filters' }>
-				<ScreenFilters name={ name } />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ parentMenu + '/effects' }>
-				<ScreenEffects name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>

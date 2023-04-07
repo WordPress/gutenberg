@@ -19,11 +19,15 @@ const {
 	useGlobalSetting,
 	useSettingsForBlockElement,
 	useHasColorPanel,
+	useHasEffectsPanel,
+	useHasFiltersPanel,
 	useGlobalStyle,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
 	DimensionsPanel: StylesDimensionsPanel,
+	EffectsPanel: StylesEffectsPanel,
+	FiltersPanel: StylesFiltersPanel,
 } = unlock( blockEditorPrivateApis );
 
 function ScreenBlock( { name, variation } ) {
@@ -46,6 +50,8 @@ function ScreenBlock( { name, variation } ) {
 	const hasColorPanel = useHasColorPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
+	const hasEffectsPanel = useHasEffectsPanel( settings );
+	const hasFiltersPanel = useHasFiltersPanel( settings );
 
 	// These intermediary objects are needed because the "layout" property is stored
 	// in settings rather than styles.
@@ -108,6 +114,30 @@ function ScreenBlock( { name, variation } ) {
 					value={ styleWithLayout }
 					onChange={ onChangeDimensions }
 					settings={ settings }
+					includeLayoutControls
+				/>
+			) }
+			{ hasEffectsPanel && (
+				<StylesEffectsPanel
+					inheritedValue={ inheritedStyleWithLayout }
+					value={ styleWithLayout }
+					onChange={ onChangeDimensions }
+					settings={ settings }
+					includeLayoutControls
+				/>
+			) }
+			{ hasFiltersPanel && (
+				<StylesFiltersPanel
+					inheritedValue={ inheritedStyleWithLayout }
+					value={ styleWithLayout }
+					onChange={ onChangeDimensions }
+					settings={ {
+						...settings,
+						color: {
+							...settings.color,
+							customDuotone: false, //TO FIX: Custom duotone only works on the block level right now
+						},
+					} }
 					includeLayoutControls
 				/>
 			) }
