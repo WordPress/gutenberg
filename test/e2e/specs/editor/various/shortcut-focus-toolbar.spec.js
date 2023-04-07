@@ -63,4 +63,25 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			page.locator( 'text=Toggle block inserter' )
 		).not.toBeVisible();
 	} );
+
+	test( 'should focus the top level toolbar when in select mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Paragraph' );
+		// We need to force the toolbar to show. Otherwise, the bug from
+		// https://github.com/WordPress/gutenberg/pull/49644 won't surface in the e2e tests.
+		await editor.showBlockToolbar();
+		// Use select mode
+		await page.keyboard.press( 'Escape' );
+		// Focus the block toolbar.
+		await pageUtils.pressKeys( 'alt+F10' );
+
+		// The first top level toolbar button should be focused.
+		await expect(
+			page.getByRole( 'button', { name: 'Toggle block inserter' } )
+		).toBeFocused();
+	} );
 } );
