@@ -3,7 +3,7 @@
  */
 import { useState, useLayoutEffect } from '@wordpress/element';
 
-/** @typedef {import('../register-format-type').RichTextFormatType} RichTextFormatType */
+/** @typedef {import('../register-format-type').WPFormat} WPFormat */
 /** @typedef {import('../create').RichTextValue} RichTextValue */
 
 /**
@@ -50,8 +50,8 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 
 /**
  * @typedef {Object} VirtualAnchorElement
- * @property {Function} getBoundingClientRect A function returning a DOMRect
- * @property {Document} ownerDocument         The element's ownerDocument
+ * @property {() => DOMRect} getBoundingClientRect A function returning a DOMRect
+ * @property {Document}      ownerDocument         The element's ownerDocument
  */
 
 /**
@@ -117,10 +117,10 @@ function getAnchor( editableContentElement, tagName, className ) {
  * no format is active. The returned value is meant to be used for positioning
  * UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
  *
- * @param {Object}             $1                        Named parameters.
- * @param {HTMLElement|null}   $1.editableContentElement The element containing
- *                                                       the editable content.
- * @param {RichTextFormatType} $1.settings               The format type's settings.
+ * @param {Object}           $1                        Named parameters.
+ * @param {HTMLElement|null} $1.editableContentElement The element containing
+ *                                                     the editable content.
+ * @param {WPFormat=}        $1.settings               The format type's settings.
  * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
  */
 export function useAnchor( { editableContentElement, settings = {} } ) {

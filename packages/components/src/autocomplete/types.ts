@@ -167,10 +167,10 @@ type RichTextFormat = {
 	type: string;
 };
 type RichTextFormatList = Array< RichTextFormat >;
-type RichTextValue = {
+export type RichTextValue = {
 	text: string;
-	formats?: Array< RichTextFormatList >;
-	replacements?: Array< RichTextFormat >;
+	formats: Array< RichTextFormatList >;
+	replacements: Array< RichTextFormat >;
 	start: number | undefined;
 	end: number | undefined;
 };
@@ -187,7 +187,7 @@ export type UseAutocompleteProps = {
 	 * A function to be called when an option is selected to insert into the
 	 * existing text.
 	 */
-	onChange: ( value: string ) => void;
+	onChange: ( value: RichTextValue ) => void;
 	/**
 	 * A function to be called when an option is selected to replace the
 	 * existing text.

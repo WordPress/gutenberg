@@ -239,7 +239,7 @@ Insert a Rich Text value, an HTML string, or a plain text string, into a Rich Te
 
 _Parameters_
 
--   _value_ `RichTextValue`: Value to modify.
+-   _value_ `RichTextValue & RichTextNonNullable`: Value to modify.
 -   _valueToInsert_ `RichTextValue|string`: Value to insert.
 -   _startIndex_ `[number]`: Start index.
 -   _endIndex_ `[number]`: End index.
@@ -443,7 +443,7 @@ _Parameters_
 
 -   _$1_ `Object`: Named parameters.
 -   _$1.editableContentElement_ `HTMLElement|null`: The element containing the editable content.
--   _$1.settings_ `RichTextFormatType`: The format type's settings.
+-   _$1.settings_ `WPFormat=`: The format type's settings.
 
 _Returns_
 

@@ -26,8 +26,6 @@ import {
 	insert,
 	isCollapsed,
 	getTextContent,
-	// Error expected because `@wordpress/rich-text` is not yet fully typed.
-	// @ts-expect-error
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
 
@@ -45,6 +43,7 @@ import type {
 	ReplaceOption,
 	UseAutocompleteProps,
 	WPCompleter,
+	RichTextValue,
 } from './types';
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
@@ -238,9 +237,10 @@ export function useAutocomplete( {
 	// but this is a preemptive performance improvement, since the autocompleter
 	// is a potential bottleneck for the editor type metric.
 	const textContent = useMemo( () => {
-		if ( isCollapsed( record ) ) {
+		if ( isCollapsed( record as RichTextValue ) ) {
 			return getTextContent( slice( record, 0 ) );
 		}
+		return null;
 	}, [ record ] );
 
 	useEffect( () => {
@@ -300,7 +300,11 @@ export function useAutocomplete( {
 				}
 
 				const textAfterSelection = getTextContent(
-					slice( record, undefined, getTextContent( record ).length )
+					slice(
+						record as RichTextValue,
+						undefined,
+						getTextContent( record as RichTextValue ).length
+					)
 				);
 
 				if (
