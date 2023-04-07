@@ -37,8 +37,8 @@ export function apiFetch( request: APIFetchOptions ) {
  * Control for resolving a selector in a registered data store.
  * Alias for the `resolveSelect` built-in control in the `@wordpress/data` package.
  *
- * @param storeNameOrDescriptor
- * @param selectorName
+ * @param storeNameOrDescriptor The store object or identifier.
+ * @param selectorName          The selector name.
  * @param args                  Arguments passed without change to the `@wordpress/data` control.
  */
 export function select(
@@ -62,8 +62,8 @@ export function select(
  * Control for calling a selector in a registered data store.
  * Alias for the `select` built-in control in the `@wordpress/data` package.
  *
- * @param storeNameOrDescriptor
- * @param selectorName
+ * @param storeNameOrDescriptor The store object or identifier.
+ * @param selectorName          The selector name.
  * @param args                  Arguments passed without change to the `@wordpress/data` control.
  */
 export function syncSelect(
@@ -83,8 +83,8 @@ export function syncSelect(
  * Control for dispatching an action in a registered data store.
  * Alias for the `dispatch` control in the `@wordpress/data` package.
  *
- * @param storeNameOrDescriptor
- * @param actionName
+ * @param storeNameOrDescriptor The store object or identifier.
+ * @param actionName            The action name.
  * @param args                  Arguments passed without change to the `@wordpress/data` control.
  */
 export function dispatch(
