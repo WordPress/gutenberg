@@ -3,10 +3,10 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ],
-		"checkJs": false
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
+		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../element" },
 		{ "path": "../hooks" },

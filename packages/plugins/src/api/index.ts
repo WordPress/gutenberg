@@ -5,12 +5,13 @@
  */
 import { applyFilters, doAction } from '@wordpress/hooks';
 import { plugins as pluginsIcon } from '@wordpress/icons';
-import type { WPElement } from '@wordpress/element';
+import type { IconType } from '@wordpress/components';
+import type { WPComponent } from '@wordpress/element';
 
 /**
  * Defined behavior of a plugin type.
  */
-export interface WPPlugin {
+export interface Plugin {
 	/**
 	 * A string identifying the plugin. Must be unique across all registered plugins.
 	 */
@@ -21,12 +22,12 @@ export interface WPPlugin {
 	 * element (or function returning an element) if you choose to render your
 	 * own SVG.
 	 */
-	icon?: string | WPElement | Function;
+	icon?: IconType;
 
 	/**
 	 * A component containing the UI elements to be rendered.
 	 */
-	render: Function;
+	render: WPComponent;
 
 	/**
 	 * The optional scope to be used when rendering inside a plugin area.
@@ -35,15 +36,17 @@ export interface WPPlugin {
 	scope?: string;
 }
 
+type PluginSettings = Omit< Plugin, 'name' >;
+
 /**
  * Plugin definitions keyed by plugin name.
  */
-const plugins = {} as Record< string, WPPlugin >;
+const plugins = {} as Record< string, Plugin >;
 
 /**
  * Registers a plugin to the editor.
  *
- * @param name     A string identifying the plugin.Must be
+ * @param name     A string identifying the plugin. Must be
  *                 unique across all registered plugins.
  * @param settings The settings for this plugin.
  *
@@ -117,10 +120,7 @@ const plugins = {} as Record< string, WPPlugin >;
  *
  * @return The final plugin settings object.
  */
-export function registerPlugin(
-	name: string,
-	settings: Omit< WPPlugin, 'name' >
-) {
+export function registerPlugin( name: string, settings: PluginSettings ) {
 	if ( typeof settings !== 'object' ) {
 		console.error( 'No settings object provided!' );
 		return null;
@@ -139,10 +139,11 @@ export function registerPlugin(
 		console.error( `Plugin "${ name }" is already registered.` );
 	}
 
-	settings = applyFilters( 'plugins.registerPlugin', settings, name ) as Omit<
-		WPPlugin,
-		'name'
-	>;
+	settings = applyFilters(
+		'plugins.registerPlugin',
+		settings,
+		name
+	) as PluginSettings;
 
 	const { render, scope } = settings;
 
@@ -234,7 +235,7 @@ export function getPlugin( name: string ) {
  *
  * @return The list of plugins without a scope or for a given scope.
  */
-export function getPlugins( scope: string ) {
+export function getPlugins( scope?: string ) {
 	return Object.values( plugins ).filter(
 		( plugin ) => plugin.scope === scope
 	);

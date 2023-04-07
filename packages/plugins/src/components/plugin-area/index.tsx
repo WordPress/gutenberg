@@ -16,15 +16,27 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import { PluginContextProvider } from '../plugin-context';
 import { PluginErrorBoundary } from '../plugin-error-boundary';
 import { getPlugins } from '../../api';
+import type { PluginContext } from '../plugin-context';
+import type { Plugin } from '../../api';
 
-const getPluginContext = memoize( ( icon, name ) => ( { icon, name } ) );
+const getPluginContext = memoize(
+	( icon: PluginContext[ 'icon' ], name: PluginContext[ 'name' ] ) => ( {
+		icon,
+		name,
+	} )
+);
+
+type PluginAreaProps = {
+	scope?: string;
+	onError?: ( name: Plugin[ 'name' ], error: Error ) => void;
+};
 
 /**
  * A component that renders all plugin fills in a hidden div.
  *
- * @param {Object}             props
- * @param {string|undefined}   props.scope
- * @param {Function|undefined} props.onError
+ * @param                                                    props
+ * @param {string}                                           props.scope
+ * @param {( name: Plugin[ 'name' ], error: Error ) => void} props.onError
  * @example
  * ```js
  * // Using ES5 syntax
@@ -56,12 +68,17 @@ const getPluginContext = memoize( ( icon, name ) => ( { icon, name } ) );
  *
  * @return {WPComponent} The component to be rendered.
  */
-function PluginArea( { scope, onError } ) {
+function PluginArea( { scope, onError }: PluginAreaProps ) {
 	const store = useMemo( () => {
-		let lastValue;
+		let lastValue: Plugin[] = [];
 
 		return {
-			subscribe( listener ) {
+			subscribe(
+				listener: (
+					plugin: Omit< Plugin, 'name' >,
+					name: Plugin[ 'name' ]
+				) => void
+			) {
 				addAction(
 					'plugins.pluginRegistered',
 					'core/plugins/plugin-area/plugins-registered',
