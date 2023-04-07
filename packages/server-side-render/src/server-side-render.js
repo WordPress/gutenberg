@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -187,7 +187,7 @@ export default function ServerSideRender( props ) {
 		// shows data as soon as possible.
 		if ( prevProps === undefined ) {
 			fetchData();
-		} else if ( ! isEqual( prevProps, props ) ) {
+		} else if ( ! fastDeepEqual( prevProps, props ) ) {
 			debouncedFetchData();
 		}
 	} );

@@ -24,7 +24,7 @@ test.describe( 'Preview', () => {
 
 		// Disabled until content present.
 		await expect(
-			editorPage.locator( 'role=button[name="View"i]' )
+			editorPage.locator( 'role=button[name="Preview"i]' )
 		).toBeDisabled();
 
 		await editorPage.type(
@@ -282,7 +282,7 @@ test.describe( 'Preview with private custom post type', () => {
 		await admin.createNewPost( { postType: 'not_public', title: 'aaaaa' } );
 
 		// Open the view menu.
-		await page.click( 'role=button[name="View"i]' );
+		await page.click( 'role=button[name="Preview"i]' );
 
 		await expect(
 			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
@@ -297,7 +297,7 @@ class PreviewUtils {
 
 	async waitForPreviewNavigation( previewPage ) {
 		const previewToggle = this.page.locator(
-			'role=button[name="View"i][expanded=false]'
+			'role=button[name="Preview"i][expanded=false]'
 		);
 		const isDropdownClosed = await previewToggle.isVisible();
 		if ( isDropdownClosed ) {
@@ -343,6 +343,8 @@ class PreviewUtils {
 			return;
 		}
 
-		await this.page.click( 'role=button[name="Close dialog"i]' );
+		await this.page.click(
+			'role=dialog[name="Preferences"i] >> role=button[name="Close"i]'
+		);
 	}
 }

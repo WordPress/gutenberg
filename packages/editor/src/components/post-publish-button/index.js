@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get, some } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -34,10 +33,20 @@ export class PostPublishButton extends Component {
 			entitiesSavedStatesCallback: false,
 		};
 	}
+
 	componentDidMount() {
 		if ( this.props.focusOnMount ) {
-			this.buttonNode.current.focus();
+			// This timeout is necessary to make sure the `useEffect` hook of
+			// `useFocusReturn` gets the correct element (the button that opens the
+			// PostPublishPanel) otherwise it will get this button.
+			this.timeoutID = setTimeout( () => {
+				this.buttonNode.current.focus();
+			}, 0 );
 		}
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.timeoutID );
 	}
 
 	createOnClick( callback ) {
@@ -77,8 +86,7 @@ export class PostPublishButton extends Component {
 		this.setState( { entitiesSavedStatesCallback: false }, () => {
 			if (
 				savedEntities &&
-				some(
-					savedEntities,
+				savedEntities.some(
 					( elt ) =>
 						elt.kind === 'postType' &&
 						elt.name === postType &&
@@ -160,7 +168,7 @@ export class PostPublishButton extends Component {
 		const buttonProps = {
 			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
-			isBusy: ! isAutoSaving && isSaving && isPublished,
+			isBusy: ! isAutoSaving && isSaving,
 			variant: 'primary',
 			onClick: this.createOnClick( onClickButton ),
 		};
@@ -233,11 +241,8 @@ export default compose( [
 			isPostSavingLocked: isPostSavingLocked(),
 			isPublishable: isEditedPostPublishable(),
 			isPublished: isCurrentPostPublished(),
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),

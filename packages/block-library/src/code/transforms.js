@@ -43,7 +43,9 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
 			transform: ( { content } ) => {
-				return createBlock( 'core/paragraph', { content } );
+				return createBlock( 'core/paragraph', {
+					content: content.replace( /\n/g, '<br>' ),
+				} );
 			},
 		},
 	],

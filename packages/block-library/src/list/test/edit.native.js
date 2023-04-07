@@ -3,6 +3,7 @@
  */
 import {
 	changeTextOfRichText,
+	changeAndSelectTextOfRichText,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
@@ -18,6 +19,7 @@ import {
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import { BACKSPACE } from '@wordpress/keycodes';
 
 describe( 'List block', () => {
 	beforeAll( () => {
@@ -61,16 +63,18 @@ describe( 'List block', () => {
 		<li></li><!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
 		// Select List block
-		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
+		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 1/ );
 		fireEvent.press( listBlock );
 
 		// Select List Item block
-		const listItemBlock = getByA11yLabel( /List item Block\. Row 1/ );
+		const [ listItemBlock ] = screen.getAllByLabelText(
+			/List item Block\. Row 1/
+		);
 		fireEvent.press( listItemBlock );
 
 		const listItemField =
@@ -107,25 +111,25 @@ describe( 'List block', () => {
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
 		// Select List block
-		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
+		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 1/ );
 
 		fireEvent.press( listBlock );
 
 		// Select List Item block
-		const firstNestedLevelBlock = within( listBlock ).getByA11yLabel(
+		const [ firstNestedLevelBlock ] = within( listBlock ).getAllByLabelText(
 			/List item Block\. Row 2/
 		);
 		fireEvent.press( firstNestedLevelBlock );
 
 		// Select second level list
-		const secondNestedLevelBlock = within(
+		const [ secondNestedLevelBlock ] = within(
 			firstNestedLevelBlock
-		).getByA11yLabel( /List Block\. Row 1/ );
+		).getAllByLabelText( /List Block\. Row 1/ );
 		fireEvent.press( secondNestedLevelBlock );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -141,20 +145,22 @@ describe( 'List block', () => {
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
 		// Select List block
-		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
+		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 1/ );
 		fireEvent.press( listBlock );
 
 		// Select Secont List Item block
-		const listItemBlock = getByA11yLabel( /List item Block\. Row 2/ );
+		const [ listItemBlock ] = screen.getAllByLabelText(
+			/List item Block\. Row 2/
+		);
 		fireEvent.press( listItemBlock );
 
 		// Update indentation
-		const indentButton = getByA11yLabel( 'Indent' );
+		const indentButton = screen.getByLabelText( 'Indent' );
 		fireEvent.press( indentButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -171,33 +177,33 @@ describe( 'List block', () => {
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
 		// Select List block
-		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
+		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 1/ );
 		fireEvent.press( listBlock );
 
 		// Select List Item block
-		const firstNestedLevelBlock = within( listBlock ).getByA11yLabel(
+		const [ firstNestedLevelBlock ] = within( listBlock ).getAllByLabelText(
 			/List item Block\. Row 1/
 		);
 		fireEvent.press( firstNestedLevelBlock );
 
 		// Select Inner block List
-		const innerBlockList = within( firstNestedLevelBlock ).getByA11yLabel(
-			/List Block\. Row 1/
-		);
+		const [ innerBlockList ] = within(
+			firstNestedLevelBlock
+		).getAllByLabelText( /List Block\. Row 1/ );
 
 		// Select nested List Item block
-		const listItemBlock = within( innerBlockList ).getByA11yLabel(
+		const [ listItemBlock ] = within( innerBlockList ).getAllByLabelText(
 			/List item Block\. Row 1/
 		);
 		fireEvent.press( listItemBlock );
 
 		// Update indentation
-		const outdentButton = getByA11yLabel( 'Outdent' );
+		const outdentButton = screen.getByLabelText( 'Outdent' );
 		fireEvent.press( outdentButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -210,22 +216,22 @@ describe( 'List block', () => {
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>Item 2</li>
-		<!-- /wp:list-item -->	
+		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>Item 3</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
 		// Select List block
-		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
+		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 1/ );
 		fireEvent.press( listBlock );
 
 		// Update to ordered list
-		const orderedButton = getByA11yLabel( 'Ordered' );
+		const orderedButton = screen.getByLabelText( 'Ordered' );
 		fireEvent.press( orderedButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -238,33 +244,35 @@ describe( 'List block', () => {
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>Item 2</li>
-		<!-- /wp:list-item -->	
+		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>Item 3</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
 
-		const { getByA11yLabel, getByTestId } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
 		// Select List block
-		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
+		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 1/ );
 		fireEvent.press( listBlock );
 
 		// Update to ordered list
-		const orderedButton = getByA11yLabel( 'Ordered' );
+		const orderedButton = screen.getByLabelText( 'Ordered' );
 		fireEvent.press( orderedButton );
 
 		// Set order to reverse
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
 		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
+			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
 		);
 
-		const reverseButton = getByA11yLabel( /Reverse list numbering\. Off/ );
+		const reverseButton = screen.getByLabelText(
+			/Reverse list numbering\. Off/
+		);
 		fireEvent.press( reverseButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -277,38 +285,137 @@ describe( 'List block', () => {
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>Item 2</li>
-		<!-- /wp:list-item -->	
+		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>Item 3</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
 
-		const { getByA11yLabel, getByTestId } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
 		// Select List block
-		const listBlock = getByA11yLabel( /List Block\. Row 1/ );
+		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 1/ );
 		fireEvent.press( listBlock );
 
 		// Update to ordered list
-		const orderedButton = getByA11yLabel( 'Ordered' );
+		const orderedButton = screen.getByLabelText( 'Ordered' );
 		fireEvent.press( orderedButton );
 
 		// Set order to reverse
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
 		await waitFor(
-			() => getByTestId( 'block-settings-modal' ).props.isVisible
+			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
 		);
 
-		const startValueButton = getByA11yLabel( /Start value\. Empty/ );
+		const startValueButton = screen.getByLabelText( /Start value\. Empty/ );
 		fireEvent.press( startValueButton );
 		const startValueInput =
 			within( startValueButton ).getByDisplayValue( '' );
 		fireEvent.changeText( startValueInput, '25' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'merges with other lists', async () => {
+		const initialHtml = `<!-- wp:list -->
+		<ul><!-- wp:list-item -->
+		<li>One</li><!-- /wp:list-item --></ul>
+		<!-- /wp:list --><!-- wp:list -->
+		<ul><!-- wp:list-item -->
+		<li>Two</li><!-- /wp:list-item --></ul>
+		<!-- /wp:list -->`;
+
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+
+		// Select List block
+		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 2/ );
+		fireEvent.press( listBlock );
+
+		// Select List Item block
+		const [ listItemBlock ] = within( listBlock ).getAllByLabelText(
+			/List item Block\. Row 1/
+		);
+		fireEvent.press( listItemBlock );
+
+		// With cursor positioned at the beginning of the first List Item, press
+		// backward delete
+		const listItemField =
+			within( listItemBlock ).getByLabelText( /Text input. .*Two.*/ );
+		changeAndSelectTextOfRichText( listItemField, 'Two' );
+		fireEvent( listItemField, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
+
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+			"<!-- wp:list -->
+			<ul><!-- wp:list-item -->
+			<li>One</li>
+			<!-- /wp:list-item -->
+
+			<!-- wp:list-item -->
+			<li>Two</li>
+			<!-- /wp:list-item --></ul>
+			<!-- /wp:list -->"
+		` );
+	} );
+
+	it( 'unwraps first item when attempting to merge with non-list block', async () => {
+		const initialHtml = `<!-- wp:paragraph -->
+		<p>A quick brown fox.</p>
+		<!-- /wp:paragraph -->
+		<!-- wp:list -->
+		<ul><!-- wp:list-item -->
+		<li>One</li><!-- /wp:list-item --><!-- wp:list-item -->
+		<li>Two</li><!-- /wp:list-item --></ul>
+		<!-- /wp:list -->`;
+
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+
+		// Select List block
+		const [ listBlock ] = screen.getAllByLabelText( /List Block\. Row 2/ );
+		fireEvent.press( listBlock );
+
+		// Select List Item block
+		const [ listItemBlock ] = within( listBlock ).getAllByLabelText(
+			/List item Block\. Row 1/
+		);
+		fireEvent.press( listItemBlock );
+
+		// With cursor positioned at the beginning of the first List Item, press
+		// backward delete
+		const listItemField =
+			within( listItemBlock ).getByLabelText( /Text input. .*One.*/ );
+		changeAndSelectTextOfRichText( listItemField, 'One' );
+		fireEvent( listItemField, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
+
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>A quick brown fox.</p>
+		<!-- /wp:paragraph -->
+		
+		<!-- wp:paragraph -->
+		<p>One</p>
+		<!-- /wp:paragraph -->
+		
+		<!-- wp:list -->
+		<ul><!-- wp:list-item -->
+		<li>Two</li>
+		<!-- /wp:list-item --></ul>
+		<!-- /wp:list -->"
+	` );
 	} );
 } );

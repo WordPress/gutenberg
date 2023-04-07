@@ -16,7 +16,7 @@ export default function PostSchedule() {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
-		() => ( { anchor: popoverAnchor } ),
+		() => ( { anchor: popoverAnchor, placement: 'bottom-end' } ),
 		[ popoverAnchor ]
 	);
 
@@ -29,7 +29,6 @@ export default function PostSchedule() {
 				<span>{ __( 'Publish' ) }</span>
 				<Dropdown
 					popoverProps={ popoverProps }
-					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
 					focusOnMount
 					renderToggle={ ( { isOpen, onToggle } ) => (

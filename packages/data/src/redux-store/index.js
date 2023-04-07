@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { createStore, applyMiddleware } from 'redux';
-import { get, mapValues } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
 import EquivalentKeyMap from 'equivalent-key-map';
 
@@ -16,6 +15,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { builtinControls } from '../controls';
+import { lock } from '../private-apis';
 import promise from '../promise-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import createThunkMiddleware from './thunk-middleware';
@@ -26,11 +26,13 @@ import * as metadataActions from './metadata/actions';
 /** @typedef {import('../types').DataRegistry} DataRegistry */
 /**
  * @typedef {import('../types').StoreDescriptor<C>} StoreDescriptor
- * @template C
+ * @template {import('../types').AnyConfig} C
  */
 /**
  * @typedef {import('../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
- * @template State,Actions,Selectors
+ * @template State
+ * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template Selectors
  */
 
 const trimUndefinedValues = ( array ) => {
@@ -41,6 +43,32 @@ const trimUndefinedValues = ( array ) => {
 		}
 	}
 	return result;
+};
+
+/**
+ * Creates a new object with the same keys, but with `callback()` called as
+ * a transformer function on each of the values.
+ *
+ * @param {Object}   obj      The object to transform.
+ * @param {Function} callback The function to transform each object value.
+ * @return {Array} Transformed object.
+ */
+const mapValues = ( obj, callback ) =>
+	Object.entries( obj ?? {} ).reduce(
+		( acc, [ key, value ] ) => ( {
+			...acc,
+			[ key ]: callback( value, key ),
+		} ),
+		{}
+	);
+
+// Convert Map objects to plain objects
+const mapToObject = ( key, state ) => {
+	if ( state instanceof Map ) {
+		return Object.fromEntries( state );
+	}
+
+	return state;
 };
 
 /**
@@ -90,7 +118,9 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @template State,Actions,Selectors
+ * @template State
+ * @template {Record<string,import('../../types').ActionCreator>} Actions
+ * @template Selectors
  * @param {string}                                    key     Unique namespace identifier.
  * @param {ReduxStoreConfig<State,Actions,Selectors>} options Registered store options, with properties
  *                                                            describing reducer, actions, selectors,
@@ -99,7 +129,19 @@ function createResolversCache() {
  * @return   {StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>} Store Object.
  */
 export default function createReduxStore( key, options ) {
-	return {
+	const privateActions = {};
+	const privateSelectors = {};
+	const privateRegistrationFunctions = {
+		privateActions,
+		registerPrivateActions: ( actions ) => {
+			Object.assign( privateActions, actions );
+		},
+		privateSelectors,
+		registerPrivateSelectors: ( selectors ) => {
+			Object.assign( privateSelectors, selectors );
+		},
+	};
+	const storeDescriptor = {
 		name: key,
 		instantiate: ( registry ) => {
 			const reducer = options.reducer;
@@ -129,6 +171,9 @@ export default function createReduxStore( key, options ) {
 				registry,
 				thunkArgs
 			);
+			// Expose the private registration functions on the store
+			// so they can be copied to a sub registry in registry.js.
+			lock( store, privateRegistrationFunctions );
 			const resolversCache = createResolversCache();
 
 			let resolvers;
@@ -138,6 +183,17 @@ export default function createReduxStore( key, options ) {
 					...options.actions,
 				},
 				store
+			);
+			lock(
+				actions,
+				new Proxy( privateActions, {
+					get: ( target, prop ) => {
+						return (
+							mapActions( privateActions, store )[ prop ] ||
+							actions[ prop ]
+						);
+					},
+				} )
 			);
 
 			let selectors = mapSelectors(
@@ -159,6 +215,25 @@ export default function createReduxStore( key, options ) {
 				},
 				store
 			);
+			lock(
+				selectors,
+				new Proxy( privateSelectors, {
+					get: ( target, prop ) => {
+						return (
+							mapSelectors(
+								mapValues(
+									privateSelectors,
+									( selector ) =>
+										( state, ...args ) =>
+											selector( state.root, ...args )
+								),
+								store
+							)[ prop ] || selectors[ prop ]
+						);
+					},
+				} )
+			);
+
 			if ( options.resolvers ) {
 				const result = mapResolvers(
 					options.resolvers,
@@ -217,6 +292,13 @@ export default function createReduxStore( key, options ) {
 			};
 		},
 	};
+
+	// Expose the private registration functions on the store
+	// descriptor. That's a natural choice since that's where the
+	// public actions and selectors are stored .
+	lock( storeDescriptor, privateRegistrationFunctions );
+
+	return storeDescriptor;
 }
 
 /**
@@ -256,6 +338,9 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 			window.__REDUX_DEVTOOLS_EXTENSION__( {
 				name: key,
 				instanceId: key,
+				serialize: {
+					replacer: mapToObject,
+				},
 			} )
 		);
 	}
@@ -541,7 +626,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
  * @param {Array}  args         Selector Arguments.
  */
 async function fulfillResolver( store, resolvers, selectorName, ...args ) {
-	const resolver = get( resolvers, [ selectorName ] );
+	const resolver = resolvers[ selectorName ];
 	if ( ! resolver ) {
 		return;
 	}

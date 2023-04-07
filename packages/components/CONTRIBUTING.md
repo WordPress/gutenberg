@@ -185,7 +185,6 @@ All new component should be styled using [Emotion](https://emotion.sh/docs/intro
 
 Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
 
-
 ### Deprecating styles
 
 Changing the styles of a non-experimental component must be done with care. To prevent serious breakage in third-party usage, in some cases we may want a grace period before fully removing the old styles. This can be done by temporarily placing the new styles behind a feature flag prop prefixed by `__next`, accompanied by a `deprecate()` warning in the console. The feature flag should be opt-in (false by default), and have a reasonably descriptive name (**not** `__nextHasNewStyles`). A descriptive name allows for multiple deprecations to proceed in parallel, separated by concerns or by deprecation version.
@@ -362,7 +361,7 @@ Primary.args = {
 };
 ```
 
-A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Avoid using [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs) for new stories, as this addon is deprecated.
+A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Historically, we used [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs), but it was deprecated and later removed in [#47152](https://github.com/WordPress/gutenberg/pull/47152).
 
 The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.tsx)).
 

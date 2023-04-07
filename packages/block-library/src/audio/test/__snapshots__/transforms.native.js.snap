@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Audio block transformations to Columns block 1`] = `
+"<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
+<div class="wp-block-column" style="flex-basis:100%"><!-- wp:audio {"id":5} -->
+<figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3"></audio></figure>
+<!-- /wp:audio --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`Audio block transformations to File block 1`] = `
+"<!-- wp:file {"id":5,"href":"https://cldup.com/59IrU0WJtq.mp3"} -->
+<div class="wp-block-file"><a href="https://cldup.com/59IrU0WJtq.mp3" class="wp-block-file__button wp-element-button" download>Download</a></div>
+<!-- /wp:file -->"
+`;
+
+exports[`Audio block transformations to Group block 1`] = `
+"<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:audio {"id":5} -->
+<figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3"></audio></figure>
+<!-- /wp:audio --></div>
+<!-- /wp:group -->"
+`;

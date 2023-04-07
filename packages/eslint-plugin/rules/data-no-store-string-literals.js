@@ -122,7 +122,7 @@ function collectAllNodesFromObjectPropertyFunctionCalls( context, node ) {
 function getSuggest( context, callNode ) {
 	return [
 		{
-			desc: 'Replace literal with store definition. Import store if neccessary.',
+			desc: 'Replace literal with store definition. Import store if necessary.',
 			fix: ( fixer ) => getFixes( fixer, context, callNode ),
 		},
 	];

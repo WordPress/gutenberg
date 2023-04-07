@@ -14,16 +14,22 @@ import {
 	isValidElement,
 	memo,
 	StrictMode,
-	useState,
-	useEffect,
-	useContext,
-	useReducer,
 	useCallback,
-	useMemo,
-	useRef,
-	useImperativeHandle,
-	useLayoutEffect,
+	useContext,
 	useDebugValue,
+	useDeferredValue,
+	useEffect,
+	useId,
+	useMemo,
+	useImperativeHandle,
+	useInsertionEffect,
+	useLayoutEffect,
+	useReducer,
+	useRef,
+	useState,
+	useSyncExternalStore,
+	useTransition,
+	startTransition,
 	lazy,
 	Suspense,
 } from 'react';
@@ -151,14 +157,29 @@ export { useContext };
 export { useDebugValue };
 
 /**
+ * @see https://reactjs.org/docs/hooks-reference.html#usedeferredvalue
+ */
+export { useDeferredValue };
+
+/**
  * @see https://reactjs.org/docs/hooks-reference.html#useeffect
  */
 export { useEffect };
 
 /**
+ * @see https://reactjs.org/docs/hooks-reference.html#useid
+ */
+export { useId };
+
+/**
  * @see https://reactjs.org/docs/hooks-reference.html#useimperativehandle
  */
 export { useImperativeHandle };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#useinsertioneffect
+ */
+export { useInsertionEffect };
 
 /**
  * @see https://reactjs.org/docs/hooks-reference.html#uselayouteffect
@@ -184,6 +205,21 @@ export { useRef };
  * @see https://reactjs.org/docs/hooks-reference.html#usestate
  */
 export { useState };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usesyncexternalstore
+ */
+export { useSyncExternalStore };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usetransition
+ */
+export { useTransition };
+
+/**
+ * @see https://reactjs.org/docs/react-api.html#starttransition
+ */
+export { startTransition };
 
 /**
  * @see https://reactjs.org/docs/react-api.html#reactlazy

@@ -92,6 +92,7 @@ module.exports = {
 	},
 	defaultBlock: {
 		marginTop: 16,
+		marginLeft: 16,
 	},
 	scrollableContent: {
 		paddingBottom: 20,
@@ -173,5 +174,8 @@ module.exports = {
 	},
 	innerAppender: {
 		marginLeft: 8,
+	},
+	mediaAreaPadding: {
+		width: 12,
 	},
 };

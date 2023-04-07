@@ -5,7 +5,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
-import { useDisabled } from '@wordpress/compose';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,13 +22,8 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 				.__experimentalDiscussionSettings
 	);
 
-	const disabledRef = useDisabled();
-
 	return (
-		<div
-			className="wp-block-comments__legacy-placeholder"
-			ref={ disabledRef }
-		>
+		<div className="wp-block-comments__legacy-placeholder" inert="true">
 			<h3>
 				{
 					/* translators: %s: Post title. */
@@ -51,7 +46,7 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 						<footer className="comment-meta">
 							<div className="comment-author vcard">
 								<img
-									alt="Commenter Avatar"
+									alt={ __( 'Commenter Avatar' ) }
 									src={ avatarURL }
 									className="avatar avatar-32 photo"
 									height="32"
@@ -91,8 +86,17 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 									'To get started with moderating, editing, and deleting comments, please visit the Comments screen in the dashboard.'
 								) }
 								<br />
-								{ __( 'Commenter avatars come from' ) }{ ' ' }
-								<a href="https://gravatar.com/">Gravatar</a>.
+								{ createInterpolateElement(
+									__(
+										'Commenter avatars come from <a>Gravatar</a>.'
+									),
+									{
+										a: (
+											// eslint-disable-next-line jsx-a11y/anchor-has-content
+											<a href="https://gravatar.com/" />
+										),
+									}
+								) }
 							</p>
 						</div>
 
@@ -100,7 +104,9 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 							<a
 								className="comment-reply-link"
 								href="#top"
-								aria-label="Reply to A WordPress Commenter"
+								aria-label={ __(
+									'Reply to A WordPress Commenter'
+								) }
 							>
 								{ __( 'Reply' ) }
 							</a>

@@ -103,7 +103,7 @@ export default function ButtonsEdit( {
 
 			const insertedBlock = createBlock( 'core/button' );
 
-			insertBlock( insertedBlock, index, clientId );
+			insertBlock( insertedBlock, index, clientId, false );
 			selectBlock( insertedBlock.clientId );
 		}, 200 ),
 		[]
@@ -139,7 +139,7 @@ export default function ButtonsEdit( {
 						}
 						popoverProps={ {
 							position: 'bottom right',
-							isAlternate: true,
+							variant: 'toolbar',
 						} }
 					/>
 				</BlockControls>

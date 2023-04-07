@@ -75,7 +75,6 @@ function RichTextWrapper(
 		onReplace,
 		placeholder,
 		allowedFormats,
-		formattingControls,
 		withoutInteractiveFormatting,
 		onRemove,
 		onMerge,
@@ -98,7 +97,6 @@ function RichTextWrapper(
 		textAlign,
 		selectionColor,
 		tagsToEliminate,
-		rootTagsToEliminate,
 		disableEditingMenu,
 		fontSize,
 		fontFamily,
@@ -194,7 +192,6 @@ function RichTextWrapper(
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
-		formattingControls,
 		disableFormats,
 	} );
 	const hasFormats =
@@ -630,7 +627,6 @@ function RichTextWrapper(
 			textAlign={ textAlign }
 			selectionColor={ selectionColor }
 			tagsToEliminate={ tagsToEliminate }
-			rootTagsToEliminate={ rootTagsToEliminate }
 			disableEditingMenu={ disableEditingMenu }
 			fontSize={ fontSize }
 			fontFamily={ fontFamily }

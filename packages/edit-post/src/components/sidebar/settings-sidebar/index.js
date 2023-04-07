@@ -5,10 +5,12 @@ import {
 	BlockInspector,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { cog } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 import { Platform } from '@wordpress/element';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { isRTL, __ } from '@wordpress/i18n';
+import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -25,8 +27,6 @@ import MetaBoxes from '../../meta-boxes';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebarEditPost from '../plugin-sidebar';
 import TemplateSummary from '../template-summary';
-import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { store as editPostStore } from '../../../store';
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
@@ -78,7 +78,7 @@ const SettingsSidebar = () => {
 			/* translators: button label text should, if possible, be under 16 characters. */
 			title={ __( 'Settings' ) }
 			toggleShortcut={ keyboardShortcut }
-			icon={ cog }
+			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			{ ! isTemplateMode && sidebarName === 'edit-post/document' && (

@@ -300,7 +300,7 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Preview Link.
+-   `string | undefined`: Preview Link.
 
 ### getEditedPostSlug
 

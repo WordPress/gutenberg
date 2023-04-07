@@ -4,7 +4,11 @@
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-import { pasteHandler } from '@wordpress/blocks';
+import {
+	pasteHandler,
+	findTransform,
+	getBlockTransforms,
+} from '@wordpress/blocks';
 import {
 	isEmpty,
 	insert,
@@ -17,7 +21,6 @@ import { isURL } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { filePasteHandler } from './file-paste-handler';
 import { addActiveFormats, isShortcode } from './utils';
 import { splitValue } from './split-value';
 import { shouldDismissPastedFiles } from '../../utils/pasting';
@@ -155,6 +158,12 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
+			if ( files?.length ) {
+				// Allows us to ask for this information when we get a report.
+				// eslint-disable-next-line no-console
+				window.console.log( 'Received items:\n\n', files );
+			}
+
 			// Process any attached files, unless we infer that the files in
 			// question are redundant "screenshots" of the actual HTML payload,
 			// as created by certain office-type programs.
@@ -164,23 +173,33 @@ export function usePasteHandler( props ) {
 				files?.length &&
 				! shouldDismissPastedFiles( files, html, plainText )
 			) {
-				const content = pasteHandler( {
-					HTML: filePasteHandler( files ),
-					mode: 'BLOCKS',
-					tagName,
-					preserveWhiteSpace,
-				} );
-
-				// Allows us to ask for this information when we get a report.
-				// eslint-disable-next-line no-console
-				window.console.log( 'Received items:\n\n', files );
+				const fromTransforms = getBlockTransforms( 'from' );
+				const blocks = files
+					.reduce( ( accumulator, file ) => {
+						const transformation = findTransform(
+							fromTransforms,
+							( transform ) =>
+								transform.type === 'files' &&
+								transform.isMatch( [ file ] )
+						);
+						if ( transformation ) {
+							accumulator.push(
+								transformation.transform( [ file ] )
+							);
+						}
+						return accumulator;
+					}, [] )
+					.flat();
+				if ( ! blocks.length ) {
+					return;
+				}
 
 				if ( onReplace && isEmpty( value ) ) {
-					onReplace( content );
+					onReplace( blocks );
 				} else {
 					splitValue( {
 						value,
-						pastedBlocks: content,
+						pastedBlocks: blocks,
 						onReplace,
 						onSplit,
 						onSplitMiddle,
@@ -255,7 +274,7 @@ export function usePasteHandler( props ) {
 
 /**
  * Normalizes a given string of HTML to remove the Windows-specific "Fragment"
- * comments and any preceeding and trailing content.
+ * comments and any preceding and trailing content.
  *
  * @param {string} html the html to be normalized
  * @return {string} the normalized html

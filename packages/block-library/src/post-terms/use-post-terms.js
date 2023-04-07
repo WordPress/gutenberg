@@ -36,6 +36,6 @@ export default function usePostTerms( { postId, term } ) {
 				hasPostTerms: !! terms?.length,
 			};
 		},
-		[ postId, term?.visibility?.publicly_queryable ]
+		[ postId, term?.visibility?.publicly_queryable, slug ]
 	);
 }

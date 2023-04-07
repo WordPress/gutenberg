@@ -15,6 +15,7 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	return (
 		<div className="editor-post-excerpt">
 			<TextareaControl
+				__nextHasNoMarginBottom
 				label={ __( 'Write an excerpt (optional)' ) }
 				className="editor-post-excerpt__textarea"
 				onChange={ ( value ) => onUpdateExcerpt( value ) }
@@ -22,7 +23,7 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 			/>
 			<ExternalLink
 				href={ __(
-					'https://wordpress.org/support/article/settings-sidebar/#excerpt'
+					'https://wordpress.org/documentation/article/page-post-settings-sidebar/#excerpt'
 				) }
 			>
 				{ __( 'Learn more about manual excerpts' ) }

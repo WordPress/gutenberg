@@ -6,7 +6,7 @@ import readline from 'readline';
 
 import { spawnSync } from 'node:child_process';
 
-const LABEL = process.argv[ 2 ] || 'Backport to WP Minor Release';
+const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
 	?.stderr?.toString()
@@ -127,7 +127,7 @@ async function fetchPRs() {
 
 	const PRsWithMergeCommit = [];
 	for ( const PR of PRs ) {
-		const { mergeCommitHash } = await GitHubFetch(
+		const { merge_commit_sha: mergeCommitHash } = await GitHubFetch(
 			'/repos/WordPress/Gutenberg/pulls/' + PR.number
 		);
 		PRsWithMergeCommit.push( {

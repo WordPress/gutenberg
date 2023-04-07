@@ -60,6 +60,7 @@ const gpl2CompatibleLicenses = [
 	'ODC-By-1.0',
 	'Public Domain',
 	'Unlicense',
+	'W3C-20150513',
 	'WTFPL',
 	'Zlib',
 ];

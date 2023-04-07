@@ -19,12 +19,14 @@ export const Container = styled.fieldset`
 `;
 
 export const HeaderLabel = styled( BaseControl.VisualLabel )`
+	display: flex;
+	gap: ${ space( 1 ) };
+	justify-content: flex-start;
 	margin-bottom: 0;
 `;
 
 export const HeaderHint = styled.span`
 	color: ${ COLORS.gray[ 700 ] };
-	margin-left: ${ space( 1 ) };
 `;
 
 export const Controls = styled.div< {

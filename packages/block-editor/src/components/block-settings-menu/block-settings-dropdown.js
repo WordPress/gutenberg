@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -34,20 +29,20 @@ import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useShowMoversGestures } from '../block-toolbar/utils';
 
 const noop = () => {};
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
-	isAlternate: true,
+	variant: 'toolbar',
 };
 
-function CopyMenuItem( { blocks, onCopy } ) {
+function CopyMenuItem( { blocks, onCopy, label } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	const copyMenuItemLabel =
+	const copyMenuItemBlocksLabel =
 		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
+	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
@@ -58,12 +53,14 @@ export function BlockSettingsDropdown( {
 	__unstableDisplayLocation,
 	...props
 } ) {
-	const blockClientIds = castArray( clientIds );
+	const blockClientIds = Array.isArray( clientIds )
+		? clientIds
+		: [ clientIds ];
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const {
 		firstParentClientId,
-		hasReducedUI,
+		isDistractionFree,
 		onlyBlock,
 		parentBlockType,
 		previousBlockClientId,
@@ -74,7 +71,7 @@ export function BlockSettingsDropdown( {
 			const {
 				getBlockCount,
 				getBlockName,
-				getBlockParents,
+				getBlockRootClientId,
 				getPreviousBlockClientId,
 				getNextBlockClientId,
 				getSelectedBlockClientIds,
@@ -84,19 +81,22 @@ export function BlockSettingsDropdown( {
 
 			const { getActiveBlockVariation } = select( blocksStore );
 
-			const parents = getBlockParents( firstBlockClientId );
-			const _firstParentClientId = parents[ parents.length - 1 ];
-			const parentBlockName = getBlockName( _firstParentClientId );
+			const _firstParentClientId =
+				getBlockRootClientId( firstBlockClientId );
+			const parentBlockName =
+				_firstParentClientId && getBlockName( _firstParentClientId );
 
 			return {
 				firstParentClientId: _firstParentClientId,
-				hasReducedUI: getSettings().hasReducedUI,
-				onlyBlock: 1 === getBlockCount(),
+				isDistractionFree: getSettings().isDistractionFree,
+				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
 				parentBlockType:
-					getActiveBlockVariation(
+					_firstParentClientId &&
+					( getActiveBlockVariation(
 						parentBlockName,
 						getBlockAttributes( _firstParentClientId )
-					) || getBlockType( parentBlockName ),
+					) ||
+						getBlockType( parentBlockName ) ),
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
 				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
@@ -137,16 +137,13 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
-	const blockTitle = useBlockDisplayTitle( {
-		clientId: firstBlockClientId,
-		maximumLength: 25,
-	} );
-
 	const updateSelectionAfterRemove = useCallback(
 		__experimentalSelectBlock
 			? () => {
 					const blockToSelect =
-						previousBlockClientId || nextBlockClientId;
+						previousBlockClientId ||
+						nextBlockClientId ||
+						firstParentClientId;
 
 					if (
 						blockToSelect &&
@@ -165,16 +162,13 @@ export function BlockSettingsDropdown( {
 			__experimentalSelectBlock,
 			previousBlockClientId,
 			nextBlockClientId,
+			firstParentClientId,
 			selectedBlockClientIds,
 		]
 	);
 
-	const label = sprintf(
-		/* translators: %s: block name */
-		__( 'Remove %s' ),
-		blockTitle
-	);
-	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
+	const removeBlockLabel =
+		count === 1 ? __( 'Delete' ) : __( 'Delete blocks' );
 
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.
@@ -182,12 +176,17 @@ export function BlockSettingsDropdown( {
 	const { gestures: showParentOutlineGestures } = useShowMoversGestures( {
 		ref: selectParentButtonRef,
 		onChange( isFocused ) {
-			if ( isFocused && hasReducedUI ) {
+			if ( isFocused && isDistractionFree ) {
 				return;
 			}
 			toggleBlockHighlight( firstParentClientId, isFocused );
 		},
 	} );
+
+	// This can occur when the selected block (the parent)
+	// displays child blocks within a List View.
+	const parentBlockIsSelected =
+		selectedBlockClientIds?.includes( firstParentClientId );
 
 	return (
 		<BlockActions
@@ -204,6 +203,7 @@ export function BlockSettingsDropdown( {
 				onInsertBefore,
 				onRemove,
 				onCopy,
+				onPasteStyles,
 				onMoveTo,
 				blocks,
 			} ) => (
@@ -221,26 +221,33 @@ export function BlockSettingsDropdown( {
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
-								{ firstParentClientId !== undefined && (
-									<MenuItem
-										{ ...showParentOutlineGestures }
-										ref={ selectParentButtonRef }
-										icon={
-											<BlockIcon
-												icon={ parentBlockType.icon }
-											/>
-										}
-										onClick={ () =>
-											selectBlock( firstParentClientId )
-										}
-									>
-										{ sprintf(
-											/* translators: %s: Name of the block's parent. */
-											__( 'Select parent block (%s)' ),
-											parentBlockType.title
-										) }
-									</MenuItem>
-								) }
+								{ ! parentBlockIsSelected &&
+									!! firstParentClientId && (
+										<MenuItem
+											{ ...showParentOutlineGestures }
+											ref={ selectParentButtonRef }
+											icon={
+												<BlockIcon
+													icon={
+														parentBlockType.icon
+													}
+												/>
+											}
+											onClick={ () =>
+												selectBlock(
+													firstParentClientId
+												)
+											}
+										>
+											{ sprintf(
+												/* translators: %s: Name of the block's parent. */
+												__(
+													'Select parent block (%s)'
+												),
+												parentBlockType.title
+											) }
+										</MenuItem>
+									) }
 								{ count === 1 && (
 									<BlockHTMLConvertButton
 										clientId={ firstBlockClientId }
@@ -297,6 +304,16 @@ export function BlockSettingsDropdown( {
 										onToggle={ onClose }
 									/>
 								) }
+							</MenuGroup>
+							<MenuGroup>
+								<CopyMenuItem
+									blocks={ blocks }
+									onCopy={ onCopy }
+									label={ __( 'Copy styles' ) }
+								/>
+								<MenuItem onClick={ onPasteStyles }>
+									{ __( 'Paste styles' ) }
+								</MenuItem>
 							</MenuGroup>
 							<BlockSettingsMenuControls.Slot
 								fillProps={ { onClose } }

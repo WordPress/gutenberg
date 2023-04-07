@@ -11,9 +11,7 @@ import withState from '../';
 
 describe( 'withState', () => {
 	it( 'should pass initial state and allow updates', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const EnhancedComponent = withState( {
 			count: 0,
 		} )( ( { count, setState } ) => (

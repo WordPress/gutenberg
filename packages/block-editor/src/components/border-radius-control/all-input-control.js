@@ -61,6 +61,7 @@ export default function AllInputControl( {
 			onChange={ handleOnChange }
 			onUnitChange={ handleOnUnitChange }
 			placeholder={ allPlaceholder }
+			size={ '__unstable-large' }
 		/>
 	);
 }

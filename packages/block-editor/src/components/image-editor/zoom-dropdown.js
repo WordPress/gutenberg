@@ -28,6 +28,7 @@ export default function ZoomDropdown() {
 			) }
 			renderContent={ () => (
 				<RangeControl
+					__nextHasNoMarginBottom
 					label={ __( 'Zoom' ) }
 					min={ MIN_ZOOM }
 					max={ MAX_ZOOM }

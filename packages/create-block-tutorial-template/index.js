@@ -30,6 +30,7 @@ module.exports = {
 					type: 'string',
 				},
 			},
+			render: 'file:./render.php',
 		},
 	},
 	pluginTemplatesPath: join( __dirname, 'plugin-templates' ),

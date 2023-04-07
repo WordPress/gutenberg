@@ -22,6 +22,9 @@ test.describe( 'Using Hooks API', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'First paragraph' );
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 		await expect(
 			page.locator( 'role=button[name="Reset Block"i]' )
 		).toBeVisible();
@@ -38,6 +41,9 @@ test.describe( 'Using Hooks API', () => {
 			'role=document[name="Paragraph block"i]'
 		);
 		await expect( paragraphBlock ).toHaveText( 'First paragraph' );
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 		await page.click( 'role=button[name="Reset Block"i]' );
 		expect( await editor.getEditedPostContent() ).toEqual( '' );
 	} );

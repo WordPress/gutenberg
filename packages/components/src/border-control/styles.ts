@@ -8,12 +8,9 @@ import { css } from '@emotion/react';
  */
 import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
 import { space } from '../ui/utils/space';
+import { StyledLabel } from '../base-control/styles/base-control-styles';
 import {
-	StyledField,
-	StyledLabel,
-} from '../base-control/styles/base-control-styles';
-import {
-	Root as UnitControlWrapper,
+	ValueInput as UnitControlWrapper,
 	UnitSelect,
 } from '../unit-control/styles/unit-control-styles';
 
@@ -56,26 +53,28 @@ export const wrapperWidth = css`
 	}
 `;
 
-/*
- * When default control height is 36px the following should be removed.
- * See: InputControl and __next36pxDefaultSize.
- */
-export const wrapperHeight = ( __next36pxDefaultSize?: boolean ) => {
+export const wrapperHeight = ( size?: 'default' | '__unstable-large' ) => {
 	return css`
-		height: ${ __next36pxDefaultSize ? '36px' : '30px' };
+		height: ${ size === '__unstable-large' ? '40px' : '30px' };
 	`;
 };
 
-export const borderControlDropdown = () => css`
+export const borderControlDropdown = (
+	size?: 'default' | '__unstable-large'
+) => css`
 	background: #fff;
 
 	&& > button {
 		/*
-		 * Override button component height and padding to fit within
-		 * BorderControl regardless of size.
+		 * Override button component styles to fit within BorderControl
+		 * regardless of size.
 		 */
-		height: 100%;
-		padding: ${ space( 0.75 ) };
+		height: ${ size === '__unstable-large' ? '40px' : '30px' };
+		width: ${ size === '__unstable-large' ? '40px' : '30px' };
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		${ rtl(
 			{ borderRadius: `2px 0 0 2px` },
 			{ borderRadius: `0 2px 2px 0` }
@@ -106,7 +105,7 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 
 export const colorIndicatorWrapper = (
 	border?: Border,
-	__next36pxDefaultSize?: boolean
+	size?: 'default' | '__unstable-large'
 ) => {
 	const { style } = border || {};
 
@@ -114,9 +113,9 @@ export const colorIndicatorWrapper = (
 		border-radius: 9999px;
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
-		width: ${ __next36pxDefaultSize ? '28px' : '22px' };
-		height: ${ __next36pxDefaultSize ? '28px' : '22px' };
-		padding: ${ __next36pxDefaultSize ? '2px' : '1px' };
+		width: ${ size === '__unstable-large' ? '24px' : '22px' };
+		height: ${ size === '__unstable-large' ? '24px' : '22px' };
+		padding: ${ size === '__unstable-large' ? '2px' : '1px' };
 
 		/*
 		 * ColorIndicator
@@ -125,13 +124,8 @@ export const colorIndicatorWrapper = (
 		 * over the active state of the border control dropdown's toggle button.
 		 */
 		& > span {
-			${ ! __next36pxDefaultSize
-				? css`
-						/* Dimensions fit in 30px overall control height. */
-						height: 16px;
-						width: 16px;
-				  `
-				: '' }
+			height: ${ space( 4 ) };
+			width: ${ space( 4 ) };
 			background: linear-gradient(
 				-45deg,
 				transparent 48%,
@@ -196,10 +190,4 @@ export const borderStyleButton = css`
 export const borderSlider = () => css`
 	flex: 1 1 60%;
 	${ rtl( { marginRight: space( 3 ) } )() }
-
-	${ StyledField } {
-		margin-bottom: 0;
-		font-size: 0;
-		display: flex;
-	}
 `;

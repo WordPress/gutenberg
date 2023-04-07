@@ -7,7 +7,11 @@ import { VisuallyHidden } from '@wordpress/components';
 
 const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
 
-export default function ResizeHandle( { direction, resizeWidthBy } ) {
+export default function ResizeHandle( {
+	variation = 'default',
+	direction,
+	resizeWidthBy,
+} ) {
 	function handleKeyDown( event ) {
 		const { keyCode } = event;
 
@@ -27,7 +31,7 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 	return (
 		<>
 			<button
-				className={ `resizable-editor__drag-handle is-${ direction }` }
+				className={ `resizable-editor__drag-handle is-${ direction } is-variation-${ variation }` }
 				aria-label={ __( 'Drag to resize' ) }
 				aria-describedby={ `resizable-editor__resize-help-${ direction }` }
 				onKeyDown={ handleKeyDown }

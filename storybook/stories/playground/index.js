@@ -70,6 +70,9 @@ function App() {
 
 export default {
 	title: 'Playground/Block Editor',
+	parameters: {
+		sourceLink: 'storybook/stories/playground',
+	},
 };
 
 export const _default = () => {

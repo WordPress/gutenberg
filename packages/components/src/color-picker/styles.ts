@@ -9,7 +9,6 @@ import styled from '@emotion/styled';
 import NumberControl from '../number-control';
 import InnerSelectControl from '../select-control';
 import InnerRangeControl from '../range-control';
-import { StyledField } from '../base-control/styles/base-control-styles';
 import { space } from '../ui/utils/space';
 import { boxSizingReset } from '../utils';
 import Button from '../button';
@@ -38,10 +37,6 @@ export const SelectControl = styled( InnerSelectControl )`
 export const RangeControl = styled( InnerRangeControl )`
 	flex: 1;
 	margin-right: ${ space( 2 ) };
-
-	${ StyledField } {
-		margin-bottom: 0;
-	}
 `;
 
 // Make the Hue circle picker not go out of the bar.
@@ -115,10 +110,6 @@ export const ColorfulWrapper = styled.div`
 	}
 
 	${ interactiveHueStyles }
-
-	${ StyledField } {
-		margin-bottom: 0;
-	}
 `;
 
 export const CopyButton = styled( Button )`

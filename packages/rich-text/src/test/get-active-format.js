@@ -17,7 +17,18 @@ describe( 'getActiveFormat', () => {
 		expect( getActiveFormat( record, 'em' ) ).toBe( undefined );
 	} );
 
-	it( 'should return format at first character for uncollapsed selection', () => {
+	it( 'should return format when active over whole selection', () => {
+		const record = {
+			formats: [ [ em ], [ strong ], , ],
+			text: 'one',
+			start: 0,
+			end: 1,
+		};
+
+		expect( getActiveFormat( record, 'em' ) ).toBe( em );
+	} );
+
+	it( 'should return not return format when not active over whole selection', () => {
 		const record = {
 			formats: [ [ em ], [ strong ], , ],
 			text: 'one',
@@ -25,7 +36,7 @@ describe( 'getActiveFormat', () => {
 			end: 2,
 		};
 
-		expect( getActiveFormat( record, 'em' ) ).toBe( em );
+		expect( getActiveFormat( record, 'em' ) ).toBe( undefined );
 	} );
 
 	it( 'should return undefined if at the boundary before', () => {

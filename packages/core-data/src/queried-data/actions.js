@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * Returns an action object used in signalling that items have been received.
  *
  * @param {Array}   items Items received.
@@ -14,7 +9,7 @@ import { castArray } from 'lodash';
 export function receiveItems( items, edits ) {
 	return {
 		type: 'RECEIVE_ITEMS',
-		items: castArray( items ),
+		items: Array.isArray( items ) ? items : [ items ],
 		persistedEdits: edits,
 	};
 }
@@ -32,7 +27,7 @@ export function receiveItems( items, edits ) {
 export function removeItems( kind, name, records, invalidateCache = false ) {
 	return {
 		type: 'REMOVE_ITEMS',
-		itemIds: castArray( records ),
+		itemIds: Array.isArray( records ) ? records : [ records ],
 		kind,
 		name,
 		invalidateCache,

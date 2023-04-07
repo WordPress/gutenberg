@@ -16,67 +16,78 @@ import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
 
-function BlockListAppender( {
-	rootClientId,
-	renderAppender: CustomAppender,
-	className,
-	tagName: TagName = 'div',
-} ) {
-	const { hideInserter, canInsertDefaultBlock, selectedBlockClientId } =
-		useSelect(
-			( select ) => {
-				const {
-					canInsertBlockType,
-					getTemplateLock,
-					getSelectedBlockClientId,
-					__unstableGetEditorMode,
-				} = select( blockEditorStore );
+function DefaultAppender( { rootClientId } ) {
+	const canInsertDefaultBlock = useSelect( ( select ) =>
+		select( blockEditorStore ).canInsertBlockType(
+			getDefaultBlockName(),
+			rootClientId
+		)
+	);
 
-				return {
-					hideInserter:
-						!! getTemplateLock( rootClientId ) ||
-						__unstableGetEditorMode() === 'zoom-out',
-					canInsertDefaultBlock: canInsertBlockType(
-						getDefaultBlockName(),
-						rootClientId
-					),
-					selectedBlockClientId: getSelectedBlockClientId(),
-				};
-			},
-			[ rootClientId ]
-		);
+	if ( canInsertDefaultBlock ) {
+		// Render the default block appender if the context supports use
+		// of the default appender.
+		return <DefaultBlockAppender rootClientId={ rootClientId } />;
+	}
+
+	// Fallback in case the default block can't be inserted.
+	return (
+		<ButtonBlockAppender
+			rootClientId={ rootClientId }
+			className="block-list-appender__toggle"
+		/>
+	);
+}
+
+function useAppender( rootClientId, CustomAppender ) {
+	const { hideInserter, isParentSelected } = useSelect(
+		( select ) => {
+			const {
+				getTemplateLock,
+				getSelectedBlockClientId,
+				__unstableGetEditorMode,
+			} = select( blockEditorStore );
+
+			const selectedBlockClientId = getSelectedBlockClientId();
+
+			return {
+				hideInserter:
+					!! getTemplateLock( rootClientId ) ||
+					__unstableGetEditorMode() === 'zoom-out',
+				isParentSelected:
+					rootClientId === selectedBlockClientId ||
+					( ! rootClientId && ! selectedBlockClientId ),
+			};
+		},
+		[ rootClientId ]
+	);
 
 	if ( hideInserter || CustomAppender === false ) {
 		return null;
 	}
 
-	let appender;
 	if ( CustomAppender ) {
 		// Prefer custom render prop if provided.
-		appender = <CustomAppender />;
-	} else {
-		const isParentSelected =
-			selectedBlockClientId === rootClientId ||
-			( ! rootClientId && ! selectedBlockClientId );
+		return <CustomAppender />;
+	}
 
-		if ( ! isParentSelected ) {
-			return null;
-		}
+	if ( ! isParentSelected ) {
+		return null;
+	}
 
-		if ( canInsertDefaultBlock ) {
-			// Render the default block appender when renderAppender has not been
-			// provided and the context supports use of the default appender.
-			appender = <DefaultBlockAppender rootClientId={ rootClientId } />;
-		} else {
-			// Fallback in the case no renderAppender has been provided and the
-			// default block can't be inserted.
-			appender = (
-				<ButtonBlockAppender
-					rootClientId={ rootClientId }
-					className="block-list-appender__toggle"
-				/>
-			);
-		}
+	return <DefaultAppender rootClientId={ rootClientId } />;
+}
+
+function BlockListAppender( {
+	rootClientId,
+	renderAppender,
+	className,
+	tagName: TagName = 'div',
+} ) {
+	const appender = useAppender( rootClientId, renderAppender );
+
+	if ( ! appender ) {
+		return null;
 	}
 
 	return (

@@ -31,8 +31,8 @@ exports[`RichText should handle Home and End keys 1`] = `
 `;
 
 exports[`RichText should handle change in tag name gracefully 1`] = `
-"<!-- wp:heading {\\"level\\":3} -->
-<h3></h3>
+"<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading"></h3>
 <!-- /wp:heading -->"
 `;
 
@@ -136,17 +136,17 @@ exports[`RichText should paste paragraph contents into list 1`] = `
 
 exports[`RichText should preserve internal formatting 1`] = `
 "<!-- wp:paragraph -->
-<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
+<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-cyan-bluish-gray-color">1</mark></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`RichText should preserve internal formatting 2`] = `
 "<!-- wp:paragraph -->
-<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
+<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-cyan-bluish-gray-color">1</mark></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><mark style=\\"background-color:rgba(0, 0, 0, 0)\\" class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</mark></p>
+<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-cyan-bluish-gray-color">1</mark></p>
 <!-- /wp:paragraph -->"
 `;
 

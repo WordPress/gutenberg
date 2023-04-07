@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import coreDataStore from './store';
@@ -27,11 +22,10 @@ const createResolversCacheMiddleware =
 			.getCachedResolvers( reducerKey );
 		Object.entries( resolvers ).forEach(
 			( [ selectorName, resolversByArgs ] ) => {
-				const resolver = get( registry.stores, [
-					reducerKey,
-					'resolvers',
-					selectorName,
-				] );
+				const resolver =
+					registry.stores?.[ reducerKey ]?.resolvers?.[
+						selectorName
+					];
 				if ( ! resolver || ! resolver.shouldInvalidate ) {
 					return;
 				}

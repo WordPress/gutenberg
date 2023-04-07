@@ -2,14 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
-	useSetting,
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
-	store as blockEditorStore,
 	Warning,
 } from '@wordpress/block-editor';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
@@ -39,16 +36,9 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 	);
 }
 
-function EditableContent( { layout, context = {} } ) {
+function EditableContent( { context = {} } ) {
 	const { postType, postId } = context;
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings()?.supportsLayout;
-	}, [] );
-	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = ! layout?.type
-		? { ...defaultLayout, ...layout, type: 'default' }
-		: { ...defaultLayout, ...layout };
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
@@ -61,7 +51,6 @@ function EditableContent( { layout, context = {} } ) {
 			value: blocks,
 			onInput,
 			onChange,
-			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 		}
 	);
 	return <div { ...props } />;
@@ -69,8 +58,12 @@ function EditableContent( { layout, context = {} } ) {
 
 function Content( props ) {
 	const { context: { queryId, postType, postId } = {} } = props;
-	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
+	if ( userCanEdit === undefined ) {
+		return null;
+	}
+
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 
 	return isEditable ? (
@@ -84,8 +77,8 @@ function Content( props ) {
 	);
 }
 
-function Placeholder() {
-	const blockProps = useBlockProps();
+function Placeholder( { layoutClassNames } ) {
+	const blockProps = useBlockProps( { className: layoutClassNames } );
 	return (
 		<div { ...blockProps }>
 			<p>
@@ -118,7 +111,11 @@ function RecursionError() {
 	);
 }
 
-export default function PostContentEdit( { context, attributes } ) {
+export default function PostContentEdit( {
+	context,
+	attributes,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
 	const { layout = {} } = attributes;
 	const hasAlreadyRendered = useHasRecursion( contextPostId );
@@ -132,7 +129,7 @@ export default function PostContentEdit( { context, attributes } ) {
 			{ contextPostId && contextPostType ? (
 				<Content context={ context } layout={ layout } />
 			) : (
-				<Placeholder />
+				<Placeholder layoutClassNames={ layoutClassNames } />
 			) }
 		</RecursionProvider>
 	);

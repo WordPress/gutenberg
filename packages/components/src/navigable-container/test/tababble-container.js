@@ -47,9 +47,7 @@ describe( 'TabbableContainer', () => {
 	} );
 
 	it( 'moves focus on its tabbable children by using the tab key', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onNavigateSpy = jest.fn();
 
@@ -78,9 +76,7 @@ describe( 'TabbableContainer', () => {
 	} );
 
 	it( 'should stop at the edges when the `cycle` prop is set to `false`', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onNavigateSpy = jest.fn();
 
@@ -139,9 +135,7 @@ describe( 'TabbableContainer', () => {
 	} );
 
 	it( 'stops keydown event propagation when the tab key is pressed', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const externalWrapperOnKeyDownSpy = jest.fn();
 

@@ -12,6 +12,7 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
@@ -38,6 +39,5 @@
 				"fontSize": true
 			}
 		}
-	},
-	"editorStyle": "wp-block-term-description-editor"
+	}
 }

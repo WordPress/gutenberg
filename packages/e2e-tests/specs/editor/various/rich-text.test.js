@@ -408,12 +408,16 @@ describe( 'RichText', () => {
 		await button.evaluate( ( element ) => element.scrollIntoView() );
 		await button.click();
 
-		// Tab to the "Text" tab.
+		// Wait for the popover with "Text" tab to appear.
+		await page.waitForXPath(
+			'//button[@role="tab"][@aria-selected="true"][text()="Text"]'
+		);
+		// Initial focus is on the "Text" tab.
+		// Tab to the "Custom color picker".
 		await page.keyboard.press( 'Tab' );
 		// Tab to black.
 		await page.keyboard.press( 'Tab' );
 		// Select color other than black.
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
@@ -511,11 +515,15 @@ describe( 'RichText', () => {
 		// text in the DOM directly, setting selection in the right place, and
 		// firing `compositionend`.
 		// See https://github.com/puppeteer/puppeteer/issues/4981.
-		await page.evaluate( () => {
+		await page.evaluate( async () => {
 			document.activeElement.textContent = '`a`';
 			const selection = window.getSelection();
+			// The `selectionchange` and `compositionend` events should run in separate event
+			// loop ticks to process all data store updates in time. Native events would be
+			// scheduled the same way.
 			selection.selectAllChildren( document.activeElement );
 			selection.collapseToEnd();
+			await new Promise( ( r ) => setTimeout( r, 0 ) );
 			document.activeElement.dispatchEvent(
 				new CompositionEvent( 'compositionend' )
 			);

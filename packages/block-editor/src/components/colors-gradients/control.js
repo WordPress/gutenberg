@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -45,7 +45,6 @@ function ColorGradientControlInner( {
 	gradients,
 	disableCustomColors,
 	disableCustomGradients,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 	className,
 	label,
@@ -56,6 +55,7 @@ function ColorGradientControlInner( {
 	clearable,
 	showTitle = true,
 	enableAlpha,
+	headingLevel,
 } ) {
 	const canChooseAColor =
 		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
@@ -80,14 +80,12 @@ function ColorGradientControlInner( {
 						: onColorChange
 				}
 				{ ...{ colors, disableCustomColors } }
-				__experimentalHasMultipleOrigins={
-					__experimentalHasMultipleOrigins
-				}
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
 				}
 				clearable={ clearable }
 				enableAlpha={ enableAlpha }
+				headingLevel={ headingLevel }
 			/>
 		),
 		[ TAB_GRADIENT.value ]: (
@@ -103,13 +101,11 @@ function ColorGradientControlInner( {
 						: onGradientChange
 				}
 				{ ...{ gradients, disableCustomGradients } }
-				__experimentalHasMultipleOrigins={
-					__experimentalHasMultipleOrigins
-				}
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
 				}
 				clearable={ clearable }
+				headingLevel={ headingLevel }
 			/>
 		),
 	};
@@ -180,7 +176,7 @@ function ColorGradientControlSelect( props ) {
 
 function ColorGradientControl( props ) {
 	if (
-		every( colorsAndGradientKeys, ( key ) => props.hasOwnProperty( key ) )
+		colorsAndGradientKeys.every( ( key ) => props.hasOwnProperty( key ) )
 	) {
 		return <ColorGradientControlInner { ...props } />;
 	}

@@ -6,7 +6,6 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
 import { useEffect, useRef } from '@wordpress/element';
 import {
 	BlockControls,
@@ -37,18 +36,9 @@ const sizeOptions = [
 	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
 
-const getDefaultBlockLayout = ( blockTypeOrName ) => {
-	const layoutBlockSupportConfig = getBlockSupport(
-		blockTypeOrName,
-		'__experimentalLayout'
-	);
-	return layoutBlockSupportConfig?.default;
-};
-
 export function SocialLinksEdit( props ) {
 	const {
 		clientId,
-		name,
 		attributes,
 		iconBackgroundColor,
 		iconColor,
@@ -65,9 +55,7 @@ export function SocialLinksEdit( props ) {
 		openInNewTab,
 		showLabels,
 		size,
-		layout,
 	} = attributes;
-	const usedLayout = layout || getDefaultBlockLayout( name );
 
 	const logosOnly = attributes.className?.includes( 'is-style-logos-only' );
 
@@ -121,8 +109,8 @@ export function SocialLinksEdit( props ) {
 		allowedBlocks: ALLOWED_BLOCKS,
 		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
+		orientation: attributes.layout?.orientation ?? 'horizontal',
 		__experimentalAppenderTagName: 'li',
-		__experimentalLayout: usedLayout,
 	} );
 
 	const POPOVER_PROPS = {
@@ -209,6 +197,7 @@ export function SocialLinksEdit( props ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Open links in new tab' ) }
 						checked={ openInNewTab }
 						onChange={ () =>
@@ -216,6 +205,7 @@ export function SocialLinksEdit( props ) {
 						}
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show labels' ) }
 						checked={ showLabels }
 						onChange={ () =>
@@ -224,12 +214,11 @@ export function SocialLinksEdit( props ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="color">
+			<InspectorControls group="color">
 				{ colorSettings.map(
 					( { onChange, label, value, resetAllFilter } ) => (
 						<ColorGradientSettingsDropdown
 							key={ `social-links-color-${ label }` }
-							__experimentalHasMultipleOrigins
 							__experimentalIsRenderedInSidebar
 							settings={ [
 								{

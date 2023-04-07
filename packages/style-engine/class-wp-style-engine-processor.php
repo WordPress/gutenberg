@@ -93,7 +93,7 @@ class WP_Style_Engine_Processor {
 	public function get_css( $options = array() ) {
 		$defaults = array(
 			'optimize' => true,
-			'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+			'prettify' => SCRIPT_DEBUG,
 		);
 		$options  = wp_parse_args( $options, $defaults );
 

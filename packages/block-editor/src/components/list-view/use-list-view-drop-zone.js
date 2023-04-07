@@ -11,7 +11,10 @@ import {
 /**
  * Internal dependencies
  */
-import { getDistanceToNearestEdge } from '../../utils/math';
+import {
+	getDistanceToNearestEdge,
+	isPointContainedByRect,
+} from '../../utils/math';
 import useOnBlockDrop from '../use-on-block-drop';
 import { store as blockEditorStore } from '../../store';
 
@@ -49,23 +52,6 @@ import { store as blockEditorStore } from '../../store';
  */
 
 /**
- * Is the point contained by the rectangle.
- *
- * @param {WPPoint} point The point.
- * @param {DOMRect} rect  The rectangle.
- *
- * @return {boolean} True if the point is contained by the rectangle, false otherwise.
- */
-function isPointContainedByRect( point, rect ) {
-	return (
-		rect.left <= point.x &&
-		rect.right >= point.x &&
-		rect.top <= point.y &&
-		rect.bottom >= point.y
-	);
-}
-
-/**
  * Determines whether the user positioning the dragged block to nest as an
  * inner block.
  *
@@ -90,7 +76,7 @@ const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
  * @param {WPListViewDropZoneBlocks} blocksData Data about the blocks in list view.
  * @param {WPPoint}                  position   The point representing the cursor position when dragging.
  *
- * @return {WPListViewDropZoneTarget} An object containing data about the drop target.
+ * @return {WPListViewDropZoneTarget | undefined} An object containing data about the drop target.
  */
 function getListViewDropTarget( blocksData, position ) {
 	let candidateEdge;
@@ -160,12 +146,15 @@ function getListViewDropTarget( blocksData, position ) {
 
 	// If the user is dragging towards the bottom of the block check whether
 	// they might be trying to nest the block as a child.
-	// If the block already has inner blocks, this should always be treated
+	// If the block already has inner blocks, and is expanded, this should be treated
 	// as nesting since the next block in the tree will be the first child.
+	// However, if the block is collapsed, dragging beneath the block should
+	// still be allowed, as the next visible block in the tree will be a sibling.
 	if (
 		isDraggingBelow &&
 		candidateBlockData.canInsertDraggedBlocksAsChild &&
-		( candidateBlockData.innerBlockCount > 0 ||
+		( ( candidateBlockData.innerBlockCount > 0 &&
+			candidateBlockData.isExpanded ) ||
 			isNestingGesture( position, candidateRect ) )
 	) {
 		return {
@@ -222,10 +211,12 @@ export default function useListViewDropZone() {
 
 				const blocksData = blockElements.map( ( blockElement ) => {
 					const clientId = blockElement.dataset.block;
+					const isExpanded = blockElement.dataset.expanded === 'true';
 					const rootClientId = getBlockRootClientId( clientId );
 
 					return {
 						clientId,
+						isExpanded,
 						rootClientId,
 						blockIndex: getBlockIndex( clientId ),
 						element: blockElement,

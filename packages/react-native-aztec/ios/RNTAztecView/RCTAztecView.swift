@@ -101,7 +101,7 @@ class RCTAztecView: Aztec.TextView {
     /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
     /// on `textViewDidChange` and `textViewDidChangeSelection`
     private var isInsertingDictationResult = false
-
+    
     // MARK: - Font
 
     /// Flag to enable using the defaultFont in Aztec for specific blocks

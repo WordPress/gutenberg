@@ -105,7 +105,7 @@ describe( 'New User Experience (NUX)', () => {
 		expect( welcomeGuide ).not.toBeNull();
 
 		// Close the guide
-		await page.click( 'button[aria-label="Close dialog"]' );
+		await page.click( '[role="dialog"] button[aria-label="Close"]' );
 
 		// Reload the editor.
 		await page.reload();
@@ -125,7 +125,7 @@ describe( 'New User Experience (NUX)', () => {
 		expect( welcomeGuide ).not.toBeNull();
 
 		// Close the guide.
-		await page.click( 'button[aria-label="Close dialog"]' );
+		await page.click( '[role="dialog"] button[aria-label="Close"]' );
 
 		// Focus should be in post title field.
 		const postTitle = await page.waitForSelector(

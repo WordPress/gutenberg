@@ -66,14 +66,14 @@ function render_block_core_search( $attributes ) {
 
 	if ( $show_input ) {
 		$input_classes = array( 'wp-block-search__input' );
-		if ( $is_button_inside ) {
+		if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
 			$input_classes[] = $border_color_classes;
 		}
 		if ( ! empty( $typography_classes ) ) {
 			$input_classes[] = $typography_classes;
 		}
 		$input_markup = sprintf(
-			'<input type="search" id="%s" class="wp-block-search__input %s" name="s" value="%s" placeholder="%s" %s required />',
+			'<input type="search" id="%s" class="%s" name="s" value="%s" placeholder="%s" %s required />',
 			$input_id,
 			esc_attr( implode( ' ', $input_classes ) ),
 			get_search_query(),
@@ -116,7 +116,7 @@ function render_block_core_search( $attributes ) {
 
 			$button_internal_markup =
 				'<svg class="search-icon" viewBox="0 0 24 24" width="24" height="24">
-					<path d="M13.5 6C10.5 6 8 8.5 8 11.5c0 1.1.3 2.1.9 3l-3.4 3 1 1.1 3.4-2.9c1 .9 2.2 1.4 3.6 1.4 3 0 5.5-2.5 5.5-5.5C19 8.5 16.5 6 13.5 6zm0 9.5c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"></path>
+					<path d="M13 5c-3.3 0-6 2.7-6 6 0 1.4.5 2.7 1.3 3.7l-3.8 3.8 1.1 1.1 3.8-3.8c1 .8 2.3 1.3 3.7 1.3 3.3 0 6-2.7 6-6S16.3 5 13 5zm0 10.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z"></path>
 				</svg>';
 		}
 
@@ -367,12 +367,12 @@ function styles_for_block_core_search( $attributes ) {
 	// Add color styles.
 	$has_text_color = ! empty( $attributes['style']['color']['text'] );
 	if ( $has_text_color ) {
-		$button_styles[] = sprintf( 'color: %s;', esc_attr( $attributes['style']['color']['text'] ) );
+		$button_styles[] = sprintf( 'color: %s;', $attributes['style']['color']['text'] );
 	}
 
 	$has_background_color = ! empty( $attributes['style']['color']['background'] );
 	if ( $has_background_color ) {
-		$button_styles[] = sprintf( 'background-color: %s;', esc_attr( $attributes['style']['color']['background'] ) );
+		$button_styles[] = sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
 	}
 
 	$has_custom_gradient = ! empty( $attributes['style']['color']['gradient'] );
@@ -381,7 +381,7 @@ function styles_for_block_core_search( $attributes ) {
 	}
 
 	// Get typography styles to be shared across inner elements.
-	$typography_styles = get_typography_styles_for_block_core_search( $attributes );
+	$typography_styles = esc_attr( get_typography_styles_for_block_core_search( $attributes ) );
 	if ( ! empty( $typography_styles ) ) {
 		$label_styles [] = $typography_styles;
 		$button_styles[] = $typography_styles;
@@ -399,9 +399,9 @@ function styles_for_block_core_search( $attributes ) {
 	}
 
 	return array(
-		'input'   => ! empty( $input_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $input_styles ) ) ) : '',
-		'button'  => ! empty( $button_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $button_styles ) ) ) : '',
-		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $wrapper_styles ) ) ) : '',
+		'input'   => ! empty( $input_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $input_styles ) ) ) ) : '',
+		'button'  => ! empty( $button_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $button_styles ) ) ) ) : '',
+		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $wrapper_styles ) ) ) ) : '',
 		'label'   => ! empty( $label_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $label_styles ) ) ) ) : '',
 	);
 }
@@ -442,31 +442,39 @@ function get_typography_styles_for_block_core_search( $attributes ) {
 
 	// Add typography styles.
 	if ( ! empty( $attributes['style']['typography']['fontSize'] ) ) {
-		$typography_styles[] = sprintf( 'font-size: %s;', esc_attr( $attributes['style']['typography']['fontSize'] ) );
+		$typography_styles[] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $attributes['style']['typography']['fontSize'],
+				)
+			)
+		);
+
 	}
 
 	if ( ! empty( $attributes['style']['typography']['fontFamily'] ) ) {
-		$typography_styles[] = sprintf( 'font-family: %s;', esc_attr( $attributes['style']['typography']['fontFamily'] ) );
+		$typography_styles[] = sprintf( 'font-family: %s;', $attributes['style']['typography']['fontFamily'] );
 	}
 
 	if ( ! empty( $attributes['style']['typography']['letterSpacing'] ) ) {
-		$typography_styles[] = sprintf( 'letter-spacing: %s;', esc_attr( $attributes['style']['typography']['letterSpacing'] ) );
+		$typography_styles[] = sprintf( 'letter-spacing: %s;', $attributes['style']['typography']['letterSpacing'] );
 	}
 
 	if ( ! empty( $attributes['style']['typography']['fontWeight'] ) ) {
-		$typography_styles[] = sprintf( 'font-weight: %s;', esc_attr( $attributes['style']['typography']['fontWeight'] ) );
+		$typography_styles[] = sprintf( 'font-weight: %s;', $attributes['style']['typography']['fontWeight'] );
 	}
 
 	if ( ! empty( $attributes['style']['typography']['fontStyle'] ) ) {
-		$typography_styles[] = sprintf( 'font-style: %s;', esc_attr( $attributes['style']['typography']['fontStyle'] ) );
+		$typography_styles[] = sprintf( 'font-style: %s;', $attributes['style']['typography']['fontStyle'] );
 	}
 
 	if ( ! empty( $attributes['style']['typography']['lineHeight'] ) ) {
-		$typography_styles[] = sprintf( 'line-height: %s;', esc_attr( $attributes['style']['typography']['lineHeight'] ) );
+		$typography_styles[] = sprintf( 'line-height: %s;', $attributes['style']['typography']['lineHeight'] );
 	}
 
 	if ( ! empty( $attributes['style']['typography']['textTransform'] ) ) {
-		$typography_styles[] = sprintf( 'text-transform: %s;', esc_attr( $attributes['style']['typography']['textTransform'] ) );
+		$typography_styles[] = sprintf( 'text-transform: %s;', $attributes['style']['typography']['textTransform'] );
 	}
 
 	return implode( '', $typography_styles );

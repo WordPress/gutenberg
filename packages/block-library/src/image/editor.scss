@@ -66,7 +66,10 @@ figure.wp-block-image:not(.wp-block) {
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
 .wp-block-image .components-resizable-box__container {
-	display: inline-block;
+	// Using "display: table" because:
+	// - it visually hides empty white space in between elements
+	// - it allows the element to be as wide as its contents (instead of 100% width, as it would be with `display: block`)
+	display: table;
 	img {
 		display: block;
 		width: inherit;
@@ -138,6 +141,7 @@ figure.wp-block-image:not(.wp-block) {
 	// smoother UX.
 	.reactEasyCrop_Container .reactEasyCrop_Image {
 		border: none;
+		border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
 	}
 }
 
@@ -157,17 +161,6 @@ figure.wp-block-image:not(.wp-block) {
 	.components-popover__content {
 		min-width: 260px;
 		overflow: visible !important;
-	}
-
-	.components-range-control {
-		flex: 1;
-	}
-
-	.components-base-control__field {
-		display: flex;
-		margin-bottom: 0;
-		flex-direction: column;
-		align-items: flex-start;
 	}
 }
 

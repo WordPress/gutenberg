@@ -3,6 +3,7 @@
  */
 import { useMemo } from '@wordpress/element';
 
+import { hasBlockSupport } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -20,11 +21,25 @@ import { BlockEditContextProvider, useBlockEditContext } from './context';
 export { useBlockEditContext };
 
 export default function BlockEdit( props ) {
-	const { name, isSelected, clientId } = props;
+	const {
+		name,
+		isSelected,
+		clientId,
+		attributes = {},
+		__unstableLayoutClassNames,
+	} = props;
+	const { layout = null } = attributes;
+	const layoutSupport = hasBlockSupport(
+		name,
+		'__experimentalLayout',
+		false
+	);
 	const context = {
 		name,
 		isSelected,
 		clientId,
+		layout: layoutSupport ? layout : null,
+		__unstableLayoutClassNames,
 	};
 	return (
 		<BlockEditContextProvider

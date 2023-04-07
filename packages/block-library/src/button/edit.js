@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -17,6 +17,7 @@ import {
 	Popover,
 } from '@wordpress/components';
 import {
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -31,6 +32,7 @@ import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
+import { prependHTTP } from '@wordpress/url';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
@@ -76,14 +78,8 @@ function ButtonEdit( props ) {
 		onReplace,
 		mergeBlocks,
 	} = props;
-	const { linkTarget, placeholder, rel, style, text, url, width } =
+	const { textAlign, linkTarget, placeholder, rel, style, text, url, width } =
 		attributes;
-	const onSetLinkRel = useCallback(
-		( value ) => {
-			setAttributes( { rel: value } );
-		},
-		[ setAttributes ]
-	);
 
 	function onToggleOpenInNewTab( value ) {
 		const newLinkTarget = value ? '_blank' : undefined;
@@ -176,6 +172,7 @@ function ButtonEdit( props ) {
 						colorProps.className,
 						borderProps.className,
 						{
+							[ `has-text-align-${ textAlign }` ]: textAlign,
 							// For backwards compatibility add style that isn't
 							// provided via block support.
 							'no-border-radius': style?.border?.radius === 0,
@@ -199,6 +196,12 @@ function ButtonEdit( props ) {
 				/>
 			</div>
 			<BlockControls group="block">
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
 				{ ! isURLSet && (
 					<ToolbarButton
 						name="link"
@@ -221,7 +224,7 @@ function ButtonEdit( props ) {
 			</BlockControls>
 			{ isSelected && ( isEditingURL || isURLSet ) && (
 				<Popover
-					position="bottom center"
+					placement="bottom"
 					onClose={ () => {
 						setIsEditingURL( false );
 						richTextRef.current?.focus();
@@ -238,7 +241,7 @@ function ButtonEdit( props ) {
 							url: newURL = '',
 							opensInNewTab: newOpensInNewTab,
 						} ) => {
-							setAttributes( { url: newURL } );
+							setAttributes( { url: prependHTTP( newURL ) } );
 
 							if ( opensInNewTab !== newOpensInNewTab ) {
 								onToggleOpenInNewTab( newOpensInNewTab );
@@ -258,11 +261,12 @@ function ButtonEdit( props ) {
 					setAttributes={ setAttributes }
 				/>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
-					onChange={ onSetLinkRel }
+					onChange={ ( newRel ) => setAttributes( { rel: newRel } ) }
 				/>
 			</InspectorControls>
 		</>

@@ -206,6 +206,7 @@ The settings section has the following structure:
 			"customFontSize": true,
 			"lineHeight": false,
 			"dropCap": true,
+			"fluid": false,
 			"fontStyle": true,
 			"fontWeight": true,
 			"letterSpacing": true,
@@ -256,6 +257,9 @@ The settings section has the following structure:
 			"text": true
 		},
 		"custom": {},
+		"dimensions": {
+			"minHeight": false,
+		},
 		"layout": {
 			"contentSize": "800px",
 			"wideSize": "1000px"
@@ -278,12 +282,14 @@ The settings section has the following structure:
 		"typography": {
 			"customFontSize": true,
 			"dropCap": true,
+			"fluid": false,
 			"fontFamilies": [],
 			"fontSizes": [],
 			"fontStyle": true,
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true
 		},
@@ -315,6 +321,8 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 
 - border: color, radius, style, width
 - color: link
+- dimensions: minHeight
+- position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
 
@@ -353,10 +361,10 @@ The following presets can be defined via `theme.json`:
     - `steps`: the number of steps to generate in the spacing scale. The default is 7. To prevent the generation of the spacing presets, and to disable the related UI, this can be set to `0`.
     - `mediumStep`: the steps in the scale are generated descending and ascending from a medium step, so this should be the size value of the medium space, without the unit. The default medium step is `1.5rem` so the mediumStep value is `1.5`.
     - `unit`: the unit the scale uses, eg. `px, rem, em, %`. The default is `rem`.
-- `spacing.spacingSizes`: themes can choose to include a static `spacing.spacingSizes` array of spacing preset sizes if they have a sequence of sizes that can't be generated via an increment or mulitplier. 
+- `spacing.spacingSizes`: themes can choose to include a static `spacing.spacingSizes` array of spacing preset sizes if they have a sequence of sizes that can't be generated via an increment or multiplier.
     - `name`: a human readable name for the size, eg. `Small, Medium, Large`.
     - `slug`: the machine readable name. In order to provide the best cross site/theme compatibility the slugs should be in the format, "10","20","30","40","50","60", with "50" representing the `Medium` size value.
-    - `size`: the size, including the unit, eg. `1.5rem`. It is possible to include fluid values like `clamp(2rem, 10vw, 20rem)`. 
+    - `size`: the size, including the unit, eg. `1.5rem`. It is possible to include fluid values like `clamp(2rem, 10vw, 20rem)`.
 - `typography.fontSizes`: generates a single class and custom property per preset value.
 - `typography.fontFamilies`: generates a single custom property per preset value.
 
@@ -790,6 +798,9 @@ Each block declares which style properties it exposes via the [block supports me
 			"gradient": "value",
 			"text": "value"
 		},
+		"dimensions": {
+			"minHeight": "value"
+		},
 		"filter": {
 			"duotone": "value"
 		},
@@ -815,6 +826,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"fontWeight": "value",
 			"letterSpacing": "value",
 			"lineHeight": "value",
+			"textColumns": "value",
 			"textDecoration": "value",
 			"textTransform": "value"
 		},
@@ -839,6 +851,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"core/group": {
 				"border": {},
 				"color": {},
+				"dimensions": {},
 				"spacing": {},
 				"typography": {},
 				"elements": {
@@ -1054,7 +1067,7 @@ h3 {
 
 ##### Element pseudo selectors
 
-Pseudo selectors `:hover`, `:focus`, `:visited` are supported by Gutenberg.
+Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
 
 ```json
 "elements": {
@@ -1309,4 +1322,4 @@ The value defined for the root `styles.spacing.blockGap` style is also output as
 
 ### Why does it take so long to update the styles in the browser?
 
-When you are actively developing with theme.json you may notice it takes 30+ seconds for your changes to show up in the browser, this is because `theme.json` is cached. To remove this caching issue, set either [`WP_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#wp_debug) or [`SCRIPT_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#script_debug) to 'true' in your [`wp-config.php`](https://wordpress.org/support/article/editing-wp-config-php/). This tells WordPress to skip the cache and always use fresh data.
+When you are actively developing with theme.json you may notice it takes 30+ seconds for your changes to show up in the browser, this is because `theme.json` is cached. To remove this caching issue, set either [`WP_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#wp_debug) or [`SCRIPT_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#script_debug) to 'true' in your [`wp-config.php`](https://wordpress.org/documentation/article/editing-wp-config-php/). This tells WordPress to skip the cache and always use fresh data.

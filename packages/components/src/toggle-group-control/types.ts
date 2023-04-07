@@ -9,7 +9,6 @@ import type { RadioStateReturn } from 'reakit';
  * Internal dependencies
  */
 import type { BaseControlProps } from '../base-control/types';
-import type { FormElementProps } from '../utils/types';
 
 export type ToggleGroupControlOptionBaseProps = {
 	children: ReactNode;
@@ -72,73 +71,87 @@ export type WithToolTipProps = {
 	showTooltip?: boolean;
 };
 
-export type ToggleGroupControlProps = Omit<
-	FormElementProps< any >,
-	'defaultValue'
-> &
-	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
-		/**
-		 * Label for the form element.
-		 */
-		label: string;
-		/**
-		 * If true, the label will only be visible to screen readers.
-		 *
-		 * @default false
-		 */
-		hideLabelFromVision?: boolean;
-		/**
-		 * Determines if segments should be rendered with equal widths.
-		 *
-		 * @default false
-		 */
-		isAdaptiveWidth?: boolean;
-		/**
-		 * Renders `ToggleGroupControl` as a (CSS) block element.
-		 *
-		 * @default false
-		 */
-		isBlock?: boolean;
-		/**
-		 * Borderless style that may be preferred in some contexts.
-		 *
-		 * @default false
-		 */
-		__experimentalIsBorderless?: boolean;
-		/**
-		 * Callback when a segment is selected.
-		 */
-		onChange?: ( value: ReactText | undefined ) => void;
-		/**
-		 * The value of `ToggleGroupControl`
-		 */
-		value?: ReactText;
-		/**
-		 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
-		 * `ToggleGroupControlOptionIcon` components.
-		 */
-		children: ReactNode;
-		/**
-		 * The size variant of the control.
-		 *
-		 * @default 'default'
-		 */
-		size?: 'default' | '__unstable-large';
-	};
+export type ToggleGroupControlProps = Pick<
+	BaseControlProps,
+	'help' | '__nextHasNoMarginBottom'
+> & {
+	/**
+	 * Label for the control.
+	 */
+	label: string;
+	/**
+	 * If true, the label will only be visible to screen readers.
+	 *
+	 * @default false
+	 */
+	hideLabelFromVision?: boolean;
+	/**
+	 * Determines if segments should be rendered with equal widths.
+	 *
+	 * @default false
+	 */
+	isAdaptiveWidth?: boolean;
+	/**
+	 * Renders `ToggleGroupControl` as a (CSS) block element, spanning the entire width of
+	 * the available space. This is the recommended style when the options are text-based and not icons.
+	 *
+	 * @default false
+	 */
+	isBlock?: boolean;
+	/**
+	 * Whether an option can be deselected by clicking it again.
+	 *
+	 * @default false
+	 */
+	isDeselectable?: boolean;
+	/**
+	 * Callback when a segment is selected.
+	 */
+	onChange?: ( value: ReactText | undefined ) => void;
+	/**
+	 * The selected value.
+	 */
+	value?: ReactText;
+	/**
+	 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
+	 * `ToggleGroupControlOptionIcon` components.
+	 */
+	children: ReactNode;
+	/**
+	 * The size variant of the control.
+	 *
+	 * @default 'default'
+	 */
+	size?: 'default' | '__unstable-large';
+};
 
-export type ToggleGroupControlContextProps = RadioStateReturn &
-	Pick< ToggleGroupControlProps, 'size' > & {
-		/**
-		 * Renders `ToggleGroupControl` as a (CSS) block element.
-		 *
-		 * @default false
-		 */
-		isBlock?: boolean;
-	};
+type ToggleGroupControlAsRadioContext = {
+	isDeselectable?: false;
+} & RadioStateReturn;
+
+type ToggleGroupControlAsButtonContext = { isDeselectable: true } & Pick<
+	RadioStateReturn,
+	'state' | 'setState'
+>;
+
+export type ToggleGroupControlContextProps = Pick<
+	ToggleGroupControlProps,
+	'isBlock' | 'size'
+> & {
+	baseId: string;
+} & ( ToggleGroupControlAsRadioContext | ToggleGroupControlAsButtonContext );
 
 export type ToggleGroupControlBackdropProps = {
 	containerRef: MutableRefObject< HTMLElement | undefined >;
 	containerWidth?: number | null;
 	isAdaptiveWidth?: boolean;
 	state?: any;
+};
+
+export type ToggleGroupControlMainControlProps = Pick<
+	ToggleGroupControlProps,
+	'children' | 'isAdaptiveWidth' | 'label' | 'size'
+> & {
+	onChange: ( value: ReactText | undefined ) => void;
+	value?: ReactText;
 };

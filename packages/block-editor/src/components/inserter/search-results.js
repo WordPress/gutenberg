@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { orderBy, isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo, useEffect } from '@wordpress/element';
@@ -25,6 +20,7 @@ import usePatternsState from './hooks/use-patterns-state';
 import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
 import InserterListbox from '../inserter-listbox';
+import { orderBy } from '../../utils/sorting';
 
 const INITIAL_INSERTER_RESULTS = 9;
 /**
@@ -49,6 +45,8 @@ function InserterSearchResults( {
 	isDraggable = true,
 	shouldFocusBlock = true,
 	prioritizePatterns,
+	selectBlockOnInsert,
+	orderInitialBlockItems,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -59,6 +57,7 @@ function InserterSearchResults( {
 		isAppender,
 		insertionIndex: __experimentalInsertionIndex,
 		shouldFocusBlock,
+		selectBlockOnInsert,
 	} );
 	const [
 		blockTypes,
@@ -90,8 +89,12 @@ function InserterSearchResults( {
 		if ( maxBlockTypesToShow === 0 ) {
 			return [];
 		}
+		let orderedItems = orderBy( blockTypes, 'frecency', 'desc' );
+		if ( ! filterValue && orderInitialBlockItems ) {
+			orderedItems = orderInitialBlockItems( orderedItems );
+		}
 		const results = searchBlockItems(
-			orderBy( blockTypes, [ 'frecency' ], [ 'desc' ] ),
+			orderedItems,
 			blockTypeCategories,
 			blockTypeCollections,
 			filterValue
@@ -106,6 +109,7 @@ function InserterSearchResults( {
 		blockTypeCategories,
 		blockTypeCollections,
 		maxBlockTypes,
+		orderInitialBlockItems,
 	] );
 
 	// Announce search results on change.
@@ -132,7 +136,7 @@ function InserterSearchResults( {
 	);
 
 	const hasItems =
-		! isEmpty( filteredBlockTypes ) || ! isEmpty( filteredBlockPatterns );
+		filteredBlockTypes.length > 0 || filteredBlockPatterns.length > 0;
 
 	const blocksUI = !! filteredBlockTypes.length && (
 		<InserterPanel
@@ -159,6 +163,7 @@ function InserterSearchResults( {
 					shownPatterns={ currentShownPatterns }
 					blockPatterns={ filteredBlockPatterns }
 					onClickPattern={ onSelectBlockPattern }
+					onHover={ onHover }
 					isDraggable={ isDraggable }
 				/>
 			</div>

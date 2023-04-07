@@ -19,6 +19,8 @@ import {
 	serializeRawBlock,
 	switchToBlockType,
 	store as blocksStore,
+	getDefaultBlockName,
+	isUnmodifiedBlock,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import {
@@ -40,7 +42,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
-
+import { useLayout } from './layout';
 export const BlockListBlockContext = createContext();
 
 /**
@@ -84,6 +86,7 @@ function BlockListBlock( {
 	isSelected,
 	isSelectionEnabled,
 	className,
+	__unstableLayoutClassNames: layoutClassNames,
 	name,
 	isValid,
 	attributes,
@@ -129,6 +132,8 @@ function BlockListBlock( {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
+	const parentLayout = useLayout() || {};
+
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
 	// (InspectorControls, etc.) which are inside `BlockEdit` but not
@@ -146,6 +151,10 @@ function BlockListBlock( {
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
+			__unstableLayoutClassNames={ layoutClassNames }
+			__unstableParentLayout={
+				Object.keys( parentLayout ).length ? parentLayout : undefined
+			}
 		/>
 	);
 
@@ -296,7 +305,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	};
 } );
 
-const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
+const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 	const {
 		updateBlockAttributes,
 		insertBlocks,
@@ -304,6 +313,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		replaceBlocks,
 		toggleSelection,
 		__unstableMarkLastChangeAsPersistent,
+		moveBlocksToPosition,
+		removeBlock,
 	} = dispatch( blockEditorStore );
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
@@ -311,7 +322,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	return {
 		setAttributes( newAttributes ) {
 			const { getMultiSelectedBlockClientIds } =
-				select( blockEditorStore );
+				registry.select( blockEditorStore );
 			const multiSelectedBlockClientIds =
 				getMultiSelectedBlockClientIds();
 			const { clientId } = ownProps;
@@ -327,35 +338,181 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
-			const { getBlockIndex } = select( blockEditorStore );
+			const { getBlockIndex } = registry.select( blockEditorStore );
 			const index = getBlockIndex( clientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
 			const { clientId, rootClientId } = ownProps;
-			const { getPreviousBlockClientId, getNextBlockClientId, getBlock } =
-				select( blockEditorStore );
+			const {
+				getPreviousBlockClientId,
+				getNextBlockClientId,
+				getBlock,
+				getBlockAttributes,
+				getBlockName,
+				getBlockOrder,
+				getBlockIndex,
+				getBlockRootClientId,
+				canInsertBlockType,
+			} = registry.select( blockEditorStore );
 
+			/**
+			 * Moves the block with clientId up one level. If the block type
+			 * cannot be inserted at the new location, it will be attempted to
+			 * convert to the default block type.
+			 *
+			 * @param {string}  _clientId       The block to move.
+			 * @param {boolean} changeSelection Whether to change the selection
+			 *                                  to the moved block.
+			 */
+			function moveFirstItemUp( _clientId, changeSelection = true ) {
+				const targetRootClientId = getBlockRootClientId( _clientId );
+				const blockOrder = getBlockOrder( _clientId );
+				const [ firstClientId ] = blockOrder;
+
+				if (
+					blockOrder.length === 1 &&
+					isUnmodifiedBlock( getBlock( firstClientId ) )
+				) {
+					removeBlock( _clientId );
+				} else {
+					if (
+						canInsertBlockType(
+							getBlockName( firstClientId ),
+							targetRootClientId
+						)
+					) {
+						moveBlocksToPosition(
+							[ firstClientId ],
+							_clientId,
+							targetRootClientId,
+							getBlockIndex( _clientId )
+						);
+					} else {
+						const replacement = switchToBlockType(
+							getBlock( firstClientId ),
+							getDefaultBlockName()
+						);
+
+						if ( replacement && replacement.length ) {
+							registry.batch( () => {
+								insertBlocks(
+									replacement,
+									getBlockIndex( _clientId ),
+									targetRootClientId,
+									changeSelection
+								);
+								removeBlock( firstClientId, false );
+							} );
+						}
+					}
+
+					if (
+						! getBlockOrder( _clientId ).length &&
+						isUnmodifiedBlock( getBlock( _clientId ) )
+					) {
+						removeBlock( _clientId, false );
+					}
+				}
+			}
+
+			// For `Delete` or forward merge, we should do the exact same thing
+			// as `Backspace`, but from the other block.
 			if ( forward ) {
+				if ( rootClientId ) {
+					const nextRootClientId =
+						getNextBlockClientId( rootClientId );
+
+					if ( nextRootClientId ) {
+						// If there is a block that follows with the same parent
+						// block name and the same attributes, merge the inner
+						// blocks.
+						if (
+							getBlockName( rootClientId ) ===
+							getBlockName( nextRootClientId )
+						) {
+							const rootAttributes =
+								getBlockAttributes( rootClientId );
+							const previousRootAttributes =
+								getBlockAttributes( nextRootClientId );
+
+							if (
+								Object.keys( rootAttributes ).every(
+									( key ) =>
+										rootAttributes[ key ] ===
+										previousRootAttributes[ key ]
+								)
+							) {
+								registry.batch( () => {
+									moveBlocksToPosition(
+										getBlockOrder( nextRootClientId ),
+										nextRootClientId,
+										rootClientId
+									);
+									removeBlock( nextRootClientId, false );
+								} );
+								return;
+							}
+						} else {
+							mergeBlocks( rootClientId, nextRootClientId );
+							return;
+						}
+					}
+				}
+
 				const nextBlockClientId = getNextBlockClientId( clientId );
-				if ( nextBlockClientId ) {
+
+				if ( ! nextBlockClientId ) {
+					return;
+				}
+
+				if ( getBlockOrder( nextBlockClientId ).length ) {
+					moveFirstItemUp( nextBlockClientId, false );
+				} else {
 					mergeBlocks( clientId, nextBlockClientId );
 				}
 			} else {
 				const previousBlockClientId =
 					getPreviousBlockClientId( clientId );
+
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
 				} else if ( rootClientId ) {
-					// Attempt to "unwrap" the block contents when there's no
-					// preceding block to merge with.
-					const replacement = switchToBlockType(
-						getBlock( rootClientId ),
-						'*'
-					);
-					if ( replacement && replacement.length ) {
-						replaceBlocks( rootClientId, replacement, 0 );
+					const previousRootClientId =
+						getPreviousBlockClientId( rootClientId );
+
+					// If there is a preceding block with the same parent block
+					// name and the same attributes, merge the inner blocks.
+					if (
+						previousRootClientId &&
+						getBlockName( rootClientId ) ===
+							getBlockName( previousRootClientId )
+					) {
+						const rootAttributes =
+							getBlockAttributes( rootClientId );
+						const previousRootAttributes =
+							getBlockAttributes( previousRootClientId );
+
+						if (
+							Object.keys( rootAttributes ).every(
+								( key ) =>
+									rootAttributes[ key ] ===
+									previousRootAttributes[ key ]
+							)
+						) {
+							registry.batch( () => {
+								moveBlocksToPosition(
+									getBlockOrder( rootClientId ),
+									rootClientId,
+									previousRootClientId
+								);
+								removeBlock( rootClientId, false );
+							} );
+							return;
+						}
 					}
+
+					moveFirstItemUp( rootClientId );
 				}
 			}
 		},

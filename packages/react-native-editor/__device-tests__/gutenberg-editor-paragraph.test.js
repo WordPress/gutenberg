@@ -35,8 +35,8 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` )
 		);
 
-		await editorPage.removeBlockAtPosition( blockNames.paragraph, 2 );
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
+		await editorPage.removeBlock();
+		await editorPage.removeBlock();
 	} );
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
@@ -72,8 +72,13 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( text );
+		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph,
+			1
+		);
+		await paragraphBlockElement.click();
 		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 1 );
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
+		await editorPage.removeBlock();
 	} );
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
@@ -81,7 +86,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 
 		for ( let i = 3; i > 0; i-- ) {
-			await editorPage.removeBlockAtPosition( blockNames.paragraph, i );
+			await editorPage.removeBlock();
 		}
 	} );
 
@@ -116,7 +121,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( mergedBlockText );
 
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
+		await editorPage.removeBlock();
 	} );
 
 	// Based on https://github.com/wordpress-mobile/gutenberg-mobile/pull/1507
@@ -145,6 +150,6 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
+		await editorPage.removeBlock();
 	} );
 } );

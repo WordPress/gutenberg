@@ -36,6 +36,7 @@ function PatternsExplorerSearch( { filterValue, setFilterValue } ) {
 	return (
 		<div className={ baseClassName }>
 			<SearchControl
+				__nextHasNoMarginBottom
 				onChange={ setFilterValue }
 				value={ filterValue }
 				label={ __( 'Search for patterns' ) }

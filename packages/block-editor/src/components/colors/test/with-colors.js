@@ -42,9 +42,7 @@ describe( 'createCustomColorsHOC', () => {
 	} );
 
 	it( 'setting the color to a value in the provided custom color array updated the backgroundColor attribute', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );
@@ -74,9 +72,7 @@ describe( 'createCustomColorsHOC', () => {
 	} );
 
 	it( 'setting the color to a value not in the provided custom color array updates customBackgroundColor attribute', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );

@@ -150,118 +150,117 @@ const MyModal = () => {
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input elements.
 
-#### title
+#### `aria.describedby`: `string`
 
-This property is used as the modal header's title.
+If this property is added, it will be added to the modal content `div` as `aria-describedby`.
 
-Titles are required for accessibility reasons, see `aria.labelledby` and `contentLabel` for other ways to provide a title.
-
--   Type: `String`
 -   Required: No
 
-#### onRequestClose
-
-This function is called to indicate that the modal should be closed.
-
--   Type: `function`
--   Required: Yes
-
-#### contentLabel
-
-If this property is added, it will be added to the modal content `div` as `aria-label`.
-
-Titles are required for accessibility reasons, see `aria.labelledby` and `title` for other ways to provide a title.
-
--   Type: `String`
--   Required: No
-
-#### aria.labelledby
+#### `aria.labelledby`: `string`
 
 If this property is added, it will be added to the modal content `div` as `aria-labelledby`.
 Use this when you are rendering the title yourself within the modal's content area instead of using the `title` prop. This ensures the title is usable by assistive technology.
 
 Titles are required for accessibility reasons, see `contentLabel` and `title` for other ways to provide a title.
 
--   Type: `String`
 -   Required: No
 -   Default: if the `title` prop is provided, this will default to the id of the element that renders `title`
 
-#### aria.describedby
+#### `bodyOpenClassName`: `string`
 
-If this property is added, it will be added to the modal content `div` as `aria-describedby`.
+Class name added to the body element when the modal is open.
 
--   Type: `String`
 -   Required: No
+-   Default: `modal-open`
 
-#### focusOnMount
-
-If this property is true, it will focus the first tabbable element rendered in the modal.
-
--   Type: `boolean`
--   Required: No
--   Default: true
-
-#### shouldCloseOnEsc
-
-If this property is added, it will determine whether the modal requests to close when the escape key is pressed.
-
--   Type: `boolean`
--   Required: No
--   Default: true
-
-#### shouldCloseOnClickOutside
-
-If this property is added, it will determine whether the modal requests to close when a mouse click occurs outside of the modal content.
-
--   Type: `boolean`
--   Required: No
--   Default: true
-
-#### isDismissible
-
-If this property is set to false, the modal will not display a close icon and cannot be dismissed.
-
--   Type: `boolean`
--   Required: No
--   Default: true
-
-#### className
+#### `className`: `string`
 
 If this property is added, it will an additional class name to the modal content `div`.
 
--   Type: `String`
 -   Required: No
 
-#### role
+#### `contentLabel`: `string`
 
-If this property is added, it will override the default role of the modal.
+If this property is added, it will be added to the modal content `div` as `aria-label`.
 
--   Type: `String`
--   Required: No
--   Default: `dialog`
+Titles are required for accessibility reasons, see `aria.labelledby` and `title` for other ways to provide a title.
 
-#### overlayClassName
-
-If this property is added, it will an additional class name to the modal overlay `div`.
-
--   Type: `String`
 -   Required: No
 
-#### isFullScreen
+#### `focusOnMount`: `boolean | 'firstElement'`
+
+If this property is true, it will focus the first tabbable element rendered in the modal.
+
+-   Required: No
+-   Default: `true`
+
+#### `isDismissible`: `boolean`
+
+If this property is set to false, the modal will not display a close icon and cannot be dismissed.
+
+-   Required: No
+-   Default: `true`
+
+#### `isFullScreen`: `boolean`
 
 This property when set to `true` will render a full screen modal.
 
--   Type: `boolean`
 -   Required: No
 -   Default: `false`
 
-#### __experimentalHideHeader
+#### `onRequestClose`: ``
+
+This function is called to indicate that the modal should be closed.
+
+-   Required: Yes
+
+#### `overlayClassName`: `string`
+
+If this property is added, it will an additional class name to the modal overlay `div`.
+
+-   Required: No
+
+#### `role`: `AriaRole`
+
+If this property is added, it will override the default role of the modal.
+
+-   Required: No
+-   Default: `dialog`
+
+#### `shouldCloseOnClickOutside`: `boolean`
+
+If this property is added, it will determine whether the modal requests to close when a mouse click occurs outside of the modal content.
+
+-   Required: No
+-   Default: `true`
+
+#### `shouldCloseOnEsc`: `boolean`
+
+If this property is added, it will determine whether the modal requests to close when the escape key is pressed.
+
+-   Required: No
+-   Default: `true`
+
+#### `style`: `CSSProperties`
+
+If this property is added, it will be added to the modal frame `div`.
+
+-   Required: No
+
+#### `title`: `string`
+
+This property is used as the modal header's title.
+
+Titles are required for accessibility reasons, see `aria.labelledby` and `contentLabel` for other ways to provide a title.
+
+-   Required: No
+
+#### `__experimentalHideHeader`: `boolean`
 
 When set to `true`, the Modal's header (including the icon, title and close button) will not be rendered.
 
-*Warning*: This property is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+_Warning_: This property is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 
--   Type: `boolean`
 -   Required: No
 -   Default: `false`
 

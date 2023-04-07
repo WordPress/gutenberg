@@ -12,6 +12,7 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { FlexBlock } from '../flex';
 import FormToggle from '../form-toggle';
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
@@ -64,8 +65,19 @@ export function ToggleControl( {
 
 	let describedBy, helpLabel;
 	if ( help ) {
-		describedBy = id + '__help';
-		helpLabel = typeof help === 'function' ? help( checked ) : help;
+		if ( typeof help === 'function' ) {
+			// `help` as a function works only for controlled components where
+			// `checked` is passed down from parent component. Uncontrolled
+			// component can show only a static help label.
+			if ( checked !== undefined ) {
+				helpLabel = help( checked );
+			}
+		} else {
+			helpLabel = help;
+		}
+		if ( helpLabel ) {
+			describedBy = id + '__help';
+		}
 	}
 
 	return (
@@ -83,12 +95,13 @@ export function ToggleControl( {
 					aria-describedby={ describedBy }
 					disabled={ disabled }
 				/>
-				<label
+				<FlexBlock
+					as="label"
 					htmlFor={ id }
 					className="components-toggle-control__label"
 				>
 					{ label }
-				</label>
+				</FlexBlock>
 			</HStack>
 		</BaseControl>
 	);

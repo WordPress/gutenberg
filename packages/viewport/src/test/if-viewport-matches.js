@@ -40,6 +40,6 @@ describe( 'ifViewportMatches()', () => {
 
 		expect( useViewportMatch ).toHaveBeenCalledWith( 'wide', '>=' );
 
-		expect( screen.queryByText( 'Hello' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Hello' ) ).toBeInTheDocument();
 	} );
 } );

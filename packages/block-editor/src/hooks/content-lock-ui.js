@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarButton, MenuItem } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
@@ -12,7 +12,7 @@ import { useEffect, useRef, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
-import { BlockControls } from '../components';
+import { BlockControls, BlockSettingsMenuControls } from '../components';
 /**
  * External dependencies
  */
@@ -104,42 +104,58 @@ export const withBlockControls = createHigherOrderComponent(
 			return <BlockEdit { ...props } />;
 		}
 
+		const showStopEditingAsBlocks = isEditingAsBlocks && ! isContentLocked;
+		const showStartEditingAsBlocks =
+			! isEditingAsBlocks && isContentLocked && props.isSelected;
+
 		return (
 			<>
-				{ isEditingAsBlocks && ! isContentLocked && (
-					<StopEditingAsBlocksOnOutsideSelect
-						clientId={ props.clientId }
-						stopEditingAsBlock={ stopEditingAsBlock }
-					/>
+				{ showStopEditingAsBlocks && (
+					<>
+						<StopEditingAsBlocksOnOutsideSelect
+							clientId={ props.clientId }
+							stopEditingAsBlock={ stopEditingAsBlock }
+						/>
+						<BlockControls group="other">
+							<ToolbarButton
+								onClick={ () => {
+									stopEditingAsBlock();
+								} }
+							>
+								{ __( 'Done' ) }
+							</ToolbarButton>
+						</BlockControls>
+					</>
 				) }
-				<BlockControls group="other">
-					<ToolbarButton
-						onClick={ () => {
-							if ( isEditingAsBlocks && ! isContentLocked ) {
-								stopEditingAsBlock();
-							} else {
-								__unstableMarkNextChangeAsNotPersistent();
-								updateBlockAttributes( props.clientId, {
-									templateLock: undefined,
-								} );
-								updateBlockListSettings( props.clientId, {
-									...getBlockListSettings( props.clientId ),
-									templateLock: false,
-								} );
-								focusModeToRevert.current =
-									getSettings().focusMode;
-								updateSettings( { focusMode: true } );
-								__unstableSetTemporarilyEditingAsBlocks(
-									props.clientId
-								);
-							}
-						} }
-					>
-						{ isEditingAsBlocks && ! isContentLocked
-							? __( 'Done' )
-							: __( 'Modify' ) }
-					</ToolbarButton>
-				</BlockControls>
+				{ showStartEditingAsBlocks && (
+					<BlockSettingsMenuControls>
+						{ ( { onClose } ) => (
+							<MenuItem
+								onClick={ () => {
+									__unstableMarkNextChangeAsNotPersistent();
+									updateBlockAttributes( props.clientId, {
+										templateLock: undefined,
+									} );
+									updateBlockListSettings( props.clientId, {
+										...getBlockListSettings(
+											props.clientId
+										),
+										templateLock: false,
+									} );
+									focusModeToRevert.current =
+										getSettings().focusMode;
+									updateSettings( { focusMode: true } );
+									__unstableSetTemporarilyEditingAsBlocks(
+										props.clientId
+									);
+									onClose();
+								} }
+							>
+								{ __( 'Modify' ) }
+							</MenuItem>
+						) }
+					</BlockSettingsMenuControls>
+				) }
 				<BlockEdit
 					{ ...props }
 					className={ classnames(
@@ -156,6 +172,6 @@ export const withBlockControls = createHigherOrderComponent(
 
 addFilter(
 	'editor.BlockEdit',
-	'core/style/with-block-controls',
+	'core/content-lock-ui/with-block-controls',
 	withBlockControls
 );

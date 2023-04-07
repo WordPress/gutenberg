@@ -5,19 +5,19 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -10,11 +10,11 @@
-      class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
-      style="transform: scale(0.4444444444444444);"
-    >
-      <div
-        class="css-tada40-BarsView e1s9yo7h0"
--       style="color: blue;"
-+       style="color: rgb(30, 30, 30);"
+@@ -11,11 +11,11 @@
+        class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
+        style="transform: scale(0.4444444444444444);"
       >
         <div
-          class="InnerBar1"
-        />
-        <div
+          class="css-tada40-BarsView e1s9yo7h0"
+-         style="color: blue;"
++         style="color: rgb(30, 30, 30);"
+        >
+          <div
+            class="InnerBar1"
+          />
+          <div
 `;
 
 exports[`props should render correctly 1`] = `
@@ -179,58 +179,60 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 330deg ) translate( 0, -130% );
 }
 
-<div
-  aria-busy="true"
-  class="components-spinner emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="Spinner"
-  style="height: 16px; width: 16px;"
->
+<div>
   <div
-    aria-hidden="true"
-    class="emotion-2 emotion-3"
-    style="transform: scale(0.4444444444444444);"
+    aria-busy="true"
+    class="components-spinner emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="Spinner"
+    style="height: 16px; width: 16px;"
   >
     <div
-      class="emotion-4 emotion-5"
-      style="color: rgb(30, 30, 30);"
+      aria-hidden="true"
+      class="emotion-2 emotion-3"
+      style="transform: scale(0.4444444444444444);"
     >
       <div
-        class="InnerBar1"
-      />
-      <div
-        class="InnerBar2"
-      />
-      <div
-        class="InnerBar3"
-      />
-      <div
-        class="InnerBar4"
-      />
-      <div
-        class="InnerBar5"
-      />
-      <div
-        class="InnerBar6"
-      />
-      <div
-        class="InnerBar7"
-      />
-      <div
-        class="InnerBar8"
-      />
-      <div
-        class="InnerBar9"
-      />
-      <div
-        class="InnerBar10"
-      />
-      <div
-        class="InnerBar11"
-      />
-      <div
-        class="InnerBar12"
-      />
+        class="emotion-4 emotion-5"
+        style="color: rgb(30, 30, 30);"
+      >
+        <div
+          class="InnerBar1"
+        />
+        <div
+          class="InnerBar2"
+        />
+        <div
+          class="InnerBar3"
+        />
+        <div
+          class="InnerBar4"
+        />
+        <div
+          class="InnerBar5"
+        />
+        <div
+          class="InnerBar6"
+        />
+        <div
+          class="InnerBar7"
+        />
+        <div
+          class="InnerBar8"
+        />
+        <div
+          class="InnerBar9"
+        />
+        <div
+          class="InnerBar10"
+        />
+        <div
+          class="InnerBar11"
+        />
+        <div
+          class="InnerBar12"
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -241,23 +243,23 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -1,16 +1,16 @@
-  <div
-    aria-busy="true"
-    class="components-spinner css-14ywscc-ContainerView e1s9yo7h2"
-    data-wp-c16t="true"
-    data-wp-component="Spinner"
--   style="height: 31px; width: 31px;"
-+   style="height: 16px; width: 16px;"
-  >
+@@ -2,16 +2,16 @@
     <div
-      aria-hidden="true"
-      class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
--     style="transform: scale(0.8611111111111112);"
-+     style="transform: scale(0.4444444444444444);"
+      aria-busy="true"
+      class="components-spinner css-14ywscc-ContainerView e1s9yo7h2"
+      data-wp-c16t="true"
+      data-wp-component="Spinner"
+-     style="height: 31px; width: 31px;"
++     style="height: 16px; width: 16px;"
     >
       <div
-        class="css-tada40-BarsView e1s9yo7h0"
-        style="color: rgb(30, 30, 30);"
+        aria-hidden="true"
+        class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
+-       style="transform: scale(0.8611111111111112);"
++       style="transform: scale(0.4444444444444444);"
       >
+        <div
+          class="css-tada40-BarsView e1s9yo7h0"
+          style="color: rgb(30, 30, 30);"
+        >
 `;

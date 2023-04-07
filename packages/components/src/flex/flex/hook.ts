@@ -40,7 +40,7 @@ function useDeprecatedProps(
 
 export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 	const {
-		align = 'center',
+		align,
 		className,
 		direction: directionProp = 'row',
 		expanded = true,
@@ -57,14 +57,12 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 
 	const isColumn =
 		typeof direction === 'string' && !! direction.includes( 'column' );
-	const isReverse =
-		typeof direction === 'string' && direction.includes( 'reverse' );
 
 	const cx = useCx();
 
 	const classes = useMemo( () => {
 		const base = css( {
-			alignItems: isColumn ? 'normal' : align,
+			alignItems: align ?? ( isColumn ? 'normal' : 'center' ),
 			flexDirection: direction,
 			flexWrap: wrap ? 'wrap' : undefined,
 			gap: space( gap ),
@@ -87,7 +85,6 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 		expanded,
 		gap,
 		isColumn,
-		isReverse,
 		justify,
 		wrap,
 	] );

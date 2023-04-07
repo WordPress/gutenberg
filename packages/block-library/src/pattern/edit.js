@@ -26,10 +26,17 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	// It will continue to pull from the pattern file unless changes are made to its respective template part.
 	useEffect( () => {
 		if ( selectedPattern?.blocks ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceBlocks( clientId, selectedPattern.blocks );
+			// We batch updates to block list settings to avoid triggering cascading renders
+			// for each container block included in a tree and optimize initial render.
+			// Since the above uses microtasks, we need to use a microtask here as well,
+			// because nested pattern blocks cannot be inserted if the parent block supports
+			// inner blocks but doesn't have blockSettings in the state.
+			window.queueMicrotask( () => {
+				__unstableMarkNextChangeAsNotPersistent();
+				replaceBlocks( clientId, selectedPattern.blocks );
+			} );
 		}
-	}, [ selectedPattern?.blocks ] );
+	}, [ clientId, selectedPattern?.blocks ] );
 
 	const props = useBlockProps();
 

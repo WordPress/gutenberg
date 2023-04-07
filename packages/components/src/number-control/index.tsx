@@ -2,23 +2,30 @@
  * External dependencies
  */
 import classNames from 'classnames';
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
-import { isRTL } from '@wordpress/i18n';
+import { useRef, forwardRef } from '@wordpress/element';
+import { isRTL, __ } from '@wordpress/i18n';
+import { plus as plusIcon, reset as resetIcon } from '@wordpress/icons';
+import { useMergeRefs } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import { Input } from './styles/number-control-styles';
+import { Input, SpinButton } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { add, subtract, roundClamp } from '../utils/math';
 import { ensureNumber, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { NumberControlProps } from './types';
+import { HStack } from '../h-stack';
+import { Spacer } from '../spacer';
+
+const noop = () => {};
 
 function UnforwardedNumberControl(
 	{
@@ -26,6 +33,7 @@ function UnforwardedNumberControl(
 		className,
 		dragDirection = 'n',
 		hideHTMLArrows = false,
+		spinControls = 'native',
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
 		label,
@@ -36,10 +44,25 @@ function UnforwardedNumberControl(
 		step = 1,
 		type: typeProp = 'number',
 		value: valueProp,
+		size = 'default',
+		suffix,
+		onChange = noop,
 		...props
 	}: WordPressComponentProps< NumberControlProps, 'input', false >,
-	ref: ForwardedRef< any >
+	forwardedRef: ForwardedRef< any >
 ) {
+	if ( hideHTMLArrows ) {
+		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {
+			alternative: 'spinControls="none"',
+			since: '6.2',
+			version: '6.3',
+		} );
+		spinControls = 'none';
+	}
+
+	const inputRef = useRef< HTMLInputElement >();
+	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
+
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
@@ -55,6 +78,23 @@ function UnforwardedNumberControl(
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
 	const classes = classNames( 'components-number-control', className );
+
+	const spinValue = (
+		value: string | number | undefined,
+		direction: 'up' | 'down',
+		event: KeyboardEvent | MouseEvent | undefined
+	) => {
+		event?.preventDefault();
+		const shift = event?.shiftKey && isShiftStepEnabled;
+		const delta = shift ? ensureNumber( shiftStep ) * baseStep : baseStep;
+		let nextValue = isValueEmpty( value ) ? baseValue : value;
+		if ( direction === 'up' ) {
+			nextValue = add( nextValue, delta );
+		} else if ( direction === 'down' ) {
+			nextValue = subtract( nextValue, delta );
+		}
+		return constrainValue( nextValue, shift ? delta : undefined );
+	};
 
 	/**
 	 * "Middleware" function that intercepts updates from InputControl.
@@ -78,33 +118,11 @@ function UnforwardedNumberControl(
 				type === inputControlActionTypes.PRESS_UP ||
 				type === inputControlActionTypes.PRESS_DOWN
 			) {
-				const enableShift =
-					( event as KeyboardEvent | undefined )?.shiftKey &&
-					isShiftStepEnabled;
-
-				const incrementalValue = enableShift
-					? ensureNumber( shiftStep ) * baseStep
-					: baseStep;
-				let nextValue = isValueEmpty( currentValue )
-					? baseValue
-					: currentValue;
-
-				if ( event?.preventDefault ) {
-					event.preventDefault();
-				}
-
-				if ( type === inputControlActionTypes.PRESS_UP ) {
-					nextValue = add( nextValue, incrementalValue );
-				}
-
-				if ( type === inputControlActionTypes.PRESS_DOWN ) {
-					nextValue = subtract( nextValue, incrementalValue );
-				}
-
 				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
-				nextState.value = constrainValue(
-					nextValue,
-					enableShift ? incrementalValue : undefined
+				nextState.value = spinValue(
+					currentValue,
+					type === inputControlActionTypes.PRESS_UP ? 'up' : 'down',
+					event as KeyboardEvent | undefined
 				);
 			}
 
@@ -112,9 +130,7 @@ function UnforwardedNumberControl(
 			 * Handles drag to update events
 			 */
 			if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
-				// @ts-expect-error TODO: See if reducer actions can be typed better
 				const [ x, y ] = payload.delta;
-				// @ts-expect-error TODO: See if reducer actions can be typed better
 				const enableShift = payload.shiftKey && isShiftStepEnabled;
 				const modifier = enableShift
 					? ensureNumber( shiftStep ) * baseStep
@@ -178,6 +194,18 @@ function UnforwardedNumberControl(
 			return nextState;
 		};
 
+	const buildSpinButtonClickHandler =
+		( direction: 'up' | 'down' ) =>
+		( event: MouseEvent< HTMLButtonElement > ) =>
+			onChange( String( spinValue( valueProp, direction, event ) ), {
+				// Set event.target to the <input> so that consumers can use
+				// e.g. event.target.validity.
+				event: {
+					...event,
+					target: inputRef.current!,
+				},
+			} );
+
 	return (
 		<Input
 			autoComplete={ autoComplete }
@@ -185,12 +213,12 @@ function UnforwardedNumberControl(
 			{ ...props }
 			className={ classes }
 			dragDirection={ dragDirection }
-			hideHTMLArrows={ hideHTMLArrows }
+			hideHTMLArrows={ spinControls !== 'native' }
 			isDragEnabled={ isDragEnabled }
 			label={ label }
 			max={ max }
 			min={ min }
-			ref={ ref }
+			ref={ mergedRef }
 			required={ required }
 			step={ step }
 			type={ typeProp }
@@ -200,6 +228,43 @@ function UnforwardedNumberControl(
 				const baseState = numberControlStateReducer( state, action );
 				return stateReducerProp?.( baseState, action ) ?? baseState;
 			} }
+			size={ size }
+			suffix={
+				spinControls === 'custom' ? (
+					<>
+						{ suffix }
+						<Spacer marginBottom={ 0 } marginRight={ 2 }>
+							<HStack spacing={ 1 }>
+								<SpinButton
+									icon={ plusIcon }
+									isSmall
+									aria-hidden="true"
+									aria-label={ __( 'Increment' ) }
+									tabIndex={ -1 }
+									onClick={ buildSpinButtonClickHandler(
+										'up'
+									) }
+									size={ size }
+								/>
+								<SpinButton
+									icon={ resetIcon }
+									isSmall
+									aria-hidden="true"
+									aria-label={ __( 'Decrement' ) }
+									tabIndex={ -1 }
+									onClick={ buildSpinButtonClickHandler(
+										'down'
+									) }
+									size={ size }
+								/>
+							</HStack>
+						</Spacer>
+					</>
+				) : (
+					suffix
+				)
+			}
+			onChange={ onChange }
 		/>
 	);
 }

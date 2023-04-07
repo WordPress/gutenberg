@@ -77,7 +77,7 @@ const setupDriver = async () => {
 		try {
 			appiumProcess = await AppiumLocal.start( localAppiumPort );
 		} catch ( err ) {
-			// Ignore error here, Appium is probably already running (Appium desktop has its own server for instance)
+			// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
 			// eslint-disable-next-line no-console
 			await console.log(
 				'Could not start Appium server',
@@ -313,15 +313,21 @@ const clickElementOutsideOfTextInput = async ( driver, element ) => {
 };
 
 // Long press to activate context menu.
-const longPressMiddleOfElement = async ( driver, element ) => {
+const longPressMiddleOfElement = async (
+	driver,
+	element,
+	waitTime = 5000, // Setting to wait a bit longer because this is failing more frequently on the CI
+	customElementSize
+) => {
 	const location = await element.getLocation();
-	const size = await element.getSize();
+	const size = customElementSize || ( await element.getSize() );
 
 	const x = location.x + size.width / 2;
 	const y = location.y + size.height / 2;
+
 	const action = new wd.TouchAction( driver )
 		.longPress( { x, y } )
-		.wait( 5000 ) // Setting to wait a bit longer because this is failing more frequently on the CI
+		.wait( waitTime )
 		.release();
 	await action.perform();
 };
@@ -366,6 +372,19 @@ const tapPasteAboveElement = async ( driver, element ) => {
 		const pasteButtonLocator = '//XCUIElementTypeMenuItem[@name="Paste"]';
 		await clickIfClickable( driver, pasteButtonLocator );
 		await driver.sleep( 3000 ); // Wait for paste notification to disappear.
+	}
+};
+
+const selectTextFromElement = async ( driver, element ) => {
+	if ( isAndroid() ) {
+		await longPressMiddleOfElement( driver, element, 0 );
+	} else {
+		await doubleTap( driver, element );
+		await driver.waitForElementByXPath(
+			'//XCUIElementTypeMenuItem[@name="Copy"]',
+			wd.asserters.isDisplayed,
+			4000
+		);
 	}
 };
 
@@ -493,6 +512,26 @@ const toggleOrientation = async ( driver ) => {
 	} else {
 		await driver.setOrientation( 'LANDSCAPE' );
 	}
+};
+
+/**
+ * Toggle the device dark mode.
+ *
+ * @param {Object}  driver   Driver
+ * @param {boolean} darkMode Whether to enable dark mode or not
+ */
+const toggleDarkMode = ( driver, darkMode = true ) => {
+	if ( isAndroid() ) {
+		return driver.execute( 'mobile: shell', [
+			{
+				command: `cmd uimode night  ${ darkMode ? 'yes' : 'no' }`,
+			},
+		] );
+	}
+
+	return driver.execute( 'mobile: setAppearance', {
+		style: darkMode ? 'dark' : 'light',
+	} );
 };
 
 const isEditorVisible = async ( driver ) => {
@@ -678,6 +717,7 @@ module.exports = {
 	longPressMiddleOfElement,
 	setClipboard,
 	setupDriver,
+	selectTextFromElement,
 	stopDriver,
 	swipeDown,
 	swipeFromTo,
@@ -686,6 +726,7 @@ module.exports = {
 	tapPasteAboveElement,
 	tapSelectAllAboveElement,
 	timer,
+	toggleDarkMode,
 	toggleHtmlMode,
 	toggleOrientation,
 	typeString,

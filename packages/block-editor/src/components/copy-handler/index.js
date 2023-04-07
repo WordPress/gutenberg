@@ -7,6 +7,8 @@ import {
 	pasteHandler,
 	store as blocksStore,
 	createBlock,
+	findTransform,
+	getBlockTransforms,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
@@ -84,6 +86,7 @@ export function useClipboardHandler() {
 		__unstableIsSelectionCollapsed,
 		__unstableIsSelectionMergeable,
 		__unstableGetSelectedBlocksWithPartialSelection,
+		canInsertBlockType,
 	} = useSelect( blockEditorStore );
 	const {
 		flashBlock,
@@ -91,6 +94,7 @@ export function useClipboardHandler() {
 		replaceBlocks,
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
+		insertBlocks,
 	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
@@ -201,13 +205,55 @@ export function useClipboardHandler() {
 					__experimentalCanUserUseUnfilteredHTML:
 						canUserUseUnfilteredHTML,
 				} = getSettings();
-				const { plainText, html } = getPasteEventData( event );
-				const blocks = pasteHandler( {
-					HTML: html,
-					plainText,
-					mode: 'BLOCKS',
-					canUserUseUnfilteredHTML,
-				} );
+				const { plainText, html, files } = getPasteEventData( event );
+				let blocks = [];
+
+				if ( files.length ) {
+					const fromTransforms = getBlockTransforms( 'from' );
+					blocks = files
+						.reduce( ( accumulator, file ) => {
+							const transformation = findTransform(
+								fromTransforms,
+								( transform ) =>
+									transform.type === 'files' &&
+									transform.isMatch( [ file ] )
+							);
+							if ( transformation ) {
+								accumulator.push(
+									transformation.transform( [ file ] )
+								);
+							}
+							return accumulator;
+						}, [] )
+						.flat();
+				} else {
+					blocks = pasteHandler( {
+						HTML: html,
+						plainText,
+						mode: 'BLOCKS',
+						canUserUseUnfilteredHTML,
+					} );
+				}
+
+				if ( selectedBlockClientIds.length === 1 ) {
+					const [ selectedBlockClientId ] = selectedBlockClientIds;
+
+					if (
+						blocks.every( ( block ) =>
+							canInsertBlockType(
+								block.name,
+								selectedBlockClientId
+							)
+						)
+					) {
+						insertBlocks(
+							blocks,
+							undefined,
+							selectedBlockClientId
+						);
+						return;
+					}
+				}
 
 				replaceBlocks(
 					selectedBlockClientIds,

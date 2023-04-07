@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -34,7 +29,7 @@ import PatternTransformationsMenu from './pattern-transformations-menu';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { replaceBlocks, multiSelect } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
 	const {
 		possibleBlockTransformations,
@@ -52,7 +47,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const { canRemoveBlocks } = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId(
-				castArray( clientIds )[ 0 ]
+				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
 			);
 			const [ { name: firstBlockName } ] = blocks;
 			const _isSingleBlockSelected = blocks.length === 1;
@@ -94,12 +89,27 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
+	function selectForMultipleBlocks( insertedBlocks ) {
+		if ( insertedBlocks.length > 1 ) {
+			multiSelect(
+				insertedBlocks[ 0 ].clientId,
+				insertedBlocks[ insertedBlocks.length - 1 ].clientId
+			);
+		}
+	}
+
 	// Simple block tranformation based on the `Block Transforms` API.
-	const onBlockTransform = ( name ) =>
-		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
+	function onBlockTransform( name ) {
+		const newBlocks = switchToBlockType( blocks, name );
+		replaceBlocks( clientIds, newBlocks );
+		selectForMultipleBlocks( newBlocks );
+	}
+
 	// Pattern transformation through the `Patterns` API.
-	const onPatternTransform = ( transformedBlocks ) =>
+	function onPatternTransform( transformedBlocks ) {
 		replaceBlocks( clientIds, transformedBlocks );
+		selectForMultipleBlocks( transformedBlocks );
+	}
 
 	/**
 	 * The `isTemplate` check is a stopgap solution here.
@@ -163,7 +173,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						label={ blockSwitcherLabel }
 						popoverProps={ {
 							position: 'bottom right',
-							isAlternate: true,
+							variant: 'toolbar',
 							className: 'block-editor-block-switcher__popover',
 						} }
 						icon={

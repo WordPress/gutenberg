@@ -7,7 +7,8 @@
 			"hasParallax": false,
 			"dimRatio": 50,
 			"backgroundType": "image",
-			"gradient": "midnight"
+			"gradient": "midnight",
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{

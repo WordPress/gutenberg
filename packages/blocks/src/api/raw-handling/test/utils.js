@@ -4,46 +4,14 @@
 import deepFreeze from 'deep-freeze';
 
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import { getBlockContentSchemaFromTransforms, isPlain } from '../utils';
-import { store as mockStore } from '../../../store';
-import { STORE_NAME as mockStoreName } from '../../../store/constants';
-
-jest.mock( '@wordpress/data', () => {
-	return {
-		select: jest.fn( ( store ) => {
-			switch ( store ) {
-				case [ mockStoreName ]:
-				case mockStore: {
-					return {
-						hasBlockSupport: ( blockName, supports ) => {
-							return (
-								blockName === 'core/paragraph' &&
-								supports === 'anchor'
-							);
-						},
-					};
-				}
-			}
-		} ),
-		combineReducers: () => {
-			const mock = jest.fn();
-			return mock;
-		},
-		createReduxStore: () => {
-			const mock = jest.fn();
-			return mock;
-		},
-		register: () => {
-			const mock = jest.fn();
-			return mock;
-		},
-		createRegistryControl() {
-			return jest.fn();
-		},
-	};
-} );
 
 describe( 'isPlain', () => {
 	it( 'should return true for plain text', () => {
@@ -65,6 +33,19 @@ describe( 'isPlain', () => {
 } );
 
 describe( 'getBlockContentSchema', () => {
+	beforeAll( () => {
+		registerBlockType( 'core/paragraph', {
+			title: 'Paragraph',
+			supports: {
+				anchor: true,
+			},
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( 'core/paragraph' );
+	} );
+
 	const myContentSchema = {
 		strong: {},
 		em: {},

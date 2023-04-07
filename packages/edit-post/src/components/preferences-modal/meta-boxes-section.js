@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -23,8 +18,7 @@ export function MetaBoxesSection( {
 	...sectionProps
 } ) {
 	// The 'Custom Fields' meta box is a special case that we handle separately.
-	const thirdPartyMetaBoxes = filter(
-		metaBoxes,
+	const thirdPartyMetaBoxes = metaBoxes.filter(
 		( { id } ) => id !== 'postcustom'
 	);
 
@@ -37,7 +31,7 @@ export function MetaBoxesSection( {
 			{ areCustomFieldsRegistered && (
 				<EnableCustomFieldsOption label={ __( 'Custom fields' ) } />
 			) }
-			{ map( thirdPartyMetaBoxes, ( { id, title } ) => (
+			{ thirdPartyMetaBoxes.map( ( { id, title } ) => (
 				<EnablePanelOption
 					key={ id }
 					label={ title }

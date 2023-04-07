@@ -11,12 +11,14 @@ import {
 	SearchControl,
 	TextHighlight,
 	__experimentalText as Text,
+	__experimentalVStack as VStack,
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -50,7 +52,10 @@ function SuggestionListItem( {
 			}
 		>
 			<span className={ `${ baseCssClass }__title` }>
-				<TextHighlight text={ suggestion.name } highlight={ search } />
+				<TextHighlight
+					text={ decodeEntities( suggestion.name ) }
+					highlight={ search }
+				/>
 			</span>
 			{ suggestion.link && (
 				<span className={ `${ baseCssClass }__info` }>
@@ -127,6 +132,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 		<>
 			{ showSearchControl && (
 				<SearchControl
+					__nextHasNoMarginBottom
 					onChange={ setSearch }
 					value={ search }
 					label={ labels.search_items }
@@ -153,9 +159,12 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 				</Composite>
 			) }
 			{ debouncedSearch && ! suggestions?.length && (
-				<p className="edit-site-custom-template-modal__no-results">
+				<Text
+					as="p"
+					className="edit-site-custom-template-modal__no-results"
+				>
 					{ labels.not_found }
-				</p>
+				</Text>
 			) }
 		</>
 	);
@@ -179,17 +188,16 @@ function AddCustomTemplateModal( {
 				entityForSuggestions.labels.singular_name
 			) }
 			className={ baseCssClass }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
 			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			{ ! showSearchEntities && (
-				<>
-					<p>
+				<VStack spacing={ 4 }>
+					<Text as="p">
 						{ __(
 							'Select whether to create a single template for all items or a specific one.'
 						) }
-					</p>
+					</Text>
 					<Flex
 						className={ `${ baseCssClass }__contents` }
 						gap="4"
@@ -241,20 +249,20 @@ function AddCustomTemplateModal( {
 							</Text>
 						</FlexItem>
 					</Flex>
-				</>
+				</VStack>
 			) }
 			{ showSearchEntities && (
-				<>
-					<p>
+				<VStack spacing={ 4 }>
+					<Text as="p">
 						{ __(
 							'This template will be used only for the specific item chosen.'
 						) }
-					</p>
+					</Text>
 					<SuggestionList
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
 					/>
-				</>
+				</VStack>
 			) }
 		</Modal>
 	);

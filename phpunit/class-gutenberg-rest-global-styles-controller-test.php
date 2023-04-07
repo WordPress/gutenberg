@@ -11,17 +11,6 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 	 */
 	protected static $global_styles_id;
 
-	private function find_and_normalize_global_styles_by_id( $global_styles, $id ) {
-		foreach ( $global_styles as $style ) {
-			if ( $style['id'] === $id ) {
-				unset( $style['_links'] );
-				return $style;
-			}
-		}
-
-		return null;
-	}
-
 	public function set_up() {
 		parent::set_up();
 		switch_theme( 'emptytheme' );
@@ -75,9 +64,11 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		);
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_context_param() {
-		// TODO: Implement test_context_param() method.
-		$this->markTestIncomplete();
+		// Controller does not use get_context_param().
 	}
 
 	public function test_get_theme_items() {
@@ -116,8 +107,11 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		$this->assertSameSetsWithIndex( $data, $expected );
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_items() {
-		$this->markTestIncomplete();
+		// Controller does not implement get_items().
 	}
 
 	public function test_get_item() {
@@ -141,8 +135,11 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		);
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_create_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement create_item().
 	}
 
 	public function test_update_item() {
@@ -158,17 +155,24 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		$this->assertEquals( 'My new global styles title', $data['title']['raw'] );
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_delete_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement delete_item().
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_prepare_item() {
-		// TODO: Implement test_prepare_item() method.
-		$this->markTestIncomplete();
+		// Controller does not implement prepare_item().
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_item_schema() {
-		// TODO: Implement test_get_item_schema() method.
-		$this->markTestIncomplete();
+		// Covered by the core.
 	}
 }

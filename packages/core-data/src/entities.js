@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { capitalCase, pascalCase } from 'change-case';
-import { map, find, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -45,7 +44,7 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
 		getTitle: ( record ) => {
-			return get( record, [ 'title' ], __( 'Site Title' ) );
+			return record?.title ?? __( 'Site Title' );
 		},
 	},
 	{
@@ -213,7 +212,7 @@ async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
 		path: '/wp/v2/types?context=view',
 	} );
-	return map( postTypes, ( postType, name ) => {
+	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
@@ -251,7 +250,7 @@ async function loadTaxonomyEntities() {
 	const taxonomies = await apiFetch( {
 		path: '/wp/v2/taxonomies?context=view',
 	} );
-	return map( taxonomies, ( taxonomy, name ) => {
+	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'taxonomy',
@@ -288,7 +287,9 @@ export const getMethodName = (
 	prefix = 'get',
 	usePlural = false
 ) => {
-	const entityConfig = find( rootEntitiesConfig, { kind, name } );
+	const entityConfig = rootEntitiesConfig.find(
+		( config ) => config.kind === kind && config.name === name
+	);
 	const kindPrefix = kind === 'root' ? '' : pascalCase( kind );
 	const nameSuffix = pascalCase( name ) + ( usePlural ? 's' : '' );
 	const suffix =
@@ -313,7 +314,9 @@ export const getOrLoadEntitiesConfig =
 			return configs;
 		}
 
-		const loader = find( additionalEntityConfigLoaders, { kind } );
+		const loader = additionalEntityConfigLoaders.find(
+			( l ) => l.kind === kind
+		);
 		if ( ! loader ) {
 			return [];
 		}

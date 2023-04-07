@@ -825,7 +825,7 @@ describe( 'readConfig', () => {
 				)
 			);
 			const config = await readConfig( '.wp-env.json' );
-			// Custom port is overriden while testsPort gets the deault value.
+			// Custom port is overridden while testsPort gets the deault value.
 			expect( config ).toMatchObject( {
 				env: {
 					development: {
@@ -848,7 +848,7 @@ describe( 'readConfig', () => {
 				)
 			);
 			const config = await readConfig( '.wp-env.json' );
-			// Custom port is overriden while testsPort gets the deault value.
+			// Custom port is overridden while testsPort gets the deault value.
 			expect( config ).toMatchObject( {
 				env: {
 					development: {
@@ -884,7 +884,7 @@ describe( 'readConfig', () => {
 				)
 			);
 			const config = await readConfig( '.wp-env.json' );
-			// Custom port is overriden while testsPort gets the deault value.
+			// Custom port is overridden while testsPort gets the deault value.
 			expect( config ).toMatchObject( {
 				env: {
 					development: {

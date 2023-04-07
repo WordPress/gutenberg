@@ -7,8 +7,9 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { initializeEditor as internalInitializeEditor } from '@wordpress/edit-post';
 import { createElement, cloneElement } from '@wordpress/element';
+// eslint-disable-next-line no-restricted-imports
+import { initializeEditor as internalInitializeEditor } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ export async function initializeEditor( props, { component } = {} ) {
 	const postType = 'post';
 
 	return waitForStoreResolvers( () => {
+		const { screenWidth = 320, ...rest } = props || {};
 		const editorElement = component
 			? createElement( component, { postType, postId } )
 			: internalInitializeEditor( uniqueId, postType, postId );
@@ -37,7 +39,7 @@ export async function initializeEditor( props, { component } = {} ) {
 		const screen = render(
 			cloneElement( editorElement, {
 				initialTitle: 'test',
-				...props,
+				...rest,
 			} )
 		);
 
@@ -46,7 +48,7 @@ export async function initializeEditor( props, { component } = {} ) {
 		fireEvent( screen.getByTestId( 'block-list-wrapper' ), 'layout', {
 			nativeEvent: {
 				layout: {
-					width: 100,
+					width: screenWidth,
 				},
 			},
 		} );
