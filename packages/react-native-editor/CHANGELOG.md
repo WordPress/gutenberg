@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.92.1
+-   [*] Avoid empty Gallery block error [#49557]
+
 ## 1.92.0
 * No User facing changes *
 
