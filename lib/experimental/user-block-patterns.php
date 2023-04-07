@@ -86,8 +86,8 @@ function gutenberg_register_user_block_patterns() {
 	register_block_pattern_category(
 		'user',
 		array(
-			'label'       => _x( 'User patterns', 'Block pattern category' ),
-			'description' => __( 'Patterns that were created by users on this site.' ),
+			'label'       => _x( 'User patterns', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'Patterns that were created by users on this site.', 'gutenberg' ),
 		)
 	);
 
