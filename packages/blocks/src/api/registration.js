@@ -533,7 +533,7 @@ export function setDefaultBlockName( name ) {
  *
  *     return (
  *         <Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
- *             { __( 'Set the default block to Heading' ) }
+ *             { __( 'Wrap in columns' ) }
  *         </Button>
  *     );
  * };
