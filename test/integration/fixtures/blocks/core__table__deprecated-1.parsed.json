@@ -2,6 +2,7 @@
 	{
 		"blockName": "core/table",
 		"attrs": {
+			"hasFixedLayout": false,
 			"backgroundColor": "subtle-pale-blue"
 		},
 		"innerBlocks": [],
