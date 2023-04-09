@@ -13,11 +13,14 @@ import { store as blockEditorStore } from '../../store';
  * Contains the properties `ConvertToGroupButton` component needs.
  *
  * @typedef {Object} ConvertToGroupButtonProps
- * @property {string[]}  clientIds         An array of the selected client ids.
- * @property {boolean}   isGroupable       Indicates if the selected blocks can be grouped.
- * @property {boolean}   isUngroupable     Indicates if the selected blocks can be ungrouped.
- * @property {WPBlock[]} blocksSelection   An array of the selected blocks.
- * @property {string}    groupingBlockName The name of block used for handling grouping interactions.
+ * @property {string[]}  clientIds                An array of the selected client ids.
+ * @property {boolean}   isGroupable              Indicates if the selected blocks can be grouped.
+ * @property {boolean}   isUngroupable            Indicates if the selected blocks can be ungrouped.
+ * @property {WPBlock[]} blocksSelection          An array of the selected blocks.
+ * @property {string}    groupingBlockName        The name of block used for handling grouping interactions.
+ * @property {string}    groupingBlockNameLabel   The label of action for handling grouping interactions.
+ * @property {string}    ungroupingBlockNameLabel The label of action for handling ungrouping interactions.
+ *
  */
 
 /**
@@ -37,6 +40,8 @@ export default function useConvertToGroupButtonProps( selectedClientIds ) {
 		isUngroupable,
 		blocksSelection,
 		groupingBlockName,
+		groupingBlockNameLabel,
+		ungroupingBlockNameLabel,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -45,12 +50,18 @@ export default function useConvertToGroupButtonProps( selectedClientIds ) {
 				canInsertBlockType,
 				getSelectedBlockClientIds,
 			} = select( blockEditorStore );
-			const { getGroupingBlockName } = select( blocksStore );
+			const {
+				getGroupingBlockName,
+				getGroupingBlockNameLabel,
+				getUngroupingBlockNameLabel,
+			} = select( blocksStore );
 
 			const _clientIds = selectedClientIds?.length
 				? selectedClientIds
 				: getSelectedBlockClientIds();
 			const _groupingBlockName = getGroupingBlockName();
+			const _groupingBlockNameLabel = getGroupingBlockNameLabel();
+			const _ungroupingBlockNameLabel = getUngroupingBlockNameLabel();
 
 			const rootClientId = !! _clientIds?.length
 				? getBlockRootClientId( _clientIds[ 0 ] )
@@ -83,6 +94,8 @@ export default function useConvertToGroupButtonProps( selectedClientIds ) {
 				isUngroupable: _isUngroupable,
 				blocksSelection: _blocksSelection,
 				groupingBlockName: _groupingBlockName,
+				groupingBlockNameLabel: _groupingBlockNameLabel,
+				ungroupingBlockNameLabel: _ungroupingBlockNameLabel,
 			};
 		},
 		[ selectedClientIds ]
@@ -94,5 +107,7 @@ export default function useConvertToGroupButtonProps( selectedClientIds ) {
 		isUngroupable,
 		blocksSelection,
 		groupingBlockName,
+		groupingBlockNameLabel,
+		ungroupingBlockNameLabel,
 	};
 }

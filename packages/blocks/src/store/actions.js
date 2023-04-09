@@ -397,6 +397,44 @@ export function setGroupingBlockName( name ) {
 }
 
 /**
+ * Returns an action object used to set the label of the button used
+ * when grouping other blocks
+ * eg: in "Group/Ungroup" interactions
+ * Ignored from documentation as the recommended usage for this action through setGroupingBlockName from @wordpress/blocks.
+ *
+ * @ignore
+ *
+ * @param {string} name Block label.
+ *
+ * @return {Object} Action object.
+ */
+export function setGroupingBlockNameLabel( name ) {
+	return {
+		type: 'SET_GROUPING_BLOCK_NAME_LABEL',
+		name,
+	};
+}
+
+/**
+ * Returns an action object used to set the label of the button used
+ * when ungrouping other blocks
+ * eg: in "Group/Ungroup" interactions
+ * Ignored from documentation as the recommended usage for this action through setGroupingBlockName from @wordpress/blocks.
+ *
+ * @ignore
+ *
+ * @param {string} name Block label.
+ *
+ * @return {Object} Action object.
+ */
+export function setUngroupingBlockNameLabel( name ) {
+	return {
+		type: 'SET_UNGROUPING_BLOCK_NAME_LABEL',
+		name,
+	};
+}
+
+/**
  * Returns an action object used to set block categories.
  * Ignored from documentation as the recommended usage for this action through setCategories from @wordpress/blocks.
  *

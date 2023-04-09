@@ -6,6 +6,8 @@ import {
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
+	setGroupingBlockNameLabel,
+	setUngroupingBlockNameLabel,
 } from '@wordpress/blocks';
 
 /**
@@ -274,6 +276,8 @@ export const registerCoreBlocks = (
 	}
 	setUnregisteredTypeHandlerName( missing.name );
 	setGroupingBlockName( group.name );
+	setGroupingBlockNameLabel( group.metadata.title );
+	setUngroupingBlockNameLabel( 'Ungroup' );
 };
 
 /**

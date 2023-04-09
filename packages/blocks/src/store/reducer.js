@@ -249,6 +249,14 @@ export const groupingBlockName = createBlockNameSetterReducer(
 	'SET_GROUPING_BLOCK_NAME'
 );
 
+export const groupingBlockNameLabel = createBlockNameSetterReducer(
+	'SET_GROUPING_BLOCK_NAME_LABEL'
+);
+
+export const ungroupingBlockNameLabel = createBlockNameSetterReducer(
+	'SET_UNGROUPING_BLOCK_NAME_LABEL'
+);
+
 /**
  * Reducer managing the categories
  *
@@ -309,6 +317,8 @@ export default combineReducers( {
 	freeformFallbackBlockName,
 	unregisteredFallbackBlockName,
 	groupingBlockName,
+	groupingBlockNameLabel,
+	ungroupingBlockNameLabel,
 	categories,
 	collections,
 } );
