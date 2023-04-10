@@ -47,8 +47,7 @@ _Returns_
 
 ### controls
 
-The default export is what you use to register the controls with your custom
-store.
+The default export is what you use to register the controls with your custom store.
 
 _Usage_
 
@@ -78,8 +77,7 @@ _Returns_
 
 ### dispatch
 
-Control for dispatching an action in a registered data store.
-Alias for the `dispatch` control in the `@wordpress/data` package.
+Control for dispatching an action in a registered data store. Alias for the `dispatch` control in the `@wordpress/data` package.
 
 _Parameters_
 
@@ -87,8 +85,7 @@ _Parameters_
 
 ### select
 
-Control for resolving a selector in a registered data store.
-Alias for the `resolveSelect` built-in control in the `@wordpress/data` package.
+Control for resolving a selector in a registered data store. Alias for the `resolveSelect` built-in control in the `@wordpress/data` package.
 
 _Parameters_
 
@@ -96,8 +93,7 @@ _Parameters_
 
 ### syncSelect
 
-Control for calling a selector in a registered data store.
-Alias for the `select` built-in control in the `@wordpress/data` package.
+Control for calling a selector in a registered data store. Alias for the `select` built-in control in the `@wordpress/data` package.
 
 _Parameters_
 
