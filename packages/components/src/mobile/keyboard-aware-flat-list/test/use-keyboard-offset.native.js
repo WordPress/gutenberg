@@ -16,6 +16,7 @@ describe( 'useKeyboardOffset', () => {
 	beforeEach( () => {
 		Keyboard.removeAllListeners( 'keyboardDidShow' );
 		Keyboard.removeAllListeners( 'keyboardDidHide' );
+		Keyboard.removeAllListeners( 'keyboardWillShow' );
 	} );
 
 	it( 'returns the initial state', () => {
