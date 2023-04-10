@@ -8,6 +8,7 @@ import { space } from '../ui/utils/space';
 import { RangeControl, NumberControlWrapper } from './styles';
 import { COLORS } from '../utils/colors-values';
 import type { InputWithSliderProps } from './types';
+// test
 
 export const InputWithSlider = ( {
 	min,
