@@ -23,27 +23,32 @@ const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 
 const fetchHandler = (
-	{ path, method = 'GET', data },
+	{ path, url, method = 'GET', data },
 	retries = 20,
 	retryCount = 1
 ) => {
+	const endpoint = path || url;
+
 	if ( ! isMethodSupported( method ) ) {
 		return Promise.reject( `Unsupported method: ${ method }` );
 	}
 
-	if ( ! isPathSupported( path, method ) ) {
+	if ( ! isPathSupported( endpoint, method ) ) {
 		return Promise.reject(
-			`Unsupported path for method ${ method }: ${ path }`
+			`Unsupported path for method ${ method }: ${ endpoint }`
 		);
 	}
 
 	let responsePromise;
 	switch ( method ) {
 		case 'GET':
-			responsePromise = fetchRequest( path, shouldEnableCaching( path ) );
+			responsePromise = fetchRequest(
+				endpoint,
+				shouldEnableCaching( endpoint )
+			);
 			break;
 		case 'POST':
-			responsePromise = postRequest( path, data );
+			responsePromise = postRequest( endpoint, data );
 			break;
 	}
 
@@ -63,7 +68,7 @@ const fetchHandler = (
 			return Promise.reject( error );
 		}
 		return setTimeoutPromise( 1000 * retryCount ).then( () =>
-			fetchHandler( { path }, retries - 1, retryCount + 1 )
+			fetchHandler( { endpoint }, retries - 1, retryCount + 1 )
 		);
 	} );
 };
@@ -71,18 +76,20 @@ const fetchHandler = (
 export const isMethodSupported = ( method ) =>
 	SUPPORTED_METHODS.includes( method );
 
-export const isPathSupported = ( path, method ) => {
+export const isPathSupported = ( endpoint, method ) => {
 	const supportedEndpoints = applyFilters(
 		'native.supported_endpoints',
 		SUPPORTED_ENDPOINTS
 	);
 	return supportedEndpoints[ method ].some( ( pattern ) =>
-		pattern.test( path )
+		pattern.test( endpoint )
 	);
 };
 
-export const shouldEnableCaching = ( path ) =>
-	! DISABLED_CACHING_ENDPOINTS.some( ( pattern ) => pattern.test( path ) );
+export const shouldEnableCaching = ( endpoint ) =>
+	! DISABLED_CACHING_ENDPOINTS.some( ( pattern ) =>
+		pattern.test( endpoint )
+	);
 
 export default () => {
 	apiFetch.setFetchHandler( ( options ) => fetchHandler( options ) );
