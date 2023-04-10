@@ -6,7 +6,7 @@ on:
         paths:
             - 'packages/components/**'
             - '!packages/components/src/**/stories/**'
-            - '!packages/components/src**/test/**'
+            - '!packages/components/src/**/test/**'
 jobs:
     check:
         name: Check CHANGELOG diff
