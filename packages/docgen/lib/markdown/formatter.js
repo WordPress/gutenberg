@@ -80,7 +80,7 @@ const formatDescription = ( description, docs ) => {
 					transformer( node );
 				}
 				if ( node.type === 'text' && node.value ) {
-					// Replace line breaks with spaces and remove hyphens from hyphenated words.
+					// Replace line breaks with spaces and remove line-ending hyphens.
 					node.value = node.value
 						.replace( /([A-Za-z])-\n([A-Za-z])/g, '$1$2' )
 						.replace( /\n/g, ' ' );
