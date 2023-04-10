@@ -538,6 +538,92 @@ test.describe( 'Image', () => {
 <figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->` );
 	} );
+
+	test( 'can be replaced by dragging-and-dropping images from the inserter', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = page.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+
+		async function openMediaTab() {
+			await page
+				.getByRole( 'button', { name: 'Toggle block inserter' } )
+				.click();
+
+			await blockLibrary.getByRole( 'tab', { name: 'Media' } ).click();
+
+			await blockLibrary
+				.getByRole( 'tabpanel', { name: 'Media' } )
+				.getByRole( 'button', { name: 'Openverse' } )
+				.click();
+		}
+
+		await openMediaTab();
+
+		// Drag the first image from the media library into the image block.
+		await blockLibrary
+			.getByRole( 'listbox', { name: 'Media List' } )
+			.getByRole( 'option' )
+			.first()
+			.dragTo( imageBlock );
+
+		await expect( async () => {
+			const blocks = await editor.getBlocks();
+			expect( blocks ).toHaveLength( 1 );
+
+			const [
+				{
+					attributes: { url },
+				},
+			] = blocks;
+			expect(
+				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
+			).toBe( url );
+			expect(
+				new URL( url ).host,
+				'should be updated to the media library'
+			).toBe( new URL( page.url() ).host );
+		}, 'should update the image from the media inserter' ).toPass();
+		const [
+			{
+				attributes: { url: firstUrl },
+			},
+		] = await editor.getBlocks();
+
+		await openMediaTab();
+
+		// Drag the second image from the media library into the image block.
+		await blockLibrary
+			.getByRole( 'listbox', { name: 'Media List' } )
+			.getByRole( 'option' )
+			.nth( 1 )
+			.dragTo( imageBlock );
+
+		await expect( async () => {
+			const blocks = await editor.getBlocks();
+			expect( blocks ).toHaveLength( 1 );
+
+			const [
+				{
+					attributes: { url },
+				},
+			] = blocks;
+			expect( url ).not.toBe( firstUrl );
+			expect(
+				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
+			).toBe( url );
+			expect(
+				new URL( url ).host,
+				'should be updated to the media library'
+			).toBe( new URL( page.url() ).host );
+		}, 'should replace the original image with the second image' ).toPass();
+	} );
 } );
 
 class ImageBlockUtils {
