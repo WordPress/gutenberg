@@ -9,17 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import { ColorPicker } from '..';
 
-function getFormatSelector( container: HTMLElement ) {
-	return container.querySelector( '.components-select-control__input' );
-}
-
-function getInputByClass(
-	container: HTMLElement,
-	className: string
-): HTMLInputElement | null {
-	return container.querySelector( className );
-}
-
 const hslaMatcher = expect.objectContaining( {
 	h: expect.any( Number ),
 	s: expect.any( Number ),
@@ -53,7 +42,7 @@ describe( 'ColorPicker', () => {
 			const onChangeComplete = jest.fn();
 			const color = '#000';
 
-			const { container } = render(
+			render(
 				<ColorPicker
 					onChangeComplete={ onChangeComplete }
 					color={ color }
@@ -61,7 +50,7 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			const formatSelector = getFormatSelector( container );
+			const formatSelector = screen.getByRole( 'combobox' );
 
 			if ( formatSelector === null ) {
 				throw new Error(
@@ -73,10 +62,7 @@ describe( 'ColorPicker', () => {
 
 			await user.selectOptions( formatSelector, 'hex' );
 
-			const hexInput = getInputByClass(
-				container,
-				'.components-base-control.components-input-control input'
-			);
+			const hexInput = screen.getByRole( 'textbox' );
 
 			if ( hexInput === null ) {
 				throw new Error(
@@ -101,7 +87,7 @@ describe( 'ColorPicker', () => {
 			const onChange = jest.fn();
 			const color = '#000';
 
-			const { container } = render(
+			render(
 				<ColorPicker
 					onChange={ onChange }
 					color={ color }
@@ -109,7 +95,7 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			const formatSelector = getFormatSelector( container );
+			const formatSelector = screen.getByRole( 'combobox' );
 
 			if ( formatSelector === null ) {
 				throw new Error(
@@ -121,10 +107,7 @@ describe( 'ColorPicker', () => {
 
 			await user.selectOptions( formatSelector, 'hex' );
 
-			const hexInput = getInputByClass(
-				container,
-				'.components-base-control.components-input-control input'
-			);
+			const hexInput = screen.getByRole( 'textbox' );
 
 			if ( hexInput === null ) {
 				throw new Error(
@@ -152,7 +135,7 @@ describe( 'ColorPicker', () => {
 			const onChange = jest.fn();
 			const color = '#fff';
 
-			const { container } = render(
+			render(
 				<ColorPicker
 					onChange={ onChange }
 					color={ color }
@@ -160,7 +143,7 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			const formatSelector = getFormatSelector( container );
+			const formatSelector = screen.getByRole( 'combobox' );
 
 			if ( formatSelector === null ) {
 				throw new Error(
@@ -201,7 +184,7 @@ describe( 'ColorPicker', () => {
 			const onChange = jest.fn();
 			const color = '#2ad5d5';
 
-			const { container } = render(
+			render(
 				<ColorPicker
 					onChange={ onChange }
 					color={ color }
@@ -209,7 +192,7 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			const formatSelector = getFormatSelector( container );
+			const formatSelector = screen.getByRole( 'combobox' );
 
 			if ( formatSelector === null ) {
 				throw new Error(
