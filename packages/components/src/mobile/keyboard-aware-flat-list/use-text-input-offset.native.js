@@ -34,7 +34,7 @@ export default function useTextInputOffset( scrollEnabled, scrollViewRef ) {
 								// For cases where the caretY value is -1
 								// we use the y + height value, e.g the current
 								// character index is not valid or out of bounds
-								// see https://github.com/wordpress-mobile/AztecEditor-iOS/blob/develop/Aztec/Classes/TextKit/TextView.swift#L762
+								// see https://github.com/wordpress-mobile/AztecEditor-iOS/blob/4d0522d67b0056ac211466caaa76936cc5b4f947/Aztec/Classes/TextKit/TextView.swift#L762
 								caretY >= 0 && caretY < height
 									? y + caretY
 									: y + height;
