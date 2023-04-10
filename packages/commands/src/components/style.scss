@@ -1,10 +1,12 @@
 // dirty hack to clean up modal
 .commands-command-menu {
-	padding: 0;
 	width: 100%;
 	max-width: 680px;
 	position: relative;
 	top: 15%;
+	border-radius: $grid-unit-10;
+	padding: $grid-unit-30;
+	background: $white;
 
 	.components-modal__content {
 		margin: 0;
@@ -20,7 +22,6 @@
 .commands-command-menu__header {
 	display: flex;
 	align-items: center;
-	margin: $grid-unit-15 $grid-unit-15 0 $grid-unit-15;
 
 	.components-button {
 		height: $grid-unit-70;
@@ -62,23 +63,23 @@
 	}
 
 	[cmdk-input] {
-		border: 1px solid $gray-600;
+		border: none;
 		width: 100%;
 		padding: $grid-unit-15 $grid-unit-20;
 		min-height: $grid-unit-70;
 		outline: none;
 		color: $gray-900;
 		margin: 0;
-		border-radius: $radius-block-ui;
+		font-size: 16px;
 
 		&::placeholder {
 			color: $gray-600;
 		}
 
 		&:focus {
-			outline: 2px solid transparent;
-			border-color: var(--wp-admin-theme-color);
-			box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+			border: none;
+			box-shadow: none;
+			outline: none;
 		}
 	}
 
@@ -130,28 +131,11 @@
 	}
 
 	[cmdk-root] > [cmdk-list] {
-		min-height: 300px;
 		max-height: 400px;
 		overflow: auto;
 		overscroll-behavior: contain;
 		transition: 100ms ease;
 		transition-property: height;
-		margin: $grid-unit-15;
-	}
-
-	[cmdk-group-heading] {
-		user-select: none;
-		color: $gray-700;
-		padding: $grid-unit-30 $grid-unit-20 $grid-unit-20;
-		display: flex;
-		align-items: center;
-		font-size: 11px;
-		text-transform: uppercase;
-		font-weight: 500;
-		position: sticky;
-		top: 0;
-		background: $white;
-		z-index: 1;
 	}
 
 	[cmdk-empty] {
