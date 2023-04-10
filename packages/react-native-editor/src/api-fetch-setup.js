@@ -23,7 +23,7 @@ const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 
 const fetchHandler = (
-	{ path, url, method = 'GET', data },
+	{ path, url, method = 'GET', data, ...remainingOptions },
 	retries = 20,
 	retryCount = 1
 ) => {
@@ -44,7 +44,8 @@ const fetchHandler = (
 		case 'GET':
 			responsePromise = fetchRequest(
 				endpoint,
-				shouldEnableCaching( endpoint )
+				shouldEnableCaching( endpoint ),
+				{ ...remainingOptions }
 			);
 			break;
 		case 'POST':
