@@ -1,25 +1,13 @@
 /**
  * External dependencies
  */
-import { screen, render, fireEvent, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import { ColorPicker } from '..';
-
-/**
- * Ordinarily we'd try to select the component by role but the slider role appears
- * on several elements and we'd end up encoding assumptions about order when
- * trying to select the appropriate element. We might as well just use the class name
- * on the container which will be more durable if, for example, the order changes.
- */
-function getSaturation( container: HTMLElement ) {
-	return container.querySelector(
-		'.react-colorful__saturation .react-colorful__interactive'
-	);
-}
 
 function getFormatSelector( container: HTMLElement ) {
 	return container.querySelector( '.components-select-control__input' );
@@ -30,30 +18,6 @@ function getInputByClass(
 	className: string
 ): HTMLInputElement | null {
 	return container.querySelector( className );
-}
-
-type PageXPageY = { pageX: number; pageY: number };
-
-// Fix to pass `pageX` and `pageY`
-// See https://github.com/testing-library/react-testing-library/issues/268
-class FakeMouseEvent extends MouseEvent {
-	constructor( type: MouseEvent[ 'type' ], values?: PageXPageY ) {
-		super( type, { buttons: 1, bubbles: true, ...values } );
-
-		Object.assign( this, {
-			pageX: values?.pageX ?? 0,
-			pageY: values?.pageY ?? 0,
-		} );
-	}
-}
-
-function moveReactColorfulSlider(
-	sliderElement: Element,
-	from: PageXPageY,
-	to: PageXPageY
-) {
-	fireEvent( sliderElement, new FakeMouseEvent( 'mousedown', from ) );
-	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
 }
 
 const hslaMatcher = expect.objectContaining( {
@@ -85,35 +49,48 @@ const legacyColorMatcher = {
 describe( 'ColorPicker', () => {
 	describe( 'legacy props', () => {
 		it( 'should fire onChangeComplete with the legacy color format', async () => {
+			const user = userEvent.setup();
 			const onChangeComplete = jest.fn();
-			const color = '#fff';
+			const color = '#000';
 
 			const { container } = render(
 				<ColorPicker
 					onChangeComplete={ onChangeComplete }
 					color={ color }
+					enableAlpha={ false }
 				/>
 			);
 
-			const saturation = getSaturation( container );
+			const formatSelector = getFormatSelector( container );
 
-			if ( saturation === null ) {
-				throw new Error( 'The saturation slider could not be found' );
+			if ( formatSelector === null ) {
+				throw new Error(
+					'The color format selector could not be found'
+				);
 			}
 
-			expect( saturation ).toBeInTheDocument();
+			expect( formatSelector ).toBeInTheDocument();
 
-			moveReactColorfulSlider(
-				saturation,
-				{ pageX: 0, pageY: 0 },
-				{ pageX: 10, pageY: 10 }
+			await user.selectOptions( formatSelector, 'hex' );
+
+			const hexInput = getInputByClass(
+				container,
+				'.components-base-control.components-input-control input'
 			);
 
-			await waitFor( () =>
-				expect( onChangeComplete ).toHaveBeenCalled()
-			);
+			if ( hexInput === null ) {
+				throw new Error(
+					'The color format selector could not be found'
+				);
+			}
 
-			expect( onChangeComplete ).toHaveBeenCalledWith(
+			expect( hexInput ).toBeInTheDocument();
+
+			await user.clear( hexInput );
+			await user.type( hexInput, '1ab' );
+
+			expect( onChangeComplete ).toHaveBeenCalledTimes( 3 );
+			expect( onChangeComplete ).toHaveBeenLastCalledWith(
 				legacyColorMatcher
 			);
 		} );
