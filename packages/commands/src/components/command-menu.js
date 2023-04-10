@@ -205,9 +205,7 @@ export function CommandMenu() {
 							autoFocus
 							value={ search }
 							onValueChange={ setSearch }
-							placeholder={ __(
-								'Search for content and templates, or try commands like "Add…"'
-							) }
+							placeholder={ __( 'Type a command or search' ) }
 						/>
 					</div>
 					{ search && (
