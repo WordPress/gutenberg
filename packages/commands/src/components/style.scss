@@ -67,27 +67,14 @@
 		padding: 0 $grid-unit-20;
 		color: $gray-900;
 
-		&[aria-selected="true"] {
-			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
-			color: var(--wp-admin-theme-color);
-
-			svg {
-				color: var(--wp-admin-theme-color);
-			}
+		&[aria-selected="true"],
+		&:active {
+			background: $gray-100;
 		}
 
 		&[aria-disabled="true"] {
 			color: $gray-600;
 			cursor: not-allowed;
-		}
-
-		&:active {
-			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
-		}
-
-		svg,
-		.dashicon {
-			color: $gray-800;
 		}
 	}
 
