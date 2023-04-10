@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `Mobile` Refactor of the KeyboardAwareFlatList component.
+
 ### Enhancements
 
 -   `DropZone`: Smooth animation ([#49517](https://github.com/WordPress/gutenberg/pull/49517)).
