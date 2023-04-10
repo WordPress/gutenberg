@@ -136,12 +136,14 @@ function gutenberg_resolve_assets_override() {
 	 * For the Block Editor, use the enqueued fonts.
 	 */
 	if ( class_exists( 'WP_Fonts' ) ) {
-		$wp_fonts   = wp_fonts();
-		$registered = $wp_fonts->get_registered_font_families();
+		$wp_fonts       = wp_fonts();
+		$registered     = $wp_fonts->get_registered_font_families();
+		$is_site_editor = 'site-editor.php' === $pagenow;
+
 		if ( ! empty( $registered ) ) {
 			$done           = $wp_fonts->done;
 			$wp_fonts->done = array();
-			if ( 'site-editor.php' === $pagenow ) {
+			if ( $is_site_editor ) {
 				$queue           = $wp_fonts->queue;
 				$wp_fonts->queue = $registered;
 			}
@@ -152,7 +154,7 @@ function gutenberg_resolve_assets_override() {
 
 			// Reset the Fonts API.
 			$wp_fonts->done = $done;
-			if ( 'site-editor.php' === $pagenow ) {
+			if ( $is_site_editor ) {
 				$wp_fonts->queue = $queue;
 			}
 		}
