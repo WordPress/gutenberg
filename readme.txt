@@ -31,7 +31,7 @@ For the adventurous and tech-savvy, the Gutenberg plugin gives you the latest an
 
 ### Discover More
 
-- **User Documentation:** Review the <a href="https://wordpress.org/support/article/wordpress-editor/">WordPress Editor documentation</a> for detailed instructions on using the editor as an author to create posts, pages, and more.
+- **User Documentation:** Review the <a href="https://wordpress.org/documentation/article/wordpress-block-editor/">WordPress Editor documentation</a> for detailed instructions on using the editor as an author to create posts, pages, and more.
 
 - **Developer Documentation:** Explore the <a href="https://developer.wordpress.org/block-editor/">Developer Documentation</a> for extensive tutorials, documentation, and API references on how to extend the editor.
 
@@ -55,7 +55,7 @@ To report a security issue, please visit the [WordPress HackerOne](https://hacke
 
 = Do I have to use the Gutenberg plugin to get access to these features? =
 
-Not necessarily. Each version of WordPress after 5.0 has included features from the Gutenberg plugin, which are known collectively as the <a href="https://wordpress.org/support/article/wordpress-editor/">WordPress Editor</a>. You are likely already benefitting from stable features!
+Not necessarily. Each version of WordPress after 5.0 has included features from the Gutenberg plugin, which are known collectively as the <a href="https://wordpress.org/documentation/article/wordpress-block-editor/">WordPress Editor</a>. You are likely already benefitting from stable features!
 
 But if you want cutting edge beta features, including more experimental items, you will need to use the plugin. You can <a href="https://wordpress.org/news/2021/04/become-an-early-adopter-with-the-gutenberg-plugin/">read more here</a> to help decide whether the plugin is right for you.
 

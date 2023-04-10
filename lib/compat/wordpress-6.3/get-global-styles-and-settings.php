@@ -23,35 +23,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			return null;
 		}
 
-		$has_selectors        = ! empty( $block_type->selectors );
-		$use_editor_selectors = false;
-
-		// Determine if we are in the editor and require editor selectors
-		// if they are available.
-		if ( function_exists( 'get_current_screen' ) ) {
-			$current_screen       = get_current_screen();
-			$use_editor_selectors = ! empty( $block_type->editor_selectors ) && $current_screen && $current_screen->is_block_editor;
-		}
-
-		// Duotone (No fallback selectors for Duotone).
-		if ( 'filters.duotone' === $target || array( 'filters', 'duotone' ) === $target ) {
-			// Prefer editor selector if available.
-			$duotone_editor_selector = $use_editor_selectors
-				? _wp_array_get( $block_type->editor_selectors, array( 'filters', 'duotone' ), null )
-				: null;
-
-			if ( $duotone_editor_selector ) {
-				return $duotone_editor_selector;
-			}
-
-			// If selectors API in use, only use it's value or null.
-			if ( $has_selectors ) {
-				return _wp_array_get( $block_type->selectors, array( 'filters', 'duotone' ), null );
-			}
-
-			// Selectors API, not available, check for old experimental selector.
-			return _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null );
-		}
+		$has_selectors = ! empty( $block_type->selectors );
 
 		// Root Selector.
 
@@ -59,10 +31,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 		// feature selectors later on.
 		$root_selector = null;
 
-		if ( $use_editor_selectors && isset( $block_type->editor_selectors['root'] ) ) {
-			// Prefer editor selectors if specified.
-			$root_selector = $block_type->editor_selectors['root'];
-		} elseif ( $has_selectors && isset( $block_type->selectors['root'] ) ) {
+		if ( $has_selectors && isset( $block_type->selectors['root'] ) ) {
 			// Use the selectors API if available.
 			$root_selector = $block_type->selectors['root'];
 		} elseif ( isset( $block_type->supports['__experimentalSelector'] ) && is_string( $block_type->supports['__experimentalSelector'] ) ) {
@@ -79,8 +48,8 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			return $root_selector;
 		}
 
-		// If target is not `root` or `duotone` we have a feature or subfeature
-		// as the target. If the target is a string convert to an array.
+		// If target is not `root` we have a feature or subfeature as the target.
+		// If the target is a string convert to an array.
 		if ( is_string( $target ) ) {
 			$target = explode( '.', $target );
 		}
@@ -89,35 +58,17 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 		if ( 1 === count( $target ) ) {
 			$fallback_selector = $fallback ? $root_selector : null;
 
-			// Look for selector under `feature.root`.
-			$path = array_merge( $target, array( 'root' ) );
-
-			// Use editor specific selector if available.
-			if ( $use_editor_selectors ) {
-				$feature_selector = _wp_array_get( $block_type->editor_selectors, $path, null );
-
-				if ( $feature_selector ) {
-					return $feature_selector;
-				}
-
-				// Check if feature selector set via shorthand.
-				$feature_selector = _wp_array_get( $block_type->editor_selectors, $target, null );
-
-				// Only return if a selector was found.
-				if ( is_string( $feature_selector ) ) {
-					return $feature_selector;
-				}
-			}
-
 			// Prefer the selectors API if available.
 			if ( $has_selectors ) {
+				// Look for selector under `feature.root`.
+				$path             = array_merge( $target, array( 'root' ) );
 				$feature_selector = _wp_array_get( $block_type->selectors, $path, null );
 
 				if ( $feature_selector ) {
 					return $feature_selector;
 				}
 
-				// Check if feature selector set via shorthand.
+				// Check if feature selector is set via shorthand.
 				$feature_selector = _wp_array_get( $block_type->selectors, $target, null );
 
 				return is_string( $feature_selector ) ? $feature_selector : $fallback_selector;
@@ -133,40 +84,15 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			}
 
 			// Scope the feature selector by the block's root selector.
-			$scopes    = explode( ',', $root_selector );
-			$selectors = explode( ',', $feature_selector );
-
-			$selectors_scoped = array();
-			foreach ( $scopes as $outer ) {
-				foreach ( $selectors as $inner ) {
-					$outer = trim( $outer );
-					$inner = trim( $inner );
-					if ( ! empty( $outer ) && ! empty( $inner ) ) {
-						$selectors_scoped[] = $outer . ' ' . $inner;
-					} elseif ( empty( $outer ) ) {
-						$selectors_scoped[] = $inner;
-					} elseif ( empty( $inner ) ) {
-						$selectors_scoped[] = $outer;
-					}
-				}
-			}
-
-			return implode( ', ', $selectors_scoped );
+			return WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $feature_selector );
 		}
 
 		// Subfeature selector
 		// This may fallback either to parent feature or root selector.
 		$subfeature_selector = null;
 
-		// Use any explicit editor selector. Subfeature editor-only selectors
-		// will not fall back to the feature's editor specific selector if
-		// the normal selectors object contains a selector for the subfeature.
-		if ( $use_editor_selectors ) {
-			$subfeature_selector = _wp_array_get( $block_type->editor_selectors, $target, null );
-		}
-
 		// Use selectors API if available.
-		if ( $has_selectors && ! $subfeature_selector ) {
+		if ( $has_selectors ) {
 			$subfeature_selector = _wp_array_get( $block_type->selectors, $target, null );
 		}
 

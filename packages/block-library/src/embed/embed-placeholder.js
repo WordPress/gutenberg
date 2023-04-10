@@ -40,7 +40,7 @@ const EmbedPlaceholder = ( {
 			<div className="components-placeholder__learn-more">
 				<ExternalLink
 					href={ __(
-						'https://wordpress.org/support/article/embeds/'
+						'https://wordpress.org/documentation/article/embeds/'
 					) }
 				>
 					{ __( 'Learn more about embeds' ) }

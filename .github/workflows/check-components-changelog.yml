@@ -1,0 +1,30 @@
+name: Verify @wordpress/components CHANGELOG update
+
+on:
+    pull_request:
+        types: [opened, synchronize]
+        paths:
+            - 'packages/components/**'
+            - '!packages/components/src/**/stories/**'
+            - '!packages/components/src**/test/**'
+jobs:
+    check:
+        name: Check CHANGELOG diff
+        runs-on: ubuntu-latest
+        steps:
+            - name: 'Get PR commit count'
+              run: echo "PR_COMMIT_COUNT=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
+            - name: Checkout code
+              uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+                  fetch-depth: ${{ env.PR_COMMIT_COUNT }}
+            - name: 'Fetch relevant history from origin'
+              run: git fetch origin ${{ github.event.pull_request.base.ref }}
+            - name: Run git diff
+              run: |
+                  changelog_path="packages/components/CHANGELOG.md"
+                  if git diff --quiet ${{ github.event.pull_request.base.sha }} HEAD -- "$changelog_path"; then
+                    echo "Please add a CHANGELOG entry to $changelog_path"
+                    exit 1
+                  fi

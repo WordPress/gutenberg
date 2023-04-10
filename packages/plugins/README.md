@@ -184,8 +184,7 @@ _Returns_
 
 #### withPluginContext
 
-A Higher Order Component used to inject Plugin context to the
-wrapped component.
+A Higher Order Component used to inject Plugin context to the wrapped component.
 
 _Parameters_
 
