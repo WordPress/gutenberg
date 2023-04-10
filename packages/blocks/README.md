@@ -870,6 +870,10 @@ _Parameters_
 
 Assigns name of block for handling block grouping interactions.
 
+This function lets you select a different block to group other blocks in instead of the
+default `core/group` block. This function must be used in a component or when the DOM is fully
+loaded. See <https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dom-ready/>
+
 _Usage_
 
 ```js
@@ -878,7 +882,7 @@ import { setGroupingBlockName } from '@wordpress/blocks';
 const ExampleComponent = () => {
 	return (
 		<Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
-			{ __( 'Set the default block to Heading' ) }
+			{ __( 'Wrap in columns' ) }
 		</Button>
 	);
 };

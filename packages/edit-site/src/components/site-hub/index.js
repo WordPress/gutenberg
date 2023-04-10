@@ -29,7 +29,6 @@ const HUB_ANIMATION_DURATION = 0.3;
 
 const SiteHub = forwardRef( ( props, ref ) => {
 	const { canvasMode, dashboardLink } = useSelect( ( select ) => {
-		select( editSiteStore ).getEditedPostType();
 		const { getCanvasMode, getSettings } = unlock(
 			select( editSiteStore )
 		);

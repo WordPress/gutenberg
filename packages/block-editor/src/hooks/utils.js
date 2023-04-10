@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, mapValues, get } from 'lodash';
+import { isEmpty, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,9 +31,9 @@ export const cleanEmptyObject = ( object ) => {
 		return object;
 	}
 	const cleanedNestedObjects = Object.fromEntries(
-		Object.entries( mapValues( object, cleanEmptyObject ) ).filter(
-			( [ , value ] ) => Boolean( value )
-		)
+		Object.entries( object )
+			.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
+			.filter( ( [ , value ] ) => Boolean( value ) )
 	);
 	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
 };

@@ -34,6 +34,7 @@
 		"@wordpress/block-serialization-default-parser": "file:packages/block-serialization-default-parser",
 		"@wordpress/block-serialization-spec-parser": "file:packages/block-serialization-spec-parser",
 		"@wordpress/blocks": "file:packages/blocks",
+		"@wordpress/commands": "file:packages/commands",
 		"@wordpress/components": "file:packages/components",
 		"@wordpress/compose": "file:packages/compose",
 		"@wordpress/core-data": "file:packages/core-data",
