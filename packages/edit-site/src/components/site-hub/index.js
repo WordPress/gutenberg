@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { forwardRef } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -97,7 +98,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 
 				{ showLabels && (
 					<div className="edit-site-site-hub__site-title">
-						{ siteTitle }
+						{ decodeEntities( siteTitle ) }
 					</div>
 				) }
 			</HStack>
