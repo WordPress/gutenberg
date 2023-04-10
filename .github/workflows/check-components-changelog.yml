@@ -10,6 +10,7 @@ on:
             - '!packages/components/src/**/*.android.js'
             - '!packages/components/src/**/*.ios.js'
             - '!packages/components/src/**/*.native.js'
+            - '!packages/components/src/**/*.native.scss'
             - '!packages/components/src/**/react-native-*'
 jobs:
     check:
