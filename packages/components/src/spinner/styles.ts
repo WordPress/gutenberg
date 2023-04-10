@@ -26,6 +26,7 @@ export const StyledSpinner = styled.svg`
 	position: relative;
 	color: ${ COLORS.ui.theme };
 	overflow: visible;
+	background-color: none;
 `;
 
 const commonPathProps = css`
