@@ -14,7 +14,7 @@ describe( 'Formatter', () => {
 				{
 					path: docPath + '-code.js',
 					description: `My declaration example.
-Hyphen-
+Client-side hyphen-
 ation.
 
 Code:
@@ -61,7 +61,7 @@ Ordered Lists:
 
 ## myDeclaration
 
-My declaration example. Hyphenation.
+My declaration example. Client-side hyphenation.
 
 Code:
 
