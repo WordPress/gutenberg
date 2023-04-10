@@ -95,46 +95,51 @@ describe( 'ColorPicker', () => {
 			);
 		} );
 	} );
+	describe( 'Hex input', () => {
+		it( 'should fire onChange with the correct value from the hex input', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			const color = '#000';
 
-	it( 'should fire onChange with the correct value from the hex input', async () => {
-		const user = userEvent.setup();
-		const onChange = jest.fn();
-		const color = '#000';
+			const { container } = render(
+				<ColorPicker
+					onChange={ onChange }
+					color={ color }
+					enableAlpha={ false }
+				/>
+			);
 
-		const { container } = render(
-			<ColorPicker
-				onChange={ onChange }
-				color={ color }
-				enableAlpha={ false }
-			/>
-		);
+			const formatSelector = getFormatSelector( container );
 
-		const formatSelector = getFormatSelector( container );
+			if ( formatSelector === null ) {
+				throw new Error(
+					'The color format selector could not be found'
+				);
+			}
 
-		if ( formatSelector === null ) {
-			throw new Error( 'The color format selector could not be found' );
-		}
+			expect( formatSelector ).toBeInTheDocument();
 
-		expect( formatSelector ).toBeInTheDocument();
+			await user.selectOptions( formatSelector, 'hex' );
 
-		await user.selectOptions( formatSelector, 'hex' );
+			const hexInput = getInputByClass(
+				container,
+				'.components-base-control.components-input-control input'
+			);
 
-		const hexInput = getInputByClass(
-			container,
-			'.components-base-control.components-input-control input'
-		);
+			if ( hexInput === null ) {
+				throw new Error(
+					'The color format selector could not be found'
+				);
+			}
 
-		if ( hexInput === null ) {
-			throw new Error( 'The color format selector could not be found' );
-		}
+			expect( hexInput ).toBeInTheDocument();
 
-		expect( hexInput ).toBeInTheDocument();
+			await user.clear( hexInput );
+			await user.type( hexInput, '1ab' );
 
-		await user.clear( hexInput );
-		await user.type( hexInput, '1ab' );
-
-		expect( onChange ).toHaveBeenCalledTimes( 3 );
-		expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
+			expect( onChange ).toHaveBeenCalledTimes( 3 );
+			expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
+		} );
 	} );
 
 	describe.each( [
