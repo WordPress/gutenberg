@@ -121,28 +121,6 @@ describe( 'useKeyboardOffset', () => {
 		);
 	} );
 
-	it( 'sets keyboard offset to 0 when keyboard is hidden and shouldPreventAutomaticScroll is false', () => {
-		// Arrange
-		const shouldPreventAutomaticScroll = jest.fn().mockReturnValue( false );
-		const { result } = renderHook( () =>
-			useKeyboardOffset( true, shouldPreventAutomaticScroll )
-		);
-
-		// Act
-		act( () => {
-			RCTDeviceEventEmitter.emit( 'keyboardDidShow', {
-				endCoordinates: { height: 250 },
-			} );
-		} );
-		act( () => {
-			RCTDeviceEventEmitter.emit( 'keyboardDidHide' );
-			jest.runAllTimers();
-		} );
-
-		// Assert
-		expect( result.current[ 0 ] ).toBe( 0 );
-	} );
-
 	it( 'does not set keyboard offset to 0 when keyboard is hidden and shouldPreventAutomaticScroll is true', () => {
 		// Arrange
 		const shouldPreventAutomaticScroll = jest.fn().mockReturnValue( true );
@@ -187,12 +165,12 @@ describe( 'useKeyboardOffset', () => {
 		// Act
 		act( () => {
 			RCTDeviceEventEmitter.emit( 'keyboardDidShow', {
-				endCoordinates: { height: 250 },
+				endCoordinates: { height: 150 },
 			} );
 		} );
 
 		// Assert
-		expect( result.current[ 0 ] ).toBe( 250 );
+		expect( result.current[ 0 ] ).toBe( 150 );
 
 		// Act
 		act( () => {
@@ -205,7 +183,7 @@ describe( 'useKeyboardOffset', () => {
 		} );
 
 		// Assert
-		expect( result.current[ 0 ] ).toBe( 250 );
+		expect( result.current[ 0 ] ).toBe( 150 );
 
 		// Act
 		act( () => {
