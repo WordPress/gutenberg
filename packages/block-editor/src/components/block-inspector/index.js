@@ -327,7 +327,9 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
 			<BlockVariationTransforms blockClientId={ clientId } />
-			{ blockName === 'core/query' && <CreateNewPostLink /> }
+			{ blockName === 'core/query' && (
+				<CreateNewPostLink clientId={ clientId } />
+			) }
 			{ showTabs && (
 				<InspectorControlsTabs
 					hasBlockStyles={ hasBlockStyles }

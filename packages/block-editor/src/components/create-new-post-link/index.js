@@ -11,10 +11,10 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
-const CreateNewPostLink = () => {
+const CreateNewPostLink = ( { clientId } ) => {
 	const postType = useSelect( ( select ) => {
-		const { getSelectedBlock } = select( blockEditorStore );
-		return getSelectedBlock()?.attributes?.query?.postType;
+		const { getBlockAttributes } = select( blockEditorStore );
+		return getBlockAttributes( clientId )?.query?.postType;
 	} );
 
 	if ( ! postType ) return null;
