@@ -182,6 +182,7 @@ function Sandbox( {
 	title = '',
 	type,
 	url,
+	viewportProps = '',
 } ) {
 	const colorScheme = usePreferredColorScheme();
 	const ref = useRef();
@@ -215,7 +216,7 @@ function Sandbox( {
 					<title>{ title }</title>
 					<meta
 						name="viewport"
-						content="width=device-width, initial-scale=1"
+						content={ `width=device-width, initial-scale=1, ${ viewportProps }` }
 					></meta>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
 					{ styles.map( ( rules, i ) => (
