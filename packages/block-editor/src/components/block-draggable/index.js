@@ -36,6 +36,7 @@ const BlockDraggable = ( {
 		[ clientIds ]
 	);
 	const isDragging = useRef( false );
+	const timerRef = useRef();
 	const [ startScrolling, scrollOnDragOver, stopScrolling ] =
 		useScrollWhenDragging();
 
@@ -44,12 +45,16 @@ const BlockDraggable = ( {
 
 	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
+		const timer = timerRef.current;
 		return () => {
 			if ( isDragging.current ) {
 				stopDraggingBlocks();
 			}
+			if ( timer ) {
+				window.cancelAnimationFrame( timer );
+			}
 		};
-	}, [] );
+	}, [ stopDraggingBlocks ] );
 
 	if ( ! isDraggable ) {
 		return children( { draggable: false } );
@@ -67,14 +72,18 @@ const BlockDraggable = ( {
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
-				startDraggingBlocks( clientIds );
-				isDragging.current = true;
+				// Below code will hide the source element, which is triggered synchronously
+				// and will break the drag event. So we need to defer it to the next frame.
+				timerRef.current = window.requestAnimationFrame( () => {
+					startDraggingBlocks( clientIds );
+					isDragging.current = true;
 
-				startScrolling( event );
+					startScrolling( event );
 
-				if ( onDragStart ) {
-					onDragStart();
-				}
+					if ( onDragStart ) {
+						onDragStart();
+					}
+				} );
 			} }
 			onDragOver={ scrollOnDragOver }
 			onDragEnd={ () => {
