@@ -357,10 +357,7 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
  */
 function gutenberg_get_duotone_filter_id( $preset ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
-	if ( ! isset( $preset['slug'] ) ) {
-		return '';
-	}
-	return WP_Duotone_Gutenberg::get_filter_id( $preset['slug'] );
+	return WP_Duotone_Gutenberg::get_filter_id_from_preset( $preset );
 }
 
 /**
@@ -404,9 +401,10 @@ function gutenberg_register_duotone_support( $block_type ) {
 /**
  * Render out the duotone stylesheet and SVG.
  *
+ * @deprecated 6.3.0 Use WP_Duotone_Gutenberg::render_duotone_support() instead.
+ *
  * @param  string $block_content Rendered block content.
  * @param  array  $block         Block object.
- * @deprecated    6.3.0          Use WP_Duotone_Gutenberg::render_duotone_support() instead.
  * @return string                Filtered block content.
  */
 function gutenberg_render_duotone_support( $block_content, $block ) {
