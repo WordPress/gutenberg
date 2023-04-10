@@ -867,6 +867,7 @@ class WP_Duotone_Gutenberg {
 	 * @return string The SVG for the filter definition.
 	 */
 	public static function get_filter_svg_from_preset( $preset ) {
+		// TODO: This function will be refactored out in a follow-up PR where it will be deprecated.
 		$filter_id = gutenberg_get_duotone_filter_id( $preset );
 		return self::get_filter_svg( $filter_id, $preset['colors'] );
 	}
