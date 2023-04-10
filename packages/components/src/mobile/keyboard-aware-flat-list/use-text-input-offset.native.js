@@ -32,7 +32,9 @@ export default function useTextInputOffset( scrollEnabled, scrollViewRef ) {
 						( _x, y, _width, height ) => {
 							const caretYOffset =
 								// For cases where the caretY value is -1
-								// we use the y + height value.
+								// we use the y + height value, e.g the current
+								// character index is not valid or out of bounds
+								// see https://github.com/wordpress-mobile/AztecEditor-iOS/blob/develop/Aztec/Classes/TextKit/TextView.swift#L762
 								caretY >= 0 && caretY < height
 									? y + caretY
 									: y + height;
