@@ -742,7 +742,7 @@ Registers a new block provided a unique name and an object defining its
 behavior. Once registered, the block is made available as an option to any
 editor interface where blocks are implemented.
 
-For more in-depth information on registering a custom block see the [Create a block tutorial](docs/how-to-guides/block-tutorial/README.md)
+For more in-depth information on registering a custom block see the [Create a block tutorial](/docs/getting-started/create-block/README.md)
 
 _Usage_
 
@@ -911,6 +911,10 @@ _Parameters_
 
 Assigns name of block for handling block grouping interactions.
 
+This function lets you select a different block to group other blocks in instead of the
+default `core/group` block. This function must be used in a component or when the DOM is fully
+loaded. See <https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dom-ready/>
+
 _Usage_
 
 ```js
@@ -919,7 +923,7 @@ import { setGroupingBlockName } from '@wordpress/blocks';
 const ExampleComponent = () => {
 	return (
 		<Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
-			{ __( 'Set the default block to Heading' ) }
+			{ __( 'Wrap in columns' ) }
 		</Button>
 	);
 };

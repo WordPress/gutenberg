@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "15.5.0-rc.1",
+	"version": "15.5.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -34,6 +34,7 @@
 		"@wordpress/block-serialization-default-parser": "file:packages/block-serialization-default-parser",
 		"@wordpress/block-serialization-spec-parser": "file:packages/block-serialization-spec-parser",
 		"@wordpress/blocks": "file:packages/blocks",
+		"@wordpress/commands": "file:packages/commands",
 		"@wordpress/components": "file:packages/components",
 		"@wordpress/compose": "file:packages/compose",
 		"@wordpress/core-data": "file:packages/core-data",
@@ -223,6 +224,7 @@
 		"react-native-url-polyfill": "1.1.2",
 		"react-refresh": "0.10.0",
 		"react-test-renderer": "18.2.0",
+		"reassure": "0.7.1",
 		"redux": "4.1.2",
 		"resize-observer-polyfill": "1.5.1",
 		"rimraf": "3.0.2",

@@ -20,11 +20,7 @@ import { useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
-import icon from './media-container-icon';
+import { media as icon } from '@wordpress/icons';
 
 /**
  * Constants

@@ -144,9 +144,7 @@ test.describe( 'List View', () => {
 		await listView
 			.getByRole( 'button', { name: 'Options for Paragraph block' } )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: /Remove Paragraph/i } )
-			.click();
+		await page.getByRole( 'menuitem', { name: /Delete/i } ).click();
 
 		// Heading block should be selected as previous block.
 		await expect(
@@ -196,7 +194,7 @@ test.describe( 'List View', () => {
 		await listView
 			.getByRole( 'button', { name: 'Options for Image block' } )
 			.click();
-		await page.getByRole( 'menuitem', { name: /Remove Image/i } ).click();
+		await page.getByRole( 'menuitem', { name: /Delete/i } ).click();
 
 		// Heading block should be selected as previous block.
 		await expect(
@@ -247,7 +245,7 @@ test.describe( 'List View', () => {
 		await listView
 			.getByRole( 'button', { name: 'Options for Image block' } )
 			.click();
-		await page.getByRole( 'menuitem', { name: /Remove blocks/i } ).click();
+		await page.getByRole( 'menuitem', { name: /Delete blocks/i } ).click();
 
 		// Newly created paragraph block should be selected.
 		await expect(
@@ -474,9 +472,11 @@ test.describe( 'List View', () => {
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
-			editor.canvas.getByRole( 'button', {
-				name: 'Close Document Overview Sidebar',
-			} )
+			editor.canvas
+				.getByRole( 'region', { name: 'Document Overview' } )
+				.getByRole( 'button', {
+					name: 'Close',
+				} )
 		).toBeFocused();
 
 		// Close List View and ensure it's closed.

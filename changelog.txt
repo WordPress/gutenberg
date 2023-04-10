@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 15.5.0-rc.1 =
+= 15.5.0 =
 
 ## Changelog
 
@@ -76,6 +76,7 @@
 - Duotone: Use `WP_Theme_JSON_Resolver_Gutenberg` instead of `WP_Theme_JSON_Resolver`. ([49199](https://github.com/WordPress/gutenberg/pull/49199))
 - Fix typo (overriden -> overridden). ([48711](https://github.com/WordPress/gutenberg/pull/48711))
 - Writing flow: Prevent default browser behaviour on input when editable. ([49370](https://github.com/WordPress/gutenberg/pull/49370))
+- Fix `onHover` error on patterns tab in mobile. ([49450](https://github.com/WordPress/gutenberg/pull/49450))
 
 #### General Interface
 - Invalid Page address displayed when a future page is first scheduled. ([49092](https://github.com/WordPress/gutenberg/pull/49092))
@@ -133,6 +134,7 @@
 - Selectors API: Fix for global styles hook, style variations, and duotone. ([49393](https://github.com/WordPress/gutenberg/pull/49393))
 - Fix typo for the word `accross`. ([49295](https://github.com/WordPress/gutenberg/pull/49295))
 - Duotone: Limit SVG filter output to used filters. ([49103](https://github.com/WordPress/gutenberg/pull/49103))
+- Selectors API: Make duotone selectors fallback and be scoped. (https://github.com/WordPress/gutenberg/pull/49423)
 
 #### List View
 - Show close button in List View on mobile. ([49200](https://github.com/WordPress/gutenberg/pull/49200))
@@ -147,6 +149,9 @@
 
 #### Tools
 - babel-plugin-makepot: Fix non-existing translation handling. ([49431](https://github.com/WordPress/gutenberg/pull/49431))
+
+#### Navigation
+Fix fallback not rendering. ([49431](https://github.com/WordPress/gutenberg/pull/49576))
 
 ### Performance
 
