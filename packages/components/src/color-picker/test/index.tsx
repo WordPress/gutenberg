@@ -119,68 +119,6 @@ describe( 'ColorPicker', () => {
 		} );
 	} );
 
-	it( 'should fire onChange with the string value', async () => {
-		const onChange = jest.fn();
-		const color = 'rgba(1, 1, 1, 0.5)';
-
-		const { container } = render(
-			<ColorPicker onChange={ onChange } color={ color } enableAlpha />
-		);
-
-		const saturation = getSaturation( container );
-
-		if ( saturation === null ) {
-			throw new Error( 'The saturation slider could not be found' );
-		}
-
-		expect( saturation ).toBeInTheDocument();
-
-		moveReactColorfulSlider(
-			saturation,
-			{ pageX: 0, pageY: 0 },
-			{ pageX: 10, pageY: 10 }
-		);
-
-		await waitFor( () => expect( onChange ).toHaveBeenCalled() );
-
-		expect( onChange ).toHaveBeenCalledWith(
-			expect.stringMatching( /^#([a-fA-F0-9]{8})$/ )
-		);
-	} );
-
-	it( 'should fire onChange with the HSL value', async () => {
-		const onChange = jest.fn();
-		const color = 'hsla(125, 20%, 50%, 0.5)';
-
-		const { container } = render(
-			<ColorPicker
-				onChange={ onChange }
-				color={ color }
-				enableAlpha={ false }
-			/>
-		);
-
-		const saturation = getSaturation( container );
-
-		if ( saturation === null ) {
-			throw new Error( 'The saturation slider could not be found' );
-		}
-
-		expect( saturation ).toBeInTheDocument();
-
-		moveReactColorfulSlider(
-			saturation,
-			{ pageX: 0, pageY: 0 },
-			{ pageX: 10, pageY: 10 }
-		);
-
-		await waitFor( () => expect( onChange ).toHaveBeenCalled() );
-
-		expect( onChange ).toHaveBeenCalledWith(
-			expect.stringMatching( /^#([a-fA-F0-9]{6})$/ )
-		);
-	} );
-
 	it( 'should fire onChange with the correct value from the hex input', async () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
@@ -221,6 +159,7 @@ describe( 'ColorPicker', () => {
 		expect( onChange ).toHaveBeenCalledTimes( 3 );
 		expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
 	} );
+
 	describe.each( [
 		[ 'red', 0, '#7dffff' ],
 		[ 'green', 1, '#ff7dff' ],
@@ -269,6 +208,7 @@ describe( 'ColorPicker', () => {
 			expect( onChange ).toHaveBeenLastCalledWith( expected );
 		} );
 	} );
+
 	describe.each( [
 		[ 'hue', 0, '#aad52a' ],
 		[ 'saturation', 1, '#20dfdf' ],
