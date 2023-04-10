@@ -20,7 +20,7 @@ async function getPageOrPostFromSlug( slug ) {
 }
 
 function buildEditorURI( id ) {
-	return `https://gutenberg.test/wp-admin/post.php?post=${ id }&action=edit`;
+	return `/wp-admin/post.php?post=${ id }&action=edit`;
 }
 
 export function useSelectObject() {
