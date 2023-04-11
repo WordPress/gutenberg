@@ -539,11 +539,11 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	 * the given font size multiplied by the min font size scale factor.
 	 */
 	if ( ! $minimum_font_size_raw ) {
-		$preferred_font_size_in_px  = $preferred_size['unit'] === 'px' ? $preferred_size['value'] : $preferred_size['value'] * 16;
+		$preferred_font_size_in_px = 'px' === $preferred_size['unit'] ? $preferred_size['value'] : $preferred_size['value'] * 16;
 		// Logarithmic scale factor: Min font scale that tapers out as the font size increases.
 		$minimum_font_size_factor = 1 - 0.12 * log( $preferred_font_size_in_px );
 		// Constrains the minimum font size factor between min and max values.
-		$minimum_font_size_factor = min( max( $minimum_font_size_factor, $default_minimum_font_size_factor_min ), $default_minimum_font_size_factor_max );
+		$minimum_font_size_factor     = min( max( $minimum_font_size_factor, $default_minimum_font_size_factor_min ), $default_minimum_font_size_factor_max );
 		$calculated_minimum_font_size = round( $preferred_size['value'] * $minimum_font_size_factor, 3 );
 
 		// Only use calculated min font size if it's > $minimum_font_size_limit value.
