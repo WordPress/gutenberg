@@ -36,9 +36,10 @@ test.describe( 'Global styles revisions', () => {
 		] );
 	} );
 
-	test.beforeEach( async ( { admin, siteEditor } ) => {
-		await admin.visitSiteEditor();
-		await siteEditor.enterEditMode();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.visitSiteEditor( {
+			canvas: 'edit',
+		} );
 	} );
 
 	test( 'should display revisions UI when there is more than 1 revision', async ( {
@@ -61,7 +62,7 @@ test.describe( 'Global styles revisions', () => {
 			await userGlobalStylesRevisions.getGlobalStylesRevisions();
 
 		// There are not enough revisions to show the revisions UI yet, so let's create some.
-		if ( currentRevisions.length < 2 ) {
+		if ( currentRevisions.length < 1 ) {
 			await expect(
 				page.getByRole( 'button', {
 					name: 'Styles revisions',
@@ -75,7 +76,7 @@ test.describe( 'Global styles revisions', () => {
 				.getByRole( 'button', { name: 'Typography Text styles' } )
 				.click();
 			await page.getByRole( 'button', { name: 'Appearance' } ).click();
-			await page.getByRole( 'option', { name: 'Thin' } ).click();
+			await page.getByRole( 'option', { name: 'Thin Italic' } ).click();
 			await editor.saveSiteEditorEntities();
 
 			// Change a style and save it again just for good luck.
@@ -91,6 +92,8 @@ test.describe( 'Global styles revisions', () => {
 			await page.click(
 				'role=button[name="Navigate to the previous view"i]'
 			);
+
+			// Now there should be enough revisions to show the revisions UI.
 			await expect(
 				page.getByRole( 'button', {
 					name: 'Styles revisions',
