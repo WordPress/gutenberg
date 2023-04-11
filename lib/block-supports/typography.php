@@ -517,14 +517,6 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		)
 	);
 
-	// Sets a ceiling for the minimum font size.
-	$minimum_font_size_ceiling = gutenberg_get_typography_value_and_unit(
-		'64px',
-		array(
-			'coerce_to' => $preferred_size['unit'],
-		)
-	);
-
 	// Don't enforce minimum font size if a font size has explicitly set a min and max value.
 	if ( ! empty( $minimum_font_size_limit ) && ( ! $minimum_font_size_raw && ! $maximum_font_size_raw ) ) {
 		/*
