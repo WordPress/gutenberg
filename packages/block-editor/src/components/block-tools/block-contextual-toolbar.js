@@ -10,7 +10,11 @@ import { __ } from '@wordpress/i18n';
 import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { ToolbarItem, ToolbarButton } from '@wordpress/components';
+import {
+	ToolbarItem,
+	ToolbarButton,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { levelUp } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -130,7 +134,13 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			{ ...props }
 		>
 			{ isFixed && isLargeViewport && blockType && (
-				<>
+				<ToolbarGroup
+					className={
+						isCollapsed
+							? 'block-editor-block-toolbar__group-expand-fixed-toolbar'
+							: 'block-editor-block-toolbar__group-collapse-fixed-toolbar'
+					}
+				>
 					{ isCollapsed ? (
 						<ExpandFixedToolbarButton
 							onClick={ () => setIsCollapsed( false ) }
@@ -143,7 +153,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 							ref={ collapseFixedToolbarButtonRef }
 						/>
 					) }
-				</>
+				</ToolbarGroup>
 			) }
 			{ ! isCollapsed && <BlockToolbar hideDragHandle={ isFixed } /> }
 		</NavigableToolbar>
