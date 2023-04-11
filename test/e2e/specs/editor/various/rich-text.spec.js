@@ -613,7 +613,7 @@ test.describe( 'RichText', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	test.only( 'should properly convert `text-color` <span> tags to <mark> tags', async ( {
+	test( 'should properly convert `text-color` <span> tags to <mark> tags', async ( {
 		page,
 		editor,
 	} ) => {
