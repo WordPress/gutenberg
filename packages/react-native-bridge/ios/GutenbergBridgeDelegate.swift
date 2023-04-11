@@ -140,7 +140,7 @@ extension RCTLogLevel {
     }
 }
 
-public protocol GutenbergBridgeDelegate: class {
+public protocol GutenbergBridgeDelegate: AnyObject {
     /// Tells the delegate that Gutenberg had returned the requested HTML content.
     /// You can request HTML content by calling `requestHTML()` on a Gutenberg bridge instance.
     ///
