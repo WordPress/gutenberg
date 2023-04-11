@@ -31,12 +31,21 @@ remove_action( 'in_admin_header', 'wp_global_styles_render_svg_filters' );
 function _wp_get_iframed_editor_assets__63() {
 	global $wp_styles, $wp_scripts;
 
+	// Keep track of the styles and scripts instance to restore later.
 	$current_wp_styles  = $wp_styles;
 	$current_wp_scripts = $wp_scripts;
 
+	// Create new instances to collect the assets.
 	$wp_styles  = new WP_Styles();
 	$wp_scripts = new WP_Scripts();
 
+	// Register all currently registered styles and scripts. The actions that
+	// follow enqueue assets, but don't necessarily register them.
+	$wp_styles->registered = $current_wp_styles->registered;
+	$wp_scripts->registered = $current_wp_scripts->registered;
+
+	// We don't want to load EDITOR scripts and styles in the iframe, only
+	// assets for the content.
 	add_filter( 'should_load_block_editor_scripts_and_styles', '__return_false' );
 	do_action( 'enqueue_block_assets' );
 	remove_filter( 'should_load_block_editor_scripts_and_styles', '__return_false' );
@@ -54,6 +63,7 @@ function _wp_get_iframed_editor_assets__63() {
 	wp_print_footer_scripts();
 	$scripts = ob_get_clean();
 
+	// Restore the original instances.
 	$wp_styles  = $current_wp_styles;
 	$wp_scripts = $current_wp_scripts;
 
