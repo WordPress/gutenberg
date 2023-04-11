@@ -6,10 +6,11 @@
 		height: calc(100% - #{ $header-height * 2 });
 	}
 	@include break-medium() {
-		width: 50%;
+		width: 95%;
 	}
 	@include break-large() {
-		height: fit-content;
+		height: 95%;
+		max-height: none;
 	}
 }
 
@@ -18,7 +19,7 @@
 	width: 100%;
 	margin-top: $grid-unit-05;
 	gap: $grid-unit-30;
-	grid-template-columns: repeat(auto-fit, minmax(min(100%/2, max(240px, 100%/10)), 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%/2, max(240px, 100%/5)), 1fr));
 
 	.block-editor-block-patterns-list__list-item {
 		break-inside: avoid-column;
