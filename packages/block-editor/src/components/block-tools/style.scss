@@ -119,7 +119,7 @@
 		}
 	}
 
-	// on desktop viewports the toolbar is fixed
+	// on desktop and tablet viewports the toolbar is fixed
 	// on top of interface header
 	@include break-medium() {
 		&.is-fixed {
@@ -131,8 +131,6 @@
 			left: $grid-unit-80 + $grid-unit-40;
 			// Don't fill up when empty
 			min-height: initial;
-			// Don't fill the whole header, minimize area
-			width: initial;
 			// remove the border
 			border-bottom: none;
 			// has to be flex for collapse button to fit
@@ -214,6 +212,39 @@
 		}
 	}
 
+	// on tablet vewports the toolbar is fixed
+	// on top of interface header and covers the whole header
+	// except for the inserter on the left
+	@include break-medium() {
+		&.is-fixed {
+			width: calc(100% - #{$grid-unit-80 + $grid-unit-40});
+			&.is-collapsed {
+				// when collapsed minimize area
+				width: initial;
+			}
+			.is-fullscreen-mode & {
+				width: calc(100% - #{$grid-unit-80 + $grid-unit-70});
+				&.is-collapsed {
+					// when collapsed minimize area
+					width: initial;
+				}
+			}
+		}
+	}
+
+	// on desktop viewports the toolbar is fixed
+	// on top of interface header and leaves room
+	// for the block inserter the publish button
+	@include break-large() {
+		&.is-fixed {
+			// Don't fill the whole header, minimize area
+			width: initial;
+			.is-fullscreen-mode & {
+				// Don't fill the whole header, minimize area
+				width: initial;
+			}
+		}
+	}
 
 }
 
