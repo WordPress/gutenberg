@@ -143,9 +143,16 @@ export function CommandMenu() {
 		} );
 	}, [ registerShortcut ] );
 
-	useShortcut( 'core/commands', () => setOpen( ( prevOpen ) => ! prevOpen ), {
-		bindGlobal: true,
-	} );
+	useShortcut(
+		'core/commands',
+		( event ) => {
+			event.preventDefault();
+			setOpen( ( prevOpen ) => ! prevOpen );
+		},
+		{
+			bindGlobal: true,
+		}
+	);
 
 	const setLoader = useCallback(
 		( name, value ) =>
