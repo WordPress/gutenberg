@@ -122,19 +122,9 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 	} );
 
 	test.describe( 'In Top Toolbar option:', () => {
-		test.beforeEach( async ( { page } ) => {
+		test.beforeEach( async ( { editor } ) => {
 			// Ensure the fixed toolbar option is on
-			await page.evaluate( async () => {
-				const isFixedToolbarActive = window.wp.data
-					.select( 'core/edit-post' )
-					.isFeatureActive( 'fixedToolbar' );
-
-				if ( ! isFixedToolbarActive ) {
-					window.wp.data
-						.dispatch( 'core/edit-post' )
-						.toggleFeature( 'fixedToolbar' );
-				}
-			} );
+			await editor.toggleFixedToolbar( true );
 		} );
 
 		test.describe( 'In edit mode:', () => {
