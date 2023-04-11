@@ -42,7 +42,6 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const isBackToDashboardButton = canvasMode === 'view';
-	const showLabels = canvasMode !== 'edit';
 	const siteIconButtonProps = isBackToDashboardButton
 		? {
 				href: dashboardLink || 'index.php',
@@ -95,11 +94,9 @@ const SiteHub = forwardRef( ( props, ref ) => {
 					</Button>
 				</motion.div>
 
-				{ showLabels && (
-					<div className="edit-site-site-hub__site-title">
-						{ siteTitle }
-					</div>
-				) }
+				<div className="edit-site-site-hub__site-title">
+					{ siteTitle }
+				</div>
 			</HStack>
 		</motion.div>
 	);

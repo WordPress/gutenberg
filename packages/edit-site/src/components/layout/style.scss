@@ -3,82 +3,51 @@
 	background: $gray-900;
 	color: $white;
 	display: flex;
-	flex-direction: column;
+	align-items: stretch;
 }
 
 .edit-site-layout__hub {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: calc(100vw - #{$canvas-padding * 2});
 	height: $header-height;
 	z-index: z-index(".edit-site-layout__hub");
-
-	.edit-site-layout.is-full-canvas.is-edit-mode & {
-		width: auto;
-		padding-right: 0;
-	}
-
-	@include break-medium {
-		width: calc(#{$nav-sidebar-width} - #{$canvas-padding * 2});
-	}
-
-	.edit-site-layout.is-full-canvas & {
-		padding-right: $grid-unit-20;
-		border-radius: 0;
-		width: 100vw;
-		box-shadow: none;
-
-		@include break-medium {
-			width: auto;
-			padding-right: 0;
-		}
-	}
 }
 
 .edit-site-layout__header {
 	height: $header-height;
 	display: flex;
 	z-index: z-index(".edit-site-layout__header");
-
-	// This is only necessary for the exit animation
-	.edit-site-layout:not(.is-full-canvas) & {
-		position: fixed;
-		width: 100vw;
-	}
 }
 
-.edit-site-layout__content {
-	height: 100%;
-	flex-grow: 1;
-	display: flex;
+.edit-site-layout__header-wrapper {
+	overflow: hidden;
+	position: relative;
+	z-index: 10;
 }
 
 .edit-site-layout__sidebar {
 	z-index: z-index(".edit-site-layout__sidebar");
-	width: 100vw;
-
-	@include break-medium {
-		width: $nav-sidebar-width;
-	}
-
-	// This is only necessary for the exit animation
-	.edit-site-layout.is-full-canvas & {
-		position: fixed !important;
-		height: 100vh;
-		left: 0;
-		top: 0;
-	}
-
-	> div {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-	}
+	max-width: $nav-sidebar-width;
+	display: flex;
+	flex-direction: column;
 
 	.resizable-editor__drag-handle {
 		right: 0;
 	}
+
+	.interface-navigable-region {
+		flex: 1 1 auto;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.edit-site-sidebar__content {
+		flex: 1 1 auto;
+	}
+}
+
+.edit-site-layout__content {
+	flex: 1 1 auto;
+	height: 100%;
+	padding: 16px;
 }
 
 .edit-site-layout__canvas-container {
@@ -148,14 +117,15 @@
 .edit-site-layout__view-mode-toggle.components-button {
 	position: relative;
 	color: $white;
-	height: 100%;
-	width: 100%;
+	height: $header-height;
+	width: $header-height;
+	position: fixed;
 	border-radius: $radius-block-ui;
 	padding: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-
+	z-index: 100;
 	&:hover,
 	&:active {
 		color: $white;
@@ -219,4 +189,44 @@
 	@include break-medium {
 		border-left: $border-width solid $gray-300;
 	}
+}
+
+
+// me stuff
+
+.the-frame {
+	position: fixed;
+	flex: 1 1 auto;
+	z-index: 2;
+	overflow: hidden;
+	&.resizing {
+		pointer-events: none;
+	}
+	&.secondary:not(.edit) {
+		position: absolute;
+		width: 328px;
+		height: 250px;
+		left: 16px;
+		bottom: 16px;
+		margin: 0;
+		z-index: 2;
+		// .interface-interface-skeleton {
+		// 	pointer-events: none;
+		// }
+	}
+	.interface-interface-skeleton {
+		position: static;
+		height: 100%;
+	}
+}
+
+.the-frame__handle {
+	position: absolute;
+	left: 340px;
+	width: 5px;
+	height: 25px;
+	background: red;
+	top: 50%;
+	z-index: 100;
+	cursor: col-resize;
 }
