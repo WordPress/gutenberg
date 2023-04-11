@@ -64,15 +64,15 @@ describe( 'Preformatted', () => {
 
 		// Act
 		await addBlock( screen, 'Preformatted' );
-		const verseTextInput = await screen.findByPlaceholderText(
+		const preformattedTextInput = await screen.findByPlaceholderText(
 			'Write preformatted text…'
 		);
 		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( verseTextInput, string, {
+		changeAndSelectTextOfRichText( preformattedTextInput, string, {
 			selectionStart: string.length,
 			selectionEnd: string.length,
 		} );
-		fireEvent( verseTextInput, 'onKeyDown', {
+		fireEvent( preformattedTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
 			keyCode: ENTER,
