@@ -3,6 +3,21 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const documentToolbarButton = ( page ) => {
+	return page.getByRole( 'button', {
+		name: 'Toggle block inserter',
+		exact: true,
+	} );
+};
+
+const documentToolbarTooltip = ( page ) => {
+	return page.locator( 'text=Toggle block inserter' );
+};
+
+const blockToolbarButton = ( page ) => {
+	return page.getByRole( 'button', { name: 'Paragraph', exact: true } );
+};
+
 test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -21,9 +36,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await pageUtils.pressKeys( 'alt+F10' );
 
 			// The first top level toolbar button should be focused.
-			await expect(
-				page.getByRole( 'button', { name: 'Toggle block inserter' } )
-			).toBeFocused();
+			await expect( documentToolbarButton( page ) ).toBeFocused();
 		} );
 
 		test( 'should focus the top level toolbar when on an empty block', async ( {
@@ -36,9 +49,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await pageUtils.pressKeys( 'alt+F10' );
 
 			// The first top level toolbar button should be focused.
-			await expect(
-				page.getByRole( 'button', { name: 'Toggle block inserter' } )
-			).toBeFocused();
+			await expect( documentToolbarButton( page ) ).toBeFocused();
 		} );
 
 		test( 'should focus the block toolbar when a block is selected', async ( {
@@ -51,9 +62,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			// Focus the block toolbar.
 			await pageUtils.pressKeys( 'alt+F10' );
 			// The paragraph block toolbar button should be focused.
-			await expect(
-				page.getByRole( 'button', { name: 'Paragraph' } )
-			).toBeFocused();
+			await expect( blockToolbarButton( page ) ).toBeFocused();
 		} );
 
 		test( 'should focus the block toolbar when a block is selected and the toolbar is visible', async ( {
@@ -70,14 +79,10 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			// Focus the block toolbar.
 			await pageUtils.pressKeys( 'alt+F10' );
 			// The block toolbar should be focused.
-			await expect(
-				page.getByRole( 'button', { name: 'Paragraph' } )
-			).toBeFocused();
+			await expect( blockToolbarButton( page ) ).toBeFocused();
 
 			// The document toolbar popup should not be visible
-			await expect(
-				page.locator( 'text=Toggle block inserter' )
-			).not.toBeVisible();
+			await expect( documentToolbarTooltip( page ) ).not.toBeVisible();
 		} );
 	} );
 
@@ -99,9 +104,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await pageUtils.pressKeys( 'alt+F10' );
 
 			// The first top level toolbar button should be focused.
-			await expect(
-				page.getByRole( 'button', { name: 'Toggle block inserter' } )
-			).toBeFocused();
+			await expect( documentToolbarButton( page ) ).toBeFocused();
 		} );
 
 		test( 'should focus the top level toolbar from title', async ( {
@@ -115,9 +118,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await pageUtils.pressKeys( 'alt+F10' );
 
 			// The first top level toolbar button should be focused.
-			await expect(
-				page.getByRole( 'button', { name: 'Toggle block inserter' } )
-			).toBeFocused();
+			await expect( documentToolbarButton( page ) ).toBeFocused();
 		} );
 	} );
 
@@ -138,13 +139,11 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 				await pageUtils.pressKeys( 'alt+F10' );
 
 				// The block toolbar should be focused.
-				await expect(
-					page.getByRole( 'button', { name: 'Paragraph' } )
-				).toBeFocused();
+				await expect( blockToolbarButton( page ) ).toBeFocused();
 
 				// The document toolbar popup should not be visible
 				await expect(
-					page.locator( 'text=Toggle block inserter' )
+					documentToolbarTooltip( page )
 				).not.toBeVisible();
 			} );
 
@@ -158,13 +157,11 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 				await pageUtils.pressKeys( 'alt+F10' );
 
 				// The block toolbar should be focused.
-				await expect(
-					page.getByRole( 'button', { name: 'Paragraph' } )
-				).toBeFocused();
+				await expect( blockToolbarButton( page ) ).toBeFocused();
 
 				// The document toolbar popup should not be visible
 				await expect(
-					page.locator( 'text=Toggle block inserter' )
+					documentToolbarTooltip( page )
 				).not.toBeVisible();
 			} );
 
@@ -176,11 +173,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 				await pageUtils.pressKeys( 'alt+F10' );
 
 				// The first top level toolbar button should be focused.
-				await expect(
-					page.getByRole( 'button', {
-						name: 'Toggle block inserter',
-					} )
-				).toBeFocused();
+				await expect( documentToolbarButton( page ) ).toBeFocused();
 			} );
 		} );
 
@@ -199,16 +192,11 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 				await pageUtils.pressKeys( 'alt+F10' );
 
 				// The block toolbar should be focused.
-				await expect(
-					page.getByRole( 'button', {
-						name: 'Paragraph',
-						exact: true,
-					} )
-				).toBeFocused();
+				await expect( blockToolbarButton( page ) ).toBeFocused();
 
 				// The document toolbar popup should not be visible
 				await expect(
-					page.locator( 'text=Toggle block inserter' )
+					documentToolbarTooltip( page )
 				).not.toBeVisible();
 			} );
 
@@ -225,16 +213,11 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 				await pageUtils.pressKeys( 'alt+F10' );
 
 				// The block toolbar should be focused.
-				await expect(
-					page.getByRole( 'button', {
-						name: 'Paragraph',
-						exact: true,
-					} )
-				).toBeFocused();
+				await expect( blockToolbarButton( page ) ).toBeFocused();
 
 				// The document toolbar popup should not be visible
 				await expect(
-					page.locator( 'text=Toggle block inserter' )
+					documentToolbarTooltip( page )
 				).not.toBeVisible();
 			} );
 
@@ -249,11 +232,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 				await pageUtils.pressKeys( 'alt+F10' );
 
 				// The first top level toolbar button should be focused.
-				await expect(
-					page.getByRole( 'button', {
-						name: 'Toggle block inserter',
-					} )
-				).toBeFocused();
+				await expect( documentToolbarButton( page ) ).toBeFocused();
 			} );
 		} );
 	} );
