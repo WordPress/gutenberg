@@ -261,7 +261,7 @@ export default function VisualEditor( { styles } ) {
 		postContentAttributes,
 	] );
 
-	const layout = newestPostContentAttributes?.layout || {};
+	const { layout = {}, align = '' } = newestPostContentAttributes || {};
 
 	const postContentLayoutClasses = useLayoutClasses(
 		newestPostContentAttributes,
@@ -272,7 +272,8 @@ export default function VisualEditor( { styles } ) {
 		{
 			'is-layout-flow': ! themeSupportsLayout,
 		},
-		themeSupportsLayout && postContentLayoutClasses
+		themeSupportsLayout && postContentLayoutClasses,
+		align && `align${ align }`
 	);
 
 	const postContentLayoutStyles = useLayoutStyles(
@@ -326,6 +327,12 @@ export default function VisualEditor( { styles } ) {
 		],
 		[ styles ]
 	);
+
+	// Add some styles for alignwide/alignfull Post Content and its children.
+	const alignCSS = `.is-root-container.alignwide { max-width: var(--wp--style--global--wide-size); margin-left: auto; margin-right: auto;}
+		.is-root-container.alignwide:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: var(--wp--style--global--wide-size);}
+		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
+		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
 	return (
 		<BlockTools
@@ -382,6 +389,9 @@ export default function VisualEditor( { styles } ) {
 											globalLayoutSettings?.definitions
 										}
 									/>
+									{ align && (
+										<LayoutStyle css={ alignCSS } />
+									) }
 									{ postContentLayoutStyles && (
 										<LayoutStyle
 											layout={ postContentLayout }
