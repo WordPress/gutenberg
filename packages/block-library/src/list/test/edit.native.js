@@ -347,7 +347,10 @@ describe( 'List block', () => {
 		// backward delete
 		const listItemField =
 			within( listItemBlock ).getByLabelText( /Text input. .*Two.*/ );
-		changeAndSelectTextOfRichText( listItemField, 'Two' );
+		changeAndSelectTextOfRichText( listItemField, 'Two', {
+			initialSelectionStart: 0,
+			initialSelectionEnd: 3,
+		} );
 		fireEvent( listItemField, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
@@ -395,7 +398,10 @@ describe( 'List block', () => {
 		// backward delete
 		const listItemField =
 			within( listItemBlock ).getByLabelText( /Text input. .*One.*/ );
-		changeAndSelectTextOfRichText( listItemField, 'One' );
+		changeAndSelectTextOfRichText( listItemField, 'One', {
+			initialSelectionStart: 0,
+			initialSelectionEnd: 3,
+		} );
 		fireEvent( listItemField, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
@@ -406,11 +412,11 @@ describe( 'List block', () => {
 		"<!-- wp:paragraph -->
 		<p>A quick brown fox.</p>
 		<!-- /wp:paragraph -->
-		
+
 		<!-- wp:paragraph -->
 		<p>One</p>
 		<!-- /wp:paragraph -->
-		
+
 		<!-- wp:list -->
 		<ul><!-- wp:list-item -->
 		<li>Two</li>
