@@ -46,7 +46,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	const siteIconButtonProps = isBackToDashboardButton
 		? {
 				href: dashboardLink || 'index.php',
-				'aria-label': __( 'Go back to the dashboard' ),
+				label: __( 'Go back to the Dashboard' ),
 		  }
 		: {
 				label: __( 'Open Navigation Sidebar' ),
