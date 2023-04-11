@@ -39,18 +39,20 @@
  */
 class WP_Duotone_Gutenberg {
 	/**
-	 * An array of Duotone presets from global, theme, and custom styles.
+	 * An array of duotone filter data from global, theme, and custom presets.
 	 *
 	 * Example:
-	 * [
-	 *      'blue-orange' =>
-	 *          [
-	 *              'slug'  => 'blue-orange',
-	 *              'colors' => [ '#0000ff', '#ffcc00' ],
-	 *          ]
+	 *  [
+	 *      'wp-duotone-blue-orange' => [
+	 *          'slug'   => 'blue-orange',
+	 *          'colors' => [ '#0000ff', '#ffcc00' ],
+	 *      ],
+	 *      'wp-duotone-red-yellow' => [
+	 *          'slug'   => 'red-yellow',
+	 *          'colors' => [ '#cc0000', '#ffff33' ],
 	 *      ],
 	 *      …
-	 * ]
+	 *  ]
 	 *
 	 * @since 6.3.0
 	 * @var array
@@ -58,8 +60,8 @@ class WP_Duotone_Gutenberg {
 	private static $global_styles_presets = array();
 
 	/**
-	 * An array of block names from global, theme, and custom styles that have duotone presets. We'll use this to quickly
-	 * check if a block being rendered needs to have duotone applied, and which duotone preset to use.
+	 * Block names from global, theme, and custom styles that use duotone presets and the slug of
+	 * the preset they are using.
 	 *
 	 * Example:
 	 *  [
@@ -73,21 +75,21 @@ class WP_Duotone_Gutenberg {
 	private static $global_styles_block_names = array();
 
 	/**
-	 * An array of Duotone SVG and CSS output needed for the frontend duotone rendering based on what is
-	 * being output on the page. Organized by an id of the preset/color group and the information needed
-	 * to generate the SVG and CSS at render.
+	 * All of the duotone filter data for SVGs on the page. Includes both
+	 * presets and custom filters.
 	 *
 	 * Example:
 	 *  [
 	 *      'wp-duotone-blue-orange' => [
-	 *          'slug'  => 'blue-orange',
+	 *          'slug'   => 'blue-orange',
 	 *          'colors' => [ '#0000ff', '#ffcc00' ],
 	 *      ],
 	 *      'wp-duotone-000000-ffffff-2' => [
-	 *          'slug' => '000000-ffffff-2',
+	 *          'slug'   => '000000-ffffff-2',
 	 *          'colors' => [ '#000000', '#ffffff' ],
 	 *      ],
-	 * ]
+	 *      …
+	 *  ]
 	 *
 	 * @since 6.3.0
 	 * @var array
@@ -687,7 +689,8 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
-	 * Appends the used global style duotone filter CSS Vars to the inline global styles CSS
+	 * Appends the used global style duotone filter presets (CSS custom
+	 * properties) to the inline global styles CSS.
 	 */
 	public static function output_global_styles() {
 		if ( ! empty( self::$used_global_styles_presets ) ) {
