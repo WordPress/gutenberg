@@ -1,0 +1,31 @@
+.block-editor-hooks__use-editor-wrapper-styles {
+	width: 100%;
+	max-width: 580;
+	align-self: center;
+}
+
+.block-editor-hooks__use-editor-wrapper-styles--reversed {
+	flex-direction: column-reverse;
+	width: 100%;
+	max-width: 580;
+}
+
+.block-editor-hooks__use-editor-wrapper-styles-alignment--full {
+	max-width: 100%;
+}
+
+.block-editor-hooks__use-editor-wrapper-styles-alignment--wide {
+	max-width: 1054;
+}
+
+.block-editor-hooks__use-editor-wrapper-styles-alignment--wide-medium {
+	max-width: 770;
+}
+
+.block-editor-hooks__use-editor-wrapper-styles-alignment--wide-landscape {
+	max-width: 662;
+}
+
+.block-editor-hooks__use-editor-wrapper-styles-block {
+	margin: $block-edge-to-content;
+}
