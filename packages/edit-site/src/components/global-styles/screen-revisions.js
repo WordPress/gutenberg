@@ -6,13 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
 	Button,
 	SelectControl,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	useContext,
@@ -21,7 +21,12 @@ import {
 	useEffect,
 	useMemo,
 } from '@wordpress/element';
-import { check } from '@wordpress/icons';
+import {
+	check,
+	redo as redoIcon,
+	reset as resetIcon,
+	undo as undoIcon,
+} from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -66,6 +71,14 @@ function RevisionsSelect( { userRevisions, currentRevisionId, onChange } ) {
 function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 	const [ canReset, onReset ] = useGlobalStylesReset();
+	const { hasUndo } = useSelect(
+		( select ) => ( {
+			hasUndo: select( coreStore ).hasUndo(),
+		} ),
+		[]
+	);
+	const { undo } = useDispatch( coreStore );
+
 	return (
 		<>
 			<ol className="edit-site-global-styles-screen-revisions__revisions-list">
@@ -100,14 +113,22 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 					);
 				} ) }
 			</ol>
-			{ canReset && (
+			<div className="edit-site-global-styles-screen-revisions__buttons">
 				<Button
-					onClick={ onReset }
+					onClick={ hasUndo ? undo : undefined }
+					icon={ ! isRTL() ? redoIcon : undoIcon }
+					className="edit-site-global-styles-screen-revisions__undo"
+					label={ __( 'Undo last change' ) }
+					aria-disabled={ ! hasUndo }
+				/>
+				<Button
+					onClick={ canReset ? onReset : undefined }
+					icon={ resetIcon }
 					className="edit-site-global-styles-screen-revisions__reset"
-				>
-					{ __( 'Reset styles to defaults' ) }
-				</Button>
-			) }
+					label={ __( 'Reset styles to defaults' ) }
+					aria-disabled={ ! canReset }
+				/>
+			</div>
 		</>
 	);
 }
@@ -134,12 +155,13 @@ function ScreenRevisions() {
 		let currentRevision = userRevisions[ 0 ];
 		for ( let i = 0; i < userRevisions.length; i++ ) {
 			if ( isGlobalStyleConfigEqual( userConfig, userRevisions[ i ] ) ) {
+				// @TODO: Should we remove revisions from the list that match exactly the default global styles?
 				currentRevision = userRevisions[ i ];
 				break;
 			}
 		}
 		setCurrentRevisionId( currentRevision?.id );
-	}, [ userRevisions, hasRevisions ] );
+	}, [ userRevisions, hasRevisions, userConfig ] );
 
 	const restoreRevision = useCallback(
 		( revision ) => {

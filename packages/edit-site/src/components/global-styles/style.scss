@@ -208,7 +208,6 @@
 	margin: 0;
 }
 
-.edit-site-global-styles-screen-revisions__reset,
 .edit-site-global-styles-screen-revisions__revision-item {
 	justify-content: center;
 	width: 100%;
@@ -218,3 +217,7 @@
 	}
 }
 
+.edit-site-global-styles-screen-revisions__buttons {
+	display: flex;
+	justify-content: center;
+}
