@@ -151,23 +151,20 @@
 				}
 			}
 
-			& > button.components-button.has-icon {
-
+			& > .block-editor-block-toolbar__collapse-fixed-toolbar {
 				border-radius: 0;
+				// Add a border as separator in the block toolbar.
+				border-right: $border-width solid $gray-300;
+				padding-right: 6px;
+				padding-left: 6px;
+			}
 
-				&.block-editor-block-toolbar__collapse-fixed-toolbar {
-					// Add a border as separator in the block toolbar.
-					border-right: $border-width solid $gray-300;
-					padding-right: 6px;
-					padding-left: 6px;
-				}
-
-				&.block-editor-block-toolbar__expand-fixed-toolbar {
-					// Add a border as separator in the block toolbar.
-					border-left: $border-width solid $gray-300;
-					padding-right: 6px;
-					padding-left: 6px;
-				}
+			& > .block-editor-block-toolbar__expand-fixed-toolbar {
+				border-radius: 0;
+				// Add a border as separator in the block toolbar.
+				border-left: $border-width solid $gray-300;
+				padding-right: 6px;
+				padding-left: 6px;
 			}
 		}
 
