@@ -1,4 +1,5 @@
 import Foundation
+import WebKit
 
 public struct SourceFile {
     enum SourceFileError: Error {
