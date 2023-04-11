@@ -18,108 +18,79 @@ const blockToolbarButton = ( page ) => {
 	return page.getByRole( 'button', { name: 'Paragraph', exact: true } );
 };
 
+const useSelectMode = async ( page ) => {
+	await page.keyboard.press( 'Escape' );
+};
+
+const moveToToolbarShortcut = async ( pageUtils ) => {
+	await pageUtils.pressKeys( 'alt+F10' );
+};
+
 test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
 
-	test.describe( 'In default view options in edit mode:', () => {
-		test( 'should focus the top level toolbar when no block is selected', async ( {
-			page,
-			pageUtils,
-		} ) => {
-			await page.type(
-				'.editor-post-title__input',
-				'Focus toolbar shortcut (alt + F10)'
-			);
-			// Focus the top level toolbar.
-			await pageUtils.pressKeys( 'alt+F10' );
+	test( 'Focuses correct toolbar in default view options in edit mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Test: Focus the top level toolbar from title
+		await moveToToolbarShortcut( pageUtils );
+		await expect( documentToolbarButton( page ) ).toBeFocused();
 
-			// The first top level toolbar button should be focused.
-			await expect( documentToolbarButton( page ) ).toBeFocused();
-		} );
+		// Test: Focus document toolbar from empty block
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await moveToToolbarShortcut( pageUtils );
+		await expect( documentToolbarButton( page ) ).toBeFocused();
 
-		test( 'should focus the top level toolbar when on an empty block', async ( {
-			page,
-			pageUtils,
-		} ) => {
-			// Move from title into an empty block
-			await page.keyboard.press( 'Enter' );
-			// Focus the top level toolbar.
-			await pageUtils.pressKeys( 'alt+F10' );
+		// Test: Focus block toolbar from block content when block toolbar isn't visible
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type(
+			"Focus to block toolbar when block toolbar isn't visible"
+		);
+		await moveToToolbarShortcut( pageUtils );
+		await expect( blockToolbarButton( page ) ).toBeFocused();
+		await expect( documentToolbarTooltip( page ) ).not.toBeVisible();
 
-			// The first top level toolbar button should be focused.
-			await expect( documentToolbarButton( page ) ).toBeFocused();
-		} );
-
-		test( 'should focus the block toolbar when a block is selected', async ( {
-			editor,
-			page,
-			pageUtils,
-		} ) => {
-			await editor.insertBlock( { name: 'core/paragraph' } );
-			await page.keyboard.type( 'Paragraph' );
-			// Focus the block toolbar.
-			await pageUtils.pressKeys( 'alt+F10' );
-			// The paragraph block toolbar button should be focused.
-			await expect( blockToolbarButton( page ) ).toBeFocused();
-		} );
-
-		test( 'should focus the block toolbar when a block is selected and the toolbar is visible', async ( {
-			editor,
-			page,
-			pageUtils,
-		} ) => {
-			await editor.insertBlock( { name: 'core/paragraph' } );
-			await page.keyboard.type( 'Paragraph' );
-			// We need to force the toolbar to show. Otherwise, the bug from
-			// https://github.com/WordPress/gutenberg/pull/49644 won't surface in the e2e tests.
-			await editor.showBlockToolbar();
-
-			// Focus the block toolbar.
-			await pageUtils.pressKeys( 'alt+F10' );
-			// The block toolbar should be focused.
-			await expect( blockToolbarButton( page ) ).toBeFocused();
-
-			// The document toolbar popup should not be visible
-			await expect( documentToolbarTooltip( page ) ).not.toBeVisible();
-		} );
+		// Test: Focus block toolbar from block content when block toolbar is visible
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type(
+			'Focus to block toolbar when block toolbar is visible'
+		);
+		// We need to force the toolbar to show. Otherwise, the bug from
+		// https://github.com/WordPress/gutenberg/pull/49644 won't surface in the e2e tests.
+		await editor.showBlockToolbar();
+		await moveToToolbarShortcut( pageUtils );
+		await expect( blockToolbarButton( page ) ).toBeFocused();
+		await expect( documentToolbarTooltip( page ) ).not.toBeVisible();
 	} );
 
-	test.describe( 'In default view options in select mode:', () => {
-		test( 'should focus the top level toolbar from paragraph block', async ( {
-			editor,
-			page,
-			pageUtils,
-		} ) => {
-			await editor.insertBlock( { name: 'core/paragraph' } );
-			await page.keyboard.type( 'Paragraph' );
-			// We need to force the toolbar to show. Otherwise, the bug from
-			// https://github.com/WordPress/gutenberg/pull/49644 won't surface in the e2e tests.
-			await editor.showBlockToolbar();
-			// Use select mode
-			await page.keyboard.press( 'Escape' );
+	test( 'Focuses correct toolbar in default view options in select mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Test: Focus the document toolbar from title
+		await useSelectMode( page );
+		await moveToToolbarShortcut( pageUtils );
+		await expect( documentToolbarButton( page ) ).toBeFocused();
 
-			// Focus the block toolbar.
-			await pageUtils.pressKeys( 'alt+F10' );
+		// Test: Focus the top level toolbar from empty block
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await useSelectMode( page );
+		await moveToToolbarShortcut( pageUtils );
+		await expect( documentToolbarButton( page ) ).toBeFocused();
 
-			// The first top level toolbar button should be focused.
-			await expect( documentToolbarButton( page ) ).toBeFocused();
-		} );
-
-		test( 'should focus the top level toolbar from title', async ( {
-			page,
-			pageUtils,
-		} ) => {
-			// Use select mode
-			await page.keyboard.press( 'Escape' );
-
-			// Focus the block toolbar.
-			await pageUtils.pressKeys( 'alt+F10' );
-
-			// The first top level toolbar button should be focused.
-			await expect( documentToolbarButton( page ) ).toBeFocused();
-		} );
+		// Test: Focus the top level toolbar from paragraph block
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type(
+			'Focus top level toolbar from paragraph block in select mode.'
+		);
+		await useSelectMode( page );
+		await moveToToolbarShortcut( pageUtils );
+		await expect( documentToolbarButton( page ) ).toBeFocused();
 	} );
 
 	test.describe( 'In Top Toolbar option:', () => {
@@ -128,112 +99,57 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			await editor.toggleFixedToolbar( true );
 		} );
 
-		test.describe( 'In edit mode:', () => {
-			test( 'should focus the block toolbar from paragraph block', async ( {
-				page,
-				pageUtils,
-			} ) => {
-				await page.keyboard.press( 'Enter' );
-				await page.keyboard.type( 'Paragraph' );
-				// Focus the block toolbar.
-				await pageUtils.pressKeys( 'alt+F10' );
+		test( 'Focuses the correct toolbar in edit mode', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			// Test: Focus the document toolbar from title
+			await moveToToolbarShortcut( pageUtils );
+			await expect( documentToolbarButton( page ) ).toBeFocused();
 
-				// The block toolbar should be focused.
-				await expect( blockToolbarButton( page ) ).toBeFocused();
+			// Test: Focus the block toolbar from empty block
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await moveToToolbarShortcut( pageUtils );
+			await expect( blockToolbarButton( page ) ).toBeFocused();
+			await expect( documentToolbarTooltip( page ) ).not.toBeVisible();
 
-				// The document toolbar popup should not be visible
-				await expect(
-					documentToolbarTooltip( page )
-				).not.toBeVisible();
-			} );
-
-			test( 'should focus the block toolbar from empty block', async ( {
-				page,
-				pageUtils,
-			} ) => {
-				// Go to empty paragraph block
-				await page.keyboard.press( 'Enter' );
-				// Focus the block toolbar.
-				await pageUtils.pressKeys( 'alt+F10' );
-
-				// The block toolbar should be focused.
-				await expect( blockToolbarButton( page ) ).toBeFocused();
-
-				// The document toolbar popup should not be visible
-				await expect(
-					documentToolbarTooltip( page )
-				).not.toBeVisible();
-			} );
-
-			test( 'should focus the document toolbar from title', async ( {
-				page,
-				pageUtils,
-			} ) => {
-				// Focus the block toolbar.
-				await pageUtils.pressKeys( 'alt+F10' );
-
-				// The first top level toolbar button should be focused.
-				await expect( documentToolbarButton( page ) ).toBeFocused();
-			} );
+			// Test: Focus the block toolbar from paragraph block with content
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.type(
+				'Focus the block toolbar from paragraph block with content'
+			);
+			await moveToToolbarShortcut( pageUtils );
+			await expect( blockToolbarButton( page ) ).toBeFocused();
+			await expect( documentToolbarTooltip( page ) ).not.toBeVisible();
 		} );
 
-		test.describe( 'In select mode:', () => {
-			test( 'should focus the block toolbar from paragraph block', async ( {
-				editor,
-				page,
-				pageUtils,
-			} ) => {
-				await editor.insertBlock( { name: 'core/paragraph' } );
-				await page.keyboard.type( 'Paragraph' );
-				// Use select mode
-				await page.keyboard.press( 'Escape' );
+		test( 'Focuses the correct toolbar in select mode', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			// Test: Focus the document toolbar from title
+			await useSelectMode( page );
+			await moveToToolbarShortcut( pageUtils );
+			await expect( documentToolbarButton( page ) ).toBeFocused();
 
-				// Focus the block toolbar.
-				await pageUtils.pressKeys( 'alt+F10' );
+			// Test: Focus the block toolbar from empty block
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await useSelectMode( page );
+			await moveToToolbarShortcut( pageUtils );
+			await expect( blockToolbarButton( page ) ).toBeFocused();
+			await expect( documentToolbarTooltip( page ) ).not.toBeVisible();
 
-				// The block toolbar should be focused.
-				await expect( blockToolbarButton( page ) ).toBeFocused();
-
-				// The document toolbar popup should not be visible
-				await expect(
-					documentToolbarTooltip( page )
-				).not.toBeVisible();
-			} );
-
-			test( 'should focus the block toolbar from empty block', async ( {
-				page,
-				pageUtils,
-			} ) => {
-				// Move to empty paragrph block
-				await page.keyboard.press( 'Enter' );
-				// Use select mode
-				await page.keyboard.press( 'Escape' );
-
-				// Focus the block toolbar.
-				await pageUtils.pressKeys( 'alt+F10' );
-
-				// The block toolbar should be focused.
-				await expect( blockToolbarButton( page ) ).toBeFocused();
-
-				// The document toolbar popup should not be visible
-				await expect(
-					documentToolbarTooltip( page )
-				).not.toBeVisible();
-			} );
-
-			test( 'should focus the top level toolbar from title', async ( {
-				page,
-				pageUtils,
-			} ) => {
-				// Use select mode
-				await page.keyboard.press( 'Escape' );
-
-				// Focus the block toolbar.
-				await pageUtils.pressKeys( 'alt+F10' );
-
-				// The first top level toolbar button should be focused.
-				await expect( documentToolbarButton( page ) ).toBeFocused();
-			} );
+			// Test: Focus the block toolbar from paragraph in select mode
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.type(
+				'Focus the block toolbar from paragraph in select mode'
+			);
+			await useSelectMode( page );
+			await moveToToolbarShortcut( pageUtils );
+			await expect( blockToolbarButton( page ) ).toBeFocused();
+			await expect( documentToolbarTooltip( page ) ).not.toBeVisible();
 		} );
 	} );
 } );
