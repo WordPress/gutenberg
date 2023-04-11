@@ -35,7 +35,7 @@ extension SourceFile {
     
     public func jsScript(with argument: String? = nil) throws -> WKUserScript {
         let content = try getContent()
-        let formatted = String(format: content, argument ?? [])
+        let formatted = String(format: content, argument ?? "")
         
         switch self.type {
         case .css:
