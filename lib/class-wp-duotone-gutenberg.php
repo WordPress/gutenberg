@@ -971,10 +971,17 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Returns the prefixed id for the duotone filter for use as a CSS id.
 	 *
+	 * Exported for the deprecated function gutenberg_get_duotone_filter_id().
+	 *
+	 * @since 6.3.0
+	 * @deprecated 6.3.0
+	 *
 	 * @param  array $preset Duotone preset value as seen in theme.json.
 	 * @return string        Duotone filter CSS id.
 	 */
 	public static function get_filter_id_from_preset( $preset ) {
+		_deprecated_function( __FUNCTION__, '6.3.0' );
+
 		$filter_id = '';
 		if ( isset( $preset['slug'] ) ) {
 			$filter_id = self::get_filter_id( $preset['slug'] );
@@ -985,10 +992,17 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Gets the SVG for the duotone filter definition from a preset.
 	 *
+	 * Exported for the deprecated function gutenberg_get_duotone_filter_property().
+	 *
+	 * @since 6.3.0
+	 * @deprecated 6.3.0
+	 *
 	 * @param array $preset The duotone preset.
 	 * @return string The SVG for the filter definition.
 	 */
 	public static function get_filter_svg_from_preset( $preset ) {
+		_deprecated_function( __FUNCTION__, '6.3.0' );
+
 		$filter_id = self::get_filter_id_from_preset( $preset );
 		return self::get_filter_svg( $filter_id, $preset['colors'] );
 	}
@@ -996,10 +1010,17 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Gets the CSS filter property value from a preset.
 	 *
+	 * Exported for the deprecated function gutenberg_get_duotone_filter_id().
+	 *
+	 * @since 6.3.0
+	 * @deprecated 6.3.0
+	 *
 	 * @param array $preset The duotone preset.
 	 * @return string The CSS filter property value.
 	 */
 	public static function get_filter_css_property_value_from_preset( $preset ) {
+		_deprecated_function( __FUNCTION__, '6.3.0' );
+
 		if ( isset( $preset['colors'] ) && is_string( $preset['colors'] ) ) {
 			return $preset['colors'];
 		}
