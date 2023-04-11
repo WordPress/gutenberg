@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { ToolbarItem, Button } from '@wordpress/components';
+import { ToolbarItem, ToolbarButton } from '@wordpress/components';
 import { levelUp } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -25,8 +25,8 @@ import BlockIcon from '../block-icon';
 const CollapseFixedToolbarButton = forwardRef( ( { onClick }, ref ) => {
 	return (
 		<ToolbarItem
-			as={ Button }
-			className="components-button components-toolbar-button block-editor-block-toolbar__collapse-fixed-toolbar"
+			as={ ToolbarButton }
+			className="block-editor-block-toolbar__collapse-fixed-toolbar"
 			icon={ levelUp }
 			onClick={ onClick }
 			ref={ ref }
@@ -38,8 +38,8 @@ const CollapseFixedToolbarButton = forwardRef( ( { onClick }, ref ) => {
 const ExpandFixedToolbarButton = forwardRef( ( { onClick, icon }, ref ) => {
 	return (
 		<ToolbarItem
-			as={ Button }
-			className="components-button components-toolbar-button block-editor-block-toolbar__expand-fixed-toolbar"
+			as={ ToolbarButton }
+			className="block-editor-block-toolbar__expand-fixed-toolbar"
 			icon={ <BlockIcon icon={ icon } /> }
 			onClick={ onClick }
 			ref={ ref }
