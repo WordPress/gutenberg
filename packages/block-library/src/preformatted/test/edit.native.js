@@ -77,11 +77,12 @@ describe( 'Preformatted', () => {
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
+		changeAndSelectTextOfRichText( preformattedTextInput, 'Again' );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:preformatted -->
-		<pre class="wp-block-preformatted">A great statement.<br></pre>
+		<pre class="wp-block-preformatted">A great statement.<br>Again</pre>
 		<!-- /wp:preformatted -->"
 	` );
 	} );
