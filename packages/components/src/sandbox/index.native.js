@@ -218,7 +218,7 @@ const Sandbox = forwardRef( function Sandbox(
 		// Avoid comma issues with props.viewportProps.
 		const addViewportProps = viewportProps
 			.trim()
-			.replace( /(^[^,]) /, ', $1' );
+			.replace( /(^[^,])/, ', $1' );
 
 		const htmlDoc = (
 			<html lang={ lang }>
