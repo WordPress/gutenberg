@@ -6,10 +6,14 @@ import { Command } from 'cmdk';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Modal, TextHighlight } from '@wordpress/components';
+import {
+	store as keyboardShortcutsStore,
+	useShortcut,
+} from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -116,6 +120,7 @@ export function CommandMenuGroup( { group, search, setLoader, close } ) {
 }
 
 export function CommandMenu() {
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
 	const [ open, setOpen ] = useState( false );
 	const { groups } = useSelect( ( select ) => {
@@ -126,18 +131,28 @@ export function CommandMenu() {
 	}, [] );
 	const [ loaders, setLoaders ] = useState( {} );
 
-	// Toggle the menu when Meta-K is pressed
 	useEffect( () => {
-		const toggleOnMetaK = ( e ) => {
-			if ( e.key === 'k' && e.metaKey ) {
-				setOpen( ( prevOpen ) => ! prevOpen );
-				e.preventDefault();
-			}
-		};
+		registerShortcut( {
+			name: 'core/commands',
+			category: 'global',
+			description: __( 'Open the global command menu' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'k',
+			},
+		} );
+	}, [ registerShortcut ] );
 
-		document.addEventListener( 'keydown', toggleOnMetaK );
-		return () => document.removeEventListener( 'keydown', toggleOnMetaK );
-	}, [] );
+	useShortcut(
+		'core/commands',
+		( event ) => {
+			event.preventDefault();
+			setOpen( ( prevOpen ) => ! prevOpen );
+		},
+		{
+			bindGlobal: true,
+		}
+	);
 
 	const setLoader = useCallback(
 		( name, value ) =>
