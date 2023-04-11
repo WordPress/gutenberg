@@ -15,8 +15,8 @@ export { default as isShallowEqualArrays } from './arrays';
  * Returns true if the two arrays or objects are shallow equal, or false
  * otherwise. Also handles primitive values, just in case.
  *
- * @param {any} a First object or array to compare.
- * @param {any} b Second object or array to compare.
+ * @param {unknown} a First object or array to compare.
+ * @param {unknown} b Second object or array to compare.
  *
  * @return {boolean} Whether the two values are shallow equal.
  */
