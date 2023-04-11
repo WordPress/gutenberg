@@ -18,6 +18,7 @@
 	},
 	"usesContext": [ "commentId" ],
 	"supports": {
+		"interactivity": true,
 		"anchor": true,
 		"html": false,
 		"color": {
@@ -46,5 +47,6 @@
 				"fontSize": true
 			}
 		}
-	}
+	},
+	"viewScript": [ "file:./view.min.js" ]
 }

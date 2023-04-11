@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Server-side rendering of the `core/comment-date` block.
  *
@@ -26,21 +27,27 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 	$classes = ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) ? 'has-link-color' : '';
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
-	$formatted_date     = get_comment_date(
-		isset( $attributes['format'] ) ? $attributes['format'] : '',
-		$comment
+
+	$formatted_time = sprintf(
+		'<time datetime="%1$s" data-wp-init="effects.core.checkDiff" data-wp-text="context.commentsDateDiff"></time>',
+		esc_attr( get_comment_date( 'c', $comment ) ),
 	);
-	$link               = get_comment_link( $comment );
+
+	$link = get_comment_link( $comment );
 
 	if ( ! empty( $attributes['isLink'] ) ) {
-		$formatted_date = sprintf( '<a href="%1s">%2s</a>', esc_url( $link ), $formatted_date );
+		$formatted_time = sprintf( '<a href="%1s">%2s</a>', esc_url( $link ), $formatted_time );
 	}
 
 	return sprintf(
-		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
+		'<div 
+			data-wp-context=\'{ "commentDate": "' . get_comment_time( 'c', false, true, $comment ) . '", "commentsDateDiff": ""}\'
+			%1$s
+		>
+			%2$s
+		</div>',
 		$wrapper_attributes,
-		esc_attr( get_comment_date( 'c', $comment ) ),
-		$formatted_date
+		$formatted_time
 	);
 }
 
