@@ -1,0 +1,11 @@
+<!-- wp:heading {"fontSize":"large"} -->
+<h2 class="has-large-font-size">Line 1 to be made large</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"fontSize":"large"} -->
+<h2 class="has-large-font-size">Line 2 to be made large</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"fontSize":"large"} -->
+<h2 class="has-large-font-size">Line 3 to be made large</h2>
+<!-- /wp:heading -->
