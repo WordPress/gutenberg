@@ -495,7 +495,7 @@ class WP_Duotone_Gutenberg {
 				continue;
 			}
 			// If it has a duotone filter preset, save the block name and the preset slug.
-			$slug = self::gutenberg_get_slug_from_attr( $duotone_attr );
+			$slug = self::get_slug_from_attribute( $duotone_attr );
 
 			if ( $slug && $slug !== $duotone_attr ) {
 				self::$global_styles_block_names[ $block_node['name'] ] = $slug;
@@ -511,7 +511,7 @@ class WP_Duotone_Gutenberg {
 	 * @param string $duotone_attr The duotone attribute from a block.
 	 * @return string The slug of the duotone preset or an empty string if no slug is found.
 	 */
-	private static function gutenberg_get_slug_from_attr( $duotone_attr ) {
+	private static function get_slug_from_attribute( $duotone_attr ) {
 		// Uses Branch Reset Groups `(?|…)` to return one capture group.
 		preg_match( '/(?|var:preset\|duotone\|(\S+)|var\(--wp--preset--duotone--(\S+)\))/', $duotone_attr, $matches );
 
@@ -525,7 +525,7 @@ class WP_Duotone_Gutenberg {
 	 * @return bool True if the duotone preset present and valid.
 	 */
 	private static function is_preset( $duotone_attr ) {
-		$slug      = self::gutenberg_get_slug_from_attr( $duotone_attr );
+		$slug      = self::get_slug_from_attribute( $duotone_attr );
 		$filter_id = self::get_filter_id( $slug );
 
 		return array_key_exists( $filter_id, self::$global_styles_presets );
@@ -910,8 +910,7 @@ class WP_Duotone_Gutenberg {
 			$is_custom    = is_array( $duotone_attr );
 
 			if ( $is_preset ) {
-
-				$slug         = self::gutenberg_get_slug_from_attr( $duotone_attr ); // e.g. 'green-blue'.
+				$slug         = self::get_slug_from_attribute( $duotone_attr ); // e.g. 'green-blue'.
 				$filter_id    = self::get_filter_id( $slug ); // e.g. 'wp-duotone-filter-green-blue'.
 				$filter_value = self::get_css_var( $slug ); // e.g. 'var(--wp--preset--duotone--green-blue)'.
 
