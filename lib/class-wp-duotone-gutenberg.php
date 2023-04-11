@@ -130,16 +130,6 @@ class WP_Duotone_Gutenberg {
 	private static $block_css_declarations = array();
 
 	/**
-	 * Prefix used for generating and referencing duotone CSS custom properties.
-	 */
-	const CSS_VAR_PREFIX = '--wp--preset--duotone--';
-
-	/**
-	 * Prefix used for generating and referencing duotone filter IDs.
-	 */
-	const FILTER_ID_PREFIX = 'wp-duotone-';
-
-	/**
 	 * Direct port of colord's clamp function. Using min/max instead of
 	 * nested ternaries.
 	 *
@@ -538,7 +528,7 @@ class WP_Duotone_Gutenberg {
 	 * @return string The CSS variable name.
 	 */
 	private static function get_css_custom_property_name( $slug ) {
-		return self::CSS_VAR_PREFIX . $slug;
+		return  "--wp--preset--duotone--$slug";
 	}
 
 	/**
@@ -548,7 +538,7 @@ class WP_Duotone_Gutenberg {
 	 * @return string The ID of the duotone filter.
 	 */
 	private static function get_filter_id( $slug ) {
-		return self::FILTER_ID_PREFIX . $slug;
+		return  "wp-duotone-$slug";
 	}
 
 	/**
@@ -558,7 +548,7 @@ class WP_Duotone_Gutenberg {
 	 * @return string The URL for the duotone filter.
 	 */
 	private static function get_filter_url( $filter_id ) {
-		return 'url(#' . $filter_id . ')';
+		return "url(#$filter_id)";
 	}
 
 	/**
@@ -642,7 +632,8 @@ class WP_Duotone_Gutenberg {
 	 * @return string The CSS variable.
 	 */
 	private static function get_css_var( $slug ) {
-		return 'var(' . self::get_css_custom_property_name( $slug ) . ')';
+		$name = self::get_css_custom_property_name( $slug );
+		return "var($name)";
 	}
 
 	/**
@@ -752,7 +743,7 @@ class WP_Duotone_Gutenberg {
 			$colors            = $filter_data['colors'];
 			$css_property_name = self::get_css_custom_property_name( $slug );
 			$declaration_value = is_string( $colors ) ? $colors : self::get_filter_url( $filter_id );
-			$css              .= $css_property_name . ':' . $declaration_value . ';';
+			$css              .= "$css_property_name:$declaration_value;";
 		}
 		$css .= '}';
 		return $css;
