@@ -65,7 +65,7 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 		return {
 			block,
 			blockType,
-			styles: getBlockStyles( block.name ),
+			styles: getBlockStyles( block.name, block.attributes ),
 			className: block.attributes.className || '',
 		};
 	};

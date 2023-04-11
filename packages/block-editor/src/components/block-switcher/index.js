@@ -49,10 +49,13 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 			const rootClientId = getBlockRootClientId(
 				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
 			);
-			const [ { name: firstBlockName } ] = blocks;
+			const [
+				{ name: firstBlockName, attributes: firstBlockAttributes },
+			] = blocks;
 			const _isSingleBlockSelected = blocks.length === 1;
 			const styles =
-				_isSingleBlockSelected && getBlockStyles( firstBlockName );
+				_isSingleBlockSelected &&
+				getBlockStyles( firstBlockName, firstBlockAttributes );
 			let _icon;
 			if ( _isSingleBlockSelected ) {
 				_icon = blockInformation?.icon; // Take into account active block variations.

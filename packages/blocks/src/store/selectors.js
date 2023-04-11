@@ -116,8 +116,9 @@ export function getBlockType( state, name ) {
 /**
  * Returns block styles by block name.
  *
- * @param {Object} state Data state.
- * @param {string} name  Block type name.
+ * @param {Object} state        Data state.
+ * @param {string} name         Block type name.
+ * @param {Object} [attributes] Block attributes. If provided, will try to find and include styles for specific block variations.
  *
  * @example
  * ```js
@@ -143,9 +144,48 @@ export function getBlockType( state, name ) {
  *
  * @return {Array?} Block Styles.
  */
-export function getBlockStyles( state, name ) {
-	return state.blockStyles[ name ];
-}
+export const getBlockStyles = createSelector(
+	( state, name, attributes ) => {
+		const mainBlockStyles = state.blockStyles[ name ]?.filter(
+			( { variations } ) => ! variations
+		);
+		// If block attributes are provided, try to find styles for
+		// any active block variation.
+		if ( ! attributes ) {
+			return mainBlockStyles;
+		}
+		const activeVariation = getActiveBlockVariation(
+			state,
+			name,
+			attributes
+		);
+		if ( ! activeVariation ) {
+			return mainBlockStyles;
+		}
+		const activeVariationStyles = state.blockStyles[ name ]?.filter(
+			( { variations } ) => variations?.includes( activeVariation.name )
+		);
+		return [ ...activeVariationStyles, ...mainBlockStyles ];
+	},
+	( state, name ) => [ state.blockStyles[ name ] ]
+);
+
+/**
+ * Returns block variation styles by block name.
+ *
+ * @param {Object} state Data state.
+ * @param {string} name  Block type name.
+ *
+ * @return {Array?} Block Styles.
+ */
+export const getBlockVariationStyles = createSelector(
+	( state, name ) => {
+		return state.blockStyles[ name ]?.filter(
+			( { variations } ) => !! variations
+		);
+	},
+	( state, name ) => [ state.blockStyles[ name ] ]
+);
 
 /**
  * Returns block variations by block name.
