@@ -33,7 +33,7 @@
  */
 
 /**
- * Manages which duotone filters need to be output on the page.
+ * Manages duotone block supports and global styles.
  *
  * @access public
  */
