@@ -9,23 +9,26 @@
 		width: 95%;
 	}
 	@include break-large() {
-		height: 95%;
-		max-height: none;
+		max-height: 95%;
 	}
 }
 
 .edit-site-start-template-options__modal-content .block-editor-block-patterns-list {
-	display: grid;
+	display: flex;
+	flex-wrap: wrap;
+	gap: $grid-unit-30;
 	width: 100%;
 	margin-top: $grid-unit-05;
-	gap: $grid-unit-30;
-	grid-template-columns: repeat(auto-fit, minmax(min(100%/2, max(240px, 100%/5)), 1fr));
 
 	.block-editor-block-patterns-list__list-item {
 		break-inside: avoid-column;
 		margin-bottom: 0;
-		width: 100%;
 		aspect-ratio: 3/4;
+		width: calc(50% - #{ $grid-unit-30 * 1 } / 2);
+
+		@include break-large() {
+			width: calc(25% - #{ $grid-unit-30 * 3 } / 4);
+		}
 
 		.block-editor-block-preview__container {
 			height: 100%;
