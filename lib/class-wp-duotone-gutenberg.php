@@ -477,7 +477,7 @@ class WP_Duotone_Gutenberg {
 				continue;
 			}
 
-			// Value looks like this: 'var(--wp--preset--duotone--blue-orange)' or 'var:preset|duotone|default-filter'.
+			// Value looks like this: 'var(--wp--preset--duotone--blue-orange)' or 'var:preset|duotone|blue-orange'.
 			$duotone_attr_path = array_merge( $block_node['path'], array( 'filter', 'duotone' ) );
 			$duotone_attr      = _wp_array_get( $theme_json, $duotone_attr_path, array() );
 
@@ -495,7 +495,7 @@ class WP_Duotone_Gutenberg {
 
 	/**
 	 * Take the inline CSS duotone variable from a block and return the slug. Handles styles slugs like:
-	 * var:preset|duotone|default-filter
+	 * var:preset|duotone|blue-orange
 	 * var(--wp--preset--duotone--blue-orange)
 	 *
 	 * @param string $duotone_attr The duotone attribute from a block.
@@ -892,7 +892,7 @@ class WP_Duotone_Gutenberg {
 
 			// Possible values for duotone attribute:
 			// 1. Array of colors - e.g. array('#000000', '#ffffff').
-			// 2. Variable for an existing Duotone preset - e.g. 'var:preset|duotone|green-blue' or 'var(--wp--preset--duotone--green-blue)''
+			// 2. Variable for an existing Duotone preset - e.g. 'var:preset|duotone|blue-orange' or 'var(--wp--preset--duotone--blue-orange)''
 			// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
 
 			$duotone_attr = $block['attrs']['style']['color']['duotone'];
@@ -901,9 +901,9 @@ class WP_Duotone_Gutenberg {
 			$is_custom    = is_array( $duotone_attr );
 
 			if ( $is_preset ) {
-				$slug         = self::get_slug_from_attribute( $duotone_attr ); // e.g. 'green-blue'.
-				$filter_id    = self::get_filter_id( $slug ); // e.g. 'wp-duotone-filter-green-blue'.
-				$filter_value = self::get_css_var( $slug ); // e.g. 'var(--wp--preset--duotone--green-blue)'.
+				$slug         = self::get_slug_from_attribute( $duotone_attr ); // e.g. 'blue-orange'.
+				$filter_id    = self::get_filter_id( $slug ); // e.g. 'wp-duotone-filter-blue-orange'.
+				$filter_value = self::get_css_var( $slug ); // e.g. 'var(--wp--preset--duotone--blue-orange)'.
 
 				// CSS custom property, SVG filter, and block CSS.
 				self::enqueue_global_styles_preset( $filter_id, $duotone_selector, $filter_value );
@@ -928,9 +928,9 @@ class WP_Duotone_Gutenberg {
 				self::enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $filter_data );
 			}
 		} elseif ( $has_global_styles_duotone ) {
-			$slug         = self::$global_styles_block_names[ $block['blockName'] ]; // e.g. 'green-blue'.
-			$filter_id    = self::get_filter_id( $slug ); // e.g. 'wp-duotone-filter-green-blue'.
-			$filter_value = self::get_css_var( $slug ); // e.g. 'var(--wp--preset--duotone--green-blue)'.
+			$slug         = self::$global_styles_block_names[ $block['blockName'] ]; // e.g. 'blue-orange'.
+			$filter_id    = self::get_filter_id( $slug ); // e.g. 'wp-duotone-filter-blue-orange'.
+			$filter_value = self::get_css_var( $slug ); // e.g. 'var(--wp--preset--duotone--blue-orange)'.
 
 			// CSS custom property, SVG filter, and block CSS.
 			self::enqueue_global_styles_preset( $filter_id, $duotone_selector, $filter_value );
