@@ -121,25 +121,28 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 		} );
 	} );
 
-	test.describe( 'In Top Toolbar mode:', () => {
-		test.beforeEach(
-			async (
-				{
-					// editor,
-					// page,
-					// pageUtils,
+	test.describe( 'In Top Toolbar option in edit mode:', () => {
+		test.beforeEach( async ( { page } ) => {
+			// Ensure the fixed toolbar option is on
+			await page.evaluate( async () => {
+				const isFixedToolbarActive = window.wp.data
+					.select( 'core/edit-post' )
+					.isFeatureActive( 'fixedToolbar' );
+
+				if ( ! isFixedToolbarActive ) {
+					window.wp.data
+						.dispatch( 'core/edit-post' )
+						.toggleFeature( 'fixedToolbar' );
 				}
-			) => {
-				// Select the Options pane
-				// Switch to Top Toolbar Mode
-				// Return to editor pane
-			}
-		);
+			} );
+		} );
 
-		test.skip( 'should focus the block toolbar from paragraph block', async ( {
+		test( 'should focus the block toolbar from paragraph block', async ( {
 			page,
 			pageUtils,
 		} ) => {
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'Paragraph' );
 			// Focus the block toolbar.
 			await pageUtils.pressKeys( 'alt+F10' );
 
@@ -154,12 +157,12 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			).not.toBeVisible();
 		} );
 
-		test.skip( 'should focus the block toolbar from empty block in select mode', async ( {
+		test( 'should focus the block toolbar from empty block', async ( {
 			page,
 			pageUtils,
 		} ) => {
-			//
-
+			// Go to empty paragraph block
+			await page.keyboard.press( 'Enter' );
 			// Focus the block toolbar.
 			await pageUtils.pressKeys( 'alt+F10' );
 
@@ -174,7 +177,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 			).not.toBeVisible();
 		} );
 
-		test.skip( 'should focus the document toolbar from title in select mode', async ( {
+		test( 'should focus the document toolbar from title', async ( {
 			page,
 			pageUtils,
 		} ) => {
