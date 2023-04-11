@@ -90,7 +90,12 @@ function GroupEdit( {
 		[ clientId ]
 	);
 
-	const { tagName: TagName = 'div', templateLock, allowedBlocks, layout = {} } = attributes;
+	const {
+		tagName: TagName = 'div',
+		templateLock,
+		allowedBlocks,
+		layout = {},
+	} = attributes;
 
 	// Layout settings.
 	const defaultLayout = useSetting( 'layout' ) || {};
