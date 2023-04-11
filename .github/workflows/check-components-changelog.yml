@@ -6,7 +6,12 @@ on:
         paths:
             - 'packages/components/**'
             - '!packages/components/src/**/stories/**'
-            - '!packages/components/src**/test/**'
+            - '!packages/components/src/**/test/**'
+            - '!packages/components/src/**/*.android.js'
+            - '!packages/components/src/**/*.ios.js'
+            - '!packages/components/src/**/*.native.js'
+            - '!packages/components/src/**/*.native.scss'
+            - '!packages/components/src/**/react-native-*'
 jobs:
     check:
         name: Check CHANGELOG diff
