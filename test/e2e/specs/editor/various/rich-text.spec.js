@@ -612,4 +612,84 @@ test.describe( 'RichText', () => {
 		// Expect: <strong>1</strong>-<em>2</em>
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	test.only( 'should properly convert `text-color` <span> tags to <mark> tags', async ( {
+		page,
+		editor,
+	} ) => {
+		// Regression test: `span` tags modifying text color should be converted
+		// to `mark` tags.
+		// See: https://github.com/WordPress/gutenberg/pull/35516
+
+		// Change editing mode from "Visual" to "HTML".
+		await page.click(
+			'.interface-more-menu-dropdown [aria-label="Options"]'
+		);
+		await page.click( 'span:has-text("Code editor")' );
+
+		const markupFixture = `
+				<!-- wp:paragraph -->
+				<p><span class="has-inline-color has-red-color">Preset color added pre-11.7</span></p>
+				<!-- /wp:paragraph -->
+				<!-- wp:paragraph -->
+				<p><span style="color:#a30097" class="has-inline-color">Custom color added pre-11.7</span></p>
+				<!-- /wp:paragraph -->
+			`;
+
+		await page.type( '.editor-post-text-editor', markupFixture );
+
+		// Change editing mode from "HTML" to "Visual"
+		await page.click(
+			'.interface-more-menu-dropdown [aria-label="Options"]'
+		);
+		await page.click( 'span:has-text("Visual editor")' );
+
+		// Confirm editor markup has been properly converted
+		const [ editorPresetColorText, editorCustomColorText ] =
+			await page.evaluate( () =>
+				Array.from(
+					document.querySelectorAll(
+						'p[aria-label="Paragraph block"] > *'
+					)
+				).map( ( el ) => ( {
+					tag: el.localName,
+					style: el.getAttribute( 'style' ),
+				} ) )
+			);
+
+		expect( editorPresetColorText.tag ).toEqual( 'mark' );
+		expect( editorPresetColorText.style ).toEqual(
+			'background-color:rgba(0, 0, 0, 0)'
+		);
+		expect( editorCustomColorText.tag ).toEqual( 'mark' );
+		expect( editorCustomColorText.style ).toEqual(
+			'background-color:rgba(0, 0, 0, 0);color:#a30097'
+		);
+
+		// Publish and view post
+		await editor.publishPost();
+		await page.click( 'a.is-primary:has-text("View Post")' );
+
+		await page.waitForSelector( '.entry-content' );
+
+		// Confirm front end markup has been properly converted
+		const [ frontendPresetColorText, frontendCustomColorText ] =
+			await page.evaluate( () =>
+				Array.from(
+					document.querySelectorAll( '.entry-content p  > *' )
+				).map( ( el ) => ( {
+					tag: el.localName,
+					style: el.getAttribute( 'style' ),
+				} ) )
+			);
+
+		expect( frontendPresetColorText.tag ).toEqual( 'mark' );
+		expect( frontendPresetColorText.style ).toEqual(
+			'background-color:rgba(0, 0, 0, 0)'
+		);
+		expect( frontendCustomColorText.tag ).toEqual( 'mark' );
+		expect( frontendCustomColorText.style ).toEqual(
+			'background-color:rgba(0, 0, 0, 0);color:#a30097'
+		);
+	} );
 } );
