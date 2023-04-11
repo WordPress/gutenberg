@@ -41,7 +41,7 @@ function _wp_get_iframed_editor_assets__63() {
 
 	// Register all currently registered styles and scripts. The actions that
 	// follow enqueue assets, but don't necessarily register them.
-	$wp_styles->registered = $current_wp_styles->registered;
+	$wp_styles->registered  = $current_wp_styles->registered;
 	$wp_scripts->registered = $current_wp_scripts->registered;
 
 	// We don't want to load EDITOR scripts and styles in the iframe, only
