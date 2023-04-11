@@ -1,5 +1,16 @@
 == Changelog ==
 
+= 15.5.1 =
+
+## Changelog
+
+### Bug Fixes
+
+####  Site Editor
+
+* Global styles: Fix error when updating padding input in global styles ([49465](https://github.com/WordPress/gutenberg/pull/49465))
+
+
 = 15.5.0 =
 
 ## Changelog
