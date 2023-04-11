@@ -34,9 +34,8 @@ import { isGlobalStyleConfigEqual } from './utils';
 import { unlock } from '../../private-apis';
 
 export const MINIMUM_REVISION_COUNT = 1;
-
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 const SELECTOR_MINIMUM_REVISION_COUNT = 10;
+const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
 function RevisionsSelect( { userRevisions, currentRevisionId, onChange } ) {
 	const userRevisionsOptions = useMemo( () => {
