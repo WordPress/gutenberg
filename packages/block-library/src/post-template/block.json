@@ -43,6 +43,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"spacing": {
+			"blockGap": true
 		}
 	},
 	"style": "wp-block-post-template",
