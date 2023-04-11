@@ -53,10 +53,14 @@ export default function ListViewDropIndicator( {
 			'.block-editor-block-icon'
 		);
 		const rootBlockIconRect = rootBlockIconElement.getBoundingClientRect();
+
+		// The indent is the distance from the left edge of the target element
+		// to the right edge of the root block icon, minus 1/4 of the width of the icon
+		// to account for the block icon's padding.
 		return (
 			rootBlockIconRect.right -
 			targetElementRect.left -
-			rootBlockIconRect.width / 2 // Reduce the indentation by half the icon width.
+			rootBlockIconRect.width / 4
 		);
 	}, [ rootBlockElement, targetElement ] );
 
