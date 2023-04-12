@@ -162,8 +162,9 @@ export const DropdownMenuItem = forwardRef(
 export const DropdownMenuCheckboxItem = ( {
 	children,
 	checked = false,
+	suffix,
 	...props
-}: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps ) => {
+}: DropdownMenuCheckboxItemProps ) => {
 	return (
 		<DropdownMenuStyled.CheckboxItem { ...props } checked={ checked }>
 			<DropdownMenuStyled.ItemPrefixWrapper>
@@ -183,6 +184,11 @@ export const DropdownMenuCheckboxItem = ( {
 				</DropdownMenuPrimitive.ItemIndicator>
 			</DropdownMenuStyled.ItemPrefixWrapper>
 			{ children }
+			{ suffix && (
+				<DropdownMenuStyled.ItemSuffixWrapper>
+					{ suffix }
+				</DropdownMenuStyled.ItemSuffixWrapper>
+			) }
 		</DropdownMenuStyled.CheckboxItem>
 	);
 };
@@ -199,6 +205,7 @@ const radioDot = (
 
 export const DropdownMenuRadioItem = ( {
 	children,
+	suffix,
 	...props
 }: DropdownMenuRadioItemProps ) => {
 	return (
@@ -213,6 +220,11 @@ export const DropdownMenuRadioItem = ( {
 				</DropdownMenuPrimitive.ItemIndicator>
 			</DropdownMenuStyled.ItemPrefixWrapper>
 			{ children }
+			{ suffix && (
+				<DropdownMenuStyled.ItemSuffixWrapper>
+					{ suffix }
+				</DropdownMenuStyled.ItemSuffixWrapper>
+			) }
 		</DropdownMenuStyled.RadioItem>
 	);
 };

@@ -132,6 +132,7 @@ const CheckboxItemsGroup = () => {
 			<DropdownMenuCheckboxItem
 				checked={ bookmarksChecked }
 				onCheckedChange={ setBookmarksChecked }
+				suffix={ <KeyboardShortcut>⌘+B</KeyboardShortcut> }
 			>
 				Show Bookmarks
 			</DropdownMenuCheckboxItem>
