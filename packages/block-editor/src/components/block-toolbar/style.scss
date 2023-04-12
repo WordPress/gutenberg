@@ -207,19 +207,10 @@
 
 		.block-editor-block-mover__move-button-container {
 			border-left: 1px solid $gray-900;
-
-			&::before {
-				content: "";
-				display: block;
-				height: 1px;
-				background: $gray-900;
-				order: 2;
-				margin: -0.5px 0;
-			}
 		}
 
 		.is-down-button.is-down-button.is-down-button {
-			order: 3;
+			order: 2;
 		}
 
 		.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container::before {
