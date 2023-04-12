@@ -254,6 +254,18 @@ const SpacerEdit = ( {
 				width: '72px',
 			} );
 		}
+		if ( isFlexLayout && ! flexSize ) {
+			setAttributes( {
+				style: {
+					...blockStyle,
+					layout: {
+						...layout,
+						flexSize: width || '72px',
+						selfStretch: 'fixed',
+					},
+				},
+			} );
+		}
 	}, [] );
 
 	return (
