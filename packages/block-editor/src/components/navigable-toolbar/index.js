@@ -94,7 +94,7 @@ function useToolbarFocus(
 	isAccessibleToolbar,
 	defaultIndex,
 	onIndexChange,
-	useKeyboardFocusShortcut
+	shouldUseKeyboardFocusShortcut
 ) {
 	// Make sure we don't use modified versions of this prop.
 	const [ initialFocusOnMount ] = useState( focusOnMount );
@@ -105,7 +105,7 @@ function useToolbarFocus(
 	}, [] );
 
 	const focusToolbarViaShortcut = () => {
-		if ( useKeyboardFocusShortcut ) {
+		if ( shouldUseKeyboardFocusShortcut ) {
 			focusToolbar();
 		}
 	};
@@ -154,7 +154,7 @@ function useToolbarFocus(
 function NavigableToolbar( {
 	children,
 	focusOnMount,
-	useKeyboardFocusShortcut = true,
+	shouldUseKeyboardFocusShortcut = true,
 	__experimentalInitialIndex: initialIndex,
 	__experimentalOnIndexChange: onIndexChange,
 	...props
@@ -168,7 +168,7 @@ function NavigableToolbar( {
 		isAccessibleToolbar,
 		initialIndex,
 		onIndexChange,
-		useKeyboardFocusShortcut
+		shouldUseKeyboardFocusShortcut
 	);
 
 	if ( isAccessibleToolbar ) {

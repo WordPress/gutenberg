@@ -40,7 +40,7 @@ function HeaderToolbar() {
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
-		useKeyboardFocusShortcut,
+		shouldUseKeyboardFocusShortcut,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
@@ -76,13 +76,11 @@ function HeaderToolbar() {
 			// Anytime there's a fixed toolbar and a selection, a toolbar is showing
 			( hasFixedToolbar && selectedBlockId );
 
-		const shouldUseKeyboardFocusShortcut =
-			isDistractionFree ||
-			! maybeBlockToolbarShowing ||
-			( ! hasFixedToolbar && editorMode !== 'edit' );
-
 		return {
-			useKeyboardFocusShortcut: shouldUseKeyboardFocusShortcut,
+			shouldUseKeyboardFocusShortcut:
+				isDistractionFree ||
+				! maybeBlockToolbarShowing ||
+				( ! hasFixedToolbar && editorMode !== 'edit' ),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
 				getEditorMode() === 'visual' &&
@@ -149,7 +147,7 @@ function HeaderToolbar() {
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
-			useKeyboardFocusShortcut={ useKeyboardFocusShortcut }
+			shouldUseKeyboardFocusShortcut={ shouldUseKeyboardFocusShortcut }
 		>
 			<div className="edit-post-header-toolbar__left">
 				<ToolbarItem
