@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 23.8.0 (2023-04-12)
+
 ### Internal
 
 -   `Mobile` Refactor of the KeyboardAwareFlatList component.
