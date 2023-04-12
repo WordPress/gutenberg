@@ -1,33 +1,39 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useEffect, useMemo } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
 import BlockPopover from '../components/block-popover';
-import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
+import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+
+function getComputedCSS( element, property ) {
+	return element.ownerDocument.defaultView
+		.getComputedStyle( element )
+		.getPropertyValue( property );
+}
 
 export function PaddingVisualizer( { clientId, attributes, forceShow } ) {
+	const blockElement = useBlockElement( clientId );
+	const [ style, setStyle ] = useState();
+
 	const padding = attributes?.style?.spacing?.padding;
-	const style = useMemo( () => {
-		return {
-			borderTopWidth: padding?.top
-				? getSpacingPresetCssVar( padding?.top )
-				: 0,
-			borderRightWidth: padding?.right
-				? getSpacingPresetCssVar( padding?.right )
-				: 0,
-			borderBottomWidth: padding?.bottom
-				? getSpacingPresetCssVar( padding?.bottom )
-				: 0,
-			borderLeftWidth: padding?.left
-				? getSpacingPresetCssVar( padding?.left )
-				: 0,
-		};
-	}, [ padding ] );
+
+	useEffect( () => {
+		if ( ! blockElement ) {
+			return;
+		}
+
+		setStyle( {
+			borderTopWidth: getComputedCSS( blockElement, 'padding-top' ),
+			borderRightWidth: getComputedCSS( blockElement, 'padding-right' ),
+			borderBottomWidth: getComputedCSS( blockElement, 'padding-bottom' ),
+			borderLeftWidth: getComputedCSS( blockElement, 'padding-left' ),
+		} );
+	}, [ blockElement, padding ] );
 
 	const [ isActive, setIsActive ] = useState( false );
 	const valueRef = useRef( padding );

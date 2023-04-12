@@ -185,8 +185,7 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 ### cloneBlock
 
-Given a block object, returns a copy of the block object,
-optionally merging new attributes and/or replacing its inner blocks.
+Given a block object, returns a copy of the block object, optionally merging new attributes and/or replacing its inner blocks.
 
 _Parameters_
 
@@ -214,10 +213,7 @@ _Returns_
 
 ### createBlocksFromInnerBlocksTemplate
 
-Given an array of InnerBlocks templates or Block Objects,
-returns an array of created Blocks from them.
-It handles the case of having InnerBlocks as Blocks by
-converting them to the proper format to continue recursively.
+Given an array of InnerBlocks templates or Block Objects, returns an array of created Blocks from them. It handles the case of having InnerBlocks as Blocks by converting them to the proper format to continue recursively.
 
 _Parameters_
 
@@ -242,11 +238,7 @@ _Returns_
 
 ### findTransform
 
-Given an array of transforms, returns the highest-priority transform where
-the predicate function returns a truthy value. A higher-priority transform
-is one with a lower priority value (i.e. first in priority order). Returns
-null if the transforms set is empty or the predicate function returns a
-falsey value for all entries.
+Given an array of transforms, returns the highest-priority transform where the predicate function returns a truthy value. A higher-priority transform is one with a lower priority value (i.e. first in priority order). Returns null if the transforms set is empty or the predicate function returns a falsey value for all entries.
 
 _Parameters_
 
@@ -336,10 +328,7 @@ _Returns_
 
 ### getBlockTransforms
 
-Returns normal block transforms for a given transform direction, optionally
-for a specific block by name, or an empty array if there are no transforms.
-If no block name is provided, returns transforms for all blocks. A normal
-transform object includes `blockName` as a property.
+Returns normal block transforms for a given transform direction, optionally for a specific block by name, or an empty array if there are no transforms. If no block name is provided, returns transforms for all blocks. A normal transform object includes `blockName` as a property.
 
 _Parameters_
 
@@ -392,8 +381,7 @@ _Returns_
 
 ### getFreeformContentHandlerName
 
-Retrieves name of block handling non-block content, or undefined if no
-handler has been defined.
+Retrieves name of block handling non-block content, or undefined if no handler has been defined.
 
 _Returns_
 
@@ -413,8 +401,7 @@ Undocumented declaration.
 
 ### getPossibleBlockTransformations
 
-Returns an array of block types that the set of blocks received as argument
-can be transformed into.
+Returns an array of block types that the set of blocks received as argument can be transformed into.
 
 _Parameters_
 
@@ -426,8 +413,7 @@ _Returns_
 
 ### getSaveContent
 
-Given a block type containing a save render implementation and attributes, returns the
-static markup to be saved.
+Given a block type containing a save render implementation and attributes, returns the static markup to be saved.
 
 _Parameters_
 
@@ -441,8 +427,7 @@ _Returns_
 
 ### getSaveElement
 
-Given a block type containing a save render implementation and attributes, returns the
-enhanced element to be saved or string when raw HTML expected.
+Given a block type containing a save render implementation and attributes, returns the enhanced element to be saved or string when raw HTML expected.
 
 _Parameters_
 
@@ -456,8 +441,7 @@ _Returns_
 
 ### getUnregisteredTypeHandlerName
 
-Retrieves name of block handling unregistered block types, or undefined if no
-handler has been defined.
+Retrieves name of block handling unregistered block types, or undefined if no handler has been defined.
 
 _Returns_
 
@@ -503,9 +487,7 @@ _Returns_
 
 ### isReusableBlock
 
-Determines whether or not the given block is a reusable block. This is a
-special block type that is used to point to a global block stored via the
-API.
+Determines whether or not the given block is a reusable block. This is a special block type that is used to point to a global block stored via the API.
 
 _Parameters_
 
@@ -517,9 +499,7 @@ _Returns_
 
 ### isTemplatePart
 
-Determines whether or not the given block is a template part. This is a
-special block type that allows composing a page template out of reusable
-design elements.
+Determines whether or not the given block is a template part. This is a special block type that allows composing a page template out of reusable design elements.
 
 _Parameters_
 
@@ -531,8 +511,7 @@ _Returns_
 
 ### isUnmodifiedBlock
 
-Determines whether the block's attributes are equal to the default attributes
-which means the block is unmodified.
+Determines whether the block's attributes are equal to the default attributes which means the block is unmodified.
 
 _Parameters_
 
@@ -544,8 +523,7 @@ _Returns_
 
 ### isUnmodifiedDefaultBlock
 
-Determines whether the block is a default block and its attributes are equal
-to the default attributes which means the block is unmodified.
+Determines whether the block is a default block and its attributes are equal to the default attributes which means the block is unmodified.
 
 _Parameters_
 
@@ -559,9 +537,7 @@ _Returns_
 
 > **Deprecated** Use validateBlock instead to avoid data loss.
 
-Returns true if the parsed block is valid given the input content. A block
-is considered valid if, when serialized with assumed attributes, the content
-matches the original value.
+Returns true if the parsed block is valid given the input content. A block is considered valid if, when serialized with assumed attributes, the content matches the original value.
 
 Logs to console in development environments when invalid.
 
@@ -589,9 +565,7 @@ _Returns_
 
 ### normalizeIconObject
 
-Function that receives an icon as set by the blocks during the registration
-and returns a new icon object that is normalized so we can rely on just on possible icon structure
-in the codebase.
+Function that receives an icon as set by the blocks during the registration and returns a new icon object that is normalized so we can rely on just on possible icon structure in the codebase.
 
 _Parameters_
 
@@ -603,17 +577,9 @@ _Returns_
 
 ### parse
 
-Utilizes an optimized token-driven parser based on the Gutenberg grammar spec
-defined through a parsing expression grammar to take advantage of the regular
-cadence provided by block delimiters -- composed syntactically through HTML
-comments -- which, given a general HTML document as an input, returns a block
-list array representation.
+Utilizes an optimized token-driven parser based on the Gutenberg grammar spec defined through a parsing expression grammar to take advantage of the regular cadence provided by block delimiters -- composed syntactically through HTML comments -- which, given a general HTML document as an input, returns a block list array representation.
 
-This is a recursive-descent parser that scans linearly once through the input
-document. Instead of directly recursing it utilizes a trampoline mechanism to
-prevent stack overflow. This initial pass is mainly interested in separating
-and isolating the blocks serialized in the document and manifestly not in the
-content within the blocks.
+This is a recursive-descent parser that scans linearly once through the input document. Instead of directly recursing it utilizes a trampoline mechanism to prevent stack overflow. This initial pass is mainly interested in separating and isolating the blocks serialized in the document and manifestly not in the content within the blocks.
 
 _Related_
 
@@ -630,8 +596,7 @@ _Returns_
 
 ### parseWithAttributeSchema
 
-Given a block's raw content and an attribute's schema returns the attribute's
-value depending on its source.
+Given a block's raw content and an attribute's schema returns the attribute's value depending on its source.
 
 _Parameters_
 
@@ -738,11 +703,9 @@ _Parameters_
 
 ### registerBlockType
 
-Registers a new block provided a unique name and an object defining its
-behavior. Once registered, the block is made available as an option to any
-editor interface where blocks are implemented.
+Registers a new block provided a unique name and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
 
-For more in-depth information on registering a custom block see the [Create a block tutorial](docs/how-to-guides/block-tutorial/README.md)
+For more in-depth information on registering a custom block see the [Create a block tutorial](/docs/getting-started/create-block/README.md)
 
 _Usage_
 
@@ -816,11 +779,7 @@ _Returns_
 
 ### serializeRawBlock
 
-Serializes a block node into the native HTML-comment-powered block format.
-CAVEAT: This function is intended for re-serializing blocks as parsed by
-valid parsers and skips any validation steps. This is NOT a generic
-serialization function for in-memory blocks. For most purposes, see the
-following functions available in the `@wordpress/blocks` package:
+Serializes a block node into the native HTML-comment-powered block format. CAVEAT: This function is intended for re-serializing blocks as parsed by valid parsers and skips any validation steps. This is NOT a generic serialization function for in-memory blocks. For most purposes, see the following functions available in the `@wordpress/blocks` package:
 
 _Related_
 
@@ -911,6 +870,8 @@ _Parameters_
 
 Assigns name of block for handling block grouping interactions.
 
+This function lets you select a different block to group other blocks in instead of the default `core/group` block. This function must be used in a component or when the DOM is fully loaded. See <https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dom-ready/>
+
 _Usage_
 
 ```js
@@ -919,7 +880,7 @@ import { setGroupingBlockName } from '@wordpress/blocks';
 const ExampleComponent = () => {
 	return (
 		<Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
-			{ __( 'Set the default block to Heading' ) }
+			{ __( 'Wrap in columns' ) }
 		</Button>
 	);
 };
@@ -966,10 +927,7 @@ _Returns_
 
 Synchronize a block list with a block template.
 
-Synchronizing a block list with a block template means that we loop over the blocks
-keep the block as is if it matches the block at the same position in the template
-(If it has the same name) and if doesn't match, we create a new block based on the template.
-Extra blocks not present in the template are removed.
+Synchronizing a block list with a block template means that we loop over the blocks keep the block as is if it matches the block at the same position in the template (If it has the same name) and if doesn't match, we create a new block based on the template. Extra blocks not present in the template are removed.
 
 _Parameters_
 
@@ -1098,10 +1056,7 @@ _Parameters_
 
 ### validateBlock
 
-Returns an object with `isValid` property set to `true` if the parsed block
-is valid given the input content. A block is considered valid if, when serialized
-with assumed attributes, the content matches the original value. If block is
-invalid, this function returns all validations issues as well.
+Returns an object with `isValid` property set to `true` if the parsed block is valid given the input content. A block is considered valid if, when serialized with assumed attributes, the content matches the original value. If block is invalid, this function returns all validations issues as well.
 
 _Parameters_
 
@@ -1116,8 +1071,7 @@ _Returns_
 
 > **Deprecated**
 
-A Higher Order Component used to inject BlockContent using context to the
-wrapped component.
+A Higher Order Component used to inject BlockContent using context to the wrapped component.
 
 _Parameters_
 

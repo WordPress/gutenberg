@@ -17,6 +17,7 @@ const ROOT_BLOCK_SUPPORTS = [
 	'linkColor',
 	'captionColor',
 	'buttonColor',
+	'headingColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',

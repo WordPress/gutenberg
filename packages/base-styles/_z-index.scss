@@ -33,8 +33,8 @@ $z-layers: (
 	".interface-interface-skeleton__content": 20,
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
-	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
-	".wp-block-cover.is-placeholder .components-placeholder.is-large": 1, // Cover block resizer component inside a large placeholder.
+	".wp-block-cover__inner-container": 32, // InnerBlocks area inside cover image block. Must be higher than block popover and less than drop zone.
+	".wp-block-cover.is-placeholder .components-placeholder.is-large": 32, // Cover block resizer component inside a large placeholder.
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
 	".block-library-cover__padding-visualizer": 2, // BoxControl visualizer needs to be +1 higher than .wp-block-cover.has-background-dim::before
 	".wp-block-cover__image-background": 0, // Image background inside cover block.
@@ -187,6 +187,8 @@ $z-layers: (
 	".edit-site-layout__canvas-container": 2,
 	".edit-site-layout__sidebar": 1,
 	".edit-site-layout__canvas-container.is-resizing::after": 100,
+	// Title needs to appear above other UI the section content.
+	".edit-site-sidebar-navigation-screen__title-icon": 1,
 );
 
 @function z-index( $key ) {

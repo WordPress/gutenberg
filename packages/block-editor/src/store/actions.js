@@ -75,7 +75,7 @@ export const resetBlocks =
 /**
  * Block validity is a function of blocks state (at the point of a
  * reset) and the template setting. As a compromise to its placement
- * across distinct parts of state, it is implemented here as a side-
+ * across distinct parts of state, it is implemented here as a side
  * effect of the block reset action.
  *
  * @param {Array} blocks Array of blocks.

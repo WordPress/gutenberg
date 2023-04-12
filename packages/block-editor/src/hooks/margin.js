@@ -1,43 +1,48 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useRef, useState, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
 import BlockPopover from '../components/block-popover';
-import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
+import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+
+function getComputedCSS( element, property ) {
+	return element.ownerDocument.defaultView
+		.getComputedStyle( element )
+		.getPropertyValue( property );
+}
 
 export function MarginVisualizer( { clientId, attributes, forceShow } ) {
+	const blockElement = useBlockElement( clientId );
+	const [ style, setStyle ] = useState();
+
 	const margin = attributes?.style?.spacing?.margin;
 
-	const style = useMemo( () => {
-		const marginTop = margin?.top
-			? getSpacingPresetCssVar( margin?.top )
-			: 0;
-		const marginRight = margin?.right
-			? getSpacingPresetCssVar( margin?.right )
-			: 0;
-		const marginBottom = margin?.bottom
-			? getSpacingPresetCssVar( margin?.bottom )
-			: 0;
-		const marginLeft = margin?.left
-			? getSpacingPresetCssVar( margin?.left )
-			: 0;
+	useEffect( () => {
+		if ( ! blockElement ) {
+			return;
+		}
 
-		return {
-			borderTopWidth: marginTop,
-			borderRightWidth: marginRight,
-			borderBottomWidth: marginBottom,
-			borderLeftWidth: marginLeft,
-			top: marginTop ? `calc(${ marginTop } * -1)` : 0,
-			right: marginRight ? `calc(${ marginRight } * -1)` : 0,
-			bottom: marginBottom ? `calc(${ marginBottom } * -1)` : 0,
-			left: marginLeft ? `calc(${ marginLeft } * -1)` : 0,
-		};
-	}, [ margin ] );
+		const top = getComputedCSS( blockElement, 'margin-top' );
+		const right = getComputedCSS( blockElement, 'margin-right' );
+		const bottom = getComputedCSS( blockElement, 'margin-bottom' );
+		const left = getComputedCSS( blockElement, 'margin-left' );
+
+		setStyle( {
+			borderTopWidth: top,
+			borderRightWidth: right,
+			borderBottomWidth: bottom,
+			borderLeftWidth: left,
+			top: top ? `-${ top }` : 0,
+			right: right ? `-${ right }` : 0,
+			bottom: bottom ? `-${ bottom }` : 0,
+			left: left ? `-${ left }` : 0,
+		} );
+	}, [ blockElement, margin ] );
 
 	const [ isActive, setIsActive ] = useState( false );
 	const valueRef = useRef( margin );

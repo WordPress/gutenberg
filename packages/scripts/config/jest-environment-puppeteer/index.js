@@ -42,11 +42,7 @@ const KEYS = {
 	ENTER: '\r',
 };
 
-const root = process.env.GITHUB_WORKSPACE || process.cwd();
-const ARTIFACTS_PATH = path.resolve(
-	root,
-	process.env.WP_ARTIFACTS_PATH || 'artifacts'
-);
+const { WP_ARTIFACTS_PATH } = process.env;
 
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
@@ -172,7 +168,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 		await this.global.jestPuppeteer.resetBrowser();
 
 		try {
-			await mkdir( ARTIFACTS_PATH, { recursive: true } );
+			await mkdir( WP_ARTIFACTS_PATH, { recursive: true } );
 		} catch ( err ) {
 			if ( err.code !== 'EEXIST' ) {
 				throw err;
@@ -206,11 +202,11 @@ class PuppeteerEnvironment extends NodeEnvironment {
 			replacement: '-',
 		} );
 		await writeFile(
-			path.join( ARTIFACTS_PATH, `${ fileName }-snapshot.html` ),
+			path.join( WP_ARTIFACTS_PATH, `${ fileName }-snapshot.html` ),
 			await this.global.page.content()
 		);
 		await this.global.page.screenshot( {
-			path: path.join( ARTIFACTS_PATH, `${ fileName }.jpg` ),
+			path: path.join( WP_ARTIFACTS_PATH, `${ fileName }.jpg` ),
 		} );
 	}
 

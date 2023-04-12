@@ -39,13 +39,14 @@ export const __unstableGetPreference = createRegistrySelector(
 /**
  * Returns whether the given feature is enabled or not.
  *
+ * @deprecated
  * @param {Object} state       Global application state.
  * @param {string} featureName Feature slug.
  *
  * @return {boolean} Is active.
  */
 export function isFeatureActive( state, featureName ) {
-	deprecated( `select( 'core/interface' ).isFeatureActive`, {
+	deprecated( `select( 'core/edit-site' ).isFeatureActive`, {
 		since: '6.0',
 		alternative: `select( 'core/preferences' ).get`,
 	} );

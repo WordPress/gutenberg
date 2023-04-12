@@ -14,7 +14,7 @@ import { unlock } from '../../private-apis';
 const { useGlobalStylesOutput } = unlock( blockEditorPrivateApis );
 
 function useGlobalStylesRenderer() {
-	const [ styles, settings, svgFilters ] = useGlobalStylesOutput();
+	const [ styles, settings ] = useGlobalStylesOutput();
 	const { getSettings } = useSelect( editSiteStore );
 	const { updateSettings } = useDispatch( editSiteStore );
 
@@ -30,7 +30,6 @@ function useGlobalStylesRenderer() {
 		updateSettings( {
 			...currentStoreSettings,
 			styles: [ ...nonGlobalStyles, ...styles ],
-			svgFilters,
 			__experimentalFeatures: settings,
 		} );
 	}, [ styles, settings ] );
