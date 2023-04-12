@@ -25,3 +25,8 @@
 .wp-block-social-links.is-style-logos-only .wp-social-link button {
 	padding: 0;
 }
+
+// Ensure radius is applied when the link is highlighted in the editor.
+.wp-block-social-links:not(.is-style-logos-only) .wp-social-link {
+	border-radius: 9999px;
+}
