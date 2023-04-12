@@ -37,6 +37,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
+		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/editor": "file:../editor",

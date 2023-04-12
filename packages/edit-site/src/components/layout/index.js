@@ -74,7 +74,8 @@ export default function Layout() {
 			const { getAllShortcutKeyCombinations } = select(
 				keyboardShortcutsStore
 			);
-			const { getCanvasMode } = unlock( select( editSiteStore ) );
+			const { getCanvasMode, hasPageContentLock: _hasPageContentLock } =
+				unlock( select( editSiteStore ) );
 			return {
 				canvasMode: getCanvasMode(),
 				previousShortcut: getAllShortcutKeyCombinations(
@@ -85,6 +86,7 @@ export default function Layout() {
 				),
 				hasFixedToolbar:
 					select( preferencesStore ).get( 'fixedToolbar' ),
+				hasPageContentLock: _hasPageContentLock(),
 			};
 		}, [] );
 	const navigateRegionsProps = useNavigateRegions( {

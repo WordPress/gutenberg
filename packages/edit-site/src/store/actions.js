@@ -530,3 +530,10 @@ export const switchEditorMode =
 			speak( __( 'Code editor selected' ), 'assertive' );
 		}
 	};
+
+export function togglePageContentLock( hasPageContentLock ) {
+	return {
+		type: 'TOGGLE_PAGE_CONTENT_LOCK',
+		hasPageContentLock,
+	};
+}

@@ -17,6 +17,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { getFilteredTemplatePartBlocks } from './utils';
+import { CONTENT_BLOCK_TYPES } from './constants';
 
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
@@ -122,6 +123,8 @@ export const getSettings = createSelector(
 			__experimentalReusableBlocks: getReusableBlocks( state ),
 			__experimentalPreferPatternsOnRoot:
 				'wp_template' === getEditedPostType( state ),
+			contentBlockTypes: CONTENT_BLOCK_TYPES,
+			templateLock: hasPageContentLock( state ) ? 'contentOnly' : false,
 		};
 
 		const canUserCreateMedia = getCanUserCreateMedia( state );
@@ -147,6 +150,7 @@ export const getSettings = createSelector(
 		__unstableGetPreference( state, 'showIconLabels' ),
 		getReusableBlocks( state ),
 		getEditedPostType( state ),
+		hasPageContentLock( state ),
 	]
 );
 
@@ -320,4 +324,12 @@ export function isNavigationOpened() {
 		since: '6.2',
 		version: '6.4',
 	} );
+}
+
+export function isPage( state ) {
+	return state.editedPost.context?.postId;
+}
+
+export function hasPageContentLock( state ) {
+	return isPage( state ) ? state.hasPageContentLock : false;
 }

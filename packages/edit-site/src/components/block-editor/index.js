@@ -38,6 +38,7 @@ import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import StyleBook from '../style-book';
 import { unlock } from '../../private-apis';
+import usePageContentLockNotifications from '../use-page-content-lock-notifications';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -137,6 +138,7 @@ export default function BlockEditor() {
 		contentRef,
 		useClipboardHandler(),
 		useTypingObserver(),
+		usePageContentLockNotifications(),
 	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );

@@ -127,14 +127,13 @@ export function ImageEdit( {
 	const ref = useRef();
 	const { imageDefaultSize, mediaUpload, isContentLocked } = useSelect(
 		( select ) => {
-			const { getSettings, __unstableGetContentLockingParent } =
+			const { getSettings, __experimentalIsContentLockedBlock } =
 				select( blockEditorStore );
 			const settings = getSettings();
 			return {
 				imageDefaultSize: settings.imageDefaultSize,
 				mediaUpload: settings.mediaUpload,
-				isContentLocked:
-					!! __unstableGetContentLockingParent( clientId ),
+				isContentLocked: __experimentalIsContentLockedBlock( clientId ),
 			};
 		},
 		[]

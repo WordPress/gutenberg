@@ -39,6 +39,7 @@ import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
 import { useHasStyleBook } from '../style-book';
+import PageContentBreadcrumbs from './page-content-breadcrumbs';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -56,6 +57,7 @@ export default function HeaderEditMode() {
 		blockEditorMode,
 		homeUrl,
 		showIconLabels,
+		isPage,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -63,6 +65,7 @@ export default function HeaderEditMode() {
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
+			isPage: _isPage,
 		} = select( editSiteStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
@@ -88,6 +91,7 @@ export default function HeaderEditMode() {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			isPage: _isPage(),
 		};
 	}, [] );
 
@@ -223,7 +227,9 @@ export default function HeaderEditMode() {
 			) }
 
 			<div className="edit-site-header-edit-mode__center">
-				{ hasStyleBook ? __( 'Style Book' ) : <DocumentActions /> }
+				{ hasStyleBook && __( 'Style Book' ) }
+				{ ! hasStyleBook && isPage && <PageContentBreadcrumbs /> }
+				{ ! hasStyleBook && ! isPage && <DocumentActions /> }
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">

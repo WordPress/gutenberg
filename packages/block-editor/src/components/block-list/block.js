@@ -18,7 +18,6 @@ import {
 	isUnmodifiedDefaultBlock,
 	serializeRawBlock,
 	switchToBlockType,
-	store as blocksStore,
 	getDefaultBlockName,
 	isUnmodifiedBlock,
 } from '@wordpress/blocks';
@@ -99,7 +98,7 @@ function BlockListBlock( {
 } ) {
 	const {
 		themeSupportsLayout,
-		hasContentLockedParent,
+		isContentLocked,
 		isContentBlock,
 		isContentLocking,
 		isTemporarilyEditingAsBlocks,
@@ -107,22 +106,17 @@ function BlockListBlock( {
 		( select ) => {
 			const {
 				getSettings,
-				__unstableGetContentLockingParent,
-				getTemplateLock,
 				__unstableGetTemporarilyEditingAsBlocks,
+				__experimentalIsContentBlock,
+				__experimentalIsContentLockedBlock,
+				__experimentalIsContentLockingBlock,
 			} = select( blockEditorStore );
-			const _hasContentLockedParent =
-				!! __unstableGetContentLockingParent( clientId );
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
-				isContentBlock:
-					select( blocksStore ).__experimentalHasContentRoleAttribute(
-						name
-					),
-				hasContentLockedParent: _hasContentLockedParent,
+				isContentBlock: __experimentalIsContentBlock( clientId ),
+				isContentLocked: __experimentalIsContentLockedBlock( clientId ),
 				isContentLocking:
-					getTemplateLock( clientId ) === 'contentOnly' &&
-					! _hasContentLockedParent,
+					__experimentalIsContentLockingBlock( clientId ),
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
 			};
@@ -160,7 +154,7 @@ function BlockListBlock( {
 
 	const blockType = getBlockType( name );
 
-	if ( hasContentLockedParent && ! isContentBlock ) {
+	if ( isContentLocked && ! isContentBlock ) {
 		wrapperProps = {
 			...wrapperProps,
 			tabIndex: -1,
@@ -237,7 +231,7 @@ function BlockListBlock( {
 				'is-content-locked': isContentLocking,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
-				'is-content-block': hasContentLockedParent && isContentBlock,
+				'is-content-block': isContentLocked && isContentBlock,
 			},
 			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
 			className

@@ -49,13 +49,13 @@ export const withBlockControls = createHigherOrderComponent(
 		const { templateLock, isLockedByParent, isEditingAsBlocks } = useSelect(
 			( select ) => {
 				const {
-					__unstableGetContentLockingParent,
+					__experimentalIsContentLockedBlock,
 					getTemplateLock,
 					__unstableGetTemporarilyEditingAsBlocks,
 				} = select( blockEditorStore );
 				return {
 					templateLock: getTemplateLock( props.clientId ),
-					isLockedByParent: !! __unstableGetContentLockingParent(
+					isLockedByParent: __experimentalIsContentLockedBlock(
 						props.clientId
 					),
 					isEditingAsBlocks:

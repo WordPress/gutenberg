@@ -406,14 +406,16 @@ export const replaceBlocks =
 		);
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
 		// Replace is valid if the new blocks can be inserted in the root block.
-		for ( let index = 0; index < blocks.length; index++ ) {
-			const block = blocks[ index ];
-			const canInsertBlock = select.canInsertBlockType(
-				block.name,
-				rootClientId
-			);
-			if ( ! canInsertBlock ) {
-				return;
+		if ( ! meta?.skipChecks ) {
+			for ( let index = 0; index < blocks.length; index++ ) {
+				const block = blocks[ index ];
+				const canInsertBlock = select.canInsertBlockType(
+					block.name,
+					rootClientId
+				);
+				if ( ! canInsertBlock ) {
+					return;
+				}
 			}
 		}
 		dispatch( {
@@ -1623,7 +1625,7 @@ export const insertBeforeBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
+		const isLocked = select.__experimentalIsInsertionLocked( rootClientId );
 		if ( isLocked ) {
 			return;
 		}
@@ -1648,7 +1650,7 @@ export const insertAfterBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
+		const isLocked = select.__experimentalIsInsertionLocked( rootClientId );
 		if ( isLocked ) {
 			return;
 		}

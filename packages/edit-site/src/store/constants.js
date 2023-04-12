@@ -9,3 +9,9 @@ export const TEMPLATE_PART_AREA_HEADER = 'header';
 export const TEMPLATE_PART_AREA_FOOTER = 'footer';
 export const TEMPLATE_PART_AREA_SIDEBAR = 'sidebar';
 export const TEMPLATE_PART_AREA_GENERAL = 'uncategorized';
+
+export const CONTENT_BLOCK_TYPES = [
+	'core/post-featured-image',
+	'core/post-title',
+	'core/post-content',
+];

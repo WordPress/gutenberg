@@ -131,6 +131,10 @@ _Returns_
 
 -   `Object`: Settings.
 
+### hasPageContentLock
+
+Undocumented declaration.
+
 ### isFeatureActive
 
 > **Deprecated**
@@ -173,6 +177,10 @@ _Returns_
 ### isNavigationOpened
 
 > **Deprecated**
+
+### isPage
+
+Undocumented declaration.
 
 ### isSaveViewOpened
 
@@ -354,6 +362,10 @@ Dispatches an action that toggles a feature flag.
 _Parameters_
 
 -   _featureName_ `string`: Feature name.
+
+### togglePageContentLock
+
+Undocumented declaration.
 
 ### updateSettings
 

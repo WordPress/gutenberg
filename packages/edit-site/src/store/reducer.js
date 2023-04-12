@@ -140,6 +140,17 @@ function canvasMode( state = 'init', action ) {
 	return state;
 }
 
+function hasPageContentLock( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_EDITED_POST':
+			return !! action.context?.postId;
+		case 'TOGGLE_PAGE_CONTENT_LOCK':
+			return action.hasPageContentLock ?? ! state;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	deviceType,
 	settings,
@@ -148,4 +159,5 @@ export default combineReducers( {
 	listViewPanel,
 	saveViewPanel,
 	canvasMode,
+	hasPageContentLock,
 } );

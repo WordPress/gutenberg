@@ -27,7 +27,7 @@ export function useInBetweenInserter() {
 		isBlockInsertionPointVisible,
 		isMultiSelecting,
 		getSelectedBlockClientIds,
-		getTemplateLock,
+		__experimentalIsInsertionLocked,
 		__unstableIsWithinBlockOverlay,
 	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
@@ -75,7 +75,7 @@ export function useInBetweenInserter() {
 				}
 
 				// Don't set the insertion point if the template is locked.
-				if ( getTemplateLock( rootClientId ) ) {
+				if ( __experimentalIsInsertionLocked( rootClientId ) ) {
 					return;
 				}
 
