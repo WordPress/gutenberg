@@ -2,7 +2,7 @@
 
 `withNotices` is a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html) used typically in adding the ability to post notice messages within the original component.
 
-Wrapping the original component with `withNotices` encapsulates the component with the additional props `noticeOperations` and `noticeUI`.
+Wrapping the original component with `withNotices` encapsulates the component with the additional props `noticeOperations`, `noticeUI`, and `noticeList`.
 
 **noticeOperations**
 Contains a number of useful functions to add notices to your site.
@@ -33,6 +33,9 @@ _Parameters_
 
 <a  name="noticeUi"  href="#noticeUi">#</a>**noticeUi**
 The rendered `NoticeList`.
+
+<a  name="noticeList"  href="#noticeList">#</a>**noticeList**
+The array of notice objects to be displayed.
 
 ## Usage
 

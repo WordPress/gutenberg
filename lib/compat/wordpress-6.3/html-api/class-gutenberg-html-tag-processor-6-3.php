@@ -40,7 +40,7 @@
  * Example:
  * ```php
  *     $tags = new WP_HTML_Tag_Processor( $html );
- *     if ( $tags->next_tag( array( 'tag_name' => 'option' ) ) ) {
+ *     if ( $tags->next_tag( 'option' ) ) {
  *         $tags->set_attribute( 'selected', true );
  *     }
  * ```
@@ -58,10 +58,11 @@
  *     $tags->next_tag();
  * ```
  *
- * | Goal                                                      | Query                                                                      |
- * |-----------------------------------------------------------|----------------------------------------------------------------------------|
- * | Find any tag.                                             | `$tags->next_tag();`                                                       |
+ * | Goal                                                      | Query                                                                           |
+ * |-----------------------------------------------------------|---------------------------------------------------------------------------------|
+ * | Find any tag.                                             | `$tags->next_tag();`                                                            |
  * | Find next image tag.                                      | `$tags->next_tag( array( 'tag_name' => 'img' ) );`                              |
+ * | Find next image tag (without passing the array).          | `$tags->next_tag( 'img' );`                                                     |
  * | Find next tag containing the `fullwidth` CSS class.       | `$tags->next_tag( array( 'class_name' => 'fullwidth' ) );`                      |
  * | Find next image tag containing the `fullwidth` CSS class. | `$tags->next_tag( array( 'tag_name' => 'img', 'class_name' => 'fullwidth' ) );` |
  *
@@ -775,7 +776,8 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 				return false;
 			}
 
-			$at += 2;
+			$closer_potentially_starts_at = $at;
+			$at                          += 2;
 
 			/*
 			 * Find a case-insensitive match to the tag name.
@@ -818,7 +820,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			}
 
 			if ( '>' === $html[ $at ] || '/' === $html[ $at ] ) {
-				++$this->bytes_already_parsed;
+				$this->bytes_already_parsed = $closer_potentially_starts_at;
 				return true;
 			}
 		}
@@ -887,7 +889,8 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			}
 
 			if ( '/' === $html[ $at ] ) {
-				$is_closing = true;
+				$closer_potentially_starts_at = $at - 1;
+				$is_closing                   = true;
 				++$at;
 			} else {
 				$is_closing = false;
@@ -938,7 +941,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 			}
 
 			if ( $is_closing ) {
-				$this->bytes_already_parsed = $at;
+				$this->bytes_already_parsed = $closer_potentially_starts_at;
 				if ( $this->bytes_already_parsed >= $doc_length ) {
 					return false;
 				}
@@ -948,7 +951,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 				}
 
 				if ( '>' === $html[ $this->bytes_already_parsed ] ) {
-					++$this->bytes_already_parsed;
+					$this->bytes_already_parsed = $closer_potentially_starts_at;
 					return true;
 				}
 			}
@@ -1623,7 +1626,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *     $p->get_attribute( 'enabled' ) === true;
 	 *     $p->get_attribute( 'aria-label' ) === null;
 	 *
-	 *     $p->next_tag( array() ) === false;
+	 *     $p->next_tag() === false;
 	 *     $p->get_attribute( 'class' ) === null;
 	 * ```
 	 *
@@ -1704,7 +1707,7 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 *     $p->next_tag( array( 'class_name' => 'test' ) ) === true;
 	 *     $p->get_attribute_names_with_prefix( 'data-' ) === array( 'data-enabled', 'data-test-id' );
 	 *
-	 *     $p->next_tag( array() ) === false;
+	 *     $p->next_tag() === false;
 	 *     $p->get_attribute_names_with_prefix( 'data-' ) === null;
 	 * ```
 	 *
@@ -1735,10 +1738,10 @@ class Gutenberg_HTML_Tag_Processor_6_3 {
 	 * Example:
 	 * ```php
 	 *     $p = new WP_HTML_Tag_Processor( '<DIV CLASS="test">Test</DIV>' );
-	 *     $p->next_tag( array() ) === true;
+	 *     $p->next_tag() === true;
 	 *     $p->get_tag() === 'DIV';
 	 *
-	 *     $p->next_tag( array() ) === false;
+	 *     $p->next_tag() === false;
 	 *     $p->get_tag() === null;
 	 * ```
 	 *

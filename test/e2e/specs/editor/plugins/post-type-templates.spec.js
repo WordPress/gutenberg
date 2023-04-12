@@ -69,7 +69,7 @@ test.describe( 'Post type templates', () => {
 				'My Empty Book'
 			);
 			await page.keyboard.press( 'ArrowDown' );
-			await pageUtils.pressKeyWithModifier( 'primary', 'A' );
+			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
 			await page.click( 'role=button[name="Save draft"i]' );
 			await expect(

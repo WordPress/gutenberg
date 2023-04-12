@@ -29,7 +29,7 @@ Get hands on: check out the [block editor live demo](https://wordpress.org/guten
 
 -   **Download:** To use the latest release of the Gutenberg plugin on your WordPress site: install from the plugins page in wp-admin, or [download from the WordPress.org plugins repository](https://wordpress.org/plugins/gutenberg/).
 
--   **User Documentation:** See the [WordPress Editor documentation](https://wordpress.org/support/article/wordpress-editor/) for detailed docs on using the editor as an author creating posts and pages.
+-   **User Documentation:** See the [WordPress Editor documentation](https://wordpress.org/documentation/article/wordpress-block-editor/) for detailed docs on using the editor as an author creating posts and pages.
 
 -   **User Support:** If you have run into an issue, you should check the [Support Forums first](https://wordpress.org/support/forums/). The forums are a great place to get help. If you have a bug to report, please [submit it to the Gutenberg repository](https://github.com/wordpress/gutenberg/issues). Please search prior to creating a new bug to confirm its not a duplicate.
 
@@ -43,7 +43,7 @@ Review the [Create a Block tutorial](/docs/getting-started/create-block/README.m
 
 Gutenberg is an open-source project and welcomes all contributors from code to design, and from documentation to triage. The project is built by many contributors and volunteers and we'd love your help building it.
 
-See the [Contributors Handbook](https://developer.wordpress.org/block-editor/contributors/) for all the details on how you can contribute. 
+See the [Contributors Handbook](https://developer.wordpress.org/block-editor/contributors/) for all the details on how you can contribute.
 
 To get up and running quickly with **code contribution** see [Getting Started With Code Contribution](/docs/contributors/code/getting-started-with-code-contribution.md). Also check out the other resources available on the [Code Contributions](/docs/contributors/code/README.md) page.
 

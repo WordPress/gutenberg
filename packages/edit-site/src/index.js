@@ -67,6 +67,7 @@ export function initializeEditor( id, settings ) {
 		welcomeGuide: true,
 		welcomeGuideStyles: true,
 		showListViewByDefault: false,
+		showBlockBreadcrumbs: true,
 	} );
 
 	dispatch( interfaceStore ).setDefaultComplementaryArea(

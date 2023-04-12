@@ -20,7 +20,9 @@ module.exports = {
 		'<rootDir>/test/unit/config/gutenberg-env.js',
 	],
 	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
-	testURL: 'http://localhost',
+	testEnvironmentOptions: {
+		url: 'http://localhost/',
+	},
 	testPathIgnorePatterns: [
 		'/.git/',
 		'/node_modules/',
@@ -33,6 +35,7 @@ module.exports = {
 		'<rootDir>/.+.native.js$',
 		'/packages/react-native-*',
 	],
+	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import { View } from 'react-native';
 
 /**
@@ -99,13 +98,8 @@ class MediaTextEdit extends Component {
 		if ( mediaType === 'image' && media.sizes ) {
 			// Try the "large" size URL, falling back to the "full" size URL below.
 			src =
-				get( media, [ 'sizes', 'large', 'url' ] ) ||
-				get( media, [
-					'media_details',
-					'sizes',
-					'large',
-					'source_url',
-				] );
+				media.sizes.large?.url ||
+				media?.media_details?.sizes?.large?.source_url;
 		}
 
 		setAttributes( {
