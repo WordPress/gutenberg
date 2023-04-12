@@ -154,7 +154,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 							'rendered' => sprintf( __( '%1$s (%2$s)', 'gutenberg' ), $time_ago, $date_short ),
 						),
 						'id'        => $id,
-						'is_latest' => $id === array_key_first( $user_theme_revisions ),
+						'is_latest' => array_key_first( $user_theme_revisions ) === $id,
 					);
 				}
 			}
