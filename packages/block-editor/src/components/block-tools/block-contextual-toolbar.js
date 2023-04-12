@@ -73,8 +73,8 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 		}
 	}, [ isCollapsed ] );
 
-	const { blockType, hasParents, showParentSelector } = useSelect(
-		( select ) => {
+	const { blockType, hasParents, showParentSelector, selectedBlockClientId } =
+		useSelect( ( select ) => {
 			const {
 				getBlockName,
 				getBlockParents,
@@ -83,16 +83,17 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			} = select( blockEditorStore );
 			const { getBlockType } = select( blocksStore );
 			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-			const parents = getBlockParents( selectedBlockClientId );
+			const _selectedBlockClientId = selectedBlockClientIds[ 0 ];
+			const parents = getBlockParents( _selectedBlockClientId );
 			const firstParentClientId = parents[ parents.length - 1 ];
 			const parentBlockName = getBlockName( firstParentClientId );
 			const parentBlockType = getBlockType( parentBlockName );
 
 			return {
+				selectedBlockClientId: _selectedBlockClientId,
 				blockType:
-					selectedBlockClientId &&
-					getBlockType( getBlockName( selectedBlockClientId ) ),
+					_selectedBlockClientId &&
+					getBlockType( getBlockName( _selectedBlockClientId ) ),
 				hasParents: parents.length,
 				showParentSelector:
 					parentBlockType &&
@@ -106,9 +107,11 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 						selectedBlockClientId
 					),
 			};
-		},
-		[]
-	);
+		}, [] );
+
+	useEffect( () => {
+		setIsCollapsed( false );
+	}, [ selectedBlockClientId ] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
