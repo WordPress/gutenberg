@@ -52,24 +52,60 @@ import { store as blockEditorStore } from '../../store';
  *                                                  'inside' refers to nesting as an inner block.
  */
 
+const NESTING_LEVEL_INDENTATION = 28;
+
+function isUpGesture( point, rect, nestingLevel = 1 ) {
+	// If the block is nested, and the user is dragging to the bottom
+	// left of the block, then it is an upward gesture.
+	const blockIndentPosition =
+		rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
+	return point.x < blockIndentPosition;
+}
+
+function getDesiredRelativeParentLevel( point, rect, nestingLevel = 1 ) {
+	const blockIndentPosition =
+		rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
+	const desiredParentLevel = Math.round(
+		( point.x - blockIndentPosition ) / NESTING_LEVEL_INDENTATION
+	);
+	return Math.abs( desiredParentLevel );
+}
+
 /**
  * Determines whether the user positioning the dragged block to nest as an
  * inner block.
  *
- * Presently this is determined by whether the cursor is on the right hand side
- * of the block.
+ * Determined based on nesting level indentation of the current block, plus
+ * the indentation of the next level of nesting.
  *
- * @param {WPPoint} point The point representing the cursor position when dragging.
- * @param {DOMRect} rect  The rectangle.
+ * @param {WPPoint} point        The point representing the cursor position when dragging.
+ * @param {DOMRect} rect         The rectangle.
+ * @param {number}  nestingLevel The rectangle.
  */
-function isNestingGesture( point, rect ) {
-	const blockCenterX = rect.left + rect.width / 2;
-	return point.x > blockCenterX;
+function isNestingGesture( point, rect, nestingLevel = 1 ) {
+	const blockIndentPosition =
+		rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
+	return point.x > blockIndentPosition + NESTING_LEVEL_INDENTATION;
 }
 
 // Block navigation is always a vertical list, so only allow dropping
 // to the above or below a block.
 const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
+
+function getCandidateBlockParents( candidateBlockData, blocksData ) {
+	const candidateBlockParents = [];
+	let currentBlockData = candidateBlockData;
+
+	while ( currentBlockData ) {
+		candidateBlockParents.push( { ...currentBlockData } );
+		currentBlockData = blocksData.find(
+			( blockData ) =>
+				blockData.clientId === currentBlockData.rootClientId
+		);
+	}
+
+	return candidateBlockParents;
+}
 
 /**
  * Given blocks data and the cursor position, compute the drop target.
@@ -84,8 +120,10 @@ export function getListViewDropTarget( blocksData, position ) {
 	let candidateBlockData;
 	let candidateDistance;
 	let candidateRect;
+	let candidateBlockIndex;
 
-	for ( const blockData of blocksData ) {
+	for ( let i = 0; i < blocksData.length; i++ ) {
+		const blockData = blocksData[ i ];
 		if ( blockData.isDraggedBlock ) {
 			continue;
 		}
@@ -121,10 +159,12 @@ export function getListViewDropTarget( blocksData, position ) {
 				candidateEdge = 'bottom';
 				candidateRect =
 					previousBlockData.element.getBoundingClientRect();
+				candidateBlockIndex = index - 1;
 			} else {
 				candidateBlockData = blockData;
 				candidateEdge = edge;
 				candidateRect = rect;
+				candidateBlockIndex = index;
 			}
 
 			// If the mouse position is within the block, break early
@@ -143,7 +183,50 @@ export function getListViewDropTarget( blocksData, position ) {
 		return;
 	}
 
+	// Now that we have a candidate block, we can perform more expensive
+	// checks to determine the drop target.
+
+	const candidateBlockParents = getCandidateBlockParents(
+		candidateBlockData,
+		blocksData
+	);
+
 	const isDraggingBelow = candidateEdge === 'bottom';
+
+	if (
+		isDraggingBelow &&
+		candidateBlockData.rootClientId &&
+		isUpGesture( position, candidateRect, candidateBlockParents.length )
+	) {
+		const currentLevel = candidateBlockData.nestingLevel;
+		const nextLevel = blocksData[ candidateBlockIndex + 1 ]
+			? blocksData[ candidateBlockIndex + 1 ]?.nestingLevel
+			: 1;
+
+		if ( currentLevel && nextLevel ) {
+			const desiredRelativeLevel = getDesiredRelativeParentLevel(
+				position,
+				candidateRect,
+				candidateBlockParents.length
+			);
+
+			const targetParentIndex =
+				Math.max(
+					Math.min( desiredRelativeLevel, currentLevel - nextLevel ),
+					1
+				) - 1;
+
+			if ( candidateBlockParents[ targetParentIndex ] ) {
+				return {
+					rootClientId:
+						candidateBlockParents[ targetParentIndex ].rootClientId,
+					clientId: candidateBlockData.clientId,
+					blockIndex: candidateBlockData.index,
+					dropPosition: candidateEdge,
+				};
+			}
+		}
+	}
 
 	// If the user is dragging towards the bottom of the block check whether
 	// they might be trying to nest the block as a child.
@@ -156,7 +239,11 @@ export function getListViewDropTarget( blocksData, position ) {
 		candidateBlockData.canInsertDraggedBlocksAsChild &&
 		( ( candidateBlockData.innerBlockCount > 0 &&
 			candidateBlockData.isExpanded ) ||
-			isNestingGesture( position, candidateRect ) )
+			isNestingGesture(
+				position,
+				candidateRect,
+				candidateBlockParents.length
+			) )
 	) {
 		return {
 			rootClientId: candidateBlockData.clientId,
@@ -221,6 +308,7 @@ export default function useListViewDropZone() {
 						rootClientId,
 						blockIndex: getBlockIndex( clientId ),
 						element: blockElement,
+						nestingLevel: blockElement.ariaLevel,
 						isDraggedBlock: isBlockDrag
 							? draggedBlockClientIds.includes( clientId )
 							: false,
