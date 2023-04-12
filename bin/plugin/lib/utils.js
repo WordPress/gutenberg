@@ -60,6 +60,20 @@ function readJSONFile( fileName ) {
 }
 
 /**
+ * Utility to write a formatted JSON file.
+ *
+ * @param {string} filePath
+ * @param {Object} content
+ */
+function writeJSONFile( filePath, content ) {
+	return fs.writeFileSync(
+		filePath,
+		JSON.stringify( content, null, 2 ),
+		'utf8'
+	);
+}
+
+/**
  * Common logic wrapping a step in the process.
  *
  * @param {string}   name         Step name.
@@ -124,6 +138,7 @@ module.exports = {
 	askForConfirmation,
 	runStep,
 	readJSONFile,
+	writeJSONFile,
 	runShellScript,
 	getRandomTemporaryPath,
 };
