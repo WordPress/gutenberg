@@ -104,7 +104,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 					) &&
 					selectedBlockClientIds.length <= 1 &&
 					! __unstableGetContentLockingParent(
-						selectedBlockClientId
+						_selectedBlockClientId
 					),
 			};
 		}, [] );
