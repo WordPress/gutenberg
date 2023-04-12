@@ -83,15 +83,10 @@ export function useAlternativeBlockPatterns( area, clientId ) {
 			const blockNameWithArea = area
 				? `core/template-part/${ area }`
 				: 'core/template-part';
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-			return __experimentalGetPatternsByBlockTypes(
-				blockNameWithArea,
-				rootClientId
-			);
+			return getPatternsByBlockTypes( blockNameWithArea, rootClientId );
 		},
 		[ area, clientId ]
 	);

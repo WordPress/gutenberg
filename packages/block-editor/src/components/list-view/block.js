@@ -27,12 +27,12 @@ import { sprintf, __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ListViewLeaf from './leaf';
+import useListViewScrollIntoView from './use-list-view-scroll-into-view';
 import {
 	BlockMoverUpButton,
 	BlockMoverDownButton,
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
-import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useListViewContext } from './context';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -57,6 +57,7 @@ function ListViewBlock( {
 	isSyncedBranch,
 } ) {
 	const cellRef = useRef( null );
+	const rowRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
 
@@ -133,7 +134,8 @@ function ListViewBlock( {
 		  )
 		: __( 'Options' );
 
-	const { isTreeGridMounted, expand, collapse } = useListViewContext();
+	const { isTreeGridMounted, expand, collapse, BlockSettingsMenu } =
+		useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -209,7 +211,7 @@ function ListViewBlock( {
 		'is-synced-branch': isSyncedBranch,
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
-		'is-synced': blockInformation.isSynced,
+		'is-synced': blockInformation?.isSynced,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
@@ -219,6 +221,19 @@ function ListViewBlock( {
 	const dropdownClientIds = selectedClientIds.includes( clientId )
 		? selectedClientIds
 		: [ clientId ];
+
+	// Pass in a ref to the row, so that it can be scrolled
+	// into view when selected. For long lists, the placeholder for the
+	// selected block is also observed, within ListViewLeafPlaceholder.
+	useListViewScrollIntoView( {
+		isSelected,
+		rowItemRef: rowRef,
+		selectedClientIds,
+	} );
+
+	// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
+	const currentlyEditingBlockInCanvas =
+		isSelected && selectedClientIds.length === 1;
 
 	return (
 		<ListViewLeaf
@@ -233,8 +248,10 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
+			data-expanded={ canExpand ? isExpanded : undefined }
 			isExpanded={ canExpand ? isExpanded : undefined }
 			aria-selected={ !! isSelected || forceSelectionContentLock }
+			ref={ rowRef }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
@@ -256,7 +273,9 @@ function ListViewBlock( {
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
 							ref={ ref }
-							tabIndex={ tabIndex }
+							tabIndex={
+								currentlyEditingBlockInCanvas ? 0 : tabIndex
+							}
 							onFocus={ onFocus }
 							isExpanded={ isExpanded }
 							selectedClientIds={ selectedClientIds }
@@ -303,14 +322,15 @@ function ListViewBlock( {
 				</>
 			) }
 
-			{ showBlockActions && (
+			{ showBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected || forceSelectionContentLock }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
-						<BlockSettingsDropdown
+						<BlockSettingsMenu
 							clientIds={ dropdownClientIds }
+							block={ block }
 							icon={ moreVertical }
 							label={ settingsAriaLabel }
 							toggleProps={ {

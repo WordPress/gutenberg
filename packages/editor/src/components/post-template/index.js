@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, map } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -44,6 +44,7 @@ export function PostTemplate() {
 
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			label={ __( 'Template:' ) }
 			value={ selectedTemplate }
 			onChange={ ( templateSlug ) => {
@@ -51,9 +52,8 @@ export function PostTemplate() {
 					template: templateSlug || '',
 				} );
 			} }
-			options={ map(
-				availableTemplates,
-				( templateName, templateSlug ) => ( {
+			options={ Object.entries( availableTemplates ?? {} ).map(
+				( [ templateSlug, templateName ] ) => ( {
 					value: templateSlug,
 					label: templateName,
 				} )

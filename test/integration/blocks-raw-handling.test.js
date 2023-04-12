@@ -378,6 +378,8 @@ describe( 'Blocks raw handling', () => {
 			'google-docs',
 			'google-docs-list-only',
 			'google-docs-table',
+			'google-docs-table-with-colspan',
+			'google-docs-table-with-rowspan',
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',
 			'ms-word',

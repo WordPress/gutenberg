@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { safeDecodeURIComponent } from './safe-decode-uri-component';
 import { getQueryString } from './get-query-string';
 
 /** @typedef {import('./get-query-arg').QueryArgParsed} QueryArgParsed */
@@ -85,7 +86,7 @@ export function getQueryArgs( url ) {
 					// Filtering avoids decoding as `undefined` for value, where
 					// default is restored in destructuring assignment.
 					.filter( Boolean )
-					.map( decodeURIComponent );
+					.map( safeDecodeURIComponent );
 
 				if ( key ) {
 					const segments = key.replace( /\]/g, '' ).split( '[' );

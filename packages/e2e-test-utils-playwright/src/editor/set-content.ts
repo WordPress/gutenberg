@@ -6,8 +6,8 @@ import type { Editor } from './index';
 /**
  * Set the content of the editor.
  *
- * @param  this
- * @param  html Serialized block HTML.
+ * @param this
+ * @param html Serialized block HTML.
  */
 async function setContent( this: Editor, html: string ) {
 	await this.page.evaluate( ( _html ) => {

@@ -1,0 +1,18 @@
+{
+	"version": 2,
+	"settings": {
+		"blocks": {
+			"core/post-title": {
+				"color": {
+					"palette": [
+						{
+							"slug": "light",
+							"name": "Light",
+							"color": "#f1f1f1"
+						}
+					]
+				}
+			}
+		}
+	}
+}

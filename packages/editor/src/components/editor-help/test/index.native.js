@@ -36,11 +36,11 @@ it( 'navigates back from help topic detail screen', async () => {
 	fireEvent.press( backButton[ backButton.length - 1 ] );
 
 	// Currently logs `act` warning due to https://github.com/callstack/react-native-testing-library/issues/379
-	await waitForElementToBeRemoved( () =>
-		screen.getByText(
-			'Each block has its own settings. To find them, tap on a block. Its settings will appear on the toolbar at the bottom of the screen.'
-		)
-	);
+	const text =
+		'Each block has its own settings. To find them, tap on a block. Its settings will appear on the toolbar at the bottom of the screen.';
+	await waitForElementToBeRemoved( () => screen.getByText( text ) );
+
+	expect( screen.queryByText( text ) ).toBeNull();
 } );
 
 it( 'dismisses when close button is pressed', async () => {

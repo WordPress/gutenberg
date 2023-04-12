@@ -16,12 +16,6 @@ import { store as blockEditorStore } from '../../store';
 const EMPTY_ARRAY = [];
 
 function getShowTabs( blockName, tabSettings = {} ) {
-	// Don't allow settings to force the display of tabs if the block inspector
-	// tabs experiment hasn't been opted into.
-	if ( ! window?.__experimentalEnableBlockInspectorTabs ) {
-		return false;
-	}
-
 	// Block specific setting takes precedence over generic default.
 	if ( tabSettings[ blockName ] !== undefined ) {
 		return tabSettings[ blockName ];
@@ -43,16 +37,15 @@ export default function useInspectorControlsTabs( blockName ) {
 		default: defaultGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
+		position: positionGroup,
+		styles: stylesGroup,
 		typography: typographyGroup,
 	} = InspectorControlsGroups;
 
 	// List View Tab: If there are any fills for the list group add that tab.
 	const listViewDisabled = useIsListViewTabDisabled( blockName );
 	const listFills = useSlotFills( listGroup.Slot.__unstableName );
-
-	if ( ! listViewDisabled && !! listFills && listFills.length ) {
-		tabs.push( TAB_LIST_VIEW );
-	}
+	const hasListFills = ! listViewDisabled && !! listFills && listFills.length;
 
 	// Styles Tab: Add this tab if there are any fills for block supports
 	// e.g. border, color, spacing, typography, etc.
@@ -60,27 +53,40 @@ export default function useInspectorControlsTabs( blockName ) {
 		...( useSlotFills( borderGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( colorGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( dimensionsGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( stylesGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( typographyGroup.Slot.__unstableName ) || [] ),
 	];
+	const hasStyleFills = styleFills.length;
 
-	if ( styleFills.length ) {
-		tabs.push( TAB_STYLES );
-	}
+	// Settings Tab: If we don't have multiple tabs to display
+	// (i.e. both list view and styles), check only the default and position
+	// InspectorControls slots. If we have multiple tabs, we'll need to check
+	// the advanced controls slot as well to ensure they are rendered.
+	const advancedFills =
+		useSlotFills( InspectorAdvancedControls.slotName ) || [];
 
-	// Settings Tab: If there are any fills for the general InspectorControls
-	// or Advanced Controls slot, then add this tab.
 	const settingsFills = [
 		...( useSlotFills( defaultGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
+		...( useSlotFills( positionGroup.Slot.__unstableName ) || [] ),
+		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
 	];
+
+	// Add the tabs in the order that they will default to if available.
+	// List View > Settings > Styles.
+	if ( hasListFills ) {
+		tabs.push( TAB_LIST_VIEW );
+	}
 
 	if ( settingsFills.length ) {
 		tabs.push( TAB_SETTINGS );
 	}
 
+	if ( hasStyleFills ) {
+		tabs.push( TAB_STYLES );
+	}
+
 	const tabSettings = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings()
-			.__experimentalBlockInspectorTabs;
+		return select( blockEditorStore ).getSettings().blockInspectorTabs;
 	}, [] );
 
 	const showTabs = getShowTabs( blockName, tabSettings );

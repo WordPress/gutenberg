@@ -9,13 +9,9 @@ import userEvent from '@testing-library/user-event';
  */
 import TimePicker from '..';
 
-jest.useFakeTimers();
-
 describe( 'TimePicker', () => {
 	it( 'should call onChange with updated date values', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChangeSpy = jest.fn();
 
@@ -69,9 +65,7 @@ describe( 'TimePicker', () => {
 	} );
 
 	it( 'should call onChange with an updated hour (12-hour clock)', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChangeSpy = jest.fn();
 
@@ -93,9 +87,7 @@ describe( 'TimePicker', () => {
 	} );
 
 	it( 'should call onChange with a bounded hour (12-hour clock) if the hour is out of bounds', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChangeSpy = jest.fn();
 
@@ -117,9 +109,7 @@ describe( 'TimePicker', () => {
 	} );
 
 	it( 'should call onChange with an updated hour (24-hour clock)', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChangeSpy = jest.fn();
 
@@ -141,9 +131,7 @@ describe( 'TimePicker', () => {
 	} );
 
 	it( 'should call onChange with a bounded minute if out of bounds', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChangeSpy = jest.fn();
 
@@ -165,9 +153,7 @@ describe( 'TimePicker', () => {
 	} );
 
 	it( 'should switch to PM correctly', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChangeSpy = jest.fn();
 
@@ -187,9 +173,7 @@ describe( 'TimePicker', () => {
 	} );
 
 	it( 'should switch to AM correctly', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChangeSpy = jest.fn();
 
@@ -209,9 +193,7 @@ describe( 'TimePicker', () => {
 	} );
 
 	it( 'should allow to set the time correctly when the PM period is selected', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChangeSpy = jest.fn();
 
@@ -244,9 +226,7 @@ describe( 'TimePicker', () => {
 	} );
 
 	it( 'should truncate at the minutes on change', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChangeSpy = jest.fn();
 

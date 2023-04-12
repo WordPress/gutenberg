@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+## 11.7.0 (2023-03-29)
+
+-   `ImageSizeControl`: Update image size label ([#49112](https://github.com/WordPress/gutenberg/pull/49112)).
+
+## 11.6.0 (2023-03-15)
+
+## 11.5.0 (2023-03-01)
+
+### Bug Fix
+
+-   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).
+
+## 11.4.0 (2023-02-15)
+
+### Bug Fix
+
+-   `LinkControl`: fix scrollbar displayed on toggle link settings ([#47986](https://github.com/WordPress/gutenberg/pull/47986)).
+
+## 11.3.0 (2023-02-01)
+
+## 11.2.0 (2023-01-11)
+
+### Bug Fix
+
+-   `BlockInspector`: Fix browser warning error when block is not selected ([#46875](https://github.com/WordPress/gutenberg/pull/46875)).
+-   Move component styles needed for iframes to content styles ([#47103](https://github.com/WordPress/gutenberg/pull/47103)).
+-   Block Inserter: Correctly apply style to the default inserter ([#47166](https://github.com/WordPress/gutenberg/pull/47166)).
+-   List View: Fix crash when the first template-parts is deleted width del key ([#47227](https://github.com/WordPress/gutenberg/pull/47227)).
+
+## 11.1.0 (2023-01-02)
+
+## 11.0.0 (2022-12-14)
+
 ### Breaking Changes
 
 -   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
@@ -10,6 +43,7 @@
 
 -   `URLInput`: the `renderSuggestions` callback prop now receives `currentInputValue` as a new parameter ([45806](https://github.com/WordPress/gutenberg/pull/45806)).
 -   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
+-   `URLInput`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([46692](https://github.com/WordPress/gutenberg/pull/46692)).
 
 ### Bug Fix
 

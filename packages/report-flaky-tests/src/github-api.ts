@@ -5,11 +5,6 @@ import { getOctokit } from '@actions/github';
 import type { GitHub } from '@actions/github/lib/utils';
 import type { Endpoints } from '@octokit/types';
 
-/**
- * Internal dependencies
- */
-import { isReportComment } from './markdown';
-
 type Octokit = InstanceType< typeof GitHub >;
 
 type Repo = {
@@ -78,7 +73,11 @@ class GitHubAPI {
 		return data;
 	}
 
-	async createComment( sha: string, body: string ) {
+	async createCommentOnCommit(
+		sha: string,
+		body: string,
+		isReportComment: ( body: string ) => boolean
+	) {
 		const { data: comments } =
 			await this.#octokit.rest.repos.listCommentsForCommit( {
 				...this.#repo,
@@ -103,6 +102,50 @@ class GitHubAPI {
 		const { data } = await this.#octokit.rest.repos.createCommitComment( {
 			...this.#repo,
 			commit_sha: sha,
+			body,
+		} );
+
+		return data;
+	}
+
+	async createCommentOnPR(
+		prNumber: number,
+		body: string,
+		isReportComment: ( body: string ) => boolean
+	) {
+		let reportComment;
+		let page = 1;
+
+		while ( ! reportComment ) {
+			const { data: comments } =
+				await this.#octokit.rest.issues.listComments( {
+					...this.#repo,
+					issue_number: prNumber,
+					page,
+				} );
+			reportComment = comments.find(
+				( comment ) => comment.body && isReportComment( comment.body )
+			);
+			if ( comments.length > 0 ) {
+				page += 1;
+			} else {
+				break;
+			}
+		}
+
+		if ( reportComment ) {
+			const { data } = await this.#octokit.rest.issues.updateComment( {
+				...this.#repo,
+				comment_id: reportComment.id,
+				body,
+			} );
+
+			return data;
+		}
+
+		const { data } = await this.#octokit.rest.issues.createComment( {
+			...this.#repo,
+			issue_number: prNumber,
 			body,
 		} );
 

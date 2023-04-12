@@ -13,10 +13,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   box-sizing: inherit;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
-}
-
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
@@ -29,10 +25,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   display: inline-block;
   margin-bottom: calc(4px * 2);
   padding: 0;
-}
-
-.components-panel__row .emotion-8 {
-  margin-bottom: inherit;
 }
 
 <div>
@@ -145,7 +137,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
         class="components-base-control components-checkbox-control emotion-0 emotion-1"
       >
         <div
-          class="components-base-control__field emotion-8 emotion-3"
+          class="components-base-control__field emotion-2 emotion-3"
         >
           <span
             class="components-checkbox-control__input-container"
@@ -183,10 +175,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   box-sizing: inherit;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
-}
-
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
@@ -199,10 +187,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   display: inline-block;
   margin-bottom: calc(4px * 2);
   padding: 0;
-}
-
-.components-panel__row .emotion-8 {
-  margin-bottom: inherit;
 }
 
 <div>
@@ -315,7 +299,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
         class="components-base-control components-checkbox-control emotion-0 emotion-1"
       >
         <div
-          class="components-base-control__field emotion-8 emotion-3"
+          class="components-base-control__field emotion-2 emotion-3"
         >
           <span
             class="components-checkbox-control__input-container"

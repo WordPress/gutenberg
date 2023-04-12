@@ -77,7 +77,7 @@ function TemplateTitle() {
 			</Button>
 			{ hasOptions ? (
 				<Dropdown
-					position="bottom center"
+					popoverProps={ { placement: 'bottom' } }
 					contentClassName="edit-post-template-top-area__popover"
 					renderToggle={ ( { onToggle } ) => (
 						<Button

@@ -41,12 +41,10 @@ To use these utilities, instantiate them within each test file:
 ```js
 test.use( {
 	editor: async ( { page }, use ) => {
-		await use( new Editor( { page, hasIframe: true } ) );
+		await use( new Editor( { page } ) );
 	},
 } );
 ```
-
-The `hasIframe` property denotes whether the editor canvas uses an Iframe, as the site editor currently does. Omit this for non-iframe editors.
 
 Within a test or test utility, use the `canvas` property to select elements within the iframe canvas:
 
@@ -60,7 +58,7 @@ Generic Playwright utilities for interacting with web pages.
 
 ```js
 const pageUtils = new PageUtils( { page } );
-await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+await pageUtils.pressKeys( 'primary+a' );
 ```
 
 ### RequestUtils

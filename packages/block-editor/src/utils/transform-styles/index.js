@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -23,7 +18,7 @@ import wrap from './transforms/wrap';
  * @return {Array} converted rules.
  */
 const transformStyles = ( styles, wrapperClassName = '' ) => {
-	return map( styles, ( { css, baseURL } ) => {
+	return Object.values( styles ?? [] ).map( ( { css, baseURL } ) => {
 		const transforms = [];
 		if ( wrapperClassName ) {
 			transforms.push( wrap( wrapperClassName ) );

@@ -43,6 +43,7 @@ import {
 import { close } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { Path, SVG } from '@wordpress/primitives';
+import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -52,6 +53,7 @@ import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import {
 	getFrameOffset,
+	getFrameScale,
 	positionToPlacement,
 	placementToMotionAnimationProps,
 	getReferenceOwnerDocument,
@@ -65,6 +67,7 @@ import type {
 	PopoverAnchorRefTopBottom,
 } from './types';
 import { limitShift as customLimitShift } from './limit-shift';
+import { overlayMiddlewares } from './overlay-middlewares';
 
 /**
  * Name of slot in which popover should fill.
@@ -268,6 +271,7 @@ const UnforwardedPopover = (
 	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
 
 	const middleware = [
+		...( placementProp === 'overlay' ? overlayMiddlewares() : [] ),
 		// Custom middleware which adjusts the popover's position by taking into
 		// account the offset of the anchor's iframe (if any) compared to the page.
 		{
@@ -361,7 +365,10 @@ const UnforwardedPopover = (
 		placement: computedPlacement,
 		middlewareData: { arrow: arrowData },
 	} = useFloating( {
-		placement: normalizedPlacementFromProps,
+		placement:
+			normalizedPlacementFromProps === 'overlay'
+				? undefined
+				: normalizedPlacementFromProps,
 		middleware,
 		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
 			autoUpdate( referenceParam, floatingParam, updateParam, {
@@ -399,12 +406,14 @@ const UnforwardedPopover = (
 			fallbackReferenceElement,
 			fallbackDocument: document,
 		} );
+		const scale = getFrameScale( resultingReferenceOwnerDoc );
 		const resultingReferenceElement = getReferenceElement( {
 			anchor,
 			anchorRef,
 			anchorRect,
 			getAnchorRect,
 			fallbackReferenceElement,
+			scale,
 		} );
 
 		referenceCallbackRef( resultingReferenceElement );
@@ -441,17 +450,24 @@ const UnforwardedPopover = (
 		}
 
 		const { defaultView } = referenceOwnerDocument;
+		const { frameElement } = defaultView;
+
+		const scrollContainer = frameElement
+			? getScrollContainer( frameElement )
+			: null;
 
 		const updateFrameOffset = () => {
 			frameOffsetRef.current = getFrameOffset( referenceOwnerDocument );
 			update();
 		};
 		defaultView.addEventListener( 'resize', updateFrameOffset );
+		scrollContainer?.addEventListener( 'scroll', updateFrameOffset );
 
 		updateFrameOffset();
 
 		return () => {
 			defaultView.removeEventListener( 'resize', updateFrameOffset );
+			scrollContainer?.removeEventListener( 'scroll', updateFrameOffset );
 		};
 	}, [ referenceOwnerDocument, update, refs.floating ] );
 

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { visitAdminPage } from '@wordpress/e2e-test-utils';
+import { canvas, visitAdminPage } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -166,11 +166,15 @@ export async function openPreviousGlobalStylesPanel() {
  * Enters edit mode.
  */
 export async function enterEditMode() {
-	const editSiteToggle = await page.$( '.edit-site-site-hub__edit-button' );
-	// This check is necessary for the performance tests in old branches
-	// where the site editor toggle was not implemented yet.
-	if ( ! editSiteToggle ) {
-		return;
+	try {
+		await page.waitForSelector(
+			'.edit-site-visual-editor__editor-canvas[role="button"]',
+			{ timeout: 3000 }
+		);
+
+		await canvas().click( 'body' );
+	} catch {
+		// This catch is necessary for the performance tests in old branches
+		// where the site editor toggle was not implemented yet.
 	}
-	await page.click( '.edit-site-site-hub__edit-button' );
 }

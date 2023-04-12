@@ -21,7 +21,7 @@ export default function useCreateNavigationMenu( clientId ) {
 	const [ value, setValue ] = useState( null );
 	const [ error, setError ] = useState( null );
 
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord, editEntityRecord } = useDispatch( coreStore );
 	const generateDefaultTitle = useGenerateDefaultNavigationTitle( clientId );
 
 	// This callback uses data from the two placeholder steps and only creates
@@ -68,6 +68,18 @@ export default function useCreateNavigationMenu( clientId ) {
 				.then( ( response ) => {
 					setValue( response );
 					setStatus( CREATE_NAVIGATION_MENU_SUCCESS );
+
+					// Set the status to publish so that the Navigation block
+					// shows up in the multi entity save flow.
+					if ( postStatus !== 'publish' ) {
+						editEntityRecord(
+							'postType',
+							'wp_navigation',
+							response.id,
+							{ status: 'publish' }
+						);
+					}
+
 					return response;
 				} )
 				.catch( ( err ) => {
@@ -78,7 +90,7 @@ export default function useCreateNavigationMenu( clientId ) {
 					} );
 				} );
 		},
-		[ serialize, saveEntityRecord ]
+		[ saveEntityRecord, editEntityRecord, generateDefaultTitle ]
 	);
 
 	return {

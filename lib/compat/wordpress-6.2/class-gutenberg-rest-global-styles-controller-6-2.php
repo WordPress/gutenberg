@@ -90,6 +90,29 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 	}
 
 	/**
+	 * Get the link relations available for the post and current user.
+	 *
+	 * @since 5.9.0
+	 * @since 6.2.0 Added 'edit-css' action.
+	 *
+	 * @return array List of link relations.
+	 */
+	protected function get_available_actions() {
+		$rels = array();
+
+		$post_type = get_post_type_object( $this->post_type );
+		if ( current_user_can( $post_type->cap->publish_posts ) ) {
+			$rels[] = 'https://api.w.org/action-publish';
+		}
+
+		if ( current_user_can( 'edit_css' ) ) {
+			$rels[] = 'https://api.w.org/action-edit-css';
+		}
+
+		return $rels;
+	}
+
+	/**
 	 * Updates a single global style config.
 	 *
 	 * @since 5.9.0
@@ -249,6 +272,32 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 			);
 			$response->add_links( $links );
 		}
+
+		return $response;
+	}
+
+	/**
+	 * Returns the given theme global styles variations.
+	 *
+	 * @since 6.0.0
+	 * @since 6.2.0 Returns parent theme variations, if they exist.
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_theme_items( $request ) {
+		if ( get_stylesheet() !== $request['stylesheet'] ) {
+			// This endpoint only supports the active or parent theme for now.
+			return new WP_Error(
+				sprintf( '%s', $request['template'] ),
+				__( 'Theme not found.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
+		$response   = rest_ensure_response( $variations );
 
 		return $response;
 	}

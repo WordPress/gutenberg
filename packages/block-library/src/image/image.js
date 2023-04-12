@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, map } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,7 +28,6 @@ import {
 	store as blockEditorStore,
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
-	__experimentalImageEditingProvider as ImageEditingProvider,
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
@@ -135,19 +134,13 @@ export default function Image( {
 				} = select( blockEditorStore );
 
 				const rootClientId = getBlockRootClientId( clientId );
-				const settings = Object.fromEntries(
-					Object.entries( getSettings() ).filter( ( [ key ] ) =>
-						[
-							'imageEditing',
-							'imageSizes',
-							'maxWidth',
-							'mediaUpload',
-						].includes( key )
-					)
-				);
+				const settings = getSettings();
 
 				return {
-					...settings,
+					imageEditing: settings.imageEditing,
+					imageSizes: settings.imageSizes,
+					maxWidth: settings.maxWidth,
+					mediaUpload: settings.mediaUpload,
 					canInsertCover: canInsertBlockType(
 						'core/cover',
 						rootClientId
@@ -172,18 +165,23 @@ export default function Image( {
 		allowResize &&
 		! isContentLocked &&
 		! ( isWideAligned && isLargeViewport );
-	const imageSizeOptions = map(
-		imageSizes.filter( ( { slug } ) =>
-			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
-		),
-		( { name, slug } ) => ( { value: slug, label: name } )
-	);
+	const imageSizeOptions = imageSizes
+		.filter(
+			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
+		)
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+	const canUploadMedia = !! mediaUpload;
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
 	// we can enable a button in the toolbar to upload the image.
 	useEffect( () => {
-		if ( ! isExternalImage( id, url ) || ! isSelected || externalBlob ) {
+		if (
+			! isExternalImage( id, url ) ||
+			! isSelected ||
+			! canUploadMedia ||
+			externalBlob
+		) {
 			return;
 		}
 
@@ -193,7 +191,7 @@ export default function Image( {
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
 			.catch( () => {} );
-	}, [ id, url, isSelected, externalBlob ] );
+	}, [ id, url, isSelected, externalBlob, canUploadMedia ] );
 
 	// We need to show the caption when changes come from
 	// history navigation(undo/redo).
@@ -267,12 +265,7 @@ export default function Image( {
 	}
 
 	function updateImage( newSizeSlug ) {
-		const newUrl = get( image, [
-			'media_details',
-			'sizes',
-			newSizeSlug,
-			'source_url',
-		] );
+		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
 		if ( ! newUrl ) {
 			return null;
 		}
@@ -414,19 +407,18 @@ export default function Image( {
 					{ ! multiImageSelection && (
 						<TextareaControl
 							__nextHasNoMarginBottom
-							label={ __( 'Alt text (alternative text)' ) }
+							label={ __( 'Alternative text' ) }
 							value={ alt }
 							onChange={ updateAlt }
 							help={
 								<>
 									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 										{ __(
-											'Describe the purpose of the image'
+											'Describe the purpose of the image.'
 										) }
 									</ExternalLink>
-									{ __(
-										'Leave empty if the image is purely decorative.'
-									) }
+									<br />
+									{ __( 'Leave empty if decorative.' ) }
 								</>
 							}
 						/>
@@ -441,11 +433,15 @@ export default function Image( {
 						isResizable={ isResizable }
 						imageWidth={ naturalWidth }
 						imageHeight={ naturalHeight }
+						imageSizeHelp={ __(
+							'Select the size of the source image.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
@@ -525,13 +521,20 @@ export default function Image( {
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
-				borderProps={ isRounded ? undefined : borderProps }
+				id={ id }
 				url={ url }
 				width={ width }
 				height={ height }
 				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
+				onSaveImage={ ( imageAttributes ) =>
+					setAttributes( imageAttributes )
+				}
+				onFinishEditing={ () => {
+					setIsEditingImage( false );
+				} }
+				borderProps={ isRounded ? undefined : borderProps }
 			/>
 		);
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
@@ -620,18 +623,7 @@ export default function Image( {
 	}
 
 	return (
-		<ImageEditingProvider
-			id={ id }
-			url={ url }
-			naturalWidth={ naturalWidth }
-			naturalHeight={ naturalHeight }
-			clientWidth={ clientWidth }
-			onSaveImage={ ( imageAttributes ) =>
-				setAttributes( imageAttributes )
-			}
-			isEditing={ isEditingImage }
-			onFinishEditing={ () => setIsEditingImage( false ) }
-		>
+		<>
 			{ /* Hide controls during upload to avoid component remount,
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
@@ -639,6 +631,7 @@ export default function Image( {
 			{ showCaption &&
 				( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
+						identifier="caption"
 						className={ __experimentalGetElementClassName(
 							'caption'
 						) }
@@ -658,6 +651,6 @@ export default function Image( {
 						}
 					/>
 				) }
-		</ImageEditingProvider>
+		</>
 	);
 }

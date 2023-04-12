@@ -1,37 +1,17 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-import fastDeepEqual from 'fast-deep-equal/es6';
-
-/**
  * WordPress dependencies
  */
-import { store as coreStore } from '@wordpress/core-data';
-import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	useMemo,
-	useContext,
-	useState,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
-import { ENTER } from '@wordpress/keycodes';
-import {
-	__experimentalGrid as Grid,
-	Card,
-	CardBody,
-} from '@wordpress/components';
+import { Card, CardBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useEffect, useRef } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from './global-styles-provider';
-import { GlobalStylesContext } from './context';
-import StylesPreview from './preview';
 import ScreenHeader from './header';
+import StyleVariationsContainer from './style-variations-container';
 
 let uniqueId = 0;
 
@@ -118,33 +98,12 @@ function Variation( { variation } ) {
 }
 
 function ScreenStyleVariations() {
-	const { variations, mode } = useSelect( ( select ) => {
+	const { mode } = useSelect( ( select ) => {
 		return {
-			variations:
-				select(
-					coreStore
-				).__experimentalGetCurrentThemeGlobalStylesVariations(),
-
 			mode: select( blockEditorStore ).__unstableGetEditorMode(),
 		};
 	}, [] );
 
-	const withEmptyVariation = useMemo( () => {
-		return [
-			{
-				title: __( 'Default' ),
-				settings: {},
-				styles: {},
-			},
-			...variations.map( ( variation ) => ( {
-				...variation,
-				settings: variation.settings ?? {},
-				styles: variation.styles ?? {},
-			} ) ),
-		];
-	}, [ variations ] );
-
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const shouldRevertInitialMode = useRef( null );
 	useEffect( () => {
 		// ignore changes to zoom-out mode as we explictily change to it on mount.
@@ -167,7 +126,10 @@ function ScreenStyleVariations() {
 				}
 			};
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
+
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	return (
 		<>
@@ -179,13 +141,13 @@ function ScreenStyleVariations() {
 				) }
 			/>
 
-			<Card size="small" isBorderless>
+			<Card
+				size="small"
+				isBorderless
+				className="edit-site-global-styles-screen-style-variations"
+			>
 				<CardBody>
-					<Grid columns={ 2 }>
-						{ withEmptyVariation?.map( ( variation, index ) => (
-							<Variation key={ index } variation={ variation } />
-						) ) }
-					</Grid>
+					<StyleVariationsContainer />
 				</CardBody>
 			</Card>
 		</>

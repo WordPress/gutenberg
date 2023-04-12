@@ -51,7 +51,7 @@ function isFunction( maybeFunc ) {
  * @param {Object}      thunkArgs        Argument object for the thunk middleware.
  * @param {Function}    thunkArgs.select Function to select from the store.
  *
- * @return {?WPBlockType} The block, if it has been successfully registered; otherwise `undefined`.
+ * @return {WPBlockType | undefined} The block, if it has been successfully registered; otherwise `undefined`.
  */
 const processBlockType = ( blockType, { select } ) => {
 	const { name } = blockType;

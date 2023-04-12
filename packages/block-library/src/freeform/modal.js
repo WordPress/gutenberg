@@ -88,7 +88,7 @@ export default function ModalEdit( props ) {
 								{ __( 'Cancel' ) }
 							</Button>
 							<Button
-								isPrimary
+								variant="primary"
 								onClick={ () => {
 									setAttributes( {
 										content:

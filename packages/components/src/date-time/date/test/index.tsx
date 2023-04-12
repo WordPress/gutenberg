@@ -10,8 +10,6 @@ import userEvent from '@testing-library/user-event';
  */
 import DatePicker from '..';
 
-jest.useFakeTimers();
-
 describe( 'DatePicker', () => {
 	it( 'should highlight the current date', () => {
 		render( <DatePicker currentDate="2022-05-02T11:00:00" /> );
@@ -33,9 +31,7 @@ describe( 'DatePicker', () => {
 	} );
 
 	it( 'should call onChange when a day is selected', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onChange = jest.fn();
 
@@ -54,9 +50,7 @@ describe( 'DatePicker', () => {
 	} );
 
 	it( 'should call onMonthPreviewed and onChange when a day in a different month is selected', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onMonthPreviewed = jest.fn();
 		const onChange = jest.fn();

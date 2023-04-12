@@ -1,98 +1,127 @@
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
-import { forwardRef, useState } from '@wordpress/element';
+import {
+	forwardRef,
+	useState,
+	useEffect,
+	useCallback,
+} from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import Inserter from '../inserter';
-import { LinkUI } from './link-ui';
-import { updateAttributes } from './update-attributes';
-import { useInsertedBlock } from './use-inserted-block';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
-const BLOCKS_WITH_LINK_UI_SUPPORT = [
+import { unlock } from '../../lock-unlock';
+import { privateApis as blockEditorPrivateApis } from '../../private-apis';
+
+const prioritizedInserterBlocks = [
+	'core/navigation-link/page',
 	'core/navigation-link',
-	'core/navigation-submenu',
 ];
 
-export const Appender = forwardRef( ( props, ref ) => {
-	const [ insertedBlockClientId, setInsertedBlockClientId ] = useState();
+export const Appender = forwardRef(
+	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
+		const [ insertedBlock, setInsertedBlock ] = useState( null );
 
-	const { hideInserter, clientId } = useSelect( ( select ) => {
-		const {
-			getTemplateLock,
-			__unstableGetEditorMode,
-			getSelectedBlockClientId,
-		} = select( blockEditorStore );
+		const instanceId = useInstanceId( Appender );
+		const { hideInserter } = useSelect(
+			( select ) => {
+				const { getTemplateLock, __unstableGetEditorMode } =
+					select( blockEditorStore );
 
-		const _clientId = getSelectedBlockClientId();
+				return {
+					hideInserter:
+						!! getTemplateLock( clientId ) ||
+						__unstableGetEditorMode() === 'zoom-out',
+				};
+			},
+			[ clientId ]
+		);
 
-		return {
-			clientId: getSelectedBlockClientId(),
-			hideInserter:
-				!! getTemplateLock( _clientId ) ||
-				__unstableGetEditorMode() === 'zoom-out',
-		};
-	}, [] );
+		const blockTitle = useBlockDisplayTitle( {
+			clientId,
+			context: 'list-view',
+		} );
 
-	const {
-		insertedBlockAttributes,
-		insertedBlockName,
-		setInsertedBlockAttributes,
-	} = useInsertedBlock( insertedBlockClientId );
+		const insertedBlockTitle = useBlockDisplayTitle( {
+			clientId: insertedBlock?.clientId,
+			context: 'list-view',
+		} );
 
-	const maybeSetInsertedBlockOnInsertion = ( _insertedBlock ) => {
-		if ( ! _insertedBlock?.clientId ) {
-			return;
+		useEffect( () => {
+			if ( ! insertedBlockTitle?.length ) {
+				return;
+			}
+
+			speak(
+				sprintf(
+					// translators: %s: name of block being inserted (i.e. Paragraph, Image, Group etc)
+					__( '%s block inserted' ),
+					insertedBlockTitle
+				),
+				'assertive'
+			);
+		}, [ insertedBlockTitle ] );
+
+		const orderInitialBlockItems = useCallback( ( items ) => {
+			items.sort( ( { id: aName }, { id: bName } ) => {
+				// Sort block items according to `prioritizedInserterBlocks`.
+				let aIndex = prioritizedInserterBlocks.indexOf( aName );
+				let bIndex = prioritizedInserterBlocks.indexOf( bName );
+				// All other block items should come after that.
+				if ( aIndex < 0 ) aIndex = prioritizedInserterBlocks.length;
+				if ( bIndex < 0 ) bIndex = prioritizedInserterBlocks.length;
+				return aIndex - bIndex;
+			} );
+			return items;
+		}, [] );
+
+		if ( hideInserter ) {
+			return null;
 		}
+		const { PrivateInserter } = unlock( blockEditorPrivateApis );
+		const descriptionId = `off-canvas-editor-appender__${ instanceId }`;
+		const description = sprintf(
+			/* translators: 1: The name of the block. 2: The numerical position of the block. 3: The level of nesting for the block. */
+			__( 'Append to %1$s block at position %2$d, Level %3$d' ),
+			blockTitle,
+			blockCount + 1,
+			nestingLevel
+		);
 
-		setInsertedBlockClientId( _insertedBlock?.clientId );
-	};
-
-	let maybeLinkUI;
-
-	if (
-		insertedBlockClientId &&
-		BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName )
-	) {
-		maybeLinkUI = (
-			<LinkUI
-				clientId={ insertedBlockClientId }
-				link={ insertedBlockAttributes }
-				onClose={ () => setInsertedBlockClientId( null ) }
-				hasCreateSuggestion={ false }
-				onChange={ ( updatedValue ) => {
-					updateAttributes(
-						updatedValue,
-						setInsertedBlockAttributes,
-						insertedBlockAttributes
-					);
-					setInsertedBlockClientId( null );
-				} }
-			/>
+		return (
+			<div className="offcanvas-editor-appender">
+				<PrivateInserter
+					ref={ ref }
+					rootClientId={ clientId }
+					position="bottom right"
+					isAppender
+					selectBlockOnInsert={ false }
+					shouldDirectInsert={ false }
+					__experimentalIsQuick
+					{ ...props }
+					toggleProps={ { 'aria-describedby': descriptionId } }
+					onSelectOrClose={ ( maybeInsertedBlock ) => {
+						if ( maybeInsertedBlock?.clientId ) {
+							setInsertedBlock( maybeInsertedBlock );
+						}
+					} }
+					orderInitialBlockItems={ orderInitialBlockItems }
+				/>
+				<div
+					className="offcanvas-editor-appender__description"
+					id={ descriptionId }
+				>
+					{ description }
+				</div>
+			</div>
 		);
 	}
-
-	if ( hideInserter ) {
-		return null;
-	}
-
-	return (
-		<div className="offcanvas-editor__appender">
-			{ maybeLinkUI }
-
-			<Inserter
-				ref={ ref }
-				rootClientId={ clientId }
-				position="bottom right"
-				isAppender={ true }
-				selectBlockOnInsert={ false }
-				onSelectOrClose={ maybeSetInsertedBlockOnInsertion }
-				__experimentalIsQuick
-				{ ...props }
-			/>
-		</div>
-	);
-} );
+);

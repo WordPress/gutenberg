@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { addQueryArgs } from '@wordpress/url';
+import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -21,8 +21,15 @@ export function useLink( params = {}, state, shouldReplace = false ) {
 		}
 	}
 
+	const currentArgs = getQueryArgs( window.location.href );
+	const currentUrlWithoutArgs = removeQueryArgs(
+		window.location.href,
+		...Object.keys( currentArgs )
+	);
+	const newUrl = addQueryArgs( currentUrlWithoutArgs, params );
+
 	return {
-		href: addQueryArgs( window.location.href, params ),
+		href: newUrl,
 		onClick,
 	};
 }

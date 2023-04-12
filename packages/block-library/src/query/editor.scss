@@ -19,28 +19,31 @@
 	}
 }
 
-.block-editor-query-pattern__selection-modal .components-modal__content {
-	padding: 0;
-	margin-bottom: $header-height; // $header-height to accommodate bottom toolbar
-	&::before {
-		margin-bottom: 0;
-	}
-}
-
-.block-editor-query-pattern__selection-modal {
+.block-library-query-pattern__selection-modal {
 	// To keep modal dimensions consistent as subsections are navigated, width
 	// and height are used instead of max-(width/height).
-	@include break-small() {
-		width: calc(100% - #{ $grid-unit-20 * 2 });
-		height: calc(100% - #{ $header-height * 2 });
+	.components-modal__frame {
+		@include break-small() {
+			width: calc(100% - #{$grid-unit-20 * 2});
+			height: calc(100% - #{$header-height * 2});
+		}
+
+		@include break-medium() {
+			width: $break-medium - $grid-unit-20 * 2;
+		}
+
+		@include break-large() {
+			height: 70%;
+		}
 	}
-	@include break-medium() {
-		width: $break-medium - $grid-unit-20 * 2;
-	}
-	@include break-large() {
-		height: 80%;
-		width: 80%;
-		max-height: none;
+
+	.block-library-query-pattern__selection-search {
+		background: $white;
+		position: sticky;
+		top: 0;
+		padding: $grid-unit-20 0;
+		margin-bottom: 2px;
+		z-index: z-index(".block-library-query-pattern__selection-search");
 	}
 }
 

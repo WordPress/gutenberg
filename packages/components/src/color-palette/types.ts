@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from 'react';
  * Internal dependencies
  */
 import type { DropdownProps } from '../dropdown/types';
+import type { HeadingSize } from '../heading/types';
 
 export type ColorObject = {
 	name: string;
@@ -27,6 +28,7 @@ type PaletteProps = {
 	onChange: ( newColor?: string, index?: number ) => void;
 	value?: string;
 	actions?: ReactNode;
+	headingLevel?: HeadingSize;
 };
 
 export type SinglePaletteProps = PaletteProps & {
@@ -55,7 +57,7 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 *
 	 * @default []
 	 */
-	colors?: ( PaletteObject | ColorObject )[];
+	colors?: PaletteObject[] | ColorObject[];
 	/**
 	 * Whether to allow the user to pick a custom color on top of the predefined
 	 * choices (defined via the `colors` prop).
@@ -70,6 +72,12 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 * @default false
 	 */
 	enableAlpha?: boolean;
+	/**
+	 * The heading level.
+	 *
+	 * @default 2
+	 */
+	headingLevel?: HeadingSize;
 	/**
 	 * Currently active value.
 	 */

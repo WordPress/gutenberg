@@ -11,7 +11,7 @@ import { isValueDefined } from '../utils/values';
 
 const H_ALIGNMENTS: Alignments = {
 	bottom: { align: 'flex-end', justify: 'center' },
-	bottomLeft: { align: 'flex-start', justify: 'flex-end' },
+	bottomLeft: { align: 'flex-end', justify: 'flex-start' },
 	bottomRight: { align: 'flex-end', justify: 'flex-end' },
 	center: { align: 'center', justify: 'center' },
 	edge: { align: 'center', justify: 'space-between' },
@@ -25,13 +25,13 @@ const H_ALIGNMENTS: Alignments = {
 
 const V_ALIGNMENTS: Alignments = {
 	bottom: { justify: 'flex-end', align: 'center' },
-	bottomLeft: { justify: 'flex-start', align: 'flex-end' },
+	bottomLeft: { justify: 'flex-end', align: 'flex-start' },
 	bottomRight: { justify: 'flex-end', align: 'flex-end' },
 	center: { justify: 'center', align: 'center' },
 	edge: { justify: 'space-between', align: 'center' },
 	left: { justify: 'center', align: 'flex-start' },
 	right: { justify: 'center', align: 'flex-end' },
-	stretch: { justify: 'stretch' },
+	stretch: { align: 'stretch' },
 	top: { justify: 'flex-start', align: 'center' },
 	topLeft: { justify: 'flex-start', align: 'flex-start' },
 	topRight: { justify: 'flex-start', align: 'flex-end' },

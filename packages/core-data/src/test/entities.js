@@ -52,12 +52,6 @@ describe( 'getMethodName', () => {
 describe( 'getKindEntities', () => {
 	beforeEach( async () => {
 		triggerFetch.mockReset();
-		jest.useFakeTimers();
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	it( 'shouldn’t do anything if the entities have already been resolved', async () => {

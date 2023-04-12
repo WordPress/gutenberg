@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -435,11 +434,8 @@ const v2 = {
 			// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
 			// as there is no expectation that themes create classes that set border colors.
 		} else if ( mainColor ) {
-			const colors = get(
-				select( blockEditorStore ).getSettings(),
-				[ 'colors' ],
-				[]
-			);
+			const colors =
+				select( blockEditorStore ).getSettings().colors ?? [];
 			const colorObject = getColorObjectByAttributeValues(
 				colors,
 				mainColor

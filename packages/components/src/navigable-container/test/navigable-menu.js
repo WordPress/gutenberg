@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import { NavigableMenu } from '../menu';
 
-jest.useFakeTimers();
-
 const NavigableMenuTestCase = ( props ) => (
 	<NavigableMenu { ...props }>
 		<button>Item 1</button>
@@ -46,9 +44,7 @@ describe( 'NavigableMenu', () => {
 	} );
 
 	it( 'moves focus on its focusable children by using the up/down arrow keys', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onNavigateSpy = jest.fn();
 
@@ -87,9 +83,7 @@ describe( 'NavigableMenu', () => {
 	} );
 
 	it( 'moves focus on its focusable children by using the left/right arrow keys when the `orientation`prop is set to `horizontal', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onNavigateSpy = jest.fn();
 
@@ -133,9 +127,7 @@ describe( 'NavigableMenu', () => {
 	} );
 
 	it( 'should stop at the edges when the `cycle` prop is set to `false`', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onNavigateSpy = jest.fn();
 
@@ -193,9 +185,7 @@ describe( 'NavigableMenu', () => {
 	} );
 
 	it( 'stops keydown event propagation when arrow keys are pressed, regardless of the `orientation` prop', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const externalWrapperOnKeyDownSpy = jest.fn();
 
@@ -224,9 +214,7 @@ describe( 'NavigableMenu', () => {
 	} );
 
 	it( 'skips its internal logic when the tab key is pressed', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<>

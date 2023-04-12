@@ -125,6 +125,7 @@ class PostTitle extends Component {
 
 		return (
 			<View
+				testID="post-title"
 				style={ [
 					styles.titleContainer,
 					borderStyle,

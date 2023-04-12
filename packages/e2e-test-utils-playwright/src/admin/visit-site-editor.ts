@@ -20,9 +20,9 @@ const CANVAS_SELECTOR = 'iframe[title="Editor canvas"i]';
  *
  * By default, it also skips the welcome guide. The option can be disabled if need be.
  *
- * @param {Admin}                 this
- * @param {SiteEditorQueryParams} query            Query params to be serialized as query portion of URL.
- * @param {boolean}               skipWelcomeGuide Whether to skip the welcome guide as part of the navigation.
+ * @param this
+ * @param query            Query params to be serialized as query portion of URL.
+ * @param skipWelcomeGuide Whether to skip the welcome guide as part of the navigation.
  */
 export async function visitSiteEditor(
 	this: Admin,
