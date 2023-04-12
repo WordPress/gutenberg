@@ -68,10 +68,7 @@ describe( 'Preformatted', () => {
 			'Write preformatted text…'
 		);
 		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( preformattedTextInput, string, {
-			selectionStart: string.length,
-			selectionEnd: string.length,
-		} );
+		changeAndSelectTextOfRichText( preformattedTextInput, string );
 		fireEvent( preformattedTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},

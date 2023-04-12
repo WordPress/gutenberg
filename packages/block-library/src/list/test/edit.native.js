@@ -347,9 +347,8 @@ describe( 'List block', () => {
 		// backward delete
 		const listItemField =
 			within( listItemBlock ).getByLabelText( /Text input. .*Two.*/ );
-		changeAndSelectTextOfRichText( listItemField, 'Two', {
-			initialSelectionStart: 0,
-			initialSelectionEnd: 3,
+		changeAndSelectTextOfRichText( listItemField, '', {
+			selectionStart: 0,
 		} );
 		fireEvent( listItemField, 'onKeyDown', {
 			nativeEvent: {},
@@ -398,9 +397,8 @@ describe( 'List block', () => {
 		// backward delete
 		const listItemField =
 			within( listItemBlock ).getByLabelText( /Text input. .*One.*/ );
-		changeAndSelectTextOfRichText( listItemField, 'One', {
-			initialSelectionStart: 0,
-			initialSelectionEnd: 3,
+		changeAndSelectTextOfRichText( listItemField, '', {
+			selectionStart: 0,
 		} );
 		fireEvent( listItemField, 'onKeyDown', {
 			nativeEvent: {},

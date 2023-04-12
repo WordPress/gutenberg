@@ -35,7 +35,7 @@ export const changeAndSelectTextOfRichText = (
 	const {
 		initialSelectionStart = currentValueSansOuterHtmlTags.length,
 		initialSelectionEnd = initialSelectionStart,
-		selectionStart = 0,
+		selectionStart = currentValueSansOuterHtmlTags.length + text.length,
 		selectionEnd = selectionStart,
 	} = options;
 

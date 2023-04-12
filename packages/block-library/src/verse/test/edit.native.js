@@ -65,10 +65,7 @@ describe( 'Verse block', () => {
 			'Write verse…'
 		);
 		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( verseTextInput, string, {
-			selectionStart: string.length,
-			selectionEnd: string.length,
-		} );
+		changeAndSelectTextOfRichText( verseTextInput, string );
 		fireEvent( verseTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},

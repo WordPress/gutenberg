@@ -36,10 +36,7 @@ describe( 'Pullquote', () => {
 		const pullquoteTextInput =
 			within( pullquoteBlock ).getByPlaceholderText( 'Add quote' );
 		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( pullquoteTextInput, string, {
-			selectionStart: string.length,
-			selectionEnd: string.length,
-		} );
+		changeAndSelectTextOfRichText( pullquoteTextInput, string );
 		fireEvent( pullquoteTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
