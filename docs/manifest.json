@@ -1470,6 +1470,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/commands",
+		"slug": "packages-commands",
+		"markdown_source": "../packages/commands/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/components",
 		"slug": "packages-components",
 		"markdown_source": "../packages/components/README.md",

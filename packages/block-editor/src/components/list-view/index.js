@@ -7,6 +7,7 @@ import {
 } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import {
 	useCallback,
 	useEffect,
@@ -56,11 +57,12 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  *
  * @param {Object}         props                   Components props.
  * @param {string}         props.id                An HTML element id for the root element of ListView.
- * @param {Array}          props.blocks            Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {Array}          props.blocks            _deprecated_ Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {?boolean}       props.showBlockMovers   Flag to enable block movers. Defaults to `false`.
  * @param {?boolean}       props.isExpanded        Flag to determine whether nested levels are expanded by default. Defaults to `false`.
  * @param {?boolean}       props.showAppender      Flag to show or hide the block appender. Defaults to `false`.
  * @param {?ComponentType} props.blockSettingsMenu Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
+ * @param {string}         props.rootClientId      The client id of the root block from which we determine the blocks to show in the list.
  * @param {Ref}            ref                     Forwarded ref
  */
 function ListViewComponent(
@@ -71,11 +73,23 @@ function ListViewComponent(
 		isExpanded = false,
 		showAppender = false,
 		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
+		rootClientId,
 	},
 	ref
 ) {
+	// This can be removed once we no longer need to support the blocks prop.
+	if ( blocks ) {
+		deprecated(
+			'`blocks` property in `wp.blockEditor.__experimentalListView`',
+			{
+				since: '6.3',
+				alternative: '`rootClientId` property',
+			}
+		);
+	}
+
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
-		useListViewClientIds( blocks );
+		useListViewClientIds( { blocks, rootClientId } );
 
 	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
 		( select ) => {
@@ -219,6 +233,7 @@ function ListViewComponent(
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
 						blocks={ clientIdsTree }
+						parentId={ rootClientId }
 						selectBlock={ selectEditorBlock }
 						showBlockMovers={ showBlockMovers }
 						fixedListWindow={ fixedListWindow }
@@ -241,6 +256,7 @@ export default forwardRef( ( props, ref ) => {
 			{ ...props }
 			showAppender={ false }
 			blockSettingsMenu={ BlockSettingsDropdown }
+			rootClientId={ null }
 		/>
 	);
 } );

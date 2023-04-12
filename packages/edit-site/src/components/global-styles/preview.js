@@ -130,7 +130,7 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 							height: normalizedHeight * ratio,
 							width: '100%',
 							background: gradientValue ?? backgroundColor,
-							cursor: 'pointer',
+							cursor: withHoverView ? 'pointer' : undefined,
 						} }
 						initial="start"
 						animate={
