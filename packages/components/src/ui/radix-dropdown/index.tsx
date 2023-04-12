@@ -6,6 +6,7 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 /**
  * WordPress dependencies
  */
+import { forwardRef } from '@wordpress/element';
 import { SVG, Circle } from '@wordpress/primitives';
 import { check, lineSolid } from '@wordpress/icons';
 
@@ -108,42 +109,49 @@ export const DropdownSubMenu = ( {
 export const DropdownMenuLabel = DropdownMenuStyled.Label;
 export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
-export const DropdownMenuItem = ( {
-	children,
-	prefix,
-	suffix,
-	...props
-}: DropdownItemProps ) => {
-	return (
-		<DropdownMenuStyled.Item { ...props }>
-			{ prefix && (
-				<DropdownMenuStyled.ItemPrefixWrapper>
-					{ prefix }
-				</DropdownMenuStyled.ItemPrefixWrapper>
-			) }
-			{ children }
-			{ suffix && (
-				<DropdownMenuStyled.ItemSuffixWrapper>
-					{ suffix }
-				</DropdownMenuStyled.ItemSuffixWrapper>
-			) }
-		</DropdownMenuStyled.Item>
-	);
-};
+export const DropdownMenuItem = forwardRef(
+	(
+		{ children, prefix, suffix, ...props }: DropdownItemProps,
+		forwardedRef: React.ForwardedRef< any >
+	) => {
+		return (
+			<DropdownMenuStyled.Item { ...props } ref={ forwardedRef }>
+				{ prefix && (
+					<DropdownMenuStyled.ItemPrefixWrapper>
+						{ prefix }
+					</DropdownMenuStyled.ItemPrefixWrapper>
+				) }
+				{ children }
+				{ suffix && (
+					<DropdownMenuStyled.ItemSuffixWrapper>
+						{ suffix }
+					</DropdownMenuStyled.ItemSuffixWrapper>
+				) }
+			</DropdownMenuStyled.Item>
+		);
+	}
+);
 
 export const DropdownMenuCheckboxItem = ( {
 	children,
+	checked = false,
 	...props
 }: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps ) => {
 	return (
-		<DropdownMenuStyled.CheckboxItem { ...props }>
+		<DropdownMenuStyled.CheckboxItem { ...props } checked={ checked }>
 			<DropdownMenuStyled.ItemPrefixWrapper>
-				<DropdownMenuPrimitive.ItemIndicator>
-					{ props.checked === 'indeterminate' && (
-						<Icon icon={ lineSolid } size={ 20 } />
-					) }
-					{ props.checked === true && (
-						<Icon icon={ check } size={ 20 } />
+				{ /*
+					TODO: adding `asChild` seems to trigger an error due to the fact
+					that `Icon` doesn't forward refs to the underlying dom elements.
+					*/ }
+				<DropdownMenuPrimitive.ItemIndicator asChild>
+					{ ( checked === 'indeterminate' || checked === true ) && (
+						<Icon
+							icon={
+								checked === 'indeterminate' ? lineSolid : check
+							}
+							size={ 20 }
+						/>
 					) }
 				</DropdownMenuPrimitive.ItemIndicator>
 			</DropdownMenuStyled.ItemPrefixWrapper>
@@ -169,7 +177,11 @@ export const DropdownMenuRadioItem = ( {
 	return (
 		<DropdownMenuStyled.RadioItem { ...props }>
 			<DropdownMenuStyled.ItemPrefixWrapper>
-				<DropdownMenuPrimitive.ItemIndicator>
+				{ /*
+					TODO: adding `asChild` seems to trigger an error due to the fact
+					that `Icon` doesn't forward refs to the underlying dom elements.
+					*/ }
+				<DropdownMenuPrimitive.ItemIndicator asChild>
 					<Icon icon={ radioDot } size={ 20 } />
 				</DropdownMenuPrimitive.ItemIndicator>
 			</DropdownMenuStyled.ItemPrefixWrapper>
