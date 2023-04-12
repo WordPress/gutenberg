@@ -7,15 +7,18 @@ import type { Editor } from './index';
  * Toggles the fixed toolbar option.
  *
  * @param this
- * @param isFixed Boolean value true/false for on/off.
+ * @param setIsFixedToolbar Boolean value true/false for on/off.
  */
-export async function toggleFixedToolbar( this: Editor, isFixed: boolean ) {
-	await this.page.evaluate( ( _isFixed ) => {
+export async function toggleFixedToolbar(
+	this: Editor,
+	setIsFixedToolbar: boolean
+) {
+	await this.page.evaluate( ( _setIsFixedToolbar ) => {
 		const { select, dispatch } = window.wp.data;
 		const isCurrentlyFixed =
 			select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
-		if ( isCurrentlyFixed !== _isFixed ) {
+		if ( isCurrentlyFixed !== _setIsFixedToolbar ) {
 			dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
 		}
-	}, isFixed );
+	}, setIsFixedToolbar );
 }
