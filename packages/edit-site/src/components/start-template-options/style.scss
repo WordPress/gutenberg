@@ -26,7 +26,11 @@
 		aspect-ratio: 3/4;
 		width: calc(50% - #{ $grid-unit-30 * 1 } / 2);
 
-		@include break-large() {
+		@include break-medium() {
+			width: calc(33.333% - #{ $grid-unit-30 * 2 } / 3);
+		}
+
+		@include break-wide() {
 			width: calc(25% - #{ $grid-unit-30 * 3 } / 4);
 		}
 
