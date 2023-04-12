@@ -39,6 +39,7 @@ import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
 import { useHasStyleBook } from '../style-book';
+import SiteHub from '../site-hub';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -144,6 +145,7 @@ export default function HeaderEditMode() {
 					aria-label={ __( 'Document tools' ) }
 				>
 					<div className="edit-site-header-edit-mode__toolbar">
+						<SiteHub backButton />
 						<ToolbarItem
 							ref={ inserterButton }
 							as={ Button }

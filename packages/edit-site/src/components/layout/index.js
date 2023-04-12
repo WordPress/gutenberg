@@ -18,7 +18,12 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useRef } from '@wordpress/element';
+import {
+	useState,
+	useRef,
+	useEffect,
+	useLayoutEffect,
+} from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
@@ -36,7 +41,6 @@ import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import SiteHub from '../site-hub';
-import ResizeHandle from '../block-editor/resize-handle';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
@@ -44,20 +48,48 @@ import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 
 const ANIMATION_DURATION = 0.2;
-const emptyResizeHandleStyles = {
-	position: undefined,
-	userSelect: undefined,
-	cursor: undefined,
-	width: undefined,
-	height: undefined,
-	top: undefined,
-	right: undefined,
-	bottom: undefined,
-	left: undefined,
+
+const SIDEBAR_DEFAULT_WIDTH = 360;
+const SMALL_FRAME_SIZE = 240;
+
+const frameVariants = {
+	hovering: {
+		top: 8,
+		bottom: 8,
+		left: SIDEBAR_DEFAULT_WIDTH + 16,
+		right: 16,
+	},
+	edit: {
+		top: 0,
+		bottom: 0,
+		left: 0,
+		right: 0,
+		borderRadius: 0,
+		transition: { bounce: 0.2 },
+	},
+	primary: {
+		top: 16,
+		bottom: 16,
+		left: SIDEBAR_DEFAULT_WIDTH + 16,
+		right: 16,
+		transition: { bounce: 0.2 },
+	},
 };
 
-const DRAG_HANDLE_WIDTH = 4;
-const SIDEBAR_DEFAULT_WIDTH = 360;
+const devices = [
+	{
+		label: 'Mobile',
+		width: 480,
+	},
+	{
+		label: 'Tablet',
+		width: 768,
+	},
+	{
+		label: 'Desktop',
+		width: null,
+	},
+];
 
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
@@ -65,6 +97,7 @@ export default function Layout() {
 	useSyncCanvasModeWithURL();
 
 	const hubRef = useRef();
+	const frameRef = useRef();
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
@@ -102,11 +135,33 @@ export default function Layout() {
 	const isFullCanvas =
 		( isMobileViewport && isListPage ) ||
 		( isEditorPage && canvasMode === 'edit' );
-	const [ fullResizer, fullSize ] = useResizeObserver();
 	const [ isResizing, setIsResizing ] = useState( false );
+	const [ isHovering, setIsHovering ] = useState( false );
+	const [ frameWidth, setFrameWidth ] = useState( 0 );
 
 	const x = useMotionValue( 0 );
-	const left = useTransform( x, ( x ) => x + SIDEBAR_DEFAULT_WIDTH );
+
+	const [ fullResizer, { height: fullHeight, width: fullWidth } ] =
+		useResizeObserver();
+
+	useEffect( () => {
+		if ( fullWidth ) {
+			return x.onChange( ( latest ) => {
+				setFrameWidth(
+					fullWidth - SIDEBAR_DEFAULT_WIDTH - 32 - latest * 2
+				);
+			} );
+		}
+	}, [ fullWidth ] );
+
+	useEffect( () => {
+		if ( canvasMode === 'edit' ) {
+			x.set( 0 );
+		}
+	}, [ canvasMode ] );
+
+	const frameAnimate =
+		canvasMode === 'edit' ? 'edit' : isHovering ? 'hovering' : 'primary';
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -115,60 +170,126 @@ export default function Layout() {
 		return null;
 	}
 
-	const handleResize = ( event, info ) => {
-		console.log( info );
-		setFrameLeft( info.point.x );
-	};
+	const { label } = devices.find(
+		( device ) => frameWidth <= device.width || device.width === null
+	);
 
 	return (
 		<>
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
 			{ fullResizer }
+
 			<motion.div
-				className="the-frame__handle"
-				title="drag to resize"
-				dragMomentum={ false }
-				drag="x"
-				dragConstraints={ {
-					left: 0,
-					right: SIDEBAR_DEFAULT_WIDTH,
-				} }
-				onDragStart={ () => setIsResizing( true ) }
-				onDragEnd={ () => setIsResizing( false ) }
-				style={ { x } }
-			/>
-			<motion.div
-				style={ {
-					right: x,
-					left,
-					top: 16,
-					bottom: 16,
-				} }
-				animate={ canvasMode === 'edit' ? 'edit' : 'primary' }
+				variants={ frameVariants }
+				initial={ canvasMode === 'edit' ? 'edit' : 'primary' }
+				animate={ frameAnimate }
+				ref={ frameRef }
+				onMouseOver={ () => setIsHovering( true ) }
+				onMouseOut={ () => setIsHovering( false ) }
 				className={ classnames( 'the-frame', {
 					edit: canvasMode === 'edit',
 					secondary: isListPage,
 					resizing: isResizing,
 				} ) }
 			>
-				<motion.div
-					className="edit-site-layout__header-wrapper"
-					animate={ {
-						marginTop: canvasMode === 'edit' ? 0 : -60,
-					} }
-					transition={ { duration: ANIMATION_DURATION } }
-				>
-					<NavigableRegion
-						className="edit-site-layout__header"
-						ariaLabel={ __( 'Editor top bar' ) }
-					>
-						<Header />
-					</NavigableRegion>
-				</motion.div>
-				<Editor secondary={ isListPage } />
+				{ !! fullResizer && (
+					<div>
+						<AnimatePresence>
+							{ ( isHovering || isResizing ) && (
+								<motion.div
+									key="handle"
+									className="the-frame__handle"
+									title="drag to resize"
+									dragMomentum={ false }
+									drag="x"
+									onDragStart={ () => setIsResizing( true ) }
+									onDragEnd={ () => setIsResizing( false ) }
+									style={ { x } }
+									initial={ {
+										opacity: 0,
+										left: 0,
+										y: '-50%',
+									} }
+									animate={ {
+										opacity: 1,
+										left: -15,
+										y: '-50%',
+									} }
+									exit={ {
+										opacity: 0,
+										left: 0,
+										y: '-50%',
+									} }
+									dragConstraints={ {
+										left: 0,
+										right:
+											( fullWidth -
+												SIDEBAR_DEFAULT_WIDTH -
+												16 -
+												SMALL_FRAME_SIZE ) /
+											2,
+									} }
+								>
+									{ isResizing && (
+										<motion.div
+											key="handle-label"
+											initial={ {
+												opacity: 0,
+												x: 20,
+											} }
+											animate={ {
+												opacity: 1,
+												x: 0,
+											} }
+											exit={ {
+												opacity: 0,
+												x: 20,
+											} }
+											className="the-frame__handle-label"
+										>
+											{ label }
+										</motion.div>
+									) }
+								</motion.div>
+							) }
+						</AnimatePresence>
+						<div className="the-frame__devices">
+							{ devices.map( ( device ) => (
+								<div
+									className="the-frame__device"
+									key={ device.label }
+									style={ { width: device.width } }
+								/>
+							) ) }
+						</div>
+						<motion.div
+							style={ {
+								left: x,
+								right: x,
+							} }
+							className="the-frame__inner"
+						>
+							<motion.div
+								className="edit-site-layout__header-wrapper"
+								initial={ { marginTop: -60 } }
+								animate={ {
+									marginTop: canvasMode === 'edit' ? 0 : -60,
+								} }
+								transition={ { bounce: 0.2 } }
+							>
+								<NavigableRegion
+									className="edit-site-layout__header"
+									ariaLabel={ __( 'Editor top bar' ) }
+								>
+									<Header />
+								</NavigableRegion>
+							</motion.div>
+							<Editor secondary={ isListPage } />
+						</motion.div>
+					</div>
+				) }
 			</motion.div>
-
 			<div
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }

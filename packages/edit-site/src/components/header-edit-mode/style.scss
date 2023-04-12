@@ -10,8 +10,21 @@ $header-toolbar-min-width: 335px;
 	width: 100%;
 	justify-content: space-between;
 	border-bottom: $border-width solid $gray-200;
-	padding-left: $header-height;
-
+	.edit-site-site-hub {
+		padding: 0;
+		margin-right: $grid-unit-20;
+		.edit-site-site-hub__view-mode-toggle-container {
+			background: none;
+			border-right: 1px solid rgba(0,0,0,.1);
+		}
+		.edit-site-layout__view-mode-toggle {
+			background: none;
+			color: $gray-800;
+			&:hover {
+				color: $gray-900;
+			}
+		}
+	}
 	.edit-site-header-edit-mode__start {
 		display: flex;
 		border: none;
@@ -39,11 +52,6 @@ $header-toolbar-min-width: 335px;
 .edit-site-header-edit-mode__toolbar {
 	display: flex;
 	align-items: center;
-	padding-left: $grid-unit-10;
-
-	@include break-small() {
-		padding-left: $grid-unit-30;
-	}
 
 	@include break-wide() {
 		padding-right: $grid-unit-10;

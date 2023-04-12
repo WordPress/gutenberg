@@ -12,6 +12,7 @@ import {
 	__unstableMotion as motion,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { Icon, chevronLeft } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -27,7 +28,7 @@ import { unlock } from '../../private-apis';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
-const SiteHub = forwardRef( ( props, ref ) => {
+const SiteHub = forwardRef( ( { backButton, ...props }, ref ) => {
 	const { canvasMode, dashboardLink } = useSelect( ( select ) => {
 		select( editSiteStore ).getEditedPostType();
 		const { getCanvasMode, getSettings } = unlock(
@@ -90,13 +91,18 @@ const SiteHub = forwardRef( ( props, ref ) => {
 						{ ...siteIconButtonProps }
 						className="edit-site-layout__view-mode-toggle"
 					>
-						<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+						{ backButton ? (
+							<Icon icon={ chevronLeft } />
+						) : (
+							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+						) }
 					</Button>
 				</motion.div>
-
-				<div className="edit-site-site-hub__site-title">
-					{ siteTitle }
-				</div>
+				{ ! backButton && (
+					<div className="edit-site-site-hub__site-title">
+						{ siteTitle }
+					</div>
+				) }
 			</HStack>
 		</motion.div>
 	);

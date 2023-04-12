@@ -198,9 +198,24 @@
 	position: fixed;
 	flex: 1 1 auto;
 	z-index: 2;
-	overflow: hidden;
+	border-radius: 8px;
+	background-color: rgba(255,255,255,.05);
+	box-shadow: 0px 643px 257px rgba(0, 0, 0, 0.01), 0px 362px 217px rgba(0, 0, 0, 0.05), 0px 161px 161px rgba(0, 0, 0, 0.09), 0px 40px 88px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
+	transition: box-shadow;
 	&.resizing {
 		pointer-events: none;
+		.the-frame__devices {
+			opacity: 1;
+		}
+	}
+	&:hover {
+		&::before {
+			position: absolute;
+			left: -50px;
+			height: 100%;
+			width: 50px;
+			content: '';
+		}
 	}
 	&.secondary:not(.edit) {
 		position: absolute;
@@ -220,13 +235,51 @@
 	}
 }
 
+.the-frame__inner {
+	overflow: hidden;
+	position: absolute;
+	inset: 0;
+}
+
+.the-frame__devices {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+}
+
+.the-frame__device {
+	overflow: hidden;
+	position: absolute;
+	height: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	border-left: 1px solid rgba(255,255,255,.05);
+	border-right: 1px solid rgba(255,255,255,.05);
+}
+
 .the-frame__handle {
 	position: absolute;
-	left: 340px;
 	width: 5px;
-	height: 25px;
-	background: red;
+	height: 50px;
+	background-color: rgba(255,255,255,.3);
 	top: 50%;
 	z-index: 100;
+	border-radius: 5px;
 	cursor: col-resize;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	&:hover{
+		background-color: #3858E9;
+	}
+	.the-frame__handle-label {
+		border-radius: 2px;
+		background: #3858E9;
+		padding: 4px 8px;
+		color: white;
+		font-size: 11px;
+		margin-right: 15px;
+	}
 }
