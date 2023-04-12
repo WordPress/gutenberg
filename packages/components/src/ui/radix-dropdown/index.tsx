@@ -6,7 +6,6 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
 import { SVG, Circle } from '@wordpress/primitives';
 import { check, lineSolid } from '@wordpress/icons';
 
@@ -84,88 +83,78 @@ export const DropdownMenu = ( {
 	);
 };
 
-export const DropdownSubMenu = forwardRef(
-	(
-		{
-			children,
-			subProps,
-			subContentProps,
-			portalProps,
-			trigger,
-			triggerProps,
-		}: DropdownSubMenuProps,
-		forwardedRef: React.ForwardedRef< any >
-	) => {
-		return (
-			<DropdownMenuPrimitive.Sub { ...subProps }>
-				<DropdownMenuStyled.SubTrigger { ...triggerProps } asChild>
-					{ trigger }
-				</DropdownMenuStyled.SubTrigger>
-				<DropdownMenuPrimitive.Portal { ...portalProps }>
-					<DropdownMenuStyled.SubContent
-						{ ...subContentProps }
-						ref={ forwardedRef }
-					>
-						{ children }
-					</DropdownMenuStyled.SubContent>
-				</DropdownMenuPrimitive.Portal>
-			</DropdownMenuPrimitive.Sub>
-		);
-	}
-);
+export const DropdownSubMenu = ( {
+	children,
+	subProps,
+	subContentProps,
+	portalProps,
+	trigger,
+	triggerProps,
+}: DropdownSubMenuProps ) => {
+	return (
+		<DropdownMenuPrimitive.Sub { ...subProps }>
+			<DropdownMenuStyled.SubTrigger { ...triggerProps } asChild>
+				{ trigger }
+			</DropdownMenuStyled.SubTrigger>
+			<DropdownMenuPrimitive.Portal { ...portalProps }>
+				<DropdownMenuStyled.SubContent { ...subContentProps }>
+					{ children }
+				</DropdownMenuStyled.SubContent>
+			</DropdownMenuPrimitive.Portal>
+		</DropdownMenuPrimitive.Sub>
+	);
+};
 
 export const DropdownMenuLabel = DropdownMenuStyled.Label;
 export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
-export const DropdownMenuItem = forwardRef(
-	(
-		{ children, prefix, suffix, ...props }: DropdownItemProps,
-		forwardedRef: React.ForwardedRef< any >
-	) => {
-		return (
-			<DropdownMenuStyled.Item { ...props } ref={ forwardedRef }>
-				{ prefix && (
-					<DropdownMenuStyled.ItemPrefixWrapper>
-						{ prefix }
-					</DropdownMenuStyled.ItemPrefixWrapper>
-				) }
-				{ children }
-				{ suffix && (
-					<DropdownMenuStyled.ItemSuffixWrapper>
-						{ suffix }
-					</DropdownMenuStyled.ItemSuffixWrapper>
-				) }
-			</DropdownMenuStyled.Item>
-		);
-	}
-);
-export const DropdownMenuCheckboxItem = forwardRef(
-	(
-		{
-			children,
-			...props
-		}: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps,
-		forwardedRef: React.ForwardedRef< any >
-	) => {
-		return (
-			<DropdownMenuStyled.CheckboxItem { ...props } ref={ forwardedRef }>
+export const DropdownMenuItem = ( {
+	children,
+	prefix,
+	suffix,
+	...props
+}: DropdownItemProps ) => {
+	return (
+		<DropdownMenuStyled.Item { ...props }>
+			{ prefix && (
 				<DropdownMenuStyled.ItemPrefixWrapper>
-					<DropdownMenuPrimitive.ItemIndicator>
-						{ props.checked === 'indeterminate' && (
-							<Icon icon={ lineSolid } size={ 20 } />
-						) }
-						{ props.checked === true && (
-							<Icon icon={ check } size={ 20 } />
-						) }
-					</DropdownMenuPrimitive.ItemIndicator>
+					{ prefix }
 				</DropdownMenuStyled.ItemPrefixWrapper>
-				{ children }
-			</DropdownMenuStyled.CheckboxItem>
-		);
-	}
-);
+			) }
+			{ children }
+			{ suffix && (
+				<DropdownMenuStyled.ItemSuffixWrapper>
+					{ suffix }
+				</DropdownMenuStyled.ItemSuffixWrapper>
+			) }
+		</DropdownMenuStyled.Item>
+	);
+};
 
-export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
+export const DropdownMenuCheckboxItem = ( {
+	children,
+	...props
+}: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps ) => {
+	return (
+		<DropdownMenuStyled.CheckboxItem { ...props }>
+			<DropdownMenuStyled.ItemPrefixWrapper>
+				<DropdownMenuPrimitive.ItemIndicator>
+					{ props.checked === 'indeterminate' && (
+						<Icon icon={ lineSolid } size={ 20 } />
+					) }
+					{ props.checked === true && (
+						<Icon icon={ check } size={ 20 } />
+					) }
+				</DropdownMenuPrimitive.ItemIndicator>
+			</DropdownMenuStyled.ItemPrefixWrapper>
+			{ children }
+		</DropdownMenuStyled.CheckboxItem>
+	);
+};
+
+export const DropdownMenuRadioGroup = () => (
+	<DropdownMenuPrimitive.RadioGroup />
+);
 
 const radioDot = (
 	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -173,25 +162,20 @@ const radioDot = (
 	</SVG>
 );
 
-export const DropdownMenuRadioItem = forwardRef(
-	(
-		{
-			children,
-			...props
-		}: DropdownMenuPrimitive.DropdownMenuRadioItemProps,
-		forwardedRef: React.ForwardedRef< any >
-	) => {
-		return (
-			<DropdownMenuStyled.RadioItem { ...props } ref={ forwardedRef }>
-				<DropdownMenuStyled.ItemPrefixWrapper>
-					<DropdownMenuPrimitive.ItemIndicator>
-						<Icon icon={ radioDot } size={ 20 } />
-					</DropdownMenuPrimitive.ItemIndicator>
-				</DropdownMenuStyled.ItemPrefixWrapper>
-				{ children }
-			</DropdownMenuStyled.RadioItem>
-		);
-	}
-);
+export const DropdownMenuRadioItem = ( {
+	children,
+	...props
+}: DropdownMenuPrimitive.DropdownMenuRadioItemProps ) => {
+	return (
+		<DropdownMenuStyled.RadioItem { ...props }>
+			<DropdownMenuStyled.ItemPrefixWrapper>
+				<DropdownMenuPrimitive.ItemIndicator>
+					<Icon icon={ radioDot } size={ 20 } />
+				</DropdownMenuPrimitive.ItemIndicator>
+			</DropdownMenuStyled.ItemPrefixWrapper>
+			{ children }
+		</DropdownMenuStyled.RadioItem>
+	);
+};
 
 export const DropdownMenuSeparator = DropdownMenuStyled.Separator;
