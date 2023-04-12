@@ -12,10 +12,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
-import {
-	switchToBlockType,
-	getPossibleBlockTransformations,
-} from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -110,36 +106,13 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		const blocks = widgets.flatMap( ( widget ) => {
 			const block = transformWidgetToBlock( widget );
 
-			if ( block.name !== 'core/legacy-widget' ) {
-				return block;
-			}
-
-			const transforms = getPossibleBlockTransformations( [
-				block,
-			] ).filter( ( item ) => {
-				// The block without any transformations can't be a wildcard.
-				if ( ! item.transforms ) {
-					return true;
-				}
-
-				const hasWildCardFrom = item.transforms?.from?.find(
-					( from ) => from.blocks && from.blocks.includes( '*' )
-				);
-				const hasWildCardTo = item.transforms?.to?.find(
-					( to ) => to.blocks && to.blocks.includes( '*' )
-				);
-
-				return ! hasWildCardFrom && ! hasWildCardTo;
-			} );
-
 			// Skip the block if we have no matching transformations.
-			if ( ! transforms.length ) {
+			if ( ! block ) {
 				skippedWidgets.add( widget.id_base );
 				return [];
 			}
 
-			// Try transforming the Legacy Widget into a first matching block.
-			return switchToBlockType( block, transforms[ 0 ].name );
+			return block;
 		} );
 
 		await createFromBlocks(

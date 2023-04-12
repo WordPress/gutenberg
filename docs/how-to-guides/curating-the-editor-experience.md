@@ -290,10 +290,10 @@ For instance, in the previous section, color and typography controls were disabl
 
 To provide more flexibility, WordPress 6.1 introduced server-side filters allowing you to customize theme.json data at four different data layers.
 
-- `wp_theme_json_data_default` - Hooks into the default data provided by WordPress
-- `wp_theme_json_data_blocks` - Hooks into the data provided by blocks.
-- `wp_theme_json_data_theme` - Hooks into the data provided by the current theme.
-- `wp_theme_json_data_user` - Hooks into the data provided by the user.
+- [`wp_theme_json_data_default`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_default/) - Hooks into the default data provided by WordPress
+- [`wp_theme_json_data_blocks`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_blocks/) - Hooks into the data provided by blocks.
+- [`wp_theme_json_data_theme`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_theme/) - Hooks into the data provided by the current theme.
+- [`wp_theme_json_data_user`](https://developer.wordpress.org/reference/hooks/wp_theme_json_data_user/) - Hooks into the data provided by the user.
 
 In the following example, the data from the current theme's theme.json file is updated using the `wp_theme_json_data_theme` filter. Color controls are restored if the current user is an Administrator.
 

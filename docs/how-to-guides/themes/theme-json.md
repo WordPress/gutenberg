@@ -289,6 +289,7 @@ The settings section has the following structure:
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true
 		},
@@ -321,6 +322,7 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 - border: color, radius, style, width
 - color: link
 - dimensions: minHeight
+- position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
 
@@ -824,6 +826,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"fontWeight": "value",
 			"letterSpacing": "value",
 			"lineHeight": "value",
+			"textColumns": "value",
 			"textDecoration": "value",
 			"textTransform": "value"
 		},
@@ -1064,7 +1067,7 @@ h3 {
 
 ##### Element pseudo selectors
 
-Pseudo selectors `:hover`, `:focus`, `:visited` are supported by Gutenberg.
+Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
 
 ```json
 "elements": {
@@ -1319,4 +1322,4 @@ The value defined for the root `styles.spacing.blockGap` style is also output as
 
 ### Why does it take so long to update the styles in the browser?
 
-When you are actively developing with theme.json you may notice it takes 30+ seconds for your changes to show up in the browser, this is because `theme.json` is cached. To remove this caching issue, set either [`WP_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#wp_debug) or [`SCRIPT_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#script_debug) to 'true' in your [`wp-config.php`](https://wordpress.org/support/article/editing-wp-config-php/). This tells WordPress to skip the cache and always use fresh data.
+When you are actively developing with theme.json you may notice it takes 30+ seconds for your changes to show up in the browser, this is because `theme.json` is cached. To remove this caching issue, set either [`WP_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#wp_debug) or [`SCRIPT_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#script_debug) to 'true' in your [`wp-config.php`](https://wordpress.org/documentation/article/editing-wp-config-php/). This tells WordPress to skip the cache and always use fresh data.

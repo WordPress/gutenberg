@@ -17,7 +17,8 @@
 	&:hover,
 	&:focus-visible,
 	&:focus,
-	&:not([aria-disabled="true"]):active {
+	&:not([aria-disabled="true"]):active,
+	&[aria-expanded="true"] {
 		color: $white;
 	}
 }

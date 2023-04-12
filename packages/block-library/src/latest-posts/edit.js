@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -57,7 +56,7 @@ const USERS_LIST_QUERY = {
 };
 
 function getFeaturedImageDetails( post, size ) {
-	const image = get( post, [ '_embedded', 'wp:featuredmedia', '0' ] );
+	const image = post._embedded?.[ 'wp:featuredmedia' ]?.[ '0' ];
 
 	return {
 		url:
@@ -116,16 +115,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			);
 
 			return {
-				defaultImageWidth: get(
-					settings.imageDimensions,
-					[ featuredImageSizeSlug, 'width' ],
-					0
-				),
-				defaultImageHeight: get(
-					settings.imageDimensions,
-					[ featuredImageSizeSlug, 'height' ],
-					0
-				),
+				defaultImageWidth:
+					settings.imageDimensions?.[ featuredImageSizeSlug ]
+						?.width ?? 0,
+				defaultImageHeight:
+					settings.imageDimensions?.[ featuredImageSizeSlug ]
+						?.height ?? 0,
 				imageSizes: settings.imageSizes,
 				latestPosts: getEntityRecords(
 					'postType',
@@ -204,7 +199,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const hasPosts = !! latestPosts?.length;
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Post content settings' ) }>
+			<PanelBody title={ __( 'Post content' ) }>
 				<ToggleControl
 					label={ __( 'Post content' ) }
 					checked={ displayPostContent }
@@ -234,7 +229,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					displayPostContentRadio === 'excerpt' && (
 						<RangeControl
 							__nextHasNoMarginBottom
-							label={ __( 'Max number of words in excerpt' ) }
+							label={ __( 'Max number of words' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
 								setAttributes( { excerptLength: value } )
@@ -245,7 +240,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					) }
 			</PanelBody>
 
-			<PanelBody title={ __( 'Post meta settings' ) }>
+			<PanelBody title={ __( 'Post meta' ) }>
 				<ToggleControl
 					__nextHasNoMarginBottom
 					label={ __( 'Display author name' ) }
@@ -264,7 +259,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				/>
 			</PanelBody>
 
-			<PanelBody title={ __( 'Featured image settings' ) }>
+			<PanelBody title={ __( 'Featured image' ) }>
 				<ToggleControl
 					__nextHasNoMarginBottom
 					label={ __( 'Display featured image' ) }
@@ -294,6 +289,9 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							imageWidth={ defaultImageWidth }
 							imageHeight={ defaultImageHeight }
 							imageSizeOptions={ imageSizeOptions }
+							imageSizeHelp={ __(
+								'Select the size of the source image.'
+							) }
 							onChangeImage={ ( value ) =>
 								setAttributes( {
 									featuredImageSizeSlug: value,

@@ -2,9 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
+import {
+	__experimentalUseNavigator as useNavigator,
+	ExternalLink,
+} from '@wordpress/components';
+import { useEntityRecord } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { pencil } from '@wordpress/icons';
 
@@ -21,26 +24,11 @@ export default function SidebarNavigationScreenNavigationItem() {
 	const {
 		params: { postType, postId },
 	} = useNavigator();
-
-	const { post } = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( coreStore );
-
-			// The currently selected entity to display.
-			// Typically template or template part in the site editor.
-			return {
-				post:
-					postId && postType
-						? getEntityRecord( 'postType', postType, postId )
-						: null,
-			};
-		},
-		[ postType, postId ]
-	);
+	const { record } = useEntityRecord( 'postType', postType, postId );
 
 	return (
 		<SidebarNavigationScreen
-			title={ post ? decodeEntities( post?.title?.rendered ) : null }
+			title={ record ? decodeEntities( record?.title?.rendered ) : null }
 			actions={
 				<SidebarButton
 					onClick={ () => setCanvasMode( 'edit' ) }
@@ -48,8 +36,29 @@ export default function SidebarNavigationScreenNavigationItem() {
 					icon={ pencil }
 				/>
 			}
+			description={
+				postType === 'page'
+					? __(
+							'Pages are static and are not listed by date. Pages do not use tags or categories.'
+					  )
+					: __(
+							'Posts are entries listed in reverse chronological order on the site homepage or on the posts page.'
+					  )
+			}
 			content={
-				post ? decodeEntities( post?.description?.rendered ) : null
+				<>
+					{ record?.link ? (
+						<ExternalLink
+							className="edit-site-sidebar-navigation-screen__page-link"
+							href={ record.link }
+						>
+							{ record.link }
+						</ExternalLink>
+					) : null }
+					{ record
+						? decodeEntities( record?.description?.rendered )
+						: null }
+				</>
 			}
 		/>
 	);

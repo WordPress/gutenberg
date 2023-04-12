@@ -41,9 +41,7 @@ test.describe( 'Block deletion', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: 'Remove Paragraph' } )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 
 		// Ensure the last block was removed.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -90,9 +88,7 @@ test.describe( 'Block deletion', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: 'Remove Paragraph' } )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 
 		// Ensure the paragraph was removed.
 		await expect
@@ -138,7 +134,7 @@ test.describe( 'Block deletion', () => {
 		).toBeFocused();
 
 		// Remove the current paragraph via dedicated keyboard shortcut.
-		await pageUtils.pressKeyWithModifier( 'access', 'z' );
+		await pageUtils.pressKeys( 'access+z' );
 
 		// Ensure the last block was removed.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -274,7 +270,7 @@ test.describe( 'Block deletion', () => {
 		).toBeFocused();
 
 		// Select the last two paragraphs.
-		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await expect
 			.poll( () =>
 				page.evaluate( () =>
@@ -321,9 +317,7 @@ test.describe( 'Block deletion', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: 'Remove Paragraph' } )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 
 		// Ensure an empty block was created and focused.
 		await expect(

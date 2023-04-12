@@ -51,7 +51,7 @@ function ScreenRoot() {
 	}, [] );
 
 	return (
-		<Card size="small">
+		<Card size="small" className="edit-site-global-styles-screen-root">
 			<CardBody>
 				<VStack spacing={ 4 }>
 					<Card>

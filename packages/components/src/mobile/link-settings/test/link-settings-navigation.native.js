@@ -10,7 +10,7 @@ import { render, fireEvent, waitFor } from 'test/helpers';
 import LinkSettingsNavigation from '../link-settings-navigation';
 
 beforeAll( () => {
-	jest.useFakeTimers( 'legacy' );
+	jest.useFakeTimers( { legacyFakeTimers: true } );
 } );
 
 afterAll( () => {

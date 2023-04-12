@@ -146,6 +146,7 @@ export default function UnsavedInnerBlocks( {
 
 		createNavigationMenu( null, blocks );
 	}, [
+		blocks,
 		createNavigationMenu,
 		isDisabled,
 		isSaving,

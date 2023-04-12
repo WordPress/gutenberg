@@ -170,12 +170,18 @@ export default function Image( {
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
 		)
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+	const canUploadMedia = !! mediaUpload;
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
 	// we can enable a button in the toolbar to upload the image.
 	useEffect( () => {
-		if ( ! isExternalImage( id, url ) || ! isSelected || externalBlob ) {
+		if (
+			! isExternalImage( id, url ) ||
+			! isSelected ||
+			! canUploadMedia ||
+			externalBlob
+		) {
 			return;
 		}
 
@@ -185,7 +191,7 @@ export default function Image( {
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
 			.catch( () => {} );
-	}, [ id, url, isSelected, externalBlob ] );
+	}, [ id, url, isSelected, externalBlob, canUploadMedia ] );
 
 	// We need to show the caption when changes come from
 	// history navigation(undo/redo).
@@ -401,19 +407,18 @@ export default function Image( {
 					{ ! multiImageSelection && (
 						<TextareaControl
 							__nextHasNoMarginBottom
-							label={ __( 'Alt text (alternative text)' ) }
+							label={ __( 'Alternative text' ) }
 							value={ alt }
 							onChange={ updateAlt }
 							help={
 								<>
 									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 										{ __(
-											'Describe the purpose of the image'
+											'Describe the purpose of the image.'
 										) }
 									</ExternalLink>
-									{ __(
-										'Leave empty if the image is purely decorative.'
-									) }
+									<br />
+									{ __( 'Leave empty if decorative.' ) }
 								</>
 							}
 						/>
@@ -428,6 +433,9 @@ export default function Image( {
 						isResizable={ isResizable }
 						imageWidth={ naturalWidth }
 						imageHeight={ naturalHeight }
+						imageSizeHelp={ __(
+							'Select the size of the source image.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>

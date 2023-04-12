@@ -46,10 +46,6 @@ const MainContent = ( {
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
-		return <p>{ __( 'Select or create a menu' ) }</p>;
-	}
-
-	if ( currentMenuId && isNavigationMenuMissing ) {
 		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
 	}
 
@@ -69,6 +65,7 @@ const MainContent = ( {
 	return (
 		<OffCanvasEditor
 			blocks={ clientIdsTree }
+			parentClientId={ clientId }
 			isExpanded={ true }
 			LeafMoreMenu={ LeafMoreMenu }
 			description={ description }
@@ -89,9 +86,7 @@ const MenuInspectorControls = ( props ) => {
 
 	return (
 		<InspectorControls group="list">
-			<PanelBody
-				title={ process.env.IS_GUTENBERG_PLUGIN ? null : __( 'Menu' ) }
-			>
+			<PanelBody title={ null }>
 				<HStack className="wp-block-navigation-off-canvas-editor__header">
 					<Heading
 						className="wp-block-navigation-off-canvas-editor__title"

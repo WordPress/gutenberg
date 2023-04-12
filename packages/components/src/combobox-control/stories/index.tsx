@@ -36,7 +36,7 @@ const meta: ComponentMeta< typeof ComboboxControl > = {
 };
 export default meta;
 
-const mapCountryOption = ( country: typeof countries[ number ] ) => ( {
+const mapCountryOption = ( country: ( typeof countries )[ number ] ) => ( {
 	value: country.code,
 	label: country.name,
 } );

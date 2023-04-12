@@ -32,7 +32,7 @@ test.describe( 'Classic', () => {
 		await page.click( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
 	} );
@@ -73,7 +73,7 @@ test.describe( 'Classic', () => {
 		await createGallery.click();
 		await page.click( 'role=button[name="Insert gallery"i]' );
 
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toMatch( /\[gallery ids=\"\d+\"\]/ );
@@ -89,7 +89,7 @@ test.describe( 'Classic', () => {
 		await galleryBlock.focus();
 
 		// Check that you can undo back to a Classic block gallery in one step.
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 		await expect(
 			page.locator( 'role=document[name="Block: Classic"i]' )
 		).toBeVisible();
@@ -119,7 +119,7 @@ test.describe( 'Classic', () => {
 		await page.click( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 
 		await page.click( 'role=button[name="Save draft"i]' );
 

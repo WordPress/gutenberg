@@ -13,6 +13,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/block-editor',
 	'@wordpress/block-library',
 	'@wordpress/blocks',
+	'@wordpress/commands',
 	'@wordpress/components',
 	'@wordpress/customize-widgets',
 	'@wordpress/data',

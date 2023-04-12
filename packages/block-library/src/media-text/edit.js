@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
 import {
@@ -36,30 +36,20 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import MediaContainer from './media-container';
-import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
-
-/**
- * Constants
- */
-const TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			placeholder: _x( 'Content…', 'content placeholder' ),
-		},
-	],
-];
+import {
+	DEFAULT_MEDIA_SIZE_SLUG,
+	WIDTH_CONSTRAINT_PERCENTAGE,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_ATTACHMENT,
+	TEMPLATE,
+} from './constants';
 
 // this limits the resize to a safe zone to avoid making broken layouts
-const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) =>
 	Math.max(
 		WIDTH_CONSTRAINT_PERCENTAGE,
 		Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE )
 	);
-
-const LINK_DESTINATION_MEDIA = 'media';
-const LINK_DESTINATION_ATTACHMENT = 'attachment';
 
 function getImageSourceUrlBySizeSlug( image, slug ) {
 	// eslint-disable-next-line camelcase
@@ -280,17 +270,16 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			{ mediaType === 'image' && (
 				<TextareaControl
 					__nextHasNoMarginBottom
-					label={ __( 'Alt text (alternative text)' ) }
+					label={ __( 'Alternative text' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={
 						<>
 							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-								{ __( 'Describe the purpose of the image' ) }
+								{ __( 'Describe the purpose of the image.' ) }
 							</ExternalLink>
-							{ __(
-								'Leave empty if the image is purely decorative.'
-							) }
+							<br />
+							{ __( 'Leave empty if decorative.' ) }
 						</>
 					}
 				/>
@@ -301,7 +290,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					slug={ mediaSizeSlug }
 					imageSizeOptions={ imageSizeOptions }
 					isResizable={ false }
-					imageSizeHelp={ __( 'Select which image size to load.' ) }
+					imageSizeHelp={ __(
+						'Select the size of the source image.'
+					) }
 				/>
 			) }
 			{ mediaUrl && (
