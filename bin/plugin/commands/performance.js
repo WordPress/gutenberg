@@ -541,7 +541,6 @@ async function runPerformanceTests( refs, options ) {
 	// Formatting the results.
 	for ( const testSuite of testSuites ) {
 		logAction( `${ testSuite }\n` );
-
 		/** @type {Record<string, Record<string, string>>} */
 		const invertedResult = {};
 		Object.entries( results[ testSuite ] ).reduce(
@@ -561,6 +560,7 @@ async function runPerformanceTests( refs, options ) {
 			invertedResult
 		);
 		console.table( invertedResult );
+		logNewline();
 
 		const resultsFilename = testSuite + '.performance-results.json';
 		writeJSONFile(
@@ -569,7 +569,6 @@ async function runPerformanceTests( refs, options ) {
 		);
 	}
 
-	logNewline();
 	console.timeEnd( TIMERS.total );
 	logNewline();
 }
