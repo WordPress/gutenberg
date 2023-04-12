@@ -69,23 +69,25 @@ async function checkUnverifiedDeclarationFiles() {
 		.filter( ( dirent ) => dirent.isDirectory() )
 		.map( ( dirent ) => path.join( packageDir, dirent.name ) );
 
-	const declarations = await Promise.all(
-		subDirs.map( async ( pkg ) => {
-			const tsconfigPath = path.join( pkg, 'tsconfig.json' );
-			try {
-				const tsconfig = await readTsConfig( tsconfigPath );
+	const declarations = (
+		await Promise.all(
+			subDirs.map( async ( pkg ) => {
+				const tsconfigPath = path.join( pkg, 'tsconfig.json' );
+				try {
+					const tsconfig = await readTsConfig( tsconfigPath );
 
-				if ( tsconfig.compilerOptions?.checkJs === false ) {
-					return getDecFile( pkg );
+					if ( tsconfig.compilerOptions?.checkJs === false ) {
+						return getDecFile( pkg );
+					}
+				} catch ( error ) {
+					if ( error.code !== 'ENOENT' ) {
+						throw error;
+					}
 				}
-			} catch ( error ) {
-				if ( error.code !== 'ENOENT' ) {
-					throw error;
-				}
-			}
-			return null;
-		} )
-	).filter( Boolean );
+				return null;
+			} )
+		)
+	 ).filter( Boolean );
 
 	const tscResults = await Promise.allSettled(
 		declarations.map( ( declaration ) =>
