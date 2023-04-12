@@ -226,7 +226,7 @@ const Sandbox = forwardRef( function Sandbox(
 					<title>{ title }</title>
 					<meta
 						name="viewport"
-						content={ `width=device-width, initial-scale=1 ${ addViewportProps }` }
+						content={ `width=device-width, initial-scale=1${ addViewportProps }` }
 					></meta>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
 					{ styles.map( ( rules, i ) => (
