@@ -85,6 +85,11 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Developer Documentation': 'Documentation',
 	'[Type] Code Quality': 'Code Quality',
 	'[Type] Security': 'Security',
+	'Accessibility (a11y)': 'Accessibility',
+	'[a11y] Color Contrast': 'Accessibility',
+	'[a11y] Keyboard & Focus': 'Accessibility',
+	'[a11y] Labelling': 'Accessibility',
+	'[a11y] Zooming': 'Accessibility',
 };
 
 /**
@@ -126,11 +131,6 @@ const LABEL_FEATURE_MAPPING = {
 	'[Block] Legacy Widget': 'Widgets Editor',
 	'REST API Interaction': 'REST API',
 	'New Block': 'Block Library',
-	'Accessibility (a11y)': 'Accessibility',
-	'[a11y] Color Contrast': 'Accessibility',
-	'[a11y] Keyboard & Focus': 'Accessibility',
-	'[a11y] Labelling': 'Accessibility',
-	'[a11y] Zooming': 'Accessibility',
 	'[Package] E2E Tests': 'Testing',
 	'[Package] E2E Test Utils': 'Testing',
 	'Automated Testing': 'Testing',
@@ -154,6 +154,7 @@ const GROUP_TITLE_ORDER = [
 	'Enhancements',
 	'New APIs',
 	'Bug Fixes',
+	'Accessibility',
 	'Performance',
 	'Experiments',
 	'Documentation',
