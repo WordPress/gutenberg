@@ -34,7 +34,7 @@ const CollapseFixedToolbarButton = forwardRef( ( { onClick }, ref ) => {
 			icon={ levelUp }
 			onClick={ onClick }
 			ref={ ref }
-			label={ __( 'Collapse Block Tools' ) }
+			label={ __( 'Collapse block tools' ) }
 		/>
 	);
 } );
@@ -47,7 +47,7 @@ const ExpandFixedToolbarButton = forwardRef( ( { onClick, icon }, ref ) => {
 			icon={ <BlockIcon icon={ icon } /> }
 			onClick={ onClick }
 			ref={ ref }
-			label={ __( 'Expand Block Tools' ) }
+			label={ __( 'Expand block tools' ) }
 		/>
 	);
 } );
