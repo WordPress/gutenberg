@@ -25,6 +25,10 @@ test.describe( 'Site editor writing flow', () => {
 			postType: 'wp_template_part',
 			canvas: 'edit',
 		} );
+
+		// Wait for the template part to be loaded.
+		await page.waitForLoadState( 'networkidle' );
+
 		// Select the first site title block.
 		const siteTitleBlock = editor.canvas.locator(
 			'role=document[name="Block: Site Title"i]'
@@ -53,6 +57,10 @@ test.describe( 'Site editor writing flow', () => {
 			postType: 'wp_template_part',
 			canvas: 'edit',
 		} );
+
+		// Wait for the template part to be loaded.
+		await page.waitForLoadState( 'networkidle' );
+
 		// Make sure the sidebar is open.
 		await editor.openDocumentSettingsSidebar();
 
