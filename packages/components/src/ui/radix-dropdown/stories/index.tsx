@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta } from '@storybook/react';
-import { css } from '@emotion/react';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
@@ -19,12 +19,11 @@ import {
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
 } from '../';
-import { useCx } from '../../../utils/hooks/use-cx';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, createContext, useContext } from '@wordpress/element';
 import { chevronRightSmall, menu, wordpress } from '@wordpress/icons';
 
 /**
@@ -32,30 +31,63 @@ import { chevronRightSmall, menu, wordpress } from '@wordpress/icons';
  */
 import Icon from '../../../icon';
 
+const DropdownMenuStoryContext = createContext< {
+	bookmarksChecked?: boolean;
+	setBookmarksChecked?: ( v: boolean ) => void;
+	urlsChecked?: boolean;
+	setUrlsChecked?: ( v: boolean ) => void;
+	person?: string;
+	setPerson?: ( v: string ) => void;
+} >( {} );
+
 const meta: ComponentMeta< typeof DropdownMenu > = {
-	title: 'Components/RadixDropdown',
+	title: 'Components/Radix DropdownMenu',
 	component: DropdownMenu,
-	subcomponents: { DropdownMenuItem },
+	subcomponents: {
+		DropdownMenuItem,
+		DropdownSubMenu,
+		DropdownMenuSeparator,
+		DropdownMenuCheckboxItem,
+		DropdownMenuGroup,
+		DropdownMenuLabel,
+		DropdownMenuRadioGroup,
+		DropdownMenuRadioItem,
+	},
 	argTypes: {
-		// focusOnMount: {
-		// 	options: [ 'firstElement', true, false ],
-		// 	control: {
-		// 		type: 'radio',
-		// 	},
-		// },
-		// position: { control: { type: null } },
-		// renderContent: { control: { type: null } },
-		// renderToggle: { control: { type: null } },
+		children: { control: { type: null } },
+		trigger: { control: { type: null } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { source: { state: 'open', excludeDecorators: true } },
 	},
+	decorators: [
+		( Story ) => {
+			const [ bookmarksChecked, setBookmarksChecked ] = useState( true );
+			const [ urlsChecked, setUrlsChecked ] = useState( false );
+			const [ person, setPerson ] = useState( 'pedro' );
+
+			return (
+				<DropdownMenuStoryContext.Provider
+					value={ {
+						bookmarksChecked,
+						setBookmarksChecked,
+						urlsChecked,
+						setUrlsChecked,
+						person,
+						setPerson,
+					} }
+				>
+					<Story />
+				</DropdownMenuStoryContext.Provider>
+			);
+		},
+	],
 };
 export default meta;
 
-const iconButton = css`
+const MenuButton = styled.div`
 	all: unset;
 	font-family: inherit;
 	border-radius: 100%;
@@ -82,51 +114,89 @@ const iconButton = css`
 	}
 `;
 
-const rightSlot = css`
+const ItemSuffix = styled.div`
 	margin-left: auto;
 	padding-left: 24px;
 `;
 
-export const DropdownMenuDemo = () => {
-	const [ bookmarksChecked, setBookmarksChecked ] = useState( true );
-	const [ urlsChecked, setUrlsChecked ] = useState( false );
-	const [ person, setPerson ] = useState( 'pedro' );
-
-	const cx = useCx();
-
-	const rightSlotClassName = cx( rightSlot );
+const CheckboxItemsGroup = () => {
+	const {
+		bookmarksChecked,
+		setBookmarksChecked,
+		urlsChecked,
+		setUrlsChecked,
+	} = useContext( DropdownMenuStoryContext );
 
 	return (
-		<DropdownMenu
-			trigger={
-				<button
-					className={ cx( iconButton ) }
-					aria-label="Customise options"
-				>
-					<Icon icon={ menu } size={ 20 } />
-				</button>
-			}
-			contentProps={ { sideOffset: 5 } }
-		>
+		<DropdownMenuGroup>
+			<DropdownMenuCheckboxItem
+				checked={ bookmarksChecked }
+				onCheckedChange={ setBookmarksChecked }
+			>
+				Show Bookmarks <ItemSuffix>⌘+B</ItemSuffix>
+			</DropdownMenuCheckboxItem>
+
+			<DropdownMenuCheckboxItem
+				checked={ urlsChecked }
+				onCheckedChange={ setUrlsChecked }
+			>
+				Show Full URLs
+			</DropdownMenuCheckboxItem>
+
+			<DropdownMenuSeparator />
+		</DropdownMenuGroup>
+	);
+};
+
+const RadioItemsGroup = () => {
+	const { person, setPerson } = useContext( DropdownMenuStoryContext );
+
+	return (
+		<DropdownMenuRadioGroup value={ person } onValueChange={ setPerson }>
+			<DropdownMenuLabel>People</DropdownMenuLabel>
+			<DropdownMenuRadioItem value="pedro">
+				Pedro Duarte
+			</DropdownMenuRadioItem>
+			<DropdownMenuRadioItem
+				className="DropdownMenuRadioItem"
+				value="colm"
+			>
+				Colm Tuite
+			</DropdownMenuRadioItem>
+		</DropdownMenuRadioGroup>
+	);
+};
+
+const Template: ComponentStory< typeof DropdownMenu > = ( props ) => (
+	<DropdownMenu { ...props } />
+);
+export const Default = Template.bind( {} );
+Default.args = {
+	trigger: (
+		<MenuButton aria-label="Customize options">
+			<Icon icon={ menu } size={ 20 } />
+		</MenuButton>
+	),
+	sideOffset: 5,
+	children: (
+		<>
 			<DropdownMenuGroup>
 				<DropdownMenuItem icon={ wordpress }>
-					New Tab <div className={ rightSlotClassName }>⌘+T</div>
+					New Tab <ItemSuffix>⌘+T</ItemSuffix>
 				</DropdownMenuItem>
 				<DropdownMenuItem>
-					New Window <div className={ rightSlotClassName }>⌘+N</div>
+					New Window <ItemSuffix>⌘+N</ItemSuffix>
 				</DropdownMenuItem>
 				<DropdownMenuItem disabled>
-					New Private Window{ ' ' }
-					<div className={ rightSlotClassName }>⇧+⌘+N</div>
+					New Private Window <ItemSuffix>⇧+⌘+N</ItemSuffix>
 				</DropdownMenuItem>
-
 				<DropdownSubMenu
 					trigger={
 						<>
 							More Tools
-							<div className={ rightSlotClassName }>
+							<ItemSuffix>
 								<Icon icon={ chevronRightSmall } size={ 28 } />
-							</div>
+							</ItemSuffix>
 						</>
 					}
 					subContentProps={ {
@@ -135,52 +205,19 @@ export const DropdownMenuDemo = () => {
 					} }
 				>
 					<DropdownMenuItem>
-						Save Page As…{ ' ' }
-						<div className={ rightSlotClassName }>⌘+S</div>
+						Save Page As… <ItemSuffix>⌘+S</ItemSuffix>
 					</DropdownMenuItem>
 					<DropdownMenuItem>Create Shortcut…</DropdownMenuItem>
 					<DropdownMenuItem>Name Window…</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem>Developer Tools</DropdownMenuItem>
 				</DropdownSubMenu>
-
 				<DropdownMenuSeparator />
 			</DropdownMenuGroup>
 
-			<DropdownMenuGroup>
-				<DropdownMenuCheckboxItem
-					checked={ bookmarksChecked }
-					onCheckedChange={ setBookmarksChecked }
-				>
-					Show Bookmarks{ ' ' }
-					<div className={ rightSlotClassName }>⌘+B</div>
-				</DropdownMenuCheckboxItem>
+			<CheckboxItemsGroup />
 
-				<DropdownMenuCheckboxItem
-					checked={ urlsChecked }
-					onCheckedChange={ setUrlsChecked }
-				>
-					Show Full URLs
-				</DropdownMenuCheckboxItem>
-
-				<DropdownMenuSeparator />
-			</DropdownMenuGroup>
-
-			<DropdownMenuRadioGroup
-				value={ person }
-				onValueChange={ setPerson }
-			>
-				<DropdownMenuLabel>People</DropdownMenuLabel>
-				<DropdownMenuRadioItem value="pedro">
-					Pedro Duarte
-				</DropdownMenuRadioItem>
-				<DropdownMenuRadioItem
-					className="DropdownMenuRadioItem"
-					value="colm"
-				>
-					Colm Tuite
-				</DropdownMenuRadioItem>
-			</DropdownMenuRadioGroup>
-		</DropdownMenu>
-	);
+			<RadioItemsGroup />
+		</>
+	),
 };
