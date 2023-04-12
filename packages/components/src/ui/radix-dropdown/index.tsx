@@ -42,6 +42,7 @@ import type {
 //   - added to mirror previous menu item component
 //   - should we expect consumers to provide this directly with children?
 //   - should we expose prefix / suffix to help?
+// - Props: should we export HTML-inherited props?
 export const DropdownMenu = ( {
 	// Root props
 	defaultOpen,
@@ -97,9 +98,8 @@ export const DropdownSubMenu = forwardRef(
 	) => {
 		return (
 			<DropdownMenuPrimitive.Sub { ...subProps }>
-				<DropdownMenuStyled.SubTrigger { ...triggerProps }>
+				<DropdownMenuStyled.SubTrigger { ...triggerProps } asChild>
 					{ trigger }
-					{ /* Arrow? */ }
 				</DropdownMenuStyled.SubTrigger>
 				<DropdownMenuPrimitive.Portal { ...portalProps }>
 					<DropdownMenuStyled.SubContent
@@ -119,16 +119,21 @@ export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
 export const DropdownMenuItem = forwardRef(
 	(
-		{ children, icon, ...props }: DropdownItemProps,
+		{ children, prefix, suffix, ...props }: DropdownItemProps,
 		forwardedRef: React.ForwardedRef< any >
 	) => {
 		return (
 			<DropdownMenuStyled.Item { ...props } ref={ forwardedRef }>
-				{ children }
-				{ icon && (
+				{ prefix && (
 					<DropdownMenuStyled.ItemPrefixWrapper>
-						<Icon icon={ icon } size={ 18 } />
+						{ prefix }
 					</DropdownMenuStyled.ItemPrefixWrapper>
+				) }
+				{ children }
+				{ suffix && (
+					<DropdownMenuStyled.ItemSuffixWrapper>
+						{ suffix }
+					</DropdownMenuStyled.ItemSuffixWrapper>
 				) }
 			</DropdownMenuStyled.Item>
 		);
@@ -144,15 +149,17 @@ export const DropdownMenuCheckboxItem = forwardRef(
 	) => {
 		return (
 			<DropdownMenuStyled.CheckboxItem { ...props } ref={ forwardedRef }>
+				<DropdownMenuStyled.ItemPrefixWrapper>
+					<DropdownMenuPrimitive.ItemIndicator>
+						{ props.checked === 'indeterminate' && (
+							<Icon icon={ lineSolid } size={ 20 } />
+						) }
+						{ props.checked === true && (
+							<Icon icon={ check } size={ 20 } />
+						) }
+					</DropdownMenuPrimitive.ItemIndicator>
+				</DropdownMenuStyled.ItemPrefixWrapper>
 				{ children }
-				<DropdownMenuStyled.ItemIndicator>
-					{ props.checked === 'indeterminate' && (
-						<Icon icon={ lineSolid } size={ 20 } />
-					) }
-					{ props.checked === true && (
-						<Icon icon={ check } size={ 20 } />
-					) }
-				</DropdownMenuStyled.ItemIndicator>
 			</DropdownMenuStyled.CheckboxItem>
 		);
 	}
@@ -176,10 +183,12 @@ export const DropdownMenuRadioItem = forwardRef(
 	) => {
 		return (
 			<DropdownMenuStyled.RadioItem { ...props } ref={ forwardedRef }>
+				<DropdownMenuStyled.ItemPrefixWrapper>
+					<DropdownMenuPrimitive.ItemIndicator>
+						<Icon icon={ radioDot } size={ 20 } />
+					</DropdownMenuPrimitive.ItemIndicator>
+				</DropdownMenuStyled.ItemPrefixWrapper>
 				{ children }
-				<DropdownMenuStyled.ItemIndicator>
-					<Icon icon={ radioDot } size={ 20 } />
-				</DropdownMenuStyled.ItemIndicator>
 			</DropdownMenuStyled.RadioItem>
 		);
 	}
