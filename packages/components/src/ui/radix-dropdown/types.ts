@@ -3,11 +3,6 @@
  */
 import type * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 
-/**
- * Internal dependencies
- */
-import type { IconType } from '../../icon';
-
 export type DropdownMenuProps = {
 	/**
 	 * The open state of the dropdown menu when it is initially rendered. Use when
@@ -87,6 +82,35 @@ export type DropdownSubMenuProps = {
 	children: React.ReactNode;
 };
 
-export type DropdownItemProps = DropdownMenuPrimitive.DropdownMenuItemProps & {
-	icon?: IconType;
+export type DropdownItemProps = {
+	/**
+	 * When true, prevents the user from interacting with the item.
+	 *
+	 * @default false
+	 */
+	disabled?: DropdownMenuPrimitive.DropdownMenuItemProps[ 'disabled' ];
+	/**
+	 * Event handler called when the user selects an item (via mouse or keyboard).
+	 * Calling `event.preventDefault` in this handler will prevent the dropdown
+	 * menu from closing when selecting that item.
+	 */
+	onSelect?: DropdownMenuPrimitive.DropdownMenuItemProps[ 'onSelect' ];
+	/**
+	 * Optional text used for typeahead purposes. By default the typeahead
+	 * behavior will use the `.textContent` of the item. Use this when the content
+	 * is complex, or you have non-textual content inside.
+	 */
+	textValue?: DropdownMenuPrimitive.DropdownMenuItemProps[ 'textValue' ];
+	/**
+	 * The contents of the item
+	 */
+	children: React.ReactNode;
+	/**
+	 * The contents of the item's prefix
+	 */
+	prefix?: React.ReactNode;
+	/**
+	 * The contents of the item's suffix
+	 */
+	suffix?: React.ReactNode;
 };

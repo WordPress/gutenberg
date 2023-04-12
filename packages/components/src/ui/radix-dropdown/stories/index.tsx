@@ -114,9 +114,8 @@ const MenuButton = styled.div`
 	}
 `;
 
-const ItemSuffix = styled.div`
-	margin-left: auto;
-	padding-left: 24px;
+const KeyboardShortcut = styled.span`
+	opacity: 0.8;
 `;
 
 const CheckboxItemsGroup = () => {
@@ -133,7 +132,7 @@ const CheckboxItemsGroup = () => {
 				checked={ bookmarksChecked }
 				onCheckedChange={ setBookmarksChecked }
 			>
-				Show Bookmarks <ItemSuffix>⌘+B</ItemSuffix>
+				Show Bookmarks
 			</DropdownMenuCheckboxItem>
 
 			<DropdownMenuCheckboxItem
@@ -181,31 +180,42 @@ Default.args = {
 	children: (
 		<>
 			<DropdownMenuGroup>
-				<DropdownMenuItem icon={ wordpress }>
-					New Tab <ItemSuffix>⌘+T</ItemSuffix>
+				<DropdownMenuItem
+					prefix={ <Icon icon={ wordpress } size={ 18 } /> }
+					suffix={ <KeyboardShortcut>⌘+T</KeyboardShortcut> }
+				>
+					New Tab
 				</DropdownMenuItem>
-				<DropdownMenuItem>
-					New Window <ItemSuffix>⌘+N</ItemSuffix>
+				<DropdownMenuItem
+					suffix={ <KeyboardShortcut>⌘+N</KeyboardShortcut> }
+				>
+					New Window
 				</DropdownMenuItem>
-				<DropdownMenuItem disabled>
-					New Private Window <ItemSuffix>⇧+⌘+N</ItemSuffix>
+				<DropdownMenuItem
+					disabled
+					suffix={ <KeyboardShortcut>⇧+⌘+N</KeyboardShortcut> }
+				>
+					New Private Window
 				</DropdownMenuItem>
 				<DropdownSubMenu
 					trigger={
-						<>
-							More Tools
-							<ItemSuffix>
+						<DropdownMenuItem
+							suffix={
 								<Icon icon={ chevronRightSmall } size={ 28 } />
-							</ItemSuffix>
-						</>
+							}
+						>
+							More Tools
+						</DropdownMenuItem>
 					}
 					subContentProps={ {
 						sideOffset: 2,
 						alignOffset: -5,
 					} }
 				>
-					<DropdownMenuItem>
-						Save Page As… <ItemSuffix>⌘+S</ItemSuffix>
+					<DropdownMenuItem
+						suffix={ <KeyboardShortcut>⌘+S</KeyboardShortcut> }
+					>
+						Save Page As…
 					</DropdownMenuItem>
 					<DropdownMenuItem>Create Shortcut…</DropdownMenuItem>
 					<DropdownMenuItem>Name Window…</DropdownMenuItem>

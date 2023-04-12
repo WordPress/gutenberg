@@ -17,6 +17,8 @@ const ANIMATION_PARAMS = {
 	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
 };
 
+const ITEM_HORIZONTAL_PADDING = space( 2 );
+
 const slideUpAndFade = keyframes( {
 	'0%': {
 		opacity: 0,
@@ -89,7 +91,7 @@ const baseItem = css`
 	display: flex;
 	align-items: center;
 	height: ${ space( 9 ) };
-	padding: 0 ${ space( 2 ) };
+	padding: 0 ${ ITEM_HORIZONTAL_PADDING };
 	position: relative;
 	user-select: none;
 	outline: none;
@@ -112,17 +114,21 @@ const baseItem = css`
 	}
 `;
 
-const itemLeftSpace = css`
-	padding-left: ${ space( 8 ) };
-`;
-
 const itemPrefix = css`
-	position: absolute;
-	left: 0;
 	width: ${ space( 8 ) };
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	margin-left: calc( -1 * ${ ITEM_HORIZONTAL_PADDING } );
+`;
+
+const itemSuffix = css`
+	width: max-content;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: auto;
+	padding-left: ${ space( 6 ) };
 `;
 
 export const Content = styled( DropdownMenu.Content )`
@@ -134,19 +140,12 @@ export const SubContent = styled( DropdownMenu.SubContent )`
 
 export const Item = styled( DropdownMenu.Item )`
 	${ baseItem }
-
-	/* Should the standard item have larger left padding ? */
-	${ itemLeftSpace }
 `;
 export const CheckboxItem = styled( DropdownMenu.CheckboxItem )`
 	${ baseItem }
-
-	${ itemLeftSpace }
 `;
 export const RadioItem = styled( DropdownMenu.RadioItem )`
 	${ baseItem }
-
-	${ itemLeftSpace }
 `;
 export const SubTrigger = styled( DropdownMenu.SubTrigger )`
 	&[data-state='open']:not( [data-highlighted] ) {
@@ -154,13 +153,10 @@ export const SubTrigger = styled( DropdownMenu.SubTrigger )`
 	}
 
 	${ baseItem }
-
-	/* Should the standard item have larger left padding ? */
-	${ itemLeftSpace }
 `;
 
 export const Label = styled( DropdownMenu.Label )`
-	${ itemLeftSpace }
+	padding: 0 ${ ITEM_HORIZONTAL_PADDING };
 	font-size: ${ font( 'helpText.fontSize' ) };
 	line-height: ${ space( 7 ) };
 	color: ${ COLORS.ui.textDisabled };
@@ -172,12 +168,12 @@ export const Separator = styled( DropdownMenu.Separator )`
 	margin: ${ space( 2 ) };
 `;
 
-export const ItemIndicator = styled( DropdownMenu.ItemIndicator )`
+export const ItemPrefixWrapper = styled.span`
 	${ itemPrefix }
 `;
 
-export const ItemPrefixWrapper = styled.span`
-	${ itemPrefix }
+export const ItemSuffixWrapper = styled.span`
+	${ itemSuffix }
 `;
 
 export const Arrow = styled( DropdownMenu.Arrow )`
