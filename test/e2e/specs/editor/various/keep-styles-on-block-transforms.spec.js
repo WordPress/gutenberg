@@ -42,8 +42,8 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.keyboard.type( 'Line 2 to be made large' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Line 3 to be made large' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await page.click( 'role=radio[name="Large"i]' );
 		await page.click( 'role=button[name="Paragraph"i]' );
 		await page.click(
