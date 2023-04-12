@@ -60,16 +60,13 @@ function HeaderToolbar() {
 		const isDistractionFree = getSettings().isDistractionFree;
 		const hasFixedToolbar = getSettings().hasFixedToolbar;
 
-		let isBlockWithToolbarSelected = false;
 		// Check if we have an empty block selected
 		// If the first block in a multi selection is empty, there isn't a toolbar to show
 		const selectedBlockId =
 			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
-		if ( selectedBlockId ) {
-			const { name, attributes = {} } = getBlock( selectedBlockId ) || {};
-			isBlockWithToolbarSelected =
-				name && ! isUnmodifiedDefaultBlock( { name, attributes } );
-		}
+		const isBlockWithToolbarSelected = selectedBlockId
+			? ! isUnmodifiedDefaultBlock( getBlock( selectedBlockId ) )
+			: false;
 
 		const maybeBlockToolbarShowing =
 			isBlockWithToolbarSelected ||
