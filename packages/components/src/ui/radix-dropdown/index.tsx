@@ -42,35 +42,46 @@ import type {
 //   - added to mirror previous menu item component
 //   - should we expect consumers to provide this directly with children?
 //   - should we expose prefix / suffix to help?
-export const DropdownMenu = forwardRef(
-	(
-		{
-			children,
-			rootProps,
-			portalProps,
-			contentProps,
-			trigger,
-		}: DropdownMenuProps,
-		forwardedRef: React.ForwardedRef< any >
-	) => {
-		return (
-			<DropdownMenuPrimitive.Root { ...rootProps }>
-				<DropdownMenuPrimitive.Trigger asChild>
-					{ trigger }
-				</DropdownMenuPrimitive.Trigger>
-				<DropdownMenuPrimitive.Portal { ...portalProps }>
-					<DropdownMenuStyled.Content
-						{ ...contentProps }
-						ref={ forwardedRef }
-					>
-						{ children }
-						<DropdownMenuStyled.Arrow />
-					</DropdownMenuStyled.Content>
-				</DropdownMenuPrimitive.Portal>
-			</DropdownMenuPrimitive.Root>
-		);
-	}
-);
+export const DropdownMenu = ( {
+	// Root props
+	defaultOpen,
+	open,
+	onOpenChange,
+	modal = true,
+	// Content positioning props
+	side = 'bottom',
+	sideOffset = 0,
+	align = 'center',
+	alignOffset = 0,
+	// Render props
+	children,
+	trigger,
+}: DropdownMenuProps ) => {
+	return (
+		<DropdownMenuPrimitive.Root
+			defaultOpen={ defaultOpen }
+			open={ open }
+			onOpenChange={ onOpenChange }
+			modal={ modal }
+		>
+			<DropdownMenuPrimitive.Trigger asChild>
+				{ trigger }
+			</DropdownMenuPrimitive.Trigger>
+			<DropdownMenuPrimitive.Portal>
+				<DropdownMenuStyled.Content
+					side={ side }
+					align={ align }
+					sideOffset={ sideOffset }
+					alignOffset={ alignOffset }
+					loop={ true }
+				>
+					{ children }
+					<DropdownMenuStyled.Arrow />
+				</DropdownMenuStyled.Content>
+			</DropdownMenuPrimitive.Portal>
+		</DropdownMenuPrimitive.Root>
+	);
+};
 
 export const DropdownSubMenu = forwardRef(
 	(
