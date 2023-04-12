@@ -73,14 +73,12 @@ jobs:
 
                     # Confirm that there is an 'Unreleased' section and that the relevant entry is in that section
                     if ! grep -nq -e '^## Unreleased' "${changelog_path}" || \
-                     ! [[ \
+                      { [[ -n "${current_pr_entry_line_no}" ]] && ! [[ \
                         ${current_pr_entry_line_no} -gt ${unreleased_header_line_no} && \
                         ${current_pr_entry_line_no} -lt ${latest_release_header_line_no} \
-                      ]]; then
+                      ]]; }; then
                         echo "Please make sure your CHANGELOG entry is in the \`## Unreleased\` section"
-                        echo
-                        echo "${optional_check_notice}"
-                        exit 1
+                      exit 1
                     fi
 
                     # Confirm that there is an entry with the right PR link it's part of the current changes
