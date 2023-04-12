@@ -57,8 +57,9 @@ const baseContent = css`
 	border: 1px solid ${ COLORS.ui.border };
 	border-radius: 6px;
 	padding: ${ space( 2 ) };
-	box-shadow: 0px 10px 38px -10px rgba( 22, 23, 24, 0.35 ),
-		0px 10px 20px -15px rgba( 22, 23, 24, 0.2 );
+	box-shadow: 0 0.7px 1px rgba( 0, 0, 0, 0.1 ),
+		0 1.2px 1.7px -0.2px rgba( 0, 0, 0, 0.1 ),
+		0 2.3px 3.3px -0.5px rgba( 0, 0, 0, 0.1 );
 	animation-duration: ${ ANIMATION_PARAMS.DURATION };
 	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
 	will-change: transform, opacity;
@@ -174,15 +175,4 @@ export const ItemPrefixWrapper = styled.span`
 
 export const ItemSuffixWrapper = styled.span`
 	${ itemSuffix }
-`;
-
-export const Arrow = styled( DropdownMenu.Arrow )`
-	fill: ${ COLORS.ui.background };
-
-	/* The following styles aim at adding a border to the arrow*/
-	stroke: ${ COLORS.ui.border };
-	stroke-dasharray: 36 28;
-	stroke-dashoffset: 34;
-	stroke-linejoin: round;
-	stroke-width: 2.5;
 `;

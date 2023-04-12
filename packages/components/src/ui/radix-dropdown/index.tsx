@@ -83,7 +83,6 @@ export const DropdownMenu = ( {
 					loop={ true }
 				>
 					{ children }
-					<DropdownMenuStyled.Arrow />
 				</DropdownMenuStyled.Content>
 			</DropdownMenuPrimitive.Portal>
 		</DropdownMenuPrimitive.Root>
