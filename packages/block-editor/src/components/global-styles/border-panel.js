@@ -50,8 +50,14 @@ function applyFallbackStyle( border ) {
 		return border;
 	}
 
-	if ( ! border.style && ( border.color || border.width ) ) {
+	const hasColorOrWidth = border.color || border.width;
+
+	if ( ! border.style && hasColorOrWidth ) {
 		return { ...border, style: 'solid' };
+	}
+
+	if ( border.style && ! hasColorOrWidth ) {
+		return undefined;
 	}
 
 	return border;
