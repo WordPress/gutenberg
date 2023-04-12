@@ -128,6 +128,7 @@ const CheckboxItemsGroup = () => {
 
 	return (
 		<DropdownMenuGroup>
+			<DropdownMenuLabel>Options</DropdownMenuLabel>
 			<DropdownMenuCheckboxItem
 				checked={ bookmarksChecked }
 				onCheckedChange={ setBookmarksChecked }
@@ -156,10 +157,7 @@ const RadioItemsGroup = () => {
 			<DropdownMenuRadioItem value="pedro">
 				Pedro Duarte
 			</DropdownMenuRadioItem>
-			<DropdownMenuRadioItem
-				className="DropdownMenuRadioItem"
-				value="colm"
-			>
+			<DropdownMenuRadioItem value="colm">
 				Colm Tuite
 			</DropdownMenuRadioItem>
 		</DropdownMenuRadioGroup>
@@ -207,10 +205,6 @@ Default.args = {
 							More Tools
 						</DropdownMenuItem>
 					}
-					subContentProps={ {
-						sideOffset: 2,
-						alignOffset: -5,
-					} }
 				>
 					<DropdownMenuItem
 						suffix={ <KeyboardShortcut>⌘+S</KeyboardShortcut> }

@@ -19,6 +19,12 @@ import type {
 	DropdownMenuProps,
 	DropdownSubMenuProps,
 	DropdownItemProps,
+	DropdownMenuLabelProps,
+	DropdownMenuGroupProps,
+	DropdownMenuCheckboxItemProps,
+	DropdownMenuRadioGroupProps,
+	DropdownMenuRadioItemProps,
+	DropdownMenuSeparatorProps,
 } from './types';
 
 // Observations / Questions:
@@ -42,7 +48,7 @@ import type {
 //   - added to mirror previous menu item component
 //   - should we expect consumers to provide this directly with children?
 //   - should we expose prefix / suffix to help?
-// - Props: should we export HTML-inherited props?
+// - Props: should we export HTML-inherited props? (e.g styles, classnames, hidden, etc..)
 export const DropdownMenu = ( {
 	// Root props
 	defaultOpen,
@@ -85,20 +91,36 @@ export const DropdownMenu = ( {
 };
 
 export const DropdownSubMenu = ( {
+	// Sub props
+	defaultOpen,
+	open,
+	onOpenChange,
+	// Sub trigger props
+	disabled,
+	textValue,
+	// Render props
 	children,
-	subProps,
-	subContentProps,
-	portalProps,
 	trigger,
-	triggerProps,
 }: DropdownSubMenuProps ) => {
 	return (
-		<DropdownMenuPrimitive.Sub { ...subProps }>
-			<DropdownMenuStyled.SubTrigger { ...triggerProps } asChild>
+		<DropdownMenuPrimitive.Sub
+			defaultOpen={ defaultOpen }
+			open={ open }
+			onOpenChange={ onOpenChange }
+		>
+			<DropdownMenuStyled.SubTrigger
+				disabled={ disabled }
+				textValue={ textValue }
+				asChild
+			>
 				{ trigger }
 			</DropdownMenuStyled.SubTrigger>
-			<DropdownMenuPrimitive.Portal { ...portalProps }>
-				<DropdownMenuStyled.SubContent { ...subContentProps }>
+			<DropdownMenuPrimitive.Portal>
+				<DropdownMenuStyled.SubContent
+					loop
+					sideOffset={ 4 }
+					alignOffset={ -8 }
+				>
 					{ children }
 				</DropdownMenuStyled.SubContent>
 			</DropdownMenuPrimitive.Portal>
@@ -106,8 +128,13 @@ export const DropdownSubMenu = ( {
 	);
 };
 
-export const DropdownMenuLabel = DropdownMenuStyled.Label;
-export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
+export const DropdownMenuLabel = ( props: DropdownMenuLabelProps ) => (
+	<DropdownMenuStyled.Label { ...props } />
+);
+
+export const DropdownMenuGroup = ( props: DropdownMenuGroupProps ) => (
+	<DropdownMenuPrimitive.Group { ...props } />
+);
 
 export const DropdownMenuItem = forwardRef(
 	(
@@ -160,9 +187,9 @@ export const DropdownMenuCheckboxItem = ( {
 	);
 };
 
-export const DropdownMenuRadioGroup = () => (
-	<DropdownMenuPrimitive.RadioGroup />
-);
+export const DropdownMenuRadioGroup = (
+	props: DropdownMenuRadioGroupProps
+) => <DropdownMenuPrimitive.RadioGroup { ...props } />;
 
 const radioDot = (
 	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -173,7 +200,7 @@ const radioDot = (
 export const DropdownMenuRadioItem = ( {
 	children,
 	...props
-}: DropdownMenuPrimitive.DropdownMenuRadioItemProps ) => {
+}: DropdownMenuRadioItemProps ) => {
 	return (
 		<DropdownMenuStyled.RadioItem { ...props }>
 			<DropdownMenuStyled.ItemPrefixWrapper>
@@ -190,4 +217,6 @@ export const DropdownMenuRadioItem = ( {
 	);
 };
 
-export const DropdownMenuSeparator = DropdownMenuStyled.Separator;
+export const DropdownMenuSeparator = ( props: DropdownMenuSeparatorProps ) => (
+	<DropdownMenuStyled.Separator { ...props } />
+);
