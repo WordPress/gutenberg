@@ -32,7 +32,6 @@ const HUB_ANIMATION_DURATION = 0.3;
 
 const SiteHub = forwardRef( ( props, ref ) => {
 	const { canvasMode } = useSelect( ( select ) => {
-		select( editSiteStore ).getEditedPostType();
 		const { getCanvasMode, getSettings } = unlock(
 			select( editSiteStore )
 		);
@@ -45,7 +44,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const siteIconButtonProps = {
-		label: __( 'Open Navigation Sidebar' ),
+		label: __( 'Open Admin Sidebar' ),
 		onMouseDown: () => {
 			if ( canvasMode === 'edit' ) {
 				clearSelectedBlock();
@@ -62,7 +61,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	const controls = useAnimation();
 	useEffect( () => {
 		controls.set( { layout: true } );
-	} );
+	}, [ controls ] );
 
 	return (
 		<motion.div
