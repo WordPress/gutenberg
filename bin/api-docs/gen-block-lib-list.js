@@ -156,7 +156,7 @@ function readBlockJSON( filename ) {
 			: [];
 	const attributes = getTruthyKeys( blockjson.attributes );
 	const parent = blockjson.parent
-		? '\n' + `-	**Parent:** ${ blockjson.parent }`
+		? '\n' + `-	**Parent:** ${ blockjson.parent.join( ', ' ) }`
 		: '';
 	const experimental = blockjson.__experimental
 		? '\n' + `-	**Experimental:** ${ blockjson.__experimental }`
