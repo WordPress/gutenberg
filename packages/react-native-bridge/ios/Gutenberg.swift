@@ -123,6 +123,10 @@ public class Gutenberg: UIResponder {
         sendEvent(.featuredImageIdNativeUpdated, body: ["featuredImageId": mediaId])
     }
 
+    public func postHasBeenJustSaved() {
+        sendEvent(.postHasBeenJustSaved)
+    }
+
     public func replace(block: Block) {
         sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
     }
