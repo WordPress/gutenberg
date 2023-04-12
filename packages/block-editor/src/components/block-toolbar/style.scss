@@ -163,8 +163,19 @@
 		}
 	}
 
-	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+	.block-editor-block-mover .block-editor-block-mover__move-button-container {
 		width: auto;
+	}
+
+	.block-editor-block-mover.is-horizontal .block-editor-block-mover__move-button-container {
+		padding-left: 6px;
+		padding-right: 6px;
+
+		> * {
+			// Override !important padding rules set in block mover styles.
+			padding-left: 6px !important;
+			padding-right: 6px !important;
+		}
 	}
 
 	// Mover overrides.
