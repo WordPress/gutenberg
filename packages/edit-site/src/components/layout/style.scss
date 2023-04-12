@@ -191,6 +191,8 @@
 	.edit-site-layout__view-mode-toggle-icon {
 		display: flex;
 		border-radius: $radius-block-ui;
+		height: $grid-unit-80;
+		width: $grid-unit-80;
 	}
 }
 

@@ -60,10 +60,9 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	);
 
 	const controls = useAnimation();
-
 	useEffect( () => {
 		controls.set( { layout: true } );
-	}, [] );
+	} );
 
 	return (
 		<motion.div
@@ -100,10 +99,10 @@ const SiteHub = forwardRef( ( props, ref ) => {
 						<motion.div
 							initial={ false }
 							animate={ {
-								scale: canvasMode === 'view' ? 0.5 : 1.04,
+								scale: canvasMode === 'view' ? 0.5 : 1,
 							} }
 							whileHover={ {
-								scale: canvasMode === 'view' ? 0.5 : 1,
+								scale: canvasMode === 'view' ? 0.5 : 0.96,
 							} }
 							transition={ {
 								type: 'tween',
