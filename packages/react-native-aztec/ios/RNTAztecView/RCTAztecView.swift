@@ -101,7 +101,7 @@ class RCTAztecView: Aztec.TextView {
     /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
     /// on `textViewDidChange` and `textViewDidChangeSelection`
     private var isInsertingDictationResult = false
-
+    
     // MARK: - Font
 
     /// Flag to enable using the defaultFont in Aztec for specific blocks
@@ -234,7 +234,10 @@ class RCTAztecView: Aztec.TextView {
         previousContentSize = newSize
 
         let body = packForRN(newSize, withName: "contentSize")
-        onContentSizeChange(body)
+        let caretData = packCaretDataForRN()
+        var result = body
+        result.merge(caretData) { (_, new) in new }
+        onContentSizeChange(result)
     }
 
     // MARK: - Paste handling
@@ -479,6 +482,7 @@ class RCTAztecView: Aztec.TextView {
             if !(caretEndRect.isInfinite || caretEndRect.isNull) {
                 result["selectionEndCaretX"] = caretEndRect.origin.x
                 result["selectionEndCaretY"] = caretEndRect.origin.y
+                result["selectionEndCaretHeight"] = caretEndRect.size.height
             }
         }
 
@@ -792,7 +796,8 @@ extension RCTAztecView: UITextViewDelegate {
 
     override func becomeFirstResponder() -> Bool {
         if !isFirstResponder && canBecomeFirstResponder {
-            onFocus?([:])
+            let caretData = packCaretDataForRN()
+            onFocus?(caretData)
         }
         return super.becomeFirstResponder()
     }

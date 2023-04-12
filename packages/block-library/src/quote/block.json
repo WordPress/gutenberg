@@ -30,6 +30,7 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"anchor": true,
+		"html": false,
 		"__experimentalOnEnter": true,
 		"typography": {
 			"fontSize": true,

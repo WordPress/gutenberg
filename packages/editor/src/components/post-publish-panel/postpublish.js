@@ -17,6 +17,7 @@ import PostScheduleLabel from '../post-schedule/label';
 import { store as editorStore } from '../../store';
 
 const POSTNAME = '%postname%';
+const PAGENAME = '%pagename%';
 
 /**
  * Returns URL for a future post.
@@ -31,6 +32,10 @@ const getFuturePostUrl = ( post ) => {
 
 	if ( post.permalink_template.includes( POSTNAME ) ) {
 		return post.permalink_template.replace( POSTNAME, slug );
+	}
+
+	if ( post.permalink_template.includes( PAGENAME ) ) {
+		return post.permalink_template.replace( PAGENAME, slug );
 	}
 
 	return post.permalink_template;

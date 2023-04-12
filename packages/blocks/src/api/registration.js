@@ -169,6 +169,17 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 				serverSideBlockDefinitions[ blockName ].ancestor =
 					definitions[ blockName ].ancestor;
 			}
+			// The `selectors` prop is not yet included in the server provided
+			// definitions. Polyfill it as well. This can be removed when the
+			// minimum supported WordPress is >= 6.3.
+			if (
+				serverSideBlockDefinitions[ blockName ].selectors ===
+					undefined &&
+				definitions[ blockName ].selectors
+			) {
+				serverSideBlockDefinitions[ blockName ].selectors =
+					definitions[ blockName ].selectors;
+			}
 			continue;
 		}
 
@@ -203,6 +214,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'attributes',
 		'providesContext',
 		'usesContext',
+		'selectors',
 		'supports',
 		'styles',
 		'example',
@@ -236,7 +248,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
  *
- * For more in-depth information on registering a custom block see the [Create a block tutorial](docs/how-to-guides/block-tutorial/README.md)
+ * For more in-depth information on registering a custom block see the [Create a block tutorial](/docs/getting-started/create-block/README.md)
  *
  * @param {string|Object} blockNameOrMetadata Block type name or its metadata.
  * @param {Object}        settings            Block settings.
@@ -290,6 +302,7 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		attributes: {},
 		providesContext: {},
 		usesContext: [],
+		selectors: {},
 		supports: {},
 		styles: [],
 		variations: [],
@@ -510,6 +523,10 @@ export function setDefaultBlockName( name ) {
 /**
  * Assigns name of block for handling block grouping interactions.
  *
+ * This function lets you select a different block to group other blocks in instead of the
+ * default `core/group` block. This function must be used in a component or when the DOM is fully
+ * loaded. See https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dom-ready/
+ *
  * @param {string} name Block name.
  *
  * @example
@@ -520,7 +537,7 @@ export function setDefaultBlockName( name ) {
  *
  *     return (
  *         <Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
- *             { __( 'Set the default block to Heading' ) }
+ *             { __( 'Wrap in columns' ) }
  *         </Button>
  *     );
  * };

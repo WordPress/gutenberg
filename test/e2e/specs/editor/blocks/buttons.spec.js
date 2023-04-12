@@ -50,7 +50,7 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
 		await editor.insertBlock( { name: 'core/buttons' } );
-		await pageUtils.pressKeyWithModifier( 'primary', 'k' );
+		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
 			page.locator( 'role=combobox[name="URL"i]' )
 		).toBeFocused();
@@ -78,7 +78,7 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/issues/34307
 		await editor.insertBlock( { name: 'core/buttons' } );
-		await pageUtils.pressKeyWithModifier( 'primary', 'k' );
+		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
 			page.locator( 'role=combobox[name="URL"i]' )
 		).toBeFocused();
@@ -107,7 +107,7 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/issues/34307
 		await editor.insertBlock( { name: 'core/buttons' } );
-		await pageUtils.pressKeyWithModifier( 'primary', 'k' );
+		await pageUtils.pressKeys( 'primary+k' );
 
 		const urlInput = page.locator( 'role=combobox[name="URL"i]' );
 
@@ -116,7 +116,7 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Move to "Edit" and switch UI back to edit mode
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		// Check the value of the URL input has had http:// prepended.
@@ -130,7 +130,7 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'WordPress' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'k' );
+		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'https://www.wordpress.org/' );
 		await page.keyboard.press( 'Enter' );
 		// Make sure that the dialog is still opened, and that focus is retained

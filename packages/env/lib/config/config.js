@@ -331,7 +331,7 @@ function getNumberFromEnvVariable( varName ) {
  * Gets the `wp-env` home directory in which generated files are created.
  *
  * By default: '~/.wp-env/'. On Linux with snap packages: '~/wp-env/'. Can be
- * overriden with the WP_ENV_HOME environment variable.
+ * overridden with the WP_ENV_HOME environment variable.
  *
  * @return {Promise<string>} The absolute path to the `wp-env` home directory.
  */
