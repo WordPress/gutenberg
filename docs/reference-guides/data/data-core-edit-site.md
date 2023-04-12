@@ -133,6 +133,8 @@ _Returns_
 
 ### isFeatureActive
 
+> **Deprecated**
+
 Returns whether the given feature is enabled or not.
 
 _Parameters_
@@ -302,8 +304,7 @@ _Returns_
 
 ### setPage
 
-Resolves the template for a page and displays both. If no path is given, attempts
-to use the postId to generate a path like `?p=${ postId }`.
+Resolves the template for a page and displays both. If no path is given, attempts to use the postId to generate a path like `?p=${ postId }`.
 
 _Parameters_
 

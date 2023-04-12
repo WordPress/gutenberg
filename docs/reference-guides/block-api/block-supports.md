@@ -139,7 +139,6 @@ supports: {
 -   Default value: null
 -   Subproperties:
     -   `background`: type `boolean`, default value `true`
-    -   `__experimentalDuotone`: type `string`, default value undefined
     -   `gradients`: type `boolean`, default value `false`
     -   `link`: type `boolean`, default value `false`
     -   `text`: type `boolean`, default value `true`
@@ -231,46 +230,9 @@ When the block declares support for `color.background`, the attributes definitio
 
 ### color.__experimentalDuotone
 
-This property adds UI controls which allow to apply a duotone filter to a block or part of a block.
+_**Note:** Deprecated since WordPress 6.3._
 
-The parent selector is automatically added much like nesting in Sass/SCSS (however, the `&` selector is not supported).
-
-```js
-supports: {
-    color: {
-        // Apply the filter to the same selector in both edit and save.
-        __experimentalDuotone: '> .duotone-img, > .duotone-video',
-
-        // Default values must be disabled if you don't want to use them with duotone.
-        background: false,
-        text: false
-    }
-}
-```
-
-Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
-
-When the block declares support for `color.__experimentalDuotone`, the attributes definition is extended to include the attribute `style`:
-
-- `style`: attribute of `object` type with no default assigned.
-
-  The block can apply a default duotone color by specifying its own attribute with a default e.g.:
-
-  ```js
-  attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  duotone: [
-                      '#FFF',
-                      '#000'
-                  ]
-              }
-          }
-      }
-  }
-  ```
+This property has been replaced by [`filter.duotone`](#filter-duotone). 
 
 ### color.gradients
 
@@ -498,6 +460,60 @@ attributes: {
     }
 }
 ```
+
+## filter
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `duotone`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the properties related to filters. When it does, the block editor will show UI controls for the user to set their values.
+
+### filter.duotone
+
+This property adds UI controls which allow the user to apply a duotone filter to
+a block or part of a block.
+
+```js
+supports: {
+    filter: {
+        // Enable duotone support
+        duotone: true
+    }
+},
+selectors: {
+    filter: {
+        // Apply the filter to img elements inside the image block
+        duotone: '.wp-block-image img'
+    }
+}
+```
+
+The filter can be applied to an element inside the block by setting the `selectors.filter.duotone` selector.
+
+Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
+
+When the block declares support for `filter.duotone`, the attributes definition is extended to include the attribute `style`:
+
+- `style`: attribute of `object` type with no default assigned.
+
+  The block can apply a default duotone color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      style: {
+          type: 'object',
+          default: {
+              color: {
+                  duotone: [
+                      '#FFF',
+                      '#000'
+                  ]
+              }
+          }
+      }
+  }
+  ```
 
 ## html
 

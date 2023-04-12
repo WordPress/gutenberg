@@ -384,39 +384,40 @@ const withElementsStyles = createHigherOrderComponent(
 		);
 
 		const styles = useMemo( () => {
-			const rawElementsStyles = props.attributes.style?.elements;
+			// The .editor-styles-wrapper selector is required on elements styles. As it is
+			// added to all other editor styles, not providing it causes reset and global
+			// styles to override element styles because of higher specificity.
+			const elements = [
+				{
+					styles: ! skipLinkColorSerialization
+						? props.attributes.style?.elements?.link
+						: undefined,
+					selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS.link }`,
+				},
+				{
+					styles: ! skipLinkColorSerialization
+						? props.attributes.style?.elements?.link?.[ ':hover' ]
+						: undefined,
+					selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS.link }:hover`,
+				},
+			];
 			const elementCssRules = [];
-			if (
-				rawElementsStyles &&
-				Object.keys( rawElementsStyles ).length > 0
-			) {
-				// Remove values based on whether serialization has been skipped for a specific style.
-				const filteredElementsStyles = {
-					...rawElementsStyles,
-					link: {
-						...rawElementsStyles.link,
-						color: ! skipLinkColorSerialization
-							? rawElementsStyles.link?.color
-							: undefined,
-					},
-				};
-
-				for ( const [ elementName, elementStyles ] of Object.entries(
-					filteredElementsStyles
-				) ) {
+			for ( const { styles: elementStyles, selector } of elements ) {
+				if ( elementStyles ) {
 					const cssRule = compileCSS( elementStyles, {
-						// The .editor-styles-wrapper selector is required on elements styles. As it is
-						// added to all other editor styles, not providing it causes reset and global
-						// styles to override element styles because of higher specificity.
-						selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
+						selector,
 					} );
-					if ( !! cssRule ) {
-						elementCssRules.push( cssRule );
-					}
+					elementCssRules.push( cssRule );
 				}
 			}
-			return elementCssRules.length > 0 ? elementCssRules : undefined;
-		}, [ props.attributes.style?.elements ] );
+			return elementCssRules.length > 0
+				? elementCssRules.join( '' )
+				: undefined;
+		}, [
+			props.attributes.style?.elements,
+			blockElementsContainerIdentifier,
+			skipLinkColorSerialization,
+		] );
 
 		const element = useContext( BlockList.__unstableElementContext );
 

@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { forwardRef } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -29,7 +30,6 @@ const HUB_ANIMATION_DURATION = 0.3;
 
 const SiteHub = forwardRef( ( props, ref ) => {
 	const { canvasMode, dashboardLink } = useSelect( ( select ) => {
-		select( editSiteStore ).getEditedPostType();
 		const { getCanvasMode, getSettings } = unlock(
 			select( editSiteStore )
 		);
@@ -46,7 +46,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 	const siteIconButtonProps = isBackToDashboardButton
 		? {
 				href: dashboardLink || 'index.php',
-				'aria-label': __( 'Go back to the dashboard' ),
+				label: __( 'Go back to the Dashboard' ),
 		  }
 		: {
 				label: __( 'Open Navigation Sidebar' ),
@@ -97,7 +97,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 
 				{ showLabels && (
 					<div className="edit-site-site-hub__site-title">
-						{ siteTitle }
+						{ decodeEntities( siteTitle ) }
 					</div>
 				) }
 			</HStack>

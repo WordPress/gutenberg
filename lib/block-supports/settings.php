@@ -115,7 +115,7 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 		)
 	);
 
-	// include preset css classes on the the stylesheet.
+	// include preset css classes on the stylesheet.
 	$styles .= $theme_json_object->get_stylesheet(
 		array( 'presets' ),
 		null,
@@ -131,6 +131,8 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 
 	return null;
 }
-
+// Remove WordPress core filter to avoid rendering duplicate settings style blocks.
+remove_filter( 'render_block', '_wp_add_block_level_presets_class', 10, 2 );
+remove_filter( 'pre_render_block', '_wp_add_block_level_preset_styles', 10, 2 );
 add_filter( 'render_block', '_gutenberg_add_block_level_presets_class', 10, 2 );
 add_filter( 'pre_render_block', '_gutenberg_add_block_level_preset_styles', 10, 2 );

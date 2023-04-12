@@ -48,8 +48,6 @@ export default function ImageSizeControl( {
 			) }
 			{ isResizable && (
 				<div className="block-editor-image-size-control">
-					<p>{ __( 'Image dimensions' ) }</p>
-
 					<HStack align="baseline" spacing="3">
 						<NumberControl
 							className="block-editor-image-size-control__width"

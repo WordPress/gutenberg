@@ -22,6 +22,7 @@ import { __ } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { CommandMenu } from '@wordpress/commands';
 
 /**
  * Internal dependencies
@@ -42,6 +43,7 @@ import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
+import { useCommands } from '../../hooks/commands';
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
@@ -60,6 +62,7 @@ export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
 	useSyncCanvasModeWithURL();
+	useCommands();
 
 	const hubRef = useRef();
 	const { params } = useLocation();
@@ -123,6 +126,7 @@ export default function Layout() {
 
 	return (
 		<>
+			{ window?.__experimentalEnableCommandCenter && <CommandMenu /> }
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
 			{ fullResizer }

@@ -183,39 +183,18 @@ export default function PostFeaturedImageEdit( {
 	let image;
 
 	/**
-	 * A post featured image block placed in a query loop
-	 * does not have image replacement or upload options.
+	 * A Post Featured Image block should not have image replacement
+	 * or upload options in the following cases:
+	 * - Is placed in a Query Loop. This is a consious decision to
+	 * prevent content editing of different posts in Query Loop, and
+	 * this could change in the future.
+	 * - Is in a context where it does not have a postId (for example
+	 * in a template or template part).
 	 */
-	if ( ! featuredImage && isDescendentOfQueryLoop ) {
+	if ( ! featuredImage && ( isDescendentOfQueryLoop || ! postId ) ) {
 		return (
 			<>
 				{ controls }
-				<div { ...blockProps }>
-					{ placeholder() }
-					<Overlay
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						clientId={ clientId }
-					/>
-				</div>
-			</>
-		);
-	}
-
-	/**
-	 * A post featured image placed in a block template, outside a query loop,
-	 * does not have a postId and will always be a placeholder image.
-	 * It does not have image replacement, upload, or link options.
-	 */
-	if ( ! featuredImage && ! postId ) {
-		return (
-			<>
-				<DimensionControls
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					imageSizeOptions={ imageSizeOptions }
-				/>
 				<div { ...blockProps }>
 					{ placeholder() }
 					<Overlay
