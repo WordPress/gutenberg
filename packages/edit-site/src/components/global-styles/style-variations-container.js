@@ -11,7 +11,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
-import { __experimentalGrid as Grid } from '@wordpress/components';
+import {
+	__experimentalGrid as Grid,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -23,6 +26,7 @@ import StylesPreview from './preview';
 import { unlock } from '../../private-apis';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+let uniqueId = 0;
 
 function compareVariations( a, b ) {
 	return (
@@ -66,6 +70,8 @@ function Variation( { variation } ) {
 		return compareVariations( user, variation );
 	}, [ user, variation ] );
 
+	const describedbyID = `style-variations-item-${ ++uniqueId }`;
+
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			<div
@@ -81,6 +87,9 @@ function Variation( { variation } ) {
 				tabIndex="0"
 				aria-label={ variation?.title }
 				aria-current={ isActive }
+				aria-describedby={
+					!! variation?.description ? describedbyID : undefined
+				}
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
@@ -90,6 +99,11 @@ function Variation( { variation } ) {
 						isFocused={ isFocused }
 						withHoverView
 					/>
+					{ variation?.description && (
+						<VisuallyHidden id={ describedbyID }>
+							{ variation?.description }
+						</VisuallyHidden>
+					) }
 				</div>
 			</div>
 		</GlobalStylesContext.Provider>
