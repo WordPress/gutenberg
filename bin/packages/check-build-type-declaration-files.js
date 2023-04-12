@@ -28,7 +28,12 @@ function stripJsonComments( jsonString ) {
 	return cleanedLines.join( '\n' );
 }
 
-async function checkDeclarationFile( file ) {
+async function readTsConfig( tsconfigPath ) {
+	const tsconfigRaw = await fs.readFile( tsconfigPath, 'utf-8' );
+	return JSON.parse( stripJsonComments( tsconfigRaw ) );
+}
+
+async function typecheckDeclarations( file ) {
 	return new Promise( ( resolve, reject ) => {
 		exec( `npx tsc --noEmit ${ file }`, ( error, stdout, stderr ) => {
 			if ( error ) {
@@ -38,11 +43,6 @@ async function checkDeclarationFile( file ) {
 			}
 		} );
 	} );
-}
-
-async function readTsConfig( tsconfigPath ) {
-	const tsconfigRaw = await fs.readFile( tsconfigPath, 'utf-8' );
-	return JSON.parse( stripJsonComments( tsconfigRaw ) );
 }
 
 // Returns the path to the build-types declaration file for a package if it exists.
@@ -65,16 +65,19 @@ async function getDecFile( packagePath ) {
 
 async function checkUnverifiedDeclarationFiles() {
 	const packageDir = path.resolve( 'packages' );
-	const subDirs = ( await fs.readdir( packageDir, { withFileTypes: true } ) )
+	const packageDirs = (
+		await fs.readdir( packageDir, { withFileTypes: true } )
+	 )
 		.filter( ( dirent ) => dirent.isDirectory() )
 		.map( ( dirent ) => path.join( packageDir, dirent.name ) );
 
 	const declarations = (
 		await Promise.all(
-			subDirs.map( async ( pkg ) => {
-				const tsconfigPath = path.join( pkg, 'tsconfig.json' );
+			packageDirs.map( async ( pkg ) => {
 				try {
-					const tsconfig = await readTsConfig( tsconfigPath );
+					const tsconfig = await readTsConfig(
+						path.join( pkg, 'tsconfig.json' )
+					);
 
 					if ( tsconfig.compilerOptions?.checkJs === false ) {
 						return getDecFile( pkg );
@@ -90,9 +93,7 @@ async function checkUnverifiedDeclarationFiles() {
 	 ).filter( Boolean );
 
 	const tscResults = await Promise.allSettled(
-		declarations.map( ( declaration ) =>
-			checkDeclarationFile( declaration )
-		)
+		declarations.map( typecheckDeclarations )
 	);
 
 	tscResults.forEach( ( { status, reason } ) => {
