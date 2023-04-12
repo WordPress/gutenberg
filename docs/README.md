@@ -10,15 +10,15 @@ The editor consists of several primary elements, as shown in the following figur
 
 The elements highlighted in the figure are:
 
-1. **Block inserter**: A panel for inserting blocks into the content canvas
+1. **Inserter**: A panel for inserting blocks into the content canvas
 2. **Content canvas**: The content editor, which holds content created with blocks
-3. **Block settings**: A sidebar panel for configuring a block’s settings
+3. **Settings sidebar.**: A sidebar panel for configuring a block’s settings (among other things)
 
 Through the Block editor, you create content modularly using Blocks. There are a number of [core blocks](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/) ready to be used, and you can also [create your own custom block](https://developer.wordpress.org/block-editor/getting-started/create-block/).
 
 A [Block](https://developer.wordpress.org/block-editor/explanations/architecture/key-concepts/#blocks) is a discrete element such as a Paragraph, Heading, Media element, or Embed. Each block is treated as a separate element with individual editing and format controls. When all these components are pieced together, they make up the content that is then [stored in the WordPress database](https://developer.wordpress.org/block-editor/explanations/architecture/data-flow/#serialization-and-parsing).
 
-The Block Editor is the result of the [work done on the **Gutenberg project**](https://developer.wordpress.org/block-editor/explanations/faq/#what-is-gutenberg) which is aimed to revolutionize the publishing experience.
+The Block Editor is the result of the [work done on the **Gutenberg project**](https://developer.wordpress.org/block-editor/explanations/faq/#what-is-gutenberg) which is aimed to revolutionize the WordPress editing experience.
 
 Besides offering an [enhanced editing experience](https://wordpress.org/gutenberg/) through visual content creation tools, the Block Editor is also a powerful developer platform with a [rich feature set of APIs](https://developer.wordpress.org/block-editor/reference-guides/) that allow it to be manipulated and extended in a multitude of different ways.
 
@@ -56,30 +56,10 @@ Gutenberg is open source software and anyone is welcome to contribute to the pro
 
 This handbook should be considered the canonical resource for all things related to block development. However there are other resources that can help you.
 
-
-### Developer Blog
-
-The [WordPress Developer Blog](https://developer.wordpress.org/news/) is an ever-growing resource of technical articles covering specific topics related to block development and a wide variety of use cases. The blog is also an excellent way to [keep up with the latest developments in WordPress](https://developer.wordpress.org/news/tag/roundup/).
-
-
-### Courses
-
-There are some useful courses available on the [Learn WordPress](https://learn.wordpress.org/) site:
-
-* [Introduction to Block Development: Build your first custom block](https://learn.wordpress.org/course/introduction-to-block-development-build-your-first-custom-block/) - This course is a step-by-step tutorial that guides you from beginner to full block development. The course will lead you step by step in developing an example project. It will also provide you with a solid foundation that will help you make better use of this handbook.
-* [Converting a Shortcode to a Block](https://learn.wordpress.org/course/converting-a-shortcode-to-a-block/) - This course shows you how to do something that is a common use case, namely taking a legacy shortcode based plugin and block-_ifying_ it.
-* [Using the WordPress Data Layer](https://learn.wordpress.org/course/using-the-wordpress-data-layer/) - This course teaches the principles of working with WordPress data in the block editor.
-
-### Videos
-
-[WordPress.tv](https://wordpress.tv/) is an ever-growing resource of videos ranging from talks at WordCamps to recordings of online workshops. You’re sure to find something to aid your learning about [block development](https://wordpress.tv/?s=block%20development&sort=newest) or the [block-editor](https://wordpress.tv/?s=block%20editor&sort=relevance) here.
-
-
-### Code
-
-Development of the block editor project is carried out in the [Gutenberg repository](https://github.com/WordPress/gutenberg/) on GitHub. The [`block-library` directory](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src) contains the core blocks and there you can see how they are built. 
-
-_The [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository is another useful reference._
+- [**WordPress Developer Blog**](https://developer.wordpress.org/news/) - An ever-growing resource of technical articles covering specific topics related to block development and a wide variety of use cases. The blog is also an excellent way to [keep up with the latest developments in WordPress](https://developer.wordpress.org/news/tag/roundup/).
+- [**Learn WordPress**](https://learn.wordpress.org/) - the WordPress hub for learning resources where you can find courses like [Introduction to Block Development: Build your first custom block](https://learn.wordpress.org/course/introduction-to-block-development-build-your-first-custom-block/), [Converting a Shortcode to a Block](https://learn.wordpress.org/course/converting-a-shortcode-to-a-block/) or [Using the WordPress Data Layer](https://learn.wordpress.org/course/using-the-wordpress-data-layer/)
+- [**WordPress.tv**](https://wordpress.tv/) - a hub of WordPress-related videos (from talks at WordCamps to recordings of online workshops) curated and moderated by the WordPress.org community. You’re sure to find something to aid your learning about [block development](https://wordpress.tv/?s=block%20development&sort=newest) or the [block-editor](https://wordpress.tv/?s=block%20editor&sort=relevance) here.
+- [**Gutenberg repository**](https://github.com/WordPress/gutenberg/) - development of the block editor project is carried out in this GitHub repository. The [`block-library` directory](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src) contains the core blocks and there you can see how they are built. _The [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository is another useful reference._
 
 
 ## Are you in the right place?
