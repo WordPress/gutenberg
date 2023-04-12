@@ -99,6 +99,7 @@ export function getFullWidthStyles(
  * @param {string}  blockName            The name of the block.
  * @param {number}  blockWidth           The width of the block.
  * @param {boolean} hasParents           Whether the block has parents.
+ * @param {number}  marginHorizontal     Default horizontal margin.
  * @param {string}  parentBlockAlignment The alignment of the parent block.
  * @param {string}  parentBlockName      The name of the parent block.
  * @param {number}  parentWidth          The width of the parent block.
@@ -110,6 +111,7 @@ export function getBlockMargin(
 	blockName,
 	blockWidth,
 	hasParents,
+	marginHorizontal,
 	parentBlockAlignment,
 	parentBlockName,
 	parentWidth,
@@ -117,19 +119,16 @@ export function getBlockMargin(
 ) {
 	const { isContainerRelated, isWider, isWideWidth, isFullWidth } =
 		alignmentHelpers;
-	const defaultMargin =
-		styles[ 'block-editor-hooks__use-editor-wrapper-styles-block' ]
-			?.marginLeft;
 
 	if ( isFullWidth( align ) ) {
 		if ( ! hasParents ) {
 			return 0;
 		}
-		return defaultMargin;
+		return marginHorizontal;
 	}
 
 	if ( isWideWidth( align ) ) {
-		return defaultMargin;
+		return marginHorizontal;
 	}
 
 	if (
@@ -137,9 +136,9 @@ export function getBlockMargin(
 		! isWider( blockWidth, 'medium' )
 	) {
 		if ( isContainerRelated( blockName ) || isWider( width, 'mobile' ) ) {
-			return defaultMargin;
+			return marginHorizontal;
 		}
-		return defaultMargin * 2;
+		return marginHorizontal * 2;
 	}
 
 	if (
@@ -148,11 +147,11 @@ export function getBlockMargin(
 	) {
 		const isScreenWidthEqual = parentWidth === width;
 		if ( isScreenWidthEqual || isWider( width, 'mobile' ) ) {
-			return defaultMargin;
+			return marginHorizontal;
 		}
 	}
 
-	return defaultMargin;
+	return marginHorizontal;
 }
 
 /**
@@ -164,6 +163,7 @@ export function getBlockMargin(
  * @param {number}  props.blockWidth           The width of the block.
  * @param {string}  props.contentResizeMode    The content resize mode.
  * @param {boolean} props.hasParents           Whether the block has parents.
+ * @param {number}  props.marginHorizontal     Default horizontal margin.
  * @param {string}  props.parentBlockAlignment The alignment of the parent block.
  * @param {string}  props.parentBlockName      The name of the parent block.
  * @param {number}  props.parentWidth          The width of the parent block.
@@ -176,6 +176,7 @@ export function useEditorWrapperStyles( {
 	blockWidth,
 	contentResizeMode,
 	hasParents,
+	marginHorizontal,
 	parentBlockAlignment,
 	parentBlockName,
 	parentWidth,
@@ -191,6 +192,7 @@ export function useEditorWrapperStyles( {
 				blockName,
 				blockWidth,
 				hasParents,
+				marginHorizontal,
 				parentBlockAlignment,
 				parentBlockName,
 				parentWidth,
@@ -201,6 +203,7 @@ export function useEditorWrapperStyles( {
 			blockName,
 			blockWidth,
 			hasParents,
+			marginHorizontal,
 			parentBlockAlignment,
 			parentBlockName,
 			parentWidth,

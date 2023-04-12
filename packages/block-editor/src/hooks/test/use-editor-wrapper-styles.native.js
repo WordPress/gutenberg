@@ -140,17 +140,30 @@ describe( 'getBlockMargin', () => {
 	} );
 
 	it( 'should return 0 for full width alignment without parents', () => {
-		const result = getBlockMargin( 'full', 'core/cover', 300, false );
+		const result = getBlockMargin( 'full', 'core/cover', 300, false, 16 );
 		expect( result ).toBe( 0 );
 	} );
 
+	it( 'should return 8 for no alignment set and custom marginHorizontal', () => {
+		const result = getBlockMargin(
+			undefined,
+			'core/image',
+			300,
+			true,
+			8,
+			undefined,
+			'core/gallery'
+		);
+		expect( result ).toBe( 8 );
+	} );
+
 	it( 'should return default margin for full width alignment with parents', () => {
-		const result = getBlockMargin( 'full', 'core/cover', 300, true );
+		const result = getBlockMargin( 'full', 'core/cover', 300, true, 16 );
 		expect( result ).toBe( 16 );
 	} );
 
 	it( 'should return default margin for wide width alignment', () => {
-		const result = getBlockMargin( 'wide', 'core/columns', 300, false );
+		const result = getBlockMargin( 'wide', 'core/columns', 300, false, 16 );
 		expect( result ).toBe( 16 );
 	} );
 
@@ -160,6 +173,7 @@ describe( 'getBlockMargin', () => {
 			'core/cover',
 			300,
 			true,
+			16,
 			'full',
 			'core/group',
 			1024,
@@ -174,6 +188,7 @@ describe( 'getBlockMargin', () => {
 			'core/cover',
 			300,
 			true,
+			16,
 			'full',
 			'core/columns',
 			320,
@@ -188,6 +203,7 @@ describe( 'getBlockMargin', () => {
 			'core/cover',
 			300,
 			true,
+			16,
 			undefined,
 			'core/columns',
 			1024,
@@ -202,6 +218,7 @@ describe( 'getBlockMargin', () => {
 			'core/paragraph',
 			300,
 			true,
+			16,
 			undefined,
 			'core/group'
 		);
@@ -222,7 +239,7 @@ describe( 'useEditorWrapperStyles', () => {
 		} );
 	} );
 
-	it( 'should return the default wrapper styles and margin when no props are set', () => {
+	it( 'should return the default wrapper styles when no props are set', () => {
 		// Arrange
 		jest.spyOn(
 			require( 'react-native' ),
@@ -237,7 +254,6 @@ describe( 'useEditorWrapperStyles', () => {
 			expect.objectContaining( defaultCanvasStyles ),
 			{},
 		] );
-		expect( result.current[ 1 ] ).toEqual( 16 );
 	} );
 
 	it( 'should return the correct wrapper styles and margin for wide (medium) alignment', () => {
@@ -253,6 +269,7 @@ describe( 'useEditorWrapperStyles', () => {
 				align: 'wide',
 				blockName: 'core/group',
 				blockWidth: 800,
+				marginHorizontal: 16,
 			} )
 		);
 
@@ -279,6 +296,7 @@ describe( 'useEditorWrapperStyles', () => {
 				align: 'wide',
 				blockName: 'core/group',
 				blockWidth: 700,
+				marginHorizontal: 16,
 			} )
 		);
 
@@ -305,6 +323,7 @@ describe( 'useEditorWrapperStyles', () => {
 				align: 'wide',
 				blockName: 'core/group',
 				blockWidth: 800,
+				marginHorizontal: 16,
 			} )
 		);
 
@@ -331,6 +350,7 @@ describe( 'useEditorWrapperStyles', () => {
 				align: 'full',
 				blockName: 'core/cover',
 				blockWidth: 700,
+				marginHorizontal: 16,
 			} )
 		);
 
@@ -353,7 +373,7 @@ describe( 'useEditorWrapperStyles', () => {
 
 		// Act
 		const { result } = renderHook( () =>
-			useEditorWrapperStyles( { align: 'left' } )
+			useEditorWrapperStyles( { align: 'left', marginHorizontal: 16 } )
 		);
 
 		// Assert
@@ -373,7 +393,7 @@ describe( 'useEditorWrapperStyles', () => {
 
 		// Act
 		const { result } = renderHook( () =>
-			useEditorWrapperStyles( { align: 'center' } )
+			useEditorWrapperStyles( { align: 'center', marginHorizontal: 16 } )
 		);
 
 		// Assert
@@ -393,7 +413,7 @@ describe( 'useEditorWrapperStyles', () => {
 
 		// Act
 		const { result } = renderHook( () =>
-			useEditorWrapperStyles( { align: 'right' } )
+			useEditorWrapperStyles( { align: 'right', marginHorizontal: 16 } )
 		);
 
 		// Assert
@@ -413,7 +433,7 @@ describe( 'useEditorWrapperStyles', () => {
 
 		// Act
 		const { result } = renderHook( () =>
-			useEditorWrapperStyles( { reversed: true } )
+			useEditorWrapperStyles( { reversed: true, marginHorizontal: 16 } )
 		);
 
 		// Assert
@@ -437,7 +457,10 @@ describe( 'useEditorWrapperStyles', () => {
 
 		// Act
 		const { result } = renderHook( () =>
-			useEditorWrapperStyles( { contentResizeMode: 'stretch' } )
+			useEditorWrapperStyles( {
+				contentResizeMode: 'stretch',
+				marginHorizontal: 16,
+			} )
 		);
 
 		// Assert
