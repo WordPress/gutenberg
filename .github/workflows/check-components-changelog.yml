@@ -71,15 +71,6 @@ jobs:
                     pr_link_grep_pattern="(\[#${PR_NUMBER}\](https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}))"
                     current_pr_entry_line_no=$(grep -n -e "${pr_link_grep_pattern}" "${changelog_path}" | sed -r "s,^([0-9]*):-.*${pr_link_pattern}.*,\1,")
 
-                    # Confirm that there is an entry with the right PR link it's part of the current changes
-                    if ! ( grep -nq -e "${pr_link_grep_pattern}" "${changelog_path}" \
-                      && echo "${changed_lines[@]}" | grep -qw "$current_pr_entry_line_no" ); then
-                        echo "Please make sure your CHANGELOG entry has a link to the current PR."
-                        echo
-                        echo "${optional_check_notice}"
-                        exit 1
-                    fi
-
                     # Confirm that there is an 'Unreleased' section and that the relevant entry is in that section
                     if ! grep -nq -e '^## Unreleased' "${changelog_path}" || \
                      ! [[ \
@@ -87,6 +78,15 @@ jobs:
                         ${current_pr_entry_line_no} -lt ${latest_release_header_line_no} \
                       ]]; then
                         echo "Please make sure your CHANGELOG entry is in the \`## Unreleased\` section"
+                        echo
+                        echo "${optional_check_notice}"
+                        exit 1
+                    fi
+
+                    # Confirm that there is an entry with the right PR link it's part of the current changes
+                    if ! ( grep -nq -e "${pr_link_grep_pattern}" "${changelog_path}" \
+                      && echo "${changed_lines[@]}" | grep -qw "$current_pr_entry_line_no" ); then
+                        echo "Please make sure your CHANGELOG entry has a link to the current PR."
                         echo
                         echo "${optional_check_notice}"
                         exit 1
