@@ -4,6 +4,8 @@
 import triggerFetch from '@wordpress/api-fetch';
 import { controls as dataControls } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import type { StoreDescriptor } from '@wordpress/data';
+import type { APIFetchOptions } from '@wordpress/api-fetch';
 
 /**
  * Dispatches a control action for triggering an api fetch call.
@@ -24,7 +26,7 @@ import deprecated from '@wordpress/deprecated';
  *
  * @return {Object} The control descriptor.
  */
-export function apiFetch( request ) {
+export function apiFetch( request: APIFetchOptions ) {
 	return {
 		type: 'API_FETCH',
 		request,
@@ -35,45 +37,67 @@ export function apiFetch( request ) {
  * Control for resolving a selector in a registered data store.
  * Alias for the `resolveSelect` built-in control in the `@wordpress/data` package.
  *
- * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
+ * @param storeNameOrDescriptor The store object or identifier.
+ * @param selectorName          The selector name.
+ * @param args                  Arguments passed without change to the `@wordpress/data` control.
  */
-export function select( ...args ) {
+export function select(
+	storeNameOrDescriptor: string | StoreDescriptor,
+	selectorName: string,
+	...args: any[]
+) {
 	deprecated( '`select` control in `@wordpress/data-controls`', {
 		since: '5.7',
 		alternative: 'built-in `resolveSelect` control in `@wordpress/data`',
 	} );
 
-	return dataControls.resolveSelect( ...args );
+	return dataControls.resolveSelect(
+		storeNameOrDescriptor,
+		selectorName,
+		...args
+	);
 }
 
 /**
  * Control for calling a selector in a registered data store.
  * Alias for the `select` built-in control in the `@wordpress/data` package.
  *
- * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
+ * @param storeNameOrDescriptor The store object or identifier.
+ * @param selectorName          The selector name.
+ * @param args                  Arguments passed without change to the `@wordpress/data` control.
  */
-export function syncSelect( ...args ) {
+export function syncSelect(
+	storeNameOrDescriptor: string | StoreDescriptor,
+	selectorName: string,
+	...args: any[]
+) {
 	deprecated( '`syncSelect` control in `@wordpress/data-controls`', {
 		since: '5.7',
 		alternative: 'built-in `select` control in `@wordpress/data`',
 	} );
 
-	return dataControls.select( ...args );
+	return dataControls.select( storeNameOrDescriptor, selectorName, ...args );
 }
 
 /**
  * Control for dispatching an action in a registered data store.
  * Alias for the `dispatch` control in the `@wordpress/data` package.
  *
- * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
+ * @param storeNameOrDescriptor The store object or identifier.
+ * @param actionName            The action name.
+ * @param args                  Arguments passed without change to the `@wordpress/data` control.
  */
-export function dispatch( ...args ) {
+export function dispatch(
+	storeNameOrDescriptor: string | StoreDescriptor,
+	actionName: string,
+	...args: any[]
+) {
 	deprecated( '`dispatch` control in `@wordpress/data-controls`', {
 		since: '5.7',
 		alternative: 'built-in `dispatch` control in `@wordpress/data`',
 	} );
 
-	return dataControls.dispatch( ...args );
+	return dataControls.dispatch( storeNameOrDescriptor, actionName, ...args );
 }
 
 /**
@@ -95,7 +119,7 @@ export function dispatch( ...args ) {
  *
  * @return {Object} The control descriptor.
  */
-export const __unstableAwaitPromise = function ( promise ) {
+export const __unstableAwaitPromise = function < T >( promise: Promise< T > ) {
 	return {
 		type: 'AWAIT_PROMISE',
 		promise,
@@ -130,8 +154,8 @@ export const __unstableAwaitPromise = function ( promise ) {
  * store.
  */
 export const controls = {
-	AWAIT_PROMISE: ( { promise } ) => promise,
-	API_FETCH( { request } ) {
+	AWAIT_PROMISE: < T >( { promise }: { promise: Promise< T > } ) => promise,
+	API_FETCH( { request }: { request: APIFetchOptions } ) {
 		return triggerFetch( request );
 	},
 };
