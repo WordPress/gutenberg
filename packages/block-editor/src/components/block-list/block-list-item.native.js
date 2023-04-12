@@ -154,7 +154,7 @@ function BlockListItemContent( {
  * @param {string}   props.rootClientId                 The root client ID.
  * @param {Function} props.shouldShowInnerBlockAppender Whether to show the inner block appender.
  *
- * @return {WPComponent} The rendered block list item or null if the block width is not provided.
+ * @return {WPComponent|null} The rendered block list item or null if the block width is not provided.
  */
 function BlockListItem( props ) {
 	const {
