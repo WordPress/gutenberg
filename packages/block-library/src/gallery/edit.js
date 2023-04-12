@@ -562,9 +562,11 @@ function GalleryEdit( props ) {
 							max={ Math.min( MAX_COLUMNS, images.length ) }
 							{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 							required
+							size="__unstable-large"
 						/>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Crop images' ) }
 						checked={ !! imageCrop }
 						onChange={ toggleImageCrop }
@@ -577,9 +579,11 @@ function GalleryEdit( props ) {
 						onChange={ setLinkTo }
 						options={ linkOptions }
 						hideCancelButton={ true }
+						size="__unstable-large"
 					/>
 					{ hasLinkTo && (
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							checked={ linkTarget === '_blank' }
 							onChange={ toggleOpenInNewTab }
@@ -588,17 +592,21 @@ function GalleryEdit( props ) {
 					{ imageSizeOptions?.length > 0 && (
 						<SelectControl
 							__nextHasNoMarginBottom
-							label={ __( 'Image size' ) }
+							label={ __( 'Resolution' ) }
+							help={ __(
+								'Select the size of the source images.'
+							) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
 							hideCancelButton={ true }
+							size="__unstable-large"
 						/>
 					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
-								{ __( 'Image size' ) }
+								{ __( 'Resolution' ) }
 							</BaseControl.VisualLabel>
 							<View className={ 'gallery-image-sizes__loading' }>
 								<Spinner />

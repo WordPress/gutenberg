@@ -25,14 +25,14 @@ import { __, sprintf } from '@wordpress/i18n';
 import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
 import BlockEditor from '../block-editor';
 import CodeEditor from '../code-editor';
-import KeyboardShortcuts from '../keyboard-shortcuts';
+import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
-import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
+
 import useTitle from '../routes/use-title';
 import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../private-apis';
@@ -67,6 +67,7 @@ export default function Editor() {
 		isInserterOpen,
 		isListViewOpen,
 		showIconLabels,
+		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -94,6 +95,10 @@ export default function Editor() {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			showBlockBreadcrumbs: select( preferencesStore ).get(
+				'core/edit-site',
+				'showBlockBreadcrumbs'
+			),
 		};
 	}, [] );
 	const { setEditedPostContext } = useDispatch( editSiteStore );
@@ -101,8 +106,11 @@ export default function Editor() {
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
-	const showBlockBreakcrumb =
-		isEditMode && showVisualEditor && blockEditorMode !== 'zoom-out';
+	const shouldShowBlockBreakcrumbs =
+		showBlockBreadcrumbs &&
+		isEditMode &&
+		showVisualEditor &&
+		blockEditorMode !== 'zoom-out';
 	const shouldShowInserter = isEditMode && showVisualEditor && isInserterOpen;
 	const shouldShowListView = isEditMode && showVisualEditor && isListViewOpen;
 	const secondarySidebarLabel = isListViewOpen
@@ -151,75 +159,72 @@ export default function Editor() {
 	return (
 		<>
 			{ isEditMode && <WelcomeGuide /> }
-			<KeyboardShortcuts.Register />
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
 					kind="postType"
 					type={ editedPostType }
 					id={ editedPostId }
 				>
-					<GlobalStylesProvider>
-						<BlockContextProvider value={ blockContext }>
-							<SidebarComplementaryAreaFills />
-							{ isEditMode && <StartTemplateOptions /> }
-							<InterfaceSkeleton
-								enableRegionNavigation={ false }
-								className={
-									showIconLabels && 'show-icon-labels'
-								}
-								notices={ isEditMode && <EditorSnackbars /> }
-								content={
-									<>
-										<GlobalStylesRenderer />
-										{ isEditMode && <EditorNotices /> }
-										{ showVisualEditor && editedPost && (
-											<BlockEditor />
-										) }
-										{ editorMode === 'text' &&
-											editedPost &&
-											isEditMode && <CodeEditor /> }
-										{ hasLoadedPost && ! editedPost && (
-											<Notice
-												status="warning"
-												isDismissible={ false }
-											>
-												{ __(
-													"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-												) }
-											</Notice>
-										) }
-										{ isEditMode && <KeyboardShortcuts /> }
-									</>
-								}
-								secondarySidebar={
-									isEditMode &&
-									( ( shouldShowInserter && (
-										<InserterSidebar />
-									) ) ||
-										( shouldShowListView && (
-											<ListViewSidebar />
-										) ) )
-								}
-								sidebar={
-									isEditMode &&
-									isRightSidebarOpen && (
-										<ComplementaryArea.Slot scope="core/edit-site" />
-									)
-								}
-								footer={
-									showBlockBreakcrumb && (
-										<BlockBreadcrumb
-											rootLabelText={ __( 'Template' ) }
-										/>
-									)
-								}
-								labels={ {
-									...interfaceLabels,
-									secondarySidebar: secondarySidebarLabel,
-								} }
-							/>
-						</BlockContextProvider>
-					</GlobalStylesProvider>
+					<BlockContextProvider value={ blockContext }>
+						<SidebarComplementaryAreaFills />
+						{ isEditMode && <StartTemplateOptions /> }
+						<InterfaceSkeleton
+							enableRegionNavigation={ false }
+							className={ showIconLabels && 'show-icon-labels' }
+							notices={ isEditMode && <EditorSnackbars /> }
+							content={
+								<>
+									<GlobalStylesRenderer />
+									{ isEditMode && <EditorNotices /> }
+									{ showVisualEditor && editedPost && (
+										<BlockEditor />
+									) }
+									{ editorMode === 'text' &&
+										editedPost &&
+										isEditMode && <CodeEditor /> }
+									{ hasLoadedPost && ! editedPost && (
+										<Notice
+											status="warning"
+											isDismissible={ false }
+										>
+											{ __(
+												"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+											) }
+										</Notice>
+									) }
+									{ isEditMode && (
+										<KeyboardShortcutsEditMode />
+									) }
+								</>
+							}
+							secondarySidebar={
+								isEditMode &&
+								( ( shouldShowInserter && (
+									<InserterSidebar />
+								) ) ||
+									( shouldShowListView && (
+										<ListViewSidebar />
+									) ) )
+							}
+							sidebar={
+								isEditMode &&
+								isRightSidebarOpen && (
+									<ComplementaryArea.Slot scope="core/edit-site" />
+								)
+							}
+							footer={
+								shouldShowBlockBreakcrumbs && (
+									<BlockBreadcrumb
+										rootLabelText={ __( 'Template' ) }
+									/>
+								)
+							}
+							labels={ {
+								...interfaceLabels,
+								secondarySidebar: secondarySidebarLabel,
+							} }
+						/>
+					</BlockContextProvider>
 				</EntityProvider>
 			</EntityProvider>
 		</>

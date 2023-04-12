@@ -11,25 +11,33 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { store as editSiteStore } from '../../store';
 
-export default function useEditedEntityRecord() {
-	const { record, title, description, isLoaded } = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const { __experimentalGetTemplateInfo: getTemplateInfo } =
-			select( editorStore );
-		const postType = getEditedPostType();
-		const postId = getEditedPostId();
-		const _record = getEditedEntityRecord( 'postType', postType, postId );
-		const _isLoaded = !! postId;
-		const templateInfo = getTemplateInfo( _record );
+export default function useEditedEntityRecord( postType, postId ) {
+	const { record, title, description, isLoaded } = useSelect(
+		( select ) => {
+			const { getEditedPostType, getEditedPostId } =
+				select( editSiteStore );
+			const { getEditedEntityRecord } = select( coreStore );
+			const { __experimentalGetTemplateInfo: getTemplateInfo } =
+				select( editorStore );
+			const usedPostType = postType ?? getEditedPostType();
+			const usedPostId = postId ?? getEditedPostId();
+			const _record = getEditedEntityRecord(
+				'postType',
+				usedPostType,
+				usedPostId
+			);
+			const _isLoaded = !! usedPostId;
+			const templateInfo = getTemplateInfo( _record );
 
-		return {
-			record: _record,
-			title: templateInfo.title,
-			description: templateInfo.description,
-			isLoaded: _isLoaded,
-		};
-	}, [] );
+			return {
+				record: _record,
+				title: templateInfo.title,
+				description: templateInfo.description,
+				isLoaded: _isLoaded,
+			};
+		},
+		[ postType, postId ]
+	);
 
 	return {
 		isLoaded,

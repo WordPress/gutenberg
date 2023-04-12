@@ -24,7 +24,6 @@ export function ScreenVariations( { name, path = '' } ) {
 	return (
 		<div className="edit-site-global-styles-screen-variations">
 			<VStack spacing={ 3 }>
-				<p>Manage style variations, saved block appearence presets.</p>
 				<Subtitle>{ __( 'Style Variations' ) }</Subtitle>
 				<VariationsPanel name={ name } />
 			</VStack>

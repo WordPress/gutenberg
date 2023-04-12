@@ -83,10 +83,10 @@ export function getBlockGapCSS(
  * @return {Object} An object with contextual info per alignment.
  */
 export function getAlignmentsInfo( layout ) {
-	const { contentSize, wideSize } = layout;
+	const { contentSize, wideSize, type = 'default' } = layout;
 	const alignmentInfo = {};
 	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
-	if ( sizeRegex.test( contentSize ) ) {
+	if ( sizeRegex.test( contentSize ) && type === 'constrained' ) {
 		// translators: %s: container size (i.e. 600px etc)
 		alignmentInfo.none = sprintf( __( 'Max %s wide' ), contentSize );
 	}

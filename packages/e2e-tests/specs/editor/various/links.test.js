@@ -529,7 +529,7 @@ describe( 'Links', () => {
 		await waitForURLFieldAutoFocus();
 		await page.keyboard.type( 'w.org' );
 
-		// Toggle link settings open
+		// Link settings open
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 
@@ -605,7 +605,7 @@ describe( 'Links', () => {
 			await pressKeyWithModifier( 'primary', 'K' );
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Toggle link settings")]'
+				'//button[contains(@aria-label, "Link Settings")]'
 			);
 			await settingsToggle.click();
 
@@ -638,7 +638,7 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Toggle link settings")]'
+				'//button[contains(@aria-label, "Link Settings")]'
 			);
 			await settingsToggle.click();
 
@@ -702,7 +702,7 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Toggle link settings")]'
+				'//button[contains(@aria-label, "Link Settings")]'
 			);
 			await settingsToggle.click();
 
@@ -737,7 +737,7 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Toggle link settings")]'
+				'//button[contains(@aria-label, "Link Settings")]'
 			);
 			await settingsToggle.click();
 
@@ -788,7 +788,7 @@ describe( 'Links', () => {
 			await waitForURLFieldAutoFocus();
 
 			const [ settingsToggle ] = await page.$x(
-				'//button[contains(@aria-label, "Toggle link settings")]'
+				'//button[contains(@aria-label, "Link Settings")]'
 			);
 			await settingsToggle.click();
 
@@ -1001,7 +1001,7 @@ describe( 'Links', () => {
 
 			await waitForURLFieldAutoFocus();
 
-			// Toggle link settings open
+			// Link settings open
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Space' );
 

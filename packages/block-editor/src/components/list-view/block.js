@@ -33,7 +33,6 @@ import {
 	BlockMoverDownButton,
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
-import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useListViewContext } from './context';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -135,7 +134,8 @@ function ListViewBlock( {
 		  )
 		: __( 'Options' );
 
-	const { isTreeGridMounted, expand, collapse } = useListViewContext();
+	const { isTreeGridMounted, expand, collapse, BlockSettingsMenu } =
+		useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -231,6 +231,10 @@ function ListViewBlock( {
 		selectedClientIds,
 	} );
 
+	// Detect if there is a block in the canvas currently being edited and multi-selection is not happening.
+	const currentlyEditingBlockInCanvas =
+		isSelected && selectedClientIds.length === 1;
+
 	return (
 		<ListViewLeaf
 			className={ classes }
@@ -244,6 +248,7 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
+			data-expanded={ canExpand ? isExpanded : undefined }
 			isExpanded={ canExpand ? isExpanded : undefined }
 			aria-selected={ !! isSelected || forceSelectionContentLock }
 			ref={ rowRef }
@@ -268,7 +273,9 @@ function ListViewBlock( {
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
 							ref={ ref }
-							tabIndex={ tabIndex }
+							tabIndex={
+								currentlyEditingBlockInCanvas ? 0 : tabIndex
+							}
 							onFocus={ onFocus }
 							isExpanded={ isExpanded }
 							selectedClientIds={ selectedClientIds }
@@ -315,14 +322,15 @@ function ListViewBlock( {
 				</>
 			) }
 
-			{ showBlockActions && (
+			{ showBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected || forceSelectionContentLock }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
-						<BlockSettingsDropdown
+						<BlockSettingsMenu
 							clientIds={ dropdownClientIds }
+							block={ block }
 							icon={ moreVertical }
 							label={ settingsAriaLabel }
 							toggleProps={ {

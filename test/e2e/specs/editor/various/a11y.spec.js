@@ -26,18 +26,18 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 			page.locator( 'role=textbox[name=/Add title/i]' )
 		).toBeFocused();
 		// Navigate to the 'Editor settings' region.
-		await pageUtils.pressKeyWithModifier( 'ctrl', '`' );
+		await pageUtils.pressKeys( 'ctrl+`' );
 		// Navigate to the 'Editor publish' region.
-		await pageUtils.pressKeyWithModifier( 'ctrl', '`' );
+		await pageUtils.pressKeys( 'ctrl+`' );
 		// Navigate to the 'Editor footer' region.
-		await pageUtils.pressKeyWithModifier( 'ctrl', '`' );
+		await pageUtils.pressKeys( 'ctrl+`' );
 		// Navigate to the 'Editor top bar' region.
-		await pageUtils.pressKeyWithModifier( 'ctrl', '`' );
+		await pageUtils.pressKeys( 'ctrl+`' );
 
 		// This test assumes the Editor is not in Fullscreen mode. Check the
 		// first tabbable element within the 'Editor top bar' region is the
 		// 'Toggle block inserter' button.
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 		await expect(
 			page.locator( 'role=button[name=/Toggle block inserter/i]' )
 		).toBeFocused();
@@ -48,7 +48,7 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		// Open keyboard shortcuts modal.
-		await pageUtils.pressKeyWithModifier( 'access', 'h' );
+		await pageUtils.pressKeys( 'access+h' );
 
 		const modalContent = page.locator(
 			'role=dialog[name="Keyboard shortcuts"i] >> role=document'
@@ -63,13 +63,13 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		await expect( closeButton ).not.toBeFocused();
 
 		// Open keyboard shortcuts modal.
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 		await expect( modalContent ).toBeFocused();
 
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 		await expect( closeButton ).toBeFocused();
 
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 		await expect( modalContent ).toBeFocused();
 	} );
 
@@ -77,7 +77,7 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await pageUtils.pressKeyWithModifier( 'access', 'h' );
+		await pageUtils.pressKeys( 'access+h' );
 
 		// Click a non-focusable element after the last tabbable within the modal.
 		const last = page
@@ -85,7 +85,7 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 			.last();
 		await last.click();
 
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 
 		await expect(
 			page.locator(
@@ -98,12 +98,12 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await pageUtils.pressKeyWithModifier( 'access', 'h' );
+		await pageUtils.pressKeys( 'access+h' );
 
 		// Click a non-focusable element before the first tabbable within the modal.
 		await page.click( 'role=heading[name="Keyboard shortcuts"i]' );
 
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 
 		await expect(
 			page.locator(
@@ -114,6 +114,7 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 
 	test( 'should make the modal content focusable when it is scrollable', async ( {
 		page,
+		pageUtils,
 	} ) => {
 		// Open the top bar Options menu.
 		await page.click(
@@ -162,9 +163,9 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		// The General tab panel content is short and not scrollable.
 		// Check it's not focusable.
 		await clickAndFocusTab( generalTab );
-		await page.keyboard.press( 'Shift+Tab' );
+		await pageUtils.pressKeys( 'Shift+Tab' );
 		await expect( closeButton ).toBeFocused();
-		await page.keyboard.press( 'Shift+Tab' );
+		await pageUtils.pressKeys( 'Shift+Tab' );
 		await expect( preferencesModalContent ).not.toBeFocused();
 
 		// The Blocks tab panel content is long and scrollable.
@@ -177,9 +178,9 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 			'tabindex',
 			'0'
 		);
-		await page.keyboard.press( 'Shift+Tab' );
+		await pageUtils.pressKeys( 'Shift+Tab' );
 		await expect( closeButton ).toBeFocused();
-		await page.keyboard.press( 'Shift+Tab' );
+		await pageUtils.pressKeys( 'Shift+Tab' );
 		await expect( preferencesModalContent ).toBeFocused();
 
 		// Make the Blocks tab panel content shorter by searching for a block
@@ -191,17 +192,17 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 			'qwerty'
 		);
 		await clickAndFocusTab( blocksTab );
-		await page.keyboard.press( 'Shift+Tab' );
+		await pageUtils.pressKeys( 'Shift+Tab' );
 		await expect( closeButton ).toBeFocused();
-		await page.keyboard.press( 'Shift+Tab' );
+		await pageUtils.pressKeys( 'Shift+Tab' );
 		await expect( preferencesModalContent ).not.toBeFocused();
 
 		// The Panels tab panel content is short and not scrollable.
 		// Check it's not focusable.
 		await clickAndFocusTab( panelsTab );
-		await page.keyboard.press( 'Shift+Tab' );
+		await pageUtils.pressKeys( 'Shift+Tab' );
 		await expect( closeButton ).toBeFocused();
-		await page.keyboard.press( 'Shift+Tab' );
+		await pageUtils.pressKeys( 'Shift+Tab' );
 		await expect( preferencesModalContent ).not.toBeFocused();
 	} );
 } );

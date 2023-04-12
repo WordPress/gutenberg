@@ -130,26 +130,33 @@ function gutenberg_resolve_assets_override() {
 	$scripts = ob_get_clean();
 
 	/*
-	 * Generate font @font-face styles for the site editor iframe.
-	 * Use the registered font families for printing.
+	 * Generate font @font-face styles for the iframe.
+	 *
+	 * For the Site Editor, use the registered fonts.
+	 * For the Block Editor, use the enqueued fonts.
 	 */
 	if ( class_exists( 'WP_Fonts' ) ) {
-		$wp_fonts   = wp_fonts();
-		$registered = $wp_fonts->get_registered_font_families();
-		if ( ! empty( $registered ) ) {
-			$queue = $wp_fonts->queue;
-			$done  = $wp_fonts->done;
+		$wp_fonts       = wp_fonts();
+		$registered     = $wp_fonts->get_registered_font_families();
+		$is_site_editor = 'site-editor.php' === $pagenow;
 
-			$wp_fonts->done  = array();
-			$wp_fonts->queue = $registered;
+		if ( ! empty( $registered ) ) {
+			$done           = $wp_fonts->done;
+			$wp_fonts->done = array();
+			if ( $is_site_editor ) {
+				$queue           = $wp_fonts->queue;
+				$wp_fonts->queue = $registered;
+			}
 
 			ob_start();
 			$wp_fonts->do_items();
 			$styles .= ob_get_clean();
 
-			// Reset the Web Fonts API.
-			$wp_fonts->done  = $done;
-			$wp_fonts->queue = $queue;
+			// Reset the Fonts API.
+			$wp_fonts->done = $done;
+			if ( $is_site_editor ) {
+				$wp_fonts->queue = $queue;
+			}
 		}
 	}
 

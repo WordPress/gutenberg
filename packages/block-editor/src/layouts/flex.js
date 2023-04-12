@@ -347,6 +347,7 @@ function FlexWrapControl( { layout, onChange } ) {
 	const { flexWrap = 'wrap' } = layout;
 	return (
 		<ToggleControl
+			__nextHasNoMarginBottom
 			label={ __( 'Allow to wrap to multiple lines' ) }
 			onChange={ ( value ) => {
 				onChange( {

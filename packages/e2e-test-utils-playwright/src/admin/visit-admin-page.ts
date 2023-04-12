@@ -11,9 +11,9 @@ import type { Admin } from './';
 /**
  * Visits admin page and handle errors.
  *
- * @param {Admin}  this
- * @param {string} adminPath String to be serialized as pathname.
- * @param {string} query     String to be serialized as query portion of URL.
+ * @param this
+ * @param adminPath String to be serialized as pathname.
+ * @param query     String to be serialized as query portion of URL.
  */
 export async function visitAdminPage(
 	this: Admin,

@@ -22,6 +22,7 @@ import { __ } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { CommandMenu } from '@wordpress/commands';
 
 /**
  * Internal dependencies
@@ -40,6 +41,9 @@ import ResizeHandle from '../block-editor/resize-handle';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 import { unlock } from '../../private-apis';
 import SavePanel from '../save-panel';
+import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
+import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
+import { useCommands } from '../../hooks/commands';
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
@@ -58,6 +62,7 @@ export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
 	useSyncCanvasModeWithURL();
+	useCommands();
 
 	const hubRef = useRef();
 	const { params } = useLocation();
@@ -121,6 +126,9 @@ export default function Layout() {
 
 	return (
 		<>
+			{ window?.__experimentalEnableCommandCenter && <CommandMenu /> }
+			<KeyboardShortcutsRegister />
+			<KeyboardShortcutsGlobal />
 			{ fullResizer }
 			<div
 				{ ...navigateRegionsProps }
@@ -273,6 +281,21 @@ export default function Layout() {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<motion.div
+									whileHover={
+										isEditorPage && canvasMode === 'view'
+											? {
+													scale: 1.005,
+													transition: {
+														duration:
+															disableMotion ||
+															isResizing
+																? 0
+																: 0.5,
+														ease: 'easeOut',
+													},
+											  }
+											: {}
+									}
 									initial={ false }
 									layout="position"
 									className="edit-site-layout__canvas"

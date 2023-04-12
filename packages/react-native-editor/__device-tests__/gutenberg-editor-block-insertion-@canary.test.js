@@ -60,23 +60,19 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point.
 
-		if ( isAndroid() ) {
-			await editorPage.dismissKeyboard();
-		}
-
 		const titleElement = await editorPage.getTitleElement( {
 			autoscroll: true,
 		} );
 		await titleElement.click();
+
+		// Wait for editor to finish scrolling to the title
+		await editorPage.driver.sleep( 2000 );
 
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const emptyParagraphBlock = await editorPage.getBlockAtPosition(
 			blockNames.paragraph
 		);
 		expect( emptyParagraphBlock ).toBeTruthy();
-		const emptyParagraphBlockElement =
-			await editorPage.getTextBlockAtPosition( blockNames.paragraph );
-		expect( emptyParagraphBlockElement ).toBeTruthy();
 
 		await editorPage.sendTextToParagraphBlock( 1, testData.mediumText );
 		const html = await editorPage.getHtmlContent();

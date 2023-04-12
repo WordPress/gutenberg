@@ -2,7 +2,7 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { groupBy, get } from 'lodash';
+import { groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -245,11 +245,7 @@ function entity( entityConfig ) {
 										// comparison.
 										! fastDeepEqual(
 											edits[ key ],
-											get(
-												record[ key ],
-												'raw',
-												record[ key ]
-											)
+											record[ key ]?.raw ?? record[ key ]
 										) &&
 										// Sometimes the server alters the sent value which means
 										// we need to also remove the edits before the api request.

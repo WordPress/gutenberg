@@ -85,6 +85,7 @@ Default.args = {
 			size: 26,
 		},
 	],
+	units: [ 'px', 'em', 'rem' ],
 	value: 16,
 	withSlider: false,
 };

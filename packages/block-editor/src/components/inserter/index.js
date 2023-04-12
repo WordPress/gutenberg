@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { forwardRef, Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -31,20 +31,25 @@ const defaultRenderToggle = ( {
 	toggleProps = {},
 	prioritizePatterns,
 } ) => {
-	let label;
-	if ( hasSingleBlockType ) {
+	const {
+		as: Wrapper = Button,
+		label: labelProp,
+		onClick,
+		...rest
+	} = toggleProps;
+
+	let label = labelProp;
+	if ( ! label && hasSingleBlockType ) {
 		label = sprintf(
 			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
 			blockTitle
 		);
-	} else if ( prioritizePatterns ) {
+	} else if ( ! label && prioritizePatterns ) {
 		label = __( 'Add pattern' );
-	} else {
+	} else if ( ! label ) {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
-
-	const { onClick, ...rest } = toggleProps;
 
 	// Handle both onClick functions from the toggle and the parent component.
 	function handleClick( event ) {
@@ -57,7 +62,7 @@ const defaultRenderToggle = ( {
 	}
 
 	return (
-		<Button
+		<Wrapper
 			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
@@ -71,7 +76,7 @@ const defaultRenderToggle = ( {
 	);
 };
 
-class Inserter extends Component {
+class PrivateInserter extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -145,6 +150,7 @@ class Inserter extends Component {
 			prioritizePatterns,
 			onSelectOrClose,
 			selectBlockOnInsert,
+			orderInitialBlockItems,
 		} = this.props;
 
 		if ( isQuick ) {
@@ -168,6 +174,7 @@ class Inserter extends Component {
 					isAppender={ isAppender }
 					prioritizePatterns={ prioritizePatterns }
 					selectBlockOnInsert={ selectBlockOnInsert }
+					orderInitialBlockItems={ orderInitialBlockItems }
 				/>
 			);
 		}
@@ -219,7 +226,7 @@ class Inserter extends Component {
 	}
 }
 
-export default compose( [
+export const ComposedPrivateInserter = compose( [
 	withSelect(
 		( select, { clientId, rootClientId, shouldDirectInsert = true } ) => {
 			const {
@@ -416,4 +423,16 @@ export default compose( [
 		( { hasItems, isAppender, rootClientId, clientId } ) =>
 			hasItems || ( ! isAppender && ! rootClientId && ! clientId )
 	),
-] )( Inserter );
+] )( PrivateInserter );
+
+const Inserter = forwardRef( ( props, ref ) => {
+	return (
+		<ComposedPrivateInserter
+			ref={ ref }
+			{ ...props }
+			orderInitialBlockItems={ undefined }
+		/>
+	);
+} );
+
+export default Inserter;

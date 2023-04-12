@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
 /**
  * WordPress dependencies
  */
@@ -36,7 +35,7 @@ function useFrontPageId() {
 }
 
 export default function PageListItemEdit( { context, attributes } ) {
-	const { id, label, link, hasChildren } = attributes;
+	const { id, label, link, hasChildren, title } = attributes;
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
 
@@ -81,7 +80,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 					} ) }
 					href={ link }
 				>
-					{ decodeEntities( label ) }
+					{ decodeEntities( title ) }
 				</a>
 			) }
 			{ hasChildren && (

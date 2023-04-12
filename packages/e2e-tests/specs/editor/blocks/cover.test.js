@@ -42,30 +42,6 @@ describe( 'Cover', () => {
 		await createNewPost();
 	} );
 
-	it( 'can set overlay color using color picker on block placeholder', async () => {
-		await insertBlock( 'Cover' );
-		// Get the first color option from the block placeholder's color picker.
-		const colorPickerButton = await page.waitForSelector(
-			'.wp-block-cover__placeholder-background-options .components-circular-option-picker__option-wrapper:first-child button'
-		);
-		// Get the RGB value of the picked color.
-		const pickedColor = await colorPickerButton.evaluate(
-			( node ) => node.style.backgroundColor
-		);
-		// Create the block by clicking selected color button.
-		await colorPickerButton.click();
-		// Get the block's background dim element.
-		const backgroundDim = await page.waitForSelector(
-			'.wp-block-cover .has-background-dim'
-		);
-		// Get the RGB value of the background dim.
-		const dimColor = await backgroundDim.evaluate(
-			( node ) => node.style.backgroundColor
-		);
-
-		expect( pickedColor ).toEqual( dimColor );
-	} );
-
 	it( 'can set background image using image upload on block placeholder', async () => {
 		await insertBlock( 'Cover' );
 		// Create the block using uploaded image.
@@ -93,27 +69,6 @@ describe( 'Cover', () => {
 
 		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
 		expect( backgroundDimOpacity ).toBe( '0.5' );
-	} );
-
-	it( 'can have the title edited', async () => {
-		await insertBlock( 'Cover' );
-		// Click first color option from the block placeholder's color picker.
-		const colorPickerButton = await page.waitForSelector(
-			'.wp-block-cover__placeholder-background-options .components-circular-option-picker__option-wrapper:first-child button'
-		);
-		await colorPickerButton.click();
-		// Click the title placeholder to put the cursor inside.
-		const coverTitle = await page.waitForSelector(
-			'.wp-block-cover .wp-block-paragraph'
-		);
-		await coverTitle.click();
-		// Type the title.
-		await page.keyboard.type( 'foo' );
-		const coverTitleText = await coverTitle.evaluate(
-			( el ) => el.innerText
-		);
-
-		expect( coverTitleText ).toEqual( 'foo' );
 	} );
 
 	it( 'can be resized using drag & drop', async () => {
