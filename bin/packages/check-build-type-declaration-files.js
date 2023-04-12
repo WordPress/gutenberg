@@ -16,7 +16,7 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
+const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const { exec } = require( 'child_process' );
 const chalk = require( 'chalk' );
@@ -28,7 +28,7 @@ function stripJsonComments( jsonString ) {
 	return cleanedLines.join( '\n' );
 }
 
-function checkDeclarationFile( file ) {
+async function checkDeclarationFile( file ) {
 	return new Promise( ( resolve, reject ) => {
 		exec( `npx tsc --noEmit ${ file }`, ( error, stdout, stderr ) => {
 			if ( error ) {
@@ -40,43 +40,52 @@ function checkDeclarationFile( file ) {
 	} );
 }
 
-async function checkUnverifiedDeclarationFiles() {
-	const packageDir = path.resolve( 'packages' );
-	const subDirs = fs
-		.readdirSync( packageDir, { withFileTypes: true } )
-		.filter( ( dirent ) => dirent.isDirectory() )
-		.map( ( dirent ) => path.join( packageDir, dirent.name ) );
+async function readTsConfig( tsconfigPath ) {
+	const tsconfigRaw = await fs.readFile( tsconfigPath, 'utf-8' );
+	return JSON.parse( stripJsonComments( tsconfigRaw ) );
+}
 
-	const possibleDeclarations = subDirs.reduce( ( acc, pkg ) => {
-		const tsconfigPath = path.join( pkg, 'tsconfig.json' );
-
-		if ( fs.existsSync( tsconfigPath ) ) {
-			const tsconfigRaw = fs.readFileSync( tsconfigPath, 'utf-8' );
-			const tsconfig = JSON.parse( stripJsonComments( tsconfigRaw ) );
-
-			if ( tsconfig.compilerOptions?.checkJs === false ) {
-				acc.push( `${ pkg }/build-types/index.d.ts` );
-			}
+// Returns the path to the build-types declaration file for a package if it exists.
+// Throws an error and exits the script otherwise.
+async function getDecFile( packagePath ) {
+	const decFile = path.join( packagePath, 'build-types', 'index.d.ts' );
+	try {
+		await fs.access( decFile );
+		return decFile;
+	} catch ( err ) {
+		if ( err.code !== 'ENOENT' ) {
+			throw err;
 		}
-		return acc;
-	}, [] );
-
-	const declarations = possibleDeclarations.filter( ( decFile ) =>
-		fs.existsSync( decFile )
-	);
-
-	if ( declarations.length !== possibleDeclarations.length ) {
 		console.error(
-			[
-				'The following declaration files are missing, but they should exist:',
-				...possibleDeclarations.filter(
-					( dec ) => ! declarations.includes( dec )
-				),
-				'You may need to run tsc again.',
-			].join( '\n' )
+			`This declaration file should exist. You may need to run tsc again: ${ decFile }`
 		);
 		process.exit( 1 );
 	}
+}
+
+async function checkUnverifiedDeclarationFiles() {
+	const packageDir = path.resolve( 'packages' );
+	const subDirs = ( await fs.readdir( packageDir, { withFileTypes: true } ) )
+		.filter( ( dirent ) => dirent.isDirectory() )
+		.map( ( dirent ) => path.join( packageDir, dirent.name ) );
+
+	const declarations = await Promise.all(
+		subDirs.map( async ( pkg ) => {
+			const tsconfigPath = path.join( pkg, 'tsconfig.json' );
+			try {
+				const tsconfig = await readTsConfig( tsconfigPath );
+
+				if ( tsconfig.compilerOptions?.checkJs === false ) {
+					return getDecFile( pkg );
+				}
+			} catch ( error ) {
+				if ( error.code !== 'ENOENT' ) {
+					throw error;
+				}
+			}
+			return null;
+		} )
+	).filter( Boolean );
 
 	const tscResults = await Promise.allSettled(
 		declarations.map( ( declaration ) =>
