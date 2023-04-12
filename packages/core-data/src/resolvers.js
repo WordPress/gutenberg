@@ -508,9 +508,17 @@ export const __experimentalGetCurrentThemeGlobalStylesRevisions =
 		const revisionsURL =
 			currentGlobalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.href;
 		if ( revisionsURL ) {
-			const revisions = await apiFetch( {
+			const restRevisions = await apiFetch( {
 				url: revisionsURL,
 			} );
+			const revisions = restRevisions?.map( ( revision ) =>
+				Object.fromEntries(
+					Object.entries( revision ).map( ( [ key, value ] ) => [
+						camelCase( key ),
+						value,
+					] )
+				)
+			);
 			dispatch.__experimentalReceiveThemeGlobalStyleRevisions(
 				currentGlobalStyles?.id,
 				revisions

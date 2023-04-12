@@ -12,7 +12,7 @@ import {
 	Button,
 	SelectControl,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	useContext,
@@ -23,9 +23,9 @@ import {
 } from '@wordpress/element';
 import {
 	check,
-	redo as redoIcon,
-	reset as resetIcon,
 	undo as undoIcon,
+	redo as redoIcon,
+	backup as backupIcon,
 } from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -38,7 +38,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { isGlobalStyleConfigEqual } from './utils';
 import { unlock } from '../../private-apis';
 
-export const MINIMUM_REVISION_COUNT = 1;
 const SELECTOR_MINIMUM_REVISION_COUNT = 10;
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
@@ -47,7 +46,9 @@ function RevisionsSelect( { userRevisions, currentRevisionId, onChange } ) {
 		return ( userRevisions ?? [] ).map( ( revision ) => {
 			return {
 				value: revision.id,
-				label: decodeEntities( revision.title.rendered ),
+				label: revision.isLatest
+					? __( 'Latest saved revision' )
+					: decodeEntities( revision.title.rendered ),
 			};
 		} );
 	}, [ userRevisions ] );
@@ -69,21 +70,16 @@ function RevisionsSelect( { userRevisions, currentRevisionId, onChange } ) {
 }
 
 function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
-	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
-	const [ canReset, onReset ] = useGlobalStylesReset();
-	const { hasUndo } = useSelect(
-		( select ) => ( {
-			hasUndo: select( coreStore ).hasUndo(),
-		} ),
-		[]
-	);
-	const { undo } = useDispatch( coreStore );
-
 	return (
 		<>
 			<ol className="edit-site-global-styles-screen-revisions__revisions-list">
 				{ userRevisions.map( ( revision ) => {
+					revision.is_latest = undefined;
 					const isActive = revision?.id === currentRevisionId;
+					const revisionTitle = decodeEntities(
+						revision.title.rendered
+					);
+
 					return (
 						<li key={ `user-styles-revision-${ revision.id }` }>
 							<Button
@@ -95,45 +91,39 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 								) }
 								variant={ isActive ? 'tertiary' : 'secondary' }
 								disabled={ isActive }
-								icon={ isActive ? check : null }
+								icon={ revision.isLatest ? check : null }
 								onClick={ () => {
 									onChange( revision );
 								} }
-								aria-label={ sprintf(
-									/* translators: %s: human-friendly revision creation date */
-									__( 'Restore revision from %s' ),
-									revision.title.rendered
-								) }
+								aria-label={
+									revision.isLatest
+										? __( 'Restore latest saved revision' )
+										: sprintf(
+												/* translators: %s: human-friendly revision creation date */
+												__(
+													'Restore revision from %s'
+												),
+												revisionTitle
+										  )
+								}
 							>
 								<span className="edit-site-global-styles-screen-revisions__title">
-									{ revision.title.rendered }
+									{ revision.isLatest
+										? __( 'Latest saved revision' )
+										: revisionTitle }
 								</span>
 							</Button>
 						</li>
 					);
 				} ) }
 			</ol>
-			<div className="edit-site-global-styles-screen-revisions__buttons">
-				<Button
-					onClick={ hasUndo ? undo : undefined }
-					icon={ ! isRTL() ? redoIcon : undoIcon }
-					className="edit-site-global-styles-screen-revisions__undo"
-					label={ __( 'Undo last change' ) }
-					aria-disabled={ ! hasUndo }
-				/>
-				<Button
-					onClick={ canReset ? onReset : undefined }
-					icon={ resetIcon }
-					className="edit-site-global-styles-screen-revisions__reset"
-					label={ __( 'Reset styles to defaults' ) }
-					aria-disabled={ ! canReset }
-				/>
-			</div>
 		</>
 	);
 }
 
 function ScreenRevisions() {
+	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
+	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 	const { userRevisions } = useSelect(
@@ -146,22 +136,20 @@ function ScreenRevisions() {
 		[]
 	);
 	const [ currentRevisionId, setCurrentRevisionId ] = useState();
-	const hasRevisions = userRevisions.length >= MINIMUM_REVISION_COUNT;
+	const [ cachedUserConfig ] = useState( userConfig );
+	const [ canRestoreCachedConfig, setCanRestoreCachedConfig ] =
+		useState( false );
 
 	useEffect( () => {
-		if ( ! hasRevisions ) {
-			return;
-		}
-		let currentRevision = userRevisions[ 0 ];
+		let currentRevision = null;
 		for ( let i = 0; i < userRevisions.length; i++ ) {
 			if ( isGlobalStyleConfigEqual( userConfig, userRevisions[ i ] ) ) {
-				// @TODO: Should we remove revisions from the list that match exactly the default global styles?
 				currentRevision = userRevisions[ i ];
 				break;
 			}
 		}
 		setCurrentRevisionId( currentRevision?.id );
-	}, [ userRevisions, hasRevisions, userConfig ] );
+	}, [ userRevisions, userConfig ] );
 
 	const restoreRevision = useCallback(
 		( revision ) => {
@@ -170,14 +158,24 @@ function ScreenRevisions() {
 				settings: revision?.settings,
 			} ) );
 			setCurrentRevisionId( revision?.id );
+			setCanRestoreCachedConfig(
+				! isGlobalStyleConfigEqual( cachedUserConfig, revision )
+			);
 		},
-		[ userConfig ]
+		[ userConfig, cachedUserConfig ]
 	);
 
 	const RevisionsComponent =
 		userRevisions.length >= SELECTOR_MINIMUM_REVISION_COUNT
 			? RevisionsSelect
 			: RevisionsButtons;
+
+	const hasUnsavedChanges =
+		canRestoreCachedConfig &&
+		! isGlobalStyleConfigEqual(
+			cachedUserConfig,
+			userRevisions.find( ( revision ) => revision.isLatest === true )
+		);
 
 	return (
 		<>
@@ -190,17 +188,33 @@ function ScreenRevisions() {
 			<div className="edit-site-global-styles-screen-revisions">
 				<VStack spacing={ 3 }>
 					<Subtitle>{ __( 'REVISIONS' ) }</Subtitle>
-					{ hasRevisions ? (
-						<>
-							<RevisionsComponent
-								onChange={ restoreRevision }
-								currentRevisionId={ currentRevisionId }
-								userRevisions={ userRevisions }
-							/>
-						</>
-					) : (
-						<p>{ __( 'There are currently no revisions.' ) }</p>
-					) }
+					<RevisionsComponent
+						onChange={ restoreRevision }
+						currentRevisionId={ currentRevisionId }
+						userRevisions={ userRevisions }
+					/>
+					<VStack spacing={ 1 }>
+						<Button
+							onClick={ () => {
+								if ( hasUnsavedChanges ) {
+									restoreRevision( cachedUserConfig );
+								}
+							} }
+							className="edit-site-global-styles-screen-revisions__button"
+							icon={ backupIcon }
+							aria-disabled={ ! hasUnsavedChanges }
+						>
+							{ __( 'Restore unsaved changes' ) }
+						</Button>
+						<Button
+							onClick={ canReset ? onReset : undefined }
+							icon={ isRTL ? redoIcon : undoIcon }
+							className="edit-site-global-styles-screen-revisions__button"
+							aria-disabled={ ! canReset }
+						>
+							{ __( 'Reset styles to theme default' ) }
+						</Button>
+					</VStack>
 				</VStack>
 			</div>
 		</>
