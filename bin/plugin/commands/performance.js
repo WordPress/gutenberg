@@ -13,18 +13,31 @@ const inquirer = require( 'inquirer' );
  * Internal dependencies
  */
 const { formats, log } = require( '../lib/logger' );
-const { runShellScript: exec, readJSONFile } = require( '../lib/utils' );
+const {
+	runShellScript,
+	readJSONFile,
+	writeJSONFile,
+} = require( '../lib/utils' );
 const config = require( '../config' );
 
+const CWD = process.cwd();
+
 const ARTIFACTS_PATH =
-	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
+	process.env.WP_ARTIFACTS_PATH || path.join( CWD, 'artifacts' );
 
 const CHALKS = [
-	formats.title.magenta,
-	formats.title.cyan,
 	formats.title.green,
 	formats.title.yellow,
+	formats.title.cyan,
+	formats.title.red,
+	formats.title.magenta,
 ];
+
+const TIMERS = {
+	setup: '> Setup time',
+	tests: '> Tests time',
+	total: '> Total time',
+};
 
 /**
  * @typedef WPPerformanceCommandOptions
@@ -140,6 +153,16 @@ function formatTime( number ) {
 	return Math.round( number * factor ) / factor;
 }
 
+const logInfo = log;
+// @ts-ignore
+const logTitle = ( message ) => log( formats.title( `\n${ message }\n` ) );
+// @ts-ignore
+const logAction = ( message, level = 0 ) => {
+	const indent = new Array( level * 2 + 1 ).join( ' ' );
+	return log( `${ indent }> ${ message }` );
+};
+const logNewline = () => log( '' );
+
 /**
  * Curate the raw performance results.
  *
@@ -194,28 +217,22 @@ function curateResults( testSuite, results ) {
 /**
  * Runs the performance tests on the current ref.
  *
- * @param {string} testSuite                Name of the tests set.
- * @param {string} performanceTestDirectory Path to the performance tests' clone.
- * @param {string} runKey                   Unique identifier for the test run, e.g. `ref-name_post-editor_run-3`.
- *
+ * @param {string} testSuite Name of the tests set.
+ * @param {string} runKey    Unique identifier for the test run, e.g. 'post-editor_ref-name_run-3'.
  * @return {Promise<WPPerformanceResults>} Performance results for the ref.
  */
-async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
+async function runTestSuite( testSuite, runKey ) {
 	const resultsFilename = `${ runKey }.performance-results.json`;
 
-	await exec(
-		`npm run test:performance -- ${ testSuite }`,
-		performanceTestDirectory,
-		{
-			...process.env,
-			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
-			RESULTS_FILENAME: resultsFilename,
-		}
-	);
+	await runShellScript( `npm run test:performance -- ${ testSuite }`, CWD, {
+		...process.env,
+		WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
+		RESULTS_FILENAME: resultsFilename,
+	} );
 
 	return curateResults(
 		testSuite,
-		await readJSONFile( path.join( ARTIFACTS_PATH, resultsFilename ) )
+		readJSONFile( path.join( ARTIFACTS_PATH, resultsFilename ) )
 	);
 }
 
@@ -227,42 +244,60 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
  * @param {WPPerformanceCommandOptions} options Command options.
  */
 async function runPerformanceTests( refs, options ) {
-	console.time( 'Total time' );
+	console.time( TIMERS.total );
 
-	const cwd = process.cwd();
 	const runningInCI = !! process.env.CI || !! options.ci;
 	const testRounds = options.rounds || 1;
 
-	let currentRef;
+	// @ts-ignore
+	let localRef;
 
 	if ( runningInCI ) {
-		currentRef = process.env.GITHUB_HEAD_REF;
+		localRef = process.env.GITHUB_HEAD_REF;
 		// @ts-ignore
-	} else if ( await simpleGit( cwd ).checkIsRepo() ) {
+	} else if ( await simpleGit( CWD ).checkIsRepo() ) {
 		// @ts-ignore
-		currentRef = await simpleGit( cwd ).revparse( {
+		localRef = await simpleGit( CWD ).revparse( {
 			'--abbrev-ref': null,
 			HEAD: null,
 		} );
 	}
 
-	if ( ! currentRef ) {
-		throw new Error( 'Must be running from a Gutenberg repository root' );
+	if ( ! localRef ) {
+		throw new Error( 'Must be running from a Gutenberg repository root.' );
 	}
 
-	log(
-		formats.title( '\n💃 Performance Tests 🕺\n' ),
-		'\nWelcome! This tool runs the performance tests on multiple refs and displays a comparison table.\n' +
-			'In order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.\n' +
-			'Make sure these ports are not used before continuing.\n'
+	logTitle( '💃 Performance Tests 🕺' );
+	logInfo(
+		[
+			'Welcome! This tool runs the performance tests on multiple refs and displays a comparison table.',
+			'In order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.',
+			'Make sure these ports are not used before continuing.',
+		].join( '\n' )
 	);
 
-	log( '\n>> Setting up the environment\n' );
-	console.time( 'Setup duration' );
+	logTitle( '🏠 Setting up the environment' );
 
 	const rootDir = path.join( os.tmpdir(), 'wp-gutenberg-performance-tests' );
-	if ( ! fs.existsSync( rootDir ) ) {
-		log( `  >> Creating root dir: ${ rootDir }` );
+	if ( fs.existsSync( rootDir ) ) {
+		logAction( `Reusing existing tmp directory: ${ rootDir }` );
+		if ( ! runningInCI ) {
+			const { startFresh } = await inquirer.prompt( [
+				{
+					type: 'confirm',
+					name: 'startFresh',
+					message: `Empty the existing tmp directory for a fresh start?`,
+					default: false,
+				},
+			] );
+
+			if ( startFresh ) {
+				logAction( `Removing tmp directory content` );
+				await runShellScript( `rm -rf ${ rootDir }/*` );
+			}
+		}
+	} else {
+		logAction( `Creating tmp directory: ${ rootDir }` );
 		fs.mkdirSync( rootDir );
 	}
 
@@ -274,9 +309,10 @@ async function runPerformanceTests( refs, options ) {
 
 	const baseWPEnvConfig = {
 		core: wpZipURL ?? null, // Default to the latest stable core version.
-		plugins: [], // To be replaced with the target Gutenberg build path.
+		plugins: [], // To be updated with the target Gutenberg build path.
 		themes: [
-			path.join( cwd, 'test/emptytheme' ),
+			path.join( CWD, 'test/emptytheme' ),
+			// @todo Move the below to the tests that require them.
 			'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
 			'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
 		],
@@ -284,11 +320,11 @@ async function runPerformanceTests( refs, options ) {
 			tests: {
 				mappings: {
 					'wp-content/mu-plugins': path.join(
-						cwd,
+						CWD,
 						'packages/e2e-tests/mu-plugins'
 					),
 					'wp-content/plugins/gutenberg-test-plugins': path.join(
-						cwd,
+						CWD,
 						'packages/e2e-tests/plugins'
 					),
 				},
@@ -296,50 +332,61 @@ async function runPerformanceTests( refs, options ) {
 		},
 	};
 
-	let buildCurrentBranch = true;
+	let buildLocalRef = true;
 
 	if ( ! runningInCI ) {
-		// When running locally it might not make sense to rebuild the local branch
-		const { confirmation } = await inquirer.prompt( [
+		// When running locally it might not make sense to rebuild the local
+		// branch every time, so let's ask. We're assuming that the node modules
+		// are installed, though.
+		const inquiry = await inquirer.prompt( [
 			{
 				type: 'confirm',
-				name: 'confirmation',
-				message: 'Run build for the current branch?',
+				name: 'buildLocalRef',
+				message: `Build the plugin from your local branch? (${ localRef })`,
 				default: false,
 			},
 		] );
 
-		buildCurrentBranch = confirmation;
+		buildLocalRef = inquiry.buildLocalRef;
 	}
 
-	log( '  >> Building given refs:' );
-	// TODO: If ref matches "release/*", use the zipped plugin URL.
-	const testRefs = [ currentRef, ...refs ];
+	console.time( TIMERS.setup );
+
+	logAction( 'Creating environments for given refs:' );
+	// @todo If a ref matches "release/*", use the zipped plugin URL so we don't
+	// need to build.
+	const testRefs = [ ...new Set( [ localRef, ...refs ] ) ];
 
 	// Run plugin builds in parallel.
 	await Promise.all(
 		testRefs.map( async ( ref, i ) => {
 			// @ts-ignore
-			const l = ( msg ) =>
-				log( `    >> ${ CHALKS[ i ]( ref ) }: ${ msg }` );
+			const logRefAction = ( msg ) =>
+				logAction( `${ CHALKS[ i ]( ref ) }: ${ msg }`, 2 );
 
 			const envDir = path.join( rootDir, `test-env-${ i }` );
 			if ( ! fs.existsSync( envDir ) ) {
-				l( 'Creating environment directory' );
+				logRefAction( `Creating environment directory (${ envDir })` );
 				fs.mkdirSync( envDir );
+			} else {
+				logRefAction(
+					`Reusing existing environment directory (${ envDir })`
+				);
 			}
 
 			let buildDir;
+			let targetSHA;
 			let doBuild = true;
 
-			if ( i === 0 ) {
-				buildDir = cwd;
-				doBuild = buildCurrentBranch;
+			// @ts-ignore
+			if ( ref === localRef ) {
+				buildDir = CWD;
+				doBuild = buildLocalRef;
 			} else {
 				buildDir = path.join( envDir, 'plugin' );
 
 				if ( ! fs.existsSync( buildDir ) ) {
-					l( 'Creating build directory' );
+					logRefAction( `Creating build directory (${ buildDir })` );
 					fs.mkdirSync( buildDir );
 				}
 
@@ -347,17 +394,14 @@ async function runPerformanceTests( refs, options ) {
 				const git = simpleGit( buildDir );
 				const isRepo = await git.checkIsRepo();
 				if ( ! isRepo ) {
-					l( 'Initializing repository' );
+					logRefAction( 'Initializing repository' );
 					await git
 						.init()
 						.addRemote( 'origin', config.gitRepositoryURL );
 				}
 
-				let targetSHA;
-				let currentSHA;
-
 				try {
-					// Try getting SHA if passing a ref name, e.g. "trunk".
+					// Try getting last commit SHA if passing a branch name.
 					await git.fetch( 'origin', ref, { '--depth': 1 } ); // --no-tags?
 					targetSHA = await git.revparse( `origin/${ ref }` );
 				} catch {
@@ -365,58 +409,51 @@ async function runPerformanceTests( refs, options ) {
 					targetSHA = ref;
 				}
 
-				try {
-					currentSHA = await git.revparse( 'HEAD' );
-				} catch {
-					// noop
-				}
+				const isBuildUpToDate = fs.existsSync(
+					path.join( envDir, `build-ref-${ targetSHA }` )
+				);
 
-				// If the latest remote SHA is same as the current local SHA
-				// assume there is a build and it's up-to-date.
-				if ( currentSHA && currentSHA === targetSHA ) {
-					l( 'Re-using the current build' );
+				if ( isBuildUpToDate ) {
+					logRefAction( 'Reusing current build' );
 					doBuild = false;
 				} else {
-					l( 'Fetching' );
+					logRefAction( 'Fetching' );
 					await git
-						.fetch( 'origin', ref, { '--depth': 1 } ) // --no-tags?
+						.fetch( 'origin', ref, { '--depth': 1 } )
+						.reset( 'hard', `origin/${ ref }` )
 						.checkout( ref );
 
-					l( 'Installing dependencies' );
-					await exec( 'npm ci', buildDir );
+					logRefAction( 'Installing dependencies' );
+					await runShellScript( 'npm ci', buildDir );
+					doBuild = true;
 				}
 			}
 
 			if ( doBuild ) {
-				l( 'Building the plugin' );
-				await exec( 'npm run build', buildDir );
-			}
-
-			if ( fs.existsSync( path.join( envDir, '.wp-env.json' ) ) ) {
-				l( 'Re-using the current wp-env config' );
-			} else {
-				l( 'Writing the wp-env config' );
-				fs.writeFileSync(
-					path.join( envDir, '.wp-env.json' ),
-					JSON.stringify(
-						{
-							...baseWPEnvConfig,
-							plugins: [ buildDir ],
-						},
-						null,
-						2
-					),
-					'utf8'
+				logRefAction( 'Building' );
+				await runShellScript( 'npm run build', buildDir );
+				await runShellScript( 'rm -f build-ref-*', envDir );
+				await runShellScript(
+					`touch build-ref-${ targetSHA }`,
+					envDir
 				);
 			}
 
-			l( 'Ready! 🥳' );
+			if ( ! fs.existsSync( path.join( envDir, '.wp-env.json' ) ) ) {
+				logRefAction( 'Writing wp-env config' );
+				writeJSONFile( path.join( envDir, '.wp-env.json' ), {
+					...baseWPEnvConfig,
+					plugins: [ buildDir ],
+				} );
+			}
+
+			logRefAction( 'Ready! 🥳' );
 		} )
 	);
 
-	log( '' );
-	console.timeEnd( 'Setup duration' );
-	console.time( 'Tests duration' );
+	logNewline();
+	console.timeEnd( TIMERS.setup );
+	console.time( TIMERS.tests );
 
 	const testSuites = [
 		'post-editor',
@@ -427,48 +464,43 @@ async function runPerformanceTests( refs, options ) {
 
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
 	const results = {};
-	const wpEnvPath = path.join( cwd, 'node_modules/.bin/wp-env' );
+	const wpEnvPath = path.join( CWD, 'node_modules/.bin/wp-env' );
 
-	log( '\n>> Running the tests\n' );
+	logTitle( '🏃 Running the tests' );
 
 	if ( options.wpVersion ) {
-		log( `  >> Using WordPress v${ options.wpVersion }` );
+		logAction( `Using WordPress v${ options.wpVersion }\n` );
 	} else {
-		log( '  >> Using the latest stable WordPress version' );
+		logAction( 'Using the latest stable WordPress version\n' );
 	}
 
 	for ( const testSuite of testSuites ) {
 		results[ testSuite ] = {};
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
 		const rawResults = [];
-		for ( let i = 0; i < testRounds; i++ ) {
-			const roundInfo = `round ${ i + 1 } of ${ testRounds }`;
-			rawResults[ i ] = {};
+		for ( let roundIndex = 0; roundIndex < testRounds; roundIndex++ ) {
+			const roundInfo = `round ${ roundIndex + 1 } of ${ testRounds }`;
+			rawResults[ roundIndex ] = {};
 
-			log(
-				`\n  >> Suite: ${ CHALKS[ 2 ]( testSuite ) } (${ roundInfo })`
+			logAction(
+				`Suite: ${ formats.title( testSuite ) } (${ roundInfo })`
 			);
 
-			for ( const ref of testRefs ) {
+			for ( const [ refIndex, ref ] of testRefs.entries() ) {
 				const sanitizedBranch = sanitizeBranchName( ref );
-				const runKey = `${ testSuite }_${ sanitizedBranch }_run-${ i }`;
-				// @ts-ignore
-				const envDir = path.join(
-					rootDir,
-					`test-env-${ testRefs.indexOf( ref ) }`
-				);
+				const runKey = `${ testSuite }_${ sanitizedBranch }_round-${ roundIndex }`;
+				const envDir = path.join( rootDir, `test-env-${ refIndex }` );
 
-				log( `    >> Ref: ${ CHALKS[ 3 ]( ref ) }` );
-				log( '      >> Starting the environment.' );
-				await exec( `${ wpEnvPath } start`, envDir );
-				log( '      >> Running the test.' );
-				rawResults[ i ][ ref ] = await runTestSuite(
+				logAction( `Ref: ${ CHALKS[ refIndex ]( ref ) }`, 2 );
+				logAction( 'Starting the environment', 3 );
+				await runShellScript( `${ wpEnvPath } start`, envDir );
+				logAction( 'Running the test', 3 );
+				rawResults[ roundIndex ][ ref ] = await runTestSuite(
 					testSuite,
-					cwd,
 					runKey
 				);
-				log( '      >> Stopping the environment' );
-				await exec( `${ wpEnvPath } stop`, envDir );
+				logAction( 'Stopping the environment', 3 );
+				await runShellScript( `${ wpEnvPath } stop`, envDir );
 			}
 		}
 
@@ -497,20 +529,18 @@ async function runPerformanceTests( refs, options ) {
 		}
 	}
 
-	log( '' );
-	console.timeEnd( 'Tests duration' );
+	logNewline();
+	console.timeEnd( TIMERS.tests );
 
-	// TODO: Clean up the env
+	logTitle( '🎉 Results' );
 
-	// Formatting the results.
-	log( '\n>> 🎉 Results.\n' );
-
-	log(
-		'\nPlease note that client side metrics EXCLUDE the server response time.\n'
+	logInfo(
+		'Please note that client side metrics EXCLUDE the server response time.\n'
 	);
 
+	// Formatting the results.
 	for ( const testSuite of testSuites ) {
-		log( `\n>> ${ testSuite }\n` );
+		logAction( `${ testSuite }\n` );
 
 		/** @type {Record<string, Record<string, string>>} */
 		const invertedResult = {};
@@ -533,14 +563,15 @@ async function runPerformanceTests( refs, options ) {
 		console.table( invertedResult );
 
 		const resultsFilename = testSuite + '.performance-results.json';
-		fs.writeFileSync(
+		writeJSONFile(
 			path.join( ARTIFACTS_PATH, resultsFilename ),
-			JSON.stringify( results[ testSuite ], null, 2 )
+			results[ testSuite ]
 		);
 	}
 
-	log( '' );
-	console.timeEnd( 'Total time' );
+	logNewline();
+	console.timeEnd( TIMERS.total );
+	logNewline();
 }
 
 module.exports = {
