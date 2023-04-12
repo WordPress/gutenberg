@@ -45,6 +45,5 @@
 		"wp-block-post-comments-form",
 		"wp-block-buttons",
 		"wp-block-button"
-	],
-	"viewScript": [ "file:./view.min.js" ]
+	]
 }
