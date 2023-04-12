@@ -114,64 +114,45 @@ Example:
 import VisualEditor from '../visual-editor';
 ```
 
-### Experimental and Private APIs
+### Legacy Experimental APIs, Plugin-only APIs, and Private APIs
 
-There are two important API types in the Gutenberg codebase:
+#### Legacy Experimental APIs
 
-* **Experimental APIs** – they are public APIs that are only shipped in Gutenberg and not merged into WordPress core. Their existence is either pending future revision or provides an immediate means to an end.
-* **Private APIs** – they are used internally in the Gutenberg Plugin, are shipped in WordPress Core, but they cannot be accessed by WordPress extenders. Private APIs can be freely changed and removed without affecting existing WordPress websites.
+Historically, Gutenberg has used the `__experimental` and `__unstable` prefixes to indicate that a given API is not yet stable and may be subject to change. This is a legacy convention which should be avoided in favor of the plugin-only API pattern or a private API pattern described below.
 
-#### Experimental APIs are useful for incubating new features before releasing them
+The problem with using the prefixes was that these APIs rarely got stabilized or removed. As of June 2022, WordPress Core contained 280 publicly exported experimental APIs merged from the Gutenberg plugin during the major WordPress releases. Many plugins and themes started relying on these experimental APIs for essential features that couldn't be accessed in any other way.
+
+The legacy `__experimental` APIs can't be removed on a whim anymore. They became a part of the WordPress public API and fall under the [WordPress Backwards Compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/). Removing them involves a deprecation process. It may be relatively easy for some APIs, but it may require effort and span multiple WordPress releases for others.
+
+All in all, don't use the `__experimental` prefix for new APIs. Use plugin-only APIs and private APIs instead.
+
+#### Plugin-only APIs
+
+Plugin-only APIs are temporary values exported from a module whose existence is either pending future revision or provides an immediate means to an end.
 
 _To External Consumers:_
 
-**There is no support commitment for experimental APIs.** They can and will be removed or changed without advance warning, including as part of a minor or patch release. As an external consumer, you should avoid these APIs.
+**There is no support commitment for plugin-only APIs.** They can and will be removed or changed without advance warning, including as part of a minor or patch release. As an external consumer, you should avoid these APIs.
 
 _To Project Contributors:_
 
-An experimental API is named as such to communicate instability of a function whose interface is not yet finalized. Aside from references within the code, these APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
+An **plugin-only API** is one which is planned for eventual public availability, but is subject to further experimentation, testing, and discussion. It should be made stable or removed at the earliest opportunity.
 
-An experimental function or object should be:
-
-* Prefixed respectively using `__experimental`
-* Only exported in the Gutenberg plugin so it never becomes a part of WordPress core
-
-Here's an example:
+Plugin-only APIs are excluded from WordPress Core and only available in the Gutenberg Plugin:
 
 ```js
-// Using IS_GUTENBERG_PLUGIN allows Webpack to exclude the
-// experimental exports from WordPress core:
+// Using IS_GUTENBERG_PLUGIN allows Webpack to exclude this
+// export from WordPress core:
 if ( IS_GUTENBERG_PLUGIN ) {
-	export { __experimentalDoExcitingExperimentalAction } from './api';
+	export { doSomethingExciting } from './api';
 }
 ```
 
-An **experimental API** is one which is planned for eventual public availability, but is subject to further experimentation, testing, and discussion. It should be made stable or removed at the earliest opportunity.
+The public interface of such APIs is not yet finalized. Aside from references within the code, they APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
 
-While an experimental API may often stabilize into a publicly-available API, there is no guarantee that it will. The conversion to a stable API will inherently be considered a breaking change by the mere fact that the function name must be changed to remove the `__experimental` prefix.
+While a plugin-only API may often stabilize into a publicly-available API, there is no guarantee that it will.
 
-Other prefixes were also used in the past, such as `__unstable` or `__internal`.
-
-#### Experimental APIs merged into WordPress Core become a liability
-
-**Avoid introducing public experimental APIs.**
-
-As of June 2022, WordPress Core contains 280 publicly exported experimental APIs. They got merged from the Gutenberg
-plugin during the major WordPress releases. Many plugins and themes rely on these experimental APIs for essential
-features that can't be accessed in any other way. Naturally, these APIs can't be removed without a warning anymore.
-They are a part of the WordPress public API and fall under the
-[WordPress Backwards Compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/).
-Removing them involves a deprecation process. It may be relatively easy for some APIs, but it may require effort and
-span multiple WordPress releases for others.
-
-**Use private APIs instead.**
-
-Make your experimental APIs private and don't expose them to WordPress extenders.
-
-This way they'll remain internal implementation details that can be changed or removed
-without a warning and without breaking WordPress plugins.
-
-#### Private exports are supported – use the `lock()` and `unlock()` API from `@wordpress/private-apis`
+#### Private APIs
 
 Each `@wordpress` package wanting to privately access or expose a private APIs can
 do so by opting-in to `@wordpress/private-apis`:
@@ -335,7 +316,7 @@ inside it:
 // In @wordpress/package1/index.js:
 import { lock } from './private-apis';
 
-// The experimental function contains all the logic
+// A private function contains all the logic
 function privateValidateBlocks( formula, privateIsStrict ) {
 	let isValid = false;
 	// ...complex logic we don't want to duplicate...
@@ -348,7 +329,7 @@ function privateValidateBlocks( formula, privateIsStrict ) {
 }
 
 // The stable public function is a thin wrapper that calls the
-// experimental function with the experimental features disabled
+// private function with the private features disabled
 export function validateBlocks( blocks ) {
 	privateValidateBlocks( blocks, false );
 }
@@ -360,7 +341,7 @@ lock( privateApis, { privateValidateBlocks } );
 import { privateApis as package1PrivateApis } from '@wordpress/package1';
 import { unlock } from './private-apis';
 
-// The experimental function may be "unlocked" given the stable function:
+// The private function may be "unlocked" given the stable function:
 const { privateValidateBlocks } = unlock( package1PrivateApis );
 privateValidateBlocks( blocks, true );
 ```
@@ -388,7 +369,7 @@ const PrivateMyButton = ( { title, privateShowIcon = true } ) => {
 }
 
 // The stable public component is a thin wrapper that calls the
-// experimental component with the experimental features disabled
+// private component with the private features disabled
 export const MyButton = ( { title } ) =>
     <PrivateMyButton title={ title } privateShowIcon={ false } />
 
@@ -446,24 +427,24 @@ export function toggleFeature( scope, featureName ) {
 
 Some private APIs could benefit from community feedback and it makes sense to expose them to WordPress extenders. At the same time, it doesn't make sense to turn them into a public API in WordPress core. What should you do?
 
-You can re-export that private API as experimental and restrict it to the Gutenberg plugin:
+You can re-export that private API as a plugin-only API to expose it publicly only in the Gutenberg plugin:
 
 ```js
 // This function can't be used by extenders in any context:
-function privateApi() {}
+function privateEverywhere() {}
 
 // This function can be used by extenders with the Gutenberg plugin but not in vanilla WordPress Core:
-function experimentalApi() {}
+function privateInCorePublicInPlugin() {}
 
 // Gutenberg treats both functions as private APIs internally:
 const privateApis = {};
-lock(privateApis, { privateApi, experimentalApi });
+lock(privateApis, { privateEverywhere, privateInCorePublicInPlugin });
 
-// The experimental API is explicitly exported but will not be
-// merged into WordPress core thanks to the IS_GUTENBERG_PLUGIN
-// check.
+// The privateInCorePublicInPlugin function is explicitly exported,
+// but this export will not be merged into WordPress core thanks to
+// the IS_GUTENBERG_PLUGIN check.
 if ( IS_GUTENBERG_PLUGIN ) {
-   export const __experimentalApi = unlock( experiments ).experimentalApi;
+   export const privateInCorePublicInPlugin = unlock( privateApis ).privateInCorePublicInPlugin;
 }
 ```
 
