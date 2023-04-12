@@ -166,7 +166,17 @@ const RadioItemsGroup = () => {
 };
 
 const Template: ComponentStory< typeof DropdownMenu > = ( props ) => (
-	<DropdownMenu { ...props } />
+	<div
+		style={ {
+			width: '100%',
+			minHeight: '300px',
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'center',
+		} }
+	>
+		<DropdownMenu { ...props } />
+	</div>
 );
 export const Default = Template.bind( {} );
 Default.args = {
@@ -175,7 +185,7 @@ Default.args = {
 			<Icon icon={ menu } size={ 20 } />
 		</MenuButton>
 	),
-	sideOffset: 5,
+	sideOffset: 12,
 	children: (
 		<>
 			<DropdownMenuGroup>
