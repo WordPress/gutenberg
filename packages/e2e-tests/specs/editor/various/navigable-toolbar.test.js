@@ -49,7 +49,7 @@ describe( 'Block Toolbar', () => {
 			expect( scrollTopBefore ).toBe( scrollTopAfter );
 		} );
 
-		it( 'navigates in and out of toolbar by keyboard (Alt+F10, Escape)', async () => {
+		it( 'navigates into the toolbar by keyboard (Alt+F10)', async () => {
 			// Assumes new post focus starts in title. Create first new
 			// block by Enter.
 			await page.keyboard.press( 'Enter' );
@@ -82,7 +82,7 @@ describe( 'Block Toolbar', () => {
 			} );
 		} );
 
-		it( 'navigates in and out of toolbar by keyboard (Alt+F10)', async () => {
+		it( 'navigates into the toolbar by keyboard (Alt+F10)', async () => {
 			// Assumes new post focus starts in title. Create first new
 			// block by Enter.
 			await page.keyboard.press( 'Enter' );
