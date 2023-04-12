@@ -22,8 +22,8 @@ export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
 	return (
 		<Component
 			color={ rgbColor }
-			onChange={ ( nextColor ) => {
-				onChange( colord( nextColor ) );
+			onChange={ ( nextColorValue ) => {
+				onChange( colord( nextColorValue ) );
 			} }
 		/>
 	);
