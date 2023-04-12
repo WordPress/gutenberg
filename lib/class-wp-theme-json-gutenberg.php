@@ -3033,10 +3033,28 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the raw data.
 	 *
 	 * @since 5.8.0
+	 * @since 6.3.0 Runs every style value through get_property_value to resolve style ref paths that are references to other values in the tree.
 	 *
 	 * @return array Raw data.
 	 */
 	public function get_raw_data() {
+		$blocks_metadata = static::get_blocks_metadata();
+		$style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata );
+
+		foreach( $style_nodes as $node ) {
+			$value    = _wp_array_get( $this->theme_json, $node['path'], '' );
+			$metadata = _wp_array_get( $this->theme_json, $node['path'], array() );
+			foreach ( static::PROPERTIES_METADATA as $css_property => $value_path ) {
+				$property_value = _wp_array_get( $value, $value_path, '' );
+				if ( ! empty( $property_value ) ) {
+					$resolved_value = static::get_property_value( $metadata, $value_path, $this->theme_json );
+					if ( $property_value !== $resolved_value ) {
+						_wp_array_set( $this->theme_json, array_merge( $node['path'], $value_path ), $resolved_value );
+					}
+				}
+			}
+		}
+
 		return $this->theme_json;
 	}
 
