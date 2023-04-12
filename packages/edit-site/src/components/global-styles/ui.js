@@ -50,24 +50,27 @@ const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 
 function GlobalStylesActionMenu() {
 	const { toggle } = useDispatch( preferencesStore );
-	const { canEditCSS } = useSelect( ( select ) => {
+	const { canEditCSS, hasRevisions } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStyles } =
 			select( coreStore );
-
 		const currentGlobalStyles = __experimentalGetCurrentGlobalStyles();
 		const globalStyles = currentGlobalStyles?.id
 			? getEntityRecord( 'root', 'globalStyles', currentGlobalStyles?.id )
 			: undefined;
+		const revisionsCount =
+			globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count;
 
 		return {
 			canEditCSS:
 				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			hasRevisions: revisionsCount && revisionsCount > 1,
 		};
 	}, [] );
 	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { goTo } = useNavigator();
 	const loadCustomCSS = () => goTo( '/css' );
+	const loadRevisions = () => goTo( '/revisions' );
 	return (
 		<GlobalStylesMenuFill>
 			<DropdownMenu
@@ -89,6 +92,14 @@ function GlobalStylesActionMenu() {
 								{
 									title: __( 'Additional CSS' ),
 									onClick: loadCustomCSS,
+								},
+						  ]
+						: [] ),
+					...( hasRevisions
+						? [
+								{
+									title: __( 'Revisions' ),
+									onClick: loadRevisions,
 								},
 						  ]
 						: [] ),
@@ -229,6 +240,10 @@ function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 				<ScreenCSS name={ name } />
 			</GlobalStylesNavigationScreen>
 
+			<GlobalStylesNavigationScreen path={ parentMenu + '/revisions' }>
+				<ScreenRevisions name={ name } />
+			</GlobalStylesNavigationScreen>
+
 			{ !! blockStyleVariations?.length && (
 				<BlockStylesNavigationScreens
 					parentMenu={ parentMenu }
@@ -350,9 +365,6 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
-			<GlobalStylesNavigationScreen path="/revisions">
-				<ScreenRevisions />
-			</GlobalStylesNavigationScreen>
 		</NavigatorProvider>
 	);
 }

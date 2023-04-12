@@ -12,11 +12,10 @@ import {
 	CardDivider,
 	CardMedia,
 } from '@wordpress/components';
-import { isRTL, __, sprintf, _n } from '@wordpress/i18n';
-import { backup, chevronLeft, chevronRight } from '@wordpress/icons';
+import { isRTL, __ } from '@wordpress/i18n';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useContext } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -27,14 +26,10 @@ import { NavigationButtonAsItem } from './navigation-button';
 import ContextMenu from './context-menu';
 import StylesPreview from './preview';
 import { unlock } from '../../private-apis';
-import { MINIMUM_REVISION_COUNT } from './screen-revisions';
 
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 function ScreenRoot() {
 	const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 	const [ customCSS ] = useGlobalStyle( 'css' );
-	const { userConfigRevisionsCount: revisionsCount } =
-		useContext( GlobalStylesContext );
 	const { variations, canEditCSS } = useSelect( ( select ) => {
 		const {
 			getEntityRecord,
@@ -149,46 +144,6 @@ function ScreenRoot() {
 					</CardBody>
 				</>
 			) }
-
-			{ revisionsCount >= MINIMUM_REVISION_COUNT ? (
-				<>
-					<CardDivider />
-					<CardBody>
-						<Spacer
-							as="p"
-							paddingTop={ 2 }
-							paddingX="13px"
-							marginBottom={ 4 }
-						>
-							{ __( "View revisions to your site's styles." ) }
-						</Spacer>
-						<ItemGroup>
-							<NavigationButtonAsItem
-								path="/revisions"
-								aria-label={ __( 'Styles revisions' ) }
-								icon={ backup }
-							>
-								<HStack justify="space-between">
-									<FlexItem>
-										{ sprintf(
-											/* translators: %d: number of revisions */
-											_n(
-												'%d Revision',
-												'%d Revisions',
-												revisionsCount
-											),
-											revisionsCount
-										) }
-									</FlexItem>
-									<IconWithCurrentColor
-										icon={ chevronIcon }
-									/>
-								</HStack>
-							</NavigationButtonAsItem>
-						</ItemGroup>
-					</CardBody>
-				</>
-			) : null }
 		</Card>
 	);
 }

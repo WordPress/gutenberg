@@ -47,7 +47,6 @@ test.describe( 'Global styles revisions', () => {
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
-		await userGlobalStylesRevisions.disableWelcomeGuide();
 		// Navigates to Styles -> Typography -> Text and click on a size.
 		await page.getByRole( 'button', { name: 'Styles' } ).click();
 
@@ -96,12 +95,13 @@ test.describe( 'Global styles revisions', () => {
 			// Now there should be enough revisions to show the revisions UI.
 			await expect(
 				page.getByRole( 'button', {
-					name: 'Styles revisions',
+					name: 'Styles actions',
 				} )
 			).toBeVisible();
 			await page
-				.getByRole( 'button', { name: 'Styles revisions' } )
+				.getByRole( 'button', { name: 'Styles actions' } )
 				.click();
+			await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
 			const revisionButtons = page.locator(
 				'role=button[name=/^Restore revision/]'
 			);
@@ -113,12 +113,13 @@ test.describe( 'Global styles revisions', () => {
 			// There are some revisions. Let's check that the UI looks how we expect it to.
 			await expect(
 				page.getByRole( 'button', {
-					name: 'Styles revisions',
+					name: 'Styles actions',
 				} )
 			).toBeVisible();
 			await page
-				.getByRole( 'button', { name: 'Styles revisions' } )
+				.getByRole( 'button', { name: 'Styles actions' } )
 				.click();
+			await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
 			const revisionButtons = page.locator(
 				'role=button[name=/^Restore revision/]'
 			);
@@ -135,15 +136,6 @@ class UserGlobalStylesRevisions {
 		this.page = page;
 		this.requestUtils = requestUtils;
 	}
-	async disableWelcomeGuide() {
-		// Turn off the welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'welcomeGuideStyles', false );
-		} );
-	}
-
 	async getGlobalStylesRevisions() {
 		const stylesPostId =
 			await this.requestUtils.getCurrentThemeGlobalStylesPostId();

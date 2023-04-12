@@ -136,7 +136,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 
 			if ( ! empty( $user_theme_revisions ) ) {
 				// Mostly taken from wp_prepare_revisions_for_js().
-				foreach ( $user_theme_revisions as $revision ) {
+				foreach ( $user_theme_revisions as $id => $revision ) {
 					$raw_revision_config = json_decode( $revision->post_content, true );
 					$config              = ( new WP_Theme_JSON_Gutenberg( $raw_revision_config, 'custom' ) )->get_raw_data();
 					$now_gmt             = time();
@@ -146,14 +146,15 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 					$time_ago    = sprintf( __( '%s ago', 'gutenberg' ), human_time_diff( $modified_gmt, $now_gmt ) );
 					$date_short  = date_i18n( _x( 'j M @ H:i', 'revision date short format', 'gutenberg' ), $modified );
 					$revisions[] = array(
-						'styles'   => ! empty( $config['styles'] ) ? $config['styles'] : new stdClass(),
-						'settings' => ! empty( $config['settings'] ) ? $config['settings'] : new stdClass(),
-						'title'    => array(
+						'styles'    => ! empty( $config['styles'] ) ? $config['styles'] : new stdClass(),
+						'settings'  => ! empty( $config['settings'] ) ? $config['settings'] : new stdClass(),
+						'title'     => array(
 							'raw'      => $revision->post_modified,
 							/* translators: 1: Human-readable time difference, 2: short date combined to show rendered revision date. */
 							'rendered' => sprintf( __( '%1$s (%2$s)', 'gutenberg' ), $time_ago, $date_short ),
 						),
-						'id'       => $revision->ID,
+						'id'        => $id,
+						'is_latest' => $id === array_key_first( $user_theme_revisions ),
 					);
 				}
 			}
