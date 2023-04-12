@@ -103,25 +103,25 @@ The global styles folder also offers a set of reusable UI components. These comp
 
 ```js
 {
-  color: {
-    text: 'var:preset|color|blue',
-    background: '#FF0000',
-  },
-  typography: {
-    fontFamily: 'var:preset|font-family|base',
-    fontSize: '10px',
-    lineHeight: 1.5,
-  },
-  spacing: {
-    padding: 'var:preset|spacing|medium',
-  },
-  elements: {
-	link: {
-	  color: {
-		text: 'var:preset|color|green',
-	  },
+	color: {
+		text: 'var:preset|color|blue',
+		background: '#FF0000',
 	},
-  },
+	typography: {
+		fontFamily: 'var:preset|font-family|base',
+		fontSize: '10px',
+		lineHeight: 1.5,
+	},
+	spacing: {
+		padding: 'var:preset|spacing|medium',
+	},
+	elements: {
+		link: {
+			color: {
+			text: 'var:preset|color|green',
+			},
+		},
+	},
 }
 ```
 
