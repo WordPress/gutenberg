@@ -151,12 +151,12 @@ export class PostPublishButton extends Component {
 		}
 
 		const onClickButton = () => {
-			if ( isButtonDisabled ) {
+			// Allow for overriding the ability to save for custom validations and other customizations.
+			if ( ! applyFilters( 'editor.PostPublishButton.shouldSubmit', true, this.props ) ) {
 				return;
 			}
 
-			// Allow for overriding the ability to save for custom validations and other customizations.
-			if ( ! applyFilters( 'editor.PostPublishButton.shouldSubmit', true, this.props ) ) {
+			if ( isButtonDisabled ) {
 				return;
 			}
 			
