@@ -789,7 +789,7 @@ export const toStyles = (
 					( [ cssSelector, declarations ] ) => {
 						if ( !! declarations.length ) {
 							const rules = declarations.join( ';' );
-							ruleset = ruleset + `${ cssSelector }{${ rules }}`;
+							ruleset = ruleset + `${ cssSelector }{${ rules };}`;
 						}
 					}
 				);
