@@ -238,10 +238,16 @@ export function ImageEdit( {
 		}
 		mediaAttributes.href = href;
 
+		let enableLightbox = attributes.enableLightbox;
+		if ( ! enableLightbox ) {
+			enableLightbox = true;
+		}
+
 		setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
+			enableLightbox,
 		} );
 	}
 

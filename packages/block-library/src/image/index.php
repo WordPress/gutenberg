@@ -15,11 +15,12 @@
  */
 function render_block_core_image( $attributes, $content ) {
 	$processor = new WP_HTML_Tag_Processor( $content );
-	$processor->next_tag( 'figure' );
 
-	/// Include conditional to detect if user has activated lightbox in settings #1
-	$processor->set_attribute( 'data-wp-class.isZoomed', 'context.core.isZoomed');
-	$processor->set_attribute( 'data-wp-init.closeZoomOnEsc', 'actions.core.closeZoomOnEsc');
+	if( isset( $attributes['enableLightbox'] ) && $attributes['enableLightbox'] === true ) {
+		$processor->next_tag( 'figure' );
+		$processor->set_attribute( 'data-wp-class.isZoomed', 'context.core.isZoomed');
+		$processor->set_attribute( 'data-wp-init.closeZoomOnEsc', 'actions.core.closeZoomOnEsc');
+	}
 
 	$processor->next_tag( 'img' );
 
@@ -36,17 +37,21 @@ function render_block_core_image( $attributes, $content ) {
 		$content = $processor->get_updated_html();
 	}
 
-	/// Include conditional to detect if user has activated lightbox in settings #2
-	$processor->set_attribute( 'data-wp-on.click', 'actions.core.imageZoom');
-	$content = $processor->get_updated_html();
-	return <<<HTML
-		<div class="lightbox-container" data-wp-context='{ "core": { "isZoomed": false } }'>
-			$content
-			<div data-wp-portal="body" data-wp-class.overlay="context.core.isZoomed">
-				<div data-wp-on.click="actions.core.closeZoom"></div>
+	if( isset( $attributes['enableLightbox'] ) && $attributes['enableLightbox'] === true ) {
+		/// Include conditional to detect if user has activated lightbox in settings #2
+		$processor->set_attribute( 'data-wp-on.click', 'actions.core.imageZoom');
+		$content = $processor->get_updated_html();
+		return <<<HTML
+			<div class="lightbox-container" data-wp-context='{ "core": { "isZoomed": false } }'>
+				$content
+				<div data-wp-portal="body" data-wp-class.overlay="context.core.isZoomed">
+					<div data-wp-on.click="actions.core.closeZoom"></div>
+				</div>
 			</div>
-		</div>
-	HTML;
+		HTML;
+	}
+
+	return $content;
 }
 
 
