@@ -12,7 +12,7 @@ import {
 	__unstableMotion as motion,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { Icon, chevronLeft } from '@wordpress/icons';
+import { Icon, wordpress } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -92,9 +92,12 @@ const SiteHub = forwardRef( ( { backButton, ...props }, ref ) => {
 						className="edit-site-layout__view-mode-toggle"
 					>
 						{ backButton ? (
-							<Icon icon={ chevronLeft } />
+							<Icon size={ 32 } icon={ wordpress } />
 						) : (
-							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+							<SiteIcon
+								siteTitle={ siteTitle }
+								className="edit-site-layout__view-mode-toggle-icon"
+							/>
 						) }
 					</Button>
 				</motion.div>

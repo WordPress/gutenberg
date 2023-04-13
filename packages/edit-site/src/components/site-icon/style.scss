@@ -8,3 +8,14 @@
 	border-radius: $radius-block-ui;
 	object-fit: cover;
 }
+
+.edit-site-site-icon__default {
+	width: 32px;
+	height: 32px;
+	border-radius: 2px;
+	background: #3858E9;
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

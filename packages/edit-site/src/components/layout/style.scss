@@ -198,9 +198,6 @@
 	position: fixed;
 	flex: 1 1 auto;
 	z-index: 2;
-	border-radius: 8px;
-	background-color: rgba(255,255,255,.05);
-	box-shadow: 0px 643px 257px rgba(0, 0, 0, 0.01), 0px 362px 217px rgba(0, 0, 0, 0.05), 0px 161px 161px rgba(0, 0, 0, 0.09), 0px 40px 88px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
 	transition: box-shadow;
 	&.resizing {
 		pointer-events: none;
@@ -239,6 +236,8 @@
 	overflow: hidden;
 	position: absolute;
 	inset: 0;
+	background-color: rgba(255,255,255,.05);
+	box-shadow: 0px 643px 257px rgba(0, 0, 0, 0.01), 0px 362px 217px rgba(0, 0, 0, 0.05), 0px 161px 161px rgba(0, 0, 0, 0.09), 0px 40px 88px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
 }
 
 .the-frame__devices {
@@ -252,7 +251,8 @@
 .the-frame__device {
 	overflow: hidden;
 	position: absolute;
-	height: 100%;
+	height: 100vh;
+	top: -16px;
 	left: 50%;
 	transform: translateX(-50%);
 	border-left: 1px solid rgba(255,255,255,.05);

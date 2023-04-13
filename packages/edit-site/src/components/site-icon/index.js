@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
 
-function SiteIcon( { className } ) {
+function SiteIcon( { siteTitle, className } ) {
 	const { isRequestingSite, siteIconUrl } = useSelect( ( select ) => {
 		const { getEntityRecord, isResolving } = select( coreDataStore );
 		const siteData =
@@ -39,11 +39,9 @@ function SiteIcon( { className } ) {
 			src={ siteIconUrl }
 		/>
 	) : (
-		<Icon
-			className="edit-site-site-icon__icon"
-			size="32px"
-			icon={ wordpress }
-		/>
+		<div className="edit-site-site-icon__default">
+			{ siteTitle?.charAt( 0 ) || '' }
+		</div>
 	);
 
 	return (
