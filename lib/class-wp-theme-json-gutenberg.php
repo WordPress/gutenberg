@@ -252,10 +252,10 @@ class WP_Theme_JSON_Gutenberg {
 		'padding-bottom'                    => array( 'spacing', 'padding', 'bottom' ),
 		'padding-left'                      => array( 'spacing', 'padding', 'left' ),
 		'--wp--style--root--padding'        => array( 'spacing', 'padding' ),
-		'--wp--style--root--padding-top'    => array( 'spacing', 'padding', 'top' ),
-		'--wp--style--root--padding-right'  => array( 'spacing', 'padding', 'right' ),
-		'--wp--style--root--padding-bottom' => array( 'spacing', 'padding', 'bottom' ),
-		'--wp--style--root--padding-left'   => array( 'spacing', 'padding', 'left' ),
+		'--wp--style--root--padding--top'    => array( 'spacing', 'padding', 'top' ),
+		'--wp--style--root--padding--right'  => array( 'spacing', 'padding', 'right' ),
+		'--wp--style--root--padding--bottom' => array( 'spacing', 'padding', 'bottom' ),
+		'--wp--style--root--padding--left'   => array( 'spacing', 'padding', 'left' ),
 		'text-decoration'                   => array( 'typography', 'textDecoration' ),
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'filter'                            => array( 'filter', 'duotone' ),
@@ -2465,17 +2465,17 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( $use_root_padding ) {
 			// Top and bottom padding are applied to the outer block container.
-			$css .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
+			$css .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding--top); padding-bottom: var(--wp--style--root--padding--bottom); }';
 			// Right and left padding are applied to the first container with `.has-global-padding` class.
-			$css .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+			$css .= '.has-global-padding { padding-right: var(--wp--style--root--padding--right); padding-left: var(--wp--style--root--padding--left); }';
 			// Nested containers with `.has-global-padding` class do not get padding.
 			$css .= '.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }';
 			// Alignfull children of the container with left and right padding have negative margins so they can still be full width.
-			$css .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
+			$css .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding--right) * -1); margin-left: calc(var(--wp--style--root--padding--left) * -1); }';
 			// The above rule is negated for alignfull children of nested containers.
 			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }';
 			// Some of the children of alignfull blocks without content width should also get padding: text blocks and non-alignfull container blocks.
-			$css .= '.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+			$css .= '.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding--right); padding-left: var(--wp--style--root--padding--left); }';
 			// The above rule also has to be negated for blocks inside nested `.has-global-padding` blocks.
 			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }';
 		}
