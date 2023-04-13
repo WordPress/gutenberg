@@ -3,6 +3,8 @@
  * This is a silly file that replaces inline footnotes with links to
  * footnotes and a trailing footer with a list of footnote items.
  *
+ * @package gutenberg
+ *
  * @since 6.3.0
  */
 
