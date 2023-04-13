@@ -18,12 +18,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import {
-	useState,
-	useRef,
-	useEffect,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
@@ -47,32 +42,38 @@ import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 
-const ANIMATION_DURATION = 0.2;
+const FRAME_TRANSITION = { type: 'tween', duration: 0.4 };
 
 const SIDEBAR_DEFAULT_WIDTH = 360;
-const SMALL_FRAME_SIZE = 240;
+const MIN_FRAME_SIZE = 240;
+
+// Removes the inline styles in the drag handles.
+const HANDLE_STYLES_OVERRIDE = {
+	position: undefined,
+	userSelect: undefined,
+	cursor: undefined,
+	width: undefined,
+	height: undefined,
+	top: undefined,
+	right: undefined,
+	bottom: undefined,
+	left: undefined,
+};
 
 const frameVariants = {
-	hovering: {
-		top: 8,
-		bottom: 8,
-		left: SIDEBAR_DEFAULT_WIDTH + 16,
-		right: 16,
-	},
 	edit: {
 		top: 0,
 		bottom: 0,
 		left: 0,
 		right: 0,
-		borderRadius: 0,
-		transition: { bounce: 0.2 },
+		transition: FRAME_TRANSITION,
 	},
 	primary: {
 		top: 16,
 		bottom: 16,
-		left: SIDEBAR_DEFAULT_WIDTH + 16,
+		left: SIDEBAR_DEFAULT_WIDTH,
 		right: 16,
-		transition: { bounce: 0.2 },
+		transition: FRAME_TRANSITION,
 	},
 };
 
@@ -80,14 +81,17 @@ const devices = [
 	{
 		label: 'Mobile',
 		width: 480,
+		height: 640,
 	},
 	{
 		label: 'Tablet',
-		width: 768,
+		width: 1024,
+		height: 768,
 	},
 	{
 		label: 'Desktop',
 		width: null,
+		height: '100%',
 	},
 ];
 
@@ -96,7 +100,6 @@ export default function Layout() {
 	useInitEditedEntityFromURL();
 	useSyncCanvasModeWithURL();
 
-	const hubRef = useRef();
 	const frameRef = useRef();
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
@@ -119,6 +122,9 @@ export default function Layout() {
 		},
 		[]
 	);
+
+	const isEditing = canvasMode === 'edit';
+
 	const navigateRegionsProps = useNavigateRegions( {
 		previous: previousShortcut,
 		next: nextShortcut,
@@ -129,39 +135,22 @@ export default function Layout() {
 		( isMobileViewport && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
-		( isMobileViewport && isEditorPage && canvasMode === 'edit' ) ||
+		( isMobileViewport && isEditorPage && isEditing ) ||
 		! isMobileViewport ||
 		! isEditorPage;
 	const isFullCanvas =
-		( isMobileViewport && isListPage ) ||
-		( isEditorPage && canvasMode === 'edit' );
+		( isMobileViewport && isListPage ) || ( isEditorPage && isEditing );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ isHovering, setIsHovering ] = useState( false );
-	const [ frameWidth, setFrameWidth ] = useState( 0 );
-
-	const x = useMotionValue( 0 );
 
 	const [ fullResizer, { height: fullHeight, width: fullWidth } ] =
 		useResizeObserver();
 
-	useEffect( () => {
-		if ( fullWidth ) {
-			return x.onChange( ( latest ) => {
-				setFrameWidth(
-					fullWidth - SIDEBAR_DEFAULT_WIDTH - 32 - latest * 2
-				);
-			} );
-		}
-	}, [ fullWidth ] );
+	const [ frameWidth, setFrameWidth ] = useState( '100%' );
+	const [ frameDevice, setFrameDevice ] = useState( 'Desktop' );
+	const frameHeight = isEditing ? '100%' : frameDevice?.height || '100%';
 
-	useEffect( () => {
-		if ( canvasMode === 'edit' ) {
-			x.set( 0 );
-		}
-	}, [ canvasMode ] );
-
-	const frameAnimate =
-		canvasMode === 'edit' ? 'edit' : isHovering ? 'hovering' : 'primary';
+	const frameAnimate = isEditing ? 'edit' : 'primary';
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -170,124 +159,156 @@ export default function Layout() {
 		return null;
 	}
 
-	const { label } = devices.find(
-		( device ) => frameWidth <= device.width || device.width === null
-	);
-
 	return (
 		<>
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
-			{ fullResizer }
-
 			<motion.div
 				variants={ frameVariants }
-				initial={ canvasMode === 'edit' ? 'edit' : 'primary' }
+				initial={ isEditing ? 'edit' : 'primary' }
 				animate={ frameAnimate }
 				ref={ frameRef }
 				onMouseOver={ () => setIsHovering( true ) }
 				onMouseOut={ () => setIsHovering( false ) }
 				className={ classnames( 'the-frame', {
-					edit: canvasMode === 'edit',
+					edit: isEditing,
 					secondary: isListPage,
 					resizing: isResizing,
 				} ) }
 			>
-				{ !! fullResizer && (
-					<div>
-						<AnimatePresence>
-							{ ( isHovering || isResizing ) && (
-								<motion.div
-									key="handle"
-									className="the-frame__handle"
-									title="drag to resize"
-									dragMomentum={ false }
-									drag="x"
-									onDragStart={ () => setIsResizing( true ) }
-									onDragEnd={ () => setIsResizing( false ) }
-									style={ { x } }
-									initial={ {
-										opacity: 0,
-										left: 0,
-										y: '-50%',
-									} }
-									animate={ {
-										opacity: 1,
-										left: -15,
-										y: '-50%',
-									} }
-									exit={ {
-										opacity: 0,
-										left: 0,
-										y: '-50%',
-									} }
-									dragConstraints={ {
-										left: 0,
-										right:
-											( fullWidth -
-												SIDEBAR_DEFAULT_WIDTH -
-												16 -
-												SMALL_FRAME_SIZE ) /
-											2,
-									} }
-								>
-									{ isResizing && (
-										<motion.div
-											key="handle-label"
-											initial={ {
-												opacity: 0,
-												x: 20,
-											} }
-											animate={ {
-												opacity: 1,
-												x: 0,
-											} }
-											exit={ {
-												opacity: 0,
-												x: 20,
-											} }
-											className="the-frame__handle-label"
-										>
-											{ label }
-										</motion.div>
-									) }
-								</motion.div>
-							) }
-						</AnimatePresence>
-						<div className="the-frame__devices">
-							{ devices.map( ( device ) => (
-								<div
-									className="the-frame__device"
-									key={ device.label }
-									style={ { width: device.width } }
-								/>
-							) ) }
-						</div>
-						<motion.div
-							style={ {
-								left: x,
-								right: x,
+				{ fullResizer }
+				{ !! fullWidth && (
+					<>
+						{ isResizing && (
+							<div className="the-frame__devices">
+								{ devices.map( ( device ) => (
+									<div
+										className="the-frame__device"
+										key={ device.label }
+										style={ { width: device.width } }
+									/>
+								) ) }
+							</div>
+						) }
+						<ResizableBox
+							as={ motion.div }
+							initial={ false }
+							animate={ {
+								flexGrow: isEditing ? 1 : 0,
+								height: frameHeight,
 							} }
-							className="the-frame__inner"
+							transition={ FRAME_TRANSITION }
+							size={ {
+								width: frameWidth,
+							} }
+							enable={ {
+								top: false,
+								right: false,
+								bottom: false,
+								left: true,
+								topRight: false,
+								bottomRight: false,
+								bottomLeft: false,
+								topLeft: false,
+							} }
+							resizeRatio={ 2 }
+							handleClasses={ undefined }
+							handleStyles={ {
+								left: HANDLE_STYLES_OVERRIDE,
+								right: HANDLE_STYLES_OVERRIDE,
+							} }
+							minWidth={ MIN_FRAME_SIZE }
+							maxWidth={ '100%' }
+							maxHeight={ '100%' }
+							handleComponent={ {
+								left: ! isHovering ? null : (
+									<motion.div
+										key="handle"
+										className="the-frame__handle"
+										title="drag to resize"
+										onMouseDown={ () =>
+											setIsResizing( true )
+										}
+										initial={ {
+											opacity: 0,
+											left: 0,
+										} }
+										animate={ {
+											opacity: 1,
+											left: -15,
+										} }
+										exit={ {
+											opacity: 0,
+											left: 0,
+										} }
+									>
+										{ isResizing && ! isEditing && (
+											<motion.div
+												key="handle-label"
+												initial={ {
+													opacity: 0,
+													x: 20,
+												} }
+												animate={ {
+													opacity: 1,
+													x: 0,
+												} }
+												exit={ {
+													opacity: 0,
+													x: 20,
+												} }
+												className="the-frame__handle-label"
+											>
+												{ frameDevice.label }
+											</motion.div>
+										) }
+									</motion.div>
+								),
+							} }
+							onResizeStop={ ( e, direction, ref, d ) => {
+								setFrameWidth( frameWidth + d.width );
+							} }
+							onResize={ ( e, direction, ref ) => {
+								console.log( 'width:', ref.clientWidth );
+								const device = devices.find( ( dev ) =>
+									dev.width
+										? ref.clientWidth < dev.width
+										: dev
+								);
+								setFrameDevice( device );
+							} }
+							className={ classnames( 'the-frame__inner', {
+								edit: isEditing,
+								secondary: isListPage,
+								resizing: isResizing,
+							} ) }
 						>
 							<motion.div
-								className="edit-site-layout__header-wrapper"
-								initial={ { marginTop: -60 } }
+								className="the-frame__content"
 								animate={ {
-									marginTop: canvasMode === 'edit' ? 0 : -60,
+									borderRadius: isEditing ? 0 : 8,
 								} }
-								transition={ { bounce: 0.2 } }
+								transition={ FRAME_TRANSITION }
 							>
-								<NavigableRegion
-									className="edit-site-layout__header"
-									ariaLabel={ __( 'Editor top bar' ) }
+								<motion.div
+									className="edit-site-layout__header-wrapper"
+									initial={ { marginTop: -60 } }
+									animate={ {
+										marginTop: isEditing ? 0 : -60,
+									} }
+									transition={ FRAME_TRANSITION }
 								>
-									<Header />
-								</NavigableRegion>
+									<NavigableRegion
+										className="edit-site-layout__header"
+										ariaLabel={ __( 'Editor top bar' ) }
+									>
+										<Header />
+									</NavigableRegion>
+								</motion.div>
+								<Editor secondary={ isListPage } />
 							</motion.div>
-							<Editor secondary={ isListPage } />
-						</motion.div>
-					</div>
+						</ResizableBox>
+					</>
 				) }
 			</motion.div>
 			<div
@@ -298,21 +319,18 @@ export default function Layout() {
 					navigateRegionsProps.className,
 					{
 						'is-full-canvas': isFullCanvas,
-						'is-edit-mode': canvasMode === 'edit',
+						'is-edit-mode': isEditing,
 					}
 				) }
 			>
 				<AnimatePresence initial={ false }>
 					<motion.div
 						animate={ {
-							opacity: canvasMode === 'edit' ? 0.25 : 1,
+							opacity: isEditing ? 0.25 : 1,
 						} }
 						className="edit-site-layout__sidebar"
 					>
-						<SiteHub
-							ref={ hubRef }
-							className="edit-site-layout__hub"
-						/>
+						<SiteHub className="edit-site-layout__hub" />
 						<NavigableRegion
 							ariaLabel={ __( 'Navigation sidebar' ) }
 						>

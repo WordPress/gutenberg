@@ -28,7 +28,7 @@ import { unlock } from '../../private-apis';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
-const SiteHub = forwardRef( ( { backButton, ...props }, ref ) => {
+const SiteHub = ( { backButton, ...props } ) => {
 	const { canvasMode, dashboardLink } = useSelect( ( select ) => {
 		select( editSiteStore ).getEditedPostType();
 		const { getCanvasMode, getSettings } = unlock(
@@ -62,31 +62,16 @@ const SiteHub = forwardRef( ( { backButton, ...props }, ref ) => {
 	);
 
 	return (
-		<motion.div
-			ref={ ref }
+		<div
 			{ ...props }
 			className={ classnames( 'edit-site-site-hub', props.className ) }
-			layout
-			transition={ {
-				type: 'tween',
-				duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
-				ease: 'easeOut',
-			} }
 		>
 			<HStack
 				justify="flex-start"
 				className="edit-site-site-hub__text-content"
 				spacing="0"
 			>
-				<motion.div
-					className="edit-site-site-hub__view-mode-toggle-container"
-					layout
-					transition={ {
-						type: 'tween',
-						duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
-						ease: 'easeOut',
-					} }
-				>
+				<div className="edit-site-site-hub__view-mode-toggle-container">
 					<Button
 						{ ...siteIconButtonProps }
 						className="edit-site-layout__view-mode-toggle"
@@ -100,15 +85,15 @@ const SiteHub = forwardRef( ( { backButton, ...props }, ref ) => {
 							/>
 						) }
 					</Button>
-				</motion.div>
+				</div>
 				{ ! backButton && (
 					<div className="edit-site-site-hub__site-title">
 						{ siteTitle }
 					</div>
 				) }
 			</HStack>
-		</motion.div>
+		</div>
 	);
-} );
+};
 
 export default SiteHub;

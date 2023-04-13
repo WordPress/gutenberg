@@ -25,7 +25,7 @@
 
 .edit-site-layout__sidebar {
 	z-index: z-index(".edit-site-layout__sidebar");
-	max-width: $nav-sidebar-width;
+	width: $nav-sidebar-width;
 	display: flex;
 	flex-direction: column;
 
@@ -197,23 +197,22 @@
 .the-frame {
 	position: fixed;
 	flex: 1 1 auto;
-	z-index: 2;
+	z-index: 50;
 	transition: box-shadow;
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+	pointer-events: none;
+	* {
+		pointer-events: all;
+	}
 	&.resizing {
 		pointer-events: none;
-		.the-frame__devices {
-			opacity: 1;
-		}
 	}
-	&:hover {
-		&::before {
-			position: absolute;
-			left: -50px;
-			height: 100%;
-			width: 50px;
-			content: '';
-		}
+	&.edit {
+		align-items: stretch;
 	}
+	
 	&.secondary:not(.edit) {
 		position: absolute;
 		width: 328px;
@@ -233,19 +232,26 @@
 }
 
 .the-frame__inner {
-	overflow: hidden;
-	position: absolute;
-	inset: 0;
+	min-width: 240px;
+	max-height: 100%;
+	max-width: 100%;
 	background-color: rgba(255,255,255,.05);
-	box-shadow: 0px 643px 257px rgba(0, 0, 0, 0.01), 0px 362px 217px rgba(0, 0, 0, 0.05), 0px 161px 161px rgba(0, 0, 0, 0.09), 0px 40px 88px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
+	align-self: center;
+	&.resizing {
+		pointer-events: none;
+	}
+	.the-frame__content {
+		height: 100%;
+		overflow: hidden;
+		width: 100%;
+		box-shadow: 0px 643px 257px rgba(0, 0, 0, 0.01), 0px 362px 217px rgba(0, 0, 0, 0.05), 0px 161px 161px rgba(0, 0, 0, 0.09), 0px 40px 88px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
+	}
 }
 
 .the-frame__devices {
 	position: absolute;
 	inset: 0;
 	overflow: hidden;
-	opacity: 0;
-	transition: opacity 0.2s ease;
 }
 
 .the-frame__device {
@@ -264,13 +270,20 @@
 	width: 5px;
 	height: 50px;
 	background-color: rgba(255,255,255,.3);
-	top: 50%;
 	z-index: 100;
 	border-radius: 5px;
 	cursor: col-resize;
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
+	top: 50%;
+	&::before {
+		position: absolute;
+		left: 100%;
+		height: 100%;
+		width: 10px;
+		content: '';
+	}
 	&:hover{
 		background-color: #3858E9;
 	}

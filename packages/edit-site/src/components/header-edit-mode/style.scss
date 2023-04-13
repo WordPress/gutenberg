@@ -20,6 +20,7 @@ $header-toolbar-min-width: 335px;
 		.edit-site-layout__view-mode-toggle {
 			background: none;
 			color: $gray-800;
+			position: static;
 			&:hover {
 				color: $gray-900;
 			}
