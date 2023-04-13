@@ -11,6 +11,7 @@ export { getInnerBlock } from './get-inner-block';
 export { initializeEditor } from './initialize-editor';
 export { openBlockActionsMenu } from './open-block-actions-menu';
 export { openBlockSettings } from './open-block-settings';
+export { selectTextInRichText } from './rich-text-select';
 export { typeInRichText } from './rich-text-type';
 export { pasteIntoRichText } from './rich-text-paste';
 export { setupCoreBlocks } from './setup-core-blocks';
