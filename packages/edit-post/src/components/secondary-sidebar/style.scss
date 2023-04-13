@@ -1,3 +1,8 @@
+/**
+ * Note that this CSS file should be in sync with its counterpart in the other editor:
+ * packages/edit-site/src/components/secondary-sidebar/style.scss
+ */
+
 .edit-post-editor__inserter-panel,
 .edit-post-editor__document-overview-panel {
 	height: 100%;
@@ -62,8 +67,12 @@
 .edit-post-editor__list-view-panel-content,
 .edit-post-editor__list-view-container > .document-outline,
 .edit-post-editor__list-view-empty-headings {
-	overflow: auto;
 	height: 100%;
+
+	// Include custom scrollbars.
+	@include custom-scrollbars-on-hover($gray-600, $white);
+	overflow: auto;
+
 	// The table cells use an extra pixels of space left and right. We compensate for that here.
 	padding: $grid-unit-10 ($grid-unit-10 - $border-width - $border-width);
 }

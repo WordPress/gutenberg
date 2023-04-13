@@ -1,3 +1,8 @@
+/**
+ * Note that this CSS file should be in sync with its counterpart in the other editor:
+ * packages/edit-post/src/components/secondary-sidebar/style.scss
+ */
+
 .edit-site-editor__inserter-panel,
 .edit-site-editor__list-view-panel {
 	height: 100%;
@@ -42,6 +47,12 @@
 }
 
 .edit-site-editor__list-view-panel-content {
+	height: 100%;
+
+	// Include custom scrollbars.
+	@include custom-scrollbars-on-hover($gray-600, $white);
+	overflow: auto;
+
 	overflow-y: auto;
 	padding: $grid-unit-10;
 }
