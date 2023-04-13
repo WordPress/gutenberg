@@ -170,23 +170,17 @@ function BlockListItemContent( {
  * @return {WPComponent|null} The rendered block list item or null if the block width is not provided.
  */
 function BlockListItem( props ) {
-	const {
-		isGridItem,
-		numOfColumns,
-		parentWidth,
-		tileCount,
-		tileIndex,
-		...restProps
-	} = props;
+	const { isGridItem, numOfColumns, tileCount, tileIndex, ...restProps } =
+		props;
 
-	if ( ! props.blockWidth ) {
+	if ( ! props?.blockWidth ) {
 		return null;
 	}
 
 	if ( isGridItem ) {
 		return (
 			<Grid
-				maxWidth={ parentWidth }
+				maxWidth={ props?.parentWidth }
 				numOfColumns={ numOfColumns }
 				tileCount={ tileCount }
 				index={ tileIndex }
