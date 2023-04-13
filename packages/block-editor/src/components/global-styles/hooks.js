@@ -283,6 +283,12 @@ export function useSettingsForBlockElement(
 			updatedSettings.color.customGradient = false;
 		}
 
+		// If filters are not supported by the block/element, disable duotone.
+		if ( ! supportedStyles.includes( 'filter' ) ) {
+			updatedSettings.color.defaultDuotone = false;
+			updatedSettings.color.customDuotone = false;
+		}
+
 		[
 			'lineHeight',
 			'fontStyle',
@@ -359,6 +365,10 @@ export function useSettingsForBlockElement(
 				};
 			}
 		} );
+
+		updatedSettings.shadow = supportedStyles.includes( 'shadow' )
+			? updatedSettings.shadow
+			: false;
 
 		return updatedSettings;
 	}, [ parentSettings, supportedStyles, supports ] );

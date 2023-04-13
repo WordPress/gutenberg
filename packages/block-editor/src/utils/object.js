@@ -27,7 +27,7 @@ function normalizePath( path ) {
  * @return {*} Cloned object, or original literal non-object value.
  */
 function cloneObject( object ) {
-	if ( typeof object === 'object' ) {
+	if ( object && typeof object === 'object' ) {
 		return {
 			...Object.fromEntries(
 				Object.entries( object ).map( ( [ key, value ] ) => [

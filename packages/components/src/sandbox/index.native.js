@@ -14,6 +14,8 @@ import {
 	useRef,
 	useState,
 	useEffect,
+	forwardRef,
+	useCallback,
 } from '@wordpress/element';
 import { usePreferredColorScheme } from '@wordpress/compose';
 
@@ -98,7 +100,6 @@ const observeAndResizeJS = `
 		// get an DOM mutations for that, so do the resize when the window is resized, too.
 		window.addEventListener( 'resize', sendResize, true );
 		window.addEventListener( 'orientationchange', sendResize, true );
-		widow.addEventListener( 'click', sendResize, true );
 	})();
 `;
 
@@ -171,20 +172,24 @@ const style = `
 
 const EMPTY_ARRAY = [];
 
-function Sandbox( {
-	containerStyle,
-	customJS,
-	html = '',
-	lang = 'en',
-	providerUrl = '',
-	scripts = EMPTY_ARRAY,
-	styles = EMPTY_ARRAY,
-	title = '',
-	type,
-	url,
-} ) {
+const Sandbox = forwardRef( function Sandbox(
+	{
+		containerStyle,
+		customJS,
+		html = '',
+		lang = 'en',
+		providerUrl = '',
+		scripts = EMPTY_ARRAY,
+		styles = EMPTY_ARRAY,
+		title = '',
+		type,
+		url,
+		onWindowEvents = {},
+		viewportProps = '',
+	},
+	ref
+) {
 	const colorScheme = usePreferredColorScheme();
-	const ref = useRef();
 	const [ height, setHeight ] = useState( 0 );
 	const [ contentHtml, setContentHtml ] = useState( getHtmlDoc() );
 
@@ -209,13 +214,19 @@ function Sandbox( {
 		// we can use this in the future to inject custom styles or scripts.
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
 		// that expect the scripts to be part of the body.
+
+		// Avoid comma issues with props.viewportProps.
+		const addViewportProps = viewportProps
+			.trim()
+			.replace( /(^[^,])/, ', $1' );
+
 		const htmlDoc = (
 			<html lang={ lang }>
 				<head>
 					<title>{ title }</title>
 					<meta
 						name="viewport"
-						content="width=device-width, initial-scale=1"
+						content={ `width=device-width, initial-scale=1${ addViewportProps }` }
 					></meta>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
 					{ styles.map( ( rules, i ) => (
@@ -239,6 +250,21 @@ function Sandbox( {
 		return '<!DOCTYPE html>' + renderToString( htmlDoc );
 	}
 
+	const getInjectedJavaScript = useCallback( () => {
+		// Allow parent to override the resize observers with prop.customJS (legacy support)
+		let injectedJS = customJS || observeAndResizeJS;
+
+		// Add any event listeners that were passed in.
+		Object.keys( onWindowEvents ).forEach( ( eventType ) => {
+			injectedJS += `
+				window.addEventListener( '${ eventType }', function( event ) {
+					window.ReactNativeWebView.postMessage( JSON.stringify( { type: '${ eventType }', ...event.data } ) );
+				});`;
+		} );
+
+		return injectedJS;
+	}, [ customJS, onWindowEvents ] );
+
 	function updateContentHtml( forceRerender = false ) {
 		const newContentHtml = getHtmlDoc();
 
@@ -253,25 +279,6 @@ function Sandbox( {
 		}
 	}
 
-	function checkMessageForResize( event ) {
-		// Attempt to parse the message data as JSON if passed as string.
-		let data = event.nativeEvent.data || {};
-
-		if ( 'string' === typeof data ) {
-			try {
-				data = JSON.parse( data );
-			} catch ( e ) {}
-		}
-
-		// Update the state only if the message is formatted as we expect,
-		// i.e. as an object with a 'resize' action.
-		if ( 'resize' !== data.action ) {
-			return;
-		}
-
-		setHeight( data.height );
-	}
-
 	function getSizeStyle() {
 		const contentHeight = Math.ceil( height );
 
@@ -281,6 +288,39 @@ function Sandbox( {
 	function onChangeDimensions( dimensions ) {
 		setIsLandscape( dimensions.window.width >= dimensions.window.height );
 	}
+
+	const onMessage = useCallback(
+		( message ) => {
+			let data = message?.nativeEvent?.data;
+
+			try {
+				data = JSON.parse( data );
+			} catch ( e ) {
+				return;
+			}
+
+			// check for resize event
+			if ( 'resize' === data?.action ) {
+				setHeight( data.height );
+			}
+
+			// Forward the event to parent event listeners
+			Object.keys( onWindowEvents ).forEach( ( eventType ) => {
+				if ( data?.type === eventType ) {
+					try {
+						onWindowEvents[ eventType ]( data );
+					} catch ( e ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`Error handling event ${ eventType }`,
+							e
+						);
+					}
+				}
+			} );
+		},
+		[ onWindowEvents ]
+	);
 
 	useEffect( () => {
 		const dimensionsChangeSubscription = Dimensions.addEventListener(
@@ -314,7 +354,7 @@ function Sandbox( {
 				sandboxStyles[ 'sandbox-webview__container' ],
 				containerStyle,
 			] }
-			injectedJavaScript={ customJS || observeAndResizeJS }
+			injectedJavaScript={ getInjectedJavaScript() }
 			key={ key }
 			ref={ ref }
 			source={ { baseUrl: providerUrl, html: contentHtml } }
@@ -326,14 +366,15 @@ function Sandbox( {
 				getSizeStyle(),
 				Platform.isAndroid && workaroundStyles.webView,
 			] }
-			onMessage={ checkMessageForResize }
+			onMessage={ onMessage }
 			scrollEnabled={ false }
 			setBuiltInZoomControls={ false }
 			showsHorizontalScrollIndicator={ false }
 			showsVerticalScrollIndicator={ false }
+			mediaPlaybackRequiresUserAction={ false }
 		/>
 	);
-}
+} );
 
 const workaroundStyles = StyleSheet.create( {
 	webView: {

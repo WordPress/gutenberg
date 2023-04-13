@@ -208,7 +208,7 @@ describe( 'Cover block', () => {
 
 			await selectBlock( 'Block: Cover' );
 			await userEvent.type(
-				screen.getByLabelText( 'Alt text (alternative text)' ),
+				screen.getByLabelText( 'Alternative text' ),
 				'Me'
 			);
 			expect( screen.getByAltText( 'Me' ) ).toBeInTheDocument();

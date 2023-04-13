@@ -215,7 +215,7 @@ class BlockListBlock extends Component {
 			order + 1
 		);
 		const { isFullWidth, isContainerRelated } = alignmentHelpers;
-		const accessible = ! ( isSelected || isInnerBlockSelected );
+		const isFocused = isSelected || isInnerBlockSelected;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
 		const isScreenWidthWider = blockWidth < screenWidth;
@@ -224,8 +224,9 @@ class BlockListBlock extends Component {
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.onFocus }
-				accessible={ accessible }
+				accessible={ ! isFocused }
 				accessibilityRole={ 'button' }
+				disabled={ isFocused }
 			>
 				<View
 					style={ { flex: 1 } }

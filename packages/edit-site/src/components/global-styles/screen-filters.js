@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import DuotonePanel from './duotone-panel';
+import FiltersPanel from './filters-panel';
 import BlockPreviewPanel from './block-preview-panel';
 
 /**
@@ -19,7 +19,7 @@ function ScreenFilters( { name } ) {
 		<>
 			<ScreenHeader title={ __( 'Filters' ) } />
 			<BlockPreviewPanel name={ name } />
-			<DuotonePanel name={ name } />
+			<FiltersPanel name={ name } />
 		</>
 	);
 }

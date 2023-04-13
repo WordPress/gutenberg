@@ -25,17 +25,6 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 
 		$has_selectors = ! empty( $block_type->selectors );
 
-		// Duotone (No fallback selectors for Duotone).
-		if ( 'filter.duotone' === $target || array( 'filter', 'duotone' ) === $target ) {
-			// If selectors API in use, only use it's value or null.
-			if ( $has_selectors ) {
-				return _wp_array_get( $block_type->selectors, array( 'filter', 'duotone' ), null );
-			}
-
-			// Selectors API, not available, check for old experimental selector.
-			return _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), null );
-		}
-
 		// Root Selector.
 
 		// Calculated before returning as it can be used as fallback for
@@ -59,8 +48,8 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			return $root_selector;
 		}
 
-		// If target is not `root` or `duotone` we have a feature or subfeature
-		// as the target. If the target is a string convert to an array.
+		// If target is not `root` we have a feature or subfeature as the target.
+		// If the target is a string convert to an array.
 		if ( is_string( $target ) ) {
 			$target = explode( '.', $target );
 		}
@@ -95,25 +84,7 @@ if ( ! function_exists( 'wp_get_block_css_selector' ) ) {
 			}
 
 			// Scope the feature selector by the block's root selector.
-			$scopes    = explode( ',', $root_selector );
-			$selectors = explode( ',', $feature_selector );
-
-			$selectors_scoped = array();
-			foreach ( $scopes as $outer ) {
-				foreach ( $selectors as $inner ) {
-					$outer = trim( $outer );
-					$inner = trim( $inner );
-					if ( ! empty( $outer ) && ! empty( $inner ) ) {
-						$selectors_scoped[] = $outer . ' ' . $inner;
-					} elseif ( empty( $outer ) ) {
-						$selectors_scoped[] = $inner;
-					} elseif ( empty( $inner ) ) {
-						$selectors_scoped[] = $outer;
-					}
-				}
-			}
-
-			return implode( ', ', $selectors_scoped );
+			return WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $feature_selector );
 		}
 
 		// Subfeature selector

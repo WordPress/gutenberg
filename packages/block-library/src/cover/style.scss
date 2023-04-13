@@ -7,6 +7,7 @@
 	justify-content: center;
 	align-items: center;
 	padding: 1em;
+	overflow: hidden;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 	// Keep the flex layout direction to the physical direction (LTR) in RTL languages.
@@ -203,7 +204,7 @@ video.wp-block-cover__video-background {
 		// Mobile Safari does not support fixed background attachment properly.
 		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios
 		// Chrome on Android does not appear to support the attachment at all: https://issuetracker.google.com/issues/36908439
-		@supports (-webkit-overflow-scrolling: touch) {
+		@supports (-webkit-touch-callout: inherit) {
 			background-attachment: scroll;
 		}
 

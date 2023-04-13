@@ -407,19 +407,18 @@ export default function Image( {
 					{ ! multiImageSelection && (
 						<TextareaControl
 							__nextHasNoMarginBottom
-							label={ __( 'Alt text (alternative text)' ) }
+							label={ __( 'Alternative text' ) }
 							value={ alt }
 							onChange={ updateAlt }
 							help={
 								<>
 									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 										{ __(
-											'Describe the purpose of the image'
+											'Describe the purpose of the image.'
 										) }
 									</ExternalLink>
-									{ __(
-										'Leave empty if the image is purely decorative.'
-									) }
+									<br />
+									{ __( 'Leave empty if decorative.' ) }
 								</>
 							}
 						/>
