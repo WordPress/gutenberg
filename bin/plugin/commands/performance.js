@@ -154,6 +154,9 @@ function formatTime( number ) {
 	return Math.round( number * factor ) / factor;
 }
 
+/**
+ * A couple of simple helpers for creating better logs.
+ */
 const logInfo = log;
 // @ts-ignore
 const logTitle = ( message ) => log( formats.title( `\n${ message }\n` ) );
@@ -279,27 +282,28 @@ async function runPerformanceTests( refs, options ) {
 
 	logTitle( '🏠 Setting up the environment' );
 
-	const rootDir = path.join( os.tmpdir(), 'wp-gutenberg-performance-tests' );
-	if ( fs.existsSync( rootDir ) ) {
-		logAction( `Reusing existing tmp directory: ${ rootDir }` );
+	const baseDir = path.join( os.tmpdir(), 'wp-gutenberg-performance-tests' );
+	if ( fs.existsSync( baseDir ) ) {
+		logAction( `Found existing base directory: ${ baseDir }` );
 		if ( ! runningInCI ) {
 			const { startFresh } = await inquirer.prompt( [
 				{
 					type: 'confirm',
 					name: 'startFresh',
-					message: `Empty the existing tmp directory for a fresh start?`,
+					message: `Clear the existing environment?`,
 					default: false,
 				},
 			] );
 
 			if ( startFresh ) {
-				logAction( `Removing tmp directory content` );
-				await runShellScript( `rm -rf ${ rootDir }/*` );
+				logAction( `Clearing the environment` );
+				await runShellScript( `rm -rf ${ baseDir }/*` );
+				// @todo Should also clear docker images?
 			}
 		}
 	} else {
-		logAction( `Creating tmp directory: ${ rootDir }` );
-		fs.mkdirSync( rootDir );
+		logAction( `Creating base directory: ${ baseDir }` );
+		fs.mkdirSync( baseDir );
 	}
 
 	let wpZipURL;
@@ -343,7 +347,9 @@ async function runPerformanceTests( refs, options ) {
 			{
 				type: 'confirm',
 				name: 'buildLocalRef',
-				message: `Build the plugin from your local branch? (${ localRef })`,
+				message: `Build the plugin from your local branch? (${ formats.success(
+					localRef
+				) })`,
 				default: false,
 			},
 		] );
@@ -365,13 +371,13 @@ async function runPerformanceTests( refs, options ) {
 			const logRefAction = ( msg ) =>
 				logAction( `${ CHALKS[ i ]( ref ) }: ${ msg }`, 2 );
 
-			const envDir = path.join( rootDir, `test-env-${ i }` );
+			const envDir = path.join( baseDir, `test-env-${ i }` );
 			if ( ! fs.existsSync( envDir ) ) {
 				logRefAction( `Creating environment directory (${ envDir })` );
 				fs.mkdirSync( envDir );
 			} else {
 				logRefAction(
-					`Reusing existing environment directory (${ envDir })`
+					`Using existing environment directory (${ envDir })`
 				);
 			}
 
@@ -415,7 +421,7 @@ async function runPerformanceTests( refs, options ) {
 				);
 
 				if ( isBuildUpToDate ) {
-					logRefAction( 'Reusing current build' );
+					logRefAction( 'Using current build' );
 					doBuild = false;
 				} else {
 					logRefAction( 'Fetching' );
@@ -461,6 +467,8 @@ async function runPerformanceTests( refs, options ) {
 				logRefAction( 'Building' );
 				await runShellScript( 'npm run build', buildDir );
 				await runShellScript( 'rm -f build-ref-*', envDir );
+				// Save the build hash so we can check whether we need to
+				// rebuild when rerunning.
 				await runShellScript(
 					`touch build-ref-${ targetSHA }`,
 					envDir
@@ -517,7 +525,7 @@ async function runPerformanceTests( refs, options ) {
 			for ( const [ refIndex, ref ] of testRefs.entries() ) {
 				const sanitizedBranch = sanitizeBranchName( ref );
 				const runKey = `${ testSuite }_${ sanitizedBranch }_round-${ roundIndex }`;
-				const envDir = path.join( rootDir, `test-env-${ refIndex }` );
+				const envDir = path.join( baseDir, `test-env-${ refIndex }` );
 
 				logAction( `Ref: ${ CHALKS[ refIndex ]( ref ) }`, 2 );
 				logAction( 'Starting the environment', 3 );
