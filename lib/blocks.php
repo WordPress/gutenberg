@@ -23,8 +23,6 @@ function gutenberg_reregister_core_block_types() {
 				'columns',
 				'comments',
 				'details',
-				'details-content',
-				'details-summary',
 				'group',
 				'html',
 				'list',
