@@ -11,7 +11,7 @@ import type { WPComponent } from '@wordpress/element';
 /**
  * Defined behavior of a plugin type.
  */
-export interface Plugin {
+export interface WPPlugin {
 	/**
 	 * A string identifying the plugin. Must be unique across all registered plugins.
 	 */
@@ -36,12 +36,12 @@ export interface Plugin {
 	scope?: string;
 }
 
-type PluginSettings = Omit< Plugin, 'name' >;
+type PluginSettings = Omit< WPPlugin, 'name' >;
 
 /**
  * Plugin definitions keyed by plugin name.
  */
-const plugins = {} as Record< string, Plugin >;
+const plugins = {} as Record< string, WPPlugin >;
 
 /**
  * Registers a plugin to the editor.
@@ -120,7 +120,10 @@ const plugins = {} as Record< string, Plugin >;
  *
  * @return The final plugin settings object.
  */
-export function registerPlugin( name: string, settings: PluginSettings ) {
+export function registerPlugin(
+	name: string,
+	settings: PluginSettings
+): PluginSettings | null {
 	if ( typeof settings !== 'object' ) {
 		console.error( 'No settings object provided!' );
 		return null;
@@ -203,7 +206,7 @@ export function registerPlugin( name: string, settings: PluginSettings ) {
  * @return The previous plugin settings object, if it has been
  *         successfully unregistered; otherwise `undefined`.
  */
-export function unregisterPlugin( name: string ) {
+export function unregisterPlugin( name: string ): WPPlugin | undefined {
 	if ( ! plugins[ name ] ) {
 		console.error( 'Plugin "' + name + '" is not registered.' );
 		return;
@@ -223,7 +226,7 @@ export function unregisterPlugin( name: string ) {
  *
  * @return Plugin setting.
  */
-export function getPlugin( name: string ) {
+export function getPlugin( name: string ): WPPlugin | undefined {
 	return plugins[ name ];
 }
 
@@ -235,7 +238,7 @@ export function getPlugin( name: string ) {
  *
  * @return The list of plugins without a scope or for a given scope.
  */
-export function getPlugins( scope?: string ) {
+export function getPlugins( scope?: string ): WPPlugin[] {
 	return Object.values( plugins ).filter(
 		( plugin ) => plugin.scope === scope
 	);

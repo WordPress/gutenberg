@@ -7,11 +7,11 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import type { Plugin } from '../../api';
+import type { WPPlugin } from '../../api';
 
 export interface PluginContext {
-	name: null | Plugin[ 'name' ];
-	icon: null | Plugin[ 'icon' ];
+	name: null | WPPlugin[ 'name' ];
+	icon: null | WPPlugin[ 'icon' ];
 }
 
 const { Consumer, Provider } = createContext< PluginContext >( {
@@ -25,11 +25,11 @@ export { Provider as PluginContextProvider };
  * A Higher Order Component used to inject Plugin context to the
  * wrapped component.
  *
- * @param mapContextToProps Function called on every context change,
- *                          expected to return object of props to
- *                          merge with the component's own props.
+ * @param  mapContextToProps Function called on every context change,
+ *                           expected to return object of props to
+ *                           merge with the component's own props.
  *
- * @return Enhanced component with injected context as props.
+ * @return {WPComponent} Enhanced component with injected context as props.
  */
 export const withPluginContext = (
 	mapContextToProps: < T >(

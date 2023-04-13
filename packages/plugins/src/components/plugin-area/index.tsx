@@ -17,7 +17,7 @@ import { PluginContextProvider } from '../plugin-context';
 import { PluginErrorBoundary } from '../plugin-error-boundary';
 import { getPlugins } from '../../api';
 import type { PluginContext } from '../plugin-context';
-import type { Plugin } from '../../api';
+import type { WPPlugin } from '../../api';
 
 const getPluginContext = memoize(
 	( icon: PluginContext[ 'icon' ], name: PluginContext[ 'name' ] ) => ( {
@@ -28,15 +28,15 @@ const getPluginContext = memoize(
 
 type PluginAreaProps = {
 	scope?: string;
-	onError?: ( name: Plugin[ 'name' ], error: Error ) => void;
+	onError?: ( name: WPPlugin[ 'name' ], error: Error ) => void;
 };
 
 /**
  * A component that renders all plugin fills in a hidden div.
  *
- * @param                                                    props
- * @param {string}                                           props.scope
- * @param {( name: Plugin[ 'name' ], error: Error ) => void} props.onError
+ * @param                                                                props
+ * @param {string|undefined}                                             props.scope
+ * @param {( name: WPPlugin[ 'name' ], error: Error ) => void|undefined} props.onError
  * @example
  * ```js
  * // Using ES5 syntax
@@ -70,13 +70,13 @@ type PluginAreaProps = {
  */
 function PluginArea( { scope, onError }: PluginAreaProps ) {
 	const store = useMemo( () => {
-		let lastValue: Plugin[] = [];
+		let lastValue: WPPlugin[] = [];
 
 		return {
 			subscribe(
 				listener: (
-					plugin: Omit< Plugin, 'name' >,
-					name: Plugin[ 'name' ]
+					plugin: Omit< WPPlugin, 'name' >,
+					name: WPPlugin[ 'name' ]
 				) => void
 			) {
 				addAction(
