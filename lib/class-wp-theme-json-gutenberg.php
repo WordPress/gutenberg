@@ -1849,16 +1849,16 @@ class WP_Theme_JSON_Gutenberg {
 		$root_variable_duplicates = array();
 
 		// Add a solid style fallback if no style defined.
-		if ( isset( $styles[ 'border'] ) ) {
-			if ( 
-				( isset( $styles[ 'border']['width'] ) || isset( $styles[ 'border']['color'] ) ) && ! isset( $styles[ 'border']['style'] ) ) {
-				$styles[ 'border']['style'] = 'solid';
+		if ( isset( $styles['border'] ) ) {
+			if (
+				( isset( $styles['border']['width'] ) || isset( $styles['border']['color'] ) ) && ! isset( $styles['border']['style'] ) ) {
+				$styles['border']['style'] = 'solid';
 			}
-			foreach ( [ 'top', 'left', 'right', 'bottom' ] as $edge ) {
+			foreach ( array( 'top', 'left', 'right', 'bottom' ) as $edge ) {
 				if (
-					isset( $styles[ 'border'][ $edge ]) && 
-					( isset( $styles[ 'border'][ $edge ]['width'] ) || isset( $styles[ 'border'][ $edge ]['color'] ) ) && ! isset( $styles[ 'border'][ $edge ]['style'] ) ) {
-					$styles[ 'border'][ $edge ]['style'] = 'solid';
+					isset( $styles['border'][ $edge ]) &&
+					( isset( $styles['border'][ $edge ]['width'] ) || isset( $styles['border'][ $edge ]['color'] ) ) && ! isset( $styles['border'][ $edge ]['style'] ) ) {
+					$styles['border'][ $edge ]['style'] = 'solid';
 				}
 			}
 		}
