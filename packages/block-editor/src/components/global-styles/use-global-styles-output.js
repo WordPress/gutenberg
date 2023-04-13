@@ -798,15 +798,15 @@ export const toStyles = (
 			if ( styleVariationSelectors ) {
 				Object.entries( styleVariationSelectors ).forEach(
 					( [ styleVariationName, styleVariationSelector ] ) => {
-						if ( styles?.variations?.[ styleVariationName ] ) {
+						const styleVariations =
+							styles?.variations?.[ styleVariationName ];
+						if ( styleVariations ) {
 							// If the block uses any custom selectors for block support, add those first.
 							if ( featureSelectors ) {
 								const featureDeclarations =
 									getFeatureDeclarations(
 										featureSelectors,
-										styles?.variations?.[
-											styleVariationName
-										]
+										styleVariations
 									);
 
 								Object.entries( featureDeclarations ).forEach(
@@ -830,7 +830,7 @@ export const toStyles = (
 							// Otherwise add regular selectors.
 							const styleVariationDeclarations =
 								getStylesDeclarations(
-									styles?.variations?.[ styleVariationName ],
+									styleVariations,
 									styleVariationSelector,
 									useRootPaddingAlign,
 									tree
