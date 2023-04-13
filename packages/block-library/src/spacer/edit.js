@@ -254,19 +254,51 @@ const SpacerEdit = ( {
 				width: '72px',
 			} );
 		}
-		if ( isFlexLayout && ! flexSize ) {
+		if (
+			isFlexLayout &&
+			selfStretch !== 'fill' &&
+			selfStretch !== 'fit' &&
+			! flexSize
+		) {
+			const newSize =
+				inheritedOrientation === 'horizontal'
+					? getSpacingPresetCssVar( width ) || '72px'
+					: getSpacingPresetCssVar( height ) || '100px';
 			setAttributes( {
 				style: {
 					...blockStyle,
 					layout: {
 						...layout,
-						flexSize: width || '72px',
+						flexSize: newSize,
 						selfStretch: 'fixed',
 					},
 				},
 			} );
+		} else if (
+			isFlexLayout &&
+			( selfStretch === 'fill' || selfStretch === 'fit' )
+		) {
+			if ( inheritedOrientation === 'horizontal' ) {
+				setAttributes( {
+					width: '0px',
+				} );
+			} else {
+				setAttributes( {
+					height: '0px',
+				} );
+			}
 		}
-	}, [] );
+	}, [
+		blockStyle,
+		flexSize,
+		height,
+		inheritedOrientation,
+		isFlexLayout,
+		layout,
+		selfStretch,
+		setAttributes,
+		width,
+	] );
 
 	return (
 		<>
