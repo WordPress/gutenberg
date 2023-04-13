@@ -10,7 +10,7 @@ import {
 	AccessibilityInfo,
 	Platform,
 } from 'react-native';
-import { isEmpty, get } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -323,7 +323,7 @@ class BottomSheetCell extends Component {
 		const opacity =
 			activeOpacity !== undefined
 				? activeOpacity
-				: get( platformStyles, 'activeOpacity.opacity' );
+				: platformStyles.activeOpacity?.opacity;
 
 		return (
 			<TouchableRipple
