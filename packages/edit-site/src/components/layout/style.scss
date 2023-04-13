@@ -135,20 +135,6 @@
 		box-shadow: none;
 	}
 
-	&::before {
-		transition: box-shadow 0.1s ease;
-		@include reduce-motion("transition");
-		content: "";
-		display: block;
-		position: absolute;
-		top: 9px;
-		right: 9px;
-		bottom: 9px;
-		left: 9px;
-		border-radius: $radius-block-ui + $border-width + $border-width;
-		box-shadow: none;
-	}
-
 	// Lightened spot color focus.
 	&:focus::before {
 		box-shadow:
