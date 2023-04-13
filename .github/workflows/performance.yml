@@ -48,24 +48,23 @@ jobs:
               shell: bash
               run: |
                   IFS=. read -ra PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
-                  CURRENT_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
                   PREVIOUS_VERSION_BASE_10=$((PLUGIN_VERSION_ARRAY[0] * 10 + PLUGIN_VERSION_ARRAY[1] - 1))
                   PREVIOUS_RELEASE_BRANCH="release/$((PREVIOUS_VERSION_BASE_10 / 10)).$((PREVIOUS_VERSION_BASE_10 % 10))"
                   WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --wp-version "$WP_MAJOR"
+                  ./bin/plugin/cli.js perf "$PREVIOUS_RELEASE_BRANCH" "wp/$WP_MAJOR" --wp-version "$WP_MAJOR"
 
             - name: Compare performance with base branch
               if: github.event_name == 'push'
-              # The base hash used here need to be a commit that is compatible with the current WP version
+              # The base hash used here need to be a commit that is compatible with the current WP version.
               # The current one is debd225d007f4e441ceec80fbd6fa96653f94737 and it needs to be updated every WP major release.
               # It is used as a base comparison point to avoid fluctuation in the performance metrics.
               run: |
                   WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 --tests-branch $GITHUB_SHA --wp-version "$WP_MAJOR"
+                  ./bin/plugin/cli.js perf debd225d007f4e441ceec80fbd6fa96653f94737 --wp-version "$WP_MAJOR"
 
             - name: Compare performance with custom branches
               if: github.event_name == 'workflow_dispatch'
@@ -73,7 +72,7 @@ jobs:
                   BRANCHES: ${{ github.event.inputs.branches }}
                   WP_VERSION: ${{ github.event.inputs.wpversion }}
               run: |
-                  ./bin/plugin/cli.js perf $(echo $BRANCHES | tr ',' ' ') --tests-branch $GITHUB_SHA --wp-version "$WP_VERSION"
+                  ./bin/plugin/cli.js perf $(echo $BRANCHES | tr ',' ' ') --wp-version "$WP_VERSION"
 
             - name: Archive performance results
               if: success()
