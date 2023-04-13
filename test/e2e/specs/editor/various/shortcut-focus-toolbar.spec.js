@@ -79,7 +79,7 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 	test.describe( 'In Top Toolbar option:', () => {
 		test.beforeEach( async ( { editor } ) => {
 			// Ensure the fixed toolbar option is on
-			await editor.toggleFixedToolbar( true );
+			await editor.setIsFixedToolbar( true );
 		} );
 
 		test( 'Focuses the correct toolbar in edit mode', async ( {
