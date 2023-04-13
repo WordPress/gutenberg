@@ -17,6 +17,7 @@ const {
 	runShellScript,
 	readJSONFile,
 	writeJSONFile,
+	getFileHash,
 } = require( '../lib/utils' );
 const config = require( '../config' );
 
@@ -423,8 +424,35 @@ async function runPerformanceTests( refs, options ) {
 						.reset( 'hard', `origin/${ ref }` )
 						.checkout( ref );
 
-					logRefAction( 'Installing dependencies' );
-					await runShellScript( 'npm ci', buildDir );
+					// Compare package-lock.json files to see if we can use the
+					// node modules already installed within the root directory.
+					const rootPackageLockHash = getFileHash(
+						path.join( CWD, 'package-lock.json' )
+					);
+					const targetPackageLockHash = getFileHash(
+						path.join( buildDir, 'package-lock.json' )
+					);
+
+					if ( rootPackageLockHash === targetPackageLockHash ) {
+						logRefAction( 'Using existing dependencies' );
+
+						const sourceNodeModulesPath = path.join(
+							CWD,
+							'node_modules'
+						);
+						const targetNodeModulesPath = path.join(
+							buildDir,
+							'node_modules'
+						);
+
+						await runShellScript(
+							`ln -s ${ sourceNodeModulesPath } ${ targetNodeModulesPath }`
+						);
+					} else {
+						logRefAction( 'Installing dependencies' );
+						await runShellScript( 'npm ci', buildDir );
+					}
+
 					doBuild = true;
 				}
 			}

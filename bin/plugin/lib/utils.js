@@ -8,6 +8,7 @@ const childProcess = require( 'child_process' );
 const { v4: uuid } = require( 'uuid' );
 const path = require( 'path' );
 const os = require( 'os' );
+const crypto = require( 'crypto' );
 
 /**
  * Internal dependencies
@@ -134,6 +135,19 @@ function getRandomTemporaryPath() {
 	return path.join( os.tmpdir(), uuid() );
 }
 
+/**
+ * Function to get the SHA256 hash of a file.
+ *
+ * @param {string} filePath Path to the file to be hashed.
+ * @return {string} SHA of the given file.
+ */
+function getFileHash( filePath ) {
+	const fileContent = fs.readFileSync( filePath );
+	const hash = crypto.createHash( 'sha256' );
+	hash.update( fileContent );
+	return hash.digest( 'hex' );
+}
+
 module.exports = {
 	askForConfirmation,
 	runStep,
@@ -141,4 +155,5 @@ module.exports = {
 	writeJSONFile,
 	runShellScript,
 	getRandomTemporaryPath,
+	getFileHash,
 };
