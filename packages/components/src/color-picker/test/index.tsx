@@ -51,26 +51,12 @@ describe( 'ColorPicker', () => {
 			);
 
 			const formatSelector = screen.getByRole( 'combobox' );
-
-			if ( formatSelector === null ) {
-				throw new Error(
-					'The color format selector could not be found'
-				);
-			}
-
-			expect( formatSelector ).toBeInTheDocument();
+			expect( formatSelector ).toBeVisible();
 
 			await user.selectOptions( formatSelector, 'hex' );
 
 			const hexInput = screen.getByRole( 'textbox' );
-
-			if ( hexInput === null ) {
-				throw new Error(
-					'The color format selector could not be found'
-				);
-			}
-
-			expect( hexInput ).toBeInTheDocument();
+			expect( hexInput ).toBeVisible();
 
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
@@ -96,26 +82,12 @@ describe( 'ColorPicker', () => {
 			);
 
 			const formatSelector = screen.getByRole( 'combobox' );
-
-			if ( formatSelector === null ) {
-				throw new Error(
-					'The color format selector could not be found'
-				);
-			}
-
-			expect( formatSelector ).toBeInTheDocument();
+			expect( formatSelector ).toBeVisible();
 
 			await user.selectOptions( formatSelector, 'hex' );
 
 			const hexInput = screen.getByRole( 'textbox' );
-
-			if ( hexInput === null ) {
-				throw new Error(
-					'The color format selector could not be found'
-				);
-			}
-
-			expect( hexInput ).toBeInTheDocument();
+			expect( hexInput ).toBeVisible();
 
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
@@ -144,27 +116,13 @@ describe( 'ColorPicker', () => {
 			);
 
 			const formatSelector = screen.getByRole( 'combobox' );
-
-			if ( formatSelector === null ) {
-				throw new Error(
-					'The color format selector could not be found'
-				);
-			}
-
-			expect( formatSelector ).toBeInTheDocument();
+			expect( formatSelector ).toBeVisible();
 
 			await user.selectOptions( formatSelector, 'rgb' );
 
 			const inputElement =
 				screen.getAllByRole( 'spinbutton' )[ inputIndex ];
-
-			if ( inputElement === null ) {
-				throw new Error(
-					`The ${ colorInput } input could not be found`
-				);
-			}
-
-			expect( inputElement ).toBeInTheDocument();
+			expect( inputElement ).toBeVisible();
 
 			await user.clear( inputElement );
 			await user.type( inputElement, '125' );
@@ -193,27 +151,13 @@ describe( 'ColorPicker', () => {
 			);
 
 			const formatSelector = screen.getByRole( 'combobox' );
-
-			if ( formatSelector === null ) {
-				throw new Error(
-					'The color format selector could not be found'
-				);
-			}
-
-			expect( formatSelector ).toBeInTheDocument();
+			expect( formatSelector ).toBeVisible();
 
 			await user.selectOptions( formatSelector, 'hsl' );
 
 			const inputElement =
 				screen.getAllByRole( 'spinbutton' )[ inputIndex ];
-
-			if ( inputElement === null ) {
-				throw new Error(
-					`The ${ colorInput } input could not be found`
-				);
-			}
-
-			expect( inputElement ).toBeInTheDocument();
+			expect( inputElement ).toBeVisible();
 
 			await user.clear( inputElement );
 			await user.type( inputElement, '75' );
