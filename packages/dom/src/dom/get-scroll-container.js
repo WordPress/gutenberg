@@ -26,6 +26,16 @@ export default function getScrollContainer( node ) {
 		}
 	}
 
+	// Scrollable if scrollable width exceeds displayed...
+	if ( node.scrollWidth > node.clientWidth ) {
+		// ...except when overflow is defined to be hidden or visible
+		const { overflowX } = getComputedStyle( node );
+
+		if ( /(auto|scroll)/.test( overflowX ) ) {
+			return node;
+		}
+	}
+
 	if ( node.ownerDocument === node.parentNode ) {
 		return node;
 	}
