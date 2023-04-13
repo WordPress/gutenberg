@@ -205,15 +205,11 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { undo, redo, togglePostTitleSelection, editPost } = dispatch(
-			editorStore
-		);
+		const { undo, redo, togglePostTitleSelection, editPost } =
+			dispatch( editorStore );
 
-		const {
-			clearSelectedBlock,
-			insertDefaultBlock,
-			insertBlocks,
-		} = dispatch( blockEditorStore );
+		const { clearSelectedBlock, insertDefaultBlock, insertBlocks } =
+			dispatch( blockEditorStore );
 
 		return {
 			onEnterPress() {
