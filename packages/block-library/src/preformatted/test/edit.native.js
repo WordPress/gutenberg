@@ -67,8 +67,7 @@ describe( 'Preformatted', () => {
 		const preformattedTextInput = await screen.findByPlaceholderText(
 			'Write preformatted text…'
 		);
-		const string = 'A great statement.';
-		typeInRichText( preformattedTextInput, string );
+		typeInRichText( preformattedTextInput, 'A great statement.' );
 		fireEvent( preformattedTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},

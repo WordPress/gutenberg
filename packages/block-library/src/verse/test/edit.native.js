@@ -64,8 +64,7 @@ describe( 'Verse block', () => {
 		const verseTextInput = await screen.findByPlaceholderText(
 			'Write verse…'
 		);
-		const string = 'A great statement.';
-		typeInRichText( verseTextInput, string );
+		typeInRichText( verseTextInput, 'A great statement.' );
 		fireEvent( verseTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},

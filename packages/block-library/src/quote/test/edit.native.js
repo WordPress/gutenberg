@@ -49,11 +49,7 @@ describe( 'Quote', () => {
 		// screen.debug();
 		let quoteTextInput =
 			within( quoteBlock ).getByPlaceholderText( 'Start writing…' );
-		const string = 'A great statement.';
-		typeInRichText( quoteTextInput, string, {
-			selectionStart: string.length,
-			selectionEnd: string.length,
-		} );
+		typeInRichText( quoteTextInput, 'A great statement.' );
 		fireEvent( quoteTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},

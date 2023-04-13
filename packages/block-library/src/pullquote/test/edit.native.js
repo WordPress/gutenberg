@@ -35,8 +35,7 @@ describe( 'Pullquote', () => {
 		fireEvent.press( pullquoteBlock );
 		const pullquoteTextInput =
 			within( pullquoteBlock ).getByPlaceholderText( 'Add quote' );
-		const string = 'A great statement.';
-		typeInRichText( pullquoteTextInput, string );
+		typeInRichText( pullquoteTextInput, 'A great statement.' );
 		fireEvent( pullquoteTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
