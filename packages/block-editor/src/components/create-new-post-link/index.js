@@ -12,10 +12,13 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 
 const CreateNewPostLink = ( { clientId } ) => {
-	const postType = useSelect( ( select ) => {
-		const { getBlockAttributes } = select( blockEditorStore );
-		return getBlockAttributes( clientId )?.query?.postType;
-	} );
+	const postType = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = select( blockEditorStore );
+			return getBlockAttributes( clientId )?.query?.postType;
+		},
+		[ clientId ]
+	);
 
 	if ( ! postType ) return null;
 	const newPostUrl = addQueryArgs( 'post-new.php', {
