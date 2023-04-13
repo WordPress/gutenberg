@@ -551,28 +551,39 @@ export function getLayoutStyles( {
 	return ruleset;
 }
 
+const STYLE_KEYS = [
+	'border',
+	'color',
+	'dimensions',
+	'spacing',
+	'typography',
+	'filter',
+	'outline',
+	'shadow',
+];
+
+function pickStyleKeys( treeToPickFrom ) {
+	if ( ! treeToPickFrom ) {
+		return {};
+	}
+	const entries = Object.entries( treeToPickFrom );
+	const pickedEntries = entries.filter( ( [ key ] ) =>
+		STYLE_KEYS.includes( key )
+	);
+	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
+	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
+		key,
+		JSON.parse( JSON.stringify( style ) ),
+	] );
+	return Object.fromEntries( clonedEntries );
+}
+
 export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	const nodes = [];
 
 	if ( ! tree?.styles ) {
 		return nodes;
 	}
-
-	const pickStyleKeys = ( treeToPickFrom ) =>
-		Object.fromEntries(
-			Object.entries( treeToPickFrom ?? {} ).filter( ( [ key ] ) =>
-				[
-					'border',
-					'color',
-					'dimensions',
-					'spacing',
-					'typography',
-					'filter',
-					'outline',
-					'shadow',
-				].includes( key )
-			)
-		);
 
 	// Top-level.
 	const styles = pickStyleKeys( tree.styles );
@@ -614,7 +625,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 						blockSelectors[ blockName ].fallbackGapValue,
 					hasLayoutSupport:
 						blockSelectors[ blockName ].hasLayoutSupport,
-					selector: blockSelectors[ blockName ]?.selector,
+					selector: blockSelectors[ blockName ].selector,
 					styles: blockStyles,
 					featureSelectors:
 						blockSelectors[ blockName ].featureSelectors,
@@ -840,14 +851,13 @@ export const toStyles = (
 				);
 			}
 
-			const duotoneStyles = {};
-			if ( styles?.filter ) {
-				duotoneStyles.filter = styles.filter;
-				delete styles.filter;
-			}
-
 			// Process duotone styles.
 			if ( duotoneSelector ) {
+				const duotoneStyles = {};
+				if ( styles?.filter ) {
+					duotoneStyles.filter = styles.filter;
+					delete styles.filter;
+				}
 				const duotoneDeclarations =
 					getStylesDeclarations( duotoneStyles );
 				if ( duotoneDeclarations.length ) {
