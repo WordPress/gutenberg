@@ -1,4 +1,10 @@
 <?php
+/**
+ * This is a silly file that replaces inline footnotes with links to
+ * footnotes and a trailing footer with a list of footnote items.
+ *
+ * @since 6.3.0
+ */
 
 /**
  * Replaces inline footnotes with inline links and a footer list.
