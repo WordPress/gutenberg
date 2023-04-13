@@ -33,6 +33,11 @@ jobs:
                   changelog_path="packages/components/CHANGELOG.md"
                   optional_check_notice="This isn't a required check, so if you think your changes are small enough that they don't warrant a CHANGELOG entry, please go ahead and merge without one."
 
+                  # Testing stuff
+                  echo "pr base from context: ${{ github.event.pull_request.base.sha }}"
+                  git merge-base origin/trunk HEAD
+                  # /Testing stuff
+
                   # Fail if the PR doesn't touch the changelog
                   if git diff --quiet ${{ github.event.pull_request.base.sha }} HEAD -- "$changelog_path"; then
                     echo "Please add a CHANGELOG entry to $changelog_path"
