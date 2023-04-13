@@ -325,7 +325,7 @@ export function getStylesDeclarations(
 				return declarations;
 			}
 
-			if ( !! properties && typeof styleValue !== 'string' ) {
+			if ( properties && typeof styleValue !== 'string' ) {
 				Object.entries( properties ).forEach( ( entry ) => {
 					const [ name, prop ] = entry;
 
@@ -382,7 +382,7 @@ export function getStylesDeclarations(
 			ruleValue = get( tree, refPath );
 			// Presence of another ref indicates a reference to another dynamic value.
 			// Pointing to another dynamic value is not supported.
-			if ( ! ruleValue || !! ruleValue?.ref ) {
+			if ( ! ruleValue || ruleValue?.ref ) {
 				return;
 			}
 		}
@@ -576,7 +576,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 
 	// Top-level.
 	const styles = pickStyleKeys( tree.styles );
-	if ( !! styles ) {
+	if ( styles ) {
 		nodes.push( {
 			styles,
 			selector: ROOT_BLOCK_SELECTOR,
@@ -584,7 +584,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	}
 
 	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
-		if ( !! tree.styles?.elements?.[ name ] ) {
+		if ( tree.styles?.elements?.[ name ] ) {
 			nodes.push( {
 				styles: tree.styles?.elements?.[ name ],
 				selector,
@@ -606,10 +606,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 				} );
 				blockStyles.variations = variations;
 			}
-			if (
-				!! blockStyles &&
-				!! blockSelectors?.[ blockName ]?.selector
-			) {
+			if ( blockStyles && blockSelectors?.[ blockName ]?.selector ) {
 				nodes.push( {
 					duotoneSelector:
 						blockSelectors[ blockName ].duotoneSelector,
@@ -629,9 +626,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			Object.entries( node?.elements ?? {} ).forEach(
 				( [ elementName, value ] ) => {
 					if (
-						!! value &&
-						!! blockSelectors?.[ blockName ] &&
-						!! ELEMENTS?.[ elementName ]
+						value &&
+						blockSelectors?.[ blockName ] &&
+						ELEMENTS[ elementName ]
 					) {
 						nodes.push( {
 							styles: value,
@@ -677,7 +674,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 	// Top-level.
 	const presets = pickPresets( tree.settings );
 	const custom = tree.settings?.custom;
-	if ( ! isEmpty( presets ) || !! custom ) {
+	if ( ! isEmpty( presets ) || custom ) {
 		nodes.push( {
 			presets,
 			custom,
@@ -690,7 +687,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 		( [ blockName, node ] ) => {
 			const blockPresets = pickPresets( node );
 			const blockCustom = node.custom;
-			if ( ! isEmpty( blockPresets ) || !! blockCustom ) {
+			if ( ! isEmpty( blockPresets ) || blockCustom ) {
 				nodes.push( {
 					presets: blockPresets,
 					custom: blockCustom,
@@ -714,7 +711,7 @@ export const toCustomProperties = ( tree, blockSelectors ) => {
 		}
 
 		if ( declarations.length > 0 ) {
-			ruleset = ruleset + `${ selector }{${ declarations.join( ';' ) };}`;
+			ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
 		}
 	} );
 
@@ -787,9 +784,9 @@ export const toStyles = (
 
 				Object.entries( featureDeclarations ).forEach(
 					( [ cssSelector, declarations ] ) => {
-						if ( !! declarations.length ) {
+						if ( declarations.length ) {
 							const rules = declarations.join( ';' );
-							ruleset = ruleset + `${ cssSelector }{${ rules };}`;
+							ruleset += `${ cssSelector }{${ rules };}`;
 						}
 					}
 				);
@@ -811,7 +808,7 @@ export const toStyles = (
 
 								Object.entries( featureDeclarations ).forEach(
 									( [ baseSelector, declarations ] ) => {
-										if ( !! declarations.length ) {
+										if ( declarations.length ) {
 											const cssSelector =
 												concatFeatureVariationSelectorString(
 													baseSelector,
@@ -819,9 +816,7 @@ export const toStyles = (
 												);
 											const rules =
 												declarations.join( ';' );
-											ruleset =
-												ruleset +
-												`${ cssSelector }{${ rules }}`;
+											ruleset += `${ cssSelector }{${ rules };}`;
 										}
 									}
 								);
@@ -835,12 +830,10 @@ export const toStyles = (
 									useRootPaddingAlign,
 									tree
 								);
-							if ( !! styleVariationDeclarations.length ) {
-								ruleset =
-									ruleset +
-									`${ styleVariationSelector }{${ styleVariationDeclarations.join(
-										';'
-									) }}`;
+							if ( styleVariationDeclarations.length ) {
+								ruleset += `${ styleVariationSelector }{${ styleVariationDeclarations.join(
+									';'
+								) };}`;
 							}
 						}
 					}
@@ -857,12 +850,10 @@ export const toStyles = (
 			if ( duotoneSelector ) {
 				const duotoneDeclarations =
 					getStylesDeclarations( duotoneStyles );
-				if ( duotoneDeclarations.length > 0 ) {
-					ruleset =
-						ruleset +
-						`${ duotoneSelector }{${ duotoneDeclarations.join(
-							';'
-						) };}`;
+				if ( duotoneDeclarations.length ) {
+					ruleset += `${ duotoneSelector }{${ duotoneDeclarations.join(
+						';'
+					) };}`;
 				}
 			}
 
@@ -889,8 +880,7 @@ export const toStyles = (
 				tree
 			);
 			if ( declarations?.length ) {
-				ruleset =
-					ruleset + `${ selector }{${ declarations.join( ';' ) };}`;
+				ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
 			}
 
 			// Check for pseudo selector in `styles` and handle separately.
@@ -924,7 +914,7 @@ export const toStyles = (
 							';'
 						) };}`;
 
-						ruleset = ruleset + pseudoRule;
+						ruleset += pseudoRule;
 					}
 				);
 			}
@@ -965,7 +955,7 @@ export const toStyles = (
 
 		const classes = getPresetsClasses( selector, presets );
 		if ( ! isEmpty( classes ) ) {
-			ruleset = ruleset + classes;
+			ruleset += classes;
 		}
 	} );
 
