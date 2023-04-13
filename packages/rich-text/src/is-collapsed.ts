@@ -1,4 +1,7 @@
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/**
+ * Internal dependencies
+ */
+import type { RichTextValue } from './types';
 
 /**
  * Check if the selection of a Rich Text value is collapsed or not. Collapsed
@@ -6,12 +9,15 @@
  * is no selection, `undefined` will be returned. This is similar to
  * `window.getSelection().isCollapsed()`.
  *
- * @param {RichTextValue} value The rich text value to check.
- *
- * @return {boolean|undefined} True if the selection is collapsed, false if not,
- *                             undefined if there is no selection.
+ * @param props       RichTextValue The rich text value to check.
+ * @param props.start
+ * @param props.end
+ * @return True if the selection is collapsed, false if not, undefined if there is no selection.
  */
-export function isCollapsed( { start, end } ) {
+export function isCollapsed( {
+	start,
+	end,
+}: RichTextValue ): boolean | undefined {
 	if ( start === undefined || end === undefined ) {
 		return;
 	}

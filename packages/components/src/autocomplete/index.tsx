@@ -43,7 +43,6 @@ import type {
 	ReplaceOption,
 	UseAutocompleteProps,
 	WPCompleter,
-	RichTextValue,
 } from './types';
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
@@ -237,7 +236,7 @@ export function useAutocomplete( {
 	// but this is a preemptive performance improvement, since the autocompleter
 	// is a potential bottleneck for the editor type metric.
 	const textContent = useMemo( () => {
-		if ( isCollapsed( record as RichTextValue ) ) {
+		if ( isCollapsed( record ) ) {
 			return getTextContent( slice( record, 0 ) );
 		}
 		return null;
@@ -300,11 +299,7 @@ export function useAutocomplete( {
 				}
 
 				const textAfterSelection = getTextContent(
-					slice(
-						record as RichTextValue,
-						undefined,
-						getTextContent( record as RichTextValue ).length
-					)
+					slice( record, undefined, getTextContent( record ).length )
 				);
 
 				if (

@@ -33,3 +33,4 @@ export {
 	useRichText as __unstableUseRichText,
 } from './component';
 export { default as __unstableFormatEdit } from './component/format-edit';
+export { RichTextValue } from './types';

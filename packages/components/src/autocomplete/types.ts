@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import type { WPElement } from '@wordpress/element';
+import type { RichTextValue } from '@wordpress/rich-text';
+
 /**
  * Internal dependencies
  */
@@ -163,17 +165,6 @@ export type CancelablePromise< T = void > = Promise< T > & {
  *
  * @see /packages/rich-text/src/create.js
  */
-type RichTextFormat = {
-	type: string;
-};
-type RichTextFormatList = Array< RichTextFormat >;
-export type RichTextValue = {
-	text: string;
-	formats: Array< RichTextFormatList >;
-	replacements: Array< RichTextFormat >;
-	start: number | undefined;
-	end: number | undefined;
-};
 
 export type UseAutocompleteProps = {
 	/**

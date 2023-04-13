@@ -269,11 +269,13 @@ Check if the selection of a Rich Text value is collapsed or not. Collapsed means
 
 _Parameters_
 
--   _value_ `RichTextValue`: The rich text value to check.
+-   _props_ `RichTextValue`: RichTextValue The rich text value to check.
+-   _props.start_
+-   _props.end_
 
 _Returns_
 
--   `boolean|undefined`: True if the selection is collapsed, false if not, undefined if there is no selection.
+-   `boolean | undefined`: True if the selection is collapsed, false if not, undefined if there is no selection.
 
 ### isEmpty
 
@@ -355,6 +357,10 @@ _Parameters_
 _Returns_
 
 -   `RichTextValue`: A new value with replacements applied.
+
+### RichTextValue
+
+Undocumented declaration.
 
 ### slice
 
