@@ -210,18 +210,17 @@ export function getListViewDropTarget( blocksData, position ) {
 				candidateBlockParents.length
 			);
 
-			const targetParentIndex =
-				Math.max(
-					Math.min( desiredRelativeLevel, currentLevel - nextLevel ),
-					1
-				) - 1;
+			const targetParentIndex = Math.max(
+				Math.min( desiredRelativeLevel, currentLevel - nextLevel ),
+				0
+			);
 
 			if ( candidateBlockParents[ targetParentIndex ] ) {
 				return {
 					rootClientId:
 						candidateBlockParents[ targetParentIndex ].rootClientId,
 					clientId: candidateBlockData.clientId,
-					blockIndex: candidateBlockData.index,
+					blockIndex: candidateBlockData.blockIndex, // TODO: This still isn't quite right.
 					dropPosition: candidateEdge,
 				};
 			}
