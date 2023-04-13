@@ -34,77 +34,9 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 						),
 					),
 				),
-				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 		parent::register_routes();
-	}
-
-	/**
-	 * Retrieves the global styles type' schema, conforming to JSON Schema.
-	 *
-	 * @since 5.9.0
-	 * @since 6.3 Adds `revisions` schema.
-	 *
-	 * @return array Item schema data.
-	 */
-	public function get_item_schema() {
-		if ( $this->schema ) {
-			return $this->add_additional_fields_schema( $this->schema );
-		}
-
-		$schema = array(
-			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => $this->post_type,
-			'type'       => 'object',
-			'properties' => array(
-				'id'        => array(
-					'description' => __( 'ID of global styles config.', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'embed', 'view', 'edit' ),
-					'readonly'    => true,
-				),
-				'styles'    => array(
-					'description' => __( 'Global styles.', 'gutenberg' ),
-					'type'        => array( 'object' ),
-					'context'     => array( 'view', 'edit' ),
-				),
-				'settings'  => array(
-					'description' => __( 'Global settings.', 'gutenberg' ),
-					'type'        => array( 'object' ),
-					'context'     => array( 'view', 'edit' ),
-				),
-				'title'     => array(
-					'description' => __( 'Title of the global styles variation.', 'gutenberg' ),
-					'type'        => array( 'object', 'string' ),
-					'default'     => '',
-					'context'     => array( 'embed', 'view', 'edit' ),
-					'properties'  => array(
-						'raw'      => array(
-							'description' => __( 'Title for the global styles variation, as it exists in the database.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-						),
-						'rendered' => array(
-							'description' => __( 'HTML title for the post, transformed for display.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-							'readonly'    => true,
-						),
-					),
-				),
-				'revisions' => array(
-					'description' => __( 'Global styles revisions.', 'gutenberg' ),
-					'type'        => array( 'object' ),
-					'context'     => array( 'view', 'edit' ),
-					'readonly'    => true,
-				),
-			),
-		);
-
-		$this->schema = $schema;
-
-		return $this->add_additional_fields_schema( $this->schema );
 	}
 
 	/**
@@ -129,7 +61,6 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 			$user_theme_revisions = wp_get_post_revisions(
 				$post->ID,
 				array(
-					'author'         => $post->post_author,
 					'posts_per_page' => 100,
 				)
 			);
@@ -148,13 +79,22 @@ class Gutenberg_REST_Global_Styles_Controller_6_3 extends Gutenberg_REST_Global_
 					$revisions[] = array(
 						'styles'    => ! empty( $config['styles'] ) ? $config['styles'] : new stdClass(),
 						'settings'  => ! empty( $config['settings'] ) ? $config['settings'] : new stdClass(),
-						'title'     => array(
+						'date'      => array(
 							'raw'      => $revision->post_modified,
 							/* translators: 1: Human-readable time difference, 2: short date combined to show rendered revision date. */
 							'rendered' => sprintf( __( '%1$s (%2$s)', 'gutenberg' ), $time_ago, $date_short ),
 						),
 						'id'        => $id,
 						'is_latest' => array_key_first( $user_theme_revisions ) === $id,
+						'author'    => array(
+							'display_name' => get_the_author_meta( 'display_name', $post->post_author ),
+							'avatar_url'   => get_avatar_url(
+								$post->post_author,
+								array(
+									'size' => 24,
+								)
+							),
+						),
 					);
 				}
 			}

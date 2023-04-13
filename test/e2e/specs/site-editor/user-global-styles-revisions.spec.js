@@ -62,11 +62,6 @@ test.describe( 'Global styles revisions', () => {
 
 		// There are not enough revisions to show the revisions UI yet, so let's create some.
 		if ( currentRevisions.length < 1 ) {
-			await expect(
-				page.getByRole( 'button', {
-					name: 'Styles revisions',
-				} )
-			).not.toBeVisible();
 			// Change a style and save it.
 			await page
 				.getByRole( 'button', { name: 'Typography styles' } )
@@ -74,36 +69,25 @@ test.describe( 'Global styles revisions', () => {
 			await page
 				.getByRole( 'button', { name: 'Typography Text styles' } )
 				.click();
-			await page.getByRole( 'button', { name: 'Appearance' } ).click();
-			await page.getByRole( 'option', { name: 'Thin Italic' } ).click();
+			await page.click(
+				'role=radiogroup[name="Font size"i] >> role=radio[name="Large"i]'
+			);
 			await editor.saveSiteEditorEntities();
 
 			// Change a style and save it again just for good luck.
 			// We need more than 2 revisions to show the UI.
-			await page.getByRole( 'button', { name: 'Appearance' } ).click();
-			await page.getByRole( 'option', { name: 'Light' } ).click();
+			await page.click(
+				'role=radiogroup[name="Font size"i] >> role=radio[name="Medium"i]'
+			);
 			await editor.saveSiteEditorEntities();
 
-			// Back to styles pane.
-			await page.click(
-				'role=button[name="Navigate to the previous view"i]'
-			);
-			await page.click(
-				'role=button[name="Navigate to the previous view"i]'
-			);
-
 			// Now there should be enough revisions to show the revisions UI.
-			await expect(
-				page.getByRole( 'button', {
-					name: 'Styles actions',
-				} )
-			).toBeVisible();
 			await page
 				.getByRole( 'button', { name: 'Styles actions' } )
 				.click();
 			await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
 			const revisionButtons = page.locator(
-				'role=button[name=/^Restore revision/]'
+				'role=group[name="Global styles revisions"i] >> role=button[name=/^Revision by /]'
 			);
 
 			await expect( revisionButtons ).toHaveCount(
@@ -111,17 +95,12 @@ test.describe( 'Global styles revisions', () => {
 			);
 		} else {
 			// There are some revisions. Let's check that the UI looks how we expect it to.
-			await expect(
-				page.getByRole( 'button', {
-					name: 'Styles actions',
-				} )
-			).toBeVisible();
 			await page
 				.getByRole( 'button', { name: 'Styles actions' } )
 				.click();
 			await page.getByRole( 'menuitem', { name: 'Revisions' } ).click();
 			const revisionButtons = page.locator(
-				'role=button[name=/^Restore revision/]'
+				'role=group[name="Global styles revisions"i] >> role=button[name=/^Revision by /]'
 			);
 
 			await expect( revisionButtons ).toHaveCount(

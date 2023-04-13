@@ -206,14 +206,16 @@
 .edit-site-global-styles-screen-revisions__revisions-list {
 	list-style: none;
 	margin: 0;
+	li {
+		margin-bottom: $grid-unit-20;
+	}
 }
 
 .edit-site-global-styles-screen-revisions__revision-item {
-	justify-content: center;
 	width: 100%;
+	height: auto;
 	&.is-current:disabled {
-		color: $white;
-		background: $gray-900;
+		background: $gray-400;
 	}
 }
 
@@ -222,3 +224,34 @@
 	padding-top: 0;
 	height: auto;
 }
+
+.edit-site-global-styles-screen-revisions__description {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	grid-template-rows: 1fr 1fr;
+	gap: $grid-unit-05 $grid-unit-10;
+	grid-auto-flow: row;
+	align-items: start;
+	justify-items: start;
+	grid-template-areas:
+		"edit-site-global-styles-screen-revisions__avatar ."
+		"edit-site-global-styles-screen-revisions__avatar .";
+	.edit-site-global-styles-screen-revisions__avatar {
+		grid-area: edit-site-global-styles-screen-revisions__avatar;
+		width: 24px;
+		height: 24px;
+		position: relative;
+		overflow: hidden;
+		border-radius: 50%;
+		img {
+			display: inline;
+			margin: 0 auto;
+			height: 100%;
+			width: auto;
+		}
+	}
+	.edit-site-global-styles-screen-revisions__date {
+		font-size: 11px;
+	}
+}
+
