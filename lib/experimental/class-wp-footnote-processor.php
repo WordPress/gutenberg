@@ -7,7 +7,9 @@
  */
 class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 	/**
-	 * @var array Stores referenced footnotes, hash, and count of links referring to them.
+	 * Stores referenced footnotes, hash, and count of links referring to them.
+	 *
+	 * @var array
 	 */
 	private $notes = array();
 
@@ -25,10 +27,14 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 			}
 
 			$this->set_bookmark( 'start' );
-			if ( ! $this->next_tag( array(
-				'tag_name' => 'sup',
-				'tag_closers' => 'visit'
-			) ) ) {
+			if (
+				! $this->next_tag(
+					array(
+						'tag_name'    => 'sup',
+						'tag_closers' => 'visit',
+					)
+				)
+			) {
 				return $this->get_updated_html();
 			}
 
@@ -66,6 +72,11 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 		return $this->get_updated_html();
 	}
 
+	/**
+	 * Generates a list of footnote items that can be linked to in the post.
+	 *
+	 * @return string The list of footnote items, if any, otherwise an empty string.
+	 */
 	public function get_footer() {
 		if ( empty( $this->notes ) ) {
 			return '';
@@ -77,7 +88,7 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 			$count   = $info['count'];
 			$output .= sprintf( '<li id="%s">', $id );
 			$output .= $note;
-			$label = $count > 1 ?
+			$label   = $count > 1 ?
 				/* translators: %s: footnote occurrence */
 				__( 'Back to content (%s)', 'gutenberg' ) :
 				__( 'Back to content', 'gutenberg' );
@@ -126,8 +137,8 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 	 * @return void
 	 */
 	private function set_outer_content( $start_bookmark, $end_bookmark, $new_content ) {
-		$start = $this->bookmarks[ $start_bookmark ]->start;
-		$end   = $this->bookmarks[ $end_bookmark ]->end + 1;
+		$start                   = $this->bookmarks[ $start_bookmark ]->start;
+		$end                     = $this->bookmarks[ $end_bookmark ]->end + 1;
 		$this->lexical_updates[] = new WP_HTML_Text_Replacement( $start, $end, $new_content );
 		$this->get_updated_html();
 
@@ -137,9 +148,14 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 	}
 }
 
-add_filter( 'the_content', function ( $html ) {
-	$p = new WP_Footnote_Processor( $html );
-	$p->replace_footnotes();
+add_filter(
+	'the_content',
+	function ( $html ) {
+		$p = new WP_Footnote_Processor( $html );
+		$p->replace_footnotes();
 
-	return $p->get_updated_html() . $p->get_footer();
-}, 1000, 1 );
+		return $p->get_updated_html() . $p->get_footer();
+	},
+	1000,
+	1
+);
