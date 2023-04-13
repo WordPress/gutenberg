@@ -33,8 +33,4 @@ export function BlockContextProvider( { value, children } ) {
 	return <Context.Provider value={ nextValue } children={ children } />;
 }
 
-export function useBlockContext() {
-	return useContext( Context );
-}
-
 export default Context;
