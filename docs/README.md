@@ -6,7 +6,7 @@ The [**Block editor**](https://wordpress.org/gutenberg/) is a modern and up-to-d
 
 The editor consists of several primary elements, as shown in the following figure:
 
-![Quick view of the block editor](./assets/overview-block-editor-2023.png)
+![Quick view of the block editor](https://wordpress.slack.com/archives/C02QB2JS7/assets/overview-block-editor-2023.png)
 
 The elements highlighted in the figure are:
 
