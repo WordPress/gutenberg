@@ -22,7 +22,6 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import {
-	check,
 	undo as undoIcon,
 	redo as redoIcon,
 	backup as backupIcon,
@@ -44,11 +43,27 @@ const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 function RevisionsSelect( { userRevisions, currentRevisionId, onChange } ) {
 	const userRevisionsOptions = useMemo( () => {
 		return ( userRevisions ?? [] ).map( ( revision ) => {
+			const { id, date, author, is_latest: isLatest } = revision;
+			const revisionTitle = decodeEntities( date?.rendered );
 			return {
-				value: revision.id,
-				label: revision.isLatest
-					? __( 'Latest saved revision' )
-					: decodeEntities( revision.title.rendered ),
+				value: id,
+				label: isLatest
+					? sprintf(
+							/* translators: %(name)s author display name, %(date)s: human-friendly revision creation date */
+							__( 'Current revision by %(name)s from %(date)s)' ),
+							{
+								name: author?.display_name,
+								date: revisionTitle,
+							}
+					  )
+					: sprintf(
+							/* translators: %(name)s author display name, %(date)s: human-friendly revision creation date */
+							__( 'Revision by %(name)s from %(date)s' ),
+							{
+								name: author?.display_name,
+								date: revisionTitle,
+							}
+					  ),
 			};
 		} );
 	}, [ userRevisions ] );
@@ -72,16 +87,18 @@ function RevisionsSelect( { userRevisions, currentRevisionId, onChange } ) {
 function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 	return (
 		<>
-			<ol className="edit-site-global-styles-screen-revisions__revisions-list">
+			<ol
+				className="edit-site-global-styles-screen-revisions__revisions-list"
+				aria-label={ __( 'Global styles revisions' ) }
+				role="group"
+			>
 				{ userRevisions.map( ( revision ) => {
-					revision.is_latest = undefined;
-					const isActive = revision?.id === currentRevisionId;
-					const revisionTitle = decodeEntities(
-						revision.title.rendered
-					);
+					const { id, date, author, is_latest: isLatest } = revision;
+					const isActive = id === currentRevisionId;
+					const revisionTitle = decodeEntities( date?.rendered );
 
 					return (
-						<li key={ `user-styles-revision-${ revision.id }` }>
+						<li key={ `user-styles-revision-${ id }` }>
 							<Button
 								className={ classnames(
 									'edit-site-global-styles-screen-revisions__revision-item',
@@ -89,28 +106,59 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 										'is-current': isActive,
 									}
 								) }
-								variant={ isActive ? 'tertiary' : 'secondary' }
 								disabled={ isActive }
-								icon={ revision.isLatest ? check : null }
 								onClick={ () => {
 									onChange( revision );
 								} }
 								aria-label={
-									revision.isLatest
-										? __( 'Restore latest saved revision' )
-										: sprintf(
-												/* translators: %s: human-friendly revision creation date */
+									isLatest
+										? sprintf(
+												/* translators: %(name)s author display name, %(date)s: human-friendly revision creation date */
 												__(
-													'Restore revision from %s'
+													'Revision by %(name)s from %(date)s (current)'
 												),
-												revisionTitle
+												{
+													name: author?.display_name,
+													date: revisionTitle,
+												}
+										  )
+										: sprintf(
+												/* translators: %(name)s author display name, %(date)s: human-friendly revision creation date */
+												__(
+													'Revision by %(name)s from %(date)s'
+												),
+												{
+													name: author?.display_name,
+													date: revisionTitle,
+												}
 										  )
 								}
 							>
-								<span className="edit-site-global-styles-screen-revisions__title">
-									{ revision.isLatest
-										? __( 'Latest saved revision' )
-										: revisionTitle }
+								<span className="edit-site-global-styles-screen-revisions__description">
+									<span className="edit-site-global-styles-screen-revisions__avatar">
+										<img
+											alt={ author?.display_name }
+											src={ author?.avatar_url }
+										/>
+									</span>
+									<span>
+										{ isLatest
+											? sprintf(
+													/* translators: %s: author display name */
+													__(
+														'Current revision by %s'
+													),
+													author?.display_name
+											  )
+											: sprintf(
+													/* translators: %s: author display name */
+													__( 'Revision by %s' ),
+													author?.display_name
+											  ) }
+									</span>
+									<span className="edit-site-global-styles-screen-revisions__date">
+										{ revisionTitle }
+									</span>
 								</span>
 							</Button>
 						</li>
@@ -174,7 +222,7 @@ function ScreenRevisions() {
 		canRestoreCachedConfig &&
 		! isGlobalStyleConfigEqual(
 			cachedUserConfig,
-			userRevisions.find( ( revision ) => revision.isLatest === true )
+			userRevisions.find( ( revision ) => revision.is_latest === true )
 		);
 
 	return (
@@ -187,7 +235,7 @@ function ScreenRevisions() {
 			/>
 			<div className="edit-site-global-styles-screen-revisions">
 				<VStack spacing={ 3 }>
-					<Subtitle>{ __( 'REVISIONS' ) }</Subtitle>
+					<Subtitle>{ __( 'Revisions' ) }</Subtitle>
 					<RevisionsComponent
 						onChange={ restoreRevision }
 						currentRevisionId={ currentRevisionId }

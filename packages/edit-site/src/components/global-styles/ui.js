@@ -14,7 +14,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -50,20 +50,20 @@ const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 
 function GlobalStylesActionMenu() {
 	const { toggle } = useDispatch( preferencesStore );
-	const { canEditCSS, hasRevisions } = useSelect( ( select ) => {
+	const { canEditCSS, revisionsCount } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStyles } =
 			select( coreStore );
 		const currentGlobalStyles = __experimentalGetCurrentGlobalStyles();
 		const globalStyles = currentGlobalStyles?.id
 			? getEntityRecord( 'root', 'globalStyles', currentGlobalStyles?.id )
 			: undefined;
-		const revisionsCount =
-			globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count;
 
 		return {
 			canEditCSS:
 				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
-			hasRevisions: revisionsCount && revisionsCount > 1,
+			revisionsCount:
+				( globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ??
+					0 ) + 1,
 		};
 	}, [] );
 	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
@@ -71,6 +71,7 @@ function GlobalStylesActionMenu() {
 	const { goTo } = useNavigator();
 	const loadCustomCSS = () => goTo( '/css' );
 	const loadRevisions = () => goTo( '/revisions' );
+	const hasRevisions = revisionsCount >= 2;
 	return (
 		<GlobalStylesMenuFill>
 			<DropdownMenu
@@ -98,7 +99,15 @@ function GlobalStylesActionMenu() {
 					...( hasRevisions
 						? [
 								{
-									title: __( 'Revisions' ),
+									title: sprintf(
+										/* translators: %d: number of revisions */
+										_n(
+											'%d Revision',
+											'%d Revisions',
+											revisionsCount
+										),
+										revisionsCount
+									),
 									onClick: loadRevisions,
 								},
 						  ]
