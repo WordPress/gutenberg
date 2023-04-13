@@ -112,6 +112,12 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 				'color' => isset( $border['color'] ) && ! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' ) ? $border['color'] : null,
 				'style' => isset( $border['style'] ) && ! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' ) ? $border['style'] : null,
 			);
+
+			// If we set a border color or a border width, make sure we set a border style as well.
+			if ( isset( $border_side_values['color'] ) || isset( $border_side_values['width'] ) ) {
+				$border_side_values['style'] = isset( $border_side_values['style'] ) ? $border_side_values['style'] : 'solid';
+			}
+
 			$border_block_styles[ $side ] = $border_side_values;
 		}
 	}
