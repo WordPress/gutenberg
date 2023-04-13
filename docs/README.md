@@ -6,7 +6,7 @@ The [**Block editor**](https://wordpress.org/gutenberg/) is a modern and up-to-d
 
 The editor consists of several primary elements, as shown in the following figure:
 
-![Quick view of the block editor](./assets/overview-block-editor-2023.png)
+![Quick view of the block editor](https://raw.githubusercontent.com/WordPress/gutenberg/trunk/docs/assets/overview-block-editor-2023.png)
 
 The elements highlighted in the figure are:
 
@@ -27,27 +27,27 @@ Besides offering an [enhanced editing experience](https://wordpress.org/gutenber
 This handbook is focused on block development and is divided into five sections, each serving a different purpose.
 
 
-### [Getting Started](https://developer.wordpress.org/block-editor/getting-started/)
+**[Getting Started](https://developer.wordpress.org/block-editor/getting-started/)**
 
 For those just starting out with block development this is where you can get set up with a [development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/) and learn the [fundamentals of block development](https://developer.wordpress.org/block-editor/getting-started/create-block/).
 
 
-### [How-to Guides](https://developer.wordpress.org/block-editor/how-to-guides/) 
+**[How-to Guides](https://developer.wordpress.org/block-editor/how-to-guides/)**
 
 Here you can build on what you learned in the Getting Started section and learn how to solve particular problems that you might encounter. You can also get tutorials, and example code that you can reuse, for projects such as [building a full-featured block](https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/) or [working with WordPress’ data](https://developer.wordpress.org/block-editor/how-to-guides/data-basics/). In addition you can learn [How to use JavaScript with the Block Editor](https://developer.wordpress.org/block-editor/how-to-guides/javascript/).
 
 
-### [Reference Guides](https://developer.wordpress.org/block-editor/reference-guides/) 
+**[Reference Guides](https://developer.wordpress.org/block-editor/reference-guides/)**
 
 This section is the heart of the handbook and is where you can get down to the nitty-gritty and look up the details of the particular API that you’re working with or need information on. Among other things, the [Block API Reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/) covers most of what you will want to do with a block, and each [component](https://developer.wordpress.org/block-editor/reference-guides/components/) and [package](https://developer.wordpress.org/block-editor/reference-guides/packages/) is also documented here. _Components are also documented via [Storybook](https://wordpress.github.io/gutenberg/?path=/story/docs-introduction--page)._
 
 
-### [Explanations](https://developer.wordpress.org/block-editor/explanations/)
+**[Explanations](https://developer.wordpress.org/block-editor/explanations/)**
 
 This section enables you to go deeper and reinforce your practical knowledge with a theoretical understanding of the [Architecture](https://developer.wordpress.org/block-editor/explanations/architecture/) of the block editor. Its [Glossary of terms](https://developer.wordpress.org/block-editor/explanations/glossary/) and [FAQs](https://developer.wordpress.org/block-editor/explanations/faq/) should answer any outstanding questions you may have.
 
 
-### [Contributor Guide](https://developer.wordpress.org/block-editor/contributors/) 
+**[Contributor Guide](https://developer.wordpress.org/block-editor/contributors/)**
 
 Gutenberg is open source software and anyone is welcome to contribute to the project. This section details how to contribute and can help you choose in which way you want to contribute, whether that be with [code](https://developer.wordpress.org/block-editor/contributors/code/), with [design](https://developer.wordpress.org/block-editor/contributors/design/), with [documentation](https://developer.wordpress.org/block-editor/contributors/documentation/), or in some other way.
 
