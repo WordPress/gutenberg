@@ -1,7 +1,13 @@
 /**
  * Internal dependencies
  */
-import type { BoxEdge, GenerateFunction, StyleDefinition } from '../../types';
+import type {
+	BoxEdge,
+	GenerateFunction,
+	StyleDefinition,
+	Style,
+	StyleOptions,
+} from '../../types';
 import { generateRule, generateBoxRules, camelCaseJoin } from '../utils';
 
 /**
@@ -26,15 +32,56 @@ function createBorderGenerateFunction( path: string[] ): GenerateFunction {
 function createBorderEdgeGenerateFunction( edge: BoxEdge ): GenerateFunction {
 	return ( style, options ) => {
 		return [ 'color', 'style', 'width' ].flatMap( ( key ) => {
+			let styleWithFallback = style;
+			if (
+				( style?.border?.[ edge ]?.color ||
+					style?.border?.[ edge ]?.width ) &&
+				! style?.border?.[ edge ]?.style
+			) {
+				styleWithFallback = {
+					...style,
+					border: {
+						...style?.border,
+						[ edge ]: {
+							...style?.border?.[ edge ],
+							style: 'solid',
+						},
+					},
+				};
+			}
 			const path = [ 'border', edge, key ];
-			return createBorderGenerateFunction( path )( style, options );
+			return createBorderGenerateFunction( path )(
+				styleWithFallback,
+				options
+			);
 		} );
 	};
 }
 
 const color: StyleDefinition = {
 	name: 'color',
-	generate: createBorderGenerateFunction( [ 'border', 'color' ] ),
+	generate: ( style: Style, options: StyleOptions ) => {
+		const borderColorGenerate = createBorderGenerateFunction( [
+			'border',
+			'color',
+		] );
+		const borderStyleGenerate = createBorderGenerateFunction( [
+			'border',
+			'style',
+		] );
+		const output = borderColorGenerate( style, options );
+		if ( style?.border?.color && ! style?.border?.style ) {
+			return [
+				...output,
+				...borderStyleGenerate(
+					{ border: { style: 'solid' } },
+					options
+				),
+			];
+		}
+
+		return output;
+	},
 };
 
 const radius: StyleDefinition = {
@@ -60,7 +107,32 @@ const borderStyle: StyleDefinition = {
 
 const width: StyleDefinition = {
 	name: 'width',
-	generate: createBorderGenerateFunction( [ 'border', 'width' ] ),
+	generate: ( style: Style, options: StyleOptions ) => {
+		const borderWidthGenerate = createBorderGenerateFunction( [
+			'border',
+			'width',
+		] );
+		const borderStyleGenerate = createBorderGenerateFunction( [
+			'border',
+			'style',
+		] );
+		const output = borderWidthGenerate( style, options );
+		if (
+			style?.border?.width &&
+			! style?.border.color && // this is only here to avoid duplication
+			! style?.border?.style
+		) {
+			return [
+				...output,
+				...borderStyleGenerate(
+					{ border: { style: 'solid' } },
+					options
+				),
+			];
+		}
+
+		return output;
+	},
 };
 
 const borderTop: StyleDefinition = {

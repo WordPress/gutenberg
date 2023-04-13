@@ -63,15 +63,6 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		$border_block_styles['radius'] = $border_radius;
 	}
 
-	// Border style.
-	if (
-		gutenberg_has_border_feature_support( $block_type, 'style' ) &&
-		isset( $block_attributes['style']['border']['style'] ) &&
-		! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' )
-	) {
-		$border_block_styles['style'] = $block_attributes['style']['border']['style'];
-	}
-
 	// Border width.
 	if (
 		$has_border_width_support &&
@@ -96,6 +87,20 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		$preset_border_color          = array_key_exists( 'borderColor', $block_attributes ) ? "var:preset|color|{$block_attributes['borderColor']}" : null;
 		$custom_border_color          = _wp_array_get( $block_attributes, array( 'style', 'border', 'color' ), null );
 		$border_block_styles['color'] = $preset_border_color ? $preset_border_color : $custom_border_color;
+	}
+
+	// Border style.
+	if (
+		gutenberg_has_border_feature_support( $block_type, 'style' ) &&
+		isset( $block_attributes['style']['border']['style'] ) &&
+		! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' )
+	) {
+		$border_block_styles['style'] = $block_attributes['style']['border']['style'];
+	}
+
+	// If we set a border color or a border width, make sure we set a border style as well.
+	if ( isset( $border_block_styles['color'] ) || isset( $border_block_styles['width'] ) ) {
+		$border_block_styles['style'] = isset( $border_block_styles['style'] ) ? $border_block_styles['style'] : 'solid';
 	}
 
 	// Generate styles for individual border sides.

@@ -134,6 +134,40 @@ describe( 'generate', () => {
 		);
 	} );
 
+	it( 'should geneate a border style fallback if color provided', () => {
+		expect(
+			compileCSS( {
+				border: {
+					color: 'var:preset|color|perky-peppermint',
+				},
+			} )
+		).toEqual(
+			'border-color: var(--wp--preset--color--perky-peppermint); border-style: solid;'
+		);
+	} );
+
+	it( 'should geneate a border style fallback if width provided', () => {
+		expect(
+			compileCSS( {
+				border: {
+					width: '5px',
+				},
+			} )
+		).toEqual( 'border-width: 5px; border-style: solid;' );
+	} );
+
+	it( 'should geneate a border style fallback for individual border rules too', () => {
+		expect(
+			compileCSS( {
+				border: {
+					top: {
+						width: '5px',
+					},
+				},
+			} )
+		).toEqual( 'border-top-style: solid; border-top-width: 5px;' );
+	} );
+
 	it( 'should parse individual border rules', () => {
 		expect(
 			compileCSS( {
@@ -166,7 +200,7 @@ describe( 'generate', () => {
 				},
 			} )
 		).toEqual(
-			'border-top-left-radius: 1px; border-top-right-radius: 2px; border-bottom-left-radius: 3px; border-bottom-right-radius: 4px; border-top-color: var(--wp--preset--color--sandy-beach); border-top-style: dashed; border-top-width: 9px; border-right-color: var(--wp--preset--color--leafy-avenue); border-right-width: 5rem; border-bottom-color: #eee; border-bottom-style: solid; border-bottom-width: 2%; border-left-color: var(--wp--preset--color--avocado-blues); border-left-style: dotted; border-left-width: 100px;'
+			'border-top-left-radius: 1px; border-top-right-radius: 2px; border-bottom-left-radius: 3px; border-bottom-right-radius: 4px; border-top-color: var(--wp--preset--color--sandy-beach); border-top-style: dashed; border-top-width: 9px; border-right-color: var(--wp--preset--color--leafy-avenue); border-right-style: solid; border-right-width: 5rem; border-bottom-color: #eee; border-bottom-style: solid; border-bottom-width: 2%; border-left-color: var(--wp--preset--color--avocado-blues); border-left-style: dotted; border-left-width: 100px;'
 		);
 	} );
 } );
