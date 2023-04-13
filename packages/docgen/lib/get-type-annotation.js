@@ -513,8 +513,13 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
 
+	// Otherwise find the corresponding parameter token for the documented parameter.
 	let paramToken = functionToken.params[ paramIndex ];
 
+	// If the parameter is a destructured object then we sometimes need to do
+	// extra work to find the correct token inside that object. The object would
+	// be the only parameter, which means we can't index on the function params
+	// to find a property of the object.
 	if (
 		! paramToken &&
 		functionToken.params.length === 1 &&
