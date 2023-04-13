@@ -8,7 +8,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  */
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore, createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -744,6 +744,57 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
 };
 
 /**
+ * Higher-order reducer that auto insert blocks.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withAutoInsertBlocks = ( reducer ) => ( state, action ) => {
+	if ( action.type === 'RESET_BLOCKS' ) {
+		const autoInsertBlockTypes = select( blocksStore )
+			.getBlockTypes()
+			.filter( ( { autoInsert } ) => {
+				return (
+					autoInsert?.after?.length > 0 ||
+					autoInsert?.before?.length > 0
+				);
+			} )
+			.reduce( ( autoInsertAccumulator, { name, autoInsert } ) => {
+				return autoInsert.after.reduce(
+					( blockNamesAccumulator, blockName ) => {
+						blockNamesAccumulator[ blockName ] = {
+							after: [
+								...( blockNamesAccumulator?.[ blockName ]
+									?.after || [] ),
+								name,
+							],
+						};
+						return blockNamesAccumulator;
+					},
+					autoInsertAccumulator?.after || {}
+				);
+			}, {} );
+
+		const result = [];
+		action.blocks.forEach( ( block ) => {
+			result.push( block );
+			if ( block.name in autoInsertBlockTypes ) {
+				autoInsertBlockTypes[ block.name ].after.forEach(
+					( autoInsertBlockName ) => {
+						result.push( createBlock( autoInsertBlockName ) );
+					}
+				);
+			}
+		} );
+
+		return reducer( state, { ...action, blocks: result } );
+	}
+
+	return reducer( state, action );
+};
+
+/**
  * Reducer returning the blocks state.
  *
  * @param {Object} state  Current state.
@@ -760,7 +811,8 @@ export const blocks = pipe(
 	withBlockReset,
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
-	withResetControlledBlocks
+	withResetControlledBlocks,
+	withAutoInsertBlocks
 )( {
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact

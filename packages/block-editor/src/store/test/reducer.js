@@ -2372,6 +2372,41 @@ describe( 'state', () => {
 				} );
 			} );
 		} );
+
+		describe.only( 'automatically inserted blocks', () => {
+			beforeAll( () => {
+				registerBlockType( 'core/auto-inserted-block', {
+					save: noop,
+					edit: noop,
+					category: 'text',
+					title: 'auto inserted block',
+					autoInsert: {
+						after: [ 'core/test-block' ],
+					},
+				} );
+			} );
+
+			afterAll( () => {
+				unregisterBlockType( 'core/auto-inserted-block' );
+			} );
+
+			it( 'should automatically insert a block', () => {
+				const state = blocks( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [
+						{
+							clientId: 'chicken',
+							name: 'core/test-block',
+							attributes: {},
+							innerBlocks: [],
+						},
+					],
+				} );
+
+				expect( state.byClientId.size ).toBe( 2 );
+				console.log( state.order );
+			} );
+		} );
 	} );
 
 	describe( 'insertionPoint', () => {
