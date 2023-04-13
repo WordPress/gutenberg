@@ -11,13 +11,18 @@
 /**
  * Replaces inline footnotes with inline links and a footer list.
  *
+ * So many things about this are fragile, broken, ad-hoc, and
+ * coupling to internal details of the Tag Processor. This is
+ * meant to unlock footnote rendering on the server and should
+ * not be followed as an example.
+ *
  * @since 6.3.0
  */
 class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 	/**
 	 * Stores referenced footnotes, hash, and count of links referring to them.
 	 *
-	 * @var array
+	 * @var array[]
 	 */
 	private $notes = array();
 
@@ -28,29 +33,12 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 	 * @return string Transformed HTML with links instead of inline footnotes.
 	 */
 	public function replace_footnotes() {
-		while ( $this->next_tag( array( 'tag_name' => 'sup' ) ) ) {
-			$value = $this->get_attribute( 'value' );
-			if ( 'core/footnote' !== $value && 'footnote' !== $value ) {
-				continue;
-			}
-
-			$this->set_bookmark( 'start' );
-			if (
-				! $this->next_tag(
-					array(
-						'tag_name'    => 'sup',
-						'tag_closers' => 'visit',
-					)
-				)
-			) {
+		while ( $this->find_opener() ) {
+			if ( ! $this->find_balanced_closer() ) {
 				return $this->get_updated_html();
 			}
 
-			// These are internal details, not a good example, don't copy this code elsewhere.
-			$this->set_bookmark( 'end' );
-
-			// Footnote logic follows.
-			$note = substr( $this->get_inner_content( 'start', 'end' ), 2, -1 );
+			$note = substr( $this->get_note_content(), 2, -1 );
 			$id   = md5( $note );
 
 			if ( isset( $this->notes[ $id ] ) ) {
@@ -74,7 +62,7 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 				$index
 			);
 
-			$this->set_outer_content( 'start', 'end', $footnote_content );
+			$this->replace_footnote( $footnote_content );
 		}
 
 		return $this->get_updated_html();
@@ -118,35 +106,75 @@ class WP_Footnote_Processor extends WP_HTML_Tag_Processor {
 		return $output;
 	}
 
+	/**
+	 * Finds the start of the next footnote.
+	 *
+	 * Looks for a superscript tag with the `value=footnote` attribute.
+	 *
+	 * @return bool
+	 */
+	private function find_opener() {
+		while ( $this->next_tag( array( 'tag_name' => 'sup' ) ) ) {
+			$value = $this->get_attribute( 'value' );
+			if ( 'core/footnote' === $value || 'footnote' === $value ) {
+				$this->set_bookmark( 'start' );
+				return true;
+			}
+		}
 
+		return false;
+	}
 
 	/**
-	 * Returns the content inside two bookmarks.
+	 * Naively finds the end of the current footnote.
 	 *
-	 * @param string $start_bookmark Which bookmark indicates the starting point for extraction.
-	 * @param string $end_bookmark   Which bookmark indicates the ending point for extraction.
-	 *
-	 * @return string The content found inside the two bookmarks.
+	 * @return bool Whether the end of the current footnote was found.
 	 */
-	private function get_inner_content( $start_bookmark, $end_bookmark ) {
-		$open  = $this->bookmarks[ $start_bookmark ];
-		$close = $this->bookmarks[ $end_bookmark ];
+	private function find_balanced_closer() {
+		$depth = 1;
+		$query = array(
+			'tag_name'    => 'sup',
+			'tag_closers' => 'visit',
+		);
+
+		while ( $this->next_tag( $query ) ) {
+			if ( ! $this->is_tag_closer() ) {
+				$depth++;
+			} else {
+				$depth--;
+			}
+
+			if ( 0 <= $depth ) {
+				$this->set_bookmark( 'end' );
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the content inside footnote superscript tags.
+	 *
+	 * @return string The content found inside footnote superscript tags.
+	 */
+	private function get_note_content() {
+		$open  = $this->bookmarks['start'];
+		$close = $this->bookmarks['end'];
 
 		return substr( $this->html, $open->end, $close->start - $open->end );
 	}
 
 	/**
-	 * Replaces the content surrounding two bookmarks.
+	 * Replaces the footnote entirely with new HTML.
 	 *
-	 * @param string $start_bookmark Which bookmark indicates the starting point for replacement.
-	 * @param string $end_bookmark   Which bookmark indicates the ending point for replacement.
-	 * @param string $new_content    Content to replace previous content surrounded by bookmarks.
+	 * @param string $new_content Content to store in place of the existing footnote.
 	 *
 	 * @return void
 	 */
-	private function set_outer_content( $start_bookmark, $end_bookmark, $new_content ) {
-		$start                   = $this->bookmarks[ $start_bookmark ]->start;
-		$end                     = $this->bookmarks[ $end_bookmark ]->end + 1;
+	private function replace_footnote( $new_content ) {
+		$start                   = $this->bookmarks['start']->start;
+		$end                     = $this->bookmarks['end']->end + 1;
 		$this->lexical_updates[] = new WP_HTML_Text_Replacement( $start, $end, $new_content );
 		$this->get_updated_html();
 
