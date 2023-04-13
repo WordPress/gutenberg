@@ -83,6 +83,9 @@
 		},
 		"behaviors": {
 			"type": "object"
+		},
+		"enableLightbox": {
+			"type": "boolean"
 		}
 	},
 	"supports": {
