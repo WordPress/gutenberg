@@ -520,7 +520,7 @@ describe( 'global styles renderer', () => {
 				},
 			};
 
-			expect( toStyles( tree, blockSelectors ) ).toEqual(
+			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
 				'body {margin: 0;}' +
 					'.wp-image-spacing{padding-top: 1px;}.wp-image-border-color{border-color: red;}.wp-image-border{border-radius: 9999px;}.wp-image{color: red;}' +
 					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
@@ -568,7 +568,7 @@ describe( 'global styles renderer', () => {
 				},
 			};
 
-			expect( toStyles( tree, blockSelectors ) ).toEqual(
+			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
 				'body {margin: 0;}' +
 					'.is-style-foo.wp-image.wp-image-spacing{padding-top: 2px;}.is-style-foo.wp-image.wp-image-border-color{border-color: blue;}.is-style-foo.wp-image{color: blue;}' +
 					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
@@ -595,7 +595,7 @@ describe( 'global styles renderer', () => {
 				},
 			};
 
-			expect( toStyles( tree, blockSelectors ) ).toEqual(
+			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
 				'body {margin: 0;}' +
 					'.wp-image img{filter: blur(5px);}' +
 					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
@@ -611,7 +611,7 @@ describe( 'global styles renderer', () => {
 					},
 				},
 			};
-			expect( toStyles( tree, 'body' ) ).toEqual(
+			expect( toStyles( Object.freeze( tree ), 'body' ) ).toEqual(
 				'body {margin: 0; --wp--style--global--content-size: 840px; --wp--style--global--wide-size: 1100px;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
 			);
 		} );
