@@ -10,6 +10,7 @@ import { Button } from '@wordpress/components';
 import { Component, createRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -153,6 +154,12 @@ export class PostPublishButton extends Component {
 			if ( isButtonDisabled ) {
 				return;
 			}
+
+			// Allow for overriding the ability to save for custom validations and other customizations.
+			if ( ! applyFilters( 'editor.PostPublishButton.shouldSubmit', true, this.props ) ) {
+				return;
+			}
+			
 			onSubmit();
 			onStatusChange( publishStatus );
 			onSave();
