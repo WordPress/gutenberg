@@ -63,18 +63,19 @@
 	max-width: 960px;
 
 	tr {
-		border-top: $border-width solid $gray-100;
-		margin: 0;
-
-		&:first-child {
-			border-top: 0;
-		}
-
 		th,
 		td {
+			border-top: $border-width solid $gray-100;
 			padding: $grid-unit-20;
 			@include break-medium() {
 				padding: $grid-unit-30 $grid-unit-40;
+			}
+		}
+
+		&:first-child {
+			th,
+			td {
+				border-top: 0;
 			}
 		}
 
@@ -107,10 +108,10 @@
 		font-weight: 600;
 		text-align: left;
 		color: $gray-900;
-		border-top: none;
-		border-bottom: $border-width solid $gray-300;
 
 		th {
+			border-top: 0;
+			border-bottom: $border-width solid $gray-300;
 			font-weight: inherit;
 		}
 	}
