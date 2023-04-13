@@ -170,12 +170,11 @@
 	.block-editor-block-mover.is-horizontal .block-editor-block-mover__move-button-container {
 		padding-left: 6px;
 		padding-right: 6px;
+	}
 
-		> * {
-			// Override !important padding rules set in block mover styles.
-			padding-left: 6px !important;
-			padding-right: 6px !important;
-		}
+	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover-button {
+		padding-left: $grid-unit;
+		padding-right: $grid-unit;
 	}
 
 	// Mover overrides.
@@ -188,12 +187,6 @@
 
 	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-toolbar__block-controls .block-editor-block-mover {
 		border-left-color: $gray-200;
-	}
-
-	.block-editor-block-mover-button {
-		// The specificity can be reduced once https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L34 is also dealt with.
-		padding-left: $grid-unit !important;
-		padding-right: $grid-unit !important;
 	}
 
 	.block-editor-block-mover__drag-handle.has-icon {
