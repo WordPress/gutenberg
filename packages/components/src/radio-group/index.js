@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * External dependencies
  */
@@ -12,7 +14,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import ButtonGroup from '../button-group';
-import RadioContext from '../radio-context';
+import RadioContext from './radio-context';
 
 function RadioGroup(
 	{ label, checked, defaultChecked, disabled, onChange, ...props },
@@ -25,7 +27,7 @@ function RadioGroup(
 	const radioContext = {
 		...radioState,
 		disabled,
-		// controlled or uncontrolled
+		// Controlled or uncontrolled.
 		state: checked ?? radioState.state,
 		setState: onChange ?? radioState.setState,
 	};
@@ -43,4 +45,7 @@ function RadioGroup(
 	);
 }
 
+/**
+ * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
+ */
 export default forwardRef( RadioGroup );

@@ -1,8 +1,47 @@
 # Supports
 
-Block Supports is the API that allows a block to declare features used in the editor.
+Block Supports is the API that allows a block to declare support for certain features.
 
-Some block supports — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted.
+Opting into any of these features will register additional attributes on the block and provide the UI to manipulate that attribute.
+
+In order for the attribute to get applied to the block the generated properties get added to the wrapping element of the block. They get added to the object you get returned from the `useBlockProps` hook.
+
+`BlockEdit` function:
+```js
+function BlockEdit() {
+	const blockProps = useBlockProps();
+
+	return (
+		<div {...blockProps}>Hello World!</div>
+	);
+}
+```
+
+`save` function:
+```js
+function BlockEdit() {
+	const blockProps = useBlockProps.save();
+
+	return (
+		<div {...blockProps}>Hello World!</div>
+	);
+}
+```
+
+For dynamic blocks that get rendered via a `render_callback` in PHP you can use the `get_block_wrapper_attributes()` function. It returns a string containing all the generated properties and needs to get output in the opening tag of the wrapping block element.
+
+`render_callback` function:
+```php
+function render_block() {
+	$wrapper_attributes = get_block_wrapper_attributes();
+
+	return sprintf(
+		'<div %1$s>%2$s</div>',
+		$wrapper_attributes,
+		'Hello World!'
+	);
+}
+```
 
 ## anchor
 
@@ -23,7 +62,7 @@ supports: {
 -   Type: `boolean` or `array`
 -   Default value: `false`
 
-This property adds block controls which allow to change block's alignment. _Important: It doesn't work with dynamic blocks yet._
+This property adds block controls which allow to change block's alignment.
 
 ```js
 supports: {
@@ -66,6 +105,20 @@ supports: {
 }
 ```
 
+## ariaLabel
+
+- Type: `boolean`
+- Default value: `false`
+
+ARIA-labels let you define an accessible label for elements. This property allows enabling the definition of an aria-label for the block, without exposing a UI field.
+
+```js
+supports: {
+	// Add the support for aria label.
+	ariaLabel: true
+}
+```
+
 ## className
 
 -   Type: `boolean`
@@ -86,7 +139,6 @@ supports: {
 -   Default value: null
 -   Subproperties:
     -   `background`: type `boolean`, default value `true`
-    -   `__experimentalDuotone`: type `string`, default value undefined
     -   `gradients`: type `boolean`, default value `false`
     -   `link`: type `boolean`, default value `false`
     -   `text`: type `boolean`, default value `true`
@@ -178,46 +230,9 @@ When the block declares support for `color.background`, the attributes definitio
 
 ### color.__experimentalDuotone
 
-This property adds UI controls which allow to apply a duotone filter to a block or part of a block.
+_**Note:** Deprecated since WordPress 6.3._
 
-The parent selector is automatically added much like nesting in Sass/SCSS (however, the `&` selector is not supported).
-
-```js
-supports: {
-    color: {
-        // Apply the filter to the same selector in both edit and save.
-        __experimentalDuotone: '> .duotone-img, > .duotone-video',
-
-        // Default values must be disabled if you don't want to use them with duotone.
-        background: false,
-        text: false
-    }
-}
-```
-
-Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
-
-When the block declares support for `color.__experimentalDuotone`, the attributes definition is extended to include the attribute `style`:
-
-- `style`: attribute of `object` type with no default assigned.
-
-  The block can apply a default duotone color by specifying its own attribute with a default e.g.:
-
-  ```js
-  attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  duotone: [
-                      '#FFF',
-                      '#000'
-                  ]
-              }
-          }
-      }
-  }
-  ```
+This property has been replaced by [`filter.duotone`](#filter-duotone). 
 
 ### color.gradients
 
@@ -298,36 +313,25 @@ supports: {
 Link color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
 
 
-When the block declares support for `color.link`, the attributes definition is extended to include two new attributes: `linkColor` and `style`:
-
-- `linkColor`: attribute of `string` type with no default assigned.
-
-  When a user chooses from the list of preset link colors, the preset slug is stored in the `linkColor` attribute.
-
-  The block can apply a default preset text color by specifying its own attribute with a default e.g.:
-
-  ```js
-  attributes: {
-      linkColor: {
-          type: 'string',
-          default: 'some-preset-link-color-slug',
-      }
-  }
-  ```
+When the block declares support for `color.link`, the attributes definition is extended to include the `style` attribute:
 
 - `style`: attribute of `object` type with no default assigned.
 
-  When a custom link color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.link` attribute.
+  When a link color is selected, the color value is stored in the `style.elements.link.color.text` attribute.
 
-  The block can apply a default custom link color by specifying its own attribute with a default e.g.:
+  The block can apply a default link color by specifying its own attribute with a default e.g.:
 
   ```js
   attributes: {
       style: {
           type: 'object',
           default: {
-              color: {
-                  link: '#ff0000',
+              elements: {
+                  link: {
+                      color: {
+                          text: '#ff0000',
+                      }
+                  }
               }
           }
       }
@@ -424,6 +428,93 @@ supports: {
 }
 ```
 
+## dimensions
+
+_**Note:** Since WordPress 6.2._
+
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `minHeight`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+
+```js
+supports: {
+    dimensions: {
+        minHeight: true // Enable min height control.
+    }
+}
+```
+
+When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
+
+- `style`: attribute of `object` type with no default assigned. This is added when `minHeight` support is declared. It stores the custom values set by the user, e.g.:
+
+```js
+attributes: {
+    style: {
+        dimensions: {
+            minHeight: "50vh"
+        }
+    }
+}
+```
+
+## filter
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `duotone`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the properties related to filters. When it does, the block editor will show UI controls for the user to set their values.
+
+### filter.duotone
+
+This property adds UI controls which allow the user to apply a duotone filter to
+a block or part of a block.
+
+```js
+supports: {
+    filter: {
+        // Enable duotone support
+        duotone: true
+    }
+},
+selectors: {
+    filter: {
+        // Apply the filter to img elements inside the image block
+        duotone: '.wp-block-image img'
+    }
+}
+```
+
+The filter can be applied to an element inside the block by setting the `selectors.filter.duotone` selector.
+
+Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
+
+When the block declares support for `filter.duotone`, the attributes definition is extended to include the attribute `style`:
+
+- `style`: attribute of `object` type with no default assigned.
+
+  The block can apply a default duotone color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      style: {
+          type: 'object',
+          default: {
+              color: {
+                  duotone: [
+                      '#FFF',
+                      '#000'
+                  ]
+              }
+          }
+      }
+  }
+  ```
+
 ## html
 
 -   Type: `boolean`
@@ -443,7 +534,7 @@ supports: {
 -   Type: `boolean`
 -   Default value: `true`
 
-By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
+By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set `inserter` to `false`.
 
 ```js
 supports: {
@@ -480,6 +571,56 @@ supports: {
 }
 ```
 
+## lock
+
+-   Type: `boolean`
+-   Default value: `true`
+
+A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block "Options" dropdown by default. To disable this behavior, set `lock` to `false`.
+
+```js
+supports: {
+	// Remove support for locking UI.
+	lock: false
+}
+```
+
+## position
+
+_**Note:** Since WordPress 6.2._
+
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `sticky`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+
+Note that sticky position controls are currently only available for blocks set at the root level of the document. Setting a block to the `sticky` position will stick the block to its most immediate parent when the user scrolls the page.
+
+```js
+supports: {
+    position: {
+        sticky: true // Enable selecting sticky position.
+    }
+}
+```
+
+When the block declares support for a specific position property, its attributes definition is extended to include the `style` attribute.
+
+- `style`: attribute of `object` type with no default assigned. This is added when `sticky` support is declared. It stores the custom values set by the user, e.g.:
+
+```js
+attributes: {
+    style: {
+        position: {
+            type: "sticky",
+            top: "0px"
+        }
+    }
+}
+```
+
 ## spacing
 
 -   Type: `Object`
@@ -487,33 +628,50 @@ supports: {
 -   Subproperties:
     -   `margin`: type `boolean` or `array`, default value `false`
     -   `padding`: type `boolean` or `array`, default value `false`
+    -   `blockGap`: type `boolean` or `array`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
 
 ```js
 supports: {
     spacing: {
         margin: true,  // Enable margin UI control.
         padding: true, // Enable padding UI control.
+        blockGap: true,  // Enables block spacing UI control.
     }
 }
 ```
 
-When the block declares support for a specific spacing property, the attributes definition is extended to include the `style` attribute.
+When the block declares support for a specific spacing property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user.
+- `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user, e.g.:
+
+```js
+attributes: {
+    style: {
+        margin: 'value',
+        padding: {
+            top: 'value',
+        }
+    }
+}
+```
+
+A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed.
+
+Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
+
+Note: `blockGap` accepts `vertical` and `horizontal` axial sides, which adjust gap column and row values. `blockGap` doesn't support arbitrary sides.
 
 ```js
 supports: {
     spacing: {
-        margin: [ 'top', 'bottom' ], // Enable margin for arbitrary sides.
-        padding: true,               // Enable padding for all sides.
+        margin: [ 'top', 'bottom' ],             // Enable margin for arbitrary sides.
+        padding: true,                           // Enable padding for all sides.
+        blockGap: [ 'horizontal', 'vertical' ],  // Enables axial (column/row) block spacing controls
     }
 }
 ```
-
-A spacing property may define an array of allowable sides that can be configured. When arbitrary sides are defined only UI controls for those sides are displayed. Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
-
 
 ## typography
 

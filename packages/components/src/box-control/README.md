@@ -29,143 +29,74 @@ const Example = () => {
 };
 ```
 
-### Visualizer
-
-BoxControl provides a companion component that visually renders value changes. Place the component you would like the sides visualized within the companion `<Visualizer>` component.
-
-```jsx
-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-
-import MyComponent from './my-component';
-
-const { Visualizer } = BoxControl;
-
-const Example = () => {
-	const [ values, setValues ] = useState( {
-		top: '50px',
-		left: '10%',
-		right: '10%',
-		bottom: '50px',
-	} );
-
-	return (
-		<>
-			<BoxControl
-				values={ values }
-				onChange={ ( nextValues ) => setValues( nextValues ) }
-			/>
-			<Visualizer>
-				<MyComponent />
-			</Visualizer>
-		</>
-	);
-};
-```
-
-Alternatively, the `<Visualizer>` can be nested as a sibling to the component you would like visualized. Using `<Visualizer />` in this manner will require the parent element having a `position` style.
-
-```jsx
-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-
-import MyComponent from './my-component';
-
-const { Visualizer } = BoxControl;
-
-const Example = () => {
-	const [ values, setValues ] = useState( {
-		top: '50px',
-		left: '10%',
-		right: '10%',
-		bottom: '50px',
-	} );
-
-	return (
-		<>
-			<BoxControl
-				values={ values }
-				onChange={ ( nextValues ) => setValues( nextValues ) }
-			/>
-			<div style={ { position: 'relative' } }>
-				<Visualizer />
-				<MyComponent />
-			</div>
-		</>
-	);
-};
-```
-
 ## Props
-### allowReset
+### `allowReset`: `boolean`
 
 If this property is true, a button to reset the box control is rendered.
 
-- Type: `Boolean`
 - Required: No
 - Default: `true`
 
-### splitOnAxis
+### `splitOnAxis`: `boolean`
 
 If this property is true, when the box control is unlinked, vertical and horizontal controls can be used instead of updating individual sides.
 
-- Type: `Boolean`
 - Required: No
 - Default: `false`
 
-### inputProps
+### `inputProps`: `object`
 
-Props for the internal [InputControl](../input-control) components.
+Props for the internal [UnitControl](../unit-control) components.
 
--   Type: `Object`
 -   Required: No
+-   Default: `{ min: 0 }`
 
-### label
+### `label`: `string`
 
-Heading label for BoxControl.
+Heading label for the control.
 
--   Type: `String`
 -   Required: No
--   Default: `Box Control`
+-   Default: `__( 'Box Control' )`
 
-### onChange
+### `onChange`: `(next: BoxControlValue) => void`
 
 A callback function when an input value changes.
 
--   Type: `Function`
 -   Required: Yes
 
-### onChangeShowVisualizer
-
-A callback function for visualizer changes, based on input hover interactions.
-
--   Type: `Function`
--   Required: Yes
-
-### resetValues
+### `resetValues`: `object`
 
 The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
 
--   Type: `Object`
+-   Required: No
+-   Default: `{ top: undefined, right: undefined, bottom: undefined, left: undefined }`
+
+### `sides`: `string[]`
+
+Collection of sides to allow control of. If omitted or empty, all sides will be available. Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
+
 -   Required: No
 
-### sides
-
-Collection of sides to allow control of. If omitted or empty, all sides will be available.
-
--   Type: `Array<Object>`
--   Required: No
-
-### units
+### `units`: `WPUnitControlUnit[]`
 
 Collection of available units which are compatible with [UnitControl](../unit-control).
 
--   Type: `Array<Object>`
 -   Required: No
 
-### values
+### `values`: `object`
 
 The `top`, `right`, `bottom`, and `left` box dimension values.
 
--   Type: `Object`
+-   Required: No
+
+### `onMouseOver`: `function`
+
+A handler for onMouseOver events.
+
+-   Required: No
+
+### `onMouseOut`: `function`
+
+A handler for onMouseOut events.
+
 -   Required: No

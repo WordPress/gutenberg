@@ -1,0 +1,22 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"noUnusedParameters": false,
+		"checkJs": false,
+		"noImplicitAny": false
+	},
+	"references": [
+		{ "path": "../api-fetch" },
+		{ "path": "../compose" },
+		{ "path": "../data" },
+		{ "path": "../deprecated" },
+		{ "path": "../element" },
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../url" }
+	],
+	"include": [ "src/**/*" ]
+}

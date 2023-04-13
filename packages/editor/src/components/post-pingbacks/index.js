@@ -19,6 +19,7 @@ function PostPingbacks( { pingStatus = 'open', ...props } ) {
 
 	return (
 		<CheckboxControl
+			__nextHasNoMarginBottom
 			label={ __( 'Allow pingbacks & trackbacks' ) }
 			checked={ pingStatus === 'open' }
 			onChange={ onTogglePingback }
@@ -29,9 +30,8 @@ function PostPingbacks( { pingStatus = 'open', ...props } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			pingStatus: select( editorStore ).getEditedPostAttribute(
-				'ping_status'
-			),
+			pingStatus:
+				select( editorStore ).getEditedPostAttribute( 'ping_status' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

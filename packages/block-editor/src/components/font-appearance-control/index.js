@@ -3,54 +3,54 @@
  */
 import { CustomSelectControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
 const FONT_STYLES = [
 	{
-		name: __( 'Regular' ),
+		name: _x( 'Regular', 'font style' ),
 		value: 'normal',
 	},
 	{
-		name: __( 'Italic' ),
+		name: _x( 'Italic', 'font style' ),
 		value: 'italic',
 	},
 ];
 
 const FONT_WEIGHTS = [
 	{
-		name: __( 'Thin' ),
+		name: _x( 'Thin', 'font weight' ),
 		value: '100',
 	},
 	{
-		name: __( 'Extra Light' ),
+		name: _x( 'Extra Light', 'font weight' ),
 		value: '200',
 	},
 	{
-		name: __( 'Light' ),
+		name: _x( 'Light', 'font weight' ),
 		value: '300',
 	},
 	{
-		name: __( 'Regular' ),
+		name: _x( 'Regular', 'font weight' ),
 		value: '400',
 	},
 	{
-		name: __( 'Medium' ),
+		name: _x( 'Medium', 'font weight' ),
 		value: '500',
 	},
 	{
-		name: __( 'Semi Bold' ),
+		name: _x( 'Semi Bold', 'font weight' ),
 		value: '600',
 	},
 	{
-		name: __( 'Bold' ),
+		name: _x( 'Bold', 'font weight' ),
 		value: '700',
 	},
 	{
-		name: __( 'Extra Bold' ),
+		name: _x( 'Extra Bold', 'font weight' ),
 		value: '800',
 	},
 	{
-		name: __( 'Black' ),
+		name: _x( 'Black', 'font weight' ),
 		value: '900',
 	},
 ];
@@ -63,7 +63,7 @@ const FONT_WEIGHTS = [
  * @param {boolean} hasFontWeights Whether font weights are enabled and present.
  * @return {string} A label representing what font appearance is being edited.
  */
-export const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
+const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
 	if ( ! hasFontStyles ) {
 		return __( 'Font weight' );
 	}
@@ -88,6 +88,7 @@ export default function FontAppearanceControl( props ) {
 		hasFontStyles = true,
 		hasFontWeights = true,
 		value: { fontStyle, fontWeight },
+		...otherProps
 	} = props;
 	const hasStylesOrWeights = hasFontStyles || hasFontWeights;
 	const label = getFontAppearanceLabel( hasFontStyles, hasFontWeights );
@@ -205,6 +206,7 @@ export default function FontAppearanceControl( props ) {
 	return (
 		hasStylesOrWeights && (
 			<CustomSelectControl
+				{ ...otherProps }
 				className="components-font-appearance-control"
 				label={ label }
 				describedBy={ getDescribedBy() }
@@ -213,6 +215,7 @@ export default function FontAppearanceControl( props ) {
 				onChange={ ( { selectedItem } ) =>
 					onChange( selectedItem.style )
 				}
+				__nextUnconstrainedWidth
 			/>
 		)
 	);

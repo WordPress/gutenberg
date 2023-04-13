@@ -1,13 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/heading",
 		"isValid": true,
 		"attributes": {
 			"content": "The <em>Inserter</em> Tool",
 			"level": 4
 		},
-		"innerBlocks": [],
-		"originalContent": "<h4>The <em>Inserter</em> Tool</h4>"
+		"innerBlocks": []
 	}
 ]

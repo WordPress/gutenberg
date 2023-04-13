@@ -4,28 +4,29 @@ const XDEBUG_MODES = [
 	'coverage',
 	'debug',
 	'gcstats',
+	'off',
 	'profile',
 	'trace',
 ];
 
 /**
- * Custom parsing for the Xdebug mode set via yargs. This function ensures two things:
- * 1. If the --xdebug flag was set by itself, default to 'debug'.
- * 2. If the --xdebug flag includes modes, make sure they are accepted by Xdebug.
+ * Custom parsing for the Xdebug mode set via yargs. This function ensures three things:
+ * 1. If the --xdebug flag was not set, set it to 'off'.
+ * 2. If the --xdebug flag was set by itself, default to 'debug'.
+ * 3. If the --xdebug flag includes modes, make sure they are accepted by Xdebug.
  *
- * Note: ideally, we would also have this handle the case where no xdebug flag
- * is set (and then turn Xdebug off). However, yargs does not pass 'undefined'
- * to the coerce callback, so we cannot handle that case here.
- *
- * @param {string} value The user-set mode of Xdebug
+ * @param {string|undefined} value The user-set mode of Xdebug; undefined if there is no --xdebug flag.
  * @return {string} The Xdebug mode to use with defaults applied.
  */
 module.exports = function parseXdebugMode( value ) {
+	if ( value === undefined ) {
+		return 'off';
+	}
 	if ( typeof value !== 'string' ) {
 		throwXdebugModeError( value );
 	}
 
-	if ( value.length === 0 ) {
+	if ( value.length === 0 || value === 'undefined' ) {
 		return 'debug';
 	}
 

@@ -1,19 +1,19 @@
 /**
  * External dependencies
  */
-import { some, groupBy } from 'lodash';
+import { groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, Flex, FlexItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
-import { close as closeIcon } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -24,6 +24,7 @@ const TRANSLATED_SITE_PROPERTIES = {
 	title: __( 'Title' ),
 	description: __( 'Tagline' ),
 	site_logo: __( 'Logo' ),
+	site_icon: __( 'Icon' ),
 	show_on_front: __( 'Show on front' ),
 	page_on_front: __( 'Page on front' ),
 };
@@ -38,9 +39,8 @@ const PUBLISH_ON_SAVE_ENTITIES = [
 export default function EntitiesSavedStates( { close } ) {
 	const saveButtonRef = useRef();
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
-		const dirtyRecords = select(
-			coreStore
-		).__experimentalGetDirtyEntityRecords();
+		const dirtyRecords =
+			select( coreStore ).__experimentalGetDirtyEntityRecords();
 
 		// Remove site object and decouple into its edited pieces.
 		const dirtyRecordsWithoutSite = dirtyRecords.filter(
@@ -76,9 +76,11 @@ export default function EntitiesSavedStates( { close } ) {
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
 
-	const { __unstableMarkLastChangeAsPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
+
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	// To group entities by type.
 	const partitionedSavables = groupBy( dirtyEntityRecords, 'name' );
@@ -125,8 +127,7 @@ export default function EntitiesSavedStates( { close } ) {
 	const saveCheckedEntities = () => {
 		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key, property } ) => {
-				return ! some(
-					unselectedEntities,
+				return ! unselectedEntities.some(
 					( elt ) =>
 						elt.kind === kind &&
 						elt.name === name &&
@@ -139,6 +140,7 @@ export default function EntitiesSavedStates( { close } ) {
 		close( entitiesToSave );
 
 		const siteItemsToSave = [];
+		const pendingSavedRecords = [];
 		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
 			if ( 'root' === kind && 'site' === name ) {
 				siteItemsToSave.push( property );
@@ -153,19 +155,39 @@ export default function EntitiesSavedStates( { close } ) {
 					editEntityRecord( kind, name, key, { status: 'publish' } );
 				}
 
-				saveEditedEntityRecord( kind, name, key );
+				pendingSavedRecords.push(
+					saveEditedEntityRecord( kind, name, key )
+				);
 			}
 		} );
 		if ( siteItemsToSave.length ) {
-			saveSpecifiedEntityEdits(
-				'root',
-				'site',
-				undefined,
-				siteItemsToSave
+			pendingSavedRecords.push(
+				saveSpecifiedEntityEdits(
+					'root',
+					'site',
+					undefined,
+					siteItemsToSave
+				)
 			);
 		}
 
 		__unstableMarkLastChangeAsPersistent();
+
+		Promise.all( pendingSavedRecords )
+			.then( ( values ) => {
+				if (
+					values.some( ( value ) => typeof value === 'undefined' )
+				) {
+					createErrorNotice( __( 'Saving failed.' ) );
+				} else {
+					createSuccessNotice( __( 'Site updated.' ), {
+						type: 'snackbar',
+					} );
+				}
+			} )
+			.catch( ( error ) =>
+				createErrorNotice( `${ __( 'Saving failed.' ) } ${ error }` )
+			);
 	};
 
 	// Explicitly define this with no argument passed.  Using `close` on
@@ -182,8 +204,10 @@ export default function EntitiesSavedStates( { close } ) {
 			{ ...saveDialogProps }
 			className="entities-saved-states__panel"
 		>
-			<div className="entities-saved-states__panel-header">
-				<Button
+			<Flex className="entities-saved-states__panel-header" gap={ 2 }>
+				<FlexItem
+					isBlock
+					as={ Button }
 					ref={ saveButtonRef }
 					variant="primary"
 					disabled={
@@ -195,13 +219,16 @@ export default function EntitiesSavedStates( { close } ) {
 					className="editor-entities-saved-states__save-button"
 				>
 					{ __( 'Save' ) }
-				</Button>
-				<Button
-					icon={ closeIcon }
+				</FlexItem>
+				<FlexItem
+					isBlock
+					as={ Button }
+					variant="secondary"
 					onClick={ dismissPanel }
-					label={ __( 'Close panel' ) }
-				/>
-			</div>
+				>
+					{ __( 'Cancel' ) }
+				</FlexItem>
+			</Flex>
 
 			<div className="entities-saved-states__text-prompt">
 				<strong>{ __( 'Are you ready to save?' ) }</strong>

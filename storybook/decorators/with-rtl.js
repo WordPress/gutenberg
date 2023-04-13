@@ -1,21 +1,21 @@
 /**
- * External dependencies
- */
-import { forceReRender } from '@storybook/react';
-
-/**
  * WordPress dependencies
  */
 import { addFilter, removeFilter } from '@wordpress/hooks';
-import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import ltrStyles from '../style-ltr.lazy.scss';
-import rtlStyles from '../style-rtl.lazy.scss';
+import CONFIG from '../package-styles/config';
 
 export const WithRTL = ( Story, context ) => {
+	const [ rerenderKey, setRerenderKey ] = useState( 0 );
 	const ref = useRef();
 
 	useEffect( () => {
@@ -36,26 +36,29 @@ export const WithRTL = ( Story, context ) => {
 			context.globals.direction
 		);
 
-		forceReRender();
+		setRerenderKey( ( prevValue ) => prevValue + 1 );
 
 		return () => removeFilter( 'i18n.gettext_with_context', 'storybook' );
 	}, [ context.globals.direction ] );
 
 	useLayoutEffect( () => {
-		if ( context.globals.direction === 'rtl' ) {
-			rtlStyles.use();
-		} else {
-			ltrStyles.use();
-		}
+		const stylesToUse = [];
+
+		CONFIG.forEach( ( item ) => {
+			if ( item.componentIdMatcher.test( context.componentId ) ) {
+				stylesToUse.push( ...item[ context.globals.direction ] );
+			}
+		} );
+
+		stylesToUse.forEach( ( style ) => style.use() );
 
 		return () => {
-			ltrStyles.unuse();
-			rtlStyles.unuse();
+			stylesToUse.forEach( ( style ) => style.unuse() );
 		};
-	}, [ context.globals.direction ] );
+	}, [ context.componentId, context.globals.direction ] );
 
 	return (
-		<div ref={ ref }>
+		<div ref={ ref } key={ rerenderKey }>
 			<Story { ...context } />
 		</div>
 	);

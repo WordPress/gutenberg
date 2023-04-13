@@ -22,7 +22,7 @@ export default function LinkCell( {
 		<Cell
 			icon={ showIcon && link }
 			label={ __( 'Link to' ) }
-			// since this is not actually editable, we treat value as a placeholder
+			// Since this is not actually editable, we treat value as a placeholder.
 			value={ valueMask || value || __( 'Search or type URL' ) }
 			valueStyle={
 				!! ( value || valueMask ) ? undefined : placeholderColor

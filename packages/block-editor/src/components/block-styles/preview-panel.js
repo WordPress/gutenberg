@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { getBlockType } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -15,6 +16,7 @@ export default function BlockStylesPreviewPanel( {
 	className,
 	activeStyle,
 } ) {
+	const example = getBlockType( genericPreviewBlock.name )?.example;
 	const styleClassName = replaceActiveStyle( className, activeStyle, style );
 	const previewBlocks = useMemo( () => {
 		return {
@@ -27,6 +29,7 @@ export default function BlockStylesPreviewPanel( {
 					styleClassName +
 					' block-editor-block-styles__block-preview-container',
 			},
+			example,
 		};
 	}, [ genericPreviewBlock, styleClassName ] );
 

@@ -6,9 +6,8 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	insertBlock,
-	openDocumentSettingsSidebar,
-	clickButton,
 	canvas,
+	createNewTemplate,
 } from '@wordpress/e2e-test-utils';
 
 async function getComputedStyle( context, property ) {
@@ -33,21 +32,13 @@ describe( 'iframed multiple block stylesheets', () => {
 		await deactivatePlugin( 'gutenberg-test-iframed-multiple-stylesheets' );
 	} );
 
-	it.skip( 'should load multiple block stylesheets in iframe', async () => {
+	it( 'should load multiple block stylesheets in iframe', async () => {
 		await insertBlock( 'Iframed Multiple Stylesheets' );
 
 		await page.waitForSelector(
 			'.wp-block-test-iframed-multiple-stylesheets'
 		);
-		await openDocumentSettingsSidebar();
-		await clickButton( 'Page' );
-		await clickButton( 'Template' );
-		await clickButton( 'New' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( 'Iframed Test' );
-		await clickButton( 'Create' );
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await createNewTemplate( 'Iframed Test' );
 
 		// Style loaded from the main stylesheet.
 		expect( await getComputedStyle( canvas(), 'border-style' ) ).toBe(
@@ -63,9 +54,5 @@ describe( 'iframed multiple block stylesheets', () => {
 		expect( await getComputedStyle( canvas(), 'background-color' ) ).toBe(
 			'rgb(0, 0, 0)'
 		);
-
-		// Skip warnings related to block-styles enqueing and the use of add_editor_style.
-		// The issue is tracked on https://github.com/WordPress/gutenberg/issues/33212.
-		expect( console ).toHaveWarned();
 	} );
 } );

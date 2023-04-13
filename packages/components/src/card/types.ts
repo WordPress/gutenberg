@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
  */
-import type { Props as SurfaceProps } from '../surface/types';
+import type { SurfaceProps } from '../surface/types';
 
 type DeprecatedSizeOptions = 'extraSmall';
 export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large';
@@ -75,6 +74,13 @@ export type BodyProps = BaseSubComponentProps & {
 	isScrollable?: boolean;
 };
 
+export type MediaProps = {
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
+};
+
 type MarginalSubComponentProps = BaseSubComponentProps & {
 	/**
 	 * Renders without a border.
@@ -87,5 +93,5 @@ type MarginalSubComponentProps = BaseSubComponentProps & {
 export type HeaderProps = MarginalSubComponentProps;
 
 export type FooterProps = MarginalSubComponentProps & {
-	justify: CSSProperties[ 'justifyContent' ];
+	justify?: CSSProperties[ 'justifyContent' ];
 };

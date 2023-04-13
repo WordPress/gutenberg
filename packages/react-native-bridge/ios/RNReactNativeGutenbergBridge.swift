@@ -245,7 +245,19 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
     @objc
     func fetchRequest(_ path: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        self.delegate?.gutenbergDidRequestFetch(path: path, completion: { (result) in
+        self.delegate?.gutenbergDidGetRequestFetch(path: path, completion: { (result) in
+            switch result {
+            case .success(let response):
+                resolver(response)
+            case .failure(let error):
+                rejecter("\(error.code)", error.description, error)
+            }
+        })
+    }
+    
+    @objc
+    func postRequest(_ path: String, data: [String: AnyObject]?, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        self.delegate?.gutenbergDidPostRequestFetch(path: path, data: data, completion: { (result) in
             switch result {
             case .success(let response):
                 resolver(response)
@@ -392,12 +404,17 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     func sendEventToHost(_ eventName: String, properties: [AnyHashable: Any]) {
         self.delegate?.gutenbergDidRequestSendEventToHost(eventName, properties: properties)
     }
+
+    @objc
+    func generateHapticFeedback() {
+        UISelectionFeedbackGenerator().selectionChanged()
+    }
 }
 
 // MARK: - RCTBridgeModule delegate
 
 public extension Gutenberg {
-    public enum ActionButtonType: String {
+    enum ActionButtonType: String {
         case missingBlockAlertActionButton = "missing_block_alert_action_button"
     }
 }
@@ -463,12 +480,13 @@ extension MediaInfo {
     func encodeForJS() -> [String: Any] {
         guard
             let data = try? JSONEncoder().encode(self),
-            let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else
+            var jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else
         {
             assertionFailure("Encoding of MediaInfo failed")
             return [String: Any]()
         }
 
+        jsonObject["metadata"] = self.metadata
         return jsonObject
     }
 }

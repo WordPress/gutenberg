@@ -22,33 +22,26 @@
 	}
 }
 
+.wp-block-navigation .wp-block-navigation__submenu-container > .wp-block-page-list {
+	display: block; // This is needed to make sure the page list container is 100% wide, so that the children are correctly positioned.
+}
+
 // Make links unclickable in the editor.
 .wp-block-pages-list__item__link {
 	pointer-events: none;
 }
 
-.wp-block-page-list .components-placeholder {
-	min-height: 0;
-	padding: 0;
-	background-color: inherit;
-
-	.components-spinner {
-		margin: 0.5em;
-	}
-}
-
 // Modal that shows conversion option.
 .wp-block-page-list-modal {
-	max-width: 400px;
+	@include break-small() {
+		max-width: $break-mobile;
+	}
 }
 
 .wp-block-page-list-modal-buttons {
 	display: flex;
 	justify-content: flex-end;
-
-	.components-button {
-		margin-left: $grid-unit-15;
-	}
+	gap: $grid-unit-15;
 }
 
 // Simulate open on click behaviour in the editor by opening on focus instead.
@@ -63,4 +56,14 @@
 			min-width: 200px;
 		}
 	}
+}
+
+.wp-block-page-list .components-notice {
+	margin-left: 0;
+}
+
+// Space spinner to give it breathing
+// room when block is selected and has focus outline.
+.wp-block-page-list__loading-indicator-container {
+	padding: $grid-unit-10 $grid-unit-15;
 }

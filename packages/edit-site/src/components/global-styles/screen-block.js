@@ -8,14 +8,19 @@ import { getBlockType } from '@wordpress/blocks';
  */
 import ContextMenu from './context-menu';
 import ScreenHeader from './header';
+import BlockPreviewPanel from './block-preview-panel';
 
 function ScreenBlock( { name } ) {
 	const blockType = getBlockType( name );
 
 	return (
 		<>
-			<ScreenHeader back="/blocks" title={ blockType.title } />
-			<ContextMenu parentMenu={ '/blocks/' + name } name={ name } />
+			<ScreenHeader title={ blockType.title } />
+			<BlockPreviewPanel name={ name } />
+			<ContextMenu
+				parentMenu={ '/blocks/' + encodeURIComponent( name ) }
+				name={ name }
+			/>
 		</>
 	);
 }

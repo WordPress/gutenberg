@@ -22,10 +22,9 @@ import { store as blockEditorStore } from '../../store';
  * @return {WPComponent} Parent block selector.
  */
 export default function BlockParentSelector() {
-	const { selectBlock, toggleBlockHighlight } = useDispatch(
-		blockEditorStore
-	);
-	const { firstParentClientId, shouldHide, hasReducedUI } = useSelect(
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
+	const { firstParentClientId, shouldHide, isDistractionFree } = useSelect(
 		( select ) => {
 			const {
 				getBlockName,
@@ -47,7 +46,7 @@ export default function BlockParentSelector() {
 					'__experimentalParentSelector',
 					true
 				),
-				hasReducedUI: settings.hasReducedUI,
+				isDistractionFree: settings.isDistractionFree,
 			};
 		},
 		[]
@@ -60,7 +59,7 @@ export default function BlockParentSelector() {
 	const { gestures: showMoversGestures } = useShowMoversGestures( {
 		ref: nodeRef,
 		onChange( isFocused ) {
-			if ( isFocused && hasReducedUI ) {
+			if ( isFocused && isDistractionFree ) {
 				return;
 			}
 			toggleBlockHighlight( firstParentClientId, isFocused );
@@ -84,10 +83,10 @@ export default function BlockParentSelector() {
 				label={ sprintf(
 					/* translators: %s: Name of the block's parent. */
 					__( 'Select %s' ),
-					blockInformation.title
+					blockInformation?.title
 				) }
 				showTooltip
-				icon={ <BlockIcon icon={ blockInformation.icon } /> }
+				icon={ <BlockIcon icon={ blockInformation?.icon } /> }
 			/>
 		</div>
 	);

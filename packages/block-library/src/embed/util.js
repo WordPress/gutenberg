@@ -66,9 +66,11 @@ export const isFromWordPress = ( html ) =>
 	html && html.includes( 'class="wp-embedded-content"' );
 
 export const getPhotoHtml = ( photo ) => {
+	// If full image url not found use thumbnail.
+	const imageUrl = photo.url || photo.thumbnail_url;
+
 	// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
-	// actually the full size photo. If thumbnails not found, use full image.
-	const imageUrl = photo.thumbnail_url || photo.url;
+	// actually the full size photo.
 	const photoPreview = (
 		<p>
 			<img src={ imageUrl } alt={ photo.title } width="100%" />
@@ -106,8 +108,8 @@ export const createUpgradedEmbedBlock = (
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
 	const isCurrentBlockWP =
 		providerNameSlug === 'wordpress' || type === WP_EMBED_TYPE;
-	// if current block is not WordPress and a more suitable block found
-	// that is different from the current one, create the new matched block
+	// If current block is not WordPress and a more suitable block found
+	// that is different from the current one, create the new matched block.
 	const shouldCreateNewBlock =
 		! isCurrentBlockWP &&
 		matchedBlock &&
@@ -148,6 +150,21 @@ export const createUpgradedEmbedBlock = (
 		// relies on the preview to set the correct render type.
 		...attributesFromPreview,
 	} );
+};
+
+/**
+ * Determine if the block already has an aspect ratio class applied.
+ *
+ * @param {string} existingClassNames Existing block classes.
+ * @return {boolean} True or false if the classnames contain an aspect ratio class.
+ */
+export const hasAspectRatioClass = ( existingClassNames ) => {
+	if ( ! existingClassNames ) {
+		return false;
+	}
+	return ASPECT_RATIOS.some( ( { className } ) =>
+		existingClassNames.includes( className )
+	);
 };
 
 /**
@@ -281,6 +298,13 @@ export const getAttributesFromPreview = memoize(
 			attributes.providerNameSlug = providerNameSlug;
 		}
 
+		// Aspect ratio classes are removed when the embed URL is updated.
+		// If the embed already has an aspect ratio class, that means the URL has not changed.
+		// Which also means no need to regenerate it with getClassNames.
+		if ( hasAspectRatioClass( currentClassNames ) ) {
+			return attributes;
+		}
+
 		attributes.className = getClassNames(
 			html,
 			currentClassNames,
@@ -290,3 +314,32 @@ export const getAttributesFromPreview = memoize(
 		return attributes;
 	}
 );
+
+/**
+ * Returns the attributes derived from the preview, merged with the current attributes.
+ *
+ * @param {Object}  currentAttributes The current attributes of the block.
+ * @param {Object}  preview           The preview data.
+ * @param {string}  title             The block's title, e.g. Twitter.
+ * @param {boolean} isResponsive      Boolean indicating if the block supports responsive content.
+ * @return {Object} Merged attributes.
+ */
+export const getMergedAttributesWithPreview = (
+	currentAttributes,
+	preview,
+	title,
+	isResponsive
+) => {
+	const { allowResponsive, className } = currentAttributes;
+
+	return {
+		...currentAttributes,
+		...getAttributesFromPreview(
+			preview,
+			title,
+			className,
+			isResponsive,
+			allowResponsive
+		),
+	};
+};

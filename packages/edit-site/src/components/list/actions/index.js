@@ -19,9 +19,8 @@ import RenameMenuItem from './rename-menu-item';
 export default function Actions( { template } ) {
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
@@ -39,14 +38,14 @@ export default function Actions( { template } ) {
 				template.id
 			);
 
-			createSuccessNotice( __( 'Template reverted.' ), {
+			createSuccessNotice( __( 'Entity reverted.' ), {
 				type: 'snackbar',
 			} );
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while reverting the template.' );
+					: __( 'An error occurred while reverting the entity.' );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
@@ -74,13 +73,15 @@ export default function Actions( { template } ) {
 									onClose();
 								} }
 							>
-								{ __( 'Delete template' ) }
+								{ __( 'Delete' ) }
 							</MenuItem>
 						</>
 					) }
 					{ isRevertable && (
 						<MenuItem
-							info={ __( 'Restore template to default state' ) }
+							info={ __(
+								'Use the template as supplied by the theme.'
+							) }
 							onClick={ () => {
 								revertAndSaveTemplate();
 								onClose();

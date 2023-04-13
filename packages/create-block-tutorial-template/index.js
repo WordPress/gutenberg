@@ -6,7 +6,6 @@ const { join } = require( 'path' );
 module.exports = {
 	defaultValues: {
 		slug: 'gutenpride',
-		namespace: 'create-block-tutorial',
 		category: 'text',
 		title: 'Gutenpride',
 		description:
@@ -22,13 +21,19 @@ module.exports = {
 		supports: {
 			html: false,
 		},
-		npmDependencies: [
-			'@wordpress/block-editor',
-			'@wordpress/blocks',
-			'@wordpress/components',
-			'@wordpress/i18n',
-		],
 	},
-	templatesPath: join( __dirname, 'templates' ),
+	variants: {
+		static: {},
+		dynamic: {
+			attributes: {
+				message: {
+					type: 'string',
+				},
+			},
+			render: 'file:./render.php',
+		},
+	},
+	pluginTemplatesPath: join( __dirname, 'plugin-templates' ),
+	blockTemplatesPath: join( __dirname, 'block-templates' ),
 	assetsPath: join( __dirname, 'assets' ),
 };

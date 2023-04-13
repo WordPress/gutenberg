@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
@@ -32,7 +27,7 @@ export function __experimentalGetGradientClass( gradientSlug ) {
  * @return {string} Gradient value.
  */
 export function getGradientValueBySlug( gradients, slug ) {
-	const gradient = find( gradients, [ 'slug', slug ] );
+	const gradient = gradients?.find( ( g ) => g.slug === slug );
 	return gradient && gradient.gradient;
 }
 
@@ -40,7 +35,7 @@ export function __experimentalGetGradientObjectByGradientValue(
 	gradients,
 	value
 ) {
-	const gradient = find( gradients, [ 'gradient', value ] );
+	const gradient = gradients?.find( ( g ) => g.gradient === value );
 	return gradient;
 }
 
@@ -59,22 +54,22 @@ export function getGradientSlugByValue( gradients, value ) {
 	return gradient && gradient.slug;
 }
 
-const EMPTY_OBJECT = {};
-
 export function __experimentalUseGradient( {
 	gradientAttribute = 'gradient',
 	customGradientAttribute = 'customGradient',
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
+	const userGradientPalette = useSetting( 'color.gradients.custom' );
+	const themeGradientPalette = useSetting( 'color.gradients.theme' );
+	const defaultGradientPalette = useSetting( 'color.gradients.default' );
 	const allGradients = useMemo(
 		() => [
-			...( gradientsPerOrigin?.custom || [] ),
-			...( gradientsPerOrigin?.theme || [] ),
-			...( gradientsPerOrigin?.default || [] ),
+			...( userGradientPalette || [] ),
+			...( themeGradientPalette || [] ),
+			...( defaultGradientPalette || [] ),
 		],
-		[ gradientsPerOrigin ]
+		[ userGradientPalette, themeGradientPalette, defaultGradientPalette ]
 	);
 	const { gradient, customGradient } = useSelect(
 		( select ) => {

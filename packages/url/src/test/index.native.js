@@ -35,6 +35,18 @@ jest.mock( './fixtures/wpt-data.json', () => {
 		'file://­/p',
 		'file://%C2%AD/p',
 		'file://xn--/p',
+		'http://a.b.c.xn--pokxncvks',
+		'http://10.0.0.xn--pokxncvks',
+		'foo://ho|st/',
+		'http://ho%3Cst/',
+		'http://ho%3Est/',
+		'http://ho%7Cst/',
+		'file://%43%7C',
+		'file://%43|',
+		'file://C%7C',
+		'file://%43%7C/',
+		'https://%43%7C/',
+		'asdf://%43|/',
 	];
 
 	return data.filter( ( { input } ) => ! URL_EXCEPTIONS.includes( input ) );

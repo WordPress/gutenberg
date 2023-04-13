@@ -1,0 +1,137 @@
+.tools-panel-item-spacing {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	align-items: center;
+	grid-template-rows: $grid-unit-30 auto;
+}
+
+.component-spacing-sizes-control {
+	box-sizing: border-box;
+	padding-bottom: 12px;
+	width: 100%;
+	display: contents;
+
+	legend {
+		padding: 0;
+		grid-column: 1 / 1;
+		grid-row: 1 / 1;
+		align-self: center;
+	}
+
+	.components-base-control__label {
+		margin-bottom: $grid-unit-10;
+		height: $grid-unit-20;
+	}
+
+	.components-spacing-sizes-control__side-labels {
+		grid-column: 1 / 1;
+		justify-content: left;
+		height: $grid-unit-20;
+		margin-top: $grid-unit-20;
+	}
+
+	.components-spacing-sizes-control__side-label {
+		grid-column: 1 / 1;
+		justify-self: left;
+		margin-bottom: 0;
+	}
+
+	&.is-unlinked {
+		.components-range-control.components-spacing-sizes-control__range-control,
+		.components-spacing-sizes-control__custom-value-input {
+			margin-top: $grid-unit-10;
+		}
+	}
+
+	.components-spacing-sizes-control__hint-single,
+	.components-spacing-sizes-control__hint-all {
+		color: $gray-700;
+		margin-bottom: 0;
+	}
+
+	.components-spacing-sizes-control__hint-all {
+		grid-column: 2 / 2;
+		justify-self: left;
+		grid-row: 1 / 1;
+		align-self: center;
+		margin-left: $grid-unit-05;
+		margin-bottom: $grid-unit-10;
+	}
+
+	.components-spacing-sizes-control__custom-toggle-all {
+		grid-column: 2 / 2;
+		grid-row: 1 / 1;
+		justify-self: end;
+		margin-top: -4px;
+	}
+
+	.component-spacing-sizes-control__linked-button ~ .components-spacing-sizes-control__custom-toggle-all {
+		margin-right: $grid-unit-05;
+	}
+
+	.components-spacing-sizes-control__custom-toggle-single {
+		grid-column: 3 / 3;
+		justify-self: end;
+		margin-top: $grid-unit-15;
+	}
+
+	.component-spacing-sizes-control__linked-button {
+		grid-column: 3 / 3;
+		grid-row: 1 / 1;
+		justify-self: end;
+		line-height: 0;
+		margin-top: -4px;
+	}
+
+	.components-spacing-sizes-control__custom-value-range {
+		grid-column: span 2;
+		margin-left: $grid-unit-20;
+	}
+
+	.components-base-control.components-spacing-sizes-control__custom-value-input {
+		width: 124px;
+		grid-column: 1;
+		margin-bottom: 0;
+	}
+
+	.components-base-control.components-range-control {
+		height: 40px;
+		/* Vertically center the RangeControl until it has true 40px height. */
+		display: flex;
+		align-items: center;
+		margin-bottom: 0;
+
+		> .components-base-control__field {
+			/* Fixes RangeControl contents when the outer wrapper is flex */
+			flex: 1;
+		}
+	}
+
+	.components-spacing-sizes-control__range-control {
+		grid-column: span 3;
+	}
+
+	.components-range-control__mark {
+		height: $grid-unit-05;
+		width: 3px;
+		background-color: #fff;
+		z-index: 1;
+	}
+
+	.components-range-control__marks {
+		margin-top: 17px;
+
+		:first-child {
+			display: none;
+		}
+	}
+
+	.components-range-control__thumb-wrapper {
+		z-index: 3;
+	}
+
+	.components-spacing-sizes-control__custom-select-control {
+		grid-column: span 3;
+		margin-top: $grid-unit-10;
+	}
+}

@@ -15,12 +15,14 @@ export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as FocalPointPicker } from './focal-point-picker';
-export { default as Toolbar } from './toolbar';
-export { default as ToolbarButton } from './toolbar-button';
-export { default as __experimentalToolbarContext } from './toolbar-context';
-export { default as ToolbarGroup } from './toolbar-group';
-export { default as ToolbarItem } from './toolbar-item';
-export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
+export {
+	Toolbar,
+	ToolbarButton,
+	ToolbarContext as __experimentalToolbarContext,
+	ToolbarDropdownMenu,
+	ToolbarGroup,
+	ToolbarItem,
+} from './toolbar';
 export { default as Tooltip } from './tooltip';
 export { default as Icon } from './icon';
 export { default as Spinner } from './spinner';
@@ -33,6 +35,7 @@ export {
 
 export { default as __experimentalStyleProvider } from './style-provider';
 export { default as BaseControl } from './base-control';
+export { hasSplitBorders as __experimentalHasSplitBorders } from './border-box-control/utils';
 export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';
 export { default as PanelActions } from './panel/actions';
@@ -61,8 +64,9 @@ export {
 	filterUnitsWithSettings as filterUnitsWithSettings,
 } from './unit-control/utils';
 export { default as Disabled } from './disabled';
+export { default as Draggable, DraggableTrigger } from './draggable';
 
-// Higher-Order Components
+// Higher-Order Components.
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
@@ -73,7 +77,7 @@ export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 export * from './text';
 
-// Mobile Components
+// Mobile Components.
 export {
 	__unstableAutocompletionItemsFill,
 	__unstableAutocompletionItemsSlot,
@@ -113,7 +117,7 @@ export { default as AudioPlayer } from './mobile/audio-player';
 export { default as Badge } from './mobile/badge';
 export { default as Gridicons } from './mobile/gridicons';
 
-// Utils
+// Utils.
 export { colorsUtils } from './mobile/color-settings/utils';
 export {
 	WIDE_ALIGNMENTS,
@@ -121,7 +125,7 @@ export {
 	alignmentHelpers,
 } from './mobile/utils/alignments';
 
-// Hooks
+// Hooks.
 export {
 	convertUnitToMobile,
 	useConvertUnitToMobile,
@@ -134,4 +138,8 @@ export {
 	withGlobalStyles,
 	getMergedGlobalStyles,
 } from './mobile/global-styles-context';
-export { getGlobalStyles } from './mobile/global-styles-context/utils';
+export {
+	getGlobalStyles,
+	getColorsAndGradients,
+	useMobileGlobalStylesColors,
+} from './mobile/global-styles-context/utils';

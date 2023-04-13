@@ -2,27 +2,32 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import BorderPanel, { useHasBorderPanel } from './border-panel';
-import DimensionsPanel, { useHasDimensionsPanel } from './dimensions-panel';
+import DimensionsPanel from './dimensions-panel';
 import ScreenHeader from './header';
+import BlockPreviewPanel from './block-preview-panel';
+import { getVariationClassName } from './utils';
+import { unlock } from '../../private-apis';
 
-function ScreenLayout( { name } ) {
-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
-	const hasBorderPanel = useHasBorderPanel( name );
-	const hasDimensionsPanel = useHasDimensionsPanel( name );
+const { useHasDimensionsPanel, useGlobalSetting, useSettingsForBlockElement } =
+	unlock( blockEditorPrivateApis );
 
+function ScreenLayout( { name, variation = '' } ) {
+	const [ rawSettings ] = useGlobalSetting( '', name );
+	const settings = useSettingsForBlockElement( rawSettings, name );
+	const hasDimensionsPanel = useHasDimensionsPanel( settings );
+	const variationClassName = getVariationClassName( variation );
 	return (
 		<>
-			<ScreenHeader
-				back={ parentMenu ? parentMenu : '/' }
-				title={ __( 'Layout' ) }
-			/>
-			{ hasDimensionsPanel && <DimensionsPanel name={ name } /> }
-			{ hasBorderPanel && <BorderPanel name={ name } /> }
+			<ScreenHeader title={ __( 'Layout' ) } />
+			<BlockPreviewPanel name={ name } variation={ variationClassName } />
+			{ hasDimensionsPanel && (
+				<DimensionsPanel name={ name } variation={ variation } />
+			) }
 		</>
 	);
 }

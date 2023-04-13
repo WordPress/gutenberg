@@ -6,11 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import plugin, {
-	createPersistenceInterface,
-	withLazySameState,
-	migrateFeaturePreferencesToInterfaceStore,
-} from '../';
+import plugin, { createPersistenceInterface, withLazySameState } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
 
@@ -30,9 +26,10 @@ describe( 'persistence', () => {
 	} );
 
 	it( 'should not mutate options', () => {
-		const options = Object.freeze( { persist: true, reducer() {} } );
-
-		registry.registerStore( 'test', options );
+		expect( () => {
+			const options = Object.freeze( { persist: true, reducer() {} } );
+			registry.registerStore( 'test', options );
+		} ).not.toThrow( /object is not extensible/ );
 	} );
 
 	it( 'should load a persisted value as initialState', () => {
@@ -378,118 +375,6 @@ describe( 'persistence', () => {
 
 			expect( state ).toBe( 1 );
 			expect( reducer ).not.toHaveBeenCalled();
-		} );
-	} );
-} );
-
-describe( 'migrateFeaturePreferencesToInterfaceStore', () => {
-	it( 'migrates preferences from the source to the interface store', () => {
-		const persistenceInterface = createPersistenceInterface( {
-			storageKey: 'test-username',
-		} );
-
-		const initialState = {
-			preferences: {
-				features: {
-					featureA: true,
-					featureB: false,
-					featureC: true,
-				},
-			},
-		};
-
-		persistenceInterface.set( 'core/test', initialState );
-
-		migrateFeaturePreferencesToInterfaceStore(
-			persistenceInterface,
-			'core/test'
-		);
-
-		expect( persistenceInterface.get() ).toEqual( {
-			'core/interface': {
-				preferences: {
-					features: {
-						'core/test': {
-							featureA: true,
-							featureB: false,
-							featureC: true,
-						},
-					},
-				},
-			},
-			'core/test': {
-				preferences: {
-					features: undefined,
-				},
-			},
-		} );
-	} );
-
-	it( 'handles multiple preferences from different stores to be migrated', () => {
-		const persistenceInterface = createPersistenceInterface( {
-			storageKey: 'test-username',
-		} );
-
-		const initialStateA = {
-			preferences: {
-				features: {
-					featureA: true,
-					featureB: false,
-					featureC: true,
-				},
-			},
-		};
-
-		const initialStateB = {
-			preferences: {
-				features: {
-					featureD: true,
-					featureE: false,
-					featureF: true,
-				},
-			},
-		};
-
-		persistenceInterface.set( 'core/test-a', initialStateA );
-		persistenceInterface.set( 'core/test-b', initialStateB );
-
-		migrateFeaturePreferencesToInterfaceStore(
-			persistenceInterface,
-			'core/test-a'
-		);
-
-		migrateFeaturePreferencesToInterfaceStore(
-			persistenceInterface,
-			'core/test-b'
-		);
-
-		expect( persistenceInterface.get() ).toEqual( {
-			'core/interface': {
-				preferences: {
-					features: {
-						'core/test-a': {
-							featureA: true,
-							featureB: false,
-							featureC: true,
-						},
-						'core/test-b': {
-							featureD: true,
-							featureE: false,
-							featureF: true,
-						},
-					},
-				},
-			},
-			'core/test-a': {
-				preferences: {
-					features: undefined,
-				},
-			},
-			'core/test-b': {
-				preferences: {
-					features: undefined,
-				},
-			},
 		} );
 	} );
 } );

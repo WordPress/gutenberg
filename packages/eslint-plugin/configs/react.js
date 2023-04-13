@@ -6,7 +6,9 @@ module.exports = {
 		},
 	},
 	settings: {
-		'import/extensions': [ '.js', '.jsx' ],
+		react: {
+			version: 'detect',
+		},
 	},
 	plugins: [ '@wordpress', 'react', 'react-hooks' ],
 	rules: {
@@ -32,6 +34,7 @@ module.exports = {
 		'react/no-children-prop': 'off',
 		'react/prop-types': 'off',
 		'react/react-in-jsx-scope': 'off',
+		'react-hooks/exhaustive-deps': 'warn',
 		'react-hooks/rules-of-hooks': 'error',
 	},
 };

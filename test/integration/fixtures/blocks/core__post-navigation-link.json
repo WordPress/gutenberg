@@ -1,14 +1,13 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/post-navigation-link",
 		"isValid": true,
 		"attributes": {
 			"type": "next",
 			"showTitle": false,
-			"linkLabel": false
+			"linkLabel": false,
+			"arrow": "none"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

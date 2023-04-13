@@ -11,25 +11,21 @@ import {
 	trashAllPosts,
 	activateTheme,
 	clickButton,
+	createReusableBlock,
+	visitSiteEditor,
+	enterEditMode,
+	deleteAllTemplates,
+	canvas,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
 	const checkedBoxSelector = '.components-checkbox-control__checked';
 	const checkboxInputSelector = '.components-checkbox-control__input';
 	const entitiesSaveSelector = '.editor-entities-saved-states__save-button';
-	const templatePartSelector = '*[data-type="core/template-part"]';
-	const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector =
-		'.editor-post-publish-panel__header-cancel-button button';
-	const createNewButtonSelector =
-		'//button[contains(text(), "New template part")]';
+		'.editor-post-publish-panel__header-cancel-button button:not(:disabled)';
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
@@ -37,7 +33,7 @@ describe( 'Multi-entity save flow', () => {
 		const checkboxInputs = await page.$$( checkboxInputSelector );
 		expect( checkedBoxes.length - checkboxInputs.length ).toBe( 0 );
 	};
-	const assertExistance = async ( selector, shouldBePresent ) => {
+	const assertExistence = async ( selector, shouldBePresent ) => {
 		const element = await page.$( selector );
 		if ( shouldBePresent ) {
 			expect( element ).not.toBeNull();
@@ -49,9 +45,10 @@ describe( 'Multi-entity save flow', () => {
 	let originalSiteTitle, originalBlogDescription;
 
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'emptytheme' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
+		await trashAllPosts( 'wp_block' );
 
 		// Get the current Site Title and Site Tagline, so that we can reset
 		// them back to the original values once the test suite has finished.
@@ -79,8 +76,6 @@ describe( 'Multi-entity save flow', () => {
 		const saveA11ySelector =
 			'.edit-post-layout__toggle-entities-saved-states-panel-button';
 		const publishPanelSelector = '.editor-post-publish-panel';
-		const confirmTitleButtonSelector =
-			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
 		// Reusable assertions inside Post editor.
 		const assertMultiSaveEnabled = async () => {
@@ -97,46 +92,37 @@ describe( 'Multi-entity save flow', () => {
 			expect( multiSaveButton ).toBeNull();
 		};
 
-		// Template parts can't be used in posts, so this test needs to be rebuilt using perhaps reusable blocks.
-		it.skip( 'Save flow should work as expected.', async () => {
+		it( 'Save flow should work as expected.', async () => {
+			await createNewPost();
 			// Edit the page some.
-			await page.click( '.editor-post-title' );
+			await canvas().waitForSelector( '.editor-post-title' );
+			await canvas().click( '.editor-post-title' );
 			await page.keyboard.type( 'Test Post...' );
 			await page.keyboard.press( 'Enter' );
 
-			// Should not trigger multi-entity save button with only post edited
+			// Should not trigger multi-entity save button with only post edited.
 			await assertMultiSaveDisabled();
 
 			// Should only have publish panel a11y button active with only post edited.
-			await assertExistance( publishA11ySelector, true );
-			await assertExistance( saveA11ySelector, false );
-			await assertExistance( publishPanelSelector, false );
-			await assertExistance( savePanelSelector, false );
+			await assertExistence( publishA11ySelector, true );
+			await assertExistence( saveA11ySelector, false );
+			await assertExistence( publishPanelSelector, false );
+			await assertExistence( savePanelSelector, false );
 
-			// Add a template part and edit it.
-			await insertBlock( 'Template Part' );
-			const createNewButton = await page.waitForXPath(
-				createNewButtonSelector
-			);
-			await createNewButton.click();
-			const confirmTitleButton = await page.waitForSelector(
-				confirmTitleButtonSelector
-			);
-			await confirmTitleButton.click();
-
-			await page.waitForSelector( activatedTemplatePartSelector );
-			await page.click( '.block-editor-button-block-appender' );
-			await page.click( '.editor-block-list-item-paragraph' );
-			await page.keyboard.type( 'some words...' );
+			// Add a reusable block and edit it.
+			await createReusableBlock( 'Hi!', 'Test' );
+			await canvas().waitForSelector( 'p[data-type="core/paragraph"]' );
+			await canvas().click( 'p[data-type="core/paragraph"]' );
+			await page.keyboard.type( 'Oh!' );
 
 			// Should trigger multi-entity save button once template part edited.
 			await assertMultiSaveEnabled();
 
 			// Should only have save panel a11y button active after child entities edited.
-			await assertExistance( publishA11ySelector, false );
-			await assertExistance( saveA11ySelector, true );
-			await assertExistance( publishPanelSelector, false );
-			await assertExistance( savePanelSelector, false );
+			await assertExistence( publishA11ySelector, false );
+			await assertExistence( saveA11ySelector, true );
+			await assertExistence( publishPanelSelector, false );
+			await assertExistence( savePanelSelector, false );
 
 			// Opening panel has boxes checked by default.
 			await page.click( savePostSelector );
@@ -144,52 +130,67 @@ describe( 'Multi-entity save flow', () => {
 			await assertAllBoxesChecked();
 
 			// Should not show other panels (or their a11y buttons) while save panel opened.
-			await assertExistance( publishA11ySelector, false );
-			await assertExistance( saveA11ySelector, false );
-			await assertExistance( publishPanelSelector, false );
+			await assertExistence( publishA11ySelector, false );
+			await assertExistence( saveA11ySelector, false );
+			await assertExistence( publishPanelSelector, false );
 
 			// Publish panel should open after saving.
 			await page.click( entitiesSaveSelector );
 			await page.waitForSelector( publishPanelSelector );
 
 			// No other panels (or their a11y buttons) should be present with publish panel open.
-			await assertExistance( publishA11ySelector, false );
-			await assertExistance( saveA11ySelector, false );
-			await assertExistance( savePanelSelector, false );
+			await assertExistence( publishA11ySelector, false );
+			await assertExistence( saveA11ySelector, false );
+			await assertExistence( savePanelSelector, false );
 
 			// Close publish panel.
-			await page.click( closePanelButtonSelector );
+			const closePanelButton = await page.waitForSelector(
+				closePanelButtonSelector
+			);
+			await closePanelButton.click();
 
 			// Verify saving is disabled.
 			const draftSaved = await page.waitForSelector( draftSavedSelector );
 			expect( draftSaved ).not.toBeNull();
 			await assertMultiSaveDisabled();
-			await assertExistance( saveA11ySelector, false );
+			await assertExistence( saveA11ySelector, false );
 
 			await publishPost();
+			// Wait for the success notice specifically for the published post.
+			// `publishPost()` has a similar check but it only checks for the
+			// existence of any snackbars. In this case, there's another "Site updated"
+			// notice which will be sufficient for that and thus creating a false-positive.
+			await page.waitForXPath(
+				'//*[@id="a11y-speak-polite"][contains(text(), "Post published")]'
+			);
+
+			// Unselect the blocks to avoid clicking the block toolbar.
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+			} );
 
 			// Update the post.
-			await page.click( '.editor-post-title' );
+			await canvas().click( '.editor-post-title' );
 			await page.keyboard.type( '...more title!' );
 
 			// Verify update button is enabled.
-			const enabledSaveButton = await page.$( enabledSavePostSelector );
+			const enabledSaveButton = await page.waitForSelector(
+				enabledSavePostSelector
+			);
 			expect( enabledSaveButton ).not.toBeNull();
 			// Verify multi-entity saving not enabled.
 			await assertMultiSaveDisabled();
-			await assertExistance( saveA11ySelector, false );
+			await assertExistence( saveA11ySelector, false );
 
-			// Update template part.
-			await page.click( templatePartSelector );
-			await page.click(
-				`${ templatePartSelector } .wp-block[data-type="core/paragraph"]`
-			);
-			await page.keyboard.type( '...some more words...' );
-			await page.keyboard.press( 'Enter' );
+			// Update reusable block again.
+			await canvas().click( 'p[data-type="core/paragraph"]' );
+			// We need to click again due to the clickthrough overlays in reusable blocks.
+			await canvas().click( 'p[data-type="core/paragraph"]' );
+			await page.keyboard.type( 'R!' );
 
 			// Multi-entity saving should be enabled.
 			await assertMultiSaveEnabled();
-			await assertExistance( saveA11ySelector, true );
+			await assertExistence( saveA11ySelector, true );
 		} );
 
 		it( 'Site blocks should save individually', async () => {
@@ -203,20 +204,20 @@ describe( 'Multi-entity save flow', () => {
 			);
 			const editableSiteTitleSelector =
 				'.wp-block-site-title a[contenteditable="true"]';
-			await page.waitForSelector( editableSiteTitleSelector );
-			await page.focus( editableSiteTitleSelector );
+			await canvas().waitForSelector( editableSiteTitleSelector );
+			await canvas().focus( editableSiteTitleSelector );
 			await page.keyboard.type( '...' );
 
 			await insertBlock( 'Site Tagline' );
-			// Ensure tagline is retrieved before typing.
-			await page.waitForXPath(
-				'//p[contains(text(), "Just another WordPress site")]'
+			// Wait for the placeholder.
+			await canvas().waitForXPath(
+				'//span[@data-rich-text-placeholder="Write site tagline…"]'
 			);
 			const editableSiteTagLineSelector =
 				'.wp-block-site-tagline[contenteditable="true"]';
-			await page.waitForSelector( editableSiteTagLineSelector );
-			await page.focus( editableSiteTagLineSelector );
-			await page.keyboard.type( '...' );
+			await canvas().waitForSelector( editableSiteTagLineSelector );
+			await canvas().focus( editableSiteTagLineSelector );
+			await page.keyboard.type( 'Just another WordPress site' );
 
 			await clickButton( 'Publish' );
 			await page.waitForSelector( savePanelSelector );
@@ -253,7 +254,7 @@ describe( 'Multi-entity save flow', () => {
 			await assertAllBoxesChecked();
 
 			// Save a11y button should not be present with save panel open.
-			await assertExistance( saveA11ySelector, false );
+			await assertExistence( saveA11ySelector, false );
 
 			// Saving should result in items being saved.
 			await page.click( entitiesSaveSelector );
@@ -261,19 +262,20 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
-			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+			await visitSiteEditor( {
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
-			await siteEditor.disableWelcomeGuide();
+
+			await enterEditMode();
 
 			// Select the header template part via list view.
-			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
+			await page.click( '.edit-site-header-edit-mode__list-view-toggle' );
 			const headerTemplatePartListViewButton = await page.waitForXPath(
-				'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "Header")]'
+				'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "header")]'
 			);
 			headerTemplatePartListViewButton.click();
-			await page.click( 'button[aria-label="Close list view sidebar"]' );
+			await page.click( 'button[aria-label="Close List View Sidebar"]' );
 
 			// Insert something to dirty the editor.
 			await insertBlock( 'Paragraph' );
@@ -286,7 +288,7 @@ describe( 'Multi-entity save flow', () => {
 			expect( enabledButton ).not.toBeNull();
 
 			// Save a11y button should be present.
-			await assertExistance( saveA11ySelector, true );
+			await assertExistence( saveA11ySelector, true );
 
 			// Save all changes.
 			await saveAllChanges();
@@ -299,11 +301,12 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should allow re-saving after changing the same block attribute', async () => {
 			// Navigate to site editor.
-			await siteEditor.visit( {
-				postId: 'tt1-blocks//index',
+			await visitSiteEditor( {
+				postId: 'emptytheme//index',
 				postType: 'wp_template',
 			} );
-			await siteEditor.disableWelcomeGuide();
+
+			await enterEditMode();
 
 			// Insert a paragraph at the bottom.
 			await insertBlock( 'Paragraph' );
@@ -311,26 +314,23 @@ describe( 'Multi-entity save flow', () => {
 			// Open the block settings.
 			await page.click( 'button[aria-label="Settings"]' );
 
-			// Click on font size selector.
-			await page.click( 'button[aria-label="Font size"]' );
-
-			// Click on a different font size.
-			const extraSmallFontSize = await page.waitForXPath(
-				'//li[contains(text(), "Extra small")]'
+			// Wait for the font size picker controls.
+			await page.waitForSelector(
+				'.components-font-size-picker__controls'
 			);
-			await extraSmallFontSize.click();
+
+			// Change the font size.
+			await page.click(
+				'.components-font-size-picker__controls button[aria-label="Small"]'
+			);
 
 			// Save all changes.
 			await saveAllChanges();
 
-			// Click on font size selector again.
-			await page.click( 'button[aria-label="Font size"]' );
-
-			// Select another font size.
-			const normalFontSize = await page.waitForXPath(
-				'//li[contains(text(), "Normal")]'
+			// Change the font size.
+			await page.click(
+				'.components-font-size-picker__controls button[aria-label="Medium"]'
 			);
-			await normalFontSize.click();
 
 			// Assert that the save button has been re-enabled.
 			const saveButton = await page.waitForSelector(

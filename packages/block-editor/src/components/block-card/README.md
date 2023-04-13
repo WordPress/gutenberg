@@ -25,7 +25,7 @@ const MyBlockCard = () => (
 	<BlockCard
 		icon={ paragraph }
 		title="Paragraph"
-		description="Start with the building block of all narrative."
+		description="Start with the basic building block of all narrative."
 	/>
 );
 ```

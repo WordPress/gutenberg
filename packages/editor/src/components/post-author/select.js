@@ -18,9 +18,8 @@ function PostAuthorSelect() {
 	const { editPost } = useDispatch( editorStore );
 	const { postAuthor, authors } = useSelect( ( select ) => {
 		return {
-			postAuthor: select( editorStore ).getEditedPostAttribute(
-				'author'
-			),
+			postAuthor:
+				select( editorStore ).getEditedPostAttribute( 'author' ),
 			authors: select( coreStore ).getUsers( AUTHORS_QUERY ),
 		};
 	}, [] );
@@ -41,6 +40,7 @@ function PostAuthorSelect() {
 
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			className="post-author-selector"
 			label={ __( 'Author' ) }
 			options={ authorOptions }

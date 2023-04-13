@@ -12,14 +12,8 @@ const options = [
 ];
 
 const VideoSettings = ( { setAttributes, attributes } ) => {
-	const {
-		autoplay,
-		controls,
-		loop,
-		muted,
-		playsInline,
-		preload,
-	} = attributes;
+	const { autoplay, controls, loop, muted, playsInline, preload } =
+		attributes;
 
 	const autoPlayHelpText = __(
 		'Autoplay may cause usability issues for some users.'
@@ -54,32 +48,38 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 	return (
 		<>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Autoplay' ) }
 				onChange={ toggleFactory.autoplay }
-				checked={ autoplay }
+				checked={ !! autoplay }
 				help={ getAutoplayHelp }
 			/>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Loop' ) }
 				onChange={ toggleFactory.loop }
-				checked={ loop }
+				checked={ !! loop }
 			/>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Muted' ) }
 				onChange={ toggleFactory.muted }
-				checked={ muted }
+				checked={ !! muted }
 			/>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Playback controls' ) }
 				onChange={ toggleFactory.controls }
-				checked={ controls }
+				checked={ !! controls }
 			/>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Play inline' ) }
 				onChange={ toggleFactory.playsInline }
-				checked={ playsInline }
+				checked={ !! playsInline }
 			/>
 			<SelectControl
+				__nextHasNoMarginBottom
 				label={ __( 'Preload' ) }
 				value={ preload }
 				onChange={ onChangePreload }

@@ -14,6 +14,8 @@ import { useSelect } from '@wordpress/data';
 
 const name = 'core/paragraph';
 
+const allowedParentBlockAlignments = [ 'left', 'center', 'right' ];
+
 function ParagraphBlock( {
 	attributes,
 	mergeBlocks,
@@ -21,6 +23,7 @@ function ParagraphBlock( {
 	setAttributes,
 	style,
 	clientId,
+	parentBlockAlignment,
 } ) {
 	const isRTL = useSelect( ( select ) => {
 		return !! select( blockEditorStore ).getSettings().isRTL;
@@ -40,6 +43,15 @@ function ParagraphBlock( {
 	const onAlignmentChange = useCallback( ( nextAlign ) => {
 		setAttributes( { align: nextAlign } );
 	}, [] );
+
+	const parentTextAlignment = allowedParentBlockAlignments.includes(
+		parentBlockAlignment
+	)
+		? parentBlockAlignment
+		: undefined;
+
+	const textAlignment = align || parentTextAlignment;
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -82,7 +94,7 @@ function ParagraphBlock( {
 				onReplace={ onReplace }
 				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 				placeholder={ placeholder || __( 'Start writing…' ) }
-				textAlign={ align }
+				textAlign={ textAlignment }
 				__unstableEmbedURLOnPaste
 			/>
 		</>

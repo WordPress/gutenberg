@@ -6,10 +6,14 @@ import {
 	serialize,
 	pasteHandler,
 	store as blocksStore,
+	createBlock,
+	findTransform,
+	getBlockTransforms,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
+	__unstableStripHTML as stripHTML,
 } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -19,7 +23,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getPasteEventData } from '../../utils/get-paste-event-data';
+import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 
 export function useNotifyCopy() {
@@ -78,10 +82,20 @@ export function useClipboardHandler() {
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
+		__unstableIsFullySelected,
+		__unstableIsSelectionCollapsed,
+		__unstableIsSelectionMergeable,
+		__unstableGetSelectedBlocksWithPartialSelection,
+		canInsertBlockType,
 	} = useSelect( blockEditorStore );
-	const { flashBlock, removeBlocks, replaceBlocks } = useDispatch(
-		blockEditorStore
-	);
+	const {
+		flashBlock,
+		removeBlocks,
+		replaceBlocks,
+		__unstableDeleteSelection,
+		__unstableExpandSelection,
+		insertBlocks,
+	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
 	return useRefEffect( ( node ) => {
@@ -116,35 +130,130 @@ export function useClipboardHandler() {
 			const eventDefaultPrevented = event.defaultPrevented;
 			event.preventDefault();
 
+			const isSelectionMergeable = __unstableIsSelectionMergeable();
+			const shouldHandleWholeBlocks =
+				__unstableIsSelectionCollapsed() || __unstableIsFullySelected();
+			const expandSelectionIsNeeded =
+				! shouldHandleWholeBlocks && ! isSelectionMergeable;
 			if ( event.type === 'copy' || event.type === 'cut' ) {
 				if ( selectedBlockClientIds.length === 1 ) {
 					flashBlock( selectedBlockClientIds[ 0 ] );
 				}
-				notifyCopy( event.type, selectedBlockClientIds );
-				const blocks = getBlocksByClientId( selectedBlockClientIds );
-				const serialized = serialize( blocks );
+				// If we have a partial selection that is not mergeable, just
+				// expand the selection to the whole blocks.
+				if ( expandSelectionIsNeeded ) {
+					__unstableExpandSelection();
+				} else {
+					notifyCopy( event.type, selectedBlockClientIds );
+					let blocks;
+					// Check if we have partial selection.
+					if ( shouldHandleWholeBlocks ) {
+						blocks = getBlocksByClientId( selectedBlockClientIds );
+					} else {
+						const [ head, tail ] =
+							__unstableGetSelectedBlocksWithPartialSelection();
+						const inBetweenBlocks = getBlocksByClientId(
+							selectedBlockClientIds.slice(
+								1,
+								selectedBlockClientIds.length - 1
+							)
+						);
+						blocks = [ head, ...inBetweenBlocks, tail ];
+					}
 
-				event.clipboardData.setData( 'text/plain', serialized );
-				event.clipboardData.setData( 'text/html', serialized );
+					const wrapperBlockName = event.clipboardData.getData(
+						'__unstableWrapperBlockName'
+					);
+
+					if ( wrapperBlockName ) {
+						blocks = createBlock(
+							wrapperBlockName,
+							JSON.parse(
+								event.clipboardData.getData(
+									'__unstableWrapperBlockAttributes'
+								)
+							),
+							blocks
+						);
+					}
+
+					const serialized = serialize( blocks );
+
+					event.clipboardData.setData(
+						'text/plain',
+						toPlainText( serialized )
+					);
+					event.clipboardData.setData( 'text/html', serialized );
+				}
 			}
 
 			if ( event.type === 'cut' ) {
-				removeBlocks( selectedBlockClientIds );
+				// We need to also check if at the start we needed to
+				// expand the selection, as in this point we might have
+				// programmatically fully selected the blocks above.
+				if ( shouldHandleWholeBlocks && ! expandSelectionIsNeeded ) {
+					removeBlocks( selectedBlockClientIds );
+				} else {
+					__unstableDeleteSelection();
+				}
 			} else if ( event.type === 'paste' ) {
 				if ( eventDefaultPrevented ) {
-					// This was likely already handled in rich-text/use-paste-handler.js
+					// This was likely already handled in rich-text/use-paste-handler.js.
 					return;
 				}
 				const {
-					__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
+					__experimentalCanUserUseUnfilteredHTML:
+						canUserUseUnfilteredHTML,
 				} = getSettings();
-				const { plainText, html } = getPasteEventData( event );
-				const blocks = pasteHandler( {
-					HTML: html,
-					plainText,
-					mode: 'BLOCKS',
-					canUserUseUnfilteredHTML,
-				} );
+				const { plainText, html, files } = getPasteEventData( event );
+				let blocks = [];
+
+				if ( files.length ) {
+					const fromTransforms = getBlockTransforms( 'from' );
+					blocks = files
+						.reduce( ( accumulator, file ) => {
+							const transformation = findTransform(
+								fromTransforms,
+								( transform ) =>
+									transform.type === 'files' &&
+									transform.isMatch( [ file ] )
+							);
+							if ( transformation ) {
+								accumulator.push(
+									transformation.transform( [ file ] )
+								);
+							}
+							return accumulator;
+						}, [] )
+						.flat();
+				} else {
+					blocks = pasteHandler( {
+						HTML: html,
+						plainText,
+						mode: 'BLOCKS',
+						canUserUseUnfilteredHTML,
+					} );
+				}
+
+				if ( selectedBlockClientIds.length === 1 ) {
+					const [ selectedBlockClientId ] = selectedBlockClientIds;
+
+					if (
+						blocks.every( ( block ) =>
+							canInsertBlockType(
+								block.name,
+								selectedBlockClientId
+							)
+						)
+					) {
+						insertBlocks(
+							blocks,
+							undefined,
+							selectedBlockClientId
+						);
+						return;
+					}
+				}
 
 				replaceBlocks(
 					selectedBlockClientIds,
@@ -171,4 +280,24 @@ function CopyHandler( { children } ) {
 	return <div ref={ useClipboardHandler() }>{ children }</div>;
 }
 
+/**
+ * Given a string of HTML representing serialized blocks, returns the plain
+ * text extracted after stripping the HTML of any tags and fixing line breaks.
+ *
+ * @param {string} html Serialized blocks.
+ * @return {string} The plain-text content with any html removed.
+ */
+function toPlainText( html ) {
+	// Manually handle BR tags as line breaks prior to `stripHTML` call
+	html = html.replace( /<br>/g, '\n' );
+
+	const plainText = stripHTML( html ).trim();
+
+	// Merge any consecutive line breaks
+	return plainText.replace( /\n\n+/g, '\n\n' );
+}
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/copy-handler/README.md
+ */
 export default CopyHandler;

@@ -3,8 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import { Separator } from 'reakit';
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -15,11 +14,11 @@ import {
 	WordPressComponentProps,
 } from '../ui/context';
 import { DividerView } from './styles';
-import type { Props } from './types';
+import type { DividerProps } from './types';
 
-function Divider(
-	props: WordPressComponentProps< Props, 'hr', false >,
-	forwardedRef: Ref< any >
+function UnconnectedDivider(
+	props: WordPressComponentProps< DividerProps, 'hr', false >,
+	forwardedRef: ForwardedRef< any >
 ) {
 	const contextProps = useContextSystem( props, 'Divider' );
 
@@ -35,7 +34,6 @@ function Divider(
 /**
  * `Divider` is a layout component that separates groups of related content.
  *
- * @example
  * ```js
  * import {
  * 		__experimentalDivider as Divider,
@@ -54,6 +52,6 @@ function Divider(
  * }
  * ```
  */
-const ConnectedDivider = contextConnect( Divider, 'Divider' );
+export const Divider = contextConnect( UnconnectedDivider, 'Divider' );
 
-export default ConnectedDivider;
+export default Divider;

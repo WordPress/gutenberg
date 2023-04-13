@@ -122,7 +122,7 @@ function getdave_sbe_render_block_editor() {
 
 Here we simply output some basic placeholder HTML.
 
-Note that we've included an `id` attribute `getdave-sbe-block-editor`. Keep a note of that, a we'll be using it shortly.
+Note that we've included an `id` attribute `getdave-sbe-block-editor`. Keep a note of that, as we'll be using it shortly.
 
 ### Enqueuing JavaScript and CSS
 
@@ -519,7 +519,7 @@ And with that we have covered the render of our custom `<BlockEditor>`!
 ## Block Persistence
 
 We've come a long way on our journey to create a custom block editor. But there is
-one major area left to touch upon - Block persistance; that is the act of having our
+one major area left to touch upon - Block persistence; that is the act of having our
 Blocks saved and **available _between_ page refreshes**.
 
 ![alt text](https://wordpress.org/gutenberg/files/2020/03/block-persistance.gif 'Screencapture showing added Blocks being restored between page refreshes.')
@@ -620,4 +620,4 @@ If you've made it this far then congratulations! I hope you now have a better un
 
 In addition, you've reviewed an working example of the code required to implement your own custom functioning block editor. This information should prove useful, especially as Gutenberg expands beyond editing just the `Post` and into Widgets, Full Site Editing and beyond!
 
-The full code for the custom functioning block editor we've just built is [available on Github](https://github.com/getdave/standalone-block-editor). I encourage you to download and try it out for yourself. Experiment, then and take things even further!
+The full code for the custom functioning block editor we've just built is [available on GitHub](https://github.com/getdave/standalone-block-editor). I encourage you to download and try it out for yourself. Experiment, then and take things even further!

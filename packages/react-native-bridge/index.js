@@ -23,13 +23,13 @@ export const actionButtons = {
 	missingBlockAlertActionButton: 'missing_block_alert_action_button',
 };
 
-// Console polyfill from react-native
+// Console polyfill from react-native.
 
 export function nativeLoggingHook( message, logLevel ) {
 	RNReactNativeGutenbergBridge.editorDidEmitLog( message, logLevel );
 }
 
-// Send messages
+// Send messages.
 
 export function sendNativeEditorDidLayout() {
 	// For now, this is only needed on iOS to solve layout issues with the toolbar.
@@ -40,7 +40,7 @@ export function sendNativeEditorDidLayout() {
 	}
 }
 
-// Register listeners
+// Register listeners.
 
 export function subscribeParentGetHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'requestGetHtml', callback );
@@ -297,6 +297,10 @@ export function fetchRequest( path, enableCaching = true ) {
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
 }
 
+export function postRequest( path, data = {} ) {
+	return RNReactNativeGutenbergBridge.postRequest( path, data );
+}
+
 export function showUserSuggestions() {
 	return RNReactNativeGutenbergBridge.showUserSuggestions();
 }
@@ -434,6 +438,13 @@ export function sendEventToHost( eventName, properties ) {
 		eventName,
 		properties
 	);
+}
+
+/**
+ * Generate haptic feedback.
+ */
+export function generateHapticFeedback() {
+	RNReactNativeGutenbergBridge.generateHapticFeedback();
 }
 
 export default RNReactNativeGutenbergBridge;

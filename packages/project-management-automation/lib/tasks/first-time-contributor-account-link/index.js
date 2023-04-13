@@ -34,7 +34,7 @@ function getPromptMessageText( author ) {
 
 /**
  * Prompts the user to link their GitHub account to their WordPress.org profile
- * if neccessary for props credit.
+ * if necessary for props credit.
  *
  * @param {WebhookPayloadPush} payload Push event payload.
  * @param {GitHub}             octokit Initialized Octokit REST client.
@@ -47,13 +47,23 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		return;
 	}
 
-	const commit = /** @type {WebhookPayloadPushCommit} */ ( payload
-		.commits[ 0 ] );
+	const commit = /** @type {WebhookPayloadPushCommit} */ (
+		payload.commits[ 0 ]
+	);
 	const pullRequest = getAssociatedPullRequest( commit );
 	if ( ! pullRequest ) {
 		debug(
 			'first-time-contributor-account-link: Cannot determine pull request associated with commit. Aborting'
 		);
+		return;
+	}
+
+	const { data: user } = await octokit.rest.users.getByUsername( {
+		username: commit.author.username,
+	} );
+
+	if ( user.type === 'Bot' ) {
+		debug( 'first-time-contributor-account-link: User is a bot. Aborting' );
 		return;
 	}
 

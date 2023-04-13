@@ -13,7 +13,6 @@ import {
 	useBlockProps,
 	PlainText,
 } from '@wordpress/block-editor';
-import { RawHTML } from '@wordpress/element';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
@@ -30,7 +29,7 @@ export default function PostTitleEdit( {
 	context: { postType, postId, queryId },
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
-	const isDescendentOfQueryLoop = !! queryId;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
@@ -61,9 +60,10 @@ export default function PostTitleEdit( {
 					{ ...blockProps }
 				/>
 			) : (
-				<TagName { ...blockProps }>
-					<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
-				</TagName>
+				<TagName
+					{ ...blockProps }
+					dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
+				/>
 			);
 	}
 
@@ -91,9 +91,10 @@ export default function PostTitleEdit( {
 						target={ linkTarget }
 						rel={ rel }
 						onClick={ ( event ) => event.preventDefault() }
-					>
-						<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
-					</a>
+						dangerouslySetInnerHTML={ {
+							__html: fullTitle?.rendered,
+						} }
+					/>
 				</TagName>
 			);
 	}
@@ -117,6 +118,7 @@ export default function PostTitleEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Make title a link' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
@@ -124,6 +126,7 @@ export default function PostTitleEdit( {
 					{ isLink && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -133,6 +136,7 @@ export default function PostTitleEdit( {
 								checked={ linkTarget === '_blank' }
 							/>
 							<TextControl
+								__nextHasNoMarginBottom
 								label={ __( 'Link rel' ) }
 								value={ rel }
 								onChange={ ( newRel ) =>

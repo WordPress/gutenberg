@@ -1,8 +1,8 @@
 # Core Data
 
-Core Data is a [data module](/packages/data/README.md) intended to simplify access to and manipulation of core WordPress entities. It registers its own store and provides a number of selectors which resolve data from the WordPress REST API automatically, along with dispatching action creators to manipulate data.
+Core Data is a [data module](https://github.com/WordPress/gutenberg/tree/HEAD/packages/data/README.md) intended to simplify access to and manipulation of core WordPress entities. It registers its own store and provides a number of selectors which resolve data from the WordPress REST API automatically, along with dispatching action creators to manipulate data. Core data is shipped with [`TypeScript definitions for WordPress data types`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-data/src/entity-types/README.md).
 
-Used in combination with features of the data module such as [`subscribe`](/packages/data/README.md#subscribe-function) or [higher-order components](/packages/data/README.md#higher-order-components), it enables a developer to easily add data into the logic and display of their plugin.
+Used in combination with features of the data module such as [`subscribe`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/data/README.md#subscribe-function) or [higher-order components](https://github.com/WordPress/gutenberg/tree/HEAD/packages/data/README.md#higher-order-components), it enables a developer to easily add data into the logic and display of their plugin.
 
 ## Installation
 
@@ -70,72 +70,20 @@ _Parameters_
 -   _query_ `?Object`: Special query parameters for the DELETE API call.
 -   _options_ `[Object]`: Delete options.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+-   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
 ### editEntityRecord
 
-Returns an action object that triggers an
-edit to an entity record.
+Returns an action object that triggers an edit to an entity record.
 
 _Parameters_
 
 -   _kind_ `string`: Kind of the edited entity record.
 -   _name_ `string`: Name of the edited entity record.
--   _recordId_ `number`: Record ID of the edited entity record.
+-   _recordId_ `number|string`: Record ID of the edited entity record.
 -   _edits_ `Object`: The edits.
 -   _options_ `Object`: Options for the edit.
--   _options.undoIgnore_ `boolean`: Whether to ignore the edit in undo history or not.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveAutosaves
-
-Returns an action object used in signalling that the autosaves for a
-post have been received.
-
-_Parameters_
-
--   _postId_ `number`: The id of the post that is parent to the autosave.
--   _autosaves_ `Array|Object`: An array of autosaves or singular autosave object.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveCurrentTheme
-
-Returns an action object used in signalling that the current theme has been received.
-
-_Parameters_
-
--   _currentTheme_ `Object`: The current theme.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveCurrentUser
-
-Returns an action used in signalling that the current user has been received.
-
-_Parameters_
-
--   _currentUser_ `Object`: Current user object.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveEmbedPreview
-
-Returns an action object used in signalling that the preview data for
-a given URl has been received.
-
-_Parameters_
-
--   _url_ `string`: URL to preview the embed for.
--   _preview_ `*`: Preview data.
+-   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
 
 _Returns_
 
@@ -147,8 +95,8 @@ Returns an action object used in signalling that entity records have been receiv
 
 _Parameters_
 
--   _kind_ `string`: Kind of the received entity.
--   _name_ `string`: Name of the received entity.
+-   _kind_ `string`: Kind of the received entity record.
+-   _name_ `string`: Name of the received entity record.
 -   _records_ `Array|Object`: Records received.
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
@@ -170,6 +118,8 @@ _Returns_
 
 ### receiveUploadPermissions
 
+> **Deprecated** since WP 5.9, use receiveUserPermission instead.
+
 Returns an action object used in signalling that Upload permissions have been received.
 
 _Parameters_
@@ -180,41 +130,9 @@ _Returns_
 
 -   `Object`: Action object.
 
-### receiveUserPermission
-
-Returns an action object used in signalling that the current user has
-permission to perform an action on a REST resource.
-
-_Parameters_
-
--   _key_ `string`: A key that represents the action and REST resource.
--   _isAllowed_ `boolean`: Whether or not the user can perform the action.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveUserQuery
-
-Returns an action object used in signalling that authors have been received.
-
-_Parameters_
-
--   _queryID_ `string`: Query ID.
--   _users_ `Array|Object`: Users received.
-
-_Returns_
-
--   `Object`: Action object.
-
 ### redo
 
-Action triggered to redo the last undoed
-edit to an entity record, if any.
-
-_Returns_
-
--   `undefined`:
+Action triggered to redo the last undoed edit to an entity record, if any.
 
 ### saveEditedEntityRecord
 
@@ -239,15 +157,11 @@ _Parameters_
 -   _options_ `Object`: Saving options.
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
+-   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
 ### undo
 
-Action triggered to undo the last edit to
-an entity record, if any.
-
-_Returns_
-
--   `undefined`:
+Action triggered to undo the last edit to an entity record, if any.
 
 <!-- END TOKEN(Autogenerated actions|src/actions.js) -->
 
@@ -255,48 +169,45 @@ _Returns_
 
 The following selectors are available on the object returned by `wp.data.select( 'core' )`:
 
-<!-- START TOKEN(Autogenerated selectors|src/selectors.js) -->
+<!-- START TOKEN(Autogenerated selectors|src/selectors.ts) -->
 
 ### canUser
 
-Returns whether the current user can perform the given action on the given
-REST resource.
+Returns whether the current user can perform the given action on the given REST resource.
 
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
+Calling this may trigger an OPTIONS request to the REST API via the `canUser()` resolver.
 
 <https://developer.wordpress.org/rest-api/reference/>
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
 -   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
--   _id_ `string=`: Optional ID of the rest resource to check.
+-   _id_ `EntityRecordKey`: Optional ID of the rest resource to check.
 
 _Returns_
 
--   `boolean|undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
+-   `boolean | undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
 
 ### canUserEditEntityRecord
 
 Returns whether the current user can edit the given entity.
 
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
+Calling this may trigger an OPTIONS request to the REST API via the `canUser()` resolver.
 
 <https://developer.wordpress.org/rest-api/reference/>
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `string`: Record's id.
+-   _recordId_ `EntityRecordKey`: Record's id.
 
 _Returns_
 
--   `boolean|undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
+-   `boolean | undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
 
 ### getAuthors
 
@@ -306,12 +217,12 @@ Returns all available authors.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
--   _query_ `Object|undefined`: Optional object of query parameters to include with request.
+-   _state_ `State`: Data state.
+-   _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request.
 
 _Returns_
 
--   `Array`: Authors list.
+-   `ET.User[]`: Authors list.
 
 ### getAutosave
 
@@ -319,31 +230,54 @@ Returns the autosave for the post and author.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `number`: The id of the parent post.
--   _authorId_ `number`: The id of the author.
+-   _postId_ `EntityRecordKey`: The id of the parent post.
+-   _authorId_ `EntityRecordKey`: The id of the author.
 
 _Returns_
 
--   `?Object`: The autosave for the post and author.
+-   `EntityRecord | undefined`: The autosave for the post and author.
 
 ### getAutosaves
 
 Returns the latest autosaves for the post.
 
-May return multiple autosaves since the backend stores one autosave per
-author for each post.
+May return multiple autosaves since the backend stores one autosave per author for each post.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `number`: The id of the parent post.
+-   _postId_ `EntityRecordKey`: The id of the parent post.
 
 _Returns_
 
--   `?Array`: An array of autosaves for the post, or undefined if there is none.
+-   `Array< any > | undefined`: An array of autosaves for the post, or undefined if there is none.
+
+### getBlockPatternCategories
+
+Retrieve the list of registered block pattern categories.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< any >`: Block pattern category list.
+
+### getBlockPatterns
+
+Retrieve the list of registered block patterns.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< any >`: Block pattern list.
 
 ### getCurrentTheme
 
@@ -351,11 +285,11 @@ Return the current theme.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 
 _Returns_
 
--   `Object`: The current theme.
+-   `any`: The current theme.
 
 ### getCurrentUser
 
@@ -363,11 +297,11 @@ Returns the current user.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 
 _Returns_
 
--   `Object`: Current user object.
+-   `undefined< 'edit' >`: Current user object.
 
 ### getEditedEntityRecord
 
@@ -375,14 +309,14 @@ Returns the specified entity record, merged with its edits.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
--   `Object?`: The entity record, merged with its edits.
+-   `undefined< EntityRecord > | undefined`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -390,57 +324,86 @@ Returns the embed preview for the given URL.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _url_ `string`: Embedded URL.
 
 _Returns_
 
--   `*`: Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
+-   `any`: Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
 
 ### getEntitiesByKind
 
-Returns whether the entities for the give kind are loaded.
+> **Deprecated** since WordPress 6.0. Use getEntitiesConfig instead
+
+Returns the loaded entities for the given kind.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _kind_ `string`: Entity kind.
 
 _Returns_
 
--   `Array<Object>`: Array of entities with config matching kind.
+-   `Array< any >`: Array of entities with config matching kind.
+
+### getEntitiesConfig
+
+Returns the loaded entities for the given kind.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _kind_ `string`: Entity kind.
+
+_Returns_
+
+-   `Array< any >`: Array of entities with config matching kind.
 
 ### getEntity
 
-Returns the entity object given its kind and name.
+> **Deprecated** since WordPress 6.0. Use getEntityConfig instead
+
+Returns the entity config given its kind and name.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 
 _Returns_
 
--   `Object`: Entity
+-   `any`: Entity config
+
+### getEntityConfig
+
+Returns the entity config given its kind and name.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+
+_Returns_
+
+-   `any`: Entity config
 
 ### getEntityRecord
 
-Returns the Entity's record object by key. Returns `null` if the value is not
-yet received, undefined if the value entity is known to not exist, or the
-entity object if it exists and is received.
+Returns the Entity's record object by key. Returns `null` if the value is not yet received, undefined if the value entity is known to not exist, or the entity object if it exists and is received.
 
 _Parameters_
 
--   _state_ `Object`: State tree
+-   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `number`: Record's key
--   _query_ `?Object`: Optional query.
+-   _key_ `EntityRecordKey`: Record's key
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID.
 
 _Returns_
 
--   `Object?`: Record.
+-   `EntityRecord | undefined`: Record.
 
 ### getEntityRecordEdits
 
@@ -448,33 +411,31 @@ Returns the specified entity record's edits.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
--   `Object?`: The entity record's edits.
+-   `Optional< any >`: The entity record's edits.
 
 ### getEntityRecordNonTransientEdits
 
 Returns the specified entity record's non transient edits.
 
-Transient edits don't create an undo level, and
-are not considered for change detection.
-They are defined in the entity's config.
+Transient edits don't create an undo level, and are not considered for change detection. They are defined in the entity's config.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
--   `Object?`: The entity record's non transient edits.
+-   `Optional< any >`: The entity record's non transient edits.
 
 ### getEntityRecords
 
@@ -482,14 +443,14 @@ Returns the Entity's records.
 
 _Parameters_
 
--   _state_ `Object`: State tree
+-   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `?Object`: Optional terms query.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID.
 
 _Returns_
 
--   `?Array`: Records.
+-   `EntityRecord[] | null`: Records.
 
 ### getLastEntityDeleteError
 
@@ -497,14 +458,14 @@ Returns the specified entity record's last delete error.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
--   `Object?`: The entity record's save error.
+-   `any`: The entity record's save error.
 
 ### getLastEntitySaveError
 
@@ -512,49 +473,45 @@ Returns the specified entity record's last save error.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
--   `Object?`: The entity record's save error.
+-   `any`: The entity record's save error.
 
 ### getRawEntityRecord
 
-Returns the entity's record object by key,
-with its attributes mapped to their raw values.
+Returns the entity's record object by key, with its attributes mapped to their raw values.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `number`: Record's key.
+-   _key_ `EntityRecordKey`: Record's key.
 
 _Returns_
 
--   `Object?`: Object with the entity's raw attributes.
+-   `EntityRecord | undefined`: Object with the entity's raw attributes.
 
 ### getRedoEdit
 
-Returns the next edit from the current undo offset
-for the entity records edits history, if any.
+Returns the next edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 
 _Returns_
 
--   `Object?`: The edit.
+-   `Optional< any >`: The edit.
 
 ### getReferenceByDistinctEdits
 
-Returns a new reference when edited values have changed. This is useful in
-inferring where an edit has been made between states by comparison of the
-return values using strict equality.
+Returns a new reference when edited values have changed. This is useful in inferring where an edit has been made between states by comparison of the return values using strict equality.
 
 _Usage_
 
@@ -565,11 +522,11 @@ _Usage_
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `State`: Editor state.
 
 _Returns_
 
--   `*`: A value whose reference will change only when an edit occurs.
+-   A value whose reference will change only when an edit occurs.
 
 ### getThemeSupports
 
@@ -577,24 +534,23 @@ Return theme supports data in the index.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 
 _Returns_
 
--   `*`: Index data.
+-   `any`: Index data.
 
 ### getUndoEdit
 
-Returns the previous edit from the current undo offset
-for the entity records edits history, if any.
+Returns the previous edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 
 _Returns_
 
--   `Object?`: The edit.
+-   `Optional< any >`: The edit.
 
 ### getUserQueryResults
 
@@ -602,24 +558,23 @@ Returns all the users returned by a query ID.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _queryID_ `string`: Query ID.
 
 _Returns_
 
--   `Array`: Users list.
+-   `undefined< 'edit' >[]`: Users list.
 
 ### hasEditsForEntityRecord
 
-Returns true if the specified entity record has edits,
-and false otherwise.
+Returns true if the specified entity record has edits, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -627,15 +582,14 @@ _Returns_
 
 ### hasEntityRecords
 
-Returns true if records have been received for the given set of parameters,
-or false otherwise.
+Returns true if records have been received for the given set of parameters, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree
+-   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `?Object`: Optional terms query.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query.
 
 _Returns_
 
@@ -647,9 +601,9 @@ Returns true if the REST request for autosaves has completed.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `number`: The id of the parent post.
+-   _postId_ `EntityRecordKey`: The id of the parent post.
 
 _Returns_
 
@@ -657,12 +611,11 @@ _Returns_
 
 ### hasRedo
 
-Returns true if there is a next edit from the current undo offset
-for the entity records edits history, and false otherwise.
+Returns true if there is a next edit from the current undo offset for the entity records edits history, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 
 _Returns_
 
@@ -670,12 +623,11 @@ _Returns_
 
 ### hasUndo
 
-Returns true if there is a previous edit from the current undo offset
-for the entity records edits history, and false otherwise.
+Returns true if there is a previous edit from the current undo offset for the entity records edits history, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 
 _Returns_
 
@@ -687,10 +639,10 @@ Returns true if the specified entity record is autosaving, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -702,10 +654,10 @@ Returns true if the specified entity record is deleting, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
@@ -715,13 +667,11 @@ _Returns_
 
 Determines if the returned preview is an oEmbed link fallback.
 
-WordPress can be configured to return a simple link to a URL if it is not embeddable.
-We need to be able to determine if a URL is embeddable or not, based on what we
-get back from the oEmbed preview API.
+WordPress can be configured to return a simple link to a URL if it is not embeddable. We need to be able to determine if a URL is embeddable or not, based on what we get back from the oEmbed preview API.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _url_ `string`: Embedded URL.
 
 _Returns_
@@ -730,12 +680,11 @@ _Returns_
 
 ### isRequestingEmbedPreview
 
-Returns true if a request is in progress for embed preview data, or false
-otherwise.
+Returns true if a request is in progress for embed preview data, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _url_ `string`: URL the preview would be for.
 
 _Returns_
@@ -748,15 +697,245 @@ Returns true if the specified entity record is saving, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `EntityRecordKey`: Record ID.
 
 _Returns_
 
 -   `boolean`: Whether the entity record is saving or not.
 
-<!-- END TOKEN(Autogenerated selectors|src/selectors.js) -->
+<!-- END TOKEN(Autogenerated selectors|src/selectors.ts) -->
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Hooks
+
+The following set of react hooks available to import from the `@wordpress/core-data` package:
+
+<!-- START TOKEN(Autogenerated hooks|src/hooks/index.ts) -->
+
+### useEntityRecord
+
+Resolves the specified entity record.
+
+_Usage_
+
+```js
+import { useEntityRecord } from '@wordpress/core-data';
+
+function PageTitleDisplay( { id } ) {
+	const { record, isResolving } = useEntityRecord( 'postType', 'page', id );
+
+	if ( isResolving ) {
+		return 'Loading...';
+	}
+
+	return record.title;
+}
+
+// Rendered in the application:
+// <PageTitleDisplay id={ 1 } />
+```
+
+In the above example, when `PageTitleDisplay` is rendered into an
+application, the page and the resolution details will be retrieved from
+the store state using `getEntityRecord()`, or resolved if missing.
+
+```js
+import { useDispatch } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { TextControl } from '@wordpress/components';
+import { store as noticeStore } from '@wordpress/notices';
+import { useEntityRecord } from '@wordpress/core-data';
+
+function PageRenameForm( { id } ) {
+	const page = useEntityRecord( 'postType', 'page', id );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticeStore );
+
+	const setTitle = useCallback(
+		( title ) => {
+			page.edit( { title } );
+		},
+		[ page.edit ]
+	);
+
+	if ( page.isResolving ) {
+		return 'Loading...';
+	}
+
+	async function onRename( event ) {
+		event.preventDefault();
+		try {
+			await page.save();
+			createSuccessNotice( __( 'Page renamed.' ), {
+				type: 'snackbar',
+			} );
+		} catch ( error ) {
+			createErrorNotice( error.message, { type: 'snackbar' } );
+		}
+	}
+
+	return (
+		<form onSubmit={ onRename }>
+			<TextControl
+				label={ __( 'Name' ) }
+				value={ page.editedRecord.title }
+				onChange={ setTitle }
+			/>
+			<button type="submit">{ __( 'Save' ) }</button>
+		</form>
+	);
+}
+
+// Rendered in the application:
+// <PageRenameForm id={ 1 } />
+```
+
+In the above example, updating and saving the page title is handled
+via the `edit()` and `save()` mutation helpers provided by
+`useEntityRecord()`;
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+-   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+-   _recordId_ `string | number`: ID of the requested entity record.
+-   _options_ `Options`: Optional hook options.
+
+_Returns_
+
+-   `EntityRecordResolution< RecordType >`: Entity record data.
+
+_Changelog_
+
+`6.1.0` Introduced in WordPress core.
+
+### useEntityRecords
+
+Resolves the specified entity records.
+
+_Usage_
+
+```js
+import { useEntityRecord } from '@wordpress/core-data';
+
+function PageTitlesList() {
+	const { records, isResolving } = useEntityRecords( 'postType', 'page' );
+
+	if ( isResolving ) {
+		return 'Loading...';
+	}
+
+	return (
+		<ul>
+			{ records.map( ( page ) => (
+				<li>{ page.title }</li>
+			) ) }
+		</ul>
+	);
+}
+
+// Rendered in the application:
+// <PageTitlesList />
+```
+
+In the above example, when `PageTitlesList` is rendered into an
+application, the list of records and the resolution details will be retrieved from
+the store state using `getEntityRecords()`, or resolved if missing.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+-   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+-   _queryArgs_ `Record< string, unknown >`: Optional HTTP query description for how to fetch the data, passed to the requested API endpoint.
+-   _options_ `Options`: Optional hook options.
+
+_Returns_
+
+-   `EntityRecordsResolution< RecordType >`: Entity records data.
+
+_Changelog_
+
+`6.1.0` Introduced in WordPress core.
+
+### useResourcePermissions
+
+Resolves resource permissions.
+
+_Usage_
+
+```js
+import { useResourcePermissions } from '@wordpress/core-data';
+
+function PagesList() {
+	const { canCreate, isResolving } = useResourcePermissions( 'pages' );
+
+	if ( isResolving ) {
+		return 'Loading ...';
+	}
+
+	return (
+		<div>
+			{ canCreate ? <button>+ Create a new page</button> : false }
+			// ...
+		</div>
+	);
+}
+
+// Rendered in the application:
+// <PagesList />
+```
+
+```js
+import { useResourcePermissions } from '@wordpress/core-data';
+
+function Page( { pageId } ) {
+	const { canCreate, canUpdate, canDelete, isResolving } =
+		useResourcePermissions( 'pages', pageId );
+
+	if ( isResolving ) {
+		return 'Loading ...';
+	}
+
+	return (
+		<div>
+			{ canCreate ? <button>+ Create a new page</button> : false }
+			{ canUpdate ? <button>Edit page</button> : false }
+			{ canDelete ? <button>Delete page</button> : false }
+			// ...
+		</div>
+	);
+}
+
+// Rendered in the application:
+// <Page pageId={ 15 } />
+```
+
+In the above example, when `PagesList` is rendered into an
+application, the appropriate permissions and the resolution details will be retrieved from
+the store state using `canUser()`, or resolved if missing.
+
+_Parameters_
+
+-   _resource_ `string`: The resource in question, e.g. media.
+-   _id_ `IdType`: ID of a specific resource entry, if needed, e.g. 10.
+
+_Returns_
+
+-   `ResourcePermissionsResolution< IdType >`: Entity records data.
+
+_Changelog_
+
+`6.1.0` Introduced in WordPress core.
+
+<!-- END TOKEN(Autogenerated hooks|src/hooks/index.ts) -->
+
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

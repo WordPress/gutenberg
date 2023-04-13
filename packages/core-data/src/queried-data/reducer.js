@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { map, flowRight, omit, filter, mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -51,7 +47,7 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
 	const size = Math.max(
-		itemIds.length,
+		itemIds?.length ?? 0,
 		nextItemIdsStartIndex + nextItemIds.length
 	);
 
@@ -66,10 +62,33 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 		mergedItemIds[ i ] = isInNextItemsRange
 			? nextItemIds[ i - nextItemIdsStartIndex ]
-			: itemIds[ i ];
+			: itemIds?.[ i ];
 	}
 
 	return mergedItemIds;
+}
+
+/**
+ * Helper function to filter out entities with certain IDs.
+ * Entities are keyed by their ID.
+ *
+ * @param {Object} entities Entity objects, keyed by entity ID.
+ * @param {Array}  ids      Entity IDs to filter out.
+ *
+ * @return {Object} Filtered entities.
+ */
+function removeEntitiesById( entities, ids ) {
+	return Object.fromEntries(
+		Object.entries( entities ).filter(
+			( [ id ] ) =>
+				! ids.some( ( itemId ) => {
+					if ( Number.isInteger( itemId ) ) {
+						return itemId === +id;
+					}
+					return itemId === id;
+				} )
+		)
+	);
 }
 
 /**
@@ -102,8 +121,11 @@ export function items( state = {}, action ) {
 			};
 		}
 		case 'REMOVE_ITEMS':
-			return mapValues( state, ( contextState ) =>
-				omit( contextState, action.itemIds )
+			return Object.fromEntries(
+				Object.entries( state ).map( ( [ itemId, contextState ] ) => [
+					itemId,
+					removeEntitiesById( contextState, action.itemIds ),
+				] )
 			);
 	}
 	return state;
@@ -116,10 +138,10 @@ export function items( state = {}, action ) {
  * In such cases, completeness is used as an indication of whether it would be
  * safe to use queried data for a non-`_fields`-limited request.
  *
- * @param {Object<string,boolean>} state  Current state.
- * @param {Object}                 action Dispatched action.
+ * @param {Object<string,Object<string,boolean>>} state  Current state.
+ * @param {Object}                                action Dispatched action.
  *
- * @return {Object<string,boolean>} Next state.
+ * @return {Object<string,Object<string,boolean>>} Next state.
  */
 export function itemIsComplete( state = {}, action ) {
 	switch ( action.type ) {
@@ -130,7 +152,7 @@ export function itemIsComplete( state = {}, action ) {
 			// An item is considered complete if it is received without an associated
 			// fields query. Ideally, this would be implemented in such a way where the
 			// complete aggregate of all fields would satisfy completeness. Since the
-			// fields are not consistent across all entity types, this would require
+			// fields are not consistent across all entities, this would require
 			// introspection on the REST schema for each entity to know which fields
 			// compose a complete item for that entity.
 			const queryParts = query ? getQueryParts( query ) : {};
@@ -155,8 +177,11 @@ export function itemIsComplete( state = {}, action ) {
 			};
 		}
 		case 'REMOVE_ITEMS':
-			return mapValues( state, ( contextState ) =>
-				omit( contextState, action.itemIds )
+			return Object.fromEntries(
+				Object.entries( state ).map( ( [ itemId, contextState ] ) => [
+					itemId,
+					removeEntitiesById( contextState, action.itemIds ),
+				] )
 			);
 	}
 
@@ -172,7 +197,7 @@ export function itemIsComplete( state = {}, action ) {
  *
  * @return {Object} Next state.
  */
-const receiveQueries = flowRight( [
+const receiveQueries = compose( [
 	// Limit to matching action type so we don't attempt to replace action on
 	// an unhandled action.
 	ifMatchingAction( ( action ) => 'query' in action ),
@@ -206,7 +231,7 @@ const receiveQueries = flowRight( [
 
 	return getMergedItemIds(
 		state || [],
-		map( action.items, key ),
+		action.items.map( ( item ) => item[ key ] ),
 		page,
 		perPage
 	);
@@ -230,13 +255,23 @@ const queries = ( state = {}, action ) => {
 				return result;
 			}, {} );
 
-			return mapValues( state, ( contextQueries ) => {
-				return mapValues( contextQueries, ( queryItems ) => {
-					return filter( queryItems, ( queryId ) => {
-						return ! removedItems[ queryId ];
-					} );
-				} );
-			} );
+			return Object.fromEntries(
+				Object.entries( state ).map(
+					( [ queryGroup, contextQueries ] ) => [
+						queryGroup,
+						Object.fromEntries(
+							Object.entries( contextQueries ).map(
+								( [ query, queryItems ] ) => [
+									query,
+									queryItems.filter(
+										( queryId ) => ! removedItems[ queryId ]
+									),
+								]
+							)
+						),
+					]
+				)
+			);
 		default:
 			return state;
 	}

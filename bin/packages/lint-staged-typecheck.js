@@ -17,7 +17,7 @@ const tscPath = path.join( repoRoot, 'node_modules', '.bin', 'tsc' );
 // lint-staged passes full paths to staged changes
 const changedFiles = process.argv.slice( 2 );
 
-// Transform changed files to package directories containing tsconfig.json
+// Transform changed files to package directories containing tsconfig.json.
 const changedPackages = _.uniq(
 	changedFiles.map( ( fullPath ) => {
 		const relativePath = path.relative( repoRoot, fullPath );

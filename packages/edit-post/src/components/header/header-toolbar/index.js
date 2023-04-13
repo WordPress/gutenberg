@@ -10,7 +10,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 	store as editorStore,
@@ -31,9 +30,8 @@ const preventDefault = ( event ) => {
 
 function HeaderToolbar() {
 	const inserterButton = useRef();
-	const { setIsInserterOpened, setIsListViewOpened } = useDispatch(
-		editPostStore
-	);
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editPostStore );
 	const {
 		isInserterEnabled,
 		isInserterOpened,
@@ -42,15 +40,11 @@ function HeaderToolbar() {
 		isListViewOpen,
 		listViewShortcut,
 	} = useSelect( ( select ) => {
-		const {
-			hasInserterItems,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-		} = select( blockEditorStore );
+		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
+			select( blockEditorStore );
 		const { getEditorSettings } = select( editorStore );
-		const { getEditorMode, isFeatureActive, isListViewOpened } = select(
-			editPostStore
-		);
+		const { getEditorMode, isFeatureActive, isListViewOpened } =
+			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		return {
@@ -83,34 +77,39 @@ function HeaderToolbar() {
 	const overflowItems = (
 		<>
 			<ToolbarItem
-				as={ TableOfContents }
-				hasOutlineItemsDisabled={ isTextModeEnabled }
-				repositionDropdown={ showIconLabels && ! isWideViewport }
-				showTooltip={ ! showIconLabels }
-				variant={ showIconLabels ? 'tertiary' : undefined }
-			/>
-			<ToolbarItem
 				as={ Button }
-				className="edit-post-header-toolbar__list-view-toggle"
+				className="edit-post-header-toolbar__document-overview-toggle"
 				icon={ listView }
 				disabled={ isTextModeEnabled }
 				isPressed={ isListViewOpen }
 				/* translators: button label text should, if possible, be under 16 characters. */
-				label={ __( 'List View' ) }
+				label={ __( 'Document Overview' ) }
 				onClick={ toggleListView }
 				shortcut={ listViewShortcut }
 				showTooltip={ ! showIconLabels }
+				variant={ showIconLabels ? 'tertiary' : undefined }
 			/>
 		</>
 	);
-	const openInserter = useCallback( () => {
+	const toggleInserter = useCallback( () => {
 		if ( isInserterOpened ) {
-			// Focusing the inserter button closes the inserter popover
+			// Focusing the inserter button should close the inserter popover.
+			// However, there are some cases it won't close when the focus is lost.
+			// See https://github.com/WordPress/gutenberg/issues/43090 for more details.
 			inserterButton.current.focus();
+			setIsInserterOpened( false );
 		} else {
 			setIsInserterOpened( true );
 		}
 	}, [ isInserterOpened, setIsInserterOpened ] );
+
+	/* translators: button label text should, if possible, be under 16 characters. */
+	const longLabel = _x(
+		'Toggle block inserter',
+		'Generic label for block inserter button'
+	);
+	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
+
 	return (
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
@@ -124,20 +123,12 @@ function HeaderToolbar() {
 					variant="primary"
 					isPressed={ isInserterOpened }
 					onMouseDown={ preventDefault }
-					onClick={ openInserter }
+					onClick={ toggleInserter }
 					disabled={ ! isInserterEnabled }
 					icon={ plus }
-					/* translators: button label text should, if possible, be under 16
-			characters. */
-					label={ _x(
-						'Toggle block inserter',
-						'Generic label for block inserter button'
-					) }
+					label={ showIconLabels ? shortLabel : longLabel }
 					showTooltip={ ! showIconLabels }
-				>
-					{ showIconLabels &&
-						( ! isInserterOpened ? __( 'Add' ) : __( 'Close' ) ) }
-				</ToolbarItem>
+				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
 						{ isLargeViewport && (

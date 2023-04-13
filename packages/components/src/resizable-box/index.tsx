@@ -9,8 +9,7 @@ import { forwardRef } from '@wordpress/element';
 import classnames from 'classnames';
 import { Resizable } from 're-resizable';
 import type { ResizableProps } from 're-resizable';
-// eslint-disable-next-line no-restricted-imports
-import type { ReactNode, Ref } from 'react';
+import type { ReactNode, ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -89,14 +88,13 @@ const HANDLE_STYLES = {
 };
 
 type ResizableBoxProps = ResizableProps & {
-	className: string;
 	children: ReactNode;
-	showHandle: boolean;
-	__experimentalShowTooltip: boolean;
-	__experimentalTooltipProps: Parameters< typeof ResizeTooltip >[ 0 ];
+	showHandle?: boolean;
+	__experimentalShowTooltip?: boolean;
+	__experimentalTooltipProps?: Parameters< typeof ResizeTooltip >[ 0 ];
 };
 
-function ResizableBox(
+function UnforwardedResizableBox(
 	{
 		className,
 		children,
@@ -105,7 +103,7 @@ function ResizableBox(
 		__experimentalTooltipProps: tooltipProps = {},
 		...props
 	}: ResizableBoxProps,
-	ref: Ref< Resizable >
+	ref: ForwardedRef< Resizable >
 ): JSX.Element {
 	return (
 		<Resizable
@@ -125,4 +123,6 @@ function ResizableBox(
 	);
 }
 
-export default forwardRef( ResizableBox );
+export const ResizableBox = forwardRef( UnforwardedResizableBox );
+
+export default ResizableBox;

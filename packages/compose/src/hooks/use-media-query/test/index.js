@@ -1,156 +1,74 @@
 /**
  * External dependencies
  */
-import { create, act } from 'react-test-renderer';
+import { act, render } from '@testing-library/react';
+import { matchMedia, setMedia, cleanup } from 'mock-match-media';
 
 /**
  * Internal dependencies
  */
 import useMediaQuery from '../';
 
+const TestComponent = ( { query } ) => {
+	const queryResult = useMediaQuery( query );
+	return `useMediaQuery: ${ queryResult }`;
+};
+
 describe( 'useMediaQuery', () => {
-	let addListener, removeListener;
-
 	beforeAll( () => {
-		jest.spyOn( global, 'matchMedia' );
+		window.matchMedia = matchMedia;
+	} );
 
-		addListener = jest.fn();
-		removeListener = jest.fn();
+	beforeEach( () => {
+		setMedia( {
+			width: '960px',
+		} );
 	} );
 
 	afterEach( () => {
-		global.matchMedia.mockClear();
-		addListener.mockClear();
-		removeListener.mockClear();
-	} );
-
-	afterAll( () => {
-		global.matchMedia.mockRestore();
-	} );
-
-	const TestComponent = ( { query } ) => {
-		const queryResult = useMediaQuery( query );
-		return `useMediaQuery: ${ queryResult }`;
-	};
-
-	it( 'should return true when query matches on the first render', async () => {
-		global.matchMedia.mockReturnValue( {
-			addListener,
-			removeListener,
-			matches: true,
-		} );
-
-		const root = create( <TestComponent query="(min-width: 782px)" /> );
-
-		expect( root.toJSON() ).toBe( 'useMediaQuery: true' );
+		cleanup();
 	} );
 
 	it( 'should return true when query matches', async () => {
-		global.matchMedia.mockReturnValue( {
-			addListener,
-			removeListener,
-			matches: true,
-		} );
+		const { container } = render(
+			<TestComponent query="(min-width: 782px)" />
+		);
 
-		let root;
-
-		await act( async () => {
-			root = create( <TestComponent query="(min-width: 782px)" /> );
-		} );
-
-		expect( root.toJSON() ).toBe( 'useMediaQuery: true' );
-
-		await act( async () => {
-			root.unmount();
-		} );
-		expect( removeListener ).toHaveBeenCalled();
+		expect( container ).toHaveTextContent( 'useMediaQuery: true' );
 	} );
 
 	it( 'should correctly update the value when the query evaluation matches', async () => {
-		// first render
-		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
-			matches: true,
-		} );
-		// the query within useEffect
-		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
-			matches: true,
-		} );
-		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
-			matches: true,
-		} );
-		global.matchMedia.mockReturnValueOnce( {
-			addListener,
-			removeListener,
-			matches: false,
+		const { container } = render(
+			<TestComponent query="(min-width: 782px)" />
+		);
+
+		expect( container ).toHaveTextContent( 'useMediaQuery: true' );
+
+		act( () => {
+			setMedia( {
+				width: '600px',
+			} );
 		} );
 
-		let root, updateMatchFunction;
-		await act( async () => {
-			root = create( <TestComponent query="(min-width: 782px)" /> );
-		} );
-		expect( root.toJSON() ).toBe( 'useMediaQuery: true' );
-
-		await act( async () => {
-			updateMatchFunction = addListener.mock.calls[ 0 ][ 0 ];
-			updateMatchFunction();
-		} );
-		expect( root.toJSON() ).toBe( 'useMediaQuery: false' );
-
-		await act( async () => {
-			root.unmount();
-		} );
-		expect( removeListener.mock.calls ).toEqual( [
-			[ updateMatchFunction ],
-		] );
+		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 	} );
 
 	it( 'should return false when the query does not matches', async () => {
-		global.matchMedia.mockReturnValue( {
-			addListener,
-			removeListener,
-			matches: false,
-		} );
-		let root;
-		await act( async () => {
-			root = create( <TestComponent query="(min-width: 782px)" /> );
-		} );
-		expect( root.toJSON() ).toBe( 'useMediaQuery: false' );
+		const { container } = render(
+			<TestComponent query="(max-width: 782px)" />
+		);
 
-		await act( async () => {
-			root.unmount();
-		} );
-		expect( removeListener ).toHaveBeenCalled();
+		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 	} );
 
-	it( 'should not call matchMedia if a query is not passed', async () => {
-		global.matchMedia.mockReturnValue( {
-			addListener,
-			removeListener,
-			matches: false,
-		} );
-		let root;
-		await act( async () => {
-			root = create( <TestComponent /> );
-		} );
-		// query will be case to a boolean to simplify the return type.
-		expect( root.toJSON() ).toBe( 'useMediaQuery: false' );
+	it( 'should return false when a query is not passed', async () => {
+		const { container, rerender } = render( <TestComponent /> );
 
-		await act( async () => {
-			root.update( <TestComponent query={ false } /> );
-		} );
-		expect( root.toJSON() ).toBe( 'useMediaQuery: false' );
+		// Query will be case to a boolean to simplify the return type.
+		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 
-		await act( async () => {
-			root.unmount();
-		} );
-		expect( global.matchMedia ).not.toHaveBeenCalled();
-		expect( addListener ).not.toHaveBeenCalled();
-		expect( removeListener ).not.toHaveBeenCalled();
+		rerender( <TestComponent query={ false } /> );
+
+		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 	} );
 } );

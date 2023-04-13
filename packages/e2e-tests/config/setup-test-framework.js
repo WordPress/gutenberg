@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import { toMatchInlineSnapshot, toMatchSnapshot } from 'jest-snapshot';
 
 /**
@@ -13,6 +12,7 @@ import {
 	clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
+	resetPreferences,
 	setBrowserViewport,
 	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
@@ -65,7 +65,7 @@ const OBSERVED_CONSOLE_MESSAGE_TYPES = {
  */
 const pageEvents = [];
 
-// The Jest timeout is increased because these tests are a bit slow
+// The Jest timeout is increased because these tests are a bit slow.
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 
 // Retry failed tests at most 2 times in CI.
@@ -171,11 +171,7 @@ function observeConsoleLogging() {
 		// correctly. Instead, the logic here synchronously inspects the
 		// internal object shape of the JSHandle to find the error text. If it
 		// cannot be found, the default text value is used instead.
-		text = get(
-			message.args(),
-			[ 0, '_remoteObject', 'description' ],
-			text
-		);
+		text = message.args()[ 0 ]?._remoteObject?.description ?? text;
 
 		// Disable reason: We intentionally bubble up the console message
 		// which, unless the test explicitly anticipates the logging via
@@ -242,6 +238,7 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 	await simulateAdverseConditions();
+	await resetPreferences();
 	await activateTheme( 'twentytwentyone' );
 	await trashAllPosts();
 	await trashAllPosts( 'wp_block' );
@@ -253,6 +250,7 @@ beforeAll( async () => {
 } );
 
 afterEach( async () => {
+	await resetPreferences();
 	await setupBrowser();
 } );
 

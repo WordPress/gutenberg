@@ -6,16 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useInnerBlocksProps } from '@wordpress/block-editor';
-import { VisuallyHidden } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import {
+	RichText,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { View } from '@wordpress/primitives';
+import { forwardRef } from '@wordpress/element';
 
-const allowedBlocks = [ 'core/image' ];
-
-export const Gallery = ( props ) => {
+export const Gallery = ( props, captionRef ) => {
 	const {
 		attributes,
 		isSelected,
@@ -23,42 +23,18 @@ export const Gallery = ( props ) => {
 		mediaPlaceholder,
 		insertBlocksAfter,
 		blockProps,
+		__unstableLayoutClassNames: layoutClassNames,
+		showCaption,
 	} = props;
 
 	const { align, columns, caption, imageCrop } = attributes;
 
-	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
-		allowedBlocks,
-		orientation: 'horizontal',
-		renderAppender: false,
-		__experimentalLayout: { type: 'default', alignments: [] },
-	} );
-
-	const [ captionFocused, setCaptionFocused ] = useState( false );
-
-	function onFocusCaption() {
-		if ( ! captionFocused ) {
-			setCaptionFocused( true );
-		}
-	}
-
-	function removeCaptionFocus() {
-		if ( captionFocused ) {
-			setCaptionFocused( false );
-		}
-	}
-
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setCaptionFocused( false );
-		}
-	}, [ isSelected ] );
-
 	return (
 		<figure
-			{ ...innerBlocksProps }
+			{ ...blockProps }
 			className={ classnames(
 				blockProps.className,
+				layoutClassNames,
 				'blocks-gallery-grid',
 				{
 					[ `align${ align }` ]: align,
@@ -68,60 +44,38 @@ export const Gallery = ( props ) => {
 				}
 			) }
 		>
-			{ children }
-
-			<View
-				className="blocks-gallery-media-placeholder-wrapper"
-				onClick={ removeCaptionFocus }
-			>
-				{ mediaPlaceholder }
-			</View>
-			<RichTextVisibilityHelper
-				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-				captionFocused={ captionFocused }
-				onFocusCaption={ onFocusCaption }
-				tagName="figcaption"
-				className="blocks-gallery-caption"
-				aria-label={ __( 'Gallery caption text' ) }
-				placeholder={ __( 'Write gallery caption…' ) }
-				value={ caption }
-				onChange={ ( value ) => setAttributes( { caption: value } ) }
-				inlineToolbar
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( 'core/paragraph' ) )
-				}
-			/>
+			{ blockProps.children }
+			{ isSelected && ! blockProps.children && (
+				<View className="blocks-gallery-media-placeholder-wrapper">
+					{ mediaPlaceholder }
+				</View>
+			) }
+			{ showCaption &&
+				( ! RichText.isEmpty( caption ) || isSelected ) && (
+					<RichText
+						identifier="caption"
+						aria-label={ __( 'Gallery caption text' ) }
+						placeholder={ __( 'Write gallery caption…' ) }
+						value={ caption }
+						className={ classnames(
+							'blocks-gallery-caption',
+							__experimentalGetElementClassName( 'caption' )
+						) }
+						ref={ captionRef }
+						tagName="figcaption"
+						onChange={ ( value ) =>
+							setAttributes( { caption: value } )
+						}
+						inlineToolbar
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+						}
+					/>
+				) }
 		</figure>
 	);
 };
 
-function RichTextVisibilityHelper( {
-	isHidden,
-	captionFocused,
-	onFocusCaption,
-	className,
-	value,
-	placeholder,
-	tagName,
-	captionRef,
-	...richTextProps
-} ) {
-	if ( isHidden ) {
-		return <VisuallyHidden as={ RichText } { ...richTextProps } />;
-	}
-
-	return (
-		<RichText
-			ref={ captionRef }
-			value={ value }
-			placeholder={ placeholder }
-			className={ className }
-			tagName={ tagName }
-			isSelected={ captionFocused }
-			onClick={ onFocusCaption }
-			{ ...richTextProps }
-		/>
-	);
-}
-
-export default Gallery;
+export default forwardRef( Gallery );

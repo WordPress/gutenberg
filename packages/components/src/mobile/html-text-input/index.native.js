@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TextInput } from 'react-native';
+import { ScrollView, TextInput } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,7 @@ import {
 /**
  * Internal dependencies
  */
-import HTMLInputContainer from './container';
+import KeyboardAvoidingView from '../keyboard-avoiding-view';
 import styles from './style.scss';
 
 export class HTMLTextInput extends Component {
@@ -52,7 +52,7 @@ export class HTMLTextInput extends Component {
 
 	componentWillUnmount() {
 		removeFilter( 'native.persist-html', 'html-text-input' );
-		//TODO: Blocking main thread
+		// TODO: Blocking main thread.
 		this.stopEditing();
 	}
 
@@ -73,7 +73,13 @@ export class HTMLTextInput extends Component {
 	}
 
 	render() {
-		const { getStylesFromColorScheme, style } = this.props;
+		const {
+			editTitle,
+			getStylesFromColorScheme,
+			parentHeight,
+			style,
+			title,
+		} = this.props;
 		const titleStyle = [
 			styles.htmlViewTitle,
 			style?.text && { color: style.text },
@@ -90,41 +96,50 @@ export class HTMLTextInput extends Component {
 			...( style?.text && { color: style.text } ),
 		};
 		return (
-			<HTMLInputContainer parentHeight={ this.props.parentHeight }>
-				<TextInput
-					autoCorrect={ false }
-					accessibilityLabel="html-view-title"
-					textAlignVertical="center"
-					numberOfLines={ 1 }
-					style={ titleStyle }
-					value={ this.props.title }
-					placeholder={ __( 'Add title' ) }
-					placeholderTextColor={ placeholderStyle.color }
-					onChangeText={ this.props.editTitle }
-				/>
-				<TextInput
-					autoCorrect={ false }
-					accessibilityLabel="html-view-content"
-					textAlignVertical="top"
-					multiline
-					style={ htmlStyle }
-					value={ this.state.value }
-					onChangeText={ this.edit }
-					onBlur={ this.stopEditing }
-					placeholder={ __( 'Start writing…' ) }
-					placeholderTextColor={ placeholderStyle.color }
-					scrollEnabled={ HTMLInputContainer.scrollEnabled }
-				/>
-			</HTMLInputContainer>
+			<KeyboardAvoidingView
+				style={ styles.keyboardAvoidingView }
+				parentHeight={ parentHeight }
+			>
+				<ScrollView style={ styles.scrollView }>
+					<TextInput
+						autoCorrect={ false }
+						accessibilityLabel="html-view-title"
+						textAlignVertical="center"
+						numberOfLines={ 1 }
+						style={ titleStyle }
+						value={ title }
+						placeholder={ __( 'Add title' ) }
+						placeholderTextColor={ placeholderStyle.color }
+						onChangeText={ editTitle }
+					/>
+					<TextInput
+						ref={ this.contentTextInputRef }
+						autoCorrect={ false }
+						accessibilityLabel="html-view-content"
+						textAlignVertical="top"
+						multiline
+						style={ htmlStyle }
+						value={ this.state.value }
+						onChangeText={ this.edit }
+						onBlur={ this.stopEditing }
+						placeholder={ __( 'Start writing…' ) }
+						placeholderTextColor={ placeholderStyle.color }
+						scrollEnabled={ false }
+						// [Only iOS] This prop prevents the text input from
+						// automatically getting focused after scrolling
+						// content.
+						rejectResponderTermination={ false }
+					/>
+				</ScrollView>
+			</KeyboardAvoidingView>
 		);
 	}
 }
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getEditedPostContent } = select(
-			'core/editor'
-		);
+		const { getEditedPostAttribute, getEditedPostContent } =
+			select( 'core/editor' );
 
 		return {
 			title: getEditedPostAttribute( 'title' ),

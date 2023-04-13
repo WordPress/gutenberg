@@ -31,6 +31,12 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
+    @objc var disableAutocorrection: Bool = false {
+        didSet {
+            autocorrectionType = disableAutocorrection ? .no : .default
+        }
+    }
+
     override var textAlignment: NSTextAlignment {
         set {
             super.textAlignment = newValue
@@ -95,8 +101,12 @@ class RCTAztecView: Aztec.TextView {
     /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
     /// on `textViewDidChange` and `textViewDidChangeSelection`
     private var isInsertingDictationResult = false
-
+    
     // MARK: - Font
+
+    /// Flag to enable using the defaultFont in Aztec for specific blocks
+    /// Like the Preformatted and Heading blocks.
+    private var blockUseDefaultFont: Bool = false
 
     /// Font family for all contents  Once this is set, it will always override the font family for all of its
     /// contents, regardless of what HTML is provided to Aztec.
@@ -146,6 +156,8 @@ class RCTAztecView: Aztec.TextView {
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
         storage.htmlConverter.shouldCollapseSpaces = false
         shouldNotifyOfNonUserChanges = false
+        // Typing attributes are controlled by RichText component so we have to prevent Aztec to recalculate them when deleting backward.
+        shouldRecalculateTypingAttributesOnDeleteBackward = false
         disableLinkTapRecognizer()
         preBackgroundColor = .clear
     }
@@ -222,7 +234,10 @@ class RCTAztecView: Aztec.TextView {
         previousContentSize = newSize
 
         let body = packForRN(newSize, withName: "contentSize")
-        onContentSizeChange(body)
+        let caretData = packCaretDataForRN()
+        var result = body
+        result.merge(caretData) { (_, new) in new }
+        onContentSizeChange(result)
     }
 
     // MARK: - Paste handling
@@ -467,6 +482,7 @@ class RCTAztecView: Aztec.TextView {
             if !(caretEndRect.isInfinite || caretEndRect.isNull) {
                 result["selectionEndCaretX"] = caretEndRect.origin.x
                 result["selectionEndCaretY"] = caretEndRect.origin.y
+                result["selectionEndCaretHeight"] = caretEndRect.size.height
             }
         }
 
@@ -488,6 +504,21 @@ class RCTAztecView: Aztec.TextView {
 
     // MARK: - RN Properties
 
+    @objc func setBlockUseDefaultFont(_ useDefaultFont: Bool) {
+        guard blockUseDefaultFont != useDefaultFont else {
+            return
+        }
+
+        if useDefaultFont {
+            // Enable using the defaultFont in Aztec
+            // For the PreFormatter and HeadingFormatter
+            Configuration.useDefaultFont = true
+        }
+
+        blockUseDefaultFont = useDefaultFont
+        refreshFont()
+    }
+
     @objc
     func setContents(_ contents: NSDictionary) {
 
@@ -500,6 +531,9 @@ class RCTAztecView: Aztec.TextView {
         }
 
         let html = contents["text"] as? String ?? ""
+
+        let tag = contents["tag"] as? String ?? ""
+        checkDefaultFontFamily(tag: tag)
 
         setHTML(html)
         updatePlaceholderVisibility()
@@ -681,6 +715,16 @@ class RCTAztecView: Aztec.TextView {
             textStorage.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSMakeRange(0, textStorage.length))
         }
     }
+    
+    /// This method sets the desired font family
+    /// for specific tags.
+    private func checkDefaultFontFamily(tag: String) {
+        // Since we are using the defaultFont to customize
+        // the font size, we need to set the monospace font.
+        if (blockUseDefaultFont && tag == "pre") {
+            setFontFamily(FontProvider.shared.monospaceFont.fontName)
+        }
+    }
 
     // MARK: - Formatting interface
 
@@ -752,7 +796,8 @@ extension RCTAztecView: UITextViewDelegate {
 
     override func becomeFirstResponder() -> Bool {
         if !isFirstResponder && canBecomeFirstResponder {
-            onFocus?([:])
+            let caretData = packCaretDataForRN()
+            onFocus?(caretData)
         }
         return super.becomeFirstResponder()
     }

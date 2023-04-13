@@ -29,17 +29,28 @@
 	},
 	"supports": {
 		"anchor": true,
-		"__experimentalSlashInserter": true,
+		"html": false,
+		"__experimentalOnEnter": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true,
 				"fontAppearance": true
+			}
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
 			}
 		}
 	},
@@ -49,8 +60,7 @@
 			"label": "Default",
 			"isDefault": true
 		},
-		{ "name": "plain", "label": "Plain" },
-		{ "name": "large", "label": "Large" }
+		{ "name": "plain", "label": "Plain" }
 	],
 	"editorStyle": "wp-block-quote-editor",
 	"style": "wp-block-quote"

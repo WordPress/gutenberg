@@ -1,16 +1,13 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import React, { useEffect, useState } from 'react';
-// eslint-disable-next-line no-restricted-imports
-import type { Ref, KeyboardEvent } from 'react';
+import type { ForwardedRef, KeyboardEvent } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,18 +23,25 @@ import { Flex } from '../flex';
 import Button from '../button';
 import { Text } from '../text';
 import { VStack } from '../v-stack';
+import * as styles from './styles';
+import { useCx } from '../utils/hooks/use-cx';
 
 function ConfirmDialog(
 	props: WordPressComponentProps< OwnProps, 'div', false >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		isOpen: isOpenProp,
 		onConfirm,
 		onCancel,
 		children,
+		confirmButtonText,
+		cancelButtonText,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
+
+	const cx = useCx();
+	const wrapperClassName = cx( styles.wrapper );
 
 	const [ isOpen, setIsOpen ] = useState< boolean >();
 	const [ shouldSelfClose, setShouldSelfClose ] = useState< boolean >();
@@ -53,14 +57,13 @@ function ConfirmDialog(
 	}, [ isOpenProp ] );
 
 	const handleEvent = useCallback(
-		( callback?: ( event: DialogInputEvent ) => void ) => (
-			event: DialogInputEvent
-		) => {
-			callback?.( event );
-			if ( shouldSelfClose ) {
-				setIsOpen( false );
-			}
-		},
+		( callback?: ( event: DialogInputEvent ) => void ) =>
+			( event: DialogInputEvent ) => {
+				callback?.( event );
+				if ( shouldSelfClose ) {
+					setIsOpen( false );
+				}
+			},
 		[ shouldSelfClose, setIsOpen ]
 	);
 
@@ -73,8 +76,8 @@ function ConfirmDialog(
 		[ handleEvent, onConfirm ]
 	);
 
-	const cancelLabel = __( 'Cancel' );
-	const confirmLabel = __( 'OK' );
+	const cancelLabel = cancelButtonText ?? __( 'Cancel' );
+	const confirmLabel = confirmButtonText ?? __( 'OK' );
 
 	return (
 		<>
@@ -85,6 +88,7 @@ function ConfirmDialog(
 					closeButtonLabel={ cancelLabel }
 					isDismissible={ true }
 					ref={ forwardedRef }
+					overlayClassName={ wrapperClassName }
 					__experimentalHideHeader
 					{ ...otherProps }
 				>

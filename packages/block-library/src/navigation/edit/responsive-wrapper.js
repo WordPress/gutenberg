@@ -8,8 +8,13 @@ import classnames from 'classnames';
  */
 import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
-import { SVG, Rect } from '@wordpress/primitives';
 import { __ } from '@wordpress/i18n';
+import { getColorClassName } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import OverlayMenuIcon from './overlay-menu-icon';
 
 export default function ResponsiveWrapper( {
 	children,
@@ -18,20 +23,42 @@ export default function ResponsiveWrapper( {
 	isResponsive,
 	onToggle,
 	isHiddenByDefault,
-	classNames,
-	styles,
+	overlayBackgroundColor,
+	overlayTextColor,
+	hasIcon,
+	icon,
 } ) {
 	if ( ! isResponsive ) {
 		return children;
 	}
+
 	const responsiveContainerClasses = classnames(
 		'wp-block-navigation__responsive-container',
-		classNames,
 		{
+			'has-text-color':
+				!! overlayTextColor.color || !! overlayTextColor?.class,
+			[ getColorClassName( 'color', overlayTextColor?.slug ) ]:
+				!! overlayTextColor?.slug,
+			'has-background':
+				!! overlayBackgroundColor.color ||
+				overlayBackgroundColor?.class,
+			[ getColorClassName(
+				'background-color',
+				overlayBackgroundColor?.slug
+			) ]: !! overlayBackgroundColor?.slug,
 			'is-menu-open': isOpen,
 			'hidden-by-default': isHiddenByDefault,
 		}
 	);
+
+	const styles = {
+		color: ! overlayTextColor?.slug && overlayTextColor?.color,
+		backgroundColor:
+			! overlayBackgroundColor?.slug &&
+			overlayBackgroundColor?.color &&
+			overlayBackgroundColor.color,
+	};
+
 	const openButtonClasses = classnames(
 		'wp-block-navigation__responsive-container-open',
 		{ 'always-shown': isHiddenByDefault }
@@ -39,28 +66,26 @@ export default function ResponsiveWrapper( {
 
 	const modalId = `${ id }-modal`;
 
+	const dialogProps = {
+		className: 'wp-block-navigation__responsive-dialog',
+		...( isOpen && {
+			role: 'dialog',
+			'aria-modal': true,
+			'aria-label': __( 'Menu' ),
+		} ),
+	};
+
 	return (
 		<>
 			{ ! isOpen && (
 				<Button
 					aria-haspopup="true"
-					aria-expanded={ isOpen }
-					aria-label={ __( 'Open menu' ) }
+					aria-label={ hasIcon && __( 'Open menu' ) }
 					className={ openButtonClasses }
 					onClick={ () => onToggle( true ) }
 				>
-					<SVG
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 24 24"
-						width="24"
-						height="24"
-						role="img"
-						aria-hidden="true"
-						focusable="false"
-					>
-						<Rect x="4" y="7.5" width="16" height="1.5" />
-						<Rect x="4" y="15" width="16" height="1.5" />
-					</SVG>
+					{ hasIcon && <OverlayMenuIcon icon={ icon } /> }
+					{ ! hasIcon && __( 'Menu' ) }
 				</Button>
 			) }
 
@@ -73,18 +98,14 @@ export default function ResponsiveWrapper( {
 					className="wp-block-navigation__responsive-close"
 					tabIndex="-1"
 				>
-					<div
-						className="wp-block-navigation__responsive-dialog"
-						role="dialog"
-						aria-modal="true"
-						aria-labelledby={ `${ modalId }-title` }
-					>
+					<div { ...dialogProps }>
 						<Button
 							className="wp-block-navigation__responsive-container-close"
-							aria-label={ __( 'Close menu' ) }
+							aria-label={ hasIcon && __( 'Close menu' ) }
 							onClick={ () => onToggle( false ) }
 						>
-							<Icon icon={ close } />
+							{ hasIcon && <Icon icon={ close } /> }
+							{ ! hasIcon && __( 'Close' ) }
 						</Button>
 						<div
 							className="wp-block-navigation__responsive-container-content"

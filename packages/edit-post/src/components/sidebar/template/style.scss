@@ -4,14 +4,6 @@
 			width: $grid-unit * 40;
 		}
 	}
-
-	.components-modal__header {
-		border-bottom: none;
-	}
-
-	.components-modal__content::before {
-		margin-bottom: $grid-unit-05;
-	}
 }
 
 .edit-post-template__modal-actions {
@@ -25,6 +17,14 @@
 
 	@include break-medium() {
 		width: $grid-unit * 30;
+	}
+}
+
+.edit-post-template__notice {
+	margin: 0 0 $grid-unit-10 0;
+
+	.components-notice__content {
+		margin: 0;
 	}
 }
 

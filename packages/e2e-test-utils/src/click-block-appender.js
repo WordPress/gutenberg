@@ -10,4 +10,5 @@ export async function clickBlockAppender() {
 		'.block-editor-default-block-appender__content'
 	);
 	await appender.click();
+	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 }

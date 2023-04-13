@@ -1,1 +1,1 @@
-export { default } from './component';
+export { default as NavigatorProvider } from './component';

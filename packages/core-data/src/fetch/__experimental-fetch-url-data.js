@@ -60,6 +60,7 @@ const fetchUrlData = async ( url, options = {} ) => {
 	const protocol = getProtocol( url );
 
 	if (
+		! protocol ||
 		! isValidProtocol( protocol ) ||
 		! protocol.startsWith( 'http' ) ||
 		! /^https?:\/\/[^\/\s]/i.test( url )

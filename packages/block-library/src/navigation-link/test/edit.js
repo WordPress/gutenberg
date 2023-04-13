@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import { updateNavigationLinkBlockAttributes } from '../edit';
+import { updateAttributes } from '../update-attributes';
 
 describe( 'edit', () => {
-	describe( 'updateNavigationLinkBlockAttributes', () => {
-		// data shapes are linked to fetchLinkSuggestions from
-		// core-data/src/fetch/__experimental-fetch-link-suggestions.js
+	describe( 'updateAttributes', () => {
+		// Data shapes are linked to fetchLinkSuggestions from
+		// core-data/src/fetch/__experimental-fetch-link-suggestions.js.
 		it( 'can update a post link', () => {
 			const setAttributes = jest.fn();
 			const linkSuggestion = {
@@ -18,10 +18,7 @@ describe( 'edit', () => {
 				type: 'post',
 			};
 
-			updateNavigationLinkBlockAttributes(
-				linkSuggestion,
-				setAttributes
-			);
+			updateAttributes( linkSuggestion, setAttributes );
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				id: 1337,
 				label: 'Menu Test',
@@ -42,10 +39,7 @@ describe( 'edit', () => {
 				type: 'page',
 				url: 'http://wordpress.local/sample-page/',
 			};
-			updateNavigationLinkBlockAttributes(
-				linkSuggestion,
-				setAttributes
-			);
+			updateAttributes( linkSuggestion, setAttributes );
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				id: 2,
 				kind: 'post-type',
@@ -66,10 +60,7 @@ describe( 'edit', () => {
 				type: 'post_tag',
 				url: 'http://wordpress.local/tag/bar/',
 			};
-			updateNavigationLinkBlockAttributes(
-				linkSuggestion,
-				setAttributes
-			);
+			updateAttributes( linkSuggestion, setAttributes );
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				id: 15,
 				kind: 'taxonomy',
@@ -90,10 +81,7 @@ describe( 'edit', () => {
 				type: 'category',
 				url: 'http://wordpress.local/category/cats/',
 			};
-			updateNavigationLinkBlockAttributes(
-				linkSuggestion,
-				setAttributes
-			);
+			updateAttributes( linkSuggestion, setAttributes );
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				id: 9,
 				kind: 'taxonomy',
@@ -114,10 +102,7 @@ describe( 'edit', () => {
 				type: 'portfolio',
 				url: 'http://wordpress.local/portfolio/fall/',
 			};
-			updateNavigationLinkBlockAttributes(
-				linkSuggestion,
-				setAttributes
-			);
+			updateAttributes( linkSuggestion, setAttributes );
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				id: 131,
 				kind: 'post-type',
@@ -138,10 +123,7 @@ describe( 'edit', () => {
 				type: 'portfolio_tag',
 				url: 'http://wordpress.local/portfolio_tag/PortfolioTag/',
 			};
-			updateNavigationLinkBlockAttributes(
-				linkSuggestion,
-				setAttributes
-			);
+			updateAttributes( linkSuggestion, setAttributes );
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				id: 4,
 				kind: 'taxonomy',
@@ -160,21 +142,16 @@ describe( 'edit', () => {
 				opensInNewTab: false,
 				title: 'Portfolio Category',
 				type: 'portfolio_category',
-				url:
-					'http://wordpress.local/portfolio_category/Portfolio-category/',
+				url: 'http://wordpress.local/portfolio_category/Portfolio-category/',
 			};
-			updateNavigationLinkBlockAttributes(
-				linkSuggestion,
-				setAttributes
-			);
+			updateAttributes( linkSuggestion, setAttributes );
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				id: 2,
 				kind: 'taxonomy',
 				opensInNewTab: false,
 				label: 'Portfolio Category',
 				type: 'portfolio_category',
-				url:
-					'http://wordpress.local/portfolio_category/Portfolio-category/',
+				url: 'http://wordpress.local/portfolio_category/Portfolio-category/',
 			} );
 		} );
 
@@ -188,12 +165,9 @@ describe( 'edit', () => {
 				type: 'post-format',
 				url: 'http://wordpress.local/type/video/',
 			};
-			updateNavigationLinkBlockAttributes(
-				linkSuggestion,
-				setAttributes
-			);
+			updateAttributes( linkSuggestion, setAttributes );
 			// post_format returns a slug ID value from the Search API
-			// we do not persist this ID since we expect this value to be a post or term ID
+			// we do not persist this ID since we expect this value to be a post or term ID.
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				kind: 'taxonomy',
 				opensInNewTab: false,
@@ -210,10 +184,7 @@ describe( 'edit', () => {
 					opensInNewTab: false,
 					url: 'www.wordpress.org',
 				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
+				updateAttributes( linkSuggestion, setAttributes );
 				expect( setAttributes ).toHaveBeenCalledWith( {
 					opensInNewTab: false,
 					url: 'www.wordpress.org',
@@ -231,10 +202,7 @@ describe( 'edit', () => {
 					type: 'URL',
 					url: 'http://www.wordpress.org',
 				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
+				updateAttributes( linkSuggestion, setAttributes );
 				expect( setAttributes ).toHaveBeenCalledWith( {
 					opensInNewTab: false,
 					label: 'www.wordpress.org',
@@ -252,10 +220,7 @@ describe( 'edit', () => {
 					type: 'mailto',
 					url: 'mailto:foo@example.com',
 				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
+				updateAttributes( linkSuggestion, setAttributes );
 				expect( setAttributes ).toHaveBeenCalledWith( {
 					opensInNewTab: false,
 					label: 'mailto:foo@example.com',
@@ -274,10 +239,7 @@ describe( 'edit', () => {
 					type: 'internal',
 					url: '#foo',
 				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
+				updateAttributes( linkSuggestion, setAttributes );
 				expect( setAttributes ).toHaveBeenCalledWith( {
 					opensInNewTab: false,
 					label: '#foo',
@@ -296,10 +258,7 @@ describe( 'edit', () => {
 					type: 'tel',
 					url: 'tel:5555555',
 				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
+				updateAttributes( linkSuggestion, setAttributes );
 				expect( setAttributes ).toHaveBeenCalledWith( {
 					opensInNewTab: false,
 					label: 'tel:5555555',
@@ -321,10 +280,7 @@ describe( 'edit', () => {
 					type: 'URL',
 					url: 'https://www.wordpress.org',
 				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
+				updateAttributes( linkSuggestion, setAttributes );
 				expect( setAttributes ).toHaveBeenCalledWith( {
 					opensInNewTab: false,
 					label: 'www.wordpress.org',
@@ -341,10 +297,7 @@ describe( 'edit', () => {
 					type: 'URL',
 					url: 'wordpress.org',
 				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
+				updateAttributes( linkSuggestion, setAttributes );
 				expect( setAttributes ).toHaveBeenCalledWith( {
 					opensInNewTab: false,
 					label: 'Custom Title',
@@ -361,35 +314,12 @@ describe( 'edit', () => {
 					type: 'URL',
 					url: 'https://wordpress.org',
 				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
+				updateAttributes( linkSuggestion, setAttributes );
 				expect( setAttributes ).toHaveBeenCalledWith( {
 					opensInNewTab: false,
 					label: 'Custom Title',
 					kind: 'custom',
 					url: 'https://wordpress.org',
-				} );
-			} );
-			// https://github.com/WordPress/gutenberg/pull/18617
-			it( 'label is javascript escaped', () => {
-				const setAttributes = jest.fn();
-				const linkSuggestion = {
-					opensInNewTab: false,
-					title: '<Navigation />',
-					type: 'URL',
-					url: 'https://wordpress.local?p=1',
-				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
-				expect( setAttributes ).toHaveBeenCalledWith( {
-					opensInNewTab: false,
-					label: '&lt;Navigation /&gt;',
-					kind: 'custom',
-					url: 'https://wordpress.local?p=1',
 				} );
 			} );
 			// https://github.com/WordPress/gutenberg/pull/19679
@@ -402,10 +332,7 @@ describe( 'edit', () => {
 					type: 'URL',
 					url: 'http://wordpress.org/?s=<>',
 				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
+				updateAttributes( linkSuggestion, setAttributes );
 				expect( setAttributes ).toHaveBeenCalledWith( {
 					opensInNewTab: false,
 					label: 'Custom Title',
@@ -430,11 +357,7 @@ describe( 'edit', () => {
 					type: 'post',
 				};
 
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes,
-					mockState
-				);
+				updateAttributes( linkSuggestion, setAttributes, mockState );
 				expect( mockState ).toEqual( {
 					id: 1337,
 					label: 'Menu Test',
@@ -443,8 +366,8 @@ describe( 'edit', () => {
 					type: 'post',
 					url: 'https://wordpress.local/menu-test/',
 				} );
-				//click on the existing link control, and toggle opens new tab
-				updateNavigationLinkBlockAttributes(
+				// Click on the existing link control, and toggle opens new tab.
+				updateAttributes(
 					{
 						url: 'https://wordpress.local/menu-test/',
 						opensInNewTab: true,
@@ -475,11 +398,7 @@ describe( 'edit', () => {
 					type: 'post',
 				};
 
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes,
-					mockState
-				);
+				updateAttributes( linkSuggestion, setAttributes, mockState );
 				expect( mockState ).toEqual( {
 					id: 1337,
 					label: 'Menu Test',
@@ -488,8 +407,8 @@ describe( 'edit', () => {
 					type: 'post',
 					url: 'https://wordpress.local/menu-test/',
 				} );
-				//click on the existing link control, and toggle opens new tab
-				updateNavigationLinkBlockAttributes(
+				// Click on the existing link control, and toggle opens new tab.
+				updateAttributes(
 					{
 						url: 'https://wordpress.local/foo/',
 						opensInNewTab: false,

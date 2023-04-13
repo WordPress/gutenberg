@@ -1,53 +1,68 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
 	__experimentalVStack as VStack,
 	__experimentalPaletteEdit as PaletteEdit,
+	__experimentalSpacer as Spacer,
 	DuotonePicker,
-	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useSetting } from './hooks';
+import Subtitle from './subtitle';
+import { unlock } from '../../private-apis';
+
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+
+const noop = () => {};
 
 export default function GradientPalettePanel( { name } ) {
-	const [ themeGradients, setThemeGradients ] = useSetting(
+	const [ themeGradients, setThemeGradients ] = useGlobalSetting(
 		'color.gradients.theme',
 		name
 	);
-	const [ baseThemeGradients ] = useSetting(
+	const [ baseThemeGradients ] = useGlobalSetting(
 		'color.gradients.theme',
 		name,
 		'base'
 	);
-	const [ defaultGradients, setDefaultGradients ] = useSetting(
+	const [ defaultGradients, setDefaultGradients ] = useGlobalSetting(
 		'color.gradients.default',
 		name
 	);
-	const [ baseDefaultGradients ] = useSetting(
+	const [ baseDefaultGradients ] = useGlobalSetting(
 		'color.gradients.default',
 		name,
 		'base'
 	);
-	const [ customGradients, setCustomGradients ] = useSetting(
+	const [ customGradients, setCustomGradients ] = useGlobalSetting(
 		'color.gradients.custom',
 		name
 	);
 
-	const [ defaultPaletteEnabled ] = useSetting(
+	const [ defaultPaletteEnabled ] = useGlobalSetting(
 		'color.defaultGradients',
 		name
 	);
-	const [ duotonePalette ] = useSetting( 'color.duotone' ) || [];
+
+	const [ customDuotone ] = useGlobalSetting( 'color.duotone.custom' ) || [];
+	const [ defaultDuotone ] =
+		useGlobalSetting( 'color.duotone.default' ) || [];
+	const [ themeDuotone ] = useGlobalSetting( 'color.duotone.theme' ) || [];
+	const [ defaultDuotoneEnabled ] = useGlobalSetting(
+		'color.defaultDuotone'
+	);
+
+	const duotonePalette = [
+		...( customDuotone || [] ),
+		...( themeDuotone || [] ),
+		...( defaultDuotone && defaultDuotoneEnabled ? defaultDuotone : [] ),
+	];
+
 	return (
 		<VStack
 			className="edit-site-global-styles-gradient-palette-panel"
@@ -60,6 +75,7 @@ export default function GradientPalettePanel( { name } ) {
 					gradients={ themeGradients }
 					onChange={ setThemeGradients }
 					paletteLabel={ __( 'Theme' ) }
+					paletteLabelHeadingLevel={ 3 }
 				/>
 			) }
 			{ !! defaultGradients &&
@@ -71,29 +87,32 @@ export default function GradientPalettePanel( { name } ) {
 						gradients={ defaultGradients }
 						onChange={ setDefaultGradients }
 						paletteLabel={ __( 'Default' ) }
+						paletteLabelLevel={ 3 }
 					/>
 				) }
 			<PaletteEdit
 				gradients={ customGradients }
 				onChange={ setCustomGradients }
 				paletteLabel={ __( 'Custom' ) }
+				paletteLabelLevel={ 3 }
 				emptyMessage={ __(
 					'Custom gradients are empty! Add some gradients to create your own palette.'
 				) }
 				slugPrefix="custom-"
 			/>
-			<div>
-				<Heading className="edit-site-global-styles-gradient-palette-panel__duotone-heading">
-					{ __( 'Duotone' ) }
-				</Heading>
-				<DuotonePicker
-					duotonePalette={ duotonePalette }
-					disableCustomDuotone={ true }
-					disableCustomColors={ true }
-					clearable={ false }
-					onChange={ noop }
-				/>
-			</div>
+			{ !! duotonePalette && !! duotonePalette.length && (
+				<div>
+					<Subtitle level={ 3 }>{ __( 'Duotone' ) }</Subtitle>
+					<Spacer margin={ 3 } />
+					<DuotonePicker
+						duotonePalette={ duotonePalette }
+						disableCustomDuotone={ true }
+						disableCustomColors={ true }
+						clearable={ false }
+						onChange={ noop }
+					/>
+				</div>
+			) }
 		</VStack>
 	);
 }

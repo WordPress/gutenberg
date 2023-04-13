@@ -17,13 +17,17 @@ import { store as blockEditorStore } from '../../store';
  * @return {import('react').RefCallback} Ref callback.
  */
 export function useBlockSelectionClearer() {
-	const { hasSelectedBlock, hasMultiSelection } = useSelect(
-		blockEditorStore
-	);
+	const { getSettings, hasSelectedBlock, hasMultiSelection } =
+		useSelect( blockEditorStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { clearBlockSelection: isEnabled } = getSettings();
 
 	return useRefEffect(
 		( node ) => {
+			if ( ! isEnabled ) {
+				return;
+			}
+
 			function onMouseDown( event ) {
 				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
 					return;
@@ -43,7 +47,7 @@ export function useBlockSelectionClearer() {
 				node.removeEventListener( 'mousedown', onMouseDown );
 			};
 		},
-		[ hasSelectedBlock, hasMultiSelection, clearSelectedBlock ]
+		[ hasSelectedBlock, hasMultiSelection, clearSelectedBlock, isEnabled ]
 	);
 }
 

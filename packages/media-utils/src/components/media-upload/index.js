@@ -1,24 +1,19 @@
 /**
- * External dependencies
- */
-import { castArray, defaults, pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-const { wp } = window;
 
 const DEFAULT_EMPTY_GALLERY = [];
 
 /**
  * Prepares the Featured Image toolbars and frames.
  *
- * @return {wp.media.view.MediaFrame.Select} The default media workflow.
+ * @return {window.wp.media.view.MediaFrame.Select} The default media workflow.
  */
 const getFeaturedImageMediaFrame = () => {
+	const { wp } = window;
+
 	return wp.media.view.MediaFrame.Select.extend( {
 		/**
 		 * Enables the Set Featured Image Button.
@@ -78,9 +73,10 @@ const getFeaturedImageMediaFrame = () => {
 /**
  * Prepares the Gallery toolbars and frames.
  *
- * @return {wp.media.view.MediaFrame.Post} The default media workflow.
+ * @return {window.wp.media.view.MediaFrame.Post} The default media workflow.
  */
 const getGalleryDetailsMediaFrame = () => {
+	const { wp } = window;
 	/**
 	 * Custom gallery details frame.
 	 *
@@ -169,14 +165,10 @@ const getGalleryDetailsMediaFrame = () => {
 					multiple: 'add',
 					editable: false,
 
-					library: wp.media.query(
-						defaults(
-							{
-								type: 'image',
-							},
-							this.options.library
-						)
-					),
+					library: wp.media.query( {
+						type: 'image',
+						...this.options.library,
+					} ),
 				} ),
 				new wp.media.controller.EditImage( {
 					model: this.options.editImage,
@@ -196,8 +188,8 @@ const getGalleryDetailsMediaFrame = () => {
 	} );
 };
 
-// the media library image object contains numerous attributes
-// we only need this set to display the image in the library
+// The media library image object contains numerous attributes
+// we only need this set to display the image in the library.
 const slimImageObject = ( img ) => {
 	const attrSet = [
 		'sizes',
@@ -210,10 +202,17 @@ const slimImageObject = ( img ) => {
 		'link',
 		'caption',
 	];
-	return pick( img, attrSet );
+	return attrSet.reduce( ( result, key ) => {
+		if ( img?.hasOwnProperty( key ) ) {
+			result[ key ] = img[ key ];
+		}
+		return result;
+	}, {} );
 };
 
 const getAttachmentsCollection = ( ids ) => {
+	const { wp } = window;
+
 	return wp.media.query( {
 		order: 'ASC',
 		orderby: 'post__in',
@@ -239,6 +238,8 @@ class MediaUpload extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onClose = this.onClose.bind( this );
+
+		const { wp } = window;
 
 		if ( gallery ) {
 			this.buildAndSetGalleryFrame();
@@ -291,6 +292,8 @@ class MediaUpload extends Component {
 			return;
 		}
 
+		const { wp } = window;
+
 		this.lastGalleryValue = value;
 
 		// If a frame already existed remove it.
@@ -328,6 +331,7 @@ class MediaUpload extends Component {
 	 * @return {void}
 	 */
 	buildAndSetFeatureImageFrame() {
+		const { wp } = window;
 		const featuredImageFrame = getFeaturedImageMediaFrame();
 		const attachments = getAttachmentsCollection( this.props.value );
 		const selection = new wp.media.model.Selection( attachments.models, {
@@ -369,19 +373,24 @@ class MediaUpload extends Component {
 
 	onSelect() {
 		const { onSelect, multiple = false } = this.props;
-		// Get media attachment details from the frame state
+		// Get media attachment details from the frame state.
 		const attachment = this.frame.state().get( 'selection' ).toJSON();
 		onSelect( multiple ? attachment : attachment[ 0 ] );
 	}
 
 	onOpen() {
+		const { wp } = window;
+		const { value } = this.props;
 		this.updateCollection();
+
+		//Handle active tab in media model on model open.
+		if ( this.props.mode ) {
+			this.frame.content.mode( this.props.mode );
+		}
 
 		// Handle both this.props.value being either (number[]) multiple ids
 		// (for galleries) or a (number) singular id (e.g. image block).
-		const hasMedia = Array.isArray( this.props.value )
-			? !! this.props.value?.length
-			: !! this.props.value;
+		const hasMedia = Array.isArray( value ) ? !! value?.length : !! value;
 
 		if ( ! hasMedia ) {
 			return;
@@ -389,17 +398,16 @@ class MediaUpload extends Component {
 
 		const isGallery = this.props.gallery;
 		const selection = this.frame.state().get( 'selection' );
+		const valueArray = Array.isArray( value ) ? value : [ value ];
 
 		if ( ! isGallery ) {
-			castArray( this.props.value ).forEach( ( id ) => {
+			valueArray.forEach( ( id ) => {
 				selection.add( wp.media.attachment( id ) );
 			} );
 		}
 
 		// Load the images so they are available in the media modal.
-		const attachments = getAttachmentsCollection(
-			castArray( this.props.value )
-		);
+		const attachments = getAttachmentsCollection( valueArray );
 
 		// Once attachments are loaded, set the current selection.
 		attachments.more().done( function () {
@@ -422,15 +430,15 @@ class MediaUpload extends Component {
 		if ( frameContent && frameContent.collection ) {
 			const collection = frameContent.collection;
 
-			// clean all attachments we have in memory.
+			// Clean all attachments we have in memory.
 			collection
 				.toArray()
 				.forEach( ( model ) => model.trigger( 'destroy', model ) );
 
-			// reset has more flag, if library had small amount of items all items may have been loaded before.
+			// Reset has more flag, if library had small amount of items all items may have been loaded before.
 			collection.mirroring._hasMore = true;
 
-			// request items
+			// Request items.
 			collection.more();
 		}
 	}

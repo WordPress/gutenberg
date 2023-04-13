@@ -13,9 +13,13 @@ import classnames from 'classnames/dedupe';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
-import { RichText, BlockIcon } from '@wordpress/block-editor';
+import {
+	RichText,
+	BlockIcon,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -139,13 +143,19 @@ class EmbedPreview extends Component {
 				) }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
+						identifier="caption"
 						tagName="figcaption"
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
 						placeholder={ __( 'Add caption' ) }
 						value={ caption }
 						onChange={ onCaptionChange }
 						inlineToolbar
 						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
 						}
 					/>
 				) }

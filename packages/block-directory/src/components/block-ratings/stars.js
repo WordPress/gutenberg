@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { times } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -24,7 +19,7 @@ function Stars( { rating } ) {
 				stars
 			) }
 		>
-			{ times( fullStarCount, ( i ) => (
+			{ Array.from( { length: fullStarCount } ).map( ( _, i ) => (
 				<Icon
 					key={ `full_stars_${ i }` }
 					className="block-directory-block-ratings__star-full"
@@ -32,7 +27,7 @@ function Stars( { rating } ) {
 					size={ 16 }
 				/>
 			) ) }
-			{ times( halfStarCount, ( i ) => (
+			{ Array.from( { length: halfStarCount } ).map( ( _, i ) => (
 				<Icon
 					key={ `half_stars_${ i }` }
 					className="block-directory-block-ratings__star-half-full"
@@ -40,7 +35,7 @@ function Stars( { rating } ) {
 					size={ 16 }
 				/>
 			) ) }
-			{ times( emptyStarCount, ( i ) => (
+			{ Array.from( { length: emptyStarCount } ).map( ( _, i ) => (
 				<Icon
 					key={ `empty_stars_${ i }` }
 					className="block-directory-block-ratings__star-empty"

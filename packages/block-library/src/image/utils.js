@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, each, get } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * Internal dependencies
@@ -13,7 +13,7 @@ export function removeNewTabRel( currentRel ) {
 
 	if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
 		if ( ! isEmpty( newRel ) ) {
-			each( NEW_TAB_REL, ( relVal ) => {
+			NEW_TAB_REL.forEach( ( relVal ) => {
 				const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
 				newRel = newRel.replace( regExp, '' );
 			} );
@@ -64,7 +64,7 @@ export function getUpdatedLinkTargetSettings( value, { rel } ) {
  * @param {string} size  Selected size slug to apply.
  */
 export function getImageSizeAttributes( image, size ) {
-	const url = get( image, [ 'media_details', 'sizes', size, 'source_url' ] );
+	const url = image?.media_details?.sizes?.[ size ]?.source_url;
 
 	if ( url ) {
 		return { url, width: undefined, height: undefined, sizeSlug: size };

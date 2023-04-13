@@ -2,12 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map, filter } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
 import {
@@ -29,6 +28,7 @@ import {
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
+import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -36,31 +36,20 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import MediaContainer from './media-container';
-import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
-
-/**
- * Constants
- */
-const TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			fontSize: 'large',
-			placeholder: _x( 'Content…', 'content placeholder' ),
-		},
-	],
-];
+import {
+	DEFAULT_MEDIA_SIZE_SLUG,
+	WIDTH_CONSTRAINT_PERCENTAGE,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_ATTACHMENT,
+	TEMPLATE,
+} from './constants';
 
 // this limits the resize to a safe zone to avoid making broken layouts
-const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) =>
 	Math.max(
 		WIDTH_CONSTRAINT_PERCENTAGE,
 		Math.min( width, 100 - WIDTH_CONSTRAINT_PERCENTAGE )
 	);
-
-const LINK_DESTINATION_MEDIA = 'media';
-const LINK_DESTINATION_ATTACHMENT = 'attachment';
 
 function getImageSourceUrlBySizeSlug( image, slug ) {
 	// eslint-disable-next-line camelcase
@@ -72,9 +61,26 @@ function attributesFromMedia( {
 	setAttributes,
 } ) {
 	return ( media ) => {
+		if ( ! media || ! media.url ) {
+			setAttributes( {
+				mediaAlt: undefined,
+				mediaId: undefined,
+				mediaType: undefined,
+				mediaUrl: undefined,
+				mediaLink: undefined,
+				href: undefined,
+				focalPoint: undefined,
+			} );
+			return;
+		}
+
+		if ( isBlobURL( media.url ) ) {
+			media.type = getBlobTypeByURL( media.url );
+		}
+
 		let mediaType;
 		let src;
-		// for media selections originated from a file upload.
+		// For media selections originated from a file upload.
 		if ( media.media_type ) {
 			if ( media.media_type === 'image' ) {
 				mediaType = 'image';
@@ -84,7 +90,7 @@ function attributesFromMedia( {
 				mediaType = 'video';
 			}
 		} else {
-			// for media selections originated from existing files in the media library.
+			// For media selections originated from existing files in the media library.
 			mediaType = media.type;
 		}
 
@@ -120,7 +126,7 @@ function attributesFromMedia( {
 	};
 }
 
-function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
+function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const {
 		focalPoint,
 		href,
@@ -140,12 +146,24 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
-	const image = useSelect(
-		( select ) =>
-			mediaId && isSelected
-				? select( coreStore ).getMedia( mediaId )
-				: null,
-		[ isSelected, mediaId ]
+	const { imageSizes, image, isContentLocked } = useSelect(
+		( select ) => {
+			const { __unstableGetContentLockingParent, getSettings } =
+				select( blockEditorStore );
+			return {
+				isContentLocked:
+					!! __unstableGetContentLockingParent( clientId ),
+				image:
+					mediaId && isSelected
+						? select( coreStore ).getMedia( mediaId, {
+								context: 'view',
+						  } )
+						: null,
+				imageSizes: getSettings()?.imageSizes,
+			};
+		},
+
+		[ isSelected, mediaId, clientId ]
 	);
 
 	const refMediaContainer = useRef();
@@ -170,7 +188,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		setAttributes( {
 			mediaWidth: applyWidthConstraints( width ),
 		} );
-		setTemporaryMediaWidth( applyWidthConstraints( width ) );
+		setTemporaryMediaWidth( null );
 	};
 
 	const classNames = classnames( {
@@ -196,16 +214,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		setAttributes( { verticalAlignment: alignment } );
 	};
 
-	const imageSizes = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		return settings?.imageSizes;
-	}, [] );
-	const imageSizeOptions = map(
-		filter( imageSizes, ( { slug } ) =>
-			getImageSourceUrlBySizeSlug( image, slug )
-		),
-		( { name, slug } ) => ( { value: slug, label: name } )
-	);
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) => getImageSourceUrlBySizeSlug( image, slug ) )
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 	const updateImage = ( newMediaSizeSlug ) => {
 		const newUrl = getImageSourceUrlBySizeSlug( image, newMediaSizeSlug );
 
@@ -220,8 +231,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const mediaTextGeneralSettings = (
-		<PanelBody title={ __( 'Media & Text settings' ) }>
+		<PanelBody title={ __( 'Settings' ) }>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Stack on mobile' ) }
 				checked={ isStackedOnMobile }
 				onChange={ () =>
@@ -232,6 +244,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			/>
 			{ mediaType === 'image' && (
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Crop image to fill entire column' ) }
 					checked={ imageFill }
 					onChange={ () =>
@@ -243,6 +256,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			) }
 			{ imageFill && mediaUrl && mediaType === 'image' && (
 				<FocalPointPicker
+					__nextHasNoMarginBottom
 					label={ __( 'Focal point picker' ) }
 					url={ mediaUrl }
 					value={ focalPoint }
@@ -255,17 +269,17 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			) }
 			{ mediaType === 'image' && (
 				<TextareaControl
-					label={ __( 'Alt text (alternative text)' ) }
+					__nextHasNoMarginBottom
+					label={ __( 'Alternative text' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={
 						<>
 							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-								{ __( 'Describe the purpose of the image' ) }
+								{ __( 'Describe the purpose of the image.' ) }
 							</ExternalLink>
-							{ __(
-								'Leave empty if the image is purely decorative.'
-							) }
+							<br />
+							{ __( 'Leave empty if decorative.' ) }
 						</>
 					}
 				/>
@@ -276,10 +290,14 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					slug={ mediaSizeSlug }
 					imageSizeOptions={ imageSizeOptions }
 					isResizable={ false }
+					imageSizeHelp={ __(
+						'Select the size of the source image.'
+					) }
 				/>
 			) }
 			{ mediaUrl && (
 				<RangeControl
+					__nextHasNoMarginBottom
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
 					onChange={ commitWidthChange }
@@ -304,24 +322,31 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		<>
 			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
 			<BlockControls group="block">
-				<BlockVerticalAlignmentControl
-					onChange={ onVerticalAlignmentChange }
-					value={ verticalAlignment }
-				/>
-				<ToolbarButton
-					icon={ pullLeft }
-					title={ __( 'Show media on left' ) }
-					isActive={ mediaPosition === 'left' }
-					onClick={ () => setAttributes( { mediaPosition: 'left' } ) }
-				/>
-				<ToolbarButton
-					icon={ pullRight }
-					title={ __( 'Show media on right' ) }
-					isActive={ mediaPosition === 'right' }
-					onClick={ () =>
-						setAttributes( { mediaPosition: 'right' } )
-					}
-				/>
+				{ ! isContentLocked && (
+					<>
+						<BlockVerticalAlignmentControl
+							onChange={ onVerticalAlignmentChange }
+							value={ verticalAlignment }
+						/>
+						<ToolbarButton
+							icon={ pullLeft }
+							title={ __( 'Show media on left' ) }
+							isActive={ mediaPosition === 'left' }
+							onClick={ () =>
+								setAttributes( { mediaPosition: 'left' } )
+							}
+						/>
+						<ToolbarButton
+							icon={ pullRight }
+							title={ __( 'Show media on right' ) }
+							isActive={ mediaPosition === 'right' }
+							onClick={ () =>
+								setAttributes( { mediaPosition: 'right' } )
+							}
+						/>
+					</>
+				) }
+
 				{ mediaType === 'image' && (
 					<ImageURLInputUI
 						url={ href || '' }
@@ -337,6 +362,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 				) }
 			</BlockControls>
 			<div { ...blockProps }>
+				{ mediaPosition === 'right' && <div { ...innerBlocksProps } /> }
 				<MediaContainer
 					className="wp-block-media-text__media"
 					onSelectMedia={ onSelectMedia }
@@ -354,9 +380,10 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 						mediaType,
 						mediaUrl,
 						mediaWidth,
+						isContentLocked,
 					} }
 				/>
-				<div { ...innerBlocksProps } />
+				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }
 			</div>
 		</>
 	);

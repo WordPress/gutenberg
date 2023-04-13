@@ -37,9 +37,8 @@ class BottomSheetCell extends Component {
 			isScreenReaderEnabled: false,
 		};
 
-		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
-			this
-		);
+		this.handleScreenReaderToggled =
+			this.handleScreenReaderToggled.bind( this );
 
 		this.isCurrent = false;
 	}
@@ -52,14 +51,14 @@ class BottomSheetCell extends Component {
 
 	componentDidMount() {
 		this.isCurrent = true;
-		AccessibilityInfo.addEventListener(
+		this.a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled
 		);
 
 		AccessibilityInfo.isScreenReaderEnabled().then(
 			( isScreenReaderEnabled ) => {
-				if ( this.isCurrent ) {
+				if ( this.isCurrent && isScreenReaderEnabled ) {
 					this.setState( { isScreenReaderEnabled } );
 				}
 			}
@@ -68,10 +67,7 @@ class BottomSheetCell extends Component {
 
 	componentWillUnmount() {
 		this.isCurrent = false;
-		AccessibilityInfo.removeEventListener(
-			'screenReaderChanged',
-			this.handleScreenReaderToggled
-		);
+		this.a11yInfoChangeSubscription.remove();
 	}
 
 	handleScreenReaderToggled( isScreenReaderEnabled ) {
@@ -193,7 +189,7 @@ class BottomSheetCell extends Component {
 		};
 
 		const separatorStyle = () => {
-			//eslint-disable-next-line @wordpress/no-unused-vars-before-return
+			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 			const defaultSeparatorStyle = this.props.getStylesFromColorScheme(
 				styles.separator,
 				styles.separatorDark
@@ -238,7 +234,7 @@ class BottomSheetCell extends Component {
 			// we show the TextInput just when the user wants to edit the value,
 			// and the Text component to display it.
 			// We also show the TextInput to display placeholder.
-			const shouldShowPlaceholder = isValueEditable && value === '';
+			const shouldShowPlaceholder = isInteractive && value === '';
 			return this.state.isEditingValue || shouldShowPlaceholder ? (
 				<TextInput
 					ref={ ( c ) => ( this._valueTextInput = c ) }
@@ -359,7 +355,12 @@ class BottomSheetCell extends Component {
 					<View style={ rowContainerStyles }>
 						<View style={ styles.cellRowContainer }>
 							{ icon && (
-								<View style={ styles.cellRowContainer }>
+								<View
+									style={ [
+										styles.cellRowContainer,
+										styles.cellRowIcon,
+									] }
+								>
 									<Icon
 										icon={ icon }
 										size={ 24 }

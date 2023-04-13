@@ -22,37 +22,27 @@ const BlockDraggable = ( {
 } ) => {
 	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
-			const {
-				getBlockRootClientId,
-				getTemplateLock,
-				getBlockName,
-			} = select( blockEditorStore );
+			const { canMoveBlocks, getBlockRootClientId, getBlockName } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-			const templateLock = rootClientId
-				? getTemplateLock( rootClientId )
-				: null;
 			const blockName = getBlockName( clientIds[ 0 ] );
 
 			return {
 				srcRootClientId: rootClientId,
-				isDraggable: 'all' !== templateLock,
+				isDraggable: canMoveBlocks( clientIds, rootClientId ),
 				icon: getBlockType( blockName )?.icon,
 			};
 		},
 		[ clientIds ]
 	);
 	const isDragging = useRef( false );
-	const [
-		startScrolling,
-		scrollOnDragOver,
-		stopScrolling,
-	] = useScrollWhenDragging();
+	const [ startScrolling, scrollOnDragOver, stopScrolling ] =
+		useScrollWhenDragging();
 
-	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
-		blockEditorStore
-	);
+	const { startDraggingBlocks, stopDraggingBlocks } =
+		useDispatch( blockEditorStore );
 
-	// Stop dragging blocks if the block draggable is unmounted
+	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
 		return () => {
 			if ( isDragging.current ) {
@@ -62,7 +52,7 @@ const BlockDraggable = ( {
 	}, [] );
 
 	if ( ! isDraggable ) {
-		return children( { isDraggable: false } );
+		return children( { draggable: false } );
 	}
 
 	const transferData = {

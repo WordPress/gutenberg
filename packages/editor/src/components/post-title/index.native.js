@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,7 +34,7 @@ class PostTitle extends Component {
 		this.onPaste = this.onPaste.bind( this );
 	}
 	componentDidUpdate( prevProps ) {
-		// Unselect if any other block is selected and blur the RichText
+		// Unselect if any other block is selected and blur the RichText.
 		if (
 			this.props.isSelected &&
 			! prevProps.isAnyBlockSelected &&
@@ -96,7 +95,7 @@ class PostTitle extends Component {
 
 	getTitle( title, postType ) {
 		if ( 'page' === postType ) {
-			return isEmpty( title )
+			return ! title
 				? /* translators: accessibility text. empty page title. */
 				  __( 'Page title. Empty' )
 				: sprintf(
@@ -106,7 +105,7 @@ class PostTitle extends Component {
 				  );
 		}
 
-		return isEmpty( title )
+		return ! title
 			? /* translators: accessibility text. empty post title. */
 			  __( 'Post title. Empty' )
 			: sprintf(
@@ -142,6 +141,7 @@ class PostTitle extends Component {
 
 		return (
 			<View
+				testID="post-title"
 				style={ [
 					styles.titleContainer,
 					borderStyle,
@@ -158,11 +158,12 @@ class PostTitle extends Component {
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }
-					onBlur={ this.props.onBlur } // always assign onBlur as a props
+					onBlur={ this.props.onBlur } // Always assign onBlur as a props.
 					multiline={ false }
 					style={ titleStyles }
 					styles={ styles }
 					fontSize={ 24 }
+					lineHeight={ 1 }
 					fontWeight={ 'bold' }
 					deleteEnter={ true }
 					onChange={ ( value ) => {
@@ -184,19 +185,15 @@ class PostTitle extends Component {
 
 export default compose(
 	withSelect( ( select ) => {
-		const { isPostTitleSelected, getEditedPostAttribute } = select(
-			editorStore
-		);
-		const {
-			getSelectedBlockClientId,
-			getBlockRootClientId,
-			getSettings,
-		} = select( blockEditorStore );
+		const { isPostTitleSelected, getEditedPostAttribute } =
+			select( editorStore );
+		const { getSelectedBlockClientId, getBlockRootClientId, getSettings } =
+			select( blockEditorStore );
 
 		const selectedId = getSelectedBlockClientId();
 		const selectionIsNested = !! getBlockRootClientId( selectedId );
-		const globalStyles = getSettings()?.__experimentalGlobalStylesBaseStyles
-			?.color;
+		const globalStyles =
+			getSettings()?.__experimentalGlobalStylesBaseStyles?.color;
 
 		return {
 			postType: getEditedPostAttribute( 'type' ),

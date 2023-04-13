@@ -23,7 +23,9 @@ function TableOfContents(
 	);
 	return (
 		<Dropdown
-			position={ repositionDropdown ? 'middle right right' : 'bottom' }
+			popoverProps={ {
+				placement: repositionDropdown ? 'right' : 'bottom',
+			} }
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (

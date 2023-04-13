@@ -1,34 +1,52 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { EditorKeyboardShortcutsRegister } from '@wordpress/editor';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
 import { KeyboardShortcutHelpModal } from '../index';
 
+const noop = () => {};
+
 describe( 'KeyboardShortcutHelpModal', () => {
 	it( 'should match snapshot when the modal is active', () => {
-		const wrapper = shallow(
-			<KeyboardShortcutHelpModal
-				isModalActive={ true }
-				toggleModal={ noop }
-			/>
+		render(
+			<ShortcutProvider>
+				<EditorKeyboardShortcutsRegister />
+				<KeyboardShortcutHelpModal isModalActive toggleModal={ noop } />
+			</ShortcutProvider>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
+		expect(
+			screen.getByRole( 'dialog', {
+				name: 'Keyboard shortcuts',
+			} )
+		).toMatchSnapshot();
 	} );
 
-	it( 'should match snapshot when the modal is not active', () => {
-		const wrapper = shallow(
-			<KeyboardShortcutHelpModal
-				isModalActive={ false }
-				toggleModal={ noop }
-			/>
+	it( 'should not render the modal when inactive', () => {
+		render(
+			<ShortcutProvider>
+				<EditorKeyboardShortcutsRegister />
+				<KeyboardShortcutHelpModal
+					isModalActive={ false }
+					toggleModal={ noop }
+				/>
+			</ShortcutProvider>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
+		expect(
+			screen.queryByRole( 'dialog', {
+				name: 'Keyboard shortcuts',
+			} )
+		).not.toBeInTheDocument();
 	} );
 } );

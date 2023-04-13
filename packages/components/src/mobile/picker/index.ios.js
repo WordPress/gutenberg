@@ -10,6 +10,12 @@ import { __ } from '@wordpress/i18n';
 import { Component, forwardRef, useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { BottomSheetContext } from '@wordpress/components';
+import { usePreferredColorScheme } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
 
 class Picker extends Component {
 	presentPicker() {
@@ -23,9 +29,15 @@ class Picker extends Component {
 			isBottomSheetOpened,
 			closeBottomSheet,
 			onHandleClosingBottomSheet,
+			colorScheme,
 		} = this.props;
 		const labels = options.map( ( { label } ) => label );
 		const fullOptions = [ __( 'Cancel' ) ].concat( labels );
+
+		const buttonTitleColor =
+			colorScheme === 'light'
+				? styles[ 'components-picker__button-title' ].color
+				: styles[ 'components-picker__button-title--dark' ].color;
 
 		ActionSheetIOS.showActionSheetWithOptions(
 			{
@@ -35,6 +47,7 @@ class Picker extends Component {
 				destructiveButtonIndex,
 				disabledButtonIndices,
 				anchor: getAnchor && getAnchor(),
+				tintColor: buttonTitleColor,
 			},
 			( buttonIndex ) => {
 				if ( buttonIndex === 0 ) {
@@ -66,6 +79,8 @@ const PickerComponent = forwardRef( ( props, ref ) => {
 	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
 
+	const colorScheme = usePreferredColorScheme();
+
 	return (
 		<Picker
 			ref={ ref }
@@ -73,6 +88,7 @@ const PickerComponent = forwardRef( ( props, ref ) => {
 			isBottomSheetOpened={ isBottomSheetOpened }
 			closeBottomSheet={ closeGeneralSidebar }
 			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
+			colorScheme={ colorScheme }
 		/>
 	);
 } );

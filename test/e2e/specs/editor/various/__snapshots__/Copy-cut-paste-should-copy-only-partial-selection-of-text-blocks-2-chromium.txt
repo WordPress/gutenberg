@@ -1,0 +1,15 @@
+<!-- wp:paragraph -->
+<p>block</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>B </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>A block</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>B block</p>
+<!-- /wp:paragraph -->

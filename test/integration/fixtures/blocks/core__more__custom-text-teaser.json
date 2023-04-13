@@ -1,13 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/more",
 		"isValid": true,
 		"attributes": {
 			"customText": "Continue Reading",
 			"noTeaser": true
 		},
-		"innerBlocks": [],
-		"originalContent": "<!--more Continue Reading-->\n<!--noteaser-->"
+		"innerBlocks": []
 	}
 ]

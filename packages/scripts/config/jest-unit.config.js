@@ -9,11 +9,10 @@ const path = require( 'path' );
 const { hasBabelConfig } = require( '../utils' );
 
 const jestUnitConfig = {
-	testRunner: 'jest-circus/runner',
 	preset: '@wordpress/jest-preset-default',
 	reporters: [
 		'default',
-		path.join( __dirname, 'jest-github-actions-reporter.js' ),
+		path.join( __dirname, 'jest-github-actions-reporter', 'index.js' ),
 	],
 };
 

@@ -12,7 +12,7 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/html' ],
+			blocks: [ 'core/html', 'core/paragraph' ],
 			transform: ( { content } ) => {
 				return createBlock( 'core/code', {
 					content,
@@ -35,6 +35,17 @@ const transforms = {
 						},
 					},
 				},
+			},
+		},
+	],
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( { content } ) => {
+				return createBlock( 'core/paragraph', {
+					content: content.replace( /\n/g, '<br>' ),
+				} );
 			},
 		},
 	],

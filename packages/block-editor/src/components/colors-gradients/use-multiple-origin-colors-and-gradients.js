@@ -8,7 +8,6 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useSetting from '../use-setting';
-import useCommonSingleMultipleSelects from './use-common-single-multiple-selects';
 
 /**
  * Retrieves color and gradient related settings.
@@ -19,7 +18,10 @@ import useCommonSingleMultipleSelects from './use-common-single-multiple-selects
  * @return {Object} Color and gradient related settings.
  */
 export default function useMultipleOriginColorsAndGradients() {
-	const colorGradientSettings = useCommonSingleMultipleSelects();
+	const colorGradientSettings = {
+		disableCustomColors: ! useSetting( 'color.custom' ),
+		disableCustomGradients: ! useSetting( 'color.customGradient' ),
+	};
 	const customColors = useSetting( 'color.palette.custom' );
 	const themeColors = useSetting( 'color.palette.theme' );
 	const defaultColors = useSetting( 'color.palette.default' );

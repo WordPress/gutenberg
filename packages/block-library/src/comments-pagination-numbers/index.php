@@ -15,32 +15,15 @@
  * @return string Returns the pagination numbers for the comments.
  */
 function render_block_core_comments_pagination_numbers( $attributes, $content, $block ) {
-	// Get the post ID from which comments should be retrieved.
-	$post_id = isset( $block->context['postId'] )
-		? $block->context['postId']
-		: get_the_id();
-
-	if ( ! $post_id ) {
+	// Bail out early if the post ID is not set for some reason.
+	if ( empty( $block->context['postId'] ) ) {
 		return '';
 	}
 
-	// Get the 'comments per page' setting.
-	$per_page = isset( $block->context['queryPerPage'] )
-		? $block->context['queryPerPage']
-		: get_option( 'comments_per_page' );
+	$comment_vars = build_comment_query_vars_from_block( $block );
 
-	// Get the total number of pages.
-	$comments = get_approved_comments( $post_id );
-	$total    = get_comment_pages_count( $comments, $per_page );
-
-	// Get the number of the default page.
-	$default_page = 'newest' === get_option( 'default_comments_page' ) ? $total : 1;
-
-	// Get the current comment page from the URL.
-	$current = get_query_var( 'cpage' );
-	if ( ! $current ) {
-		$current = $default_page;
-	}
+	$total   = ( new WP_Comment_Query( $comment_vars ) )->max_num_pages;
+	$current = ! empty( $comment_vars['paged'] ) ? $comment_vars['paged'] : null;
 
 	// Render links.
 	$content = paginate_comments_links(

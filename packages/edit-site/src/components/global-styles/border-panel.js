@@ -1,210 +1,71 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalBorderRadiusControl as BorderRadiusControl,
-	__experimentalBorderStyleControl as BorderStyleControl,
-	__experimentalColorGradientControl as ColorGradientControl,
-} from '@wordpress/block-editor';
-import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalUnitControl as UnitControl,
-	__experimentalUseCustomUnits as useCustomUnits,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import { unlock } from '../../private-apis';
 
-const MIN_BORDER_WIDTH = 0;
+const {
+	useGlobalStyle,
+	useGlobalSetting,
+	useSettingsForBlockElement,
+	BorderPanel: StylesBorderPanel,
+} = unlock( blockEditorPrivateApis );
 
-// Defining empty array here instead of inline avoids unnecessary re-renders of
-// color control.
-const EMPTY_ARRAY = [];
+export default function BorderPanel( { name, variation = '' } ) {
+	let prefixParts = [];
+	if ( variation ) {
+		prefixParts = [ 'variations', variation ].concat( prefixParts );
+	}
+	const prefix = prefixParts.join( '.' );
 
-export function useHasBorderPanel( name ) {
-	const controls = [
-		useHasBorderColorControl( name ),
-		useHasBorderRadiusControl( name ),
-		useHasBorderStyleControl( name ),
-		useHasBorderWidthControl( name ),
-	];
-
-	return controls.some( Boolean );
-}
-
-function useHasBorderColorControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	return (
-		useSetting( 'border.color', name )[ 0 ] &&
-		supports.includes( 'borderColor' )
-	);
-}
-
-function useHasBorderRadiusControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	return (
-		useSetting( 'border.radius', name )[ 0 ] &&
-		supports.includes( 'borderRadius' )
-	);
-}
-
-function useHasBorderStyleControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	return (
-		useSetting( 'border.style', name )[ 0 ] &&
-		supports.includes( 'borderStyle' )
-	);
-}
-
-function useHasBorderWidthControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	return (
-		useSetting( 'border.width', name )[ 0 ] &&
-		supports.includes( 'borderWidth' )
-	);
-}
-
-export default function BorderPanel( { name } ) {
-	// To better reflect if the user has customized a value we need to
-	// ensure the style value being checked is from the `user` origin.
-	const [ userBorderStyles ] = useStyle( 'border', name, 'user' );
-	const createHasValueCallback = ( feature ) => () =>
-		!! userBorderStyles?.[ feature ];
-
-	const createResetCallback = ( setStyle ) => () => setStyle( undefined );
-
-	const handleOnChange = ( setStyle ) => ( value ) => {
-		setStyle( value || undefined );
-	};
-
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' )[ 0 ] || [
-			'px',
-			'em',
-			'rem',
-		],
+	const [ style ] = useGlobalStyle( prefix, name, 'user', false );
+	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
+		shouldDecodeEncode: false,
 	} );
+	const [ rawSettings ] = useGlobalSetting( '', name );
+	const settings = useSettingsForBlockElement( rawSettings, name );
 
-	// Border width.
-	const showBorderWidth = useHasBorderWidthControl( name );
-	const [ borderWidthValue, setBorderWidth ] = useStyle(
-		'border.width',
-		name
-	);
+	const onChange = ( newStyle ) => {
+		// As Global Styles can't conditionally generate styles based on if
+		// other style properties have been set, we need to force split
+		// border definitions for user set global border styles. Border
+		// radius is derived from the same property i.e. `border.radius` if
+		// it is a string that is used. The longhand border radii styles are
+		// only generated if that property is an object.
+		//
+		// For borders (color, style, and width) those are all properties on
+		// the `border` style property. This means if the theme.json defined
+		// split borders and the user condenses them into a flat border or
+		// vice-versa we'd get both sets of styles which would conflict.
+		const { border } = newStyle;
+		const updatedBorder = ! hasSplitBorders( border )
+			? {
+					top: border,
+					right: border,
+					bottom: border,
+					left: border,
+			  }
+			: {
+					color: null,
+					style: null,
+					width: null,
+					...border,
+			  };
 
-	// Border style.
-	const showBorderStyle = useHasBorderStyleControl( name );
-	const [ borderStyle, setBorderStyle ] = useStyle( 'border.style', name );
-
-	// Border color.
-	const showBorderColor = useHasBorderColorControl( name );
-	const [ borderColor, setBorderColor ] = useStyle( 'border.color', name );
-	const [ colors = EMPTY_ARRAY ] = useSetting( 'color.palette' );
-	const disableCustomColors = ! useSetting( 'color.custom' )[ 0 ];
-	const disableCustomGradients = ! useSetting( 'color.customGradient' )[ 0 ];
-
-	// Border radius.
-	const showBorderRadius = useHasBorderRadiusControl( name );
-	const [ borderRadiusValues, setBorderRadius ] = useStyle(
-		'border.radius',
-		name
-	);
-	const hasBorderRadius = () => {
-		const borderValues = userBorderStyles?.radius;
-		if ( typeof borderValues === 'object' ) {
-			return Object.entries( borderValues ).some( Boolean );
-		}
-		return !! borderValues;
-	};
-
-	const resetAll = () => {
-		setBorderColor( undefined );
-		setBorderRadius( undefined );
-		setBorderStyle( undefined );
-		setBorderWidth( undefined );
-	};
-
-	// When we set a border color or width ensure we have a style so the user
-	// can see a visible border.
-	const handleOnChangeWithStyle = ( setStyle ) => ( value ) => {
-		if ( !! value && ! borderStyle ) {
-			setBorderStyle( 'solid' );
-		}
-
-		setStyle( value || undefined );
+		setStyle( { ...newStyle, border: updatedBorder } );
 	};
 
 	return (
-		<ToolsPanel label={ __( 'Border' ) } resetAll={ resetAll }>
-			{ showBorderWidth && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ createHasValueCallback( 'width' ) }
-					label={ __( 'Width' ) }
-					onDeselect={ createResetCallback( setBorderWidth ) }
-					isShownByDefault={ true }
-				>
-					<UnitControl
-						value={ borderWidthValue }
-						label={ __( 'Width' ) }
-						min={ MIN_BORDER_WIDTH }
-						onChange={ handleOnChangeWithStyle( setBorderWidth ) }
-						units={ units }
-					/>
-				</ToolsPanelItem>
-			) }
-			{ showBorderStyle && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ createHasValueCallback( 'style' ) }
-					label={ __( 'Style' ) }
-					onDeselect={ createResetCallback( setBorderStyle ) }
-					isShownByDefault={ true }
-				>
-					<BorderStyleControl
-						value={ borderStyle }
-						onChange={ handleOnChange( setBorderStyle ) }
-					/>
-				</ToolsPanelItem>
-			) }
-			{ showBorderColor && (
-				<ToolsPanelItem
-					hasValue={ createHasValueCallback( 'color' ) }
-					label={ __( 'Color' ) }
-					onDeselect={ createResetCallback( setBorderColor ) }
-					isShownByDefault={ true }
-				>
-					<ColorGradientControl
-						label={ __( 'Color' ) }
-						colorValue={ borderColor }
-						colors={ colors }
-						gradients={ undefined }
-						disableCustomColors={ disableCustomColors }
-						disableCustomGradients={ disableCustomGradients }
-						onColorChange={ handleOnChangeWithStyle(
-							setBorderColor
-						) }
-						clearable={ false }
-					/>
-				</ToolsPanelItem>
-			) }
-			{ showBorderRadius && (
-				<ToolsPanelItem
-					hasValue={ hasBorderRadius }
-					label={ __( 'Radius' ) }
-					onDeselect={ createResetCallback( setBorderRadius ) }
-					isShownByDefault={ true }
-				>
-					<BorderRadiusControl
-						values={ borderRadiusValues }
-						onChange={ handleOnChange( setBorderRadius ) }
-					/>
-				</ToolsPanelItem>
-			) }
-		</ToolsPanel>
+		<StylesBorderPanel
+			inheritedValue={ inheritedStyle }
+			value={ style }
+			onChange={ onChange }
+			settings={ settings }
+		/>
 	);
 }

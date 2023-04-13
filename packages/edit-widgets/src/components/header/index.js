@@ -35,23 +35,19 @@ function Header() {
 		[ widgetAreaClientId ]
 	);
 	const { isInserterOpen, isListViewOpen } = useSelect( ( select ) => {
-		const { isInserterOpened, isListViewOpened } = select(
-			editWidgetsStore
-		);
+		const { isInserterOpened, isListViewOpened } =
+			select( editWidgetsStore );
 		return {
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
 		};
 	}, [] );
-	const {
-		setIsWidgetAreaOpen,
-		setIsInserterOpened,
-		setIsListViewOpened,
-	} = useDispatch( editWidgetsStore );
+	const { setIsWidgetAreaOpen, setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editWidgetsStore );
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const handleClick = () => {
 		if ( isInserterOpen ) {
-			// Focusing the inserter button closes the inserter popover
+			// Focusing the inserter button closes the inserter popover.
 			setIsInserterOpened( false );
 		} else {
 			if ( ! isLastSelectedWidgetAreaOpen ) {

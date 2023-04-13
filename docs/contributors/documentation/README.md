@@ -14,7 +14,7 @@ The Gutenberg project uses GitHub for managing code and tracking issues. The mai
 
 There are two major sets of documentation for the Gutenberg project:
 
-1. [User documentation](https://wordpress.org/support/article/wordpress-editor/) is information on how to use the Editor as an author publishing posts. For contributing to user docs, follow the docs blog, or ask in the #docs Slack channel, to understand the current priorities.
+1. [User documentation](https://wordpress.org/documentation/article/wordpress-block-editor/) is information on how to use the Editor as an author publishing posts. For contributing to user docs, follow the docs blog, or ask in the #docs Slack channel, to understand the current priorities.
 2. [Block editor handbook](https://developer.wordpress.org/block-editor/) is everything related to the Gutenberg project including: developing, extending, and—what you are reading right now—contributing specific to Gutenberg.
 
 The rest of this document covers contributing to the block editor handbook.
@@ -64,6 +64,25 @@ To add a new document requires a working JavaScript development environment to b
 
 If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommitted local change that must be committed.
 
+### Documenting Packages
+
+Package documentation is generated automatically by the documentation tool by pulling the contents of the README.md file located in the root of the package. Sometimes however, it is preferable to split the contents of the README out into smaller, easier to read portions.
+
+This can be accomplished by creating a `docs` directory in the package and adding `toc.json` file that contains references other markdown files also contained in the `docs` directory. The `toc.json` file should contain an array of pages to be added as sub-pages of the main README file. The formatting follows the [`manifest.json`](https://github.com/WordPress/gutenberg/blob/HEAD/docs/manifest.json) file that is generated automatically.
+
+In order for these pages to be nested under the main package name, be sure to set the `parent` property correctly. See the example below that adds child pages to the [`@wordpress/create-block` section](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/).
+
+```json
+[
+	{
+		"title": "@wordpress/create-block External Template",
+		"slug": "packages-create-block-external-template",
+		"markdown_source": "../packages/create-block/docs/external-template.md",
+		"parent": "packages-create-block"
+	}
+]
+```
+
 ### Using links
 
 It's likely at some point you'll want to link to other internal documentation pages. It's worth emphasizing all documents can be browsed in different contexts:
@@ -88,26 +107,26 @@ An example, the link to this page is: `/docs/contributors/documentation/README.m
 
 The code example in markdown should be wrapped in three tick marks \`\`\` and should additionally include a language specifier. See this [GitHub documentation around fenced code blocks](https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks).
 
-A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `ESNext` and `ES5` code samples. For example, [on this block tutorial page](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
+A unique feature to the Gutenberg documentation is the `codetabs` toggle, this allows two versions of code to be shown at once. This is used for showing both `JSX` and `Plain` code samples. For example, [on this block tutorial page](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
 
 Here is an example `codetabs` section:
 
 ````md
-    {% codetabs %}
-    {% ESNext %}
+    \{\% codetabs \%\}
+    \{\% JSX \%\}
     ```js
-    	// ESNext code here
+    // JSX code here
     ```
-    {% ES5 %}
+    \{\% Plain \%\}
     ```js
-    	// ES5 code here
+    // Plain code here
     ```
-    {% end %}
+    \{\% end \%\}
 ````
 
-The preferred format for code examples is ESNext, this should be the default view. The example placed first in source will be shown as the default.
+The preferred format for code examples is JSX, this should be the default view. The example placed first in source will be shown as the default.
 
-**Note:** it is not required to include ES5 code examples. The guidance is to include `ES5` code for beginner tutorials, but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem is in ESNext.
+**Note:** It is not required to include plain JavaScript code examples for every guide. The recommendation is to include plain code for beginner tutorials or short examples, but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem are in JSX that requires a build process.
 
 ### Callout notices
 

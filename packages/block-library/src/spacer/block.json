@@ -8,16 +8,22 @@
 	"textdomain": "default",
 	"attributes": {
 		"height": {
-			"type": "number",
-			"default": 100
+			"type": "string",
+			"default": "100px"
 		},
 		"width": {
-			"type": "number"
+			"type": "string"
 		}
 	},
 	"usesContext": [ "orientation" ],
 	"supports": {
-		"anchor": true
+		"anchor": true,
+		"spacing": {
+			"margin": [ "top", "bottom" ],
+			"__experimentalDefaultControls": {
+				"margin": true
+			}
+		}
 	},
 	"editorStyle": "wp-block-spacer-editor",
 	"style": "wp-block-spacer"

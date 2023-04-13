@@ -1,30 +1,35 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { useHistory } from '../routes';
 import CreateTemplatePartModal from '../create-template-part-modal';
+import {
+	useExistingTemplateParts,
+	getUniqueTemplatePartTitle,
+	getCleanTemplatePartSlug,
+} from '../../utils/template-part-create';
 
-export default function NewTemplatePart( { postType } ) {
+export default function NewTemplatePart( {
+	postType,
+	showIcon = true,
+	toggleProps,
+} ) {
 	const history = useHistory();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { getLastEntitySaveError } = useSelect( coreStore );
+	const existingTemplateParts = useExistingTemplateParts();
 
 	async function createTemplatePart( { title, area } ) {
 		if ( ! title ) {
@@ -35,32 +40,31 @@ export default function NewTemplatePart( { postType } ) {
 		}
 
 		try {
+			const uniqueTitle = getUniqueTemplatePartTitle(
+				title,
+				existingTemplateParts
+			);
+			const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
+
 			const templatePart = await saveEntityRecord(
 				'postType',
 				'wp_template_part',
 				{
-					slug: kebabCase( title ),
-					title,
+					slug: cleanSlug,
+					title: uniqueTitle,
 					content: '',
 					area,
-				}
+				},
+				{ throwOnError: true }
 			);
-
-			const lastEntitySaveError = getLastEntitySaveError(
-				'postType',
-				'wp_template_part',
-				templatePart.id
-			);
-			if ( lastEntitySaveError ) {
-				throw lastEntitySaveError;
-			}
 
 			setIsModalOpen( false );
 
 			// Navigate to the created template part editor.
 			history.push( {
 				postId: templatePart.id,
-				postType: templatePart.type,
+				postType: 'wp_template_part',
+				canvas: 'edit',
 			} );
 
 			// TODO: Add a success notice?
@@ -77,17 +81,20 @@ export default function NewTemplatePart( { postType } ) {
 			setIsModalOpen( false );
 		}
 	}
+	const { as: Toggle = Button, ...restToggleProps } = toggleProps ?? {};
 
 	return (
 		<>
-			<Button
-				variant="primary"
+			<Toggle
+				{ ...restToggleProps }
 				onClick={ () => {
 					setIsModalOpen( true );
 				} }
+				icon={ showIcon ? plus : null }
+				label={ postType.labels.add_new }
 			>
-				{ postType.labels.add_new }
-			</Button>
+				{ showIcon ? null : postType.labels.add_new }
+			</Toggle>
 			{ isModalOpen && (
 				<CreateTemplatePartModal
 					closeModal={ () => setIsModalOpen( false ) }

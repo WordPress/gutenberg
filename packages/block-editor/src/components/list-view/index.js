@@ -6,7 +6,8 @@ import {
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
+import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import {
 	useCallback,
 	useEffect,
@@ -23,78 +24,94 @@ import { __ } from '@wordpress/i18n';
 import ListViewBranch from './branch';
 import { ListViewContext } from './context';
 import ListViewDropIndicator from './drop-indicator';
+import useBlockSelection from './use-block-selection';
 import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
+import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
+import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
 
-const noop = () => {};
 const expanded = ( state, action ) => {
-	switch ( action.type ) {
-		case 'expand':
-			return { ...state, ...{ [ action.clientId ]: true } };
-		case 'collapse':
-			return { ...state, ...{ [ action.clientId ]: false } };
-		default:
-			return state;
+	if ( Array.isArray( action.clientIds ) ) {
+		return {
+			...state,
+			...action.clientIds.reduce(
+				( newState, id ) => ( {
+					...newState,
+					[ id ]: action.type === 'expand',
+				} ),
+				{}
+			),
+		};
 	}
+	return state;
 };
 
+export const BLOCK_LIST_ITEM_HEIGHT = 36;
+
+/** @typedef {import('react').ComponentType} ComponentType */
+/** @typedef {import('react').Ref<HTMLElement>} Ref */
+
 /**
- * Wrap `ListViewRows` with `TreeGrid`. ListViewRows is a
- * recursive component (it renders itself), so this ensures TreeGrid is only
- * present at the very top of the navigation grid.
+ * Show a hierarchical list of blocks.
  *
- * @param {Object}   props                                          Components props.
- * @param {Array}    props.blocks                                   Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {Function} props.onSelect                                 Block selection callback.
- * @param {boolean}  props.showNestedBlocks                         Flag to enable displaying nested blocks.
- * @param {boolean}  props.showBlockMovers                          Flag to enable block movers
- * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
- * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
- * @param {boolean}  props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
- * @param {Object}   ref                                            Forwarded ref
+ * @param {Object}         props                   Components props.
+ * @param {string}         props.id                An HTML element id for the root element of ListView.
+ * @param {Array}          props.blocks            _deprecated_ Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {?boolean}       props.showBlockMovers   Flag to enable block movers. Defaults to `false`.
+ * @param {?boolean}       props.isExpanded        Flag to determine whether nested levels are expanded by default. Defaults to `false`.
+ * @param {?boolean}       props.showAppender      Flag to show or hide the block appender. Defaults to `false`.
+ * @param {?ComponentType} props.blockSettingsMenu Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
+ * @param {string}         props.rootClientId      The client id of the root block from which we determine the blocks to show in the list.
+ * @param {Ref}            ref                     Forwarded ref
  */
-function ListView(
+function ListViewComponent(
 	{
+		id,
 		blocks,
-		onSelect = noop,
-		__experimentalFeatures,
-		__experimentalPersistentListViewFeatures,
-		__experimentalHideContainerBlockActions,
-		showNestedBlocks,
-		showBlockMovers,
-		...props
+		showBlockMovers = false,
+		isExpanded = false,
+		showAppender = false,
+		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
+		rootClientId,
 	},
 	ref
 ) {
-	const {
-		clientIdsTree,
-		draggedClientIds,
-		selectedClientIds,
-	} = useListViewClientIds( blocks );
-	const { selectBlock } = useDispatch( blockEditorStore );
-	const { visibleBlockCount } = useSelect(
+	// This can be removed once we no longer need to support the blocks prop.
+	if ( blocks ) {
+		deprecated(
+			'`blocks` property in `wp.blockEditor.__experimentalListView`',
+			{
+				since: '6.3',
+				alternative: '`rootClientId` property',
+			}
+		);
+	}
+
+	const { clientIdsTree, draggedClientIds, selectedClientIds } =
+		useListViewClientIds( { blocks, rootClientId } );
+
+	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
 		( select ) => {
-			const { getGlobalBlockCount, getClientIdsOfDescendants } = select(
-				blockEditorStore
-			);
+			const {
+				getGlobalBlockCount,
+				getClientIdsOfDescendants,
+				__unstableGetEditorMode,
+			} = select( blockEditorStore );
 			const draggedBlockCount =
 				draggedClientIds?.length > 0
 					? getClientIdsOfDescendants( draggedClientIds ).length + 1
 					: 0;
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
+				shouldShowInnerBlocks: __unstableGetEditorMode() !== 'zoom-out',
 			};
 		},
 		[ draggedClientIds ]
 	);
-	const selectEditorBlock = useCallback(
-		( clientId ) => {
-			selectBlock( clientId );
-			onSelect( clientId );
-		},
-		[ selectBlock, onSelect ]
-	);
+
+	const { updateBlockSelection } = useBlockSelection();
+
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone();
@@ -102,6 +119,17 @@ function ListView(
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
 
 	const isMounted = useRef( false );
+	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
+		firstSelectedBlockClientId: selectedClientIds[ 0 ],
+		setExpandedState,
+	} );
+	const selectEditorBlock = useCallback(
+		( event, clientId ) => {
+			updateBlockSelection( event, clientId );
+			setSelectedTreeId( clientId );
+		},
+		[ setSelectedTreeId, updateBlockSelection ]
+	);
 	useEffect( () => {
 		isMounted.current = true;
 	}, [] );
@@ -111,10 +139,10 @@ function ListView(
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	const [ fixedListWindow ] = useFixedWindowList(
 		elementRef,
-		36,
+		BLOCK_LIST_ITEM_HEIGHT,
 		visibleBlockCount,
 		{
-			useWindowing: __experimentalPersistentListViewFeatures,
+			useWindowing: true,
 			windowOverscan: 40,
 		}
 	);
@@ -124,7 +152,7 @@ function ListView(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientId } );
+			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
 		},
 		[ setExpandedState ]
 	);
@@ -133,7 +161,7 @@ function ListView(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientId } );
+			setExpandedState( { type: 'collapse', clientIds: [ clientId ] } );
 		},
 		[ setExpandedState ]
 	);
@@ -149,29 +177,42 @@ function ListView(
 		},
 		[ collapse ]
 	);
+	const focusRow = useCallback(
+		( event, startRow, endRow ) => {
+			if ( event.shiftKey ) {
+				updateBlockSelection(
+					event,
+					startRow?.dataset?.block,
+					endRow?.dataset?.block
+				);
+			}
+		},
+		[ updateBlockSelection ]
+	);
 
 	const contextValue = useMemo(
 		() => ( {
-			__experimentalFeatures,
-			__experimentalPersistentListViewFeatures,
-			__experimentalHideContainerBlockActions,
 			isTreeGridMounted: isMounted.current,
 			draggedClientIds,
 			expandedState,
 			expand,
 			collapse,
+			BlockSettingsMenu,
 		} ),
 		[
-			__experimentalFeatures,
-			__experimentalPersistentListViewFeatures,
-			__experimentalHideContainerBlockActions,
 			isMounted.current,
 			draggedClientIds,
 			expandedState,
 			expand,
 			collapse,
+			BlockSettingsMenu,
 		]
 	);
+
+	// If there are no blocks to show, do not render the list view.
+	if ( ! clientIdsTree.length ) {
+		return null;
+	}
 
 	return (
 		<AsyncModeProvider value={ true }>
@@ -180,25 +221,42 @@ function ListView(
 				blockDropTarget={ blockDropTarget }
 			/>
 			<TreeGrid
+				id={ id }
 				className="block-editor-list-view-tree"
 				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
+				onFocusRow={ focusRow }
+				applicationAriaLabel={ __( 'Block navigation structure' ) }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
 						blocks={ clientIdsTree }
+						parentId={ rootClientId }
 						selectBlock={ selectEditorBlock }
-						showNestedBlocks={ showNestedBlocks }
 						showBlockMovers={ showBlockMovers }
 						fixedListWindow={ fixedListWindow }
 						selectedClientIds={ selectedClientIds }
-						{ ...props }
+						isExpanded={ isExpanded }
+						shouldShowInnerBlocks={ shouldShowInnerBlocks }
+						showAppender={ showAppender }
 					/>
 				</ListViewContext.Provider>
 			</TreeGrid>
 		</AsyncModeProvider>
 	);
 }
-export default forwardRef( ListView );
+export const PrivateListView = forwardRef( ListViewComponent );
+
+export default forwardRef( ( props, ref ) => {
+	return (
+		<PrivateListView
+			ref={ ref }
+			{ ...props }
+			showAppender={ false }
+			blockSettingsMenu={ BlockSettingsDropdown }
+			rootClientId={ null }
+		/>
+	);
+} );

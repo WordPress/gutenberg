@@ -3,7 +3,7 @@
  */
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-import { slice, toHTMLString } from '@wordpress/rich-text';
+import { insert, toHTMLString } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -12,6 +12,35 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { preventEventDiscovery } from './prevent-event-discovery';
+import {
+	retrieveSelectedAttribute,
+	START_OF_SELECTED_AREA,
+} from '../../utils/selection';
+
+function findSelection( blocks ) {
+	let i = blocks.length;
+
+	while ( i-- ) {
+		const attributeKey = retrieveSelectedAttribute(
+			blocks[ i ].attributes
+		);
+
+		if ( attributeKey ) {
+			blocks[ i ].attributes[ attributeKey ] = blocks[ i ].attributes[
+				attributeKey
+			].replace( START_OF_SELECTED_AREA, '' );
+			return [ blocks[ i ].clientId, attributeKey, 0, 0 ];
+		}
+
+		const nestedSelection = findSelection( blocks[ i ].innerBlocks );
+
+		if ( nestedSelection ) {
+			return nestedSelection;
+		}
+	}
+
+	return [];
+}
 
 export function useInputRules( props ) {
 	const {
@@ -22,12 +51,15 @@ export function useInputRules( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function inputRule() {
-			const { value, onReplace } = propsRef.current;
+			const { getValue, onReplace, selectionChange } = propsRef.current;
 
 			if ( ! onReplace ) {
 				return;
 			}
 
+			// We must use getValue() here because value may be update
+			// asynchronously.
+			const value = getValue();
 			const { start, text } = value;
 			const characterBefore = text.slice( start - 1, start );
 
@@ -52,18 +84,21 @@ export function useInputRules( props ) {
 			}
 
 			const content = toHTMLString( {
-				value: slice( value, start, text.length ),
+				value: insert( value, START_OF_SELECTED_AREA, 0, start ),
 			} );
 			const block = transformation.transform( content );
 
+			selectionChange( ...findSelection( [ block ] ) );
 			onReplace( [ block ] );
 			__unstableMarkAutomaticChange();
+
+			return true;
 		}
 
 		function onInput( event ) {
 			const { inputType, type } = event;
 			const {
-				value,
+				getValue,
 				onChange,
 				__unstableAllowPrefixTransformations,
 				formatTypes,
@@ -75,9 +110,10 @@ export function useInputRules( props ) {
 			}
 
 			if ( __unstableAllowPrefixTransformations && inputRule ) {
-				inputRule();
+				if ( inputRule() ) return;
 			}
 
+			const value = getValue();
 			const transformed = formatTypes.reduce(
 				( accumlator, { __unstableInputRule } ) => {
 					if ( __unstableInputRule ) {

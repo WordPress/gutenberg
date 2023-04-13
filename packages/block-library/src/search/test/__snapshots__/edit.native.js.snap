@@ -11,12 +11,19 @@ exports[`Search Block renders block with button inside option 1`] = `
     accessibilityRole="none"
     accessible={true}
   >
-    <View>
+    <View
+      style={
+        [
+          undefined,
+          undefined,
+        ]
+      }
+    >
       <RCTAztecView
         accessible={true}
-        activeFormats={Array []}
+        activeFormats={[]}
         blockType={
-          Object {
+          {
             "tag": "p",
           }
         }
@@ -46,27 +53,28 @@ exports[`Search Block renders block with button inside option 1`] = `
         placeholder="Add label…"
         placeholderTextColor="gray"
         style={
-          Object {
+          {
             "backgroundColor": undefined,
             "maxWidth": undefined,
             "minHeight": 0,
           }
         }
         text={
-          Object {
+          {
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
-        triggerKeyCodes={Array []}
+        triggerKeyCodes={[]}
       />
     </View>
   </View>
   <View
     style={
-      Array [
+      [
         undefined,
         undefined,
         false,
@@ -79,7 +87,6 @@ exports[`Search Block renders block with button inside option 1`] = `
       accessible={true}
     >
       <TextInput
-        allowFontScaling={true}
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
@@ -90,11 +97,10 @@ exports[`Search Block renders block with button inside option 1`] = `
         onChange={[Function]}
         onFocus={[Function]}
         placeholder="Optional placeholder…"
-        rejectResponderTermination={true}
         scrollEnabled={false}
         style={
-          Array [
-            Array [
+          [
+            [
               false,
               undefined,
               undefined,
@@ -102,12 +108,11 @@ exports[`Search Block renders block with button inside option 1`] = `
             undefined,
           ]
         }
-        underlineColorAndroid="transparent"
       />
     </View>
     <View
       style={
-        Array [
+        [
           undefined,
           false,
           undefined,
@@ -121,12 +126,19 @@ exports[`Search Block renders block with button inside option 1`] = `
         accessible={true}
         onLayout={[Function]}
       >
-        <View>
+        <View
+          style={
+            [
+              undefined,
+              undefined,
+            ]
+          }
+        >
           <RCTAztecView
             accessible={true}
-            activeFormats={Array []}
+            activeFormats={[]}
             blockType={
-              Object {
+              {
                 "tag": "p",
               }
             }
@@ -157,22 +169,23 @@ exports[`Search Block renders block with button inside option 1`] = `
             placeholder=""
             placeholderTextColor="gray"
             style={
-              Object {
+              {
                 "backgroundColor": undefined,
                 "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
             text={
-              Object {
+              {
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
+                "tag": "p",
                 "text": "<p>Search Button</p>",
               }
             }
             textAlign="center"
-            triggerKeyCodes={Array []}
+            triggerKeyCodes={[]}
           />
         </View>
       </View>
@@ -192,12 +205,19 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
     accessibilityRole="none"
     accessible={true}
   >
-    <View>
+    <View
+      style={
+        [
+          undefined,
+          undefined,
+        ]
+      }
+    >
       <RCTAztecView
         accessible={true}
-        activeFormats={Array []}
+        activeFormats={[]}
         blockType={
-          Object {
+          {
             "tag": "p",
           }
         }
@@ -227,27 +247,28 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         placeholder="Add label…"
         placeholderTextColor="gray"
         style={
-          Object {
+          {
             "backgroundColor": undefined,
             "maxWidth": undefined,
             "minHeight": 0,
           }
         }
         text={
-          Object {
+          {
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
-        triggerKeyCodes={Array []}
+        triggerKeyCodes={[]}
       />
     </View>
   </View>
   <View
     style={
-      Array [
+      [
         undefined,
         false,
         false,
@@ -260,7 +281,6 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
       accessible={true}
     >
       <TextInput
-        allowFontScaling={true}
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
@@ -271,11 +291,10 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         onChange={[Function]}
         onFocus={[Function]}
         placeholder="Optional placeholder…"
-        rejectResponderTermination={true}
         scrollEnabled={false}
         style={
-          Array [
-            Array [
+          [
+            [
               undefined,
               undefined,
               undefined,
@@ -283,12 +302,11 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
             undefined,
           ]
         }
-        underlineColorAndroid="transparent"
       />
     </View>
     <View
       style={
-        Array [
+        [
           undefined,
           false,
           undefined,
@@ -296,7 +314,17 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         ]
       }
     >
-      Svg
+      <Svg
+        fill="gray"
+        height={24}
+        onLayout={[Function]}
+        style={{}}
+        viewBox="0 0 24 24"
+        width={24}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        Path
+      </Svg>
     </View>
   </View>
 </View>
@@ -310,7 +338,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
 >
   <View
     style={
-      Array [
+      [
         undefined,
         false,
         false,
@@ -323,7 +351,6 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
       accessible={true}
     >
       <TextInput
-        allowFontScaling={true}
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
@@ -334,11 +361,10 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         onChange={[Function]}
         onFocus={[Function]}
         placeholder="Optional placeholder…"
-        rejectResponderTermination={true}
         scrollEnabled={false}
         style={
-          Array [
-            Array [
+          [
+            [
               undefined,
               undefined,
               undefined,
@@ -346,12 +372,11 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
             undefined,
           ]
         }
-        underlineColorAndroid="transparent"
       />
     </View>
     <View
       style={
-        Array [
+        [
           undefined,
           false,
           undefined,
@@ -365,12 +390,19 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         accessible={true}
         onLayout={[Function]}
       >
-        <View>
+        <View
+          style={
+            [
+              undefined,
+              undefined,
+            ]
+          }
+        >
           <RCTAztecView
             accessible={true}
-            activeFormats={Array []}
+            activeFormats={[]}
             blockType={
-              Object {
+              {
                 "tag": "p",
               }
             }
@@ -401,22 +433,23 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
             placeholder=""
             placeholderTextColor="gray"
             style={
-              Object {
+              {
                 "backgroundColor": undefined,
                 "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
             text={
-              Object {
+              {
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
+                "tag": "p",
                 "text": "<p>Search Button</p>",
               }
             }
             textAlign="center"
-            triggerKeyCodes={Array []}
+            triggerKeyCodes={[]}
           />
         </View>
       </View>
@@ -436,12 +469,19 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
     accessibilityRole="none"
     accessible={true}
   >
-    <View>
+    <View
+      style={
+        [
+          undefined,
+          undefined,
+        ]
+      }
+    >
       <RCTAztecView
         accessible={true}
-        activeFormats={Array []}
+        activeFormats={[]}
         blockType={
-          Object {
+          {
             "tag": "p",
           }
         }
@@ -471,27 +511,28 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         placeholder="Add label…"
         placeholderTextColor="gray"
         style={
-          Object {
+          {
             "backgroundColor": undefined,
             "maxWidth": undefined,
             "minHeight": 0,
           }
         }
         text={
-          Object {
+          {
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
-        triggerKeyCodes={Array []}
+        triggerKeyCodes={[]}
       />
     </View>
   </View>
   <View
     style={
-      Array [
+      [
         undefined,
         false,
         false,
@@ -504,7 +545,6 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
       accessible={true}
     >
       <TextInput
-        allowFontScaling={true}
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
@@ -515,11 +555,10 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         onChange={[Function]}
         onFocus={[Function]}
         placeholder="Optional placeholder…"
-        rejectResponderTermination={true}
         scrollEnabled={false}
         style={
-          Array [
-            Array [
+          [
+            [
               undefined,
               undefined,
               undefined,
@@ -527,12 +566,11 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             undefined,
           ]
         }
-        underlineColorAndroid="transparent"
       />
     </View>
     <View
       style={
-        Array [
+        [
           undefined,
           false,
           undefined,
@@ -546,12 +584,19 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         accessible={true}
         onLayout={[Function]}
       >
-        <View>
+        <View
+          style={
+            [
+              undefined,
+              undefined,
+            ]
+          }
+        >
           <RCTAztecView
             accessible={true}
-            activeFormats={Array []}
+            activeFormats={[]}
             blockType={
-              Object {
+              {
                 "tag": "p",
               }
             }
@@ -582,22 +627,23 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             placeholder=""
             placeholderTextColor="gray"
             style={
-              Object {
+              {
                 "backgroundColor": undefined,
                 "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
             text={
-              Object {
+              {
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
+                "tag": "p",
                 "text": "<p>Search Button</p>",
               }
             }
             textAlign="center"
-            triggerKeyCodes={Array []}
+            triggerKeyCodes={[]}
           />
         </View>
       </View>
@@ -617,12 +663,19 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
     accessibilityRole="none"
     accessible={true}
   >
-    <View>
+    <View
+      style={
+        [
+          undefined,
+          undefined,
+        ]
+      }
+    >
       <RCTAztecView
         accessible={true}
-        activeFormats={Array []}
+        activeFormats={[]}
         blockType={
-          Object {
+          {
             "tag": "p",
           }
         }
@@ -652,21 +705,22 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
         placeholder="Add label…"
         placeholderTextColor="gray"
         style={
-          Object {
+          {
             "backgroundColor": undefined,
             "maxWidth": undefined,
             "minHeight": 0,
           }
         }
         text={
-          Object {
+          {
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
-        triggerKeyCodes={Array []}
+        triggerKeyCodes={[]}
       />
     </View>
   </View>
@@ -676,7 +730,6 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
     accessible={true}
   >
     <TextInput
-      allowFontScaling={true}
       className="wp-block-search__input"
       ellipsizeMode="tail"
       fontFamily="serif"
@@ -687,11 +740,10 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
       onChange={[Function]}
       onFocus={[Function]}
       placeholder="Optional placeholder…"
-      rejectResponderTermination={true}
       scrollEnabled={false}
       style={
-        Array [
-          Array [
+        [
+          [
             undefined,
             undefined,
             undefined,
@@ -699,7 +751,6 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
           undefined,
         ]
       }
-      underlineColorAndroid="transparent"
     />
   </View>
 </View>

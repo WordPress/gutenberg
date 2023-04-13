@@ -8,8 +8,13 @@
 	"keywords": [ "menu", "navigation" ],
 	"textdomain": "default",
 	"attributes": {
-		"__unstableMaxPages": {
-			"type": "number"
+		"parentPageID": {
+			"type": "integer",
+			"default": 0
+		},
+		"isNested": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [
@@ -28,8 +33,22 @@
 		"openSubmenusOnClick"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
-		"html": false
+		"html": false,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
 	},
 	"editorStyle": "wp-block-page-list-editor",
 	"style": "wp-block-page-list"

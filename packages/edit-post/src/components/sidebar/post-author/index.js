@@ -10,7 +10,7 @@ import {
 export function PostAuthor() {
 	return (
 		<PostAuthorCheck>
-			<PanelRow>
+			<PanelRow className="edit-post-post-author">
 				<PostAuthorForm />
 			</PanelRow>
 		</PostAuthorCheck>

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { RefObject } from 'react';
 
 /**
@@ -16,7 +15,7 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
  *
  * @see https://codesandbox.io/s/uselatestref-mlj3i?file=/src/App.tsx
  *
- * @param  value The value to reference
+ * @param value The value to reference
  * @return The prop reference.
  */
 export function useLatestRef< T >( value: T ): RefObject< T > {

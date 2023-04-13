@@ -18,15 +18,12 @@ export default function useIsFloatingKeyboard() {
 			setFloating( event.endCoordinates.width !== windowWidth );
 		};
 
-		Keyboard.addListener(
+		const keyboardChangeSubscription = Keyboard.addListener(
 			'keyboardWillChangeFrame',
 			onKeyboardWillChangeFrame
 		);
 		return () => {
-			Keyboard.removeListener(
-				'keyboardWillChangeFrame',
-				onKeyboardWillChangeFrame
-			);
+			keyboardChangeSubscription.remove();
 		};
 	}, [ windowWidth ] );
 

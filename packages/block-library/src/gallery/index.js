@@ -6,6 +6,7 @@ import { gallery as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit-wrapper';
 import metadata from './block.json';
@@ -26,15 +27,13 @@ export const settings = {
 			{
 				name: 'core/image',
 				attributes: {
-					url:
-						'https://s.w.org/images/core/5.3/Glacial_lakes%2C_Bhutan.jpg',
+					url: 'https://s.w.org/images/core/5.3/Glacial_lakes%2C_Bhutan.jpg',
 				},
 			},
 			{
 				name: 'core/image',
 				attributes: {
-					url:
-						'https://s.w.org/images/core/5.3/Sediment_off_the_Yucatan_Peninsula.jpg',
+					url: 'https://s.w.org/images/core/5.3/Sediment_off_the_Yucatan_Peninsula.jpg',
 				},
 			},
 		],
@@ -44,3 +43,5 @@ export const settings = {
 	save,
 	deprecated,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

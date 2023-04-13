@@ -16,9 +16,10 @@ import { STORE_NAME } from '../store/constants';
  */
 const addAnnotationClassName = ( OriginalComponent ) => {
 	return withSelect( ( select, { clientId, className } ) => {
-		const annotations = select(
-			STORE_NAME
-		).__experimentalGetAnnotationsForBlock( clientId );
+		const annotations =
+			select( STORE_NAME ).__experimentalGetAnnotationsForBlock(
+				clientId
+			);
 
 		return {
 			className: annotations

@@ -15,13 +15,13 @@ describe( 'invalid blocks', () => {
 	} );
 
 	it( 'Should show an invalid block message with clickable options', async () => {
-		// Create an empty paragraph with the focus in the block
+		// Create an empty paragraph with the focus in the block.
 		await clickBlockAppender();
 		await page.keyboard.type( 'hello' );
 
 		await clickBlockToolbarButton( 'Options' );
 
-		// Change to HTML mode and close the options
+		// Change to HTML mode and close the options.
 		await clickMenuItem( 'Edit as HTML' );
 
 		// Focus on the textarea and enter an invalid paragraph
@@ -33,14 +33,14 @@ describe( 'invalid blocks', () => {
 		// Takes the focus away from the block so the invalid warning is triggered
 		await page.click( '.editor-post-save-draft' );
 
-		// Click on the 'three-dots' menu toggle
+		// Click on the 'three-dots' menu toggle.
 		await page.click(
 			'.block-editor-warning__actions button[aria-label="More options"]'
 		);
 
 		await clickMenuItem( 'Resolve' );
 
-		// Check we get the resolve modal with the appropriate contents
+		// Check we get the resolve modal with the appropriate contents.
 		const htmlBlockContent = await page.$eval(
 			'.block-editor-block-compare__html',
 			( node ) => node.textContent

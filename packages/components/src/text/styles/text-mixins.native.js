@@ -3,7 +3,7 @@
  */
 import { fontFamily } from './font-family';
 import css from './emotion-css';
-import { G2 } from '../../utils/colors-values';
+import { COLORS } from '../../utils/colors-values';
 
 const fontWeightNormal = `font-weight: 400;`;
 const fontWeightMedium = `font-weight: 500;`;
@@ -81,7 +81,7 @@ const sectionHeading = `
 	font-size: 11px;
 	line-height: 1.4;
 	text-transform: uppercase;
-	color: ${ G2.gray[ 700 ] }
+	color: ${ COLORS.gray[ 700 ] }
 `;
 
 /**

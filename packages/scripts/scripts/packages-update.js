@@ -6,6 +6,11 @@ const fs = require( 'fs' );
 const spawn = require( 'cross-spawn' );
 
 /**
+ * Internal dependencies
+ */
+const { getArgFromCLI } = require( '../utils' );
+
+/**
  * Constants
  */
 const WORDPRESS_PACKAGES_PREFIX = '@wordpress/';
@@ -44,8 +49,10 @@ function getPackageVersionDiff( initialPackageJSON, finalPackageJSON ) {
 }
 
 function updatePackagesToLatestVersion( packages ) {
+	const distTag = getArgFromCLI( '--dist-tag' ) || 'latest';
+
 	const packagesWithLatest = packages.map(
-		( packageName ) => `${ packageName }@latest`
+		( packageName ) => `${ packageName }@${ distTag }`
 	);
 	return spawn.sync( 'npm', [ 'install', ...packagesWithLatest, '--save' ], {
 		stdio: 'inherit',

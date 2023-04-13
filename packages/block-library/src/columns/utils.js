@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { sumBy, merge, mapValues } from 'lodash';
-
-/**
  * Returns a column width attribute value rounded to standard precision.
  * Returns `undefined` if the value is not a valid finite number.
  *
@@ -44,8 +39,10 @@ export function getTotalColumnsWidth(
 	blocks,
 	totalBlockCount = blocks.length
 ) {
-	return sumBy( blocks, ( block ) =>
-		getEffectiveColumnWidth( block, totalBlockCount )
+	return blocks.reduce(
+		( sum, block ) =>
+			sum + getEffectiveColumnWidth( block, totalBlockCount ),
+		0
 	);
 }
 
@@ -84,10 +81,14 @@ export function getRedistributedColumnWidths(
 ) {
 	const totalWidth = getTotalColumnsWidth( blocks, totalBlockCount );
 
-	return mapValues( getColumnWidths( blocks, totalBlockCount ), ( width ) => {
-		const newWidth = ( availableWidth * width ) / totalWidth;
-		return toWidthPrecision( newWidth );
-	} );
+	return Object.fromEntries(
+		Object.entries( getColumnWidths( blocks, totalBlockCount ) ).map(
+			( [ clientId, width ] ) => {
+				const newWidth = ( availableWidth * width ) / totalWidth;
+				return [ clientId, toWidthPrecision( newWidth ) ];
+			}
+		)
+	);
 }
 
 /**
@@ -119,13 +120,13 @@ export function hasExplicitPercentColumnWidths( blocks ) {
  * @return {WPBlock[]} blocks Mapped block objects.
  */
 export function getMappedColumnWidths( blocks, widths ) {
-	return blocks.map( ( block ) =>
-		merge( {}, block, {
-			attributes: {
-				width: `${ widths[ block.clientId ] }%`,
-			},
-		} )
-	);
+	return blocks.map( ( block ) => ( {
+		...block,
+		attributes: {
+			...block.attributes,
+			width: `${ widths[ block.clientId ] }%`,
+		},
+	} ) );
 }
 
 /**

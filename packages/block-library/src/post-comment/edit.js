@@ -8,7 +8,7 @@ import { blockDefault } from '@wordpress/icons';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 const ALLOWED_BLOCKS = [
-	'core/comment-author-avatar',
+	'core/avatar',
 	'core/comment-author-name',
 	'core/comment-content',
 	'core/comment-date',
@@ -16,7 +16,7 @@ const ALLOWED_BLOCKS = [
 	'core/comment-reply-link',
 ];
 const TEMPLATE = [
-	[ 'core/comment-author-avatar' ],
+	[ 'core/avatar' ],
 	[ 'core/comment-author-name' ],
 	[ 'core/comment-date' ],
 	[ 'core/comment-content' ],
@@ -43,6 +43,7 @@ export default function Edit( { attributes: { commentId }, setAttributes } ) {
 					) }
 				>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ commentId }
 						onChange={ ( val ) =>
 							setCommentIdInput( parseInt( val ) )

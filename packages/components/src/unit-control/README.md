@@ -4,7 +4,7 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-UnitControl allows the user to set a value as well as a unit (e.g. `px`).
+`UnitControl` allows the user to set a numeric quantity as well as a unit (e.g. `px`).
 
 ## Usage
 
@@ -61,19 +61,29 @@ The position of the label (`top`, `side`, `bottom`, or `edge`).
 
 -   Required: No
 
+### `onBlur`: `FocusEventHandler< HTMLInputElement | HTMLSelectElement >`
+
+Callback invoked when either the quantity or unit inputs fire the `blur` event.
+
+-   Required: No
+
+### `onFocus`: `FocusEventHandler< HTMLInputElement | HTMLSelectElement >`
+
+Callback invoked when either the quantity or unit inputs fire the `focus` event.
+
+-   Required: No
+
 ### `onChange`: `UnitControlOnChangeCallback`
 
 Callback when the `value` changes.
 
 -   Required: No
--   Default: `noop`
 
 ### `onUnitChange`: `UnitControlOnChangeCallback`
 
 Callback when the `unit` changes.
 
 -   Required: No
--   Default: `noop`
 
 ### `size`: `string`
 
@@ -96,7 +106,7 @@ Example:
 
 -   Required: No
 
-### `units`: `WPUnitControlUnitList`
+### `units`: `WPUnitControlUnit[]`
 
 Collection of available units.
 
@@ -117,7 +127,9 @@ const Example = () => {
 		{ value: 'em', label: 'em', default: 0 },
 	];
 
-	return <UnitControl onChange={ setValue } value={ value } units={units} />;
+	return (
+		<UnitControl onChange={ setValue } value={ value } units={ units } />
+	);
 };
 ```
 

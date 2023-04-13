@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
@@ -9,12 +8,10 @@
 			"overlayMenu": "never",
 			"layout": {
 				"type": "flex",
-				"setCascadingProperties": "true",
 				"justifyContent": "center",
 				"orientation": "vertical"
 			}
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

@@ -10,6 +10,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
+import deprecated from '@wordpress/deprecated';
 
 const ColorSelectorSVGIcon = () => (
 	<SVG xmlns="https://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -48,44 +49,51 @@ const ColorSelectorIcon = ( { style, className } ) => {
  *
  * @return {*} React toggle button component.
  */
-const renderToggleComponent = ( { TextColor, BackgroundColor } ) => ( {
-	onToggle,
-	isOpen,
-} ) => {
-	const openOnArrowDown = ( event ) => {
-		if ( ! isOpen && event.keyCode === DOWN ) {
-			event.preventDefault();
-			onToggle();
-		}
+const renderToggleComponent =
+	( { TextColor, BackgroundColor } ) =>
+	( { onToggle, isOpen } ) => {
+		const openOnArrowDown = ( event ) => {
+			if ( ! isOpen && event.keyCode === DOWN ) {
+				event.preventDefault();
+				onToggle();
+			}
+		};
+
+		return (
+			<ToolbarGroup>
+				<ToolbarButton
+					className="components-toolbar__control block-library-colors-selector__toggle"
+					label={ __( 'Open Colors Selector' ) }
+					onClick={ onToggle }
+					onKeyDown={ openOnArrowDown }
+					icon={
+						<BackgroundColor>
+							<TextColor>
+								<ColorSelectorIcon />
+							</TextColor>
+						</BackgroundColor>
+					}
+				/>
+			</ToolbarGroup>
+		);
 	};
 
+const BlockColorsStyleSelector = ( { children, ...other } ) => {
+	deprecated( `wp.blockEditor.BlockColorsStyleSelector`, {
+		alternative: 'block supports API',
+		since: '6.1',
+		version: '6.3',
+	} );
+
 	return (
-		<ToolbarGroup>
-			<ToolbarButton
-				className="components-toolbar__control block-library-colors-selector__toggle"
-				label={ __( 'Open Colors Selector' ) }
-				onClick={ onToggle }
-				onKeyDown={ openOnArrowDown }
-				icon={
-					<BackgroundColor>
-						<TextColor>
-							<ColorSelectorIcon />
-						</TextColor>
-					</BackgroundColor>
-				}
-			/>
-		</ToolbarGroup>
+		<Dropdown
+			popoverProps={ { placement: 'bottom-start' } }
+			className="block-library-colors-selector"
+			contentClassName="block-library-colors-selector__popover"
+			renderToggle={ renderToggleComponent( other ) }
+			renderContent={ () => children }
+		/>
 	);
 };
-
-const BlockColorsStyleSelector = ( { children, ...other } ) => (
-	<Dropdown
-		position="bottom right"
-		className="block-library-colors-selector"
-		contentClassName="block-library-colors-selector__popover"
-		renderToggle={ renderToggleComponent( other ) }
-		renderContent={ () => children }
-	/>
-);
 
 export default BlockColorsStyleSelector;

@@ -1,13 +1,13 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/archives",
 		"isValid": true,
 		"attributes": {
 			"displayAsDropdown": false,
-			"showPostCounts": false
+			"showLabel": true,
+			"showPostCounts": false,
+			"type": "monthly"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

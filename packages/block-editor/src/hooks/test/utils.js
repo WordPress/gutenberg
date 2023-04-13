@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
@@ -12,6 +7,8 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import '../anchor';
+
+const noop = () => {};
 
 describe( 'anchor', () => {
 	const blockSettings = {
@@ -97,7 +94,7 @@ describe( 'anchor', () => {
 			expect( extraProps.id ).toBe( 'foo' );
 		} );
 
-		it( 'should remove an anchor attribute ID when feild is cleared', () => {
+		it( 'should remove an anchor attribute ID when field is cleared', () => {
 			const attributes = { anchor: '' };
 			const extraProps = getSaveContentExtraProps(
 				{},

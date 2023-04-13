@@ -38,13 +38,13 @@ $toggle-border-width: 1px;
 
 	// Checked state.
 	&.is-checked .components-form-toggle__track {
-		background-color: var(--wp-admin-theme-color);
-		border: $toggle-border-width solid var(--wp-admin-theme-color);
+		background-color: $components-color-accent;
+		border: $toggle-border-width solid $components-color-accent;
 		border: #{ $toggle-height * 0.5 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
 	}
 
 	.components-form-toggle__input:focus + .components-form-toggle__track {
-		box-shadow: 0 0 0 2px $white, 0 0 0 (2px + $border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 2px $white, 0 0 0 (2px + $border-width-focus) $components-color-accent;
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;

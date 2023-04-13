@@ -1,13 +1,17 @@
 const coreDataStore = {
 	name: 'core/data',
 	instantiate( registry ) {
-		const getCoreDataSelector = ( selectorName ) => ( key, ...args ) => {
-			return registry.select( key )[ selectorName ]( ...args );
-		};
+		const getCoreDataSelector =
+			( selectorName ) =>
+			( key, ...args ) => {
+				return registry.select( key )[ selectorName ]( ...args );
+			};
 
-		const getCoreDataAction = ( actionName ) => ( key, ...args ) => {
-			return registry.dispatch( key )[ actionName ]( ...args );
-		};
+		const getCoreDataAction =
+			( actionName ) =>
+			( key, ...args ) => {
+				return registry.dispatch( key )[ actionName ]( ...args );
+			};
 
 		return {
 			getSelectors() {

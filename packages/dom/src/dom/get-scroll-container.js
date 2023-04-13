@@ -4,7 +4,8 @@
 import getComputedStyle from './get-computed-style';
 
 /**
- * Given a DOM node, finds the closest scrollable container node.
+ * Given a DOM node, finds the closest scrollable container node or the node
+ * itself, if scrollable.
  *
  * @param {Element | null} node Node from which to start.
  *
@@ -19,11 +20,16 @@ export default function getScrollContainer( node ) {
 	if ( node.scrollHeight > node.clientHeight ) {
 		// ...except when overflow is defined to be hidden or visible
 		const { overflowY } = getComputedStyle( node );
+
 		if ( /(auto|scroll)/.test( overflowY ) ) {
 			return node;
 		}
 	}
 
-	// Continue traversing
+	if ( node.ownerDocument === node.parentNode ) {
+		return node;
+	}
+
+	// Continue traversing.
 	return getScrollContainer( /** @type {Element} */ ( node.parentNode ) );
 }

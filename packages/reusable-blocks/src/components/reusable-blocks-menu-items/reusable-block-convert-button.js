@@ -12,10 +12,10 @@ import {
 	Modal,
 	Button,
 	TextControl,
-	Flex,
-	FlexItem,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { reusableBlock } from '@wordpress/icons';
+import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -43,9 +43,8 @@ export default function ReusableBlockConvertButton( {
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getBlocksByClientId, canInsertBlockType } = select(
-				blockEditorStore
-			);
+			const { getBlocksByClientId, canInsertBlockType } =
+				select( blockEditorStore );
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
@@ -81,13 +80,11 @@ export default function ReusableBlockConvertButton( {
 		[ clientIds ]
 	);
 
-	const {
-		__experimentalConvertBlocksToReusable: convertBlocksToReusable,
-	} = useDispatch( store );
+	const { __experimentalConvertBlocksToReusable: convertBlocksToReusable } =
+		useDispatch( store );
 
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 	const onConvert = useCallback(
 		async function ( reusableBlockTitle ) {
 			try {
@@ -113,17 +110,16 @@ export default function ReusableBlockConvertButton( {
 			{ ( { onClose } ) => (
 				<>
 					<MenuItem
-						icon={ reusableBlock }
+						icon={ symbol }
 						onClick={ () => {
 							setIsModalOpen( true );
 						} }
 					>
-						{ __( 'Add to Reusable blocks' ) }
+						{ __( 'Create Reusable block' ) }
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal
 							title={ __( 'Create Reusable block' ) }
-							closeLabel={ __( 'Close' ) }
 							onRequestClose={ () => {
 								setIsModalOpen( false );
 								setTitle( '' );
@@ -139,18 +135,16 @@ export default function ReusableBlockConvertButton( {
 									onClose();
 								} }
 							>
-								<TextControl
-									label={ __( 'Name' ) }
-									value={ title }
-									onChange={ setTitle }
-								/>
-								<Flex
-									className="reusable-blocks-menu-items__convert-modal-actions"
-									justify="flex-end"
-								>
-									<FlexItem>
+								<VStack spacing="5">
+									<TextControl
+										__nextHasNoMarginBottom
+										label={ __( 'Name' ) }
+										value={ title }
+										onChange={ setTitle }
+									/>
+									<HStack justify="right">
 										<Button
-											variant="secondary"
+											variant="tertiary"
 											onClick={ () => {
 												setIsModalOpen( false );
 												setTitle( '' );
@@ -158,13 +152,12 @@ export default function ReusableBlockConvertButton( {
 										>
 											{ __( 'Cancel' ) }
 										</Button>
-									</FlexItem>
-									<FlexItem>
+
 										<Button variant="primary" type="submit">
 											{ __( 'Save' ) }
 										</Button>
-									</FlexItem>
-								</Flex>
+									</HStack>
+								</VStack>
 							</form>
 						</Modal>
 					) }

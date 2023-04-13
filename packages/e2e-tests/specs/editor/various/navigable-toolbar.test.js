@@ -20,9 +20,8 @@ describe.each( [
 
 		await page.evaluate( ( _isUnifiedToolbar ) => {
 			const { select, dispatch } = wp.data;
-			const isCurrentlyUnified = select(
-				'core/edit-post'
-			).isFeatureActive( 'fixedToolbar' );
+			const isCurrentlyUnified =
+				select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
 			if ( isCurrentlyUnified !== _isUnifiedToolbar ) {
 				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
 			}
@@ -38,7 +37,7 @@ describe.each( [
 		// until starting to type within it.
 		await page.keyboard.type( 'Example' );
 
-		// Upward
+		// Upward.
 		await pressKeyWithModifier( 'alt', 'F10' );
 		expect( await isInBlockToolbar() ).toBe( true );
 	} );

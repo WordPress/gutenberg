@@ -69,11 +69,8 @@ export default function Sidebar() {
 		isGeneralSidebarOpen,
 		selectedWidgetAreaBlock,
 	} = useSelect( ( select ) => {
-		const {
-			getSelectedBlock,
-			getBlock,
-			getBlockParentsByBlockName,
-		} = select( blockEditorStore );
+		const { getSelectedBlock, getBlock, getBlockParentsByBlockName } =
+			select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 
 		const selectedBlock = getSelectedBlock();

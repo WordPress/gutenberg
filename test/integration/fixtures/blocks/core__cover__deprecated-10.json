@@ -1,0 +1,32 @@
+[
+	{
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"url": "https://w.wiki/59Sd",
+			"useFeaturedImage": false,
+			"id": 609,
+			"alt": "",
+			"hasParallax": false,
+			"isRepeated": false,
+			"dimRatio": 50,
+			"backgroundType": "image",
+			"isDark": true,
+			"tagName": "div"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"align": "center",
+					"content": "",
+					"dropCap": false,
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

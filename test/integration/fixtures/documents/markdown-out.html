@@ -1,5 +1,5 @@
 <!-- wp:heading {"level":1} -->
-<h1>This is a heading with <em>italic</em></h1>
+<h1 class="wp-block-heading">This is a heading with <em>italic</em></h1>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -11,19 +11,43 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2>Lists</h2>
+<h2 class="wp-block-heading">Lists</h2>
 <!-- /wp:heading -->
 
 <!-- wp:list -->
-<ul><li>A</li><li>Bulleted<ul><li>Indented</li></ul></li><li>List</li></ul>
+<ul><!-- wp:list-item -->
+<li>A</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Bulleted<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>Indented</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>List</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
 <!-- wp:list {"ordered":true} -->
-<ol><li>One</li><li>Two</li><li>Three</li></ol>
+<ol><!-- wp:list-item -->
+<li>One</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Two</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Three</li>
+<!-- /wp:list-item --></ol>
 <!-- /wp:list -->
 
 <!-- wp:heading -->
-<h2>Table</h2>
+<h2 class="wp-block-heading">Table</h2>
 <!-- /wp:heading -->
 
 <!-- wp:table -->
@@ -35,15 +59,21 @@
 <!-- /wp:table -->
 
 <!-- wp:heading -->
-<h2>Quote</h2>
+<h2 class="wp-block-heading">Quote</h2>
 <!-- /wp:heading -->
 
 <!-- wp:quote -->
-<blockquote class="wp-block-quote"><p>First</p><p>Second</p></blockquote>
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>First</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:heading -->
-<h2>Code</h2>
+<h2 class="wp-block-heading">Code</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->

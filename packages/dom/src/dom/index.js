@@ -6,6 +6,7 @@ export { default as getRectangleFromRange } from './get-rectangle-from-range';
 export { default as getScrollContainer } from './get-scroll-container';
 export { default as getOffsetParent } from './get-offset-parent';
 export { default as isEntirelySelected } from './is-entirely-selected';
+export { default as isFormElement } from './is-form-element';
 export { default as isHorizontalEdge } from './is-horizontal-edge';
 export { default as isNumberInput } from './is-number-input';
 export { default as isTextField } from './is-text-field';

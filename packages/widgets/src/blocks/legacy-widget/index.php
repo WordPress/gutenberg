@@ -24,21 +24,9 @@ function render_block_core_legacy_widget( $attributes ) {
 		return '';
 	}
 
-	$id_base = $attributes['idBase'];
-	if ( method_exists( $wp_widget_factory, 'get_widget_key' ) && method_exists( $wp_widget_factory, 'get_widget_object' ) ) {
-		$widget_key    = $wp_widget_factory->get_widget_key( $id_base );
-		$widget_object = $wp_widget_factory->get_widget_object( $id_base );
-	} else {
-		/*
-		 * This file is copied from the published @wordpress/widgets package when WordPress
-		 * Core is built. Because the package is a dependency of both WordPress Core and the
-		 * Gutenberg plugin where the block editor is developed, this fallback condition is
-		 * required until the minimum required version of WordPress for the plugin is raised
-		 * to 5.8.
-		 */
-		$widget_key    = gutenberg_get_widget_key( $id_base );
-		$widget_object = gutenberg_get_widget_object( $id_base );
-	}
+	$id_base       = $attributes['idBase'];
+	$widget_key    = $wp_widget_factory->get_widget_key( $id_base );
+	$widget_object = $wp_widget_factory->get_widget_object( $id_base );
 
 	if ( ! $widget_key || ! $widget_object ) {
 		return '';
@@ -46,7 +34,7 @@ function render_block_core_legacy_widget( $attributes ) {
 
 	if ( isset( $attributes['instance']['encoded'], $attributes['instance']['hash'] ) ) {
 		$serialized_instance = base64_decode( $attributes['instance']['encoded'] );
-		if ( wp_hash( $serialized_instance ) !== $attributes['instance']['hash'] ) {
+		if ( ! hash_equals( wp_hash( $serialized_instance ), (string) $attributes['instance']['hash'] ) ) {
 			return '';
 		}
 		$instance = unserialize( $serialized_instance );

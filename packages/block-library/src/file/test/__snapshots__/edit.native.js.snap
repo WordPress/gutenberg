@@ -4,7 +4,7 @@ exports[`File block renders file error state without crashing 1`] = `
 <View
   pointerEvents="box-none"
   style={
-    Array [
+    [
       undefined,
       undefined,
     ]
@@ -12,7 +12,7 @@ exports[`File block renders file error state without crashing 1`] = `
 >
   <View
     style={
-      Array [
+      [
         undefined,
         undefined,
         undefined,
@@ -20,7 +20,12 @@ exports[`File block renders file error state without crashing 1`] = `
     }
   />
   <View
-    accessible={true}
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={false}
     focusable={true}
     onClick={[Function]}
     onLayout={[Function]}
@@ -30,30 +35,36 @@ exports[`File block renders file error state without crashing 1`] = `
     onResponderTerminate={[Function]}
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
+    testID="file-edit-container"
   >
     <Text
       onTextLayout={[Function]}
       style={
-        Object {
+        {
           "color": "gray",
         }
       }
-    >
-      
-    </Text>
+    />
     <View
       style={
-        Object {
+        {
           "height": 44,
         }
       }
     >
-      <View>
+      <View
+        style={
+          [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
-          activeFormats={Array []}
+          activeFormats={[]}
           blockType={
-            Object {
+            {
               "tag": "p",
             }
           }
@@ -84,68 +95,81 @@ exports[`File block renders file error state without crashing 1`] = `
           placeholder="File name"
           placeholderTextColor="gray"
           style={
-            Object {
+            {
               "backgroundColor": undefined,
               "maxWidth": undefined,
               "minHeight": 0,
             }
           }
           text={
-            Object {
+            {
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>File name</p>",
             }
           }
           textAlign="left"
-          triggerKeyCodes={Array []}
+          triggerKeyCodes={[]}
         />
       </View>
       <View>
-        Svg
+        <Svg
+          height={24}
+          style={{}}
+          viewBox="-2 -2 24 24"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          Path
+        </Svg>
         <TextInput
-          allowFontScaling={true}
           editable={false}
           fontFamily="serif"
           onChange={[Function]}
-          rejectResponderTermination={true}
           scrollEnabled={false}
           style={
-            Array [
-              Object {
+            [
+              {
                 "fontFamily": "serif",
               },
               undefined,
             ]
           }
-          underlineColorAndroid="transparent"
           value="Error"
         />
       </View>
     </View>
     <View
       style={
-        Array [
-          Array [
-            Object {
+        [
+          [
+            {
               "paddingLeft": 10,
               "paddingRight": 10,
             },
             undefined,
           ],
-          Object {
+          {
             "alignSelf": "flex-start",
           },
         ]
       }
     >
-      <View>
+      <View
+        style={
+          [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
-          activeFormats={Array []}
+          activeFormats={[]}
           blockType={
-            Object {
+            {
               "tag": "p",
             }
           }
@@ -179,7 +203,7 @@ exports[`File block renders file error state without crashing 1`] = `
           placeholderTextColor="white"
           selectionColor="white"
           style={
-            Object {
+            {
               "backgroundColor": undefined,
               "color": "white",
               "maxWidth": 80,
@@ -187,15 +211,16 @@ exports[`File block renders file error state without crashing 1`] = `
             }
           }
           text={
-            Object {
+            {
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>Download</p>",
             }
           }
           textAlign="center"
-          triggerKeyCodes={Array []}
+          triggerKeyCodes={[]}
         />
       </View>
     </View>
@@ -207,7 +232,7 @@ exports[`File block renders file without crashing 1`] = `
 <View
   pointerEvents="box-none"
   style={
-    Array [
+    [
       undefined,
       undefined,
     ]
@@ -215,7 +240,7 @@ exports[`File block renders file without crashing 1`] = `
 >
   <View
     style={
-      Array [
+      [
         undefined,
         undefined,
         undefined,
@@ -223,7 +248,12 @@ exports[`File block renders file without crashing 1`] = `
     }
   />
   <View
-    accessible={true}
+    accessibilityState={
+      {
+        "disabled": false,
+      }
+    }
+    accessible={false}
     focusable={true}
     onClick={[Function]}
     onLayout={[Function]}
@@ -233,30 +263,36 @@ exports[`File block renders file without crashing 1`] = `
     onResponderTerminate={[Function]}
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
+    testID="file-edit-container"
   >
     <Text
       onTextLayout={[Function]}
       style={
-        Object {
+        {
           "color": "gray",
         }
       }
-    >
-      
-    </Text>
+    />
     <View
       style={
-        Object {
+        {
           "height": 44,
         }
       }
     >
-      <View>
+      <View
+        style={
+          [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
-          activeFormats={Array []}
+          activeFormats={[]}
           blockType={
-            Object {
+            {
               "tag": "p",
             }
           }
@@ -287,47 +323,55 @@ exports[`File block renders file without crashing 1`] = `
           placeholder="File name"
           placeholderTextColor="gray"
           style={
-            Object {
+            {
               "backgroundColor": undefined,
               "maxWidth": undefined,
               "minHeight": 0,
             }
           }
           text={
-            Object {
+            {
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>File name</p>",
             }
           }
           textAlign="left"
-          triggerKeyCodes={Array []}
+          triggerKeyCodes={[]}
         />
       </View>
     </View>
     <View
       style={
-        Array [
-          Array [
-            Object {
+        [
+          [
+            {
               "paddingLeft": 10,
               "paddingRight": 10,
             },
             false,
           ],
-          Object {
+          {
             "alignSelf": "flex-start",
           },
         ]
       }
     >
-      <View>
+      <View
+        style={
+          [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
-          activeFormats={Array []}
+          activeFormats={[]}
           blockType={
-            Object {
+            {
               "tag": "p",
             }
           }
@@ -361,7 +405,7 @@ exports[`File block renders file without crashing 1`] = `
           placeholderTextColor="white"
           selectionColor="white"
           style={
-            Object {
+            {
               "backgroundColor": undefined,
               "color": "white",
               "maxWidth": 80,
@@ -369,15 +413,16 @@ exports[`File block renders file without crashing 1`] = `
             }
           }
           text={
-            Object {
+            {
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>Download</p>",
             }
           }
           textAlign="center"
-          triggerKeyCodes={Array []}
+          triggerKeyCodes={[]}
         />
       </View>
     </View>
@@ -388,7 +433,7 @@ exports[`File block renders file without crashing 1`] = `
 exports[`File block renders placeholder without crashing 1`] = `
 <View
   style={
-    Object {
+    {
       "flex": 1,
     }
   }
@@ -407,8 +452,8 @@ exports[`File block renders placeholder without crashing 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      Array [
-        Array [
+      [
+        [
           undefined,
           undefined,
           undefined,
@@ -419,15 +464,23 @@ exports[`File block renders placeholder without crashing 1`] = `
   >
     <View
       style={
-        Object {
+        {
           "fill": "gray",
         }
       }
     >
       <View
-        style={Object {}}
+        style={{}}
       >
-        Svg
+        <Svg
+          height={24}
+          style={{}}
+          viewBox="0 0 24 24"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          Path
+        </Svg>
       </View>
     </View>
     <Text>

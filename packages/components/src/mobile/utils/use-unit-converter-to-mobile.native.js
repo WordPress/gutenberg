@@ -40,6 +40,10 @@ const convertUnitToMobile = ( containerSize, globalStyles, value, unit ) => {
 	const { valueToConvert, valueUnit } = getValueAndUnit( value, unit ) || {};
 	const { fontSize = 16 } = globalStyles || {};
 
+	if ( valueToConvert === undefined ) {
+		return undefined;
+	}
+
 	switch ( valueUnit ) {
 		case 'rem':
 		case 'em':
@@ -66,11 +70,17 @@ const useConvertUnitToMobile = ( value, unit ) => {
 	);
 
 	useEffect( () => {
-		Dimensions.addEventListener( 'change', onDimensionsChange );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onDimensionsChange
+		);
 
 		return () => {
-			Dimensions.removeEventListener( 'change', onDimensionsChange );
+			dimensionsChangeSubscription.remove();
 		};
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	const onDimensionsChange = useCallback( ( { window } ) => {
@@ -78,7 +88,8 @@ const useConvertUnitToMobile = ( value, unit ) => {
 	}, [] );
 
 	return useMemo( () => {
-		const { valueToConvert, valueUnit } = getValueAndUnit( value, unit );
+		const { valueToConvert, valueUnit } =
+			getValueAndUnit( value, unit ) || {};
 
 		return convertUnitToMobile(
 			windowSizes,
@@ -86,6 +97,9 @@ const useConvertUnitToMobile = ( value, unit ) => {
 			valueToConvert,
 			valueUnit
 		);
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ windowSizes, value, unit ] );
 };
 

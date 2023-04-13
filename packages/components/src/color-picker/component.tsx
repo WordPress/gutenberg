@@ -1,51 +1,36 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import { Ref, useCallback } from 'react';
+import type { ForwardedRef } from 'react';
 import { colord, extend, Colord } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
-import { settings } from '@wordpress/icons';
+import { useCallback, useState, useMemo } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import {
-	useContextSystem,
-	contextConnect,
-	WordPressComponentProps,
-} from '../ui/context';
-import { HStack } from '../h-stack';
-import { Spacer } from '../spacer';
+import { useContextSystem, contextConnect } from '../ui/context';
 import {
 	ColorfulWrapper,
 	SelectControl,
 	AuxiliaryColorArtefactWrapper,
-	DetailsControlButton,
+	AuxiliaryColorArtefactHStackHeader,
+	ColorInputWrapper,
 } from './styles';
-import { ColorDisplay } from './color-display';
+import { ColorCopyButton } from './color-copy-button';
 import { ColorInput } from './color-input';
 import { Picker } from './picker';
 import { useControlledValue } from '../utils/hooks';
 
-import type { ColorType } from './types';
+import type { ColorPickerProps, ColorType } from './types';
 
 extend( [ namesPlugin ] );
-
-export interface ColorPickerProps {
-	enableAlpha?: boolean;
-	color?: string;
-	onChange?: ( color: string ) => void;
-	defaultValue?: string;
-	copyFormat?: ColorType;
-}
 
 const options = [
 	{ label: 'RGB', value: 'rgb' as const },
@@ -53,9 +38,9 @@ const options = [
 	{ label: 'Hex', value: 'hex' as const },
 ];
 
-const ColorPicker = (
-	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
-	forwardedRef: Ref< any >
+const UnconnectedColorPicker = (
+	props: ColorPickerProps,
+	forwardedRef: ForwardedRef< any >
 ) => {
 	const {
 		enableAlpha = false,
@@ -74,7 +59,7 @@ const ColorPicker = (
 	} );
 
 	const safeColordColor = useMemo( () => {
-		return colord( color );
+		return colord( color || '' );
 	}, [ color ] );
 
 	const debouncedSetColor = useDebounce( setColor );
@@ -86,7 +71,6 @@ const ColorPicker = (
 		[ debouncedSetColor ]
 	);
 
-	const [ showInputs, setShowInputs ] = useState< boolean >( false );
 	const [ colorType, setColorType ] = useState< ColorType >(
 		copyFormat || 'hex'
 	);
@@ -99,50 +83,38 @@ const ColorPicker = (
 				enableAlpha={ enableAlpha }
 			/>
 			<AuxiliaryColorArtefactWrapper>
-				<HStack justify="space-between">
-					{ showInputs ? (
-						<SelectControl
-							options={ options }
-							value={ colorType }
-							onChange={ ( nextColorType ) =>
-								setColorType( nextColorType as ColorType )
-							}
-							label={ __( 'Color format' ) }
-							hideLabelFromVision
-						/>
-					) : (
-						<ColorDisplay
-							color={ safeColordColor }
-							colorType={ copyFormat || colorType }
-							enableAlpha={ enableAlpha }
-						/>
-					) }
-					<DetailsControlButton
-						isSmall
-						onClick={ () => setShowInputs( ! showInputs ) }
-						icon={ settings }
-						isPressed={ showInputs }
-						label={
-							showInputs
-								? __( 'Hide detailed inputs' )
-								: __( 'Show detailed inputs' )
+				<AuxiliaryColorArtefactHStackHeader justify="space-between">
+					<SelectControl
+						__nextHasNoMarginBottom
+						options={ options }
+						value={ colorType }
+						onChange={ ( nextColorType ) =>
+							setColorType( nextColorType as ColorType )
 						}
+						label={ __( 'Color format' ) }
+						hideLabelFromVision
 					/>
-				</HStack>
-				<Spacer margin={ 4 } />
-				{ showInputs && (
+					<ColorCopyButton
+						color={ safeColordColor }
+						colorType={ copyFormat || colorType }
+					/>
+				</AuxiliaryColorArtefactHStackHeader>
+				<ColorInputWrapper direction="column" gap={ 2 }>
 					<ColorInput
 						colorType={ colorType }
 						color={ safeColordColor }
 						onChange={ handleChange }
 						enableAlpha={ enableAlpha }
 					/>
-				) }
+				</ColorInputWrapper>
 			</AuxiliaryColorArtefactWrapper>
 		</ColorfulWrapper>
 	);
 };
 
-const ConnectedColorPicker = contextConnect( ColorPicker, 'ColorPicker' );
+export const ColorPicker = contextConnect(
+	UnconnectedColorPicker,
+	'ColorPicker'
+);
 
-export default ConnectedColorPicker;
+export default ColorPicker;

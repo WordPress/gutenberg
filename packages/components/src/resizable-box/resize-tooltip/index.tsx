@@ -1,15 +1,13 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
+import type { Ref, ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
 
 /**
  * Internal dependencies
@@ -31,6 +29,8 @@ type ResizeTooltipProps = React.ComponentProps< typeof Root > & {
 	zIndex?: number;
 };
 
+const noop = () => {};
+
 function ResizeTooltip(
 	{
 		axis,
@@ -44,7 +44,7 @@ function ResizeTooltip(
 		zIndex = 1000,
 		...props
 	}: ResizeTooltipProps,
-	ref: Ref< HTMLDivElement >
+	ref: ForwardedRef< HTMLDivElement >
 ): JSX.Element | null {
 	const { label, resizeListener } = useResizeLabel( {
 		axis,

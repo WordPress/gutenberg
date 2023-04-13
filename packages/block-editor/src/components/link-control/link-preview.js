@@ -44,7 +44,8 @@ export default function LinkPreview( {
 
 	const displayTitle = richData?.title || value?.title || displayURL;
 
-	const isEmptyURL = ! value.url.length;
+	// url can be undefined if the href attribute is unset
+	const isEmptyURL = ! value?.url?.length;
 
 	let icon;
 
@@ -59,7 +60,6 @@ export default function LinkPreview( {
 	return (
 		<div
 			aria-label={ __( 'Currently selected' ) }
-			aria-selected="true"
 			className={ classnames( 'block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,
@@ -98,7 +98,7 @@ export default function LinkPreview( {
 							</>
 						) : (
 							<span className="block-editor-link-control__search-item-error-notice">
-								Link is empty
+								{ __( 'Link is empty' ) }
 							</span>
 						) }
 					</span>
@@ -123,9 +123,11 @@ export default function LinkPreview( {
 				<ViewerSlot fillProps={ value } />
 			</div>
 
-			{ ( ( hasRichData &&
-				( richData?.image || richData?.description ) ) ||
-				isFetching ) && (
+			{ !! (
+				( hasRichData &&
+					( richData?.image || richData?.description ) ) ||
+				isFetching
+			) && (
 				<div className="block-editor-link-control__search-item-bottom">
 					{ ( richData?.image || isFetching ) && (
 						<div

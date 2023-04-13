@@ -3,8 +3,8 @@
 	"apiVersion": 2,
 	"name": "core/comments-pagination",
 	"title": "Comments Pagination",
-	"category": "design",
-	"parent": [ "core/comments-query-loop" ],
+	"category": "theme",
+	"parent": [ "core/comments" ],
 	"description": "Displays a paginated navigation to next/previous set of comments, when applicable.",
 	"textdomain": "default",
 	"attributes": {
@@ -14,21 +14,40 @@
 		}
 	},
 	"providesContext": {
-		"paginationArrow": "paginationArrow"
+		"comments/paginationArrow": "paginationArrow"
 	},
 	"supports": {
+		"anchor": true,
 		"align": true,
 		"reusable": false,
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
 		},
 		"__experimentalLayout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {
 				"type": "flex"
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
 			}
 		}
 	},

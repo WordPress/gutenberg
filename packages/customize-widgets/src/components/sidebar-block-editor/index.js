@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { defaultTo } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
@@ -22,7 +17,7 @@ import {
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -48,21 +43,19 @@ export default function SidebarBlockEditor( {
 		keepCaretInsideBlock,
 		isWelcomeGuideActive,
 	} = useSelect( ( select ) => {
-		const { isFeatureActive } = select( interfaceStore );
+		const { get } = select( preferencesStore );
 		return {
-			hasUploadPermissions: defaultTo(
-				select( coreStore ).canUser( 'create', 'media' ),
-				true
-			),
-			isFixedToolbarActive: isFeatureActive(
+			hasUploadPermissions:
+				select( coreStore ).canUser( 'create', 'media' ) ?? true,
+			isFixedToolbarActive: !! get(
 				'core/customize-widgets',
 				'fixedToolbar'
 			),
-			keepCaretInsideBlock: isFeatureActive(
+			keepCaretInsideBlock: !! get(
 				'core/customize-widgets',
 				'keepCaretInsideBlock'
 			),
-			isWelcomeGuideActive: isFeatureActive(
+			isWelcomeGuideActive: !! get(
 				'core/customize-widgets',
 				'welcomeGuide'
 			),

@@ -52,6 +52,7 @@
 		"fontSize",
 		"customFontSize",
 		"showSubmenuIcon",
+		"maxNestingLevel",
 		"openSubmenusOnClick",
 		"style"
 	],

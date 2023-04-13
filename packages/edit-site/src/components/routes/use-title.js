@@ -6,6 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -36,8 +37,8 @@ export default function useTitle( title ) {
 			const formattedTitle = sprintf(
 				/* translators: Admin screen title. 1: Admin screen name, 2: Network or site name. */
 				__( '%1$s ‹ %2$s — WordPress' ),
-				title,
-				siteTitle
+				decodeEntities( title ),
+				decodeEntities( siteTitle )
 			);
 
 			document.title = formattedTitle;

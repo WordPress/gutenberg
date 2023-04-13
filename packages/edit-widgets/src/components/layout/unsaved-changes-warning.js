@@ -32,7 +32,7 @@ export default function UnsavedChangesWarning() {
 		 *
 		 * @param {Event} event `beforeunload` event.
 		 *
-		 * @return {?string} Warning prompt message, if unsaved changes exist.
+		 * @return {string | undefined} Warning prompt message, if unsaved changes exist.
 		 */
 		const warnIfUnsavedChanges = ( event ) => {
 			if ( isDirty ) {

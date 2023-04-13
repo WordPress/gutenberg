@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/post-title",
 		"isValid": true,
 		"attributes": {
@@ -9,7 +8,6 @@
 			"rel": "",
 			"linkTarget": "_self"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

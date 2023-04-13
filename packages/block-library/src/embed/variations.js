@@ -26,12 +26,13 @@ import {
 	embedDailymotionIcon,
 	embedPinterestIcon,
 	embedWolframIcon,
+	embedPocketCastsIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
 /**
- * Template option choices for predefined columns layouts.
+ * The embed provider services.
  *
  * @type {WPBlockVariation[]}
  */
@@ -151,7 +152,7 @@ const variations = [
 		attributes: { providerNameSlug: 'cloudup', responsive: true },
 	},
 	{
-		// Deprecated since CollegeHumor content is now powered by YouTube
+		// Deprecated since CollegeHumor content is now powered by YouTube.
 		name: 'collegehumor',
 		title: 'CollegeHumor',
 		icon: embedVideoIcon,
@@ -167,7 +168,7 @@ const variations = [
 		keywords: [ 'polldaddy', __( 'survey' ) ],
 		description: __( 'Embed Crowdsignal (formerly Polldaddy) content.' ),
 		patterns: [
-			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i,
+			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.crowdsignal\.net|.+\.survey\.fm)\/.+/i,
 		],
 		attributes: { providerNameSlug: 'crowdsignal', responsive: true },
 	},
@@ -215,6 +216,15 @@ const variations = [
 		description: __( 'Embed Mixcloud content.' ),
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
 		attributes: { providerNameSlug: 'mixcloud', responsive: true },
+	},
+	{
+		name: 'pocketcasts',
+		title: 'Pocket Casts',
+		icon: embedPocketCastsIcon,
+		keywords: [ __( 'podcast' ), __( 'audio' ) ],
+		description: __( 'Embed a podcast player from Pocket Casts.' ),
+		patterns: [ /^https:\/\/pca.st\/\w+/i ],
+		attributes: { providerNameSlug: 'pocketcasts', responsive: true },
 	},
 	{
 		name: 'reddit',
@@ -299,7 +309,7 @@ const variations = [
 		icon: embedTumblrIcon,
 		keywords: [ __( 'social' ) ],
 		description: __( 'Embed a Tumblr post.' ),
-		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],
+		patterns: [ /^https?:\/\/(.+)\.tumblr\.com\/.+/i ],
 		attributes: { providerNameSlug: 'tumblr', responsive: true },
 	},
 	{
@@ -344,9 +354,9 @@ const variations = [
 	},
 	{
 		name: 'wolfram-cloud',
-		title: 'Wolfram Cloud',
+		title: 'Wolfram',
 		icon: embedWolframIcon,
-		description: __( 'Embed Wolfram Cloud notebook content.' ),
+		description: __( 'Embed Wolfram notebook content.' ),
 		patterns: [ /^https?:\/\/(www\.)?wolframcloud\.com\/obj\/.+/i ],
 		attributes: { providerNameSlug: 'wolfram-cloud', responsive: true },
 	},

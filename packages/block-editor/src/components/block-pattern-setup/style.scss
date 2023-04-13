@@ -5,62 +5,90 @@
 	align-items: flex-start;
 	width: 100%;
 	border-radius: $radius-block-ui;
-	box-shadow: inset 0 0 0 $border-width $gray-900;
-	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 
-	// TODO change to check parent.
 	&.view-mode-grid {
+		padding-top: $grid-unit-05;
+
 		.block-editor-block-pattern-setup__toolbar {
 			justify-content: center;
 		}
 
 		.block-editor-block-pattern-setup__container {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			grid-gap: $grid-unit-20;
-			padding: $grid-unit-20;
-			max-height: 550px;
-			overflow: auto;
-			margin: 0 $border-width $border-width $border-width;
-			width: calc(100% - #{ $border-width * 2 });
-			background: $white;
+			column-gap: $grid-unit-30;
+			display: block;
+			width: 100%;
+			padding: $grid-unit-40;
+			padding-bottom: 0;
+			padding-top: 0;
+			column-count: 2;
+
+			@include break-huge() {
+				column-count: 3;
+			}
 
 			.block-editor-block-preview__container,
 			div[role="button"] {
 				cursor: pointer;
 			}
 
-			.block-editor-block-pattern-setup-list__item-title {
-				padding: $grid-unit-05;
-				font-size: $helptext-font-size;
-				text-align: center;
-			}
+			.block-editor-block-pattern-setup-list__item {
+				&:hover .block-editor-block-preview__container {
+					box-shadow: 0 0 0 2px var(--wp-admin-theme-color);
+				}
 
-			.block-editor-block-preview__container {
-				border-radius: $radius-block-ui;
-				border: $border-width solid $gray-300;
+				&:focus .block-editor-block-preview__container {
+					box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+					// Windows High Contrast mode will show this outline, but not the box-shadow.
+					outline: 2px solid transparent;
+				}
+				&:hover .block-editor-block-pattern-setup-list__item-title,
+				&:focus .block-editor-block-pattern-setup-list__item-title {
+					color: var(--wp-admin-theme-color);
+				}
+			}
+			.block-editor-block-pattern-setup-list__list-item {
+				break-inside: avoid-column;
+				margin-bottom: $grid-unit-30;
+
+				.block-editor-block-pattern-setup-list__item-title {
+					padding-top: $grid-unit-10;
+					font-size: 12px;
+					text-align: center;
+					cursor: pointer;
+				}
+
+				.block-editor-block-preview__container {
+					min-height: 100px;
+					border-radius: $radius-block-ui;
+					border: $border-width solid $gray-300;
+				}
+
+				.block-editor-block-preview__content {
+					width: 100%;
+				}
 			}
 		}
 	}
 
 	.block-editor-block-pattern-setup__toolbar {
+		height: $header-height;
 		box-sizing: border-box;
-		position: relative;
 		padding: $grid-unit-20;
 		width: 100%;
 		text-align: left;
 		margin: 0;
 		color: $gray-900;
+		position: absolute;
+		bottom: 0;
 		// Block UI appearance.
-		border-radius: $radius-block-ui $radius-block-ui 0 0;
 		background-color: $white;
-		box-shadow: inset 0 0 0 $border-width $gray-900;
-		outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
-
 		display: flex;
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
+		border-top: 1px solid $gray-300;
+		align-self: flex-end;
 
 		.block-editor-block-pattern-setup__display-controls {
 			display: flex;
@@ -80,6 +108,7 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
+		height: 100%;
 		box-sizing: border-box;
 
 		.carousel-container {
@@ -87,19 +116,21 @@
 			position: relative;
 			padding: 0;
 			margin: 0;
+			height: 100%;
 			list-style: none;
 			transform-style: preserve-3d;
 			* {
 				box-sizing: border-box;
 			}
 			.pattern-slide {
-				opacity: 0;
 				position: absolute;
 				top: 0;
 				width: 100%;
+				height: 100%;
+				background-color: $white;
 				margin: auto;
-				padding: $grid-unit-20;
-				transition: transform 0.5s, opacity 0.5s, z-index 0.5s;
+				padding: 0;
+				transition: transform 0.5s, z-index 0.5s;
 				z-index: z-index(".block-editor-block-pattern-setup .pattern-slide");
 
 				&.active-slide {
@@ -124,4 +155,9 @@
 			display: none;
 		}
 	}
+}
+
+.block-editor-block-pattern-setup__carousel,
+.block-editor-block-pattern-setup__grid {
+	width: 100%;
 }

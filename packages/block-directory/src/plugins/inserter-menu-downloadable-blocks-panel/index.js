@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __unstableInserterMenuExtension } from '@wordpress/block-editor';
+import { debounce } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 
 /**

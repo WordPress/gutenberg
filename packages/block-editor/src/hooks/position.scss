@@ -1,0 +1,18 @@
+.block-editor-hooks__position-selection__select-control {
+	.components-custom-select-control__hint {
+		display: none;
+	}
+}
+
+.block-editor-hooks__position-selection__select-control__option {
+	&.has-hint {
+		grid-template-columns: auto 30px;
+		line-height: $default-line-height;
+		margin-bottom: 0;
+	}
+
+	.components-custom-select-control__item-hint {
+		grid-row: 2;
+		text-align: left;
+	}
+}

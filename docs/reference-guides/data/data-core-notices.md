@@ -8,8 +8,27 @@ Namespace: `core/notices`.
 
 ### getNotices
 
-Returns all notices as an array, optionally for a given context. Defaults to
-the global context.
+Returns all notices as an array, optionally for a given context. Defaults to the global context.
+
+_Usage_
+
+```js
+import { useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+
+const ExampleComponent = () => {
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
+	return (
+		<ul>
+			{ notices.map( ( notice ) => (
+				<li key={ notice.ID }>{ notice.content }</li>
+			) ) }
+		</ul>
+	);
+};
+```
 
 _Parameters_
 
@@ -28,12 +47,38 @@ _Returns_
 
 ### createErrorNotice
 
-Returns an action object used in signalling that an error notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that an error notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 
 -   createNotice
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	const { createErrorNotice } = useDispatch( noticesStore );
+	return (
+		<Button
+			onClick={ () =>
+				createErrorNotice( __( 'An error occurred!' ), {
+					type: 'snackbar',
+					explicitDismiss: true,
+				} )
+			}
+		>
+			{ __(
+				'Generate an snackbar error notice with explicit dismiss button.'
+			) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
@@ -46,12 +91,35 @@ _Returns_
 
 ### createInfoNotice
 
-Returns an action object used in signalling that an info notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that an info notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 
 -   createNotice
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	const { createInfoNotice } = useDispatch( noticesStore );
+	return (
+		<Button
+			onClick={ () =>
+				createInfoNotice( __( 'Something happened!' ), {
+					isDismissible: false,
+				} )
+			}
+		>
+			{ __( 'Generate a notice that cannot be dismissed.' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
@@ -66,6 +134,26 @@ _Returns_
 
 Returns an action object used in signalling that a notice is to be created.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	const { createNotice } = useDispatch( noticesStore );
+	return (
+		<Button
+			onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
+		>
+			{ __( 'Generate a success notice!' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _status_ `[string]`: Notice status.
@@ -77,8 +165,8 @@ _Parameters_
 -   _options.type_ `[string]`: Type of notice, one of `default`, or `snackbar`.
 -   _options.speak_ `[boolean]`: Whether the notice content should be announced to screen readers.
 -   _options.actions_ `[Array<WPNoticeAction>]`: User actions to be presented with notice.
--   _options.icon_ `[Object]`: An icon displayed with the notice.
--   _options.explicitDismiss_ `[boolean]`: Whether the notice includes an explict dismiss button and can't be dismissed by clicking the body of the notice.
+-   _options.icon_ `[string]`: An icon displayed with the notice. Only used when type is set to `snackbar`.
+-   _options.explicitDismiss_ `[boolean]`: Whether the notice includes an explicit dismiss button and can't be dismissed by clicking the body of the notice. Only applies when type is set to `snackbar`.
 -   _options.onDismiss_ `[Function]`: Called when the notice is dismissed.
 
 _Returns_
@@ -87,12 +175,36 @@ _Returns_
 
 ### createSuccessNotice
 
-Returns an action object used in signalling that a success notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that a success notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 
 -   createNotice
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	return (
+		<Button
+			onClick={ () =>
+				createSuccessNotice( __( 'Success!' ), {
+					type: 'snackbar',
+					icon: '🔥',
+				} )
+			}
+		>
+			{ __( 'Generate a snackbar success notice!' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
@@ -105,12 +217,40 @@ _Returns_
 
 ### createWarningNotice
 
-Returns an action object used in signalling that a warning notice is to be
-created. Refer to `createNotice` for options documentation.
+Returns an action object used in signalling that a warning notice is to be created. Refer to `createNotice` for options documentation.
 
 _Related_
 
 -   createNotice
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	const { createWarningNotice, createInfoNotice } =
+		useDispatch( noticesStore );
+	return (
+		<Button
+			onClick={ () =>
+				createWarningNotice( __( 'Warning!' ), {
+					onDismiss: () => {
+						createInfoNotice(
+							__( 'The warning has been dismissed!' )
+						);
+					},
+				} )
+			}
+		>
+			{ __( 'Generates a warning notice with onDismiss callback' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
@@ -124,6 +264,41 @@ _Returns_
 ### removeNotice
 
 Returns an action object used in signalling that a notice is to be removed.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
+	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
+
+	return (
+		<>
+			<Button
+				onClick={ () =>
+					createWarningNotice( __( 'Warning!' ), {
+						isDismissible: false,
+					} )
+				}
+			>
+				{ __( 'Generate a notice' ) }
+			</Button>
+			{ notices.length > 0 && (
+				<Button onClick={ () => removeNotice( notices[ 0 ].id ) }>
+					{ __( 'Remove the notice' ) }
+				</Button>
+			) }
+		</>
+	);
+};
+```
 
 _Parameters_
 
