@@ -414,7 +414,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 // MARK: - RCTBridgeModule delegate
 
 public extension Gutenberg {
-    public enum ActionButtonType: String {
+    enum ActionButtonType: String {
         case missingBlockAlertActionButton = "missing_block_alert_action_button"
     }
 }
