@@ -24,9 +24,12 @@ import { useEditorWrapperStyles } from '../../hooks/use-editor-wrapper-styles';
  * @param {number}   props.blockWidth                   The width of the block.
  * @param {string}   props.clientId                     The block client ID.
  * @param {string}   props.contentResizeMode            The content resize mode, e.g "stretch".
+ * @param {Object}   props.contentStyle                 Styles for the block content
  * @param {boolean}  props.isStackedHorizontally        Whether the block is stacked horizontally.
  * @param {number}   props.marginHorizontal             The horizontal margin.
  * @param {number}   props.marginVertical               The vertical margin.
+ * @param {Function} props.onAddBlock                   On Add block callback.
+ * @param {Function} props.onDeleteBlock                On delete block callback.
  * @param {number}   props.parentWidth                  The width of the parent block.
  * @param {string}   props.rootClientId                 The root client ID.
  * @param {Function} props.shouldShowInnerBlockAppender Whether to show the inner block appender.
@@ -37,9 +40,12 @@ function BlockListItemContent( {
 	blockWidth,
 	clientId,
 	contentResizeMode,
+	contentStyle,
 	isStackedHorizontally,
 	marginHorizontal,
 	marginVertical,
+	onAddBlock,
+	onDeleteBlock,
 	parentWidth,
 	rootClientId,
 	shouldShowInnerBlockAppender,
@@ -127,8 +133,12 @@ function BlockListItemContent( {
 			<Block
 				blockWidth={ blockWidth }
 				clientId={ clientId }
+				contentStyle={ contentStyle }
+				isStackedHorizontally={ isStackedHorizontally }
 				marginHorizontal={ margin }
 				marginVertical={ marginVertical }
+				onAddBlock={ onAddBlock }
+				onDeleteBlock={ onDeleteBlock }
 				parentWidth={ parentWidth }
 			/>
 			{ shouldShowBlockInsertionPointAfter && <BlockInsertionPoint /> }
@@ -148,9 +158,12 @@ function BlockListItemContent( {
  * @param {number}   props.blockWidth                   The width of the block.
  * @param {string}   props.clientId                     The block client ID.
  * @param {string}   props.contentResizeMode            The content resize mode, e.g "stretch".
+ * @param {Object}   props.contentStyle                 Styles for the block content
  * @param {boolean}  props.isStackedHorizontally        Whether the block is stacked horizontally.
  * @param {number}   props.marginHorizontal             The horizontal margin.
  * @param {number}   props.marginVertical               The vertical margin.
+ * @param {Function} props.onAddBlock                   On Add block callback.
+ * @param {Function} props.onDeleteBlock                On delete block callback.
  * @param {string}   props.rootClientId                 The root client ID.
  * @param {Function} props.shouldShowInnerBlockAppender Whether to show the inner block appender.
  *
